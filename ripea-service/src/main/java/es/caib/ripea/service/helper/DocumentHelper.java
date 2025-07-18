@@ -1887,7 +1887,7 @@ public class DocumentHelper {
 		if (docsIdx != null) {
 			for (Long docId: docsIdx) {
 				FitxerDto fitxer = getFitxerAssociat(docId, null);
-				ZipEntry entry = new ZipEntry(revisarContingutNom(fitxer.getNom()) + "." + FilenameUtils.getExtension(fitxer.getNom()));
+				ZipEntry entry = new ZipEntry(revisarContingutNom(docId.toString()+"_"+fitxer.getNom()));// + "." + FilenameUtils.getExtension(fitxer.getNom()));
 				entry.setSize(fitxer.getContingut().length);
 				zos.putNextEntry(entry);
 				zos.write(fitxer.getContingut());

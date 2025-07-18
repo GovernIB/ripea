@@ -80,10 +80,10 @@ export const Firmes = (props:any) => {
                     {
                         firma?.detalls?.map((detall:any, index:number) =>
                             <Grid item xs={12} key={index}>
-                                <ContenidoData xs={6} title={t('page.arxiu.firma.responsableNom')}>{detall?.responsableNom}</ContenidoData>
-                                <ContenidoData xs={6} title={t('page.arxiu.firma.responsableNif')}>{detall?.responsableNif}</ContenidoData>
-                                <ContenidoData xs={6} title={t('page.arxiu.firma.data')}>{formatDate(detall?.data)}</ContenidoData>
-                                <ContenidoData xs={6} title={t('page.arxiu.firma.emissorCertificat')}>{detall?.emissorCertificat}</ContenidoData>
+                                <ContenidoData xs={12} title={t('page.arxiu.firma.responsableNom')}>{detall?.responsableNom}</ContenidoData>
+                                <ContenidoData xs={12} title={t('page.arxiu.firma.responsableNif')}>{detall?.responsableNif}</ContenidoData>
+                                <ContenidoData xs={12} title={t('page.arxiu.firma.data')}>{formatDate(detall?.data)}</ContenidoData>
+                                <ContenidoData xs={12} title={t('page.arxiu.firma.emissorCertificat')}>{detall?.emissorCertificat}</ContenidoData>
                             </Grid>
                         )
                     }

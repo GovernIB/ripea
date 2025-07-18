@@ -33,11 +33,13 @@ import es.caib.ripea.persistence.entity.DocumentEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.ViaFirmaUsuariEntity;
 import es.caib.ripea.persistence.entity.resourceentity.DocumentResourceEntity;
+import es.caib.ripea.persistence.entity.resourceentity.ExpedientResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.InteressatResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaDocumentResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.RegistreAnnexResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.UsuariResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.DocumentResourceRepository;
+import es.caib.ripea.persistence.entity.resourcerepository.ExpedientResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.InteressatResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaDocumentResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.RegistreAnnexResourceRepository;
@@ -149,6 +151,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     private final UsuariResourceRepository usuariResourceRepository;
     private final DocumentResourceRepository documentResourceRepository;
     private final MetaDocumentResourceRepository metaDocumentResourceRepository;
+    private final ExpedientResourceRepository expedientResourceRepository;
     private final InteressatResourceRepository interessatResourceRepository;
     private final RegistreAnnexResourceRepository registreAnnexResourceRepository;
     private final ContingutMovimentRepository contingutMovimentRepository;
@@ -741,13 +744,18 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
             	documentDto.setFitxerContingut(fitxerDto.getContingut());
             	documentDto.setFitxerContentType(fitxerDto.getContentType());
             	documentDto.setFitxerTamany((long)fitxerDto.getContentType().length());
+            	documentDto.setFitxerNom(fitxerDto.getNom());
             	documentDto.setAmbFirma(false);
             	documentDto.setData(Calendar.getInstance().getTime());
             	documentDto = documentHelper.crearDocument(entitatEntity.getId(), documentDto, pare, true, false);
-            	
+
             	DocumentResourceEntity newZipFile = new DocumentResourceEntity();
         		newZipFile.setId(documentDto.getId());
         		newZipFile.setNom(documentDto.getNom());
+        		//newZipFile.setExpedient(expedientResourceRepository.findById(params.getExpedient().getId()).get());
+        		ExpedientResourceEntity ere = new ExpedientResourceEntity();
+        		ere.setId(params.getExpedient().getId());
+        		newZipFile.setExpedient(ere);
         		
         		return objectMappingHelper.newInstanceMap(newZipFile, DocumentResource.class);
         		

@@ -371,8 +371,8 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
     }
     
     private class AdressaPerspectiveApplicator implements PerspectiveApplicator<InteressatResourceEntity, InteressatResource> {
-        @Override
-        public void applySingle(String code, InteressatResourceEntity entity, InteressatResource resource) throws PerspectiveApplicationException {
+    	
+    	private void carregaDadesAdressa(InteressatResourceEntity entity, InteressatResource resource) {
         	if (Utils.hasValue(resource.getPais())) {
         		Pais pais = pluginHelper.dadesExternesPaisFindByCodi(resource.getPais());
         		resource.setPaisNom(pais!=null?pais.getNom():"");
@@ -385,6 +385,14 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
             		Municipi muni = pluginHelper.dadesExternesMunicipisFindByCodi(resource.getProvincia(), resource.getMunicipi());
             		resource.setMunicipiNom(muni!=null?muni.getNom():"");
             	}
+        	}
+    	}
+    	
+        @Override
+        public void applySingle(String code, InteressatResourceEntity entity, InteressatResource resource) throws PerspectiveApplicationException {
+        	carregaDadesAdressa(entity, resource);
+        	if (entity.getRepresentant()!=null) {
+        		carregaDadesAdressa(entity.getRepresentant(), resource);
         	}
         }
     }
