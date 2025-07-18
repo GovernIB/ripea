@@ -8,6 +8,7 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
+import es.caib.ripea.service.helper.*;
 import org.springframework.stereotype.Service;
 
 import es.caib.ripea.persistence.entity.DocumentEntity;
@@ -16,12 +17,6 @@ import es.caib.ripea.persistence.entity.resourceentity.DocumentNotificacioResour
 import es.caib.ripea.persistence.entity.resourcerepository.DocumentNotificacioResourceRepository;
 import es.caib.ripea.plugin.notificacio.RespostaJustificantEnviamentNotib;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
-import es.caib.ripea.service.helper.ConfigHelper;
-import es.caib.ripea.service.helper.DocumentHelper;
-import es.caib.ripea.service.helper.DocumentNotificacioHelper;
-import es.caib.ripea.service.helper.EntityComprovarHelper;
-import es.caib.ripea.service.helper.ExcepcioLogHelper;
-import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
@@ -53,6 +48,8 @@ public class DocumentNotificacioResourceServiceImpl extends BaseMutableResourceS
 	private final ExcepcioLogHelper excepcioLogHelper;
 	private final EntityComprovarHelper entityComprovarHelper;
 	private final DocumentNotificacioHelper documentNotificacioHelper;
+	private final MessageHelper messageHelper;
+
 	private final DocumentNotificacioResourceRepository documentNotificacioResourceRepository;
 	
     @PostConstruct
@@ -122,12 +119,12 @@ public class DocumentNotificacioResourceServiceImpl extends BaseMutableResourceS
 
 			if (params.isMassivo()) {
                 //La generació massiva de justificants de notificacions no esta implementat. No pareix probable que la demanin. Pero ho deixam obert a implementació.
-				throw new ReportGenerationException(getResourceClass(), notificacioId, code, "La generació de justificants massiu per notificacions no esta implementat.");
+				throw new ReportGenerationException(getResourceClass(), notificacioId, code, "documentNotificacio.justificant.massive.reject");
 			} else {
 				DocumentNotificacioResourceEntity documentNotificacioResourceEntity = documentNotificacioResourceRepository.findById(notificacioId).get();
 				RespostaJustificantEnviamentNotib resposta = pluginHelper.notificacioDescarregarJustificantEnviamentNotib(documentNotificacioResourceEntity.getNotificacioIdentificador());
 				if (resposta.isError()) {
-					throw new ReportGenerationException(getResourceClass(), notificacioId, code, "La descarrega del justificant de la notificacio ha fallat: "+resposta.getErrorDescripcio());
+					throw new ReportGenerationException(getResourceClass(), notificacioId, code, messageHelper.getMessage("documentNotificacio.justificant.reject", new Object[]{resposta.getErrorDescripcio()}));
 				} else {
 	            	resultat = new DownloadableFile(
 	            			"justificantEnviament_"+notificacioId+".pdf",
@@ -182,7 +179,7 @@ public class DocumentNotificacioResourceServiceImpl extends BaseMutableResourceS
 						getResourceClass(), 
 						documentId,
 						code,
-						"La descarrega del document enviat de la notificacio ha fallat: "+ex.getMessage());
+                        messageHelper.getMessage("documentNotificacio.docEnviat.reject", new Object[]{ex.getMessage()}));
 			}
 		}
     }

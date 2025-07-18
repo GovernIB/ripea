@@ -793,7 +793,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 				return resultat;
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/expedient/export/ODS", e);
-				throw new ReportGenerationException(ExpedientResource.class, null, code, "S'ha produit un error al exportar a excel els expedients seleccionats.");
+				throw new ReportGenerationException(ExpedientResource.class, null, code, "expedient.export.ods.reject");
 			}
     	}
     	
@@ -823,7 +823,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     			return resultat;
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/expedient/export/CSV", e);
-				throw new ReportGenerationException(ExpedientResource.class, null, code, "S'ha produit un error al exportar a CSV els expedients seleccionats.");
+				throw new ReportGenerationException(ExpedientResource.class, null, code, "expedient.export.csv.reject");
 			}
     	}
     	
@@ -853,7 +853,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     			return resultat;
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/expedient/ExportIndexZipGenerator", e);
-				throw new ReportGenerationException(ExpedientResource.class, null, code, "S'ha produit un error al generar index ZIP dels expedients seleccionats.");
+				throw new ReportGenerationException(ExpedientResource.class, null, code, "expedient.export.indexZip.reject");
 			}
     	}
     	
@@ -906,7 +906,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/expedient/"+expedientId+"/exportarZipMassiu", e);
-				throw new ReportGenerationException(ExpedientResource.class, expedientId, code, "S'ha produit un error al generar el index en format PDF per els expedients seleccionats: "+e.getMessage());
+				throw new ReportGenerationException(ExpedientResource.class, expedientId, code, messageHelper.getMessage("expedient.export.indexPdf.reject", new Object[]{e.getMessage()}));
 			}
     	}
     }
@@ -982,18 +982,14 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     		ExpedientResource.ExportarDocumentMassiu params = (ExpedientResource.ExportarDocumentMassiu)data.get(0);
 
             if (params.isMassivo()) {
-	            if (params.getIds()!=null && !params.getIds().isEmpty()) {
-	            	resultat = new DownloadableFile("BACKGROUND", "application/"+fileType, null);
-	            	List<ExecucioMassivaContingutDto> elementsMassiva = execucioMassivaHelper.getMassivaContingutFromIds(params.getIds());
-	    			ExecucioMassivaDto execMassDto = new ExecucioMassivaDto(ExecucioMassivaTipusDto.EXPORTAR_ZIP, new Date(), null, configHelper.getRolActual());
-	    			execMassDto.setCarpetes(params.isCarpetes());
-	    			execMassDto.setVersioImprimible(params.isVersioImprimible());
-	    			execMassDto.setNomFitxer(params.getNomFitxer());
-	    			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
-	    			execucioMassivaHelper.saveExecucioMassiva(entitatEntity, execMassDto, elementsMassiva, ElementTipusEnumDto.EXPEDIENT);
-	            } else {
-					throw new ReportGenerationException(ExpedientResource.class, null, code, "S'ha produit un error al generar ZIP: no hi ha cap expedient seleccionat.");
-	            }
+                resultat = new DownloadableFile("BACKGROUND", "application/"+fileType, null);
+                List<ExecucioMassivaContingutDto> elementsMassiva = execucioMassivaHelper.getMassivaContingutFromIds(params.getIds());
+                ExecucioMassivaDto execMassDto = new ExecucioMassivaDto(ExecucioMassivaTipusDto.EXPORTAR_ZIP, new Date(), null, configHelper.getRolActual());
+                execMassDto.setCarpetes(params.isCarpetes());
+                execMassDto.setVersioImprimible(params.isVersioImprimible());
+                execMassDto.setNomFitxer(params.getNomFitxer());
+                EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+                execucioMassivaHelper.saveExecucioMassiva(entitatEntity, execMassDto, elementsMassiva, ElementTipusEnumDto.EXPEDIENT);
             } else {
                 Long expedientId = params.getIds().get(0);
             	try {
@@ -1015,7 +1011,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
 				} catch (Exception e) {
 					excepcioLogHelper.addExcepcio("/expedient/"+expedientId+"/exportarZipMassiu", e);
-					throw new ReportGenerationException(ExpedientResource.class, expedientId, code, "S'ha produit un error al generar ZIP per els expedients seleccionats: "+e.getMessage());
+					throw new ReportGenerationException(ExpedientResource.class, expedientId, code, messageHelper.getMessage("expedient.export.zip.reject", new Object[]{e.getMessage()}));
 				}
             }
             
@@ -1065,16 +1061,10 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 	    		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
 	    		
 	            if (params.isMassivo()) {
-	            	
-		            if (params.getIds()!=null && !params.getIds().isEmpty()) {
-		            	resultat = new DownloadableFile("BACKGROUND", "application/"+fileType, null);
-		            	List<ExecucioMassivaContingutDto> elementsMassiva = execucioMassivaHelper.getMassivaContingutFromIds(params.getIds());
-		    			ExecucioMassivaDto execMassDto = new ExecucioMassivaDto(ExecucioMassivaTipusDto.EXPORTAR_INDEX_PDF, new Date(), null, configHelper.getRolActual());
-		    			execucioMassivaHelper.saveExecucioMassiva(entitatEntity, execMassDto, elementsMassiva, ElementTipusEnumDto.EXPEDIENT);
-		            } else {
-						throw new ReportGenerationException(ExpedientResource.class, expedientId, code, "S'ha produit un error al generar el index en format PDF per els expedients seleccionats: no hi ha cap expedient seleccionat.");
-		            }
-		            
+                    resultat = new DownloadableFile("BACKGROUND", "application/"+fileType, null);
+                    List<ExecucioMassivaContingutDto> elementsMassiva = execucioMassivaHelper.getMassivaContingutFromIds(params.getIds());
+                    ExecucioMassivaDto execMassDto = new ExecucioMassivaDto(ExecucioMassivaTipusDto.EXPORTAR_INDEX_PDF, new Date(), null, configHelper.getRolActual());
+                    execucioMassivaHelper.saveExecucioMassiva(entitatEntity, execMassDto, elementsMassiva, ElementTipusEnumDto.EXPEDIENT);
 	            } else {
 	        		FitxerDto fitxerDto = expedientHelper.generarIndexExpedients(
 	        				entitatEntity.getId(),
@@ -1089,7 +1079,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/expedient/"+expedientId+"/exportarZipMassiu", e);
-				throw new ReportGenerationException(ExpedientResource.class, expedientId, code, "S'ha produit un error al generar el index en format PDF per els expedients seleccionats.");
+				throw new ReportGenerationException(ExpedientResource.class, expedientId, code, "expedient.export.indexPdf.reject");
 			}
             
             return resultat;
@@ -1121,16 +1111,10 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 	    		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
 	    		
 	            if (params.isMassivo()) {
-	            	
-		            if (params.getIds()!=null && !params.getIds().isEmpty()) {
-		            	resultat = new DownloadableFile("BACKGROUND", "application/"+fileType, null);
-		            	List<ExecucioMassivaContingutDto> elementsMassiva = execucioMassivaHelper.getMassivaContingutFromIds(params.getIds());
-		    			ExecucioMassivaDto execMassDto = new ExecucioMassivaDto(ExecucioMassivaTipusDto.EXPORTAR_INDEX_EXCEL, new Date(), null, configHelper.getRolActual());
-		    			execucioMassivaHelper.saveExecucioMassiva(entitatEntity, execMassDto, elementsMassiva, ElementTipusEnumDto.EXPEDIENT);
-		            } else {
-						throw new ReportGenerationException(ExpedientResource.class, expedientId, code, "S'ha produit un error al generar el index en format XLSX per els expedients seleccionats: no hi ha cap expedient seleccionat.");
-		            }
-		            
+                    resultat = new DownloadableFile("BACKGROUND", "application/"+fileType, null);
+                    List<ExecucioMassivaContingutDto> elementsMassiva = execucioMassivaHelper.getMassivaContingutFromIds(params.getIds());
+                    ExecucioMassivaDto execMassDto = new ExecucioMassivaDto(ExecucioMassivaTipusDto.EXPORTAR_INDEX_EXCEL, new Date(), null, configHelper.getRolActual());
+                    execucioMassivaHelper.saveExecucioMassiva(entitatEntity, execMassDto, elementsMassiva, ElementTipusEnumDto.EXPEDIENT);
 	            } else {
 	        		FitxerDto fitxerDto = expedientHelper.generarIndexExpedients(
 	        				entitatEntity.getId(),
@@ -1145,7 +1129,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/expedient/"+expedientId+"/exportarZipMassiu", e);
-				throw new ReportGenerationException(ExpedientResource.class, expedientId, code, "S'ha produit un error al generar el index en format XLSX per els expedients seleccionats.");
+				throw new ReportGenerationException(ExpedientResource.class, expedientId, code, "expedient.export.indexXlsx.reject");
 			}
             
             return resultat;
@@ -1177,16 +1161,10 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 	    		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
 	    		
 	            if (params.isMassivo()) {
-	            	
-		            if (params.getIds()!=null && !params.getIds().isEmpty()) {
-		            	resultat = new DownloadableFile("BACKGROUND", "application/"+fileType, null);
-		            	List<ExecucioMassivaContingutDto> elementsMassiva = execucioMassivaHelper.getMassivaContingutFromIds(params.getIds());
-		    			ExecucioMassivaDto execMassDto = new ExecucioMassivaDto(ExecucioMassivaTipusDto.EXPORTAR_ENI, new Date(), null, configHelper.getRolActual());
-		    			execucioMassivaHelper.saveExecucioMassiva(entitatEntity, execMassDto, elementsMassiva, ElementTipusEnumDto.EXPEDIENT);
-		            } else {
-						throw new ReportGenerationException(ExpedientResource.class, expedientId, code, "S'ha produit un error al exportar a ENI els expedients seleccionats: no hi ha cap expedient seleccionat.");
-		            }
-		            
+                    resultat = new DownloadableFile("BACKGROUND", "application/"+fileType, null);
+                    List<ExecucioMassivaContingutDto> elementsMassiva = execucioMassivaHelper.getMassivaContingutFromIds(params.getIds());
+                    ExecucioMassivaDto execMassDto = new ExecucioMassivaDto(ExecucioMassivaTipusDto.EXPORTAR_ENI, new Date(), null, configHelper.getRolActual());
+                    execucioMassivaHelper.saveExecucioMassiva(entitatEntity, execMassDto, elementsMassiva, ElementTipusEnumDto.EXPEDIENT);
 	            } else {
 	        		FitxerDto fitxerDto = expedientHelper.exportarExpedient(new HashSet<>(params.getIds()), false);
 	            	resultat = new DownloadableFile(
@@ -1197,7 +1175,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/expedient/"+expedientId+"/exportarEni", e);
-				throw new ReportGenerationException(ExpedientResource.class, expedientId, code, "S'ha produit un error al exportar a ENI per els expedients seleccionats.");
+				throw new ReportGenerationException(ExpedientResource.class, expedientId, code, "expedient.export.eni.reject");
 			}
             
             return resultat;
@@ -1220,7 +1198,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
     	@Override
 		public DownloadableFile generateFile(String code, List<?> data, ReportFileType fileType, OutputStream out) {
-    		
+
     		DownloadableFile resultat = null;
     		Long expedientId = data.get(0)!=null?(Long)data.get(0):null;
     		
@@ -1230,7 +1208,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 	    		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
 	    		
 	            if (params.isMassivo()) {
-					throw new ReportGenerationException(ExpedientResource.class, expedientId, code, "La funcio de Índex PDF i exportació ENI no esta implementada massivament.");
+					throw new ReportGenerationException(ExpedientResource.class, expedientId, code, "expedient.export.pdfeni.massive.reject");
 	            } else {
 	        		FitxerDto fitxerDto = expedientHelper.generarIndexExpedients(
 	        				entitatEntity.getId(),
@@ -1245,9 +1223,9 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/expedient/"+expedientId+"/exportarEni", e);
-				throw new ReportGenerationException(ExpedientResource.class, expedientId, code, "S'ha produit un error al exportar a ENI per els expedients seleccionats.");
+				throw new ReportGenerationException(ExpedientResource.class, expedientId, code, "expedient.export.eni.reject");
 			}
-            
+
             return resultat;
 		}
     	
@@ -1279,7 +1257,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 				return resultat;
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/expedient/PlantillaExcelInteressatsReportGenerator", e);
-				throw new ReportGenerationException(ExpedientResource.class, 0, code, "S'ha produit un error al descarregar la plantilla excel de importació de interessats.");
+				throw new ReportGenerationException(ExpedientResource.class, 0, code, "expedient.export.plantillaExcelInteressats.reject");
 			}
 		}
 		
@@ -1293,7 +1271,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
     	@Override
 		public DownloadableFile generateFile(String code, List<?> data, ReportFileType fileType, OutputStream out) {
-    		
+
     		DownloadableFile resultat = null;
     		Long expedientId = data.get(0)!=null?(Long)data.get(0):null;
     		
@@ -1303,16 +1281,10 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 	    		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
 	    		
 	            if (params.isMassivo()) {
-	            	
-		            if (params.getIds()!=null && !params.getIds().isEmpty()) {
-		            	resultat = new DownloadableFile("BACKGROUND", "application/"+fileType, null);
-		            	List<ExecucioMassivaContingutDto> elementsMassiva = execucioMassivaHelper.getMassivaContingutFromIds(params.getIds());
-		    			ExecucioMassivaDto execMassDto = new ExecucioMassivaDto(ExecucioMassivaTipusDto.EXPORTAR_INSIDE, new Date(), null, configHelper.getRolActual());
-		    			execucioMassivaHelper.saveExecucioMassiva(entitatEntity, execMassDto, elementsMassiva, ElementTipusEnumDto.EXPEDIENT);
-		            } else {
-						throw new ReportGenerationException(ExpedientResource.class, expedientId, code, "S'ha produit un error al exportar a format INSIDE els expedients seleccionats: no hi ha cap expedient seleccionat.");
-		            }
-		            
+                    resultat = new DownloadableFile("BACKGROUND", "application/"+fileType, null);
+                    List<ExecucioMassivaContingutDto> elementsMassiva = execucioMassivaHelper.getMassivaContingutFromIds(params.getIds());
+                    ExecucioMassivaDto execMassDto = new ExecucioMassivaDto(ExecucioMassivaTipusDto.EXPORTAR_INSIDE, new Date(), null, configHelper.getRolActual());
+                    execucioMassivaHelper.saveExecucioMassiva(entitatEntity, execMassDto, elementsMassiva, ElementTipusEnumDto.EXPEDIENT);
 	            } else {
 	        		FitxerDto fitxerDto = expedientHelper.exportarExpedient(new HashSet<>(params.getIds()), true);
 	            	resultat = new DownloadableFile(
@@ -1323,9 +1295,9 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/expedient/"+expedientId+"/exportarEni", e);
-				throw new ReportGenerationException(ExpedientResource.class, expedientId, code, "S'ha produit un error al exportar a format INSIDE els expedients seleccionats.");
+				throw new ReportGenerationException(ExpedientResource.class, expedientId, code, "expedient.export.inside.reject");
 			}
-            
+
             return resultat;
 		}
     	

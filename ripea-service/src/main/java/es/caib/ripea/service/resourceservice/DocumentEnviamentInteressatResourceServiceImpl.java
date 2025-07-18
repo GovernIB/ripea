@@ -103,18 +103,18 @@ public class DocumentEnviamentInteressatResourceServiceImpl extends BaseMutableR
 
 		@Override
 		public DownloadableFile generateFile(String code, List<?> data, ReportFileType fileType, OutputStream out) {
-			
+
 			DownloadableFile resultat = null;
 			Long notificacioInteressatId = data.get(0)!=null?(Long)data.get(0):null;
-			
+
 			try {
 				
 				DocumentEnviamentInteressatResource.MassiveAction params = (DocumentEnviamentInteressatResource.MassiveAction)data.get(1);
 				
 				if (params.isMassivo()) {
-					throw new ReportGenerationException(DocumentEnviamentInteressatResource.class, notificacioInteressatId, code, "La generació de certificats massiu per interessats de notificacions no esta implementat.");
+					throw new ReportGenerationException(DocumentEnviamentInteressatResource.class, notificacioInteressatId, code, "documentEnviamentInteressat.certificat.massive.reject");
 				} else {
-	            	resultat = new DownloadableFile(
+                    return new DownloadableFile(
 	            			"certificacio_"+notificacioInteressatId+".pdf",
 	            			"application/pdf",
 	            			pluginHelper.notificacioConsultarIDescarregarCertificacio(notificacioInteressatId));
@@ -122,10 +122,8 @@ public class DocumentEnviamentInteressatResourceServiceImpl extends BaseMutableR
 				
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/notificacioInteressat/"+notificacioInteressatId+"/CertificatReportGenerator", e);
-				throw new ReportGenerationException(getResourceClass(), notificacioInteressatId, code, "S'ha produit un error al descarregar certificat per l'enviament del interessat.");
-			}				
-				
-			return resultat;
+				throw new ReportGenerationException(getResourceClass(), notificacioInteressatId, code, "documentEnviamentInteressat.certificat.reject");
+			}
 		}
 		
 		@Override
