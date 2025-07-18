@@ -29,7 +29,7 @@ const Notificacio = (props:any) => {
             <ContenidoData title={t('page.interessat.detall.incapacitat')}>{entity?.incapacitat}</ContenidoData>
 
             <CardData title={t('page.interessat.detall.direccioPostal')} hidden={representant || !entregaPostal}>
-                <ContenidoData title={t('page.interessat.detall.direccio')}>{entity?.pais} {entity?.provincia} {entity?.municipi} {entity?.codiPostal} {entity?.adresa}</ContenidoData>
+                <ContenidoData title={t('page.interessat.detall.direccio')}>{entity?.paisNom} {entity?.provinciaNom} {entity?.municipiNom} {entity?.codiPostal} {entity?.adresa}</ContenidoData>
             </CardData>
 
             <CardData title={t('page.interessat.rep')} hidden={!representant}>
@@ -42,12 +42,13 @@ const Notificacio = (props:any) => {
             </CardData>
 
             <CardData title={t('page.interessat.detall.direccioPostal')} hidden={!representant || !entregaPostal}>
-                <ContenidoData title={t('page.interessat.detall.direccio')}>{representant?.pais} {representant?.provincia} {representant?.municipi} {representant?.codiPostal} {representant?.adresa}</ContenidoData>
+                <ContenidoData title={t('page.interessat.detall.direccio')}>{representant?.paisNom} {representant?.provinciaNom} {representant?.municipiNom} {representant?.codiPostal} {representant?.adresa}</ContenidoData>
             </CardData>
         </CardData>
     </Grid>
 }
 
+const perspectives = ['REPRESENTANT', 'ADRESSA']
 const AdditionalInfo = (props:any) => {
     const {data} = props;
     const { t } = useTranslation();
@@ -62,7 +63,7 @@ const AdditionalInfo = (props:any) => {
         if (apiIsReady) {
             if (data?.interessats?.length>0) {
                 const filter = builder.inside('id', data?.interessats?.map?.((interessat:any)=>interessat?.id))
-                apiFindAll({unpaged: true, filter: filter, perspectives: ['REPRESENTANT']})
+                apiFindAll({unpaged: true, filter, perspectives})
                     .then((app) => {
                         setInteressats(app?.rows);
                     })
