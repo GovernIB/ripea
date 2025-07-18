@@ -548,6 +548,10 @@ const translationCa = {
                 tipusMime: "Tipus MIME",
                 contingut: "CSV",
                 csvRegulacio: "Regulació del CSV",
+                responsableNom: "Nom del responsable",
+                responsableNif: "Nif del responsable",
+                data: "Data de la signatura",
+                emissorCertificat: "Emissor del certificat",
             },
             tabs: {
                 resum: "Informació",
@@ -569,6 +573,7 @@ const translationCa = {
                 version: "Versions",
                 file: "Fitxer",
                 scaner: "Escaneig",
+                firmes: "Firmes",
             },
             detall: {
                 fitxerNom: "Nom del fitxer",

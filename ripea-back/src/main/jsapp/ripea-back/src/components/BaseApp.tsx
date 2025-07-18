@@ -143,7 +143,7 @@ const generateFooter = (version?:string) => {
                 version={version}
                 logos={[drassana]}
                 backgroundColor="#5F5D5D"
-                style={{ position: 'fixed', height: '36px', bottom: 0, width: '100%' }}
+                style={{ position: 'fixed', height: '36px', bottom: 0, width: '100%', zIndex: 999 }}
             />
         </>
     );

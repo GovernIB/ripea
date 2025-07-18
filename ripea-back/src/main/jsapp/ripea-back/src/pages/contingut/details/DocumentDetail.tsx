@@ -48,7 +48,7 @@ const Versiones = (props:any) => {
     const { t } = useTranslation();
     const {descarregarVersio} = useActions()
 
-    return <BasePage>
+    return <Grid container flexDirection={"column"} columnSpacing={1} rowSpacing={1}>
         {
             entity?.versions?.map((version:any) =>
                 <CardData key={version?.id} title={t('page.document.versio.title') + ' ' + version?.id}
@@ -66,9 +66,34 @@ const Versiones = (props:any) => {
                 </CardData>
             )
         }
-    </BasePage>;
+    </Grid>;
 }
 
+export const Firmes = (props:any) => {
+    const { entity } = props;
+    const { t } = useTranslation();
+
+    return <Grid container flexDirection={"column"} columnSpacing={1} rowSpacing={1}>
+        {
+            entity?.firmes?.map((firma:any, index:number) =>
+                <CardData key={index} title={firma?.fitxerNom}>
+                    {
+                        firma?.detalls?.map((detall:any, index:number) =>
+                            <Grid item xs={12} key={index}>
+                                <ContenidoData xs={6} title={t('page.arxiu.firma.responsableNom')}>{detall?.responsableNom}</ContenidoData>
+                                <ContenidoData xs={6} title={t('page.arxiu.firma.responsableNif')}>{detall?.responsableNif}</ContenidoData>
+                                <ContenidoData xs={6} title={t('page.arxiu.firma.data')}>{formatDate(detall?.data)}</ContenidoData>
+                                <ContenidoData xs={6} title={t('page.arxiu.firma.emissorCertificat')}>{detall?.emissorCertificat}</ContenidoData>
+                            </Grid>
+                        )
+                    }
+                </CardData>
+            )
+        }
+    </Grid>
+}
+
+const perspectives = ['VERSIONS', 'COUNT', 'FIRMES']
 const useDocumentDetail = () => {
     const { t } = useTranslation();
 
@@ -86,7 +111,7 @@ const useDocumentDetail = () => {
 
     const handleOpen = (id:any) => {
         if(apiIsReady && id){
-            apiGetOne(id, {perspectives: ['VERSIONS', 'COUNT']})
+            apiGetOne(id, {perspectives})
                 .then((app) => setEntity(app))
                 .catch((error) => {
                     handleClose()
@@ -122,6 +147,13 @@ const useDocumentDetail = () => {
             content: <Versiones entity={entity}/>,
             badge: entity?.versions?.length,
             hidden: !entity?.versions || entity?.versions?.length == 0,
+        },
+        {
+            value: "firmes",
+            label: t('page.document.tabs.firmes'),
+            content: <Firmes entity={entity}/>,
+            badge: entity?.firmes?.length,
+            hidden: !entity?.firmes || entity?.firmes?.length == 0,
         },
     ]
 

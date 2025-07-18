@@ -174,7 +174,7 @@ const DocumentsGrid = (props: any) => {
         <Load value={entity && isReady}>
             <DropZone onDrop={onDrop} disabled={!entity?.potModificar}>
                 <StyledMuiGrid
-                    resourceName="documentResource"
+                    resourceName={"documentResource"}
                     popupEditFormDialogResourceTitle={t('page.document.title')}
                     columns={columns}
                     // paginationActive
