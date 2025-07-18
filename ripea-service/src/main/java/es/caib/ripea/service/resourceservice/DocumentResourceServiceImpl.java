@@ -44,6 +44,8 @@ import es.caib.ripea.persistence.entity.resourcerepository.RegistreAnnexResource
 import es.caib.ripea.persistence.entity.resourcerepository.UsuariResourceRepository;
 import es.caib.ripea.persistence.repository.ContingutMovimentRepository;
 import es.caib.ripea.persistence.repository.ContingutRepository;
+import es.caib.ripea.persistence.repository.DocumentNotificacioRepository;
+import es.caib.ripea.persistence.repository.DocumentPortafirmesRepository;
 import es.caib.ripea.persistence.repository.DocumentRepository;
 import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
@@ -58,6 +60,7 @@ import es.caib.ripea.service.helper.EmailHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
 import es.caib.ripea.service.helper.ExpedientHelper;
+import es.caib.ripea.service.helper.MessageHelper;
 import es.caib.ripea.service.helper.PinbalHelper;
 import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.helper.RolHelper;
@@ -81,6 +84,7 @@ import es.caib.ripea.service.intf.dto.DocumentDto;
 import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentFirmaTipusEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentNotificacioDto;
+import es.caib.ripea.service.intf.dto.DocumentNotificacioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentNotificacioTipusEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentPublicacioDto;
 import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
@@ -140,6 +144,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 	private final DocumentFirmaPortafirmesHelper firmaPortafirmesHelper;
 	private final DocumentFirmaViaFirmaHelper firmaViaFirmaHelper;
 	private final UsuariHelper usuariHelper;
+	private final MessageHelper messageHelper;
 
     private final UsuariResourceRepository usuariResourceRepository;
     private final DocumentResourceRepository documentResourceRepository;
@@ -147,6 +152,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     private final InteressatResourceRepository interessatResourceRepository;
     private final RegistreAnnexResourceRepository registreAnnexResourceRepository;
     private final ContingutMovimentRepository contingutMovimentRepository;
+    private final DocumentNotificacioRepository documentNotificacioRepository;
+    private final DocumentPortafirmesRepository documentPortafirmesRepository;
     private final ContingutRepository contingutRepository;
     private final DocumentRepository documentRepository;
     private final EntitatRepository entitatRepository;
@@ -302,10 +309,21 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                 null,
                 null
         ));
+        
         resource.setErrors(cacheResourceHelper.findErrorsValidacioPerNode(entity));
         resource.setValid(resource.getErrors().isEmpty());
-
+        
         resource.setAmbNotificacions(!entity.getNotificacions().isEmpty());
+        
+		DocumentNotificacioEstatEnumDto estatDarreraNotificacio = documentNotificacioRepository.findLastEstatNotificacioByDocumentId(entity.getId());
+		resource.setEstatDarreraNotificacio(estatDarreraNotificacio != null ? estatDarreraNotificacio.name() : "");
+
+		Boolean isErrorLastNotificacio = documentNotificacioRepository.findErrorLastNotificacioByDocumentId(entity.getId());
+		resource.setErrorDarreraNotificacio(isErrorLastNotificacio != null ? isErrorLastNotificacio : false);
+
+		Boolean isErrorLastEnviament = documentPortafirmesRepository.findErrorLastEnviamentPortafirmesByDocumentId(entity.getId());
+		resource.setErrorEnviamentPortafirmes(isErrorLastEnviament != null ? isErrorLastEnviament : false);
+        
         resource.setHasFirma(resource.getDocumentFirmaTipus()!=DocumentFirmaTipusEnumDto.SENSE_FIRMA);
         resource.setMetaDocumentInfo(objectMappingHelper.newInstanceMap(Hibernate.unproxy(entity.getMetaDocument()), MetaDocumentResource.class));
     }
@@ -1181,19 +1199,27 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                         anyInteressatIsAdministracio = true;
                     }
                     if (params.getEntregaPostal()!=null && params.getEntregaPostal() && !interessatResourceEntity.adressaCompleta()) {
-                        throw new ActionExecutionException(interessatResourceEntity.getClass(), interessatResourceEntity.getId(), code, "notificacio.controller.reject.postal");
+                        throw new ActionExecutionException(
+                        		interessatResourceEntity.getClass(),
+                        		interessatResourceEntity.getId(),
+                        		code,
+                        		messageHelper.getMessage("notificacio.controller.reject.postal"));
                     }
                 }
-	        	
+
 	        	if (DocumentNotificacioTipusEnumDto.COMUNICACIO.equals(params.getTipus()) && 
 	        		"application/zip".equals(entity.getFitxerContentType()) &&
 	        		anyInteressatIsAdministracio) {
-	        			throw new ActionExecutionException(entity.getClass(), entity.getId(), code, "notificacio.controller.reject.comunicacio.zip.administracio");
+	        			throw new ActionExecutionException(
+	        					entity.getClass(),
+	        					entity.getId(),
+	        					code,
+	        					messageHelper.getMessage("notificacio.controller.reject.comunicacio.zip.administracio"));
 	        	}
-	        	
+
 	            String entitatActualCodi = configHelper.getEntitatActualCodi();
 	            EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true, false);
-	        	
+
 	        	DocumentNotificacioDto notificacioDto = new DocumentNotificacioDto();
 	        	notificacioDto.setTipus(params.getTipus());
 	        	notificacioDto.setInteressatsIds(interessatsIds); //El helper notifica al representant si és necessari

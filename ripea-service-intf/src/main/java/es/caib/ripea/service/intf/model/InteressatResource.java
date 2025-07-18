@@ -47,6 +47,9 @@ import lombok.experimental.FieldNameConstants;
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = InteressatResource.PERSPECTIVE_REPRESENTANT_CODE),
                 @ResourceConfigArtifact(
+                        type = ResourceArtifactType.PERSPECTIVE,
+                        code = InteressatResource.PERSPECTIVE_ADRESSA_CODE),
+                @ResourceConfigArtifact(
                         type = ResourceArtifactType.REPORT,
                         code = InteressatResource.ACTION_EXPORTAR_CODE,
                         formClass = InteressatResource.ExportInteressatsFormAction.class),
@@ -63,6 +66,7 @@ import lombok.experimental.FieldNameConstants;
 public class InteressatResource extends BaseAuditableResource<Long> {
 
     public static final String PERSPECTIVE_REPRESENTANT_CODE = "REPRESENTANT";
+    public static final String PERSPECTIVE_ADRESSA_CODE = "ADRESSA";
     public static final String ACTION_EXPORTAR_CODE  = "EXPORTAR";
     public static final String ACTION_IMPORTAR_CODE  = "IMPORTAR";
     public static final String ACTION_GUARDAR_ARXIU  = "GUARDAR_ARXIU";
@@ -132,6 +136,11 @@ public class InteressatResource extends BaseAuditableResource<Long> {
     @Transient private ResourceReference<InteressatResource, Long> representat;
     @Transient private boolean hasRepresentats;
 
+    //Dades per mostrar en lloc dels codis guardats en els camps principals
+    @Transient private String paisNom;
+    @Transient private String provinciaNom;
+    @Transient private String municipiNom;
+    
     @Transient
 	public String getCodiNom() {
     	return Utils.getCodiNom(this.tipus, this.documentNum, this.nom, this.llinatge1, this.llinatge2, this.raoSocial, this.organCodi);

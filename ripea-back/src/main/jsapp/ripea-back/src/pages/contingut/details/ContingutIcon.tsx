@@ -47,7 +47,7 @@ const DocumentIcon = (props:any) => {
         :<Icon title={t('page.document.title')} >description</Icon>}
 
         {isInOptions(entity?.documentTipus, 'IMPORTAT') && <Icon title={t('page.document.alert.import')} color={"info"}>info</Icon>}
-        {isInOptions(entity?.estat, 'REDACCIO') && <Icon title={t('page.document.alert.delete')} color={"warning"}>B</Icon>}
+        {isInOptions(entity?.estat, 'REDACCIO') && <Icon sx={{marginBottom: '5px'}} title={t('page.document.alert.delete')} color={"warning"}>B</Icon>}
         {isInOptions(entity?.estat, 'CUSTODIAT', 'FIRMAT', 'ADJUNT_FIRMAT') && <Icon title={t('page.document.alert.firma')} color={"success"}>edit</Icon>}
 
         {entity?.gesDocOriginalId && <Icon title={t('page.document.alert.original')} color={"warning"}>file_copy</Icon>}
@@ -62,17 +62,16 @@ const DocumentIcon = (props:any) => {
         {isInOptions(entity?.estat, 'DEFINITIU') && <Icon title={t('page.document.alert.definitiu')} color={"success"}>check_box</Icon>}
 
         {/*—------------------- INICI ICONES DE NOTIFICACIO —----------------------*/}
-        {entity?.ambNotificacions && (
-            !entity?.errorDarreraNotificacio
+        {entity?.ambNotificacions && (!entity?.errorDarreraNotificacio
                 ?<>
                     {isInOptions(entity?.estatDarreraNotificacio, 'PENDENT', 'REGISTRADA') &&
-                        <Icon color={"warning"}>mail</Icon>}
+                        <Icon color={"info"}>mail</Icon>}
 
                     {isInOptions(entity?.estatDarreraNotificacio, 'ENVIADA_AMB_ERRORS', 'FINALITZADA_AMB_ERRORS') &&
                         <Icon color={"error"}>mail</Icon>}
 
                     {isInOptions(entity?.estatDarreraNotificacio, 'PROCESSADA', 'FINALITZADA') &&
-                        <Icon color={"info"}>mail</Icon>}
+                        <Icon color={"success"}>mail</Icon>}
                 </>
                 :<Icon color={"error"}>mail</Icon>
         )}

@@ -5,12 +5,18 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
-import es.caib.ripea.service.helper.*;
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 
@@ -25,8 +31,19 @@ import es.caib.ripea.persistence.entity.resourceentity.InteressatResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.InteressatResourceRepository;
 import es.caib.ripea.persistence.repository.ExpedientRepository;
 import es.caib.ripea.persistence.repository.InteressatRepository;
+import es.caib.ripea.plugin.dadesext.Municipi;
+import es.caib.ripea.plugin.dadesext.Pais;
+import es.caib.ripea.plugin.dadesext.Provincia;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.base.springfilter.FilterSpecification;
+import es.caib.ripea.service.helper.CacheHelper;
+import es.caib.ripea.service.helper.ConfigHelper;
+import es.caib.ripea.service.helper.EntityComprovarHelper;
+import es.caib.ripea.service.helper.ExcepcioLogHelper;
+import es.caib.ripea.service.helper.ExpedientInteressatHelper;
+import es.caib.ripea.service.helper.MessageHelper;
+import es.caib.ripea.service.helper.PluginHelper;
+import es.caib.ripea.service.helper.UnitatOrganitzativaHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
@@ -82,6 +99,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
     public void init() {
         register(InteressatResource.Fields.documentNum, new NumDocOnchangeLogicProcessor());
         register(InteressatResource.PERSPECTIVE_REPRESENTANT_CODE, new RespresentantPerspectiveApplicator());
+        register(InteressatResource.PERSPECTIVE_ADRESSA_CODE, new AdressaPerspectiveApplicator());
         register(InteressatResource.ACTION_EXPORTAR_CODE, new ExportarReportGenerator());
         register(InteressatResource.ACTION_IMPORTAR_CODE, new ImportarInteressatsActionExecutor());
         register(InteressatResource.ACTION_GUARDAR_ARXIU, new GuardarArxiuActionExecutor());
@@ -351,6 +369,26 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
             }
         }
     }
+    
+    private class AdressaPerspectiveApplicator implements PerspectiveApplicator<InteressatResourceEntity, InteressatResource> {
+        @Override
+        public void applySingle(String code, InteressatResourceEntity entity, InteressatResource resource) throws PerspectiveApplicationException {
+        	if (Utils.hasValue(resource.getPais())) {
+        		Pais pais = pluginHelper.dadesExternesPaisFindByCodi(resource.getPais());
+        		resource.setPaisNom(pais!=null?pais.getNom():"");
+        	}
+        	if (Utils.hasValue(resource.getProvincia())) {
+        		Provincia prov = pluginHelper.dadesExternesProvinciesFindByCodi(resource.getProvincia());
+        		resource.setProvinciaNom(prov!=null?prov.getNom():"");
+        		
+            	if (Utils.hasValue(resource.getMunicipi())) {
+            		Municipi muni = pluginHelper.dadesExternesMunicipisFindByCodi(resource.getProvincia(), resource.getMunicipi());
+            		resource.setMunicipiNom(muni!=null?muni.getNom():"");
+            	}
+        	}
+        }
+    }
+    
     private class NumDocOnchangeLogicProcessor implements OnChangeLogicProcessor<InteressatResource> {
 
         public static final String NOT_REPRESENT_HIMSELF = "NOT_REPRESENT_HIMSELF";

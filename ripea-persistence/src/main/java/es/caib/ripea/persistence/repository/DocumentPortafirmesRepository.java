@@ -38,8 +38,8 @@ public interface DocumentPortafirmesRepository extends JpaRepository<DocumentPor
 			"		from " +
 			"			DocumentPortafirmesEntity p " +
 			"		where " +
-			"			p.document = :document) ")
-	Boolean findErrorLastEnviamentPortafirmesByDocument(@Param("document") DocumentEntity document);
+			"			p.document.id = :documentId) ")
+	Boolean findErrorLastEnviamentPortafirmesByDocumentId(@Param("documentId") Long documentId);
 	
 	DocumentPortafirmesEntity findByPortafirmesId(
 			String portafirmesId);

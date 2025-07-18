@@ -104,11 +104,11 @@ public class TascaHelper {
 										if (docExp.isFirmat()) { validacioOk = true; }
 										break;
 									case AP_FI_NI:
-										DocumentNotificacioEstatEnumDto darreraNot_I = documentNotificacioRepository.findLastEstatNotificacioByDocument(docExp);
+										DocumentNotificacioEstatEnumDto darreraNot_I = documentNotificacioRepository.findLastEstatNotificacioByDocumentId(docExp.getId());
 										if (darreraNot_I!=null) { validacioOk = true; }
 										break;
 									case AP_FI_NF:
-										DocumentNotificacioEstatEnumDto darreraNot_F = documentNotificacioRepository.findLastEstatNotificacioByDocument(docExp);
+										DocumentNotificacioEstatEnumDto darreraNot_F = documentNotificacioRepository.findLastEstatNotificacioByDocumentId(docExp.getId());
 										if (DocumentNotificacioEstatEnumDto.FINALITZADA.equals(darreraNot_F) || 
 											DocumentNotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(darreraNot_F)) { 
 												validacioOk = true;

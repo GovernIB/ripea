@@ -47,7 +47,6 @@ public interface DocumentNotificacioRepository extends JpaRepository<DocumentNot
 
 	DocumentNotificacioEntity findByNotificacioIdentificador(String notificacioIdentificador);
 
-	
 	@Query( "select dn.notificacioEstat " +
 			"from " +
 			"	DocumentNotificacioEntity dn " +
@@ -57,8 +56,8 @@ public interface DocumentNotificacioRepository extends JpaRepository<DocumentNot
 			"		from " +
 			"			DocumentNotificacioEntity n " +
 			"		where " +
-			"			n.document = :document) ")
-	DocumentNotificacioEstatEnumDto findLastEstatNotificacioByDocument(@Param("document") DocumentEntity document);
+			"			n.document.id = :documentId) ")
+	DocumentNotificacioEstatEnumDto findLastEstatNotificacioByDocumentId(@Param("documentId") Long documentId);
 	
 	@Query( "select dn.error " +
 			"from " +
@@ -69,9 +68,8 @@ public interface DocumentNotificacioRepository extends JpaRepository<DocumentNot
 			"		from " +
 			"			DocumentNotificacioEntity n " +
 			"		where " +
-			"			n.document = :document) ")
-	Boolean findErrorLastNotificacioByDocument(@Param("document") DocumentEntity document);
-	
+			"			n.document.id = :documentId) ")
+	Boolean findErrorLastNotificacioByDocumentId(@Param("documentId") Long documentId);
 	
 	@Query("select " +
 			"	dn " +

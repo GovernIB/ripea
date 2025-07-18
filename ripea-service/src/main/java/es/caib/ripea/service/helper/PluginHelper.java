@@ -3976,7 +3976,7 @@ public class PluginHelper {
 			throw new SistemaExternException(IntegracioHelper.INTCODI_PROCEDIMENT, errorDescripcio, ex);
 		}
 	}
-
+	
 	public List<Pais> dadesExternesPaisosFindAll() {
 
 		long t0 = System.currentTimeMillis();
@@ -4000,6 +4000,46 @@ public class PluginHelper {
 					accioDescripcio,
 					dadesExternesPlugin.getEndpointURL(),
 					null,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_DADESEXT, errorDescripcio, ex);
+		}
+	}
+	
+	public Pais dadesExternesPaisFindByCodi(String codiPais) {
+		
+		long t0 = System.currentTimeMillis();
+		String accioDescripcio = "Consulta del pais "+codiPais;
+		Map<String, String> accioParams = new HashMap<String, String>();
+		accioParams.put("codiPais", codiPais);
+		DadesExternesPlugin dadesExternesPlugin = getDadesExternesPlugin();
+		
+		try {
+			List<Pais> paisos = dadesExternesPlugin.paisFindAll();
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_DADESEXT,
+					accioDescripcio,
+					dadesExternesPlugin.getEndpointURL(),
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0);
+			if (paisos!=null) {
+				for (Pais pais: paisos) {
+					if (pais.getNom().equals(codiPais)) {
+						return pais;
+					}
+				}
+			}
+			return null;
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al accedir al plugin de dades externes";
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_DADESEXT,
+					accioDescripcio,
+					dadesExternesPlugin.getEndpointURL(),
+					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
@@ -4069,6 +4109,46 @@ public class PluginHelper {
 			throw new SistemaExternException(IntegracioHelper.INTCODI_DADESEXT, errorDescripcio, ex);
 		}
 	}
+	
+	public Provincia dadesExternesProvinciesFindByCodi(String provinciaCodi) {
+
+		long t0 = System.currentTimeMillis();
+		String accioDescripcio = "Consulta de província per codi "+provinciaCodi;
+		Map<String, String> accioParams = new HashMap<String, String>();
+		accioParams.put("provinciaCodi", provinciaCodi);
+		DadesExternesPlugin dadesExternesPlugin = getDadesExternesPlugin();
+
+		try {
+			List<Provincia> provincies = dadesExternesPlugin.provinciaFindAll();
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_DADESEXT,
+					accioDescripcio,
+					dadesExternesPlugin.getEndpointURL(),
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0);
+			if (provincies!=null) {
+				for (Provincia prov: provincies) {
+					if (prov.getNom().equals(provinciaCodi)) {
+						return prov;
+					}
+				}
+			}
+			return null;
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al accedir al plugin de dades externes";
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_DADESEXT,
+					accioDescripcio,
+					dadesExternesPlugin.getEndpointURL(),
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_DADESEXT, errorDescripcio, ex);
+		}
+	}
 
 	public List<Provincia> dadesExternesProvinciesFindAmbComunitat(
 			String comunitatCodi) {
@@ -4104,8 +4184,7 @@ public class PluginHelper {
 		}
 	}
 
-	public List<Municipi> dadesExternesMunicipisFindAmbProvincia(
-			String provinciaCodi) {
+	public List<Municipi> dadesExternesMunicipisFindAmbProvincia(String provinciaCodi) {
 
 		long t0 = System.currentTimeMillis();
 		String accioDescripcio = "Consulta dels municipis d'una província";
@@ -4114,8 +4193,7 @@ public class PluginHelper {
 		accioParams.put("provinciaCodi", provinciaCodi);
 
 		try {
-			List<Municipi> municipis = dadesExternesPlugin.municipiFindByProvincia(
-					provinciaCodi);
+			List<Municipi> municipis = dadesExternesPlugin.municipiFindByProvincia(provinciaCodi);
 			integracioHelper.addAccioOk(
 					IntegracioHelper.INTCODI_DADESEXT,
 					accioDescripcio,
@@ -4124,6 +4202,47 @@ public class PluginHelper {
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
 			return municipis;
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al accedir al plugin de dades externes";
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_DADESEXT,
+					accioDescripcio,
+					dadesExternesPlugin.getEndpointURL(),
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_DADESEXT, errorDescripcio, ex);
+		}
+	}
+	
+	public Municipi dadesExternesMunicipisFindByCodi(String provinciaCodi, String municipiCodi) {
+
+		long t0 = System.currentTimeMillis();
+		String accioDescripcio = "Consulta del municipi amb codi "+municipiCodi;
+		Map<String, String> accioParams = new HashMap<String, String>();
+		DadesExternesPlugin dadesExternesPlugin = getDadesExternesPlugin();
+		accioParams.put("provinciaCodi", provinciaCodi);
+		accioParams.put("municipiCodi", municipiCodi);
+
+		try {
+			List<Municipi> municipis = dadesExternesPlugin.municipiFindByProvincia(provinciaCodi);
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_DADESEXT,
+					accioDescripcio,
+					dadesExternesPlugin.getEndpointURL(),
+					null,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0);
+			if (municipis!=null) {
+				for (Municipi muni: municipis) {
+					if (muni.getNom().equals(municipiCodi)) {
+						return muni;
+					}
+				}
+			}
+			return null;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de dades externes";
 			integracioHelper.addAccioError(

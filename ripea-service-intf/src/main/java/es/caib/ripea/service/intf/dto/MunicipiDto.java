@@ -1,15 +1,7 @@
-/**
- * 
- */
 package es.caib.ripea.service.intf.dto;
 
 import java.io.Serializable;
 
-/**
- * Objecte que representa un municipi provinent d'una font externa.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 public class MunicipiDto implements Serializable {
 
 	private String codi;
@@ -17,9 +9,7 @@ public class MunicipiDto implements Serializable {
 	private String codiEntitatGeografica;
 	private Long codiProvincia;
 	
-	public MunicipiDto() {
-		
-	}
+	public MunicipiDto() {}
 	
 	public MunicipiDto(
 			String codi,
@@ -56,7 +46,12 @@ public class MunicipiDto implements Serializable {
 	public String getCodiDir3() {
 		return codi + "-" + codiEntitatGeografica;
 	}
+	
+	@Override
+	public String toString() {
+		return "MunicipiDto [codi=" + codi + ", nom=" + nom + ", codiEntitatGeografica=" + codiEntitatGeografica
+				+ ", codiProvincia=" + codiProvincia + "]";
+	}
 
 	private static final long serialVersionUID = -6781006082031161827L;
-
 }

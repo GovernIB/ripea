@@ -272,7 +272,10 @@ public class DocumentResource extends NodeResource {
     @Transient private int NumMetaDades;
     @Transient private boolean documentDeAnotacio;
     @Transient private boolean ambNotificacions;
+    @Transient private String estatDarreraNotificacio;
+    @Transient private boolean errorDarreraNotificacio;
     @Transient private boolean funcionariHabilitatDigitalib;
+    @Transient private boolean errorEnviamentPortafirmes;
     @Transient private boolean pluginSummarizeActiu;
     @ResourceField(enumType = true, onChangeActive = true)
     @Transient private String digitalitzacioPerfil;
@@ -583,6 +586,7 @@ public class DocumentResource extends NodeResource {
                 break;
             case FIRMA_SEPARADA:
                 resultat.setTipusFirma(DocumentTipusFirmaEnumDto.SEPARAT);
+                resultat.setFirmaSeparada(true);
                 break;
             default:
                 break;

@@ -118,8 +118,8 @@ public class InteressatResourceEntity extends BaseAuditableEntity<InteressatReso
 		if (Utils.isEmpty(this.getPais()) || Utils.isEmpty(this.getProvincia()) ||
 			Utils.isEmpty(this.getMunicipi()) || Utils.isEmpty(this.getCodiPostal()) ||
 			Utils.isEmpty(this.getAdresa())) {
-				return true;
+				return false;
 		}
-		return false;
+		return true;
     }
 }

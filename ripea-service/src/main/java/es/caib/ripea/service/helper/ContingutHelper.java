@@ -910,13 +910,13 @@ public class ContingutHelper {
 	private void setEnviamentProperties(DocumentDto dto, DocumentEntity document) {
 		dto.setAmbNotificacions(documentNotificacioRepository.countByDocument(document) > 0);
 
-		DocumentNotificacioEstatEnumDto estatDarreraNotificacio = documentNotificacioRepository.findLastEstatNotificacioByDocument(document);
+		DocumentNotificacioEstatEnumDto estatDarreraNotificacio = documentNotificacioRepository.findLastEstatNotificacioByDocumentId(document.getId());
 		dto.setEstatDarreraNotificacio(estatDarreraNotificacio != null ? estatDarreraNotificacio.name() : "");
 
-		Boolean isErrorLastNotificacio = documentNotificacioRepository.findErrorLastNotificacioByDocument(document);
+		Boolean isErrorLastNotificacio = documentNotificacioRepository.findErrorLastNotificacioByDocumentId(document.getId());
 		dto.setErrorDarreraNotificacio(isErrorLastNotificacio != null ? isErrorLastNotificacio : false);
 
-		Boolean isErrorLastEnviament = documentPortafirmesRepository.findErrorLastEnviamentPortafirmesByDocument(document);
+		Boolean isErrorLastEnviament = documentPortafirmesRepository.findErrorLastEnviamentPortafirmesByDocumentId(document.getId());
 		dto.setErrorEnviamentPortafirmes(isErrorLastEnviament != null ? isErrorLastEnviament : false);
 
 		dto.setGesDocFirmatId(document.getGesDocFirmatId());
