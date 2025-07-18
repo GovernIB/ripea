@@ -548,6 +548,10 @@ const translationEn = {
                 tipusMime: "MIME type",
                 contingut: "CSV",
                 csvRegulacio: "CSV regulation",
+                responsableNom: "Responsible person's name",
+                responsableNif: "Responsible person's ID",
+                data: "Signature date",
+                emissorCertificat: "Certificate issuer"
             },
             tabs: {
                 resum: "Information",
@@ -569,6 +573,7 @@ const translationEn = {
                 version: "Versions",
                 file: "File",
                 scaner: "Scan",
+                firmes: "Signatures",
             },
             detall: {
                 fitxerNom: "File Name",

@@ -548,6 +548,10 @@ const translationEs = {
                 tipusMime: "Tipo MIME",
                 contingut: "CSV",
                 csvRegulacio: "Regulación CSV",
+                responsableNom: "Nombre del responsable",
+                responsableNif: "NIF del responsable",
+                data: "Fecha de la firma",
+                emissorCertificat: "Emisor del certificado"
             },
             tabs: {
                 resum: "Información",
@@ -569,6 +573,7 @@ const translationEs = {
                 version: "Versiones",
                 file: "Fichero",
                 scaner: "Escaneo",
+                firmes: "Firmas",
             },
             detall: {
                 fitxerNom: "Nombre del fichero",
