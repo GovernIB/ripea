@@ -148,7 +148,6 @@ const theme = createTheme({
 		MuiDialogTitle: {
             styleOverrides: {
                 root: {
-					marginBottom: '10px',
 					backgroundColor: "#f5f5f5",
 					borderBottom: "1px solid #e3e3e3",
 					padding: "5px 24px",
@@ -157,7 +156,14 @@ const theme = createTheme({
 					alignItems: "center",
                 }
             }
-        }		
+        },
+		MuiAlert: {
+            styleOverrides: {
+                root: {
+					marginBottom: '5px',
+                }
+            }
+        },
     }
 });
 

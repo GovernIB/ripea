@@ -4666,7 +4666,7 @@ public class PluginHelper {
 								System.currentTimeMillis() - t0);
 	
 					} catch (Exception ex) {
-						String errorDescripcio = "Error al accedir al plugin de notificacions";
+						String errorDescripcio = "Error en el plugin de notificacions: "+ex.getMessage();
 						integracioHelper.addAccioError(
 								IntegracioHelper.INTCODI_NOTIFICACIO,
 								accioDescripcio,
@@ -4836,7 +4836,7 @@ public class PluginHelper {
 			return respostaEnviar;
 
 		} catch (Exception ex) {
-			String errorDescripcio = "Error al accedir al plugin de notificacions";
+			String errorDescripcio = "Error en el plugin de notificacions: "+ex.getMessage();
 			integracioHelper.addAccioError(
 					IntegracioHelper.INTCODI_NOTIFICACIO,
 					accioDescripcio,

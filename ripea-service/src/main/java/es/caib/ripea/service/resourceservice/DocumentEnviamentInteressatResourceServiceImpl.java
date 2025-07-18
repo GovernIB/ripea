@@ -78,6 +78,7 @@ public class DocumentEnviamentInteressatResourceServiceImpl extends BaseMutableR
             	AmpliarPlazoForm documentNotificacioDto = new AmpliarPlazoForm();
             	List<DocumentEnviamentInteressatDto> documentEnviamentInteressats = new ArrayList<DocumentEnviamentInteressatDto>();
             	DocumentEnviamentInteressatDto documentEnviamentInteressatDto = new DocumentEnviamentInteressatDto();
+            	documentEnviamentInteressatDto.setId(entity.getId());
             	documentEnviamentInteressatDto.setDiesAmpliacio(params.getDiesAmpliacio());
             	documentEnviamentInteressatDto.setMotiu(params.getMotiu());
             	documentEnviamentInteressatDto.setEnviamentReferencia(entity.getEnviamentReferencia());

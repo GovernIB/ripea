@@ -857,9 +857,9 @@ const translationCa = {
             },
             action: {
                 ampliarPlac: {
-                    label: "Ampliar termini",
-                    title: "Ampliació del termini dels enviaments de la remesa",
-                    ok: "El termini ha estat ampliat",
+                    label: "Ampliar plaç",
+                    title: "Ampliació del plaç dels enviaments de la remesa",
+                    ok: "El plaç del enviament ha estat ampliat",
                 },
                 certificat: {
                     label: "Certificació",
