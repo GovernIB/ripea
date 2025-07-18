@@ -761,34 +761,30 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
         @Override
         public DocumentResource exec(String code, DocumentResourceEntity entity, DocumentResource.MoureFormAction params) throws ActionExecutionException {
-        	
-        	if (params!=null && params.getIds()!=null && params.getIds().size()>0) {
-        		try {
-	        		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
-	    			for (Long contingutOrigenId: params.getIds()) {
-	    				Long contingutDestiId = params.getCarpeta()!=null?params.getCarpeta().getId():params.getExpedient().getId();
-	    				switch (params.getAction()) {
-						case MOURE:
-							contingutHelper.move(entitatEntity.getId(), contingutOrigenId, contingutDestiId,configHelper.getRolActual());							
-							break;
-						case COPIAR:
-							contingutHelper.copy(entitatEntity.getId(), contingutOrigenId, contingutDestiId, false); //No recursiu
-							break;
-						case VINCULAR:
-							//Recursiu igual que a ContingutController.vincular (POST)
-							contingutHelper.link(entitatEntity.getId(), contingutOrigenId, contingutDestiId, true);
-							break;
-						default:
-							break;
-						}
-	    			}
-    			} catch (Exception e) {
-    				excepcioLogHelper.addExcepcio("/expedient/MoureActionExecutor", e);
-    				throw new ReportGenerationException(DocumentResource.class, null, code, e.getMessage());
-    			}	    			
-        	} else {
-        		throw new ActionExecutionException(getResourceClass(), null, code, "No s'ha indicat cap element per realitzar l'acció.");
-        	}
+
+            try {
+                EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+                for (Long contingutOrigenId: params.getIds()) {
+                    Long contingutDestiId = params.getCarpeta()!=null?params.getCarpeta().getId():params.getExpedient().getId();
+                    switch (params.getAction()) {
+                    case MOURE:
+                        contingutHelper.move(entitatEntity.getId(), contingutOrigenId, contingutDestiId,configHelper.getRolActual());
+                        break;
+                    case COPIAR:
+                        contingutHelper.copy(entitatEntity.getId(), contingutOrigenId, contingutDestiId, false); //No recursiu
+                        break;
+                    case VINCULAR:
+                        //Recursiu igual que a ContingutController.vincular (POST)
+                        contingutHelper.link(entitatEntity.getId(), contingutOrigenId, contingutDestiId, true);
+                        break;
+                    default:
+                        break;
+                    }
+                }
+            } catch (Exception e) {
+                excepcioLogHelper.addExcepcio("/expedient/MoureActionExecutor", e);
+                throw new ReportGenerationException(DocumentResource.class, null, code, e.getMessage());
+            }
 
             if (!params.isMassivo() && params.getIds().size() == 1){
                 DocumentResourceEntity documentResourceEntity = documentResourceRepository.findById(params.getIds().get(0)).get();
@@ -942,7 +938,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 				return objectMappingHelper.newInstanceMap(entity, DocumentResource.class);
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/document/"+entity.getId()+"/ViaFirmaActionExecutor", e);
-				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, "Error al enviar a viaFirma: "+e.getMessage());
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, messageHelper.getMessage("document.viaFirma.reject", new Object[]{e.getMessage()}));
 			}
 		}
     }
@@ -1070,8 +1066,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 				
 				return params;
 			} catch (Exception e) {
-				excepcioLogHelper.addExcepcio("/document/"+entity.getId()+"/NouDocumentPinbalActionExecutor", e);
-				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, "Error al generar document PINBAL: "+e.getMessage());
+				excepcioLogHelper.addExcepcio("/document/NouDocumentPinbalActionExecutor", e);
+				throw new ActionExecutionException(getResourceClass(), null, code, messageHelper.getMessage("document.nouDocumentPinbal.reject", new Object[]{e.getMessage()}));
 			}				
 		}
     }
@@ -1100,7 +1096,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                 return (Serializable)result;
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/document/"+entity.getId()+"/IniciarFirmaWebActionExecutor", e);
-				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, "Error al iniciar firma en navegador: "+e.getMessage());
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, messageHelper.getMessage("document.iniciarFirmaWeb.reject", new Object[]{e.getMessage()}));
 			}
 		}
     }

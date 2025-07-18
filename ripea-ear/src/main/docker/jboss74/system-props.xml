@@ -1,5 +1,7 @@
 <system-properties>
     <property name="es.caib.ripea.properties" value="/home/jboss/apps/ripea/jboss.properties"/>
     <property name="es.caib.ripea.system.properties" value="/home/jboss/apps/ripea/jboss_system.properties"/>
+    <property name="javax.net.ssl.trustStore" value="/home/jboss/keystores/truststore.jks"/>
+    <property name="javax.net.ssl.trustStorePassword" value="tecnologies"/>
     <property name="com.sun.jersey.server.impl.cdi.lookupExtensionInBeanManager" value="true"/>
 </system-properties>
