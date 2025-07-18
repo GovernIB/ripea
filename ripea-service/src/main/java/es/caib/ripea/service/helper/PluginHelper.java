@@ -4027,7 +4027,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0);
 			if (paisos!=null) {
 				for (Pais pais: paisos) {
-					if (pais.getNom().equals(codiPais)) {
+					if (pais.getCodi().equals(codiPais)) {
 						return pais;
 					}
 				}
