@@ -26,7 +26,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.ExpedientEntity;
+import es.caib.ripea.persistence.entity.InteressatAdministracioEntity;
 import es.caib.ripea.persistence.entity.InteressatEntity;
+import es.caib.ripea.persistence.entity.InteressatPersonaFisicaEntity;
+import es.caib.ripea.persistence.entity.InteressatPersonaJuridicaEntity;
 import es.caib.ripea.persistence.entity.resourceentity.InteressatResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.InteressatResourceRepository;
 import es.caib.ripea.persistence.repository.ExpedientRepository;
@@ -97,7 +100,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
 
     @PostConstruct
     public void init() {
-        register(InteressatResource.Fields.documentNum, new NumDocOnchangeLogicProcessor());
+
         register(InteressatResource.PERSPECTIVE_REPRESENTANT_CODE, new RespresentantPerspectiveApplicator());
         register(InteressatResource.PERSPECTIVE_ADRESSA_CODE, new AdressaPerspectiveApplicator());
         register(InteressatResource.ACTION_EXPORTAR_CODE, new ExportarReportGenerator());
@@ -106,6 +109,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
         
         register(InteressatResource.Fields.tipus, new TipusOnchangeLogicProcessor());
         register(InteressatResource.Fields.organCodi, new UnitatsOrganitzativesOnchangeLogicProcessor());
+        register(InteressatResource.Fields.documentNum, new NumDocOnchangeLogicProcessor());
         
         register(InteressatResource.Fields.municipi, new MunicipiFieldOptionsProvider());
         register(InteressatResource.Fields.provincia, new ProvinciaFieldOptionsProvider());
@@ -160,7 +164,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
         @Override
         public void onChange(Serializable id, UnitatOrganitzativaFormFilter previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, UnitatOrganitzativaFormFilter target) {}
     }
-
+    
     private class TipusOnchangeLogicProcessor implements OnChangeLogicProcessor<InteressatResource> {
         @Override
         public void onChange(Serializable id, InteressatResource previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, InteressatResource target) {
@@ -186,6 +190,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
             }
         }
     }
+    
     private class UnitatsOrganitzativesOnchangeLogicProcessor implements OnChangeLogicProcessor<InteressatResource> {
         @Override
         public void onChange(Serializable id, InteressatResource previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, InteressatResource target) {
@@ -404,26 +409,56 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
         @Override
         public void onChange(Serializable id, InteressatResource previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, InteressatResource target) {
 
-            if (fieldValue!=null && fieldValue.toString().length()==9){
-                Optional<InteressatResourceEntity> resource = interessatResourceRepository.findByExpedientIdAndDocumentNum(previous.getExpedient().getId(), fieldValue.toString());
-                resource.ifPresent((interessatResourceEntity)-> {
-                    if (
-                            !answers.containsKey(NOT_REPRESENT_HIMSELF) &&
-                            (previous.getRepresentat()!=null && Objects.equals(previous.getRepresentat().getId(), interessatResourceEntity.getId()))
-                            || (previous.getRepresentant()!=null && Objects.equals(previous.getRepresentant().getId(), interessatResourceEntity.getId()))
+            if (fieldValue!=null && fieldValue.toString().length()==9) {
+            	
+            	InteressatEntity interessatExistent = interessatRepository.findByExpedientIdAndDocumentNum(previous.getExpedient().getId(), fieldValue.toString());
+            	
+				if (interessatExistent!=null) {
+
+					//Controlar que el interessat no es representa a ell mateix
+                    if (	!answers.containsKey(NOT_REPRESENT_HIMSELF) &&
+                    		(previous.getRepresentat()!=null && Objects.equals(previous.getRepresentat().getId(), interessatExistent.getId()))
+                    		|| (previous.getRepresentant()!=null && Objects.equals(previous.getRepresentant().getId(), interessatExistent.getId()))
                     ){
                         throw new AnswerRequiredException(InteressatResource.class, NOT_REPRESENT_HIMSELF, messageHelper.getMessage("es.caib.ripea.service.intf.resourcevalidation.InteressatValid.representHimself"));
-                    }
-
-//                    if (!Objects.equals(interessatResourceEntity.getId(), previous.getId())) {
-//                        InteressatResource interessatResource = objectMappingHelper.newInstanceMap(interessatResourceEntity, InteressatResource.class);
-//                        objectMappingHelper.map(interessatResource, target, "esRepresentant");
-//                    }
-                });
+                    
+                    } else if (!interessatExistent.getId().equals(previous.getId())) {
+                    	//Controlar que no estam introduint un interessat repetit
+						target.setDocumentTipus(interessatExistent.getDocumentTipus());
+						target.setNom(interessatExistent.getNom());
+						target.setPais(interessatExistent.getPais());
+						target.setProvincia(interessatExistent.getProvincia());
+						target.setMunicipi(interessatExistent.getMunicipi());
+						target.setCodiPostal(interessatExistent.getCodiPostal());
+						target.setAdresa(interessatExistent.getAdresa());
+						target.setEmail(interessatExistent.getEmail());
+						target.setTelefon(interessatExistent.getTelefon());
+						target.setObservacions(interessatExistent.getObservacions());
+						target.setPreferenciaIdioma(interessatExistent.getPreferenciaIdioma());
+						target.setEntregaDeh(interessatExistent.getEntregaDeh());
+						target.setEntregaDehObligat(interessatExistent.getEntregaDehObligat());
+						
+						switch (interessatExistent.getTipus()) {
+							case ADMINISTRACIO: 
+								InteressatAdministracioEntity interessatAdmExistent = (InteressatAdministracioEntity)interessatExistent;
+								target.setOrganCodi(interessatAdmExistent.getOrganCodi());
+								target.setOrganNom(interessatAdmExistent.getOrganNom());
+								break;
+							case PERSONA_FISICA: 
+								InteressatPersonaFisicaEntity interessatFisExistent = (InteressatPersonaFisicaEntity)interessatExistent; 
+								target.setLlinatge1(interessatFisExistent.getLlinatge1());
+								target.setLlinatge2(interessatFisExistent.getLlinatge2());
+								break;
+							case PERSONA_JURIDICA: 
+								InteressatPersonaJuridicaEntity interessatJuridExistent = (InteressatPersonaJuridicaEntity)interessatExistent;
+								target.setRaoSocial(interessatJuridExistent.getRaoSocial());
+								break;
+						}
+					}
+				}
             }
         }
     }
-
 
     private class ExportarReportGenerator implements ReportGenerator<InteressatResourceEntity,InteressatResource.ExportInteressatsFormAction, Serializable> {
 

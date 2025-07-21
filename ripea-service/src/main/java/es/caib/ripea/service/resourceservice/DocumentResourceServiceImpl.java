@@ -1060,14 +1060,18 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 	            }
 	
 	            //Com a millora, al crear una petició pinbal, o al crear un document, es podria especificar la carpeta destí.
-				pinbalHelper.pinbalNovaConsulta(
+	            Exception resultatConsulta = pinbalHelper.pinbalNovaConsulta(
 						entitatEntity.getId(),
                         params.getExpedient().getId(),
-						entity.getMetaDocument().getId(),
+                        params.getTipusDocument().getId(),
 						consulta, 
 						configHelper.getRolActual());
 				
-				return params;
+	            if (resultatConsulta==null) {
+	            	return params;
+	            } else {
+	            	throw new ActionExecutionException(getResourceClass(), null, code, messageHelper.getMessage("document.nouDocumentPinbal.reject", new Object[]{resultatConsulta.getMessage()}));
+	            }
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/document/NouDocumentPinbalActionExecutor", e);
 				throw new ActionExecutionException(getResourceClass(), null, code, messageHelper.getMessage("document.nouDocumentPinbal.reject", new Object[]{e.getMessage()}));

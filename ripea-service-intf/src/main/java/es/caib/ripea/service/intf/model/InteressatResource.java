@@ -98,10 +98,10 @@ public class InteressatResource extends BaseAuditableResource<Long> {
 	protected String documentNum;
 	@Size(max = 4)
 	@ResourceField(enumType = true)
-	protected String pais;
+	protected String pais = "724";
 	@Size(max = 2)
 	@ResourceField(enumType = true)
-	protected String provincia;
+	protected String provincia = "07";
 	@Size(max = 5)
 	@ResourceField(enumType = true)
 	protected String municipi;

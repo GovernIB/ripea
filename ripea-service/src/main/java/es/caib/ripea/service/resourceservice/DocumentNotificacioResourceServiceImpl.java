@@ -114,20 +114,20 @@ public class DocumentNotificacioResourceServiceImpl extends BaseMutableResourceS
 		public DownloadableFile generateFile(String code, List<?> data, ReportFileType fileType, OutputStream out) {
 
 			DownloadableFile resultat = null;
-			Long notificacioId = data.get(0)!=null?(Long)data.get(0):null;
+			Long documentNotificacioId = data.get(0)!=null?(Long)data.get(0):null;
 			DocumentNotificacioResource.MassiveAction params = (DocumentNotificacioResource.MassiveAction)data.get(1);
 
 			if (params.isMassivo()) {
                 //La generació massiva de justificants de notificacions no esta implementat. No pareix probable que la demanin. Pero ho deixam obert a implementació.
-				throw new ReportGenerationException(getResourceClass(), notificacioId, code, "documentNotificacio.justificant.massive.reject");
+				throw new ReportGenerationException(getResourceClass(), documentNotificacioId, code, "documentNotificacio.justificant.massive.reject");
 			} else {
-				DocumentNotificacioResourceEntity documentNotificacioResourceEntity = documentNotificacioResourceRepository.findById(notificacioId).get();
+				DocumentNotificacioResourceEntity documentNotificacioResourceEntity = documentNotificacioResourceRepository.findById(documentNotificacioId).get();
 				RespostaJustificantEnviamentNotib resposta = pluginHelper.notificacioDescarregarJustificantEnviamentNotib(documentNotificacioResourceEntity.getNotificacioIdentificador());
 				if (resposta.isError()) {
-					throw new ReportGenerationException(getResourceClass(), notificacioId, code, messageHelper.getMessage("documentNotificacio.justificant.reject", new Object[]{resposta.getErrorDescripcio()}));
+					throw new ReportGenerationException(getResourceClass(), documentNotificacioId, code, messageHelper.getMessage("documentNotificacio.justificant.reject", new Object[]{resposta.getErrorDescripcio()}));
 				} else {
 	            	resultat = new DownloadableFile(
-	            			"justificantEnviament_"+notificacioId+".pdf",
+	            			"justificantEnviament_"+documentNotificacioId+".pdf",
 	            			"application/pdf",
 	            			resposta.getJustificant());
 				}

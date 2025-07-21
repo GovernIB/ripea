@@ -83,6 +83,7 @@ import es.caib.ripea.service.intf.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.IntegracioAccioTipusEnumDto;
+import es.caib.ripea.service.intf.dto.MetaNodeDto;
 import es.caib.ripea.service.intf.dto.NtiOrigenEnumDto;
 import es.caib.ripea.service.intf.dto.PinbalConsentimentEnumDto;
 import es.caib.ripea.service.intf.dto.PinbalConsultaDto;
@@ -318,6 +319,9 @@ public class PinbalHelper {
 			document.setAmbFirma(true);
 			document.setFirmaSeparada(false);
 			document.setPinbalIdpeticion(idPeticion);
+			MetaNodeDto metaNode = new MetaNodeDto();
+			metaNode.setId(metaDocumentId);
+			document.setMetaNode(metaNode);
 
 			DocumentDto docum = documentHelper.crearDocument(
 					entitatId,
