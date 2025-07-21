@@ -3,6 +3,7 @@ import * as builder from '../../util/springFilterUtils';
 import {useDadaActions} from "./details/DadaActions.tsx";
 import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
 import {useEffect, useState} from "react";
+import {MultiplicitatStyled} from "../contingut/details/MetaExpedient.tsx";
 
 const dadesFilter = (metaDada:any, dades:any[]) :any[] => {
     return dades?.filter((dada)=>dada?.metaDada?.id == metaDada?.id)
@@ -60,6 +61,11 @@ const MetaDadaGrid = (props: { entity:any, onRowCountChange?: ((value:number) =>
                 }
                 return value?.map((dada: any) => dada?.valor).join(", \n")
             },
+        },
+        {
+            field: 'multiplicitat',
+            flex: 0.5,
+            renderCell: (params:any) => <MultiplicitatStyled multiplicitat={params?.formattedValue}/>
         }
     ]
 

@@ -123,7 +123,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
     const {handleOpen: handleImportarExpedient, dialog: dialogImportarExpedient} = useImportarExpedient(entity, refresh)
 
     const {apiDownload, getLinkCSV, definitiu, guardarArxiu} = useActions(refresh)
-    const {handleOpen: handleDetallOpen, dialog: dialogDetall} = useDocumentDetail();
+    const {handleOpen: handleDetallOpen, dialog: dialogDetall} = useDocumentDetail(entity);
     const {handleOpen: handleHistoricOpen, dialog: dialogHistoric} = useHistoric();
     const {handleOpen: handleVisualitzarOpen, dialog: dialogVisualitzar} = useVisualitzar();
     const {handleOpen: handleSeguimentOpen, dialog: dialogSeguiment} = useSeguimentPortafirmes(entity?.potModificar, refresh);

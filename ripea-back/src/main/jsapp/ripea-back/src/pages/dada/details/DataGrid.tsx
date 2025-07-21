@@ -42,6 +42,23 @@ const DataGrid = (props:any) => {
 
     const [numDades, setNumDades] = useState<number>(0);
 
+    const actions = [
+        {
+            title: t('common.update'),
+            icon: "edit",
+            showInMenu: false,
+            clickShowUpdateDialog: true,
+            hidden: !contingut?.potModificar,
+        },
+        {
+            title: t('common.update'),
+            icon: "delete",
+            showInMenu: false,
+            clickTriggerDelete: true,
+            hidden: !contingut?.potModificar,
+        },
+    ]
+
     return <StyledMuiGrid
         resourceName={"dadaResource"}
         popupEditFormDialogResourceTitle={t('page.dada.title', {metaDada: entity?.nom})}
@@ -60,6 +77,7 @@ const DataGrid = (props:any) => {
             node:{id: contingut?.id},
             tipusValor: entity?.tipus,
         }}
+        rowAdditionalActions={actions}
         popupEditFormDialogComponentProps={{ fullWidth: true, maxWidth: 'xs' }}
         onRowCountChange={(count:number)=>{
             setNumDades?.(count)
@@ -68,8 +86,6 @@ const DataGrid = (props:any) => {
         autoHeight
         formInitOnChange
         toolbarHideCreate={ !contingut?.potModificar || numDades > 0 && !(entity?.multiplicitat == 'M_0_N' || entity?.multiplicitat == 'M_1_N') }
-        rowHideUpdateButton={!contingut?.potModificar}
-        rowHideDeleteButton={!contingut?.potModificar}
     />
 }
 const useDataGrid = (contingut:any, refresh?:() => void) => {

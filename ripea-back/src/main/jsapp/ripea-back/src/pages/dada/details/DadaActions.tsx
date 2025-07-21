@@ -10,7 +10,7 @@ export const useDadaActions = (contingut:any, refresh?: () => void) => {
         {
             title: t('common.detail'),
             icon: "info",
-            showInMenu: true,
+            showInMenu: false,
             onClick: handleOpen,
             hidden: (row:any) => row?.readOnly,
         }
