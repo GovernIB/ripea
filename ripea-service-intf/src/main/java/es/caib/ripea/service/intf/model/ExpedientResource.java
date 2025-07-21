@@ -434,13 +434,4 @@ public class ExpedientResource extends NodeResource implements Serializable {
     	private ResourceReference<CarpetaResource, Long> carpeta;
         private String novaCarpetaNom;
     }
-    
-//    public boolean estaRelacionatAmb(Long id) {
-//    	if (this.getRelacionatsAmb()!=null) {
-//            return this.getRelacionatsAmb().stream()
-//                    .anyMatch(relacionatAmb -> relacionatAmb.getId().equals(id));
-//    	}
-//
-//    	return false;
-//    }
 }

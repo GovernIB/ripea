@@ -196,7 +196,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         register(DocumentResource.ViaFirmaForm.Fields.viaFirmaDispositiuCodi, new ViaFirmaDispositiuOptionsProvider());
         register(null, new InitialOnChangeDocumentResourceLogicProcessor());
     }
-
+    
     public class InitialOnChangeDocumentResourceLogicProcessor implements OnChangeLogicProcessor<DocumentResource> {
 		@Override
 		public void onChange(Serializable id, DocumentResource previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, DocumentResource target) {
@@ -821,13 +821,15 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 				}
 				
 				if (errorGuardant!=null) {
-					throw new ActionExecutionException(getResourceClass(), entity.getId(), code, errorGuardant);
+					String message = messageHelper.getMessage("message.common.action.error")+": "+errorGuardant.getMessage();
+					throw new ActionExecutionException(getResourceClass(), entity.getId(), code, message);
 				} else {
 					return objectMappingHelper.newInstanceMap(entity, DocumentResource.class);
 				}
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/document/"+entity.getId()+"/GuardarArxiuActionExecutor", e);
-				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, e);
+				String message = messageHelper.getMessage("message.common.action.error")+": "+e.getMessage();
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, message);
 			}
 		}
 		
@@ -862,7 +864,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                 return objectMappingHelper.newInstanceMap(entity, DocumentResource.class);
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/document/"+entity.getId()+"/ConvertirDefinitiuActionExecutor", e);
-				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, e);
+				String message = messageHelper.getMessage("message.common.action.error")+": "+e.getMessage();
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, message);
 			}
 		}
     	
@@ -882,7 +885,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                 return (Serializable)result;
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/document/CsvLinkActionExecutor", e);
-				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, e);
+				String message = messageHelper.getMessage("message.common.action.error")+": "+e.getMessage();
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, message);
 			}
 		}
     }
@@ -1132,7 +1136,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         		return objectMappingHelper.newInstanceMap(entity, DocumentResource.class);
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/document/"+entity.getId()+"/publicar", e);
-				return null;
+				String message = messageHelper.getMessage("message.common.action.error")+": "+e.getMessage();
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, message);
 			}
         }
 
@@ -1234,7 +1239,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/document/"+entity.getId()+"/notificar", e);
-				throw new ActionExecutionException(DocumentResource.class, entity.getId(), code, e.getMessage());
+				String message = messageHelper.getMessage("message.common.action.error")+": "+e.getMessage();
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, message);
 			}
         	
         	return objectMappingHelper.newInstanceMap(entity, DocumentResource.class);
@@ -1287,10 +1293,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
         @Override
         public DocumentResource exec(String code, DocumentResourceEntity entity, DocumentResource.EnviarPortafirmesFormAction params) throws ActionExecutionException {
-        	/*if (permisosResourceHelper.comprovarPermisDocument(entity, ExtendedPermission.WRITE, true)) {
-        		 documentResourceHelper.portafirmesEnviar(null, entity, code, null, null, code, null, null, null, null, code, false, false);
-        	}*/
-        	
+
         	Long entitatId  = entity.getEntitat().getId();
         	Long documentId = entity.getId();
         	String rolActual = configHelper.getRolActual();

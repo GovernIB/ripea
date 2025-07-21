@@ -4,6 +4,8 @@ import lombok.Getter;
 
 import java.io.Serializable;
 
+import es.caib.ripea.service.intf.utils.Utils;
+
 /**
  * Excepció que es llança quan falla l'execució d'una acció.
  * 
@@ -39,11 +41,11 @@ public class ActionExecutionException extends RuntimeException {
 			String code,
 			String message,
 			Throwable cause) {
-		super("Action " + getReportId(resourceClass, id, code) + " execution failed" + (message != null ? ": " + message : ""), cause);
+		super(message != null ? Utils.abbreviate(message, 150) : "", cause);
 		this.resourceClass = resourceClass;
 		this.id = id;
 		this.code = code;
-		this.errorMessage = message;
+		this.errorMessage = super.getMessage();
 	}
 
 	public static String getReportId(Class<?> resourceClass, Serializable id, String code) {

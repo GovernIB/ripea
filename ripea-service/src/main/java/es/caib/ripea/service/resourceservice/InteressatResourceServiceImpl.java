@@ -518,7 +518,8 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
 				}
             } catch (Exception e) {
                 excepcioLogHelper.addExcepcio("/expedient/interessats/"+entity.getId()+"GuardarArxiuActionExecutor.onChange", e);
-                throw new ActionExecutionException(getResourceClass(), entity.getId(), code, e.getMessage());
+				String message = messageHelper.getMessage("message.common.action.error")+": "+e.getMessage();
+				throw new ActionExecutionException(getResourceClass(), entity==null?null:entity.getId(), code, message);
             }
 			return objectMappingHelper.newInstanceMap(entity, InteressatResource.class);
 		}
@@ -584,7 +585,8 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
                         params.getInteressatsPerImportar());
             } catch (Exception e) {
                 excepcioLogHelper.addExcepcio("/expedient/"+params.getExpedient().getId()+"/ImportarInteressatsActionExecutor", e);
-                throw new ActionExecutionException(getResourceClass(), params.getExpedient().getId(), code, e.getMessage());
+                String message = messageHelper.getMessage("message.common.action.error")+": "+e.getMessage();
+				throw new ActionExecutionException(getResourceClass(), params.getExpedient().getId(), code, message);
             }
             return null;
         }

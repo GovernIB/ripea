@@ -699,7 +699,8 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 	        	return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
 			} catch (Exception ex) {
 				excepcioLogHelper.addExcepcio("/expedient/ReobrirActionExecutor", ex);
-				throw new ActionExecutionException(getResourceClass(), null, code, ex.getMessage());
+				String message = messageHelper.getMessage("message.common.action.error")+": "+ex.getMessage();
+				throw new ActionExecutionException(getResourceClass(), entity==null?null:entity.getId(), code, message);
 			}
 		}
     }
@@ -722,7 +723,8 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 						contingutHelper.deleteReversible(entitatEntity.getId(), params.getIds().get(0), null, code);
 					} catch (IOException e) {
 						excepcioLogHelper.addExcepcio("/expedient/"+entity.getId()+"/delete", e);
-						throw new ActionExecutionException(getResourceClass(), entity.getId(), code, e.getMessage());
+						String message = messageHelper.getMessage("message.common.action.error")+": "+e.getMessage();
+						throw new ActionExecutionException(getResourceClass(), entity==null?null:entity.getId(), code, message);
 					}
             	}
             }
@@ -745,7 +747,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/expedient/"+entity.getId()+"/TancarActionExecutor", e);
 				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, messageHelper.getMessage("expedient.tancar.reject", new Object[]{e.getMessage()}));
-			}				
+			}
 		}
     }
     
@@ -944,7 +946,8 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 				return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
 			} catch (Exception ex) {
 				excepcioLogHelper.addExcepcio("/expedient/"+entity.getId()+"ImportarDocumentsArxiuActionExecutor", ex);
-				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, ex.getMessage());
+				String message = messageHelper.getMessage("message.common.action.error")+": "+ex.getMessage();
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, message);
 			}
 		}
     }
@@ -969,7 +972,8 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 	        	return (Serializable)resultat;
 			} catch (Exception ex) {
 				excepcioLogHelper.addExcepcio("/expedient/SincronitzarArxiuActionExecutor", ex);
-				throw new ActionExecutionException(getResourceClass(), null, code, ex.getMessage());
+				String message = messageHelper.getMessage("message.common.action.error")+": "+ex.getMessage();
+				throw new ActionExecutionException(getResourceClass(), entity==null?null:entity.getId(), code, message);
 			}
 		}
     }
