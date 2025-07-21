@@ -42,7 +42,7 @@ const Notificacio = (props:any) => {
             </CardData>
 
             <CardData title={t('page.interessat.detall.direccioPostal')} hidden={!representant || !entregaPostal}>
-                <ContenidoData title={t('page.interessat.detall.direccio')}>{representant?.paisNom} {representant?.provinciaNom} {representant?.municipiNom} {representant?.codiPostal} {representant?.adresa}</ContenidoData>
+                <ContenidoData title={t('page.interessat.detall.direccio')}>{entity?.paisNom} {entity?.provinciaNom} {entity?.municipiNom} {representant?.codiPostal} {representant?.adresa}</ContenidoData>
             </CardData>
         </CardData>
     </Grid>
