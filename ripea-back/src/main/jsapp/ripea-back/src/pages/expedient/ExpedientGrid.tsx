@@ -20,10 +20,9 @@ import Load from "../../components/Load.tsx";
 import {useUserSession} from "../../components/Session.tsx";
 import {GridSortDirection} from "@mui/x-data-grid-pro";
 
-const labelStyle = {padding: '1px 4px', fontSize: '11px', fontWeight: '500', borderRadius: '2px'}
-const commonStyle = {p: 0.5, display: 'flex', alignItems: 'center', borderRadius: '5px', width: 'max-content'}
-const obertStyle = {border: '1px dashed #AAA', ...labelStyle}
-const tancatStyle = {backgroundColor: 'grey', color: 'white', ...labelStyle}
+const labelStyle = {padding: '1px 4px', fontSize: '11px', fontWeight: '500', borderRadius: '2px', display: 'flex', alignItems: 'center', width: 'max-content'}
+const obertStyle = {border: '1px dashed #AAA'}
+const tancatStyle = {backgroundColor: 'grey', color: 'white'}
 
 export const ExpedientGridForm = () => {
     const {data} = useFormContext();
@@ -48,17 +47,15 @@ export const ExpedientGridForm = () => {
 export const StyledEstat = (props: any) => {
     const {entity: expedient, icon, children} = props;
 
-    const additionalStyle = {backgroundColor: expedient?.estatAdditionalInfo?.color, ...labelStyle}
-
     const style = expedient?.estatAdditionalInfo
-        ? additionalStyle
+        ? {backgroundColor: expedient?.estatAdditionalInfo?.color}
         : expedient?.estat == 'TANCAT'
             ? tancatStyle
             : obertStyle;
 
     const icona = expedient?.estat == 'TANCAT' ? 'folder' : 'folder_open'
 
-    return <Typography variant="caption" sx={{...commonStyle, ...style}}>
+    return <Typography variant="caption" sx={{...labelStyle, ...style}}>
         {icon && <Icon fontSize={"inherit"}>{icona}</Icon>}
         {expedient?.estatAdditionalInfo?.nom ?? children}
     </Typography>
@@ -84,7 +81,7 @@ export const StyledPrioritat = (props: any) => {
             break;
     }
 
-    return <Typography variant="caption" sx={{...commonStyle, ...labelStyle, ...style}}>{children}</Typography>
+    return <Typography variant="caption" sx={{...labelStyle, ...style}}>{children}</Typography>
 }
 
 const beforeAvis = [

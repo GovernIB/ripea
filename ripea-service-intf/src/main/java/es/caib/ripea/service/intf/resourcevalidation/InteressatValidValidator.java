@@ -24,7 +24,7 @@ public class InteressatValidValidator implements ConstraintValidator<InteressatV
     public boolean isValid(InteressatResource resource, ConstraintValidatorContext context) {
         boolean valid = true;
 
-        if(resource.getEntregaDeh()!=null && resource.getEntregaDeh()){
+        if (resource.getEntregaDeh() != null && resource.getEntregaDeh()) {
             if (resource.getEmail() == null || resource.getEmail().isBlank()) {
                 context
                         .buildConstraintViolationWithTemplate("{javax.validation.constraints.NotNull.message}")
@@ -81,11 +81,30 @@ public class InteressatValidValidator implements ConstraintValidator<InteressatV
                         .disableDefaultConstraintViolation();
                 valid = false;
             } else {
-                if (
-                        (resource.getRepresentat() != null && Objects.equals(resource.getRepresentat().getId(), resource.getId()))
-                                || (resource.getRepresentant() != null && Objects.equals(resource.getRepresentant().getId(), resource.getId()))
-                                || (resource.getDocumentTipus() == InteressatDocumentTipusEnumDto.NIF && !validarNIF(resource.getDocumentNum()))
-                ) {
+                boolean validDocumentNum = true;
+
+                if (resource.getDocumentTipus() == InteressatDocumentTipusEnumDto.NIF) {
+                    if (resource.getTipus() == InteressatTipusEnum.InteressatPersonaFisicaEntity) {
+                        if (!validarNIF(resource.getDocumentNum())) {
+                            validDocumentNum = false;
+                        }
+                    } else {
+                        if (!validarCIF(resource.getDocumentNum())) {
+                            validDocumentNum = false;
+                        }
+                    }
+                } else if (resource.getDocumentTipus() == InteressatDocumentTipusEnumDto.DOCUMENT_IDENTIFICATIU_ESTRANGERS) {
+                    if (!validarNIE(resource.getDocumentNum())) {
+                        validDocumentNum = false;
+                    }
+                }
+
+                if ((resource.getRepresentat() != null && Objects.equals(resource.getRepresentat().getId(), resource.getId()))
+                        || (resource.getRepresentant() != null && Objects.equals(resource.getRepresentant().getId(), resource.getId()))) {
+                    validDocumentNum = false;
+                }
+
+                if (!validDocumentNum) {
                     context
                             .buildConstraintViolationWithTemplate("{es.caib.ripea.service.intf.resourcevalidation.InteressatValid.documentNum}")
                             .addPropertyNode(InteressatResource.Fields.documentNum)
@@ -102,10 +121,7 @@ public class InteressatValidValidator implements ConstraintValidator<InteressatV
             );
 
             for (InteressatResource interesado : interesados) {
-                if (
-                    (resource.getId()==null || !Objects.equals(resource.getId(), interesado.getId()))
-                    && Objects.equals(resource.getDocumentNum(), interesado.getDocumentNum())
-                ) {
+                if ((resource.getId() == null || !Objects.equals(resource.getId(), interesado.getId())) && Objects.equals(resource.getDocumentNum(), interesado.getDocumentNum())) {
                     context
                             .buildConstraintViolationWithTemplate("{es.caib.ripea.service.intf.resourcevalidation.InteressatValid.documentNumExists}")
                             .addPropertyNode(InteressatResource.Fields.documentNum)
@@ -155,5 +171,67 @@ public class InteressatValidValidator implements ConstraintValidator<InteressatV
         }
 
         return false;
+    }
+
+    public static boolean validarNIE(String nie) {
+        if (nie == null || !nie.matches("^[XYZxyz]\\d{7}[A-Za-z]$")) {
+            return false;
+        }
+
+        nie = nie.toUpperCase();
+        char letraInicial = nie.charAt(0);
+        String nieNum;
+        switch (letraInicial) {
+            case 'X':
+                nieNum = "0" + nie.substring(1, 8);
+                break;
+            case 'Y':
+                nieNum = "1" + nie.substring(1, 8);
+                break;
+            case 'Z':
+                nieNum = "2" + nie.substring(1, 8);
+                break;
+            default:
+                return false;
+        }
+
+        int numero = Integer.parseInt(nieNum);
+        char letraControl = "TRWAGMYFPDXBNJZSQVHLCKE".charAt(numero % 23);
+
+        return letraControl == nie.charAt(8);
+    }
+
+    public static boolean validarCIF(String cif) {
+        if (cif == null || !cif.matches("^[ABCDEFGHJKLMNPQRSUVW]\\d{7}[0-9A-J]$")) {
+            return false;
+        }
+
+        cif = cif.toUpperCase();
+        int sumaPar = 0;
+        int sumaImpar = 0;
+
+        // posiciones impares (1, 3, 5)
+        for (int i = 1; i < 8; i += 2) {
+            int n = Character.getNumericValue(cif.charAt(i));
+            int doble = n * 2;
+            sumaImpar += (doble / 10) + (doble % 10);
+        }
+
+        // posiciones pares (2, 4, 6)
+        for (int i = 2; i < 7; i += 2) {
+            sumaPar += Character.getNumericValue(cif.charAt(i));
+        }
+
+        int sumaTotal = sumaPar + sumaImpar;
+        int digitoControl = (10 - (sumaTotal % 10)) % 10;
+
+        char letraControl = cif.charAt(8);
+        char letraEsperada = "JABCDEFGHI".charAt(digitoControl);
+
+        if (Character.isDigit(letraControl)) {
+            return letraControl == Character.forDigit(digitoControl, 10);
+        } else {
+            return letraControl == letraEsperada;
+        }
     }
 }

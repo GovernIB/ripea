@@ -71,7 +71,7 @@ const columns = [
     // },
     {
         field: 'descripcio',
-        flex: 0.5,
+        flex: 0.75,
     },
     {
         field: 'metaDocument',
@@ -79,11 +79,11 @@ const columns = [
     },
     {
         field: 'createdDate',
-        flex: 0.75,
+        flex: 0.55,
     },
     {
         field: 'createdBy',
-        flex: 0.5,
+        flex: 0.45,
     },
 ];
 
@@ -150,7 +150,7 @@ const DocumentsGrid = (props: any) => {
     const gridApiRef = useMuiDataGridApiRef();
     const [treeView, setTreeView] = useState<boolean>(true);
     const [expand, setExpand] = useState<boolean>(user?.conf?.expedientExpandit);
-    const [vista, setVista] = useState<string>(user?.conf?.vistaActual);
+    const [vista, setVista] = useState<string>(getFolderExpand("vista") ?? user?.conf?.vistaActual);
 
     const {carpetes, expedients, refresh: refreshTree, isReady} = useTreeView(commonFilter)
     const refresh = () => {
@@ -169,6 +169,7 @@ const DocumentsGrid = (props: any) => {
 
     useEffect(() => {
         removeAll()
+        addFolderExpand("vista", vista)
     }, [expand, vista]);
 
     return <GridPage>
@@ -223,7 +224,6 @@ const DocumentsGrid = (props: any) => {
                                         additionalRows.push(contingut)
                                     }
                                 }
-
                                 setTreeView(additionalRows?.length > 0)
                                 break;
                             case View.tipus:

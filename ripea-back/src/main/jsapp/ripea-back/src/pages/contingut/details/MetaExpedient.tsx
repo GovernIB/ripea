@@ -1,5 +1,4 @@
 import {Grid, Typography} from "@mui/material";
-import React from "react";
 
 const style = {
     display: 'flex',
@@ -14,19 +13,38 @@ const style = {
 }
 
 export const MultiplicitatStyled = (props:any) => {
-    const {multiplicitat} = props;
+    const {multiplicitat, sx} = props;
 
-    return <Typography variant="caption" sx={style}>
+    return <Typography variant="caption" sx={{...style, ...sx}}>
         {multiplicitat}
     </Typography>
 }
 
 const MetaExpedient = (props:any) => {
     const {entity} = props;
+    let multiplicitat;
 
-    return <Grid display={"flex"} alignItems={"center"} justifyContent={'space-between'}>
+    switch (entity?.multiplicitat) {
+        case "M_0_1":
+            multiplicitat = "0..1"
+            break;
+        case "M_0_N":
+            multiplicitat = "0..N"
+            break;
+        case "M_1":
+            multiplicitat = "1"
+            break;
+        case "M_1_N":
+            multiplicitat = "1..N"
+            break;
+        default:
+            multiplicitat = entity?.multiplicitat;
+            break;
+    }
+
+    return <Grid width={'330px'} display={"flex"} alignItems={"center"} justifyContent={'space-between'}>
         {entity?.nom}
-        <MultiplicitatStyled multiplicitat={entity?.multiplicitat}/>
+        <MultiplicitatStyled multiplicitat={multiplicitat} sx={{display: 'flex', justifySelf: 'end'}}/>
     </Grid>
 }
 export default MetaExpedient;
