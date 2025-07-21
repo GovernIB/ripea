@@ -74,7 +74,7 @@ public class DocumentNotificacioInteressatHelper {
 
 			notificacionsWithError.put(interessat.getDocumentNum(), respostaEnviar.getErrorDescripcio());
 		} else {
-			cacheHelper.evictErrorsValidacioPerNode(expedientEntity);
+			cacheHelper.evictErrorsValidacioPerNode(expedientEntity.getId());
 			cacheHelper.evictNotificacionsPendentsPerExpedient(expedientEntity);
 			notificacioEntity.updateEnviat(null, respostaEnviar.getEstat(), respostaEnviar.getIdentificador());
 		}
@@ -93,7 +93,7 @@ public class DocumentNotificacioInteressatHelper {
 		for (InteressatDto interessatDto : dto.getInteressats()) {
 			destinitariAmbDocument += interessatDto.getNomCompletAmbDocument();
 		}
-		cacheHelper.evictErrorsValidacioPerNode(expedientEntity);
+		cacheHelper.evictErrorsValidacioPerNode(expedientEntity.getId());
 		cacheHelper.evictNotificacionsPendentsPerExpedient(expedientEntity);
 		logAll(notificacioEntity, LogTipusEnumDto.NOTIFICACIO_ENVIADA, destinitariAmbDocument);
 	}

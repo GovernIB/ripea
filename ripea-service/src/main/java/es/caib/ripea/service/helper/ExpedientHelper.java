@@ -1516,10 +1516,10 @@ public class ExpedientHelper {
 		dto.setNumero(entity.getNumero());
 		dto.setNom(entity.getNom());
 		dto.setAlerta(alertaRepository.countByLlegidaAndContingutId(false, entity.getId()) > 0);
-		dto.setValid(cacheHelper.findErrorsValidacioPerNode(entity).isEmpty());
+		dto.setValid(cacheHelper.findErrorsValidacioPerNode(entity.getId()).isEmpty());
 		dto.setErrorLastEnviament(cacheHelper.hasEnviamentsPortafirmesAmbErrorPerExpedient(entity));
 		dto.setErrorLastNotificacio(cacheHelper.hasNotificacionsAmbErrorPerExpedient(entity));
-		dto.setAmbEnviamentsPendents(cacheHelper.hasEnviamentsPortafirmesPendentsPerExpedient(entity));
+		dto.setAmbEnviamentsPendents(cacheHelper.hasEnviamentsPortafirmesPendentsPerExpedient(entity.getId()));
 		dto.setAmbNotificacionsPendents(cacheHelper.hasNotificacionsPendentsPerExpedient(entity));
 		dto.setArxiuUuid(entity.getArxiuUuid());
 		dto.setId(entity.getId());

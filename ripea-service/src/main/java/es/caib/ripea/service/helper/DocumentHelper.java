@@ -151,7 +151,7 @@ public class DocumentHelper {
 		
 		DocumentDto dto =  new DocumentDto();
 		if (expedient != null) {
-			cacheHelper.evictErrorsValidacioPerNode(expedient);
+			cacheHelper.evictErrorsValidacioPerNode(expedient.getId());
 		}
 		contingutHelper.comprovarNomValid(
 				pare,
@@ -412,8 +412,8 @@ public class DocumentHelper {
 				document.getNom(),
 				documentEntity.getId(),
 				DocumentEntity.class);
-		cacheHelper.evictErrorsValidacioPerNode(documentEntity);
-		cacheHelper.evictErrorsValidacioPerNode(documentEntity.getExpedient());
+		cacheHelper.evictErrorsValidacioPerNode(documentEntity.getId());
+		cacheHelper.evictErrorsValidacioPerNode(documentEntity.getExpedient().getId());
 		
 		
 		String nomOriginal = documentEntity.getNom();
@@ -659,8 +659,8 @@ public class DocumentHelper {
 					metaDocument.getNtiTipoDocumental());
 		} 
 
-		cacheHelper.evictErrorsValidacioPerNode(documentEntity);
-		cacheHelper.evictErrorsValidacioPerNode(documentEntity.getExpedient());
+		cacheHelper.evictErrorsValidacioPerNode(documentEntity.getId());
+		cacheHelper.evictErrorsValidacioPerNode(documentEntity.getExpedient().getId());
 		// Registra al log la modificació del document
 		contingutLogHelper.log(
 				documentEntity,
@@ -735,8 +735,8 @@ public class DocumentHelper {
 					metaDocument.getNtiTipoDocumental());
 		}
 
-		cacheHelper.evictErrorsValidacioPerNode(documentEntity);
-		cacheHelper.evictErrorsValidacioPerNode(documentEntity.getExpedient());
+		cacheHelper.evictErrorsValidacioPerNode(documentEntity.getId());
+		cacheHelper.evictErrorsValidacioPerNode(documentEntity.getExpedient().getId());
 		// Registra al log la modificació del document
 		contingutLogHelper.log(
 				documentEntity,
@@ -843,7 +843,7 @@ public class DocumentHelper {
 				documentCreat,
 				entitat.getUnitatArrel());
 		if (expedient != null) {
-			cacheHelper.evictErrorsValidacioPerNode(expedient);
+			cacheHelper.evictErrorsValidacioPerNode(expedient.getId());
 		}
 		return documentCreat;
 	}

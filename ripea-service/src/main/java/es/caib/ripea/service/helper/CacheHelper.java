@@ -46,9 +46,11 @@ import es.caib.ripea.persistence.repository.DocumentPortafirmesRepository;
 import es.caib.ripea.persistence.repository.DocumentRepository;
 import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.persistence.repository.ExpedientPeticioRepository;
+import es.caib.ripea.persistence.repository.ExpedientRepository;
 import es.caib.ripea.persistence.repository.ExpedientTascaRepository;
 import es.caib.ripea.persistence.repository.MetaDadaRepository;
 import es.caib.ripea.persistence.repository.MetaDocumentRepository;
+import es.caib.ripea.persistence.repository.NodeRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.persistence.repository.UsuariRepository;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
@@ -84,6 +86,8 @@ public class CacheHelper {
 
 	@Autowired private EntitatRepository entitatRepository;
 	@Autowired private DadaRepository dadaRepository;
+	@Autowired private NodeRepository nodeRepository;
+	@Autowired private ExpedientRepository expedientRepository;
 	@Autowired private DocumentRepository documentRepository;
 	@Autowired private MetaDadaRepository metaDadaRepository;
 	@Autowired private MetaDocumentRepository metaDocumentRepository;
@@ -196,12 +200,16 @@ public class CacheHelper {
 	@CacheEvict(value = "findOrganismesEntitatAmbPermisDisseny", key="{#entitatId, #usuariCodi}")
 	public void evictOrganismesEntitatAmbPermisDisseny(Long entitatId, String usuariCodi) {}
 
-	@Cacheable(value = "errorsValidacioNode", key = "#node.id")
-	public List<ValidacioErrorDto> findErrorsValidacioPerNode(
-			NodeEntity node) {
-		logger.debug("Consulta dels errors de validació pel node (nodeId=" + node.getId() + ")");
+	@Cacheable(value = "errorsValidacioNode", key = "#nodeId")
+	public List<ValidacioErrorDto> findErrorsValidacioPerNode(Long nodeId) {
+
+		logger.debug("Consulta dels errors de validació pel node (nodeId=" + nodeId + ")");
+		
+		NodeEntity node = nodeRepository.findById(nodeId).get();
+		
 		List<ValidacioErrorDto> errors = new ArrayList<ValidacioErrorDto>();
 		List<DadaEntity> dades = dadaRepository.findByNode(node);
+		
 		// Valida dades específiques del meta-node
 		List<MetaDadaEntity> metaDades = metaDadaRepository.findByMetaNodeAndActivaTrueAndMultiplicitatIn(node.getMetaNode(),
 					new MultiplicitatEnumDto [] {
@@ -306,8 +314,9 @@ public class CacheHelper {
 		
 		return errors;
 	}
-	@CacheEvict(value = "errorsValidacioNode", key = "#node.id")
-	public void evictErrorsValidacioPerNode(NodeEntity node) {}
+	
+	@CacheEvict(value = "errorsValidacioNode", key = "#nodeId")
+	public void evictErrorsValidacioPerNode(Long nodeId) {}
 	
 	@Cacheable(value = "usuariAmbCodi", key="#usuariCodi")
 	public DadesUsuari findUsuariAmbCodi(String usuariCodi) {
@@ -602,11 +611,11 @@ public class CacheHelper {
 	}
 		
 	@CacheEvict(value = "notificacionsAmbErrorPerExpedient", key="#expedient")
-	public void evictNotificacionsAmbErrorPerExpedient(ExpedientEntity expedient) { }
+	public void evictNotificacionsAmbErrorPerExpedient(ExpedientEntity expedient) {}
 	
-	@Cacheable(value = "enviamentsPortafirmesPendentsPerExpedient", key="#expedient")
-	public boolean hasEnviamentsPortafirmesPendentsPerExpedient(
-			ExpedientEntity expedient) {
+	@Cacheable(value = "enviamentsPortafirmesPendentsPerExpedient", key="#expedientId")
+	public boolean hasEnviamentsPortafirmesPendentsPerExpedient(Long expedientId) {
+		ExpedientEntity expedient = expedientRepository.findById(expedientId).get();
 		boolean hasEnviamentsPortafirmesPendents = false; //enviaments Portafirmes amb error
 		for (ContingutEntity contingut : expedient.getFills()) {
 			if (contingut instanceof DocumentEntity) {
@@ -627,13 +636,11 @@ public class CacheHelper {
 		return hasEnviamentsPortafirmesPendents;
 	}
 
-	@CacheEvict(value = "enviamentsPortafirmesPendentsPerExpedient", key="#expedient")
-	public void evictEnviamentsPortafirmesPendentsPerExpedient(ExpedientEntity expedient) {
-	}
+	@CacheEvict(value = "enviamentsPortafirmesPendentsPerExpedient", key="#expedientId")
+	public void evictEnviamentsPortafirmesPendentsPerExpedient(Long expedientId) {}
 
 	@Cacheable(value = "notificacionsPendentsPerExpedient", key="#expedient")
-	public boolean hasNotificacionsPendentsPerExpedient(
-			ExpedientEntity expedient) {
+	public boolean hasNotificacionsPendentsPerExpedient(ExpedientEntity expedient) {
 		List<DocumentEntity> documents = documentRepository.findByExpedientAndEsborrat(
 				expedient,
 				0);

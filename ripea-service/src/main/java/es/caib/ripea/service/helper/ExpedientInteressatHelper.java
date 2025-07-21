@@ -108,7 +108,7 @@ public class ExpedientInteressatHelper {
 			arxiuPropagarInteressats(expedient, interessatEntity);
 		}
 		
-		cacheHelper.evictErrorsValidacioPerNode(expedient);
+		cacheHelper.evictErrorsValidacioPerNode(expedient.getId());
 		
 		return interessatEntity;
 	}
@@ -558,7 +558,7 @@ public class ExpedientInteressatHelper {
 					false,
 					false);
 			
-			cacheHelper.evictErrorsValidacioPerNode(expedient);
+			cacheHelper.evictErrorsValidacioPerNode(expedient.getId());
 		} else {
 			logger.error("No s'ha trobat l'interessat a l'expedient ("
 					+ "expedientId=" + expedientId + ", "

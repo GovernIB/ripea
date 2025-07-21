@@ -597,7 +597,7 @@ public class ContingutHelper {
 		}
 		dto.setAgafatPer(conversioTipusHelper.convertir(expedient.getAgafatPer(), UsuariDto.class));
 
-        List<ValidacioErrorDto> errorsValidacio = cacheHelper.findErrorsValidacioPerNode(expedient);
+        List<ValidacioErrorDto> errorsValidacio = cacheHelper.findErrorsValidacioPerNode(expedient.getId());
         dto.setValid(errorsValidacio.isEmpty());
         dto.setNotificacionsCaducades(expedientHelper.expedientTeNotificacionsCaducades(expedient));
 		dto.setNumSeguidors(expedient.getSeguidors().size());
@@ -637,7 +637,7 @@ public class ContingutHelper {
 	private void setExpedientEstatErrors(ExpedientDto dto, ExpedientEntity expedient) {
 		dto.setErrorLastEnviament(cacheHelper.hasEnviamentsPortafirmesAmbErrorPerExpedient(expedient));
 		dto.setErrorLastNotificacio(cacheHelper.hasNotificacionsAmbErrorPerExpedient(expedient));
-		dto.setAmbEnviamentsPendents(cacheHelper.hasEnviamentsPortafirmesPendentsPerExpedient(expedient));
+		dto.setAmbEnviamentsPendents(cacheHelper.hasEnviamentsPortafirmesPendentsPerExpedient(expedient.getId()));
 		dto.setAmbNotificacionsPendents(cacheHelper.hasNotificacionsPendentsPerExpedient(expedient));
 	}
 
@@ -933,7 +933,7 @@ public class ContingutHelper {
 	}
 
 	private void setValidationProperties(DocumentDto dto, DocumentEntity document) {
-		dto.setValid(cacheHelper.findErrorsValidacioPerNode(document).isEmpty());
+		dto.setValid(cacheHelper.findErrorsValidacioPerNode(document.getId()).isEmpty());
 		dto.setValidacioFirmaCorrecte(document.isValidacioFirmaCorrecte());
 		dto.setValidacioFirmaErrorMsg(document.getValidacioFirmaErrorMsg());
 	}
@@ -1445,7 +1445,7 @@ public class ContingutHelper {
 		// Cancel·lar enviament si el document conté enviaments pendents
 		if (contingut instanceof DocumentEntity) {
 			if (expedientPare != null) {
-				cacheHelper.evictErrorsValidacioPerNode(expedientPare);
+				cacheHelper.evictErrorsValidacioPerNode(expedientPare.getId());
 			}
 			DocumentEntity document = (DocumentEntity)contingut;
 			if (document.getEstat().equals(DocumentEstatEnumDto.FIRMA_PENDENT)) {

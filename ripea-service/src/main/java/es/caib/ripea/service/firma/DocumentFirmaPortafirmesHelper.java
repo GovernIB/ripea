@@ -106,7 +106,7 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 					DocumentEntity.class,
 					"El document a enviar al portafirmes no és del tipus " + DocumentTipusEnumDto.DIGITAL);
 		}
-		if (!cacheHelper.findErrorsValidacioPerNode(document).isEmpty()) {
+		if (!cacheHelper.findErrorsValidacioPerNode(document.getId()).isEmpty()) {
 			throw new ValidationException(
 					document.getId(),
 					DocumentEntity.class,
@@ -166,15 +166,13 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 		
 		// Si l'enviament produeix excepcions la retorna
 		SistemaExternException sex = portafirmesEnviar(documentPortafirmes, annexos, transaccioId);
-		cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedient());
+		cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedient().getId());
 		if (sex != null) {
 			throw sex;
 		}
 
 		documentPortafirmes = documentPortafirmesRepository.save(documentPortafirmes);
-		
 		document.updateEstat(DocumentEstatEnumDto.FIRMA_PENDENT);
-		
 		documentPortafirmes.updateAnnexos(annexos);
 		
 		logAll(document, documentPortafirmes, LogTipusEnumDto.PFIRMA_ENVIAMENT);
@@ -241,7 +239,7 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 		} else if (DocumentEnviamentEstatEnumDto.ENVIAT.equals(documentPortafirmes.getEstat())) {
 			exception = portafirmesProcessar(documentPortafirmes);
 		}
-		cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedient());
+		cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedient().getId());
 		return exception;
 	}
 
@@ -383,7 +381,7 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 				
 			// ========================================== DOCUMENT WAS REBUTJAT EN PORTAFIRMES ==============================================
 			} else if (PortafirmesCallbackEstatEnumDto.REBUTJAT.equals(callbackEstat)) {
-				cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedient());
+				cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedient().getId());
 				documentPortafirmes.getDocument().updateEstat(
 						DocumentEstatEnumDto.REDACCIO);
 				documentPortafirmes.updateProcessat(
@@ -430,7 +428,7 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 		
 		DocumentEntity document = documentPortafirmes.getDocument();
 		
-		cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedient());
+		cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedient().getId());
 		document.updateEstat(documentPortafirmes.getFirmaParcial() ? DocumentEstatEnumDto.FIRMA_PARCIAL : DocumentEstatEnumDto.FIRMAT);
 		logFirmat(document);
 
@@ -467,13 +465,9 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 		return portafirmesDocument;
 	}
 	
-	public void portafirmesCancelar(
-			Long entitatId,
-			DocumentEntity document, String rolActual) {
-		logger.debug("Enviant document a portafirmes (" +
-				"entitatId=" + entitatId + ", " +
-				"id=" + document.getId() + ")");
-		cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedient());
+	public void portafirmesCancelar(Long entitatId, DocumentEntity document, String rolActual) {
+		logger.debug("Enviant document a portafirmes (entitatId=" + entitatId + ", id=" + document.getId() + ")");
+		cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedient().getId());
 		cacheHelper.evictEnviamentsPortafirmesAmbErrorPerExpedient(document.getExpedient());
 		boolean hasFirmaParcial = false;
 		List<DocumentViaFirmaEntity> enviamentsViaFirmaProcessats = documentViaFirmaRepository.findByDocumentAndEstatInOrderByCreatedDateDesc(

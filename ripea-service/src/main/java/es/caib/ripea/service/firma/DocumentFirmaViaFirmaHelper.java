@@ -82,7 +82,7 @@ public class DocumentFirmaViaFirmaHelper extends DocumentFirmaHelper{
 					DocumentEntity.class,
 					"El document a enviar a viaFirma no és del tipus " + DocumentTipusEnumDto.DIGITAL);
 		}
-		if (!cacheHelper.findErrorsValidacioPerNode(document).isEmpty()) {
+		if (!cacheHelper.findErrorsValidacioPerNode(document.getId()).isEmpty()) {
 			throw new ValidationException(
 					document.getId(),
 					DocumentEntity.class,
@@ -167,7 +167,7 @@ public class DocumentFirmaViaFirmaHelper extends DocumentFirmaHelper{
 		DocumentEstatEnumDto documentEstatAnterior = document.getEstat();
 		ViaFirmaCallbackEstatEnumDto callbackEstat = documentViaFirma.getCallbackEstat();
 		if (ViaFirmaCallbackEstatEnumDto.RESPONSED.equals(callbackEstat)) {
-			cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedient());
+			cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedient().getId());
 			if (documentViaFirma.isFirmaParcial())
 				document.updateEstat(DocumentEstatEnumDto.FIRMA_PARCIAL);
 			else
@@ -216,7 +216,7 @@ public class DocumentFirmaViaFirmaHelper extends DocumentFirmaHelper{
 		} 
 		if (ViaFirmaCallbackEstatEnumDto.WAITING_CHECK.equals(callbackEstat)) {
 			try {
-				cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedient());
+				cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedient().getId());
 				contingutLogHelper.log(
 						documentViaFirma.getDocument(),
 						LogTipusEnumDto.VFIRMA_WAITING_CHECK,
@@ -233,7 +233,7 @@ public class DocumentFirmaViaFirmaHelper extends DocumentFirmaHelper{
 		
 		if (ViaFirmaCallbackEstatEnumDto.REJECTED.equals(callbackEstat)) {
 			try {
-				cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedient());
+				cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedient().getId());
 				if (! document.getEstat().equals(DocumentEstatEnumDto.FIRMA_PARCIAL)) {
 					documentViaFirma.getDocument().updateEstat(
 							DocumentEstatEnumDto.REDACCIO);
@@ -255,7 +255,7 @@ public class DocumentFirmaViaFirmaHelper extends DocumentFirmaHelper{
 			}
 		} else if (ViaFirmaCallbackEstatEnumDto.ERROR.equals(callbackEstat)) {
 			try {
-				cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedient());
+				cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedient().getId());
 				documentViaFirma.getDocument().updateEstat(
 						DocumentEstatEnumDto.REDACCIO);
 				documentViaFirma.updateProcessat(
@@ -275,7 +275,7 @@ public class DocumentFirmaViaFirmaHelper extends DocumentFirmaHelper{
 			}
 		} else if (ViaFirmaCallbackEstatEnumDto.EXPIRED.equals(callbackEstat)) {
 			try {
-				cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedient());
+				cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedient().getId());
 				documentViaFirma.getDocument().updateEstat(
 						DocumentEstatEnumDto.REDACCIO);
 				documentViaFirma.updateProcessat(
@@ -319,7 +319,7 @@ public class DocumentFirmaViaFirmaHelper extends DocumentFirmaHelper{
 			documentViaFirma.updateEnviat(
 					new Date(),
 					messageCode);
-			cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedient());
+			cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedient().getId());
 		} catch (Exception ex) {
 			Throwable rootCause = ExceptionUtils.getRootCause(ex);
 			if (rootCause == null) rootCause = ex;

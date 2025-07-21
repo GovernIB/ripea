@@ -1,25 +1,26 @@
 package es.caib.ripea.service.resourcehelper;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.stereotype.Component;
+
 import es.caib.ripea.persistence.entity.resourceentity.ExpedientResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.DocumentResourceRepository;
+import es.caib.ripea.service.helper.CacheHelper;
 import es.caib.ripea.service.helper.ContingutHelper;
 import es.caib.ripea.service.intf.model.ExpedientResource;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
 public class ExpedientResourceHelper {
 
     private final DocumentResourceRepository documentResourceRepository;
-
-    private final CacheResourceHelper cacheResourceHelper;
+    private final CacheHelper cacheHelper;
     private final ContingutHelper contingutHelper;
 
     public void setPotTancar(ExpedientResourceEntity entity, ExpedientResource resource){
         this.setExpedientEstatDocuments(entity, resource);
-        resource.setErrors(cacheResourceHelper.findErrorsValidacioPerNode(entity));
+        resource.setErrors(cacheHelper.findErrorsValidacioPerNode(entity.getId()));
         resource.setValid(resource.getErrors().isEmpty());
 
         resource.setPotTancar(

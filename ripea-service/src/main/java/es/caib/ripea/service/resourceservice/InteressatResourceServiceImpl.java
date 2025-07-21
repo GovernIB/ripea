@@ -346,7 +346,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
     	ExpedientEntity expedient 	= expedientRepository.findById(entity.getExpedient().getId()).get();
     	InteressatEntity interessat = interessatRepository.findById(entity.getId()).get();
     	expedientInteressatHelper.arxiuPropagarInteressats(expedient, interessat);
-    	cacheHelper.evictErrorsValidacioPerNode(expedient);
+    	cacheHelper.evictErrorsValidacioPerNode(expedient.getId());
     }
 
     @Override
@@ -359,11 +359,17 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
     }
 
     @Override
+    protected void afterUpdateSave(InteressatResourceEntity entity, InteressatResource resource, Map<String, AnswerRequiredException.AnswerValue> answers, boolean anyOrderChanged) {
+    	cacheHelper.evictErrorsValidacioPerNode(entity.getExpedient().getId());
+    }
+    
+    @Override
     protected void afterDelete(InteressatResourceEntity entity, Map<String, AnswerRequiredException.AnswerValue> answers) {
         InteressatResourceEntity representant = entity.getRepresentant();
         if (representant!=null && representant.isEsRepresentant() && representant.getRepresentats().isEmpty()){
             interessatResourceRepository.delete(representant);
         }
+        cacheHelper.evictErrorsValidacioPerNode(entity.getExpedient().getId());
     }
 
     private class RespresentantPerspectiveApplicator implements PerspectiveApplicator<InteressatResourceEntity, InteressatResource> {

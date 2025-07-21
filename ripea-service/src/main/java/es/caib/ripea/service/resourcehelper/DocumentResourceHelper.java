@@ -11,20 +11,18 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.stereotype.Component;
 
 import es.caib.ripea.persistence.entity.DocumentEntity;
-import es.caib.ripea.persistence.entity.DocumentPortafirmesEntity;
 import es.caib.ripea.persistence.entity.resourceentity.DocumentEnviamentAnnexResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.DocumentPortafirmesResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.DocumentResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.DocumentEnviamentAnnexResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.DocumentPortafirmesResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.DocumentResourceRepository;
-import es.caib.ripea.plugin.portafirmes.PortafirmesPrioritatEnum;
+import es.caib.ripea.service.helper.CacheHelper;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
-import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
 import es.caib.ripea.service.intf.dto.PortafirmesPrioritatEnumDto;
@@ -39,8 +37,8 @@ public class DocumentResourceHelper {
     private final DocumentResourceRepository documentResourceRepository;
     private final DocumentPortafirmesResourceRepository documentPortafirmesResourceRepository;
     private final DocumentEnviamentAnnexResourceRepository documentEnviamentAnnexResourceRepository;
-    private final CacheResourceHelper cacheResourceHelper;
     private final ConfigHelper configHelper;
+    private final CacheHelper cacheHelper;
 
     public String getUniqueNameInPare(DocumentResourceEntity entity) {
         List<DocumentResourceEntity> documentResourceEntityList = documentResourceRepository.findAllByPareId(entity.getPare().getId());
@@ -83,7 +81,7 @@ public class DocumentResourceHelper {
 		if (!DocumentTipusEnumDto.DIGITAL.equals(document.getDocumentTipus())) {
 			throw new ValidationException(document.getId(), DocumentEntity.class, "El document a enviar al portafirmes no és del tipus " + DocumentTipusEnumDto.DIGITAL);
 		}
-		if (!cacheResourceHelper.findErrorsValidacioPerNode(document).isEmpty()) {
+		if (!cacheHelper.findErrorsValidacioPerNode(document.getId()).isEmpty()) {
 			throw new ValidationException(document.getId(), DocumentEntity.class, "El document a enviar al portafirmes te alertes de validació");
 		}		
 		if (DocumentEstatEnumDto.FIRMAT.equals(document.getEstat()) || DocumentEstatEnumDto.CUSTODIAT.equals(document.getEstat())) {
@@ -152,7 +150,7 @@ public class DocumentResourceHelper {
 			documentPortafirmes.updateEnviatError(ExceptionUtils.getStackTrace(rootCause), null);
 			throw ex;
 		} finally {
-			cacheResourceHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedient());
+			cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedient().getId());
 		}
 
 		documentPortafirmes = documentPortafirmesResourceRepository.save(documentPortafirmes);

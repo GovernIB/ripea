@@ -249,7 +249,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		logger.info("MetaExpedientServiceImpl.update evictErrorsValidacioPerNode start (total expedients:" + (expedients.size()) + "");
 		
 		for (ExpedientEntity expedient: expedients) {
-			cacheHelper.evictErrorsValidacioPerNode(expedient);
+			cacheHelper.evictErrorsValidacioPerNode(expedient.getId());
 		}
 		
 		if (cacheHelper.mostrarLogsRendiment())

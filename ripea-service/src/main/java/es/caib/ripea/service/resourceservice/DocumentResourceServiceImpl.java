@@ -39,7 +39,6 @@ import es.caib.ripea.persistence.entity.resourceentity.MetaDocumentResourceEntit
 import es.caib.ripea.persistence.entity.resourceentity.RegistreAnnexResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.UsuariResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.DocumentResourceRepository;
-import es.caib.ripea.persistence.entity.resourcerepository.ExpedientResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.InteressatResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaDocumentResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.RegistreAnnexResourceRepository;
@@ -119,7 +118,6 @@ import es.caib.ripea.service.intf.model.NodeResource.MassiveAction;
 import es.caib.ripea.service.intf.model.UsuariResource;
 import es.caib.ripea.service.intf.resourceservice.DocumentResourceService;
 import es.caib.ripea.service.intf.utils.Utils;
-import es.caib.ripea.service.resourcehelper.CacheResourceHelper;
 import es.caib.ripea.service.resourcehelper.ContingutResourceHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -141,7 +139,6 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     private final ExcepcioLogHelper excepcioLogHelper;
     private final DocumentNotificacioHelper documentNotificacioHelper;
     private final EntityComprovarHelper entityComprovarHelper;
-    private final CacheResourceHelper cacheResourceHelper;
     private final RolHelper rolHelper;
 	private final DocumentFirmaPortafirmesHelper firmaPortafirmesHelper;
 	private final DocumentFirmaViaFirmaHelper firmaViaFirmaHelper;
@@ -151,7 +148,6 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     private final UsuariResourceRepository usuariResourceRepository;
     private final DocumentResourceRepository documentResourceRepository;
     private final MetaDocumentResourceRepository metaDocumentResourceRepository;
-    private final ExpedientResourceRepository expedientResourceRepository;
     private final InteressatResourceRepository interessatResourceRepository;
     private final RegistreAnnexResourceRepository registreAnnexResourceRepository;
     private final ContingutMovimentRepository contingutMovimentRepository;
@@ -313,7 +309,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                 null
         ));
         
-        resource.setErrors(cacheResourceHelper.findErrorsValidacioPerNode(entity));
+        resource.setErrors(cacheHelper.findErrorsValidacioPerNode(entity.getId()));
         resource.setValid(resource.getErrors().isEmpty());
         
         resource.setAmbNotificacions(!entity.getNotificacions().isEmpty());

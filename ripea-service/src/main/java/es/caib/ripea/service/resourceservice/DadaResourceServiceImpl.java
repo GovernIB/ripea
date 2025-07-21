@@ -15,6 +15,7 @@ import es.caib.ripea.persistence.entity.resourceentity.DadaResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.DadaResourceRepository;
 import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
+import es.caib.ripea.service.helper.CacheHelper;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.DominiHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
@@ -37,6 +38,7 @@ import lombok.extern.slf4j.Slf4j;
 public class DadaResourceServiceImpl extends BaseMutableResourceService<DadaResource, Long, DadaResourceEntity> implements DadaResourceService {
 
 	private final DominiHelper dominiHelper;
+	private final CacheHelper cacheHelper;
 	private final ConfigHelper configHelper;
 	private final ExcepcioLogHelper excepcioLogHelper;
 	private final EntitatRepository entitatRepository;
@@ -53,6 +55,25 @@ public class DadaResourceServiceImpl extends BaseMutableResourceService<DadaReso
         beforeSave(entity, resource, answers);
     }
 
+    //Metodes "after" (volem netejar la cache de validacio del expedient)
+    @Override
+    protected void afterCreateSave(DadaResourceEntity entity, DadaResource resource, Map<String, AnswerRequiredException.AnswerValue> answers, boolean anyOrderChanged) {
+    	afterDbChange(entity);
+    }    
+    @Override
+    protected void afterUpdateSave(DadaResourceEntity entity, DadaResource resource, Map<String, AnswerRequiredException.AnswerValue> answers, boolean anyOrderChanged) {
+    	afterDbChange(entity);
+    }    
+    @Override
+    protected void afterDelete(DadaResourceEntity entity, Map<String, AnswerRequiredException.AnswerValue> answers) {
+        updateOrder(entity, null);
+        afterDbChange(entity);
+    }    
+    private void afterDbChange(DadaResourceEntity entity) {
+    	cacheHelper.evictErrorsValidacioPerNode(entity.getNode().getId());
+    }
+    //Fi Metodes AFTER
+    
     @Override
     protected void beforeUpdateSave(DadaResourceEntity entity, DadaResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
         beforeSave(entity, resource, answers);
@@ -61,11 +82,6 @@ public class DadaResourceServiceImpl extends BaseMutableResourceService<DadaReso
     private void beforeSave(DadaResourceEntity entity, DadaResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
         String value = resource.getDataValorByTipus();
         entity.setValor(value);
-    }
-
-    @Override
-    protected void afterDelete(DadaResourceEntity entity, Map<String, AnswerRequiredException.AnswerValue> answers) {
-        updateOrder(entity, null);
     }
 
     @Override

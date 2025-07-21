@@ -4968,10 +4968,8 @@ public class PluginHelper {
 					emailHelper.canviEstatNotificacio(notificacio, estatAnterior);
 			}
 
-			cacheHelper.evictErrorsValidacioPerNode(
-					expedient);
-			cacheHelper.evictNotificacionsPendentsPerExpedient(
-					expedient);
+			cacheHelper.evictErrorsValidacioPerNode(expedient.getId());
+			cacheHelper.evictNotificacionsPendentsPerExpedient(expedient);
 
 			integracioHelper.addAccioOk(
 					IntegracioHelper.INTCODI_NOTIFICACIO,

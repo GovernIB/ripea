@@ -32,6 +32,7 @@ import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
+import es.caib.ripea.service.helper.MessageHelper;
 import es.caib.ripea.service.helper.TascaHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
@@ -69,6 +70,7 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
     private final TascaHelper tascaHelper;
     private final ExcepcioLogHelper excepcioLogHelper;
     private final EntityComprovarHelper entityComprovarHelper;
+    private final MessageHelper messageHelper;
     
 	@PostConstruct
 	public void init() {
@@ -251,7 +253,13 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
 		if (validacionsPendents==null || validacionsPendents.isEmpty()) {
 			tascaHelper.canviarEstatTasca(entity.getId(), estat, motiu, configHelper.getRolActual());
 		} else {
-			throw new ActionExecutionException(getResourceClass(), entity.getId(), null, "expedientTasca.changeEstat.reject.validacionsPendents");
+			String message = messageHelper.getMessage("expedientTasca.changeEstat.reject.validacionsPendents");
+            for (MetaExpedientTascaValidacioDto validacio : validacionsPendents) {
+                String itemValidacio  = messageHelper.getMessage("metaexpedient.tasca.validacio.tipus." + validacio.getItemValidacio());
+                String tipusValidacio = messageHelper.getMessage("metaexpedient.tasca.validacio.enum." + validacio.getTipusValidacio());
+                message += "<br/>&nbsp;-&nbsp;" + itemValidacio + " <b>" + validacio.getItemNom() + "</b>: " + tipusValidacio;
+            }
+			throw new ActionExecutionException(getResourceClass(), entity.getId(), null, message);
 		}
     }
 

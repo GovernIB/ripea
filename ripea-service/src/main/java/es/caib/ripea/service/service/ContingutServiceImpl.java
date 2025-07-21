@@ -13,7 +13,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -188,7 +187,7 @@ public class ContingutServiceImpl implements ContingutService {
 					valors.get(dadaCodi),
 					entitatId);
 		}
-		cacheHelper.evictErrorsValidacioPerNode(node);
+		cacheHelper.evictErrorsValidacioPerNode(node.getId());
 	}
 	
 	private void nodeDadaGuardar(
@@ -730,18 +729,10 @@ public class ContingutServiceImpl implements ContingutService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public List<ValidacioErrorDto> findErrorsValidacio(
-			Long entitatId,
-			Long contingutId) {
-		logger.debug("Obtenint errors de validació del contingut ("
-				+ "entitatId=" + entitatId + ", "
-				+ "contingutId=" + contingutId + ")");
-		NodeEntity node = contingutHelper.comprovarNodeDinsExpedientAccessible(
-				entitatId,
-				contingutId,
-				true,
-				false);
-		return cacheHelper.findErrorsValidacioPerNode(node);
+	public List<ValidacioErrorDto> findErrorsValidacio(Long entitatId, Long contingutId) {
+		logger.debug("Obtenint errors de validació del contingut (entitatId=" + entitatId + ", contingutId=" + contingutId + ")");
+		NodeEntity node = contingutHelper.comprovarNodeDinsExpedientAccessible(entitatId, contingutId, true,false);
+		return cacheHelper.findErrorsValidacioPerNode(node.getId());
 	}
 
 	@Transactional(readOnly = true)

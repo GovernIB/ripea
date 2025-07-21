@@ -322,7 +322,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 					ExpedientEstatEnumDto.OBERT, 
 					0);
 			for (ExpedientEntity expedient: expedients) {
-				cacheHelper.evictErrorsValidacioPerNode(expedient);
+				cacheHelper.evictErrorsValidacioPerNode(expedient.getId());
 			}
 		}
 		
