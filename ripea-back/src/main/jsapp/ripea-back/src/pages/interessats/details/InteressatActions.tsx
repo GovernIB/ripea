@@ -51,7 +51,7 @@ export const useActions = (refresh?: () => void) => {
             .then((representant) => {
                 messageDialogShow(
                     t('page.interessat.action.deleteRep.check'),
-                    t('page.interessat.dialog.deleteRep.description'),
+                    t('page.interessat.action.deleteRep.description'),
                     confirmDialogButtons,
                     confirmDialogComponentProps)
                     .then((value: any) => {
@@ -84,7 +84,7 @@ export const useActions = (refresh?: () => void) => {
     const deleteInteressat = (id: any, row: any) => {
         messageDialogShow(
             t('page.interessat.action.delete.check'),
-            t('page.interessat.dialog.delete.description'),
+            t('page.interessat.action.delete.description'),
             confirmDialogButtons,
             confirmDialogComponentProps)
             .then((value: any) => {

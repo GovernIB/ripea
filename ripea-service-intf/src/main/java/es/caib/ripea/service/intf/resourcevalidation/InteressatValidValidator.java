@@ -62,6 +62,16 @@ public class InteressatValidValidator implements ConstraintValidator<InteressatV
                 valid = false;
             }
         }
+        if (InteressatTipusEnum.InteressatPersonaJuridicaEntity.equals(resource.getTipus())) {
+            if (resource.getRaoSocial() == null) {
+                context
+                        .buildConstraintViolationWithTemplate("{javax.validation.constraints.NotNull.message}")
+                        .addPropertyNode(InteressatResource.Fields.raoSocial)
+                        .addConstraintViolation()
+                        .disableDefaultConstraintViolation();
+                valid = false;
+            }
+        }
         if (!InteressatTipusEnum.InteressatAdministracioEntity.equals(resource.getTipus())) {
             if (resource.getDocumentNum() == null || resource.getDocumentNum().isBlank()) {
                 context

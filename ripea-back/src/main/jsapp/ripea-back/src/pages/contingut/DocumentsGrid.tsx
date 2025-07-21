@@ -14,6 +14,7 @@ import { useUserSession } from "../../components/Session.tsx";
 import { useSessionList } from "../../components/SessionStorageContext.tsx";
 import DropZone from "../../components/DropZone.tsx";
 import DocumentsGridForm from "./DocumentGridForm.tsx";
+import MetaExpedient from "./details/MetaExpedient.tsx";
 
 const View = {
     estat: 'TREETABLE_PER_ESTAT',
@@ -196,7 +197,13 @@ const DocumentsGrid = (props: any) => {
                         headerName: t('page.contingut.grid.nom'),
                         flex: 1.5,
                         valueFormatter: (value: any, row: any) => {
-                            return row?.id ? <ContingutIcon entity={row} /> : value;
+                            if (row?.id) {
+                                if (vista == View.tipus && row?.multiplicitat) {
+                                    return <MetaExpedient entity={row}/>;
+                                }
+                                return <ContingutIcon entity={row} />
+                            }
+                            return value;
                         },
                         renderCell: (params: any) => {
                             return treeView
@@ -208,25 +215,40 @@ const DocumentsGrid = (props: any) => {
                     treeDataAdditionalRows={(_rows: any) => {
                         const additionalRows: any[] = [];
 
-                        if (vista == View.carpeta || vista == View.icona) {
-                            for (const contingut of [...carpetes, ...expedients]) {
-                                if (entity?.id!= contingut.id && !additionalRows.map((b) => b.id).includes(contingut.id)) {
-                                    additionalRows.push(contingut)
+                        switch (vista) {
+                            case View.carpeta:
+                            case View.icona:
+                                for (const contingut of [...carpetes, ...expedients]) {
+                                    if (entity?.id!= contingut.id && !additionalRows.map((b) => b.id).includes(contingut.id)) {
+                                        additionalRows.push(contingut)
+                                    }
                                 }
-                            }
 
-                            setTreeView(additionalRows?.length > 0)
-                        } else {
-                            setTreeView(true)
+                                setTreeView(additionalRows?.length > 0)
+                                break;
+                            case View.tipus:
+                                if (_rows!=null){
+                                    for (const row of _rows) {
+                                        if (!additionalRows.map((b) => b.id).includes(row?.metaNode?.id)) {
+                                            additionalRows.push(row?.metaDocumentInfo)
+                                        }
+                                    }
+                                }
+                                setTreeView(true)
+                                break;
+                            case View.estat:
+                                setTreeView(true)
+                                break;
                         }
+
                         // console.log('>>> additionalRows', additionalRows)
                         return additionalRows;
                     }}
                     getTreeDataPath={(row: any): string[] => {
                         switch (vista) {
                             case View.estat: return [`${row?.expedientEstatAdditional?.description}`, `${row.id}`];
-                            case View.tipus: return [`${row?.metaNode?.description}`, `${row.id}`];
-                            default: return row.treePath.filter((id:any)=>id!=entity?.id);
+                            case View.tipus: return row?.metaNode ?[`${row?.metaNode?.id}`, `${row.id}`] :[`${row.id}`];
+                            default: return row?.treePath?.filter((id:any)=>id!=entity?.id) ?? [`${row.id}`];
                         }
                     }}
 

@@ -34,7 +34,10 @@ const Contenido = (props:any) => {
 }
 
 const Dada = (props:any) => {
-    const { entity, onRowCountChange } = props
+    const { entity, potModificar, onRowCountChange } = props
+    if (entity!=null && potModificar!=null) {
+        entity['potModificar'] = potModificar;
+    }
 
     return <GridPage>
         <Box width={'100%'} height={110 + 52 * 4}>
@@ -94,7 +97,7 @@ export const Firmes = (props:any) => {
 }
 
 const perspectives = ['VERSIONS', 'COUNT', 'FIRMES']
-const useDocumentDetail = () => {
+const useDocumentDetail = (expedient:any) => {
     const { t } = useTranslation();
 
     const {
@@ -137,7 +140,7 @@ const useDocumentDetail = () => {
         {
             value: "dades",
             label: t('page.contingut.tabs.dades'),
-            content: <Dada entity={entity} onRowCountChange={setNumDades}/>,
+            content: <Dada entity={entity} potModificar={expedient?.potModificar} onRowCountChange={setNumDades}/>,
             badge: numDades ?? entity?.numDades,
             hidden: !entity?.numMetaDades,
         },

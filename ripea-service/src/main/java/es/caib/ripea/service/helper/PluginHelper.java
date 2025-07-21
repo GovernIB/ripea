@@ -4129,7 +4129,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0);
 			if (provincies!=null) {
 				for (Provincia prov: provincies) {
-					if (prov.getNom().equals(provinciaCodi)) {
+					if (prov.getCodi().equals(provinciaCodi)) {
 						return prov;
 					}
 				}
@@ -4237,7 +4237,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0);
 			if (municipis!=null) {
 				for (Municipi muni: municipis) {
-					if (muni.getNom().equals(municipiCodi)) {
+					if (muni.getCodi().equals(municipiCodi)) {
 						return muni;
 					}
 				}
