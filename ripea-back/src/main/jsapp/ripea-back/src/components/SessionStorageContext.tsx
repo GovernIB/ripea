@@ -96,6 +96,11 @@ export const useSessionList = (key:string) => {
         get: (key:string)=> container?.[key],
         save: listSave,
         remove: (key:string) => listSave(key, undefined),
-        removeAll: remove
+        removeAll: () => {
+            if (containerRef?.current) {
+                containerRef.current = [];
+            }
+            remove();
+        }
     }
 }
