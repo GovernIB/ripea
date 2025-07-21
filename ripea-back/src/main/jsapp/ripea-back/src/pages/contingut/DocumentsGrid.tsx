@@ -168,9 +168,8 @@ const DocumentsGrid = (props: any) => {
     }, [])
 
     useEffect(() => {
-        removeAll()
         addFolderExpand("vista", vista)
-    }, [expand, vista]);
+    }, [vista]);
 
     return <GridPage>
         <Load value={entity && isReady}>
@@ -266,7 +265,11 @@ const DocumentsGrid = (props: any) => {
                     toolbarElementsWithPositions={[
                         {
                             position: 0,
-                            element: <ExpandButton value={expand} onChange={setExpand} hidden={!treeView} />,
+                            element: <ExpandButton value={expand} onChange={(value) => {
+                                removeAll()
+                                addFolderExpand("vista", vista)
+                                setExpand(value)
+                            }} hidden={!treeView} />,
                         },
                         {
                             position: 1,

@@ -90,7 +90,8 @@ const TancarForm = () => {
                         }}
                         height={162 + 52 * 4}
                         readOnly
-                    /></Load>
+                    />
+                </Load>
             </Grid>
 
             <Grid item xs={12} hidden={!entity?.conteNotificacionsCaducades}>
