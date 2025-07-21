@@ -3,14 +3,16 @@
  */
 package es.caib.ripea.back.validation;
 
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
 import es.caib.ripea.back.command.ViaFirmaEnviarCommand;
 import es.caib.ripea.back.helper.MessageHelper;
 import es.caib.ripea.service.intf.config.PropertyConfig;
+import es.caib.ripea.service.intf.dto.ViaFirmaTipusDestinatariEnum;
 import es.caib.ripea.service.intf.service.AplicacioService;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
 
 /**
  * Constraint de validació que controla alguns camps del formulari de viaFirma
@@ -40,6 +42,18 @@ public class ViaFirmaValidator implements ConstraintValidator<ViaFirma, ViaFirma
 		if (command.isValidateCodeEnabled() && (command.getValidateCode() == null || command.getValidateCode().isEmpty())) {
 			context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty"))
 			.addNode("validateCode")
+			.addConstraintViolation();
+			valid = false;
+		}
+		if (ViaFirmaTipusDestinatariEnum.EMAIL.equals(command.getTipusDestinatari()) && (command.getSignantEmail() == null || command.getSignantEmail().isEmpty())) {
+			context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty"))
+			.addNode("signantEmail")
+			.addConstraintViolation();
+			valid = false;
+		}
+		if (ViaFirmaTipusDestinatariEnum.TABLET.equals(command.getTipusDestinatari()) && (command.getCodiUsuariViaFirma() == null || command.getCodiUsuariViaFirma().isEmpty())) {
+			context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty"))
+			.addNode("codisUsuariViaFirma")
 			.addConstraintViolation();
 			valid = false;
 		}

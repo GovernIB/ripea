@@ -20,8 +20,10 @@ public class ViaFirmaParams implements Serializable {
 	private String codiUsuari;
 	private String contrasenya;
 	private ViaFirmaDispositiu viaFirmaDispositiu;
+	private ViaFirmaTipusDestinatari tipusDestinatari;
 	private String signantNif;
 	private String signantNom;
+	private String signantEmail;
 	private String expedientCodi;
 	private String observaciones;
 	private boolean validateCodeEnabled;

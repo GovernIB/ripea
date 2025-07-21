@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import es.caib.ripea.service.intf.config.PropertyConfig;
-import es.caib.ripea.service.intf.utils.Utils;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,8 +18,12 @@ import com.viafirma.documents.sdk.java.model.Evidence;
 import com.viafirma.documents.sdk.java.model.Evidence.TypeEnum;
 import com.viafirma.documents.sdk.java.model.Message;
 import com.viafirma.documents.sdk.java.model.Notification;
+import com.viafirma.documents.sdk.java.model.Notification.NotificationTypeEnum;
 import com.viafirma.documents.sdk.java.model.Param;
 import com.viafirma.documents.sdk.java.model.Policy;
+import com.viafirma.documents.sdk.java.model.Position;
+import com.viafirma.documents.sdk.java.model.Rectangle;
+import com.viafirma.documents.sdk.java.model.SharedLink;
 import com.viafirma.documents.sdk.java.model.Signature;
 import com.viafirma.documents.sdk.java.model.Signature.CertificationLevelEnum;
 import com.viafirma.documents.sdk.java.model.Workflow;
@@ -35,6 +37,9 @@ import es.caib.ripea.plugin.viafirma.ViaFirmaError;
 import es.caib.ripea.plugin.viafirma.ViaFirmaParams;
 import es.caib.ripea.plugin.viafirma.ViaFirmaPlugin;
 import es.caib.ripea.plugin.viafirma.ViaFirmaResponse;
+import es.caib.ripea.plugin.viafirma.ViaFirmaTipusDestinatari;
+import es.caib.ripea.service.intf.config.PropertyConfig;
+import es.caib.ripea.service.intf.utils.Utils;
 
 /**
  * Implementació de del plugin de viaFirma
@@ -51,96 +56,16 @@ public class ViaFirmaPluginImpl extends RipeaAbstractPluginProperties implements
 	}
 	
 	@Override
-	public ViaFirmaResponse uploadDocument(ViaFirmaParams parametresViaFirma) throws SistemaExternException {
+	public ViaFirmaResponse uploadDocument(ViaFirmaParams params) throws SistemaExternException {
 		String errorDescripcio = "No s'ha pogut enviar el document a viaFirma";
 		ViaFirmaResponse response = new ViaFirmaResponse();
 		ViaFirmaError error = new ViaFirmaError();
-		Message message = new Message();
 		try {
-			// Create notification info
-            Notification notification = new Notification();
-            notification.setText(parametresViaFirma.getTitol());
-            notification.setDetail(parametresViaFirma.getDescripcio());
-            if (parametresViaFirma.isDeviceEnabled()) {
-            	notification.setDevices(new ArrayList<Device>());
-            	notification.getDevices().add(
-            			convertToDevice(
-            					parametresViaFirma.getViaFirmaDispositiu(),
-            					null));
-            } else {
-            	notification.setDevices(new ArrayList<Device>());
-            	notification.getDevices().add(
-            			convertToDevice(
-            					null, 
-            					parametresViaFirma.getCodiUsuari()));
-            }
-            if (parametresViaFirma.isValidateCodeEnabled()) {
-            	notification.setValidateCode(parametresViaFirma.getValidateCode());
-            }
-            message.setNotification(notification);
-            
-            // Create a template document
-            Document document = new Document();
-            document.setTemplateType(TemplateTypeEnum.base64);
-            document.setTemplateReference(parametresViaFirma.getContingut());
-            message.setDocument(document);
-
-            String signantNom = parametresViaFirma.getSignantNom().replaceAll(",", "");
-            String signantNif = parametresViaFirma.getSignantNif();
-            //Configuració de las políticas de firma
-            message.setPolicies(new ArrayList<Policy>());
-            Policy policy = new Policy();
-            policy.setEvidences(new ArrayList<Evidence>());
-            Evidence evidence = new Evidence();
-            evidence.setType(TypeEnum.SIGNATURE);
-            evidence.setHelpText("Firma de " + signantNom);
-            evidence.setHelpDetail("Yo, " + signantNom + ", con NIF número " + signantNif + " he leído y entendido el contenido del documento que voy a firmar." + (parametresViaFirma.getObservaciones() != null ? "[Observaciones: " + parametresViaFirma.getObservaciones()  + "]" : ""));
-            evidence.setTypeFormatSign("XADES_B");
-            
-            List<Param> metadataList = new ArrayList<Param>();
-            //Titular Nom
-            Param titularNom = new Param();
-            titularNom.setKey("TITULAR");
-            titularNom.setValue(signantNom);
-            metadataList.add(titularNom);
-            //Titular NIF
-            Param titularNif = new Param();
-            titularNif.setKey("TITULAR_DNI");
-            titularNif.setValue(signantNif);
-            metadataList.add(titularNif);
-            //Codi expedient
-            Param expedient = new Param();
-            expedient.setKey("EXPEDIENTE");
-            expedient.setValue(parametresViaFirma.getExpedientCodi());
-            metadataList.add(expedient);
-            //Observacions
-            Param observacions = new Param();
-            observacions.setKey("OBSERVACIONES");
-            observacions.setValue(parametresViaFirma.getObservaciones());
-            metadataList.add(observacions);
-            message.setMetadataList(metadataList);
-            //evidence.setMetadataList(metadataList);   
-            policy.getEvidences().add(evidence);
-
-            policy.setSignatures(new ArrayList<Signature>());
-            Signature signature = new Signature();
-            signature.setType(com.viafirma.documents.sdk.java.model.Signature.TypeEnum.SERVER);
-            signature.setHelpText("Server signature");
-            signature.setTypeFormatSign(com.viafirma.documents.sdk.java.model.Signature.TypeFormatSignEnum.PADES_LTA);
-            signature.setCertificationLevel(CertificationLevelEnum.NOT_CERTIFIED);
-            policy.getSignatures().add(signature);
-
-            message.getPolicies().add(policy);
-            
-            message.setCallbackURL(getCallBackUrl());
-            message.setCallbackAuthorization(generateAuthenticationHeader());
-            message.setGroupCode(getGroupCodi());
-            
-            Workflow workFlow = new Workflow();
-            workFlow.setType(com.viafirma.documents.sdk.java.model.Workflow.TypeEnum.APP);
-            message.setWorkflow(workFlow);
-            
-            String messageCode = getViaFirmaClient(parametresViaFirma.getCodiUsuari(), parametresViaFirma.getContrasenya()).
+			Message message = (ViaFirmaTipusDestinatari.EMAIL.equals(params.getTipusDestinatari()))
+	                ? prepararMessagePerEmail(params)
+	                : prepararMessagePerTablet(params);
+			
+            String messageCode = getViaFirmaClient(params.getCodiUsuari(), params.getContrasenya()).
 				getV3MessagesApi().sendMessage(message);
             
 			response.setCodiMissatge(messageCode);
@@ -209,6 +134,177 @@ public class ViaFirmaPluginImpl extends RipeaAbstractPluginProperties implements
 		return viaFirmaDispositius;
 	}
 
+    private Message prepararMessagePerEmail(ViaFirmaParams params) throws SistemaExternException {
+        Message message = new Message();
+
+        message.setNotification(buildNotificationForEmail(params));
+        message.setDocument(buildDocument(params));
+        message.setPolicies(buildPolicies(params, false));
+        setCommonMessageAttributes(message, params);
+
+        Workflow workflow = new Workflow();
+        workflow.setType(com.viafirma.documents.sdk.java.model.Workflow.TypeEnum.WEB);
+        message.setWorkflow(workflow);
+
+        return message;
+    }
+
+    private Message prepararMessagePerTablet(ViaFirmaParams params) throws SistemaExternException {
+        Message message = new Message();
+
+        message.setNotification(buildNotificationForTablet(params));
+        message.setDocument(buildDocument(params));
+        message.setPolicies(buildPolicies(params, true));
+        setCommonMessageAttributes(message, params);
+
+        Workflow workflow = new Workflow();
+        workflow.setType(com.viafirma.documents.sdk.java.model.Workflow.TypeEnum.APP);
+        message.setWorkflow(workflow);
+
+        return message;
+    }
+
+    // Construye notificación para email
+    private Notification buildNotificationForEmail(ViaFirmaParams params) {
+        Notification notification = new Notification();
+        notification.setText(params.getTitol());
+        notification.setNotificationType(NotificationTypeEnum.MAIL);
+
+        SharedLink shared = new SharedLink();
+        shared.setEmail(params.getSignantEmail());
+        shared.setSubject("Firma documento viafirma");
+        notification.setSharedLink(shared);
+
+        notification.setDetail(params.getDescripcio());
+
+        if (params.isValidateCodeEnabled()) {
+            notification.setValidateCode(params.getValidateCode());
+        }
+
+        return notification;
+    }
+
+    // Construye notificación para tablet
+    private Notification buildNotificationForTablet(ViaFirmaParams params) throws SistemaExternException {
+        Notification notification = new Notification();
+        notification.setText(params.getTitol());
+        notification.setDetail(params.getDescripcio());
+
+        List<Device> devices = new ArrayList<>();
+
+        if (params.isDeviceEnabled()) {
+            devices.add(convertToDevice(params.getViaFirmaDispositiu(), null));
+        } else {
+            devices.add(convertToDevice(null, params.getCodiUsuari()));
+        }
+
+        notification.setDevices(devices);
+
+        if (params.isValidateCodeEnabled()) {
+            notification.setValidateCode(params.getValidateCode());
+        }
+
+        return notification;
+    }
+
+    // Construye documento base
+    private Document buildDocument(ViaFirmaParams params) {
+        Document document = new Document();
+        document.setTemplateType(TemplateTypeEnum.base64);
+        document.setTemplateReference(params.getContingut());
+        return document;
+    }
+
+    // Construye políticas comunes, ajusta según sea email o tablet
+    private List<Policy> buildPolicies(ViaFirmaParams params, boolean isTablet) {
+        List<Policy> policies = new ArrayList<>();
+
+        Policy policy = new Policy();
+        policy.setEvidences(new ArrayList<>());
+
+        Evidence evidence = new Evidence();
+        evidence.setType(TypeEnum.SIGNATURE);
+        evidence.setHelpText("Firma de " + cleanName(params.getSignantNom()));
+
+        String helpDetail = String.format("Yo, %s, con NIF número %s he leído y entendido el contenido del documento que voy a firmar.",
+                cleanName(params.getSignantNom()),
+                params.getSignantNif());
+
+        if (params.getObservaciones() != null && !params.getObservaciones().isEmpty()) {
+            helpDetail += " [Observaciones: " + params.getObservaciones() + "]";
+        }
+
+        evidence.setHelpDetail(helpDetail);
+
+        if (isTablet) {
+            evidence.setTypeFormatSign("XADES_B");
+        }
+
+        if (!isTablet) {
+            List<Position> positions = new ArrayList<>();
+            Position position = new Position();
+            Rectangle rectangle = new Rectangle();
+            rectangle.setHeight(62);
+            rectangle.setWidth(125);
+            //rectangle.setX(105);
+            //rectangle.setY(532);
+            position.setPage(0);
+            position.setRectangle(rectangle);
+            positions.add(position);
+            
+            evidence.setPositions(positions);
+        }
+
+        policy.getEvidences().add(evidence);
+
+        policy.setSignatures(new ArrayList<>());
+
+        Signature signature = new Signature();
+        if (isTablet) {
+            signature.setType(com.viafirma.documents.sdk.java.model.Signature.TypeEnum.SERVER);
+            signature.setHelpText("Server signature");
+            signature.setTypeFormatSign(com.viafirma.documents.sdk.java.model.Signature.TypeFormatSignEnum.PADES_LTA);
+            signature.setCertificationLevel(CertificationLevelEnum.NOT_CERTIFIED);
+        } else {
+            signature.setType(com.viafirma.documents.sdk.java.model.Signature.TypeEnum.SERVER);
+        }
+
+        policy.getSignatures().add(signature);
+
+        policies.add(policy);
+
+        return policies;
+    }
+
+    private void setCommonMessageAttributes(Message message, ViaFirmaParams params) throws SistemaExternException {
+        message.setMetadataList(buildMetadataList(params));
+        message.setCallbackURL(getCallBackUrl());
+        message.setCallbackAuthorization(generateAuthenticationHeader());
+        message.setGroupCode(getGroupCodi());
+    }
+
+    private List<Param> buildMetadataList(ViaFirmaParams params) {
+        List<Param> metadataList = new ArrayList<>();
+
+        metadataList.add(createParam("TITULAR", cleanName(params.getSignantNom())));
+        metadataList.add(createParam("TITULAR_DNI", params.getSignantNif()));
+        metadataList.add(createParam("EXPEDIENTE", params.getExpedientCodi()));
+        metadataList.add(createParam("OBSERVACIONES", params.getObservaciones()));
+
+        return metadataList;
+    }
+
+    private Param createParam(String key, String value) {
+        Param param = new Param();
+        param.setKey(key);
+        param.setValue(value != null ? value : "");
+        return param;
+    }
+
+    private String cleanName(String name) {
+        return name != null ? name.replaceAll(",", "") : "";
+    }
+    
 	private ViaFirmaClient viaFirmaClient;
 	private ViaFirmaClient getViaFirmaClient(
 			String usuari,

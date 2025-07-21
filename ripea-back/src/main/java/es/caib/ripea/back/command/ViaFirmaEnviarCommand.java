@@ -3,16 +3,18 @@
  */
 package es.caib.ripea.back.command;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
+
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 import es.caib.ripea.back.helper.ConversioTipusHelper;
 import es.caib.ripea.back.validation.ViaFirma;
+import es.caib.ripea.service.intf.dto.ViaFirmaTipusDestinatariEnum;
 import es.caib.ripea.service.intf.dto.ViaFirmaDispositiuDto;
 import es.caib.ripea.service.intf.dto.ViaFirmaEnviarDto;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import javax.validation.constraints.NotEmpty;
-
-import javax.validation.constraints.Size;
 
 /**
  * Command per a enviar documents al portafirmes.
@@ -27,7 +29,7 @@ public class ViaFirmaEnviarCommand {
 	private String titol;
 	@Size(max=256)
 	private String descripcio;
-	@NotEmpty
+	private ViaFirmaTipusDestinatariEnum tipusDestinatari;
 	private String codiUsuariViaFirma;
 	private String codisUsuariViaFirma;
 	private String dispositiuViaFirma;
@@ -36,6 +38,7 @@ public class ViaFirmaEnviarCommand {
 	private String signantNif;
 	@NotEmpty
 	private String signantNom;
+	private String signantEmail;
 	@Size(max=256)
 	private String observacions;
 	

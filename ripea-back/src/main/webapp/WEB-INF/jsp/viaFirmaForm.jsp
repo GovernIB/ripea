@@ -147,6 +147,7 @@ $(document).ready(function() {
 					if (data) {
 						$('#signantNom').val(data.llinatgesComaNom);
 						$('#signantNif').val(data.documentNum);
+						$('#signantEmail').val(data.email);
 					}
 				},
 				error: function() {
@@ -156,6 +157,7 @@ $(document).ready(function() {
 		} else {
 			$('#signantNom').val('');
 			$('#signantNif').val('');
+			$('#signantEmail').val('');
 		}
 	});
 	
@@ -181,6 +183,24 @@ $(document).ready(function() {
 		}
 	});
 	valdiateCodeEnabledInput.trigger('change');
+	
+	var campCodiUsuari = $('select#codisUsuariViaFirma').closest('.form-group');
+	var campDispositiu = $('#dispositiuViaFirma').closest('.form-group');
+	var campEmail = $('#signantEmail').closest('.form-group');
+	var campTipusUsuari = $('#tipusDestinatari');
+	
+	campTipusUsuari.on('change', function() {
+		if($(this).val() == 'EMAIL') {
+			campCodiUsuari.hide();
+			campDispositiu.hide();
+			campEmail.show();
+		} else {
+			campCodiUsuari.show();
+			campDispositiu.show();
+			campEmail.hide();
+		}
+	});
+	campTipusUsuari.trigger('change');
 });
 
 </script>
@@ -194,6 +214,7 @@ $(document).ready(function() {
 		</div>
 		<rip:inputText name="titol" textKey="contenidor.document.biometrica.camp.motiu" />
 		<rip:inputText name="descripcio" textKey="contenidor.document.biometrica.camp.descripcio" />
+		<rip:inputSelect name="tipusDestinatari" optionEnum="ViaFirmaTipusDestinatariEnum" emptyOption="false" textKey="contenidor.document.biometrica.camp.tipus" required="true"/>
 		<rip:inputHidden name="codiUsuariViaFirma"/>
 		<rip:inputSelect name="codisUsuariViaFirma" textKey="contenidor.document.biometrica.camp.usuari"  required="true"/>
 		<c:if test="${isDispositiusEnabled}">
@@ -206,6 +227,7 @@ $(document).ready(function() {
 		<rip:inputSelect name="interessatId" textKey="contenidor.document.biometrica.camp.interessat" emptyOption="true" emptyOptionTextKey="contenidor.document.biometrica.camp.interessat.nou" optionItems="${interessats}" optionValueAttribute="id" optionTextAttribute="identificador"/>
 		<rip:inputText name="signantNom" textKey="contenidor.document.biometrica.camp.interessat.nom" required="true"/>
 		<rip:inputText name="signantNif" textKey="contenidor.document.biometrica.camp.interessat.nif" required="true"/>
+		<rip:inputText name="signantEmail" textKey="contenidor.document.biometrica.camp.interessat.email" required="true"/>
 		<div class="title">
 			<label><spring:message code="contenidor.document.biometrica.dades.altres"/></label>
 			<hr>

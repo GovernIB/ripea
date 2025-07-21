@@ -19,12 +19,14 @@ public class ViaFirmaEnviarDto implements Serializable {
 
 	private String titol;
 	private String descripcio;
+	private ViaFirmaTipusDestinatariEnum tipusDestinatari;
 	private String codiUsuariViaFirma;
 	private String contrasenyaUsuariViaFirma;
 	private ViaFirmaDispositiuDto viaFirmaDispositiu;
 	private String viaFirmaDispositiuCodi;
 	private String signantNif;
 	private String signantNom;
+	private String signantEmail;
 	private String observacions;
 	private boolean isFirmaParcial; 
 	private boolean validateCodeEnabled;

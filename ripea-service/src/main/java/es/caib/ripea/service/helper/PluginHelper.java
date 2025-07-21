@@ -149,6 +149,7 @@ import es.caib.ripea.plugin.viafirma.ViaFirmaDocument;
 import es.caib.ripea.plugin.viafirma.ViaFirmaParams;
 import es.caib.ripea.plugin.viafirma.ViaFirmaPlugin;
 import es.caib.ripea.plugin.viafirma.ViaFirmaResponse;
+import es.caib.ripea.plugin.viafirma.ViaFirmaTipusDestinatari;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.AmpliarPlazoForm;
 import es.caib.ripea.service.intf.dto.ArbreDto;
@@ -5402,6 +5403,8 @@ public class PluginHelper {
 					documentViaFirmaEntity.getSignantNif());
 			parametresViaFirma.setSignantNom(
 					documentViaFirmaEntity.getSignantNom());
+			parametresViaFirma.setSignantEmail(
+					documentViaFirmaEntity.getSignantEmail());
 			parametresViaFirma.setObservaciones(
 					documentViaFirmaEntity.getObservacions());
 			parametresViaFirma.setValidateCodeEnabled(
@@ -5410,6 +5413,8 @@ public class PluginHelper {
 					documentViaFirmaEntity.getValidateCode());
 			parametresViaFirma.setDeviceEnabled(
 					getPropertyViaFirmaDispositius());
+			parametresViaFirma.setTipusDestinatari(
+					ViaFirmaTipusDestinatari.valueOf(documentViaFirmaEntity.getTipusDestinatari().name()));
 			
 			viaFirmaResponse = viaFirmaPlugin.uploadDocument(parametresViaFirma);
 			

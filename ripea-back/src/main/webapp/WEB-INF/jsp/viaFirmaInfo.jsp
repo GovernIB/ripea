@@ -50,9 +50,21 @@
 					<td><spring:message code="portafirmes.estat.enum.${viafirma.estat}"/></td>
 				</tr>
 				<tr>
-					<td><strong><spring:message code="viafirma.info.camp.codiusuari"/></strong></td>
-					<td>${viafirma.codiUsuari}</td>
+					<td><strong><spring:message code="viafirma.info.camp.tipusDestinatari"/></strong></td>
+					<td><spring:message code="via.firma.tipus.destinatari.enum.${viafirma.tipusDestinatari}"/></td>
 				</tr>
+				<c:if test="${viafirma.tipusDestinatari == 'TABLET'}">
+					<tr>
+						<td><strong><spring:message code="viafirma.info.camp.codiusuari"/></strong></td>
+						<td>${viafirma.codiUsuari}</td>
+					</tr>
+				</c:if>
+				<c:if test="${viafirma.tipusDestinatari == 'EMAIL'}">
+					<tr>
+						<td><strong><spring:message code="viafirma.info.camp.email"/></strong></td>
+						<td>${viafirma.signantEmail}</td>
+					</tr>
+				</c:if>
 				<c:if test="${not empty viafirma.messageCode}">
 					<tr>
 						<td><strong><spring:message code="viafirma.info.camp.messagecode"/></strong></td>

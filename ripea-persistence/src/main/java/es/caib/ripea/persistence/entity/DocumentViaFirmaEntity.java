@@ -6,6 +6,8 @@ package es.caib.ripea.persistence.entity;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.service.intf.dto.ViaFirmaCallbackEstatEnumDto;
+import es.caib.ripea.service.intf.dto.ViaFirmaTipusDestinatariEnum;
+
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -38,11 +40,15 @@ public class DocumentViaFirmaEntity extends DocumentEnviamentEntity {
 	private String messageCode;
 	@Column(name = "vf_callback_estat")
 	private ViaFirmaCallbackEstatEnumDto callbackEstat;
-	
+	@Column(name = "vf_tipus_destinatari")
+	@Enumerated(EnumType.STRING)
+	private ViaFirmaTipusDestinatariEnum tipusDestinatari;
 	@Column(name = "vf_signant_nif")
 	private String signantNif;
 	@Column(name = "vf_signant_nom")
 	private String signantNom;
+	@Column(name = "vf_signant_email")
+	private String signantEmail;
 	@Column(name = "vf_observacions")
 	private String observacions;
 	
@@ -89,11 +95,17 @@ public class DocumentViaFirmaEntity extends DocumentEnviamentEntity {
 	public DispositiuEnviamentEntity getDispositiuEnviament() {
 		return dispositiuEnviament;
 	}
+	public ViaFirmaTipusDestinatariEnum getTipusDestinatari() {
+		return tipusDestinatari;
+	}
 	public String getSignantNif() {
 		return signantNif;
 	}
 	public String getSignantNom() {
 		return signantNom;
+	}
+	public String getSignantEmail() {
+		return signantEmail;
 	}
 	public String getObservacions() {
 		return observacions;
@@ -133,8 +145,10 @@ public class DocumentViaFirmaEntity extends DocumentEnviamentEntity {
 			String titol,
 			String descripcio,
 			String codiDispositiu,
+			ViaFirmaTipusDestinatariEnum tipusDestinatari,
 			String signantNif,
 			String signantNom,
+			String signantEmail,
 			String observacions,
 			DispositiuEnviamentEntity dispositiuEnviament,
 			boolean lecturaObligatoria,
@@ -151,8 +165,10 @@ public class DocumentViaFirmaEntity extends DocumentEnviamentEntity {
 				titol,
 				descripcio,
 				codiDispositiu,
+				tipusDestinatari,
 				signantNif,
 				signantNom,
+				signantEmail,
 				observacions,
 				dispositiuEnviament,
 				lecturaObligatoria,
@@ -173,8 +189,10 @@ public class DocumentViaFirmaEntity extends DocumentEnviamentEntity {
 				String titol,
 				String descripcio,
 				String codiDispositiu,
+				ViaFirmaTipusDestinatariEnum tipusDestinatari,
 				String signantNif,
 				String signantNom,
+				String signantEmail,
 				String observacions,
 				DispositiuEnviamentEntity dispositiuEnviament,
 				boolean lecturaObligatoria,
@@ -193,8 +211,10 @@ public class DocumentViaFirmaEntity extends DocumentEnviamentEntity {
 			built.titol = titol;
 			built.descripcio = descripcio;
 			built.codiDispositiu = codiDispositiu;
+			built.tipusDestinatari = tipusDestinatari;
 			built.signantNif = signantNif;
 			built.signantNom = signantNom;
+			built.signantEmail = signantEmail;
 			built.observacions = observacions;
 			built.dispositiuEnviament = dispositiuEnviament;
 			built.lecturaObligatoria = lecturaObligatoria;
