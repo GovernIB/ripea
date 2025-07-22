@@ -579,7 +579,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
 				throw new ActionExecutionException(getResourceClass(), entity==null?null:entity.getId(), code, message);
             }
 			//Dada per mostrar al missatge de OK, retornar el entity convertit a InteressatResource dona error perque no el troba
-			return entity.getDocumentNum(); 
+			return "{ \"cocumentNum\": \""+entity.getDocumentNum()+"\" }";
 		}
     }
     
@@ -603,7 +603,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
 				throw new ActionExecutionException(getResourceClass(), entity==null?null:entity.getId(), code, message);
             }
 			//Dada per mostrar al missatge de OK, retornar el entity convertit a InteressatResource dona error perque no el troba
-			return entity.getDocumentNum(); 
+			return "{ \"cocumentNum\": \""+entity.getDocumentNum()+"\" }";
 		}
     }
     
