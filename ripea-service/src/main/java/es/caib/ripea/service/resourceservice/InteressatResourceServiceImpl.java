@@ -18,6 +18,7 @@ import javax.annotation.PostConstruct;
 
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -50,6 +51,7 @@ import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
 import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
+import es.caib.ripea.service.intf.base.exception.ResourceNotFoundException;
 import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.base.model.FieldOption;
 import es.caib.ripea.service.intf.base.model.FileReference;
@@ -417,11 +419,74 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
 		interessatDto.setEntregaDeh(resource.getEntregaDeh());
 		interessatDto.setEntregaDehObligat(resource.getEntregaDehObligat());
     }
-
-    @Override
-    protected void afterUpdateSave(InteressatResourceEntity entity, InteressatResource resource, Map<String, AnswerRequiredException.AnswerValue> answers, boolean anyOrderChanged) {
-    	cacheHelper.evictErrorsValidacioPerNode(entity.getExpedient().getId());
-    }
+    
+	@Override
+	public InteressatResource update(Long id, InteressatResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotFoundException {
+		
+		InteressatEntity interessatExistent = interessatRepository.findByExpedientIdAndDocumentNum(resource.getExpedient().getId(), resource.getDocumentNum());
+		
+		//Modificam un representant
+		if (resource.getRepresentat()!=null) {
+			
+			if (interessatExistent!=null && !interessatExistent.getId().equals(resource.getId())) {
+				//Si el interessat que hem trobat amb el mateix NIF, no és el representat, per tant ja no es validarà amb el metode update
+				if (interessatExistent.getRepresentant()==null || !interessatExistent.getRepresentant().getDocumentNum().equals(resource.getDocumentNum())) {
+					//En aquest cas canviam el ID, i rl que es modificará será el interessat
+					resource.setId(interessatExistent.getId());
+				}
+			}
+			
+			//A la funció de update, ja es comprova que no es modifiqui amb el mateix ID que el representat (ValidationException)
+			expedientInteressatHelper.update(
+					resource.getExpedient().getId(),
+					resource.getRepresentat().getId(),
+					toInteressatDto(resource),
+					configHelper.getRolActual(),
+					true,
+					true);
+			
+		} else {
+			
+			/**
+			 * Modificam un interessat. Cas 1: Hem introduit el mateix document que el seu representant... Validation exception
+			 */
+			if (resource.getRepresentant()!=null && interessatExistent!=null && 
+				resource.getRepresentant().getId()!=null && 
+				resource.getRepresentant().getId().equals(interessatExistent.getId())) {
+					//Modificam un interessat, de tal manera que quedará amb el mateix document que el seu representant
+					//La funció update s'encarrega de fer la validació
+					expedientInteressatHelper.update(
+							resource.getExpedient().getId(),
+							null,
+							toInteressatDto(resource),
+							configHelper.getRolActual(),
+							true,
+							true);
+			} else {
+	
+				/**
+				 * Modificam un interessat. Cas 2: Hem introduit el mateix document que un altre interessat del expedient
+				 */
+				if (interessatExistent!=null && !interessatExistent.getId().equals(resource.getId())) {
+					resource.setId(interessatExistent.getId());
+				} else {
+					/**
+					 * Modificam un interessat. Cas 3: El numero de document no esta repetit per l'expedient
+					 */
+				}
+				
+				expedientInteressatHelper.update(
+						resource.getExpedient().getId(),
+						null,
+						toInteressatDto(resource),
+						configHelper.getRolActual(),
+						true,
+						true);
+			}
+		}
+		
+		return resource;
+	}
 
     private class RespresentantPerspectiveApplicator implements PerspectiveApplicator<InteressatResourceEntity, InteressatResource> {
         @Override
@@ -484,7 +549,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
                         }
                     } else if (!interessatExistent.getId().equals(previous.getId())) {
                     	//Controlar que no estam introduint un interessat repetit
-                    	target.setId(interessatExistent.getId());
+//                    	target.setId(interessatExistent.getId());
 						target.setDocumentTipus(interessatExistent.getDocumentTipus());
 						target.setNom(interessatExistent.getNom());
 						target.setPais(interessatExistent.getPais());
@@ -579,7 +644,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
 				throw new ActionExecutionException(getResourceClass(), entity==null?null:entity.getId(), code, message);
             }
 			//Dada per mostrar al missatge de OK, retornar el entity convertit a InteressatResource dona error perque no el troba
-			return entity.getDocumentNum(); 
+			return "{ \"cocumentNum\": \""+entity.getDocumentNum()+"\" }";
 		}
     }
     
@@ -603,7 +668,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
 				throw new ActionExecutionException(getResourceClass(), entity==null?null:entity.getId(), code, message);
             }
 			//Dada per mostrar al missatge de OK, retornar el entity convertit a InteressatResource dona error perque no el troba
-			return entity.getDocumentNum(); 
+			return "{ \"cocumentNum\": \""+entity.getDocumentNum()+"\" }";
 		}
     }
     

@@ -64,6 +64,7 @@ public class ExpedientInteressatHelper {
 	@Autowired private ExpedientHelper expedientHelper;
 	@Autowired private ContingutHelper contingutHelper;
 	@Autowired private CacheHelper cacheHelper;
+	@Autowired private MessageHelper messageHelper;
 	@Autowired(required = true) private javax.validation.Validator validator;
 	
 	@Transactional
@@ -152,7 +153,10 @@ public class ExpedientInteressatHelper {
 		InteressatEntity interessat = interessatRepository.findById(interessatId).orElse(null);
 		if (interessat == null) {
 			throw new NotFoundException(interessatId, InteressatEntity.class);
+		} else if (interessat.getDocumentNum().equals(representant.getDocumentNum())) {
+			throw new ValidationException(messageHelper.getMessage("es.caib.ripea.service.intf.resourcevalidation.InteressatValid.representHimself"));
 		}
+		
 		representantEntity.updateEsRepresentant(true);
 		interessat.updateRepresentant(representantEntity);
 		
@@ -354,10 +358,11 @@ public class ExpedientInteressatHelper {
 		if (interessatId != null) {
 			interessat = interessatRepository.findById(interessatId).orElse(null);
 			if (interessat == null) {
-				throw new NotFoundException(
-						interessatId,
-						InteressatEntity.class);
+				throw new NotFoundException(interessatId, InteressatEntity.class);
+			} else if (interessat.getDocumentNum().equals(interessatRepresentant.getDocumentNum())) {
+				throw new ValidationException(messageHelper.getMessage("es.caib.ripea.service.intf.resourcevalidation.InteressatValid.representHimself"));
 			}
+			
 			// Si canviam de representant, l'eliminam de l'interessant actual
 			if (interessat.getRepresentant() != null && !interessat.getRepresentant().getId().equals(interessatRepresentant.getId())) {
 				removeRepresentant(interessat);
@@ -367,7 +372,15 @@ public class ExpedientInteressatHelper {
 				associarRepresentant = true;
 			}
 		}
+
 		InteressatEntity interessatRepresentantEntity = interessatRepository.getOne(interessatRepresentant.getId());
+		
+		//Estam modificant un interessat, de tal forma que quedaria representant-se a si mateix
+		if (interessatRepresentantEntity.getRepresentant()!=null && 
+			interessatRepresentantEntity.getRepresentant().getDocumentNum().equals(interessatRepresentant.getDocumentNum())) {
+			throw new ValidationException(messageHelper.getMessage("es.caib.ripea.service.intf.resourcevalidation.InteressatValid.representHimself"));
+		}
+		
 		InteressatEntity deproxied = HibernateHelper.deproxy(interessatRepresentantEntity);
 		if (interessatRepresentant.isAdministracio()) {
 			updateOrganNom(interessatRepresentant);
