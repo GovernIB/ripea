@@ -131,14 +131,14 @@ const useInteressatActions = (entity:any, refresh?: () => void) => {
             title: <Divider sx={{px: 1, width: '100%'}} color={"none"}/>,
             showInMenu: true,
             disabled: true,
-            hidden: !entity?.potModificar,
+            hidden: (row: any) => row?.tipus == 'InteressatAdministracioEntity' || !entity?.potModificar,
         },
         {
             title: t('page.interessat.action.createRep.label'),
             icon: "add",
             showInMenu: true,
             onClick: createRepresentent,
-            hidden: (row: any) => row?.representant || !entity?.potModificar,
+            hidden: (row: any) => row?.representant || row?.tipus == 'InteressatAdministracioEntity' || !entity?.potModificar,
         },
         {
             title: t('page.interessat.action.updateRep.label'),
