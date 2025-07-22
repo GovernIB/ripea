@@ -113,6 +113,7 @@ import es.caib.ripea.service.intf.model.DocumentResource.NotificarFormAction;
 import es.caib.ripea.service.intf.model.DocumentResource.UpdateTipusDocumentFormAction;
 import es.caib.ripea.service.intf.model.DocumentResource.ViaFirmaForm;
 import es.caib.ripea.service.intf.model.ExpedientResource;
+import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.model.MetaDocumentResource;
 import es.caib.ripea.service.intf.model.NodeResource.MassiveAction;
 import es.caib.ripea.service.intf.model.UsuariResource;
@@ -910,14 +911,17 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 		@Override
 		public void onChange(Serializable id, ViaFirmaForm previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, ViaFirmaForm target) {
 			if (fieldName==null) {
-				DocumentResourceEntity docRes = documentResourceRepository.findById(((Integer)id).longValue()).get();
+				DocumentResourceEntity docRes = documentResourceRepository.findById((Long)id).get();
 				target.setTitol(docRes.getNom());
 				target.setDescripcio("Firm de document "+docRes.getNom()+"["+docRes.getMetaDocument().getNom()+"]");
 				target.setDispositiusEnabled(configHelper.getAsBoolean(PropertyConfig.VIAFIRMA_PLUGIN_DISPOSITIUS_ENABLED));
 			} else if (DocumentResource.ViaFirmaForm.Fields.interessat.equals(fieldName)) {
-				InteressatResourceEntity intRes = interessatResourceRepository.findById((Long)fieldValue).get();
-				target.setSignantNom(intRes.getNomComplet());
-				target.setSignantNif(intRes.getDocumentNum());
+				if (fieldValue!=null) {
+					Long interessatId = ((ResourceReference<InteressatResource, Long>)fieldValue).getId();
+					InteressatResourceEntity intRes = interessatResourceRepository.findById(interessatId).get();
+					target.setSignantNom(intRes.getNomComplet()); 
+					target.setSignantNif(intRes.getDocumentNum());
+				}
 			}
 		}
 

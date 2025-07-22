@@ -136,22 +136,15 @@ public class ExpedientInteressatHelper {
 		return representantEntity;
 	}
 
-	@Transactional
-	public InteressatDto createRepresentant(
+	public InteressatEntity createRepresentantEntity(
 			Long expedientId,
 			Long interessatId, //interessatId to which representant will be related to
 			InteressatDto representant,
 			boolean propagarArxiu, 
 			PermissionEnumDto permission, 
 			String rolActual, 
-			boolean comprovarAgafat){
-		
-
-		logger.debug("Creant nou representant ("
-				+ "expedientId=" + expedientId + ", "
-				+ "interessatId=" + interessatId + ", "
-				+ "representant=" + representant + ")");
-
+			boolean comprovarAgafat) {
+		logger.debug("Creant nou representant (expedientId=" + expedientId + ", interessatId=" + interessatId + ", representant=" + representant + ")");
 
 		ExpedientEntity expedient = getExpedientComprovantPermisos(expedientId, permission, rolActual, comprovarAgafat);
 		InteressatEntity representantEntity = createDB(expedient, representant);
@@ -167,9 +160,20 @@ public class ExpedientInteressatHelper {
 			arxiuPropagarInteressats(expedient, representantEntity);
 		}
 		
-		return conversioTipusHelper.convertir(
-							interessatRepository.save(representantEntity),
-							InteressatDto.class);
+		return representantEntity; 
+	}
+	
+	@Transactional
+	public InteressatDto createRepresentant(
+			Long expedientId,
+			Long interessatId, //interessatId to which representant will be related to
+			InteressatDto representant,
+			boolean propagarArxiu, 
+			PermissionEnumDto permission, 
+			String rolActual, 
+			boolean comprovarAgafat) {
+		InteressatEntity representantEntity = createRepresentantEntity(expedientId, interessatId, representant, propagarArxiu, permission, rolActual, comprovarAgafat);
+		return conversioTipusHelper.convertir(interessatRepository.save(representantEntity), InteressatDto.class);
 	}
 	
 	@Transactional

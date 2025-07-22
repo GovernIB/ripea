@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -25,14 +24,13 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import es.caib.ripea.persistence.entity.EntitatEntity;
-import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.entity.InteressatAdministracioEntity;
 import es.caib.ripea.persistence.entity.InteressatEntity;
 import es.caib.ripea.persistence.entity.InteressatPersonaFisicaEntity;
 import es.caib.ripea.persistence.entity.InteressatPersonaJuridicaEntity;
 import es.caib.ripea.persistence.entity.resourceentity.InteressatResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.InteressatResourceRepository;
-import es.caib.ripea.persistence.repository.ExpedientRepository;
+import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.persistence.repository.InteressatRepository;
 import es.caib.ripea.plugin.dadesext.Municipi;
 import es.caib.ripea.plugin.dadesext.Pais;
@@ -52,19 +50,22 @@ import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
 import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
-import es.caib.ripea.service.intf.base.exception.ResourceNotDeletedException;
 import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.base.model.FieldOption;
 import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ReportFileType;
 import es.caib.ripea.service.intf.dto.ComunitatDto;
+import es.caib.ripea.service.intf.dto.InteressatAdministracioDto;
 import es.caib.ripea.service.intf.dto.InteressatDocumentTipusEnumDto;
 import es.caib.ripea.service.intf.dto.InteressatDto;
 import es.caib.ripea.service.intf.dto.InteressatImportacioTipusDto;
+import es.caib.ripea.service.intf.dto.InteressatPersonaFisicaDto;
+import es.caib.ripea.service.intf.dto.InteressatPersonaJuridicaDto;
 import es.caib.ripea.service.intf.dto.InteressatTipusEnum;
 import es.caib.ripea.service.intf.dto.MunicipiDto;
 import es.caib.ripea.service.intf.dto.NivellAdministracioDto;
 import es.caib.ripea.service.intf.dto.PaisDto;
+import es.caib.ripea.service.intf.dto.PermissionEnumDto;
 import es.caib.ripea.service.intf.dto.ProvinciaDto;
 import es.caib.ripea.service.intf.dto.UnitatOrganitzativaDto;
 import es.caib.ripea.service.intf.model.ExpedientResource;
@@ -94,7 +95,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
     private final CacheHelper cacheHelper;
     private final MessageHelper messageHelper;
 
-    private final ExpedientRepository expedientRepository;
+    private final EntitatRepository entitatRepository;
     private final InteressatRepository interessatRepository;
     private final InteressatResourceRepository interessatResourceRepository;
 
@@ -106,6 +107,8 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
         register(InteressatResource.ACTION_EXPORTAR_CODE, new ExportarReportGenerator());
         register(InteressatResource.ACTION_IMPORTAR_CODE, new ImportarInteressatsActionExecutor());
         register(InteressatResource.ACTION_GUARDAR_ARXIU, new GuardarArxiuActionExecutor());
+        register(InteressatResource.ACTION_DELETE_INTERESSAT, new DeleteInteressatActionExecutor());
+        register(InteressatResource.ACTION_DELETE_REPRESENTANT, new DeleteRepresentantActionExecutor());
         
         register(InteressatResource.Fields.tipus, new TipusOnchangeLogicProcessor());
         register(InteressatResource.Fields.organCodi, new UnitatsOrganitzativesOnchangeLogicProcessor());
@@ -334,42 +337,90 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
     }
     
     @Override
-    protected void beforeCreateSave(InteressatResourceEntity entity, InteressatResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
-        if(resource.getRepresentat()!=null){
-            Optional<InteressatResourceEntity> interessatResourceEntity = interessatResourceRepository.findById(resource.getRepresentat().getId());
-            interessatResourceEntity.ifPresent((interessat)->interessat.setRepresentant(entity));
-        }
+    public InteressatResource create(InteressatResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
+    	InteressatDto interessatDto = toInteressatDto(resource);
+    	InteressatEntity interessatExistent = interessatRepository.findByExpedientIdAndDocumentNum(
+    			resource.getExpedient().getId(),
+    			resource.getDocumentNum());
+    	//CREATE
+    	if(interessatExistent==null) {
+    		//Create representant
+    		if(resource.getRepresentat()!=null) {
+    			expedientInteressatHelper.createRepresentantEntity(
+    					resource.getExpedient().getId(),
+    					resource.getRepresentat().getId(),
+    					interessatDto, //Dades del representant
+    					true, //propagarArxiu
+    					PermissionEnumDto.WRITE,
+    					configHelper.getRolActual(),
+    					true); //comprovarAgafat
+    		} else {
+	    		expedientInteressatHelper.createInteressatEntity(
+	    				resource.getExpedient().getId(),
+	    				interessatDto,
+	    				true, //propagarArxiu
+	    				PermissionEnumDto.WRITE,
+	    				configHelper.getRolActual(),
+	    				true); //comprovarAgafat
+    		}
+    	} else { //UPDATE
+    		interessatDto.setId(interessatExistent.getId());
+    		expedientInteressatHelper.updateInteressatRepresentantEntity(
+    				resource.getExpedient().getId(),
+    				resource.getRepresentat().getId(), //ID del representat
+    				interessatDto,
+    				configHelper.getRolActual(),
+    				true,  //comprovarAgafat
+    				true); //propagarArxiu
+    	}
+    	return resource;
     }
     
-    @Override
-    protected void afterCreateSave(InteressatResourceEntity entity, InteressatResource resource, Map<String, AnswerRequiredException.AnswerValue> answers, boolean anyOrderChanged) {
-    	ExpedientEntity expedient 	= expedientRepository.findById(entity.getExpedient().getId()).get();
-    	InteressatEntity interessat = interessatRepository.findById(entity.getId()).get();
-    	expedientInteressatHelper.arxiuPropagarInteressats(expedient, interessat);
-    	cacheHelper.evictErrorsValidacioPerNode(expedient.getId());
+    private InteressatDto toInteressatDto(InteressatResource resource) {
+		switch (resource.getTipus()) {
+			case InteressatAdministracioEntity: 
+				InteressatAdministracioDto interessatAdmDto = new InteressatAdministracioDto();
+				interessatAdmDto.setOrganCodi(resource.getOrganCodi());
+				interessatAdmDto.setOrganNom(resource.getOrganNom());
+				setDadesComunsInteressat(resource, interessatAdmDto);
+				return interessatAdmDto;
+			case InteressatPersonaFisicaEntity: 
+				InteressatPersonaFisicaDto interessatFisDto = new InteressatPersonaFisicaDto(); 
+				interessatFisDto.setNom(resource.getNom());
+				interessatFisDto.setLlinatge1(resource.getLlinatge1());
+				interessatFisDto.setLlinatge2(resource.getLlinatge2());
+				setDadesComunsInteressat(resource, interessatFisDto);
+				return interessatFisDto;
+			case InteressatPersonaJuridicaEntity: 
+				InteressatPersonaJuridicaDto interessatJurDto = new InteressatPersonaJuridicaDto();
+				interessatJurDto.setRaoSocial(resource.getRaoSocial());
+				setDadesComunsInteressat(resource, interessatJurDto);
+				return interessatJurDto;
+		}
+		return null;
     }
-
-    @Override
-    protected void beforeDelete(InteressatResourceEntity entity, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotDeletedException {
-        if (entity.isEsRepresentant()) {
-            entity.getRepresentats().forEach((representat) -> {
-                representat.setRepresentant(null);
-            });
-        }
+    
+    private void setDadesComunsInteressat(InteressatResource resource, InteressatDto interessatDto) {
+    	//Controlar que no estam introduint un interessat repetit
+    	interessatDto.setId(resource.getId());
+		interessatDto.setDocumentTipus(resource.getDocumentTipus());
+		interessatDto.setDocumentNum(resource.getDocumentNum());
+		interessatDto.setPais(resource.getPais());
+		interessatDto.setProvincia(resource.getProvincia());
+		interessatDto.setMunicipi(resource.getMunicipi());
+		interessatDto.setCodiPostal(resource.getCodiPostal());
+		interessatDto.setAdresa(resource.getAdresa());
+		interessatDto.setEmail(resource.getEmail());
+		interessatDto.setTelefon(resource.getTelefon());
+		interessatDto.setObservacions(resource.getObservacions());
+		interessatDto.setPreferenciaIdioma(resource.getPreferenciaIdioma());
+		interessatDto.setEntregaDeh(resource.getEntregaDeh());
+		interessatDto.setEntregaDehObligat(resource.getEntregaDehObligat());
     }
 
     @Override
     protected void afterUpdateSave(InteressatResourceEntity entity, InteressatResource resource, Map<String, AnswerRequiredException.AnswerValue> answers, boolean anyOrderChanged) {
     	cacheHelper.evictErrorsValidacioPerNode(entity.getExpedient().getId());
-    }
-    
-    @Override
-    protected void afterDelete(InteressatResourceEntity entity, Map<String, AnswerRequiredException.AnswerValue> answers) {
-        InteressatResourceEntity representant = entity.getRepresentant();
-        if (representant!=null && representant.isEsRepresentant() && representant.getRepresentats().isEmpty()){
-            interessatResourceRepository.delete(representant);
-        }
-        cacheHelper.evictErrorsValidacioPerNode(entity.getExpedient().getId());
     }
 
     private class RespresentantPerspectiveApplicator implements PerspectiveApplicator<InteressatResourceEntity, InteressatResource> {
@@ -415,7 +466,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
         @Override
         public void onChange(Serializable id, InteressatResource previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, InteressatResource target) {
 
-            if (fieldValue!=null && fieldValue.toString().length()==9) {
+            if (fieldValue!=null && fieldValue.toString().length()==9 && !fieldValue.toString().equals(previous.getDocumentNum())) {
             	
             	InteressatEntity interessatExistent = interessatRepository.findByExpedientIdAndDocumentNum(previous.getExpedient().getId(), fieldValue.toString());
             	
@@ -427,9 +478,9 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
                     		|| (previous.getRepresentant()!=null && Objects.equals(previous.getRepresentant().getId(), interessatExistent.getId()))
                     ){
                         throw new AnswerRequiredException(InteressatResource.class, NOT_REPRESENT_HIMSELF, messageHelper.getMessage("es.caib.ripea.service.intf.resourcevalidation.InteressatValid.representHimself"));
-                    
                     } else if (!interessatExistent.getId().equals(previous.getId())) {
                     	//Controlar que no estam introduint un interessat repetit
+                    	target.setId(interessatExistent.getId());
 						target.setDocumentTipus(interessatExistent.getDocumentTipus());
 						target.setNom(interessatExistent.getNom());
 						target.setPais(interessatExistent.getPais());
@@ -503,6 +554,53 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
         }
     }
 
+    private class DeleteRepresentantActionExecutor implements ActionExecutor<InteressatResourceEntity, Serializable, Serializable> {
+
+		@Override
+		public void onChange(Serializable id, Serializable previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, Serializable target) {}
+
+		@Override
+		public Serializable exec(String code, InteressatResourceEntity entity, Serializable params) throws ActionExecutionException {
+			try {
+				EntitatEntity entitat = entitatRepository.findByCodi(configHelper.getEntitatActualCodi());
+				expedientInteressatHelper.deleteRepresentant(
+						entitat.getId(),
+						entity.getExpedient().getId(),
+						entity.getRepresentant().getId(),
+						entity.getId(),
+						configHelper.getRolActual());
+            } catch (Exception e) {
+                excepcioLogHelper.addExcepcio("/expedient/interessats/"+entity.getId()+"/DeleteRepresentantArxiuActionExecutor", e);
+				String message = messageHelper.getMessage("message.common.action.error")+": "+e.getMessage();
+				throw new ActionExecutionException(getResourceClass(), entity==null?null:entity.getId(), code, message);
+            }
+			return objectMappingHelper.newInstanceMap(entity, InteressatResource.class);
+		}
+    }
+    
+    private class DeleteInteressatActionExecutor implements ActionExecutor<InteressatResourceEntity, Serializable, Serializable> {
+
+		@Override
+		public void onChange(Serializable id, Serializable previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, Serializable target) {}
+
+		@Override
+		public Serializable exec(String code, InteressatResourceEntity entity, Serializable params) throws ActionExecutionException {
+			try {
+				EntitatEntity entitat = entitatRepository.findByCodi(configHelper.getEntitatActualCodi());
+				expedientInteressatHelper.delete(
+						entitat.getId(),
+						entity.getExpedient().getId(),
+						entity.getId(),
+						configHelper.getRolActual());
+            } catch (Exception e) {
+                excepcioLogHelper.addExcepcio("/expedient/interessats/"+entity.getId()+"/DeleteInteressatActionExecutor", e);
+				String message = messageHelper.getMessage("message.common.action.error")+": "+e.getMessage();
+				throw new ActionExecutionException(getResourceClass(), entity==null?null:entity.getId(), code, message);
+            }
+			return objectMappingHelper.newInstanceMap(entity, InteressatResource.class);
+		}
+    }
+    
     private class GuardarArxiuActionExecutor implements ActionExecutor<InteressatResourceEntity, Serializable, Serializable> {
 
 		@Override
@@ -523,7 +621,6 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
             }
 			return objectMappingHelper.newInstanceMap(entity, InteressatResource.class);
 		}
-    	
     }
 
     private class ImportarInteressatsActionExecutor implements ActionExecutor<InteressatResourceEntity, InteressatResource.ImportarInteressatsFormAction, Serializable> {
@@ -588,7 +685,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
                 String message = messageHelper.getMessage("message.common.action.error")+": "+e.getMessage();
 				throw new ActionExecutionException(getResourceClass(), params.getExpedient().getId(), code, message);
             }
-            return null;
+            return objectMappingHelper.newInstanceMap(entity, InteressatResource.class);
         }
     }
 

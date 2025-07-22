@@ -56,6 +56,8 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
         
 		boolean isAdmin = "IPA_ADMIN".equals(rolActual);
 		boolean isAdminOrgan = "IPA_ORGAN_ADMIN".equals(rolActual);
+		boolean isDissenyador = "IPA_DISSENY".equals(rolActual);
+		boolean usuariFiltreOrgan = isAdminOrgan || isDissenyador;
         
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true,false);
 		
@@ -71,7 +73,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 	        );
 		}
         
-        if (organActualCodi!=null) {
+        if (organActualCodi!=null && usuariFiltreOrgan) {
         	Filter filtreOrganGestor = FilterBuilder.equal(MetaExpedientResource.Fields.organGestor+"."+OrganGestorResource.Fields.codi, organActualCodi);
         	filtreBase = FilterBuilder.and(filtreBase, filtreOrganGestor);
         }

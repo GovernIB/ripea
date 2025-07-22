@@ -115,7 +115,7 @@ public class InteressatValidValidator implements ConstraintValidator<InteressatV
             }
         }
 
-        if (!resource.isEsRepresentant()) {
+        /*if (!resource.isEsRepresentant()) {
             List<InteressatResource> interesados = interessatResourceService.findBySpringFilter(
                     "expedient.id : " + resource.getExpedient().getId() + " and esRepresentant : false"
             );
@@ -131,7 +131,7 @@ public class InteressatValidValidator implements ConstraintValidator<InteressatV
                     break;
                 }
             }
-        }
+        }*/
 
         return valid;
     }

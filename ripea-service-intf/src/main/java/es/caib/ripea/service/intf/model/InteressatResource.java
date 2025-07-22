@@ -61,6 +61,14 @@ import lombok.experimental.FieldNameConstants;
                         type = ResourceArtifactType.ACTION,
                         code = InteressatResource.ACTION_GUARDAR_ARXIU,
                         requiresId = true),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = InteressatResource.ACTION_DELETE_INTERESSAT,
+                        requiresId = true),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = InteressatResource.ACTION_DELETE_REPRESENTANT,
+                        requiresId = true),
         }
 )
 public class InteressatResource extends BaseAuditableResource<Long> {
@@ -70,6 +78,8 @@ public class InteressatResource extends BaseAuditableResource<Long> {
     public static final String ACTION_EXPORTAR_CODE  = "EXPORTAR";
     public static final String ACTION_IMPORTAR_CODE  = "IMPORTAR";
     public static final String ACTION_GUARDAR_ARXIU  = "GUARDAR_ARXIU";
+    public static final String ACTION_DELETE_INTERESSAT  = "DELETE_INTERESSAT";
+    public static final String ACTION_DELETE_REPRESENTANT  = "DELETE_REPRESENTANT";
     public static final String FILTER_CODE = "UNITAT_ORGANITZATIVA_FILTER";
 
 	@NotNull
