@@ -15,6 +15,7 @@ import useHistoric from "../../Historic.tsx";
 import useTancar from "../actions/Tancar.tsx";
 import useDescargarDocuments from "../actions/DescargarDocuments.tsx";
 import useModifyExpedient from "../actions/ModifyExpedient.tsx";
+import {useNavigate} from "react-router-dom";
 
 export const iniciaDescarga = (url:string, fileName:string) => {
     const link = document.createElement('a');
@@ -46,6 +47,7 @@ export const iniciaDescargaJSON = (result: any) => {
 export const useActions = (refresh?: () => void) => {
     const { t } = useTranslation();
     const { value: user } = useUserSession();
+    const navigate = useNavigate();
 
     const {
         patch: apiPatch,
@@ -118,7 +120,14 @@ export const useActions = (refresh?: () => void) => {
             confirmDialogComponentProps)
             .then((value: any) => {
                 if (value) {
-                    action(id, 'ESBORRAR', t('page.expedient.action.eliminar.ok', {expedient: row?.nom}));
+                    apiAction(undefined, {code: 'ESBORRAR', data:{ ids: [id], massivo: false }})
+                        .then(() => {
+                            navigate("/expedient")
+                            temporalMessageShow(null, t('page.expedient.action.eliminar.ok', {expedient: row?.nom}), 'success');
+                        })
+                        .catch((error) => {
+                            temporalMessageShow(null, error?.message, 'error');
+                        });
                 }
             });
     }
