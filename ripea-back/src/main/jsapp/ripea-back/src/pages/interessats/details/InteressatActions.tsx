@@ -17,9 +17,6 @@ export const useActions = (refresh?: () => void) => {
     const confirmDialogComponentProps = {maxWidth: 'sm', fullWidth: true};
 
     const {
-        delete: apiDelete,
-        patch: apiPatch,
-        getOne,
         artifactAction: apiAction,
         artifactReport: apiReport,
     } = useResourceApiService('interessatResource');
@@ -46,42 +43,26 @@ export const useActions = (refresh?: () => void) => {
             });
     }
 
-    const deleteRepresentent = (id: any, row: any) => {
-        getOne(row?.representant?.id)
-            .then((representant) => {
-                messageDialogShow(
-                    t('page.interessat.action.deleteRep.check'),
-                    t('page.interessat.action.deleteRep.description'),
-                    confirmDialogButtons,
-                    confirmDialogComponentProps)
-                    .then((value: any) => {
-                        if (value) {
-                            if (representant?.esRepresentant) {
-                                apiDelete(representant?.id)
-                                    .then(() => {
-                                        refresh?.();
-                                        temporalMessageShow(null, t('page.interessat.action.deleteRep.ok'), 'success');
-                                    })
-                                    .catch((error) => {
-                                        error?.message && temporalMessageShow(null, error?.message, 'error');
-                                    });
-                            } else {
-                                apiPatch(id, {
-                                    data: { representant: null }
-                                })
-                                    .then(() => {
-                                        refresh?.();
-                                        temporalMessageShow(null, t('page.interessat.action.deleteRep.ok'), 'success');
-                                    })
-                                    .catch((error) => {
-                                        error?.message && temporalMessageShow(null, error?.message, 'error');
-                                    });
-                            }
-                        }
-                    });
-            })
+    const deleteRepresentent = (id: any) => {
+        messageDialogShow(
+            t('page.interessat.action.deleteRep.check'),
+            t('page.interessat.action.deleteRep.description'),
+            confirmDialogButtons,
+            confirmDialogComponentProps)
+            .then((value: any) => {
+                if (value) {
+                    apiAction(id, {code: 'DELETE_REPRESENTANT'})
+                        .then(()=>{
+                            refresh?.()
+                            temporalMessageShow(null, t('page.interessat.action.deleteRep.ok'), 'success');
+                        })
+                        .catch((error) => {
+                            temporalMessageShow(null, error?.message, 'error');
+                        });
+                }
+            });
     }
-    const deleteInteressat = (id: any, row: any) => {
+    const deleteInteressat = (id: any) => {
         messageDialogShow(
             t('page.interessat.action.delete.check'),
             t('page.interessat.action.delete.description'),
@@ -89,27 +70,14 @@ export const useActions = (refresh?: () => void) => {
             confirmDialogComponentProps)
             .then((value: any) => {
                 if (value) {
-                    if (row?.hasRepresentats) {
-                        apiPatch(id, {
-                            data: { esRepresentant: true }
+                    apiAction(id, {code: 'DELETE_INTERESSAT'})
+                        .then(() => {
+                            refresh?.();
+                            temporalMessageShow(null, t('page.interessat.action.delete.ok'), 'success');
                         })
-                            .then(() => {
-                                refresh?.();
-                                temporalMessageShow(null, t('page.interessat.action.delete.ok'), 'success');
-                            })
-                            .catch((error) => {
-                                error?.message && temporalMessageShow(null, error?.message, 'error');
-                            });
-                    } else {
-                        apiDelete(id)
-                            .then(() => {
-                                refresh?.();
-                                temporalMessageShow(null, t('page.interessat.action.delete.ok'), 'success');
-                            })
-                            .catch((error) => {
-                                error?.message && temporalMessageShow(null, error?.message, 'error');
-                            });
-                    }
+                        .catch((error) => {
+                            error?.message && temporalMessageShow(null, error?.message, 'error');
+                        });
                 }
             });
     }

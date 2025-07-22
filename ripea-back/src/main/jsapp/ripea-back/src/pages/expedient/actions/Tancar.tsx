@@ -39,7 +39,9 @@ const TancarForm = () => {
         builder.eq('expedient.id', entity?.id),
         builder.or(
             builder.eq('estat', "'REDACCIO'"),
-            builder.eq('arxiuUuid', null)),
+            builder.eq('arxiuUuid', null),
+        ),
+        builder.eq('esborrat', 0),
     )
 
     const {

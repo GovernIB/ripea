@@ -4,10 +4,16 @@ import GridFormField from "../../../components/GridFormField.tsx";
 import {useRef} from "react";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
+import * as builder from "../../../util/springFilterUtils.ts";
 
 const EnviarViaFirmaForm = () => {
     const {data} = useFormContext();
     const { t } = useTranslation();
+
+    const interessatFilter = builder.and(
+        builder.eq('expedient.id', data?.expedient?.id),
+        builder.eq('esRepresentant', false)
+    );
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <Grid item xs={12} ><Typography sx={{ borderBottom: '1px solid gray' }}>{t('page.document.detall.dataBasic')}</Typography></Grid>
@@ -17,7 +23,7 @@ const EnviarViaFirmaForm = () => {
         <GridFormField xs={12} name="viaFirmaDispositiuCodi" hidden={!data?.isDispositiusEnabled}/>
 
         <Grid item xs={12} ><Typography sx={{ borderBottom: '1px solid gray' }}>{t('page.document.detall.dataInteressat')}</Typography></Grid>
-        <GridFormField xs={12} name="interessat"/>
+        <GridFormField xs={12} name="interessat" filter={interessatFilter}/>
         <GridFormField xs={6} name="signantNif"/>
         <GridFormField xs={6} name="signantNom"/>
 
@@ -49,8 +55,10 @@ const useEnviarViaFirma = (refresh?: () => void) => {
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
 
-    const handleShow = (id:any) :void => {
-        apiRef.current?.show?.(id)
+    const handleShow = (id:any, row:any) :void => {
+        apiRef.current?.show?.(id, {
+            expedient: row?.expedient,
+        })
     }
     const onSuccess = (result:any) :void => {
         refresh?.()

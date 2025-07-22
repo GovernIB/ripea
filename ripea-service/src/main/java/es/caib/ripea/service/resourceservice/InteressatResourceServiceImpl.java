@@ -473,11 +473,15 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
 				if (interessatExistent!=null) {
 
 					//Controlar que el interessat no es representa a ell mateix
-                    if (	!answers.containsKey(NOT_REPRESENT_HIMSELF) &&
+                    if (
                     		(previous.getRepresentat()!=null && Objects.equals(previous.getRepresentat().getId(), interessatExistent.getId()))
                     		|| (previous.getRepresentant()!=null && Objects.equals(previous.getRepresentant().getId(), interessatExistent.getId()))
                     ){
-                        throw new AnswerRequiredException(InteressatResource.class, NOT_REPRESENT_HIMSELF, messageHelper.getMessage("es.caib.ripea.service.intf.resourcevalidation.InteressatValid.representHimself"));
+                        if (answers.containsKey(NOT_REPRESENT_HIMSELF)) {
+                            target.setDocumentNum(null);
+                        } else {
+                            throw new AnswerRequiredException(InteressatResource.class, NOT_REPRESENT_HIMSELF, messageHelper.getMessage("es.caib.ripea.service.intf.resourcevalidation.InteressatValid.representHimself"));
+                        }
                     } else if (!interessatExistent.getId().equals(previous.getId())) {
                     	//Controlar que no estam introduint un interessat repetit
                     	target.setId(interessatExistent.getId());
