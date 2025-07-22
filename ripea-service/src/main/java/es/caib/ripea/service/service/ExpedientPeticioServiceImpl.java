@@ -34,6 +34,7 @@ import es.caib.ripea.persistence.entity.ExpedientPeticioEntity;
 import es.caib.ripea.persistence.entity.InteressatEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.RegistreAnnexEntity;
+import es.caib.ripea.persistence.entity.RegistreEntity;
 import es.caib.ripea.persistence.entity.RegistreInteressatEntity;
 import es.caib.ripea.persistence.repository.DocumentRepository;
 import es.caib.ripea.persistence.repository.EntitatRepository;
@@ -414,11 +415,9 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	@Transactional
 	@Override
 	public RegistreDto findRegistreById(Long registreId) {
-		return conversioTipusHelper.convertir(
-				registreRepository.findById(registreId),
-				RegistreDto.class);
+		RegistreEntity registreEntity = registreRepository.findById(registreId).get();
+		return conversioTipusHelper.convertir(registreEntity, RegistreDto.class);
 	}
-	
 
 	@Transactional
 	@Override

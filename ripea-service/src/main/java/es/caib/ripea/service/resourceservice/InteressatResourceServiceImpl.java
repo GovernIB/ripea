@@ -363,11 +363,11 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
 	    				configHelper.getRolActual(),
 	    				true); //comprovarAgafat
     		}
-    	} else { //UPDATE
+    	} else { //UPDATE    		
     		interessatDto.setId(interessatExistent.getId());
     		expedientInteressatHelper.updateInteressatRepresentantEntity(
     				resource.getExpedient().getId(),
-    				resource.getRepresentat().getId(), //ID del representat
+    				resource.getRepresentat()!=null?resource.getRepresentat().getId():null, //ID del representat
     				interessatDto,
     				configHelper.getRolActual(),
     				true,  //comprovarAgafat
@@ -570,15 +570,16 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
 				expedientInteressatHelper.deleteRepresentant(
 						entitat.getId(),
 						entity.getExpedient().getId(),
-						entity.getRepresentant().getId(),
 						entity.getId(),
+						entity.getRepresentant().getId(),
 						configHelper.getRolActual());
             } catch (Exception e) {
                 excepcioLogHelper.addExcepcio("/expedient/interessats/"+entity.getId()+"/DeleteRepresentantArxiuActionExecutor", e);
 				String message = messageHelper.getMessage("message.common.action.error")+": "+e.getMessage();
 				throw new ActionExecutionException(getResourceClass(), entity==null?null:entity.getId(), code, message);
             }
-			return objectMappingHelper.newInstanceMap(entity, InteressatResource.class);
+			//Dada per mostrar al missatge de OK, retornar el entity convertit a InteressatResource dona error perque no el troba
+			return entity.getDocumentNum(); 
 		}
     }
     
@@ -601,7 +602,8 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
 				String message = messageHelper.getMessage("message.common.action.error")+": "+e.getMessage();
 				throw new ActionExecutionException(getResourceClass(), entity==null?null:entity.getId(), code, message);
             }
-			return objectMappingHelper.newInstanceMap(entity, InteressatResource.class);
+			//Dada per mostrar al missatge de OK, retornar el entity convertit a InteressatResource dona error perque no el troba
+			return entity.getDocumentNum(); 
 		}
     }
     

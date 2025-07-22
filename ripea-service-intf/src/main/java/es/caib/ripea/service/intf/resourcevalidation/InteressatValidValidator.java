@@ -1,24 +1,22 @@
 package es.caib.ripea.service.intf.resourcevalidation;
 
-import es.caib.ripea.service.intf.dto.InteressatDocumentTipusEnumDto;
-import es.caib.ripea.service.intf.dto.InteressatTipusEnum;
-import es.caib.ripea.service.intf.model.InteressatResource;
-import es.caib.ripea.service.intf.resourceservice.InteressatResourceService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
+
+import org.springframework.stereotype.Component;
+
+import es.caib.ripea.service.intf.dto.InteressatDocumentTipusEnumDto;
+import es.caib.ripea.service.intf.dto.InteressatTipusEnum;
+import es.caib.ripea.service.intf.model.InteressatResource;
+import lombok.RequiredArgsConstructor;
+
 @Component
 @RequiredArgsConstructor
 public class InteressatValidValidator implements ConstraintValidator<InteressatValid, InteressatResource> {
-
-    private final InteressatResourceService interessatResourceService;
 
     @Override
     public boolean isValid(InteressatResource resource, ConstraintValidatorContext context) {
