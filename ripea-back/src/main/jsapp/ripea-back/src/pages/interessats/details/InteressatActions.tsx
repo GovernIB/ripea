@@ -28,7 +28,7 @@ export const useActions = (refresh?: () => void) => {
                 temporalMessageShow(null, t('page.contingut.action.guardarArxiu.ok', {contingut: row?.codiNom}), 'success');
             })
             .catch((error) => {
-                temporalMessageShow(null, error?.message, 'error');
+                error?.message && temporalMessageShow(null, error?.message, 'error');
             });
     }
 
@@ -39,7 +39,7 @@ export const useActions = (refresh?: () => void) => {
                 temporalMessageShow(null, t('page.interessat.action.exportar.ok'), 'info');
             })
             .catch((error) => {
-                temporalMessageShow(null, error?.message, 'error');
+                error?.message && temporalMessageShow(null, error?.message, 'error');
             });
     }
 
@@ -57,7 +57,7 @@ export const useActions = (refresh?: () => void) => {
                             temporalMessageShow(null, t('page.interessat.action.deleteRep.ok'), 'success');
                         })
                         .catch((error) => {
-                            temporalMessageShow(null, error?.message, 'error');
+                            error?.message && temporalMessageShow(null, error?.message, 'error');
                         });
                 }
             });
@@ -145,14 +145,14 @@ const useInteressatActions = (entity:any, refresh?: () => void) => {
             icon: "edit",
             showInMenu: true,
             onClick: updateRepresentent,
-            hidden: (row: any) => !row?.representant || !entity?.potModificar,
+            hidden: (row: any) => !row?.representant || row?.tipus == 'InteressatAdministracioEntity' || !entity?.potModificar,
         },
         {
             title: t('page.interessat.action.deleteRep.label'),
             icon: "delete",
             showInMenu: true,
             onClick: deleteRepresentent,
-            hidden: (row: any) => !row?.representant || !entity?.potModificar,
+            hidden: (row: any) => !row?.representant || row?.tipus == 'InteressatAdministracioEntity' || !entity?.potModificar,
         },
     ];
 

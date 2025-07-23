@@ -490,7 +490,7 @@ const translationEs = {
                     ok: "La relación entre los 2 expedientes se ha eliminado correctamente.",
                 },
                 excelInteressats: {
-                    title: "Exportar interesados a EXCEL",
+                    title: "Descargar plantilla para importar interesados Excel",
                     ok: "Los interesados se han exportado correctamente",
                 }
             },

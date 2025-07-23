@@ -490,8 +490,8 @@ const translationCa = {
                     ok: "La relació entre els 2 expedients s'ha eliminat correctament.",
                 },
                 excelInteressats: {
-                    title: "Exportar interessats a EXCEL",
-                    ok: "Els interessats s'han exportat correctament"
+                    title: "Descarregar plantilla per importar interessats des d'Excel",
+                    ok: "Els interessats s'han exportat correctament",
                 }
             },
             alert: {

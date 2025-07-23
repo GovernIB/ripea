@@ -171,6 +171,7 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
             popupEditFormContent={<InteressatsGridForm/>}
             formAdditionalData={{
                 expedient: {id: entity?.id},
+                esRepresentant: false,
             }}
             rowAdditionalActions={actions}
             onRowCountChange={onRowCountChange}

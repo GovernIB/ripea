@@ -2,11 +2,7 @@ package es.caib.ripea.service.resourceservice;
 
 import java.io.OutputStream;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -336,6 +332,7 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
                             resultat.add(new FieldOption(metaDoc.getId().toString(), metaDoc.getNom()));
                         }
             		}
+                    resultat.sort(Comparator.comparing(FieldOption::getDescription));
             	}
             }
             return resultat;

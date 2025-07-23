@@ -10,7 +10,7 @@ import {useState} from "react";
 import {Grid} from "@mui/material";
 import GridFormField from "../../components/GridFormField.tsx";
 
-const sortModel:any = [{field: 'registre.data', sort: 'desc'}];
+const sortModel:any = [{field: 'registreInfo.data', sort: 'desc'}];
 const perspectives = ['REGISTRE', 'ESTAT_VIEW'];
 const namedQueries = ['LLISTAT_ANOTACIONS'];
 
@@ -56,25 +56,31 @@ const AnotacionsGrid = () => {
         },
         {
             field: 'metaExpedient',
+            sortable: false,
             flex: 0.5,
         },
         {
             field: 'registreInfo.interessats',
             headerName: t('page.registre.grid.interessats'),
+            sortable: false,
             flex: 0.5,
             valueFormatter: (value: any) => value.map((i:any)=>i?.description).join(", \n")
         },
         {
             field: 'grup',
+            sortable: false,
             flex: 0.5,
         },
         {
             field: 'estat',
+            sortable: false,
             flex: 0.5,
         },
         {
             field: 'dataActualitzacio',
+            sortable: false,
             flex: 0.5,
+            valueFormatter: (value: any) => formatDate(value)
         },
     ];
 
@@ -95,7 +101,7 @@ const AnotacionsGrid = () => {
                 <StyledMuiGrid
                     resourceName="expedientPeticioResource"
                     filter={springFilter}
-                    staticSortModel={sortModel}
+                    sortModel={sortModel}
                     perspectives={perspectives}
                     columns={columns}
                     rowAdditionalActions={actions}
@@ -107,7 +113,6 @@ const AnotacionsGrid = () => {
                     popupEditFormDialogTitle={t('page.anotacio.action.canviProcediment.title')}
                     popupEditUpdateActive
                     popupEditFormContent={<AnotacionsGridForm/>}
-                    disableColumnSorting
                     toolbarHideCreate
                 />
             </Load>
