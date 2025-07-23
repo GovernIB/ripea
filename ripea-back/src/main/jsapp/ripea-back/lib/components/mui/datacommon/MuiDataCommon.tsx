@@ -4,11 +4,12 @@ import {
     ResourceApiFindCommonArgs,
 } from '../../ResourceApiProvider';
 import { ResourceType, ExportFileType } from '../../ResourceApiContext';
-import { useDataQuickFilter } from './DataQuickFilter';
-import { toToolbarIcon } from '../ToolbarIcon';
-import DataFormDialog, { DataFormDialogApi } from './DataFormDialog';
+import { FormI18nKeys } from '../../form/Form';
 import { useBaseAppContext } from '../../BaseAppContext';
 import { useConfirmDialogButtons } from '../../AppButtons';
+import { toToolbarIcon } from '../ToolbarIcon';
+import { useDataQuickFilter } from './DataQuickFilter';
+import DataFormDialog, { DataFormDialogApi } from './DataFormDialog';
 
 export type DataCommonFindArgs = ResourceApiFindCommonArgs;
 
@@ -184,6 +185,7 @@ export const useDataCommonEditable = (
     popupEditFormDialogComponentProps: any,
     popupEditFormDialogOnClose: ((reason?: string) => boolean) | undefined,
     popupEditFormComponentProps: any,
+    popupEditFormI18nKeys: FormI18nKeys | undefined,
     apiCurrentActions: any,
     apiDelete: (id: any) => Promise<any>,
     refresh: () => void) => {
@@ -286,6 +288,7 @@ export const useDataCommonEditable = (
         resourceTitle={popupEditFormDialogResourceTitle}
         dialogComponentProps={popupEditFormDialogComponentProps}
         formComponentProps={popupEditFormComponentProps}
+        formI18nKeys={popupEditFormI18nKeys}
         onClose={popupEditFormDialogOnClose}
         apiRef={dataDialogPopupApiRef}>
         {popupEditFormContent}

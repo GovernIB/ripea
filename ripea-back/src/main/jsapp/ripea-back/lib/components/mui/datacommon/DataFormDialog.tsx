@@ -1,4 +1,5 @@
 import React from 'react';
+import { FormI18nKeys } from '../../form/Form';
 import { useBaseAppContext, DialogButton } from '../../BaseAppContext';
 import { useFormDialog, FormDialogSubmitFn } from '../form/FormDialog';
 
@@ -14,6 +15,7 @@ export type DataFormDialogProps = React.PropsWithChildren & {
     dialogButtons?: DialogButton[];
     dialogComponentProps?: any;
     formComponentProps?: any;
+    formI18nKeys?: FormI18nKeys;
     apiRef?: React.MutableRefObject<DataFormDialogApi | undefined>;
     formSubmit?: FormDialogSubmitFn;
     onClose?: (reason?: string) => boolean;
@@ -27,6 +29,7 @@ export const DataFormDialog: React.FC<DataFormDialogProps> = (props) => {
         dialogButtons,
         dialogComponentProps,
         formComponentProps,
+        formI18nKeys,
         apiRef,
         formSubmit,
         onClose,
@@ -43,6 +46,7 @@ export const DataFormDialog: React.FC<DataFormDialogProps> = (props) => {
         children,
         dialogComponentProps ?? { fullWidth: true, maxWidth: 'md' },
         formComponentProps,
+        formI18nKeys,
         onClose);
     const show = (id?: any, additionalData?: any) => formDialogShow(id, {
         title: titleProp ?? ((id != null ? t('datacommon.update.title') : t('datacommon.create.title')) + ' ' + (resourceTitle ?? resourceName)),

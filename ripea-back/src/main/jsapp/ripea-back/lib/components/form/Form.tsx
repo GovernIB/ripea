@@ -74,8 +74,19 @@ export type FormProps = React.PropsWithChildren & {
     fieldTypeMap?: Map<string, string>;
     /** Indica que és un formulari d'una sola línia (per exemple: formularis que es mostran a una fila de la graella) */
     inline?: true;
+    /** Claus alternatives per a les traduccions */
+    i18nKeys?: FormI18nKeys;
     /** Indica si s'han d'imprimir a la consola missatges de depuració */
     debug?: true;
+};
+
+export type FormI18nKeys = {
+    createSuccess?: string;
+    createError?: string;
+    updateSuccess?: string;
+    updateError?: string;
+    deleteSuccess?: string;
+    deleteError?: string;
 };
 
 const formDataReducer = (state: any, action: FormFieldDataAction): any => {
@@ -151,6 +162,7 @@ export const Form: React.FC<FormProps> = (props) => {
         dataValidator,
         fieldTypeMap,
         inline,
+        i18nKeys,
         debug = false,
         children,
     } = props;
@@ -415,7 +427,7 @@ export const Form: React.FC<FormProps> = (props) => {
                     apiAction
                         .then((savedData: any) => {
                             const message =
-                                calcId != null ? t('form.update.success') : t('form.create.success');
+                                calcId != null ? t(i18nKeys?.updateSuccess ?? 'form.update.success') : t(i18nKeys?.createSuccess ?? 'form.create.success');
                             temporalMessageShow(null, message, 'success');
                             reset(savedData);
                             if (calcId != null) {
@@ -469,7 +481,7 @@ export const Form: React.FC<FormProps> = (props) => {
                         })
                         .catch((error: ResourceApiError) => {
                             const title =
-                                calcId != null ? t('form.update.error') : t('form.create.error');
+                                calcId != null ? t(i18nKeys?.updateError ?? 'form.update.error') : t(i18nKeys?.createError ?? 'form.create.error');
                             handleSubmissionErrors(error, title, reject);
                         });
                 }
@@ -489,10 +501,10 @@ export const Form: React.FC<FormProps> = (props) => {
                 apiDelete(calcId)
                     .then(() => {
                         goBack(goBackLink);
-                        temporalMessageShow(null, t('form.delete.success'), 'success');
+                        temporalMessageShow(null, t(i18nKeys?.deleteSuccess ?? 'form.delete.success'), 'success');
                     })
                     .catch((error: ResourceApiError) => {
-                        temporalMessageShow(t('form.delete.error'), error.message, 'error');
+                        temporalMessageShow(t(i18nKeys?.deleteError ?? 'form.delete.error'), error.message, 'error');
                     });
             }
         });

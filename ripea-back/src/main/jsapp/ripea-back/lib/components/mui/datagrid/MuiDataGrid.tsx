@@ -25,6 +25,7 @@ import {
     ReactElementWithPosition,
     joinReactElementsWithPositionWithReactElementsWithPositions
 } from '../../../util/reactNodePosition';
+import { FormI18nKeys } from '../../form/Form';
 import { useResourceApiContext, ResourceType, ExportFileType } from '../../ResourceApiContext';
 import { useResourceApiService } from '../../ResourceApiProvider';
 import { toDataGridActionItem, DataGridActionItemOnClickFn } from './DataGridActionItem';
@@ -113,6 +114,7 @@ export type MuiDataGridProps = {
     popupEditFormDialogComponentProps?: any;
     popupEditFormDialogOnClose?: (reason?: string) => boolean;
     popupEditFormComponentProps?: any;
+    popupEditFormI18nKeys?: FormI18nKeys;
     onRowsChange?: (rows: GridRowsProp, pageInfo: any) => void;
     onRowOrderChange?: GridEventListener<'rowOrderChange'>;
     onRowSelectionModelChange?: (rowSelectionModel: GridRowSelectionModel, details: GridCallbackDetails) => void;
@@ -357,6 +359,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         popupEditFormDialogComponentProps,
         popupEditFormDialogOnClose,
         popupEditFormComponentProps,
+        popupEditFormI18nKeys,
         onRowClick,
         onRowsChange,
         onRowOrderChange,
@@ -475,6 +478,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         popupEditFormDialogComponentProps,
         popupEditFormDialogOnClose,
         popupEditFormComponentProps,
+        popupEditFormI18nKeys,
         apiCurrentActions,
         apiDelete,
         refresh);

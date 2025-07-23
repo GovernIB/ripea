@@ -35,7 +35,7 @@ export type BaseAppProps = React.PropsWithChildren & {
     code: string;
     persistentSession?: boolean;
     persistentLanguage?: boolean;
-    i18nUseTranslation: (ns: string) => { t: any };
+    i18nUseTranslation: (ns?: string) => { t: any };
     i18nCurrentLanguage?: string;
     i18nHandleLanguageChange?: I18nHandleLanguageChangeFn;
     i18nAddResourceBundleCallback?: I18nAddResourceBundleCallback;
@@ -126,7 +126,7 @@ const useFormFieldComponents = (formFieldComponents?: FormFieldComponent[]) => {
 const useI18n = (
     code: string,
     persistentLanguage: boolean,
-    i18nUseTranslation: (ns: string) => { t: any },
+    i18nUseTranslation: (ns?: string) => { t: any },
     i18nCurrentLanguage?: string,
     i18nHandleLanguageChange?: I18nHandleLanguageChangeFn,
     i18nAddResourceBundleCallback?: I18nAddResourceBundleCallback) => {
@@ -136,6 +136,7 @@ const useI18n = (
         persistentStateSet,
     } = usePersistentState(code);
     const { t: tI18Next } = i18nUseTranslation(LIB_I18N_NS);
+    const { t: tI18NextGlobal } = i18nUseTranslation();
     const {
         currentLanguage,
         setCurrentLanguage,
@@ -162,7 +163,13 @@ const useI18n = (
     React.useEffect(() => {
         currentLanguage && i18nHandleLanguageChange?.(currentLanguage);
     }, [currentLanguage]);
-    const t = (key: string, params?: any) => tI18Next(key, params);
+    const t = (key: string, params?: any) => {
+        const result = tI18Next(key, params);
+        if (result === key) {
+            return tI18NextGlobal(key, params);
+        }
+        return result;
+    }
     return {
         currentLanguage,
         setCurrentLanguage,

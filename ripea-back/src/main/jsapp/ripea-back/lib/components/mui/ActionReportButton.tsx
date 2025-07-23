@@ -3,7 +3,7 @@ import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import Icon from '@mui/material/Icon';
 import Badge from '@mui/material/Badge';
-import { useFormDialog, FormDialogSubmitFn } from './form/FormDialog';
+import { FormI18nKeys } from '../form/Form';
 import {
     useActionDialogButtons,
     useReportDialogButtons,
@@ -12,6 +12,7 @@ import {
 import { useBaseAppContext } from '../BaseAppContext';
 import { ExportFileType } from '../ResourceApiContext';
 import { useResourceApiService } from '../ResourceApiProvider';
+import { useFormDialog, FormDialogSubmitFn } from './form/FormDialog';
 
 export type ActionReportCustomButton = {
     disabled?: boolean;
@@ -36,6 +37,7 @@ export type ActionReportButtonProps = {
     selectedCount?: number;
     buttonComponent?: React.FC<ActionReportCustomButton>;
     formAdditionalData?: any;
+    formI18nKeys?: FormI18nKeys;
     formInitOnChangeRequest?: boolean;
     formDialogContent?: React.ReactElement;
     formDialogComponentProps?: any;
@@ -91,6 +93,7 @@ export const useActionReportLogic = (
     reportFileType?: ExportFileType,
     confirm?: boolean,
     formAdditionalDataArg?: any,
+    formI18nKeys?: FormI18nKeys,
     formInitOnChangeRequest?: boolean,
     formDialogContent?: React.ReactElement,
     formDialogComponentPropsArg?: any,
@@ -148,6 +151,7 @@ export const useActionReportLogic = (
         formDialogContent,
         null,
         { resourceType: action ? 'action' : 'report', resourceTypeCode: action ?? report },
+        formI18nKeys,
         dialogCloseCallback);
     const exec = (id: any, dialogTitle?: any, formAdditionalData?: any, formDialogComponentProps?: any) => {
         if (hasForm && !dialogDisabled) {
@@ -228,6 +232,7 @@ export const ActionReportButton: React.FC<ActionReportButtonProps> = (props) => 
         selectedCount,
         buttonComponent: buttonComponentProp,
         formAdditionalData,
+        formI18nKeys,
         formInitOnChangeRequest,
         formDialogContent,
         formDialogComponentProps,
@@ -249,6 +254,7 @@ export const ActionReportButton: React.FC<ActionReportButtonProps> = (props) => 
         reportFileType,
         confirm,
         formAdditionalData,
+        formI18nKeys,
         formInitOnChangeRequest,
         formDialogContent,
         formDialogComponentProps,
