@@ -427,7 +427,9 @@ export const Form: React.FC<FormProps> = (props) => {
                     apiAction
                         .then((savedData: any) => {
                             const message =
-                                calcId != null ? t(i18nKeys?.updateSuccess ?? 'form.update.success') : t(i18nKeys?.createSuccess ?? 'form.create.success');
+                                calcId != null ?
+                                    t(i18nKeys?.updateSuccess ?? 'form.update.success', { data: savedData }) :
+                                    t(i18nKeys?.createSuccess ?? 'form.create.success', { data: savedData });
                             temporalMessageShow(null, message, 'success');
                             reset(savedData);
                             if (calcId != null) {
@@ -481,7 +483,9 @@ export const Form: React.FC<FormProps> = (props) => {
                         })
                         .catch((error: ResourceApiError) => {
                             const title =
-                                calcId != null ? t(i18nKeys?.updateError ?? 'form.update.error') : t(i18nKeys?.createError ?? 'form.create.error');
+                                calcId != null ?
+                                t(i18nKeys?.updateError ?? 'form.update.error', { error }) :
+                                t(i18nKeys?.createError ?? 'form.create.error', { error });
                             handleSubmissionErrors(error, title, reject);
                         });
                 }
