@@ -129,6 +129,7 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 	    			OrganGestorEntity ogEntity	= organGestorRepository.findByEntitatIdAndCodi(entitat.getId(), organActualCodi);
 					PermisosPerAnotacions permisosPerAnotacions = expedientPeticioHelper.findPermisosPerAnotacions(
 							entitat.getId(),
+							null, //UsuariActual, afaga el autenticat
 							rolActual,
 							ogEntity!=null?ogEntity.getId():null);
 		

@@ -19,7 +19,7 @@ const ExpedientFilterForm = () => {
     return <>
         <GridFormField xs={3} name="numero"/>
         <GridFormField xs={3} name="nom"/>
-        <GridFormField xs={3} name="estat" requestParams={{metaExpedientId: data?.metaExpedient?.id}} autocomplete />
+        <GridFormField xs={3} name="estat" requestParams={{metaExpedientId: data?.metaExpedient?.id}} />
         <GridFormField xs={3} name="interessat"/>
         <GridFormField xs={3} name="organGestor" />
         <GridFormField xs={3} name="metaExpedient" filter={filterMetaExpedient}/>

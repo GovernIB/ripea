@@ -151,6 +151,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		long t3 = System.currentTimeMillis();
 		PermisosPerAnotacions permisosPerAnotacions = expedientPeticioHelper.findPermisosPerAnotacions(
 				entitatId,
+				null,
 				rolActual, 
 				organActualId);
 		if (cacheHelper.mostrarLogsCercadorAnotacio())
@@ -662,6 +663,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		
 		PermisosPerAnotacions permisosPerAnotacions = expedientPeticioHelper.findPermisosPerAnotacions(
 				entitatId,
+				null,
 				rolActual, 
 				organActualId);
 		

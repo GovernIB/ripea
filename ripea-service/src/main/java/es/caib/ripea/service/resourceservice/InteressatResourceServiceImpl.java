@@ -232,6 +232,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
 					resultat.add(new FieldOption(pais.getCodi(), pais.getNom()));
 				}
 			}
+			resultat.sort(Comparator.comparing(FieldOption::getDescription));
 			return resultat;
 		}
 	}
@@ -276,6 +277,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
 					}
 				}
             }
+            resultat.sort(Comparator.comparing(FieldOption::getDescription));
 			return resultat;
 		}
     }
@@ -304,7 +306,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
 				}
 			}
 				
-			Collections.sort(resultat, Comparator.comparing(FieldOption::getDescription));
+			resultat.sort(Comparator.comparing(FieldOption::getDescription));
 			return resultat;
 		}
 	}
@@ -329,6 +331,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
 					}
 				}
 			}
+			resultat.sort(Comparator.comparing(FieldOption::getDescription));
 			return resultat;
 		}
 	}

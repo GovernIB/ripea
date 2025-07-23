@@ -33,6 +33,7 @@ import es.caib.ripea.persistence.entity.ExecucioMassivaEntity;
 import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.entity.ExpedientPeticioEntity;
 import es.caib.ripea.persistence.entity.ExpedientTascaEntity;
+import es.caib.ripea.persistence.entity.GrupEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientComentariEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientOrganGestorEntity;
@@ -54,8 +55,8 @@ import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.PermisDto;
 import es.caib.ripea.service.intf.dto.TascaEstatEnumDto;
 import es.caib.ripea.service.intf.dto.UsuariAnotacioDto;
-import es.caib.ripea.service.intf.service.EventService;
 import es.caib.ripea.service.intf.dto.VersioDocumentEnum;
+import es.caib.ripea.service.intf.service.EventService;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.permission.ExtendedPermission;
 
@@ -318,28 +319,30 @@ public class EmailHelper {
 		EntitatEntity entitat = registre.getEntitat();
 		OrganGestorEntity organ = organGestorRepository.findByEntitatIdAndCodi(entitat.getId(), registre.getDestiCodi());
 		
-		List<DadesUsuari> dadesUsuarisAdminEntitat = pluginHelper.dadesUsuariFindAmbGrup("IPA_ADMIN");
+		if (metaExpedient != null) {
+			
+			List<DadesUsuari> dadesUsuarisAdminEntitat = pluginHelper.dadesUsuariFindAmbGrup("IPA_ADMIN");
 
-		if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
-			logger.info("dadesUsuariFindAmbGrup(IPA_ADMIN) (size=" + Utils.getSize(dadesUsuarisAdminEntitat) + ")");
+			if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
+				logger.info("dadesUsuariFindAmbGrup(IPA_ADMIN) (size=" + Utils.getSize(dadesUsuarisAdminEntitat) + ")");
 
-		for (DadesUsuari dadesUsuari : dadesUsuarisAdminEntitat) {
-			boolean granted = permisosHelper.isGrantedAll(
-					entitat.getId(),
-					EntitatEntity.class,
-					new Permission[] { ExtendedPermission.ADMINISTRATION },
-					dadesUsuari.getCodi());
-			if (granted) {
-				UsuariAnotacioDto aux = new UsuariAnotacioDto(dadesUsuari.getCodi(), UsuariAnotacioDto.TipoUsuario.ADMIN, null, metaExpedient.getId());
-				if (!usuariJaDinsLlista(resultat, dadesUsuari.getCodi())) {
-					resultat.add(aux);
+			for (DadesUsuari dadesUsuari : dadesUsuarisAdminEntitat) {
+				boolean granted = permisosHelper.isGrantedAll(
+						entitat.getId(),
+						EntitatEntity.class,
+						new Permission[] { ExtendedPermission.ADMINISTRATION },
+						dadesUsuari.getCodi());
+				if (granted) {
+					UsuariAnotacioDto aux = new UsuariAnotacioDto(dadesUsuari.getCodi(), UsuariAnotacioDto.TipoUsuario.ADMIN, null, metaExpedient.getId());
+					if (!usuariJaDinsLlista(resultat, dadesUsuari.getCodi())) {
+						resultat.add(aux);
+					}
 				}
 			}
-		}
-		if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
-			logger.info("dadesUsuariFindAmbGrup(IPA_ADMIN) time:  " + (System.currentTimeMillis() - t2) + " ms");
-		
-		if (metaExpedient != null) {
+			
+			if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
+				logger.info("dadesUsuariFindAmbGrup(IPA_ADMIN) time:  " + (System.currentTimeMillis() - t2) + " ms");			
+			
 			boolean isProcedimentNoComu = metaExpedient.getOrganGestor() != null;
 
 			long t3 = System.currentTimeMillis();
@@ -386,6 +389,7 @@ public class EmailHelper {
 					}
 				}
 			}
+
 			if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
 				logger.info("dadesUsuariFindAmbGrup(IPA_ORGAN_ADMIN) time:  " + (System.currentTimeMillis() - t3) + " ms");
 
@@ -462,6 +466,12 @@ public class EmailHelper {
 				logger.info("Usuaris amb permís sobre procediment o òrgan del procediment (usuarisAmbPermis): " + usuarisAmbPermis.size());
 			}
 
+			if(metaExpedient.isGestioAmbGrupsActiva() && expedientPeticio.getGrup()!=null) {
+				//Amb permis de lectura sobre el grup es suficient.
+				List<PermisDto> usuarisPermisGrup = permisosHelper.findPermisos(expedientPeticio.getGrup().getId(), GrupEntity.class);
+				usuarisAmbPermis.addAll(usuarisPermisGrup);
+			}
+			
 			for (PermisDto permisDto : usuarisAmbPermis) {
 				UsuariAnotacioDto aux = new UsuariAnotacioDto(permisDto.getPrincipalNom(), UsuariAnotacioDto.TipoUsuario.ADM_ORG_COMUN, null, metaExpedient.getId());
 				if (!usuariJaDinsLlista(resultat, permisDto.getPrincipalNom())) {
@@ -532,7 +542,6 @@ public class EmailHelper {
 				subject,
 				text,
 				EventTipusEnumDto.NOVA_ANOTACIO);
-
 
 		if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
 			logger.info("novaAnotacioPendent end (id=" + expedientPeticioId + "):  " + (System.currentTimeMillis() - t1) + " ms");

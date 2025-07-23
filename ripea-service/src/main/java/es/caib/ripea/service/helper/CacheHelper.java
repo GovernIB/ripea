@@ -748,9 +748,9 @@ public class CacheHelper {
 		
 		PermisosPerAnotacions permisosPerAnotacions = expedientPeticioHelper.findPermisosPerAnotacions(
 				entitat.getId(),
+				usuariCodi,
 				rolActual,
 				organActualId);
-
 
 		long numAnotacionsPendents = expedientPeticioRepository.countAnotacionsPendentsPerMetaExpedients(
 				entitat,
