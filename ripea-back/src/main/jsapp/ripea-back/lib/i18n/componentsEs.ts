@@ -79,6 +79,10 @@ const componentsEs = {
             error: 'Error borrando elemento',
         },
         field: {
+            enum: {
+                clear: 'Borrar',
+                noOptions: 'Sin opciones',
+            },
             reference: {
                 open: 'Abrir',
                 close: 'Cerrar',

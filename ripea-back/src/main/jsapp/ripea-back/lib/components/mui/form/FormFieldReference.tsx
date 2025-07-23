@@ -286,10 +286,10 @@ export const FormFieldReference: React.FC<FormFieldRefProps> = (props) => {
     } = useFormFieldCommon(field, fieldError, inline, componentProps, startAdornmentIcons);
     const loadingElement = <CircularProgress color="inherit" size={20} />;
     const endAdornment = optionsLoading ? loadingElement : componentProps?.slotProps?.input?.endAdornment;
-    const valueAdapted = React.useMemo(() => {
+    const valueMultipleAdapted = React.useMemo(() => {
         return multiple ? (value != null ? (Array.isArray(value) ? value : [value]) : []) : (value ?? null);
     }, [multiple, value]);
-    const inputValueAdapted = React.useMemo(() => {
+    const inputValueMultipleAdapted = React.useMemo(() => {
         return multiple ? inputValue : (value != null ? value.description : inputValue);
     }, [multiple, value, inputValue]);
     return <>
@@ -306,9 +306,9 @@ export const FormFieldReference: React.FC<FormFieldRefProps> = (props) => {
             dialogComponentProps={dialogComponentProps} />}
         <Autocomplete
             name={name}
-            value={valueAdapted}
+            value={valueMultipleAdapted}
             onChange={handleOnChange}
-            inputValue={inputValueAdapted}
+            inputValue={inputValueMultipleAdapted}
             onInputChange={handleOnInputChange}
             options={options}
             multiple={multiple}
@@ -317,7 +317,11 @@ export const FormFieldReference: React.FC<FormFieldRefProps> = (props) => {
             open={open}
             onOpen={() => !disabled && !readOnly && setOpen(true)}
             onClose={(event: Event, reason) => {
-                reason === 'escape' && handleOnInputChange(event, value?.description ?? '');
+                if (reason === 'escape') {
+                    // Esborra el valor de inputValue si no hi ha cap opció seleccionada
+                    // quan es pitja la tecla escape.
+                    handleOnInputChange(event, value?.description ?? '');
+                }
                 setOpen(false);
             }}
             getOptionLabel={(option: any) => option?.description}

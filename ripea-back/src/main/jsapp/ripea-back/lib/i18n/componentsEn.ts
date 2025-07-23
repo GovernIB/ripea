@@ -79,6 +79,10 @@ const componentsEn = {
             error: 'Error deleting element',
         },
         field: {
+            enum: {
+                clear: 'Clear',
+                noOptions: 'No options',
+            },
             reference: {
                 open: 'Open',
                 close: 'Close',

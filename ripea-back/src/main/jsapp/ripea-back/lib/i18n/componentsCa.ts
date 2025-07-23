@@ -79,6 +79,10 @@ const componentsCa = {
             error: 'Error esborrant element',
         },
         field: {
+            enum: {
+                clear: 'Esborrar',
+                noOptions: 'Sense opcions',
+            },
             reference: {
                 open: 'Obrir',
                 close: 'Tancar',

@@ -1,9 +1,12 @@
 import React from 'react';
-import TextField from '@mui/material/TextField';
 import MenuItem from '@mui/material/MenuItem';
 import ListItemText from '@mui/material/ListItemText';
 import Checkbox from '@mui/material/Checkbox';
+import TextField from '@mui/material/TextField';
+import Autocomplete, { AutocompleteChangeReason } from '@mui/material/Autocomplete';
+import Icon from '@mui/material/Icon';
 import { FormFieldCustomProps } from '../../form/FormField';
+import { useBaseAppContext } from '../../BaseAppContext';
 import { useResourceApiContext } from '../../ResourceApiContext';
 import { useFormFieldCommon } from './FormFieldText';
 
@@ -11,6 +14,7 @@ type FormFieldEnumProps = FormFieldCustomProps & {
     multiple?: boolean;
     hiddenEnumValues?: string[];
     requestParams?: any;
+    autocomplete?: boolean;
 };
 
 type EnumOption = {
@@ -34,10 +38,14 @@ export const FormFieldEnum: React.FC<FormFieldEnumProps> = (props) => {
         multiple: multipleProp,
         hiddenEnumValues,
         requestParams,
+        autocomplete,
     } = props;
+    const { t } = useBaseAppContext();
     const { requestHref } = useResourceApiContext();
-    const [open, setOpen] = React.useState(false);
+    const [textFieldOpen, setTextFieldOpen] = React.useState(false);
     const [enumOptions, setEnumOptions] = React.useState<EnumOption[]>();
+    const [autocompleteOpen, setAutocompleteOpen] = React.useState<boolean>(false);
+    const [autocompleteInputValue, setAutocompleteInputValue] = React.useState<string>('');
     const multiple = (field?.multiple || multipleProp) ?? false;
     const {
         helperText,
@@ -49,7 +57,29 @@ export const FormFieldEnum: React.FC<FormFieldEnumProps> = (props) => {
         ...componentProps?.slotProps?.input,
         startAdornment,
     };
-    const valueMultipleAdapted = multiple ? (value != null ? (Array.isArray(value) ? value : [value]) : []) : (value ?? '');
+    const valueTextFieldMultipleAdapted = multiple ? (value != null ? (Array.isArray(value) ? value : [value]) : []) : (value ?? '');
+    const valueAutocompleteMultipleAdapted = React.useMemo(() => {
+        return multiple ? (value != null ? (Array.isArray(value) ? value : [value]) : []) : (value ?? null);
+    }, [multiple, value]);
+    const autocompleteInputValueMultipleAdapted = React.useMemo(() => {
+        return multiple ? autocompleteInputValue : (value != null ? (enumOptions?.find(o => o.value === value)?.description ?? '') : autocompleteInputValue);
+    }, [multiple, value, autocompleteInputValue, enumOptions]);
+    const handleAutocompleteOnChange = (_event: Event, value: any, reason: AutocompleteChangeReason): void => {
+        if (reason === 'clear') {
+            setAutocompleteOpen(true);
+        }
+        if (multiple) {
+            console.log('>>> handleAutocompleteOnChange', value)
+            onChange(value?.map((v: any) => v.id));
+            setAutocompleteInputValue('');
+        } else {
+            onChange(value?.id ?? undefined);
+            setAutocompleteInputValue(value?.description ?? '');
+        }
+    }
+    const handleAutocompleteOnInputChange = (_event: any, newValue: string) => {
+        setAutocompleteInputValue(newValue);
+    }
     React.useEffect(() => {
         if (field.options != null) {
             const optionsObj = { ...field.options };
@@ -77,12 +107,12 @@ export const FormFieldEnum: React.FC<FormFieldEnumProps> = (props) => {
             setEnumOptions([]);
         }
     }, [field, requestParams, hiddenEnumValues]);
-    return enumOptions && <TextField
+    return enumOptions && (!autocomplete ? <TextField
         select
         name={name}
         label={!inline ? label : undefined}
         placeholder={componentProps?.placeholder ?? (inline ? label : undefined)}
-        value={valueMultipleAdapted}
+        value={valueTextFieldMultipleAdapted}
         required={required ?? field.required}
         disabled={disabled}
         error={fieldError != null}
@@ -98,10 +128,10 @@ export const FormFieldEnum: React.FC<FormFieldEnumProps> = (props) => {
             input: inputProps,
             select: {
                 multiple,
-                open,
+                textFieldOpen,
                 readOnly,
-                onClose: () => setOpen(false),
-                onOpen: () => setOpen(true),
+                onClose: () => setTextFieldOpen(false),
+                onOpen: () => setTextFieldOpen(true),
                 renderValue: (value: any) => {
                     const selectedText = (v: any) => {
                         const found = enumOptions.find(o => o.value === v);
@@ -119,6 +149,95 @@ export const FormFieldEnum: React.FC<FormFieldEnumProps> = (props) => {
                 <ListItemText primary={o.description ?? o.value} />
             </MenuItem>;
         })}
-    </TextField>;
+    </TextField> : <Autocomplete
+        name={name}
+        value={valueAutocompleteMultipleAdapted}
+        onChange={handleAutocompleteOnChange}
+        inputValue={autocompleteInputValueMultipleAdapted}
+        onInputChange={handleAutocompleteOnInputChange}
+        options={enumOptions.map(o => ({ id: o.value, description: o.description ?? o.value }))}
+        multiple={multiple}
+        readOnly={readOnly}
+        disableCloseOnSelect={multiple}
+        open={autocompleteOpen}
+        onOpen={() => !disabled && !readOnly && setAutocompleteOpen(true)}
+        onClose={(event: Event, reason) => {
+            if (reason === 'escape') {
+                // Esborra el valor de inputValue si no hi ha cap opció seleccionada
+                // quan es pitja la tecla escape.
+                handleAutocompleteOnInputChange(event, value?.description ?? '');
+            }
+            setAutocompleteOpen(false);
+        }}
+        getOptionLabel={(option: any) => {
+            if (typeof option === 'string') {
+                if (option.length) {
+                    const optionFound = enumOptions.find(o => o.value === option);
+                    return optionFound ? (optionFound.description ?? optionFound.value) : '';
+                } else {
+                    return option;
+                }
+            } else {
+                return option?.description;
+            }
+        }}
+        isOptionEqualToValue={(option: any, value: any) => option.id === value?.id}
+        renderOption={(props, option: any, { selected }) => {
+            const optionDescription = option.description;
+            if (multiple) {
+                const { key, ...optionProps } = props;
+                return <li key={key} {...optionProps}>
+                    <Checkbox
+                        checked={selected}
+                        icon={<Icon>check_box_outline_blank</Icon>}
+                        checkedIcon={<Icon>check_box</Icon>}
+                        sx={{ mr: 1 }} />
+                    {optionDescription}
+                </li>;
+            } else {
+                return <li {...props} key={option.id}>{optionDescription}</li>;
+            }
+        }}
+        fullWidth
+        {...componentProps}
+        renderInput={(params) => <TextField
+            {...params}
+            label={!inline ? label : undefined}
+            placeholder={componentProps?.placeholder ?? (inline ? label : undefined)}
+            disabled={disabled}
+            required={required ?? field.required}
+            error={fieldError != null}
+            title={componentProps?.title ?? title}
+            helperText={helperText}
+            sx={{
+                // Sin esto, si la columna no tiene suficiente espacio para el texto y el icono,
+                // coloca uno encima del otro y se ve cortado por la mitad.
+                '& .MuiAutocomplete-inputRoot': {
+                    flexWrap: inline ? 'nowrap' : undefined,
+                },
+            }}
+            InputProps={{
+                ...params.InputProps,
+                startAdornment: params.InputProps.startAdornment ? <>
+                    {startAdornment}
+                    {params.InputProps.startAdornment}
+                </> : startAdornment,
+                endAdornment: params.InputProps.endAdornment,
+            }}
+            inputProps={params.inputProps}
+        />}
+        slotProps={{
+            popper: {
+                sx: {
+                    minWidth: '300px',
+                },
+            },
+        }}
+        // The next prop fixes a bug in Firefox where the focus was put into the Listbox
+        // container, and then lost focus of the form completely when navigating to the next input
+        ListboxProps={{ tabIndex: '-1' }}
+        clearText={t('form.field.enum.clear')}
+        noOptionsText={t('form.field.enum.noOptions')}
+    />);
 }
 export default FormFieldEnum;
