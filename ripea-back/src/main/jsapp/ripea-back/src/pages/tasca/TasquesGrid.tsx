@@ -123,6 +123,10 @@ const TasquesGrid = (props: any) => {
             }}
             rowAdditionalActions={actions}
             toolbarHideCreate={!entity?.potModificar}
+
+            popupEditFormI18nKeys={{
+                createSuccess: 'page.tasca.action.new.ok',
+            }}
         />
         {components}
     </GridPage>

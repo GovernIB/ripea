@@ -22,11 +22,11 @@ const useModifyExpedient = (refresh?: () => void) => {
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
 
-    const handleShow = (id:any, row:any) :void => {
+    const handleShow = (id:any) :void => {
         apiRef.current?.show?.(id)
-            .then(() => {
+            .then((data:any) => {
                 refresh?.()
-                temporalMessageShow(null, t('page.expedient.action.update.ok', {expedient: row?.nom}), 'success');
+                temporalMessageShow(null, t('page.expedient.action.update.ok', {data}), 'success');
             })
             .catch((error) => {
                 error?.message && temporalMessageShow(null, error?.message, 'error');

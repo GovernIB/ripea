@@ -9,6 +9,7 @@ import Load from "../../components/Load.tsx";
 import {useState} from "react";
 import {Grid} from "@mui/material";
 import GridFormField from "../../components/GridFormField.tsx";
+import {GridSortDirection} from "@mui/x-data-grid-pro";
 
 const sortModel:any = [{field: 'registreInfo.data', sort: 'desc'}];
 const perspectives = ['REGISTRE', 'ESTAT_VIEW'];
@@ -42,17 +43,26 @@ const AnotacionsGrid = () => {
             field: 'registreInfo.data',
             headerName: t('page.registre.grid.dataRecepcio'),
             flex: 0.75,
-            valueFormatter: (value: any) => formatDate(value)
+            valueFormatter: (value: any) => formatDate(value),
+            sortProcessor: (field: string, sort: GridSortDirection) => {
+                return [{field: 'registre.data', sort}];
+            },
         },
         {
             field: 'registreInfo.extracte',
             headerName: t('page.registre.grid.extracte'),
             flex: 1,
+            sortProcessor: (field: string, sort: GridSortDirection) => {
+                return [{field: 'registre.extracte', sort}];
+            },
         },
         {
             field: 'registreInfo.destiDescripcio',
             headerName: t('page.registre.grid.destiDescripcio'),
             flex: 0.5,
+            sortProcessor: (field: string, sort: GridSortDirection) => {
+                return [{field: 'registre.destiDescripcio', sort}];
+            },
         },
         {
             field: 'metaExpedient',
@@ -110,10 +120,14 @@ const AnotacionsGrid = () => {
 
                     paginationActive
 
-                    popupEditFormDialogTitle={t('page.anotacio.action.canviProcediment.title')}
                     popupEditUpdateActive
                     popupEditFormContent={<AnotacionsGridForm/>}
                     toolbarHideCreate
+
+                    popupEditFormDialogTitle={t('page.anotacio.action.canviProcediment.title')}
+                    popupEditFormI18nKeys={{
+                        updateSuccess: 'page.anotacio.action.canviProcediment.ok',
+                    }}
                 />
             </Load>
             {components}

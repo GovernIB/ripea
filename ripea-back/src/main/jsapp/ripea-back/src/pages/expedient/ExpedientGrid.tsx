@@ -273,6 +273,10 @@ const ExpedientGrid = () => {
                             'padding-left': '6px'
                         }
                 }}
+                popupEditFormI18nKeys={{
+                    createSuccess: 'page.expedient.action.new.ok',
+                    updateSuccess: 'page.expedient.action.update.ok',
+                }}
             />
             </Load>
 

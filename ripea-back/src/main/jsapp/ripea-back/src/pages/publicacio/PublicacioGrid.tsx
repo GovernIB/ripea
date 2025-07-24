@@ -6,6 +6,7 @@ import GridFormField from "../../components/GridFormField.tsx";
 import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
 import usePublicacioActions from "./details/PublicacioActions.tsx";
 import {EstatMessage} from "../remesa/RemesaGrid.tsx";
+import {useTranslation} from "react-i18next";
 
 const StyledEstat = (props:any) => {
     const { entity: publicacio } = props;
@@ -68,12 +69,14 @@ const columns = [
 
 const PublicacioGrid = (props:any) => {
     const { id, onRowCountChange } = props;
+    const { t } = useTranslation()
 
     const {actions, components} = usePublicacioActions();
 
     return <GridPage>
         <StyledMuiGrid
             resourceName="documentPublicacioResource"
+            popupEditFormDialogResourceTitle={t('page.publicacio.title')}
             // perspectives={['']}
             popupEditActive
             popupEditFormContent={<PublicacioGridForm/>}
@@ -85,6 +88,11 @@ const PublicacioGrid = (props:any) => {
             onRowCountChange={onRowCountChange}
             disableColumnSorting
             toolbarHideCreate
+
+            popupEditFormI18nKeys={{
+                updateSuccess: 'page.dada.action.update.ok',
+                deleteSuccess: 'page.dada.action.delete.ok',
+            }}
         />
         {components}
     </GridPage>
