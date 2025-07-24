@@ -782,8 +782,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                     }
                 }
             } catch (Exception e) {
-                excepcioLogHelper.addExcepcio("/expedient/MoureActionExecutor", e);
-                throw new ReportGenerationException(DocumentResource.class, null, code, e.getMessage());
+                excepcioLogHelper.addExcepcio("/expedient/MoureCopiarVincularActionExecutor", e);
+                throw new ActionExecutionException(getResourceClass(), null, code, e.getMessage());
             }
 
             if (!params.isMassivo() && params.getIds().size() == 1){

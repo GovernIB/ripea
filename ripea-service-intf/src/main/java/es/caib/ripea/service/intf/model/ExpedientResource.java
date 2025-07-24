@@ -131,7 +131,12 @@ import lombok.experimental.FieldNameConstants;
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientResource.ACTION_IMPORT_DOCS,
                         formClass = ExpedientResource.ImportarDocumentsForm.class,
-                        requiresId = true),                
+                        requiresId = true),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = ExpedientResource.ACTION_IMPORT_DOCS_ZIP,
+                        formClass = ExpedientResource.ImportarDocumentsZipForm.class,
+                        requiresId = true),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientResource.ACTION_MASSIVE_REOBRIR_CODE,
@@ -172,6 +177,10 @@ import lombok.experimental.FieldNameConstants;
 						type = ResourceArtifactType.REPORT,
 						code = ExpedientResource.REPORT_PLANTILLA_EXCEL_INTERESSATS,
                         requiresId = true),
+				@ResourceConfigArtifact(
+						type = ResourceArtifactType.REPORT,
+						code = ExpedientResource.REPORT_PLANTILLA_DADES_CSV,
+                        requiresId = true),				
 		})
 @ExpedientValid
 public class ExpedientResource extends NodeResource implements Serializable {
@@ -201,7 +210,9 @@ public class ExpedientResource extends NodeResource implements Serializable {
 	public static final String REPORT_EXPORT_SELECTED_DOCS = "EXPORT_SELECTED_DOCS";
 	public static final String ACTION_SYNC_ARXIU = "SYNC_ARXIU";
 	public static final String ACTION_IMPORT_DOCS = "IMPORT_DOCS";
+	public static final String ACTION_IMPORT_DOCS_ZIP = "IMPORT_DOCS_ZIP";
 	public static final String REPORT_PLANTILLA_EXCEL_INTERESSATS = "PLANTILLA_EXCEL_INTERESSATS";
+	public static final String REPORT_PLANTILLA_DADES_CSV = "PLANTILLA_DADES_CSV";
 	
 	public static final String PERSPECTIVE_FOLLOWERS = "FOLLOWERS";
 	public static final String PERSPECTIVE_ARXIU_EXPEDIENT = "ARXIU_EXPEDIENT";
@@ -433,5 +444,15 @@ public class ExpedientResource extends NodeResource implements Serializable {
         private Date dataPresentacio;
     	private ResourceReference<CarpetaResource, Long> carpeta;
         private String novaCarpetaNom;
+    }
+    
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @FieldNameConstants
+    public static class ImportarDocumentsZipForm implements Serializable {
+    	@NotNull
+    	private FileReference documentZip;
+    	private List<DocumentResource> documentsUsuari;
     }
 }

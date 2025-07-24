@@ -78,6 +78,7 @@ import es.caib.ripea.service.intf.dto.ExecucioMassivaTipusDto;
 import es.caib.ripea.service.intf.dto.FileNameOption;
 import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.ImportacioDto;
+import es.caib.ripea.service.intf.dto.InteressatDto;
 import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
 import es.caib.ripea.service.intf.dto.PermisosPerExpedientsDto;
 import es.caib.ripea.service.intf.dto.ResultatConsultaDto;
@@ -89,6 +90,7 @@ import es.caib.ripea.service.intf.model.ExpedientResource;
 import es.caib.ripea.service.intf.model.ExpedientResource.ExpedientFilterForm;
 import es.caib.ripea.service.intf.model.ExpedientResource.ExportarDocumentMassiu;
 import es.caib.ripea.service.intf.model.ExpedientResource.ImportarDocumentsForm;
+import es.caib.ripea.service.intf.model.ExpedientResource.ImportarDocumentsZipForm;
 import es.caib.ripea.service.intf.model.ExpedientResource.ImportarExpedientFormAction;
 import es.caib.ripea.service.intf.model.ExpedientResource.TancarExpedientFormAction;
 import es.caib.ripea.service.intf.model.InteressatResource;
@@ -157,6 +159,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         register(ExpedientResource.REPORT_MASSIVE_EXPORT_ENI, 		new ExportEniGenerator());
         register(ExpedientResource.REPORT_MASSIVE_EXPORT_INSIDE, 	new ExportIdexInsideGenerator());
         register(ExpedientResource.REPORT_PLANTILLA_EXCEL_INTERESSATS, 	new PlantillaExcelInteressatsReportGenerator());
+        register(ExpedientResource.REPORT_PLANTILLA_DADES_CSV, 	new PlantillaDadesCsvReportGenerator());
         //Genera un Zip de los documentos seleccionados para un expediente concreto
         register(ExpedientResource.REPORT_EXPORT_SELECTED_DOCS, new ExportSelectedDocsGenerator());
         
@@ -172,6 +175,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         register(ExpedientResource.ACTION_IMPORTAR_CODE, new ImportarActionExecutor());
         register(ExpedientResource.ACTION_SYNC_ARXIU, new SincronitzarArxiuActionExecutor());
         register(ExpedientResource.ACTION_IMPORT_DOCS, new ImportarDocumentsArxiuActionExecutor());
+        register(ExpedientResource.ACTION_IMPORT_DOCS_ZIP, new ImportarDocumentsZipArxiuActionExecutor());
         
         register(ExpedientResource.PERSPECTIVE_AMB_PINBAL_CODE, new AmbDocumentsPinbalPerspectiveApplicator());
         register(ExpedientResource.PERSPECTIVE_FOLLOWERS, new FollowersPerspectiveApplicator());
@@ -795,7 +799,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 				return resultat;
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/expedient/export/ODS", e);
-				throw new ReportGenerationException(ExpedientResource.class, null, code, "expedient.export.ods.reject");
+				throw new ReportGenerationException(getResourceClass(), null, code, "expedient.export.ods.reject");
 			}
     	}
     	
@@ -825,7 +829,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     			return resultat;
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/expedient/export/CSV", e);
-				throw new ReportGenerationException(ExpedientResource.class, null, code, "expedient.export.csv.reject");
+				throw new ReportGenerationException(getResourceClass(), null, code, "expedient.export.csv.reject");
 			}
     	}
     	
@@ -855,7 +859,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     			return resultat;
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/expedient/ExportIndexZipGenerator", e);
-				throw new ReportGenerationException(ExpedientResource.class, null, code, "expedient.export.indexZip.reject");
+				throw new ReportGenerationException(getResourceClass(), null, code, "expedient.export.indexZip.reject");
 			}
     	}
     	
@@ -908,9 +912,38 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/expedient/"+expedientId+"/exportarZipMassiu", e);
-				throw new ReportGenerationException(ExpedientResource.class, expedientId, code, messageHelper.getMessage("expedient.export.indexPdf.reject", new Object[]{e.getMessage()}));
+				throw new ReportGenerationException(getResourceClass(), expedientId, code, messageHelper.getMessage("expedient.export.indexPdf.reject", new Object[]{e.getMessage()}));
 			}
     	}
+    }
+    
+    private class ImportarDocumentsZipArxiuActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.ImportarDocumentsZipForm, Serializable> {
+
+		@Override
+		public void onChange(Serializable id, ImportarDocumentsZipForm previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, ImportarDocumentsZipForm target) {
+        	
+        	try {
+                    
+                if (ExpedientResource.ImportarDocumentsZipForm.Fields.documentZip.equals(fieldName)) {
+                	List<DocumentResource> llistaDocumentsProcessats = new ArrayList<DocumentResource>();
+                	
+                	if (fieldValue!=null) { 
+                		llistaDocumentsProcessats.add(new DocumentResource());
+                		llistaDocumentsProcessats.add(new DocumentResource());
+                		llistaDocumentsProcessats.add(new DocumentResource());
+                	}
+                	
+                	target.setDocumentsUsuari(llistaDocumentsProcessats);
+                }
+            } catch (Exception e) {
+                excepcioLogHelper.addExcepcio("/expedient/interessats/ImportarDocumentsZipArxiuActionExecutor.onChange", e);
+            }
+		}
+
+		@Override
+		public Serializable exec(String code, ExpedientResourceEntity entity, ImportarDocumentsZipForm params) throws ActionExecutionException {
+			return null;
+		}
     }
     
     private class ImportarDocumentsArxiuActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.ImportarDocumentsForm, Serializable> {
@@ -1015,7 +1048,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
 				} catch (Exception e) {
 					excepcioLogHelper.addExcepcio("/expedient/"+expedientId+"/exportarZipMassiu", e);
-					throw new ReportGenerationException(ExpedientResource.class, expedientId, code, messageHelper.getMessage("expedient.export.zip.reject", new Object[]{e.getMessage()}));
+					throw new ReportGenerationException(getResourceClass(), expedientId, code, messageHelper.getMessage("expedient.export.zip.reject", new Object[]{e.getMessage()}));
 				}
             }
             
@@ -1083,7 +1116,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/expedient/"+expedientId+"/exportarZipMassiu", e);
-				throw new ReportGenerationException(ExpedientResource.class, expedientId, code, "expedient.export.indexPdf.reject");
+				throw new ReportGenerationException(getResourceClass(), expedientId, code, "expedient.export.indexPdf.reject");
 			}
             
             return resultat;
@@ -1133,7 +1166,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/expedient/"+expedientId+"/exportarZipMassiu", e);
-				throw new ReportGenerationException(ExpedientResource.class, expedientId, code, "expedient.export.indexXlsx.reject");
+				throw new ReportGenerationException(getResourceClass(), expedientId, code, "expedient.export.indexXlsx.reject");
 			}
             
             return resultat;
@@ -1179,7 +1212,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/expedient/"+expedientId+"/exportarEni", e);
-				throw new ReportGenerationException(ExpedientResource.class, expedientId, code, "expedient.export.eni.reject");
+				throw new ReportGenerationException(getResourceClass(), expedientId, code, "expedient.export.eni.reject");
 			}
             
             return resultat;
@@ -1212,7 +1245,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 	    		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
 	    		
 	            if (params.isMassivo()) {
-					throw new ReportGenerationException(ExpedientResource.class, expedientId, code, "expedient.export.pdfeni.massive.reject");
+					throw new ReportGenerationException(getResourceClass(), expedientId, code, "expedient.export.pdfeni.massive.reject");
 	            } else {
 	        		FitxerDto fitxerDto = expedientHelper.generarIndexExpedients(
 	        				entitatEntity.getId(),
@@ -1227,7 +1260,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/expedient/"+expedientId+"/exportarEni", e);
-				throw new ReportGenerationException(ExpedientResource.class, expedientId, code, "expedient.export.eni.reject");
+				throw new ReportGenerationException(getResourceClass(), expedientId, code, "expedient.export.eni.reject");
 			}
 
             return resultat;
@@ -1245,7 +1278,32 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		@Override
 		public void onChange(Serializable id, MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {}
     }
-    
+
+    private class PlantillaDadesCsvReportGenerator implements ReportGenerator<ExpedientResourceEntity, Serializable, Serializable> {
+
+		@Override
+		public void onChange(Serializable id, Serializable previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, Serializable target) {}
+
+		@Override
+		public DownloadableFile generateFile(String code, List<?> data, ReportFileType fileType, OutputStream out) {
+			try {
+				DownloadableFile resultat = new DownloadableFile(
+	        			"model_dades_importacio_zip.csv",
+	        			"text/csv",
+	        			this.getClass().getResourceAsStream("/es/caib/ripea/core/templates/model_dades_importacio_zip.csv").readAllBytes());
+				return resultat;
+			} catch (Exception e) {
+				excepcioLogHelper.addExcepcio("/expedient/PlantillaDadesCsvReportGenerator", e);
+				throw new ReportGenerationException(getResourceClass(), 0, code, "expedient.export.plantillaExcelInteressats.reject");
+			}
+		}
+		
+		@Override
+		public List<Serializable> generateData(String code, ExpedientResourceEntity entity, Serializable params) throws ReportGenerationException {
+			return null;
+		} 	
+    }
+
     private class PlantillaExcelInteressatsReportGenerator implements ReportGenerator<ExpedientResourceEntity, Serializable, Serializable> {
 
 		@Override
@@ -1261,7 +1319,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 				return resultat;
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/expedient/PlantillaExcelInteressatsReportGenerator", e);
-				throw new ReportGenerationException(ExpedientResource.class, 0, code, "expedient.export.plantillaExcelInteressats.reject");
+				throw new ReportGenerationException(getResourceClass(), 0, code, "expedient.export.plantillaExcelInteressats.reject");
 			}
 		}
 		
@@ -1299,7 +1357,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/expedient/"+expedientId+"/exportarEni", e);
-				throw new ReportGenerationException(ExpedientResource.class, expedientId, code, "expedient.export.inside.reject");
+				throw new ReportGenerationException(getResourceClass(), expedientId, code, "expedient.export.inside.reject");
 			}
 
             return resultat;
