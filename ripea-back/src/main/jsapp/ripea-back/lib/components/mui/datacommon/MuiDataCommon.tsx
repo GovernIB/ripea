@@ -14,6 +14,7 @@ import DataFormDialog, { DataFormDialogApi } from './DataFormDialog';
 export type DataCommonFindArgs = ResourceApiFindCommonArgs;
 
 export type DataCommonAdditionalAction = {
+    label?: string;
     title?: string;
     icon?: string;
     showInMenu?: boolean | ((row: any) => boolean);
@@ -227,7 +228,7 @@ export const useDataCommonEditable = (
     }
     const triggerDelete = (id: any) => {
         messageDialogShow(
-            t('datacommon.delete.single.title'),
+            t('datacommon.delete.single.label'),
             t('datacommon.delete.single.confirm'),
             confirmDialogButtons,
             confirmDialogComponentProps).
@@ -249,14 +250,14 @@ export const useDataCommonEditable = (
     }
     const isCreateLinkPresent = apiCurrentActions?.['create'] != null;
     const toolbarAddElement = isCreateLinkPresent && !readOnly ? toToolbarIcon('add', {
-        title: t('datacommon.create.title'),
+        title: t('datacommon.create.label'),
         linkTo: toolbarCreateLink,
         linkState: formAdditionalData ? { additionalData: formAdditionalData } : undefined,
         onClick: !toolbarCreateLink ? showCreateDialog : undefined,
     }) : undefined;
     const rowEditActions: DataCommonAdditionalAction[] = [];
     !readOnly && rowEditActions.push({
-        title: t('datacommon.update.title'),
+        label: t('datacommon.update.label'),
         rowLink: 'update',
         icon: 'edit',
         linkTo: rowUpdateLink,
@@ -266,7 +267,7 @@ export const useDataCommonEditable = (
         clickShowUpdateDialog: rowUpdateLink == null,
     });
     !readOnly && rowEditActions.push({
-        title: t('datacommon.delete.title'),
+        label: t('datacommon.delete.label'),
         icon: 'delete',
         onClick: triggerDelete,
         disabled: rowDisableDeleteButton,
@@ -275,7 +276,7 @@ export const useDataCommonEditable = (
         rowLink: 'delete',
     });
     rowDetailLink && rowEditActions.push({
-        title: t('datacommon.details.title'),
+        label: t('datacommon.details.label'),
         icon: 'info',
         linkTo: rowDetailLink,
         disabled: rowDisableDetailsButton,

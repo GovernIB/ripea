@@ -142,7 +142,7 @@ const Interessats = (props:any) => {
 
     const actions = [
         {
-            title: t('common.detail'),
+            label: t('common.detail'),
             icon: "info",
             showInMenu: true,
             onClick: handleOpen,
@@ -212,21 +212,21 @@ const Annexos = (props:any) => {
 
     const actions = [
         {
-            title: t('page.document.action.view.label'),
+            label: t('page.document.action.view.label'),
             icon: "search",
             showInMenu: true,
             onClick: handleVisualitzar,
             hidden: (row:any) => row?.fitxerExtension != 'pdf',
         },
         {
-            title: t('page.anotacio.action.firma.label'),
+            label: t('page.anotacio.action.firma.label'),
             icon: "edit",
             showInMenu: true,
             onClick: handleAnnexFirma,
             hidden: (row:any) => row?.firmaTipus == null,
         },
         {
-            title: t('page.anotacio.action.descargarAnnex.label'),
+            label: t('page.anotacio.action.descargarAnnex.label'),
             icon: "download",
             showInMenu: true,
             onClick: download,

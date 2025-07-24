@@ -39,20 +39,20 @@ const useNotificacioInteressatActions = (entity:any, refresh?: () => void) => {
 
     const actions = [
         {
-            title: t('common.detail'),
+            label: t('common.detail'),
             icon: 'info',
             showInMenu: true,
             onClick: handleOpen,
         },
         {
-            title: t('page.notificacioInteressat.action.ampliarPlac.label'),
+            label: t('page.notificacioInteressat.action.ampliarPlac.label'),
             icon: "edit_calendar",
             showInMenu: true,
             onClick: handleShow,
             hidden: (row:any) => row?.finalitzat || entity?.notificacioEstat == 'PROCESSADA',
         },
         {
-            title: t('page.notificacioInteressat.action.certificat.label'),
+            label: t('page.notificacioInteressat.action.certificat.label'),
             icon: "download",
             showInMenu: true,
             onClick: certificat,

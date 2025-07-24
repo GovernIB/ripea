@@ -206,7 +206,8 @@ const rowActionsToGridActionsCellItems = (
         rowLinkShow && rowArtifactShow && !hidden && actions.push(
             toDataGridActionItem(
                 params.id,
-                rowAction.title ?? (rowLink != null ? rowLink?.title : rowAction),
+                rowAction.label ?? (rowLink != null ? rowLink?.title : rowAction),
+                rowAction.title,
                 params.row,
                 rowAction.icon,
                 rowActionLinkTo,

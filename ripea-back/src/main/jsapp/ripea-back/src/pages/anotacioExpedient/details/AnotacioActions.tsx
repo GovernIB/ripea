@@ -7,7 +7,7 @@ const useAnotacioActions = () => {
 
     const actions = [
         {
-            title: t('common.detail'),
+            label: t('common.detail'),
             icon: "info",
             showInMenu: true,
             onClick: handleOpen,

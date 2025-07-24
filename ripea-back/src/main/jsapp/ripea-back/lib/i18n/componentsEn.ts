@@ -16,28 +16,28 @@ const componentsEn = {
     },
     datacommon: {
         details: {
-            title: 'Details',
+            label: 'Details',
         },
         create: {
-            title: 'Create',
+            label: 'Create',
         },
         update: {
-            title: 'Update',
+            label: 'Update',
         },
         delete: {
-            title: 'Delete',
+            label: 'Delete',
             single: {
-                title: 'Confirmation',
+                label: 'Confirmation',
                 confirm: 'Are you sure you want to delete this item (this action can\'t be undone)?',
                 success: 'Deleted items',
                 error: 'Error deleting items',
             },
         },
         export: {
-            title: 'Export',
+            label: 'Export',
         },
         refresh: {
-            title: 'Refresh',
+            label: 'Refresh',
         },
         toolbar: {
             error: 'An error has occurred',

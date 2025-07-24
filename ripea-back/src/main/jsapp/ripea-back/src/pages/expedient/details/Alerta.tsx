@@ -68,7 +68,7 @@ const Alerta = (props:any) => {
     const {llegit, massiveLlegit} = useActions(refresh);
     const actions =[
         {
-            title: t('page.alert.action.read.label'),
+            label: t('page.alert.action.read.label'),
             icon: "mail",
             showInMenu: false,
             onClick: llegit,
@@ -76,7 +76,7 @@ const Alerta = (props:any) => {
     ]
     const massiveActions =[
         {
-            title: t('page.alert.action.read.label'),
+            label: t('page.alert.action.read.label'),
             icon: "mail",
             showInMenu: true,
             onClick: massiveLlegit,

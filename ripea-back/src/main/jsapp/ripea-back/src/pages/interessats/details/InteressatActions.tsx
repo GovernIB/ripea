@@ -52,9 +52,9 @@ export const useActions = (refresh?: () => void) => {
             .then((value: any) => {
                 if (value) {
                     apiAction(id, {code: 'DELETE_REPRESENTANT'})
-                        .then(()=>{
+                        .then((data:any)=>{
                             refresh?.()
-                            temporalMessageShow(null, t('page.interessat.action.deleteRep.ok'), 'success');
+                            temporalMessageShow(null, t('page.interessat.action.deleteRep.ok',{data}), 'success');
                         })
                         .catch((error) => {
                             error?.message && temporalMessageShow(null, error?.message, 'error');
@@ -71,9 +71,9 @@ export const useActions = (refresh?: () => void) => {
             .then((value: any) => {
                 if (value) {
                     apiAction(id, {code: 'DELETE_INTERESSAT'})
-                        .then(() => {
+                        .then((data:any) => {
                             refresh?.();
-                            temporalMessageShow(null, t('page.interessat.action.delete.ok'), 'success');
+                            temporalMessageShow(null, t('page.interessat.action.delete.ok',{data}), 'success');
                         })
                         .catch((error) => {
                             error?.message && temporalMessageShow(null, error?.message, 'error');
@@ -99,7 +99,7 @@ const useInteressatActions = (entity:any, refresh?: () => void) => {
 
     const actions = [
         {
-            title: t('page.contingut.action.guardarArxiu.label'),
+            label: t('page.contingut.action.guardarArxiu.label'),
             icon: 'autorenew',
             showInMenu: true,
             onClick: guardarArxiu,
@@ -107,48 +107,48 @@ const useInteressatActions = (entity:any, refresh?: () => void) => {
             hidden: (row:any) => row?.arxiuPropagat && ( !row?.representant || row?.representantInfo?.arxiuPropagat ),
         },
         {
-            title: t('common.detail'),
+            label: t('common.detail'),
             icon: "info",
             showInMenu: true,
             onClick: handleDetail,
             hidden: entity?.potModificar,
         },
         {
-            title: t('common.update'),
+            label: t('common.update'),
             icon: 'edit',
             showInMenu: true,
             clickShowUpdateDialog: true,
             hidden: !entity?.potModificar,
         },
         {
-            title: t('page.interessat.action.delete.label'),
+            label: t('page.interessat.action.delete.label'),
             icon: "delete",
             showInMenu: true,
             onClick: deleteInteressat,
             hidden: !entity?.potModificar,
         },
         {
-            title: <Divider sx={{px: 1, width: '100%'}} color={"none"}/>,
+            label: <Divider sx={{px: 1, width: '100%'}} color={"none"}/>,
             showInMenu: true,
             disabled: true,
             hidden: (row: any) => row?.tipus == 'InteressatAdministracioEntity' || !entity?.potModificar,
         },
         {
-            title: t('page.interessat.action.createRep.label'),
+            label: t('page.interessat.action.createRep.label'),
             icon: "add",
             showInMenu: true,
             onClick: createRepresentent,
             hidden: (row: any) => row?.representant || row?.tipus == 'InteressatAdministracioEntity' || !entity?.potModificar,
         },
         {
-            title: t('page.interessat.action.updateRep.label'),
+            label: t('page.interessat.action.updateRep.label'),
             icon: "edit",
             showInMenu: true,
             onClick: updateRepresentent,
             hidden: (row: any) => !row?.representant || row?.tipus == 'InteressatAdministracioEntity' || !entity?.potModificar,
         },
         {
-            title: t('page.interessat.action.deleteRep.label'),
+            label: t('page.interessat.action.deleteRep.label'),
             icon: "delete",
             showInMenu: true,
             onClick: deleteRepresentent,

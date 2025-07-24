@@ -32,9 +32,9 @@ const useModificar = (refresh?: () => void) => {
     const handleShow = (id:any, row:any) :void => {
         apiRef.current?.show?.(id, row)
     }
-    const onSuccess = ((result:any) => {
+    const onSuccess = ((data:any) => {
         refresh?.()
-        temporalMessageShow(null, t('page.carpeta.action.update.ok', {carpeta: result?.nom}), 'success');
+        temporalMessageShow(null, t('page.carpeta.action.update.ok', {data}), 'success');
     })
 
     return {

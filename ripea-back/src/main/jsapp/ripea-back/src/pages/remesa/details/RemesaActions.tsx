@@ -68,40 +68,40 @@ const useRemesaActions = (refresh?: () => void) => {
 
     const actions = [
         {
-            title: t('common.detail'),
+            label: t('common.detail'),
             icon: "info",
             showInMenu: true,
             onClick: handleDetallOpen,
         },
         {
-            title: t('common.update')+'...',
+            label: t('common.update')+'...',
             icon: 'edit',
             showInMenu: true,
             clickShowUpdateDialog: true,
             hidden: (row:any) => row.tipus != 'MANUAL',
         },
         {
-            title: t('page.notificacio.action.actualitzarEstat.label'),
+            label: t('page.notificacio.action.actualitzarEstat.label'),
             icon: "sync",
             showInMenu: true,
             onClick: actualitzarEstat,
             hidden: (row:any) => row.estat == 'PROCESSADA',
         },
         {
-            title: t('page.notificacio.action.notificacioInteressat.label'),
+            label: t('page.notificacio.action.notificacioInteressat.label'),
             icon: "send",
             showInMenu: true,
             onClick: handleNotificacioOpen,
         },
         {
-            title: t('page.notificacio.action.justificant.label'),
+            label: t('page.notificacio.action.justificant.label'),
             icon: "download",
             showInMenu: true,
             onClick: justificant,
             hidden: (row:any) => row.estat == 'PENDENT',
         },
 		{
-		    title: t('common.delete'),
+		    label: t('common.delete'),
 		    icon: 'delete',
 		    showInMenu: true,
             clickTriggerDelete: true,

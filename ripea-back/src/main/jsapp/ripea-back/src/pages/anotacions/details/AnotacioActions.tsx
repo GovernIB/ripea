@@ -87,41 +87,41 @@ const useAnotacioActions = (refresh?: () => void) => {
 
     const actions = [
         {
-            title: t('common.detail'),
+            label: t('common.detail'),
             icon: "info",
             showInMenu: true,
             onClick: handleOpen,
         },
         {
-            title: t('page.anotacio.action.acceptar.label'),
+            label: t('page.anotacio.action.acceptar.label'),
             icon: "check_circle",
             showInMenu: true,
             onClick: handleAcceptar,
             hidden: (row:any) => row?.estat != 'PENDENT' || row?.pendentCanviEstatDistribucio,
         },
         {
-            title: t('page.anotacio.action.rebutjar.label'),
+            label: t('page.anotacio.action.rebutjar.label'),
             icon: "close",
             showInMenu: true,
             onClick: handleRebutjar,
             hidden: (row:any) => row?.estat != 'PENDENT' || row?.pendentCanviEstatDistribucio,
         },
         {
-            title: t('page.anotacio.action.canviProcediment.label'),
+            label: t('page.anotacio.action.canviProcediment.label'),
             icon: "edit",
             showInMenu: true,
             clickShowUpdateDialog: true,
             hidden: (row:any) => row?.estat != 'PENDENT' || row?.pendentCanviEstatDistribucio || !isRolActualAdmin,
         },
         {
-            title: t('page.expedient.title'),
+            label: t('page.expedient.title'),
             icon: icons.expedient,
             showInMenu: true,
             onClick: (id:any, row:any) => navigate(`/contingut/${row?.expedient?.id}`),
             hidden: (row:any) => row?.estatView != 'ACCEPTAT' || !row?.expedient,
         },
         {
-            title: t('page.anotacio.action.canviEstatDistribucio.label'),
+            label: t('page.anotacio.action.canviEstatDistribucio.label'),
             icon: "turn_right",
             showInMenu: true,
             onClick: canviEstatDistribucio,

@@ -38,9 +38,9 @@ const useActions = (refresh?:()=>void) => {
             .then((value: any) => {
                 if (value) {
                     apiDelete(id)
-                        .then(() => {
+                        .then((data) => {
                             refresh?.();
-                            temporalMessageShow(null, t('page.carpeta.action.delete.ok'), 'success');
+                            temporalMessageShow(null, t('page.carpeta.action.delete.ok', {data}), 'success');
                         })
                         .catch((error) => {
                             temporalMessageShow(null, error?.message, 'error');
@@ -71,55 +71,55 @@ const useCarpetaActions = (entity:any, refresh?: () => void) => {
 
     const actions = [
         {
-            title: t('page.carpeta.action.update.label'),
+            label: t('page.carpeta.action.update.label'),
             icon: 'edit',
             showInMenu: true,
             onClick: handleModifyCarpeta,
             hidden: !entity?.potModificar || !user?.sessionScope?.isCreacioCarpetesActiva,
         },
         {
-            title: t('page.expedient.action.exportPDF.label'),
+            label: t('page.expedient.action.exportPDF.label'),
             icon: 'format_list_numbered',
             showInMenu: true,
             onClick: exportarPDF,
             hidden: (row:any) => !entity?.potModificar || !user?.sessionScope?.isCreacioCarpetesActiva || !row?.hasDocumentsFills,
         },
         {
-            title: t('page.expedient.action.exportEXCEL.label'),
+            label: t('page.expedient.action.exportEXCEL.label'),
             icon: 'lists',
             showInMenu: true,
             onClick: exportarEXCEL,
             hidden: (row:any) => !entity?.potModificar || !user?.sessionScope?.isCreacioCarpetesActiva || !user?.sessionScope?.isExportacioExcelActiva || !row?.hasDocumentsFills,
         },
         {
-            title: t('page.contingut.action.move.label'),
+            label: t('page.contingut.action.move.label'),
             icon: "open_with",
             showInMenu: true,
             onClick: handleMoure,
             hidden: !entity?.potModificar || !user?.sessionScope?.isCreacioCarpetesActiva,
         },
         {
-            title: t('page.contingut.action.copy.label'),
+            label: t('page.contingut.action.copy.label'),
             icon: "file_copy",
             showInMenu: true,
             onClick: handleCopiar,
             hidden: !entity?.potModificar || !user?.sessionScope?.isCreacioCarpetesActiva || !user?.sessionScope?.isMostrarCopiar,
         },
         {
-            title: t('page.carpeta.action.delete.label'),
+            label: t('page.carpeta.action.delete.label'),
             icon: "delete",
             showInMenu: true,
             onClick: eliminar,
             hidden: !entity?.potModificar || !user?.sessionScope?.isCreacioCarpetesActiva,
         },
         {
-            title: <Divider sx={{width: '100%'}} color={"none"}/>,
+            label: <Divider sx={{width: '100%'}} color={"none"}/>,
             showInMenu: true,
             disabled: true,
             hidden: !entity?.potModificar || !user?.sessionScope?.isCreacioCarpetesActiva,
         },
         {
-            title: t('page.contingut.action.history.label'),
+            label: t('page.contingut.action.history.label'),
             icon: "list",
             showInMenu: true,
             onClick: handleHistoricOpen,

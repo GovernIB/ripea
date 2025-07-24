@@ -8,19 +8,19 @@ const usePublicacioActions = () => {
 
     const actions = [
         {
-            title: t('common.detail'),
+            label: t('common.detail'),
             icon: "info",
             showInMenu: true,
             onClick: handleDetallOpen,
         },
         {
-            title: t('common.update')+'...',
+            label: t('common.update')+'...',
             icon: 'edit',
             showInMenu: true,
             clickShowUpdateDialog: true,
         },
         {
-            title: t('common.delete')+'...',
+            label: t('common.delete')+'...',
             icon: 'edit',
             showInMenu: true,
             clickTriggerDelete: true,

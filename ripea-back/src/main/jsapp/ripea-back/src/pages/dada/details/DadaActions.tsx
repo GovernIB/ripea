@@ -8,7 +8,7 @@ export const useDadaActions = (contingut:any, refresh?: () => void) => {
 
     const actions = [
         {
-            title: t('common.detail'),
+            label: t('common.detail'),
             icon: "info",
             showInMenu: false,
             onClick: handleOpen,
