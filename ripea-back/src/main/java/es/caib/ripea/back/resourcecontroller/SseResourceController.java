@@ -237,15 +237,17 @@ public class SseResourceController {
 			while (iterator.hasNext()) {
 				Map.Entry<String, SseEmitter> usuariClient = iterator.next();
             	Iterator<Map.Entry<String, Long>> tascaInterator = tasques.getTasquesPendentsUsuaris().entrySet().iterator();
-            	Map.Entry<String, Long> usuariTasca = tascaInterator.next();
-            	if (usuariTasca.getKey().equals(usuariClient.getKey())) {
-            		try {
-            			usuariClient.getValue().send(SseEmitter.event().name(UserEventType.TASQUES.getEventName()).data(usuariTasca.getValue()));
-            			logger.debug("... comunicats TasquesPendentsEvent al usuari "+usuariClient.getKey()+" a travers del emissor "+usuariClient.getValue().hashCode()+".");
-    	            } catch (Exception e) {
-    	            	clientsUsuaris.remove(usuariClient.getKey());
-    	            	logger.debug("... eliminat emisor de TasquesPendentsEvent "+usuariClient.getValue().hashCode()+" del usuari "+usuariClient.getKey()+" per error: "+e.getMessage()+".");
-    	            }	            		
+            	if (tascaInterator.hasNext()) {
+            		Map.Entry<String, Long> usuariTasca = tascaInterator.next();
+	            	if (usuariTasca.getKey().equals(usuariClient.getKey())) {
+	            		try {
+	            			usuariClient.getValue().send(SseEmitter.event().name(UserEventType.TASQUES.getEventName()).data(usuariTasca.getValue()));
+	            			logger.debug("... comunicats TasquesPendentsEvent al usuari "+usuariClient.getKey()+" a travers del emissor "+usuariClient.getValue().hashCode()+".");
+	    	            } catch (Exception e) {
+	    	            	clientsUsuaris.remove(usuariClient.getKey());
+	    	            	logger.debug("... eliminat emisor de TasquesPendentsEvent "+usuariClient.getValue().hashCode()+" del usuari "+usuariClient.getKey()+" per error: "+e.getMessage()+".");
+	    	            }	            		
+	            	}
             	}
 	        }
     	}

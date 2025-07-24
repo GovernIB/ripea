@@ -797,7 +797,7 @@ public class ExpedientInteressatHelper {
 	}
 
 	@SuppressWarnings("deprecation") // POI 3.15
-	public List<InteressatDto> extreureInteressatsExcel(InputStream excel, Long expedientId) {
+	public List<InteressatDto> extreureInteressatsExcel(InputStream excel, Long expedientId, boolean validar) {
 		List<InteressatDto> interessatsExcel = new ArrayList<>();
 
 		try (Workbook workbook = WorkbookFactory.create(excel)) {
@@ -896,7 +896,9 @@ public class ExpedientInteressatHelper {
 	        throw new RuntimeException("Hi ha hagut un error recuperant la informació dels interessats del excel", e);
 	    }
 
-		validarLlistaInteressats(interessatsExcel, expedientId);
+		if (validar) {
+			validarLlistaInteressats(interessatsExcel, expedientId);
+		}
 		
 	    return interessatsExcel;
     }

@@ -3,10 +3,10 @@ package es.caib.ripea.service.resourceservice;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -18,7 +18,6 @@ import javax.annotation.PostConstruct;
 
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -701,26 +700,36 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
 
         @Override
         public void onChange(Serializable id, InteressatResource.ImportarInteressatsFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, InteressatResource.ImportarInteressatsFormAction target) {
-            try {
-                if (previous.getTipusImportacio().equals(InteressatImportacioTipusDto.JSON)) {
-                    if (fieldValue!=null) {
-                        List<InteressatDto> listaInteressatsFitxer = new ArrayList<InteressatDto>();
-                        if (InteressatResource.ImportarInteressatsFormAction.Fields.fitxerJsonInteressats.equals(fieldName)) {
+            
+        	List<InteressatDto> listaInteressatsFitxer = new ArrayList<InteressatDto>();
+        	
+        	try {
+                    
+                if (InteressatResource.ImportarInteressatsFormAction.Fields.fitxerJsonInteressats.equals(fieldName)) {
+                	
+                	if (fieldValue!=null) { 
+                		
+                    	if (previous.getTipusImportacio().equals(InteressatImportacioTipusDto.JSON)) {
+                    	
                             ObjectMapper objectMapper = new ObjectMapper();
                             objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
                             listaInteressatsFitxer = objectMapper.readValue(
                                     ((FileReference)fieldValue).getContent(),
                                     new TypeReference<List<InteressatDto>>() {});
                         } else {
-                            listaInteressatsFitxer = expedientInteressatHelper.extreureInteressatsExcel(
-                                    new ByteArrayInputStream(((FileReference)fieldValue).getContent()),
-                                    previous.getExpedient().getId());
+                        	InputStream excelStream = new ByteArrayInputStream(((FileReference)fieldValue).getContent());
+                        	listaInteressatsFitxer = expedientInteressatHelper.extreureInteressatsExcel(
+                        			excelStream,
+                        			previous.getExpedient().getId(),
+                        			false);
                         }
-
+                    	
                         //Abans de retornar la llista de interessats, comprovam si existeixen al expedient actual
+                        //En cas de no tenir-lo, afegim ID: Uncaught Error: MUI X: The Data Grid component requires all rows to have a unique `id` property.
                         if (!listaInteressatsFitxer.isEmpty()) {
                             //Només fem la consulta en cas necessari
                             List<InteressatEntity> interessatsExpActual = interessatRepository.findByExpedientId(previous.getExpedient().getId());
+                            Long idAssignat = 1l;
                             for (InteressatDto interessatDto: listaInteressatsFitxer) {
                                 if (interessatsExpActual!=null) {
                                     for (InteressatEntity interessatExp: interessatsExpActual) {
@@ -730,17 +739,18 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
                                         }
                                     }
                                 }
+                                if (interessatDto.getId()==null) { interessatDto.setId(idAssignat++); }
+                                //TODO: interessatDto.validarInteressatDto()
                             }
                         }
-
-                        target.setInteressatsFitxer(listaInteressatsFitxer);
-                    } else {
-                        target.setInteressatsFitxer(new ArrayList<>());
-                    }
+                	}
                 }
+                
             } catch (Exception e) {
-                excepcioLogHelper.addExcepcio("/expedient/interessats/ImportarInteressatsActionExecutor.onChange", e);
+                excepcioLogHelper.addExcepcio("/expedient/interessats/ImportarInteressatsActionExecutor/"+previous.getTipusImportacio()+".onChange", e);
             }
+        	
+        	target.setInteressatsFitxer(listaInteressatsFitxer);
         }
 
         @Override

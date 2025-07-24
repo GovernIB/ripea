@@ -1,10 +1,15 @@
 package es.caib.ripea.service.intf.dto;
 
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import java.io.Serializable;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
+import es.caib.ripea.service.intf.utils.Utils;
 
 @JsonTypeInfo(
 		use = JsonTypeInfo.Id.NAME,
@@ -45,7 +50,7 @@ public abstract class InteressatDto implements Serializable {
 	protected Boolean entregaDeh;
 	private Boolean entregaDehObligat;
 	private Boolean incapacitat;
-
+	private String errorsValidacio;
 	private boolean jaExistentExpedient = false;
 	private InteressatAssociacioAccioEnum accio;
 	
@@ -269,7 +274,31 @@ public abstract class InteressatDto implements Serializable {
 		this.expedientArxiuPropagat = expedientArxiuPropagat;
 	}
 
+	public Map<String, String> validarInteressatDto() {
+		Map<String, String> resultat = new HashMap<String, String>();
+		//Validar documentNum igual que a InteressatDocumentValidator
+		if (this.documentNum!=null) {
+			if (InteressatDocumentTipusEnumDto.NIF.equals(this.getDocumentTipus())) {
+				
+				if (this.getTipus() == InteressatTipusEnumDto.PERSONA_FISICA) {
+					 if (!Utils.validacioDni(this.documentNum)) {
+						 resultat.put("documentNum", "missatge.error.dni");
+					 }
+				} else {
+					if (!Utils.validacioCif(this.documentNum)) {
+						resultat.put("documentNum", "missatge.error.nif");
+					}
+				}
 
+			} else if (InteressatDocumentTipusEnumDto.DOCUMENT_IDENTIFICATIU_ESTRANGERS.equals(this.documentTipus)) {
+				if (!Utils.validacioNie(this.documentNum)) {
+					resultat.put("documentNum", "missatge.error.nie");
+				}
+			}
+		}
+		//A part de altres validacions de camps obligatoris i tamany de strings.
+		return resultat;
+	}
 
 	private static final long serialVersionUID = -139254994389509932L;
 
