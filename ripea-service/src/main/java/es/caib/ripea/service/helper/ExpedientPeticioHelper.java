@@ -42,7 +42,6 @@ import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.ExpedientPeticioAccioEnumDto;
 import es.caib.ripea.service.intf.dto.ExpedientPeticioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.ExpedientPeticioInfoDto;
-import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.permission.ExtendedPermission;
 
@@ -54,8 +53,8 @@ public class ExpedientPeticioHelper {
 	@Autowired private RegistreInteressatRepository registreInteressatRepository;
 	@Autowired private RegistreAnnexRepository registreAnnexRepository;
 	@Autowired private EntitatRepository entitatRepository;
-	@Autowired private MetaExpedientRepository metaExpedientRepository;
 	@Autowired private ExpedientRepository expedientRepository;
+	@Autowired private MetaExpedientRepository metaExpedientRepository;
 	@Autowired private CacheHelper cacheHelper;
 	@Autowired private MetaExpedientHelper metaExpedientHelper;
 	@Autowired private ConfigHelper configHelper;
@@ -147,25 +146,38 @@ public class ExpedientPeticioHelper {
 	public ExpedientPeticioInfoDto getExpedeintPeticiInfo(Long expedientPeticioId) {
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.getOne(expedientPeticioId);
 		return new ExpedientPeticioInfoDto(expedientPeticioEntity.getIdentificador(), expedientPeticioEntity.getClauAcces(), expedientPeticioEntity.getEstat());
-		
 	}
-	
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void setEstatCanviatDistribucioNewTransaction(Long expedientPeticioId, boolean canviat) {
-		
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.getOne(expedientPeticioId);
 		expedientPeticioEntity.setEstatCanviatDistribucio(canviat);
 	}
 	
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public void crearRegistrePerPeticio(AnotacioRegistreEntrada registreEntrada, Long expedientPeticioId) {
+	public void rebutjaPeticioEnArribada(Long expedientPeticioId, AnotacioRegistreId anotacioRegistreId, String motiu) {
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.getOne(expedientPeticioId);
-		EntitatEntity entitat = entitatRepository.findByUnitatArrel(
-				registreEntrada.getEntitatCodi());
-		if (entitat == null) {
-			throw new NotFoundException(entitat, EntitatEntity.class);
-		}
+		pluginHelper.canviEstatAnotacio(anotacioRegistreId, Estat.REBUTJADA, motiu);
+		expedientPeticioEntity.updateEstat(ExpedientPeticioEstatEnumDto.REBUTJAT);
+		expedientPeticioEntity.setDataActualitzacio(new Date());
+		expedientPeticioEntity.setEstatCanviatDistribucio(true);
+	}
+	
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public void acceptaPeticioEnArribada(Long expedientPeticioId, AnotacioRegistreId anotacioRegistreId, boolean canviat) {
+		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.getOne(expedientPeticioId);
+		pluginHelper.canviEstatAnotacio(anotacioRegistreId, Estat.REBUDA, "");
+		expedientPeticioEntity.updateEstat(ExpedientPeticioEstatEnumDto.PENDENT);
+		expedientPeticioEntity.setDataActualitzacio(new Date());
+		expedientPeticioEntity.setEstatCanviatDistribucio(canviat);
+	}
+	
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public void crearRegistrePerPeticio(
+			AnotacioRegistreEntrada registreEntrada,
+			ExpedientPeticioEntity expedientPeticioEntity,
+			MetaExpedientEntity metaExpedientEntity,
+			EntitatEntity entitat) {
 		
 		RegistreEntity registreEntity = RegistreEntity.getBuilder(
 				registreEntrada.getAssumpteTipusCodi(),
@@ -206,16 +218,8 @@ public class ExpedientPeticioHelper {
 				justificantArxiuUuid(registreEntrada.getJustificantFitxerArxiuUuid()).
 				build();
 		registreRepository.save(registreEntity);
+
 		expedientPeticioEntity.updateRegistre(registreEntity);
-		
-		// set metaexpedient to which expedient will belong if peticion is accepted
-		List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findByEntitatAndClassificacioOrderByNomAsc(
-				entitat,
-				expedientPeticioEntity.getRegistre().getProcedimentCodi());
-		MetaExpedientEntity metaExpedientEntity = null;
-		if (!metaExpedients.isEmpty()) {
-			metaExpedientEntity = metaExpedients.get(0);
-		}
 		expedientPeticioEntity.updateMetaExpedient(metaExpedientEntity);
 		
 		calcularGrup(entitat, expedientPeticioEntity);
@@ -389,7 +393,7 @@ public class ExpedientPeticioHelper {
 		return exception;
 	}
 	
-	public PermisosPerAnotacions findPermisosPerAnotacions(Long entitatId, String rolActual, Long organActualId) {
+	public PermisosPerAnotacions findPermisosPerAnotacions(Long entitatId, String usuariCodi, String rolActual, Long organActualId) {
 		PermisosPerAnotacions permisosPerAnotacionsDto = new PermisosPerAnotacions();		
 		if (rolActual.equals("IPA_ADMIN")) {
 			// in this case all annotations of entitat are permitted, it is not equal to annotations belonging to any procediment of entitat because some of the annotations might not have procediment assigned
@@ -402,7 +406,7 @@ public class ExpedientPeticioHelper {
 			permisosPerAnotacionsDto.setProcedimentsPermesos(metaExpedientHelper.findProcedimentsDeOrganIDeDescendentsDeOrgan(organActualId));
 		} else if (rolActual.equals("tothom")) {
 			permisosPerAnotacionsDto.setProcedimentsPermesos(metaExpedientHelper.getCreateWritePermesos(entitatId));
-			List<Long> idsGrupsPermesos = permisosHelper.getObjectsIdsWithPermission(GrupEntity.class, ExtendedPermission.READ);
+			List<Long> idsGrupsPermesos = permisosHelper.getObjectsIdsWithPermission(GrupEntity.class, ExtendedPermission.READ, usuariCodi, rolActual);
 			permisosPerAnotacionsDto.setIdsGrupsPermesos(idsGrupsPermesos);
 		}
 		return permisosPerAnotacionsDto;

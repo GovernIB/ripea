@@ -133,6 +133,44 @@ public class PermisosHelper {
 				new Permission[] { permission });
 	}
 
+	public List<Long> getObjectsIdsWithPermission(Class<?> clazz, Permission permission, String usuariCodi, String rolActual) {
+		
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (auth == null) {
+			return new ArrayList<>();
+		}
+		
+		List<AclSidEntity> sids = new ArrayList<AclSidEntity>();
+		List<String> rolesNames = new ArrayList<String>();
+		AclSidEntity userSid = null;
+		
+		//Agafam usuari i rols de la autenticació
+		if (usuariCodi==null) {
+			userSid = aclSidRepository.getUserSid(auth.getName());
+			for (GrantedAuthority authority : auth.getAuthorities()) {
+				rolesNames.add(authority.getAuthority());
+			}
+		} else {
+			//Agafam usuari i rols dels parametres
+			userSid = aclSidRepository.getUserSid(usuariCodi);
+			rolesNames.add(rolActual);
+		}
+
+		if (userSid != null) { sids.add(userSid); }
+
+		for (AclSidEntity aclSid: aclSidRepository.findRolesSid(rolesNames)) {
+			if (aclSid != null) {
+				sids.add(aclSid);
+			}
+		}
+		
+		if (!sids.isEmpty()) {
+			return aclObjectIdentityRepository.findObjectsWithPermissions(clazz.getName(), sids, permission.getMask());
+		} else {
+			return new ArrayList<Long>();
+		}
+	}
+	
 	/**
 	 * Obté els identificadors de tots els objectes de la classe especificada sobre
 	 * els quals l'usuari actual té permisos
@@ -142,33 +180,7 @@ public class PermisosHelper {
 	 * @return Llista dels identificadors dels objectes seleccionats
 	 */
 	public List<Long> getObjectsIdsWithPermission(Class<?> clazz, Permission permission) {
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		if (auth == null) {
-			return new ArrayList<>();
-		}
-
-		List<AclSidEntity> sids = new ArrayList<AclSidEntity>();
-		AclSidEntity userSid = aclSidRepository.getUserSid(auth.getName());
-		if (userSid != null) {
-			sids.add(userSid);
-		}
-		List<String> rolesNames = new ArrayList<String>();
-		for (GrantedAuthority authority : auth.getAuthorities()) {
-			rolesNames.add(authority.getAuthority());
-		}
-		for (AclSidEntity aclSid: aclSidRepository.findRolesSid(rolesNames)) {
-			if (aclSid != null) {
-				sids.add(aclSid);
-			}
-		}
-		if (!sids.isEmpty()) {
-			return aclObjectIdentityRepository.findObjectsWithPermissions(
-					clazz.getName(),
-					sids,
-					permission.getMask());
-		} else {
-			return new ArrayList<Long>();
-		}
+		return getObjectsIdsWithPermission(clazz, permission, null, null);
 	}
 	
 	/**

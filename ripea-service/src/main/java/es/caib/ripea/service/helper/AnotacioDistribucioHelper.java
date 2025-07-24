@@ -1,5 +1,8 @@
 package es.caib.ripea.service.helper;
 
+import java.util.Date;
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -11,7 +14,11 @@ import es.caib.distribucio.rest.client.integracio.domini.AnotacioRegistreEntrada
 import es.caib.distribucio.rest.client.integracio.domini.AnotacioRegistreId;
 import es.caib.distribucio.rest.client.integracio.domini.Estat;
 import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.ExpedientPeticioEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.repository.EntitatRepository;
+import es.caib.ripea.persistence.repository.ExpedientPeticioRepository;
+import es.caib.ripea.persistence.repository.MetaExpedientRepository;
 import es.caib.ripea.service.intf.dto.ExpedientPeticioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.ExpedientPeticioInfoDto;
 
@@ -20,6 +27,8 @@ public class AnotacioDistribucioHelper {
 
 	@Autowired private ExpedientPeticioHelper expedientPeticioHelper;
 	@Autowired private EntitatRepository entitatRepository;
+	@Autowired private MetaExpedientRepository metaExpedientRepository;
+	@Autowired private ExpedientPeticioRepository expedientPeticioRepository;
 	@Autowired private CacheHelper cacheHelper;
 	@Autowired private EmailHelper emailHelper;
 	@Autowired private PluginHelper pluginHelper;
@@ -62,15 +71,40 @@ public class AnotacioDistribucioHelper {
 				if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
 					logger.info("anotacioGuardar crearRegistrePerPeticio start (" + identificador + ", " + expedientPeticioId + ")");
 
+				ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findById(expedientPeticioId).orElse(null);
+				EntitatEntity entitat = entitatRepository.findByUnitatArrel(registre.getEntitatCodi());
+				if (entitat == null) {
+					expedientPeticioHelper.rebutjaPeticioEnArribada(
+							expedientPeticioId,
+							anotacioRegistreId,
+							"No s'ha trobat a RIPEA la entitat "+registre.getEntitatCodi());				
+					return;
+				}
+
+				List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findByEntitatAndClassificacioOrderByNomAsc(
+						entitat,
+						registre.getProcedimentCodi());
+				MetaExpedientEntity metaExpedientEntity = null;
+				if (!metaExpedients.isEmpty()) {
+					metaExpedientEntity = metaExpedients.get(0);
+				}
+				
+				if (metaExpedientEntity==null) {
+					expedientPeticioHelper.rebutjaPeticioEnArribada(
+							expedientPeticioId,
+							anotacioRegistreId,
+							"No s'ha trobat a RIPEA el procediment "+registre.getProcedimentCodi() + " per l'entitat "+registre.getEntitatCodi());
+					return;
+				}
+				
 				/**
 				 * Guarda les dades a:
 				 *	> RegistreEntity = ipa_registre
 				 *	> RegistreAnnexEntity = ipa_registre_annex
 				 *	> RegistreInteressatEntity = ipa_registre_interessat
+				 *	També calcula el grup que li toca (opcional).
 				 */
-				expedientPeticioHelper.crearRegistrePerPeticio(
-						registre,
-						expedientPeticioId);
+				expedientPeticioHelper.crearRegistrePerPeticio(registre, expedientPeticioEntity, metaExpedientEntity, entitat);
 
 				if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
 					logger.info("anotacioGuardar crearRegistrePerPeticio end (" + identificador + ", " + expedientPeticioId + "):  " + (System.currentTimeMillis() - t3) + " ms");
@@ -80,12 +114,7 @@ public class AnotacioDistribucioHelper {
 					logger.info("anotacioGuardar canviEstat start (" + identificador + ", " + expedientPeticioId + ")");
 
 				try {
-					pluginHelper.canviEstatAnotacio(
-							anotacioRegistreId,
-							Estat.REBUDA,
-							"");
-					expedientPeticioHelper.setEstatCanviatDistribucioNewTransaction(expedientPeticioId, true);
-					
+					expedientPeticioHelper.acceptaPeticioEnArribada(expedientPeticioId, anotacioRegistreId, true);
 				} catch (Exception e) {
 					expedientPeticioHelper.setEstatCanviatDistribucioNewTransaction(expedientPeticioId, false);
 				}

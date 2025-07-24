@@ -373,6 +373,7 @@ public class SeguimentServiceImpl implements SeguimentService {
 		
 		PermisosPerAnotacions permisosPerAnotacions = expedientPeticioHelper.findPermisosPerAnotacions(
 				entitatId,
+				null,
 				rolActual, 
 				null);
 		

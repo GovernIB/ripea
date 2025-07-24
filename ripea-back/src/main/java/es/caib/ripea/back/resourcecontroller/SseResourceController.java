@@ -261,9 +261,9 @@ public class SseResourceController {
 			//Els avisos s'envien a tots els usuaris connectats
 			while (iterator.hasNext()) {
 				Map.Entry<String, SseEmitter> usuariClient = iterator.next();
-            	Iterator<Map.Entry<String, Long>> tascaInterator = anotacions.getAnotacionsPendentsUsuaris().entrySet().iterator();
-            	while (iterator.hasNext()) {
-	            	Map.Entry<String, Long> usuariTasca = tascaInterator.next();
+            	Iterator<Map.Entry<String, Long>> anotacioIterator = anotacions.getAnotacionsPendentsUsuaris().entrySet().iterator();
+            	while (anotacioIterator.hasNext()) {
+	            	Map.Entry<String, Long> usuariTasca = anotacioIterator.next();
 	            	if (usuariTasca.getKey().equals(usuariClient.getKey())) {
 	            		try {
 	            			usuariClient.getValue().send(SseEmitter.event().name(UserEventType.NOTIFICACIONS.getEventName()).data(usuariTasca.getValue()));

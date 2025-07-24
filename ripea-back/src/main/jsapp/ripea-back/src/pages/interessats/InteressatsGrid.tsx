@@ -50,7 +50,7 @@ export const InteressatsGridForm = () => {
 
         {data?.tipus === 'InteressatAdministracioEntity' && <GridFormField xs={11} name="organCodi"
                        requestParams={{...(value ?? []), isInteressatAdministracio: data?.tipus == 'InteressatAdministracioEntity'}}
-                       required/>}
+                       required autocomplete/>}
         <GridButtonField xs={1} name={"filter"} icon={"search"} hidden={data?.tipus != 'InteressatAdministracioEntity'}/>
 
         <GridFormField xs={12} name="documentTipus"
@@ -74,13 +74,13 @@ export const InteressatsGridForm = () => {
 
         <GridFormField xs={6} name="pais"
                        disabled={data?.tipus == 'InteressatAdministracioEntity'}
-                       readOnly={data?.tipus == 'InteressatAdministracioEntity'}/>
+                       readOnly={data?.tipus == 'InteressatAdministracioEntity'} autocomplete/>
         <GridFormField xs={6} name="provincia" requestParams={{pais: data?.pais}}
                        disabled={data?.tipus == 'InteressatAdministracioEntity'}
-                       readOnly={data?.tipus == 'InteressatAdministracioEntity'}/>
+                       readOnly={data?.tipus == 'InteressatAdministracioEntity'} autocomplete/>
         <GridFormField xs={6} name="municipi" requestParams={{provincia: data?.provincia}}
                        disabled={data?.tipus == 'InteressatAdministracioEntity'}
-                       readOnly={data?.tipus == 'InteressatAdministracioEntity'}/>
+                       readOnly={data?.tipus == 'InteressatAdministracioEntity'} autocomplete/>
         <GridFormField xs={6} name="codiPostal"
                        disabled={data?.tipus == 'InteressatAdministracioEntity'}
                        readOnly={data?.tipus == 'InteressatAdministracioEntity'}/>

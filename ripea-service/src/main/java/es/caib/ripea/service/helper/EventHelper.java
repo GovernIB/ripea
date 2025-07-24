@@ -1,6 +1,7 @@
 package es.caib.ripea.service.helper;
 
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -9,6 +10,10 @@ import java.util.Map;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 
 import es.caib.ripea.persistence.entity.EntitatEntity;
@@ -131,6 +136,14 @@ public class EventHelper {
 				
 				UsuariEntity usuari = usuariRepository.getOne(usuariCodi.getCodi());
 
+				//Si en aquest punt ens trobam amb la autenticació SYSTEM_RIPEA, 
+				//Hem de canviar al usuari corresponent perque funcioni les crides a permisosHelper.getObjectsIdsWithPermission
+//				if ("SYSTEM_RIPEA".equals(SecurityContextHolder.getContext().getAuthentication().getName())) {
+//			        User user = new User(usuariCodi.getCodi(), "", Collections.singletonList(new SimpleGrantedAuthority(usuari.getRolActual())));
+//			        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+//			        SecurityContextHolder.getContext().setAuthentication(authentication);
+//				}
+				
 				return cacheHelper.countAnotacionsPendents(
 						entitatEntity,
 						usuari.getRolActual(),
