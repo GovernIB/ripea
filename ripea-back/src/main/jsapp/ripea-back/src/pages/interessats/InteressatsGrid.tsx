@@ -164,7 +164,7 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
                 builder.eq('expedient.id', entity?.id),
                 builder.eq('esRepresentant', false)
             )}
-            staticSortModel={sortModel}
+            sortModel={sortModel}
             perspectives={perspectives}
             disableColumnSorting
             popupEditCreateActive
@@ -177,6 +177,7 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
             onRowCountChange={onRowCountChange}
             toolbarCreateTitle={t('page.interessat.action.new.label')}
             toolbarHideCreate={!entity?.potModificar}
+            toolbarHideQuickFilter={false}
 
             selectionActive
             onRowSelectionModelChange={(newSelection) => {
