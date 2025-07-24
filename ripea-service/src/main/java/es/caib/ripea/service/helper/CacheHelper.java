@@ -323,6 +323,9 @@ public class CacheHelper {
 		return pluginHelper.dadesUsuariFindAmbCodi(usuariCodi);
 	}
 
+	@CacheEvict(value = "usuariAmbCodi", key="#usuariCodi")
+	public void evictUsuariAmbCodi(String usuariCodi) {}
+	
 	@CacheEvict(allEntries = true, value = "usuariAmbCodi")
 	@Scheduled(fixedDelay = 86400000)
 	public void evictUsuariAmbCodi() {}

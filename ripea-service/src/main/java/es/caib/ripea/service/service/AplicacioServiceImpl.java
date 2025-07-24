@@ -223,6 +223,12 @@ public class AplicacioServiceImpl implements AplicacioService {
 		logger.debug("Consultant plugin de dades d'usuari (usuariCodi=" + auth.getName() + ")");		
 		DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(auth.getName());
 		
+		//Per si de cas s'ha quedat cacheat el null https://github.com/GovernIB/ripea/issues/1700
+		if (dadesUsuari==null) {
+			cacheHelper.evictUsuariAmbCodi(auth.getName());
+			dadesUsuari = cacheHelper.findUsuariAmbCodi(auth.getName());
+		}
+		
 		if (dadesUsuari != null) {
 			logger.debug("Dades usuari:");
 			logger.debug("Dades usuari getCodi: "+dadesUsuari.getCodi());
