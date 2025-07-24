@@ -2,12 +2,15 @@ package es.caib.ripea.service.intf.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import es.caib.ripea.service.intf.dto.*;
 import org.springframework.data.annotation.Transient;
 
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
@@ -18,11 +21,6 @@ import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.Resource;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
-import es.caib.ripea.service.intf.dto.InteressatDocumentTipusEnumDto;
-import es.caib.ripea.service.intf.dto.InteressatDto;
-import es.caib.ripea.service.intf.dto.InteressatIdiomaEnumDto;
-import es.caib.ripea.service.intf.dto.InteressatImportacioTipusDto;
-import es.caib.ripea.service.intf.dto.InteressatTipusEnum;
 import es.caib.ripea.service.intf.resourcevalidation.InteressatValid;
 import es.caib.ripea.service.intf.utils.Utils;
 import lombok.Getter;
@@ -146,6 +144,10 @@ public class InteressatResource extends BaseAuditableResource<Long> {
     @Transient private ResourceReference<InteressatResource, Long> representat;
     @Transient private boolean hasRepresentats;
 
+    // Importar
+    @Transient private Boolean jaExistentExpedient;
+    @Transient private Map<String, String> errors = new HashMap<>();
+
     //Dades per mostrar en lloc dels codis guardats en els camps principals
     @Transient private String paisNom;
     @Transient private String provinciaNom;
@@ -170,10 +172,10 @@ public class InteressatResource extends BaseAuditableResource<Long> {
         @NotNull
         @ResourceField(onChangeActive = true)
         private FileReference fitxerJsonInteressats;
-        private List<InteressatDto> interessatsFitxer;
+        private List<InteressatResource> interessatsFitxer;
         @NotNull
         @NotEmpty
-        private List<InteressatDto> interessatsPerImportar;
+        private List<InteressatResource> interessatsPerImportar;
 
         @NotNull
         private ResourceReference<ExpedientResource, Long> expedient;
@@ -203,20 +205,4 @@ public class InteressatResource extends BaseAuditableResource<Long> {
         private String nom;
         private boolean unitatArrel;
     }
-    
-//    public InteressatDto toDocumentDto() {
-//    	InteressatDto resultat = null;
-//    	switch (this.tipus) {
-//		case InteressatPersonaFisicaEntity:
-//			resultat = new InteressatPersonaFisicaDto();
-//			break;
-//		case InteressatPersonaJuridicaEntity:
-//			resultat = new InteressatPersonaJuridicaDto();
-//			break;
-//		case InteressatAdministracioEntity:
-//			resultat = new InteressatAdministracioDto();
-//			break;
-//    	}
-//        return resultat;
-//    }
 }

@@ -66,6 +66,7 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
         popupEditFormComponentProps,
         rowHideUpdateButton = true,
         rowHideDeleteButton = true,
+        toolbarHideQuickFilter = true,
         rowExpansionChange,
         onRefresh,
         ...others
@@ -218,7 +219,7 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
             toolbarHideRefresh
             toolbarHideCreate
             toolbarHideExport
-            toolbarHideQuickFilter
+            toolbarHideQuickFilter={toolbarHideQuickFilter}
             toolbarElementsWithPositions={toolbarElements}
             rowHideUpdateButton={rowHideUpdateButton}
             rowHideDeleteButton={rowHideDeleteButton}

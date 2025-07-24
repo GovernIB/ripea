@@ -274,32 +274,6 @@ public abstract class InteressatDto implements Serializable {
 		this.expedientArxiuPropagat = expedientArxiuPropagat;
 	}
 
-	public Map<String, String> validarInteressatDto() {
-		Map<String, String> resultat = new HashMap<String, String>();
-		//Validar documentNum igual que a InteressatDocumentValidator
-		if (this.documentNum!=null) {
-			if (InteressatDocumentTipusEnumDto.NIF.equals(this.getDocumentTipus())) {
-				
-				if (this.getTipus() == InteressatTipusEnumDto.PERSONA_FISICA) {
-					 if (!Utils.validacioDni(this.documentNum)) {
-						 resultat.put("documentNum", "missatge.error.dni");
-					 }
-				} else {
-					if (!Utils.validacioCif(this.documentNum)) {
-						resultat.put("documentNum", "missatge.error.nif");
-					}
-				}
-
-			} else if (InteressatDocumentTipusEnumDto.DOCUMENT_IDENTIFICATIU_ESTRANGERS.equals(this.documentTipus)) {
-				if (!Utils.validacioNie(this.documentNum)) {
-					resultat.put("documentNum", "missatge.error.nie");
-				}
-			}
-		}
-		//A part de altres validacions de camps obligatoris i tamany de strings.
-		return resultat;
-	}
-
 	private static final long serialVersionUID = -139254994389509932L;
 
 }
