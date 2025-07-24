@@ -308,7 +308,7 @@
 									<li><a href="expedient/metaExpedient/{{:id}}/list" data-toggle="modal" data-maximized="true"><span class="fa fa-briefcase"></span>&nbsp;&nbsp;<spring:message code="decorator.menu.expedients"/></a></li>
 								</c:if>
 								<li><a href="metaExpedient/{{:id}}"			data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
-								<li><a href="metaExpedient/{{:id}}/export"	data-toggle="ajax" ><span class="fa fa-upload"></span>&nbsp;&nbsp;<spring:message code="comu.boto.exportar"/></a></li>
+								<li><a class="fileDownload" href="metaExpedient/{{:id}}/export"><span class="fa fa-upload"></span>&nbsp;&nbsp;<spring:message code="comu.boto.exportar"/></a></li>
 								<c:if test="${isRolAdmin || isRolAdminOrgan}">
 									<li><a href="metaExpedient/{{:id}}/regla" data-toggle="modal"><span class="fa fa-search"></span>&nbsp;&nbsp;<spring:message code="metaexpedient.list.boto.regla"/></a></li>
 								</c:if>

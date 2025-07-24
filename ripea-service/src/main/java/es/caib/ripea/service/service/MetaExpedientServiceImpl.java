@@ -1508,7 +1508,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				"permis=" + permis + ")");
 
 		if (PrincipalTipusEnumDto.USUARI.equals(permis.getPrincipalTipus())) {
-			UsuariDto aux = usuariHelper.getUsuariByCodiDades(rolActual);
+			UsuariDto aux = usuariHelper.getUsuariByCodiDades(permis.getPrincipalNom());
 			if (aux==null) throw new NotFoundException(permis.getPrincipalNom(), UsuariDto.class);
 		}
 		

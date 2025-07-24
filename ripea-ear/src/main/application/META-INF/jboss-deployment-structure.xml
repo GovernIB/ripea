@@ -12,12 +12,18 @@
 <!-- 			<module name="io.undertow.core" export="true"/> -->
 <!-- 			<module name="io.undertow.servlet" export="true"/> -->
 <!-- 			<module name="io.undertow.websocket" export="true"/> -->
-<!-- 			<module name="jdk.management"/> -->
+			<!-- Modul necessari per el monitor del sistema MonitorHelper -->
+			<module name="jdk.management"/>
 		</dependencies>
 		<exclude-subsystems>
 			<!-- Excloent aquest subsystem fa que s'utilitzin els jars de jackson que venen amb el projecte i evitam errors -->
 			<subsystem name="jaxrs"/>
 		</exclude-subsystems>
 	</deployment>
+	<sub-deployment name="ripea-back.war">
+		<dependencies>
+			<module name="jdk.management"/>
+		</dependencies>
+	</sub-deployment>
 	<ear-subdeployments-isolated>false</ear-subdeployments-isolated>
 </jboss-deployment-structure>

@@ -35,9 +35,17 @@ public interface RegistreAnnexRepository extends JpaRepository<RegistreAnnexEnti
 			"where " +
 			"    ep.expedient = :expedient " +
 			"and (a.document is null or a.error is not null)" )
-	List<RegistreAnnexEntity> findDocumentsDeAnotacionesNoMogutsASerieFinal(
-			@Param("expedient") ExpedientEntity expedient);
+	List<RegistreAnnexEntity> findDocumentsDeAnotacionesNoMogutsASerieFinal(@Param("expedient") ExpedientEntity expedient);
 
+	@Query(	"select " +
+			"    a " +
+			"from " +
+			"    RegistreAnnexEntity a left join a.registre.expedientPeticions ep " +
+			"where " +
+			"    ep.expedient.id = :expedientId " +
+			"and (a.document is null or a.error is not null)" )
+	List<RegistreAnnexEntity> findDocumentsDeAnotacionesNoMogutsASerieFinalByExpedientId(@Param("expedientId") Long expedientId);
+	
 	@Query(	"select " +
 			"    a " +
 			"from " +

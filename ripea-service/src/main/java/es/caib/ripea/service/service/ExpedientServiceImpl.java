@@ -1625,6 +1625,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		
 		Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
 		ordenacioMap.put("numero", new String[] { "codi", "any", "sequencia" });
+		ordenacioMap.put("estat", new String[] { "estat", "estatAdditional" });
 		
 		Page<ExpedientEntity> paginaExpedients = expedientRepository.findByMetaExpedientAndEsborrat(metaExpedientFiltre, 0, paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap));
 		return paginacioHelper.toPaginaDto(
