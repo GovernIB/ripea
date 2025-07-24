@@ -188,7 +188,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
 
     const documentActions = [
         {
-            title: t('page.contingut.action.guardarArxiu.label'),
+            label: t('page.contingut.action.guardarArxiu.label'),
             icon: 'autorenew',
             showInMenu: true,
             onClick: guardarArxiu,
@@ -196,13 +196,13 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             hidden: (row:any) => row?.arxiuUuid && !row?.gesDocFirmatId,
         },
         {
-            title: t('page.document.action.detall.label'),
+            label: t('page.document.action.detall.label'),
             icon: "folder",
             showInMenu: true,
             onClick: handleDetallOpen,
         },
         {
-            title: t('common.update')+'...',
+            label: t('common.update')+'...',
             icon: 'edit',
             showInMenu: true,
             clickShowUpdateDialog: true,
@@ -210,7 +210,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             hidden: (row:any) => !entity?.potModificar || (isInOptions(row?.arxiuEstat, 'DEFINITIU') && !isPermesModificarCustodiatsVar(row)) ||  isInOptions(row?.estat, 'FIRMA_PENDENT'),
         },
         {
-            title: t('page.contingut.action.move.label'),
+            label: t('page.contingut.action.move.label'),
             icon: "open_with",
             showInMenu: true,
             onClick: handleMoureShow,
@@ -218,26 +218,26 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             hidden: !entity?.potModificar,
         },
         {
-            title: t('page.contingut.action.copy.label'),
+            label: t('page.contingut.action.copy.label'),
             icon: "file_copy",
             showInMenu: true,
             onClick: handleCopiarShow,
             hidden: !entity?.potModificar || !user?.sessionScope?.isMostrarCopiar,
         },
         {
-            title: t('page.contingut.action.vincular.label'),
+            label: t('page.contingut.action.vincular.label'),
             icon: "link",
             showInMenu: true,
             onClick: handleVincularShow,
             hidden: !entity?.potModificar || !user?.sessionScope?.isMostrarVincular,
         },
         {
-            title: <Divider sx={{width: '100%'}} color={"none"}/>,
+            label: <Divider sx={{width: '100%'}} color={"none"}/>,
             showInMenu: true,
             disabled: true,
         },
         {
-            title: t('page.document.action.imprimible.label'),
+            label: t('page.document.action.imprimible.label'),
             icon: "download",
             showInMenu: true,
 			onClick: (id:any) => apiDownload(id, 'imprimible', t('page.document.action.imprimible.ok')),
@@ -245,28 +245,28 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             hidden: (row:any) => !isDigitalOrImportat(row) || !( (row?.arxiuEstat=='DEFINITIU' || row?.estat=='FIRMA_PARCIAL') || user?.sessionScope?.imprimibleNoFirmats),
         },
         {
-            title: t('common.download'),
+            label: t('common.download'),
             icon: "download",
             showInMenu: true,
 			onClick: (id:any) => apiDownload(id, 'adjunt', t('page.expedient.results.actionOk')),
             hidden: (row:any) => !isDigitalOrImportat(row),
         },
         {
-            title: t('page.document.action.original.label'),
+            label: t('page.document.action.original.label'),
             icon: "download",
             showInMenu: true,
 			onClick: (id:any) => apiDownload(id, 'original', t('page.document.action.original.ok')),
             hidden: (row:any) => !isDigitalOrImportat(row) || !row?.gesDocOriginalId
         },
         {
-            title: t('page.document.action.firma.label'),
+            label: t('page.document.action.firma.label'),
             icon: "download",
             showInMenu: true,
 			onClick: (id:any) => apiDownload(id, 'firmaAdjunt', t('page.document.action.firma.ok')),
             hidden: (row:any) => !isDigitalOrImportat(row) || row?.ntiTipoFirma != "TF04"
         },
         {
-            title: t('page.document.action.view.label'),
+            label: t('page.document.action.view.label'),
             icon: "search",
             showInMenu: true,
             onClick: handleVisualitzarOpen,
@@ -274,14 +274,14 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             hidden: (row:any) => !isDigitalOrImportat(row),
         },
         {
-            title: t('page.document.action.csv.label'),
+            label: t('page.document.action.csv.label'),
             icon: "file_copy",
             showInMenu: true,
             onClick: getLinkCSV,
             hidden: (row:any) => !isInOptions(row?.estat, 'DEFINITIU', 'CUSTODIAT') || !user?.sessionScope?.isUrlValidacioDefinida,
         },
         {
-            title: t('page.document.action.portafirmes.label'),
+            label: t('page.document.action.portafirmes.label'),
             icon: "mail",
             showInMenu: true,
             onClick: handleEviarPortafirmesShow,
@@ -289,7 +289,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             hidden : (row:any) => !entity?.potModificar || !row?.metaDocumentInfo?.firmaPortafirmesActiva || !isFirmaActiva(row),
         },
         {
-            title: t('page.document.action.firmar.label'),
+            label: t('page.document.action.firmar.label'),
             icon: "edit_document",
             showInMenu: true,
             onClick: handleFirmaShow,
@@ -297,7 +297,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             hidden: (row:any) => !entity?.potModificar || !row?.metaDocumentInfo?.firmaPassarelaActiva || !isFirmaActiva(row),
         },
         {
-            title: t('page.document.action.viaFirma.label'),
+            label: t('page.document.action.viaFirma.label'),
             icon: "mail",
             showInMenu: true,
             onClick: handleEnviarViaFirma,
@@ -305,7 +305,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             hidden: (row:any) => !entity?.potModificar || !row?.metaDocumentInfo?.firmaBiometricaActiva || !isFirmaActiva(row),
         },
         {
-            title: entity?.metaExpedientInfo?.tipusClassificacio == 'SIA' // notificar/comunicar
+            label: entity?.metaExpedientInfo?.tipusClassificacio == 'SIA' // notificar/comunicar
                 ? t('page.document.action.notificar.label')
                 : t('page.document.action.comunicar.label'),
             icon: "mail",
@@ -314,51 +314,51 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             hidden: (row:any) => !entity?.potModificar || !(row?.documentFirmaTipus != 'SENSE_FIRMA' && row?.arxiuUuid || isInOptions(row?.fitxerExtension, 'zip')),
         },
         {
-            title: t('page.document.action.publicar.label'),
+            label: t('page.document.action.publicar.label'),
             icon: "publish",
             showInMenu: true,
             onClick: handlePublicarShow,
             hidden: (row:any) => !entity?.potModificar || !(row?.documentFirmaTipus != 'SENSE_FIRMA' && row?.arxiuUuid || isInOptions(row?.fitxerExtension, 'zip')) || !user?.sessionScope?.isMostrarPublicar
         },
         {
-            title: t('page.document.action.mail.label'),
+            label: t('page.document.action.mail.label'),
             icon: "mail",
             showInMenu: true,
             onClick: handleEnviarViaEmailShow,
         },
         {
-            title: t('page.document.action.seguiment.label'),
+            label: t('page.document.action.seguiment.label'),
             icon: "info",
             showInMenu: true,
             onClick: handleSeguimentOpen,
             hidden: (row:any) => !(row?.estat == 'FIRMA_PENDENT' && row?.documentTipus == 'DIGITAL'),
         },
         {
-            title: <Divider sx={{width: '100%'}} color={"none"}/>,
+            label: <Divider sx={{width: '100%'}} color={"none"}/>,
             showInMenu: true,
             disabled: true,
         },
         {
-            title: t('page.document.action.definitive.label'),
+            label: t('page.document.action.definitive.label'),
             icon: "check_circle",
             showInMenu: true,
             onClick: definitiu,
             hidden: (row:any) => !entity?.potModificar || !isInOptions(row?.estat, 'REDACCIO' , 'FIRMA_PARCIAL') || !isInOptions(row?.documentTipus, 'DIGITAL') || !user?.sessionScope?.isConvertirDefinitiuActiu,
         },
         {
-            title: <Divider sx={{width: '100%'}} color={"none"}/>,
+            label: <Divider sx={{width: '100%'}} color={"none"}/>,
             showInMenu: true,
             disabled: true,
             hidden: (row:any) => !entity?.potModificar || !isInOptions(row?.estat, 'REDACCIO' , 'FIRMA_PARCIAL') || !isInOptions(row?.documentTipus, 'DIGITAL') || !user?.sessionScope?.isConvertirDefinitiuActiu,
         },
         {
-            title: t('page.contingut.action.history.label'),
+            label: t('page.contingut.action.history.label'),
             icon: "list",
             showInMenu: true,
             onClick: handleHistoricOpen,
         },
         {
-            title: t('page.contingut.action.infoArxiu.label'),
+            label: t('page.contingut.action.infoArxiu.label'),
             icon: "info",
             showInMenu: true,
             onClick: handleArxiuOpen,

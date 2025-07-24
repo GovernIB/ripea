@@ -89,7 +89,7 @@ const ImportarExpedient = (props:any) => {
 
     const actions = [
         {
-            title: t('page.expedient.action.importar.label'),
+            label: t('page.expedient.action.importar.label'),
             icon: "download",
             showInMenu: false,
             onClick: (id:any) => importarExpedient(entity?.id, id)

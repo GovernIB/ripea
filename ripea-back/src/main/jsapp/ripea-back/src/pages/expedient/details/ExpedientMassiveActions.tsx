@@ -87,92 +87,92 @@ const useExpedientMassiveActions = (refresh?: () => void)=> {
 
     const actions = [
         {
-            title: t('page.expedient.action.agafar.label'),
+            label: t('page.expedient.action.agafar.label'),
             icon: "lock",
             showInMenu: true,
             onClick: agafar,
         },
         {
-            title: t('page.expedient.action.lliberar.label'),
+            label: t('page.expedient.action.lliberar.label'),
             icon: "lock_open",
             showInMenu: true,
 			onClick: alliberar,
         },
 		{
-		    title: t('page.expedient.action.retornar.label'),
+		    label: t('page.expedient.action.retornar.label'),
 		    icon: "undo",
             showInMenu: true,
 			onClick: retornar,
 		},		
         {
-            title: t('page.expedient.action.follow.label'),
+            label: t('page.expedient.action.follow.label'),
             icon: "person_add_alt1",
             showInMenu: true,
             onClick: follow,
         },
         {
-            title: t('page.expedient.action.unfollow.label'),
+            label: t('page.expedient.action.unfollow.label'),
             icon: "person_remove",
             showInMenu: true,
             onClick: unfollow,
         },
         {
-            title: t('common.delete'),
+            label: t('common.delete'),
             icon: "delete",
             showInMenu: true,
 			onClick: esborrar,
         },
         {
-            title: <Divider sx={{px: 1, width: '100%'}} color={"none"}/>,
+            label: <Divider sx={{px: 1, width: '100%'}} color={"none"}/>,
             showInMenu: true,
             disabled: true,
         },
         {
-            title: t('page.expedient.action.exportFullCalcul.label'),
+            label: t('page.expedient.action.exportFullCalcul.label'),
             icon: "download",
             showInMenu: true,
 			onClick: exportExcel
         },
         {
-            title: t('page.expedient.action.exportCSV.label'),
+            label: t('page.expedient.action.exportCSV.label'),
             icon: "download",
             showInMenu: true,
 			onClick: exportCsv
         },
         {
-            title: t('page.expedient.action.exportZIP.label'),
+            label: t('page.expedient.action.exportZIP.label'),
             icon: "download",
             showInMenu: true,
 			onClick: exportIndexZip
         },
         {
-            title: t('page.expedient.action.exportPDF.label'),
+            label: t('page.expedient.action.exportPDF.label'),
             icon: "download",
             showInMenu: true,
 			onClick: exportIndexPdf,
         },
 		{
-            title: t('page.expedient.action.exportEXCEL.label'),
+            label: t('page.expedient.action.exportEXCEL.label'),
 		    icon: "download",
             showInMenu: true,
 			onClick: exportIndexXls,
             hidden: !(user?.sessionScope?.isExportacioExcelActiva),
 		},
         {
-            title: t('page.expedient.action.exportENI.label'),
+            label: t('page.expedient.action.exportENI.label'),
             icon: "download",
             showInMenu: true,
 			onClick: exportEni
         },
 		{
-            title: t('page.expedient.action.exportINSIDE.label'),
+            label: t('page.expedient.action.exportINSIDE.label'),
 		    icon: "download",
             showInMenu: true,
 			onClick: exportInside,
 			hidden: !(user?.sessionScope?.isExportacioInsideActiva),
 		},
         {
-            title: t('page.expedient.action.exportZIP.label'),
+            label: t('page.expedient.action.exportZIP.label'),
             icon: "description",
             showInMenu: true,
             onClick: handleExportDoc,

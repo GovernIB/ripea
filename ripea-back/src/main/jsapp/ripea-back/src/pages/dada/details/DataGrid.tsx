@@ -44,14 +44,14 @@ const DataGrid = (props:any) => {
 
     const actions = [
         {
-            title: t('common.update'),
+            label: t('common.update'),
             icon: "edit",
             showInMenu: false,
             clickShowUpdateDialog: true,
             hidden: !contingut?.potModificar,
         },
         {
-            title: t('common.update'),
+            label: t('common.update'),
             icon: "delete",
             showInMenu: false,
             clickTriggerDelete: true,

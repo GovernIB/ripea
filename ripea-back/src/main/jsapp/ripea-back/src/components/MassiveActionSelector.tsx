@@ -48,13 +48,13 @@ const MassiveActionSelector: React.FC<MassiveActionSelectorProps> = (props:Massi
     {/* Selection buttons */}
     const buttonActions = [
         {
-            title: t('common.select.all'),
+            label: t('common.select.all'),
             icon: "check_box",
             showInMenu: true,
             onClick: handleSelectAll
         },
         {
-            title: t('common.select.clear'),
+            label: t('common.select.clear'),
             icon: "check_box_outline_blank",
             showInMenu: true,
             onClick: handleClearSelection

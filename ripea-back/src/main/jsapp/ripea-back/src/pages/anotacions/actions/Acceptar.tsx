@@ -86,7 +86,7 @@ const AcceptarTabAnnexos = () => {
 
     const actions = [
         {
-            title: t('page.document.action.view.label'),
+            label: t('page.document.action.view.label'),
             icon: "search",
             showInMenu: false,
             onClick: handleOpen,

@@ -5,6 +5,7 @@ import { useBaseAppContext } from '../../BaseAppContext';
 
 type DataGridActionItemProps = {
     id: any;
+    label?: string;
     title?: string;
     row?: any;
     icon?: string;
@@ -20,7 +21,7 @@ export type DataGridActionItemOnClickFn = (id: any, row: any, event: React.Mouse
 
 export const toDataGridActionItem = (
     id: any,
-    title: string,
+    label: string,
     row?: any,
     icon?: string,
     linkTo?: string,
@@ -30,7 +31,8 @@ export const toDataGridActionItem = (
     disabled?: boolean): React.ReactElement => {
     return <DataGridActionItem
         id={id}
-        title={title}
+        label={label}
+        title={undefined}
         row={row}
         icon={icon}
         linkTo={linkTo}
@@ -43,6 +45,7 @@ export const toDataGridActionItem = (
 const DataGridActionItem: React.FC<DataGridActionItemProps> = (props) => {
     const {
         id,
+        label,
         title,
         row,
         icon,
@@ -59,8 +62,8 @@ const DataGridActionItem: React.FC<DataGridActionItemProps> = (props) => {
     linkTo && (additionalProps['to'] = linkTo);
     linkState && (additionalProps['state'] = linkState);
     return <GridActionsCellItem
-        label={title}
-        title={!showInMenu ? title : undefined}
+        label={label}
+        title={!showInMenu ? (title ?? label) : undefined}
         icon={icon ? <Icon>{icon}</Icon> : undefined}
         onClick={event => {
             onClickCustom ? onClickCustom?.(id, row, event) : onClick(event);

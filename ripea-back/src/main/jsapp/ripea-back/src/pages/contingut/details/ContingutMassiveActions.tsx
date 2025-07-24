@@ -39,27 +39,27 @@ const useContingutMassiveActions = (entity:any, refresh?: () => void) => {
 
     const actions = [
         {
-            title: t('common.download'),
+            label: t('common.download'),
             icon: "download",
             showInMenu: true,
             onClick: download,
         },
         {
-            title: t('page.document.action.notificarMasiva.title'),
+            label: t('page.document.action.notificarMasiva.title'),
             icon: "mail",
             showInMenu: true,
             onClick: handleNotificar,
             hidden: !entity?.potModificar,
         },
         {
-            title: t('page.contingut.action.move.title'),
+            label: t('page.contingut.action.move.title'),
             icon: "open_with",
             showInMenu: true,
             onClick: (ids:any[])=>handleMoure(ids, entity),
             hidden: !entity?.potModificar,
         },
         {
-            title: t('page.document.action.changeType.title'),
+            label: t('page.document.action.changeType.title'),
             icon: "edit",
             showInMenu: true,
             onClick: handleCanviTipus,

@@ -16,28 +16,28 @@ const componentsCa = {
     },
     datacommon: {
         details: {
-            title: 'Detalls',
+            label: 'Detalls',
         },
         create: {
-            title: 'Crear',
+            label: 'Crear',
         },
         update: {
-            title: 'Modificar',
+            label: 'Modificar',
         },
         delete: {
-            title: 'Esborrar',
+            label: 'Esborrar',
             single: {
-                title: 'Confirmació',
+                label: 'Confirmació',
                 confirm: 'Estau segur que voleu esborrar aquest element (aquesta acció no es pot desfer)?',
                 success: 'Element esborrat',
                 error: 'Error esborrant element',
             },
         },
         export: {
-            title: 'Exportar',
+            label: 'Exportar',
         },
         refresh: {
-            title: 'Refrescar',
+            label: 'Refrescar',
         },
         toolbar: {
             error: 'S\'ha produit un error',

@@ -126,13 +126,13 @@ const useExecucioMassiva = () => {
 
     const actions: any = [
         {
-            title: t('common.detail'),
+            label: t('common.detail'),
             icon: "info",
             showInMenu: true,
             onClick: handleContingutOpen,
         },
         {
-            title: t('common.download'),
+            label: t('common.download'),
             icon: 'download',
             showInMenu: true,
             onClick: download,
