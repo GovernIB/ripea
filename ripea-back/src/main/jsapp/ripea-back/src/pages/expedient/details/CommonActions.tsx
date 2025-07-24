@@ -123,7 +123,7 @@ export const useActions = (refresh?: () => void) => {
                     apiAction(undefined, {code: 'ESBORRAR', data:{ ids: [id], massivo: false }})
                         .then(() => {
                             navigate("/expedient")
-                            temporalMessageShow(null, t('page.expedient.action.eliminar.ok', {expedient: row?.nom}), 'success');
+                            temporalMessageShow(null, t('page.expedient.action.eliminar.ok', {data: row}), 'success');
                         })
                         .catch((error) => {
                             temporalMessageShow(null, error?.message, 'error');

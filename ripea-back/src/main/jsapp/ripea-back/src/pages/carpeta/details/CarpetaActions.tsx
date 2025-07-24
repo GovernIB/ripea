@@ -38,9 +38,9 @@ const useActions = (refresh?:()=>void) => {
             .then((value: any) => {
                 if (value) {
                     apiDelete(id)
-                        .then(() => {
+                        .then((data) => {
                             refresh?.();
-                            temporalMessageShow(null, t('page.carpeta.action.delete.ok'), 'success');
+                            temporalMessageShow(null, t('page.carpeta.action.delete.ok', {data}), 'success');
                         })
                         .catch((error) => {
                             temporalMessageShow(null, error?.message, 'error');

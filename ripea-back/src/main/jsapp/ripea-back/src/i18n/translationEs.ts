@@ -206,6 +206,7 @@ const translationEs = {
                 canviProcediment: {
                     label: "Cambiar procedimiento",
                     title: "Cambiar procedimiento",
+                    ok: "La anotación {{data.identificador}} se ha modificado correctamente",
                 },
                 canviEstatDistribucio: {
                     label: "Cambiar estado a distribución",
@@ -241,6 +242,7 @@ const translationEs = {
             action: {
                 new: {
                     label: "Nueva Tarea",
+                    ok: "La tarea {{data.titol}} se ha creado correctamente",
                 },
                 tramitar: {
                     label: "Tramitar",
@@ -316,27 +318,30 @@ const translationEs = {
                 },
                 new: {
                     label: "Nuevo Interesado",
-                    ok: "El interesado se ha creado correctamente",
+                    ok: "El interesado {{data.documentNum}} se ha creado correctamente",
+                },
+                update: {
+                    ok: "El interesado {{data.documentNum}} se ha modificado correctamente",
                 },
                 delete: {
                     label: "Borrar Interesado",
                     check: "Esta seguro de que quiere seguir con esta acción?",
                     description: "Una vez borrado no se prodra recuperar",
-                    ok: "El interesado se ha borrado correctamente",
+                    ok: "El interesado {{data.documentNum}} se ha borrado correctamente",
                 },
                 createRep: {
                     label: "Añadir Representante",
-                    ok: "El representante se ha creado correctamente",
+                    ok: "El representante {{data.documentNum}} se ha creado correctamente",
                 },
                 updateRep: {
                     label: "Modificar Representante",
-                    ok: "El representante se ha modificar correctamente",
+                    ok: "El representante {{data.documentNum}} se ha modificar correctamente",
                 },
                 deleteRep: {
                     label: "Borrar Representante",
                     check: "Esta seguro de que quiere seguir con esta acción?",
                     description: "Una vez borrado no se prodra recuperar",
-                    ok: "El representante se ha borrado correctamente",
+                    ok: "El representante {{data.documentNum}} se ha borrado correctamente",
                 },
                 importar: {
                     label: "Importar...",
@@ -370,12 +375,12 @@ const translationEs = {
             action: {
                 new: {
                     label: "Nuevo expedient",
-                    ok: "El expediente '{{expedient}}' se ha creado correctamente.",
+                    ok: "El expediente '{{data.nom}}' se ha creado correctamente.",
                 },
                 update: {
                     label: "Modificar...",
                     title: "Modificar Expediente",
-                    ok: "El expediente '{{expedient}}' se ha modificado correctamente.",
+                    ok: "El expediente '{{data.nom}}' se ha modificado correctamente.",
                 },
                 detall: {
                     label: "Gestionar",
@@ -406,7 +411,7 @@ const translationEs = {
                 },
                 eliminar: {
                     label: "Eliminar",
-                    ok: "El expediente '{{expedient}}' ha sido borrado correctamente",
+                    ok: "El expediente '{{data.nom}}' ha sido borrado correctamente",
                 },
                 close: {
                     label: "Cerrar...",
@@ -601,6 +606,15 @@ const translationEs = {
                 dataOther: "Otros datos",
             },
             action: {
+                new: {
+                    ok: "El docmuento {{data.nom}} se ha creado correctamente"
+                },
+                update: {
+                    ok: "El docmuento {{data.nom}} se ha modificado correctamente"
+                },
+                delete: {
+                    ok: "El docmuento {{data.nom}} se ha eliminado correctamente"
+                },
                 pinbal: {
                     label: "Consulta PINBAL...",
                     title: "Nueva consulta PINBAL",
@@ -721,18 +735,18 @@ const translationEs = {
             action: {
                 new: {
                     label: "Carpeta...",
-                    ok: "Carpeta '{{carpeta}}' creada correctamente",
+                    ok: "Carpeta '{{data.nom}}' creada correctamente",
                 },
                 update: {
                     label: "Modificar...",
                     title: "Modificar carpeta",
-                    ok: "Carpeta '{{carpeta}}' modificada correctamente",
+                    ok: "Carpeta '{{data.nom}}' modificada correctamente",
                 },
                 delete: {
                     label: "Borrar...",
                     check: "Esta seguro de que quiere seguir con esta acción?",
                     description: "Una vez borrado no se prodra recuperar",
-                    ok: "Elemento borrado",
+                    ok: "Carpeta '{{data.nom}}' eliminada correctamente",
                 }
             }
         },
@@ -740,6 +754,17 @@ const translationEs = {
             title: "valor para el dato '{{metaDada}}'",
             grid: {
                 valor: "Valor del dato",
+            },
+            action: {
+                new: {
+                    ok: "El dato {{data.valor}} se ha creado correctamente",
+                },
+                update: {
+                    ok: "El dato {{data.valor}} se ha modificado correctamente",
+                },
+                delete: {
+                    ok: "El dato {{data.valor}} se ha eliminado correctamente",
+                },
             },
         },
         metaDada: {
@@ -820,6 +845,9 @@ const translationEs = {
                 estatError: "Error procesando la notificación dentro de Notib",
             },
             action: {
+                update: {
+                    ok: "La remesa {{data.assumpte}} se ha modificado correctamente",
+                },
                 actualitzarEstat: {
                     label: "Actualizar estado",
                     ok: "El estado ha sido actualizado",
@@ -873,6 +901,7 @@ const translationEs = {
             },
         },
         publicacio: {
+            title: "Publicación",
             detall: {
                 title: "Detalle de la publicación",
                 document: "Documento",
@@ -883,10 +912,11 @@ const translationEs = {
                 observacions: "Observaciones",
             },
             action: {
-                update: "Modificar publicación",
+                update: {
+                    ok: "La publicación {{data.assumpte}} se ha modificado correctamente",
+                },
                 delete: {
-                    title: "Borrar publicación",
-                    message: "Una vez borrada la publicación no se podra recuperar",
+                    ok: "La publicación {{data.assumpte}} se ha eliminado correctamente",
                 }
             },
         },

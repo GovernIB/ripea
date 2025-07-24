@@ -169,50 +169,51 @@ const translationEn = {
         },
         anotacio: {
             filter: {
-                title: "Registry entry search"
+                title: "Log annotation search"
             },
             tabs: {
                 resum: "Summary",
                 estat: "Status",
-                registre: "Registry Information",
-                interessats: "Interested Parties",
+                registre: "Registry info",
+                interessats: "Stakeholders",
                 annexos: "Annexes",
-                justificant: "Receipt",
+                justificant: "Proof",
             },
             detall: {
-                title: "Registration Annotation Details",
+                title: "Log annotation details",
                 estatView: "Status",
-                dataAlta: "Creation Date",
+                dataAlta: "Registration date",
                 observacions: "Reason",
-                rejectedDate: "Rejection Date",
-                acceptedDate: "Acceptance Date",
+                rejectedDate: "Rejection date",
+                acceptedDate: "Acceptance date",
                 usuariActualitzacio: "User",
             },
             action: {
                 justificant: {
-                    label: "Download receipt",
-                    ok: "The receipt has been downloaded successfully",
+                    label: "Download proof",
+                    ok: "The proof has been downloaded successfully",
                 },
                 acceptar: {
                     label: "Accept...",
-                    title: "Accept case file",
-                    ok: "The annotation has been accepted successfully",
+                    title: "Accept record",
+                    ok: "The annotation has been successfully accepted",
                 },
                 rebutjar: {
                     label: "Reject...",
-                    title: "Reject case file",
-                    ok: "The annotation has been rejected successfully",
+                    title: "Reject record",
+                    ok: "The annotation has been successfully rejected",
                 },
                 canviProcediment: {
                     label: "Change procedure",
                     title: "Change procedure",
+                    ok: "Annotation {{data.identificador}} has been successfully modified",
                 },
                 canviEstatDistribucio: {
-                    label: "Change status to distribution",
-                    ok: "The status has been changed successfully",
+                    label: "Change state to distribution",
+                    ok: "Status has been successfully changed",
                 },
                 descargarAnnex: {
-                    label: "Download Annex",
+                    label: "Download annex",
                     ok: "Annex downloaded successfully",
                 },
                 firma: {
@@ -224,15 +225,15 @@ const translationEn = {
         tasca: {
             title: "Task",
             detall: {
-                title: "Task Details",
-                metaExpedientTasca: "Task Type",
-                metaExpedientTascaDescription: "Task Type Description",
+                title: "Task details",
+                metaExpedientTasca: "Task type",
+                metaExpedientTascaDescription: "Task type description",
                 createdBy: "Created by",
-                responsablesStr: "Responsible Parties",
-                responsableActual: "Current Responsible",
+                responsablesStr: "Responsible users",
+                responsableActual: "Current responsible",
                 delegat: "Delegate",
                 observadors: "Observers",
-                dataInici: "Start Date",
+                dataInici: "Start date",
                 duracio: "Duration",
                 dataLimit: "Deadline",
                 estat: "Status",
@@ -241,6 +242,7 @@ const translationEn = {
             action: {
                 new: {
                     label: "New Task",
+                    ok: "The task {{data.titol}} was created successfully",
                 },
                 tramitar: {
                     label: "Process",
@@ -257,11 +259,11 @@ const translationEn = {
                 cancel: {
                     label: "Cancel",
                     title: "Are you sure you want to cancel this task?",
-                    ok: "The task has been cancelled successfully",
+                    ok: "The task has been canceled successfully",
                 },
                 finalitzar: {
                     label: "Finish",
-                    ok: "The task has been completed successfully",
+                    ok: "The task has been finished successfully",
                 },
                 reassignar: {
                     label: "Reassign",
@@ -279,21 +281,21 @@ const translationEn = {
                     ok: "The task has been resumed successfully",
                 },
                 changeDataLimit: {
-                    label: "Change deadline...",
+                    label: "Modify deadline...",
                     title: "Change deadline",
-                    ok: "The task has been updated successfully",
+                    ok: "The task has been modified successfully",
                 },
                 changePrioritat: {
                     label: "Change priority...",
-                    title: "Change task priority",
-                    ok: "The task has been updated successfully",
+                    title: "Modify task priority",
+                    ok: "The task has been modified successfully",
                 },
                 reobrir: {
                     label: "Reopen",
                     title: "Reopen task",
                     ok: "The task has been reopened successfully",
                 },
-            }
+            },
         },
         interessat: {
             title: "Interested Party",
@@ -312,210 +314,213 @@ const translationEn = {
             },
             action: {
                 detail: {
-                    title: "Details of the interested party",
+                    title: "Interested Party Details",
                 },
                 new: {
                     label: "New Interested Party",
-                    ok: "The interested party has been successfully created",
+                    ok: "The interested party {{data.documentNum}} was created successfully",
+                },
+                update: {
+                    ok: "The interested party {{data.documentNum}} was updated successfully",
                 },
                 delete: {
                     label: "Delete Interested Party",
                     check: "Are you sure you want to proceed with this action?",
                     description: "Once deleted, it cannot be recovered",
-                    ok: "The interested party has been successfully deleted",
+                    ok: "The interested party {{data.documentNum}} was deleted successfully",
                 },
                 createRep: {
                     label: "Add Representative",
-                    ok: "The representative has been successfully created",
+                    ok: "The representative {{data.documentNum}} was created successfully",
                 },
                 updateRep: {
                     label: "Edit Representative",
-                    ok: "The representative has been successfully updated",
+                    ok: "The representative {{data.documentNum}} was updated successfully",
                 },
                 deleteRep: {
                     label: "Delete Representative",
                     check: "Are you sure you want to proceed with this action?",
                     description: "Once deleted, it cannot be recovered",
-                    ok: "The representative has been successfully deleted",
+                    ok: "The representative {{data.documentNum}} was deleted successfully",
                 },
                 importar: {
                     label: "Import...",
-                    title: "Import stakeholders",
-                    ok: "Stakeholders imported successfully",
+                    title: "Import interested parties",
+                    ok: "Interested parties imported successfully",
                 },
                 exportar: {
                     label: "Export...",
-                    ok: "Stakeholders exported successfully",
+                    ok: "Interested parties exported successfully",
                 },
             },
             grid: {
-                title: "Stakeholders from the file",
+                title: "Interested parties from file",
                 representant: "Representative",
             },
             alert: {
-                incapacitat: "If the holder has a disability, a recipient must be specified.",
-                jaExistentExpedient: "Already exists in the file",
+                incapacitat: "If the holder has a disability, it is mandatory to indicate a recipient.",
+                jaExistentExpedient: "Already exists in the case file",
             },
         },
         expedient: {
-            title: "Expedient",
+            title: "Case file",
             filter: {
-                title: "Expedient Search"
+                title: "Case file search"
             },
             detall: {
-                title: "Case Information",
+                title: "Case file information",
                 agafatPer: "Taken by",
                 avisos: "Warnings",
             },
             action: {
                 new: {
-                    label: "New expedient",
-                    ok: "The expedient '{{expedient}}' has been created successfully.",
+                    label: "New case file",
+                    ok: "The case file '{{data.nom}}' was created successfully.",
                 },
                 update: {
-                    label: "Modify...",
-                    title: "Modify Expedient",
-                    ok: "The expedient '{{expedient}}' has been modified successfully.",
+                    label: "Edit...",
+                    title: "Edit case file",
+                    ok: "The case file '{{data.nom}}' was updated successfully.",
                 },
                 detall: {
                     label: "Manage",
                 },
                 importar: {
                     label: "Import case file",
-                    ok: "The case file has been successfully imported",
+                    ok: "The case file was imported successfully",
                 },
                 agafar: {
-                    label: "Take",
-                    ok: "The expedient '{{expedient}}' has been taken by the user '{{user}}'.",
+                    label: "Lock",
+                    ok: "The case file '{{expedient}}' has been taken by user '{{user}}'",
                 },
                 follow: {
                     label: "Follow",
-                    ok: "The user '{{user}}' has started following the expedient '{{expedient}}'.",
+                    ok: "User '{{user}}' started following case file '{{expedient}}'.",
                 },
                 unfollow: {
                     label: "Unfollow",
-                    ok: "The user '{{user}}' has stopped following the expedient '{{expedient}}'.",
+                    ok: "User '{{user}}' stopped following case file '{{expedient}}'.",
                 },
                 retornar: {
                     label: "Return",
-                    ok: "The expedient '{{expedient}}' has been returned to the user '{{user}}'.",
+                    ok: "The case file '{{expedient}}' has been returned to user '{{user}}'",
                 },
                 lliberar: {
                     label: "Release",
-                    ok: "The expedient '{{expedient}}' has been released.",
+                    ok: "The case file '{{expedient}}' has been released",
                 },
                 eliminar: {
                     label: "Delete",
-                    ok: "The expedient '{{expedient}}' has been deleted successfully.",
+                    ok: "The case file '{{data.nom}}' was deleted successfully",
                 },
                 close: {
                     label: "Close...",
-                    title: "Close expedient",
-                    ok: "The expedient '{{expedient}}' has been closed successfully.",
+                    title: "Close case file",
+                    ok: "The case file '{{expedient}}' was closed successfully",
                 },
                 open: {
                     label: "Reopen",
-                    description: "Do you want to reopen the case?",
-                    ok: "The expedient '{{expedient}}' has been reopened successfully.",
+                    description: "Do you want to reopen the case file?",
+                    ok: "The case file '{{expedient}}' was reopened successfully",
                 },
                 download: {
                     label: "Download documents...",
                     title: "Document selection",
-                    ok: "The documents have been downloaded successfully",
+                    ok: "Documents downloaded successfully",
                 },
                 exportFullCalcul: {
                     label: "Export spreadsheet",
-                    ok: "The spreadsheet has been downloaded successfully",
+                    ok: "Spreadsheet downloaded successfully",
                 },
                 exportZIP: {
                     label: "Export ZIP index",
                     title: "Export documents to ZIP",
-                    ok: "The ZIP document has been downloaded successfully",
+                    ok: "ZIP document downloaded successfully",
                 },
                 exportPDF: {
                     label: "Export PDF index",
-                    ok: "The PDF document has been downloaded successfully",
+                    ok: "PDF document downloaded successfully",
                 },
                 exportCSV: {
                     label: "Export CSV index",
-                    ok: "The CSV index has been downloaded successfully",
+                    ok: "CSV index downloaded successfully",
                 },
                 exportEXCEL: {
                     label: "Export EXCEL index",
-                    ok: "The EXCEL index has been downloaded successfully",
+                    ok: "EXCEL index downloaded successfully",
                 },
                 exportPDF_ENI: {
                     label: "PDF index and ENI export",
-                    ok: "The document has been downloaded successfully",
+                    ok: "Document downloaded successfully",
                 },
                 exportENI: {
                     label: "ENI export",
-                    ok: "The ENI document has been downloaded successfully",
+                    ok: "ENI document downloaded successfully",
                 },
                 exportINSIDE: {
                     label: "INSIDE export",
-                    ok: "The INSIDE document has been downloaded successfully",
+                    ok: "INSIDE document downloaded successfully",
                 },
                 export: {
                     label: "Export documents...",
                     title: "Export documents",
-                    ok: "The documents have been downloaded successfully",
+                    ok: "Documents downloaded successfully",
                 },
                 sincronitzar: {
-                    label: "Synchronize status with file",
-                    ok: "The archive status has been synchronized",
+                    label: "Sync status with archive",
+                    ok: "Archive status synchronized",
                 },
                 changePrioritat: {
                     label: "Change priority...",
-                    title: "Modify expedient priority",
-                    ok: "The expedient '{{expedient}}' has been modified successfully.",
+                    title: "Edit case file priority",
+                    ok: "Priority of case file '{{expedient}}' was updated successfully.",
                 },
                 changeEstat: {
                     label: "Change status...",
-                    title: "Modify expedient status",
-                    ok: "The expedient '{{expedient}}' has been modified successfully.",
+                    title: "Edit case file status",
+                    ok: "Status of case file '{{expedient}}' was updated successfully.",
                 },
                 assignar: {
                     label: "Assign",
-                    title: "Assign expedient to user",
-                    ok: "The expedient '{{expedient}}' has been assigned successfully.",
+                    title: "Assign case file to user",
+                    ok: "Case file '{{expedient}}' was assigned successfully.",
                 },
                 relacio: {
                     label: "Relate...",
-                    title: "Relate expedient",
-                    ok: "The relations of the expedient '{{expedient}}' have changed successfully.",
+                    title: "Relate case file",
+                    ok: "Relations of case file '{{expedient}}' were updated successfully.",
                 },
                 eliminarRelacio: {
                     label: "Delete relation",
-                    ok: "The relation of the 2 expedients has been removed successfully.",
+                    ok: "The relation between the two case files was successfully deleted.",
                 },
                 excelInteressats: {
-                    title: "Download template to import stakeholders from Excel",
-                    ok: "Stakeholders have been exported successfully",
+                    title: "Download Excel template to import interested parties",
+                    ok: "Interested parties exported successfully",
                 }
             },
             alert: {
-                owner: "It is necessary to reserve the file to be able to modify it",
-                alert: "This file has unread pending alerts",
-                validation: "This file has validation errors",
-                esborranys: "There are documents in draft status (B) that must either be finalized or removed from the case file before it can be closed.\nThis action will make the documents a permanent part of the case file and they will no longer be deletable.",
-                borradors: "This file contains drafts that will be deleted when closing it. You have the option to mark the drafts to be signed with server signature before closing the file to avoid their deletion. If the documents contain any invalid signatures, they will be removed and the document will be re-signed on the server.",
-                notificacio: "This file contains expired notifications that are not finalized. An attempt will be made to update their status. If new information about pending notifications arrives, the certificate will be saved in Helium but not in the Digital Archive.",
-                documents: "This file contains annotation annex documents with errors. An attempt will be made to reprocess them upon closing, and if it is not possible to move them, a copy will be saved in the Digital Archive without the original signatures (both the original document and the copy will still be accessible from the file’s content tab).",
-                errorEnviament: "This case file has deliveries with errors",
-                errorNotificacio: "This case file has notifications with errors",
-                ambEnviamentsPendents: "This case file has pending deliveries to Portafirmas",
+                owner: "You must reserve the case file in order to edit it",
+                alert: "This case file has unread alerts",
+                validation: "This case file has validation errors",
+                esborranys: "There are draft documents (B) that must be finalized or removed in order to close the case file.\nThis action will finalize the documents and they can no longer be deleted.",
+                borradors: "This case file contains drafts that will be deleted when closed. You can mark them to be signed with server signature before closing to avoid deletion. Invalid signatures will be removed and re-signed.",
+                notificacio: "This case file contains expired, uncompleted notifications. An attempt will be made to update their status. Any new information will be saved in Helium, not in the Digital Archive.",
+                documents: "This case file contains annex documents with errors. They will be reprocessed if possible. Otherwise, a copy will be saved in the Digital Archive without original signatures (both original and copy will remain accessible).",
+                errorEnviament: "This case file has send errors",
+                errorNotificacio: "This case file has notification errors",
+                ambEnviamentsPendents: "This case file has pending sends to signature portal",
                 ambNotificacionsPendents: "This case file has pending notifications",
             },
             modal: {
-                seguidors: "Expedient followers",
+                seguidors: "Case file followers",
             },
-			results: {
+            results: {
                 checkDelete: "Are you sure you want to delete this item?",
-                checkRelacio: "Are you sure you want to delete this relationship?",
-                actionOk: "Action executed.",
-				actionBackgroundOk: "Action is executing on background.",
-			}
+                checkRelacio: "Are you sure you want to delete this relation?",
+                actionOk: "Action executed successfully.",
+                actionBackgroundOk: "Action has been scheduled for background execution. You can track it in the mass actions list.",
+            }
         },
         arxiu: {
             detall: {
@@ -563,10 +568,10 @@ const translationEn = {
         document: {
             title: "Document",
             view: {
-                title: "View Type",
-                estat: "View by Status",
-                tipus: "View by Document Type",
-                carpeta: "View by Folder",
+                title: "View type",
+                estat: "View by status",
+                tipus: "View by document type",
+                carpeta: "View by folder",
             },
             tabs: {
                 resum: "Content",
@@ -576,21 +581,21 @@ const translationEn = {
                 firmes: "Signatures",
             },
             detall: {
-                fitxerNom: "File Name",
-                fitxerContentType: "Content Type",
-                metaDocument: "Document Type",
-                createdDate: "Creation Date",
+                fitxerNom: "File name",
+                fitxerContentType: "Content type",
+                metaDocument: "Document type",
+                createdDate: "Creation date",
                 estat: "Status",
-                dataCaptura: "Capture Date",
+                dataCaptura: "Capture date",
                 origen: "Origin",
-                tipoDocumental: "NTI Documentary Type",
-                estadoElaboracion: "Elaboration Status",
+                tipoDocumental: "Document type NTI",
+                estadoElaboracion: "Elaboration status",
                 csv: "CSV",
-                csvRegulacion: "CSV Regulation",
-                tipoFirma: "Signature Type",
-                flux: "There is a predefined signature flow. Creating a new signature flow will overwrite the selected one.",
-                summarize: "Generate title and description using artificial intelligence.\n(Requires a document to be attached beforehand)",
-                documentOrigenFormat: "Format: ES_<Body>_<AAAA>_<Specific_ID>",
+                csvRegulacion: "CSV regulation",
+                tipoFirma: "Signature type",
+                flux: "There is a predefined signature flow. Creating a new flow will overwrite the selected one.",
+                summarize: "Generate title and description with artificial intelligence.\n(Requires having previously attached a document)",
+                documentOrigenFormat: "Format: ES_<Organ>_<YYYY>_<Specific_ID>",
                 dataBasic: "Basic data",
                 dataInteressat: "Interested party data",
                 dataEspecific: "Specific data",
@@ -601,10 +606,19 @@ const translationEn = {
                 dataOther: "Other data",
             },
             action: {
+                new: {
+                    ok: "The document {{data.nom}} has been created successfully"
+                },
+                update: {
+                    ok: "The document {{data.nom}} has been updated successfully"
+                },
+                delete: {
+                    ok: "The document {{data.nom}} has been deleted successfully"
+                },
                 pinbal: {
                     label: "PINBAL query...",
                     title: "New PINBAL query",
-                    ok: "The document has been created from the pinbal query '{{codiServeiPinbal}}'"
+                    ok: "Document created from PINBAL query '{{codiServeiPinbal}}'",
                 },
                 import: {
                     label: "Import documents...",
@@ -616,11 +630,11 @@ const translationEn = {
                 },
                 imprimible: {
                     label: "Printable version",
-                    ok: "The printable version has been downloaded successfully",
+                    ok: "Printable version downloaded successfully",
                 },
                 original: {
                     label: "Download original",
-                    ok: "The original document has been downloaded successfully",
+                    ok: "Original document downloaded successfully",
                 },
                 firma: {
                     label: "Download signature",
@@ -636,12 +650,12 @@ const translationEn = {
                     ok: "CSV link copied successfully",
                 },
                 portafirmes: {
-                    label: "Send to signature inbox...",
-                    title: "Send document to signature inbox",
-                    ok: "Document '{{document}}' sent to signature inbox",
+                    label: "Send to portafirmas...",
+                    title: "Send document to portafirmas",
+                    ok: "Document '{{document}}' sent to portafirmas",
                 },
                 toPDF: {
-                    description: "The document format will be changed before sending it to the signature platform",
+                    description: "Document format will be changed before sending to portafirmas",
                     title: "View PDF version",
                 },
                 firmar: {
@@ -650,15 +664,15 @@ const translationEn = {
                 viaFirma: {
                     label: "Send viaFirma...",
                     title: "Send document to ViaFirma",
-                    ok: "Document '{{document}}' sent via viaFirma",
+                    ok: "Document '{{document}}' sent to viaFirma",
                 },
                 mail: {
                     label: "Send via email...",
-                    title: "Send document via email",
+                    title: "Send document by email",
                     ok: "Document '{{document}}' sent via email",
                 },
                 seguiment: {
-                    label: "Signature inbox tracking",
+                    label: "Portafirmas tracking",
                     title: "Signature details",
                     ok: "The signature has been cancelled successfully",
                 },
@@ -670,7 +684,7 @@ const translationEn = {
                 notificarMasiva: {
                     label: "Notify or communicate...",
                     title: "Generate document to notify",
-                    ok: "A zip of the selected items has been generated",
+                    ok: "A zip with the selected items has been generated",
                 },
                 comunicar: {
                     label: "Communicate...",
@@ -682,33 +696,33 @@ const translationEn = {
                 },
                 descarregarImprimible: {
                     label: "Download printable version",
-                    ok: "The printable version has been downloaded successfully",
+                    ok: "Printable version downloaded successfully",
                 },
                 changeType: {
                     label: "Change type...",
                     title: "Change type",
-                    ok: "Document '{{document}}' modified successfully",
+                    ok: "Documents have been modified successfully",
                 },
                 definitive: {
                     label: "Convert to definitive",
-                    description: "This action will make the documents permanently part of the file and they cannot be deleted.",
+                    description: "This action will make the documents part of the file definitively and they cannot be deleted.",
                     ok: "Document '{{document}}' changed to definitive",
                 },
             },
             alert: {
                 import: "Document imported",
                 delete: "Draft document",
-                firma: "Signed document",
+                firma: "Document signed",
                 original: "This document contained invalid signatures and has been cloned and signed on the server to be saved in the Digital Archive. The original can be downloaded from the actions menu",
-                custodiar: "Pending custody of signed document from portafirmas",
-                moure: "The annotation’s document is pending to be moved to the procedure’s documentary series",
-                definitiu: "Final document",
+                custodiar: "Pending to custody signed portafirmas document",
+                moure: "The annotation's document is pending to be moved to the procedural document series",
+                definitiu: "Definitive document",
                 firmaPendent: "Pending signature",
                 firmaParcial: "Partially signed",
                 errorPortafirmes: "Error sending to portafirmas",
                 funcionariHabilitatDigitalib: "You must be an authorized official in DIGITALIB",
-                folder: "If no folder is selected, the documents will be imported directly into the case file.",
-                scaned: "The scanning process was completed successfully.",
+                folder: "If no folder is selected, documents will be imported directly into the file.",
+                scaned: "The scanning process was successful.",
             },
             versio: {
                 title: "Version",
@@ -717,29 +731,40 @@ const translationEn = {
             },
         },
         carpeta: {
-            title: 'Folder',
+            title: "Folder",
             action: {
                 new: {
                     label: "Folder...",
-                    ok: "Folder '{{carpeta}}' created successfully",
+                    ok: "Folder '{{data.nom}}' created successfully",
                 },
                 update: {
                     label: "Edit...",
                     title: "Edit folder",
-                    ok: "Folder '{{carpeta}}' successfully updated",
+                    ok: "Folder '{{data.nom}}' updated successfully",
                 },
                 delete: {
                     label: "Delete...",
                     check: "Are you sure you want to proceed with this action?",
                     description: "Once deleted, it cannot be recovered",
-                    ok: "Item deleted",
+                    ok: "Folder '{{data.nom}}' deleted successfully",
                 }
             }
         },
         dada: {
-            title: "value for the data '{{metaDada}}'",
+            title: "value for data '{{metaDada}}'",
             grid: {
-                valor: "Value of the data",
+                valor: "Data value",
+            },
+            action: {
+                new: {
+                    ok: "The data {{data.valor}} has been created successfully",
+                },
+                update: {
+                    ok: "The data {{data.valor}} has been updated successfully",
+                },
+                delete: {
+                    ok: "The data {{data.valor}} has been deleted successfully",
+                },
             },
         },
         metaDada: {
@@ -817,24 +842,27 @@ const translationEn = {
                 fitxerNom: "File name",
                 serveiTipusEnum: "Service type",
                 notificacioIdentificador: "Identifier",
-                estatError: "Error processing the notification inside Notib",
+                estatError: "Error processing the notification in Notib",
             },
             action: {
+                update: {
+                    ok: "The dispatch {{data.assumpte}} has been updated successfully",
+                },
                 actualitzarEstat: {
                     label: "Update status",
-                    ok: "The status has been updated",
+                    ok: "Status has been updated successfully",
                 },
                 notificacioInteressat: {
-                    label: "Shipments",
-                    title: "Shipments",
+                    label: "Deliveries",
+                    title: "Deliveries",
                     ok: "",
                 },
                 justificant: {
-                    label: "Proof of shipment",
+                    label: "Delivery receipt",
                     ok: "",
                 },
                 documentEnviat: {
-                    label: "Document sent",
+                    label: "Sent document",
                     ok: "The sent document has been downloaded",
                 },
             },
@@ -873,20 +901,22 @@ const translationEn = {
             },
         },
         publicacio: {
+            title: "Publication",
             detall: {
-                title: "Publication Details",
+                title: "Publication detail",
                 document: "Document",
-                enviatData: "Sending Date",
+                enviatData: "Sent date",
                 estat: "Status",
                 tipus: "Type",
                 assumpte: "Subject",
                 observacions: "Observations",
             },
             action: {
-                update: "Edit Publication",
+                update: {
+                    ok: "The publication {{data.assumpte}} has been successfully updated",
+                },
                 delete: {
-                    title: "Delete Publication",
-                    message: "Once deleted, the publication cannot be recovered",
+                    ok: "The publication {{data.assumpte}} has been successfully deleted",
                 }
             },
         },

@@ -206,6 +206,7 @@ const translationCa = {
                 canviProcediment: {
                     label: "Canviar procediment",
                     title: "Canviar procediment",
+                    ok: "L'anotació {{data.identificador}} s'ha modificat correctament",
                 },
                 canviEstatDistribucio: {
                     label: "Canviar estat a distribució",
@@ -233,7 +234,7 @@ const translationCa = {
                 delegat: "Delegat",
                 observadors: "Observadors",
                 dataInici: "Data d'inici",
-                duracio: "Duració",
+                duracio: "Durada",
                 dataLimit: "Data límit",
                 estat: "Estat",
                 prioritat: "Prioritat",
@@ -241,6 +242,7 @@ const translationCa = {
             action: {
                 new: {
                     label: "Nova tasca",
+                    ok: "La tasca {{data.titol}} s'ha creat correctament",
                 },
                 tramitar: {
                     label: "Tramitar",
@@ -293,7 +295,7 @@ const translationCa = {
                     title: "Reobrir tasca",
                     ok: "La tasca s'ha reobert correctament",
                 },
-            }
+            },
         },
         interessat: {
             title: "Interessat",
@@ -302,7 +304,7 @@ const translationCa = {
                 nif: "NIF/CIF/NIE",
                 nom: "Nom",
                 raoSocial: "Raó social",
-                llinatges: "Llinatges",
+                llinatges: "Cognoms",
                 telefon: "Telèfon",
                 email: "Correu electrònic",
                 incapacitat: "Incapacitat",
@@ -316,27 +318,30 @@ const translationCa = {
                 },
                 new: {
                     label: "Nou Interessat",
-                    ok: "L'interessat s'ha creat correctament",
+                    ok: "L'interessat {{data.documentNum}} s'ha creat correctament",
+                },
+                update: {
+                    ok: "L'interessat {{data.documentNum}} s'ha modificat correctament",
                 },
                 delete: {
                     label: "Esborrar Interessat",
-                    check: "Està segur que vol continuar amb aquesta acció?",
+                    check: "Esteu segur que voleu continuar amb aquesta acció?",
                     description: "Un cop esborrat no es podrà recuperar",
-                    ok: "L'interessat s'ha esborrat correctament",
+                    ok: "L'interessat {{data.documentNum}} s'ha esborrat correctament",
                 },
                 createRep: {
                     label: "Afegir Representant",
-                    ok: "El representant s'ha creat correctament",
+                    ok: "El representant {{data.documentNum}} s'ha creat correctament",
                 },
                 updateRep: {
                     label: "Modificar Representant",
-                    ok: "El representant s'ha modificat correctament",
+                    ok: "El representant {{data.documentNum}} s'ha modificat correctament",
                 },
                 deleteRep: {
                     label: "Esborrar Representant",
-                    check: "Està segur que vol continuar amb aquesta acció?",
+                    check: "Esteu segur que voleu continuar amb aquesta acció?",
                     description: "Un cop esborrat no es podrà recuperar",
-                    ok: "El representant s'ha esborrat correctament",
+                    ok: "El representant {{data.documentNum}} s'ha esborrat correctament",
                 },
                 importar: {
                     label: "Importar...",
@@ -353,169 +358,169 @@ const translationCa = {
                 representant: "Representant",
             },
             alert: {
-                incapacitat: "En cas de titular amb discapacitat es obligatori indicar un destinatari.",
+                incapacitat: "En cas de titular amb discapacitat és obligatori indicar un destinatari.",
                 jaExistentExpedient: "Ja existeix a l'expedient",
             },
         },
         expedient: {
             title: "Expedient",
             filter: {
-                title: "Cercador d'expedients"
+                title: "Cercador d’expedients"
             },
             detall: {
-                title: "Informació de l'expedient",
+                title: "Informació de l’expedient",
                 agafatPer: "Agafat per",
                 avisos: "Avisos",
             },
             action: {
                 new: {
                     label: "Nou expedient",
-                    ok: "L'expedient '{{expedient}}' s'ha creat correctament.",
+                    ok: "L’expedient '{{data.nom}}' s’ha creat correctament.",
                 },
                 update: {
                     label: "Modificar...",
-                    title: "Modificar Expedient",
-                    ok: "L'expedient '{{expedient}}' s'ha modificat correctament.",
+                    title: "Modificar expedient",
+                    ok: "L’expedient '{{data.nom}}' s’ha modificat correctament.",
                 },
                 detall: {
                     label: "Gestionar",
                 },
-                agafar: {
-                    label: "Agafar",
-                    ok: "L'expedient '{{expedient}}' ha estat agafat per l'usuari '{{user}}'",
-                },
                 importar: {
                     label: "Importar expedient",
-                    ok: "L'expedient s'ha importat correctament",
+                    ok: "L’expedient s’ha importat correctament",
+                },
+                agafar: {
+                    label: "Bloquejar",
+                    ok: "L’expedient '{{expedient}}' ha estat agafat per l’usuari '{{user}}'",
                 },
                 follow: {
                     label: "Seguir",
-                    ok: "L'usuari '{{user}}' ha començat a seguir l'expedient '{{expedient}}'.",
+                    ok: "L’usuari '{{user}}' ha començat a seguir l’expedient '{{expedient}}'.",
                 },
                 unfollow: {
                     label: "Deixar de seguir",
-                    ok: "L'usuari '{{user}}' ha deixat de seguir l'expedient '{{expedient}}'.",
+                    ok: "L’usuari '{{user}}' ha deixat de seguir l’expedient '{{expedient}}'.",
                 },
                 retornar: {
-                    label: "Retornar",
-                    ok: "L'expedient '{{expedient}}' ha estat retornat a l'usuari '{{user}}'",
+                    label: "Tornar",
+                    ok: "L’expedient '{{expedient}}' ha estat tornat a l’usuari '{{user}}'",
                 },
                 lliberar: {
                     label: "Alliberar",
-                    ok: "L'expedient '{{expedient}}' ha estat alliberat",
+                    ok: "L’expedient '{{expedient}}' ha estat alliberat",
                 },
                 eliminar: {
                     label: "Eliminar",
-                    ok: "L'expedient '{{expedient}}' ha estat esborrat correctament",
+                    ok: "L’expedient '{{data.nom}}' ha estat eliminat correctament",
                 },
                 close: {
                     label: "Tancar...",
                     title: "Tancar expedient",
-                    ok: "L'expedient '{{expedient}}' ha estat tancat correctament",
+                    ok: "L’expedient '{{expedient}}' ha estat tancat correctament",
                 },
                 open: {
                     label: "Reobrir",
-                    description: "Voleu reobrir l'expedient?",
-                    ok: "L'expedient '{{expedient}}' ha estat reobert correctament",
+                    description: "Voleu reobrir l’expedient?",
+                    ok: "L’expedient '{{expedient}}' ha estat reobert correctament",
                 },
                 download: {
                     label: "Descarregar documents...",
                     title: "Selecció de documents",
-                    ok: "Els documents s'han descarregat correctament",
+                    ok: "Els documents s’han descarregat correctament",
                 },
                 exportFullCalcul: {
                     label: "Exportar full de càlcul",
-                    ok: "El full de càlcul s'ha descarregat correctament",
+                    ok: "El full de càlcul s’ha descarregat correctament",
                 },
                 exportZIP: {
                     label: "Exportar índex ZIP",
                     title: "Exportar documents a ZIP",
-                    ok: "El document ZIP s'ha descarregat correctament",
+                    ok: "El document ZIP s’ha descarregat correctament",
                 },
                 exportPDF: {
                     label: "Exportar índex PDF",
-                    ok: "El document PDF s'ha descarregat correctament",
+                    ok: "El document PDF s’ha descarregat correctament",
                 },
                 exportCSV: {
                     label: "Exportar índex CSV",
-                    ok: "L'índex CSV s'ha descarregat correctament",
+                    ok: "L’índex CSV s’ha descarregat correctament",
                 },
                 exportEXCEL: {
                     label: "Exportar índex EXCEL",
-                    ok: "L'índex EXCEL s'ha descarregat correctament",
+                    ok: "L’índex EXCEL s’ha descarregat correctament",
                 },
                 exportPDF_ENI: {
                     label: "Índex PDF i exportació ENI",
-                    ok: "El document s'ha descarregat correctament",
+                    ok: "El document s’ha descarregat correctament",
                 },
                 exportENI: {
                     label: "Exportació ENI",
-                    ok: "El document ENI s'ha descarregat correctament",
+                    ok: "El document ENI s’ha descarregat correctament",
                 },
                 exportINSIDE: {
                     label: "Exportació INSIDE",
-                    ok: "El document INSIDE s'ha descarregat correctament",
+                    ok: "El document INSIDE s’ha descarregat correctament",
                 },
                 export: {
                     label: "Exportar els documents...",
                     title: "Exportar documents",
-                    ok: "Els documents s'han descarregat correctament",
+                    ok: "Els documents s’han descarregat correctament",
                 },
                 sincronitzar: {
                     label: "Sincronitzar estat amb arxiu",
-                    ok: "L'estat de l'arxiu s'ha sincronitzat",
+                    ok: "L’estat de l’arxiu s’ha sincronitzat",
                 },
                 changePrioritat: {
                     label: "Canviar prioritat...",
-                    title: "Modificar prioritat de l'expedient",
-                    ok: "La prioritat de l'expedient '{{expedient}}' s'ha modificat correctament.",
+                    title: "Modificar prioritat de l’expedient",
+                    ok: "La prioritat de l’expedient '{{expedient}}' s’ha modificat correctament.",
                 },
                 changeEstat: {
                     label: "Canviar estat...",
-                    title: "Modificar estat de l'expedient",
-                    ok: "L'estat de l'expedient '{{expedient}}' s'ha modificat correctament.",
+                    title: "Modificar estat de l’expedient",
+                    ok: "L’estat de l’expedient '{{expedient}}' s’ha modificat correctament.",
                 },
                 assignar: {
                     label: "Assignar",
                     title: "Assignar expedient a usuari",
-                    ok: "L'expedient '{{expedient}}' s'ha assignat correctament.",
+                    ok: "L’expedient '{{expedient}}' s’ha assignat correctament.",
                 },
                 relacio: {
                     label: "Relacionar...",
                     title: "Relacionar expedient",
-                    ok: "Les relacions de l'expedient '{{expedient}}' han canviat correctament.",
+                    ok: "Les relacions de l’expedient '{{expedient}}' han canviat correctament.",
                 },
                 eliminarRelacio: {
                     label: "Eliminar relació",
-                    ok: "La relació entre els 2 expedients s'ha eliminat correctament.",
+                    ok: "La relació entre els 2 expedients s’ha eliminat correctament.",
                 },
                 excelInteressats: {
-                    title: "Descarregar plantilla per importar interessats des d'Excel",
-                    ok: "Els interessats s'han exportat correctament",
+                    title: "Descarregar plantilla per importar interessats Excel",
+                    ok: "Els interessats s’han exportat correctament",
                 }
             },
             alert: {
-                owner: "Cal reservar l'expedient per poder modificar-lo",
+                owner: "És necessari reservar l’expedient per poder-lo modificar",
                 alert: "Aquest expedient té alertes pendents de llegir",
                 validation: "Aquest expedient té errors de validació",
-                esborranys: "Existen documentos en estado borrador (B) que deben pasarse a definitivos o eliminarse del expediente si se quiere cerrar el expediente.\nEsta acción hará que los documentos pasen a formar parte del expediente definitivamente y no se podrán eliminar.",
-                borradors: "Aquest expedient conté esborranys que s'eliminaran en tancar-lo. A continuació teniu l'opció de marcar els esborranys perquè siguin signats amb signatura de servidor abans del tancament de l'expedient i així evitar-ne l'eliminació. Si els documents contenen alguna signatura invàlida, aquestes s'eliminaran i es tornarà a signar el document al servidor.",
-                notificacio: "Aquest expedient conté notificacions caducades no finalitzades. S'intentarà actualitzar-ne l'estat. Si arriba nova informació de les notificacions pendents, es desarà el certificat a l'Helium, però no a l'Arxiu digital.",
-                documents: "Aquest expedient conté documents d'annexos d'anotacions amb errors. S'intentaran reprocessar en tancar-lo i, en cas que no sigui possible moure'ls, se'n desarà una còpia a l'Arxiu digital sense les signatures originals (tant el document original com la còpia es podran continuar consultant des de la pestanya de contingut de l'expedient).",
+                esborranys: "Hi ha documents en estat esborrany (B) que s’han de passar a definitius o eliminar-se si es vol tancar l’expedient.\nAquesta acció farà que els documents formin part de l’expedient definitivament i no es podran eliminar.",
+                borradors: "Aquest expedient conté esborranys que s’eliminaran en tancar-lo. Pot marcar-los per signar-los amb signatura de servidor i evitar-ne l’eliminació. Les firmes no vàlides seran eliminades i es tornaran a signar.",
+                notificacio: "Aquest expedient conté notificacions caducades no finalitzades. Es provarà d’actualitzar-ne l’estat. Les noves dades es desaran a Helium, però no a l’arxiu digital.",
+                documents: "Aquest expedient conté documents d’anotacions amb errors. Es provaran de reprocesar i, si no és possible, es guardarà una còpia sense signatures originals a l’arxiu digital.",
                 errorEnviament: "Aquest expedient té enviaments amb errors",
                 errorNotificacio: "Aquest expedient té notificacions amb errors",
-                ambEnviamentsPendents: "Aquest expedient té enviaments pendents de Portafirmes",
+                ambEnviamentsPendents: "Aquest expedient té enviaments pendents de Portasignatures",
                 ambNotificacionsPendents: "Aquest expedient té notificacions pendents",
             },
             modal: {
-                seguidors: "Seguidors del expedient",
+                seguidors: "Seguidors de l’expedient",
             },
-			results: {
-                checkDelete: "Esteu segur que voleu esborrar aquest element?",
-                checkRelacio: "Esteu segur que voleu esborrar aquesta relació?",
-                actionOk: "L'acció s'ha executat correctament.",
-				actionBackgroundOk: "L'acció s'ha preparat per la seva execució en segon plà. Pot consultar l'estat del procés des del llistat d'execucions massives.",
-			}
+            results: {
+                checkDelete: "Esteu segur que voleu eliminar aquest element?",
+                checkRelacio: "Esteu segur que voleu eliminar aquesta relació?",
+                actionOk: "L’acció s’ha executat correctament.",
+                actionBackgroundOk: "L’acció s’ha preparat per executar-se en segon pla. Podeu consultar-ne l’estat al llistat d’accions massives.",
+            }
         },
         arxiu: {
             detall: {
@@ -573,7 +578,7 @@ const translationCa = {
                 version: "Versions",
                 file: "Fitxer",
                 scaner: "Escaneig",
-                firmes: "Firmes",
+                firmes: "Signatures",
             },
             detall: {
                 fitxerNom: "Nom del fitxer",
@@ -587,12 +592,12 @@ const translationCa = {
                 estadoElaboracion: "Estat d'elaboració",
                 csv: "CSV",
                 csvRegulacion: "Regulació del CSV",
-                tipoFirma: "Tipus de firma",
-                flux: "Existeix un flux de firma predefinit. La creació d’un nou flux de firma implica sobreescriure el seleccionat.",
-                summarize: "Generar titol i descripció amb inteligència artificial.\n(Requereix haver adjuntat un document prèviament)",
+                tipoFirma: "Tipus de signatura",
+                flux: "Existeix un flux de signatura predefinit. La creació d'un nou flux implica sobreescriure el seleccionat.",
+                summarize: "Generar títol i descripció amb intel·ligència artificial.\n(Requereix haver adjuntat un document prèviament)",
                 documentOrigenFormat: "Format: ES_<Òrgan>_<AAAA>_<ID_específic>",
                 dataBasic: "Dades bàsiques",
-                dataInteressat: "Dades de l'interessat",
+                dataInteressat: "Dades interessat",
                 dataEspecific: "Dades específiques",
                 dadesRegistrals: "Dades registrals",
                 fetRegistral: "Fet registral",
@@ -601,6 +606,15 @@ const translationCa = {
                 dataOther: "Altres dades",
             },
             action: {
+                new: {
+                    ok: "El document {{data.nom}} s'ha creat correctament"
+                },
+                update: {
+                    ok: "El document {{data.nom}} s'ha modificat correctament"
+                },
+                delete: {
+                    ok: "El document {{data.nom}} s'ha eliminat correctament"
+                },
                 pinbal: {
                     label: "Consulta PINBAL...",
                     title: "Nova consulta PINBAL",
@@ -687,7 +701,7 @@ const translationCa = {
                 changeType: {
                     label: "Canviar tipus...",
                     title: "Canviar tipus",
-                    ok: "Document '{{document}}' modificat correctament",
+                    ok: "Els documents s'han modificat correctament",
                 },
                 definitive: {
                     label: "Convertir a definitiu",
@@ -697,17 +711,17 @@ const translationCa = {
             },
             alert: {
                 import: "Document importat",
-                delete: "Document esborrat",
-                firma: "Document firmat",
-                original: "Aquest document contenia signatures invàlides i s'ha clonat i signat al servidor per poder desar-lo a l'Arxiu Digital. Es pot descarregar l'original des del menú d'accions",
-                custodiar: "Document signat del portafirmes pendent de custodiar",
+                delete: "Document esborrany",
+                firma: "Document signat",
+                original: "Aquest document contenia signatures invàlides i s'ha clonat i signat en servidor per poder guardar-lo a l'Arxiu Digital. Es pot descarregar l'original des del menú d'accions",
+                custodiar: "Pendent de custodiar document signat de portafirmes",
                 moure: "El document de l'anotació està pendent de moure a la sèrie documental del procediment",
                 definitiu: "Document definitiu",
-                firmaPendent: "Pendent de firmar",
-                firmaParcial: "Firmat parcialment",
-                errorPortafirmes: "Error a l'enviar al portafirmes",
-                funcionariHabilitatDigitalib: "Cal ser un funcionari habilitat a DIGITALIB",
-                folder: "En cas de no seleccionar una carpeta, s'importaran els documents directament a l'expedient.",
+                firmaPendent: "Pendent de signar",
+                firmaParcial: "Signat parcialment",
+                errorPortafirmes: "Error en enviar al portafirmes",
+                funcionariHabilitatDigitalib: "És necessari ser un funcionari habilitat a DIGITALIB",
+                folder: "En cas de no seleccionar una carpeta s'importaran els documents directament a l'expedient.",
                 scaned: "El procés d'escaneig s'ha realitzat amb èxit.",
             },
             versio: {
@@ -717,29 +731,40 @@ const translationCa = {
             },
         },
         carpeta: {
-            title: 'Carpeta',
+            title: "Carpeta",
             action: {
                 new: {
                     label: "Carpeta...",
-                    ok: "Carpeta '{{carpeta}}' creada correctament",
+                    ok: "Carpeta '{{data.nom}}' creada correctament",
                 },
                 update: {
                     label: "Modificar...",
                     title: "Modificar carpeta",
-                    ok: "Carpeta '{{carpeta}}' modificada correctament",
+                    ok: "Carpeta '{{data.nom}}' modificada correctament",
                 },
                 delete: {
                     label: "Esborrar...",
-                    check: "Esteu segur que voleu continuar amb aquesta acció?",
-                    description: "Un cop esborrat no es podrà recuperar",
-                    ok: "Element esborrat",
+                    check: "Està segur que vol continuar amb aquesta acció?",
+                    description: "Un cop esborrada no es podrà recuperar",
+                    ok: "Carpeta '{{data.nom}}' eliminada correctament",
                 }
             }
         },
         dada: {
-            title: "valor per al dada '{{metaDada}}'",
+            title: "valor per a la dada '{{metaDada}}'",
             grid: {
                 valor: "Valor de la dada",
+            },
+            action: {
+                new: {
+                    ok: "La dada {{data.valor}} s'ha creat correctament",
+                },
+                update: {
+                    ok: "La dada {{data.valor}} s'ha modificat correctament",
+                },
+                delete: {
+                    ok: "La dada {{data.valor}} s'ha eliminat correctament",
+                },
             },
         },
         metaDada: {
@@ -813,16 +838,19 @@ const translationCa = {
                 createdDate: "Enviada el",
                 processatData: "Finalitzada el",
                 tipus: "Tipus",
-                entregaPostal: "Entrega postal",
-                fitxerNom: "Nom del fitxer",
+                entregaPostal: "Lliurament postal",
+                fitxerNom: "Nom de l'arxiu",
                 serveiTipusEnum: "Tipus de servei",
                 notificacioIdentificador: "Identificador",
-                estatError: "Error en processar la notificació dins de Notib",
+                estatError: "Error processant la notificació dins de Notib",
             },
             action: {
+                update: {
+                    ok: "La remesa {{data.assumpte}} s'ha modificat correctament",
+                },
                 actualitzarEstat: {
                     label: "Actualitzar estat",
-                    ok: "L'estat ha estat actualitzat",
+                    ok: "L'estat s'ha actualitzat correctament",
                 },
                 notificacioInteressat: {
                     label: "Enviaments",
@@ -873,20 +901,22 @@ const translationCa = {
             },
         },
         publicacio: {
+            title: "Publicació",
             detall: {
                 title: "Detall de la publicació",
                 document: "Document",
-                enviatData: "'Data d'enviament'",
+                enviatData: "Data d'enviament",
                 estat: "Estat",
                 tipus: "Tipus",
                 assumpte: "Assumpte",
                 observacions: "Observacions",
             },
             action: {
-                update: "Modificar publicació",
+                update: {
+                    ok: "La publicació {{data.assumpte}} s'ha modificat correctament",
+                },
                 delete: {
-                    title: "Esborrar publicació",
-                    message: "Un cop esborrada la publicació no es podrà recuperar",
+                    ok: "La publicació {{data.assumpte}} s'ha eliminat correctament",
                 }
             },
         },

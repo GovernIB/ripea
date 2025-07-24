@@ -53,13 +53,13 @@ const RemesaGridForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField xs={12} name="tipus"/>
         <GridFormField xs={12} name="estat" disabled readOnly/>
-        <GridFormField xs={12} name="interessats" multiple/>
+        {/*<GridFormField xs={12} name="interessats" multiple/>*/}
         <GridFormField xs={12} name="assumpte"/>
         <GridFormField xs={12} name="serveiTipusEnum"/>
         <GridFormField xs={12} name="observacions"/>
         <GridFormField xs={12} name="dataProgramada" type={'date'}/>
 
-        <GridFormField xs={12} name="caducitatDiesNaturals"/>
+        {/*<GridFormField xs={12} name="caducitatDiesNaturals"/>*/}
         <GridFormField xs={12} name="dataCaducitat" type={'date'}/>
 
         <GridFormField xs={12} name="retard"/>
@@ -105,6 +105,7 @@ const columns = [
 
 const RemesaGrid = (props:any) => {
     const { id, onRowCountChange } = props;
+    const { t } = useTranslation()
 
     const apiRef = useMuiDataGridApiRef()
     const refresh = () => {
@@ -116,6 +117,7 @@ const RemesaGrid = (props:any) => {
     return <GridPage>
         <StyledMuiGrid
             resourceName="documentNotificacioResource"
+            popupEditFormDialogResourceTitle={t('page.notificacio.title')}
             popupEditActive
             popupEditFormContent={<RemesaGridForm/>}
             filter={builder.eq('expedient.id', id)}
@@ -128,6 +130,10 @@ const RemesaGrid = (props:any) => {
             onRowCountChange={onRowCountChange}
             disableColumnSorting
             toolbarHideCreate
+
+            popupEditFormI18nKeys={{
+                updateSuccess: 'page.notificacio.action.update.ok',
+            }}
         />
         {components}
     </GridPage>

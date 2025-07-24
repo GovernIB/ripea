@@ -210,6 +210,10 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
                     />,
                 },
             ]}
+            popupEditFormI18nKeys={{
+                createSuccess: 'page.interessat.action.new.ok',
+                updateSuccess: 'page.interessat.action.update.ok',
+            }}
         />
 
         {contentImport}

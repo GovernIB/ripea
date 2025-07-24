@@ -52,9 +52,9 @@ export const useActions = (refresh?: () => void) => {
             .then((value: any) => {
                 if (value) {
                     apiAction(id, {code: 'DELETE_REPRESENTANT'})
-                        .then(()=>{
+                        .then((data:any)=>{
                             refresh?.()
-                            temporalMessageShow(null, t('page.interessat.action.deleteRep.ok'), 'success');
+                            temporalMessageShow(null, t('page.interessat.action.deleteRep.ok',{data}), 'success');
                         })
                         .catch((error) => {
                             error?.message && temporalMessageShow(null, error?.message, 'error');
@@ -71,9 +71,9 @@ export const useActions = (refresh?: () => void) => {
             .then((value: any) => {
                 if (value) {
                     apiAction(id, {code: 'DELETE_INTERESSAT'})
-                        .then(() => {
+                        .then((data:any) => {
                             refresh?.();
-                            temporalMessageShow(null, t('page.interessat.action.delete.ok'), 'success');
+                            temporalMessageShow(null, t('page.interessat.action.delete.ok',{data}), 'success');
                         })
                         .catch((error) => {
                             error?.message && temporalMessageShow(null, error?.message, 'error');

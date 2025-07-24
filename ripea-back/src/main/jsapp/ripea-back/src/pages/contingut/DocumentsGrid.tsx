@@ -300,6 +300,11 @@ const DocumentsGrid = (props: any) => {
                     rowHideDeleteButton={hiddenDelete}
 
                     popupEditFormComponentProps={{ initOnChangeRequest: true }}
+                    popupEditFormI18nKeys={{
+                        createSuccess: 'page.document.action.new.ok',
+                        updateSuccess: 'page.document.action.update.ok',
+                        deleteSuccess: 'page.document.action.delete.ok',
+                    }}
                 />
                 {components}
                 {massiveComponents}

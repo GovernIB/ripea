@@ -33,9 +33,9 @@ const useCrear = (entity:any, refresh?: () => void) => {
             expedient: {id: entity?.id},
             expedientRelacionat: {id: entity?.id},
         })
-            .then((result:any) => {
+            .then((data:any) => {
                 refresh?.()
-                temporalMessageShow(null, t('page.carpeta.action.new.ok', {carpeta: result?.nom}), 'success');
+                temporalMessageShow(null, t('page.carpeta.action.new.ok', {data}), 'success');
             })
             .catch((error:any) => {
                 error?.message && temporalMessageShow(null, error?.message, 'error');
