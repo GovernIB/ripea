@@ -15,7 +15,10 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
+import javax.validation.groups.Default;
 
+import es.caib.ripea.service.intf.base.model.*;
+import es.caib.ripea.service.resourcehelper.InteressatResourceHelper;
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 
@@ -51,10 +54,6 @@ import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerV
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
 import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
 import es.caib.ripea.service.intf.base.exception.ResourceNotFoundException;
-import es.caib.ripea.service.intf.base.model.DownloadableFile;
-import es.caib.ripea.service.intf.base.model.FieldOption;
-import es.caib.ripea.service.intf.base.model.FileReference;
-import es.caib.ripea.service.intf.base.model.ReportFileType;
 import es.caib.ripea.service.intf.dto.ComunitatDto;
 import es.caib.ripea.service.intf.dto.InteressatAdministracioDto;
 import es.caib.ripea.service.intf.dto.InteressatDocumentTipusEnumDto;
@@ -76,6 +75,7 @@ import es.caib.ripea.service.intf.resourceservice.InteressatResourceService;
 import es.caib.ripea.service.intf.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.*;
 
 /**
  * Implementació del servei de gestió d'expedients.
@@ -89,6 +89,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
 
 	private final UnitatOrganitzativaHelper unitatOrganitzativaHelper;
     private final ExpedientInteressatHelper expedientInteressatHelper;
+    private final InteressatResourceHelper interessatResourceHelper;
     private final EntityComprovarHelper entityComprovarHelper;
     private final ExcepcioLogHelper excepcioLogHelper;
     private final ConfigHelper configHelper;
@@ -99,6 +100,8 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
     private final EntitatRepository entitatRepository;
     private final InteressatRepository interessatRepository;
     private final InteressatResourceRepository interessatResourceRepository;
+
+    private final SmartValidator validator;
 
     @PostConstruct
     public void init() {
@@ -698,72 +701,81 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
 
     private class ImportarInteressatsActionExecutor implements ActionExecutor<InteressatResourceEntity, InteressatResource.ImportarInteressatsFormAction, Serializable> {
 
+        private Map<String, String> validate(InteressatResource interessatResource) {
+            DataBinder dataBinder = new DataBinder(interessatResource);
+            BindingResult bindingResult = dataBinder.getBindingResult();
+
+            validator.validate(
+                    interessatResource,
+                    bindingResult,
+                    0,
+                    Resource.OnCreate.class,
+                    Default.class);
+
+            return bindingResult.getFieldErrors().stream()
+                    .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
+        }
+
         @Override
         public void onChange(Serializable id, InteressatResource.ImportarInteressatsFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, InteressatResource.ImportarInteressatsFormAction target) {
-            
-        	List<InteressatDto> listaInteressatsFitxer = new ArrayList<InteressatDto>();
-        	
-        	try {
-                    
-                if (InteressatResource.ImportarInteressatsFormAction.Fields.fitxerJsonInteressats.equals(fieldName)) {
-                	
-                	if (fieldValue!=null) { 
-                		
-                    	if (previous.getTipusImportacio().equals(InteressatImportacioTipusDto.JSON)) {
-                    	
-                            ObjectMapper objectMapper = new ObjectMapper();
-                            objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+            if (InteressatResource.ImportarInteressatsFormAction.Fields.fitxerJsonInteressats.equals(fieldName)) {
+                List<InteressatResource> listaInteressatsFitxer = new ArrayList<InteressatResource>();
+                if (fieldValue!=null) {
+                    if (previous.getTipusImportacio().equals(InteressatImportacioTipusDto.JSON)) {
+                        ObjectMapper objectMapper = new ObjectMapper();
+                        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+                        try {
                             listaInteressatsFitxer = objectMapper.readValue(
                                     ((FileReference)fieldValue).getContent(),
-                                    new TypeReference<List<InteressatDto>>() {});
-                        } else {
-                        	InputStream excelStream = new ByteArrayInputStream(((FileReference)fieldValue).getContent());
-                        	listaInteressatsFitxer = expedientInteressatHelper.extreureInteressatsExcel(
-                        			excelStream,
-                        			previous.getExpedient().getId(),
-                        			false);
+                                    new TypeReference<List<InteressatResource>>() {});
+                        } catch (Exception e) {
+                            excepcioLogHelper.addExcepcio("/expedient/interessats/ImportarInteressatsActionExecutor/"+previous.getTipusImportacio()+".onChange", e);
                         }
-                    	
-                        //Abans de retornar la llista de interessats, comprovam si existeixen al expedient actual
-                        //En cas de no tenir-lo, afegim ID: Uncaught Error: MUI X: The Data Grid component requires all rows to have a unique `id` property.
-                        if (!listaInteressatsFitxer.isEmpty()) {
-                            //Només fem la consulta en cas necessari
-                            List<InteressatEntity> interessatsExpActual = interessatRepository.findByExpedientId(previous.getExpedient().getId());
-                            Long idAssignat = 1l;
-                            for (InteressatDto interessatDto: listaInteressatsFitxer) {
-                                if (interessatsExpActual!=null) {
-                                    for (InteressatEntity interessatExp: interessatsExpActual) {
-                                        if (interessatExp.getDocumentNum().equalsIgnoreCase(interessatDto.getDocumentNum())) {
-                                            interessatDto.setJaExistentExpedient(true);
-                                            break;
-                                        }
+                    } else {
+                        InputStream excelStream = new ByteArrayInputStream(((FileReference)fieldValue).getContent());
+                        listaInteressatsFitxer = interessatResourceHelper.extreureInteressatsExcel(excelStream);
+                    }
+
+                    //Abans de retornar la llista de interessats, comprovam si existeixen al expedient actual
+                    //En cas de no tenir-lo, afegim ID: Uncaught Error: MUI X: The Data Grid component requires all rows to have a unique `id` property.
+                    if (!listaInteressatsFitxer.isEmpty()) {
+                        //Només fem la consulta en cas necessari
+                        List<InteressatEntity> interessatsExpActual = interessatRepository.findByExpedientId(previous.getExpedient().getId());
+                        Long idAssignat = 1l;
+                        for (InteressatResource interessatResource: listaInteressatsFitxer) {
+                            if (interessatsExpActual!=null) {
+                                for (InteressatEntity interessatExp: interessatsExpActual) {
+                                    if (interessatExp.getDocumentNum().equalsIgnoreCase(interessatResource.getDocumentNum())) {
+                                        interessatResource.setJaExistentExpedient(true);
+                                        break;
                                     }
                                 }
-                                if (interessatDto.getId()==null) { interessatDto.setId(idAssignat++); }
-                                //TODO: interessatDto.validarInteressatDto()
                             }
+                            if (interessatResource.getId()==null) { interessatResource.setId(idAssignat++); }
+                            //TODO: interessatDto.validarInteressatDto()
+                            interessatResource.setExpedient(previous.getExpedient());
+                            interessatResource.setErrors(validate(interessatResource));
                         }
-                	}
+                    }
                 }
-                
-            } catch (Exception e) {
-                excepcioLogHelper.addExcepcio("/expedient/interessats/ImportarInteressatsActionExecutor/"+previous.getTipusImportacio()+".onChange", e);
+                target.setInteressatsFitxer(listaInteressatsFitxer);
             }
-        	
-        	target.setInteressatsFitxer(listaInteressatsFitxer);
         }
 
         @Override
         public Serializable exec(String code, InteressatResourceEntity entity, InteressatResource.ImportarInteressatsFormAction params) throws ActionExecutionException {
             try {
                 String rolActual = configHelper.getRolActual();
-                String entitatActual = configHelper.getEntitatActualCodi();
-                EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatActual, false, false, false, true, false);
-                expedientInteressatHelper.importarInteressats(
-                        entitatEntity.getId(),
+
+                interessatResourceHelper.importarInteressats(
                         params.getExpedient().getId(),
                         rolActual,
-                        params.getInteressatsPerImportar());
+                        params.getInteressatsPerImportar().stream()
+                                .peek(i-> i.setErrors(validate(i)))
+                                .filter(i->i.getErrors().isEmpty())
+                                .collect(Collectors.toList())
+                );
             } catch (Exception e) {
                 excepcioLogHelper.addExcepcio("/expedient/"+params.getExpedient().getId()+"/ImportarInteressatsActionExecutor", e);
                 String message = messageHelper.getMessage("message.common.action.error")+": "+e.getMessage();

@@ -26,6 +26,7 @@ const ImportForm = () => {
                 {params?.row?.documentNum}
                 {params?.row?.jaExistentExpedient &&
                     <Icon color={"warning"} title={t('page.interessat.alert.jaExistentExpedient')}>warning</Icon>}
+                {Object.values(params?.row?.errors)?.map?.((value:any) => <Icon title={value} color={'error'}>error</Icon>)}
             </>
         },
         {
@@ -58,7 +59,7 @@ const ImportForm = () => {
                 onRowSelectionModelChange={(newSelection) => {
                     setSelectedRows([...newSelection]);
                 }}
-                // isRowSelectable={(params: any) => !params?.row?.jaExistentExpedient}
+                isRowSelectable={(params: any) => Object.keys(params?.row?.errors)?.length == 0}
 
                 style={{
                     maxHeight: 162 + 52 * 4,
