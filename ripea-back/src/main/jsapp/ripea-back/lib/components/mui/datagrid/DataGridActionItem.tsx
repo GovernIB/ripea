@@ -22,6 +22,7 @@ export type DataGridActionItemOnClickFn = (id: any, row: any, event: React.Mouse
 export const toDataGridActionItem = (
     id: any,
     label: string,
+    title?: string,
     row?: any,
     icon?: string,
     linkTo?: string,
@@ -32,7 +33,7 @@ export const toDataGridActionItem = (
     return <DataGridActionItem
         id={id}
         label={label}
-        title={undefined}
+        title={title}
         row={row}
         icon={icon}
         linkTo={linkTo}
@@ -63,7 +64,7 @@ const DataGridActionItem: React.FC<DataGridActionItemProps> = (props) => {
     linkState && (additionalProps['state'] = linkState);
     return <GridActionsCellItem
         label={label}
-        title={!showInMenu ? (title ?? label) : undefined}
+        title={!showInMenu ? label : title}
         icon={icon ? <Icon>{icon}</Icon> : undefined}
         onClick={event => {
             onClickCustom ? onClickCustom?.(id, row, event) : onClick(event);

@@ -15,6 +15,7 @@ export type DataCommonFindArgs = ResourceApiFindCommonArgs;
 
 export type DataCommonAdditionalAction = {
     label?: string;
+    title?: string;
     icon?: string;
     showInMenu?: boolean | ((row: any) => boolean);
     disabled?: boolean | ((row: any) => boolean);
