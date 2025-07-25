@@ -673,6 +673,18 @@ const useAccionesMassivas = () => {
                     onClick: handleOpen,
                 },
             ],
+        },
+        {
+            divider: true,
+        },
+        {
+            id: 'recargar',
+            title: t('page.user.menu.backVersio'),
+            icon: 'fast_rewind',
+            onClick: () => {
+                const url = window.location.href.replace('/reactapp', '');
+                window.location.replace(url);
+            },
         }
     ]
     const content = <>

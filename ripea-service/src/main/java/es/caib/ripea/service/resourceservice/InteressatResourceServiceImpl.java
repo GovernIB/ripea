@@ -17,10 +17,12 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.validation.groups.Default;
 
-import es.caib.ripea.service.intf.base.model.*;
-import es.caib.ripea.service.resourcehelper.InteressatResourceHelper;
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.DataBinder;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.SmartValidator;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -42,7 +44,6 @@ import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.base.springfilter.FilterSpecification;
 import es.caib.ripea.service.helper.CacheHelper;
 import es.caib.ripea.service.helper.ConfigHelper;
-import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
 import es.caib.ripea.service.helper.ExpedientInteressatHelper;
 import es.caib.ripea.service.helper.MessageHelper;
@@ -54,6 +55,11 @@ import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerV
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
 import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
 import es.caib.ripea.service.intf.base.exception.ResourceNotFoundException;
+import es.caib.ripea.service.intf.base.model.DownloadableFile;
+import es.caib.ripea.service.intf.base.model.FieldOption;
+import es.caib.ripea.service.intf.base.model.FileReference;
+import es.caib.ripea.service.intf.base.model.ReportFileType;
+import es.caib.ripea.service.intf.base.model.Resource;
 import es.caib.ripea.service.intf.dto.ComunitatDto;
 import es.caib.ripea.service.intf.dto.InteressatAdministracioDto;
 import es.caib.ripea.service.intf.dto.InteressatDocumentTipusEnumDto;
@@ -73,9 +79,9 @@ import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.model.InteressatResource.UnitatOrganitzativaFormFilter;
 import es.caib.ripea.service.intf.resourceservice.InteressatResourceService;
 import es.caib.ripea.service.intf.utils.Utils;
+import es.caib.ripea.service.resourcehelper.InteressatResourceHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.validation.*;
 
 /**
  * Implementació del servei de gestió d'expedients.
@@ -90,7 +96,6 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
 	private final UnitatOrganitzativaHelper unitatOrganitzativaHelper;
     private final ExpedientInteressatHelper expedientInteressatHelper;
     private final InteressatResourceHelper interessatResourceHelper;
-    private final EntityComprovarHelper entityComprovarHelper;
     private final ExcepcioLogHelper excepcioLogHelper;
     private final ConfigHelper configHelper;
     private final PluginHelper pluginHelper;

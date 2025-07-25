@@ -256,7 +256,7 @@
 				<file>
                 	<exists>${basedir}/boot.profile</exists>
             	</file>
-			</activation>			
+			</activation>
 			<dependencies>
 				<dependency>
 					<groupId>${project.groupId}</groupId>
@@ -379,6 +379,11 @@
 		</profile>
 		<profile>
 			<id>front</id>
+			<activation>
+				<file>
+                	<missing>${basedir}/nofront.profile</missing>
+            	</file>
+			</activation>			
 			<build>
 				<plugins>
 					<plugin>

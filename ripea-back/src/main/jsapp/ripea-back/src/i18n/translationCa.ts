@@ -7,7 +7,7 @@ const translationCa = {
         delete: "Esborrar",
         action: "Acció",
         expand: "Expandir",
-        contract: "Contraure",
+        contract: "Contreure",
         download: "Descarregar",
         detail: "Detall",
         refresh: "Refrescar",
@@ -941,6 +941,7 @@ const translationCa = {
                 segonPla: "Reiniciar tasques en segon pla",
                 plugins: "Reiniciar connectors",
                 avisos: "Avisos",
+                backVersio: "Recarregar amb el disseny antic",
 
                 anotacions: "Anotacions",
                 procediments: "Procediments",

@@ -941,6 +941,7 @@ const translationEs = {
                 segonPla: "Reiniciar tareas en segundo plano",
                 plugins: "Reiniciar plugins",
                 avisos: "Avisos",
+                backVersio: "Recargar con el diseño antiguo",
 
                 anotacions: "Anotaciones",
                 procediments: "Procedimientos",

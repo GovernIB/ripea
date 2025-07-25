@@ -44,7 +44,7 @@ public class RipeaController {
 			if (entitat == null)
 				throw new SecurityException("No te cap entitat assignada");
 			if (RolHelper.isRolActualAdministrador(request) || RolHelper.isRolActualAdministradorOrgan(request) || RolHelper.isRolActualUsuari(request)) {
-				return "redirect:expedient";
+				return "redirect:reactapp/expedient";
 			} else if (RolHelper.isRolActualRevisor(request)) {
 				return "redirect:metaExpedientRevisio";
 			} else {

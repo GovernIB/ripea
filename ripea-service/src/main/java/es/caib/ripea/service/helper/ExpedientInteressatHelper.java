@@ -401,11 +401,17 @@ public class ExpedientInteressatHelper {
 			interessatRepository.delete(deproxied);
 			interessatRepresentantEntity = InteressatEntity.getBuilder(interessatRepresentant, expedient, representant).build();
 			interessatRepresentantEntity = interessatRepository.save(interessatRepresentantEntity);
-			// Afegim el nou interessat a totes les representacions
-			if (interessatsAQuiRepresenta != null && !interessatsAQuiRepresenta.isEmpty()) {
-				for (InteressatEntity inter : interessatsAQuiRepresenta) {
-					inter.updateRepresentant(interessatRepresentantEntity);
+			
+			//Si han canviat el tipus a adminitració, no pot tenir representant ni pot representar a ningú
+			if (!InteressatTipusEnumDto.ADMINISTRACIO.equals(interessatRepresentantEntity.getTipus())) {
+				// Afegim el nou interessat a totes les representacions
+				if (interessatsAQuiRepresenta != null && !interessatsAQuiRepresenta.isEmpty()) {
+					for (InteressatEntity inter : interessatsAQuiRepresenta) {
+						inter.updateRepresentant(interessatRepresentantEntity);
+					}
 				}
+			} else {
+				interessatRepresentantEntity.setRepresentant(null);
 			}
 		}
 
