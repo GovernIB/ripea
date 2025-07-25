@@ -10,13 +10,6 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import es.caib.ripea.service.intf.base.model.Resource;
-import es.caib.ripea.service.intf.dto.*;
-import es.caib.ripea.service.intf.resourcevalidation.AdjuntValid;
-import es.caib.ripea.service.intf.resourcevalidation.DocPinbalValid;
-import es.caib.ripea.service.intf.resourcevalidation.EnviarPortafirmesValid;
-import es.caib.ripea.service.intf.utils.Utils;
-
 import org.springframework.data.annotation.Transient;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -25,8 +18,42 @@ import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceField;
 import es.caib.ripea.service.intf.base.model.FileReference;
+import es.caib.ripea.service.intf.base.model.Resource;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
+import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
+import es.caib.ripea.service.intf.dto.ArxiuEstatEnumDto;
+import es.caib.ripea.service.intf.dto.ArxiuFirmaDto;
+import es.caib.ripea.service.intf.dto.DocumentDto;
+import es.caib.ripea.service.intf.dto.DocumentEnviamentEstatEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentFirmaTipusEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentNotificacioEstatEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentNotificacioTipusEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentNtiEstadoElaboracionEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentNtiTipoFirmaEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentPublicacioTipusEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentTipusFirmaEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentVersioDto;
+import es.caib.ripea.service.intf.dto.MetaDocumentDto;
+import es.caib.ripea.service.intf.dto.MetaDocumentFirmaFluxTipusEnumDto;
+import es.caib.ripea.service.intf.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
+import es.caib.ripea.service.intf.dto.NtiOrigenEnumDto;
+import es.caib.ripea.service.intf.dto.PinbalConsentimentEnumDto;
+import es.caib.ripea.service.intf.dto.PortafirmesFluxRespostaDto;
+import es.caib.ripea.service.intf.dto.PortafirmesPrioritatEnumDto;
+import es.caib.ripea.service.intf.dto.ServeiTipusEnumDto;
+import es.caib.ripea.service.intf.dto.SexeEnumDto;
+import es.caib.ripea.service.intf.dto.SiNoEnumDto;
+import es.caib.ripea.service.intf.dto.TipusPassaportEnumDto;
+import es.caib.ripea.service.intf.dto.VersioDocumentEnum;
+import es.caib.ripea.service.intf.dto.ViaFirmaTipusDestinatariEnum;
+import es.caib.ripea.service.intf.resourcevalidation.AdjuntValid;
+import es.caib.ripea.service.intf.resourcevalidation.DocPinbalValid;
+import es.caib.ripea.service.intf.resourcevalidation.EnviarPortafirmesValid;
+import es.caib.ripea.service.intf.resourcevalidation.ViaFirmaValid;
+import es.caib.ripea.service.intf.utils.Utils;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -323,12 +350,14 @@ public class DocumentResource extends NodeResource {
     @Getter
     @Setter
     @FieldNameConstants
+    @ViaFirmaValid
     public static class ViaFirmaForm implements Serializable {
     	@Size(max=256)
     	private String titol;
     	@Size(max=256)
     	private String descripcio;
     	@NotNull
+    	private ViaFirmaTipusDestinatariEnum tipusDestinatari = ViaFirmaTipusDestinatariEnum.TABLET;
         @Transient
         @ResourceField(enumType = true, onChangeActive = true)
     	private String codiUsuariViaFirma;
@@ -342,6 +371,7 @@ public class DocumentResource extends NodeResource {
     	private String signantNif;
     	@NotNull
     	private String signantNom;
+    	private String signantEmail;
     	@Size(max=256)
     	private String observacions;
     	private Boolean firmaParcial;

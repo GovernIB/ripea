@@ -119,15 +119,15 @@ const ExpedientAlert = (props:any) => {
     const {handleOpen: hanldeErrorValidacio, dialog: dialogErrorValidacio} = useErrorValidacio();
 
     return <>
-        {expedient?.agafatPer?.id != user?.codi && !expedient?.potModificar &&
+        {expedient?.agafatPer?.id != user?.codi &&
             <Alert severity="info"
                    action={
                        <IconButton sx={{py:0}} onClick={()=>agafar(expedient?.id, expedient)} color={"inherit"}>
                            <Icon>lock</Icon>
-                           <Typography variant={"subtitle2"}>{t('page.expedient.action.agafar.label')}</Typography>
+						   <Typography variant={"subtitle2"}>{t('page.expedient.action.agafar.label')}</Typography>
                        </IconButton>
                    }
-            >{t('page.expedient.alert.owner')}</Alert>
+            >{user?.rolActual != 'IPA_ADMIN' && t('page.expedient.alert.owner')}</Alert>
         }
         { expedient?.estat == "OBERT" && expedient?.hasEsborranys && user?.sessionScope?.isConvertirDefinitiuActiu &&
             <Alert severity="info">{t('page.expedient.alert.esborranys')}</Alert>

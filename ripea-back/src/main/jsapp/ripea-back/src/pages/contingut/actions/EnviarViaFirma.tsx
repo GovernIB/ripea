@@ -19,13 +19,15 @@ const EnviarViaFirmaForm = () => {
         <Grid item xs={12} ><Typography sx={{ borderBottom: '1px solid gray' }}>{t('page.document.detall.dataBasic')}</Typography></Grid>
         <GridFormField xs={12} name="titol"/>
         <GridFormField xs={12} name="descripcio"/>
-        <GridFormField xs={12} name="codiUsuariViaFirma" required/>
+        <GridFormField xs={12} name="tipusDestinatari"/>
+        <GridFormField xs={12} name="codiUsuariViaFirma" hidden={data?.tipusDestinatari == 'EMAIL'}/>
         <GridFormField xs={12} name="viaFirmaDispositiuCodi" hidden={!data?.isDispositiusEnabled}/>
 
         <Grid item xs={12} ><Typography sx={{ borderBottom: '1px solid gray' }}>{t('page.document.detall.dataInteressat')}</Typography></Grid>
         <GridFormField xs={12} name="interessat" filter={interessatFilter}/>
         <GridFormField xs={6} name="signantNif"/>
-        <GridFormField xs={6} name="signantNom"/>
+        <GridFormField xs={6} name="signantNom"     hidden={data?.tipusDestinatari == 'EMAIL'}/>
+        <GridFormField xs={6} name="signantEmail"   hidden={data?.tipusDestinatari != 'EMAIL'}/>
 
         <Grid item xs={12} ><Typography sx={{ borderBottom: '1px solid gray' }}>{t('page.document.detall.dataOther')}</Typography></Grid>
         <GridFormField xs={4} name="firmaParcial"/>

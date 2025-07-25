@@ -921,6 +921,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 					InteressatResourceEntity intRes = interessatResourceRepository.findById(interessatId).get();
 					target.setSignantNom(intRes.getNomComplet()); 
 					target.setSignantNif(intRes.getDocumentNum());
+					target.setSignantEmail(intRes.getEmail());
 				}
 			}
 		}
@@ -932,6 +933,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 				ViaFirmaEnviarDto viaFirmaEnviarDto = new ViaFirmaEnviarDto();
 				viaFirmaEnviarDto.setTitol(params.getTitol());
 				viaFirmaEnviarDto.setDescripcio(params.getDescripcio());
+				viaFirmaEnviarDto.setTipusDestinatari(params.getTipusDestinatari());
+				viaFirmaEnviarDto.setSignantEmail(params.getSignantEmail());
 				viaFirmaEnviarDto.setCodiUsuariViaFirma(params.getCodiUsuariViaFirma());
 				viaFirmaEnviarDto.setViaFirmaDispositiuCodi(params.getViaFirmaDispositiuCodi());
 				viaFirmaEnviarDto.setSignantNif(params.getSignantNif());
@@ -945,7 +948,11 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 				return objectMappingHelper.newInstanceMap(entity, DocumentResource.class);
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/document/"+entity.getId()+"/ViaFirmaActionExecutor", e);
-				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, messageHelper.getMessage("document.viaFirma.reject", new Object[]{e.getMessage()}));
+				throw new ActionExecutionException(
+						getResourceClass(),
+						entity.getId(),
+						code,
+						messageHelper.getMessage("document.viaFirma.reject", new Object[]{e.getMessage()}));
 			}
 		}
     }

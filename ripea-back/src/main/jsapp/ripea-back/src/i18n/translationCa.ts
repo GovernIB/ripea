@@ -67,6 +67,10 @@ const translationCa = {
             TF08: "ODT",
             TF09: "OOXML",
         },
+        tipusDestinatari: {
+            TABLET: "Tablet",
+            EMAIL: "Email",
+        }
     },
     page: {
         comment: {
@@ -621,7 +625,7 @@ const translationCa = {
                     ok: "S'ha creat el document a partir de la consulta pinbal '{{codiServeiPinbal}}'",
                 },
                 import: {
-                    label: "Importar documents...",
+                    label: "Importar documents SGD...",
                     title: "Importació de documents des del SGD",
                     ok: "Documents importats correctament",
                 },

@@ -156,30 +156,30 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
 
     const createDocumentActions = [
         {
-            title: t('page.document.title')+"...",
+            label: t('page.document.title')+"...",
             icon: "description",
             onClick: () => apiRef?.current?.showCreateDialog?.(),
         },
         {
-            title: t('page.document.action.pinbal.label'),
+            label: t('page.document.action.pinbal.label'),
             icon: "description",
             onClick: handleDocPinbal,
             disabled: !entity?.ambDocumentsPinbal,
         },
         {
-            title: t('page.carpeta.action.new.label'),
+            label: t('page.carpeta.action.new.label'),
             icon: "folder",
             onClick: handleCrearCarpeta,
             disabled: !user?.sessionScope?.isCreacioCarpetesActiva,
         },
         {
-            title: t('page.document.action.import.label'),
+            label: t('page.document.action.import.label'),
             icon: "upload_file",
             onClick: handleImportar,
             disabled: !user?.sessionScope?.isMostrarImportacio,
         },
         {
-            title: t('page.contingut.action.importarExpedient.label'),
+            label: t('page.contingut.action.importarExpedient.label'),
             icon: "link",
             onClick: handleImportarExpedient,
             hidden: !user?.sessionScope?.isImportacioRelacionatsActiva,

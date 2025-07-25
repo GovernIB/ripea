@@ -67,6 +67,10 @@ const translationEn = {
             TF08: "ODT",
             TF09: "OOXML",
         },
+        tipusDestinatari: {
+            TABLET: "Tablet",
+            EMAIL: "Email",
+        }        
     },
     page: {
         comment: {
@@ -621,7 +625,7 @@ const translationEn = {
                     ok: "Document created from PINBAL query '{{codiServeiPinbal}}'",
                 },
                 import: {
-                    label: "Import documents...",
+                    label: "Import documents from SGD...",
                     title: "Import documents from SGD",
                     ok: "Documents imported successfully",
                 },
