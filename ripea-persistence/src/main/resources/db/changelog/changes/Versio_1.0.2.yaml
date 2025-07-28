@@ -5,21 +5,21 @@ databaseChangeLog:
     changes:
       - sqlFile:
           dbms: oracle
-          path: scripts/oracle/Versio_1.0.2_DDL.sql
+          path: ../scripts/oracle/Versio_1.0.2_DDL.sql
           splitStatements: true
           relativeToChangelogFile: true
       - sqlFile:
           dbms: oracle
-          path: scripts/oracle/Versio_1.0.2_DML.sql
+          path: ../scripts/oracle/Versio_1.0.2_DML.sql
           splitStatements: true
           relativeToChangelogFile: true
       - sqlFile:
           dbms: postgresql
-          path: scripts/postgres/Versio_1.0.2_DDL.sql
+          path: ../scripts/postgres/Versio_1.0.2_DDL.sql
           splitStatements: true
           relativeToChangelogFile: true
       - sqlFile:
           dbms: postgresql
-          path: scripts/postgres/Versio_1.0.2_DML.sql
+          path: ../scripts/postgres/Versio_1.0.2_DML.sql
           splitStatements: true
           relativeToChangelogFile: true
