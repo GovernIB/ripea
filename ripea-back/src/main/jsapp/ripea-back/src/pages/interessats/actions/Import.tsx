@@ -26,7 +26,9 @@ const ImportForm = () => {
                 {params?.row?.documentNum}
                 {params?.row?.jaExistentExpedient &&
                     <Icon color={"warning"} title={t('page.interessat.alert.jaExistentExpedient')}>warning</Icon>}
-                {Object.values(params?.row?.errors)?.map?.((value:any) => <Icon title={value} color={'error'}>error</Icon>)}
+                {Object.entries(params?.row?.errors)?.map(([key, value]) => (
+                    <Icon key={key} title={`${key}: ${value}`} color={'error'}>error</Icon>
+                ))}
             </>
         },
         {
@@ -39,7 +41,7 @@ const ImportForm = () => {
             field: 'representant',
             headerName: t('page.interessat.grid.representant'),
             flex: 0.75,
-            valueFormatter: (value: any) => value?.organNom ?? value?.nomComplet,
+            valueFormatter: (value: any) => value?.description,
         },
     ];
 
