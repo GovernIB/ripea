@@ -200,16 +200,19 @@ const rowActionsToGridActionsCellItems = (
         const rowActionLinkTo = (typeof rowAction.linkTo === 'function') ? rowAction.linkTo?.(params.row) : rowAction.linkTo?.replace('{{id}}', '' + params.id);
         const rowActionLinkState = (typeof rowAction.linkState === 'function') ? rowAction.linkState?.(params.row) : rowAction.linkState;
         const rowActionOnClick = getRowActionOnClick(rowAction, showCreateDialog, showUpdateDialog, triggerDelete);
+        const label = typeof rowAction.label === 'function' ? rowAction.label(params.row) : rowAction.label;
+        const title = typeof rowAction.title === 'function' ? rowAction.title(params.row) : rowAction.title;
+        const icon = typeof rowAction.icon === 'function' ? rowAction.icon(params.row) : rowAction.icon;
         const showInMenu = (typeof rowAction.showInMenu === 'function') ? rowAction.showInMenu(params.row) : rowAction.showInMenu;
         const disabled = forceDisabled || ((typeof rowAction.disabled === 'function') ? rowAction.disabled(params.row) : rowAction.disabled);
         const hidden = (typeof rowAction.hidden === 'function') ? rowAction.hidden(params.row) : rowAction.hidden;
         rowLinkShow && rowArtifactShow && !hidden && actions.push(
             toDataGridActionItem(
                 params.id,
-                rowAction.label ?? (rowLink != null ? rowLink?.title : rowAction),
-                rowAction.title,
+                label ?? (rowLink != null ? rowLink?.title : rowAction),
+                title,
+                icon,
                 params.row,
-                rowAction.icon,
                 rowActionLinkTo,
                 rowActionLinkState,
                 rowActionOnClick,

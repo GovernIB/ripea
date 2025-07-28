@@ -14,9 +14,9 @@ import DataFormDialog, { DataFormDialogApi } from './DataFormDialog';
 export type DataCommonFindArgs = ResourceApiFindCommonArgs;
 
 export type DataCommonAdditionalAction = {
-    label?: string;
-    title?: string;
-    icon?: string;
+    label?: string | ((row: any) => string);
+    title?: string | ((row: any) => string);
+    icon?: string | ((row: any) => string);
     showInMenu?: boolean | ((row: any) => boolean);
     disabled?: boolean | ((row: any) => boolean);
     hidden?: boolean | ((row: any) => boolean);

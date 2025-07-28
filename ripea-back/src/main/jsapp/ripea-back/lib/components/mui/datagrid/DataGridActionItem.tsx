@@ -5,10 +5,10 @@ import { useBaseAppContext } from '../../BaseAppContext';
 
 type DataGridActionItemProps = {
     id: any;
-    label?: string;
+    label: string;
     title?: string;
-    row?: any;
     icon?: string;
+    row?: any;
     linkTo?: string;
     linkState?: any;
     onClick?: any;
@@ -23,8 +23,8 @@ export const toDataGridActionItem = (
     id: any,
     label: string,
     title?: string,
-    row?: any,
     icon?: string,
+    row?: any,
     linkTo?: string,
     linkState?: any,
     onClick?: DataGridActionItemOnClickFn,
@@ -34,8 +34,8 @@ export const toDataGridActionItem = (
         id={id}
         label={label}
         title={title}
-        row={row}
         icon={icon}
+        row={row}
         linkTo={linkTo}
         linkState={linkState}
         onClickCustom={onClick}
@@ -48,8 +48,8 @@ const DataGridActionItem: React.FC<DataGridActionItemProps> = (props) => {
         id,
         label,
         title,
-        row,
         icon,
+        row,
         linkTo,
         linkState,
         onClick,
