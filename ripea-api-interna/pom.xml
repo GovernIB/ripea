@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>es.caib.ripea</groupId>
 		<artifactId>ripea</artifactId>
-		<version>1.0.1</version>
+		<version>1.0.2</version>
 	</parent>
 	<artifactId>ripea-api-interna</artifactId>
 	<packaging>war</packaging>
@@ -38,9 +38,7 @@
 		<profile>
 			<id>ide</id>
 			<activation>
-				<file>
-                	<exists>${basedir}/boot.profile</exists>
-            	</file>
+				<activeByDefault>false</activeByDefault>
 			</activation>
 			<dependencies>
 				<dependency>
@@ -81,9 +79,7 @@
 		<profile>
 			<id>jboss</id>
 			<activation>
-				<file>
-                	<missing>${basedir}/boot.profile</missing>
-            	</file>
+				<activeByDefault>true</activeByDefault>
 			</activation>
 			<dependencies>
 				<dependency>

@@ -1,0 +1,25 @@
+databaseChangeLog:
+- changeSet:
+    id: Versio_1.0.2
+    author: limit
+    changes:
+      - sqlFile:
+          dbms: oracle
+          path: scripts/oracle/Versio_1.0.2_DDL.sql
+          splitStatements: true
+          relativeToChangelogFile: true
+      - sqlFile:
+          dbms: oracle
+          path: scripts/oracle/Versio_1.0.2_DML.sql
+          splitStatements: true
+          relativeToChangelogFile: true
+      - sqlFile:
+          dbms: postgresql
+          path: scripts/postgres/Versio_1.0.2_DDL.sql
+          splitStatements: true
+          relativeToChangelogFile: true
+      - sqlFile:
+          dbms: postgresql
+          path: scripts/postgres/Versio_1.0.2_DML.sql
+          splitStatements: true
+          relativeToChangelogFile: true

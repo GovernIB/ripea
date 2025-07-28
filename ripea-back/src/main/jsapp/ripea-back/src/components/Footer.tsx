@@ -29,15 +29,39 @@ export const Footer: React.FC<AppFootProps> = (props) => {
     const [scmRevision, setScmRevision] = useState<string | null>(null);
     const [comandaVersion, setComandaVersion] = useState<string>(version ?? '');
 
-    useEffect(() => {
-        fetch('/build-info.json')
-            .then(response => response.json())
-            .then(data => {
-                setBuildTimestamp(data.buildTimestamp);
-                setScmRevision(data.scmRevision);
-                data.comandaVersion && setComandaVersion(data.comandaVersion);
-            });
-    }, []);
+	useEffect(() => {
+	    // Comprova si window.__MANIFEST__ ja està disponible
+	    if (window.__MANIFEST__) {
+	        setBuildTimestamp(window.__MANIFEST__["Build-Timestamp"]);
+	        setScmRevision(window.__MANIFEST__["Implementation-SCM-Revision"]);
+	        setComandaVersion(window.__MANIFEST__["Implementation-Version"]);
+	    } else {
+	        // Si no està disponible, espera a que l'script es carregui
+	        const checkManifestInterval = setInterval(() => {
+	            if (window.__MANIFEST__) {
+	                clearInterval(checkManifestInterval);
+	                setBuildTimestamp(window.__MANIFEST__["Build-Timestamp"]);
+	                setScmRevision(window.__MANIFEST__["Implementation-SCM-Revision"]);
+	                setComandaVersion(window.__MANIFEST__["Implementation-Version"]);
+	            }
+	        }, 100);
+
+	        // Estableix un temps límit per aturar la comprovació després d'un temps raonable (5 segons)
+	        const timeoutId = setTimeout(() => {
+	            clearInterval(checkManifestInterval);
+	            // Si el manifest encara no està disponible, podem establir valors per defecte o deixar-ho com a null
+	            if (!window.__MANIFEST__) {
+	                console.warn('Manifest no disponible després del temps d\'espera');
+	            }
+	        }, 5000);
+
+	        // Neteja l'interval i el temps límit quan el component es desmunta
+	        return () => {
+	            clearInterval(checkManifestInterval);
+	            clearTimeout(timeoutId);
+	        };
+	    }
+	}, []);
 
     const backgroundStyle = backgroundColor ? toolbarBackgroundStyle(backgroundColor, backgroundImg) : {};
     return <footer>
