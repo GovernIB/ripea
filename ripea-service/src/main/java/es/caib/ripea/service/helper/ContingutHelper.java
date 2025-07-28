@@ -23,6 +23,7 @@ import java.util.zip.ZipOutputStream;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -996,15 +997,17 @@ public class ContingutHelper {
 		return resposta;
 	}
 	
-	
 	public ContingutDto toContingutDtoSimplificat(ContingutEntity contingut, boolean nomesFinsExpedientArrel, List<ContingutDto> pathDto) {
-		ContingutDto resposta = null;		
-		if (contingut instanceof ExpedientEntity) {
+		
+		ContingutDto resposta = null;
+		Class<?> realClass = Hibernate.getClass(contingut);
+		
+		if (realClass.equals(ExpedientEntity.class)) {
 			ExpedientDto expedient = new ExpedientDto();
 			resposta = expedient;
 		}
 		
-		if (contingut instanceof CarpetaEntity) {
+		if (realClass.equals(CarpetaEntity.class)) {
 			CarpetaDto carpeta = new CarpetaDto();
 			resposta = carpeta;
 		}

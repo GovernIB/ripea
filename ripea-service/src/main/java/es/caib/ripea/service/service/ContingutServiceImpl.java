@@ -566,7 +566,7 @@ public class ContingutServiceImpl implements ContingutService {
 		return contingutHelper.getBasicInfo(contingut);
 	}
 	
-	
+	@Transactional(readOnly = true)
 	@Override
 	public ContingutDto findAmbIdUserPerMoureCopiarVincular(Long entitatId, Long contingutId) throws NotFoundException {
 		long t0 = System.currentTimeMillis();
@@ -582,7 +582,6 @@ public class ContingutServiceImpl implements ContingutService {
 		
 		return contingutHelper.toContingutDtoSimplificat(contingut, true, null);
 	}
-	
 
 	@Transactional(readOnly = true)
 	@Override
@@ -605,8 +604,6 @@ public class ContingutServiceImpl implements ContingutService {
 				false, 
 				false);
 	}
-
-	
 
 	@Transactional(readOnly = true)
 	@Override
