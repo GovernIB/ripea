@@ -4,7 +4,7 @@ import {DataGridPro} from "@mui/x-data-grid-pro";
 import {MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
-import GridFormField from "../../../components/GridFormField.tsx";
+import GridFormField, {FileFormField} from "../../../components/GridFormField.tsx";
 import Load from "../../../components/Load.tsx";
 
 const ImportForm = () => {
@@ -51,7 +51,7 @@ const ImportForm = () => {
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
 		<GridFormField xs={12} name="tipusImportacio" required/>
-        <GridFormField xs={12} name="fitxerJsonInteressats" type={"file"} required/>
+        <FileFormField xs={12} name="fitxerJsonInteressats" required/>
 
         <Load value={data?.interessatsFitxer} noEffect>
             <Grid item xs={12}>

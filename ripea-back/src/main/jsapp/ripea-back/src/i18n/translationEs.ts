@@ -727,6 +727,7 @@ const translationEs = {
                 funcionariHabilitatDigitalib: "Es necesario ser un funcionario habilitado en DIGITALIB",
                 folder: "En caso de no seleccionar una carpeta se importarán los documentos directamente en el expediente.",
                 scaned: "El proceso de escaneo se ha realizado con éxito.",
+                view: "Solo para PDF, ODT y DOCX",
             },
             versio: {
                 title: "Versión",

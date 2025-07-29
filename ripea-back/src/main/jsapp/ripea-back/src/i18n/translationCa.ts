@@ -727,6 +727,7 @@ const translationCa = {
                 funcionariHabilitatDigitalib: "És necessari ser un funcionari habilitat a DIGITALIB",
                 folder: "En cas de no seleccionar una carpeta s'importaran els documents directament a l'expedient.",
                 scaned: "El procés d'escaneig s'ha realitzat amb èxit.",
+                view: "Nomes per PDF, ODT i DOCX",
             },
             versio: {
                 title: "Versió",

@@ -267,6 +267,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
         },
         {
             label: t('page.document.action.view.label'),
+            title: t('page.document.alert.view'),
             icon: "search",
             showInMenu: true,
             onClick: handleVisualitzarOpen,

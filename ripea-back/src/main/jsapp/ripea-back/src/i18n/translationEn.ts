@@ -727,6 +727,7 @@ const translationEn = {
                 funcionariHabilitatDigitalib: "You must be an authorized official in DIGITALIB",
                 folder: "If no folder is selected, documents will be imported directly into the file.",
                 scaned: "The scanning process was successful.",
+                view: "Only for PDF, ODT and DOCX",
             },
             versio: {
                 title: "Version",

@@ -642,8 +642,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
                 String mssg = interessatResourceHelper.importarInteressats(
                         params.getExpedient().getId(),
                         params.getInteressatsPerImportar().stream()
-                                .peek(i-> i.setErrors(validate(i)))
-                                .filter(i->i.getErrors().isEmpty())
+                                .filter(i->validate(i).isEmpty())
                                 .collect(Collectors.toList())
                 );
                 return "{ \"mssg\": \""+mssg+"\" }";
