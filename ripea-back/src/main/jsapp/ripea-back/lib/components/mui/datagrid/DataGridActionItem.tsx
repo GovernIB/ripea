@@ -1,5 +1,6 @@
 import React from 'react';
 import Icon from '@mui/material/Icon';
+import Tooltip from '@mui/material/Tooltip';
 import { GridActionsCellItem } from '@mui/x-data-grid-pro';
 import { useBaseAppContext } from '../../BaseAppContext';
 
@@ -47,7 +48,7 @@ const DataGridActionItem: React.FC<DataGridActionItemProps> = (props) => {
     const {
         id,
         label,
-        title,
+        title: titleProp,
         icon,
         row,
         linkTo,
@@ -62,15 +63,17 @@ const DataGridActionItem: React.FC<DataGridActionItemProps> = (props) => {
     linkTo && (additionalProps['component'] = getLinkComponent());
     linkTo && (additionalProps['to'] = linkTo);
     linkState && (additionalProps['state'] = linkState);
-    return <GridActionsCellItem
+    const title = !showInMenu ? label : titleProp;
+    const actionCellItem = <GridActionsCellItem
         label={label}
-        title={!showInMenu ? label : title}
+        title={title}
         icon={icon ? <Icon>{icon}</Icon> : undefined}
         onClick={event => {
             onClickCustom ? onClickCustom?.(id, row, event) : onClick(event);
         }}
         disabled={disabled}
         {...additionalProps} />;
+    return title && disabled ? <div title={title}>{actionCellItem}</div> : actionCellItem;
 }
 
 export default DataGridActionItem;
