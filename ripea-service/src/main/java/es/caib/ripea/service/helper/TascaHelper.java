@@ -132,15 +132,15 @@ public class TascaHelper {
 		return resultat;
 	}
 	
-	public boolean shouldNotifyAboutDeadline(ExpedientTascaEntity expedientTascaEntity) {
+	public boolean shouldNotifyAboutDeadline(Date expedientTascaDataLimit) {
 
 		try {
 
 			boolean shouldNotifyAboutDeadline = false;
 			int preavisDataLimitEnDies = configHelper.getAsInt(PropertyConfig.TASCA_PREAVIS_DATA_LIMIT, 3);
 
-			if (expedientTascaEntity.getDataLimit() != null) {
-				if ((new Date()).after(new DateTime(expedientTascaEntity.getDataLimit()).minusDays(preavisDataLimitEnDies).toDate())) {
+			if (expedientTascaDataLimit != null) {
+				if ((new Date()).after(new DateTime(expedientTascaDataLimit).minusDays(preavisDataLimitEnDies).toDate())) {
 					shouldNotifyAboutDeadline = true;
 				}
 			}

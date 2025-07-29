@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -14,11 +15,13 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
-import es.caib.ripea.service.intf.model.DocumentResource;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
+import com.turkraft.springfilter.FilterBuilder;
+import com.turkraft.springfilter.parser.Filter;
 
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.ExpedientTascaEntity;
@@ -43,6 +46,8 @@ import es.caib.ripea.service.intf.dto.ExpedientTascaDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientTascaValidacioDto;
 import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
 import es.caib.ripea.service.intf.dto.TascaEstatEnumDto;
+import es.caib.ripea.service.intf.model.ContingutResource;
+import es.caib.ripea.service.intf.model.EntitatResource;
 import es.caib.ripea.service.intf.model.ExpedientTascaResource;
 import es.caib.ripea.service.intf.model.ExpedientTascaResource.DelegarTascaFormAction;
 import es.caib.ripea.service.intf.model.ExpedientTascaResource.ReassignarTascaFormAction;
@@ -89,6 +94,20 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
 	}
 
     @Override
+    protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
+
+    	String entitatActualCodi = configHelper.getEntitatActualCodi();
+    	
+        Filter filtreBase = FilterBuilder.and(
+                (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null,
+                FilterBuilder.equal(ExpedientTascaResource.Fields.expedient + "." + ContingutResource.Fields.entitat + "." + EntitatResource.Fields.codi, 
+                		entitatActualCodi != null?entitatActualCodi:"................................................................................")
+        );
+        
+        return filtreBase.generate();
+    }
+	
+    @Override
     public ExpedientTascaResource create(ExpedientTascaResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
     	try {
     		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
@@ -125,18 +144,23 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
         resource.setObservadors(entity.getObservadors()
                 .stream().map(obs->ResourceReference.<UsuariResource, String>toResourceReference(obs.getId(), obs.getCodiAndNom()))
                 .collect(Collectors.toList()));
-        String user = SecurityContextHolder.getContext().getAuthentication().getName();
+        String usuariActualCodi = SecurityContextHolder.getContext().getAuthentication().getName();
         boolean usuariActualResponsable = false;
         if (resource.getResponsables()!=null) {
         	for (ResourceReference<UsuariResource,String> resp: resource.getResponsables()) {
-        		if (resp.getId().equals(user)) {
+        		if (resp.getId().equals(usuariActualCodi)) {
         			usuariActualResponsable = true;
         			break;
         		}
         	}
         }
        	resource.setUsuariActualResponsable(usuariActualResponsable);
-        resource.setUsuariActualDelegat(resource.getDelegat()!=null && Objects.equals(resource.getDelegat().getId(), user));
+        resource.setUsuariActualDelegat(resource.getDelegat()!=null && usuariActualCodi.equals(resource.getDelegat().getId()));
+        if (entity.getDataLimit()!=null && entity.getDataLimit().after(Calendar.getInstance().getTime())) {
+        	resource.setDataLimitExpirada(true);
+        }
+        resource.setShouldNotifyAboutDeadline(tascaHelper.shouldNotifyAboutDeadline(entity.getDataLimit()));
+        resource.setUsuariActualOnlyObservador(entity.isUsuariActualOnlyObservador(usuariActualCodi));
     }
 
     // PerspectiveApplicator
