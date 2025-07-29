@@ -73,13 +73,13 @@
             $('#taulaDades').on('draw.dt', function (row, data) {
 
                 $("span[class='usuariActualObservador']").each(function (index) {
-                    var tr = $(this).parent().parent();
-                    tr.attr("title", "<spring:message code="tasca.info.llegenda.observador"/>");
-                    tr.css("box-shadow", "#75ce73 -4px 0px 0px");
-                    tr.children().not(':nth-child(11)').css("opacity", "0.6");
-                    tr.children().not(':nth-child(11)').css("cursor", "default");
-                    tr.children().not(':nth-child(11)').css("pointer-events", "none");
-
+//                     var tr = $(this).parent().parent();
+//                     tr.attr("title", "<spring:message code="tasca.info.llegenda.observador"/>");
+//                     tr.css("box-shadow", "#75ce73 -4px 0px 0px");
+//                     tr.children().not(':nth-child(11)').css("opacity", "0.6");
+//                     tr.children().not(':nth-child(11)').css("cursor", "default");
+//                     tr.children().not(':nth-child(11)').css("pointer-events", "none");
+                	$(this).parent().parent().css("box-shadow", "#75ce73 -4px 0px 0px");
                 });
 
                 $("span[class='usuariActualDelegat']").each(function (index) {

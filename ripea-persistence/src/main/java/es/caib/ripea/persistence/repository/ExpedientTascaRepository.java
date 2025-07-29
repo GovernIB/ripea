@@ -86,10 +86,11 @@ public interface ExpedientTascaRepository extends JpaRepository<ExpedientTascaEn
 		"    tasca " +
 		"from " +
 		"    ExpedientTascaEntity tasca " +
-		"inner join tasca.responsables responsable " +
-		"left join tasca.observadors observador " +
+//		"inner join tasca.responsables responsable " +
+//		"left join tasca.observadors observador " +
 		"where " +
-		"	 (responsable = :responsable or observador = :responsable or tasca.delegat = :responsable) " +
+//		"	 (responsable = :responsable or observador = :responsable or tasca.delegat = :responsable) " +
+		" (:responsable MEMBER OF tasca.responsables or :responsable MEMBER OF tasca.observadors or :responsable = tasca.delegat) " +
 		"and (tasca.estat in (:estats)) " +
 		"and (tasca.expedient.esborrat = 0) " +
 		"and (:esNullExpedient = true or tasca.expedient = :expedient) " +

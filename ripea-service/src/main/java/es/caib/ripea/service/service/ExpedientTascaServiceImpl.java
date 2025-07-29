@@ -488,7 +488,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 	@Transactional
 	@Override
 	public ExpedientTascaDto updateDataLimit(ExpedientTascaDto expedientTascaDto) {
-		logger.debug("Canviant responsable de la tasca " +
+		logger.debug("Canviant data limit de la tasca " +
 			"expedientTascaId=" + expedientTascaDto.getId() + ", " +
 			"dataLimit=" + expedientTascaDto.getDataLimit() + ")");
 
