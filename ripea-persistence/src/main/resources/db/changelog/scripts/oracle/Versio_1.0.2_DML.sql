@@ -6,3 +6,5 @@ values ('es.caib.ripea.front.api.url',null,'URL de la API per la aplicació REAC
 
 Insert into IPA_CONFIG (KEY,VALUE,DESCRIPTION,GROUP_CODE,POSITION,JBOSS_PROPERTY,TYPE_CODE,LASTMODIFIEDBY_CODI,LASTMODIFIEDDATE,CONFIGURABLE_ORGAN,ORGAN_CODI,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,ENTITAT_CODI,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) 
 values ('es.caib.ripea.maxUploadSize','52428800','Maxim tamany dels fitxers dels camps fileUpload dels formularis.','GENERAL','11','0','INT',null,null,'0',null,'0','0',null,'0','0');
+
+UPDATE IPA_USUARI set IDIOMA = lower(IDIOMA);
