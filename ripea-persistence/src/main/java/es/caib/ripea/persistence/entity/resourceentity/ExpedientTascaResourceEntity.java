@@ -100,4 +100,25 @@ public class ExpedientTascaResourceEntity extends BaseAuditableEntity<ExpedientT
 
     @Column(name = "observacions", length = 1024)
     private String observacions;
+    
+    public boolean isUsuariActualOnlyObservador(String usuariActualCodi) {
+    	if (this.getResponsables()!=null) {
+    		for (UsuariResourceEntity ue: this.getResponsables()) {
+    			if (usuariActualCodi.equals(ue.getCodi())) {
+    				return false;
+    			}
+    		}
+    	}
+    	if (this.getDelegat()!=null && usuariActualCodi.equals(this.getDelegat().getCodi())) {
+    		return false;
+    	}
+    	if (this.getObservadors()!=null) {
+    		for (UsuariResourceEntity ue: this.getObservadors()) {
+    			if (usuariActualCodi.equals(ue.getCodi())) {
+    				return true;
+    			}
+    		}
+    	}
+    	return false;
+    }
 }

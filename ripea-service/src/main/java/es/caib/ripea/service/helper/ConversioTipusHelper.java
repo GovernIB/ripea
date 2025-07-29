@@ -108,7 +108,6 @@ import es.caib.ripea.service.intf.dto.config.OrganConfigDto;
 import es.caib.ripea.service.intf.dto.historic.HistoricExpedientDto;
 import es.caib.ripea.service.intf.dto.historic.HistoricInteressatDto;
 import es.caib.ripea.service.intf.dto.historic.HistoricUsuariDto;
-import es.caib.ripea.service.intf.model.ExpedientResource;
 import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.utils.Utils;
 import ma.glasnost.orika.CustomConverter;
@@ -296,7 +295,7 @@ public class ConversioTipusHelper {
 						target.setEstat(source.getEstat());
 						target.setMotiuRebuig(source.getMotiuRebuig());
 						target.setDataLimit(source.getDataLimit());
-						target.setShouldNotifyAboutDeadline(tascaHelper.shouldNotifyAboutDeadline(source));
+						target.setShouldNotifyAboutDeadline(tascaHelper.shouldNotifyAboutDeadline(source.getDataLimit()));
 						target.setNumComentaris(source.getComentaris() == null ? 0L :source.getComentaris().size());
 						target.setNumComentaris(source.getComentaris() == null ? 0L :source.getComentaris().size());
 						target.setDuracio(source.getDuracio());
