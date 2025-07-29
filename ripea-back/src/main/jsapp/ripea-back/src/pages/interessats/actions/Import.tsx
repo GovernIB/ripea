@@ -4,7 +4,7 @@ import {DataGridPro} from "@mui/x-data-grid-pro";
 import {MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
-import GridFormField from "../../../components/GridFormField.tsx";
+import GridFormField, {FileFormField} from "../../../components/GridFormField.tsx";
 import Load from "../../../components/Load.tsx";
 
 const ImportForm = () => {
@@ -26,7 +26,9 @@ const ImportForm = () => {
                 {params?.row?.documentNum}
                 {params?.row?.jaExistentExpedient &&
                     <Icon color={"warning"} title={t('page.interessat.alert.jaExistentExpedient')}>warning</Icon>}
-                {Object.values(params?.row?.errors)?.map?.((value:any) => <Icon title={value} color={'error'}>error</Icon>)}
+                {Object.entries(params?.row?.errors)?.map(([key, value]) => (
+                    <Icon key={key} title={`${key}: ${value}`} color={'error'}>error</Icon>
+                ))}
             </>
         },
         {
@@ -39,7 +41,7 @@ const ImportForm = () => {
             field: 'representant',
             headerName: t('page.interessat.grid.representant'),
             flex: 0.75,
-            valueFormatter: (value: any) => value?.organNom ?? value?.nomComplet,
+            valueFormatter: (value: any) => value?.description,
         },
     ];
 
@@ -49,7 +51,7 @@ const ImportForm = () => {
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
 		<GridFormField xs={12} name="tipusImportacio" required/>
-        <GridFormField xs={12} name="fitxerJsonInteressats" type={"file"} required/>
+        <FileFormField xs={12} name="fitxerJsonInteressats" required/>
 
         <Load value={data?.interessatsFitxer} noEffect>
             <Grid item xs={12}>

@@ -17,7 +17,9 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.validation.groups.Default;
 
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.hibernate.Hibernate;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.DataBinder;
@@ -61,17 +63,12 @@ import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ReportFileType;
 import es.caib.ripea.service.intf.base.model.Resource;
 import es.caib.ripea.service.intf.dto.ComunitatDto;
-import es.caib.ripea.service.intf.dto.InteressatAdministracioDto;
 import es.caib.ripea.service.intf.dto.InteressatDocumentTipusEnumDto;
-import es.caib.ripea.service.intf.dto.InteressatDto;
 import es.caib.ripea.service.intf.dto.InteressatImportacioTipusDto;
-import es.caib.ripea.service.intf.dto.InteressatPersonaFisicaDto;
-import es.caib.ripea.service.intf.dto.InteressatPersonaJuridicaDto;
 import es.caib.ripea.service.intf.dto.InteressatTipusEnum;
 import es.caib.ripea.service.intf.dto.MunicipiDto;
 import es.caib.ripea.service.intf.dto.NivellAdministracioDto;
 import es.caib.ripea.service.intf.dto.PaisDto;
-import es.caib.ripea.service.intf.dto.PermissionEnumDto;
 import es.caib.ripea.service.intf.dto.ProvinciaDto;
 import es.caib.ripea.service.intf.dto.UnitatOrganitzativaDto;
 import es.caib.ripea.service.intf.model.ExpedientResource;
@@ -107,6 +104,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
     private final InteressatResourceRepository interessatResourceRepository;
 
     private final SmartValidator validator;
+    private final DataSourceProperties mainDataSourceProperties;
 
     @PostConstruct
     public void init() {
@@ -350,152 +348,12 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
     
     @Override
     public InteressatResource create(InteressatResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
-    	InteressatDto interessatDto = toInteressatDto(resource);
-    	InteressatEntity interessatExistent = interessatRepository.findByExpedientIdAndDocumentNum(
-    			resource.getExpedient().getId(),
-    			resource.getDocumentNum());
-    	//CREATE
-    	if(interessatExistent==null) {
-    		//Create representant
-    		if(resource.getRepresentat()!=null) {
-    			expedientInteressatHelper.createRepresentantEntity(
-    					resource.getExpedient().getId(),
-    					resource.getRepresentat().getId(),
-    					interessatDto, //Dades del representant
-    					true, //propagarArxiu
-    					PermissionEnumDto.WRITE,
-    					configHelper.getRolActual(),
-    					true); //comprovarAgafat
-    		} else {
-	    		expedientInteressatHelper.createInteressatEntity(
-	    				resource.getExpedient().getId(),
-	    				interessatDto,
-	    				true, //propagarArxiu
-	    				PermissionEnumDto.WRITE,
-	    				configHelper.getRolActual(),
-	    				true); //comprovarAgafat
-    		}
-    	} else { //UPDATE    		
-    		interessatDto.setId(interessatExistent.getId());
-    		expedientInteressatHelper.updateInteressatRepresentantEntity(
-    				resource.getExpedient().getId(),
-    				resource.getRepresentat()!=null?resource.getRepresentat().getId():null, //ID del representat
-    				interessatDto,
-    				configHelper.getRolActual(),
-    				true,  //comprovarAgafat
-    				true); //propagarArxiu
-    	}
-    	return resource;
-    }
-    
-    private InteressatDto toInteressatDto(InteressatResource resource) {
-		switch (resource.getTipus()) {
-			case InteressatAdministracioEntity: 
-				InteressatAdministracioDto interessatAdmDto = new InteressatAdministracioDto();
-				interessatAdmDto.setOrganCodi(resource.getOrganCodi());
-				interessatAdmDto.setOrganNom(resource.getOrganNom());
-				setDadesComunsInteressat(resource, interessatAdmDto);
-				return interessatAdmDto;
-			case InteressatPersonaFisicaEntity: 
-				InteressatPersonaFisicaDto interessatFisDto = new InteressatPersonaFisicaDto(); 
-				interessatFisDto.setNom(resource.getNom());
-				interessatFisDto.setLlinatge1(resource.getLlinatge1());
-				interessatFisDto.setLlinatge2(resource.getLlinatge2());
-				setDadesComunsInteressat(resource, interessatFisDto);
-				return interessatFisDto;
-			case InteressatPersonaJuridicaEntity: 
-				InteressatPersonaJuridicaDto interessatJurDto = new InteressatPersonaJuridicaDto();
-				interessatJurDto.setRaoSocial(resource.getRaoSocial());
-				setDadesComunsInteressat(resource, interessatJurDto);
-				return interessatJurDto;
-		}
-		return null;
-    }
-    
-    private void setDadesComunsInteressat(InteressatResource resource, InteressatDto interessatDto) {
-    	//Controlar que no estam introduint un interessat repetit
-    	interessatDto.setId(resource.getId());
-		interessatDto.setDocumentTipus(resource.getDocumentTipus());
-		interessatDto.setDocumentNum(resource.getDocumentNum());
-		interessatDto.setPais(resource.getPais());
-		interessatDto.setProvincia(resource.getProvincia());
-		interessatDto.setMunicipi(resource.getMunicipi());
-		interessatDto.setCodiPostal(resource.getCodiPostal());
-		interessatDto.setAdresa(resource.getAdresa());
-		interessatDto.setEmail(resource.getEmail());
-		interessatDto.setTelefon(resource.getTelefon());
-		interessatDto.setObservacions(resource.getObservacions());
-		interessatDto.setPreferenciaIdioma(resource.getPreferenciaIdioma());
-		interessatDto.setEntregaDeh(resource.getEntregaDeh());
-		interessatDto.setEntregaDehObligat(resource.getEntregaDehObligat());
+        return interessatResourceHelper.create(resource);
     }
     
 	@Override
 	public InteressatResource update(Long id, InteressatResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotFoundException {
-		
-		InteressatEntity interessatExistent = interessatRepository.findByExpedientIdAndDocumentNum(resource.getExpedient().getId(), resource.getDocumentNum());
-		
-		//Modificam un representant
-		if (resource.getRepresentat()!=null) {
-			
-			if (interessatExistent!=null && !interessatExistent.getId().equals(resource.getId())) {
-				//Si el interessat que hem trobat amb el mateix NIF, no és el representat, per tant ja no es validarà amb el metode update
-				if (interessatExistent.getRepresentant()==null || !interessatExistent.getRepresentant().getDocumentNum().equals(resource.getDocumentNum())) {
-					//En aquest cas canviam el ID, i rl que es modificará será el interessat
-					resource.setId(interessatExistent.getId());
-				}
-			}
-			
-			//A la funció de update, ja es comprova que no es modifiqui amb el mateix ID que el representat (ValidationException)
-			expedientInteressatHelper.update(
-					resource.getExpedient().getId(),
-					resource.getRepresentat().getId(),
-					toInteressatDto(resource),
-					configHelper.getRolActual(),
-					true,
-					true);
-			
-		} else {
-			
-			/**
-			 * Modificam un interessat. Cas 1: Hem introduit el mateix document que el seu representant... Validation exception
-			 */
-			if (resource.getRepresentant()!=null && interessatExistent!=null && 
-				resource.getRepresentant().getId()!=null && 
-				resource.getRepresentant().getId().equals(interessatExistent.getId())) {
-					//Modificam un interessat, de tal manera que quedará amb el mateix document que el seu representant
-					//La funció update s'encarrega de fer la validació
-					expedientInteressatHelper.update(
-							resource.getExpedient().getId(),
-							null,
-							toInteressatDto(resource),
-							configHelper.getRolActual(),
-							true,
-							true);
-			} else {
-	
-				/**
-				 * Modificam un interessat. Cas 2: Hem introduit el mateix document que un altre interessat del expedient
-				 */
-				if (interessatExistent!=null && !interessatExistent.getId().equals(resource.getId())) {
-					resource.setId(interessatExistent.getId());
-				} else {
-					/**
-					 * Modificam un interessat. Cas 3: El numero de document no esta repetit per l'expedient
-					 */
-				}
-				
-				expedientInteressatHelper.update(
-						resource.getExpedient().getId(),
-						null,
-						toInteressatDto(resource),
-						configHelper.getRolActual(),
-						true,
-						true);
-			}
-		}
-		
-		return resource;
+		return interessatResourceHelper.update(resource);
 	}
 
     private class RespresentantPerspectiveApplicator implements PerspectiveApplicator<InteressatResourceEntity, InteressatResource> {
@@ -604,14 +462,19 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
         @Override
         public DownloadableFile generateFile(String code, List<?> data, ReportFileType fileType, OutputStream out) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            Long expedientId = (Long)data.get(0);
+            ExpedientResource.MassiveAction params = (ExpedientResource.MassiveAction)data.get(1);
             try {
-                Long expedientId = (Long)data.get(0);
-                ExpedientResource.MassiveAction params = (ExpedientResource.MassiveAction)data.get(1);
-//                entityComprovarHelper.comprovarExpedient(expedientId, true, true, false, false, false, configHelper.getRolActual());
                 ObjectMapper objectMapper = new ObjectMapper();
-                objectMapper.writerWithDefaultPrettyPrinter().writeValue(baos, expedientInteressatHelper.findByIds(params.getIds()));
-                DownloadableFile resultat = new DownloadableFile("Interessats_expedient_"+expedientId+".json", "application/json", baos.toByteArray());
-                return resultat;
+                objectMapper.registerModule(new JavaTimeModule());
+                objectMapper.writerWithDefaultPrettyPrinter().writeValue(baos,
+                        interessatResourceRepository.findAllById(params.getIds()).stream()
+                                .map(interessatEntity -> {
+                                    InteressatResource interessatResource = objectMappingHelper.newInstanceMap(interessatEntity, InteressatResource.class);
+                                    new RespresentantPerspectiveApplicator().applySingle(InteressatResource.PERSPECTIVE_REPRESENTANT_CODE, interessatEntity, interessatResource);
+                                    return interessatResource;
+                                }).collect(Collectors.toList()));
+                return new DownloadableFile("Interessats_expedient_"+expedientId+".json", "application/json", baos.toByteArray());
             } catch (Exception e) {
                 excepcioLogHelper.addExcepcio("/expedient/ExportarInteressatsReportGenerator", e);
                 throw new ReportGenerationException(getResourceClass(), null, code, "interessat.export.reject");
@@ -651,10 +514,10 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
             } catch (Exception e) {
                 excepcioLogHelper.addExcepcio("/expedient/interessats/"+entity.getId()+"/DeleteRepresentantArxiuActionExecutor", e);
 				String message = messageHelper.getMessage("message.common.action.error")+": "+e.getMessage();
-				throw new ActionExecutionException(getResourceClass(), entity==null?null:entity.getId(), code, message);
+				throw new ActionExecutionException(getResourceClass(), entity.getRepresentant().getId(), code, message);
             }
 			//Dada per mostrar al missatge de OK, retornar el entity convertit a InteressatResource dona error perque no el troba
-			return "{ \"cocumentNum\": \""+entity.getDocumentNum()+"\" }";
+			return "{ \"documentNum\": \""+entity.getRepresentant().getDocumentNum()+"\" }";
 		}
     }
     
@@ -675,10 +538,10 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
             } catch (Exception e) {
                 excepcioLogHelper.addExcepcio("/expedient/interessats/"+entity.getId()+"/DeleteInteressatActionExecutor", e);
 				String message = messageHelper.getMessage("message.common.action.error")+": "+e.getMessage();
-				throw new ActionExecutionException(getResourceClass(), entity==null?null:entity.getId(), code, message);
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, message);
             }
 			//Dada per mostrar al missatge de OK, retornar el entity convertit a InteressatResource dona error perque no el troba
-			return "{ \"cocumentNum\": \""+entity.getDocumentNum()+"\" }";
+			return "{ \"documentNum\": \""+entity.getDocumentNum()+"\" }";
 		}
     }
     
@@ -698,7 +561,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
             } catch (Exception e) {
                 excepcioLogHelper.addExcepcio("/expedient/interessats/"+entity.getId()+"GuardarArxiuActionExecutor.onChange", e);
 				String message = messageHelper.getMessage("message.common.action.error")+": "+e.getMessage();
-				throw new ActionExecutionException(getResourceClass(), entity==null?null:entity.getId(), code, message);
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, message);
             }
 			return objectMappingHelper.newInstanceMap(entity, InteressatResource.class);
 		}
@@ -721,25 +584,31 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
                     .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
         }
 
+        private static final String NOT_COMPATIBLE = "NOT_COMPATIBLE";
+
         @Override
         public void onChange(Serializable id, InteressatResource.ImportarInteressatsFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, InteressatResource.ImportarInteressatsFormAction target) {
 
             if (InteressatResource.ImportarInteressatsFormAction.Fields.fitxerJsonInteressats.equals(fieldName)) {
                 List<InteressatResource> listaInteressatsFitxer = new ArrayList<InteressatResource>();
                 if (fieldValue!=null) {
-                    if (previous.getTipusImportacio().equals(InteressatImportacioTipusDto.JSON)) {
-                        ObjectMapper objectMapper = new ObjectMapper();
-                        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+                    if (!answers.containsKey(NOT_COMPATIBLE)) {
                         try {
-                            listaInteressatsFitxer = objectMapper.readValue(
-                                    ((FileReference)fieldValue).getContent(),
-                                    new TypeReference<List<InteressatResource>>() {});
+                            if (previous.getTipusImportacio().equals(InteressatImportacioTipusDto.JSON)) {
+                                ObjectMapper objectMapper = new ObjectMapper();
+                                objectMapper.registerModule(new JavaTimeModule());
+                                objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+                                listaInteressatsFitxer = objectMapper.readValue(
+                                        ((FileReference) fieldValue).getContent(),
+                                        new TypeReference<List<InteressatResource>>() {});
+                            } else {
+                                InputStream excelStream = new ByteArrayInputStream(((FileReference) fieldValue).getContent());
+                                listaInteressatsFitxer = interessatResourceHelper.extreureInteressatsExcel(excelStream);
+                            }
                         } catch (Exception e) {
-                            excepcioLogHelper.addExcepcio("/expedient/interessats/ImportarInteressatsActionExecutor/"+previous.getTipusImportacio()+".onChange", e);
+                            excepcioLogHelper.addExcepcio("/expedient/interessats/ImportarInteressatsActionExecutor/" + previous.getTipusImportacio() + ".onChange", e);
+                            throw new AnswerRequiredException(InteressatResource.ImportarInteressatsFormAction.class, NOT_COMPATIBLE, "interessat.import.reject");
                         }
-                    } else {
-                        InputStream excelStream = new ByteArrayInputStream(((FileReference)fieldValue).getContent());
-                        listaInteressatsFitxer = interessatResourceHelper.extreureInteressatsExcel(excelStream);
                     }
 
                     //Abans de retornar la llista de interessats, comprovam si existeixen al expedient actual
@@ -747,7 +616,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
                     if (!listaInteressatsFitxer.isEmpty()) {
                         //Només fem la consulta en cas necessari
                         List<InteressatEntity> interessatsExpActual = interessatRepository.findByExpedientId(previous.getExpedient().getId());
-                        Long idAssignat = 1l;
+                        long idAssignat = 1L;
                         for (InteressatResource interessatResource: listaInteressatsFitxer) {
                             if (interessatsExpActual!=null) {
                                 for (InteressatEntity interessatExp: interessatsExpActual) {
@@ -758,7 +627,6 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
                                 }
                             }
                             if (interessatResource.getId()==null) { interessatResource.setId(idAssignat++); }
-                            //TODO: interessatDto.validarInteressatDto()
                             interessatResource.setExpedient(previous.getExpedient());
                             interessatResource.setErrors(validate(interessatResource));
                         }
@@ -771,22 +639,18 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
         @Override
         public Serializable exec(String code, InteressatResourceEntity entity, InteressatResource.ImportarInteressatsFormAction params) throws ActionExecutionException {
             try {
-                String rolActual = configHelper.getRolActual();
-
-                interessatResourceHelper.importarInteressats(
+                String mssg = interessatResourceHelper.importarInteressats(
                         params.getExpedient().getId(),
-                        rolActual,
                         params.getInteressatsPerImportar().stream()
-                                .peek(i-> i.setErrors(validate(i)))
-                                .filter(i->i.getErrors().isEmpty())
+                                .filter(i->validate(i).isEmpty())
                                 .collect(Collectors.toList())
                 );
+                return "{ \"mssg\": \""+mssg+"\" }";
             } catch (Exception e) {
                 excepcioLogHelper.addExcepcio("/expedient/"+params.getExpedient().getId()+"/ImportarInteressatsActionExecutor", e);
                 String message = messageHelper.getMessage("message.common.action.error")+": "+e.getMessage();
 				throw new ActionExecutionException(getResourceClass(), params.getExpedient().getId(), code, message);
             }
-            return objectMappingHelper.newInstanceMap(entity, InteressatResource.class);
         }
     }
 

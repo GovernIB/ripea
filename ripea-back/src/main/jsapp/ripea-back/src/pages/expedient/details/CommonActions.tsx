@@ -338,6 +338,7 @@ export const useCommonActions = (refresh?: () => void) => {
         },
         {
             label: t('page.expedient.action.close.label'),
+            title: (row:any) => row?.tancarDisabledMessage,
             icon: "check",
             showInMenu: true,
             onClick: handleTancar,

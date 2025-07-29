@@ -2,6 +2,7 @@ package es.caib.ripea.service.intf.resourcevalidation;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
+import es.caib.ripea.service.intf.dto.DocumentFirmaTipusEnumDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -47,6 +48,18 @@ public class AdjuntValidator implements ConstraintValidator<AdjuntValid, Documen
                 .disableDefaultConstraintViolation();
             return false;
 		}
+
+        if (resource.getHasFirma()
+                && DocumentFirmaTipusEnumDto.FIRMA_SEPARADA.equals(resource.getDocumentFirmaTipus())
+                && (resource.getFirmaAdjunt()==null || resource.getFirmaAdjunt().getContentLength()==null)
+        ){
+            context
+                    .buildConstraintViolationWithTemplate("{javax.validation.constraints.NotNull.message}")
+                    .addPropertyNode(DocumentResource.Fields.firmaAdjunt)
+                    .addConstraintViolation()
+                    .disableDefaultConstraintViolation();
+            return false;
+        }
 
         return true;
 	}

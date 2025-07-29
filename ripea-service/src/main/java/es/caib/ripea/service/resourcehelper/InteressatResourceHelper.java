@@ -1,7 +1,15 @@
 package es.caib.ripea.service.resourcehelper;
 
+import es.caib.ripea.persistence.entity.InteressatEntity;
 import es.caib.ripea.persistence.entity.resourceentity.InteressatResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.InteressatResourceRepository;
+import es.caib.ripea.persistence.repository.InteressatRepository;
+import es.caib.ripea.service.base.helper.ObjectMappingHelper;
+import es.caib.ripea.service.helper.ConfigHelper;
+import es.caib.ripea.service.helper.ExpedientInteressatHelper;
+import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
+import es.caib.ripea.service.intf.base.exception.ResourceNotFoundException;
+import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.model.InteressatResource;
 import lombok.RequiredArgsConstructor;
@@ -13,12 +21,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
+import static com.sun.star.awt.ContainerWindowProvider.create;
 
 @Component
 @RequiredArgsConstructor
 public class InteressatResourceHelper {
 
     private final InteressatResourceRepository interessatResourceRepository;
+    private final InteressatRepository interessatRepository;
+    private final ExpedientInteressatHelper expedientInteressatHelper;
+    private final ConfigHelper configHelper;
 
     public List<InteressatResource> extreureInteressatsExcel(InputStream excel) {
         List<InteressatResource> interessatsExcel = new ArrayList<>();
@@ -132,73 +146,36 @@ public class InteressatResourceHelper {
         return interessatsExcel;
     }
 
-    public String importarInteressats(Long expedientId, String rolActual, List<InteressatResource> interessats) {
+    public String importarInteressats(Long expedientId, List<InteressatResource> interessats) {
+        int numInteressatsImp = 0;
         int numInteressatsUpd = 0;
-        int numInteressatsIns = 0;
-        Map<String, String> errorsInteressats = new HashMap<String, String>();
 
-//        if (interessats != null && !interessats.isEmpty()) {
-//
-//            //Recuperam tots els InteressatDto del expedient, siguin interessats arrel o representants.
-//            List<InteressatResourceEntity> interessatsActualsExp = interessatResourceRepository.findByExpedientId(expedientId);
-//
-//            //Recorrem els interessats del JSON que s'ha importat
-//            for (InteressatResource interessat : interessats) {
-//                InteressatResourceEntity interessatProcessar = getInteressatActualExpedientByDocNum(interessatsActualsExp, interessat.getDocumentNum());
-//                if (interessatProcessar == null) {
-//                    //El create, crea el interessat associat al expedient, sense FK cap a representant, i amb es_representant=false
-//                    //És a dir, un interessat arrel del expedient.
-//
-//                    InteressatDto interessatCreatDto = create(expedientId, interessat, true, PermissionEnumDto.WRITE, rolActual, true);
-//                    interessatProcessar = interessatResourceRepository.getOne(interessatCreatDto.getId());
-//                    interessatsActualsExp.add(interessatProcessar);
-//                    numInteressatsIns++;
-//
-//                } else {
-//                    //El merge no toca ni la FK cap a representant, ni l'atribut es_representant
-//                    //per tant si era interessat haurà actualitzat el interessat, i si era representant, el representant.
-//                    interessatProcessar = mergeInteressat(interessatProcessar.getId(), interessat);
-//                    numInteressatsUpd++;
-//                }
-//
-//                if (interessat.getRepresentant() != null) {
-//                    //Si el representant amb numDoc no existeix al expedient (sigui com a representant o com a interessat), es crea com a nou interessat
-//                    InteressatResourceEntity representantProcessar = getInteressatActualExpedientByDocNum(interessatsActualsExp, interessat.getRepresentant().getDocumentNum());
-//                    if (representantProcessar == null) {
-//
-//                        InteressatDto representantCreatDto = create(expedientId, interessat.getRepresentant(), true, PermissionEnumDto.WRITE, rolActual, true);
-//                        representantProcessar = interessatResourceRepository.getOne(representantCreatDto.getId());
-//                        representantProcessar.updateEsRepresentant(true);
-//
-//                    } else {
-//                        representantProcessar = mergeInteressat(representantProcessar.getId(), interessat.getRepresentant());
-//                    }
-//
-//                    //Ara tenim el representant actualitzat o creat, pero encara no apunta al interessat que estam important
-//                    interessatProcessar.setRepresentant(representantProcessar);
-//                }
-//            }
-//        }
+        if (interessats != null && !interessats.isEmpty()) {
+            List<InteressatResourceEntity> interessatsActualsExp = interessatResourceRepository.findByExpedientId(expedientId);
+            List<String> numDocList = interessatsActualsExp.stream().map(InteressatResourceEntity::getDocumentNum).collect(Collectors.toList());
 
-        String resultatStr = "S'han importat <b>" + numInteressatsIns + "</b> nous interessats, i <b>" + numInteressatsUpd + "</b> s'han actualitzat.";
-        if (errorsInteressats.size() > 0) {
-            resultatStr += "<br/>Els seguents interessats no s'han pogut importar:";
-            for (Map.Entry<String, String> entry : errorsInteressats.entrySet()) {
-                resultatStr += "<br/> - " + entry.getKey() + ": " + entry.getValue();
-            }
-        }
-        return resultatStr;
-    }
+            for (InteressatResource interessat : interessats) {
+                if (!numDocList.contains(interessat.getDocumentNum())) {
+                    interessat = create(interessat);
+                    numInteressatsImp++;
+                } else {
+                    interessat = update(interessat);
+                    numInteressatsUpd++;
+                }
 
-    private InteressatResourceEntity getInteressatActualExpedientByDocNum(List<InteressatResourceEntity> interessatsActualsExp, String docNum) {
-        if (interessatsActualsExp!=null) {
-            for (InteressatResourceEntity interessatExistent : interessatsActualsExp) {
-                if (interessatExistent.getDocumentNum().equalsIgnoreCase(docNum)) {
-                    return interessatExistent;
+                if (interessat.getRepresentant() != null) {
+                    InteressatResource representant = interessat.getRepresentantInfo();
+                    representant.setRepresentat(ResourceReference.toResourceReference(interessat.getId()));
+                    if (!numDocList.contains(representant.getDocumentNum())) {
+                        create(representant);
+                    } else {
+                        update(representant);
+                    }
                 }
             }
         }
-        return null;
+
+        return "S'han importat <b>" + numInteressatsImp + "</b> nous interessats, i <b>" + numInteressatsUpd + "</b> s'han actualitzat.";
     }
 
     private <E extends Enum<E>> E parseEnum(String value, Class<E> enumClass) {
@@ -207,5 +184,162 @@ public class InteressatResourceHelper {
         } catch (Exception e) {
             throw e;
         }
+    }
+
+    public InteressatResource create(InteressatResource resource) {
+        Long resultId;
+        InteressatDto interessatDto = toInteressatDto(resource);
+        InteressatEntity interessatExistent = interessatRepository.findByExpedientIdAndDocumentNum(
+                resource.getExpedient().getId(),
+                resource.getDocumentNum());
+        //CREATE
+        if(interessatExistent==null) {
+            //Create representant
+            if(resource.getRepresentat()!=null) {
+                InteressatEntity interessat = expedientInteressatHelper.createRepresentantEntity(
+                        resource.getExpedient().getId(),
+                        resource.getRepresentat().getId(),
+                        interessatDto, //Dades del representant
+                        true, //propagarArxiu
+                        PermissionEnumDto.WRITE,
+                        configHelper.getRolActual(),
+                        true); //comprovarAgafat
+                resultId = interessat.getId();
+            } else {
+                InteressatEntity interessat = expedientInteressatHelper.createInteressatEntity(
+                        resource.getExpedient().getId(),
+                        interessatDto,
+                        true, //propagarArxiu
+                        PermissionEnumDto.WRITE,
+                        configHelper.getRolActual(),
+                        true); //comprovarAgafat
+                resultId = interessat.getId();
+            }
+        } else { //UPDATE
+            interessatDto.setId(interessatExistent.getId());
+            InteressatEntity interessat = expedientInteressatHelper.updateInteressatRepresentantEntity(
+                    resource.getExpedient().getId(),
+                    resource.getRepresentat()!=null?resource.getRepresentat().getId():null, //ID del representat
+                    interessatDto,
+                    configHelper.getRolActual(),
+                    true,  //comprovarAgafat
+                    true); //propagarArxiu
+            resultId = interessat.getId();
+        }
+
+        resource.setId(resultId);
+        return resource;
+    }
+
+    public InteressatResource update(InteressatResource resource) throws ResourceNotFoundException {
+        Long resultId;
+        InteressatEntity interessatExistent = interessatRepository.findByExpedientIdAndDocumentNum(resource.getExpedient().getId(), resource.getDocumentNum());
+
+        //Modificam un representant
+        if (resource.getRepresentat()!=null) {
+
+            if (interessatExistent!=null && !interessatExistent.getId().equals(resource.getId())) {
+                //Si el interessat que hem trobat amb el mateix NIF, no és el representat, per tant ja no es validarà amb el metode update
+                if (interessatExistent.getRepresentant()==null || !interessatExistent.getRepresentant().getDocumentNum().equals(resource.getDocumentNum())) {
+                    //En aquest cas canviam el ID, i rl que es modificará será el interessat
+                    resource.setId(interessatExistent.getId());
+                }
+            }
+
+            //A la funció de update, ja es comprova que no es modifiqui amb el mateix ID que el representat (ValidationException)
+            InteressatDto interessat = expedientInteressatHelper.update(
+                    resource.getExpedient().getId(),
+                    resource.getRepresentat().getId(),
+                    toInteressatDto(resource),
+                    configHelper.getRolActual(),
+                    true,
+                    true);
+            resultId = interessat.getId();
+        } else {
+
+            /**
+             * Modificam un interessat. Cas 1: Hem introduit el mateix document que el seu representant... Validation exception
+             */
+            if (resource.getRepresentant()!=null && interessatExistent!=null &&
+                    resource.getRepresentant().getId()!=null &&
+                    resource.getRepresentant().getId().equals(interessatExistent.getId())) {
+                //Modificam un interessat, de tal manera que quedará amb el mateix document que el seu representant
+                //La funció update s'encarrega de fer la validació
+                InteressatDto interessat = expedientInteressatHelper.update(
+                        resource.getExpedient().getId(),
+                        null,
+                        toInteressatDto(resource),
+                        configHelper.getRolActual(),
+                        true,
+                        true);
+                resultId = interessat.getId();
+            } else {
+
+                /**
+                 * Modificam un interessat. Cas 2: Hem introduit el mateix document que un altre interessat del expedient
+                 */
+                if (interessatExistent!=null && !interessatExistent.getId().equals(resource.getId())) {
+                    resource.setId(interessatExistent.getId());
+                } else {
+                    /**
+                     * Modificam un interessat. Cas 3: El numero de document no esta repetit per l'expedient
+                     */
+                }
+
+                InteressatDto interessat = expedientInteressatHelper.update(
+                        resource.getExpedient().getId(),
+                        null,
+                        toInteressatDto(resource),
+                        configHelper.getRolActual(),
+                        true,
+                        true);
+                resultId = interessat.getId();
+            }
+        }
+
+        resource.setId(resultId);
+        return resource;
+    }
+
+    private InteressatDto toInteressatDto(InteressatResource resource) {
+        switch (resource.getTipus()) {
+            case InteressatAdministracioEntity:
+                InteressatAdministracioDto interessatAdmDto = new InteressatAdministracioDto();
+                interessatAdmDto.setOrganCodi(resource.getOrganCodi());
+                interessatAdmDto.setOrganNom(resource.getOrganNom());
+                setDadesComunsInteressat(resource, interessatAdmDto);
+                return interessatAdmDto;
+            case InteressatPersonaFisicaEntity:
+                InteressatPersonaFisicaDto interessatFisDto = new InteressatPersonaFisicaDto();
+                interessatFisDto.setNom(resource.getNom());
+                interessatFisDto.setLlinatge1(resource.getLlinatge1());
+                interessatFisDto.setLlinatge2(resource.getLlinatge2());
+                setDadesComunsInteressat(resource, interessatFisDto);
+                return interessatFisDto;
+            case InteressatPersonaJuridicaEntity:
+                InteressatPersonaJuridicaDto interessatJurDto = new InteressatPersonaJuridicaDto();
+                interessatJurDto.setRaoSocial(resource.getRaoSocial());
+                setDadesComunsInteressat(resource, interessatJurDto);
+                return interessatJurDto;
+        }
+        return null;
+    }
+
+    private void setDadesComunsInteressat(InteressatResource resource, InteressatDto interessatDto) {
+        //Controlar que no estam introduint un interessat repetit
+        interessatDto.setId(resource.getId());
+        interessatDto.setDocumentTipus(resource.getDocumentTipus());
+        interessatDto.setDocumentNum(resource.getDocumentNum());
+        interessatDto.setPais(resource.getPais());
+        interessatDto.setProvincia(resource.getProvincia());
+        interessatDto.setMunicipi(resource.getMunicipi());
+        interessatDto.setCodiPostal(resource.getCodiPostal());
+        interessatDto.setAdresa(resource.getAdresa());
+        interessatDto.setEmail(resource.getEmail());
+        interessatDto.setTelefon(resource.getTelefon());
+        interessatDto.setObservacions(resource.getObservacions());
+        interessatDto.setPreferenciaIdioma(resource.getPreferenciaIdioma());
+        interessatDto.setEntregaDeh(resource.getEntregaDeh());
+        interessatDto.setEntregaDehObligat(resource.getEntregaDehObligat());
     }
 }

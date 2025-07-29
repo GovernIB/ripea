@@ -29,7 +29,7 @@ const useActions = (refresh?:()=>void) => {
             });
     }
 
-    const eliminar= (id:any) :void => {
+    const eliminar= (id:any, row:any) :void => {
         messageDialogShow(
             t('page.carpeta.action.delete.check'),
             t('page.carpeta.action.delete.description'),
@@ -38,9 +38,9 @@ const useActions = (refresh?:()=>void) => {
             .then((value: any) => {
                 if (value) {
                     apiDelete(id)
-                        .then((data) => {
+                        .then(() => {
                             refresh?.();
-                            temporalMessageShow(null, t('page.carpeta.action.delete.ok', {data}), 'success');
+                            temporalMessageShow(null, t('page.carpeta.action.delete.ok', {data: row}), 'success');
                         })
                         .catch((error) => {
                             temporalMessageShow(null, error?.message, 'error');
