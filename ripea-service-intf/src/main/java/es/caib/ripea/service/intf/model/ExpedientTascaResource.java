@@ -100,10 +100,11 @@ public class ExpedientTascaResource extends BaseAuditableResource<Long> {
     private String comentari;
     private long numComentaris;
 
-    private boolean usuariActualResponsable;
-    private boolean usuariActualObservador;
-    private boolean usuariActualDelegat;
-    private boolean usuariActualOnlyObservador;
+    private boolean usuariActualResponsable; //L'usuari actual es dins la llista de responsables
+    private boolean usuariActualObservador;  //L'usuari actual es dins la llista de observadors
+    private boolean usuariActualDelegat; //L'usuari actual es el delegat
+    private boolean usuariActualOnlyObservador; //L'usuari actual es observador, pero no responsable ni delegat
+    private boolean agafadaUsuariActual; //L'usuari actual es el responsable actual de la tasca
 
     private String titol;
     private String observacions;

@@ -161,6 +161,7 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
         }
         resource.setShouldNotifyAboutDeadline(tascaHelper.shouldNotifyAboutDeadline(entity.getDataLimit()));
         resource.setUsuariActualOnlyObservador(entity.isUsuariActualOnlyObservador(usuariActualCodi));
+        resource.setAgafadaUsuariActual(entity.getResponsableActual()!=null && entity.getResponsableActual().getId().equals(usuariActualCodi));
     }
 
     // PerspectiveApplicator
