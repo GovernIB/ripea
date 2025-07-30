@@ -10,7 +10,7 @@ import {formatDate} from '../../../util/dateUtils.ts';
 import TabComponent from "../../../components/TabComponent.tsx";
 import InteressatsGrid from "../../interessats/InteressatsGrid.tsx";
 import DocumentsGrid from "../../contingut/DocumentsGrid.tsx";
-import TasquesGrid from "../../tasca/TasquesGrid.tsx";
+import TasquesExpedientGrid from "../../tasca/TasquesExpedientGrid.tsx";
 import AnotacionsExpedientGrid from "../../anotacioExpedient/AnotacionsExpedientGrid.tsx";
 import ExpedientActionButton from "./ExpedientActionButton.tsx";
 import MetaDadaGrid from "../../dada/MetaDadaGrid.tsx";
@@ -231,7 +231,7 @@ const Expedient = () => {
         {
             value: "tasques",
             label: t('page.contingut.tabs.tasques'),
-            content: <TasquesGrid entity={expedient} onRowCountChange={setNumTasques}/>,
+            content: <TasquesExpedientGrid entity={expedient} onRowCountChange={setNumTasques}/>,
             badge: numTasques ?? expedient?.numTasques,
         },
     ]
