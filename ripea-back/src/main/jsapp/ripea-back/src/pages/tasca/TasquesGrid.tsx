@@ -1,54 +1,26 @@
-import { Grid } from "@mui/material";
-import {
-    GridPage,
-    useFormContext,
-    useMuiDataGridApiRef,
-} from 'reactlib';
+import {GridPage,} from 'reactlib';
 import {useTranslation} from "react-i18next";
-import GridFormField from "../../components/GridFormField.tsx";
-import * as builder from "../../util/springFilterUtils.ts";
 import { formatDate } from "../../util/dateUtils.ts";
-import useTascaActions from "./details/TascaActions.tsx";
 import {StyledPrioritat} from "../expedient/ExpedientGrid.tsx";
 import {CommentDialog} from "../CommentDialog.tsx";
 import StyledMuiGrid from '../../components/StyledMuiGrid.tsx';
+import TasquesGridFilter from "./TasquesGridFilter.tsx";
+import {useMemo, useState} from "react";
+import Load from "../../components/Load.tsx";
+import { CardPage } from "../../components/CardData.tsx";
 
-const TasquesGridForm = () => {
-    const { data } = useFormContext();
-
-    const metaTascaFilter: string = builder.and(
-        builder.eq("metaExpedient.id", data?.metaExpedient?.id),
-        builder.eq("activa", true),
-    );
-
-    return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="metaExpedientTasca" filter={metaTascaFilter}/>
-        <GridFormField xs={12} name="metaExpedientTascaDescription" type={"textarea"} readOnly disabled/>
-        <GridFormField xs={12} name="responsables" multiple required/>
-        <GridFormField xs={12} name="observadors" multiple/>
-        <GridFormField xs={6} name="duracio"/>
-        <GridFormField xs={6} name="dataLimit" type={"date"}/>
-        <GridFormField xs={12} name="titol"/>
-        <GridFormField xs={12} name="observacions" type={"textarea"}/>
-        <GridFormField xs={12} name="prioritat" required/>
-    </Grid>
-}
-
-const perspectives = ["RESPONSABLES_RESUM"]
 const columns = [
+    {
+        field: 'expedient',
+        flex: 0.5,
+    },
     {
         field: 'metaExpedientTasca',
         flex: 0.5,
     },
     {
-        field: 'dataInici',
+        field: 'metaExpedientTascaDescription',
         flex: 0.5,
-        valueFormatter: (value: any) => formatDate(value)
-    },
-    {
-        field: 'dataLimit',
-        flex: 0.5,
-        valueFormatter: (value: any) => formatDate(value, "DD/MM/Y")
     },
     {
         field: 'titol',
@@ -59,9 +31,14 @@ const columns = [
         flex: 0.5,
     },
     {
-        field: 'responsablesStr',
+        field: 'prioritat',
         flex: 0.5,
-        sortable: false,
+        renderCell: (params: any) => <StyledPrioritat entity={params?.row}>{params.formattedValue}</StyledPrioritat>
+    },
+    {
+        field: 'dataInici',
+        flex: 0.5,
+        valueFormatter: (value: any) => formatDate(value)
     },
     {
         field: 'responsableActual',
@@ -69,23 +46,23 @@ const columns = [
         sortable: false,
     },
     {
+        field: 'dataLimit',
+        flex: 0.5,
+        valueFormatter: (value: any) => formatDate(value, "DD/MM/Y")
+    },
+    {
         field: 'estat',
         flex: 0.5,
     },
-    {
-        field: 'prioritat',
-        flex: 0.5,
-        renderCell: (params: any) => <StyledPrioritat entity={params?.row}>{params.formattedValue}</StyledPrioritat>
-    },
 ];
 
-const sortModel:any = [{field: 'id', sort: 'asc'}];
-const TasquesGrid = (props: any) => {
-    const { entity, onRowCountChange } = props;
+const sortModel:any = [{field: 'dataInici', sort: 'desc'}];
+const TasquesGrid = () => {
     const { t } = useTranslation();
-    const apiRef = useMuiDataGridApiRef();
+    const [springFilter, setSpringFilter] = useState<string>();
+    const [load, setLoad] = useState<boolean>(false);
 
-    const additionalColumns = [
+    const additionalColumns = useMemo(()=>[
         ...columns,
         {
             field: 'numComentaris',
@@ -99,36 +76,37 @@ const TasquesGrid = (props: any) => {
                 resourceReference={'expedientTasca'}
             />
         },
-    ]
+    ], [columns])
 
-    const { actions, components } = useTascaActions(entity, apiRef?.current?.refresh);
+    const apiRef = useMuiDataGridApiRef();
+
+    const refresh = () => {
+        apiRef?.current?.refresh?.();
+    }
 
     return <GridPage>
-        <StyledMuiGrid
-            apiRef={apiRef}
-            resourceName="expedientTascaResource"
-            popupEditFormDialogResourceTitle={t('page.tasca.title')}
-            columns={additionalColumns}
-            // paginationActive
-            filter={builder.eq('expedient.id', entity?.id)}
-            perspectives={perspectives}
-            sortModel={sortModel}
-            onRowCountChange={onRowCountChange}
-            popupEditCreateActive
-			toolbarCreateTitle={t('page.tasca.action.new.label')}
-            popupEditFormContent={<TasquesGridForm/>}
-            formAdditionalData={{
-                expedient: {id: entity?.id},
-                metaExpedient: entity?.metaExpedient,
-            }}
-            rowAdditionalActions={actions}
-            toolbarHideCreate={!entity?.potModificar}
+        <CardPage title={t('page.user.menu.tasca')}>
+            <TasquesGridFilter
+                onSpringFilterChange={(value:any)=>{
+                    setSpringFilter(value)
+                    setLoad(true)
+                }}
+            />
 
-            popupEditFormI18nKeys={{
-                createSuccess: 'page.tasca.action.new.ok',
-            }}
-        />
-        {components}
+            <Load value={load} noEffect>
+            <StyledMuiGrid
+                apiRef={apiRef}
+                resourceName="expedientTascaResource"
+                columns={additionalColumns}
+                filter={springFilter}
+                // perspectives={perspectives}
+                sortModel={sortModel}
+                // rowAdditionalActions={actions}
+                paginationActive
+                readOnly
+            />
+            </Load>
+        </CardPage>
     </GridPage>
 }
 

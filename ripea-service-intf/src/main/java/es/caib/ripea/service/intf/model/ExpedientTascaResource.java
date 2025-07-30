@@ -30,6 +30,10 @@ import java.util.List;
         descriptionField = "titol",
         artifacts = {
                 @ResourceConfigArtifact(
+                        type = ResourceArtifactType.FILTER,
+                        code = ExpedientTascaResource.FILTER_CODE,
+                        formClass = ExpedientTascaResource.TascaFilterForm.class),
+                @ResourceConfigArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = ExpedientTascaResource.PERSPECTIVE_RESPONSABLES_CODE),
                 @ResourceConfigArtifact(
@@ -85,6 +89,8 @@ public class ExpedientTascaResource extends BaseAuditableResource<Long> {
     public static final String ACTION_REBUTJAR_CODE = "REBUTJAR";
     public static final String ACTION_RETOMAR_CODE = "RETOMAR";
 
+    public static final String FILTER_CODE = "TASCA_FILTER";
+
 //    @NotNull
     private Date dataInici;
     private Date dataFi;
@@ -136,6 +142,22 @@ public class ExpedientTascaResource extends BaseAuditableResource<Long> {
         private TascaEstatEnumDto estat;
     }
     
+    @Getter
+    @Setter
+    public static class TascaFilterForm implements Serializable {
+        private ResourceReference<MetaExpedientResource, Long> metaExpedient;
+        private ResourceReference<ExpedientResource, Long> expedient;
+        private ResourceReference<MetaExpedientTascaResource, Long> metaExpedientTasca;
+        private String titol;
+        private PrioritatEnumDto prioritat;
+        private Date dataInici;
+        private Date dataFi;
+        private Date dataLimitInici;
+        private Date dataLimitFi;
+        private List<TascaEstatEnumDto> estat = new ArrayList<>(
+                List.of(TascaEstatEnumDto.PENDENT, TascaEstatEnumDto.INICIADA, TascaEstatEnumDto.AGAFADA));
+    }
+
     @Getter
     @Setter
     public static class ChangePrioritatFormAction implements Serializable {

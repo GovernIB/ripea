@@ -3,6 +3,7 @@ import NotFoundPage from './pages/NotFound';
 import Expedient from './pages/expedient/details/Expedient.tsx';
 import ExpedientGrid from './pages/expedient/ExpedientGrid';
 import AnotacionsGrid from "./pages/anotacions/AnotacionsGrid.tsx";
+import TasquesGrid from "./pages/tasca/TasquesGrid.tsx";
 
 const AppRoutes: React.FC = () => {
     return <Routes>
@@ -13,6 +14,7 @@ const AppRoutes: React.FC = () => {
         </Route>
         <Route path="contingut/:id" element={<Expedient />} />
         <Route path="expedientPeticio" element={<AnotacionsGrid />} />
+        <Route path="usuariTasca" element={<TasquesGrid />} />
         <Route path="*" element={<NotFoundPage />} />
     </Routes>;
 }
