@@ -1,9 +1,8 @@
 import axios from "axios";
 import {useEffect, useMemo} from "react";
 import {useSession} from "./SessionStorageContext.tsx";
-import {useResourceApiService} from "reactlib";
+import {useResourceApiService, useResourceApiContext} from "reactlib";
 
-const userUrl :string = import.meta.env.VITE_API_URL + 'usuari';
 const userkey :string = 'usuario';
 const entitatKey = 'entitat';
 const organKey = 'organ';
@@ -11,10 +10,11 @@ const organKey = 'organ';
 export const useUserSession = () => {
     axios.defaults.withCredentials = true;
 
+    const { apiUrl } = useResourceApiContext();
     const {value, isInitialized, save, remove} = useSession(userkey)
 
     const refresh = () => {
-        axios.get(userUrl+'/actual/securityInfo')
+        axios.get(apiUrl + 'usuari/actual/securityInfo')
             .then((response) => {
                 save(response.data);
             })
@@ -25,7 +25,7 @@ export const useUserSession = () => {
     }
 
     const apiSave = (value:any) => {
-        axios.post(userUrl+'/actual/changeInfo', value)
+        axios.post(apiUrl + 'usuari/actual/changeInfo', value)
             .then((response) => {
                 save(response.data);
             })
