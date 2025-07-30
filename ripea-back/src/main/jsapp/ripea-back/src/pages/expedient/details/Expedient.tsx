@@ -58,7 +58,7 @@ const ExpedientsRelacionats = (props:any) => {
         ...expedient?.relacionatsAmb ?? []
     ])];
 
-    return <CardData title={'Expedients relacionats'} display={'flex'} flexDirection={'column'} hidden={relacionats?.length==0}>
+    return <CardData title={t('page.contingut.action.importarExpedient.title')} display={'flex'} flexDirection={'column'} hidden={relacionats?.length==0}>
         {
             relacionats?.map((relacionat:any) =>
                 <Grid key={relacionat?.id} container alignItems="center">
