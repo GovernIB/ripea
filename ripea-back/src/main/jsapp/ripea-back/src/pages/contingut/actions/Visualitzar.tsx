@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {MuiDialog, useBaseAppContext, useResourceApiService} from "reactlib";
+import {MuiDialog, useBaseAppContext, useResourceApiService, useResourceApiContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import Load from "../../../components/Load.tsx";
 import Iframe from "../../../components/Iframe.tsx";
@@ -7,11 +7,14 @@ import {Firmes} from "../details/DocumentDetail.tsx";
 import {Grid} from "@mui/material";
 
 const getUrl = (id: any) => {
-    return `${import.meta.env.VITE_BASE_URL}contingut/document/${id}/getPDF`
+    const cleanApiUrl = apiUrl.replace(/\/reactapp\/api\/?$/, ''); //Eliminar /api de la URL per obtenir el base URL
+    return `${cleanApiUrl}contingut/document/${id}/getPDF`;
 }
 
 const Visualitzar = (props: any) => {
+    
     const {entity} = props;
+    const { apiUrl } = useResourceApiContext();
 
     return <Load value={entity}>
         <Firmes entity={entity}/>

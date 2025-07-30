@@ -5,7 +5,7 @@ import {useEntitatSession, useUserSession} from "../../components/Session.tsx";
 import {useTranslation} from "react-i18next";
 import useExecucioMassiva from "./actions/ExecucioMassivaGrid.tsx";
 import {useNotificacionsSession, useTasquesSession} from "../../components/SseClient.tsx";
-import {MenuEntry} from "reactlib";
+import {MenuEntry, useResourceApiContext} from "reactlib";
 import AppMenu from "../../components/AppMenu.tsx";
 import {
     Link as RouterLink,
@@ -20,7 +20,9 @@ export const icons = {
 }
 
 export const toProgramaAntic = (ref:string) => {
-    window.location.href = (`${import.meta.env.VITE_BASE_URL}${ref}`)
+    const { apiUrl } = useResourceApiContext();
+    const cleanApiUrl = apiUrl.replace(/\/reactapp\/api\/?$/, ''); //Eliminar /api de la URL per obtenir el base URL
+    window.location.href = (`${cleanApiUrl}${ref}`)
 }
 
 const Link = React.forwardRef<HTMLAnchorElement, RouterLinkProps>((itemProps, ref) => {

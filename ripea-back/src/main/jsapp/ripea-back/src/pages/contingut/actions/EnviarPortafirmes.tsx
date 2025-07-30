@@ -1,6 +1,6 @@
 import {useRef, useState} from "react";
 import {Alert, Grid, Icon} from "@mui/material";
-import {MuiDialog, MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
+import {MuiDialog, MuiFormDialogApi, useBaseAppContext, useFormContext, useResourceApiContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import GridFormField, {GridButton} from "../../../components/GridFormField.tsx";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
@@ -12,10 +12,12 @@ import IconButton from "@mui/material/IconButton";
 import Load from "../../../components/Load.tsx";
 
 const useConverdedToPDF = () => {
+    
     const { t } = useTranslation();
-
     const [open, setOpen] = useState(false);
     const [entityId, setEntityId] = useState<any>();
+    const { apiUrl } = useResourceApiContext();
+    const cleanApiUrl = apiUrl.replace(/\/reactapp\/api\/?$/, ''); //Eliminar /api de la URL per obtenir el base URL
 
     const handleOpen = (id:any) => {
         setEntityId(id);
@@ -48,7 +50,7 @@ const useConverdedToPDF = () => {
             }}
         >
             <Load value={entityId}>
-                <Iframe src={`${import.meta.env.VITE_BASE_URL}document/convertir/pdf/${entityId}`}/>
+                <Iframe src={`${cleanApiUrl}document/convertir/pdf/${entityId}`}/>
             </Load>
         </MuiDialog>
 
