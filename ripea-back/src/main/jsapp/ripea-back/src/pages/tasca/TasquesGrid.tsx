@@ -1,4 +1,4 @@
-import {GridPage,} from 'reactlib';
+import {GridPage, useMuiDataGridApiRef,} from 'reactlib';
 import {useTranslation} from "react-i18next";
 import { formatDate } from "../../util/dateUtils.ts";
 import {StyledPrioritat} from "../expedient/ExpedientGrid.tsx";
