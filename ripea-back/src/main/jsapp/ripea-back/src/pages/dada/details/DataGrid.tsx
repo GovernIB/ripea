@@ -51,7 +51,7 @@ const DataGrid = (props:any) => {
             hidden: !contingut?.potModificar,
         },
         {
-            label: t('common.update'),
+            label: t('common.delete'),
             icon: "delete",
             showInMenu: false,
             clickTriggerDelete: true,

@@ -1,7 +1,6 @@
 import GridFormField from "../../components/GridFormField.tsx";
 import StyledMuiFilter from "../../components/StyledMuiFilter.tsx";
 import * as builder from '../../util/springFilterUtils';
-import {formatEndOfDay} from "../../util/dateUtils.ts";
 
 const AnotacioFilterForm = () => {
     return <>
@@ -17,8 +16,7 @@ const AnotacioFilterForm = () => {
 }
 
 const springFilterBuilder = (data: any): string => {
-    let filterStr: string = '';
-    filterStr += builder.and(
+    let filterStr: string = builder.and(
         builder.like("identificador", data.numRegistre),
         builder.like("registre.extracte", data.extracte),
         builder.like("registre.destiCodiINom", data.destinacio),
