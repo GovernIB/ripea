@@ -469,7 +469,6 @@ body {
 					<%---- Expedients ----%>
 					<ul>
 					<li><span class="fa fa-folder-o"></span><a href="<c:url value="/expedient"></c:url>"><spring:message code="decorator.menu.expedients"/></a></li>
-					<li><span class="fa fa-folder-o" style="color: coral;"></span><a href="<c:url value="/reactapp/expedient"></c:url>"><spring:message code="decorator.menu.expedients"/> (REACT)</a></li>
 					<%---- Annotacions pendents ----%>
 					<li><span class="fa fa-envelope"></span><a href="<c:url value="/expedientPeticio"></c:url>"><spring:message code="decorator.menu.expedientPeticions"/><span id="anotacio-pendent-count" class="badge small">${countAnotacionsPendents}</span></a></li>
 					<li style="display: inline-table;width: 100%;">
@@ -548,7 +547,6 @@ body {
 				<c:when test="${isRolActualAdministradorOrgan}">
 					<ul>
 					<li><span class="fa fa-folder-o"></span><a href="<c:url value="/expedient"></c:url>"><spring:message code="decorator.menu.expedients"/></a></li>
-					<li><span class="fa fa-folder-o" style="color: coral;"></span><a href="<c:url value="/reactapp/expedient"></c:url>"><spring:message code="decorator.menu.expedients"/> (REACT)</a></li>
 					<li>
 						<span class="fa fa-envelope"></span>
 						<a href="<c:url value="/expedientPeticio"></c:url>">
@@ -574,7 +572,6 @@ body {
 				<c:when test="${isRolActualUsuari}">
 				<ul>
 					<li><span class="fa fa-folder-o"></span><a href="<c:url value="/expedient"></c:url>"><spring:message code="decorator.menu.expedients"/></a></li>
-					<li><span class="fa fa-folder-o" style="color: coral;"></span><a href="<c:url value="/reactapp/expedient"></c:url>"><spring:message code="decorator.menu.expedients"/> (REACT)</a></li>
 					<li>
 						<span class="fa fa-envelope"></span>
 						<a href="<c:url value="/expedientPeticio"></c:url>"><spring:message code="decorator.menu.expedientPeticions"/> <span id="anotacio-pendent-count" class="badge small">${countAnotacionsPendents}</span></a>
@@ -675,6 +672,7 @@ body {
 									<li><a href="<c:url value="/excepcio"/>"><spring:message code="decorator.menu.excepcions"/></a></li>
 								</c:when>
 								<c:when test="${isRolActualAdministrador or isRolActualAdministradorOrgan}">
+									<li><a style="color: #f7903e;" href="<c:url value="/reactapp/expedient"></c:url>"><spring:message code="decorator.menu.expedients.new"/></a></li>
 									<li><a href="<c:url value="/expedient"></c:url>"><spring:message code="decorator.menu.expedients"/></a></li>
 									<li>
 										<a href="<c:url value="/expedientPeticio"></c:url>">
@@ -687,6 +685,7 @@ body {
 									</li>
 								</c:when>
 								<c:when test="${isRolActualUsuari}">
+								    <li><a style="color: #f7903e;" href="<c:url value="/reactapp/expedient"></c:url>"><spring:message code="decorator.menu.expedients.new"/></a></li>
 									<li><a href="<c:url value="/expedient"></c:url>"><spring:message code="decorator.menu.expedients"/></a></li>
 									<li>
 										<a href="<c:url value="/expedientPeticio"></c:url>">
