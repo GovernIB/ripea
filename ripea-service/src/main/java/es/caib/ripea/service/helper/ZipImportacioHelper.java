@@ -1,4 +1,4 @@
-package es.caib.ripea.back.helper;
+package es.caib.ripea.service.helper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -6,14 +6,20 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.nio.file.Paths;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import javax.activation.MimetypesFileTypeMap;
+import javax.validation.ConstraintViolation;
+import javax.validation.groups.Default;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -25,11 +31,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
-import es.caib.ripea.back.command.DocumentCommand;
-import es.caib.ripea.back.command.ProgresProcessamentZipCommand;
+import es.caib.ripea.service.intf.base.model.FileReference;
+import es.caib.ripea.service.intf.base.model.Resource;
+import es.caib.ripea.service.intf.dto.DocumentDto;
+import es.caib.ripea.service.intf.dto.DocumentFirmaTipusEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentTipusFirmaEnumDto;
 import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentDto;
+import es.caib.ripea.service.intf.dto.ProgresProcessamentZipDto;
 import es.caib.ripea.service.intf.dto.SignatureInfoDto;
+import es.caib.ripea.service.intf.exception.ElementNotValidException;
+import es.caib.ripea.service.intf.model.DocumentResource;
 import es.caib.ripea.service.intf.service.DocumentService;
 import es.caib.ripea.service.intf.service.MetaDocumentService;
 
@@ -42,23 +55,26 @@ import es.caib.ripea.service.intf.service.MetaDocumentService;
 @Component
 public class ZipImportacioHelper {
 
+	@Autowired
+	private ConversioTipusHelper conversioTipusHelper;
     @Autowired
-    private MetaDocumentService metaDocumentService;
-    
+    private MetaDocumentService metaDocumentService;    
     @Autowired
     private DocumentService documentService;
-
+    @Autowired
+    private javax.validation.Validator validator;
+    
     private final Map<String, byte[]> mapDocuments = new HashMap<>();
-    private final Map<Long, ProgresProcessamentZipCommand> mapProgres = new HashMap<>();
+    private final Map<Long, ProgresProcessamentZipDto> mapProgres = new HashMap<>();
 
-    public List<DocumentCommand> extreureDocuments(
+    public List<DocumentDto> extreureDocuments(
     		MultipartFile fitxerZip, 
     		Long metaExpedientId, 
     		Long pareId, EntitatDto entitat) 
             throws IOException {
         mapDocuments.clear();
         
-        ProgresProcessamentZipCommand progres = incialitzarProgres(pareId);
+        ProgresProcessamentZipDto progres = incialitzarProgres(pareId);
        
         String contingutCSV = llegirCSVIMapejarDocuments(
         		fitxerZip, 
@@ -73,18 +89,18 @@ public class ZipImportacioHelper {
 	            		contingutCSV, 
 	            		metaExpedientId, 
 	            		pareId, 
-	            		entitat.getId()) : new ArrayList<DocumentCommand>();
+	            		entitat.getId()) : new ArrayList<DocumentDto>();
     }
 
-    private ProgresProcessamentZipCommand incialitzarProgres(Long pareId) {
+    private ProgresProcessamentZipDto incialitzarProgres(Long pareId) {
     	logger.debug("Inicialitzant el progrés d'importació de documents");
     	
-        ProgresProcessamentZipCommand progres = new ProgresProcessamentZipCommand();
+    	ProgresProcessamentZipDto progres = new ProgresProcessamentZipDto();
         mapProgres.put(pareId, progres);
         return progres;
     }
 
-    private String llegirCSVIMapejarDocuments(MultipartFile fitxerZip, ProgresProcessamentZipCommand progres) throws IOException {
+    private String llegirCSVIMapejarDocuments(MultipartFile fitxerZip, ProgresProcessamentZipDto progres) throws IOException {
     	logger.debug("Llegint CSV i relacionant fitxer CSV amb fitxer dins del ZIP");
     	
         String contingutFitxerCSV = null;
@@ -112,7 +128,7 @@ public class ZipImportacioHelper {
         return contingutFitxerCSV;
     }
 
-    private void inicialitzarDocumentsPendents(MultipartFile arxiuZip, ProgresProcessamentZipCommand progres) throws IOException {
+    private void inicialitzarDocumentsPendents(MultipartFile arxiuZip, ProgresProcessamentZipDto progres) throws IOException {
     	logger.debug("Comptant els total de documents per processar");
     	
         int totalDocuments = 0;
@@ -159,7 +175,7 @@ public class ZipImportacioHelper {
         return outputStream.toByteArray();
     }
 
-    private List<DocumentCommand> processarCSV(
+    private List<DocumentDto> processarCSV(
     		String contingutCSV, 
     		Long metaExpedientId, 
     		Long pareId, 
@@ -167,8 +183,8 @@ public class ZipImportacioHelper {
             throws IOException {
     	logger.debug("Processant files CSV i creant documentCommand");
     	
-        List<DocumentCommand> documents = new ArrayList<>();
-        ProgresProcessamentZipCommand progres = mapProgres.get(pareId);
+        List<DocumentDto> documents = new ArrayList<DocumentDto>();
+        ProgresProcessamentZipDto progres = mapProgres.get(pareId);
 
         Reader reader = null;
         CSVParser csvParser = null;
@@ -179,13 +195,13 @@ public class ZipImportacioHelper {
 
             for (CSVRecord record : csvParser) {
                 progres.addInfo("Processant fila " + record.getRecordNumber());
-                DocumentCommand documentCommand = crearDocumentCommand(
+                DocumentDto documentDto = crearDocumentDto(
                 		record, 
                 		metaExpedientId, 
                 		pareId, 
                 		entitatId, 
                 		progres);
-                documents.add(documentCommand);
+                documents.add(documentDto);
             }
         } finally {
             if (csvParser != null) {
@@ -195,15 +211,54 @@ public class ZipImportacioHelper {
                 reader.close();
             }
         }
+        
+        validarLlistaDocuments(documents);
+        
         return documents;
     }
+    
+	private void validarLlistaDocuments(List<DocumentDto> documents) {
+		for (DocumentDto documentDto : documents) {
+			DocumentResource documentResource = conversioTipusHelper.convertir(
+					documentDto, 
+					DocumentResource.class);
+			
+			documentResource.setHasFirma(documentDto.isAmbFirma());
+			documentResource.setAdjunt(new FileReference(
+					documentDto.getFitxerNom(),
+					documentDto.getFitxerContingut(),
+					documentDto.getFitxerContentType(),
+					documentDto.getFitxerTamany()
+	        ));
+			
+			Set<ConstraintViolation<DocumentResource>> violations = validator.validate(
+					documentResource, 
+					Default.class, Resource.OnCreate.class,  Resource.OnUpdate.class);
 
-    private DocumentCommand crearDocumentCommand(
+	        if (!violations.isEmpty()) {
+	    		StringBuilder validacions = new StringBuilder();
+	            validacions.append("<ul>");
+	            for (ConstraintViolation<DocumentResource> v : violations) {
+	            	String camp = v.getPropertyPath().toString();
+	            	
+	            	if (! camp.isBlank())
+	            		validacions.append("<li>").append(camp).append(": ").append(v.getMessage()).append("</li>");
+	            	else
+	            		validacions.append("<li>").append(v.getMessage()).append("</li>");
+	            }
+	            validacions.append("</ul>");
+	            
+	            throw new ElementNotValidException(validacions.toString());
+	        }
+		}
+	}
+
+    private DocumentDto crearDocumentDto(
     		CSVRecord record, 
     		Long metaExpedientId, 
     		Long pareId, 
     		Long entitatId,
-    		ProgresProcessamentZipCommand progres) {
+    		ProgresProcessamentZipDto progres) {
         String tipusDocumentCodi = obtenirValorFila(record, "Tipo de documento ENI", true);
         String nomFitxer = obtenirValorFila(record, "Nombre del fichero", true);
         String nomDocument = obtenirValorFila(record, "Nombre del documento", true);
@@ -228,40 +283,51 @@ public class ZipImportacioHelper {
         if (metaDocument == null)
         	throw new RuntimeException("No s'ha trobat cap tipus de document amb el codi " + tipusDocumentCodi);
         	
-        DocumentCommand documentCommand = new DocumentCommand();
-        documentCommand.setMetaNodeId(metaDocument.getId());
-        documentCommand.setNom(nomDocument);
-        documentCommand.setOrigen(DocumentCommand.DocumentFisicOrigenEnum.DISC);
-        documentCommand.setFitxerNom(nomFitxer);
-        documentCommand.setFitxerContentType(fitxerContentType);
-        documentCommand.setDescripcio(descripcio);
-        documentCommand.setFitxerContingut(fitxerContingut);
-        documentCommand.setDataTime(new LocalDateTime());
-        documentCommand.setNtiEstadoElaboracion(metaDocument.getNtiEstadoElaboracion());
-        documentCommand.setNtiOrigen(metaDocument.getNtiOrigen());
-        documentCommand.setPareId(pareId);
-        documentCommand.setValidacioFirmaCorrecte(true);
+        DocumentDto documentDto = new DocumentDto();
+        documentDto.setMetaNode(metaDocument);
+        documentDto.setDocumentTipus(DocumentTipusEnumDto.DIGITAL);
+        documentDto.setNom(nomDocument);
+        documentDto.setNtiVersion("1.0");
+        //        documentCommand.setOrigen(DocumentCommand.DocumentFisicOrigenEnum.DISC);
+        documentDto.setFitxerNom(nomFitxer);
+        documentDto.setFitxerContentType(fitxerContentType);
+        documentDto.setFitxerContingut(fitxerContingut);
+        documentDto.setFitxerTamany((long) fitxerContingut.length);
+        documentDto.setDescripcio(descripcio);
+        documentDto.setDataCaptura(new Date());
+        documentDto.setData(new Date());
+        documentDto.setNtiEstadoElaboracion(metaDocument.getNtiEstadoElaboracion());
+        documentDto.setNtiOrigen(metaDocument.getNtiOrigen());
+        documentDto.setPareId(pareId);
+        documentDto.setValidacioFirmaCorrecte(true);
 
+        if (!firmat) {
+        	documentDto.setDocumentFirmaTipus(DocumentFirmaTipusEnumDto.SENSE_FIRMA);
+        	documentDto.setAmbFirma(false);
+        }
+        
         if (firmat) {
         	logger.debug("Validant la firma del fitxer {} del CSV", nomFitxer);
             SignatureInfoDto signatureInfo = documentService.checkIfSignedAttached(
             		fitxerContingut, 
             		fitxerContentType);
-            documentCommand.setAmbFirma(!signatureInfo.isError());
-            documentCommand.setValidacioFirmaCorrecte(!signatureInfo.isError());
-            documentCommand.setValidacioFirmaErrorMsg(signatureInfo.getErrorMsg());
+            documentDto.setAmbFirma(!signatureInfo.isError());
+            documentDto.setDocumentFirmaTipus(DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA);
+            documentDto.setTipusFirma(DocumentTipusFirmaEnumDto.ADJUNT);
+            documentDto.setValidacioFirmaCorrecte(!signatureInfo.isError());
+            documentDto.setValidacioFirmaErrorMsg(signatureInfo.getErrorMsg());
         }
 
         progres.incrementOperacionsRealitzades();
         
-        return documentCommand;
+        return documentDto;
     }
 
     public byte[] obtenirContingutFitxer(String nomFitxer) {
         return mapDocuments.get(nomFitxer);
     }
 
-    public ProgresProcessamentZipCommand obtenirProgresActual(Long pareId) {
+    public ProgresProcessamentZipDto obtenirProgresActual(Long pareId) {
         return mapProgres.get(pareId);
     }
     
@@ -278,6 +344,10 @@ public class ZipImportacioHelper {
 		}
 		return null;
     }
+    
+//    private static Date convertToDate(LocalDateTime dateToConvert) throws ParseException {
+//		return new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse(date);
+//	}
     
     private static final Logger logger = LoggerFactory.getLogger(ZipImportacioHelper.class);
     

@@ -1,4 +1,4 @@
-package es.caib.ripea.back.command;
+package es.caib.ripea.service.intf.dto;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Getter @Setter
-public class ProgresProcessamentZipCommand {
+public class ProgresProcessamentZipDto {
 
 	private Integer progres = 0;
 	private Integer numOperacions = 0;
