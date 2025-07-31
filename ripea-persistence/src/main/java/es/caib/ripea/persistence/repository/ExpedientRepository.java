@@ -208,26 +208,20 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"    distinct e.id " +
 			"from " +
 			"    ExpedientEntity e " +
-			"    left join e.organGestorPares eogp " +
-			"    left join eogp.metaExpedientOrganGestor eogpmeog " +
-			"    left join eogp.metaExpedientOrganGestor.organGestor eogpmeogog " +
+			"    left join e.metaexpedientOrganGestorPares meogp " +
 			"where	e.esborrat = 0 " +
 			"and	e.entitat = :entitat " +
 			"and (" +
-			"     (:esNullMetaExpedientIdPermesos = false and (e.metaExpedient.id in (:metaExpedientIdPermesos0) " +
-			"			or e.metaExpedient.id in (:metaExpedientIdPermesos1) " +
-			"			or e.metaExpedient.id in (:metaExpedientIdPermesos2) " +
-			"			or e.metaExpedient.id in (:metaExpedientIdPermesos3))) " +
-			"     or (:esNullOrganIdPermesos = false and (e.organGestor.id in (:organIdPermesos0) " +
-			"			or e.organGestor.id in (:organIdPermesos1) " +
-			"			or e.organGestor.id in (:organIdPermesos2) " +
-			"			or e.organGestor.id in (:organIdPermesos3))) " +
-			"     or (:esNullOrganIdPermesos = false and (eogpmeogog.id in (:organIdPermesos0) " +
-			"			or eogpmeogog.id in (:organIdPermesos1) " +
-			"			or eogpmeogog.id in (:organIdPermesos2) " +
-			"			or eogpmeogog.id in (:organIdPermesos3))) " +
-			"     or (:esNullMetaExpedientOrganIdPermesos = false and eogpmeog.id in (:metaExpedientOrganIdPermesos)) " +
-			"     or (:esNullOrganProcedimentsComunsIdsPermesos = false and eogpmeogog.id in (:organProcedimentsComunsIdsPermesos) and e.metaExpedient.id in (:procedimentsComunsIds))) " +
+			"     (:esNullIdsMetaExpedientsPermesos = false and (e.metaExpedient.id in (:idsMetaExpedientsPermesos0)" +
+			"			or e.metaExpedient.id in (:idsMetaExpedientsPermesos1)" +
+			"			or e.metaExpedient.id in (:idsMetaExpedientsPermesos2)" +
+			"			or e.metaExpedient.id in (:idsMetaExpedientsPermesos3))) " +
+			"     or (:esNullIdsOrgansPermesos = false and (meogp.organGestor.id in (:idsOrgansPermesos0)" +
+			"			or meogp.organGestor.id in (:idsOrgansPermesos1)" +
+			"			or meogp.organGestor.id in (:idsOrgansPermesos2)" +
+			"			or meogp.organGestor.id in (:idsOrgansPermesos3))) " +
+			"     or (:esNullIdsMetaExpedientOrganPairsPermesos = false and meogp.id in (:idsMetaExpedientOrganPairsPermesos)) " +
+			"     or (:esNullIdsOrgansAmbProcedimentsComunsPermesos = false and meogp.organGestor.id in (:idsOrgansAmbProcedimentsComunsPermesos) and e.metaExpedient.id in (:idsProcedimentsComuns))) " +
 			// Un cop superada la select anterior, es procedeix a afinar per permisos per procediment:
 			// - Per admin i superadmin: es compleix la primera condicio = No filtra
 			// - Per la resta: el procediment no ha de requerir permis directe o en cas contrari, s'ha de tenir el permis directe de lectura.
@@ -267,12 +261,12 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"and (:esNullMetaExpedientDominiValor = true " +
 			"		or  (select count(*) from DadaEntity dada " + 
 			"				where dada.metaDada.codi = :metaExpedientDominiCodi " + 
-			"				 and dada.node = e.id " + 
-			"				 and (" + 
-			"						(dada.valor = :metaExpedientDominiValor)" + 
-			"					 	or (dada.valor like '%,' || :metaExpedientDominiValor || '%')" + 
-			"						or (dada.valor like '%,' || :metaExpedientDominiValor || ',%')" + 
-			"						or (dada.valor like '%' || :metaExpedientDominiValor || ',%'))"	+ 
+			"				and dada.node = e.id " + 
+			"				and (" + 
+			"						dada.valor = :metaExpedientDominiValor" + 
+			"					 	or dada.valor like '%'  || :metaExpedientDominiValor || ',%'" + 
+			"						or dada.valor like '%,' || :metaExpedientDominiValor || ',%'" + 
+			"						or dada.valor like '%,' || :metaExpedientDominiValor || '%')"	+ 
 			"					 ) != 0) " +
 			"and (:noFiltreGrups = true or (e.grup is null or (:esNullIdsGrupsPermesos = false and e.grup.id in (:idsGrupsPermesos)))) " +
 			"and (:esFiltrarExpedientsAmbFirmaPendent != true " + 
@@ -280,29 +274,29 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"			select dp.expedient.id " + 
 			"			from DocumentPortafirmesEntity dp " + 
 			"			where (dp.estat = es.caib.ripea.service.intf.dto.DocumentEnviamentEstatEnumDto.PENDENT or " + 
-			"				   dp.estat = es.caib.ripea.service.intf.dto.DocumentEnviamentEstatEnumDto.ENVIAT)" + 
+			"				   dp.estat = es.caib.ripea.service.intf.dto.DocumentEnviamentEstatEnumDto.ENVIAT) " + 
 			"				   and dp.error = false)) " +
 			"and (:esNullNumeroRegistre = true " +
-			"		or lower(e.registresImportats) like lower('%'||:numeroRegistre||'%')) " +
+			"		or lower(e.registresImportats) like lower('%'||:numeroRegistre||'%'))" +
 			"and (:esNullGrup = true or e.grup = :grup) "
 			)
 	List<Long> findIdsByEntitatAndFiltre(
 			@Param("entitat") EntitatEntity entitat,
-			@Param("esNullMetaExpedientIdPermesos") boolean esNullMetaExpedientIdPermesos, 
-			@Param("metaExpedientIdPermesos0") List<Long> metaExpedientIdPermesos0,
-			@Param("metaExpedientIdPermesos1") List<Long> metaExpedientIdPermesos1,
-			@Param("metaExpedientIdPermesos2") List<Long> metaExpedientIdPermesos2,
-			@Param("metaExpedientIdPermesos3") List<Long> metaExpedientIdPermesos3,
-			@Param("esNullOrganIdPermesos") boolean esNullOrganIdPermesos,
-			@Param("organIdPermesos0") List<Long> organIdPermesos0,
-			@Param("organIdPermesos1") List<Long> organIdPermesos1,
-			@Param("organIdPermesos2") List<Long> organIdPermesos2,
-			@Param("organIdPermesos3") List<Long> organIdPermesos3,
-			@Param("esNullMetaExpedientOrganIdPermesos") boolean esNullMetaExpedientOrganIdPermesos,
-			@Param("metaExpedientOrganIdPermesos") List<Long> metaExpedientOrganIdPermesos,
-			@Param("esNullOrganProcedimentsComunsIdsPermesos") boolean esNullOrganProcedimentsComunsIdsPermesos, 
-			@Param("organProcedimentsComunsIdsPermesos") List<Long> organProcedimentsComunsIdsPermesos,
-			@Param("procedimentsComunsIds") List<Long> procedimentsComunsIds,
+			@Param("esNullIdsMetaExpedientsPermesos") boolean esNullIdsMetaExpedientsPermesos, 
+			@Param("idsMetaExpedientsPermesos0") List<Long> idsMetaExpedientsPermesos0,
+			@Param("idsMetaExpedientsPermesos1") List<Long> idsMetaExpedientsPermesos1,
+			@Param("idsMetaExpedientsPermesos2") List<Long> idsMetaExpedientsPermesos2,
+			@Param("idsMetaExpedientsPermesos3") List<Long> idsMetaExpedientsPermesos3,
+			@Param("esNullIdsOrgansPermesos") boolean esNullIdsOrgansPermesos,
+			@Param("idsOrgansPermesos0") List<Long> idsOrgansPermesos0,
+			@Param("idsOrgansPermesos1") List<Long> idsOrgansPermesos1,
+			@Param("idsOrgansPermesos2") List<Long> idsOrgansPermesos2,
+			@Param("idsOrgansPermesos3") List<Long> idsOrgansPermesos3,
+			@Param("esNullIdsMetaExpedientOrganPairsPermesos") boolean esNullIdsMetaExpedientOrganPairsPermesos,
+			@Param("idsMetaExpedientOrganPairsPermesos") List<Long> idsMetaExpedientOrganPairsPermesos,
+			@Param("esNullIdsOrgansAmbProcedimentsComunsPermesos") boolean esNullIdsOrgansAmbProcedimentsComunsPermesos, 
+			@Param("idsOrgansAmbProcedimentsComunsPermesos") List<Long> idsOrgansAmbProcedimentsComunsPermesos,
+			@Param("idsProcedimentsComuns") List<Long> idsProcedimentsComuns,
 			@Param("esNullMetaNode") boolean esNullMetaNode,
 			@Param("metaNode") MetaNodeEntity metaNode,
 			@Param("esNullMetaExpedientIdDomini") boolean esNullMetaExpedientIdDomini,
@@ -328,7 +322,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("esNullAgafatPer") boolean esNullAgafatPer,
 			@Param("agafatPer") UsuariEntity agafatPer,
 			@Param("esNullSeguitPer") boolean esNullSeguitPer,
-			@Param("seguitPer") UsuariEntity seguitPer,			
+			@Param("seguitPer") UsuariEntity seguitPer,
 			@Param("esNullTipusId") boolean esNullTipusId,
 			@Param("tipusId") Long tipusId,
 			@Param("esNullExpedientsToBeExcluded") boolean esNullExpedientsToBeExcluded, 

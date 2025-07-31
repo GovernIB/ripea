@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -616,6 +617,11 @@ public class Utils {
         return new ArrayList<>(new LinkedHashSet<>(lista)); // Set elimina duplicados y mantiene el orden
     }
 	
+	public static List<Long> eliminarDuplicadosLista(List<Long> lista) {
+		if (lista==null) return null;
+        return new ArrayList<>(new LinkedHashSet<>(lista)); // Set elimina duplicados y mantiene el orden
+    }
+	
 	public static String desencripta(String encryptedData, String key) {
 		try {
 	        SecretKeySpec secretKey = new SecretKeySpec(key.getBytes(), "AES");
@@ -768,4 +774,18 @@ public class Utils {
         // 2. Validar que contiene solo alfanuméricos y comas (incluso si hay varias comas seguidas)
         return normalizado.matches("^([a-zA-Z0-9]+)(,[a-zA-Z0-9]+)*$");
     }
+	
+	public static String getValorCampFiltre(String camp, String springFilter) {
+		if (hasValue(springFilter) && hasValue(camp)) {
+	        String regex = camp + ":('.*?'|\\d+)";
+	        Pattern pattern = Pattern.compile(regex);
+	        Matcher matcher = pattern.matcher(springFilter);
+
+	        if (matcher.find()) {
+	            return matcher.group(1); // Devuelve el valor encontrado
+	        }
+	        return null; // Si no se encuentra, devuelve null
+		}
+		return null;
+	}
 }
