@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useCallback} from "react";
 import {Grid, Button} from "@mui/material";
 import {StyledBadge} from "../../components/StyledBadge.tsx";
 import {useEntitatSession, useUserSession} from "../../components/Session.tsx";
@@ -19,11 +19,20 @@ export const icons = {
     consulta: 'search',
 }
 
-export const toProgramaAntic = (ref:string) => {
+export const useToProgramaAntic = () => {
     const { apiUrl } = useResourceApiContext();
-    const cleanApiUrl = apiUrl.replace(/\/reactapp\/api\/?$/, ''); //Eliminar /api de la URL per obtenir el base URL
-    window.location.href = (`${cleanApiUrl}${ref}`)
-}
+    const cleanApiUrl = apiUrl.replace(/\/api\/?$/, '/');
+
+    const getUrl = useCallback((ref: string) => {
+        // console.log("apiUrl", apiUrl, cleanApiUrl)
+        return `${cleanApiUrl}${ref}`;
+    },[]);
+
+    return {
+        getUrl,
+        toProgramaAntic: (ref: string) => window.location.href = getUrl(ref)
+    };
+};
 
 const Link = React.forwardRef<HTMLAnchorElement, RouterLinkProps>((itemProps, ref) => {
     return <RouterLink ref={ref} {...itemProps} role={undefined} />;
@@ -111,6 +120,7 @@ const UserHeadToolbar = () => {
 
 const useMenuSupAdmin = () => {
     const { t } = useTranslation();
+    const { toProgramaAntic } = useToProgramaAntic();
 
     const appEntries:any[] = [
         {
@@ -215,6 +225,7 @@ const useMenuAdmin = () => {
     const { value: user } = useUserSession();
     const { value: numNotif } = useNotificacionsSession()
     const { t } = useTranslation();
+    const { toProgramaAntic } = useToProgramaAntic();
 
     const appEntries:any[] = [
         {
@@ -396,6 +407,7 @@ const useMenuAdminOrgan = () => {
     const { value: user } = useUserSession();
     const { value: numNotif } = useNotificacionsSession()
     const { t } = useTranslation();
+    const { toProgramaAntic } = useToProgramaAntic();
 
     const appEntries:any[] = [
         {
@@ -467,6 +479,7 @@ const useMenuAdminOrgan = () => {
 }
 const useMenuDissenyOrgan = () => {
     const { t } = useTranslation();
+    const { toProgramaAntic } = useToProgramaAntic();
 
     const appEntries:any[] = [];
     const entries = [
@@ -497,6 +510,7 @@ const useMenuUsuari = () => {
     const { value: numNotif } = useNotificacionsSession()
     const { value: numTasc } = useTasquesSession()
     const { t } = useTranslation();
+    const { toProgramaAntic } = useToProgramaAntic();
 
     const appEntries:any[] = [
         {
@@ -592,6 +606,7 @@ const useAccionesMassivas = () => {
     const { value: user } = useUserSession();
     const isRolActualAdmin = user?.rolActual == 'IPA_ADMIN';
     const { t } = useTranslation();
+    const { toProgramaAntic } = useToProgramaAntic();
 
     const {handleOpen, dialog} = useExecucioMassiva();
 
@@ -701,6 +716,7 @@ const useAccionesMassivas = () => {
 }
 const useMenuRevisor = () => {
     const { t } = useTranslation();
+    const { toProgramaAntic } = useToProgramaAntic();
 
     const appEntries:any[] = [];
     const entries = [

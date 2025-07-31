@@ -1,22 +1,16 @@
 import {useState} from "react";
-import {MuiDialog, useResourceApiContext} from "reactlib";
+import {MuiDialog} from "reactlib";
 import {useTranslation} from "react-i18next";
 import Load from "../../../components/Load.tsx";
 import Iframe from "../../../components/Iframe.tsx";
-
-const getUrl = (id:any) => {
-    const { apiUrl } = useResourceApiContext();
-    const cleanApiUrl = apiUrl.replace(/\/reactapp\/api\/?$/, ''); //Eliminar /api de la URL per obtenir el base URL
-    return `${cleanApiUrl}expedientPeticio/annex/${id}/content`;
-}
+import {useToProgramaAntic} from "../../user/UserHeadToolbar.tsx";
 
 const Visualitzar = (props:any) => {
-    
     const {id} = props;
-    const { apiUrl } = useResourceApiContext();
+    const { getUrl } = useToProgramaAntic();
 
     return <Load value={id}>
-        <Iframe src={getUrl(id)}/>
+        <Iframe src={getUrl(`expedientPeticio/annex/${id}/content`)}/>
     </Load>
 }
 

@@ -1,5 +1,5 @@
 import {Divider} from "@mui/material";
-import {useBaseAppContext, useConfirmDialogButtons,useResourceApiService, useResourceApiContext} from "reactlib";
+import {useBaseAppContext, useConfirmDialogButtons,useResourceApiService} from "reactlib";
 import {useTranslation} from "react-i18next";
 import useTascaDetail from "./TascaDetail.tsx";
 import useRebutjar from "../actions/Rebutjar.tsx";
@@ -9,6 +9,7 @@ import useReobrir from "../actions/Reobrir.tsx";
 import useCambiarDataLimit from "../actions/CambiarDataLimit.tsx";
 import useCambiarPrioritat from "../actions/CambiarPrioritat.tsx";
 import useRetomar from "../actions/Retomar.tsx";
+import {useToProgramaAntic} from "../../user/UserHeadToolbar.tsx";
 
 const useActions = (refresh?: () => void) => {
     const { t } = useTranslation();
@@ -48,9 +49,11 @@ const useActions = (refresh?: () => void) => {
 }
 
 const useTascaActions = (entity:any, refresh?: () => void) => {
-    
     const { t } = useTranslation();
+    const { toProgramaAntic } = useToProgramaAntic();
+
     const {changeEstat, cancelar} = useActions(refresh)
+
     const {handleShow: handleRebutjar, content: rebutjarContent} = useRebutjar(refresh);
     const {handleShow: handleReassignar, content: reassignarContent} = useReassignar(refresh);
     const {handleShow: handleDelegar, content: delegarContent} = useDelegar(refresh);
@@ -59,8 +62,6 @@ const useTascaActions = (entity:any, refresh?: () => void) => {
     const {handleShow: handleCambiarPrioritat, content: cambiarPrioritatContent} = useCambiarPrioritat(refresh);
     const {handleShow: handleRetomar, content: retomarContent} = useRetomar(refresh);
     const { handleOpen, dialog } = useTascaDetail();
-    const { apiUrl } = useResourceApiContext();
-    const cleanApiUrl = apiUrl.replace(/\/reactapp\/api\/?$/, ''); //Eliminar /api de la URL per obtenir el base URL
 
     const disableResponsable = (row: any): boolean => {
         return !row?.usuariActualResponsable && !row?.usuariActualDelegat;
@@ -90,9 +91,7 @@ const useTascaActions = (entity:any, refresh?: () => void) => {
             label: t('page.tasca.action.tramitar.label'),
             icon: "folder",
             showInMenu: true,
-            onClick: (id:any, row:any) => {
-                window.location.href = (`${cleanApiUrl}contingut/${row?.expedient?.id}?tascaId=${id}`)
-            },
+            onClick: (id:any, row:any) => toProgramaAntic(`contingut/${row?.expedient?.id}?tascaId=${id}`),
             disabled: disableResponsable,
             hidden: (row:any)=> !entity?.potModificar || hiddenByEstat(row),
         },
