@@ -72,6 +72,7 @@ export type MuiDataGridProps = {
     findDisabled?: boolean;
     paginationActive?: boolean;
     selectionActive?: boolean;
+    paginationModel?: GridPaginationModel;
     sortModel?: GridSortModel;
     staticSortModel?: GridSortModel;
     quickFilterInitialValue?: string;
@@ -321,6 +322,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         findDisabled,
         paginationActive,
         selectionActive,
+        paginationModel: paginationModelProp,
         sortModel,
         staticSortModel,
         quickFilterInitialValue,
@@ -384,7 +386,9 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
     const treeDataAdditionalRowsIsFunction = treeDataAdditionalRows ? typeof treeDataAdditionalRows === 'function' : false;
     const [internalSortModel, setInternalSortModel] = React.useState<GridSortModel>(sortModel ?? []);
     const [internalFilter, setInternalFilter] = React.useState<string | undefined>(filterProp);
-    const [paginationModel, setPaginationModel] = React.useState<GridPaginationModel>();
+    const [paginationModel, setPaginationModel] = React.useState<GridPaginationModel | undefined>(
+        paginationModelProp
+    );
     const [rowSelectionModel, setRowSelectionModel] = React.useState<GridRowSelectionModel>(rowSelectionModelProp);
     const [additionalRows, setAdditionalRows] = React.useState<any[]>(!treeDataAdditionalRowsIsFunction ? [] : treeDataAdditionalRows as any[]);
     const {
@@ -598,7 +602,14 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
             }}
             slotProps={{
                 row: { linkTo: rowLink, cursorPointer: onRowClick != null },
-                footer: { paginationActive, selectionActive, pageInfo, setRowSelectionModel },
+                footer: {
+                    paginationActive,
+                    selectionActive,
+                    paginationModel,
+                    pageInfo,
+                    setRowSelectionModel,
+                    pageSizeOptions: otherProps?.pageSizeOptions,
+                },
                 noRowsOverlay: { findDisabled },
             }}
             semiBordered={semiBordered}
