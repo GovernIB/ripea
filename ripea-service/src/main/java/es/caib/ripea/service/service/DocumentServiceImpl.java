@@ -67,6 +67,7 @@ import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.helper.SynchronizationHelper;
 import es.caib.ripea.service.helper.UsuariHelper;
 import es.caib.ripea.service.helper.ViaFirmaHelper;
+import es.caib.ripea.service.helper.ZipImportacioHelper;
 import es.caib.ripea.service.intf.dto.ArbreJsonDto;
 import es.caib.ripea.service.intf.dto.ArxiuFirmaDetallDto;
 import es.caib.ripea.service.intf.dto.ArxiuFirmaDto;
@@ -77,6 +78,7 @@ import es.caib.ripea.service.intf.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentPortafirmesDto;
 import es.caib.ripea.service.intf.dto.DocumentViaFirmaDto;
+import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.FirmaResultatDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.IntegracioAccioTipusEnumDto;
@@ -91,6 +93,7 @@ import es.caib.ripea.service.intf.dto.PortafirmesBlockDto;
 import es.caib.ripea.service.intf.dto.PortafirmesCallbackEstatEnumDto;
 import es.caib.ripea.service.intf.dto.PortafirmesDocumentTipusDto;
 import es.caib.ripea.service.intf.dto.PortafirmesPrioritatEnumDto;
+import es.caib.ripea.service.intf.dto.ProgresProcessamentZipDto;
 import es.caib.ripea.service.intf.dto.RespostaJustificantEnviamentNotibDto;
 import es.caib.ripea.service.intf.dto.Resum;
 import es.caib.ripea.service.intf.dto.SignatureInfoDto;
@@ -141,6 +144,7 @@ public class DocumentServiceImpl implements DocumentService {
 	@Autowired private UsuariHelper usuariHelper;
     @Autowired private EmailHelper emailHelper;
     @Autowired private ContingutLogHelper contingutLogHelper;
+    @Autowired private ZipImportacioHelper zipImportacioHelper;
 
 	@Transactional
 	@Override
@@ -1574,4 +1578,22 @@ public class DocumentServiceImpl implements DocumentService {
 	public String getEnllacCsv(Long entitatId, Long documentId) {
 		return documentHelper.getEnllacCsv(entitatId, documentId);
 	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<DocumentDto> extreureDocumentsZip(InputStream zip, Long metaExpedientId, Long pareId,
+			EntitatDto entitatActual) throws IOException {
+		return zipImportacioHelper.extreureDocuments(zip, metaExpedientId, pareId, entitatActual);
+	}
+
+	@Override
+	public ProgresProcessamentZipDto obtenirProgresProcessamentZip(Long pareId) {
+		return zipImportacioHelper.obtenirProgresActual(pareId);
+	}
+
+	@Override
+	public byte[] obtenirContingutFitxerZip(String fitxerNom) {
+		return zipImportacioHelper.obtenirContingutFitxer(fitxerNom);
+	}
+	
 }

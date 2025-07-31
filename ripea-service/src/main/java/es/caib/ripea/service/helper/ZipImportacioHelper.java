@@ -6,8 +6,6 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.nio.file.Paths;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -24,12 +22,10 @@ import javax.validation.groups.Default;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
 
 import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.Resource;
@@ -64,11 +60,11 @@ public class ZipImportacioHelper {
     @Autowired
     private javax.validation.Validator validator;
     
-    private final Map<String, byte[]> mapDocuments = new HashMap<>();
+    private Map<String, byte[]> mapDocuments = new HashMap<>();
     private final Map<Long, ProgresProcessamentZipDto> mapProgres = new HashMap<>();
 
     public List<DocumentDto> extreureDocuments(
-    		MultipartFile fitxerZip, 
+    		InputStream zip, 
     		Long metaExpedientId, 
     		Long pareId, EntitatDto entitat) 
             throws IOException {
@@ -76,20 +72,22 @@ public class ZipImportacioHelper {
         
         ProgresProcessamentZipDto progres = incialitzarProgres(pareId);
        
-        String contingutCSV = llegirCSVIMapejarDocuments(
-        		fitxerZip, 
-        		progres);
+        ZipContent zipContent = parseZip(zip);
 
-        inicialitzarDocumentsPendents(
-        		fitxerZip, 
-        		progres);
+        int totalDocuments = zipContent.getMapDocuments().size();
+        progres.setNumOperacions(totalDocuments);
+        
+        if (zipContent.getCsvContingut() == null) {
+            throw new RuntimeException("No s'ha trobat cap arxiu CSV al ZIP");
+        }
+        
+        this.mapDocuments = zipContent.getMapDocuments();
 
-        return (contingutCSV != null) ?
-	            	processarCSV(
-	            		contingutCSV, 
-	            		metaExpedientId, 
-	            		pareId, 
-	            		entitat.getId()) : new ArrayList<DocumentDto>();
+        return processarCSV(
+                zipContent.getCsvContingut(), 
+                metaExpedientId, 
+                pareId, 
+                entitat.getId());
     }
 
     private ProgresProcessamentZipDto incialitzarProgres(Long pareId) {
@@ -100,61 +98,25 @@ public class ZipImportacioHelper {
         return progres;
     }
 
-    private String llegirCSVIMapejarDocuments(MultipartFile fitxerZip, ProgresProcessamentZipDto progres) throws IOException {
-    	logger.debug("Llegint CSV i relacionant fitxer CSV amb fitxer dins del ZIP");
-    	
-        String contingutFitxerCSV = null;
-        ZipInputStream zis = null;
-        try {
-            zis = new ZipInputStream(fitxerZip.getInputStream());
+    private ZipContent parseZip(InputStream zipInputStream) throws IOException {
+        ZipContent zipContent = new ZipContent();
+        try (ZipInputStream zis = new ZipInputStream(zipInputStream)) {
             ZipEntry entry;
             while ((entry = zis.getNextEntry()) != null) {
                 if (entry.isDirectory()) continue;
-                String nomFitxer = Paths.get(entry.getName()).getFileName().toString();
-                
-                if (nomFitxer.toLowerCase().endsWith(".csv")) {
-                	contingutFitxerCSV = llegirFitxerCSV(zis);
+
+                String nomFitxer = Paths.get(entry.getName()).getFileName().toString().toLowerCase();
+                if (nomFitxer.endsWith(".csv")) {
+                    zipContent.setCsvContingut(llegirFitxerCSV(zis));
                 } else {
-                    mapDocuments.put(nomFitxer, llegirFitxerAdjunt(zis));
+                    zipContent.putFile(nomFitxer, llegirFitxerAdjunt(zis));
                 }
                 zis.closeEntry();
             }
-        } finally {
-            if (zis != null) {
-                zis.close();
-            }
         }
-        
-        return contingutFitxerCSV;
+        return zipContent;
     }
-
-    private void inicialitzarDocumentsPendents(MultipartFile arxiuZip, ProgresProcessamentZipDto progres) throws IOException {
-    	logger.debug("Comptant els total de documents per processar");
-    	
-        int totalDocuments = 0;
-        ZipInputStream zis = null;
-        try {
-            zis = new ZipInputStream(arxiuZip.getInputStream());
-            ZipEntry entry;
-            while ((entry = zis.getNextEntry()) != null) {
-                if (!entry.isDirectory() && !entry.getName().toLowerCase().endsWith(".csv")) {
-                    totalDocuments++;
-                }
-            }
-        } finally {
-            if (zis != null) {
-                zis.close();
-            }
-        }
-        
-        progres.setNumOperacions(totalDocuments);
-        
-        if (totalDocuments != mapDocuments.size()) {
-            progres.addInfo("Error processant els documents...");
-        	throw new RuntimeException("El total de fitxers no conincideix amb el CSV");
-        }
-    }
-
+    
     private String llegirFitxerCSV(InputStream inputStream) throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         byte[] buffer = new byte[1024];
@@ -348,6 +310,28 @@ public class ZipImportacioHelper {
 //    private static Date convertToDate(LocalDateTime dateToConvert) throws ParseException {
 //		return new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse(date);
 //	}
+
+    class ZipContent {
+        private Map<String, byte[]> mapDocuments = new HashMap<>();
+        private String csvContingut;
+
+        public Map<String, byte[]> getMapDocuments() {
+            return mapDocuments;
+        }
+
+        public void putFile(String name, byte[] content) {
+            mapDocuments.put(name, content);
+        }
+
+		public String getCsvContingut() {
+			return csvContingut;
+		}
+
+		public void setCsvContingut(String csvContingut) {
+			this.csvContingut = csvContingut;
+		}
+    }
+
     
     private static final Logger logger = LoggerFactory.getLogger(ZipImportacioHelper.class);
     
