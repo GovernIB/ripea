@@ -27,6 +27,7 @@ import com.turkraft.springfilter.FilterBuilder;
 import com.turkraft.springfilter.parser.Filter;
 
 import es.caib.plugins.arxiu.api.Expedient;
+import es.caib.ripea.persistence.entity.ContingutEntity;
 import es.caib.ripea.persistence.entity.DocumentEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.ExpedientEntity;
@@ -41,6 +42,7 @@ import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientResource
 import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientSequenciaResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.UsuariResourceRepository;
 import es.caib.ripea.persistence.repository.ContingutMovimentRepository;
+import es.caib.ripea.persistence.repository.ContingutRepository;
 import es.caib.ripea.persistence.repository.DadaRepository;
 import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.persistence.repository.ExpedientEstatRepository;
@@ -60,6 +62,7 @@ import es.caib.ripea.service.helper.ExpedientHelper;
 import es.caib.ripea.service.helper.MessageHelper;
 import es.caib.ripea.service.helper.MetaDocumentHelper;
 import es.caib.ripea.service.helper.PluginHelper;
+import es.caib.ripea.service.helper.ZipImportacioHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
@@ -95,7 +98,6 @@ import es.caib.ripea.service.intf.model.ExpedientResource.ImportarDocumentsZipFo
 import es.caib.ripea.service.intf.model.ExpedientResource.ImportarExpedientFormAction;
 import es.caib.ripea.service.intf.model.ExpedientResource.TancarExpedientFormAction;
 import es.caib.ripea.service.intf.model.InteressatResource;
-import es.caib.ripea.service.intf.model.MetaExpedientOrganGestorResource;
 import es.caib.ripea.service.intf.model.MetaExpedientResource;
 import es.caib.ripea.service.intf.model.NodeResource.MassiveAction;
 import es.caib.ripea.service.intf.model.UsuariResource;
@@ -117,7 +119,8 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 	private final ExpedientEstatRepository expedientEstatRepository;
     private final DocumentResourceRepository documentResourceRepository;
 	private final DadaRepository dadaRepository;
-	private final ContingutMovimentRepository contingutMovimentRepository;
+	private final ContingutRepository contingutRepository;
+	private final ContingutMovimentRepository contingutMovimentRepository;	
 	
     private final UsuariResourceRepository usuariResourceRepository;
     private final ExpedientResourceRepository expedientResourceRepository;
@@ -137,6 +140,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     private final ExcepcioLogHelper excepcioLogHelper;
     private final ExecucioMassivaHelper execucioMassivaHelper;
     private final MetaDocumentHelper metaDocumentHelper;
+    private final ZipImportacioHelper zipImportacioHelper;
     private final MessageHelper messageHelper;
 
     @PostConstruct
@@ -912,11 +916,14 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
                     
                 if (ExpedientResource.ImportarDocumentsZipForm.Fields.documentZip.equals(fieldName)) {
                 	List<DocumentResource> llistaDocumentsProcessats = new ArrayList<DocumentResource>();
+                	List <DocumentDto> aux = zipImportacioHelper.extreureDocuments(null, null, null, null);
                 	
-                	if (fieldValue!=null) { 
-                		llistaDocumentsProcessats.add(new DocumentResource());
-                		llistaDocumentsProcessats.add(new DocumentResource());
-                		llistaDocumentsProcessats.add(new DocumentResource());
+                	if (aux!=null) {
+                		for (DocumentDto doc: aux) {
+                			DocumentResource documentResource = new DocumentResource();
+                			documentResource.setNom(doc.getNom());
+                			llistaDocumentsProcessats.add(documentResource);
+                		}
                 	}
                 	
                 	target.setDocumentsUsuari(llistaDocumentsProcessats);
@@ -928,7 +935,26 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
 		@Override
 		public Serializable exec(String code, ExpedientResourceEntity entity, ImportarDocumentsZipForm params) throws ActionExecutionException {
-			return null;
+			try {
+	    		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+	    		ContingutEntity pare = contingutRepository.findById(entity.getId()).get();
+				for (DocumentResource documentCommand : params.getDocumentsUsuari()) {
+					byte[] fitxerContingut = zipImportacioHelper.obtenirContingutFitxer(documentCommand.getFitxerNom());
+					DocumentDto document = new DocumentDto();
+					//TODO: convertir el DocumentResource a DocumentDto
+					documentHelper.crearDocument(
+							entitatEntity.getId(),
+							document,
+							pare,
+							false,
+							true);
+				}
+				return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
+			} catch (Exception ex) {
+				excepcioLogHelper.addExcepcio("/expedient/"+entity.getId()+"ImportarDocumentsZipArxiuActionExecutor", ex);
+				String message = messageHelper.getMessage("message.common.action.error")+": "+ex.getMessage();
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, message);
+			}				
 		}
     }
     

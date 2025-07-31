@@ -80,6 +80,7 @@ const theme = createTheme({
             styleOverrides: {
                 root: {
                         padding: '10px',
+                        height: '35px',
                 },
             },
         },

@@ -6,8 +6,6 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.nio.file.Paths;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -24,12 +22,10 @@ import javax.validation.groups.Default;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
 
 import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.Resource;
@@ -68,7 +64,7 @@ public class ZipImportacioHelper {
     private final Map<Long, ProgresProcessamentZipDto> mapProgres = new HashMap<>();
 
     public List<DocumentDto> extreureDocuments(
-    		MultipartFile fitxerZip, 
+    		InputStream fitxerZip, 
     		Long metaExpedientId, 
     		Long pareId, EntitatDto entitat) 
             throws IOException {
@@ -100,13 +96,13 @@ public class ZipImportacioHelper {
         return progres;
     }
 
-    private String llegirCSVIMapejarDocuments(MultipartFile fitxerZip, ProgresProcessamentZipDto progres) throws IOException {
+    private String llegirCSVIMapejarDocuments(InputStream  fitxerZip, ProgresProcessamentZipDto progres) throws IOException {
     	logger.debug("Llegint CSV i relacionant fitxer CSV amb fitxer dins del ZIP");
     	
         String contingutFitxerCSV = null;
         ZipInputStream zis = null;
         try {
-            zis = new ZipInputStream(fitxerZip.getInputStream());
+            zis = new ZipInputStream(fitxerZip);
             ZipEntry entry;
             while ((entry = zis.getNextEntry()) != null) {
                 if (entry.isDirectory()) continue;
@@ -128,13 +124,13 @@ public class ZipImportacioHelper {
         return contingutFitxerCSV;
     }
 
-    private void inicialitzarDocumentsPendents(MultipartFile arxiuZip, ProgresProcessamentZipDto progres) throws IOException {
+    private void inicialitzarDocumentsPendents(InputStream  arxiuZip, ProgresProcessamentZipDto progres) throws IOException {
     	logger.debug("Comptant els total de documents per processar");
     	
         int totalDocuments = 0;
         ZipInputStream zis = null;
         try {
-            zis = new ZipInputStream(arxiuZip.getInputStream());
+            zis = new ZipInputStream(arxiuZip);
             ZipEntry entry;
             while ((entry = zis.getNextEntry()) != null) {
                 if (!entry.isDirectory() && !entry.getName().toLowerCase().endsWith(".csv")) {
