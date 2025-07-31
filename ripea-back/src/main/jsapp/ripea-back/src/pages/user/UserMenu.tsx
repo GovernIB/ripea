@@ -11,7 +11,7 @@ import MenuButton from "../../components/MenuButton.tsx";
 import {TextAvatar} from "reactlib";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Load from "../../components/Load.tsx";
-import {toProgramaAntic} from "./UserHeadToolbar.tsx";
+import {useToProgramaAntic} from "./UserHeadToolbar.tsx";
 
 const MenuSelect = (props:any) => {
     const {icon, value, onChange, color = "#000", children, ...other} = props
@@ -180,6 +180,7 @@ export const UserMenu = () => {
 }
 const UserMenuButton = () => {
     const { t } = useTranslation();
+    const { toProgramaAntic } = useToProgramaAntic();
     const { value: user, remove: signOut } = useUserSession();
 
     return <Load value={user} noEffect>

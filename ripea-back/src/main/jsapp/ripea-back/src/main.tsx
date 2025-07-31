@@ -55,18 +55,18 @@ const getEnvApiUrl = () => {
 ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
         {/*<AuthProvider config={getAuthConfig()} mandatory everetAuthPatch>*/}
-        <SessionStorageProvider>
-            <SseProvider>
-                <ResourceApiProvider apiUrl={getEnvApiUrl()} userSessionActive>
+        <ResourceApiProvider apiUrl={getEnvApiUrl()} userSessionActive>
+            <SessionStorageProvider>
+                <SseProvider>
                     <ThemeProvider theme={theme}>
                         <CssBaseline />
                         <BrowserRouter basename={import.meta.env.BASE_URL}>
                             <App />
                         </BrowserRouter>
                     </ThemeProvider>
-                </ResourceApiProvider>
-            </SseProvider>
-        </SessionStorageProvider>
+                </SseProvider>
+            </SessionStorageProvider>
+        </ResourceApiProvider>
         {/*</AuthProvider>*/}
     </React.StrictMode>,
 );

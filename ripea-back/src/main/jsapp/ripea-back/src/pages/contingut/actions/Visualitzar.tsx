@@ -5,17 +5,15 @@ import Load from "../../../components/Load.tsx";
 import Iframe from "../../../components/Iframe.tsx";
 import {Firmes} from "../details/DocumentDetail.tsx";
 import {Grid} from "@mui/material";
-
-const getUrl = (id: any) => {
-    return `${import.meta.env.VITE_BASE_URL}contingut/document/${id}/getPDF`
-}
+import {useToProgramaAntic} from "../../user/UserHeadToolbar.tsx";
 
 const Visualitzar = (props: any) => {
     const {entity} = props;
+    const { getUrl } = useToProgramaAntic();
 
     return <Load value={entity}>
         <Firmes entity={entity}/>
-        <Grid item sx={{p: 0, mt: 1}}><Iframe src={getUrl(entity?.id)}/></Grid>
+        <Grid item sx={{p: 0, mt: 1}}><Iframe src={getUrl(`contingut/document/${entity?.id}/getPDF`)}/></Grid>
     </Load>
 }
 

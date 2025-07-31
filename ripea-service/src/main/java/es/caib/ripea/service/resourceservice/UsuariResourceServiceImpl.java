@@ -2,15 +2,19 @@ package es.caib.ripea.service.resourceservice;
 
 import es.caib.ripea.persistence.entity.resourceentity.UsuariResourceEntity;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
+import es.caib.ripea.service.base.service.BaseMutableResourceService.FieldOptionsProvider;
 import es.caib.ripea.service.helper.RolHelper;
 import es.caib.ripea.service.intf.base.exception.ResourceNotFoundException;
+import es.caib.ripea.service.intf.base.model.FieldOption;
 import es.caib.ripea.service.intf.base.permission.UserPermissionInfo;
 import es.caib.ripea.service.intf.base.permission.UserPermissionInfo.PermisosEntitat;
 import es.caib.ripea.service.intf.config.BaseConfig;
+import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.model.UsuariResource;
 import es.caib.ripea.service.intf.resourceservice.UsuariResourceService;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.resourcehelper.UsuariResourceHelper;
+import es.caib.ripea.service.resourceservice.InteressatResourceServiceImpl.MunicipiFieldOptionsProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
@@ -21,9 +25,13 @@ import org.springframework.transaction.annotation.Transactional;
 import com.turkraft.springfilter.FilterBuilder;
 import com.turkraft.springfilter.parser.Filter;
 
+import javax.annotation.PostConstruct;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -38,6 +46,11 @@ import java.util.Optional;
 public class UsuariResourceServiceImpl extends BaseMutableResourceService<UsuariResource, String, UsuariResourceEntity> implements UsuariResourceService {
 
     private final UsuariResourceHelper usuariResourceHelper;
+    
+    @PostConstruct
+    public void init() {
+    	register(UsuariResource.Fields.numElementsPagina, new ElementsPaginaOptionsProvider());
+    }
 
     @Override
     protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
@@ -47,6 +60,19 @@ public class UsuariResourceServiceImpl extends BaseMutableResourceService<Usuari
     	Filter filtreNom2 = FilterBuilder.not(FilterBuilder.like(UsuariResource.Fields.codi, "$%"));
     	Filter filtreResultat = FilterBuilder.and(filtreBase, filtreNom1, filtreNom2);
     	return filtreResultat.generate();
+    }
+    
+    public class ElementsPaginaOptionsProvider implements FieldOptionsProvider {
+		public List<FieldOption> getOptions(String fieldName, Map<String,String[]> requestParameterMap) {
+			List<FieldOption> resultat = new ArrayList<FieldOption>();
+			resultat.add(new FieldOption(null, "Automatic"));
+			resultat.add(new FieldOption("10", "10"));
+			resultat.add(new FieldOption("20", "20"));
+			resultat.add(new FieldOption("50", "50"));
+			resultat.add(new FieldOption("100", "100"));
+			resultat.add(new FieldOption("250", "250"));
+			return resultat;
+		}
     }
     
     @Transactional(readOnly = true)

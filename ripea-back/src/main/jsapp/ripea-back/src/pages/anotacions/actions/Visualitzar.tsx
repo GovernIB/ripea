@@ -3,16 +3,14 @@ import {MuiDialog} from "reactlib";
 import {useTranslation} from "react-i18next";
 import Load from "../../../components/Load.tsx";
 import Iframe from "../../../components/Iframe.tsx";
-
-const getUrl = (id:any) => {
-    return `${import.meta.env.VITE_BASE_URL}expedientPeticio/annex/${id}/content`;
-}
+import {useToProgramaAntic} from "../../user/UserHeadToolbar.tsx";
 
 const Visualitzar = (props:any) => {
     const {id} = props;
+    const { getUrl } = useToProgramaAntic();
 
     return <Load value={id}>
-        <Iframe src={getUrl(id)}/>
+        <Iframe src={getUrl(`expedientPeticio/annex/${id}/content`)}/>
     </Load>
 }
 

@@ -1,8 +1,5 @@
 import {Divider} from "@mui/material";
-import {
-    useBaseAppContext, useConfirmDialogButtons,
-    useResourceApiService,
-} from "reactlib";
+import {useBaseAppContext, useConfirmDialogButtons,useResourceApiService} from "reactlib";
 import {useTranslation} from "react-i18next";
 import useTascaDetail from "./TascaDetail.tsx";
 import useRebutjar from "../actions/Rebutjar.tsx";
@@ -54,7 +51,6 @@ export const useActions = (refresh?: () => void) => {
 const useTascaActions = (entity:any, refresh?: () => void) => {
     const { t } = useTranslation();
     const navigate = useNavigate();
-
     const {changeEstat, cancelar} = useActions(refresh)
 
     const {handleShow: handleRebutjar, content: rebutjarContent} = useRebutjar(refresh);

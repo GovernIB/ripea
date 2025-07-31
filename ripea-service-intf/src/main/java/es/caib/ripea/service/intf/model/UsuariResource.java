@@ -1,6 +1,7 @@
 package es.caib.ripea.service.intf.model;
 
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
+import es.caib.ripea.service.intf.base.annotation.ResourceField;
 import es.caib.ripea.service.intf.base.model.BaseResource;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.ContingutVistaEnumDto;
@@ -43,6 +44,7 @@ public class UsuariResource extends BaseResource<String> {
 	@Size(max = 64)
 	private String rolActual;
 	private ContingutVistaEnumDto vistaActual;
+	@ResourceField(enumType = true)
 	private Long numElementsPagina;
 	private boolean rebreEmailsAgrupats = true;
 	private boolean rebreAvisosNovesAnotacions;

@@ -946,7 +946,7 @@ const translationEn = {
                 segonPla: "Restart background tasks",
                 plugins: "Restart plugins",
                 avisos: "Notifications",
-                backVersio: "Reload with old design",
+                backVersio: "Classic interface",
 
                 anotacions: "Annotations",
                 procediments: "Procedures",

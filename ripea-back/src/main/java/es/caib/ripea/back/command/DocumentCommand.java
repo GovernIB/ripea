@@ -58,9 +58,9 @@ public class DocumentCommand extends ContenidorCommand {
 	@NotEmpty(groups = {CreateDigital.class, CreateFisic.class, UpdateDigital.class, UpdateFisic.class})
 	@Size(groups = {CreateDigital.class, CreateFisic.class, UpdateDigital.class, UpdateFisic.class}, max=9)
 	private String ntiOrgano;*/
-	@NotNull(groups = {CreateDigital.class, CreateFisic.class, UpdateDigital.class, UpdateFisic.class})
+	@NotNull(groups = {CreateDigital.class, CreateFisic.class, UpdateDigital.class, UpdateFisic.class, CreateDigitalZip.class})
 	private NtiOrigenEnumDto ntiOrigen;
-	@NotNull(groups = {CreateDigital.class, CreateFisic.class, UpdateDigital.class, UpdateFisic.class})
+	@NotNull(groups = {CreateDigital.class, CreateFisic.class, UpdateDigital.class, UpdateFisic.class, CreateDigitalZip.class})
 	private DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion;
 	/*@NotNull(groups = {CreateDigital.class, CreateFisic.class, UpdateDigital.class, UpdateFisic.class})
 	private DocumentNtiTipoDocumentalEnumDto ntiTipoDocumental;*/

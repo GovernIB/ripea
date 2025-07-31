@@ -3,19 +3,49 @@
  */
 package es.caib.ripea.service.intf.service;
 
-import es.caib.ripea.service.intf.dto.*;
-import es.caib.ripea.service.intf.exception.NotFoundException;
-import es.caib.ripea.service.intf.exception.PinbalException;
-import es.caib.ripea.service.intf.exception.SistemaExternException;
-import es.caib.ripea.service.intf.exception.ValidationException;
-import org.springframework.security.access.prepost.PreAuthorize;
-
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.security.PermitAll;
+
+import org.springframework.security.access.prepost.PreAuthorize;
+
+import es.caib.ripea.service.intf.dto.ArbreJsonDto;
+import es.caib.ripea.service.intf.dto.ArxiuFirmaDetallDto;
+import es.caib.ripea.service.intf.dto.ContingutMassiuFiltreDto;
+import es.caib.ripea.service.intf.dto.DocumentDto;
+import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentPortafirmesDto;
+import es.caib.ripea.service.intf.dto.DocumentViaFirmaDto;
+import es.caib.ripea.service.intf.dto.EntitatDto;
+import es.caib.ripea.service.intf.dto.FirmaResultatDto;
+import es.caib.ripea.service.intf.dto.FitxerDto;
+import es.caib.ripea.service.intf.dto.MetaDocumentFirmaFluxTipusEnumDto;
+import es.caib.ripea.service.intf.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
+import es.caib.ripea.service.intf.dto.PaginaDto;
+import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
+import es.caib.ripea.service.intf.dto.PermissionEnumDto;
+import es.caib.ripea.service.intf.dto.PinbalConsultaDto;
+import es.caib.ripea.service.intf.dto.PortafirmesBlockDto;
+import es.caib.ripea.service.intf.dto.PortafirmesCallbackEstatEnumDto;
+import es.caib.ripea.service.intf.dto.PortafirmesPrioritatEnumDto;
+import es.caib.ripea.service.intf.dto.ProgresProcessamentZipDto;
+import es.caib.ripea.service.intf.dto.RespostaJustificantEnviamentNotibDto;
+import es.caib.ripea.service.intf.dto.Resum;
+import es.caib.ripea.service.intf.dto.SignatureInfoDto;
+import es.caib.ripea.service.intf.dto.UsuariDto;
+import es.caib.ripea.service.intf.dto.VersioDocumentEnum;
+import es.caib.ripea.service.intf.dto.ViaFirmaCallbackEstatEnumDto;
+import es.caib.ripea.service.intf.dto.ViaFirmaDispositiuDto;
+import es.caib.ripea.service.intf.dto.ViaFirmaEnviarDto;
+import es.caib.ripea.service.intf.dto.ViaFirmaUsuariDto;
+import es.caib.ripea.service.intf.exception.NotFoundException;
+import es.caib.ripea.service.intf.exception.PinbalException;
+import es.caib.ripea.service.intf.exception.SistemaExternException;
+import es.caib.ripea.service.intf.exception.ValidationException;
 
 
 /**
@@ -751,5 +781,18 @@ public interface DocumentService {
 
     @PreAuthorize("isAuthenticated()")
     public byte[] getPlantillaImportacioZip();
+    
+    @PreAuthorize("isAuthenticated()")
+	public List<DocumentDto> extreureDocumentsZip(
+			InputStream zip, 
+			Long metaExpedientId, 
+			Long pareId,
+			EntitatDto entitatActual) throws IOException;
+    
+    @PreAuthorize("isAuthenticated()")
+	public ProgresProcessamentZipDto obtenirProgresProcessamentZip(Long pareId);
+    
+    @PreAuthorize("isAuthenticated()")
+	public byte[] obtenirContingutFitxerZip(String fitxerNom);
     
 }

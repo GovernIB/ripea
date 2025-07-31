@@ -51,7 +51,7 @@ import es.caib.ripea.service.intf.dto.InteressatTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MunicipiDto;
 import es.caib.ripea.service.intf.dto.ProvinciaDto;
 import es.caib.ripea.service.intf.dto.UnitatOrganitzativaDto;
-import es.caib.ripea.service.intf.exception.InteressatNotValidException;
+import es.caib.ripea.service.intf.exception.ElementNotValidException;
 import es.caib.ripea.service.intf.service.ConfigService;
 import es.caib.ripea.service.intf.service.DadesExternesService;
 import es.caib.ripea.service.intf.service.ExpedientInteressatService;
@@ -219,7 +219,7 @@ public class ExpedientInteressatController extends BaseUserOAdminOOrganControlle
 									fitxer.getInputStream(), 
 									expedientId);
 						} catch (Exception e) {
-							if (e instanceof InteressatNotValidException) {
+							if (e instanceof ElementNotValidException) {
 								MissatgesHelper.error(request,  e.getMessage());
 					        	return "interessatImportForm";
 							}

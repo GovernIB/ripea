@@ -24,6 +24,7 @@ public interface MetaExpedientOrganGestorRepository extends JpaRepository<MetaEx
 			Long organGestorId);
 
 	List<MetaExpedientOrganGestorEntity> findByMetaExpedient(MetaExpedientEntity metaExpedient);
+	List<MetaExpedientOrganGestorEntity> findByOrganGestorId(Long organGestorId);
 	
 	@Query(	"select distinct " +
 			"    meog.organGestor.codi " +

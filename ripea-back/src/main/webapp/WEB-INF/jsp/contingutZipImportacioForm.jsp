@@ -6,7 +6,6 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 
 <c:set var="titol"><spring:message code="contingut.boto.crear.document.multiple"/></c:set>
-<c:set var="idioma"><%=org.springframework.web.servlet.support.RequestContextUtils.getLocale(request).getLanguage()%></c:set>
 
 <html>
 <head>
@@ -165,7 +164,9 @@ $(document).ready(function() {
 <body>
 
 	<c:set var="formAction"><rip:modalUrl value="${action}"/></c:set>
-		
+
+    <div class="esborranys alert well-sm alert-info alert-dismissable"><spring:message code="contingut.boto.crear.document.multiple.info"/></div>
+
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="command" enctype="multipart/form-data">
 		<form:hidden path="tascaId"/>
 		<form:hidden path="metaExpedientId"/>
@@ -273,7 +274,7 @@ $(document).ready(function() {
 			</button>
 			
 			<button type="button" name="cancelarBtn" class="btn btn-default">
-				<spring:message code="comu.boto.cancelar"/>	
+				<spring:message code="comu.boto.tanca"/>
 			</button>
 		</div>
 	</form:form>

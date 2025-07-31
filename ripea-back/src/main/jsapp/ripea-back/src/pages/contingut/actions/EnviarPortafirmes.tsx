@@ -10,9 +10,11 @@ import Iframe from "../../../components/Iframe.tsx";
 import * as builder from '../../../util/springFilterUtils.ts';
 import IconButton from "@mui/material/IconButton";
 import Load from "../../../components/Load.tsx";
+import {useToProgramaAntic} from "../../user/UserHeadToolbar.tsx";
 
 const useConverdedToPDF = () => {
     const { t } = useTranslation();
+    const { getUrl } = useToProgramaAntic();
 
     const [open, setOpen] = useState(false);
     const [entityId, setEntityId] = useState<any>();
@@ -48,7 +50,7 @@ const useConverdedToPDF = () => {
             }}
         >
             <Load value={entityId}>
-                <Iframe src={`${import.meta.env.VITE_BASE_URL}document/convertir/pdf/${entityId}`}/>
+                <Iframe src={getUrl(`document/convertir/pdf/${entityId}`)}/>
             </Load>
         </MuiDialog>
 

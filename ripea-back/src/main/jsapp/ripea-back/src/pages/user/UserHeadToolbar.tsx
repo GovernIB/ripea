@@ -1,11 +1,11 @@
-import React from "react";
-import {Grid, Button} from "@mui/material";
+import React, {useCallback} from "react";
+import {Grid, Button, Icon} from "@mui/material";
 import {StyledBadge} from "../../components/StyledBadge.tsx";
 import {useEntitatSession, useUserSession} from "../../components/Session.tsx";
 import {useTranslation} from "react-i18next";
 import useExecucioMassiva from "./actions/ExecucioMassivaGrid.tsx";
 import {useNotificacionsSession, useTasquesSession} from "../../components/SseClient.tsx";
-import {MenuEntry} from "reactlib";
+import {MenuEntry, useResourceApiContext} from "reactlib";
 import AppMenu from "../../components/AppMenu.tsx";
 import {
     Link as RouterLink,
@@ -19,9 +19,20 @@ export const icons = {
     consulta: 'search',
 }
 
-export const toProgramaAntic = (ref:string) => {
-    window.location.href = (`${import.meta.env.VITE_BASE_URL}${ref}`)
-}
+export const useToProgramaAntic = () => {
+    const { apiUrl } = useResourceApiContext();
+    const cleanApiUrl = apiUrl.replace(/\/api\/?$/, '/');
+
+    const getUrl = useCallback((ref: string) => {
+        // console.log("apiUrl", apiUrl, cleanApiUrl)
+        return `${cleanApiUrl}${ref}`;
+    },[]);
+
+    return {
+        getUrl,
+        toProgramaAntic: (ref: string) => window.location.href = getUrl(ref)
+    };
+};
 
 const Link = React.forwardRef<HTMLAnchorElement, RouterLinkProps>((itemProps, ref) => {
     return <RouterLink ref={ref} {...itemProps} role={undefined} />;
@@ -35,11 +46,12 @@ const generateMenuItems = (appMenuEntries: any[]) => {
             <Button
                 className="appMenuItem"
                 key={entry.id}
-                style={{ color: entitat?.capsaleraColorLletra ?? '#000', marginLeft: 0 }}
+                style={{ color: entitat?.capsaleraColorLletra ?? '#000', marginLeft: 0, ...entry?.componentProps }}
                 component={Link}
                 to={entry.to} // Navegació amb React Router
                 onClick={entry?.onClick}
             >
+                {entry?.icon && <Icon>{entry?.icon}</Icon>}
                 {entry.title}
             </Button>
         ))
@@ -59,7 +71,9 @@ const MenuBadge = (props:any) => {
 }
 
 const UserHeadToolbar = () => {
+    const { t } = useTranslation();
     const { value: user } = useUserSession();
+
     const isRolActualSupAdmin = user?.rolActual == 'IPA_SUPER';
     const isRolActualAdmin = user?.rolActual == 'IPA_ADMIN';
     const isRolActualOrganAdmin = user?.rolActual == 'IPA_ORGAN_ADMIN';
@@ -67,7 +81,18 @@ const UserHeadToolbar = () => {
     const isRolActualRevisor = user?.rolActual == 'IPA_REVISIO';
     const isRolActualUser = user?.rolActual == 'tothom';
 
-    const appMenuEntries:any[] =[]
+    const appMenuEntries:any[] =[
+        {
+            id: 'recargar',
+            title: t('page.user.menu.backVersio'),
+            icon: 'fast_rewind',
+            componentProps: {color: '#ff9523'},
+            onClick: () => {
+                const url = window.location.href.replace('/reactapp', '');
+                window.location.replace(url);
+            },
+        }
+    ]
     const menuEntries:any[] =[]
     const contents:any[] = []
 
@@ -109,6 +134,7 @@ const UserHeadToolbar = () => {
 
 const useMenuSupAdmin = () => {
     const { t } = useTranslation();
+    const { toProgramaAntic } = useToProgramaAntic();
 
     const appEntries:any[] = [
         {
@@ -213,6 +239,7 @@ const useMenuAdmin = () => {
     const { value: user } = useUserSession();
     const { value: numNotif } = useNotificacionsSession()
     const { t } = useTranslation();
+    const { toProgramaAntic } = useToProgramaAntic();
 
     const appEntries:any[] = [
         {
@@ -394,6 +421,7 @@ const useMenuAdminOrgan = () => {
     const { value: user } = useUserSession();
     const { value: numNotif } = useNotificacionsSession()
     const { t } = useTranslation();
+    const { toProgramaAntic } = useToProgramaAntic();
 
     const appEntries:any[] = [
         {
@@ -465,6 +493,7 @@ const useMenuAdminOrgan = () => {
 }
 const useMenuDissenyOrgan = () => {
     const { t } = useTranslation();
+    const { toProgramaAntic } = useToProgramaAntic();
 
     const appEntries:any[] = [];
     const entries = [
@@ -495,6 +524,7 @@ const useMenuUsuari = () => {
     const { value: numNotif } = useNotificacionsSession()
     const { value: numTasc } = useTasquesSession()
     const { t } = useTranslation();
+    const { toProgramaAntic } = useToProgramaAntic();
 
     const appEntries:any[] = [
         {
@@ -590,6 +620,7 @@ const useAccionesMassivas = () => {
     const { value: user } = useUserSession();
     const isRolActualAdmin = user?.rolActual == 'IPA_ADMIN';
     const { t } = useTranslation();
+    const { toProgramaAntic } = useToProgramaAntic();
 
     const {handleOpen, dialog} = useExecucioMassiva();
 
@@ -677,15 +708,6 @@ const useAccionesMassivas = () => {
         {
             divider: true,
         },
-        {
-            id: 'recargar',
-            title: t('page.user.menu.backVersio'),
-            icon: 'fast_rewind',
-            onClick: () => {
-                const url = window.location.href.replace('/reactapp', '');
-                window.location.replace(url);
-            },
-        }
     ]
     const content = <>
         {dialog}
@@ -699,6 +721,7 @@ const useAccionesMassivas = () => {
 }
 const useMenuRevisor = () => {
     const { t } = useTranslation();
+    const { toProgramaAntic } = useToProgramaAntic();
 
     const appEntries:any[] = [];
     const entries = [

@@ -49,7 +49,7 @@ export const DataFormDialog: React.FC<DataFormDialogProps> = (props) => {
         formI18nKeys,
         onClose);
     const show = (id?: any, additionalData?: any) => formDialogShow(id, {
-        title: titleProp ?? ((id != null ? t('datacommon.update.title') : t('datacommon.create.title')) + ' ' + (resourceTitle ?? resourceName)),
+        title: titleProp ?? ((id != null ? t('datacommon.update.label') : t('datacommon.create.label')) + ' ' + (resourceTitle ?? resourceName)),
         additionalData,
     });
     const close = () => formDialogClose();

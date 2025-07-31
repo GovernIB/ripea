@@ -946,7 +946,7 @@ const translationCa = {
                 segonPla: "Reiniciar tasques en segon pla",
                 plugins: "Reiniciar connectors",
                 avisos: "Avisos",
-                backVersio: "Recarregar amb el disseny antic",
+                backVersio: "Interfície clàssica",
 
                 anotacions: "Anotacions",
                 procediments: "Procediments",

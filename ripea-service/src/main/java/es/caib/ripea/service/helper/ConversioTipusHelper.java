@@ -108,6 +108,7 @@ import es.caib.ripea.service.intf.dto.config.OrganConfigDto;
 import es.caib.ripea.service.intf.dto.historic.HistoricExpedientDto;
 import es.caib.ripea.service.intf.dto.historic.HistoricInteressatDto;
 import es.caib.ripea.service.intf.dto.historic.HistoricUsuariDto;
+import es.caib.ripea.service.intf.model.DocumentResource;
 import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.utils.Utils;
 import ma.glasnost.orika.CustomConverter;
@@ -1017,6 +1018,17 @@ public class ConversioTipusHelper {
 	      
 	      //if not excluded with the new version of orika 1.4.6 it gives: ma.glasnost.orika.MappingException: Encountered mapping of primitive to object (or vise-versa); sourceType=boolean, destinationType=ExpedientEntity
 	      mapperFactory.classMap(DocumentEntity.class, DocumentDto.class) 
+	      	.exclude("esborrat")
+	      	.exclude("expedient")
+	      	.exclude("document")
+	      	.exclude("node")
+	      	.exclude("carpeta")
+	      	.exclude("escriptori")
+	      	.exclude("registre")
+	        .byDefault()
+	        .register();
+	      
+	      mapperFactory.classMap(DocumentDto.class, DocumentResource.class) 
 	      	.exclude("esborrat")
 	      	.exclude("expedient")
 	      	.exclude("document")

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import {useSessionList} from './SessionStorageContext';
 import {useUserSession} from "./Session.tsx";
+import {useResourceApiContext} from "reactlib";
 
 // Keys for session storage
 const sseClientKey = 'sseClient';
@@ -37,9 +38,11 @@ export const useTasquesSession = () => {
  * Rep esdeveniments en temps real i actualitza la sessió
  */
 export const SseClient: React.FC = () => {
+    
   const eventSourceRef = useRef<EventSource | null>(null);
   const { save: saveSession, removeAll } = useSseClientSession();
   const { value: user } = useUserSession();
+  const { apiUrl } = useResourceApiContext();
 
   const addEventListener = (eventSource: EventSource, key: string) => {
       eventSource.addEventListener(key, (event) => {
@@ -62,8 +65,6 @@ export const SseClient: React.FC = () => {
                   eventSourceRef.current.close();
               }
 
-              // Crear una nova connexió
-              const apiUrl = import.meta.env.VITE_API_URL || '/api/';
               const sseUrl = `${apiUrl}sse/subscribe/user/${user?.codi}`;
 
               const eventSource = new EventSource(sseUrl, {withCredentials: true});
