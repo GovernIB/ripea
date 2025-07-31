@@ -8,6 +8,11 @@ import TasquesGridFilter from "./TasquesGridFilter.tsx";
 import {useMemo, useState} from "react";
 import Load from "../../components/Load.tsx";
 import { CardPage } from "../../components/CardData.tsx";
+import * as builder from "../../util/springFilterUtils.ts";
+import {useUserSession} from "../../components/Session.tsx";
+import {Icon, Typography} from "@mui/material";
+import useTascaActions from "./details/TascaActions.tsx";
+import {useNavigate} from "react-router-dom";
 
 const columns = [
     {
@@ -48,7 +53,15 @@ const columns = [
     {
         field: 'dataLimit',
         flex: 0.5,
-        valueFormatter: (value: any) => formatDate(value, "DD/MM/Y")
+        valueFormatter: (value: any) => formatDate(value, "DD/MM/Y"),
+        renderCell: (params: any) => {
+            const color = params?.row?.dataLimitExpirada
+                ?'error'
+                :params?.row?.shouldNotifyAboutDeadline
+                    ?'warning'
+                    :'default'
+            return <Typography variant={"inherit"} color={color}>{params?.formattedValue}<Icon>alarm</Icon></Typography>
+        }
     },
     {
         field: 'estat',
@@ -59,6 +72,9 @@ const columns = [
 const sortModel:any = [{field: 'dataInici', sort: 'desc'}];
 const TasquesGrid = () => {
     const { t } = useTranslation();
+    const { value: user } = useUserSession();
+    const navigate = useNavigate();
+
     const [springFilter, setSpringFilter] = useState<string>();
     const [load, setLoad] = useState<boolean>(false);
 
@@ -74,6 +90,7 @@ const TasquesGrid = () => {
                 title={`${t('page.comment.tasca')}: ${params?.row?.metaExpedientTascaDescription}`}
                 resourceName={'expedientTascaComentariResource'}
                 resourceReference={'expedientTasca'}
+                readOnly={params?.row?.usuariActualOnlyObservador}
             />
         },
     ], [columns])
@@ -83,6 +100,8 @@ const TasquesGrid = () => {
     const refresh = () => {
         apiRef?.current?.refresh?.();
     }
+
+    const { actions, components } = useTascaActions({potModificar: true}, refresh)
 
     return <GridPage>
         <CardPage title={t('page.user.menu.tasca')}>
@@ -94,17 +113,41 @@ const TasquesGrid = () => {
             />
 
             <Load value={load} noEffect>
-            <StyledMuiGrid
-                apiRef={apiRef}
-                resourceName="expedientTascaResource"
-                columns={additionalColumns}
-                filter={springFilter}
-                // perspectives={perspectives}
-                sortModel={sortModel}
-                // rowAdditionalActions={actions}
-                paginationActive
-                readOnly
-            />
+                <StyledMuiGrid
+                    apiRef={apiRef}
+                    resourceName="expedientTascaResource"
+                    columns={additionalColumns}
+                    filter={builder.and(
+                        builder.eq("expedient.esborrat", 0),
+                        springFilter,
+                    )}
+                    sortModel={sortModel}
+                    rowAdditionalActions={actions}
+
+                    onRowDoubleClick={(params: any) => navigate(`/contingut/${params?.row?.expedient?.id}/tasca/${params?.id}`)}
+                    rowProps={(row: any) => {
+                        let color;
+                        if (row?.delegat?.id == user.codi) {
+                            color = '#36cfe8';
+                        }
+                        const observadors:any[] = row?.observadors?.map((obs:any)=>obs?.id);
+                        if (observadors.includes(user.codi)) {
+                            color = '#75ce73'
+                        }
+                        return color
+                            ? {
+                                'box-shadow': `${color} -6px 0px 0px`,
+                                'border-left': `6px solid ${color}`,
+                            }
+                            : {
+                                'padding-left': '6px'
+                            }
+                    }}
+
+                    paginationActive
+                    readOnly
+                />
+                {components}
             </Load>
         </CardPage>
     </GridPage>

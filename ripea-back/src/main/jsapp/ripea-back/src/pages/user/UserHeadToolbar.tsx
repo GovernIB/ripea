@@ -515,7 +515,7 @@ const useMenuUsuari = () => {
             title: t('page.user.menu.tasca'),
             badge: numTasc,
             icon: icons.tasca,
-            onClick: () => toProgramaAntic('usuariTasca'),
+            to: '/usuariTasca',
         },
     ];
     const entries = [
@@ -537,7 +537,7 @@ const useMenuUsuari = () => {
             title: t('page.user.menu.tasca'),
             badge: numTasc,
             icon: icons.tasca,
-            onClick: () => toProgramaAntic('usuariTasca'),
+            to: '/usuariTasca',
         },
         {
             id: 'flux',

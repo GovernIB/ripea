@@ -100,8 +100,8 @@ public class ExpedientTascaResource extends BaseAuditableResource<Long> {
     
     @ResourceField(onChangeActive = true)
     private Date dataLimit;
-    private boolean dataLimitExpirada;
-    private boolean shouldNotifyAboutDeadline;
+    @Transient private boolean dataLimitExpirada;
+    @Transient private boolean shouldNotifyAboutDeadline;
     
     private String comentari;
     private long numComentaris;

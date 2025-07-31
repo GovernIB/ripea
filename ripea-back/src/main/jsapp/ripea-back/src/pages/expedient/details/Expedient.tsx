@@ -82,11 +82,11 @@ const ExpedientsRelacionats = (props:any) => {
     </CardData>
 }
 
-const ExpedientInfo = (props:any) => {
-    const {entity: expedient, xs} = props;
+export const ExpedientInfo = (props:any) => {
+    const {title, entity: expedient, xs, readOnly} = props;
     const { t } = useTranslation();
 
-    return <CardData title={t('page.expedient.detall.title')} direction={'column'} xs={xs}>
+    return <CardData title={title ?? t('page.expedient.detall.title')} direction={'column'} xs={xs}>
         <Contenido title={t('page.contingut.detalle.numero')}>{expedient?.numero}</Contenido>
         <Contenido title={t('page.contingut.detalle.titol')}>{expedient?.nom}</Contenido>
         <Contenido title={t('page.contingut.detalle.metaExpedient')}>{expedient?.metaExpedient?.description}</Contenido>
@@ -98,9 +98,11 @@ const ExpedientInfo = (props:any) => {
 
         <ExpedientsRelacionats entity={expedient}/>
 
-        <Grid item xs={12} display={'flex'} justifyContent={'end'}>
-            <ExpedientActionButton entity={expedient}/>
-        </Grid>
+        {!readOnly &&
+            <Grid item xs={12} display={'flex'} justifyContent={'end'}>
+                <ExpedientActionButton entity={expedient}/>
+            </Grid>
+        }
     </CardData>
 }
 

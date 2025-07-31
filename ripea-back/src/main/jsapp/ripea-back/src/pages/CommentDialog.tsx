@@ -1,5 +1,5 @@
 import {useEffect, useRef, useState} from "react";
-import {Badge, Grid, Icon, IconButton, Typography} from "@mui/material";
+import {Badge, Button, Grid, Icon, IconButton, Typography} from "@mui/material";
 import {MuiFormDialog, useResourceApiService, MuiFormDialogApi, useBaseAppContext} from "reactlib";
 import GridFormField from "../components/GridFormField.tsx";
 import {formatDate} from "../util/dateUtils.ts";
@@ -7,9 +7,11 @@ import {useUserSession} from "../components/Session.tsx";
 import Load from "../components/Load.tsx";
 import DOMPurify from 'dompurify';
 
-const CommentForm = () => {
+const CommentForm = (props:any) => {
+    const { readOnly } = props;
+
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="text"/>
+        <GridFormField xs={12} name="text" disabled={readOnly} readOnly={readOnly}/>
     </Grid>
 }
 
@@ -75,10 +77,10 @@ const Comments = (props:any) => {
 }
 
 export const CommentDialog = (props:any) => {
-    const { entity, title, resourceName, resourceReference } = props;
+    const { entity, title, resourceName, resourceReference, componentProps, readOnly } = props;
     const [numComm, setNumComm] = useState<number>(entity?.numComentaris || 0);
     const formApiRef = useRef<MuiFormDialogApi>()
-    const {temporalMessageShow} = useBaseAppContext();
+    const {t, temporalMessageShow} = useBaseAppContext();
 
     const handleOpen = () => {
         formApiRef.current?.show(undefined, {
@@ -95,17 +97,31 @@ export const CommentDialog = (props:any) => {
     }
 
     return <>
-        <IconButton aria-label="forum" color={"inherit"} onClick={handleOpen}>
+        <Button {...componentProps} aria-label="forum" color={"inherit"} onClick={handleOpen}>
             <Badge badgeContent={numComm ?? entity?.numComentaris} color="primary">
                 <Icon>forum</Icon>
             </Badge>
-        </IconButton>
+        </Button>
         <Load value={entity} noEffect>
             <MuiFormDialog
                 resourceName={resourceName}
                 title={title}
                 onClose={(reason?: string) => reason !== 'backdropClick'}
                 apiRef={formApiRef}
+                dialogButtons={[
+                    {
+                        value: false,
+                        text: t('buttons.form.cancel'),
+                        componentProps: { variant: 'outlined' },
+                    }, {
+                        value: true,
+                        text: t('buttons.form.save'),
+                        icon: 'save',
+                        componentProps: { variant: 'contained' },
+                        hidden: readOnly,
+                    }
+                ]
+                    .filter((btn:any)=>!btn?.hidden)}
             >
                 <Comments
                     entity={entity}
@@ -113,7 +129,7 @@ export const CommentDialog = (props:any) => {
                     resourceReference={resourceReference}
                     onRowCountChange={setNumComm}
                 />
-                <CommentForm/>
+                <CommentForm readOnly={readOnly}/>
             </MuiFormDialog>
         </Load>
     </>

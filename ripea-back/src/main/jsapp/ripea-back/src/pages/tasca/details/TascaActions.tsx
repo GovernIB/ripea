@@ -12,8 +12,9 @@ import useReobrir from "../actions/Reobrir.tsx";
 import useCambiarDataLimit from "../actions/CambiarDataLimit.tsx";
 import useCambiarPrioritat from "../actions/CambiarPrioritat.tsx";
 import useRetomar from "../actions/Retomar.tsx";
+import {useNavigate} from "react-router-dom";
 
-const useActions = (refresh?: () => void) => {
+export const useActions = (refresh?: () => void) => {
     const { t } = useTranslation();
     const {messageDialogShow, temporalMessageShow} = useBaseAppContext();
     const confirmDialogButtons = useConfirmDialogButtons();
@@ -52,6 +53,7 @@ const useActions = (refresh?: () => void) => {
 
 const useTascaActions = (entity:any, refresh?: () => void) => {
     const { t } = useTranslation();
+    const navigate = useNavigate();
 
     const {changeEstat, cancelar} = useActions(refresh)
 
@@ -92,9 +94,7 @@ const useTascaActions = (entity:any, refresh?: () => void) => {
             label: t('page.tasca.action.tramitar.label'),
             icon: "folder",
             showInMenu: true,
-            onClick: (id:any, row:any) => {
-                window.location.href = (`${import.meta.env.VITE_BASE_URL}contingut/${row?.expedient?.id}?tascaId=${id}`)
-            },
+            onClick: (id:any, row:any) => navigate(`/contingut/${row?.expedient?.id}/tasca/${id}`),
             disabled: disableResponsable,
             hidden: (row:any)=> !entity?.potModificar || hiddenByEstat(row),
         },

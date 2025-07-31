@@ -97,6 +97,7 @@ const TasquesExpedientGrid = (props: any) => {
                 title={`${t('page.comment.tasca')}: ${params?.row?.metaExpedientTascaDescription}`}
                 resourceName={'expedientTascaComentariResource'}
                 resourceReference={'expedientTasca'}
+                readOnly={params?.row?.usuariActualOnlyObservador}
             />
         },
     ]

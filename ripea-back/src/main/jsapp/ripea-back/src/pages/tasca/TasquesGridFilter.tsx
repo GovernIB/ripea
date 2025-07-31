@@ -22,7 +22,7 @@ const TasquesGridFilterForm = () => {
 
 const springFilterBuilder = (data:any) => {
     const filterStr: string = builder.and(
-        builder.eq("metaExpedient.id", data?.metaExpedient?.id),
+        builder.eq("expedient.metaExpedient.id", data?.metaExpedient?.id),
         builder.eq("expedient.id", data?.expedient?.id),
         builder.eq("metaExpedientTasca.id", data?.metaExpedientTasca?.id),
         builder.like("titol", data?.titol),
