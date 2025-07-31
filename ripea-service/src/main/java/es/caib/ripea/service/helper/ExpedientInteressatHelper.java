@@ -46,7 +46,7 @@ import es.caib.ripea.service.intf.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
 import es.caib.ripea.service.intf.dto.PermissionEnumDto;
 import es.caib.ripea.service.intf.dto.UnitatOrganitzativaDto;
-import es.caib.ripea.service.intf.exception.InteressatNotValidException;
+import es.caib.ripea.service.intf.exception.ElementNotValidException;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.exception.ValidationException;
 import es.caib.ripea.service.intf.model.InteressatResource;
@@ -951,7 +951,7 @@ public class ExpedientInteressatHelper {
 	            }
 	            validacions.append("</ul>");
 	            
-	            throw new InteressatNotValidException(validacions.toString());
+	            throw new ElementNotValidException(validacions.toString());
 	        }
 		}
 		

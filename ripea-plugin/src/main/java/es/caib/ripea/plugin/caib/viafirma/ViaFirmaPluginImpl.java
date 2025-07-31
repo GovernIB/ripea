@@ -138,7 +138,7 @@ public class ViaFirmaPluginImpl extends RipeaAbstractPluginProperties implements
         Message message = new Message();
 
         message.setNotification(buildNotificationForEmail(params));
-        message.setDocument(buildDocument(params));
+        message.setDocument(buildDocument(params, false));
         message.setPolicies(buildPolicies(params, false));
         setCommonMessageAttributes(message, params);
 
@@ -153,7 +153,7 @@ public class ViaFirmaPluginImpl extends RipeaAbstractPluginProperties implements
         Message message = new Message();
 
         message.setNotification(buildNotificationForTablet(params));
-        message.setDocument(buildDocument(params));
+        message.setDocument(buildDocument(params, true));
         message.setPolicies(buildPolicies(params, true));
         setCommonMessageAttributes(message, params);
 
@@ -208,10 +208,14 @@ public class ViaFirmaPluginImpl extends RipeaAbstractPluginProperties implements
     }
 
     // Construye documento base
-    private Document buildDocument(ViaFirmaParams params) {
+    private Document buildDocument(ViaFirmaParams params, boolean isTablet) {
         Document document = new Document();
         document.setTemplateType(TemplateTypeEnum.base64);
         document.setTemplateReference(params.getContingut());
+        if (!isTablet) {
+        	document.setFormRequired(true);
+        	document.setFormDisabled(true);
+        }
         return document;
     }
 

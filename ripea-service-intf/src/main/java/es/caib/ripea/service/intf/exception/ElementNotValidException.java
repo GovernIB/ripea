@@ -1,10 +1,10 @@
 package es.caib.ripea.service.intf.exception;
 
-public class InteressatNotValidException extends RuntimeException {
+public class ElementNotValidException extends RuntimeException {
 
     private static final long serialVersionUID = 7251111046083112422L;
 
-	public InteressatNotValidException(String message) {
+	public ElementNotValidException(String message) {
         super(message);
     }
 

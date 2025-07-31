@@ -207,6 +207,11 @@
 			<groupId>org.apache.activemq</groupId>
 			<artifactId>artemis-jms-server</artifactId>
 		</dependency>
+		<dependency>
+		    <groupId>org.apache.commons</groupId>
+		    <artifactId>commons-csv</artifactId>
+		    <version>1.6</version>
+		</dependency>
 	</dependencies>
 	<profiles>
 		<profile>

@@ -3,6 +3,7 @@ package es.caib.ripea.back.controller;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -26,14 +28,14 @@ import es.caib.ripea.back.command.DocumentCommand;
 import es.caib.ripea.back.command.DocumentCommand.CreateDigitalZip;
 import es.caib.ripea.back.command.ImportacioZipCommand;
 import es.caib.ripea.back.command.ImportacioZipCommand.ProcessarZip;
-import es.caib.ripea.back.command.ProgresProcessamentZipCommand;
 import es.caib.ripea.back.helper.EnumHelper;
 import es.caib.ripea.back.helper.MissatgesHelper;
 import es.caib.ripea.back.helper.RolHelper;
-import es.caib.ripea.back.helper.ZipImportacioHelper;
 import es.caib.ripea.service.intf.dto.DocumentDto;
 import es.caib.ripea.service.intf.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.service.intf.dto.EntitatDto;
+import es.caib.ripea.service.intf.dto.ProgresProcessamentZipDto;
+import es.caib.ripea.service.intf.exception.ElementNotValidException;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.DocumentService;
 import es.caib.ripea.service.intf.service.MetaDocumentService;
@@ -48,8 +50,6 @@ import es.caib.ripea.service.intf.service.MetaDocumentService;
 @RequestMapping("/contingut")
 public class ContingutZipImportacioController extends BaseUserOAdminOOrganController {
 
-	@Autowired
-	private ZipImportacioHelper zipImportacioHelper;
 	@Autowired
 	private DocumentService documentService;
 	@Autowired
@@ -66,16 +66,16 @@ public class ContingutZipImportacioController extends BaseUserOAdminOOrganContro
 			Model model)
 			throws ClassNotFoundException, IOException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		ImportacioZipCommand importacioZipCommand = new ImportacioZipCommand();
+		ImportacioZipCommand command = new ImportacioZipCommand();
 		
-		importacioZipCommand.setPareId(pareId);
-		importacioZipCommand.setTascaId(tascaId);
-		importacioZipCommand.setMetaExpedientId(metaExpedientId);
+		command.setPareId(pareId);
+		command.setTascaId(tascaId);
+		command.setMetaExpedientId(metaExpedientId);
 
 		omplirModelFormulari(
 				model, 
 				pareId, 
-				importacioZipCommand, 
+				command, 
 				entitatActual);
 		return "contingutZipImportacioForm";
 	}
@@ -84,27 +84,52 @@ public class ContingutZipImportacioController extends BaseUserOAdminOOrganContro
 	public String processarZip(
 			HttpServletRequest request, 
 			@PathVariable Long pareId,
-			@Validated({ProcessarZip.class}) ImportacioZipCommand importacioZipCommand,
+			@ModelAttribute("command") @Validated({ProcessarZip.class}) ImportacioZipCommand command,
 			BindingResult bindingResult,
 			Model model) throws ClassNotFoundException, IOException {
 		
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		
 		try {
+			if (bindingResult.hasErrors()) {
+				omplirModelFormulari(
+						model, 
+						pareId, 
+						command,
+						entitatActual);
+				return "contingutZipImportacioForm";
+			}
 			
 			List<DocumentCommand> documents = new ArrayList<DocumentCommand>();
-			
-			documents = zipImportacioHelper.extreureDocuments(
-					importacioZipCommand.getArxiuZip(), 
-					importacioZipCommand.getMetaExpedientId(),
-					importacioZipCommand.getPareId(), 
-					entitatActual);
+			try {
+				List<DocumentDto> documentsDto = documentService.extreureDocumentsZip(
+						command.getArxiuZip().getInputStream(), 
+						command.getMetaExpedientId(),
+						command.getPareId(), 
+						entitatActual);
 				
-			importacioZipCommand.setDocuments(documents);
+				documents = documentsDto.stream()
+					    .map(DocumentCommand::asCommand)
+					    .collect(Collectors.toList());
+			} catch (Exception e) {
+				omplirModelFormulari(
+						model, 
+						pareId, 
+						command,
+						entitatActual);
+				
+				if (e instanceof ElementNotValidException) {
+					MissatgesHelper.error(request,  e.getMessage());
+		        	return "contingutZipImportacioForm";
+				}
+				
+				throw e;	
+			}
+			command.setDocuments(documents);
 			omplirModelFormulari(
 					model, 
 					pareId, 
-					importacioZipCommand,
+					command,
 					entitatActual);
 			
 			return "contingutZipImportacioForm";
@@ -112,34 +137,34 @@ public class ContingutZipImportacioController extends BaseUserOAdminOOrganContro
 			omplirModelFormulari(
 					model, 
 					pareId, 
-					importacioZipCommand,
+					command,
 					entitatActual);
 			MissatgesHelper.error(request, ex.getMessage(), ex);
 			return "contingutZipImportacioForm";
 		}
-	}
+	}	
 
 	@RequestMapping(value = "/{pareId}/zip/importacio/progres", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<ProgresProcessamentZipCommand> processarZip(
+	public ResponseEntity<ProgresProcessamentZipDto> processarZip(
 			HttpServletRequest request, 
 			@PathVariable Long pareId,
 			Model model) throws ClassNotFoundException, IOException {		
 		try {
-			ProgresProcessamentZipCommand progres = zipImportacioHelper.obtenirProgresActual(pareId);
+			ProgresProcessamentZipDto progres = documentService.obtenirProgresProcessamentZip(pareId);
 			
-			return new ResponseEntity<ProgresProcessamentZipCommand>(progres, HttpStatus.OK);
+			return new ResponseEntity<ProgresProcessamentZipDto>(progres, HttpStatus.OK);
 		} catch (Exception ex) {
 			MissatgesHelper.error(request, ex.getMessage(), ex);
 		}
-		return new ResponseEntity<ProgresProcessamentZipCommand>(HttpStatus.OK);
+		return new ResponseEntity<ProgresProcessamentZipDto>(HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/{pareId}/zip/importacio/new", method = RequestMethod.POST)
 	public String post(
 			HttpServletRequest request,
 			@PathVariable Long pareId,
-			@Validated({CreateDigitalZip.class}) ImportacioZipCommand importacioZipCommand,
+			@ModelAttribute("command") @Validated({CreateDigitalZip.class}) ImportacioZipCommand command,
 			BindingResult bindingResult,
 			Model model) throws ClassNotFoundException, IOException {
 		StringBuilder documentsCreats = new StringBuilder();
@@ -152,13 +177,13 @@ public class ContingutZipImportacioController extends BaseUserOAdminOOrganContro
 				omplirModelFormulari(
 						model, 
 						pareId, 
-						importacioZipCommand, 
+						command, 
 						entitatActual);
 				return "contingutZipImportacioForm";
 			}
 			
-			for (DocumentCommand documentCommand : importacioZipCommand.getDocuments()) {
-				byte[] fitxerContingut = zipImportacioHelper.obtenirContingutFitxer(documentCommand.getFitxerNom());
+			for (DocumentCommand documentCommand : command.getDocuments()) {
+				byte[] fitxerContingut = documentService.obtenirContingutFitxerZip(documentCommand.getFitxerNom());
  				documentCommand.setFitxerContingut(fitxerContingut);
 				
  				try {
@@ -168,7 +193,7 @@ public class ContingutZipImportacioController extends BaseUserOAdminOOrganContro
 							DocumentCommand.asDto(documentCommand),
 							false, 
 							RolHelper.getRolActual(request), 
-							importacioZipCommand.getTascaId());
+							command.getTascaId());
 					
 					documentsCreats.append(" - " + document.getNom());
 					documentsCreats.append("<br>");
@@ -207,7 +232,7 @@ public class ContingutZipImportacioController extends BaseUserOAdminOOrganContro
 			omplirModelFormulari(
 					model, 
 					pareId, 
-					importacioZipCommand, 
+					command, 
 					entitatActual);
 			return getModalControllerReturnValueError(
 					request,
@@ -235,10 +260,10 @@ public class ContingutZipImportacioController extends BaseUserOAdminOOrganContro
         }
     }
 	
-	private void omplirModelFormulari(Model model, Long pareId, ImportacioZipCommand importacioZipCommand, EntitatDto entitatActual) {
+	private void omplirModelFormulari(Model model, Long pareId, ImportacioZipCommand command, EntitatDto entitatActual) {
 		String action = "/contingut/" + pareId + "/zip/importacio/processar";
 		
-		if (importacioZipCommand.getDocuments() != null && ! importacioZipCommand.getDocuments().isEmpty())
+		if (command.getDocuments() != null && ! command.getDocuments().isEmpty())
 			action = "/contingut/" + pareId + "/zip/importacio/new";
 		
 		model.addAttribute("action", action);
@@ -247,7 +272,7 @@ public class ContingutZipImportacioController extends BaseUserOAdminOOrganContro
 				metaDocumentService.findActiusPerCreacio(
 						entitatActual.getId(),
 						null,
-						importacioZipCommand.getMetaExpedientId(),
+						command.getMetaExpedientId(),
 						false));
 		model.addAttribute(
 				"ntiEstatElaboracioOptions",
@@ -256,7 +281,7 @@ public class ContingutZipImportacioController extends BaseUserOAdminOOrganContro
 						"document.nti.estela.enum."));
 		model.addAttribute("isPermesPropagarModificacioDefinitius", isPropagarModificacioDefinitiusActiva());
 		model.addAttribute("estatsElaboracioIdentificadorEniObligat", obtenirEstatsElaboracioIdentificadorEniObligat());
-		model.addAttribute("command", importacioZipCommand);
+		model.addAttribute("command", command);
 	}
 	
 	private Boolean isPropagarModificacioDefinitiusActiva() {

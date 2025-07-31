@@ -6,7 +6,6 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 
 <c:set var="titol"><spring:message code="contingut.boto.crear.document.multiple"/></c:set>
-<c:set var="idioma"><%=org.springframework.web.servlet.support.RequestContextUtils.getLocale(request).getLanguage()%></c:set>
 
 <html>
 <head>
