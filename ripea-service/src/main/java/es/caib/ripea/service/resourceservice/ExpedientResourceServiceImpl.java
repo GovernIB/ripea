@@ -929,7 +929,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
                 			expedientEntity.getMetaExpedient().getId(),
                 			expedientEntity.getId(),
                 			entitatId);
-                	
+
                 	if (aux!=null) {
                 		for (DocumentDto doc: aux) {
                 			DocumentResource documentResource = new DocumentResource();
@@ -937,6 +937,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
                 			documentResource.setFitxerNom(doc.getFitxerNom());
                 			documentResource.setDescripcio(doc.getDescripcio());
                 			documentResource.setFitxerContentType(doc.getFitxerContentType());
+                			//TODO: Acebar de completar els camps necessaris per el formulari.
                 			llistaDocumentsProcessats.add(documentResource);
                 		}
                 	}
