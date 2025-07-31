@@ -1,7 +1,9 @@
 package es.caib.ripea.service.resourceservice;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.time.chrono.ChronoLocalDateTime;
@@ -71,6 +73,7 @@ import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
 import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.base.model.FieldOption;
+import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ReportFileType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
@@ -915,13 +918,25 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         	try {
                     
                 if (ExpedientResource.ImportarDocumentsZipForm.Fields.documentZip.equals(fieldName)) {
+                	
+                	Long entitatId = entitatRepository.findByCodi(configHelper.getEntitatActualCodi()).getId();
                 	List<DocumentResource> llistaDocumentsProcessats = new ArrayList<DocumentResource>();
-                	List <DocumentDto> aux = zipImportacioHelper.extreureDocuments(null, null, null, null);
+                	InputStream inputStream = new ByteArrayInputStream(((FileReference) fieldValue).getContent());
+                	ExpedientEntity expedientEntity = expedientRepository.findById((Long)id).get();
+                	
+                	List <DocumentDto> aux = zipImportacioHelper.extreureDocuments(
+                			inputStream, 
+                			expedientEntity.getMetaExpedient().getId(),
+                			expedientEntity.getId(),
+                			entitatId);
                 	
                 	if (aux!=null) {
                 		for (DocumentDto doc: aux) {
                 			DocumentResource documentResource = new DocumentResource();
                 			documentResource.setNom(doc.getNom());
+                			documentResource.setFitxerNom(doc.getFitxerNom());
+                			documentResource.setDescripcio(doc.getDescripcio());
+                			documentResource.setFitxerContentType(doc.getFitxerContentType());
                 			llistaDocumentsProcessats.add(documentResource);
                 		}
                 	}
@@ -938,13 +953,11 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 			try {
 	    		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
 	    		ContingutEntity pare = contingutRepository.findById(entity.getId()).get();
-				for (DocumentResource documentCommand : params.getDocumentsUsuari()) {
-					byte[] fitxerContingut = zipImportacioHelper.obtenirContingutFitxer(documentCommand.getFitxerNom());
-					DocumentDto document = new DocumentDto();
-					//TODO: convertir el DocumentResource a DocumentDto
+				for (DocumentResource documentResource : params.getDocumentsUsuari()) {
+					byte[] fitxerContingut = zipImportacioHelper.obtenirContingutFitxer(documentResource.getFitxerNom());
 					documentHelper.crearDocument(
 							entitatEntity.getId(),
-							document,
+							documentResource.toDocumentDto(),
 							pare,
 							false,
 							true);
