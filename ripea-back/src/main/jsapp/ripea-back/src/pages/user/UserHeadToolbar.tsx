@@ -1,5 +1,5 @@
 import React, {useCallback} from "react";
-import {Grid, Button} from "@mui/material";
+import {Grid, Button, Icon} from "@mui/material";
 import {StyledBadge} from "../../components/StyledBadge.tsx";
 import {useEntitatSession, useUserSession} from "../../components/Session.tsx";
 import {useTranslation} from "react-i18next";
@@ -46,11 +46,12 @@ const generateMenuItems = (appMenuEntries: any[]) => {
             <Button
                 className="appMenuItem"
                 key={entry.id}
-                style={{ color: entitat?.capsaleraColorLletra ?? '#000', marginLeft: 0 }}
+                style={{ color: entitat?.capsaleraColorLletra ?? '#000', marginLeft: 0, ...entry?.componentProps }}
                 component={Link}
                 to={entry.to} // Navegació amb React Router
                 onClick={entry?.onClick}
             >
+                {entry?.icon && <Icon>{entry?.icon}</Icon>}
                 {entry.title}
             </Button>
         ))
@@ -70,7 +71,9 @@ const MenuBadge = (props:any) => {
 }
 
 const UserHeadToolbar = () => {
+    const { t } = useTranslation();
     const { value: user } = useUserSession();
+
     const isRolActualSupAdmin = user?.rolActual == 'IPA_SUPER';
     const isRolActualAdmin = user?.rolActual == 'IPA_ADMIN';
     const isRolActualOrganAdmin = user?.rolActual == 'IPA_ORGAN_ADMIN';
@@ -78,7 +81,18 @@ const UserHeadToolbar = () => {
     const isRolActualRevisor = user?.rolActual == 'IPA_REVISIO';
     const isRolActualUser = user?.rolActual == 'tothom';
 
-    const appMenuEntries:any[] =[]
+    const appMenuEntries:any[] =[
+        {
+            id: 'recargar',
+            title: t('page.user.menu.backVersio'),
+            icon: 'fast_rewind',
+            componentProps: {color: '#ff9523'},
+            onClick: () => {
+                const url = window.location.href.replace('/reactapp', '');
+                window.location.replace(url);
+            },
+        }
+    ]
     const menuEntries:any[] =[]
     const contents:any[] = []
 
@@ -694,15 +708,6 @@ const useAccionesMassivas = () => {
         {
             divider: true,
         },
-        {
-            id: 'recargar',
-            title: t('page.user.menu.backVersio'),
-            icon: 'fast_rewind',
-            onClick: () => {
-                const url = window.location.href.replace('/reactapp', '');
-                window.location.replace(url);
-            },
-        }
     ]
     const content = <>
         {dialog}
