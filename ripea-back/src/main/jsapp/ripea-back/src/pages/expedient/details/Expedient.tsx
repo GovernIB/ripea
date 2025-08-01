@@ -238,7 +238,7 @@ const Expedient = () => {
         },
     ]
 
-    return <GridPage>
+    return <>
         <SseExpedient id={id}/>
 
         <Load value={expedient} noEffect>
@@ -283,7 +283,7 @@ const Expedient = () => {
             </Grid>
         </CardData>
         </Load>
-    </GridPage>
+    </>
 }
 
 export default Expedient;

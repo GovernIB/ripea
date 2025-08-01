@@ -44,8 +44,17 @@ public class UsuariResource extends BaseResource<String> {
 	@Size(max = 64)
 	private String rolActual;
 	private ContingutVistaEnumDto vistaActual;
-	@ResourceField(enumType = true)
+
+    @ResourceField(enumType = true)
 	private Long numElementsPagina;
+
+    public String getNumElementsPagina() {
+        return numElementsPagina != null ? numElementsPagina.toString() : null;
+    }
+    public void setNumElementsPagina(String value) {
+        this.numElementsPagina = (value != null && !value.isEmpty()) ? Long.parseLong(value) : null;
+    }
+
 	private boolean rebreEmailsAgrupats = true;
 	private boolean rebreAvisosNovesAnotacions;
 	private boolean rebreEmailsCanviEstatRevisio = true;

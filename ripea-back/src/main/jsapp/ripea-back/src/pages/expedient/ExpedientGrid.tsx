@@ -1,10 +1,6 @@
 import {useState} from "react";
 import {Typography, Icon, Grid} from "@mui/material";
-import {
-    GridPage,
-    useFormContext,
-    useMuiDataGridApiRef,
-} from 'reactlib';
+import {useFormContext, useMuiDataGridApiRef,} from 'reactlib';
 import {useTranslation} from "react-i18next";
 import {useNavigate} from "react-router-dom";
 import {formatDate} from '../../util/dateUtils';
@@ -237,7 +233,7 @@ const ExpedientGrid = () => {
     ]
         .filter((col:any)=>!col?.hidden);
 
-    return <GridPage>
+    return <>
         <CardPage title={t('page.expedient.filter.title')}>
             <ExpedientFilter onSpringFilterChange={(value:any)=>{
                 setSpringFilter(value)
@@ -257,7 +253,6 @@ const ExpedientGrid = () => {
                 popupEditFormContent={<ExpedientGridForm/>}
                 onRowDoubleClick={(row: any) => navigate(`/contingut/${row?.id}`)}
                 rowAdditionalActions={actions}
-                paginationActive
                 selectionActive
                 toolbarCreateTitle={t('page.expedient.action.new.label')}
                 toolbarMassiveActions={massiveActions}
@@ -283,7 +278,7 @@ const ExpedientGrid = () => {
             {components}
             {massiveComponents}
         </CardPage>
-    </GridPage>
+    </>
 }
 
 export default ExpedientGrid;

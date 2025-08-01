@@ -134,9 +134,6 @@ const RelacionarForm= () => {
                     }
             }}
 
-            height={162 + 52 * 10}
-            paginationActive
-            // autoHeight
             readOnly
         />
         </Load>

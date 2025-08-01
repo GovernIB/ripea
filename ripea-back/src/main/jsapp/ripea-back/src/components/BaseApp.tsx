@@ -137,7 +137,7 @@ const CustomLocalizationProvider = ({ children }: React.PropsWithChildren) => {
 const generateFooter = (version?:string) => {
     return (
         <>
-            <div style={{ height: '36px', width: '100%' }} />
+            {/*<div style={{ height: '36px', width: '100%' }} />*/}
             <Footer
                 title="RIPEA"
                 version={version}

@@ -1,7 +1,7 @@
 import React, {useEffect, useMemo, useState} from "react";
 import { FormControl, Grid, InputLabel, Select, MenuItem, Icon } from "@mui/material";
 import {GridTreeDataGroupingCell} from "@mui/x-data-grid-pro";
-import { GridPage, useMuiDataGridApiRef, useResourceApiService } from 'reactlib';
+import { useMuiDataGridApiRef, useResourceApiService } from 'reactlib';
 import { useTranslation } from "react-i18next";
 import ContingutIcon from "./details/ContingutIcon.tsx";
 import { useContingutActions } from "./details/ContingutActions.tsx";
@@ -171,7 +171,7 @@ const DocumentsGrid = (props: any) => {
         addFolderExpand("vista", vista)
     }, [vista]);
 
-    return <GridPage>
+    return <>
         <Load value={entity && isReady}>
             <DropZone onDrop={onDrop} disabled={!entity?.potModificar}>
                 <StyledMuiGrid
@@ -310,7 +310,7 @@ const DocumentsGrid = (props: any) => {
                 {massiveComponents}
             </DropZone>
         </Load>
-    </GridPage>
+    </>
 }
 
 export default DocumentsGrid;

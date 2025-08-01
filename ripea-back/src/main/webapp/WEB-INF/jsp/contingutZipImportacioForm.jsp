@@ -183,6 +183,7 @@ $(document).ready(function() {
 				<rip:inputHidden name="documents[${status.index}].validacioFirmaCorrecte"/>
 				<rip:inputHidden name="documents[${status.index}].validacioFirmaErrorMsg"/>
 				<rip:inputHidden name="documents[${status.index}].tipusFirma"/>
+				<rip:inputHidden name="documents[${status.index}].fitxerContentType"/>
 				
 				<rip:inputSelect 
 					 name="documents[${status.index}].metaNodeId" 
