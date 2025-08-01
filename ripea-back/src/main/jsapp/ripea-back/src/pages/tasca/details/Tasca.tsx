@@ -1,4 +1,4 @@
-import {GridPage, useResourceApiService} from "reactlib";
+import {useResourceApiService} from "reactlib";
 import SseExpedient from "../../../components/SseExpedient.tsx";
 import {useTranslation} from "react-i18next";
 import {useNavigate, useParams} from "react-router-dom";
@@ -44,7 +44,7 @@ const Tasca = () => {
         }
     },[apiTascaIsReady])
 
-    return <GridPage>
+    return <>
         <SseExpedient id={id}/>
 
         <Load value={expedient && tasca} noEffect>
@@ -109,6 +109,6 @@ const Tasca = () => {
                 </Grid>
             </CardData>
         </Load>
-    </GridPage>
+    </>
 }
 export default Tasca;

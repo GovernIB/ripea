@@ -1,4 +1,4 @@
-import {GridPage, useMuiDataGridApiRef,} from 'reactlib';
+import {useMuiDataGridApiRef,} from 'reactlib';
 import {useTranslation} from "react-i18next";
 import { formatDate } from "../../util/dateUtils.ts";
 import {StyledPrioritat} from "../expedient/ExpedientGrid.tsx";
@@ -103,7 +103,7 @@ const TasquesGrid = () => {
 
     const { actions, components } = useTascaActions({potModificar: true}, refresh)
 
-    return <GridPage>
+    return <>
         <CardPage title={t('page.user.menu.tasca')}>
             <TasquesGridFilter
                 onSpringFilterChange={(value:any)=>{
@@ -150,7 +150,7 @@ const TasquesGrid = () => {
                 {components}
             </Load>
         </CardPage>
-    </GridPage>
+    </>
 }
 
 export default TasquesGrid;
