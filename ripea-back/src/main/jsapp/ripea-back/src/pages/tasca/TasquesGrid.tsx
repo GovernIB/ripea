@@ -121,6 +121,7 @@ const TasquesGrid = () => {
                         builder.eq("expedient.esborrat", 0),
                         springFilter,
                     )}
+                    namedQueries={['USUARI_RELACIONAT']}
                     sortModel={sortModel}
                     rowAdditionalActions={actions}
 

@@ -183,8 +183,7 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
                     .MuiDataGrid-cell--withRenderer {
                         align-items: flex-start !important;
                     }
-                    .MuiDataGrid-columnHeaderCheckbox, 
-                    .MuiDataGrid-cellCheckbox {
+                    .MuiDataGrid-columnHeaderCheckbox {
                         align-items: flex-start !important;
                         padding-top: 4px !important;
                     }
