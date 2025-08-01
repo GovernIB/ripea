@@ -374,10 +374,11 @@ public class DocumentResource extends NodeResource {
     	private String signantEmail;
     	@Size(max=256)
     	private String observacions;
-    	private Boolean firmaParcial;
-    	private Boolean validateCodeEnabled;
+    	private Boolean firmaParcial = false;
+    	private Boolean rellenable = false;
+    	private Boolean validateCodeEnabled = false;
     	private String validateCode;
-    	private Boolean rebreCorreu;
+    	private Boolean rebreCorreu = false;
     }
     
     @Getter
