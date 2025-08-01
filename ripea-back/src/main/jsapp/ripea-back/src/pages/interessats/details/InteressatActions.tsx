@@ -111,7 +111,7 @@ const useInteressatActions = (entity:any, refresh?: () => void) => {
             icon: "info",
             showInMenu: true,
             onClick: handleDetail,
-            hidden: entity?.potModificar,
+            // hidden: entity?.potModificar,
         },
         {
             label: t('common.update'),

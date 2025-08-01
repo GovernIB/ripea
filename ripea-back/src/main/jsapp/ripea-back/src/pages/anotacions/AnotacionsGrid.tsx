@@ -1,4 +1,4 @@
-import {GridPage, useFormContext, useMuiDataGridApiRef} from 'reactlib';
+import {useFormContext, useMuiDataGridApiRef} from 'reactlib';
 import {useTranslation} from "react-i18next";
 import useAnotacioActions from "./details/AnotacioActions.tsx";
 import {formatDate} from "../../util/dateUtils.ts";
@@ -100,7 +100,7 @@ const AnotacionsGrid = () => {
 
     const {actions, components} = useAnotacioActions(refresh);
 
-    return <GridPage>
+    return <>
         <CardPage title={t('page.anotacio.filter.title')}>
             <AnotacioFilter onSpringFilterChange={(value:any)=>{
                 setSpringFilter(value)
@@ -132,7 +132,7 @@ const AnotacionsGrid = () => {
             </Load>
             {components}
         </CardPage>
-    </GridPage>
+    </>
 }
 
 export default AnotacionsGrid;

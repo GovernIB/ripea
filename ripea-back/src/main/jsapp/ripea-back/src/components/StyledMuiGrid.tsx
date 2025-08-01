@@ -145,7 +145,21 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
         }));
     }, [columns])
 
-    return <>
+    const paginationProps = useMemo(() => {
+        return user?.conf?.numElementsPagina != null
+            ? {
+                paginationActive: true,
+                autoHeight: true,
+                paginationModel: {page: 0, pageSize: +user?.conf?.numElementsPagina},
+                pageSizeOptions: [10, 20, 50, 100, 250],
+            }
+            : {
+                paginationActive: false,
+                autoHeight: true,
+            }
+    }, [user])
+
+    return <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
         <style>
             {`
                     .cell-with-wrap {
@@ -224,7 +238,9 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
             rowHideUpdateButton={rowHideUpdateButton}
             rowHideDeleteButton={rowHideDeleteButton}
             readOnly={readOnly}
+
+            {...paginationProps}
         />
-    </>
+    </div>
 }
 export default StyledMuiGrid;
