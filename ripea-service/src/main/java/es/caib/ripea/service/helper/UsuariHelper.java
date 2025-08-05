@@ -1,6 +1,7 @@
 package es.caib.ripea.service.helper;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -240,7 +241,7 @@ public class UsuariHelper {
 
 	public Set<ViaFirmaUsuariEntity> viaFirmaUsuarisUsuariActual() {
 		UsuariEntity usuari = usuariRepository.findByCodi(SecurityContextHolder.getContext().getAuthentication().getName());
-		return usuari.getViaFirmaUsuaris();
+		return usuari != null ? usuari.getViaFirmaUsuaris() : new HashSet<ViaFirmaUsuariEntity>();
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(UsuariHelper.class);

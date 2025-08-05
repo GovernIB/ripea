@@ -23,6 +23,7 @@ import useAlerta from "./Alerta.tsx";
 import useErrorValidacio from "./ErrorValidacio.tsx";
 import SseExpedient from "../../../components/SseExpedient.tsx";
 import {icons} from "../../user/UserHeadToolbar.tsx";
+import {setTitlePage} from "../../../TitleHeaderConfigurator.tsx";
 
 const Contenido = (props :any) => {
     const { title, children } = props;
@@ -177,6 +178,12 @@ const Expedient = () => {
             appGetOne(id, {perspectives}).then((app) => setExpedient(app))
         }
     },[apiIsReady])
+
+    useEffect(() => {
+        if (expedient) {
+            setTitlePage(expedient?.nom)
+        }
+    }, [expedient]);
 
     const [numContingut, setNumContingut] = useState<number>(expedient?.numContingut);
     const [numInteressats, setNumInteressats] = useState<number>(expedient?.numInteressats);

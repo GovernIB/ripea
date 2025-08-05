@@ -90,7 +90,7 @@ const beforeAvis = [
         flex: 1,
     },
     {
-        field: 'tipusStr',
+        field: 'metaExpedient',
         flex: 1,
         sortable: false,
     },

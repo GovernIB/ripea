@@ -111,4 +111,8 @@ public class MetaExpedientResourceEntity extends MetaNodeResourceEntity<MetaExpe
 			return false;
 		}
 	}
+
+    public String getNomClassificacio() {
+        return nom + " (" + classificacio +")";
+    }
 }

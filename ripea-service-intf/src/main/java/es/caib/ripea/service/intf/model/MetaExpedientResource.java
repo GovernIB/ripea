@@ -28,7 +28,7 @@ import lombok.experimental.FieldNameConstants;
 @NoArgsConstructor
 @ResourceConfig(
 		quickFilterFields = { "codi", "nom" },
-		descriptionField = "nom"
+		descriptionField = "nomClassificacio"
 )
 public class MetaExpedientResource extends MetaNodeResource {
 
@@ -77,4 +77,8 @@ public class MetaExpedientResource extends MetaNodeResource {
 
 	@Transient private List<ResourceReference<ExpedientEstatResource, Long>> estats;
 	@Transient private List<ResourceReference<MetaExpedientOrganGestorResource, Long>> metaExpedientOrganGestors;
+
+    public String getNomClassificacio() {
+        return nom + " (" + classificacio +")";
+    }
 }

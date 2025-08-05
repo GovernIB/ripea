@@ -26,13 +26,14 @@ const EnviarViaFirmaForm = () => {
         <Grid item xs={12} ><Typography sx={{ borderBottom: '1px solid gray' }}>{t('page.document.detall.dataInteressat')}</Typography></Grid>
         <GridFormField xs={12} name="interessat" filter={interessatFilter}/>
         <GridFormField xs={6} name="signantNif"/>
-        <GridFormField xs={6} name="signantNom"     hidden={data?.tipusDestinatari == 'EMAIL'}/>
+        <GridFormField xs={6} name="signantNom"/>
         <GridFormField xs={6} name="signantEmail"   hidden={data?.tipusDestinatari != 'EMAIL'}/>
 
         <Grid item xs={12} ><Typography sx={{ borderBottom: '1px solid gray' }}>{t('page.document.detall.dataOther')}</Typography></Grid>
-        <GridFormField xs={4} name="firmaParcial"/>
-        <GridFormField xs={4} name="validateCodeEnabled"/>
-        <GridFormField xs={4} name="rebreCorreu"/>
+        <GridFormField xs={data?.tipusDestinatari != 'EMAIL' ? 4 : 3} name="firmaParcial"/>
+        <GridFormField xs={data?.tipusDestinatari != 'EMAIL' ? 4 : 3} name="rellenable" hidden={data?.tipusDestinatari != 'EMAIL'}/>
+        <GridFormField xs={data?.tipusDestinatari != 'EMAIL' ? 4 : 3} name="validateCodeEnabled"/>
+        <GridFormField xs={data?.tipusDestinatari != 'EMAIL' ? 4 : 3} name="rebreCorreu"/>
         <GridFormField xs={12} name="validateCode" hidden={!data?.validateCodeEnabled}/>
         <GridFormField xs={12} name="observacions" type={"textarea"}/>
     </Grid>
