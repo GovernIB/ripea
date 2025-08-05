@@ -72,6 +72,11 @@ const translationEs = {
             EMAIL: "Email",
         }        
     },
+    navigate: {
+        expedient: "Buscador de expedientes",
+        expedientPeticio: "Buscador de anotaciones de registro",
+        usuariTasca: "Tareas",
+    },
     page: {
         comment: {
             expedient: "Comentarios del expediente",

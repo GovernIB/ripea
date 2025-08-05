@@ -72,6 +72,11 @@ const translationCa = {
             EMAIL: "Email",
         }
     },
+    navigate: {
+        expedient: "Cercador d'expedients",
+        expedientPeticio: "Cercador d'anotacions de registre",
+        usuariTasca: "Tasques",
+    },
     page: {
         comment: {
             expedient: "Comentaris de l'expedient",

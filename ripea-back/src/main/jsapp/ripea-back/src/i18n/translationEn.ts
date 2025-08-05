@@ -72,6 +72,11 @@ const translationEn = {
             EMAIL: "Email",
         }        
     },
+    navigate: {
+        expedient: "Case search",
+        expedientPeticio: "Registry entries search",
+        usuariTasca: "Tasks",
+    },
     page: {
         comment: {
             expedient: "Expedient Comments",

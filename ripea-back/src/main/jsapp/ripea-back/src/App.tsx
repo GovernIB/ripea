@@ -1,17 +1,18 @@
 import React, {useMemo} from 'react';
-import { BaseApp } from './components/BaseApp';
+import {BaseApp} from './components/BaseApp';
 import logo from './assets/Drassana_RIP_DRA_COL.svg';
 import goib_logo from './assets/goib_logo.svg';
 import AppRoutes from './AppRoutes';
 import {useEntitatSession} from "./components/Session.tsx";
+import TitleHeaderConfigurator from "./TitleHeaderConfigurator.tsx";
 
 export const App: React.FC = () => {
     const version = '1.0.1';
     const { value: entitat } = useEntitatSession()
-    const entitatLogo = useMemo(()=>{
-        return entitat?.logoImgBytes ?`data:image/png;base64,${entitat?.logoImgBytes}` :null;
+    const entitatLogo = useMemo(() => {
+        return entitat?.logoImgBytes ? `data:image/png;base64,${entitat?.logoImgBytes}` : null;
     }, [entitat]);
-    const backgroundColor = useMemo(()=>{
+    const backgroundColor = useMemo(() => {
         return entitat?.capsaleraColorFons
     }, [entitat]);
     return <BaseApp
@@ -28,7 +29,8 @@ export const App: React.FC = () => {
         title={<img src={logo} title={'RIPEA v' + version} style={{ height: '80px' }} alt={'RIPEA v' + version} />}
         version={version}
         appbarBackgroundColor={backgroundColor ?? "#FFFFFF"}>
-        <AppRoutes />
+        <TitleHeaderConfigurator/>
+        <AppRoutes/>
     </BaseApp>;
 }
 
