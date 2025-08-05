@@ -21,6 +21,7 @@ const translationEn = {
         import: "Import",
         export: "Export",
         consult: "Consult",
+        filter: "Filter",
     },
     enum: {
         rol: {

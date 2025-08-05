@@ -1,7 +1,7 @@
+import {Grid} from "@mui/material";
 import GridFormField from "../../components/GridFormField.tsx";
 import StyledMuiFilter from "../../components/StyledMuiFilter.tsx";
 import * as builder from '../../util/springFilterUtils';
-import {formatEndOfDay} from "../../util/dateUtils.ts";
 
 const AnotacioFilterForm = () => {
     return <>
@@ -13,6 +13,7 @@ const AnotacioFilterForm = () => {
         <GridFormField xs={4} name="dataRecepcioFinal" type={"date"}/>
         <GridFormField xs={4} name="estat"/>
         <GridFormField xs={4} name="interessat"/>
+        <Grid xs={1.6}></Grid>
     </>
 }
 

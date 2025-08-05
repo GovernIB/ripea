@@ -3,12 +3,13 @@ import {MuiFilter, useFilterApiRef, useFormApiRef} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {useSession} from "./SessionStorageContext.tsx";
 import {useEffect, useMemo} from "react";
+import {GridButtonField} from "./GridFormField.tsx";
 
 const filterStyle = { sx: {mb: 2, p: 2, backgroundColor: '#f5f5f5', border: '1px solid #e3e3e3', borderRadius: '4px'} };
 
 export type FilterButtonProps = {
     value: string;
-    text: string;
+    text?: string;
     icon?: string;
     componentProps?: any;
 };
@@ -17,6 +18,7 @@ export type FilterButtonProps = {
 //     buttons?: FilterButtonProps[],
 //     buttonCallback?: (code:any) => void,
 //     sessionKey?: string,
+//     advancedSearch?: boolean;
 // }
 
 const StyledMuiFilter = (props:any) => {
@@ -61,6 +63,7 @@ const StyledMuiFilter = (props:any) => {
         children,
         code,
         sessionKey = code,
+        advancedSearch = false,
         ...other
     } = props
 
@@ -103,11 +106,12 @@ const StyledMuiFilter = (props:any) => {
         <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
             {children}
 
-            <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'end' }}>
+            <Grid item xs={2.4} sx={{ display: 'flex', justifyContent: 'end' }}>
+                {advancedSearch && <GridButtonField name={"advanced"} icon={"filter_list"}/>}
                 {
                     buttons?.map((button:FilterButtonProps)=>
                         <Button key={button.value} onClick={() => buttonCallback?.(button.value)} {...button?.componentProps}>
-                            {button?.icon && <Icon>{button?.icon}</Icon>}
+                            {button?.icon && <Icon sx={{ mr: 0 }}>{button?.icon}</Icon>}
                             {button.text}
                         </Button>)
                 }

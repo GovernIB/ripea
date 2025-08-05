@@ -16,6 +16,15 @@ const ExpedientFilterForm = () => {
         builder.eq('revisioEstat', "'REVISAT'"),
     );
 
+    if (!data?.advanced) {
+        return <>
+            <GridFormField xs={2.4} name="numero"/>
+            <GridFormField xs={2.4} name="estat" requestParams={{metaExpedientId: data?.metaExpedient?.id}} />
+            <GridFormField xs={2.4} name="dataCreacioInici"/>
+            <GridFormField xs={2.4} name="dataCreacioFinal"/>
+        </>
+    }
+
     return <>
         <GridFormField xs={3} name="numero"/>
         <GridFormField xs={3} name="nom"/>
@@ -43,6 +52,7 @@ const ExpedientFilterForm = () => {
         <GridButtonField xs={1} name={'agafat'} icon={'lock'}/>
         <GridButtonField xs={1} name={'pendentFirmar'} icon={'edit'}/>
         <GridButtonField xs={1} name={'seguit'} icon={'group_add'} hidden={user?.rolActual != "tothom"}/>
+        <Grid item xs={6.6}/>
     </>
 }
 
@@ -103,8 +113,20 @@ const ExpedientFilter = (props: any) => {
     return <StyledMuiFilter
         resourceName={"expedientResource"}
         code={"EXPEDIENT_FILTER"}
-        springFilterBuilder={(data: any)=> springFilterBuilder(data, user)}
+        springFilterBuilder={(data: any)=> {
+            if (!data?.advanced) {
+                return springFilterBuilder({
+                    numero: data.numero,
+                    estat: data.estat,
+                    dataCreacioInici: data.dataCreacioInici,
+                    dataCreacioFinal: data.dataCreacioFinal,
+                    advanced: true,
+                }, user)
+            }
+            return springFilterBuilder(data, user)
+        }}
         onSpringFilterChange={onSpringFilterChange}
+        advancedSearch
     >
         <ExpedientFilterForm/>
     </StyledMuiFilter>
