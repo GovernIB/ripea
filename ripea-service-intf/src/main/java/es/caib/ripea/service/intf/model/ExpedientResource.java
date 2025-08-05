@@ -340,10 +340,6 @@ public class ExpedientResource extends NodeResource implements Serializable {
     @Transient private int numTasques;
     @Transient private int numAlert;
     @Transient private boolean disableOrganGestor = false;
-    
-    public String getTipusStr() {
-        return this.getMetaExpedient() != null ? this.getMetaExpedient().getDescription() + " - " + ntiClasificacionSia : null;
-    }
 
     @Transient
     private ArxiuDetallDto arxiu;
