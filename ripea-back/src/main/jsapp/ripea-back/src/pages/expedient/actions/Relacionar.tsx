@@ -59,12 +59,12 @@ const ActionFilterFrom = () => {
         builder.eq('revisioEstat', "'REVISAT'"),
     );
 
-    return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={3} name="metaExpedient" filter={filterMetaExpedient}/>
-        <GridFormField xs={3} name="numero"/>
-        <GridFormField xs={3} name="nom"/>
-        <GridFormField xs={3} name="estat" requestParams={{metaExpedientId: data?.metaExpedient?.id}}/>
-    </Grid>
+    return <>
+        <GridFormField xs={2.4} name="metaExpedient" filter={filterMetaExpedient}/>
+        <GridFormField xs={2.4} name="numero"/>
+        <GridFormField xs={2.4} name="nom"/>
+        <GridFormField xs={2.4} name="estat" requestParams={{metaExpedientId: data?.metaExpedient?.id}}/>
+    </>
 }
 
 const ActionFilter = (props:any) => {

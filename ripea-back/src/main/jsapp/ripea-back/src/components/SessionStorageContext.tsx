@@ -1,4 +1,4 @@
-import React, {createContext, useContext, useState, useEffect, useRef} from 'react';
+import React, {createContext, useContext, useState, useEffect, useRef, useCallback} from 'react';
 
 type SessionData = Record<string, any>;
 
@@ -52,7 +52,9 @@ export const SessionStorageProvider = ({ children }: { children: React.ReactNode
 
     return (
         <SessionStorageContext.Provider value={{ data, setValue, removeValue }}>
-            {children}
+            <SessionProvider>
+                {children}
+            </SessionProvider>
         </SessionStorageContext.Provider>
     );
 };
@@ -104,3 +106,61 @@ export const useSessionList = (key:string) => {
         }
     }
 }
+
+type SessionMap = Map<string, any>;
+
+type SessionContextType = {
+    sessionMap: SessionMap;
+    setSessionByKey: (key: string, session: any) => void;
+    clearSessionByKey: (key: string) => void;
+};
+
+const SessionContext = createContext<SessionContextType | undefined>(undefined);
+
+export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    const [sessionMap, setSessionMap] = useState<SessionMap>(new Map());
+
+    const setSessionByKey = (key: string, session: any) => {
+        setSessionMap((prev) => {
+            const newMap = new Map(prev);
+            newMap.set(key, session);
+            return newMap;
+        });
+    };
+
+    const clearSessionByKey = (key: string) => {
+        setSessionMap((prev) => {
+            const newMap = new Map(prev);
+            newMap.delete(key);
+            return newMap;
+        });
+    };
+
+    return (
+        <SessionContext.Provider value={{ sessionMap, setSessionByKey, clearSessionByKey }}>
+            {children}
+        </SessionContext.Provider>
+    );
+};
+
+export const useSessionContext = (key: string) => {
+    const context = useContext(SessionContext);
+    if (!context) throw new Error('useSessionContext debe usarse dentro de <SessionProvider>');
+
+    const { sessionMap, setSessionByKey, clearSessionByKey } = context;
+
+    const value = sessionMap.get(key);
+
+    const save = useCallback(
+        (newValue: any) => {
+            setSessionByKey(key, newValue);
+        },
+        [key, setSessionByKey]
+    );
+
+    const clear = useCallback(() => {
+        clearSessionByKey(key);
+    }, [key, clearSessionByKey]);
+
+    return { value, save, clear };
+};

@@ -1,17 +1,18 @@
 import axios from "axios";
 import {useEffect, useMemo} from "react";
-import {useSession} from "./SessionStorageContext.tsx";
+import {useSession, useSessionContext} from "./SessionStorageContext.tsx";
 import {useResourceApiService, useResourceApiContext} from "reactlib";
 
 const userkey :string = 'usuario';
 const entitatKey = 'entitat';
 const organKey = 'organ';
 
+let alreadyRequested = false;
 export const useUserSession = () => {
     axios.defaults.withCredentials = true;
-
     const { apiUrl } = useResourceApiContext();
-    const {value, isInitialized, save, remove} = useSession(userkey)
+
+    const { value, save, clear } = useSessionContext(userkey);
 
     const refresh = () => {
         axios.get(apiUrl + 'usuari/actual/securityInfo')
@@ -43,7 +44,7 @@ export const useUserSession = () => {
         //     .catch((error) => {
         //         console.log(">>>> axios error", error)
         //     })
-        remove()
+        clear()
     }
 
     const permisos :any = useMemo(()=>{
@@ -54,8 +55,8 @@ export const useUserSession = () => {
     }, [value])
 
     useEffect(() => {
-        if (!isInitialized()) {
-            save({})
+        if (!value && !alreadyRequested) {
+            alreadyRequested = true;
             refresh();
         }
     }, []);

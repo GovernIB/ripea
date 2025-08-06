@@ -33,9 +33,9 @@ export const App: React.FC = () => {
     return <BaseApp
         code="cmd"
         logo={entitatLogo}
-        // style={{ height: '110px' }}
+        style={{ height: '64px' }}
         logoStyle={{
-            '& img': { height: '60px' },
+            '& img': { height: '49px' },
             pl: 2,
             pr: 4,
             mr: 4,
