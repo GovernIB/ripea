@@ -134,6 +134,7 @@ const RelacionarForm= () => {
                     }
             }}
 
+            style={{ minHeight: 110 + 52 * 10 }}
             readOnly
         />
         </Load>
