@@ -31,7 +31,8 @@ export const FollowersDialog = (props:any) => {
         }
     }, [open]);
 	
-    const handleOpen = () => {
+    const handleOpen = (event:any) => {
+        event.stopPropagation()
 		setOpen(true);
     }
 

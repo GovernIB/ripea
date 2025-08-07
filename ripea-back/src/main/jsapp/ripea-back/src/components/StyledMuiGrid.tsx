@@ -148,18 +148,14 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
     const paginationProps = useMemo(() => {
         return user?.conf?.numElementsPagina != null
             ? {
-                paginationActive: true,
                 autoHeight: true,
                 paginationModel: {page: 0, pageSize: +user?.conf?.numElementsPagina},
                 pageSizeOptions: [10, 20, 50, 100, 250],
             }
-            : {
-                paginationActive: false,
-                autoHeight: true,
-            }
+            : {}
     }, [user])
 
-    return <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+    return <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
         <style>
             {`
                     .cell-with-wrap {
@@ -201,6 +197,8 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
             resourceName={resourceName}
             filter={filter}
 
+            key={user?.conf?.numElementsPagina}
+
             {...others}
             apiRef={apiRef}
             datagridApiRef={datagridApiRef}
@@ -220,6 +218,7 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
             disableColumnMenu
             disableColumnSorting={!!staticSortModel}
             staticSortModel={staticSortModel}
+            paginationActive
 
             selectionActive={selectionActive || !!toolbarMassiveActions}
             checkboxSelection={selectionActive || !!toolbarMassiveActions}

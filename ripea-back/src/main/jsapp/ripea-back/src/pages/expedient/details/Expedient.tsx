@@ -1,6 +1,6 @@
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
-import {useResourceApiService} from 'reactlib';
+import {GridPage, useResourceApiService} from 'reactlib';
 import {useState, useEffect} from "react";
 import {Typography, Grid, Icon, IconButton, Link, Alert, Button} from '@mui/material';
 import {formatDate} from '../../../util/dateUtils.ts';
@@ -242,7 +242,7 @@ const Expedient = () => {
         },
     ]
 
-    return <>
+    return <GridPage>
         <SseExpedient id={id}/>
 
         <Load value={expedient} noEffect>
@@ -287,7 +287,7 @@ const Expedient = () => {
             </Grid>
         </CardData>
         </Load>
-    </>
+    </GridPage>
 }
 
 export default Expedient;

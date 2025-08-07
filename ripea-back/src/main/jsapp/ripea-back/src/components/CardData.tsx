@@ -51,11 +51,16 @@ export const CardData = (props:any) => {
 
 export const CardPage = (props:any) => {
     const {title, header, headerProps = cardHeader, children} = props;
-    return <Card sx={cardBorder}>
+    return <Card sx={{
+        ...cardBorder,
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column'
+    }}>
         {title && <CardHeader title={title} sx={headerProps}/>}
         {header && <CardContent sx={headerProps}>{header}</CardContent>}
 
-        <CardContent>
+        <CardContent sx={{height: '100%', display: 'flex', flexDirection: 'column'}}>
             {children}
         </CardContent>
     </Card>

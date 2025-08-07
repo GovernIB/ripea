@@ -69,6 +69,6 @@ export const FileFormField = (props:GridFormField) => {
 const GridFormField = (props:GridFormField) => {
     const { xs, hidden, componentProps = {}, ...other} = props;
 
-    return <Grid item xs={xs} hidden={!!hidden}><FormField {...other} componentProps={{...componentProps, sx: {backgroundColor: 'white'}}}/></Grid>
+    return <Grid item xs={xs} hidden={!!hidden}><FormField {...other} componentProps={{sx: {backgroundColor: 'white'}, ...componentProps}}/></Grid>
 }
 export default GridFormField;

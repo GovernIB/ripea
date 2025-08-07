@@ -82,7 +82,8 @@ export const CommentDialog = (props:any) => {
     const formApiRef = useRef<MuiFormDialogApi>()
     const {t, temporalMessageShow} = useBaseAppContext();
 
-    const handleOpen = () => {
+    const handleOpen = (event:any) => {
+        event.stopPropagation()
         formApiRef.current?.show(undefined, {
             [resourceReference]: {
                 id: entity?.id

@@ -210,22 +210,23 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
         linkComponent={Link}
         menuEntries={baseAppMenuEntries}>
         <CustomLocalizationProvider>
-            <div>
+            <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
                 {
                     value?.avisosUsuari?.map((avis:any) => {
                         if (!read?.includes?.(avis.id)) {
-                            return <AlertExpand key={avis.id} title={avis.assumpte}
-                                         severity={getAlertSeverity(avis.avisNivell)}
-                                         onClose={() => {
-                                             save([...(read ?? []), avis.id])
-                                         }}>
+                            return <AlertExpand
+                                key={avis.id} title={avis.assumpte}
+                                severity={getAlertSeverity(avis.avisNivell)}
+                                sx={{ m: 0 }}
+                                onClose={() => {save([...(read ?? []), avis.id])}}
+                            >
                                 {avis.missatge}
                             </AlertExpand>
                         }
                     })
                 }
+                {i18nInitialized && children}
             </div>
-            {i18nInitialized && children}
         </CustomLocalizationProvider>
     </MuiBaseApp>;
 }
