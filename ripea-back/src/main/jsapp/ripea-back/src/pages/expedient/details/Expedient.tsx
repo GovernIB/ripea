@@ -242,7 +242,7 @@ const Expedient = () => {
         },
     ]
 
-    return <GridPage>
+    return <GridPage disableMargins>
         <SseExpedient id={id}/>
 
         <Load value={expedient} noEffect>

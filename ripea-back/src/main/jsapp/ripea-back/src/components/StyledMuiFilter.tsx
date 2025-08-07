@@ -37,7 +37,7 @@ const StyledMuiFilter = (props:any) => {
         },
         {
             value: 'search',
-            text: t('common.search'),
+            text: t('common.filter'),
             icon: 'filter_alt',
             componentProps: {
                 variant: "contained",

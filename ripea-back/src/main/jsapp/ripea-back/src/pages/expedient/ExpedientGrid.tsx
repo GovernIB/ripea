@@ -15,6 +15,8 @@ import {CardPage} from "../../components/CardData.tsx";
 import Load from "../../components/Load.tsx";
 import {useUserSession} from "../../components/Session.tsx";
 import {GridSortDirection} from "@mui/x-data-grid-pro";
+import useAlerta from "./details/Alerta.tsx";
+import useErrorValidacio from "./details/ErrorValidacio.tsx";
 
 const labelStyle = {padding: '1px 4px', fontSize: '11px', fontWeight: '500', borderRadius: '2px', display: 'flex', alignItems: 'center', width: 'max-content'}
 const obertStyle = {border: '1px dashed #AAA'}
@@ -25,6 +27,7 @@ export const ExpedientGridForm = () => {
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField xs={12} name="metaExpedient" hidden={!!data?.id}/>
+
         <GridFormField xs={12} name="nom"/>
         <GridFormField xs={12} name="organGestor"
                        namedQueries={[`EXPEDIENT_FORM#${data?.metaExpedient?.id || 0}`]}
@@ -140,6 +143,9 @@ const ExpedientGrid = () => {
     const {actions, components} = useCommonActions(refresh);
     const {actions: massiveActions, components: massiveComponents} = useMassiveActions(refresh);
 
+    const {handleOpen: handelAlert, dialog: dialogAlert} = useAlerta();
+    const {handleOpen: hanldeErrorValidacio, dialog: dialogErrorValidacio} = useErrorValidacio();
+
     const columnsAddition :any[] = [
         ...beforeAvis,
         {
@@ -149,7 +155,12 @@ const ExpedientGrid = () => {
             flex: 0.5,
             renderCell: (params: any) => (<>
                 {!params.row?.valid &&
-                    <Icon color={"warning"} title={t('page.expedient.alert.validation')}>warning</Icon>}
+                    <Icon color={"warning"}
+                          title={t('page.expedient.alert.validation')}
+                          onClick={(event:any) => {
+                              event.stopPropagation()
+                              hanldeErrorValidacio(params.row?.id, params.row)
+                          }}>warning</Icon>}
                 {params.row?.errorLastEnviament &&
                     <Icon color={"error"} title={t('page.expedient.alert.errorEnviament')}>edit</Icon>}
                 {params.row?.errorLastNotificacio &&
@@ -159,7 +170,12 @@ const ExpedientGrid = () => {
                 {params.row?.ambNotificacionsPendents &&
                     <Icon color={"primary"} title={t('page.expedient.alert.ambNotificacionsPendents')}>mail</Icon>}
                 {params.row?.numAlert != 0 &&
-                    <Icon color={"error"} title={t('page.expedient.alert.alert')}>error</Icon>}
+                    <Icon color={"error"}
+                          title={t('page.expedient.alert.alert')}
+                          onClick={(event:any) => {
+                              event.stopPropagation()
+                              handelAlert(params.row?.id, params.row)
+                          }}>error</Icon>}
                 {params.row?.arxiuUuid == null &&
                     <Icon color={"error"} title={t('page.contingut.alert.guardarPendent')}>warning</Icon>}
             </>),
@@ -278,6 +294,8 @@ const ExpedientGrid = () => {
 
             {components}
             {massiveComponents}
+            {dialogAlert}
+            {dialogErrorValidacio}
         </CardPage>
     </GridPage>
 }

@@ -223,7 +223,7 @@ const Annexos = (props:any) => {
             icon: "edit",
             showInMenu: true,
             onClick: handleAnnexFirma,
-            hidden: (row:any) => row?.firmaTipus == null,
+            hidden: (row:any) => row?.firmaTipus == null || !row?.firmes?.length,
         },
         {
             label: t('page.anotacio.action.descargarAnnex.label'),

@@ -25,7 +25,7 @@ import UserMenuButton, {UserMenu} from "../pages/user/UserMenu.tsx";
 import {useAlertesSession} from "./SseClient.tsx";
 import {useUserSession} from "./Session";
 import AlertExpand from "./AlertExpand.tsx";
-import {useSession, useSessionList} from "./SessionStorageContext.tsx";
+import {useSession} from "./SessionStorageContext.tsx";
 
 export type MenuEntryWithResource = MenuEntry & {
     resourceName?: string;
@@ -138,13 +138,13 @@ const CustomLocalizationProvider = ({ children }: React.PropsWithChildren) => {
 const generateFooter = (version?:string) => {
     return (
         <>
-            <div style={{ height: '36px', width: '100%' }} />
+            {/*<div style={{ height: '36px', width: '100%' }} />*/}
             <Footer
                 title="RIPEA"
                 version={version}
                 logos={[drassana]}
                 backgroundColor="#5F5D5D"
-                style={{ position: 'fixed', height: '36px', bottom: 0, width: '100%', zIndex: 999 }}
+                style={{ height: '36px', width: '100%', zIndex: 999 }}
             />
         </>
     );
