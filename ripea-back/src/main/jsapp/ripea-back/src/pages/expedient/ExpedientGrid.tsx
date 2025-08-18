@@ -251,13 +251,13 @@ const ExpedientGrid = () => {
                 apiRef={apiRef}
                 popupEditCreateActive
                 popupEditFormContent={<ExpedientGridForm/>}
+                popupEditFormDialogTitle={t('page.expedient.action.new.title')}
                 onRowClick={(row: any) => navigate(`/contingut/${row?.id}`)}
                 onRowDoubleClick={(row: any) => navigate(`/contingut/${row?.id}`)}
                 rowAdditionalActions={actions}
                 selectionActive
                 toolbarCreateTitle={t('page.expedient.action.new.label')}
                 toolbarMassiveActions={massiveActions}
-
                 rowProps={(row: any) => {
                     const color = row?.estatAdditionalInfo?.color;
                     return color

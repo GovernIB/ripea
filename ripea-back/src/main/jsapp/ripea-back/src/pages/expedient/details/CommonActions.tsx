@@ -256,13 +256,6 @@ export const useCommonActions = (refresh?: () => void) => {
             showInMenu: true,
         },
         {
-            label: t('page.expedient.action.update.label'),
-            icon: 'edit',
-            showInMenu: true,
-            onClick: handleModifyExpedient,
-            hidden: (row:any) => isTancat(row) || !row?.potModificar,
-        },
-        {
             label: t('page.expedient.action.follow.label'),
             icon: "person_add",
             showInMenu: true,
@@ -288,6 +281,13 @@ export const useCommonActions = (refresh?: () => void) => {
             onClick: hanldeAssignar,
             hidden: (row:any) => !isAdminOAdminOrgan(row),// si el usuario actual no admin o organo
         },
+        {
+            label: t('page.expedient.action.update.label'),
+            icon: 'edit',
+            showInMenu: true,
+            onClick: handleModifyExpedient,
+            hidden: (row:any) => isTancat(row) || !row?.potModificar,
+        },        
         {
             label: <Divider sx={{px: 1, width: '100%'}} color={"none"}/>,
             showInMenu: true,

@@ -12,7 +12,7 @@ const translationCa = {
         detail: "Detall",
         refresh: "Refrescar",
         clear: "Netejar",
-        search: "Cercar",
+        search: "Filtrar",
         options: "Opcions",
         select: {
             all: "Seleccionar tots",
@@ -157,7 +157,7 @@ const translationCa = {
                 },
                 infoArxiu: {
                     title: "Informació obtinguda de l'arxiu",
-                    label: "Informació de l'arxiu",
+                    label: "Informació arxiu",
                 },
                 importarExpedient: {
                     label: "Importar expedient relacionat...",
@@ -385,6 +385,7 @@ const translationCa = {
             action: {
                 new: {
                     label: "Nou expedient",
+                    title: "Crear nou expedient",
                     ok: "L’expedient '{{data.nom}}' s’ha creat correctament.",
                 },
                 update: {
@@ -400,7 +401,7 @@ const translationCa = {
                     ok: "L’expedient s’ha importat correctament",
                 },
                 agafar: {
-                    label: "Bloquejar",
+                    label: "Agafar",
                     ok: "L’expedient '{{expedient}}' ha estat agafat per l’usuari '{{user}}'",
                 },
                 follow: {

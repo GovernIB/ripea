@@ -30,6 +30,7 @@ const StyledMuiFilter = (props:any) => {
         {
             value: 'clear',
             text: t('common.clear'),
+            icon: 'auto_fix_normal',
             componentProps: {
                 variant: "outlined",
                 sx: { borderRadius: '4px' },

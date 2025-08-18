@@ -384,12 +384,13 @@ const translationEs = {
             },
             action: {
                 new: {
-                    label: "Nuevo expedient",
+                    label: "Nuevo expediente",
+                    title: "Crear nuevo expediente",
                     ok: "El expediente '{{data.nom}}' se ha creado correctamente.",
                 },
                 update: {
                     label: "Modificar...",
-                    title: "Modificar Expediente",
+                    title: "Modificar expediente",
                     ok: "El expediente '{{data.nom}}' se ha modificado correctamente.",
                 },
                 detall: {
