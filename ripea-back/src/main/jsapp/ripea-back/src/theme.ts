@@ -101,16 +101,55 @@ const theme = createTheme({
                     fontSize: '14px',
                 },
             }
-        },     
+        },
+        MuiGrid: {
+            styleOverrides: {
+                item: {
+                    paddingTop: '9px',
+                }
+            }
+        },
         MuiFormLabel: {
             styleOverrides: {
                 root: {
+                    fontStyle: 'italic',
+                    paddingRight: '2px',
                     fontSize: '14px',
                     fontWeight: 200,
-                    color: '#666666',
-                    // Altres propietats opcionals:
-                    // fontWeight: 500,
-                    // lineHeight: 1.5,
+                    color: 'darkgray',
+                    '&.Mui-disabled': {
+                        fontStyle: 'italic',
+                        paddingRight: '2px',
+                    },
+                    '&.Mui-focused': {
+                        fontStyle: 'italic',
+                        paddingRight: '2px',
+                        backgroundColor: 'white',
+                        borderBottom: '1px solid #337ab7',                        
+                    }
+                },
+                filled: {
+                    fontStyle: 'italic',
+                    paddingRight: '2px',
+                    fontSize: '14px',
+                    fontWeight: 200,
+                    color: 'black',
+                    backgroundColor: 'white',
+                    borderBottom: '1px solid gray',                    
+                    '&.Mui-disabled': {
+                        fontStyle: 'italic',
+                        paddingRight: '2px',
+                        color: 'black',
+                        opacity: 1,
+                        backgroundColor: 'white',
+                        borderBottom: '1px solid gray'
+                    },
+                    '&.Mui-focused': {
+                        fontStyle: 'italic',
+                        paddingRight: '2px',
+                        backgroundColor: 'white',
+                        borderBottom: '1px solid #337ab7',                        
+                    }
                 }
             }
         },

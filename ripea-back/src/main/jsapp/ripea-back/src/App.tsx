@@ -26,7 +26,7 @@ export const App: React.FC = () => {
             mr: 4,
             borderRight: `2px solid ${ entitat?.capsaleraColorLletra ?? '#000' }`
         }}
-        title={<img src={logo} title={'RIPEA v' + version} style={{ height: '80px' }} alt={'RIPEA v' + version} />}
+        title={<img src={logo} style={{ height: '80px', paddingTop: '5px' }} />}
         version={version}
         appbarBackgroundColor={backgroundColor ?? "#FFFFFF"}>
         <TitleHeaderConfigurator/>

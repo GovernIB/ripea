@@ -18,15 +18,11 @@ const PerfilFrom = () =>{
             cardProps={{border: '1px solid #004B99'}}
             headerProps={{color: 'white', backgroundColor: '#004B99'}}
         >
-            <GridFormField xs={12} name="nom" componentProps={{ sx: { backgroundColor: 'rgba(231, 229, 229, 0.6)' } }} readOnly/>
-            <GridFormField xs={12} name="nif" componentProps={{ sx: { backgroundColor: 'rgba(231, 229, 229, 0.6)' } }} readOnly/>
-            <GridFormField xs={12} name="email" componentProps={{ sx: { backgroundColor: 'rgba(231, 229, 229, 0.6)' } }} readOnly/>
+            <GridFormField xs={12} name="nom" disabled readOnly/>
+            <GridFormField xs={12} name="nif" disabled readOnly/>
+            <GridFormField xs={12} name="email" disabled readOnly/>
             <GridFormField xs={12} name="emailAlternatiu"/>
-
-            <GridFormField xs={12} name="rols"
-                           value={user?.auth}
-                           componentProps={{ sx: { backgroundColor: 'rgba(231, 229, 229, 0.6)' } }}
-                           readOnly multiple/>
+            <GridFormField xs={12} name="rols" value={user?.auth} disabled readOnly multiple/>
             <GridFormField xs={12} name="idioma" required/>
         </CardData>
 
