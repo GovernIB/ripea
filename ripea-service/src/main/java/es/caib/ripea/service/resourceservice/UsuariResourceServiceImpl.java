@@ -65,7 +65,7 @@ public class UsuariResourceServiceImpl extends BaseMutableResourceService<Usuari
     public class ElementsPaginaOptionsProvider implements FieldOptionsProvider {
 		public List<FieldOption> getOptions(String fieldName, Map<String,String[]> requestParameterMap) {
 			List<FieldOption> resultat = new ArrayList<FieldOption>();
-			resultat.add(new FieldOption(null, "Automatic"));
+			resultat.add(new FieldOption(null, "Automàtic"));
 			resultat.add(new FieldOption("10", "10"));
 			resultat.add(new FieldOption("20", "20"));
 			resultat.add(new FieldOption("50", "50"));
