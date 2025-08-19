@@ -172,8 +172,8 @@ const useExpedientMassiveActions = (refresh?: () => void)=> {
 			hidden: !(user?.sessionScope?.isExportacioInsideActiva),
 		},
         {
-            label: t('page.expedient.action.exportZIP.label'),
-            icon: "description",
+            label: t('page.expedient.action.exportDocs.label'),
+            icon: "folder_zip",
             showInMenu: true,
             onClick: handleExportDoc,
         },

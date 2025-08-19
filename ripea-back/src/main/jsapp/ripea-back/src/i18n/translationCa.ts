@@ -5,7 +5,7 @@ const translationCa = {
         copy: "Copiar",
         update: "Modificar",
         delete: "Esborrar",
-        action: "Acció",
+        action: "Accions",
         expand: "Expandir",
         contract: "Contreure",
         download: "Descarregar",
@@ -166,7 +166,7 @@ const translationCa = {
             },
             history: {
                 create: "Creació",
-                update: "Modificació",
+                update: "Darrera modificació",
                 user: "Usuari",
                 date: "Data",
             },
@@ -453,7 +453,7 @@ const translationCa = {
                     ok: "El document PDF s’ha descarregat correctament",
                 },
                 exportCSV: {
-                    label: "Exportar índex CSV",
+                    label: "Exportar CSV",
                     ok: "L’índex CSV s’ha descarregat correctament",
                 },
                 exportEXCEL: {
@@ -471,6 +471,10 @@ const translationCa = {
                 exportINSIDE: {
                     label: "Exportació INSIDE",
                     ok: "El document INSIDE s’ha descarregat correctament",
+                },
+                exportDocs: {
+                    label: "Exportar els documents dels expedients seleccionats",
+                    ok: "Els documents s’han exportat correctament",
                 },
                 export: {
                     label: "Exportar els documents...",
@@ -535,10 +539,10 @@ const translationCa = {
         },
         arxiu: {
             detall: {
-                arxiuUuid: "Identificador de l'arxiu",
-                fitxerNom: "Nom del fitxer",
+                arxiuUuid: "Identificador a l'arxiu",
+                fitxerNom: "Nom del document",
                 serie: "Sèrie documental",
-                arxiuEstat: "Estat de l'arxiu",
+                arxiuEstat: "Estat a l'arxiu",
                 document: "Contingut del document",
                 fitxerContentType: "Tipus MIME",
                 metadata: "Metadades ENI",
@@ -769,6 +773,7 @@ const translationCa = {
             },
             action: {
                 new: {
+                    label: "Afegir valor per la dada",
                     ok: "La dada {{data.valor}} s'ha creat correctament",
                 },
                 update: {
@@ -961,7 +966,7 @@ const translationCa = {
                 grups: "Grups",
                 revisar: "Revisió de procediments",
                 tasca: "Tasques",
-                flux: "Fluxos de signatura",
+                flux: "Fluxos de firma",
 
                 consultar: "Consultar",
                 continguts: "Continguts",

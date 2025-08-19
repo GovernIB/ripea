@@ -256,6 +256,18 @@ export const useCommonActions = (refresh?: () => void) => {
             showInMenu: true,
         },
         {
+            label: t('page.expedient.action.update.label'),
+            icon: 'edit',
+            showInMenu: true,
+            onClick: handleModifyExpedient,
+            hidden: (row:any) => isTancat(row) || !row?.potModificar,
+        },
+        {
+            label: <Divider sx={{px: 1, width: '100%'}} color={"none"}/>,
+            showInMenu: true,
+            disabled: true,
+        },        
+        {
             label: t('page.expedient.action.follow.label'),
             icon: "person_add",
             showInMenu: true,
@@ -270,30 +282,12 @@ export const useCommonActions = (refresh?: () => void) => {
             hidden: (row:any) => !row?.seguidor || !isUsuariActualWrite(row),// si el usuario actual no es seguidor
         },
         {
-            label: <Divider sx={{px: 1, width: '100%'}} color={"none"}/>,
-            showInMenu: true,
-            disabled: true,
-        },
-        {
             label: t('page.expedient.action.assignar.label'),
             icon: "person",
             showInMenu: true,
             onClick: hanldeAssignar,
             hidden: (row:any) => !isAdminOAdminOrgan(row),// si el usuario actual no admin o organo
-        },
-        {
-            label: t('page.expedient.action.update.label'),
-            icon: 'edit',
-            showInMenu: true,
-            onClick: handleModifyExpedient,
-            hidden: (row:any) => isTancat(row) || !row?.potModificar,
-        },        
-        {
-            label: <Divider sx={{px: 1, width: '100%'}} color={"none"}/>,
-            showInMenu: true,
-            disabled: true,
-            hidden: (row:any) => !isAdminOAdminOrgan(row),
-        },
+        },       
         {
             label: t('page.expedient.action.agafar.label'),
             icon: "lock",
@@ -366,6 +360,7 @@ export const useCommonActions = (refresh?: () => void) => {
         },
         {
             label: t('page.contingut.action.history.label'),
+            title: t('page.contingut.action.history.title'),
             icon: "list",
             showInMenu: true,
             onClick: handelHistoricOpen,

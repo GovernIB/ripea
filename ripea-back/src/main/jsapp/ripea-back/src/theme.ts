@@ -70,9 +70,14 @@ const theme = createTheme({
         MuiTypography: {
             styleOverrides: {
                 h5: {
-                    fontSize: '1.25rem',     // Mida de la font
+                    fontSize: '1.8rem',     // Mida de la font
                     lineHeight: 1.2,         // Alçada de línia
-                    fontWeight: 500,
+                    fontWeight: 400,
+                },
+                h4: {
+                    fontSize: '1.5rem',     // Mida de la font
+                    lineHeight: 1.2,         // Alçada de línia
+                    fontWeight: 400,
                 }
             },
         },
@@ -201,6 +206,11 @@ const theme = createTheme({
             styleOverrides: {
                 root: {
 					marginBottom: '5px',
+                },
+                standardWarning: {
+                    color: "#8a6d3b",
+                    backgroundColor: "#fcf8e3",
+                    borderColor: "#faebcc",
                 }
             }
         },

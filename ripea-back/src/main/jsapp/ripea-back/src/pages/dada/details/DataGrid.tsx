@@ -86,7 +86,7 @@ const DataGrid = (props:any) => {
         autoHeight
         formInitOnChange
         toolbarHideCreate={ !contingut?.potModificar || numDades > 0 && !(entity?.multiplicitat == 'M_0_N' || entity?.multiplicitat == 'M_1_N') }
-
+        toolbarCreateTitle={t('page.dada.action.new.label')}
         popupEditFormI18nKeys={{
             createSuccess: 'page.dada.action.new.ok',
             updateSuccess: 'page.dada.action.update.ok',
