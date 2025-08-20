@@ -70,9 +70,14 @@ const theme = createTheme({
         MuiTypography: {
             styleOverrides: {
                 h5: {
-                    fontSize: '1.25rem',     // Mida de la font
+                    fontSize: '1.8rem',     // Mida de la font
                     lineHeight: 1.2,         // Alçada de línia
-                    fontWeight: 500,
+                    fontWeight: 400,
+                },
+                h4: {
+                    fontSize: '1.5rem',     // Mida de la font
+                    lineHeight: 1.2,         // Alçada de línia
+                    fontWeight: 400,
                 }
             },
         },
@@ -101,16 +106,55 @@ const theme = createTheme({
                     fontSize: '14px',
                 },
             }
-        },     
+        },
+        MuiGrid: {
+            styleOverrides: {
+                item: {
+                    paddingTop: '9px',
+                }
+            }
+        },
         MuiFormLabel: {
             styleOverrides: {
                 root: {
+                    fontStyle: 'italic',
+                    paddingRight: '2px',
                     fontSize: '14px',
                     fontWeight: 200,
-                    color: '#666666',
-                    // Altres propietats opcionals:
-                    // fontWeight: 500,
-                    // lineHeight: 1.5,
+                    color: 'darkgray',
+                    '&.Mui-disabled': {
+                        fontStyle: 'italic',
+                        paddingRight: '2px',
+                    },
+                    '&.Mui-focused': {
+                        fontStyle: 'italic',
+                        paddingRight: '2px',
+                        backgroundColor: 'white',
+                        borderBottom: '1px solid #337ab7',                        
+                    }
+                },
+                filled: {
+                    fontStyle: 'italic',
+                    paddingRight: '2px',
+                    fontSize: '14px',
+                    fontWeight: 200,
+                    color: 'black',
+                    backgroundColor: 'white',
+                    borderBottom: '1px solid gray',                    
+                    '&.Mui-disabled': {
+                        fontStyle: 'italic',
+                        paddingRight: '2px',
+                        color: 'black',
+                        opacity: 1,
+                        backgroundColor: 'white',
+                        borderBottom: '1px solid gray'
+                    },
+                    '&.Mui-focused': {
+                        fontStyle: 'italic',
+                        paddingRight: '2px',
+                        backgroundColor: 'white',
+                        borderBottom: '1px solid #337ab7',                        
+                    }
                 }
             }
         },
@@ -162,6 +206,11 @@ const theme = createTheme({
             styleOverrides: {
                 root: {
 					marginBottom: '5px',
+                },
+                standardWarning: {
+                    color: "#8a6d3b",
+                    backgroundColor: "#fcf8e3",
+                    borderColor: "#faebcc",
                 }
             }
         },

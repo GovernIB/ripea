@@ -214,7 +214,6 @@ public class ViaFirmaPluginImpl extends RipeaAbstractPluginProperties implements
         document.setTemplateReference(params.getContingut());
         if (!isTablet) {
         	document.setFormRequired(true);
-        	document.setFormDisabled(true);
         }
         return document;
     }

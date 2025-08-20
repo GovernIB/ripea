@@ -5,7 +5,7 @@ const translationEs = {
         create: "Crear",
         update: "Modificar",
         delete: "Borrar",
-        action: "Acción",
+        action: "Acciones",
         expand: "Expandir",
         contract: "Contraer",
         download: "Descargar",
@@ -384,12 +384,13 @@ const translationEs = {
             },
             action: {
                 new: {
-                    label: "Nuevo expedient",
+                    label: "Nuevo expediente",
+                    title: "Crear nuevo expediente",
                     ok: "El expediente '{{data.nom}}' se ha creado correctamente.",
                 },
                 update: {
                     label: "Modificar...",
-                    title: "Modificar Expediente",
+                    title: "Modificar expediente",
                     ok: "El expediente '{{data.nom}}' se ha modificado correctamente.",
                 },
                 detall: {
@@ -443,16 +444,16 @@ const translationEs = {
                     ok: "La hoja de cálculo se ha descargado correctamente",
                 },
                 exportZIP: {
-                    label: "Exportar indice ZIP",
+                    label: "Exportar índice ZIP",
                     title: "Exportar documentos a ZIP",
                     ok: "El documento ZIP se ha descargado correctamente",
                 },
                 exportPDF: {
-                    label: "Exportar indice PDF",
+                    label: "Exportar índice PDF",
                     ok: "El documento PDF se ha descargado correctamente",
                 },
                 exportCSV: {
-                    label: "Exportar indice CSV",
+                    label: "Exportar CSV",
                     ok: "El indice CSV se ha descargado correctamente",
                 },
                 exportEXCEL: {
@@ -471,6 +472,10 @@ const translationEs = {
                     label: "Exportación INSIDE",
                     ok: "El documento INSIDE se ha descargado correctamente",
                 },
+                exportDocs: {
+                    label: "Exportar los documentos de los expedientes seleccionados",
+                    ok: "Los documentos se han exportado correctamente",
+                },                
                 export: {
                     label: "Exportar los documentos...",
                     title: "Exportar documentos",
@@ -534,10 +539,10 @@ const translationEs = {
         },
         arxiu: {
             detall: {
-                arxiuUuid: "Identificador archivo",
-                fitxerNom: "Nombre del archivo",
+                arxiuUuid: "Identificador arxiu",
+                fitxerNom: "Nombre del documento",
                 serie: "Serie documental",
-                arxiuEstat: "Estado del archivo",
+                arxiuEstat: "Estado en arxiu",
                 document: "Contenido documento",
                 fitxerContentType: "Tipo MIME",
                 metadata: "Metadatos ENI",
@@ -768,6 +773,7 @@ const translationEs = {
             },
             action: {
                 new: {
+                    label: "Añadir valor para el dato",
                     ok: "El dato {{data.valor}} se ha creado correctamente",
                 },
                 update: {

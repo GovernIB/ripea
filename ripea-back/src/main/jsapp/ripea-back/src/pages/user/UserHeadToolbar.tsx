@@ -13,10 +13,11 @@ import {
 } from 'react-router-dom';
 
 export const icons = {
-    expedient: 'folder_open',
+    expedient: 'folder',
     anotacio: 'email',
     tasca: 'event_avaliable',
     consulta: 'search',
+    firma: 'draw',
 }
 
 export const useToProgramaAntic = () => {
@@ -572,7 +573,7 @@ const useMenuUsuari = () => {
         {
             id: 'flux',
             title: t('page.user.menu.flux'),
-            // icon: '',
+            icon: icons.firma,
             onClick: () => toProgramaAntic('fluxusuari'),
             hidden: !user?.sessionScope?.isCreacioFluxUsuariActiu,
         },

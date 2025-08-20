@@ -9,7 +9,7 @@ export const useDadaActions = (contingut:any, refresh?: () => void) => {
     const actions = [
         {
             label: t('common.detail'),
-            icon: "info",
+            icon: "edit",
             showInMenu: false,
             onClick: handleOpen,
             hidden: (row:any) => row?.readOnly,

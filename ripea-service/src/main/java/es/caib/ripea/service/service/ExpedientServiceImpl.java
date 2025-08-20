@@ -78,6 +78,7 @@ import es.caib.ripea.service.intf.dto.ExpedientFiltreDto;
 import es.caib.ripea.service.intf.dto.ExpedientSelectorDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.InteressatAssociacioAccioEnum;
+import es.caib.ripea.service.intf.dto.MetaExpedientComentariDto;
 import es.caib.ripea.service.intf.dto.MoureDestiVistaEnumDto;
 import es.caib.ripea.service.intf.dto.PaginaDto;
 import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
@@ -599,39 +600,11 @@ public class ExpedientServiceImpl implements ExpedientService {
 	@Transactional(readOnly = true)
 	@Override
 	public List<ExpedientComentariDto> findComentarisPerContingut(Long entitatId, Long expedientId) {
-		logger.debug(
-				"Obtenint els comentaris pel expedient (" + "entitatId=" + entitatId + ", " + "nodeId=" + expedientId +
-						")");
+		logger.debug("Obtenint els comentaris pel expedient (" + "entitatId=" + entitatId + ", " + "nodeId=" + expedientId +")");
 		entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
-		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				expedientId,
-				false,
-				true,
-				false,
-				false,
-				false,
-				null);
-
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(expedientId, false, true, false, false, false, null);
 		List<ExpedientComentariEntity> expcoms = expedientComentariRepository.findByExpedientOrderByCreatedDateAsc(	expedient);
-		List<ExpedientComentariDto> resultat = new ArrayList<ExpedientComentariDto>();
-		
-		if (expcoms!=null) {
-			for (ExpedientComentariEntity etc: expcoms) {
-				ExpedientComentariDto etcDto = conversioTipusHelper.convertir(etc, ExpedientComentariDto.class);
-				if (etc.getCreatedBy().isPresent()) {
-					UsuariEntity ue = usuariRepository.findByCodi(etc.getCreatedBy().get());
-					UsuariDto ucb = new UsuariDto();
-					ucb.setCodi(ue.getCodi());
-					ucb.setNom(ue.getNom());
-					ucb.setNif(ue.getNif());
-					ucb.setEmail(ue.getEmail());
-					etcDto.setCreatedBy(ucb);
-				}
-				resultat.add(etcDto);
-			}
-		}
-		
-		return resultat;
+		return conversioTipusHelper.convertirList(expcoms, ExpedientComentariDto.class);
 	}
 
 	@Transactional(readOnly = true)

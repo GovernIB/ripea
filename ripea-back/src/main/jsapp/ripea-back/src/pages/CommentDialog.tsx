@@ -1,137 +1,128 @@
-import {useEffect, useRef, useState} from "react";
-import {Badge, Button, Grid, Icon, IconButton, Typography} from "@mui/material";
-import {MuiFormDialog, useResourceApiService, MuiFormDialogApi, useBaseAppContext} from "reactlib";
-import GridFormField from "../components/GridFormField.tsx";
-import {formatDate} from "../util/dateUtils.ts";
-import {useUserSession} from "../components/Session.tsx";
-import Load from "../components/Load.tsx";
+import * as React from 'react';
 import DOMPurify from 'dompurify';
-
-const CommentForm = (props:any) => {
-    const { readOnly } = props;
-
-    return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="text" disabled={readOnly} readOnly={readOnly}/>
-    </Grid>
-}
+import {
+    Badge,
+    Grid2 as Grid,
+    Button,
+    Icon,
+    IconButton,
+    Typography
+} from '@mui/material';
+import {
+    MuiForm,
+    FormField,
+    useResourceApiService,
+    useBaseAppContext,
+    useMuiContentDialog,
+    useCloseDialogButtons,
+    useFormApiRef
+} from 'reactlib';
+import { formatDate } from '../util/dateUtils';
+import { useUserSession } from '../components/Session';
 
 const comment = {borderRadius: 2, px: 2, py: 1}
 const myComment = {...comment, bgcolor: '#a5d6a7', alignSelf: 'end'}
 const otherComment = {...comment, bgcolor: '#e0e0e0'}
 
-const Comments = (props:any) => {
-    const { entity, resourceName, resourceReference, onRowCountChange } = props;
-
+const Comments = (props: any) => {
+    const { resourceName, id, resourceReference } = props;
     const { value: user } = useUserSession();
-    const [comentarios, setComentarios] = useState<any[]>([]);
-    const {temporalMessageShow} = useBaseAppContext();
-
     const {
-        isReady: appApiIsReady,
-        find: findAll,
+        isReady: apiIsReady,
+        find: apiFind,
     } = useResourceApiService(resourceName);
-
-    useEffect(() => {
-        if (appApiIsReady && comentarios?.length == 0){
-            findAll({
-                filter: `${resourceReference}.id:${entity?.id}`,
-                includeLinksInRows: true,
-                unpaged: true,
-                sorts: ['createdDate', 'desc']
-            })
-                .then((result) => {
-                    // console.log(">>>> rows", app.rows)
-                    setComentarios(result.rows);
-                    onRowCountChange?.(result.rows?.length || 0)
-                })
-                .catch((error) => {
-                    error?.message && temporalMessageShow(null, error?.message, 'error');
-                });
+    const [comments, setComments] = React.useState<any[]>();
+    const {temporalMessageShow} = useBaseAppContext();
+    const formApiRef = useFormApiRef();
+    const gridRef = React.useRef<HTMLDivElement | undefined>();
+    const refresh = () => {
+        apiFind({
+            filter: `${resourceReference}.id:${id}`,
+            includeLinksInRows: true,
+            unpaged: true,
+            sorts: ['createdDate', 'desc']
+        }).
+        then((result) => {
+            setComments(result.rows);
+            setTimeout(() => {
+                const contentRef = gridRef.current?.parentElement;
+                if (contentRef) {
+                    contentRef.scrollTop = contentRef.scrollHeight;
+                }
+            }, 100);
+        }).
+        catch((error) => {
+            error?.message && temporalMessageShow(null, error?.message, 'error');
+        });
+    }
+    React.useEffect(() => {
+        if (apiIsReady) {
+            refresh();
         }
-    }, [appApiIsReady]);
-
+    }, [apiIsReady]);
+    const handleButtonClick = () => {
+        formApiRef.current?.save().then(() => {
+            refresh();
+            formApiRef.current?.reset();
+        });
+    }
     return <Grid
         container
         direction="column"
         rowGap={1}
-        sx={{
-            justifyContent: "center",
-            alignItems: "flex-start",
-            pb: 1,
-        }}
-    >
-        {comentarios?.map((a:any)=>
-            <Grid item key={a?.id} sx={a?.createdBy==user?.codi ?myComment :otherComment}>
-                <Typography variant={"subtitle2"} color={"textDisabled"}>{a?.createdBy}</Typography>
-
-                <Typography
-                    variant="body2"
-                    // sx={{ textAlign: 'justify' }}
-                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(a?.text) }}
-                />
-
-                <Typography variant={"caption"} color={"textDisabled"}>{formatDate(a?.createdDate)}</Typography>
+        ref={gridRef}
+        sx={{ justifyContent: 'center', alignItems: 'flex-start', pb: 1 }}>
+        {comments?.map((a:any)=>
+            <Grid key={a?.id} sx={a?.createdBy == user?.codi ? myComment : otherComment}>
+                <Typography variant="subtitle2" color="textDisabled">{a?.createdBy}</Typography>
+                <Typography variant="body2" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(a?.text) }}/>
+                <Typography variant="caption" color="textDisabled">{formatDate(a?.createdDate)}</Typography>
             </Grid>
         )}
-    </Grid>
+        <Grid size={12}>
+            <MuiForm
+                resourceName={resourceName}
+                hiddenToolbar
+                additionalData={{
+                    [resourceReference]: { id },
+                }}
+                apiRef={formApiRef}
+                commonFieldComponentProps={{ size: 'small' }}>
+                <Grid container columnSpacing={1} rowSpacing={1}>
+                    <Grid size={12} sx={{ display: 'flex' }}>
+                        <FormField name="text" />
+                        <Button onClick={handleButtonClick} startIcon={<Icon>send</Icon>} variant="contained">Enviar</Button>
+                    </Grid>
+                </Grid>
+            </MuiForm>
+        </Grid>
+    </Grid>;
 }
 
-export const CommentDialog = (props:any) => {
-    const { entity, title, resourceName, resourceReference, componentProps, readOnly } = props;
-    const [numComm, setNumComm] = useState<number>(entity?.numComentaris || 0);
-    const formApiRef = useRef<MuiFormDialogApi>()
-    const {t, temporalMessageShow} = useBaseAppContext();
-
+export const CommentDialog = (props: any) => {
+    const { entity, title, resourceName, resourceReference } = props;
+    const [dialogShow, dialogComponent] = useMuiContentDialog();
+    const closeButtons = useCloseDialogButtons();
     const handleOpen = (event:any) => {
-        event.stopPropagation()
-        formApiRef.current?.show(undefined, {
-            [resourceReference]: {
-                id: entity?.id
-            },
-        })
-            .then(() => {
-                setNumComm(prev => prev + 1);
-            })
-            .catch((error) => {
-                error?.message && temporalMessageShow(null, error?.message, 'error');
-            });
+        event.stopPropagation();
+        dialogShow(
+            title,
+            <>
+                <Comments 
+                    resourceName={resourceName}
+                    id={entity?.id}
+                    resourceReference={resourceReference} />
+            </>,
+            closeButtons,
+            { maxWidth: 'md', fullWidth: true }).
+            catch(() => {});
     }
-
     return <>
-        <Button {...componentProps} aria-label="forum" color={"inherit"} onClick={handleOpen}>
-            <Badge badgeContent={numComm ?? entity?.numComentaris} color="primary">
+        <IconButton aria-label="forum" color="inherit" onClick={handleOpen}>
+            <Badge badgeContent={entity?.numComentaris} color="primary">
                 <Icon>forum</Icon>
             </Badge>
-        </Button>
-        <Load value={entity} noEffect>
-            <MuiFormDialog
-                resourceName={resourceName}
-                title={title}
-                onClose={(reason?: string) => reason !== 'backdropClick'}
-                apiRef={formApiRef}
-                dialogButtons={[
-                    {
-                        value: false,
-                        text: t('buttons.form.cancel'),
-                        componentProps: { variant: 'outlined' },
-                    }, {
-                        value: true,
-                        text: t('buttons.form.save'),
-                        icon: 'save',
-                        componentProps: { variant: 'contained' },
-                        hidden: readOnly,
-                    }
-                ]
-                    .filter((btn:any)=>!btn?.hidden)}
-            >
-                <Comments
-                    entity={entity}
-                    resourceName={resourceName}
-                    resourceReference={resourceReference}
-                    onRowCountChange={setNumComm}
-                />
-                <CommentForm readOnly={readOnly}/>
-            </MuiFormDialog>
-        </Load>
-    </>
+        </IconButton>
+        {dialogComponent}
+    </>;
 }

@@ -135,7 +135,8 @@ const ExpedientAlert = (props:any) => {
         { expedient?.numAlert!=0 && (count === null || count !== 0) &&
             <Alert severity="error" color="warning"
                    action={
-                       <Button sx={{py: 0}} color={"inherit"} onClick={() => handelAlert(expedient?.id, expedient)}>
+                       <Button  sx={{py: 0, backgroundColor: 'white'}} variant="contained"
+                                onClick={() => handelAlert(expedient?.id, expedient)}>
                            <Typography variant={"subtitle2"}>{t('common.consult')}</Typography>
                        </Button>
                    }
@@ -144,7 +145,8 @@ const ExpedientAlert = (props:any) => {
         { !expedient?.valid &&
             <Alert severity="warning"
                    action={
-                       <Button sx={{py: 0}} color={"inherit"} onClick={() => hanldeErrorValidacio(expedient?.id, expedient)}>
+                       <Button  sx={{py: 0, backgroundColor: 'white'}} variant="outlined"
+                                onClick={() => hanldeErrorValidacio(expedient?.id, expedient)}>
                            <Typography variant={"subtitle2"}>{t('common.consult')}</Typography>
                        </Button>
                    }
@@ -246,46 +248,43 @@ const Expedient = () => {
         <SseExpedient id={id}/>
 
         <Load value={expedient} noEffect>
-        <CardData header={
-            <Grid container direction={'row'} columnSpacing={1} sx={{justifyContent: "space-between", alignItems: "center"}}>
-                <Grid item xs={8}><Typography variant="h5" display={"flex"} flexDirection={"row"} alignItems={"center"}>
-                    <Icon sx={{ fontSize: "2rem" }}>{icons.expedient}</Icon>{expedient?.nom}</Typography>
+            <CardData header={
+                <Grid container direction={'row'} columnSpacing={1} sx={{justifyContent: "space-between", alignItems: "center"}}>
+                    <Grid item xs={8}><Typography variant="h5" display={"flex"} flexDirection={"row"} alignItems={"center"}>
+                        <Icon sx={{ fontSize: "2rem" }}>{icons.expedient}</Icon>{expedient?.nom}</Typography>
+                    </Grid>
+                    <Grid item xs={4} display={'flex'} justifyContent={'end'}>
+                        <Typography variant={"subtitle1"} bgcolor={"white"} sx={{border}} px={1} hidden={!expedient?.agafatPer}>
+                            {t('page.expedient.title')} {t('page.expedient.detall.agafatPer')}: {expedient?.agafatPer?.description}
+    
+                            {expedient?.agafatPer?.id == user?.codi &&
+                                <IconButton aria-label="lock_open" color={"inherit"} onClick={()=>alliberar(id, expedient)} title={t('page.expedient.action.lliberar.label')}>
+                                    <Icon>lock_open</Icon>
+                                </IconButton>
+                            }
+                        </Typography>
+                    </Grid>
                 </Grid>
-                <Grid item xs={4} display={'flex'} justifyContent={'end'}>
-                    <Typography variant={"subtitle1"} bgcolor={"white"} sx={{border}} px={1} hidden={!expedient?.agafatPer}>
-                        {t('page.expedient.title')} {t('page.expedient.detall.agafatPer')}: {expedient?.agafatPer?.description}
-
-                        {expedient?.agafatPer?.id == user?.codi &&
-                            <IconButton aria-label="lock_open" color={"inherit"} onClick={()=>alliberar(id, expedient)} title={t('page.expedient.action.lliberar.label')}>
-                                <Icon>lock_open</Icon>
-                            </IconButton>
-                        }
-                    </Typography>
+            }>
+                <ExpedientInfo entity={expedient} xs={3}/>
+    
+                <Grid item xs={9}>
+                    <ExpedientAlert entity={expedient}></ExpedientAlert>
+                    <TabComponent
+                        indicatorColor={"primary"}
+                        textColor={"primary"}
+                        aria-label="scrollable force tabs"
+                        tabs={tabs}
+                        variant="scrollable"
+                        headerAdditionalData={<CommentDialog
+                            entity={expedient}
+                            title={`${t('page.comment.expedient')}: ${expedient?.nom}`}
+                            resourceName={'expedientComentariResource'}
+                            resourceReference={'expedient'}
+                        />}
+                    />
                 </Grid>
-            </Grid>
-        }>
-            <Grid item xs={12}>
-                <ExpedientAlert entity={expedient}></ExpedientAlert>
-            </Grid>
-
-            <ExpedientInfo entity={expedient} xs={3}/>
-
-            <Grid item xs={9}>
-                <TabComponent
-                    indicatorColor={"primary"}
-                    textColor={"primary"}
-                    aria-label="scrollable force tabs"
-                    tabs={tabs}
-                    variant="scrollable"
-                    headerAdditionalData={<CommentDialog
-                        entity={expedient}
-                        title={`${t('page.comment.expedient')}: ${expedient?.nom}`}
-                        resourceName={'expedientComentariResource'}
-                        resourceReference={'expedient'}
-                    />}
-                />
-            </Grid>
-        </CardData>
+            </CardData>
         </Load>
     </GridPage>
 }

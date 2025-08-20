@@ -69,7 +69,6 @@ export const FormFieldEnum: React.FC<FormFieldEnumProps> = (props) => {
             setAutocompleteOpen(true);
         }
         if (multiple) {
-            console.log('>>> handleAutocompleteOnChange', value)
             onChange(value?.map((v: any) => v.id));
             setAutocompleteInputValue('');
         } else {
@@ -130,22 +129,22 @@ export const FormFieldEnum: React.FC<FormFieldEnumProps> = (props) => {
                 multiple,
                 textFieldOpen,
                 readOnly,
+                displayEmpty: !required && !multiple,
                 onClose: () => setTextFieldOpen(false),
                 onOpen: () => setTextFieldOpen(true),
                 renderValue: (value: any) => {
                     const selectedText = (v: any) => {
-                        const found = enumOptions.find(o => o.value === v);
+                        const found = enumOptions.find(o => v === '' ? o.value == null : o.value === v);
                         return found?.description ?? found?.value;
                     }
                     return multiple ? value?.map((v: any) => selectedText(v)).join(', ') : selectedText(value);
                 },
             }
         }}>
-        {!required && !multiple && <MenuItem key='' value=''>&nbsp;</MenuItem>}
+        {!required && !multiple && enumOptions?.find(o => o.value == null) == null && <MenuItem key='' value=''>aaa&nbsp;</MenuItem>}
         {enumOptions.map(o => {
-            const checked = value?.includes?.(o.value);
-            return <MenuItem key={o.value} value={o.value}>
-                {multiple && <Checkbox checked={!!checked} />}
+            return <MenuItem key={o.value ?? ''} value={o.value ?? ''}>
+                {multiple && <Checkbox checked={!!(value?.includes?.(o.value))} />}
                 <ListItemText primary={o.description ?? o.value} />
             </MenuItem>;
         })}
