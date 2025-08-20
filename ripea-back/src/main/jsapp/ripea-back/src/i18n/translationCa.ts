@@ -1,6 +1,6 @@
 const translationCa = {
     common: {
-        close: "Tancar",
+        close: "Tanca",
         create: "Crear",
         copy: "Copiar",
         update: "Modificar",
@@ -22,6 +22,16 @@ const translationCa = {
         export: "Exportar",
         consult: "Consultar",
         filter: "Filtrar",
+    },
+    form: {
+        create: {
+            success: "L'element s'ha creat correctament",
+            error: "S'ha produït un error al crear l'element",
+        },
+        update: {
+            success: "L'element s'ha modificat correctament",
+            error: "S'ha produït un error al modificar l'element",
+        }
     },
     enum: {
         rol: {

@@ -91,7 +91,7 @@ const Comments = (props: any) => {
                 <Grid container columnSpacing={1} rowSpacing={1}>
                     <Grid size={12} sx={{ display: 'flex' }}>
                         <FormField name="text" />
-                        <Button onClick={handleButtonClick} startIcon={<Icon>send</Icon>} variant="contained">Enviar</Button>
+                        <Button onClick={handleButtonClick} startIcon={<Icon>send</Icon>} variant="contained">Envia</Button>
                     </Grid>
                 </Grid>
             </MuiForm>
@@ -102,7 +102,12 @@ const Comments = (props: any) => {
 export const CommentDialog = (props: any) => {
     const { entity, title, resourceName, resourceReference } = props;
     const [dialogShow, dialogComponent] = useMuiContentDialog();
-    const closeButtons = useCloseDialogButtons();
+    const { t } = useBaseAppContext();
+    const closeButtons = [{
+        value: false,
+        text: t('common.close'),
+        componentProps: { variant: 'outlined' }
+    }];
     const handleOpen = (event:any) => {
         event.stopPropagation();
         dialogShow(

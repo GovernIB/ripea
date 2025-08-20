@@ -122,10 +122,11 @@ const ExpedientAlert = (props:any) => {
         {expedient?.agafatPer?.id != user?.codi &&
             <Alert severity="info"
                    action={
-                       <IconButton sx={{py:0}} onClick={()=>agafar(expedient?.id, expedient)} color={"inherit"}>
+                       <Button sx={{py:0, backgroundColor: 'white'}} 
+                       onClick={()=>agafar(expedient?.id, expedient)} variant="outlined">
                            <Icon>lock</Icon>
 						   <Typography variant={"subtitle2"}>{t('page.expedient.action.agafar.label')}</Typography>
-                       </IconButton>
+                       </Button>
                    }
             >{user?.rolActual != 'IPA_ADMIN' && t('page.expedient.alert.owner')}</Alert>
         }
@@ -133,10 +134,11 @@ const ExpedientAlert = (props:any) => {
             <Alert severity="info">{t('page.expedient.alert.esborranys')}</Alert>
         }
         { expedient?.numAlert!=0 && (count === null || count !== 0) &&
-            <Alert severity="error" color="warning"
+            <Alert severity="warning"
                    action={
-                       <Button  sx={{py: 0, backgroundColor: 'white'}} variant="contained"
+                       <Button  sx={{py: 0, backgroundColor: 'white'}} variant="outlined"
                                 onClick={() => handelAlert(expedient?.id, expedient)}>
+                            <Icon>search</Icon>
                            <Typography variant={"subtitle2"}>{t('common.consult')}</Typography>
                        </Button>
                    }
@@ -147,6 +149,7 @@ const ExpedientAlert = (props:any) => {
                    action={
                        <Button  sx={{py: 0, backgroundColor: 'white'}} variant="outlined"
                                 onClick={() => hanldeErrorValidacio(expedient?.id, expedient)}>
+                            <Icon>search</Icon>
                            <Typography variant={"subtitle2"}>{t('common.consult')}</Typography>
                        </Button>
                    }
@@ -246,7 +249,6 @@ const Expedient = () => {
 
     return <GridPage disableMargins>
         <SseExpedient id={id}/>
-
         <Load value={expedient} noEffect>
             <CardData header={
                 <Grid container direction={'row'} columnSpacing={1} sx={{justifyContent: "space-between", alignItems: "center"}}>

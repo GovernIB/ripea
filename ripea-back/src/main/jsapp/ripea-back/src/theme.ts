@@ -50,7 +50,7 @@ const theme = createTheme({
                 },
             },
         },
-        MuiPaper: {
+        MuiPaper: {            
             styleOverrides: {
                 root: {
                     borderRadius: '0px',
@@ -84,8 +84,7 @@ const theme = createTheme({
         MuiCardHeader : {
             styleOverrides: {
                 root: {
-                        padding: '10px',
-                        height: '35px',
+                    padding: '10px',
                 },
             },
         },
@@ -105,13 +104,6 @@ const theme = createTheme({
                 root: {
                     fontSize: '14px',
                 },
-            }
-        },
-        MuiGrid: {
-            styleOverrides: {
-                item: {
-                    paddingTop: '9px',
-                }
             }
         },
         MuiFormLabel: {
@@ -204,9 +196,6 @@ const theme = createTheme({
         },
 		MuiAlert: {
             styleOverrides: {
-                root: {
-					marginBottom: '5px',
-                },
                 standardWarning: {
                     color: "#8a6d3b",
                     backgroundColor: "#fcf8e3",
