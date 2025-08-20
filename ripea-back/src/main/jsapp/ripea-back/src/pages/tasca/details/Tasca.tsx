@@ -1,5 +1,4 @@
-import {useResourceApiService} from "reactlib";
-import SseExpedient from "../../../components/SseExpedient.tsx";
+import {useResourceApiService, GridPage} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {useNavigate, useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
@@ -44,52 +43,52 @@ const Tasca = () => {
         }
     },[apiTascaIsReady])
 
-    return <>
-        <SseExpedient id={id}/>
-
+    return <GridPage disableMargins>
         <Load value={expedient && tasca} noEffect>
             <CardData header={
                 <Grid container direction={'row'} columnSpacing={1} sx={{justifyContent: "space-between", alignItems: "center"}}>
-                    <Grid item xs={10}>
-                        <Typography variant="h5"><Icon sx={{ fontSize: "2rem" }}>{icons.tasca}</Icon>{tasca?.metaExpedientTasca?.description}</Typography>
+                    <Grid item xs={5}>
+                        <Typography variant="h5"><Icon sx={{ fontSize: "2rem", paddingTop: "5px" }}>{icons.tasca}</Icon>{tasca?.metaExpedientTasca?.description}</Typography>
+                    </Grid>
+                    <Grid item xs={5}>
                         <Typography variant="subtitle1" color={'grey'}>{tasca?.metaExpedientTascaDescription}</Typography>
                     </Grid>
                     <Grid item xs={2} display={'flex'} justifyContent={'end'}>
                         <Button
-                            title={t('page.expedient.action.retornar.label')}
                             variant="outlined"
                             color={"inherit"}
-                            sx={{ borderRadius: '4px' }}
+                            sx={{ borderRadius: '4px', backgroundColor: 'white'}}
                             onClick={()=>navigate(-1)}
                         >
                             <Icon>arrow_left_alt</Icon>
+                            {t('page.expedient.action.retornar.label')}
                         </Button>
                         {tasca?.estat == 'PENDENT' &&
                             <Button
-                                title={t('page.tasca.action.iniciar.label')}
                                 variant="outlined"
                                 color={"inherit"}
-                                sx={{ borderRadius: '4px' }}
+                                sx={{ borderRadius: '4px', backgroundColor: 'white'}}
                                 onClick={()=> {
                                     changeEstat(tasca?.id, 'INICIADA', t('page.tasca.action.iniciar.ok'))
                                     navigate(-1)
                                 }}
                             >
                                 <Icon>check</Icon>
+                                {t('page.tasca.action.iniciar.label')}
                             </Button>
                         }
                         {tasca?.estat == 'INICIADA' &&
                             <Button
-                                title={t('page.tasca.action.finalitzar.label')}
                                 variant="outlined"
                                 color={"inherit"}
-                                sx={{ borderRadius: '4px' }}
+                                sx={{ borderRadius: '4px', backgroundColor: 'white'}}
                                 onClick={()=> {
                                     changeEstat(tasca?.id, 'FINALITZADA', t('page.tasca.action.finalitzar.ok'))
                                     navigate(-1)
                                 }}
                             >
                                 <Icon>arrow_right</Icon>
+                                {t('page.tasca.action.finalitzar.label')}
                             </Button>
                         }
                         <CommentDialog
@@ -109,6 +108,6 @@ const Tasca = () => {
                 </Grid>
             </CardData>
         </Load>
-    </>
+    </GridPage>
 }
 export default Tasca;

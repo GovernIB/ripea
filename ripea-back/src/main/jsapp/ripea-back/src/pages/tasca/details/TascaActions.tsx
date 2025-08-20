@@ -8,6 +8,7 @@ import useDelegar from "../actions/Delegar.tsx";
 import useReobrir from "../actions/Reobrir.tsx";
 import useCambiarDataLimit from "../actions/CambiarDataLimit.tsx";
 import useCambiarPrioritat from "../actions/CambiarPrioritat.tsx";
+import {useUserSession} from "../../../components/Session.tsx";
 import useRetomar from "../actions/Retomar.tsx";
 import {useNavigate} from "react-router-dom";
 
@@ -34,8 +35,8 @@ export const useActions = (refresh?: () => void) => {
 
     const cancelar = (id:any) => {
         messageDialogShow(
-            t('page.tasca.action.cancelar'),
-            '',
+            t('page.tasca.action.cancel.label'),
+            t('page.tasca.action.cancel.title'),
             confirmDialogButtons,
             confirmDialogComponentProps)
             .then((value: any) => {
@@ -52,7 +53,7 @@ const useTascaActions = (entity:any, refresh?: () => void) => {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const {changeEstat, cancelar} = useActions(refresh)
-
+    const { value: user } = useUserSession();
     const {handleShow: handleRebutjar, content: rebutjarContent} = useRebutjar(refresh);
     const {handleShow: handleReassignar, content: reassignarContent} = useReassignar(refresh);
     const {handleShow: handleDelegar, content: delegarContent} = useDelegar(refresh);
@@ -68,23 +69,29 @@ const useTascaActions = (entity:any, refresh?: () => void) => {
     const hiddenByEstat = (row: any): boolean => {
         return isInOptions(row?.estat, 'CANCELLADA', 'FINALITZADA', 'REBUTJADA');
     }
-
+    const nomesMostraDetalls = (row: any): boolean => {
+        return isInOptions(row?.estat, 'CANCELLADA', 'REBUTJADA');
+    }
     const isInOptions = (value:string, ...options:string[]) => {
         return options.includes(value)
+    }
+    const isOnlyObservador = (row: any): boolean => {
+         return row?.observadors?.map((obs:any)=>obs?.id).includes(user.codi) && !row?.usuariActualResponsable && !row?.usuariActualDelegat;
     }
 
     const actions = [
         {
             label: t('common.detail'),
             icon: "info",
-            showInMenu: true,
+            //Les rebutjades i cancel·lades només es poden veure els detalls. També si ets només observador.
+            showInMenu: (row:any)=> !isOnlyObservador(row) && !nomesMostraDetalls(row),
             onClick: handleOpen,
         },
         {
             label: <Divider sx={{px: 1, width: '100%'}} color={"none"}/>,
             showInMenu: true,
             disabled: true,
-            hidden: !entity?.potModificar,
+            hidden: (row: any) => isOnlyObservador(row) || nomesMostraDetalls(row),
         },
         {
             label: t('page.tasca.action.tramitar.label'),
@@ -92,7 +99,7 @@ const useTascaActions = (entity:any, refresh?: () => void) => {
             showInMenu: true,
             onClick: (id:any, row:any) => navigate(`/contingut/${row?.expedient?.id}/tasca/${id}`),
             disabled: disableResponsable,
-            hidden: (row:any)=> !entity?.potModificar || hiddenByEstat(row),
+            hidden: (row:any)=> isOnlyObservador(row) || hiddenByEstat(row),
         },
         {
             label: t('page.tasca.action.iniciar.label'),
@@ -100,7 +107,7 @@ const useTascaActions = (entity:any, refresh?: () => void) => {
             showInMenu: true,
             onClick: (id: any)=> changeEstat(id,'INICIADA', t('page.tasca.action.iniciar.ok')),
             disabled: disableResponsable,
-            hidden: (row: any) => !entity?.potModificar || row?.estat != 'PENDENT',
+            hidden: (row: any) => isOnlyObservador(row) || row?.estat != 'PENDENT',
         },
         {
             label: t('page.tasca.action.rebutjar.label'),
@@ -108,7 +115,7 @@ const useTascaActions = (entity:any, refresh?: () => void) => {
             showInMenu: true,
             onClick: handleRebutjar,
             disabled: disableResponsable,
-            hidden: (row: any) => !entity?.potModificar || row?.estat != 'PENDENT',
+            hidden: (row: any) => isOnlyObservador(row) || row?.estat != 'PENDENT',
         },
         {
             label: t('page.tasca.action.cancel.label'),
@@ -116,7 +123,7 @@ const useTascaActions = (entity:any, refresh?: () => void) => {
             showInMenu: true,
             onClick: cancelar,
             disabled: disableResponsable,
-            hidden: (row: any) => !entity?.potModificar || hiddenByEstat(row),
+            hidden: (row: any) => isOnlyObservador(row) || hiddenByEstat(row),
         },
         {
             label: t('page.tasca.action.finalitzar.label'),
@@ -124,61 +131,61 @@ const useTascaActions = (entity:any, refresh?: () => void) => {
             showInMenu: true,
             onClick: (id: any)=> changeEstat(id,'FINALITZADA', t('page.tasca.action.finalitzar.ok')),
             disabled: disableResponsable,
-            hidden: (row: any) => !entity?.potModificar || hiddenByEstat(row),
+            hidden: (row: any) => isOnlyObservador(row) || hiddenByEstat(row),
         },
         {
             label: <Divider sx={{px: 1, width: '100%'}} color={"none"}/>,
             showInMenu: true,
             disabled: true,
-            hidden: (row: any) => !entity?.potModificar || hiddenByEstat(row),
+            hidden: (row: any) => isOnlyObservador(row) || hiddenByEstat(row),
         },
         {
             label: t('page.tasca.action.reassignar.label'),
             icon: "person",
             showInMenu: true,
             onClick: handleReassignar,
-            hidden: (row: any) => !entity?.potModificar || hiddenByEstat(row),
+            hidden: (row: any) => isOnlyObservador(row) || hiddenByEstat(row),
         },
         {
             label: t('page.tasca.action.delegar.label'),
             icon: "turn_right",
             showInMenu: true,
             onClick: handleDelegar,
-            hidden: (row: any) => !entity?.potModificar || row?.delegat != null || hiddenByEstat(row),
+            hidden: (row: any) => isOnlyObservador(row) || row?.delegat != null || hiddenByEstat(row),
         },
         {
             label: t('page.tasca.action.retomar.label'),
             icon: "close",
             showInMenu: true,
             onClick: handleRetomar,
-            hidden: (row: any) => !entity?.potModificar || row?.delegat == null || row?.usuariActualDelegat || hiddenByEstat(row),
+            hidden: (row: any) => isOnlyObservador(row) || row?.delegat == null || row?.usuariActualDelegat || hiddenByEstat(row),
         },
         {
             label: <Divider sx={{px: 1, width: '100%'}} color={"none"}/>,
             showInMenu: true,
             disabled: true,
-            hidden: (row: any) => !entity?.potModificar || row?.usuariActualDelegat || hiddenByEstat(row),
+            hidden: (row: any) => isOnlyObservador(row) || row?.usuariActualDelegat || hiddenByEstat(row),
         },
         {
             label: t('page.tasca.action.changeDataLimit.label'),
-            icon: "info",
+            icon: "schedule",
             showInMenu: true,
             onClick: handleCambiarDataLimit,
-            hidden: (row: any) => !entity?.potModificar || hiddenByEstat(row),
+            hidden: (row: any) => isOnlyObservador(row) || hiddenByEstat(row),
         },
         {
             label: t('page.tasca.action.changePrioritat.label'),
-            icon: "schedule",
+            icon: "info",
             showInMenu: true,
             onClick: handleCambiarPrioritat,
-            hidden: (row: any) => !entity?.potModificar || hiddenByEstat(row),
+            hidden: (row: any) => isOnlyObservador(row) || hiddenByEstat(row),
         },
         {
             label: t('page.tasca.action.reobrir.label'),
             icon: "undo",
             showInMenu: true,
             onClick: handleReobrir,
-            hidden: (row: any) => !entity?.potModificar || row?.estat != 'FINALITZADA',
+            hidden: (row: any) => isOnlyObservador(row) || row?.estat != 'FINALITZADA',
         },
     ];
 

@@ -101,6 +101,9 @@ public class ExpedientTascaResourceEntity extends BaseAuditableEntity<ExpedientT
     @Column(name = "observacions", length = 1024)
     private String observacions;
     
+    @Transient private String responsablesStr;
+    @Transient private String observadorsStr;
+    
     public boolean isUsuariActualOnlyObservador(String usuariActualCodi) {
     	if (this.getResponsables()!=null) {
     		for (UsuariResourceEntity ue: this.getResponsables()) {
@@ -120,5 +123,27 @@ public class ExpedientTascaResourceEntity extends BaseAuditableEntity<ExpedientT
     		}
     	}
     	return false;
+    }
+    
+    public String getResponsablesStr() {
+    	String resultat = "";
+    	if (this.responsables!=null && this.responsables.size()>0) {
+    		for (UsuariResourceEntity ue: this.getResponsables()) {
+    			resultat+=ue.getNom()+"("+ue.getCodi()+"), ";
+    		}
+    		resultat = resultat.substring(0, resultat.length()-2);
+    	}
+    	return resultat;
+    }
+    
+    public String getObservadorsStr() {
+    	String resultat = "";
+    	if (this.observadors!=null && this.observadors.size()>0) {
+    		for (UsuariResourceEntity ue: this.getObservadors()) {
+    			resultat+=ue.getNom()+"("+ue.getCodi()+"), ";
+    		}
+    		resultat = resultat.substring(0, resultat.length()-2);
+    	}
+    	return resultat;
     }
 }

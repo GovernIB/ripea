@@ -50,9 +50,7 @@ const useTascaDetail = () => {
                 <ContenidoData title={t('page.tasca.detall.responsablesStr')}>{entity?.responsablesStr}</ContenidoData>
                 <ContenidoData title={t('page.tasca.detall.responsableActual')}>{entity?.responsableActual?.description}</ContenidoData>
                 <ContenidoData title={t('page.tasca.detall.delegat')}>{entity?.delegat?.description}</ContenidoData>
-                <ContenidoData title={t('page.tasca.detall.observadors')}>
-                    {entity?.observadors?.map?.((obs:any)=>`${obs.description}\n`)}
-                </ContenidoData>
+                <ContenidoData title={t('page.tasca.detall.observadors')}>{entity?.observadorsStr}</ContenidoData>
                 <ContenidoData title={t('page.tasca.detall.dataInici')}>{formatDate(entity?.dataInici)}</ContenidoData>
                 <ContenidoData title={t('page.tasca.detall.duracio')}>{entity?.duracio}</ContenidoData>
                 <ContenidoData title={t('page.tasca.detall.dataLimit')}>{formatDate(entity?.dataLimit, "DD/MM/Y")}</ContenidoData>

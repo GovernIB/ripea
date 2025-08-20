@@ -118,7 +118,9 @@ public class ExpedientTascaResource extends BaseAuditableResource<Long> {
     private Integer duracio;
     @NotNull
     private PrioritatEnumDto prioritat = PrioritatEnumDto.B_NORMAL;
+    private String responsablesActualStr;
     private String responsablesStr;
+    private String observadorsStr;
 
     @Transient
     private String metaExpedientTascaDescription;

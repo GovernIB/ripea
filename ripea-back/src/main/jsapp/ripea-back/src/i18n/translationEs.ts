@@ -9,7 +9,7 @@ const translationEs = {
         expand: "Expandir",
         contract: "Contraer",
         download: "Descargar",
-        detail: "Detalle",
+        detail: "Detalles",
         refresh: "Refrescar",
         clear: "Limpiar",
         search: "Buscar",
@@ -259,10 +259,11 @@ const translationEs = {
                 },
                 iniciar: {
                     label: "Iniciar",
+                    labelExt: "Iniciar tarea",
                     ok: "La tarea se ha iniciado correctamente",
                 },
                 rebutjar: {
-                    label: "Rechazar",
+                    label: "Rechazar...",
                     title: "Rechazar tarea",
                     ok: "La tarea se ha rechazado correctamente",
                 },
@@ -273,22 +274,23 @@ const translationEs = {
                 },
                 finalitzar: {
                     label: "Finalizar",
+                    labelExt: "Finalizar tarea",
                     ok: "La tarea se ha finalizado correctamente",
                 },
                 reassignar: {
-                    label: "Reasignar",
+                    label: "Reasignar...",
                     title: "Reasignar tarea",
                     ok: "La tarea se ha reasignado correctamente",
                 },
                 delegar: {
-                    label: "Delegar",
+                    label: "Delegar...",
                     title: "Delegar tarea",
                     ok: "La tarea se ha delegado correctamente",
                 },
                 retomar: {
-                    label: "Retomar",
-                    title: "Retomar tarea",
-                    ok: "La tarea se ha retomado correctamente",
+                    label: "Cancelar delegación",
+                    title: "Cancelar delegación de la tarea",
+                    ok: "La delegación de la tarea se ha cancelado correctamente",
                 },
                 changeDataLimit: {
                     label: "Modificar fecha limite...",
@@ -301,7 +303,7 @@ const translationEs = {
                     ok: "La tarea se ha modificado correctamente",
                 },
                 reobrir: {
-                    label: "Reabrir",
+                    label: "Reabrir...",
                     title: "Reabrir tarea",
                     ok: "La tarea se ha reabierto correctamente",
                 },

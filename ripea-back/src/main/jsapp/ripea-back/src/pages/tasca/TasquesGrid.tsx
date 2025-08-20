@@ -46,7 +46,8 @@ const columns = [
         valueFormatter: (value: any) => formatDate(value)
     },
     {
-        field: 'responsableActual',
+        field: 'responsablesActualStr',
+        headerName: 'Responsable actual',
         flex: 0.5,
         sortable: false,
     },
@@ -98,6 +99,7 @@ const TasquesGrid = () => {
     const apiRef = useMuiDataGridApiRef();
 
     const refresh = () => {
+        setLoad(true);
         apiRef?.current?.refresh?.();
     }
 

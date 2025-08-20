@@ -9,7 +9,7 @@ const translationCa = {
         expand: "Expandir",
         contract: "Contreure",
         download: "Descarregar",
-        detail: "Detall",
+        detail: "Detalls",
         refresh: "Refrescar",
         clear: "Netejar",
         search: "Filtrar",
@@ -272,7 +272,7 @@ const translationCa = {
                     ok: "La tasca s'ha iniciat correctament",
                 },
                 rebutjar: {
-                    label: "Rebutjar",
+                    label: "Rebutjar...",
                     title: "Rebutjar tasca",
                     ok: "La tasca s'ha rebutjat correctament",
                 },
@@ -286,19 +286,19 @@ const translationCa = {
                     ok: "La tasca s'ha finalitzat correctament",
                 },
                 reassignar: {
-                    label: "Reassignar",
+                    label: "Reassignar...",
                     title: "Reassignar tasca",
                     ok: "La tasca s'ha reassignat correctament",
                 },
                 delegar: {
-                    label: "Delegar",
+                    label: "Delegar...",
                     title: "Delegar tasca",
                     ok: "La tasca s'ha delegat correctament",
                 },
                 retomar: {
-                    label: "Reprendre",
-                    title: "Reprendre tasca",
-                    ok: "La tasca s'ha reprès correctament",
+                    label: "Cancel·lar delegació",
+                    title: "Cancel·lar delegació de tasca",
+                    ok: "La delegació de la tasca s'ha cancel·lat correctament",
                 },
                 changeDataLimit: {
                     label: "Modificar data límit...",
@@ -311,7 +311,7 @@ const translationCa = {
                     ok: "La tasca s'ha modificat correctament",
                 },
                 reobrir: {
-                    label: "Reobrir",
+                    label: "Reobrir...",
                     title: "Reobrir tasca",
                     ok: "La tasca s'ha reobert correctament",
                 },

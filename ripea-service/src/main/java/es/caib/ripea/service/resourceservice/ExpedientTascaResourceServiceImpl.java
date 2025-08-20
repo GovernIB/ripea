@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
-import es.caib.ripea.service.intf.utils.Utils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -31,7 +30,6 @@ import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientTascaResourc
 import es.caib.ripea.persistence.entity.resourceentity.UsuariResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.ExpedientTascaResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientTascaResourceRepository;
-import es.caib.ripea.persistence.entity.resourcerepository.UsuariResourceRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
@@ -55,14 +53,10 @@ import es.caib.ripea.service.intf.model.ExpedientTascaResource.ReassignarTascaFo
 import es.caib.ripea.service.intf.model.MetaExpedientTascaResource;
 import es.caib.ripea.service.intf.model.UsuariResource;
 import es.caib.ripea.service.intf.resourceservice.ExpedientTascaResourceService;
+import es.caib.ripea.service.intf.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * Implementació del servei de gestió de tasques.
- *
- * @author Límit Tecnologies
- */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -70,7 +64,6 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
 
     private final ExpedientTascaResourceRepository expedientTascaResourceRepository;
     private final MetaExpedientTascaResourceRepository metaExpedientTascaResourceRepository;
-    private final UsuariResourceRepository usuariResourceRepository;
 
     private final ConfigHelper configHelper;
     private final TascaHelper tascaHelper;
@@ -101,9 +94,6 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
         List<Filter> filters = new ArrayList<>();
         Map<String, String> mapaNamedQueries =  Utils.namedQueriesToMap(namedQueries);
 
-        Filter filtreBase = (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null;
-        filters.add(filtreBase);
-
         filters.add(FilterBuilder.and(
                         (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null,
                 FilterBuilder.equal(ExpedientTascaResource.Fields.expedient + "." + ContingutResource.Fields.entitat + "." + EntitatResource.Fields.codi, 
@@ -115,7 +105,8 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
             String user = SecurityContextHolder.getContext().getAuthentication().getName();
             filters.add(
                     FilterBuilder.or(
-                            FilterBuilder.equal("responsableActual.codi", user),
+//                            FilterBuilder.equal("responsableActual.codi", user),
+                            FilterBuilder.exists(FilterBuilder.equal("responsables.codi", user)),
                             FilterBuilder.exists(FilterBuilder.equal("observadors.codi", user)),
                             FilterBuilder.equal("delegat.codi", user)
                     )
@@ -184,6 +175,11 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
         resource.setShouldNotifyAboutDeadline(tascaHelper.shouldNotifyAboutDeadline(entity.getDataLimit()));
         resource.setUsuariActualOnlyObservador(entity.isUsuariActualOnlyObservador(usuariActualCodi));
         resource.setAgafadaUsuariActual(entity.getResponsableActual()!=null && entity.getResponsableActual().getId().equals(usuariActualCodi));
+        resource.setResponsablesStr(entity.getResponsablesStr());
+        resource.setObservadorsStr(entity.getObservadorsStr());
+        if (entity.getResponsableActual()!=null) {
+        	resource.setResponsablesActualStr(entity.getResponsableActual().getNom()+ "(" + entity.getResponsableActual().getCodi() +")");
+        }
     }
 
     // PerspectiveApplicator
