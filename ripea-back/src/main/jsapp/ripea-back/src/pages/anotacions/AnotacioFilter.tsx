@@ -2,8 +2,19 @@ import {Grid} from "@mui/material";
 import GridFormField from "../../components/GridFormField.tsx";
 import StyledMuiFilter from "../../components/StyledMuiFilter.tsx";
 import * as builder from '../../util/springFilterUtils';
+import {useFormContext} from "reactlib";
 
 const AnotacioFilterForm = () => {
+    const {data} = useFormContext()
+    if (!data?.advanced) {
+        return <>
+            <GridFormField xs={3.5} name="metaExpedient"/>
+            <GridFormField xs={2} name="estat"/>
+            <GridFormField xs={2} name="dataRecepcioInicial" type={"date"}/>
+            <GridFormField xs={2} name="dataRecepcioFinal" type={"date"}/>
+        </>
+    }
+
     return <>
         <GridFormField xs={4} name="numRegistre"/>
         <GridFormField xs={4} name="extracte"/>
@@ -47,9 +58,21 @@ const AnotacioFilter = (props: any) => {
     return <StyledMuiFilter
         resourceName={"expedientPeticioResource"}
         code={"ANOTACIO_FILTER"}
-        springFilterBuilder={springFilterBuilder}
+        springFilterBuilder={(data: any)=> {
+                    if (!data?.advanced) {
+                        return springFilterBuilder({
+                            metaExpedient: data.metaExpedient,
+                            estat: data.estat,
+                            dataRecepcioInicial: data.dataRecepcioInicial,
+                            dataRecepcioFinal: data.dataRecepcioFinal,
+                            advanced: true,
+                        })
+                    }
+                    return springFilterBuilder(data)
+                }}
         onSpringFilterChange={onSpringFilterChange}
 		filterOnFieldEnterKeyPressed
+        advancedSearch
     >
         <AnotacioFilterForm/>
     </StyledMuiFilter>

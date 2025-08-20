@@ -114,7 +114,7 @@ const RelacionarForm= () => {
             )}
             sortModel={sortModel}
             perspectives={perspectives}
-            toolbarHideRefresh
+            toolbarHide
             selectionActive
             rowSelectionModel={selectionModel}
 

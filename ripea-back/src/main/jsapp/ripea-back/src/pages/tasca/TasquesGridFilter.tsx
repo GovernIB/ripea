@@ -6,17 +6,26 @@ import {useFormContext} from "reactlib";
 const TasquesGridFilterForm = () => {
     const {data} = useFormContext()
 
+    if (!data?.advanced) {
+        return <>
+            <GridFormField xs={3} name="metaExpedient"/>
+            <GridFormField xs={2} name="titol"/>
+            <GridFormField xs={2} name="prioritat"/>
+            <GridFormField xs={2.5} name="estat" multiple/>
+        </>
+    }
+
     return <>
         <GridFormField xs={3} name="metaExpedient"/>
         <GridFormField xs={3} name="expedient" filter={builder.and(builder.eq("metaExpedient", data?.metaExpedient))}/>
         <GridFormField xs={2} name="metaExpedientTasca"/>
         <GridFormField xs={2} name="titol"/>
         <GridFormField xs={2} name="prioritat"/>
-        <GridFormField xs={2} name="dataInici" type={"date"}/>
-        <GridFormField xs={2} name="dataFi" type={"date"}/>
-        <GridFormField xs={2} name="dataLimitInici" type={"date"}/>
-        <GridFormField xs={2} name="dataLimitFi" type={"date"}/>
-        <GridFormField xs={4} name="estat" multiple/>
+        <GridFormField xs={1.5} name="dataInici" type={"date"}/>
+        <GridFormField xs={1.5} name="dataFi" type={"date"}/>
+        <GridFormField xs={1.5} name="dataLimitInici" type={"date"}/>
+        <GridFormField xs={1.5} name="dataLimitFi" type={"date"}/>
+        <GridFormField xs={3.5} name="estat" multiple/>
     </>
 }
 
@@ -40,8 +49,21 @@ const TasquesGridFilter = (props:any) => {
     return <StyledMuiFilter
         resourceName={"expedientTascaResource"}
         code={"TASCA_FILTER"}
-        springFilterBuilder={springFilterBuilder}
+        springFilterBuilder={(data: any)=> {
+                    if (!data?.advanced) {
+                        return springFilterBuilder({
+                            metaExpedient: data.metaExpedient,
+                            titol: data.titol,
+                            prioritat: data.prioritat,
+                            estat: data.estat,
+                            advanced: true,
+                        })
+                    }
+                    return springFilterBuilder(data)
+                }}
         onSpringFilterChange={onSpringFilterChange}
+        filterOnFieldEnterKeyPressed
+        advancedSearch
     >
         <TasquesGridFilterForm/>
     </StyledMuiFilter>

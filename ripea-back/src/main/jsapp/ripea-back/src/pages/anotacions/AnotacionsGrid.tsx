@@ -117,13 +117,10 @@ const AnotacionsGrid = () => {
                     rowAdditionalActions={actions}
                     namedQueries={namedQueries}
                     apiRef={apiRef}
-
                     paginationActive
-
                     popupEditUpdateActive
                     popupEditFormContent={<AnotacionsGridForm/>}
-                    toolbarHideCreate
-
+                    toolbarHide
                     popupEditFormDialogTitle={t('page.anotacio.action.canviProcediment.title')}
                     popupEditFormI18nKeys={{
                         updateSuccess: 'page.anotacio.action.canviProcediment.ok',

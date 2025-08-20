@@ -21,15 +21,15 @@ const columns = [
     },
     {
         field: 'metaExpedientTasca',
-        flex: 0.5,
+        flex: 0.6,
     },
     {
         field: 'metaExpedientTascaDescription',
-        flex: 0.5,
+        flex: 0.6,
     },
     {
         field: 'titol',
-        flex: 0.5,
+        flex: 0.6,
     },
     {
         field: 'observacions',
@@ -37,7 +37,7 @@ const columns = [
     },
     {
         field: 'prioritat',
-        flex: 0.5,
+        flex: 0.4,
         renderCell: (params: any) => <StyledPrioritat entity={params?.row}>{params.formattedValue}</StyledPrioritat>
     },
     {
@@ -52,7 +52,7 @@ const columns = [
     },
     {
         field: 'dataLimit',
-        flex: 0.5,
+        flex: 0.4,
         valueFormatter: (value: any) => formatDate(value, "DD/MM/Y"),
         renderCell: (params: any) => {
             const color = params?.row?.dataLimitExpirada
@@ -65,7 +65,7 @@ const columns = [
     },
     {
         field: 'estat',
-        flex: 0.5,
+        flex: 0.4,
     },
 ];
 
@@ -124,7 +124,6 @@ const TasquesGrid = () => {
                     namedQueries={['USUARI_RELACIONAT']}
                     sortModel={sortModel}
                     rowAdditionalActions={actions}
-
                     onRowDoubleClick={(params: any) => navigate(`/contingut/${params?.row?.expedient?.id}/tasca/${params?.id}`)}
                     rowProps={(row: any) => {
                         let color;
@@ -144,7 +143,7 @@ const TasquesGrid = () => {
                                 'padding-left': '6px'
                             }
                     }}
-
+                    toolbarHide
                     paginationActive
                     readOnly
                 />
