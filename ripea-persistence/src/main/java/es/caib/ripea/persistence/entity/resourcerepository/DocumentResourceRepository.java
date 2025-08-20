@@ -20,6 +20,16 @@ public interface DocumentResourceRepository extends BaseRepository<DocumentResou
             "and d.arxiuEstat = es.caib.ripea.service.intf.dto.ArxiuEstatEnumDto.DEFINITIU")
     Boolean expedientHasDocumentsDefinitius(@Param("expedient") ExpedientResourceEntity expedient);
 
+	@Query(	"select case when (count(c) > 0) then true else false end " +
+			"from " +
+			"    DocumentResourceEntity c " +
+			"where " +
+			"    c.expedient.id = :expedientId "  + 
+			"and c.documentTipus = 0 " + //= DIGITAL
+			"and c.esborrat = 0 " +
+			"and c.estat = 0 ")
+	Boolean hasFillsEsborranys(@Param("expedientId") Long expedientId);
+    
     @Query(	"select " +
             "    c " +
             "from " +
