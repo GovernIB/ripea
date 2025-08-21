@@ -1096,7 +1096,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 		public void onChange(Serializable id, IniciarFirmaSimple previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, IniciarFirmaSimple target) {
 			if (fieldName==null) {
 				//initialOnChange --> Carregar un valor per defecte per el motiu
-				String expNom = documentResourceRepository.findById(((Integer)id).longValue()).get().getExpedient().getNom();
+				String expNom = documentResourceRepository.findById((Long)id).get().getExpedient().getNom();
 				target.setMotiu("Tramitació del expedient RIPEA: "+expNom);
 			}
 		}

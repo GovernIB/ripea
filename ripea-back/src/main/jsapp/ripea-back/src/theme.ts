@@ -158,6 +158,14 @@ const theme = createTheme({
                 },
             }
         },
+        MuiTab: {
+            styleOverrides: {
+                root: {
+                    textTransform: 'none',
+                    fontSize: '1 rem',
+                },
+            }
+        },        
         MuiChip: {
             styleOverrides: {
                 root: {

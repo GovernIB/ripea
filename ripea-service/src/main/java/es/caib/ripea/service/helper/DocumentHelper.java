@@ -173,14 +173,7 @@ public class DocumentHelper {
 					"expedientId=" + expedient.getId() + ")");
 		}
 		
-		DocumentFirmaTipusEnumDto documentFirmaTipus;
-		if (!document.isAmbFirma()) {
-			documentFirmaTipus = DocumentFirmaTipusEnumDto.SENSE_FIRMA;
-		} else if (!document.isFirmaSeparada()) {
-			documentFirmaTipus = DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA;
-		} else {
-			documentFirmaTipus = DocumentFirmaTipusEnumDto.FIRMA_SEPARADA;
-		}
+		DocumentFirmaTipusEnumDto documentFirmaTipus = Utils.getDocumentFirmaTipus(document.isAmbFirma(), document.isFirmaSeparada());
 		
 		DocumentEntity entity = crearDocumentDB(
 				document.getDocumentTipus(),
@@ -327,7 +320,6 @@ public class DocumentHelper {
 	public ArxiuEstatEnumDto getArxiuEstat(DocumentFirmaTipusEnumDto documentFirmaTipus, DocumentEstatEnumDto estatAnterior) {
 		boolean isFirmatPujatArxiu = documentFirmaTipus != DocumentFirmaTipusEnumDto.SENSE_FIRMA && isFirmatPujatManualmentDefinitu();
 		boolean isEsborranyConvertit = documentFirmaTipus == DocumentFirmaTipusEnumDto.SENSE_FIRMA && (estatAnterior != null && estatAnterior.equals(DocumentEstatEnumDto.DEFINITIU));
-		
 		return (isFirmatPujatArxiu || isEsborranyConvertit) ? ArxiuEstatEnumDto.DEFINITIU : ArxiuEstatEnumDto.ESBORRANY;
 	}
 	
@@ -1094,9 +1086,7 @@ public class DocumentHelper {
 		}
 	}
 	
-	public void actualitzarFitxerDB(
-			DocumentEntity document,
-			FitxerDto fitxer) {
+	public void actualitzarFitxerDB(DocumentEntity document, FitxerDto fitxer) {
 		if (fitxer != null) {
 			document.updateFitxer(
 					fitxer.getNom(),
@@ -1104,9 +1094,7 @@ public class DocumentHelper {
 					null, 
 					fitxer.getTamany());
 		}
-
 	}
-	
 	
 	public void actualitzarFitxerFormatDB(
 			DocumentEntity document,

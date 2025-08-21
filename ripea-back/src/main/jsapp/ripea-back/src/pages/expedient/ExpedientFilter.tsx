@@ -127,6 +127,7 @@ const ExpedientFilter = (props: any) => {
         }}
         onSpringFilterChange={onSpringFilterChange}
         advancedSearch
+        filterOnFieldEnterKeyPressed
     >
         <ExpedientFilterForm/>
     </StyledMuiFilter>

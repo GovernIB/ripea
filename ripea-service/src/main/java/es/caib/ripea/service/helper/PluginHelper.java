@@ -2252,24 +2252,13 @@ public class PluginHelper {
 		}
 	}
 
-	public String arxiuDocumentCopiar(
-			DocumentEntity document,
-			String arxiuUuidDesti) {
-
-		organGestorHelper.actualitzarOrganCodi(
-				organGestorHelper.getOrganCodiFromContingutId(
-						document.getId()));
+	public ContingutArxiu arxiuDocumentCopiar(DocumentEntity document, String arxiuUuidDesti) {
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(document.getId()));
 		String accioDescripcio = "Copiar document";
 		Map<String, String> accioParams = new HashMap<String, String>();
-		accioParams.put(
-				"id",
-				document.getId().toString());
-		accioParams.put(
-				"títol",
-				document.getNom());
-		accioParams.put(
-				"arxiuUuidDesti",
-				arxiuUuidDesti);
+		accioParams.put("id", document.getId().toString());
+		accioParams.put("títol", document.getNom());
+		accioParams.put("arxiuUuidDesti", arxiuUuidDesti);
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
 		try {
@@ -2283,7 +2272,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			return docCopiat.getIdentificador();
+			return docCopiat;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
 			integracioHelper.addAccioError(
@@ -2721,27 +2710,14 @@ public class PluginHelper {
 		}
 	}
 
-	public String arxiuCarpetaCopiar(
-			CarpetaEntity carpeta,
-			String arxiuUuidDesti) {
-
-		organGestorHelper.actualitzarOrganCodi(
-				organGestorHelper.getOrganCodiFromContingutId(
-						carpeta.getId()));
-		organGestorHelper.actualitzarOrganCodi(
-				organGestorHelper.getOrganCodiFromContingutId(
-						carpeta.getId()));
+	public ContingutArxiu arxiuCarpetaCopiar(CarpetaEntity carpeta, String arxiuUuidDesti) {
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(carpeta.getId()));
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(carpeta.getId()));
 		String accioDescripcio = "Copiar carpeta";
 		Map<String, String> accioParams = new HashMap<String, String>();
-		accioParams.put(
-				"id",
-				carpeta.getId().toString());
-		accioParams.put(
-				"nom",
-				carpeta.getNom());
-		accioParams.put(
-				"arxiuUuidDesti",
-				arxiuUuidDesti);
+		accioParams.put("id", carpeta.getId().toString());
+		accioParams.put("nom", carpeta.getNom());
+		accioParams.put("arxiuUuidDesti", arxiuUuidDesti);
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
 		try {
@@ -2755,7 +2731,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			return carpetaCopiada.getIdentificador();
+			return carpetaCopiada;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
 			integracioHelper.addAccioError(

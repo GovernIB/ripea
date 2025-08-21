@@ -26,6 +26,8 @@ import java.util.List;
 @ResourceConfig(quickFilterFields = { "codi", "nom", "nif" }, descriptionField = "codiAndNom")
 public class UsuariResource extends BaseResource<String> {
 
+	private static final long serialVersionUID = -3198881636735062393L;
+	
 	@NotNull
 	@Size(max = 64)
 	private String codi;
@@ -72,15 +74,14 @@ public class UsuariResource extends BaseResource<String> {
     @Transient
     private List<String> rols;
 
-    public String getCodiAndNom(){
-        return  codi + " - " + nom;
+    public String getCodiAndNom() {
+    	return nom + " (" + codi +")";
     }
 
     public String getNomAndNif() {
     	return nom + " (" + Utils.nifMask(nif) +")";
     }
-    
-//	@Size(max = 16)
+
 	private MoureDestiVistaEnumDto vistaMoureActual = MoureDestiVistaEnumDto.LLISTA;
 
 	@Override

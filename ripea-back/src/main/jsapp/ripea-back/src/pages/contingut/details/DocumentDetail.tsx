@@ -171,7 +171,7 @@ const useDocumentDetail = (expedient:any) => {
             value: 'descarregarImprimible',
             text: t('page.document.action.descarregarImprimible.label'),
             icon: 'download',
-            hidden: entity?.estat == 'CUSTODIAT'
+            hidden: entity?.estat != 'CUSTODIAT'
         },
     ]
         .filter((button:any)=>!button?.hidden)

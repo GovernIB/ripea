@@ -106,7 +106,7 @@ public class UsuariResourceEntity implements ResourceEntity<UsuariResource, Stri
 	@Transient
 	private String codiAndNom;
 	public String getCodiAndNom() {
-		return codi + " - " + nom;
+		return nom + " (" + codi +")";
 	}
 
 	public UsuariDto toUsuariDto() {

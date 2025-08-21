@@ -17,6 +17,8 @@ public class ValidacioErrorDto implements Serializable {
 	private boolean withNotificacionsNoFinalitzades;
 	private boolean expedientWithoutInteressats;
 	
+	public ValidacioErrorDto() {}
+	
 	public ValidacioErrorDto(
 			MetaDadaDto metaDada,
 			MultiplicitatEnumDto multiplicitat) {

@@ -390,6 +390,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 			
 			ExpedientResource resultat = new ExpedientResource();
 			resultat.setId(expedientId);
+			resultat.setNom(resource.getNom());
 			return resultat;
 			
     	} catch (Exception ex) {

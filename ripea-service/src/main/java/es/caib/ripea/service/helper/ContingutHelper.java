@@ -1764,9 +1764,11 @@ public class ContingutHelper {
 				null,
 				true,
 				true);
+		
 		ContingutDto dto = toContingutDto(contingutOrigen, false, false);
-		String uuidCopia = arxiuPropagarCopia(contingutOrigen,contingutDesti);
-		contingutCopia.setArxiuUuid(uuidCopia);
+		
+		arxiuPropagarCopia(contingutOrigen,contingutDesti, contingutCopia);
+		
 		return dto;
 	}
 	
@@ -1805,6 +1807,15 @@ public class ContingutHelper {
 					null, 
 					documentOrigen.getDocumentFirmaTipus(), 
 					documentOrigen.getExpedientEstatAdditional());
+			
+			DocumentEntity docCreat = (DocumentEntity)creat;
+			docCreat.updateFitxer(
+					documentOrigen.getFitxerNom(),
+					documentOrigen.getFitxerContentType(),
+					documentOrigen.getFitxerContingut(), 
+					documentOrigen.getFitxerTamany());
+			docCreat.setVersioDarrera(documentOrigen.getVersioDarrera());
+			docCreat.setVersioCount(documentOrigen.getVersioCount());
 		}
 		if (creat != null) {
 			if (creat instanceof NodeEntity) {
@@ -2176,19 +2187,23 @@ public class ContingutHelper {
 		}
 	}
 
-	private String arxiuPropagarCopia(
+	private void arxiuPropagarCopia(
 			ContingutEntity contingut,
-			ContingutEntity desti) {
+			ContingutEntity desti,
+			ContingutEntity copia) {
 		if (contingut instanceof DocumentEntity) {
-			return pluginHelper.arxiuDocumentCopiar(
+			ContingutArxiu contingutArxiu = pluginHelper.arxiuDocumentCopiar(
 					(DocumentEntity)contingut,
 					desti.getArxiuUuid());
+			copia.setArxiuUuid(contingutArxiu.getIdentificador());
+			DocumentEntity copiaDoc = (DocumentEntity)copia;
+			copiaDoc.setArxiuEstat(documentHelper.getArxiuEstat(copiaDoc.getDocumentFirmaTipus(), null));
 		} else if (contingut instanceof CarpetaEntity) {
-			return pluginHelper.arxiuCarpetaCopiar(
+			ContingutArxiu contingutArxiu = pluginHelper.arxiuCarpetaCopiar(
 					(CarpetaEntity)contingut,
 					desti.getArxiuUuid());
+			copia.setArxiuUuid(contingutArxiu.getIdentificador());
 		}
-		return null;
 	}
 
 	public ContingutArxiu arxiuPropagarLink(

@@ -47,7 +47,8 @@ const useAnnexFirma = () => {
             buttons={[
                 {
                     value: 'close',
-                    text: t('common.close')
+                    text: t('common.close'),
+                    componentProps: { variant: 'outlined' }
                 },
             ]}
             buttonCallback={(value: any): void => {

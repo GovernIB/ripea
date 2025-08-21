@@ -87,7 +87,7 @@ const useAccioDialog = () => {
             {
                 value: 'close',
                 text: t('common.close'),
-                icon: 'close'
+                componentProps: { variant: 'outlined' }
             },
         ]}
         buttonCallback={(value :any) :void=>{
@@ -237,7 +237,7 @@ const useHistoric = () => {
                 {
                     value: 'close',
                     text: t('common.close'),
-                    icon: 'close'
+                    componentProps: { variant: 'outlined' }
                 },
             ]}
             buttonCallback={(value :any) :void=>{

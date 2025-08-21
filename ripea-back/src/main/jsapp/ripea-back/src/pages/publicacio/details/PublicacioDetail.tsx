@@ -48,7 +48,7 @@ const usePublicacioDetail = () => {
                 {
                     value: 'close',
                     text: t('common.close'),
-                    icon: 'close'
+                    componentProps: { variant: 'outlined' }
                 },
             ]}
             buttonCallback={(value :any) :void=>{

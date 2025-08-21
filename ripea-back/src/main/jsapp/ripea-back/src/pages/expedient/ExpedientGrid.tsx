@@ -86,22 +86,22 @@ export const StyledPrioritat = (props: any) => {
 const beforeAvis = [
     {
         field: 'numero',
-        flex: 0.75,
-    },
-    {
-        field: 'nom',
-        flex: 1,
+        flex: 0.70,
     },
     {
         field: 'metaExpedient',
-        flex: 1,
+        flex: 1.15,
         sortable: false,
     },
+    {
+        field: 'nom',
+        flex: 1.15,
+    },    
 ];
 const afterAvis = [
     {
         field: 'createdDate',
-        flex: 1,
+        flex: 0.8,
         valueFormatter: (value: any) => formatDate(value)
     },
     {
@@ -118,7 +118,7 @@ const afterAvis = [
     },
     {
         field: 'prioritat',
-        flex: 0.5,
+        flex: 0.45,
         renderCell: (params: any) => <StyledPrioritat entity={params?.row}>{params.formattedValue}</StyledPrioritat>
     },
 ];
@@ -191,6 +191,7 @@ const ExpedientGrid = () => {
             field: 'agafatPer',
             flex: 0.75,
             hidden: !user?.conf?.expedientListAgafatPer,
+            valueFormatter: (value: any) => value?.description,
         },
         {
             field: 'interessats',

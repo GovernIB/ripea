@@ -83,7 +83,7 @@ const useSeguimentPortafirmes = (potModificar:boolean, refresh?: () => void) => 
         {
             value: 'close',
             text: t('common.close'),
-            icon: 'close'
+            componentProps: { variant: 'outlined' }
         },
     ]
         .filter((button:any)=>!button?.hidden)

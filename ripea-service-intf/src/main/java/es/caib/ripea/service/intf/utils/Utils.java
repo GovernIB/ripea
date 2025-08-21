@@ -35,6 +35,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.security.crypto.codec.Base64;
 
+import es.caib.ripea.service.intf.dto.DocumentFirmaTipusEnumDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.InteressatTipusEnum;
 import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
@@ -787,5 +788,15 @@ public class Utils {
 	        return null; // Si no se encuentra, devuelve null
 		}
 		return null;
+	}
+	
+	public static DocumentFirmaTipusEnumDto getDocumentFirmaTipus(boolean ambFirma, boolean firmaSeparada) {
+		if (!ambFirma) {
+			return DocumentFirmaTipusEnumDto.SENSE_FIRMA;
+		} else if (!firmaSeparada) {
+			return DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA;
+		} else {
+			return DocumentFirmaTipusEnumDto.FIRMA_SEPARADA;
+		}
 	}
 }

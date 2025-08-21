@@ -44,7 +44,7 @@ export const FollowersDialog = (props:any) => {
 	
     return <>
 		<IconButton aria-label="forum" color={"inherit"} onClick={handleOpen}>
-	        <Badge badgeContent={entity?.numSeguidors} color="primary">
+	        <Badge badgeContent={entity?.numSeguidors} color="primary" showZero>
 	            <Icon>people</Icon>
 	        </Badge>
 	    </IconButton>	
@@ -59,7 +59,7 @@ export const FollowersDialog = (props:any) => {
 		        {
 		            value: 'close',
 		            text: t('common.close'),
-		            icon: 'close'
+		            componentProps: { variant: 'outlined' }
 		        },
 		    ]}
 		    buttonCallback={(value :any) :void=>{
