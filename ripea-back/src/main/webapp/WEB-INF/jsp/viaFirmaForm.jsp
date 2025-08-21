@@ -187,6 +187,7 @@ $(document).ready(function() {
 	var campCodiUsuari = $('select#codisUsuariViaFirma').closest('.form-group');
 	var campDispositiu = $('#dispositiuViaFirma').closest('.form-group');
 	var campEmail = $('#signantEmail').closest('.form-group');
+	var campEmplenable = $('#emplenable').closest('.form-group');
 	var campTipusUsuari = $('#tipusDestinatari');
 	
 	campTipusUsuari.on('change', function() {
@@ -194,10 +195,12 @@ $(document).ready(function() {
 			campCodiUsuari.hide();
 			campDispositiu.hide();
 			campEmail.show();
+			campEmplenable.show();
 		} else {
 			campCodiUsuari.show();
 			campDispositiu.show();
 			campEmail.hide();
+			campEmplenable.hide();
 		}
 	});
 	campTipusUsuari.trigger('change');
@@ -215,6 +218,7 @@ $(document).ready(function() {
 		<rip:inputText name="titol" textKey="contenidor.document.biometrica.camp.motiu" />
 		<rip:inputText name="descripcio" textKey="contenidor.document.biometrica.camp.descripcio" />
 		<rip:inputSelect name="tipusDestinatari" optionEnum="ViaFirmaTipusDestinatariEnum" emptyOption="false" textKey="contenidor.document.biometrica.camp.tipus" required="true"/>
+		<rip:inputCheckbox name="emplenable" textKey="contenidor.document.biometrica.camp.emplenable"/>
 		<rip:inputHidden name="codiUsuariViaFirma"/>
 		<rip:inputSelect name="codisUsuariViaFirma" textKey="contenidor.document.biometrica.camp.usuari"  required="true"/>
 		<c:if test="${isDispositiusEnabled}">

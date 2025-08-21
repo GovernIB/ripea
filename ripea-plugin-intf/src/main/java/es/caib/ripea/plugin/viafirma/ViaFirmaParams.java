@@ -24,6 +24,7 @@ public class ViaFirmaParams implements Serializable {
 	private String signantNif;
 	private String signantNom;
 	private String signantEmail;
+	private boolean emplenable;
 	private String expedientCodi;
 	private String observaciones;
 	private boolean validateCodeEnabled;

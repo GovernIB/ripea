@@ -68,6 +68,9 @@ public class DocumentViaFirmaEntity extends DocumentEnviamentEntity {
 	@Column(name = "firma_parcial")
 	private Boolean firmaParcial;
 	
+	@Transient
+	private Boolean emplenable;
+	
 	public String getCodiUsuari() {
 		return codiUsuari;
 	}
@@ -124,6 +127,14 @@ public class DocumentViaFirmaEntity extends DocumentEnviamentEntity {
 	}
 	public Boolean isRebreCorreu() {
 		return rebreCorreu != null ? rebreCorreu : false;
+	}
+	
+	public Boolean isEmplenable() {
+		return emplenable;
+	}
+	
+	public void setEmplenable(Boolean emplenable) {
+		this.emplenable = emplenable;
 	}
 	
 	public void updateEnviat(

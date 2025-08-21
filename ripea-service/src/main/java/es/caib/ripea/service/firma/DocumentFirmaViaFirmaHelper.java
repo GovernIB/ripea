@@ -159,6 +159,8 @@ public class DocumentFirmaViaFirmaHelper extends DocumentFirmaHelper{
 				viaFirmaEnviarDto.getValidateCode(),
 				viaFirmaEnviarDto.isRebreCorreu()).build();			
 		
+		documentViaFirma.setEmplenable(viaFirmaEnviarDto.isEmplenable());
+		
 		viaFirmaEnviar(documentViaFirma);
 	}
 	

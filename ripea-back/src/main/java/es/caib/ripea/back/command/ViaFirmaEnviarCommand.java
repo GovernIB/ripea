@@ -46,6 +46,7 @@ public class ViaFirmaEnviarCommand {
 	private Boolean validateCodeEnabled;
 	private String validateCode;
 	private Boolean rebreCorreu;
+	private Boolean emplenable;
 	
 	public static ViaFirmaEnviarDto asDto(ViaFirmaEnviarCommand command) {
 		ViaFirmaEnviarDto viaFirmaEnviar = ConversioTipusHelper.convertir(
