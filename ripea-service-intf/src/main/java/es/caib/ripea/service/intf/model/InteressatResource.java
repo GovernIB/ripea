@@ -34,7 +34,7 @@ import lombok.experimental.FieldNameConstants;
 @FieldNameConstants
 @InteressatValid(groups = {Resource.OnCreate.class, Resource.OnUpdate.class})
 @ResourceConfig(
-        quickFilterFields = { "documentNum", "nom" },
+        quickFilterFields = { "documentNum", "nom", "llinatge1", "llinatge2", "raoSocial", "organCodi", "organNom" },
         descriptionField = "codiNom",
         artifacts = {
                 @ResourceConfigArtifact(

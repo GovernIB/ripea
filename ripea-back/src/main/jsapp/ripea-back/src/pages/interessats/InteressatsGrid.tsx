@@ -178,7 +178,7 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
             toolbarCreateTitle={t('page.interessat.action.new.label')}
             toolbarHideCreate={!entity?.potModificar}
             toolbarHideQuickFilter={false}
-
+            toolbarHideRefresh
             selectionActive
             onRowSelectionModelChange={(newSelection) => {
                 // console.log('Selection changed:', newSelection);

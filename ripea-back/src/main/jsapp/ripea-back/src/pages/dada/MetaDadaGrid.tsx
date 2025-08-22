@@ -4,12 +4,26 @@ import {useDadaActions} from "./details/DadaActions.tsx";
 import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
 import {useEffect, useState} from "react";
 import {MultiplicitatStyled} from "../contingut/details/MetaExpedient.tsx";
+import {Typography} from "@mui/material";
 
 const dadesFilter = (metaDada:any, dades:any[]) :any[] => {
     return dades?.filter((dada)=>dada?.metaDada?.id == metaDada?.id)
 }
 
 const sortModel:any = [{ field: 'ordre', sort: 'asc' }]
+
+export const StyledDadaValor = (props: any) => {
+    const {valor} = props;
+    const style = {
+                border: '1px solid lightgray',
+                backgroundColor: '#e5f6fd',
+                borderRadius: '4px',
+                padding: '2px 6px',
+                marginRight: '4px',
+                display: 'inline-block'
+            };
+    return <Typography variant="caption" sx={style}> {valor} </Typography>
+}
 
 const MetaDadaGrid = (props: { entity:any, onRowCountChange?: ((value:number) => void) }) => {
     const apiRef = useMuiDataGridApiRef()
@@ -52,24 +66,30 @@ const MetaDadaGrid = (props: { entity:any, onRowCountChange?: ((value:number) =>
             flex: 0.5,
         },
         {
-            field: 'dades',
-            flex: 0.75,
-            valueGetter: (value: any, row:any) => dadesFilter(row, dades),
-            valueFormatter: (value: any, row:any) => {
-                if (row?.tipus == 'DOMINI') {
-                    return value?.map((dada: any) => dada?.dominiDescription).join(", \n")
-                }
-                return value?.map((dada: any) => dada?.valor).join(", \n")
-            },
+            field: 'multiplicitat',
+            flex: 0.2,
+            renderCell: (params:any) => <MultiplicitatStyled multiplicitat={params?.formattedValue}/>
         },
         {
-            field: 'multiplicitat',
-            flex: 0.5,
-            renderCell: (params:any) => <MultiplicitatStyled multiplicitat={params?.formattedValue}/>
+            field: 'dades',
+            flex: 1,
+            valueGetter: (value: any, row:any) => dadesFilter(row, dades),
+            renderCell: (params: any) => {
+                const value = params.value;
+                const row = params.row;
+                if (row?.tipus == 'DOMINI') {
+                    return value?.map((dada: any) => (
+                        <StyledDadaValor valor={dada?.dominiDescription}/>
+                    ));
+                }
+                return value?.map((dada: any) => (
+                    <StyledDadaValor valor={dada?.valor}/>
+                ));
+            },
         }
     ]
 
-    const {actions, components} = useDadaActions(entity,refresh);
+    const {actions, components, handleOpen} = useDadaActions(entity,refresh);
 
     return <GridPage>
         <StyledMuiGrid
@@ -83,9 +103,10 @@ const MetaDadaGrid = (props: { entity:any, onRowCountChange?: ((value:number) =>
             staticSortModel={sortModel}
             apiRef={apiRef}
             rowAdditionalActions={actions}
-            // paginationActive
+            toolbarHide
             disableColumnSorting
             readOnly
+            onRowClick={(params) => handleOpen(null, params.row)}
         />
         {components}
     </GridPage>

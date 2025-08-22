@@ -773,6 +773,10 @@ const translationEs = {
             grid: {
                 valor: "Valor del dato",
             },
+            mensajeToolbar: {
+                permis: "No tienes permiso para gestionar los valores de este dato.",
+                maxDades: "Este tipo de dato solo permite indicar un único valor.",
+            },             
             action: {
                 new: {
                     label: "Añadir valor para el dato",

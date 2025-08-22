@@ -8,7 +8,7 @@ export const useDadaActions = (contingut:any, refresh?: () => void) => {
 
     const actions = [
         {
-            label: t('common.detail'),
+            label: t('common.update'),
             icon: "edit",
             showInMenu: false,
             onClick: handleOpen,
@@ -21,6 +21,7 @@ export const useDadaActions = (contingut:any, refresh?: () => void) => {
     </>;
     return {
         actions,
-        components
+        components,
+        handleOpen
     }
 }

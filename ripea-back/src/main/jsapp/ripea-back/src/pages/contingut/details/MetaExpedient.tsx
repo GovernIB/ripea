@@ -1,6 +1,7 @@
 import {Grid, Typography} from "@mui/material";
 
 const style = {
+    border: '1px solid lightgray',
     display: 'flex',
     alignItems: 'center',
     width: 'max-content',

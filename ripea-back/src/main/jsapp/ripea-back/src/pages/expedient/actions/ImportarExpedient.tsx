@@ -114,7 +114,6 @@ const ImportarExpedient = (props:any) => {
                 sortModel={sortModel}
                 perspectives={perspectives}
                 rowAdditionalActions={actions}
-
                 rowProps={(row: any) => {
                     const color = row?.estatAdditionalInfo?.color;
                     return color
@@ -126,9 +125,7 @@ const ImportarExpedient = (props:any) => {
                             'padding-left': '6px'
                         }
                 }}
-
-                // height={162 + 52 * 4}
-                // paginationActive
+                toolbarHide
                 autoHeight
                 readOnly
             />

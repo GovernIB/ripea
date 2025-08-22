@@ -781,6 +781,10 @@ const translationCa = {
             grid: {
                 valor: "Valor de la dada",
             },
+            mensajeToolbar: {
+                permis: "No teniu permisos per gestionar els valors d'aquesta dada.",
+                maxDades: "Aquest tipus de dada només permet indicar un únic valor.",
+            }, 
             action: {
                 new: {
                     label: "Afegir valor per la dada",
