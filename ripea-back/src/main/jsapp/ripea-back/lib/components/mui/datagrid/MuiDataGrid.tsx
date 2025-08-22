@@ -28,6 +28,7 @@ import {
 import { FormI18nKeys } from '../../form/Form';
 import { useResourceApiContext, ResourceType, ExportFileType } from '../../ResourceApiContext';
 import { useResourceApiService } from '../../ResourceApiProvider';
+import { DialogButton } from '../../BaseAppContext';
 import { toDataGridActionItem, DataGridActionItemOnClickFn } from './DataGridActionItem';
 import {
     useApiDataCommon,
@@ -112,6 +113,7 @@ export type MuiDataGridProps = {
     popupEditFormContent?: React.ReactElement;
     popupEditFormDialogTitle?: string;
     popupEditFormDialogResourceTitle?: string;
+    popupEditFormDialogButtons?: DialogButton[];
     popupEditFormDialogComponentProps?: any;
     popupEditFormDialogOnClose?: (reason?: string) => boolean;
     popupEditFormComponentProps?: any;
@@ -362,6 +364,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         popupEditFormContent,
         popupEditFormDialogTitle,
         popupEditFormDialogResourceTitle,
+        popupEditFormDialogButtons,
         popupEditFormDialogComponentProps,
         popupEditFormDialogOnClose,
         popupEditFormComponentProps,
@@ -483,6 +486,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         popupEditFormContent,
         popupEditFormDialogTitle,
         popupEditFormDialogResourceTitle,
+        popupEditFormDialogButtons,
         popupEditFormDialogComponentProps,
         popupEditFormDialogOnClose,
         popupEditFormComponentProps,

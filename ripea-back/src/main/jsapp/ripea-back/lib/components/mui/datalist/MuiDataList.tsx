@@ -9,19 +9,21 @@ import Box from '@mui/material/Box';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { useTheme } from '@mui/material/styles';
+import { FormI18nKeys } from '../../form/Form';
 import { capitalize } from '../../../util/text';
 import { formattedFieldValue } from '../../../util/fields';
 import {
     useApiDataCommon,
     useDataCommonEditable,
-    DataCommonAdditionalAction
+    DataCommonAdditionalAction,
 } from '../datacommon/MuiDataCommon';
 import { useDataToolbar } from '../datacommon/DataToolbar';
 import DataNoRows from '../datacommon/DataNoRows';
 import {
     ReactElementWithPosition,
-    joinReactElementsWithPositionWithReactElementsWithPositions
+    joinReactElementsWithPositionWithReactElementsWithPositions,
 } from '../../../util/reactNodePosition';
+import { DialogButton } from '../../BaseAppContext';
 import { ResourceType } from '../../ResourceApiContext';
 import { useResourceApiService } from '../../ResourceApiProvider';
 
@@ -73,71 +75,91 @@ export type MuiDataListProps = {
     popupEditFormContent?: React.ReactElement;
     popupEditFormDialogTitle?: string;
     popupEditFormDialogResourceTitle?: string;
+    popupEditFormDialogButtons?: DialogButton[];
     popupEditFormDialogComponentProps?: any;
     popupEditFormDialogOnClose?: (reason?: string) => boolean;
     popupEditFormComponentProps?: any;
+    popupEditFormI18nKeys: FormI18nKeys | undefined;
 };
 
 const fieldDescription = (name: string, value: any, fields: any[] | undefined) => {
-    const field = fields?.find(f => f.name === name);
+    const field = fields?.find((f) => f.name === name);
     return formattedFieldValue(value, field);
-}
+};
 
 const rowActionToIconButton = (
     rowAction: DataCommonAdditionalAction,
     row: any,
     handleRowActionClick: any,
-    key: any) => {
-    return <IconButton
-        key={key}
-        onClick={(event) => handleRowActionClick(rowAction, row, event)}
-        title={rowAction.title}
-        size="small">
-        <Icon fontSize="small">{rowAction.icon ?? 'question_mark'}</Icon>
-    </IconButton>;
-}
+    key: any
+) => {
+    const title = typeof rowAction.title === 'function' ? rowAction.title(row) : rowAction.title;
+    const icon = typeof rowAction.icon === 'function' ? rowAction.icon(row) : rowAction.icon;
+    return (
+        <IconButton
+            key={key}
+            onClick={(event) => handleRowActionClick(rowAction, row, event)}
+            title={title}
+            size="small">
+            <Icon fontSize="small">{icon ?? 'question_mark'}</Icon>
+        </IconButton>
+    );
+};
 
 const ListItemSecondaryActions: React.FC<any> = (props) => {
-    const {
-        row,
-        rowAdditionalActions,
-        rowEditActions,
-        showUpdateDialog
-    } = props;
+    const { row, rowAdditionalActions, rowEditActions, showUpdateDialog } = props;
     const rowActions: DataCommonAdditionalAction[] = [...rowAdditionalActions, ...rowEditActions];
-    const noMenuRowActions = rowActions.filter(a => !a.showInMenu);
-    const showInMenuRowActions = rowActions.filter(a => a.showInMenu);
+    const noMenuRowActions = rowActions.filter((a) => !a.showInMenu);
+    const showInMenuRowActions = rowActions.filter((a) => a.showInMenu);
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
     const handleMoreMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
         setAnchorEl(event.currentTarget);
-    }
-    const handleRowActionClick = (rowAction: DataCommonAdditionalAction, row: any, event: React.MouseEvent) => {
+    };
+    const handleRowActionClick = (
+        rowAction: DataCommonAdditionalAction,
+        row: any,
+        event: React.MouseEvent
+    ) => {
         if (rowAction.clickShowUpdateDialog) {
             showUpdateDialog(row.id, row);
         } else {
             rowAction.onClick?.(row.id, row, event);
         }
-    }
-    const moreMenuIcon = showInMenuRowActions.length > 0 ? <>
-        <IconButton size="small" onClick={handleMoreMenuClick} sx={{ ml: 1 }}>
-            <Icon fontSize="small">more_vert</Icon>
-        </IconButton>
-        <Menu
-            anchorEl={anchorEl}
-            open={open}
-            onClose={() => setAnchorEl(null)}>
-            {showInMenuRowActions.map((ra, i) => <MenuItem key={i} onClick={(event) => handleRowActionClick(ra, row, event)}>
-                <Icon color="action" sx={{ mr: 1.5 }}>{ra.icon ?? 'question_mark'}</Icon>
-                {ra.title}
-            </MenuItem>)}
-        </Menu>
-    </> : null;
-    return <>
-        {noMenuRowActions.map((ra, i) => rowActionToIconButton(ra, row, handleRowActionClick, i))}
-        {moreMenuIcon}
-    </>;
-}
+    };
+    const moreMenuIcon =
+        showInMenuRowActions.length > 0 ? (
+            <>
+                <IconButton size="small" onClick={handleMoreMenuClick} sx={{ ml: 1 }}>
+                    <Icon fontSize="small">more_vert</Icon>
+                </IconButton>
+                <Menu anchorEl={anchorEl} open={open} onClose={() => setAnchorEl(null)}>
+                    {showInMenuRowActions.map((ra, i) => {
+                        const label = typeof ra.label === 'function' ? ra.label(row) : ra.label;
+                        const icon = typeof ra.icon === 'function' ? ra.icon(row) : ra.icon;
+                        return (
+                            <MenuItem
+                                key={i}
+                                onClick={(event) => handleRowActionClick(ra, row, event)}>
+                                <Icon color="action" sx={{ mr: 1.5 }}>
+                                    {icon ?? 'question_mark'}
+                                </Icon>
+                                {label}
+                            </MenuItem>
+                        );
+                    })}
+                </Menu>
+            </>
+        ) : null;
+    return (
+        <>
+            {noMenuRowActions.map((ra, i) =>
+                rowActionToIconButton(ra, row, handleRowActionClick, i)
+            )}
+            {moreMenuIcon}
+        </>
+    );
+};
 
 export const MuiDataList: React.FC<MuiDataListProps> = (props) => {
     const {
@@ -182,9 +204,11 @@ export const MuiDataList: React.FC<MuiDataListProps> = (props) => {
         popupEditFormContent,
         popupEditFormDialogTitle,
         popupEditFormDialogResourceTitle,
+        popupEditFormDialogButtons,
         popupEditFormDialogComponentProps,
         popupEditFormDialogOnClose,
         popupEditFormComponentProps,
+        popupEditFormI18nKeys,
     } = props;
     const theme = useTheme();
     const {
@@ -192,19 +216,22 @@ export const MuiDataList: React.FC<MuiDataListProps> = (props) => {
         currentError: apiCurrentError,
         delete: apiDelete,
     } = useResourceApiService(resourceName);
-    const findArgs = React.useMemo(() => ({
-        filter,
-        namedQueries,
-        perspectives,
-        unpaged: true
-    }), [filter, namedQueries, perspectives]);
+    const findArgs = React.useMemo(
+        () => ({
+            filter,
+            namedQueries,
+            perspectives,
+            unpaged: true,
+        }),
+        [filter, namedQueries, perspectives]
+    );
     const {
         loading: _loading,
         fields,
         rows,
         refresh,
         export: exportt,
-        quickFilterComponent
+        quickFilterComponent,
     } = useApiDataCommon(
         resourceName,
         resourceType,
@@ -214,7 +241,8 @@ export const MuiDataList: React.FC<MuiDataListProps> = (props) => {
         findArgs,
         quickFilterInitialValue,
         undefined,
-        { sx: { ml: 1 } });
+        { sx: { ml: 1 } }
+    );
     const {
         toolbarAddElement,
         rowEditActions,
@@ -240,23 +268,32 @@ export const MuiDataList: React.FC<MuiDataListProps> = (props) => {
         popupEditFormContent,
         popupEditFormDialogTitle,
         popupEditFormDialogResourceTitle,
+        popupEditFormDialogButtons,
         popupEditFormDialogComponentProps,
         popupEditFormDialogOnClose,
         popupEditFormComponentProps,
+        popupEditFormI18nKeys,
         apiCurrentActions,
         apiDelete,
-        refresh);
+        refresh
+    );
     const toolbarNodesPosition = 2;
     const toolbarListElementsWithPositions: ReactElementWithPosition[] = [];
-    toolbarAddElement != null && toolbarListElementsWithPositions.push({
-        position: toolbarNodesPosition,
-        element: !toolbarHideCreate ? toolbarAddElement : <span/>,
-    });
-    const toolbarNumElements = toolbarNodesPosition + (toolbarHideExport ? 0 : 1) + (toolbarHideRefresh ? 0 : 1) + (toolbarHideQuickFilter ? 0 : 1);
+    toolbarAddElement != null &&
+        toolbarListElementsWithPositions.push({
+            position: toolbarNodesPosition,
+            element: !toolbarHideCreate ? toolbarAddElement : <span />,
+        });
+    const toolbarNumElements =
+        toolbarNodesPosition +
+        (toolbarHideExport ? 0 : 1) +
+        (toolbarHideRefresh ? 0 : 1) +
+        (toolbarHideQuickFilter ? 0 : 1);
     const joinedElementsWithPositions = joinReactElementsWithPositionWithReactElementsWithPositions(
         toolbarNumElements,
         toolbarListElementsWithPositions,
-        toolbarElementsWithPositions);
+        toolbarElementsWithPositions
+    );
     const toolbar = useDataToolbar(
         title ?? capitalize(resourceName) ?? '<unknown>',
         titleDisabled ?? false,
@@ -269,51 +306,75 @@ export const MuiDataList: React.FC<MuiDataListProps> = (props) => {
         toolbarHideExport,
         toolbarHideRefresh,
         toolbarHideQuickFilter,
-        joinedElementsWithPositions);
-    return <>
-        {!toolbarHide && toolbar}
-        {toolbar}
-        {toolbarAdditionalRow ? <Box sx={{ mb: 0 }}>{toolbarAdditionalRow}</Box> : null}
-        {formDialogComponent}
-        {rows?.length ? <List
-            disablePadding
-            sx={{ border: '1px solid ' + theme.palette.divider, borderRadius: '4px' }}>
-            {rows.map((r, i) => {
-                const primary = fieldDescription(primaryField, r[primaryField], fields);
-                const secondary = secondaryField ? fieldDescription(secondaryField, r[secondaryField], fields) : undefined;
-                const primaryFieldRendererArgs = {
-                    value: r[primaryField],
-                    row: r,
-                    formattedValue: primary
-                };
-                const secondaryFieldRendererArgs = {
-                    value: secondaryField ? r[secondaryField] : undefined,
-                    row: r,
-                    formattedValue: secondary
-                };
-                return <ListItem
-                    key={r.id}
-                    secondaryAction={<ListItemSecondaryActions
-                        row={r}
-                        rowAdditionalActions={rowAdditionalActions}
-                        rowEditActions={rowEditActions}
-                        showUpdateDialog={showUpdateDialog} />}
+        joinedElementsWithPositions
+    );
+    return (
+        <>
+            {!toolbarHide && toolbar}
+            {toolbar}
+            {toolbarAdditionalRow ? <Box sx={{ mb: 0 }}>{toolbarAdditionalRow}</Box> : null}
+            {formDialogComponent}
+            {rows?.length ? (
+                <List
                     disablePadding
-                    sx={i > 0 ? { borderTop: '1px solid #E0E0E0' } : undefined}>
-                    <ListItemButton>
-                        <ListItemText
-                            primary={primaryFieldRenderer ? primaryFieldRenderer(primaryFieldRendererArgs) : primary}
-                            secondary={secondaryFieldRenderer ? secondaryFieldRenderer(secondaryFieldRendererArgs) : secondary} />
-                    </ListItemButton>
-                </ListItem>;
-            })}
-        </List> : <Box sx={{
-            border: '1px solid ' + theme.palette.divider,
-            borderRadius: '4px',
-        }}>
-            <DataNoRows />
-        </Box>}
-    </>;
-}
+                    sx={{ border: '1px solid ' + theme.palette.divider, borderRadius: '4px' }}>
+                    {rows.map((r, i) => {
+                        const primary = fieldDescription(primaryField, r[primaryField], fields);
+                        const secondary = secondaryField
+                            ? fieldDescription(secondaryField, r[secondaryField], fields)
+                            : undefined;
+                        const primaryFieldRendererArgs = {
+                            value: r[primaryField],
+                            row: r,
+                            formattedValue: primary,
+                        };
+                        const secondaryFieldRendererArgs = {
+                            value: secondaryField ? r[secondaryField] : undefined,
+                            row: r,
+                            formattedValue: secondary,
+                        };
+                        return (
+                            <ListItem
+                                key={r.id}
+                                secondaryAction={
+                                    <ListItemSecondaryActions
+                                        row={r}
+                                        rowAdditionalActions={rowAdditionalActions}
+                                        rowEditActions={rowEditActions}
+                                        showUpdateDialog={showUpdateDialog}
+                                    />
+                                }
+                                disablePadding
+                                sx={i > 0 ? { borderTop: '1px solid #E0E0E0' } : undefined}>
+                                <ListItemButton>
+                                    <ListItemText
+                                        primary={
+                                            primaryFieldRenderer
+                                                ? primaryFieldRenderer(primaryFieldRendererArgs)
+                                                : primary
+                                        }
+                                        secondary={
+                                            secondaryFieldRenderer
+                                                ? secondaryFieldRenderer(secondaryFieldRendererArgs)
+                                                : secondary
+                                        }
+                                    />
+                                </ListItemButton>
+                            </ListItem>
+                        );
+                    })}
+                </List>
+            ) : (
+                <Box
+                    sx={{
+                        border: '1px solid ' + theme.palette.divider,
+                        borderRadius: '4px',
+                    }}>
+                    <DataNoRows />
+                </Box>
+            )}
+        </>
+    );
+};
 
 export default MuiDataList;

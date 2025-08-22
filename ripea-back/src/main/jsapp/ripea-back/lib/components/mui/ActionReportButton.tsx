@@ -9,7 +9,7 @@ import {
     useReportDialogButtons,
     useConfirmDialogButtons,
 } from '../AppButtons';
-import { useBaseAppContext } from '../BaseAppContext';
+import { useBaseAppContext, DialogButton } from '../BaseAppContext';
 import { ExportFileType } from '../ResourceApiContext';
 import { useResourceApiService } from '../ResourceApiProvider';
 import { useFormDialog, FormDialogSubmitFn } from './form/FormDialog';
@@ -40,6 +40,7 @@ export type ActionReportButtonProps = {
     formI18nKeys?: FormI18nKeys;
     formInitOnChangeRequest?: boolean;
     formDialogContent?: React.ReactElement;
+    formDialogButtons?: DialogButton[];
     formDialogComponentProps?: any;
     formDialogResultProcessor?: (result?: any) => React.ReactElement;
     onSuccess?: (result?: any) => void;
@@ -96,6 +97,7 @@ export const useActionReportLogic = (
     formI18nKeys?: FormI18nKeys,
     formInitOnChangeRequest?: boolean,
     formDialogContent?: React.ReactElement,
+    formDialogButtons?: DialogButton[],
     formDialogComponentPropsArg?: any,
     formDialogResultProcessor?: (result?: any) => React.ReactElement,
     onSuccess?: (result?: any) => void,
@@ -145,7 +147,7 @@ export const useActionReportLogic = (
         resourceName,
         action ? 'ACTION' : (report ? 'REPORT' : undefined),
         action ? action : (report ? report : undefined),
-        action ? actionDialogButtons : (report ? reportDialogButtons : undefined),
+        formDialogButtons ?? (action ? actionDialogButtons : (report ? reportDialogButtons : undefined)),
         action ? execAction : generateReport,
         action ? t('actionreport.action.error') : t('actionreport.report.error'),
         formDialogContent,
@@ -235,6 +237,7 @@ export const ActionReportButton: React.FC<ActionReportButtonProps> = (props) => 
         formI18nKeys,
         formInitOnChangeRequest,
         formDialogContent,
+        formDialogButtons,
         formDialogComponentProps,
         formDialogResultProcessor,
         onSuccess,
@@ -257,6 +260,7 @@ export const ActionReportButton: React.FC<ActionReportButtonProps> = (props) => 
         formI18nKeys,
         formInitOnChangeRequest,
         formDialogContent,
+        formDialogButtons,
         formDialogComponentProps,
         formDialogResultProcessor,
         onSuccess,
