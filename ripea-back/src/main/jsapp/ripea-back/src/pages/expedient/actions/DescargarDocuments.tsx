@@ -120,6 +120,7 @@ const DescargarDocuments = (props:any) => {
         report={"EXPORT_SELECTED_DOCS"}
         reportFileType={'ZIP'}
         title={t('page.expedient.action.download.title')}
+        formDialogButtons={[{}]}
         formDialogComponentProps={{fullWidth: true, maxWidth: 'lg'}}
         {...props}
     >

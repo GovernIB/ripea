@@ -1,9 +1,10 @@
 import React, {MutableRefObject} from "react";
-import {useBaseAppContext, useMuiActionReportLogic} from "reactlib";
+import { useBaseAppContext, useMuiActionReportLogic, DialogButton } from "reactlib";
 
 type CommonProps = {
     title?: string | ((data:any) => string),
     resourceName: string,
+    formDialogButtons?: DialogButton[],
     formDialogComponentProps?: any,
     initialOnChange: boolean,
     children: React.ReactElement,
@@ -27,6 +28,7 @@ const FormActionDialog = (props:FormActionDialogProp) => {
         title,
         resourceName,
         action,
+        formDialogButtons,
         formDialogComponentProps,
         initialOnChange,
         children,
@@ -37,7 +39,6 @@ const FormActionDialog = (props:FormActionDialogProp) => {
             error?.message && temporalMessageShow(null, error?.description, 'error');
         }
     } = props;
-
     const {
         initialized,
         formDialogComponent,
@@ -53,6 +54,7 @@ const FormActionDialog = (props:FormActionDialogProp) => {
         undefined,
         initialOnChange,
         children,
+        formDialogButtons,
         formDialogComponentProps,
         formDialogResultProcessor,
         onSuccess,
@@ -80,6 +82,7 @@ export const FormReportDialog = (props:FormReportDialogProp) => {
         resourceName,
         report,
         reportFileType = 'PDF',
+        formDialogButtons,
         formDialogComponentProps,
         initialOnChange,
         children,
@@ -104,6 +107,7 @@ export const FormReportDialog = (props:FormReportDialogProp) => {
         undefined,
         initialOnChange,
         children,
+        formDialogButtons,
         formDialogComponentProps,
         formDialogResultProcessor,
         onSuccess,

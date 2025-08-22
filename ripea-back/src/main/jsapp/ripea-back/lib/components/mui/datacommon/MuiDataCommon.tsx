@@ -5,7 +5,7 @@ import {
 } from '../../ResourceApiProvider';
 import { ResourceType, ExportFileType } from '../../ResourceApiContext';
 import { FormI18nKeys } from '../../form/Form';
-import { useBaseAppContext } from '../../BaseAppContext';
+import { useBaseAppContext, DialogButton } from '../../BaseAppContext';
 import { useConfirmDialogButtons } from '../../AppButtons';
 import { toToolbarIcon } from '../ToolbarIcon';
 import { useDataQuickFilter } from './DataQuickFilter';
@@ -183,6 +183,7 @@ export const useDataCommonEditable = (
     popupEditFormContent: React.ReactElement | undefined,
     popupEditFormDialogTitle: string | undefined,
     popupEditFormDialogResourceTitle: string | undefined,
+    popupEditFormDialogButtons: DialogButton[] | undefined,
     popupEditFormDialogComponentProps: any,
     popupEditFormDialogOnClose: ((reason?: string) => boolean) | undefined,
     popupEditFormComponentProps: any,
@@ -287,6 +288,7 @@ export const useDataCommonEditable = (
         resourceName={resourceName}
         title={popupEditFormDialogTitle}
         resourceTitle={popupEditFormDialogResourceTitle}
+        dialogButtons={popupEditFormDialogButtons}
         dialogComponentProps={popupEditFormDialogComponentProps}
         formComponentProps={popupEditFormComponentProps}
         formI18nKeys={popupEditFormI18nKeys}

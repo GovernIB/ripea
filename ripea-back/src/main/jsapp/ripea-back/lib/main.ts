@@ -46,6 +46,7 @@ export { useSmallScreen, useSmallHeader } from './util/useSmallScreen';
 export { toBase64 } from './util/files';
 export * as springFilterBuilder from './util/springFilterBuilder';
 
+export type { DialogButton } from './components/BaseAppContext';
 export type { MenuEntry } from './components/mui/Menu';
 export type { MuiDataGridProps, MuiDataGridColDef } from './components/mui/datagrid/MuiDataGrid';
 export type { MuiDataGridApi, MuiDataGridApiRef } from './components/mui/datagrid/DataGridContext';
@@ -54,4 +55,3 @@ export type { FormApi, FormApiRef } from './components/form/FormContext';
 export type { FormFieldProps, FormFieldCustomProps } from './components/form/FormField';
 export type { DataFormDialogApi as MuiFormDialogApi } from './components/mui/datacommon/DataFormDialog';
 export type { FormSidebarApi as MuiFormSidebarApi } from './components/mui/form/MuiFormSidebar';
-
