@@ -237,6 +237,7 @@ const ExpedientGrid = () => {
                 title={`${t('page.comment.expedient')}: ${params?.row?.nom}`}
                 resourceName={'expedientComentariResource'}
                 resourceReference={'expedient'}
+                onClose={refresh}
             />,
             hidden: !user?.conf?.expedientListComentaris,
         },
