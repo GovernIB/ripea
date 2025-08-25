@@ -32,6 +32,7 @@ public class ViaFirmaEnviarDto implements Serializable {
 	private boolean validateCodeEnabled;
 	private String validateCode;
 	private boolean rebreCorreu;
+	private boolean emplenable;
 	
 	public Boolean isValidateCodeEnabled() {
 		return validateCodeEnabled;

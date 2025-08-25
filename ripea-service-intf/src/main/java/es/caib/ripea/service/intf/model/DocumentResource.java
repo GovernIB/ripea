@@ -375,7 +375,7 @@ public class DocumentResource extends NodeResource {
     	@Size(max=256)
     	private String observacions;
     	private Boolean firmaParcial = false;
-    	private Boolean rellenable = false;
+    	private Boolean emplenable = false;
     	private Boolean validateCodeEnabled = false;
     	private String validateCode;
     	private Boolean rebreCorreu = false;

@@ -944,6 +944,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 				viaFirmaEnviarDto.setValidateCodeEnabled(params.getValidateCodeEnabled());
 				viaFirmaEnviarDto.setValidateCode(params.getValidateCode());
 				viaFirmaEnviarDto.setRebreCorreu(params.getRebreCorreu());
+				viaFirmaEnviarDto.setEmplenable(params.getEmplenable());
+				
 				firmaViaFirmaHelper.viaFirmaEnviar(entitatEntity.getId(), entity.getId(), viaFirmaEnviarDto);
 				return objectMappingHelper.newInstanceMap(entity, DocumentResource.class);
 			} catch (Exception e) {

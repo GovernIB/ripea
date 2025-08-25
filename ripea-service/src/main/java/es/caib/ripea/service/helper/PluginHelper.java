@@ -5391,6 +5391,7 @@ public class PluginHelper {
 					getPropertyViaFirmaDispositius());
 			parametresViaFirma.setTipusDestinatari(
 					ViaFirmaTipusDestinatari.valueOf(documentViaFirmaEntity.getTipusDestinatari().name()));
+			parametresViaFirma.setEmplenable(documentViaFirmaEntity.isEmplenable());
 			
 			viaFirmaResponse = viaFirmaPlugin.uploadDocument(parametresViaFirma);
 			
