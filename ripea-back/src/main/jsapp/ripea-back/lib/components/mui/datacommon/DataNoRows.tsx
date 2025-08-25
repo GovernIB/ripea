@@ -6,10 +6,11 @@ import { useBaseAppContext } from '../../BaseAppContext';
 
 type DataNoRowsProps = {
     findDisabled?: boolean;
+    noRowsText?: string;
 };
 
 const DataNoRows: React.FC<DataNoRowsProps> = (props) => {
-    const { findDisabled } = props;
+    const { findDisabled, noRowsText } = props;
     const { t } = useBaseAppContext();
     return <Box sx={{
         width: '100%',
@@ -21,7 +22,7 @@ const DataNoRows: React.FC<DataNoRowsProps> = (props) => {
             <Typography variant="h5" color="text.secondary">{t('datacommon.findDisabled')}</Typography>
         </> : <>
             <Icon fontSize="large" color="disabled">block</Icon>
-            <Typography variant="h5" color="text.secondary">{t('datacommon.noRows')}</Typography>
+            <Typography variant="h5" color="text.secondary">{noRowsText ?? t('datacommon.noRows')}</Typography>
         </>}
     </Box>
 }

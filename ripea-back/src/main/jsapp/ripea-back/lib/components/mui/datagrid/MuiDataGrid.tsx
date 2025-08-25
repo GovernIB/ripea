@@ -71,9 +71,10 @@ export type MuiDataGridProps = {
     columns: MuiDataGridColDef[];
     readOnly?: boolean;
     findDisabled?: boolean;
-    paginationActive?: boolean;
     selectionActive?: boolean;
+    paginationActive?: boolean;
     paginationModel?: GridPaginationModel;
+    paginationNoRowsText?: string;
     sortModel?: GridSortModel;
     staticSortModel?: GridSortModel;
     quickFilterInitialValue?: string;
@@ -322,9 +323,10 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         columns,
         readOnly,
         findDisabled,
-        paginationActive,
         selectionActive,
+        paginationActive,
         paginationModel: paginationModelProp,
+        paginationNoRowsText,
         sortModel,
         staticSortModel,
         quickFilterInitialValue,
@@ -614,7 +616,10 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
                     setRowSelectionModel,
                     pageSizeOptions: otherProps?.pageSizeOptions,
                 },
-                noRowsOverlay: { findDisabled },
+                noRowsOverlay: {
+                    findDisabled,
+                    noRowsText: paginationNoRowsText,
+                },
             }}
             semiBordered={semiBordered}
             autoHeight={autoHeight}
