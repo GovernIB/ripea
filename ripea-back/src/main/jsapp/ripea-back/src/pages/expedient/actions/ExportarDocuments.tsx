@@ -15,9 +15,14 @@ const ExportarDocumentsForm = () => {
 }
 
 const ExportarDocuments = (props:any) => {
+    const { t } = useTranslation();
     return <FormReportDialog
         resourceName={"expedientResource"}
         report={"EXPORT_DOC"}
+        formDialogButtons={[
+            {icon: 'check', text: t('common.export'), componentProps: { variant: 'contained' }, value: true },
+            {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
+        ]}
         {...props}
     >
         <ExportarDocumentsForm/>

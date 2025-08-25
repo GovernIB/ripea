@@ -1,14 +1,19 @@
 const translationCa = {
     common: {
         close: "Tanca",
-        create: "Crear",
+        cancel: "Cancel·la",
+        create: "Crea",
         copy: "Copiar",
-        update: "Modificar",
+        update: "Modifica",
+        save: "Guarda",
         delete: "Esborrar",
+        accepta: "Accepta",
+        rebutja: "Rebutja",
         action: "Accions",
         expand: "Expandir",
         contract: "Contreure",
         download: "Descarregar",
+        send: "Envia",
         detail: "Detalls",
         refresh: "Refrescar",
         clear: "Netejar",
@@ -18,10 +23,12 @@ const translationCa = {
             all: "Seleccionar tots",
             clear: "Netejar selecció",
         },
-        import: "Importar",
-        export: "Exportar",
-        consult: "Consultar",
+        import: "Importa",
+        export: "Exporta",
+        consult: "Consulta",
         filter: "Filtrar",
+        downloadSelected: "Descarrega contingut seleccionat",
+        relateSelected: "Relaciona contingut seleccionat",
     },
     form: {
         create: {
@@ -506,7 +513,7 @@ const translationCa = {
                     ok: "L’estat de l’expedient '{{expedient}}' s’ha modificat correctament.",
                 },
                 assignar: {
-                    label: "Assignar",
+                    label: "Assignar...",
                     title: "Assignar expedient a usuari",
                     ok: "L’expedient '{{expedient}}' s’ha assignat correctament.",
                 },
@@ -675,6 +682,7 @@ const translationCa = {
                     ok: "Enllaç CSV copiat correctament",
                 },
                 portafirmes: {
+                    button: "Envia a portafirmes",
                     label: "Enviar a portafirmes...",
                     title: "Enviar document a portafirmes",
                     ok: "Document '{{document}}' enviat a portafirmes",
@@ -684,9 +692,11 @@ const translationCa = {
                     title: "Visualitzar versió PDF",
                 },
                 firmar: {
+                    button: "Inicia procés de firma",
                     label: "Signatura des del navegador...",
                 },
                 viaFirma: {
+                    button: "Envia a ViaFirma",
                     label: "Enviar viaFirma...",
                     title: "Enviar document a ViaFirma",
                     ok: "Document '{{document}}' enviat a viaFirma",
@@ -698,10 +708,12 @@ const translationCa = {
                 },
                 seguiment: {
                     label: "Seguiment portafirmes",
+                    cancel: "Cancel·la enviament",
                     title: "Detalls de la signatura",
                     ok: "La signatura ha estat cancel·lada correctament",
                 },
                 notificar: {
+                    button: "Notifica",
                     label: "Notificar o comunicar...",
                     title: "Crear notificació document",
                     ok: "Notificació creada correctament",

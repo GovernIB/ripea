@@ -17,6 +17,10 @@ const Crear = (props:any) => {
         resourceName={"carpetaResource"}
         resourceTitle={t('page.carpeta.title')}
         onClose={(reason?: string) => reason !== 'backdropClick'}
+        dialogButtons={[
+            {icon: 'save', text: t('common.create'), componentProps: { variant: 'contained' }, value: true },
+            {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
+        ]}
         {...props}
     >
         <CrearForm/>

@@ -25,9 +25,14 @@ const MoureForm = () => {
 }
 
 const Moure = (props:any) => {
+    const { t } = useTranslation();
     return <FormActionDialog
         resourceName={"documentResource"}
         action={'MOURE'}
+        formDialogButtons={[
+            {icon: 'save', text: t('common.save'), componentProps: { variant: 'contained' }, value: true },
+            {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
+        ]}
         {...props}
     >
         <MoureForm/>

@@ -1,14 +1,19 @@
 const translationEs = {
     common: {
         close: "Cerrar",
+        cancel: "Cancela",
         copy: "Copiar",
         create: "Crear",
         update: "Modificar",
+        save: "Guarda",
         delete: "Borrar",
+        accepta: "Acepta",
+        rebutja: "Rechaza",
         action: "Acciones",
         expand: "Expandir",
         contract: "Contraer",
         download: "Descargar",
+        send: "Envia",
         detail: "Detalles",
         refresh: "Refrescar",
         clear: "Limpiar",
@@ -22,6 +27,8 @@ const translationEs = {
         export: "Exportar",
         consult: "Consultar",
         filter: "Filtrar",
+        downloadSelected: "Descargar contenido seleccionado",
+        relateSelected: "Relacionar contenido seleccionado",
     },
     enum: {
         rol: {
@@ -498,8 +505,8 @@ const translationEs = {
                     ok: "El estado del expediente '{{expedient}}' se ha modificado correctamente.",
                 },
                 assignar: {
-                    label: "Assignar",
-                    title: "Assignar expediente a usuario",
+                    label: "Asignar...",
+                    title: "Asignar expediente a usuario",
                     ok: "El expediente '{{expedient}}' se ha assignado correctamente.",
                 },
                 relacio: {
@@ -667,6 +674,7 @@ const translationEs = {
                     ok: "Enlace CSV copiado correctamente",
                 },
                 portafirmes: {
+                    button: "Envia a portafirmas",
                     label: "Enviar a portafirmas...",
                     title: "Enviar documento a portafirmas",
                     ok: "Documento '{{document}}' enviado a portafirmas",
@@ -676,6 +684,7 @@ const translationEs = {
                     title: "Visualizar versión PDF",
                 },
                 firmar: {
+                    button: "Inicia proceso de firma",
                     label: "Firma desde el navegador...",
                 },
                 viaFirma: {
@@ -690,10 +699,12 @@ const translationEs = {
                 },
                 seguiment: {
                     label: "Seguimiento portafirmas",
+                    cancel: "Cancela envio",
                     title: "Detalles de la firma",
                     ok: "La firma ha sido cancelada correctamente",
                 },
                 notificar: {
+                    button: "Notifica",
                     label: "Notificar o comunicar...",
                     title: "Crear notificación documento",
                     ok: "Notificación creada correctamente",

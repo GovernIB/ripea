@@ -32,7 +32,7 @@ const ExpandButton = (props: { value: any, onChange: (value: any) => void, hidde
     }
 
     return <ToolbarButton
-        startIcon={<Icon>{value ? 'arrow_right' : 'arrow_drop_down'}</Icon>}
+        startIcon={<Icon>{value ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}</Icon>}
         onClick={() => onChange(!value)}
         color={'none'}
     >
@@ -192,7 +192,10 @@ const DocumentsGrid = (props: any) => {
                     rowAdditionalActions={actions}
                     onRowCountChange={onRowCountChange}
                     onRefresh={refresh}
-
+                    popupEditFormDialogButtons={[
+                        {icon: 'save', text: t('common.create'), componentProps: { variant: 'contained' }, value: true },
+                        {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false }, 
+                    ]}
                     groupingColDef={{
                         headerName: t('page.contingut.grid.nom'),
                         flex: 1.5,

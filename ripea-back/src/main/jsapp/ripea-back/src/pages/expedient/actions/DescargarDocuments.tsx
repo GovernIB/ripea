@@ -1,9 +1,5 @@
 import {useEffect, useRef, useState} from "react";
-import {
-    MuiFormDialogApi,
-    useBaseAppContext,
-    useFormContext,
-} from "reactlib";
+import {MuiFormDialogApi, useBaseAppContext, useFormContext,} from "reactlib";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import ContingutIcon from "../../contingut/details/ContingutIcon.tsx";
 import {FormReportDialog} from "../../../components/FormActionDialog.tsx";
@@ -17,11 +13,6 @@ import {useTreeView} from "../../contingut/DocumentsGrid.tsx";
 const sortModel:any = [{field: 'id', sort: 'desc'}]
 const perspectives = ["PATH"]
 const columns = [
-    // {
-    //     field: 'nom',
-    //     flex: 0.5,
-    //     renderCell: (params: any) => <ContingutIcon entity={params?.row}/>
-    // },
     {
         field: 'descripcio',
         flex: 0.5,
@@ -68,7 +59,7 @@ const DescargarDocumentsForm = () => {
             perspectives={perspectives}
             staticSortModel={sortModel}
             onRefresh={refresh}
-
+            toolbarHideRefresh
             groupingColDef={{
                 headerName: t('page.contingut.grid.nom'),
                 flex: 1.5,
@@ -81,7 +72,6 @@ const DescargarDocumentsForm = () => {
                         : params.formattedValue
                 },
             }}
-
             treeData={true}
             treeDataAdditionalRows={(_rows:any) => {
                 const additionalRows :any[] = [];
@@ -97,15 +87,12 @@ const DescargarDocumentsForm = () => {
             getTreeDataPath={(row: any): string[] => {
                 return row.treePath.filter((id: any) => id != apiRef?.current?.getId());
             }}
-
             isGroupExpandedByDefault={()=>true}
             isRowSelectable={(data: any) => data?.row?.tipus == "DOCUMENT"}
             readOnly
-
             onRowSelectionModelChange={(newSelection) => {
                 setSelectedRows([...newSelection]);
             }}
-
             selectionActive
             autoHeight
         />
@@ -120,12 +107,24 @@ const DescargarDocuments = (props:any) => {
         report={"EXPORT_SELECTED_DOCS"}
         reportFileType={'ZIP'}
         title={t('page.expedient.action.download.title')}
-        formDialogButtons={[{}]}
+        formDialogButtons={[
+            {icon: 'save', text: t('common.downloadSelected'), componentProps: { variant: 'contained' }, value: true },
+            {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
+        ]}
         formDialogComponentProps={{fullWidth: true, maxWidth: 'lg'}}
         {...props}
     >
         <DescargarDocumentsForm/>
     </FormReportDialog>
+}
+
+const handleClose = (action:any) => {
+    const apiRef = useRef<MuiFormDialogApi>();
+    if (action === 'close') {
+        apiRef.current?.close?.();
+    } else if (action === 'save') {
+
+    }
 }
 
 const useDescargarDocuments = () => {

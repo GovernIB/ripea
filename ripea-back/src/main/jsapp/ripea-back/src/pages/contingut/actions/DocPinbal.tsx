@@ -174,6 +174,10 @@ const DocPinbal = (props:any) => {
         resourceName={"documentResource"}
         action={"NEW_DOC_PINBAL"}
         title={t('page.document.action.pinbal.title')}
+        formDialogButtons={[
+            {icon: 'save', text: t('common.consult'), componentProps: { variant: 'contained' }, value: true },
+            {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
+        ]}
         {...props}
     >
         <DocPinbalForm/>

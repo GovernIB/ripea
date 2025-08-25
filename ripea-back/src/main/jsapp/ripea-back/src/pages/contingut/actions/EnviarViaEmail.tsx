@@ -20,6 +20,10 @@ const EnviarViaEmail = (props:any) => {
         resourceName={"documentResource"}
         action={"ENVIAR_VIA_EMAIL"}
         title={t('page.document.action.mail.title')}
+        formDialogButtons={[
+            {icon: 'send', text: t('common.send'), componentProps: { variant: 'contained' }, value: true },
+            {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
+        ]}
         {...props}
     >
         <EnviarViaEmailForm/>

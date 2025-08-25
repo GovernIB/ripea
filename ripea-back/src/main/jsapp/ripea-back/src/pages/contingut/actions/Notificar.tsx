@@ -142,7 +142,10 @@ const Notificar = (props:any) => {
         resourceName={"documentResource"}
         action={"NOTIFICAR"}
         title={t('page.document.action.notificar.title')}
-        // formDialogComponentProps={{fullWidth: true, maxWidth: 'md'}}
+        formDialogButtons={[
+            {icon: 'save', text: t('page.document.action.notificar.button'), componentProps: { variant: 'contained' }, value: true },
+            {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
+        ]}
         {...props}
         initialOnChange
     >

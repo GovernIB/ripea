@@ -11,6 +11,10 @@ export const ModifyExpedient = (props: { apiRef:any }) => {
         resourceName={"expedientResource"}
         title={t('page.expedient.action.update.title')}
         onClose={(reason?: string) => reason !== 'backdropClick'}
+        dialogButtons={[
+            {icon: 'save', text: t('common.update'), componentProps: { variant: 'contained' }, value: true },
+            {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
+        ]}
         apiRef={apiRef}
     >
         <ExpedientGridForm/>

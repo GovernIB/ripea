@@ -46,6 +46,10 @@ const EnviarViaFirma = (props:any) => {
         resourceName={"documentResource"}
         action={"VIA_FIRMA"}
         title={t('page.document.action.viaFirma.title')}
+        formDialogButtons={[
+            {icon: 'send', text: t('page.document.action.viaFirma.button'), componentProps: { variant: 'contained' }, value: true },
+            {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
+        ]}        
         initialOnChange
         {...props}
     >

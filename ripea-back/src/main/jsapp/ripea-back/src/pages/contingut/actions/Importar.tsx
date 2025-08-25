@@ -33,11 +33,14 @@ const ImportarForm = () => {
 
 const Importar = (props:any) => {
     const { t } = useTranslation();
-
     return <FormActionDialog
         resourceName={"expedientResource"}
         action={"IMPORT_DOCS"}
         title={t('page.document.action.import.title')}
+        formDialogButtons={[
+            {icon: 'save', text: t('common.import'), componentProps: { variant: 'contained' }, value: true },
+            {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
+        ]}
         {...props}
     >
         <ImportarForm/>

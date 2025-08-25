@@ -21,6 +21,10 @@ const FirmaNavegador = (props: any) => {
         resourceName={"documentResource"}
         title={t('page.document.action.firma.title')}
         action={"FIRMA_WEB_INI"}
+        formDialogButtons={[
+            {icon: 'play_arrow', text: t('page.document.action.firma.button'), componentProps: { variant: 'contained' }, value: true },
+            {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
+        ]}        
         initialOnChange
         {...props}
     >

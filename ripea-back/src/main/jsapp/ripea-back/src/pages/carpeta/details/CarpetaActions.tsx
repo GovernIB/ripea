@@ -15,7 +15,17 @@ const useActions = (refresh?:()=>void) => {
         delete: apiDelete,
     } = useResourceApiService('carpetaResource');
     const {messageDialogShow, temporalMessageShow} = useBaseAppContext();
-    const confirmDialogButtons = useConfirmDialogButtons();
+    const confirmDialogButtons = [{
+        value: true,
+        text: t('common.accepta'),
+        componentProps: { variant: 'contained' }
+    },
+    {
+        value: false,
+        text: t('common.cancel'),
+        componentProps: { variant: 'outlined' }
+    }];
+
     const confirmDialogComponentProps = {maxWidth: 'sm', fullWidth: true};
 
     const report = (id:any, code:string, msg:string, fileType:any) => {

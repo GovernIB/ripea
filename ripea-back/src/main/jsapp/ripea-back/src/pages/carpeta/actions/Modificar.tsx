@@ -13,11 +13,14 @@ const ModificarForm = () => {
 
 const Modificar = (props:any) => {
     const { t } = useTranslation();
-
     return <FormActionDialog
         resourceName={"carpetaResource"}
         action={"MODIFICAR_NOM"}
         title={t('page.carpeta.action.update.title')}
+        formDialogButtons={[
+            {icon: 'save', text: t('common.update'), componentProps: { variant: 'contained' }, value: true },
+            {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
+        ]}
         {...props}
     >
         <ModificarForm/>

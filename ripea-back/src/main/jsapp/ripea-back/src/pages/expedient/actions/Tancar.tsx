@@ -115,6 +115,10 @@ const Tancar = (props: any) => {
         resourceName={"expedientResource"}
         action={"TANCAR"}
         title={t('page.expedient.action.close.title')}
+        formDialogButtons={[
+            {icon: 'check', text: t('common.close'), componentProps: { variant: 'contained' }, value: true },
+            {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
+        ]}
         {...props}
     >
         <TancarForm/>

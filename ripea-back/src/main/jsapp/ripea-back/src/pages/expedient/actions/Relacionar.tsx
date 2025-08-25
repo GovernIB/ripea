@@ -148,6 +148,10 @@ const Relacionar = (props:any) => {
         resourceName={'expedientResource'}
         title={t('page.expedient.action.relacio.title')}
         onClose={(reason?: string) => reason !== 'backdropClick'}
+        dialogButtons={[
+            {icon: 'link', text: t('common.relateSelected'), componentProps: { variant: 'contained' }, value: true },
+            {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
+        ]}
         {...props}
     >
         <RelacionarForm/>

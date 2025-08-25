@@ -168,6 +168,10 @@ const EnviarPortafirmes = (props:any) => {
         resourceName={"documentResource"}
         action={"ENVIAR_PORTAFIRMES"}
         title={t('page.document.action.portafirmes.title')}
+        formDialogButtons={[
+            {icon: 'send', text: t('page.document.action.portafirmes.button'), componentProps: { variant: 'contained' }, value: true },
+            {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
+        ]}
         initialOnChange
         {...props}
     >

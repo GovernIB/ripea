@@ -18,6 +18,10 @@ const Rebutjar = (props:any) => {
         resourceName={"expedientPeticioResource"}
         action={"REBUTJAR_ANOTACIO"}
         title={t('page.anotacio.action.rebutjar.title')}
+        formDialogButtons={[
+            {icon: 'save', text: t('common.save'), componentProps: { variant: 'contained' }, value: true },
+            {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
+        ]}
         {...props}
     >
         <RebutjarForm/>

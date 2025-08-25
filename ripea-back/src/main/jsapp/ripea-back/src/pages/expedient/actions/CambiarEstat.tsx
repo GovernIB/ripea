@@ -23,6 +23,10 @@ export const CambiarEstat = (props: { apiRef:any }) => {
         title={t('page.expedient.action.changeEstat.title')}
         apiRef={apiRef}
         onClose={(reason?: string) => reason !== 'backdropClick'}
+        dialogButtons={[
+            {icon: 'save', text: t('common.save'), componentProps: { variant: 'contained' }, value: true },
+            {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
+        ]}
     >
         <CambiarEstatForm/>
     </MuiFormDialog>

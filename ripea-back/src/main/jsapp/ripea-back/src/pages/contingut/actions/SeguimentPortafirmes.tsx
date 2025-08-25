@@ -76,9 +76,10 @@ const useSeguimentPortafirmes = (potModificar:boolean, refresh?: () => void) => 
     const buttons = [
          {
             value: 'cancel',
-            text: 'Cancelar el envío',
-            icon: 'delete',
-            hidden: !(entity?.estat == 'ENVIAT' && potModificar)
+            text: t('page.document.action.seguiment.cancel'),
+            icon: 'cancel',
+            hidden: !(entity?.estat == 'ENVIAT' && potModificar),
+            componentProps: { variant: 'contained' }
         },
         {
             value: 'close',

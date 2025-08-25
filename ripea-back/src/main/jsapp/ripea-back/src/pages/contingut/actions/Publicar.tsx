@@ -23,6 +23,10 @@ const Publicar = (props:any) => {
         resourceName={"documentResource"}
         action={"PUBLICAR"}
         title={t('page.document.action.publicar.title')}
+        formDialogButtons={[
+            {icon: 'save', text: t('common.save'), componentProps: { variant: 'contained' }, value: true },
+            {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
+        ]}        
         {...props}
     >
         <PublicarForm/>
