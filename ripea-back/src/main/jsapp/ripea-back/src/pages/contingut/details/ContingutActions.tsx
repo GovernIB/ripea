@@ -28,6 +28,7 @@ export const useActions = (refresh?: () => void) => {
         artifactAction: apiAction,
         artifactReport: apiReport,
         fieldDownload: apiDownload,
+        delete: apiDelete
     } = useResourceApiService('documentResource');
     const {messageDialogShow, temporalMessageShow} = useBaseAppContext();
     const confirmDialogButtons = useConfirmDialogButtons();
@@ -102,6 +103,35 @@ export const useActions = (refresh?: () => void) => {
             });
     }
 
+    const eliminar= (id:any, row:any) :void => {
+        messageDialogShow(
+            t('page.document.action.delete.check'),
+            t('page.document.action.delete.description'),
+            [{
+                value: true,
+                text: t('common.accepta'),
+                componentProps: { variant: 'contained' }
+            },
+            {
+                value: false,
+                text: t('common.cancel'),
+                componentProps: { variant: 'outlined' }
+            }],
+            confirmDialogComponentProps)
+            .then((value: any) => {
+                if (value) {
+                    apiDelete(id)
+                        .then(() => {
+                            refresh?.();
+                            temporalMessageShow(null, t('page.document.action.delete.ok', {data: row}), 'success');
+                        })
+                        .catch((error) => {
+                            temporalMessageShow(null, error?.message, 'error');
+                        });
+                }
+            });
+    }
+
     const guardarArxiu = (id:any, row:any) => action(id, 'GUARDAR_ARXIU', t('page.contingut.action.guardarArxiu.ok', {contingut: row?.nom}))
 
     return {
@@ -110,6 +140,7 @@ export const useActions = (refresh?: () => void) => {
         descarregarVersio,
         definitiu,
         guardarArxiu,
+        eliminar,
     }
 }
 
@@ -122,7 +153,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
     const {handleShow: handleImportar, content: contentImportar} = useImportar(entity, refresh)
     const {handleOpen: handleImportarExpedient, dialog: dialogImportarExpedient} = useImportarExpedient(entity, refresh)
 
-    const {apiDownload, getLinkCSV, definitiu, guardarArxiu} = useActions(refresh)
+    const {eliminar, apiDownload, getLinkCSV, definitiu, guardarArxiu} = useActions(refresh)
     const {handleOpen: handleDetallOpen, dialog: dialogDetall} = useDocumentDetail(entity);
     const {handleOpen: handleHistoricOpen, dialog: dialogHistoric} = useHistoric();
     const {handleOpen: handleVisualitzarOpen, dialog: dialogVisualitzar} = useVisualitzar();
@@ -231,6 +262,13 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             onClick: handleVincularShow,
             hidden: !entity?.potModificar || !user?.sessionScope?.isMostrarVincular,
         },
+        {
+            label: t('page.document.action.delete.label'),
+            icon: "delete",
+            showInMenu: true,
+            onClick: eliminar,
+            hidden: (row:any) => !entity?.potModificar || !isDocument(row) || row?.estat == 'DEFINITIU',
+        },        
         {
             label: <Divider sx={{width: '100%'}} color={"none"}/>,
             showInMenu: true,
@@ -403,7 +441,6 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             ...carpetaActions,
             ...expedientActions,
         ],
-        hiddenDelete: (row:any) => !entity?.potModificar || !isDocument(row) || row?.estat == 'DEFINITIU',
         components
     }
 }

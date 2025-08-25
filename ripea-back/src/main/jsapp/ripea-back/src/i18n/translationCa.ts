@@ -645,6 +645,9 @@ const translationCa = {
                     ok: "El document {{data.nom}} s'ha modificat correctament"
                 },
                 delete: {
+                    label: "Esborrar...",
+                    check: "Està segur que vol continuar amb aquesta acció?",
+                    description: "Un cop esborrat no es podrà recuperar",
                     ok: "El document {{data.nom}} s'ha eliminat correctament"
                 },
                 pinbal: {

@@ -3,7 +3,7 @@ import { useUserSession } from "../../../components/Session.tsx";
 import {Divider} from "@mui/material";
 import useHistoric from "../../Historic.tsx";
 import useModificar from "../actions/Modificar.tsx";
-import {useBaseAppContext, useConfirmDialogButtons, useResourceApiService} from "reactlib";
+import {useBaseAppContext, useResourceApiService} from "reactlib";
 import {iniciaDescargaBlob} from "../../expedient/details/CommonActions.tsx";
 import {useCopiar, useMoure} from "../actions/Moure.tsx";
 

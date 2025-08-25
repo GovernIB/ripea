@@ -631,13 +631,16 @@ const translationEs = {
             },
             action: {
                 new: {
-                    ok: "El docmuento {{data.nom}} se ha creado correctamente"
+                    ok: "El documento {{data.nom}} se ha creado correctamente"
                 },
                 update: {
-                    ok: "El docmuento {{data.nom}} se ha modificado correctamente"
+                    ok: "El documento {{data.nom}} se ha modificado correctamente"
                 },
                 delete: {
-                    ok: "El docmuento {{data.nom}} se ha eliminado correctamente"
+                    label: "Borrar...",
+                    check: "¿Está seguro de que quiere seguir con esta acción?",
+                    description: "Una vez borrado no se podrá recuperar.",
+                    ok: "El documento {{data.nom}} se ha eliminado correctamente"
                 },
                 pinbal: {
                     label: "Consulta PINBAL...",

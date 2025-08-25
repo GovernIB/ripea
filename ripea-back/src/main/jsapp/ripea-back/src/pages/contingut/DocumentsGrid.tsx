@@ -300,8 +300,6 @@ const DocumentsGrid = (props: any) => {
                     toolbarMassiveActions={massiveActions}
                     isRowSelectable={(data: any) => data?.row?.tipus == "DOCUMENT"}
                     toolbarHideCreate
-                    rowHideDeleteButton={hiddenDelete}
-
                     popupEditFormComponentProps={{ initOnChangeRequest: true }}
                     popupEditFormI18nKeys={{
                         createSuccess: 'page.document.action.new.ok',
