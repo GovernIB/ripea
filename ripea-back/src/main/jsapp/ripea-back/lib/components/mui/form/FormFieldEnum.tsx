@@ -129,7 +129,7 @@ export const FormFieldEnum: React.FC<FormFieldEnumProps> = (props) => {
                 multiple,
                 textFieldOpen,
                 readOnly,
-                displayEmpty: !required && !multiple,
+                //displayEmpty: !required && !multiple,
                 onClose: () => setTextFieldOpen(false),
                 onOpen: () => setTextFieldOpen(true),
                 renderValue: (value: any) => {
@@ -141,7 +141,7 @@ export const FormFieldEnum: React.FC<FormFieldEnumProps> = (props) => {
                 },
             }
         }}>
-        {!required && !multiple && enumOptions?.find(o => o.value == null) == null && <MenuItem key='' value=''>aaa&nbsp;</MenuItem>}
+        {!required && !multiple && enumOptions?.find(o => o.value == null) == null && <MenuItem key='' value=''>&nbsp;</MenuItem>}
         {enumOptions.map(o => {
             return <MenuItem key={o.value ?? ''} value={o.value ?? ''}>
                 {multiple && <Checkbox checked={!!(value?.includes?.(o.value))} />}

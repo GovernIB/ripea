@@ -58,59 +58,69 @@ const GridFooterPagination: React.FC<DataGridFooterPaginationProps> = (props) =>
     const { paginationModel, pageInfo, pageSizeOptions } = props;
     const { t } = useBaseAppContext();
     const apiRef = useGridApiContext();
-    const page = useGridSelector(apiRef, gridPageSelector);
-    const pageSize = useGridSelector(apiRef, gridPageSizeSelector);
-    const pageCount =
-        pageInfo?.totalElements && pageSize
-            ? Math.ceil(pageInfo.totalElements / pageSize)
-            : undefined;
-    const pageRowCount =
-        pageInfo?.totalElements <= pageSize
-            ? pageInfo?.totalElements
-            : page === (pageCount ?? 0) - 1
-              ? pageInfo?.totalElements % pageSize || pageSize
-              : pageSize;
-    const firstElementIndex = page * pageSize + 1;
-    const lastElement = Math.min(firstElementIndex + pageRowCount - 1, pageInfo?.totalElements);
-    const boxStyle = { display: 'flex', justifContent: 'flex-end', alignItems: 'center' };
-    const currentPageSize = paginationModel?.pageSize;
-    return (
-        <Box style={boxStyle}>
-            {pageSizeOptions && (
-                <Box sx={{ mr: 4 }}>
-                    <FormControl size="small">
-                        <Select
-                            value={currentPageSize}
-                            onChange={(event) =>
-                                apiRef.current.setPaginationModel({
-                                    page,
-                                    pageSize: event.target.value as number,
-                                })
-                            }>
-                            {pageSizeOptions.map((o: number) => (
-                                <MenuItem value={o}>{o}</MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
+    if (pageInfo?.totalElements) {
+        const page = useGridSelector(apiRef, gridPageSelector);
+        const pageSize = useGridSelector(apiRef, gridPageSizeSelector);
+        const pageCount =
+            pageInfo?.totalElements && pageSize
+                ? Math.ceil(pageInfo.totalElements / pageSize)
+                : undefined;
+        const pageRowCount =
+            pageInfo?.totalElements <= pageSize
+                ? pageInfo?.totalElements
+                : page === (pageCount ?? 0) - 1
+                  ? pageInfo?.totalElements % pageSize || pageSize
+                  : pageSize;
+        const firstElementIndex = page * pageSize + 1;
+        const lastElement = Math.min(firstElementIndex + pageRowCount - 1, pageInfo?.totalElements);
+        const boxStyle = { display: 'flex', justifContent: 'flex-end', alignItems: 'center' };
+        const currentPageSize = paginationModel?.pageSize;
+        return (
+            <Box style={boxStyle}>
+                {pageSizeOptions && (
+                    <Box sx={{ mr: 4 }}>
+                        <FormControl size="small">
+                            <Select
+                                value={currentPageSize}
+                                onChange={(event) =>
+                                    apiRef.current.setPaginationModel({
+                                        page,
+                                        pageSize: event.target.value as number,
+                                    })
+                                }>
+                                {pageSizeOptions.map((o: number) => (
+                                    <MenuItem value={o}>{o}</MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                    </Box>
+                )}
+                <Box>
+                    {pageInfo != null
+                        ? t('grid.pageInfo', {
+                              from: firstElementIndex,
+                              to: lastElement,
+                              count: pageInfo.totalElements,
+                          })
+                        : ''}
                 </Box>
-            )}
-            <Box>
-                {pageInfo != null
-                    ? t('grid.pageInfo', {
-                          from: firstElementIndex,
-                          to: lastElement,
-                          count: pageInfo.totalElements,
-                      })
-                    : ''}
+                <Pagination
+                    color="primary"
+                    count={pageSize ? pageCount : 0}
+                    page={page + 1}
+                    onChange={(_event, value) => apiRef.current.setPage(value - 1)}
+                />
             </Box>
+        );
+    } else {
+        return (
             <Pagination
                 color="primary"
-                count={pageSize ? pageCount : 0}
-                page={page + 1}
+                count={0}
                 onChange={(_event, value) => apiRef.current.setPage(value - 1)}
             />
-        </Box>
-    );
+        );
+    }
 };
 
 const DataGridFooter: React.FC<DataGridFooterProps> = (props) => {

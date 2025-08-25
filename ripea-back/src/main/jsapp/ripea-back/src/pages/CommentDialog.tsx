@@ -100,7 +100,7 @@ const Comments = (props: any) => {
 }
 
 export const CommentDialog = (props: any) => {
-    const { entity, title, resourceName, resourceReference } = props;
+    const { entity, title, resourceName, resourceReference, onClose } = props;
     const [dialogShow, dialogComponent] = useMuiContentDialog();
     const { t } = useBaseAppContext();
     const closeButtons = [{
@@ -120,7 +120,9 @@ export const CommentDialog = (props: any) => {
             </>,
             closeButtons,
             { maxWidth: 'md', fullWidth: true }).
-            catch(() => {});
+            catch(() => {
+                onClose?.();
+            });
     }
     return <>
         <IconButton aria-label="forum" color="inherit" onClick={handleOpen}>
