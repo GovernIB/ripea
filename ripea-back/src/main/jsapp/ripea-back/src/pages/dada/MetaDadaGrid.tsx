@@ -5,6 +5,7 @@ import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
 import {useEffect, useState} from "react";
 import {MultiplicitatStyled} from "../contingut/details/MetaExpedient.tsx";
 import {Typography} from "@mui/material";
+import {useTranslation} from "react-i18next";
 
 const dadesFilter = (metaDada:any, dades:any[]) :any[] => {
     return dades?.filter((dada)=>dada?.metaDada?.id == metaDada?.id)
@@ -28,7 +29,7 @@ export const StyledDadaValor = (props: any) => {
 const MetaDadaGrid = (props: { entity:any, onRowCountChange?: ((value:number) => void) }) => {
     const apiRef = useMuiDataGridApiRef()
     const { entity, onRowCountChange } = props
-
+    const { t } = useTranslation();
     const {
         isReady,
         find: apiFindAll
@@ -100,6 +101,10 @@ const MetaDadaGrid = (props: { entity:any, onRowCountChange?: ((value:number) =>
                     builder.eq('metaNode.id', entity?.metaNode?.id)
                 )
             }
+            popupEditFormDialogButtons={[
+                {icon: 'save', text: t('common.save'), componentProps: { variant: 'contained' }, value: true },
+                {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false }, 
+            ]}
             staticSortModel={sortModel}
             apiRef={apiRef}
             rowAdditionalActions={actions}

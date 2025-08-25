@@ -163,7 +163,6 @@ const EnviarPortafirmesForm = () => {
 
 const EnviarPortafirmes = (props:any) => {
     const { t } = useTranslation();
-
     return <FormActionDialog
         resourceName={"documentResource"}
         action={"ENVIAR_PORTAFIRMES"}

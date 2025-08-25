@@ -781,6 +781,7 @@ const translationEs = {
         },
         dada: {
             title: "valor para el dato '{{metaDada}}'",
+            noRowsText: "No hay valores para este dato",
             grid: {
                 valor: "Valor del dato",
             },

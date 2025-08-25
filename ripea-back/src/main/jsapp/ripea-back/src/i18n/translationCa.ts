@@ -790,6 +790,7 @@ const translationCa = {
         },
         dada: {
             title: "valor per a la dada '{{metaDada}}'",
+            noRowsText: "No hi ha valors per a aquesta dada",
             grid: {
                 valor: "Valor de la dada",
             },

@@ -9,23 +9,8 @@ import {useCopiar, useMoure} from "../actions/Moure.tsx";
 
 const useActions = (refresh?:()=>void) => {
     const { t } = useTranslation();
-
-    const {
-        artifactReport: apiReport,
-        delete: apiDelete,
-    } = useResourceApiService('carpetaResource');
-    const {messageDialogShow, temporalMessageShow} = useBaseAppContext();
-    const confirmDialogButtons = [{
-        value: true,
-        text: t('common.accepta'),
-        componentProps: { variant: 'contained' }
-    },
-    {
-        value: false,
-        text: t('common.cancel'),
-        componentProps: { variant: 'outlined' }
-    }];
-
+    const { artifactReport: apiReport, delete: apiDelete } = useResourceApiService('carpetaResource');
+    const { messageDialogShow, temporalMessageShow } = useBaseAppContext();
     const confirmDialogComponentProps = {maxWidth: 'sm', fullWidth: true};
 
     const report = (id:any, code:string, msg:string, fileType:any) => {
@@ -43,7 +28,16 @@ const useActions = (refresh?:()=>void) => {
         messageDialogShow(
             t('page.carpeta.action.delete.check'),
             t('page.carpeta.action.delete.description'),
-            confirmDialogButtons,
+            [{
+                value: true,
+                text: t('common.accepta'),
+                componentProps: { variant: 'contained' }
+            },
+            {
+                value: false,
+                text: t('common.cancel'),
+                componentProps: { variant: 'outlined' }
+            }],
             confirmDialogComponentProps)
             .then((value: any) => {
                 if (value) {
