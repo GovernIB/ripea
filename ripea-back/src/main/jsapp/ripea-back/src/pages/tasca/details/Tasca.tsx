@@ -3,8 +3,7 @@ import {useTranslation} from "react-i18next";
 import {useNavigate, useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
 import Load from "../../../components/Load.tsx";
-import { CardData } from "../../../components/CardData.tsx";
-import {Button, Grid, Icon, Typography} from "@mui/material";
+import {Button, Grid2 as Grid, Icon, Typography, Box, Card, CardHeader, CardContent} from "@mui/material";
 import {icons} from "../../user/UserHeadToolbar.tsx";
 import {ExpedientInfo} from "../../expedient/details/Expedient.tsx";
 import DocumentsGrid from "../../contingut/DocumentsGrid.tsx";
@@ -43,70 +42,84 @@ const Tasca = () => {
         }
     },[apiTascaIsReady])
 
-    return <GridPage disableMargins>
+    const headerMain = <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center'}}>
+            <Icon sx={{ fontSize: '2rem' }}>{icons.tasca}</Icon>
+            <Typography variant="h4" sx={{ display: 'flex' }}>{tasca?.metaExpedientTasca?.description}</Typography>
+        </Box>
+        <Box>
+            <Typography sx={{ paddingTop: '5px'}} variant="subtitle1" color={'grey'}>{tasca?.metaExpedientTascaDescription}</Typography>
+        </Box>
+        <Box sx={{ paddingTop: '5px'}}>
+            <Button
+                variant="outlined"
+                color={"inherit"}
+                sx={{ borderRadius: '4px', backgroundColor: 'white', padding: '0px 10px'}}
+                onClick={()=>navigate(-1)}
+            >
+                <Icon>arrow_back</Icon>
+                {t('page.expedient.action.retornar.label')}
+            </Button>
+            {tasca?.estat == 'PENDENT' &&
+                <Button
+                    variant="outlined"
+                    color={"inherit"}
+                    sx={{ borderRadius: '4px', backgroundColor: 'white', padding: '0px 10px'}}
+                    onClick={()=> {
+                        changeEstat(tasca?.id, 'INICIADA', t('page.tasca.action.iniciar.ok'))
+                        navigate(-1)
+                    }}
+                >
+                    <Icon>check</Icon>
+                    {t('page.tasca.action.iniciar.label')}
+                </Button>
+            }
+            {tasca?.estat == 'INICIADA' &&
+                <Button
+                    variant="outlined"
+                    color={"inherit"}
+                    sx={{ borderRadius: '4px', backgroundColor: 'white', padding: '0px 10px'}}
+                    onClick={()=> {
+                        changeEstat(tasca?.id, 'FINALITZADA', t('page.tasca.action.finalitzar.ok'))
+                        navigate(-1)
+                    }}
+                >
+                    <Icon>arrow_right</Icon>
+                    {t('page.tasca.action.finalitzar.label')}
+                </Button>
+            }
+            <CommentDialog
+                entity={tasca}
+                iconStyle={{ fontSize: '1.2em'}}
+                sx={{ padding: '0px 10px' }}
+                title={`${t('page.comment.tasca')}: ${tasca?.metaExpedientTascaDescription}`}
+                resourceName={'expedientTascaComentariResource'}
+                resourceReference={'expedientTasca'}
+                componentProps={{variant: "outlined", sx: { borderRadius: '4px' }}}
+                readOnly={tasca?.usuariActualOnlyObservador}
+            />
+        </Box>
+    </Box>;
+
+    return <GridPage disableMargins style={{ backgroundColor: 'white' }}>
         <Load value={expedient && tasca} noEffect>
-            <CardData header={
-                <Grid container direction={'row'} columnSpacing={1} sx={{justifyContent: "space-between", alignItems: "center"}}>
-                    <Grid item xs={5}>
-                        <Typography variant="h5"><Icon sx={{ fontSize: "2rem", paddingTop: "5px" }}>{icons.tasca}</Icon>{tasca?.metaExpedientTasca?.description}</Typography>
+            <Card>
+                <CardHeader title={headerMain} sx={{
+                    backgroundColor: '#f5f5f5',
+                    borderTop: '1px solid #e3e3e3',
+                    borderBottom: '1px solid #e3e3e3',
+                }} />
+                <CardContent>
+                    <Grid container spacing={2}>
+                        <Grid size={3}>
+                            <ExpedientInfo title={tasca?.expedient?.description} entity={expedient} xs={3} readOnly/>
+                        </Grid>
+                        <Grid size={9}>
+                            <DocumentsGrid entity={expedient}/>
+                        </Grid>
                     </Grid>
-                    <Grid item xs={5}>
-                        <Typography variant="subtitle1" color={'grey'}>{tasca?.metaExpedientTascaDescription}</Typography>
-                    </Grid>
-                    <Grid item xs={2} display={'flex'} justifyContent={'end'}>
-                        <Button
-                            variant="outlined"
-                            color={"inherit"}
-                            sx={{ borderRadius: '4px', backgroundColor: 'white'}}
-                            onClick={()=>navigate(-1)}
-                        >
-                            <Icon>arrow_left_alt</Icon>
-                            {t('page.expedient.action.retornar.label')}
-                        </Button>
-                        {tasca?.estat == 'PENDENT' &&
-                            <Button
-                                variant="outlined"
-                                color={"inherit"}
-                                sx={{ borderRadius: '4px', backgroundColor: 'white'}}
-                                onClick={()=> {
-                                    changeEstat(tasca?.id, 'INICIADA', t('page.tasca.action.iniciar.ok'))
-                                    navigate(-1)
-                                }}
-                            >
-                                <Icon>check</Icon>
-                                {t('page.tasca.action.iniciar.label')}
-                            </Button>
-                        }
-                        {tasca?.estat == 'INICIADA' &&
-                            <Button
-                                variant="outlined"
-                                color={"inherit"}
-                                sx={{ borderRadius: '4px', backgroundColor: 'white'}}
-                                onClick={()=> {
-                                    changeEstat(tasca?.id, 'FINALITZADA', t('page.tasca.action.finalitzar.ok'))
-                                    navigate(-1)
-                                }}
-                            >
-                                <Icon>arrow_right</Icon>
-                                {t('page.tasca.action.finalitzar.label')}
-                            </Button>
-                        }
-                        <CommentDialog
-                            entity={tasca}
-                            title={`${t('page.comment.tasca')}: ${tasca?.metaExpedientTascaDescription}`}
-                            resourceName={'expedientTascaComentariResource'}
-                            resourceReference={'expedientTasca'}
-                            componentProps={{variant: "outlined", sx: { borderRadius: '4px' }}}
-                            readOnly={tasca?.usuariActualOnlyObservador}
-                        />
-                    </Grid>
-                </Grid>
-            }>
-                <ExpedientInfo title={tasca?.expedient?.description} entity={expedient} xs={3} readOnly/>
-                <Grid item xs={9}>
-                    <DocumentsGrid entity={expedient}/>
-                </Grid>
-            </CardData>
+                </CardContent>
+            </Card>
         </Load>
     </GridPage>
 }

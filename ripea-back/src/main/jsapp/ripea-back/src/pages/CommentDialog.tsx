@@ -100,7 +100,7 @@ const Comments = (props: any) => {
 }
 
 export const CommentDialog = (props: any) => {
-    const { entity, title, resourceName, resourceReference, onClose } = props;
+    const { entity, title, resourceName, resourceReference, onClose, iconStyle } = props;
     const [dialogShow, dialogComponent] = useMuiContentDialog();
     const { t } = useBaseAppContext();
     const closeButtons = [{
@@ -127,7 +127,7 @@ export const CommentDialog = (props: any) => {
     return <>
         <IconButton aria-label="forum" color="inherit" onClick={handleOpen}>
             <Badge badgeContent={entity?.numComentaris} color="primary" showZero>
-                <Icon>forum</Icon>
+                <Icon sx={iconStyle}>forum</Icon>
             </Badge>
         </IconButton>
         {dialogComponent}
