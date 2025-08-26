@@ -198,6 +198,7 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
             filter={filter}
 
             key={user?.conf?.numElementsPagina}
+            paginationActive
 
             {...others}
             apiRef={apiRef}
@@ -218,7 +219,6 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
             disableColumnMenu
             disableColumnSorting={!!staticSortModel}
             staticSortModel={staticSortModel}
-            paginationActive
 
             selectionActive={selectionActive || !!toolbarMassiveActions}
             checkboxSelection={selectionActive || !!toolbarMassiveActions}

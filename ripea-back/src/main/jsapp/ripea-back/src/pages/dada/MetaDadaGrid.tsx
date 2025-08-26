@@ -92,7 +92,7 @@ const MetaDadaGrid = (props: { entity:any, onRowCountChange?: ((value:number) =>
 
     const {actions, components, handleOpen} = useDadaActions(entity,refresh);
 
-    return <GridPage>
+    return <>
         <StyledMuiGrid
             resourceName="metaDadaResource"
             columns={columns}
@@ -114,6 +114,6 @@ const MetaDadaGrid = (props: { entity:any, onRowCountChange?: ((value:number) =>
             onRowClick={(params) => handleOpen(null, params.row)}
         />
         {components}
-    </GridPage>
+    </>
 }
 export default MetaDadaGrid;

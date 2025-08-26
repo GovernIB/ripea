@@ -2,7 +2,11 @@ import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 import {GridPage, useResourceApiService} from 'reactlib';
 import {useState, useEffect} from "react";
-import {Typography, Grid, Icon, IconButton, Link, Alert, Button} from '@mui/material';
+import {Typography, Grid2 as Grid, Icon, IconButton, Link, Alert, Button} from '@mui/material';
+import Box from '@mui/material/Box';
+import Card from '@mui/material/Card';
+import CardHeader from '@mui/material/CardHeader';
+import CardContent from '@mui/material/CardContent';
 import {formatDate} from '../../../util/dateUtils.ts';
 import TabComponent from "../../../components/TabComponent.tsx";
 import InteressatsGrid from "../../interessats/InteressatsGrid.tsx";
@@ -56,34 +60,35 @@ const ExpedientsRelacionats = (props:any) => {
         ...expedient?.relacionatsAmb ?? []
     ])];
 
-    return <CardData title={t('page.contingut.action.importarExpedient.title')} display={'flex'} flexDirection={'column'} hidden={relacionats?.length==0}>
-        {
-            relacionats?.map((relacionat:any) =>
-                <Grid key={relacionat?.id} container alignItems="center">
-                    <Grid item xs={1}>
-                        <Icon sx={{ fontSize: "1.3rem", paddingTop: "4px" }}>drive_file_move</Icon>
+    return <Box sx={{ my: 2 }}>
+        <CardData title={t('page.contingut.action.importarExpedient.title')} display={'flex'} flexDirection={'column'} hidden={relacionats?.length==0}>
+            {
+                relacionats?.map((relacionat:any) =>
+                    <Grid key={relacionat?.id} container alignItems="center">
+                        <Grid size={1}>
+                            <Icon sx={{ fontSize: "1.3rem", paddingTop: "4px" }}>drive_file_move</Icon>
+                        </Grid>
+                        <Grid size={10}>
+                            <Link sx={{ fontSize: "0.9rem" }} href={`./${relacionat?.id}`}>{relacionat?.description}</Link>
+                        </Grid>
+                        <Grid size={1}>
+                            <IconButton 
+                                onClick={()=>eliminarRelacio(expedient?.id, expedient, relacionat?.id)}
+                                title={t('page.expedient.action.eliminarRelacio.label')}
+                                sx={{ color: 'black'}}>
+                                    <Icon sx={{ fontSize: "1.3rem" }}>link_off</Icon>
+                            </IconButton>
+                        </Grid>
                     </Grid>
-                    <Grid item xs={10}>
-                        <Link sx={{ fontSize: "0.9rem" }} href={`./${relacionat?.id}`}>{relacionat?.description}</Link>
-                    </Grid>
-                    <Grid item xs={1}>
-                        <IconButton 
-                            onClick={()=>eliminarRelacio(expedient?.id, expedient, relacionat?.id)}
-                            title={t('page.expedient.action.eliminarRelacio.label')}
-                            sx={{ color: 'black'}}>
-                                <Icon sx={{ fontSize: "1.3rem" }}>link_off</Icon>
-                        </IconButton>
-                    </Grid>
-                </Grid>
-            )
-        }
-    </CardData>
+                )
+            }
+        </CardData>
+    </Box>
 }
 
 export const ExpedientInfo = (props:any) => {
     const {title, entity: expedient, xs, readOnly} = props;
     const { t } = useTranslation();
-
     return <CardData title={title ?? t('page.expedient.detall.title')} direction={'column'} xs={xs}>
         <Contenido title={t('page.contingut.detalle.numero')}>{expedient?.numero}</Contenido>
         <Contenido title={t('page.contingut.detalle.titol')}>{expedient?.nom}</Contenido>
@@ -97,7 +102,7 @@ export const ExpedientInfo = (props:any) => {
         <ExpedientsRelacionats entity={expedient}/>
 
         {!readOnly &&
-            <Grid item xs={12} display={'flex'} justifyContent={'end'}>
+            <Grid size={12} display={'flex'} justifyContent={'end'}>
                 <ExpedientActionButton entity={expedient}/>
             </Grid>
         }
@@ -247,48 +252,58 @@ const Expedient = () => {
         },
     ]
 
-    return <GridPage disableMargins>
+    const headerMain = <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center'}}>
+            <Icon sx={{ fontSize: '2rem' }}>{icons.expedient}</Icon>
+            <Typography variant="h4" sx={{ display: 'flex' }}>{expedient?.nom}</Typography>
+        </Box>
+        <Box>
+            <Typography variant={"subtitle1"} bgcolor={"white"} sx={{border}} px={1} hidden={!expedient?.agafatPer}>
+                {t('page.expedient.title')} {t('page.expedient.detall.agafatPer')}: {expedient?.agafatPer?.description}
+                {expedient?.agafatPer?.id == user?.codi &&
+                    <IconButton aria-label="lock_open" color={"inherit"} onClick={() => alliberar(id, expedient)} title={t('page.expedient.action.lliberar.label')}>
+                        <Icon>lock_open</Icon>
+                    </IconButton>
+                }
+            </Typography>
+        </Box>
+    </Box>;
+    return <GridPage disableMargins style={{ backgroundColor: 'white' }}>
         <SseExpedient id={id}/>
         <Load value={expedient} noEffect>
-            <CardData header={
-                <Grid container direction={'row'} columnSpacing={1} sx={{justifyContent: "space-between", alignItems: "center"}}>
-                    <Grid item xs={8}><Typography variant="h5" display={"flex"} flexDirection={"row"} alignItems={"center"}>
-                        <Icon sx={{ fontSize: "2rem" }}>{icons.expedient}</Icon>{expedient?.nom}</Typography>
+            <Card>
+                <CardHeader title={headerMain} sx={{
+                    backgroundColor: '#f5f5f5',
+                    borderTop: '1px solid #e3e3e3',
+                    borderBottom: '1px solid #e3e3e3',
+                }} />
+                <CardContent>
+                    <Grid container spacing={2}>
+                        <Grid size={3}>
+                            <ExpedientInfo entity={expedient} />
+                        </Grid>
+                        <Grid size={9}>
+                            <ExpedientAlert entity={expedient} />
+                            <Box>
+                                <TabComponent
+                                    indicatorColor={"primary"}
+                                    textColor={"primary"}
+                                    aria-label="scrollable force tabs"
+                                    tabs={tabs}
+                                    variant="scrollable"
+                                    headerAdditionalData={<CommentDialog
+                                        entity={expedient}
+                                        title={`${t('page.comment.expedient')}: ${expedient?.nom}`}
+                                        resourceName={'expedientComentariResource'}
+                                        resourceReference={'expedient'} />}
+                                />
+                            </Box>
+                        </Grid>
                     </Grid>
-                    <Grid item xs={4} display={'flex'} justifyContent={'end'}>
-                        <Typography variant={"subtitle1"} bgcolor={"white"} sx={{border}} px={1} hidden={!expedient?.agafatPer}>
-                            {t('page.expedient.title')} {t('page.expedient.detall.agafatPer')}: {expedient?.agafatPer?.description}
-    
-                            {expedient?.agafatPer?.id == user?.codi &&
-                                <IconButton aria-label="lock_open" color={"inherit"} onClick={()=>alliberar(id, expedient)} title={t('page.expedient.action.lliberar.label')}>
-                                    <Icon>lock_open</Icon>
-                                </IconButton>
-                            }
-                        </Typography>
-                    </Grid>
-                </Grid>
-            }>
-                <ExpedientInfo entity={expedient} xs={3}/>
-    
-                <Grid item xs={9}>
-                    <ExpedientAlert entity={expedient}></ExpedientAlert>
-                    <TabComponent
-                        indicatorColor={"primary"}
-                        textColor={"primary"}
-                        aria-label="scrollable force tabs"
-                        tabs={tabs}
-                        variant="scrollable"
-                        headerAdditionalData={<CommentDialog
-                            entity={expedient}
-                            title={`${t('page.comment.expedient')}: ${expedient?.nom}`}
-                            resourceName={'expedientComentariResource'}
-                            resourceReference={'expedient'}
-                        />}
-                    />
-                </Grid>
-            </CardData>
+                </CardContent>
+            </Card>
         </Load>
-    </GridPage>
+    </GridPage>;
 }
 
 export default Expedient;
