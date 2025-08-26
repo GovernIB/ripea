@@ -114,7 +114,7 @@ const RemesaGrid = (props:any) => {
 
     const {actions, components} = useRemesaActions(refresh);
 
-    return <GridPage>
+    return <>
         <StyledMuiGrid
             resourceName="documentNotificacioResource"
             popupEditFormDialogResourceTitle={t('page.notificacio.title')}
@@ -136,6 +136,6 @@ const RemesaGrid = (props:any) => {
             }}
         />
         {components}
-    </GridPage>
+    </>
 }
 export default RemesaGrid;

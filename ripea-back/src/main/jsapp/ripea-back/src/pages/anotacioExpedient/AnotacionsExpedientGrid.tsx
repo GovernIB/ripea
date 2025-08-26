@@ -45,7 +45,7 @@ const AnotacionsExpedientGrid = (props:any) => {
 
     const {actions, components} = useAnotacioActions();
 
-    return <GridPage>
+    return <>
         <StyledMuiGrid
             resourceName="expedientPeticioResource"
             filter={builder.eq('expedient.id', id)}
@@ -58,7 +58,7 @@ const AnotacionsExpedientGrid = (props:any) => {
             readOnly
         />
         {components}
-    </GridPage>
+    </>
 }
 
 export default AnotacionsExpedientGrid;

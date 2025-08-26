@@ -104,7 +104,7 @@ const TasquesExpedientGrid = (props: any) => {
 
     const { actions, components } = useTascaActions(entity, apiRef?.current?.refresh);
 
-    return <GridPage disableMargins>
+    return <>
         <StyledMuiGrid
             apiRef={apiRef}
             resourceName="expedientTascaResource"
@@ -130,7 +130,7 @@ const TasquesExpedientGrid = (props: any) => {
             }}
         />
         {components}
-    </GridPage>
+    </>
 }
 
 export default TasquesExpedientGrid;

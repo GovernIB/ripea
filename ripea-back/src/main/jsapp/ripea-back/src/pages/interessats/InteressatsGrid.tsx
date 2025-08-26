@@ -153,7 +153,7 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
     const {excelInteressats} = useExpedientActions(refresh);
     const {handleShow: handleImport, content: contentImport} = useImport(entity, refresh);
 
-    return <GridPage>
+    return <>
         <StyledMuiGrid
             resourceName="interessatResource"
             popupEditFormDialogResourceTitle={t('page.interessat.title')}
@@ -219,7 +219,7 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
 
         {contentImport}
         {components}
-    </GridPage>
+    </>
 }
 
 export default InteressatsGrid;

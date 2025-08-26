@@ -73,7 +73,7 @@ const PublicacioGrid = (props:any) => {
 
     const {actions, components} = usePublicacioActions();
 
-    return <GridPage>
+    return <>
         <StyledMuiGrid
             resourceName="documentPublicacioResource"
             popupEditFormDialogResourceTitle={t('page.publicacio.title')}
@@ -95,6 +95,6 @@ const PublicacioGrid = (props:any) => {
             }}
         />
         {components}
-    </GridPage>
+    </>
 }
 export default PublicacioGrid;
