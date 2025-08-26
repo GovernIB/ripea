@@ -10,10 +10,8 @@ const ExpedientFilterForm = () => {
     const {data} = useFormContext()
     const { value: user } = useUserSession();
     const xsValue = user?.rolActual != "tothom" ? 7.6 : 6.6;
-    const filterMetaExpedient = builder.and(
+    const filterMetaExpedient = data?.organGestor && builder.and(
         builder.eq('organGestor.id', data?.organGestor?.id),
-        builder.eq('actiu', true),
-        builder.eq('revisioEstat', "'REVISAT'"),
     );
 
     if (!data?.advanced) {

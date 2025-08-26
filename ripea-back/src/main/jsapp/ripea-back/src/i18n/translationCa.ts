@@ -672,6 +672,7 @@ const translationCa = {
                     ok: "El document original s'ha descarregat correctament",
                 },
                 firma: {
+                    button: "Iniciar procés de firma",
                     label: "Descarregar signatura",
                     title: "Signar des del navegador",
                     ok: "Document signat correctament",

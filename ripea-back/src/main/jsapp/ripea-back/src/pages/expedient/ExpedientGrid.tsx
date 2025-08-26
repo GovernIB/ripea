@@ -17,6 +17,7 @@ import {useUserSession} from "../../components/Session.tsx";
 import {GridSortDirection} from "@mui/x-data-grid-pro";
 import useAlerta from "./details/Alerta.tsx";
 import useErrorValidacio from "./details/ErrorValidacio.tsx";
+import * as builder from '../../util/springFilterUtils';
 
 const labelStyle = {padding: '1px 4px', fontSize: '11px', fontWeight: '500', borderRadius: '2px', display: 'flex', alignItems: 'center', width: 'max-content'}
 const obertStyle = {border: '1px dashed #AAA'}
@@ -24,10 +25,14 @@ const tancatStyle = {backgroundColor: 'grey', color: 'white'}
 
 export const ExpedientGridForm = () => {
     const {data} = useFormContext();
-
+    const filterMetaExpedientCrear = builder.and(
+        builder.eq('actiu', true),
+        builder.eq('revisioEstat', "'REVISAT'"),
+    );
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="metaExpedient" hidden={!!data?.id}/>
-
+        <GridFormField  xs={12} name="metaExpedient"
+                        hidden={!!data?.id}
+                        filter={filterMetaExpedientCrear}/>
         <GridFormField xs={12} name="nom"/>
         <GridFormField xs={12} name="organGestor"
                        namedQueries={[`EXPEDIENT_FORM#${data?.metaExpedient?.id || 0}`]}

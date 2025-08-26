@@ -79,7 +79,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
         List<MetaExpedientEntity> metaExpPermesos = metaExpedientHelper.findAmbPermis(
         		entitat.getId(),
         		ExtendedPermission.READ,
-        		true, //nomesActius
+        		false, //nomesActius --> Aquest filtre s'aplica en el currentSpringFilter si es necessari.
         		null, //filtreNomOrCodiSia
         		isAdmin,
         		isAdminOrgan,
