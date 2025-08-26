@@ -16,6 +16,7 @@ import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.Transient;
 
+@SuppressWarnings("serial")
 @Getter
 @Setter
 @NoArgsConstructor

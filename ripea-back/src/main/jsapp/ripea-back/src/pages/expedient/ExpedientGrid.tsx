@@ -125,7 +125,7 @@ const afterAvis = [
 
 // sortModel i perspectives per prevenir re-renders
 const sortModel: any = [{field: 'createdDate', sort: 'desc'}];
-const perspectives = ["INTERESSATS_RESUM", "ESTAT", 'RELACIONAT', "COUNT"];
+const perspectives = ["INTERESSATS_RESUM", "ESTAT", 'RELACIONAT', "COUNT", "AUDITORIA"];
 
 const ExpedientGrid = () => {
     const {t} = useTranslation();

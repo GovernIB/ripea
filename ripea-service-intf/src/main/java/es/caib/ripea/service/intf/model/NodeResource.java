@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 
+@SuppressWarnings("serial")
 @Getter
 @Setter
 @NoArgsConstructor

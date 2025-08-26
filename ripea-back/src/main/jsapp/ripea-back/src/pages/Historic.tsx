@@ -173,11 +173,11 @@ const Auditoria = (props:any) => {
     return <BasePage>
         <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
             <CardData title={t('page.contingut.history.create')} xs={6}>
-                <ContenidoData title={t('page.contingut.history.user')}>{entity?.createdBy}</ContenidoData>
+                <ContenidoData title={t('page.contingut.history.user')}>{entity?.createdByFullName}</ContenidoData>
                 <ContenidoData title={t('page.contingut.history.date')} >{formatDate(entity?.createdDate)}</ContenidoData>
             </CardData>
             <CardData title={t('page.contingut.history.update')} xs={6}>
-                <ContenidoData title={t('page.contingut.history.user')} >{entity?.lastModifiedBy}</ContenidoData>
+                <ContenidoData title={t('page.contingut.history.user')} >{entity?.lastModifiedByFullName}</ContenidoData>
                 <ContenidoData title={t('page.contingut.history.date')} >{formatDate(entity?.lastModifiedDate)}</ContenidoData>
             </CardData>
         </Grid>
