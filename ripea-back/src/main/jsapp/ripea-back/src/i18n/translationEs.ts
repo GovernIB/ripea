@@ -336,6 +336,7 @@ const translationEs = {
                     title: "Detalle del interesado",
                 },
                 new: {
+                    btnUpdate: "Actualiza",
                     label: "Nuevo Interesado",
                     ok: "El interesado {{data.documentNum}} se ha creado correctamente",
                 },

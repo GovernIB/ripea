@@ -344,6 +344,7 @@ const translationCa = {
                     title: "Detall de l'interessat",
                 },
                 new: {
+                    btnUpdate: "Actualitza",
                     label: "Nou Interessat",
                     ok: "L'interessat {{data.documentNum}} s'ha creat correctament",
                 },

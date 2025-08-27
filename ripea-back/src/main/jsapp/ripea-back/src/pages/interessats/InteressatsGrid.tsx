@@ -24,13 +24,26 @@ const InteressatsGridFormFilter = () => {
         <GridFormField xs={6} name="municipi" requestParams={{provincia: data?.provincia}}/>
         <GridFormField xs={6} name="nif"/>
         <GridFormField xs={6} name="nom"/>
-        <GridFormField xs={6} name="unitatArrel" type={"checkbox"}/>
+        <GridFormField xs={9.6} name="unitatArrel" type={"checkbox"}/>
     </>
 }
 
 export const InteressatsGridForm = () => {
+
+    const { t } = useTranslation();
     const {data} = useFormContext()
     const { value } = useSession("UNITAT_ORGANITZATIVA_FILTER");
+    const filterButtons = [
+        {
+            value: 'search',
+            text: t('page.interessat.action.new.btnUpdate'),
+            icon: 'system_update_alt',
+            componentProps: {
+                variant: "contained",
+                sx: { borderRadius: '4px'},
+            },
+        },
+    ]
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField xs={12} name="tipus" required/>
@@ -42,6 +55,7 @@ export const InteressatsGridForm = () => {
                     code={"UNITAT_ORGANITZATIVA_FILTER"}
                     springFilterBuilder={()=>{}}
                     onSpringFilterChange={()=>{}}
+                    buttons={filterButtons}
                 >
                     <InteressatsGridFormFilter/>
                 </StyledMuiFilter>

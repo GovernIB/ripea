@@ -112,7 +112,7 @@ public class InteressatResource extends BaseAuditableResource<Long> {
 	protected String provincia = "07";
 	@Size(max = 5)
 	@ResourceField(enumType = true)
-	protected String municipi;
+	protected String municipi = "407";
 	@Size(max = 160)
 	protected String adresa;
 	@Size(max = 5)
