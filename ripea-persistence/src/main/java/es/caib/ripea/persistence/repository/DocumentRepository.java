@@ -1,7 +1,6 @@
 package es.caib.ripea.persistence.repository;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -134,8 +133,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 	        "     d.estat = :estat " +
 	        "group by" +
 	        "     e.metaExpedient")
-	List<MetaExpedientCountAggregation> countByEstatGroupByMetaExpedient(
-			@Param("estat") DocumentEstatEnumDto estat);
+	List<MetaExpedientCountAggregation> countByEstatGroupByMetaExpedient(@Param("estat") DocumentEstatEnumDto estat);
 
 	@Query(	"select " +
 			"    c " +
@@ -152,10 +150,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			@Param("expedient") ExpedientEntity expedient,
 			@Param("documentId") Long documentId);
 
-	List<DocumentEntity> findByExpedientAndEsborrat(
-			ExpedientEntity expedient,
-			int esborrat);
-	
+	List<DocumentEntity> findByExpedientAndEsborrat(ExpedientEntity expedient, int esborrat);
 	
 	@Query(	"select " +
 			"    d.id " +
@@ -164,13 +159,9 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"where " +
 			"d.expedient.id = :expedientId " +
 			"and d.esborrat = :esborrat ")
-	List<Long> findIdByExpedientIdAndEsborrat(
-			@Param("expedientId") Long expedientId,
-			@Param("esborrat") int esborrat);
+	List<Long> findIdByExpedientIdAndEsborrat(@Param("expedientId") Long expedientId, @Param("esborrat") int esborrat);
 	
-	List<DocumentEntity> findByExpedient(
-			ExpedientEntity expedient);
-	
+	List<DocumentEntity> findByExpedient(ExpedientEntity expedient);
 	
 	@Query(	"select " +
 			"    d " +

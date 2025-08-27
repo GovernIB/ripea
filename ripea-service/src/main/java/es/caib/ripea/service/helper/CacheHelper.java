@@ -206,7 +206,6 @@ public class CacheHelper {
 		logger.debug("Consulta dels errors de validació pel node (nodeId=" + nodeId + ")");
 		
 		NodeEntity node = nodeRepository.findById(nodeId).get();
-		
 		List<ValidacioErrorDto> errors = new ArrayList<ValidacioErrorDto>();
 		List<DadaEntity> dades = dadaRepository.findByNode(node);
 		
@@ -216,6 +215,7 @@ public class CacheHelper {
 						MultiplicitatEnumDto.M_1,
 						MultiplicitatEnumDto.M_1_N
 					});
+		
 		for (MetaDadaEntity metaDada: metaDades) {
 			boolean trobada = false;
 			for (DadaEntity dada: dades) {
@@ -224,13 +224,14 @@ public class CacheHelper {
 					break;
 				}
 			}
-			if (!trobada)
+			if (!trobada) {
 				errors.add(
 						crearValidacioError(
 								metaDada,
 								metaDada.getMultiplicitat()));
-
+			}
 		}
+		
 		if (node instanceof ExpedientEntity) {
 			
 			ExpedientEntity expedient = (ExpedientEntity)node;
@@ -246,10 +247,13 @@ public class CacheHelper {
 			
 			for (MetaDocumentEntity metaDocument: metaDocumentsDelMetaExpedient) {
 				boolean trobat = false;
-				for (DocumentEntity document: documents) {
-					if (document.getMetaDocument() != null && document.getMetaDocument().equals(metaDocument)) {
-						trobat = true;
-						break;
+				// #1667 - ELs tipus de documents inactius no haurien de validar-se als expedients
+				if (metaDocument.isActiu()) {
+					for (DocumentEntity document: documents) {
+						if (document.getMetaDocument() != null && document.getMetaDocument().equals(metaDocument)) {
+							trobat = true;
+							break;
+						}
 					}
 				}
 				if (!trobat)
