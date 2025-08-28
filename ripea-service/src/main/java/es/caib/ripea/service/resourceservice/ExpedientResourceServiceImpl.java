@@ -958,6 +958,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
                 			documentResource.setFitxerNom(doc.getFitxerNom());
                 			documentResource.setDescripcio(doc.getDescripcio());
                 			documentResource.setFitxerContentType(doc.getFitxerContentType());
+                			//Utils.getFitxerContentType(adjunt.getName(), adjunt.getContentType()) ??
                 			//TODO: Acebar de completar els camps necessaris per el formulari.
                 			llistaDocumentsProcessats.add(documentResource);
                 		}

@@ -610,6 +610,7 @@ const translationEs = {
                 fitxerContentType: "Tipo de contenido",
                 metaDocument: "Tipo de documento",
                 createdDate: "Fecha de creación",
+                createdBy: "Creado por",
                 estat: "Estado",
                 dataCaptura: "Fecha de captura",
                 origen: "Origen",
@@ -663,6 +664,9 @@ const translationEs = {
                 original: {
                     label: "Descargar original",
                     ok: "El documenmto original se ha descargado correctamente",
+                },
+                download: {
+                    ok: "El documento se ha descargado correctamente",
                 },
                 firma: {
                     button: "Iniciar proceso de firma",

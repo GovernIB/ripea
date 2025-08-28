@@ -618,6 +618,7 @@ const translationCa = {
                 fitxerContentType: "Tipus de contingut",
                 metaDocument: "Tipus de document",
                 createdDate: "Data de creació",
+                createdBy: "Creat per",
                 estat: "Estat",
                 dataCaptura: "Data de captura",
                 origen: "Origen",
@@ -671,6 +672,9 @@ const translationCa = {
                 original: {
                     label: "Descarregar original",
                     ok: "El document original s'ha descarregat correctament",
+                },
+                download: {
+                    ok: "Document descarregat correctament",
                 },
                 firma: {
                     button: "Iniciar procés de firma",

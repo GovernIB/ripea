@@ -133,11 +133,11 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
         },
         {
             field: 'documentNum',
-            flex: 0.5,
+            flex: 0.3,
         },
         {
             field: 'nomComplet',// organNom
-            flex: 1,
+            flex: 1.2,
             valueFormatter: (value: any, row:any) => value ?? row?.organNom,
             renderCell: (params:any) => <>
                 {params?.formattedValue}
@@ -147,7 +147,7 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
         },
         {
             field: 'representant',
-            flex: 0.75,
+            flex: 0.9,
             renderCell: (params:any) => <>
                 {params?.formattedValue}
                 {params?.row?.representant && !params?.row?.representantInfo?.arxiuPropagat &&

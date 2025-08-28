@@ -75,14 +75,14 @@ const columns = [
     },
     {
         field: 'metaDocument',
-        flex: 0.5,
+        flex: 0.6,
     },
     {
         field: 'createdDate',
         flex: 0.55,
     },
     {
-        field: 'createdBy',
+        field: 'createdByFullName',
         flex: 0.45,
     },
 ];

@@ -327,6 +327,17 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         
         resource.setHasFirma(resource.getDocumentFirmaTipus()!=DocumentFirmaTipusEnumDto.SENSE_FIRMA);
         resource.setMetaDocumentInfo(objectMappingHelper.newInstanceMap(Hibernate.unproxy(entity.getMetaDocument()), MetaDocumentResource.class));
+        
+    	if (entity.getCreatedBy()!=null) {
+    		UsuariResourceEntity usuariResourceEntity = usuariResourceRepository.findById(entity.getCreatedBy()).orElse(null);
+    		if (usuariResourceEntity!=null) {
+    			resource.setCreatedByFullName(usuariResourceEntity.getNom() + " (" + usuariResourceEntity.getCodi() + ")");
+    		}
+    	}
+    	if (entity.getLastModifiedBy()!=null) {
+    		UsuariResourceEntity usuariResourceEntity = usuariResourceRepository.findById(entity.getLastModifiedBy()).orElse(null);
+    		resource.setLastModifiedByFullName(usuariResourceEntity.getNom() + " (" + usuariResourceEntity.getCodi() + ")");
+    	}
     }
 
     private class PathPerspectiveApplicator implements PerspectiveApplicator<DocumentResourceEntity, DocumentResource> {
@@ -519,11 +530,14 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                 target.setFitxerNom(adjunt.getName());
                 target.setFitxerContingut(adjunt.getContent());
                 target.setFitxerTamany(adjunt.getContentLength());
+              //La majoria de les vegades no arriba el contentType, al detectaFirmaDocument l'emplenam si es buid
                 target.setFitxerContentType(adjunt.getContentType());
 
                 if (Boolean.parseBoolean(configHelper.getConfig(PropertyConfig.DETECCIO_FIRMA_AUTOMATICA))) {
                 	
-                	SignatureInfoDto signatureInfoDto = pluginHelper.detectaFirmaDocument(adjunt.getContent(), adjunt.getContentType());
+                	SignatureInfoDto signatureInfoDto = pluginHelper.detectaFirmaDocument(
+                			adjunt.getContent(),
+                			Utils.getFitxerContentType(adjunt.getName(), adjunt.getContentType()));
 
                     target.setAmbFirma(signatureInfoDto.isSigned());
                     target.setHasFirma(signatureInfoDto.isSigned());
@@ -535,9 +549,12 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                         if (signatureInfoDto.isError() && !answers.containsKey(ERROR_SIGNATURE_VALIDATION)) {
                             throw new AnswerRequiredException(DocumentResource.class, ERROR_SIGNATURE_VALIDATION, signatureInfoDto.getErrorMsg());
                         }
+                    } else {
+                    	target.setDocumentFirmaTipus(DocumentFirmaTipusEnumDto.SENSE_FIRMA);
                     }
                 }
             } else {
+            	target.setDocumentFirmaTipus(DocumentFirmaTipusEnumDto.SENSE_FIRMA);
                 target.setFitxerNom(null);
                 target.setFitxerContingut(null);
                 target.setFitxerTamany(null);
@@ -1167,6 +1184,11 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
             if (fieldName==null){
                 target.setPermetreEnviamentPostal(ConfigHelper.getEntitat().get().isPermetreEnviamentPostal());
                	target.setDuracio(configHelper.getAsInt(PropertyConfig.NOTIB_PLUGIN_CADUCA, 10));
+               	List<InteressatResourceEntity> interessatsExp = documentResourceRepository.findById((Long)id).get().getExpedient().getInteressats();
+               	if (interessatsExp!=null && interessatsExp.size()==1) {
+               		InteressatResourceEntity interessatUnic = interessatsExp.get(0);
+               		target.getInteressats().add(ResourceReference.toResourceReference(interessatUnic.getId(), interessatUnic.getCodiNom()));
+               	}
             } else {
                 switch (fieldName) {
                     case DocumentResource.NotificarFormAction.Fields.duracio:

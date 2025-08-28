@@ -71,26 +71,26 @@ const sortModel:any = [{field: 'id', sort: 'asc'}];
 const columns = [
     {
         field: 'tipus',
-        flex: 0.5
+        flex: 0.7
     },
     {
         field: 'createdDate',
-        flex: 0.75,
+        flex: 0.6,
         valueFormatter: (value: any) => formatDate(value)
     },
     {
         field: 'dataEnviada',
-        flex: 0.75,
+        flex: 0.6,
         valueFormatter: (value: any) => formatDate(value)
     },
     {
         field: 'dataFinalitzada',
-        flex: 0.75,
+        flex: 0.6,
         valueFormatter: (value: any) => formatDate(value)
     },
     {
         field: 'assumpte',
-        flex: 0.5,
+        flex: 0.75,
     },
     {
         field: 'document',
@@ -104,14 +104,11 @@ const columns = [
 ]
 
 const RemesaGrid = (props:any) => {
+
     const { id, onRowCountChange } = props;
     const { t } = useTranslation()
-
     const apiRef = useMuiDataGridApiRef()
-    const refresh = () => {
-        apiRef?.current?.refresh?.();
-    }
-
+    const refresh = () => { apiRef?.current?.refresh?.(); }
     const {actions, components} = useRemesaActions(refresh);
 
     return <>
@@ -122,15 +119,12 @@ const RemesaGrid = (props:any) => {
             popupEditFormContent={<RemesaGridForm/>}
             filter={builder.eq('expedient.id', id)}
             staticSortModel={sortModel}
-            // perspectives={['']}
             columns={columns}
             rowAdditionalActions={actions}
-            // paginationActive
             apiRef={apiRef}
             onRowCountChange={onRowCountChange}
             disableColumnSorting
             toolbarHideCreate
-
             popupEditFormI18nKeys={{
                 updateSuccess: 'page.notificacio.action.update.ok',
             }}
