@@ -187,7 +187,7 @@ public class ContingutZipImportacioController extends BaseUserOAdminOOrganContro
  				documentCommand.setFitxerContingut(fitxerContingut);
 				
  				try {
-					DocumentDto document = documentService.create(
+					DocumentDto document = documentService.crearAmbCarpetes(
 							entitatActual.getId(),
 							pareId,
 							DocumentCommand.asDto(documentCommand),

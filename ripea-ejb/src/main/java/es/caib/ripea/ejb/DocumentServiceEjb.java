@@ -653,4 +653,16 @@ public class DocumentServiceEjb extends AbstractServiceEjb<DocumentService> impl
 	public byte[] getPlantillaImportacioZip() {
 		return delegateService.getPlantillaImportacioZip();
 	}
+    
+    @Override
+	@RolesAllowed("**")
+    public DocumentDto crearAmbCarpetes(
+			Long id, 
+			Long pareId, 
+			DocumentDto asDto, 
+			boolean b, 
+			String rolActual,
+			Long tascaId) {
+    	return delegateService.crearAmbCarpetes(id, pareId, asDto, b, rolActual, tascaId);
+    }
 }

@@ -795,4 +795,13 @@ public interface DocumentService {
     @PreAuthorize("isAuthenticated()")
 	public byte[] obtenirContingutFitxerZip(String fitxerNom);
     
+    @PreAuthorize("isAuthenticated()")
+	public DocumentDto crearAmbCarpetes(
+			Long id, 
+			Long pareId, 
+			DocumentDto asDto, 
+			boolean b, 
+			String rolActual,
+			Long tascaId);
+    
 }

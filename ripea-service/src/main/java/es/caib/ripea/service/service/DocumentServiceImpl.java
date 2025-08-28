@@ -146,6 +146,31 @@ public class DocumentServiceImpl implements DocumentService {
     @Autowired private ContingutLogHelper contingutLogHelper;
     @Autowired private ZipImportacioHelper zipImportacioHelper;
 
+    
+    @Transactional
+	@Override
+	public DocumentDto crearAmbCarpetes(
+			Long entitatId,
+			Long pareId,
+			DocumentDto document,
+			boolean comprovarMetaExpedient, 
+			String rolActual, 
+			Long tascaId) {
+    	
+    	zipImportacioHelper.assignarCarpeta(
+    			document,
+    			entitatId, 
+    			pareId);
+    	
+    	return create(
+    				entitatId,
+    				document.getPareId(), 
+    				document, 
+    				comprovarMetaExpedient, 
+    				rolActual, 
+    				tascaId);
+    }
+    
 	@Transactional
 	@Override
 	public DocumentDto create(
@@ -1580,7 +1605,7 @@ public class DocumentServiceImpl implements DocumentService {
 	}
 
 	@Override
-	@Transactional(readOnly = true)
+	@Transactional
 	public List<DocumentDto> extreureDocumentsZip(InputStream zip, Long metaExpedientId, Long pareId, EntitatDto entitatActual) throws IOException {
 		return zipImportacioHelper.extreureDocuments(zip, metaExpedientId, pareId, entitatActual.getId());
 	}

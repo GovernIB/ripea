@@ -319,4 +319,8 @@ public class CarpetaHelper {
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(CarpetaHelper.class);
+
+	public CarpetaEntity comprovarCarpetaExpedient(String nomCarpeta, ContingutEntity pare) {
+		return carpetaRepository.findByNomAndPareAndEsborrat(nomCarpeta, pare, 0);
+	}
 }

@@ -24,4 +24,6 @@ public interface CarpetaRepository extends JpaRepository<CarpetaEntity, Long> {
 			int esborrat);
 
     List<CarpetaEntity> findByExpedientAndEsborrat(ExpedientEntity expedient, int esborrat);
+    
+    CarpetaEntity findByNomAndPareAndEsborrat(String nom, ContingutEntity pare, int esborrat);
 }
