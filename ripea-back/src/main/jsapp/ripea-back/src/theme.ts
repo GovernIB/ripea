@@ -84,7 +84,7 @@ const theme = createTheme({
         MuiCardHeader : {
             styleOverrides: {
                 root: {
-                    padding: '10px',
+                    padding: '5px',
                 },
             },
         },
@@ -121,8 +121,7 @@ const theme = createTheme({
                     '&.Mui-focused': {
                         fontStyle: 'italic',
                         paddingRight: '2px',
-                        backgroundColor: 'white',
-                        borderBottom: '1px solid #337ab7',                        
+                        backgroundColor: 'white',   
                     }
                 },
                 filled: {
@@ -132,20 +131,17 @@ const theme = createTheme({
                     fontWeight: 200,
                     color: 'black',
                     backgroundColor: 'white',
-                    borderBottom: '1px solid gray',                    
                     '&.Mui-disabled': {
                         fontStyle: 'italic',
                         paddingRight: '2px',
                         color: 'black',
                         opacity: 1,
                         backgroundColor: 'white',
-                        borderBottom: '1px solid gray'
                     },
                     '&.Mui-focused': {
                         fontStyle: 'italic',
                         paddingRight: '2px',
                         backgroundColor: 'white',
-                        borderBottom: '1px solid #337ab7',                        
                     }
                 }
             }

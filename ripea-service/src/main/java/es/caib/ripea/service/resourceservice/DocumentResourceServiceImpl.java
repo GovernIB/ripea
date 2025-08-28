@@ -9,6 +9,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -326,6 +327,17 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         
         resource.setHasFirma(resource.getDocumentFirmaTipus()!=DocumentFirmaTipusEnumDto.SENSE_FIRMA);
         resource.setMetaDocumentInfo(objectMappingHelper.newInstanceMap(Hibernate.unproxy(entity.getMetaDocument()), MetaDocumentResource.class));
+        
+    	if (entity.getCreatedBy()!=null) {
+    		UsuariResourceEntity usuariResourceEntity = usuariResourceRepository.findById(entity.getCreatedBy()).orElse(null);
+    		if (usuariResourceEntity!=null) {
+    			resource.setCreatedByFullName(usuariResourceEntity.getNom() + " (" + usuariResourceEntity.getCodi() + ")");
+    		}
+    	}
+    	if (entity.getLastModifiedBy()!=null) {
+    		UsuariResourceEntity usuariResourceEntity = usuariResourceRepository.findById(entity.getLastModifiedBy()).orElse(null);
+    		resource.setLastModifiedByFullName(usuariResourceEntity.getNom() + " (" + usuariResourceEntity.getCodi() + ")");
+    	}
     }
 
     private class PathPerspectiveApplicator implements PerspectiveApplicator<DocumentResourceEntity, DocumentResource> {
@@ -518,11 +530,14 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                 target.setFitxerNom(adjunt.getName());
                 target.setFitxerContingut(adjunt.getContent());
                 target.setFitxerTamany(adjunt.getContentLength());
+              //La majoria de les vegades no arriba el contentType, al detectaFirmaDocument l'emplenam si es buid
                 target.setFitxerContentType(adjunt.getContentType());
 
                 if (Boolean.parseBoolean(configHelper.getConfig(PropertyConfig.DETECCIO_FIRMA_AUTOMATICA))) {
                 	
-                	SignatureInfoDto signatureInfoDto = pluginHelper.detectaFirmaDocument(adjunt.getContent(), adjunt.getContentType());
+                	SignatureInfoDto signatureInfoDto = pluginHelper.detectaFirmaDocument(
+                			adjunt.getContent(),
+                			Utils.getFitxerContentType(adjunt.getName(), adjunt.getContentType()));
 
                     target.setAmbFirma(signatureInfoDto.isSigned());
                     target.setHasFirma(signatureInfoDto.isSigned());
@@ -534,9 +549,12 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                         if (signatureInfoDto.isError() && !answers.containsKey(ERROR_SIGNATURE_VALIDATION)) {
                             throw new AnswerRequiredException(DocumentResource.class, ERROR_SIGNATURE_VALIDATION, signatureInfoDto.getErrorMsg());
                         }
+                    } else {
+                    	target.setDocumentFirmaTipus(DocumentFirmaTipusEnumDto.SENSE_FIRMA);
                     }
                 }
             } else {
+            	target.setDocumentFirmaTipus(DocumentFirmaTipusEnumDto.SENSE_FIRMA);
                 target.setFitxerNom(null);
                 target.setFitxerContingut(null);
                 target.setFitxerTamany(null);
@@ -1166,6 +1184,11 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
             if (fieldName==null){
                 target.setPermetreEnviamentPostal(ConfigHelper.getEntitat().get().isPermetreEnviamentPostal());
                	target.setDuracio(configHelper.getAsInt(PropertyConfig.NOTIB_PLUGIN_CADUCA, 10));
+               	List<InteressatResourceEntity> interessatsExp = documentResourceRepository.findById((Long)id).get().getExpedient().getInteressats();
+               	if (interessatsExp!=null && interessatsExp.size()==1) {
+               		InteressatResourceEntity interessatUnic = interessatsExp.get(0);
+               		target.getInteressats().add(ResourceReference.toResourceReference(interessatUnic.getId(), interessatUnic.getCodiNom()));
+               	}
             } else {
                 switch (fieldName) {
                     case DocumentResource.NotificarFormAction.Fields.duracio:
@@ -1301,68 +1324,77 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                             .collect(Collectors.toList());
                 } catch (Exception e) {}
             }
+            resultat.sort(Comparator.comparing(FieldOption::getDescription));
             return resultat;
         }
 
         @Override
         public DocumentResource exec(String code, DocumentResourceEntity entity, DocumentResource.EnviarPortafirmesFormAction params) throws ActionExecutionException {
 
-        	Long entitatId  = entity.getEntitat().getId();
-        	Long documentId = entity.getId();
-        	String rolActual = configHelper.getRolActual();
+        	try {
         	
-        	DocumentEntity document = documentHelper.comprovarDocument(
-        			entitatId,
-					documentId,
-					false,
-					true,
-					false,
-					false, 
-					false, 
-					rolActual);
+	        	Long entitatId  = entity.getEntitat().getId();
+	        	Long documentId = entity.getId();
+	        	String rolActual = configHelper.getRolActual();
+	        	
+	        	DocumentEntity document = documentHelper.comprovarDocument(
+	        			entitatId,
+						documentId,
+						false,
+						true,
+						false,
+						false, 
+						false, 
+						rolActual);
+	        	
+	        	//Unificar els portafirmes responsables en un array de NIFS
+	        	List<String> pfResponsables = new ArrayList<String>();
+	        	if (params.getResponsables()!=null) {
+	        		for (ResourceReference <UsuariResource, String> usuari: params.getResponsables()) {
+	        			pfResponsables.add(usuariResourceRepository.findById(usuari.getId()).get().getNif());
+	        		}
+	        	}
+	        	if (params.getNifsManuals()!=null) {
+	        		if(params.getNifsManuals().indexOf(",")>0) {
+	        			pfResponsables.addAll(Arrays.asList(params.getNifsManuals().split(",")));
+	        		} else {
+	        			pfResponsables.add(params.getNifsManuals());
+	        		}
+	        	}
+	        	if (params.getCarrecs()!=null) {
+	        		pfResponsables.addAll(params.getCarrecs());
+	        	}
+	        	
+	        	List<Long> annexosIds = new ArrayList<Long>();
+	        	if (params.getAnnexos()!=null) {
+	        		for (ResourceReference <DocumentResource, Long> annex: params.getAnnexos()) {
+	        			annexosIds.add(annex.getId());
+	        		}
+	        	}
+	        	
+	        	//Enviam com a parametre transactionID si s'ha creat un flux temporal, sino enviam el fluxId
+				firmaPortafirmesHelper.portafirmesEnviar(
+						entitatId,
+						document,
+						params.getMotiu(),
+						params.getPrioritat(),
+						null,
+						params.getPortafirmesEnviarFluxId(),
+						pfResponsables.toArray(new String[0]),
+						params.getPortafirmesSequenciaTipus(),
+						params.getPortafirmesFluxTipus(),
+						annexosIds.toArray(new Long[0]),
+						params.getFluxCreat()!=null?params.getFluxCreat().getFluxId():null,
+						params.isAvisFirmaParcial(),
+						params.isFirmaParcial());
+	        	
+	        	return objectMappingHelper.newInstanceMap(entity, DocumentResource.class);
         	
-        	//Unificar els portafirmes responsables en un array de NIFS
-        	List<String> pfResponsables = new ArrayList<String>();
-        	if (params.getResponsables()!=null) {
-        		for (ResourceReference <UsuariResource, String> usuari: params.getResponsables()) {
-        			pfResponsables.add(usuari.getId());
-        		}
-        	}
-        	if (params.getNifsManuals()!=null) {
-        		if(params.getNifsManuals().indexOf(",")>0) {
-        			pfResponsables.addAll(Arrays.asList(params.getNifsManuals().split(",")));
-        		} else {
-        			pfResponsables.add(params.getNifsManuals());
-        		}
-        	}
-        	if (params.getCarrecs()!=null) {
-        		pfResponsables.addAll(params.getCarrecs());
-        	}
-        	
-        	List<Long> annexosIds = new ArrayList<Long>();
-        	if (params.getAnnexos()!=null) {
-        		for (ResourceReference <DocumentResource, Long> annex: params.getAnnexos()) {
-        			annexosIds.add(annex.getId());
-        		}
-        	}
-        	
-        	//Enviam com a parametre transactionID si s'ha creat un flux temporal, sino enviam el fluxId
-			firmaPortafirmesHelper.portafirmesEnviar(
-					entitatId,
-					document,
-					params.getMotiu(),
-					params.getPrioritat(),
-					null,
-					params.getPortafirmesEnviarFluxId(),
-					pfResponsables.toArray(new String[0]),
-					params.getPortafirmesSequenciaTipus(),
-					params.getPortafirmesFluxTipus(),
-					annexosIds.toArray(new Long[0]),
-					params.getFluxCreat()!=null?params.getFluxCreat().getFluxId():null,
-					params.isAvisFirmaParcial(),
-					params.isFirmaParcial());
-        	
-        	return objectMappingHelper.newInstanceMap(entity, DocumentResource.class);
+			} catch (Exception e) {
+				excepcioLogHelper.addExcepcio("/document/"+entity.getId()+"/EnviarPortafirmesActionExecutor", e);
+				String message = messageHelper.getMessage("message.common.action.error")+": "+e.getMessage();
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, message);
+			}
         }
 
         @Override

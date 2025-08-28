@@ -47,11 +47,11 @@ const useActions = (refresh?: () => void) => {
 const columns = [
     {
         field: "text",
-        flex: 0.5,
+        flex: 1.1,
     },
     {
         field: "createdDate",
-        flex: 0.5,
+        flex: 0.4,
         valueFormatter: (value: any) => formatDate(value)
     },
 ]
@@ -69,7 +69,7 @@ const Alerta = (props:any) => {
     const actions =[
         {
             label: t('page.alert.action.read.label'),
-            icon: "mail",
+            icon: "mark_email_read",
             showInMenu: false,
             onClick: llegit,
         },
@@ -77,7 +77,7 @@ const Alerta = (props:any) => {
     const massiveActions =[
         {
             label: t('page.alert.action.read.label'),
-            icon: "mail",
+            icon: "mark_email_read",
             showInMenu: true,
             onClick: massiveLlegit,
         },

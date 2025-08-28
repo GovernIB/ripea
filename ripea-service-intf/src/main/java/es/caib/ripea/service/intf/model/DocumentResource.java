@@ -538,7 +538,7 @@ public class DocumentResource extends NodeResource {
         private String nifsManuals;
         @ResourceField(enumType = true)
         private List<String> carrecs = new ArrayList<>();
-        private MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSequenciaTipus;
+        private MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSequenciaTipus = MetaDocumentFirmaSequenciaTipusEnumDto.SERIE;
 
         // FLUX
         @Transient
@@ -618,6 +618,7 @@ public class DocumentResource extends NodeResource {
             case FIRMA_SEPARADA:
                 resultat.setTipusFirma(DocumentTipusFirmaEnumDto.SEPARAT);
                 resultat.setFirmaSeparada(true);
+                resultat.setFirmaNom(this.getFirmaNom());
                 break;
             default:
                 break;

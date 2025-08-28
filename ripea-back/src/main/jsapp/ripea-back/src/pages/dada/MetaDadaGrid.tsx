@@ -64,7 +64,7 @@ const MetaDadaGrid = (props: { entity:any, onRowCountChange?: ((value:number) =>
     const columns = [
         {
             field: 'nom',
-            flex: 0.5,
+            flex: 0.7,
         },
         {
             field: 'multiplicitat',
@@ -73,7 +73,7 @@ const MetaDadaGrid = (props: { entity:any, onRowCountChange?: ((value:number) =>
         },
         {
             field: 'dades',
-            flex: 1,
+            flex: 0.8,
             valueGetter: (value: any, row:any) => dadesFilter(row, dades),
             renderCell: (params: any) => {
                 const value = params.value;

@@ -42,12 +42,12 @@ const columns = [
     },
     {
         field: 'dataInici',
-        flex: 0.5,
+        flex: 0.55,
         valueFormatter: (value: any) => formatDate(value)
     },
     {
         field: 'dataLimit',
-        flex: 0.5,
+        flex: 0.45,
         valueFormatter: (value: any) => formatDate(value, "DD/MM/Y")
     },
     {
@@ -98,6 +98,7 @@ const TasquesExpedientGrid = (props: any) => {
                 resourceName={'expedientTascaComentariResource'}
                 resourceReference={'expedientTasca'}
                 readOnly={params?.row?.usuariActualOnlyObservador}
+                onClose={apiRef?.current?.refresh}
             />
         },
     ]

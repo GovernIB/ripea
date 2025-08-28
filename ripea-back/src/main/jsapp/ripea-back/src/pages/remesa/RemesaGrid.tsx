@@ -11,9 +11,12 @@ const commonStyle = {p: 0.5, display: 'flex', alignItems: 'center', borderRadius
 export const EstatMessage = (props:any) => {
     const {title, icon, color, children} = props;
 
-    return <Typography variant="caption" title={title || (typeof children === 'string' ?children :'')} sx={{ ...commonStyle, backgroundColor: `${color}.main`, color: 'white' }}>
-        <Icon fontSize={"inherit"} sx={{ mr: children!=null  ?1 :0 }}>{icon}</Icon>
-        {children}
+    return <Typography 
+        variant="caption" 
+        title={title || (typeof children === 'string' ?children :'')} 
+        sx={{ ...commonStyle, backgroundColor: `${color}.light`, color: 'white' }}>
+            <Icon fontSize={"inherit"} sx={{ mr: children!=null  ?1 :0 }}>{icon}</Icon>
+            <Typography sx={{fontSize: '0.8rem', paddingRight: '5px'}}>{children}</Typography>
     </Typography>
 }
 const StyledEstat = (props:any) => {
@@ -29,8 +32,11 @@ const StyledEstat = (props:any) => {
                 }
             </>
         case 'REGISTRADA':
+            return <EstatMessage icon={"info"} color={'info'}>{children}</EstatMessage>
         case 'FINALITZADA':
+            return <EstatMessage icon={"check"} color={'success'}>{children}</EstatMessage>
         case 'PROCESSADA':
+            return <EstatMessage icon={"info"} color={'info'}>{children}</EstatMessage>
         case 'ENVIADA_AMB_ERRORS':
             if (entity?.error) {
                 return <EstatMessage icon={"warning"} color={'error'}>{children}</EstatMessage>
@@ -38,6 +44,7 @@ const StyledEstat = (props:any) => {
                 return <EstatMessage icon={"check"} color={'success'}>{children}</EstatMessage>
             }
         case 'ENVIADA':
+            return <EstatMessage icon={"info"} color={'info'}>{children}</EstatMessage>
         case 'FINALITZADA_AMB_ERRORS':
             if (entity?.error) {
                 return <EstatMessage icon={"warning"} color={'error'}>{children}</EstatMessage>
@@ -71,26 +78,26 @@ const sortModel:any = [{field: 'id', sort: 'asc'}];
 const columns = [
     {
         field: 'tipus',
-        flex: 0.5
+        flex: 0.7
     },
     {
         field: 'createdDate',
-        flex: 0.75,
+        flex: 0.6,
         valueFormatter: (value: any) => formatDate(value)
     },
     {
         field: 'dataEnviada',
-        flex: 0.75,
+        flex: 0.6,
         valueFormatter: (value: any) => formatDate(value)
     },
     {
         field: 'dataFinalitzada',
-        flex: 0.75,
+        flex: 0.6,
         valueFormatter: (value: any) => formatDate(value)
     },
     {
         field: 'assumpte',
-        flex: 0.5,
+        flex: 0.75,
     },
     {
         field: 'document',
@@ -104,14 +111,11 @@ const columns = [
 ]
 
 const RemesaGrid = (props:any) => {
+
     const { id, onRowCountChange } = props;
     const { t } = useTranslation()
-
     const apiRef = useMuiDataGridApiRef()
-    const refresh = () => {
-        apiRef?.current?.refresh?.();
-    }
-
+    const refresh = () => { apiRef?.current?.refresh?.(); }
     const {actions, components} = useRemesaActions(refresh);
 
     return <>
@@ -122,15 +126,12 @@ const RemesaGrid = (props:any) => {
             popupEditFormContent={<RemesaGridForm/>}
             filter={builder.eq('expedient.id', id)}
             staticSortModel={sortModel}
-            // perspectives={['']}
             columns={columns}
             rowAdditionalActions={actions}
-            // paginationActive
             apiRef={apiRef}
             onRowCountChange={onRowCountChange}
             disableColumnSorting
             toolbarHideCreate
-
             popupEditFormI18nKeys={{
                 updateSuccess: 'page.notificacio.action.update.ok',
             }}

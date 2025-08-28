@@ -12,6 +12,7 @@ import {useActions, useAnexxActions} from "./AnotacioActions.tsx";
 import useRegistreInteressatDetail from "./RegistreInteressatDetail.tsx";
 import useVisualitzar from "../actions/Visualitzar.tsx";
 import useAnnexFirma from "./AnnexFirma.tsx";
+import {icons} from "../../user/UserHeadToolbar.tsx";
 
 const Resum = (props:any) => {
     const { entity, setNumInteressats, setNumAnnexos } = props;
@@ -19,22 +20,22 @@ const Resum = (props:any) => {
     const { t } = useTranslation();
 
     return <BasePage>
-        <Grid container direction={"row"} columnSpacing={1} rowSpacing={2}>
-            <ContenidoData title={t('page.registre.detall.identificador')} xs={6}>{registre?.identificador}</ContenidoData>
-            <ContenidoData title={t('page.registre.detall.data')} xs={6}>{formatDate(registre?.data)}</ContenidoData>
-            <ContenidoData title={t('page.registre.detall.oficina')}>{registre?.oficinaDescripcio} ({registre?.oficinaCodi})</ContenidoData>
-            <ContenidoData title={t('page.registre.detall.extracte')}>{registre?.extracte}</ContenidoData>
-            <ContenidoData title={t('page.registre.detall.observacions')}>{registre?.observacions}</ContenidoData>
-            <ContenidoData title={t('page.registre.detall.identificador')} xs={4}>{registre?.identificador}</ContenidoData>
-            <ContenidoData title={t('page.registre.detall.data')} xs={4}>{formatDate(registre?.data)}</ContenidoData>
-            <ContenidoData title={t('page.registre.detall.oficinaDescripcio')} xs={4}>{registre?.oficinaDescripcio}</ContenidoData>
+        <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
+            <ContenidoData title={t('page.registre.detall.identificador')}      xs={6} titleXs={4} textXs={8}>{registre?.identificador}</ContenidoData>
+            <ContenidoData title={t('page.registre.detall.data')}               xs={6} titleXs={4} textXs={8}>{formatDate(registre?.data)}</ContenidoData>
+            <ContenidoData title={t('page.registre.detall.oficina')}            xs={6} titleXs={4} textXs={8}>{registre?.oficinaDescripcio} ({registre?.oficinaCodi})</ContenidoData>
+            <ContenidoData title={t('page.registre.detall.extracte')}           xs={6} titleXs={4} textXs={8}>{registre?.extracte}</ContenidoData>
+            <ContenidoData title={t('page.registre.detall.observacions')}       xs={6} titleXs={4} textXs={8}>{registre?.observacions}</ContenidoData>
+            <ContenidoData title={t('page.registre.detall.identificador')}      xs={6} titleXs={4} textXs={8}>{registre?.identificador}</ContenidoData>
+            <ContenidoData title={t('page.registre.detall.data')}               xs={6} titleXs={4} textXs={8}>{formatDate(registre?.data)}</ContenidoData>
+            <ContenidoData title={t('page.registre.detall.oficinaDescripcio')}  xs={6} titleXs={4} textXs={8}>{registre?.oficinaDescripcio}</ContenidoData>
 
-            <CardData xs={12} title={t('page.registre.detall.infoResumida')}>
-                <ContenidoData title={t('page.registre.detall.docFisica')}>{registre?.docFisicaCodi} - {registre?.docFisicaDescripcio}</ContenidoData>
-                <ContenidoData title={t('page.registre.detall.desti')}>{registre?.destiDescripcio} ({registre?.destiCodi})</ContenidoData>
-                <ContenidoData title={t('page.registre.detall.refExterna')}>{registre?.refExterna}</ContenidoData>
-                <ContenidoData title={t('page.registre.detall.expedientNumero')} xs={6}>{registre?.expedientNumero}</ContenidoData>
-                <ContenidoData title={t('page.registre.detall.procediment')} xs={6}>{registre?.procedimentCodi} - {entity?.metaExpedient?.description}</ContenidoData>
+            <CardData xs={12}  title={t('page.registre.detall.infoResumida')}>
+                <ContenidoData title={t('page.registre.detall.docFisica')}          xs={6} titleXs={4} textXs={8}>{registre?.docFisicaCodi} - {registre?.docFisicaDescripcio}</ContenidoData>
+                <ContenidoData title={t('page.registre.detall.desti')}              xs={6} titleXs={4} textXs={8}>{registre?.destiDescripcio} ({registre?.destiCodi})</ContenidoData>
+                <ContenidoData title={t('page.registre.detall.refExterna')}         xs={6} titleXs={4} textXs={8}>{registre?.refExterna}</ContenidoData>
+                <ContenidoData title={t('page.registre.detall.expedientNumero')}    xs={6} titleXs={4} textXs={8}>{registre?.expedientNumero}</ContenidoData>
+                <ContenidoData title={t('page.registre.detall.procediment')}        xs={12} titleXs={2} textXs={10}>{registre?.procedimentCodi} - {entity?.metaExpedient?.description}</ContenidoData>
             </CardData>
 
             <CardData xs={12} title={t('page.registre.detall.interessats')}>
@@ -54,23 +55,22 @@ const Estat = (props:any) => {
 
     return <BasePage>
         <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-            <ContenidoData title={t('page.anotacio.detall.estatView')}>{entity?.estatView}</ContenidoData>
-            <ContenidoData title={t('page.anotacio.detall.dataAlta')}>{formatDate(entity?.dataAlta)}</ContenidoData>
-
+            <ContenidoData title={t('page.anotacio.detall.estatView')} xs={6} titleXs={4} textXs={8}>{entity?.estatView}</ContenidoData>
+            <ContenidoData title={t('page.anotacio.detall.dataAlta')} xs={6} titleXs={4} textXs={8}>{formatDate(entity?.dataAlta)}</ContenidoData>
             {entity?.estat == 'REBUTJAT' &&
-                <ContenidoData title={t('page.anotacio.detall.observacions')}>{entity?.observacions}</ContenidoData>
+                <ContenidoData title={t('page.anotacio.detall.observacions')} xs={6} titleXs={4} textXs={8}>{entity?.observacions}</ContenidoData>
             }
-
             {entity?.estat != 'PENDENT' &&
                 <>
                     <ContenidoData title={entity?.estat == 'REBUTJAT'
                         ?t('page.anotacio.detall.rejectedDate')
                         :t('page.anotacio.detall.acceptedDate')}
+                        xs={6} titleXs={4} textXs={8}
                     >
                         {formatDate(entity?.dataActualitzacio)}
                     </ContenidoData>
 
-                    <ContenidoData title={t('page.anotacio.detall.usuariActualitzacio')}>{entity?.usuariActualitzacio?.description}</ContenidoData>
+                    <ContenidoData title={t('page.anotacio.detall.usuariActualitzacio')} xs={6} titleXs={4} textXs={8}>{entity?.usuariActualitzacio?.description}</ContenidoData>
                 </>
             }
         </Grid>
@@ -83,29 +83,29 @@ const InformeRegistre = (props:any) => {
 
     return <BasePage>
         <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-            <ContenidoData title={t('page.registre.detall.tipus')}>{t('page.registre.detall.entrada')}</ContenidoData>
-            <ContenidoData title={t('page.registre.detall.identificador')}>{entity?.identificador}</ContenidoData>
-            <ContenidoData title={t('page.registre.detall.data')}>{formatDate(entity?.data)}</ContenidoData>
-            <ContenidoData title={t('page.registre.detall.oficina')}>{entity?.oficinaDescripcio} ({entity?.oficinaCodi})</ContenidoData>
+            <ContenidoData title={t('page.registre.detall.tipus')}          xs={6} titleXs={4} textXs={8}>{t('page.registre.detall.entrada')}</ContenidoData>
+            <ContenidoData title={t('page.registre.detall.identificador')}  xs={6} titleXs={4} textXs={8}>{entity?.identificador}</ContenidoData>
+            <ContenidoData title={t('page.registre.detall.data')}           xs={6} titleXs={4} textXs={8}>{formatDate(entity?.data)}</ContenidoData>
+            <ContenidoData title={t('page.registre.detall.oficina')}        xs={6} titleXs={4} textXs={8}>{entity?.oficinaDescripcio} ({entity?.oficinaCodi})</ContenidoData>
 
             <CardData xs={6} title={t('page.registre.detall.required')}>
-                <ContenidoData title={t('page.registre.detall.llibre')}>{entity?.llibreDescripcio} ({entity?.llibreCodi})</ContenidoData>
-                <ContenidoData title={t('page.registre.detall.extracte')}>{entity?.extracte}</ContenidoData>
-                <ContenidoData title={t('page.registre.detall.docFisica')}>{entity?.docFisicaCodi} - {entity?.docFisicaDescripcio}</ContenidoData>
-                <ContenidoData title={t('page.registre.detall.desti')}>{entity?.destiDescripcio} ({entity?.destiCodi})</ContenidoData>
-                <ContenidoData title={t('page.registre.detall.assumpte')}>{entity?.assumpteTipusDescripcio} ({entity?.assumpteTipusCodi})</ContenidoData>
-                <ContenidoData title={t('page.registre.detall.idioma')}>{entity?.idiomaDescripcio} ({entity?.idiomaCodi})</ContenidoData>
+                <ContenidoData title={t('page.registre.detall.llibre')}     xs={12} titleXs={4} textXs={8}>{entity?.llibreDescripcio} ({entity?.llibreCodi})</ContenidoData>
+                <ContenidoData title={t('page.registre.detall.extracte')}   xs={12} titleXs={4} textXs={8}>{entity?.extracte}</ContenidoData>
+                <ContenidoData title={t('page.registre.detall.docFisica')}  xs={12} titleXs={4} textXs={8}>{entity?.docFisicaCodi} - {entity?.docFisicaDescripcio}</ContenidoData>
+                <ContenidoData title={t('page.registre.detall.desti')}      xs={12} titleXs={4} textXs={8}>{entity?.destiDescripcio} ({entity?.destiCodi})</ContenidoData>
+                <ContenidoData title={t('page.registre.detall.assumpte')}   xs={12} titleXs={4} textXs={8}>{entity?.assumpteTipusDescripcio} ({entity?.assumpteTipusCodi})</ContenidoData>
+                <ContenidoData title={t('page.registre.detall.idioma')}     xs={12} titleXs={4} textXs={8}>{entity?.idiomaDescripcio} ({entity?.idiomaCodi})</ContenidoData>
             </CardData>
 
             <CardData xs={6} title={t('page.registre.detall.optional')}>
-                <ContenidoData title={t('page.registre.detall.assumpteCodi')}>{entity?.assumpteCodiCodi}</ContenidoData>
-                <ContenidoData title={t('page.registre.detall.refExterna')} xs={6}>{entity?.refExterna}</ContenidoData>
-                <ContenidoData title={t('page.registre.detall.expedientNumero')} xs={6}>{entity?.expedientNumero}</ContenidoData>
-                <ContenidoData title={t('page.registre.detall.transport')} xs={6}>{entity?.transportTipusDescripcio}</ContenidoData>
-                <ContenidoData title={t('page.registre.detall.transportNumero')} xs={6}>{entity?.transportNumero}</ContenidoData>
-                <ContenidoData title={t('page.registre.detall.origenRegistreNumero')} xs={6}>{entity?.origenRegistreNumero}</ContenidoData>
-                <ContenidoData title={t('page.registre.detall.origenData')} xs={6}>{formatDate(entity?.origenData)}</ContenidoData>
-                <ContenidoData title={t('page.registre.detall.observacions')}>{entity?.observacions}</ContenidoData>
+                <ContenidoData title={t('page.registre.detall.assumpteCodi')}       xs={12} titleXs={4} textXs={8}>{entity?.assumpteCodiCodi}</ContenidoData>
+                <ContenidoData title={t('page.registre.detall.refExterna')}         xs={12} titleXs={4} textXs={8}>{entity?.refExterna}</ContenidoData>
+                <ContenidoData title={t('page.registre.detall.expedientNumero')}    xs={12} titleXs={4} textXs={8}>{entity?.expedientNumero}</ContenidoData>
+                <ContenidoData title={t('page.registre.detall.transport')}          xs={12} titleXs={4} textXs={8}>{entity?.transportTipusDescripcio}</ContenidoData>
+                <ContenidoData title={t('page.registre.detall.transportNumero')}    xs={12} titleXs={4} textXs={8}>{entity?.transportNumero}</ContenidoData>
+                <ContenidoData title={t('page.registre.detall.origenRegistreNumero')} xs={12} titleXs={4} textXs={8}>{entity?.origenRegistreNumero}</ContenidoData>
+                <ContenidoData title={t('page.registre.detall.origenData')}         xs={12} titleXs={4} textXs={8}>{formatDate(entity?.origenData)}</ContenidoData>
+                <ContenidoData title={t('page.registre.detall.observacions')}       xs={12} titleXs={4} textXs={8}>{entity?.observacions}</ContenidoData>
             </CardData>
         </Grid>
     </BasePage>
@@ -260,7 +260,7 @@ const Justificant = (props:any) => {
 
     const {downloadJustificant} = useActions()
 
-    return <CardData title={<><Icon hidden>description</Icon>{entity?.titol}</>}
+    return <CardData title={<><Icon hidden sx={{ fontSize: '1em', paddingTop: '2px', }}>description</Icon>{entity?.titol}</>}
          buttons={[
              {
                  text: t('page.anotacio.action.justificant.label'),
@@ -269,15 +269,15 @@ const Justificant = (props:any) => {
              }
          ]}
     >
-        <ContenidoData title={t('page.registre.justificant.ntiFechaCaptura')}>{formatDate(entity?.ntiFechaCaptura)}</ContenidoData>
-        <ContenidoData title={t('page.registre.justificant.ntiOrigen')}>{entity?.ntiOrigen}</ContenidoData>
-        <ContenidoData title={t('page.registre.justificant.ntiTipoDocumental')}>{entity?.ntiTipoDocumental}</ContenidoData>
-        <ContenidoData title={t('page.registre.justificant.uuid')}>{entity?.uuid}</ContenidoData>
-        <ContenidoData title={t('page.registre.justificant.titol')}>{entity?.titol}</ContenidoData>
+        <ContenidoData title={t('page.registre.justificant.ntiFechaCaptura')}   xs={6} titleXs={4} textXs={8}>{formatDate(entity?.ntiFechaCaptura)}</ContenidoData>
+        <ContenidoData title={t('page.registre.justificant.ntiOrigen')}         xs={6} titleXs={4} textXs={8}>{entity?.ntiOrigen}</ContenidoData>
+        <ContenidoData title={t('page.registre.justificant.ntiTipoDocumental')} xs={6} titleXs={4} textXs={8}>{entity?.ntiTipoDocumental}</ContenidoData>
+        <ContenidoData title={t('page.registre.justificant.uuid')}              xs={6} titleXs={4} textXs={8}>{entity?.uuid}</ContenidoData>
+        <ContenidoData title={t('page.registre.justificant.titol')}             xs={6} titleXs={4} textXs={8}>{entity?.titol}</ContenidoData>
 
-        <CardData title={t('page.arxiu.firma.title')}>
-            <ContenidoData title={t('page.registre.justificant.firmaTipus')}>{entity?.firmaTipus}</ContenidoData>
-            <ContenidoData title={t('page.registre.justificant.firmaPerfil')}>{entity?.firmaPerfil}</ContenidoData>
+        <CardData title={<><Icon hidden sx={{ fontSize: '1em', paddingTop: '2px', }}>{icons.firma}</Icon>{t('page.arxiu.firma.title')}</>}>
+            <ContenidoData title={t('page.registre.justificant.firmaTipus')}    xs={6} titleXs={4} textXs={8}>{entity?.firmaTipus}</ContenidoData>
+            <ContenidoData title={t('page.registre.justificant.firmaPerfil')}   xs={6} titleXs={4} textXs={8}>{entity?.firmaPerfil}</ContenidoData>
         </CardData>
     </CardData>
 }

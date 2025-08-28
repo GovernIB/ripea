@@ -344,6 +344,7 @@ const translationCa = {
                     title: "Detall de l'interessat",
                 },
                 new: {
+                    btnUpdate: "Actualitza",
                     label: "Nou Interessat",
                     ok: "L'interessat {{data.documentNum}} s'ha creat correctament",
                 },
@@ -617,6 +618,7 @@ const translationCa = {
                 fitxerContentType: "Tipus de contingut",
                 metaDocument: "Tipus de document",
                 createdDate: "Data de creació",
+                createdBy: "Creat per",
                 estat: "Estat",
                 dataCaptura: "Data de captura",
                 origen: "Origen",
@@ -671,7 +673,11 @@ const translationCa = {
                     label: "Descarregar original",
                     ok: "El document original s'ha descarregat correctament",
                 },
+                download: {
+                    ok: "Document descarregat correctament",
+                },
                 firma: {
+                    button: "Iniciar procés de firma",
                     label: "Descarregar signatura",
                     title: "Signar des del navegador",
                     ok: "Document signat correctament",

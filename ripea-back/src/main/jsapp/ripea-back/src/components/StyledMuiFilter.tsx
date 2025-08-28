@@ -1,4 +1,4 @@
-import {Button, Grid, Icon} from "@mui/material";
+import {Button, Grid, Icon, Typography} from "@mui/material";
 import {MuiFilter, useFilterApiRef, useFormApiRef} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {useSession} from "./SessionStorageContext.tsx";
@@ -113,7 +113,7 @@ const StyledMuiFilter = (props:any) => {
                     buttons?.map((button:FilterButtonProps)=>
                         <Button key={button.value} onClick={() => buttonCallback?.(button.value)} {...button?.componentProps}>
                             {button?.icon && <Icon sx={{ mr: 0 }}>{button?.icon}</Icon>}
-                            {button.text}
+                            <Typography sx={{ paddingLeft: '5px', marginTop: '1px' }}>{button.text}</Typography>
                         </Button>)
                 }
             </Grid>

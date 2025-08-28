@@ -92,6 +92,7 @@ const TasquesGrid = () => {
                 resourceName={'expedientTascaComentariResource'}
                 resourceReference={'expedientTasca'}
                 readOnly={params?.row?.usuariActualOnlyObservador}
+                onClose={refresh}
             />
         },
     ], [columns])

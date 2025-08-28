@@ -799,4 +799,41 @@ public class Utils {
 			return DocumentFirmaTipusEnumDto.FIRMA_SEPARADA;
 		}
 	}
+	
+    public static String getFitxerContentType(String fitxerNom, String fitxerContentType) {
+    	if (!Utils.hasValue(fitxerContentType)) {
+    		//Alguns contentTypes coneguts:
+    		if (Utils.hasValue(fitxerNom)) {
+    			if (fitxerNom.endsWith(".xsig")) {
+    				return "application/octet-stream";
+    			} else if (fitxerNom.endsWith(".xml")) {
+    				return "text/xml";
+    			} else if (fitxerNom.endsWith(".pdf")) {
+    				return "application/pdf";
+    			} else if (fitxerNom.endsWith(".odt")) {
+    				return "application/vnd.oasis.opendocument.text";
+    			} else if (fitxerNom.endsWith(".zip")) {
+    				return "application/x-zip-compressed";
+    			} else if (fitxerNom.endsWith(".docx")) {
+    				return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+    			} else if (fitxerNom.endsWith(".txt")) {
+    				return "text/plain";
+    			} else if (fitxerNom.endsWith(".csv")) {
+    				return "text/csv";
+    			} else if (fitxerNom.endsWith(".xlsx")) {
+    				return "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";    				
+    			} else if (fitxerNom.endsWith(".xls")) {
+    				return "application/vnd.ms-excel";    				
+    			} else if (fitxerNom.endsWith(".doc")) {
+    				return "application/msword";
+    			} else if (fitxerNom.endsWith(".jpg")) {
+    				return "image/jpeg";
+    			} else {
+    				return "application/octet-stream";
+    			}
+    		}	
+    	}
+    	
+    	return fitxerContentType;
+    }
 }

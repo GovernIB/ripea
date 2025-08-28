@@ -179,8 +179,12 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
         @Override
         public void onChange(Serializable id, InteressatResource previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, InteressatResource target) {
             if (fieldValue!=null) {
-                switch ((InteressatTipusEnum)fieldValue){
+            	target = previous; //Conservam tots els valors, nomes resetejam els necessaris.
+            	InteressatTipusEnum nouTipus = (InteressatTipusEnum)fieldValue;
+            	target.setTipus(nouTipus);
+                switch (nouTipus){
                     case InteressatPersonaFisicaEntity:
+                    	target.setDocumentTipus(InteressatDocumentTipusEnumDto.NIF);
                         target.setOrganCodi(null);
                         break;
                     case InteressatPersonaJuridicaEntity:

@@ -40,25 +40,25 @@ const sortModel:any = [{field: 'id', sort: 'asc'}];
 const columns = [
     {
         field: 'tipus',
-        flex: 0.5,
+        flex: 0.4,
     },
     {
         field: 'createdDate',
-        flex: 0.75,
+        flex: 0.5,
         valueFormatter: (value: any) => formatDate(value)
     },
     {
         field: 'processatData',
-        flex: 0.75,
+        flex: 0.5,
         valueFormatter: (value: any) => formatDate(value)
     },
     {
         field: 'assumpte',
-        flex: 0.5,
+        flex: 0.9,
     },
     {
         field: 'document',
-        flex: 0.5,
+        flex: 0.7,
     },
     {
         field: 'estat',

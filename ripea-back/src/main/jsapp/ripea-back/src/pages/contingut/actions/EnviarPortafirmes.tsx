@@ -125,6 +125,7 @@ const EnviarPortafirmesForm = () => {
                                value: data?.fluxCreat?.fluxId,
                                description: data?.fluxCreat?.nom +' - '+ data?.fluxCreat?.descripcio,
                            }}}
+                           autocomplete
                            required/>
 
             <GridButton

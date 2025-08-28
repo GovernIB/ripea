@@ -286,21 +286,21 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             label: t('common.download'),
             icon: "download",
             showInMenu: true,
-			onClick: (id:any) => apiDownload(id, 'adjunt', t('page.expedient.results.actionOk')),
+			onClick: (id:any) => apiDownload(id, 'adjunt', t('page.document.action.download.ok')),
             hidden: (row:any) => !isDigitalOrImportat(row),
         },
         {
             label: t('page.document.action.original.label'),
             icon: "download",
             showInMenu: true,
-			onClick: (id:any) => apiDownload(id, 'original', t('page.document.action.original.ok')),
+			onClick: (id:any) => apiDownload(id, 'original', t('page.document.action.download.ok')),
             hidden: (row:any) => !isDigitalOrImportat(row) || !row?.gesDocOriginalId
         },
         {
             label: t('page.document.action.firma.label'),
             icon: "download",
             showInMenu: true,
-			onClick: (id:any) => apiDownload(id, 'firmaAdjunt', t('page.document.action.firma.ok')),
+			onClick: (id:any) => apiDownload(id, 'firmaAdjunt', t('page.document.action.download.ok')),
             hidden: (row:any) => !isDigitalOrImportat(row) || row?.ntiTipoFirma != "TF04"
         },
         {

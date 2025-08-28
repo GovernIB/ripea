@@ -129,7 +129,7 @@ public class ExpedientTascaResourceEntity extends BaseAuditableEntity<ExpedientT
     	String resultat = "";
     	if (this.responsables!=null && this.responsables.size()>0) {
     		for (UsuariResourceEntity ue: this.getResponsables()) {
-    			resultat+=ue.getNom()+"("+ue.getCodi()+"), ";
+    			resultat+=ue.getNom()+" ("+ue.getCodi()+"), ";
     		}
     		resultat = resultat.substring(0, resultat.length()-2);
     	}
@@ -140,7 +140,7 @@ public class ExpedientTascaResourceEntity extends BaseAuditableEntity<ExpedientT
     	String resultat = "";
     	if (this.observadors!=null && this.observadors.size()>0) {
     		for (UsuariResourceEntity ue: this.getObservadors()) {
-    			resultat+=ue.getNom()+"("+ue.getCodi()+"), ";
+    			resultat+=ue.getNom()+" ("+ue.getCodi()+"), ";
     		}
     		resultat = resultat.substring(0, resultat.length()-2);
     	}
