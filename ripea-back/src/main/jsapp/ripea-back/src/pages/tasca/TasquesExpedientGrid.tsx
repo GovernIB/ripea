@@ -98,6 +98,7 @@ const TasquesExpedientGrid = (props: any) => {
                 resourceName={'expedientTascaComentariResource'}
                 resourceReference={'expedientTasca'}
                 readOnly={params?.row?.usuariActualOnlyObservador}
+                onClose={apiRef?.current?.refresh}
             />
         },
     ]
