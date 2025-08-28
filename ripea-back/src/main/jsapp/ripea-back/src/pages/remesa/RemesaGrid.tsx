@@ -11,9 +11,12 @@ const commonStyle = {p: 0.5, display: 'flex', alignItems: 'center', borderRadius
 export const EstatMessage = (props:any) => {
     const {title, icon, color, children} = props;
 
-    return <Typography variant="caption" title={title || (typeof children === 'string' ?children :'')} sx={{ ...commonStyle, backgroundColor: `${color}.main`, color: 'white' }}>
-        <Icon fontSize={"inherit"} sx={{ mr: children!=null  ?1 :0 }}>{icon}</Icon>
-        {children}
+    return <Typography 
+        variant="caption" 
+        title={title || (typeof children === 'string' ?children :'')} 
+        sx={{ ...commonStyle, backgroundColor: `${color}.light`, color: 'white' }}>
+            <Icon fontSize={"inherit"} sx={{ mr: children!=null  ?1 :0 }}>{icon}</Icon>
+            <Typography sx={{fontSize: '0.8rem', paddingRight: '5px'}}>{children}</Typography>
     </Typography>
 }
 const StyledEstat = (props:any) => {
@@ -29,8 +32,11 @@ const StyledEstat = (props:any) => {
                 }
             </>
         case 'REGISTRADA':
+            return <EstatMessage icon={"info"} color={'info'}>{children}</EstatMessage>
         case 'FINALITZADA':
+            return <EstatMessage icon={"check"} color={'success'}>{children}</EstatMessage>
         case 'PROCESSADA':
+            return <EstatMessage icon={"info"} color={'info'}>{children}</EstatMessage>
         case 'ENVIADA_AMB_ERRORS':
             if (entity?.error) {
                 return <EstatMessage icon={"warning"} color={'error'}>{children}</EstatMessage>
@@ -38,6 +44,7 @@ const StyledEstat = (props:any) => {
                 return <EstatMessage icon={"check"} color={'success'}>{children}</EstatMessage>
             }
         case 'ENVIADA':
+            return <EstatMessage icon={"info"} color={'info'}>{children}</EstatMessage>
         case 'FINALITZADA_AMB_ERRORS':
             if (entity?.error) {
                 return <EstatMessage icon={"warning"} color={'error'}>{children}</EstatMessage>

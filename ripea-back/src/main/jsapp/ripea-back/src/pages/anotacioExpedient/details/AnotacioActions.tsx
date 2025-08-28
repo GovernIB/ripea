@@ -9,7 +9,7 @@ const useAnotacioActions = () => {
         {
             label: t('common.detail'),
             icon: "info",
-            showInMenu: true,
+            showInMenu: false,
             onClick: handleOpen,
         },
     ];

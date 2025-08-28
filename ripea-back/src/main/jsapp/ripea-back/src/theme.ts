@@ -84,7 +84,7 @@ const theme = createTheme({
         MuiCardHeader : {
             styleOverrides: {
                 root: {
-                    padding: '10px',
+                    padding: '5px',
                 },
             },
         },
