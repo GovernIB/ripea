@@ -10,17 +10,17 @@ import Iframe from "../../../components/Iframe.tsx";
 
 const SeguimentPortafirmes = (props:any) => {
     const {entity} = props;
-
+    const { t } = useTranslation();
     return <Load value={entity}>
         <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
             <CardData xs={6} title={entity?.document?.description}>
-                <ContenidoData title={'assumpte'}>{entity?.assumpte}</ContenidoData>
-                <ContenidoData title={'enviatData'}>{formatDate(entity?.enviatData)}</ContenidoData>
-                <ContenidoData title={'estat'}>{entity?.estat}</ContenidoData>
-                <ContenidoData title={'prioritat'}>{entity?.prioritat}</ContenidoData>
-                <ContenidoData title={'documentTipus'}>{entity?.documentTipus}</ContenidoData>
-                <ContenidoData title={'fluxTipus'}>{entity?.fluxTipus}</ContenidoData>
-                <ContenidoData title={'portafirmesId'}>{entity?.portafirmesId}</ContenidoData>
+                <ContenidoData title={t('page.contingut.action.seguimentPortafirmes.assumpte')}>{entity?.assumpte}</ContenidoData>
+                <ContenidoData title={t('page.contingut.action.seguimentPortafirmes.enviatData')}>{formatDate(entity?.enviatData)}</ContenidoData>
+                <ContenidoData title={t('page.contingut.action.seguimentPortafirmes.estat')}>{t(`enum.estat.${entity?.estat}`)}</ContenidoData>
+                <ContenidoData title={t('page.contingut.action.seguimentPortafirmes.prioritat')}>{t(`enum.prioritat.${entity?.prioritat}`)}</ContenidoData>
+                <ContenidoData title={t('page.contingut.action.seguimentPortafirmes.documentTipusNom')}>{entity?.documentTipusNom}</ContenidoData>
+                <ContenidoData title={t('page.contingut.action.seguimentPortafirmes.fluxTipus')}>{t(`enum.fluxTipus.${entity?.fluxTipus}`)}</ContenidoData>
+                <ContenidoData title={t('page.contingut.action.seguimentPortafirmes.portafirmesId')}>{entity?.portafirmesId}</ContenidoData>
             </CardData>
 
             <Grid item xs={6}>
@@ -29,6 +29,7 @@ const SeguimentPortafirmes = (props:any) => {
         </Grid>
     </Load>
 }
+
 const useSeguimentPortafirmes = (potModificar:boolean, refresh?: () => void) => {
     const { t } = useTranslation();
     const {temporalMessageShow} = useBaseAppContext();

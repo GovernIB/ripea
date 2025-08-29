@@ -1,6 +1,7 @@
 package es.caib.ripea.service.resourceservice;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
@@ -22,6 +23,7 @@ import es.caib.ripea.service.helper.ExcepcioLogHelper;
 import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
+import es.caib.ripea.service.intf.dto.PortafirmesDocumentTipusDto;
 import es.caib.ripea.service.intf.model.DocumentPortafirmesResource;
 import es.caib.ripea.service.intf.resourceservice.DocumentPortafirmesResourceService;
 import lombok.RequiredArgsConstructor;
@@ -52,6 +54,13 @@ public class DocumentPortafirmesResourceServiceImpl extends BaseMutableResourceS
     		resource.setUrlFluxSeguiment(pluginHelper.portafirmesRecuperarUrlEstatFluxFirmes(
     				Long.valueOf(entity.getPortafirmesId()),
     				usuari.getIdioma()!=null?usuari.getIdioma().toString():"ca"));
+    		List<PortafirmesDocumentTipusDto> list = pluginHelper.portafirmesFindDocumentTipus();
+    		for (PortafirmesDocumentTipusDto doctipus : list) {
+    			if (Long.toString(doctipus.getId()).equals(entity.getDocumentTipus())) {
+    				resource.setDocumentTipusNom(doctipus.getNom());
+    				break;
+    			}
+    		}
     	} catch (Exception ex) {
     		//No s'ha pogut carregar la URL del fluxe
     	}

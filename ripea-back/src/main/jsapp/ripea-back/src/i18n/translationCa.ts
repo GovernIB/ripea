@@ -58,10 +58,23 @@ const translationCa = {
             C_ALTA: "Alta",
             B_NORMAL: "Normal",
             A_BAIXA: "Baixa",
+            BAIXA: "Baixa",
+            NORMAL: "Normal",
+            ALTA: "Alta",
+        },
+        fluxTipus: {
+            SIMPLE: "Simple",
+            PORTAFIB: "Portafib",
         },
         estat: {
             TANCAT: "Tancat",
             OBERT: "Obert",
+            ENVIAT: "Enviat",
+            PAUSAT: "Pausat",
+            INICIAT: "Iniciat",
+            FIRMAT: "Firmat",
+            REBUTJAT: "Rebutjat",
+            PARCIAL: "Parcial",
         },
         origen: {
             O0: "Ciutadà",
@@ -179,6 +192,17 @@ const translationCa = {
                 importarExpedient: {
                     label: "Importar expedient relacionat...",
                     title: "Expedients relacionats",
+                },
+                seguimentPortafirmes: {
+                    label: "Seguiment Portafirmes",
+                    title: "Seguiment Portafirmes",
+                    assumpte: "Assumpte",
+                    enviatData: "Data d'enviament",
+                    estat: "Estat",
+                    prioritat: "Prioritat",
+                    documentTipusNom: "Tipus de document",
+                    fluxTipus: "Tipus de flux",
+                    portafirmesId: "ID Portafirmes",
                 },
             },
             history: {

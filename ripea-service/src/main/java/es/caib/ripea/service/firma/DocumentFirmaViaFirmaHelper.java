@@ -100,6 +100,7 @@ public class DocumentFirmaViaFirmaHelper extends DocumentFirmaHelper{
 			if (viaFirmaDispositiuDto.getCodi().equals(viaFirmaEnviarDto.getCodiUsuariViaFirma())) {
 				contrasenyaUsuariViaFirma = viaFirmaDispositiuDto.getContrasenya();
 				viaFirmaEnviarDto.setContrasenyaUsuariViaFirma(contrasenyaUsuariViaFirma);
+				break;
 			}
 		}
 		
