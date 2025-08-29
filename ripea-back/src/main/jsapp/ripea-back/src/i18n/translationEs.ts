@@ -193,7 +193,10 @@ const translationEs = {
                     documentTipusNom: "Tipo de documento",
                     fluxTipus: "Tipo de flujo",
                     portafirmesId: "ID Portafirmas",
-                },                
+                }, 
+                seguimentvf: {
+                    label: "Seguiment Viafirma",
+                }                              
             },
             history: {
                 create: "Creación",

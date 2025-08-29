@@ -21,6 +21,7 @@ import es.caib.ripea.service.intf.resourceservice.DocumentNotificacioResourceSer
 import es.caib.ripea.service.intf.resourceservice.DocumentPortafirmesResourceService;
 import es.caib.ripea.service.intf.resourceservice.DocumentPublicacioResourceService;
 import es.caib.ripea.service.intf.resourceservice.DocumentResourceService;
+import es.caib.ripea.service.intf.resourceservice.DocumentViafirmaResourceService;
 import es.caib.ripea.service.intf.resourceservice.EntitatResourceService;
 import es.caib.ripea.service.intf.resourceservice.ExecucioMassivaContingutResourceService;
 import es.caib.ripea.service.intf.resourceservice.ExecucioMassivaResourceService;
@@ -480,6 +481,12 @@ public class EjbClientConfig {
 	@ConditionalOnWarDeployment
 	public LocalStatelessSessionProxyFactoryBean documentPortafirmesResourceServiceEjb() {
 		return getLocalEjbFactoyBean(DocumentPortafirmesResourceService.class);
+	}
+	
+	@Bean
+	@ConditionalOnWarDeployment
+	public LocalStatelessSessionProxyFactoryBean documentViafirmaResourceServiceEjb() {
+		return getLocalEjbFactoyBean(DocumentViafirmaResourceService.class);
 	}
 
 	@Bean

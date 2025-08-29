@@ -13,8 +13,8 @@ public interface DocumentViaFirmaRepository extends JpaRepository<DocumentViaFir
 
 	List<DocumentViaFirmaEntity> findByDocument(DocumentEntity document);
 
-	List<DocumentViaFirmaEntity> findByDocumentAndEstatInOrderByCreatedDateDesc(
-			DocumentEntity document,
+	List<DocumentViaFirmaEntity> findByDocumentIdAndEstatInOrderByCreatedDateDesc(
+			Long documentId,
 			DocumentEnviamentEstatEnumDto[] estat);
 
 	List<DocumentViaFirmaEntity> findByDocumentAndEstatInAndErrorOrderByCreatedDateDesc(

@@ -120,6 +120,7 @@ public class PermissionHelper {
 			if (targetType.endsWith(".DocumentEnviamentResource")) { return userPermissions.isConsulta(); }
 			if (targetType.endsWith(".DocumentNotificacioResource")) { return userPermissions.isConsulta(); }
 			if (targetType.endsWith(".DocumentPortafirmesResource")) { return userPermissions.isConsulta(); }
+			if (targetType.endsWith(".DocumentViaFirmaResource")) { return userPermissions.isConsulta(); }
 			if (targetType.endsWith(".DocumentPublicacioResource")) { return userPermissions.isConsulta(); }
 			if (targetType.endsWith(".DocumentResource")) { return userPermissions.isConsulta(); }
 			if (targetType.endsWith(".ExecucioMassivaContingutResource")) { return userPermissions.isConsulta(); }

@@ -204,6 +204,16 @@ const translationCa = {
                     fluxTipus: "Tipus de flux",
                     portafirmesId: "ID Portafirmes",
                 },
+                seguimentvf: {
+                    label: "Seguiment Viafirma",
+                    document: "Document",
+                    titol: "Títol notificació",
+                    descripcio: "Descripció notificació",
+                    enviatData: "Data d'enviament",
+                    estat: "Estat",
+                    tipusDestinatari: "Tipus de destinatari",
+                    messageCode: "Codi missatge viaFirma",
+                }
             },
             history: {
                 create: "Creació",
@@ -742,7 +752,7 @@ const translationCa = {
                 seguiment: {
                     label: "Seguiment portafirmes",
                     cancel: "Cancel·la enviament",
-                    title: "Detalls de la signatura",
+                    title: "Detalls de la firma",
                     ok: "La signatura ha estat cancel·lada correctament",
                 },
                 notificar: {
