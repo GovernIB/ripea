@@ -43,10 +43,10 @@ const translationCa = {
     enum: {
         rol: {
             IPA_SUPER: "Superusuari",
-            IPA_ADMIN: "Administrador",
-            IPA_DISSENY: "Dissenyador",
-            IPA_ORGAN_ADMIN: "Administrador d'òrgans",
-            IPA_REVISIO: "Revisor",
+            IPA_ADMIN: "Administrador d'entitat",
+            IPA_DISSENY: "Dissenyador d'òrgan gestor",
+            IPA_ORGAN_ADMIN: "Administrador d'òrgan gestor",
+            IPA_REVISIO: "Revisor de procediments",
             tothom: "Usuari",
         },
         siNO: {
@@ -1011,7 +1011,7 @@ const translationCa = {
             options: {
                 perfil: "El meu perfil",
                 manual: "Manual d'usuari",
-                manualAdmin: "Manual d'administrador",
+                manualAdmin: "Manual dels administradors",
                 logout: "Desconnectar"
             },
             menu: {
@@ -1020,13 +1020,13 @@ const translationCa = {
                 monitoritzar: "Monitoritzar",
                 integracions: "Integracions",
                 excepcions: "Excepcions",
-                monitor: "Monitor del sistema",
+                monitor: "Monitor de sistema",
 
-                config: "Configuració",
+                config: "Configurar",
                 props: "Propietats configurables",
                 pinbal: "Serveis PINBAL",
-                segonPla: "Reiniciar tasques en segon pla",
-                plugins: "Reiniciar connectors",
+                segonPla: "Reiniciar tasques en segon pla ...",
+                plugins: "Reiniciar plugins ...",
                 avisos: "Avisos",
                 backVersio: "Interfície clàssica",
 
@@ -1058,15 +1058,15 @@ const translationCa = {
             massive: {
                 title: "Acció massiva",
                 portafirmes: "Enviar documents al portafirmes",
-                firmar: "Signar documents des del navegador",
+                firmar: "Firmar documents des del navegador",
                 marcar: "Marcar com a definitius",
-                estat: "Canvi d'estat dels expedients",
+                estat: "Canvi d'estat d'expedients",
                 tancar: "Tancament d'expedients",
                 custodiar: "Custodiar elements pendents",
                 csv: "Copiar enllaç CSV",
                 anexos: "Adjuntar annexos pendents d'anotacions acceptades",
                 anotacio: "Actualitzar estat de les anotacions a Distribució",
-                prioritat: "Canviar prioritat dels expedients",
+                prioritat: "Canviar prioritat d'expedients",
             },
             action: {
                 massives: {

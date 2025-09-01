@@ -33,10 +33,10 @@ const translationEs = {
     enum: {
         rol: {
             IPA_SUPER: "Superusuario",
-            IPA_ADMIN: "Administrador",
-            IPA_DISSENY: "Disseñador",
-            IPA_ORGAN_ADMIN: "Administrador de organos",
-            IPA_REVISIO: "Revisor",
+            IPA_ADMIN: "Administrador de entidad",
+            IPA_DISSENY: "Diseñador de Órgano gestor",
+            IPA_ORGAN_ADMIN: "Administrador de Órgano gestor",
+            IPA_REVISIO: "Revisor de procedimientos",
             tothom: "Usuario",
         },
         siNO: {
@@ -994,8 +994,8 @@ const translationEs = {
         user: {
             options: {
                 perfil: "Mi perfil",
-                manual: "Manual de usuario",
-                manualAdmin: "Manual de administrador",
+                manual: "Manual de Usuario",
+                manualAdmin: "Manual de los Administradores",
                 logout: "Desconectar"
             },
             menu: {
@@ -1004,13 +1004,13 @@ const translationEs = {
                 monitoritzar: "Monitorizar",
                 integracions: "Integraciones",
                 excepcions: "Excepciones",
-                monitor: "Monitor de sistema",
+                monitor: "Monitor del sistema",
 
                 config: "Configuración",
                 props: "Propiedades configurables",
                 pinbal: "Servicios PINBAL",
-                segonPla: "Reiniciar tareas en segundo plano",
-                plugins: "Reiniciar plugins",
+                segonPla: "Reiniciar tareas en segundo plano ...",
+                plugins: "Reiniciar plugins ...",
                 avisos: "Avisos",
                 backVersio: "Interfaz clásica",
 
