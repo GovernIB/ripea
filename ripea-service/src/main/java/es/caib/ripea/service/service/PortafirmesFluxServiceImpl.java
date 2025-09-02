@@ -95,9 +95,9 @@ public class PortafirmesFluxServiceImpl implements PortafirmesFluxService {
 	
 	@Transactional(readOnly = true)
 	@Override
-	public List<PortafirmesFluxRespostaDto> recuperarPlantillesDisponibles(Long entitatId, String rolActual, boolean filtrar) {
+	public List<PortafirmesFluxRespostaDto> recuperarPlantillesDisponibles(Long entitatId, Long metaDocumentId, boolean filtrar) {
 		logger.debug("Recuperant plantilles disponibles per l'usuari aplicació");
-		return pluginHelper.portafirmesRecuperarPlantillesDisponibles(entitatId, filtrar);
+		return pluginHelper.portafirmesRecuperarPlantillesDisponibles(entitatId, metaDocumentId, filtrar);
 	}
 	
 	@Transactional

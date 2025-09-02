@@ -10,6 +10,7 @@ public class PortafirmesFluxRespostaDto implements Serializable {
 	private boolean error;
 	private PortafirmesFluxEstatDto estat;
 	private boolean isUsuariActual;
+	private boolean isProcedimentDefault;
 	private String usuari; //Usuari que ha iniciat el proces de firma
 	
 	public String getNom() {
@@ -55,6 +56,13 @@ public class PortafirmesFluxRespostaDto implements Serializable {
 	}
 	public void setUsuari(String usuari) {
 		this.usuari = usuari;
+	}
+
+	public boolean isProcedimentDefault() {
+		return isProcedimentDefault;
+	}
+	public void setProcedimentDefault(boolean isProcedimentDefault) {
+		this.isProcedimentDefault = isProcedimentDefault;
 	}
 
 	private static final long serialVersionUID = -6768802833333049841L;

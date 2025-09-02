@@ -115,12 +115,9 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 		}
 		MetaDocumentCommand command = null;
 		if (metaDocument != null) {
-			model.addAttribute("portafirmesFluxSeleccionat", metaDocument.getPortafirmesFluxId());
-			command = MetaDocumentCommand.asCommand(metaDocument);
-			
+			command = MetaDocumentCommand.asCommand(metaDocument);			
 		} else {
-			command = new MetaDocumentCommand();
-			
+			command = new MetaDocumentCommand();			
 		}
 		command.setEntitatId(entitatActual.getId());
 		command.setMetaExpedientId(metaExpedientId);
@@ -138,6 +135,7 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 				model.addAttribute("isRolActualRevisor", true);
 			}
 		}
+		
 		addBotoCarrecsProperty(model);
 		return "metaExpedientMetaDocumentForm";
 	}
@@ -197,15 +195,13 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
 		
 		if (command.getId() != null) {
+			
 			metaDocumentService.update(
 					entitatActual.getId(),
-					metaExpedientId,
 					MetaDocumentCommand.asDto(command),
 					command.getPlantilla() != null ? command.getPlantilla().getOriginalFilename() : null,
 					command.getPlantilla() != null ? command.getPlantilla().getContentType() : null,
-					command.getPlantilla() != null ? command.getPlantilla().getBytes() : null, 
-					rolActual, 
-					organActual != null ? organActual.getId() : null);
+					command.getPlantilla() != null ? command.getPlantilla().getBytes() : null);
 			
 			return getModalControllerReturnValueSuccess(
 					request,
@@ -219,7 +215,9 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 					MetaDocumentCommand.asDto(command),
 					command.getPlantilla().getOriginalFilename(),
 					command.getPlantilla().getContentType(),
-					command.getPlantilla().getBytes(), rolActual, organActual != null ? organActual.getId() : null);
+					command.getPlantilla().getBytes(),
+					rolActual, 
+					organActual != null ? organActual.getId() : null);
 
 			return getModalControllerReturnValueSuccess(
 					request,
@@ -454,7 +452,10 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 	public List<PortafirmesFluxRespostaDto> getPlantillesDisponibles(HttpServletRequest request, Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
 		organGestorService.actualitzarOrganCodi(SessioHelper.getOrganActual(request));
-		List<PortafirmesFluxRespostaDto> resposta = portafirmesFluxService.recuperarPlantillesDisponibles(entitatActual.getId(), RolHelper.getRolActual(request), false);
+		List<PortafirmesFluxRespostaDto> resposta = portafirmesFluxService.recuperarPlantillesDisponibles(
+				entitatActual.getId(),
+				null,
+				false);
 		return resposta;
 	}
 

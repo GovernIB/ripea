@@ -89,12 +89,14 @@ import es.caib.ripea.persistence.entity.InteressatPersonaFisicaEntity;
 import es.caib.ripea.persistence.entity.InteressatPersonaJuridicaEntity;
 import es.caib.ripea.persistence.entity.MetaDadaEntity;
 import es.caib.ripea.persistence.entity.MetaDocumentEntity;
+import es.caib.ripea.persistence.entity.MetaDocumentFluxPortafibEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.entity.UsuariEntity;
 import es.caib.ripea.persistence.repository.DocumentEnviamentInteressatRepository;
 import es.caib.ripea.persistence.repository.ExpedientPeticioRepository;
 import es.caib.ripea.persistence.repository.FluxFirmaUsuariRepository;
+import es.caib.ripea.persistence.repository.MetaDocumentFluxPortafibRepository;
 import es.caib.ripea.persistence.repository.MetaDocumentRepository;
 import es.caib.ripea.persistence.repository.UsuariRepository;
 import es.caib.ripea.plugin.PropertiesHelper;
@@ -266,6 +268,7 @@ public class PluginHelper {
 	@Autowired private DocumentEnviamentInteressatRepository documentEnviamentInteressatRepository;
 	@Autowired private ExpedientPeticioRepository expedientPeticioRepository;
 	@Autowired private FluxFirmaUsuariRepository fluxFirmaUsuariRepository;
+	@Autowired private MetaDocumentFluxPortafibRepository metaDocumentFluxPortafibRepository;
 	@Autowired private UsuariRepository usuariRepository;
 
 	public List<String> rolsUsuariFindAmbCodi(String usuariCodi) {
@@ -3735,8 +3738,13 @@ public class PluginHelper {
 		return resposta;
 	}
 
-	public List<PortafirmesFluxRespostaDto> portafirmesRecuperarPlantillesDisponibles(Long entitatId, boolean filtrar) {
-
+	/**
+	 * Recupera les plantilles de firma disponibles:
+	 * - Plantilles del firmant = usuariActual si filtrar=true (isUsuariActual=true)
+	 * - Totes les plantilles si filtrar=false (isUsuariActual=false)
+	 * - EXTRA: Si li passes metaDocumentId, afegeix les plantilles definides al procediment. (isProcedimentDefault=true)
+	 */
+	public List<PortafirmesFluxRespostaDto> portafirmesRecuperarPlantillesDisponibles(Long entitatId, Long metaDocumentId, boolean filtrar) {
 		String accioDescripcio = "Recuperant flux de firma";
 		long t0 = System.currentTimeMillis();
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -3794,6 +3802,32 @@ public class PluginHelper {
 				}
 			}
 			
+			if (metaDocumentId!=null) {
+				List<MetaDocumentFluxPortafibEntity> fluxosProcediment = metaDocumentFluxPortafibRepository.findByMetaDocumentId(metaDocumentId);
+				List<PortafirmesFluxInfo> fluxosPerDefecteAfegir = new ArrayList<PortafirmesFluxInfo>();
+				if (fluxosProcediment!=null) {
+					for (MetaDocumentFluxPortafibEntity fluxProcediment: fluxosProcediment) {
+						if (!llistatFluxosContainsId(respostesDto, fluxProcediment.getPortafirmesFluxId())) {
+							PortafirmesFluxInfo portafirmesFluxInfo = portafirmesPlugin.recuperarFluxDeFirmaByIdPlantilla(
+									fluxProcediment.getPortafirmesFluxId(),
+									aplicacioService.getUsuariActual().getIdioma(),
+									false);
+							fluxosPerDefecteAfegir.add(portafirmesFluxInfo);
+						}
+					}
+				}
+				//Afegim ara els procediments al llistat, ja que no es pot fer un add a una llista mentra la recorres
+				if (fluxosPerDefecteAfegir.size()>0) {
+					for (PortafirmesFluxInfo aux: fluxosPerDefecteAfegir) {
+						PortafirmesFluxRespostaDto fluxDefault = new PortafirmesFluxRespostaDto();
+						fluxDefault.setFluxId(aux.getNom());
+						fluxDefault.setNom(aux.getDescripcio());
+						fluxDefault.setProcedimentDefault(true);
+						respostesDto.add(fluxDefault);
+					}
+				}
+			}
+			
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de portafirmes";
 			integracioHelper.addAccioError(
@@ -3808,6 +3842,18 @@ public class PluginHelper {
 			throw new SistemaExternException(IntegracioHelper.INTCODI_PFIRMA, errorDescripcio, ex);
 		}
 		return respostesDto;
+	}
+	
+	private boolean llistatFluxosContainsId(List<PortafirmesFluxRespostaDto> fluxosResposta, String fluxId) {
+		if (fluxosResposta!=null) {
+			for (PortafirmesFluxRespostaDto aux: fluxosResposta) {
+				if (aux.getFluxId().equals(fluxId)) {
+					aux.setProcedimentDefault(true);
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	public boolean portafirmesEsborrarPlantillaFirma(

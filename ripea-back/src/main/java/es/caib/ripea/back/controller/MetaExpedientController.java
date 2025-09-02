@@ -500,34 +500,43 @@ public class MetaExpedientController extends BaseAdminController {
 			
 			if (command.getMetaDocuments() != null) {
 				
-				List<PortafirmesFluxRespostaDto> plantilles = portafirmesFluxService.recuperarPlantillesDisponibles(entitatActual.getId(), RolHelper.getRolActual(request), false);
-				
 				for (MetaDocumentCommand metaDocumentCommand : command.getMetaDocuments()) {
 					for (MetaDocumentDto metaDocumentDto : metaExpedientExport.getMetaDocuments()) {
+						
 						if (metaDocumentDto.getId().equals(metaDocumentCommand.getId())) {
 							metaDocumentDto.setPortafirmesResponsables(metaDocumentCommand.getPortafirmesResponsables());
 						}
-						
-						if (metaDocumentDto.getPortafirmesFluxId() != null && !metaDocumentDto.getPortafirmesFluxId().isEmpty()) {
-							boolean exists = false;
-							if (plantilles != null) {
-								for (PortafirmesFluxRespostaDto portafirmesFlux : plantilles) {
-									if (portafirmesFlux.getFluxId().equals(metaDocumentDto.getPortafirmesFluxId())) {
-										exists = true;
+
+						List<PortafirmesFluxRespostaDto> plantilles = portafirmesFluxService.recuperarPlantillesDisponibles(
+								entitatActual.getId(),
+								metaDocumentCommand.getId(),
+								false);
+
+						List<String> fluxosExistents = new ArrayList<>();
+						if (metaDocumentDto.getPortafirmesFluxosId() != null) {
+							for (String fluxDefecteMetadocId: metaDocumentDto.getPortafirmesFluxosId()) {
+								boolean exists = false;
+								if (plantilles != null) {
+									for (PortafirmesFluxRespostaDto portafirmesFlux : plantilles) {
+										if (portafirmesFlux.getFluxId().equals(fluxDefecteMetadocId)) {
+											exists = true;
+										}
 									}
 								}
-							}
-							if (!exists) {
-								MissatgesHelper.warning(
-										request, 
-										getMessage(
-												request,
-												"metaexpedient.import.controller.fluxIdNotFound",
-												new Object[] {metaDocumentDto.getPortafirmesFluxId(), metaDocumentDto.getCodi()}));
-										
-								metaDocumentDto.setPortafirmesFluxId(null);
+								
+								if (!exists) {
+									MissatgesHelper.warning(
+											request, 
+											getMessage(
+													request,
+													"metaexpedient.import.controller.fluxIdNotFound",
+													new Object[] {fluxDefecteMetadocId, metaDocumentDto.getCodi()}));
+								} else {
+									fluxosExistents.add(fluxDefecteMetadocId);
+								}
 							}
 						}
+						metaDocumentDto.setPortafirmesFluxosId(fluxosExistents.toArray(new String[0]));
 					}
 				}
 			}

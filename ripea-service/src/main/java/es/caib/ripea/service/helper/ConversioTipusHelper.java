@@ -962,6 +962,14 @@ public class ConversioTipusHelper {
 					} else {
 						target.setNtiTipoDocumentalNom(tipusDocumental.getNomEspanyol());
 					}
+	            	
+	            	if (source.getFluxosFirma()!=null) {
+	            		String[] arrayIds = new String[source.getFluxosFirma().size()];
+	            		for (int i = 0; i < source.getFluxosFirma().size(); i++) {
+	            		    arrayIds[i] = source.getFluxosFirma().get(i).getPortafirmesFluxId();
+	            		}
+	            		target.setPortafirmesFluxosId(arrayIds);
+	            	}
 	            }
 	        })
 	        .byDefault()

@@ -3,6 +3,7 @@ package es.caib.ripea.back.controller;
 import es.caib.ripea.back.command.MetaDocumentCommand;
 import es.caib.ripea.back.helper.DatatablesHelper;
 import es.caib.ripea.back.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.back.helper.EntitatHelper;
 import es.caib.ripea.back.helper.EnumHelper;
 import es.caib.ripea.back.helper.ExceptionHelper;
 import es.caib.ripea.back.helper.MissatgesHelper;
@@ -76,7 +77,7 @@ public class MetaDocumentController extends BaseAdminController {
 		}
 		MetaDocumentCommand command = null;
 		if (metaDocument != null) {
-			model.addAttribute("portafirmesFluxSeleccionat", metaDocument.getPortafirmesFluxId());
+			model.addAttribute("portafirmesFluxSeleccionat", metaDocument.getPortafirmesFluxosId()!=null?metaDocument.getPortafirmesFluxosId()[0]:null);
 			command = MetaDocumentCommand.asCommand(metaDocument);
 		} else {
 			command = new MetaDocumentCommand();
@@ -118,12 +119,17 @@ public class MetaDocumentController extends BaseAdminController {
 					"metadocument.controller.modificat.ok",
 					new Object[] { command.getNom() });
 		} else {
+			OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
+			String rolActual = RolHelper.getRolActual(request);
 			metaDocumentService.create(
 					entitatActual.getId(),
+					command.getMetaExpedientId(),
 					MetaDocumentCommand.asDto(command),
 					command.getPlantilla().getOriginalFilename(),
 					command.getPlantilla().getContentType(),
-					command.getPlantilla().getBytes());
+					command.getPlantilla().getBytes(),
+					rolActual, 
+					organActual != null ? organActual.getId() : null);
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:metaDocument",
@@ -266,7 +272,10 @@ public class MetaDocumentController extends BaseAdminController {
 	@ResponseBody
 	public List<PortafirmesFluxRespostaDto> getPlantillesDisponibles(HttpServletRequest request, Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
-		List<PortafirmesFluxRespostaDto> resposta = portafirmesFluxService.recuperarPlantillesDisponibles(entitatActual.getId(), RolHelper.getRolActual(request), false);
+		List<PortafirmesFluxRespostaDto> resposta = portafirmesFluxService.recuperarPlantillesDisponibles(
+				entitatActual.getId(),
+				null,
+				false);
 		return resposta;
 	}
 

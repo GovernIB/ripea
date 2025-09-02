@@ -1,13 +1,18 @@
 package es.caib.ripea.service.helper;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import javax.transaction.Transactional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import es.caib.ripea.persistence.entity.ContingutEntity;
@@ -15,54 +20,59 @@ import es.caib.ripea.persistence.entity.DocumentEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.entity.MetaDocumentEntity;
+import es.caib.ripea.persistence.entity.MetaDocumentFluxPortafibEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.PinbalServeiEntity;
+import es.caib.ripea.persistence.entity.UsuariEntity;
 import es.caib.ripea.persistence.repository.DocumentRepository;
-import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.persistence.repository.ExpedientRepository;
+import es.caib.ripea.persistence.repository.MetaDocumentFluxPortafibRepository;
 import es.caib.ripea.persistence.repository.MetaDocumentRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientRepository;
 import es.caib.ripea.persistence.repository.PinbalServeiRepository;
+import es.caib.ripea.persistence.repository.UsuariRepository;
 import es.caib.ripea.service.intf.dto.MetaDocumentDto;
 import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
+import es.caib.ripea.service.intf.exception.SistemaExternException;
 
 @Component
 public class MetaDocumentHelper {
 	
-	@Autowired private ConversioTipusHelper conversioTipusHelper;
 	@Autowired private EntityComprovarHelper entityComprovarHelper;
 	@Autowired private MetaExpedientHelper metaExpedientHelper;
 	@Autowired private ContingutHelper contingutHelper;
+	@Autowired private PluginHelper pluginHelper;
 	@Autowired private CacheHelper cacheHelper;
 	
 	@Autowired private ExpedientRepository expedientRepository;
 	@Autowired private PinbalServeiRepository pinbalServeiRepository;
 	@Autowired private MetaExpedientRepository metaExpedientRepository;
 	@Autowired private MetaDocumentRepository metaDocumentRepository;
+	@Autowired private MetaDocumentFluxPortafibRepository metaDocumentFluxPortafibRepository;
 	@Autowired private DocumentRepository documentRepository;
+	@Autowired private UsuariRepository usuariRepository;
 	
 	public MetaDocumentEntity update(
 			Long metaExpedientId,
 			MetaDocumentDto metaDocument,
 			String plantillaNom,
 			String plantillaContentType,
-			byte[] plantillaContingut,
-			String rolActual,
-			Long organId) {
+			byte[] plantillaContingut) {
+		
 		MetaDocumentEntity metaDocumentEntity = metaDocumentRepository.findByMetaExpedientIdAndCodi(metaExpedientId, metaDocument.getCodi());
+		
 		PinbalServeiEntity pinbalServeiEntity = null;
 		if (metaDocument.getPinbalServei()!=null && metaDocument.getPinbalServei().getId()!=null) {
 			pinbalServeiEntity = pinbalServeiRepository.findById(metaDocument.getPinbalServei().getId()).orElse(null);
 		}
-		//* = No s'actualitza
+
 		metaDocumentEntity.update(
-				metaDocumentEntity.getCodi(), //*
+				metaDocumentEntity.getCodi(),
 				metaDocument.getNom(),
 				metaDocument.getDescripcio(),
 				metaDocument.getMultiplicitat(),
 				metaDocument.isFirmaPortafirmesActiva(),
 				metaDocument.getPortafirmesDocumentTipus(),
-				metaDocument.getPortafirmesFluxId(),
 				metaDocument.getPortafirmesResponsables(),
 				metaDocument.getPortafirmesSequenciaTipus(),
 				metaDocument.getPortafirmesCustodiaTipus(),
@@ -89,10 +99,45 @@ public class MetaDocumentHelper {
 					plantillaContingut);
 		}
 		
+		updateFluxos(metaDocumentEntity, metaDocument.getPortafirmesFluxosId());
+		
 		return metaDocumentEntity;
 	}
 	
-	public MetaDocumentDto create(
+	@Transactional(dontRollbackOn = SistemaExternException.class)
+	private void updateFluxos(MetaDocumentEntity metaDocumentEntity, String[] newFluxos) {
+		
+		if (newFluxos!=null && newFluxos.length>0) {
+
+			for (String fluxId : newFluxos) {
+				//Insertar els fluxos que no existeixen actualment a la entitat
+				if (!metaDocumentEntity.fluxeExistById(fluxId))	{
+					MetaDocumentFluxPortafibEntity metaDocumentFluxPortafibEntity = new MetaDocumentFluxPortafibEntity();
+					metaDocumentFluxPortafibEntity.setMetaDocument(metaDocumentEntity);
+					metaDocumentFluxPortafibEntity.setPortafirmesFluxId(fluxId);
+					try {
+						Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+						UsuariEntity usuariActualEntity = usuariRepository.findById(auth.getName()).get();
+						metaDocumentFluxPortafibEntity.setPortafirmesFluxDesc(pluginHelper.portafirmesRecuperarInfoFluxDeFirma(
+								fluxId,
+								usuariActualEntity.getIdioma(),
+								false).getNom());
+					} catch (SistemaExternException ex) {
+						//No s'ha trobat el fluxe
+					}
+					metaDocumentFluxPortafibRepository.save(metaDocumentFluxPortafibEntity);
+				}
+			}
+			
+		}
+		
+		//Eliminar els fluxos anteriors que ja no apliquen segons el DTO rebut
+		metaDocumentEntity.getFluxosFirma().removeIf(flux -> 
+			!Arrays.asList(newFluxos).contains(flux.getPortafirmesFluxId())
+		);
+	}
+	
+	public MetaDocumentEntity create(
 			Long entitatId,
 			Long metaExpedientId,
 			MetaDocumentDto metaDocument,
@@ -121,7 +166,7 @@ public class MetaDocumentHelper {
 			pinbalServeiEntity = pinbalServeiRepository.findById(metaDocument.getPinbalServei().getId()).orElse(null);
 		}
 		
-		MetaDocumentEntity entity = MetaDocumentEntity.getBuilder(
+		MetaDocumentEntity newMetaDocumententity = MetaDocumentEntity.getBuilder(
 				entitat,
 				metaDocument.getCodi(),
 				metaDocument.getNom(),
@@ -138,7 +183,6 @@ public class MetaDocumentHelper {
 				firmaPortafirmesActiva(metaDocument.isFirmaPortafirmesActiva()).
 				descripcio(metaDocument.getDescripcio()).
 				portafirmesDocumentTipus(metaDocument.getPortafirmesDocumentTipus()).
-				portafirmesFluxId(metaDocument.getPortafirmesFluxId()).
 				portafirmesResponsables(metaDocument.getPortafirmesResponsables()).
 				portafirmesSequenciaTipus(metaDocument.getPortafirmesSequenciaTipus()).
 				portafirmesCustodiaTipus(metaDocument.getPortafirmesCustodiaTipus()).
@@ -148,11 +192,11 @@ public class MetaDocumentHelper {
 				pinbalServei(pinbalServeiEntity).
 				build();
 		
-		entity.updatePerDefecte(metaDocument.isPerDefecte());
-		entity.setPinbalUtilitzarCifOrgan(metaDocument.isPinbalUtilitzarCifOrgan());
+		newMetaDocumententity.updatePerDefecte(metaDocument.isPerDefecte());
+		newMetaDocumententity.setPinbalUtilitzarCifOrgan(metaDocument.isPinbalUtilitzarCifOrgan());
 		
 		if (plantillaContingut != null) {
-			entity.updatePlantilla(
+			newMetaDocumententity.updatePlantilla(
 					plantillaNom,
 					plantillaContentType,
 					plantillaContingut);
@@ -162,9 +206,11 @@ public class MetaDocumentHelper {
 			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientId, organId);
 		}
 
-		return conversioTipusHelper.convertir(
-				metaDocumentRepository.save(entity),
-				MetaDocumentDto.class);
+		newMetaDocumententity = metaDocumentRepository.save(newMetaDocumententity);
+
+		updateFluxos(newMetaDocumententity, metaDocument.getPortafirmesFluxosId());
+		
+		return newMetaDocumententity;
 	}
 	
 	public MetaDocumentEntity findByCodiAndProcediment(MetaExpedientEntity metaExpedientEntity, String codi) {

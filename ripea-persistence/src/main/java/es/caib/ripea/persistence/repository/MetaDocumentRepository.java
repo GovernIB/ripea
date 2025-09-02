@@ -116,7 +116,7 @@ public interface MetaDocumentRepository extends JpaRepository<MetaDocumentEntity
 			"    MetaDocumentEntity md " +
 			"where (md.metaExpedient = :metaExpedient) " +
 			"and (md.firmaPortafirmesActiva = true) "+
-			"and (md.portafirmesResponsables != null or md.portafirmesFluxId != null)")
+			"and (md.portafirmesResponsables != null or EXISTS (SELECT f FROM MetaDocumentFluxPortafibEntity f WHERE f.metaDocument = md))")
 	List<MetaDocumentEntity> findByMetaExpedientAndFirmaPortafirmesActivaAmbFluxOResponsable(
 			@Param("metaExpedient") MetaExpedientEntity metaExpedient);
 	

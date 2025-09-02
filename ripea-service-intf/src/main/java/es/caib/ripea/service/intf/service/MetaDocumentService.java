@@ -48,38 +48,11 @@ public interface MetaDocumentService {
 			byte[] plantillaContingut, String rolActual, Long organId) throws NotFoundException;
 
 	/**
-	 * Crea un nou meta-document.
-	 * 
-	 * @param entitatId
-	 *            Id de l'entitat.
-	 * @param metaDocument
-	 *            Informació del meta-document a crear.
-	 * @param plantillaNom
-	 *            Nom de l'arxiu de la plantilla.
-	 * @param plantillaContentType
-	 *            Content type de l'arxiu de la plantilla.
-	 * @param plantillaContingut
-	 *            Contingut de l'arxiu de la plantilla.
-	 * @return El meta-document creat.
-	 * @throws NotFoundException
-	 *             Si no s'ha trobat l'objecte amb l'id especificat.
-	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
-	public MetaDocumentDto create(
-			Long entitatId,
-			MetaDocumentDto metaDocument,
-			String plantillaNom,
-			String plantillaContentType,
-			byte[] plantillaContingut) throws NotFoundException;
-	
-	/**
 	 * Actualitza la informació del meta-document que tengui el mateix
 	 * id que l'especificat per paràmetre.
 	 * 
 	 * @param entitatId
 	 *            Id de l'entitat.
-	 * @param metaExpedientId
-	 *            Identificador del meta-expedient pare.
 	 * @param metaDocument
 	 *            Informació del meta-document a modificar.
 	 * @param plantillaNom
@@ -88,41 +61,11 @@ public interface MetaDocumentService {
 	 *            Content type de l'arxiu de la plantilla.
 	 * @param plantillaContingut
 	 *            Contingut de l'arxiu de la plantilla.
-	 * @param rolActual TODO
-	 * @param organId TODO
 	 * @return El meta-document modificat.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("isAuthenticated()")
-	public MetaDocumentDto update(
-			Long entitatId,
-			Long metaExpedientId,
-			MetaDocumentDto metaDocument,
-			String plantillaNom,
-			String plantillaContentType,
-			byte[] plantillaContingut, String rolActual, Long organId) throws NotFoundException;
-
-	
-	/**
-	 * Actualitza la informació del meta-document que tengui el mateix
-	 * id que l'especificat per paràmetre.
-	 * 
-	 * @param entitatId
-	 *            Id de l'entitat.
-	 * @param metaDocument
-	 *            Informació del meta-document a modificar.
-	 * @param plantillaNom
-	 *            Nom de l'arxiu de la plantilla.
-	 * @param plantillaContentType
-	 *            Content type de l'arxiu de la plantilla.
-	 * @param plantillaContingut
-	 *            Contingut de l'arxiu de la plantilla.
-	 * @return El meta-document modificat.
-	 * @throws NotFoundException
-	 *             Si no s'ha trobat l'objecte amb l'id especificat.
-	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public MetaDocumentDto update(
 			Long entitatId,
 			MetaDocumentDto metaDocument,

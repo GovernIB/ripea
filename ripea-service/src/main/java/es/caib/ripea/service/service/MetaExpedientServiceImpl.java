@@ -336,8 +336,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 
 		if (procedimentImportat.getMetaDocuments() != null) {
 			for (MetaDocumentDto metaDocumentDto : procedimentImportat.getMetaDocuments()) {
-				MetaDocumentDto metaDocumentCreated = metaDocumentHelper.create(entitatId, entity.getId(), metaDocumentDto, metaDocumentDto.getPlantillaNom(), metaDocumentDto.getPlantillaContentType(), metaDocumentDto.getPlantillaContingut(), rolActual, organId);
-				
+				MetaDocumentEntity metaDocumentEntity = metaDocumentHelper.create(entitatId, entity.getId(), metaDocumentDto, metaDocumentDto.getPlantillaNom(), metaDocumentDto.getPlantillaContentType(), metaDocumentDto.getPlantillaContingut(), rolActual, organId);
+				MetaDocumentDto metaDocumentCreated = conversioTipusHelper.convertir(metaDocumentEntity, MetaDocumentDto.class);
 				if (metaDocumentDto.getMetaDades() != null) {
 					for (MetaDadaDto metaDadaDto : metaDocumentDto.getMetaDades()) {
 						if (metaDadaDto.getTipus() == MetaDadaTipusEnumDto.DOMINI) {
@@ -469,9 +469,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 						metaDocumentDto,
 						metaDocumentDto.getPlantillaNom(),
 						metaDocumentDto.getPlantillaContentType(),
-						metaDocumentDto.getPlantillaContingut(),
-						rolActual,
-						organId).getId();
+						metaDocumentDto.getPlantillaContingut()).getId();
 				} else {
 					metaDocumentCreatedId = metaDocumentHelper.create(
 							entitatId,

@@ -59,9 +59,10 @@ public class PortafirmesFluxServiceEjb extends AbstractServiceEjb<PortafirmesFlu
 
 	@Override
 	@RolesAllowed("**")
-	public List<PortafirmesFluxRespostaDto> recuperarPlantillesDisponibles(Long entitatId, String rolActual, boolean filtrar) {
-		return delegateService.recuperarPlantillesDisponibles(entitatId, rolActual, filtrar);
+	public List<PortafirmesFluxRespostaDto> recuperarPlantillesDisponibles(Long entitatId, Long metaDocumentId, boolean filtrar) {
+		return delegateService.recuperarPlantillesDisponibles(entitatId, metaDocumentId, filtrar);
 	}
+	
 	@Override
 	@RolesAllowed("**")
 	public String recuperarUrlEdicioPlantilla(String plantillaFluxId, String returnUrl) {

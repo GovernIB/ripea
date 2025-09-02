@@ -162,7 +162,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 			transaccioId = (String)RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_TRANSACCIOID);
 		}
 		if (command.getPortafirmesFluxTipus().equals(MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB) &&
-				(metaDocument.getPortafirmesFluxId() == null || metaDocument.getPortafirmesFluxId().isEmpty()) &&
+				(command.getPortafirmesEnviarFluxId() == null || command.getPortafirmesEnviarFluxId().isEmpty()) &&
 				(transaccioId == null || transaccioId.isEmpty()) &&
 				(command.getPortafirmesEnviarFluxId() == null || command.getPortafirmesEnviarFluxId().isEmpty())) {
 			emplenarModelPortafirmes(
@@ -736,12 +736,12 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 			PortafirmesEnviarCommand command) {
 		if (metaDocument.getPortafirmesFluxTipus() != null) {
 			command.setPortafirmesFluxTipus(metaDocument.getPortafirmesFluxTipus());
-			model.addAttribute("portafirmesFluxId", metaDocument.getPortafirmesFluxId());
-			if (metaDocument.getPortafirmesFluxTipus().equals(MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB) && metaDocument.getPortafirmesFluxId() == null) {
-				model.addAttribute("nouFluxDeFirma", true);
-			} else {
-				model.addAttribute("nouFluxDeFirma", false);
-			}
+//			model.addAttribute("portafirmesFluxId", metaDocument.getPortafirmesFluxId());
+//			if (metaDocument.getPortafirmesFluxTipus().equals(MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB) && metaDocument.getPortafirmesFluxId() == null) {
+//				model.addAttribute("nouFluxDeFirma", true);
+//			} else {
+//				model.addAttribute("nouFluxDeFirma", false);
+//			}
 		} else {
 			model.addAttribute("nouFluxDeFirma", false);
 			command.setPortafirmesFluxTipus(MetaDocumentFirmaFluxTipusEnumDto.SIMPLE);

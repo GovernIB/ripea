@@ -47,38 +47,6 @@ public class MetaDocumentServiceEjb extends AbstractServiceEjb<MetaDocumentServi
 	
 	@Override
 	@RolesAllowed("IPA_ADMIN")
-	public MetaDocumentDto create(Long entitatId, 
-			MetaDocumentDto metaDocument, String plantillaNom,
-			String plantillaContentType, byte[] plantillaContingut) throws NotFoundException {
-		return delegateService.create(
-				entitatId,
-				metaDocument,
-				plantillaNom,
-				plantillaContentType,
-				plantillaContingut);
-	}
-
-
-	@Override
-	@RolesAllowed("**")
-	public MetaDocumentDto update(
-			Long entitatId,
-			Long metaExpedientId,
-			MetaDocumentDto metaDocument,
-			String plantillaNom,
-			String plantillaContentType,
-			byte[] plantillaContingut, String rolActual, Long organId) {
-		return delegateService.update(
-				entitatId,
-				metaExpedientId,
-				metaDocument,
-				plantillaNom,
-				plantillaContentType,
-				plantillaContingut, rolActual, organId);
-	}
-	
-	@Override
-	@RolesAllowed("IPA_ADMIN")
 	public MetaDocumentDto update(Long entitatId, MetaDocumentDto metaDocument, String plantillaNom,
 			String plantillaContentType, byte[] plantillaContingut) throws NotFoundException {
 		return delegateService.update(

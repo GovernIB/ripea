@@ -64,19 +64,9 @@ public interface PortafirmesFluxService {
 	 */
 	@PreAuthorize("isAuthenticated()")
 	public PortafirmesFluxInfoDto recuperarDetallFluxFirma(String plantillaFluxId, boolean signerInfo);
-	
-	/**
-	 * Recupera un llistat de les plantilles disponibles per un usuari aplicació
-	 * @param entitatId 
-	 * @param rolActual
-	 * @param filtrar 
-	 * @param transaccioId
-	 * 				Id de la transacció.
-	 * 
-	 * @return La el id del flux de firma o error.
-	 */
+
 	@PreAuthorize("isAuthenticated()")
-	public List<PortafirmesFluxRespostaDto> recuperarPlantillesDisponibles(Long entitatId, String rolActual, boolean filtrar);
+	public List<PortafirmesFluxRespostaDto> recuperarPlantillesDisponibles(Long entitatId, Long metaDocumentId, boolean filtrar);
 	
 	/**
 	 * Recupera un llistat de les plantilles disponibles per un usuari aplicació

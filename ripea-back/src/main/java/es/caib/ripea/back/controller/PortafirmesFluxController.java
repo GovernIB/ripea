@@ -217,34 +217,13 @@ public class PortafirmesFluxController extends BaseUserOAdminOOrganController {
 	public List<PortafirmesFluxRespostaDto> getPlantillesDisponibles(HttpServletRequest request, @PathVariable Long documentId, Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		organGestorService.actualitzarOrganCodi(organGestorService.getOrganCodiFromContingutId(documentId));
-		List<PortafirmesFluxRespostaDto> resposta;
-		
 		Boolean filtrarPerUsuariActual = aplicacioService.propertyBooleanFindByKey(PropertyConfig.FILTRAR_USUARI_DESCRIPCIO);
-		if (filtrarPerUsuariActual == null || filtrarPerUsuariActual.equals(true)) {
-			
-			resposta = portafirmesFluxService.recuperarPlantillesDisponibles(entitatActual.getId(), RolHelper.getRolActual(request), true);
-			String fluxPerDefecteId = documentService.findById(entitatActual.getId(), documentId, null).getMetaDocument().getPortafirmesFluxId();
-			if (fluxPerDefecteId != null && !fluxPerDefecteId.isEmpty()) {
-				PortafirmesFluxInfoDto portafirmesFluxInfoDto = portafirmesFluxService.recuperarDetallFluxFirma(fluxPerDefecteId, false);
-				
-				boolean isAlreadyOnList = false;
-				for (PortafirmesFluxRespostaDto respostaDto : resposta) {
-					if (respostaDto.getFluxId().equals(fluxPerDefecteId)) {
-						isAlreadyOnList = true;
-					}
-				}
-				if (!isAlreadyOnList) {
-					PortafirmesFluxRespostaDto portafirmesFluxRespostaDto = new PortafirmesFluxRespostaDto();
-					portafirmesFluxRespostaDto.setFluxId(fluxPerDefecteId);
-					portafirmesFluxRespostaDto.setNom(portafirmesFluxInfoDto.getNom());
-					resposta.add(0, portafirmesFluxRespostaDto);
-				}
-			}
-		} else {
-			resposta = portafirmesFluxService.recuperarPlantillesDisponibles(entitatActual.getId(), RolHelper.getRolActual(request), false);
-		}
-
-		
+		Long metaDocumentId = documentService.findById(entitatActual.getId(), documentId, null).getMetaDocument().getId();
+		boolean filtrarUsuari = filtrarPerUsuariActual == null || filtrarPerUsuariActual.equals(true);
+		List<PortafirmesFluxRespostaDto> resposta = portafirmesFluxService.recuperarPlantillesDisponibles(
+				entitatActual.getId(),
+				metaDocumentId,
+				filtrarUsuari);
 		return resposta;
 	}
 

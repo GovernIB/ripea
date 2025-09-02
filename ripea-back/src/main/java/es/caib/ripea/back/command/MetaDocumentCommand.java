@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.back.command;
 
 import es.caib.ripea.back.helper.ConversioTipusHelper;
@@ -16,11 +13,6 @@ import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Command per al manteniment de meta-documents.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Getter
 @ResponsableNotEmpty
 @CodiMetaDocumentNoRepetit(
@@ -44,7 +36,7 @@ public class MetaDocumentCommand {
 	@Size(max=64)
 	private String portafirmesDocumentTipus;
 	@Size(max=64)
-	private String portafirmesFluxId;
+	private String[] portafirmesFluxosId;
 	private String[] portafirmesResponsables;
 	private MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSequenciaTipus;
 	@Size(max=64)
@@ -84,20 +76,13 @@ public class MetaDocumentCommand {
 	}
 
 	public static MetaDocumentCommand asCommand(MetaDocumentDto dto) {
-		return ConversioTipusHelper.convertir(
-				dto,
-				MetaDocumentCommand.class);
+		return ConversioTipusHelper.convertir(dto, MetaDocumentCommand.class);
 	}
+	
 	public static MetaDocumentDto asDto(MetaDocumentCommand command) {
 		if (command.getPortafirmesFluxTipus() == MetaDocumentFirmaFluxTipusEnumDto.SIMPLE)
-			command.setPortafirmesFluxId(null);
-		
+			command.setPortafirmesFluxosId(null);
 		MetaDocumentDto resultat = ConversioTipusHelper.convertir(command, MetaDocumentDto.class);
-//		if (command.getPinbalServei()!=null && command.getPinbalServei()>0) {
-//			PinbalServeiDto psDto = new PinbalServeiDto();
-//			psDto.setId(command.getPinbalServei());
-//			resultat.setPinbalServei(psDto);
-//		}
 		return resultat;
 	}
 
@@ -108,7 +93,6 @@ public class MetaDocumentCommand {
 	public void setComu(boolean isComu) {
 		this.comu = isComu;
 	}
-
 	
 	public void setId(Long id) {
 		this.id = id;
@@ -140,10 +124,6 @@ public class MetaDocumentCommand {
 
 	public void setPortafirmesDocumentTipus(String portafirmesDocumentTipus) {
 		this.portafirmesDocumentTipus = portafirmesDocumentTipus != null ? portafirmesDocumentTipus.trim() : null;
-	}
-
-	public void setPortafirmesFluxId(String portafirmesFluxId) {
-		this.portafirmesFluxId = portafirmesFluxId != null ? portafirmesFluxId.trim() : null;
 	}
 
 	public void setPortafirmesResponsables(String[] portafirmesResponsables) {
@@ -220,5 +200,9 @@ public class MetaDocumentCommand {
 
 	public void setPinbalUtilitzarCifOrgan(boolean pinbalUtilitzarCifOrgan) {
 		this.pinbalUtilitzarCifOrgan = pinbalUtilitzarCifOrgan;
+	}
+
+	public void setPortafirmesFluxosId(String[] portafirmesFluxosId) {
+		this.portafirmesFluxosId = portafirmesFluxosId;
 	}
 }

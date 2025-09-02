@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.service.intf.dto;
 
 import lombok.Getter;
@@ -9,17 +6,12 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.io.Serializable;
 
-/**
- * Informació d'un MetaDocument.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Getter @Setter
 public class MetaDocumentDto extends MetaNodeAmbMetaDadesDto implements Serializable {
 
 	private MultiplicitatEnumDto multiplicitat;
 	private boolean firmaPortafirmesActiva;
-	private String portafirmesFluxId;
+	private String[] portafirmesFluxosId;
 	private String[] portafirmesResponsables;
 	private MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSequenciaTipus;
 	private String portafirmesCustodiaTipus;
@@ -89,5 +81,4 @@ public class MetaDocumentDto extends MetaNodeAmbMetaDadesDto implements Serializ
 	}
 
 	private static final long serialVersionUID = -139254994389509932L;
-
 }

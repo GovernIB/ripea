@@ -60,6 +60,7 @@ import es.caib.ripea.service.intf.dto.PortafirmesCallbackEstatEnumDto;
 import es.caib.ripea.service.intf.dto.PortafirmesPrioritatEnumDto;
 import es.caib.ripea.service.intf.exception.SistemaExternException;
 import es.caib.ripea.service.intf.exception.ValidationException;
+import es.caib.ripea.service.intf.utils.Utils;
 
 @Component
 public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
@@ -131,6 +132,12 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 					DocumentEntity.class,
 					"Aquest document te enviaments al portafirmes pendents");
 		}
+		if (!Utils.hasValue(portafirmesFluxId)) {
+			throw new ValidationException(
+					document.getId(),
+					DocumentEntity.class,
+					"No s'ha seleccionat un flux de firma");
+		}
 		if (!document.getMetaDocument().isFirmaPortafirmesActiva()) {
 			throw new ValidationException(
 					document.getId(),
@@ -150,7 +157,7 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 				portafirmesResponsables,
 				portafirmesSeqTipus,
 				portafirmesFluxTipus,
-				(portafirmesFluxId != null && !portafirmesFluxId.isEmpty()) ? portafirmesFluxId : document.getMetaDocument().getPortafirmesFluxId(),
+				portafirmesFluxId,
 				document.getExpedient(),
 				document,
 				avisFirmaParcial,

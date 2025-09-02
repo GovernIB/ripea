@@ -33,7 +33,6 @@ import es.caib.ripea.service.intf.dto.ExecucioMassivaTipusDto;
 import es.caib.ripea.service.intf.dto.ExpedientSelectorDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentFirmaFluxTipusEnumDto;
-import es.caib.ripea.service.intf.dto.PortafirmesFluxInfoDto;
 import es.caib.ripea.service.intf.dto.PortafirmesFluxRespostaDto;
 import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.service.AplicacioService;
@@ -309,40 +308,14 @@ public class DocumentMassiuPortafirmesController extends BaseUserOAdminOOrganCon
 	public List<PortafirmesFluxRespostaDto> getPlantillesDisponibles(HttpServletRequest request, @PathVariable Long metadocumentId, Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		organGestorService.actualitzarOrganCodi(organGestorService.getOrganCodiFromMetaDocumentId(metadocumentId));
-		List<PortafirmesFluxRespostaDto> resposta;
-
 		Boolean filtrarPerUsuariActual = aplicacioService.propertyBooleanFindByKey(PropertyConfig.FILTRAR_USUARI_DESCRIPCIO);
-		if (filtrarPerUsuariActual == null || filtrarPerUsuariActual.equals(true)) {
-
-			resposta = portafirmesFluxService.recuperarPlantillesDisponibles(entitatActual.getId(), RolHelper.getRolActual(request) ,true);
-
-			MetaDocumentDto metaDocument = metaDocumentService.findById(metadocumentId);
-			String fluxPerDefecteId = metaDocument.getPortafirmesFluxId();
-			if (fluxPerDefecteId != null && !fluxPerDefecteId.isEmpty()) {
-				PortafirmesFluxInfoDto portafirmesFluxInfoDto = portafirmesFluxService.recuperarDetallFluxFirma(fluxPerDefecteId, false);
-
-				boolean isAlreadyOnList = false;
-				for (PortafirmesFluxRespostaDto respostaDto : resposta) {
-					if (respostaDto.getFluxId().equals(fluxPerDefecteId)) {
-						isAlreadyOnList = true;
-					}
-				}
-				if (!isAlreadyOnList) {
-					PortafirmesFluxRespostaDto portafirmesFluxRespostaDto = new PortafirmesFluxRespostaDto();
-					portafirmesFluxRespostaDto.setFluxId(fluxPerDefecteId);
-					portafirmesFluxRespostaDto.setNom(portafirmesFluxInfoDto.getNom());
-					resposta.add(0, portafirmesFluxRespostaDto);
-				}
-			}
-		} else {
-			resposta = portafirmesFluxService.recuperarPlantillesDisponibles(entitatActual.getId(), RolHelper.getRolActual(request), false);
-		}
-
-
+		boolean filtrarUsuari = filtrarPerUsuariActual == null || filtrarPerUsuariActual.equals(true);
+		List<PortafirmesFluxRespostaDto> resposta = portafirmesFluxService.recuperarPlantillesDisponibles(
+				entitatActual.getId(),
+				metadocumentId,
+				filtrarUsuari);
 		return resposta;
 	}
-	
-	
 
 	@RequestMapping(value = "/select", method = RequestMethod.GET)
 	@ResponseBody
@@ -441,14 +414,14 @@ public class DocumentMassiuPortafirmesController extends BaseUserOAdminOOrganCon
 		model.addAttribute("fluxTipus", metaDocument.getPortafirmesFluxTipus());
 		if (metaDocument.getPortafirmesFluxTipus() != null) {
 			command.setPortafirmesFluxTipus(metaDocument.getPortafirmesFluxTipus());
-			model.addAttribute("portafirmesFluxId", metaDocument.getPortafirmesFluxId());
-			if (metaDocument.getPortafirmesFluxTipus().equals(MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB) && metaDocument.getPortafirmesFluxId() == null) {
-				model.addAttribute("nouFluxDeFirma", true);
-			} else {
-				String urlPlantilla = portafirmesFluxService.recuperarUrlMostrarPlantilla(metaDocument.getPortafirmesFluxId());
-				model.addAttribute("nouFluxDeFirma", false);
-				model.addAttribute("urlPlantilla", urlPlantilla);
-			}
+//			model.addAttribute("portafirmesFluxId", metaDocument.getPortafirmesFluxId());
+//			if (metaDocument.getPortafirmesFluxTipus().equals(MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB) && metaDocument.getPortafirmesFluxId() == null) {
+//				model.addAttribute("nouFluxDeFirma", true);
+//			} else {
+//				String urlPlantilla = portafirmesFluxService.recuperarUrlMostrarPlantilla(metaDocument.getPortafirmesFluxId());
+//				model.addAttribute("nouFluxDeFirma", false);
+//				model.addAttribute("urlPlantilla", urlPlantilla);
+//			}
 		} else {
 			model.addAttribute("nouFluxDeFirma", false);
 			command.setPortafirmesFluxTipus(MetaDocumentFirmaFluxTipusEnumDto.SIMPLE);

@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.persistence.entity;
 
 import es.caib.ripea.service.intf.config.BaseConfig;
@@ -8,13 +5,11 @@ import es.caib.ripea.service.intf.dto.*;
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.*;
 
-/**
- * Classe del model de dades que representa un meta-document.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Entity
 @Table(
 		name = BaseConfig.DB_PREFIX + "metadocument",
@@ -31,8 +26,6 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 	private boolean firmaPortafirmesActiva;
 	@Column(name = "portafirmes_doctip", length = 64)
 	private String portafirmesDocumentTipus;
-	@Column(name = "portafirmes_fluxid", length = 64)
-	private String portafirmesFluxId;
 	@Column(name = "portafirmes_respons", length = 512)
 	private String portafirmesResponsables;
 	@Enumerated(EnumType.STRING)
@@ -48,14 +41,9 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 	private String plantillaNom;
 	@Column(name = "plantilla_content_type", length = 256)
 	private String plantillaContentType;
-	//@Lob
 	@Basic(fetch = FetchType.LAZY)
 	@Column(name = "plantilla_contingut")
 	private byte[] plantillaContingut;
-	@ManyToOne(optional = false, fetch = FetchType.LAZY)
-	@JoinColumn(name = "meta_expedient_id")
-	@ForeignKey(name = BaseConfig.DB_PREFIX + "metaexp_metadoc_fk")
-	private MetaExpedientEntity metaExpedient;
 	
 	@Column(name = "ordre")
 	private int ordre;
@@ -66,15 +54,8 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 	@Enumerated(EnumType.STRING)
 	private DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion;
 	
-	
 	@Column(name = "nti_tipdoc", length = 4)
 	private String ntiTipoDocumental;
-	
-//	@ManyToOne
-//	@JoinColumn(name = "nti_tipusdoc")
-//	@ForeignKey(name = BaseConfig.DB_PREFIX + "tipdoc_metadoc_fk")
-//	private TipusDocumentalEntity ntiTipusDocumental;
-	
 	
 	@Column(name = "firma_biometrica")
 	private boolean firmaBiometricaActiva;
@@ -95,24 +76,32 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 	@Column(name = "pinbal_actiu", nullable = false)
 	private boolean pinbalActiu;
 	
-	@ManyToOne(optional = false, fetch = FetchType.LAZY)
-	@JoinColumn(name = "pinbal_servei")
-	@ForeignKey(name = "PINBAL_SERVEI_FK")
-	private PinbalServeiEntity pinbalServei;
-	
 	@Column(name = "pinbal_finalitat", length = 512)
 	protected String pinbalFinalitat;
 	
 	@Column(name = "pinbal_utilitzar_cif_organ", nullable = false)
 	private boolean pinbalUtilitzarCifOrgan;
 	
-	
 	@Column(name = "per_defecte")
 	private boolean perDefecte;
 	
 	@Transient
 	private boolean leftPerCreacio;
+
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@JoinColumn(name = "pinbal_servei")
+	@ForeignKey(name = "PINBAL_SERVEI_FK")
+	private PinbalServeiEntity pinbalServei;
 	
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@JoinColumn(name = "meta_expedient_id")
+	@ForeignKey(name = BaseConfig.DB_PREFIX + "metaexp_metadoc_fk")
+	private MetaExpedientEntity metaExpedient;
+	
+	@OneToMany(mappedBy = "metaDocument", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<MetaDocumentFluxPortafibEntity> fluxosFirma = new ArrayList<MetaDocumentFluxPortafibEntity>();
+	
+	/** * --------------------------------------------- * */
 
 	public MultiplicitatEnumDto getMultiplicitat() {
 		return multiplicitat;
@@ -122,9 +111,6 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 	}
 	public String getPortafirmesDocumentTipus() {
 		return portafirmesDocumentTipus;
-	}
-	public String getPortafirmesFluxId() {
-		return portafirmesFluxId;
 	}
 	public String[] getPortafirmesResponsables() {
 		if (portafirmesResponsables == null)
@@ -212,6 +198,14 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 		this.pinbalUtilitzarCifOrgan = pinbalUtilitzarCifOrgan;
 	}
 	
+	public List<MetaDocumentFluxPortafibEntity> getFluxosFirma() {
+		return fluxosFirma;
+	}
+	
+	public void setFluxosFirma(List<MetaDocumentFluxPortafibEntity> fluxosFirma) {
+		this.fluxosFirma = fluxosFirma;
+	}
+
 	public boolean isMultiple() {
 		return this.multiplicitat!=null && (MultiplicitatEnumDto.M_0_N.equals(this.multiplicitat) || MultiplicitatEnumDto.M_1_N.equals(this.multiplicitat));
 	}
@@ -223,7 +217,6 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 			MultiplicitatEnumDto multiplicitat,
 			boolean firmaPortafirmesActiva,
 			String portafirmesDocumentTipus,
-			String portafirmesFluxId,
 			String[] portafirmesResponsables,
 			MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSequenciaTipus,
 			String portafirmesCustodiaTipus,
@@ -243,7 +236,6 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 		this.multiplicitat = multiplicitat;
 		this.firmaPortafirmesActiva = firmaPortafirmesActiva;
 		this.portafirmesDocumentTipus = portafirmesDocumentTipus;
-		this.portafirmesFluxId = portafirmesFluxId;
 		this.portafirmesResponsables = getResponsablesFromArray(portafirmesResponsables);
 		this.portafirmesSequenciaTipus = portafirmesSequenciaTipus;
 		this.portafirmesCustodiaTipus = portafirmesCustodiaTipus;
@@ -354,10 +346,6 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 			built.portafirmesDocumentTipus = portafirmesDocumentTipus;
 			return this;
 		}
-		public Builder portafirmesFluxId(String portafirmesFluxId) {
-			built.portafirmesFluxId = portafirmesFluxId;
-			return this;
-		}
 		public Builder portafirmesResponsables(String[] portafirmesResponsables) {
 			built.portafirmesResponsables = getResponsablesFromArray(portafirmesResponsables);
 			return this;
@@ -406,6 +394,17 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 
 	}
 
+	public boolean fluxeExistById(String fluxeId) {
+		if (this.fluxosFirma!=null) {
+			for (MetaDocumentFluxPortafibEntity mdfpe: this.fluxosFirma) {
+				if (mdfpe.getPortafirmesFluxId().equals(fluxeId)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
