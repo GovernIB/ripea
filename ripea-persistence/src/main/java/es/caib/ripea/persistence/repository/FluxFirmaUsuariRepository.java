@@ -35,9 +35,7 @@ public interface FluxFirmaUsuariRepository extends JpaRepository<FluxFirmaUsuari
 			@Param("descripcio") String descripcio,
 			Pageable pageable);
 	
-	List<FluxFirmaUsuariEntity> findByEntitatAndUsuari(EntitatEntity entitat, UsuariEntity usuari);
-
-	List<FluxFirmaUsuariEntity> findByEntitat(EntitatEntity entitat);
+	List<FluxFirmaUsuariEntity> findByEntitatIdAndUsuariCodi(Long entitatId, String usuariCodi);
 
 	FluxFirmaUsuariEntity findByUsuariAndPortafirmesFluxId(UsuariEntity usuari, String plantillaFluxId);
 	

@@ -313,6 +313,7 @@ public class DocumentMassiuPortafirmesController extends BaseUserOAdminOOrganCon
 		List<PortafirmesFluxRespostaDto> resposta = portafirmesFluxService.recuperarPlantillesDisponibles(
 				entitatActual.getId(),
 				metadocumentId,
+				true,
 				filtrarUsuari);
 		return resposta;
 	}

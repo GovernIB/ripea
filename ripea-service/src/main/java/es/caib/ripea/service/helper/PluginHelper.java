@@ -3740,92 +3740,95 @@ public class PluginHelper {
 
 	/**
 	 * Recupera les plantilles de firma disponibles:
-	 * - Plantilles del firmant = usuariActual si filtrar=true (isUsuariActual=true)
-	 * - Totes les plantilles si filtrar=false (isUsuariActual=false)
+	 * 
+	 * Issue 658: Quan es creava un flux de firma, a la descripció per defecte s’hi informava el codi de l’usuari actual per poder després "filtrar"
+	 * els fluxos d’aquell usuari. Això es controla amb la propietat "es.caib.ripea.plugin.portafirmes.flux.filtrar.usuari.descripcio"
+	 * 
+	 * - Plantilles del firmant = usuariActual si filtrar=true
+	 * - Totes les plantilles si filtrar=false
+	 * 
 	 * - EXTRA: Si li passes metaDocumentId, afegeix les plantilles definides al procediment. (isProcedimentDefault=true)
+	 * - EXTRA: Si li passes addUserFluxes, afegeix les plantilles creades per el usuari actual. (isUsuariActual=true)
+	 * 
+	 * La resta de plantilles que no pertanyen ni al prodeciment si al usuari, son les "comunes" del desplegable
 	 */
-	public List<PortafirmesFluxRespostaDto> portafirmesRecuperarPlantillesDisponibles(Long entitatId, Long metaDocumentId, boolean filtrar) {
+	public List<PortafirmesFluxRespostaDto> portafirmesRecuperarPlantillesDisponibles(
+			Long entitatId,
+			Long metaDocumentId,
+			boolean addUserFluxes,
+			boolean filtrar) {
+		
 		String accioDescripcio = "Recuperant flux de firma";
 		long t0 = System.currentTimeMillis();
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false, false);
 		UsuariEntity usuari = usuariRepository.getOne(auth.getName());
-		List<PortafirmesFluxRespostaDto> plantillesFiltrades = new ArrayList<PortafirmesFluxRespostaDto>();
 		List<PortafirmesFluxRespostaDto> respostesDto = new ArrayList<PortafirmesFluxRespostaDto>();
 		PortafirmesPlugin portafirmesPlugin = getPortafirmesPlugin();
+		
 		try {
 			List<PortafirmesFluxResposta> plantilles = null;
 			if (filtrar) {
-				plantilles = portafirmesPlugin.recuperarPlantillesPerFiltre(
-						usuari.getIdioma(),
-						usuari.getCodi());
+				//Plantilles del usuari actual (A on el usuari es firmant), per selectors de enviament a PF desde tramitació (USER)
+				plantilles = portafirmesPlugin.recuperarPlantillesPerFiltre(usuari.getIdioma(), usuari.getCodi());
 			} else {
-				plantilles = portafirmesPlugin.recuperarPlantillesDisponibles(
-						usuari.getIdioma());
+				//Totes les plantilles: per gestio del procediment (tipus de documents) (ADMIN)
+				plantilles = portafirmesPlugin.recuperarPlantillesDisponibles(usuari.getIdioma());
 			}
 
 			if (plantilles != null) {
+				//FLUXOS DE FIRMA COMUNS
 				for (PortafirmesFluxResposta plantilla : plantilles) {
 					PortafirmesFluxRespostaDto resposta = new PortafirmesFluxRespostaDto();
-					resposta.setFluxId(
-							plantilla.getFluxId());
-					resposta.setNom(
-							plantilla.getNom());
-					respostesDto.add(
-							resposta);
+					resposta.setFluxId(plantilla.getFluxId());
+					resposta.setNom(plantilla.getNom());
+					respostesDto.add(resposta);
 				}
 			}
 			
-			List<FluxFirmaUsuariEntity> plantillesUsuari = fluxFirmaUsuariRepository.findByEntitat(entitat);
-
-			for (PortafirmesFluxRespostaDto plantilla : respostesDto) {
-				boolean isCurrentUserTemplate = false;
-				boolean isUserTemplate = false;
-
+			if (addUserFluxes) {
+				List<FluxFirmaUsuariEntity> plantillesUsuari = fluxFirmaUsuariRepository.findByEntitatIdAndUsuariCodi(entitatId, auth.getName());
+				//FLUXOS DE FIRMA CREAT EXPRESSAMENT PER L'USUARI ACTUAL
 				for (FluxFirmaUsuariEntity fluxFirmaUsuari : plantillesUsuari) {
-					if (plantilla.getFluxId().equals(fluxFirmaUsuari.getPortafirmesFluxId()) && fluxFirmaUsuari.getUsuari().equals(usuari)) {
-						// Plantilla usuari actual
-						isCurrentUserTemplate = true;
-						break;
-					} else if (plantilla.getFluxId().equals(fluxFirmaUsuari.getPortafirmesFluxId()) && !isCurrentUserTemplate) {
-						// Plantilla d'un altre usuari (no mostrar al llistat)
-						isUserTemplate = true;
-						break;
-					}
-				}
-
-				// Plantilles usuari actual i plantilles comuns
-				if (isCurrentUserTemplate
-						|| (!isCurrentUserTemplate && !plantillesFiltrades.contains(plantilla)) && !isUserTemplate) {
-					plantilla.setUsuariActual(isCurrentUserTemplate);
-					plantillesFiltrades.add(plantilla);
+					PortafirmesFluxRespostaDto fluxUsuari = new PortafirmesFluxRespostaDto();
+					fluxUsuari.setFluxId(fluxFirmaUsuari.getPortafirmesFluxId());
+					fluxUsuari.setNom(fluxFirmaUsuari.getDescripcio());
+					fluxUsuari.setUsuariActual(true);
+					respostesDto.add(fluxUsuari);
 				}
 			}
 			
 			if (metaDocumentId!=null) {
 				List<MetaDocumentFluxPortafibEntity> fluxosProcediment = metaDocumentFluxPortafibRepository.findByMetaDocumentId(metaDocumentId);
-				List<PortafirmesFluxInfo> fluxosPerDefecteAfegir = new ArrayList<PortafirmesFluxInfo>();
+//				List<PortafirmesFluxInfo> fluxosPerDefecteAfegir = new ArrayList<PortafirmesFluxInfo>();
+				//FLUXOS DE FIRMA DEL PROCEDIMENT
 				if (fluxosProcediment!=null) {
 					for (MetaDocumentFluxPortafibEntity fluxProcediment: fluxosProcediment) {
-						if (!llistatFluxosContainsId(respostesDto, fluxProcediment.getPortafirmesFluxId())) {
-							PortafirmesFluxInfo portafirmesFluxInfo = portafirmesPlugin.recuperarFluxDeFirmaByIdPlantilla(
-									fluxProcediment.getPortafirmesFluxId(),
-									aplicacioService.getUsuariActual().getIdioma(),
-									false);
-							fluxosPerDefecteAfegir.add(portafirmesFluxInfo);
-						}
-					}
-				}
-				//Afegim ara els procediments al llistat, ja que no es pot fer un add a una llista mentra la recorres
-				if (fluxosPerDefecteAfegir.size()>0) {
-					for (PortafirmesFluxInfo aux: fluxosPerDefecteAfegir) {
+//						if (!llistatFluxosContainsId(respostesDto, fluxProcediment.getPortafirmesFluxId())) {
+//							PortafirmesFluxInfo portafirmesFluxInfo = portafirmesPlugin.recuperarFluxDeFirmaByIdPlantilla(
+//									fluxProcediment.getPortafirmesFluxId(),
+//									aplicacioService.getUsuariActual().getIdioma(),
+//									false);
+//							fluxosPerDefecteAfegir.add(portafirmesFluxInfo);
+//						}
+						
 						PortafirmesFluxRespostaDto fluxDefault = new PortafirmesFluxRespostaDto();
-						fluxDefault.setFluxId(aux.getNom());
-						fluxDefault.setNom(aux.getDescripcio());
+						fluxDefault.setFluxId(fluxProcediment.getPortafirmesFluxId());
+						fluxDefault.setNom(fluxProcediment.getPortafirmesFluxDesc());
 						fluxDefault.setProcedimentDefault(true);
 						respostesDto.add(fluxDefault);
 					}
 				}
+				
+				//Afegim ara els procediments al llistat, ja que no es pot fer un add a una llista mentra la recorres
+//				if (fluxosPerDefecteAfegir.size()>0) {
+//					for (PortafirmesFluxInfo aux: fluxosPerDefecteAfegir) {
+//						PortafirmesFluxRespostaDto fluxDefault = new PortafirmesFluxRespostaDto();
+//						fluxDefault.setFluxId(aux.getNom());
+//						fluxDefault.setNom(aux.getDescripcio());
+//						fluxDefault.setProcedimentDefault(true);
+//						respostesDto.add(fluxDefault);
+//					}
+//				}
 			}
 			
 		} catch (Exception ex) {

@@ -268,6 +268,7 @@ public class MetaDocumentController extends BaseAdminController {
 		List<PortafirmesFluxRespostaDto> resposta = portafirmesFluxService.recuperarPlantillesDisponibles(
 				entitatActual.getId(),
 				null,
+				false,
 				false);
 		return resposta;
 	}

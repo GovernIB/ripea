@@ -438,49 +438,60 @@
 				async: false,
 				url: "<c:url value="/massiu/portafirmes/${metadocumentId}/portafirmes/flux/plantilles"/>",
 				success: function(data) {
+
 					var defaultPortafirmesFluxId = "${portafirmesFluxId}";
 					var plantillaActual = "${portafirmesFluxSeleccionat}";
 					var selPlantilles = $("#portafirmesEnviarFluxId");
 					selPlantilles.empty();
 					selPlantilles.append("<option value=\"\"></option>");
+					
 					if (data) {
-						var items = [];
-						var itemsUsuari = [];
-						
-						selPlantilles.append("<optgroup label='<spring:message code='metadocument.form.camp.portafirmes.flux.group.comun'/>'>");
-						$.each(data, function(i, val) {
-							if (val.usuariActual) {
-								itemsUsuari.push({
-									"id": val.fluxId,
-									"text": val.nom
-								});
-							}
-							if (!val.usuariActual) {
-								if (defaultPortafirmesFluxId != '' && defaultPortafirmesFluxId === val.fluxId) {
-									selPlantilles.append("<option selected value=\"" + val.fluxId + "\">" + val.nom + "</option>");
-								} else {
-									selPlantilles.append("<option value=\"" + val.fluxId + "\">" + val.nom + "</option>");
-								}
-							}
-						});
-						selPlantilles.append("</optgroup>");
-						
-						if (itemsUsuari.length > 0) {
-							selPlantilles.append("<optgroup label='<spring:message code='metadocument.form.camp.portafirmes.flux.group.usuari'/>'>");
-							$.each(itemsUsuari, function(i, val) {
-								if (defaultPortafirmesFluxId != '' && defaultPortafirmesFluxId === val.id) {
-									selPlantilles.append("<option selected value=\"" + val.id + "\">" + val.text + "</option>");
-								} else {
-									selPlantilles.append("<option value=\"" + val.id + "\">" + val.text + "</option>");
-								}
-							});
-							selPlantilles.append("</optgroup>");
-						}
+
+	                    var itemsProcediment = [];
+	                    var itemsUsuari = [];
+	                    var itemsComuns = [];
+
+	                    $.each(data, function(i, val) {
+	                        if (val.usuariActual) {
+	                            itemsUsuari.push({"id": val.fluxId, "text": val.nom});
+	                        } else if (val.procedimentDefault) {
+	                            itemsProcediment.push({"id": val.fluxId, "text": val.nom});
+	                        } else {
+	                            itemsComuns.push({"id": val.fluxId, "text": val.nom});
+	                        }
+	                    });
+	                    
+	                    if (itemsProcediment.length > 0) {
+	                        selPlantilles.append("<optgroup label='<spring:message code='metadocument.form.camp.portafirmes.flux.group.proc'/>'>");
+	                        $.each(itemsProcediment, function(i, val) {
+	                            selPlantilles.append("<option value=\"" + val.id + "\">" + val.text + "</option>");
+	                        });
+	                        selPlantilles.append("</optgroup>");
+	                    }
+	                    
+	                   if (itemsUsuari.length > 0) {
+	                        selPlantilles.append("<optgroup label='<spring:message code='metadocument.form.camp.portafirmes.flux.group.usuari'/>'>");
+	                        $.each(itemsUsuari, function(i, val) {
+	                            selPlantilles.append("<option value=\"" + val.id + "\">" + val.text + "</option>");
+	                        });
+	                        selPlantilles.append("</optgroup>");
+	                    }
+	                   
+	                   if (itemsComuns.length > 0) {
+	                       selPlantilles.append("<optgroup label='<spring:message code='metadocument.form.camp.portafirmes.flux.group.comun'/>'>");
+	                       $.each(itemsComuns, function(i, val) {
+	                           selPlantilles.append("<option value=\"" + val.id + "\">" + val.text + "</option>");
+	                       });
+	                       selPlantilles.append("</optgroup>");
+	                   }
+
 					}
+					
 					var select2Options = {
 						theme: 'bootstrap',
 						minimumResultsForSearch: "4"
 					};
+					
 					selPlantilles.select2(select2Options);
 					if (plantillaActual != '') {
 						selPlantilles.val(plantillaActual);

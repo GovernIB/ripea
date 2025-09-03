@@ -66,7 +66,7 @@ public interface PortafirmesFluxService {
 	public PortafirmesFluxInfoDto recuperarDetallFluxFirma(String plantillaFluxId, boolean signerInfo);
 
 	@PreAuthorize("isAuthenticated()")
-	public List<PortafirmesFluxRespostaDto> recuperarPlantillesDisponibles(Long entitatId, Long metaDocumentId, boolean filtrar);
+	public List<PortafirmesFluxRespostaDto> recuperarPlantillesDisponibles(Long entitatId, Long metaDocumentId, boolean addUserFluxes, boolean filtrar);
 	
 	/**
 	 * Recupera un llistat de les plantilles disponibles per un usuari aplicació

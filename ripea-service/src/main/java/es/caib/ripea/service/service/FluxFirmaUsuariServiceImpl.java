@@ -166,10 +166,9 @@ public class FluxFirmaUsuariServiceImpl implements FluxFirmaUsuariService {
 				false);
 		
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		UsuariEntity usuari = usuariRepository.getOne(auth.getName());
 		
 		return conversioTipusHelper.convertirList(
-				fluxFirmaUsuariRepository.findByEntitatAndUsuari(entitat, usuari), 
+				fluxFirmaUsuariRepository.findByEntitatIdAndUsuariCodi(entitatId, auth.getName()), 
 				FluxFirmaUsuariDto	.class);
 	}
 	

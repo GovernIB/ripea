@@ -223,6 +223,7 @@ public class PortafirmesFluxController extends BaseUserOAdminOOrganController {
 		List<PortafirmesFluxRespostaDto> resposta = portafirmesFluxService.recuperarPlantillesDisponibles(
 				entitatActual.getId(),
 				metaDocumentId,
+				true,
 				filtrarUsuari);
 		return resposta;
 	}

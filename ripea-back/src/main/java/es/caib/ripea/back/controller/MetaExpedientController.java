@@ -510,6 +510,7 @@ public class MetaExpedientController extends BaseAdminController {
 						List<PortafirmesFluxRespostaDto> plantilles = portafirmesFluxService.recuperarPlantillesDisponibles(
 								entitatActual.getId(),
 								metaDocumentCommand.getId(),
+								false,
 								false);
 
 						List<String> fluxosExistents = new ArrayList<>();

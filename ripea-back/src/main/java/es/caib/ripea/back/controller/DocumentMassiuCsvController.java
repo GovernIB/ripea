@@ -203,6 +203,7 @@ public class DocumentMassiuCsvController extends BaseUserOAdminOOrganController 
 		List<PortafirmesFluxRespostaDto> resposta = portafirmesFluxService.recuperarPlantillesDisponibles(
 				entitatActual.getId(),
 				metadocumentId,
+				true,
 				filtrarUsuari);
 		return resposta;
 	}
