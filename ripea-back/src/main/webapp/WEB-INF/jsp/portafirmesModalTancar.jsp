@@ -19,7 +19,7 @@
 	<script src="<c:url value="/webjars/jquery/1.12.4/dist/jquery.min.js"/>"></script>
 <script>
 let fluxIframe = window.frameElement;
-
+debugger;
 if (fluxIframe) {
 	const idTransaccioFlux = "${fluxId}";
 	const fluxErrorDesc = "${fn:escapeXml(FluxError)}";
@@ -29,21 +29,30 @@ if (fluxIframe) {
 	const $modalFlux = $(fluxIframe.parentElement.parentElement).prev();
 	var alertDiv;
 	
-	if (idTransaccioFlux != null && idTransaccioFlux != '') {
-		var successMessage = "<option value=\"" + idTransaccioFlux + "\" selected>" + fluxCreatedNom + "</option>";
-		$modalFlux.find('#portafirmesFluxId').append(successMessage);
-	} else if (fluxErrorDesc != null && fluxErrorDesc != '') {
-		alertDiv = '<div class="alert alert-danger" role="alert"> \
-						<a class="close" data-dismiss="alert">×</a> \
-						<span>' + fluxErrorDesc + '</span> \
-					</div>';
-		//desactivar selecció si s'ha creat un nou flux
-		if (localStorage.getItem('tmpTransaccioId') == null && localStorage.getItem('tmpTransaccioId') == '') {
-			$modalFlux.find('#portafirmesFluxId').attr('disabled', false);
-		}
+    if (idTransaccioFlux != null && idTransaccioFlux != '') {
 
-		$modalFlux.find(".portafirmesEnviarFluxId_btn_addicional").find('i').addClass('fa-eye').removeClass('fa-eye-slash');
-	}
+    	//Afegir la opció al selector de fluxos, i que estigui ja seleccionada.
+        let selectorfluxos = $modalFlux.find('#portafirmesFluxosId');
+        $(selectorfluxos).append(new Option(fluxCreatedNom, idTransaccioFlux));
+        let valoresActuales = $(selectorfluxos).val() || [];
+        valoresActuales.push(idTransaccioFlux);
+        $(selectorfluxos).val(valoresActuales).trigger('change');
+        
+        //Afegir la fila a la taula de fluxos seleccionats
+        window.parent.addFluxRow(idTransaccioFlux, fluxCreatedNom);
+
+    } else if (fluxErrorDesc != null && fluxErrorDesc != '') {
+        alertDiv = '<div class="alert alert-danger" role="alert"> \
+                        <a class="close" data-dismiss="alert">×</a> \
+                        <span>' + fluxErrorDesc + '</span> \
+                    </div>';
+        //desactivar selecció si s'ha creat un nou flux
+        if (localStorage.getItem('tmpTransaccioId') == null && localStorage.getItem('tmpTransaccioId') == '') {
+            $modalFlux.find('#portafirmesFluxosId').attr('disabled', false);
+        }
+
+        $modalFlux.find(".portafirmesEnviarFluxId_btn_addicional").find('i').addClass('fa-eye').removeClass('fa-eye-slash');
+    }
 	if (fluxSuccesDesc != null && fluxSuccesDesc != '') {
 		$modalFlux.find('#portafirmesEnviarFluxId').empty();
 		$modalFlux.find('#portafirmesEnviarFluxId').attr('disabled', true);

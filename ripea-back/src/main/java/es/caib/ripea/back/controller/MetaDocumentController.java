@@ -32,11 +32,11 @@ import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 /**
- * Controlador per al manteniment de meta-documents no asociats a cap
- * meta-expedient.
+ * Controlador per al manteniment de meta-documents NO ASOCIATS A CAP META-EXPEDIENT.
  *
  * @author Limit Tecnologies <limit@limit.es>
  */
+
 @Controller
 @RequestMapping("/metaDocument")
 public class MetaDocumentController extends BaseAdminController {
@@ -77,15 +77,15 @@ public class MetaDocumentController extends BaseAdminController {
 		}
 		MetaDocumentCommand command = null;
 		if (metaDocument != null) {
-			model.addAttribute("portafirmesFluxSeleccionat", metaDocument.getPortafirmesFluxosId()!=null?metaDocument.getPortafirmesFluxosId()[0]:null);
 			command = MetaDocumentCommand.asCommand(metaDocument);
 		} else {
 			command = new MetaDocumentCommand();
 		}
 		command.setEntitatId(entitatActual.getId());
+		command.setComu(false); //inicialitzarm per el atribut required del camp portafirmesResponsables del form
 		model.addAttribute(command);
 		emplenarModelForm(request, model);
-		return "metaDocumentForm";
+		return "metaExpedientMetaDocumentForm";
 	}
 
 	@RequestMapping(method = RequestMethod.POST)
@@ -104,7 +104,7 @@ public class MetaDocumentController extends BaseAdminController {
 		if (bindingResult.hasErrors()) {
 			emplenarModelForm(request, model);
 			request.getSession().setAttribute(MissatgesHelper.SESSION_ATTRIBUTE_BINDING_ERRORS, bindingResult.getGlobalErrors());
-			return "metaDocumentForm";
+			return "metaExpedientMetaDocumentForm";
 		}
 		if (command.getId() != null) {
 			metaDocumentService.update(
@@ -217,7 +217,7 @@ public class MetaDocumentController extends BaseAdminController {
 		String urlReturn;
 		PortafirmesIniciFluxRespostaDto transaccioResponse = null;
 		try {
-			urlReturn = aplicacioService.propertyBaseUrl() + "/metaExpedient/metaDocument/flux/returnurl/";
+			urlReturn = aplicacioService.propertyBaseUrl() + "/metaDocument/flux/returnurl/";
 			if (plantillaId != null && !plantillaId.isEmpty()) {
 				transaccioResponse = new PortafirmesIniciFluxRespostaDto();
 				String urlEdicio = portafirmesFluxService.recuperarUrlEdicioPlantilla(plantillaId, urlReturn);
@@ -244,15 +244,10 @@ public class MetaDocumentController extends BaseAdminController {
 	@RequestMapping(value = "/flux/returnurl/{transactionId}", method = RequestMethod.GET)
 	public String transaccioEstat(HttpServletRequest request, @PathVariable String transactionId, Model model) {
 		PortafirmesFluxRespostaDto resposta = portafirmesFluxService.recuperarFluxFirma(transactionId);
-
 		if (resposta.isError() && resposta.getEstat() != null) {
-			model.addAttribute(
-					"FluxError",
-					getMessage(request, "metadocument.form.camp.portafirmes.flux.enum." + resposta.getEstat()));
+			model.addAttribute("FluxError", getMessage(request, "metadocument.form.camp.portafirmes.flux.enum." + resposta.getEstat()));
 		} else {
-			model.addAttribute(
-					"FluxCreat",
-					getMessage(request, "metadocument.form.camp.portafirmes.flux.enum.FINAL_OK"));
+			model.addAttribute("FluxCreat", getMessage(request, "metadocument.form.camp.portafirmes.flux.enum.FINAL_OK"));
 			model.addAttribute("fluxId", resposta.getFluxId());
 			model.addAttribute("FluxNom", resposta.getNom());
 			model.addAttribute("FluxDescripcio", resposta.getDescripcio());
@@ -262,9 +257,7 @@ public class MetaDocumentController extends BaseAdminController {
 
 	@RequestMapping(value = "/flux/returnurl/", method = RequestMethod.GET)
 	public String transaccioEstat(HttpServletRequest request, Model model) {
-		model.addAttribute(
-				"FluxCreat",
-				getMessage(request, "metadocument.form.camp.portafirmes.flux.edicio.enum.FINAL_OK"));
+		model.addAttribute("FluxCreat", getMessage(request, "metadocument.form.camp.portafirmes.flux.edicio.enum.FINAL_OK"));
 		return "portafirmesModalTancar";
 	}
 
@@ -296,20 +289,15 @@ public class MetaDocumentController extends BaseAdminController {
 			model.addAttribute("portafirmesDocumentTipus", tipus);
 		}
 		model.addAttribute("isPortafirmesDocumentTipusSuportat", tipusDocumentPortafirmes);
-
+		model.addAttribute("byMetaExpedient", false);
 		// Dades nti
-		model.addAttribute(
-				"ntiOrigenOptions",
-				EnumHelper.getOptionsForEnum(NtiOrigenEnumDto.class, "document.nti.origen.enum."));
+		model.addAttribute("ntiOrigenOptions", EnumHelper.getOptionsForEnum(NtiOrigenEnumDto.class, "document.nti.origen.enum."));
 		List<TipusDocumentalDto> tipusDocumental = tipusDocumentalService.findByEntitat(entitatActual.getId());
 		model.addAttribute("ntiTipusDocumentalOptions", tipusDocumental);
-		model.addAttribute(
-				"ntiEstatElaboracioOptions",
-				EnumHelper.getOptionsForEnum(DocumentNtiEstadoElaboracionEnumDto.class, "document.nti.estela.enum."));
-		model.addAttribute(
-				"isFirmaBiometrica",
-				Boolean.parseBoolean(
-						aplicacioService.propertyFindByNom(PropertyConfig.FIRMA_BIOMETRICA_ACTIVA)));
+		model.addAttribute("ntiEstatElaboracioOptions", EnumHelper.getOptionsForEnum(DocumentNtiEstadoElaboracionEnumDto.class, "document.nti.estela.enum."));
+		model.addAttribute("isFirmaBiometrica", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.FIRMA_BIOMETRICA_ACTIVA)));
+		model.addAttribute("bloquejarCamps", false);
+		model.addAttribute("consultar", false);
 		loadServeisPinbal(model, false);
 	}
 	

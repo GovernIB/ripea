@@ -59,7 +59,14 @@ public class MetaDocumentHelper {
 			String plantillaContentType,
 			byte[] plantillaContingut) {
 		
-		MetaDocumentEntity metaDocumentEntity = metaDocumentRepository.findByMetaExpedientIdAndCodi(metaExpedientId, metaDocument.getCodi());
+		MetaDocumentEntity metaDocumentEntity = null;
+		
+		//El Metadocument pot ser generic (sense associar a un procediment)
+		if (metaExpedientId!=null) {
+			metaDocumentEntity = metaDocumentRepository.findByMetaExpedientIdAndCodi(metaExpedientId, metaDocument.getCodi());
+		} else {
+			metaDocumentEntity = metaDocumentRepository.findById(metaDocument.getId()).get();
+		}
 		
 		PinbalServeiEntity pinbalServeiEntity = null;
 		if (metaDocument.getPinbalServei()!=null && metaDocument.getPinbalServei().getId()!=null) {
@@ -147,10 +154,7 @@ public class MetaDocumentHelper {
 			String rolActual,
 			Long organId) {
 		
-		logger.debug("Creant un nou meta-document (" +
-				"entitatId=" + entitatId + ", " +
-				"metaExpedientId=" + metaExpedientId + ", " +
-				"metaDocument=" + metaDocument + ")");
+		logger.debug("Creant un nou meta-document (entitatId=" + entitatId + ", metaExpedientId=" + metaExpedientId + ", metaDocument=" + metaDocument + ")");
 
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
@@ -159,7 +163,13 @@ public class MetaDocumentHelper {
 				false, 
 				true, false);
 		
-		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
+		MetaExpedientEntity metaExpedient = null;
+		int ordre = 0;
+		//El Metadocument pot ser generic (sense associar a un procediment)
+		if (metaExpedientId!=null) {
+			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
+			ordre = metaDocumentRepository.countByMetaExpedient(metaExpedient);
+		}
 		
 		PinbalServeiEntity pinbalServeiEntity = null;
 		if (metaDocument.getPinbalServei()!=null && metaDocument.getPinbalServei().getId()!=null) {
@@ -177,7 +187,7 @@ public class MetaDocumentHelper {
 				metaDocument.getNtiTipoDocumental(),
 				metaDocument.isPinbalActiu(),
 				metaDocument.getPinbalFinalitat(),
-				metaDocumentRepository.countByMetaExpedient(metaExpedient)).
+				ordre).
 				biometricaLectura(metaDocument.isBiometricaLectura()).
 				firmaBiometricaActiva(metaDocument.isFirmaBiometricaActiva()).
 				firmaPortafirmesActiva(metaDocument.isFirmaPortafirmesActiva()).

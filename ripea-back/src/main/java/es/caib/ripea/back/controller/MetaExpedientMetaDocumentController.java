@@ -385,66 +385,10 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 		}
 	}
 
-	@RequestMapping(value = "/metaDocument/iniciarTransaccio", method = RequestMethod.GET)
-	@ResponseBody
-	public PortafirmesIniciFluxRespostaDto iniciarTransaccio(
-			HttpServletRequest request,
-			@RequestParam(value = "nom", required = false) String nom,
-			@RequestParam(value = "plantillaId", required = false) String plantillaId,
-			Model model) throws UnsupportedEncodingException {
-		organGestorService.actualitzarOrganCodi(SessioHelper.getOrganActual(request));
-		String urlReturn;
-		PortafirmesIniciFluxRespostaDto transaccioResponse = null;
-		try {
-			urlReturn = aplicacioService.propertyBaseUrl() + "/metaExpedient/metaDocument/flux/returnurl/";
-			if (plantillaId != null && !plantillaId.isEmpty()) {
-				transaccioResponse = new PortafirmesIniciFluxRespostaDto();
-				String urlEdicio = portafirmesFluxService.recuperarUrlEdicioPlantilla(plantillaId, urlReturn);
-				transaccioResponse.setUrlRedireccio(urlEdicio);
-			} else {
-				transaccioResponse = portafirmesFluxService.iniciarFluxFirma(urlReturn, true);
-			}
-		} catch (Exception ex) {
-			logger.error("Error al iniciar transacio", ex);
-			transaccioResponse = new PortafirmesIniciFluxRespostaDto();
-			transaccioResponse.setError(true);
-			transaccioResponse.setErrorDescripcio(ex.getMessage());
-		}
-
-		return transaccioResponse;
-	}
-
 	@RequestMapping(value = "/metaDocument/tancarTransaccio/{idTransaccio}", method = RequestMethod.GET)
 	@ResponseBody
 	public void tancarTransaccio(HttpServletRequest request, @PathVariable String idTransaccio, Model model) {
 		portafirmesFluxService.tancarTransaccio(idTransaccio);
-	}
-
-	@RequestMapping(value = "/metaDocument/flux/returnurl/{transactionId}", method = RequestMethod.GET)
-	public String transaccioEstat(HttpServletRequest request, @PathVariable String transactionId, Model model) {
-		PortafirmesFluxRespostaDto resposta = portafirmesFluxService.recuperarFluxFirma(transactionId);
-		organGestorService.actualitzarOrganCodi(SessioHelper.getOrganActual(request));
-
-		if (resposta.isError() && resposta.getEstat() != null) {
-			model.addAttribute(
-					"FluxError",
-					getMessage(request, "metadocument.form.camp.portafirmes.flux.enum." + resposta.getEstat()));
-		} else {
-			model.addAttribute(
-					"FluxCreat",
-					getMessage(request, "metadocument.form.camp.portafirmes.flux.enum.FINAL_OK"));
-			model.addAttribute("fluxId", resposta.getFluxId());
-			model.addAttribute("FluxNom", resposta.getNom());
-			model.addAttribute("FluxDescripcio", resposta.getDescripcio());
-		}
-		return "portafirmesModalTancar";
-	}
-
-	@RequestMapping(value = "/metaDocument/flux/returnurl/", method = RequestMethod.GET)
-	public String transaccioEstat(HttpServletRequest request, Model model) {
-		model.addAttribute("FluxCreat", getMessage(request, "metadocument.form.camp.portafirmes.flux.edicio.enum.FINAL_OK"));
-//		model.addAttribute("isEdicio", true);
-		return "portafirmesModalTancar";
 	}
 
 	@RequestMapping(value = "/metaDocument/flux/plantilles", method = RequestMethod.GET)
@@ -487,7 +431,7 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 			model.addAttribute("portafirmesDocumentTipus", tipus);
 		}
 		model.addAttribute("isPortafirmesDocumentTipusSuportat", tipusDocumentPortafirmes);
-
+		model.addAttribute("byMetaExpedient", true);
 		// Dades nti
 		model.addAttribute(
 				"ntiOrigenOptions",

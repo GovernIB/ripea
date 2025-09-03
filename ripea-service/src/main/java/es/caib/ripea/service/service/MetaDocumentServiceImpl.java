@@ -95,7 +95,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		entityComprovarHelper.comprovarEntitat(entitatId, false, true, false, false, false);
 		MetaDocumentEntity entity = entityComprovarHelper.comprovarMetaDocument(metaDocument.getId());
 		entity = metaDocumentHelper.update(
-				entity.getMetaExpedient().getId(),
+				entity.getMetaExpedient()==null?null:entity.getMetaExpedient().getId(),
 				metaDocument,
 				plantillaNom,
 				plantillaContentType,
@@ -110,10 +110,8 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 			Long metaExpedientId,
 			Long id,
 			boolean actiu, String rolActual) {
-		logger.debug("Actualitzant propietat activa d'un meta-document existent (" +
-				"entitatId=" + entitatId + ", " +
-				"metaExpedientId=" + metaExpedientId + ", " +
-				"id=" + id + ")");
+		logger.debug("Actualitzant propietat activa d'un meta-document existent (entitatId=" + entitatId + ", metaExpedientId=" + metaExpedientId + ", id=" + id + ")");
+		
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
@@ -122,15 +120,18 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				false, 
 				true);
 		
-		MetaExpedientEntity metaExpedient;
-		metaExpedient = metaExpedientId == null ? null : entityComprovarHelper.comprovarMetaExpedient(
-															entitat,
-															metaExpedientId);
-		MetaDocumentEntity metaDocument = entityComprovarHelper.comprovarMetaDocument(
-				entitat,
-				metaExpedient,
-				id);
-		metaDocument.updateActiu(actiu);
+		MetaExpedientEntity metaExpedient = null;
+		MetaDocumentEntity metaDocumentEntity = null;
+		
+		if (metaExpedientId!=null) {
+			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
+			metaDocumentEntity = entityComprovarHelper.comprovarMetaDocument(entitat, metaExpedient, id);
+		} else {
+			metaDocumentEntity = metaDocumentRepository.findById(id).get();
+		}
+
+		metaDocumentEntity.updateActiu(actiu);
+		
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
 			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId(), null);
 		}
@@ -146,21 +147,15 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 			}
 		}
 		
-		return conversioTipusHelper.convertir(
-				metaDocument,
-				MetaDocumentDto.class);
+		return conversioTipusHelper.convertir(metaDocumentEntity, MetaDocumentDto.class);
 	}
 
 	@Transactional
 	@Override
-	public MetaDocumentDto delete(
-			Long entitatId,
-			Long metaExpedientId,
-			Long id, String rolActual, Long organId) {
-		logger.debug("Esborrant meta-document (" +
-				"entitatId=" + entitatId + ", " +
-				"metaExpedientId=" + metaExpedientId + ", " +
-				"id=" + id + ")");
+	public MetaDocumentDto delete(Long entitatId, Long metaExpedientId, Long id, String rolActual, Long organId) {
+		
+		logger.debug("Esborrant meta-document (entitatId=" + entitatId + ", metaExpedientId=" + metaExpedientId + ", id=" + id + ")");
+		
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
@@ -169,16 +164,17 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				false, 
 				true);
 
-		MetaExpedientEntity metaExpedient;
-		metaExpedient = metaExpedientId == null ? null : entityComprovarHelper.comprovarMetaExpedient(
-															entitat,
-															metaExpedientId);
-		MetaDocumentEntity metaDocument = entityComprovarHelper.comprovarMetaDocument(
-				entitat,
-				metaExpedient,
-				id);
+		MetaExpedientEntity metaExpedient = null;
+		MetaDocumentEntity metaDocumentEntity = null;
 		
-		List<DocumentEntity> docs = documentRepository.findByMetaNode(metaDocument);
+		if (metaExpedientId!=null) {
+			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
+			metaDocumentEntity = entityComprovarHelper.comprovarMetaDocument(entitat, metaExpedient, id);
+		} else {
+			metaDocumentEntity = metaDocumentRepository.findById(id).get();
+		}
+		
+		List<DocumentEntity> docs = documentRepository.findByMetaNode(metaDocumentEntity);
 		if (docs != null && !docs.isEmpty()) {
 			throw new ExisteixenDocumentsException();
 		}
@@ -192,15 +188,13 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 			metaExpedientTascaValidacioRepository.deleteAll(validacionsDoc);
 		}
 		
-		metaDocumentRepository.delete(metaDocument);
+		metaDocumentRepository.delete(metaDocumentEntity);
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
 			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId(), organId);
 		}
-		return conversioTipusHelper.convertir(
-				metaDocument,
-				MetaDocumentDto.class);
+		
+		return conversioTipusHelper.convertir(metaDocumentEntity, MetaDocumentDto.class);
 	}
-	
 	
 	@Override
 	@Transactional
@@ -238,52 +232,38 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 			elements.get(i).updateOrdre(i);
 		}
 	}
-	
-	
-
-
-	
 
 	@Transactional(readOnly = true)
 	@Override
-	public MetaDocumentDto findById(
-			Long entitatId,
-			Long metaExpedientId,
-			Long id) {
-		logger.debug("Consulta del meta-document (" +
-				"entitatId=" + entitatId + ", " +
-				"metaExpedientId=" + metaExpedientId + ", " +
-				"id=" + id + ")");
+	public MetaDocumentDto findById(Long entitatId, Long metaExpedientId, Long id) {
+		
+		logger.debug("Consulta del meta-document (entitatId=" + entitatId + ", metaExpedientId=" + metaExpedientId + ", id=" + id + ")");
+		
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
 		MetaExpedientEntity metaExpedient;
-		metaExpedient = metaExpedientId == null ? null : entityComprovarHelper.comprovarMetaExpedient(
-															entitat,
-															metaExpedientId);
+		MetaDocumentEntity metaDocument;
 		
-		MetaDocumentEntity metaDocument = entityComprovarHelper.comprovarMetaDocument(
-				entitat,
-				metaExpedient,
-				id);
+		if (metaExpedientId == null) {
+			metaExpedient = null;
+			metaDocument = entityComprovarHelper.comprovarMetaDocument(id);
+		} else {
+			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
+			metaDocument = entityComprovarHelper.comprovarMetaDocument(entitat, metaExpedient, id);	
+		}
 		
-		MetaDocumentDto resposta = conversioTipusHelper.convertir(
-				metaDocument,
-				MetaDocumentDto.class);
+		MetaDocumentDto resposta = conversioTipusHelper.convertir(metaDocument, MetaDocumentDto.class);
 		if (resposta != null) {
 			metaNodeHelper.omplirMetaDadesPerMetaNode(resposta);
 		}
 		return resposta;
 	}
 	
-	
 	@Transactional(readOnly = true)
 	@Override
-	public MetaDocumentDto findById(
-			Long metaDocumentId) {
-		logger.debug("Consulta del meta-document (" +
-				"metaDocumentId=" + metaDocumentId + ")");
+	public MetaDocumentDto findById(Long metaDocumentId) {
+		logger.debug("Consulta del meta-document (metaDocumentId=" + metaDocumentId + ")");
 
-		MetaDocumentEntity metaDocument = entityComprovarHelper.comprovarMetaDocument(
-				metaDocumentId);
+		MetaDocumentEntity metaDocument = entityComprovarHelper.comprovarMetaDocument(metaDocumentId);
 		
 		entityComprovarHelper.comprovarEntitat(
 				metaDocument.getEntitat().getId(),
@@ -292,7 +272,6 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				false, 
 				true, 
 				false);
-		
 		
 		MetaDocumentDto resposta = conversioTipusHelper.convertir(
 				metaDocument,
