@@ -22,10 +22,10 @@ let fluxIframe = window.frameElement;
 
 if (fluxIframe) {
 	const idTransaccioFlux = "${fluxId}";
-	const fluxErrorDesc = "${FluxError}";
-	const fluxSuccesDesc = "${FluxCreat}";
-	const fluxCreatedNom = "${FluxNom}";
-	const fluxCreatedDescripcio = "${FluxDescripcio}";
+	const fluxErrorDesc = "${fn:escapeXml(FluxError)}";
+	const fluxSuccesDesc = "${fn:escapeXml(FluxCreat)}";
+	const fluxCreatedNom = "${fn:escapeXml(FluxNom)}";
+	const fluxCreatedDescripcio = "${fn:escapeXml(FluxDescripcio)}";
 	const $modalFlux = $(fluxIframe.parentElement.parentElement).prev();
 	var alertDiv;
 	
