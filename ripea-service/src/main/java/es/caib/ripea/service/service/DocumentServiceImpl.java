@@ -1185,32 +1185,18 @@ public class DocumentServiceImpl implements DocumentService {
 	
 	@Transactional
 	@Override
-	public void viaFirmaCancelar(
-			Long entitatId,
-			Long id) {
-		logger.debug("Enviant document a viaFirma (" +
-				"entitatId=" + entitatId + ", " +
-				"id=" + id + ")");
+	public void viaFirmaCancelar(Long entitatId, Long documentId) {
+		logger.debug("Enviant document a viaFirma (entitatId=" + entitatId + ", documentId=" + documentId + ")");
 		DocumentEntity document = documentHelper.comprovarDocument(
 				entitatId,
-				id,
+				documentId,
 				false,
 				true,
 				false,
 				false, 
 				false, 
 				null);
-		List<DocumentViaFirmaEntity> enviamentsPendents = documentViaFirmaRepository.findByDocumentAndEstatInOrderByCreatedDateDesc(
-				document,
-				new DocumentEnviamentEstatEnumDto[] {DocumentEnviamentEstatEnumDto.ENVIAT});
-		if (enviamentsPendents.size() == 0) {
-			throw new ValidationException(
-					document.getId(),
-					DocumentEntity.class,
-					"Aquest document no te enviaments a viaFirma pendents");
-		}
-		DocumentViaFirmaEntity documentViaFirma = enviamentsPendents.get(0);
-		firmaViaFirmaHelper.viaFirmaCancelar(documentViaFirma);
+		firmaViaFirmaHelper.viaFirmaCancelar(documentId);
 	}
 	
 	@Transactional(readOnly = true)
@@ -1226,8 +1212,8 @@ public class DocumentServiceImpl implements DocumentService {
 				id,
 				true,
 				false);
-		List<DocumentViaFirmaEntity> enviamentsPendents = documentViaFirmaRepository.findByDocumentAndEstatInOrderByCreatedDateDesc(
-				document,
+		List<DocumentViaFirmaEntity> enviamentsPendents = documentViaFirmaRepository.findByDocumentIdAndEstatInOrderByCreatedDateDesc(
+				document.getId(),
 				new DocumentEnviamentEstatEnumDto[] {
 						DocumentEnviamentEstatEnumDto.PENDENT,
 						DocumentEnviamentEstatEnumDto.ENVIAT

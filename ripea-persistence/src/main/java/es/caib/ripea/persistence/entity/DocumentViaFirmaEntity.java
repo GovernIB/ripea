@@ -51,7 +51,6 @@ public class DocumentViaFirmaEntity extends DocumentEnviamentEntity {
 	private String signantEmail;
 	@Column(name = "vf_observacions")
 	private String observacions;
-	
 	@Column(name = "vf_validate_code_enabled")
 	private Boolean validateCodeEnabled;
 	@Column(name = "vf_validate_code")

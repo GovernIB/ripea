@@ -39,6 +39,7 @@ public class DocumentPortafirmesResource extends DocumentEnviamentResource {
 	private PortafirmesPrioritatEnumDto prioritat;
 	private Date caducitatData;
 	private String documentTipus;
+	@Transient private String documentTipusNom;
 	private String responsables;
 	private MetaDocumentFirmaSequenciaTipusEnumDto sequenciaTipus;
 	private MetaDocumentFirmaFluxTipusEnumDto fluxTipus;

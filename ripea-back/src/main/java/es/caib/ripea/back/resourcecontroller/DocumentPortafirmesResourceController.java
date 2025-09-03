@@ -7,14 +7,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * Servei REST de gestió d'aplicacions.
- *
- * @author Límit Tecnologies
- */
 @RestController
 @RequestMapping(BaseConfig.API_PATH + "/documentPortafirmes")
 @Tag(name = "DocumentPortafirmes", description = "Servei de gestió de portafirmes de document")
-public class DocumentPortafirmesResourceController extends BaseMutableResourceController<DocumentPortafirmesResource, Long> {
-
-}
+public class DocumentPortafirmesResourceController extends BaseMutableResourceController<DocumentPortafirmesResource, Long> {}

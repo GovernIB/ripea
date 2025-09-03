@@ -100,6 +100,7 @@ public class DocumentFirmaViaFirmaHelper extends DocumentFirmaHelper{
 			if (viaFirmaDispositiuDto.getCodi().equals(viaFirmaEnviarDto.getCodiUsuariViaFirma())) {
 				contrasenyaUsuariViaFirma = viaFirmaDispositiuDto.getContrasenya();
 				viaFirmaEnviarDto.setContrasenyaUsuariViaFirma(contrasenyaUsuariViaFirma);
+				break;
 			}
 		}
 		
@@ -359,12 +360,24 @@ public class DocumentFirmaViaFirmaHelper extends DocumentFirmaHelper{
 		}
 	}
 		
-	public void viaFirmaCancelar(DocumentViaFirmaEntity documentViaFirma) {
+	public void viaFirmaCancelar(Long documentId) {
+		List<DocumentViaFirmaEntity> enviamentsPendents = documentViaFirmaRepository.findByDocumentIdAndEstatInOrderByCreatedDateDesc(
+				documentId,
+				new DocumentEnviamentEstatEnumDto[] {DocumentEnviamentEstatEnumDto.ENVIAT});
+
+		if (enviamentsPendents.size() == 0) {
+			throw new ValidationException(
+					documentId,
+					DocumentEntity.class,
+					"Aquest document no te enviaments a viaFirma pendents");
+		}
+		DocumentViaFirmaEntity documentViaFirma = enviamentsPendents.get(0);		
+		
 		DocumentEntity document = documentViaFirma.getDocument();
 		documentViaFirma.updateMessageCode(null);
 		documentViaFirma.updateCancelat(new Date());
-		document.updateEstat(
-				DocumentEstatEnumDto.REDACCIO);
+		document.updateEstat(DocumentEstatEnumDto.REDACCIO);
+		
 		contingutLogHelper.log(
 				document,
 				LogTipusEnumDto.VFIRMA_CANCELACIO,

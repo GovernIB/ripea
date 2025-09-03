@@ -6,31 +6,26 @@ import {CardData, ContenidoData} from "../../../components/CardData.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import Load from "../../../components/Load.tsx";
 import * as builder from '../../../util/springFilterUtils.ts'
-import Iframe from "../../../components/Iframe.tsx";
 
-const SeguimentPortafirmes = (props:any) => {
+const SeguimentViafirma = (props:any) => {
     const {entity} = props;
     const { t } = useTranslation();
     return <Load value={entity}>
         <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-            <CardData xs={6} title={entity?.document?.description}>
-                <ContenidoData title={t('page.contingut.action.seguimentPortafirmes.assumpte')}>{entity?.assumpte}</ContenidoData>
-                <ContenidoData title={t('page.contingut.action.seguimentPortafirmes.enviatData')}>{formatDate(entity?.enviatData)}</ContenidoData>
-                <ContenidoData title={t('page.contingut.action.seguimentPortafirmes.estat')}>{t(`enum.estat.${entity?.estat}`)}</ContenidoData>
-                <ContenidoData title={t('page.contingut.action.seguimentPortafirmes.prioritat')}>{t(`enum.prioritat.${entity?.prioritat}`)}</ContenidoData>
-                <ContenidoData title={t('page.contingut.action.seguimentPortafirmes.documentTipusNom')}>{entity?.documentTipusNom}</ContenidoData>
-                <ContenidoData title={t('page.contingut.action.seguimentPortafirmes.fluxTipus')}>{t(`enum.fluxTipus.${entity?.fluxTipus}`)}</ContenidoData>
-                <ContenidoData title={t('page.contingut.action.seguimentPortafirmes.portafirmesId')}>{entity?.portafirmesId}</ContenidoData>
+            <CardData xs={12} title={entity?.document?.description}>
+                <ContenidoData title={t('page.contingut.action.seguimentvf.document')}>{entity?.document?.nom}</ContenidoData>
+                <ContenidoData title={t('page.contingut.action.seguimentvf.titol')}>{entity?.document?.titol}</ContenidoData>
+                <ContenidoData title={t('page.contingut.action.seguimentvf.descripcio')}>{entity?.document?.descripcio}</ContenidoData>
+                <ContenidoData title={t('page.contingut.action.seguimentvf.enviatData')}>{formatDate(entity?.enviatData)}</ContenidoData>
+                <ContenidoData title={t('page.contingut.action.seguimentvf.estat')}>{t(`enum.estat.${entity?.estat}`)}</ContenidoData>
+                <ContenidoData title={t('page.contingut.action.seguimentvf.tipusDestinatari')}>{t(`enum.tipusDestinatari.${entity?.tipusDestinatari}`)}</ContenidoData>
+                <ContenidoData title={t('page.contingut.action.seguimentvf.messageCode')}>{entity?.messageCode}</ContenidoData>
             </CardData>
-
-            <Grid item xs={6}>
-                <Iframe src={entity?.urlFluxSeguiment} style={{ height: '100%' }}/>
-            </Grid>
         </Grid>
     </Load>
 }
 
-const useSeguimentPortafirmes = (potModificar:boolean, refresh?: () => void) => {
+const useSeguimentViafirma = (potModificar:boolean, refresh?: () => void) => {
     const { t } = useTranslation();
     const {temporalMessageShow} = useBaseAppContext();
 
@@ -38,7 +33,7 @@ const useSeguimentPortafirmes = (potModificar:boolean, refresh?: () => void) => 
         isReady: apiIsReady,
         find: apiFind,
         artifactAction: apiAction,
-    } = useResourceApiService('documentPortafirmesResource')
+    } = useResourceApiService('documentViaFirmaResource')
     const [open, setOpen] = useState(false);
     const [entity, setEntity] = useState<any>();
 
@@ -107,7 +102,7 @@ const useSeguimentPortafirmes = (potModificar:boolean, refresh?: () => void) => 
                 }
             }}
         >
-            <SeguimentPortafirmes entity={entity}/>
+            <SeguimentViafirma entity={entity}/>
         </MuiDialog>;
 
     return {
@@ -116,4 +111,4 @@ const useSeguimentPortafirmes = (potModificar:boolean, refresh?: () => void) => 
         dialog,
     }
 }
-export default useSeguimentPortafirmes;
+export default useSeguimentViafirma;

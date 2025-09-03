@@ -477,8 +477,8 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 		cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedient().getId());
 		cacheHelper.evictEnviamentsPortafirmesAmbErrorPerExpedient(document.getExpedient());
 		boolean hasFirmaParcial = false;
-		List<DocumentViaFirmaEntity> enviamentsViaFirmaProcessats = documentViaFirmaRepository.findByDocumentAndEstatInOrderByCreatedDateDesc(
-				document, 
+		List<DocumentViaFirmaEntity> enviamentsViaFirmaProcessats = documentViaFirmaRepository.findByDocumentIdAndEstatInOrderByCreatedDateDesc(
+				document.getId(), 
 				new DocumentEnviamentEstatEnumDto[] {DocumentEnviamentEstatEnumDto.PROCESSAT});
 		if (enviamentsViaFirmaProcessats != null && ! enviamentsViaFirmaProcessats.isEmpty()) {
 			hasFirmaParcial = enviamentsViaFirmaProcessats.get(0).isFirmaParcial();

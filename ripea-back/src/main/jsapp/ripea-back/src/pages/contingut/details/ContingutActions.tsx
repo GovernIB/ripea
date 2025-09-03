@@ -13,6 +13,7 @@ import useEnviarPortafirmes from "../actions/EnviarPortafirmes.tsx";
 import useVisualitzar from "../actions/Visualitzar.tsx";
 import useEnviarViaEmail from "../actions/EnviarViaEmail.tsx";
 import useSeguimentPortafirmes from "../actions/SeguimentPortafirmes.tsx";
+import useSeguimentViafirma from "../actions/SeguimentViafirma.tsx";
 import useFirmaNavegador from "../actions/FirmaNavegador.tsx";
 import useDocPinbal from "../actions/DocPinbal.tsx";
 import useEnviarViaFirma from "../actions/EnviarViaFirma.tsx";
@@ -158,6 +159,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
     const {handleOpen: handleHistoricOpen, dialog: dialogHistoric} = useHistoric();
     const {handleOpen: handleVisualitzarOpen, dialog: dialogVisualitzar} = useVisualitzar();
     const {handleOpen: handleSeguimentOpen, dialog: dialogSeguiment} = useSeguimentPortafirmes(entity?.potModificar, refresh);
+    const {handleOpen: handleSeguimentVfOpen, dialog: dialogSeguimentVf} = useSeguimentViafirma(entity?.potModificar, refresh);
     const {handleOpen: handleArxiuOpen, dialog: arxiuDialog} = useInformacioArxiu('documentResource', 'ARXIU_DOCUMENT');
     const {handleShow: handleMoureShow, content: contentMoure} = useMoure(refresh);
     const {handleShow: handleCopiarShow, content: contentCopiar} = useCopiar(refresh);
@@ -373,6 +375,13 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             hidden: (row:any) => !(row?.estat == 'FIRMA_PENDENT' && row?.documentTipus == 'DIGITAL'),
         },
         {
+            label: t('page.contingut.action.seguimentvf.label'),
+            icon: "info",
+            showInMenu: true,
+            onClick: handleSeguimentVfOpen,
+            hidden: (row:any) => !(row?.estat == 'FIRMA_PENDENT_VIAFIRMA' && row?.documentTipus == 'DIGITAL'),
+        },
+        {
             label: <Divider sx={{width: '100%'}} color={"none"}/>,
             showInMenu: true,
             disabled: true,
@@ -427,6 +436,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
         {contentPublicar}
         {contentEviarPortafirmes}
         {dialogSeguiment}
+        {dialogSeguimentVf}
         {contentFirma}
         {contentDocPinbal}
         {contentEnviarViaFirma}
