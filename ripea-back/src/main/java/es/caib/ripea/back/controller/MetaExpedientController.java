@@ -498,50 +498,36 @@ public class MetaExpedientController extends BaseAdminController {
 			String rolActual = RolHelper.getRolActual(request);
 			EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
 			
-			if (command.getMetaDocuments() != null) {
-				
-				for (MetaDocumentCommand metaDocumentCommand : command.getMetaDocuments()) {
-					for (MetaDocumentDto metaDocumentDto : metaExpedientExport.getMetaDocuments()) {
-						
-						if (metaDocumentDto.getId().equals(metaDocumentCommand.getId())) {
-							metaDocumentDto.setPortafirmesResponsables(metaDocumentCommand.getPortafirmesResponsables());
-						}
-
-						List<PortafirmesFluxRespostaDto> plantilles = portafirmesFluxService.recuperarPlantillesDisponibles(
-								entitatActual.getId(),
-								metaDocumentCommand.getId(),
-								false,
-								false);
-
-						List<String> fluxosExistents = new ArrayList<>();
-						if (metaDocumentDto.getPortafirmesFluxosId() != null) {
-							for (String fluxDefecteMetadocId: metaDocumentDto.getPortafirmesFluxosId()) {
-								boolean exists = false;
-								if (plantilles != null) {
-									for (PortafirmesFluxRespostaDto portafirmesFlux : plantilles) {
-										if (portafirmesFlux.getFluxId().equals(fluxDefecteMetadocId)) {
-											exists = true;
-										}
-									}
-								}
-								
-								if (!exists) {
-									MissatgesHelper.warning(
-											request, 
-											getMessage(
-													request,
-													"metaexpedient.import.controller.fluxIdNotFound",
-													new Object[] {fluxDefecteMetadocId, metaDocumentDto.getCodi()}));
-								} else {
-									fluxosExistents.add(fluxDefecteMetadocId);
+			//El JSON original té documents
+			if (metaExpedientExport.getMetaDocuments() != null) {
+				//Recuperam totes les plantilles disponibles a PF
+				List<PortafirmesFluxRespostaDto> plantilles = portafirmesFluxService.recuperarPlantillesDisponibles(
+						entitatActual.getId(),
+						null,
+						false,
+						false);
+				for (MetaDocumentDto metaDocumentDto : metaExpedientExport.getMetaDocuments()) {
+					if (metaDocumentDto.getPortafirmesFluxosId()!=null) {
+						for (String fluxId: metaDocumentDto.getPortafirmesFluxosId()) {
+							boolean trobat = false;
+							for (PortafirmesFluxRespostaDto plantillaFluxPF: plantilles) {
+								if (plantillaFluxPF.getFluxId().equals(fluxId)) {
+									trobat = true;
 								}
 							}
+							if (!trobat) {
+								MissatgesHelper.warning(
+										request, 
+										getMessage(
+												request,
+												"metaexpedient.import.controller.fluxIdNotFound",
+												new Object[] {fluxId, metaDocumentDto.getCodi()}));
+							}
 						}
-						metaDocumentDto.setPortafirmesFluxosId(fluxosExistents.toArray(new String[0]));
 					}
 				}
 			}
-			
+
 			if (command.getEstats() != null) {
 				for (ExpedientEstatCommand expedientEstatCommand : command.getEstats()) {
 					for (ExpedientEstatDto expedientEstatDto : metaExpedientExport.getEstats()) {
