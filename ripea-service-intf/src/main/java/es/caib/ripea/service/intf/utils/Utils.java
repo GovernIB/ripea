@@ -692,12 +692,11 @@ public class Utils {
         return resultado.toString();
     }
 	
-	// ============= Validació del DNI/NIE ============
 	public static final String DNI_O_NIE_STRING_ASOCIATION = "TRWAGMYFPDXBNJZSQVHLCKE";
 	public static String lletraDniONie(int dni) {
 		return "" + DNI_O_NIE_STRING_ASOCIATION.charAt(dni % 23);
 	}
-	// Validació del DNI
+
 	private static final Pattern dniPattern = Pattern.compile("[0-9]{8}[A-Z]");
 	public static boolean validacioDni(String dni) {
 		if (!dniPattern.matcher(dni).matches()) {
@@ -707,7 +706,7 @@ public class Utils {
 		String lletra = dni.substring(8);
 		return lletra.equals(lletraDniONie(new Integer(nums).intValue()));
 	}
-	// Validació del NIE
+
 	private static final Pattern niePattern = Pattern.compile("[XYZ][0-9]{7}[A-Z]");
 	public static boolean validacioNie(String nie) {
 		if (!niePattern.matcher(nie).matches()) {
@@ -716,6 +715,14 @@ public class Utils {
 		String nums = (char)(nie.charAt(0) - 40) + nie.substring(1, 8);
 		String lletra = nie.substring(8);
 		return lletra.equals(lletraDniONie(new Integer(nums).intValue()));
+	}
+	
+	private static final Pattern eidasPattern = Pattern.compile("^[A-Z]{2}/[A-Z]{2}/[A-Za-z0-9]{1,30}$");
+	public static boolean validacioEidas(String eidas) {
+		if (!eidasPattern.matcher(eidas).matches()) {
+			return false;
+		}
+		return true;
 	}
 	
 	// ========== Validació CIF ================

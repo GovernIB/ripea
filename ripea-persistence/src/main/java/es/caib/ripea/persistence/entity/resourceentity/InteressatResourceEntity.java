@@ -49,7 +49,7 @@ public class InteressatResourceEntity extends BaseAuditableEntity<InteressatReso
 	@Column(name = "document_tipus", length = 40)
 	@Enumerated(EnumType.STRING)
 	protected InteressatDocumentTipusEnumDto documentTipus;
-	@Column(name = "document_num", length = 17)
+	@Column(name = "document_num", length = 36)
 	protected String documentNum;
 	@Column(name = "pais", length = 4)
 	protected String pais;

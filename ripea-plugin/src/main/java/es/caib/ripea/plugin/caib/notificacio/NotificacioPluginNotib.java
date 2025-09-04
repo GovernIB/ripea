@@ -468,7 +468,8 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 			switch (interessatTipusEnumDto) {
 				case PERSONA_FISICA:
 					if (InteressatDocumentTipusEnumDto.NIF.equals(documentTipusEnumDto) || 
-						InteressatDocumentTipusEnumDto.DOCUMENT_IDENTIFICATIU_ESTRANGERS.equals(documentTipusEnumDto)) {
+						InteressatDocumentTipusEnumDto.DOCUMENT_IDENTIFICATIU_ESTRANGERS.equals(documentTipusEnumDto) ||
+						InteressatDocumentTipusEnumDto.ESTRANGER_EIDAS.equals(documentTipusEnumDto)) {
 						interessatTipusEnumDtoWS = InteressatTipus.FISICA;
 						break;
 					} else {

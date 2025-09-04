@@ -38,6 +38,8 @@ public class InteressatDocumentValidator implements ConstraintValidator<Interess
 
 				} else if (interessat.getDocumentTipus() == InteressatDocumentTipusEnumDto.DOCUMENT_IDENTIFICATIU_ESTRANGERS) {
 					valid = Utils.validacioNie(docNum);
+				} else if (interessat.getDocumentTipus() == InteressatDocumentTipusEnumDto.ESTRANGER_EIDAS) {
+					valid = Utils.validacioEidas(docNum);
 				}
 
 				if (!valid) {

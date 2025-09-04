@@ -61,7 +61,7 @@ public class InteressatCommand  {
 	@NotNull(groups = {PersonaFisica.class, PersonaJuridica.class})
 	protected InteressatDocumentTipusEnumDto documentTipus;
 	@NotEmpty(groups = {PersonaFisica.class, PersonaJuridica.class})
-	@Size(max = 9, groups = {PersonaFisica.class, PersonaJuridica.class}, message = "max.size")
+	@Size(max = 36, groups = {PersonaFisica.class, PersonaJuridica.class}, message = "max.size")
 	protected String documentNum;
 	
 	@Size(max = 4, groups={PersonaFisica.class, PersonaJuridica.class, Administracio.class}, message = "max.size")
