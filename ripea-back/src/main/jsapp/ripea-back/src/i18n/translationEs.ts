@@ -5,6 +5,7 @@ const translationEs = {
         copy: "Copiar",
         create: "Crear",
         update: "Modificar",
+        actualize: "Actualiza",
         save: "Guarda",
         delete: "Borrar",
         accepta: "Acepta",
@@ -186,16 +187,10 @@ const translationEs = {
                 seguimentPortafirmes: {
                     label: "Seguimiento Portafirmas",
                     title: "Seguimiento Portafirmas",
-                    assumpte: "Asunto",
-                    enviatData: "Fecha envío",
-                    estat: "Estado",
-                    prioritat: "Prioridad",
-                    documentTipusNom: "Tipo de documento",
-                    fluxTipus: "Tipo de flujo",
-                    portafirmesId: "ID Portafirmas",
                 }, 
                 seguimentvf: {
                     label: "Seguiment Viafirma",
+                    title: "Detalles de la firma",
                 }                              
             },
             history: {
@@ -293,7 +288,6 @@ const translationEs = {
                 },
                 iniciar: {
                     label: "Iniciar",
-                    labelExt: "Iniciar tarea",
                     ok: "La tarea se ha iniciado correctamente",
                 },
                 rebutjar: {
@@ -308,7 +302,6 @@ const translationEs = {
                 },
                 finalitzar: {
                     label: "Finalizar",
-                    labelExt: "Finalizar tarea",
                     ok: "La tarea se ha finalizado correctamente",
                 },
                 reassignar: {
@@ -363,7 +356,6 @@ const translationEs = {
                     title: "Detalle del interesado",
                 },
                 new: {
-                    btnUpdate: "Actualiza",
                     label: "Nuevo Interesado",
                     ok: "El interesado {{data.documentNum}} se ha creado correctamente",
                 },
@@ -724,6 +716,7 @@ const translationEs = {
                     label: "Firma desde el navegador...",
                 },
                 viaFirma: {
+                    button: "Enviar a ViaFirma",
                     label: "Enviar viaFirma...",
                     title: "Enviar documento a ViaFirma",
                     ok: "Documento '{{document}}' enviado a viaFirma",
@@ -734,10 +727,13 @@ const translationEs = {
                     ok: "Documento '{{document}}' enviado via email",
                 },
                 seguiment: {
-                    label: "Seguimiento portafirmas",
-                    cancel: "Cancela envio",
+                    label: "Seguimiento portafirmes",
+                    cancel: "Cancelar envío",
                     title: "Detalles de la firma",
                     ok: "La firma ha sido cancelada correctamente",
+                },
+                cancel: {
+                    label: "Cancelar envío",
                 },
                 notificar: {
                     button: "Notifica",
@@ -989,6 +985,42 @@ const translationEs = {
                 delete: {
                     ok: "La publicación {{data.assumpte}} se ha eliminado correctamente",
                 }
+            },
+        },
+        documentPortafirmes: {
+            detall: {
+                assumpte: "Asunto",
+                enviatData: "Fecha de envío",
+                estat: "Estado",
+                prioritat: "Prioridad",
+                documentTipusNom: "Tipo de documento",
+                fluxTipus: "Tipo de flujo",
+                portafirmesId: "ID Portafirmes",
+            },
+        },
+        documentVia: {
+            detall: {
+                document: "Documento",
+                titol: "Título notificación",
+                descripcio: "Descripción notificación",
+                enviatData: "Fecha de envío",
+                estat: "Estado",
+                tipusDestinatari: "Tipo de destinatario",
+                codiUsuari: "Usuario viaFirma",
+                signantEmail: "Email destinatario",
+                messageCode: "Código mensaje viaFirma",
+                intentData: "Fecha último intento",
+                intentNum: "Número reintentos",
+            },
+            tabs: {
+                dades: "Datos",
+                errors: "Errores",
+            },
+            alert: {
+                reintentar: "Reintentar envío",
+                enviament: "Se han producido errores al enviar el documento a viaFirma",
+                processament: "Se han producido errores procesando la firma del documento",
+                cancelat: "Se ha cancelado la firma",
             },
         },
         user: {

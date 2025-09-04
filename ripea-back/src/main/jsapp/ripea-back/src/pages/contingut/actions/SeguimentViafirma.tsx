@@ -1,28 +1,75 @@
 import {useState} from "react";
-import {Grid} from "@mui/material";
+import {Alert, Grid, Icon} from "@mui/material";
 import {MuiDialog, useBaseAppContext, useResourceApiService} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {CardData, ContenidoData} from "../../../components/CardData.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import Load from "../../../components/Load.tsx";
 import * as builder from '../../../util/springFilterUtils.ts'
+import IconButton from "@mui/material/IconButton";
+import TabComponent from "../../../components/TabComponent.tsx";
+import Box from "@mui/material/Box";
 
-const SeguimentViafirma = (props:any) => {
+const Dades = (props:any) => {
     const {entity} = props;
     const { t } = useTranslation();
-    return <Load value={entity}>
-        <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-            <CardData xs={12} title={entity?.document?.description}>
-                <ContenidoData title={t('page.contingut.action.seguimentvf.document')}>{entity?.document?.nom}</ContenidoData>
-                <ContenidoData title={t('page.contingut.action.seguimentvf.titol')}>{entity?.document?.titol}</ContenidoData>
-                <ContenidoData title={t('page.contingut.action.seguimentvf.descripcio')}>{entity?.document?.descripcio}</ContenidoData>
-                <ContenidoData title={t('page.contingut.action.seguimentvf.enviatData')}>{formatDate(entity?.enviatData)}</ContenidoData>
-                <ContenidoData title={t('page.contingut.action.seguimentvf.estat')}>{t(`enum.estat.${entity?.estat}`)}</ContenidoData>
-                <ContenidoData title={t('page.contingut.action.seguimentvf.tipusDestinatari')}>{t(`enum.tipusDestinatari.${entity?.tipusDestinatari}`)}</ContenidoData>
-                <ContenidoData title={t('page.contingut.action.seguimentvf.messageCode')}>{entity?.messageCode}</ContenidoData>
+    return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
+        <CardData xs={12} title={entity?.document?.description}>
+            {/*<ContenidoData title={t('page.documentVia.detall.document')}>{entity?.document?.description}</ContenidoData>*/}
+            <ContenidoData title={t('page.documentVia.detall.titol')}>{entity?.titol}</ContenidoData>
+            <ContenidoData title={t('page.documentVia.detall.descripcio')}>{entity?.descripcio}</ContenidoData>
+            <ContenidoData title={t('page.documentVia.detall.enviatData')}>{formatDate(entity?.enviatData)}</ContenidoData>
+            <ContenidoData title={t('page.documentVia.detall.estat')}>{t(`enum.estat.${entity?.estat}`)}</ContenidoData>
+            <ContenidoData title={t('page.documentVia.detall.tipusDestinatari')}>{t(`enum.tipusDestinatari.${entity?.tipusDestinatari}`)}</ContenidoData>
+            <ContenidoData title={t('page.documentVia.detall.codiUsuari')} hidden={entity?.tipusDestinatari != 'TABLET'}>{entity?.codiUsuari}</ContenidoData>
+            <ContenidoData title={t('page.documentVia.detall.signantEmail')} hidden={entity?.tipusDestinatari != 'EMAIL'}>{entity?.signantEmail}</ContenidoData>
+            <ContenidoData title={t('page.documentVia.detall.messageCode')} hiddenIfEmpty>{entity?.messageCode}</ContenidoData>
+        </CardData>
+    </Grid>
+}
+const Errors = (props:any) => {
+    const {entity} = props;
+    const { t } = useTranslation();
+
+    if (entity?.error) {
+        return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
+            <Grid xs={12} sx={{ pl:1, pt:1 }}>
+                <Alert severity={'error'}
+                       icon={<Icon>warning</Icon>}
+                       action={<IconButton title={t('page.documentVia.alert.reintentar')} size="small">
+                           <Icon>refresh</Icon>
+                       </IconButton>}
+                >
+                    {entity?.estat == 'PENDENT' && t('page.documentVia.alert.enviament')}
+                    {entity?.estat == 'ENVIAT' && t('page.documentVia.alert.processament')}
+                    {entity?.estat == 'CANCELAT' && t('page.documentVia.alert.cancelat')}
+                </Alert>
+            </Grid>
+
+            <CardData xs={12} title={t('page.documentVia.alert.enviament')}>
+                <ContenidoData xs={12} title={t('page.documentVia.detall.intentData')}>{formatDate(entity?.intentData)}</ContenidoData>
+                <ContenidoData xs={12} title={t('page.documentVia.detall.intentNum')}>{entity?.intentNum}</ContenidoData>
+
+                <Grid xs={12}>
+                    <Box
+                        sx={{
+                            border: 'solid 1px #e3e3e3',
+                            borderRadius: '4px',
+                            backgroundColor: '#f5f5f5',
+                            display: 'block',
+                            overflow: 'auto',
+                            whiteSpace: 'pre',
+                            fontFamily: 'monospace', // opcional para parecer <pre>
+                            mt: 1,
+                            p: 1
+                        }}
+                    >
+                        {entity?.errorDescripcio}
+                    </Box>
+                </Grid>
             </CardData>
         </Grid>
-    </Load>
+    }
 }
 
 const useSeguimentViafirma = (potModificar:boolean, refresh?: () => void) => {
@@ -50,6 +97,7 @@ const useSeguimentViafirma = (potModificar:boolean, refresh?: () => void) => {
 
     const handleOpen = (id:any) => {
         if (apiIsReady && id){
+            setOpen(true)
             apiFind({
                 filter: builder.eq('document.id', id),
                 sorts: ['createdDate', 'desc']
@@ -59,7 +107,10 @@ const useSeguimentViafirma = (potModificar:boolean, refresh?: () => void) => {
                         setEntity(result?.rows[0])
                     }
                 })
-            setOpen(true)
+                .catch((error) => {
+                    temporalMessageShow(null, error?.message, 'error');
+                    handleClose()
+                });
         }
     }
     const handleClose = (reason?: string) => {
@@ -72,7 +123,7 @@ const useSeguimentViafirma = (potModificar:boolean, refresh?: () => void) => {
     const buttons = [
          {
             value: 'cancel',
-            text: t('page.document.action.seguiment.cancel'),
+            text: t('page.document.action.cancel.label'),
             icon: 'cancel',
             hidden: !(entity?.estat == 'ENVIAT' && potModificar),
             componentProps: { variant: 'contained' }
@@ -85,12 +136,26 @@ const useSeguimentViafirma = (potModificar:boolean, refresh?: () => void) => {
     ]
         .filter((button:any)=>!button?.hidden)
 
+    const tabs = [
+        {
+            value: "dades",
+            label: t('page.documentVia.tabs.dades'),
+            content: <Dades entity={entity}/>,
+        },
+        {
+            value: "errors",
+            label: t('page.documentVia.tabs.errors'),
+            content: <Errors entity={entity}/>,
+            disabled: !entity?.error
+        },
+    ]
+
     const dialog =
         <MuiDialog
             open={open}
             closeCallback={handleClose}
-            title={t('page.document.action.seguiment.title')}
-            componentProps={{ fullWidth: true, maxWidth: 'xl'}}
+            title={t('page.contingut.action.seguimentvf.title')}
+            componentProps={{ fullWidth: true, maxWidth: 'md'}}
             buttons={buttons}
             buttonCallback={(value :any) :void=>{
                 if (value=='close') {
@@ -102,7 +167,9 @@ const useSeguimentViafirma = (potModificar:boolean, refresh?: () => void) => {
                 }
             }}
         >
-            <SeguimentViafirma entity={entity}/>
+            <Load value={entity}>
+                <TabComponent tabs={tabs} variant="scrollable"/>
+            </Load>
         </MuiDialog>;
 
     return {

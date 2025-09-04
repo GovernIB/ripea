@@ -91,12 +91,12 @@ export const MenuActionButton = (props:MenuActionButtonProps) => {
         {actions.map((action:any, index:number) =>
             !(typeof action.hidden === 'function' ? action.hidden(entity) : action.hidden)
             && (!action?.linkTo && !action?.clickShowUpdateDialog)
-            && <div title={ typeof action.title == 'function' ?action.title?.(entity) :action.title}>
+            && <div key={`action-${index}`} title={ typeof action.title == 'function' ?action.title?.(entity) :action.title}>
                 <MenuItem onClick={()=>
                     entity?.id
                         ? action?.onClick?.(entity?.id, entity)
                         : action?.onClick?.(entity)
-                } key={`action-${index}`} disabled={typeof action?.disabled === 'function' ? action?.disabled(entity) : action?.disabled}>
+                } disabled={typeof action?.disabled === 'function' ? action?.disabled(entity) : action?.disabled}>
                     {action.icon && <Icon>{action.icon}</Icon>}{action.label}
                 </MenuItem>
             </div>

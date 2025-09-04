@@ -14,13 +14,13 @@ const SeguimentPortafirmes = (props:any) => {
     return <Load value={entity}>
         <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
             <CardData xs={6} title={entity?.document?.description}>
-                <ContenidoData title={t('page.contingut.action.seguimentPortafirmes.assumpte')}>{entity?.assumpte}</ContenidoData>
-                <ContenidoData title={t('page.contingut.action.seguimentPortafirmes.enviatData')}>{formatDate(entity?.enviatData)}</ContenidoData>
-                <ContenidoData title={t('page.contingut.action.seguimentPortafirmes.estat')}>{t(`enum.estat.${entity?.estat}`)}</ContenidoData>
-                <ContenidoData title={t('page.contingut.action.seguimentPortafirmes.prioritat')}>{t(`enum.prioritat.${entity?.prioritat}`)}</ContenidoData>
-                <ContenidoData title={t('page.contingut.action.seguimentPortafirmes.documentTipusNom')}>{entity?.documentTipusNom}</ContenidoData>
-                <ContenidoData title={t('page.contingut.action.seguimentPortafirmes.fluxTipus')}>{t(`enum.fluxTipus.${entity?.fluxTipus}`)}</ContenidoData>
-                <ContenidoData title={t('page.contingut.action.seguimentPortafirmes.portafirmesId')}>{entity?.portafirmesId}</ContenidoData>
+                <ContenidoData title={t('page.documentPortafirmes.detall.assumpte')}>{entity?.assumpte}</ContenidoData>
+                <ContenidoData title={t('page.documentPortafirmes.detall.enviatData')}>{formatDate(entity?.enviatData)}</ContenidoData>
+                <ContenidoData title={t('page.documentPortafirmes.detall.estat')}>{t(`enum.estat.${entity?.estat}`)}</ContenidoData>
+                <ContenidoData title={t('page.documentPortafirmes.detall.prioritat')}>{t(`enum.prioritat.${entity?.prioritat}`)}</ContenidoData>
+                <ContenidoData title={t('page.documentPortafirmes.detall.documentTipusNom')}>{entity?.documentTipusNom}</ContenidoData>
+                <ContenidoData title={t('page.documentPortafirmes.detall.fluxTipus')}>{t(`enum.fluxTipus.${entity?.fluxTipus}`)}</ContenidoData>
+                <ContenidoData title={t('page.documentPortafirmes.detall.portafirmesId')}>{entity?.portafirmesId}</ContenidoData>
             </CardData>
 
             <Grid item xs={6}>
@@ -77,7 +77,7 @@ const useSeguimentPortafirmes = (potModificar:boolean, refresh?: () => void) => 
     const buttons = [
          {
             value: 'cancel',
-            text: t('page.document.action.seguiment.cancel'),
+            text: t('page.document.action.cancel.label'),
             icon: 'cancel',
             hidden: !(entity?.estat == 'ENVIAT' && potModificar),
             componentProps: { variant: 'contained' }

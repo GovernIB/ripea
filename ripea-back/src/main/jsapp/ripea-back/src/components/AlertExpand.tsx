@@ -4,7 +4,7 @@ import Box from "@mui/material/Box";
 import AlertTitle from "@mui/material/AlertTitle";
 
 const AlertExpand = (props:any) => {
-    const { title, label, sx, children, onClose, ...other} = props
+    const { title, label, sx, children, onClose, action, ...other} = props
     const [verDetalles, setVerDetalles] = useState(false);
 
     const toggleDetalles = () => setVerDetalles((prev) => !prev);
@@ -22,6 +22,7 @@ const AlertExpand = (props:any) => {
             }}
             action={
                 <>
+                    {action}
                     <IconButton
                         aria-label="ver detalles"
                         color="inherit"

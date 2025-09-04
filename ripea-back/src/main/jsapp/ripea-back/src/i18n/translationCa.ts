@@ -5,6 +5,7 @@ const translationCa = {
         create: "Crea",
         copy: "Copiar",
         update: "Modifica",
+        actualize: "Actualitza",
         save: "Guarda",
         delete: "Esborrar",
         accepta: "Accepta",
@@ -30,16 +31,6 @@ const translationCa = {
         downloadSelected: "Descarrega contingut seleccionat",
         relateSelected: "Relaciona contingut seleccionat",
     },
-    form: {
-        create: {
-            success: "L'element s'ha creat correctament",
-            error: "S'ha produït un error al crear l'element",
-        },
-        update: {
-            success: "L'element s'ha modificat correctament",
-            error: "S'ha produït un error al modificar l'element",
-        }
-    },
     enum: {
         rol: {
             IPA_SUPER: "Superusuari",
@@ -54,13 +45,13 @@ const translationCa = {
             false: "No",
         },
         prioritat: {
-            D_MOLT_ALTA: "Molt alta",
-            C_ALTA: "Alta",
+            D_MOLT_ALTA: "Very high",
+            C_ALTA: "High",
             B_NORMAL: "Normal",
-            A_BAIXA: "Baixa",
-            BAIXA: "Baixa",
+            A_BAIXA: "Low",
+            BAIXA: "Low",
             NORMAL: "Normal",
-            ALTA: "Alta",
+            ALTA: "High",
         },
         fluxTipus: {
             SIMPLE: "Simple",
@@ -196,23 +187,10 @@ const translationCa = {
                 seguimentPortafirmes: {
                     label: "Seguiment Portafirmes",
                     title: "Seguiment Portafirmes",
-                    assumpte: "Assumpte",
-                    enviatData: "Data d'enviament",
-                    estat: "Estat",
-                    prioritat: "Prioritat",
-                    documentTipusNom: "Tipus de document",
-                    fluxTipus: "Tipus de flux",
-                    portafirmesId: "ID Portafirmes",
                 },
                 seguimentvf: {
                     label: "Seguiment Viafirma",
-                    document: "Document",
-                    titol: "Títol notificació",
-                    descripcio: "Descripció notificació",
-                    enviatData: "Data d'enviament",
-                    estat: "Estat",
-                    tipusDestinatari: "Tipus de destinatari",
-                    messageCode: "Codi missatge viaFirma",
+                    title: "Detalls de la firma",
                 }
             },
             history: {
@@ -378,7 +356,6 @@ const translationCa = {
                     title: "Detall de l'interessat",
                 },
                 new: {
-                    btnUpdate: "Actualitza",
                     label: "Nou Interessat",
                     ok: "L'interessat {{data.documentNum}} s'ha creat correctament",
                 },
@@ -755,6 +732,9 @@ const translationCa = {
                     title: "Detalls de la firma",
                     ok: "La signatura ha estat cancel·lada correctament",
                 },
+                cancel: {
+                    label: "Cancel·la enviament",
+                },
                 notificar: {
                     button: "Notifica",
                     label: "Notificar o comunicar...",
@@ -1005,6 +985,42 @@ const translationCa = {
                 delete: {
                     ok: "La publicació {{data.assumpte}} s'ha eliminat correctament",
                 }
+            },
+        },
+        documentPortafirmes: {
+            detall: {
+                assumpte: "Assumpte",
+                enviatData: "Data d'enviament",
+                estat: "Estat",
+                prioritat: "Prioritat",
+                documentTipusNom: "Tipus de document",
+                fluxTipus: "Tipus de flux",
+                portafirmesId: "ID Portafirmes",
+            },
+        },
+        documentVia: {
+            detall: {
+                document: "Document",
+                titol: "Títol notificació",
+                descripcio: "Descripció notificació",
+                enviatData: "Data d'enviament",
+                estat: "Estat",
+                tipusDestinatari: "Tipus de destinatari",
+                codiUsuari: "Usuari viaFirma",
+                signantEmail: "Email destinatari",
+                messageCode: "Codi missatge viaFirma",
+                intentData: "Data darrer intent",
+                intentNum: "Número reintents",
+            },
+            tabs: {
+                dades: "Dades",
+                errors: "Errors",
+            },
+            alert: {
+                reintentar: "Reintentar enviament",
+                enviament: "S'han produit errors al enviar el document a viaFirma",
+                processament: "S'han produit errors processant la firma del document",
+                cancelat: "S'ha cancelat la firma",
             },
         },
         user: {

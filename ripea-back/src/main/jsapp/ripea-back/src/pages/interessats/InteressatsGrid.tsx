@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import {Grid, Icon} from "@mui/material";
 import {
-    GridPage, useFormContext,
+    useFormContext,
     useMuiDataGridApiRef,
 } from 'reactlib';
 import {useTranslation} from "react-i18next";
@@ -36,7 +36,7 @@ export const InteressatsGridForm = () => {
     const filterButtons = [
         {
             value: 'search',
-            text: t('page.interessat.action.new.btnUpdate'),
+            text: t('common.actualize'),
             icon: 'system_update_alt',
             componentProps: {
                 variant: "contained",
