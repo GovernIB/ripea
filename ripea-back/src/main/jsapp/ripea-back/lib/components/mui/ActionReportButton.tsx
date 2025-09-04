@@ -45,6 +45,7 @@ export type ActionReportButtonProps = {
     formDialogResultProcessor?: (result?: any) => React.ReactElement;
     onSuccess?: (result?: any) => void;
     onError?: (error?: any) => void;
+    onClose?: () => void;
     buttonComponentProps?: any;
     iconComponentProps?: any;
 };
@@ -102,6 +103,7 @@ export const useActionReportLogic = (
     formDialogResultProcessor?: (result?: any) => React.ReactElement,
     onSuccess?: (result?: any) => void,
     onError?: (error?: any) => void,
+    onClose?: () => void,
     dialogCloseCallback?: (reason?: string) => boolean) => {
     const { t, messageDialogShow, saveAs } = useBaseAppContext();
     const actionDialogButtons = useActionDialogButtons();
@@ -163,7 +165,9 @@ export const useActionReportLogic = (
                 additionalData: formAdditionalData ?? formAdditionalDataArg,
                 initOnChangeRequest: formInitOnChangeRequest,
                 dialogComponentProps: formDialogComponentProps ?? formDialogComponentPropsArg ?? { fullWidth: true, maxWidth: 'md' }
-            }).catch(_error => {});
+            }).
+            catch(_error => {}).
+            finally(() => onClose?.());
         } else if (action != null) {
             if (confirm) {
                 const confirmDialogComponentProps = { maxWidth: 'sm', fullWidth: true };
@@ -242,6 +246,7 @@ export const ActionReportButton: React.FC<ActionReportButtonProps> = (props) => 
         formDialogResultProcessor,
         onSuccess,
         onError,
+        onClose,
         buttonComponentProps,
         iconComponentProps,
     } = props;
@@ -264,7 +269,8 @@ export const ActionReportButton: React.FC<ActionReportButtonProps> = (props) => 
         formDialogComponentProps,
         formDialogResultProcessor,
         onSuccess,
-        onError);
+        onError,
+        onClose);
     const buttonTitle = title ?? apiLink?.title ?? action ?? report;
     const ButtonComponent = buttonComponentProp ?? (icon != null ? IconCustomButton : TextCustomButton);
     const {
