@@ -548,6 +548,7 @@ public class DocumentResource extends NodeResource {
         @Transient private String urlInicioFlujoFirma;
         @Transient private MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus;
         @Transient private PortafirmesFluxRespostaDto fluxCreat;
+        @Transient private String idTransaccio;
     }
     
     @Getter

@@ -1433,7 +1433,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     				String urlReturnToRipea = configHelper.getConfig(PropertyConfig.BASE_URL) + "/modal/document/event/portafirmes/flux/"+paramSecure+"/";
     				PortafirmesIniciFluxRespostaDto transaccioResponse = pluginHelper.portafirmesIniciarFluxDeFirma(false, urlReturnToRipea);
     				target.setUrlInicioFlujoFirma(transaccioResponse.getUrlRedireccio());
-        		}
+    				target.setIdTransaccio(transaccioResponse.getIdTransaccio());
+    			}
         		
         	} else { //És un camp concret el que s'ha canviat
         		if (DocumentResource.EnviarPortafirmesFormAction.Fields.portafirmesEnviarFluxId.equals(fieldName)) {
