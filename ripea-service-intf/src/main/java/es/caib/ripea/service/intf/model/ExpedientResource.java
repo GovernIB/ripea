@@ -10,8 +10,6 @@ import java.util.List;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import es.caib.ripea.service.intf.resourcevalidation.ExpedientValid;
-import es.caib.ripea.service.intf.resourcevalidation.ImportarDocumentValid;
 import org.springframework.data.annotation.Transient;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -23,10 +21,13 @@ import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
+import es.caib.ripea.service.intf.dto.DocumentAmbTipusDto;
 import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.dto.FileNameOption;
 import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
 import es.caib.ripea.service.intf.dto.TipusImportEnumDto;
+import es.caib.ripea.service.intf.resourcevalidation.ExpedientValid;
+import es.caib.ripea.service.intf.resourcevalidation.ImportarDocumentValid;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -177,6 +178,10 @@ import lombok.experimental.FieldNameConstants;
 						code = ExpedientResource.REPORT_MASSIVE_EXPORT_INSIDE,
 						formClass = ExpedientResource.MassiveAction.class),
 				@ResourceConfigArtifact(
+						type = ResourceArtifactType.ACTION,
+						code = ExpedientResource.ACTION_MASSIVE_IMPORT_DOCS,
+						formClass = ExpedientResource.MassiveImportDocsAction.class),
+				@ResourceConfigArtifact(
 						type = ResourceArtifactType.REPORT,
 						code = ExpedientResource.REPORT_PLANTILLA_EXCEL_INTERESSATS,
                         requiresId = true),
@@ -207,6 +212,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
 	public static final String ACTION_MASSIVE_RETORNAR_CODE = "RETORNAR";
 	public static final String ACTION_MASSIVE_DELETE_CODE = "ESBORRAR";
 	public static final String ACTION_MASSIVE_REOBRIR_CODE = "REOBRIR";
+	public static final String ACTION_MASSIVE_IMPORT_DOCS = "IMPORT_DOCS_MASS";
 	
 	public static final String ACTION_TANCAR_CODE = "TANCAR";
 	public static final String ACTION_IMPORTAR_CODE = "IMPORTAR";
@@ -412,6 +418,15 @@ public class ExpedientResource extends NodeResource implements Serializable {
 		private boolean carpetes = true;
         private boolean versioImprimible = false;
         private FileNameOption nomFitxer = FileNameOption.ORIGINAL;
+    }
+    
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @FieldNameConstants
+    public static class MassiveImportDocsAction extends MassiveAction {
+    	private boolean totsExpedientsMateixProcediment = true;
+    	private List<DocumentAmbTipusDto> documents;
     }
     
     @Getter

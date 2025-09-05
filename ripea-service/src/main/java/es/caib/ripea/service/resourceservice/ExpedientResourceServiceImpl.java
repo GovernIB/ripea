@@ -79,6 +79,7 @@ import es.caib.ripea.service.intf.base.model.ReportFileType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
 import es.caib.ripea.service.intf.dto.CodiValorDto;
+import es.caib.ripea.service.intf.dto.DocumentAmbTipusDto;
 import es.caib.ripea.service.intf.dto.DocumentDto;
 import es.caib.ripea.service.intf.dto.ElementTipusEnumDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaContingutDto;
@@ -100,6 +101,7 @@ import es.caib.ripea.service.intf.model.ExpedientResource.ExportarDocumentMassiu
 import es.caib.ripea.service.intf.model.ExpedientResource.ImportarDocumentsForm;
 import es.caib.ripea.service.intf.model.ExpedientResource.ImportarDocumentsZipForm;
 import es.caib.ripea.service.intf.model.ExpedientResource.ImportarExpedientFormAction;
+import es.caib.ripea.service.intf.model.ExpedientResource.MassiveImportDocsAction;
 import es.caib.ripea.service.intf.model.ExpedientResource.TancarExpedientFormAction;
 import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.model.MetaExpedientResource;
@@ -178,6 +180,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         register(ExpedientResource.ACTION_MASSIVE_UNFOLLOW_CODE, new UnFollowActionExecutor());
         register(ExpedientResource.ACTION_MASSIVE_DELETE_CODE, new DeleteActionExecutor());
         register(ExpedientResource.ACTION_MASSIVE_REOBRIR_CODE, new ReobrirActionExecutor());
+        register(ExpedientResource.ACTION_MASSIVE_IMPORT_DOCS, new ImportarDocumentsMassiu());
         
         register(ExpedientResource.ACTION_TANCAR_CODE, new TancarActionExecutor());
         register(ExpedientResource.ACTION_IMPORTAR_CODE, new ImportarActionExecutor());
@@ -696,6 +699,36 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
         @Override
         public void onChange(Serializable id, ExpedientResource.MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientResource.MassiveAction target) {}
+    }
+    
+    private class ImportarDocumentsMassiu implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.MassiveImportDocsAction, Serializable> {
+
+		@Override
+		public void onChange(Serializable id, MassiveImportDocsAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveImportDocsAction target) {}
+
+		@Override
+		public Serializable exec(String code, ExpedientResourceEntity entity, MassiveImportDocsAction params) throws ActionExecutionException {
+
+			if (params!=null && params.getDocuments()!=null && params.getDocuments().size()>0) {
+			
+				//1.- Guardar fitxers temporalment a disc: en un sol fitxer ZIP amb els objectes passats a fitxers JSON
+				for (DocumentAmbTipusDto doc: params.getDocuments()) {
+					
+				}
+				
+				//2.- Programar la acció massiva per els expedient seleccionats.
+				List<ExecucioMassivaContingutDto> elementsMassiva = execucioMassivaHelper.getMassivaContingutFromIds(params.getIds());
+				ExecucioMassivaDto execMassDto = new ExecucioMassivaDto(
+						ExecucioMassivaTipusDto.IMPORTAR_DOCS,
+						new Date(),
+						null,
+						configHelper.getRolActual());
+	        	String entitatActual = configHelper.getEntitatActualCodi();
+	        	EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatActual, false, false, false, true, false);
+				execucioMassivaHelper.saveExecucioMassiva(entitatEntity, execMassDto, elementsMassiva, ElementTipusEnumDto.EXPEDIENT);
+			}
+			return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
+		}    	
     }
     
     private class ReobrirActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
