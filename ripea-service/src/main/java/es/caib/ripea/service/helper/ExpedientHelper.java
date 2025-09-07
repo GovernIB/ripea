@@ -34,7 +34,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Persistable;
 import org.springframework.security.acls.model.Permission;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -131,10 +130,12 @@ import es.caib.ripea.service.intf.dto.PermisosPerExpedientsDto;
 import es.caib.ripea.service.intf.dto.PermissionEnumDto;
 import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
 import es.caib.ripea.service.intf.dto.RegistreAnnexEstatEnumDto;
+import es.caib.ripea.service.intf.dto.SiNoEnumDto;
 import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.exception.ArxiuJaGuardatException;
 import es.caib.ripea.service.intf.exception.InteressatTipusDocumentException;
 import es.caib.ripea.service.intf.exception.ValidationException;
+import es.caib.ripea.service.intf.service.ExpedientSeguidorService;
 import es.caib.ripea.service.intf.utils.DateUtil;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.permission.ExtendedPermission;
@@ -181,6 +182,7 @@ public class ExpedientHelper {
 	@Autowired private DocumentNotificacioRepository documentNotificacioRepository;
 	@Autowired private CsvHelper csvHelper;
 	@Autowired private ExpedientRepositoryCommnand expedientRepositoryCommnand;
+	@Autowired private ExpedientSeguidorService expedientSeguidorService;
 	
 	public static List<DocumentDto> expedientsWithImportacio = new ArrayList<DocumentDto>();
 
@@ -223,7 +225,8 @@ public class ExpedientHelper {
 			Long grupId,
 			String rolActual,
 			PrioritatEnumDto prioritat,
-			String prioritatMotiu) {
+			String prioritatMotiu,
+			SiNoEnumDto seguidor) {
 
 		logger.info(
 				"Expedient crear Helper START(" +
@@ -357,6 +360,16 @@ public class ExpedientHelper {
 						"any=" + expedient.getAny() + ", " +
 						"metaExpedient=" + expedient.getMetaExpedient().getId() + " - " + expedient.getMetaExpedient().getCodi() + ")");
 
+		if (SiNoEnumDto.SI.equals(seguidor)) {
+			try {
+				expedientSeguidorService.follow(
+						entitatId,
+						expedient.getId());
+			} catch (Exception e) {
+				logger.error("Hi ha hagut un error en intentar posar-se com a seguidor de l'expedient.", e);
+			}
+		}
+		
 		return expedient.getId();
 	}
 

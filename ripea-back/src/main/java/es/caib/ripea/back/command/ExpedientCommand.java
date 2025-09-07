@@ -11,6 +11,7 @@ import es.caib.ripea.back.validation.ExpedientNomUnique;
 import es.caib.ripea.back.validation.ExpedientODocumentNom;
 import es.caib.ripea.service.intf.dto.ExpedientDto;
 import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
+import es.caib.ripea.service.intf.dto.SiNoEnumDto;
 import es.caib.ripea.service.intf.utils.Utils;
 import lombok.Getter;
 import lombok.Setter;
@@ -51,7 +52,8 @@ public class ExpedientCommand extends ContenidorCommand {
 	@NotNull(groups = {Create.class, Update.class})
 	private PrioritatEnumDto prioritat;
 	private String prioritatMotiu;
-
+	private SiNoEnumDto seguidor = SiNoEnumDto.NO;
+	
 	public void setTancatMotiu(String tancatMotiu) {
 		this.tancatMotiu = Utils.trim(tancatMotiu);
 	}

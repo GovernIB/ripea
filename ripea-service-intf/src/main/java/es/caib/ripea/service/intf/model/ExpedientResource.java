@@ -25,6 +25,7 @@ import es.caib.ripea.service.intf.dto.DocumentAmbTipusDto;
 import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.dto.FileNameOption;
 import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
+import es.caib.ripea.service.intf.dto.SiNoEnumDto;
 import es.caib.ripea.service.intf.dto.TipusImportEnumDto;
 import es.caib.ripea.service.intf.resourcevalidation.ExpedientValid;
 import es.caib.ripea.service.intf.resourcevalidation.ImportarDocumentValid;
@@ -351,6 +352,9 @@ public class ExpedientResource extends NodeResource implements Serializable {
     @Transient private int numTasques;
     @Transient private int numAlert;
     @Transient private boolean disableOrganGestor = false;
+    
+    // Elecció seguir o no expedient
+    @Transient private SiNoEnumDto asignarSeguidor = SiNoEnumDto.NO;
 
     @Transient
     private ArxiuDetallDto arxiu;

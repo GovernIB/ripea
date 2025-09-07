@@ -390,7 +390,8 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 					resource.getGrup()!=null?resource.getGrup().getId():null,
 					configHelper.getRolActual(),
 					resource.getPrioritat(),
-					resource.getPrioritatMotiu());
+					resource.getPrioritatMotiu(),
+					resource.getAsignarSeguidor());
 			
 			expedientHelper.arxiuPropagarExpedientAmbInteressatsNewTransaction(expedientId);
 			

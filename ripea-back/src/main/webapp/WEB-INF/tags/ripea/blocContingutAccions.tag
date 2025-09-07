@@ -114,6 +114,14 @@
 		</c:if>
 		<%---- Agafar/Alliberar ... ----%>
 		<c:if test="${contingut.expedient}">
+			<%---- Seguir -----%>
+			<c:if test="${expedient.usuariActualWrite && expedient.seguidor}">
+				<li><a href="<c:url value="/expedient/${contingut.id}/unfollow"/>"><span class="fa fa-user-times"></span>&nbsp;&nbsp;<spring:message code="comu.boto.unfollow"/></a></li>
+			</c:if>
+			<c:if test="${expedient.usuariActualWrite && !expedient.seguidor}">			
+				<li><a href="<c:url value="/expedient/${contingut.id}/follow"/>"><span class="fa fa-user-plus"></span>&nbsp;&nbsp;<spring:message code="comu.boto.follow"/></a></li>		
+			</c:if>
+								
 			<c:if test="${not contingut.agafat}">
 				<li><a href="<c:url value="/expedient/${contingut.id}/agafar"/>"><span class="fa fa-lock"></span>&nbsp;<spring:message code="comu.boto.agafar"/></a></li>
 			</c:if>

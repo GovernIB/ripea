@@ -48,6 +48,7 @@ import es.caib.ripea.service.intf.dto.ExpedientPeticioAccioEnumDto;
 import es.caib.ripea.service.intf.dto.ExpedientPeticioEstatViewEnumDto;
 import es.caib.ripea.service.intf.dto.InteressatAssociacioAccioEnum;
 import es.caib.ripea.service.intf.dto.NtiTipoDocumentoEnumDto;
+import es.caib.ripea.service.intf.dto.SiNoEnumDto;
 import es.caib.ripea.service.intf.model.ExpedientPeticioResource;
 import es.caib.ripea.service.intf.model.ExpedientPeticioResource.AcceptarAnotacioForm;
 import es.caib.ripea.service.intf.model.ExpedientPeticioResource.RebutjarAnotacioForm;
@@ -453,7 +454,8 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 							entity.getGrup()!=null?entity.getGrup().getId():null,
 							rolActual,
 							params.getPrioritat(),
-							params.getPrioritatMotiu());
+							params.getPrioritatMotiu(),
+							SiNoEnumDto.NO);
 				} else {
 	                /**
 	                 * ExpedientServiceImpl.incorporar

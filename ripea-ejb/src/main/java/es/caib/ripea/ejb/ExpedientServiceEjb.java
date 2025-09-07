@@ -25,6 +25,7 @@ import es.caib.ripea.service.intf.dto.PaginaDto;
 import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
 import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
 import es.caib.ripea.service.intf.dto.RespostaPublicacioComentariDto;
+import es.caib.ripea.service.intf.dto.SiNoEnumDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.service.ExpedientService;
 import lombok.experimental.Delegate;
@@ -56,7 +57,8 @@ public class ExpedientServiceEjb extends AbstractServiceEjb<ExpedientService> im
 			Long justificantIdMetaDoc,
 			Map<String, InteressatAssociacioAccioEnum> interessatsAccionsMap,
 			PrioritatEnumDto prioritat,
-			String prioritatMotiu) {
+			String prioritatMotiu,
+			SiNoEnumDto seguidor) {
 		return delegateService.create(
 				entitatId,
 				contenidorId,
@@ -72,7 +74,8 @@ public class ExpedientServiceEjb extends AbstractServiceEjb<ExpedientService> im
 				justificantIdMetaDoc,
 				interessatsAccionsMap,
 				prioritat,
-				prioritatMotiu);
+				prioritatMotiu,
+				seguidor);
 	}
 	
 	@Override
