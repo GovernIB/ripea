@@ -3,13 +3,13 @@ package es.caib.ripea.service.intf.model;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.Year;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import es.caib.ripea.service.intf.resourcevalidation.MassiveImportDocValid;
 import org.springframework.data.annotation.Transient;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -428,9 +428,15 @@ public class ExpedientResource extends NodeResource implements Serializable {
     @Setter
     @NoArgsConstructor
     @FieldNameConstants
+    @MassiveImportDocValid
     public static class MassiveImportDocsAction extends MassiveAction {
-    	private boolean totsExpedientsMateixProcediment = true;
-    	private List<DocumentAmbTipusDto> documents;
+        @NotNull private boolean totsExpedientsMateixProcediment;
+        @NotNull @NotEmpty
+        private List<DocumentAmbTipusDto> documents;
+        @Transient private Long metaExpedientId;
+        @Transient private FileReference file;
+        @Transient @ResourceField(enumType = true)
+        private String tipusDocument;
     }
     
     @Getter

@@ -7,18 +7,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.time.chrono.ChronoLocalDateTime;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
+import es.caib.ripea.persistence.entity.*;
+import es.caib.ripea.persistence.repository.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.hibernate.Hibernate;
 import org.springframework.security.core.Authentication;
@@ -29,13 +24,6 @@ import com.turkraft.springfilter.FilterBuilder;
 import com.turkraft.springfilter.parser.Filter;
 
 import es.caib.plugins.arxiu.api.Expedient;
-import es.caib.ripea.persistence.entity.ContingutEntity;
-import es.caib.ripea.persistence.entity.DocumentEntity;
-import es.caib.ripea.persistence.entity.EntitatEntity;
-import es.caib.ripea.persistence.entity.ExpedientEntity;
-import es.caib.ripea.persistence.entity.ExpedientEstatEntity;
-import es.caib.ripea.persistence.entity.MetaDocumentEntity;
-import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.entity.resourceentity.ExpedientResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.UsuariResourceEntity;
@@ -44,13 +32,6 @@ import es.caib.ripea.persistence.entity.resourcerepository.ExpedientResourceRepo
 import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientSequenciaResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.UsuariResourceRepository;
-import es.caib.ripea.persistence.repository.ContingutMovimentRepository;
-import es.caib.ripea.persistence.repository.ContingutRepository;
-import es.caib.ripea.persistence.repository.DadaRepository;
-import es.caib.ripea.persistence.repository.EntitatRepository;
-import es.caib.ripea.persistence.repository.ExpedientEstatRepository;
-import es.caib.ripea.persistence.repository.ExpedientRepository;
-import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.CacheHelper;
 import es.caib.ripea.service.helper.CarpetaHelper;
@@ -79,7 +60,6 @@ import es.caib.ripea.service.intf.base.model.ReportFileType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
 import es.caib.ripea.service.intf.dto.CodiValorDto;
-import es.caib.ripea.service.intf.dto.DocumentAmbTipusDto;
 import es.caib.ripea.service.intf.dto.DocumentDto;
 import es.caib.ripea.service.intf.dto.ElementTipusEnumDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaContingutDto;
@@ -148,6 +128,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     private final MetaDocumentHelper metaDocumentHelper;
     private final ZipImportacioHelper zipImportacioHelper;
     private final MessageHelper messageHelper;
+    private final MetaExpedientRepository metaExpedientRepository;
 
     @PostConstruct
     public void init() {
@@ -704,31 +685,93 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     
     private class ImportarDocumentsMassiu implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.MassiveImportDocsAction, Serializable> {
 
-		@Override
-		public void onChange(Serializable id, MassiveImportDocsAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveImportDocsAction target) {}
+        private Map<String, String> parseToMap(String input){
+            String[] tokens = input.split(",", -1); // split preservando vacíos
+
+            Map<String, String> map = new HashMap<>();
+            for (int i = 0; i < tokens.length - 1; i += 2) {
+                String key = tokens[i].trim();
+                String value = tokens[i + 1].trim();
+                map.put(key, value);
+            }
+            return map;
+        }
+
+        @Override
+        public List<FieldOption> getOptions(String fieldName, Map<String, String[]> requestParameterMap) {
+            List<FieldOption> resultat = new ArrayList<>();
+            if (MassiveImportDocsAction.Fields.tipusDocument.equals(fieldName)) {
+                String entitatActualCodi = configHelper.getEntitatActualCodi();
+                EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true,false);
+                MetaExpedientEntity metaExpedientEntity = metaExpedientRepository.findById(Long.parseLong(requestParameterMap.get(MassiveImportDocsAction.Fields.metaExpedientId)[0])).get();
+                List<MetaDocumentEntity>  metaDocsPermesos = metaDocumentHelper.findMetaDocumentsDisponiblesPerCreacio(
+                        entitat,
+                        null,
+                        metaExpedientEntity,
+                        false);
+                if (metaDocsPermesos!=null) {
+                    String[] additionalOptionArr = requestParameterMap.get("tipusDocument")[0].split(",", -1);
+                    List<String> additionalOption = Arrays.asList(additionalOptionArr);
+
+                    String value = requestParameterMap.containsKey("value")
+                            ? requestParameterMap.get("value")[0]
+                            : null;
+
+                    for (MetaDocumentEntity metaDoc : metaDocsPermesos) {
+                        if (metaDoc.isMultiple() ||
+                                (
+                                        !additionalOption.contains(String.valueOf(metaDoc.getId())) ||
+                                                String.valueOf(metaDoc.getId()).equals(value)
+                                )
+                        ) {
+                            resultat.add(new FieldOption(metaDoc.getId().toString(), metaDoc.getNom()));
+                        }
+                    }
+                    resultat.sort(Comparator.comparing(FieldOption::getDescription));
+                }
+            }
+            return resultat;
+        }
+
+        @Override
+		public void onChange(Serializable id, MassiveImportDocsAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveImportDocsAction target) {
+            if (fieldName == null) {
+                if (!previous.getIds().isEmpty()) {
+                    List<ExpedientResourceEntity> expedients = expedientResourceRepository.findAllById(previous.getIds());
+                    Long metaExpedientId = expedients.get(0).getMetaExpedient().getId();
+                    target.setMetaExpedientId(metaExpedientId);
+
+                    boolean allSame = expedients.stream()
+                            .allMatch(e -> Objects.equals(e.getMetaExpedient().getId(), metaExpedientId));
+
+                    target.setTotsExpedientsMateixProcediment(allSame);
+                } else {
+                    target.setTotsExpedientsMateixProcediment(false);
+                }
+            }
+        }
 
 		@Override
 		public Serializable exec(String code, ExpedientResourceEntity entity, MassiveImportDocsAction params) throws ActionExecutionException {
-
-			if (params!=null && params.getDocuments()!=null && params.getDocuments().size()>0) {
-			
-				//1.- Guardar fitxers temporalment a disc: en un sol fitxer ZIP amb els objectes passats a fitxers JSON
-				for (DocumentAmbTipusDto doc: params.getDocuments()) {
-					
-				}
-				
-				//2.- Programar la acció massiva per els expedient seleccionats.
-				List<ExecucioMassivaContingutDto> elementsMassiva = execucioMassivaHelper.getMassivaContingutFromIds(params.getIds());
-				ExecucioMassivaDto execMassDto = new ExecucioMassivaDto(
-						ExecucioMassivaTipusDto.IMPORTAR_DOCS,
-						new Date(),
-						null,
-						configHelper.getRolActual());
-	        	String entitatActual = configHelper.getEntitatActualCodi();
-	        	EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatActual, false, false, false, true, false);
-				execucioMassivaHelper.saveExecucioMassiva(entitatEntity, execMassDto, elementsMassiva, ElementTipusEnumDto.EXPEDIENT);
-			}
-			return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
+//            if (params!=null && params.getDocuments()!=null && !params.getDocuments().isEmpty()) {
+//				//1.- Guardar fitxers temporalment a disc: en un sol fitxer ZIP amb els objectes passats a fitxers JSON
+//				for (DocumentAmbTipusDto doc: params.getDocuments()) {
+//
+//				}
+//
+//				//2.- Programar la acció massiva per els expedient seleccionats.
+//				List<ExecucioMassivaContingutDto> elementsMassiva = execucioMassivaHelper.getMassivaContingutFromIds(params.getIds());
+//				ExecucioMassivaDto execMassDto = new ExecucioMassivaDto(
+//						ExecucioMassivaTipusDto.IMPORTAR_DOCS,
+//						new Date(),
+//						null,
+//						configHelper.getRolActual());
+//	        	String entitatActual = configHelper.getEntitatActualCodi();
+//	        	EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatActual, false, false, false, true, false);
+//				execucioMassivaHelper.saveExecucioMassiva(entitatEntity, execMassDto, elementsMassiva, ElementTipusEnumDto.EXPEDIENT);
+//			}
+//			return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
+            return null;
 		}    	
     }
     

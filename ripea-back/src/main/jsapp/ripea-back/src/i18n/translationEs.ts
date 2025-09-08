@@ -549,7 +549,11 @@ const translationEs = {
                 excelInteressats: {
                     title: "Descargar plantilla para importar interesados Excel",
                     ok: "Los interesados se han exportado correctamente",
-                }
+                },
+                impDocMass: {
+                    label: "Importar documentos a los expedientes seleccionados",
+                    title: "Importar documentos a expedientes"
+                },
             },
             alert: {
                 owner: "Es necesario reservar el expediente para poder modificarlo",
