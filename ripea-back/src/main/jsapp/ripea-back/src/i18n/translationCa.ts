@@ -564,7 +564,11 @@ const translationCa = {
                 excelInteressats: {
                     title: "Descarregar plantilla per importar interessats Excel",
                     ok: "Els interessats s’han exportat correctament",
-                }
+                },
+                impDocMass: {
+                    label: "Importar documents als expedients seleccionats",
+                    title: "Importar documents a expedients",
+                },
             },
             alert: {
                 owner: "És necessari reservar l’expedient per poder-lo modificar",

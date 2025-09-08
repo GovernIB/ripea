@@ -77,6 +77,7 @@ import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
 import es.caib.ripea.service.intf.dto.RegistreAnnexDto;
 import es.caib.ripea.service.intf.dto.RegistreDto;
 import es.caib.ripea.service.intf.dto.RegistreInteressatDto;
+import es.caib.ripea.service.intf.dto.SiNoEnumDto;
 import es.caib.ripea.service.intf.exception.DocumentAlreadyImportedException;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.EntitatService;
@@ -845,7 +846,8 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 						justificantIdMetaDoc,
 						interessatsAccionsMap,
 						expedientPeticioAcceptarCommand.getPrioritat(),
-						expedientPeticioAcceptarCommand.getPrioritatMotiu());
+						expedientPeticioAcceptarCommand.getPrioritatMotiu(),
+						SiNoEnumDto.NO);
 				processatOk = expedientDto.isProcessatOk();
 				expCreatArxiuOk = expedientDto.isExpCreatArxiuOk();
 				expedientId = expedientDto.getId();

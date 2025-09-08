@@ -63,7 +63,8 @@ public interface ExpedientService {
 			Long justificantIdMetaDoc,
 			Map<String, InteressatAssociacioAccioEnum> interessatsAccionsMap,
 			PrioritatEnumDto prioritat,
-			String prioritatMotiu) throws NotFoundException, ValidationException;
+			String prioritatMotiu,
+			SiNoEnumDto seguidor) throws NotFoundException, ValidationException;
 
 
     /**

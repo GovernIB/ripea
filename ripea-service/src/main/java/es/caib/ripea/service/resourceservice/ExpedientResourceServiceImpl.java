@@ -8,12 +8,15 @@ import java.io.OutputStream;
 import java.io.Serializable;
 import java.time.chrono.ChronoLocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
@@ -38,6 +41,7 @@ import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.entity.ExpedientEstatEntity;
 import es.caib.ripea.persistence.entity.MetaDocumentEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.entity.resourceentity.ExpedientResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientResourceEntity;
@@ -53,6 +57,7 @@ import es.caib.ripea.persistence.repository.DadaRepository;
 import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.persistence.repository.ExpedientEstatRepository;
 import es.caib.ripea.persistence.repository.ExpedientRepository;
+import es.caib.ripea.persistence.repository.MetaExpedientRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.CacheHelper;
@@ -151,6 +156,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     private final MetaDocumentHelper metaDocumentHelper;
     private final ZipImportacioHelper zipImportacioHelper;
     private final MessageHelper messageHelper;
+    private final MetaExpedientRepository metaExpedientRepository;
 
     @PostConstruct
     public void init() {
@@ -393,7 +399,8 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 					resource.getGrup()!=null?resource.getGrup().getId():null,
 					configHelper.getRolActual(),
 					resource.getPrioritat(),
-					resource.getPrioritatMotiu());
+					resource.getPrioritatMotiu(),
+					resource.getAsignarSeguidor());
 			
 			expedientHelper.arxiuPropagarExpedientAmbInteressatsNewTransaction(expedientId);
 			
@@ -706,8 +713,71 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     
     private class ImportarDocumentsMassiu implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.MassiveImportDocsAction, Serializable> {
 
-		@Override
-		public void onChange(Serializable id, MassiveImportDocsAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveImportDocsAction target) {}
+        private Map<String, String> parseToMap(String input){
+            String[] tokens = input.split(",", -1); // split preservando vacíos
+
+            Map<String, String> map = new HashMap<>();
+            for (int i = 0; i < tokens.length - 1; i += 2) {
+                String key = tokens[i].trim();
+                String value = tokens[i + 1].trim();
+                map.put(key, value);
+            }
+            return map;
+        }
+
+        @Override
+        public List<FieldOption> getOptions(String fieldName, Map<String, String[]> requestParameterMap) {
+            List<FieldOption> resultat = new ArrayList<>();
+            if (MassiveImportDocsAction.Fields.tipusDocument.equals(fieldName)) {
+                String entitatActualCodi = configHelper.getEntitatActualCodi();
+                EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true,false);
+                MetaExpedientEntity metaExpedientEntity = metaExpedientRepository.findById(Long.parseLong(requestParameterMap.get(MassiveImportDocsAction.Fields.metaExpedientId)[0])).get();
+                List<MetaDocumentEntity>  metaDocsPermesos = metaDocumentHelper.findMetaDocumentsDisponiblesPerCreacio(
+                        entitat,
+                        null,
+                        metaExpedientEntity,
+                        false);
+                if (metaDocsPermesos!=null) {
+                    String[] additionalOptionArr = requestParameterMap.get("tipusDocument")[0].split(",", -1);
+                    List<String> additionalOption = Arrays.asList(additionalOptionArr);
+
+                    String value = requestParameterMap.containsKey("value")
+                            ? requestParameterMap.get("value")[0]
+                            : null;
+
+                    for (MetaDocumentEntity metaDoc : metaDocsPermesos) {
+                        if (metaDoc.isMultiple() ||
+                                (
+                                        !additionalOption.contains(String.valueOf(metaDoc.getId())) ||
+                                                String.valueOf(metaDoc.getId()).equals(value)
+                                )
+                        ) {
+                            resultat.add(new FieldOption(metaDoc.getId().toString(), metaDoc.getNom()));
+                        }
+                    }
+                    resultat.sort(Comparator.comparing(FieldOption::getDescription));
+                }
+            }
+            return resultat;
+        }
+
+        @Override
+		public void onChange(Serializable id, MassiveImportDocsAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveImportDocsAction target) {
+            if (fieldName == null) {
+                if (!previous.getIds().isEmpty()) {
+                    List<ExpedientResourceEntity> expedients = expedientResourceRepository.findAllById(previous.getIds());
+                    Long metaExpedientId = expedients.get(0).getMetaExpedient().getId();
+                    target.setMetaExpedientId(metaExpedientId);
+
+                    boolean allSame = expedients.stream()
+                            .allMatch(e -> Objects.equals(e.getMetaExpedient().getId(), metaExpedientId));
+
+                    target.setTotsExpedientsMateixProcediment(allSame);
+                } else {
+                    target.setTotsExpedientsMateixProcediment(false);
+                }
+            }
+        }
 
 		@Override
 		public Serializable exec(String code, ExpedientResourceEntity entity, MassiveImportDocsAction params) throws ActionExecutionException {

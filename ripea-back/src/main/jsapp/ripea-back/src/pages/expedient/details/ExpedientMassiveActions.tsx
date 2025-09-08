@@ -3,6 +3,7 @@ import {useExportarDocumentsMassive} from "../actions/ExportarDocuments.tsx";
 import { useTranslation } from "react-i18next";
 import {useUserSession} from "../../../components/Session.tsx";
 import {Divider} from "@mui/material";
+import useImportarDocumentMassive from "../actions/ImportarDocumentMassive.tsx";
 
 export const useMassiveActions = (refresh?: () => void)=> {
 	
@@ -84,6 +85,7 @@ const useExpedientMassiveActions = (refresh?: () => void)=> {
     } = useMassiveActions(refresh);
 
     const {handleMassiveShow: handleExportDoc, content: contentExportDoc} = useExportarDocumentsMassive(refresh);
+    const {handleShow: handleImpDocMass, content: contentImpDocMass} = useImportarDocumentMassive(refresh);
 
     const actions = [
         {
@@ -177,10 +179,22 @@ const useExpedientMassiveActions = (refresh?: () => void)=> {
             showInMenu: true,
             onClick: handleExportDoc,
         },
+        {
+            label: <Divider sx={{px: 1, width: '100%'}} color={"none"}/>,
+            showInMenu: true,
+            disabled: true,
+        },
+        {
+            label: t('page.expedient.action.impDocMass.label'),
+            icon: "folder_zip",
+            showInMenu: true,
+            onClick: handleImpDocMass,
+        },
     ]
 
     const components = <>
         {contentExportDoc}
+        {contentImpDocMass}
     </>
 
     return {

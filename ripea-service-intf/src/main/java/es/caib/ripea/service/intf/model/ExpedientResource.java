@@ -3,13 +3,13 @@ package es.caib.ripea.service.intf.model;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.Year;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import es.caib.ripea.service.intf.resourcevalidation.MassiveImportDocValid;
 import org.springframework.data.annotation.Transient;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -25,6 +25,7 @@ import es.caib.ripea.service.intf.dto.DocumentAmbTipusDto;
 import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.dto.FileNameOption;
 import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
+import es.caib.ripea.service.intf.dto.SiNoEnumDto;
 import es.caib.ripea.service.intf.dto.TipusImportEnumDto;
 import es.caib.ripea.service.intf.resourcevalidation.ExpedientValid;
 import es.caib.ripea.service.intf.resourcevalidation.ImportarDocumentValid;
@@ -351,6 +352,9 @@ public class ExpedientResource extends NodeResource implements Serializable {
     @Transient private int numTasques;
     @Transient private int numAlert;
     @Transient private boolean disableOrganGestor = false;
+    
+    // Elecció seguir o no expedient
+    @Transient private SiNoEnumDto asignarSeguidor = SiNoEnumDto.NO;
 
     @Transient
     private ArxiuDetallDto arxiu;
@@ -424,9 +428,15 @@ public class ExpedientResource extends NodeResource implements Serializable {
     @Setter
     @NoArgsConstructor
     @FieldNameConstants
+    @MassiveImportDocValid
     public static class MassiveImportDocsAction extends MassiveAction {
-    	private boolean totsExpedientsMateixProcediment = true;
-    	private List<DocumentAmbTipusDto> documents;
+        @NotNull private boolean totsExpedientsMateixProcediment;
+        @NotNull @NotEmpty
+        private List<DocumentAmbTipusDto> documents;
+        @Transient private Long metaExpedientId;
+        @Transient private FileReference file;
+        @Transient @ResourceField(enumType = true)
+        private String tipusDocument;
     }
     
     @Getter

@@ -507,7 +507,11 @@ const translationEn = {
                 excelInteressats: {
                     title: "Download Excel template to import interested parties",
                     ok: "Interested parties exported successfully",
-                }
+                },
+                impDocMass: {
+                    label: "Importar documentos a los expedientes seleccionados",
+                    title: "Importar documentos a expedientes"
+                },
             },
             alert: {
                 owner: "You must reserve the case file in order to edit it",

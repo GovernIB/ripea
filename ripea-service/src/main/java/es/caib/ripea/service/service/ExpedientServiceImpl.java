@@ -87,6 +87,7 @@ import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
 import es.caib.ripea.service.intf.dto.RespostaPublicacioComentariDto;
 import es.caib.ripea.service.intf.dto.ResultDto;
 import es.caib.ripea.service.intf.dto.ResultEnumDto;
+import es.caib.ripea.service.intf.dto.SiNoEnumDto;
 import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.exception.DocumentAlreadyImportedException;
 import es.caib.ripea.service.intf.exception.NotFoundException;
@@ -146,7 +147,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 			Long justificantIdMetaDoc,
 			Map<String, InteressatAssociacioAccioEnum> interessatsAccionsMap,
 			PrioritatEnumDto prioritat,
-			String prioritatMotiu) {
+			String prioritatMotiu,
+			SiNoEnumDto seguidor) {
 		
 		organGestorHelper.actualitzarOrganCodi(organGestorRepository.getOne(organGestorId).getCodi());
 		logger.info(
@@ -175,7 +177,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 					grupId,
 					rolActual,
 					prioritat,
-					prioritatMotiu);
+					prioritatMotiu,
+					seguidor);
 		}
 
 		boolean expCreatArxiuOk = expedientHelper.arxiuPropagarExpedientAmbInteressatsNewTransaction(expedientId);
