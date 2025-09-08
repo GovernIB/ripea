@@ -280,12 +280,21 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     	try {
     		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
     		DocumentEntity documentActual = documentRepository.findById(resource.getId()).get();
+    		DocumentResourceEntity documentResourceActual = documentResourceRepository.findById(resource.getId()).get();
+    		Long reorderPreviousParentId = reorderGetParentId(documentResourceActual);
+    		Long reorderResourceSequence = reorderGetResourceSequence(resource, documentResourceActual);
     		DocumentDto documentCreat = documentHelper.updateDocument(
     				entitatEntity.getId(),
     				documentActual,
-                    resource.toDocumentDto(),
+					resource.toDocumentDto(),
     				true);
     		resource.setId(documentCreat.getId());
+			reorderIfReorderable(
+					documentResourceRepository.findById(resource.getId()).get(),
+					reorderResourceSequence,
+					reorderPreviousParentId,
+					true,
+					false);
     		return resource;
     	} catch (Exception ex) {
     		excepcioLogHelper.addExcepcio("/document/"+resource.getId()+"/update", ex);
@@ -339,6 +348,11 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     		resource.setLastModifiedByFullName(usuariResourceEntity.getNom() + " (" + usuariResourceEntity.getCodi() + ")");
     	}
     }
+
+	@Override
+	protected List<DocumentResourceEntity> reorderFindLinesWithParent(Serializable parentId) {
+		return documentResourceRepository.findAllByPareId((Long)parentId);
+	}
 
     private class PathPerspectiveApplicator implements PerspectiveApplicator<DocumentResourceEntity, DocumentResource> {
         @Override

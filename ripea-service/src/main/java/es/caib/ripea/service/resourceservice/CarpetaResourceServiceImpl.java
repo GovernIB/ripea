@@ -8,6 +8,9 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
+import es.caib.ripea.persistence.entity.resourceentity.DocumentResourceEntity;
+import es.caib.ripea.persistence.entity.resourcerepository.CarpetaResourceRepository;
+import es.caib.ripea.persistence.entity.resourcerepository.DocumentResourceRepository;
 import org.springframework.stereotype.Service;
 
 import com.turkraft.springfilter.FilterBuilder;
@@ -52,6 +55,7 @@ public class CarpetaResourceServiceImpl extends BaseMutableResourceService<Carpe
 
 	private final EntitatRepository entitatRepository;
 	private final CarpetaRepository carpetaRepository;
+	private final CarpetaResourceRepository carpetaResourceRepository;
 	
 	private final ContingutHelper contingutHelper;
 	private final ExcepcioLogHelper excepcioLogHelper;
@@ -116,6 +120,11 @@ public class CarpetaResourceServiceImpl extends BaseMutableResourceService<Carpe
     		throw new ResourceNotFoundException(getResourceClass(), ex.getMessage());
     	}
     }
+
+	@Override
+	protected List<CarpetaResourceEntity> reorderFindLinesWithParent(Serializable parentId) {
+		return carpetaResourceRepository.findAllByPareId((Long)parentId);
+	}
 
     private class PathPerspectiveApplicator implements PerspectiveApplicator<CarpetaResourceEntity, CarpetaResource> {
         @Override

@@ -220,6 +220,8 @@ public class DocumentResource extends NodeResource {
     @ResourceField(onChangeActive = true)
     private FileReference imprimible;    
 
+	private boolean ordrePatch;
+
 	@Size(max = 32)
 	private String versioDarrera;
 	@NotNull

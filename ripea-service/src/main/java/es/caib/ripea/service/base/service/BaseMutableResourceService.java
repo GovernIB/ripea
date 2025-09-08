@@ -352,7 +352,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 	protected Integer reorderGetIncrement() {
 		return null;
 	}
-	private Long reorderGetResourceSequence(R resource, E entity) {
+	protected Long reorderGetResourceSequence(R resource, E entity) {
 		ResourceConfig resourceConfig = resource.getClass().getAnnotation(ResourceConfig.class);
 		if (resourceConfig != null && !resourceConfig.orderField().isEmpty()) {
 			try {
@@ -374,7 +374,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 			return null;
 		}
 	}
-	private ID reorderGetParentId(E entity) {
+	protected ID reorderGetParentId(E entity) {
 		if (entity instanceof ReorderableEntity<?>) {
 			ReorderableEntity<ID> reorderableEntity = (ReorderableEntity<ID>)entity;
 			return reorderableEntity.getOrderParentId();
@@ -382,13 +382,13 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 			return null;
 		}
 	}
-	private long reorderSetNextSequence(ReorderableEntity<ID> reorderableEntity, long index) {
+	protected long reorderSetNextSequence(ReorderableEntity<ID> reorderableEntity, long index) {
 		Integer increment = reorderGetIncrement();
 		long nextValue = index * (increment != null ? increment : 1);
 		reorderableEntity.setOrder(nextValue);
 		return nextValue;
 	}
-	private boolean reorderIfReorderable(
+	protected boolean reorderIfReorderable(
 			E entity,
 			Long sequenceForEntity,
 			ID previousParentId,
@@ -423,7 +423,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 		}
 		return anyOrderChanged;
 	}
-	private boolean reorderWithParentId(
+	protected boolean reorderWithParentId(
 			@Nullable ReorderableEntity<ID> reorderableEntity,
 			@Nullable Long sequenceForEntity,
 			@Nullable ID parentId,
