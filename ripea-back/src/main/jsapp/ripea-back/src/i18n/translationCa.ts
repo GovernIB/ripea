@@ -704,8 +704,8 @@ const translationCa = {
                     label: "Detalls",
                 },
                 imprimible: {
-                    label: "Versió imprimible",
-                    ok: "La versió imprimible s'ha descarregat correctament",
+                    label: "Còpia autèntica imprimible",
+                    ok: "La còpia autèntica imprimible s'ha descarregat correctament",
                 },
                 original: {
                     label: "Descarregar original",
@@ -778,9 +778,9 @@ const translationCa = {
                     title: "Crear publicació",
                     ok: "Publicació creada correctament",
                 },
-                descarregarImprimible: {
-                    label: "Descarregar versió imprimible",
-                    ok: "La versió imprimible s'ha descarregat correctament",
+                descarregarOriginal: {
+                    label: "Document original",
+                    ok: "El document original s'ha descarregat correctament",
                 },
                 changeType: {
                     label: "Canviar tipus...",

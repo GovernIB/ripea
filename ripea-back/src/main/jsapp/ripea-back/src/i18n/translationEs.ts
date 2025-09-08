@@ -689,8 +689,8 @@ const translationEs = {
                     label: "Detalles",
                 },
                 imprimible: {
-                    label: "Versión imprimible",
-                    ok: "La versión imprimible se ha descargado correctamente",
+                    label: "Copia auténtica imprimible",
+                    ok: "La copia auténtica imprimible se ha descargado correctamente"
                 },
                 original: {
                     label: "Descargar original",
@@ -762,9 +762,9 @@ const translationEs = {
                     title: "Crear publicación",
                     ok: "Publicación creada correctamente",
                 },
-                descarregarImprimible: {
-                    label: "Descarregar versión imprimible",
-                    ok: "La versión imprimible se ha descargado correctamente",
+                descarregarOriginal: {
+                    label: "Documento original",
+                    ok: "El documento original se ha descargado correctamente"
                 },
                 changeType: {
                     label: "Cambiar tipo...",
