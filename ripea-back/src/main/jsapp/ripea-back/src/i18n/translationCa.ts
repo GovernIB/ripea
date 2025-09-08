@@ -1071,6 +1071,7 @@ const translationCa = {
                 anexos: "Adjuntar annexos pendents d'anotacions acceptades",
                 anotacio: "Actualitzar estat de les anotacions a Distribució",
                 prioritat: "Canviar prioritat d'expedients",
+                refresh: "Refrescar dada 10 segons"
             },
             action: {
                 massives: {

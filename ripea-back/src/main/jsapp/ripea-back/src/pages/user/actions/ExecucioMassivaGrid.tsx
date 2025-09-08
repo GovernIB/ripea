@@ -193,7 +193,7 @@ const useExecucioMassiva = () => {
                             position: 0,
                             element: <FormControlLabel
                                 control={<Checkbox checked={isRefresh} onClick={() => setRefresh(!isRefresh)}/>}
-                                label="10s refresh"/>,
+                                label={t('page.user.massive.refresh')}/>,
                         }
                     ]}
                     rowProps={(row: any) => {

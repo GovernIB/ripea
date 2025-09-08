@@ -727,11 +727,17 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
         @Override
         public List<FieldOption> getOptions(String fieldName, Map<String, String[]> requestParameterMap) {
+        	
             List<FieldOption> resultat = new ArrayList<>();
+            
             if (MassiveImportDocsAction.Fields.tipusDocument.equals(fieldName)) {
-                String entitatActualCodi = configHelper.getEntitatActualCodi();
-                EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true,false);
+                
                 MetaExpedientEntity metaExpedientEntity = metaExpedientRepository.findById(Long.parseLong(requestParameterMap.get(MassiveImportDocsAction.Fields.metaExpedientId)[0])).get();
+                
+//                String entitatActualCodi = configHelper.getEntitatActualCodi(); //Arribava null per la darrera fila
+//                EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true,false);
+                
+                EntitatEntity entitat = metaExpedientEntity.getEntitat();
                 List<MetaDocumentEntity>  metaDocsPermesos = metaDocumentHelper.findMetaDocumentsDisponiblesPerCreacio(
                         entitat,
                         null,

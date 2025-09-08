@@ -186,7 +186,7 @@ const useExpedientMassiveActions = (refresh?: () => void)=> {
         },
         {
             label: t('page.expedient.action.impDocMass.label'),
-            icon: "folder_zip",
+            icon: "add_notes",
             showInMenu: true,
             onClick: handleImpDocMass,
         },

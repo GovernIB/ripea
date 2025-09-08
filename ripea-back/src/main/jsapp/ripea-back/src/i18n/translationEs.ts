@@ -1055,6 +1055,7 @@ const translationEs = {
                 anexos: "Adjuntar anexos pendientes de anotaciones aceptadas",
                 anotacio: "Actualizar estado de las anotaciones en Distribución",
                 prioritat: "Cambiar prioridad de expedientes",
+                refresh: "Refrescar dada 10 segundos"
             },
             action: {
                 massives: {

@@ -280,6 +280,7 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 					pluginHelper.gestioDocumentalDelete(
 							execucioMassiva.getDocumentNom(),
 							PluginHelper.GESDOC_AGRUPACIO_DOCS_ESBORRANYS);
+					execucioMassiva.setDocumentNom(null);
 				}
 				
 				execucioMassiva.updateDataFi(new Date());

@@ -18,4 +18,10 @@ public class FileReference {
 	protected final String contentType;
 	protected final Long contentLength;
 
+	public FileReference() {
+	    this.name = null;
+	    this.content = null;
+	    this.contentType = null;
+	    this.contentLength = null;
+	}
 }
