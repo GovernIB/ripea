@@ -21,6 +21,7 @@ import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
+import es.caib.ripea.service.intf.dto.DocumentAmbTipusDto;
 import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.dto.FileNameOption;
 import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
@@ -436,12 +437,6 @@ public class ExpedientResource extends NodeResource implements Serializable {
         @Transient private FileReference file;
         @Transient @ResourceField(enumType = true)
         private String tipusDocument;
-
-        @Getter @Setter
-        public class DocumentAmbTipusDto {
-            private FileReference fitxer;
-            private Long tipusDocument;
-        }
     }
     
     @Getter
