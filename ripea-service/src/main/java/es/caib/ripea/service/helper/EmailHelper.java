@@ -679,15 +679,13 @@ public class EmailHelper {
 
 	}
 
-	public void canviEstatDocumentViaFirma(
-			DocumentViaFirmaEntity documentViaFirma) {
-		logger.debug("Enviant correu electrònic per a canvi d'estat de document a ViaFirma (" +
-			"documentViaFirma=" + documentViaFirma.getId() + ")");
+	public void canviEstatDocumentViaFirma(DocumentViaFirmaEntity documentViaFirma) {
+		
+		logger.debug("Enviant correu electrònic per a canvi d'estat de document a ViaFirma (documentViaFirma=" + documentViaFirma.getId() + ")");
 
 		DocumentEntity document = documentViaFirma.getDocument();
 		String enviamentCreatedByCodi = documentViaFirma.getCreatedBy().get();
 		ExpedientEntity expedient = document.getExpedient();
-
 		String subject = getPrefixRipea() + " Canvi d'estat de document enviat a ViaFirma";
 		String estat = (documentViaFirma.getEstat() == DocumentEnviamentEstatEnumDto.PROCESSAT) ? "FIRMAT" : documentViaFirma.getEstat().toString();
 
@@ -710,70 +708,16 @@ public class EmailHelper {
 				null,
 				null);
 
-		sendOrSaveEmail(
-				responsables,
-				subject,
-				text,
-				EventTipusEnumDto.CANVI_ESTAT_VIAFIRMA);
-
+		sendOrSaveEmail(responsables, subject, text, EventTipusEnumDto.CANVI_ESTAT_VIAFIRMA);
 	}
 
-
-	public void canviEstatNotificacio(
-			DocumentNotificacioEntity documentNotificacio,
-			DocumentEnviamentEstatEnumDto estatAnterior) {
-		logger.debug("Enviant correu electrònic per a canvi d'estat de notificació (" +
-			"documentNotificacioId=" + documentNotificacio.getId() + ")");
+	public void canviEstatNotificacio(DocumentNotificacioEntity documentNotificacio, DocumentNotificacioEstatEnumDto estatAnterior) {
+		
+		logger.debug("Enviant correu electrònic per a canvi d'estat de notificació (documentNotificacioId=" + documentNotificacio.getId() + ")");
 
 		DocumentEntity document = documentNotificacio.getDocument();
 		String notificacioCreatedByCodi = documentNotificacio.getCreatedBy().get();
 		ExpedientEntity expedient = document.getExpedient();
-
-		String subject = getPrefixRipea() + " Canvi d'estat de notificació";
-		String estat = (documentNotificacio.getEstat() == DocumentEnviamentEstatEnumDto.PROCESSAT) ? "ENTREGAT" : documentNotificacio.getEstat().toString();
-		String text =
-				"Informació del document:\n" +
-				"\tExpedient nom: " + expedient.getNom() + "\n" +
-				"\tExpedient núm.: " + expedient.getNumero() + "\n" +
-				"\tDocument nom: " + document.getNom() + "\n" +
-				(document.getMetaDocument() != null ? "\tDocument tipus.: " + document.getMetaDocument().getNom() : "" ) + "\n" +
-				"\tDocument fitxer: " + document.getFitxerNom() + "\n\n" +
-				"Estat anterior:" + estatAnterior + "\n" +
-				"Estat actual:" + estat + "\n" +
-				getEnllacExpedient(expedient.getId());
-
-
-		Set<DadesUsuari> responsables = getGestors(
-				false,
-				false,
-				expedient,
-				notificacioCreatedByCodi,
-				null,
-				null);
-
-		sendOrSaveEmail(
-				responsables,
-				subject,
-				text,
-				EventTipusEnumDto.CANVI_ESTAT_NOTIFICACIO);
-
-
-	}
-
-
-
-
-
-	public void canviEstatNotificacio(
-			DocumentNotificacioEntity documentNotificacio,
-			DocumentNotificacioEstatEnumDto estatAnterior) {
-		logger.debug("Enviant correu electrònic per a canvi d'estat de notificació (" +
-			"documentNotificacioId=" + documentNotificacio.getId() + ")");
-
-		DocumentEntity document = documentNotificacio.getDocument();
-		String notificacioCreatedByCodi = documentNotificacio.getCreatedBy().get();
-		ExpedientEntity expedient = document.getExpedient();
-
 
 		String subject = getPrefixRipea() + " Canvi d'estat de notificació";
 		String estat = documentNotificacio.getNotificacioEstat() != null ? documentNotificacio.getNotificacioEstat().toString() : "";
@@ -784,10 +728,9 @@ public class EmailHelper {
 				"\tDocument nom: " + document.getNom() + "\n" +
 				(document.getMetaDocument() != null ? "\tDocument tipus.: " + document.getMetaDocument().getNom() : "" ) + "\n" +
 				"\tDocument fitxer: " + document.getFitxerNom() + "\n\n" +
-				"Estat anterior:" + estatAnterior.toString() + "\n" +
+				"Estat anterior:" + estatAnterior!=null? estatAnterior.toString() : "" + "\n" +
 				"Estat actual:" + estat + "\n" +
 				getEnllacExpedient(expedient.getId());
-
 
 		Set<DadesUsuari> responsables = getGestors(
 				false,
@@ -797,14 +740,8 @@ public class EmailHelper {
 				null,
 				null);
 
-
-		sendOrSaveEmail(
-				responsables,
-				subject,
-				text,
-				EventTipusEnumDto.CANVI_ESTAT_NOTIFICACIO);
+		sendOrSaveEmail(responsables, subject, text, EventTipusEnumDto.CANVI_ESTAT_NOTIFICACIO);
 	}
-
 
 	public void enviarEmailCanviarEstatTasca(
 			ExpedientTascaEntity expedientTascaEntity,
