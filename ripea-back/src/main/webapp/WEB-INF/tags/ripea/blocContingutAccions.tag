@@ -215,6 +215,9 @@
 				<c:set var="mostrarSeparador" value="${false}"/>
 				<li role="separator" class="divider"></li>
 			</c:if>
+            <%---- Descarregar ----%>
+            <li><a href="<c:url value="/contingut/${contingut.pare.id}/document/${contingut.id}/descarregar?tascaId=${tascaId}"/>"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.DocOriginal"/></a></li>
+            <%---- Descarregar Imprimible----%>			
 			<c:if test="${contingut.documentTipus == 'DIGITAL' or contingut.documentTipus == 'IMPORTAT'}">
 				<c:if test="${!isTasca and ((contingut.arxiuEstatDefinitiu or contingut.firmaParcial) or (imprimibleNoFirmats and contingut.pdf))}">
 					<c:choose>
@@ -234,8 +237,6 @@
 						</c:otherwise>
 					</c:choose>			
 				</c:if>
-				<%---- Descarregar ----%>
-				<li><a href="<c:url value="/contingut/${contingut.pare.id}/document/${contingut.id}/descarregar?tascaId=${tascaId}"/>"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregar"/></a></li>
 				<%---- Descarregar original de distribucio ----%>
 				<c:if test="${contingut.gesDocOriginalId!=null}">
 				<li><a href="<c:url value="/contingut/${contingut.pare.id}/document/${contingut.id}/descarregarOriginal?tascaId=${tascaId}"/>"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregar.original"/></a></li>

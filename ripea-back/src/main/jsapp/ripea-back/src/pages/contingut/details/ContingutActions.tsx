@@ -277,19 +277,19 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             disabled: true,
         },
         {
+            label: t('page.document.action.descarregarOriginal.label'),
+            icon: "download",
+            showInMenu: true,
+			onClick: (id:any) => apiDownload(id, 'adjunt', t('page.document.action.descarregarOriginal.ok')),
+            hidden: (row:any) => !isDigitalOrImportat(row),
+        },        
+        {
             label: t('page.document.action.imprimible.label'),
             icon: "download",
             showInMenu: true,
 			onClick: (id:any) => apiDownload(id, 'imprimible', t('page.document.action.imprimible.ok')),
             disabled: (row:any) => isInOptions(row?.fitxerExtension, 'xsig'),
             hidden: (row:any) => !isDigitalOrImportat(row) || !( (row?.arxiuEstat=='DEFINITIU' || row?.estat=='FIRMA_PARCIAL') || user?.sessionScope?.imprimibleNoFirmats),
-        },
-        {
-            label: t('page.document.action.descarregarOriginal.label'),
-            icon: "download",
-            showInMenu: true,
-			onClick: (id:any) => apiDownload(id, 'adjunt', t('page.document.action.descarregarOriginal.ok')),
-            hidden: (row:any) => !isDigitalOrImportat(row),
         },
         {
             label: t('page.document.action.original.label'),

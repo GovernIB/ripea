@@ -908,10 +908,10 @@ function removeCookie(cname) {
 	<c:if test="${contingut.document}">
 		<div id="modal-botons" class="well">
 			<c:if test="${contingut.custodiat}">
-				<a data-element-no-tancar="true" href="<c:url value="/contingut/${contingut.id}/document/${contingut.id}/descarregarImprimible"/>" class="btn btn-default pull-right"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregar.imprimible"/></a>
+				<a data-element-no-tancar="true" href="<c:url value="/contingut/${contingut.id}/document/${contingut.id}/descarregarImprimible"/>" class="btn btn-default pull-right"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregarImprimible"/></a>
 			</c:if>
 			<c:if test="${contingut.documentTipus != 'FISIC'}">
-				<a data-element-no-tancar="true" href="<c:url value="/contingut/${contingut.id}/document/${contingut.id}/descarregar"/>" <c:if test="${contingut.custodiat}">style="margin-right: 10px;"</c:if> class="btn btn-default pull-right"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregar"/></a>
+				<a data-element-no-tancar="true" href="<c:url value="/contingut/${contingut.id}/document/${contingut.id}/descarregar"/>" <c:if test="${contingut.custodiat}">style="margin-right: 10px;"</c:if> class="btn btn-default pull-right"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.DocOriginal"/></a>
 			</c:if>
 		</div>
 	</c:if>
