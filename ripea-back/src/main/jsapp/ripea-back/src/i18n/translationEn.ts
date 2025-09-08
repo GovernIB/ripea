@@ -643,8 +643,8 @@ const translationEn = {
                     label: "Details",
                 },
                 imprimible: {
-                    label: "Printable version",
-                    ok: "Printable version downloaded successfully",
+                    label: "Printable authentic copy",
+                    ok: "The printable authentic copy has been downloaded successfully"
                 },
                 original: {
                     label: "Download original",
@@ -708,9 +708,9 @@ const translationEn = {
                     title: "Create publication",
                     ok: "Publication created successfully",
                 },
-                descarregarImprimible: {
-                    label: "Download printable version",
-                    ok: "Printable version downloaded successfully",
+                descarregarOriginal: {
+                    label: "Original document",
+                    ok: "The original document has been downloaded successfully"
                 },
                 changeType: {
                     label: "Change type...",

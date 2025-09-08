@@ -163,13 +163,13 @@ const useDocumentDetail = (expedient:any) => {
     let buttons :any[] = [
         {
             value: 'download',
-            text: t('common.download'),
+            text: t('page.document.action.descarregarOriginal.label'),
             icon: 'download',
             hidden: entity?.documentTipus == 'FISIC'
         },
         {
             value: 'descarregarImprimible',
-            text: t('page.document.action.descarregarImprimible.label'),
+            text: t('page.document.action.imprimible.label'),
             icon: 'download',
             hidden: entity?.estat != 'CUSTODIAT'
         },
@@ -186,7 +186,7 @@ const useDocumentDetail = (expedient:any) => {
             buttonCallback={(value :any) :void => {
                 switch (value){
                     case 'download':
-                        apiDownload(entity?.id, 'adjunt', t('page.expedient.results.actionOk'))
+                        apiDownload(entity?.id, 'adjunt', t('page.document.action.descarregarOriginal.ok'))
                         break;
                     case 'descarregarImprimible':
                         apiDownload(entity?.id, 'imprimible', t('page.document.action.imprimible.ok'))

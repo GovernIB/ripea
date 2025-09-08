@@ -379,10 +379,10 @@ public class ExecucioMassivaHelper {
 		        			DocumentDto documentDto = new DocumentDto();
 		        			documentDto.setDocumentFirmaTipus(DocumentFirmaTipusEnumDto.SENSE_FIRMA);
 		        	        MetaDocumentDto metaNode = new MetaDocumentDto();
-		        	        metaNode.setId(docExp.getTipusDocument().getId());
+		        	        metaNode.setId(docExp.getTipusDocument());
 		        	        documentDto.setMetaNode(metaNode);
 		        	        documentDto.setPareId(emc.getElementId());
-		        	        MetaDocumentEntity metaDocumentEntity = metaDocumentRepository.findById(docExp.getTipusDocument().getId()).get();
+		        	        MetaDocumentEntity metaDocumentEntity = metaDocumentRepository.findById(docExp.getTipusDocument()).get();
 		        	        documentDto.setDocumentTipus(DocumentTipusEnumDto.DIGITAL);
 		        	        //El nom no es pot repetir dins l'expedient
 		        	        String nomDocument = metaDocumentEntity.getNom()+" "+emc.getElementId()+ " "+System.currentTimeMillis(); 
