@@ -5017,16 +5017,13 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					"Error al accedir al plugin de notificacions",
 					ex);
-			throw new SistemaExternException(IntegracioHelper.INTCODI_NOTIFICACIO,
-					"Error al accedir al plugin de notificacions", ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_NOTIFICACIO,"Error al accedir al plugin de notificacions", ex);
 		}
 	}
 
-	public void guardarCertificacio(
-			DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity,
-			RespostaConsultaEstatEnviament resposta) {
+	public void guardarCertificacio(DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity, RespostaConsultaEstatEnviament resposta) {
+		
 		DocumentNotificacioEntity notificacio = documentEnviamentInteressatEntity.getNotificacio();
-		ExpedientEntity expedient = notificacio.getExpedient();
 
 		boolean certificacioRetornat = resposta.getCertificacioData() != null;
 
@@ -5057,62 +5054,43 @@ public class PluginHelper {
 				// saves in gestio documental but never uses it?
 				byte[] certificacio = resposta.getCertificacioContingut();
 				String gestioDocumentalId = notificacio.getEnviamentCertificacioArxiuId();
-				if (gestioDocumentalId != null
-						&& documentEnviamentInteressatEntity.getEnviamentCertificacioData().before(
-								resposta.getCertificacioData())) {
-					gestioDocumentalDelete(
-							notificacio.getEnviamentCertificacioArxiuId(),
-							GESDOC_AGRUPACIO_CERTIFICACIONS);
+				if (gestioDocumentalId!=null && 
+					documentEnviamentInteressatEntity.getEnviamentCertificacioData()!=null &&
+					resposta.getCertificacioData()!=null &&
+					documentEnviamentInteressatEntity.getEnviamentCertificacioData().before(resposta.getCertificacioData())) {
+					gestioDocumentalDelete(gestioDocumentalId, GESDOC_AGRUPACIO_CERTIFICACIONS);
 				}
-				if (gestioDocumentalId == null
-						|| documentEnviamentInteressatEntity.getEnviamentCertificacioData().before(
-								resposta.getCertificacioData())) {
-					gestioDocumentalId = gestioDocumentalCreate(
-							PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS,
-							new ByteArrayInputStream(certificacio));
+				if (gestioDocumentalId == null || (
+						documentEnviamentInteressatEntity.getEnviamentCertificacioData()!=null &&
+						resposta.getCertificacioData()!=null &&
+						documentEnviamentInteressatEntity.getEnviamentCertificacioData().before(resposta.getCertificacioData()))) {
+					gestioDocumentalId = gestioDocumentalCreate(PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS, new ByteArrayInputStream(certificacio));
 				}
-				notificacio.setEnviamentCertificacioArxiuId(
-						gestioDocumentalId);
+				notificacio.setEnviamentCertificacioArxiuId(gestioDocumentalId);
 			}
-
 		}
 
 		if (resposta.getEstat() == es.caib.ripea.plugin.notificacio.EnviamentEstat.NOTIFICADA) {
-			logAll(
-					notificacio,
-					LogTipusEnumDto.NOTIFICACIO_CERTIFICADA,
-					null);
+			logAll(notificacio, LogTipusEnumDto.NOTIFICACIO_CERTIFICADA, null);
 		} else if (resposta.getEstat() == es.caib.ripea.plugin.notificacio.EnviamentEstat.REBUTJADA) {
-			logAll(
-					notificacio,
-					LogTipusEnumDto.NOTIFICACIO_REBUTJADA,
-					null);
+			logAll(notificacio, LogTipusEnumDto.NOTIFICACIO_REBUTJADA, null);
 		}
 
-		documentEnviamentInteressatEntity.updateEnviamentCertificacioData(
-				resposta.getCertificacioData());
-
+		documentEnviamentInteressatEntity.updateEnviamentCertificacioData(resposta.getCertificacioData());
 	}
 
 	private DocumentDto certificacioToDocumentDto(
 			DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity,
 			MetaDocumentEntity metaDocument,
 			RespostaConsultaEstatEnviament resposta) {
-		return contingutHelper.generarDocumentDto(
-				documentEnviamentInteressatEntity,
-				metaDocument,
-				resposta);
+		return contingutHelper.generarDocumentDto(documentEnviamentInteressatEntity, metaDocument, resposta);
 	}
 
 	private void logAll(
 			DocumentNotificacioEntity notificacioEntity,
 			LogTipusEnumDto tipusLog,
 			String param1) {
-		logAll(
-				notificacioEntity,
-				tipusLog,
-				param1,
-				notificacioEntity.getAssumpte());
+		logAll(notificacioEntity, tipusLog, param1, notificacioEntity.getAssumpte());
 	}
 
 	private void logAll(
