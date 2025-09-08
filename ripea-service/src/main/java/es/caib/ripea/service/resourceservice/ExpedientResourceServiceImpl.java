@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import javax.annotation.PostConstruct;
 
@@ -25,6 +27,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.turkraft.springfilter.FilterBuilder;
 import com.turkraft.springfilter.parser.Filter;
 
@@ -709,23 +712,53 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		@Override
 		public Serializable exec(String code, ExpedientResourceEntity entity, MassiveImportDocsAction params) throws ActionExecutionException {
 
-			if (params!=null && params.getDocuments()!=null && params.getDocuments().size()>0) {
+			try {
 			
-				//1.- Guardar fitxers temporalment a disc: en un sol fitxer ZIP amb els objectes passats a fitxers JSON
-				for (DocumentAmbTipusDto doc: params.getDocuments()) {
-					
-				}
+				if (params!=null && params.getDocuments()!=null && params.getDocuments().size()>0) {
 				
-				//2.- Programar la acció massiva per els expedient seleccionats.
-				List<ExecucioMassivaContingutDto> elementsMassiva = execucioMassivaHelper.getMassivaContingutFromIds(params.getIds());
-				ExecucioMassivaDto execMassDto = new ExecucioMassivaDto(
-						ExecucioMassivaTipusDto.IMPORTAR_DOCS,
-						new Date(),
-						null,
-						configHelper.getRolActual());
-	        	String entitatActual = configHelper.getEntitatActualCodi();
-	        	EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatActual, false, false, false, true, false);
-				execucioMassivaHelper.saveExecucioMassiva(entitatEntity, execMassDto, elementsMassiva, ElementTipusEnumDto.EXPEDIENT);
+					//1.- Guardar fitxers temporalment a disc: en un sol fitxer ZIP amb els objectes passats a fitxers JSON
+					ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		            ZipOutputStream zipOut = new ZipOutputStream(baos);
+					for (int i = 0; i < params.getDocuments().size(); i++) {
+						DocumentAmbTipusDto doc = params.getDocuments().get(i);
+						// Convertir el objeto a JSON
+						ObjectMapper objectMapper = new ObjectMapper();
+						String docAsString = objectMapper.writeValueAsString(doc);
+						// Crear una entrada en el ZIP
+						String entryName = "document_" + (i + 1) + ".json";
+						ZipEntry zipEntry = new ZipEntry(entryName);
+						zipOut.putNextEntry(zipEntry);
+		                // Escribir el JSON en la entrada
+		                byte[] jsonBytes = docAsString.getBytes("UTF-8");
+		                zipOut.write(jsonBytes, 0, jsonBytes.length);
+		                zipOut.closeEntry();
+					}
+					
+//					FitxerDto resultat = new FitxerDto();
+//					resultat.setNom(expedient.getNom().replaceAll(" ", "_") + ".zip");
+//					resultat.setContentType("application/zip");
+//					resultat.setContingut(baos.toByteArray());
+					
+					String gestioDocumentalAdjuntId = pluginHelper.gestioDocumentalCreate(
+								PluginHelper.GESDOC_AGRUPACIO_DOCS_ESBORRANYS,
+								new ByteArrayInputStream(baos.toByteArray()));
+					
+					//2.- Programar la acció massiva per els expedient seleccionats.
+					List<ExecucioMassivaContingutDto> elementsMassiva = execucioMassivaHelper.getMassivaContingutFromIds(params.getIds());
+					ExecucioMassivaDto execMassDto = new ExecucioMassivaDto(
+							ExecucioMassivaTipusDto.IMPORTAR_DOCS,
+							new Date(),
+							null,
+							configHelper.getRolActual());
+					execMassDto.setDocumentNom(gestioDocumentalAdjuntId);
+					
+		        	String entitatActual = configHelper.getEntitatActualCodi();
+		        	EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatActual, false, false, false, true, false);
+					execucioMassivaHelper.saveExecucioMassiva(entitatEntity, execMassDto, elementsMassiva, ElementTipusEnumDto.EXPEDIENT);
+				}
+			} catch (Exception e) {
+				excepcioLogHelper.addExcepcio("/expedient/"+entity.getId()+"/ImportarDocumentsMassiu", e);
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, messageHelper.getMessage("message.common.action.error")+": "+e.getMessage());
 			}
 			return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
 		}    	

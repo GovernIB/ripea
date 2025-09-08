@@ -1,5 +1,6 @@
 package es.caib.ripea.service.service;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -10,6 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import org.slf4j.Logger;
@@ -21,6 +23,8 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.ExecucioMassivaContingutEntity;
@@ -41,7 +45,9 @@ import es.caib.ripea.service.helper.ExceptionHelper;
 import es.caib.ripea.service.helper.ExecucioMassivaHelper;
 import es.caib.ripea.service.helper.ExpedientHelper;
 import es.caib.ripea.service.helper.MessageHelper;
+import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.intf.config.PropertyConfig;
+import es.caib.ripea.service.intf.dto.DocumentAmbTipusDto;
 import es.caib.ripea.service.intf.dto.DocumentDto;
 import es.caib.ripea.service.intf.dto.ElementTipusEnumDto;
 import es.caib.ripea.service.intf.dto.EntitatDto;
@@ -54,6 +60,7 @@ import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.exception.ValidationException;
 import es.caib.ripea.service.intf.service.ExecucioMassivaService;
+import es.caib.ripea.service.intf.utils.Utils;
 
 @Service
 public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
@@ -68,6 +75,7 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 	@Autowired private AlertaHelper alertaHelper;
 	@Autowired private MessageHelper messageHelper;
 	@Autowired private ExpedientHelper expedientHelper;
+	@Autowired private PluginHelper pluginHelper;
 	@Autowired private EmailHelper emailHelper;
 	@Autowired private ConfigHelper configHelper;
     @Autowired private ExpedientRepository expedientRepository;
@@ -195,8 +203,45 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 				ExecucioMassivaEntity execucioMassiva = massives.get(0);
 				EntitatDto entitat = conversioTipusHelper.convertir(execucioMassiva.getEntitat(), EntitatDto.class);
 				ConfigHelper.setEntitat(entitat);
+				List<DocumentAmbTipusDto> documents = new ArrayList<DocumentAmbTipusDto>();
 				
 				if (execucioMassiva.getContinguts() != null) {
+					
+					//Cas especific de importació massiva de documents, els quals s'han guardat temporalment a disc.
+					//Per nomes llegir-ho una vegada i no per cada expedient, els obtenim ara, y els passam a executarExecucioMassivaContingutNewTransaction
+					if (ExecucioMassivaTipusDto.IMPORTAR_DOCS.equals(execucioMassiva.getTipus()) && Utils.hasValue(execucioMassiva.getDocumentNom())) {
+						
+						ByteArrayOutputStream streamZipDocs = new ByteArrayOutputStream();
+						pluginHelper.gestioDocumentalGet(
+								execucioMassiva.getDocumentNom(),
+								PluginHelper.GESDOC_AGRUPACIO_DOCS_ESBORRANYS,
+								streamZipDocs);
+						
+						//Extreurer els documents del ZIP
+						ByteArrayInputStream bais = new ByteArrayInputStream(streamZipDocs.toByteArray());
+			            ZipInputStream zipIn = new ZipInputStream(bais);
+			            ObjectMapper objectMapper = new ObjectMapper();
+			            
+			            ZipEntry entry;
+			            while ((entry = zipIn.getNextEntry()) != null) {
+			                if (!entry.isDirectory() && entry.getName().endsWith(".json")) {
+			                    // Leer el contenido del archivo JSON
+			                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			                    byte[] buffer = new byte[1024];
+			                    int len;
+			                    while ((len = zipIn.read(buffer)) > 0) {
+			                        baos.write(buffer, 0, len);
+			                    }
+
+			                    String json = baos.toString("UTF-8");
+
+			                    // Convertir el JSON al objeto
+			                    DocumentAmbTipusDto doc = objectMapper.readValue(json, DocumentAmbTipusDto.class);
+			                    documents.add(doc);
+			                }
+			                zipIn.closeEntry();
+			            }
+					}
 
 					if (ExecucioMassivaTipusDto.EXPORTAR_ZIP.equals(execucioMassiva.getTipus())) {
 						//Cas de exportació a ZIP, no es individual per cada expedient, s'ha de executar per tots els expedients
@@ -214,7 +259,8 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 						for (ExecucioMassivaContingutEntity execucioMassivaItemEntity : execucioMassiva.getContinguts()) {
 							
 							String throwable = execucioMassivaHelper.executarExecucioMassivaContingutNewTransaction(
-									execucioMassivaItemEntity.getId());
+									execucioMassivaItemEntity.getId(),
+									documents);
 							
 							if (throwable != null) {
 								alertaHelper.crearAlerta(
@@ -228,6 +274,14 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 						}
 					}
 				}
+				
+				//Esborram el fitxer temporal ZIP amb els Json dels documents del disc
+				if (ExecucioMassivaTipusDto.IMPORTAR_DOCS.equals(execucioMassiva.getTipus()) && Utils.hasValue(execucioMassiva.getDocumentNom())) {
+					pluginHelper.gestioDocumentalDelete(
+							execucioMassiva.getDocumentNom(),
+							PluginHelper.GESDOC_AGRUPACIO_DOCS_ESBORRANYS);
+				}
+				
 				execucioMassiva.updateDataFi(new Date());
 				execucioMassivaRepository.save(execucioMassiva);
 				

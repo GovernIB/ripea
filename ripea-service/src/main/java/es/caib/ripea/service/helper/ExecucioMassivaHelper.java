@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -31,17 +32,22 @@ import es.caib.ripea.persistence.entity.ExecucioMassivaContingutEntity;
 import es.caib.ripea.persistence.entity.ExecucioMassivaEntity;
 import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.entity.InteressatEntity;
+import es.caib.ripea.persistence.entity.MetaDocumentEntity;
 import es.caib.ripea.persistence.entity.RegistreAnnexEntity;
 import es.caib.ripea.persistence.repository.ContingutRepository;
 import es.caib.ripea.persistence.repository.ExecucioMassivaContingutRepository;
 import es.caib.ripea.persistence.repository.ExecucioMassivaRepository;
 import es.caib.ripea.persistence.repository.ExpedientPeticioRepository;
 import es.caib.ripea.persistence.repository.InteressatRepository;
+import es.caib.ripea.persistence.repository.MetaDocumentRepository;
 import es.caib.ripea.persistence.repository.RegistreAnnexRepository;
 import es.caib.ripea.service.firma.DocumentFirmaPortafirmesHelper;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentAmbTipusDto;
 import es.caib.ripea.service.intf.dto.DocumentDto;
+import es.caib.ripea.service.intf.dto.DocumentFirmaTipusEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
 import es.caib.ripea.service.intf.dto.ElementTipusEnumDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaContingutDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaDto;
@@ -49,6 +55,8 @@ import es.caib.ripea.service.intf.dto.ExecucioMassivaEstatDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaTipusDto;
 import es.caib.ripea.service.intf.dto.FileNameOption;
 import es.caib.ripea.service.intf.dto.FitxerDto;
+import es.caib.ripea.service.intf.dto.MetaDocumentDto;
+import es.caib.ripea.service.intf.dto.SignatureInfoDto;
 import es.caib.ripea.service.intf.exception.ArxiuJaGuardatException;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.exception.ValidationException;
@@ -63,6 +71,7 @@ public class ExecucioMassivaHelper {
 	@Autowired private RegistreAnnexRepository registreAnnexRepository;
 	@Autowired private ExpedientPeticioRepository expedientPeticioRepository;
 	@Autowired private ContingutRepository contingutRepository;
+	@Autowired private MetaDocumentRepository metaDocumentRepository;
 	
 	@Autowired private AlertaHelper alertaHelper;
 	@Autowired private MessageHelper messageHelper;
@@ -315,7 +324,7 @@ public class ExecucioMassivaHelper {
 	}
 	
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
- 	public String executarExecucioMassivaContingutNewTransaction(Long execucioMassivaContingutId) {
+ 	public String executarExecucioMassivaContingutNewTransaction(Long execucioMassivaContingutId, List<DocumentAmbTipusDto> documents) {
 		
 		Throwable exc = null;
 		String resultat = null;
@@ -360,7 +369,55 @@ public class ExecucioMassivaHelper {
 		         */
 		        emc.updateDataInici(new Date());
 		        
-				if (ExecucioMassivaTipusDto.PORTASIGNATURES.equals(tipus)){
+		        if (ExecucioMassivaTipusDto.IMPORTAR_DOCS.equals(tipus)){
+		        	if (documents!=null) {
+		        		for (DocumentAmbTipusDto docExp: documents) {
+		        			
+		        			//Content type ampliat
+		        			String contentTypeDoc = Utils.getFitxerContentType(docExp.getFitxer().getName(), docExp.getFitxer().getContentType());
+		        			
+		        			DocumentDto documentDto = new DocumentDto();
+		        			documentDto.setDocumentFirmaTipus(DocumentFirmaTipusEnumDto.SENSE_FIRMA);
+		        	        MetaDocumentDto metaNode = new MetaDocumentDto();
+		        	        metaNode.setId(docExp.getTipusDocument().getId());
+		        	        documentDto.setMetaNode(metaNode);
+		        	        documentDto.setPareId(emc.getElementId());
+		        	        MetaDocumentEntity metaDocumentEntity = metaDocumentRepository.findById(docExp.getTipusDocument().getId()).get();
+		        	        documentDto.setDocumentTipus(DocumentTipusEnumDto.DIGITAL);
+		        	        //El nom no es pot repetir dins l'expedient
+		        	        String nomDocument = metaDocumentEntity.getNom()+" "+emc.getElementId()+ " "+System.currentTimeMillis(); 
+		        	        documentDto.setNom(Utils.abbreviate(nomDocument, 1024));
+		        	        documentDto.setDescripcio("Document importat massivament desde el llistat de expedients. ("+emc.getExecucioMassiva().getId()+")");
+		        	        documentDto.setData(Calendar.getInstance().getTime());
+		        	        documentDto.setNtiOrigen(metaDocumentEntity.getNtiOrigen());
+		        	        documentDto.setNtiEstadoElaboracion(metaDocumentEntity.getNtiEstadoElaboracion());
+		        	        documentDto.setNtiIdDocumentoOrigen(null);
+		        	        documentDto.setFitxerNom(docExp.getFitxer().getName());
+		        	        documentDto.setFitxerContingut(docExp.getFitxer().getContent());
+		        	        documentDto.setFitxerContentType(contentTypeDoc);
+		        			
+		        			//1.- comprovar la firma del document com es faria desde el formulari de contingut
+		        			if (Boolean.parseBoolean(configHelper.getConfig(PropertyConfig.DETECCIO_FIRMA_AUTOMATICA))) {
+		                    	SignatureInfoDto signatureInfoDto = pluginHelper.detectaFirmaDocument(
+		                    			docExp.getFitxer().getContent(),
+		                    			contentTypeDoc);
+		                    	
+		                    	if (signatureInfoDto.isSigned()) {
+		                    		documentDto.setAmbFirma(true);
+		                    		documentDto.setDocumentFirmaTipus(DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA);
+		                    	}
+		        			}
+
+		        			//2.- Crear el document per l'expedient (multiplicitat)
+		        			documentHelper.crearDocument(
+		        					emc.getExecucioMassiva().getEntitat().getId(),
+		        					documentDto,
+		        					contingutRepository.findById(emc.getElementId()).get(),
+		        					false,
+		        					false);
+		        		}
+		        	}
+		        } else if (ExecucioMassivaTipusDto.PORTASIGNATURES.equals(tipus)){
 					exc = enviarPortafirmes(emc);
 				} else if (ExecucioMassivaTipusDto.CUSTODIAR_ELEMENTS_PENDENTS.equals(tipus)){
 					exc = custodiarElementsPendents(emc);

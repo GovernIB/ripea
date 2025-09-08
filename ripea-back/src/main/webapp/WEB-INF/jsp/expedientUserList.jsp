@@ -549,8 +549,8 @@ function removeCookie(cname) {
 		</div>
 		
 	</form:form>
+	
 	<div class="rmodal"></div>
-	<!-- TODO --> 
 	
 	<script id="botonsTemplate" type="text/x-jsrender">
 		<div class="text-right">
@@ -566,14 +566,18 @@ function removeCookie(cname) {
 						<li><a href="expedient/alliberar"><span class="fa fa-unlock"></span>&nbsp;&nbsp;<spring:message code="expedient.list.user.alliberar"/></a></li>
 						<li><a href="expedient/follow" data-toggle="ajax"><span class="fa fa-user-plus"></span>&nbsp;&nbsp;<spring:message code="expedient.list.user.follow"/></a></li>		
 						<li><a href="expedient/unfollow" data-toggle="ajax"><span class="fa fa-user-times"></span>&nbsp;&nbsp;<spring:message code="expedient.list.user.unfollow"/></a></li>
-						<%-- li><a href="expedient/canviPrioritats" data-toggle="modal"><span class="fa fa-signal fa-rotate-90"></span>&nbsp;&nbsp;<spring:message code="comu.boto.canviarPrioritat"/></a></li --%>
 						<li><a href="expedient/delete" data-confirm="<spring:message code="contingut.confirmacio.esborrar.node.multiple"/>"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="expedient.list.user.esborrar"/></a></li>
+                        <li role="separator" class="divider"></li>
 						<li><a href="expedient/export/ODS"><span class="fa fa-download"></span>&nbsp;&nbsp;<spring:message code="expedient.list.user.exportar.ODS"/></a></li>
 						<li><a href="expedient/export/CSV"><span class="fa fa-download"></span>&nbsp;&nbsp;<spring:message code="expedient.list.user.exportar.CSV"/></a></li>
 						<li><a class="fileDownload" href="expedient/generarIndex/ZIP"><span class="fa fa-download"></span>&nbsp;&nbsp;<spring:message code="expedient.list.user.recuperar.index.zip"/></a></li>
 						<li><a class="fileDownload" href="expedient/generarIndex/PDF"><span class="fa fa-download"></span>&nbsp;&nbsp;<spring:message code="expedient.list.user.recuperar.index.pdf"/></a></li>
 						<li><a class="fileDownload" href="expedient/exportarEni"><span class="fa fa-download"></span>&nbsp;&nbsp;<spring:message code="expedient.list.user.recuperar.exportacio.eni"/></a></li>
 						<li><a class="fileDownload" href="expedient/exportarZipMassiu" data-toggle="modal"><span class="fa fa-file-archive-o"></span>&nbsp;&nbsp;<spring:message code="expedient.list.user.recuperar.exportacio.mass"/></a></li>
+                        <%--
+                        <li role="separator" class="divider"></li>
+                        <li><a href="expedient/importarZipMassiu" data-toggle="modal"><span class="fa fa-files-o"></span>&nbsp;&nbsp;<spring:message code="expedient.list.user.recuperar.importar.mass"/></a></li>
+                        --%>
 					</ul>
 				</div>
 			</div>
