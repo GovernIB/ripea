@@ -21,8 +21,9 @@ import javax.persistence.*;
 public class AlertaEntity extends RipeaAuditable<Long> {
 
 	private static final int ERROR_MAX_LENGTH = 2048;
+	private static final int TEXT_MAX_LENGTH  = 256;
 
-	@Column(name = "text", length = 1024, nullable = false)
+	@Column(name = "text", length = TEXT_MAX_LENGTH, nullable = false)
 	private String text;
 	@Column(name = "error", length = ERROR_MAX_LENGTH)
 	private String error;
@@ -78,7 +79,7 @@ public class AlertaEntity extends RipeaAuditable<Long> {
 				boolean llegida,
 				ContingutEntity contingut) {
 			built = new AlertaEntity();
-			built.text = text;
+			built.text	= StringUtils.abbreviate(text , TEXT_MAX_LENGTH);
 			built.error = StringUtils.abbreviate(error, ERROR_MAX_LENGTH);
 			built.llegida = new Boolean(llegida);
 			built.contingut = contingut;

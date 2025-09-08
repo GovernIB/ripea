@@ -151,14 +151,8 @@ public class PortafibRestController {
 		return portafirmesCalbackDto;
 	}
   
-	private void throwCallBackException(
-			IntegracioAccioBuilderDto integracioAccio,
-			String errorDescripcio,
-			Exception ex){
-		log.error(
-				errorDescripcio + "(" +
-				integracioAccio.getParametres() + ")",
-				ex);
+	private void throwCallBackException(IntegracioAccioBuilderDto integracioAccio, String errorDescripcio, Exception ex){
+		log.error(errorDescripcio + "(" + integracioAccio.getParametres() + ")", ex);
 		
 		documentService.portafirmesCallbackIntegracioError(
 				integracioAccio.getDescripcio(),
@@ -166,9 +160,7 @@ public class PortafibRestController {
 				errorDescripcio,
 				ex);
 		
-		throw new RuntimeException(
-				"Excepcio al processar petició rebuda al callback rest de portafirmes",
-				ex);
+		throw new RuntimeException("Excepcio callback portafirmes RIPEA: "+ex.getMessage(), ex);
 	}
 	
 	private IntegracioAccioBuilderDto getIntegraccioAccio(PortafirmesCalbackDto portafirmesCalback) {
