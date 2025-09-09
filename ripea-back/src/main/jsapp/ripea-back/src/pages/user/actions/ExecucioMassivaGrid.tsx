@@ -63,7 +63,7 @@ const columns = [
         flex: 0.5,
         renderCell: (params: any) => {
             const row = params?.row;
-            const value = 100 - row?.pendents * 100 / row?.executades
+            const value = Math.round(100 - row?.pendents * 100 / row?.executades)
 
             return <>
                 <Chip label={row?.executades} size="small"/>
