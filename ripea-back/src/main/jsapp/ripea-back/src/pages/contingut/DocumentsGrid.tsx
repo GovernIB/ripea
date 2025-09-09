@@ -1,6 +1,6 @@
 import React, {useEffect, useMemo, useState} from "react";
 import { DndContext, useDraggable, useDroppable } from '@dnd-kit/core';
-import { FormControl, Grid, InputLabel, Select, MenuItem, Icon, Box } from "@mui/material";
+import { FormControl, Grid, InputLabel, Select, MenuItem, Icon, IconButton, Box } from "@mui/material";
 import {
     GridRow,
     GridSlots,
@@ -28,24 +28,67 @@ const View = {
     icona: 'GRID',
 }
 
+type DraggableContextType = {
+    draggableAttributes: any;
+    draggableListeners: any;
+    draggableSetActivatorNodeRef: (element: HTMLElement | null) => void;
+}
+const DraggableContext = React.createContext<DraggableContextType | undefined>(undefined);
+const useDraggableContext = () => {
+    const context = React.useContext(DraggableContext);
+    if (context === undefined) {
+        throw new Error('useDraggableContext must be used within an DraggableContext.Provider');
+    }
+    return context;
+}
 const DraggableGridRow: React.FC<any> = (props) => {
-    const { attributes, listeners, setNodeRef: draggableSetNodeRef, transform } = useDraggable({
+    const {
+        attributes: draggableAttributes,
+        listeners: draggableListeners,
+        transform: draggableTransform,
+        setNodeRef: draggableSetNodeRef,
+        setActivatorNodeRef: draggableSetActivatorNodeRef
+    } = useDraggable({
         id: 'draggable_' + props.row.id,
         data: props.row,
     });
-    const { isOver, setNodeRef: droppableSetNodeRef } = useDroppable({
+    const droppableProps = useDroppable({
         id: 'droppable_' + props.row.id,
         data: props.row,
     });
-    const draggableStyle = transform ? {
-        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+    const { isOver, setNodeRef: droppableSetNodeRef } = droppableProps;
+    const draggableStyle = draggableTransform ? {
+        transform: `translate3d(${draggableTransform.x}px, ${draggableTransform.y}px, 0)`,
     } : undefined;
     const droppableStyle = {
-        backgroundColor: isOver ? 'green' : undefined,
+        border: isOver && props.row.tipus === 'CARPETA' ? '2px solid grey' : undefined,
+        borderTop: isOver && props.row.tipus !== 'CARPETA' ? '2px solid grey' : undefined,
     };
     return <div ref={droppableSetNodeRef} style={droppableStyle}>
-        <GridRow {...props} ref={draggableSetNodeRef} style={draggableStyle} {...listeners} {...attributes} />
+        <DraggableContext.Provider
+            value={{
+                draggableAttributes,
+                draggableListeners,
+                draggableSetActivatorNodeRef
+            }}>
+            <GridRow
+                ref={draggableSetNodeRef}
+                style={draggableStyle}
+                {...props}>
+            </GridRow>
+        </DraggableContext.Provider>
     </div>;
+}
+const DraggableGridRowHandler: React.FC = () => {
+    const { draggableAttributes, draggableListeners, draggableSetActivatorNodeRef } = useDraggableContext();
+    return <IconButton
+        size="small"
+        ref={draggableSetActivatorNodeRef}
+        {...draggableAttributes}
+        {...draggableListeners}
+        sx={{ cursor: 'grab', mr: 1 }}>
+            <Icon sx={{ mr: 0 }}>swap_vert</Icon>
+    </IconButton>;
 }
 
 const ExpandButton = (props: { value: any, onChange: (value: any) => void, hidden: boolean }) => {
@@ -271,7 +314,7 @@ const DocumentsGrid = (props: any) => {
                                         return <MetaExpedient entity={row}/>;
                                     }
                                     return <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                        {vista == View.carpeta && <Icon sx={{ mr: 2 }}>drag_indicator</Icon>}
+                                        {vista == View.carpeta && <DraggableGridRowHandler />}
                                         <ContingutIcon entity={row} />
                                     </Box>
                                 }
