@@ -120,6 +120,7 @@ import es.caib.ripea.plugin.notificacio.EntregaPostalTipus;
 import es.caib.ripea.plugin.notificacio.Enviament;
 import es.caib.ripea.plugin.notificacio.EnviamentTipus;
 import es.caib.ripea.plugin.notificacio.Notificacio;
+import es.caib.ripea.plugin.notificacio.NotificacioEstat;
 import es.caib.ripea.plugin.notificacio.NotificacioPlugin;
 import es.caib.ripea.plugin.notificacio.Persona;
 import es.caib.ripea.plugin.notificacio.RespostaConsultaEstatEnviament;
@@ -4909,52 +4910,58 @@ public class PluginHelper {
 			
 				resposta = notificacioPlugin.consultarEnviament(documentEnviamentInteressatEntity.getEnviamentReferencia());
 	
-				documentEnviamentInteressatEntity.updateEnviamentEstat(
-						resposta.getEstat(),
-						resposta.getEstatData(),
-						resposta.getEstatOrigen(),
-						documentEnviamentInteressatEntity.getEnviamentCertificacioData(),
-						resposta.getCertificacioOrigen(),
-						resposta.isError(),
-						resposta.getErrorDescripcio());
-	
-				documentEnviamentInteressatEntity.updateEnviamentInfoRegistre(
-						resposta.getRegistreData(),
-						resposta.getRegistreNumero(),
-						resposta.getRegistreNumeroFormatat());
+				if (!resposta.isError()) {
 				
-				guardarCertificacio(documentEnviamentInteressatEntity, resposta);
+					documentEnviamentInteressatEntity.updateEnviamentEstat(
+							resposta.getEstat(),
+							resposta.getEstatData(),
+							resposta.getEstatOrigen(),
+							documentEnviamentInteressatEntity.getEnviamentCertificacioData(),
+							resposta.getCertificacioOrigen(),
+							resposta.isError(),
+							resposta.getErrorDescripcio());
+		
+					documentEnviamentInteressatEntity.updateEnviamentInfoRegistre(
+							resposta.getRegistreData(),
+							resposta.getRegistreNumero(),
+							resposta.getRegistreNumeroFormatat());
+					
+					guardarCertificacio(documentEnviamentInteressatEntity, resposta);
+				}
 			}
 
 			RespostaConsultaEstatNotificacio respostaNotificioEstat = notificacioPlugin.consultarNotificacio(
 					notificacio.getNotificacioIdentificador());
 			
-			notificacio.updateNotificacioEstat(
-					respostaNotificioEstat.getEstat(),
-					resposta!=null?resposta.getEstatData():Calendar.getInstance().getTime(),
-					respostaNotificioEstat.isError(),
-					respostaNotificioEstat.getErrorDescripcio(),
-					respostaNotificioEstat.getDataEnviada(),
-					respostaNotificioEstat.getDataFinalitzada());
-
-			DocumentNotificacioEstatEnumDto estatDespres = notificacio.getNotificacioEstat();
-			
-			if (estatAnterior != estatDespres &&
-				estatAnterior != DocumentNotificacioEstatEnumDto.FINALITZADA &&
-				estatDespres  != DocumentNotificacioEstatEnumDto.PROCESSADA) {
-					emailHelper.canviEstatNotificacio(notificacio, estatAnterior);
+			if (respostaNotificioEstat.isError()) {
+				
+				notificacio.updateNotificacioEstat(
+						respostaNotificioEstat.getEstat(),
+						resposta!=null?resposta.getEstatData():Calendar.getInstance().getTime(),
+						respostaNotificioEstat.isError(),
+						respostaNotificioEstat.getErrorDescripcio(),
+						respostaNotificioEstat.getDataEnviada(),
+						respostaNotificioEstat.getDataFinalitzada());
+	
+				DocumentNotificacioEstatEnumDto estatDespres = notificacio.getNotificacioEstat();
+				
+				if (estatAnterior != estatDespres &&
+					estatAnterior != DocumentNotificacioEstatEnumDto.FINALITZADA &&
+					estatDespres  != DocumentNotificacioEstatEnumDto.PROCESSADA) {
+						emailHelper.canviEstatNotificacio(notificacio, estatAnterior);
+				}
+				
+				cacheHelper.evictErrorsValidacioPerNode(expedient.getId());
+				cacheHelper.evictNotificacionsPendentsPerExpedient(expedient);
+	
+				integracioHelper.addAccioOk(
+						IntegracioHelper.INTCODI_NOTIFICACIO,
+						"Consulta d'estat d'una notificació electrònica",
+						notificacioPlugin.getEndpointURL(),
+						accioParams,
+						IntegracioAccioTipusEnumDto.RECEPCIO,
+						System.currentTimeMillis() - t0);
 			}
-
-			cacheHelper.evictErrorsValidacioPerNode(expedient.getId());
-			cacheHelper.evictNotificacionsPendentsPerExpedient(expedient);
-
-			integracioHelper.addAccioOk(
-					IntegracioHelper.INTCODI_NOTIFICACIO,
-					"Consulta d'estat d'una notificació electrònica",
-					notificacioPlugin.getEndpointURL(),
-					accioParams,
-					IntegracioAccioTipusEnumDto.RECEPCIO,
-					System.currentTimeMillis() - t0);
 
 			return resposta;
 
