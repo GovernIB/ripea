@@ -280,21 +280,25 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     	try {
     		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
     		DocumentEntity documentActual = documentRepository.findById(resource.getId()).get();
-    		DocumentResourceEntity documentResourceActual = documentResourceRepository.findById(resource.getId()).get();
-    		Long reorderPreviousParentId = reorderGetParentId(documentResourceActual);
-    		Long reorderResourceSequence = reorderGetResourceSequence(resource, documentResourceActual);
-    		DocumentDto documentCreat = documentHelper.updateDocument(
-    				entitatEntity.getId(),
-    				documentActual,
-					resource.toDocumentDto(),
-    				true);
-    		resource.setId(documentCreat.getId());
-			reorderIfReorderable(
-					documentResourceRepository.findById(resource.getId()).get(),
-					reorderResourceSequence,
-					reorderPreviousParentId,
-					true,
-					false);
+    		
+    		if (resource.isOrdrePatch()) {
+    			DocumentResourceEntity documentResourceActual = documentResourceRepository.findById(resource.getId()).get();
+    			Long reorderPreviousParentId = reorderGetParentId(documentResourceActual);
+    			Long reorderResourceSequence = reorderGetResourceSequence(resource, documentResourceActual);
+				reorderIfReorderable(
+						documentResourceRepository.findById(resource.getId()).get(),
+						reorderResourceSequence,
+						reorderPreviousParentId,
+						true,
+						false);
+    		} else {
+        		DocumentDto documentCreat = documentHelper.updateDocument(
+        				entitatEntity.getId(),
+        				documentActual,
+    					resource.toDocumentDto(),
+        				true);
+        		resource.setId(documentCreat.getId());
+    		}
     		return resource;
     	} catch (Exception ex) {
     		excepcioLogHelper.addExcepcio("/document/"+resource.getId()+"/update", ex);
