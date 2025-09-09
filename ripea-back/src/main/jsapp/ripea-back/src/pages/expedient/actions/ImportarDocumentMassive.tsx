@@ -76,14 +76,13 @@ const ImportarDocumentMassiveForm = (props:any) => {
             field: 'delete',
             headerName: "",
             flex: 0.25,
-            renderCell: (params:any) => <IconButton
+            renderCell: (params:any) => <ToolbarButton
+                icon={'remove'}
                 onClick={() => {
                     const newDocs = data?.documents?.filter((doc:any) => doc.id !== params.row.id) || []
                     apiRef?.current?.setFieldValue('documents', newDocs)
                 }}
-            >
-                <Icon>remove</Icon>
-            </IconButton>
+            />,
         }
     ]
 
