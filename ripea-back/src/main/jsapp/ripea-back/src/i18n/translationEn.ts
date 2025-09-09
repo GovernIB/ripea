@@ -509,8 +509,9 @@ const translationEn = {
                     ok: "Interested parties exported successfully",
                 },
                 impDocMass: {
-                    label: "Importar documentos a los expedientes seleccionados",
-                    title: "Importar documentos a expedientes"
+                    label: "Import documents into the selected cases",
+                    title: "Import documents into cases",
+                    warning: "The cases must belong to the same procedure",
                 },
             },
             alert: {

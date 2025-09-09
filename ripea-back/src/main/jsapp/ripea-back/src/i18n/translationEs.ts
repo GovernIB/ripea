@@ -552,7 +552,8 @@ const translationEs = {
                 },
                 impDocMass: {
                     label: "Importar documentos a los expedientes seleccionados",
-                    title: "Importar documentos a expedientes"
+                    title: "Importar documentos a expedientes",
+                    warning: "Los expedientes deben pertenecer al mismo procedimiento",
                 },
             },
             alert: {

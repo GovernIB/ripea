@@ -1,10 +1,9 @@
 import {FormField, MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
-import {Grid, Box, Icon, Alert} from "@mui/material";
+import {Grid, Box, Alert} from "@mui/material";
 import {useEffect, useRef, useState} from "react";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 import {DataGridPro, GridToolbarContainer} from "@mui/x-data-grid-pro";
-import IconButton from "@mui/material/IconButton";
 import {ToolbarButton} from "../../../components/StyledMuiGrid.tsx";
 
 const ImportarDocumentMassiveForm = (props:any) => {
@@ -19,7 +18,7 @@ const ImportarDocumentMassiveForm = (props:any) => {
     }, [data?.totsExpedientsMateixProcediment]);
 
     if (!data?.totsExpedientsMateixProcediment) {
-        return <Alert severity={"warning"}>Els expedients han de pertanyer al mateix procediment</Alert>
+        return <Alert severity={"warning"}>{t('page.expedient.action.impDocMass.warning')}</Alert>
     }
 
     const fieldFitxer = fields?.filter(i=>i.name=='file')[0];
@@ -38,7 +37,6 @@ const ImportarDocumentMassiveForm = (props:any) => {
             headerName: fieldFitxer.label,
             flex: 1,
             renderCell: (params:any) => {
-                console.log(">>>> params", params)
                 const value = data?.documents.find((d:any) => d.id === params.row.id)?.fitxer
                 return <Box mt={1.5}><FormField
                     name={'file' + (value ? `#${params?.row?.id}` : '')}
@@ -56,7 +54,6 @@ const ImportarDocumentMassiveForm = (props:any) => {
             flex: 1,
             renderCell: (params:any) => {
                 const value = data?.documents.find((d:any) => d.id === params.row.id)?.tipusDocument
-
                 return <Box mt={1.5}><FormField
                     name={'tipusDocument' + (value ? `#${params?.row?.id}` : '')}
                     field={fieldTipusDocument}
