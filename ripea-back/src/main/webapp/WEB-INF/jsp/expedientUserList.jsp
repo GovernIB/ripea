@@ -75,7 +75,7 @@ table.dataTable tr > td:nth-child(6) {
 
 var mostrarMeusExpedients = '${meusExpedients}' === 'true';
 var mostrarExpedientsFirmaPendent = '${firmaPendent}' === 'true';
-var columnaAgafatPer = 19;
+var columnaAgafatPer = 23;
 
 $(document).ready(function() {
 

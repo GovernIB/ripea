@@ -1302,7 +1302,11 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
             if (DocumentResource.EnviarPortafirmesFormAction.Fields.portafirmesEnviarFluxId.equals(fieldName)) {
                 EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), true, false, false, false, false);
-                List<PortafirmesFluxRespostaDto> fluxosDto = pluginHelper.portafirmesRecuperarPlantillesDisponibles(entitatEntity.getId(), null, true, false);
+                List<PortafirmesFluxRespostaDto> fluxosDto = pluginHelper.portafirmesRecuperarPlantillesDisponibles(
+                		entitatEntity.getId(),
+                		requestParameterMap.get("metaDocumentId")!=null && requestParameterMap.get("metaDocumentId").length>0 ? Long.parseLong(requestParameterMap.get("metaDocumentId")[0]) : null,
+                		true,
+                		false);
 
                 if (requestParameterMap.containsKey("additionalOption")){
                     Map<String, String> additionalOption = parseToMap(requestParameterMap.get("additionalOption")[0]);

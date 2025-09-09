@@ -121,10 +121,13 @@ const EnviarPortafirmesForm = () => {
             <GridFormField xs={12} name="annexos" multiple filter={filterAnnexos}/>
             <GridFormField xs={10} name="portafirmesEnviarFluxId"
                            componentProps={{title: t('page.document.detall.flux')}}
-                           requestParams={{additionalOption: {
-                               value: data?.fluxCreat?.fluxId,
-                               description: data?.fluxCreat?.nom +' - '+ data?.fluxCreat?.descripcio,
-                           }}}
+                           requestParams={{additionalOption: 
+                                {
+                                    value: data?.fluxCreat?.fluxId,
+                                    description: data?.fluxCreat?.nom +' - '+ data?.fluxCreat?.descripcio,
+                               },
+                               metaDocumentId: data?.metaDocument?.id,
+                            }}
                            autocomplete
                            required/>
 
