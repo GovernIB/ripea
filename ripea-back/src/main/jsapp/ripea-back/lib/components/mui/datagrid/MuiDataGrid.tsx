@@ -584,6 +584,30 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
     const stripedProps: any = striped ? {
         getRowClassName: (params: GridRowClassNameParams) => params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd'
     } : null;
+    const slotsProps: any = {
+        slots: {
+            ...otherProps?.slots,
+            row: otherProps?.slots?.row ?? DataGridRow as GridSlots['row'],
+            footer: otherProps?.slots?.footer ?? DataGridFooter as GridSlots['footer'],
+            noRowsOverlay: otherProps?.slots?.noRowsOverlay ?? DataGridNoRowsOverlay,
+        },
+        slotProps: {
+            ...otherProps?.slotProps,
+            row: otherProps?.slotProps?.row ?? { linkTo: rowLink, cursorPointer: onRowClick != null },
+            footer: otherProps?.slotProps?.footer ?? {
+                paginationActive,
+                selectionActive,
+                paginationModel,
+                pageInfo,
+                setRowSelectionModel,
+                pageSizeOptions: otherProps?.pageSizeOptions,
+            },
+            noRowsOverlay: otherProps?.slotProps?.noRowsOverlay ?? {
+                findDisabled,
+                noRowsText: paginationNoRowsText,
+            },
+        }
+    };
     const processedRows = [...additionalRows, ...rows];
     const content = <>
         {!toolbarHide && toolbar}
@@ -601,26 +625,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
             {...paginationProps}
             {...selectionProps}
             {...stripedProps}
-            slots={{
-                row: DataGridRow as GridSlots['row'],
-                footer: DataGridFooter as GridSlots['footer'],
-                noRowsOverlay: DataGridNoRowsOverlay,
-            }}
-            slotProps={{
-                row: { linkTo: rowLink, cursorPointer: onRowClick != null },
-                footer: {
-                    paginationActive,
-                    selectionActive,
-                    paginationModel,
-                    pageInfo,
-                    setRowSelectionModel,
-                    pageSizeOptions: otherProps?.pageSizeOptions,
-                },
-                noRowsOverlay: {
-                    findDisabled,
-                    noRowsText: paginationNoRowsText,
-                },
-            }}
+            {...slotsProps}
             semiBordered={semiBordered}
             autoHeight={autoHeight}
             sx={{

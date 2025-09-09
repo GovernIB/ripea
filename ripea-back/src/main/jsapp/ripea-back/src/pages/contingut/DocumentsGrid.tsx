@@ -1,6 +1,11 @@
 import React, {useEffect, useMemo, useState} from "react";
-import { FormControl, Grid, InputLabel, Select, MenuItem, Icon } from "@mui/material";
-import {GridTreeDataGroupingCell} from "@mui/x-data-grid-pro";
+import { DndContext, useDraggable, useDroppable } from '@dnd-kit/core';
+import { FormControl, Grid, InputLabel, Select, MenuItem, Icon, Box } from "@mui/material";
+import {
+    GridRow,
+    GridSlots,
+    GridTreeDataGroupingCell,
+} from "@mui/x-data-grid-pro";
 import { useMuiDataGridApiRef, useResourceApiService } from 'reactlib';
 import { useTranslation } from "react-i18next";
 import ContingutIcon from "./details/ContingutIcon.tsx";
@@ -21,6 +26,26 @@ const View = {
     tipus: 'TREETABLE_PER_TIPUS_DOCUMENT',
     carpeta: 'TREETABLE_PER_CARPETA',
     icona: 'GRID',
+}
+
+const DraggableGridRow: React.FC<any> = (props) => {
+    const { attributes, listeners, setNodeRef: draggableSetNodeRef, transform } = useDraggable({
+        id: 'draggable_' + props.row.id,
+        data: props.row,
+    });
+    const { isOver, setNodeRef: droppableSetNodeRef } = useDroppable({
+        id: 'droppable_' + props.row.id,
+        data: props.row,
+    });
+    const draggableStyle = transform ? {
+        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+    } : undefined;
+    const droppableStyle = {
+        backgroundColor: isOver ? 'green' : undefined,
+    };
+    return <div ref={droppableSetNodeRef} style={droppableStyle}>
+        <GridRow {...props} ref={draggableSetNodeRef} style={draggableStyle} {...listeners} {...attributes} />
+    </div>;
 }
 
 const ExpandButton = (props: { value: any, onChange: (value: any) => void, hidden: boolean }) => {
@@ -84,58 +109,66 @@ const columns = [
     {
         field: 'createdByFullName',
         flex: 0.45,
-    },
+    }
 ];
 
-export const useTreeView = (commonFilter:string) => {
+export const useExpedientsCarpetes = (commonFilter:string) => {
     const {
         isReady: apiExpedientIsReady,
         find: apiExpedientFindAll,
     } = useResourceApiService('expedientResource');
+    const {
+        isReady: apiCarpetaIsReady,
+        find: apiCarpetaFindAll,
+    } = useResourceApiService('carpetaResource');
     const [expedients, setExpedients] = useState<any[]>([]);
-
+    const [carpetes, setCarpetes] = useState<any[]>([]);
     const findExpedients = () => {
         apiExpedientFindAll({perspectives, unpaged: true, filter: commonFilter})
             .then((result)=> setExpedients(result.rows))
             .catch(()=> setExpedients([]))
     }
-    useEffect(() => {
-        if (apiExpedientIsReady) {findExpedients()}
-    }, [apiExpedientIsReady]);
-
-    const {
-        isReady: apiCarpetaIsReady,
-        find: apiCarpetaFindAll,
-    } = useResourceApiService('carpetaResource');
-    const [carpetes, setCarpetes] = useState<any[]>([]);
-
-    const findCarpetas = () => {
+    const findCarpetes = () => {
         apiCarpetaFindAll({perspectives, unpaged: true, filter: commonFilter})
             .then((result)=> setCarpetes(result.rows))
             .catch(()=> setCarpetes([]))
     }
-
     useEffect(() => {
-        if (apiCarpetaIsReady) {findCarpetas()}
+        if (apiExpedientIsReady) {
+            findExpedients();
+        }
+    }, [apiExpedientIsReady]);
+    useEffect(() => {
+        if (apiCarpetaIsReady) {
+            findCarpetes();
+        }
     }, [apiCarpetaIsReady]);
-
     const refresh = () => {
-        findExpedients()
-        findCarpetas()
+        findExpedients();
+        findCarpetes();
     }
-
     return {
+        isReady: apiExpedientIsReady && apiCarpetaIsReady,
         expedients,
         carpetes,
         refresh,
-        isReady: apiExpedientIsReady && apiCarpetaIsReady,
-    }
+
+    };
 }
 
 const DocumentsGrid = (props: any) => {
     const { entity, onRowCountChange } = props;
     const { t } = useTranslation();
-    const {value: user} = useUserSession();
+    const { value: user } = useUserSession();
+
+    const {
+        isReady: apiDocumentIsReady,
+        patch: apiDocumentPatch,
+    } = useResourceApiService('documentResource');
+    const {
+        isReady: apiCarpetaIsReady,
+        patch: apiCarpetaPatch,
+    } = useResourceApiService('carpetaResource');
 
     const commonFilter = useMemo(() => builder.and(
         builder.or(
@@ -151,8 +184,12 @@ const DocumentsGrid = (props: any) => {
     const [treeView, setTreeView] = useState<boolean>(true);
     const [expand, setExpand] = useState<boolean>(user?.conf?.expedientExpandit);
     const [vista, setVista] = useState<string>(getFolderExpand("vista") ?? user?.conf?.vistaActual);
-
-    const {carpetes, expedients, refresh: refreshTree, isReady} = useTreeView(commonFilter)
+    const {
+        isReady,
+        carpetes,
+        expedients,
+        refresh: refreshTree
+    } = useExpedientsCarpetes(commonFilter);
     const refresh = () => {
         if (vista == View.carpeta || vista == View.icona) {
             refreshTree()
@@ -167,6 +204,33 @@ const DocumentsGrid = (props: any) => {
         gridApiRef?.current?.showCreateDialog?.(null, { adjunt })
     }, [])
 
+    const handleDragEnd = (event: any) => {
+        //console.log('>>> handleDragEnd', event)
+        const sourceData = event.active.data.current;
+        const targetData = event.over.data.current;
+        console.log('>>> ', sourceData.nom, '(', sourceData.ordre, ')->', targetData.nom, '(', targetData.ordre, ')')
+        const patchData = {
+            ...(targetData.tipus === 'DOCUMENT' && { ordre: targetData.ordre }),
+            pare: { id: targetData.pare.id },
+            ordrePatch: true
+        };
+        if (sourceData.tipus === 'DOCUMENT') {
+            if (apiDocumentIsReady) {
+                apiDocumentPatch(sourceData.id, { data: patchData }).
+                then(() => gridApiRef.current.refresh());
+            } else {
+                console.error('Servei de l\'API pels documents no disponible')
+            }
+        } else if (sourceData.tipus === 'CARPETA') {
+            if (apiCarpetaIsReady) {
+                apiCarpetaPatch(sourceData.id, { data: patchData }).
+                then(() => gridApiRef.current.refresh());
+            } else {
+                console.error('Servei de l\'API per les carpetes no disponible')
+            }
+        }
+    }
+
     useEffect(() => {
         addFolderExpand("vista", vista)
     }, [vista]);
@@ -174,141 +238,147 @@ const DocumentsGrid = (props: any) => {
     return <>
         <Load value={entity && isReady}>
             <DropZone onDrop={onDrop} disabled={!entity?.potModificar}>
-                <StyledMuiGrid
-                    resourceName={"documentResource"}
-                    popupEditFormDialogResourceTitle={t('page.document.title')}
-                    columns={columns}
-                    paginationActive={false}
-                    filter={commonFilter}
-                    perspectives={perspectives}
-                    staticSortModel={sortModel}
-                    popupEditCreateActive
-                    popupEditFormContent={<DocumentsGridForm />}
-                    formAdditionalData={{
-                        expedient: { id: entity?.id },
-                        metaExpedient: entity?.metaExpedient,
-                    }}
-                    apiRef={gridApiRef}
-                    rowAdditionalActions={actions}
-                    onRowCountChange={onRowCountChange}
-                    onRefresh={refresh}
-                    popupEditFormDialogButtons={[
-                        {icon: 'save', text: t('common.create'), componentProps: { variant: 'contained' }, value: true },
-                        {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false }, 
-                    ]}
-                    groupingColDef={{
-                        headerName: t('page.contingut.grid.nom'),
-                        flex: 1.5,
-                        valueFormatter: (value: any, row: any) => {
-                            if (row?.id) {
-                                if (vista == View.tipus && row?.multiplicitat) {
-                                    return <MetaExpedient entity={row}/>;
-                                }
-                                return <ContingutIcon entity={row} />
-                            }
-                            return value;
-                        },
-                        renderCell: (params: any) => {
-                            return treeView
-                                ? <GridTreeDataGroupingCell {...params} />
-                                : params.formattedValue
-                        },
-                    }}
-                    treeData
-                    treeDataAdditionalRows={(_rows: any) => {
-                        const additionalRows: any[] = [];
-
-                        switch (vista) {
-                            case View.carpeta:
-                            case View.icona:
-                                for (const contingut of [...carpetes, ...expedients]) {
-                                    if (entity?.id!= contingut.id && !additionalRows.map((b) => b.id).includes(contingut.id)) {
-                                        additionalRows.push(contingut)
+                <DndContext onDragEnd={handleDragEnd}>
+                    <StyledMuiGrid
+                        resourceName={"documentResource"}
+                        popupEditFormDialogResourceTitle={t('page.document.title')}
+                        columns={columns}
+                        paginationActive={false}
+                        filter={commonFilter}
+                        perspectives={perspectives}
+                        staticSortModel={sortModel}
+                        //rowReordering
+                        popupEditCreateActive
+                        popupEditFormContent={<DocumentsGridForm />}
+                        formAdditionalData={{
+                            expedient: { id: entity?.id },
+                            metaExpedient: entity?.metaExpedient,
+                        }}
+                        apiRef={gridApiRef}
+                        rowAdditionalActions={actions}
+                        onRowCountChange={onRowCountChange}
+                        onRefresh={refresh}
+                        popupEditFormDialogButtons={[
+                            {icon: 'save', text: t('common.create'), componentProps: { variant: 'contained' }, value: true },
+                            {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false }, 
+                        ]}
+                        groupingColDef={{
+                            headerName: t('page.contingut.grid.nom'),
+                            flex: 1.5,
+                            valueFormatter: (value: any, row: any) => {
+                                if (row?.id) {
+                                    if (vista == View.tipus && row?.multiplicitat) {
+                                        return <MetaExpedient entity={row}/>;
                                     }
+                                    return <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                        {vista == View.carpeta && <Icon sx={{ mr: 2 }}>drag_indicator</Icon>}
+                                        <ContingutIcon entity={row} />
+                                    </Box>
                                 }
-                                setTreeView(additionalRows?.length > 0)
-                                break;
-                            case View.tipus:
-                                if (_rows!=null){
-                                    for (const row of _rows) {
-                                        if (!additionalRows.map((b) => b.id).includes(row?.metaNode?.id)) {
-                                            additionalRows.push(row?.metaDocumentInfo)
+                                return value;
+                            },
+                            renderCell: (params: any) => {
+                                return treeView
+                                    ? <>
+                                        <GridTreeDataGroupingCell {...params} />
+                                    </>
+                                    : params.formattedValue
+                            },
+                        }}
+                        slots={{
+                            row: DraggableGridRow as GridSlots['row'],
+                        }}
+                        treeData
+                        treeDataAdditionalRows={(_rows: any) => {
+                            const additionalRows: any[] = [];
+                            switch (vista) {
+                                case View.carpeta:
+                                case View.icona:
+                                    for (const contingut of [...carpetes, ...expedients]) {
+                                        if (entity?.id!= contingut.id && !additionalRows.map((b) => b.id).includes(contingut.id)) {
+                                            additionalRows.push(contingut)
                                         }
                                     }
-                                }
-                                setTreeView(true)
-                                break;
-                            case View.estat:
-                                setTreeView(true)
-                                break;
-                        }
-
-                        // console.log('>>> additionalRows', additionalRows)
-                        return additionalRows;
-                    }}
-                    getTreeDataPath={(row: any): string[] => {
-                        switch (vista) {
-                            case View.estat: return [`${row?.expedientEstatAdditional?.description}`, `${row.id}`];
-                            case View.tipus: return row?.metaNode ?[`${row?.metaNode?.id}`, `${row.id}`] :[`${row.id}`];
-                            default: return row?.treePath?.filter((id:any)=>id!=entity?.id) ?? [`${row.id}`];
-                        }
-                    }}
-
-                    rowExpansionChange={(params: any) => {
-                        addFolderExpand(params.id, params.childrenExpanded)
-                    }}
-                    isGroupExpandedByDefault={(params) => {
-                        const value = getFolderExpand(`${params?.id}`)
-                        if (value !== undefined) {
-                            return value
-                        }
-                        addFolderExpand(`${params?.id}`, expand)
-                        return expand
-                    }}
-                    toolbarElementsWithPositions={[
-                        {
-                            position: 0,
-                            element: <ExpandButton value={expand} onChange={(value) => {
-                                removeAll()
-                                addFolderExpand("vista", vista)
-                                setExpand(value)
-                            }} hidden={!treeView} />,
-                        },
-                        {
-                            position: 1,
-                            element: <TreeViewSelector value={vista} onChange={(value: any) => {
-                                setVista(value);
-                                refresh();
-                            }} />,
-                        },
-                        {
-                            position: 3,
-                            element: <MenuActionButton
-                                id={'createDocument'}
-                                hidden={!entity?.potModificar}
-                                buttonLabel={t('page.contingut.action.create.label')}
-                                buttonProps={{
-                                    startIcon: <Icon>add</Icon>,
-                                    variant: "outlined",
-                                    sx: { borderRadius: '4px', minWidth: '20px', minHeight: '32px', py: 0 }
-                                }}
-                                actions={createActions}
-                            />,
-                        }
-                    ]}
-
-                    toolbarMassiveActions={massiveActions}
-                    isRowSelectable={(data: any) => data?.row?.tipus == "DOCUMENT"}
-                    toolbarHideCreate
-                    popupEditFormComponentProps={{ initOnChangeRequest: true }}
-                    popupEditFormI18nKeys={{
-                        createSuccess: 'page.document.action.new.ok',
-                        updateSuccess: 'page.document.action.update.ok',
-                        deleteSuccess: 'page.document.action.delete.ok',
-                    }}
-                />
-                {components}
-                {massiveComponents}
+                                    setTreeView(additionalRows?.length > 0)
+                                    break;
+                                case View.tipus:
+                                    if (_rows!=null){
+                                        for (const row of _rows) {
+                                            if (!additionalRows.map((b) => b.id).includes(row?.metaNode?.id)) {
+                                                additionalRows.push(row?.metaDocumentInfo)
+                                            }
+                                        }
+                                    }
+                                    setTreeView(true)
+                                    break;
+                                case View.estat:
+                                    setTreeView(true)
+                                    break;
+                            }
+                            return additionalRows;
+                        }}
+                        getTreeDataPath={(row: any): string[] => {
+                            switch (vista) {
+                                case View.estat: return [`${row?.expedientEstatAdditional?.description}`, `${row.id}`];
+                                case View.tipus: return row?.metaNode ?[`${row?.metaNode?.id}`, `${row.id}`] :[`${row.id}`];
+                                default: return row?.treePath?.filter((id:any)=>id!=entity?.id) ?? [`${row.id}`];
+                            }
+                        }}
+                        rowExpansionChange={(params: any) => {
+                            addFolderExpand(params.id, params.childrenExpanded)
+                        }}
+                        isGroupExpandedByDefault={(params) => {
+                            const value = getFolderExpand(`${params?.id}`)
+                            if (value !== undefined) {
+                                return value
+                            }
+                            addFolderExpand(`${params?.id}`, expand)
+                            return expand
+                        }}
+                        toolbarElementsWithPositions={[
+                            {
+                                position: 0,
+                                element: <ExpandButton value={expand} onChange={(value) => {
+                                    removeAll()
+                                    addFolderExpand("vista", vista)
+                                    setExpand(value)
+                                }} hidden={!treeView} />,
+                            },
+                            {
+                                position: 1,
+                                element: <TreeViewSelector value={vista} onChange={(value: any) => {
+                                    setVista(value);
+                                    refresh();
+                                }} />,
+                            },
+                            {
+                                position: 3,
+                                element: <MenuActionButton
+                                    id={'createDocument'}
+                                    hidden={!entity?.potModificar}
+                                    buttonLabel={t('page.contingut.action.create.label')}
+                                    buttonProps={{
+                                        startIcon: <Icon>add</Icon>,
+                                        variant: "outlined",
+                                        sx: { borderRadius: '4px', minWidth: '20px', minHeight: '32px', py: 0 }
+                                    }}
+                                    actions={createActions}
+                                />,
+                            }
+                        ]}
+                        toolbarMassiveActions={massiveActions}
+                        isRowSelectable={(data: any) => data?.row?.tipus == "DOCUMENT"}
+                        toolbarHideCreate
+                        popupEditFormComponentProps={{ initOnChangeRequest: true }}
+                        popupEditFormI18nKeys={{
+                            createSuccess: 'page.document.action.new.ok',
+                            updateSuccess: 'page.document.action.update.ok',
+                            deleteSuccess: 'page.document.action.delete.ok',
+                        }}
+                    />
+                    {components}
+                    {massiveComponents}
+                </DndContext>
             </DropZone>
         </Load>
     </>

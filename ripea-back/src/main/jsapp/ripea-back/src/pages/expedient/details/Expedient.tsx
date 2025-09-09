@@ -209,6 +209,7 @@ const Expedient = () => {
             label: t('page.contingut.tabs.contingut'),
             content: <DocumentsGrid entity={expedient} onRowCountChange={setNumContingut}/>,
             badge: numContingut ?? expedient?.numContingut,
+            showZero: true,
         },
         {
             value: "dades",
@@ -216,12 +217,14 @@ const Expedient = () => {
             content: <MetaDadaGrid entity={expedient} onRowCountChange={setNumDades}/>,
             badge: numDades ?? expedient?.numDades,
             hidden: !expedient?.numMetaDades,
+            showZero: true,
         },
         {
             value: "interessats",
             label: t('page.contingut.tabs.interessats'),
             content: <InteressatsGrid entity={expedient} num={numInteressats ?? expedient?.numInteressats} onRowCountChange={setNumInteressats}/>,
             badge: numInteressats ?? expedient?.numInteressats,
+            showZero: true,
         },
         {
             value: "remeses",
@@ -229,6 +232,7 @@ const Expedient = () => {
             content: <RemesaGrid id={id} onRowCountChange={setNumRemeses}/>,
             badge: numRemeses ?? expedient?.numRemeses,
             hidden: !expedient?.numRemeses,
+            showZero: true,
         },
         {
             value: "publicacions",
@@ -236,6 +240,7 @@ const Expedient = () => {
             content: <PublicacioGrid id={id} onRowCountChange={setNumPublicacions}/>,
             badge: numPublicacions ?? expedient?.numPublicacions,
             hidden: !expedient?.numPublicacions,
+            showZero: true,
         },
         {
             value: "anotacions",
@@ -243,12 +248,14 @@ const Expedient = () => {
             content: <AnotacionsExpedientGrid id={id} onRowCountChange={setNumAnotacions}/>,
             badge: numAnotacions ?? expedient?.numAnotacions,
             hidden: !expedient?.numAnotacions,
+            showZero: true,
         },
         {
             value: "tasques",
             label: t('page.contingut.tabs.tasques'),
             content: <TasquesExpedientGrid entity={expedient} onRowCountChange={setNumTasques}/>,
             badge: numTasques ?? expedient?.numTasques,
+            showZero: true,
         },
     ]
 
@@ -286,9 +293,6 @@ const Expedient = () => {
                             <ExpedientAlert entity={expedient} />
                             <Box>
                                 <TabComponent
-                                    indicatorColor={"primary"}
-                                    textColor={"primary"}
-                                    aria-label="scrollable force tabs"
                                     tabs={tabs}
                                     variant="scrollable"
                                     headerAdditionalData={<CommentDialog

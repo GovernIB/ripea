@@ -18,6 +18,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import es.caib.ripea.persistence.base.entity.ReorderableEntity;
 import org.hibernate.annotations.Where;
 
 import es.caib.ripea.service.intf.config.BaseConfig;
@@ -38,7 +39,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class DocumentResourceEntity extends NodeResourceEntity<DocumentResource> {
+public class DocumentResourceEntity extends NodeResourceEntity<DocumentResource> implements ReorderableEntity<Long> {
 
 	@Column(name = "tipus", nullable = false)
 	private DocumentTipusEnumDto documentTipus;
@@ -169,4 +170,18 @@ public class DocumentResourceEntity extends NodeResourceEntity<DocumentResource>
 			this.validacioFirmaCorrecte = true;
 		}
 	}
+
+	@Override
+	public Long getOrder() {
+		return (long)ordre;
+	}
+	@Override
+	public void setOrder(Long order) {
+		ordre = order != null ? order.intValue() : 0;
+	}
+	@Override
+	public Long getOrderParentId() {
+		return pare != null ? pare.getId() : null;
+	}
+
 }

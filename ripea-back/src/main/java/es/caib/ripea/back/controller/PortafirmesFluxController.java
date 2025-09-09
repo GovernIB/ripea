@@ -117,6 +117,14 @@ public class PortafirmesFluxController extends BaseUserOAdminOOrganController {
 		portafirmesFluxService.tancarTransaccio(idTransaccio);
 	}
 
+	@RequestMapping(value = "/portafirmes/tancarTransaccio/{idTransaccio}", method = RequestMethod.POST)
+	public void tancarTransaccioPost(
+			HttpServletRequest request,
+			@PathVariable String idTransaccio,
+			Model model) {
+		portafirmesFluxService.tancarTransaccio(idTransaccio);
+	}
+	
 	@RequestMapping(value = "/event/portafirmes/flux/{dades}/{transactionId}",  produces="text/plain")
 	@ResponseBody
 	public ResponseEntity<String> transaccioEstat(

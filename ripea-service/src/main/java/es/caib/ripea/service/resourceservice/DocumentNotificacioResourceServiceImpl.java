@@ -27,6 +27,7 @@ import es.caib.ripea.service.intf.base.model.ReportFileType;
 import es.caib.ripea.service.intf.dto.DocumentNotificacioTipusEnumDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.model.DocumentNotificacioResource;
+import es.caib.ripea.service.intf.model.DocumentResource;
 import es.caib.ripea.service.intf.model.DocumentNotificacioResource.MassiveAction;
 import es.caib.ripea.service.intf.resourceservice.DocumentNotificacioResourceService;
 import lombok.RequiredArgsConstructor;
@@ -92,13 +93,13 @@ public class DocumentNotificacioResourceServiceImpl extends BaseMutableResourceS
             	if (document!=null) {
             		documentNotificacioHelper.actualitzarEstat(entity.getId());
             	} else {
-            		throw new ActionExecutionException(getResourceClass(), entity.getId(), code, "documentNotificacio.actualitzarEstat.reject.credential");
+            		throw new ActionExecutionException(getResourceClass(), entity.getId(), code, messageHelper.getMessage("documentNotificacio.actualitzarEstat.reject.credential"));
             	}
-            	return null;
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/notificacio/"+entity.getId()+"/DocumentNotificacioResource", e);
-				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, "documentNotificacio.actualitzarEstat.reject");
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, messageHelper.getMessage("documentNotificacio.actualitzarEstat.reject"));
             }
+            return objectMappingHelper.newInstanceMap(entity, DocumentNotificacioResource.class);
         }
 
         @Override

@@ -398,7 +398,22 @@
 				url: "<c:url value="/modal/document/portafirmes/iniciarTransaccio"/>",
 				success: function(transaccioResponse, textStatus, XmlHttpRequest) {
 					if (transaccioResponse != null && !transaccioResponse.error) {
-						localStorage.setItem('tmpTransaccioId', transaccioResponse.idTransaccio);
+						String idTransaccio = transaccioResponse.idTransaccio;
+						if (idTransaccio) {
+							// Tancar transacció en tancar navegador
+							window.addEventListener('beforeunload', function () {
+								event.preventDefault();
+								event.returnValue = '';
+								
+							    const url = "<c:url value='/document/portafirmes/tancarTransaccio/" + idTransaccio + "'/>";
+							    const data = JSON.stringify({ idTransaccio: idTransaccio });
+							    
+							    navigator.sendBeacon(url, data);
+							    
+							    localStorage.removeItem('tmpTransaccioId');
+							});
+						}
+						localStorage.setItem('tmpTransaccioId', idTransaccio);
 						$('.content').addClass("hidden");
 						var fluxIframe = '<div class="iframe_container">' +
 								'<iframe onload="removeLoading()" id="fluxIframe" class="iframe_content" width="100%" height="100%" frameborder="0" allowtransparency="true" src="' + transaccioResponse.urlRedireccio + '"></iframe>' +

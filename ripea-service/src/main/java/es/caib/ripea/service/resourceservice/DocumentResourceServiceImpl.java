@@ -280,12 +280,25 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     	try {
     		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
     		DocumentEntity documentActual = documentRepository.findById(resource.getId()).get();
-    		DocumentDto documentCreat = documentHelper.updateDocument(
-    				entitatEntity.getId(),
-    				documentActual,
-                    resource.toDocumentDto(),
-    				true);
-    		resource.setId(documentCreat.getId());
+    		
+    		if (resource.isOrdrePatch()) {
+    			DocumentResourceEntity documentResourceActual = documentResourceRepository.findById(resource.getId()).get();
+    			Long reorderPreviousParentId = reorderGetParentId(documentResourceActual);
+    			Long reorderResourceSequence = reorderGetResourceSequence(resource, documentResourceActual);
+				reorderIfReorderable(
+						documentResourceRepository.findById(resource.getId()).get(),
+						reorderResourceSequence,
+						reorderPreviousParentId,
+						true,
+						false);
+    		} else {
+        		DocumentDto documentCreat = documentHelper.updateDocument(
+        				entitatEntity.getId(),
+        				documentActual,
+    					resource.toDocumentDto(),
+        				true);
+        		resource.setId(documentCreat.getId());
+    		}
     		return resource;
     	} catch (Exception ex) {
     		excepcioLogHelper.addExcepcio("/document/"+resource.getId()+"/update", ex);
@@ -339,6 +352,11 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     		resource.setLastModifiedByFullName(usuariResourceEntity.getNom() + " (" + usuariResourceEntity.getCodi() + ")");
     	}
     }
+
+	@Override
+	protected List<DocumentResourceEntity> reorderFindLinesWithParent(Serializable parentId) {
+		return documentResourceRepository.findAllByPareId((Long)parentId);
+	}
 
     private class PathPerspectiveApplicator implements PerspectiveApplicator<DocumentResourceEntity, DocumentResource> {
         @Override
@@ -1437,7 +1455,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     				String urlReturnToRipea = configHelper.getConfig(PropertyConfig.BASE_URL) + "/modal/document/event/portafirmes/flux/"+paramSecure+"/";
     				PortafirmesIniciFluxRespostaDto transaccioResponse = pluginHelper.portafirmesIniciarFluxDeFirma(false, urlReturnToRipea);
     				target.setUrlInicioFlujoFirma(transaccioResponse.getUrlRedireccio());
-        		}
+    				target.setIdTransaccio(transaccioResponse.getIdTransaccio());
+    			}
         		
         	} else { //És un camp concret el que s'ha canviat
         		if (DocumentResource.EnviarPortafirmesFormAction.Fields.portafirmesEnviarFluxId.equals(fieldName)) {

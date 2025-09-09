@@ -7,12 +7,14 @@ import java.util.List;
 import java.util.Set;
 
 import javax.mail.MessagingException;
+import javax.mail.SendFailedException;
 import javax.mail.internet.MimeMessage;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.mail.MailSendException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -1233,7 +1235,7 @@ public class EmailHelper {
                     }
                 }
                 mailSender.send(message);
-            } catch (MessagingException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
 		}

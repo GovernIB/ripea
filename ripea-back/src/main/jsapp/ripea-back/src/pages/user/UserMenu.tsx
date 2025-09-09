@@ -120,7 +120,7 @@ export const UserMenu = () => {
 
         {(isRolActualSupAdmin || isRolActualAdmin || isRolActualOrganAdmin) &&
             <MenuItem onClick={()=>{
-                const url = 'https://github.com/GovernIB/ripea/raw/ripea-1.0/doc/pdf/02_ripea_manual_administradors.pdf';
+                const url = 'https://github.com/GovernIB/ripea/raw/ripea-1.0-dev/doc/pdf/02_ripea_manual_administradors.pdf';
                 iniciaDescarga(url, '02_ripea_manual_administradors.pdf')
             }}>
                 <ListItemIcon><Icon fontSize={"small"}>download</Icon></ListItemIcon>
@@ -128,7 +128,7 @@ export const UserMenu = () => {
             </MenuItem>}
 
         <MenuItem onClick={()=>{
-            const url = 'https://github.com/GovernIB/ripea/raw/ripea-1.0/doc/pdf/01_ripea_manual_usuari.pdf';
+            const url = 'https://github.com/GovernIB/ripea/raw/ripea-1.0-dev/doc/pdf/01_ripea_manual_usuari.pdf';
             iniciaDescarga(url, '01_ripea_manual_usuari.pdf')
         }}>
             <ListItemIcon><Icon fontSize={"small"}>download</Icon></ListItemIcon>

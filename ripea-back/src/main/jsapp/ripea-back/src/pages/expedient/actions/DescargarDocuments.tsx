@@ -8,7 +8,7 @@ import {useTranslation} from "react-i18next";
 import {GridTreeDataGroupingCell} from "@mui/x-data-grid-pro";
 import {iniciaDescargaBlob} from "../details/CommonActions.tsx";
 import Load from "../../../components/Load.tsx";
-import {useTreeView} from "../../contingut/DocumentsGrid.tsx";
+import {useExpedientsCarpetes} from "../../contingut/DocumentsGrid.tsx";
 
 const sortModel:any = [{field: 'id', sort: 'desc'}]
 const perspectives = ["PATH"]
@@ -49,7 +49,7 @@ const DescargarDocumentsForm = () => {
         builder.eq('esborrat', 0),
     )
 
-    const {carpetes, expedients, refresh, isReady} = useTreeView(commonFilter)
+    const {isReady, carpetes, expedients, refresh} = useExpedientsCarpetes(commonFilter)
 
     return <Load value={apiRef && isReady}>
         <StyledMuiGrid

@@ -223,7 +223,7 @@
         <th data-col-name="id" data-visible="false"></th>
         <th data-col-name="expedient" data-visible="false"></th>
         <th data-col-name="expedientEstat" data-visible="false"></th>
-        <th data-col-name="metaExpedient.nom" data-orderable="true" width="15%"><spring:message code="accio.massiva.list.column.metaexpedient"/></th>
+        <th data-col-name="metaExpedient.nom" data-orderable="true" width="25%"><spring:message code="accio.massiva.list.column.metaexpedient"/></th>
         <th data-col-name="nom" data-ordenable="true"><spring:message code="accio.massiva.list.column.nom"/></th>
         <th data-col-name="estat" data-template="#cellEstatTemplate" width="11%">
             <spring:message code="expedient.list.user.columna.estat"/>
@@ -271,8 +271,8 @@
                 </span>
             </script>
         </th>
-        <th data-col-name="createdDate" data-ordenable="true" data-converter="datetime" width="15%"><spring:message code="accio.massiva.list.column.datacreacio"/></th>
-        <th data-col-name="createdBy.codiAndNom" data-ordenable="true" width="15%"><spring:message code="accio.massiva.list.column.creatper"/></th>
+        <th data-col-name="createdDate" data-ordenable="true" data-converter="datetime" width="10%"><spring:message code="accio.massiva.list.column.datacreacio"/></th>
+        <th data-col-name="createdBy.codiAndNom" data-ordenable="true" width="20%"><spring:message code="accio.massiva.list.column.creatper"/></th>
     </tr>
     </thead>
 </table>

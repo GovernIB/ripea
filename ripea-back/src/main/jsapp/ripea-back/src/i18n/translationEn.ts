@@ -1,18 +1,24 @@
 const translationEn = {
     common: {
         close: "Close",
-        copy: "Copy",
+        cancel: "Cancel",
         create: "Create",
+        copy: "Copy",
         update: "Update",
+        actualize: "Actualiza",
+        save: "Save",
         delete: "Delete",
-        action: "Action",
+        accepta: "Accept",
+        rebutja: "Reject",
+        action: "Actions",
         expand: "Expand",
-        contract: "Contract",
+        contract: "Collapse",
         download: "Download",
-        detail: "Detail",
+        send: "Send",
+        detail: "Details",
         refresh: "Refresh",
         clear: "Clear",
-        search: "Search",
+        search: "Filter",
         options: "Options",
         select: {
             all: "Select all",
@@ -22,6 +28,8 @@ const translationEn = {
         export: "Export",
         consult: "Consult",
         filter: "Filter",
+        downloadSelected: "Download selected content",
+        relateSelected: "Relate selected content",
     },
     enum: {
         rol: {
@@ -37,14 +45,27 @@ const translationEn = {
             false: "No",
         },
         prioritat: {
-            D_MOLT_ALTA: "Very High",
+            D_MOLT_ALTA: "Very high",
             C_ALTA: "High",
             B_NORMAL: "Normal",
             A_BAIXA: "Low",
+            BAIXA: "Low",
+            NORMAL: "Normal",
+            ALTA: "High",
+        },
+        fluxTipus: {
+            SIMPLE: "Simple",
+            PORTAFIB: "Portafib",
         },
         estat: {
             TANCAT: "Closed",
             OBERT: "Open",
+            ENVIAT: "Sent",
+            PAUSAT: "Paused",
+            INICIAT: "Started",
+            FIRMAT: "Signed",
+            REBUTJAT: "Rejected",
+            PARCIAL: "Partial",
         },
         origen: {
             O0: "Citizen",
@@ -54,15 +75,15 @@ const translationEn = {
             EE01: "Original",
             EE02: "Authentic electronic copy with format change",
             EE03: "Authentic electronic copy of paper document",
-            EE04: "Partial authentic electronic copy",
+            EE04: "Authentic partial electronic copy",
             EE99: "Others",
         },
         tipoFirma: {
             TF01: "CSV",
-            TF02: "Internally detached XAdES signature",
-            TF03: "Enveloped XAdES signature",
-            TF04: "Detached/explicit CAdES signature",
-            TF05: "Attached/implicit CAdES signature",
+            TF02: "XAdES signature internally detached",
+            TF03: "XAdES signature enveloped",
+            TF04: "CAdES signature detached/explicit",
+            TF05: "CAdES signature attached/implicit",
             TF06: "PAdES",
             TF07: "SMIME",
             TF08: "ODT",
@@ -71,7 +92,7 @@ const translationEn = {
         tipusDestinatari: {
             TABLET: "Tablet",
             EMAIL: "Email",
-        }        
+        }
     },
     navigate: {
         expedient: "Case search",
@@ -162,6 +183,14 @@ const translationEn = {
                 importarExpedient: {
                     label: "Import related case file...",
                     title: "Related case files",
+                },
+                seguimentPortafirmes: {
+                    label: "Portafirmes tracking",
+                    title: "Portafirmes tracking",
+                },
+                seguimentvf: {
+                    label: "Viafirma tracking",
+                    title: "Signature details",
                 },
             },
             history: {
@@ -384,8 +413,9 @@ const translationEn = {
             },
             action: {
                 new: {
-                    label: "New case file",
-                    ok: "The case file '{{data.nom}}' was created successfully.",
+                    label: "New file",
+                    title: "Create new file",
+                    ok: "The file '{{data.nom}}' has been created successfully.",
                 },
                 update: {
                     label: "Edit...",
@@ -470,6 +500,10 @@ const translationEn = {
                 exportINSIDE: {
                     label: "INSIDE export",
                     ok: "INSIDE document downloaded successfully",
+                },
+                exportDocs: {
+                    label: "Export selected files' documents",
+                    ok: "The documents have been exported successfully",
                 },
                 export: {
                     label: "Export documents...",
@@ -600,6 +634,7 @@ const translationEn = {
                 fitxerContentType: "Content type",
                 metaDocument: "Document type",
                 createdDate: "Creation date",
+                createdBy: "Created by",
                 estat: "Status",
                 dataCaptura: "Capture date",
                 origen: "Origin",
@@ -608,8 +643,8 @@ const translationEn = {
                 csv: "CSV",
                 csvRegulacion: "CSV regulation",
                 tipoFirma: "Signature type",
-                flux: "There is a predefined signature flow. Creating a new flow will overwrite the selected one.",
-                summarize: "Generate title and description with artificial intelligence.\n(Requires having previously attached a document)",
+                flux: "A predefined signature flow exists. Creating a new flow will overwrite the selected one.",
+                summarize: "Generate title and description using artificial intelligence.\n(Requires a document to be attached first)",
                 documentOrigenFormat: "Format: ES_<Organ>_<YYYY>_<Specific_ID>",
                 dataBasic: "Basic data",
                 dataInteressat: "Interested party data",
@@ -628,6 +663,9 @@ const translationEn = {
                     ok: "The document {{data.nom}} has been updated successfully"
                 },
                 delete: {
+                    label: "Delete...",
+                    check: "Are you sure you want to continue with this action?",
+                    description: "Once deleted it cannot be recovered",
                     ok: "The document {{data.nom}} has been deleted successfully"
                 },
                 pinbal: {
@@ -651,9 +689,13 @@ const translationEn = {
                     label: "Download original",
                     ok: "Original document downloaded successfully",
                 },
+                download: {
+                    ok: "Document downloaded successfully",
+                },
                 firma: {
+                    button: "Start signing process",
                     label: "Download signature",
-                    title: "Sign from browser",
+                    title: "Sign from the browser",
                     ok: "Document signed successfully",
                 },
                 view: {
@@ -665,20 +707,23 @@ const translationEn = {
                     ok: "CSV link copied successfully",
                 },
                 portafirmes: {
-                    label: "Send to portafirmas...",
-                    title: "Send document to portafirmas",
-                    ok: "Document '{{document}}' sent to portafirmas",
+                    button: "Send to Portafirmes",
+                    label: "Send to Portafirmes...",
+                    title: "Send document to Portafirmes",
+                    ok: "Document '{{document}}' sent to Portafirmes",
                 },
                 toPDF: {
                     description: "Document format will be changed before sending to portafirmas",
                     title: "View PDF version",
                 },
                 firmar: {
-                    label: "Sign from browser...",
+                    button: "Start signing process",
+                    label: "Browser signature...",
                 },
                 viaFirma: {
+                    button: "Send to viaFirma",
                     label: "Send viaFirma...",
-                    title: "Send document to ViaFirma",
+                    title: "Send document to viaFirma",
                     ok: "Document '{{document}}' sent to viaFirma",
                 },
                 mail: {
@@ -687,11 +732,16 @@ const translationEn = {
                     ok: "Document '{{document}}' sent via email",
                 },
                 seguiment: {
-                    label: "Portafirmas tracking",
+                    label: "Portafirmes tracking",
+                    cancel: "Cancel sending",
                     title: "Signature details",
                     ok: "The signature has been cancelled successfully",
                 },
+                cancel: {
+                    label: "Cancel sending",
+                },
                 notificar: {
+                    button: "Notify",
                     label: "Notify or communicate...",
                     title: "Create document notification",
                     ok: "Notification created successfully",
@@ -768,11 +818,17 @@ const translationEn = {
         },
         dada: {
             title: "value for data '{{metaDada}}'",
+            noRowsText: "There are no values for this data",
             grid: {
                 valor: "Data value",
             },
+            mensajeToolbar: {
+                permis: "You do not have permission to manage the values of this data.",
+                maxDades: "This type of data only allows a single value.",
+            },
             action: {
                 new: {
+                    label: "Add value for data",
                     ok: "The data {{data.valor}} has been created successfully",
                 },
                 update: {
@@ -934,6 +990,42 @@ const translationEn = {
                 delete: {
                     ok: "The publication {{data.assumpte}} has been successfully deleted",
                 }
+            },
+        },
+        documentPortafirmes: {
+            detall: {
+                assumpte: "Subject",
+                enviatData: "Sent date",
+                estat: "Status",
+                prioritat: "Priority",
+                documentTipusNom: "Document type",
+                fluxTipus: "Flow type",
+                portafirmesId: "Portafirmes ID",
+            },
+        },
+        documentVia: {
+            detall: {
+                document: "Document",
+                titol: "Notification title",
+                descripcio: "Notification description",
+                enviatData: "Sent date",
+                estat: "Status",
+                tipusDestinatari: "Recipient type",
+                codiUsuari: "viaFirma user",
+                signantEmail: "Recipient email",
+                messageCode: "viaFirma message code",
+                intentData: "Last attempt date",
+                intentNum: "Number of retries",
+            },
+            tabs: {
+                dades: "Data",
+                errors: "Errors",
+            },
+            alert: {
+                reintentar: "Retry sending",
+                enviament: "Errors occurred while sending the document to viaFirma",
+                processament: "Errors occurred while processing the document signature",
+                cancelat: "The signature has been canceled",
             },
         },
         user: {

@@ -11,7 +11,8 @@ type CommonProps = {
     apiRef?: MutableRefObject<any>,
     formDialogResultProcessor?: (result?: any) => React.ReactElement,
     onSuccess?: (result?: any) => void,
-    onError?: (error?: any) => void
+    onError?: (error?: any) => void,
+    onClose?: (error?: any) => void
 }
 type FormActionDialogProp = CommonProps & {
     action: string,
@@ -37,7 +38,8 @@ const FormActionDialog = (props:FormActionDialogProp) => {
         onSuccess = () => temporalMessageShow(null, '', 'success'),
         onError = (error:any) => {
             error?.message && temporalMessageShow(null, error?.description, 'error');
-        }
+        },
+        onClose
     } = props;
     const {
         initialized,
@@ -59,6 +61,7 @@ const FormActionDialog = (props:FormActionDialogProp) => {
         formDialogResultProcessor,
         onSuccess,
         onError,
+        onClose,
         (reason?: string) => reason !== 'backdropClick'
     )
 

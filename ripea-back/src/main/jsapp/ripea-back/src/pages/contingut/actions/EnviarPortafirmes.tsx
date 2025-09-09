@@ -1,4 +1,4 @@
-import {useRef, useState} from "react";
+import {useRef, useState, forwardRef, useImperativeHandle } from "react";
 import {Alert, Grid, Icon} from "@mui/material";
 import {MuiDialog, MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
 import {useTranslation} from "react-i18next";
@@ -11,6 +11,7 @@ import * as builder from '../../../util/springFilterUtils.ts';
 import IconButton from "@mui/material/IconButton";
 import Load from "../../../components/Load.tsx";
 import {useToProgramaAntic} from "../../user/UserHeadToolbar.tsx";
+import { useEffect } from "react";
 
 const useConverdedToPDF = () => {
     const { t } = useTranslation();
@@ -62,14 +63,42 @@ const useConverdedToPDF = () => {
     }
 }
 
-const EnviarPortafirmesForm = () => {
+// Funció genèrica per tancar transacció
+const tancarTransaccio = (getUrl: (path: string) => string, idTransaccio?: string) => {
+    if (!idTransaccio) return;
+    
+    const url = getUrl(`document/portafirmes/tancarTransaccio/${idTransaccio}`);
+
+    if (navigator.sendBeacon) {
+        navigator.sendBeacon(url);
+    } else {
+        fetch(url, { method: "GET", keepalive: true });
+    }
+};
+
+
+// Hook per tancar la transacció en tancar finestra/navegador utilitzant l'event beforeunload
+const useCerrarTransaccioOnUnload = (getUrl: (path: string) => string, idTransaccio?: string, openNewFlux?: boolean) => {
+    useEffect(() => {
+        if (!idTransaccio || !openNewFlux) return;
+        
+        const handleBeforeUnload = () => {
+            tancarTransaccio(getUrl, idTransaccio);
+        };
+
+        window.addEventListener("beforeunload", handleBeforeUnload);
+        return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+    }, [idTransaccio, openNewFlux]);
+};
+
+const EnviarPortafirmesForm = forwardRef((props, ref) => {
     const { t } = useTranslation();
     const {data, apiRef} = useFormContext();
     const { onChange } = useFluxCreateSession();
     const { value: user } = useUserSession()
     const [open, setOpen] = useState<boolean>(!!data?.portafirmesEnviarFluxId);
     const [openNewFlux, setOpenNewFlux] = useState<boolean>(false);
-
+	const { getUrl } = useToProgramaAntic();
     const {handleOpen, dialog} = useConverdedToPDF();
 
     onChange((flux) => {
@@ -88,6 +117,18 @@ const EnviarPortafirmesForm = () => {
         builder.eq('esborrat', 0),
     )
 
+    useCerrarTransaccioOnUnload(getUrl, data?.idTransaccio, openNewFlux);
+
+    // Tancar transacció en tancar modal manualmente
+    const handleCloseModal = () => {
+        tancarTransaccio(getUrl, data?.idTransaccio);
+    };
+    
+    // Exposar funció perquè es pugui tancar des del component fill
+    useImperativeHandle(ref, () => ({
+        handleCloseModal
+    }));
+    
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
 
         { data?.extension != 'pdf' &&
@@ -163,10 +204,12 @@ const EnviarPortafirmesForm = () => {
             <Iframe src={data?.urlInicioFlujoFirma}/>
         </Grid>
     </Grid>
-}
+});
 
 const EnviarPortafirmes = (props:any) => {
     const { t } = useTranslation();
+    const formRef = useRef<any>();
+    
     return <FormActionDialog
         resourceName={"documentResource"}
         action={"ENVIAR_PORTAFIRMES"}
@@ -176,9 +219,10 @@ const EnviarPortafirmes = (props:any) => {
             {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
         ]}
         initialOnChange
+        onClose={() => formRef.current?.handleCloseModal?.()}
         {...props}
     >
-        <EnviarPortafirmesForm/>
+        <EnviarPortafirmesForm ref={formRef}/>
     </FormActionDialog>
 }
 
