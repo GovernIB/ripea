@@ -1,7 +1,7 @@
 import {MuiFormDialog, MuiFormDialogApi, useBaseAppContext} from "reactlib";
-import {InteressatsGridForm} from "../InteressatsGrid.tsx";
 import {useRef} from "react";
 import {useTranslation} from "react-i18next";
+import {InteressatsGridForm} from "../InteressatsGridForm.tsx";
 
 const CreateForm = (props:any) => {
     return <MuiFormDialog

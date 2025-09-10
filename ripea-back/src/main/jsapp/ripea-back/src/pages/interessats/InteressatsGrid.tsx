@@ -1,116 +1,13 @@
 import React, {useState} from "react";
-import {Grid, Icon} from "@mui/material";
-import {
-    useFormContext,
-    useMuiDataGridApiRef,
-} from 'reactlib';
+import {Icon} from "@mui/material";
+import { useMuiDataGridApiRef } from 'reactlib';
 import {useTranslation} from "react-i18next";
-import GridFormField, {GridButtonField} from "../../components/GridFormField.tsx";
 import StyledMuiGrid, {ToolbarButton} from "../../components/StyledMuiGrid.tsx";
 import useInteressatActions, {useActions} from "./details/InteressatActions.tsx";
 import * as builder from "../../util/springFilterUtils.ts";
 import useImport from "./actions/Import.tsx";
 import {useActions as useExpedientActions} from "../expedient/details/CommonActions.tsx"
-import StyledMuiFilter from "../../components/StyledMuiFilter.tsx";
-import {useSession} from "../../components/SessionStorageContext.tsx";
-
-const InteressatsGridFormFilter = () => {
-    const {data} = useFormContext()
-
-    return <>
-        <GridFormField xs={6} name="nivell"/>
-        <GridFormField xs={6} name="comunitatAutonoma"/>
-        <GridFormField xs={6} name="provincia" requestParams={{comunitatAutonoma: data?.comunitatAutonoma}}/>
-        <GridFormField xs={6} name="municipi" requestParams={{provincia: data?.provincia}}/>
-        <GridFormField xs={6} name="nif"/>
-        <GridFormField xs={6} name="nom"/>
-        <GridFormField xs={9.6} name="unitatArrel" type={"checkbox"}/>
-    </>
-}
-
-export const InteressatsGridForm = () => {
-
-    const { t } = useTranslation();
-    const {data} = useFormContext()
-    const { value } = useSession("UNITAT_ORGANITZATIVA_FILTER");
-    const filterButtons = [
-        {
-            value: 'search',
-            text: t('common.actualize'),
-            icon: 'system_update_alt',
-            componentProps: {
-                variant: "contained",
-                sx: { borderRadius: '4px'},
-            },
-        },
-    ]
-
-    return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="tipus" required/>
-
-        {!!data?.filter &&
-            <Grid item xs={12}>
-                <StyledMuiFilter
-                    resourceName={"interessatResource"}
-                    code={"UNITAT_ORGANITZATIVA_FILTER"}
-                    springFilterBuilder={()=>{}}
-                    onSpringFilterChange={()=>{}}
-                    buttons={filterButtons}
-                >
-                    <InteressatsGridFormFilter/>
-                </StyledMuiFilter>
-            </Grid>
-        }
-
-        {data?.tipus === 'InteressatAdministracioEntity' && <GridFormField xs={11} name="organCodi"
-                       requestParams={{...(value ?? []), isInteressatAdministracio: data?.tipus == 'InteressatAdministracioEntity'}}
-                       required autocomplete/>}
-        <GridButtonField xs={1} name={"filter"} icon={"search"} hidden={data?.tipus != 'InteressatAdministracioEntity'}/>
-
-        <GridFormField xs={12} name="documentTipus"
-                       disabled={data?.tipus != 'InteressatPersonaFisicaEntity'}
-                       readOnly={data?.tipus != 'InteressatPersonaFisicaEntity'}
-                       required/>
-        <GridFormField xs={12} name="documentNum"
-                       disabled={data?.tipus == 'InteressatAdministracioEntity'}
-                       readOnly={data?.tipus == 'InteressatAdministracioEntity'}
-                       required={data?.tipus != 'InteressatAdministracioEntity'}/>
-
-        <GridFormField xs={12} name={"raoSocial"}
-                       hidden={data?.tipus != 'InteressatPersonaJuridicaEntity'}
-                       required/>
-
-        {data?.tipus == 'InteressatPersonaFisicaEntity' && <>
-            <GridFormField xs={12} name="nom"/>
-            <GridFormField xs={6} name="llinatge1"/>
-            <GridFormField xs={6} name="llinatge2"/>
-        </>}
-
-        <GridFormField xs={6} name="pais"
-                       disabled={data?.tipus == 'InteressatAdministracioEntity'}
-                       readOnly={data?.tipus == 'InteressatAdministracioEntity'} autocomplete/>
-        <GridFormField xs={6} name="provincia" requestParams={{pais: data?.pais}}
-                       disabled={data?.tipus == 'InteressatAdministracioEntity'}
-                       readOnly={data?.tipus == 'InteressatAdministracioEntity'} autocomplete/>
-        <GridFormField xs={6} name="municipi" requestParams={{provincia: data?.provincia}}
-                       disabled={data?.tipus == 'InteressatAdministracioEntity'}
-                       readOnly={data?.tipus == 'InteressatAdministracioEntity'} autocomplete/>
-        <GridFormField xs={6} name="codiPostal"
-                       disabled={data?.tipus == 'InteressatAdministracioEntity'}
-                       readOnly={data?.tipus == 'InteressatAdministracioEntity'}/>
-        <GridFormField xs={12} name="adresa" type={"textarea"}
-                       disabled={data?.tipus == 'InteressatAdministracioEntity'}
-                       readOnly={data?.tipus == 'InteressatAdministracioEntity'}/>
-
-        <GridFormField xs={6} name="email" required={data?.entregaDeh}/>
-        <GridFormField xs={6} name="telefon"/>
-        <GridFormField xs={12} name="observacions" type={"textarea"}/>
-        <GridFormField xs={12} name="preferenciaIdioma" required/>
-
-        <GridFormField xs={6} name="entregaDeh"/>
-        <GridFormField xs={6} name="entregaDehObligat" hidden={!data?.entregaDeh}/>
-    </Grid>
-}
+import {InteressatsGridForm} from "./InteressatsGridForm.tsx";
 
 const perspectives = ['REPRESENTANT']
 const sortModel:any = [{field: 'id', sort: 'asc'}]
