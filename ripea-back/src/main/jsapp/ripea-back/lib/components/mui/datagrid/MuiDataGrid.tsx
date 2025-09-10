@@ -106,6 +106,7 @@ export type MuiDataGridProps = {
     rowHideDeleteButton?: boolean | ((row: any) => boolean);
     rowHideDetailsButton?: boolean | ((row: any) => boolean);
     rowActionsColumnProps?: any;
+    rowActionsColumnIndex?: number;
     rowAdditionalActions?: DataCommonAdditionalAction[];
     rowSelectionModel?: GridRowSelectionModel,
     popupEditActive?: boolean;
@@ -229,6 +230,7 @@ const rowActionsToGridActionsCellItems = (
 const useGridColumns = (
     columns: MuiDataGridColDef[],
     rowActionsColumnProps: any,
+    rowActionsColumnIndex: number | undefined,
     rowActions: DataCommonAdditionalAction[],
     rowEditActions: DataCommonAdditionalAction[],
     fields: any[] | undefined,
@@ -278,7 +280,7 @@ const useGridColumns = (
             };
         });
         if (rowActions && rowActions.length) {
-            processedColumns.push({
+            const actionsColumn = {
                 field: ' ',
                 type: 'actions',
                 getActions: (params: GridRowParams) => {
@@ -294,7 +296,8 @@ const useGridColumns = (
                         anyRowInEditMode && !isEditMode);
                 },
                 ...rowActionsColumnProps,
-            });
+            };
+            processedColumns.splice(rowActionsColumnIndex ?? processedColumns.length, 0, actionsColumn);
         }
         return processedColumns;
     }, [columns, fields, rowModesModel, artifacts]);
@@ -358,6 +361,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         rowHideDeleteButton,
         rowHideDetailsButton,
         rowActionsColumnProps,
+        rowActionsColumnIndex,
         rowAdditionalActions = [],
         rowSelectionModel: rowSelectionModelProp = [],
         popupEditActive,
@@ -530,6 +534,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
     const processedColumns = useGridColumns(
         columns,
         rowActionsColumnProps,
+        rowActionsColumnIndex,
         [...rowAdditionalActions, ...rowEditActions],
         rowEditActions,
         fields,

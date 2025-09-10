@@ -131,29 +131,6 @@ const TreeViewSelector = (props: { value: any, onChange: (value: any) => void })
 
 const sortModel: any = [{ field: 'id', sort: 'desc' }]
 const perspectives = ["PATH"]
-const columns = [
-    // {
-    //     field: 'nom',
-    //     flex: 0.5,
-    //     renderCell: (params: any) => <ContingutIcon entity={params?.row}/>
-    // },
-    {
-        field: 'descripcio',
-        flex: 0.75,
-    },
-    {
-        field: 'metaDocument',
-        flex: 0.6,
-    },
-    {
-        field: 'createdDate',
-        flex: 0.55,
-    },
-    {
-        field: 'createdByFullName',
-        flex: 0.45,
-    }
-];
 
 export const useExpedientsCarpetes = (commonFilter:string) => {
     const {
@@ -243,6 +220,34 @@ const DocumentsGrid = (props: any) => {
     const { createActions, actions, hiddenDelete, components } = useContingutActions(entity, gridApiRef, refresh);
     const { actions: massiveActions, components: massiveComponents } = useContingutMassiveActions(entity, refresh);
 
+    const columns = [
+        // {
+        //     field: 'nom',
+        //     flex: 0.5,
+        //     renderCell: (params: any) => <ContingutIcon entity={params?.row}/>
+        // },
+        {
+            field: 'descripcio',
+            flex: 0.75,
+        },
+        {
+            field: 'metaDocument',
+            flex: 0.6,
+        },
+        {
+            field: 'createdDate',
+            flex: 0.55,
+        },
+        {
+            field: 'createdByFullName',
+            flex: 0.45,
+        },
+        ...(vista == View.carpeta ? [{
+            renderCell: (params: any) => <DraggableGridRowHandler />,
+            flex: 0.1
+        }] : [])
+    ];
+
     const onDrop = React.useCallback((adjunt: any) => {
         gridApiRef?.current?.showCreateDialog?.(null, { adjunt })
     }, [])
@@ -286,6 +291,7 @@ const DocumentsGrid = (props: any) => {
                         resourceName={"documentResource"}
                         popupEditFormDialogResourceTitle={t('page.document.title')}
                         columns={columns}
+                        rowActionsColumnIndex={4}
                         paginationActive={false}
                         filter={commonFilter}
                         perspectives={perspectives}
@@ -314,7 +320,6 @@ const DocumentsGrid = (props: any) => {
                                         return <MetaExpedient entity={row}/>;
                                     }
                                     return <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                        {vista == View.carpeta && <DraggableGridRowHandler />}
                                         <ContingutIcon entity={row} />
                                     </Box>
                                 }
