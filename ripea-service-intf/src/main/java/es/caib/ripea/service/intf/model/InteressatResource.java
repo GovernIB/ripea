@@ -113,10 +113,36 @@ public class InteressatResource extends BaseAuditableResource<Long> {
 	@Size(max = 5)
 	@ResourceField(enumType = true)
 	protected String municipi = "407";
-	@Size(max = 160)
-	protected String adresa;
 	@Size(max = 5)
 	protected String codiPostal;
+	
+	protected EntregaPostalTipusEnum adressaTipus = EntregaPostalTipusEnum.NACIONAL;
+	protected EntregaPostalViaTipusEnum adressaTipusVia = EntregaPostalViaTipusEnum.CALLE;
+	@Size(max = 250)
+	protected String adresa;
+	@Size(max = 5)
+	protected String adressaNumCasa;
+	@Size(max = 3)
+	protected String adresaQualificador;
+	@Size(max = 10)
+	protected String adresaPuntKm;
+	@Size(max = 10)
+	protected String adresaApartatCorreus;
+	@Size(max = 50)
+	protected String adresaPortal;
+	@Size(max = 50)
+	protected String adresaEscala;
+	@Size(max = 50)
+	protected String adresaPlanta;
+	@Size(max = 50)
+	protected String adresaPorta;
+	@Size(max = 50)
+	protected String adresaBloc;
+	@Size(max = 250)
+	protected String adresaComplement;
+	@Size(max = 255)
+	protected String adresaPoblacio;
+	
 	@Size(max = 160)
 	protected String email;
 	@Size(max = 20)

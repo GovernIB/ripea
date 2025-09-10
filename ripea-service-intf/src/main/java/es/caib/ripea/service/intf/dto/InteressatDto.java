@@ -1,15 +1,11 @@
 package es.caib.ripea.service.intf.dto;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-
-import es.caib.ripea.service.intf.utils.Utils;
 
 @JsonTypeInfo(
 		use = JsonTypeInfo.Id.NAME,
@@ -33,8 +29,23 @@ public abstract class InteressatDto implements Serializable {
 	protected String provinciaNom;
 	protected String municipi;
 	protected String municipiNom;
-	protected String adresa;
 	protected String codiPostal;
+	
+	protected EntregaPostalTipusEnum adressaTipus;
+	protected EntregaPostalViaTipusEnum adressaTipusVia;	
+	protected String adresa;
+	protected String adressaNumCasa;
+	protected String adresaQualificador;
+	protected String adresaPuntKm;
+	protected String adresaApartatCorreus;
+	protected String adresaPortal;
+	protected String adresaEscala;
+	protected String adresaPlanta;
+	protected String adresaPorta;
+	protected String adresaBloc;
+	protected String adresaComplement;
+	protected String adresaPoblacio;
+	
 	protected String email;
 	protected String telefon;
 	protected String observacions;

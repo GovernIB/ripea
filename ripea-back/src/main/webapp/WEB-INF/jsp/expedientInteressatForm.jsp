@@ -760,7 +760,7 @@ pageContext.setAttribute("idiomaEnumOptions", es.caib.ripea.back.helper.EnumHelp
 
 		<!-- Adressa -->
 		<rip:inputTextarea name="adresa" textKey="interessat.form.camp.adresa"
-			labelSize="2" disabled="${!potModificar}"/>
+			labelSize="2" maxlength="250" showsize="true" disabled="${!potModificar}"/>
 
 		<div class="row">
 			<!-- Correu electrònic -->

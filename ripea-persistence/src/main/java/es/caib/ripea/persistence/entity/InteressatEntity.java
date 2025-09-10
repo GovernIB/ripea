@@ -29,6 +29,8 @@ import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import es.caib.ripea.service.intf.config.BaseConfig;
+import es.caib.ripea.service.intf.dto.EntregaPostalTipusEnum;
+import es.caib.ripea.service.intf.dto.EntregaPostalViaTipusEnum;
 import es.caib.ripea.service.intf.dto.InteressatAdministracioDto;
 import es.caib.ripea.service.intf.dto.InteressatDocumentTipusEnumDto;
 import es.caib.ripea.service.intf.dto.InteressatDto;
@@ -86,10 +88,40 @@ public abstract class InteressatEntity extends RipeaAuditable<Long> {
 	protected String provincia;
 	@Column(name = "municipi", length = 5)
 	protected String municipi;
-	@Column(name = "adresa", length = 160)
-	protected String adresa;
 	@Column(name = "codi_postal", length = 5)
 	protected String codiPostal;
+	// ADRESSA NORMALITZADA //
+	@Column(name = "ADRESSA_TIPUS", length = 50)
+	@Enumerated(EnumType.STRING)
+	protected EntregaPostalTipusEnum adressaTipus;
+	@Column(name = "ADRESSA_TIPUS_VIA", length = 15)
+	@Enumerated(EnumType.STRING)
+	protected EntregaPostalViaTipusEnum adressaTipusVia;	
+	@Column(name = "ADRESA", length = 250)
+	protected String adresa;
+	@Column(name = "ADRESSA_NUM_CASA", length = 5)
+	protected String adressaNumCasa;
+	@Column(name = "ADRESSA_QUAL", length = 3)
+	protected String adresaQualificador;
+	@Column(name = "ADRESSA_PUNT_KM", length = 10)
+	protected String adresaPuntKm;
+	@Column(name = "ADRESSA_AP_CORREUS", length = 10)
+	protected String adresaApartatCorreus;
+	@Column(name = "ADRESSA_PORTAL", length = 50)
+	protected String adresaPortal;
+	@Column(name = "ADRESSA_ESCALA", length = 50)
+	protected String adresaEscala;
+	@Column(name = "ADRESSA_PLANTA", length = 50)
+	protected String adresaPlanta;
+	@Column(name = "ADRESSA_PORTA", length = 50)
+	protected String adresaPorta;
+	@Column(name = "ADRESSA_BLOC", length = 50)
+	protected String adresaBloc;
+	@Column(name = "ADRESSA_COMPLEMENT", length = 250)
+	protected String adresaComplement;
+	@Column(name = "ADRESSA_POBLACIO", length = 255)
+	protected String adresaPoblacio;
+	// FI ADRESSA NORMALITZADA //
 	@Column(name = "email", length = 160)
 	protected String email;
 	@Column(name = "telefon", length = 20)

@@ -63,14 +63,14 @@ public class InteressatCommand  {
 	@NotEmpty(groups = {PersonaFisica.class, PersonaJuridica.class})
 	@Size(max = 36, groups = {PersonaFisica.class, PersonaJuridica.class}, message = "max.size")
 	protected String documentNum;
-	
+
 	@Size(max = 4, groups={PersonaFisica.class, PersonaJuridica.class, Administracio.class}, message = "max.size")
 	protected String pais;
 	@Size(max = 2, groups = {PersonaFisica.class, PersonaJuridica.class, Administracio.class}, message = "max.size")
 	protected String provincia;
 	@Size(max = 5, groups = {PersonaFisica.class, PersonaJuridica.class, Administracio.class}, message = "max.size")
 	protected String municipi;
-	@Size(max = 160, groups = {PersonaFisica.class, PersonaJuridica.class, Administracio.class}, message = "max.size")
+	@Size(max = 250, groups = {PersonaFisica.class, PersonaJuridica.class, Administracio.class}, message = "max.size")
 	protected String adresa;
 	@Size(max = 5, groups = {PersonaFisica.class, PersonaJuridica.class, Administracio.class}, message = "max.size")
 	protected String codiPostal;
