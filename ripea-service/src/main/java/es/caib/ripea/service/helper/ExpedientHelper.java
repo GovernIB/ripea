@@ -108,6 +108,7 @@ import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentNtiTipoFirmaEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
+import es.caib.ripea.service.intf.dto.EntregaPostalTipusEnum;
 import es.caib.ripea.service.intf.dto.ExpedientDto;
 import es.caib.ripea.service.intf.dto.ExpedientEstatDto;
 import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
@@ -2516,6 +2517,7 @@ public class ExpedientHelper {
 			interessatPersonaFisicaDto.setPais(registreInteressatEntity.getPaisCodi());
 			interessatPersonaFisicaDto.setProvincia(registreInteressatEntity.getProvinciaCodi());
 			interessatPersonaFisicaDto.setMunicipi(registreInteressatEntity.getMunicipiCodi());
+			interessatPersonaFisicaDto.setAdressaTipus(EntregaPostalTipusEnum.SENSE_NORMALITZAR);
 			interessatPersonaFisicaDto.setAdresa(registreInteressatEntity.getAdresa());
 			interessatPersonaFisicaDto.setCodiPostal(registreInteressatEntity.getCp());
 			interessatPersonaFisicaDto.setEmail(registreInteressatEntity.getEmail());
@@ -2535,6 +2537,7 @@ public class ExpedientHelper {
 			interessatPersonaJuridicaDto.setPais(registreInteressatEntity.getPaisCodi());
 			interessatPersonaJuridicaDto.setProvincia(registreInteressatEntity.getProvinciaCodi());
 			interessatPersonaJuridicaDto.setMunicipi(registreInteressatEntity.getMunicipiCodi());
+			interessatPersonaJuridicaDto.setAdressaTipus(EntregaPostalTipusEnum.SENSE_NORMALITZAR);
 			interessatPersonaJuridicaDto.setAdresa(registreInteressatEntity.getAdresa());
 			interessatPersonaJuridicaDto.setCodiPostal(registreInteressatEntity.getCp());
 			interessatPersonaJuridicaDto.setEmail(registreInteressatEntity.getEmail());
@@ -2552,6 +2555,7 @@ public class ExpedientHelper {
 			interessatAdministracioDto.setPais(registreInteressatEntity.getPaisCodi());
 			interessatAdministracioDto.setProvincia(registreInteressatEntity.getProvinciaCodi());
 			interessatAdministracioDto.setMunicipi(registreInteressatEntity.getMunicipiCodi());
+			interessatAdministracioDto.setAdressaTipus(EntregaPostalTipusEnum.SENSE_NORMALITZAR);
 			interessatAdministracioDto.setAdresa(registreInteressatEntity.getAdresa());
 			interessatAdministracioDto.setCodiPostal(registreInteressatEntity.getCp());
 			interessatAdministracioDto.setEmail(registreInteressatEntity.getEmail());

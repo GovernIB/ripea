@@ -104,8 +104,8 @@ export const InteressatsGridForm = () => {
             <GridFormField xs={4} name="adresaPlanta"/>
             <GridFormField xs={4} name="adresaPorta"/>
             <GridFormField xs={4} name="adresaBloc"/>
-            {/*<GridFormField xs={4} name="adresaQualificador"/>*/}
-            <GridFormField xs={4} name="adresaPoblacio"/>
+            <GridFormField xs={4} name="adresaQualificador"/>
+            <GridFormField xs={12} name="adresaPoblacio"/>
             <GridFormField xs={12} name="adresaComplement"/>
         </> : <>
             <GridFormField xs={12} name="adresa" type={"textarea"}

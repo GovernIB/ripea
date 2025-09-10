@@ -79,7 +79,6 @@ import es.caib.ripea.persistence.entity.DocumentEnviamentInteressatEntity;
 import es.caib.ripea.persistence.entity.DocumentNotificacioEntity;
 import es.caib.ripea.persistence.entity.DocumentPortafirmesEntity;
 import es.caib.ripea.persistence.entity.DocumentViaFirmaEntity;
-import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.entity.ExpedientPeticioEntity;
 import es.caib.ripea.persistence.entity.FluxFirmaUsuariEntity;
@@ -119,10 +118,10 @@ import es.caib.ripea.plugin.firmaservidor.SignaturaResposta;
 import es.caib.ripea.plugin.firmaweb.FirmaWebPlugin;
 import es.caib.ripea.plugin.gesdoc.GestioDocumentalPlugin;
 import es.caib.ripea.plugin.notificacio.EntregaPostalTipus;
+import es.caib.ripea.plugin.notificacio.EntregaPostalViaTipus;
 import es.caib.ripea.plugin.notificacio.Enviament;
 import es.caib.ripea.plugin.notificacio.EnviamentTipus;
 import es.caib.ripea.plugin.notificacio.Notificacio;
-import es.caib.ripea.plugin.notificacio.NotificacioEstat;
 import es.caib.ripea.plugin.notificacio.NotificacioPlugin;
 import es.caib.ripea.plugin.notificacio.Persona;
 import es.caib.ripea.plugin.notificacio.RespostaConsultaEstatEnviament;
@@ -179,6 +178,7 @@ import es.caib.ripea.service.intf.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentNtiTipoFirmaEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
 import es.caib.ripea.service.intf.dto.EntitatDto;
+import es.caib.ripea.service.intf.dto.EntregaPostalTipusEnum;
 import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.dto.FirmaResultatDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
@@ -4792,9 +4792,8 @@ public class PluginHelper {
 			if (notificacioDto.isEntregaPostal()) {
 				
 				enviament.setEntregaPostalActiva(true);
-				enviament.setEntregaPostalTipus(EntregaPostalTipus.SENSE_NORMALITZAR);
-				InteressatEntity interessatPerAdresa = interessat;
 				
+				InteressatEntity interessatPerAdresa = interessat;
 				if (interessat.getRepresentant() != null) {
 					interessatPerAdresa = interessat.getRepresentant();
 				}
@@ -4832,10 +4831,33 @@ public class PluginHelper {
 				enviament.setEntregaPostalCodiPostal(interessatPerAdresa.getCodiPostal());
 				enviament.setEntregaPostalPaisCodi(pais.getAlfa2());
 				enviament.setEntregaPostalProvinciaCodi(provincia.getCodi());
-				enviament.setEntregaPostalMunicipiCodi(provincia.getCodi() + String.format("%04d",Integer.parseInt(municipi.getCodi())));
-				enviament.setEntregaPostalLinea1(interessatPerAdresa.getAdresa() + ", " + interessatPerAdresa.getCodiPostal() + ", "+ municipi.getNom());
-				enviament.setEntregaPostalLinea2(provincia.getNom() + ", " + pais.getNom());
+				enviament.setEntregaPostalMunicipiCodi(provincia.getCodi() + String.format("%04d",Integer.parseInt(municipi.getCodi())));				
+				
+				//Enviament postal sense normalitzar (versio classica de RIPEA abans de issue #1669
+				if (interessat.getAdressaTipus()==null || EntregaPostalTipusEnum.SENSE_NORMALITZAR.equals(interessat.getAdressaTipus())) {
+					enviament.setEntregaPostalTipus(EntregaPostalTipus.SENSE_NORMALITZAR);
+					String enviamentPostalLinia1 = interessatPerAdresa.getAdresa() + ", " + interessatPerAdresa.getCodiPostal() + ", "+ municipi.getNom();
+					String enviamentPostalLinia2 = provincia.getNom() + ", " + pais.getNom();
+					enviament.setEntregaPostalLinea1(Utils.abbreviate(enviamentPostalLinia1, 50));
+					enviament.setEntregaPostalLinea2(Utils.abbreviate(enviamentPostalLinia2, 50));
+				} else {
+					enviament.setEntregaPostalTipus(EntregaPostalTipus.valueOf(interessat.getAdressaTipus().name()));
+					enviament.setEntregaPostalViaTipus(EntregaPostalViaTipus.valueOf(interessat.getAdressaTipusVia().name()));
+					enviament.setEntregaPostalViaNom(Utils.abbreviate(interessat.getAdresa(), 50));
+					enviament.setEntregaPostalNumeroCasa(interessat.getAdressaNumCasa());
+					enviament.setEntregaPostalNumeroQualificador(interessat.getAdresaQualificador());
+					enviament.setEntregaPostalPuntKm(interessat.getAdresaPuntKm());
+					enviament.setEntregaPostalApartatCorreus(interessat.getAdresaApartatCorreus());
+					enviament.setEntregaPostalPortal(interessat.getAdresaPortal());
+					enviament.setEntregaPostalEscala(interessat.getAdresaEscala());
+					enviament.setEntregaPostalPlanta(interessat.getAdresaPlanta());
+					enviament.setEntregaPostalPorta(interessat.getAdresaPorta());
+					enviament.setEntregaPostalBloc(interessat.getAdresaBloc());
+					enviament.setEntregaPostalPoblacio(interessat.getAdresaPoblacio());
+					enviament.setEntregaPostalComplement(interessat.getAdresaComplement());
+				}
 			}
+			
 			// ########## ENVIAMENT DEH ###############
 			if (interessat.getEntregaDeh() != null && interessat.getEntregaDeh() && Boolean.parseBoolean(
 					configHelper.getConfig(PropertyConfig.NOTIB_PLUGIN_DEH_ACTIVA))) {
@@ -4844,7 +4866,9 @@ public class PluginHelper {
 				enviament.setEntregaDehProcedimentCodi(metaExpedient.getClassificacio());
 				enviament.setEntregaNif(interessat.getDocumentNum());
 			}
+			
 			enviaments.add(enviament);
+			
 			notificacio.setEnviaments(enviaments);
 			notificacio.setUsuariCodi(usuari.getCodi());
 			notificacio.setServeiTipusEnum(notificacioDto.getServeiTipusEnum());

@@ -63,6 +63,7 @@ import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ReportFileType;
 import es.caib.ripea.service.intf.base.model.Resource;
 import es.caib.ripea.service.intf.dto.ComunitatDto;
+import es.caib.ripea.service.intf.dto.EntregaPostalTipusEnum;
 import es.caib.ripea.service.intf.dto.InteressatDocumentTipusEnumDto;
 import es.caib.ripea.service.intf.dto.InteressatImportacioTipusDto;
 import es.caib.ripea.service.intf.dto.InteressatTipusEnum;
@@ -192,11 +193,12 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
                         target.setOrganCodi(null);
                         break;
                     case InteressatAdministracioEntity:
+                    	target.setAdressaTipus(EntregaPostalTipusEnum.SENSE_NORMALITZAR);
                         target.setDocumentTipus(InteressatDocumentTipusEnumDto.CODI_ORIGEN);
                         target.setDocumentNum(null);
                         target.setCodiPostal(null);
                         target.setAdresa(null);
-	                    target.setPais(null); //Posam la adreça null ja que es carregarà automaticament al seleccionat una unitat adminsitrativa
+	                    target.setPais(null); //Posam la adreça null ja que es carregarà automaticament al seleccionar una unitat administrativa
 	                    target.setProvincia(null);
 	                    target.setMunicipi(null);
                         break;
