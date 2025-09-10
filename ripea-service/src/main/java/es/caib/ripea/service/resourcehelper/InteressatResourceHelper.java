@@ -334,7 +334,38 @@ public class InteressatResourceHelper {
         interessatDto.setProvincia(resource.getProvincia());
         interessatDto.setMunicipi(resource.getMunicipi());
         interessatDto.setCodiPostal(resource.getCodiPostal());
+        //ADRESSA NORMALITZADA
         interessatDto.setAdresa(resource.getAdresa());
+        if (resource.getAdressaTipus()==null || EntregaPostalTipusEnum.SENSE_NORMALITZAR.equals(resource.getAdressaTipus())) {
+        	interessatDto.setAdressaTipus(EntregaPostalTipusEnum.SENSE_NORMALITZAR);
+        	interessatDto.setAdressaTipusVia(null);
+        	interessatDto.setAdressaNumCasa(null);
+        	interessatDto.setAdresaQualificador(null);
+        	interessatDto.setAdresaPuntKm(null);
+        	interessatDto.setAdresaApartatCorreus(null);
+        	interessatDto.setAdresaPortal(null);
+        	interessatDto.setAdresaEscala(null);
+        	interessatDto.setAdresaPlanta(null);
+        	interessatDto.setAdresaPorta(null);
+        	interessatDto.setAdresaBloc(null);
+        	interessatDto.setAdresaComplement(null);
+        	interessatDto.setAdresaPoblacio(null);
+        } else {
+        	interessatDto.setAdressaTipus(resource.getAdressaTipus());
+        	interessatDto.setAdressaTipusVia(resource.getAdressaTipusVia());
+        	interessatDto.setAdressaNumCasa(resource.getAdressaNumCasa());
+        	interessatDto.setAdresaQualificador(resource.getAdresaQualificador());
+        	interessatDto.setAdresaPuntKm(resource.getAdresaPuntKm());
+        	interessatDto.setAdresaApartatCorreus(resource.getAdresaApartatCorreus());
+        	interessatDto.setAdresaPortal(resource.getAdresaPortal());
+        	interessatDto.setAdresaEscala(resource.getAdresaEscala());
+        	interessatDto.setAdresaPlanta(resource.getAdresaPlanta());
+        	interessatDto.setAdresaPorta(resource.getAdresaPorta());
+        	interessatDto.setAdresaBloc(resource.getAdresaBloc());
+        	interessatDto.setAdresaComplement(resource.getAdresaComplement());
+        	interessatDto.setAdresaPoblacio(resource.getAdresaPoblacio());
+        }
+        
         interessatDto.setEmail(resource.getEmail());
         interessatDto.setTelefon(resource.getTelefon());
         interessatDto.setObservacions(resource.getObservacions());

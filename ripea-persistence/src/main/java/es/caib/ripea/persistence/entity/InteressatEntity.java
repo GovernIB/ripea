@@ -304,11 +304,39 @@ public abstract class InteressatEntity extends RipeaAuditable<Long> {
 		return null;
 	}
 
+	public void updateAdressaNormalitzada(InteressatDto interessat) {
+        if  (interessat.getAdressaTipus()==null || EntregaPostalTipusEnum.SENSE_NORMALITZAR.equals(interessat.getAdressaTipus())) {
+        	this.adressaTipus		= EntregaPostalTipusEnum.SENSE_NORMALITZAR;
+        	this.adressaTipusVia 	= null;
+        	this.adressaNumCasa 	= null;
+        	this.adresaQualificador = null;
+        	this.adresaPuntKm 		= null;
+        	this.adresaApartatCorreus = null;
+        	this.adresaPortal 		= null;
+        	this.adresaEscala 		= null;
+        	this.adresaPlanta 		= null;
+        	this.adresaPorta 		= null;
+        	this.adresaBloc 		= null;
+        	this.adresaComplement 	= null;
+        	this.adresaPoblacio 	= null;
+        } else {
+        	this.adressaTipus		= interessat.getAdressaTipus();
+        	this.adressaTipusVia 	= interessat.getAdressaTipusVia();
+        	this.adressaNumCasa 	= interessat.getAdressaNumCasa();
+        	this.adresaQualificador = interessat.getAdresaQualificador();
+        	this.adresaPuntKm 		= interessat.getAdresaPuntKm();
+        	this.adresaApartatCorreus = interessat.getAdresaApartatCorreus();
+        	this.adresaPortal 		= interessat.getAdresaPortal();
+        	this.adresaEscala 		= interessat.getAdresaEscala();
+        	this.adresaPlanta 		= interessat.getAdresaPlanta();
+        	this.adresaPorta 		= interessat.getAdresaPorta();
+        	this.adresaBloc 		= interessat.getAdresaBloc();
+        	this.adresaComplement 	= interessat.getAdresaComplement();
+        	this.adresaPoblacio 	= interessat.getAdresaPoblacio();
+        }
+	}
+	
 	public abstract InteressatTipusEnumDto getTipus();
-
-//	public InteressatEntity getRepresentat() {
-//		return !CollectionUtils.isEmpty(representats) ? representats.get(0) : null;
-//	}
 
 	public void setRepresentant(InteressatEntity representant) {
 		this.representant = representant;
@@ -317,6 +345,7 @@ public abstract class InteressatEntity extends RipeaAuditable<Long> {
 	public abstract static class Builder {
 		public abstract InteressatEntity build();
 	}
+
 	private static final long serialVersionUID = -2299453443943600172L;
 
 }

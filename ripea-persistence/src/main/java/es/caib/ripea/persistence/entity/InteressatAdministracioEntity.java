@@ -111,7 +111,8 @@ public class InteressatAdministracioEntity extends InteressatEntity {
 			throw new InteressatTipusDocumentException(dto.getDocumentNum(), InteressatTipusEnumDto.ADMINISTRACIO.name(), dto.getTipus().name(), this.expedient.getId());
 
 		super.update(dto);
-
+		super.updateAdressaNormalitzada(dto);
+		
 		InteressatAdministracioDto interessatAdministracioDto = (InteressatAdministracioDto) dto;
 		this.organCodi = interessatAdministracioDto.getOrganCodi();
 		this.organNom = (interessatAdministracioDto.getOrganNom()!=null && interessatAdministracioDto.getOrganNom().length() > 256) ? interessatAdministracioDto.getOrganNom().substring(0, 256) : interessatAdministracioDto.getOrganNom();

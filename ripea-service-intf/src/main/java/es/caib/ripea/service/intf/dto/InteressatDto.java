@@ -285,6 +285,85 @@ public abstract class InteressatDto implements Serializable {
 		this.expedientArxiuPropagat = expedientArxiuPropagat;
 	}
 
+	public EntregaPostalTipusEnum getAdressaTipus() {
+		return adressaTipus;
+	}
+	public void setAdressaTipus(EntregaPostalTipusEnum adressaTipus) {
+		this.adressaTipus = adressaTipus;
+	}
+	public EntregaPostalViaTipusEnum getAdressaTipusVia() {
+		return adressaTipusVia;
+	}
+	public void setAdressaTipusVia(EntregaPostalViaTipusEnum adressaTipusVia) {
+		this.adressaTipusVia = adressaTipusVia;
+	}
+	public String getAdressaNumCasa() {
+		return adressaNumCasa;
+	}
+	public void setAdressaNumCasa(String adressaNumCasa) {
+		this.adressaNumCasa = adressaNumCasa;
+	}
+	public String getAdresaQualificador() {
+		return adresaQualificador;
+	}
+	public void setAdresaQualificador(String adresaQualificador) {
+		this.adresaQualificador = adresaQualificador;
+	}
+	public String getAdresaPuntKm() {
+		return adresaPuntKm;
+	}
+	public void setAdresaPuntKm(String adresaPuntKm) {
+		this.adresaPuntKm = adresaPuntKm;
+	}
+	public String getAdresaApartatCorreus() {
+		return adresaApartatCorreus;
+	}
+	public void setAdresaApartatCorreus(String adresaApartatCorreus) {
+		this.adresaApartatCorreus = adresaApartatCorreus;
+	}
+	public String getAdresaPortal() {
+		return adresaPortal;
+	}
+	public void setAdresaPortal(String adresaPortal) {
+		this.adresaPortal = adresaPortal;
+	}
+	public String getAdresaEscala() {
+		return adresaEscala;
+	}
+	public void setAdresaEscala(String adresaEscala) {
+		this.adresaEscala = adresaEscala;
+	}
+	public String getAdresaPlanta() {
+		return adresaPlanta;
+	}
+	public void setAdresaPlanta(String adresaPlanta) {
+		this.adresaPlanta = adresaPlanta;
+	}
+	public String getAdresaPorta() {
+		return adresaPorta;
+	}
+	public void setAdresaPorta(String adresaPorta) {
+		this.adresaPorta = adresaPorta;
+	}
+	public String getAdresaBloc() {
+		return adresaBloc;
+	}
+	public void setAdresaBloc(String adresaBloc) {
+		this.adresaBloc = adresaBloc;
+	}
+	public String getAdresaComplement() {
+		return adresaComplement;
+	}
+	public void setAdresaComplement(String adresaComplement) {
+		this.adresaComplement = adresaComplement;
+	}
+	public String getAdresaPoblacio() {
+		return adresaPoblacio;
+	}
+	public void setAdresaPoblacio(String adresaPoblacio) {
+		this.adresaPoblacio = adresaPoblacio;
+	}
+
 	private static final long serialVersionUID = -139254994389509932L;
 
 }

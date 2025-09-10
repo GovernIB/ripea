@@ -83,6 +83,7 @@ public class InteressatPersonaJuridicaEntity extends InteressatEntity {
 			throw new InteressatTipusDocumentException(dto.getDocumentNum(), InteressatTipusEnumDto.PERSONA_JURIDICA.name(), dto.getTipus().name(), this.expedient.getId());
 
 		super.update(dto);
+		super.updateAdressaNormalitzada(dto);
 
 		InteressatPersonaJuridicaDto interessatPersonaJuridicaDto = (InteressatPersonaJuridicaDto) dto;
 		this.raoSocial = interessatPersonaJuridicaDto.getRaoSocial();

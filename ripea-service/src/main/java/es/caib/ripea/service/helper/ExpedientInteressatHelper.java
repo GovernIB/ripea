@@ -35,6 +35,7 @@ import es.caib.ripea.persistence.repository.ExpedientRepository;
 import es.caib.ripea.persistence.repository.InteressatRepository;
 import es.caib.ripea.service.intf.base.model.Resource;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
+import es.caib.ripea.service.intf.dto.EntregaPostalTipusEnum;
 import es.caib.ripea.service.intf.dto.InteressatAdministracioDto;
 import es.caib.ripea.service.intf.dto.InteressatDocumentTipusEnumDto;
 import es.caib.ripea.service.intf.dto.InteressatDto;
@@ -260,7 +261,10 @@ public class ExpedientInteressatHelper {
 					interessatAdministracioDto.getAmbOficinaSir()).build();
 		}
 		
+		interessatEntity.updateAdressaNormalitzada(interessat);
+		
 		interessatEntity = interessatRepository.save(interessatEntity);
+		
 		expedient.addInteressat(interessatEntity);
 		
 		// Registra al log la creació de l'interessat
