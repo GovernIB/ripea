@@ -577,26 +577,30 @@ public class Utils {
     }
 
 	public static String getNomComplet(InteressatTipusEnum tipus, String nom, String llinatge1, String llinatge2, String raoSocial, String organCodi) {
-		switch (tipus) {
-		case InteressatPersonaFisicaEntity:
-			StringBuilder sb = new StringBuilder();
-			if (nom != null) {
-				sb.append(nom);
+		if (tipus!=null) {
+			switch (tipus) {
+				case InteressatPersonaFisicaEntity:
+					StringBuilder sb = new StringBuilder();
+					if (nom != null) {
+						sb.append(nom);
+					}
+					if (llinatge1 != null) {
+						sb.append(" ");
+						sb.append(llinatge1);
+						if (llinatge2 != null) {
+							sb.append(" ");
+							sb.append(llinatge2);
+						}
+					}
+					return sb.toString();	
+				case InteressatPersonaJuridicaEntity:
+					return raoSocial;
+				case InteressatAdministracioEntity:
+					return Utils.hasValue(nom)?nom:organCodi;
+				default:
+					return null;
 			}
-			if (llinatge1 != null) {
-				sb.append(" ");
-				sb.append(llinatge1);
-				if (llinatge2 != null) {
-					sb.append(" ");
-					sb.append(llinatge2);
-				}
-			}
-			return sb.toString();	
-		case InteressatPersonaJuridicaEntity:
-			return raoSocial;
-		case InteressatAdministracioEntity:
-			return Utils.hasValue(nom)?nom:organCodi;
-		default:
+		} else {
 			return null;
 		}
 	}
