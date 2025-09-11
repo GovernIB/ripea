@@ -277,7 +277,6 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     }
     
     @Override
-    @Transactional
 	public DocumentResource update(Long id, DocumentResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotFoundException {
     	try {
     		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
@@ -286,6 +285,9 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     			DocumentResourceEntity documentResourceActual = documentResourceRepository.findById(resource.getId()).get();
     			Long reorderPreviousParentId = reorderGetParentId(documentResourceActual);
     			Long reorderResourceSequence = reorderGetSequenceFromResourceOrEntity(resource, documentResourceActual);
+				if (!Objects.equals(resource.getPare().getId(), documentActual.getPareId())) {
+					documentActual.setPare(contingutRepository.findById(resource.getPare().getId()).get());
+				}
 				reorderIfReorderable(
 						documentResourceActual,
 						reorderResourceSequence,

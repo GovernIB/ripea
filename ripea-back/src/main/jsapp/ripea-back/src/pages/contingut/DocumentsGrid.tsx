@@ -263,13 +263,14 @@ const DocumentsGrid = (props: any) => {
     const handleDragEnd = (event: any) => {
         const sourceData = event.active.data.current;
         const targetData = event.over.data.current;
-        //console.log('>>> ', sourceData.nom, '(', sourceData.ordre, ')->', targetData.nom, '(', targetData.ordre, ')')
+        console.log('>>> ', sourceData.nom, '(', sourceData.ordre, ')->', targetData.nom, '(', targetData.ordre, ')')
         const patchData = {
             ...(targetData.tipus === 'DOCUMENT' && { ordre: targetData.ordre }),
-            pare: { id: targetData.pare.id },
+            pare: { id: targetData.tipus === 'DOCUMENT' ? targetData.pare.id : targetData.id },
             ordrePatch: true
         };
         if (sourceData.tipus === 'DOCUMENT') {
+            console.log('>>> document patch', patchData)
             if (apiDocumentIsReady) {
                 apiDocumentPatch(sourceData.id, { data: patchData }).
                 then(() => gridApiRef.current.refresh());
@@ -277,6 +278,7 @@ const DocumentsGrid = (props: any) => {
                 console.error('Servei de l\'API pels documents no disponible')
             }
         } else if (sourceData.tipus === 'CARPETA') {
+            console.log('>>> carpeta patch', patchData)
             if (apiCarpetaIsReady) {
                 apiCarpetaPatch(sourceData.id, { data: patchData }).
                 then(() => gridApiRef.current.refresh());
