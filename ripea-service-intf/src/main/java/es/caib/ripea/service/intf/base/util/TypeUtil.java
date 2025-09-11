@@ -62,6 +62,10 @@ public class TypeUtil {
 		return referencedClass;
 	}
 
+	public static String getMethodSuffixFromFieldName(String fieldName) {
+		return fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
+	}
+
 	public static String getMethodSuffixFromField(Field field) {
 		return field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1);
 	}
@@ -124,6 +128,23 @@ public class TypeUtil {
 		}
 	}
 
+	public static <C> C getFieldOrGetterValue(String fieldName, Object target) {
+		Field field = ReflectionUtils.findField(target.getClass(), fieldName);
+		if (field == null) {
+			String methodSuffix = getMethodSuffixFromField(field);
+			String getMethodName = "get" + methodSuffix;
+			Method getMethod = ReflectionUtils.findMethod(target.getClass(), getMethodName);
+			if (getMethod != null) {
+				return (C) ReflectionUtils.invokeMethod(getMethod, target);
+			} else {
+				throw new ResourceFieldNotFoundException(target.getClass(), fieldName);
+			}
+		} else {
+			ReflectionUtils.makeAccessible(field);
+			return (C)ReflectionUtils.getField(field, target);
+		}
+	}
+
 	public static <C> C getFieldOrGetterValue(Field field, Object target) {
 		String methodSuffix = getMethodSuffixFromField(field);
 		String getMethodName = "get" + methodSuffix;
@@ -134,6 +155,55 @@ public class TypeUtil {
 			ReflectionUtils.makeAccessible(field);
 			return (C)ReflectionUtils.getField(field, target);
 		}
+	}
+
+	public static <C> C getFieldOrGetterValue(String fieldName, Object target, Class<C> expectedType) {
+		Object value = null;
+		Field field = ReflectionUtils.findField(target.getClass(), fieldName);
+		if (field == null) {
+			String methodSuffix = getMethodSuffixFromFieldName(fieldName);
+			String getMethodName = "get" + methodSuffix;
+			Method getMethod = ReflectionUtils.findMethod(target.getClass(), getMethodName);
+			if (getMethod != null) {
+				value = ReflectionUtils.invokeMethod(getMethod, target);
+				if (value != null && !expectedType.isInstance(value)) {
+					throw new IllegalStateException(
+							"Returned value from method " + getMethod + " is not an instance of " + expectedType.getName());
+				}
+			} else {
+				throw new ResourceFieldNotFoundException(target.getClass(), fieldName);
+			}
+		} else {
+			ReflectionUtils.makeAccessible(field);
+			value = ReflectionUtils.getField(field, target);
+			if (value != null && !expectedType.isInstance(value)) {
+				throw new IllegalStateException(
+						"Returned value from field " + field + " is not an instance of " + expectedType.getName());
+			}
+		}
+		return (C)value;
+	}
+
+	public static <C> C getFieldOrGetterValue(Field field, Object target, Class<C> expectedType) {
+		Object value = null;
+		String methodSuffix = getMethodSuffixFromField(field);
+		String getMethodName = "get" + methodSuffix;
+		Method getMethod = ReflectionUtils.findMethod(target.getClass(), getMethodName);
+		if (getMethod != null) {
+			value = ReflectionUtils.invokeMethod(getMethod, target);
+			if (value != null && !expectedType.isInstance(value)) {
+				throw new IllegalStateException(
+						"Returned value from method " + getMethod + " is not an instance of " + expectedType.getName());
+			}
+		} else {
+			ReflectionUtils.makeAccessible(field);
+			value = ReflectionUtils.getField(field, target);
+			if (value != null && !expectedType.isInstance(value)) {
+				throw new IllegalStateException(
+						"Returned value from field " + field + " is not an instance of " + expectedType.getName());
+			}
+		}
+		return (C)value;
 	}
 
 	public static void setFieldOrSetterValue(Field field, Object target, Object value) {
@@ -154,7 +224,7 @@ public class TypeUtil {
 			ReflectionUtils.makeAccessible(field);
 			return (V)ReflectionUtils.getField(field, target);
 		} else {
-			throw new ResourceFieldNotFoundException(target.getClass(), "fieldName");
+			throw new ResourceFieldNotFoundException(target.getClass(), fieldName);
 		}
 	}
 

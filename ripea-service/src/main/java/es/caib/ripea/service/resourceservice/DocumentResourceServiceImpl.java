@@ -280,17 +280,18 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     	try {
     		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
     		DocumentEntity documentActual = documentRepository.findById(resource.getId()).get();
-    		
     		if (resource.isOrdrePatch()) {
     			DocumentResourceEntity documentResourceActual = documentResourceRepository.findById(resource.getId()).get();
     			Long reorderPreviousParentId = reorderGetParentId(documentResourceActual);
-    			Long reorderResourceSequence = reorderGetResourceSequence(resource, documentResourceActual);
-				reorderIfReorderable(
-						documentResourceRepository.findById(resource.getId()).get(),
+    			Long reorderResourceSequence = reorderGetSequenceFromResourceOrEntity(resource, documentResourceActual);
+				boolean orderChanged = reorderIfReorderable(
+						documentResourceActual,
 						reorderResourceSequence,
 						reorderPreviousParentId,
 						true,
 						false);
+				if (orderChanged)
+					System.out.println(">>> orderChanged: " + reorderResourceSequence + " -> " + documentResourceActual.getOrder());
     		} else {
         		DocumentDto documentCreat = documentHelper.updateDocument(
         				entitatEntity.getId(),

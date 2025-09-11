@@ -131,7 +131,7 @@ const TreeViewSelector = (props: { value: any, onChange: (value: any) => void })
 
 const perspectives = ["PATH"]
 
-export const useExpedientsCarpetes = (commonFilter:string) => {
+export const useExpedientsCarpetes = (commonFilter: string) => {
     const {
         isReady: apiExpedientIsReady,
         find: apiExpedientFindAll,
@@ -261,10 +261,9 @@ const DocumentsGrid = (props: any) => {
     }, [])
 
     const handleDragEnd = (event: any) => {
-        //console.log('>>> handleDragEnd', event)
         const sourceData = event.active.data.current;
         const targetData = event.over.data.current;
-        console.log('>>> ', sourceData.nom, '(', sourceData.ordre, ')->', targetData.nom, '(', targetData.ordre, ')')
+        //console.log('>>> ', sourceData.nom, '(', sourceData.ordre, ')->', targetData.nom, '(', targetData.ordre, ')')
         const patchData = {
             ...(targetData.tipus === 'DOCUMENT' && { ordre: targetData.ordre }),
             pare: { id: targetData.pare.id },
