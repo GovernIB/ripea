@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
+import es.caib.ripea.persistence.entity.resourcerepository.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.fundaciobit.apisib.apifirmasimple.v1.beans.FirmaSimpleStartTransactionRequest;
@@ -39,11 +40,6 @@ import es.caib.ripea.persistence.entity.resourceentity.InteressatResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaDocumentResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.RegistreAnnexResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.UsuariResourceEntity;
-import es.caib.ripea.persistence.entity.resourcerepository.DocumentResourceRepository;
-import es.caib.ripea.persistence.entity.resourcerepository.InteressatResourceRepository;
-import es.caib.ripea.persistence.entity.resourcerepository.MetaDocumentResourceRepository;
-import es.caib.ripea.persistence.entity.resourcerepository.RegistreAnnexResourceRepository;
-import es.caib.ripea.persistence.entity.resourcerepository.UsuariResourceRepository;
 import es.caib.ripea.persistence.repository.ContingutMovimentRepository;
 import es.caib.ripea.persistence.repository.ContingutRepository;
 import es.caib.ripea.persistence.repository.DocumentNotificacioRepository;
@@ -149,6 +145,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 	private final MessageHelper messageHelper;
 
     private final UsuariResourceRepository usuariResourceRepository;
+	private final ContingutResourceRepository contingutResourceRepository;
     private final DocumentResourceRepository documentResourceRepository;
     private final MetaDocumentResourceRepository metaDocumentResourceRepository;
     private final InteressatResourceRepository interessatResourceRepository;
@@ -277,6 +274,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     }
     
     @Override
+    @Transactional
 	public DocumentResource update(Long id, DocumentResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotFoundException {
     	try {
     		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
@@ -285,8 +283,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     			DocumentResourceEntity documentResourceActual = documentResourceRepository.findById(resource.getId()).get();
     			Long reorderPreviousParentId = reorderGetParentId(documentResourceActual);
     			Long reorderResourceSequence = reorderGetSequenceFromResourceOrEntity(resource, documentResourceActual);
-				if (!Objects.equals(resource.getPare().getId(), documentActual.getPareId())) {
-					documentActual.setPare(contingutRepository.findById(resource.getPare().getId()).get());
+				if (!Objects.equals(resource.getPare().getId(), documentResourceActual.getPare().getId())) {
+					documentResourceActual.setPare(contingutResourceRepository.findById(resource.getPare().getId()).get());
 				}
 				reorderIfReorderable(
 						documentResourceActual,
