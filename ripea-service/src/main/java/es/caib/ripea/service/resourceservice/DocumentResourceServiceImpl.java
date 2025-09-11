@@ -123,6 +123,7 @@ import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.resourcehelper.ContingutResourceHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -276,6 +277,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     }
     
     @Override
+    @Transactional
 	public DocumentResource update(Long id, DocumentResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotFoundException {
     	try {
     		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
@@ -354,7 +356,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
 	@Override
 	protected List<DocumentResourceEntity> reorderFindLinesWithParent(Serializable parentId) {
-		return documentResourceRepository.findAllByPareId((Long)parentId);
+		return documentResourceRepository.findAllByPareIdOrderByOrdreAsc((Long)parentId);
 	}
 
     private class PathPerspectiveApplicator implements PerspectiveApplicator<DocumentResourceEntity, DocumentResource> {

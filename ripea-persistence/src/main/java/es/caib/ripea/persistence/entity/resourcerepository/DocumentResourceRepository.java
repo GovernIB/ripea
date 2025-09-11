@@ -11,7 +11,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface DocumentResourceRepository extends BaseRepository<DocumentResourceEntity, Long> {
+
     List<DocumentResourceEntity> findAllByPareId(Long pareId);
+	List<DocumentResourceEntity> findAllByPareIdOrderByOrdreAsc(Long pareId);
     List<DocumentResourceEntity> findByExpedientAndEsborrat(ExpedientResourceEntity expedient, int esborrat);
 
     @Query("select case when count(d) > 0 then true else false end " +

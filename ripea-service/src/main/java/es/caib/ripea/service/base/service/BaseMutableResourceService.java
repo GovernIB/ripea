@@ -386,7 +386,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 		boolean anyOrderChanged = false;
 		if (entity instanceof ReorderableEntity<?>) {
 			ReorderableEntity<ID> reorderableEntity = (ReorderableEntity<ID>)entity;
-			boolean reorderParentIdChanged = !Objects.equals(reorderableEntity.getOrderParentId(), previousParentId);
+			boolean parentIdChanged = !Objects.equals(reorderableEntity.getOrderParentId(), previousParentId);
 			log.debug("\tReordenant entitat {} amb la seqüència {} (previousParentId={})",
 					entity,
 					sequenceForEntity,
@@ -395,11 +395,11 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 					reorderableEntity,
 					sequenceForEntity,
 					reorderableEntity.getOrderParentId(),
-					reorderParentIdChanged,
+					parentIdChanged,
 					sameSequenceInsertBefore,
 					isDelete);
 			if (anyOrderChanged1) anyOrderChanged = true;
-			if (reorderParentIdChanged) {
+			if (parentIdChanged) {
 				boolean anyOrderChanged2 = reorderWithParentId(
 						null,
 						null,
@@ -416,7 +416,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 			@Nullable ReorderableEntity<ID> reorderableEntity,
 			@Nullable Long sequenceForEntity,
 			@Nullable ID parentId,
-			boolean reorderParentIdChanged,
+			boolean parentIdChanged,
 			boolean sameSequenceInsertBefore,
 			boolean isDelete) {
 		boolean anyOrderChanged = false;
@@ -430,7 +430,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 			ReorderableEntity<ID> line = (ReorderableEntity<ID>)value;
 			if (!line.equals(reorderableEntity)) {
 				Long currentSequence = line.getOrder();
-				boolean insertHere = sequenceForEntity != null && (sameSequenceInsertBefore ?
+				boolean insertHere = !parentIdChanged && sequenceForEntity != null && (sameSequenceInsertBefore ?
 						currentSequence != null && currentSequence.compareTo(sequenceForEntity) >= 0 :
 						currentSequence != null && currentSequence.compareTo(sequenceForEntity) > 0);
 				if (!inserted && insertHere) {
