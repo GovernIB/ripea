@@ -115,7 +115,7 @@ public class InteressatResource extends BaseAuditableResource<Long> {
 	protected String municipi = "407";
 	@Size(max = 5)
 	protected String codiPostal;
-	
+    @NotNull
 	protected EntregaPostalTipusEnum adressaTipus = EntregaPostalTipusEnum.NACIONAL;
 	protected EntregaPostalViaTipusEnum adressaTipusVia = EntregaPostalViaTipusEnum.CALLE;
 	@Size(max = 250)

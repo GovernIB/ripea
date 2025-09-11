@@ -18,65 +18,64 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class InteressatValidValidator implements ConstraintValidator<InteressatValid, InteressatResource> {
 
+    private void addViolation(ConstraintValidatorContext context, String field, String message) {
+        context.buildConstraintViolationWithTemplate(message)
+                .addPropertyNode(field)
+                .addConstraintViolation();
+    }
+    private void notNullViolation(ConstraintValidatorContext context, String field) {
+        addViolation(context, field, "{javax.validation.constraints.NotNull.message}");
+    }
+
     @Override
     public boolean isValid(InteressatResource resource, ConstraintValidatorContext context) {
         boolean valid = true;
+        context.disableDefaultConstraintViolation();
 
         if (resource.getEntregaDeh() != null && resource.getEntregaDeh()) {
             if (resource.getEmail() == null || resource.getEmail().isBlank()) {
-                context
-                        .buildConstraintViolationWithTemplate("{javax.validation.constraints.NotNull.message}")
-                        .addPropertyNode(InteressatResource.Fields.email)
-                        .addConstraintViolation()
-                        .disableDefaultConstraintViolation();
+                notNullViolation(context, InteressatResource.Fields.email);
                 valid = false;
             }
         }
         if (InteressatTipusEnum.InteressatPersonaFisicaEntity.equals(resource.getTipus())) {
             if (resource.getNom() == null || resource.getNom().isBlank()) {
-                context
-                        .buildConstraintViolationWithTemplate("{javax.validation.constraints.NotNull.message}")
-                        .addPropertyNode(InteressatResource.Fields.nom)
-                        .addConstraintViolation()
-                        .disableDefaultConstraintViolation();
+                notNullViolation(context, InteressatResource.Fields.nom);
                 valid = false;
             }
             if (resource.getLlinatge1() == null || resource.getLlinatge1().isBlank()) {
-                context
-                        .buildConstraintViolationWithTemplate("{javax.validation.constraints.NotNull.message}")
-                        .addPropertyNode(InteressatResource.Fields.llinatge1)
-                        .addConstraintViolation()
-                        .disableDefaultConstraintViolation();
+                notNullViolation(context, InteressatResource.Fields.llinatge1);
                 valid = false;
             }
         }
         if (InteressatTipusEnum.InteressatAdministracioEntity.equals(resource.getTipus())) {
             if (resource.getOrganCodi() == null) {
-                context
-                        .buildConstraintViolationWithTemplate("{javax.validation.constraints.NotNull.message}")
-                        .addPropertyNode(InteressatResource.Fields.organCodi)
-                        .addConstraintViolation()
-                        .disableDefaultConstraintViolation();
+                notNullViolation(context, InteressatResource.Fields.organCodi);
                 valid = false;
             }
         }
         if (InteressatTipusEnum.InteressatPersonaJuridicaEntity.equals(resource.getTipus())) {
             if (resource.getRaoSocial() == null) {
-                context
-                        .buildConstraintViolationWithTemplate("{javax.validation.constraints.NotNull.message}")
-                        .addPropertyNode(InteressatResource.Fields.raoSocial)
-                        .addConstraintViolation()
-                        .disableDefaultConstraintViolation();
+                notNullViolation(context, InteressatResource.Fields.raoSocial);
                 valid = false;
             }
         }
         if (!InteressatTipusEnum.InteressatAdministracioEntity.equals(resource.getTipus())) {
+            if (resource.getAdressaTipusVia() == null) {
+                notNullViolation(context, InteressatResource.Fields.adressaTipusVia);
+                valid = false;
+            }
+            if (resource.getAdresa() == null || resource.getAdresa().isBlank()) {
+                notNullViolation(context, InteressatResource.Fields.adresa);
+                valid = false;
+            }
+            if (resource.getAdressaNumCasa() == null || resource.getAdressaNumCasa().isBlank()) {
+                notNullViolation(context, InteressatResource.Fields.adressaNumCasa);
+                valid = false;
+            }
+
             if (resource.getDocumentNum() == null || resource.getDocumentNum().isBlank()) {
-                context
-                        .buildConstraintViolationWithTemplate("{javax.validation.constraints.NotNull.message}")
-                        .addPropertyNode(InteressatResource.Fields.documentNum)
-                        .addConstraintViolation()
-                        .disableDefaultConstraintViolation();
+                notNullViolation(context, InteressatResource.Fields.documentNum);
                 valid = false;
             } else {
                 boolean validDocumentNum = true;
@@ -103,11 +102,8 @@ public class InteressatValidValidator implements ConstraintValidator<InteressatV
                 }
 
                 if (!validDocumentNum) {
-                    context
-                            .buildConstraintViolationWithTemplate("{es.caib.ripea.service.intf.resourcevalidation.InteressatValid.documentNum}")
-                            .addPropertyNode(InteressatResource.Fields.documentNum)
-                            .addConstraintViolation()
-                            .disableDefaultConstraintViolation();
+                    addViolation(context, InteressatResource.Fields.documentNum,
+                            "{es.caib.ripea.service.intf.resourcevalidation.InteressatValid.documentNum}");
                     valid = false;
                 }
             }

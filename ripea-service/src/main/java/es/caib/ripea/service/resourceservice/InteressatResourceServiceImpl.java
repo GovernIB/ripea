@@ -182,9 +182,6 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
             if (fieldValue!=null) {
                 switch ((InteressatTipusEnum)fieldValue){
                     case InteressatPersonaFisicaEntity:
-                    	target.setDocumentTipus(InteressatDocumentTipusEnumDto.NIF);
-                        target.setOrganCodi(null);
-                        break;
                     case InteressatPersonaJuridicaEntity:
                         target.setDocumentTipus(InteressatDocumentTipusEnumDto.NIF);
                         target.setOrganCodi(null);
