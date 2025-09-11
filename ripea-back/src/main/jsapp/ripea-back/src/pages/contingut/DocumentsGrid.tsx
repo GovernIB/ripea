@@ -129,7 +129,6 @@ const TreeViewSelector = (props: { value: any, onChange: (value: any) => void })
     </Grid>
 }
 
-const sortModel: any = [{ field: 'id', sort: 'desc' }]
 const perspectives = ["PATH"]
 
 export const useExpedientsCarpetes = (commonFilter:string) => {
@@ -180,6 +179,15 @@ const DocumentsGrid = (props: any) => {
     const { entity, onRowCountChange } = props;
     const { t } = useTranslation();
     const { value: user } = useUserSession();
+
+    //const sortModel: any = [{ field: 'id', sort: 'desc' }]
+
+    const sortModel = useMemo(() => {
+        if (user?.sessionScope?.ordenacioContingutPermesa) {
+            return [{ field: 'ordre', sort: 'asc' }];
+        }
+        return [{ field: 'id', sort: 'desc' }];
+    }, [user?.sessionScope?.ordenacioContingutPermesa]);
 
     const {
         isReady: apiDocumentIsReady,
