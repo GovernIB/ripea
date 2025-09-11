@@ -66,6 +66,7 @@ import lombok.experimental.FieldNameConstants;
 @ResourceConfig(
         quickFilterFields = { "nom", "fitxerNom" },
         descriptionField = "nom",
+		orderField = "ordreLong",
         artifacts = {
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
@@ -320,6 +321,10 @@ public class DocumentResource extends NodeResource {
             return "";
         }
     }
+
+	public Long getOrdreLong() {
+		return (long)ordre;
+	}
 
     public String getFitxerContentType() {
     	if (Utils.hasValue(this.fitxerContentType)) { return this.fitxerContentType; }

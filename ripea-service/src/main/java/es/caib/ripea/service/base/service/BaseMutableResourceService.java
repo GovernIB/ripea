@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ReflectionUtils;
 
 import java.io.Serializable;
-import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -92,7 +91,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 		completeResource(resource);
 		E entity = getEntity(id, null);
 		ID reorderPreviousParentId = reorderGetParentId(entity);
-		Long reorderResourceSequence = reorderGetResourceSequence(resource, entity);
+		Long reorderResourceSequence = reorderGetSequenceFromResourceOrEntity(resource, entity);
 		boolean proceedWithUpdate = beforeUpdateEntity(entity, resource, answers);
 		E saved;
 		if (proceedWithUpdate) {
@@ -352,27 +351,17 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 	protected Integer reorderGetIncrement() {
 		return null;
 	}
-	protected Long reorderGetResourceSequence(R resource, E entity) {
+	protected Long reorderGetSequenceFromResourceOrEntity(R resource, E entity) {
+		Long sequence = null;
 		ResourceConfig resourceConfig = resource.getClass().getAnnotation(ResourceConfig.class);
 		if (resourceConfig != null && !resourceConfig.orderField().isEmpty()) {
-			try {
-				Field orderField = resource.getClass().getDeclaredField(resourceConfig.orderField());
-				ReflectionUtils.makeAccessible(orderField);
-				Long resourceOrder = (Long)ReflectionUtils.getField(orderField, resource);
-				if (resourceOrder != null) {
-					return resourceOrder;
-				} else if (entity instanceof ReorderableEntity<?>) {
-					ReorderableEntity<ID> reorderableEntity = (ReorderableEntity<ID>)entity;
-					return reorderableEntity.getOrder();
-				} else {
-					return null;
-				}
-			} catch (NoSuchFieldException e) {
-				return null;
-			}
-		} else {
-			return null;
+			sequence = TypeUtil.getFieldOrGetterValue(resourceConfig.orderField(), resource, Long.class);
 		}
+		if (sequence == null && entity instanceof ReorderableEntity<?>) {
+			ReorderableEntity<ID> reorderableEntity = (ReorderableEntity<ID>)entity;
+			sequence = reorderableEntity.getOrder();
+		}
+		return sequence;
 	}
 	protected ID reorderGetParentId(E entity) {
 		if (entity instanceof ReorderableEntity<?>) {
@@ -397,7 +386,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 		boolean anyOrderChanged = false;
 		if (entity instanceof ReorderableEntity<?>) {
 			ReorderableEntity<ID> reorderableEntity = (ReorderableEntity<ID>)entity;
-			boolean reorderParentIdChanged = !Objects.equals(reorderableEntity.getOrderParentId(), previousParentId);
+			boolean parentIdChanged = !Objects.equals(reorderableEntity.getOrderParentId(), previousParentId);
 			log.debug("\tReordenant entitat {} amb la seqüència {} (previousParentId={})",
 					entity,
 					sequenceForEntity,
@@ -406,11 +395,11 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 					reorderableEntity,
 					sequenceForEntity,
 					reorderableEntity.getOrderParentId(),
-					reorderParentIdChanged,
+					parentIdChanged,
 					sameSequenceInsertBefore,
 					isDelete);
 			if (anyOrderChanged1) anyOrderChanged = true;
-			if (reorderParentIdChanged) {
+			if (parentIdChanged) {
 				boolean anyOrderChanged2 = reorderWithParentId(
 						null,
 						null,
@@ -427,7 +416,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 			@Nullable ReorderableEntity<ID> reorderableEntity,
 			@Nullable Long sequenceForEntity,
 			@Nullable ID parentId,
-			boolean reorderParentIdChanged,
+			boolean parentIdChanged,
 			boolean sameSequenceInsertBefore,
 			boolean isDelete) {
 		boolean anyOrderChanged = false;
@@ -441,7 +430,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 			ReorderableEntity<ID> line = (ReorderableEntity<ID>)value;
 			if (!line.equals(reorderableEntity)) {
 				Long currentSequence = line.getOrder();
-				boolean insertHere = sequenceForEntity != null && (sameSequenceInsertBefore ?
+				boolean insertHere = !parentIdChanged && sequenceForEntity != null && (sameSequenceInsertBefore ?
 						currentSequence != null && currentSequence.compareTo(sequenceForEntity) >= 0 :
 						currentSequence != null && currentSequence.compareTo(sequenceForEntity) > 0);
 				if (!inserted && insertHere) {

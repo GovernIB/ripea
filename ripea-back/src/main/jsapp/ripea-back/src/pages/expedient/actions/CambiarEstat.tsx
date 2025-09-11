@@ -3,14 +3,19 @@ import {Grid} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
 import {useRef} from "react";
 import {useTranslation} from "react-i18next";
+import * as builder from "../../../util/springFilterUtils.ts";
 
 const CambiarEstatForm = () => {
     const { data } = useFormContext();
 
+    const filterEstatAdditional = builder.eq('metaExpedient.id', data?.metaExpedient?.id)
+
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField xs={12} name="nom" disabled readOnly/>
         {/*<GridFormField xs={12} name="estat" disabled readOnly/>*/}
-        <GridFormField xs={12} name="estatAdditional" hidden={data?.estat == "TANCAT"}/>
+        <GridFormField xs={12} name="estatAdditional"
+                       filter={filterEstatAdditional}
+                       hidden={data?.estat == "TANCAT"}/>
     </Grid>
 }
 
