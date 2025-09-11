@@ -290,8 +290,6 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 						reorderPreviousParentId,
 						true,
 						false);
-				if (orderChanged)
-					System.out.println(">>> orderChanged: " + reorderResourceSequence + " -> " + documentResourceActual.getOrder());
     		} else {
         		DocumentDto documentCreat = documentHelper.updateDocument(
         				entitatEntity.getId(),
