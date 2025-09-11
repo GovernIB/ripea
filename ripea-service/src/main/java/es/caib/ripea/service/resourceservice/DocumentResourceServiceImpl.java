@@ -284,7 +284,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     			DocumentResourceEntity documentResourceActual = documentResourceRepository.findById(resource.getId()).get();
     			Long reorderPreviousParentId = reorderGetParentId(documentResourceActual);
     			Long reorderResourceSequence = reorderGetSequenceFromResourceOrEntity(resource, documentResourceActual);
-				boolean orderChanged = reorderIfReorderable(
+				reorderIfReorderable(
 						documentResourceActual,
 						reorderResourceSequence,
 						reorderPreviousParentId,
