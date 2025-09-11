@@ -1,8 +1,7 @@
 import React, {useEffect, useMemo, useState} from "react";
-import { DndContext, useDraggable, useDroppable } from '@dnd-kit/core';
-import { FormControl, Grid, InputLabel, Select, MenuItem, Icon, IconButton, Box } from "@mui/material";
+import { DndContext } from '@dnd-kit/core';
+import { FormControl, Grid, InputLabel, Select, MenuItem, Icon, Box } from "@mui/material";
 import {
-    GridRow,
     GridSlots,
     GridTreeDataGroupingCell,
 } from "@mui/x-data-grid-pro";
@@ -20,75 +19,13 @@ import { useSessionList } from "../../components/SessionStorageContext.tsx";
 import DropZone from "../../components/DropZone.tsx";
 import DocumentsGridForm from "./DocumentGridForm.tsx";
 import MetaExpedient from "./details/MetaExpedient.tsx";
+import {DraggableGridRow, DraggableGridRowHandler} from "../../components/DraggableContext.tsx";
 
 const View = {
     estat: 'TREETABLE_PER_ESTAT',
     tipus: 'TREETABLE_PER_TIPUS_DOCUMENT',
     carpeta: 'TREETABLE_PER_CARPETA',
     icona: 'GRID',
-}
-
-type DraggableContextType = {
-    draggableAttributes: any;
-    draggableListeners: any;
-    draggableSetActivatorNodeRef: (element: HTMLElement | null) => void;
-}
-const DraggableContext = React.createContext<DraggableContextType | undefined>(undefined);
-const useDraggableContext = () => {
-    const context = React.useContext(DraggableContext);
-    if (context === undefined) {
-        throw new Error('useDraggableContext must be used within an DraggableContext.Provider');
-    }
-    return context;
-}
-const DraggableGridRow: React.FC<any> = (props) => {
-    const {
-        attributes: draggableAttributes,
-        listeners: draggableListeners,
-        transform: draggableTransform,
-        setNodeRef: draggableSetNodeRef,
-        setActivatorNodeRef: draggableSetActivatorNodeRef
-    } = useDraggable({
-        id: 'draggable_' + props.row.id,
-        data: props.row,
-    });
-    const droppableProps = useDroppable({
-        id: 'droppable_' + props.row.id,
-        data: props.row,
-    });
-    const { isOver, setNodeRef: droppableSetNodeRef } = droppableProps;
-    const draggableStyle = draggableTransform ? {
-        transform: `translate3d(${draggableTransform.x}px, ${draggableTransform.y}px, 0)`,
-    } : undefined;
-    const droppableStyle = {
-        border: isOver && props.row.tipus === 'CARPETA' ? '2px solid grey' : undefined,
-        borderTop: isOver && props.row.tipus !== 'CARPETA' ? '2px solid grey' : undefined,
-    };
-    return <div ref={droppableSetNodeRef} style={droppableStyle}>
-        <DraggableContext.Provider
-            value={{
-                draggableAttributes,
-                draggableListeners,
-                draggableSetActivatorNodeRef
-            }}>
-            <GridRow
-                ref={draggableSetNodeRef}
-                style={draggableStyle}
-                {...props}>
-            </GridRow>
-        </DraggableContext.Provider>
-    </div>;
-}
-const DraggableGridRowHandler: React.FC = () => {
-    const { draggableAttributes, draggableListeners, draggableSetActivatorNodeRef } = useDraggableContext();
-    return <IconButton
-        size="small"
-        ref={draggableSetActivatorNodeRef}
-        {...draggableAttributes}
-        {...draggableListeners}
-        sx={{ cursor: 'grab', mr: 1 }}>
-            <Icon sx={{ mr: 0 }}>swap_vert</Icon>
-    </IconButton>;
 }
 
 const ExpandButton = (props: { value: any, onChange: (value: any) => void, hidden: boolean }) => {
@@ -128,8 +65,6 @@ const TreeViewSelector = (props: { value: any, onChange: (value: any) => void })
         </FormControl>
     </Grid>
 }
-
-const perspectives = ["PATH"]
 
 export const useExpedientsCarpetes = (commonFilter: string) => {
     const {
@@ -171,16 +106,37 @@ export const useExpedientsCarpetes = (commonFilter: string) => {
         expedients,
         carpetes,
         refresh,
-
     };
 }
 
+const perspectives = ["PATH"]
+const columns = [
+    // {
+    //     field: 'nom',
+    //     flex: 0.5,
+    //     renderCell: (params: any) => <ContingutIcon entity={params?.row}/>
+    // },
+    {
+        field: 'descripcio',
+        flex: 0.75,
+    },
+    {
+        field: 'metaDocument',
+        flex: 0.6,
+    },
+    {
+        field: 'createdDate',
+        flex: 0.55,
+    },
+    {
+        field: 'createdByFullName',
+        flex: 0.45,
+    },
+];
 const DocumentsGrid = (props: any) => {
     const { entity, onRowCountChange } = props;
     const { t } = useTranslation();
     const { value: user } = useUserSession();
-
-    //const sortModel: any = [{ field: 'id', sort: 'desc' }]
 
     const sortModel = useMemo(() => {
         if (user?.sessionScope?.ordenacioContingutPermesa) {
@@ -225,36 +181,16 @@ const DocumentsGrid = (props: any) => {
         gridApiRef?.current?.refresh?.();
     }
 
-    const { createActions, actions, hiddenDelete, components } = useContingutActions(entity, gridApiRef, refresh);
+    const { createActions, actions, components } = useContingutActions(entity, gridApiRef, refresh);
     const { actions: massiveActions, components: massiveComponents } = useContingutMassiveActions(entity, refresh);
 
-    const columns = [
-        // {
-        //     field: 'nom',
-        //     flex: 0.5,
-        //     renderCell: (params: any) => <ContingutIcon entity={params?.row}/>
-        // },
-        {
-            field: 'descripcio',
-            flex: 0.75,
-        },
-        {
-            field: 'metaDocument',
-            flex: 0.6,
-        },
-        {
-            field: 'createdDate',
-            flex: 0.55,
-        },
-        {
-            field: 'createdByFullName',
-            flex: 0.45,
-        },
-        ...(vista == View.carpeta ? [{
-            renderCell: (params: any) => <DraggableGridRowHandler />,
+    const additionalColumns = useMemo(()=>[
+        ...columns,
+        ...(vista == View.carpeta && user?.sessionScope?.ordenacioContingutPermesa ? [{
+            renderCell: () => <DraggableGridRowHandler />,
             flex: 0.1
         }] : [])
-    ];
+    ], [columns, vista, user?.sessionScope?.ordenacioContingutPermesa])
 
     const onDrop = React.useCallback((adjunt: any) => {
         gridApiRef?.current?.showCreateDialog?.(null, { adjunt })
@@ -269,21 +205,21 @@ const DocumentsGrid = (props: any) => {
             pare: { id: targetData.tipus === 'DOCUMENT' ? targetData.pare.id : targetData.id },
             ordrePatch: true
         };
-        if (sourceData.tipus === 'DOCUMENT') {
-            console.log('>>> document patch', patchData)
-            if (apiDocumentIsReady) {
-                apiDocumentPatch(sourceData.id, { data: patchData }).
-                then(() => gridApiRef.current.refresh());
-            } else {
-                console.error('Servei de l\'API pels documents no disponible')
-            }
-        } else if (sourceData.tipus === 'CARPETA') {
-            console.log('>>> carpeta patch', patchData)
-            if (apiCarpetaIsReady) {
-                apiCarpetaPatch(sourceData.id, { data: patchData }).
-                then(() => gridApiRef.current.refresh());
-            } else {
-                console.error('Servei de l\'API per les carpetes no disponible')
+        if (sourceData.ordre != targetData.ordre || sourceData.pare.id != targetData.pare.id) {
+            if (sourceData.tipus === 'DOCUMENT') {
+                console.log('>>> document patch', patchData)
+                if (apiDocumentIsReady) {
+                    apiDocumentPatch(sourceData.id, {data: patchData}).then(() => gridApiRef.current.refresh());
+                } else {
+                    console.error('Servei de l\'API pels documents no disponible')
+                }
+            } else if (sourceData.tipus === 'CARPETA') {
+                console.log('>>> carpeta patch', patchData)
+                if (apiCarpetaIsReady) {
+                    apiCarpetaPatch(sourceData.id, {data: patchData}).then(() => gridApiRef.current.refresh());
+                } else {
+                    console.error('Servei de l\'API per les carpetes no disponible')
+                }
             }
         }
     }
@@ -299,7 +235,7 @@ const DocumentsGrid = (props: any) => {
                     <StyledMuiGrid
                         resourceName={"documentResource"}
                         popupEditFormDialogResourceTitle={t('page.document.title')}
-                        columns={columns}
+                        columns={additionalColumns}
                         rowActionsColumnIndex={4}
                         paginationActive={false}
                         filter={commonFilter}
