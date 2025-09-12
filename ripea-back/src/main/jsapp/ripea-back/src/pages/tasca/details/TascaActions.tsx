@@ -78,6 +78,7 @@ const useTascaActions = (entity:any, refresh?: () => void) => {
     const isOnlyObservador = (row: any): boolean => {
          return row?.observadors?.map((obs:any)=>obs?.id).includes(user.codi) && !row?.usuariActualResponsable && !row?.usuariActualDelegat;
     }
+    const hiddenTramitable = (row:any) => isOnlyObservador(row) || hiddenByEstat(row)
 
     const actions = [
         {
@@ -99,7 +100,7 @@ const useTascaActions = (entity:any, refresh?: () => void) => {
             showInMenu: true,
             onClick: (id:any, row:any) => navigate(`/contingut/${row?.expedient?.id}/tasca/${id}`),
             disabled: disableResponsable,
-            hidden: (row:any)=> isOnlyObservador(row) || hiddenByEstat(row),
+            hidden: hiddenTramitable,
         },
         {
             label: t('page.tasca.action.iniciar.label'),
@@ -203,6 +204,7 @@ const useTascaActions = (entity:any, refresh?: () => void) => {
     return {
         actions,
         components,
+        isTramitable: (row:any) => !hiddenTramitable(row),
     }
 }
 export default useTascaActions;

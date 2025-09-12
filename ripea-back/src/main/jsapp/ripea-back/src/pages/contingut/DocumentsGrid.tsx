@@ -20,6 +20,7 @@ import DropZone from "../../components/DropZone.tsx";
 import DocumentsGridForm from "./DocumentGridForm.tsx";
 import MetaExpedient from "./details/MetaExpedient.tsx";
 import {DraggableGridRow, DraggableGridRowHandler} from "../../components/DraggableContext.tsx";
+import useVisualitzar from "./actions/Visualitzar.tsx";
 
 const View = {
     estat: 'TREETABLE_PER_ESTAT',
@@ -181,6 +182,7 @@ const DocumentsGrid = (props: any) => {
         gridApiRef?.current?.refresh?.();
     }
 
+    const {handleOpen: handleVisualitzarOpen, dialog: dialogVisualitzar, isValid} = useVisualitzar();
     const { createActions, actions, components } = useContingutActions(entity, gridApiRef, refresh);
     const { actions: massiveActions, components: massiveComponents } = useContingutMassiveActions(entity, refresh);
 
@@ -361,6 +363,12 @@ const DocumentsGrid = (props: any) => {
                         ]}
                         toolbarMassiveActions={massiveActions}
                         isRowSelectable={(data: any) => data?.row?.tipus == "DOCUMENT"}
+                        onRowClick={(params: any) => {
+                            if (params?.row.tipus === 'DOCUMENT' && isValid(params?.row)) {
+                                handleVisualitzarOpen(params?.id)
+                            }
+                        }}
+
                         toolbarHideCreate
                         popupEditFormComponentProps={{ initOnChangeRequest: true }}
                         popupEditFormI18nKeys={{
@@ -371,6 +379,7 @@ const DocumentsGrid = (props: any) => {
                     />
                     {components}
                     {massiveComponents}
+                    {dialogVisualitzar}
                 </DndContext>
             </DropZone>
         </Load>

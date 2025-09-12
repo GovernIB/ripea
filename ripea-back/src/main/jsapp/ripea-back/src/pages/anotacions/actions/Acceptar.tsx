@@ -82,7 +82,7 @@ const AcceptarTabAnnexos = () => {
         },
     ]
 
-    const {handleOpen, dialog} = useVisualitzar()
+    const {handleOpen, dialog, isValid} = useVisualitzar()
 
     const actions = [
         {
@@ -90,7 +90,7 @@ const AcceptarTabAnnexos = () => {
             icon: "search",
             showInMenu: false,
             onClick: handleOpen,
-            hidden: (row:any) => row?.fitxerExtension != 'pdf',
+            hidden: (row:any) => !isValid(row),
         },
     ]
 
@@ -107,6 +107,11 @@ const AcceptarTabAnnexos = () => {
                     );
 
                     apiRef?.current?.setFieldValue('annexos', annexos)
+                }
+            }}
+            onRowClick={(params: any) => {
+                if (isValid(params?.row)) {
+                    handleOpen(params?.id)
                 }
             }}
 

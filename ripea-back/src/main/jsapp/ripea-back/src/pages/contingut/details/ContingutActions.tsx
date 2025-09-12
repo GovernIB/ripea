@@ -157,7 +157,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
     const {eliminar, apiDownload, getLinkCSV, definitiu, guardarArxiu} = useActions(refresh)
     const {handleOpen: handleDetallOpen, dialog: dialogDetall} = useDocumentDetail(entity);
     const {handleOpen: handleHistoricOpen, dialog: dialogHistoric} = useHistoric();
-    const {handleOpen: handleVisualitzarOpen, dialog: dialogVisualitzar} = useVisualitzar();
+    const {handleOpen: handleVisualitzarOpen, dialog: dialogVisualitzar, isValid} = useVisualitzar();
     const {handleOpen: handleSeguimentOpen, dialog: dialogSeguiment} = useSeguimentPortafirmes(entity?.potModificar, refresh);
     const {handleOpen: handleSeguimentVfOpen, dialog: dialogSeguimentVf} = useSeguimentViafirma(entity?.potModificar, refresh);
     const {handleOpen: handleArxiuOpen, dialog: arxiuDialog} = useInformacioArxiu('documentResource', 'ARXIU_DOCUMENT');
@@ -311,7 +311,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             icon: "search",
             showInMenu: true,
             onClick: handleVisualitzarOpen,
-            disabled: (row:any) => !isInOptions(row?.fitxerExtension, 'pdf', 'odt', 'docx'),
+            disabled: (row:any) => !isValid(row),
             hidden: (row:any) => !isDigitalOrImportat(row),
         },
         {

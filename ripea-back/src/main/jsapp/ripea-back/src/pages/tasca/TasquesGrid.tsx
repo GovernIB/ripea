@@ -104,7 +104,7 @@ const TasquesGrid = () => {
         apiRef?.current?.refresh?.();
     }
 
-    const { actions, components } = useTascaActions({potModificar: true}, refresh)
+    const { actions, components, isTramitable } = useTascaActions({potModificar: true}, refresh)
 
     return <GridPage disableMargins>
         <CardPage title={t('page.user.menu.tasca')}>
@@ -127,7 +127,11 @@ const TasquesGrid = () => {
                     namedQueries={['USUARI_RELACIONAT']}
                     sortModel={sortModel}
                     rowAdditionalActions={actions}
-                    onRowDoubleClick={(params: any) => navigate(`/contingut/${params?.row?.expedient?.id}/tasca/${params?.id}`)}
+                    onRowClick={(params: any) => {
+                        if (isTramitable(params?.row)) {
+                            navigate(`/contingut/${params?.row?.expedient?.id}/tasca/${params?.id}`)
+                        }
+                    }}
                     rowProps={(row: any) => {
                         let color;
                         if (row?.delegat?.id == user.codi) {

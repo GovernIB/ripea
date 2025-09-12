@@ -93,8 +93,8 @@ const theme = createTheme({
                 root: {
                     // Si algún hijo input/select está readonly o disabled
                     '&:has(.MuiInputBase-input[readonly][aria-hidden="false"]), &:has(.MuiInputBase-input.Mui-disabled), &:has(.MuiSelect-select[readonly]), &:has(.MuiSelect-select.Mui-disabled)': {
-                        backgroundColor: '#e7e5e5',
-                        opacity: 0.6,
+                        backgroundColor: 'rgba(231,229,229,0.6)',
+                        // opacity: 0.6,
                     }
                 }
             }
@@ -113,7 +113,7 @@ const theme = createTheme({
                     paddingRight: '2px',
                     fontSize: '14px',
                     fontWeight: 200,
-                    color: 'darkgray',
+                    color: 'dark',
                     '&.Mui-disabled': {
                         fontStyle: 'italic',
                         paddingRight: '2px',
