@@ -140,6 +140,8 @@ import es.caib.ripea.service.intf.service.ExpedientSeguidorService;
 import es.caib.ripea.service.intf.utils.DateUtil;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.permission.ExtendedPermission;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 
 @Component
 public class ExpedientHelper {
@@ -184,6 +186,7 @@ public class ExpedientHelper {
 	@Autowired private CsvHelper csvHelper;
 	@Autowired private ExpedientRepositoryCommnand expedientRepositoryCommnand;
 	@Autowired private ExpedientSeguidorService expedientSeguidorService;
+	@Autowired private MeterRegistry meterRegistry;
 	
 	public static List<DocumentDto> expedientsWithImportacio = new ArrayList<DocumentDto>();
 
@@ -229,149 +232,160 @@ public class ExpedientHelper {
 			String prioritatMotiu,
 			SiNoEnumDto seguidor) {
 
-		logger.info(
-				"Expedient crear Helper START(" +
-						"entitatId=" + entitatId + ", " +
-						"metaExpedientId=" + metaExpedientId + ", " +
-						"metaExpedientDominiId=" + metaExpedientDominiId + ", " +
-						"organGestorId=" + organGestorId + ", " +
-						"any=" + any + ", " +
-						"nom=" + nom + ", " +
-						"expedientPeticioId=" + expedientPeticioId + ")");
-
-
-//		try {
-//			Thread.sleep(5000L);
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//		}
-
-		if (metaExpedientId == null) {
-			throw new ValidationException(
-					"<creacio>",
-					ExpedientEntity.class,
-					"No es pot crear un expedient sense un meta-expedient associat");
-		}
-		if (expedientPeticioId != null) {
-			ExpedientPeticioEntity expedientPeticio = expedientPeticioRepository.getOne(expedientPeticioId);
-			if (expedientPeticio.getExpedient() != null) {
- 				throw new ValidationException(
+		Timer.Sample sample = Timer.start(meterRegistry);
+		
+		try {
+		
+			logger.info(
+					"Expedient crear Helper START(" +
+							"entitatId=" + entitatId + ", " +
+							"metaExpedientId=" + metaExpedientId + ", " +
+							"metaExpedientDominiId=" + metaExpedientDominiId + ", " +
+							"organGestorId=" + organGestorId + ", " +
+							"any=" + any + ", " +
+							"nom=" + nom + ", " +
+							"expedientPeticioId=" + expedientPeticioId + ")");
+	
+			if (metaExpedientId == null) {
+				throw new ValidationException(
 						"<creacio>",
 						ExpedientEntity.class,
-						"Aquesta anotació ja està relacionada amb algun expedient");
+						"No es pot crear un expedient sense un meta-expedient associat");
 			}
-		}
-		boolean exists = checkIfExistsByMetaExpedientAndNom(
-				metaExpedientId,
-				nom) != null;
-		if (exists) {
-			throw new ValidationException(
-					"<creacio>",
-					ExpedientEntity.class,
-					"Ja existeix un altre expedient amb el mateix títol per aquest procediment");
-		}
-
-		entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				false,
-				false,
-				true,
-				false);
-		
-		entityComprovarHelper.comprovarPermisExpedientCreation(
-				metaExpedientId,
-				organGestorId, 
-				grupId, 
-				rolActual);
-		
-		MetaExpedientEntity metaExpedient = metaExpedientRepository.getOne(metaExpedientId);
-		
-		OrganGestorEntity organGestor = getOrganGestorForExpedient(
-				metaExpedient,
-				organGestorId,
-				ExtendedPermission.CREATE,
-				rolActual);
-
-		ExpedientEntity expedient = contingutHelper.crearNouExpedient(
-				nom,
-				metaExpedient,
-				null,
-				metaExpedient.getEntitat(),
-				organGestor,
-				"1.0",
-				metaExpedient.getEntitat().getUnitatArrel(),
-				new Date(),
-				any,
-				true,
-				grupId,
-				prioritat,
-				prioritatMotiu);
-		contingutLogHelper.logCreacio(expedient, false, false);
-		crearDadesPerDefecte(
-				metaExpedient,
-				expedient);
-		List<ExpedientEstatEntity> expedientEstats = expedientEstatRepository.findByMetaExpedientOrderByOrdreAsc(expedient.getMetaExpedient());
-		// find inicial state if exists
-		ExpedientEstatEntity estatInicial = null;
-		for (ExpedientEstatEntity expedientEstat : expedientEstats) {
-			if (expedientEstat.isInicial()) {
-				estatInicial = expedientEstat;
+			
+			if (expedientPeticioId != null) {
+				ExpedientPeticioEntity expedientPeticio = expedientPeticioRepository.getOne(expedientPeticioId);
+				if (expedientPeticio.getExpedient() != null) {
+	 				throw new ValidationException(
+							"<creacio>",
+							ExpedientEntity.class,
+							"Aquesta anotació ja està relacionada amb algun expedient");
+				}
 			}
-		}
-		// set inicial estat if exists
-		if (estatInicial != null) {
-			expedient.updateEstatAdditional(estatInicial);
-			// if estat has usuari responsable agafar expedient by this user
-			if (estatInicial.getResponsableCodi() != null) {
-				agafar(expedient, estatInicial.getResponsableCodi());
-				
+			
+			boolean exists = checkIfExistsByMetaExpedientAndNom(metaExpedientId, nom) != null;
+			
+			if (exists) {
+				throw new ValidationException(
+						"<creacio>",
+						ExpedientEntity.class,
+						"Ja existeix un altre expedient amb el mateix títol per aquest procediment");
 			}
-		}
-		// Crea les relacions expedients i organs pare
-		organGestorHelper.crearExpedientOrganPares(
-				expedient,
-				organGestor);
-		
-		// if expedient comes from distribucio
-		if (expedientPeticioId != null) {
-			relateExpedientWithPeticioAndSetAnnexosPendent(expedientPeticioId, expedient.getId());
-			if (associarInteressats) {
-				associateInteressats(
-						expedient.getId(),
-						expedientPeticioId,
-						PermissionEnumDto.CREATE,
-						rolActual,
-						interessatsAccionsMap);
+	
+			entityComprovarHelper.comprovarEntitat(
+					entitatId,
+					false,
+					false,
+					false,
+					true,
+					false);
+			
+			entityComprovarHelper.comprovarPermisExpedientCreation(
+					metaExpedientId,
+					organGestorId, 
+					grupId, 
+					rolActual);
+			
+			MetaExpedientEntity metaExpedient = metaExpedientRepository.getOne(metaExpedientId);
+			
+			OrganGestorEntity organGestor = getOrganGestorForExpedient(
+					metaExpedient,
+					organGestorId,
+					ExtendedPermission.CREATE,
+					rolActual);
+	
+			ExpedientEntity expedient = contingutHelper.crearNouExpedient(
+					nom,
+					metaExpedient,
+					null,
+					metaExpedient.getEntitat(),
+					organGestor,
+					"1.0",
+					metaExpedient.getEntitat().getUnitatArrel(),
+					new Date(),
+					any,
+					true,
+					grupId,
+					prioritat,
+					prioritatMotiu);
+			contingutLogHelper.logCreacio(expedient, false, false);
+			crearDadesPerDefecte(metaExpedient, expedient);
+			
+			List<ExpedientEstatEntity> expedientEstats = expedientEstatRepository.findByMetaExpedientOrderByOrdreAsc(expedient.getMetaExpedient());
+			// find inicial state if exists
+			ExpedientEstatEntity estatInicial = null;
+			for (ExpedientEstatEntity expedientEstat : expedientEstats) {
+				if (expedientEstat.isInicial()) {
+					estatInicial = expedientEstat;
+				}
 			}
-			ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.getOne(expedientPeticioId);
-			expedientPeticioHelper.canviEstatExpedientPeticio(expedientPeticioEntity, ExpedientPeticioEstatEnumDto.PROCESSAT_PENDENT);
-		}
-		// crear carpetes per defecte del procediment
-		crearCarpetesMetaExpedient(entitatId, metaExpedient, expedient);
-		
-		boolean throwExcepcion = false;//throwExcepcion = true;
-		if (throwExcepcion) {
-			throw new RuntimeException("Mock excepcion al crear expedient");
-		}
-		
-		logger.info(
-				"Expedient crear Helper END(" +
-						"sequencia=" + expedient.getSequencia() + ", " +
-						"any=" + expedient.getAny() + ", " +
-						"metaExpedient=" + expedient.getMetaExpedient().getId() + " - " + expedient.getMetaExpedient().getCodi() + ")");
-
-		if (SiNoEnumDto.SI.equals(seguidor)) {
-			try {
-				expedientSeguidorService.follow(
-						entitatId,
-						expedient.getId());
-			} catch (Exception e) {
-				logger.error("Hi ha hagut un error en intentar posar-se com a seguidor de l'expedient.", e);
+			
+			// set inicial estat if exists
+			if (estatInicial != null) {
+				expedient.updateEstatAdditional(estatInicial);
+				// if estat has usuari responsable agafar expedient by this user
+				if (estatInicial.getResponsableCodi() != null) {
+					agafar(expedient, estatInicial.getResponsableCodi());
+					
+				}
 			}
-		}
-		
-		return expedient.getId();
+			
+			// Crea les relacions expedients i organs pare
+			organGestorHelper.crearExpedientOrganPares(expedient, organGestor);
+			
+			// if expedient comes from distribucio
+			if (expedientPeticioId != null) {
+				relateExpedientWithPeticioAndSetAnnexosPendent(expedientPeticioId, expedient.getId());
+				if (associarInteressats) {
+					associateInteressats(
+							expedient.getId(),
+							expedientPeticioId,
+							PermissionEnumDto.CREATE,
+							rolActual,
+							interessatsAccionsMap);
+				}
+				ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.getOne(expedientPeticioId);
+				expedientPeticioHelper.canviEstatExpedientPeticio(expedientPeticioEntity, ExpedientPeticioEstatEnumDto.PROCESSAT_PENDENT);
+			}
+			
+			// crear carpetes per defecte del procediment
+			crearCarpetesMetaExpedient(entitatId, metaExpedient, expedient);
+			
+			boolean throwExcepcion = false;//throwExcepcion = true;
+			if (throwExcepcion) {
+				throw new RuntimeException("Mock excepcion al crear expedient");
+			}
+			
+			logger.info(
+					"Expedient crear Helper END(" +
+							"sequencia=" + expedient.getSequencia() + ", " +
+							"any=" + expedient.getAny() + ", " +
+							"metaExpedient=" + expedient.getMetaExpedient().getId() + " - " + expedient.getMetaExpedient().getCodi() + ")");
+	
+			if (SiNoEnumDto.SI.equals(seguidor)) {
+				try {
+					expedientSeguidorService.follow(
+							entitatId,
+							expedient.getId());
+				} catch (Exception e) {
+					logger.error("Hi ha hagut un error en intentar posar-se com a seguidor de l'expedient.", e);
+				}
+			}
+			
+	        sample.stop(Timer.builder("ExpedientHelper.create")
+	                .description("Tiempo y resultado")
+	                .tags("resultado", "exito")
+	                .register(meterRegistry));
+	        
+	        return expedient.getId();
+        
+        } catch (Exception e) {
+            sample.stop(Timer.builder("ExpedientHelper.create")
+                .description("Tiempo y resultado")
+                .tags("resultado", "error")
+                .register(meterRegistry));
+            throw e;
+        }
 	}
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)

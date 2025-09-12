@@ -33,7 +33,9 @@ public class BaseApiInternaSecurityConfig {
 				new AntPathRequestMatcher("/v3/api-docs/**"),
 				new AntPathRequestMatcher("/rest/portafib/v1/**/*"),
 				new AntPathRequestMatcher("/api/viaFirmaResponse"),
-				new AntPathRequestMatcher("/notib/**/*")
+				new AntPathRequestMatcher("/notib/**/*"),
+				new AntPathRequestMatcher("/appInfo"),
+				new AntPathRequestMatcher("/salut")
 		};
 	}
 
