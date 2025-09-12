@@ -1,4 +1,4 @@
-import {GridPage, useMuiDataGridApiRef} from "reactlib";
+import {useMuiDataGridApiRef} from "reactlib";
 import {Grid, Typography, Icon} from "@mui/material";
 import useRemesaActions from "./details/RemesaActions.tsx";
 import GridFormField from "../../components/GridFormField.tsx";
@@ -32,19 +32,17 @@ const StyledEstat = (props:any) => {
                 }
             </>
         case 'REGISTRADA':
+        case 'PROCESSADA':
+        case 'ENVIADA':
             return <EstatMessage icon={"info"} color={'info'}>{children}</EstatMessage>
         case 'FINALITZADA':
             return <EstatMessage icon={"check"} color={'success'}>{children}</EstatMessage>
-        case 'PROCESSADA':
-            return <EstatMessage icon={"info"} color={'info'}>{children}</EstatMessage>
         case 'ENVIADA_AMB_ERRORS':
             if (entity?.error) {
                 return <EstatMessage icon={"warning"} color={'error'}>{children}</EstatMessage>
             } else {
                 return <EstatMessage icon={"check"} color={'success'}>{children}</EstatMessage>
             }
-        case 'ENVIADA':
-            return <EstatMessage icon={"info"} color={'info'}>{children}</EstatMessage>
         case 'FINALITZADA_AMB_ERRORS':
             if (entity?.error) {
                 return <EstatMessage icon={"warning"} color={'error'}>{children}</EstatMessage>

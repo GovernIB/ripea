@@ -12,10 +12,7 @@ const CambiarEstatForm = () => {
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField xs={12} name="nom" disabled readOnly/>
-        {/*<GridFormField xs={12} name="estat" disabled readOnly/>*/}
-        <GridFormField xs={12} name="estatAdditional"
-                       filter={filterEstatAdditional}
-                       hidden={data?.estat == "TANCAT"}/>
+        <GridFormField xs={12} name="estatAdditional" filter={filterEstatAdditional}/>
     </Grid>
 }
 

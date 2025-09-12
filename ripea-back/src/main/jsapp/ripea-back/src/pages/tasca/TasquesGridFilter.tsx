@@ -49,18 +49,18 @@ const TasquesGridFilter = (props:any) => {
     return <StyledMuiFilter
         resourceName={"expedientTascaResource"}
         code={"TASCA_FILTER"}
-        springFilterBuilder={(data: any)=> {
-                    if (!data?.advanced) {
-                        return springFilterBuilder({
-                            metaExpedient: data.metaExpedient,
-                            titol: data.titol,
-                            prioritat: data.prioritat,
-                            estat: data.estat,
-                            advanced: true,
-                        })
-                    }
-                    return springFilterBuilder(data)
-                }}
+        springFilterBuilder={(data: any) => {
+            if (!data?.advanced) {
+                return springFilterBuilder({
+                    metaExpedient: data.metaExpedient,
+                    titol: data.titol,
+                    prioritat: data.prioritat,
+                    estat: data.estat,
+                    advanced: true,
+                })
+            }
+            return springFilterBuilder(data)
+        }}
         onSpringFilterChange={onSpringFilterChange}
         filterOnFieldEnterKeyPressed
         advancedSearch

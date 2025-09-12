@@ -1,4 +1,3 @@
-import {GridPage} from 'reactlib';
 import {useTranslation} from "react-i18next";
 import useAnotacioActions from "./details/AnotacioActions.tsx";
 import {formatDate} from "../../util/dateUtils.ts";

@@ -1,4 +1,4 @@
-import {GridPage, useMuiDataGridApiRef, useResourceApiService} from "reactlib";
+import {useMuiDataGridApiRef, useResourceApiService} from "reactlib";
 import * as builder from '../../util/springFilterUtils';
 import {useDadaActions} from "./details/DadaActions.tsx";
 import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";

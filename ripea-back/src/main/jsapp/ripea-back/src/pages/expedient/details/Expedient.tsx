@@ -2,11 +2,7 @@ import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 import {GridPage, useResourceApiService} from 'reactlib';
 import {useState, useEffect} from "react";
-import {Typography, Grid2 as Grid, Icon, IconButton, Link, Alert, Button} from '@mui/material';
-import Box from '@mui/material/Box';
-import Card from '@mui/material/Card';
-import CardHeader from '@mui/material/CardHeader';
-import CardContent from '@mui/material/CardContent';
+import {Typography, Grid2 as Grid, Icon, IconButton, Link, Alert, Button, Box} from '@mui/material';
 import {formatDate} from '../../../util/dateUtils.ts';
 import TabComponent from "../../../components/TabComponent.tsx";
 import InteressatsGrid from "../../interessats/InteressatsGrid.tsx";
@@ -19,7 +15,7 @@ import {StyledEstat, StyledPrioritat} from "../ExpedientGrid.tsx";
 import {CommentDialog} from "../../CommentDialog.tsx";
 import RemesaGrid from "../../remesa/RemesaGrid.tsx";
 import PublicacioGrid from "../../publicacio/PublicacioGrid.tsx";
-import {CardData, ContenidoData} from "../../../components/CardData.tsx";
+import {CardData, CardPage, ContenidoData} from "../../../components/CardData.tsx";
 import Load from "../../../components/Load.tsx";
 import {useUserSession} from "../../../components/Session.tsx";
 import {useActions} from "./CommonActions.tsx";
@@ -275,37 +271,30 @@ const Expedient = () => {
             </Typography>
         </Box>
     </Box>;
-    return <GridPage disableMargins style={{ backgroundColor: 'white' }}>
+    return <GridPage disableMargins>
         <SseExpedient id={id}/>
         <Load value={expedient} noEffect>
-            <Card>
-                <CardHeader title={headerMain} sx={{
-                    backgroundColor: '#f5f5f5',
-                    borderTop: '1px solid #e3e3e3',
-                    borderBottom: '1px solid #e3e3e3',
-                }} />
-                <CardContent>
-                    <Grid container spacing={2}>
-                        <Grid size={3}>
-                            <ExpedientInfo entity={expedient} />
-                        </Grid>
-                        <Grid size={9}>
-                            <ExpedientAlert entity={expedient} />
-                            <Box>
-                                <TabComponent
-                                    tabs={tabs}
-                                    variant="scrollable"
-                                    headerAdditionalData={<CommentDialog
-                                        entity={expedient}
-                                        title={`${t('page.comment.expedient')}: ${expedient?.nom}`}
-                                        resourceName={'expedientComentariResource'}
-                                        resourceReference={'expedient'} />}
-                                />
-                            </Box>
-                        </Grid>
+            <CardPage header={headerMain}>
+                <Grid container spacing={2}>
+                    <Grid size={3}>
+                        <ExpedientInfo entity={expedient} />
                     </Grid>
-                </CardContent>
-            </Card>
+                    <Grid size={9}>
+                        <ExpedientAlert entity={expedient} />
+                        <Box>
+                            <TabComponent
+                                tabs={tabs}
+                                variant="scrollable"
+                                headerAdditionalData={<CommentDialog
+                                    entity={expedient}
+                                    title={`${t('page.comment.expedient')}: ${expedient?.nom}`}
+                                    resourceName={'expedientComentariResource'}
+                                    resourceReference={'expedient'} />}
+                            />
+                        </Box>
+                    </Grid>
+                </Grid>
+            </CardPage>
         </Load>
     </GridPage>;
 }

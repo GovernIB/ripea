@@ -1,5 +1,4 @@
 import {Grid} from "@mui/material";
-import {GridPage} from "reactlib";
 import * as builder from "../../util/springFilterUtils.ts";
 import {formatDate} from "../../util/dateUtils.ts";
 import GridFormField from "../../components/GridFormField.tsx";
