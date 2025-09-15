@@ -391,6 +391,11 @@ const translationEn = {
                     label: "Export...",
                     ok: "Interested parties exported successfully",
                 },
+                importSGD: {
+                    label: "Import stakeholders from Registry...",
+                    title: "Import stakeholders from Registry",
+                    ok: "Stakeholders successfully imported",
+                },
             },
             grid: {
                 title: "Interested parties from file",

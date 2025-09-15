@@ -8,6 +8,8 @@ import * as builder from "../../util/springFilterUtils.ts";
 import useImport from "./actions/Import.tsx";
 import {useActions as useExpedientActions} from "../expedient/details/CommonActions.tsx"
 import {InteressatsGridForm} from "./InteressatsGridForm.tsx";
+import {MenuActionButton} from "../../components/MenuButton.tsx";
+import {useUserSession} from "../../components/Session.tsx";
 
 const perspectives = ['REPRESENTANT']
 const sortModel:any = [{field: 'id', sort: 'asc'}]
@@ -21,6 +23,7 @@ interface DetailGridProps {
 const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
     const {entity, num, onRowCountChange} = props
     const { t } = useTranslation();
+    const { value: user } = useUserSession()
     const [selectedRows, setSelectedRows] = useState<any[]>([]);
 
     const columns = [
@@ -59,7 +62,7 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
         apiRef?.current?.refresh()
     }
 
-    const {actions, components} = useInteressatActions(entity, refresh)
+    const {actions, createActions, components} = useInteressatActions(entity, refresh)
     const {exportar} = useActions(refresh);
     const {excelInteressats} = useExpedientActions(refresh);
     const {handleShow: handleImport, content: contentImport} = useImport(entity, refresh);
@@ -87,7 +90,7 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
             rowAdditionalActions={actions}
             onRowCountChange={onRowCountChange}
             toolbarCreateTitle={t('page.interessat.action.new.label')}
-            toolbarHideCreate={!entity?.potModificar}
+            toolbarHideCreate={user?.sessionScope?.isMostrarImportacio || !entity?.potModificar}
             toolbarHideQuickFilter={false}
             toolbarHideRefresh
             selectionActive
@@ -121,6 +124,20 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
                                             hidden={!entity?.potModificar || !num}
                     />,
                 },
+                {
+                    position: 3,
+                    element: <MenuActionButton
+                        id={'createInteressats'}
+                        hidden={!user?.sessionScope?.isMostrarImportacio || !entity?.potModificar}
+                        buttonLabel={t('page.interessat.action.new.label')}
+                        buttonProps={{
+                            startIcon: <Icon>add</Icon>,
+                            variant: "outlined",
+                            sx: { borderRadius: '4px', minWidth: '20px', minHeight: '32px', py: 0 }
+                        }}
+                        actions={createActions}
+                    />,
+                }
             ]}
             popupEditFormI18nKeys={{
                 createSuccess: 'page.interessat.action.new.ok',

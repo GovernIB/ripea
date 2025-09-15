@@ -196,7 +196,8 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         register(ExpedientResource.ACTION_SYNC_ARXIU, new SincronitzarArxiuActionExecutor());
         register(ExpedientResource.ACTION_IMPORT_DOCS, new ImportarDocumentsArxiuActionExecutor());
         register(ExpedientResource.ACTION_IMPORT_DOCS_ZIP, new ImportarDocumentsZipArxiuActionExecutor());
-        
+        register(ExpedientResource.ACTION_IMPORT_INTE, new ImportarInteressatsArxiuActionExecutor());
+
         register(ExpedientResource.PERSPECTIVE_AMB_PINBAL_CODE, new AmbDocumentsPinbalPerspectiveApplicator());
         register(ExpedientResource.PERSPECTIVE_FOLLOWERS, new FollowersPerspectiveApplicator());
         register(ExpedientResource.PERSPECTIVE_COUNT, new CountPerspectiveApplicator());
@@ -1174,7 +1175,17 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 			}
 		}
     }
-    
+    private class ImportarInteressatsArxiuActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.ImportarInteressatsForm, Serializable> {
+
+		@Override
+		public void onChange(Serializable id, ExpedientResource.ImportarInteressatsForm previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, ExpedientResource.ImportarInteressatsForm target) {}
+
+		@Override
+		public Serializable exec(String code, ExpedientResourceEntity entity, ExpedientResource.ImportarInteressatsForm params) throws ActionExecutionException {
+			return null;
+		}
+    }
+
     private class SincronitzarArxiuActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
 
 		@Override
