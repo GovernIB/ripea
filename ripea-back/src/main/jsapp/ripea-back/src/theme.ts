@@ -104,6 +104,11 @@ const theme = createTheme({
                 root: {
                     fontSize: '14px',
                 },
+                input: {
+                    '&.Mui-disabled': {
+                        '-webkit-text-fill-color': 'black',
+                    }
+                }
             }
         },
         MuiFormLabel: {
@@ -113,15 +118,16 @@ const theme = createTheme({
                     paddingRight: '2px',
                     fontSize: '14px',
                     fontWeight: 200,
-                    color: 'dark',
+                    color: 'black',
                     '&.Mui-disabled': {
                         fontStyle: 'italic',
                         paddingRight: '2px',
+                        color: 'black',
                     },
                     '&.Mui-focused': {
                         fontStyle: 'italic',
                         paddingRight: '2px',
-                        backgroundColor: 'white',   
+                        backgroundColor: 'white',
                     }
                 },
                 filled: {
