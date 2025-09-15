@@ -6,8 +6,9 @@ import {
 } from "reactlib";
 import {useTranslation} from "react-i18next";
 import useInteressatDetail from "./InteressatDetail.tsx";
-import {useCreateRepresentant} from "../actions/Create.tsx";
+import useCreate, {useCreateRepresentant} from "../actions/Create.tsx";
 import {iniciaDescargaJSON} from "../../expedient/details/CommonActions.tsx";
+import useImportarSGD from "../actions/ImportarSGD.tsx";
 
 export const useActions = (refresh?: () => void) => {
     const { t } = useTranslation();
@@ -95,7 +96,24 @@ const useInteressatActions = (entity:any, refresh?: () => void) => {
 
     const {guardarArxiu, deleteRepresentent, deleteInteressat} = useActions(refresh);
     const {handleOpen: handleDetail, dialog: dialogDetail} = useInteressatDetail();
+    const {create, content: contentCreate} = useCreate(refresh)
     const {create: createRepresentent, update: updateRepresentent, content} = useCreateRepresentant(refresh)
+    const {handleShow: handleImportarSGD, content: contentImportarSGD} = useImportarSGD(entity, refresh)
+
+    const createActions = [
+        {
+            label: t('page.interessat.title')+"...",
+            icon: 'person_add',
+            showInMenu: true,
+            onClick: create,
+        },
+        {
+            label: t('page.interessat.action.importSGD.label'),
+            icon: 'group_search',
+            showInMenu: true,
+            onClick: handleImportarSGD,
+        }
+    ]
 
     const actions = [
         {
@@ -159,10 +177,13 @@ const useInteressatActions = (entity:any, refresh?: () => void) => {
     const components=<>
         {content}
         {dialogDetail}
+        {contentCreate}
+        {contentImportarSGD}
     </>;
 
     return {
         actions,
+        createActions,
         components,
     }
 }

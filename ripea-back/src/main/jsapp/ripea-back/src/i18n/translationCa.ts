@@ -391,6 +391,11 @@ const translationCa = {
                     label: "Exportar...",
                     ok: "Interessats exportats correctament",
                 },
+                importSGD: {
+                    label: "Importar interessats des de Registre...",
+                    title: "Importar interessats des de Registre",
+                    ok: "Interessats importats correctament",
+                },
             },
             grid: {
                 title: "Interessats del fitxer",

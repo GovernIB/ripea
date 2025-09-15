@@ -139,6 +139,11 @@ import lombok.experimental.FieldNameConstants;
                         requiresId = true),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
+                        code = ExpedientResource.ACTION_IMPORT_INTE,
+                        formClass = ExpedientResource.ImportarInteressatsForm.class,
+                        requiresId = true),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
                         code = ExpedientResource.ACTION_IMPORT_DOCS_ZIP,
                         formClass = ExpedientResource.ImportarDocumentsZipForm.class,
                         requiresId = true),
@@ -221,6 +226,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
 	public static final String ACTION_SYNC_ARXIU = "SYNC_ARXIU";
 	public static final String ACTION_IMPORT_DOCS = "IMPORT_DOCS";
 	public static final String ACTION_IMPORT_DOCS_ZIP = "IMPORT_DOCS_ZIP";
+	public static final String ACTION_IMPORT_INTE = "IMPORT_INTE";
 	public static final String REPORT_PLANTILLA_EXCEL_INTERESSATS = "PLANTILLA_EXCEL_INTERESSATS";
 	public static final String REPORT_PLANTILLA_DADES_CSV = "PLANTILLA_DADES_CSV";
 	
@@ -468,6 +474,16 @@ public class ExpedientResource extends NodeResource implements Serializable {
         private Date dataPresentacio;
     	private ResourceReference<CarpetaResource, Long> carpeta;
         private String novaCarpetaNom;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @FieldNameConstants
+    public static class ImportarInteressatsForm implements Serializable {
+    	@NotNull private String numeroRegistre;
+        @NotNull @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy", timezone="Europe/Madrid")
+        private Date dataPresentacio;
     }
     
     @Getter

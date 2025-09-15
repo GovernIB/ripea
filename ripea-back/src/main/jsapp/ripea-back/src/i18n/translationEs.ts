@@ -391,6 +391,11 @@ const translationEs = {
                     label: "Exportar...",
                     ok: "Interesados exportados correctamente",
                 },
+                importSGD: {
+                    label: "Importar interesados desde Registro...",
+                    title: "Importar interesados desde Registro",
+                    ok: "Interesados importados correctamente",
+                }
             },
             grid: {
                 title: "Interesados del fichero",
