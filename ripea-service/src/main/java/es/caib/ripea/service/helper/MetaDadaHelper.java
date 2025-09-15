@@ -13,6 +13,7 @@ import es.caib.ripea.persistence.entity.MetaNodeEntity;
 import es.caib.ripea.persistence.repository.MetaDadaRepository;
 import es.caib.ripea.service.intf.dto.MetaDadaDto;
 import es.caib.ripea.service.intf.dto.MetaDadaTipusEnumDto;
+import io.micrometer.core.instrument.Timer;
 
 @Component
 public class MetaDadaHelper {
@@ -21,72 +22,80 @@ public class MetaDadaHelper {
 	@Autowired private ConversioTipusHelper conversioTipusHelper;
 	@Autowired private EntityComprovarHelper entityComprovarHelper;
 	@Autowired private MetaExpedientHelper metaExpedientHelper;
+	@Autowired private ApplicationHelper applicationHelper;
 
 	public MetaDadaEntity findByMetaNodeAndCodi(MetaNodeEntity metaNode, String codi) {
 		return metaDadaRepository.findByMetaNodeAndCodi(metaNode, codi);
 	}
 	
-	public MetaDadaDto create(
-			Long entitatId,
-			Long metaNodeId,
-			MetaDadaDto metaDada, String rolActual, Long organId) {
-		logger.debug("Creant una nova meta-dada (" +
-				"entitatId=" + entitatId + ", " +
-				"metaNodeId=" + metaNodeId + ", " +
-				"metaDada=" + metaDada + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-		MetaNodeEntity metaNode = entityComprovarHelper.comprovarMetaNode(entitat, metaNodeId);
+	public MetaDadaDto create(Long entitatId, Long metaNodeId, MetaDadaDto metaDada, String rolActual, Long organId) {
 		
-		int ordre = metaDadaRepository.countByMetaNode(metaNode);
+		Timer.Sample sample = Timer.start(applicationHelper.getMeterRegistry());
 		
-		Object valor = null;
-		if (metaDada.getTipus()==MetaDadaTipusEnumDto.BOOLEA) {
-			valor = metaDada.getValorBoolea();
-		} else if (metaDada.getTipus()==MetaDadaTipusEnumDto.DATA) {
-			valor = metaDada.getValorData();
-		} else if (metaDada.getTipus()==MetaDadaTipusEnumDto.FLOTANT) {
-			valor = metaDada.getValorFlotant();
-		} else if (metaDada.getTipus()==MetaDadaTipusEnumDto.IMPORT) {
-			valor = metaDada.getValorImport();
-		} else if (metaDada.getTipus()==MetaDadaTipusEnumDto.SENCER) {
-			valor = metaDada.getValorSencer();
-		}  else if (metaDada.getTipus()==MetaDadaTipusEnumDto.TEXT || metaDada.getTipus()==MetaDadaTipusEnumDto.DOMINI) {
-			valor = metaDada.getValorString();
-		}
+		try {
 		
-		
-		MetaDadaEntity entity = MetaDadaEntity.getBuilder(
-				metaDada.getCodi(),
-				metaDada.getNom(),
-				metaDada.getTipus(),
-				metaDada.getMultiplicitat(),		
-				valor,
-				metaDada.isReadOnly(),
-				ordre,
-				metaNode,
-				metaDada.isNoAplica(),
-				metaDada.isEnviable(),
-				metaDada.getMetadadaArxiu()).
-				descripcio(metaDada.getDescripcio()).
-				build();
-		
-		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			Long metaExpedientId = null;
-			if (metaNode instanceof MetaExpedientEntity) {
-				metaExpedientId = metaNode.getId();
-			} else if (metaNode instanceof MetaDocumentEntity) {
-				metaExpedientId = ((MetaDocumentEntity) metaNode).getMetaExpedient().getId();
+			logger.debug("Creant una nova meta-dada (entitatId=" + entitatId + ", metaNodeId=" + metaNodeId + ", metaDada=" + metaDada + ")");
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
+			MetaNodeEntity metaNode = entityComprovarHelper.comprovarMetaNode(entitat, metaNodeId);		
+			int ordre = metaDadaRepository.countByMetaNode(metaNode);
+			
+			Object valor = null;
+			if (metaDada.getTipus()==MetaDadaTipusEnumDto.BOOLEA) {
+				valor = metaDada.getValorBoolea();
+			} else if (metaDada.getTipus()==MetaDadaTipusEnumDto.DATA) {
+				valor = metaDada.getValorData();
+			} else if (metaDada.getTipus()==MetaDadaTipusEnumDto.FLOTANT) {
+				valor = metaDada.getValorFlotant();
+			} else if (metaDada.getTipus()==MetaDadaTipusEnumDto.IMPORT) {
+				valor = metaDada.getValorImport();
+			} else if (metaDada.getTipus()==MetaDadaTipusEnumDto.SENCER) {
+				valor = metaDada.getValorSencer();
+			}  else if (metaDada.getTipus()==MetaDadaTipusEnumDto.TEXT || metaDada.getTipus()==MetaDadaTipusEnumDto.DOMINI) {
+				valor = metaDada.getValorString();
 			}
-			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientId, organId);
-		}
-		return conversioTipusHelper.convertir(
-				metaDadaRepository.save(entity),
-				MetaDadaDto.class);
+	
+			MetaDadaEntity entity = MetaDadaEntity.getBuilder(
+					metaDada.getCodi(),
+					metaDada.getNom(),
+					metaDada.getTipus(),
+					metaDada.getMultiplicitat(),		
+					valor,
+					metaDada.isReadOnly(),
+					ordre,
+					metaNode,
+					metaDada.isNoAplica(),
+					metaDada.isEnviable(),
+					metaDada.getMetadadaArxiu()).
+					descripcio(metaDada.getDescripcio()).
+					build();
+			
+			if (rolActual.equals("IPA_ORGAN_ADMIN")) {
+				Long metaExpedientId = null;
+				if (metaNode instanceof MetaExpedientEntity) {
+					metaExpedientId = metaNode.getId();
+				} else if (metaNode instanceof MetaDocumentEntity) {
+					metaExpedientId = ((MetaDocumentEntity) metaNode).getMetaExpedient().getId();
+				}
+				metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientId, organId);
+			}
+
+			sample.stop(Timer.builder("METRICS@Subsystem_Procediment.metaDada")
+					.description("Tiempo y resultado")
+					.tags("resultado", "exito")
+					.register(applicationHelper.getMeterRegistry()));
+		
+			return conversioTipusHelper.convertir(
+					metaDadaRepository.save(entity),
+					MetaDadaDto.class);
+			
+		} catch (Exception e) {
+			sample.stop(Timer.builder("METRICS@Subsystem_Procediment.metaDada")
+				.description("Tiempo y resultado")
+				.tags("resultado", "error")
+				.register(applicationHelper.getMeterRegistry()));
+			throw e;
+		}			
 	}
 	
-	
-	
 	private static final Logger logger = LoggerFactory.getLogger(MetaDadaHelper.class);
-	
-
 }

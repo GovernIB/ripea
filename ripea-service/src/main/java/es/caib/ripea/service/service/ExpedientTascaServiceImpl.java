@@ -5,15 +5,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import es.caib.ripea.persistence.entity.*;
-import es.caib.ripea.persistence.repository.*;
-import es.caib.ripea.plugin.usuari.DadesUsuari;
-import es.caib.ripea.service.helper.*;
-import es.caib.ripea.service.intf.dto.*;
-import es.caib.ripea.service.intf.exception.NotFoundException;
-import es.caib.ripea.service.intf.service.ExpedientTascaService;
-import es.caib.ripea.service.intf.utils.Utils;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,19 +28,17 @@ import es.caib.ripea.persistence.repository.ExpedientTascaRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientTascaRepository;
 import es.caib.ripea.persistence.repository.UsuariRepository;
+import es.caib.ripea.service.helper.ApplicationHelper;
 import es.caib.ripea.service.helper.CacheHelper;
 import es.caib.ripea.service.helper.ContingutHelper;
 import es.caib.ripea.service.helper.ConversioTipusHelper;
 import es.caib.ripea.service.helper.DateHelper;
-import es.caib.ripea.service.helper.EmailHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.PaginacioHelper;
 import es.caib.ripea.service.helper.TascaHelper;
-import es.caib.ripea.service.helper.UsuariHelper;
 import es.caib.ripea.service.intf.dto.ContingutDto;
 import es.caib.ripea.service.intf.dto.ExpedientTascaComentariDto;
 import es.caib.ripea.service.intf.dto.ExpedientTascaDto;
-import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientTascaDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientTascaValidacioDto;
 import es.caib.ripea.service.intf.dto.PaginaDto;
@@ -61,6 +50,7 @@ import es.caib.ripea.service.intf.dto.UsuariTascaFiltreDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.service.EventService;
 import es.caib.ripea.service.intf.service.ExpedientTascaService;
+import io.micrometer.core.instrument.Timer;
 
 @Service
 public class ExpedientTascaServiceImpl implements ExpedientTascaService {
@@ -80,6 +70,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 	@Autowired private AlertaRepository alertaRepository;
 	@Autowired private PaginacioHelper paginacioHelper;
 	@Autowired private TascaHelper tascaHelper;
+	@Autowired private ApplicationHelper applicationHelper;
 
 	@Transactional(readOnly = true)
 	@Override
@@ -116,92 +107,108 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 		UsuariTascaFiltreDto filtre,
 		PaginacioParamsDto paginacioParams) {
 
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		logger.debug("Obtenint la llista del usuari tasques (" +
-			"auth=" + auth.getName() + ")");
+	    Timer.Sample sample = Timer.start(applicationHelper.getMeterRegistry());
+		
+	    try {
+		
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			logger.debug("Obtenint la llista del usuari tasques (" +
+				"auth=" + auth.getName() + ")");
+	
+			UsuariEntity usuariEntity = usuariRepository.findByCodi(auth.getName());
+	
+			ExpedientEntity expedient = null;
+			if (filtre.getExpedientId() != null) {
+				expedient = entityComprovarHelper.comprovarExpedient(
+					filtre.getExpedientId(),
+					false,
+					false,
+					false,
+					false,
+					false,
+					null);
+			}
+	
+			Page<ExpedientTascaEntity> tasques = null;
+			Date dataInici = DateHelper.toDateInicialDia(filtre.getDataInici());
+			Date dataFi = DateHelper.toDateFinalDia(filtre.getDataFi());
+			Date dataLimitInici = DateHelper.toDateInicialDia(filtre.getDataLimitInici());
+			Date dataLimitFi = DateHelper.toDateFinalDia(filtre.getDataLimitFi());
+	
+			String titol = filtre.getTitol();
+			PrioritatEnumDto prioritat = filtre.getPrioritat();
+			MetaExpedientTascaEntity tipusTasca = null;
+			if (filtre.getMetaExpedientTascaId() != null) {
+				tipusTasca = metaExpedientTascaRepository.getOne(filtre.getMetaExpedientTascaId());
+			}
+			MetaExpedientEntity procediment = null;
+			if (filtre.getMetaExpedientId() != null) {
+				procediment = metaExpedientRepository.getOne(filtre.getMetaExpedientId());
+			}
+	
+			if (filtre.getEstats().length == 0) {
+				tasques = expedientTascaRepository.findByResponsable(
+					usuariEntity,
+					expedient == null,
+					expedient,
+					dataInici == null,
+					dataInici,
+					dataFi == null,
+					dataFi,
+					dataLimitInici == null,
+					dataLimitInici,
+					dataLimitFi == null,
+					dataLimitFi,
+					titol == null || titol.isEmpty(),
+					titol,
+					prioritat == null,
+					prioritat,
+					tipusTasca == null,
+					tipusTasca,
+					procediment == null,
+					procediment,
+					paginacioHelper.toSpringDataPageable(
+						paginacioParams));
+			} else {
+				tasques = expedientTascaRepository.findByResponsableAndEstat(
+					usuariEntity,
+					filtre.getEstats(),
+					expedient == null,
+					expedient,
+					dataInici == null,
+					dataInici,
+					dataFi == null,
+					dataFi,
+					dataLimitInici == null,
+					dataLimitInici,
+					dataLimitFi == null,
+					dataLimitFi,
+					titol == null || titol.isEmpty(),
+					titol,
+					prioritat == null,
+					prioritat,
+					tipusTasca == null,
+					tipusTasca,
+					procediment == null,
+					procediment,
+					paginacioHelper.toSpringDataPageable(
+						paginacioParams));
+			}
 
-		UsuariEntity usuariEntity = usuariRepository.findByCodi(auth.getName());
+			sample.stop(Timer.builder("METRICS@Subsystem_Expedient.tasquesUserList")
+					.description("Tiempo y resultado")
+					.tags("resultado", "exito", "interfaz", "JSP")
+					.register(applicationHelper.getMeterRegistry()));
 
-		ExpedientEntity expedient = null;
-		if (filtre.getExpedientId() != null) {
-			expedient = entityComprovarHelper.comprovarExpedient(
-				filtre.getExpedientId(),
-				false,
-				false,
-				false,
-				false,
-				false,
-				null);
+			return paginacioHelper.toPaginaDto(tasques, ExpedientTascaDto.class);
+			
+		} catch (Exception e) {
+			sample.stop(Timer.builder("METRICS@Subsystem_Expedient.tasquesUserList")
+				.description("Tiempo y resultado")
+				.tags("resultado", "error", "interfaz", "JSP")
+				.register(applicationHelper.getMeterRegistry()));
+			throw e;
 		}
-
-		Page<ExpedientTascaEntity> tasques = null;
-		Date dataInici = DateHelper.toDateInicialDia(filtre.getDataInici());
-		Date dataFi = DateHelper.toDateFinalDia(filtre.getDataFi());
-		Date dataLimitInici = DateHelper.toDateInicialDia(filtre.getDataLimitInici());
-		Date dataLimitFi = DateHelper.toDateFinalDia(filtre.getDataLimitFi());
-
-		String titol = filtre.getTitol();
-		PrioritatEnumDto prioritat = filtre.getPrioritat();
-		MetaExpedientTascaEntity tipusTasca = null;
-		if (filtre.getMetaExpedientTascaId() != null) {
-			tipusTasca = metaExpedientTascaRepository.getOne(filtre.getMetaExpedientTascaId());
-		}
-		MetaExpedientEntity procediment = null;
-		if (filtre.getMetaExpedientId() != null) {
-			procediment = metaExpedientRepository.getOne(filtre.getMetaExpedientId());
-		}
-
-		if (filtre.getEstats().length == 0) {
-			tasques = expedientTascaRepository.findByResponsable(
-				usuariEntity,
-				expedient == null,
-				expedient,
-				dataInici == null,
-				dataInici,
-				dataFi == null,
-				dataFi,
-				dataLimitInici == null,
-				dataLimitInici,
-				dataLimitFi == null,
-				dataLimitFi,
-				titol == null || titol.isEmpty(),
-				titol,
-				prioritat == null,
-				prioritat,
-				tipusTasca == null,
-				tipusTasca,
-				procediment == null,
-				procediment,
-				paginacioHelper.toSpringDataPageable(
-					paginacioParams));
-		} else {
-			tasques = expedientTascaRepository.findByResponsableAndEstat(
-				usuariEntity,
-				filtre.getEstats(),
-				expedient == null,
-				expedient,
-				dataInici == null,
-				dataInici,
-				dataFi == null,
-				dataFi,
-				dataLimitInici == null,
-				dataLimitInici,
-				dataLimitFi == null,
-				dataLimitFi,
-				titol == null || titol.isEmpty(),
-				titol,
-				prioritat == null,
-				prioritat,
-				tipusTasca == null,
-				tipusTasca,
-				procediment == null,
-				procediment,
-				paginacioHelper.toSpringDataPageable(
-					paginacioParams));
-		}
-
-		return paginacioHelper.toPaginaDto(tasques, ExpedientTascaDto.class);
-
 	}
 
 	@Transactional(readOnly = true)
@@ -318,10 +325,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 	@Transactional
 	@Override
 	public ExpedientTascaDto canviarTascaEstat(Long tascaId, TascaEstatEnumDto tascaEstat, String motiu, String rolActual) {
-		logger.debug("Canviant estat del tasca " +
-			"tascaId=" + tascaId + ", " +
-			"tascaEstat=" + tascaEstat +
-			")");
+		logger.debug("Canviant estat del tasca tascaId=" + tascaId + ", tascaEstat=" + tascaEstat + ")");
 		ExpedientTascaEntity tasca = tascaHelper.canviarEstatTasca(tascaId, tascaEstat, motiu, rolActual);
 		eventService.notifyTasquesPendents(null);
 		return conversioTipusHelper.convertir(tasca, ExpedientTascaDto.class);

@@ -1,7 +1,33 @@
 package es.caib.ripea.service.helper;
 
-import es.caib.ripea.persistence.entity.*;
-import es.caib.ripea.persistence.repository.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import org.joda.time.DateTime;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+
+import es.caib.ripea.persistence.entity.DadaEntity;
+import es.caib.ripea.persistence.entity.DocumentEntity;
+import es.caib.ripea.persistence.entity.ExpedientEntity;
+import es.caib.ripea.persistence.entity.ExpedientTascaComentariEntity;
+import es.caib.ripea.persistence.entity.ExpedientTascaEntity;
+import es.caib.ripea.persistence.entity.MetaDadaEntity;
+import es.caib.ripea.persistence.entity.MetaDocumentEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientTascaEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientTascaValidacioEntity;
+import es.caib.ripea.persistence.entity.UsuariEntity;
+import es.caib.ripea.persistence.repository.DadaRepository;
+import es.caib.ripea.persistence.repository.DocumentNotificacioRepository;
+import es.caib.ripea.persistence.repository.DocumentRepository;
+import es.caib.ripea.persistence.repository.ExpedientTascaRepository;
+import es.caib.ripea.persistence.repository.MetaDadaRepository;
+import es.caib.ripea.persistence.repository.MetaDocumentRepository;
+import es.caib.ripea.persistence.repository.MetaExpedientTascaRepository;
+import es.caib.ripea.persistence.repository.UsuariRepository;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.DocumentNotificacioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.ExpedientTascaDto;
@@ -13,15 +39,7 @@ import es.caib.ripea.service.intf.dto.TascaEstatEnumDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.service.EventService;
 import es.caib.ripea.service.intf.utils.Utils;
-import org.joda.time.DateTime;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import io.micrometer.core.instrument.Timer;
 
 @Component
 public class TascaHelper {
@@ -34,16 +52,15 @@ public class TascaHelper {
 	@Autowired private DocumentRepository documentRepository;
 	@Autowired private DocumentNotificacioRepository documentNotificacioRepository;
 	@Autowired private UsuariRepository usuariRepository;
-	
 	@Autowired private EventService eventService;
-	
 	@Autowired private EntityComprovarHelper entityComprovarHelper;	
 	@Autowired private ConfigHelper configHelper;
 	@Autowired private EmailHelper emailHelper;
 	@Autowired private ConversioTipusHelper conversioTipusHelper;
 	@Autowired private ContingutLogHelper contingutLogHelper;
 	@Autowired private ContingutHelper contingutHelper;
-	@Autowired private CacheHelper cacheHelper;	
+	@Autowired private CacheHelper cacheHelper;
+	@Autowired private ApplicationHelper applicationHelper;
 
 	public List<MetaExpedientTascaValidacioDto> getValidacionsPendentsTasca(Long expedientTascaId) {
 		List<MetaExpedientTascaValidacioDto> resultat = new ArrayList<MetaExpedientTascaValidacioDto>();
@@ -211,83 +228,96 @@ public class TascaHelper {
 	}
 	
 	public ExpedientTascaEntity createTasca(Long entitatId, Long expedientId, ExpedientTascaDto expedientTasca) {
-		
-		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				expedientId,
-				false,
-				false,
-				false,
-				false,
-				false,
-				null);
-
-		MetaExpedientTascaEntity metaExpedientTascaEntity = metaExpedientTascaRepository.getOne(expedientTasca.getMetaExpedientTascaId());
-		List<UsuariEntity> responsables = new ArrayList<UsuariEntity>();
-		for (String responsableCodi : expedientTasca.getResponsablesCodi()) {
-			UsuariEntity responsable = usuariRepository.findById(responsableCodi).orElse(null);
-			if (responsable==null) throw new NotFoundException(responsableCodi, UsuariEntity.class);
-			responsables.add(responsable);
-		}
-
-		List<UsuariEntity> observadors = new ArrayList<UsuariEntity>(); // Per coneixement
-
-		if (expedientTasca.getObservadorsCodi() != null) {
-			for (String observadorCodi : expedientTasca.getObservadorsCodi()) {
-				UsuariEntity observador = usuariRepository.findById(observadorCodi).orElse(null);
-				if (observador==null) throw new NotFoundException(observadorCodi, UsuariEntity.class);
-				observadors.add(observador);
+    	Timer.Sample sample = Timer.start(applicationHelper.getMeterRegistry());
+    	try {  
+			ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+					expedientId,
+					false,
+					false,
+					false,
+					false,
+					false,
+					null);
+	
+			MetaExpedientTascaEntity metaExpedientTascaEntity = metaExpedientTascaRepository.getOne(expedientTasca.getMetaExpedientTascaId());
+			List<UsuariEntity> responsables = new ArrayList<UsuariEntity>();
+			for (String responsableCodi : expedientTasca.getResponsablesCodi()) {
+				UsuariEntity responsable = usuariRepository.findById(responsableCodi).orElse(null);
+				if (responsable==null) throw new NotFoundException(responsableCodi, UsuariEntity.class);
+				responsables.add(responsable);
 			}
-		}
-
-		ExpedientTascaEntity expedientTascaEntity = ExpedientTascaEntity.getBuilder(
-			expedient,
-			metaExpedientTascaEntity,
-			responsables,
-			observadors,
-			expedientTasca.getDataLimit(),
-			expedientTasca.getTitol(),
-			expedientTasca.getDuracio(),
-			expedientTasca.getPrioritat(),
-			expedientTasca.getObservacions()).build();
-
-		if (expedientTasca.getComentari() != null && !expedientTasca.getComentari().isEmpty()) {
-			ExpedientTascaComentariEntity comentari = ExpedientTascaComentariEntity.getBuilder(expedientTascaEntity, expedientTasca.getComentari()).build();
-			expedientTascaEntity.addComentari(comentari);
-		}
-
-		String titol = expedientTasca.getTitol();
-		String observacions = expedientTasca.getObservacions();
-		boolean isTitolNotEmtpy = titol != null && !titol.isEmpty();
-		boolean isObservacionsNotEmpty = observacions != null && !observacions.isEmpty();
-
-		if (isTitolNotEmtpy || isObservacionsNotEmpty) {
-			String comentariTitol = (isTitolNotEmtpy ? "Títol: " + titol + "\n" : "") +
-				(isObservacionsNotEmpty ? "\tObservacions: " + observacions + "\n" : "");
-
-			ExpedientTascaComentariEntity comentari = ExpedientTascaComentariEntity.getBuilder(expedientTascaEntity, comentariTitol).build();
-			expedientTascaEntity.addComentari(comentari);
-		}
-		if (metaExpedientTascaEntity.getEstatCrearTasca() != null) {
-			expedient.updateEstatAdditional(metaExpedientTascaEntity.getEstatCrearTasca());
-		}
-
-		for (String responsableCodi : expedientTasca.getResponsablesCodi()) {
-			cacheHelper.evictCountTasquesPendents(responsableCodi);
-		}
-
-		if (expedientTasca.getObservadorsCodi() != null) {
-			for (String observadorCodi : expedientTasca.getObservadorsCodi()) {
-				cacheHelper.evictCountTasquesPendents(observadorCodi);
+	
+			List<UsuariEntity> observadors = new ArrayList<UsuariEntity>(); // Per coneixement
+	
+			if (expedientTasca.getObservadorsCodi() != null) {
+				for (String observadorCodi : expedientTasca.getObservadorsCodi()) {
+					UsuariEntity observador = usuariRepository.findById(observadorCodi).orElse(null);
+					if (observador==null) throw new NotFoundException(observadorCodi, UsuariEntity.class);
+					observadors.add(observador);
+				}
 			}
-		}
-		expedientTascaRepository.save(expedientTascaEntity);
-		logAccioTasca(expedientTascaEntity, LogTipusEnumDto.CREACIO);
-		emailHelper.enviarEmailCanviarEstatTasca(expedientTascaEntity, null);
-		
-		//Notificar event als usuaris afectats
-		eventService.notifyTasquesPendents(expedientTascaEntity.getResponsablesAndObservadorsCodis(true));
-		
-		return expedientTascaEntity;
+	
+			ExpedientTascaEntity expedientTascaEntity = ExpedientTascaEntity.getBuilder(
+				expedient,
+				metaExpedientTascaEntity,
+				responsables,
+				observadors,
+				expedientTasca.getDataLimit(),
+				expedientTasca.getTitol(),
+				expedientTasca.getDuracio(),
+				expedientTasca.getPrioritat(),
+				expedientTasca.getObservacions()).build();
+	
+			if (expedientTasca.getComentari() != null && !expedientTasca.getComentari().isEmpty()) {
+				ExpedientTascaComentariEntity comentari = ExpedientTascaComentariEntity.getBuilder(expedientTascaEntity, expedientTasca.getComentari()).build();
+				expedientTascaEntity.addComentari(comentari);
+			}
+	
+			String titol = expedientTasca.getTitol();
+			String observacions = expedientTasca.getObservacions();
+			boolean isTitolNotEmtpy = titol != null && !titol.isEmpty();
+			boolean isObservacionsNotEmpty = observacions != null && !observacions.isEmpty();
+	
+			if (isTitolNotEmtpy || isObservacionsNotEmpty) {
+				String comentariTitol = (isTitolNotEmtpy ? "Títol: " + titol + "\n" : "") +
+					(isObservacionsNotEmpty ? "\tObservacions: " + observacions + "\n" : "");
+	
+				ExpedientTascaComentariEntity comentari = ExpedientTascaComentariEntity.getBuilder(expedientTascaEntity, comentariTitol).build();
+				expedientTascaEntity.addComentari(comentari);
+			}
+			if (metaExpedientTascaEntity.getEstatCrearTasca() != null) {
+				expedient.updateEstatAdditional(metaExpedientTascaEntity.getEstatCrearTasca());
+			}
+	
+			for (String responsableCodi : expedientTasca.getResponsablesCodi()) {
+				cacheHelper.evictCountTasquesPendents(responsableCodi);
+			}
+	
+			if (expedientTasca.getObservadorsCodi() != null) {
+				for (String observadorCodi : expedientTasca.getObservadorsCodi()) {
+					cacheHelper.evictCountTasquesPendents(observadorCodi);
+				}
+			}
+			expedientTascaRepository.save(expedientTascaEntity);
+			logAccioTasca(expedientTascaEntity, LogTipusEnumDto.CREACIO);
+			emailHelper.enviarEmailCanviarEstatTasca(expedientTascaEntity, null);
+			
+			//Notificar event als usuaris afectats
+			eventService.notifyTasquesPendents(expedientTascaEntity.getResponsablesAndObservadorsCodis(true));
+			
+			sample.stop(Timer.builder("METRICS@Subsystem_Expedient.createTasca")
+					.description("Tiempo y resultado")
+					.tags("resultado", "exito")
+					.register(applicationHelper.getMeterRegistry()));
+			
+    		return expedientTascaEntity;
+    	} catch (Exception e) {
+			sample.stop(Timer.builder("METRICS@Subsystem_Expedient.createTasca")
+					.description("Tiempo y resultado")
+					.tags("resultado", "error")
+					.register(applicationHelper.getMeterRegistry()));
+			throw e;
+    	}			
 	}
 	
 	public ExpedientTascaEntity reobrirTasca(
@@ -377,72 +407,90 @@ public class TascaHelper {
 	
 	public ExpedientTascaEntity canviarEstatTasca(Long tascaId, TascaEstatEnumDto tascaEstat, String motiu, String rolActual) {
 		
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		UsuariEntity responsableActual = usuariRepository.findById(auth.getName()).orElse(null);
-		if (responsableActual==null) throw new NotFoundException(auth.getName(), UsuariEntity.class);
-		ExpedientTascaEntity tasca = expedientTascaRepository.getOne(tascaId);
-
+		Timer.Sample sample = Timer.start(applicationHelper.getMeterRegistry());
+		
 		try {
-			tasca = comprovarTasca(tascaId);
-		} catch (Exception e) {
-			contingutHelper.comprovarContingutDinsExpedientModificable(
-				tasca.getExpedient().getEntitat().getId(),
-				tasca.getExpedient().getId(),
-				false,
-				true,
-				false,
-				false,
-				false,
-				true,
-				rolActual);
-		}
-
-		TascaEstatEnumDto tascaEstatAnterior = tasca.getEstat();
-
-		if (tascaEstat == TascaEstatEnumDto.REBUTJADA) {
-			tasca.updateRebutjar(motiu);
-		} else {
-			tasca.updateEstat(tascaEstat);
-		}
-
-		if (tascaEstat == TascaEstatEnumDto.FINALITZADA || tascaEstat == TascaEstatEnumDto.CANCELLADA || tascaEstat == TascaEstatEnumDto.REBUTJADA) {
-			tasca.updateDelegat(null);
-		}
-
-		if (tascaEstat == TascaEstatEnumDto.INICIADA) {
-			tasca.updateResponsableActual(responsableActual);
-		}
-
-		ExpedientEntity expedientEntity = tasca.getExpedient();
-
-		if (tascaEstat == TascaEstatEnumDto.FINALITZADA && tasca.getMetaTasca().getEstatFinalitzarTasca() != null) {
-			expedientEntity.updateEstatAdditional(tasca.getMetaTasca().getEstatFinalitzarTasca());
-		}
-
-		// Tornar a l'estat inicial 'OBERT' si no hi ha un estat addicional en finalitzar tasca
-		if (tascaEstat == TascaEstatEnumDto.FINALITZADA
-			&& tasca.getMetaTasca().getEstatFinalitzarTasca() == null
-			&& expedientEntity.getEstatAdditional() != null) {
-			expedientEntity.updateEstatAdditional(null);
-		}
-
-		emailHelper.enviarEmailCanviarEstatTasca(tasca, tascaEstatAnterior);
-
-		for (UsuariEntity responsable : tasca.getResponsables()) {
-			cacheHelper.evictCountTasquesPendents(responsable.getCodi());
-		}
 		
-		if (tasca.getObservadors() != null) {
-			for (UsuariEntity observador : tasca.getObservadors()) {
-				cacheHelper.evictCountTasquesPendents(observador.getCodi());
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			UsuariEntity responsableActual = usuariRepository.findById(auth.getName()).orElse(null);
+			if (responsableActual==null) throw new NotFoundException(auth.getName(), UsuariEntity.class);
+			ExpedientTascaEntity tasca = expedientTascaRepository.getOne(tascaId);
+	
+			try {
+				tasca = comprovarTasca(tascaId);
+			} catch (Exception e) {
+				contingutHelper.comprovarContingutDinsExpedientModificable(
+					tasca.getExpedient().getEntitat().getId(),
+					tasca.getExpedient().getId(),
+					false,
+					true,
+					false,
+					false,
+					false,
+					true,
+					rolActual);
 			}
-		}
-
-		//Notificar event als usuaris afectats
-		eventService.notifyTasquesPendents(tasca.getResponsablesAndObservadorsCodis(true));
-		
-		logAccioTasca(tasca, LogTipusEnumDto.CANVI_ESTAT);
-		
-		return tasca;
+	
+			TascaEstatEnumDto tascaEstatAnterior = tasca.getEstat();
+	
+			if (tascaEstat == TascaEstatEnumDto.REBUTJADA) {
+				tasca.updateRebutjar(motiu);
+			} else {
+				tasca.updateEstat(tascaEstat);
+			}
+	
+			if (tascaEstat == TascaEstatEnumDto.FINALITZADA || tascaEstat == TascaEstatEnumDto.CANCELLADA || tascaEstat == TascaEstatEnumDto.REBUTJADA) {
+				tasca.updateDelegat(null);
+			}
+	
+			if (tascaEstat == TascaEstatEnumDto.INICIADA) {
+				tasca.updateResponsableActual(responsableActual);
+			}
+	
+			ExpedientEntity expedientEntity = tasca.getExpedient();
+	
+			if (tascaEstat == TascaEstatEnumDto.FINALITZADA && tasca.getMetaTasca().getEstatFinalitzarTasca() != null) {
+				expedientEntity.updateEstatAdditional(tasca.getMetaTasca().getEstatFinalitzarTasca());
+			}
+	
+			// Tornar a l'estat inicial 'OBERT' si no hi ha un estat addicional en finalitzar tasca
+			if (tascaEstat == TascaEstatEnumDto.FINALITZADA
+				&& tasca.getMetaTasca().getEstatFinalitzarTasca() == null
+				&& expedientEntity.getEstatAdditional() != null) {
+				expedientEntity.updateEstatAdditional(null);
+			}
+	
+			emailHelper.enviarEmailCanviarEstatTasca(tasca, tascaEstatAnterior);
+	
+			for (UsuariEntity responsable : tasca.getResponsables()) {
+				cacheHelper.evictCountTasquesPendents(responsable.getCodi());
+			}
+			
+			if (tasca.getObservadors() != null) {
+				for (UsuariEntity observador : tasca.getObservadors()) {
+					cacheHelper.evictCountTasquesPendents(observador.getCodi());
+				}
+			}
+	
+			//Notificar event als usuaris afectats
+			eventService.notifyTasquesPendents(tasca.getResponsablesAndObservadorsCodis(true));
+			
+			logAccioTasca(tasca, LogTipusEnumDto.CANVI_ESTAT);
+			
+			
+			sample.stop(Timer.builder("METRICS@Subsystem_Expedient.canviEstatTasca")
+					.description("Tiempo y resultado")
+					.tags("resultado", "exito")
+					.register(applicationHelper.getMeterRegistry()));
+			
+			return tasca;
+			
+		} catch (Exception e) {
+			sample.stop(Timer.builder("METRICS@Subsystem_Expedient.canviEstatTasca")
+					.description("Tiempo y resultado")
+					.tags("resultado", "error")
+					.register(applicationHelper.getMeterRegistry()));
+			throw e;
+		}			
 	}
 }

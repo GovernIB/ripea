@@ -219,6 +219,7 @@ import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.exception.SistemaExternException;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.utils.Utils;
+import io.micrometer.core.instrument.Timer;
 
 @Component
 public class PluginHelper {
@@ -264,7 +265,7 @@ public class PluginHelper {
 	@Autowired private EmailHelper emailHelper;
 	@Autowired private ContingutHelper contingutHelper;
 	@Autowired private DocumentNotificacioHelper documentNotificacioHelper;
-	@Autowired private EntityComprovarHelper entityComprovarHelper;
+	@Autowired private ApplicationHelper applicationHelper;
 	
 	@Autowired private DocumentEnviamentInteressatRepository documentEnviamentInteressatRepository;
 	@Autowired private ExpedientPeticioRepository expedientPeticioRepository;
@@ -5152,10 +5153,10 @@ public class PluginHelper {
 
 	}
 
-	public String gestioDocumentalCreate(
-			String agrupacio,
-			InputStream contingut) {
+	public String gestioDocumentalCreate(String agrupacio, InputStream contingut) {
 
+		Timer.Sample sample = Timer.start(applicationHelper.getMeterRegistry());
+		
 		String accioDescripcio = "Crear document al gestor documental";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("agrupacio", agrupacio);
@@ -5172,6 +5173,10 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
+			sample.stop(Timer.builder("METRICS@Subsystem_FileSystem.create")
+					.description("Tiempo y resultado")
+					.tags("resultado", "exito")
+					.register(applicationHelper.getMeterRegistry()));			
 			return resultat;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al crear document al gestor documental";
@@ -5184,6 +5189,10 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
+			sample.stop(Timer.builder("METRICS@Subsystem_FileSystem.create")
+					.description("Tiempo y resultado")
+					.tags("resultado", "error")
+					.register(applicationHelper.getMeterRegistry()));			
 			throw new SistemaExternException(IntegracioHelper.INTCODI_GESDOC, errorDescripcio, ex);
 		}
 	}
@@ -5262,11 +5271,9 @@ public class PluginHelper {
 		}
 	}
 
-	public void gestioDocumentalGet(
-			String id,
-			String agrupacio,
-			OutputStream contingutOut) {
+	public void gestioDocumentalGet(String id, String agrupacio, OutputStream contingutOut) {
 
+		Timer.Sample sample = Timer.start(applicationHelper.getMeterRegistry());
 		String accioDescripcio = "GET document al gestor documental";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("id", id);
@@ -5284,6 +5291,10 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
+			sample.stop(Timer.builder("METRICS@Subsystem_FileSystem.get")
+					.description("Tiempo y resultado")
+					.tags("resultado", "exito")
+					.register(applicationHelper.getMeterRegistry()));			
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al consultar document al gestor documental";
 			integracioHelper.addAccioError(
@@ -5295,6 +5306,10 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
+			sample.stop(Timer.builder("METRICS@Subsystem_FileSystem.get")
+					.description("Tiempo y resultado")
+					.tags("resultado", "error")
+					.register(applicationHelper.getMeterRegistry()));			
 			throw new SistemaExternException(IntegracioHelper.INTCODI_GESDOC, errorDescripcio, ex);
 		}
 	}

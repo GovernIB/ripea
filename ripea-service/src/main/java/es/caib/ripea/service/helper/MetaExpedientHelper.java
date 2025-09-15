@@ -75,6 +75,7 @@ import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.exception.SistemaExternException;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.permission.ExtendedPermission;
+import io.micrometer.core.instrument.Timer;
 
 @Component
 public class MetaExpedientHelper {
@@ -101,6 +102,7 @@ public class MetaExpedientHelper {
 	@Autowired private CacheHelper cacheHelper;
 	@Autowired private MetaNodeHelper metaNodeHelper;
 	@Autowired private MetaDocumentRepository metaDocumentRepository;
+	@Autowired private ApplicationHelper applicationHelper;
 
 	public static final String PROCEDIMENT_ORGAN_NO_SYNC = "Hi ha procediments que pertanyen a òrgans no existents en l'organigrama actual";
 
@@ -445,34 +447,53 @@ public class MetaExpedientHelper {
 			MetaExpedientTascaDto metaExpedientTasca,
 			String rolActual,
 			Long organId) throws NotFoundException {
-		logger.debug(
-				"Creant una nova tasca del meta-expedient (" + "entitatId=" + entitatId + ", " + "metaExpedientId=" +
-						metaExpedientId + ", " + "metaExpedientTasca=" + metaExpedientTasca + ")");
 		
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-
-		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
-
-		Long idEstatCrear = metaExpedientTasca.getEstatIdCrearTasca();
-		ExpedientEstatEntity estatCrearTasca = idEstatCrear != null ? expedientEstatRepository.getOne(idEstatCrear) : null;
-		Long idEstatFinalitzar = metaExpedientTasca.getEstatIdFinalitzarTasca();
-		ExpedientEstatEntity estatFinalitzarTasca = idEstatFinalitzar != null ? expedientEstatRepository.getOne(
-				idEstatFinalitzar) : null;
-		MetaExpedientTascaEntity entity = MetaExpedientTascaEntity.getBuilder(
-				metaExpedientTasca.getCodi(),
-				metaExpedientTasca.getNom(),
-				metaExpedientTasca.getDescripcio(),
-				metaExpedientTasca.getResponsable(),
-				metaExpedient,
-				metaExpedientTasca.getDataLimit(),
-				metaExpedientTasca.getDuracio(),
-				metaExpedientTasca.getPrioritat(),
-				estatCrearTasca,
-				estatFinalitzarTasca).build();
-		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			canviarRevisioADisseny(entitatId, metaExpedient.getId(), organId);
-		}
-		return conversioTipusHelper.convertir(metaExpedientTascaRepository.save(entity), MetaExpedientTascaDto.class);
+		Timer.Sample sample = Timer.start(applicationHelper.getMeterRegistry());
+		
+		try {
+		
+			logger.debug(
+					"Creant una nova tasca del meta-expedient (" + "entitatId=" + entitatId + ", " + "metaExpedientId=" +
+							metaExpedientId + ", " + "metaExpedientTasca=" + metaExpedientTasca + ")");
+			
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
+	
+			MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
+	
+			Long idEstatCrear = metaExpedientTasca.getEstatIdCrearTasca();
+			ExpedientEstatEntity estatCrearTasca = idEstatCrear != null ? expedientEstatRepository.getOne(idEstatCrear) : null;
+			Long idEstatFinalitzar = metaExpedientTasca.getEstatIdFinalitzarTasca();
+			ExpedientEstatEntity estatFinalitzarTasca = idEstatFinalitzar != null ? expedientEstatRepository.getOne(
+					idEstatFinalitzar) : null;
+			MetaExpedientTascaEntity entity = MetaExpedientTascaEntity.getBuilder(
+					metaExpedientTasca.getCodi(),
+					metaExpedientTasca.getNom(),
+					metaExpedientTasca.getDescripcio(),
+					metaExpedientTasca.getResponsable(),
+					metaExpedient,
+					metaExpedientTasca.getDataLimit(),
+					metaExpedientTasca.getDuracio(),
+					metaExpedientTasca.getPrioritat(),
+					estatCrearTasca,
+					estatFinalitzarTasca).build();
+			if (rolActual.equals("IPA_ORGAN_ADMIN")) {
+				canviarRevisioADisseny(entitatId, metaExpedient.getId(), organId);
+			}
+			
+			sample.stop(Timer.builder("METRICS@Subsystem_Procediment.metaTasca")
+					.description("Tiempo y resultado")
+					.tags("resultado", "exito")
+					.register(applicationHelper.getMeterRegistry()));
+		
+			return conversioTipusHelper.convertir(metaExpedientTascaRepository.save(entity), MetaExpedientTascaDto.class);
+			
+		} catch (Exception e) {
+			sample.stop(Timer.builder("METRICS@Subsystem_Procediment.metaTasca")
+				.description("Tiempo y resultado")
+				.tags("resultado", "error")
+				.register(applicationHelper.getMeterRegistry()));
+			throw e;
+		}				
 	}
 	
 	public MetaExpedientTascaEntity findTascaByMetaExpedientAndCodi(MetaExpedientEntity metaExpedient, String codi) {

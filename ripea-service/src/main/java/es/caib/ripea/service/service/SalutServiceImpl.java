@@ -124,7 +124,7 @@ public class SalutServiceImpl implements SalutService{
 		//Estats de salut particulars
 		EstatSalut salutDb = checkDatabase();		
 		List<IntegracioSalut> salutIntegracions = new ArrayList<IntegracioSalut>();
-		List<SubsistemaSalut> subsistemesSalut = new ArrayList<SubsistemaSalut>();
+		List<SubsistemaSalut> subsistemesSalut = checkSubsistemes();
 		List<DetallSalut> salutAltres = checkAltres(); 		//Comparar amb MonitorSystemController
 		List<MissatgeSalut> missatgesSalut = checkMissatges();
 		
@@ -210,6 +210,251 @@ public class SalutServiceImpl implements SalutService{
         var exp = (int) (Math.log(bytes) / Math.log(unit));
         var pre = "kMGTPE".charAt(exp - 1);
         return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
+    }
+    
+    public List<IntegracioSalut> checkIntegracions() {
+    	List<IntegracioSalut> integracionsSalut = new ArrayList<>();
+    	
+//    	IntegracioSalut.builder()
+//		.codi(getCodiApp().name())
+//		.estat(estatSalut.getEstat())
+//		.latencia(estatSalut.getLatencia())
+//		.peticions(plugin.getPeticionsPlugin())
+//		.build()
+    	
+    	return integracionsSalut;
+    }
+    
+    public List<SubsistemaSalut> checkSubsistemes() {
+    	
+    	List<SubsistemaSalut> salutSubsistemes = new ArrayList<SubsistemaSalut>();
+    	
+    	/**
+    	 * T R A M I T A C I O     E X P E D I E N T S
+    	 */
+
+    	String[] codesEXP = {"METRICS@Subsystem_Expedient.create"
+    			, "METRICS@Subsystem_Expedient.list"
+    			, "METRICS@Subsystem_Expedient.tasquesUserList"
+    			, "METRICS@Subsystem_Expedient.createTasca"
+    			, "METRICS@Subsystem_Expedient.canviEstatTasca"};
+    	
+		//TOTALS
+		long subsistema_total_exito = 0;
+		long subsistema_total_error = 0;
+		int tempsPromitgSubsistema	= 0;
+    	
+    	for (String codiMetrica: codesEXP) {
+    		Timer timerExpedientExito = meterRegistry.find(codiMetrica).tags("resultado", "exito").timer();
+    		Timer timerExpedientError = meterRegistry.find(codiMetrica).tags("resultado", "error").timer();
+    		long exitoAux	= timerExpedientExito!=null?timerExpedientExito.count():0;
+    		long errorAux	= timerExpedientError!=null?timerExpedientError.count():0;
+    		int promitgAux	= (int)(timerExpedientExito!=null?timerExpedientExito.mean(TimeUnit.MILLISECONDS):0);
+    		//Afegir als totals
+    		subsistema_total_exito = subsistema_total_exito + exitoAux;
+    		subsistema_total_error = subsistema_total_error + errorAux;
+    		tempsPromitgSubsistema = tempsPromitgSubsistema + promitgAux;
+    	}
+ 		
+		salutSubsistemes.add(SubsistemaSalut.builder()
+                .codi("Subsystem_Expedient")
+                .latencia(tempsPromitgSubsistema/codesEXP.length)
+                .estat(calculaEstat(subsistema_total_exito, subsistema_total_error))
+                .totalOk(subsistema_total_exito)
+                .totalError(subsistema_total_error)
+                .build());
+		
+    	/**
+    	 * G E S T I O     P R O C E D I M E N T S
+    	 */
+    	String[] codesPRC = {"METRICS@Subsystem_Procediment.create"
+    			, "METRICS@Subsystem_Procediment.list"
+    			, "METRICS@Subsystem_Procediment.import"
+    			, "METRICS@Subsystem_Procediment.metaDoc"
+    			, "METRICS@Subsystem_Procediment.metaDada"
+    			, "METRICS@Subsystem_Procediment.metaTasca"};
+    	
+		//TOTALS
+		subsistema_total_exito = 0;
+		subsistema_total_error = 0;
+		tempsPromitgSubsistema = 0;
+    	
+    	for (String codiMetrica: codesPRC) {
+    		Timer timerExpedientExito = meterRegistry.find(codiMetrica).tags("resultado", "exito").timer();
+    		Timer timerExpedientError = meterRegistry.find(codiMetrica).tags("resultado", "error").timer();
+    		long exitoAux	= timerExpedientExito!=null?timerExpedientExito.count():0;
+    		long errorAux	= timerExpedientError!=null?timerExpedientError.count():0;
+    		int promitgAux	= (int)(timerExpedientExito!=null?timerExpedientExito.mean(TimeUnit.MILLISECONDS):0);
+    		//Afegir als totals
+    		subsistema_total_exito = subsistema_total_exito + exitoAux;
+    		subsistema_total_error = subsistema_total_error + errorAux;
+    		tempsPromitgSubsistema = tempsPromitgSubsistema + promitgAux;
+    	}
+ 		
+		salutSubsistemes.add(SubsistemaSalut.builder()
+                .codi("Subsystem_Procediment")
+                .latencia(tempsPromitgSubsistema/codesPRC.length)
+                .estat(calculaEstat(subsistema_total_exito, subsistema_total_error))
+                .totalOk(subsistema_total_exito)
+                .totalError(subsistema_total_error)
+                .build());
+
+    	/**
+    	 * A C C I O N S     M A S S I V E S
+    	 */
+    	String[] codesMAS = {"METRICS@Subsystem_Background.userMassiveAction"
+    			, "METRICS@Subsystem_Background.consultarIGuardarAnotacions"
+    			, "METRICS@Subsystem_Background.guardarEnArxiuContingutsPendents"
+    			, "METRICS@Subsystem_Background.enviarEmailsAgrupats"};
+    	
+		//TOTALS
+		subsistema_total_exito = 0;
+		subsistema_total_error = 0;
+		tempsPromitgSubsistema = 0;
+    	
+    	for (String codiMetrica: codesMAS) {
+    		Timer timerExpedientExito = meterRegistry.find(codiMetrica).tags("resultado", "exito").timer();
+    		Timer timerExpedientError = meterRegistry.find(codiMetrica).tags("resultado", "error").timer();
+    		long exitoAux	= timerExpedientExito!=null?timerExpedientExito.count():0;
+    		long errorAux	= timerExpedientError!=null?timerExpedientError.count():0;
+    		int promitgAux	= (int)(timerExpedientExito!=null?timerExpedientExito.mean(TimeUnit.MILLISECONDS):0);
+    		//Afegir als totals
+    		subsistema_total_exito = subsistema_total_exito + exitoAux;
+    		subsistema_total_error = subsistema_total_error + errorAux;
+    		tempsPromitgSubsistema = tempsPromitgSubsistema + promitgAux;
+    	}
+ 		
+		salutSubsistemes.add(SubsistemaSalut.builder()
+                .codi("Subsystem_Background")
+                .latencia(tempsPromitgSubsistema/codesMAS.length)
+                .estat(calculaEstat(subsistema_total_exito, subsistema_total_error))
+                .totalOk(subsistema_total_exito)
+                .totalError(subsistema_total_error)
+                .build());		
+		
+    	/**
+    	 * F I L E     S Y S T E M
+    	 */
+		String[] codesFS = {"METRICS@Subsystem_FileSystem.create", "METRICS@Subsystem_FileSystem.get"};
+    	
+		//TOTALS
+		subsistema_total_exito = 0;
+		subsistema_total_error = 0;
+		tempsPromitgSubsistema = 0;
+    	
+    	for (String codiMetrica: codesFS) {
+    		Timer timerExpedientExito = meterRegistry.find(codiMetrica).tags("resultado", "exito").timer();
+    		Timer timerExpedientError = meterRegistry.find(codiMetrica).tags("resultado", "error").timer();
+    		long exitoAux	= timerExpedientExito!=null?timerExpedientExito.count():0;
+    		long errorAux	= timerExpedientError!=null?timerExpedientError.count():0;
+    		int promitgAux	= (int)(timerExpedientExito!=null?timerExpedientExito.mean(TimeUnit.MILLISECONDS):0);
+    		//Afegir als totals
+    		subsistema_total_exito = subsistema_total_exito + exitoAux;
+    		subsistema_total_error = subsistema_total_error + errorAux;
+    		tempsPromitgSubsistema = tempsPromitgSubsistema + promitgAux;
+    	}
+ 		
+		salutSubsistemes.add(SubsistemaSalut.builder()
+                .codi("Subsystem_FileSystem")
+                .latencia(tempsPromitgSubsistema/codesFS.length)
+                .estat(calculaEstat(subsistema_total_exito, subsistema_total_error))
+                .totalOk(subsistema_total_exito)
+                .totalError(subsistema_total_error)
+                .build());
+		
+    	/**
+    	 * C A L L B A C K     D I S T R I B U C I O     (Event controlador)
+    	 */
+    	
+		String code = "METRICS@Subsystem_Callback_Distribucio.event";
+    	
+		Timer timerSubsistemExito = meterRegistry.find(code).tags("resultado", "exito").timer();
+		Timer timerSubsistemError = meterRegistry.find(code).tags("resultado", "error").timer();
+		
+		subsistema_total_exito = timerSubsistemExito!=null?timerSubsistemExito.count():0;
+		subsistema_total_error = timerSubsistemError!=null?timerSubsistemError.count():0;
+		
+		tempsPromitgSubsistema = (int)(timerSubsistemExito!=null?timerSubsistemExito.mean(TimeUnit.MILLISECONDS):0);
+    	
+		salutSubsistemes.add(SubsistemaSalut.builder()
+                .codi("Subsystem_Callback_Distribucio")
+                .latencia(tempsPromitgSubsistema)
+                .estat(calculaEstat(subsistema_total_exito, subsistema_total_error))
+                .totalOk(subsistema_total_exito)
+                .totalError(subsistema_total_error)
+                .build());
+		
+    	/**
+    	 * C A L L B A C K     N O T I B     (Event controlador)
+    	 */
+    	
+    	code = "METRICS@Subsystem_Callback_Notib.notificaCanvi";
+    	
+		timerSubsistemExito = meterRegistry.find(code).tags("resultado", "exito").timer();
+		timerSubsistemError = meterRegistry.find(code).tags("resultado", "error").timer();
+		
+		subsistema_total_exito = timerSubsistemExito!=null?timerSubsistemExito.count():0;
+		subsistema_total_error = timerSubsistemError!=null?timerSubsistemError.count():0;
+		
+		tempsPromitgSubsistema = (int)(timerSubsistemExito!=null?timerSubsistemExito.mean(TimeUnit.MILLISECONDS):0);
+    	
+		salutSubsistemes.add(SubsistemaSalut.builder()
+                .codi("Subsystem_Callback_Notib")
+                .latencia(tempsPromitgSubsistema)
+                .estat(calculaEstat(subsistema_total_exito, subsistema_total_error))
+                .totalOk(subsistema_total_exito)
+                .totalError(subsistema_total_error)
+                .build());
+		
+    	/**
+    	 * C A L L B A C K     P O R T A F I B     (Event controlador)
+    	 */
+    	
+    	code = "METRICS@Subsystem_Callback_Portafib.event";
+    	
+		timerSubsistemExito = meterRegistry.find(code).tags("resultado", "exito").timer();
+		timerSubsistemError = meterRegistry.find(code).tags("resultado", "error").timer();
+		
+		subsistema_total_exito = timerSubsistemExito!=null?timerSubsistemExito.count():0;
+		subsistema_total_error = timerSubsistemError!=null?timerSubsistemError.count():0;
+		
+		tempsPromitgSubsistema = (int)(timerSubsistemExito!=null?timerSubsistemExito.mean(TimeUnit.MILLISECONDS):0);
+    	
+		salutSubsistemes.add(SubsistemaSalut.builder()
+                .codi("Subsystem_Callback_Portafib")
+                .latencia(tempsPromitgSubsistema)
+                .estat(calculaEstat(subsistema_total_exito, subsistema_total_error))
+                .totalOk(subsistema_total_exito)
+                .totalError(subsistema_total_error)
+                .build());		
+		
+    	return salutSubsistemes;
+    }
+
+    private static EstatSalutEnum calculaEstat(Long totalPeticionsOk, Long totalPeticionsError) {
+        
+    	final long ok = (totalPeticionsOk != null) ? totalPeticionsOk : 0L;
+        final long ko = (totalPeticionsError != null) ? totalPeticionsError : 0L;
+        final long total = ok + ko;
+
+        if (total==0) {
+        	return EstatSalutEnum.UNKNOWN;
+        }
+        
+        // Percentatge d'errors arrodonit correctament evitant divisió d'enters
+        final int errorRatePct = (int) Math.round((ko * 100.0) / Math.max(1L, total));
+
+        if (errorRatePct >= 100) {
+        	return EstatSalutEnum.DOWN;
+        } else if (errorRatePct > 30) {
+        	return EstatSalutEnum.ERROR;
+        } else if (errorRatePct > 10) {
+        	return EstatSalutEnum.DEGRADED;
+        } else if (errorRatePct < 5) {
+        	return EstatSalutEnum.UP;
+        } else {
+            return EstatSalutEnum.WARN; // 5-10%
+        }
     }
     
     public List<MissatgeSalut> checkMissatges() {

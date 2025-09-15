@@ -27,6 +27,7 @@ import es.caib.ripea.service.intf.dto.PortafirmesCallbackEstatEnumDto;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.DocumentService;
 import es.caib.ripea.service.intf.utils.Utils;
+import io.micrometer.core.instrument.Timer;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +48,8 @@ public class PortafibRestController {
 			description = "Realitza les operacions necessaries a RIPEA depenent del estat y actualitza el document a Arxiu.")
 	public ResponseEntity<String> event(@RequestBody PortaFIBEvent event) {
 
+		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
+		
 		try {
 
 			// Crear un usuario autenticado simulado. En portafib no se puede configurar una autenticación BASIC
@@ -90,14 +93,20 @@ public class PortafibRestController {
 						ex);
 			}
 
-			return new ResponseEntity<String>(
-					"OK",
-					HttpStatus.OK);
+			sample.stop(Timer.builder("METRICS@Subsystem_Callback_Portafib.event")
+					.description("Tiempo y resultado")
+					.tags("resultado", "exito")
+					.register(aplicacioService.getMeterRegistry()));
+			
+			return new ResponseEntity<String>("OK", HttpStatus.OK);
+			
 		} catch (Throwable th) {
 			log.error("Error al callback portafib rest", th);
-			return new ResponseEntity<String>(
-					"Error desconegut processant event de Peticio de Firma REST: " + th.getMessage(),
-					HttpStatus.INTERNAL_SERVER_ERROR);
+			sample.stop(Timer.builder("METRICS@Subsystem_Callback_Portafib.event")
+					.description("Tiempo y resultado")
+					.tags("resultado", "error")
+					.register(aplicacioService.getMeterRegistry()));			
+			return new ResponseEntity<String>("Error desconegut processant event de Peticio de Firma REST: " + th.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		} finally {
 			//Eliminam la autenticació provissional creada per el usuari $portafib_ripea
 			SecurityContextHolder.clearContext();

@@ -37,6 +37,7 @@ import es.caib.ripea.persistence.repository.ExecucioMassivaRepository;
 import es.caib.ripea.persistence.repository.ExpedientRepository;
 import es.caib.ripea.persistence.repository.UsuariRepository;
 import es.caib.ripea.service.helper.AlertaHelper;
+import es.caib.ripea.service.helper.ApplicationHelper;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.ConversioTipusHelper;
 import es.caib.ripea.service.helper.EmailHelper;
@@ -61,6 +62,7 @@ import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.exception.ValidationException;
 import es.caib.ripea.service.intf.service.ExecucioMassivaService;
 import es.caib.ripea.service.intf.utils.Utils;
+import io.micrometer.core.instrument.Timer;
 
 @Service
 public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
@@ -79,6 +81,7 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 	@Autowired private EmailHelper emailHelper;
 	@Autowired private ConfigHelper configHelper;
     @Autowired private ExpedientRepository expedientRepository;
+    @Autowired private ApplicationHelper applicationHelper;
 
 	@Transactional
 	@Override
@@ -193,6 +196,8 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 	@Transactional
 	@Override
 	public void executeNextMassiveScheduledTask() {
+		
+		Timer.Sample sample = Timer.start(applicationHelper.getMeterRegistry());
 		logger.trace("Execució tasca periòdica: Execucions massives");
 
 		try {
@@ -294,8 +299,18 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 					}
 				}
 			}
+			
+			sample.stop(Timer.builder("METRICS@Subsystem_Background.userMassiveAction")
+					.description("Tiempo y resultado")
+					.tags("resultado", "exito")
+					.register(applicationHelper.getMeterRegistry()));
+			
 		} catch (Exception e) {
 			logger.error("Error al fer execucio massiva", e);
+			sample.stop(Timer.builder("METRICS@Subsystem_Background.userMassiveAction")
+					.description("Tiempo y resultado")
+					.tags("resultado", "error")
+					.register(applicationHelper.getMeterRegistry()));			
 		}
 	}
 

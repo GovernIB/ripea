@@ -48,6 +48,7 @@ import es.caib.ripea.persistence.repository.RegistreAnnexRepository;
 import es.caib.ripea.persistence.repository.UsuariRepository;
 import es.caib.ripea.persistence.repository.command.ExpedientRepositoryCommnand;
 import es.caib.ripea.service.auxiliary.ExpedientFiltreCalculat;
+import es.caib.ripea.service.helper.ApplicationHelper;
 import es.caib.ripea.service.helper.CacheHelper;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.ContingutHelper;
@@ -78,7 +79,6 @@ import es.caib.ripea.service.intf.dto.ExpedientFiltreDto;
 import es.caib.ripea.service.intf.dto.ExpedientSelectorDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.InteressatAssociacioAccioEnum;
-import es.caib.ripea.service.intf.dto.MetaExpedientComentariDto;
 import es.caib.ripea.service.intf.dto.MoureDestiVistaEnumDto;
 import es.caib.ripea.service.intf.dto.PaginaDto;
 import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
@@ -97,6 +97,7 @@ import es.caib.ripea.service.intf.service.ExpedientService;
 import es.caib.ripea.service.intf.utils.DateUtil;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.permission.ExtendedPermission;
+import io.micrometer.core.instrument.Timer;
 
 @Service
 public class ExpedientServiceImpl implements ExpedientService {
@@ -126,6 +127,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 	@Autowired private RegistreAnnexRepository registreAnnexRepository;
 	@Autowired private EmailHelper emailHelper;
 	@Autowired private EventService eventService;
+	@Autowired private ApplicationHelper applicationHelper;
 	
 	public static List<DocumentDto> expedientsWithImportacio = new ArrayList<DocumentDto>();
 	public Object lock = new Object();
@@ -1291,196 +1293,210 @@ public class ExpedientServiceImpl implements ExpedientService {
 			Long organActual,
 			ResultEnumDto resultEnum) {
 		
-		ResultDto<ExpedientDto> result = new ResultDto<ExpedientDto>();
+	    Timer.Sample sample = Timer.start(applicationHelper.getMeterRegistry());
+	    try {		
 		
-		long t0 = System.currentTimeMillis();
-		
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				false,
-				false,
-				true,
-				false);
-
-		PermisosPerExpedientsDto permisosPerExpedients = expedientHelper.findPermisosPerExpedients(
-				entitatId,
-				rolActual,
-				organActual);
-				
-		ExpedientFiltreCalculat expedientFiltreCalculat = calculateFilter(
-				filtre,
-				expedientId,
-				entitatId,
-				rolActual);
-		
-		if (resultEnum == ResultEnumDto.PAGE) {
+			ResultDto<ExpedientDto> result = new ResultDto<ExpedientDto>();
 			
-			// ================================  RETURNS PAGE (DATATABLE) ==========================================
-			long t10 = System.currentTimeMillis();
-			Map<String, String[]> ordenacioMap = new HashMap<>();
-			ordenacioMap.put("createdBy.codiAndNom", new String[] {"createdBy.nom"});
-			ordenacioMap.put("agafatPer.codiAndNom", new String[] {"agafatPer.codi"});
-			ordenacioMap.put("estat", new String[] {"estatAdditional", "estat", "id"});
-			paginacioParams.eliminaCampOrdenacio("tipusStr");
-
-			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap);
-			Page<ExpedientEntity> paginaExpedients = expedientRepository.findByEntitatAndPermesosAndFiltre(
-					entitat,
-					permisosPerExpedients.getIdsMetaExpedientsPermesos() == null,
-					permisosPerExpedients.getIdsMetaExpedientsPermesos(0),
-					permisosPerExpedients.getIdsMetaExpedientsPermesos(1),
-					permisosPerExpedients.getIdsMetaExpedientsPermesos(2),
-					permisosPerExpedients.getIdsMetaExpedientsPermesos(3),
-					permisosPerExpedients.getIdsOrgansPermesos() == null,
-					permisosPerExpedients.getIdsOrgansPermesos(0),
-					permisosPerExpedients.getIdsOrgansPermesos(1),
-					permisosPerExpedients.getIdsOrgansPermesos(2),
-					permisosPerExpedients.getIdsOrgansPermesos(3),
-					permisosPerExpedients.getIdsMetaExpedientOrganPairsPermesos() == null,
-					permisosPerExpedients.getIdsMetaExpedientOrganPairsPermesos(),
-					permisosPerExpedients.getIdsOrgansAmbProcedimentsComunsPermesos() == null,
-					permisosPerExpedients.getIdsOrgansAmbProcedimentsComunsPermesos(),	
-					permisosPerExpedients.getIdsProcedimentsComuns(),
-					expedientFiltreCalculat.getMetaExpedientFiltre() == null,
-					expedientFiltreCalculat.getMetaExpedientFiltre(),
-					expedientFiltreCalculat.getIdsMetaExpedientsDomini() == null,
-					expedientFiltreCalculat.getIdsMetaExpedientsDomini(),
-					expedientFiltreCalculat.getOrganGestorFiltre() == null,
-					expedientFiltreCalculat.getOrganGestorFiltre(),
-					filtre.getNumero() == null,
-					filtre.getNumero() != null ? filtre.getNumero() : "",
-					filtre.getNom() == null,
-					filtre.getNom() != null ? filtre.getNom() : "",
-					filtre.getDataCreacioInici() == null,
-					DateUtil.getLocalDateTimeFromDate(filtre.getDataCreacioInici(), true, false),
-					filtre.getDataCreacioFi() == null,
-					DateUtil.getLocalDateTimeFromDate(filtre.getDataCreacioFi(), false, true),
-					filtre.getDataTancatInici() == null,
-					filtre.getDataTancatInici(),
-					filtre.getDataTancatFi() == null,
-					filtre.getDataTancatFi(),
-					expedientFiltreCalculat.getChosenEstatEnum() == null,
-					expedientFiltreCalculat.getChosenEstatEnum(),
-					expedientFiltreCalculat.getChosenEstat() == null,
-					expedientFiltreCalculat.getChosenEstat(),
-					expedientFiltreCalculat.getAgafatPer() == null,
-					expedientFiltreCalculat.getAgafatPer(),
-					expedientFiltreCalculat.getSeguitPer() == null,
-					expedientFiltreCalculat.getSeguitPer(),				
-					filtre.getTipusId() == null,
-					filtre.getTipusId(),
-					expedientFiltreCalculat.getExpedientsToBeExluded() == null,
-					expedientFiltreCalculat.getExpedientsToBeExluded(),
-					filtre.getInteressat() == null,
-					filtre.getInteressat() != null ? filtre.getInteressat() : "",
-					filtre.getMetaExpedientDominiCodi(),
-					filtre.getMetaExpedientDominiValor() == null,
-					filtre.getMetaExpedientDominiValor(),
-					permisosPerExpedients.getIdsGrupsPermesos() == null,
-					permisosPerExpedients.getIdsGrupsPermesos(),
-					rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_SUPER"), //No aplica filtre permis directe procediment
-					rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN"), //No aplica filtre grups
-					filtre.isAmbFirmaPendent(),
-					Utils.isEmpty(filtre.getNumeroRegistre()),
-					! Utils.isEmpty(filtre.getNumeroRegistre()) ? filtre.getNumeroRegistre() : "",
-					expedientFiltreCalculat.getGrup() == null,
-					expedientFiltreCalculat.getGrup(),
-					pageable);
-			if (cacheHelper.mostrarLogsRendiment())
-				logger.info("findByEntitatAndPermesosAndFiltre time:  " + (System.currentTimeMillis() - t10) + " ms");
-			long t11 = System.currentTimeMillis();
-			PaginaDto<ExpedientDto> paginaDto = paginacioHelper.toPaginaDto(
-					paginaExpedients,
-					ExpedientDto.class,
+			long t0 = System.currentTimeMillis();
+			
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+					entitatId,
+					false,
+					false,
+					false,
+					true,
+					false);
+	
+			PermisosPerExpedientsDto permisosPerExpedients = expedientHelper.findPermisosPerExpedients(
+					entitatId,
 					rolActual,
-					new ConverterParam<ExpedientEntity, ExpedientDto, String>() {
-						@Override
-						public ExpedientDto convert(ExpedientEntity source, String param) {
-							return expedientHelper.toExpedientDto(source, false, true, param, true);
-						}
-					});
-			for (ExpedientDto expedient: paginaDto) {
-				boolean enAlerta = alertaRepository.countByLlegidaAndContingutId(false, expedient.getId()) > 0;
-				expedient.setAlerta(enAlerta);
-			}
-			result.setPagina(paginaDto);
-			if (cacheHelper.mostrarLogsRendiment())	
-				logger.info("toPaginaDto time:  " + (System.currentTimeMillis() - t11) + " ms");
-			if (cacheHelper.mostrarLogsRendiment())
-				logger.info("findAmbFiltrePaginat (" + (paginaDto != null ? paginaDto.getTamany() + "/" + paginaDto.getElementsTotal() : "0")  +") time:  " + (System.currentTimeMillis() - t0) + " ms");
-
-		} else {
+					organActual);
+					
+			ExpedientFiltreCalculat expedientFiltreCalculat = calculateFilter(
+					filtre,
+					expedientId,
+					entitatId,
+					rolActual);
 			
-			// ==================================  RETURNS IDS (SELECCIONAR TOTS) ============================================
-			List<Long> expedientsIds = expedientRepository.findIdsByEntitatAndFiltre(
-					entitat,
-					permisosPerExpedients.getIdsMetaExpedientsPermesos() == null,
-					permisosPerExpedients.getIdsMetaExpedientsPermesos(0),
-					permisosPerExpedients.getIdsMetaExpedientsPermesos(1),
-					permisosPerExpedients.getIdsMetaExpedientsPermesos(2),
-					permisosPerExpedients.getIdsMetaExpedientsPermesos(3),
-					permisosPerExpedients.getIdsOrgansPermesos() == null,
-					permisosPerExpedients.getIdsOrgansPermesos(0),
-					permisosPerExpedients.getIdsOrgansPermesos(1),
-					permisosPerExpedients.getIdsOrgansPermesos(2),
-					permisosPerExpedients.getIdsOrgansPermesos(3),
-					permisosPerExpedients.getIdsMetaExpedientOrganPairsPermesos() == null,
-					permisosPerExpedients.getIdsMetaExpedientOrganPairsPermesos(),
-					permisosPerExpedients.getIdsOrgansAmbProcedimentsComunsPermesos() == null,
-					permisosPerExpedients.getIdsOrgansAmbProcedimentsComunsPermesos(),	
-					permisosPerExpedients.getIdsProcedimentsComuns(),
-					expedientFiltreCalculat.getMetaExpedientFiltre() == null,
-					expedientFiltreCalculat.getMetaExpedientFiltre(),
-					expedientFiltreCalculat.getIdsMetaExpedientsDomini() == null,
-					expedientFiltreCalculat.getIdsMetaExpedientsDomini(),
-					expedientFiltreCalculat.getOrganGestorFiltre() == null,
-					expedientFiltreCalculat.getOrganGestorFiltre(),
-					filtre.getNumero() == null,
-					filtre.getNumero() != null ? filtre.getNumero() : "",
-					filtre.getNom() == null,
-					filtre.getNom() != null ? filtre.getNom() : "",
-					filtre.getDataCreacioInici() == null,
-					DateUtil.getLocalDateTimeFromDate(filtre.getDataCreacioInici(), true, false),
-					filtre.getDataCreacioFi() == null,
-					DateUtil.getLocalDateTimeFromDate(filtre.getDataCreacioFi(), false, true),
-					filtre.getDataTancatInici() == null,
-					filtre.getDataTancatInici(),
-					filtre.getDataTancatFi() == null,
-					filtre.getDataTancatFi(),
-					expedientFiltreCalculat.getChosenEstatEnum() == null,
-					expedientFiltreCalculat.getChosenEstatEnum(),
-					expedientFiltreCalculat.getChosenEstat() == null,
-					expedientFiltreCalculat.getChosenEstat(),
-					expedientFiltreCalculat.getAgafatPer() == null,
-					expedientFiltreCalculat.getAgafatPer(),
-					expedientFiltreCalculat.getSeguitPer() == null,
-					expedientFiltreCalculat.getSeguitPer(),						
-					filtre.getTipusId() == null,
-					filtre.getTipusId(),
-					expedientFiltreCalculat.getExpedientsToBeExluded() == null,
-					expedientFiltreCalculat.getExpedientsToBeExluded(),
-					filtre.getInteressat() == null,
-					filtre.getInteressat() != null ? filtre.getInteressat() : "",
-					filtre.getMetaExpedientDominiCodi(),
-					filtre.getMetaExpedientDominiValor() == null,
-					filtre.getMetaExpedientDominiValor(),
-					permisosPerExpedients.getIdsGrupsPermesos() == null,
-					permisosPerExpedients.getIdsGrupsPermesos(),
-					rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_SUPER"), //No aplica filtre permis directe procediment
-					rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN"), //No aplica filtre grups
-					filtre.isAmbFirmaPendent(),
-					Utils.isEmpty(filtre.getNumeroRegistre()),
-					! Utils.isEmpty(filtre.getNumeroRegistre()) ? filtre.getNumeroRegistre() : "",
-					expedientFiltreCalculat.getGrup() == null,
-					expedientFiltreCalculat.getGrup());
-
-			result.setIds(expedientsIds);
-			if (cacheHelper.mostrarLogsRendiment())
-				logger.info("findAmbFiltrePaginat ids (size: " + expedientsIds.size()  +") time:  " + (System.currentTimeMillis() - t0) + " ms");
-		}
-
-		return result;
+			if (resultEnum == ResultEnumDto.PAGE) {
+				
+				// ================================  RETURNS PAGE (DATATABLE) ==========================================
+				long t10 = System.currentTimeMillis();
+				Map<String, String[]> ordenacioMap = new HashMap<>();
+				ordenacioMap.put("createdBy.codiAndNom", new String[] {"createdBy.nom"});
+				ordenacioMap.put("agafatPer.codiAndNom", new String[] {"agafatPer.codi"});
+				ordenacioMap.put("estat", new String[] {"estatAdditional", "estat", "id"});
+				paginacioParams.eliminaCampOrdenacio("tipusStr");
+	
+				Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap);
+				Page<ExpedientEntity> paginaExpedients = expedientRepository.findByEntitatAndPermesosAndFiltre(
+						entitat,
+						permisosPerExpedients.getIdsMetaExpedientsPermesos() == null,
+						permisosPerExpedients.getIdsMetaExpedientsPermesos(0),
+						permisosPerExpedients.getIdsMetaExpedientsPermesos(1),
+						permisosPerExpedients.getIdsMetaExpedientsPermesos(2),
+						permisosPerExpedients.getIdsMetaExpedientsPermesos(3),
+						permisosPerExpedients.getIdsOrgansPermesos() == null,
+						permisosPerExpedients.getIdsOrgansPermesos(0),
+						permisosPerExpedients.getIdsOrgansPermesos(1),
+						permisosPerExpedients.getIdsOrgansPermesos(2),
+						permisosPerExpedients.getIdsOrgansPermesos(3),
+						permisosPerExpedients.getIdsMetaExpedientOrganPairsPermesos() == null,
+						permisosPerExpedients.getIdsMetaExpedientOrganPairsPermesos(),
+						permisosPerExpedients.getIdsOrgansAmbProcedimentsComunsPermesos() == null,
+						permisosPerExpedients.getIdsOrgansAmbProcedimentsComunsPermesos(),	
+						permisosPerExpedients.getIdsProcedimentsComuns(),
+						expedientFiltreCalculat.getMetaExpedientFiltre() == null,
+						expedientFiltreCalculat.getMetaExpedientFiltre(),
+						expedientFiltreCalculat.getIdsMetaExpedientsDomini() == null,
+						expedientFiltreCalculat.getIdsMetaExpedientsDomini(),
+						expedientFiltreCalculat.getOrganGestorFiltre() == null,
+						expedientFiltreCalculat.getOrganGestorFiltre(),
+						filtre.getNumero() == null,
+						filtre.getNumero() != null ? filtre.getNumero() : "",
+						filtre.getNom() == null,
+						filtre.getNom() != null ? filtre.getNom() : "",
+						filtre.getDataCreacioInici() == null,
+						DateUtil.getLocalDateTimeFromDate(filtre.getDataCreacioInici(), true, false),
+						filtre.getDataCreacioFi() == null,
+						DateUtil.getLocalDateTimeFromDate(filtre.getDataCreacioFi(), false, true),
+						filtre.getDataTancatInici() == null,
+						filtre.getDataTancatInici(),
+						filtre.getDataTancatFi() == null,
+						filtre.getDataTancatFi(),
+						expedientFiltreCalculat.getChosenEstatEnum() == null,
+						expedientFiltreCalculat.getChosenEstatEnum(),
+						expedientFiltreCalculat.getChosenEstat() == null,
+						expedientFiltreCalculat.getChosenEstat(),
+						expedientFiltreCalculat.getAgafatPer() == null,
+						expedientFiltreCalculat.getAgafatPer(),
+						expedientFiltreCalculat.getSeguitPer() == null,
+						expedientFiltreCalculat.getSeguitPer(),				
+						filtre.getTipusId() == null,
+						filtre.getTipusId(),
+						expedientFiltreCalculat.getExpedientsToBeExluded() == null,
+						expedientFiltreCalculat.getExpedientsToBeExluded(),
+						filtre.getInteressat() == null,
+						filtre.getInteressat() != null ? filtre.getInteressat() : "",
+						filtre.getMetaExpedientDominiCodi(),
+						filtre.getMetaExpedientDominiValor() == null,
+						filtre.getMetaExpedientDominiValor(),
+						permisosPerExpedients.getIdsGrupsPermesos() == null,
+						permisosPerExpedients.getIdsGrupsPermesos(),
+						rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_SUPER"), //No aplica filtre permis directe procediment
+						rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN"), //No aplica filtre grups
+						filtre.isAmbFirmaPendent(),
+						Utils.isEmpty(filtre.getNumeroRegistre()),
+						! Utils.isEmpty(filtre.getNumeroRegistre()) ? filtre.getNumeroRegistre() : "",
+						expedientFiltreCalculat.getGrup() == null,
+						expedientFiltreCalculat.getGrup(),
+						pageable);
+				if (cacheHelper.mostrarLogsRendiment())
+					logger.info("findByEntitatAndPermesosAndFiltre time:  " + (System.currentTimeMillis() - t10) + " ms");
+				long t11 = System.currentTimeMillis();
+				PaginaDto<ExpedientDto> paginaDto = paginacioHelper.toPaginaDto(
+						paginaExpedients,
+						ExpedientDto.class,
+						rolActual,
+						new ConverterParam<ExpedientEntity, ExpedientDto, String>() {
+							@Override
+							public ExpedientDto convert(ExpedientEntity source, String param) {
+								return expedientHelper.toExpedientDto(source, false, true, param, true);
+							}
+						});
+				for (ExpedientDto expedient: paginaDto) {
+					boolean enAlerta = alertaRepository.countByLlegidaAndContingutId(false, expedient.getId()) > 0;
+					expedient.setAlerta(enAlerta);
+				}
+				result.setPagina(paginaDto);
+				if (cacheHelper.mostrarLogsRendiment())	
+					logger.info("toPaginaDto time:  " + (System.currentTimeMillis() - t11) + " ms");
+				if (cacheHelper.mostrarLogsRendiment())
+					logger.info("findAmbFiltrePaginat (" + (paginaDto != null ? paginaDto.getTamany() + "/" + paginaDto.getElementsTotal() : "0")  +") time:  " + (System.currentTimeMillis() - t0) + " ms");
+	
+			} else {
+				
+				// ==================================  RETURNS IDS (SELECCIONAR TOTS) ============================================
+				List<Long> expedientsIds = expedientRepository.findIdsByEntitatAndFiltre(
+						entitat,
+						permisosPerExpedients.getIdsMetaExpedientsPermesos() == null,
+						permisosPerExpedients.getIdsMetaExpedientsPermesos(0),
+						permisosPerExpedients.getIdsMetaExpedientsPermesos(1),
+						permisosPerExpedients.getIdsMetaExpedientsPermesos(2),
+						permisosPerExpedients.getIdsMetaExpedientsPermesos(3),
+						permisosPerExpedients.getIdsOrgansPermesos() == null,
+						permisosPerExpedients.getIdsOrgansPermesos(0),
+						permisosPerExpedients.getIdsOrgansPermesos(1),
+						permisosPerExpedients.getIdsOrgansPermesos(2),
+						permisosPerExpedients.getIdsOrgansPermesos(3),
+						permisosPerExpedients.getIdsMetaExpedientOrganPairsPermesos() == null,
+						permisosPerExpedients.getIdsMetaExpedientOrganPairsPermesos(),
+						permisosPerExpedients.getIdsOrgansAmbProcedimentsComunsPermesos() == null,
+						permisosPerExpedients.getIdsOrgansAmbProcedimentsComunsPermesos(),	
+						permisosPerExpedients.getIdsProcedimentsComuns(),
+						expedientFiltreCalculat.getMetaExpedientFiltre() == null,
+						expedientFiltreCalculat.getMetaExpedientFiltre(),
+						expedientFiltreCalculat.getIdsMetaExpedientsDomini() == null,
+						expedientFiltreCalculat.getIdsMetaExpedientsDomini(),
+						expedientFiltreCalculat.getOrganGestorFiltre() == null,
+						expedientFiltreCalculat.getOrganGestorFiltre(),
+						filtre.getNumero() == null,
+						filtre.getNumero() != null ? filtre.getNumero() : "",
+						filtre.getNom() == null,
+						filtre.getNom() != null ? filtre.getNom() : "",
+						filtre.getDataCreacioInici() == null,
+						DateUtil.getLocalDateTimeFromDate(filtre.getDataCreacioInici(), true, false),
+						filtre.getDataCreacioFi() == null,
+						DateUtil.getLocalDateTimeFromDate(filtre.getDataCreacioFi(), false, true),
+						filtre.getDataTancatInici() == null,
+						filtre.getDataTancatInici(),
+						filtre.getDataTancatFi() == null,
+						filtre.getDataTancatFi(),
+						expedientFiltreCalculat.getChosenEstatEnum() == null,
+						expedientFiltreCalculat.getChosenEstatEnum(),
+						expedientFiltreCalculat.getChosenEstat() == null,
+						expedientFiltreCalculat.getChosenEstat(),
+						expedientFiltreCalculat.getAgafatPer() == null,
+						expedientFiltreCalculat.getAgafatPer(),
+						expedientFiltreCalculat.getSeguitPer() == null,
+						expedientFiltreCalculat.getSeguitPer(),						
+						filtre.getTipusId() == null,
+						filtre.getTipusId(),
+						expedientFiltreCalculat.getExpedientsToBeExluded() == null,
+						expedientFiltreCalculat.getExpedientsToBeExluded(),
+						filtre.getInteressat() == null,
+						filtre.getInteressat() != null ? filtre.getInteressat() : "",
+						filtre.getMetaExpedientDominiCodi(),
+						filtre.getMetaExpedientDominiValor() == null,
+						filtre.getMetaExpedientDominiValor(),
+						permisosPerExpedients.getIdsGrupsPermesos() == null,
+						permisosPerExpedients.getIdsGrupsPermesos(),
+						rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_SUPER"), //No aplica filtre permis directe procediment
+						rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN"), //No aplica filtre grups
+						filtre.isAmbFirmaPendent(),
+						Utils.isEmpty(filtre.getNumeroRegistre()),
+						! Utils.isEmpty(filtre.getNumeroRegistre()) ? filtre.getNumeroRegistre() : "",
+						expedientFiltreCalculat.getGrup() == null,
+						expedientFiltreCalculat.getGrup());
+	
+				result.setIds(expedientsIds);
+				if (cacheHelper.mostrarLogsRendiment())
+					logger.info("findAmbFiltrePaginat ids (size: " + expedientsIds.size()  +") time:  " + (System.currentTimeMillis() - t0) + " ms");
+			}
+	
+			sample.stop(Timer.builder("METRICS@Subsystem_Expedient.list")
+					.description("Tiempo y resultado")
+					.tags("resultado", "exito", "interfaz", "JSP")
+					.register(applicationHelper.getMeterRegistry()));
+			return result;		
+		} catch (Exception e) {
+			sample.stop(Timer.builder("METRICS@Subsystem_Expedient.list")
+				.description("Tiempo y resultado")
+				.tags("resultado", "error", "interfaz", "JSP")
+				.register(applicationHelper.getMeterRegistry()));
+			throw e;
+		}			
 	}
 	
 	private ExpedientFiltreCalculat calculateFilter(

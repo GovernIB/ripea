@@ -6,6 +6,7 @@ import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.ExecucioMassivaService;
 import es.caib.ripea.service.intf.service.MonitorTasquesService;
 import es.caib.ripea.service.intf.service.SegonPlaService;
+import io.micrometer.core.instrument.Timer;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -181,13 +182,22 @@ public class SchedulingConfig implements SchedulingConfigurer {
                     @SneakyThrows
                     @Override
                     public void run() {
+                    	Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 						monitorTasquesService.inici(codiConsultarIGuardarAnotacionsPendents);
 						try {
 							createAuthenticationContext();
 							segonPlaService.consultarIGuardarAnotacionsPeticionsPendents();
 							monitorTasquesService.fi(codiConsultarIGuardarAnotacionsPendents);
+							sample.stop(Timer.builder("METRICS@Subsystem_Background.consultarIGuardarAnotacions")
+									.description("Tiempo y resultado")
+									.tags("resultado", "exito")
+									.register(aplicacioService.getMeterRegistry()));
 						} catch (Throwable th) {
 							tractarErrorTascaSegonPla(th, codiConsultarIGuardarAnotacionsPendents);
+							sample.stop(Timer.builder("METRICS@Subsystem_Background.consultarIGuardarAnotacions")
+									.description("Tiempo y resultado")
+									.tags("resultado", "error")
+									.register(aplicacioService.getMeterRegistry()));
 						} finally {
                         	SecurityContextHolder.clearContext();
                         }                 	
@@ -257,13 +267,22 @@ public class SchedulingConfig implements SchedulingConfigurer {
                     @SneakyThrows
                     @Override
                     public void run() {
+                    	Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
                     	monitorTasquesService.inici(codiEnviarEmailsAgrupats);
                         try {
                         	createAuthenticationContext();
                         	segonPlaService.enviarEmailsPendentsAgrupats();
                         	monitorTasquesService.fi(codiEnviarEmailsAgrupats);
-                        } catch(Throwable th) {                        	
+							sample.stop(Timer.builder("METRICS@Subsystem_Background.enviarEmailsAgrupats")
+									.description("Tiempo y resultado")
+									.tags("resultado", "exito")
+									.register(aplicacioService.getMeterRegistry()));                        	
+                        } catch(Throwable th) {
                         	tractarErrorTascaSegonPla(th, codiEnviarEmailsAgrupats);
+							sample.stop(Timer.builder("METRICS@Subsystem_Background.enviarEmailsAgrupats")
+									.description("Tiempo y resultado")
+									.tags("resultado", "error")
+									.register(aplicacioService.getMeterRegistry()));                        	
                         } finally {
                         	SecurityContextHolder.clearContext();
                         }
@@ -278,13 +297,22 @@ public class SchedulingConfig implements SchedulingConfigurer {
                     @SneakyThrows
                     @Override
                     public void run() {
+                    	Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 						monitorTasquesService.inici(codiGuardarEnArxiuContingutsPendents);
 						try {
 							createAuthenticationContext();
 	                        segonPlaService.guardarExpedientsDocumentsArxiu();
 							monitorTasquesService.fi(codiGuardarEnArxiuContingutsPendents);
+							sample.stop(Timer.builder("METRICS@Subsystem_Background.guardarEnArxiuContingutsPendents")
+									.description("Tiempo y resultado")
+									.tags("resultado", "exito")
+									.register(aplicacioService.getMeterRegistry()));
 						} catch (Throwable th) {
 							tractarErrorTascaSegonPla(th, codiGuardarEnArxiuContingutsPendents);
+							sample.stop(Timer.builder("METRICS@Subsystem_Background.guardarEnArxiuContingutsPendents")
+									.description("Tiempo y resultado")
+									.tags("resultado", "error")
+									.register(aplicacioService.getMeterRegistry()));
 						} finally {
                         	SecurityContextHolder.clearContext();
                         }

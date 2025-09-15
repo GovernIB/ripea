@@ -16,9 +16,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import es.caib.distribucio.ws.backoffice.AnotacioRegistreId;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.ExpedientPeticioService;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 
@@ -38,12 +39,21 @@ public class DistribucioRestController {
 			description = "Guarda a la Base de dades les dades de identificació de la anotació, per posteriorment processarles i descarregar la informació completa.",
 			security = { @SecurityRequirement(name = "basicAuth") })
 	public ResponseEntity<String> event(@RequestBody List<AnotacioRegistreId> event) {
+		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		try {
 			//Guardam el usuari a la taula de BBDD, aquest en concret ha de existir a Keycloak, i tendrem les dades de auditoria correctes.
 			aplicacioService.processarAutenticacioUsuari(false);
 			expedientPeticioService.crearExpedientPeticion(event);
+			sample.stop(Timer.builder("METRICS@Subsystem_Callback_Distribucio.event")
+					.description("Tiempo y resultado")
+					.tags("resultado", "exito")
+					.register(aplicacioService.getMeterRegistry()));			
 			return new ResponseEntity<String>("OK", HttpStatus.OK);
 		} catch (Exception e) {
+			sample.stop(Timer.builder("METRICS@Subsystem_Callback_Distribucio.event")
+					.description("Tiempo y resultado")
+					.tags("resultado", "error")
+					.register(aplicacioService.getMeterRegistry()));
 			return new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		} finally {
 			//Eliminam la autenticació ja que nomes hauria de servir per la petició actual

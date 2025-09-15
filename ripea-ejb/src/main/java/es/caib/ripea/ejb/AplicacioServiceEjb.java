@@ -3,6 +3,7 @@ package es.caib.ripea.ejb;
 import es.caib.ripea.ejb.base.AbstractServiceEjb;
 import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.service.AplicacioService;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.experimental.Delegate;
 
 import javax.annotation.security.PermitAll;
@@ -316,5 +317,11 @@ public class AplicacioServiceEjb extends AbstractServiceEjb<AplicacioService> im
 	@RolesAllowed({ "IPA_SUPER" })
 	public Long updateUsuariCodi(String codiAntic, String codiNou) {
 		return delegateService.updateUsuariCodi(codiAntic, codiNou);
+	}
+	
+	@Override
+	@RolesAllowed("**")
+	public MeterRegistry getMeterRegistry() {
+		return delegateService.getMeterRegistry();
 	}
 }

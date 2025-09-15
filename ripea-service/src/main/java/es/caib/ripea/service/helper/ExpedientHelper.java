@@ -186,7 +186,7 @@ public class ExpedientHelper {
 	@Autowired private CsvHelper csvHelper;
 	@Autowired private ExpedientRepositoryCommnand expedientRepositoryCommnand;
 	@Autowired private ExpedientSeguidorService expedientSeguidorService;
-	@Autowired private MeterRegistry meterRegistry;
+	@Autowired private ApplicationHelper applicationHelper;
 	
 	public static List<DocumentDto> expedientsWithImportacio = new ArrayList<DocumentDto>();
 
@@ -232,7 +232,7 @@ public class ExpedientHelper {
 			String prioritatMotiu,
 			SiNoEnumDto seguidor) {
 
-		Timer.Sample sample = Timer.start(meterRegistry);
+		Timer.Sample sample = Timer.start(applicationHelper.getMeterRegistry());
 		
 		try {
 		
@@ -372,18 +372,18 @@ public class ExpedientHelper {
 				}
 			}
 			
-	        sample.stop(Timer.builder("ExpedientHelper.create")
+	        sample.stop(Timer.builder("METRICS@Subsystem_Expedient.create")
 	                .description("Tiempo y resultado")
 	                .tags("resultado", "exito")
-	                .register(meterRegistry));
+	                .register(applicationHelper.getMeterRegistry()));
 	        
 	        return expedient.getId();
         
         } catch (Exception e) {
-            sample.stop(Timer.builder("ExpedientHelper.create")
+            sample.stop(Timer.builder("METRICS@Subsystem_Expedient.create")
                 .description("Tiempo y resultado")
                 .tags("resultado", "error")
-                .register(meterRegistry));
+                .register(applicationHelper.getMeterRegistry()));
             throw e;
         }
 	}

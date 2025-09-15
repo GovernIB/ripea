@@ -90,6 +90,7 @@ import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.MetaExpedientService;
 import es.caib.ripea.service.intf.service.PortafirmesFluxService;
 import es.caib.ripea.service.intf.utils.Utils;
+import io.micrometer.core.instrument.Timer;
 
 /**
  * Controlador per al manteniment de meta-expedients.
@@ -482,6 +483,8 @@ public class MetaExpedientController extends BaseAdminController {
 			BindingResult bindingResult,
 			Model model) throws JsonParseException, IOException {
 		
+		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
+		
 		ObjectMapper objectMapper = new ObjectMapper();
 		objectMapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
 		MetaExpedientImportEditCommand command = objectMapper.readValue(commandStr, MetaExpedientImportEditCommand.class);
@@ -577,7 +580,13 @@ public class MetaExpedientController extends BaseAdminController {
 				messageSuccess = "metaexpedient.import.controller.update.ok";
 			}
 
-			MissatgesHelper.success(request, getMessage(request, messageSuccess, new String[] {command.getNom() }));			
+			MissatgesHelper.success(request, getMessage(request, messageSuccess, new String[] {command.getNom() }));
+			
+			sample.stop(Timer.builder("METRICS@Subsystem_Procediment.import")
+					.description("Tiempo y resultado")
+					.tags("resultado", "exito")
+					.register(aplicacioService.getMeterRegistry()));
+			
 			return null;
 			
 		} catch (Exception e) {
@@ -590,6 +599,10 @@ public class MetaExpedientController extends BaseAdminController {
 							"metaexpedient.import.controller.import.error",
 							new Object[] { command.getNom(), ExceptionHelper.getRootCauseOrItself(e).getMessage() }),
 					e);
+			sample.stop(Timer.builder("METRICS@Subsystem_Procediment.import")
+					.description("Tiempo y resultado")
+					.tags("resultado", "error")
+					.register(aplicacioService.getMeterRegistry()));			
 			return null;
 			
 		} finally {

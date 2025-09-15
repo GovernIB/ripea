@@ -4,6 +4,7 @@ import java.util.Collections;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import es.caib.notib.client.domini.NotificacioCanviClient;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.DocumentService;
+import io.micrometer.core.instrument.Timer;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -46,12 +48,26 @@ public class NotibWsController {
 			summary = "Recepció de canvi de estat de notificació enviada previament a Notib.",
 			description = "Actualitza les dades de la notificació a la BBDD de RIPEA.")
 	public void notificaCanvi(@RequestBody NotificacioCanviClient notificacioCanvi) {
-		// Crear un usuario autenticado simulado. En portafib no se puede configurar una autenticación BASIC
-        User user = new User("$notib_ripea", "notib_ripea", Collections.singletonList(new SimpleGrantedAuthority("tothom")));
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-		//Guardam el usuari a la taula de BBDD, ja que sino algunes dades d'auditoria donen error
-		aplicacioService.processarAutenticacioUsuari(false);
-		documentService.notificacioActualitzarEstat(notificacioCanvi.getIdentificador(), notificacioCanvi.getReferenciaEnviament());
+		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
+		
+		try {
+		
+			// Crear un usuario autenticado simulado. En portafib no se puede configurar una autenticación BASIC
+	        User user = new User("$notib_ripea", "notib_ripea", Collections.singletonList(new SimpleGrantedAuthority("tothom")));
+	        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+	        SecurityContextHolder.getContext().setAuthentication(authentication);
+			//Guardam el usuari a la taula de BBDD, ja que sino algunes dades d'auditoria donen error
+			aplicacioService.processarAutenticacioUsuari(false);
+			documentService.notificacioActualitzarEstat(notificacioCanvi.getIdentificador(), notificacioCanvi.getReferenciaEnviament());
+			sample.stop(Timer.builder("METRICS@Subsystem_Callback_Notib.notificaCanvi")
+					.description("Tiempo y resultado")
+					.tags("resultado", "exito")
+					.register(aplicacioService.getMeterRegistry()));
+		} catch (Exception e) {
+			sample.stop(Timer.builder("METRICS@Subsystem_Callback_Notib.notificaCanvi")
+					.description("Tiempo y resultado")
+					.tags("resultado", "error")
+					.register(aplicacioService.getMeterRegistry()));
+		}			
 	}
 }

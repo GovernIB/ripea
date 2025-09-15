@@ -31,6 +31,7 @@ import es.caib.ripea.persistence.entity.resourceentity.UsuariResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.ExpedientTascaResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientTascaResourceRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
+import es.caib.ripea.service.helper.ApplicationHelper;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
@@ -54,6 +55,7 @@ import es.caib.ripea.service.intf.model.MetaExpedientTascaResource;
 import es.caib.ripea.service.intf.model.UsuariResource;
 import es.caib.ripea.service.intf.resourceservice.ExpedientTascaResourceService;
 import es.caib.ripea.service.intf.utils.Utils;
+import io.micrometer.core.instrument.Timer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -70,6 +72,7 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
     private final ExcepcioLogHelper excepcioLogHelper;
     private final EntityComprovarHelper entityComprovarHelper;
     private final MessageHelper messageHelper;
+    private final ApplicationHelper applicationHelper;
     
 	@PostConstruct
 	public void init() {
@@ -89,35 +92,52 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
 
     @Override
     protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
-    	String entitatActualCodi = configHelper.getEntitatActualCodi();
-
-        List<Filter> filters = new ArrayList<>();
-        Map<String, String> mapaNamedQueries =  Utils.namedQueriesToMap(namedQueries);
-
-        filters.add(FilterBuilder.and(
-                        (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null,
-                FilterBuilder.equal(ExpedientTascaResource.Fields.expedient + "." + ContingutResource.Fields.entitat + "." + EntitatResource.Fields.codi, 
-                		entitatActualCodi != null?entitatActualCodi:"................................................................................")
-                )
-        );
-
-        if (mapaNamedQueries.containsKey("USUARI_RELACIONAT")){
-            String user = SecurityContextHolder.getContext().getAuthentication().getName();
-            filters.add(
-                    FilterBuilder.or(
-//                            FilterBuilder.equal("responsableActual.codi", user),
-                            FilterBuilder.exists(FilterBuilder.equal("responsables.codi", user)),
-                            FilterBuilder.exists(FilterBuilder.equal("observadors.codi", user)),
-                            FilterBuilder.equal("delegat.codi", user)
-                    )
-            );
-        }
-
-        List<Filter> result = filters.stream()
-                .filter(f -> f!=null && !String.valueOf(f).isEmpty())
-                .collect(Collectors.toList());
-
-        return result.isEmpty() ? null : FilterBuilder.and(result).generate();
+    		
+    	Timer.Sample sample = Timer.start(applicationHelper.getMeterRegistry());
+    	
+    	try {
+    		
+    		String entitatActualCodi = configHelper.getEntitatActualCodi();
+	        List<Filter> filters = new ArrayList<>();
+	        Map<String, String> mapaNamedQueries =  Utils.namedQueriesToMap(namedQueries);
+	
+	        filters.add(FilterBuilder.and(
+	                        (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null,
+	                FilterBuilder.equal(ExpedientTascaResource.Fields.expedient + "." + ContingutResource.Fields.entitat + "." + EntitatResource.Fields.codi, 
+	                		entitatActualCodi != null?entitatActualCodi:"................................................................................")
+	                )
+	        );
+	
+	        if (mapaNamedQueries.containsKey("USUARI_RELACIONAT")){
+	            String user = SecurityContextHolder.getContext().getAuthentication().getName();
+	            filters.add(
+	                    FilterBuilder.or(
+	//                            FilterBuilder.equal("responsableActual.codi", user),
+	                            FilterBuilder.exists(FilterBuilder.equal("responsables.codi", user)),
+	                            FilterBuilder.exists(FilterBuilder.equal("observadors.codi", user)),
+	                            FilterBuilder.equal("delegat.codi", user)
+	                    )
+	            );
+	        }
+	
+	        List<Filter> result = filters.stream()
+	                .filter(f -> f!=null && !String.valueOf(f).isEmpty())
+	                .collect(Collectors.toList());
+	
+			sample.stop(Timer.builder("METRICS@Subsystem_Expedient.tasquesUserList")
+					.description("Tiempo y resultado")
+					.tags("resultado", "exito", "interfaz", "REACT")
+					.register(applicationHelper.getMeterRegistry()));
+	
+			return result.isEmpty() ? null : FilterBuilder.and(result).generate();
+			
+		} catch (Exception e) {
+			sample.stop(Timer.builder("METRICS@Subsystem_Expedient.tasquesUserList")
+				.description("Tiempo y resultado")
+				.tags("resultado", "error", "interfaz", "REACT")
+				.register(applicationHelper.getMeterRegistry()));
+			throw e;
+		}
     }
 	
     @Override

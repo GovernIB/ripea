@@ -1,16 +1,21 @@
-/**
- * 
- */
 package es.caib.ripea.service.intf.service;
-
-import es.caib.ripea.service.intf.dto.*;
-import es.caib.ripea.service.intf.exception.NotFoundException;
-import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 import java.util.Properties;
-
 import javax.annotation.security.PermitAll;
+import org.springframework.security.access.prepost.PreAuthorize;
+import io.micrometer.core.instrument.MeterRegistry;
+import es.caib.ripea.service.intf.dto.DiagnosticFiltreDto;
+import es.caib.ripea.service.intf.dto.EntitatDto;
+import es.caib.ripea.service.intf.dto.ExcepcioLogDto;
+import es.caib.ripea.service.intf.dto.GenericDto;
+import es.caib.ripea.service.intf.dto.IntegracioAccioDto;
+import es.caib.ripea.service.intf.dto.IntegracioDto;
+import es.caib.ripea.service.intf.dto.IntegracioFiltreDto;
+import es.caib.ripea.service.intf.dto.PaginaDto;
+import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
+import es.caib.ripea.service.intf.dto.UsuariDto;
+import es.caib.ripea.service.intf.exception.NotFoundException;
 
 /**
  * Declaració dels mètodes comuns de l'aplicació.
@@ -243,4 +248,7 @@ public interface AplicacioService {
 	
 	@PreAuthorize("hasRole('IPA_SUPER')")
 	public Long updateUsuariCodi(String codiAntic, String codiNou);
+	
+	@PermitAll
+	public MeterRegistry getMeterRegistry();
 }

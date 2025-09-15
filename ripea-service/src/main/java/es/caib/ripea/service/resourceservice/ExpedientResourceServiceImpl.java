@@ -60,6 +60,7 @@ import es.caib.ripea.persistence.repository.ExpedientRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
+import es.caib.ripea.service.helper.ApplicationHelper;
 import es.caib.ripea.service.helper.CacheHelper;
 import es.caib.ripea.service.helper.CarpetaHelper;
 import es.caib.ripea.service.helper.ConfigHelper;
@@ -119,6 +120,7 @@ import es.caib.ripea.service.intf.resourceservice.ExpedientResourceService;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.permission.ExtendedPermission;
 import es.caib.ripea.service.resourcehelper.ContingutResourceHelper;
+import io.micrometer.core.instrument.Timer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -142,6 +144,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     private final MetaExpedientSequenciaResourceRepository metaExpedientSequenciaResourceRepository;
 
     private final ContingutResourceHelper contingutResourceHelper;
+    private final ApplicationHelper applicationHelper;
     private final PluginHelper pluginHelper;
     private final CacheHelper cacheHelper;
     private final DominiHelper dominiHelper;
@@ -220,48 +223,65 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     @Override
     protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
     	
-        // En cas de no disposar d'entitat actual, filtrarem per un string "................................................................................"
-        // amb una mida superior a la mida màxima del camp codi de manera que asseguram que no es retornin resultats un cop aplicat el filtre
-        String entitatActualCodi = configHelper.getEntitatActualCodi();
-        String organActualCodi	 = configHelper.getOrganActualCodi();
-        String rolActual		 = configHelper.getRolActual();
-
-        //throw new PermissionDeniedException
-        EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true, false);
-        OrganGestorEntity ogEntity	= organGestorRepository.findByEntitatIdAndCodi(entitatEntity.getId(), organActualCodi);
+        Timer.Sample sample = Timer.start(applicationHelper.getMeterRegistry());
         
-		PermisosPerExpedientsDto permisosPerExpedients = expedientHelper.findPermisosPerExpedients(
-				entitatEntity.getId(),
-				rolActual,
-				ogEntity!=null?ogEntity.getId():null);
-
-		//Si no es té permis per cap banda, no retornam resultats
-		if (permisosPerExpedients.capPermis()) {
-			return FilterBuilder.equal("id", 0).generate();
-		}
-		
-        Filter filtreFrontAndEntitat = FilterBuilder.and(
-                (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null,
-                FilterBuilder.equal(MetaExpedientResource.Fields.entitat + "." + EntitatResource.Fields.codi, 
-                		entitatActualCodi != null?entitatActualCodi:"................................................................................")
-        );
-		
-		Filter filtreNoEliminats = FilterBuilder.and(FilterBuilder.equal(ContingutResource.Fields.esborrat, "0"));
-		Filter filtrePermisos = null;
-
-        List<String> permesosClausulesIn = Utils.getIdsEnGruposMil(
-        		expedientHelper.findExpedientsPermesosIds(entitatEntity, permisosPerExpedients, rolActual));
-        if (permesosClausulesIn!=null) {
-	        for (String aux: permesosClausulesIn) {
-		        if (aux != null && !aux.isEmpty()) {
-		        	filtrePermisos = FilterBuilder.or(filtrePermisos, Filter.parse("id IN (" + aux + ")"));
+        try {
+    	
+	        // En cas de no disposar d'entitat actual, filtrarem per un string "................................................................................"
+	        // amb una mida superior a la mida màxima del camp codi de manera que asseguram que no es retornin resultats un cop aplicat el filtre
+	        String entitatActualCodi = configHelper.getEntitatActualCodi();
+	        String organActualCodi	 = configHelper.getOrganActualCodi();
+	        String rolActual		 = configHelper.getRolActual();
+	
+	        //throw new PermissionDeniedException
+	        EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true, false);
+	        OrganGestorEntity ogEntity	= organGestorRepository.findByEntitatIdAndCodi(entitatEntity.getId(), organActualCodi);
+	        
+			PermisosPerExpedientsDto permisosPerExpedients = expedientHelper.findPermisosPerExpedients(
+					entitatEntity.getId(),
+					rolActual,
+					ogEntity!=null?ogEntity.getId():null);
+	
+			//Si no es té permis per cap banda, no retornam resultats
+			if (permisosPerExpedients.capPermis()) {
+				return FilterBuilder.equal("id", 0).generate();
+			}
+			
+	        Filter filtreFrontAndEntitat = FilterBuilder.and(
+	                (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null,
+	                FilterBuilder.equal(MetaExpedientResource.Fields.entitat + "." + EntitatResource.Fields.codi, 
+	                		entitatActualCodi != null?entitatActualCodi:"................................................................................")
+	        );
+			
+			Filter filtreNoEliminats = FilterBuilder.and(FilterBuilder.equal(ContingutResource.Fields.esborrat, "0"));
+			Filter filtrePermisos = null;
+	
+	        List<String> permesosClausulesIn = Utils.getIdsEnGruposMil(
+	        		expedientHelper.findExpedientsPermesosIds(entitatEntity, permisosPerExpedients, rolActual));
+	        if (permesosClausulesIn!=null) {
+		        for (String aux: permesosClausulesIn) {
+			        if (aux != null && !aux.isEmpty()) {
+			        	filtrePermisos = FilterBuilder.or(filtrePermisos, Filter.parse("id IN (" + aux + ")"));
+			        }
 		        }
 	        }
-        }
-
-		Filter filtreResultat = FilterBuilder.and(filtreFrontAndEntitat, filtreNoEliminats, filtrePermisos);
+	
+			Filter filtreResultat = FilterBuilder.and(filtreFrontAndEntitat, filtreNoEliminats, filtrePermisos);
+	    
+    		sample.stop(Timer.builder("METRICS@Subsystem_Expedient.list")
+    				.description("Tiempo y resultado")
+    				.tags("resultado", "exito", "interfaz", "REACT")
+    				.register(applicationHelper.getMeterRegistry()));			
+			
+	        return filtreResultat.generate();
         
-        return filtreResultat.generate();
+    	} catch (Exception e) {
+    		sample.stop(Timer.builder("METRICS@Subsystem_Expedient.list")
+    			.description("Tiempo y resultado")
+    			.tags("resultado", "error", "interfaz", "REACT")
+    			.register(applicationHelper.getMeterRegistry()));
+    		throw e;
+    	}
 //
 //        /**
 //         * Procediment (meta-expedients) amb permisos

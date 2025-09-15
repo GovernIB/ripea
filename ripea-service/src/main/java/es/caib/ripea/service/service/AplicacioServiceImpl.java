@@ -66,6 +66,7 @@ import es.caib.ripea.persistence.repository.ViaFirmaUsuariRepository;
 import es.caib.ripea.persistence.repository.config.ConfigRepository;
 import es.caib.ripea.persistence.repository.historic.HistoricUsuariRepository;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
+import es.caib.ripea.service.helper.ApplicationHelper;
 import es.caib.ripea.service.helper.CacheHelper;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.ConversioTipusHelper;
@@ -87,12 +88,11 @@ import es.caib.ripea.service.intf.dto.IntegracioDto;
 import es.caib.ripea.service.intf.dto.IntegracioFiltreDto;
 import es.caib.ripea.service.intf.dto.PaginaDto;
 import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
-import es.caib.ripea.service.intf.dto.PortafirmesCarrecDto;
 import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.service.AplicacioService;
-import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.permission.ExtendedPermission;
+import io.micrometer.core.instrument.MeterRegistry;
 
 @Service
 public class AplicacioServiceImpl implements AplicacioService {
@@ -100,7 +100,8 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Autowired private UsuariRepository usuariRepository;
 	@Autowired private CacheHelper cacheHelper;
 	@Autowired private PluginHelper pluginHelper;
-	@Autowired private PinbalHelper pinbalHelper;	
+	@Autowired private PinbalHelper pinbalHelper;
+	@Autowired private ApplicationHelper applicationHelper;
 	@Autowired private ConversioTipusHelper conversioTipusHelper;
 	@Autowired private IntegracioHelper integracioHelper;
 	@Autowired private ExcepcioLogHelper excepcioLogHelper;
@@ -881,4 +882,9 @@ public class AplicacioServiceImpl implements AplicacioService {
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(AplicacioServiceImpl.class);
+
+	@Override
+	public MeterRegistry getMeterRegistry() {
+		return applicationHelper.getMeterRegistry();
+	}
 }

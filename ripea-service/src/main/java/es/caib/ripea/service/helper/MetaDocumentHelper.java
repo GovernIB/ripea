@@ -34,6 +34,7 @@ import es.caib.ripea.persistence.repository.UsuariRepository;
 import es.caib.ripea.service.intf.dto.MetaDocumentDto;
 import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
 import es.caib.ripea.service.intf.exception.SistemaExternException;
+import io.micrometer.core.instrument.Timer;
 
 @Component
 public class MetaDocumentHelper {
@@ -43,6 +44,7 @@ public class MetaDocumentHelper {
 	@Autowired private ContingutHelper contingutHelper;
 	@Autowired private PluginHelper pluginHelper;
 	@Autowired private CacheHelper cacheHelper;
+	@Autowired private ApplicationHelper applicationHelper;
 	
 	@Autowired private ExpedientRepository expedientRepository;
 	@Autowired private PinbalServeiRepository pinbalServeiRepository;
@@ -154,73 +156,90 @@ public class MetaDocumentHelper {
 			String rolActual,
 			Long organId) {
 		
-		logger.debug("Creant un nou meta-document (entitatId=" + entitatId + ", metaExpedientId=" + metaExpedientId + ", metaDocument=" + metaDocument + ")");
+		Timer.Sample sample = Timer.start(applicationHelper.getMeterRegistry());
+		
+		try {
+		
+			logger.debug("Creant un nou meta-document (entitatId=" + entitatId + ", metaExpedientId=" + metaExpedientId + ", metaDocument=" + metaDocument + ")");
+	
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+					entitatId,
+					false,
+					false,
+					false, 
+					true, false);
+			
+			MetaExpedientEntity metaExpedient = null;
+			int ordre = 0;
+			//El Metadocument pot ser generic (sense associar a un procediment)
+			if (metaExpedientId!=null) {
+				metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
+				ordre = metaDocumentRepository.countByMetaExpedient(metaExpedient);
+			}
+			
+			PinbalServeiEntity pinbalServeiEntity = null;
+			if (metaDocument.getPinbalServei()!=null && metaDocument.getPinbalServei().getId()!=null) {
+				pinbalServeiEntity = pinbalServeiRepository.findById(metaDocument.getPinbalServei().getId()).orElse(null);
+			}
+			
+			MetaDocumentEntity newMetaDocumententity = MetaDocumentEntity.getBuilder(
+					entitat,
+					metaDocument.getCodi(),
+					metaDocument.getNom(),
+					metaDocument.getMultiplicitat(),
+					metaExpedient,
+					metaDocument.getNtiOrigen(),
+					metaDocument.getNtiEstadoElaboracion(),
+					metaDocument.getNtiTipoDocumental(),
+					metaDocument.isPinbalActiu(),
+					metaDocument.getPinbalFinalitat(),
+					ordre).
+					biometricaLectura(metaDocument.isBiometricaLectura()).
+					firmaBiometricaActiva(metaDocument.isFirmaBiometricaActiva()).
+					firmaPortafirmesActiva(metaDocument.isFirmaPortafirmesActiva()).
+					descripcio(metaDocument.getDescripcio()).
+					portafirmesDocumentTipus(metaDocument.getPortafirmesDocumentTipus()).
+					portafirmesResponsables(metaDocument.getPortafirmesResponsables()).
+					portafirmesSequenciaTipus(metaDocument.getPortafirmesSequenciaTipus()).
+					portafirmesCustodiaTipus(metaDocument.getPortafirmesCustodiaTipus()).
+					firmaPassarelaActiva(metaDocument.isFirmaPassarelaActiva()).
+					firmaPassarelaCustodiaTipus(metaDocument.getFirmaPassarelaCustodiaTipus()).
+					portafirmesFluxTipus(metaDocument.getPortafirmesFluxTipus()).
+					pinbalServei(pinbalServeiEntity).
+					build();
+			
+			newMetaDocumententity.updatePerDefecte(metaDocument.isPerDefecte());
+			newMetaDocumententity.setPinbalUtilitzarCifOrgan(metaDocument.isPinbalUtilitzarCifOrgan());
+			
+			if (plantillaContingut != null) {
+				newMetaDocumententity.updatePlantilla(
+						plantillaNom,
+						plantillaContentType,
+						plantillaContingut);
+			}
+			
+			if ("IPA_ORGAN_ADMIN".equals(rolActual)) {
+				metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientId, organId);
+			}
+	
+			newMetaDocumententity = metaDocumentRepository.save(newMetaDocumententity);
+	
+			updateFluxos(newMetaDocumententity, metaDocument.getPortafirmesFluxosId());
 
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				false,
-				false, 
-				true, false);
+			sample.stop(Timer.builder("METRICS@Subsystem_Procediment.metaDoc")
+					.description("Tiempo y resultado")
+					.tags("resultado", "exito")
+					.register(applicationHelper.getMeterRegistry()));
 		
-		MetaExpedientEntity metaExpedient = null;
-		int ordre = 0;
-		//El Metadocument pot ser generic (sense associar a un procediment)
-		if (metaExpedientId!=null) {
-			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
-			ordre = metaDocumentRepository.countByMetaExpedient(metaExpedient);
-		}
-		
-		PinbalServeiEntity pinbalServeiEntity = null;
-		if (metaDocument.getPinbalServei()!=null && metaDocument.getPinbalServei().getId()!=null) {
-			pinbalServeiEntity = pinbalServeiRepository.findById(metaDocument.getPinbalServei().getId()).orElse(null);
-		}
-		
-		MetaDocumentEntity newMetaDocumententity = MetaDocumentEntity.getBuilder(
-				entitat,
-				metaDocument.getCodi(),
-				metaDocument.getNom(),
-				metaDocument.getMultiplicitat(),
-				metaExpedient,
-				metaDocument.getNtiOrigen(),
-				metaDocument.getNtiEstadoElaboracion(),
-				metaDocument.getNtiTipoDocumental(),
-				metaDocument.isPinbalActiu(),
-				metaDocument.getPinbalFinalitat(),
-				ordre).
-				biometricaLectura(metaDocument.isBiometricaLectura()).
-				firmaBiometricaActiva(metaDocument.isFirmaBiometricaActiva()).
-				firmaPortafirmesActiva(metaDocument.isFirmaPortafirmesActiva()).
-				descripcio(metaDocument.getDescripcio()).
-				portafirmesDocumentTipus(metaDocument.getPortafirmesDocumentTipus()).
-				portafirmesResponsables(metaDocument.getPortafirmesResponsables()).
-				portafirmesSequenciaTipus(metaDocument.getPortafirmesSequenciaTipus()).
-				portafirmesCustodiaTipus(metaDocument.getPortafirmesCustodiaTipus()).
-				firmaPassarelaActiva(metaDocument.isFirmaPassarelaActiva()).
-				firmaPassarelaCustodiaTipus(metaDocument.getFirmaPassarelaCustodiaTipus()).
-				portafirmesFluxTipus(metaDocument.getPortafirmesFluxTipus()).
-				pinbalServei(pinbalServeiEntity).
-				build();
-		
-		newMetaDocumententity.updatePerDefecte(metaDocument.isPerDefecte());
-		newMetaDocumententity.setPinbalUtilitzarCifOrgan(metaDocument.isPinbalUtilitzarCifOrgan());
-		
-		if (plantillaContingut != null) {
-			newMetaDocumententity.updatePlantilla(
-					plantillaNom,
-					plantillaContentType,
-					plantillaContingut);
-		}
-		
-		if ("IPA_ORGAN_ADMIN".equals(rolActual)) {
-			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientId, organId);
-		}
-
-		newMetaDocumententity = metaDocumentRepository.save(newMetaDocumententity);
-
-		updateFluxos(newMetaDocumententity, metaDocument.getPortafirmesFluxosId());
-		
-		return newMetaDocumententity;
+			return newMetaDocumententity;
+			
+		} catch (Exception e) {
+			sample.stop(Timer.builder("METRICS@Subsystem_Procediment.metaDoc")
+				.description("Tiempo y resultado")
+				.tags("resultado", "error")
+				.register(applicationHelper.getMeterRegistry()));
+			throw e;
+		}			
 	}
 	
 	public MetaDocumentEntity findByCodiAndProcediment(MetaExpedientEntity metaExpedientEntity, String codi) {

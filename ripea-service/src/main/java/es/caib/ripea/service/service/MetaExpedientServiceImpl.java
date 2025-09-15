@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.security.acls.model.Permission;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,6 +51,7 @@ import es.caib.ripea.persistence.repository.UsuariRepository;
 import es.caib.ripea.persistence.repository.historic.HistoricExpedientRepository;
 import es.caib.ripea.persistence.repository.historic.HistoricInteressatRepository;
 import es.caib.ripea.persistence.repository.historic.HistoricUsuariRepository;
+import es.caib.ripea.service.helper.ApplicationHelper;
 import es.caib.ripea.service.helper.CacheHelper;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.ConversioTipusHelper;
@@ -99,7 +99,6 @@ import es.caib.ripea.service.intf.dto.PaginaDto;
 import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
 import es.caib.ripea.service.intf.dto.PermisDto;
 import es.caib.ripea.service.intf.dto.PermissionEnumDto;
-import es.caib.ripea.service.intf.dto.PortafirmesFluxInfoDto;
 import es.caib.ripea.service.intf.dto.PrincipalTipusEnumDto;
 import es.caib.ripea.service.intf.dto.ProcedimentDto;
 import es.caib.ripea.service.intf.dto.ProgresActualitzacioDto;
@@ -113,6 +112,7 @@ import es.caib.ripea.service.intf.exception.PermissionDeniedException;
 import es.caib.ripea.service.intf.service.MetaExpedientService;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.permission.ExtendedPermission;
+import io.micrometer.core.instrument.Timer;
 
 @Service
 public class MetaExpedientServiceImpl implements MetaExpedientService {
@@ -148,62 +148,80 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	@Autowired private CacheHelper cacheHelper;
 	@Autowired private MetaDocumentHelper metaDocumentHelper;
 	@Autowired private MetaDadaHelper metaDadaHelper;
+	@Autowired private ApplicationHelper applicationHelper;
 
 	public static Map<String, ProgresActualitzacioDto> progresActualitzacio = new HashMap<>();
 
 	@Transactional
 	@Override
 	public MetaExpedientDto create(Long entitatId, MetaExpedientDto metaExpedient, String rolActual, Long organId) {
-		logger.debug(
-				"Creant un nou meta-expedient (" + "entitatId=" + entitatId + ", " + "metaExpedient=" + metaExpedient +
-						")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-		if (metaExpedient.getOrganGestor() != null) {
-			entityComprovarHelper.comprovarPermisOrganGestor(
-					entitatId,
-					metaExpedient.getOrganGestor().getId(),
-					true);
-		}
-		MetaExpedientEntity metaExpedientPare = null;
-		if (metaExpedient.getPareId() != null) {
-
-		metaExpedientPare = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedient.getPareId());
-		}
-		Long organGestorId = metaExpedient.getOrganGestor() != null ? metaExpedient.getOrganGestor().getId() : null;
-		MetaExpedientEntity entity = MetaExpedientEntity.getBuilder(
-				metaExpedient.getCodi(),
-				metaExpedient.getNom(),
-				metaExpedient.getDescripcio(),
-				metaExpedient.getSerieDocumental(),
-				metaExpedient.getClassificacio(),
-				metaExpedient.isNotificacioActiva(),
-				metaExpedient.isPermetMetadocsGenerals(),
-				entitat,
-				metaExpedientPare,
-				organGestorId == null ? null : organGestorRepository.getOne(organGestorId),
-				metaExpedient.isGestioAmbGrupsActiva(),
-				metaExpedient.isInteressatObligatori(),
-				rolActual.equals("IPA_ADMIN")?metaExpedient.isPermisDirecte():false).
-				expressioNumero(metaExpedient.getExpressioNumero()).
-				tipusClassificacio(metaExpedient.getTipusClassificacio()).build();
-		MetaExpedientEntity metaExpedientEntity = metaExpedientRepository.save(entity);
-		if (metaExpedient.getEstructuraCarpetes() != null) {
-			//crear estructura carpetes per defecte
-			metaExpedientHelper.crearEstructuraCarpetes(
-					metaExpedient.getEstructuraCarpetes(), 
-					metaExpedientEntity);
-		}
 		
-		MetaExpedientDto metaExpedientDto = conversioTipusHelper.convertir(metaExpedientEntity, MetaExpedientDto.class);
-		if ("IPA_ORGAN_ADMIN".equals(rolActual)) {
-			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientEntity.getId(), organId);
-		} else {
-			metaExpedientEntity.updateRevisioEstat(MetaExpedientRevisioEstatEnumDto.REVISAT);
-			if (metaExpedient.isCrearReglaDistribucio()) {
-				metaExpedientDto.setCrearReglaResponse(metaExpedientHelper.crearReglaDistribucio(metaExpedientEntity.getId()));
+		Timer.Sample sample = Timer.start(applicationHelper.getMeterRegistry());
+		
+		try {
+		
+			logger.debug("Creant un nou meta-expedient (" + "entitatId=" + entitatId + ", " + "metaExpedient=" + metaExpedient + ")");
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
+			if (metaExpedient.getOrganGestor() != null) {
+				entityComprovarHelper.comprovarPermisOrganGestor(
+						entitatId,
+						metaExpedient.getOrganGestor().getId(),
+						true);
 			}
-		}
-		return metaExpedientDto;
+			MetaExpedientEntity metaExpedientPare = null;
+			if (metaExpedient.getPareId() != null) {
+	
+			metaExpedientPare = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedient.getPareId());
+			}
+			Long organGestorId = metaExpedient.getOrganGestor() != null ? metaExpedient.getOrganGestor().getId() : null;
+			MetaExpedientEntity entity = MetaExpedientEntity.getBuilder(
+					metaExpedient.getCodi(),
+					metaExpedient.getNom(),
+					metaExpedient.getDescripcio(),
+					metaExpedient.getSerieDocumental(),
+					metaExpedient.getClassificacio(),
+					metaExpedient.isNotificacioActiva(),
+					metaExpedient.isPermetMetadocsGenerals(),
+					entitat,
+					metaExpedientPare,
+					organGestorId == null ? null : organGestorRepository.getOne(organGestorId),
+					metaExpedient.isGestioAmbGrupsActiva(),
+					metaExpedient.isInteressatObligatori(),
+					rolActual.equals("IPA_ADMIN")?metaExpedient.isPermisDirecte():false).
+					expressioNumero(metaExpedient.getExpressioNumero()).
+					tipusClassificacio(metaExpedient.getTipusClassificacio()).build();
+			MetaExpedientEntity metaExpedientEntity = metaExpedientRepository.save(entity);
+			if (metaExpedient.getEstructuraCarpetes() != null) {
+				//crear estructura carpetes per defecte
+				metaExpedientHelper.crearEstructuraCarpetes(
+						metaExpedient.getEstructuraCarpetes(), 
+						metaExpedientEntity);
+			}
+			
+			MetaExpedientDto metaExpedientDto = conversioTipusHelper.convertir(metaExpedientEntity, MetaExpedientDto.class);
+			if ("IPA_ORGAN_ADMIN".equals(rolActual)) {
+				metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientEntity.getId(), organId);
+			} else {
+				metaExpedientEntity.updateRevisioEstat(MetaExpedientRevisioEstatEnumDto.REVISAT);
+				if (metaExpedient.isCrearReglaDistribucio()) {
+					metaExpedientDto.setCrearReglaResponse(metaExpedientHelper.crearReglaDistribucio(metaExpedientEntity.getId()));
+				}
+			}
+			
+			sample.stop(Timer.builder("METRICS@Subsystem_Procediment.create")
+					.description("Tiempo y resultado")
+					.tags("resultado", "exito")
+					.register(applicationHelper.getMeterRegistry()));
+		
+			return metaExpedientDto;
+			
+		} catch (Exception e) {
+			sample.stop(Timer.builder("METRICS@Subsystem_Procediment.create")
+				.description("Tiempo y resultado")
+				.tags("resultado", "error")
+				.register(applicationHelper.getMeterRegistry()));
+			throw e;
+		}			
 	}
 
 	@Transactional
@@ -1035,13 +1053,32 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 			PaginacioParamsDto paginacioParams,
 			String rolActual,
 			boolean hasPermisAdmComu) {
-		PaginaDto<MetaExpedientDto> resposta = null;
-		if (isRolFiltreoOrgan) {
-			resposta = findByOrganGestor(entitatId, organGestorId, hasPermisAdmComu, filtre, paginacioParams);
-		} else {
-			resposta = findByEntitat(entitatId, filtre, paginacioParams, rolActual);
-		}
-		return resposta;
+		
+	    Timer.Sample sample = Timer.start(applicationHelper.getMeterRegistry());
+		
+	    try {
+		
+			PaginaDto<MetaExpedientDto> resposta = null;
+			if (isRolFiltreoOrgan) {
+				resposta = findByOrganGestor(entitatId, organGestorId, hasPermisAdmComu, filtre, paginacioParams);
+			} else {
+				resposta = findByEntitat(entitatId, filtre, paginacioParams, rolActual);
+			}
+
+			sample.stop(Timer.builder("METRICS@Subsystem_Procediment.list")
+					.description("Tiempo y resultado")
+					.tags("resultado", "exito")
+					.register(applicationHelper.getMeterRegistry()));
+
+			return resposta;
+			
+		} catch (Exception e) {
+			sample.stop(Timer.builder("METRICS@Subsystem_Procediment.list")
+				.description("Tiempo y resultado")
+				.tags("resultado", "error")
+				.register(applicationHelper.getMeterRegistry()));
+			throw e;
+		}			
 	}
 	
 	@Transactional(readOnly = true)
