@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
+import es.caib.ripea.service.intf.dto.EntregaPostalTipusEnum;
 import org.springframework.stereotype.Component;
 
 import es.caib.ripea.service.intf.dto.InteressatDocumentTipusEnumDto;
@@ -61,17 +62,19 @@ public class InteressatValidValidator implements ConstraintValidator<InteressatV
             }
         }
         if (!InteressatTipusEnum.InteressatAdministracioEntity.equals(resource.getTipus())) {
-            if (resource.getAdressaTipusVia() == null) {
-                notNullViolation(context, InteressatResource.Fields.adressaTipusVia);
-                valid = false;
-            }
-            if (resource.getAdresa() == null || resource.getAdresa().isBlank()) {
-                notNullViolation(context, InteressatResource.Fields.adresa);
-                valid = false;
-            }
-            if (resource.getAdressaNumCasa() == null || resource.getAdressaNumCasa().isBlank()) {
-                notNullViolation(context, InteressatResource.Fields.adressaNumCasa);
-                valid = false;
+            if (!EntregaPostalTipusEnum.SENSE_NORMALITZAR.equals(resource.getAdressaTipus())) {
+                if (resource.getAdressaTipusVia() == null) {
+                    notNullViolation(context, InteressatResource.Fields.adressaTipusVia);
+                    valid = false;
+                }
+                if (resource.getAdresa() == null || resource.getAdresa().isBlank()) {
+                    notNullViolation(context, InteressatResource.Fields.adresa);
+                    valid = false;
+                }
+                if (resource.getAdressaNumCasa() == null || resource.getAdressaNumCasa().isBlank()) {
+                    notNullViolation(context, InteressatResource.Fields.adressaNumCasa);
+                    valid = false;
+                }
             }
 
             if (resource.getDocumentNum() == null || resource.getDocumentNum().isBlank()) {
