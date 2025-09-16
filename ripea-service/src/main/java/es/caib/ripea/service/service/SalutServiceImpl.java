@@ -20,6 +20,7 @@ import es.caib.comanda.ms.salut.model.EstatSalut;
 import es.caib.comanda.ms.salut.model.EstatSalutEnum;
 import es.caib.comanda.ms.salut.model.IntegracioApp;
 import es.caib.comanda.ms.salut.model.IntegracioInfo;
+import es.caib.comanda.ms.salut.model.IntegracioPeticions;
 import es.caib.comanda.ms.salut.model.IntegracioSalut;
 import es.caib.comanda.ms.salut.model.Manual;
 import es.caib.comanda.ms.salut.model.MissatgeSalut;
@@ -32,6 +33,7 @@ import es.caib.ripea.service.intf.dto.AvisDto;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.AvisService;
 import es.caib.ripea.service.intf.service.SalutService;
+import io.micrometer.core.instrument.Meter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import lombok.RequiredArgsConstructor;
@@ -123,7 +125,7 @@ public class SalutServiceImpl implements SalutService{
 		
 		//Estats de salut particulars
 		EstatSalut salutDb = checkDatabase();		
-		List<IntegracioSalut> salutIntegracions = new ArrayList<IntegracioSalut>();
+		List<IntegracioSalut> salutIntegracions = checkIntegracions();
 		List<SubsistemaSalut> subsistemesSalut = checkSubsistemes();
 		List<DetallSalut> salutAltres = checkAltres(); 		//Comparar amb MonitorSystemController
 		List<MissatgeSalut> missatgesSalut = checkMissatges();
@@ -213,7 +215,57 @@ public class SalutServiceImpl implements SalutService{
     }
     
     public List<IntegracioSalut> checkIntegracions() {
+    	
     	List<IntegracioSalut> integracionsSalut = new ArrayList<>();
+    	
+    	/**
+    	 * IntegracioApp.USR //Gestió d'usuaris (METRICS@Integracions.dadesUsuari)
+    	 */
+		String[] codesFS = {"METRICS@Integracions.dadesUsuari"};
+    	
+		//TOTALS
+		long subsistema_total_exito = 0;
+		long subsistema_total_error = 0;
+		int tempsPromitgSubsistema	= 0;
+    	
+    	for (String codiMetrica: codesFS) {
+    		Timer timerExpedientExito = meterRegistry.find(codiMetrica).tags("resultado", "exito").timer();
+    		Timer timerExpedientError = meterRegistry.find(codiMetrica).tags("resultado", "error").timer();
+    		long exitoAux	= timerExpedientExito!=null?timerExpedientExito.count():0;
+    		long errorAux	= timerExpedientError!=null?timerExpedientError.count():0;
+    		int promitgAux	= (int)(timerExpedientExito!=null?timerExpedientExito.mean(TimeUnit.MILLISECONDS):0);
+    		//Afegir als totals
+    		subsistema_total_exito = subsistema_total_exito + exitoAux;
+    		subsistema_total_error = subsistema_total_error + errorAux;
+    		tempsPromitgSubsistema = tempsPromitgSubsistema + promitgAux;
+    		List<Meter> meters = meterRegistry. getMeters();
+    	}
+    	
+    	
+    	IntegracioPeticions ip = new IntegracioPeticions();
+//    	ip.addPeticioError(null)
+    	
+    	integracionsSalut.add(IntegracioSalut.builder()
+                .codi(IntegracioApp.USR.toString())
+                .latencia(tempsPromitgSubsistema/codesFS.length)
+                .estat(calculaEstat(subsistema_total_exito, subsistema_total_error))
+//                .peticions(subsistema_total_error)
+                .build());
+    	
+//		IntegracioApp.PFI //portafirmes
+//		IntegracioApp.ARX //Arxiu
+//		IntegracioApp.GDC //Gestor documental
+//		IntegracioApp.PBL //PINBAL
+//		IntegracioApp.DIS //DISTRIBUCIO
+//		IntegracioApp.CDO //Conversió de documents
+//		IntegracioApp.DIR //Dades externes
+//		IntegracioApp.NOT //NOTIB
+//		if (Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.FIRMA_BIOMETRICA_ACTIVA))) {
+//			IntegracioApp.VIF //Via Firma
+//		}
+//		IntegracioApp.DIB //Digitalització
+//		IntegracioApp.VFI //Validació firma
+//		IntegracioApp.RSC //ROLSAC
     	
 //    	IntegracioSalut.builder()
 //		.codi(getCodiApp().name())

@@ -275,6 +275,7 @@ public class PluginHelper {
 
 	public List<String> rolsUsuariFindAmbCodi(String usuariCodi) {
 
+		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		long t0 = System.currentTimeMillis();
 		String accioDescripcio = "Consulta rols a partir del codi d'usuari";
 		Map<String, String> accioParams = new HashMap<String, String>();
@@ -290,6 +291,10 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
+			sample.stop(Timer.builder("METRICS@Integracions.dadesUsuari")
+					.description("Tiempo y resultado")
+					.tags("resultado", "exito")
+					.register(aplicacioService.getMeterRegistry()));			
 			return rolsDisponibles;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de dades d'usuari";
@@ -302,12 +307,17 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
+			sample.stop(Timer.builder("METRICS@Integracions.dadesUsuari")
+					.description("Tiempo y resultado")
+					.tags("resultado", "error")
+					.register(aplicacioService.getMeterRegistry()));			
 			throw new SistemaExternException(IntegracioHelper.INTCODI_USUARIS, errorDescripcio, ex);
 		}
 	}
 
 	public DadesUsuari dadesUsuariFindAmbCodi(String usuariCodi) {
 
+		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		long t0 = System.currentTimeMillis();
 		String accioDescripcio = "Consulta d'usuari amb codi";
 		Map<String, String> accioParams = new HashMap<String, String>();
@@ -323,6 +333,10 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
+			sample.stop(Timer.builder("METRICS@Integracions.dadesUsuari")
+					.description("Tiempo y resultado")
+					.tags("resultado", "exito")
+					.register(aplicacioService.getMeterRegistry()));
 			return dadesUsuari;
 		} catch (SistemaExternNoTrobatException snte) {
 			String errorDescripcio = "No s'ha trobat cap usuari al sistema extern";
@@ -347,13 +361,17 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
+			sample.stop(Timer.builder("METRICS@Integracions.dadesUsuari")
+					.description("Tiempo y resultado")
+					.tags("resultado", "error")
+					.register(aplicacioService.getMeterRegistry()));
 			throw new SistemaExternException(IntegracioHelper.INTCODI_USUARIS, errorDescripcio, ex);
 		}
 	}
 
-	public List<DadesUsuari> dadesUsuariFindAmbGrup(
-			String grupCodi) {
+	public List<DadesUsuari> dadesUsuariFindAmbGrup(String grupCodi) {
 
+		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		long t0 = System.currentTimeMillis();
 		String accioDescripcio = "Consulta d'usuaris d'un grup";
 		Map<String, String> accioParams = new HashMap<String, String>();
@@ -370,6 +388,10 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
+			sample.stop(Timer.builder("METRICS@Integracions.dadesUsuari")
+					.description("Tiempo y resultado")
+					.tags("resultado", "exito")
+					.register(aplicacioService.getMeterRegistry()));			
 			return dadesUsuari;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de dades d'usuari";
@@ -382,13 +404,17 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
+			sample.stop(Timer.builder("METRICS@Integracions.dadesUsuari")
+					.description("Tiempo y resultado")
+					.tags("resultado", "error")
+					.register(aplicacioService.getMeterRegistry()));
 			throw new SistemaExternException(IntegracioHelper.INTCODI_USUARIS, errorDescripcio, ex);
 		}
 	}
 
-	public List<DadesUsuari> findAmbFiltre(
-			String filtre) throws SistemaExternException {
+	public List<DadesUsuari> findAmbFiltre(String filtre) throws SistemaExternException {
 
+		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		long t0 = System.currentTimeMillis();
 		String accioDescripcio = "Consulta d'usuaris d'un filtre";
 		Map<String, String> accioParams = new HashMap<String, String>();
@@ -404,6 +430,10 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
+			sample.stop(Timer.builder("METRICS@Integracions.dadesUsuari")
+					.description("Tiempo y resultado")
+					.tags("resultado", "exito")
+					.register(aplicacioService.getMeterRegistry()));
 			return dadesUsuari;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de dades d'usuari";
@@ -416,6 +446,10 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
+			sample.stop(Timer.builder("METRICS@Integracions.dadesUsuari")
+					.description("Tiempo y resultado")
+					.tags("resultado", "error")
+					.register(aplicacioService.getMeterRegistry()));
 			throw new SistemaExternException(IntegracioHelper.INTCODI_USUARIS, errorDescripcio, ex);
 		}
 	}
