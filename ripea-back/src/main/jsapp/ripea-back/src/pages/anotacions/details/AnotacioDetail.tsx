@@ -144,7 +144,7 @@ const Interessats = (props:any) => {
         {
             label: t('common.detail'),
             icon: "info",
-            showInMenu: true,
+            showInMenu: false,
             onClick: handleOpen,
             hidden: (row:any) => row?.tipus == "ADMINISTRACIO"
         },
@@ -162,7 +162,13 @@ const Interessats = (props:any) => {
             disableColumnSorting
             readOnly
             autoHeight
+
             onRowCountChange={onRowCountChange}
+            onRowClick={(params: any) => {
+                if (params?.row?.tipus != "ADMINISTRACIO") {
+                    handleOpen(params?.id, params?.row)
+                }
+            }}
         />
         {dialog}
     </>
@@ -207,7 +213,7 @@ const Annexos = (props:any) => {
     const { t } = useTranslation();
 
     const { handleOpen: handleAnnexFirma, dialog: dialogAnnexFirma } = useAnnexFirma();
-    const { handleOpen: handleVisualitzar, dialog: dialogVisualitzar } = useVisualitzar()
+    const { handleOpen: handleVisualitzar, dialog: dialogVisualitzar, isValid } = useVisualitzar()
     const {download} = useAnexxActions()
 
     const actions = [
@@ -216,7 +222,7 @@ const Annexos = (props:any) => {
             icon: "search",
             showInMenu: true,
             onClick: handleVisualitzar,
-            hidden: (row:any) => row?.fitxerExtension != 'pdf',
+            hidden: (row:any) => !isValid(row),
         },
         {
             label: t('page.anotacio.action.firma.label'),
@@ -248,6 +254,11 @@ const Annexos = (props:any) => {
             autoHeight
 
             onRowCountChange={onRowCountChange}
+            onRowClick={(params: any) => {
+                if (isValid(params?.row)) {
+                    handleVisualitzar(params?.id)
+                }
+            }}
         />
         {dialogAnnexFirma}
         {dialogVisualitzar}

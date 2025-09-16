@@ -4,7 +4,6 @@ import {useTranslation} from "react-i18next";
 import Load from "../../../components/Load.tsx";
 import Iframe from "../../../components/Iframe.tsx";
 import {Firmes} from "../details/DocumentDetail.tsx";
-import {Grid} from "@mui/material";
 import {useToProgramaAntic} from "../../user/UserHeadToolbar.tsx";
 
 const Visualitzar = (props: any) => {
@@ -13,7 +12,7 @@ const Visualitzar = (props: any) => {
 
     return <Load value={entity}>
         <Firmes entity={entity}/>
-        <Grid item sx={{p: 0, mt: 1}}><Iframe src={getUrl(`contingut/document/${entity?.id}/getPDF`)}/></Grid>
+        <Iframe src={getUrl(`contingut/document/${entity?.id}/getPDF`)}/>
     </Load>
 }
 
