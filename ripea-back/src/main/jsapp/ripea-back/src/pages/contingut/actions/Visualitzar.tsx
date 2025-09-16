@@ -74,7 +74,8 @@ const useVisualitzar = () => {
     return {
         handleOpen,
         handleClose,
-        dialog
+        dialog,
+        isValid: (row:any) => ['pdf', 'odt', 'docx'].includes(row?.fitxerExtension)
     }
 }
 export default useVisualitzar;

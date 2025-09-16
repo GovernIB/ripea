@@ -10,6 +10,7 @@ import {useState} from "react";
 import {Grid} from "@mui/material";
 import GridFormField from "../../components/GridFormField.tsx";
 import {GridSortDirection} from "@mui/x-data-grid-pro";
+import useAnotacioDetail from "./details/AnotacioDetail.tsx";
 
 const sortModel:any = [{field: 'registreInfo.data', sort: 'desc'}];
 const perspectives = ['REGISTRE', 'ESTAT_VIEW'];
@@ -99,6 +100,7 @@ const AnotacionsGrid = () => {
     }
 
     const {actions, components} = useAnotacioActions(refresh);
+    const {handleOpen, dialog} = useAnotacioDetail();
 
     return <GridPage disableMargins>
         <CardPage title={t('page.anotacio.filter.title')}>
@@ -125,9 +127,11 @@ const AnotacionsGrid = () => {
                     popupEditFormI18nKeys={{
                         updateSuccess: 'page.anotacio.action.canviProcediment.ok',
                     }}
+                    onRowClick={(params: any) => handleOpen(params?.row?.id, params?.row) }
                 />
             </Load>
             {components}
+            {dialog}
         </CardPage>
     </GridPage>
 }
