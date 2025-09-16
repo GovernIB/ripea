@@ -5,7 +5,7 @@ import {StyledPrioritat} from "../expedient/ExpedientGrid.tsx";
 import {CommentDialog} from "../CommentDialog.tsx";
 import StyledMuiGrid from '../../components/StyledMuiGrid.tsx';
 import TasquesGridFilter from "./TasquesGridFilter.tsx";
-import {useMemo, useState} from "react";
+import {useState} from "react";
 import Load from "../../components/Load.tsx";
 import { CardPage } from "../../components/CardData.tsx";
 import * as builder from "../../util/springFilterUtils.ts";
@@ -15,73 +15,70 @@ import useTascaActions from "./details/TascaActions.tsx";
 import {useNavigate} from "react-router-dom";
 import useTascaDetail from "./details/TascaDetail.tsx";
 
-const columns = [
-    {
-        field: 'expedient',
-        flex: 0.5,
-    },
-    {
-        field: 'metaExpedientTasca',
-        flex: 0.6,
-    },
-    {
-        field: 'metaExpedientTascaDescription',
-        flex: 0.6,
-    },
-    {
-        field: 'titol',
-        flex: 0.6,
-    },
-    {
-        field: 'observacions',
-        flex: 0.5,
-    },
-    {
-        field: 'prioritat',
-        flex: 0.4,
-        renderCell: (params: any) => <StyledPrioritat entity={params?.row}>{params.formattedValue}</StyledPrioritat>
-    },
-    {
-        field: 'dataInici',
-        flex: 0.5,
-        valueFormatter: (value: any) => formatDate(value)
-    },
-    {
-        field: 'responsablesActualStr',
-        headerName: 'Responsable actual',
-        flex: 0.5,
-        sortable: false,
-    },
-    {
-        field: 'dataLimit',
-        flex: 0.4,
-        valueFormatter: (value: any) => formatDate(value, "DD/MM/Y"),
-        renderCell: (params: any) => {
-            const color = params?.row?.dataLimitExpirada
-                ?'error'
-                :params?.row?.shouldNotifyAboutDeadline
-                    ?'warning'
-                    :'default'
-            return <Typography variant={"inherit"} color={color}>{params?.formattedValue}<Icon>alarm</Icon></Typography>
-        }
-    },
-    {
-        field: 'estat',
-        flex: 0.4,
-    },
-];
-
 const sortModel:any = [{field: 'dataInici', sort: 'desc'}];
 const TasquesGrid = () => {
     const { t } = useTranslation();
     const { value: user } = useUserSession();
     const navigate = useNavigate();
+    const apiRef = useMuiDataGridApiRef();
 
     const [springFilter, setSpringFilter] = useState<string>();
     const [load, setLoad] = useState<boolean>(false);
 
-    const additionalColumns = useMemo(()=>[
-        ...columns,
+    const columns = [
+        {
+            field: 'expedient',
+            flex: 0.5,
+        },
+        {
+            field: 'metaExpedientTasca',
+            flex: 0.6,
+        },
+        {
+            field: 'metaExpedientTascaDescription',
+            flex: 0.6,
+        },
+        {
+            field: 'titol',
+            flex: 0.6,
+        },
+        {
+            field: 'observacions',
+            flex: 0.5,
+        },
+        {
+            field: 'prioritat',
+            flex: 0.4,
+            renderCell: (params: any) => <StyledPrioritat entity={params?.row}>{params.formattedValue}</StyledPrioritat>
+        },
+        {
+            field: 'dataInici',
+            flex: 0.5,
+            valueFormatter: (value: any) => formatDate(value)
+        },
+        {
+            field: 'responsablesActualStr',
+            headerName: t('page.tasca.detall.responsableActual'),
+            flex: 0.5,
+            sortable: false,
+        },
+        {
+            field: 'dataLimit',
+            flex: 0.4,
+            valueFormatter: (value: any) => formatDate(value, "DD/MM/Y"),
+            renderCell: (params: any) => {
+                const color = params?.row?.dataLimitExpirada
+                    ?'error'
+                    :params?.row?.shouldNotifyAboutDeadline
+                        ?'warning'
+                        :'default'
+                return <Typography variant={"inherit"} color={color}>{params?.formattedValue}<Icon>alarm</Icon></Typography>
+            }
+        },
+        {
+            field: 'estat',
+            flex: 0.4,
+        },
         {
             field: 'numComentaris',
             headerName: '',
@@ -96,9 +93,7 @@ const TasquesGrid = () => {
                 onClose={refresh}
             />
         },
-    ], [columns])
-
-    const apiRef = useMuiDataGridApiRef();
+    ];
 
     const refresh = () => {
         setLoad(true);
@@ -121,7 +116,7 @@ const TasquesGrid = () => {
                 <StyledMuiGrid
                     apiRef={apiRef}
                     resourceName="expedientTascaResource"
-                    columns={additionalColumns}
+                    columns={columns}
                     filter={builder.and(
                         builder.eq("expedient.esborrat", 0),
                         springFilter,
