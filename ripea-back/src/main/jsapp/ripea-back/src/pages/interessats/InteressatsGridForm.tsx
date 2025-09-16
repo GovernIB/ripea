@@ -89,7 +89,7 @@ export const InteressatsGridForm = () => {
                        disabled={data?.tipus == 'InteressatAdministracioEntity'}
                        readOnly={data?.tipus == 'InteressatAdministracioEntity'}/>
 
-        <GridFormField xs={12} name="adressaTipus"
+        <GridFormField xs={12} name="adressaTipus" required
                        disabled={data?.tipus == 'InteressatAdministracioEntity'}
                        readOnly={data?.tipus == 'InteressatAdministracioEntity'}/>
 
