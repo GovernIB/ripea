@@ -13,6 +13,7 @@ import {useUserSession} from "../../components/Session.tsx";
 import {Icon, Typography} from "@mui/material";
 import useTascaActions from "./details/TascaActions.tsx";
 import {useNavigate} from "react-router-dom";
+import useTascaDetail from "./details/TascaDetail.tsx";
 
 const columns = [
     {
@@ -105,6 +106,7 @@ const TasquesGrid = () => {
     }
 
     const { actions, components, isTramitable } = useTascaActions({potModificar: true}, refresh)
+    const { handleOpen, dialog } = useTascaDetail();
 
     return <GridPage disableMargins>
         <CardPage title={t('page.user.menu.tasca')}>
@@ -130,6 +132,8 @@ const TasquesGrid = () => {
                     onRowClick={(params: any) => {
                         if (isTramitable(params?.row)) {
                             navigate(`/contingut/${params?.row?.expedient?.id}/tasca/${params?.id}`)
+                        } else {
+                            handleOpen(params?.row?.id, params?.row)
                         }
                     }}
                     rowProps={(row: any) => {
@@ -155,6 +159,7 @@ const TasquesGrid = () => {
                     readOnly
                 />
                 {components}
+                {dialog}
             </Load>
         </CardPage>
     </GridPage>
