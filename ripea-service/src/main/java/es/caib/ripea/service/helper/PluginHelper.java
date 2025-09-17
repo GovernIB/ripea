@@ -443,7 +443,7 @@ public class PluginHelper {
 		accioParams.put("Codi Dir3 de l'entitat", codiDir3);
 		Map<String, NodeDir3> organigrama = null;
 		UnitatsOrganitzativesPlugin unitatsOrganitzativesPlugin = getUnitatsOrganitzativesPlugin();
-		String endpoint = dadesUsuariPlugin.getEndpointURL();
+		String endpoint = unitatsOrganitzativesPlugin.getEndpointURL();
 		
 		try {
 			organigrama = unitatsOrganitzativesPlugin.organigrama(codiDir3);
@@ -484,10 +484,10 @@ public class PluginHelper {
 		accioParams.put("unitatPare",pareCodi);
 		accioParams.put("fechaActualizacion",dataActualitzacio == null ? null : dataActualitzacio.toString());
 		accioParams.put("fechaSincronizacion",dataSincronitzacio == null ? null : dataSincronitzacio.toString());
-		String endpoint = dadesUsuariPlugin.getEndpointURL();
 
 		List<UnitatOrganitzativa> unitatsOrganitzatives = null;
 		UnitatsOrganitzativesPlugin unitatsOrganitzativesPlugin = getUnitatsOrganitzativesPlugin();
+		String endpoint = unitatsOrganitzativesPlugin.getEndpointURL();
 		
 		try {
 			unitatsOrganitzatives = unitatsOrganitzativesPlugin.findAmbPare(
@@ -579,7 +579,7 @@ public class PluginHelper {
 		accioParams.put("unitatPare",pareCodi);
 		long t0 = System.currentTimeMillis();
 		UnitatsOrganitzativesPlugin unitatsOrganitzativesPlugin = getUnitatsOrganitzativesPlugin();
-		String endpoint = dadesUsuariPlugin.getEndpointURL();
+		String endpoint = unitatsOrganitzativesPlugin.getEndpointURL();
 		
 		try {
 			
@@ -647,7 +647,7 @@ public class PluginHelper {
 		accioParams.put("codi",	codi);
 		long t0 = System.currentTimeMillis();
 		UnitatsOrganitzativesPlugin unitatsOrganitzativesPlugin = getUnitatsOrganitzativesPlugin();
-		String endpoint = dadesUsuariPlugin.getEndpointURL();
+		String endpoint = unitatsOrganitzativesPlugin.getEndpointURL();
 		
 		try {
 			
@@ -703,7 +703,7 @@ public class PluginHelper {
 		accioParams.put("esUnitatArrel", esUnitatArrel == null ? "null" : esUnitatArrel.toString());
 		
 		UnitatsOrganitzativesPlugin unitatsOrganitzativesPlugin = getUnitatsOrganitzativesPlugin();
-		String endpoint = dadesUsuariPlugin.getEndpointURL();
+		String endpoint = unitatsOrganitzativesPlugin.getEndpointURL();
 		
 		try {
 			List<UnitatOrganitzativa> units = unitatsOrganitzativesPlugin.cercaUnitats(
@@ -782,7 +782,7 @@ public class PluginHelper {
 		accioParams.put("estat", expedient.getEstat().name());
 		
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
-		String endpoint = dadesUsuariPlugin.getEndpointURL();
+		String endpoint = arxiuPluginWrapper.getEndpoint();
 
 		try {
 			String classificacio = metaExpedient.getClassificacio();
@@ -874,7 +874,7 @@ public class PluginHelper {
 		accioParams.put("estat",expedient.getEstat().name());
 		
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
-		String endpoint = dadesUsuariPlugin.getEndpointURL();
+		String endpoint = arxiuPluginWrapper.getEndpoint();
 		
 		try {
 			List<String> interessats = new ArrayList<String>();
@@ -925,7 +925,7 @@ public class PluginHelper {
 		String accioDescripcio = "Consulta d'un expedient per uuid";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
-		String endpoint = dadesUsuariPlugin.getEndpointURL();
+		String endpoint = arxiuPluginWrapper.getEndpoint();
 		
 		try {
 			Expedient arxiuExpedient = arxiuPluginWrapper.getPlugin().expedientDetalls(
@@ -973,7 +973,7 @@ public class PluginHelper {
 		accioParams.put("tipus",metaExpedientNom);		
 		
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
-		String endpoint = dadesUsuariPlugin.getEndpointURL();
+		String endpoint = arxiuPluginWrapper.getEndpoint();
 		
 		try {
 			Expedient arxiuExpedient = arxiuPluginWrapper.getPlugin().expedientDetalls(
@@ -1024,7 +1024,7 @@ public class PluginHelper {
 				expedient.getMetaExpedient().getNom());
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
-		String endpoint = dadesUsuariPlugin.getEndpointURL();
+		String endpoint = arxiuPluginWrapper.getEndpoint();
 		
 		try {
 			arxiuPluginWrapper.getPlugin().expedientEsborrar(
@@ -1064,7 +1064,7 @@ public class PluginHelper {
 				uuid);
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
-		String endpoint = dadesUsuariPlugin.getEndpointURL();
+		String endpoint = arxiuPluginWrapper.getEndpoint();
 		try {
 			arxiuPluginWrapper.getPlugin().expedientEsborrar(
 					uuid);
@@ -1111,7 +1111,7 @@ public class PluginHelper {
 				expedient.getMetaExpedient().getNom());
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
-		String endpoint = dadesUsuariPlugin.getEndpointURL();
+		String endpoint = arxiuPluginWrapper.getEndpoint();
 		
 		try {
 			String arxiuUuid = arxiuPluginWrapper.getPlugin().expedientTancar(
@@ -1163,7 +1163,7 @@ public class PluginHelper {
 				expedient.getMetaExpedient().getNom());
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
-		String endpoint = dadesUsuariPlugin.getEndpointURL();
+		String endpoint = arxiuPluginWrapper.getEndpoint();
 		
 		try {
 			arxiuPluginWrapper.getPlugin().expedientReobrir(
@@ -1208,7 +1208,7 @@ public class PluginHelper {
 				expedient.getNom());
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
-		String endpoint = dadesUsuariPlugin.getEndpointURL();
+		String endpoint = arxiuPluginWrapper.getEndpoint();
 		
 		try {
 			String exportacio = arxiuPluginWrapper.getPlugin().expedientExportarEni(
@@ -1262,7 +1262,7 @@ public class PluginHelper {
 				expedientFill.getNom());
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
-		String endpoint = dadesUsuariPlugin.getEndpointURL();
+		String endpoint = arxiuPluginWrapper.getEndpoint();
 		
 		try {
 			arxiuPluginWrapper.getPlugin().expedientLligar(
@@ -1303,7 +1303,7 @@ public class PluginHelper {
 		accioParams.put("titolExpedientFill", expedientFill.getNom());
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
-		String endpoint = dadesUsuariPlugin.getEndpointURL();
+		String endpoint = arxiuPluginWrapper.getEndpoint();
 		
 		try {
 			arxiuPluginWrapper.getPlugin().expedientDeslligar(expedientPare.getArxiuUuid(), expedientFill.getArxiuUuid());
@@ -1461,7 +1461,7 @@ public class PluginHelper {
 				unitatOrganitzativaCodi);
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
-		String endpoint = dadesUsuariPlugin.getEndpointURL();
+		String endpoint = arxiuPluginWrapper.getEndpoint();
 		
 		try {
 			String nomExpedient = "EXP_REG_" + expedientNumero + "_" + System.currentTimeMillis();
@@ -1526,7 +1526,7 @@ public class PluginHelper {
 				uuidExpedient);
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
-		String endpoint = dadesUsuariPlugin.getEndpointURL();
+		String endpoint = arxiuPluginWrapper.getEndpoint();
 		String uuidDocument = null;
 		
 		try {
@@ -2048,10 +2048,10 @@ public class PluginHelper {
         }
         if (arxiuUuid != null) { accioParams.put("arxiuUuid", arxiuUuid); }
         accioParams.put("versio", versio);
-        accioParams.put("ambContingut", new Boolean(ambContingut).toString());
-        accioParams.put("ambVersioImprimible", new Boolean(ambVersioImprimible).toString());
+        accioParams.put("ambContingut", Boolean.valueOf(ambContingut).toString());
+        accioParams.put("ambVersioImprimible", Boolean.valueOf(ambVersioImprimible).toString());
         accioParams.put("arxiuUuidConsulta", arxiuUuidConsulta);
-        String endpoint = dadesUsuariPlugin.getEndpointURL();
+        String endpoint = arxiuPluginWrapper.getEndpoint();
         
         try {
             Document documentDetalls = arxiuPluginWrapper.getPlugin().documentDetalls(arxiuUuidConsulta, versio, ambContingut);
@@ -2147,7 +2147,7 @@ public class PluginHelper {
 				document.getNom());
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
-		String endpoint = dadesUsuariPlugin.getEndpointURL();
+		String endpoint = arxiuPluginWrapper.getEndpoint();
 		try {
 			arxiuPluginWrapper.getPlugin().documentEsborrar(
 					document.getArxiuUuid());
@@ -2211,7 +2211,7 @@ public class PluginHelper {
                 documentNom);
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
-		String endpoint = dadesUsuariPlugin.getEndpointURL();
+		String endpoint = arxiuPluginWrapper.getEndpoint();
 		try {
 			Expedient arxiuExpedient = arxiuPluginWrapper.getPlugin().expedientDetalls(
                     expedientArxiuUuid,
@@ -2258,7 +2258,7 @@ public class PluginHelper {
 		String accioDescripcio = "Consulta de tipus de documents addicionals";
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
-		String endpoint = dadesUsuariPlugin.getEndpointURL();
+		String endpoint = arxiuPluginWrapper.getEndpoint();
 		try {
 			List<DocumentTipusAddicional> documentTipusAddicionals = arxiuPluginWrapper.getPlugin()
 					.documentTipusAddicionals();
@@ -2309,7 +2309,7 @@ public class PluginHelper {
 		accioParams.put("arxiuUuidDesti", arxiuUuidDesti);
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
-		String endpoint = dadesUsuariPlugin.getEndpointURL();
+		String endpoint = arxiuPluginWrapper.getEndpoint();
 		try {
 			ContingutArxiu docCopiat = arxiuPluginWrapper.getPlugin().documentCopiar(
 					document.getArxiuUuid(),
@@ -2359,7 +2359,7 @@ public class PluginHelper {
 				arxiuUuidDesti);
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
-		String endpoint = dadesUsuariPlugin.getEndpointURL();
+		String endpoint = arxiuPluginWrapper.getEndpoint();
 		try {
 			// Empram el mètode carpetaCopiar per no disposar d'un mètode específic per
 			// vincular.
@@ -2410,7 +2410,7 @@ public class PluginHelper {
 				uuidExpedientDesti);
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
-		String endpoint = dadesUsuariPlugin.getEndpointURL();
+		String endpoint = arxiuPluginWrapper.getEndpoint();
 		try {
 			boolean throwException = false;// throwException = true
 			if (throwException) {
@@ -2515,7 +2515,7 @@ public class PluginHelper {
 				document.getNom());
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
-		String endpoint = dadesUsuariPlugin.getEndpointURL();
+		String endpoint = arxiuPluginWrapper.getEndpoint();
 		try {
 			String exportacio = arxiuPluginWrapper.getPlugin().documentExportarEni(
 					document.getArxiuUuid());
@@ -2553,7 +2553,7 @@ public class PluginHelper {
 		accioParams.put("títol", document.getNom());
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
-		String endpoint = dadesUsuariPlugin.getEndpointURL();
+		String endpoint = arxiuPluginWrapper.getEndpoint();
 		
 		try {
 			DocumentContingut documentContingut = arxiuPluginWrapper.getPlugin().documentImprimible(document.getArxiuUuid());
@@ -2619,7 +2619,7 @@ public class PluginHelper {
 				contingutPare.getNom());
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
-		String endpoint = dadesUsuariPlugin.getEndpointURL();
+		String endpoint = arxiuPluginWrapper.getEndpoint();
 
 		try {
 			if (carpeta.getArxiuUuid() == null) {
@@ -2679,7 +2679,7 @@ public class PluginHelper {
 				carpeta.getNom());
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
-		String endpoint = dadesUsuariPlugin.getEndpointURL();
+		String endpoint = arxiuPluginWrapper.getEndpoint();
 		
 		try {
 			Carpeta carpetaDetalls = arxiuPluginWrapper.getPlugin().carpetaDetalls(
@@ -2716,7 +2716,7 @@ public class PluginHelper {
 		Map<String, String> accioParams = new HashMap<String, String>();
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
-		String endpoint = dadesUsuariPlugin.getEndpointURL();
+		String endpoint = arxiuPluginWrapper.getEndpoint();
 		
 		try {
 			Carpeta arxiuCarpeta = arxiuPluginWrapper.getPlugin().carpetaDetalls(
@@ -2762,7 +2762,7 @@ public class PluginHelper {
 				carpeta.getNom());
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
-		String endpoint = dadesUsuariPlugin.getEndpointURL();
+		String endpoint = arxiuPluginWrapper.getEndpoint();
 		
 		try {
 			arxiuPluginWrapper.getPlugin().carpetaEsborrar(
@@ -2803,7 +2803,7 @@ public class PluginHelper {
 		accioParams.put("arxiuUuidDesti", arxiuUuidDesti);
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
-		String endpoint = dadesUsuariPlugin.getEndpointURL();
+		String endpoint = arxiuPluginWrapper.getEndpoint();
 		
 		try {
 			ContingutArxiu carpetaCopiada = arxiuPluginWrapper.getPlugin().carpetaCopiar(
@@ -2852,7 +2852,7 @@ public class PluginHelper {
 				arxiuUuidDesti);
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
-		String endpoint = dadesUsuariPlugin.getEndpointURL();
+		String endpoint = arxiuPluginWrapper.getEndpoint();
 		
 		try {
 			arxiuPluginWrapper.getPlugin().carpetaMoure(
@@ -2892,7 +2892,7 @@ public class PluginHelper {
 				params.getNumeroRegistre());
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
-		String endpoint = dadesUsuariPlugin.getEndpointURL();
+		String endpoint = arxiuPluginWrapper.getEndpoint();
 		
 		try {
 			String tipusRegistreLabel = null;
@@ -2952,7 +2952,7 @@ public class PluginHelper {
 				arxiuUuid);
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
-		String endpoint = dadesUsuariPlugin.getEndpointURL();
+		String endpoint = arxiuPluginWrapper.getEndpoint();
 		
 		try {
 			Document document = arxiuPluginWrapper.getPlugin().documentDetalls(
@@ -3021,7 +3021,7 @@ public class PluginHelper {
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(document.getId()));
 		long t0 = System.currentTimeMillis();
 		PortafirmesPlugin portafirmesPlugin = getPortafirmesPlugin();
-		String endpoint = dadesUsuariPlugin.getEndpointURL();
+		String endpoint = portafirmesPlugin.getEndpointURL();
 		
 		Map<String, String> accioParams = getAccioParamsPerPortaFirmesUpload(
 				document,
@@ -3090,30 +3090,15 @@ public class PluginHelper {
 			if (cacheHelper.mostrarLogsIntegracio()) {
 				String entitatCodi = configHelper.getEntitatActualCodi();
 				String organCodi = configHelper.getOrganActualCodi();
-				logger.info(
-						"[PFI] Enviament de document a firmar: " + portafirmesDocument.getTitol());
-				logger.info(
-						"[PFI] Entitat codi: " + entitatCodi);
-				logger.info(
-						"[PFI] Organ codi: " + organCodi);
-				logger.info(
-						"[PFI] DocumentTipus: " + documentTipus);
-				logger.info(
-						"[PFI] Motiu: " + motiu);
-				if (portafirmesPlugin != null) {
-					logger.info(
-							"[PFI] Class: " + portafirmesPlugin.getClass().getCanonicalName());
-					if (portafirmesPlugin instanceof RipeaAbstractPluginProperties) {
-						logger.info(
-								"[PFI] Url: " + ((RipeaAbstractPluginProperties) portafirmesPlugin).getProperty(
-										"plugin.portafirmes.firmasimpleasync.url"));
-						logger.info(
-								"[PFI] User: " + ((RipeaAbstractPluginProperties) portafirmesPlugin).getProperty(
-										"plugin.portafirmes.firmasimpleasync.username"));
-					}
-				} else {
-					logger.info(
-							"[PFI] : Plugin no instanciat!!!");
+				logger.info("[PFI] Enviament de document a firmar: " + portafirmesDocument.getTitol());
+				logger.info("[PFI] Entitat codi: " + entitatCodi);
+				logger.info("[PFI] Organ codi: " + organCodi);
+				logger.info("[PFI] DocumentTipus: " + documentTipus);
+				logger.info("[PFI] Motiu: " + motiu);
+				logger.info("[PFI] Class: " + portafirmesPlugin.getClass().getCanonicalName());
+				if (portafirmesPlugin instanceof RipeaAbstractPluginProperties) {
+					logger.info("[PFI] Url: " + ((RipeaAbstractPluginProperties) portafirmesPlugin).getProperty("plugin.portafirmes.firmasimpleasync.url"));
+					logger.info("[PFI] User: " + ((RipeaAbstractPluginProperties) portafirmesPlugin).getProperty("plugin.portafirmes.firmasimpleasync.username"));
 				}
 			}
 
@@ -3168,7 +3153,7 @@ public class PluginHelper {
 		accioParams.put("documentPortafirmesId", documentPortafirmes.getId().toString());
 		accioParams.put("portafirmesId", Long.valueOf(documentPortafirmes.getPortafirmesId()).toString());
 		PortafirmesPlugin portafirmesPlugin = getPortafirmesPlugin();
-		String endpoint = dadesUsuariPlugin.getEndpointURL();
+		String endpoint = portafirmesPlugin.getEndpointURL();
 		PortafirmesDocument portafirmesDocument = null;
 		
 		try {
@@ -3212,7 +3197,7 @@ public class PluginHelper {
 		accioParams.put("documentPortafirmesId", documentPortafirmes.getId().toString());
 		accioParams.put("portafirmesId", Long.valueOf(documentPortafirmes.getPortafirmesId()).toString());
 		PortafirmesPlugin portafirmesPlugin = getPortafirmesPlugin();
-		String endpoint = dadesUsuariPlugin.getEndpointURL();
+		String endpoint = portafirmesPlugin.getEndpointURL();
 		
 		try {
 			portafirmesPlugin.delete(documentPortafirmes.getPortafirmesId());
@@ -3247,7 +3232,7 @@ public class PluginHelper {
 		String accioDescripcio = "Consulta de tipus de document";
 		long t0 = System.currentTimeMillis();
 		PortafirmesPlugin portafirmesPlugin = getPortafirmesPlugin();
-		String endpoint = dadesUsuariPlugin.getEndpointURL();
+		String endpoint = portafirmesPlugin.getEndpointURL();
 		try {
 			List<PortafirmesDocumentTipus> tipus = portafirmesPlugin.findDocumentTipus();
 			integracioHelper.addAccioOk(
@@ -3296,7 +3281,7 @@ public class PluginHelper {
 		String accioDescripcio = "Iniciant flux de firma";
 		long t0 = System.currentTimeMillis();
 		PortafirmesPlugin portafirmesPlugin = getPortafirmesPlugin();
-		String endpoint = dadesUsuariPlugin.getEndpointURL();
+		String endpoint = portafirmesPlugin.getEndpointURL();
 		PortafirmesIniciFluxRespostaDto transaccioResponseDto = new PortafirmesIniciFluxRespostaDto();
 		try {
 			
@@ -3352,7 +3337,7 @@ public class PluginHelper {
 		long t0 = System.currentTimeMillis();
 		PortafirmesFluxRespostaDto respostaDto;
 		PortafirmesPlugin portafirmesPlugin = getPortafirmesPlugin();
-		String endpoint = dadesUsuariPlugin.getEndpointURL();
+		String endpoint = portafirmesPlugin.getEndpointURL();
 		
 		try {
 			respostaDto = new PortafirmesFluxRespostaDto();
@@ -3397,7 +3382,7 @@ public class PluginHelper {
 		long t0 = System.currentTimeMillis();
 		List<PortafirmesCarrecDto> carrecsDto = new ArrayList<PortafirmesCarrecDto>();
 		PortafirmesPlugin portafirmesPlugin = getPortafirmesPlugin();
-		String endpoint = dadesUsuariPlugin.getEndpointURL();
+		String endpoint = portafirmesPlugin.getEndpointURL();
 		
 		try {
 			List<PortafirmesCarrec> portafirmesCarrecs = portafirmesPlugin.recuperarCarrecs();
@@ -3451,7 +3436,7 @@ public class PluginHelper {
 		String organCodi = configHelper.getOrganActualCodi();
 		logger.info("portafirmesRecuperarCarrec > Cridam a getPortafirmesPlugin("+entitatCodi+", "+organCodi+")");
 		PortafirmesPlugin portafirmesPlugin = getPortafirmesPlugin();
-		String endpoint = dadesUsuariPlugin.getEndpointURL();
+		String endpoint = portafirmesPlugin.getEndpointURL();
 		Properties pps = ((RipeaAbstractPluginProperties) portafirmesPlugin).getPluginProperties();
 		logger.info("portafirmesRecuperarCarrec > properties:"+pps.toString());
 		
@@ -3502,7 +3487,7 @@ public class PluginHelper {
 		String accioDescripcio = "Tancant flux de firma";
 		long t0 = System.currentTimeMillis();
 		PortafirmesPlugin portafirmesPlugin = getPortafirmesPlugin();
-		String endpoint = dadesUsuariPlugin.getEndpointURL();
+		String endpoint = portafirmesPlugin.getEndpointURL();
 		
 		try {
 			portafirmesPlugin.tancarTransaccioFlux(idTransaccio);
@@ -3532,6 +3517,7 @@ public class PluginHelper {
 
 	public List<DigitalitzacioPerfilDto> digitalitzacioPerfilsDisponibles() {
 
+		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		long t0 = System.currentTimeMillis();
 		Map<String, String> accioParams = new HashMap<String, String>();
 		String idioma = aplicacioService.getUsuariActual().getIdioma();
@@ -3542,7 +3528,7 @@ public class PluginHelper {
 		accioParams.put("idioma",idioma);
 		List<DigitalitzacioPerfilDto> perfilsDto = new ArrayList<DigitalitzacioPerfilDto>();
 		DigitalitzacioPlugin digitalitzacioPlugin = getDigitalitzacioPlugin();
-		
+		String endpoint = digitalitzacioPlugin.getEndpointURL();
 		try {
 			List<DigitalitzacioPerfil> perfils = digitalitzacioPlugin.recuperarPerfilsDisponibles(
 					idioma);
@@ -3569,7 +3555,8 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.digitalitzacio", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			return perfilsDto;
 		} catch (Exception ex) {
 			integracioHelper.addAccioError(
 					IntegracioHelper.INTCODI_DIGITALITZACIO,
@@ -3580,10 +3567,10 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					"Error al accedir al plugin de digitalitzacio",
 					ex);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.digitalitzacio", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_DIGITALITZACIO,
 					"Error al accedir al plugin de digitalitzacio", ex);
 		}
-		return perfilsDto;
 	}
 
 	public DigitalitzacioTransaccioRespostaDto digitalitzacioIniciarProces(
@@ -3592,6 +3579,7 @@ public class PluginHelper {
 			UsuariDto funcionari,
 			String urlReturn) {
 
+		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		long t0 = System.currentTimeMillis();
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put(
@@ -3609,7 +3597,7 @@ public class PluginHelper {
 
 		DigitalitzacioTransaccioRespostaDto respostaDto = new DigitalitzacioTransaccioRespostaDto();
 		DigitalitzacioPlugin digitalitzacioPlugin = getDigitalitzacioPlugin();
-		
+		String endpoint = digitalitzacioPlugin.getEndpointURL();
 		try {
 			DigitalitzacioTransaccioResposta resposta = digitalitzacioPlugin.iniciarProces(
 					codiPerfil,
@@ -3634,7 +3622,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.digitalitzacio", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 		} catch (Exception ex) {
 			integracioHelper.addAccioError(
 					IntegracioHelper.INTCODI_DIGITALITZACIO,
@@ -3645,6 +3633,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					"Error al accedir al plugin de digitalitzacio",
 					ex);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.digitalitzacio", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_DIGITALITZACIO,
 					"Error al accedir al plugin de digitalitzacio", ex);
 		}
@@ -3656,6 +3645,7 @@ public class PluginHelper {
 			boolean returnScannedFile,
 			boolean returnSignedFile) {
 
+		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		long t0 = System.currentTimeMillis();
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put(
@@ -3672,7 +3662,7 @@ public class PluginHelper {
 
 		DigitalitzacioResultatDto resultatDto = new DigitalitzacioResultatDto();
 		DigitalitzacioPlugin digitalitzacioPlugin = getDigitalitzacioPlugin();
-		
+		String endpoint = digitalitzacioPlugin.getEndpointURL();
 		try {
 			DigitalitzacioResultat resultat = digitalitzacioPlugin.recuperarResultat(
 					idTransaccio,
@@ -3706,6 +3696,7 @@ public class PluginHelper {
 						accioParams,
 						IntegracioAccioTipusEnumDto.ENVIAMENT,
 						System.currentTimeMillis() - t0);
+				applicationHelper.stopTimer(sample, "METRICS@Integracions.digitalitzacio", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 			}
 		} catch (Exception ex) {
 			integracioHelper.addAccioError(
@@ -3717,6 +3708,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					"Error al accedir al plugin de digitalitzacio",
 					ex);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.digitalitzacio", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_DIGITALITZACIO,
 					"Error al accedir al plugin de digitalitzacio", ex);
 
@@ -3724,18 +3716,16 @@ public class PluginHelper {
 		return resultatDto;
 	}
 
-	public void digitalitzacioTancarTransaccio(
-			String idTransaccio) {
+	public void digitalitzacioTancarTransaccio(String idTransaccio) {
 
+		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		long t0 = System.currentTimeMillis();
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("idTransaccio",	idTransaccio);
 		DigitalitzacioPlugin digitalitzacioPlugin = getDigitalitzacioPlugin();
-		
+		String endpoint = digitalitzacioPlugin.getEndpointURL();
 		try {
-			digitalitzacioPlugin.tancarTransaccio(
-					idTransaccio);
-
+			digitalitzacioPlugin.tancarTransaccio(idTransaccio);
 			integracioHelper.addAccioOk(
 					IntegracioHelper.INTCODI_DIGITALITZACIO,
 					"Tancant transacció digitalització",
@@ -3743,6 +3733,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.digitalitzacio", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 		} catch (Exception ex) {
 			integracioHelper.addAccioError(
 					IntegracioHelper.INTCODI_DIGITALITZACIO,
@@ -3753,6 +3744,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					"Error al accedir al plugin de digitalitzacio",
 					ex);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.digitalitzacio", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_DIGITALITZACIO,
 					"Error al accedir al plugin de digitalitzacio", ex);
 		}
@@ -3763,10 +3755,12 @@ public class PluginHelper {
 			String idioma,
 			boolean signerInfo) {
 
+		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		String accioDescripcio = "Recuperant detall flux de firma";
 		long t0 = System.currentTimeMillis();
 		PortafirmesFluxInfoDto respostaDto;
 		PortafirmesPlugin portafirmesPlugin = getPortafirmesPlugin();
+		String endpoint = portafirmesPlugin.getEndpointURL();
 		try {
 			respostaDto = new PortafirmesFluxInfoDto();
 			PortafirmesFluxInfo resposta = portafirmesPlugin.recuperarFluxDeFirmaByIdPlantilla(
@@ -3811,9 +3805,16 @@ public class PluginHelper {
 							signerDto);
 				}
 
-				respostaDto.setDestinataris(
-						destinataris);
+				respostaDto.setDestinataris(destinataris);
 			}
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_PFIRMA,
+					accioDescripcio,
+					endpoint,
+					null,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmesFlux", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de portafirmes";
 			integracioHelper.addAccioError(
@@ -3825,6 +3826,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmesFlux", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_PFIRMA, errorDescripcio, ex);
 		}
 		return respostaDto;
@@ -3835,17 +3837,26 @@ public class PluginHelper {
 			String idioma,
 			String returnUrl,
 			boolean edicio) {
-
+		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		String accioDescripcio = "Recuperant url flux de firma";
 		long t0 = System.currentTimeMillis();
 		String resposta = null;
 		PortafirmesPlugin portafirmesPlugin = getPortafirmesPlugin();
+		String endpoint = portafirmesPlugin.getEndpointURL();
 		try {
 			resposta = portafirmesPlugin.recuperarUrlViewEditPlantilla(
 					plantillaFluxId,
 					idioma,
 					returnUrl,
 					edicio);
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_PFIRMA,
+					accioDescripcio,
+					endpoint,
+					null,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmesFlux", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");			
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de portafirmes";
 			integracioHelper.addAccioError(
@@ -3857,6 +3868,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmesFlux", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_PFIRMA, errorDescripcio, ex);
 		}
 		return resposta;
@@ -3881,14 +3893,14 @@ public class PluginHelper {
 			Long metaDocumentId,
 			boolean addUserFluxes,
 			boolean filtrar) {
-		
+		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		String accioDescripcio = "Recuperant flux de firma";
 		long t0 = System.currentTimeMillis();
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		UsuariEntity usuari = usuariRepository.getOne(auth.getName());
+		UsuariEntity usuari = usuariRepository.findByCodi(auth.getName());
 		List<PortafirmesFluxRespostaDto> respostesDto = new ArrayList<PortafirmesFluxRespostaDto>();
 		PortafirmesPlugin portafirmesPlugin = getPortafirmesPlugin();
-		
+		String endpoint = portafirmesPlugin.getEndpointURL();
 		try {
 			List<PortafirmesFluxResposta> plantilles = null;
 			if (filtrar) {
@@ -3927,14 +3939,6 @@ public class PluginHelper {
 				//FLUXOS DE FIRMA DEL PROCEDIMENT
 				if (fluxosProcediment!=null) {
 					for (MetaDocumentFluxPortafibEntity fluxProcediment: fluxosProcediment) {
-//						if (!llistatFluxosContainsId(respostesDto, fluxProcediment.getPortafirmesFluxId())) {
-//							PortafirmesFluxInfo portafirmesFluxInfo = portafirmesPlugin.recuperarFluxDeFirmaByIdPlantilla(
-//									fluxProcediment.getPortafirmesFluxId(),
-//									aplicacioService.getUsuariActual().getIdioma(),
-//									false);
-//							fluxosPerDefecteAfegir.add(portafirmesFluxInfo);
-//						}
-						
 						PortafirmesFluxRespostaDto fluxDefault = new PortafirmesFluxRespostaDto();
 						fluxDefault.setFluxId(fluxProcediment.getPortafirmesFluxId());
 						fluxDefault.setNom(fluxProcediment.getPortafirmesFluxDesc());
@@ -3942,19 +3946,15 @@ public class PluginHelper {
 						respostesDto.add(fluxDefault);
 					}
 				}
-				
-				//Afegim ara els procediments al llistat, ja que no es pot fer un add a una llista mentra la recorres
-//				if (fluxosPerDefecteAfegir.size()>0) {
-//					for (PortafirmesFluxInfo aux: fluxosPerDefecteAfegir) {
-//						PortafirmesFluxRespostaDto fluxDefault = new PortafirmesFluxRespostaDto();
-//						fluxDefault.setFluxId(aux.getNom());
-//						fluxDefault.setNom(aux.getDescripcio());
-//						fluxDefault.setProcedimentDefault(true);
-//						respostesDto.add(fluxDefault);
-//					}
-//				}
 			}
-			
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_PFIRMA,
+					accioDescripcio,
+					endpoint,
+					null,
+					IntegracioAccioTipusEnumDto.RECEPCIO,
+					System.currentTimeMillis() - t0);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmesFlux", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de portafirmes";
 			integracioHelper.addAccioError(
@@ -3966,33 +3966,32 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmesFlux", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");	
 			throw new SistemaExternException(IntegracioHelper.INTCODI_PFIRMA, errorDescripcio, ex);
 		}
 		return respostesDto;
-	}
-	
-	private boolean llistatFluxosContainsId(List<PortafirmesFluxRespostaDto> fluxosResposta, String fluxId) {
-		if (fluxosResposta!=null) {
-			for (PortafirmesFluxRespostaDto aux: fluxosResposta) {
-				if (aux.getFluxId().equals(fluxId)) {
-					aux.setProcedimentDefault(true);
-					return true;
-				}
-			}
-		}
-		return false;
 	}
 
 	public boolean portafirmesEsborrarPlantillaFirma(
 			String idioma,
 			String plantillaFluxId) {
 
+		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		String accioDescripcio = "Esborrant flux de firma";
 		long t0 = System.currentTimeMillis();
 		PortafirmesPlugin portafirmesPlugin = getPortafirmesPlugin();
+		String endpoint = portafirmesPlugin.getEndpointURL();
 		boolean esborrat;
 		try {
 			esborrat = portafirmesPlugin.esborrarPlantillaFirma(idioma, plantillaFluxId);
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_PFIRMA,
+					accioDescripcio,
+					endpoint,
+					null,
+					IntegracioAccioTipusEnumDto.RECEPCIO,
+					System.currentTimeMillis() - t0);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmesFlux", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de portafirmes";
 			integracioHelper.addAccioError(
@@ -4004,6 +4003,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmesFlux", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_PFIRMA, errorDescripcio, ex);
 		}
 		return esborrat;
@@ -4012,14 +4012,22 @@ public class PluginHelper {
 	public String portafirmesRecuperarUrlEstatFluxFirmes(
 			long portafirmesId,
 			String idioma) {
+		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		String accioDescripcio = "Recuperant url estat flux de firmes";
 		long t0 = System.currentTimeMillis();
 		String resposta = null;
 		PortafirmesPlugin portafirmesPlugin = getPortafirmesPlugin();
+		String endpoint = portafirmesPlugin.getEndpointURL();
 		try {
-			resposta = portafirmesPlugin.recuperarUrlViewEstatFluxDeFirmes(
-					portafirmesId,
-					idioma);
+			resposta = portafirmesPlugin.recuperarUrlViewEstatFluxDeFirmes(portafirmesId, idioma);
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_PFIRMA,
+					accioDescripcio,
+					endpoint,
+					null,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmesFlux", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");			
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de portafirmes";
 			integracioHelper.addAccioError(
@@ -4031,26 +4039,25 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmesFlux", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_PFIRMA, errorDescripcio, ex);
 		}
 		return resposta;
 	}
 
-	public String conversioConvertirPdfArxiuNom(
-			String nomOriginal) {
-		return getConversioPlugin().getNomArxiuConvertitPdf(
-				nomOriginal);
+	public String conversioConvertirPdfArxiuNom(String nomOriginal) {
+		return getConversioPlugin().getNomArxiuConvertitPdf(nomOriginal);
 	}
 
-	public FitxerDto conversioConvertirPdf(
-			FitxerDto original,
-			String urlPerEstampar) {
+	public FitxerDto conversioConvertirPdf(FitxerDto original, String urlPerEstampar) {
 
+		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		String accioDescripcio = "Conversió de document a PDF";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("arxiuOriginalNom", original.getNom());
 		accioParams.put("arxiuOriginalTamany", Integer.valueOf(original.getContingut().length).toString());
 		ConversioPlugin conversioPlugin = getConversioPlugin();
+		String endpoint = conversioPlugin.getEndpointURL();
 		long t0 = System.currentTimeMillis();
 		try {
 			ConversioArxiu convertit = conversioPlugin.convertirPdfIEstamparUrl(
@@ -4070,12 +4077,10 @@ public class PluginHelper {
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
 			FitxerDto resposta = new FitxerDto();
-			resposta.setNom(
-					convertit.getArxiuNom());
-			resposta.setContingut(
-					convertit.getArxiuContingut());
-			resposta.setContentType(
-					"application/pdf");
+			resposta.setNom(convertit.getArxiuNom());
+			resposta.setContingut(convertit.getArxiuContingut());
+			resposta.setContentType("application/pdf");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.conversio", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 			return resposta;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de conversió de documents: " + ex.getMessage();
@@ -4088,6 +4093,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.conversio", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_CONVERT, errorDescripcio, ex);
 		}
 	}
@@ -4096,43 +4102,48 @@ public class PluginHelper {
 			String codiDir3,
 			String codiSia) {
 
+		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		String accioDescripcio = "Consulta del procediment per codi SIA";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("codiDir3",	codiDir3);
 		accioParams.put("codiSia", codiSia);
 		ProcedimentPlugin procedimentPlugin = getProcedimentPlugin();
 		long t0 = System.currentTimeMillis();
+		String endpoint = procedimentPlugin.getEndpointURL();
 		try {
 			ProcedimentDto procediment = procedimentPlugin.findAmbCodiSia(codiDir3, codiSia);
 			integracioHelper.addAccioOk(
 					IntegracioHelper.INTCODI_PROCEDIMENT,
 					accioDescripcio,
-					procedimentPlugin.getEndpointURL(),
+					endpoint,
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.rolsac", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 			return procediment;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al consultar el procediment per codi SIA: " + ex.getMessage();
 			integracioHelper.addAccioError(
 					IntegracioHelper.INTCODI_PROCEDIMENT,
 					accioDescripcio,
-					procedimentPlugin.getEndpointURL(),
+					endpoint,
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.rolsac", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_PROCEDIMENT, errorDescripcio, ex);
 		}
 	}
 	
 	public List<Pais> dadesExternesPaisosFindAll() {
 
+		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		long t0 = System.currentTimeMillis();
 		String accioDescripcio = "Consulta de tots els paisos";
 		DadesExternesPlugin dadesExternesPlugin = getDadesExternesPlugin();
-		
+		String endpoint = dadesExternesPlugin.getEndpointURL();
 		try {
 			List<Pais> paisos = dadesExternesPlugin.paisFindAll();
 			integracioHelper.addAccioOk(
@@ -4142,6 +4153,7 @@ public class PluginHelper {
 					null,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 			return paisos;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de dades externes";
@@ -4154,18 +4166,20 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_DADESEXT, errorDescripcio, ex);
 		}
 	}
 	
 	public Pais dadesExternesPaisFindByCodi(String codiPais) {
 		
+		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		long t0 = System.currentTimeMillis();
 		String accioDescripcio = "Consulta del pais "+codiPais;
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("codiPais", codiPais);
 		DadesExternesPlugin dadesExternesPlugin = getDadesExternesPlugin();
-		
+		String endpoint = dadesExternesPlugin.getEndpointURL();
 		try {
 			List<Pais> paisos = dadesExternesPlugin.paisFindAll();
 			integracioHelper.addAccioOk(
@@ -4175,6 +4189,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 			if (paisos!=null) {
 				for (Pais pais: paisos) {
 					if (pais.getCodi().equals(codiPais)) {
@@ -4194,16 +4209,18 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_DADESEXT, errorDescripcio, ex);
 		}
 	}
 
 	public List<ComunitatAutonoma> dadesExternesComunitatsFindAll() {
 
+		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		long t0 = System.currentTimeMillis();
 		String accioDescripcio = "Consulta de totes les comunitats";
 		DadesExternesPlugin dadesExternesPlugin = getDadesExternesPlugin();
-
+		String endpoint = dadesExternesPlugin.getEndpointURL();
 		try {
 			List<ComunitatAutonoma> comunitats = dadesExternesPlugin.comunitatFindAll();
 			integracioHelper.addAccioOk(
@@ -4213,6 +4230,7 @@ public class PluginHelper {
 					null,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 			return comunitats;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de dades externes";
@@ -4225,16 +4243,18 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_DADESEXT, errorDescripcio, ex);
 		}
 	}
 
 	public List<Provincia> dadesExternesProvinciesFindAll() {
 
+		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		long t0 = System.currentTimeMillis();
 		String accioDescripcio = "Consulta de totes les províncies";
 		DadesExternesPlugin dadesExternesPlugin = getDadesExternesPlugin();
-
+		String endpoint = dadesExternesPlugin.getEndpointURL();
 		try {
 			List<Provincia> provincies = dadesExternesPlugin.provinciaFindAll();
 			integracioHelper.addAccioOk(
@@ -4244,6 +4264,7 @@ public class PluginHelper {
 					null,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 			return provincies;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de dades externes";
@@ -4256,18 +4277,20 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_DADESEXT, errorDescripcio, ex);
 		}
 	}
 	
 	public Provincia dadesExternesProvinciesFindByCodi(String provinciaCodi) {
 
+		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		long t0 = System.currentTimeMillis();
 		String accioDescripcio = "Consulta de província per codi "+provinciaCodi;
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("provinciaCodi", provinciaCodi);
 		DadesExternesPlugin dadesExternesPlugin = getDadesExternesPlugin();
-
+		String endpoint = dadesExternesPlugin.getEndpointURL();
 		try {
 			List<Provincia> provincies = dadesExternesPlugin.provinciaFindAll();
 			integracioHelper.addAccioOk(
@@ -4277,6 +4300,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 			if (provincies!=null) {
 				for (Provincia prov: provincies) {
 					if (prov.getCodi().equals(provinciaCodi)) {
@@ -4296,6 +4320,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_DADESEXT, errorDescripcio, ex);
 		}
 	}
@@ -4303,12 +4328,13 @@ public class PluginHelper {
 	public List<Provincia> dadesExternesProvinciesFindAmbComunitat(
 			String comunitatCodi) {
 
+		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		long t0 = System.currentTimeMillis();
 		String accioDescripcio = "Consulta de les províncies d'una comunitat";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		DadesExternesPlugin dadesExternesPlugin = getDadesExternesPlugin();
 		accioParams.put("comunitatCodi", comunitatCodi);
-		
+		String endpoint = dadesExternesPlugin.getEndpointURL();
 		try {
 			List<Provincia> provincies = dadesExternesPlugin.provinciaFindByComunitat(comunitatCodi);
 			integracioHelper.addAccioOk(
@@ -4318,6 +4344,7 @@ public class PluginHelper {
 					null,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 			return provincies;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de dades externes";
@@ -4330,18 +4357,20 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_DADESEXT, errorDescripcio, ex);
 		}
 	}
 
 	public List<Municipi> dadesExternesMunicipisFindAmbProvincia(String provinciaCodi) {
 
+		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		long t0 = System.currentTimeMillis();
 		String accioDescripcio = "Consulta dels municipis d'una província";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		DadesExternesPlugin dadesExternesPlugin = getDadesExternesPlugin();
 		accioParams.put("provinciaCodi", provinciaCodi);
-
+		String endpoint = dadesExternesPlugin.getEndpointURL();
 		try {
 			List<Municipi> municipis = dadesExternesPlugin.municipiFindByProvincia(provinciaCodi);
 			integracioHelper.addAccioOk(
@@ -4351,6 +4380,7 @@ public class PluginHelper {
 					null,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 			return municipis;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de dades externes";
@@ -4363,19 +4393,21 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_DADESEXT, errorDescripcio, ex);
 		}
 	}
 	
 	public Municipi dadesExternesMunicipisFindByCodi(String provinciaCodi, String municipiCodi) {
 
+		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		long t0 = System.currentTimeMillis();
 		String accioDescripcio = "Consulta del municipi amb codi "+municipiCodi;
 		Map<String, String> accioParams = new HashMap<String, String>();
 		DadesExternesPlugin dadesExternesPlugin = getDadesExternesPlugin();
 		accioParams.put("provinciaCodi", provinciaCodi);
 		accioParams.put("municipiCodi", municipiCodi);
-
+		String endpoint = dadesExternesPlugin.getEndpointURL();
 		try {
 			List<Municipi> municipis = dadesExternesPlugin.municipiFindByProvincia(provinciaCodi);
 			integracioHelper.addAccioOk(
@@ -4385,6 +4417,7 @@ public class PluginHelper {
 					null,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 			if (municipis!=null) {
 				for (Municipi muni: municipis) {
 					if (muni.getCodi().equals(municipiCodi)) {
@@ -4404,19 +4437,20 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_DADESEXT, errorDescripcio, ex);
 		}
 	}
 
-	public List<Municipi> dadesExternesMunicipisFindAmbProvinciaPinbal(
-			String provinciaCodi) {
+	public List<Municipi> dadesExternesMunicipisFindAmbProvinciaPinbal(String provinciaCodi) {
 
+		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		long t0 = System.currentTimeMillis();
 		String accioDescripcio = "Consulta dels municipis d'una província per consultes a PINBAL";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("provinciaCodi", provinciaCodi);
 		DadesExternesPlugin dadesExternesPlugin = getDadesExternesPinbalPlugin();
-		
+		String endpoint = dadesExternesPlugin.getEndpointURL();
 		try {
 			List<Municipi> municipis = dadesExternesPlugin.municipiFindByProvincia(provinciaCodi);
 			integracioHelper.addAccioOk(
@@ -4426,6 +4460,7 @@ public class PluginHelper {
 					null,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 			return municipis;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de dades externes PINBAL";
@@ -4438,17 +4473,19 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_DADESEXT, errorDescripcio, ex);
 		}
 	}
 
 	public List<NivellAdministracioDto> dadesExternesNivellsAdministracioAll() {
 
+		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		long t0 = System.currentTimeMillis();
 		String accioDescripcio = "Consulta de nivells d'administració";
 		Map<String, String> accioParams = new HashMap<String, String>();		
 		DadesExternesPlugin dadesExternesPlugin = getDadesExternesPlugin();
-		
+		String endpoint = dadesExternesPlugin.getEndpointURL();
 		try {
 			List<NivellAdministracioDto> nivellAdministracio = conversioTipusHelper.convertirList(
 					dadesExternesPlugin.nivellAdministracioFindAll(),
@@ -4461,6 +4498,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.RECEPCIO,
 					System.currentTimeMillis() - t0);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 			return nivellAdministracio;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de dades externes";
@@ -4473,17 +4511,19 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_DADESEXT, errorDescripcio, ex);
 		}
 	}
 
 	public List<TipusViaDto> dadesExternesTipusViaAll() {
 
+		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		long t0 = System.currentTimeMillis();
 		String accioDescripcio = "Consulta de tipus de via";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		DadesExternesPlugin dadesExternesPlugin = getDadesExternesPlugin();
-
+		String endpoint = dadesExternesPlugin.getEndpointURL();
 		try {
 			List<TipusViaDto> tipusVies = conversioTipusHelper.convertirList(
 					dadesExternesPlugin.tipusViaFindAll(),
@@ -4495,6 +4535,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.RECEPCIO,
 					System.currentTimeMillis() - t0);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 			return tipusVies;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de dades externes";
@@ -4507,6 +4548,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_DADESEXT, errorDescripcio, ex);
 		}
 	}
@@ -4568,9 +4610,14 @@ public class PluginHelper {
 	public SignatureInfoDto detectSignedAttachedUsingValidateSignaturePlugin(
 			byte[] documentContingut,
 			String firmaContentType) {
+
+		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
+		long t0 = System.currentTimeMillis();
+		IValidateSignaturePluginWrapper validaSignaturaPlugin = getValidaSignaturaPlugin();
+		String accioDescripcio = "Validació de firma";
 		
 		try {
-			
+
 			ValidateSignatureRequest validationRequest = new ValidateSignatureRequest();
 			validationRequest.setSignatureData(documentContingut);
 			SignatureRequestedInformation sri = new SignatureRequestedInformation();
@@ -4582,9 +4629,17 @@ public class PluginHelper {
 			sri.setReturnTimeStampInfo(true);
 			validationRequest.setSignatureRequestedInformation(sri);
 			
-			ValidateSignatureResponse validateSignatureResponse = getValidaSignaturaPlugin().getPlugin().validateSignature(validationRequest);
+			ValidateSignatureResponse validateSignatureResponse = validaSignaturaPlugin.getPlugin().validateSignature(validationRequest);
 
 			ValidationStatus validationStatus = validateSignatureResponse.getValidationStatus();
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_VALIDASIG,
+					accioDescripcio,
+					validaSignaturaPlugin!=null?validaSignaturaPlugin.getEndpoint():"Llibreria itextpdf",
+					null,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.validaFirma", "resultado", "exito", "endpoint", Utils.hasValue(validaSignaturaPlugin.getEndpoint())?validaSignaturaPlugin.getEndpoint():"N/A");
 			if (validationStatus.getStatus() == 1) {
 				return new SignatureInfoDto(true, false, null);
 			} else {
@@ -4605,11 +4660,27 @@ public class PluginHelper {
 					|| throwable.getMessage().contains("El documento OOXML no está firmado(urn:oasis:names:tc:dss:1.0:resultmajor:ResponderError)")
 					|| throwable.getMessage().contains("El documento OOXML no está firmado.(urn:oasis:names:tc:dss:1.0:resultmajor:ResponderError)")
 					|| throwable.getMessage().contains("La firma proporcionada no contiene un nodo <ds:Signature>")) {
+				integracioHelper.addAccioOk(
+						IntegracioHelper.INTCODI_VALIDASIG,
+						accioDescripcio,
+						validaSignaturaPlugin!=null?validaSignaturaPlugin.getEndpoint():"Llibreria itextpdf",
+						null,
+						IntegracioAccioTipusEnumDto.ENVIAMENT,
+						System.currentTimeMillis() - t0);				
+				applicationHelper.stopTimer(sample, "METRICS@Integracions.validaFirma", "resultado", "exito", "endpoint", Utils.hasValue(validaSignaturaPlugin.getEndpoint())?validaSignaturaPlugin.getEndpoint():"N/A");
 				return new SignatureInfoDto(false, false, null);
 			} else {
-				logger.error(
-						"Error al detectar firma de document",
-						e);
+				logger.error("Error al detectar firma de document", e);
+				integracioHelper.addAccioError(
+						IntegracioHelper.INTCODI_VALIDASIG,
+						accioDescripcio,
+						validaSignaturaPlugin!=null?validaSignaturaPlugin.getEndpoint():"Llibreria itextpdf",
+						null,
+						IntegracioAccioTipusEnumDto.ENVIAMENT,
+						System.currentTimeMillis() - t0,
+						throwable.getMessage(),
+						e);				
+				applicationHelper.stopTimer(sample, "METRICS@Integracions.validaFirma", "resultado", "error", "endpoint", Utils.hasValue(validaSignaturaPlugin.getEndpoint())?validaSignaturaPlugin.getEndpoint():"N/A");
 				return new SignatureInfoDto(false, true,
                         RolHelper.getRolsCurrentUser().contains("IPA_ADMIN")
                         ? e.getMessage()
@@ -4617,6 +4688,7 @@ public class PluginHelper {
 			}
 		}
 	}
+	
 
 	public List<ArxiuFirmaDto> validaSignaturaObtenirFirmes(String uuid, boolean throwExceptionIfNotValid) {
 		Document arxiuDocument = arxiuDocumentConsultar(null, uuid, null, true, false);
@@ -4636,6 +4708,7 @@ public class PluginHelper {
 			String firmaContentType,
 			boolean throwExceptionIfNotValid) {
 		
+		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		String accioDescripcio = "Obtenir informació de document firmat";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		if (documentContingut != null) {
@@ -4724,11 +4797,9 @@ public class PluginHelper {
 								}
 								document.close();
 							} catch (IOException ex) {
-								logger.error(
-										"Hi ha hagut un problema recuperant l'hora de firma: " + ex.getMessage());
+								logger.error("Hi ha hagut un problema recuperant l'hora de firma: " + ex.getMessage());
 							}
 						}
-	
 						detalls.add(detall);
 					}
 					firma.setAutofirma(false);
@@ -4750,19 +4821,21 @@ public class PluginHelper {
 						firma.setFitxerNom(nomFitxer);
 					}
 					firmes.add(firma);
-				}		
+				}
+				
+				integracioHelper.addAccioOk(
+						IntegracioHelper.INTCODI_VALIDASIG,
+						accioDescripcio,
+						validaSignaturaPlugin!=null?validaSignaturaPlugin.getEndpoint():"N/D",
+						accioParams,
+						IntegracioAccioTipusEnumDto.ENVIAMENT,
+						System.currentTimeMillis() - t0);
+				applicationHelper.stopTimer(sample, "METRICS@Integracions.validaFirma", "resultado", "exito", "endpoint", Utils.hasValue(validaSignaturaPlugin.getEndpoint())?validaSignaturaPlugin.getEndpoint():"N/A");
+				
 			} else {
 				ArxiuFirmaDto firma = documentHelper.getArxiuFirmaPades(nomFitxer, documentContingut);
 				firmes = Arrays.asList(firma);
 			}
-			
-			integracioHelper.addAccioOk(
-					IntegracioHelper.INTCODI_VALIDASIG,
-					accioDescripcio,
-					validaSignaturaPlugin!=null?validaSignaturaPlugin.getEndpoint():"Llibreria itextpdf",
-					accioParams,
-					IntegracioAccioTipusEnumDto.ENVIAMENT,
-					System.currentTimeMillis() - t0);
 			
 			return firmes;
 			
@@ -4771,22 +4844,28 @@ public class PluginHelper {
 			integracioHelper.addAccioError(
 					IntegracioHelper.INTCODI_VALIDASIG,
 					accioDescripcio,
-					validaSignaturaPlugin!=null?validaSignaturaPlugin.getEndpoint():"Llibreria itextpdf",
+					validaSignaturaPlugin!=null?validaSignaturaPlugin.getEndpoint():"N/D",
 					accioParams,
-					IntegracioAccioTipusEnumDto.RECEPCIO,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
+			
+			if (validaSignaturaPlugin!=null)
+				applicationHelper.stopTimer(sample, "METRICS@Integracions.validaFirma", "resultado", "error", "endpoint", Utils.hasValue(validaSignaturaPlugin.getEndpoint())?validaSignaturaPlugin.getEndpoint():"N/A");
+			
 			throw new SistemaExternException(IntegracioHelper.INTCODI_VALIDASIG, errorDescripcio, ex);
 		}
 	}
 
 	public List<RespostaAmpliarPlazo> ampliarPlazoEnviament(AmpliarPlazoForm documentNotificacioDto) {
 		
+		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		long t0 = System.currentTimeMillis();
 		List<RespostaAmpliarPlazo> resultat = new ArrayList<RespostaAmpliarPlazo>();
 		NotificacioPlugin notificacioPlugin = getNotificacioPlugin();
 		String accioDescripcio = "Ampliar plaç de enviament notib";
+		String endpoint = notificacioPlugin.getEndpointURL();
 		
 		if (documentNotificacioDto!=null && documentNotificacioDto.getDocumentEnviamentInteressats()!=null) {
 			for (DocumentEnviamentInteressatDto dei: documentNotificacioDto.getDocumentEnviamentInteressats()) {
@@ -4814,7 +4893,7 @@ public class PluginHelper {
 								accioParams,
 								IntegracioAccioTipusEnumDto.ENVIAMENT,
 								System.currentTimeMillis() - t0);
-	
+						applicationHelper.stopTimer(sample, "METRICS@Integracions.notib", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 					} catch (Exception ex) {
 						String errorDescripcio = "Error en el plugin de notificacions: "+ex.getMessage();
 						integracioHelper.addAccioError(
@@ -4826,6 +4905,7 @@ public class PluginHelper {
 								System.currentTimeMillis() - t0,
 								errorDescripcio,
 								ex);
+						applicationHelper.stopTimer(sample, "METRICS@Integracions.notib", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 						throw new SistemaExternException(IntegracioHelper.INTCODI_NOTIFICACIO, errorDescripcio, ex);
 					}
 				}
@@ -4841,6 +4921,7 @@ public class PluginHelper {
 			DocumentEntity documentEntity,
 			InteressatEntity interessat) {
 
+		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(expedientEntity.getId()));
 		MetaExpedientEntity metaExpedient = expedientEntity.getMetaExpedient();
 		
@@ -4853,6 +4934,7 @@ public class PluginHelper {
 		
 		long t0 = System.currentTimeMillis();
 		NotificacioPlugin notificacioPlugin = getNotificacioPlugin();
+		String endpoint = notificacioPlugin.getEndpointURL();
 		
 		try {
 			Notificacio notificacio = new Notificacio();
@@ -5006,7 +5088,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.notib", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 			return respostaEnviar;
 
 		} catch (Exception ex) {
@@ -5020,43 +5102,89 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.notib", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_NOTIFICACIO, errorDescripcio, ex);
 		}
 	}
 
 	public byte[] notificacioConsultarIDescarregarCertificacio(Long documentEnviamentInteressatId) {
-
-		DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity = documentEnviamentInteressatRepository.getOne(documentEnviamentInteressatId);
 		
+		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
+		long t0 = System.currentTimeMillis();
+		Map<String, String> accioParams = new HashMap<String, String>();
+		accioParams.put("documentEnviamentInteressatId", documentEnviamentInteressatId.toString());
+		
+		DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity = documentEnviamentInteressatRepository.findById(documentEnviamentInteressatId).get();
 		organGestorHelper.actualitzarOrganCodi(
 				organGestorHelper.getOrganCodiFromContingutId(
 						documentEnviamentInteressatEntity.getNotificacio().getExpedient().getId()));
-
-		RespostaConsultaEstatEnviament resposta;
+		NotificacioPlugin notificacioPlugin = getNotificacioPlugin();
+		String endpoint = notificacioPlugin.getEndpointURL();
 		try {
-			resposta = getNotificacioPlugin().consultarEnviament(
-					documentEnviamentInteressatEntity.getEnviamentReferencia());
+			RespostaConsultaEstatEnviament resposta = notificacioPlugin.consultarEnviament(documentEnviamentInteressatEntity.getEnviamentReferencia());
+			byte[] certificacio = resposta.getCertificacioContingut();
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_NOTIFICACIO,
+					"Descarregar certificació enviament NOTIB",
+					notificacioPlugin.getEndpointURL(),
+					accioParams,
+					IntegracioAccioTipusEnumDto.RECEPCIO,
+					System.currentTimeMillis() - t0);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.notib", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");			
+			return certificacio;
 		} catch (Exception e) {
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_NOTIFICACIO,
+					"Descarregar certificació enviament NOTIB",
+					notificacioPlugin.getEndpointURL(),
+					accioParams,
+					IntegracioAccioTipusEnumDto.RECEPCIO,
+					System.currentTimeMillis() - t0,
+					"Error al accedir al plugin de notificacions",
+					e);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.notib", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");			
 			throw new RuntimeException(e);
 		}
-		byte[] certificacio = resposta.getCertificacioContingut();
-		return certificacio;
+
 	}
 
-	public RespostaJustificantEnviamentNotib notificacioDescarregarJustificantEnviamentNotib(
-			String identificador) {
-
+	public RespostaJustificantEnviamentNotib notificacioDescarregarJustificantEnviamentNotib(String identificador) {
+		
+		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
+		long t0 = System.currentTimeMillis();
+		Map<String, String> accioParams = new HashMap<String, String>();
+		accioParams.put("identificador", identificador);
+		NotificacioPlugin notificacioPlugin = getNotificacioPlugin();
+		String endpoint = notificacioPlugin.getEndpointURL();
 		try {
-			return getNotificacioPlugin().consultaJustificantEnviament(
-					identificador);
+			RespostaJustificantEnviamentNotib resultat = notificacioPlugin.consultaJustificantEnviament(identificador);
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_NOTIFICACIO,
+					"Descarregar justificant enviament NOTIB",
+					notificacioPlugin.getEndpointURL(),
+					accioParams,
+					IntegracioAccioTipusEnumDto.RECEPCIO,
+					System.currentTimeMillis() - t0);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.notib", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			return resultat;
 		} catch (Exception e) {
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_NOTIFICACIO,
+					"Descarregar justificant enviament NOTIB",
+					notificacioPlugin.getEndpointURL(),
+					accioParams,
+					IntegracioAccioTipusEnumDto.RECEPCIO,
+					System.currentTimeMillis() - t0,
+					"Error al accedir al plugin de notificacions",
+					e);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.notib", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 			throw new RuntimeException(e);
 		}
 	}
 
-	public RespostaConsultaEstatEnviament notificacioConsultarIActualitzarEstat(
-			DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity) {
+	public RespostaConsultaEstatEnviament notificacioConsultarIActualitzarEstat(DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity) {
 
+		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		long t0 = System.currentTimeMillis();
 		DocumentNotificacioEntity notificacio = documentEnviamentInteressatEntity.getNotificacio();
 		ExpedientEntity expedient = notificacio.getExpedient();
@@ -5097,7 +5225,7 @@ public class PluginHelper {
 		accioParams.put("concepte", notificacio.getAssumpte());
 		accioParams.put("referencia", documentEnviamentInteressatEntity.getEnviamentReferencia());
 		NotificacioPlugin notificacioPlugin = getNotificacioPlugin();
-
+		String endpoint = notificacioPlugin.getEndpointURL();
 		try {
 
 			RespostaConsultaEstatEnviament resposta = null;
@@ -5157,6 +5285,7 @@ public class PluginHelper {
 						accioParams,
 						IntegracioAccioTipusEnumDto.RECEPCIO,
 						System.currentTimeMillis() - t0);
+				applicationHelper.stopTimer(sample, "METRICS@Integracions.notib", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 			}
 
 			return resposta;
@@ -5171,6 +5300,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					"Error al accedir al plugin de notificacions",
 					ex);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.notib", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_NOTIFICACIO,"Error al accedir al plugin de notificacions", ex);
 		}
 	}
@@ -5429,21 +5559,17 @@ public class PluginHelper {
 			FitxerDto fitxer,
 			String motiu,
 			String idioma) {
-
+		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		organGestorHelper.actualitzarOrganCodi(
 				organGestorHelper.getOrganCodiFromContingutId(
 						document.getId()));
 		String accioDescripcio = "Firma en servidor d'un document";
 		Map<String, String> accioParams = new HashMap<String, String>();
-		accioParams.put(
-				"id",
-				document.getId().toString());
-		accioParams.put(
-				"títol",
-				document.getNom());
+		accioParams.put("id", document.getId().toString());
+		accioParams.put("títol", document.getNom());
 		long t0 = System.currentTimeMillis();
 		FirmaServidorPlugin firmaServidorPlugin = getFirmaServidorPlugin();
-		
+		String endpoint = firmaServidorPlugin.getEndpointURL();
 		try {
 
 			SignaturaResposta firma = firmaServidorPlugin.firmar(fitxer.getNom(), motiu, fitxer.getContingut(), idioma, fitxer.getContentType());
@@ -5469,11 +5595,11 @@ public class PluginHelper {
 			integracioHelper.addAccioOk(
 					IntegracioHelper.INTCODI_FIRMASERV,
 					accioDescripcio,
-					firmaServidorPlugin.getEndpointURL(),
+					endpoint,
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.firmaServidor", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 			return firma;
 
 		} catch (Exception ex) {
@@ -5481,20 +5607,20 @@ public class PluginHelper {
 			integracioHelper.addAccioError(
 					IntegracioHelper.INTCODI_FIRMASERV,
 					accioDescripcio,
-					firmaServidorPlugin.getEndpointURL(),
+					endpoint,
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.firmaServidor", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_FIRMASERV, errorDescripcio, ex);
 		}
 	}
 
-	public String viaFirmaUpload(
-			DocumentEntity document,
-			DocumentViaFirmaEntity documentViaFirmaEntity) {
-
+	public String viaFirmaUpload(DocumentEntity document, DocumentViaFirmaEntity documentViaFirmaEntity) {
+		
+		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		organGestorHelper.actualitzarOrganCodi(
 				organGestorHelper.getOrganCodiFromContingutId(
 						document.getId()));
@@ -5513,7 +5639,7 @@ public class PluginHelper {
 		FitxerDto fitxerOriginal = documentHelper.getFitxerAssociat(document, null);
 		FitxerDto fitxerConvertit = this.conversioConvertirPdf(fitxerOriginal, null);
 		ViaFirmaPlugin viaFirmaPlugin = getViaFirmaPlugin();
-		
+		String endpoint = viaFirmaPlugin.getEndpointURL();
 		try {
 			DispositiuEnviamentEntity dispositiu = documentViaFirmaEntity.getDispositiuEnviament();
 			if (dispositiu != null) {
@@ -5578,25 +5704,36 @@ public class PluginHelper {
 			
 			viaFirmaResponse = viaFirmaPlugin.uploadDocument(parametresViaFirma);
 			
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_VIAFIRMA,
+					accioDescripcio,
+					endpoint,
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.viafirma", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			
 		} catch (Exception ex) {
+			
 			String errorDescripcio = "Error al accedir al plugin de viaFirma";
 			integracioHelper.addAccioError(
 					IntegracioHelper.INTCODI_VIAFIRMA,
 					accioDescripcio,
-					viaFirmaPlugin.getEndpointURL(),
+					endpoint,
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.viafirma", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_VIAFIRMA, errorDescripcio, ex);
 		}
 		return viaFirmaResponse.getCodiMissatge();
 	}
 
-	public ViaFirmaDocument viaFirmaDownload(
-			DocumentViaFirmaEntity documentViaFirma) {
-
+	public ViaFirmaDocument viaFirmaDownload(DocumentViaFirmaEntity documentViaFirma) {
+		
+		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		String accioDescripcio = "Descarregar document firmat";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		DocumentEntity document = documentViaFirma.getDocument();
@@ -5612,6 +5749,7 @@ public class PluginHelper {
 		long t0 = System.currentTimeMillis();
 		ViaFirmaDocument viaFirmaDocument = null;
 		ViaFirmaPlugin viaFirmaPlugin = getViaFirmaPlugin();
+		String endpoint = viaFirmaPlugin.getEndpointURL();
 		
 		try {
 			viaFirmaDocument = viaFirmaPlugin.downloadDocument(
@@ -5621,10 +5759,11 @@ public class PluginHelper {
 			integracioHelper.addAccioOk(
 					IntegracioHelper.INTCODI_VIAFIRMA,
 					accioDescripcio,
-					viaFirmaPlugin.getEndpointURL(),
+					endpoint,
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.viafirma", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 			return viaFirmaDocument;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al descarregar el document firmat";
@@ -5633,27 +5772,53 @@ public class PluginHelper {
 			integracioHelper.addAccioError(
 					IntegracioHelper.INTCODI_VIAFIRMA,
 					accioDescripcio,
-					viaFirmaPlugin.getEndpointURL(),
+					endpoint,
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.viafirma", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_VIAFIRMA, errorDescripcio, ex);
 		}
 	}
 
 	public List<ViaFirmaDispositiuDto> getDeviceUser(String codiUsuari, String contasenya) {
+		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
+		long t0 = System.currentTimeMillis();
+		String accioDescripcio = "Llista dispositius usuari";
+		Map<String, String> accioParams = new HashMap<String, String>();
+		accioParams.put("codiUsuari", codiUsuari);
 		List<ViaFirmaDispositiuDto> viaFirmaDispositiusDto = new ArrayList<>();
+		ViaFirmaPlugin viaFirmaPlugin = getViaFirmaPlugin();
+		String endpoint = viaFirmaPlugin.getEndpointURL();
 		try {
-			List<ViaFirmaDispositiu> viaFirmaDispositius = getViaFirmaPlugin().getDeviceUser(
+			List<ViaFirmaDispositiu> viaFirmaDispositius = viaFirmaPlugin.getDeviceUser(
 					codiUsuari,
 					contasenya);
 			viaFirmaDispositiusDto = conversioTipusHelper.convertirList(
 					viaFirmaDispositius,
 					ViaFirmaDispositiuDto.class);
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_VIAFIRMA,
+					accioDescripcio,
+					endpoint,
+					accioParams,
+					IntegracioAccioTipusEnumDto.RECEPCIO,
+					System.currentTimeMillis() - t0);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.viafirma", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de viaFirma";
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_VIAFIRMA,
+					accioDescripcio,
+					endpoint,
+					accioParams,
+					IntegracioAccioTipusEnumDto.RECEPCIO,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.viafirma", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_VIAFIRMA, errorDescripcio, ex);
 		}
 		return viaFirmaDispositiusDto;
@@ -5665,6 +5830,7 @@ public class PluginHelper {
 			String urlReturnToRipea,
 			String iframeVista) {
 
+		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		UsuariDto usuariActual = aplicacioService.getUsuariActual();
 		
 		String accioDescripcio = "Iniciant firma simple";
@@ -5677,7 +5843,7 @@ public class PluginHelper {
 		
 		long t0 = System.currentTimeMillis();
 		FirmaWebPlugin firmaWebPlugin = getFirmaSimpleWebPlugin();
-
+		String endpoint = firmaWebPlugin.getEndpointURL();
 		try {
 			String resultat = firmaWebPlugin.firmaSimpleWebStart(
 					fitxersPerFirmar,
@@ -5692,6 +5858,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.firmaSimpleWeb", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 			return resultat;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al iniciar la firma simple.";
@@ -5704,18 +5871,21 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.firmaSimpleWeb", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_FIRMASIMPLE, errorDescripcio, ex);
 		}
 	}
 
 	public FirmaResultatDto firmaSimpleWebEnd(String transactionID) {
 
+		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		String accioDescripcio = "Finalitzant firma simple";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("transactionID", transactionID);	
 		long t0 = System.currentTimeMillis();
 		FirmaWebPlugin firmaWebPlugin = getFirmaSimpleWebPlugin();
-
+		String endpoint = firmaWebPlugin.getEndpointURL();
+		
 		try {
 			FirmaResultatDto resultat = firmaWebPlugin.firmaSimpleWebEnd(transactionID);
 			integracioHelper.addAccioOk(
@@ -5725,6 +5895,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.firmaSimpleWeb", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 			return resultat;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al finalitzar la firma simple.";
@@ -5737,18 +5908,21 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.firmaSimpleWeb", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_FIRMASIMPLE, errorDescripcio, ex);
 		}
 	}
 
 	public AnotacioRegistreEntrada consultaAnotacio(AnotacioRegistreId anotacioRegistreId) {
 		
+		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
+		long t0 = System.currentTimeMillis();
 		String accioDescripcio = "Consulta les dades d'una anotació";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("clauAcces", anotacioRegistreId.getClauAcces());
 		accioParams.put("identificador", anotacioRegistreId.getIndetificador());
 		DistribucioPlugin distribucioPlugin = getDistribucioPlugin();
-		long t0 = System.currentTimeMillis();
+		String endpoint = distribucioPlugin.getEndpointURL();
 		
 		try {
 			
@@ -5760,6 +5934,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.distribucio", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 			return resultat;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al consulta les dades d'una anotació.";
@@ -5772,12 +5947,15 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.distribucio", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_DISTRIBUCIO, errorDescripcio, ex);
 		}
 	}
 	
 	public void canviEstatAnotacio(AnotacioRegistreId anotacioRegistreId, Estat estat, String obs) {
 		
+		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
+		long t0 = System.currentTimeMillis();
 		String accioDescripcio = "Canvi estat d'una anotació";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("clauAcces", anotacioRegistreId.getClauAcces());
@@ -5785,7 +5963,7 @@ public class PluginHelper {
 		accioParams.put("estat", estat.toString());
 		accioParams.put("observacions", obs);
 		DistribucioPlugin distribucioPlugin = getDistribucioPlugin();
-		long t0 = System.currentTimeMillis();
+		String endpoint = distribucioPlugin.getEndpointURL();
 		
 		try {
 			distribucioPlugin.canviEstat(anotacioRegistreId, estat, obs);
@@ -5796,6 +5974,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.distribucio", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al canviar estat d'una anotació.";
 			integracioHelper.addAccioError(
@@ -5807,6 +5986,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.distribucio", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_DISTRIBUCIO, errorDescripcio, ex);
 		}
 	}
@@ -5835,11 +6015,8 @@ public class PluginHelper {
 		return resposta;
 	}
 
-	private Long toLongValue(
-			String text) {
-		return text == null || text.isEmpty() ? null
-				: Long.parseLong(
-						text);
+	private Long toLongValue(String text) {
+		return text == null || text.isEmpty() ? null : Long.parseLong(text);
 	}
 
 	private Expedient toArxiuExpedient(
@@ -5912,15 +6089,10 @@ public class PluginHelper {
 		return expedient;
 	}
 
-	private Carpeta toArxiuCarpeta(
-			String identificador,
-			String nom) {
-
+	private Carpeta toArxiuCarpeta(String identificador, String nom) {
 		Carpeta carpeta = new Carpeta();
-		carpeta.setIdentificador(
-				identificador);
-		carpeta.setNom(
-				nom);
+		carpeta.setIdentificador(identificador);
+		carpeta.setNom(nom);
 		return carpeta;
 	}
 
@@ -6154,9 +6326,7 @@ public class PluginHelper {
 		return extensio;
 	}
 
-	private String getExtensio(
-			String nom) {
-
+	private String getExtensio(String nom) {
 		String extensio = null;
 		if (nom != null) {
 			int indexPunt = nom.lastIndexOf(
@@ -6164,15 +6334,12 @@ public class PluginHelper {
 			if (indexPunt != -1 && indexPunt < nom.length() - 1) {
 				extensio = nom.substring(
 						indexPunt).toLowerCase();
-
 			}
 		}
 		return extensio;
 	}
 
-	private DocumentFormat getDocumentFormat(
-			DocumentExtensio extensio) {
-
+	private DocumentFormat getDocumentFormat(DocumentExtensio extensio) {
 		DocumentFormat format = null;
 		if (extensio != null) {
 			switch (extensio) {
@@ -6329,10 +6496,7 @@ public class PluginHelper {
 	 * return capsaleraTest; }
 	 */
 
-	private void propagarMetadadesExpedient(
-			Expedient expedientArxiu,
-			ExpedientEntity expedientDb) {
-
+	private void propagarMetadadesExpedient(Expedient expedientArxiu, ExpedientEntity expedientDb) {
 		List<String> metadadaOrgans = expedientArxiu.getMetadades().getOrgans();
 		String organs = null;
 		if (expedientArxiu.getMetadades().getOrgans() != null) {
@@ -6351,8 +6515,7 @@ public class PluginHelper {
 			organs = organsSb.toString();
 		}
 		expedientDb.updateNti(
-				obtenirNumeroVersioEniExpedient(
-						expedientArxiu.getMetadades().getVersioNti()),
+				obtenirNumeroVersioEniExpedient(expedientArxiu.getMetadades().getVersioNti()),
 				expedientArxiu.getMetadades().getIdentificador(),
 				organs,
 				expedientArxiu.getMetadades().getDataObertura(),

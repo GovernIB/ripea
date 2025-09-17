@@ -210,16 +210,6 @@ public class SalutServiceImpl implements SalutService{
 	@Override
 	public SalutInfo checkSalut(String versio, String performanceUrl) {
 		
-		Timer timer = meterRegistry.find("ExpedientHelper.create").tags("resultado", "exito").timer();
-		long numExpCreats = 0;
-		double tempsPromitgExpCreat = 0;
-		
-		if (timer != null) {
-			numExpCreats = timer.count(); // número de ejecuciones
-//			double totalTime = timer.totalTime(TimeUnit.MILLISECONDS); // tiempo total
-			tempsPromitgExpCreat = timer.mean(TimeUnit.MILLISECONDS); // tiempo promedio
-		}
-		
 		//Estats de salut particulars
 		EstatSalut salutDb = checkDatabase();		
 		List<IntegracioSalut> salutIntegracions = checkIntegracions();
@@ -228,11 +218,10 @@ public class SalutServiceImpl implements SalutService{
 		List<MissatgeSalut> missatgesSalut = checkMissatges();
 		
 		//Estat de salut general (depen de tots els altres)
-		EstatSalutEnum estat = calculaEstatGlobal(salutIntegracions, subsistemesSalut);
-		EstatSalut estatSalut = EstatSalut.builder()
-                .estat(estat)
-                .latencia((int)tempsPromitgExpCreat)
-                .build();
+		EstatSalutEnum estat	= calculaEstatGlobal(salutIntegracions, subsistemesSalut);
+		int latenciaGlobal 		= calculaLatenciaGlobal(salutDb, salutIntegracions, subsistemesSalut);
+		
+		EstatSalut estatSalut = EstatSalut.builder().estat(estat).latencia(latenciaGlobal).build();
 		
         return SalutInfo.builder()
                 .codi("RIP")
@@ -265,6 +254,29 @@ public class SalutServiceImpl implements SalutService{
 		return calculaEstat(totalPeticionsOk, totalPeticionsError);
 	}
 	
+	private int calculaLatenciaGlobal(
+			EstatSalut salutDb,
+			List<IntegracioSalut> salutIntegracions,
+			List<SubsistemaSalut> subsistemesSalut) {
+		
+		//JA començam amb les dades de la petició a BBDD
+		Long totalPeticionsOk		= 1l;
+		int totalLatenciaPeticionsOk= salutDb.getLatencia();
+		
+		if (salutIntegracions.size()>0) {
+			for (IntegracioSalut is: salutIntegracions) {
+				totalPeticionsOk = totalPeticionsOk + is.getPeticions().getTotalOk();
+//				is.getPeticions().getPeticionsPerEntorn().get("").get
+			}
+		}
+		if (subsistemesSalut.size()>0) {
+			for (SubsistemaSalut ss: subsistemesSalut) {
+				totalPeticionsOk = totalPeticionsOk + ss.getTotalOk();
+			}
+		}
+		return (int)(totalLatenciaPeticionsOk/totalPeticionsOk);
+	}
+
     private EstatSalut checkDatabase() {
 
         try {
@@ -277,7 +289,8 @@ public class SalutServiceImpl implements SalutService{
         }
     }
 
-    public List<DetallSalut> checkAltres() {
+    @SuppressWarnings("unused")
+	public List<DetallSalut> checkAltres() {
 
         try {
         	
@@ -414,7 +427,11 @@ public class SalutServiceImpl implements SalutService{
 		Map<String, IntegracioPeticions> peticionsPerEntornUSR = getPeticionsPerEntorn(ipUSR, codesFSUSR); 
 		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.USR.toString(), ipUSR, peticionsPerEntornUSR, codesFSUSR.length));
 		
-		String[] codesFSPFI = {"METRICS@Integracions.portafirmes", "METRICS@Integracions.portafirmesFlux"};
+		String[] codesFSPFI = {
+				"METRICS@Integracions.portafirmes",
+				"METRICS@Integracions.portafirmesFlux",
+				"METRICS@Integracions.firmaServidor",
+				"METRICS@Integracions.firmaSimpleWeb"};
 		IntegracioPeticions ipPFI = new IntegracioPeticions();
 		Map<String, IntegracioPeticions> peticionsPerEntornPFI = getPeticionsPerEntorn(ipPFI, codesFSPFI); 
 		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.PFI.toString(), ipPFI, peticionsPerEntornPFI, codesFSPFI.length));
@@ -439,7 +456,7 @@ public class SalutServiceImpl implements SalutService{
 		Map<String, IntegracioPeticions> peticionsPerEntornCDO = getPeticionsPerEntorn(ipCDO, codesFSCDO); 
 		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.CDO.toString(), ipCDO, peticionsPerEntornCDO, codesFSCDO.length));
 		
-		String[] codesFSDIR = {"METRICS@Integracions.dir3"}; //getUnitatsOrganitzativesPlugin
+		String[] codesFSDIR = {"METRICS@Integracions.dir3"}; //getUnitatsOrganitzativesPlugin, getDadesExternesPlugin
 		IntegracioPeticions ipDIR = new IntegracioPeticions();
 		Map<String, IntegracioPeticions> peticionsPerEntornDIR = getPeticionsPerEntorn(ipDIR, codesFSDIR); 
 		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.DIR.toString(), ipDIR, peticionsPerEntornDIR, codesFSDIR.length));
@@ -466,10 +483,10 @@ public class SalutServiceImpl implements SalutService{
 		Map<String, IntegracioPeticions> peticionsPerEntornVFI = getPeticionsPerEntorn(ipVFI, codesFSVFI); 
 		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.VFI.toString(), ipVFI, peticionsPerEntornVFI, codesFSVFI.length));
 		
-		String[] codesFSRSC = {"METRICS@Integracions.rolsac"};
+		String[] codesFSRSC = {"METRICS@Integracions.rolsac"}; //getProcedimentPlugin
 		IntegracioPeticions ipRSC = new IntegracioPeticions();
 		Map<String, IntegracioPeticions> peticionsPerEntornRSC = getPeticionsPerEntorn(ipRSC, codesFSRSC); 
-		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.DIB.toString(), ipRSC, peticionsPerEntornRSC, codesFSRSC.length));
+		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.RSC.toString(), ipRSC, peticionsPerEntornRSC, codesFSRSC.length));
     	
     	return integracionsSalut;
     }
