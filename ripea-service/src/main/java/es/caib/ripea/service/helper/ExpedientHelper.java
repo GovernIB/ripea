@@ -372,18 +372,12 @@ public class ExpedientHelper {
 				}
 			}
 			
-	        sample.stop(Timer.builder("METRICS@Subsystem_Expedient.create")
-	                .description("Tiempo y resultado")
-	                .tags("resultado", "exito")
-	                .register(applicationHelper.getMeterRegistry()));
+			applicationHelper.stopTimer(sample, "METRICS@Subsystem_Expedient.create", "resultado", "exito");
 	        
 	        return expedient.getId();
         
         } catch (Exception e) {
-            sample.stop(Timer.builder("METRICS@Subsystem_Expedient.create")
-                .description("Tiempo y resultado")
-                .tags("resultado", "error")
-                .register(applicationHelper.getMeterRegistry()));
+        	applicationHelper.stopTimer(sample, "METRICS@Subsystem_Expedient.create", "resultado", "error");
             throw e;
         }
 	}

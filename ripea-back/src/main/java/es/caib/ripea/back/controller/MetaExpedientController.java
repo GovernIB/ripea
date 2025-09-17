@@ -582,10 +582,7 @@ public class MetaExpedientController extends BaseAdminController {
 
 			MissatgesHelper.success(request, getMessage(request, messageSuccess, new String[] {command.getNom() }));
 			
-			sample.stop(Timer.builder("METRICS@Subsystem_Procediment.import")
-					.description("Tiempo y resultado")
-					.tags("resultado", "exito")
-					.register(aplicacioService.getMeterRegistry()));
+			aplicacioService.stopTimer(sample, "METRICS@Subsystem_Procediment.import", "resultado", "exito");
 			
 			return null;
 			
@@ -599,10 +596,7 @@ public class MetaExpedientController extends BaseAdminController {
 							"metaexpedient.import.controller.import.error",
 							new Object[] { command.getNom(), ExceptionHelper.getRootCauseOrItself(e).getMessage() }),
 					e);
-			sample.stop(Timer.builder("METRICS@Subsystem_Procediment.import")
-					.description("Tiempo y resultado")
-					.tags("resultado", "error")
-					.register(aplicacioService.getMeterRegistry()));			
+			aplicacioService.stopTimer(sample, "METRICS@Subsystem_Procediment.import", "resultado", "error");			
 			return null;
 			
 		} finally {

@@ -305,17 +305,11 @@ public class TascaHelper {
 			//Notificar event als usuaris afectats
 			eventService.notifyTasquesPendents(expedientTascaEntity.getResponsablesAndObservadorsCodis(true));
 			
-			sample.stop(Timer.builder("METRICS@Subsystem_Expedient.createTasca")
-					.description("Tiempo y resultado")
-					.tags("resultado", "exito")
-					.register(applicationHelper.getMeterRegistry()));
+			applicationHelper.stopTimer(sample, "METRICS@Subsystem_Expedient.createTasca", "resultado", "exito");
 			
     		return expedientTascaEntity;
     	} catch (Exception e) {
-			sample.stop(Timer.builder("METRICS@Subsystem_Expedient.createTasca")
-					.description("Tiempo y resultado")
-					.tags("resultado", "error")
-					.register(applicationHelper.getMeterRegistry()));
+    		applicationHelper.stopTimer(sample, "METRICS@Subsystem_Expedient.createTasca", "resultado", "error");
 			throw e;
     	}			
 	}
@@ -476,20 +470,11 @@ public class TascaHelper {
 			eventService.notifyTasquesPendents(tasca.getResponsablesAndObservadorsCodis(true));
 			
 			logAccioTasca(tasca, LogTipusEnumDto.CANVI_ESTAT);
-			
-			
-			sample.stop(Timer.builder("METRICS@Subsystem_Expedient.canviEstatTasca")
-					.description("Tiempo y resultado")
-					.tags("resultado", "exito")
-					.register(applicationHelper.getMeterRegistry()));
-			
+			applicationHelper.stopTimer(sample, "METRICS@Subsystem_Expedient.canviEstatTasca", "resultado", "exito");
 			return tasca;
 			
 		} catch (Exception e) {
-			sample.stop(Timer.builder("METRICS@Subsystem_Expedient.canviEstatTasca")
-					.description("Tiempo y resultado")
-					.tags("resultado", "error")
-					.register(applicationHelper.getMeterRegistry()));
+			applicationHelper.stopTimer(sample, "METRICS@Subsystem_Expedient.canviEstatTasca", "resultado", "error");
 			throw e;
 		}			
 	}

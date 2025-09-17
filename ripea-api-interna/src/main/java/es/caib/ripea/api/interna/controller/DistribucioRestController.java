@@ -44,16 +44,10 @@ public class DistribucioRestController {
 			//Guardam el usuari a la taula de BBDD, aquest en concret ha de existir a Keycloak, i tendrem les dades de auditoria correctes.
 			aplicacioService.processarAutenticacioUsuari(false);
 			expedientPeticioService.crearExpedientPeticion(event);
-			sample.stop(Timer.builder("METRICS@Subsystem_Callback_Distribucio.event")
-					.description("Tiempo y resultado")
-					.tags("resultado", "exito")
-					.register(aplicacioService.getMeterRegistry()));			
+			aplicacioService.stopTimer(sample, "METRICS@Subsystem_Callback_Distribucio.event", "resultado", "exito");
 			return new ResponseEntity<String>("OK", HttpStatus.OK);
 		} catch (Exception e) {
-			sample.stop(Timer.builder("METRICS@Subsystem_Callback_Distribucio.event")
-					.description("Tiempo y resultado")
-					.tags("resultado", "error")
-					.register(aplicacioService.getMeterRegistry()));
+			aplicacioService.stopTimer(sample, "METRICS@Subsystem_Callback_Distribucio.event", "resultado", "error");
 			return new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		} finally {
 			//Eliminam la autenticació ja que nomes hauria de servir per la petició actual

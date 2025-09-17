@@ -300,17 +300,11 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 				}
 			}
 			
-			sample.stop(Timer.builder("METRICS@Subsystem_Background.userMassiveAction")
-					.description("Tiempo y resultado")
-					.tags("resultado", "exito")
-					.register(applicationHelper.getMeterRegistry()));
+			applicationHelper.stopTimer(sample, "METRICS@Subsystem_Background.userMassiveAction", "resultado", "exito");
 			
 		} catch (Exception e) {
 			logger.error("Error al fer execucio massiva", e);
-			sample.stop(Timer.builder("METRICS@Subsystem_Background.userMassiveAction")
-					.description("Tiempo y resultado")
-					.tags("resultado", "error")
-					.register(applicationHelper.getMeterRegistry()));			
+			applicationHelper.stopTimer(sample, "METRICS@Subsystem_Background.userMassiveAction", "resultado", "error");		
 		}
 	}
 

@@ -4,6 +4,7 @@ import es.caib.ripea.ejb.base.AbstractServiceEjb;
 import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 import lombok.experimental.Delegate;
 
 import javax.annotation.security.PermitAll;
@@ -323,5 +324,17 @@ public class AplicacioServiceEjb extends AbstractServiceEjb<AplicacioService> im
 	@RolesAllowed("**")
 	public MeterRegistry getMeterRegistry() {
 		return delegateService.getMeterRegistry();
+	}
+	
+	@Override
+	@RolesAllowed("**")
+	public String getMetriquesJSON() throws Exception {
+		return delegateService.getMetriquesJSON();
+	}
+	
+	@Override
+	@RolesAllowed("**")
+	public void stopTimer(Timer.Sample sample, String metricCode, String... tags) {
+		delegateService.stopTimer(sample, metricCode, tags);				
 	}
 }

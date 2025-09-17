@@ -93,19 +93,13 @@ public class PortafibRestController {
 						ex);
 			}
 
-			sample.stop(Timer.builder("METRICS@Subsystem_Callback_Portafib.event")
-					.description("Tiempo y resultado")
-					.tags("resultado", "exito")
-					.register(aplicacioService.getMeterRegistry()));
+			aplicacioService.stopTimer(sample, "METRICS@Subsystem_Callback_Portafib.event", "resultado", "exito");
 			
 			return new ResponseEntity<String>("OK", HttpStatus.OK);
 			
 		} catch (Throwable th) {
 			log.error("Error al callback portafib rest", th);
-			sample.stop(Timer.builder("METRICS@Subsystem_Callback_Portafib.event")
-					.description("Tiempo y resultado")
-					.tags("resultado", "error")
-					.register(aplicacioService.getMeterRegistry()));			
+			aplicacioService.stopTimer(sample, "METRICS@Subsystem_Callback_Portafib.event", "resultado", "error");		
 			return new ResponseEntity<String>("Error desconegut processant event de Peticio de Firma REST: " + th.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		} finally {
 			//Eliminam la autenticació provissional creada per el usuari $portafib_ripea

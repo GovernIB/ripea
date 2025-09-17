@@ -226,18 +226,12 @@ public class MetaDocumentHelper {
 	
 			updateFluxos(newMetaDocumententity, metaDocument.getPortafirmesFluxosId());
 
-			sample.stop(Timer.builder("METRICS@Subsystem_Procediment.metaDoc")
-					.description("Tiempo y resultado")
-					.tags("resultado", "exito")
-					.register(applicationHelper.getMeterRegistry()));
+			applicationHelper.stopTimer(sample, "METRICS@Subsystem_Procediment.metaDoc", "resultado", "exito");
 		
 			return newMetaDocumententity;
 			
 		} catch (Exception e) {
-			sample.stop(Timer.builder("METRICS@Subsystem_Procediment.metaDoc")
-				.description("Tiempo y resultado")
-				.tags("resultado", "error")
-				.register(applicationHelper.getMeterRegistry()));
+			applicationHelper.stopTimer(sample, "METRICS@Subsystem_Procediment.metaDoc", "resultado", "error");
 			throw e;
 		}			
 	}

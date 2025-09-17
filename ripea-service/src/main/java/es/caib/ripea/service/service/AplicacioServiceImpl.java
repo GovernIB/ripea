@@ -93,6 +93,7 @@ import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.permission.ExtendedPermission;
 import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer.Sample;
 
 @Service
 public class AplicacioServiceImpl implements AplicacioService {
@@ -886,5 +887,15 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Override
 	public MeterRegistry getMeterRegistry() {
 		return applicationHelper.getMeterRegistry();
+	}
+	
+	@Override
+    public String getMetriquesJSON() throws Exception {
+		return applicationHelper.getMetriquesJSON();
+	}
+
+	@Override
+	public void stopTimer(Sample sample, String metricCode, String... tags) {
+		applicationHelper.stopTimer(sample, metricCode, tags);
 	}
 }

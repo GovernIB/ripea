@@ -1485,16 +1485,10 @@ public class ExpedientServiceImpl implements ExpedientService {
 					logger.info("findAmbFiltrePaginat ids (size: " + expedientsIds.size()  +") time:  " + (System.currentTimeMillis() - t0) + " ms");
 			}
 	
-			sample.stop(Timer.builder("METRICS@Subsystem_Expedient.list")
-					.description("Tiempo y resultado")
-					.tags("resultado", "exito", "interfaz", "JSP")
-					.register(applicationHelper.getMeterRegistry()));
+			applicationHelper.stopTimer(sample, "METRICS@Subsystem_Expedient.list", "resultado", "exito");
 			return result;		
 		} catch (Exception e) {
-			sample.stop(Timer.builder("METRICS@Subsystem_Expedient.list")
-				.description("Tiempo y resultado")
-				.tags("resultado", "error", "interfaz", "JSP")
-				.register(applicationHelper.getMeterRegistry()));
+			applicationHelper.stopTimer(sample, "METRICS@Subsystem_Expedient.list", "resultado", "error");
 			throw e;
 		}			
 	}

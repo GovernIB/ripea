@@ -208,18 +208,12 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				}
 			}
 			
-			sample.stop(Timer.builder("METRICS@Subsystem_Procediment.create")
-					.description("Tiempo y resultado")
-					.tags("resultado", "exito")
-					.register(applicationHelper.getMeterRegistry()));
+			applicationHelper.stopTimer(sample, "METRICS@Subsystem_Procediment.create", "resultado", "exito");
 		
 			return metaExpedientDto;
 			
 		} catch (Exception e) {
-			sample.stop(Timer.builder("METRICS@Subsystem_Procediment.create")
-				.description("Tiempo y resultado")
-				.tags("resultado", "error")
-				.register(applicationHelper.getMeterRegistry()));
+			applicationHelper.stopTimer(sample, "METRICS@Subsystem_Procediment.create", "resultado", "error");
 			throw e;
 		}			
 	}
@@ -1065,27 +1059,19 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				resposta = findByEntitat(entitatId, filtre, paginacioParams, rolActual);
 			}
 
-			sample.stop(Timer.builder("METRICS@Subsystem_Procediment.list")
-					.description("Tiempo y resultado")
-					.tags("resultado", "exito")
-					.register(applicationHelper.getMeterRegistry()));
+			applicationHelper.stopTimer(sample, "METRICS@Subsystem_Procediment.list", "resultado", "exito");
 
 			return resposta;
 			
 		} catch (Exception e) {
-			sample.stop(Timer.builder("METRICS@Subsystem_Procediment.list")
-				.description("Tiempo y resultado")
-				.tags("resultado", "error")
-				.register(applicationHelper.getMeterRegistry()));
+			applicationHelper.stopTimer(sample, "METRICS@Subsystem_Procediment.list", "resultado", "error");
 			throw e;
 		}			
 	}
 	
 	@Transactional(readOnly = true)
 	@Override
-	public int countMetaExpedientsPendentRevisar(
-			Long entitatId) {
-		
+	public int countMetaExpedientsPendentRevisar(Long entitatId) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false, false, false);
 		return metaExpedientRepository.findByRevisioEstat(entitat, MetaExpedientRevisioEstatEnumDto.PENDENT).size();
 	}

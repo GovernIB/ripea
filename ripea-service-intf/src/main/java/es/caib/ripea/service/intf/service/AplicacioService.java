@@ -5,6 +5,7 @@ import java.util.Properties;
 import javax.annotation.security.PermitAll;
 import org.springframework.security.access.prepost.PreAuthorize;
 import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 import es.caib.ripea.service.intf.dto.DiagnosticFiltreDto;
 import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.ExcepcioLogDto;
@@ -249,6 +250,7 @@ public interface AplicacioService {
 	@PreAuthorize("hasRole('IPA_SUPER')")
 	public Long updateUsuariCodi(String codiAntic, String codiNou);
 	
-	@PermitAll
-	public MeterRegistry getMeterRegistry();
+	@PermitAll public MeterRegistry getMeterRegistry();
+	@PermitAll public void stopTimer(Timer.Sample sample, String metricCode, String... tags);
+	@PermitAll public String getMetriquesJSON() throws Exception;
 }

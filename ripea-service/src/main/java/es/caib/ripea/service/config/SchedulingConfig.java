@@ -188,16 +188,10 @@ public class SchedulingConfig implements SchedulingConfigurer {
 							createAuthenticationContext();
 							segonPlaService.consultarIGuardarAnotacionsPeticionsPendents();
 							monitorTasquesService.fi(codiConsultarIGuardarAnotacionsPendents);
-							sample.stop(Timer.builder("METRICS@Subsystem_Background.consultarIGuardarAnotacions")
-									.description("Tiempo y resultado")
-									.tags("resultado", "exito")
-									.register(aplicacioService.getMeterRegistry()));
+							aplicacioService.stopTimer(sample, "METRICS@Subsystem_Background.consultarIGuardarAnotacions", "resultado", "exito");
 						} catch (Throwable th) {
 							tractarErrorTascaSegonPla(th, codiConsultarIGuardarAnotacionsPendents);
-							sample.stop(Timer.builder("METRICS@Subsystem_Background.consultarIGuardarAnotacions")
-									.description("Tiempo y resultado")
-									.tags("resultado", "error")
-									.register(aplicacioService.getMeterRegistry()));
+							aplicacioService.stopTimer(sample, "METRICS@Subsystem_Background.consultarIGuardarAnotacions", "resultado", "error");
 						} finally {
                         	SecurityContextHolder.clearContext();
                         }                 	
@@ -273,16 +267,10 @@ public class SchedulingConfig implements SchedulingConfigurer {
                         	createAuthenticationContext();
                         	segonPlaService.enviarEmailsPendentsAgrupats();
                         	monitorTasquesService.fi(codiEnviarEmailsAgrupats);
-							sample.stop(Timer.builder("METRICS@Subsystem_Background.enviarEmailsAgrupats")
-									.description("Tiempo y resultado")
-									.tags("resultado", "exito")
-									.register(aplicacioService.getMeterRegistry()));                        	
+                        	aplicacioService.stopTimer(sample, "METRICS@Subsystem_Background.enviarEmailsAgrupats", "resultado", "exito");                       	
                         } catch(Throwable th) {
                         	tractarErrorTascaSegonPla(th, codiEnviarEmailsAgrupats);
-							sample.stop(Timer.builder("METRICS@Subsystem_Background.enviarEmailsAgrupats")
-									.description("Tiempo y resultado")
-									.tags("resultado", "error")
-									.register(aplicacioService.getMeterRegistry()));                        	
+                        	aplicacioService.stopTimer(sample, "METRICS@Subsystem_Background.enviarEmailsAgrupats", "resultado", "error");                     	
                         } finally {
                         	SecurityContextHolder.clearContext();
                         }
@@ -303,16 +291,10 @@ public class SchedulingConfig implements SchedulingConfigurer {
 							createAuthenticationContext();
 	                        segonPlaService.guardarExpedientsDocumentsArxiu();
 							monitorTasquesService.fi(codiGuardarEnArxiuContingutsPendents);
-							sample.stop(Timer.builder("METRICS@Subsystem_Background.guardarEnArxiuContingutsPendents")
-									.description("Tiempo y resultado")
-									.tags("resultado", "exito")
-									.register(aplicacioService.getMeterRegistry()));
+							aplicacioService.stopTimer(sample, "METRICS@Subsystem_Background.guardarEnArxiuContingutsPendents", "resultado", "exito");
 						} catch (Throwable th) {
 							tractarErrorTascaSegonPla(th, codiGuardarEnArxiuContingutsPendents);
-							sample.stop(Timer.builder("METRICS@Subsystem_Background.guardarEnArxiuContingutsPendents")
-									.description("Tiempo y resultado")
-									.tags("resultado", "error")
-									.register(aplicacioService.getMeterRegistry()));
+							aplicacioService.stopTimer(sample, "METRICS@Subsystem_Background.guardarEnArxiuContingutsPendents", "resultado", "error");
 						} finally {
                         	SecurityContextHolder.clearContext();
                         }

@@ -269,18 +269,12 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 	
 			Filter filtreResultat = FilterBuilder.and(filtreFrontAndEntitat, filtreNoEliminats, filtrePermisos);
 	    
-    		sample.stop(Timer.builder("METRICS@Subsystem_Expedient.list")
-    				.description("Tiempo y resultado")
-    				.tags("resultado", "exito", "interfaz", "REACT")
-    				.register(applicationHelper.getMeterRegistry()));			
+			applicationHelper.stopTimer(sample, "METRICS@Subsystem_Expedient.list", "resultado", "exito");		
 			
 	        return filtreResultat.generate();
         
     	} catch (Exception e) {
-    		sample.stop(Timer.builder("METRICS@Subsystem_Expedient.list")
-    			.description("Tiempo y resultado")
-    			.tags("resultado", "error", "interfaz", "REACT")
-    			.register(applicationHelper.getMeterRegistry()));
+    		applicationHelper.stopTimer(sample, "METRICS@Subsystem_Expedient.list", "resultado", "error");
     		throw e;
     	}
 //

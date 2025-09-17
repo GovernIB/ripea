@@ -79,20 +79,14 @@ public class MetaDadaHelper {
 				metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientId, organId);
 			}
 
-			sample.stop(Timer.builder("METRICS@Subsystem_Procediment.metaDada")
-					.description("Tiempo y resultado")
-					.tags("resultado", "exito")
-					.register(applicationHelper.getMeterRegistry()));
+			applicationHelper.stopTimer(sample, "METRICS@Subsystem_Procediment.metaDada", "resultado", "exito");
 		
 			return conversioTipusHelper.convertir(
 					metaDadaRepository.save(entity),
 					MetaDadaDto.class);
 			
 		} catch (Exception e) {
-			sample.stop(Timer.builder("METRICS@Subsystem_Procediment.metaDada")
-				.description("Tiempo y resultado")
-				.tags("resultado", "error")
-				.register(applicationHelper.getMeterRegistry()));
+			applicationHelper.stopTimer(sample, "METRICS@Subsystem_Procediment.metaDada", "resultado", "error");
 			throw e;
 		}			
 	}

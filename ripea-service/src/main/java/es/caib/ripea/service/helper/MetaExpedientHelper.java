@@ -480,18 +480,12 @@ public class MetaExpedientHelper {
 				canviarRevisioADisseny(entitatId, metaExpedient.getId(), organId);
 			}
 			
-			sample.stop(Timer.builder("METRICS@Subsystem_Procediment.metaTasca")
-					.description("Tiempo y resultado")
-					.tags("resultado", "exito")
-					.register(applicationHelper.getMeterRegistry()));
+			applicationHelper.stopTimer(sample, "METRICS@Subsystem_Procediment.metaTasca", "resultado", "exito");
 		
 			return conversioTipusHelper.convertir(metaExpedientTascaRepository.save(entity), MetaExpedientTascaDto.class);
 			
 		} catch (Exception e) {
-			sample.stop(Timer.builder("METRICS@Subsystem_Procediment.metaTasca")
-				.description("Tiempo y resultado")
-				.tags("resultado", "error")
-				.register(applicationHelper.getMeterRegistry()));
+			applicationHelper.stopTimer(sample, "METRICS@Subsystem_Procediment.metaTasca", "resultado", "error");
 			throw e;
 		}				
 	}

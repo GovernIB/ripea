@@ -124,18 +124,12 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
 	                .filter(f -> f!=null && !String.valueOf(f).isEmpty())
 	                .collect(Collectors.toList());
 	
-			sample.stop(Timer.builder("METRICS@Subsystem_Expedient.tasquesUserList")
-					.description("Tiempo y resultado")
-					.tags("resultado", "exito", "interfaz", "REACT")
-					.register(applicationHelper.getMeterRegistry()));
+	        applicationHelper.stopTimer(sample, "METRICS@Subsystem_Expedient.tasquesUserList", "resultado", "exito");
 	
 			return result.isEmpty() ? null : FilterBuilder.and(result).generate();
 			
 		} catch (Exception e) {
-			sample.stop(Timer.builder("METRICS@Subsystem_Expedient.tasquesUserList")
-				.description("Tiempo y resultado")
-				.tags("resultado", "error", "interfaz", "REACT")
-				.register(applicationHelper.getMeterRegistry()));
+			applicationHelper.stopTimer(sample, "METRICS@Subsystem_Expedient.tasquesUserList", "resultado", "error");
 			throw e;
 		}
     }

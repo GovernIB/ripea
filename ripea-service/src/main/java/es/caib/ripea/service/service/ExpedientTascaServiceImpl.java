@@ -195,18 +195,12 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 						paginacioParams));
 			}
 
-			sample.stop(Timer.builder("METRICS@Subsystem_Expedient.tasquesUserList")
-					.description("Tiempo y resultado")
-					.tags("resultado", "exito", "interfaz", "JSP")
-					.register(applicationHelper.getMeterRegistry()));
+			applicationHelper.stopTimer(sample, "METRICS@Subsystem_Expedient.tasquesUserList", "resultado", "exito");
 
 			return paginacioHelper.toPaginaDto(tasques, ExpedientTascaDto.class);
 			
 		} catch (Exception e) {
-			sample.stop(Timer.builder("METRICS@Subsystem_Expedient.tasquesUserList")
-				.description("Tiempo y resultado")
-				.tags("resultado", "error", "interfaz", "JSP")
-				.register(applicationHelper.getMeterRegistry()));
+			applicationHelper.stopTimer(sample, "METRICS@Subsystem_Expedient.tasquesUserList", "resultado", "error");
 			throw e;
 		}
 	}

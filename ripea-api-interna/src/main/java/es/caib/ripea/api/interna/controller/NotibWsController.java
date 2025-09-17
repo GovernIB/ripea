@@ -59,15 +59,9 @@ public class NotibWsController {
 			//Guardam el usuari a la taula de BBDD, ja que sino algunes dades d'auditoria donen error
 			aplicacioService.processarAutenticacioUsuari(false);
 			documentService.notificacioActualitzarEstat(notificacioCanvi.getIdentificador(), notificacioCanvi.getReferenciaEnviament());
-			sample.stop(Timer.builder("METRICS@Subsystem_Callback_Notib.notificaCanvi")
-					.description("Tiempo y resultado")
-					.tags("resultado", "exito")
-					.register(aplicacioService.getMeterRegistry()));
+			aplicacioService.stopTimer(sample, "METRICS@Subsystem_Callback_Notib.notificaCanvi", "resultado", "exito");
 		} catch (Exception e) {
-			sample.stop(Timer.builder("METRICS@Subsystem_Callback_Notib.notificaCanvi")
-					.description("Tiempo y resultado")
-					.tags("resultado", "error")
-					.register(aplicacioService.getMeterRegistry()));
+			aplicacioService.stopTimer(sample, "METRICS@Subsystem_Callback_Notib.notificaCanvi", "resultado", "error");
 		}			
 	}
 }
