@@ -10,6 +10,7 @@ import AppMenu from "../../components/AppMenu.tsx";
 import {
     Link as RouterLink,
     LinkProps as RouterLinkProps,
+    useLocation,
 } from 'react-router-dom';
 
 export const icons = {
@@ -74,6 +75,7 @@ const MenuBadge = (props:any) => {
 const UserHeadToolbar = () => {
     const { t } = useTranslation();
     const { value: user } = useUserSession();
+    const location = useLocation();
 
     const isRolActualSupAdmin = user?.rolActual == 'IPA_SUPER';
     const isRolActualAdmin = user?.rolActual == 'IPA_ADMIN';
@@ -89,6 +91,14 @@ const UserHeadToolbar = () => {
             icon: 'fast_rewind',
             componentProps: {color: '#ff9523'},
             onClick: () => {
+                if (location.pathname.includes('/tasca/')) {
+                    const url = location.pathname
+                            .replace('/tasca/', '?tascaId=') + '&origenTasques=true';
+                    const baseUrl = window.location.href.split('/reactapp')[0]
+                    window.location.replace(baseUrl + url);
+                    return;
+                }
+
                 const url = window.location.href.replace('/reactapp', '');
                 window.location.replace(url);
             },

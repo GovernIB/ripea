@@ -1,4 +1,4 @@
-import {GridPage, useMuiDataGridApiRef} from "reactlib";
+import {useMuiDataGridApiRef} from "reactlib";
 import {Grid, Typography, Icon} from "@mui/material";
 import useRemesaActions from "./details/RemesaActions.tsx";
 import GridFormField from "../../components/GridFormField.tsx";
@@ -6,6 +6,7 @@ import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
 import {formatDate} from "../../util/dateUtils.ts";
 import * as builder from "../../util/springFilterUtils.ts";
 import {useTranslation} from "react-i18next";
+import useRemesaDetail from "./details/RemesaDetail.tsx";
 
 const commonStyle = {p: 0.5, display: 'flex', alignItems: 'center', borderRadius: '5px', width: 'max-content'}
 export const EstatMessage = (props:any) => {
@@ -111,12 +112,14 @@ const columns = [
 ]
 
 const RemesaGrid = (props:any) => {
-
     const { id, onRowCountChange } = props;
     const { t } = useTranslation()
+
     const apiRef = useMuiDataGridApiRef()
     const refresh = () => { apiRef?.current?.refresh?.(); }
+
     const {actions, components} = useRemesaActions(refresh);
+    const {handleOpen, dialog} = useRemesaDetail();
 
     return <>
         <StyledMuiGrid
@@ -132,11 +135,13 @@ const RemesaGrid = (props:any) => {
             onRowCountChange={onRowCountChange}
             disableColumnSorting
             toolbarHideCreate
+            onRowClick={(params: any) => handleOpen(params?.row?.id, params?.row) }
             popupEditFormI18nKeys={{
                 updateSuccess: 'page.notificacio.action.update.ok',
             }}
         />
         {components}
+        {dialog}
     </>
 }
 export default RemesaGrid;

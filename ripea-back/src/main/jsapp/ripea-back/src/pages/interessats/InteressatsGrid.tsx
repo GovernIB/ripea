@@ -13,6 +13,7 @@ import useImport from "./actions/Import.tsx";
 import {useActions as useExpedientActions} from "../expedient/details/CommonActions.tsx"
 import StyledMuiFilter from "../../components/StyledMuiFilter.tsx";
 import {useSession} from "../../components/SessionStorageContext.tsx";
+import useInteressatDetail from "./details/InteressatDetail.tsx";
 
 const InteressatsGridFormFilter = () => {
     const {data} = useFormContext()
@@ -166,6 +167,7 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
     const {exportar} = useActions(refresh);
     const {excelInteressats} = useExpedientActions(refresh);
     const {handleShow: handleImport, content: contentImport} = useImport(entity, refresh);
+    const {handleOpen, dialog} = useInteressatDetail();
 
     return <>
         <StyledMuiGrid
@@ -225,12 +227,13 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
                     />,
                 },
             ]}
+            onRowClick={(params: any) => handleOpen(params?.row?.id, params?.row) }
             popupEditFormI18nKeys={{
                 createSuccess: 'page.interessat.action.new.ok',
                 updateSuccess: 'page.interessat.action.update.ok',
             }}
         />
-
+        {dialog}
         {contentImport}
         {components}
     </>

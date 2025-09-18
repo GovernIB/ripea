@@ -5,6 +5,7 @@ import Load from "../../../components/Load.tsx";
 import Iframe from "../../../components/Iframe.tsx";
 import {Firmes} from "../details/DocumentDetail.tsx";
 import {useToProgramaAntic} from "../../user/UserHeadToolbar.tsx";
+import {useActions} from "../details/ContingutActions.tsx";
 
 const Visualitzar = (props: any) => {
     const {entity} = props;
@@ -25,6 +26,8 @@ const useVisualitzar = () => {
         getOne: apiGetOne,
     } = useResourceApiService('documentResource');
     const {temporalMessageShow} = useBaseAppContext();
+
+    const {apiDownload} = useActions()
 
     const [open, setOpen] = useState(false);
     const [entity, setEntity] = useState<any>();
@@ -48,23 +51,39 @@ const useVisualitzar = () => {
         }
     };
 
+    let buttons :any[] = [
+        {
+            value: 'download',
+            text: t('common.download'),
+            icon: 'download',
+            hidden: entity?.documentTipus == 'FISIC'
+        },
+        {
+            value: 'descarregarImprimible',
+            text: t('page.document.action.descarregarImprimible.label'),
+            icon: 'download',
+            hidden: entity?.estat != 'CUSTODIAT'
+        },
+    ]
+        .filter((button:any)=>!button?.hidden)
+
     const dialog =
         <MuiDialog
             open={open}
             closeCallback={handleClose}
-            title={t('page.document.action.view.title')}
+            title={entity?.nom}
             componentProps={{fullWidth: true, maxWidth: 'md'}}
-            buttons={[
-                {
-                    value: 'close',
-                    text: t('common.close'),
-                    componentProps: { variant: 'outlined' }
-                },
-            ]}
-            buttonCallback={(value: any): void => {
-                if (value == 'close') {
-                    handleClose();
+            buttons={buttons}
+            buttonCallback={(value :any) :void => {
+                switch (value){
+                    case 'download':
+                        apiDownload(entity?.id, 'adjunt', t('page.expedient.results.actionOk'))
+                        break;
+                    case 'descarregarImprimible':
+                        apiDownload(entity?.id, 'imprimible', t('page.document.action.imprimible.ok'))
+                        break;
                 }
+                handleClose();
             }}
         >
             <Visualitzar entity={entity}/>
