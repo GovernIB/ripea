@@ -250,7 +250,12 @@ public interface AplicacioService {
 	@PreAuthorize("hasRole('IPA_SUPER')")
 	public Long updateUsuariCodi(String codiAntic, String codiNou);
 	
-	@PermitAll public MeterRegistry getMeterRegistry();
-	@PermitAll public void stopTimer(Timer.Sample sample, String metricCode, String... tags);
-	@PermitAll public String getMetriquesJSON() throws Exception;
+	@PermitAll
+	public MeterRegistry getMeterRegistry();
+	
+	@PermitAll
+	public void stopTimer(Timer.Sample sample, String metricCode, String... tags);
+	
+	@PermitAll
+	public String getMetriquesJSON() throws Exception;
 }

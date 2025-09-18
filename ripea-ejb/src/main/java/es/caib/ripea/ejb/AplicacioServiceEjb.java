@@ -321,19 +321,19 @@ public class AplicacioServiceEjb extends AbstractServiceEjb<AplicacioService> im
 	}
 	
 	@Override
-	@RolesAllowed("**")
+	@PermitAll
 	public MeterRegistry getMeterRegistry() {
 		return delegateService.getMeterRegistry();
 	}
 	
 	@Override
-	@RolesAllowed("**")
+	@PermitAll
 	public String getMetriquesJSON() throws Exception {
 		return delegateService.getMetriquesJSON();
 	}
 	
 	@Override
-	@RolesAllowed("**")
+	@PermitAll
 	public void stopTimer(Timer.Sample sample, String metricCode, String... tags) {
 		delegateService.stopTimer(sample, metricCode, tags);				
 	}

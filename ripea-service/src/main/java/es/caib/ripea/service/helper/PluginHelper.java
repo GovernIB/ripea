@@ -292,7 +292,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.dadesUsuari", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dadesUsuari", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			return rolsDisponibles;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de dades d'usuari";
@@ -305,7 +305,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.dadesUsuari", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");	
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dadesUsuari", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");	
 			throw new SistemaExternException(IntegracioHelper.INTCODI_USUARIS, errorDescripcio, ex);
 		}
 	}
@@ -329,7 +329,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.dadesUsuari", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dadesUsuari", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			return dadesUsuari;
 		} catch (SistemaExternNoTrobatException snte) {
 			String errorDescripcio = "No s'ha trobat cap usuari al sistema extern";
@@ -354,7 +354,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.dadesUsuari", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dadesUsuari", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_USUARIS, errorDescripcio, ex);
 		}
 	}
@@ -379,7 +379,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.dadesUsuari", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dadesUsuari", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			return dadesUsuari;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de dades d'usuari";
@@ -392,7 +392,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.dadesUsuari", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dadesUsuari", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_USUARIS, errorDescripcio, ex);
 		}
 	}
@@ -416,7 +416,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.dadesUsuari", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dadesUsuari", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			return dadesUsuari;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de dades d'usuari";
@@ -429,7 +429,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.dadesUsuari", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dadesUsuari", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_USUARIS, errorDescripcio, ex);
 		}
 	}
@@ -454,7 +454,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			return organigrama;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al obtenir l'organigrama per entitat";
@@ -467,7 +467,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_UNITATS, errorDescripcio, ex);
 		}
 	}
@@ -508,7 +508,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_UNITATS, errorDescripcio, ex);
 		}
 
@@ -526,7 +526,7 @@ public class PluginHelper {
 						System.currentTimeMillis() - t0,
 						errorMissatge,
 						null);
-				applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+				applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 				throw new SistemaExternException(IntegracioHelper.INTCODI_UNITATS, errorMissatge);
 			}
 		}
@@ -538,7 +538,7 @@ public class PluginHelper {
 				accioParams,
 				IntegracioAccioTipusEnumDto.ENVIAMENT,
 				System.currentTimeMillis() - t0);
-		applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+		applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 		return unitatsOrganitzatives;
 	}
 
@@ -607,7 +607,7 @@ public class PluginHelper {
 						accioParams,
 						IntegracioAccioTipusEnumDto.ENVIAMENT,
 						System.currentTimeMillis() - t0);
-				applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+				applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 				return resposta;
 			} else {
 				String errorMissatge = "No s'ha trobat la unitat organitzativa arrel (codi=" + pareCodi + ")";
@@ -620,7 +620,7 @@ public class PluginHelper {
 						System.currentTimeMillis() - t0,
 						errorMissatge,
 						null);
-				applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+				applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 				throw new SistemaExternException(IntegracioHelper.INTCODI_UNITATS, errorMissatge);
 			}
 		} catch (Exception ex) {
@@ -634,7 +634,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_UNITATS, errorDescripcio, ex);
 		}
 	}
@@ -662,7 +662,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			return unitatOrganitzativa;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin d'unitats organitzatives";
@@ -675,7 +675,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_UNITATS, errorDescripcio, ex);
 		}
 	}
@@ -725,7 +725,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			return unitatsOrganitzatives;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al realitzar la cerca de unitats organitzatives";
@@ -738,7 +738,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_UNITATS, errorDescripcio, ex);
 		}
 	}
@@ -841,7 +841,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
 			integracioHelper.addAccioError(
@@ -853,7 +853,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, errorDescripcio, ex);
 		}
 	}
@@ -900,7 +900,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
 			integracioHelper.addAccioError(
@@ -912,7 +912,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, errorDescripcio, ex);
 		}
 	}
@@ -938,7 +938,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			return arxiuExpedient;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
@@ -951,7 +951,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, errorDescripcio, ex);
 		}
 	}
@@ -986,7 +986,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			return arxiuExpedient;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
@@ -999,7 +999,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, errorDescripcio, ex);
 		}
 	}
@@ -1037,7 +1037,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
 			integracioHelper.addAccioError(
@@ -1049,7 +1049,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, errorDescripcio, ex);
 		}
 	}
@@ -1075,7 +1075,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
 			integracioHelper.addAccioError(
@@ -1087,7 +1087,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, errorDescripcio, ex);
 		}
 	}
@@ -1127,7 +1127,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
 			integracioHelper.addAccioError(
@@ -1139,7 +1139,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, errorDescripcio, ex);
 		}
 	}
@@ -1176,7 +1176,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
 			integracioHelper.addAccioError(
@@ -1188,7 +1188,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, errorDescripcio, ex);
 		}
 	}
@@ -1220,7 +1220,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			return exportacio;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
@@ -1233,7 +1233,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, errorDescripcio, ex);
 		}
 	}
@@ -1275,7 +1275,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
 			integracioHelper.addAccioError(
@@ -1287,7 +1287,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, errorDescripcio, ex);
 		}
 	}
@@ -1314,7 +1314,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
 			integracioHelper.addAccioError(
@@ -1326,7 +1326,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0, 
 					errorDescripcio, 
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, errorDescripcio, ex);
 		}
 	}
@@ -1493,7 +1493,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.RECEPCIO,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			return expedient.getIdentificador();
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al crear contenidor per als documents annexos de Distribució";
@@ -1506,7 +1506,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, errorDescripcio, ex);
 		}
 	}
@@ -1588,7 +1588,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0);
 
 			uuidDocument = document.getIdentificador();
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			logger.debug("Annex Distribució creat:" + uuidDocument);
 			return uuidDocument;
 			
@@ -1603,7 +1603,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, errorDescripcio, ex);
 		}
 	}
@@ -1674,7 +1674,7 @@ public class PluginHelper {
 				integracioAccio.getParametres(),
 				IntegracioAccioTipusEnumDto.ENVIAMENT,
 				System.currentTimeMillis() - integracioAccio.getTempsInici());
-		applicationHelper.stopTimer(sample, "METRICS@Integracions.dadesUsuari", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+		applicationHelper.stopTimer(sample, "METRICS@Integracions.dadesUsuari", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 	}
 
 	private SistemaExternException arxiuEnviamentError(
@@ -1692,7 +1692,7 @@ public class PluginHelper {
 				System.currentTimeMillis() - integracioAccio.getTempsInici(),
 				errorDescripcio,
 				ex);
-		applicationHelper.stopTimer(sample, "METRICS@Integracions.dadesUsuari", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+		applicationHelper.stopTimer(sample, "METRICS@Integracions.dadesUsuari", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 		return new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, errorDescripcio, ex);
 	}
 
@@ -2084,7 +2084,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			return documentDetalls;
 		} catch (Exception ex) {
 			String msg = "";
@@ -2104,7 +2104,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, errorDescripcio, ex);
 		}
 	}
@@ -2159,7 +2159,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
 			integracioHelper.addAccioError(
@@ -2171,7 +2171,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, errorDescripcio, ex);
 		}
 	}
@@ -2234,7 +2234,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			return versions;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
@@ -2247,7 +2247,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, errorDescripcio, ex);
 		}
 	}
@@ -2281,7 +2281,7 @@ public class PluginHelper {
 					null,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			return tipusDocumentalsDto;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
@@ -2294,7 +2294,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, errorDescripcio, ex);
 		}
 	}
@@ -2321,7 +2321,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			return docCopiat;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
@@ -2334,7 +2334,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, errorDescripcio, ex);
 		}
 	}
@@ -2373,7 +2373,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			return nouContingut;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
@@ -2386,7 +2386,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, errorDescripcio, ex);
 		}
 	}
@@ -2475,7 +2475,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			if (nouDocumentArxiu != null) {
 				return nouDocumentArxiu.getIdentificador();
 			} else {
@@ -2492,7 +2492,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, errorDescripcio, ex);
 		}
 	}
@@ -2526,7 +2526,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			return exportacio;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
@@ -2539,7 +2539,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, errorDescripcio, ex);
 		}
 	}
@@ -2570,7 +2570,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			return fitxer;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
@@ -2583,7 +2583,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, errorDescripcio, ex);
 		}
 	}
@@ -2645,7 +2645,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
 			integracioHelper.addAccioError(
@@ -2657,7 +2657,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, errorDescripcio, ex);
 		}
 	}
@@ -2691,7 +2691,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			return carpetaDetalls;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
@@ -2704,7 +2704,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, errorDescripcio, ex);
 		}
 	}
@@ -2728,7 +2728,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			return arxiuCarpeta;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
@@ -2741,7 +2741,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, errorDescripcio, ex);
 		}
 	}
@@ -2775,7 +2775,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
 			integracioHelper.addAccioError(
@@ -2787,7 +2787,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, errorDescripcio, ex);
 		}
 	}
@@ -2816,7 +2816,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			return carpetaCopiada;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
@@ -2829,7 +2829,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, errorDescripcio, ex);
 		}
 	}
@@ -2865,7 +2865,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
 			integracioHelper.addAccioError(
@@ -2877,7 +2877,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, errorDescripcio, ex);
 		}
 	}
@@ -2921,7 +2921,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			return contingutArxiu;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
@@ -2934,7 +2934,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, errorDescripcio, ex);
 		}
 	}
@@ -2984,7 +2984,7 @@ public class PluginHelper {
 						accioParams,
 						IntegracioAccioTipusEnumDto.ENVIAMENT,
 						System.currentTimeMillis() - t0);
-				applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");				
+				applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");				
 				return document;
 			}
 			return document;
@@ -2999,7 +2999,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, errorDescripcio, ex);
 		}
 	}
@@ -3121,7 +3121,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmes", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmes", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			return portafirmesEnviamentId;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de portafirmes";
@@ -3134,7 +3134,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmes", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmes", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_PFIRMA, errorDescripcio, ex);
 		}
 	}
@@ -3165,7 +3165,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmes", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmes", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			return portafirmesDocument;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al descarregar el document firmat";
@@ -3178,7 +3178,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmes", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmes", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_PFIRMA, errorDescripcio, ex);
 		}
 	}
@@ -3208,7 +3208,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmes", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmes", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de portafirmes";
 			integracioHelper.addAccioError(
@@ -3220,7 +3220,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmes", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmes", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_PFIRMA, errorDescripcio, ex);
 		}
 	}
@@ -3242,7 +3242,7 @@ public class PluginHelper {
 					null,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmes", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmes", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			if (tipus != null) {
 				List<PortafirmesDocumentTipusDto> resposta = new ArrayList<PortafirmesDocumentTipusDto>();
 				for (PortafirmesDocumentTipus t : tipus) {
@@ -3267,7 +3267,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmes", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmes", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_PFIRMA, errorDescripcio, ex);
 		}
 	}
@@ -3312,7 +3312,7 @@ public class PluginHelper {
 					null,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmesFlux", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmesFlux", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			return transaccioResponseDto;
 		} catch (Exception ex) {
 			String errorDescripcio = ex.getMessage();
@@ -3325,7 +3325,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmesFlux", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmesFlux", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_PFIRMA, errorDescripcio, ex);
 		}
 	}
@@ -3357,7 +3357,7 @@ public class PluginHelper {
 					null,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmesFlux", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmesFlux", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			return respostaDto;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de portafirmes";
@@ -3370,7 +3370,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmesFlux", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmesFlux", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_PFIRMA, errorDescripcio, ex);
 		}
 	}
@@ -3404,7 +3404,7 @@ public class PluginHelper {
 					null,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmes", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmes", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			return carrecsDto;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de portafirmes";
@@ -3417,7 +3417,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmes", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmes", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_PFIRMA, errorDescripcio, ex);
 		}
 	}
@@ -3463,7 +3463,7 @@ public class PluginHelper {
 					null,
 					IntegracioAccioTipusEnumDto.RECEPCIO,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmes", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmes", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			return carrecDto;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de portafirmes";
@@ -3476,7 +3476,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmes", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmes", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_PFIRMA, errorDescripcio, ex);
 		}
 	}
@@ -3498,7 +3498,7 @@ public class PluginHelper {
 					null,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmesFlux", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmesFlux", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de portafirmes";
 			integracioHelper.addAccioError(
@@ -3510,7 +3510,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmesFlux", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmesFlux", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_PFIRMA, errorDescripcio, ex);
 		}
 	}
@@ -3555,7 +3555,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.digitalitzacio", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.digitalitzacio", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			return perfilsDto;
 		} catch (Exception ex) {
 			integracioHelper.addAccioError(
@@ -3567,7 +3567,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					"Error al accedir al plugin de digitalitzacio",
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.digitalitzacio", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.digitalitzacio", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_DIGITALITZACIO,
 					"Error al accedir al plugin de digitalitzacio", ex);
 		}
@@ -3622,7 +3622,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.digitalitzacio", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.digitalitzacio", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 		} catch (Exception ex) {
 			integracioHelper.addAccioError(
 					IntegracioHelper.INTCODI_DIGITALITZACIO,
@@ -3633,7 +3633,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					"Error al accedir al plugin de digitalitzacio",
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.digitalitzacio", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.digitalitzacio", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_DIGITALITZACIO,
 					"Error al accedir al plugin de digitalitzacio", ex);
 		}
@@ -3696,7 +3696,7 @@ public class PluginHelper {
 						accioParams,
 						IntegracioAccioTipusEnumDto.ENVIAMENT,
 						System.currentTimeMillis() - t0);
-				applicationHelper.stopTimer(sample, "METRICS@Integracions.digitalitzacio", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+				applicationHelper.stopTimer(sample, "METRICS@Integracions.digitalitzacio", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			}
 		} catch (Exception ex) {
 			integracioHelper.addAccioError(
@@ -3708,7 +3708,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					"Error al accedir al plugin de digitalitzacio",
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.digitalitzacio", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.digitalitzacio", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_DIGITALITZACIO,
 					"Error al accedir al plugin de digitalitzacio", ex);
 
@@ -3733,7 +3733,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.digitalitzacio", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.digitalitzacio", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 		} catch (Exception ex) {
 			integracioHelper.addAccioError(
 					IntegracioHelper.INTCODI_DIGITALITZACIO,
@@ -3744,7 +3744,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					"Error al accedir al plugin de digitalitzacio",
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.digitalitzacio", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.digitalitzacio", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_DIGITALITZACIO,
 					"Error al accedir al plugin de digitalitzacio", ex);
 		}
@@ -3814,7 +3814,7 @@ public class PluginHelper {
 					null,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmesFlux", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmesFlux", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de portafirmes";
 			integracioHelper.addAccioError(
@@ -3826,7 +3826,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmesFlux", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmesFlux", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_PFIRMA, errorDescripcio, ex);
 		}
 		return respostaDto;
@@ -3856,7 +3856,7 @@ public class PluginHelper {
 					null,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmesFlux", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");			
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmesFlux", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");			
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de portafirmes";
 			integracioHelper.addAccioError(
@@ -3868,7 +3868,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmesFlux", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmesFlux", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_PFIRMA, errorDescripcio, ex);
 		}
 		return resposta;
@@ -3954,7 +3954,7 @@ public class PluginHelper {
 					null,
 					IntegracioAccioTipusEnumDto.RECEPCIO,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmesFlux", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmesFlux", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de portafirmes";
 			integracioHelper.addAccioError(
@@ -3966,7 +3966,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmesFlux", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");	
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmesFlux", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");	
 			throw new SistemaExternException(IntegracioHelper.INTCODI_PFIRMA, errorDescripcio, ex);
 		}
 		return respostesDto;
@@ -3991,7 +3991,7 @@ public class PluginHelper {
 					null,
 					IntegracioAccioTipusEnumDto.RECEPCIO,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmesFlux", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmesFlux", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de portafirmes";
 			integracioHelper.addAccioError(
@@ -4003,7 +4003,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmesFlux", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmesFlux", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_PFIRMA, errorDescripcio, ex);
 		}
 		return esborrat;
@@ -4027,7 +4027,7 @@ public class PluginHelper {
 					null,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmesFlux", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");			
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmesFlux", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");			
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de portafirmes";
 			integracioHelper.addAccioError(
@@ -4039,7 +4039,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmesFlux", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmesFlux", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_PFIRMA, errorDescripcio, ex);
 		}
 		return resposta;
@@ -4080,7 +4080,7 @@ public class PluginHelper {
 			resposta.setNom(convertit.getArxiuNom());
 			resposta.setContingut(convertit.getArxiuContingut());
 			resposta.setContentType("application/pdf");
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.conversio", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.conversio", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			return resposta;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de conversió de documents: " + ex.getMessage();
@@ -4093,7 +4093,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.conversio", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.conversio", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_CONVERT, errorDescripcio, ex);
 		}
 	}
@@ -4119,7 +4119,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.rolsac", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.rolsac", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			return procediment;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al consultar el procediment per codi SIA: " + ex.getMessage();
@@ -4132,7 +4132,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.rolsac", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.rolsac", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_PROCEDIMENT, errorDescripcio, ex);
 		}
 	}
@@ -4153,7 +4153,7 @@ public class PluginHelper {
 					null,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			return paisos;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de dades externes";
@@ -4166,7 +4166,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_DADESEXT, errorDescripcio, ex);
 		}
 	}
@@ -4189,7 +4189,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			if (paisos!=null) {
 				for (Pais pais: paisos) {
 					if (pais.getCodi().equals(codiPais)) {
@@ -4209,7 +4209,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_DADESEXT, errorDescripcio, ex);
 		}
 	}
@@ -4230,7 +4230,7 @@ public class PluginHelper {
 					null,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			return comunitats;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de dades externes";
@@ -4243,7 +4243,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_DADESEXT, errorDescripcio, ex);
 		}
 	}
@@ -4264,7 +4264,7 @@ public class PluginHelper {
 					null,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			return provincies;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de dades externes";
@@ -4277,7 +4277,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_DADESEXT, errorDescripcio, ex);
 		}
 	}
@@ -4300,7 +4300,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			if (provincies!=null) {
 				for (Provincia prov: provincies) {
 					if (prov.getCodi().equals(provinciaCodi)) {
@@ -4320,7 +4320,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_DADESEXT, errorDescripcio, ex);
 		}
 	}
@@ -4344,7 +4344,7 @@ public class PluginHelper {
 					null,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			return provincies;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de dades externes";
@@ -4357,7 +4357,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_DADESEXT, errorDescripcio, ex);
 		}
 	}
@@ -4380,7 +4380,7 @@ public class PluginHelper {
 					null,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			return municipis;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de dades externes";
@@ -4393,7 +4393,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_DADESEXT, errorDescripcio, ex);
 		}
 	}
@@ -4417,7 +4417,7 @@ public class PluginHelper {
 					null,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			if (municipis!=null) {
 				for (Municipi muni: municipis) {
 					if (muni.getCodi().equals(municipiCodi)) {
@@ -4437,7 +4437,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_DADESEXT, errorDescripcio, ex);
 		}
 	}
@@ -4460,7 +4460,7 @@ public class PluginHelper {
 					null,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			return municipis;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de dades externes PINBAL";
@@ -4473,7 +4473,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_DADESEXT, errorDescripcio, ex);
 		}
 	}
@@ -4498,7 +4498,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.RECEPCIO,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			return nivellAdministracio;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de dades externes";
@@ -4511,7 +4511,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_DADESEXT, errorDescripcio, ex);
 		}
 	}
@@ -4535,7 +4535,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.RECEPCIO,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			return tipusVies;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de dades externes";
@@ -4548,7 +4548,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_DADESEXT, errorDescripcio, ex);
 		}
 	}
@@ -4893,7 +4893,7 @@ public class PluginHelper {
 								accioParams,
 								IntegracioAccioTipusEnumDto.ENVIAMENT,
 								System.currentTimeMillis() - t0);
-						applicationHelper.stopTimer(sample, "METRICS@Integracions.notib", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+						applicationHelper.stopTimer(sample, "METRICS@Integracions.notib", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 					} catch (Exception ex) {
 						String errorDescripcio = "Error en el plugin de notificacions: "+ex.getMessage();
 						integracioHelper.addAccioError(
@@ -4905,7 +4905,7 @@ public class PluginHelper {
 								System.currentTimeMillis() - t0,
 								errorDescripcio,
 								ex);
-						applicationHelper.stopTimer(sample, "METRICS@Integracions.notib", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+						applicationHelper.stopTimer(sample, "METRICS@Integracions.notib", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 						throw new SistemaExternException(IntegracioHelper.INTCODI_NOTIFICACIO, errorDescripcio, ex);
 					}
 				}
@@ -5088,7 +5088,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.notib", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.notib", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			return respostaEnviar;
 
 		} catch (Exception ex) {
@@ -5102,7 +5102,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.notib", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.notib", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_NOTIFICACIO, errorDescripcio, ex);
 		}
 	}
@@ -5130,7 +5130,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.RECEPCIO,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.notib", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");			
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.notib", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");			
 			return certificacio;
 		} catch (Exception e) {
 			integracioHelper.addAccioError(
@@ -5142,7 +5142,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					"Error al accedir al plugin de notificacions",
 					e);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.notib", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");			
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.notib", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");			
 			throw new RuntimeException(e);
 		}
 
@@ -5165,7 +5165,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.RECEPCIO,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.notib", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.notib", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			return resultat;
 		} catch (Exception e) {
 			integracioHelper.addAccioError(
@@ -5177,7 +5177,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					"Error al accedir al plugin de notificacions",
 					e);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.notib", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.notib", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new RuntimeException(e);
 		}
 	}
@@ -5285,7 +5285,7 @@ public class PluginHelper {
 						accioParams,
 						IntegracioAccioTipusEnumDto.RECEPCIO,
 						System.currentTimeMillis() - t0);
-				applicationHelper.stopTimer(sample, "METRICS@Integracions.notib", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+				applicationHelper.stopTimer(sample, "METRICS@Integracions.notib", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			}
 
 			return resposta;
@@ -5300,7 +5300,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					"Error al accedir al plugin de notificacions",
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.notib", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.notib", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_NOTIFICACIO,"Error al accedir al plugin de notificacions", ex);
 		}
 	}
@@ -5599,7 +5599,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.firmaServidor", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.firmaServidor", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			return firma;
 
 		} catch (Exception ex) {
@@ -5613,7 +5613,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.firmaServidor", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.firmaServidor", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_FIRMASERV, errorDescripcio, ex);
 		}
 	}
@@ -5711,7 +5711,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.viafirma", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.viafirma", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			
 		} catch (Exception ex) {
 			
@@ -5725,7 +5725,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.viafirma", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.viafirma", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_VIAFIRMA, errorDescripcio, ex);
 		}
 		return viaFirmaResponse.getCodiMissatge();
@@ -5763,7 +5763,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.viafirma", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.viafirma", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			return viaFirmaDocument;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al descarregar el document firmat";
@@ -5778,7 +5778,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.viafirma", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.viafirma", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_VIAFIRMA, errorDescripcio, ex);
 		}
 	}
@@ -5806,7 +5806,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.RECEPCIO,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.viafirma", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.viafirma", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de viaFirma";
 			integracioHelper.addAccioError(
@@ -5818,7 +5818,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.viafirma", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.viafirma", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_VIAFIRMA, errorDescripcio, ex);
 		}
 		return viaFirmaDispositiusDto;
@@ -5858,7 +5858,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.firmaSimpleWeb", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.firmaSimpleWeb", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			return resultat;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al iniciar la firma simple.";
@@ -5871,7 +5871,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.firmaSimpleWeb", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.firmaSimpleWeb", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_FIRMASIMPLE, errorDescripcio, ex);
 		}
 	}
@@ -5895,7 +5895,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.firmaSimpleWeb", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.firmaSimpleWeb", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			return resultat;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al finalitzar la firma simple.";
@@ -5908,7 +5908,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.firmaSimpleWeb", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.firmaSimpleWeb", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_FIRMASIMPLE, errorDescripcio, ex);
 		}
 	}
@@ -5934,7 +5934,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.distribucio", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.distribucio", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			return resultat;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al consulta les dades d'una anotació.";
@@ -5947,7 +5947,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.distribucio", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.distribucio", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_DISTRIBUCIO, errorDescripcio, ex);
 		}
 	}
@@ -5974,7 +5974,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.distribucio", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.distribucio", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al canviar estat d'una anotació.";
 			integracioHelper.addAccioError(
@@ -5986,7 +5986,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.distribucio", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/A");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.distribucio", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_DISTRIBUCIO, errorDescripcio, ex);
 		}
 	}

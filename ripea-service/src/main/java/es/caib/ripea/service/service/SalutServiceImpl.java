@@ -1,11 +1,8 @@
 package es.caib.ripea.service.service;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.InputStream;
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -57,7 +54,6 @@ public class SalutServiceImpl implements SalutService{
 	private final EntitatRepository entitatRepository;
 	private final MeterRegistry meterRegistry;
 	private final JdbcTemplate jdbcTemplate;
-	private final PluginHelper pluginHelper;
 	
 	//Guardam les dades del enviament anterior, d'aquesta manera podrem calcular la diferencia
 	private static List<MetriquesRipeaInfoDto> dadesSalutRipea = new ArrayList<MetriquesRipeaInfoDto>();
@@ -103,25 +99,26 @@ public class SalutServiceImpl implements SalutService{
 		return totalsError; //Si NO hi havia dades anteriors, retornam les que tenim
 	}
 	
-	public static int getDadesIntegracioTempsMitgPeriodeByCodiAndEndpoint(String codi, String endpoint, long tempsMitgTotal) {
+	public static int getDadesIntegracioTempsMitgPeriodeByCodiAndEndpoint(String codi, String endpoint, long tempsMitgTotal, long peticionsOkTotals) {
 		MetriquesRipeaInfoDto integracioPeticions = getDadesIntegracioRipeaByCodiAndEndpoint(codi, endpoint);
-		if (integracioPeticions != null) {
-			long resultat = tempsMitgTotal-integracioPeticions.getTempsMitg();
-			return (int) (resultat>0?resultat:0); //Si hi havia dades anteriors, retornam la resta (les del periode)
+		if (integracioPeticions != null && integracioPeticions.getPeticionsOk()>0) {
+			return getPromitgPonderatInvers(tempsMitgTotal, peticionsOkTotals, integracioPeticions.getTempsMitg(), integracioPeticions.getPeticionsOk());
 		}
 		return (int) tempsMitgTotal; //Si NO hi havia dades anteriors, retornam les que tenim
 	}
 	
-	public static void actualizarDadesSalutRipeaByCodi(String codi, long totalsOk, long totalsError) {
+	public static void actualizarDadesSalutRipeaByCodi(String codi, long totalsOk, long totalsError, int tempsPromitg) {
         MetriquesRipeaInfoDto dto = getDadesSalutRipeaByCodi(codi);
         if (dto != null) {
             dto.setPeticionsOk(totalsOk);
             dto.setPeticionsError(totalsError);
+            dto.setTempsMitg(tempsPromitg);
         } else {
         	MetriquesRipeaInfoDto nou = new MetriquesRipeaInfoDto();
         	nou.setCodi(codi);
         	nou.setPeticionsOk(totalsOk);
         	nou.setPeticionsError(totalsError);
+        	nou.setTempsMitg(tempsPromitg);
             dadesSalutRipea.add(nou);
         }
     }
@@ -144,6 +141,28 @@ public class SalutServiceImpl implements SalutService{
 		} else {
 			return totalsError; //Si NO hi havia dades anteriors, retornam les que tenim
 		}
+	}
+	
+	public static int getDadesTempsPromitgPeriodeByCodi(String codi, int tempsPromitgTotal, long peticionsOkTotals) {
+		MetriquesRipeaInfoDto dto = getDadesSalutRipeaByCodi(codi);
+		if (dto!=null && dto.getTempsMitg()>0) {
+			return getPromitgPonderatInvers(tempsPromitgTotal, peticionsOkTotals, dto.getTempsMitg(), dto.getPeticionsOk());
+		} else {
+			return tempsPromitgTotal; //Si NO hi havia dades anteriors, retornam les que tenim
+		}
+	}
+	
+	/**
+	 * Si 3 peticions, han tardat 3653 ms de mitja, i 5 han tardat 2150 ms.
+	 * ¿Quant han tardar de mitja en executar-se les 2 noves peticions?
+	 */
+	private static int getPromitgPonderatInvers(long tempsPromitgTotal, long peticionsOkTotals, long tempsPromitgAnterior, long peticionsOkAnteriors) {
+		long novesPeticions = peticionsOkTotals-peticionsOkAnteriors;
+		long resultat = 0; //Si no hi ha hagut noves peticions en aquest periode, pero si anteriors, el promitg del periode es zero
+		if (novesPeticions>0) {
+			resultat = (tempsPromitgTotal*peticionsOkTotals)-(tempsPromitgAnterior*peticionsOkAnteriors) / novesPeticions;
+		}
+		return (int) (resultat>0?resultat:0);
 	}
 	
 	// --------------------FI METODES ESTATICS---------------- //
@@ -403,7 +422,8 @@ public class SalutServiceImpl implements SalutService{
         	integracioPeticioEndpoint.setTempsMigUltimPeriode(getDadesIntegracioTempsMitgPeriodeByCodiAndEndpoint(
         			codiIntegracio,
         			entry.getKey(),
-        			entry.getValue().getTempsMitg()));
+        			entry.getValue().getTempsMitg(),
+        			entry.getValue().getPeticionsOk()));
         	
         	//Afegim al mapa de peticions per endpoint, les dades 
         	peticionsPerEntorn.put(entry.getKey(), integracioPeticioEndpoint);
@@ -418,36 +438,51 @@ public class SalutServiceImpl implements SalutService{
     private IntegracioSalut getIntegracioSalutAmbTotals(
     		String codiIntegracio,
     		IntegracioPeticions ip) {
-    	//Cálcul de totals per les dades generals de IntegracioPeticions
-		long integracio_total_exito		= 0;
-		long integracio_total_error		= 0;
-		int  integracio_temps_promitg	= 0;
     	String endpointBase = "";
     	long numUsos = 0;
-    	if (ip.getPeticionsPerEntorn()!=null) {
+    	if (ip.getPeticionsPerEntorn()!=null && ip.getPeticionsPerEntorn().size()>0) {
     		//Sumam els valors totals dels diferents endpoints del codi de integració
 	    	for (Map.Entry<String, IntegracioPeticions> entry : ip.getPeticionsPerEntorn().entrySet()) {
 	    		ip.setTotalOk(ip.getTotalOk()+entry.getValue().getTotalOk());
 	    		ip.setTotalError(ip.getTotalError()+entry.getValue().getTotalError());
-	    		ip.setTotalTempsMig(ip.getTotalTempsMig()+entry.getValue().getTotalTempsMig());
-	    		ip.setPeticionsOkUltimPeriode(ip.getPeticionsOkUltimPeriode()+entry.getValue().getPeticionsOkUltimPeriode());
-	    		ip.setPeticionsErrorUltimPeriode(ip.getPeticionsErrorUltimPeriode()+entry.getValue().getPeticionsErrorUltimPeriode());
-	    		ip.setTempsMigUltimPeriode(ip.getTempsMigUltimPeriode()+entry.getValue().getTempsMigUltimPeriode());
+	    		ip.setTotalTempsMig(ip.getTotalTempsMig()!=null?
+	    				ip.getTotalTempsMig():0
+	    				+entry.getValue().getTotalTempsMig());
+	    		ip.setPeticionsOkUltimPeriode(ip.getPeticionsOkUltimPeriode()!=null?
+	    				ip.getPeticionsOkUltimPeriode():0
+	    				+entry.getValue().getPeticionsOkUltimPeriode());
+	    		ip.setPeticionsErrorUltimPeriode(ip.getPeticionsErrorUltimPeriode()!=null?
+	    				ip.getPeticionsErrorUltimPeriode():0
+	    				+entry.getValue().getPeticionsErrorUltimPeriode());
+	    		ip.setTempsMigUltimPeriode(ip.getTempsMigUltimPeriode()!=null?
+	    				ip.getTempsMigUltimPeriode():0
+	    				+entry.getValue().getTempsMigUltimPeriode());
 	    		//Com a endpoint base per el objecte principal de IntegracioSalut, ens quedam amb el que té mes usos
 	    		if (entry.getValue().getPeticionsOkUltimPeriode()+entry.getValue().getPeticionsErrorUltimPeriode()>numUsos) {
 	    			numUsos = entry.getValue().getPeticionsOkUltimPeriode()+entry.getValue().getPeticionsErrorUltimPeriode();
 	    			endpointBase = ip.getEndpoint();
 	    		}
 	    	}
+	    	
+	    	ip.setEndpoint(endpointBase);
+	    	
+	    	return IntegracioSalut.builder()
+	                .codi(codiIntegracio)
+	                .latencia(ip.getTotalTempsMig()/ip.getPeticionsPerEntorn().size())
+	                .estat(calculaEstat(ip.getTotalOk(), ip.getTotalError()))
+	                .peticions(ip)
+	                .build();
+    	} else {
+    		
+	    	ip.setEndpoint(endpointBase);
+	    	
+	    	return IntegracioSalut.builder()
+	                .codi(codiIntegracio)
+	                .latencia(null)
+	                .estat(EstatSalutEnum.UNKNOWN)
+	                .peticions(ip)
+	                .build();
     	}
-    	ip.setEndpoint(endpointBase);
-    	
-    	return IntegracioSalut.builder()
-                .codi(codiIntegracio)
-                .latencia(ip.getTotalTempsMig()/ip.getPeticionsPerEntorn().size())
-                .estat(calculaEstat(ip.getTotalOk(), ip.getTotalError()))
-                .peticions(ip)
-                .build();
     }
     
     public List<IntegracioSalut> checkIntegracions() {
@@ -544,9 +579,45 @@ public class SalutServiceImpl implements SalutService{
 		return endpoints;
     }
     
+    private SubsistemaSalut getSubsistemaSalut(String codi, String[] codesSubsystemMetrics) {
+		
+    	long subsistema_total_exito = 0;
+		long subsistema_total_error = 0;
+		int tempsPromitgSubsistema	= 0;
+    	
+    	for (String codiMetrica: codesSubsystemMetrics) {
+    		Timer timerExpedientExito = meterRegistry.find(codiMetrica).tags("resultado", "exito").timer();
+    		Timer timerExpedientError = meterRegistry.find(codiMetrica).tags("resultado", "error").timer();
+    		long exitoAux	= timerExpedientExito!=null?timerExpedientExito.count():0;
+    		long errorAux	= timerExpedientError!=null?timerExpedientError.count():0;
+    		int promitgAux	= (int)(timerExpedientExito!=null?timerExpedientExito.mean(TimeUnit.MILLISECONDS):0);
+    		//Afegir als totals
+    		subsistema_total_exito = subsistema_total_exito + exitoAux;
+    		subsistema_total_error = subsistema_total_error + errorAux;
+    		tempsPromitgSubsistema = tempsPromitgSubsistema + promitgAux;
+    	}
+    	
+    	int		tempsPromitgActual = (int) (tempsPromitgSubsistema/subsistema_total_exito);
+    	long	peticionsOkDarrerPeriode = getDadesOkPeriodeByCodi(codi, subsistema_total_exito); 
+    	SubsistemaSalut resultat = SubsistemaSalut.builder()
+                .codi(codi)
+                .totalTempsMig(tempsPromitgActual)
+                .estat(calculaEstat(subsistema_total_exito, subsistema_total_error))
+                .totalOk(subsistema_total_exito)
+                .totalError(subsistema_total_error)
+                .peticionsOkUltimPeriode(peticionsOkDarrerPeriode)
+                .peticionsErrorUltimPeriode(getDadesErrorPeriodeByCodi(codi, subsistema_total_error))
+                .tempsMigUltimPeriode(getDadesTempsPromitgPeriodeByCodi(codi, tempsPromitgActual, subsistema_total_exito))
+                .build();
+		
+		actualizarDadesSalutRipeaByCodi(codi, subsistema_total_exito, subsistema_total_error, tempsPromitgActual);
+		
+		return resultat;
+    }
+    
     public List<SubsistemaSalut> checkSubsistemes() {
     	
-    	String jsonMetrics;
+    	/*String jsonMetrics;
 		try {
 			jsonMetrics = aplicacioService.getMetriquesJSON();
 	        InputStream contingut = new ByteArrayInputStream(jsonMetrics.getBytes(StandardCharsets.UTF_8));
@@ -560,48 +631,19 @@ public class SalutServiceImpl implements SalutService{
 	    	pluginHelper.gestioDocumentalCreate("JSONSS", contingut);
 		} catch (Exception e) {
 			e.printStackTrace();
-		}
+		}*/
     	
     	List<SubsistemaSalut> salutSubsistemes = new ArrayList<SubsistemaSalut>();
     	
     	/**
     	 * T R A M I T A C I O     E X P E D I E N T S
     	 */
-
     	String[] codesEXP = {"METRICS@Subsystem_Expedient.create"
     			, "METRICS@Subsystem_Expedient.list"
     			, "METRICS@Subsystem_Expedient.tasquesUserList"
     			, "METRICS@Subsystem_Expedient.createTasca"
     			, "METRICS@Subsystem_Expedient.canviEstatTasca"};
-    	
-		//TOTALS
-		long subsistema_total_exito = 0;
-		long subsistema_total_error = 0;
-		int tempsPromitgSubsistema	= 0;
-    	
-    	for (String codiMetrica: codesEXP) {
-    		Timer timerExpedientExito = meterRegistry.find(codiMetrica).tags("resultado", "exito").timer();
-    		Timer timerExpedientError = meterRegistry.find(codiMetrica).tags("resultado", "error").timer();
-    		long exitoAux	= timerExpedientExito!=null?timerExpedientExito.count():0;
-    		long errorAux	= timerExpedientError!=null?timerExpedientError.count():0;
-    		int promitgAux	= (int)(timerExpedientExito!=null?timerExpedientExito.mean(TimeUnit.MILLISECONDS):0);
-    		//Afegir als totals
-    		subsistema_total_exito = subsistema_total_exito + exitoAux;
-    		subsistema_total_error = subsistema_total_error + errorAux;
-    		tempsPromitgSubsistema = tempsPromitgSubsistema + promitgAux;
-    	}
-    	
-		salutSubsistemes.add(SubsistemaSalut.builder()
-                .codi("SUB_EXP")
-                .latencia(tempsPromitgSubsistema/codesEXP.length)
-                .estat(calculaEstat(subsistema_total_exito, subsistema_total_error))
-                .totalOk(subsistema_total_exito)
-                .totalError(subsistema_total_error)
-                .peticionsOkUltimPeriode(getDadesOkPeriodeByCodi("SUB_EXP", subsistema_total_exito))
-                .peticionsErrorUltimPeriode(getDadesErrorPeriodeByCodi("SUB_EXP", subsistema_total_error))
-                .build());
-		
-		actualizarDadesSalutRipeaByCodi("SUB_EXP", subsistema_total_exito, subsistema_total_error);
+    	salutSubsistemes.add(getSubsistemaSalut("SUB_EXP", codesEXP));
 		
     	/**
     	 * G E S T I O     P R O C E D I M E N T S
@@ -612,35 +654,7 @@ public class SalutServiceImpl implements SalutService{
     			, "METRICS@Subsystem_Procediment.metaDoc"
     			, "METRICS@Subsystem_Procediment.metaDada"
     			, "METRICS@Subsystem_Procediment.metaTasca"};
-    	
-		//TOTALS
-		subsistema_total_exito = 0;
-		subsistema_total_error = 0;
-		tempsPromitgSubsistema = 0;
-    	
-    	for (String codiMetrica: codesPRC) {
-    		Timer timerExpedientExito = meterRegistry.find(codiMetrica).tags("resultado", "exito").timer();
-    		Timer timerExpedientError = meterRegistry.find(codiMetrica).tags("resultado", "error").timer();
-    		long exitoAux	= timerExpedientExito!=null?timerExpedientExito.count():0;
-    		long errorAux	= timerExpedientError!=null?timerExpedientError.count():0;
-    		int promitgAux	= (int)(timerExpedientExito!=null?timerExpedientExito.mean(TimeUnit.MILLISECONDS):0);
-    		//Afegir als totals
-    		subsistema_total_exito = subsistema_total_exito + exitoAux;
-    		subsistema_total_error = subsistema_total_error + errorAux;
-    		tempsPromitgSubsistema = tempsPromitgSubsistema + promitgAux;
-    	}
- 		
-		salutSubsistemes.add(SubsistemaSalut.builder()
-                .codi("SUB_PRC")
-                .latencia(tempsPromitgSubsistema/codesPRC.length)
-                .estat(calculaEstat(subsistema_total_exito, subsistema_total_error))
-                .totalOk(subsistema_total_exito)
-                .totalError(subsistema_total_error)
-                .peticionsOkUltimPeriode(getDadesOkPeriodeByCodi("SUB_PRC", subsistema_total_exito))
-                .peticionsErrorUltimPeriode(getDadesErrorPeriodeByCodi("SUB_PRC", subsistema_total_error))
-                .build());
-		
-		actualizarDadesSalutRipeaByCodi("SUB_PRC", subsistema_total_exito, subsistema_total_error);
+    	salutSubsistemes.add(getSubsistemaSalut("SUB_PRC", codesPRC));
 
     	/**
     	 * A C C I O N S     M A S S I V E S
@@ -649,147 +663,34 @@ public class SalutServiceImpl implements SalutService{
     			, "METRICS@Subsystem_Background.consultarIGuardarAnotacions"
     			, "METRICS@Subsystem_Background.guardarEnArxiuContingutsPendents"
     			, "METRICS@Subsystem_Background.enviarEmailsAgrupats"};
-    	
-		//TOTALS
-		subsistema_total_exito = 0;
-		subsistema_total_error = 0;
-		tempsPromitgSubsistema = 0;
-    	
-    	for (String codiMetrica: codesMAS) {
-    		Timer timerExpedientExito = meterRegistry.find(codiMetrica).tags("resultado", "exito").timer();
-    		Timer timerExpedientError = meterRegistry.find(codiMetrica).tags("resultado", "error").timer();
-    		long exitoAux	= timerExpedientExito!=null?timerExpedientExito.count():0;
-    		long errorAux	= timerExpedientError!=null?timerExpedientError.count():0;
-    		int promitgAux	= (int)(timerExpedientExito!=null?timerExpedientExito.mean(TimeUnit.MILLISECONDS):0);
-    		//Afegir als totals
-    		subsistema_total_exito = subsistema_total_exito + exitoAux;
-    		subsistema_total_error = subsistema_total_error + errorAux;
-    		tempsPromitgSubsistema = tempsPromitgSubsistema + promitgAux;
-    	}
- 		
-		salutSubsistemes.add(SubsistemaSalut.builder()
-                .codi("SUB_MAS")
-                .latencia(tempsPromitgSubsistema/codesMAS.length)
-                .estat(calculaEstat(subsistema_total_exito, subsistema_total_error))
-                .totalOk(subsistema_total_exito)
-                .totalError(subsistema_total_error)
-                .peticionsOkUltimPeriode(getDadesOkPeriodeByCodi("SUB_MAS", subsistema_total_exito))
-                .peticionsErrorUltimPeriode(getDadesErrorPeriodeByCodi("SUB_MAS", subsistema_total_error))
-                .build());
-		
-		actualizarDadesSalutRipeaByCodi("SUB_MAS", subsistema_total_exito, subsistema_total_error);	
+    	salutSubsistemes.add(getSubsistemaSalut("SUB_MAS", codesMAS));
 		
     	/**
     	 * F I L E     S Y S T E M
     	 */
 		String[] codesFS = {"METRICS@Subsystem_FileSystem.create", "METRICS@Subsystem_FileSystem.get"};
-    	
-		//TOTALS
-		subsistema_total_exito = 0;
-		subsistema_total_error = 0;
-		tempsPromitgSubsistema = 0;
-    	
-    	for (String codiMetrica: codesFS) {
-    		Timer timerExpedientExito = meterRegistry.find(codiMetrica).tags("resultado", "exito").timer();
-    		Timer timerExpedientError = meterRegistry.find(codiMetrica).tags("resultado", "error").timer();
-    		long exitoAux	= timerExpedientExito!=null?timerExpedientExito.count():0;
-    		long errorAux	= timerExpedientError!=null?timerExpedientError.count():0;
-    		int promitgAux	= (int)(timerExpedientExito!=null?timerExpedientExito.mean(TimeUnit.MILLISECONDS):0);
-    		//Afegir als totals
-    		subsistema_total_exito = subsistema_total_exito + exitoAux;
-    		subsistema_total_error = subsistema_total_error + errorAux;
-    		tempsPromitgSubsistema = tempsPromitgSubsistema + promitgAux;
-    	}
- 		
-		salutSubsistemes.add(SubsistemaSalut.builder()
-                .codi("SUB_GDO")
-                .latencia(tempsPromitgSubsistema/codesFS.length)
-                .estat(calculaEstat(subsistema_total_exito, subsistema_total_error))
-                .totalOk(subsistema_total_exito)
-                .totalError(subsistema_total_error)
-                .peticionsOkUltimPeriode(getDadesOkPeriodeByCodi("SUB_GDO", subsistema_total_exito))
-                .peticionsErrorUltimPeriode(getDadesErrorPeriodeByCodi("SUB_GDO", subsistema_total_error))
-                .build());
-		
-		actualizarDadesSalutRipeaByCodi("SUB_GDO", subsistema_total_exito, subsistema_total_error);	
+		salutSubsistemes.add(getSubsistemaSalut("SUB_GDO", codesFS));
 		
     	/**
     	 * C A L L B A C K     D I S T R I B U C I O     (Event controlador)
     	 */
     	
-		String code = "METRICS@Subsystem_Callback_Distribucio.event";
-    	
-		Timer timerSubsistemExito = meterRegistry.find(code).tags("resultado", "exito").timer();
-		Timer timerSubsistemError = meterRegistry.find(code).tags("resultado", "error").timer();
-		
-		subsistema_total_exito = timerSubsistemExito!=null?timerSubsistemExito.count():0;
-		subsistema_total_error = timerSubsistemError!=null?timerSubsistemError.count():0;
-		
-		tempsPromitgSubsistema = (int)(timerSubsistemExito!=null?timerSubsistemExito.mean(TimeUnit.MILLISECONDS):0);
-    	
-		salutSubsistemes.add(SubsistemaSalut.builder()
-                .codi("SUB_CDI")
-                .latencia(tempsPromitgSubsistema)
-                .estat(calculaEstat(subsistema_total_exito, subsistema_total_error))
-                .totalOk(subsistema_total_exito)
-                .totalError(subsistema_total_error)
-                .peticionsOkUltimPeriode(getDadesOkPeriodeByCodi("SUB_CDI", subsistema_total_exito))
-                .peticionsErrorUltimPeriode(getDadesErrorPeriodeByCodi("SUB_CDI", subsistema_total_error))
-                .build());
-		
-		actualizarDadesSalutRipeaByCodi("SUB_CDI", subsistema_total_exito, subsistema_total_error);	
+		String[] codeCDI = {"METRICS@Subsystem_Callback_Distribucio.event"};
+		salutSubsistemes.add(getSubsistemaSalut("SUB_CDI", codeCDI));
 		
     	/**
     	 * C A L L B A C K     N O T I B     (Event controlador)
     	 */
     	
-    	code = "METRICS@Subsystem_Callback_Notib.notificaCanvi";
-    	
-		timerSubsistemExito = meterRegistry.find(code).tags("resultado", "exito").timer();
-		timerSubsistemError = meterRegistry.find(code).tags("resultado", "error").timer();
-		
-		subsistema_total_exito = timerSubsistemExito!=null?timerSubsistemExito.count():0;
-		subsistema_total_error = timerSubsistemError!=null?timerSubsistemError.count():0;
-		
-		tempsPromitgSubsistema = (int)(timerSubsistemExito!=null?timerSubsistemExito.mean(TimeUnit.MILLISECONDS):0);
-    	
-		salutSubsistemes.add(SubsistemaSalut.builder()
-                .codi("SUB_CNB")
-                .latencia(tempsPromitgSubsistema)
-                .estat(calculaEstat(subsistema_total_exito, subsistema_total_error))
-                .totalOk(subsistema_total_exito)
-                .totalError(subsistema_total_error)
-                .peticionsOkUltimPeriode(getDadesOkPeriodeByCodi("SUB_CNB", subsistema_total_exito))
-                .peticionsErrorUltimPeriode(getDadesErrorPeriodeByCodi("SUB_CNB", subsistema_total_error))
-                .build());
-		
-		actualizarDadesSalutRipeaByCodi("SUB_CNB", subsistema_total_exito, subsistema_total_error);
+		String[] codeCNB = {"METRICS@Subsystem_Callback_Notib.notificaCanvi"};
+    	salutSubsistemes.add(getSubsistemaSalut("SUB_CNB", codeCNB));
 		
     	/**
     	 * C A L L B A C K     P O R T A F I B     (Event controlador)
     	 */
     	
-    	code = "METRICS@Subsystem_Callback_Portafib.event";
-    	
-		timerSubsistemExito = meterRegistry.find(code).tags("resultado", "exito").timer();
-		timerSubsistemError = meterRegistry.find(code).tags("resultado", "error").timer();
-		
-		subsistema_total_exito = timerSubsistemExito!=null?timerSubsistemExito.count():0;
-		subsistema_total_error = timerSubsistemError!=null?timerSubsistemError.count():0;
-		
-		tempsPromitgSubsistema = (int)(timerSubsistemExito!=null?timerSubsistemExito.mean(TimeUnit.MILLISECONDS):0);
-    	
-		salutSubsistemes.add(SubsistemaSalut.builder()
-                .codi("SUB_CPF")
-                .latencia(tempsPromitgSubsistema)
-                .estat(calculaEstat(subsistema_total_exito, subsistema_total_error))
-                .totalOk(subsistema_total_exito)
-                .totalError(subsistema_total_error)
-                .peticionsOkUltimPeriode(getDadesOkPeriodeByCodi("SUB_CPF", subsistema_total_exito))
-                .peticionsErrorUltimPeriode(getDadesErrorPeriodeByCodi("SUB_CPF", subsistema_total_error))
-                .build());
-		
-		actualizarDadesSalutRipeaByCodi("SUB_CPF", subsistema_total_exito, subsistema_total_error);	
+    	String[] codeCPF = {"METRICS@Subsystem_Callback_Portafib.event"};
+    	salutSubsistemes.add(getSubsistemaSalut("SUB_CPF", codeCPF));
 		
     	return salutSubsistemes;
     }
