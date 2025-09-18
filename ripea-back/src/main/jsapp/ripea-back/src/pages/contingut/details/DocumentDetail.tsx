@@ -79,18 +79,16 @@ export const Firmes = (props:any) => {
     return <Grid container flexDirection={"column"} columnSpacing={1} rowSpacing={1}>
         {
             entity?.firmes?.map((firma:any, index:number) => {
-                    return firma?.errorFirma
-                        ? <Grid item xs={12} key={index}><Alert severity={"error"}>{firma?.errorDesc}</Alert></Grid>
-                        : <CardData key={index} title={firma?.fitxerNom}>
-                            {firma?.detalls?.map((detall: any, i: number) =>
-                                <Grid item xs={12} key={`${index}-${i}`}>
-                                    <Icon>{icons.firma}</Icon> {detall?.responsableNom} - {detall?.responsableNif} - {formatDate(detall?.data)} - {detall?.emissorCertificat}
-                                </Grid>
-                            )
-                            }
-                        </CardData>
-                }
-            )
+                return firma?.errorFirma
+                    ? <Grid item xs={12} key={index}><Alert severity={"error"}>{firma?.errorDesc}</Alert></Grid>
+                    : <CardData key={index} title={firma?.fitxerNom}>
+                        {firma?.detalls?.map((detall: any, i: number) =>
+                            <Grid item xs={12} key={`${index}-${i}`}>
+                                <Icon>{icons.firma}</Icon> {detall?.responsableNom} - {detall?.responsableNif} - {formatDate(detall?.data)} - {detall?.emissorCertificat}
+                            </Grid>
+                        )}
+                    </CardData>
+            })
         }
     </Grid>
 }

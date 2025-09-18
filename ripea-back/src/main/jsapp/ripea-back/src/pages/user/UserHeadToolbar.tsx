@@ -27,6 +27,12 @@ export const useToProgramaAntic = () => {
 
     const getUrl = useCallback((ref: string) => {
         // console.log("apiUrl", apiUrl, cleanApiUrl)
+        if (cleanApiUrl.endsWith("/") && ref.startsWith("/")) {
+            ref = ref.substring(1);
+        }
+        if (!cleanApiUrl.endsWith("/") && !ref.startsWith("/")) {
+            ref = "/" + ref
+        }
         return `${cleanApiUrl}${ref}`;
     },[]);
 
@@ -75,6 +81,7 @@ const MenuBadge = (props:any) => {
 const UserHeadToolbar = () => {
     const { t } = useTranslation();
     const { value: user } = useUserSession();
+    const { toProgramaAntic } = useToProgramaAntic()
     const location = useLocation();
 
     const isRolActualSupAdmin = user?.rolActual == 'IPA_SUPER';
@@ -94,13 +101,11 @@ const UserHeadToolbar = () => {
                 if (location.pathname.includes('/tasca/')) {
                     const url = location.pathname
                             .replace('/tasca/', '?tascaId=') + '&origenTasques=true';
-                    const baseUrl = window.location.href.split('/reactapp')[0]
-                    window.location.replace(baseUrl + url);
+                    toProgramaAntic(url)
                     return;
                 }
 
-                const url = window.location.href.replace('/reactapp', '');
-                window.location.replace(url);
+                toProgramaAntic(location.pathname)
             },
         }
     ]
