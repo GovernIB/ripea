@@ -36,11 +36,10 @@ import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.AvisDto;
-import es.caib.ripea.service.intf.dto.SalutRipeaInfoDto;
+import es.caib.ripea.service.intf.dto.MetriquesRipeaInfoDto;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.AvisService;
 import es.caib.ripea.service.intf.service.SalutService;
-import es.caib.ripea.service.intf.utils.Utils;
 import io.micrometer.core.instrument.Meter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
@@ -61,11 +60,11 @@ public class SalutServiceImpl implements SalutService{
 	private final PluginHelper pluginHelper;
 	
 	//Guardam les dades del enviament anterior, d'aquesta manera podrem calcular la diferencia
-	private static List<SalutRipeaInfoDto> dadesSalutRipea = new ArrayList<SalutRipeaInfoDto>();
-	private static Map<String, IntegracioPeticions> dadesIntegracionsRipea = new HashMap<String, IntegracioPeticions>();
+	private static List<MetriquesRipeaInfoDto> dadesSalutRipea = new ArrayList<MetriquesRipeaInfoDto>();
+	private static Map<String, Map<String, MetriquesRipeaInfoDto>> dadesIntegracionsEndpointsByIntegracioCodi = new HashMap<String, Map<String, MetriquesRipeaInfoDto>>();
 	
-	public static SalutRipeaInfoDto getDadesSalutRipeaByCodi(String codi) {
-        for (SalutRipeaInfoDto dto : dadesSalutRipea) {
+	public static MetriquesRipeaInfoDto getDadesSalutRipeaByCodi(String codi) {
+        for (MetriquesRipeaInfoDto dto : dadesSalutRipea) {
             if (dto.getCodi().equalsIgnoreCase(codi)) {
                 return dto;
             }
@@ -73,51 +72,53 @@ public class SalutServiceImpl implements SalutService{
         return null;
 	}
 	
-	public static IntegracioPeticions getDadesIntegracioRipeaByCodi(String codi) {
-		if (dadesIntegracionsRipea!=null) {
-			return dadesIntegracionsRipea.get(codi);
+	public static MetriquesRipeaInfoDto getDadesIntegracioRipeaByCodiAndEndpoint(String codi, String endpoint) {
+		if (dadesIntegracionsEndpointsByIntegracioCodi!=null) {
+			Map<String, MetriquesRipeaInfoDto> aux = dadesIntegracionsEndpointsByIntegracioCodi.get(codi);
+			if (aux!=null) return aux.get(endpoint);
 		}
 		return null;
 	}
 	
-	public static void setDadesIntegracionsRipea(String codi, IntegracioPeticions dadesIntegracionsRipeaActualitzades) {
-		if (dadesIntegracionsRipea==null) dadesIntegracionsRipea = new HashMap<String, IntegracioPeticions>();
-        dadesIntegracionsRipea.put(codi, dadesIntegracionsRipeaActualitzades);
+	public static void setDadesIntegracionsRipea(String codi, Map<String, MetriquesRipeaInfoDto> dadesIntegracionsRipeaActualitzades) {
+		if (dadesIntegracionsEndpointsByIntegracioCodi==null) dadesIntegracionsEndpointsByIntegracioCodi = new HashMap<String, Map<String, MetriquesRipeaInfoDto>>();
+        dadesIntegracionsEndpointsByIntegracioCodi.put(codi, dadesIntegracionsRipeaActualitzades);
 	}
 	
 	public static long getDadesIntegracioOkPeriodeByCodiAndEndpoint(String codi, String endpoint, long totalsOk) {
-		IntegracioPeticions integracioPeticions = getDadesIntegracioRipeaByCodi(codi);
+		MetriquesRipeaInfoDto integracioPeticions = getDadesIntegracioRipeaByCodiAndEndpoint(codi, endpoint);
 		if (integracioPeticions != null) {
-			//Trobrar les integracions del endpoint indicat
-			if (integracioPeticions.getPeticionsPerEntorn()!=null) {
-				IntegracioPeticions peticionsEndpoint = integracioPeticions.getPeticionsPerEntorn().get(endpoint);
-				long resultat = totalsOk-peticionsEndpoint.getTotalOk();
-				return resultat>0?resultat:0; //Si hi havia dades anteriors, retornam la resta (les del periode)
-			}
+			long resultat = totalsOk-integracioPeticions.getPeticionsOk();
+			return resultat>0?resultat:0; //Si hi havia dades anteriors, retornam la resta (les del periode)
 		}
 		return totalsOk; //Si NO hi havia dades anteriors, retornam les que tenim
 	}
 	
 	public static long getDadesIntegracioErrorPeriodeByCodiAndEndpoint(String codi, String endpoint, long totalsError) {
-		IntegracioPeticions integracioPeticions = getDadesIntegracioRipeaByCodi(codi);
+		MetriquesRipeaInfoDto integracioPeticions = getDadesIntegracioRipeaByCodiAndEndpoint(codi, endpoint);
 		if (integracioPeticions != null) {
-			//Trobrar les integracions del endpoint indicat
-			if (integracioPeticions.getPeticionsPerEntorn()!=null) {
-				IntegracioPeticions peticionsEndpoint = integracioPeticions.getPeticionsPerEntorn().get(endpoint);
-				long resultat = totalsError-peticionsEndpoint.getTotalError();
-				return resultat>0?resultat:0; //Si hi havia dades anteriors, retornam la resta (les del periode)
-			}
+			long resultat = totalsError-integracioPeticions.getPeticionsError();
+			return resultat>0?resultat:0; //Si hi havia dades anteriors, retornam la resta (les del periode)
 		}
 		return totalsError; //Si NO hi havia dades anteriors, retornam les que tenim
 	}
 	
+	public static int getDadesIntegracioTempsMitgPeriodeByCodiAndEndpoint(String codi, String endpoint, long tempsMitgTotal) {
+		MetriquesRipeaInfoDto integracioPeticions = getDadesIntegracioRipeaByCodiAndEndpoint(codi, endpoint);
+		if (integracioPeticions != null) {
+			long resultat = tempsMitgTotal-integracioPeticions.getTempsMitg();
+			return (int) (resultat>0?resultat:0); //Si hi havia dades anteriors, retornam la resta (les del periode)
+		}
+		return (int) tempsMitgTotal; //Si NO hi havia dades anteriors, retornam les que tenim
+	}
+	
 	public static void actualizarDadesSalutRipeaByCodi(String codi, long totalsOk, long totalsError) {
-        SalutRipeaInfoDto dto = getDadesSalutRipeaByCodi(codi);
+        MetriquesRipeaInfoDto dto = getDadesSalutRipeaByCodi(codi);
         if (dto != null) {
             dto.setPeticionsOk(totalsOk);
             dto.setPeticionsError(totalsError);
         } else {
-        	SalutRipeaInfoDto nou = new SalutRipeaInfoDto();
+        	MetriquesRipeaInfoDto nou = new MetriquesRipeaInfoDto();
         	nou.setCodi(codi);
         	nou.setPeticionsOk(totalsOk);
         	nou.setPeticionsError(totalsError);
@@ -126,7 +127,7 @@ public class SalutServiceImpl implements SalutService{
     }
 	
 	public static long getDadesOkPeriodeByCodi(String codi, long totalsOk) {
-		SalutRipeaInfoDto dto = getDadesSalutRipeaByCodi(codi);
+		MetriquesRipeaInfoDto dto = getDadesSalutRipeaByCodi(codi);
 		if (dto != null) {
 			long resultat = totalsOk-dto.getPeticionsOk();
 			return resultat>0?resultat:0; //Si hi havia dades anteriors, retornam la resta (les del periode)
@@ -136,7 +137,7 @@ public class SalutServiceImpl implements SalutService{
 	}
 	
 	public static long getDadesErrorPeriodeByCodi(String codi, long totalsError) {
-		SalutRipeaInfoDto dto = getDadesSalutRipeaByCodi(codi);
+		MetriquesRipeaInfoDto dto = getDadesSalutRipeaByCodi(codi);
 		if (dto != null) {
 			long resultat = totalsError-dto.getPeticionsError();
 			return resultat>0?resultat:0; //Si hi havia dades anteriors, retornam la resta (les del periode)
@@ -342,19 +343,17 @@ public class SalutServiceImpl implements SalutService{
         return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
     }
     
-    private Map<String, IntegracioPeticions> getPeticionsPerEntorn(IntegracioPeticions ip, String[] codesFS) {
+    private Map<String, IntegracioPeticions> getPeticionsPerEntorn(String codiIntegracio, String[] codesFS) {
     	
 		List<String> endpoints = new ArrayList<String>();
 		Map<String, IntegracioPeticions> peticionsPerEntorn = new HashMap<>();
-    	
+		Map<String, MetriquesRipeaInfoDto> acumulacioMetriquesPerEndpoint = new HashMap<String, MetriquesRipeaInfoDto>();
+		
+		//Recorrem els diferents codis de metrica (per exemple: portafib, firmaServidor i firmaWeb, son de la mateixa integració)
     	for (String codiMetrica: codesFS) {
     		
-    		//Obtenir els diferents endpoints de les metriques
+    		//Obtenir els diferents endpoints de cada metrica de la integració
     		endpoints = getEndpointNames(codiMetrica);
-    		//Inicialitzar contadors per endpoint
-    		long endpoint_total_exito	= 0;
-    		long endpoint_total_error	= 0;
-    		int endpoint_temps_promitg	= 0;
     		
     		for (String endpoint: endpoints) {
     		
@@ -363,40 +362,78 @@ public class SalutServiceImpl implements SalutService{
 	    		long exitoAux	= timerExpedientExito!=null?timerExpedientExito.count():0;
 	    		long errorAux	= timerExpedientError!=null?timerExpedientError.count():0;
 	    		int promitgAux	= (int)(timerExpedientExito!=null?timerExpedientExito.mean(TimeUnit.MILLISECONDS):0);
-	    		//Afegir als totals
-	    		endpoint_total_exito = endpoint_total_exito + exitoAux;
-	    		endpoint_total_error = endpoint_total_error + errorAux;
-	    		endpoint_temps_promitg = endpoint_temps_promitg + promitgAux;
 	        	
-	        	ip.setEndpoint(endpoint);
-	        	ip.setTotalOk(endpoint_total_exito);
-	        	ip.setTotalError(endpoint_total_error);
-	        	ip.setPeticionsOkUltimPeriode(getDadesIntegracioOkPeriodeByCodiAndEndpoint(codiMetrica, endpoint, endpoint_total_exito));
-	        	ip.setPeticionsErrorUltimPeriode(getDadesIntegracioErrorPeriodeByCodiAndEndpoint(codiMetrica, endpoint, endpoint_total_error));
-	        	
-	        	peticionsPerEntorn.put(endpoint, ip);
+	    		MetriquesRipeaInfoDto aux = acumulacioMetriquesPerEndpoint.get(endpoint)!=null
+	    				?acumulacioMetriquesPerEndpoint.get(endpoint)
+	    						:new MetriquesRipeaInfoDto();
+	    		
+	    		aux.setCodi(codiIntegracio);
+	    		aux.setPeticionsError(aux.getPeticionsError()+errorAux);
+	    		aux.setPeticionsOk(aux.getPeticionsOk()+exitoAux);
+	    		//Acumulam promitjos de les peticions de diferents codis de metrica. Despres els haurem de dividir per el nombre total de codis.
+	    		aux.setTempsMitg(aux.getTempsMitg()+promitgAux);
+
+	    		//Anam recollint, per el mateix endpoint, les dades dels diferents codis de metrica que tenim per una integració
+	    		acumulacioMetriquesPerEndpoint.put(endpoint, aux);
     		}
     	}
+    	
+    	//Recorrem la llista de peticions acumulades per endpoint dels diferents codis de metrica per la integració
+    	//Transformam el mapa <String, MetriquesRipeaInfoDto> en el objecte de retorn <String, IntegracioPeticions>
+    	for (Map.Entry<String, MetriquesRipeaInfoDto> entry : acumulacioMetriquesPerEndpoint.entrySet()) {
+    		
+    		IntegracioPeticions integracioPeticioEndpoint = new IntegracioPeticions();
+        	integracioPeticioEndpoint.setEndpoint(entry.getKey());
+        	
+        	//DADES TOTALS DESDE EL INICI DE LA RECOLLIDA DE DADES (REINICI DEL SERVIDOR)
+        	integracioPeticioEndpoint.setTotalOk(entry.getValue().getPeticionsOk()); //Total de Oks fins al moment actual per aquest endpoint
+        	integracioPeticioEndpoint.setTotalError(entry.getValue().getPeticionsError()); //Total de errors fins al moment actual per aquest endpoint
+        	//Promitg acumulat per el endpoint, de les diferents métriques
+        	integracioPeticioEndpoint.setTotalTempsMig(entry.getValue().getTempsMitg()/codesFS.length);
+        	
+        	//DADES PARCIALS = DADES TOTALS - DARRERES DADES ENVIADES (VARIABLES STATIC)
+        	integracioPeticioEndpoint.setPeticionsOkUltimPeriode(getDadesIntegracioOkPeriodeByCodiAndEndpoint(
+        			codiIntegracio,
+        			entry.getKey(),
+        			entry.getValue().getPeticionsOk()));
+        	integracioPeticioEndpoint.setPeticionsErrorUltimPeriode(getDadesIntegracioErrorPeriodeByCodiAndEndpoint(
+        			codiIntegracio,
+        			entry.getKey(),
+        			entry.getValue().getPeticionsError()));
+        	integracioPeticioEndpoint.setTempsMigUltimPeriode(getDadesIntegracioTempsMitgPeriodeByCodiAndEndpoint(
+        			codiIntegracio,
+        			entry.getKey(),
+        			entry.getValue().getTempsMitg()));
+        	
+        	//Afegim al mapa de peticions per endpoint, les dades 
+        	peticionsPerEntorn.put(entry.getKey(), integracioPeticioEndpoint);
+    	}
+    	
+    	//Actualitzam les dades estátiques per la seguent petició
+    	setDadesIntegracionsRipea(codiIntegracio, acumulacioMetriquesPerEndpoint);
+    	
     	return peticionsPerEntorn;
     }
     
     private IntegracioSalut getIntegracioSalutAmbTotals(
     		String codiIntegracio,
-    		IntegracioPeticions ip,
-    		Map<String, IntegracioPeticions> peticionsPerEntorn,
-    		int numCodis) {
+    		IntegracioPeticions ip) {
     	//Cálcul de totals per les dades generals de IntegracioPeticions
 		long integracio_total_exito		= 0;
 		long integracio_total_error		= 0;
 		int  integracio_temps_promitg	= 0;
     	String endpointBase = "";
     	long numUsos = 0;
-    	if (peticionsPerEntorn!=null) {
-	    	for (Map.Entry<String, IntegracioPeticions> entry : peticionsPerEntorn.entrySet()) {
+    	if (ip.getPeticionsPerEntorn()!=null) {
+    		//Sumam els valors totals dels diferents endpoints del codi de integració
+	    	for (Map.Entry<String, IntegracioPeticions> entry : ip.getPeticionsPerEntorn().entrySet()) {
 	    		ip.setTotalOk(ip.getTotalOk()+entry.getValue().getTotalOk());
 	    		ip.setTotalError(ip.getTotalError()+entry.getValue().getTotalError());
+	    		ip.setTotalTempsMig(ip.getTotalTempsMig()+entry.getValue().getTotalTempsMig());
 	    		ip.setPeticionsOkUltimPeriode(ip.getPeticionsOkUltimPeriode()+entry.getValue().getPeticionsOkUltimPeriode());
 	    		ip.setPeticionsErrorUltimPeriode(ip.getPeticionsErrorUltimPeriode()+entry.getValue().getPeticionsErrorUltimPeriode());
+	    		ip.setTempsMigUltimPeriode(ip.getTempsMigUltimPeriode()+entry.getValue().getTempsMigUltimPeriode());
+	    		//Com a endpoint base per el objecte principal de IntegracioSalut, ens quedam amb el que té mes usos
 	    		if (entry.getValue().getPeticionsOkUltimPeriode()+entry.getValue().getPeticionsErrorUltimPeriode()>numUsos) {
 	    			numUsos = entry.getValue().getPeticionsOkUltimPeriode()+entry.getValue().getPeticionsErrorUltimPeriode();
 	    			endpointBase = ip.getEndpoint();
@@ -407,8 +444,8 @@ public class SalutServiceImpl implements SalutService{
     	
     	return IntegracioSalut.builder()
                 .codi(codiIntegracio)
-                .latencia(integracio_temps_promitg/numCodis)
-                .estat(calculaEstat(integracio_total_exito, integracio_total_error))
+                .latencia(ip.getTotalTempsMig()/ip.getPeticionsPerEntorn().size())
+                .estat(calculaEstat(ip.getTotalOk(), ip.getTotalError()))
                 .peticions(ip)
                 .build();
     }
@@ -424,8 +461,8 @@ public class SalutServiceImpl implements SalutService{
     	
 		String[] codesFSUSR = {"METRICS@Integracions.dadesUsuari"};
 		IntegracioPeticions ipUSR = new IntegracioPeticions();
-		Map<String, IntegracioPeticions> peticionsPerEntornUSR = getPeticionsPerEntorn(ipUSR, codesFSUSR); 
-		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.USR.toString(), ipUSR, peticionsPerEntornUSR, codesFSUSR.length));
+		ipUSR.setPeticionsPerEntorn(getPeticionsPerEntorn(IntegracioApp.USR.toString(), codesFSUSR));
+		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.USR.toString(), ipUSR));
 		
 		String[] codesFSPFI = {
 				"METRICS@Integracions.portafirmes",
@@ -433,60 +470,60 @@ public class SalutServiceImpl implements SalutService{
 				"METRICS@Integracions.firmaServidor",
 				"METRICS@Integracions.firmaSimpleWeb"};
 		IntegracioPeticions ipPFI = new IntegracioPeticions();
-		Map<String, IntegracioPeticions> peticionsPerEntornPFI = getPeticionsPerEntorn(ipPFI, codesFSPFI); 
-		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.PFI.toString(), ipPFI, peticionsPerEntornPFI, codesFSPFI.length));
+		ipUSR.setPeticionsPerEntorn(getPeticionsPerEntorn(IntegracioApp.PFI.toString(), codesFSPFI));
+		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.PFI.toString(), ipPFI));
     	
 		String[] codesFSARX = {"METRICS@Integracions.arxiu"};
 		IntegracioPeticions ipARX = new IntegracioPeticions();
-		Map<String, IntegracioPeticions> peticionsPerEntornARX = getPeticionsPerEntorn(ipARX, codesFSARX); 
-		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.ARX.toString(), ipARX, peticionsPerEntornARX, codesFSARX.length));
+		ipUSR.setPeticionsPerEntorn(getPeticionsPerEntorn(IntegracioApp.ARX.toString(), codesFSARX)); 
+		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.ARX.toString(), ipARX));
 		
 		String[] codesFSPBL = {"METRICS@Integracions.pinbal"};
 		IntegracioPeticions ipPBL = new IntegracioPeticions();
-		Map<String, IntegracioPeticions> peticionsPerEntornPBL = getPeticionsPerEntorn(ipPBL, codesFSPBL); 
-		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.PBL.toString(), ipPBL, peticionsPerEntornPBL, codesFSPBL.length));
+		ipUSR.setPeticionsPerEntorn(getPeticionsPerEntorn(IntegracioApp.PBL.toString(), codesFSPBL)); 
+		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.PBL.toString(), ipPBL));
 
 		String[] codesFSDIS = {"METRICS@Integracions.distribucio"};
 		IntegracioPeticions ipDIS = new IntegracioPeticions();
-		Map<String, IntegracioPeticions> peticionsPerEntornDIS = getPeticionsPerEntorn(ipDIS, codesFSDIS); 
-		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.DIS.toString(), ipDIS, peticionsPerEntornDIS, codesFSDIS.length));
+		ipUSR.setPeticionsPerEntorn(getPeticionsPerEntorn(IntegracioApp.DIS.toString(), codesFSDIS)); 
+		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.DIS.toString(), ipDIS));
 		
 		String[] codesFSCDO = {"METRICS@Integracions.conversio"};
 		IntegracioPeticions ipCDO = new IntegracioPeticions();
-		Map<String, IntegracioPeticions> peticionsPerEntornCDO = getPeticionsPerEntorn(ipCDO, codesFSCDO); 
-		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.CDO.toString(), ipCDO, peticionsPerEntornCDO, codesFSCDO.length));
+		ipUSR.setPeticionsPerEntorn(getPeticionsPerEntorn(IntegracioApp.CDO.toString(), codesFSCDO));
+		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.CDO.toString(), ipCDO));
 		
 		String[] codesFSDIR = {"METRICS@Integracions.dir3"}; //getUnitatsOrganitzativesPlugin, getDadesExternesPlugin
 		IntegracioPeticions ipDIR = new IntegracioPeticions();
-		Map<String, IntegracioPeticions> peticionsPerEntornDIR = getPeticionsPerEntorn(ipDIR, codesFSDIR); 
-		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.DIR.toString(), ipDIR, peticionsPerEntornDIR, codesFSDIR.length));
+		ipUSR.setPeticionsPerEntorn(getPeticionsPerEntorn(IntegracioApp.DIR.toString(), codesFSDIR));
+		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.DIR.toString(), ipDIR));
 		
 		String[] codesFSNOT = {"METRICS@Integracions.notib"};
 		IntegracioPeticions ipNOT = new IntegracioPeticions();
-		Map<String, IntegracioPeticions> peticionsPerEntornNOT = getPeticionsPerEntorn(ipNOT, codesFSNOT); 
-		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.NOT.toString(), ipNOT, peticionsPerEntornNOT, codesFSNOT.length));
+		ipUSR.setPeticionsPerEntorn(getPeticionsPerEntorn(IntegracioApp.NOT.toString(), codesFSNOT)); 
+		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.NOT.toString(), ipNOT));
 		
 		if (Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.FIRMA_BIOMETRICA_ACTIVA))) {
 			String[] codesFSVIF = {"METRICS@Integracions.viafirma"};
 			IntegracioPeticions ipVIF = new IntegracioPeticions();
-			Map<String, IntegracioPeticions> peticionsPerEntornVIF = getPeticionsPerEntorn(ipVIF, codesFSVIF); 
-			integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.VIF.toString(), ipVIF, peticionsPerEntornVIF, codesFSVIF.length));
+			ipUSR.setPeticionsPerEntorn(getPeticionsPerEntorn(IntegracioApp.VIF.toString(), codesFSVIF)); 
+			integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.VIF.toString(), ipVIF));
 		}
 		
 		String[] codesFSDIB = {"METRICS@Integracions.digitalitzacio"};
 		IntegracioPeticions ipDIB = new IntegracioPeticions();
-		Map<String, IntegracioPeticions> peticionsPerEntornDIB = getPeticionsPerEntorn(ipDIB, codesFSDIB); 
-		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.DIB.toString(), ipDIB, peticionsPerEntornDIB, codesFSDIB.length));
+		ipUSR.setPeticionsPerEntorn(getPeticionsPerEntorn(IntegracioApp.DIB.toString(), codesFSDIB));
+		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.DIB.toString(), ipDIB));
 		
 		String[] codesFSVFI = {"METRICS@Integracions.validaFirma"};
 		IntegracioPeticions ipVFI = new IntegracioPeticions();
-		Map<String, IntegracioPeticions> peticionsPerEntornVFI = getPeticionsPerEntorn(ipVFI, codesFSVFI); 
-		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.VFI.toString(), ipVFI, peticionsPerEntornVFI, codesFSVFI.length));
+		ipUSR.setPeticionsPerEntorn(getPeticionsPerEntorn(IntegracioApp.VFI.toString(), codesFSVFI)); 
+		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.VFI.toString(), ipVFI));
 		
 		String[] codesFSRSC = {"METRICS@Integracions.rolsac"}; //getProcedimentPlugin
 		IntegracioPeticions ipRSC = new IntegracioPeticions();
-		Map<String, IntegracioPeticions> peticionsPerEntornRSC = getPeticionsPerEntorn(ipRSC, codesFSRSC); 
-		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.RSC.toString(), ipRSC, peticionsPerEntornRSC, codesFSRSC.length));
+		ipUSR.setPeticionsPerEntorn(getPeticionsPerEntorn(IntegracioApp.RSC.toString(), codesFSRSC)); 
+		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.RSC.toString(), ipRSC));
     	
     	return integracionsSalut;
     }
