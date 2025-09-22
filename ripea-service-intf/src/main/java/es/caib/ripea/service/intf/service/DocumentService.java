@@ -568,6 +568,11 @@ public interface DocumentService {
 			Long entitatId,
 			Long id) throws NotFoundException, SistemaExternException;
 	
+	@PreAuthorize("isAuthenticated()")
+	public FitxerDto getImprimibleOrOriginal(
+			Long entitatId,
+			Long id) throws NotFoundException, SistemaExternException;
+	
 	/**
 	 * Genera un identificador del document per firmar en el navegador
 	 * del client.

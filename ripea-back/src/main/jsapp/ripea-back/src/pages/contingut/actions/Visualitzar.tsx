@@ -13,7 +13,7 @@ const Visualitzar = (props: any) => {
 
     return <Load value={entity}>
         <Firmes entity={entity}/>
-        <Iframe src={getUrl(`contingut/document/${entity?.id}/getPDF`)}/>
+        <Iframe src={getUrl(`contingut/document/${entity?.id}/getImprimibleOrOriginal`)}/>
     </Load>
 }
 
@@ -54,7 +54,7 @@ const useVisualitzar = () => {
     let buttons :any[] = [
         {
             value: 'download',
-            text: t('common.download'),
+            text: t('page.document.action.original.label'),
             icon: 'download',
             hidden: entity?.documentTipus == 'FISIC'
         },

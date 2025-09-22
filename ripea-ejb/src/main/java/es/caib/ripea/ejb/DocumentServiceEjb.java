@@ -332,6 +332,12 @@ public class DocumentServiceEjb extends AbstractServiceEjb<DocumentService> impl
 				entitatId,
 				id);
 	}
+	
+	@Override
+	@RolesAllowed("**")
+	public FitxerDto getImprimibleOrOriginal(Long entitatId, Long id) {
+		return delegateService.getImprimibleOrOriginal(entitatId, id);
+	}
 
 	@Override
 	@RolesAllowed("**")

@@ -285,17 +285,17 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             hidden: (row:any) => !isDigitalOrImportat(row) || !( (row?.arxiuEstat=='DEFINITIU' || row?.estat=='FIRMA_PARCIAL') || user?.sessionScope?.imprimibleNoFirmats),
         },
         {
-            label: t('common.download'),
+            label: t('page.document.action.original.label'),
             icon: "download",
             showInMenu: true,
-			onClick: (id:any) => apiDownload(id, 'adjunt', t('page.document.action.download.ok')),
+			onClick: (id:any) => apiDownload(id, 'adjunt', t('page.document.action.original.label.ok')),
             hidden: (row:any) => !isDigitalOrImportat(row),
         },
         {
             label: t('page.document.action.original.label'),
             icon: "download",
             showInMenu: true,
-			onClick: (id:any) => apiDownload(id, 'original', t('page.document.action.download.ok')),
+			onClick: (id:any) => apiDownload(id, 'original', t('page.document.action.original.label.ok')),
             hidden: (row:any) => !isDigitalOrImportat(row) || !row?.gesDocOriginalId
         },
         {
