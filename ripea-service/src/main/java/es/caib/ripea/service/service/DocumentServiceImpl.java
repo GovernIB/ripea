@@ -1329,24 +1329,24 @@ public class DocumentServiceImpl implements DocumentService {
 	
 	@Transactional
 	@Override
-	public FitxerDto convertirPdfPerFirmaClient(
-			Long entitatId,
-			Long id) {
-		return documentHelper.convertirPdfPerFirmaClient(
-				entitatId,
-				id);
+	public FitxerDto convertirPdfPerFirmaClient(Long entitatId, Long id) {
+		return documentHelper.convertirPdfPerFirmaClient(entitatId, id);
 	}
 	
 	@Transactional
 	@Override
 	//Obtenir el fitxer en PDF, sense estampar ni operacions extres, nomes per previsualitzat al navegador.
 	//Si el fitxer ja es un PDF, es retorna directament.
-	public FitxerDto getFitxerPDF(
-			Long entitatId,
-			Long id) {
-		return documentHelper.getFitxerPDF(
-				entitatId,
-				id);
+	public FitxerDto getFitxerPDF(Long entitatId, Long id) {
+		return documentHelper.getFitxerPDF(entitatId, id);
+	}
+	
+	@Transactional
+	@Override
+	//Obtenir el fitxer en PDF, sense estampar ni operacions extres, nomes per previsualitzat al navegador.
+	//Si el fitxer ja es un PDF, es retorna directament.
+	public FitxerDto getImprimibleOrOriginal(Long entitatId, Long id) {
+		return documentHelper.getImprimibleOrOriginal(entitatId, id);
 	}
 
 	@Transactional

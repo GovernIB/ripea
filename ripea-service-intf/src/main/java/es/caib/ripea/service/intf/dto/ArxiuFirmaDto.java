@@ -26,6 +26,8 @@ public class ArxiuFirmaDto {
 	private String csvRegulacio;
 	private boolean autofirma;
 	private List<ArxiuFirmaDetallDto> detalls;
+    private boolean errorFirma = false;
+    private String errorDesc;
 
 	public String getContingutComString() {
 		if (contingut != null) {

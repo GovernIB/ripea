@@ -1824,6 +1824,22 @@ public class DocumentHelper {
         }
 	}
 	
+	public FitxerDto getImprimibleOrOriginal(Long entitatId, Long id) {
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(id));
+		logger.debug("Converteix un document en PDF per a la firma client (entitatId=" + entitatId + ", id=" + id + ")");
+		DocumentEntity document = comprovarDocumentDinsExpedientAccessible(entitatId, id, true, false);
+		boolean digitalOrImportat = DocumentTipusEnumDto.DIGITAL.equals(document.getDocumentTipus()) || DocumentTipusEnumDto.IMPORTAT.equals(document.getDocumentTipus());
+		boolean definitiuOrFirmaParcial = ArxiuEstatEnumDto.DEFINITIU.equals(document.getArxiuEstat()) || DocumentEstatEnumDto.FIRMA_PARCIAL.equals(document.getEstat());
+		boolean imprimiblesNoFirmats = Boolean.parseBoolean(configHelper.getConfig(PropertyConfig.IMPRIMIBLE_NO_FIRMAT_ACTIU));
+		boolean esPDF = document.getFitxerNom().endsWith(".pdf");		
+		if (digitalOrImportat && (definitiuOrFirmaParcial || (imprimiblesNoFirmats && esPDF))) {
+			try {
+				return pluginHelper.arxiuDocumentVersioImprimible(document);
+			} catch (Exception ex) {}
+		}
+		return getFitxerPDF(entitatId, id);		
+	}
+	
 	public void crearEntradaDocument(
 			ZipOutputStream zos,
 			Long documentId, 

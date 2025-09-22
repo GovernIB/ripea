@@ -10,6 +10,7 @@ import AppMenu from "../../components/AppMenu.tsx";
 import {
     Link as RouterLink,
     LinkProps as RouterLinkProps,
+    useLocation,
 } from 'react-router-dom';
 
 export const icons = {
@@ -26,6 +27,12 @@ export const useToProgramaAntic = () => {
 
     const getUrl = useCallback((ref: string) => {
         // console.log("apiUrl", apiUrl, cleanApiUrl)
+        if (cleanApiUrl.endsWith("/") && ref.startsWith("/")) {
+            ref = ref.substring(1);
+        }
+        if (!cleanApiUrl.endsWith("/") && !ref.startsWith("/")) {
+            ref = "/" + ref
+        }
         return `${cleanApiUrl}${ref}`;
     },[]);
 
@@ -74,6 +81,8 @@ const MenuBadge = (props:any) => {
 const UserHeadToolbar = () => {
     const { t } = useTranslation();
     const { value: user } = useUserSession();
+    const { toProgramaAntic } = useToProgramaAntic()
+    const location = useLocation();
 
     const isRolActualSupAdmin = user?.rolActual == 'IPA_SUPER';
     const isRolActualAdmin = user?.rolActual == 'IPA_ADMIN';
@@ -89,8 +98,14 @@ const UserHeadToolbar = () => {
             icon: 'fast_rewind',
             componentProps: {color: '#ff9523'},
             onClick: () => {
-                const url = window.location.href.replace('/reactapp', '');
-                window.location.replace(url);
+                if (location.pathname.includes('/tasca/')) {
+                    const url = location.pathname
+                            .replace('/tasca/', '?tascaId=') + '&origenTasques=true';
+                    toProgramaAntic(url)
+                    return;
+                }
+
+                toProgramaAntic(location.pathname)
             },
         }
     ]

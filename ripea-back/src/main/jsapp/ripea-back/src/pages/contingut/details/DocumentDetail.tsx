@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {Box, Grid} from "@mui/material";
+import {Alert, Box, Grid, Icon} from "@mui/material";
 import {BasePage, GridPage, useResourceApiService, MuiDialog, useBaseAppContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import TabComponent from "../../../components/TabComponent.tsx";
@@ -8,6 +8,7 @@ import {formatDate} from "../../../util/dateUtils.ts";
 import MetaDadaGrid from "../../dada/MetaDadaGrid.tsx";
 import Load from "../../../components/Load.tsx";
 import {useActions} from "./ContingutActions.tsx";
+import {icons} from "../../user/UserHeadToolbar.tsx";
 
 const Contenido = (props:any) => {
     const {entity} = props;
@@ -74,24 +75,20 @@ const Versiones = (props:any) => {
 
 export const Firmes = (props:any) => {
     const { entity } = props;
-    const { t } = useTranslation();
 
     return <Grid container flexDirection={"column"} columnSpacing={1} rowSpacing={1}>
         {
-            entity?.firmes?.map((firma:any, index:number) =>
-                <CardData key={index} title={firma?.fitxerNom}>
-                    {
-                        firma?.detalls?.map((detall:any, index:number) =>
-                            <Grid item xs={12} key={index}>
-                                <ContenidoData xs={12} title={t('page.arxiu.firma.responsableNom')}>{detall?.responsableNom}</ContenidoData>
-                                <ContenidoData xs={12} title={t('page.arxiu.firma.responsableNif')}>{detall?.responsableNif}</ContenidoData>
-                                <ContenidoData xs={12} title={t('page.arxiu.firma.data')}>{formatDate(detall?.data)}</ContenidoData>
-                                <ContenidoData xs={12} title={t('page.arxiu.firma.emissorCertificat')}>{detall?.emissorCertificat}</ContenidoData>
+            entity?.firmes?.map((firma:any, index:number) => {
+                return firma?.errorFirma
+                    ? <Grid item xs={12} key={index}><Alert severity={"error"}>{firma?.errorDesc}</Alert></Grid>
+                    : <>
+                        {firma?.detalls?.map((detall: any, i: number) =>
+                            <Grid item xs={12} key={`${index}-${i}`}>
+                                <Icon>{icons.firma}</Icon> {detall?.responsableNom} - {detall?.responsableNif} - {formatDate(detall?.data)} - {detall?.emissorCertificat}
                             </Grid>
-                        )
-                    }
-                </CardData>
-            )
+                        )}
+                    </>
+            })
         }
     </Grid>
 }

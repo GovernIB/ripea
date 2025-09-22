@@ -768,6 +768,10 @@ const translationEs = {
                     label: "Documento original",
                     ok: "El documento original se ha descargado correctamente"
                 },
+                descarregarImprimible: {
+                    label: "Descargar copia auténtica",
+                    ok: "La copia auténtica se ha descargado correctamente",
+                },
                 changeType: {
                     label: "Cambiar tipo...",
                     title: "Cambiar tipo",

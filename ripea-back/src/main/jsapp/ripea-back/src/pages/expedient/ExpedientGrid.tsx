@@ -276,8 +276,7 @@ const ExpedientGrid = () => {
                 popupEditCreateActive
                 popupEditFormContent={<ExpedientGridForm/>}
                 popupEditFormDialogTitle={t('page.expedient.action.new.title')}
-                onRowClick={(row: any) => navigate(`/contingut/${row?.id}`)}
-                onRowDoubleClick={(row: any) => navigate(`/contingut/${row?.id}`)}
+                onRowClick={(params: any) => navigate(`/contingut/${params?.id}`)}
                 rowAdditionalActions={actions}
                 selectionActive
                 toolbarCreateTitle={t('page.expedient.action.new.label')}

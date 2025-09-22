@@ -295,7 +295,14 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             label: t('page.document.action.original.label'),
             icon: "download",
             showInMenu: true,
-			onClick: (id:any) => apiDownload(id, 'original', t('page.document.action.download.ok')),
+			onClick: (id:any) => apiDownload(id, 'adjunt', t('page.document.action.original.label.ok')),
+            hidden: (row:any) => !isDigitalOrImportat(row),
+        },
+        {
+            label: t('page.document.action.original.label'),
+            icon: "download",
+            showInMenu: true,
+			onClick: (id:any) => apiDownload(id, 'original', t('page.document.action.original.label.ok')),
             hidden: (row:any) => !isDigitalOrImportat(row) || !row?.gesDocOriginalId
         },
         {

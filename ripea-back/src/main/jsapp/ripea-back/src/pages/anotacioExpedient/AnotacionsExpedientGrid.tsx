@@ -4,6 +4,7 @@ import {formatDate} from "../../util/dateUtils.ts";
 import StyledMuiGrid from '../../components/StyledMuiGrid.tsx';
 import * as builder from "../../util/springFilterUtils.ts";
 import {GridSortDirection} from "@mui/x-data-grid-pro";
+import useAnotacioDetail from "../anotacions/details/AnotacioDetail.tsx";
 
 const sortModel:any = [{field: 'registreInfo.data', sort: 'desc'}];
 const perspectives = ['REGISTRE', 'ESTAT_VIEW'];
@@ -43,6 +44,7 @@ const AnotacionsExpedientGrid = (props:any) => {
     ];
 
     const {actions, components} = useAnotacioActions();
+    const {handleOpen, dialog} = useAnotacioDetail();
 
     return <>
         <StyledMuiGrid
@@ -53,10 +55,12 @@ const AnotacionsExpedientGrid = (props:any) => {
             columns={columns}
             rowAdditionalActions={actions}
             // paginationActive
+            onRowClick={(params: any) => handleOpen(params?.row?.id, params?.row) }
             disableColumnSorting
             readOnly
         />
         {components}
+        {dialog}
     </>
 }
 

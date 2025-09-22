@@ -10,6 +10,7 @@ import {useActions as useExpedientActions} from "../expedient/details/CommonActi
 import {InteressatsGridForm} from "./InteressatsGridForm.tsx";
 import {MenuActionButton} from "../../components/MenuButton.tsx";
 import {useUserSession} from "../../components/Session.tsx";
+import useInteressatDetail from "./details/InteressatDetail.tsx";
 
 const perspectives = ['REPRESENTANT']
 const sortModel:any = [{field: 'id', sort: 'asc'}]
@@ -66,6 +67,7 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
     const {exportar} = useActions(refresh);
     const {excelInteressats} = useExpedientActions(refresh);
     const {handleShow: handleImport, content: contentImport} = useImport(entity, refresh);
+    const {handleOpen, dialog} = useInteressatDetail();
 
     return <>
         <StyledMuiGrid
@@ -139,12 +141,13 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
                     />,
                 }
             ]}
+            onRowClick={(params: any) => handleOpen(params?.row?.id, params?.row) }
             popupEditFormI18nKeys={{
                 createSuccess: 'page.interessat.action.new.ok',
                 updateSuccess: 'page.interessat.action.update.ok',
             }}
         />
-
+        {dialog}
         {contentImport}
         {components}
     </>

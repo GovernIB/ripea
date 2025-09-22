@@ -45,13 +45,13 @@ const translationCa = {
             false: "No",
         },
         prioritat: {
-            D_MOLT_ALTA: "Very high",
-            C_ALTA: "High",
+            D_MOLT_ALTA: "Molt alta",
+            C_ALTA: "Alta",
             B_NORMAL: "Normal",
-            A_BAIXA: "Low",
-            BAIXA: "Low",
+            A_BAIXA: "Baixa",
+            BAIXA: "Baixa",
             NORMAL: "Normal",
-            ALTA: "High",
+            ALTA: "Alta",
         },
         fluxTipus: {
             SIMPLE: "Simple",
@@ -767,6 +767,10 @@ const translationCa = {
                 descarregarOriginal: {
                     label: "Document original",
                     ok: "El document original s'ha descarregat correctament",
+                },
+                descarregarImprimible: {
+                    label: "Descarregar còpia auténtica imprimible",
+                    ok: "La còpia auténtica imprimible s'ha descarregat correctament",
                 },
                 changeType: {
                     label: "Canviar tipus...",

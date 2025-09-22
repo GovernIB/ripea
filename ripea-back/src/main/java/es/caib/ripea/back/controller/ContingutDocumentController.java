@@ -743,7 +743,22 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			response.setContentType("application/pdf");
 			response.setHeader("Content-Disposition", "inline; filename=\""+convertit.getNom()+"\"");
 			response.getOutputStream().write(convertit.getContingut());
-				
+		} catch (Exception e) {
+			logger.error("Error al recuperar el document "+documentId+" per previsualitzar.", e);
+		}
+	}
+	
+	@RequestMapping(value = "/document/{documentId}/getImprimibleOrOriginal", method = RequestMethod.GET)
+	public void getImprimibleOrOriginal(
+			HttpServletRequest request,
+			HttpServletResponse response,
+			@PathVariable Long documentId) throws IOException {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		try {
+			FitxerDto convertit = documentService.getImprimibleOrOriginal(entitatActual.getId(), documentId);
+			response.setContentType("application/pdf");
+			response.setHeader("Content-Disposition", "inline; filename=\""+convertit.getNom()+"\"");
+			response.getOutputStream().write(convertit.getContingut());
 		} catch (Exception e) {
 			logger.error("Error al recuperar el document "+documentId+" per previsualitzar.", e);
 		}

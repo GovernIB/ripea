@@ -8,6 +8,7 @@ import TabComponent from "../../../components/TabComponent.tsx";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import useVisualitzar from "./Visualitzar.tsx";
+import useRegistreInteressatDetail from "../details/RegistreInteressatDetail.tsx";
 
 const AcceptarTabExpedient = () => {
     const {data} =useFormContext();
@@ -142,6 +143,7 @@ const columnsInteressats = [
     },
 ]
 const AcceptarTabInteressats = () => {
+    const { t } = useTranslation()
     const {data, apiRef} = useFormContext();
     const [selectedRows, setSelectedRows] = useState<any[]>(data?.interessats || []);
 
@@ -151,19 +153,40 @@ const AcceptarTabInteressats = () => {
 
     const filter = builder.eq("registre.id", data?.registre?.id)
 
-    return <StyledMuiGrid
-        resourceName={"registreInteressatResource"}
-        filter={filter}
-        columns={columnsInteressats}
-        selectionActive
-        rowSelectionModel={selectedRows}
-        onRowSelectionModelChange={(newSelection) => {
-            setSelectedRows([...newSelection]);
-        }}
+    const {handleOpen, dialog} = useRegistreInteressatDetail();
 
-        height={162 + 52 * 4}
-        readOnly
-    />
+    const actions = [
+        {
+            label: t('common.detail'),
+            icon: "info",
+            showInMenu: false,
+            onClick: handleOpen,
+            hidden: (row:any) => row?.tipus == "ADMINISTRACIO"
+        },
+    ]
+
+    return <>
+        <StyledMuiGrid
+            resourceName={"registreInteressatResource"}
+            filter={filter}
+            columns={columnsInteressats}
+            rowAdditionalActions={actions}
+            selectionActive
+            rowSelectionModel={selectedRows}
+            onRowSelectionModelChange={(newSelection) => {
+                setSelectedRows([...newSelection]);
+            }}
+            onRowClick={(params: any) => {
+                if (params?.row?.tipus != "ADMINISTRACIO") {
+                    handleOpen(params?.id, params?.row)
+                }
+            }}
+
+            height={162 + 52 * 4}
+            readOnly
+        />
+        {dialog}
+    </>
 }
 
 const AcceptarForm = () => {

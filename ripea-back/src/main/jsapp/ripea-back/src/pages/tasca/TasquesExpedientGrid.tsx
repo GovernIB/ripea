@@ -11,6 +11,7 @@ import useTascaActions from "./details/TascaActions.tsx";
 import {StyledPrioritat} from "../expedient/ExpedientGrid.tsx";
 import {CommentDialog} from "../CommentDialog.tsx";
 import StyledMuiGrid from '../../components/StyledMuiGrid.tsx';
+import useTascaDetail from "./details/TascaDetail.tsx";
 
 const TasquesGridForm = () => {
     const { data } = useFormContext();
@@ -103,6 +104,7 @@ const TasquesExpedientGrid = (props: any) => {
     ]
 
     const { actions, components } = useTascaActions(entity, apiRef?.current?.refresh);
+    const { handleOpen, dialog } = useTascaDetail();
 
     return <>
         <StyledMuiGrid
@@ -125,11 +127,13 @@ const TasquesExpedientGrid = (props: any) => {
             rowAdditionalActions={actions}
             toolbarHideCreate={!entity?.potModificar}
 
+            onRowClick={(params: any) => handleOpen(params?.row?.id, params?.row) }
             popupEditFormI18nKeys={{
                 createSuccess: 'page.tasca.action.new.ok',
             }}
         />
         {components}
+        {dialog}
     </>
 }
 
