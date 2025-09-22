@@ -2887,9 +2887,8 @@ public class PluginHelper {
 		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		String accioDescripcio = "Importar documents";
 		Map<String, String> accioParams = new HashMap<String, String>();
-		accioParams.put(
-				"numeroRegistre",
-				params.getNumeroRegistre());
+		accioParams.put("numeroRegistre", params.getNumeroRegistre());
+		
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
 		String endpoint = arxiuPluginWrapper.getEndpoint();
@@ -2899,21 +2898,26 @@ public class PluginHelper {
 			String dataPresentacioStr = null;
 			String numeroRegistreStr = null;
 			String codiEniStr = null;
-			if (params.getTipusImportacio().equals(
-					TipusImportEnumDto.NUMERO_REGISTRE)) {
+			
+			if (params.getTipusImportacio().equals(TipusImportEnumDto.NUMERO_REGISTRE)) {
 				DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-				dataPresentacioStr = "'" + dateFormat.format(
-						params.getDataPresentacioFormatted()) + "'";
+				dataPresentacioStr = "'" + dateFormat.format(params.getDataPresentacioFormatted()) + "'";
 				tipusRegistreLabel = "'" + params.getTipusRegistre().getLabel() + "'";
 				numeroRegistreStr = "'" + params.getNumeroRegistre() + "'";
 			} else {
 				codiEniStr = "'" + params.getCodiEni() + "'";
 			}
 			// Aprofitam el mètode documentVersions per fer la importació
-			String paramsJson = "{" + "'tipusImportacio' : '" + params.getTipusImportacio().name() + "',"
-					+ "'numeroRegistre' : " + numeroRegistreStr + "," + "'tipusRegistre' : " + tipusRegistreLabel + ","
-					+ "'dataPresentacio' : " + dataPresentacioStr + "," + "'codiEni' : " + codiEniStr + "" + "}";
+			String paramsJson = "{" + 
+									"'tipusImportacio' : '" + params.getTipusImportacio().name() + "'," + 
+									"'numeroRegistre' : " + numeroRegistreStr + "," + 
+									"'tipusRegistre' : " + tipusRegistreLabel + "," + 
+									"'dataPresentacio' : " + dataPresentacioStr + "," + 
+									"'codiEni' : " + codiEniStr + "" + 
+								"}";
+			
 			List<ContingutArxiu> contingutArxiu = arxiuPluginWrapper.getPlugin().documentVersions(paramsJson);
+			
 			integracioHelper.addAccioOk(
 					IntegracioHelper.INTCODI_ARXIU,
 					accioDescripcio,
@@ -2955,17 +2959,22 @@ public class PluginHelper {
 		String endpoint = arxiuPluginWrapper.getEndpoint();
 		
 		try {
-			Document document = arxiuPluginWrapper.getPlugin().documentDetalls(
-					arxiuUuid,
-					null,
-					false);
-			document.setIdentificador(
-					arxiuUuid);
+//			Document document = arxiuPluginWrapper.getPlugin().documentDetalls(
+//					arxiuUuid,
+//					null,
+//					false);
+//			document.setIdentificador(
+//					arxiuUuid);
+			Document document = null;
 			if (moureDocument) {
 				// Si és de registre moure el document
-				arxiuPluginWrapper.getPlugin().documentCopiar(
+				ContingutArxiu nouContingut = arxiuPluginWrapper.getPlugin().documentCopiar(
 						arxiuUuidPare,
 						arxiuUuid);
+				document = arxiuPluginWrapper.getPlugin().documentDetalls(
+						nouContingut.getIdentificador(),
+						null,
+						false);
 			} else {
 				// Si és una importació amb ENI fer un linkdocument
 				// Empram el mètode carpetaCopiar per no disposar d'un mètode específic per
