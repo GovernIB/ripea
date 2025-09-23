@@ -1,10 +1,12 @@
-﻿<%@ taglib tagdir="/WEB-INF/tags/ripea" prefix="rip"%>
+<%@ taglib tagdir="/WEB-INF/tags/ripea" prefix="rip"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
-<%  pageContext.setAttribute("isRolActualDissenyadorOrgan", es.caib.ripea.back.helper.RolHelper.isRolActualDissenyadorOrgan(request)); %>
-
+<%
+pageContext.setAttribute("isRolActualDissenyadorOrgan", es.caib.ripea.back.helper.RolHelper.isRolActualDissenyadorOrgan(request));
+pageContext.setAttribute("isRolActualAdministradorLectura", es.caib.ripea.back.helper.RolHelper.isRolActualAdministradorLectura(request), PageContext.SESSION_SCOPE);
+%>
 <html>
 <head>
 	<title><spring:message code="metaexpedient.list.titol"/></title>
@@ -78,7 +80,6 @@
         $('#metaexpedients').DataTable().ajax.reload();
     	webutilRefreshMissatges();
 	}
-    
 
     function setCookie(cname,cvalue) {
     	var exdays = 30;
@@ -91,22 +92,25 @@
 </head>
 <body>
 
-	<div class="text-right" data-toggle="botons-titol" data-btn-title-col-size="4">
-		<div>
-			<div class="btn-group">
-				<button class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
- 						<span class="fa fa-download"></span> <spring:message code="comu.boto.importar"/> <span class="caret"></span>
-				</button>
-				<ul class="dropdown-menu">
-					<li><a href="metaExpedient/importRolsac" data-toggle="modal" data-datatable-id="metaexpedients"><spring:message code="metaexpedient.boto.importar.rolsac"/></a></li>
-					<li><a href="metaExpedient/importFitxer" data-toggle="modal" data-datatable-id="metaexpedients"><spring:message code="metaexpedient.boto.importar.fitxer"/></a></li>
-				</ul>
+	<c:if test="${!isRolActualAdministradorLectura}">
+		<div class="text-right" data-toggle="botons-titol" data-btn-title-col-size="4">
+			<div>
+				<div class="btn-group">
+					<button class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+	 						<span class="fa fa-download"></span> <spring:message code="comu.boto.importar"/> <span class="caret"></span>
+					</button>
+					<ul class="dropdown-menu">
+						<li><a href="metaExpedient/importRolsac" data-toggle="modal" data-datatable-id="metaexpedients"><spring:message code="metaexpedient.boto.importar.rolsac"/></a></li>
+						<li><a href="metaExpedient/importFitxer" data-toggle="modal" data-datatable-id="metaexpedients"><spring:message code="metaexpedient.boto.importar.fitxer"/></a></li>
+					</ul>
+				</div>
+				
+				<a class="btn btn-default" href="metaExpedient/sincronitzar" data-toggle="modal" data-datatable-id="metaexpedients"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="metaexpedient.list.boto.sincronitzar"/></a>
+				<a class="btn btn-default" href="metaExpedient/new" data-toggle="modal" data-datatable-id="metaexpedients"><span class="fa fa-plus"></span>&nbsp;<spring:message code="metaexpedient.list.boto.nou"/></a>
 			</div>
-			
-			<a class="btn btn-default" href="metaExpedient/sincronitzar" data-toggle="modal" data-datatable-id="metaexpedients"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="metaexpedient.list.boto.sincronitzar"/></a>
-			<a class="btn btn-default" href="metaExpedient/new" data-toggle="modal" data-datatable-id="metaexpedients"><span class="fa fa-plus"></span>&nbsp;<spring:message code="metaexpedient.list.boto.nou"/></a>
 		</div>
-	</div>
+	</c:if>
+	
 	<c:url value="metaExpedient/filtrar" var="formAction"/>
 	<form:form id="metaExpedientFiltreForm" action="${ formAction }" method="post" cssClass="well" modelAttribute="metaExpedientFiltreCommand">
 		<div class="row">
@@ -275,7 +279,7 @@
 				<th data-col-name="organEstat" data-visible="false"></th>
 				<th data-col-name="organTipusTransicio" data-visible="false"></th>
 
-                <c:if test="${(not isRolAdminOrgan || isActiveGestioPermisPerAdminOrgan) && not isRolDissenyadorOrgan}">
+                <c:if test="${(not isRolAdminOrgan || isActiveGestioPermisPerAdminOrgan) && not isRolDissenyadorOrgan && not isRolActualAdministradorLectura}">
 					<th data-col-name="permisosCount" data-template="#cellPermisosTemplate" data-orderable="false" width="1%">
 						<script id="cellPermisosTemplate" type="text/x-jsrender">
 							<a href="<c:url value="/metaExpedient/{{:id}}/permis"/>" target="_blank" class="btn btn-default"><spring:message code="metaexpedient.list.boto.permisos"/>&nbsp;<span class="badge">{{:permisosCount}}</span></a>
@@ -299,6 +303,22 @@
 						</div>					
 					</script>
 				</th>
+				
+				<c:if test="${isRolActualAdministradorLectura}">
+				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="1%">
+					<script id="cellAccionsTemplate" type="text/x-jsrender">
+						<div class="dropdown">
+							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
+							<ul class="dropdown-menu">
+								<li><a href="expedient/metaExpedient/{{:id}}/list" data-toggle="modal" data-maximized="true"><span class="fa fa-briefcase"></span>&nbsp;&nbsp;<spring:message code="decorator.menu.expedients"/></a></li>
+								<li><a class="fileDownload" href="metaExpedient/{{:id}}/export"><span class="fa fa-upload"></span>&nbsp;&nbsp;<spring:message code="comu.boto.exportar"/></a></li>
+							</ul>
+						</div>
+					</script>
+				</th>
+				</c:if>
+				
+				<c:if test="${!isRolActualAdministradorLectura}">
 				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="1%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
 						<div class="dropdown">
@@ -330,6 +350,7 @@
 						</div>
 					</script>
 				</th>
+				</c:if>
 			</tr>
 		</thead>
 	</table>

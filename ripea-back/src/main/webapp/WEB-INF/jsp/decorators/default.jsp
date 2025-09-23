@@ -18,6 +18,7 @@
     pageContext.setAttribute("rolsUsuariActual", es.caib.ripea.back.helper.RolHelper.getRolsUsuariActual(request));
     pageContext.setAttribute("isRolActualSuperusuari", es.caib.ripea.back.helper.RolHelper.isRolActualSuperusuari(request));
     pageContext.setAttribute("isRolActualAdministrador", es.caib.ripea.back.helper.RolHelper.isRolActualAdministrador(request), PageContext.SESSION_SCOPE);
+    pageContext.setAttribute("isRolActualAdministradorLectura", es.caib.ripea.back.helper.RolHelper.isRolActualAdministradorLectura(request), PageContext.SESSION_SCOPE);
     pageContext.setAttribute("isRolActualAdministradorOrgan", es.caib.ripea.back.helper.RolHelper.isRolActualAdministradorOrgan(request));
     pageContext.setAttribute("isRolActualDissenyadorOrgan", es.caib.ripea.back.helper.RolHelper.isRolActualDissenyadorOrgan(request));
     pageContext.setAttribute("isRolActualRevisor", es.caib.ripea.back.helper.RolHelper.isRolActualRevisor(request));
@@ -284,6 +285,11 @@ body {
             <%------------------------ MENU BUTTONS ------------------------%>
             <div class="btn-group navbar-btn navbar-right" style="margin-top: 25px;">
                 <c:choose>
+                	<c:when test="${isRolActualAdministradorLectura}">
+						<a href="<c:url value="/reactapp/expedient"/>"	class="btn btn-default"><span class="fa fa-folder" style="color: #004b99;"></span> <spring:message code="decorator.menu.expedients.new"/></a>
+                        <a href="<c:url value="/expedient"/>"			class="btn btn-primary"><spring:message code="decorator.menu.expedients"/></a>
+                        <a href="<c:url value="/metaExpedient"/>"		class="btn btn-primary"><spring:message code="decorator.menu.metaexpedients"/><c:if test="${organsNoSincronitzats > 0}"><span class="badge small" title="<spring:message code='metaexpedient.actualitzacio.organs.no.sync'/>" style="background-color: #a94442; float: right;">${organsNoSincronitzats}</span></c:if></a>
+                	</c:when>
                     <c:when test="${isRolActualSuperusuari}">
                         
                         <%---- Entitats ----%>
@@ -313,7 +319,7 @@ body {
                     <c:when test="${isRolActualAdministrador}">
                         <%---- Expedients ----%>
                         <a href="<c:url value="/reactapp/expedient"></c:url>" class="btn btn-default"><span class="fa fa-folder" style="color: #004b99;"></span> <spring:message code="decorator.menu.expedients.new"/></a>
-                        <a href="<c:url value="/expedient"></c:url>"class="btn btn-primary"><spring:message code="decorator.menu.expedients"/></a>                              
+                        <a href="<c:url value="/expedient"></c:url>"class="btn btn-primary"><spring:message code="decorator.menu.expedients"/></a>
                         <%---- Annotacions pendents ----%>
                         <a href="<c:url value="/expedientPeticio"></c:url>" class="btn btn-primary">
                             <spring:message code="decorator.menu.expedientPeticions"/>

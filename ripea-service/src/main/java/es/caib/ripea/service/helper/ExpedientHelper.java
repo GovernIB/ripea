@@ -2132,7 +2132,7 @@ public class ExpedientHelper {
 		List<Long> idsOrgansAmbProcedimentsComunsPermesos = null;
 		List<Long> idsGrupsPermesos = null;
 
-		if (rolActual.equals("IPA_ADMIN")) {
+		if (rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ADMIN_LECTURA")) {
 
 			//Si ets admin veruas els expedients de tots els procediments de la entitat
 			idsMetaExpedientsPermesos = metaExpedientRepository.findAllIdsByEntitat(entitat);

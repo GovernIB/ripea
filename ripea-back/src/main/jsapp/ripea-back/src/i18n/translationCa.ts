@@ -35,6 +35,7 @@ const translationCa = {
         rol: {
             IPA_SUPER: "Superusuari",
             IPA_ADMIN: "Administrador d'entitat",
+			IPA_ADMIN_LECTURA: "Administrador (lectura)",
             IPA_DISSENY: "Dissenyador d'òrgan gestor",
             IPA_ORGAN_ADMIN: "Administrador d'òrgan gestor",
             IPA_REVISIO: "Revisor de procediments",

@@ -35,6 +35,7 @@ const translationEn = {
         rol: {
             IPA_SUPER: "Superuser",
             IPA_ADMIN: "Administrator",
+			IPA_ADMIN_LECTURA: "Administrator (read)",
             IPA_DISSENY: "Designer",
             IPA_ORGAN_ADMIN: "Organ Administrator",
             IPA_REVISIO: "Reviewer",

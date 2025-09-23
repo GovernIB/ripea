@@ -566,6 +566,8 @@ public class PermisosHelper {
 						permis.setDelete(true);
 					if (ExtendedPermission.ADMINISTRATION.equals(ace.getPermission()))
 						permis.setAdministration(true);
+					if (ExtendedPermission.ADMINISTRATION_READ.equals(ace.getPermission()))
+						permis.setAdministrationLectura(true);
 					if (ExtendedPermission.STATISTICS.equals(ace.getPermission()))
 						permis.setStatistics(true);
 					if (ExtendedPermission.COMU.equals(ace.getPermission()))
@@ -721,6 +723,8 @@ public class PermisosHelper {
 			permissions.add(ExtendedPermission.DELETE);
 		if (permis.isAdministration())
 			permissions.add(ExtendedPermission.ADMINISTRATION);
+		if (permis.isAdministrationLectura())
+			permissions.add(ExtendedPermission.ADMINISTRATION_READ);
 		if (permis.isStatistics())
 			permissions.add(ExtendedPermission.STATISTICS);
 		if (permis.isProcedimentsComuns())

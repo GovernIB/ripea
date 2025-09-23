@@ -31,7 +31,8 @@ public class AccesAdminEntitatOAdminOrganORevisorInterceptor implements AsyncHan
 			HttpServletRequest request,
 			HttpServletResponse response,
 			Object handler) throws Exception {
-		if (!RolHelper.isRolActualAdministrador(request) && 
+		if (!RolHelper.isRolActualAdministrador(request) &&
+			!RolHelper.isRolActualAdministradorLectura(request) &&
 			!RolHelper.isRolActualAdministradorOrgan(request) &&
 			!RolHelper.isRolActualDissenyadorOrgan(request) &&
 			!RolHelper.isRolActualRevisor(request)) {

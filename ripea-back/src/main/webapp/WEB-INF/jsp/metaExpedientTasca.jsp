@@ -3,6 +3,9 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<%
+pageContext.setAttribute("isRolActualAdministradorLectura", es.caib.ripea.back.helper.RolHelper.isRolActualAdministradorLectura(request), PageContext.SESSION_SCOPE);
+%>
 <html>
 <head>
 	<title><spring:message code="metaexpedient.tasca.titol"/>: ${metaExpedient.nom}</title>
@@ -17,7 +20,7 @@
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
 </head>
 <body>
-	<c:if test="${!esRevisor && !bloquejarCamps}">
+	<c:if test="${!esRevisor && !bloquejarCamps && !isRolActualAdministradorLectura}">
 		<div class="text-right" data-toggle="botons-titol">
 			<a class="btn btn-default" href="tasca/new" data-toggle="modal" data-datatable-id="metadades"><span class="fa fa-plus"></span>&nbsp;<spring:message code="metaexpedient.tasca.boto.afegir"/></a>
 		</div>
@@ -26,7 +29,13 @@
 	<c:set var="element" scope="request" value="tasca"/>
 	<jsp:include page="includes/procedimentElementsMenu.jsp"/>
 	
-	<table id="metadades" data-toggle="datatable" data-url="<c:url value="/metaExpedient/${metaExpedient.id}/tasca/datatable"/>" data-info-type="search" data-default-order="0" data-default-dir="asc" class="table table-striped table-bordered">
+	<table id="metadades"
+		data-toggle="datatable"
+		data-url="<c:url value="/metaExpedient/${metaExpedient.id}/tasca/datatable"/>"
+		data-info-type="search"
+		data-default-order="0"
+		data-default-dir="asc"
+		class="table table-striped table-bordered">
 		<thead>
 			<tr>
 				<th data-col-name="codi" data-orderable="false"><spring:message code="metaexpedient.tasca.columna.codi"/></th>
@@ -79,6 +88,7 @@
 						{{if activa}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>
+				<c:if test="${!isRolActualAdministradorLectura}">
 				<th data-col-name="id"  data-template="#cellAccionsTemplate" data-orderable="false" width="5%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
 						<div class="dropdown">
@@ -104,6 +114,7 @@
 						</div>
 					</script>
 				</th>
+				</c:if>
 			</tr>
 		</thead>
 	</table>

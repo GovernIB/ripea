@@ -1,32 +1,89 @@
 package es.caib.ripea.back.controller;
 
-import es.caib.ripea.back.command.ContingutMoureCopiarEnviarCommand;
-import es.caib.ripea.back.helper.*;
-import es.caib.ripea.back.helper.DatatablesHelper.DatatablesResponse;
-import es.caib.ripea.plugin.notificacio.EnviamentEstat;
-import es.caib.ripea.service.intf.config.PropertyConfig;
-import es.caib.ripea.service.intf.dto.*;
-import es.caib.ripea.service.intf.registre.RegistreTipusEnum;
-import es.caib.ripea.service.intf.service.*;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.propertyeditors.CustomDateEditor;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.*;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.net.ConnectException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.net.ConnectException;
-import java.text.SimpleDateFormat;
-import java.util.*;
+
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import es.caib.ripea.back.command.ContingutMoureCopiarEnviarCommand;
+import es.caib.ripea.back.helper.BeanGeneratorHelper;
+import es.caib.ripea.back.helper.DatatablesHelper;
+import es.caib.ripea.back.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.back.helper.EntitatHelper;
+import es.caib.ripea.back.helper.EnumHelper;
+import es.caib.ripea.back.helper.ExceptionHelper;
+import es.caib.ripea.back.helper.ExpedientHelper;
+import es.caib.ripea.back.helper.JsonResponse;
+import es.caib.ripea.back.helper.MissatgesHelper;
+import es.caib.ripea.back.helper.ModalHelper;
+import es.caib.ripea.back.helper.RequestSessionHelper;
+import es.caib.ripea.back.helper.RolHelper;
+import es.caib.ripea.back.helper.SessioHelper;
+import es.caib.ripea.plugin.notificacio.EnviamentEstat;
+import es.caib.ripea.service.intf.config.PropertyConfig;
+import es.caib.ripea.service.intf.dto.AlertaDto;
+import es.caib.ripea.service.intf.dto.ArbreDto;
+import es.caib.ripea.service.intf.dto.CarpetaDto;
+import es.caib.ripea.service.intf.dto.CodiValorDto;
+import es.caib.ripea.service.intf.dto.ContingutDto;
+import es.caib.ripea.service.intf.dto.ContingutLogDetallsDto;
+import es.caib.ripea.service.intf.dto.ContingutVistaEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentDto;
+import es.caib.ripea.service.intf.dto.DocumentEnviamentEstatEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentEnviamentTipusEnumDto;
+import es.caib.ripea.service.intf.dto.EntitatDto;
+import es.caib.ripea.service.intf.dto.ExpedientCarpetaArbreDto;
+import es.caib.ripea.service.intf.dto.ExpedientDto;
+import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
+import es.caib.ripea.service.intf.dto.ExpedientTascaDto;
+import es.caib.ripea.service.intf.dto.FitxerDto;
+import es.caib.ripea.service.intf.dto.InteressatDto;
+import es.caib.ripea.service.intf.dto.InteressatTipusEnumDto;
+import es.caib.ripea.service.intf.dto.LogObjecteTipusEnumDto;
+import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
+import es.caib.ripea.service.intf.dto.MetaDocumentDto;
+import es.caib.ripea.service.intf.dto.NodeDto;
+import es.caib.ripea.service.intf.dto.PermissionEnumDto;
+import es.caib.ripea.service.intf.dto.ResultDocumentsSenseContingut;
+import es.caib.ripea.service.intf.dto.TascaEstatEnumDto;
+import es.caib.ripea.service.intf.dto.UsuariDto;
+import es.caib.ripea.service.intf.registre.RegistreTipusEnum;
+import es.caib.ripea.service.intf.service.AlertaService;
+import es.caib.ripea.service.intf.service.AplicacioService;
+import es.caib.ripea.service.intf.service.CarpetaService;
+import es.caib.ripea.service.intf.service.ContingutService;
+import es.caib.ripea.service.intf.service.DocumentEnviamentService;
+import es.caib.ripea.service.intf.service.DocumentService;
+import es.caib.ripea.service.intf.service.ExpedientInteressatService;
+import es.caib.ripea.service.intf.service.ExpedientService;
+import es.caib.ripea.service.intf.service.ExpedientTascaService;
+import es.caib.ripea.service.intf.service.MetaDadaService;
+import es.caib.ripea.service.intf.service.MetaDocumentService;
+import es.caib.ripea.service.intf.service.MetaExpedientService;
+import es.caib.ripea.service.intf.service.OrganGestorService;
+import es.caib.ripea.service.intf.service.URLInstruccioService;
 
 /**
  * Controlador per a la gestió de contenidors i mètodes compartits entre diferents tipus de contingut.
@@ -311,7 +368,8 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 		
 		model.addAttribute("expedientAgafatPerUsuariActual", agafatUsuariActual);
 
-		boolean potModificar = ((agafatUsuariActual && expedient.isUsuariActualWrite() || isTascaObert || contingut.isAdmin()) && expedient.getEstat().equals(ExpedientEstatEnumDto.OBERT));
+		boolean potModificar = ((agafatUsuariActual && expedient.isUsuariActualWrite() || isTascaObert || contingut.isAdmin()) 
+				&& expedient.getEstat().equals(ExpedientEstatEnumDto.OBERT));
 		model.addAttribute("potModificar", potModificar);
 		model.addAttribute("expedientObert", expedient.getEstat().equals(ExpedientEstatEnumDto.OBERT));
 		model.addAttribute("expedientTancat", expedient.getEstat().equals(ExpedientEstatEnumDto.TANCAT));

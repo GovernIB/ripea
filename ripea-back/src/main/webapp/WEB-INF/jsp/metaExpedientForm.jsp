@@ -4,6 +4,9 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+<%
+pageContext.setAttribute("isRolActualAdministradorLectura", es.caib.ripea.back.helper.RolHelper.isRolActualAdministradorLectura(request), PageContext.SESSION_SCOPE);
+%>
 <c:choose>
 	<c:when test="${empty metaExpedientCommand.id}">
 		<c:set var="titol"><spring:message code="metaexpedient.form.titol.crear" /></c:set>
@@ -459,7 +462,7 @@ function calculateClassificacioId() {
 				<rip:inputCheckbox name="gestioAmbGrupsActiva" textKey="metaexpedient.form.camp.gestioAmbGrupsActiva" disabled="${bloquejarCamps}"/>
 				
 				<c:if test="${isObligarInteressatActiu}">
-					<rip:inputCheckbox name="interessatObligatori" textKey="metaexpedient.form.camp.interessat"/>
+					<rip:inputCheckbox name="interessatObligatori" textKey="metaexpedient.form.camp.interessat" disabled="${bloquejarCamps}"/>
 				</c:if>
 				
 				<rip:inputCheckbox 

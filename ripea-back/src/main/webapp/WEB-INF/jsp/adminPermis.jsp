@@ -30,6 +30,12 @@
 						{{if administration}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>
+				<th data-col-name="administrationLectura" data-orderable="false" data-template="#cellAdministrationReadTemplate">
+					<spring:message code="permis.list.columna.administracioRead"/>
+					<script id="cellAdministrationReadTemplate" type="text/x-jsrender">
+						{{if administrationLectura}}<span class="fa fa-check"></span>{{/if}}
+					</script>
+				</th>
 				<th data-col-name="read" data-orderable="false" data-template="#cellReadTemplate">
 					<spring:message code="permis.list.columna.usuari"/>
 					<script id="cellReadTemplate" type="text/x-jsrender">

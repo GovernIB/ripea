@@ -252,6 +252,9 @@ public class MetaExpedientController extends BaseAdminController {
 				model.addAttribute("bloquejarCamps", true);
 				model.addAttribute("consultar", true);
 				model.addAttribute("isRolActualRevisor", true);
+			} else if (RolHelper.isRolActualAdministradorLectura(request)){
+				model.addAttribute("bloquejarCamps", true);
+				model.addAttribute("consultar", true);
 			}
 		}
 		

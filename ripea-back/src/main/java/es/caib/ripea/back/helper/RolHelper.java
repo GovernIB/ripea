@@ -25,6 +25,7 @@ public class RolHelper {
 
 	private static final String ROLE_SUPER 			= "IPA_SUPER";
 	private static final String ROLE_ADMIN 			= "IPA_ADMIN";
+	private static final String ROLE_ADMIN_LECTURA	= "IPA_ADMIN_LECTURA";
 	private static final String ROLE_DISSENY 		= "IPA_DISSENY";
 	private static final String ROLE_ADMIN_ORGAN 	= "IPA_ORGAN_ADMIN";
 	private static final String ROLE_REVISOR 		= "IPA_REVISIO";
@@ -102,6 +103,8 @@ public class RolHelper {
 				rolActual = ROLE_USER;
 			} else if (request.isUserInRole(ROLE_ADMIN) && rolsDisponibles.contains(ROLE_ADMIN)) {
 				rolActual = ROLE_ADMIN;
+			} else if (request.isUserInRole(ROLE_ADMIN_LECTURA) && rolsDisponibles.contains(ROLE_ADMIN_LECTURA)) {
+				rolActual = ROLE_ADMIN_LECTURA;				
 			} else if (isUsuariActualTeOrgans(request) && rolsDisponibles.contains(ROLE_ADMIN_ORGAN)) {
 				rolActual = ROLE_ADMIN_ORGAN;
 			} else if (request.isUserInRole(ROLE_SUPER) && rolsDisponibles.contains(ROLE_SUPER)) {
@@ -148,6 +151,9 @@ public class RolHelper {
 	public static boolean isRolActualAdministrador(HttpServletRequest request) {
 		return ROLE_ADMIN.equals(getRolActual(request));
 	}
+	public static boolean isRolActualAdministradorLectura(HttpServletRequest request) {
+		return ROLE_ADMIN_LECTURA.equals(getRolActual(request));
+	}
 	public static boolean isRolActualAdministradorOrgan(HttpServletRequest request) {
 		return ROLE_ADMIN_ORGAN.equals(getRolActual(request));
 	}
@@ -170,6 +176,9 @@ public class RolHelper {
 	public static boolean hasRolAdministrador(HttpServletRequest request) {
 		return getRolsUsuariActual(request).contains(ROLE_ADMIN);
 	}
+	public static boolean hasRolAdministradorRead(HttpServletRequest request) {
+		return getRolsUsuariActual(request).contains(ROLE_ADMIN_LECTURA);
+	}
 	public static boolean hasRolAdministradorOrgan(HttpServletRequest request) {
 		return getRolsUsuariActual(request).contains(ROLE_ADMIN_ORGAN);
 	}
@@ -190,6 +199,9 @@ public class RolHelper {
 		if (entitatActual != null) {
 			if (entitatActual.isUsuariActualAdministration() && request.isUserInRole(ROLE_ADMIN)) {
 				rols.add(ROLE_ADMIN);
+			}
+			if (entitatActual.isUsuariActualAdministrationRead() && request.isUserInRole(ROLE_ADMIN_LECTURA)) {
+				rols.add(ROLE_ADMIN_LECTURA);
 			}
 			if (request.isUserInRole(ROLE_ADMIN_ORGAN)) {
 				rols.add(ROLE_ADMIN_ORGAN);

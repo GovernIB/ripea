@@ -3,7 +3,9 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
-
+<%
+pageContext.setAttribute("isRolActualAdministradorLectura", es.caib.ripea.back.helper.RolHelper.isRolActualAdministradorLectura(request), PageContext.SESSION_SCOPE);
+%>
 <html>
 <head>
 	<title><spring:message code="metadocument.list.titol"/>: ${metaExpedient.nom}</title>
@@ -30,7 +32,7 @@
 	
 </head>
 <body>
-	<c:if test="${!esRevisor && !bloquejarCamps}">
+	<c:if test="${!esRevisor && !bloquejarCamps && !isRolActualAdministradorLectura}">
 		<div class="text-right" data-toggle="botons-titol">
 			<a class="btn btn-default" href="metaDocument/new" data-toggle="modal" data-datatable-id="metadocuments"><span class="fa fa-plus"></span>&nbsp;<spring:message code="metadocument.list.boto.nou"/></a>
 		</div>
@@ -38,14 +40,13 @@
 	
 	<c:set var="element" scope="request" value="document"/>
 	<jsp:include page="includes/procedimentElementsMenu.jsp"/>
-
 	
 	<table
 		id="metadocuments"
 		data-toggle="datatable"
 		data-url="<c:url value="metaDocument/datatable"/>"
 		data-info-type="search"
-		${!esRevisor ? 'data-drag-enabled="true"' : ''}
+		${!esRevisor && !isRolActualAdministradorLectura ? 'data-drag-enabled="true"' : ''}
 		class="table table-striped table-bordered"
 		style="width:100%">
 		<thead>
@@ -115,6 +116,10 @@
 						<a href="<c:url value="/metaDocument/{{:id}}/metaDada"/>" class="btn btn-default"><span class="fa fa-file-alt"></span>&nbsp;<spring:message code="metaexpedient.list.boto.meta.dades"/>&nbsp;<span class="badge">{{:metaDadesCount}}</span></a>
 					</script>
 				</th>
+				<c:if test="${isRolActualAdministradorLectura}">
+				<th data-col-name="id" data-visible="false"></th>
+				</c:if>
+				<c:if test="${!isRolActualAdministradorLectura}">
 				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
 						<div class="dropdown">
@@ -145,6 +150,7 @@
 						</div>
 					</script>
 				</th>
+				</c:if>
 			</tr>
 		</thead>
 	</table>

@@ -20,6 +20,7 @@ public class PermisDto implements Serializable {
 	private boolean delete;
 	private boolean procedimentsComuns;
 	private boolean administration;
+	private boolean administrationLectura;
 	private boolean administrationComuns;
 	private boolean statistics;
 	private boolean disseny;

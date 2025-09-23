@@ -33,6 +33,7 @@ public class EntitatDto extends AuditoriaDto {
 	
 	private boolean usuariActualRead;
 	private boolean usuariActualAdministration;
+	private boolean usuariActualAdministrationRead;
 	
 	private byte[] logoImgBytes;
 	private boolean logo;

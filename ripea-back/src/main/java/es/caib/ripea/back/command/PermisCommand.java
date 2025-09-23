@@ -28,6 +28,7 @@ public class PermisCommand {
 	private boolean create;
 	private boolean delete;
 	private boolean administration;
+	private boolean administrationLectura;
 	private boolean statistics;
 	private boolean selectAll;
 	private boolean procedimentsComuns;
@@ -125,5 +126,9 @@ public class PermisCommand {
 		this.administrationComuns = administrationComuns;
 	}
 
-	public void setDisseny(boolean disseny) { this.disseny = disseny; }	
+	public void setDisseny(boolean disseny) { this.disseny = disseny; }
+
+	public void setAdministrationLectura(boolean administrationLectura) {
+		this.administrationLectura = administrationLectura;
+	}	
 }

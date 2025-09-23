@@ -3,6 +3,9 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<%
+pageContext.setAttribute("isRolActualAdministradorLectura", es.caib.ripea.back.helper.RolHelper.isRolActualAdministradorLectura(request), PageContext.SESSION_SCOPE);
+%>
 <html>
 <head>
 	<title><spring:message code="metadocument.metadada.titol"/></title>
@@ -27,10 +30,19 @@ $(document).ready(function() {
 </script>
 </head>
 <body>
+	<c:if test="${!isRolActualAdministradorLectura}">
 	<div class="text-right" data-toggle="botons-titol">
 		<a class="btn btn-default" href="metaDada/new" data-toggle="modal" data-datatable-id="metadades"><span class="fa fa-plus"></span>&nbsp;<spring:message code="metadocument.metadada.boto.afegir"/></a>
 	</div>
-	<table id="metadades" data-toggle="datatable" data-url="<c:url value="/metaDocument/${metaDocument.id}/metaDada/datatable"/>" data-drag-enabled="true" data-info-type="search" data-default-order="0" data-default-dir="asc" class="table table-striped table-bordered">
+	</c:if>
+	<table id="metadades"
+		data-toggle="datatable"
+		data-url="<c:url value="/metaDocument/${metaDocument.id}/metaDada/datatable"/>"
+		${!isRolActualAdministradorLectura ? 'data-drag-enabled="true"' : ''}
+		data-info-type="search"
+		data-default-order="0"
+		data-default-dir="asc"
+		class="table table-striped table-bordered">
 		<thead>
 			<tr>
 				<th data-col-name="ordre" data-visible="false"></th>
@@ -44,6 +56,7 @@ $(document).ready(function() {
 						{{if metaDada.activa}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>
+				<c:if test="${!isRolActualAdministradorLectura}">
 				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
 						<div class="dropdown">
@@ -57,6 +70,7 @@ $(document).ready(function() {
 						</div>
 					</script>
 				</th>
+				</c:if>
 			</tr>
 		</thead>
 	</table>

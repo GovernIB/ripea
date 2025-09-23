@@ -5,8 +5,9 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
-
-
+<%
+pageContext.setAttribute("isRolActualAdministradorLectura", es.caib.ripea.back.helper.RolHelper.isRolActualAdministradorLectura(request), PageContext.SESSION_SCOPE);
+%>
 <c:set var="expedientId" scope="request" value="${contingut.expedientId}" />
 <c:set var="expedient" scope="request" value="${contingut.expedientObject}" />
 
@@ -39,7 +40,7 @@
 <c:set var="permissionWrite" scope="request" value="${expedient.usuariActualWrite}"/>
 <c:set var="potModificar" scope="request">
 	<c:choose>
-		<c:when test="${((expedientAgafatPerUsuariActual and permissionWrite) or isTascaObert or contingut.admin) and expedientObert}">true</c:when>
+		<c:when test="${((expedientAgafatPerUsuariActual and permissionWrite) or isTascaObert or contingut.admin) and expedientObert and !isRolActualAdministradorLectura}">true</c:when>
 		<c:otherwise>false</c:otherwise>
 	</c:choose>
 </c:set>
@@ -578,9 +579,9 @@ function removeCookie(cname) {
 <body>
 	<div class="rmodal"></div>
 	<input id="contingutId" type="hidden" value="${contingut.id}">
-	
+
 	<!---------------------------------------- AGAFAR / ALLIBERAR  ------------------------------------------>
-	<c:if test="${(contingut.expedient or contingut.carpeta) and not empty expedient.agafatPer and !isTasca}">
+	<c:if test="${(contingut.expedient or contingut.carpeta) and not empty expedient.agafatPer and !isTasca and !isRolActualAdministradorLectura}">
 		<div class="text-right" data-toggle="botons-titol">
 			<ul class="list-group pull-right">
 	  			<li class="list-group-item" style="padding: 5px 12px; margin-right: 4px">
@@ -593,7 +594,7 @@ function removeCookie(cname) {
 	  		</ul>
 		</div>
 	</c:if>
-	<c:if test="${!isTasca && not expedientAgafatPerUsuariActual}">
+	<c:if test="${!isTasca && not expedientAgafatPerUsuariActual and !isRolActualAdministradorLectura}">
 		<div id="alerta-no-agafat" class="alert well-sm alert-info alert-dismissable" style="min-height: 40px;">
 			<c:if test="${!contingut.admin}">
 				<span class="fa fa-info-circle"></span> 
@@ -753,7 +754,7 @@ function removeCookie(cname) {
 							</ul>
 						</c:if> 
 						
-						<c:if test="${!isTasca}">
+						<c:if test="${!isTasca && !isRolActualAdministradorLectura}">
 							<rip:blocContingutAccions 
 								id="botons-accions-info" 
 								contingut="${expedient}"

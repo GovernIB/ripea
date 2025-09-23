@@ -4,7 +4,9 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
-
+<%
+pageContext.setAttribute("isRolActualAdministradorLectura", es.caib.ripea.back.helper.RolHelper.isRolActualAdministradorLectura(request), PageContext.SESSION_SCOPE);
+%>
 <html>
 <head>
 	<title><spring:message code="expedient.list.user.titol"/></title>
@@ -587,12 +589,13 @@ function removeCookie(cname) {
 		</div>
 	</script>
 	<script id="rowhrefTemplate" type="text/x-jsrender">contingut/{{:id}}</script>
+	
 	<table
 		id="taulaDades"
 		data-toggle="datatable" 
 		data-url="<c:url value="/expedient/datatable"/>"
 		data-selection-enabled="true"
-		data-botons-template="#botonsTemplate"
+		<c:if test="${!isRolActualAdministradorLectura}">data-botons-template="#botonsTemplate"</c:if>
 		data-rowhref-template="#rowhrefTemplate"
 		data-save-state="true" 
 		data-default-order="19"
@@ -726,6 +729,34 @@ function removeCookie(cname) {
 						{{/if}}							
 					</script>
 				</th>
+				<c:if test="${isRolActualAdministradorLectura}">
+					<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="1%">
+					<script id="cellAccionsTemplate" type="text/x-jsrender">
+						<div class="dropdown">
+							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
+							<ul class="dropdown-menu">
+								<%---- Gestionar ----%>
+								<li><a id="agafar_lnk" href="contingut/{{:id}}"><span class="fa fa-folder-open-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.consultar"/></a></li>
+
+								<%---- Seguir -----%>
+								{{if usuariActualWrite && seguidor}}
+									<li><a href="expedient/{{:id}}/unfollow" data-toggle="ajax"><span class="fa fa-user-times"></span>&nbsp;&nbsp;<spring:message code="comu.boto.unfollow"/></a></li>
+								{{else usuariActualWrite && !seguidor}}					
+									<li><a href="expedient/{{:id}}/follow" data-toggle="ajax"><span class="fa fa-user-plus"></span>&nbsp;&nbsp;<spring:message code="comu.boto.follow"/></a></li>		
+								{{/if}}
+								<li role="separator" class="divider"></li>
+								<li><a href="<c:url value="/contingut/{{:id}}/log"/>" data-toggle="modal"><span class="fa fa-list"></span>&nbsp;<spring:message code="comu.boto.historial"/></a></li>
+								{{if arxiuUuid != null}}
+									<li><a href="<c:url value="/contingut/{{:id}}/arxiu"/>" data-toggle="modal"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.arxiu"/></a></li>
+								{{else}}
+									<li class="disabled"><a href="#"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.arxiu"/></a></li>
+								{{/if}}
+							</ul>
+						</div>
+					</script>
+					</th>
+				</c:if>
+				<c:if test="${!isRolActualAdministradorLectura}">
 				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="1%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
 						<div class="dropdown">
@@ -846,7 +877,8 @@ function removeCookie(cname) {
 							</ul>
 						</div>
 					</script>
-				</th>				
+				</th>
+				</c:if>
 			</tr>
 		</thead>
 	</table>

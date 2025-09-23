@@ -4,6 +4,9 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+<%
+pageContext.setAttribute("isRolActualAdministradorLectura", es.caib.ripea.back.helper.RolHelper.isRolActualAdministradorLectura(request), PageContext.SESSION_SCOPE);
+%>
 <rip:blocIconaContingutNoms/>
 <html>
 <head>
@@ -35,7 +38,7 @@
 <body>
 
 	<script id="botonsTemplate" type="text/x-jsrender">
-		<c:if test="${!bloquejarCamps}">
+		<c:if test="${!bloquejarCamps && !isRolActualAdministradorLectura}">
 		<p style="text-align:right"><a class="btn btn-default" href="${metaExpedient.id}/new" data-toggle="modal" data-datatable-id="regles" data-refresh-pagina="true"><span class="fa fa-plus"></span>&nbsp;<spring:message code="expedient.estat.list.boto.nou"/></a></p>
 		</c:if>
 	</script>
@@ -43,7 +46,12 @@
 	<c:set var="element" scope="request" value="estat"/>
 	<jsp:include page="includes/procedimentElementsMenu.jsp"/>
 	
-	<table id="estats" data-toggle="datatable" data-url="<c:url value="/expedientEstat/${metaExpedient.id}/datatable"/>" ${!esRevisor ? 'data-drag-enabled="true"' : ''} class="table table-striped table-bordered" style="width:100%" ${!esRevisor ? 'data-botons-template="#botonsTemplate"' : ''}>
+	<table id="estats" 
+		data-toggle="datatable"
+		data-url="<c:url value="/expedientEstat/${metaExpedient.id}/datatable"/>"
+		${!esRevisor && !isRolActualAdministradorLectura ? 'data-drag-enabled="true"' : ''}
+		class="table table-striped table-bordered"
+		style="width:100%" ${!esRevisor ? 'data-botons-template="#botonsTemplate"' : ''}>
 
 		<thead>
 			<tr>
@@ -66,6 +74,7 @@
 						<span class="color-legend" {{if color}}style="background-color: {{:color}};"{{else}}style="border: dashed 1px #AAA;"{{/if}}></span>
 					</script>
 				</th>
+				<c:if test="${!isRolActualAdministradorLectura}">
 				<th data-col-name="id" data-orderable="false" data-template="#cellAccionsTemplate" width="10%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
 						<div class="dropdown">
@@ -86,6 +95,7 @@
 						</div>
 					</script>
 				</th>
+				</c:if>
 			</tr>
 		</thead>
 	</table>

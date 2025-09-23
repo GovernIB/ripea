@@ -25,14 +25,15 @@ public class PermisosEntitatHelper {
 	@Autowired private OrganGestorService organGestorService;
 
 	public void omplirPermisosPerEntitats(List<EntitatDto> entitats, boolean ambLlistaPermisos) {
+		
 		// Filtra les entitats per saber els permisos per a l'usuari actual
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		ObjectIdentifierExtractor<EntitatDto> oie = new ObjectIdentifierExtractor<EntitatDto>() {
-
 			public Long getObjectIdentifier(EntitatDto entitat) {
 				return entitat.getId();
 			}
 		};
+		
 		List<EntitatDto> entitatsRead = new ArrayList<EntitatDto>();
 		entitatsRead.addAll(entitats);
 		permisosHelper.filterGrantedAll(
@@ -41,6 +42,7 @@ public class PermisosEntitatHelper {
 				EntitatEntity.class,
 				new Permission[] { ExtendedPermission.READ },
 				auth);
+		
 		List<EntitatDto> entitatsAdministracio = new ArrayList<EntitatDto>();
 		entitatsAdministracio.addAll(entitats);
 		permisosHelper.filterGrantedAll(
@@ -49,12 +51,23 @@ public class PermisosEntitatHelper {
 				EntitatEntity.class,
 				new Permission[] { ExtendedPermission.ADMINISTRATION },
 				auth);
+		
+		List<EntitatDto> entitatsAdministracioLectura = new ArrayList<EntitatDto>();
+		entitatsAdministracioLectura.addAll(entitats);
+		permisosHelper.filterGrantedAll(
+				entitatsAdministracioLectura,
+				oie,
+				EntitatEntity.class,
+				new Permission[] { ExtendedPermission.ADMINISTRATION_READ },
+				auth);
 
 		for (EntitatDto entitat : entitats) {
 			entitat.setUsuariActualRead(entitatsRead.contains(entitat));
-			entitat.setUsuariActualAdministration(entitatsAdministracio.contains(entitat));		
+			entitat.setUsuariActualAdministration(entitatsAdministracio.contains(entitat));	
+			entitat.setUsuariActualAdministrationRead(entitatsAdministracioLectura.contains(entitat));
 			entitat.setOrgansGestors(organGestorService.findOrganismesEntitatAmbPermis(entitat.getId()));
 		}
+
 		// Obté els permisos per a totes les entitats només amb una consulta
 		if (ambLlistaPermisos) {
 			List<Serializable> ids = new ArrayList<Serializable>();

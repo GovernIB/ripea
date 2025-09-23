@@ -24,6 +24,7 @@ public class ExtendedPermission extends BasePermission {
 	public static final Permission COMU = new ExtendedPermission(1 << 6, 'M'); // 64
 	public static final Permission ADM_COMU = new ExtendedPermission(1 << 7, 'O'); // 128
 	public static final Permission DISSENY = new ExtendedPermission(1 << 8, 'Y'); // 256
+	public static final Permission ADMINISTRATION_READ = new ExtendedPermission(1 << 9, 'E'); // 512
 	
 	protected ExtendedPermission(int mask) {
 		super(mask);

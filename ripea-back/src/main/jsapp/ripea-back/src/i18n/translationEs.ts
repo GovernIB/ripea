@@ -35,6 +35,7 @@ const translationEs = {
         rol: {
             IPA_SUPER: "Superusuario",
             IPA_ADMIN: "Administrador de entidad",
+			IPA_ADMIN_LECTURA: "Administrador (lectura)",
             IPA_DISSENY: "Diseñador de Órgano gestor",
             IPA_ORGAN_ADMIN: "Administrador de Órgano gestor",
             IPA_REVISIO: "Revisor de procedimientos",

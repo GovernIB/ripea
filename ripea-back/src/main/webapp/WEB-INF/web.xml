@@ -14,6 +14,9 @@
 		<role-name>IPA_ADMIN</role-name>
 	</security-role>
 	<security-role>
+		<role-name>IPA_ADMIN_LECTURA</role-name>
+	</security-role>	
+	<security-role>
 		<role-name>IPA_DISSENY</role-name>
 	</security-role>
 	<security-role>

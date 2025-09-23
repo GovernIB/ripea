@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.query.Param;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -1328,7 +1329,10 @@ public class ExpedientServiceImpl implements ExpedientService {
 				ordenacioMap.put("agafatPer.codiAndNom", new String[] {"agafatPer.codi"});
 				ordenacioMap.put("estat", new String[] {"estatAdditional", "estat", "id"});
 				paginacioParams.eliminaCampOrdenacio("tipusStr");
-	
+
+				boolean isAdmin 		= rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ADMIN_LECTURA") || rolActual.equals("IPA_SUPER");
+				boolean noFiltreGrups	= rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ADMIN_LECTURA") || rolActual.equals("IPA_ORGAN_ADMIN");
+
 				Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap);
 				Page<ExpedientEntity> paginaExpedients = expedientRepository.findByEntitatAndPermesosAndFiltre(
 						entitat,
@@ -1384,8 +1388,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 						filtre.getMetaExpedientDominiValor(),
 						permisosPerExpedients.getIdsGrupsPermesos() == null,
 						permisosPerExpedients.getIdsGrupsPermesos(),
-						rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_SUPER"), //No aplica filtre permis directe procediment
-						rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN"), //No aplica filtre grups
+						isAdmin, //No aplica filtre permis directe procediment
+						noFiltreGrups, //No aplica filtre grups
 						filtre.isAmbFirmaPendent(),
 						Utils.isEmpty(filtre.getNumeroRegistre()),
 						! Utils.isEmpty(filtre.getNumeroRegistre()) ? filtre.getNumeroRegistre() : "",

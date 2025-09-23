@@ -3,6 +3,9 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<%
+pageContext.setAttribute("isRolActualAdministradorLectura", es.caib.ripea.back.helper.RolHelper.isRolActualAdministradorLectura(request), PageContext.SESSION_SCOPE);
+%>
 <c:set var="metaNodeNom" value="${metaExpedient.nom}"/>
 <c:if test="${not empty metaDocument}"><c:set var="metaNodeNom" value="${metaDocument.nom}"/></c:if>
 <html>
@@ -44,7 +47,7 @@ $(document).ready(function() {
 </script>	
 </head>
 <body>
-	<c:if test="${!esRevisor && !bloquejarCamps}">
+	<c:if test="${!esRevisor && !bloquejarCamps && !isRolActualAdministradorLectura}">
 		<div class="text-right" data-toggle="botons-titol">
 			<a class="btn btn-default" href="metaDada/new" data-toggle="modal" data-datatable-id="metadades"><span class="fa fa-plus"></span>&nbsp;<spring:message code="metadada.list.boto.nova"/></a>
 		</div>
@@ -54,7 +57,14 @@ $(document).ready(function() {
 		<c:set var="element" scope="request" value="dada"/>
 		<jsp:include page="includes/procedimentElementsMenu.jsp"/>
 	</c:if>
-	<table id="metadades" data-toggle="datatable" data-url="<c:url value="metaDada/datatable"/>" data-default-order="0" data-default-dir="asc" data-info-type="search" ${!esRevisor ? 'data-drag-enabled="true"' : ''} class="table table-striped table-bordered">
+	<table id="metadades"
+		data-toggle="datatable"
+		data-url="<c:url value="metaDada/datatable"/>"
+		data-default-order="0"
+		data-default-dir="asc"
+		data-info-type="search"
+		${!esRevisor && !isRolActualAdministradorLectura ? 'data-drag-enabled="true"' : ''}
+		class="table table-striped table-bordered">
 		<thead>
 			<tr>
 				<th data-col-name="ordre" data-visible="false"></th>
@@ -69,6 +79,7 @@ $(document).ready(function() {
 						{{if activa}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>
+				<c:if test="${!isRolActualAdministradorLectura}">
 				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
 						<div class="dropdown">
@@ -94,6 +105,7 @@ $(document).ready(function() {
 						</div>
 					</script>
 				</th>
+				</c:if>
 			</tr>
 		</thead>
 	</table>
