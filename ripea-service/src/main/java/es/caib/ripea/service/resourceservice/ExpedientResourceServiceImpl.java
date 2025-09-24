@@ -207,24 +207,14 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     
     @Override
     protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
-
+    	
         // En cas de no disposar d'entitat actual, filtrarem per un string "................................................................................"
         // amb una mida superior a la mida màxima del camp codi de manera que asseguram que no es retornin resultats un cop aplicat el filtre
         String entitatActualCodi = configHelper.getEntitatActualCodi();
         String organActualCodi	 = configHelper.getOrganActualCodi();
         String rolActual		 = configHelper.getRolActual();
-    	
-        Filter filtreFrontAndEntitat = FilterBuilder.and(
-                (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null,
-                FilterBuilder.equal(MetaExpedientResource.Fields.entitat + "." + EntitatResource.Fields.codi, 
-                		entitatActualCodi != null?entitatActualCodi:"................................................................................")
-        );
-    	
-    	Map<String, String> mapaNamedQueries =  Utils.namedQueriesToMap(namedQueries);
-    	if (mapaNamedQueries.size()>0 && mapaNamedQueries.containsKey("FROM_TASCA")) {
-            return filtreFrontAndEntitat.generate();
-    	}
 
+        //throw new PermissionDeniedException
         EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true, false);
         OrganGestorEntity ogEntity	= organGestorRepository.findByEntitatIdAndCodi(entitatEntity.getId(), organActualCodi);
         
@@ -237,6 +227,12 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		if (permisosPerExpedients.capPermis()) {
 			return FilterBuilder.equal("id", 0).generate();
 		}
+		
+        Filter filtreFrontAndEntitat = FilterBuilder.and(
+                (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null,
+                FilterBuilder.equal(MetaExpedientResource.Fields.entitat + "." + EntitatResource.Fields.codi, 
+                		entitatActualCodi != null?entitatActualCodi:"................................................................................")
+        );
 		
 		Filter filtreNoEliminats = FilterBuilder.and(FilterBuilder.equal(ContingutResource.Fields.esborrat, "0"));
 		Filter filtrePermisos = null;
