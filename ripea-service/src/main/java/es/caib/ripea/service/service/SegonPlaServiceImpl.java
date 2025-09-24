@@ -1,5 +1,30 @@
 package es.caib.ripea.service.service;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import es.caib.ripea.persistence.entity.ContingutEntity;
 import es.caib.ripea.persistence.entity.DocumentEntity;
 import es.caib.ripea.persistence.entity.EmailPendentEnviarEntity;
@@ -16,6 +41,8 @@ import es.caib.ripea.persistence.repository.InteressatRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientComentariRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientRepository;
 import es.caib.ripea.service.config.SchedulingConfig;
+import es.caib.ripea.service.helper.AnotacioDistribucioHelper;
+import es.caib.ripea.service.helper.ApplicationHelper;
 import es.caib.ripea.service.helper.CacheHelper;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.ConversioTipusHelper;
@@ -25,9 +52,9 @@ import es.caib.ripea.service.helper.ExpedientHelper;
 import es.caib.ripea.service.helper.ExpedientHelper2;
 import es.caib.ripea.service.helper.ExpedientInteressatHelper;
 import es.caib.ripea.service.helper.ExpedientPeticioHelper;
-import es.caib.ripea.service.helper.AnotacioDistribucioHelper;
 import es.caib.ripea.service.helper.MetaExpedientHelper;
 import es.caib.ripea.service.helper.OrganGestorHelper;
+import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.helper.SynchronizationHelper;
 import es.caib.ripea.service.helper.TestHelper;
 import es.caib.ripea.service.intf.config.PropertyConfig;
@@ -39,25 +66,6 @@ import es.caib.ripea.service.intf.exception.ArxiuJaGuardatException;
 import es.caib.ripea.service.intf.service.SegonPlaService;
 import es.caib.ripea.service.intf.utils.Utils;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 
 @Service
 @Slf4j
@@ -86,6 +94,8 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	@Autowired private SchedulingConfig schedulingConfig;
 	@Autowired private DocumentRepository documentRepository;
 	@Autowired private AnotacioDistribucioHelper anotacioDistribucioHelper;
+	@Autowired private ApplicationHelper applicationHelper;
+	@Autowired private PluginHelper pluginHelper;
 
     /*
 	 * Obtain registres from DISTRIBUCIO for created peticions and save them in DB
@@ -483,7 +493,34 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 		
 		if (cacheHelper.mostrarLogsSegonPla())
 			logger.info("Fin de tasca periòdica: Consulta expedients pendents de tancar a l'arxiu i que ha arribat l'hora programada :  " + (System.currentTimeMillis() - t1) + " ms");
+	}
+	
+	@Override
+	@Transactional
+	public void generarJsonMetriques() throws Exception {
 		
+		long t1 = System.currentTimeMillis();
+		if (cacheHelper.mostrarLogsSegonPla())
+			logger.info("Execució tasca periòdica: Consulta expedients pendents de tancar a l'arxiu i que ha arribat l'hora programada");
+
+		String jsonMetrics = applicationHelper.getMetriquesJSON();
+        InputStream contingut = new ByteArrayInputStream(jsonMetrics.getBytes(StandardCharsets.UTF_8));
+        String baseDir = configHelper.getConfig(PropertyConfig.GESDOC_PLUGIN_FILESYSTEM_PATH);
+        String agrupacio = "METRICS";
+		if (baseDir.endsWith("/")) {
+			baseDir = baseDir + agrupacio;
+		} else {
+			baseDir = baseDir + "/" + agrupacio;
+		}
+		//Si no el getGestioDocumentalPlugin dona un error
+		List<EntitatEntity> entitats = entitatRepository.findAll();
+		if (entitats!=null && entitats.size()>0) {
+			ConfigHelper.setEntitat(conversioTipusHelper.convertir(entitats.get(0), EntitatDto.class));
+	    	pluginHelper.gestioDocumentalCreate(agrupacio, contingut);
+		}
+		
+		if (cacheHelper.mostrarLogsSegonPla())
+			logger.info("Fin de tasca periòdica: Consulta expedients pendents de tancar a l'arxiu i que ha arribat l'hora programada :  " + (System.currentTimeMillis() - t1) + " ms");
 	}
 	
 	@Override

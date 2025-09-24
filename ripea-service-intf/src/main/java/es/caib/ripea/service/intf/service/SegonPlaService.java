@@ -28,4 +28,6 @@ public interface SegonPlaService {
 	void restartSchedulledTasks(String taskCodi);
 	
 	void tancarExpedientsArxiu();
+	
+	void generarJsonMetriques() throws Exception;
 }

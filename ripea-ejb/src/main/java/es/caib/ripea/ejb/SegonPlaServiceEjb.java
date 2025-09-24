@@ -89,4 +89,10 @@ public class SegonPlaServiceEjb extends AbstractServiceEjb<SegonPlaService> impl
 	public void tancarExpedientsArxiu() {
 		delegateService.tancarExpedientsArxiu();
 	}
+	
+	@Override
+	@RolesAllowed("**")
+	public void generarJsonMetriques() throws Exception {
+		delegateService.generarJsonMetriques();
+	}
 }

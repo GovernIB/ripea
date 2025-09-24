@@ -30,7 +30,6 @@ import es.caib.comanda.ms.salut.model.SalutInfo;
 import es.caib.comanda.ms.salut.model.SubsistemaSalut;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.repository.EntitatRepository;
-import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.AvisDto;
 import es.caib.ripea.service.intf.dto.MetriquesRipeaInfoDto;
@@ -616,22 +615,6 @@ public class SalutServiceImpl implements SalutService{
     }
     
     public List<SubsistemaSalut> checkSubsistemes() {
-    	
-    	/*String jsonMetrics;
-		try {
-			jsonMetrics = aplicacioService.getMetriquesJSON();
-	        InputStream contingut = new ByteArrayInputStream(jsonMetrics.getBytes(StandardCharsets.UTF_8));
-	        String baseDir = aplicacioService.propertyFindByNom(PropertyConfig.GESDOC_PLUGIN_FILESYSTEM_PATH);
-	        String agrupacio = "METRICS";
-			if (baseDir.endsWith("/")) {
-				baseDir = baseDir + agrupacio;
-			} else {
-				baseDir = baseDir + "/" + agrupacio;
-			}
-	    	pluginHelper.gestioDocumentalCreate("JSONSS", contingut);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}*/
     	
     	List<SubsistemaSalut> salutSubsistemes = new ArrayList<SubsistemaSalut>();
     	

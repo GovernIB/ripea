@@ -69,6 +69,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
     private final String codiActualitzacioDeProcediments = "actualitzacioDeProcediments";
     private final String codiConsultaDeCanvisAlOrganigrama = "consultaDeCanvisAlOrganigrama";
     private final String codiBuidarCachesDominis = "buidarCachesDominis";
+    private final String codiGenerarJsonMetriques = "generarJsonMetriques";
 
      @Bean
      public TaskScheduler taskScheduler() {
@@ -115,6 +116,9 @@ public class SchedulingConfig implements SchedulingConfigurer {
             }
             if (codiBuidarCachesDominis.equals(taskCodi) || "totes".equals(taskCodi)) {
                 rescheduleTask("buidarCachesDominis", getTrigger(codiBuidarCachesDominis));
+            }
+            if (codiGenerarJsonMetriques.equals(taskCodi) || "totes".equals(taskCodi)) {
+                rescheduleTask("generarJsonMetriques", getTrigger(codiGenerarJsonMetriques));
             }
         }
     }
@@ -386,6 +390,27 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 },
                 getTrigger(codiTancarExpedientsEnArxiu)
         );
+
+        addTask(
+        		codiGenerarJsonMetriques,
+                new Runnable() {
+                    @SneakyThrows
+                    @Override
+                    public void run() {
+						monitorTasquesService.inici(codiGenerarJsonMetriques);
+						try {
+							createAuthenticationContext();
+	                        segonPlaService.generarJsonMetriques();
+							monitorTasquesService.fi(codiGenerarJsonMetriques);
+						} catch (Throwable th) {
+							tractarErrorTascaSegonPla(th, codiGenerarJsonMetriques);
+						} finally {
+                        	SecurityContextHolder.clearContext();
+                        }
+                    }
+                },
+                getTrigger(codiGenerarJsonMetriques)
+        );        
     } //Fi de configureTasks
 
     private Trigger getTrigger(String taskCodi) {
@@ -610,6 +635,24 @@ public class SchedulingConfig implements SchedulingConfigurer {
                     Date nextExecution = trigger.nextExecutionTime(triggerContext);
                     Long longNextExecution = nextExecution.getTime() - System.currentTimeMillis();
                     monitorTasquesService.updateProperaExecucio(codiEnviarDocumentsAlPortafirmes, longNextExecution);
+                    return nextExecution;
+                }
+            };
+        } else if (taskCodi.equals(codiGenerarJsonMetriques)) {
+            return new Trigger() {
+                @Override
+                public Date nextExecutionTime(TriggerContext triggerContext) {
+                	CronTrigger trigger = null;
+                    try {
+                    	String cron = configHelper.getConfig(PropertyConfig.JSON_METRIQUES_CRON);
+                    	if (cron == null) cron = "0 0 3 * * *";
+                        trigger = new CronTrigger(cron);
+                    } catch (Exception e) {
+                        log.error("Error getting next execution date for generarJsonMetriques()", e);
+                    }
+                    Date nextExecution = trigger.nextExecutionTime(triggerContext);
+                    Long longNextExecution = nextExecution.getTime() - System.currentTimeMillis();
+                    monitorTasquesService.updateProperaExecucio(codiGenerarJsonMetriques, longNextExecution);
                     return nextExecution;
                 }
             };
