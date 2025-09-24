@@ -17,6 +17,7 @@ import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import org.hibernate.Hibernate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -48,6 +49,7 @@ import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
 import es.caib.ripea.service.intf.dto.TascaEstatEnumDto;
 import es.caib.ripea.service.intf.model.ContingutResource;
 import es.caib.ripea.service.intf.model.EntitatResource;
+import es.caib.ripea.service.intf.model.ExpedientResource;
 import es.caib.ripea.service.intf.model.ExpedientTascaResource;
 import es.caib.ripea.service.intf.model.ExpedientTascaResource.DelegarTascaFormAction;
 import es.caib.ripea.service.intf.model.ExpedientTascaResource.ReassignarTascaFormAction;
