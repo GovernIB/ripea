@@ -221,7 +221,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         );
     	
     	Map<String, String> mapaNamedQueries =  Utils.namedQueriesToMap(namedQueries);
-    	if (mapaNamedQueries.size()>0 && mapaNamedQueries.containsKey("FROM_TASCA")) {
+    	if (mapaNamedQueries.size()>0 && mapaNamedQueries.containsKey("WITHOUT_PERMISION_CHECK")) {
             return filtreFrontAndEntitat.generate();
     	}
 

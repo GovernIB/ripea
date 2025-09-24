@@ -76,7 +76,6 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
 	@PostConstruct
 	public void init() {
 		register(ExpedientTascaResource.PERSPECTIVE_RESPONSABLES_CODE, new ResponsablesPerspectiveApplicator());
-		register(ExpedientTascaResource.PERSPECTIVE_EXPEDIENT_CODE, new ExpedientPerspectiveApplicator());
         register(ExpedientTascaResource.Fields.metaExpedientTasca, new MetaExpedientTascaOnchangeLogicProcessor());
         register(ExpedientTascaResource.Fields.duracio, new DuracioOnchangeLogicProcessor());
         register(ExpedientTascaResource.Fields.dataLimit, new DataLimitOnchangeLogicProcessor());
@@ -196,13 +195,6 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
 				}
 				resource.setResponsablesStr(StringUtils.join(responsablesStr, ","));
 			}
-		}
-	}
-	
-	private class ExpedientPerspectiveApplicator implements PerspectiveApplicator<ExpedientTascaResourceEntity, ExpedientTascaResource> {
-		@Override
-		public void applySingle(String code, ExpedientTascaResourceEntity entity, ExpedientTascaResource resource) throws PerspectiveApplicationException {
-			resource.setExpedientInfo(objectMappingHelper.newInstanceMap(Hibernate.unproxy(entity.getExpedient()), ExpedientResource.class));
 		}
 	}
 

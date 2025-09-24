@@ -9,8 +9,10 @@ import {ExpedientInfo} from "../../expedient/details/Expedient.tsx";
 import DocumentsGrid from "../../contingut/DocumentsGrid.tsx";
 import {CommentDialog} from "../../CommentDialog.tsx";
 import {useActions} from "./TascaActions.tsx";
+import * as builder from "../../../util/springFilterUtils.ts";
 
 const expedientPerspectives = ['COUNT', 'ESTAT', 'RELACIONAT', 'AMB_PINBAL', "META_EXPEDIENT"]
+const expedientNamedQueries = ['WITHOUT_PERMISION_CHECK'];
 const Tasca = () => {
     const { t } = useTranslation();
     const { id, tascaId } = useParams();
@@ -20,13 +22,14 @@ const Tasca = () => {
 
     const {
         isReady: apiIsReady,
-        getOne: appGetOne,
+        find: appFind,
     } = useResourceApiService('expedientResource');
     const [expedient, setExpedient] = useState<any>();
 
     useEffect(()=>{
         if (apiIsReady) {
-            appGetOne(id, {perspectives: expedientPerspectives}).then((app) => setExpedient(app))
+            appFind( {unpaged: true, filter: builder.eq('id', id), perspectives: expedientPerspectives, namedQueries: expedientNamedQueries} )
+                .then((params) => setExpedient(params?.rows?.[0] || undefined) )
         }
     },[apiIsReady])
 

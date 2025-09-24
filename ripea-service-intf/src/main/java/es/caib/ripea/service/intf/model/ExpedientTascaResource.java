@@ -37,9 +37,6 @@ import java.util.List;
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = ExpedientTascaResource.PERSPECTIVE_RESPONSABLES_CODE),
                 @ResourceConfigArtifact(
-                        type = ResourceArtifactType.PERSPECTIVE,
-                        code = ExpedientTascaResource.PERSPECTIVE_EXPEDIENT_CODE),                
-                @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientTascaResource.ACTION_REABRIR_CODE,
                         formClass = ExpedientTascaResource.ReobrirFormAction.class,
@@ -83,7 +80,6 @@ import java.util.List;
 public class ExpedientTascaResource extends BaseAuditableResource<Long> {
 
     public static final String PERSPECTIVE_RESPONSABLES_CODE = "RESPONSABLES_RESUM";
-    public static final String PERSPECTIVE_EXPEDIENT_CODE = "EXPEDIENT_INFO";    
     public static final String ACTION_CHANGE_ESTAT_CODE = "CHANGE_ESTAT";
     public static final String ACTION_CHANGE_PRIORITAT_CODE = "CHANGE_PRIORITAT";
     public static final String ACTION_CHANGE_DATALIMIT_CODE = "CHANGE_DATALIMIT";
@@ -131,7 +127,6 @@ public class ExpedientTascaResource extends BaseAuditableResource<Long> {
 
     @NotNull
     private ResourceReference<ExpedientResource, Long> expedient;
-    @Transient private ExpedientResource expedientInfo;
     @NotNull
     @ResourceField(onChangeActive = true)
     private ResourceReference<MetaExpedientTascaResource, Long> metaExpedientTasca;
