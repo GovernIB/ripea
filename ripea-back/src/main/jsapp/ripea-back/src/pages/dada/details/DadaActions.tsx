@@ -1,10 +1,10 @@
 import useDataGrid from "./DataGrid.tsx";
 import {useTranslation} from "react-i18next";
 
-export const useDadaActions = (contingut:any, refresh?: () => void) => {
+export const useDadaActions = (entity:any, refresh?: () => void) => {
     const { t } = useTranslation();
 
-    const {handleOpen, content} = useDataGrid(contingut, refresh)
+    const {handleOpen, content} = useDataGrid(entity, refresh)
 
     const actions = [
         {
@@ -12,7 +12,7 @@ export const useDadaActions = (contingut:any, refresh?: () => void) => {
             icon: "edit",
             showInMenu: false,
             onClick: handleOpen,
-            hidden: (row:any) => row?.readOnly,
+            hidden: (row:any) => row?.readOnly || !entity?.potModificar,
         }
     ]
 
@@ -22,6 +22,5 @@ export const useDadaActions = (contingut:any, refresh?: () => void) => {
     return {
         actions,
         components,
-        handleOpen
     }
 }

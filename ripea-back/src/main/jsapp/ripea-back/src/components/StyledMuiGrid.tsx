@@ -220,9 +220,9 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
             disableColumnSorting={!!staticSortModel}
             staticSortModel={staticSortModel}
 
-            selectionActive={selectionActive || !!toolbarMassiveActions}
-            checkboxSelection={selectionActive || !!toolbarMassiveActions}
-            keepNonExistentRowsSelected={selectionActive || !!toolbarMassiveActions}
+            selectionActive={selectionActive || (!!toolbarMassiveActions && !readOnly)}
+            checkboxSelection={selectionActive || (!!toolbarMassiveActions && !readOnly)}
+            keepNonExistentRowsSelected={selectionActive || (!!toolbarMassiveActions && !readOnly)}
 
             popupEditFormDialogComponentProps={{ fullWidth: true, maxWidth: 'md', initOnChangeRequest: formInitOnChange, ...popupEditFormDialogComponentProps }}
             popupEditFormComponentProps={{ ...(popupEditFormComponentProps ?? []), avoidSubmitIfAnyValidatorErrors: true }}

@@ -68,12 +68,14 @@ const ExpedientsRelacionats = (props:any) => {
                             <Link sx={{ fontSize: "0.9rem" }} href={`./${relacionat?.id}`}>{relacionat?.description}</Link>
                         </Grid>
                         <Grid size={1}>
-                            <IconButton 
-                                onClick={()=>eliminarRelacio(expedient?.id, expedient, relacionat?.id)}
-                                title={t('page.expedient.action.eliminarRelacio.label')}
-                                sx={{ color: 'black'}}>
-                                    <Icon sx={{ fontSize: "1.3rem" }}>link_off</Icon>
-                            </IconButton>
+                            {expedient?.potModificar &&
+                                <IconButton
+                                    onClick={()=>eliminarRelacio(expedient?.id, expedient, relacionat?.id)}
+                                    title={t('page.expedient.action.eliminarRelacio.label')}
+                                    sx={{ color: 'black'}}>
+                                        <Icon sx={{ fontSize: "1.3rem" }}>link_off</Icon>
+                                </IconButton>
+                            }
                         </Grid>
                     </Grid>
                 )
@@ -120,7 +122,7 @@ const ExpedientAlert = (props:any) => {
     const {handleOpen: hanldeErrorValidacio, dialog: dialogErrorValidacio} = useErrorValidacio();
 
     return <>
-        {expedient?.agafatPer?.id != user?.codi &&
+        {expedient?.agafatPer?.id != user?.codi && expedient?.potModificar &&
             <Alert severity="info"
                    action={
                        <Button sx={{py:0, backgroundColor: 'white'}} 
@@ -225,7 +227,7 @@ const Expedient = () => {
         {
             value: "remeses",
             label: t('page.contingut.tabs.remeses'),
-            content: <RemesaGrid id={id} onRowCountChange={setNumRemeses}/>,
+            content: <RemesaGrid entity={expedient} onRowCountChange={setNumRemeses}/>,
             badge: numRemeses ?? expedient?.numRemeses,
             hidden: !expedient?.numRemeses,
             showZero: true,
@@ -233,7 +235,7 @@ const Expedient = () => {
         {
             value: "publicacions",
             label: t('page.contingut.tabs.publicacions'),
-            content: <PublicacioGrid id={id} onRowCountChange={setNumPublicacions}/>,
+            content: <PublicacioGrid entity={expedient} onRowCountChange={setNumPublicacions}/>,
             badge: numPublicacions ?? expedient?.numPublicacions,
             hidden: !expedient?.numPublicacions,
             showZero: true,
@@ -285,11 +287,11 @@ const Expedient = () => {
                             <TabComponent
                                 tabs={tabs}
                                 variant="scrollable"
-                                headerAdditionalData={<CommentDialog
+                                headerAdditionalData={expedient?.potModificar ?<CommentDialog
                                     entity={expedient}
                                     title={`${t('page.comment.expedient')}: ${expedient?.nom}`}
                                     resourceName={'expedientComentariResource'}
-                                    resourceReference={'expedient'} />}
+                                    resourceReference={'expedient'} /> : <></>}
                             />
                         </Box>
                     </Grid>

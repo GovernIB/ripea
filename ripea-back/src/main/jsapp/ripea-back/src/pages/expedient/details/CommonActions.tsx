@@ -250,7 +250,7 @@ export const useCommonActions = (refresh?: () => void) => {
 
     const actions = [
         {
-            label: t('page.expedient.action.detall.label'),
+            label: user?.rolActual == 'IPA_ADMIN_LECTURA' ?t('common.detail') :t('page.expedient.action.detall.label'),
             icon: "folder",
             linkTo: "/contingut/{{id}}",
             showInMenu: true,
@@ -266,6 +266,7 @@ export const useCommonActions = (refresh?: () => void) => {
             label: <Divider sx={{px: 1, width: '100%'}} color={"none"}/>,
             showInMenu: true,
             disabled: true,
+            hidden: (row:any) => isTancat(row) || !row?.potModificar,
         },        
         {
             label: t('page.expedient.action.follow.label'),
@@ -293,21 +294,21 @@ export const useCommonActions = (refresh?: () => void) => {
             icon: "lock",
             showInMenu: true,
             onClick: agafar,
-            hidden: isAgafatUsuariActual
+            hidden: (row:any) => isAgafatUsuariActual(row) || !row?.potModificar
         },
         {
             label: t('page.expedient.action.retornar.label'),
             icon: "undo",
             showInMenu: true,
             onClick: retornar,
-            hidden: (row:any) => !isAgafatUsuariActual(row) || row?.agafatPer?.id == row?.createdBy,
+            hidden: (row:any) => !isAgafatUsuariActual(row) || row?.agafatPer?.id == row?.createdBy || !row?.potModificar,
         },
         {
             label: t('page.expedient.action.lliberar.label'),
             icon: "lock_open",
             showInMenu: true,
             onClick: alliberar,
-            hidden: (row:any) => !row?.agafatPer,
+            hidden: (row:any) => !row?.agafatPer || !row?.potModificar,
         },
         {
             label: t('page.expedient.action.changePrioritat.label'),
@@ -344,7 +345,7 @@ export const useCommonActions = (refresh?: () => void) => {
             icon: "undo",
             showInMenu: true,
             onClick: reobrir,
-            hidden: (row:any) => !isTancat(row) || !user?.sessionScope?.isReobrirPermes || !( !user?.sessionScope?.isTancamentLogicActiu || row?.tancatData),
+            hidden: (row:any) => !isTancat(row) || !user?.sessionScope?.isReobrirPermes || !( !user?.sessionScope?.isTancamentLogicActiu || row?.tancatData) || !row?.potModificar,
         },
         {
             label: t('page.expedient.action.eliminar.label'),
@@ -430,6 +431,7 @@ export const useCommonActions = (refresh?: () => void) => {
             icon: "autorenew",
             showInMenu: true,
             onClick: syncArxiu,
+            hidden: (row:any) => !row?.potModificar,
         },
     ]
         .map(({ hidden, ...rest }) => ({

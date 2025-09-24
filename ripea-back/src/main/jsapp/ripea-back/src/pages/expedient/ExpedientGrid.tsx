@@ -141,6 +141,7 @@ const ExpedientGrid = () => {
     const apiRef = useMuiDataGridApiRef();
 
     const {value: user} = useUserSession();
+    const isRolActualAdminLectura = user?.rolActual == 'IPA_ADMIN_LECTURA';
 
     const refresh = () => {
         apiRef?.current?.refresh?.();
@@ -276,9 +277,9 @@ const ExpedientGrid = () => {
                 popupEditCreateActive
                 popupEditFormContent={<ExpedientGridForm/>}
                 popupEditFormDialogTitle={t('page.expedient.action.new.title')}
+                readOnly={isRolActualAdminLectura}
                 onRowClick={(params: any) => navigate(`/contingut/${params?.id}`)}
                 rowAdditionalActions={actions}
-                selectionActive
                 toolbarCreateTitle={t('page.expedient.action.new.label')}
                 toolbarMassiveActions={massiveActions}
                 rowProps={(row: any) => {
