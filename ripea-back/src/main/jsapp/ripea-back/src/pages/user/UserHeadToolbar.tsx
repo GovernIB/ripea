@@ -86,6 +86,7 @@ const UserHeadToolbar = () => {
 
     const isRolActualSupAdmin = user?.rolActual == 'IPA_SUPER';
     const isRolActualAdmin = user?.rolActual == 'IPA_ADMIN';
+    const isRolActualAdminLectura = user?.rolActual == 'IPA_ADMIN_LECTURA';
     const isRolActualOrganAdmin = user?.rolActual == 'IPA_ORGAN_ADMIN';
     const isRolActualDissenyOrgan = user?.rolActual == 'IPA_DISSENY';
     const isRolActualRevisor = user?.rolActual == 'IPA_REVISIO';
@@ -115,6 +116,7 @@ const UserHeadToolbar = () => {
     const menus = [
         { condition: isRolActualSupAdmin, hook: useMenuSupAdmin },
         { condition: isRolActualAdmin, hook: useMenuAdmin },
+        { condition: isRolActualAdminLectura, hook: useMenuAdminLectura },
         { condition: isRolActualOrganAdmin, hook: useMenuAdminOrgan },
         { condition: isRolActualDissenyOrgan, hook: useMenuDissenyOrgan },
         { condition: isRolActualUser, hook: useMenuUsuari },
@@ -422,6 +424,52 @@ const useMenuAdmin = () => {
                     onClick: () => toProgramaAntic('expedientPeticioComunicades'),
                 },
             ],
+        },
+    ]
+    const content = <>
+    </>
+
+    return {
+        appEntries,
+        entries,
+        content,
+    }
+}
+const useMenuAdminLectura = () => {
+    const { value: user } = useUserSession();
+    const { t } = useTranslation();
+    const { toProgramaAntic } = useToProgramaAntic();
+
+    const appEntries:any[] = [
+        {
+            id: 'expedient',
+            title: t('page.user.menu.expedient'),
+            icon: icons.expedient,
+            to: '/expedient',
+        },
+        {
+            id: 'procediments',
+            title: t('page.user.menu.procediments'),
+            badge: user?.sessionScope?.organsNoSincronitzats,
+            hover: t('page.user.menu.procedimentsTitle'),
+            // icon: '',
+            onClick: () => toProgramaAntic('metaExpedient'),
+        },
+    ];
+    const entries = [
+        {
+            id: 'expedient',
+            title: t('page.user.menu.expedient'),
+            icon: icons.expedient,
+            to: '/expedient',
+        },
+        {
+            id: 'procediments',
+            title: t('page.user.menu.procediments'),
+            barge: user?.sessionScope?.organsNoSincronitzats,
+            hover: t('page.user.menu.procedimentsTitle'),
+            // icon: '',
+            onClick: () => toProgramaAntic('metaExpedient'),
         },
     ]
     const content = <>

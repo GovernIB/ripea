@@ -188,7 +188,7 @@ const DocumentsGrid = (props: any) => {
 
     const additionalColumns = useMemo(()=>[
         ...columns,
-        ...(vista == View.carpeta && user?.sessionScope?.ordenacioContingutPermesa ? [{
+        ...(vista == View.carpeta && entity?.potModificar && user?.sessionScope?.ordenacioContingutPermesa ? [{
             renderCell: () => <DraggableGridRowHandler />,
             flex: 0.1
         }] : [])

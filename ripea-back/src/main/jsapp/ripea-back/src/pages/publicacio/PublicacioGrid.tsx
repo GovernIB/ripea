@@ -67,10 +67,10 @@ const columns = [
 ]
 
 const PublicacioGrid = (props:any) => {
-    const { id, onRowCountChange } = props;
+    const { entity, onRowCountChange } = props;
     const { t } = useTranslation()
 
-    const {actions, components} = usePublicacioActions();
+    const {actions, components} = usePublicacioActions(entity);
 
     return <>
         <StyledMuiGrid
@@ -82,7 +82,7 @@ const PublicacioGrid = (props:any) => {
             columns={columns}
             rowAdditionalActions={actions}
             // paginationActive
-            filter={builder.eq('expedient.id', id)}
+            filter={builder.eq('expedient.id', entity?.id)}
             staticSortModel={sortModel}
             onRowCountChange={onRowCountChange}
             disableColumnSorting

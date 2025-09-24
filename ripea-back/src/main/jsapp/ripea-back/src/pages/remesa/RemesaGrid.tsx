@@ -110,13 +110,13 @@ const columns = [
 ]
 
 const RemesaGrid = (props:any) => {
-    const { id, onRowCountChange } = props;
+    const { entity, onRowCountChange } = props;
     const { t } = useTranslation()
 
     const apiRef = useMuiDataGridApiRef()
     const refresh = () => { apiRef?.current?.refresh?.(); }
 
-    const {actions, components} = useRemesaActions(refresh);
+    const {actions, components} = useRemesaActions(entity, refresh);
     const {handleOpen, dialog} = useRemesaDetail();
 
     return <>
@@ -125,7 +125,7 @@ const RemesaGrid = (props:any) => {
             popupEditFormDialogResourceTitle={t('page.notificacio.title')}
             popupEditActive
             popupEditFormContent={<RemesaGridForm/>}
-            filter={builder.eq('expedient.id', id)}
+            filter={builder.eq('expedient.id', entity?.id)}
             staticSortModel={sortModel}
             columns={columns}
             rowAdditionalActions={actions}

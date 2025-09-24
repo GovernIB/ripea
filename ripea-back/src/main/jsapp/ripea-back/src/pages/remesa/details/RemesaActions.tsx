@@ -58,7 +58,7 @@ export const useActions = (refresh?: () => void) => {
     }
 }
 
-const useRemesaActions = (refresh?: () => void) => {
+const useRemesaActions = (entity:any, refresh?: () => void) => {
     const { t } = useTranslation();
 
     const {actualitzarEstat, justificant} = useActions(refresh)
@@ -78,20 +78,21 @@ const useRemesaActions = (refresh?: () => void) => {
             icon: 'edit',
             showInMenu: true,
             clickShowUpdateDialog: true,
-            hidden: (row:any) => row.tipus != 'MANUAL',
+            hidden: (row:any) => row.tipus != 'MANUAL' || !entity?.potModificar,
         },
         {
             label: t('page.notificacio.action.actualitzarEstat.label'),
             icon: "sync",
             showInMenu: true,
             onClick: actualitzarEstat,
-            hidden: (row:any) => row.estat == 'PROCESSADA',
+            hidden: (row:any) => row.estat == 'PROCESSADA'|| !entity?.potModificar,
         },
         {
             label: t('page.notificacio.action.notificacioInteressat.label'),
             icon: "send",
             showInMenu: true,
             onClick: handleNotificacioOpen,
+            hidden: !entity?.potModificar,
         },
         {
             label: t('page.notificacio.action.justificant.label'),
@@ -105,7 +106,7 @@ const useRemesaActions = (refresh?: () => void) => {
 		    icon: 'delete',
 		    showInMenu: true,
             clickTriggerDelete: true,
-		    hidden: (row:any) => row.tipus != 'MANUAL',
+		    hidden: (row:any) => row.tipus != 'MANUAL' || !entity?.potModificar,
 		},		
     ];
 

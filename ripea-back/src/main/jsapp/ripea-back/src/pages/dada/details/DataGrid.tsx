@@ -59,9 +59,7 @@ const DataGrid = (props:any) => {
         },
     ]
 
-    const mensajeToolbar = !contingut?.potModificar
-    ? <span style={{ color: '#8a6d3b', fontWeight: 300 }}>{t('page.dada.mensajeToolbar.permis')}</span>
-    : (numDades > 0 && !(entity?.multiplicitat == 'M_0_N' || entity?.multiplicitat == 'M_1_N'))
+    const mensajeToolbar = (numDades > 0 && !(entity?.multiplicitat == 'M_0_N' || entity?.multiplicitat == 'M_1_N'))
         ? <span style={{ color: '#337ab7', fontWeight: 300 }}>{t('page.dada.mensajeToolbar.maxDades')}</span>
         : <></>;
 

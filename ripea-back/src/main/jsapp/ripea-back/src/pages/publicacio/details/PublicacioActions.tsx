@@ -1,7 +1,7 @@
 import {useTranslation} from "react-i18next";
 import usePublicacioDetail from "./PublicacioDetail.tsx";
 
-const usePublicacioActions = () => {
+const usePublicacioActions = (entity:any) => {
     const { t } = useTranslation();
 
     const {handleOpen: handleDetallOpen, dialog: dialogDetall} = usePublicacioDetail();
@@ -10,7 +10,7 @@ const usePublicacioActions = () => {
         {
             label: t('common.detail'),
             icon: "info",
-            showInMenu: true,
+            showInMenu: entity?.potModificar,
             onClick: handleDetallOpen,
         },
         {
@@ -18,12 +18,14 @@ const usePublicacioActions = () => {
             icon: 'edit',
             showInMenu: true,
             clickShowUpdateDialog: true,
+            hidden: !entity?.potModificar,
         },
         {
             label: t('common.delete')+'...',
             icon: 'edit',
             showInMenu: true,
             clickTriggerDelete: true,
+            hidden: !entity?.potModificar,
         },
     ];
 

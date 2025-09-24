@@ -6,6 +6,7 @@ import {useEffect, useState} from "react";
 import {MultiplicitatStyled} from "../contingut/details/MetaExpedient.tsx";
 import {Typography} from "@mui/material";
 import {useTranslation} from "react-i18next";
+import useDataGrid from "./details/DataGrid.tsx";
 
 const dadesFilter = (metaDada:any, dades:any[]) :any[] => {
     return dades?.filter((dada)=>dada?.metaDada?.id == metaDada?.id)
@@ -90,7 +91,8 @@ const MetaDadaGrid = (props: { entity:any, onRowCountChange?: ((value:number) =>
         }
     ]
 
-    const {actions, components, handleOpen} = useDadaActions(entity,refresh);
+    const {actions, components} = useDadaActions(entity, refresh);
+    const {handleOpen, content} = useDataGrid(entity, refresh)
 
     return <>
         <StyledMuiGrid
@@ -111,9 +113,14 @@ const MetaDadaGrid = (props: { entity:any, onRowCountChange?: ((value:number) =>
             toolbarHide
             disableColumnSorting
             readOnly
-            onRowClick={(params) => handleOpen(null, params.row)}
+            onRowClick={(params) => {
+                if (entity?.potModificar) {
+                    handleOpen(null, params.row)
+                }
+            }}
         />
         {components}
+        {content}
     </>
 }
 export default MetaDadaGrid;
