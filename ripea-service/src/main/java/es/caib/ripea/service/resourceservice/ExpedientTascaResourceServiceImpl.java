@@ -17,6 +17,7 @@ import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import org.hibernate.Hibernate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -47,6 +48,7 @@ import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
 import es.caib.ripea.service.intf.dto.TascaEstatEnumDto;
 import es.caib.ripea.service.intf.model.ContingutResource;
 import es.caib.ripea.service.intf.model.EntitatResource;
+import es.caib.ripea.service.intf.model.ExpedientResource;
 import es.caib.ripea.service.intf.model.ExpedientTascaResource;
 import es.caib.ripea.service.intf.model.ExpedientTascaResource.DelegarTascaFormAction;
 import es.caib.ripea.service.intf.model.ExpedientTascaResource.ReassignarTascaFormAction;
@@ -74,6 +76,7 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
 	@PostConstruct
 	public void init() {
 		register(ExpedientTascaResource.PERSPECTIVE_RESPONSABLES_CODE, new ResponsablesPerspectiveApplicator());
+		register(ExpedientTascaResource.PERSPECTIVE_EXPEDIENT_CODE, new ExpedientPerspectiveApplicator());
         register(ExpedientTascaResource.Fields.metaExpedientTasca, new MetaExpedientTascaOnchangeLogicProcessor());
         register(ExpedientTascaResource.Fields.duracio, new DuracioOnchangeLogicProcessor());
         register(ExpedientTascaResource.Fields.dataLimit, new DataLimitOnchangeLogicProcessor());
@@ -193,6 +196,13 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
 				}
 				resource.setResponsablesStr(StringUtils.join(responsablesStr, ","));
 			}
+		}
+	}
+	
+	private class ExpedientPerspectiveApplicator implements PerspectiveApplicator<ExpedientTascaResourceEntity, ExpedientTascaResource> {
+		@Override
+		public void applySingle(String code, ExpedientTascaResourceEntity entity, ExpedientTascaResource resource) throws PerspectiveApplicationException {
+			resource.setExpedientInfo(objectMappingHelper.newInstanceMap(Hibernate.unproxy(entity.getExpedient()), ExpedientResource.class));
 		}
 	}
 
