@@ -37,6 +37,7 @@ const PerfilFrom = () =>{
             <GridFormField xs={12} name="procediment" filter={builder.and(
                 builder.eq('entitat.id', data?.entitatPerDefecte?.id)
             )}/>
+            <GridFormField xs={12} name="modeFosc"/>
         </CardData>
 
         <CardData title={t('page.user.perfil.column')}>

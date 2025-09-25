@@ -31,7 +31,7 @@ const MenuSelect = (props:any) => {
                 value={value}
                 onChange={(event) => onChange(event.target.value)}
                 sx={{
-                    color: color,
+                    // color: color,
                     backgroundColor: 'transparent',
 
                     '.MuiSelect-select.MuiSelect-standard': {
@@ -40,9 +40,9 @@ const MenuSelect = (props:any) => {
                     '.MuiOutlinedInput-notchedOutline': {
                         border: 'none',
                     },
-                    '.MuiSvgIcon-root ': {
-                        fill: `${color} !important`,
-                    }
+                    // '.MuiSvgIcon-root ': {
+                    //     fill: `${color} !important`,
+                    // }
                 }}
                 {...other}
             >

@@ -1,4 +1,4 @@
-import React, {useCallback} from "react";
+import React, {useCallback, useState} from "react";
 import {Grid, Button, Icon} from "@mui/material";
 import {StyledBadge} from "../../components/StyledBadge.tsx";
 import {useEntitatSession, useUserSession} from "../../components/Session.tsx";
@@ -12,6 +12,7 @@ import {
     LinkProps as RouterLinkProps,
     useLocation,
 } from 'react-router-dom';
+import theme from "../../theme.ts";
 
 export const icons = {
     expedient: 'folder',
@@ -108,7 +109,14 @@ const UserHeadToolbar = () => {
 
                 toProgramaAntic(location.pathname)
             },
-        }
+        },
+        // {
+        //     id: 'theme_color',
+        //     icon: darkMode ?'toggle_off' :'toggle_on',
+        //     onClick: () => {
+        //         setDarkMode((prev) => !prev)
+        //     }
+        // }
     ]
     const menuEntries:any[] =[]
     const contents:any[] = []

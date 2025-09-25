@@ -3,18 +3,15 @@ import ReactDOM from 'react-dom/client';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import { BrowserRouter } from 'react-router-dom';
-import { ThemeProvider } from '@emotion/react';
-import { CssBaseline } from '@mui/material';
 import { LicenseInfo } from '@mui/x-license';
-import theme from './theme';
 import App from './App.tsx'
 import {
     envVar,
-    // KeycloakAuthProvider as AuthProvider,
     ResourceApiProvider
 } from 'reactlib';
 import {SessionStorageProvider} from "./components/SessionStorageContext.tsx";
 import SseProvider from "./components/SseClient.tsx";
+import {ThemeUserProvider} from "./components/ThemeUserProvider.tsx";
 
 dayjs.extend(duration);
 
@@ -58,12 +55,12 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <ResourceApiProvider apiUrl={getEnvApiUrl()} userSessionActive>
             <SessionStorageProvider>
                 <SseProvider>
-                    <ThemeProvider theme={theme}>
-                        <CssBaseline />
+                    <ThemeUserProvider>
+                        {/*<CssBaseline />*/}
                         <BrowserRouter basename={import.meta.env.BASE_URL}>
                             <App />
                         </BrowserRouter>
-                    </ThemeProvider>
+                    </ThemeUserProvider>
                 </SseProvider>
             </SessionStorageProvider>
         </ResourceApiProvider>

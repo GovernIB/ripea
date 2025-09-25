@@ -46,6 +46,8 @@ public class UsuariResource extends BaseResource<String> {
 	@Size(max = 64)
 	private String rolActual;
 	private ContingutVistaEnumDto vistaActual;
+    @NotNull
+    private boolean modeFosc = false;
 
     @ResourceField(enumType = true)
 	private Long numElementsPagina;

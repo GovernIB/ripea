@@ -1,7 +1,8 @@
-import { createTheme } from '@mui/material/styles';
+import {ThemeOptions, createTheme} from '@mui/material/styles';
+import merge from 'lodash.merge';
 import backgroundPattern from './assets/background-pattern.png';
 
-const theme = createTheme({
+const base: ThemeOptions = {
     palette: {
         primary: {
             main: '#337ab7',
@@ -214,6 +215,46 @@ const theme = createTheme({
             }
         },
     }
-});
+};
 
-export default theme;
+export const lightTheme = createTheme( merge( base, {
+    palette: {
+        mode: 'light',
+    },
+}));
+
+export const darkTheme = createTheme( merge( base, {
+    palette: {
+        mode: 'dark',
+        background: { default: '#121212', paper: '#1d1d1d' },
+    },
+    components: {
+        MuiDataGrid: {
+            styleOverrides: {
+                row: {
+                    '&.even': {
+                        color: 'black',
+                        ".MuiSvgIcon-root": {
+                            color: "black"
+                        },
+                    },
+                },
+            }
+        },
+        MuiAlert: {
+            styleOverrides: {
+                // standardSuccess: {
+                //     backgroundColor: theme.palette.success.dark,
+                // },
+                standardInfo: {
+                    backgroundColor: '#08335a',
+                },
+                // standardError: {
+                //     backgroundColor: theme.palette.error.dark,
+                // },
+            },
+        },
+    }
+}));
+
+// export const theme = createTheme({...base});
