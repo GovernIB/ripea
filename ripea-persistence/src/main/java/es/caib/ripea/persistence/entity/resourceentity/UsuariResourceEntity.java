@@ -71,6 +71,8 @@ public class UsuariResourceEntity implements ResourceEntity<UsuariResource, Stri
 	private boolean expedientListComentaris = true;
 	@Column(name = "exp_list_grup")
 	private boolean expedientListGrup = false;
+	@Column(name = "mode_fosc")
+	private boolean modeFosc = false;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(
