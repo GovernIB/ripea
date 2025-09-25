@@ -1,0 +1,25 @@
+--1660
+INSERT INTO IPA_CONFIG (
+  KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE,
+  LASTMODIFIEDBY_CODI, LASTMODIFIEDDATE, CONFIGURABLE_ORGAN, ORGAN_CODI,
+  CONFIGURABLE_ENTITAT_ACTIU, CONFIGURABLE_ORGAN_ACTIU, ENTITAT_CODI,
+  CONFIGURABLE, CONFIGURABLE_ORG_DESCENDENTS
+)
+VALUES (
+  'es.caib.ripea.segonpla.estadistiques.diaries',
+  '0 0 1 * * *',
+  'Cron per guardar estadistiques del dia actual.',
+  'SCHEDULLED',
+  '11',
+  '0',
+  'TEXT',
+  NULL,
+  NULL,
+  '0',
+  NULL,
+  '0',
+  '0',
+  NULL,
+  '0',
+  '0'
+);
