@@ -174,105 +174,10 @@ $(document).ready(function() {
 		<c:if test="${empty command.documents}">
 			<rip:inputFile name="arxiuZip" textKey="contingut.document.zip.form.camp.arxiu" required="true"/>
 		</c:if>
-		
-		<c:if test="${not empty command.documents}">			
-			<c:forEach items="${command.documents}" varStatus="status" var="documentCommand">
-				<div class="title-container">
-					<label>Document ${status.index + 1}: ${documentCommand.fitxerNom}</label>
-				</div>
-				<rip:inputHidden name="documents[${status.index}].validacioFirmaCorrecte"/>
-				<rip:inputHidden name="documents[${status.index}].validacioFirmaErrorMsg"/>
-				<rip:inputHidden name="documents[${status.index}].tipusFirma"/>
-				<rip:inputHidden name="documents[${status.index}].fitxerContentType"/>
-				<rip:inputHidden name="documents[${status.index}].pareId"/>
-				
-				<rip:inputSelect 
-					 name="documents[${status.index}].metaNodeId" 
-					 textKey="contingut.document.form.camp.metanode" 
-					 optionItems="${metaDocuments}" 
-					 optionValueAttribute="id" 
-					 optionTextAttribute="nom" 
-					 emptyOption="${fn:length(metaDocuments) > 1 ? true : false}" 
-					 emptyOptionTextKey="contingut.document.form.camp.nti.cap" 
-					 required="true"/>
-					 
-				<rip:inputText
-					 name="documents[${status.index}].nom"
-					 textKey="contingut.document.form.camp.nom"
-					 required="true"
-					 tooltip="true"
-					 tooltipMsg="contingut.document.form.camp.nom.caracters"
-					 maxlength="250"/>
-					 
-				<rip:inputTextarea 
-					 name="documents[${status.index}].descripcio" 
-					 textKey="contingut.document.form.camp.descripcio" 
-					 showsize="true" 
-					 maxlength="510"/>
-					 
-				<rip:inputDateTime 
-					 name="documents[${status.index}].dataTime" 
-					 textKey="contingut.document.form.camp.data" 
-					 required="true" 
-					 readonly="true"/>
-				
-				<rip:inputSelect 
-					 name="documents[${status.index}].ntiOrigen" 
-					 emptyOption="true" 
-					 emptyOptionTextKey="contingut.document.form.camp.nti.cap" 
-					 textKey="contingut.document.form.camp.nti.origen" 
-					 optionEnum="NtiOrigenEnumDto" 
-					 required="true"/>
-				
-				<rip:inputSelect 
-					 id="ntiEstadoElaboracion_${status.index}"
-					 name="documents[${status.index}].ntiEstadoElaboracion" 
-					 emptyOption="true" 
-					 emptyOptionTextKey="contingut.document.form.camp.nti.cap" 
-					 textKey="contingut.document.form.camp.nti.estela" 
-					 required="true" 
-					 optionItems="${ntiEstatElaboracioOptions}" 
-					 optionValueAttribute="value" 
-					 optionTextKeyAttribute="text"/>
-
-				<div id="ntiIdDocumentoOrigenDiv_${status.index}">
-					<rip:inputText 
-						name="documents[${status.index}].ntiIdDocumentoOrigen"
-						textKey="contingut.document.form.camp.id.doc.origen"
-						required="true"
-						comment="contingut.document.form.camp.id.doc.origen.comtentari" />
-				</div>
-
-				<rip:inputText
-					 name="documents[${status.index}].fitxerNom" 
-					 textKey="contingut.document.form.camp.arxiu.nom"
-					 readonly="true"/>
-					 
-				
-				<rip:inputCheckbox 
-					 name="documents[${status.index}].ambFirma" 
-					 textKey="contingut.document.form.camp.amb.firma" 
-					 disabled="true"/>
-				
-				<c:if test="${!documentCommand.validacioFirmaCorrecte}">
-					<div class="alert alert-danger" style="padding-top: 5px; padding-bottom: 5px; padding-left: 10px; margin-top: -20px; margin-bottom: 0px;" role="alert"><span>${documentCommand.validacioFirmaErrorMsg}</span></div>
-				</c:if>
-			</c:forEach>
-		</c:if>
 
 		<div id="modal-botons" class="well">
-			<div class="text-right col-md-12">
-				<a href="<c:url value="/contingut/zip/importacio/plantilla"/>"
-					class="btn btn-info"
-					style="float: left;"
-					data-element-no-tancar="true"
-					title="<spring:message code="contingut.document.zip.form.plantilla.boto"/>">
-					<span class="fa fa-download"></span>
-					<spring:message code="contingut.document.zip.form.plantilla.boto"/>
-				</a>
-			</div>
-			<button type="submit" name="${not empty command.documents ? 'crearDocumentsBtn' : 'processarDocumentsBtn'}" class="btn btn-success"><span class="fa fa-save"></span>
-				<spring:message code="${not empty command.documents ? 'comu.boto.crear' : 'comu.boto.processar'}"/>		
+			<button type="submit" name="processarDocumentsBtn" class="btn btn-success"><span class="fa fa-save"></span>
+				<spring:message code="comu.boto.processar"/>		
 			</button>
 			
 			<button type="button" name="cancelarBtn" class="btn btn-default">

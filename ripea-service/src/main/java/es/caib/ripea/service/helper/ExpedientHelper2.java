@@ -251,7 +251,8 @@ public class ExpedientHelper2 {
 						docDto,
 						document.getPare(),
 						false,
-						false);
+						false,
+						true);
 				
 				//Relacionam els dos documents, original i clon
 //				document.setDocumentClonId(nouDocument.getId());

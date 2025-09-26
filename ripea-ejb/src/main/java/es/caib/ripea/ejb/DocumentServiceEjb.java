@@ -63,14 +63,16 @@ public class DocumentServiceEjb extends AbstractServiceEjb<DocumentService> impl
 			DocumentDto document,
 			boolean comprovarMetaExpedient, 
 			String rolActual, 
-			Long tascaId) {
+			Long tascaId,
+			boolean comprovarMetaDocument) {
 		return delegateService.create(
 				entitatId,
 				contenidorId,
 				document,
 				comprovarMetaExpedient, 
 				rolActual, 
-				tascaId);
+				tascaId,
+				comprovarMetaDocument);
 	}
 
 	@Override
@@ -660,15 +662,4 @@ public class DocumentServiceEjb extends AbstractServiceEjb<DocumentService> impl
 		return delegateService.getPlantillaImportacioZip();
 	}
     
-    @Override
-	@RolesAllowed("**")
-    public DocumentDto crearAmbCarpetes(
-			Long id, 
-			Long pareId, 
-			DocumentDto asDto, 
-			boolean b, 
-			String rolActual,
-			Long tascaId) {
-    	return delegateService.crearAmbCarpetes(id, pareId, asDto, b, rolActual, tascaId);
-    }
 }

@@ -328,6 +328,7 @@ public class PinbalHelper {
 					document,
 					pare,
 					true,
+					true,
 					true);
 			
 			DocumentEntity doc = documentRepository.getOne(docum.getId());

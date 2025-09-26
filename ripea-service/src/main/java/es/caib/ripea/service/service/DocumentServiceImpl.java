@@ -145,31 +145,6 @@ public class DocumentServiceImpl implements DocumentService {
     @Autowired private EmailHelper emailHelper;
     @Autowired private ContingutLogHelper contingutLogHelper;
     @Autowired private ZipImportacioHelper zipImportacioHelper;
-
-    
-    @Transactional
-	@Override
-	public DocumentDto crearAmbCarpetes(
-			Long entitatId,
-			Long pareId,
-			DocumentDto document,
-			boolean comprovarMetaExpedient, 
-			String rolActual, 
-			Long tascaId) {
-    	
-    	zipImportacioHelper.assignarCarpeta(
-    			document,
-    			entitatId, 
-    			pareId);
-    	
-    	return create(
-    				entitatId,
-    				document.getPareId(), 
-    				document, 
-    				comprovarMetaExpedient, 
-    				rolActual, 
-    				tascaId);
-    }
     
 	@Transactional
 	@Override
@@ -179,7 +154,8 @@ public class DocumentServiceImpl implements DocumentService {
 			DocumentDto document,
 			boolean comprovarMetaExpedient, 
 			String rolActual, 
-			Long tascaId) {
+			Long tascaId,
+			boolean comprovarMetaDocument) {
 		if (cacheHelper.mostrarLogsCreacioContingut())
 			logger.info("[DOC] Creant nou document (" +
 				"entitatId=" + entitatId + ", " +
@@ -219,7 +195,8 @@ public class DocumentServiceImpl implements DocumentService {
 				document,
 				pare,
 				comprovarMetaExpedient,
-				true);
+				true,
+				comprovarMetaDocument);
 
 		if (cacheHelper.mostrarLogsCreacioContingut())
 			logger.info("[DOC] Creat nou document (" +
@@ -1592,18 +1569,13 @@ public class DocumentServiceImpl implements DocumentService {
 
 	@Override
 	@Transactional
-	public List<DocumentDto> extreureDocumentsZip(InputStream zip, Long metaExpedientId, Long pareId, EntitatDto entitatActual) throws IOException {
-		return zipImportacioHelper.extreureDocuments(zip, metaExpedientId, pareId, entitatActual.getId());
+	public int extreureDocumentsZip(InputStream zip, String rolActual, Long pareId, Long tascaId, EntitatDto entitatActual) throws IOException {
+		return zipImportacioHelper.descomprimirZip(zip, rolActual, pareId, tascaId, entitatActual.getId());
 	}
 
 	@Override
 	public ProgresProcessamentZipDto obtenirProgresProcessamentZip(Long pareId) {
 		return zipImportacioHelper.obtenirProgresActual(pareId);
-	}
-
-	@Override
-	public byte[] obtenirContingutFitxerZip(String fitxerNom) {
-		return zipImportacioHelper.obtenirContingutFitxer(fitxerNom);
 	}
 	
 }

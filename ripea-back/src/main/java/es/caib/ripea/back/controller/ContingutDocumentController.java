@@ -1258,7 +1258,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 						DocumentGenericCommand.asDto(command),
 						false, 
 						RolHelper.getRolActual(request), 
-						null);
+						null,
+						true);
 
 				if (metaDocumentId != null) {
 					
@@ -1316,7 +1317,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					DocumentGenericCommand.asDto(command),
 					false, 
 					RolHelper.getRolActual(request), 
-					null);
+					null,
+					true);
 			
 			return "redirect:../../document/" + document.getId() + "/notificar";
 	
@@ -1663,7 +1665,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 							dto,
 							comprovarMetaExpedient, 
 							rolActual, 
-							tascaId);
+							tascaId,
+							true);
 				}
 			}
 			
@@ -1673,7 +1676,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					DocumentCommand.asDto(command),
 					comprovarMetaExpedient, 
 					rolActual, 
-					tascaId);
+					tascaId,
+					true);
 			
 			crearDadesPerDefecteSiExisteixen(
 					entitatActual.getId(),

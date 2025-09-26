@@ -1096,63 +1096,32 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     private class ImportarDocumentsZipArxiuActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.ImportarDocumentsZipForm, Serializable> {
 
 		@Override
-		public void onChange(Serializable id, ImportarDocumentsZipForm previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, ImportarDocumentsZipForm target) {
-        	
-        	try {
-                    
-                if (ExpedientResource.ImportarDocumentsZipForm.Fields.documentZip.equals(fieldName)) {
-                	
-                	Long entitatId = entitatRepository.findByCodi(configHelper.getEntitatActualCodi()).getId();
-                	List<DocumentResource> llistaDocumentsProcessats = new ArrayList<DocumentResource>();
-                	InputStream inputStream = new ByteArrayInputStream(((FileReference) fieldValue).getContent());
-                	ExpedientEntity expedientEntity = expedientRepository.findById((Long)id).get();
-                	
-                	List <DocumentDto> aux = zipImportacioHelper.extreureDocuments(
-                			inputStream, 
-                			expedientEntity.getMetaExpedient().getId(),
-                			expedientEntity.getId(),
-                			entitatId);
-
-                	if (aux!=null) {
-                		for (DocumentDto doc: aux) {
-                			DocumentResource documentResource = new DocumentResource();
-                			documentResource.setNom(doc.getNom());
-                			documentResource.setFitxerNom(doc.getFitxerNom());
-                			documentResource.setDescripcio(doc.getDescripcio());
-                			documentResource.setFitxerContentType(doc.getFitxerContentType());
-                			//Utils.getFitxerContentType(adjunt.getName(), adjunt.getContentType()) ??
-                			//TODO: Acebar de completar els camps necessaris per el formulari.
-                			llistaDocumentsProcessats.add(documentResource);
-                		}
-                	}
-                	
-                	target.setDocumentsUsuari(llistaDocumentsProcessats);
-                }
-            } catch (Exception e) {
-                excepcioLogHelper.addExcepcio("/expedient/interessats/ImportarDocumentsZipArxiuActionExecutor.onChange", e);
-            }
-		}
+		public void onChange(Serializable id, ImportarDocumentsZipForm previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, ImportarDocumentsZipForm target) {}
 
 		@Override
 		public Serializable exec(String code, ExpedientResourceEntity entity, ImportarDocumentsZipForm params) throws ActionExecutionException {
-			try {
-	    		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
-	    		ContingutEntity pare = contingutRepository.findById(entity.getId()).get();
-				for (DocumentResource documentResource : params.getDocumentsUsuari()) {
-					byte[] fitxerContingut = zipImportacioHelper.obtenirContingutFitxer(documentResource.getFitxerNom());
-					documentHelper.crearDocument(
-							entitatEntity.getId(),
-							documentResource.toDocumentDto(),
-							pare,
-							false,
-							true);
-				}
-				return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
-			} catch (Exception ex) {
-				excepcioLogHelper.addExcepcio("/expedient/"+entity.getId()+"ImportarDocumentsZipArxiuActionExecutor", ex);
-				String message = messageHelper.getMessage("message.common.action.error")+": "+ex.getMessage();
-				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, message);
-			}				
+		    try {
+		        EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+		        ContingutEntity pare = contingutRepository.findById(entity.getId()).orElseThrow();
+
+		        FileReference zipFile = params.getDocumentZip();
+		        try (InputStream inputStream = new ByteArrayInputStream(zipFile.getContent())) {
+		            int total = zipImportacioHelper.descomprimirZip(
+		                    inputStream,
+		                    configHelper.getRolActual(),
+		                    pare.getId(),
+		                    null, // tascaId
+		                    entitatEntity.getId()
+		            );
+		            log.info("S'han importat {} documents des del ZIP", total);
+		        }
+
+		        return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
+		    } catch (Exception ex) {
+		        excepcioLogHelper.addExcepcio("/expedient/" + entity.getId() + "ImportarDocumentsZipArxiuActionExecutor", ex);
+		        String message = messageHelper.getMessage("message.common.action.error") + ": " + ex.getMessage();
+		        throw new ActionExecutionException(getResourceClass(), entity.getId(), code, message);
+		    }			
 		}
     }
     

@@ -226,7 +226,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                     resource.toDocumentDto(),
     				pare,
     				true,
-    				false);
+    				false,
+    				true);
     		resource.setId(documentCreat.getId());
     		return resource;
     	} catch (ValidationException ex) {
@@ -755,7 +756,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
             	documentDto.setFitxerNom(fitxerDto.getNom());
             	documentDto.setAmbFirma(false);
             	documentDto.setData(Calendar.getInstance().getTime());
-            	documentDto = documentHelper.crearDocument(entitatEntity.getId(), documentDto, pare, true, false);
+            	documentDto = documentHelper.crearDocument(entitatEntity.getId(), documentDto, pare, true, false, true);
 
             	DocumentResourceEntity newZipFile = new DocumentResourceEntity();
         		newZipFile.setId(documentDto.getId());

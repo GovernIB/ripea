@@ -415,7 +415,8 @@ public class ExecucioMassivaHelper {
 		        					documentDto,
 		        					contingutRepository.findById(emc.getElementId()).get(),
 		        					false,
-		        					false);
+		        					false,
+		        					true);
 		        		}
 		        	}
 		        } else if (ExecucioMassivaTipusDto.PORTASIGNATURES.equals(tipus)){

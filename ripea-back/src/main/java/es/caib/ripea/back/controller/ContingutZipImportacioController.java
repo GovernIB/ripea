@@ -1,15 +1,9 @@
 package es.caib.ripea.back.controller;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,14 +18,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import es.caib.ripea.back.command.DocumentCommand;
-import es.caib.ripea.back.command.DocumentCommand.CreateDigitalZip;
 import es.caib.ripea.back.command.ImportacioZipCommand;
 import es.caib.ripea.back.command.ImportacioZipCommand.ProcessarZip;
 import es.caib.ripea.back.helper.EnumHelper;
 import es.caib.ripea.back.helper.MissatgesHelper;
 import es.caib.ripea.back.helper.RolHelper;
-import es.caib.ripea.service.intf.dto.DocumentDto;
 import es.caib.ripea.service.intf.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.ProgresProcessamentZipDto;
@@ -99,18 +90,14 @@ public class ContingutZipImportacioController extends BaseUserOAdminOOrganContro
 						entitatActual);
 				return "contingutZipImportacioForm";
 			}
-			
-			List<DocumentCommand> documents = new ArrayList<DocumentCommand>();
+			int totalDocuments = 0;
 			try {
-				List<DocumentDto> documentsDto = documentService.extreureDocumentsZip(
+				totalDocuments = documentService.extreureDocumentsZip(
 						command.getArxiuZip().getInputStream(), 
-						command.getMetaExpedientId(),
-						command.getPareId(), 
+						RolHelper.getRolActual(request),
+						command.getPareId(),
+						command.getTascaId(),
 						entitatActual);
-				
-				documents = documentsDto.stream()
-					    .map(DocumentCommand::asCommand)
-					    .collect(Collectors.toList());
 			} catch (Exception e) {
 				omplirModelFormulari(
 						model, 
@@ -125,14 +112,11 @@ public class ContingutZipImportacioController extends BaseUserOAdminOOrganContro
 				
 				throw e;	
 			}
-			command.setDocuments(documents);
-			omplirModelFormulari(
-					model, 
-					pareId, 
-					command,
-					entitatActual);
-			
-			return "contingutZipImportacioForm";
+			return getModalControllerReturnValueSuccess(
+					request,
+					"redirect:../../contingut/" + pareId,
+					"document.controller.multiple.creat.ok",
+					new Object[] { totalDocuments });
 		} catch (Exception ex) {
 			omplirModelFormulari(
 					model, 
@@ -160,106 +144,6 @@ public class ContingutZipImportacioController extends BaseUserOAdminOOrganContro
 		return new ResponseEntity<ProgresProcessamentZipDto>(HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/{pareId}/zip/importacio/new", method = RequestMethod.POST)
-	public String post(
-			HttpServletRequest request,
-			@PathVariable Long pareId,
-			@ModelAttribute("command") @Validated({CreateDigitalZip.class}) ImportacioZipCommand command,
-			BindingResult bindingResult,
-			Model model) throws ClassNotFoundException, IOException {
-		StringBuilder documentsCreats = new StringBuilder();
-		StringBuilder documentsAmbError = new StringBuilder();
-		
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		
-		try {
-			if (bindingResult.hasErrors()) {
-				omplirModelFormulari(
-						model, 
-						pareId, 
-						command, 
-						entitatActual);
-				return "contingutZipImportacioForm";
-			}
-			
-			for (DocumentCommand documentCommand : command.getDocuments()) {
-				byte[] fitxerContingut = documentService.obtenirContingutFitxerZip(documentCommand.getFitxerNom());
- 				documentCommand.setFitxerContingut(fitxerContingut);
-				
- 				try {
-					DocumentDto document = documentService.crearAmbCarpetes(
-							entitatActual.getId(),
-							pareId,
-							DocumentCommand.asDto(documentCommand),
-							false, 
-							RolHelper.getRolActual(request), 
-							command.getTascaId());
-					
-					documentsCreats.append(" - " + document.getNom());
-					documentsCreats.append("<br>");
- 				} catch (Exception ex) {
- 					documentsAmbError.append(" - " + documentCommand.getNom() + (ex.getMessage() != null ? " - " + ex.getMessage() : ""));
- 					documentsAmbError.append("<br>");
- 					
- 					logger.error("Hi ha hagut un error creant un dels documents del fitxe zip", ex);
-				}
-				
-			}
-			
-			if (documentsAmbError.length() != 0) {
-				MissatgesHelper.error(
-						request,
-						getMessage(
-								request,
-								"document.controller.multiple.creat.ko",
-								new Object[] { documentsAmbError.toString() }));
-			}
-			
-			if (documentsCreats.length() != 0) {
-				MissatgesHelper.success(
-						request,
-						getMessage(
-								request,
-								"document.controller.multiple.creat.ok",
-								new Object[] { documentsCreats.toString() }));
-			}
-			
-			return getModalControllerReturnValueSuccess(
-					request,
-					"redirect:../../contingut/" + pareId,
-					null);
-		} catch (Exception ex) {
-			omplirModelFormulari(
-					model, 
-					pareId, 
-					command, 
-					entitatActual);
-			return getModalControllerReturnValueError(
-					request,
-					"redirect:../../contingut/" + pareId + "/zip/importacio/new",
-					"document.controller.multiple.ko",
-					ex);
-		}
-	}
-	
-    @RequestMapping(value = "/zip/importacio/plantilla", method = RequestMethod.GET)
-    @ResponseBody
-    public void getModelDadesCarregaMassiuCSV(
-    		HttpServletResponse response) throws IOException {
-
-        response.setHeader("Set-cookie", "fileDownload=true; path=/");
-        try {
-        	byte[] contingutPlantilla = documentService.getPlantillaImportacioZip();
-        	
-            writeFileToResponse(
-            		"model_dades_importacio_zip.csv", 
-            		contingutPlantilla, 
-            		response);
-        } catch (Exception ex) {
-        	logger.debug("Error al obtenir la plantilla del model de dades CSV per a la importació ZIP", ex);
-        }
-    }
-	
 	private void omplirModelFormulari(Model model, Long pareId, ImportacioZipCommand command, EntitatDto entitatActual) {
 		String action = "/contingut/" + pareId + "/zip/importacio/processar";
 		
@@ -292,6 +176,4 @@ public class ContingutZipImportacioController extends BaseUserOAdminOOrganContro
 		return aplicacioService.propertyFindByNom("es.caib.ripea.estat.elaboracio.identificador.origen.obligat");
 	}
 	
-	private static final Logger logger = LoggerFactory.getLogger(ContingutZipImportacioController.class);
-
 }

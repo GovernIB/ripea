@@ -82,7 +82,8 @@ public interface DocumentService {
 			DocumentDto document,
 			boolean comprovarMetaExpedient, 
 			String rolActual, 
-			Long tascaId) throws NotFoundException, ValidationException;
+			Long tascaId,
+			boolean comprovarMetaDocument) throws NotFoundException, ValidationException;
 
 	/**
 	 * Modifica un document.
@@ -788,25 +789,14 @@ public interface DocumentService {
     public byte[] getPlantillaImportacioZip();
     
     @PreAuthorize("isAuthenticated()")
-	public List<DocumentDto> extreureDocumentsZip(
+	public int extreureDocumentsZip(
 			InputStream zip, 
-			Long metaExpedientId, 
-			Long pareId,
+			String rolActual, 
+			Long pareId, 
+			Long tascaId, 
 			EntitatDto entitatActual) throws IOException;
     
     @PreAuthorize("isAuthenticated()")
 	public ProgresProcessamentZipDto obtenirProgresProcessamentZip(Long pareId);
-    
-    @PreAuthorize("isAuthenticated()")
-	public byte[] obtenirContingutFitxerZip(String fitxerNom);
-    
-    @PreAuthorize("isAuthenticated()")
-	public DocumentDto crearAmbCarpetes(
-			Long id, 
-			Long pareId, 
-			DocumentDto asDto, 
-			boolean b, 
-			String rolActual,
-			Long tascaId);
     
 }

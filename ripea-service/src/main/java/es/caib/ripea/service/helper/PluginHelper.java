@@ -5340,7 +5340,8 @@ public class PluginHelper {
 							document,
 							notificacio.getDocument().getPare(),
 							true,
-							false);
+							false,
+							true);
 				}
 
 			} else {

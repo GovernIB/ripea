@@ -97,7 +97,8 @@ public class DocumentHelper {
 			DocumentDto document,
 			ContingutEntity pare,
 			boolean comprovarMetaExpedient,
-			boolean returnDetail) {
+			boolean returnDetail,
+			boolean comprovarMetaDocument) {
 		
 		ExpedientEntity expedient = pare.getExpedientPare();
 		
@@ -112,18 +113,21 @@ public class DocumentHelper {
 					"metaExpedient=" + expedient.getMetaExpedient().getNom() + "(" + expedient.getMetaExpedient().getId() + "))");
 		
 		MetaDocumentEntity metaDocument = null;
-		if (document.getMetaNode()!=null) {
-			metaDocument = entityComprovarHelper.comprovarMetaDocument(
-					pare.getEntitat(),
-					expedient.getMetaExpedient(),
-					document.getMetaNode().getId(),
-					true,
-					comprovarMetaExpedient);
-		} else {
-			throw new ValidationException(
-					"<creacio>",
-					ExpedientEntity.class,
-					"No es pot crear un document sense un meta-document associat");
+		
+		if (comprovarMetaDocument) {
+		    if (document.getMetaNode() == null) {
+		        throw new ValidationException(
+		                "<creacio>",
+		                ExpedientEntity.class,
+		                "No es pot crear un document sense un meta-document associat");
+		    }
+
+		    metaDocument = entityComprovarHelper.comprovarMetaDocument(
+		            pare.getEntitat(),
+		            expedient.getMetaExpedient(),
+		            document.getMetaNode().getId(),
+		            true,
+		            comprovarMetaExpedient);
 		}
 		
 		//Casos en que han adjuntat document original i document firmat, pero el firmat ja conté el original (firmes attached)
@@ -162,7 +166,7 @@ public class DocumentHelper {
 				expedient,
 				metaDocument,
 				0);
-		if (documents.size() > 0 && (metaDocument.getMultiplicitat().equals(MultiplicitatEnumDto.M_1) || metaDocument.getMultiplicitat().equals(MultiplicitatEnumDto.M_0_1))) {
+		if (metaDocument != null && documents.size() > 0 && (metaDocument.getMultiplicitat().equals(MultiplicitatEnumDto.M_1) || metaDocument.getMultiplicitat().equals(MultiplicitatEnumDto.M_0_1))) {
 			throw new ValidationException(
 					"<creacio>",
 					ExpedientEntity.class,
@@ -184,7 +188,7 @@ public class DocumentHelper {
 				expedient.getNtiOrgano(),
 				document.getNtiOrigen(),
 				document.getNtiEstadoElaboracion(),
-				metaDocument.getNtiTipoDocumental(),
+				metaDocument != null ? metaDocument.getNtiTipoDocumental() : document.getNtiTipoDocumental(),
 				metaDocument,
 				pare,
 				pare.getEntitat(),
