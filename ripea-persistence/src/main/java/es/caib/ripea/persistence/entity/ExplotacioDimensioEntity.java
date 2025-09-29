@@ -1,5 +1,6 @@
 package es.caib.ripea.persistence.entity;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
@@ -31,4 +32,22 @@ public class ExplotacioDimensioEntity extends RipeaPersistable<Long> {
 	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(name = "usuari_codi")
 	protected UsuariEntity usuari;
+	
+	@Column(name = "entitat_codi") protected String entitatCodi;
+	@Column(name = "procediment_codi") protected String procedimentCodi;
+	@Column(name = "organ_codi") protected String organCodi;
+	
+	public void inicializaDimensio(
+			EntitatEntity entitatEntity,
+			MetaExpedientEntity metaExpedientEntity,
+			OrganGestorEntity organGestorEntity,
+			UsuariEntity usuariEntity) {
+		this.setEntitat(entitatEntity);
+		this.setEntitatCodi(entitatEntity.getCodi());
+		this.setProcediment(metaExpedientEntity);
+		this.setProcedimentCodi(metaExpedientEntity.getCodi());
+		this.setOrganGestor(organGestorEntity);
+		this.setOrganCodi(organGestorEntity.getCodi());
+		this.setUsuari(usuariEntity);
+	}
 }

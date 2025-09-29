@@ -1,6 +1,7 @@
 package es.caib.ripea.persistence.entity;
 
 import java.time.LocalDate;
+import java.time.temporal.WeekFields;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -40,4 +41,23 @@ public class ExplotacioTempsEntity extends RipeaPersistable<Long> {
 	@Column(name = "dia_setmana")
 	@Enumerated(EnumType.STRING)
 	private DiaSetmanaEnum diaSetmana;
+	
+	public ExplotacioTempsEntity(LocalDate data) {
+		super();
+		this.data = data;
+		this.anualitat = data.getYear();
+		this.trimestre = data.getMonthValue() / 3;
+		this.mes = data.getMonthValue();
+		this.setmana = data.get(WeekFields.ISO.weekOfWeekBasedYear());
+		this.dia = data.getDayOfMonth();
+		switch (data.getDayOfWeek()) {
+			case SUNDAY:	this.diaSetmana = DiaSetmanaEnum.DG; break;
+			case MONDAY:	this.diaSetmana = DiaSetmanaEnum.DL; break;
+			case TUESDAY:	this.diaSetmana = DiaSetmanaEnum.DM; break;
+			case WEDNESDAY: this.diaSetmana = DiaSetmanaEnum.DC; break;
+			case THURSDAY:	this.diaSetmana = DiaSetmanaEnum.DJ; break;
+			case FRIDAY:	this.diaSetmana = DiaSetmanaEnum.DV; break;
+			case SATURDAY:	this.diaSetmana = DiaSetmanaEnum.DS; break;
+		}
+	}
 }

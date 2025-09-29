@@ -1,5 +1,7 @@
 package es.caib.ripea.ejb;
 
+import java.util.Date;
+
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 
@@ -75,7 +77,6 @@ public class SegonPlaServiceEjb extends AbstractServiceEjb<SegonPlaService> impl
 	@RolesAllowed("**")
 	public void enviarEmailPerComentariMetaExpedient() {
 		delegateService.enviarEmailPerComentariMetaExpedient();
-		
 	}
 
 	@Override
@@ -94,5 +95,11 @@ public class SegonPlaServiceEjb extends AbstractServiceEjb<SegonPlaService> impl
 	@RolesAllowed("**")
 	public void generarJsonMetriques() throws Exception {
 		delegateService.generarJsonMetriques();
+	}
+	
+	@Override
+	@RolesAllowed("**")
+	public void generarEstadistiquesDiaries(Date fecha) throws Exception {
+		delegateService.generarEstadistiquesDiaries(fecha);
 	}
 }

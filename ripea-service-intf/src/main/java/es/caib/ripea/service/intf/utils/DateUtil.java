@@ -72,10 +72,25 @@ public class DateUtil {
 		return cal;
 	}
 	
+	public static Calendar startOfDay(Calendar cal) {
+		cal.set(Calendar.HOUR_OF_DAY, 0);
+		cal.set(Calendar.MINUTE, 0);
+		cal.set(Calendar.SECOND, 0);
+		cal.set(Calendar.MILLISECOND, 0);
+		return cal;
+	}
+	
 	public static Calendar endOfDay(Date date) {
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(date);
 		endOfDay(cal);
+		return cal;
+	}
+	
+	public static Calendar startOfDay(Date date) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		startOfDay(cal);
 		return cal;
 	}
 

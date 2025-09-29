@@ -70,6 +70,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
     private final String codiConsultaDeCanvisAlOrganigrama = "consultaDeCanvisAlOrganigrama";
     private final String codiBuidarCachesDominis = "buidarCachesDominis";
     private final String codiGenerarJsonMetriques = "generarJsonMetriques";
+    private final String codiGenerarEstadistiquesDiaries = "generarEstadistiquesDiaries";
 
      @Bean
      public TaskScheduler taskScheduler() {
@@ -119,6 +120,9 @@ public class SchedulingConfig implements SchedulingConfigurer {
             }
             if (codiGenerarJsonMetriques.equals(taskCodi) || "totes".equals(taskCodi)) {
                 rescheduleTask("generarJsonMetriques", getTrigger(codiGenerarJsonMetriques));
+            }
+            if (codiGenerarEstadistiquesDiaries.equals(taskCodi) || "totes".equals(taskCodi)) {
+                rescheduleTask("generarEstadistiquesDiaries", getTrigger(codiGenerarEstadistiquesDiaries));
             }
         }
     }
@@ -410,7 +414,28 @@ public class SchedulingConfig implements SchedulingConfigurer {
                     }
                 },
                 getTrigger(codiGenerarJsonMetriques)
-        );        
+        );
+        
+        addTask(
+        		codiGenerarEstadistiquesDiaries,
+                new Runnable() {
+                    @SneakyThrows
+                    @Override
+                    public void run() {
+						monitorTasquesService.inici(codiGenerarEstadistiquesDiaries);
+						try {
+							createAuthenticationContext();
+	                        segonPlaService.generarEstadistiquesDiaries(null);
+							monitorTasquesService.fi(codiGenerarEstadistiquesDiaries);
+						} catch (Throwable th) {
+							tractarErrorTascaSegonPla(th, codiGenerarEstadistiquesDiaries);
+						} finally {
+                        	SecurityContextHolder.clearContext();
+                        }
+                    }
+                },
+                getTrigger(codiGenerarEstadistiquesDiaries)
+        );
     } //Fi de configureTasks
 
     private Trigger getTrigger(String taskCodi) {
@@ -653,6 +678,24 @@ public class SchedulingConfig implements SchedulingConfigurer {
                     Date nextExecution = trigger.nextExecutionTime(triggerContext);
                     Long longNextExecution = nextExecution.getTime() - System.currentTimeMillis();
                     monitorTasquesService.updateProperaExecucio(codiGenerarJsonMetriques, longNextExecution);
+                    return nextExecution;
+                }
+            };
+        } else if (taskCodi.equals(codiGenerarEstadistiquesDiaries)) {
+            return new Trigger() {
+                @Override
+                public Date nextExecutionTime(TriggerContext triggerContext) {
+                	CronTrigger trigger = null;
+                    try {
+                    	String cron = configHelper.getConfig(PropertyConfig.ESTADISTIQUES_DIARIES_CRON);
+                    	if (cron == null) cron = "0 0 1 * * *";
+                        trigger = new CronTrigger(cron);
+                    } catch (Exception e) {
+                        log.error("Error getting next execution date for generarEstadistiquesDiaries()", e);
+                    }
+                    Date nextExecution = trigger.nextExecutionTime(triggerContext);
+                    Long longNextExecution = nextExecution.getTime() - System.currentTimeMillis();
+                    monitorTasquesService.updateProperaExecucio(codiGenerarEstadistiquesDiaries, longNextExecution);
                     return nextExecution;
                 }
             };

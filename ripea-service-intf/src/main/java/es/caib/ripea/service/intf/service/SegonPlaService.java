@@ -1,5 +1,7 @@
 package es.caib.ripea.service.intf.service;
 
+import java.util.Date;
+
 import org.springframework.security.access.prepost.PreAuthorize;
 
 @PreAuthorize("isAuthenticated()")
@@ -30,4 +32,6 @@ public interface SegonPlaService {
 	void tancarExpedientsArxiu();
 	
 	void generarJsonMetriques() throws Exception;
+	
+	void generarEstadistiquesDiaries(Date fecha) throws Exception;
 }

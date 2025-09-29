@@ -1,8 +1,13 @@
 package es.caib.ripea.back.controller;
 
-import es.caib.ripea.back.helper.EnumHelper.HtmlOption;
-import es.caib.ripea.service.intf.dto.UsuariDto;
-import es.caib.ripea.service.intf.service.AplicacioService;
+import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,10 +19,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletRequest;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.List;
+import es.caib.ripea.back.helper.EnumHelper.HtmlOption;
+import es.caib.ripea.service.intf.dto.UsuariDto;
+import es.caib.ripea.service.intf.service.AplicacioService;
+import es.caib.ripea.service.intf.service.SegonPlaService;
 
 /**
  * Controlador per a les consultes ajax dels usuaris normals.
@@ -29,6 +34,7 @@ import java.util.List;
 public class AjaxUserController extends BaseUserController {
 
 	@Autowired private AplicacioService aplicacioService;
+	@Autowired private SegonPlaService segonPlaService;
 
 	@RequestMapping(value = "/usuari/{codi}", method = RequestMethod.GET)
 	@ResponseBody
@@ -38,6 +44,24 @@ public class AjaxUserController extends BaseUserController {
 			Model model) {
 		UsuariDto aux = aplicacioService.findUsuariAmbCodi(codi);
 		return aux;
+	}
+	
+	@RequestMapping(value = "/stats/{dataTextddmmyyyy}", method = RequestMethod.GET)
+	@ResponseBody
+	public String stats(
+			HttpServletRequest request,
+			@PathVariable String dataTextddmmyyyy,
+			Model model) {
+		try {
+			SimpleDateFormat formato = new SimpleDateFormat("ddMMyyyy");
+			Date fecha = formato.parse(dataTextddmmyyyy);
+
+			segonPlaService.generarEstadistiquesDiaries(fecha);
+			return "OK";
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "KO";
+		}
 	}
 
 	// CERCA USUARIS a BBDD RIPEA (NO PLUGIN). SUGGEST

@@ -50,6 +50,7 @@ public class PropertyConfig {
 	public static final String EXECUTAR_EXECUCIONS_MASSIVES_RATE = "es.caib.ripea.segonpla.massives.periode.comprovacio";
 	public static final String ENVIAR_EMAILS_PENDENTS_AGRUPATS_CRON = "es.caib.ripea.segonpla.email.enviament.agrupat.cron";
 	public static final String JSON_METRIQUES_CRON = "es.caib.ripea.segonpla.json.metriques";
+	public static final String ESTADISTIQUES_DIARIES_CRON = "es.caib.ripea.segonpla.estadistiques.diaries";
 	public static final String TASCA_DURACIO_DEFAULT = "es.caib.ripea.duracio.tasca";
 	public static final String TASCA_PREAVIS_DATA_LIMIT = "es.caib.ripea.tasca.preavisDataLimitEnDies";
 	public static final String BUIDAR_CACHES_DOMINIS_RATE = "es.caib.ripea.dominis.cache.execucio";
