@@ -23,6 +23,9 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 
 	public OrganGestorEntity findByEntitatAndCodi(EntitatEntity entitat, String codi);
 	
+	@Query("SELECT e.codi FROM OrganGestorEntity e ORDER BY e.codi")
+	List<String> findCodisOrdenats();
+	
 	@Query(	"from " +
 			"    OrganGestorEntity og " +
 			"where (og.entitat.id = :entitatId)" +

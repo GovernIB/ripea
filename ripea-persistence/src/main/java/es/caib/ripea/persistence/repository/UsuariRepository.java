@@ -12,6 +12,9 @@ import java.util.List;
 public interface UsuariRepository extends JpaRepository<UsuariEntity, String> {
 	
 	public UsuariEntity findByCodi(String codi);
+	
+	@Query("SELECT e.codi FROM UsuariEntity e ORDER BY e.codi")
+	List<String> findCodisOrdenats();
 
 	public List<UsuariEntity> findByNifOrderByVersionDesc(String nif);
 

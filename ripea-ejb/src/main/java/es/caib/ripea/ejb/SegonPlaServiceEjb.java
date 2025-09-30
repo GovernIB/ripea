@@ -1,11 +1,18 @@
 package es.caib.ripea.ejb;
 
+import java.time.LocalDate;
 import java.util.Date;
+import java.util.List;
 
+import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 
+import es.caib.comanda.ms.estadistica.model.DimensioDesc;
+import es.caib.comanda.ms.estadistica.model.IndicadorDesc;
+import es.caib.comanda.ms.estadistica.model.RegistresEstadistics;
 import es.caib.ripea.ejb.base.AbstractServiceEjb;
+import es.caib.ripea.service.intf.dto.ExplotFetsAmbDimensioDto;
 import es.caib.ripea.service.intf.service.SegonPlaService;
 import lombok.experimental.Delegate;
 
@@ -98,8 +105,32 @@ public class SegonPlaServiceEjb extends AbstractServiceEjb<SegonPlaService> impl
 	}
 	
 	@Override
-	@RolesAllowed("**")
-	public void generarEstadistiquesDiaries(Date fecha) throws Exception {
-		delegateService.generarEstadistiquesDiaries(fecha);
+	@PermitAll
+	public List<ExplotFetsAmbDimensioDto> generarEstadistiquesDiaries(Date fecha) throws Exception {
+		return delegateService.generarEstadistiquesDiaries(fecha);
+	}
+	
+	@Override
+	@PermitAll
+	public List<DimensioDesc> getDimensionsInfo() {
+		return delegateService.getDimensionsInfo();
+	}
+	
+	@Override
+	@PermitAll
+	public List<IndicadorDesc> getIndicadorsInfo() {
+		return delegateService.getIndicadorsInfo();
+	}
+	
+	@Override
+	@PermitAll
+	public RegistresEstadistics consultaEstadistiques(LocalDate date) {
+		return delegateService.consultaEstadistiques(date);
+	}
+	
+	@Override
+	@PermitAll
+	public boolean existeixenEstadistiques(LocalDate date) {
+		return delegateService.existeixenEstadistiques(date);
 	}
 }

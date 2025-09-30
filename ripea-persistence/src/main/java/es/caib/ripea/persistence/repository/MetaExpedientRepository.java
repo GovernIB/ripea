@@ -19,6 +19,9 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 
 	MetaExpedientEntity findByEntitatAndCodi(EntitatEntity entitat, String codi);
 
+	@Query("SELECT e.codi FROM MetaExpedientEntity e ORDER BY e.codi")
+	List<String> findCodisOrdenats();
+	
 	@Query( "select " +
 			"	me.id " +
 			"from " +

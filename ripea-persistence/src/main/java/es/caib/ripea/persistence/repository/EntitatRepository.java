@@ -22,11 +22,12 @@ public interface EntitatRepository extends JpaRepository<EntitatEntity, Long> {
 
 	List<EntitatEntity> findByActiva(boolean activa);
 
-	Page<EntitatEntity> findBy(
-			Pageable pageable);
+	Page<EntitatEntity> findBy(Pageable pageable);
 
-	List<EntitatEntity> findBy(
-			Sort sort);
+	List<EntitatEntity> findBy(Sort sort);
+	
+	@Query("SELECT e.codi FROM EntitatEntity e ORDER BY e.codi")
+	List<String> findCodisOrdenats();
 
 	@Query("select org.entitat " + 
 			"from " + 

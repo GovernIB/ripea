@@ -26,6 +26,10 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import es.caib.comanda.ms.estadistica.model.DimensioDesc;
+import es.caib.comanda.ms.estadistica.model.Format;
+import es.caib.comanda.ms.estadistica.model.IndicadorDesc;
+import es.caib.comanda.ms.estadistica.model.RegistresEstadistics;
 import es.caib.ripea.persistence.entity.ContingutEntity;
 import es.caib.ripea.persistence.entity.DocumentEntity;
 import es.caib.ripea.persistence.entity.EmailPendentEnviarEntity;
@@ -548,8 +552,109 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	}
 	
 	@Override
+	@Transactional(readOnly = true)
+	public List<DimensioDesc> getDimensionsInfo() {
+		List<DimensioDesc> resultat = new ArrayList<DimensioDesc>();
+		
+		List<String> valorsEntitats = entitatRepository.findCodisOrdenats();
+		DimensioDesc dimEntitat = new DimensioDesc("ENT", "Entitats", "Entitats de RIPEA", valorsEntitats);
+		resultat.add(dimEntitat);
+		
+		List<String> valorsProcediments = metaExpedientRepository.findCodisOrdenats();
+		DimensioDesc dimProcediment = new DimensioDesc("PRO", "Procediment", "Procediments de RIPEA", valorsProcediments);
+		resultat.add(dimProcediment);
+		
+		List<String> valorsOGs = organGestorRepository.findCodisOrdenats();
+		DimensioDesc dimOrgansGestors = new DimensioDesc("ORG", "Òrgan gestor", "Òrgans gestors de RIPEA", valorsOGs);
+		resultat.add(dimOrgansGestors);
+		
+		List<String> valorsUsuaris = usuariRepository.findCodisOrdenats();
+		DimensioDesc dimUsuari = new DimensioDesc("USU", "Usuaris", "Usuaris de RIPEA", valorsUsuaris);
+		resultat.add(dimUsuari);
+		
+		return resultat;
+	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public List<IndicadorDesc> getIndicadorsInfo() {
+		
+		List<IndicadorDesc> resultat = new ArrayList<IndicadorDesc>();
+		
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.ANO_NOVES.toString(), "Anotacions noves", "Noves anotacions rebudes a RIPEA", Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.ANO_NOVES_TOTAL.toString(), "Anotacions noves totals", "Total noves anotacions rebudes a RIPEA", Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.ANO_PROCESSADES.toString(), "Anotacions processades", "Anotacions processades a RIPEA", Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.ANO_PROCESSADES_TOTAL.toString(), "Anotacions processades totals", "Anotacions processades totals a RIPEA", Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.ANO_REBUTJADES.toString(), "Anotacions rebutjades", "Anotacions rebutjades a RIPEA", Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.ANO_REBUTJADES_TOTAL.toString(), "Anotacions rebutjades totals", "Anotacions rebutjades totals a RIPEA", Format.LONG));
+		
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.EXP_OBERTS.toString(), "Expedients oberts", "Expedients oberts a RIPEA", Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.EXP_OBERTS_TOTAL.toString(), "Expedients oberts totals", "Expedients oberts totals a RIPEA", Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.EXP_TANCATS.toString(), "Expedients tancats", "Expedients tancats a RIPEA", Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.EXP_TANCATS_TOTAL.toString(), "Expedients tancats totals", "Expedients tancats totals a RIPEA", Format.LONG));
+		
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.FIR_FIRMADES.toString(), "Env. portafib firmats", "Env. portafib firmats a RIPEA", Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.FIR_FIRMADES_TOTAL.toString(), "Env. portafib firmats totals", "Env. portafib firmats totals a RIPEA", Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.FIR_INICIADES.toString(), "Env. portafib iniciats", "Env. portafib iniciats a RIPEA", Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.FIR_INICIADES_TOTAL.toString(), "Env. portafib iniciats totals", "Env. portafib iniciats totals a RIPEA", Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.FIR_PARCIALS.toString(), "Env. portafib parcials", "Env. portafib parcials a RIPEA", Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.FIR_PARCIALS_TOTAL.toString(), "Env. portafib parcials totals", "Env. portafib parcials totals a RIPEA", Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.FIR_PAUSADES.toString(), "Env. portafib pausats", "Env. portafib pausats a RIPEA", Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.FIR_PAUSADES_TOTAL.toString(), "Env. portafib pausats totals", "Env. portafib pausats totals a RIPEA", Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.FIR_REBUTJADES.toString(), "Env. portafib rebutjats", "Env. portafib rebutjats a RIPEA", Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.FIR_REBUTJADES_TOTAL.toString(), "Env. portafib rebutjats totals", "Env. portafib rebutjats totals a RIPEA", Format.LONG));
+		
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.NOT_ENVIADES.toString(), "Notificacions enviades", "Notificacions enviades a RIPEA", Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.NOT_ENVIADES_TOTAL.toString(), "Notificacions enviades totals", "Notificacions enviades totals a RIPEA", Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.NOT_PENDENTS.toString(), "Notificacions pendents", "Notificacions pendents a RIPEA", Format.LONG));		
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.NOT_PENDENTS_TOTAL.toString(), "Notificacions pendents totals", "Notificacions pendents totals a RIPEA", Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.NOT_REGISTRADES.toString(), "Notificacions registrades", "Notificacions registrades a RIPEA", Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.NOT_REGISTRADES_TOTAL.toString(), "Notificacions registrades totals", "Notificacions registrades totals a RIPEA", Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.NOT_FINALITZADES.toString(), "Notificacions finalitzades", "Notificacions finalitzades a RIPEA", Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.NOT_FINALITZADES_TOTAL.toString(), "Notificacions finalitzades totals", "Notificacions finalitzades totals a RIPEA", Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.NOT_PROCESSADES.toString(), "Notificacions processades", "Notificacions processades a RIPEA", Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.NOT_PROCESSADES_TOTAL.toString(), "Notificacions processades totals", "Notificacions processades totals a RIPEA", Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.NOT_ENVIADES_ERROR.toString(), "Notificacions enviades", "Notificacions enviades a RIPEA", Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.NOT_ENVIADES_ERROR_TOTAL.toString(), "Notificacions enviades totals", "Notificacions enviades totals a RIPEA", Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.NOT_FINALITZADES_ERROR.toString(), "Notificacions finalitzades", "Notificacions finalitzades a RIPEA", Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.NOT_FINALITZADES_ERROR_TOTAL.toString(), "Notificacions finalitzades totals", "Notificacions finalitzades totals a RIPEA", Format.LONG));
+		
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.PIN_ENVIAMENTS.toString(), "Enviaments PINBAL", "Enviaments PINBAL a RIPEA", Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.PIN_ENVIAMENTS_TOTAL.toString(), "Enviaments PINBAL totals", "Enviaments PINBAL totals a RIPEA", Format.LONG));
+		
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_AGAFADES.toString(), "Tasques afagades", "Tasques afagades a RIPEA", Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_AGAFADES_TOTAL.toString(), "Tasques afagades totals", "Tasques afagades totals a RIPEA", Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_CANCELADES.toString(), "Tasques cancelades", "Tasques cancelades a RIPEA", Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_CANCELADES_TOTAL.toString(), "Tasques cancelades totals", "Tasques cancelades totals a RIPEA", Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_FINALITZADES.toString(), "Tasques finalitzades", "Tasques finalitzades a RIPEA", Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_FINALITZADES_TOTAL.toString(), "Tasques finalitzades totals", "Tasques finalitzades totals a RIPEA", Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_INICIADES.toString(), "Tasques iniciades", "Tasques iniciades a RIPEA", Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_INICIADES_TOTAL.toString(), "Tasques iniciades totals", "Tasques iniciades totals a RIPEA", Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_PENDENTS.toString(), "Tasques pendents", "Tasques pendents a RIPEA", Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_PENDENTS_TOTAL.toString(), "Tasques pendents totals", "Tasques pendents totals a RIPEA", Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_REBUTJADES.toString(), "Tasques rebutjades", "Tasques rebutjades a RIPEA", Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_REBUTJADES_TOTAL.toString(), "Tasques rebutjades totals", "Tasques rebutjades totals a RIPEA", Format.LONG));
+		
+		return resultat;
+	}
+	
+	@Override
 	@Transactional
-	public void generarEstadistiquesDiaries(Date fecha) throws Exception {
+	public boolean existeixenEstadistiques(LocalDate date) {
+		ExplotacioTempsEntity tempsDia = explotacioTempsRepository.findFirstByData(date);
+		return (tempsDia!=null);
+	}
+	
+	@Override
+	@Transactional
+	public RegistresEstadistics consultaEstadistiques(LocalDate date) {
+		RegistresEstadistics resultat = new RegistresEstadistics();
+		return resultat;
+	}
+
+	@Override
+	@Transactional
+	public List<ExplotFetsAmbDimensioDto> generarEstadistiquesDiaries(Date fecha) throws Exception {
 
 		LocalDate avui = LocalDate.now();
 		
@@ -851,6 +956,8 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 			
 			explotacioFetsRepository.save(explotacioFetsEntity);
 		}
+		
+		return dimensions;
 	}
 	
 	//Afegeix a la llista de distinctDimensions, les tuples entitatId-procedimentId-organId-usuariCodi que estan a aux pero no a distinctDimensions
@@ -990,10 +1097,6 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 		String maxReintentsCanviEstatRebudaDistribucio = configHelper.getConfig(PropertyConfig.MAX_REINTENTS_CANVI_ESTST_DISTRIBUCIO);
 		return maxReintentsCanviEstatRebudaDistribucio != null && !maxReintentsCanviEstatRebudaDistribucio.isEmpty() ? Integer.valueOf(maxReintentsCanviEstatRebudaDistribucio) : 0;
 	}
-	
-	
-	
 
 	private static final Logger logger = LoggerFactory.getLogger(SegonPlaServiceImpl.class);
-
 }

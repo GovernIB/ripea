@@ -60,6 +60,12 @@ public class EjbClientApiIntConfig {
 	
 	@Bean
 	@ConditionalOnWarDeployment
+	public LocalStatelessSessionProxyFactoryBean segonPlaService() {
+		return getLocalEjbFactoyBean(SegonPlaService.class);
+	}
+	
+	@Bean
+	@ConditionalOnWarDeployment
 	public LocalStatelessSessionProxyFactoryBean salutService() {
 		return getLocalEjbFactoyBean(SalutService.class);
 	}

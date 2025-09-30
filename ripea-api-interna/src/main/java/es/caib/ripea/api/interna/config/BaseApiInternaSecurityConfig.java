@@ -35,7 +35,9 @@ public class BaseApiInternaSecurityConfig {
 				new AntPathRequestMatcher("/api/viaFirmaResponse"),
 				new AntPathRequestMatcher("/notib/**/*"),
 				new AntPathRequestMatcher("/appInfo"),
-				new AntPathRequestMatcher("/salut")
+				new AntPathRequestMatcher("/salut"),
+				new AntPathRequestMatcher("/estadistiques"),
+				new AntPathRequestMatcher("/estadistiquesInfo")
 		};
 	}
 
