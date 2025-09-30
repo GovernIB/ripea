@@ -48,6 +48,8 @@ public class ZipImportacioHelper {
     private CarpetaHelper carpetaHelper;
     @Autowired
     private EntityComprovarHelper entityComprovarHelper;
+    @Autowired
+	private MessageHelper messageHelper;
     
     private final Map<String, List<String>> ubicacioDocuments = new HashMap<>();
     private final Map<Long, ProgresProcessamentZipDto> mapProgres = new HashMap<>();
@@ -72,6 +74,8 @@ public class ZipImportacioHelper {
             		entitatId, 
             		pareId);
 
+            progres.addInfo(messageHelper.getMessage("contingut.boto.crear.document.multiple.proces", new Object[]{documentDto.getFitxerNom()}));
+            
             documentService.create(entitatId,
                                    documentDto.getPareId(),
                                    documentDto,
@@ -79,7 +83,6 @@ public class ZipImportacioHelper {
                                    rolActual,
                                    tascaId,
                                    false);
-
             progres.incrementOperacionsRealitzades();
         }
         return progres.getNumOperacions();
@@ -181,7 +184,7 @@ public class ZipImportacioHelper {
         documentDto.setNtiEstadoElaboracion(NTI_ESTADO_ELABORACION);
         documentDto.setNtiTipoDocumental(NTI_TIPO_DOCUMENTAL);
         
-        validarFirmes(mimeType, contingut, documentDto);
+        //validarFirmes(mimeType, contingut, documentDto);
         
         return documentDto;
     }

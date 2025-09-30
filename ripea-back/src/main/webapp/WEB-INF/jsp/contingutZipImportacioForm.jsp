@@ -142,7 +142,7 @@ $(document).ready(function() {
             		$(rootIframe.parentElement).find(".progress-bar").css("width", response.progres + "%").text(Math.round(response.progres) + "%");
             		
             		$(response.info).each(function(index, info) {
-                		$(rootIframe.parentElement).find(".progressText").text(info.text || "Procesando...");
+                		$(rootIframe.parentElement).find(".progressText").html(info.text || "Procesando...");
             		});
                 }
             	
