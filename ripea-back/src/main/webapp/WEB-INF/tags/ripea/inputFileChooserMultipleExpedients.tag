@@ -23,7 +23,7 @@
 </c:choose>
 <!-- setting parent container of document we are moving  -->
 <c:choose> 
-	<c:when test="${not empty contingutOrigen.pare && empty documentsOrigen}"><c:set var="contenidorInicialId" value="${contingutOrigen.pare.id}"/></c:when>
+	<c:when test="${not empty contingutOrigen.expedientPare && empty documentsOrigen}"><c:set var="contenidorInicialId" value="${contingutOrigen.expedientPare.id}"/></c:when>
 	<c:otherwise><c:set var="contenidorInicialId" value="${contingutOrigen.id}"/></c:otherwise>
 </c:choose>
 <div class="form-group<c:if test="${not empty campErrors}"> has-error</c:if>">

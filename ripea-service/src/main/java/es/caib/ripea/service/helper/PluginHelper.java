@@ -4933,7 +4933,7 @@ public class PluginHelper {
 			RespostaConsultaEstatNotificacio respostaNotificioEstat = notificacioPlugin.consultarNotificacio(
 					notificacio.getNotificacioIdentificador());
 			
-			if (respostaNotificioEstat.isError()) {
+			if (!respostaNotificioEstat.isError()) {
 				
 				notificacio.updateNotificacioEstat(
 						respostaNotificioEstat.getEstat(),
