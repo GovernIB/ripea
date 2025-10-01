@@ -41,20 +41,13 @@
 <%--				<li><a href="<c:url value="/expedient/${contingut.id}/guardarExpedientArxiu?origin=expDetail"/>"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.guardarArxiu"/></a></li>--%>
 <%--			</c:when>--%>
 		</c:choose>
+		
 		<c:if test="${(empty mostrarObrir or mostrarObrir)}">
-			<c:choose>
-				<c:when test="${contingut.carpeta}">
-					<li><a href="${(not empty contingut.expedientRelacionat) ? contingut.expedientRelacionat.id : contingut.id}"><span class="fa fa-folder-open-o"></span>&nbsp;<spring:message code="comu.boto.detalls"/></a></li>
-				</c:when>
-				<c:otherwise>
-					<c:if test="${!isTasca}">
-						<%---- Consultar ----%>
-						<li class="${(contingut.document && contingut.gesDocAdjuntId!=null) ? 'disabled' : ''}"><a href="<c:url value="/contingut/${contingut.id}"/>" data-toggle="modal" ><span class="fa fa-folder-open-o"></span>&nbsp;<spring:message code="comu.boto.detalls"/></a></li>
-					</c:if>
-				</c:otherwise>
-			</c:choose>
-			
-			<c:set var="mostrarSeparador" value="${true}"/>
+			<c:if test="${(!contingut.carpeta and !isTasca)}">
+				<%---- Detalls ----%>
+				<li class="${(contingut.document && contingut.gesDocAdjuntId!=null) ? 'disabled' : ''}"><a href="<c:url value="/contingut/${contingut.id}"/>" data-toggle="modal" ><span class="fa fa-folder-open-o"></span>&nbsp;<spring:message code="comu.boto.detalls"/></a></li>
+				<c:set var="mostrarSeparador" value="${true}"/>
+			</c:if>
 		</c:if>
 		
 		<%---- Assignar... ----%>
