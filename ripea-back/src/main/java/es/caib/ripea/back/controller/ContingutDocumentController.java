@@ -150,7 +150,22 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		if (tascaId != null) {
 			model.addAttribute("tascaId", tascaId);
 		}
-
+		
+		try {
+			List<ArbreDto<ExpedientCarpetaArbreDto>> carpetes = carpetaService.findArbreCarpetesExpedient(
+					entitatActual.getId(),
+					null,
+					document!=null && document.getExpedientId()!=null?document.getExpedientId():pareId,
+					RolHelper.getRolActual(request));
+			model.addAttribute("carpetes", carpetes);
+			model.addAttribute("jstreeJson", command.getEstructuraCarpetesJson());
+			model.addAttribute("selectedCarpeta", command.getDestiId());
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		
+		model.addAttribute("isPermesCrearCarpetes", isPermesCrearCarpetes());
+		
 		return "contingutDocumentForm";
 	}
 
@@ -1616,6 +1631,10 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		return aplicacioService.propertyBooleanFindByKey(PropertyConfig.PROPAGAR_MODIFICACIO_ARXIU);
 	}
 	
+	private Boolean isPermesCrearCarpetes() {
+		return aplicacioService.propertyBooleanFindByKey(PropertyConfig.CARPETES_CREACIO_ACTIVA);
+	}
+	
 	private Boolean isDeteccioFirmaAutomaticaActiva() {
 		return aplicacioService.propertyBooleanFindByKey(PropertyConfig.DETECCIO_FIRMA_AUTOMATICA);
 	}
@@ -1646,8 +1665,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			Long tascaId) throws NotFoundException, ValidationException, ValidacioFirmaException, IOException, ClassNotFoundException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, ParseException {
 		
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-
-		Long pareId = command.getPareId();
+		Long pareId = Utils.hasValue(command.getDestiId())?Long.parseLong(command.getDestiId()):command.getPareId();
+		
 		if (command.getId() == null) {
 			
 			// for testing, create multiple documents with the same fitxer

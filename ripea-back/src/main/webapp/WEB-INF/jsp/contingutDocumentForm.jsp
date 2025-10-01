@@ -35,6 +35,8 @@
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<script src="<c:url value="/webjars/autoNumeric/1.9.30/autoNumeric.js"/>"></script>
 	<script src="<c:url value="/js/jquery.maskedinput.min.js"/>"></script>
+	<link href="<c:url value="/webjars/jstree/3.2.1/dist/themes/default/style.min.css"/>" rel="stylesheet">
+	<script src="<c:url value="/webjars/jstree/3.2.1/dist/jstree.min.js"/>"></script>
 	<rip:modalHead/>
 <style type="text/css">
 
@@ -585,6 +587,38 @@ $(document).ready(function() {
 	        $('input[type=radio][name=tipusFirma]').val('SEPARAT');
 	    }
 	</c:if>
+	
+	var arbre = $('#arbreCarpetes');
+	
+	arbre.on('show_contextmenu.jstree', function(e, reference, element) {
+	    if ((!reference.node.original) 
+	    		|| (reference.node.original.id != undefined && !isNaN(reference.node.original.id)) ) {
+	        $('.vakata-context li:eq(2), .vakata-context li:eq(3)').remove();
+	    }
+	});
+			
+	<c:if test="${not empty jstreeJson}">
+		arbre.jstree(true).settings.core.data = ${jstreeJson};
+		arbre.jstree(true).refresh();
+		
+		arbre.on("refresh.jstree", function(e) {
+			  arbre.jstree('select_node', ${selectedCarpeta});
+		});
+	</c:if>
+	
+
+	$('form').on('submit', function(){
+	    // Obtener la carpeta seleccionada en jsTree
+	    var selectedNode = arbre.jstree('get_selected', true)[0]; // Puedes ajustar este selector según tu configuración
+		var json = arbre.data().jstree.get_json()
+		var jsonString = JSON.stringify(json);
+
+		$('#estructuraCarpetesJson').val(jsonString);
+
+		if (selectedNode) {
+	    	$('#destiId').val(selectedNode.id);
+	    }
+	});
 });
 
 function removeLoading() {
@@ -654,10 +688,14 @@ function removeLoading() {
 		</c:if>
 		
 		<rip:inputTextarea name="descripcio" textKey="contingut.document.form.camp.descripcio" showsize="true" maxlength="510"/>
-		<%-- <rip:inputDate name="data" textKey="contingut.document.form.camp.data" required="true" readonly="${readOnlyValue}"/>--%>
 		<rip:inputDateTime name="dataTime" textKey="contingut.document.form.camp.data" required="true" readonly="${!isPermesPropagarModificacioDefinitius}"/>
 		<rip:inputSelect name="ntiOrigen" emptyOption="true" emptyOptionTextKey="contingut.document.form.camp.nti.cap" textKey="contingut.document.form.camp.nti.origen" optionEnum="NtiOrigenEnumDto" required="true"/>
 		<rip:inputSelect name="ntiEstadoElaboracion" emptyOption="true" emptyOptionTextKey="contingut.document.form.camp.nti.cap" textKey="contingut.document.form.camp.nti.estela" required="true" optionItems="${ntiEstatElaboracioOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
+	
+		<c:if test="${isPermesCrearCarpetes and empty documentCommand.id}">
+			<rip:arbreMultiple name="estructuraCarpetesJson" id="arbreCarpetes" withlabel="true" isContextMenuEnabled="true" textKey="contingut.importacio.form.camp.desti" atributId="id" atributNom="nom" arbre="${carpetes}" changedCallback="changedCallback" renamedCallback="renamedCallback" deletedCallback="deletedCallback"/>				
+			<form:hidden path="destiId"/>
+		</c:if>
 	
 		<div id="ntiIdDocumentoOrigenDiv">
 			<rip:inputText name="ntiIdDocumentoOrigen" textKey="contingut.document.form.camp.id.doc.origen" required="true" comment="contingut.document.form.camp.id.doc.origen.comtentari"/>

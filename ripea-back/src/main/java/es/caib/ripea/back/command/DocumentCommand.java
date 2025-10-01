@@ -12,12 +12,18 @@ import org.joda.time.LocalDateTime;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
 
 /**
  * Command per al manteniment de documents.
@@ -80,6 +86,9 @@ public class DocumentCommand extends ContenidorCommand {
 	private String validacioFirmaErrorMsg;
 
 	private ArxiuEstatEnumDto arxiuEstat;
+	
+	private String estructuraCarpetesJson;
+	private String destiId;
 	
 	public boolean isArxiuEstatDefinitu() {
 		return arxiuEstat != null && arxiuEstat == ArxiuEstatEnumDto.DEFINITIU;
@@ -280,6 +289,17 @@ public class DocumentCommand extends ContenidorCommand {
 		dto.setResolucion(command.getResolucion());
 		
 		dto.setScanned(command.getOrigen() == DocumentFisicOrigenEnum.ESCANER);
+		
+		try {
+			if (command.getEstructuraCarpetesJson() != null) {
+				ObjectMapper objectMapper = new ObjectMapper();
+				List<ArbreJsonDto> listCarpetes = objectMapper.readValue(command.getEstructuraCarpetesJson(), new TypeReference<List<ArbreJsonDto>>(){});
+				dto.setEstructuraCarpetes(new HashSet<ArbreJsonDto>(listCarpetes));
+			}
+		} catch (IOException ex) {
+			throw new JsonMappingException("Hi ha hagut un error en la conversió del json de jstree a List<ArbreJsonDto>", ex);
+		}
+		
 		return dto;
 	}
 
@@ -366,6 +386,22 @@ public class DocumentCommand extends ContenidorCommand {
 
 	public void setIdioma(String idioma) {
 		this.idioma = idioma;
+	}
+
+	public String getEstructuraCarpetesJson() {
+		return estructuraCarpetesJson;
+	}
+
+	public void setEstructuraCarpetesJson(String estructuraCarpetesJson) {
+		this.estructuraCarpetesJson = estructuraCarpetesJson != null ? estructuraCarpetesJson.trim() : null;
+	}
+
+	public String getDestiId() {
+		return destiId;
+	}
+
+	public void setDestiId(String destiId) {
+		this.destiId = destiId;
 	}
 
 	

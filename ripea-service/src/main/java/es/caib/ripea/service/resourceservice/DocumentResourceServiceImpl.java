@@ -220,7 +220,12 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     public DocumentResource create(DocumentResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
     	try {
     		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
-    		ContingutEntity pare = contingutRepository.findById(resource.getExpedient().getId()).get();
+			ContingutEntity pare = null;
+    		if (resource.getCarpeta()!=null) {
+    			pare = contingutRepository.findById(resource.getCarpeta().getId()).get();	
+    		} else {
+    			pare = contingutRepository.findById(resource.getExpedient().getId()).get();
+    		}
     		DocumentDto documentCreat = documentHelper.crearDocument(
     				entitatEntity.getId(),
                     resource.toDocumentDto(),
@@ -267,6 +272,11 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 						reorderPreviousParentId,
 						true,
 						false);
+				//mourer també al arxiu
+				contingutHelper.arxiuDocumentPropagarMoviment(
+						documentActual.getArxiuUuid(),
+						contingutRepository.findById(documentResourceActual.getOrderParentId()).get(),
+						documentActual.getExpedient().getArxiuUuid());				
     		} else {
         		DocumentDto documentCreat = documentHelper.updateDocument(
         				entitatEntity.getId(),
