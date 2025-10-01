@@ -54,6 +54,7 @@ const FileTabForm = () => {
 const DocumentsGridForm = () => {
     const { t } = useTranslation();
     const { data, apiRef } = useFormContext();
+    const { value: user } = useUserSession()
     const { artifactAction: apiAction } = useResourceApiService('documentResource');
 
     const actualizarDatos = () => {
@@ -71,6 +72,10 @@ const DocumentsGridForm = () => {
     const metaDocumentFilter: string = builder.and(
         builder.eq("metaExpedient.id", data?.metaExpedient?.id),
         builder.eq("actiu", true),
+    );
+    const carpetaFilter: string = builder.and(
+        builder.eq("expedient.id", data?.expedient?.id),
+        builder.eq("esborrat", 0),
     );
 
     const tabs = [
@@ -107,6 +112,10 @@ const DocumentsGridForm = () => {
         <GridFormField xs={12} name="dataCaptura" type={"date"} disabled required />
         <GridFormField xs={12} name="ntiOrigen" required />
         <GridFormField xs={12} name="ntiEstadoElaboracion" required />
+
+        <GridFormField xs={12} name="carpeta"
+                       filter={carpetaFilter}
+                       hidden={!user?.sessionScope?.isCreacioCarpetesActiva}/>
 
         <Grid item xs={12}>
             <TabComponent

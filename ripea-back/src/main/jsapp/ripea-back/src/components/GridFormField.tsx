@@ -70,11 +70,10 @@ const GridFormField = (props:GridFormField) => {
     const { xs, hidden, componentProps = {}, ...other} = props;
 
     return <Grid item xs={xs} hidden={!!hidden}>
-        <FormField {...other}
-                   componentProps={{
-                       style: { color: 'black', backgroundColor: 'white' },
-                       ...componentProps
-                   }}
-    /></Grid>
+        <FormField {...other} componentProps={{
+            sx: {color: 'black', backgroundColor: 'white'},
+            ...componentProps
+        }}/>
+    </Grid>
 }
 export default GridFormField;

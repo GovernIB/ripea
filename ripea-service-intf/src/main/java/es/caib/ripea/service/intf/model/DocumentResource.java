@@ -311,6 +311,7 @@ public class DocumentResource extends NodeResource {
     @Transient private String digitalitzacioPerfil;
     @Transient private String digitalitzacioProcesUrl;
     @Transient private MetaDocumentResource metaDocumentInfo;
+    @Transient private ResourceReference<CarpetaResource, Long> carpeta;
 
     public String getFitxerExtension() {
         if (fitxerNom != null) {
