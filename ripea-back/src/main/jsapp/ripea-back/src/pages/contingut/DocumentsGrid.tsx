@@ -319,14 +319,14 @@ const DocumentsGrid = (props: any) => {
                             }
                         }}
                         rowExpansionChange={(params: any) => {
-                            addFolderExpand(params.id, params.childrenExpanded)
+                            addFolderExpand(params.groupingKey, params.childrenExpanded)
                         }}
                         isGroupExpandedByDefault={(params) => {
-                            const value = getFolderExpand(`${params?.id}`)
+                            const value = getFolderExpand(`${params?.groupingKey}`)
                             if (value !== undefined) {
                                 return value
                             }
-                            addFolderExpand(`${params?.id}`, expand)
+                            addFolderExpand(`${params?.groupingKey}`, expand)
                             return expand
                         }}
                         toolbarElementsWithPositions={[
