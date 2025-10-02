@@ -79,12 +79,12 @@ export const useExpedientsCarpetes = (commonFilter: string) => {
     const [expedients, setExpedients] = useState<any[]>([]);
     const [carpetes, setCarpetes] = useState<any[]>([]);
     const findExpedients = () => {
-        apiExpedientFindAll({perspectives, unpaged: true, filter: commonFilter})
+        return apiExpedientFindAll({perspectives, unpaged: true, filter: commonFilter})
             .then((result)=> setExpedients(result.rows))
             .catch(()=> setExpedients([]))
     }
     const findCarpetes = () => {
-        apiCarpetaFindAll({perspectives, unpaged: true, filter: commonFilter})
+        return apiCarpetaFindAll({perspectives, unpaged: true, filter: commonFilter})
             .then((result)=> setCarpetes(result.rows))
             .catch(()=> setCarpetes([]))
     }
@@ -98,9 +98,8 @@ export const useExpedientsCarpetes = (commonFilter: string) => {
             findCarpetes();
         }
     }, [apiCarpetaIsReady]);
-    const refresh = () => {
-        findExpedients();
-        findCarpetes();
+    const refresh = async () => {
+        await Promise.allSettled([findExpedients(), findCarpetes()]);
     }
     return {
         isReady: apiExpedientIsReady && apiCarpetaIsReady,
@@ -175,9 +174,9 @@ const DocumentsGrid = (props: any) => {
         expedients,
         refresh: refreshTree
     } = useExpedientsCarpetes(commonFilter);
-    const refresh = () => {
+    const refresh = async () => {
         if (vista == View.carpeta || vista == View.icona) {
-            refreshTree()
+            await refreshTree()
         }
         gridApiRef?.current?.refresh?.();
     }

@@ -5,13 +5,15 @@ import {useTranslation} from "react-i18next";
 import GridFormField from "../../../components/GridFormField.tsx";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
+import {useUserSession} from "../../../components/Session.tsx";
 
 const MoureForm = () => {
     const { data } = useFormContext();
+    const { value: user } = useUserSession();
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField xs={12} name="contingut" readOnly disabled hidden={data?.massivo}/>
-        <GridFormField xs={12} name="expedient" namedQueries={['AGAFAT']} required/>
+        <GridFormField xs={12} name="expedient" namedQueries={['AGAFAT']} hidden={user?.sessionScope?.moureMateixExpedients} required/>
         <GridFormField xs={12} name="carpeta"
                        readOnly={!data?.expedient}
                        disabled={!data?.expedient}
