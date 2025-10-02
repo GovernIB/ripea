@@ -74,13 +74,13 @@ const useCarpetaActions = (entity:any, refresh?: () => void) => {
     const {handleShow: handleCopiar, content: contentCopiar} = useCopiar(refresh)
 
     const actions = [
-        {
+        /*{
             label: t('page.carpeta.action.update.label'),
             icon: 'edit',
             showInMenu: true,
             onClick: handleModifyCarpeta,
             hidden: !entity?.potModificar || !user?.sessionScope?.isCreacioCarpetesActiva,
-        },
+        },*/
         {
             label: t('page.expedient.action.exportPDF.label'),
             icon: 'format_list_numbered',

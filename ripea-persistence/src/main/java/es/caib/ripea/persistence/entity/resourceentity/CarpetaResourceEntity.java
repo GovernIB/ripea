@@ -8,7 +8,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import es.caib.ripea.persistence.base.entity.ResourceEntity;
-import es.caib.ripea.persistence.entity.ContingutEntity;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.model.CarpetaResource;
 import lombok.Getter;

@@ -309,6 +309,8 @@ public class DocumentHelper {
 
 		entity.updateArxiuIntent(true);
 
+		contingutHelper.reOrdenaContingut(entity);
+		
 		if (returnDetail)		
 			dto = toDocumentDto(entity);
 		else

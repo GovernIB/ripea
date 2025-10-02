@@ -79,7 +79,7 @@
 				</c:when>
 				<%--- Carpeta ---%>
 				<c:when test="${contingut.carpeta && isCreacioCarpetesActiva}">
-					<li><a href="<c:url value="/contingut/${contingut.pare.id}/carpeta/${contingut.id}"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.modificar"/>...</a></li>
+<%--					<li><a href="<c:url value="/contingut/${contingut.pare.id}/carpeta/${contingut.id}"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.modificar"/>...</a></li> --%>
 					<c:set var="mostrarSeparador" value="${true}"/>
 					<li><a href="<c:url value="/contingut/carpeta/${contingut.id}/generarIndex/PDF"/>"><span class="fa fa-list-ol"></span>&nbsp;<spring:message code="carpeta.list.user.recuperar.index.pdf"/>...</a></li>
 					<c:set var="mostrarSeparador" value="${true}"/>

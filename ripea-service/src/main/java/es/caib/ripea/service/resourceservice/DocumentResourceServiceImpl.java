@@ -233,6 +233,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     				true,
     				false);
     		resource.setId(documentCreat.getId());
+//    		reorderIfReorderable(documentResourceRepository.findById(documentCreat.getId()).get(), null, null, true, false);
     		return resource;
     	} catch (ValidationException ex) {
     		throw ex;
@@ -254,10 +255,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     }
     
     @Override
-    @Transactional
 	public DocumentResource update(Long id, DocumentResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotFoundException {
     	try {
-    		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
     		DocumentEntity documentActual = documentRepository.findById(resource.getId()).get();
     		if (resource.isOrdrePatch()) {
     			DocumentResourceEntity documentResourceActual = documentResourceRepository.findById(resource.getId()).get();
@@ -278,6 +277,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 						contingutRepository.findById(documentResourceActual.getOrderParentId()).get(),
 						documentActual.getExpedient().getArxiuUuid());				
     		} else {
+    			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
         		DocumentDto documentCreat = documentHelper.updateDocument(
         				entitatEntity.getId(),
         				documentActual,

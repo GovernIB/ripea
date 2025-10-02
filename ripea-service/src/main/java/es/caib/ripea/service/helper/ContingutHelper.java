@@ -1492,7 +1492,6 @@ public class ContingutHelper {
 			// Elimina contingut a l'arxiu
 			arxiuPropagarEliminacio(contingut);
 		}
-
 	}
 
 	public boolean conteDocumentsDefinitius(ContingutEntity contingut) {
@@ -1751,6 +1750,8 @@ public class ContingutHelper {
 				contingutDesti,
 				recursiu);
 		
+		reOrdenaContingut(contingutOrigen);
+		
 		if (contingutDesti.getExpedient() == null) {
 			contingutCopia.updateExpedient((ExpedientEntity) contingutDesti);
 		} else {
@@ -1956,6 +1957,9 @@ public class ContingutHelper {
 				contingutOrigen,
 				contingutDesti,
 				null);
+		
+		reOrdenaContingut(contingutOrigen);
+		
 		contingutLogHelper.log(
 				contingutOrigen,
 				LogTipusEnumDto.MOVIMENT,
@@ -2442,6 +2446,21 @@ public class ContingutHelper {
 		}
 	}
 
+	public void reOrdenaContingut(ContingutEntity nouContingutEntity) {
+		if (nouContingutEntity!=null && nouContingutEntity.getPare()!=null) {
+			List<ContingutEntity> fills = contingutRepository.findByPareAndEsborratAndOrdenatOrdre(nouContingutEntity.getPare(), 0);
+			int ordreNou = 1;
+			if (fills!=null) {
+				for (ContingutEntity c: fills) {
+					if (!c.getId().equals(nouContingutEntity.getId())) {
+						c.setOrdre(ordreNou);
+						ordreNou++;
+					}
+				}
+			}
+			nouContingutEntity.setOrdre(ordreNou);
+		}
+	}
 
 	public void marcarEsborrat(ContingutEntity contingut) {
 

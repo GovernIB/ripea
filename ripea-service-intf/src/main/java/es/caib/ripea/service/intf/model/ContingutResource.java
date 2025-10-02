@@ -53,4 +53,9 @@ public class ContingutResource extends BaseAuditableResource<Long> {
 	protected ResourceReference<EntitatResource, Long> entitat;
 	protected ResourceReference<ExpedientResource, Long> expedient;
 	protected ResourceReference<ContingutResource, Long> pare;
+	
+	private boolean ordrePatch;
+	public Long getOrdreLong() {
+		return (long)ordre;
+	}
 }
