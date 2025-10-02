@@ -21,6 +21,7 @@ import useCrearCarpeta from "../../carpeta/actions/Crear.tsx";
 import useImportar from "../actions/Importar.tsx";
 import useCarpetaActions from "../../carpeta/details/CarpetaActions.tsx";
 import useImportarExpedient from "../../expedient/actions/ImportarExpedient.tsx";
+import useImportarZip from "../actions/ImportarZip.tsx";
 
 export const useActions = (refresh?: () => void) => {
     const { t } = useTranslation();
@@ -153,6 +154,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
     const {handleShow: handleCrearCarpeta, content: contentCrearCarpeta} = useCrearCarpeta(entity, refresh)
     const {handleShow: handleImportar, content: contentImportar} = useImportar(entity, refresh)
     const {handleOpen: handleImportarExpedient, dialog: dialogImportarExpedient} = useImportarExpedient(entity, refresh)
+	const {handleShow: handleImportarZip, content: contentImportarZip} = useImportarZip(entity, refresh)
 
     const {eliminar, apiDownload, getLinkCSV, definitiu, guardarArxiu} = useActions(refresh)
     const {handleOpen: handleDetallOpen, dialog: dialogDetall} = useDocumentDetail(entity);
@@ -211,6 +213,12 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             onClick: handleImportar,
             disabled: !user?.sessionScope?.isMostrarImportacio,
         },
+		{
+		    label: t('page.document.action.importZip.label'),
+		    icon: "upload_file",
+		    onClick: handleImportarZip,
+		    disabled: !user?.sessionScope?.isMostrarImportacio,
+		},
         {
             label: t('page.contingut.action.importarExpedient.label'),
             icon: "link",
@@ -449,6 +457,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
         {contentEnviarViaFirma}
         {contentCrearCarpeta}
         {contentImportar}
+		{contentImportarZip}
         {dialogImportarExpedient}
     </>;
     return {

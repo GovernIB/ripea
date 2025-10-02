@@ -30,6 +30,7 @@ const translationEn = {
         filter: "Filter",
         downloadSelected: "Download selected content",
         relateSelected: "Relate selected content",
+		processing: "Processing..."
     },
     enum: {
         rol: {
@@ -684,6 +685,11 @@ const translationEn = {
                     title: "Import documents from SGD",
                     ok: "Documents imported successfully",
                 },
+				importZip: {
+				    label: "Import documents from ZIP...",
+				    title: "Import documentos from ZIP",
+				    ok: "Documents imported successfully",
+				},
                 detall: {
                     label: "Details",
                 },

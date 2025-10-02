@@ -30,6 +30,7 @@ const translationCa = {
         filter: "Filtrar",
         downloadSelected: "Descarrega contingut seleccionat",
         relateSelected: "Relaciona contingut seleccionat",
+		processing: "Processant..."
     },
     enum: {
         rol: {
@@ -684,6 +685,12 @@ const translationCa = {
                     title: "Importació de documents des del SGD",
                     ok: "Documents importats correctament",
                 },
+				importZip: {
+				    label: "Importar des de ZIP...",
+				    title: "Importació de documents des d'un ZIP",
+					title: "Importació de documents des d'un ZIP",
+				    ok: "Documents importats correctament",
+				},
                 detall: {
                     label: "Detalls",
                 },

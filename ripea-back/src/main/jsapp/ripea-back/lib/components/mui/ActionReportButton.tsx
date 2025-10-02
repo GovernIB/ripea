@@ -104,6 +104,7 @@ export const useActionReportLogic = (
     onSuccess?: (result?: any) => void,
     onError?: (error?: any) => void,
     onClose?: () => void,
+	onSubmit?: () => void,
     dialogCloseCallback?: (reason?: string) => boolean) => {
     const { t, messageDialogShow, saveAs } = useBaseAppContext();
     const actionDialogButtons = useActionDialogButtons();
@@ -116,6 +117,7 @@ export const useActionReportLogic = (
         artifactReport: apiArtifactReport,
     } = useResourceApiService(resourceName);
     const execAction: FormDialogSubmitFn = (id: any, data?: any) => new Promise((resolve, reject) => {
+		onSubmit?.();
         if (action != null) {
             const requestArgs = { id, code: action, data };
             apiArtifactAction(id, requestArgs).then((result: any) => {
