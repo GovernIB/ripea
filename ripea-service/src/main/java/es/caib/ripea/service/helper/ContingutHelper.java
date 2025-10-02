@@ -1906,22 +1906,22 @@ public class ContingutHelper {
 		}
 		
 		// Comprova el tipus del contingut que es vol moure
-		if (contingutOrigen instanceof CarpetaEntity && !isCarpetaLogica()) {
-			throw new ValidationException(
-					contingutOrigenId,
-					contingutOrigen.getClass(),
-					"Només es poden moure documents");
-		}
+//		if (contingutOrigen instanceof CarpetaEntity && !isCarpetaLogica()) {
+//			throw new ValidationException(
+//					contingutOrigenId,
+//					contingutOrigen.getClass(),
+//					"Només es poden moure documents");
+//		}
 		// No es poden moure documents firmats
-		if (contingutOrigen instanceof DocumentEntity) {
-			DocumentEntity documentOrigen = (DocumentEntity)contingutOrigen;
-			if (documentOrigen.isFirmat() && !isCarpetaLogica()) {
-				throw new ValidationException(
-						contingutOrigenId,
-						contingutOrigen.getClass(),
-						"No es poden moure documents firmats");
-			}
-		}
+//		if (contingutOrigen instanceof DocumentEntity) {
+//			DocumentEntity documentOrigen = (DocumentEntity)contingutOrigen;
+//			if (documentOrigen.isFirmat() && !isCarpetaLogica()) {
+//				throw new ValidationException(
+//						contingutOrigenId,
+//						contingutOrigen.getClass(),
+//						"No es poden moure documents firmats");
+//			}
+//		}
 		// Es comprova que el procediment orígen i destí son el mateix
 		ExpedientEntity expedientOrigen = getExpedientSuperior(
 				contingutOrigen,
