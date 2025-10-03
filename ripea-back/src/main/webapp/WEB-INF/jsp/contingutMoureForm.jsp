@@ -26,16 +26,18 @@ $(document).ready(function() {
 	var arbre = $('#arbreCarpetes');
 	
 	$('form').on('submit', function(){
-	    // Obtener la carpeta seleccionada en jstree
-	    var selectedNode = arbre.jstree('get_selected', true)[0];
-		var json = arbre.data().jstree.get_json()
-		var jsonString = JSON.stringify(json);
-
-		$('#estructuraCarpetesJson').val(jsonString);
-
-		if (selectedNode) {
-	    	$('#destiId').val(selectedNode.id);
-	    }
+		if (arbre.data()) {
+		    // Obtener la carpeta seleccionada en jstree
+		    var selectedNode = arbre.jstree('get_selected', true)[0];
+			var json = arbre.data().jstree.get_json()
+			var jsonString = JSON.stringify(json);
+	
+			$('#estructuraCarpetesJson').val(jsonString);
+	
+			if (selectedNode) {
+		    	$('#destiId').val(selectedNode.id);
+		    }
+		}
 	});
 });
 </script>

@@ -609,14 +609,14 @@ $(document).ready(function() {
 
 	$('form').on('submit', function(){
 	    // Obtener la carpeta seleccionada en jsTree
-	    var selectedNode = arbre.jstree('get_selected', true)[0]; // Puedes ajustar este selector según tu configuración
-		var json = arbre.data().jstree.get_json()
-		var jsonString = JSON.stringify(json);
-
-		$('#estructuraCarpetesJson').val(jsonString);
-
-		if (selectedNode) {
-	    	$('#destiId').val(selectedNode.id);
+	    if (arbre.data()) {
+		    var selectedNode = arbre.jstree('get_selected', true)[0]; // Puedes ajustar este selector según tu configuración
+			var json = arbre.data().jstree.get_json()
+			var jsonString = JSON.stringify(json);
+			$('#estructuraCarpetesJson').val(jsonString);
+			if (selectedNode) {
+		    	$('#destiId').val(selectedNode.id);
+		    }
 	    }
 	});
 });

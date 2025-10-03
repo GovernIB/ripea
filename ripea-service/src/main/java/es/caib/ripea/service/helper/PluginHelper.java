@@ -2338,6 +2338,101 @@ public class PluginHelper {
 		}
 	}
 
+	public String arxiuDocumentMoure(String uuid, String uuidDesti) {
+
+		String accioDescripcio = "Moure document";
+		Map<String, String> accioParams = new HashMap<String, String>();
+
+		accioParams.put(
+				"arxiuUuidOrigen",
+				uuid);
+		accioParams.put(
+				"uuidDesti",
+				uuidDesti);
+		
+		long t0 = System.currentTimeMillis();
+		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
+		try {
+			boolean throwException = false;// throwException = true
+			if (throwException) {
+				throw new RuntimeException("Mock excepcion moving document ");
+			}
+			ContingutArxiu nouDocumentArxiu = null;
+			try {
+				nouDocumentArxiu = arxiuPluginWrapper.getPlugin().documentMoure(uuid, uuidDesti);
+			} catch (Exception e) {
+
+				if (e.getMessage().contains(
+						"Duplicate child name not allowed")
+						|| e.getMessage().contains(
+								"Petición mal formada")) {
+					logger.info(
+							"Document already moved in arxiu:" + e.getMessage());
+
+					Document document = arxiuPluginWrapper.getPlugin().documentDetalls(
+							uuid,
+							null,
+							false);
+					logger.info(
+							"Document to move name=" + document.getNom() + ", uuid=" + document.getIdentificador());
+					Carpeta carpeta = arxiuPluginWrapper.getPlugin().carpetaDetalls(
+							uuidDesti);
+
+					String uuidDocumentMovido = null;
+					for (ContingutArxiu contingutArxiu : carpeta.getContinguts()) {
+						logger.info(
+								"Searching document moved: name=" + contingutArxiu.getNom() + ", uuid="
+										+ contingutArxiu.getIdentificador());
+						if (document.getNom().equals(
+								contingutArxiu.getNom())) {
+							logger.info(
+									"Document moved found: name=" + contingutArxiu.getNom() + ", uuid="
+											+ contingutArxiu.getIdentificador());
+							uuidDocumentMovido = contingutArxiu.getIdentificador();
+							break;
+						}
+					}
+					if (uuidDocumentMovido != null) {
+						return uuidDocumentMovido;
+					} else {
+						throw e;
+					}
+				} else {
+					throw e;
+				}
+			}
+
+			boolean throwException1 = false;// throwException1 = true
+			if (throwException1) {
+				throw new RuntimeException("Mock excepcion after moving document ");
+			}
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_ARXIU,
+					accioDescripcio,
+					arxiuPluginWrapper.getEndpoint(),
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0);
+			if (nouDocumentArxiu != null) {
+				return nouDocumentArxiu.getIdentificador();
+			} else {
+				return null;
+			}
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_ARXIU,
+					accioDescripcio,
+					arxiuPluginWrapper.getEndpoint(),
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, errorDescripcio, ex);
+		}
+	}
+	
 	public String arxiuDocumentMoure(
 			String uuid,
 			String uuidDesti,

@@ -10,7 +10,6 @@ import java.util.Objects;
 import javax.annotation.PostConstruct;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.turkraft.springfilter.FilterBuilder;
 import com.turkraft.springfilter.parser.Filter;
@@ -18,7 +17,6 @@ import com.turkraft.springfilter.parser.Filter;
 import es.caib.ripea.persistence.entity.CarpetaEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.resourceentity.CarpetaResourceEntity;
-import es.caib.ripea.persistence.entity.resourceentity.DocumentResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.CarpetaResourceRepository;
 import es.caib.ripea.persistence.repository.CarpetaRepository;
 import es.caib.ripea.persistence.repository.ContingutRepository;
@@ -45,7 +43,6 @@ import es.caib.ripea.service.intf.model.CarpetaResource;
 import es.caib.ripea.service.intf.model.CarpetaResource.ModificarFormAction;
 import es.caib.ripea.service.intf.model.CarpetaResource.MoureCopiarFormAction;
 import es.caib.ripea.service.intf.model.ContingutResource;
-import es.caib.ripea.service.intf.model.DocumentResource;
 import es.caib.ripea.service.intf.model.EntitatResource;
 import es.caib.ripea.service.intf.resourceservice.CarpetaResourceService;
 import es.caib.ripea.service.resourcehelper.ContingutResourceHelper;
@@ -121,7 +118,6 @@ public class CarpetaResourceServiceImpl extends BaseMutableResourceService<Carpe
 	public CarpetaResource update(Long id, CarpetaResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotFoundException {
     	try {
     		if (resource.isOrdrePatch()) {
-//        		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
         		CarpetaEntity carpetaActual = carpetaRepository.findById(resource.getId()).get();
         		if (resource.isOrdrePatch()) {
         			CarpetaResourceEntity carpetaResourceActual = carpetaResourceRepository.findById(resource.getId()).get();
@@ -136,10 +132,13 @@ public class CarpetaResourceServiceImpl extends BaseMutableResourceService<Carpe
     						reorderPreviousParentId,
     						true,
     						false);
-    				//mourer també al arxiu
-    				pluginHelper.arxiuCarpetaMoure(
-    						(CarpetaEntity)carpetaActual,
-    						contingutRepository.findById(carpetaResourceActual.getOrderParentId()).get().getArxiuUuid());				
+					boolean parentIdChanged = !Objects.equals(carpetaResourceActual.getOrderParentId(), reorderPreviousParentId);
+					if (parentIdChanged) {
+	    				//mourer també al arxiu
+	    				pluginHelper.arxiuCarpetaMoure(
+	    						(CarpetaEntity)carpetaActual,
+	    						contingutRepository.findById(carpetaResourceActual.getOrderParentId()).get().getArxiuUuid());
+					}
         		} else {
             		//TODO: ara mateix falla arxiu al renombrar una carpeta
         		}

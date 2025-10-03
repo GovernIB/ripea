@@ -21,8 +21,6 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
-import es.caib.ripea.persistence.entity.resourcerepository.*;
-import es.caib.ripea.service.intf.dto.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.fundaciobit.apisib.apifirmasimple.v1.beans.FirmaSimpleStartTransactionRequest;
@@ -41,6 +39,12 @@ import es.caib.ripea.persistence.entity.resourceentity.InteressatResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaDocumentResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.RegistreAnnexResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.UsuariResourceEntity;
+import es.caib.ripea.persistence.entity.resourcerepository.ContingutResourceRepository;
+import es.caib.ripea.persistence.entity.resourcerepository.DocumentResourceRepository;
+import es.caib.ripea.persistence.entity.resourcerepository.InteressatResourceRepository;
+import es.caib.ripea.persistence.entity.resourcerepository.MetaDocumentResourceRepository;
+import es.caib.ripea.persistence.entity.resourcerepository.RegistreAnnexResourceRepository;
+import es.caib.ripea.persistence.entity.resourcerepository.UsuariResourceRepository;
 import es.caib.ripea.persistence.repository.ContingutMovimentRepository;
 import es.caib.ripea.persistence.repository.ContingutRepository;
 import es.caib.ripea.persistence.repository.DocumentNotificacioRepository;
@@ -76,6 +80,33 @@ import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ReportFileType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.config.PropertyConfig;
+import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
+import es.caib.ripea.service.intf.dto.ArxiuFirmaDto;
+import es.caib.ripea.service.intf.dto.DigitalitzacioPerfilDto;
+import es.caib.ripea.service.intf.dto.DigitalitzacioTransaccioRespostaDto;
+import es.caib.ripea.service.intf.dto.DocumentDto;
+import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentFirmaTipusEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentNotificacioDto;
+import es.caib.ripea.service.intf.dto.DocumentNotificacioEstatEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentNotificacioTipusEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentPublicacioDto;
+import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentVersioDto;
+import es.caib.ripea.service.intf.dto.FitxerDto;
+import es.caib.ripea.service.intf.dto.InteressatTipusEnum;
+import es.caib.ripea.service.intf.dto.MetaDocumentFirmaFluxTipusEnumDto;
+import es.caib.ripea.service.intf.dto.MetaNodeDto;
+import es.caib.ripea.service.intf.dto.MunicipiDto;
+import es.caib.ripea.service.intf.dto.PaisDto;
+import es.caib.ripea.service.intf.dto.PinbalConsultaDto;
+import es.caib.ripea.service.intf.dto.PortafirmesFluxRespostaDto;
+import es.caib.ripea.service.intf.dto.PortafirmesIniciFluxRespostaDto;
+import es.caib.ripea.service.intf.dto.Resum;
+import es.caib.ripea.service.intf.dto.SignatureInfoDto;
+import es.caib.ripea.service.intf.dto.UsuariDto;
+import es.caib.ripea.service.intf.dto.ViaFirmaDispositiuDto;
+import es.caib.ripea.service.intf.dto.ViaFirmaEnviarDto;
 import es.caib.ripea.service.intf.exception.ValidationException;
 import es.caib.ripea.service.intf.model.DocumentResource;
 import es.caib.ripea.service.intf.model.DocumentResource.IniciarFirmaSimple;
@@ -94,7 +125,6 @@ import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.resourcehelper.ContingutResourceHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -270,10 +300,15 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 						true,
 						false);
 				//mourer també al arxiu
-				contingutHelper.arxiuDocumentPropagarMoviment(
-						documentActual.getArxiuUuid(),
-						contingutRepository.findById(documentResourceActual.getOrderParentId()).get(),
-						documentActual.getExpedient().getArxiuUuid());				
+				boolean parentIdChanged = !Objects.equals(documentResourceActual.getOrderParentId(), reorderPreviousParentId);
+				if (parentIdChanged) {
+					ContingutEntity contingutPare = contingutRepository.findById(documentResourceActual.getOrderParentId()).get();
+//					pluginHelper.arxiuDocumentMoure(documentActual.getArxiuUuid(), contingutPare.getArxiuUuid());
+					contingutHelper.arxiuDocumentPropagarMoviment(
+							documentActual.getArxiuUuid(),
+							contingutPare,
+							documentActual.getExpedient().getArxiuUuid());
+				}
     		} else {
     			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
         		DocumentDto documentCreat = documentHelper.updateDocument(
