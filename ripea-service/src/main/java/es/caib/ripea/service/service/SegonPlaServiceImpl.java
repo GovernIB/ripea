@@ -26,10 +26,16 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import es.caib.comanda.ms.estadistica.model.Dimensio;
 import es.caib.comanda.ms.estadistica.model.DimensioDesc;
+import es.caib.comanda.ms.estadistica.model.Fet;
 import es.caib.comanda.ms.estadistica.model.Format;
+import es.caib.comanda.ms.estadistica.model.GenericDimensio;
+import es.caib.comanda.ms.estadistica.model.GenericFet;
 import es.caib.comanda.ms.estadistica.model.IndicadorDesc;
+import es.caib.comanda.ms.estadistica.model.RegistreEstadistic;
 import es.caib.comanda.ms.estadistica.model.RegistresEstadistics;
+import es.caib.comanda.ms.estadistica.model.Temps;
 import es.caib.ripea.persistence.entity.ContingutEntity;
 import es.caib.ripea.persistence.entity.DocumentEntity;
 import es.caib.ripea.persistence.entity.EmailPendentEnviarEntity;
@@ -648,10 +654,95 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	@Override
 	@Transactional
 	public RegistresEstadistics consultaEstadistiques(LocalDate date) {
-		RegistresEstadistics resultat = new RegistresEstadistics();
+	
+		ExplotacioTempsEntity tempsDia = explotacioTempsRepository.findFirstByData(date);
+		Date dateJava = Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
+		Temps temps = new Temps(dateJava);
+
+		List<RegistreEstadistic> fets = new ArrayList<RegistreEstadistic>();
+		List<ExplotacioFetsEntity> dadesByTemps = explotacioFetsRepository.findByTemps(tempsDia);
+		
+		if (dadesByTemps!=null) {
+			for (ExplotacioFetsEntity efe: dadesByTemps) {
+				RegistreEstadistic reComanda = new RegistreEstadistic(
+						toDimensioComanda(efe.getDimensio()),
+						toFetComanda(efe));
+				fets.add(reComanda);
+			}
+		}
+		
+		RegistresEstadistics resultat = new RegistresEstadistics(temps, fets);
 		return resultat;
 	}
 
+	private List<Dimensio> toDimensioComanda(ExplotacioDimensioEntity ede) {
+		List<Dimensio> resultat = new ArrayList<Dimensio>();
+		resultat.add(new GenericDimensio("ENT", ede.getEntitatCodi()));
+		resultat.add(new GenericDimensio("PRO", ede.getProcedimentCodi()));
+		resultat.add(new GenericDimensio("ORG", ede.getOrganCodi()));
+		resultat.add(new GenericDimensio("USU", ede.getUsuari()!=null?ede.getUsuari().getCodi():null));
+		return resultat;		
+	}
+	
+	private List<Fet> toFetComanda(ExplotacioFetsEntity efe) {
+		List<Fet> resultat = new ArrayList<Fet>();
+		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.ANO_NOVES.toString(), efe.getAnotacionsNoves()!=null?efe.getAnotacionsNoves().doubleValue():null));
+		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.ANO_NOVES_TOTAL.toString(), efe.getAnotacionsNovesTotal()!=null?efe.getAnotacionsNovesTotal().doubleValue():null));
+		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.ANO_PROCESSADES.toString(), efe.getAnotacionsProcessades()!=null?efe.getAnotacionsProcessades().doubleValue():null));
+		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.ANO_PROCESSADES_TOTAL.toString(), efe.getAnotacionsProcessadesTotal()!=null?efe.getAnotacionsProcessadesTotal().doubleValue():null));
+		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.ANO_REBUTJADES.toString(), efe.getAnotacionsRebutjades()!=null?efe.getAnotacionsRebutjades().doubleValue():null));
+		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.ANO_REBUTJADES_TOTAL.toString(), efe.getAnotacionsRebutjadesTotal()!=null?efe.getAnotacionsRebutjadesTotal().doubleValue():null));
+		
+		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.EXP_OBERTS.toString(), efe.getExpedientsOberts()!=null?efe.getExpedientsOberts().doubleValue():null));
+		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.EXP_OBERTS_TOTAL.toString(), efe.getExpedientsObertsTotal()!=null?efe.getExpedientsObertsTotal().doubleValue():null));
+		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.EXP_TANCATS.toString(), efe.getExpedientsTancats()!=null?efe.getExpedientsTancats().doubleValue():null));
+		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.EXP_TANCATS_TOTAL.toString(), efe.getExpedientsTancatsTotal()!=null?efe.getExpedientsTancatsTotal().doubleValue():null));
+		
+		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.FIR_FIRMADES.toString(), efe.getFirmesFirmades()!=null?efe.getFirmesFirmades().doubleValue():null));
+		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.FIR_FIRMADES_TOTAL.toString(), efe.getFirmesFirmadesTotal()!=null?efe.getFirmesFirmadesTotal().doubleValue():null));
+		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.FIR_INICIADES.toString(), efe.getFirmesIniciades()!=null?efe.getFirmesIniciades().doubleValue():null));
+		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.FIR_INICIADES_TOTAL.toString(), efe.getFirmesIniciadesTotal()!=null?efe.getFirmesIniciadesTotal().doubleValue():null));
+		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.FIR_PARCIALS.toString(), efe.getFirmesParcials()!=null?efe.getFirmesParcials().doubleValue():null));
+		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.FIR_PARCIALS_TOTAL.toString(), efe.getFirmesParcialsTotal()!=null?efe.getFirmesParcialsTotal().doubleValue():null));
+		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.FIR_PAUSADES.toString(), efe.getFirmesPausades()!=null?efe.getFirmesPausades().doubleValue():null));
+		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.FIR_PAUSADES_TOTAL.toString(), efe.getFirmesPausadesTotal()!=null?efe.getFirmesPausadesTotal().doubleValue():null));
+		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.FIR_REBUTJADES.toString(), efe.getFirmesRebutjades()!=null?efe.getFirmesRebutjades().doubleValue():null));
+		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.FIR_REBUTJADES_TOTAL.toString(), efe.getFirmesRebutjadesTotal()!=null?efe.getFirmesRebutjadesTotal().doubleValue():null));
+		
+		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.NOT_ENVIADES.toString(), efe.getNotificacionsEnviades()!=null?efe.getNotificacionsEnviades().doubleValue():null));
+		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.NOT_ENVIADES_TOTAL.toString(), efe.getNotificacionsEnviadesTotal()!=null?efe.getNotificacionsEnviadesTotal().doubleValue():null));
+		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.NOT_PENDENTS.toString(), efe.getNotificacionsPendents()!=null?efe.getNotificacionsPendents().doubleValue():null));
+		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.NOT_PENDENTS_TOTAL.toString(), efe.getNotificacionsPendentsTotal()!=null?efe.getNotificacionsPendentsTotal().doubleValue():null));
+		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.NOT_REGISTRADES.toString(), efe.getNotificacionsRegistrades()!=null?efe.getNotificacionsRegistrades().doubleValue():null));
+		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.NOT_REGISTRADES_TOTAL.toString(), efe.getNotificacionsRegistradesTotal()!=null?efe.getNotificacionsRegistradesTotal().doubleValue():null));
+		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.NOT_FINALITZADES.toString(), efe.getNotificacionsFinalitzades()!=null?efe.getNotificacionsFinalitzades().doubleValue():null));
+		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.NOT_FINALITZADES_TOTAL.toString(), efe.getNotificacionsFinalitzadesTotal()!=null?efe.getNotificacionsFinalitzadesTotal().doubleValue():null));
+		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.NOT_PROCESSADES.toString(), efe.getNotificacionsProcessades()!=null?efe.getNotificacionsProcessades().doubleValue():null));
+		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.NOT_PROCESSADES_TOTAL.toString(), efe.getNotificacionsProcessadesTotal()!=null?efe.getNotificacionsProcessadesTotal().doubleValue():null));
+		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.NOT_ENVIADES_ERROR.toString(), efe.getNotificacionsEnvError()!=null?efe.getNotificacionsEnvError().doubleValue():null));
+		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.NOT_ENVIADES_ERROR_TOTAL.toString(), efe.getNotificacionsEnvErrorTotal()!=null?efe.getNotificacionsEnvErrorTotal().doubleValue():null));
+		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.NOT_FINALITZADES_ERROR.toString(), efe.getNotificacionsFinError()!=null?efe.getNotificacionsFinError().doubleValue():null));
+		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.NOT_FINALITZADES_ERROR_TOTAL.toString(), efe.getNotificacionsFinErrorTotal()!=null?efe.getNotificacionsFinErrorTotal().doubleValue():null));
+		
+		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.PIN_ENVIAMENTS.toString(), efe.getPinbalEnviaments()!=null?efe.getPinbalEnviaments().doubleValue():null));
+		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.PIN_ENVIAMENTS_TOTAL.toString(), efe.getPinbalEnviamentsTotal()!=null?efe.getPinbalEnviamentsTotal().doubleValue():null));		
+		
+		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.TAS_AGAFADES.toString(), efe.getTasquesAgafades()!=null?efe.getTasquesAgafades().doubleValue():null));
+		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.TAS_AGAFADES_TOTAL.toString(), efe.getTasquesAgafadesTotal()!=null?efe.getTasquesAgafadesTotal().doubleValue():null));
+		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.TAS_CANCELADES.toString(), efe.getTasquesCancelades()!=null?efe.getTasquesCancelades().doubleValue():null));
+		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.TAS_CANCELADES_TOTAL.toString(), efe.getTasquesCanceladesTotal()!=null?efe.getTasquesCanceladesTotal().doubleValue():null));
+		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.TAS_FINALITZADES.toString(), efe.getTasquesFinalitzades()!=null?efe.getTasquesFinalitzades().doubleValue():null));
+		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.TAS_FINALITZADES_TOTAL.toString(), efe.getTasquesFinalitzadesTotal()!=null?efe.getTasquesFinalitzadesTotal().doubleValue():null));
+		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.TAS_INICIADES.toString(), efe.getTasquesIniciades()!=null?efe.getTasquesIniciades().doubleValue():null));
+		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.TAS_INICIADES_TOTAL.toString(), efe.getTasquesIniciadesTotal()!=null?efe.getTasquesIniciadesTotal().doubleValue():null));
+		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.TAS_PENDENTS.toString(), efe.getTasquesPendents()!=null?efe.getTasquesPendents().doubleValue():null));
+		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.TAS_PENDENTS_TOTAL.toString(), efe.getTasquesPendentsTotal()!=null?efe.getTasquesPendentsTotal().doubleValue():null));
+		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.TAS_REBUTJADES.toString(), efe.getTasquesRebutjades()!=null?efe.getTasquesRebutjades().doubleValue():null));
+		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.TAS_REBUTJADES_TOTAL.toString(), efe.getTasquesRebutjadesTotal()!=null?efe.getTasquesRebutjadesTotal().doubleValue():null));
+		
+		return resultat;
+	}
+	
 	@Override
 	@Transactional
 	public List<ExplotFetsAmbDimensioDto> generarEstadistiquesDiaries(Date fecha) throws Exception {
@@ -674,8 +765,6 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 		
 		Date dateIni	= DateUtil.startOfDay(calendarFechaAvui).getTime();
 		Date dateFi		= DateUtil.endOfDay(calendarFechaAvui).getTime();
-		
-		Date ahirIni	= DateUtil.startOfDay(calendarFechaAhir).getTime();
 		Date ahirFi		= DateUtil.endOfDay(calendarFechaAhir).getTime();
 		
 		LocalDateTime dataAhirFi	= DateUtil.getLocalDateTimeFromDate(ahirFi, false, true);
@@ -938,9 +1027,10 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 				}
 			}
 			
-			ExplotacioTempsEntity ete = explotacioTempsRepository.findFirstByData(avui);
+			LocalDate dataEstadistiques = fecha.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+			ExplotacioTempsEntity ete = explotacioTempsRepository.findFirstByData(dataEstadistiques);
 			if (ete==null) {
-				ete = new ExplotacioTempsEntity(avui);
+				ete = new ExplotacioTempsEntity(dataEstadistiques);
 			}
 			
 			ete = explotacioTempsRepository.save(ete);

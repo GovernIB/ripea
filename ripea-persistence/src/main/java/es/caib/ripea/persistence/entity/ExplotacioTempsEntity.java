@@ -42,6 +42,10 @@ public class ExplotacioTempsEntity extends RipeaPersistable<Long> {
 	@Enumerated(EnumType.STRING)
 	private DiaSetmanaEnum diaSetmana;
 	
+	public ExplotacioTempsEntity() {
+		super();
+	}
+	
 	public ExplotacioTempsEntity(LocalDate data) {
 		super();
 		this.data = data;

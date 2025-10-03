@@ -20,6 +20,8 @@ import es.caib.ripea.service.intf.dto.TascaEstatEnumDto;
 @Component
 public interface ExplotacioFetsRepository extends JpaRepository<ExplotacioFetsEntity, Long> {
 	
+	public List<ExplotacioFetsEntity> findByTemps(@Param("temps") ExplotacioTempsEntity temps);
+	
 	public ExplotacioFetsEntity findByDimensioAndTemps(
 			@Param("dimensio") ExplotacioDimensioEntity dimensio,
 			@Param("temps") ExplotacioTempsEntity temps);

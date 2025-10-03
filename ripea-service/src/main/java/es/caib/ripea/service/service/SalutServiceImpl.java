@@ -596,7 +596,7 @@ public class SalutServiceImpl implements SalutService{
     		tempsPromitgSubsistema = tempsPromitgSubsistema + promitgAux;
     	}
     	
-    	int		tempsPromitgActual = (int) (tempsPromitgSubsistema/subsistema_total_exito);
+    	int		tempsPromitgActual = subsistema_total_exito==0?0:(int)(tempsPromitgSubsistema/subsistema_total_exito);
     	long	peticionsOkDarrerPeriode = getDadesOkPeriodeByCodi(codi, subsistema_total_exito); 
     	SubsistemaSalut resultat = SubsistemaSalut.builder()
                 .codi(codi)
