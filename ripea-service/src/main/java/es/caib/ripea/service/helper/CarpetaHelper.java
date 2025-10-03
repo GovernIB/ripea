@@ -105,7 +105,7 @@ public class CarpetaHelper {
 			carpetaEntity = carpetaRepository.save(carpetaEntity);
 			pare.addFill(carpetaEntity);
 			contingutRepository.save(pare);
-			contingutHelper.reOrdenaContingut(carpetaEntity);
+			contingutHelper.reOrdenaContingut(carpetaEntity, null);
 			// Registra al log la creació de la carpeta
 			contingutLogHelper.logCreacio(
 					carpetaEntity,

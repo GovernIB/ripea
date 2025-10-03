@@ -143,12 +143,11 @@ public class CarpetaResourceServiceImpl extends BaseMutableResourceService<Carpe
         		} else {
             		//TODO: ara mateix falla arxiu al renombrar una carpeta
         		}
-        		return resource;
     		}
     	} catch (Exception ex) {
     		excepcioLogHelper.addExcepcio("/carpeta/"+resource.getId()+"/update", ex);
     	}
-    	return null;
+    	return resource;
     }
     
     @Override

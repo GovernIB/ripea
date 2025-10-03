@@ -233,14 +233,12 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     				true,
     				false);
     		resource.setId(documentCreat.getId());
-//    		reorderIfReorderable(documentResourceRepository.findById(documentCreat.getId()).get(), null, null, true, false);
-    		return resource;
     	} catch (ValidationException ex) {
     		throw ex;
     	} catch (Exception ex) {
     		excepcioLogHelper.addExcepcio("/document/"+resource.getId()+"/create", ex);
     	}
-    	return null;
+    	return resource;
     }
     
     @Override
@@ -285,11 +283,10 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         				true);
         		resource.setId(documentCreat.getId());
     		}
-    		return resource;
     	} catch (Exception ex) {
     		excepcioLogHelper.addExcepcio("/document/"+resource.getId()+"/update", ex);
     	}
-    	return null;
+    	return resource;
     }
 
     @Override

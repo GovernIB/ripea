@@ -1750,7 +1750,7 @@ public class ContingutHelper {
 				contingutDesti,
 				recursiu);
 		
-		reOrdenaContingut(contingutOrigen);
+		reOrdenaContingut(contingutOrigen, null);
 		
 		if (contingutDesti.getExpedient() == null) {
 			contingutCopia.updateExpedient((ExpedientEntity) contingutDesti);
@@ -1958,7 +1958,7 @@ public class ContingutHelper {
 				contingutDesti,
 				null);
 		
-		reOrdenaContingut(contingutOrigen);
+		reOrdenaContingut(contingutOrigen, null);
 		
 		contingutLogHelper.log(
 				contingutOrigen,
@@ -2446,19 +2446,32 @@ public class ContingutHelper {
 		}
 	}
 
-	public void reOrdenaContingut(ContingutEntity nouContingutEntity) {
+	//Al crear un nou contingut, si assigna ordre, colocant-lo al final del contenidor pare.
+	//Opcional: Si se li passa un ordre concret, reordena tots els germans, i se li assigna el ordre indicat. 
+	public void reOrdenaContingut(ContingutEntity nouContingutEntity, Integer ordreAssignat) {
 		if (nouContingutEntity!=null && nouContingutEntity.getPare()!=null) {
 			List<ContingutEntity> fills = contingutRepository.findByPareAndEsborratAndOrdenatOrdre(nouContingutEntity.getPare(), 0);
 			int ordreNou = 1;
 			if (fills!=null) {
 				for (ContingutEntity c: fills) {
-					if (!c.getId().equals(nouContingutEntity.getId())) {
-						c.setOrdre(ordreNou);
-						ordreNou++;
+					if (ordreAssignat==null) {
+						//No té ordre assignat, reordenam els germans i al nou element el deixam per el final
+						if (!c.getId().equals(nouContingutEntity.getId())) {
+							c.setOrdre(ordreNou);
+							ordreNou++;
+						}
+					} else {
+						if (ordreNou==ordreAssignat) {
+							nouContingutEntity.setOrdre(ordreNou);
+							ordreNou++;
+						} else {
+							c.setOrdre(ordreNou);
+							ordreNou++;
+						}
 					}
 				}
 			}
-			nouContingutEntity.setOrdre(ordreNou);
+			nouContingutEntity.setOrdre(ordreAssignat==null?ordreNou:ordreAssignat);
 		}
 	}
 
