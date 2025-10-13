@@ -114,12 +114,14 @@ public class OrganGestorController extends BaseUserOAdminController {
 						"unitat.controller.synchronize.no.changes");
 			}
 			model.addAttribute("isFirstSincronization", prediccio.isFirstSincronization());
-			model.addAttribute("splitMap", prediccio.getSplitMap().asMap());
-			model.addAttribute("mergeMap", prediccio.getMergeMap().asMap());
-			model.addAttribute("substMap", prediccio.getSubstMap().asMap());
 			model.addAttribute("unitatsVigents", prediccio.getUnitatsVigents());
-			model.addAttribute("unitatsNew", prediccio.getUnitatsNew());
-			model.addAttribute("unitatsExtingides", prediccio.getUnitatsExtingides());
+			if (!prediccio.isFirstSincronization()) {
+				model.addAttribute("splitMap", prediccio.getSplitMap().asMap());
+				model.addAttribute("mergeMap", prediccio.getMergeMap().asMap());
+				model.addAttribute("substMap", prediccio.getSubstMap().asMap());			
+				model.addAttribute("unitatsNew", prediccio.getUnitatsNew());
+				model.addAttribute("unitatsExtingides", prediccio.getUnitatsExtingides());
+			}
 		} catch (Exception e) {
  			logger.error("Error al obtenir la predicció de la sincronitzacio", e);
 			return getModalControllerReturnValueErrorMessageText(
