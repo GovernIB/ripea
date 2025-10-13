@@ -60,6 +60,7 @@
 	//NO quant es molla un fitxer de disc damunt la table, per aquesta funcionalitat cercar dataTransfer.files 	
 	function dropFitxerDinsCarpeta(event) {
 		try {
+			debugger;
 			if (documentDrag!=null) {
 				let vistaActiva = $('#vistes').children("a.active").attr('id');
 				if (vistaActiva == 'vistaTreetablePerCarpetes') {
@@ -282,7 +283,7 @@
 				}
 			});
 			
-			$('.element-droppable').children(":not('.ordre-col')").droppable({
+			$('.element-droppable').droppable({
 				accept: '.element-draggable',
 				tolerance: 'pointer',
 				activeClass: 'element-target',
@@ -620,71 +621,13 @@
 		$('#table-documents > tbody > tr > td:not(:nth-child(1), :nth-child(7), :nth-child(8))').css('cursor', 'pointer');
 		</c:if>
 		//remove treetable click events on unnecessary columns for all rows
-		$('#table-documents > tbody > tr > td:is(:nth-child(1), :nth-child(7), :nth-child(8))').css('cursor', 'default').unbind('click');
+		$('#table-documents > tbody > tr > td:is(:nth-child(1), :nth-child(7))').css('cursor', 'default').unbind('click');
 		//remove treetable click events on all columns for document rows
 		$('#table-documents > tbody > tr.isDocument > td').css('cursor', 'default').unbind('click');
 		//add show viewer click events on all necessary columns for document rows
-		$('#table-documents > tbody > tr.isDocument > td:is(:nth-child(2), :nth-child(3), :nth-child(4), :nth-child(5), :nth-child(6))').css('cursor', 'pointer').click(function (event) {
+		$('#table-documents > tbody > tr.isDocument > td:is(:nth-child(2), :nth-child(3), :nth-child(4), :nth-child(5), :nth-child(6), :nth-child(8))').css('cursor', 'pointer').click(function (event) {
 			event.stopPropagation();
 			$('a:first', $(this).parent())[0].click();
-		});
-
-		// order by dragging
-		$('.ordre-col').on('mouseover', function () {
-			$('.element-draggable').draggable({disabled: true});
-			$('.element-draggable').droppable({disabled: true});
-			$('#table-documents tbody').sortable({
-				handle: ".ordre-col",
-				refreshPositions: true,
-				helper: 'clone',
-				cursor: "move",
-				cursorAt: {left: 5},
-				opacity: 0.65,
-				placeholder: "sortable-dest",
-				start: function (event, ui) {
-					$(this).attr('data-previndex', ui.item[0].rowIndex);
-				},
-				update: function (event, ui) {
-					//showLoadingModal('<spring:message code="contingut.moure.processant"/>');
-					//var tableDocuments = document.getElementById('table-documents');
-					//$(tableDocuments).addClass("disabled");
-					//$('#loading').removeClass('hidden');
-					var idsInOrder = $('#table-documents tbody').sortable("toArray", {attribute: 'id'});
-					var filtered = idsInOrder.filter(function (el) {
-						return el != '';
-					});
-					var orderedElements = new Map();
-					var idx = 1;
-					filtered.forEach(function (row) {
-						orderedElements[idx] = row;
-						idx++;
-					});
-
-					var nodeId = ui.item.data('pnode');
-					var indice = nodeId.indexOf("treetable-");
-					var attrId = nodeId.substring(indice + "treetable-".length);
-					showLoadingCurrentFolder(attrId);
-
-					$.ajax({
-						url: '<c:url value="/contingut/${expedientId}/ordenar"/>',
-						type: "POST",
-						contentType: "application/json",
-						data: JSON.stringify(orderedElements),
-						success: function (data) {
-							<c:if test="${! isMantenirEstatCarpetaActiu}">
-							location.reload();
-							</c:if>
-						}
-					});
-					<c:if test="${isMantenirEstatCarpetaActiu}">
-					loadCurrentFolderFromServer(attrId);
-					</c:if>
-				}
-			}).disableSelection();
-		});
-		$('.ordre-col').on('mouseleave', function () {
-			$('.element-draggable').draggable("enable");
-			$('.element-draggable:not(.isDocument)').droppable("enable");
 		});
 
 		if (potModificar) {

@@ -57,8 +57,8 @@ public abstract class ContingutDto extends AuditoriaDto {
 	}
 
 	public ContingutDto getPare() {
-		if (getPath() != null && !getPath().isEmpty())
-			return getPath().get(getPath().size() - 1);
+		if (getPath() != null && !getPath().isEmpty() && getPath().size()>1)
+			return getPath().get(getPath().size() - 2); //El el path es troba el mateix element (-1 no es el pare, es l'element) -2 es el pare.
 		else
 			return null;
 	}

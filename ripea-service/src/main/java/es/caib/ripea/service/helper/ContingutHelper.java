@@ -463,7 +463,7 @@ public class ContingutHelper {
 	}
 
 	private ExpedientDto calculateExpedientPare(ContingutDto resposta, ContingutEntity contingut, ToContingutParams params) {
-		if (contingut instanceof ExpedientEntity) {
+		if (contingut instanceof ExpedientEntity) { //Si es un proxy de hibernate el contingut, no funcionará
 			return (ExpedientDto) resposta;
 		} else if (params.getExpedientDto() != null) {
 			return params.getExpedientDto();
@@ -993,7 +993,7 @@ public class ContingutHelper {
 		}
 		resposta.setId(contingut.getId());
 		resposta.setNom(contingut.getNom());
-		
+		resposta.setOrdre(contingut.getOrdre());
 		return resposta;
 	}
 	
@@ -1894,12 +1894,12 @@ public class ContingutHelper {
 					"No es poden moure elements dins de si mateixos");
 		}
 		
-		if (contingutDesti instanceof DocumentEntity) {
-			throw new ValidationException(
-					contingutDestiId,
-					contingutDesti.getClass(),
-					"Només es poden moure elements dins d'una carpeta");
-		}
+//		if (contingutDesti instanceof DocumentEntity) {
+//			throw new ValidationException(
+//					contingutDestiId,
+//					contingutDesti.getClass(),
+//					"Només es poden moure elements dins d'una carpeta");
+//		}
 		
 		// Comprova que no es mou dins de un fill
 		if (contingutOrigen instanceof CarpetaEntity && isCarpetaLogica()) {
@@ -2574,7 +2574,7 @@ public class ContingutHelper {
 
 	public String getUniqueNameInPare(String nomPerComprovar, Long pareId) {
 
-		List<ContingutEntity> continguts = contingutRepository.findByPareIdAndEsborrat(pareId, 0);
+		List<ContingutEntity> continguts = contingutRepository.findByPareIdAndEsborratOrderByOrdreAsc(pareId, 0);
 		if (continguts != null) {
 			int ocurrences = 0;
 			List<String> noms = new ArrayList<String>();

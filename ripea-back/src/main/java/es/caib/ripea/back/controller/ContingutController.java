@@ -483,30 +483,72 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 		ContingutDto contingutOrigen = contingutService.findAmbIdUser(
 				entitatActual.getId(),
 				contingutOrigenId,
-				true,
+				false,
 				false, 
-				true, 
+				false, 
 				null, 
 				null);
-		
-		boolean isTheSame = false;
-		if (contingutOrigen.getPare().getId().equals(contingutDestiId)) {
-			isTheSame = true;
+		ContingutDto contingutDesti = contingutService.findAmbIdUser(
+				entitatActual.getId(),
+				contingutDestiId,
+				true,
+				false, 
+				false, 
+				null, 
+				null);
+			
+		//Comprovam si s'ha canviat el pare, en tal cas s'ha de mourer, sino es una ordenació.
+		boolean justSorting = false;
+		Long destiId = contingutDestiId;
+		if (contingutOrigen.getPare().getId().equals(contingutDesti.getPare().getId())) {
+			//Si es molla sobre un contingut del mateix pare, no movem, nomes reordenam
+			justSorting = true;
 		}
-		if (!isTheSame) {
-			try {
+		
+		if (!contingutDesti.isCarpeta()) {
+			//Si el destí es un document, s'ha de mourer al pare del destí, i posteriorment reordenar
+			destiId = contingutDesti.getPare().getId();
+		}
+
+		try {
+			if (!justSorting) {
 				contingutService.move(
 						entitatActual.getId(),
 						contingutOrigenId,
-						contingutDestiId, 
+						destiId, 
 						RolHelper.getRolActual(request));
-			} catch (Exception ex) {
-				return getAjaxControllerReturnValueError(
-						request, 
-						"redirect:../../" + contingutOrigen.getExpedientPare().getId(), 
-						"contingut.controller.element.mogut.ko", 
-						ex);
 			}
+			
+			List<ContingutDto> contingutFillsDestiPare = contingutService.getFillsBasicInfo(destiId);
+			
+			Map<Integer, Long> orderedElements = new HashMap<Integer, Long>();
+			if (contingutFillsDestiPare!=null) {
+				int ordreAssignat = 0;
+				for (ContingutDto fill: contingutFillsDestiPare) {
+					if (fill.getId().equals(contingutDestiId)) {
+						//Estam recorrent el element sobre el que hem amollat el cursor
+						//El element origen s'insertará darrera aquest.
+						orderedElements.put(ordreAssignat, fill.getId());
+						ordreAssignat++;
+						orderedElements.put(ordreAssignat, contingutOrigenId);
+						ordreAssignat++;
+					} else if (fill.getId().equals(contingutOrigenId)) {
+						//no feim res, ja l'hem insertat abans
+					} else {
+						//qualsevol altre element del pare
+						orderedElements.put(ordreAssignat, fill.getId());
+						ordreAssignat++;
+					}
+				}
+			}
+			
+			contingutService.order(entitatActual.getId(), destiId, orderedElements);
+		} catch (Exception ex) {
+			return getAjaxControllerReturnValueError(
+					request, 
+					"redirect:../../" + contingutOrigen.getExpedientPare().getId(), 
+					"contingut.controller.element.mogut.ko", 
+					ex);
 		}
 
 		return getAjaxControllerReturnValueSuccess(
