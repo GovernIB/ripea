@@ -102,6 +102,7 @@ const translationCa = {
         usuariTasca: "Tasques",
         massiu: {
             portafirmes: "Acció massiva: enviar documents al portafirmes",
+            firmasimpleweb: "Acció massiva: firmar documents des del navegador",
         },
     },
     page: {

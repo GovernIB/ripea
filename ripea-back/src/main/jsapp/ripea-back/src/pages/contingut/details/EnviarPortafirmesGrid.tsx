@@ -35,13 +35,14 @@ const springFilterBuilder = (data: any) => {
     );
 }
 
-const EnviarPortafirmesFilter = (props: any) => {
-    const {onSpringFilterChange, setRequirements} = props;
+export const EnviarPortafirmesFilter = (props: any) => {
+    const {sessionKey, onSpringFilterChange, setRequirements} = props;
     return <StyledMuiFilter
         resourceName={"documentResource"}
         code={"MASSIVE_PORTAFIRMES_FILTER"}
+        sessionKey={sessionKey || "MASSIVE_PORTAFIRMES_FILTER"}
         springFilterBuilder={(data:any) => {
-            setRequirements(!!data?.procediment && !!data?.metaDocument);
+            setRequirements?.(!!data?.procediment && !!data?.metaDocument);
             return springFilterBuilder(data)
         }}
         onSpringFilterChange={onSpringFilterChange}

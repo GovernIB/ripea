@@ -102,6 +102,7 @@ const translationEn = {
         usuariTasca: "Tasks",
         massiu: {
             portafirmes: "Mass action: send documents to the signature portal",
+            firmasimpleweb: "Mass action: sign documents from the browser",
         },
     },
     page: {
