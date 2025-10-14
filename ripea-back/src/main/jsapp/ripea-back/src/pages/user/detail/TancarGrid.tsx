@@ -1,23 +1,21 @@
 import {useTranslation} from "react-i18next";
 import {GridPage, useFormContext, useMuiDataGridApiRef} from "reactlib";
 import {useState} from "react";
-import { CardPage } from "../../../components/CardData";
+import { CardPage } from "../../../components/CardData.tsx";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
-import {Alert, Grid} from "@mui/material";
+import {Grid} from "@mui/material";
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import GridFormField from "../../../components/GridFormField.tsx";
 import {GridSortDirection} from "@mui/x-data-grid-pro";
-import {StyledEstat, StyledPrioritat} from "../ExpedientGrid.tsx";
+import {StyledEstat, StyledPrioritat} from "../../expedient/ExpedientGrid.tsx";
 
-const CanviEstatFilterFrom = () => {
+const TancarFilterFrom = () => {
     const {data} = useFormContext();
-
-    const expedientFilter = builder.and(builder.eq('metaExpedient.id', data?.procediment?.id));
 
     return <>
         <GridFormField xs={3} name="procediment"/>
-        <GridFormField xs={3} name="expedient" filter={expedientFilter}/>
+        <GridFormField xs={3} name="nom"/>
         <GridFormField xs={3} name="dataCreacioInici" type={"date"}/>
         <GridFormField xs={3} name="dataCreacioFi" type={"date"}/>
         <GridFormField xs={3} name="estat" requestParams={{metaExpedientId: data?.procediment?.id, withoutTancar: true}}/>
@@ -29,7 +27,7 @@ const CanviEstatFilterFrom = () => {
 const springFilterBuilder = (data: any) => {
     return builder.and(
         builder.eq("metaExpedient.id", data?.procediment?.id),
-        builder.eq("id", data?.expedient?.id),
+        builder.like("nom", data?.nom),
         builder.betweenDates("createdDate", data?.dataCreacioInici, data?.dataCreacioFi),
         builder.eq("estat", `'OBERT'`),
         data.estat && (data.estat != '0' && data.estat != '-1') && builder.eq("estatAdditional.id", data.estat),
@@ -37,19 +35,17 @@ const springFilterBuilder = (data: any) => {
     );
 }
 
-const CanviEstatFilter = (props: any) => {
-    const {onSpringFilterChange, setRequirements} = props;
+const TancarFilter = (props: any) => {
+    const {onSpringFilterChange} = props;
     return <StyledMuiFilter
         resourceName={"expedientResource"}
         code={"MASSIVE_CANVI_ESTAT_FILTER"}
-        springFilterBuilder={(data:any) => {
-            setRequirements?.(!!data?.procediment);
-            return springFilterBuilder(data)
-        }}
+        sessionKey={"MASSIVE_TANCAR_FILTER"}
+        springFilterBuilder={springFilterBuilder}
         onSpringFilterChange={onSpringFilterChange}
         filterOnFieldEnterKeyPressed
     >
-        <CanviEstatFilterFrom/>
+        <TancarFilterFrom/>
     </StyledMuiFilter>
 }
 
@@ -91,11 +87,10 @@ const columns = [
     },
 ]
 
-const CanviEstatGrid = () => {
+const TancarGrid = () => {
     const {t} = useTranslation();
     const apiRef = useMuiDataGridApiRef();
     const [springFilter, setSpringFilter] = useState<string>();
-    const [haveRequirements, setRequirements] = useState<boolean>(false)
 
     const refresh = () => {
         apiRef?.current?.refresh?.();
@@ -103,41 +98,38 @@ const CanviEstatGrid = () => {
 
     const actions = [
         {
-            label: t('page.document.action.portafirmes.label'),
-            icon: "logout",
+            label: t('page.document.action.close.label'),
+            icon: "check",
             showInMenu: false,
         },
     ]
     // TODO: crear acción massiva
     const massiveActions = [
         {
-            label: t('page.document.action.portafirmes.label'),
-            icon: "logout",
+            label: t('page.document.action.close.label'),
+            icon: "check",
             showInMenu: false,
         },
     ]
 
     return <GridPage disableMargins>
-        <CardPage title={t('navigate.massiu.canviEstat')}>
-            <Alert severity={'info'} sx={{mb: 1}}>{t('page.expedient.alert.canviEstat')}</Alert>
-
-            <CanviEstatFilter setRequirements={setRequirements} onSpringFilterChange={setSpringFilter}/>
+        <CardPage title={t('navigate.massiu.tancament')}>
+            <TancarFilter onSpringFilterChange={setSpringFilter}/>
 
             <StyledMuiGrid
                 apiRef={apiRef}
                 resourceName={"expedientResource"}
                 columns={columns}
                 filter={springFilter}
+                // TODO: filtrar por expediente puede cerrar
                 sortModel={sortModel}
 
                 rowAdditionalActions={actions}
                 toolbarMassiveActions={massiveActions}
-                isRowSelectable={() => haveRequirements}
 
-                disabledMassiveDefSelector={!haveRequirements}
                 toolbarHideCreate
             />
         </CardPage>
     </GridPage>
 }
-export default CanviEstatGrid;
+export default TancarGrid;

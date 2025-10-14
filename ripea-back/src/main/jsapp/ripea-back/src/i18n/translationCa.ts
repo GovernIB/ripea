@@ -30,13 +30,13 @@ const translationCa = {
         filter: "Filtrar",
         downloadSelected: "Descarrega contingut seleccionat",
         relateSelected: "Relaciona contingut seleccionat",
-		processing: "Processant..."
+        processing: "Processant..."
     },
     enum: {
         rol: {
             IPA_SUPER: "Superusuari",
             IPA_ADMIN: "Administrador d'entitat",
-			IPA_ADMIN_LECTURA: "Administrador (lectura)",
+            IPA_ADMIN_LECTURA: "Administrador (lectura)",
             IPA_DISSENY: "Dissenyador d'òrgan gestor",
             IPA_ORGAN_ADMIN: "Administrador d'òrgan gestor",
             IPA_REVISIO: "Revisor de procediments",
@@ -105,6 +105,7 @@ const translationCa = {
             firmasimpleweb: "Acció massiva: firmar documents des del navegador",
             canviEstat: "Acció massiva: Canvi d'estat d'expedients",
             tancament: "Acció massiva: Tancament d'expedients",
+            seguimentArxiuPendents: "Acció massiva: Custodiar elements pendents",
         },
     },
     page: {
@@ -199,7 +200,10 @@ const translationCa = {
                 seguimentvf: {
                     label: "Seguiment Viafirma",
                     title: "Detalls de la firma",
-                }
+                },
+                custodiar: {
+                    label: "Custodiar",
+                },
             },
             history: {
                 create: "Creació",
@@ -692,11 +696,11 @@ const translationCa = {
                     title: "Importació de documents des del SGD",
                     ok: "Documents importats correctament",
                 },
-				importZip: {
-				    label: "Importar des de ZIP...",
-				    title: "Importació de documents des d'un ZIP",
-				    ok: "Documents importats correctament",
-				},
+                importZip: {
+                    label: "Importar des de ZIP...",
+                    title: "Importació de documents des d'un ZIP",
+                    ok: "Documents importats correctament",
+                },
                 detall: {
                     label: "Detalls",
                 },
@@ -849,7 +853,7 @@ const translationCa = {
             mensajeToolbar: {
                 permis: "No teniu permisos per gestionar els valors d'aquesta dada.",
                 maxDades: "Aquest tipus de dada només permet indicar un únic valor.",
-            }, 
+            },
             action: {
                 new: {
                     label: "Afegir valor per la dada",

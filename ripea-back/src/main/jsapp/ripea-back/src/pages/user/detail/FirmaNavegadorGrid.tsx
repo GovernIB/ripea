@@ -65,20 +65,14 @@ const FirmaNavegadorGrid = () => {
                 columns={columns}
                 filter={springFilter}
                 // TODO: filtrar por permisos y pot firmar al navegador
-                // perspectives={perspectives}
                 sortModel={sortModel}
 
                 rowAdditionalActions={actions}
                 toolbarMassiveActions={massiveActions}
-                // isRowSelectable={() => haveRequirements}
-
-                // disabledMassiveDefSelector={!haveRequirements}
-                // hiddenMassiveDefSelector={true}
 
                 toolbarHideCreate
             />
         </CardPage>
-        {/*{contentEviarPortafirmes}*/}
     </GridPage>
 }
 export default FirmaNavegadorGrid;

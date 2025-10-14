@@ -30,13 +30,13 @@ const translationEn = {
         filter: "Filter",
         downloadSelected: "Download selected content",
         relateSelected: "Relate selected content",
-		processing: "Processing..."
+        processing: "Processing..."
     },
     enum: {
         rol: {
             IPA_SUPER: "Superuser",
             IPA_ADMIN: "Administrator",
-			IPA_ADMIN_LECTURA: "Administrator (read)",
+            IPA_ADMIN_LECTURA: "Administrator (read)",
             IPA_DISSENY: "Designer",
             IPA_ORGAN_ADMIN: "Organ Administrator",
             IPA_REVISIO: "Reviewer",
@@ -105,6 +105,7 @@ const translationEn = {
             firmasimpleweb: "Mass action: sign documents from the browser",
             canviEstat: "Mass action: Change case status",
             tancament: "Mass action: Close cases",
+            seguimentArxiuPendents: "Mass action: Archive pending items",
         },
     },
     page: {
@@ -199,6 +200,9 @@ const translationEn = {
                 seguimentvf: {
                     label: "Viafirma tracking",
                     title: "Signature details",
+                },
+                custodiar: {
+                    label: "Archive",
                 },
             },
             history: {
@@ -692,11 +696,11 @@ const translationEn = {
                     title: "Import documents from SGD",
                     ok: "Documents imported successfully",
                 },
-				importZip: {
-				    label: "Import documents from ZIP...",
-				    title: "Import documentos from ZIP",
-				    ok: "Documents imported successfully",
-				},
+                importZip: {
+                    label: "Import documents from ZIP...",
+                    title: "Import documentos from ZIP",
+                    ok: "Documents imported successfully",
+                },
                 detall: {
                     label: "Details",
                 },

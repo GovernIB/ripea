@@ -10,6 +10,7 @@ const TITLES: any = {
     '/massiu/firmasimpleweb': "navigate.massiu.firmasimpleweb",
     '/massiu/canviEstat': "navigate.massiu.canviEstat",
     '/massiu/tancament': "navigate.massiu.tancament",
+    '/seguimentArxiuPendents': "navigate.massiu.seguimentArxiuPendents",
 };
 
 export const setTitlePage = (title:string) => {

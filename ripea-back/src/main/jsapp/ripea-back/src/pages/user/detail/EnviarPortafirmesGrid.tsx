@@ -4,7 +4,7 @@ import {CardPage} from "../../../components/CardData.tsx";
 import {Alert} from "@mui/material";
 import {useTranslation} from "react-i18next";
 import {useState} from "react";
-import useEnviarPortafirmes from "../actions/EnviarPortafirmes.tsx";
+import useEnviarPortafirmes from "../../contingut/actions/EnviarPortafirmes.tsx";
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
 import GridFormField from "../../../components/GridFormField.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
@@ -121,7 +121,6 @@ const EnviarPortafirmesGrid = () => {
                 columns={columns}
                 filter={springFilter}
                 // TODO: filtrar por permisos y enviable a portafirma
-                // perspectives={perspectives}
                 sortModel={sortModel}
 
                 rowAdditionalActions={actions}

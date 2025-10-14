@@ -732,13 +732,13 @@ const useAccionesMassivas = () => {
                     id: 'tancar',
                     title: t('page.user.massive.tancar'),
                     // icon: '',
-                    to: 'massiu/tancament',
+                    to: '/massiu/tancament',
                 },
                 {
                     id: 'custodiar',
                     title: t('page.user.massive.custodiar'),
                     // icon: '',
-                    onClick: ()=> toProgramaAntic('seguimentArxiuPendents'),
+                    to: '/seguimentArxiuPendents',
                 },
                 {
                     id: 'csv',

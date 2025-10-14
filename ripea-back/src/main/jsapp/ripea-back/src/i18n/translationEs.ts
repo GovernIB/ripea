@@ -30,13 +30,13 @@ const translationEs = {
         filter: "Filtrar",
         downloadSelected: "Descargar contenido seleccionado",
         relateSelected: "Relacionar contenido seleccionado",
-		processing: "Procesando..."
+        processing: "Procesando..."
     },
     enum: {
         rol: {
             IPA_SUPER: "Superusuario",
             IPA_ADMIN: "Administrador de entidad",
-			IPA_ADMIN_LECTURA: "Administrador (lectura)",
+            IPA_ADMIN_LECTURA: "Administrador (lectura)",
             IPA_DISSENY: "Diseñador de Órgano gestor",
             IPA_ORGAN_ADMIN: "Administrador de Órgano gestor",
             IPA_REVISIO: "Revisor de procedimientos",
@@ -53,12 +53,12 @@ const translationEs = {
             A_BAIXA: "Baja",
             BAIXA: "Baja",
             NORMAL: "Normal",
-            ALTA: "Alta",            
+            ALTA: "Alta",
         },
         fluxTipus: {
             SIMPLE: "Simple",
             PORTAFIB: "Portafib",
-        },        
+        },
         estat: {
             TANCAT: "Cerrado",
             OBERT: "Abierto",
@@ -67,7 +67,7 @@ const translationEs = {
             INICIAT: "Iniciado",
             FIRMAT: "Firmado",
             REBUTJAT: "Rechazado",
-            PARCIAL: "Parcial",            
+            PARCIAL: "Parcial",
         },
         origen: {
             O0: "Ciudadano",
@@ -94,7 +94,7 @@ const translationEs = {
         tipusDestinatari: {
             TABLET: "Tablet",
             EMAIL: "Email",
-        }        
+        }
     },
     navigate: {
         expedient: "Buscador de expedientes",
@@ -105,6 +105,7 @@ const translationEs = {
             firmasimpleweb: "Acción masiva: firmar documentos desde el navegador",
             canviEstat: "Acción masiva: Cambio de estado de expedientes",
             tancament: "Acción masiva: Cierre de expedientes",
+            seguimentArxiuPendents: "Acción masiva: Custodiar elementos pendientes",
         },
     },
     page: {
@@ -195,11 +196,14 @@ const translationEs = {
                 seguimentPortafirmes: {
                     label: "Seguimiento Portafirmas",
                     title: "Seguimiento Portafirmas",
-                }, 
+                },
                 seguimentvf: {
                     label: "Seguiment Viafirma",
                     title: "Detalles de la firma",
-                }                              
+                },
+                custodiar: {
+                    label: "Custodiar",
+                },
             },
             history: {
                 create: "Creación",
@@ -517,7 +521,7 @@ const translationEs = {
                 exportDocs: {
                     label: "Exportar los documentos de los expedientes seleccionados",
                     ok: "Los documentos se han exportado correctamente",
-                },                
+                },
                 export: {
                     label: "Exportar los documentos...",
                     title: "Exportar documentos",
@@ -692,11 +696,11 @@ const translationEs = {
                     title: "Importación de documentos desde el SGD",
                     ok: "Documentos importados correctamente",
                 },
-				importZip: {
-				    label: "Importar desde ZIP...",
-				    title: "Importación de documentos desde un ZIP",
-				    ok: "Documentos importados correctamente",
-				},
+                importZip: {
+                    label: "Importar desde ZIP...",
+                    title: "Importación de documentos desde un ZIP",
+                    ok: "Documentos importados correctamente",
+                },
                 detall: {
                     label: "Detalles",
                 },
@@ -849,7 +853,7 @@ const translationEs = {
             mensajeToolbar: {
                 permis: "No tienes permiso para gestionar los valores de este dato.",
                 maxDades: "Este tipo de dato solo permite indicar un único valor.",
-            },             
+            },
             action: {
                 new: {
                     label: "Añadir valor para el dato",

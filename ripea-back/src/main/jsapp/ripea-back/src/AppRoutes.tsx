@@ -5,10 +5,11 @@ import ExpedientGrid from './pages/expedient/ExpedientGrid';
 import AnotacionsGrid from "./pages/anotacions/AnotacionsGrid.tsx";
 import TasquesGrid from "./pages/tasca/TasquesGrid.tsx";
 import Tasca from "./pages/tasca/details/Tasca.tsx";
-import EnviarPortafirmesGrid from "./pages/contingut/details/EnviarPortafirmesGrid.tsx";
-import FirmaNavegadorGrid from "./pages/contingut/details/FirmaNavegadorGrid.tsx";
-import CanviEstatGrid from "./pages/expedient/details/CanviEstatGrid.tsx";
-import TancarGrid from "./pages/expedient/details/TancarGrid.tsx";
+import EnviarPortafirmesGrid from "./pages/user/detail/EnviarPortafirmesGrid.tsx";
+import FirmaNavegadorGrid from "./pages/user/detail/FirmaNavegadorGrid.tsx";
+import CanviEstatGrid from "./pages/user/detail/CanviEstatGrid.tsx";
+import TancarGrid from "./pages/user/detail/TancarGrid.tsx";
+import CustodiarElementsPendentsGrid from "./pages/user/detail/CustodiarElementsPendentsGrid.tsx";
 
 const AppRoutes: React.FC = () => {
     return <Routes>
@@ -23,6 +24,7 @@ const AppRoutes: React.FC = () => {
             <Route path={"canviEstat"} element={<CanviEstatGrid />} />
             <Route path={"tancament"} element={<TancarGrid />} />
         </Route>
+        <Route path="seguimentArxiuPendents" element={<CustodiarElementsPendentsGrid />} />
         <Route path="contingut/:id" element={<Expedient />} />
         <Route path="contingut/:id/tasca/:tascaId" element={<Tasca />} />
         <Route path="expedientPeticio" element={<AnotacionsGrid />} />
