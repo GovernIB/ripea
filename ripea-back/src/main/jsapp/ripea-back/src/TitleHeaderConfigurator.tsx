@@ -6,6 +6,7 @@ const TITLES: any = {
     '/expedient': "navigate.expedient",
     '/expedientPeticio': "navigate.expedientPeticio",
     '/usuariTasca': "navigate.usuariTasca",
+    '/massiu/portafirmes': "navigate.massiu.portafirmes",
 };
 
 export const setTitlePage = (title:string) => {

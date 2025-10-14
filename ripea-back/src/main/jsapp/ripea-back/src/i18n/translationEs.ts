@@ -100,6 +100,9 @@ const translationEs = {
         expedient: "Buscador de expedientes",
         expedientPeticio: "Buscador de anotaciones de registro",
         usuariTasca: "Tareas",
+        massiu: {
+            portafirmes: "Acción masiva: enviar documentos al portafirmas",
+        },
     },
     page: {
         comment: {
@@ -805,6 +808,7 @@ const translationEs = {
                 folder: "En caso de no seleccionar una carpeta se importarán los documentos directamente en el expediente.",
                 scaned: "El proceso de escaneo se ha realizado con éxito.",
                 view: "Solo para PDF, ODT y DOCX",
+                portafirmes: "Es necesario seleccionar un procedimiento y un tipo de documento para poder realizar la acción masiva",
             },
             versio: {
                 title: "Versión",

@@ -100,6 +100,9 @@ const translationEn = {
         expedient: "Case search",
         expedientPeticio: "Registry entries search",
         usuariTasca: "Tasks",
+        massiu: {
+            portafirmes: "Mass action: send documents to the signature portal",
+        },
     },
     page: {
         comment: {
@@ -775,6 +778,10 @@ const translationEn = {
                     label: "Original document",
                     ok: "The original document has been downloaded successfully"
                 },
+                descarregarImprimible: {
+                    label: "Download authentic copy",
+                    ok: "The authentic copy has been downloaded successfully",
+                },
                 changeType: {
                     label: "Change type...",
                     title: "Change type",
@@ -801,6 +808,7 @@ const translationEn = {
                 folder: "If no folder is selected, documents will be imported directly into the file.",
                 scaned: "The scanning process was successful.",
                 view: "Only for PDF, ODT and DOCX",
+                portafirmes: "Es necesario seleccionar un procedimiento y un tipo de documento para poder realizar la acción masiva",
             },
             versio: {
                 title: "Version",

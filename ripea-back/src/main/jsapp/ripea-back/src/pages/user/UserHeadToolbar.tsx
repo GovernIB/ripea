@@ -707,7 +707,8 @@ const useAccionesMassivas = () => {
                     id: 'portafirmes',
                     title: t('page.user.massive.portafirmes'),
                     // icon: '',
-                    onClick: ()=> toProgramaAntic('massiu/portafirmes'),
+                    // onClick: ()=> toProgramaAntic('massiu/portafirmes'),
+                    to: '/massiu/portafirmes',
                 },
                 {
                     id: 'firmar',

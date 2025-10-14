@@ -154,9 +154,15 @@ import lombok.experimental.FieldNameConstants;
                         code = DocumentResource.REPORT_DESCARREGAR_VERSIO_CODE,
                         formClass = DocumentResource.DescarregarVersionFormAction.class,
                         requiresId = true),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.FILTER,
+                        code = DocumentResource.MASSIVE_PORTAFIRMES_FILTER_CODE,
+                        formClass = DocumentResource.MassicePortafirmesFilter.class),
         })
 @AdjuntValid(groups = {Resource.OnCreate.class, Resource.OnUpdate.class})
 public class DocumentResource extends NodeResource {
+
+    public static final String MASSIVE_PORTAFIRMES_FILTER_CODE = "MASSIVE_PORTAFIRMES_FILTER";
 
 	public static final String PERSPECTIVE_COUNT_CODE = "COUNT";
     public static final String PERSPECTIVE_VERSIONS_CODE = "VERSIONS";
@@ -601,6 +607,17 @@ public class DocumentResource extends NodeResource {
     public static class DescarregarVersionFormAction implements Serializable {
     	@NotNull
     	private String version;
+    }
+
+    @Getter
+    @Setter
+    public static class MassicePortafirmesFilter implements Serializable {
+        private ResourceReference<MetaExpedientResource, Long> procediment;
+        private ResourceReference<ExpedientResource, Long> expedient;
+        private ResourceReference<MetaDocumentResource, Long> metaDocument;
+        private String nom;
+        private Date dataCreacioInici;
+        private Date dataCreacioFi;
     }
 
     public DocumentDto toDocumentDto() {

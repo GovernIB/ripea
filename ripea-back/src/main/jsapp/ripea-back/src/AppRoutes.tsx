@@ -5,6 +5,7 @@ import ExpedientGrid from './pages/expedient/ExpedientGrid';
 import AnotacionsGrid from "./pages/anotacions/AnotacionsGrid.tsx";
 import TasquesGrid from "./pages/tasca/TasquesGrid.tsx";
 import Tasca from "./pages/tasca/details/Tasca.tsx";
+import EnviarPortafirmesGrid from "./pages/contingut/details/EnviarPortafirmesGrid.tsx";
 
 const AppRoutes: React.FC = () => {
     return <Routes>
@@ -13,6 +14,9 @@ const AppRoutes: React.FC = () => {
             <Route index element={<ExpedientGrid />} />
             {/*<Route path=":id" element={<Expedient />} />*/}
         </Route>
+        <Route path="massiu">
+            <Route path={"portafirmes"} element={<EnviarPortafirmesGrid />} />
+        </Route>
         <Route path="contingut/:id" element={<Expedient />} />
         <Route path="contingut/:id/tasca/:tascaId" element={<Tasca />} />
         <Route path="expedientPeticio" element={<AnotacionsGrid />} />
@@ -20,5 +24,6 @@ const AppRoutes: React.FC = () => {
         <Route path="*" element={<NotFoundPage />} />
     </Routes>;
 }
+// massiu/portafirmes
 
 export default AppRoutes;

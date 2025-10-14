@@ -8,7 +8,7 @@ export const ThemeUserProvider = ({ children }: { children: React.ReactNode }) =
     const { value: user } = useUserSession()
 
     const theme = useMemo(() => {
-        console.log(">>> user", user)
+        // console.log(">>> user", user)
         return (user?.conf?.modeFosc) ? darkTheme : lightTheme
     }, [user]);
 

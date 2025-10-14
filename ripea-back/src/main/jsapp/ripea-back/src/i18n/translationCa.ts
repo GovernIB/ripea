@@ -100,6 +100,9 @@ const translationCa = {
         expedient: "Cercador d'expedients",
         expedientPeticio: "Cercador d'anotacions de registre",
         usuariTasca: "Tasques",
+        massiu: {
+            portafirmes: "Acció massiva: enviar documents al portafirmes",
+        },
     },
     page: {
         comment: {
@@ -688,7 +691,6 @@ const translationCa = {
 				importZip: {
 				    label: "Importar des de ZIP...",
 				    title: "Importació de documents des d'un ZIP",
-					title: "Importació de documents des d'un ZIP",
 				    ok: "Documents importats correctament",
 				},
                 detall: {
@@ -806,6 +808,7 @@ const translationCa = {
                 folder: "En cas de no seleccionar una carpeta s'importaran els documents directament a l'expedient.",
                 scaned: "El procés d'escaneig s'ha realitzat amb èxit.",
                 view: "Nomes per PDF, ODT i DOCX",
+                portafirmes: "És necessari seleccionar un procediment i un tipus de document per poder realitzar l'acció massiva",
             },
             versio: {
                 title: "Versió",
