@@ -11,6 +11,7 @@ import CanviEstatGrid from "./pages/user/detail/CanviEstatGrid.tsx";
 import TancarGrid from "./pages/user/detail/TancarGrid.tsx";
 import CustodiarElementsPendentsGrid from "./pages/user/detail/CustodiarElementsPendentsGrid.tsx";
 import CopiarEnllacCSVGrid from "./pages/user/detail/CopiarEnllacCSVGrid.tsx";
+import MarcarDefinitiuGrid from "./pages/user/detail/MarcarDefinitiuGrid.tsx";
 
 const AppRoutes: React.FC = () => {
     return <Routes>
@@ -25,6 +26,7 @@ const AppRoutes: React.FC = () => {
             <Route path={"canviEstat"} element={<CanviEstatGrid />} />
             <Route path={"tancament"} element={<TancarGrid />} />
             <Route path={"csv"} element={<CopiarEnllacCSVGrid />} />
+            <Route path={"definitiu"} element={<MarcarDefinitiuGrid />} />
         </Route>
         <Route path="seguimentArxiuPendents" element={<CustodiarElementsPendentsGrid />} />
         <Route path="contingut/:id" element={<Expedient />} />

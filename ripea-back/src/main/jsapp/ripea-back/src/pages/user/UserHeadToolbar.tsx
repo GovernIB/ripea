@@ -719,7 +719,7 @@ const useAccionesMassivas = () => {
                     id: 'marcar',
                     title: t('page.user.massive.marcar'),
                     // icon: '',
-                    onClick: ()=> toProgramaAntic('massiu/definitiu'),
+                    to: '/massiu/definitiu',
                     hidden: !user?.sessionScope?.isConvertirDefinitiuActiu,
                 },
                 {
