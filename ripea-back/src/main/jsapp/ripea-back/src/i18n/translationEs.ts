@@ -103,6 +103,7 @@ const translationEs = {
         massiu: {
             portafirmes: "Acción masiva: enviar documentos al portafirmas",
             firmasimpleweb: "Acción masiva: firmar documentos desde el navegador",
+            canviEstat: "Acción masiva: Cambio de estado de expedientes",
         },
     },
     page: {
@@ -571,6 +572,7 @@ const translationEs = {
                 errorNotificacio: "Este expediente tiene notificaciones con errores",
                 ambEnviamentsPendents: "Este expediente tiene envíos pendientes de Portafirmas",
                 ambNotificacionsPendents: "Este expediente tiene notificaciones pendientes",
+                canviEstat: "Es necesario seleccionar un procedimiento para poder realizar la acción masiva",
             },
             modal: {
                 seguidors: "Seguidores del expediente",

@@ -103,6 +103,7 @@ const translationEn = {
         massiu: {
             portafirmes: "Mass action: send documents to the signature portal",
             firmasimpleweb: "Mass action: sign documents from the browser",
+            canviEstat: "Mass action: Change case status",
         },
     },
     page: {
@@ -571,6 +572,7 @@ const translationEn = {
                 errorNotificacio: "This case file has notification errors",
                 ambEnviamentsPendents: "This case file has pending sends to signature portal",
                 ambNotificacionsPendents: "This case file has pending notifications",
+                canviEstat: "It is necessary to select a procedure in order to perform the mass action",
             },
             modal: {
                 seguidors: "Case file followers",

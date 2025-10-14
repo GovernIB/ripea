@@ -7,6 +7,7 @@ import TasquesGrid from "./pages/tasca/TasquesGrid.tsx";
 import Tasca from "./pages/tasca/details/Tasca.tsx";
 import EnviarPortafirmesGrid from "./pages/contingut/details/EnviarPortafirmesGrid.tsx";
 import FirmaNavegadorGrid from "./pages/contingut/details/FirmaNavegadorGrid.tsx";
+import CanviEstatGrid from "./pages/expedient/details/CanviEstatGrid.tsx";
 
 const AppRoutes: React.FC = () => {
     return <Routes>
@@ -18,6 +19,7 @@ const AppRoutes: React.FC = () => {
         <Route path="massiu">
             <Route path={"portafirmes"} element={<EnviarPortafirmesGrid />} />
             <Route path={"firmasimpleweb"} element={<FirmaNavegadorGrid />} />
+            <Route path={"canviEstat"} element={<CanviEstatGrid />} />
         </Route>
         <Route path="contingut/:id" element={<Expedient />} />
         <Route path="contingut/:id/tasca/:tascaId" element={<Tasca />} />

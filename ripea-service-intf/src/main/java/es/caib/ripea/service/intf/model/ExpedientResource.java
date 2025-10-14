@@ -89,6 +89,10 @@ import lombok.experimental.FieldNameConstants;
 						type = ResourceArtifactType.FILTER,
 						code = ExpedientResource.FILTER_CODE,
 						formClass = ExpedientResource.ExpedientFilterForm.class),
+				@ResourceConfigArtifact(
+						type = ResourceArtifactType.FILTER,
+						code = ExpedientResource.MASSIVE_CANVI_ESTAT_FILTER_CODE,
+						formClass = ExpedientResource.MassiveCanviEstatFilter.class),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientResource.ACTION_MASSIVE_FOLLOW_CODE,
@@ -245,6 +249,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
 	
 
 	public static final String FILTER_CODE = "EXPEDIENT_FILTER";
+	public static final String MASSIVE_CANVI_ESTAT_FILTER_CODE = "MASSIVE_CANVI_ESTAT_FILTER";
 
 	@NotNull
 	private ExpedientEstatEnumDto estat = ExpedientEstatEnumDto.OBERT;
@@ -494,5 +499,17 @@ public class ExpedientResource extends NodeResource implements Serializable {
     	@NotNull
     	private FileReference documentZip;
     	private List<DocumentResource> documentsUsuari;
+    }
+
+    @Getter
+    @Setter
+    public static class MassiveCanviEstatFilter implements Serializable {
+        private ResourceReference<MetaExpedientResource, Long> procediment;
+        private ResourceReference<ExpedientResource, Long> expedient;
+        private Date dataCreacioInici;
+        private Date dataCreacioFi;
+        @ResourceField(enumType = true)
+        private String estat;
+        private PrioritatEnumDto prioritat;
     }
 }

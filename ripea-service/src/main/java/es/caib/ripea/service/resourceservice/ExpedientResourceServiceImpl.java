@@ -218,6 +218,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         register(ExpedientResource.Fields.metaExpedient, new MetaExpedientOnchangeLogicProcessor());
         register(ExpedientResource.Fields.any, new AnyOnchangeLogicProcessor());
         register(ExpedientResource.FILTER_CODE, new FilterOnchangeLogicProcessor());
+        register(ExpedientResource.MASSIVE_CANVI_ESTAT_FILTER_CODE, new FilterOnchangeLogicProcessor());
         //register(null, new InitialOnChangeExpedientResourceLogicProcessor());
     }
     
@@ -1650,7 +1651,8 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
             List<FieldOption> resultat = new ArrayList<FieldOption>();
             if(ExpedientResource.ExpedientFilterForm.Fields.estat.equals(fieldName)) {
                 resultat.add(new FieldOption("0", messageHelper.getMessage("es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto.OBERT")));
-                resultat.add(new FieldOption("-1", messageHelper.getMessage("es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto.TANCAT")));
+                if (!requestParameterMap.containsKey("withoutTancar"))
+                    resultat.add(new FieldOption("-1", messageHelper.getMessage("es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto.TANCAT")));
 
                 if (requestParameterMap.containsKey("metaExpedientId") && requestParameterMap.get("metaExpedientId").length>0){
                     Long metaExpedientId = Long.valueOf(requestParameterMap.get("metaExpedientId")[0]);

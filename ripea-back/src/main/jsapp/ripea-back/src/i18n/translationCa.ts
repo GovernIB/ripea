@@ -103,6 +103,7 @@ const translationCa = {
         massiu: {
             portafirmes: "Acció massiva: enviar documents al portafirmes",
             firmasimpleweb: "Acció massiva: firmar documents des del navegador",
+            canviEstat: "Acció massiva: Canvi d'estat d'expedients",
         },
     },
     page: {
@@ -571,6 +572,7 @@ const translationCa = {
                 errorNotificacio: "Aquest expedient té notificacions amb errors",
                 ambEnviamentsPendents: "Aquest expedient té enviaments pendents de Portasignatures",
                 ambNotificacionsPendents: "Aquest expedient té notificacions pendents",
+                canviEstat: "És necessari seleccionar un procediment per poder realitzar l'acció massiva",
             },
             modal: {
                 seguidors: "Seguidors de l’expedient",

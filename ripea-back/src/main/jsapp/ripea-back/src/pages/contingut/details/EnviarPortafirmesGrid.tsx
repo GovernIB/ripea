@@ -12,7 +12,7 @@ import * as builder from "../../../util/springFilterUtils.ts";
 const EnviarPortafirmesFilterForm = () => {
     const {data} = useFormContext();
 
-    const expedientFilter = data?.procediment ? builder.eq('metaExpedient.id', data?.procediment?.id) : "";
+    const expedientFilter = builder.and(builder.eq('metaExpedient.id', data?.procediment?.id));
     const metaDocumentFilter = builder.eq('metaExpedient.id', data?.procediment?.id || 0);
 
     return <>

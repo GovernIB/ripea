@@ -714,7 +714,7 @@ const useAccionesMassivas = () => {
                     id: 'firmar',
                     title: t('page.user.massive.firmar'),
                     // icon: '',
-                    onClick: ()=> toProgramaAntic('massiu/firmasimpleweb'),
+                    to: '/massiu/firmasimpleweb',
                 },
                 {
                     id: 'marcar',
@@ -727,7 +727,7 @@ const useAccionesMassivas = () => {
                     id: 'estat',
                     title: t('page.user.massive.estat'),
                     // icon: '',
-                    onClick: ()=> toProgramaAntic('massiu/canviEstat'),
+                    to: '/massiu/canviEstat',
                 },
                 {
                     id: 'tancar',
