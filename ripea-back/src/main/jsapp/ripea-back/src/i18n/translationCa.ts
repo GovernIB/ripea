@@ -106,6 +106,7 @@ const translationCa = {
             canviEstat: "Acció massiva: Canvi d'estat d'expedients",
             tancament: "Acció massiva: Tancament d'expedients",
             seguimentArxiuPendents: "Acció massiva: Custodiar elements pendents",
+            csv: "Acció massiva: copiar enllaç CSV",
         },
     },
     page: {

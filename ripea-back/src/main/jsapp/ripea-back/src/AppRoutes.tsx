@@ -10,6 +10,7 @@ import FirmaNavegadorGrid from "./pages/user/detail/FirmaNavegadorGrid.tsx";
 import CanviEstatGrid from "./pages/user/detail/CanviEstatGrid.tsx";
 import TancarGrid from "./pages/user/detail/TancarGrid.tsx";
 import CustodiarElementsPendentsGrid from "./pages/user/detail/CustodiarElementsPendentsGrid.tsx";
+import CopiarEnllacCSVGrid from "./pages/user/detail/CopiarEnllacCSVGrid.tsx";
 
 const AppRoutes: React.FC = () => {
     return <Routes>
@@ -23,6 +24,7 @@ const AppRoutes: React.FC = () => {
             <Route path={"firmasimpleweb"} element={<FirmaNavegadorGrid />} />
             <Route path={"canviEstat"} element={<CanviEstatGrid />} />
             <Route path={"tancament"} element={<TancarGrid />} />
+            <Route path={"csv"} element={<CopiarEnllacCSVGrid />} />
         </Route>
         <Route path="seguimentArxiuPendents" element={<CustodiarElementsPendentsGrid />} />
         <Route path="contingut/:id" element={<Expedient />} />

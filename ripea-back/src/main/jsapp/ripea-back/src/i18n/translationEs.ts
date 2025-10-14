@@ -106,6 +106,7 @@ const translationEs = {
             canviEstat: "Acción masiva: Cambio de estado de expedientes",
             tancament: "Acción masiva: Cierre de expedientes",
             seguimentArxiuPendents: "Acción masiva: Custodiar elementos pendientes",
+            csv: "Acción masiva: copiar enlace CSV",
         },
     },
     page: {

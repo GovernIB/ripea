@@ -46,7 +46,6 @@ export const EnviarPortafirmesFilter = (props: any) => {
             return springFilterBuilder(data)
         }}
         onSpringFilterChange={onSpringFilterChange}
-        filterOnFieldEnterKeyPressed
     >
         <EnviarPortafirmesFilterForm/>
     </StyledMuiFilter>

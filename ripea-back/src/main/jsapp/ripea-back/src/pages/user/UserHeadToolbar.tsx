@@ -744,7 +744,7 @@ const useAccionesMassivas = () => {
                     id: 'csv',
                     title: t('page.user.massive.csv'),
                     // icon: '',
-                    onClick: ()=> toProgramaAntic('massiu/csv'),
+                    to: '/massiu/csv',
                     hiddden: !user?.sessionScope?.isUrlValidacioDefinida,
                 },
                 {

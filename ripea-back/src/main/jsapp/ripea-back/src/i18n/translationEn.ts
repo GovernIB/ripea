@@ -106,6 +106,7 @@ const translationEn = {
             canviEstat: "Mass action: Change case status",
             tancament: "Mass action: Close cases",
             seguimentArxiuPendents: "Mass action: Archive pending items",
+            csv: "Mass action: copy CSV link",
         },
     },
     page: {

@@ -47,7 +47,6 @@ const CanviEstatFilter = (props: any) => {
             return springFilterBuilder(data)
         }}
         onSpringFilterChange={onSpringFilterChange}
-        filterOnFieldEnterKeyPressed
     >
         <CanviEstatFilterFrom/>
     </StyledMuiFilter>
