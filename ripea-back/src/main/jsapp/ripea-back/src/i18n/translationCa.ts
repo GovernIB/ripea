@@ -104,6 +104,7 @@ const translationCa = {
             portafirmes: "Acció massiva: enviar documents al portafirmes",
             firmasimpleweb: "Acció massiva: firmar documents des del navegador",
             canviEstat: "Acció massiva: Canvi d'estat d'expedients",
+            tancament: "Acció massiva: Tancament d'expedients",
         },
     },
     page: {

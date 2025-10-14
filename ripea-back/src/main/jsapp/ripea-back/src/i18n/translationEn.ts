@@ -104,6 +104,7 @@ const translationEn = {
             portafirmes: "Mass action: send documents to the signature portal",
             firmasimpleweb: "Mass action: sign documents from the browser",
             canviEstat: "Mass action: Change case status",
+            tancament: "Mass action: Close cases",
         },
     },
     page: {

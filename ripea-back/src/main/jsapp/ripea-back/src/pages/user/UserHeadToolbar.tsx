@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from "react";
+import React, {useCallback} from "react";
 import {Grid, Button, Icon} from "@mui/material";
 import {StyledBadge} from "../../components/StyledBadge.tsx";
 import {useEntitatSession, useUserSession} from "../../components/Session.tsx";
@@ -12,7 +12,6 @@ import {
     LinkProps as RouterLinkProps,
     useLocation,
 } from 'react-router-dom';
-import theme from "../../theme.ts";
 
 export const icons = {
     expedient: 'folder',
@@ -733,7 +732,7 @@ const useAccionesMassivas = () => {
                     id: 'tancar',
                     title: t('page.user.massive.tancar'),
                     // icon: '',
-                    onClick: ()=> toProgramaAntic('massiu/tancament'),
+                    to: 'massiu/tancament',
                 },
                 {
                     id: 'custodiar',

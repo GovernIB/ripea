@@ -505,6 +505,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
     @Setter
     public static class MassiveCanviEstatFilter implements Serializable {
         private ResourceReference<MetaExpedientResource, Long> procediment;
+        private String nom;
         private ResourceReference<ExpedientResource, Long> expedient;
         private Date dataCreacioInici;
         private Date dataCreacioFi;

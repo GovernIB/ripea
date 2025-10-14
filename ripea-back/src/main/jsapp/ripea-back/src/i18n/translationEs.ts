@@ -104,6 +104,7 @@ const translationEs = {
             portafirmes: "Acción masiva: enviar documentos al portafirmas",
             firmasimpleweb: "Acción masiva: firmar documentos desde el navegador",
             canviEstat: "Acción masiva: Cambio de estado de expedientes",
+            tancament: "Acción masiva: Cierre de expedientes",
         },
     },
     page: {
