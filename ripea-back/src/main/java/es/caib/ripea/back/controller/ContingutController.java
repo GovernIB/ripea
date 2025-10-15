@@ -1,32 +1,93 @@
 package es.caib.ripea.back.controller;
 
-import es.caib.ripea.back.command.ContingutMoureCopiarEnviarCommand;
-import es.caib.ripea.back.helper.*;
-import es.caib.ripea.back.helper.DatatablesHelper.DatatablesResponse;
-import es.caib.ripea.plugin.notificacio.EnviamentEstat;
-import es.caib.ripea.service.intf.config.PropertyConfig;
-import es.caib.ripea.service.intf.dto.*;
-import es.caib.ripea.service.intf.registre.RegistreTipusEnum;
-import es.caib.ripea.service.intf.service.*;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.propertyeditors.CustomDateEditor;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.*;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.net.ConnectException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.net.ConnectException;
-import java.text.SimpleDateFormat;
-import java.util.*;
+
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import es.caib.ripea.back.command.ContingutMoureCopiarEnviarCommand;
+import es.caib.ripea.back.helper.BeanGeneratorHelper;
+import es.caib.ripea.back.helper.DatatablesHelper;
+import es.caib.ripea.back.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.back.helper.EntitatHelper;
+import es.caib.ripea.back.helper.EnumHelper;
+import es.caib.ripea.back.helper.ExceptionHelper;
+import es.caib.ripea.back.helper.ExpedientHelper;
+import es.caib.ripea.back.helper.JsonResponse;
+import es.caib.ripea.back.helper.MessageHelper;
+import es.caib.ripea.back.helper.MissatgesHelper;
+import es.caib.ripea.back.helper.ModalHelper;
+import es.caib.ripea.back.helper.RequestSessionHelper;
+import es.caib.ripea.back.helper.RolHelper;
+import es.caib.ripea.back.helper.SessioHelper;
+import es.caib.ripea.plugin.notificacio.EnviamentEstat;
+import es.caib.ripea.service.intf.config.PropertyConfig;
+import es.caib.ripea.service.intf.dto.AlertaDto;
+import es.caib.ripea.service.intf.dto.ArbreDto;
+import es.caib.ripea.service.intf.dto.CarpetaDto;
+import es.caib.ripea.service.intf.dto.CodiValorDto;
+import es.caib.ripea.service.intf.dto.ContingutDto;
+import es.caib.ripea.service.intf.dto.ContingutLogDetallsDto;
+import es.caib.ripea.service.intf.dto.ContingutVistaEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentDto;
+import es.caib.ripea.service.intf.dto.DocumentEnviamentEstatEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentEnviamentTipusEnumDto;
+import es.caib.ripea.service.intf.dto.EntitatDto;
+import es.caib.ripea.service.intf.dto.ExpedientCarpetaArbreDto;
+import es.caib.ripea.service.intf.dto.ExpedientDto;
+import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
+import es.caib.ripea.service.intf.dto.ExpedientTascaDto;
+import es.caib.ripea.service.intf.dto.FitxerDto;
+import es.caib.ripea.service.intf.dto.InteressatDto;
+import es.caib.ripea.service.intf.dto.InteressatTipusEnumDto;
+import es.caib.ripea.service.intf.dto.LogObjecteTipusEnumDto;
+import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
+import es.caib.ripea.service.intf.dto.MetaDocumentDto;
+import es.caib.ripea.service.intf.dto.NodeDto;
+import es.caib.ripea.service.intf.dto.PermissionEnumDto;
+import es.caib.ripea.service.intf.dto.ResultDocumentsSenseContingut;
+import es.caib.ripea.service.intf.dto.TascaEstatEnumDto;
+import es.caib.ripea.service.intf.dto.UsuariDto;
+import es.caib.ripea.service.intf.exception.ValidationException;
+import es.caib.ripea.service.intf.registre.RegistreTipusEnum;
+import es.caib.ripea.service.intf.service.AlertaService;
+import es.caib.ripea.service.intf.service.AplicacioService;
+import es.caib.ripea.service.intf.service.CarpetaService;
+import es.caib.ripea.service.intf.service.ContingutService;
+import es.caib.ripea.service.intf.service.DocumentEnviamentService;
+import es.caib.ripea.service.intf.service.DocumentService;
+import es.caib.ripea.service.intf.service.ExpedientInteressatService;
+import es.caib.ripea.service.intf.service.ExpedientService;
+import es.caib.ripea.service.intf.service.ExpedientTascaService;
+import es.caib.ripea.service.intf.service.MetaDadaService;
+import es.caib.ripea.service.intf.service.MetaDocumentService;
+import es.caib.ripea.service.intf.service.MetaExpedientService;
+import es.caib.ripea.service.intf.service.OrganGestorService;
+import es.caib.ripea.service.intf.service.URLInstruccioService;
 
 /**
  * Controlador per a la gestió de contenidors i mètodes compartits entre diferents tipus de contingut.
@@ -36,6 +97,7 @@ import java.util.*;
 public class ContingutController extends BaseUserOAdminOOrganController {
 
 	private static final String SESSION_ATTRIBUTE_SELECCIO = "ContingutDocumentController.session.seleccio";
+	private static enum MourerCopiarVincular {MOURER, COPIAR, VINCULAR}
 	
 	@Autowired private AplicacioService aplicacioService;
 	@Autowired private ContingutService contingutService;
@@ -115,6 +177,9 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 					((DocumentDto) contingut).setFitxerTamany(tamany);
 				}
 			}
+			
+			//Ordenam els fills, les carpetes primer, despres els documents
+			reordenaFillsCarpetesFirst(contingut);
 
 			omplirModelPerMostrarContingut(
 					request,
@@ -235,6 +300,22 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 				throw e;
 			}
 		}
+	}
+	
+	private void reordenaFillsCarpetesFirst(ContingutDto contingut) {
+		List<ContingutDto> fillsReordenats = new ArrayList<ContingutDto>();
+		if (contingut.getFills()!=null) {
+			for (ContingutDto fill: contingut.getFills()) {
+				if (fill.isCarpeta()) {
+					reordenaFillsCarpetesFirst(fill);
+					fillsReordenats.add(fill);
+				}
+			}
+			for (ContingutDto fill: contingut.getFills()) {
+				if (fill.isDocument()) { fillsReordenats.add(fill); }
+			}
+		}
+		contingut.setFills(fillsReordenats);
 	}
 	
 	@RequestMapping(value = "/contingut/tag/{contingutId}", method = RequestMethod.GET)
@@ -414,20 +495,17 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 				entitatActual,
 				contingutOrigenId,
 				docsIdx,
-				model);
-		ContingutDto contingutOrigen = contingutService.getBasicInfo(
-				contingutOrigenId, 
-				true);
-		ContingutMoureCopiarEnviarCommand command = new ContingutMoureCopiarEnviarCommand();
-		if (docsIdx != null && !docsIdx.isEmpty() && (contingutOrigen instanceof CarpetaDto || contingutOrigen instanceof ExpedientDto)) {
-			command.setOrigenIds(
-					docsIdx.toArray(new Long[docsIdx.size()]));
-		} else {
-			command.setOrigenId(contingutOrigenId);
-		}
-		model.addAttribute("moureMateixExpedients", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.MOURE_MATEIX_EXPEDIENTS)));
-		model.addAttribute(command);
+				model,
+				MourerCopiarVincular.MOURER);
 		return "contingutMoureForm";
+	}
+	
+	private void errorsBindingToMessage(HttpServletRequest request, BindingResult bindingResult) {
+		StringBuilder sb = new StringBuilder();
+		for (FieldError error : bindingResult.getFieldErrors()) {
+			sb.append(error.getDefaultMessage()).append(". ");
+		}
+		MissatgesHelper.error(request, sb.toString());
 	}
 	
 	@RequestMapping(value = "/contingut/{contingutOrigenId}/moure", method = RequestMethod.POST)
@@ -444,14 +522,17 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 						request,
 						SESSION_ATTRIBUTE_SELECCIO);
 		if (bindingResult.hasErrors()) {
+			errorsBindingToMessage(request, bindingResult);
 			omplirModelPerMoureOCopiarVincular(
 					request,
 					entitatActual,
 					contingutOrigenId,
 					docsIdx,
-					model);
+					model,
+					MourerCopiarVincular.MOURER);
 			return "contingutMoureForm";
 		}
+		
 		if (docsIdx != null && !docsIdx.isEmpty()) {
 			for (Long docIdx : docsIdx) {
 				contingutService.move(
@@ -544,6 +625,17 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			
 			contingutService.order(entitatActual.getId(), destiId, orderedElements);
 		} catch (Exception ex) {
+			
+			if (ex instanceof ValidationException) {
+				MissatgesHelper.error(request, getMessage(request, "contingut.controller.element.mogut.ko")+": "+ex.getMessage());
+				return "redirect:../../" + contingutOrigen.getExpedientPare().getId();
+			}
+			
+			if (ex.getCause()!=null && ex.getCause() instanceof ValidationException) {
+				MissatgesHelper.error(request, getMessage(request, "contingut.controller.element.mogut.ko")+": "+ex.getCause().getMessage());
+				return "redirect:../../" + contingutOrigen.getExpedientPare().getId();
+			}
+
 			return getAjaxControllerReturnValueError(
 					request, 
 					"redirect:../../" + contingutOrigen.getExpedientPare().getId(), 
@@ -581,10 +673,8 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 				entitatActual,
 				contingutOrigenId,
 				null,
-				model);
-		ContingutMoureCopiarEnviarCommand command = new ContingutMoureCopiarEnviarCommand();
-		command.setOrigenId(contingutOrigenId);
-		model.addAttribute(command);
+				model,
+				MourerCopiarVincular.COPIAR);
 		return "contingutCopiarForm";
 	}
 	
@@ -597,12 +687,14 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
+			errorsBindingToMessage(request, bindingResult);
 			omplirModelPerMoureOCopiarVincular(
 					request,
 					entitatActual,
 					contingutOrigenId,
 					null,
-					model);
+					model,
+					MourerCopiarVincular.COPIAR);
 			return "contingutCopiarForm";
 		}
 		ContingutDto contingutCreat = contingutService.copy(
@@ -627,11 +719,8 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 				entitatActual,
 				contingutOrigenId,
 				null,
-				model);
-		ContingutMoureCopiarEnviarCommand command = new ContingutMoureCopiarEnviarCommand();
-		command.setOrigenId(contingutOrigenId);
-		model.addAttribute("moureMateixExpedients", false);
-		model.addAttribute(command);
+				model,
+				MourerCopiarVincular.VINCULAR);
 		return "contingutVincularForm";
 	}
 	
@@ -644,12 +733,14 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
+			errorsBindingToMessage(request, bindingResult);
 			omplirModelPerMoureOCopiarVincular(
 					request,
 					entitatActual,
 					contingutOrigenId,
 					null,
-					model);
+					model,
+					MourerCopiarVincular.VINCULAR);
 			return "contingutVincularForm";
 		}
 		Long contingutCreatId = contingutService.link(
@@ -1077,7 +1168,8 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			EntitatDto entitatActual,
 			Long contingutOrigenId,
 			Set<Long> docsIdx,
-			Model model) {
+			Model model,
+			MourerCopiarVincular accio) {
 		ContingutDto contingutOrigen = contingutService.findAmbIdUser(
 				entitatActual.getId(),
 				contingutOrigenId,
@@ -1102,9 +1194,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			model.addAttribute("isVistaArbreMoureDocuments", true);
 			List<ExpedientDto> expedientsMetaExpedient = null;
 			boolean moureEntreExpedients = ! Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.MOURE_MATEIX_EXPEDIENTS));
-			
 			Long metaExpedientId = (contingutOrigen instanceof ExpedientDto) ? ((ExpedientDto)contingutOrigen).getMetaNode().getId() : contingutOrigen.getExpedientPare().getMetaNode().getId();
-							
 			if (moureEntreExpedients) {
 				expedientsMetaExpedient = expedientService.findByEntitatAndMetaExpedient(
 						entitatActual.getId(), 
@@ -1120,6 +1210,32 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 					RolHelper.getRolActual(request));
 			
 			model.addAttribute("carpetes", carpetes);
+		}
+		
+		ContingutMoureCopiarEnviarCommand command = new ContingutMoureCopiarEnviarCommand();
+		command.setAccio(accio.toString());
+		
+		switch (accio) {
+		case MOURER:
+			ContingutDto contingutOrigen2 = contingutService.getBasicInfo(contingutOrigenId, true);
+			if (docsIdx != null && !docsIdx.isEmpty() && (contingutOrigen2 instanceof CarpetaDto || contingutOrigen2 instanceof ExpedientDto)) {
+				command.setOrigenIds(docsIdx.toArray(new Long[docsIdx.size()]));
+			} else {
+				command.setOrigenId(contingutOrigenId);
+			}
+			model.addAttribute("moureMateixExpedients", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.MOURE_MATEIX_EXPEDIENTS)));
+			model.addAttribute(command);			
+			break;
+		case COPIAR:
+			command.setOrigenId(contingutOrigenId);
+			model.addAttribute("moureMateixExpedients", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.MOURE_MATEIX_EXPEDIENTS)));
+			model.addAttribute(command);		
+			break;
+		case VINCULAR: 
+			command.setOrigenId(contingutOrigenId);
+			model.addAttribute("moureMateixExpedients", false);
+			model.addAttribute(command);
+			break;
 		}
 	}
 

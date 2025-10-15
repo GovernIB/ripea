@@ -1,19 +1,24 @@
 package es.caib.ripea.back.controller;
 
-import com.fasterxml.jackson.databind.JsonMappingException;
-import es.caib.ripea.back.command.DescarregaCommand;
-import es.caib.ripea.back.command.DocumentCommand;
-import es.caib.ripea.back.command.DocumentCommand.CreateDigital;
-import es.caib.ripea.back.command.DocumentCommand.CreateFirmaSeparada;
-import es.caib.ripea.back.command.DocumentCommand.DocumentFisicOrigenEnum;
-import es.caib.ripea.back.command.DocumentCommand.UpdateDigital;
-import es.caib.ripea.back.command.DocumentGenericCommand;
-import es.caib.ripea.back.helper.*;
-import es.caib.ripea.service.intf.config.PropertyConfig;
-import es.caib.ripea.service.intf.dto.*;
-import es.caib.ripea.service.intf.exception.*;
-import es.caib.ripea.service.intf.service.*;
-import es.caib.ripea.service.intf.utils.Utils;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.net.ConnectException;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
@@ -22,8 +27,6 @@ import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.propertyeditors.CustomDateEditor;
-import org.springframework.beans.propertyeditors.StringArrayPropertyEditor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -32,20 +35,74 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.net.ConnectException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import com.fasterxml.jackson.databind.JsonMappingException;
+
+import es.caib.ripea.back.command.DescarregaCommand;
+import es.caib.ripea.back.command.DocumentCommand;
+import es.caib.ripea.back.command.DocumentCommand.CreateDigital;
+import es.caib.ripea.back.command.DocumentCommand.CreateFirmaSeparada;
+import es.caib.ripea.back.command.DocumentCommand.DocumentFisicOrigenEnum;
+import es.caib.ripea.back.command.DocumentCommand.UpdateDigital;
+import es.caib.ripea.back.command.DocumentGenericCommand;
+import es.caib.ripea.back.helper.ArxiuTemporalHelper;
+import es.caib.ripea.back.helper.BeanGeneratorHelper;
+import es.caib.ripea.back.helper.DocumentHelper;
+import es.caib.ripea.back.helper.EnumHelper;
+import es.caib.ripea.back.helper.ExceptionHelper;
+import es.caib.ripea.back.helper.FitxerTemporalHelper;
+import es.caib.ripea.back.helper.JsonResponse;
+import es.caib.ripea.back.helper.MissatgesHelper;
+import es.caib.ripea.back.helper.RequestSessionHelper;
+import es.caib.ripea.back.helper.RolHelper;
+import es.caib.ripea.service.intf.config.PropertyConfig;
+import es.caib.ripea.service.intf.dto.ArbreDto;
+import es.caib.ripea.service.intf.dto.ArxiuEstatEnumDto;
+import es.caib.ripea.service.intf.dto.ArxiuFirmaDetallDto;
+import es.caib.ripea.service.intf.dto.ContingutDto;
+import es.caib.ripea.service.intf.dto.DadaDto;
+import es.caib.ripea.service.intf.dto.DescarregaDto;
+import es.caib.ripea.service.intf.dto.DigitalitzacioEstatDto;
+import es.caib.ripea.service.intf.dto.DigitalitzacioResultatDto;
+import es.caib.ripea.service.intf.dto.DocumentDto;
+import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentFirmaTipusEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentNtiEstadoElaboracionEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentNtiTipoDocumentalEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentTipusFirmaEnumDto;
+import es.caib.ripea.service.intf.dto.EntitatDto;
+import es.caib.ripea.service.intf.dto.ExpedientCarpetaArbreDto;
+import es.caib.ripea.service.intf.dto.FitxerDto;
+import es.caib.ripea.service.intf.dto.FitxerTemporalDto;
+import es.caib.ripea.service.intf.dto.MetaDadaDto;
+import es.caib.ripea.service.intf.dto.MetaDocumentDto;
+import es.caib.ripea.service.intf.dto.NtiOrigenEnumDto;
+import es.caib.ripea.service.intf.dto.PermissionEnumDto;
+import es.caib.ripea.service.intf.dto.Resum;
+import es.caib.ripea.service.intf.dto.SignatureInfoDto;
+import es.caib.ripea.service.intf.exception.ArxiuJaGuardatException;
+import es.caib.ripea.service.intf.exception.ArxiuNotFoundDocumentException;
+import es.caib.ripea.service.intf.exception.NotFoundException;
+import es.caib.ripea.service.intf.exception.ValidacioFirmaException;
+import es.caib.ripea.service.intf.exception.ValidationException;
+import es.caib.ripea.service.intf.service.AplicacioService;
+import es.caib.ripea.service.intf.service.CarpetaService;
+import es.caib.ripea.service.intf.service.ContingutService;
+import es.caib.ripea.service.intf.service.DigitalitzacioService;
+import es.caib.ripea.service.intf.service.DocumentService;
+import es.caib.ripea.service.intf.service.ExpedientService;
+import es.caib.ripea.service.intf.service.ExpedientTascaService;
+import es.caib.ripea.service.intf.service.MetaDadaService;
+import es.caib.ripea.service.intf.service.MetaDocumentService;
+import es.caib.ripea.service.intf.service.OrganGestorService;
+import es.caib.ripea.service.intf.utils.Utils;
 
 /**
  * Controlador per al manteniment de documents.
@@ -151,22 +208,30 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			model.addAttribute("tascaId", tascaId);
 		}
 		
+		carregaInfoCarpetesForm(
+				model,
+				command,
+				RolHelper.getRolActual(request),
+				entitatActual.getId(),
+				document!=null && document.getExpedientId()!=null?document.getExpedientId():pareId);
+		
+		return "contingutDocumentForm";
+	}
+	
+	private void carregaInfoCarpetesForm(Model model, DocumentCommand command, String rolActual, Long entitatId, Long expedientId) {
 		try {
 			List<ArbreDto<ExpedientCarpetaArbreDto>> carpetes = carpetaService.findArbreCarpetesExpedient(
-					entitatActual.getId(),
+					entitatId,
 					null,
-					document!=null && document.getExpedientId()!=null?document.getExpedientId():pareId,
-					RolHelper.getRolActual(request));
+					expedientId,
+					rolActual);
 			model.addAttribute("carpetes", carpetes);
 			model.addAttribute("jstreeJson", command.getEstructuraCarpetesJson());
 			model.addAttribute("selectedCarpeta", command.getDestiId());
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
-		
 		model.addAttribute("isPermesCrearCarpetes", isPermesCrearCarpetes());
-		
-		return "contingutDocumentForm";
 	}
 
 	private void setTipusFirma(DocumentCommand command, DocumentDto document) {
@@ -1774,7 +1839,6 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		}
 		
 	}
-
 	
 	private void omplirModelFormulari(
 			HttpServletRequest request,
@@ -1792,6 +1856,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 							contingutId, 
 							null,
 							false));
+			//Al crear es permet triar carpeta, al modificar no.
+			carregaInfoCarpetesForm(model, command, RolHelper.getRolActual(request), entitatActual.getId(), contingutId);
 		} else {
 			model.addAttribute(
 					"metaDocuments",

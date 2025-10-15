@@ -102,13 +102,13 @@ const useCarpetaActions = (entity:any, refresh?: () => void) => {
             onClick: handleMoure,
             hidden: !entity?.potModificar || !user?.sessionScope?.isCreacioCarpetesActiva,
         },
-        {
+        /*{
             label: t('page.contingut.action.copy.label'),
             icon: "file_copy",
             showInMenu: true,
             onClick: handleCopiar,
             hidden: !entity?.potModificar || !user?.sessionScope?.isCreacioCarpetesActiva || !user?.sessionScope?.isMostrarCopiar,
-        },
+        },*/
         {
             label: t('page.carpeta.action.delete.label'),
             icon: "delete",

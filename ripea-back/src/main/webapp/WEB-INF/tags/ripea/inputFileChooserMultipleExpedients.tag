@@ -87,12 +87,11 @@ a.list-group-item {
 
 </style>
 <script>
+
 String.prototype.replaceAll = function(search, replacement) {
     var target = this;
     return target.split(search).join(replacement);
 };
-
-
 
 function changeSelected(selectedId, campPath) {
 	//removing previously visually selected container
@@ -104,14 +103,9 @@ function changeSelected(selectedId, campPath) {
 	$('#file-chooser-panel-'+selectedId).css('border-color', '#2e6da4');
 	$('#file-chooser-path-'+selectedId).css('background-color', '#337ab7');
 	$('#file-chooser-path-'+selectedId).css('border-color', '#2e6da4');
-
-
-
 	$('#file-chooser-panel-'+selectedId).addClass("selected");
 	$("input#" + campPath).val(selectedId);
-	
 }
-
 
 function refrescarOne(campPath, contenidorId, prevContenidorId) {
 
@@ -121,6 +115,7 @@ function refrescarOne(campPath, contenidorId, prevContenidorId) {
 		async: false,
 		timeout: 20000,
 		success: function(data) { //returns container of the given element (it returns the folder in which document is situated and if there is no parent folder it returns expedient)
+
 			var ocultarExpedients = <c:choose><c:when test="${ocultarExpedients}">true</c:when><c:otherwise>false</c:otherwise></c:choose>;
 			var ocultarCarpetes = <c:choose><c:when test="${ocultarCarpetes}">true</c:when><c:otherwise>false</c:otherwise></c:choose>;
 			var ocultarDocuments = <c:choose><c:when test="${ocultarDocuments}">true</c:when><c:otherwise>false</c:otherwise></c:choose>;
@@ -146,12 +141,10 @@ function refrescarOne(campPath, contenidorId, prevContenidorId) {
 				path = path.replaceAll('#D#', '<span class="fa fa-file"></span>');
 			}
 	
-	
 			$("#file-chooser-panel-"+data.id).append('<div id="file-chooser-path-'+data.id+'" class="panel-heading"></div>');
 			$("#file-chooser-path-"+data.id).html('');
 			$("#file-chooser-path-"+data.id).append(path);
 			$("#file-chooser-panel-"+data.id).append('<div id="file-chooser-content-'+data.id+'" class="panel-body"></div>');
-			
 	
 			// SETTING CONTENT IN THE PANEL BODY
 			$("#file-chooser-content-"+data.id).html('');
@@ -159,7 +152,10 @@ function refrescarOne(campPath, contenidorId, prevContenidorId) {
 			if (!data.expedient) {
 				$('<a data-id="' + data.pare.id + '" class="list-group-item"><span class="fa fa-level-up fa-flip-horizontal"></span> ..</a>').appendTo("#file-chooser-content-"+data.id);
 			} else {
-				$('<a data-id="returnAll" class="list-group-item"><span class="fa fa-level-up fa-flip-horizontal"></span> ..</a>').appendTo("#file-chooser-content-"+data.id);
+				//SI estam en un expedient, no deixam anar cap amunt si no es poden mostrar els altres expedients (mourer contingut entre expedients).
+				if (!${moureMateixExpedients}) {
+					$('<a data-id="returnAll" class="list-group-item"><span class="fa fa-level-up fa-flip-horizontal"></span> ..</a>').appendTo("#file-chooser-content-"+data.id);
+				}
 			}
 			if(data.fills){
 				for (var i = 0; i < data.fills.length; i++) {
@@ -182,7 +178,6 @@ function refrescarOne(campPath, contenidorId, prevContenidorId) {
 			$('</div>').appendTo("#file-chooser-content-"+data.id);
 
 			changeSelected(contenidorId, campPath);
-
 	
 			// SETTING EVENT HANDLER FOR CLICKING FILES OR FOLDERS IN THE PANEL BODY
 			$("#file-chooser-content-"+data.id + " a").click(function() {
@@ -196,7 +191,6 @@ function refrescarOne(campPath, contenidorId, prevContenidorId) {
 			});
 				
 			webutilModalAdjustHeight();
-			
 		},
 		error: function(xhr, textStatus, errorThrown) {
 			console.log("<spring:message code="peticio.ajax.error"/>: " + xhr.responseText);
@@ -207,8 +201,6 @@ function refrescarOne(campPath, contenidorId, prevContenidorId) {
 		}
     });
 }
-
-
 
 function loadFileChooser(campPath, contenidorId) {
 	if (!${moureMateixExpedients}) {
@@ -248,24 +240,15 @@ function loadFileChooser(campPath, contenidorId) {
 				path = path.replaceAll('#D#', '<span class="fa fa-file"></span>');
 			}
 
-
 			$("#file-chooser-input").append('<div id="file-chooser-panel-'+data.id+'" class="panel panel-default"></div>');
 			$("#file-chooser-panel-"+data.id).append('<div id="file-chooser-path-'+data.id+'" class="panel-heading"></div>');
 			$("#file-chooser-path-"+data.id).html('');
 			$("#file-chooser-path-"+data.id).append(path);
 
-			
-
-
-			
-
 			// SETTING EVENT HANDLER FOR CLICKING FILES OR FOLDERS IN THE PANEL BODY
 			$(".panel").click(function() {
-				
 				var idStr = $(this).attr('id');
 				var idStrRes = idStr.replace("file-chooser-panel-", "");
-
-				
 				refrescarOne(campPath, idStrRes, data.id);	
 			});
 

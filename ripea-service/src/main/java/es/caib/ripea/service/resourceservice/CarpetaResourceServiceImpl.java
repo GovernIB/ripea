@@ -18,6 +18,7 @@ import es.caib.ripea.persistence.entity.CarpetaEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.resourceentity.CarpetaResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.CarpetaResourceRepository;
+import es.caib.ripea.persistence.entity.resourcerepository.ContingutResourceRepository;
 import es.caib.ripea.persistence.repository.CarpetaRepository;
 import es.caib.ripea.persistence.repository.ContingutRepository;
 import es.caib.ripea.persistence.repository.EntitatRepository;
@@ -58,6 +59,7 @@ public class CarpetaResourceServiceImpl extends BaseMutableResourceService<Carpe
 	private final CarpetaRepository carpetaRepository;
 	private final ContingutRepository contingutRepository;
 	private final CarpetaResourceRepository carpetaResourceRepository;
+	private final ContingutResourceRepository contingutResourceRepository;
 	
 	private final ContingutHelper contingutHelper;
 	private final ExcepcioLogHelper excepcioLogHelper;
@@ -124,7 +126,7 @@ public class CarpetaResourceServiceImpl extends BaseMutableResourceService<Carpe
         			Long reorderPreviousParentId = reorderGetParentId(carpetaResourceActual);
         			Long reorderResourceSequence = reorderGetSequenceFromResourceOrEntity(resource, carpetaResourceActual);
     				if (!Objects.equals(resource.getPare().getId(), carpetaResourceActual.getPare().getId())) {
-    					carpetaResourceActual.setPare(carpetaResourceRepository.findById(resource.getPare().getId()).get());
+    					carpetaResourceActual.setPare(contingutResourceRepository.findById(resource.getPare().getId()).get());
     				}
     				reorderIfReorderable(
     						carpetaResourceActual,
