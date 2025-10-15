@@ -13,6 +13,7 @@ const TITLES: any = {
     '/seguimentArxiuPendents': "navigate.massiu.seguimentArxiuPendents",
     '/massiu/csv': "navigate.massiu.csv",
     '/massiu/definitiu': "navigate.massiu.definitiu",
+    '/massiu/canviPrioritats': "navigate.massiu.canviPrioritats",
 };
 
 export const setTitlePage = (title:string) => {

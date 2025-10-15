@@ -764,7 +764,7 @@ const useAccionesMassivas = () => {
                     id: 'prioritat',
                     title: t('page.user.massive.prioritat'),
                     // icon: '',
-                    onClick: ()=> toProgramaAntic('massiu/canviPrioritats'),
+                    to: '/massiu/canviPrioritats',
                 },
                 {
                     divider: true,

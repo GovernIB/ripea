@@ -57,7 +57,9 @@ const FirmaNavegadorGrid = () => {
 
     return <GridPage disableMargins>
         <CardPage title={t('navigate.massiu.firmasimpleweb')}>
-            <EnviarPortafirmesFilter sessionKey={"MASSIVE_FIRMA_NAVEGADOR_FILTER"} onSpringFilterChange={setSpringFilter}/>
+            <EnviarPortafirmesFilter
+                sessionKey={"MASSIVE_FIRMA_NAVEGADOR_FILTER"}
+                onSpringFilterChange={setSpringFilter}/>
 
             <StyledMuiGrid
                 apiRef={apiRef}

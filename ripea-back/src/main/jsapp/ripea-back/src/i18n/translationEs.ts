@@ -108,6 +108,7 @@ const translationEs = {
             seguimentArxiuPendents: "Acción masiva: Custodiar elementos pendientes",
             csv: "Acción masiva: copiar enlace CSV",
             definitiu: "Acción masiva: marcar documentos como definitivos",
+            canviPrioritats: "Acción masiva: Cambio de prioridad de expedientes",
         },
     },
     page: {

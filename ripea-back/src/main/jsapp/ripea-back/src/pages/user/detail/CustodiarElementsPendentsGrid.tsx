@@ -10,18 +10,41 @@ import GridFormField from "../../../components/GridFormField.tsx";
 import {Grid} from "@mui/material";
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
 
-// Expedient
-const CustodiarExpedientsPendentsFilterFrom = () => {
+const sortModel:any = [{field: 'createdDate', sort: 'desc'}]
+const CustodiarPendentsFilterFrom = (props:any) => {
+    const { filtrarExpedient = false } = props
+    const {data} = useFormContext();
+
+    const expedientFilter = builder.and(builder.eq('metaExpedient.id', data?.procediment?.id));
+
     return <>
         <GridFormField xs={4} name="nom"/>
         <GridFormField xs={4} name="procediment"/>
-        <Grid item xs={4}/>
+        {!!filtrarExpedient
+            ?<GridFormField xs={4} name="expedient" filter={expedientFilter}/>
+            :<Grid item xs={4}/>
+        }
         <GridFormField xs={4} name="dataCreacioInici" type={"date"}/>
         <GridFormField xs={4} name="dataCreacioFi" type={"date"}/>
         <Grid item xs={1.6}/>
     </>
 }
 
+const CustodiarPendentsFilter = (props: any) => {
+    const {onSpringFilterChange, sessionKey, springFilterBuilder, filtrarExpedient = false} = props;
+    return <StyledMuiFilter
+        resourceName={"expedientResource"}
+        code={"MASSIVE_CUSTODIAR_FILTER"}
+        sessionKey={sessionKey}
+        springFilterBuilder={springFilterBuilder}
+        onSpringFilterChange={onSpringFilterChange}
+        filterOnFieldEnterKeyPressed
+    >
+        <CustodiarPendentsFilterFrom filtrarExpedient={filtrarExpedient}/>
+    </StyledMuiFilter>
+}
+
+// Expedient
 const springExpedientFilterBuilder = (data: any) => {
     return builder.and(
         builder.like("nom", data?.nom),
@@ -30,21 +53,6 @@ const springExpedientFilterBuilder = (data: any) => {
     );
 }
 
-const CustodiarExpedientsPendentsFilter = (props: any) => {
-    const {onSpringFilterChange} = props;
-    return <StyledMuiFilter
-        resourceName={"expedientResource"}
-        code={"MASSIVE_CUSTODIAR_FILTER"}
-        sessionKey={"MASSIVE_CUSTODIAR_EXPEDIENT_FILTER"}
-        springFilterBuilder={springExpedientFilterBuilder}
-        onSpringFilterChange={onSpringFilterChange}
-        filterOnFieldEnterKeyPressed
-    >
-        <CustodiarExpedientsPendentsFilterFrom/>
-    </StyledMuiFilter>
-}
-
-const expedientSortModel:any = [{field: 'createdDate', sort: 'desc'}]
 const expedientColumns = [
     {
         field: 'nom',
@@ -71,6 +79,10 @@ const CustodiarExpedientsPendentsGrid = () => {
     const apiRef = useMuiDataGridApiRef();
     const [springFilter, setSpringFilter] = useState<string>();
 
+    const refresh = () => {
+        apiRef?.current?.refresh?.();
+    }
+
     const actions = [
         {
             label: t('page.contingut.action.custodiar.label'),
@@ -88,7 +100,10 @@ const CustodiarExpedientsPendentsGrid = () => {
     ]
 
     return <GridPage disableMargins>
-        <CustodiarExpedientsPendentsFilter onSpringFilterChange={setSpringFilter}/>
+        <CustodiarPendentsFilter
+            sessionKey={"MASSIVE_CUSTODIAR_EXPEDIENT_FILTER"}
+            springFilterBuilder={springExpedientFilterBuilder}
+            onSpringFilterChange={setSpringFilter}/>
 
         <StyledMuiGrid
             apiRef={apiRef}
@@ -96,7 +111,7 @@ const CustodiarExpedientsPendentsGrid = () => {
             columns={expedientColumns}
             filter={springFilter}
             // TODO: filtrar pot custodiar
-            sortModel={expedientSortModel}
+            sortModel={sortModel}
 
             rowAdditionalActions={actions}
             toolbarMassiveActions={massiveActions}
@@ -107,21 +122,6 @@ const CustodiarExpedientsPendentsGrid = () => {
 }
 
 // Document
-const CustodiarDocumentsPendentsFilterFrom = () => {
-    const {data} = useFormContext();
-
-    const expedientFilter = builder.and(builder.eq('metaExpedient.id', data?.procediment?.id));
-
-    return <>
-        <GridFormField xs={4} name="nom"/>
-        <GridFormField xs={4} name="procediment"/>
-        <GridFormField xs={4} name="expedient" filter={expedientFilter}/>
-        <GridFormField xs={4} name="dataCreacioInici" type={"date"}/>
-        <GridFormField xs={4} name="dataCreacioFi" type={"date"}/>
-        <Grid item xs={1.6}/>
-    </>
-}
-
 const springDocumentFilterBuilder = (data: any) => {
     return builder.and(
         builder.like("nom", data?.nom),
@@ -131,21 +131,6 @@ const springDocumentFilterBuilder = (data: any) => {
     );
 }
 
-const CustodiarDocumentsPendentsFilter = (props: any) => {
-    const {onSpringFilterChange} = props;
-    return <StyledMuiFilter
-        resourceName={"expedientResource"}
-        code={"MASSIVE_CUSTODIAR_FILTER"}
-        sessionKey={"MASSIVE_CUSTODIAR_DOCUMENT_FILTER"}
-        springFilterBuilder={springDocumentFilterBuilder}
-        onSpringFilterChange={onSpringFilterChange}
-        filterOnFieldEnterKeyPressed
-    >
-        <CustodiarDocumentsPendentsFilterFrom/>
-    </StyledMuiFilter>
-}
-
-const documentSortModel:any = [{field: 'createdDate', sort: 'desc'}]
 const documentColumns = [
     {
         field: 'nom',
@@ -176,6 +161,10 @@ const CustodiarDocumentsPendentsGrid = () => {
     const apiRef = useMuiDataGridApiRef();
     const [springFilter, setSpringFilter] = useState<string>();
 
+    const refresh = () => {
+        apiRef?.current?.refresh?.();
+    }
+
     const actions = [
         {
             label: t('page.contingut.action.custodiar.label'),
@@ -193,7 +182,11 @@ const CustodiarDocumentsPendentsGrid = () => {
     ]
 
     return <GridPage disableMargins>
-        <CustodiarDocumentsPendentsFilter onSpringFilterChange={setSpringFilter}/>
+        <CustodiarPendentsFilter
+            sessionKey={"MASSIVE_CUSTODIAR_DOCUMENT_FILTER"}
+            springFilterBuilder={springDocumentFilterBuilder}
+            onSpringFilterChange={setSpringFilter}
+            filtrarExpedient/>
 
         <StyledMuiGrid
             apiRef={apiRef}
@@ -201,7 +194,7 @@ const CustodiarDocumentsPendentsGrid = () => {
             columns={documentColumns}
             filter={springFilter}
             // TODO: filtrar pot custodiar
-            sortModel={documentSortModel}
+            sortModel={sortModel}
 
             rowAdditionalActions={actions}
             toolbarMassiveActions={massiveActions}
@@ -212,21 +205,6 @@ const CustodiarDocumentsPendentsGrid = () => {
 }
 
 // Interessat
-const CustodiarInteressatsPendentsFilterFrom = () => {
-    const {data} = useFormContext();
-
-    const expedientFilter = builder.and(builder.eq('metaExpedient.id', data?.procediment?.id));
-
-    return <>
-        <GridFormField xs={4} name="nom"/>
-        <GridFormField xs={4} name="procediment"/>
-        <GridFormField xs={4} name="expedient" filter={expedientFilter}/>
-        <GridFormField xs={4} name="dataCreacioInici" type={"date"}/>
-        <GridFormField xs={4} name="dataCreacioFi" type={"date"}/>
-        <Grid item xs={1.6}/>
-    </>
-}
-
 const springInteressatFilterBuilder = (data: any) => {
     return builder.and(
         builder.like("nom", data?.nom),
@@ -236,21 +214,6 @@ const springInteressatFilterBuilder = (data: any) => {
     );
 }
 
-const CustodiarInteressatsPendentsFilter = (props: any) => {
-    const {onSpringFilterChange} = props;
-    return <StyledMuiFilter
-        resourceName={"expedientResource"}
-        code={"MASSIVE_CUSTODIAR_FILTER"}
-        sessionKey={"MASSIVE_CUSTODIAR_INTERESSAT_FILTER"}
-        springFilterBuilder={springInteressatFilterBuilder}
-        onSpringFilterChange={onSpringFilterChange}
-        filterOnFieldEnterKeyPressed
-    >
-        <CustodiarInteressatsPendentsFilterFrom/>
-    </StyledMuiFilter>
-}
-
-const interessatSortModel:any = [{field: 'createdDate', sort: 'desc'}]
 const interessatColumns = [
     {
         field: 'nom',
@@ -281,6 +244,10 @@ const CustodiarInteressatsPendentsGrid = () => {
     const apiRef = useMuiDataGridApiRef();
     const [springFilter, setSpringFilter] = useState<string>();
 
+    const refresh = () => {
+        apiRef?.current?.refresh?.();
+    }
+
     const actions = [
         {
             label: t('page.contingut.action.custodiar.label'),
@@ -298,7 +265,11 @@ const CustodiarInteressatsPendentsGrid = () => {
     ]
 
     return <GridPage disableMargins>
-        <CustodiarInteressatsPendentsFilter onSpringFilterChange={setSpringFilter}/>
+        <CustodiarPendentsFilter
+            sessionKey={"MASSIVE_CUSTODIAR_INTERESSAT_FILTER"}
+            springFilterBuilder={springInteressatFilterBuilder}
+            onSpringFilterChange={setSpringFilter}
+            filtrarExpedient/>
 
         <StyledMuiGrid
             apiRef={apiRef}
@@ -306,7 +277,7 @@ const CustodiarInteressatsPendentsGrid = () => {
             columns={interessatColumns}
             filter={springFilter}
             // TODO: filtrar pot custodiar
-            sortModel={interessatSortModel}
+            sortModel={sortModel}
 
             rowAdditionalActions={actions}
             toolbarMassiveActions={massiveActions}

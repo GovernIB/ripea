@@ -4,7 +4,7 @@ import {useState} from "react";
 import { CardPage } from "../../../components/CardData.tsx";
 import {CanviEstatFilter, CanviEstatMuiGrid} from "./CanviEstatGrid.tsx";
 
-const TancarGrid = () => {
+const CanviPrioritatGrid = () => {
     const {t} = useTranslation();
     const apiRef = useMuiDataGridApiRef();
     const [springFilter, setSpringFilter] = useState<string>();
@@ -15,31 +15,30 @@ const TancarGrid = () => {
 
     const actions = [
         {
-            label: t('page.document.action.close.label'),
-            icon: "check",
+            label: t('page.expedient.action.changePrioritat.label'),
+            icon: "logout",
             showInMenu: false,
         },
     ]
     // TODO: crear acción massiva
     const massiveActions = [
         {
-            label: t('page.document.action.close.label'),
-            icon: "check",
+            label: t('page.expedient.action.changePrioritat.label'),
+            icon: "logout",
             showInMenu: false,
         },
     ]
 
     return <GridPage disableMargins>
-        <CardPage title={t('navigate.massiu.tancament')}>
+        <CardPage title={t('navigate.massiu.canviPrioritats')}>
             <CanviEstatFilter
-                sessionKey={"MASSIVE_TANCAR_FILTER"}
+                sessionKey={"MASSIVE_CANVI_PRIORITAT_FILTER"}
                 onSpringFilterChange={setSpringFilter}
                 findExpedientByName/>
 
             <CanviEstatMuiGrid
                 apiRef={apiRef}
                 filter={springFilter}
-                // TODO: filtrar por expediente puede cerrar
 
                 rowAdditionalActions={actions}
                 toolbarMassiveActions={massiveActions}
@@ -47,4 +46,4 @@ const TancarGrid = () => {
         </CardPage>
     </GridPage>
 }
-export default TancarGrid;
+export default CanviPrioritatGrid;

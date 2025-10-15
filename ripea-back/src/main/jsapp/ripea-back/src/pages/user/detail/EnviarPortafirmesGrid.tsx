@@ -1,13 +1,14 @@
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import {GridPage, useFormContext, useMuiDataGridApiRef} from "reactlib";
 import {CardPage} from "../../../components/CardData.tsx";
-import {Alert} from "@mui/material";
+import {Alert, Grid} from "@mui/material";
 import {useTranslation} from "react-i18next";
-import {useState} from "react";
+import {useMemo, useState} from "react";
 import useEnviarPortafirmes from "../../contingut/actions/EnviarPortafirmes.tsx";
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
 import GridFormField from "../../../components/GridFormField.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
+import {useSession} from "../../../components/SessionStorageContext.tsx";
 
 const EnviarPortafirmesFilterForm = () => {
     const {data} = useFormContext();
@@ -16,36 +17,35 @@ const EnviarPortafirmesFilterForm = () => {
     const metaDocumentFilter = builder.eq('metaExpedient.id', data?.procediment?.id || 0);
 
     return <>
-        <GridFormField xs={4} name="procediment"/>
-        <GridFormField xs={4} name="expedient" filter={expedientFilter}/>
-        <GridFormField xs={4} name="metaDocument" filter={metaDocumentFilter}/>
-        <GridFormField xs={3.6} name="nom"/>
+        <GridFormField xs={3} name="procediment"/>
+        <GridFormField xs={3} name="expedient" filter={expedientFilter}/>
+        <GridFormField xs={3} name="metaDocument" filter={metaDocumentFilter}/>
+        <GridFormField xs={3} name="nom"/>
         <GridFormField xs={3} name="dataCreacioInici" type={"date"}/>
         <GridFormField xs={3} name="dataCreacioFi" type={"date"}/>
+        <Grid item xs={3.6}/>
     </>
 }
 
 const springFilterBuilder = (data: any) => {
     return builder.and(
+        builder.like("nom", data?.nom),
         builder.eq("expedient.metaExpedient.id", data?.procediment?.id),
         builder.eq("expedient.id", data?.expedient?.id),
         builder.eq("metaNode.id", data?.metaDocument?.id),
-        builder.like("nom", data?.nom),
         builder.betweenDates("createdDate", data?.dataCreacioInici, data?.dataCreacioFi)
     );
 }
 
 export const EnviarPortafirmesFilter = (props: any) => {
-    const {sessionKey, onSpringFilterChange, setRequirements} = props;
+    const {sessionKey, onSpringFilterChange} = props;
     return <StyledMuiFilter
         resourceName={"documentResource"}
         code={"MASSIVE_PORTAFIRMES_FILTER"}
-        sessionKey={sessionKey || "MASSIVE_PORTAFIRMES_FILTER"}
-        springFilterBuilder={(data:any) => {
-            setRequirements?.(!!data?.procediment && !!data?.metaDocument);
-            return springFilterBuilder(data)
-        }}
+        sessionKey={sessionKey}
+        springFilterBuilder={springFilterBuilder}
         onSpringFilterChange={onSpringFilterChange}
+        filterOnFieldEnterKeyPressed
     >
         <EnviarPortafirmesFilterForm/>
     </StyledMuiFilter>
@@ -80,7 +80,10 @@ const EnviarPortafirmesGrid = () => {
     const {t} = useTranslation();
     const apiRef = useMuiDataGridApiRef();
     const [springFilter, setSpringFilter] = useState<string>();
-    const [haveRequirements, setRequirements] = useState<boolean>(false)
+
+    const sessionKey = "MASSIVE_PORTAFIRMES_FILTER";
+    const { value: filterData } = useSession(sessionKey);
+    const haveRequirements = useMemo(() => !!filterData?.procediment && !!filterData?.metaDocument, [filterData])
 
     const refresh = () => {
         apiRef?.current?.refresh?.();
@@ -112,7 +115,9 @@ const EnviarPortafirmesGrid = () => {
         <CardPage title={t('navigate.massiu.portafirmes')}>
             <Alert severity={'info'} sx={{mb: 1}}>{t('page.document.alert.portafirmes')}</Alert>
 
-            <EnviarPortafirmesFilter setRequirements={setRequirements} onSpringFilterChange={setSpringFilter}/>
+            <EnviarPortafirmesFilter
+                sessionKey={sessionKey}
+                onSpringFilterChange={setSpringFilter}/>
 
             <StyledMuiGrid
                 apiRef={apiRef}

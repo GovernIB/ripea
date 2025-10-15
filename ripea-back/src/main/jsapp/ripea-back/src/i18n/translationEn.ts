@@ -108,6 +108,7 @@ const translationEn = {
             seguimentArxiuPendents: "Mass action: Archive pending items",
             csv: "Mass action: copy CSV link",
             definitiu: "Mass action: mark documents as definitive",
+            canviPrioritats: "Mass action: Change case priority",
         },
     },
     page: {
