@@ -104,18 +104,18 @@ const useInteressatActions = (entity:any, refresh?: () => void) => {
         {
             label: t('page.interessat.title')+"...",
             icon: 'person_add',
-            showInMenu: true,
+            showInMenu: false,
             onClick: () => create({
                 expedient: {id: entity?.id},
                 esRepresentant: false,
             }),
         },
-        {
+        /*{
             label: t('page.interessat.action.importSGD.label'),
             icon: 'group_search',
             showInMenu: true,
             onClick: handleImportarSGD,
-        }
+        }*/
     ]
 
     const actions = [
