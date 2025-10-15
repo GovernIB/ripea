@@ -210,14 +210,14 @@ const DocumentsGrid = (props: any) => {
             if (sourceData.tipus === 'DOCUMENT') {
                 //console.log('>>> document patch', patchData)
                 if (apiDocumentIsReady) {
-                    apiDocumentPatch(sourceData.id, {data: patchData}).then(() => gridApiRef.current.refresh());
+                    apiDocumentPatch(sourceData.id, {data: patchData}).then(() => refresh());
                 } else {
                     console.error('Servei de l\'API pels documents no disponible')
                 }
             } else if (sourceData.tipus === 'CARPETA') {
                 //console.log('>>> carpeta patch', patchData)
                 if (apiCarpetaIsReady) {
-                    apiCarpetaPatch(sourceData.id, {data: patchData}).then(() => gridApiRef.current.refresh());
+                    apiCarpetaPatch(sourceData.id, {data: patchData}).then(() => refresh());
                 } else {
                     console.error('Servei de l\'API per les carpetes no disponible')
                 }
