@@ -83,7 +83,7 @@ const EnviarPortafirmesGrid = () => {
 
     const sessionKey = "MASSIVE_PORTAFIRMES_FILTER";
     const { value: filterData } = useSession(sessionKey);
-    const haveRequirements = useMemo(() => !!filterData?.procediment && !!filterData?.metaDocument, [filterData])
+    const haveRequirements = useMemo(() => !!filterData?.procediment && !!filterData?.metaDocument, [filterData?.procediment, filterData?.metaDocument])
 
     const refresh = () => {
         apiRef?.current?.refresh?.();

@@ -41,6 +41,10 @@ import lombok.experimental.FieldNameConstants;
                         code = ExpedientPeticioResource.FILTER_CODE,
                         formClass = ExpedientPeticioResource.FilterForm.class),
                 @ResourceConfigArtifact(
+                        type = ResourceArtifactType.FILTER,
+                        code = ExpedientPeticioResource.ACTUALITZAR_ESTAT_FILTER_CODE,
+                        formClass = ExpedientPeticioResource.ActualitzarEstatFilter.class),
+                @ResourceConfigArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = ExpedientPeticioResource.PERSPECTIVE_REGISTRE_CODE),
                 @ResourceConfigArtifact(
@@ -68,6 +72,7 @@ import lombok.experimental.FieldNameConstants;
 )
 public class ExpedientPeticioResource extends BaseAuditableResource<Long> {
 
+    public static final String ACTUALITZAR_ESTAT_FILTER_CODE = "ACTUALITZAR_ESTAT_FILTER";
     public static final String FILTER_CODE = "ANOTACIO_FILTER";
 
     public static final String PERSPECTIVE_REGISTRE_CODE = "REGISTRE";
@@ -112,6 +117,16 @@ public class ExpedientPeticioResource extends BaseAuditableResource<Long> {
         private Date dataRecepcioFinal;
         private ExpedientPeticioEstatViewEnumDto estat = ExpedientPeticioEstatViewEnumDto.PENDENT;
         private String interessat;
+    }
+
+    @Getter
+    @Setter
+    public static class ActualitzarEstatFilter implements Serializable {
+        private String numero;
+        private Date dataAltaInici;
+        private Date dataAltaFi;
+        private ExpedientPeticioEstatEnumDto estat;
+        private boolean nomesPendents;
     }
     
     @Getter

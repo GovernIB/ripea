@@ -109,6 +109,7 @@ const translationCa = {
             csv: "Acció massiva: copiar enllaç CSV",
             definitiu: "Acció massiva: marcar documents com definitius",
             canviPrioritats: "Acció massiva: Canvi de prioritat d'expedients",
+            expedientPeticioCanviEstatDistribucio: "Acció massiva: Actualitzar estat de les anotacions a Distribució",
         },
     },
     page: {

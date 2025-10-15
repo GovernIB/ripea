@@ -109,6 +109,7 @@ const translationEn = {
             csv: "Mass action: copy CSV link",
             definitiu: "Mass action: mark documents as definitive",
             canviPrioritats: "Mass action: Change case priority",
+            expedientPeticioCanviEstatDistribucio: "Mass action: Update the status of records in Distribution",
         },
     },
     page: {

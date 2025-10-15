@@ -115,7 +115,7 @@ const CanviEstatGrid = () => {
 
     const sessionKey = "MASSIVE_CANVI_ESTAT_FILTER";
     const { value: filterData } = useSession(sessionKey);
-    const haveRequirements = useMemo(() => !!filterData?.procediment, [filterData])
+    const haveRequirements = useMemo(() => !!filterData?.procediment, [filterData?.procediment])
 
     const refresh = () => {
         apiRef?.current?.refresh?.();

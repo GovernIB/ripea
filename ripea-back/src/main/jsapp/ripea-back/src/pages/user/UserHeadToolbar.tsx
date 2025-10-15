@@ -757,7 +757,7 @@ const useAccionesMassivas = () => {
                     id: 'anotacio',
                     title: t('page.user.massive.anotacio'),
                     // icon: '',
-                    onClick: ()=> toProgramaAntic('massiu/expedientPeticioCanviEstatDistribucio'),
+                    to: 'massiu/expedientPeticioCanviEstatDistribucio',
                     hidden: !isRolActualAdmin,
                 },
                 {

@@ -14,6 +14,7 @@ const TITLES: any = {
     '/massiu/csv': "navigate.massiu.csv",
     '/massiu/definitiu': "navigate.massiu.definitiu",
     '/massiu/canviPrioritats': "navigate.massiu.canviPrioritats",
+    '/massiu/expedientPeticioCanviEstatDistribucio': "navigate.massiu.expedientPeticioCanviEstatDistribucio",
 };
 
 export const setTitlePage = (title:string) => {

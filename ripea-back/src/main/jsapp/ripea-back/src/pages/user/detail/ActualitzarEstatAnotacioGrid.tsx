@@ -1,0 +1,106 @@
+import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
+import {useTranslation} from "react-i18next";
+import {GridPage, useMuiDataGridApiRef} from "reactlib";
+import {useState} from "react";
+import {CardPage} from "../../../components/CardData.tsx";
+import {formatDate} from "../../../util/dateUtils.ts";
+import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
+import * as builder from "../../../util/springFilterUtils.ts";
+import GridFormField, {GridButtonField} from "../../../components/GridFormField.tsx";
+import {Grid} from "@mui/material";
+
+const ActualitzarEstatAnotacioFilterFrom = () => {
+    return <>
+        <GridFormField xs={3} name="numero"/>
+        <GridFormField xs={3} name="dataAltaInici" type={"date"}/>
+        <GridFormField xs={3} name="dataAltaFi" type={"date"}/>
+        <GridFormField xs={2} name="estat"/>
+        <GridButtonField xs={1} icon={"warning"} name="nomesPendents"/>
+        <Grid item xs={9.6}/>
+    </>
+}
+
+const springFilterBuilder = (data: any) => {
+    return builder.and(
+        builder.like("identificador", data?.numero),
+        builder.betweenDates("dataAlta", data?.dataAltaInici, data?.dataAltaFi),
+        builder.eq("estat", `'${data?.estat}'`)
+    );
+}
+
+const ActualitzarEstatAnotacioFilter = (props: any) => {
+    const {onSpringFilterChange} = props;
+    return <StyledMuiFilter
+        resourceName={"expedientPeticioResource"}
+        code={"ACTUALITZAR_ESTAT_FILTER"}
+        springFilterBuilder={springFilterBuilder}
+        onSpringFilterChange={onSpringFilterChange}
+        filterOnFieldEnterKeyPressed
+    >
+        <ActualitzarEstatAnotacioFilterFrom/>
+    </StyledMuiFilter>
+
+}
+
+const sortModel: any = [{field: 'dataAlta', sort: 'desc'}]
+const columns = [
+    {
+        field: 'identificador',
+        flex: 1,
+    },
+    {
+        field: 'dataAlta',
+        flex: 1,
+        valueFormatter: (value: any) => formatDate(value)
+    },
+    {
+        field: 'estat',
+        flex: 1,
+    },
+]
+
+const ActualitzarEstatAnotacioGrid = () => {
+    const {t} = useTranslation();
+    const apiRef = useMuiDataGridApiRef();
+    const [springFilter, setSpringFilter] = useState<string>();
+
+    const refresh = () => {
+        apiRef?.current?.refresh?.();
+    }
+
+    const actions = [
+        {
+            label: t(''),
+            icon: "autorenew",
+            showInMenu: false,
+        },
+    ]
+    // TODO: crear acción massiva
+    const massiveActions = [
+        {
+            label: t(''),
+            icon: "autorenew",
+            showInMenu: false,
+        },
+    ]
+
+    return <GridPage disableMargins>
+        <CardPage title={t('navigate.massiu.expedientPeticioCanviEstatDistribucio')}>
+            <ActualitzarEstatAnotacioFilter onSpringFilterChange={setSpringFilter}/>
+
+            <StyledMuiGrid
+                apiRef={apiRef}
+                resourceName={"expedientPeticioResource"}
+                columns={columns}
+                filter={springFilter}
+                sortModel={sortModel}
+
+                rowAdditionalActions={actions}
+                toolbarMassiveActions={massiveActions}
+
+                toolbarHideCreate
+            />
+        </CardPage>
+    </GridPage>
+}
+export default ActualitzarEstatAnotacioGrid;
