@@ -5,12 +5,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.annotation.PostConstruct;
 
-import es.caib.ripea.persistence.entity.resourceentity.DocumentResourceEntity;
-import es.caib.ripea.persistence.entity.resourcerepository.CarpetaResourceRepository;
-import es.caib.ripea.persistence.entity.resourcerepository.DocumentResourceRepository;
 import org.springframework.stereotype.Service;
 
 import com.turkraft.springfilter.FilterBuilder;
@@ -19,7 +17,10 @@ import com.turkraft.springfilter.parser.Filter;
 import es.caib.ripea.persistence.entity.CarpetaEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.resourceentity.CarpetaResourceEntity;
+import es.caib.ripea.persistence.entity.resourcerepository.CarpetaResourceRepository;
+import es.caib.ripea.persistence.entity.resourcerepository.ContingutResourceRepository;
 import es.caib.ripea.persistence.repository.CarpetaRepository;
+import es.caib.ripea.persistence.repository.ContingutRepository;
 import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.CarpetaHelper;
@@ -27,6 +28,7 @@ import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.ContingutHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
+import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
@@ -55,12 +57,15 @@ public class CarpetaResourceServiceImpl extends BaseMutableResourceService<Carpe
 
 	private final EntitatRepository entitatRepository;
 	private final CarpetaRepository carpetaRepository;
+	private final ContingutRepository contingutRepository;
 	private final CarpetaResourceRepository carpetaResourceRepository;
+	private final ContingutResourceRepository contingutResourceRepository;
 	
 	private final ContingutHelper contingutHelper;
 	private final ExcepcioLogHelper excepcioLogHelper;
 	private final CarpetaHelper carpetaHelper;
 	private final ConfigHelper configHelper;
+	private final PluginHelper pluginHelper;
 	private final ContingutResourceHelper contingutResourceHelper;
 	private final EntityComprovarHelper entityComprovarHelper;
 
@@ -102,10 +107,46 @@ public class CarpetaResourceServiceImpl extends BaseMutableResourceService<Carpe
 					null, 
 					true);
 			resource.setId(carpetaCreada.getId());
+//			reorderIfReorderable(carpetaResourceRepository.findById(carpetaCreada.getId()).get(), null, null, true, false);
     	} catch (ValidationException ex) {
     		throw ex;
     	} catch (Exception ex) {
     		excepcioLogHelper.addExcepcio("/carpeta/"+resource.getId()+"/create", ex);
+    	}
+    	return resource;
+    }
+    
+    @Override
+	public CarpetaResource update(Long id, CarpetaResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotFoundException {
+    	try {
+    		if (resource.isOrdrePatch()) {
+        		CarpetaEntity carpetaActual = carpetaRepository.findById(resource.getId()).get();
+        		if (resource.isOrdrePatch()) {
+        			CarpetaResourceEntity carpetaResourceActual = carpetaResourceRepository.findById(resource.getId()).get();
+        			Long reorderPreviousParentId = reorderGetParentId(carpetaResourceActual);
+        			Long reorderResourceSequence = reorderGetSequenceFromResourceOrEntity(resource, carpetaResourceActual);
+    				if (!Objects.equals(resource.getPare().getId(), carpetaResourceActual.getPare().getId())) {
+    					carpetaResourceActual.setPare(contingutResourceRepository.findById(resource.getPare().getId()).get());
+    				}
+    				reorderIfReorderable(
+    						carpetaResourceActual,
+    						reorderResourceSequence,
+    						reorderPreviousParentId,
+    						true,
+    						false);
+					boolean parentIdChanged = !Objects.equals(carpetaResourceActual.getOrderParentId(), reorderPreviousParentId);
+					if (parentIdChanged) {
+	    				//mourer també al arxiu
+	    				pluginHelper.arxiuCarpetaMoure(
+	    						(CarpetaEntity)carpetaActual,
+	    						contingutRepository.findById(carpetaResourceActual.getOrderParentId()).get().getArxiuUuid());
+					}
+        		} else {
+            		//TODO: ara mateix falla arxiu al renombrar una carpeta
+        		}
+    		}
+    	} catch (Exception ex) {
+    		excepcioLogHelper.addExcepcio("/carpeta/"+resource.getId()+"/update", ex);
     	}
     	return resource;
     }

@@ -463,7 +463,7 @@ public class ContingutHelper {
 	}
 
 	private ExpedientDto calculateExpedientPare(ContingutDto resposta, ContingutEntity contingut, ToContingutParams params) {
-		if (contingut instanceof ExpedientEntity) {
+		if (contingut instanceof ExpedientEntity) { //Si es un proxy de hibernate el contingut, no funcionará
 			return (ExpedientDto) resposta;
 		} else if (params.getExpedientDto() != null) {
 			return params.getExpedientDto();
@@ -993,7 +993,7 @@ public class ContingutHelper {
 		}
 		resposta.setId(contingut.getId());
 		resposta.setNom(contingut.getNom());
-		
+		resposta.setOrdre(contingut.getOrdre());
 		return resposta;
 	}
 	
@@ -1026,7 +1026,11 @@ public class ContingutHelper {
 		resposta.setId(contingut.getId());
 		resposta.setNom(contingut.getNom());
 		resposta.setPath(pathCalculatPerThisContingut);
-
+		ExpedientDto expPare = new ExpedientDto();
+		expPare.setId(contingut.getExpedientPare().getId());
+		expPare.setNom(contingut.getExpedientPare().getNom());
+		resposta.setExpedientPare(expPare);
+		;
 		List<ContingutEntity> fills = new ArrayList<ContingutEntity>();
 		if (isOrdenacioPermesa()) {
 			fills = contingutRepository.findByPareAndEsborratAndOrdenatOrdre(contingut, 0);
@@ -1492,7 +1496,6 @@ public class ContingutHelper {
 			// Elimina contingut a l'arxiu
 			arxiuPropagarEliminacio(contingut);
 		}
-
 	}
 
 	public boolean conteDocumentsDefinitius(ContingutEntity contingut) {
@@ -1705,16 +1708,6 @@ public class ContingutHelper {
 					contingutOrigen.getClass(),
 					"Només es poden copiar documents");
 		}
-		// TODO Mirar què passa amb els documents firmats
-		if (contingutOrigen instanceof DocumentEntity) {
-			DocumentEntity documentOrigen = (DocumentEntity)contingutOrigen;
-			if (documentOrigen.isFirmat()) {
-				throw new ValidationException(
-						contingutOrigenId,
-						contingutOrigen.getClass(),
-						"No es poden copiar documents firmats");
-			}
-		}
 		// Es comprova que el procediment orígen i destí son el mateix
 		ExpedientEntity expedientOrigen = getExpedientSuperior(
 				contingutOrigen,
@@ -1751,6 +1744,8 @@ public class ContingutHelper {
 				contingutDesti,
 				recursiu);
 		
+		reOrdenaContingut(contingutOrigen, null);
+		
 		if (contingutDesti.getExpedient() == null) {
 			contingutCopia.updateExpedient((ExpedientEntity) contingutDesti);
 		} else {
@@ -1776,7 +1771,7 @@ public class ContingutHelper {
 			EntitatEntity entitat,
 			ContingutEntity contingutOrigen,
 			ContingutEntity contingutDesti,
-			boolean recursiu) {
+			boolean recursiu) {		//Canviar el nom del document per diferenciar-lo del original
 		ContingutEntity creat = null;
 		if (contingutOrigen instanceof CarpetaEntity) {
 			CarpetaEntity carpetaOrigen = (CarpetaEntity)contingutOrigen;
@@ -1790,7 +1785,7 @@ public class ContingutHelper {
 			DocumentEntity documentOrigen = (DocumentEntity)contingutOrigen;
 			creat = documentHelper.crearDocumentDB(
 					documentOrigen.getDocumentTipus(),
-					documentOrigen.getNom(),
+					documentOrigen.getNom()+" (copia)",
 					documentOrigen.getDescripcio(),
 					documentOrigen.getData(),
 					documentOrigen.getDataCaptura(),
@@ -1893,12 +1888,12 @@ public class ContingutHelper {
 					"No es poden moure elements dins de si mateixos");
 		}
 		
-		if (contingutDesti instanceof DocumentEntity) {
-			throw new ValidationException(
-					contingutDestiId,
-					contingutDesti.getClass(),
-					"Només es poden moure elements dins d'una carpeta");
-		}
+//		if (contingutDesti instanceof DocumentEntity) {
+//			throw new ValidationException(
+//					contingutDestiId,
+//					contingutDesti.getClass(),
+//					"Només es poden moure elements dins d'una carpeta");
+//		}
 		
 		// Comprova que no es mou dins de un fill
 		if (contingutOrigen instanceof CarpetaEntity && isCarpetaLogica()) {
@@ -1906,22 +1901,22 @@ public class ContingutHelper {
 		}
 		
 		// Comprova el tipus del contingut que es vol moure
-		if (contingutOrigen instanceof CarpetaEntity && !isCarpetaLogica()) {
-			throw new ValidationException(
-					contingutOrigenId,
-					contingutOrigen.getClass(),
-					"Només es poden moure documents");
-		}
+//		if (contingutOrigen instanceof CarpetaEntity && !isCarpetaLogica()) {
+//			throw new ValidationException(
+//					contingutOrigenId,
+//					contingutOrigen.getClass(),
+//					"Només es poden moure documents");
+//		}
 		// No es poden moure documents firmats
-		if (contingutOrigen instanceof DocumentEntity) {
-			DocumentEntity documentOrigen = (DocumentEntity)contingutOrigen;
-			if (documentOrigen.isFirmat() && !isCarpetaLogica()) {
-				throw new ValidationException(
-						contingutOrigenId,
-						contingutOrigen.getClass(),
-						"No es poden moure documents firmats");
-			}
-		}
+//		if (contingutOrigen instanceof DocumentEntity) {
+//			DocumentEntity documentOrigen = (DocumentEntity)contingutOrigen;
+//			if (documentOrigen.isFirmat() && !isCarpetaLogica()) {
+//				throw new ValidationException(
+//						contingutOrigenId,
+//						contingutOrigen.getClass(),
+//						"No es poden moure documents firmats");
+//			}
+//		}
 		// Es comprova que el procediment orígen i destí son el mateix
 		ExpedientEntity expedientOrigen = getExpedientSuperior(
 				contingutOrigen,
@@ -1956,6 +1951,9 @@ public class ContingutHelper {
 				contingutOrigen,
 				contingutDesti,
 				null);
+		
+		reOrdenaContingut(contingutOrigen, null);
+		
 		contingutLogHelper.log(
 				contingutOrigen,
 				LogTipusEnumDto.MOVIMENT,
@@ -2442,6 +2440,34 @@ public class ContingutHelper {
 		}
 	}
 
+	//Al crear un nou contingut, si assigna ordre, colocant-lo al final del contenidor pare.
+	//Opcional: Si se li passa un ordre concret, reordena tots els germans, i se li assigna el ordre indicat. 
+	public void reOrdenaContingut(ContingutEntity nouContingutEntity, Integer ordreAssignat) {
+		if (nouContingutEntity!=null && nouContingutEntity.getPare()!=null) {
+			List<ContingutEntity> fills = contingutRepository.findByPareAndEsborratAndOrdenatOrdre(nouContingutEntity.getPare(), 0);
+			int ordreNou = 1;
+			if (fills!=null) {
+				for (ContingutEntity c: fills) {
+					if (ordreAssignat==null) {
+						//No té ordre assignat, reordenam els germans i al nou element el deixam per el final
+						if (!c.getId().equals(nouContingutEntity.getId())) {
+							c.setOrdre(ordreNou);
+							ordreNou++;
+						}
+					} else {
+						if (ordreNou==ordreAssignat) {
+							nouContingutEntity.setOrdre(ordreNou);
+							ordreNou++;
+						} else {
+							c.setOrdre(ordreNou);
+							ordreNou++;
+						}
+					}
+				}
+			}
+			nouContingutEntity.setOrdre(ordreAssignat==null?ordreNou:ordreAssignat);
+		}
+	}
 
 	public void marcarEsborrat(ContingutEntity contingut) {
 
@@ -2542,7 +2568,7 @@ public class ContingutHelper {
 
 	public String getUniqueNameInPare(String nomPerComprovar, Long pareId) {
 
-		List<ContingutEntity> continguts = contingutRepository.findByPareIdAndEsborrat(pareId, 0);
+		List<ContingutEntity> continguts = contingutRepository.findByPareIdAndEsborratOrderByOrdreAsc(pareId, 0);
 		if (continguts != null) {
 			int ocurrences = 0;
 			List<String> noms = new ArrayList<String>();

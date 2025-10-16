@@ -80,7 +80,7 @@ public interface ContingutRepository extends JpaRepository<ContingutEntity, Long
 			String nom,
 			int esborrat);
 	
-	List<ContingutEntity> findByPareIdAndEsborrat(
+	List<ContingutEntity> findByPareIdAndEsborratOrderByOrdreAsc(
 			Long pareId,
 			int esborrat);
 	

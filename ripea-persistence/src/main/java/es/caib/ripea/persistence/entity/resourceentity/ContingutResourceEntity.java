@@ -5,15 +5,30 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.ForeignKey;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Version;
+
+import org.hibernate.annotations.Where;
 
 import es.caib.ripea.persistence.base.entity.BaseAuditableEntity;
+import es.caib.ripea.persistence.base.entity.ReorderableEntity;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.Where;
 
 /**
  * Entitat de base de dades que representa un contingut.
@@ -26,7 +41,7 @@ import org.hibernate.annotations.Where;
 @Setter
 @NoArgsConstructor
 @Inheritance(strategy = InheritanceType.JOINED)
-public abstract class ContingutResourceEntity<R> extends BaseAuditableEntity<R> {
+public abstract class ContingutResourceEntity<R> extends BaseAuditableEntity<R> implements ReorderableEntity<Long> {
 
 	@Column(name = "nom", length = 256, nullable = false)
 	protected String nom;
@@ -91,4 +106,17 @@ public abstract class ContingutResourceEntity<R> extends BaseAuditableEntity<R> 
     )
     @Where(clause = "llegida = false")
     protected List<AlertaResourceEntity> alertes = new ArrayList<>();
+    
+	@Override
+	public Long getOrder() {
+		return (long)ordre;
+	}
+	@Override
+	public void setOrder(Long order) {
+		ordre = order != null ? order.intValue() : 0;
+	}
+	@Override
+	public Long getOrderParentId() {
+		return pare != null ? pare.getId() : null;
+	}
 }

@@ -17,6 +17,7 @@ import javax.validation.constraints.Size;
 @DestiNotEmpty
 public class ContingutMoureCopiarEnviarCommand {
 
+	protected String accio;
 	protected Long origenId;
 	protected Long[] origenIds;
 	@NotNull
@@ -58,6 +59,12 @@ public class ContingutMoureCopiarEnviarCommand {
 		this.estructuraCarpetesJson = estructuraCarpetesJson;
 	}
 	
+	public String getAccio() {
+		return accio;
+	}
+	public void setAccio(String accio) {
+		this.accio = accio;
+	}
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);

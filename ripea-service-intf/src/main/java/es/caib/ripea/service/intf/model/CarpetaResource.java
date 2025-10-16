@@ -19,6 +19,7 @@ import lombok.experimental.FieldNameConstants;
 @ResourceConfig(
         quickFilterFields = { "nom" },
         descriptionField = "nom",
+        orderField = "ordreLong",
         artifacts = {
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,

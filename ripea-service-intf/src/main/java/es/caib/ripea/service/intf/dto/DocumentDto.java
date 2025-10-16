@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -79,6 +80,9 @@ public class DocumentDto extends NodeDto {
 	private String idioma;
 	//Nomes per evitar el error al llistat de continguts de admin: No s'ha pogut llegir la propietat de l'objecte (propietatNom=numero)
 	private String numero;
+	
+	private Set<ArbreJsonDto> estructuraCarpetes;
+	private String destiId;
 	
 	public String getFitxerExtension() {
 		if (fitxerNom != null) {

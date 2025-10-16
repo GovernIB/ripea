@@ -74,13 +74,13 @@ const useCarpetaActions = (entity:any, refresh?: () => void) => {
     const {handleShow: handleCopiar, content: contentCopiar} = useCopiar(refresh)
 
     const actions = [
-        {
+        /*{
             label: t('page.carpeta.action.update.label'),
             icon: 'edit',
             showInMenu: true,
             onClick: handleModifyCarpeta,
             hidden: !entity?.potModificar || !user?.sessionScope?.isCreacioCarpetesActiva,
-        },
+        },*/
         {
             label: t('page.expedient.action.exportPDF.label'),
             icon: 'format_list_numbered',
@@ -102,13 +102,13 @@ const useCarpetaActions = (entity:any, refresh?: () => void) => {
             onClick: handleMoure,
             hidden: !entity?.potModificar || !user?.sessionScope?.isCreacioCarpetesActiva,
         },
-        {
+        /*{
             label: t('page.contingut.action.copy.label'),
             icon: "file_copy",
             showInMenu: true,
             onClick: handleCopiar,
             hidden: !entity?.potModificar || !user?.sessionScope?.isCreacioCarpetesActiva || !user?.sessionScope?.isMostrarCopiar,
-        },
+        },*/
         {
             label: t('page.carpeta.action.delete.label'),
             icon: "delete",

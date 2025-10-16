@@ -8,6 +8,8 @@ import es.caib.ripea.back.command.DocumentGenericCommand;
 import es.caib.ripea.back.helper.MessageHelper;
 import es.caib.ripea.service.intf.dto.ContingutDto;
 import es.caib.ripea.service.intf.service.ContingutService;
+import es.caib.ripea.service.intf.utils.Utils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,13 +39,18 @@ public class NomDocumentNoRepetitValidator implements ConstraintValidator<NomDoc
 			final Object obj, 
 			final ConstraintValidatorContext context) {
 		try {
-			Long entitatId = obj instanceof DocumentCommand ? ((DocumentCommand) obj).getEntitatId() : ((DocumentGenericCommand) obj).getEntitatId();
 			Long pareId = obj instanceof DocumentCommand ? ((DocumentCommand) obj).getPareId() : ((DocumentGenericCommand) obj).getPareId();
 			Long id = obj instanceof DocumentCommand ? ((DocumentCommand) obj).getId() : ((DocumentGenericCommand) obj).getId();
 			String nom = obj instanceof DocumentCommand ? ((DocumentCommand) obj).getNom() : ((DocumentGenericCommand) obj).getNom();
+			String destiId = obj instanceof DocumentCommand ? ((DocumentCommand) obj).getDestiId() : ((DocumentGenericCommand) obj).getDestiId();
+			
+			Long cotenidorIdComprovar = pareId;
+			if (destiId!=null && Utils.hasValue(destiId)) {
+				cotenidorIdComprovar = Long.parseLong(destiId);
+			}
 			
 			boolean valid = true;
-			List<ContingutDto> fills = contingutService.getFillsBasicInfo(pareId);
+			List<ContingutDto> fills = contingutService.getFillsBasicInfo(cotenidorIdComprovar);
 			
 			for (ContingutDto contingut: fills) {
 				if (contingut.isDocument()) {

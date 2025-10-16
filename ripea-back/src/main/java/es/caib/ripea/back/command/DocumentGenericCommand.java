@@ -36,6 +36,10 @@ public class DocumentGenericCommand extends ContenidorCommand {
 	@Size(groups = {ConcatenarDigital.class}, max=48)
 	private String ntiIdDocumentoOrigen;
 	private NtiOrigenEnumDto ntiOrigen;
+	
+	//No utilitzats de moment
+	private String estructuraCarpetesJson;
+	private String destiId;
 
 
 	public NtiOrigenEnumDto getNtiOrigen() {
@@ -98,6 +102,19 @@ public class DocumentGenericCommand extends ContenidorCommand {
 	}
 	public void setNtiIdDocumentoOrigen(String ntiIdDocumentoOrigen) {
 		this.ntiIdDocumentoOrigen = ntiIdDocumentoOrigen != null ? ntiIdDocumentoOrigen.trim() : null;
+	}
+	
+	public String getEstructuraCarpetesJson() {
+		return estructuraCarpetesJson;
+	}
+	public void setEstructuraCarpetesJson(String estructuraCarpetesJson) {
+		this.estructuraCarpetesJson = estructuraCarpetesJson;
+	}
+	public String getDestiId() {
+		return destiId;
+	}
+	public void setDestiId(String destiId) {
+		this.destiId = destiId;
 	}
 	public static DocumentGenericCommand asCommand(DocumentDto dto) {
 		DocumentGenericCommand command = ConversioTipusHelper.convertir(
