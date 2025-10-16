@@ -580,12 +580,20 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			
 		//Comprovam si s'ha canviat el pare, en tal cas s'ha de mourer, sino es una ordenació.
 		boolean justSorting = false;
-		Long destiId = contingutDestiId;
-		if (contingutOrigen.getPare().getId().equals(contingutDesti.getPare().getId())) {
-			//Si es molla sobre un contingut del mateix pare, no movem, nomes reordenam
+		/**
+		 * Casos en que NO s'ha de mourer contingut: 
+		 * 1.- Quant els dos son documents dins el mateix pare.
+		 * 2.- Qant es mou una carpeta o document a una altre carpeta que ja es el seu pare.
+		 * 3.- Qant es mou una carpeta sobre un document dins el mateix pare.
+		 */
+		boolean casPrimer = contingutOrigen.isDocument() && contingutDesti.isDocument() && contingutOrigen.getPare().getId().equals(contingutDesti.getPare().getId());
+		boolean casSegon  = 								contingutDesti.isCarpeta()  && contingutOrigen.getPare().getId().equals(contingutDesti.getId());
+		boolean casTercer = contingutOrigen.isCarpeta()  && contingutDesti.isDocument()  && contingutOrigen.getPare().getId().equals(contingutDesti.getPare().getId());
+		if (casPrimer || casSegon || casTercer) {
 			justSorting = true;
 		}
 		
+		Long destiId = contingutDestiId;
 		if (!contingutDesti.isCarpeta()) {
 			//Si el destí es un document, s'ha de mourer al pare del destí, i posteriorment reordenar
 			destiId = contingutDesti.getPare().getId();
