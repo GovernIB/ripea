@@ -84,12 +84,14 @@ import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.DocumentNotificacioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.EventTipusEnumDto;
+import es.caib.ripea.service.intf.dto.ExpedientErrorTancamentDto;
 import es.caib.ripea.service.intf.dto.ExpedientPeticioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.ExplotFetsAmbDimensioDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.PortafirmesCallbackEstatEnumDto;
 import es.caib.ripea.service.intf.dto.TascaEstatEnumDto;
 import es.caib.ripea.service.intf.exception.ArxiuJaGuardatException;
+import es.caib.ripea.service.intf.exception.SistemaExternException;
 import es.caib.ripea.service.intf.service.SegonPlaService;
 import es.caib.ripea.service.intf.utils.DateUtil;
 import es.caib.ripea.service.intf.utils.Utils;
@@ -507,7 +509,7 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 		long t1 = System.currentTimeMillis();
 		if (cacheHelper.mostrarLogsSegonPla())
 			logger.info("Execució tasca periòdica: Consulta expedients pendents de tancar a l'arxiu i que ha arribat l'hora programada");
-		
+		List<ExpedientErrorTancamentDto> errorsTancament = new ArrayList<ExpedientErrorTancamentDto>(); 
 		List<EntitatEntity> entitats = entitatRepository.findAll();
 
 		for (EntitatEntity entitat : entitats) {
@@ -517,16 +519,24 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 			for (ExpedientEntity expedient : expedientsPendentsTancar) {
 				synchronized (SynchronizationHelper.get0To99Lock(expedient.getId(), SynchronizationHelper.locksExpedients)) {
 					try {
-						expedientHelper2.closeExpedientArxiu(expedient);
+						expedientHelper2.closeExpedientArxiu(expedient.getId());
+					} catch (SistemaExternException ex) {
+						errorsTancament.add(new ExpedientErrorTancamentDto(expedient.getNumero(), expedient.getId(), ex.getMessage()));
 					} catch (Exception e) {
-						logger.error("Hi ha hagut un error tancant un expedient [id=" + expedient.getId() + "]", e);
+						logger.error("Error inesperat tancant expedient [{}]", expedient.getId(), e);
+						e.printStackTrace();
 					}
 				}
 			}
 		}
 		
+	    if (!errorsTancament.isEmpty()) {
+	        emailHelper.avisarAdministradorsErrorTancament(errorsTancament);
+	    }
+	    
 		if (cacheHelper.mostrarLogsSegonPla())
 			logger.info("Fin de tasca periòdica: Consulta expedients pendents de tancar a l'arxiu i que ha arribat l'hora programada :  " + (System.currentTimeMillis() - t1) + " ms");
+		
 	}
 	
 	@Override
