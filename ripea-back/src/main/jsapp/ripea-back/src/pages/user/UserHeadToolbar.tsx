@@ -398,7 +398,7 @@ const useMenuAdmin = () => {
                     id: 'portafib',
                     title: t('page.user.menu.portafib'),
                     // icon: '',
-                    onClick: () => toProgramaAntic('seguimentPortafirmes'),
+                    to: '/seguimentPortafirmes',
                 },
                 {
                     id: 'notib',
@@ -664,7 +664,7 @@ const useMenuUsuari = () => {
                     id: 'portafib',
                     title: t('page.user.menu.portafib'),
                     // icon: '',
-                    onClick: () => toProgramaAntic('seguimentPortafirmes'),
+                    to: '/seguimentPortafirmes',
                     hidden: !user?.sessionScope?.isMostrarSeguimentEnviamentsUsuariActiu,
                 },
                 {

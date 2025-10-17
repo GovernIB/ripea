@@ -64,7 +64,7 @@ const columns = [
     {
         field: 'expedient',
         flex: 0.75,
-        renderCell: (params:any) => <a href={`/contingut/${params?.id}`}>{params?.formattedValue}</a>,
+        renderCell: (params:any) => <a href={`/contingut/${params?.row?.expedient?.id}`}>{params?.formattedValue}</a>,
     },
     {
         field: 'createdDate',

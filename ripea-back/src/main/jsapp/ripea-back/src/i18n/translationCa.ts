@@ -94,7 +94,18 @@ const translationCa = {
         tipusDestinatari: {
             TABLET: "Tablet",
             EMAIL: "Email",
-        }
+        },
+        documentEnviamentEstat: {
+            PENDENT: "Pendent",
+            ENVIAT: "Enviat",
+            PROCESSAT: "Processat",
+            REBUTJAT: "Rebutjat",
+            CANCELAT: "Cancelat",
+        },
+        tipusSequencia: {
+            SERIE: "Serie",
+            PARALEL: "Paralela",
+        },
     },
     navigate: {
         expedient: "Cercador d'expedients",
@@ -1032,6 +1043,8 @@ const translationCa = {
                 prioritat: "Prioritat",
                 documentTipusNom: "Tipus de document",
                 fluxTipus: "Tipus de flux",
+                responsables: "Responsables",
+                sequenciaTipus: "Tipus sequencia firma",
                 portafirmesId: "ID Portafirmes",
             },
         },

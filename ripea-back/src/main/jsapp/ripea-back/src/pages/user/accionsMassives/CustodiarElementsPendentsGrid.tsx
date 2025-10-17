@@ -1,5 +1,5 @@
 import {GridPage, useFormContext, useMuiDataGridApiRef} from "reactlib";
-import { CardPage } from "../../../components/CardData";
+import { CardPage } from "../../../components/CardData.tsx";
 import {useTranslation} from "react-i18next";
 import TabComponent from "../../../components/TabComponent.tsx";
 import {useState} from "react";
@@ -139,7 +139,7 @@ const documentColumns = [
     {
         field: 'expedient',
         flex: 1.5,
-        renderCell: (params:any) => <a href={`/contingut/${params?.expedient?.id}`}>{params?.formattedValue}</a>,
+        renderCell: (params:any) => <a href={`/contingut/${params?.row?.expedient?.id}`}>{params?.formattedValue}</a>,
     },
     // {
     //     field: 'metaNode',
@@ -222,7 +222,7 @@ const interessatColumns = [
     {
         field: 'expedient',
         flex: 1.5,
-        renderCell: (params:any) => <a href={`/contingut/${params?.expedient?.id}`}>{params?.formattedValue}</a>,
+        renderCell: (params:any) => <a href={`/contingut/${params?.row?.expedient?.id}`}>{params?.formattedValue}</a>,
     },
     // {
     //     field: 'metaNode',

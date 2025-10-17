@@ -94,7 +94,18 @@ const translationEn = {
         tipusDestinatari: {
             TABLET: "Tablet",
             EMAIL: "Email",
-        }
+        },
+        documentEnviamentEstat: {
+            PENDENT: "Pending",
+            ENVIAT: "Sent",
+            PROCESSAT: "Processed",
+            REBUTJAT: "Rejected",
+            CANCELAT: "Cancelled",
+        },
+        tipusSequencia: {
+            SERIE: "Serial",
+            PARALEL: "Parallel",
+        },
     },
     navigate: {
         expedient: "Case search",
@@ -1032,6 +1043,8 @@ const translationEn = {
                 prioritat: "Priority",
                 documentTipusNom: "Document type",
                 fluxTipus: "Flow type",
+                responsables: "Responsible persons",
+                sequenciaTipus: "Signature sequence type",
                 portafirmesId: "Portafirmes ID",
             },
         },

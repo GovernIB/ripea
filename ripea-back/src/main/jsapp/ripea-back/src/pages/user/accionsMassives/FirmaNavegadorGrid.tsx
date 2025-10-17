@@ -1,66 +1,64 @@
-import {GridPage, useMuiDataGridApiRef} from "reactlib";
-import { CardPage } from "../../../components/CardData.tsx";
 import {useTranslation} from "react-i18next";
-import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
+import {GridPage, useMuiDataGridApiRef} from "reactlib";
 import {useState} from "react";
-import {Icon} from "@mui/material";
+import {CardPage} from "../../../components/CardData.tsx";
+import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import {EnviarPortafirmesFilter} from "./EnviarPortafirmesGrid.tsx";
 
 const sortModel: any = [{field: 'createdDate', sort: 'desc'}]
 const columns = [
     {
         field: 'nom',
-        flex: 0.75,
+        flex: 0.5,
     },
     {
         field: 'metaDocument',
-        flex: 0.5,
+        flex: 0.6,
     },
     {
         field: 'expedient',
-        flex: 1.75,
-        renderCell: (params:any) => <>
-            {/** TODO: revisar columna ubicación */}
-            /<a href={`/contingut/${params?.id}`} style={{ display: 'flex', alignItems: 'center' }}><Icon>folder</Icon>{params?.formattedValue}</a>
-            {params?.row?.pare?.id != params?.row?.expedient?.id ?<>/.../<Icon>folder</Icon>{params?.row?.pare?.description}</> :"" }
-            /<Icon>description</Icon>{params?.row?.fitxerNom}
-        </>,
+        flex: 0.75,
+        renderCell: (params:any) => <a href={`/contingut/${params?.row?.expedient?.id}`}>{params?.formattedValue}</a>,
     },
     {
         field: 'createdDate',
-        flex: 0.5,
+        flex: 0.55,
     },
     {
         field: 'createdByFullName',
-        flex: 0.5,
+        flex: 0.45,
     },
 ]
 
-const CopiarEnllacCSVGrid = () => {
+const FirmaNavegadorGrid = () => {
     const {t} = useTranslation();
     const apiRef = useMuiDataGridApiRef();
     const [springFilter, setSpringFilter] = useState<string>();
 
+    const refresh = () => {
+        apiRef?.current?.refresh?.();
+    }
+
     const actions = [
         {
-            label: t('page.document.action.csv.label'),
-            icon: "file_copy",
+            label: t('page.document.action.firma.label'),
+            icon: "edit_document",
             showInMenu: false,
         },
     ]
     // TODO: crear acción massiva
     const massiveActions = [
         {
-            label: t('page.document.action.csv.label'),
-            icon: "file_copy",
+            label: t('page.document.action.firma.label'),
+            icon: "edit_document",
             showInMenu: false,
         },
     ]
 
     return <GridPage disableMargins>
-        <CardPage title={t('navigate.massiu.csv')}>
+        <CardPage title={t('navigate.massiu.firmasimpleweb')}>
             <EnviarPortafirmesFilter
-                sessionKey={"MASSIVE_CSV_FILTER"}
+                sessionKey={"MASSIVE_FIRMA_NAVEGADOR_FILTER"}
                 onSpringFilterChange={setSpringFilter}/>
 
             <StyledMuiGrid
@@ -68,7 +66,7 @@ const CopiarEnllacCSVGrid = () => {
                 resourceName={"documentResource"}
                 columns={columns}
                 filter={springFilter}
-                // TODO: filtrar por permisos y tiene enlace csv
+                // TODO: filtrar por permisos y pot firmar al navegador
                 sortModel={sortModel}
 
                 rowAdditionalActions={actions}
@@ -79,4 +77,4 @@ const CopiarEnllacCSVGrid = () => {
         </CardPage>
     </GridPage>
 }
-export default CopiarEnllacCSVGrid;
+export default FirmaNavegadorGrid;

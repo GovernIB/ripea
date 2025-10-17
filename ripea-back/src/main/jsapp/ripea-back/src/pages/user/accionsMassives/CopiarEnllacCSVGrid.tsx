@@ -21,7 +21,7 @@ const columns = [
         flex: 1.75,
         renderCell: (params:any) => <>
             {/** TODO: revisar columna ubicación */}
-            /<a href={`/contingut/${params?.id}`} style={{ display: 'flex', alignItems: 'center' }}><Icon>folder</Icon>{params?.formattedValue}</a>
+            /<a href={`/contingut/${params?.row?.expedient?.id}`} style={{ display: 'flex', alignItems: 'center' }}><Icon>folder</Icon>{params?.formattedValue}</a>
             {params?.row?.pare?.id != params?.row?.expedient?.id ?<>/.../<Icon>folder</Icon>{params?.row?.pare?.description}</> :"" }
             /<Icon>description</Icon>{params?.row?.fitxerNom}
         </>,
@@ -36,31 +36,31 @@ const columns = [
     },
 ]
 
-const MarcarDefinitiuGrid = () => {
+const CopiarEnllacCSVGrid = () => {
     const {t} = useTranslation();
     const apiRef = useMuiDataGridApiRef();
     const [springFilter, setSpringFilter] = useState<string>();
 
     const actions = [
         {
-            label: t('page.document.action.definitive.label'),
-            icon: "check_circle",
+            label: t('page.document.action.csv.label'),
+            icon: "file_copy",
             showInMenu: false,
         },
     ]
     // TODO: crear acción massiva
     const massiveActions = [
         {
-            label: t('page.document.action.definitive.label'),
-            icon: "check_circle",
+            label: t('page.document.action.csv.label'),
+            icon: "file_copy",
             showInMenu: false,
         },
     ]
 
     return <GridPage disableMargins>
-        <CardPage title={t('navigate.massiu.definitiu')}>
+        <CardPage title={t('navigate.massiu.csv')}>
             <EnviarPortafirmesFilter
-                sessionKey={"MASSIVE_DEFINITIVE_FILTER"}
+                sessionKey={"MASSIVE_CSV_FILTER"}
                 onSpringFilterChange={setSpringFilter}/>
 
             <StyledMuiGrid
@@ -68,7 +68,7 @@ const MarcarDefinitiuGrid = () => {
                 resourceName={"documentResource"}
                 columns={columns}
                 filter={springFilter}
-                // TODO: filtrar por permisos y puede marcar definitivo
+                // TODO: filtrar por permisos y tiene enlace csv
                 sortModel={sortModel}
 
                 rowAdditionalActions={actions}
@@ -79,4 +79,4 @@ const MarcarDefinitiuGrid = () => {
         </CardPage>
     </GridPage>
 }
-export default MarcarDefinitiuGrid;
+export default CopiarEnllacCSVGrid;

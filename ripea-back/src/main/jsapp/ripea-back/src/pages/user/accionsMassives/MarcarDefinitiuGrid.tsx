@@ -1,64 +1,66 @@
-import {useTranslation} from "react-i18next";
 import {GridPage, useMuiDataGridApiRef} from "reactlib";
-import {useState} from "react";
-import {CardPage} from "../../../components/CardData.tsx";
+import { CardPage } from "../../../components/CardData.tsx";
+import {useTranslation} from "react-i18next";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
+import {useState} from "react";
+import {Icon} from "@mui/material";
 import {EnviarPortafirmesFilter} from "./EnviarPortafirmesGrid.tsx";
 
 const sortModel: any = [{field: 'createdDate', sort: 'desc'}]
 const columns = [
     {
         field: 'nom',
-        flex: 0.5,
+        flex: 0.75,
     },
     {
         field: 'metaDocument',
-        flex: 0.6,
+        flex: 0.5,
     },
     {
         field: 'expedient',
-        flex: 0.75,
-        renderCell: (params:any) => <a href={`/contingut/${params?.id}`}>{params?.formattedValue}</a>,
+        flex: 1.75,
+        renderCell: (params:any) => <>
+            {/** TODO: revisar columna ubicación */}
+            /<a href={`/contingut/${params?.row?.expedient?.id}`} style={{ display: 'flex', alignItems: 'center' }}><Icon>folder</Icon>{params?.formattedValue}</a>
+            {params?.row?.pare?.id != params?.row?.expedient?.id ?<>/.../<Icon>folder</Icon>{params?.row?.pare?.description}</> :"" }
+            /<Icon>description</Icon>{params?.row?.fitxerNom}
+        </>,
     },
     {
         field: 'createdDate',
-        flex: 0.55,
+        flex: 0.5,
     },
     {
         field: 'createdByFullName',
-        flex: 0.45,
+        flex: 0.5,
     },
 ]
 
-const FirmaNavegadorGrid = () => {
+const MarcarDefinitiuGrid = () => {
     const {t} = useTranslation();
     const apiRef = useMuiDataGridApiRef();
     const [springFilter, setSpringFilter] = useState<string>();
 
-    const refresh = () => {
-        apiRef?.current?.refresh?.();
-    }
-
     const actions = [
         {
-            label: t('page.document.action.firma.label'),
-            icon: "edit_document",
+            label: t('page.document.action.definitive.label'),
+            icon: "check_circle",
             showInMenu: false,
         },
     ]
     // TODO: crear acción massiva
     const massiveActions = [
         {
-            label: t('page.document.action.firma.label'),
-            icon: "edit_document",
+            label: t('page.document.action.definitive.label'),
+            icon: "check_circle",
             showInMenu: false,
         },
     ]
 
     return <GridPage disableMargins>
-        <CardPage title={t('navigate.massiu.firmasimpleweb')}>
+        <CardPage title={t('navigate.massiu.definitiu')}>
             <EnviarPortafirmesFilter
-                sessionKey={"MASSIVE_FIRMA_NAVEGADOR_FILTER"}
+                sessionKey={"MASSIVE_DEFINITIVE_FILTER"}
                 onSpringFilterChange={setSpringFilter}/>
 
             <StyledMuiGrid
@@ -66,7 +68,7 @@ const FirmaNavegadorGrid = () => {
                 resourceName={"documentResource"}
                 columns={columns}
                 filter={springFilter}
-                // TODO: filtrar por permisos y pot firmar al navegador
+                // TODO: filtrar por permisos y puede marcar definitivo
                 sortModel={sortModel}
 
                 rowAdditionalActions={actions}
@@ -77,4 +79,4 @@ const FirmaNavegadorGrid = () => {
         </CardPage>
     </GridPage>
 }
-export default FirmaNavegadorGrid;
+export default MarcarDefinitiuGrid;

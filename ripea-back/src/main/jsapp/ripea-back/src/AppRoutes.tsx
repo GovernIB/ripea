@@ -5,15 +5,16 @@ import ExpedientGrid from './pages/expedient/ExpedientGrid';
 import AnotacionsGrid from "./pages/anotacions/AnotacionsGrid.tsx";
 import TasquesGrid from "./pages/tasca/TasquesGrid.tsx";
 import Tasca from "./pages/tasca/details/Tasca.tsx";
-import EnviarPortafirmesGrid from "./pages/user/detail/EnviarPortafirmesGrid.tsx";
-import FirmaNavegadorGrid from "./pages/user/detail/FirmaNavegadorGrid.tsx";
-import CanviEstatGrid from "./pages/user/detail/CanviEstatGrid.tsx";
-import TancarGrid from "./pages/user/detail/TancarGrid.tsx";
-import CustodiarElementsPendentsGrid from "./pages/user/detail/CustodiarElementsPendentsGrid.tsx";
-import CopiarEnllacCSVGrid from "./pages/user/detail/CopiarEnllacCSVGrid.tsx";
-import MarcarDefinitiuGrid from "./pages/user/detail/MarcarDefinitiuGrid.tsx";
-import CanviPrioritatGrid from "./pages/user/detail/CanviPrioritatGrid.tsx";
-import ActualitzarEstatAnotacioGrid from "./pages/user/detail/ActualitzarEstatAnotacioGrid.tsx";
+import EnviarPortafirmesGrid from "./pages/user/accionsMassives/EnviarPortafirmesGrid.tsx";
+import FirmaNavegadorGrid from "./pages/user/accionsMassives/FirmaNavegadorGrid.tsx";
+import CanviEstatGrid from "./pages/user/accionsMassives/CanviEstatGrid.tsx";
+import TancarGrid from "./pages/user/accionsMassives/TancarGrid.tsx";
+import CustodiarElementsPendentsGrid from "./pages/user/accionsMassives/CustodiarElementsPendentsGrid.tsx";
+import CopiarEnllacCSVGrid from "./pages/user/accionsMassives/CopiarEnllacCSVGrid.tsx";
+import MarcarDefinitiuGrid from "./pages/user/accionsMassives/MarcarDefinitiuGrid.tsx";
+import CanviPrioritatGrid from "./pages/user/accionsMassives/CanviPrioritatGrid.tsx";
+import ActualitzarEstatAnotacioGrid from "./pages/user/accionsMassives/ActualitzarEstatAnotacioGrid.tsx";
+import DocumentEnviatsPortafirmesGrid from "./pages/user/consultes/DocumentEnviatsPortafirmesGrid.tsx";
 
 const AppRoutes: React.FC = () => {
     return <Routes>
@@ -33,6 +34,7 @@ const AppRoutes: React.FC = () => {
             <Route path={"expedientPeticioCanviEstatDistribucio"} element={<ActualitzarEstatAnotacioGrid />} />
         </Route>
         <Route path="seguimentArxiuPendents" element={<CustodiarElementsPendentsGrid />} />
+        <Route path="seguimentPortafirmes" element={<DocumentEnviatsPortafirmesGrid />} />
         <Route path="contingut/:id" element={<Expedient />} />
         <Route path="contingut/:id/tasca/:tascaId" element={<Tasca />} />
         <Route path="expedientPeticio" element={<AnotacionsGrid />} />

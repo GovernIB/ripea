@@ -8,7 +8,7 @@ import Load from "../../../components/Load.tsx";
 import * as builder from '../../../util/springFilterUtils.ts'
 import Iframe from "../../../components/Iframe.tsx";
 
-const SeguimentPortafirmes = (props:any) => {
+export const SeguimentPortafirmes = (props:any) => {
     const {entity} = props;
     const { t } = useTranslation();
     return <Load value={entity}>
@@ -20,6 +20,8 @@ const SeguimentPortafirmes = (props:any) => {
                 <ContenidoData title={t('page.documentPortafirmes.detall.prioritat')}>{t(`enum.prioritat.${entity?.prioritat}`)}</ContenidoData>
                 <ContenidoData title={t('page.documentPortafirmes.detall.documentTipusNom')}>{entity?.documentTipusNom}</ContenidoData>
                 <ContenidoData title={t('page.documentPortafirmes.detall.fluxTipus')}>{t(`enum.fluxTipus.${entity?.fluxTipus}`)}</ContenidoData>
+                <ContenidoData title={t('page.documentPortafirmes.detall.responsables')} hiddenIfEmpty>{entity?.responsables}</ContenidoData>
+                <ContenidoData title={t('page.documentPortafirmes.detall.sequenciaTipus')} hidden={!entity?.sequenciaTipus}>{t(`enum.tipusSequencia.${entity?.sequenciaTipus}`)}</ContenidoData>
                 <ContenidoData title={t('page.documentPortafirmes.detall.portafirmesId')}>{entity?.portafirmesId}</ContenidoData>
             </CardData>
 
