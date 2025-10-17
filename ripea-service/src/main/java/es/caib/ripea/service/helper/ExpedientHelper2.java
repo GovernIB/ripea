@@ -1,17 +1,9 @@
 package es.caib.ripea.service.helper;
 
-import es.caib.plugins.arxiu.api.ContingutArxiu;
-import es.caib.plugins.arxiu.api.ContingutTipus;
-import es.caib.plugins.arxiu.api.Document;
-import es.caib.plugins.arxiu.api.DocumentEstat;
-import es.caib.ripea.persistence.entity.*;
-import es.caib.ripea.persistence.repository.*;
-import es.caib.ripea.service.firma.DocumentFirmaServidorFirma;
-import es.caib.ripea.service.intf.config.PropertyConfig;
-import es.caib.ripea.service.intf.dto.*;
-import es.caib.ripea.service.intf.exception.ValidationException;
-import es.caib.ripea.service.intf.service.AplicacioService;
-import es.caib.ripea.service.intf.utils.Utils;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,8 +12,37 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
+import es.caib.plugins.arxiu.api.ContingutArxiu;
+import es.caib.plugins.arxiu.api.ContingutTipus;
+import es.caib.plugins.arxiu.api.Document;
+import es.caib.plugins.arxiu.api.DocumentEstat;
+import es.caib.ripea.persistence.entity.DocumentEntity;
+import es.caib.ripea.persistence.entity.DocumentEnviamentInteressatEntity;
+import es.caib.ripea.persistence.entity.DocumentNotificacioEntity;
+import es.caib.ripea.persistence.entity.ExpedientEntity;
+import es.caib.ripea.persistence.entity.ExpedientTascaEntity;
+import es.caib.ripea.persistence.entity.InteressatEntity;
+import es.caib.ripea.persistence.entity.RegistreAnnexEntity;
+import es.caib.ripea.persistence.repository.DocumentNotificacioRepository;
+import es.caib.ripea.persistence.repository.DocumentRepository;
+import es.caib.ripea.persistence.repository.ExecucioMassivaContingutRepository;
+import es.caib.ripea.persistence.repository.ExpedientRepository;
+import es.caib.ripea.persistence.repository.ExpedientTascaRepository;
+import es.caib.ripea.persistence.repository.InteressatRepository;
+import es.caib.ripea.persistence.repository.RegistreAnnexRepository;
+import es.caib.ripea.service.firma.DocumentFirmaServidorFirma;
+import es.caib.ripea.service.intf.config.PropertyConfig;
+import es.caib.ripea.service.intf.dto.ArxiuEstatEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentDto;
+import es.caib.ripea.service.intf.dto.ExecucioMassivaEstatDto;
+import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
+import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientTascaValidacioDto;
+import es.caib.ripea.service.intf.dto.ValidacioErrorDto;
+import es.caib.ripea.service.intf.exception.SistemaExternException;
+import es.caib.ripea.service.intf.exception.ValidationException;
+import es.caib.ripea.service.intf.service.AplicacioService;
+import es.caib.ripea.service.intf.utils.Utils;
 
 @Component
 public class ExpedientHelper2 {
@@ -129,12 +150,28 @@ public class ExpedientHelper2 {
 		}
 	}
 	
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public void closeExpedientArxiu(ExpedientEntity expedient) {
-		expedient.updateTancatData();
-		contingutLogHelper.log(expedient, LogTipusEnumDto.TANCAMENT, null, null, false, false);
+	@Transactional(propagation = Propagation.REQUIRES_NEW, noRollbackFor = SistemaExternException.class)
+	public void closeExpedientArxiu(Long expedientId) {
 		logger.debug("Tancant expedient a l'arxiu desde acció en segon pla...");		
-		pluginHelper.arxiuExpedientTancar(expedient);
+		Optional<ExpedientEntity> expedient = expedientRepository.findById(expedientId);
+		
+		if (expedient.isPresent()) {
+			try {
+				pluginHelper.arxiuExpedientTancar(expedient.get());
+				contingutLogHelper.log(expedient.get(), LogTipusEnumDto.TANCAMENT, null, null, false, false);
+			} catch (SistemaExternException ex) {
+				expedient.get().updataTancatProgramat();
+				logger.error("Error tancant expedient [{}] a l'arxiu digital. Es programa nova data de tancament.", expedient.get().getId());
+				ex.printStackTrace();
+				throw ex;
+			}
+	
+		    try {
+		    	expedient.get().updateTancatData();
+		    } catch (Exception e) {
+		    	 logger.error("Error actualitzant data de tancament per expedient [{}]", expedient.get().getId(), e);
+		    }
+		}
 	}
 	
 	@Transactional(propagation = Propagation.REQUIRES_NEW)

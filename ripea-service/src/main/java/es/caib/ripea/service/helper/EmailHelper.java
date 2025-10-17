@@ -6,15 +6,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.mail.MessagingException;
-import javax.mail.SendFailedException;
 import javax.mail.internet.MimeMessage;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.mail.MailSendException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -53,6 +50,7 @@ import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentNotificacioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.EventTipusEnumDto;
+import es.caib.ripea.service.intf.dto.ExpedientErrorTancamentDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.PermisDto;
 import es.caib.ripea.service.intf.dto.TascaEstatEnumDto;
@@ -854,6 +852,50 @@ public class EmailHelper {
 				"\tNom expedient: " + (expedient != null ? expedient.getNom() : "") + "\n" +
 				"\tComentari: " + comentari + "\n");
 		mailSender.send(missatge);
+	}
+	
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public void avisarAdministradorsErrorTancament(List<ExpedientErrorTancamentDto> errors) {
+	    try {
+	        String subject = getPrefixRipea() + " Errors tancant expedients a l'arxiu digital";
+
+	        StringBuilder text = new StringBuilder();
+	        text.append("S'han produït errors en el tancament dels següents expedients:\n\n");
+	        for (ExpedientErrorTancamentDto e : errors) {
+	            text.append(String.format("- Expedient %s (id=%d): %s\n",
+	                    e.getNumero(), e.getId(), e.getMissatgeError()));
+	        }
+	        text.append("\nS'ha programat una nova data de tancament per aquests expedients.\n\n");
+	        text.append("Data: ").append(Utils.convertDateToString(new Date(), "dd-MM-yyyy HH:mm:ss")).append("\n");
+	        text.append("Revisau el log del sistema per més detalls.");
+
+	        String from = getRemitent();
+	        List<String> destinataris = new ArrayList<>();
+	        List<DadesUsuari> admins = pluginHelper.dadesUsuariFindAmbGrup("IPA_ADMIN");
+
+	        for (DadesUsuari admin : admins) {
+	            String to = admin.getEmail();
+	            if (Utils.isNotEmpty(to)) {
+	            	destinataris.add(to);
+	            	
+	                SimpleMailMessage msg = new SimpleMailMessage();
+	                msg.setFrom(from);
+	                msg.setTo(to);
+	                msg.setSubject(subject);
+	                msg.setText(text.toString());
+	                mailSender.send(msg);
+	            }
+	        }
+
+	        if (destinataris.isEmpty()) {
+	            logger.warn("No s'ha trobat cap administrador (IPA_ADMIN) amb correu per enviar l'avís d'errors de tancament.");
+	        } else {
+	        	String destinatariosStr = destinataris.toString().replace("[", "").replace("]", "");
+	            logger.info("S'ha enviat un avís d'error de tancament a administradors ({} expedients amb error, destinataris: {}).", errors.size(), destinatariosStr);
+	        }
+	    } catch (Exception ex) {
+	        logger.error("No s'ha pogut enviar l'avís d'errors de tancament d'expedients", ex);
+	    }
 	}
 
 	private String getEnllacExpedient(Long expedientId) {

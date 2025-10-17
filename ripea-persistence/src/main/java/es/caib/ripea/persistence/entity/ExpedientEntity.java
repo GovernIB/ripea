@@ -349,6 +349,12 @@ public class ExpedientEntity extends NodeEntity {
 	public void updateTancatData() {
 		this.tancatData = new Date();
 	}
+	public void updataTancatProgramat() {
+		Calendar dataTancament = Calendar.getInstance();
+		dataTancament.add(Calendar.DATE, 1);
+		
+		this.tancatProgramat = dataTancament.getTime();
+	}
 	public void updateEstatAdditional(
 			ExpedientEstatEntity estatAdditional) {
 		this.estatAdditional = estatAdditional;
