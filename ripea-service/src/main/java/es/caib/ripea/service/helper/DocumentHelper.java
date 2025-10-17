@@ -103,7 +103,7 @@ public class DocumentHelper {
 		ExpedientEntity expedient = pare.getExpedientPare();
 		
 		EntitatEntity entitat = entitatId != null ? entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false, false) : null;
-		if (entitat!=null && !contingutHelper.checkUniqueContraint(document.getNom(), pare, entitat, ContingutTipusEnumDto.DOCUMENT)) {
+		if (entitat!=null && contingutHelper.checkUniqueContraint(document.getNom(), pare, entitat, ContingutTipusEnumDto.DOCUMENT)>0) {
 			throw new ContingutNotUniqueException();
 		}
 		
@@ -373,7 +373,7 @@ public class DocumentHelper {
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(documentEntity.getId()));
 
 		EntitatEntity entitat = entitatId != null ? entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false, false) : null;
-		if (!contingutHelper.checkUniqueContraint(document.getNom(), null, entitat, ContingutTipusEnumDto.DOCUMENT)) {
+		if (contingutHelper.checkUniqueContraint(document.getNom(), null, entitat, ContingutTipusEnumDto.DOCUMENT)>0) {
 			throw new ContingutNotUniqueException();
 		}
 		
@@ -621,7 +621,7 @@ public class DocumentHelper {
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(documentEntity.getId()));
 
 		EntitatEntity entitat = entitatId != null ? entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false, false) : null;
-		if (!contingutHelper.checkUniqueContraint(documentEntity.getNom(), null, entitat, ContingutTipusEnumDto.DOCUMENT)) {
+		if (contingutHelper.checkUniqueContraint(documentEntity.getNom(), null, entitat, ContingutTipusEnumDto.DOCUMENT)>0) {
 			throw new ContingutNotUniqueException();
 		}
 		

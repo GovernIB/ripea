@@ -2880,14 +2880,32 @@ public class ContingutHelper {
 		}
 	}
 
-	public boolean checkUniqueContraint (String nom, ContingutEntity pare, EntitatEntity entitat, ContingutTipusEnumDto tipus) {
-		List<ContingutEntity> items = contingutRepository.findByNomAndTipusAndPareAndEntitatAndEsborrat(
+	public Long existCarpetaByNom(String nom, Long pareId, Long entitatId) {
+		List<ContingutEntity> items = contingutRepository.findCarpetaByNomIgnoreCase(
+				nom,
+				ContingutTipusEnumDto.CARPETA,
+				pareId,
+				entitatId,
+				0);
+		if (items!=null && items.size()>0) {
+			return items.get(0).getId();
+		} else {
+			return null;
+		}			
+	}
+	
+	public int checkUniqueContraint (String nom, Long pareId, Long entitatId, ContingutTipusEnumDto tipus) {
+		List<ContingutEntity> items = contingutRepository.findByNomAndTipusAndPareIdAndEntitatIdAndEsborrat(
 				nom,
 				tipus,
-				pare,
-				entitat,
+				pareId,
+				entitatId,
 				0);
-		return items.size() == 0;
+		return items!=null?items.size():0;
+	}
+	
+	public int checkUniqueContraint (String nom, ContingutEntity pare, EntitatEntity entitat, ContingutTipusEnumDto tipus) {
+		return checkUniqueContraint(nom, pare.getId(), entitat.getId(), tipus);
 	}
 
 	public String getBaseDir() {
@@ -3299,10 +3317,11 @@ public class ContingutHelper {
 					nomDocument,
 					null,
 					DocumentEntity.class);
-			// CREAR DOCUMENT A LA BBDD
-			if (!checkDocumentUniqueContraint(nomDocument, isCarpeta ? carpetaEntity : expedientEntity, entitatId)) {
+
+			if (checkDocumentUniqueContraint(nomDocument, isCarpeta ? carpetaEntity : expedientEntity, entitatId)>0) {
 				throw new DocumentAlreadyImportedException();
 			}
+			
 			crearDocumentActualitzarMetadades(
 					nomDocument, 
 					documentArxiu, 
@@ -3313,11 +3332,9 @@ public class ContingutHelper {
 					usingNumeroRegistre,
 					params.getCodiEni(),
 					numeroRegistre);
-			
 		}
 		
 		expedientSuperior.updateRegistresImportats(numeroRegistre);
-		
 		return documentsRepetits;
 	}
 	
@@ -3465,7 +3482,7 @@ public class ContingutHelper {
 		}
 	}
 
-	private boolean checkDocumentUniqueContraint (String nom, ContingutEntity pare, Long entitatId) {
+	private int checkDocumentUniqueContraint (String nom, ContingutEntity pare, Long entitatId) {
 		EntitatEntity entitat = entitatId != null ? entitatRepository.getOne(entitatId) : null;
 		return  checkUniqueContraint(nom, pare, entitat, ContingutTipusEnumDto.DOCUMENT);
 	}
