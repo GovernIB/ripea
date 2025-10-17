@@ -249,18 +249,16 @@
 <body>
 	<div id="comentaris_content" class="col-xs-12">
 	</div>
-	
-	<div class="col-xs-10">
-		<div class="comentari_destins"><ul></ul></div>
-		<textarea id="comentari_text" rows="1" style="resize: none;" class="form-control" placeholder="<spring:message code="contingut.comentaris.text.placeholder"/>" maxlength="1024"></textarea>
-	</div>
-	<div class="col-xs-2">
-		<button class="btn btn-success enviar-comentari"><span class="fa fa-paper-plane-o"></span>&nbsp;<spring:message code="comu.boto.enviar"/></button>
-	</div>
-		
-	<div class="col-xs-12" style="height:10px">
-	</div>
-
+	<c:if test="${not isRolActualAdministradorLectura}">
+		<div class="col-xs-10">
+			<div class="comentari_destins"><ul></ul></div>
+			<textarea id="comentari_text" rows="1" style="resize: none;" class="form-control" placeholder="<spring:message code="contingut.comentaris.text.placeholder"/>" maxlength="1024"></textarea>
+		</div>
+		<div class="col-xs-2">
+			<button class="btn btn-success enviar-comentari"><span class="fa fa-paper-plane-o"></span>&nbsp;<spring:message code="comu.boto.enviar"/></button>
+		</div>			
+		<div class="col-xs-12" style="height:10px"></div>
+	</c:if>
 	<div id="modal-botons" class="well">
 		<a href="<c:url value="/bustiaUser"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.tancar"/></a>
 	</div>

@@ -754,7 +754,7 @@ function removeCookie(cname) {
 							</ul>
 						</c:if> 
 						
-						<c:if test="${!isTasca && !isRolActualAdministradorLectura}">
+						<c:if test="${!isTasca}">
 							<rip:blocContingutAccions 
 								id="botons-accions-info" 
 								contingut="${expedient}"

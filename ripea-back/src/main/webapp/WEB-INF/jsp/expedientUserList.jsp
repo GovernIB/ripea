@@ -746,6 +746,32 @@ function removeCookie(cname) {
 								{{/if}}
 								<li role="separator" class="divider"></li>
 								<li><a href="<c:url value="/contingut/{{:id}}/log"/>" data-toggle="modal"><span class="fa fa-list"></span>&nbsp;<spring:message code="comu.boto.historial"/></a></li>
+								<%---- Descarregar fitxer comprimit ----%>
+								{{if conteDocuments}}
+									<li><a href="<c:url value="/contingut/{{:id}}/descarregarSelectedDocuments?tascaId=${tascaId}"/>" data-toggle="modal"><span class="fa fa-download"></span>&nbsp;<spring:message code="expedient.boto.descarregar.fitxer.comprimit"/>...</a></li>
+								{{/if}}
+								{{if conteDocuments}}
+									<%---- Exportar índex PDF... ----%>
+									<li><a class="fileDownload" href="<c:url value="/expedient/{{:id}}/generarIndex/PDF"/>"><span class="fa fa-list-ol"></span>&nbsp;<spring:message code="expedient.list.user.recuperar.index.pdf"/>...</a></li>
+									<c:if test="${isExportacioExcelActiva}">
+										<li><a class="fileDownload" href="<c:url value="/expedient/{{:id}}/generarIndex/XLSX"/>"><span class="fa fa-th-list"></span>&nbsp;<spring:message code="expedient.list.user.recuperar.index.xlsx"/>...</a></li>
+									</c:if>
+									<%---- Índex PDF i exportació ENI... ----%>
+									{{if conteDocumentsDefinitius}}
+										<li><a class="fileDownload" href="<c:url value="/expedient/{{:id}}/generarExportarIndex"/>"><span class="fa fa-list-ol"></span>&nbsp;<span class="fa fa-file-code-o"></span>&nbsp;<spring:message code="expedient.list.user.recuperar.exportar.index"/>...</a></li>
+										<li><a class="fileDownload" href="<c:url value="/expedient/{{:id}}/exportarEni"/>"><span class="fa fa-file-code-o"></span>&nbsp;<spring:message code="expedient.list.user.recuperar.exportacio.eni"/>...</a></li>
+										<c:if test="${isExportacioInsideActiva}">
+											<li><a class="fileDownload" href="<c:url value="/expedient/{{:id}}/exportarEni?ambDocuments=true"/>"><span class="fa fa-file-archive-o"></span>&nbsp;<spring:message code="expedient.list.user.recuperar.exportacio.eni.inside"/>...</a></li>
+										</c:if>
+									{{else}}
+										<li class="disabled"><a href="#"><span class="fa fa-list-ol"></span>&nbsp;<span class="fa fa-file-code-o"></span>&nbsp;<spring:message code="expedient.list.user.recuperar.exportar.index"/>...</a></li>
+										<c:if test="${isExportacioInsideActiva}">
+											<li class="disabled"><a href="#"><span class="fa fa-file-archive-o"></span>&nbsp;<spring:message code="expedient.list.user.recuperar.exportacio.eni.inside"/>...</a></li>
+										</c:if>
+									{{/if}}
+								{{else}}
+									<li class="disabled"><a href="#"/><span class="fa fa-list-ol"></span>&nbsp;<spring:message code="comu.boto.index"/>...</a></li>
+								{{/if}}
 								{{if arxiuUuid != null}}
 									<li><a href="<c:url value="/contingut/{{:id}}/arxiu"/>" data-toggle="modal"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.arxiu"/></a></li>
 								{{else}}
@@ -839,7 +865,6 @@ function removeCookie(cname) {
 
 								<%---- Descarregar fitxer comprimit ----%>
 								{{if conteDocuments}}
-									<%---- <li><a href="<c:url value="/contingut/{{:id}}/descarregarAllDocumentsOfExpedient?tascaId=${tascaId}"/>" ><span class="fa fa-download"></span>&nbsp;<spring:message code="expedient.boto.descarregar.fitxer.comprimit"/></a></li> ----%>
 									<li><a href="<c:url value="/contingut/{{:id}}/descarregarSelectedDocuments?tascaId=${tascaId}"/>" data-toggle="modal"><span class="fa fa-download"></span>&nbsp;<spring:message code="expedient.boto.descarregar.fitxer.comprimit"/>...</a></li>
 								{{/if}}
 

@@ -4,6 +4,9 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<%
+pageContext.setAttribute("isRolActualAdministradorLectura", es.caib.ripea.back.helper.RolHelper.isRolActualAdministradorLectura(request), PageContext.SESSION_SCOPE);
+%>
 <html>
 <head>
 	<title><spring:message code="firma.info.titol"/></title>
@@ -71,7 +74,7 @@
 						<td>${viafirma.messageCode}</td>
 					</tr>
 				</c:if>
-				<c:if test="${viafirma.estat == 'ENVIAT'}">
+				<c:if test="${viafirma.estat == 'ENVIAT' && !isRolActualAdministradorLectura}">
 					<tr>
 						<td colspan="2" style="text-align:right">
 							<a href="<rip:modalUrl value="/document/${viafirma.document.id}/viafirma/cancel"/>" data-confirm="<spring:message code="firma.info.accio.cancel.confirmacio"/>" class="btn btn-default"><span class="fa fa-times"></span> <spring:message code="firma.info.accio.cancel"/></a>

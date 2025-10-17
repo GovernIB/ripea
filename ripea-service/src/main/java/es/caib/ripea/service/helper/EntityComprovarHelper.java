@@ -1156,6 +1156,22 @@ public class EntityComprovarHelper {
 		return isAdminEntitat;
 	}
 	
+	public boolean isAdminLecturaEntitat(Long procedimentId) {
+		
+		if (cacheHelper.mostrarLogsPermisos())
+			logger.info("isAdminEntitat( procedimentId=" + procedimentId + ")");
+		
+		MetaExpedientEntity procediment = metaExpedientRepository.getOne(procedimentId);
+		
+		boolean isAdminEntitat = false;
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		EntitatEntity entitat = procediment.getEntitat();
+		if (auth.getAuthorities().contains(new SimpleGrantedAuthority("IPA_ADMIN_LECTURA"))) {
+			isAdminEntitat = permisosHelper.isGrantedAll(entitat.getId(), EntitatEntity.class, new Permission[] { ExtendedPermission.ADMINISTRATION_READ }, auth);
+		} 
+		return isAdminEntitat;
+	}
+	
 	
 	public boolean isAdminOrgan(Long organGestorId) {
 		
@@ -1450,7 +1466,7 @@ public class EntityComprovarHelper {
 		if (cacheHelper.mostrarLogsPermisos())
 			logger.info("comprovarPermisExpedient (expedientId=" + expedientId + ", permission=" + permissionName + ", user=" + authObject.getName() + ", roles="+authObject.getAuthorities());
 		
-		if (!isAdminEntitat(procedimentId)) {
+		if (!isAdminEntitat(procedimentId) && !isAdminLecturaEntitat(procedimentId)) {
 
 			if (cacheHelper.mostrarLogsPermisos())
 				logger.info("comprovarPermisExpedient: El usuari no es administrador de la entitat. Continuam comprovant nivells més baixos.");

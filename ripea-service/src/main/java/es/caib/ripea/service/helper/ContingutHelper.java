@@ -1070,6 +1070,13 @@ public class ContingutHelper {
 						new Permission[] { ExtendedPermission.ADMINISTRATION },
 						SecurityContextHolder.getContext().getAuthentication());
 			}
+			if (rolActual.equals("IPA_ADMIN_LECTURA")) {
+				admin = permisosHelper.isGrantedAll(
+						contingut.getEntitat().getId(),
+						EntitatEntity.class,
+						new Permission[] { ExtendedPermission.ADMINISTRATION_READ },
+						SecurityContextHolder.getContext().getAuthentication());
+			}
 			if (rolActual.equals("IPA_ORGAN_ADMIN")) {
 				if (contingut.getExpedientPare().getOrganGestor() != null) {
 					boolean grantedOrgan = false;
@@ -1228,7 +1235,12 @@ public class ContingutHelper {
 
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-		if (!checkPerMassiuAdmin && !checkIfUserIsAdminOfContingut(contingutId, rolActual) && !RolHelper.isAdminEntitat(rolActual) && !RolHelper.isAdminOrgan(rolActual) && comprovarAgafatPerUsuariActual) {
+		if (!checkPerMassiuAdmin &&
+			!checkIfUserIsAdminOfContingut(contingutId, rolActual) &&
+			!RolHelper.isAdminEntitat(rolActual) &&
+			!RolHelper.isAdminLecturaEntitat(rolActual) &&
+			!RolHelper.isAdminOrgan(rolActual) &&
+			comprovarAgafatPerUsuariActual) {
 			// Comprova que l'usuari actual te agafat l'expedient
 			UsuariEntity agafatPer = expedient.getAgafatPer();
 			if (agafatPer == null) {

@@ -1909,6 +1909,9 @@ public class ExpedientHelper {
 		ExpedientFiltreCalculat expedientFiltreCalculat = new ExpedientFiltreCalculat();
 		ExpedientFiltreDto filtre = new ExpedientFiltreDto();
 		
+		boolean isAdmin 		= rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ADMIN_LECTURA") || rolActual.equals("IPA_SUPER");
+		boolean noFiltreGrups	= rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ADMIN_LECTURA") || rolActual.equals("IPA_ORGAN_ADMIN");
+		
 		return expedientRepository.findIdsByEntitatAndFiltre(
 				entitatEntity,
 				permisosPerExpedients.getIdsMetaExpedientsPermesos() == null,
@@ -1963,8 +1966,8 @@ public class ExpedientHelper {
 				filtre.getMetaExpedientDominiValor(),
 				permisosPerExpedients.getIdsGrupsPermesos() == null,
 				permisosPerExpedients.getIdsGrupsPermesos(),
-				rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_SUPER"), //No aplica filtre permis directe procediment
-				rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN"), //No aplica filtre grups
+				isAdmin, //No aplica filtre permis directe procediment
+				noFiltreGrups, //No aplica filtre grups
 				filtre.isAmbFirmaPendent(),
 				Utils.isEmpty(filtre.getNumeroRegistre()),
 				! Utils.isEmpty(filtre.getNumeroRegistre()) ? filtre.getNumeroRegistre() : "",

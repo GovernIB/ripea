@@ -5,6 +5,9 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+<%
+pageContext.setAttribute("isRolActualAdministradorLectura", es.caib.ripea.back.helper.RolHelper.isRolActualAdministradorLectura(request), PageContext.SESSION_SCOPE);
+%>
 <c:choose>
 	<c:when test="${contingut.expedient}"><c:set var="titol"><spring:message code="contingut.alertes.titol.expedient"/></c:set></c:when>
 	<c:when test="${contingut.document}"><c:set var="titol"><spring:message code="contingut.alertes.titol.document"/></c:set></c:when>
@@ -48,7 +51,9 @@ $( document ).ready(function() {
 			<div class="panel-heading" role="tab" id="heading-${alerta.id}">
 				<span class="fa fa-exclamation-circle text-danger"></span>&nbsp;
 				${alerta.text}&nbsp;
-				<a href="<c:url value="/contingut/${contingut.id}/alertes/${alerta.id}/llegir"/>" class="btn btn-primary btn-sm" title="<spring:message code="contingut.alertes.marcar.llegida"/>" style="float:right"><span class="fa fa-envelope-open-o"></span></a>
+				<c:if test="${!isRolActualAdministradorLectura}">
+					<a href="<c:url value="/contingut/${contingut.id}/alertes/${alerta.id}/llegir"/>" class="btn btn-primary btn-sm" title="<spring:message code="contingut.alertes.marcar.llegida"/>" style="float:right"><span class="fa fa-envelope-open-o"></span></a>
+				</c:if>
 				<c:if test="${not empty alerta.error}">
 					<a id="collapse-btn-${alerta.id}" href="#collapse-${alerta.id}" class="btn btn-default btn-sm" data-toggle="collapse" aria-expanded="false" aria-controls="collapse-${alerta.id}" style="float:right; margin-right:1em"><span class="fa fa-chevron-down"></span></a>
 				</c:if>

@@ -4,6 +4,9 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<%
+pageContext.setAttribute("isRolActualAdministradorLectura", es.caib.ripea.back.helper.RolHelper.isRolActualAdministradorLectura(request), PageContext.SESSION_SCOPE);
+%>
 <c:set var="isTasca" value="${not empty tascaId}"/>
 <html>
 <head>
@@ -264,7 +267,7 @@ $(document).ready(function() {
 
 				</div>
 				<div class="buttons_container">
-					<c:if test="${portafirmes.estat == 'ENVIAT' && readOnly == false}">
+					<c:if test="${portafirmes.estat == 'ENVIAT' && readOnly == false && !isRolActualAdministradorLectura}">
 						<a id="btn_cancelar" href="<rip:modalUrl value="/document/${portafirmes.document.id}/portafirmes/cancel?tascaId=${tascaId}"/>" data-confirm="<spring:message code="firma.info.accio.cancel.confirmacio"/>" class="btn btn-default"><span class="fa fa-times"></span> <spring:message code="firma.info.accio.cancel"/></a>
 					</c:if>
 				</div>
