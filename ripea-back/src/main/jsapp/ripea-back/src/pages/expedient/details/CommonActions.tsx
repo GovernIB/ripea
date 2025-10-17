@@ -242,7 +242,7 @@ export const useCommonActions = (refresh?: () => void) => {
         return row?.agafatPer?.id == user?.codi
     }
     const isUsuariActualWrite = (row:any) :boolean => {
-        return row?.usuariActualWrite
+        return row?.usuariActualWrite || user?.rolActual == "IPA_ADMIN_LECTURA"
     }
     const isAdminOAdminOrgan = (row:any) :boolean => {
         return (isRolActualAdmin && permisos?.permisAdministrador) || ( isRolActualOrganAdmin && permisos?.organs?.some((e:any)=>e.id == row?.organGestor?.id) )

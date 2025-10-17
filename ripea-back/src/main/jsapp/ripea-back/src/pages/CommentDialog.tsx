@@ -14,7 +14,6 @@ import {
     useResourceApiService,
     useBaseAppContext,
     useMuiContentDialog,
-    useCloseDialogButtons,
     useFormApiRef
 } from 'reactlib';
 import { formatDate } from '../util/dateUtils';
@@ -79,23 +78,25 @@ const Comments = (props: any) => {
                 <Typography variant="caption" color="textDisabled">{formatDate(a?.createdDate)}</Typography>
             </Grid>
         )}
-        <Grid size={12}>
-            <MuiForm
-                resourceName={resourceName}
-                hiddenToolbar
-                additionalData={{
-                    [resourceReference]: { id },
-                }}
-                apiRef={formApiRef}
-                commonFieldComponentProps={{ size: 'small' }}>
-                <Grid container columnSpacing={1} rowSpacing={1}>
-                    <Grid size={12} sx={{ display: 'flex' }}>
-                        <FormField name="text" />
-                        <Button onClick={handleButtonClick} startIcon={<Icon>send</Icon>} variant="contained">Envia</Button>
+        { user?.rolActual != "IPA_ADMIN_LECTURA" &&
+            <Grid size={12}>
+                <MuiForm
+                    resourceName={resourceName}
+                    hiddenToolbar
+                    additionalData={{
+                        [resourceReference]: { id },
+                    }}
+                    apiRef={formApiRef}
+                    commonFieldComponentProps={{ size: 'small' }}>
+                    <Grid container columnSpacing={1} rowSpacing={1}>
+                        <Grid size={12} sx={{ display: 'flex' }}>
+                            <FormField name="text" />
+                            <Button onClick={handleButtonClick} startIcon={<Icon>send</Icon>} variant="contained">Envia</Button>
+                        </Grid>
                     </Grid>
-                </Grid>
-            </MuiForm>
-        </Grid>
+                </MuiForm>
+            </Grid>
+        }
     </Grid>;
 }
 
