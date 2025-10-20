@@ -422,7 +422,7 @@ const useMenuAdmin = () => {
                     id: 'pendents',
                     title: t('page.user.menu.pendents'),
                     // icon: '',
-                    onClick: () => toProgramaAntic('seguimentExpedientsPendents'),
+                    to: '/seguimentExpedientsPendents',
                 },
                 {
                     id: 'comunicades',

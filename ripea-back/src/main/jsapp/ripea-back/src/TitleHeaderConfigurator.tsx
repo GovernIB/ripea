@@ -19,6 +19,7 @@ const TITLES: any = {
     '/seguimentNotificacions': "page.user.menu.notib",
     '/seguimentPinbal': "page.user.menu.pinbalEnviades",
     '/seguimentTasques': "page.user.menu.assignacio",
+    '/seguimentExpedientsPendents': "page.user.menu.pendents",
 };
 
 export const setTitlePage = (title:string) => {
