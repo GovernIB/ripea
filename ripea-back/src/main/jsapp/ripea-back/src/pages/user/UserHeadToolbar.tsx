@@ -416,7 +416,7 @@ const useMenuAdmin = () => {
                     id: 'assignacio',
                     title: t('page.user.menu.assignacio'),
                     // icon: '',
-                    onClick: () => toProgramaAntic('seguimentTasques'),
+                    to: '/seguimentTasques',
                 },
                 {
                     id: 'pendents',

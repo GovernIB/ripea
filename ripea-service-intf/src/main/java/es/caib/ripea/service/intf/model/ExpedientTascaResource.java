@@ -156,8 +156,10 @@ public class ExpedientTascaResource extends BaseAuditableResource<Long> {
         private Date dataFi;
         private Date dataLimitInici;
         private Date dataLimitFi;
-        private List<TascaEstatEnumDto> estat = new ArrayList<>(
+        private TascaEstatEnumDto estat;
+        private List<TascaEstatEnumDto> estats = new ArrayList<>(
                 List.of(TascaEstatEnumDto.PENDENT, TascaEstatEnumDto.INICIADA, TascaEstatEnumDto.AGAFADA));
+        private ResourceReference<UsuariResource, String> responsable;
     }
 
     @Getter

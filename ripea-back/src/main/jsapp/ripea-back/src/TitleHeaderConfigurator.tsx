@@ -18,6 +18,7 @@ const TITLES: any = {
     '/seguimentPortafirmes': "page.user.menu.portafib",
     '/seguimentNotificacions': "page.user.menu.notib",
     '/seguimentPinbal': "page.user.menu.pinbalEnviades",
+    '/seguimentTasques': "page.user.menu.assignacio",
 };
 
 export const setTitlePage = (title:string) => {

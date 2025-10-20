@@ -25,7 +25,7 @@ const TasquesGridFilterForm = () => {
         <GridFormField xs={1.5} name="dataFi" type={"date"}/>
         <GridFormField xs={1.5} name="dataLimitInici" type={"date"}/>
         <GridFormField xs={1.5} name="dataLimitFi" type={"date"}/>
-        <GridFormField xs={3.5} name="estat" multiple/>
+        <GridFormField xs={3.5} name="estats" multiple/>
     </>
 }
 
@@ -38,7 +38,7 @@ const springFilterBuilder = (data:any) => {
         builder.eq("prioritat", `${data?.prioritat}`),
         builder.betweenDates("dataInici", data?.dataInici, data?.dataFi),
         builder.betweenDates("dataLimit", data?.dataLimitInici, data?.dataLimitFi),
-        builder.inside("estat", ...(data?.estat.map((v:any)=>`'${v}'`) ?? []))
+        builder.inside("estat", ...(data?.estats.map((v:any)=>`'${v}'`) ?? []))
     );
     // console.log('>>> springFilterBuilder:', filterStr)
     return filterStr;

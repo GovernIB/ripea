@@ -17,6 +17,7 @@ import ActualitzarEstatAnotacioGrid from "./pages/user/accionsMassives/Actualitz
 import DocumentEnviatsPortafirmesGrid from "./pages/user/consultes/DocumentEnviatsPortafirmesGrid.tsx";
 import RemesesNotibGrid from "./pages/user/consultes/RemesesNotibGrid.tsx";
 import ConsultesPinbalGrid from "./pages/user/consultes/ConsultesPinbalGrid.tsx";
+import AssignacioTasquesGrid from "./pages/user/consultes/AssignacioTasquesGrid.tsx";
 
 const AppRoutes: React.FC = () => {
     return <Routes>
@@ -39,6 +40,7 @@ const AppRoutes: React.FC = () => {
         <Route path="seguimentPortafirmes" element={<DocumentEnviatsPortafirmesGrid />} />
         <Route path="seguimentNotificacions" element={<RemesesNotibGrid />} />
         <Route path="seguimentPinbal" element={<ConsultesPinbalGrid />} />
+        <Route path="seguimentTasques" element={<AssignacioTasquesGrid />} />
 
         <Route path="contingut/:id" element={<Expedient />} />
         <Route path="contingut/:id/tasca/:tascaId" element={<Tasca />} />

@@ -109,6 +109,7 @@ const ConsultesPinbalGrid = () => {
                 columns={columns}
                 filter={springFilter}
                 sortModel={sortModel}
+                readOnly
             />
         </CardPage>
     </GridPage>
