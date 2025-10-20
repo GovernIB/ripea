@@ -15,6 +15,7 @@ import MarcarDefinitiuGrid from "./pages/user/accionsMassives/MarcarDefinitiuGri
 import CanviPrioritatGrid from "./pages/user/accionsMassives/CanviPrioritatGrid.tsx";
 import ActualitzarEstatAnotacioGrid from "./pages/user/accionsMassives/ActualitzarEstatAnotacioGrid.tsx";
 import DocumentEnviatsPortafirmesGrid from "./pages/user/consultes/DocumentEnviatsPortafirmesGrid.tsx";
+import RemesesNotibGrid from "./pages/user/consultes/RemesesNotibGrid.tsx";
 
 const AppRoutes: React.FC = () => {
     return <Routes>
@@ -35,6 +36,8 @@ const AppRoutes: React.FC = () => {
         </Route>
         <Route path="seguimentArxiuPendents" element={<CustodiarElementsPendentsGrid />} />
         <Route path="seguimentPortafirmes" element={<DocumentEnviatsPortafirmesGrid />} />
+        <Route path="seguimentNotificacions" element={<RemesesNotibGrid />} />
+
         <Route path="contingut/:id" element={<Expedient />} />
         <Route path="contingut/:id/tasca/:tascaId" element={<Tasca />} />
         <Route path="expedientPeticio" element={<AnotacionsGrid />} />

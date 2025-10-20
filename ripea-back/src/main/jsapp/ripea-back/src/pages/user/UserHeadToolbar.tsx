@@ -404,7 +404,7 @@ const useMenuAdmin = () => {
                     id: 'notib',
                     title: t('page.user.menu.notib'),
                     // icon: '',
-                    onClick: () => toProgramaAntic('seguimentNotificacions'),
+                    to: 'seguimentNotificacions',
                 },
                 {
                     id: 'pinbalEnviades',
@@ -671,7 +671,7 @@ const useMenuUsuari = () => {
                     id: 'notib',
                     title: t('page.user.menu.notib'),
                     // icon: '',
-                    onClick: () => toProgramaAntic('seguimentNotificacions'),
+                    to: 'seguimentNotificacions',
                     hidden: !user?.sessionScope?.isMostrarSeguimentEnviamentsUsuariActiu,
                 },
             ],

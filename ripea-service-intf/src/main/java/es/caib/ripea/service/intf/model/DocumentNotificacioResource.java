@@ -39,6 +39,10 @@ import javax.validation.constraints.NotNull;
                     type = ResourceArtifactType.REPORT,
                     code = DocumentNotificacioResource.ACTION_DESCARREGAR_DOC_ENVIAT,
                     requiresId = true),
+            @ResourceConfigArtifact(
+                    type = ResourceArtifactType.FILTER,
+                    code = DocumentNotificacioResource.FILTER_ENVIATS_NOTIB_CODE,
+                    formClass = DocumentNotificacioResource.EnviatsNotibFilter.class),
         }
 )
 public class DocumentNotificacioResource extends DocumentEnviamentResource {
@@ -49,6 +53,7 @@ public class DocumentNotificacioResource extends DocumentEnviamentResource {
     public static final String ACTION_DESCARREGAR_JUSTIFICANT	= "DESCARREGAR_JUSTIFICANT";
     public static final String ACTION_DESCARREGAR_DOC_ENVIAT	= "DESCARREGAR_DOC_ENVIAT";
     public static final String ACTION_ELIMINAR					= "DELETE_NOTIFICACIO";
+    public static final String FILTER_ENVIATS_NOTIB_CODE        = "FILTER_ENVIATS_NOTIB";
 
     private DocumentNotificacioTipusEnumDto tipus;
     private Date dataProgramada;
@@ -70,6 +75,12 @@ public class DocumentNotificacioResource extends DocumentEnviamentResource {
     private boolean hasDocumentInteressats;
 
     private ResourceReference<OrganGestorResource, Long> emisor;
+
+    @Transient
+    private ResourceReference<MetaExpedientResource, Long> procediment;
+
+    @Transient
+    private InteressatResource destinatari;
     
     @Getter
     @Setter
@@ -79,5 +90,21 @@ public class DocumentNotificacioResource extends DocumentEnviamentResource {
         @NotEmpty
         private List<Long> ids;
         private boolean massivo = false;
+    }
+
+    @Getter
+    @Setter
+    public static class EnviatsNotibFilter implements Serializable {
+        private String nom;
+        private NotificaEnviamentTipusEnumDto tipusEnviament;
+        private String concepte;
+        private DocumentNotificacioEstatEnumDto estat;
+        private Date dataEnviamentInici;
+        private Date dataEnviamentFi;
+        private String interessat;
+        private ResourceReference<ExpedientResource, Long> expedient;
+        private ResourceReference<OrganGestorResource, Long> emisor;
+        private ResourceReference<MetaExpedientResource, Long> procediment;
+        private boolean nomesAmbError;
     }
 }

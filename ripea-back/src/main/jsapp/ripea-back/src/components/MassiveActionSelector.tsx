@@ -98,7 +98,7 @@ const MassiveActionSelector: React.FC<MassiveActionSelectorProps> = (props:Massi
             {
                 buttonActions.map((action:any, index:number)=>
                     !(typeof action.hidden === 'function' ? action.hidden(selectedRows) : action.hidden)
-                    && <Tooltip title={action?.title} key={`action-${index}`}>
+                    && <Tooltip title={action?.label} key={`action-${index}`}>
                         <Button
                             onClick={()=>action?.onClick?.(selectedRows)}
                             disabled={typeof action?.disabled === 'function' ? action?.disabled(selectedRows) : action?.disabled}
