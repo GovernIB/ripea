@@ -11,12 +11,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 @Entity
 @Table(name = BaseConfig.DB_PREFIX + "pinbal_servei")
 @Getter
 @Setter
 @NoArgsConstructor
-public class PinbalServeiResourceEntity extends BaseAuditableEntity<PinbalServeiResource> {
+public class PinbalServeiResourceEntity extends BaseAuditableEntity<PinbalServeiResource> implements Serializable {
 
 	@Column(name = "codi", length = 64, nullable = false)
 	private String codi;

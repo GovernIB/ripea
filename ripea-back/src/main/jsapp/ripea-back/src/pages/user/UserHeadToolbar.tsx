@@ -404,13 +404,13 @@ const useMenuAdmin = () => {
                     id: 'notib',
                     title: t('page.user.menu.notib'),
                     // icon: '',
-                    to: 'seguimentNotificacions',
+                    to: '/seguimentNotificacions',
                 },
                 {
                     id: 'pinbalEnviades',
                     title: t('page.user.menu.pinbalEnviades'),
                     // icon: '',
-                    onClick: () => toProgramaAntic('seguimentPinbal'),
+                    to: '/seguimentPinbal',
                 },
                 {
                     id: 'assignacio',

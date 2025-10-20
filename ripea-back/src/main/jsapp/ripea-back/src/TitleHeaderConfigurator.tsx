@@ -17,6 +17,7 @@ const TITLES: any = {
     '/massiu/expedientPeticioCanviEstatDistribucio': "navigate.massiu.expedientPeticioCanviEstatDistribucio",
     '/seguimentPortafirmes': "page.user.menu.portafib",
     '/seguimentNotificacions': "page.user.menu.notib",
+    '/seguimentPinbal': "page.user.menu.pinbalEnviades",
 };
 
 export const setTitlePage = (title:string) => {
