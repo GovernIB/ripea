@@ -27,6 +27,7 @@ import es.caib.comanda.ms.salut.model.IntegracioSalut;
 import es.caib.comanda.ms.salut.model.Manual;
 import es.caib.comanda.ms.salut.model.MissatgeSalut;
 import es.caib.comanda.ms.salut.model.SalutInfo;
+import es.caib.comanda.ms.salut.model.SubsistemaInfo;
 import es.caib.comanda.ms.salut.model.SubsistemaSalut;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.repository.EntitatRepository;
@@ -188,15 +189,15 @@ public class SalutServiceImpl implements SalutService{
 	}
 
 	@Override
-	public List<AppInfo> getSubsistemes() {
-		List<AppInfo> subsistemes = new ArrayList<AppInfo>();
-		subsistemes.add(AppInfo.builder().codi("SUB_EXP").nom("Tramitació d'expedients").build());
-		subsistemes.add(AppInfo.builder().codi("SUB_PRC").nom("Gestió de procediments").build());
-		subsistemes.add(AppInfo.builder().codi("SUB_MAS").nom("Accions massives").build());
-		subsistemes.add(AppInfo.builder().codi("SUB_CPF").nom("Callback PORTAFIB").build());
-		subsistemes.add(AppInfo.builder().codi("SUB_CNB").nom("Callback NOTIB").build());
-		subsistemes.add(AppInfo.builder().codi("SUB_CDI").nom("Callback DISTRIBUCIO").build());
-		subsistemes.add(AppInfo.builder().codi("SUB_GDO").nom("Gestió documental FileSystem").build());
+	public List<SubsistemaInfo> getSubsistemes() {
+		List<SubsistemaInfo> subsistemes = new ArrayList<SubsistemaInfo>();
+		subsistemes.add(SubsistemaInfo.builder().codi("SUB_EXP").nom("Tramitació d'expedients").build());
+		subsistemes.add(SubsistemaInfo.builder().codi("SUB_PRC").nom("Gestió de procediments").build());
+		subsistemes.add(SubsistemaInfo.builder().codi("SUB_MAS").nom("Accions massives").build());
+		subsistemes.add(SubsistemaInfo.builder().codi("SUB_CPF").nom("Callback PORTAFIB").build());
+		subsistemes.add(SubsistemaInfo.builder().codi("SUB_CNB").nom("Callback NOTIB").build());
+		subsistemes.add(SubsistemaInfo.builder().codi("SUB_CDI").nom("Callback DISTRIBUCIO").build());
+		subsistemes.add(SubsistemaInfo.builder().codi("SUB_GDO").nom("Gestió documental FileSystem").build());
 		return subsistemes;
 	}
 
@@ -215,13 +216,13 @@ public class SalutServiceImpl implements SalutService{
                         .codi("INT")
                         .nom("API interna")
                         .path(baseUrl + "/ripeaapi/interna")
-                        .api(baseUrl + "/ripeaapi/interna/rest")
+                        .api(baseUrl + "/ripeaapi/interna/swagger-ui/index.html")
                         .build(),
                 ContextInfo.builder()
                         .codi("EXT")
                         .nom("API externa")
                         .path(baseUrl + "/ripeaapi/externa")
-                        .api(baseUrl + "/ripeaapi/externa/rest")
+                        .api(null)
                         .build()
         );
 	}
@@ -260,14 +261,14 @@ public class SalutServiceImpl implements SalutService{
 		Long totalPeticionsError	= 0l;
 		if (salutIntegracions.size()>0) {
 			for (IntegracioSalut is: salutIntegracions) {
-				totalPeticionsOk = totalPeticionsOk + is.getPeticions().getTotalOk();
-				totalPeticionsError = totalPeticionsError + is.getPeticions().getTotalError();
+				totalPeticionsOk = totalPeticionsOk + (is.getPeticions().getTotalOk()!=null?is.getPeticions().getTotalOk():0l);
+				totalPeticionsError = totalPeticionsError + (is.getPeticions().getTotalError()!=null?is.getPeticions().getTotalError():0l);
 			}
 		}
 		if (subsistemesSalut.size()>0) {
 			for (SubsistemaSalut ss: subsistemesSalut) {
-				totalPeticionsOk = totalPeticionsOk + ss.getTotalOk();
-				totalPeticionsError = totalPeticionsError + ss.getTotalError();
+				totalPeticionsOk = totalPeticionsOk + (ss.getTotalOk()!=null?ss.getTotalOk():0l);
+				totalPeticionsError = totalPeticionsError + (ss.getTotalError()!=null?ss.getTotalError():0l);
 			}
 		}
 		return calculaEstat(totalPeticionsOk, totalPeticionsError);
@@ -284,13 +285,13 @@ public class SalutServiceImpl implements SalutService{
 		
 		if (salutIntegracions.size()>0) {
 			for (IntegracioSalut is: salutIntegracions) {
-				totalPeticionsOk = totalPeticionsOk + is.getPeticions().getTotalOk();
+				totalPeticionsOk = totalPeticionsOk + (is.getPeticions().getTotalOk()!=null?is.getPeticions().getTotalOk():0l);
 //				is.getPeticions().getPeticionsPerEntorn().get("").get
 			}
 		}
 		if (subsistemesSalut.size()>0) {
 			for (SubsistemaSalut ss: subsistemesSalut) {
-				totalPeticionsOk = totalPeticionsOk + ss.getTotalOk();
+				totalPeticionsOk = totalPeticionsOk + (ss.getTotalOk()!=null?ss.getTotalOk():0l);
 			}
 		}
 		return (int)(totalLatenciaPeticionsOk/totalPeticionsOk);
@@ -442,8 +443,10 @@ public class SalutServiceImpl implements SalutService{
     	if (ip.getPeticionsPerEntorn()!=null && ip.getPeticionsPerEntorn().size()>0) {
     		//Sumam els valors totals dels diferents endpoints del codi de integració
 	    	for (Map.Entry<String, IntegracioPeticions> entry : ip.getPeticionsPerEntorn().entrySet()) {
-	    		ip.setTotalOk(ip.getTotalOk()+entry.getValue().getTotalOk());
-	    		ip.setTotalError(ip.getTotalError()+entry.getValue().getTotalError());
+	    		ip.setTotalOk(ip.getTotalOk()!=null?
+	    				ip.getTotalOk():0+entry.getValue().getTotalOk());
+	    		ip.setTotalError(ip.getTotalError()!=null?
+	    				ip.getTotalError():0+entry.getValue().getTotalError());
 	    		ip.setTotalTempsMig(ip.getTotalTempsMig()!=null?
 	    				ip.getTotalTempsMig():0
 	    				+entry.getValue().getTotalTempsMig());
@@ -473,6 +476,12 @@ public class SalutServiceImpl implements SalutService{
 	                .build();
     	} else {
     		
+    		ip.setTotalOk(0l);
+    		ip.setTotalError(0l);
+    		ip.setTotalTempsMig(0);
+    		ip.setPeticionsOkUltimPeriode(0l);
+    		ip.setPeticionsErrorUltimPeriode(0l);
+    		ip.setTempsMigUltimPeriode(0);
 	    	ip.setEndpoint(endpointBase);
 	    	
 	    	return IntegracioSalut.builder()
@@ -735,7 +744,7 @@ public class SalutServiceImpl implements SalutService{
 	    		MissatgeSalut ms = MissatgeSalut.builder()
 	    				.data(avis.getDataInici())
 	    				.missatge(avis.getAssumpte()+": "+avis.getMissatge())
-	    				.nivell(avis.getAvisNivell().toString())
+	    				.nivell(avis.getSalutNivellComanda())
 	    				.build();
 	    		missatges.add(ms);
 	    	}
