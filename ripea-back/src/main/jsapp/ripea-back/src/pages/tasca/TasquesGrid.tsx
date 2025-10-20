@@ -150,7 +150,6 @@ const TasquesGrid = () => {
                             }
                     }}
                     toolbarHide
-                    paginationActive
                     readOnly
                 />
                 {components}
