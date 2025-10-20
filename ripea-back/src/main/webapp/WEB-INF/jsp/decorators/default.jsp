@@ -312,7 +312,7 @@ body {
                     </c:when>
                     <c:when test="${isRolActualAdministrador}">
                         <%---- Expedients ----%>
-                        <a href="<c:url value="/reactapp/expedient"></c:url>" class="btn btn-default"><span class="fa fa-folder" style="color: #004b99;"></span> <spring:message code="decorator.menu.expedients.new"/></a>
+<%--                         <a href="<c:url value="/reactapp/expedient"></c:url>" class="btn btn-default"><span class="fa fa-folder" style="color: #004b99;"></span> <spring:message code="decorator.menu.expedients.new"/></a> --%>
                         <a href="<c:url value="/expedient"></c:url>"class="btn btn-primary"><spring:message code="decorator.menu.expedients"/></a>                              
                         <%---- Annotacions pendents ----%>
                         <a href="<c:url value="/expedientPeticio"></c:url>" class="btn btn-primary">
@@ -404,7 +404,7 @@ body {
                     </c:when>
                     <c:when test="${isRolActualAdministradorOrgan}">
                         <%---- Expedients ----%>
-                        <a href="<c:url value="/reactapp/expedient"></c:url>" class="btn btn-default"><span class="fa fa-folder" style="color: #004b99;"></span> <spring:message code="decorator.menu.expedients.new"/></a>
+<%--                         <a href="<c:url value="/reactapp/expedient"></c:url>" class="btn btn-default"><span class="fa fa-folder" style="color: #004b99;"></span> <spring:message code="decorator.menu.expedients.new"/></a> --%>
                         <a href="<c:url value="/expedient"></c:url>"class="btn btn-primary"><spring:message code="decorator.menu.expedients"/></a>
                         <%---- Annotacions pendents ----%>
                         <a href="<c:url value="/expedientPeticio"></c:url>"class="btn btn-primary">
@@ -425,7 +425,7 @@ body {
                         <a href="<c:url value="/grup"></c:url>"class="btn btn-primary"><spring:message code="decorator.menu.grups"/></a>
                     </c:when>
                     <c:when test="${isRolActualUsuari}">
-                        <a href="<c:url value="/reactapp/expedient"></c:url>" class="btn btn-default"><span class="fa fa-folder" style="color: #004b99;"></span> <spring:message code="decorator.menu.expedients.new"/></a>
+<%--                         <a href="<c:url value="/reactapp/expedient"></c:url>" class="btn btn-default"><span class="fa fa-folder" style="color: #004b99;"></span> <spring:message code="decorator.menu.expedients.new"/></a> --%>
                         <%---- Expedients ----%>
                         <a href="<c:url value="/expedient"></c:url>"class="btn btn-primary"><spring:message code="decorator.menu.expedients"/></a>
                         <%---- Annotacions pendents ----%>
