@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 import {Icon} from "@mui/material";
-import { useMuiDataGridApiRef } from 'reactlib';
+import { GridPage, useMuiDataGridApiRef } from 'reactlib';
 import {useTranslation} from "react-i18next";
 import StyledMuiGrid, {ToolbarButton} from "../../components/StyledMuiGrid.tsx";
 import useInteressatActions, {useActions} from "./details/InteressatActions.tsx";
@@ -80,9 +80,9 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
                 builder.eq('expedient.id', entity?.id),
                 builder.eq('esRepresentant', false)
             )}
-            sortModel={sortModel}
+            staticSortModel={sortModel}
             perspectives={perspectives}
-            disableColumnSorting
+            // disableColumnSorting
             popupEditCreateActive
             popupEditFormContent={<InteressatsGridForm/>}
             formAdditionalData={{

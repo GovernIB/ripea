@@ -1,5 +1,6 @@
 import { Grid } from "@mui/material";
 import {
+    GridPage,
     useFormContext,
     useMuiDataGridApiRef,
 } from 'reactlib';
@@ -115,7 +116,7 @@ const TasquesExpedientGrid = (props: any) => {
             // paginationActive
             filter={builder.eq('expedient.id', entity?.id)}
             perspectives={perspectives}
-            sortModel={sortModel}
+            staticSortModel={sortModel}
             onRowCountChange={onRowCountChange}
             popupEditCreateActive
 			toolbarCreateTitle={t('page.tasca.action.new.label')}
