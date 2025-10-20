@@ -386,9 +386,9 @@ public class ExecucioMassivaHelper {
 		        	        MetaDocumentEntity metaDocumentEntity = metaDocumentRepository.findById(docExp.getTipusDocument()).get();
 		        	        documentDto.setDocumentTipus(DocumentTipusEnumDto.DIGITAL);
 		        	        //El nom no es pot repetir dins l'expedient
-		        	        String nomDocument = metaDocumentEntity.getNom()+" "+emc.getElementId()+ " "+System.currentTimeMillis(); 
+		        	        String nomDocument = metaDocumentEntity.getNom()+" "+emc.getElementId()+ " "+emc.getExecucioMassiva().getId(); 
 		        	        documentDto.setNom(Utils.abbreviate(nomDocument, 1024));
-		        	        documentDto.setDescripcio("Document importat massivament desde el llistat de expedients. ("+emc.getExecucioMassiva().getId()+")");
+		        	        documentDto.setDescripcio("Document importat massivament desde el llistat de expedients.");
 		        	        documentDto.setData(Calendar.getInstance().getTime());
 		        	        documentDto.setNtiOrigen(metaDocumentEntity.getNtiOrigen());
 		        	        documentDto.setNtiEstadoElaboracion(metaDocumentEntity.getNtiEstadoElaboracion());
