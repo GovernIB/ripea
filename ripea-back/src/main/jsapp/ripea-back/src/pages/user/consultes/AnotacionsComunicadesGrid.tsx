@@ -75,7 +75,7 @@ const columns = [
     {
         field: 'pendentCanviEstatDistribucio',
         flex: 0.5,
-        renderCell: (params:any) => (params?.row?.consultaWsError && <Icon>check</Icon>),
+        renderCell: (params:any) => (params?.row?.pendentCanviEstatDistribucio && <Icon>check</Icon>),
     },
     {
         field: 'reintentsCanviEstatDistribucio',

@@ -15,6 +15,8 @@ const TITLES: any = {
     '/massiu/definitiu': "navigate.massiu.definitiu",
     '/massiu/canviPrioritats': "navigate.massiu.canviPrioritats",
     '/massiu/expedientPeticioCanviEstatDistribucio': "navigate.massiu.expedientPeticioCanviEstatDistribucio",
+
+    '/metaExpedientRevisio': "page.user.menu.revisar",
     '/seguimentPortafirmes': "page.user.menu.portafib",
     '/seguimentNotificacions': "page.user.menu.notib",
     '/seguimentPinbal': "page.user.menu.pinbalEnviades",

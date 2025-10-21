@@ -391,7 +391,7 @@ const useMenuAdmin = () => {
                     id: 'revisar',
                     title: t('page.user.menu.revisar'),
                     // icon: '',
-                    onClick: () => toProgramaAntic('metaExpedientRevisio'),
+                    to: '/metaExpedientRevisio',
                     hidden: !user?.sessionScope?.revisioActiva,
                 },
                 {

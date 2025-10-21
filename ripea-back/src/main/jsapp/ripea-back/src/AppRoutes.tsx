@@ -20,6 +20,7 @@ import ConsultesPinbalGrid from "./pages/user/consultes/ConsultesPinbalGrid.tsx"
 import AssignacioTasquesGrid from "./pages/user/consultes/AssignacioTasquesGrid.tsx";
 import ExpedientsPendentsGrid from "./pages/user/consultes/ExpedientsPendentsGrid.tsx";
 import AnotacionsComunicadesGrid from "./pages/user/consultes/AnotacionsComunicadesGrid.tsx";
+import MetaExpedientGrid from "./pages/metaExpedient/MetaExpedientGrid.tsx";
 
 const AppRoutes: React.FC = () => {
     return <Routes>
@@ -38,6 +39,7 @@ const AppRoutes: React.FC = () => {
             <Route path={"canviPrioritats"} element={<CanviPrioritatGrid />} />
             <Route path={"expedientPeticioCanviEstatDistribucio"} element={<ActualitzarEstatAnotacioGrid />} />
         </Route>
+        <Route path="metaExpedientRevisio" element={<MetaExpedientGrid />} />
         <Route path="seguimentArxiuPendents" element={<CustodiarElementsPendentsGrid />} />
         <Route path="seguimentPortafirmes" element={<DocumentEnviatsPortafirmesGrid />} />
         <Route path="seguimentNotificacions" element={<RemesesNotibGrid />} />
