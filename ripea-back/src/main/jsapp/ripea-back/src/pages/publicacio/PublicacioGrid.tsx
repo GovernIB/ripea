@@ -81,7 +81,8 @@ const PublicacioGrid = (props:any) => {
             popupEditFormContent={<PublicacioGridForm/>}
             columns={columns}
             rowAdditionalActions={actions}
-            // paginationActive
+            paginationActive={false}
+            autoHeight
             filter={builder.eq('expedient.id', entity?.id)}
             staticSortModel={sortModel}
             onRowCountChange={onRowCountChange}

@@ -137,6 +137,9 @@ const RemesaGrid = (props:any) => {
             popupEditFormI18nKeys={{
                 updateSuccess: 'page.notificacio.action.update.ok',
             }}
+
+            paginationActive={false}
+            autoHeight
         />
         {components}
         {dialog}

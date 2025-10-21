@@ -113,7 +113,8 @@ const TasquesExpedientGrid = (props: any) => {
             resourceName="expedientTascaResource"
             popupEditFormDialogResourceTitle={t('page.tasca.title')}
             columns={additionalColumns}
-            // paginationActive
+            paginationActive={false}
+            autoHeight
             filter={builder.eq('expedient.id', entity?.id)}
             perspectives={perspectives}
             staticSortModel={sortModel}

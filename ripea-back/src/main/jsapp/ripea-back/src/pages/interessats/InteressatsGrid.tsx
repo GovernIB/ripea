@@ -74,7 +74,8 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
             resourceName="interessatResource"
             popupEditFormDialogResourceTitle={t('page.interessat.title')}
             columns={columns}
-            // paginationActive
+            paginationActive={false}
+            autoHeight
             apiRef={apiRef}
             filter={builder.and(
                 builder.eq('expedient.id', entity?.id),

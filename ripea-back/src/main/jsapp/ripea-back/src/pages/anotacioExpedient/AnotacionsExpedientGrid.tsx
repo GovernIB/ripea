@@ -54,7 +54,8 @@ const AnotacionsExpedientGrid = (props:any) => {
             perspectives={perspectives}
             columns={columns}
             rowAdditionalActions={actions}
-            // paginationActive
+            paginationActive={false}
+            autoHeight
             onRowClick={(params: any) => handleOpen(params?.row?.id, params?.row) }
             disableColumnSorting
             readOnly

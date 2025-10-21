@@ -118,6 +118,9 @@ const MetaDadaGrid = (props: { entity:any, onRowCountChange?: ((value:number) =>
                     handleOpen(null, params.row)
                 }
             }}
+
+            paginationActive={false}
+            autoHeight
         />
         {components}
         {content}
