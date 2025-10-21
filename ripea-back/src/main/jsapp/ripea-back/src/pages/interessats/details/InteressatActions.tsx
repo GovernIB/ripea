@@ -110,12 +110,12 @@ const useInteressatActions = (entity:any, refresh?: () => void) => {
                 esRepresentant: false,
             }),
         },
-        /*{
+        {
             label: t('page.interessat.action.importSGD.label'),
             icon: 'group_search',
             showInMenu: true,
             onClick: handleImportarSGD,
-        }*/
+        }
     ]
 
     const actions = [

@@ -211,13 +211,12 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             label: t('page.document.action.import.label'),
             icon: "upload_file",
             onClick: handleImportar,
-            disabled: !user?.sessionScope?.isMostrarImportacio,
+            hidden: !user?.sessionScope?.isMostrarImportacio,
         },
 		{
 		    label: t('page.document.action.importZip.label'),
 		    icon: "upload_file",
 		    onClick: handleImportarZip,
-		    disabled: !user?.sessionScope?.isMostrarImportacio,
 		},
         {
             label: t('page.contingut.action.importarExpedient.label'),

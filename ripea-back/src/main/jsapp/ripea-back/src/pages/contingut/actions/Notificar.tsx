@@ -27,10 +27,7 @@ const Notificacio = (props:any) => {
             <ContenidoData title={t('page.interessat.detall.email')}>{entity?.email}</ContenidoData>
             <ContenidoData title={t('page.interessat.detall.telefon')}>{entity?.telefon}</ContenidoData>
             <ContenidoData title={t('page.interessat.detall.incapacitat')}>{entity?.incapacitat}</ContenidoData>
-
-            <CardData title={t('page.interessat.detall.direccioPostal')} hidden={representant || !entregaPostal}>
-                <ContenidoData title={t('page.interessat.detall.direccio')}>{entity?.paisNom} {entity?.provinciaNom} {entity?.municipiNom} {entity?.codiPostal} {entity?.adresa}</ContenidoData>
-            </CardData>
+            <ContenidoData hidden={representant || !entregaPostal} title={<><Icon sx={{mr:1}}>place</Icon>{t('page.interessat.detall.direccioPostal')}</>}>{entity?.paisNom} {entity?.provinciaNom} {entity?.municipiNom} {entity?.codiPostal} {entity?.adresa}</ContenidoData>
 
             <CardData title={t('page.interessat.rep')} hidden={!representant}>
                 <ContenidoData title={t('page.interessat.detall.nif')}>{representant?.documentNum}</ContenidoData>
@@ -41,9 +38,7 @@ const Notificacio = (props:any) => {
                 <ContenidoData title={t('page.interessat.detall.incapacitat')}>{representant?.incapacitat}</ContenidoData>
             </CardData>
 
-            <CardData title={t('page.interessat.detall.direccioPostal')} hidden={!representant || !entregaPostal}>
-                <ContenidoData title={t('page.interessat.detall.direccio')}>{entity?.paisNom} {entity?.provinciaNom} {entity?.municipiNom} {representant?.codiPostal} {representant?.adresa}</ContenidoData>
-            </CardData>
+            <ContenidoData hidden={!representant || !entregaPostal} title={<><Icon sx={{mr:1}}>place</Icon>{t('page.interessat.detall.direccioPostal')}</>}>{entity?.paisNom} {entity?.provinciaNom} {entity?.municipiNom} {representant?.codiPostal} {representant?.adresa}</ContenidoData>
         </CardData>
     </Grid>
 }
