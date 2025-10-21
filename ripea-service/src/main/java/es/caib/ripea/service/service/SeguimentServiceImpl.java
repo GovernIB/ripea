@@ -460,11 +460,6 @@ public class SeguimentServiceImpl implements SeguimentService {
 		if (CollectionUtils.isEmpty(metaExpedientsPermesos)) {
 			metaExpedientsPermesos = null;
 		}
-		
-		PermisosPerExpedientsDto permisosPerExpedients = expedientHelper.findPermisosPerExpedients(
-				entitatId,
-				rolActual,
-				organActual);
 
 		// =========================================== EXPEDIENT =======================================================
 		if (arxiuPendentTipusEnum == ArxiuPendentTipusEnumDto.EXPEDIENT) {
@@ -474,26 +469,6 @@ public class SeguimentServiceImpl implements SeguimentService {
 			ordenacioMap.put("dataDarrerIntent", new String[] { "arxiuIntentData" });
 
 			if (resultEnum == ResultEnumDto.PAGE) {
-				
-//				Page<ExpedientEntity> exps = expedientRepository.findArxiuPendents(
-//						entitat,
-//						permisosPerExpedients.getIdsMetaExpedientsPermesos() == null,
-//						permisosPerExpedients.getIdsMetaExpedientsPermesos(),
-//						permisosPerExpedients.getIdsOrgansPermesos() == null,
-//						permisosPerExpedients.getIdsOrgansPermesos(),
-//						permisosPerExpedients.getIdsMetaExpedientOrganPairsPermesos() == null,
-//						permisosPerExpedients.getIdsMetaExpedientOrganPairsPermesos(),
-//						permisosPerExpedients.getIdsOrgansAmbProcedimentsComunsPermesos() == null,
-//						permisosPerExpedients.getIdsOrgansAmbProcedimentsComunsPermesos(),	
-//						permisosPerExpedients.getIdsProcedimentsComuns(),
-//						nomesAgafats,
-//						auth.getName(),
-//						filtre.getElementNom() == null || filtre.getElementNom().isEmpty(),
-//						filtre.getElementNom() != null ? filtre.getElementNom().trim() : "",
-//						metaExpedient == null,
-//						metaExpedient,
-//						paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap));
-
 				
 				// ============ RETURNS PAGE (DATATABLE) ===============
 				Page<ExpedientEntity> exps = expedientRepositoryCommnand.findArxiuPendents(

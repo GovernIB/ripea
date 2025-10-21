@@ -250,6 +250,11 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		        }
 	        }
         }
+        
+		//Si no es té permis per cap expedient, no retornam resultats
+		if (permesosClausulesIn==null || permesosClausulesIn.size()==0) {
+			return FilterBuilder.equal("id", 0).generate();
+		}
 
 		Filter filtreResultat = FilterBuilder.and(filtreFrontAndEntitat, filtreNoEliminats, filtrePermisos);
         
