@@ -34,6 +34,7 @@ public class PropertyConfig {
 	public static final String CAPSALERA_LLETRA	= "es.caib.ripea.capsalera.color.lletra";
 	public static final String CLAU_ENCRIPTACIO	= "es.caib.ripea.encription.key";
 	public static final String MAX_UPLOAD_FILE	= "es.caib.ripea.maxUploadSize";
+	public static final String REACT_ACTIU		= "es.caib.ripea.reactActivat";
 
 	public static final String PINBAL_BASE_URL 		= "es.caib.ripea.pinbal.base.url";
 	public static final String PINBAL_USER 			= "es.caib.ripea.pinbal.user";

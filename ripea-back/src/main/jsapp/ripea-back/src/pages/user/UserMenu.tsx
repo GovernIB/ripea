@@ -163,19 +163,28 @@ export const UserMenu = () => {
             }
         </MenuSelect>
 
-        { (isRolActualOrganAdmin || isRolActualDissenyOrgan) &&
-            <MenuSelect
-                value={organId}
-                onChange={setOrganId}
-                icon={<Icon fontSize={"inherit"}>apartment</Icon>}
-            >
-                {
-                    permisos?.organs?.map((rol:any) =>
-                        <MenuItem key={rol.codi} value={rol.id}><ListItemText>{rol.nom}</ListItemText></MenuItem>
-                    )
-                }
-            </MenuSelect>
-        }
+        { (isRolActualOrganAdmin || isRolActualDissenyOrgan) && (
+            (permisos?.organs && permisos.organs.length > 0) ? (
+                <MenuSelect
+                    value={organId}
+                    onChange={setOrganId}
+                    icon={<Icon fontSize={"inherit"}>apartment</Icon>}
+                >
+                    {
+                        permisos.organs.map((rol:any) =>
+                            <MenuItem key={rol.codi} value={rol.id}><ListItemText>{rol.nom}</ListItemText></MenuItem>
+                        )
+                    }
+                </MenuSelect>
+            ) : (
+                <MenuItem disabled>
+                    <ListItemIcon>
+                        <Icon fontSize="small">apartment</Icon>
+                    </ListItemIcon>
+                    <ListItemText><Icon fontSize="small">warning</Icon> {t('page.user.options.noOrgans', 'No hay elementos')}</ListItemText>
+                </MenuItem>
+            )
+        )}
     </>
 }
 const UserMenuButton = () => {

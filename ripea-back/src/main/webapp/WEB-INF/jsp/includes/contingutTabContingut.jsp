@@ -60,7 +60,6 @@
 	//NO quant es molla un fitxer de disc damunt la table, per aquesta funcionalitat cercar dataTransfer.files 	
 	function dropFitxerDinsCarpeta(event) {
 		try {
-			debugger;
 			if (documentDrag!=null) {
 				let vistaActiva = $('#vistes').children("a.active").attr('id');
 				if (vistaActiva == 'vistaTreetablePerCarpetes') {
@@ -109,6 +108,29 @@
             </c:otherwise>
         </c:choose>
 
+        $("#table-documents tbody tr").each(function () {
+        	  const $tr = $(this);
+
+        	  // Extrae la profundidad desde la clase treetable-depth-X
+        	  const depthMatch = $tr.attr("class").match(/treetable-depth-(\d+)/);
+        	  const profundidad = depthMatch ? parseInt(depthMatch[1], 10) : 0;
+        	  
+        	  // Busca el <td> que contiene el ícono de carpeta
+        	  const $tdWithFolder = $tr.find("td").filter(function () {
+        	    const $td = $(this);
+        	    const $folderIcon = $td.find("span.fa-folder-o");
+        	    if ($folderIcon.length === 0) return false;
+        	    const hasExpanderBefore = $folderIcon.prevAll("span.treetable-expander").length > 0;
+        	    return !hasExpanderBefore;
+        	  });
+
+        	  // Si cumple ambas condiciones, aplica clase
+        	  if ($tdWithFolder.length > 0) {
+					let calcPadding = (profundidad * 50) + 28;
+        		  $tdWithFolder.css("padding-left", calcPadding+"px");
+        	  }
+        });
+        
 		updateTableEvents();
 
 		var popoverFlag = 0;
@@ -757,9 +779,7 @@
 		var $tableDocuments = $("#table-documents");
 		var nodeId = $this.data("node");
 		var $node = $tableDocuments.find('tr[data-node="' + nodeId + '"]');
-
 		var padding = calcPadding(false, 10, $node);
-
 		$node.find('td').eq(1).css('padding-left', padding);
 	}
 

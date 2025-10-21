@@ -1049,7 +1049,8 @@ const translationEs = {
                 perfil: "Mi perfil",
                 manual: "Manual de Usuario",
                 manualAdmin: "Manual de los Administradores",
-                logout: "Desconectar"
+                logout: "Desconectar",
+                noOrgans: "Ningún órgano gestor asignado"
             },
             menu: {
                 entitat: "Entidades",

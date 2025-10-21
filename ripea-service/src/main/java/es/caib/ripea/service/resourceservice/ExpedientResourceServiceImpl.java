@@ -272,6 +272,11 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     	        }
             }
 
+    		//Si no es té permis per cap expedient, no retornam resultats
+    		if (permesosClausulesIn==null || permesosClausulesIn.size()==0) {
+    			return FilterBuilder.equal("id", 0).generate();
+    		}
+            
     		Filter filtreResultat = FilterBuilder.and(filtreFrontAndEntitat, filtreNoEliminats, filtrePermisos);
 	    
 			applicationHelper.stopTimer(sample, "METRICS@Subsystem_Expedient.list", "resultado", "exito");		
@@ -282,6 +287,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     		applicationHelper.stopTimer(sample, "METRICS@Subsystem_Expedient.list", "resultado", "error");
     		throw e;
     	}
+
 //
 //        /**
 //         * Procediment (meta-expedients) amb permisos

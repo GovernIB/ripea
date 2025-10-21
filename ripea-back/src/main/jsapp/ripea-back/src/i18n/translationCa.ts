@@ -1050,7 +1050,8 @@ const translationCa = {
                 perfil: "El meu perfil",
                 manual: "Manual d'usuari",
                 manualAdmin: "Manual dels administradors",
-                logout: "Desconnectar"
+                logout: "Desconnectar",
+                noOrgans: "Cap organ gestor assignat"
             },
             menu: {
                 entitat: "Entitats",

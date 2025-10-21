@@ -110,7 +110,10 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
         String rolActual = RolHelper.getRolActual(request);
         List<String> roles = RolHelper.getRolsUsuariActual(request);
         List<String> rolesAuth = SecurityContextHolder.getContext().getAuthentication().getAuthorities()
-                .stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList());
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .filter(role -> role.startsWith("IPA_") || role.equals("tothom"))
+                .collect(Collectors.toList());
 
         UserPermissionInfo userPermissionInfo = ((UsuariResourceService) readonlyResourceService).getCurrentUserPermissionInfo();
         userPermissionInfo.setEntitatActualId(entitatActual != null ? entitatActual.getId() : null);
@@ -181,10 +184,13 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
         response.put("isWsUsuariEntitatActiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.PORTAFIB_PLUGIN_USUARISPF_WS)));
         response.put("ordenacioContingutPermesa", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.ORDENACIO_CONTINGUT_ACTIU)));
         response.put("moureMateixExpedients", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.MOURE_MATEIX_EXPEDIENTS)));
-        List<GrupDto> grupsPermesos = grupService.findGrupsPermesosProcedimentsGestioActiva(
-        		userPermissionInfo.getEntitatActualId(),
-        		userPermissionInfo.getRolActual(),
-        		RolHelper.isRolActualAdministradorOrgan(request) ? organActual.getId() : null);
+        List<GrupDto> grupsPermesos = null;
+        if (organActual!=null) {
+	        grupService.findGrupsPermesosProcedimentsGestioActiva(
+	        		userPermissionInfo.getEntitatActualId(),
+	        		userPermissionInfo.getRolActual(),
+	        		RolHelper.isRolActualAdministradorOrgan(request) ? organActual.getId() : null);
+        }
         response.put("isFiltreGrupsVisible", (grupsPermesos!=null && !grupsPermesos.isEmpty()));
         return response;
     }
