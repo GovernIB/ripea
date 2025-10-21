@@ -45,6 +45,10 @@ import lombok.experimental.FieldNameConstants;
                         code = ExpedientPeticioResource.ACTUALITZAR_ESTAT_FILTER_CODE,
                         formClass = ExpedientPeticioResource.ActualitzarEstatFilter.class),
                 @ResourceConfigArtifact(
+                        type = ResourceArtifactType.FILTER,
+                        code = ExpedientPeticioResource.ANOTACIONS_COMUNICADES_FILTER_CODE,
+                        formClass = ExpedientPeticioResource.AnotacionsComunicadesFilter.class),
+                @ResourceConfigArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = ExpedientPeticioResource.PERSPECTIVE_REGISTRE_CODE),
                 @ResourceConfigArtifact(
@@ -72,6 +76,7 @@ import lombok.experimental.FieldNameConstants;
 )
 public class ExpedientPeticioResource extends BaseAuditableResource<Long> {
 
+    public static final String ANOTACIONS_COMUNICADES_FILTER_CODE = "ANOTACIONS_COMUNICADES_FILTER";
     public static final String ACTUALITZAR_ESTAT_FILTER_CODE = "ACTUALITZAR_ESTAT_FILTER";
     public static final String FILTER_CODE = "ANOTACIO_FILTER";
 
@@ -101,6 +106,10 @@ public class ExpedientPeticioResource extends BaseAuditableResource<Long> {
     private boolean pendentCanviEstatDistribucio;
     private int reintentsCanviEstatDistribucio;
 
+    private boolean consultaWsError;
+    private String consultaWsErrorDesc;
+    private Date consultaWsErrorDate;
+
     @Transient private RegistreResource registreInfo;
     @Transient private ExpedientPeticioEstatViewEnumDto estatView;
 
@@ -117,6 +126,16 @@ public class ExpedientPeticioResource extends BaseAuditableResource<Long> {
         private Date dataRecepcioFinal;
         private ExpedientPeticioEstatViewEnumDto estat = ExpedientPeticioEstatViewEnumDto.PENDENT;
         private String interessat;
+    }
+
+    @Getter
+    @Setter
+    public static class AnotacionsComunicadesFilter implements Serializable {
+        private String numRegistre;
+        private ExpedientPeticioEstatEnumDto estat = ExpedientPeticioEstatEnumDto.CREAT;
+        private Date dataAltaInici;
+        private Date dataAltaFi;
+        private boolean nomesAmbErrors = true;
     }
 
     @Getter

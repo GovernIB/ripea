@@ -20,6 +20,7 @@ const TITLES: any = {
     '/seguimentPinbal': "page.user.menu.pinbalEnviades",
     '/seguimentTasques': "page.user.menu.assignacio",
     '/seguimentExpedientsPendents': "page.user.menu.pendents",
+    '/expedientPeticioComunicades': "page.user.menu.comunicades",
 };
 
 export const setTitlePage = (title:string) => {

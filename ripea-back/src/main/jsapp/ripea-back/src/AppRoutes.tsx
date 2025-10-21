@@ -19,6 +19,7 @@ import RemesesNotibGrid from "./pages/user/consultes/RemesesNotibGrid.tsx";
 import ConsultesPinbalGrid from "./pages/user/consultes/ConsultesPinbalGrid.tsx";
 import AssignacioTasquesGrid from "./pages/user/consultes/AssignacioTasquesGrid.tsx";
 import ExpedientsPendentsGrid from "./pages/user/consultes/ExpedientsPendentsGrid.tsx";
+import AnotacionsComunicadesGrid from "./pages/user/consultes/AnotacionsComunicadesGrid.tsx";
 
 const AppRoutes: React.FC = () => {
     return <Routes>
@@ -43,6 +44,7 @@ const AppRoutes: React.FC = () => {
         <Route path="seguimentPinbal" element={<ConsultesPinbalGrid />} />
         <Route path="seguimentTasques" element={<AssignacioTasquesGrid />} />
         <Route path="seguimentExpedientsPendents" element={<ExpedientsPendentsGrid />} />
+        <Route path="expedientPeticioComunicades" element={<AnotacionsComunicadesGrid/>} />
 
         <Route path="contingut/:id" element={<Expedient />} />
         <Route path="contingut/:id/tasca/:tascaId" element={<Tasca />} />

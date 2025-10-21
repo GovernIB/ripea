@@ -428,7 +428,7 @@ const useMenuAdmin = () => {
                     id: 'comunicades',
                     title: t('page.user.menu.comunicades'),
                     // icon: '',
-                    onClick: () => toProgramaAntic('expedientPeticioComunicades'),
+                    to: '/expedientPeticioComunicades',
                 },
             ],
         },
