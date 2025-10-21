@@ -133,6 +133,9 @@ const translationCa = {
                 nom: "Nom",
             },
             detalle: {
+                title: "Detalls del contingut",
+                nom: "Nom",
+                data: "Data",
                 numero: "Número",
                 titol: "Títol",
                 metaExpedient: "Tipus",
@@ -218,6 +221,9 @@ const translationCa = {
                 },
                 custodiar: {
                     label: "Custodiar",
+                },
+                replay: {
+                    label: "Recuperar",
                 },
             },
             history: {

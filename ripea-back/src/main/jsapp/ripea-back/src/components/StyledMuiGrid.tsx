@@ -202,7 +202,7 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
         <MuiGrid
             resourceName={resourceName}
             filter={filter}
-            autoHeight
+            // autoHeight
             key={user?.conf?.numElementsPagina}
             paginationActive
 

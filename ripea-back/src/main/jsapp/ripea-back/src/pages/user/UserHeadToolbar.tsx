@@ -379,7 +379,7 @@ const useMenuAdmin = () => {
                     id: 'continguts',
                     title: t('page.user.menu.continguts'),
                     // icon: '',
-                    onClick: () => toProgramaAntic('contingutAdmin'),
+                    to: 'contingutAdmin',
                 },
                 {
                     id: 'dadesEstadistiques',

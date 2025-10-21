@@ -133,6 +133,9 @@ const translationEs = {
                 nom: "Nombre",
             },
             detalle: {
+                title: "Content details",
+                nom: "Name",
+                data: "Date",
                 numero: "Numero",
                 titol: "Titulo",
                 metaExpedient: "Tipo",
@@ -218,6 +221,9 @@ const translationEs = {
                 },
                 custodiar: {
                     label: "Custodiar",
+                },
+                replay: {
+                    label: "Recover",
                 },
             },
             history: {

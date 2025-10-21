@@ -4,8 +4,9 @@ import java.util.List;
 
 import es.caib.ripea.persistence.base.repository.BaseRepository;
 import es.caib.ripea.persistence.entity.resourceentity.ContingutResourceEntity;
+import es.caib.ripea.service.intf.model.ContingutResource;
 
-public interface ContingutResourceRepository extends BaseRepository<ContingutResourceEntity, Long> {
+public interface ContingutResourceRepository extends BaseRepository<ContingutResourceEntity<ContingutResource>, Long> {
 
 	public List<ContingutResourceEntity> findByPareId(Long pareId);
 }

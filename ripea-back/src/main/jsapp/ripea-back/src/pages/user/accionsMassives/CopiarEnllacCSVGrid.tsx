@@ -21,7 +21,7 @@ const columns = [
         flex: 1.75,
         renderCell: (params:any) => <>
             {/** TODO: revisar columna ubicación */}
-            /<a href={`/contingut/${params?.row?.expedient?.id}`} style={{ display: 'flex', alignItems: 'center' }}><Icon>folder</Icon>{params?.formattedValue}</a>
+            /<a href={`/contingut/${params?.row?.expedient?.id}`} style={{ display: 'flex', alignItems: 'center' }}><Icon>folder_open</Icon>{params?.formattedValue}</a>
             {params?.row?.pare?.id != params?.row?.expedient?.id ?<>/.../<Icon>folder</Icon>{params?.row?.pare?.description}</> :"" }
             /<Icon>description</Icon>{params?.row?.fitxerNom}
         </>,

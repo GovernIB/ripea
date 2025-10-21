@@ -16,6 +16,8 @@ const TITLES: any = {
     '/massiu/canviPrioritats': "navigate.massiu.canviPrioritats",
     '/massiu/expedientPeticioCanviEstatDistribucio': "navigate.massiu.expedientPeticioCanviEstatDistribucio",
 
+    '/contingutAdmin': "page.user.menu.continguts",
+    '/historic': "page.user.menu.dadesEstadistiques",
     '/metaExpedientRevisio': "page.user.menu.revisar",
     '/seguimentPortafirmes': "page.user.menu.portafib",
     '/seguimentNotificacions': "page.user.menu.notib",

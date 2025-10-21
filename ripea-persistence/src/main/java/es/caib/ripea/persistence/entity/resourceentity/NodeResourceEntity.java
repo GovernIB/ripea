@@ -1,6 +1,7 @@
 package es.caib.ripea.persistence.entity.resourceentity;
 
 import es.caib.ripea.service.intf.config.BaseConfig;
+import es.caib.ripea.service.intf.model.ContingutResource;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -25,7 +26,7 @@ import javax.persistence.Table;
 @Setter
 @NoArgsConstructor
 @Inheritance(strategy = InheritanceType.JOINED)
-public abstract class NodeResourceEntity<R> extends ContingutResourceEntity<R> {
+public abstract class NodeResourceEntity<R extends ContingutResource> extends ContingutResourceEntity<R> {
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(

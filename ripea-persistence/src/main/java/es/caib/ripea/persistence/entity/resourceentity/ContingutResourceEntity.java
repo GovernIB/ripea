@@ -10,6 +10,7 @@ import javax.persistence.*;
 import es.caib.ripea.persistence.base.entity.BaseAuditableEntity;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
+import es.caib.ripea.service.intf.model.ContingutResource;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -26,7 +27,7 @@ import org.hibernate.annotations.Where;
 @Setter
 @NoArgsConstructor
 @Inheritance(strategy = InheritanceType.JOINED)
-public abstract class ContingutResourceEntity<R> extends BaseAuditableEntity<R> {
+public class ContingutResourceEntity<R extends ContingutResource> extends BaseAuditableEntity<R> {
 
 	@Column(name = "nom", length = 256, nullable = false)
 	protected String nom;
