@@ -20,8 +20,9 @@ import ConsultesPinbalGrid from "./pages/user/consultes/ConsultesPinbalGrid.tsx"
 import AssignacioTasquesGrid from "./pages/user/consultes/AssignacioTasquesGrid.tsx";
 import ExpedientsPendentsGrid from "./pages/user/consultes/ExpedientsPendentsGrid.tsx";
 import AnotacionsComunicadesGrid from "./pages/user/consultes/AnotacionsComunicadesGrid.tsx";
-import MetaExpedientGrid from "./pages/metaExpedient/MetaExpedientGrid.tsx";
+import RevisioMetaExpedientGrid from "./pages/user/consultes/RevisioMetaExpedientGrid.tsx";
 import ContingutGrid from "./pages/user/consultes/ContingutGrid.tsx";
+import GestioMetaExpedientGrid from "./pages/user/configurar/GestioMetaExpedientGrid.tsx";
 
 const AppRoutes: React.FC = () => {
     return <Routes>
@@ -30,6 +31,8 @@ const AppRoutes: React.FC = () => {
             <Route index element={<ExpedientGrid />} />
             {/*<Route path=":id" element={<Expedient />} />*/}
         </Route>
+
+        {/* Accions massives */}
         <Route path="massiu">
             <Route path={"portafirmes"} element={<EnviarPortafirmesGrid />} />
             <Route path={"firmasimpleweb"} element={<FirmaNavegadorGrid />} />
@@ -40,15 +43,20 @@ const AppRoutes: React.FC = () => {
             <Route path={"canviPrioritats"} element={<CanviPrioritatGrid />} />
             <Route path={"expedientPeticioCanviEstatDistribucio"} element={<ActualitzarEstatAnotacioGrid />} />
         </Route>
-        <Route path="contingutAdmin" element={<ContingutGrid/>} />
-        <Route path="metaExpedientRevisio" element={<MetaExpedientGrid />} />
         <Route path="seguimentArxiuPendents" element={<CustodiarElementsPendentsGrid />} />
+
+        {/* Consultes */}
+        <Route path="contingutAdmin" element={<ContingutGrid/>} />
+        <Route path="metaExpedientRevisio" element={<RevisioMetaExpedientGrid />} />
         <Route path="seguimentPortafirmes" element={<DocumentEnviatsPortafirmesGrid />} />
         <Route path="seguimentNotificacions" element={<RemesesNotibGrid />} />
         <Route path="seguimentPinbal" element={<ConsultesPinbalGrid />} />
         <Route path="seguimentTasques" element={<AssignacioTasquesGrid />} />
         <Route path="seguimentExpedientsPendents" element={<ExpedientsPendentsGrid />} />
         <Route path="expedientPeticioComunicades" element={<AnotacionsComunicadesGrid/>} />
+
+        {/* Configurar */}
+        <Route path="metaExpedient" element={<GestioMetaExpedientGrid/>} />
 
         <Route path="contingut/:id" element={<Expedient />} />
         <Route path="contingut/:id/tasca/:tascaId" element={<Tasca />} />

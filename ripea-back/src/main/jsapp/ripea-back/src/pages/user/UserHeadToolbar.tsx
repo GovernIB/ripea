@@ -166,7 +166,7 @@ const useMenuSupAdmin = () => {
             id: 'entitat',
             title: t('page.user.menu.entitat'),
             icon: 'account_balance',
-            to: '/entitat',
+            onClick: () => toProgramaAntic('entitat'),
         },
         {
             id: 'integracions',
@@ -280,14 +280,14 @@ const useMenuAdmin = () => {
             icon: icons.anotacio,
             to: '/expedientPeticio',
         },
-        {
-            id: 'procediments',
-            title: t('page.user.menu.procediments'),
-            badge: user?.sessionScope?.organsNoSincronitzats,
-            hover: t('page.user.menu.procedimentsTitle'),
-            // icon: '',
-            onClick: () => toProgramaAntic('metaExpedient'),
-        },
+        // {
+        //     id: 'procediments',
+        //     title: t('page.user.menu.procediments'),
+        //     badge: user?.sessionScope?.organsNoSincronitzats,
+        //     hover: t('page.user.menu.procedimentsTitle'),
+        //     // icon: '',
+        //     to: '/metaExpedient',
+        // },
     ];
     const entries = [
         {
@@ -314,7 +314,7 @@ const useMenuAdmin = () => {
                     barge: user?.sessionScope?.organsNoSincronitzats,
                     hover: t('page.user.menu.procedimentsTitle'),
                     // icon: '',
-                    onClick: () => toProgramaAntic('metaExpedient'),
+                    to: '/metaExpedient',
                 },
                 {
                     id: 'documents',
@@ -445,7 +445,6 @@ const useMenuAdmin = () => {
 const useMenuAdminLectura = () => {
     const { value: user } = useUserSession();
     const { t } = useTranslation();
-    const { toProgramaAntic } = useToProgramaAntic();
 
     const appEntries:any[] = [
         {
@@ -460,7 +459,7 @@ const useMenuAdminLectura = () => {
             badge: user?.sessionScope?.organsNoSincronitzats,
             hover: t('page.user.menu.procedimentsTitle'),
             // icon: '',
-            onClick: () => toProgramaAntic('metaExpedient'),
+            to: '/metaExpedient',
         },
     ];
     const entries = [
@@ -476,7 +475,7 @@ const useMenuAdminLectura = () => {
             barge: user?.sessionScope?.organsNoSincronitzats,
             hover: t('page.user.menu.procedimentsTitle'),
             // icon: '',
-            onClick: () => toProgramaAntic('metaExpedient'),
+            to: '/metaExpedient',
         },
     ]
     const content = <>
@@ -514,7 +513,7 @@ const useMenuAdminOrgan = () => {
             badge: user?.sessionScope?.organsNoSincronitzats,
             hover: t('page.user.menu.procedimentsTitle'),
             // icon: '',
-            onClick: () => toProgramaAntic('metaExpedient'),
+            to: '/metaExpedient',
         },
     ];
     const entries = [
@@ -542,7 +541,7 @@ const useMenuAdminOrgan = () => {
                     badge: user?.sessionScope?.organsNoSincronitzats,
                     hover: t('page.user.menu.procedimentsTitle'),
                     // icon: '',
-                    onClick: () => toProgramaAntic('metaExpedient'),
+                    to: '/metaExpedient',
                 },
                 {
                     id: 'grups',
@@ -572,7 +571,7 @@ const useMenuDissenyOrgan = () => {
             id: 'procediments',
             title: t('page.user.menu.procediments'),
             // icon: '',
-            onClick: () => toProgramaAntic('metaExpedient'),
+            to: '/metaExpedient',
         },
         {
             id: 'grups',

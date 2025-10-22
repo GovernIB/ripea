@@ -6,6 +6,8 @@ const TITLES: any = {
     '/expedient': "navigate.expedient",
     '/expedientPeticio': "navigate.expedientPeticio",
     '/usuariTasca': "navigate.usuariTasca",
+
+    // Accions massives
     '/massiu/portafirmes': "navigate.massiu.portafirmes",
     '/massiu/firmasimpleweb': "navigate.massiu.firmasimpleweb",
     '/massiu/canviEstat': "navigate.massiu.canviEstat",
@@ -16,6 +18,7 @@ const TITLES: any = {
     '/massiu/canviPrioritats': "navigate.massiu.canviPrioritats",
     '/massiu/expedientPeticioCanviEstatDistribucio': "navigate.massiu.expedientPeticioCanviEstatDistribucio",
 
+    // Consultes
     '/contingutAdmin': "page.user.menu.continguts",
     '/historic': "page.user.menu.dadesEstadistiques",
     '/metaExpedientRevisio': "page.user.menu.revisar",
@@ -25,6 +28,9 @@ const TITLES: any = {
     '/seguimentTasques': "page.user.menu.assignacio",
     '/seguimentExpedientsPendents': "page.user.menu.pendents",
     '/expedientPeticioComunicades': "page.user.menu.comunicades",
+
+    // Configurar
+    '/metaExpedient': "page.user.menu.procediments",
 };
 
 export const setTitlePage = (title:string) => {

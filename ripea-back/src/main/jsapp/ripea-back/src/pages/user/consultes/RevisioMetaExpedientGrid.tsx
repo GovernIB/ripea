@@ -1,15 +1,15 @@
 import {useTranslation} from "react-i18next";
 import {useState} from "react";
 import {GridPage} from "reactlib";
-import {CardPage} from "../../components/CardData.tsx";
-import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
+import {CardPage} from "../../../components/CardData.tsx";
+import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import {Grid, Icon, Typography} from "@mui/material";
-import GridFormField from "../../components/GridFormField.tsx";
-import * as builder from "../../util/springFilterUtils.ts";
-import StyledMuiFilter from "../../components/StyledMuiFilter.tsx";
-import {formatDate} from "../../util/dateUtils.ts";
+import GridFormField from "../../../components/GridFormField.tsx";
+import * as builder from "../../../util/springFilterUtils.ts";
+import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
+import {formatDate} from "../../../util/dateUtils.ts";
 
-const MetaExpedientFilterForm = () => {
+const RevisioMetaExpedientFilterForm = () => {
     return <>
         <GridFormField xs={4} name="codi"/>
         <GridFormField xs={4} name="classificacio"/>
@@ -30,7 +30,7 @@ const springFilterBuilder = (data:any) => {
     );
 }
 
-const MetaExpedientFilter = (props: any) => {
+const RevisioMetaExpedientFilter = (props: any) => {
     const {onSpringFilterChange} = props;
 
     return <StyledMuiFilter
@@ -39,7 +39,7 @@ const MetaExpedientFilter = (props: any) => {
         springFilterBuilder={springFilterBuilder}
         onSpringFilterChange={onSpringFilterChange}
     >
-        <MetaExpedientFilterForm/>
+        <RevisioMetaExpedientFilterForm/>
     </StyledMuiFilter>
 }
 
@@ -123,13 +123,13 @@ const columns = [
     },
 ]
 
-const MetaExpedientGrid = () => {
+const RevisioMetaExpedientGrid = () => {
     const {t} = useTranslation();
     const [springFilter, setSpringFilter] = useState<string>();
 
     return <GridPage disableMargins>
         <CardPage title={t('page.user.menu.revisar')}>
-            <MetaExpedientFilter onSpringFilterChange={setSpringFilter}/>
+            <RevisioMetaExpedientFilter onSpringFilterChange={setSpringFilter}/>
 
             <StyledMuiGrid
                 resourceName={"metaExpedientResource"}
@@ -147,4 +147,4 @@ const MetaExpedientGrid = () => {
         </CardPage>
     </GridPage>
 }
-export default MetaExpedientGrid;
+export default RevisioMetaExpedientGrid;

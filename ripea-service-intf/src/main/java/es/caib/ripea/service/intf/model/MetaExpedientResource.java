@@ -8,6 +8,7 @@ import javax.validation.constraints.Size;
 
 import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
+import es.caib.ripea.service.intf.dto.MetaExpedientAmbitEnumDto;
 import org.springframework.data.annotation.Transient;
 
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
@@ -36,12 +37,17 @@ import lombok.experimental.FieldNameConstants;
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.FILTER,
                         code = MetaExpedientResource.FILTER_REVISIO_CODE,
-                        formClass = MetaExpedientResource.RevisioFormFilter.class),
+                        formClass = MetaExpedientResource.GestioRevisioFormFilter.class),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.FILTER,
+                        code = MetaExpedientResource.FILTER_GESTIO_CODE,
+                        formClass = MetaExpedientResource.GestioRevisioFormFilter.class),
         }
 )
 public class MetaExpedientResource extends MetaNodeResource {
 
     public static final String FILTER_REVISIO_CODE = "FILTER_REVISIO";
+    public static final String FILTER_GESTIO_CODE = "FILTER_GESTIO";
 
 	@NotNull
 	@Size(max = 64)
@@ -100,11 +106,15 @@ public class MetaExpedientResource extends MetaNodeResource {
 
     @Getter
     @Setter
-    public static class RevisioFormFilter implements Serializable {
+    public static class GestioRevisioFormFilter implements Serializable {
         private String codi;
         private String classificacio;
         private String nom;
         private MetaExpedientRevisioEstatEnumDto revisioEstat;
         private ResourceReference<OrganGestorResource, Long> organGestor;
+
+        private Boolean actiu;
+        private MetaExpedientAmbitEnumDto ambit;
+        private boolean permisDirecte;
     }
 }
