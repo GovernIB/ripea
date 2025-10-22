@@ -73,7 +73,7 @@ const RemesaGridForm = () => {
     </Grid>
 }
 
-const sortModel:any = [{field: 'id', sort: 'asc'}];
+const sortModel:any = [{field: 'id', sort: 'desc'}];
 const columns = [
     {
         field: 'tipus',

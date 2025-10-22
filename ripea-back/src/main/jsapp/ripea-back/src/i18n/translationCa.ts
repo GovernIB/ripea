@@ -688,7 +688,6 @@ const translationCa = {
 				importZip: {
 				    label: "Importar des de ZIP...",
 				    title: "Importació de documents des d'un ZIP",
-					title: "Importació de documents des d'un ZIP",
 				    ok: "Documents importats correctament",
 				},
                 detall: {
