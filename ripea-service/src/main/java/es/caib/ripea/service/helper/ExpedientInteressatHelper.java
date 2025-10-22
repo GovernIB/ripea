@@ -29,13 +29,14 @@ import org.springframework.transaction.annotation.Transactional;
 import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.entity.InteressatAdministracioEntity;
 import es.caib.ripea.persistence.entity.InteressatEntity;
+import es.caib.ripea.persistence.entity.InteressatGrupEntity;
 import es.caib.ripea.persistence.entity.InteressatPersonaFisicaEntity;
 import es.caib.ripea.persistence.entity.InteressatPersonaJuridicaEntity;
 import es.caib.ripea.persistence.repository.ExpedientRepository;
+import es.caib.ripea.persistence.repository.InteressatGrupRepository;
 import es.caib.ripea.persistence.repository.InteressatRepository;
 import es.caib.ripea.service.intf.base.model.Resource;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
-import es.caib.ripea.service.intf.dto.EntregaPostalTipusEnum;
 import es.caib.ripea.service.intf.dto.InteressatAdministracioDto;
 import es.caib.ripea.service.intf.dto.InteressatDocumentTipusEnumDto;
 import es.caib.ripea.service.intf.dto.InteressatDto;
@@ -66,6 +67,7 @@ public class ExpedientInteressatHelper {
 	@Autowired private ContingutHelper contingutHelper;
 	@Autowired private CacheHelper cacheHelper;
 	@Autowired private MessageHelper messageHelper;
+	@Autowired private InteressatGrupRepository interessatGrupRepository;
 	@Autowired(required = true) private javax.validation.Validator validator;
 	
 	@Transactional
@@ -437,7 +439,20 @@ public class ExpedientInteressatHelper {
 		if (propagarArxiu && expedient.getArxiuUuid() != null) {
 			arxiuPropagarInteressats(expedient, interessatRepresentantEntity);
 		}
-
+		
+		List<Long> grupsId = Optional.ofNullable(interessatRepresentant.getGrupsId())
+		        .orElse(Collections.emptyList());
+		
+		// Eliminar asociaciones actuales
+		new ArrayList<>(interessatRepresentantEntity.getGrups())
+		        .forEach(interessatRepresentantEntity::removeGrup);
+		
+		// Añadir nuevas asociaciones si las hay
+		if (!grupsId.isEmpty()) {
+		    List<InteressatGrupEntity> nuevosGrups = interessatGrupRepository.findByIdIn(grupsId);
+		    nuevosGrups.forEach(interessatRepresentantEntity::addGrup);
+		}
+		
 		return interessatRepresentantEntity;
 	}
 
@@ -1075,6 +1090,15 @@ public class ExpedientInteressatHelper {
 		interessats.addAll(interessatRepository.findAdminByExpedientAndNotRepresentantAndAmbDadesPerNotificacio(expedient));
 		return interessats;
 	}
+
+	@Transactional
+	public InteressatGrupEntity createGrup(ExpedientEntity expedient, List<InteressatEntity> interessats, String nom, String descripcio) {
+		InteressatGrupEntity grup = InteressatGrupEntity.builder().expedient(expedient).nom(nom).descripcio(descripcio).interessats(interessats).build();
+		InteressatGrupEntity grupCreat = interessatGrupRepository.save(grup);
+		return grupCreat;
+	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(ExpedientHelper.class);
+
+
 }

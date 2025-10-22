@@ -398,15 +398,50 @@ const translationEn = {
                     title: "Import stakeholders from Registry",
                     ok: "Stakeholders successfully imported",
                 },
+				gestGrups: {
+				    label: "Manage groups",
+					title: "Manage groups",
+				    ok: "Groups successfully modified",
+				},
             },
             grid: {
                 title: "Interested parties from file",
                 representant: "Representative",
+				tipus: {
+					label: "Type",
+					personaFisica: "Fisic person",
+					personaJuridica: "Legal entity",
+					administrador: "Administrator",
+				},
             },
             alert: {
                 incapacitat: "If the holder has a disability, it is mandatory to indicate a recipient.",
                 jaExistentExpedient: "Already exists in the case file",
             },
+			grup: {
+				title: "Group",
+				action: {
+					new: {
+						label: "New Group",
+						ok: "Group created successfully",
+					},
+					update: {
+						ok: "Group updated successfully",
+					},
+					delete: {
+					    label: "Delete Group Party",
+					    check: "Are you sure you want to proceed with this action?",
+					    description: "Once deleted, it cannot be recovered",
+					    ok: "The group {{data.nom}} was deleted successfully",
+					},
+					grups: {
+						label: "Select the interested party's groups",
+					},
+					interessats: {
+						label: "Select the group's interested parties",
+					},
+				},
+			},
         },
         expedient: {
             title: "Case file",

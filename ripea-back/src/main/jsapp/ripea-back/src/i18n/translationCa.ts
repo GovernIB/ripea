@@ -398,15 +398,50 @@ const translationCa = {
                     title: "Importar interessats des de Registre",
                     ok: "Interessats importats correctament",
                 },
+				gestGrups: {
+				    label: "Gestionar grups",
+					title: "Gestionar grups",
+				    ok: "Grups modificats correctament",
+				},
             },
             grid: {
                 title: "Interessats del fitxer",
                 representant: "Representant",
+				tipus: {
+					label: "Tipus",
+					personaFisica: "Persona física",
+					personaJuridica: "Persona jurídica",
+					administrador: "Administrador",
+				},
             },
             alert: {
                 incapacitat: "En cas de titular amb discapacitat és obligatori indicar un destinatari.",
                 jaExistentExpedient: "Ja existeix a l'expedient",
             },
+			grup: {
+				title: "Grup",
+				action: {
+					new: {
+						label: "Nou Grup",
+						ok: "Grup creat correctament",
+					},
+					update: {
+						ok: "Grup modificat correctament",
+					},
+					delete: {
+					    label: "Esborrar Grup",
+					    check: "Esteu segur que voleu continuar amb aquesta acció?",
+					    description: "Un cop esborrat no es podrà recuperar",
+					    ok: "El grup {{data.nom}} s'ha esborrat correctament",
+					},
+					grups: {
+						label: "Selecciona els grups de l'interessat",
+					},
+					interessats: {
+						label: "Selecciona els interessats del grup",
+					},
+				},
+			},
         },
         expedient: {
             title: "Expedient",

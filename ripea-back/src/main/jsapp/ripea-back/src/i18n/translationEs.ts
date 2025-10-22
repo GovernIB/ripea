@@ -397,16 +397,51 @@ const translationEs = {
                     label: "Importar interesados desde Registro...",
                     title: "Importar interesados desde Registro",
                     ok: "Interesados importados correctamente",
-                }
+                },
+				gestGrups: {
+				    label: "Gestionar grupos",
+					title: "Gestionar grupos",
+				    ok: "Grupos modificados correctamente",
+				},
             },
             grid: {
                 title: "Interesados del fichero",
                 representant: "Representante",
+				tipus: {
+					label: "Tipo",
+					personaFisica: "Persona física",
+					personaJuridica: "Persona jurídica",
+					administrador: "Administrador",
+				},
             },
             alert: {
                 incapacitat: "En caso de titular con incapacidad es obligatorio indicar un destinatario.",
                 jaExistentExpedient: "Ya existe en el expediente",
             },
+			grup: {
+				title: "Grupo",
+				action: {
+					new: {
+						label: "Nuevo Grupo",
+						ok: "Grupo creado correctamente",
+					},
+					update: {
+						ok: "Grupo modificado correctamente",
+					},
+					delete: {
+					    label: "Borrar Grupo",
+					    check: "Esta seguro de que quiere seguir con esta acción?",
+					    description: "Una vez borrado no se prodra recuperar",
+					    ok: "El grupo {{data.nom}} se ha borrado correctamente",
+					},
+					grups: {
+						label: "Selecciona los grupos del interesado",
+					},
+					interessats: {
+						label: "Selecciona los interesados del grupo",
+					},
+				},
+			},
         },
         expedient: {
             title: "Expediente",

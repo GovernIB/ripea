@@ -3,6 +3,7 @@ package es.caib.ripea.service.resourcehelper;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.poi.ss.usermodel.Cell;
@@ -12,9 +13,13 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.springframework.stereotype.Component;
 
+import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.entity.InteressatEntity;
+import es.caib.ripea.persistence.entity.InteressatGrupEntity;
 import es.caib.ripea.persistence.entity.resourceentity.InteressatResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.InteressatResourceRepository;
+import es.caib.ripea.persistence.repository.ExpedientRepository;
+import es.caib.ripea.persistence.repository.InteressatGrupRepository;
 import es.caib.ripea.persistence.repository.InteressatRepository;
 import es.caib.ripea.plugin.dadesext.Municipi;
 import es.caib.ripea.service.helper.ConfigHelper;
@@ -31,6 +36,7 @@ import es.caib.ripea.service.intf.dto.InteressatPersonaFisicaDto;
 import es.caib.ripea.service.intf.dto.InteressatPersonaJuridicaDto;
 import es.caib.ripea.service.intf.dto.InteressatTipusEnum;
 import es.caib.ripea.service.intf.dto.PermissionEnumDto;
+import es.caib.ripea.service.intf.model.InteressatGrupResource;
 import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.utils.Utils;
 import lombok.RequiredArgsConstructor;
@@ -40,6 +46,8 @@ import lombok.RequiredArgsConstructor;
 public class InteressatResourceHelper {
 
     private final InteressatResourceRepository interessatResourceRepository;
+    private final InteressatGrupRepository interessatGrupRepository;
+    private final ExpedientRepository expedientRepository;
     private final InteressatRepository interessatRepository;
     private final ExpedientInteressatHelper expedientInteressatHelper;
     private final ConfigHelper configHelper;
@@ -182,6 +190,37 @@ public class InteressatResourceHelper {
                     } else {
                         update(representant);
                     }
+                }
+
+            	List<ResourceReference<InteressatGrupResource, Long>> grupsRef = interessat.getGrups();
+                if (! grupsRef.isEmpty()) {                	
+                	for (ResourceReference<InteressatGrupResource, Long> grupRef : grupsRef) {
+//						InteressatGrupResourceEntity grup = interessatGrupResourceRepository.findById(grupRef.getId()).get();
+						Optional<InteressatGrupEntity> grupExp = interessatGrupRepository.findByExpedientIdAndNom(expedientId, grupRef.getDescription());
+						
+						if (grupExp.isPresent()) {
+							InteressatEntity interessatEntity = interessatRepository.findById(interessat.getId()).get();
+							boolean pertanyAlGrup = grupExp.get().getInteressats().contains(interessatEntity);
+							
+							if (!pertanyAlGrup) {
+								grupExp.get().getInteressats().add(interessatEntity);
+								interessatGrupRepository.save(grupExp.get());
+							}
+						} else {
+							ExpedientEntity expedient = expedientRepository.findById(expedientId).get();
+							InteressatEntity interessatEntity = interessatRepository.findById(interessat.getId()).get();
+							
+							InteressatGrupEntity newGrup = InteressatGrupEntity.builder()
+				                    .expedient(expedient)
+				                    .nom(grupRef.getDescription())
+//				                    .descripcio(grup.getDescripcio())
+				                    .interessats(new ArrayList<>())
+				                    .build();
+							
+							newGrup.getInteressats().add(interessatEntity);
+				            interessatGrupRepository.save(newGrup);
+						}
+					}
                 }
             }
         }
@@ -392,5 +431,18 @@ public class InteressatResourceHelper {
         interessatDto.setPreferenciaIdioma(resource.getPreferenciaIdioma());
         interessatDto.setEntregaDeh(resource.getEntregaDeh());
         interessatDto.setEntregaDehObligat(resource.getEntregaDehObligat());
+        
+        interessatDto.setGrupsId(mapGrupsIds(resource.getGrups()));
+    }
+    
+    private List<Long> mapGrupsIds(List<ResourceReference<InteressatGrupResource, Long>> grups) {
+    	if (grups == null) {
+            return new ArrayList<Long>();
+        }
+    	
+        return grups.stream()
+                .filter(ref -> ref != null && ref.getId() != null)
+                .map(ResourceReference::getId)
+                .collect(Collectors.toList());
     }
 }

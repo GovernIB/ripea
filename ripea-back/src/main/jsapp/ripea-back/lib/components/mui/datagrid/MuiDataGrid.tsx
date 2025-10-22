@@ -181,7 +181,7 @@ const getRowActionOnClick = (
     if (rowAction.clickShowCreateDialog) {
         return (_id, row) => showCreateDialog(row);
     } else if (rowAction.clickShowUpdateDialog) {
-        return (id, row) => showUpdateDialog(id, row);
+        return (id, row) => showUpdateDialog(row._originalId ?? row.id, row);
     } else if (rowAction.clickTriggerDelete) {
         return (id) => triggerDelete(id);
     } else {

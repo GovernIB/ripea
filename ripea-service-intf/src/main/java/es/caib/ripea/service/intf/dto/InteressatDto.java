@@ -1,6 +1,7 @@
 package es.caib.ripea.service.intf.dto;
 
 import java.io.Serializable;
+import java.util.List;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
@@ -67,6 +68,8 @@ public abstract class InteressatDto implements Serializable {
 	
 	protected boolean exporta = true;
 	protected boolean exportaRepresentant= (representant!=null);
+	
+	protected List<Long> grupsId;
 	
 	private int fila;
 	
@@ -362,6 +365,13 @@ public abstract class InteressatDto implements Serializable {
 	}
 	public void setAdresaPoblacio(String adresaPoblacio) {
 		this.adresaPoblacio = adresaPoblacio;
+	}
+
+	public List<Long> getGrupsId() {
+		return grupsId;
+	}
+	public void setGrupsId(List<Long> grupsId) {
+		this.grupsId = grupsId;
 	}
 
 	private static final long serialVersionUID = -139254994389509932L;
