@@ -101,10 +101,39 @@ const AdditionalInfo = (props:any) => {
     />
 }
 
+async function loadInteressatsFromGrups(
+    selectedGrups: any[],
+    formApiRef: any,
+    seleccionats: any[],
+    apiFindAllGrups: any
+) {
+    formApiRef?.current?.setFieldValue('grups', selectedGrups || []);
+
+    const grupIds = selectedGrups.map(g => g.id);
+    const filter = builder.inside('id', grupIds);
+
+    try {
+        const res = await apiFindAllGrups({ filter, unpaged: true, perspectives: ["INTERESSATS"] });
+        const grups = res.rows || [];
+
+        const interessatsGrups = grups.flatMap(g => g.interessats || []);
+
+        const existingIds = seleccionats.map(i => i.id);
+        const nous = interessatsGrups.filter(i => !existingIds.includes(i.id));
+
+        const updatedInteressats = [...seleccionats, ...nous];
+		
+        formApiRef?.current?.setFieldValue('interessats', updatedInteressats);
+    } catch (e) {
+        console.error('Error cargando interesados de los grupos', e);
+    }
+}
+
 const NotificarForm = () => {
     const { t } = useTranslation();
     const { data, apiRef: formApiRef } = useFormContext();
 
+	
     const { create, content } = useCreate()
     const onCreateInteressat = (result?:any)=> {
         formApiRef?.current?.setFieldValue('interessats', [...data?.interessats, {
@@ -113,15 +142,31 @@ const NotificarForm = () => {
         }])
     }
 
+	const grupsFilter: string = builder.and(
+	    builder.eq("expedient.id", data?.expedient?.id)
+	);
+	
     const interessatsFilter: string = builder.and(
         builder.eq("expedient.id", data?.expedient?.id),
         builder.eq('esRepresentant', false),
     );
+	
+	const { isReady: apiIsReady, find: apiFindAllGrups } = useResourceApiService('interessatGrupResource');
 
+	const carregarInteressats = (selectedGrups: any[]) => {
+	    loadInteressatsFromGrups(
+	        selectedGrups,
+	        formApiRef,
+	        data?.interessats || [],
+	        apiFindAllGrups
+	    );
+	}
+	
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField xs={12} name="tipus"/>
         <GridFormField xs={12} name="estat" required disabled/>
 
+		<GridFormField xs={12} name="grups" multiple filter={grupsFilter} onChange={carregarInteressats}/>
         <GridFormField xs={9.5} name="interessats" multiple filter={interessatsFilter}/>
 
         <GridButton

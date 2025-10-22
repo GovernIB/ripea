@@ -3,8 +3,10 @@
  */
 package es.caib.ripea.persistence.entity;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -16,6 +18,7 @@ import javax.persistence.FetchType;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -179,6 +182,9 @@ public abstract class InteressatEntity extends RipeaAuditable<Long> {
 	@Transient private String paisNom;
 	@Transient private String provinciaNom;
 	@Transient private String municipiNom;
+	
+    @ManyToMany(mappedBy = "interessats", fetch = FetchType.LAZY)
+    protected List<InteressatGrupEntity> grups = new ArrayList<>();
 
 	public Long getRepresentantId() {
 		Long representantId = null;
@@ -222,6 +228,17 @@ public abstract class InteressatEntity extends RipeaAuditable<Long> {
 	public Boolean getIncapacitat() {
 		return incapacitat != null ? incapacitat : false;
 	}
+	
+	public void addGrup(InteressatGrupEntity grup) {
+	    this.grups.add(grup);
+	    grup.getInteressats().add(this);
+	}
+
+	public void removeGrup(InteressatGrupEntity grup) {
+	    this.grups.remove(grup);
+	    grup.getInteressats().remove(this);
+	}
+	
 	public abstract String getIdentificador();
 	public abstract String getNomComplet();
 

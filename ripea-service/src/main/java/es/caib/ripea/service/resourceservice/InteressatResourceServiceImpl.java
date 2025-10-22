@@ -7,17 +7,19 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.validation.groups.Default;
 
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.hibernate.Hibernate;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.stereotype.Service;
@@ -29,13 +31,16 @@ import org.springframework.validation.SmartValidator;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.InteressatAdministracioEntity;
 import es.caib.ripea.persistence.entity.InteressatEntity;
 import es.caib.ripea.persistence.entity.InteressatPersonaFisicaEntity;
 import es.caib.ripea.persistence.entity.InteressatPersonaJuridicaEntity;
+import es.caib.ripea.persistence.entity.resourceentity.InteressatGrupResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.InteressatResourceEntity;
+import es.caib.ripea.persistence.entity.resourcerepository.InteressatGrupResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.InteressatResourceRepository;
 import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.persistence.repository.InteressatRepository;
@@ -62,6 +67,7 @@ import es.caib.ripea.service.intf.base.model.FieldOption;
 import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ReportFileType;
 import es.caib.ripea.service.intf.base.model.Resource;
+import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.ComunitatDto;
 import es.caib.ripea.service.intf.dto.EntregaPostalTipusEnum;
 import es.caib.ripea.service.intf.dto.InteressatDocumentTipusEnumDto;
@@ -73,6 +79,7 @@ import es.caib.ripea.service.intf.dto.PaisDto;
 import es.caib.ripea.service.intf.dto.ProvinciaDto;
 import es.caib.ripea.service.intf.dto.UnitatOrganitzativaDto;
 import es.caib.ripea.service.intf.model.ExpedientResource;
+import es.caib.ripea.service.intf.model.InteressatGrupResource;
 import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.model.InteressatResource.UnitatOrganitzativaFormFilter;
 import es.caib.ripea.service.intf.resourceservice.InteressatResourceService;
@@ -103,6 +110,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
     private final EntitatRepository entitatRepository;
     private final InteressatRepository interessatRepository;
     private final InteressatResourceRepository interessatResourceRepository;
+    private final InteressatGrupResourceRepository interessatGrupResourceRepository;
 
     private final SmartValidator validator;
     private final DataSourceProperties mainDataSourceProperties;
@@ -110,6 +118,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
     @PostConstruct
     public void init() {
 
+    	register(InteressatResource.PERSPECTIVE_GRUPS_CODE, new GrupsPerspectiveApplicator());
         register(InteressatResource.PERSPECTIVE_REPRESENTANT_CODE, new RespresentantPerspectiveApplicator());
         register(InteressatResource.PERSPECTIVE_ADRESSA_CODE, new AdressaPerspectiveApplicator());
         register(InteressatResource.ACTION_EXPORTAR_CODE, new ExportarReportGenerator());
@@ -391,6 +400,32 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
         	}
         }
     }
+
+    private class GrupsPerspectiveApplicator implements PerspectiveApplicator<InteressatResourceEntity, InteressatResource> {
+    	
+        @Override
+        public void applySingle(String code, InteressatResourceEntity entity, InteressatResource resource)
+                throws PerspectiveApplicationException {
+
+            // Si el interesado pertenece a grupos, los mapeamos
+            if (entity.getGrups() != null && !entity.getGrups().isEmpty()) {
+                List<ResourceReference<InteressatGrupResource, Long>> grups = entity.getGrups().stream()
+                        .map(grupEntity -> {
+                            InteressatGrupResource grupResource = objectMappingHelper.newInstanceMap(grupEntity, InteressatGrupResource.class);
+                            return ResourceReference.<InteressatGrupResource, Long>toResourceReference(
+                                    grupResource.getId(),
+                                    grupResource.getNom()
+                            );
+                        })
+                        .collect(Collectors.toList());
+                resource.setGrups(grups);
+            } else {
+                // Si no pertenece a ningún grupo lo dejamos vacío
+                resource.setGrups(Collections.emptyList());
+            }
+        }
+        
+    }
     
     private class NumDocOnchangeLogicProcessor implements OnChangeLogicProcessor<InteressatResource> {
 
@@ -465,16 +500,65 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
             Long expedientId = (Long)data.get(0);
             ExpedientResource.MassiveAction params = (ExpedientResource.MassiveAction)data.get(1);
             try {
-                ObjectMapper objectMapper = new ObjectMapper();
-                objectMapper.registerModule(new JavaTimeModule());
-                objectMapper.writerWithDefaultPrettyPrinter().writeValue(baos,
-                        interessatResourceRepository.findAllById(params.getIds()).stream()
-                                .map(interessatEntity -> {
-                                    InteressatResource interessatResource = objectMappingHelper.newInstanceMap(interessatEntity, InteressatResource.class);
-                                    new RespresentantPerspectiveApplicator().applySingle(InteressatResource.PERSPECTIVE_REPRESENTANT_CODE, interessatEntity, interessatResource);
-                                    return interessatResource;
-                                }).collect(Collectors.toList()));
-                return new DownloadableFile("Interessats_expedient_"+expedientId+".json", "application/json", baos.toByteArray());
+            	
+            	Set<Long> grupIdsSeleccionados = params.getIds().stream()
+            	        .filter(id -> interessatGrupResourceRepository.existsById(id))
+            	        .collect(Collectors.toSet());
+
+            	List<Object> exportList = new ArrayList<>();
+            	Set<Long> interessatIds = new HashSet<>();
+            	// Exportamos todos los grupos seleccionados con sus interesados
+            	for (Long grupId : grupIdsSeleccionados) {
+            	    InteressatGrupResourceEntity interessatGrupResourceEntity = interessatGrupResourceRepository.findById(grupId).orElseThrow();
+            	    InteressatGrupResource interessatGrupResource = objectMappingHelper.newInstanceMap(interessatGrupResourceEntity, InteressatGrupResource.class);
+            	     
+                    List<InteressatResource> interessats = interessatGrupResourceEntity.getInteressats().stream()
+                            .map(interessatEntity -> {
+                                InteressatResource interessatResource = objectMappingHelper.newInstanceMap(interessatEntity, InteressatResource.class);
+								new RespresentantPerspectiveApplicator().applySingle(InteressatResource.PERSPECTIVE_REPRESENTANT_CODE, interessatEntity, interessatResource);
+								new GrupsPerspectiveApplicator().applySingle(InteressatResource.PERSPECTIVE_GRUPS_CODE, interessatEntity, interessatResource);
+								
+								return interessatResource;
+                            })
+                            .collect(Collectors.toList());
+                    
+//            	    interessatGrupResource.setInteressatsDetallats(interessats);
+            	    
+                    for (InteressatResource interessat : interessats) {
+                    	if (interessat.getId() != null && interessatIds.add(interessat.getId()))
+                    		exportList.add(interessat);
+                    }
+            	}
+
+            	// Ahora exportamos los interesados individuales, excluyendo los que ya están en grupos seleccionados
+            	interessatResourceRepository.findAllById(params.getIds()).forEach(interessatEntity -> {
+            	    boolean perteneceAGrupoSeleccionado = interessatEntity.getGrups().stream()
+            	            .anyMatch(g -> grupIdsSeleccionados.contains(g.getId()));
+
+            	    if (!perteneceAGrupoSeleccionado) {
+            	        InteressatResource interessatResource = objectMappingHelper.newInstanceMap(interessatEntity, InteressatResource.class);
+						new RespresentantPerspectiveApplicator().applySingle(InteressatResource.PERSPECTIVE_REPRESENTANT_CODE, interessatEntity, interessatResource);
+            	        new GrupsPerspectiveApplicator().applySingle(InteressatResource.PERSPECTIVE_GRUPS_CODE, interessatEntity, interessatResource);
+            	        
+            	        exportList.add(interessatResource);
+            	    }
+            	});
+            	
+            	ObjectMapper objectMapper = new ObjectMapper();
+            	objectMapper.registerModule(new JavaTimeModule());
+            	objectMapper.writerWithDefaultPrettyPrinter().writeValue(baos, exportList);
+                return new DownloadableFile("Interessats_expedient_" + expedientId + ".json", "application/json", baos.toByteArray());
+                
+//                ObjectMapper objectMapper = new ObjectMapper();
+//                objectMapper.registerModule(new JavaTimeModule());
+//                objectMapper.writerWithDefaultPrettyPrinter().writeValue(baos,
+//                        interessatResourceRepository.findAllById(params.getIds()).stream()
+//                                .map(interessatEntity -> {
+//                                    InteressatResource interessatResource = objectMappingHelper.newInstanceMap(interessatEntity, InteressatResource.class);
+//                                    new RespresentantPerspectiveApplicator().applySingle(InteressatResource.PERSPECTIVE_REPRESENTANT_CODE, interessatEntity, interessatResource);
+//                                    return interessatResource;
+//                                }).collect(Collectors.toList()));
+//                return new DownloadableFile("Interessats_expedient_"+expedientId+".json", "application/json", baos.toByteArray());
             } catch (Exception e) {
                 excepcioLogHelper.addExcepcio("/expedient/ExportarInteressatsReportGenerator", e);
                 throw new ReportGenerationException(getResourceClass(), null, code, "interessat.export.reject");
@@ -598,9 +682,25 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
                                 ObjectMapper objectMapper = new ObjectMapper();
                                 objectMapper.registerModule(new JavaTimeModule());
                                 objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-                                listaInteressatsFitxer = objectMapper.readValue(
-                                        ((FileReference) fieldValue).getContent(),
-                                        new TypeReference<List<InteressatResource>>() {});
+                                
+                                List<InteressatResource> interesatsIndependents = objectMapper.readValue(
+                                    ((FileReference) fieldValue).getContent(),
+                                    new TypeReference<List<InteressatResource>>() {}
+                                );
+
+                                List<InteressatGrupResource> grupsFitxer = objectMapper.readValue(
+                                    ((FileReference) fieldValue).getContent(),
+                                    new TypeReference<List<InteressatGrupResource>>() {}
+                                );
+
+                                List<InteressatResource> interesatsDeGrups = grupsFitxer.stream()
+                                    .filter(g -> g.getInteressatsDetallats() != null)
+                                    .flatMap(g -> g.getInteressatsDetallats().stream())
+                                    .collect(Collectors.toList());
+
+                                listaInteressatsFitxer.addAll(interesatsIndependents);
+                                listaInteressatsFitxer.addAll(interesatsDeGrups);
+                                
                             } else {
                                 InputStream excelStream = new ByteArrayInputStream(((FileReference) fieldValue).getContent());
                                 listaInteressatsFitxer = interessatResourceHelper.extreureInteressatsExcel(excelStream);

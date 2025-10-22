@@ -9,6 +9,8 @@ import useInteressatDetail from "./InteressatDetail.tsx";
 import useCreate, {useCreateRepresentant} from "../actions/Create.tsx";
 import {iniciaDescargaJSON} from "../../expedient/details/CommonActions.tsx";
 import useImportarSGD from "../actions/ImportarSGD.tsx";
+import useManageInteressatGrups from "../groups/actions/ManageInteressatGrups.tsx";
+import useModifyGrup from "../groups/actions/ModifyGrup.tsx";
 
 export const useActions = (refresh?: () => void) => {
     const { t } = useTranslation();
@@ -94,11 +96,15 @@ export const useActions = (refresh?: () => void) => {
 const useInteressatActions = (entity:any, refresh?: () => void) => {
     const { t } = useTranslation();
 
+	const {updateGrup: handleModifyGrup, deleteGrup: deleteGrup, content: contentGrup} = useModifyGrup(entity, refresh);
+	const {handleShow: handleManageInteressatGrups, dialog: dialogManageInteressatGrups} = useManageInteressatGrups(entity, refresh);
     const {guardarArxiu, deleteRepresentent, deleteInteressat} = useActions(refresh);
     const {handleOpen: handleDetail, dialog: dialogDetail} = useInteressatDetail();
     const {create, content: contentCreate} = useCreate(refresh)
     const {create: createRepresentent, update: updateRepresentent, content} = useCreateRepresentant(refresh)
     const {handleShow: handleImportarSGD, content: contentImportarSGD} = useImportarSGD(entity, refresh)
+
+	const getOriginalId = (row: any) => row._originalId ?? row.id;
 
     const createActions = [
         {
@@ -123,57 +129,78 @@ const useInteressatActions = (entity:any, refresh?: () => void) => {
             label: t('page.contingut.action.guardarArxiu.label'),
             icon: 'autorenew',
             showInMenu: true,
-            onClick: guardarArxiu,
+            onClick: (row:any) => guardarArxiu(getOriginalId(row), row),
             disabled: !entity?.arxiuPropagat,
-            hidden: (row:any) => row?.arxiuPropagat && ( !row?.representant || row?.representantInfo?.arxiuPropagat ),
+            hidden: (row:any) => row?.isGroup || row?.arxiuPropagat && ( !row?.representant || row?.representantInfo?.arxiuPropagat ),
         },
         {
             label: t('common.detail'),
             icon: "info",
             showInMenu: true,
             onClick: handleDetail,
-            hidden: entity?.potModificar,
+            hidden: (row:any) => row?.isGroup || entity?.potModificar,
         },
         {
             label: t('common.update'),
             icon: 'edit',
             showInMenu: true,
-            clickShowUpdateDialog: true,
-            hidden: !entity?.potModificar,
+			clickShowUpdateDialog: true,
+            hidden: (row:any) => row?.isGroup || !entity?.potModificar,
         },
+		{
+		    label: t('common.update'),
+		    icon: 'edit',
+		    showInMenu: (row:any) => true,
+			onClick: (id:number, row:any) => handleModifyGrup(getOriginalId(row), row?.interessats),
+		    hidden: (row:any) => !row?.isGroup,
+		},
         {
-            label: t('page.interessat.action.delete.label'),
-            icon: "delete",
+            label: t('page.interessat.action.gestGrups.label'),
+            icon: "groups",
             showInMenu: true,
-            onClick: deleteInteressat,
-            hidden: !entity?.potModificar,
+            onClick: (value:any, row: any) => handleManageInteressatGrups(getOriginalId(row), row?.grups),
+            hidden: (row:any) => row?.isGroup || !entity?.potModificar,
         },
+		{
+		    label: t('page.interessat.action.delete.label'),
+		    icon: "delete",
+		    showInMenu: true,
+		    onClick: (row:any) => deleteInteressat(getOriginalId(row)),
+		    hidden: (row:any) => row?.isGroup || !entity?.potModificar,
+		},
+		{
+		    label: t('page.interessat.grup.action.delete.label'),
+		    icon: 'delete',
+		    showInMenu: (row:any) => true,
+			onClick: (id:number, row:any) => deleteGrup(getOriginalId(row), row?.interessats),
+		    hidden: (row:any) => !row?.isGroup || !entity?.potModificar,
+		},
         {
             label: <Divider sx={{px: 1, width: '100%'}} color={"none"}/>,
             showInMenu: true,
             disabled: true,
-            hidden: (row: any) => row?.tipus == 'InteressatAdministracioEntity' || !entity?.potModificar,
+            hidden: (row: any) => row?.isGroup || (row?.tipus == 'InteressatAdministracioEntity' || !entity?.potModificar),
         },
         {
             label: t('page.interessat.action.createRep.label'),
             icon: "add",
             showInMenu: true,
-            onClick: createRepresentent,
-            hidden: (row: any) => row?.representant || row?.tipus == 'InteressatAdministracioEntity' || !entity?.potModificar,
+            onClick: (row:any) => createRepresentent(getOriginalId(row), row),
+            hidden: (row: any) => row?.isGroup || (row?.representant || row?.tipus == 'InteressatAdministracioEntity' || !entity?.potModificar),
         },
         {
             label: t('page.interessat.action.updateRep.label'),
             icon: "edit",
             showInMenu: true,
-            onClick: updateRepresentent,
-            hidden: (row: any) => !row?.representant || row?.tipus == 'InteressatAdministracioEntity' || !entity?.potModificar,
+            onClick: (row:any) => updateRepresentent(getOriginalId(row), row),
+            hidden: (row: any) => row?.isGroup || (!row?.representant || row?.tipus == 'InteressatAdministracioEntity' || !entity?.potModificar),
         },
         {
             label: t('page.interessat.action.deleteRep.label'),
             icon: "delete",
             showInMenu: true,
-            onClick: deleteRepresentent,
-            hidden: (row: any) => !row?.representant || row?.tipus == 'InteressatAdministracioEntity' || !entity?.potModificar,
+            onClick: (row:any) => deleteRepresentent(getOriginalId(row)),
+            hidden: (row: any) => row?.isGroup || (!row?.representant || row?.tipus == 'InteressatAdministracioEntity' || !entity?.potModificar),
         },
     ];
 
@@ -182,6 +209,8 @@ const useInteressatActions = (entity:any, refresh?: () => void) => {
         {dialogDetail}
         {contentCreate}
         {contentImportarSGD}
+		{contentGrup}
+		{dialogManageInteressatGrups}
     </>;
 
     return {
