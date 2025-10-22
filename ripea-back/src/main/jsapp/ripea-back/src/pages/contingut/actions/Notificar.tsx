@@ -14,6 +14,16 @@ const Notificacio = (props:any) => {
     const { t } = useTranslation();
     const representant = entity?.representantInfo
 
+    const direccion = [
+        !representant ?entity?.codiPostal :representant?.codiPostal,
+        entity?.municipiNom,
+        [entity?.provinciaNom, entity?.paisNom].filter(Boolean).join(' '),
+        // !representant ?entity?.adresa :representant?.adresa,
+    ]
+        .flat()               // aplana posibles arrays
+        .filter(Boolean)      // elimina undefined, null, '' o false
+        .join(', ');          // une con coma y espacio
+
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
 
         { entity?.incapacitat == true && (!entity?.representant || entity?.representant?.incapacitat) &&
@@ -27,7 +37,12 @@ const Notificacio = (props:any) => {
             <ContenidoData title={t('page.interessat.detall.email')}>{entity?.email}</ContenidoData>
             <ContenidoData title={t('page.interessat.detall.telefon')}>{entity?.telefon}</ContenidoData>
             <ContenidoData title={t('page.interessat.detall.incapacitat')}>{entity?.incapacitat}</ContenidoData>
-            <ContenidoData hidden={representant || !entregaPostal} title={<><Icon sx={{mr:1}}>place</Icon>{t('page.interessat.detall.direccioPostal')}</>}>{entity?.paisNom} {entity?.provinciaNom} {entity?.municipiNom} {entity?.codiPostal} {entity?.adresa}</ContenidoData>
+            <ContenidoData hidden={!!representant || !entregaPostal} title={<><Icon sx={{mr:1}}>place</Icon>{t('page.interessat.detall.direccioPostal')}</>}>
+                {(entity?.adressaTipus == "NACIONAL" || entity?.adressaTipus == "ESTRANGER") && <>{entity?.adressaTipusVia} {entity?.adresa} {entity?.adressaNumCasa}</>}
+                {entity?.adressaTipus == "APARTAT_CORREUS" && <>{entity?.adressaTipusVia} {entity?.adresa} {entity?.adressaNumCasa} {entity?.adresaApartatCorreus}</>}
+                {entity?.adressaTipus == "SENSE_NORMALITZAR" && <>{entity?.adresa}</>}
+            </ContenidoData>
+            <ContenidoData hidden={!!representant || !entregaPostal}>{direccion}</ContenidoData>
 
             <CardData title={t('page.interessat.rep')} hidden={!representant}>
                 <ContenidoData title={t('page.interessat.detall.nif')}>{representant?.documentNum}</ContenidoData>
@@ -36,9 +51,13 @@ const Notificacio = (props:any) => {
                 <ContenidoData title={t('page.interessat.detall.email')}>{representant?.email}</ContenidoData>
                 <ContenidoData title={t('page.interessat.detall.telefon')}>{representant?.telefon}</ContenidoData>
                 <ContenidoData title={t('page.interessat.detall.incapacitat')}>{representant?.incapacitat}</ContenidoData>
+                <ContenidoData hidden={!entregaPostal} title={<><Icon sx={{mr:1}}>place</Icon>{t('page.interessat.detall.direccioPostal')}</>}>
+                    {(representant?.adressaTipus == "NACIONAL" || representant?.adressaTipus == "ESTRANGER") && <>{representant?.adressaTipusVia} {representant?.adresa} {representant?.adressaNumCasa}</>}
+                    {representant?.adressaTipus == "APARTAT_CORREUS" && <>{representant?.adressaTipusVia} {representant?.adresa} {representant?.adressaNumCasa} {representant?.adresaApartatCorreus}</>}
+                    {representant?.adressaTipus == "SENSE_NORMALITZAR" && <>{representant?.adresa}</>}
+                </ContenidoData>
+                <ContenidoData hidden={!entregaPostal}>{direccion}</ContenidoData>
             </CardData>
-
-            <ContenidoData hidden={!representant || !entregaPostal} title={<><Icon sx={{mr:1}}>place</Icon>{t('page.interessat.detall.direccioPostal')}</>}>{entity?.paisNom} {entity?.provinciaNom} {entity?.municipiNom} {representant?.codiPostal} {representant?.adresa}</ContenidoData>
         </CardData>
     </Grid>
 }
