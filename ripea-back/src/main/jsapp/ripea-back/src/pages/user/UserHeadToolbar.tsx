@@ -344,7 +344,7 @@ const useMenuAdmin = () => {
                     id: 'grups',
                     title: t('page.user.menu.grups'),
                     // icon: '',
-                    onClick: () => toProgramaAntic('grup'),
+                    to: '/grup',
                 },
                 {
                     id: 'organs',
@@ -491,7 +491,6 @@ const useMenuAdminOrgan = () => {
     const { value: user } = useUserSession();
     const { value: numNotif } = useNotificacionsSession()
     const { t } = useTranslation();
-    const { toProgramaAntic } = useToProgramaAntic();
 
     const appEntries:any[] = [
         {
@@ -547,7 +546,7 @@ const useMenuAdminOrgan = () => {
                     id: 'grups',
                     title: t('page.user.menu.grups'),
                     // icon: '',
-                    onClick: () => toProgramaAntic('grup'),
+                    to: '/grup',
                 },
             ],
         },
@@ -563,7 +562,6 @@ const useMenuAdminOrgan = () => {
 }
 const useMenuDissenyOrgan = () => {
     const { t } = useTranslation();
-    const { toProgramaAntic } = useToProgramaAntic();
 
     const appEntries:any[] = [];
     const entries = [
@@ -577,7 +575,7 @@ const useMenuDissenyOrgan = () => {
             id: 'grups',
             title: t('page.user.menu.grups'),
             // icon: '',
-            onClick: () => toProgramaAntic('grup'),
+            to: '/grup',
         },
     ]
     const content = <>

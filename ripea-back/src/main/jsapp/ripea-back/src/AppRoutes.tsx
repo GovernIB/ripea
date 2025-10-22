@@ -23,6 +23,7 @@ import AnotacionsComunicadesGrid from "./pages/user/consultes/AnotacionsComunica
 import RevisioMetaExpedientGrid from "./pages/user/consultes/RevisioMetaExpedientGrid.tsx";
 import ContingutGrid from "./pages/user/consultes/ContingutGrid.tsx";
 import GestioMetaExpedientGrid from "./pages/user/configurar/GestioMetaExpedientGrid.tsx";
+import GrupGrid from "./pages/user/configurar/GrupGrid.tsx";
 
 const AppRoutes: React.FC = () => {
     return <Routes>
@@ -31,6 +32,10 @@ const AppRoutes: React.FC = () => {
             <Route index element={<ExpedientGrid />} />
             {/*<Route path=":id" element={<Expedient />} />*/}
         </Route>
+        <Route path="contingut/:id" element={<Expedient />} />
+        <Route path="contingut/:id/tasca/:tascaId" element={<Tasca />} />
+        <Route path="expedientPeticio" element={<AnotacionsGrid />} />
+        <Route path="usuariTasca" element={<TasquesGrid />} />
 
         {/* Accions massives */}
         <Route path="massiu">
@@ -57,11 +62,8 @@ const AppRoutes: React.FC = () => {
 
         {/* Configurar */}
         <Route path="metaExpedient" element={<GestioMetaExpedientGrid/>} />
+        <Route path="grup" element={<GrupGrid/>} />
 
-        <Route path="contingut/:id" element={<Expedient />} />
-        <Route path="contingut/:id/tasca/:tascaId" element={<Tasca />} />
-        <Route path="expedientPeticio" element={<AnotacionsGrid />} />
-        <Route path="usuariTasca" element={<TasquesGrid />} />
         <Route path="*" element={<NotFoundPage />} />
     </Routes>;
 }

@@ -1079,6 +1079,20 @@ const translationCa = {
                 cancelat: "S'ha cancelat la firma",
             },
         },
+        grup: {
+            title: "Grup",
+            action: {
+                new: {
+                    ok: "Grup '{{data.codi}}' creat correctament",
+                },
+                update: {
+                    ok: "Grup '{{data.codi}}' modificat correctament",
+                },
+                delete: {
+                    ok: "Grup '{{data.codi}}' esborrat correctament",
+                },
+            },
+        },
         user: {
             options: {
                 perfil: "El meu perfil",

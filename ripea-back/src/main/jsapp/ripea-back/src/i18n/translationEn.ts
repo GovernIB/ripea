@@ -1079,6 +1079,20 @@ const translationEn = {
                 cancelat: "The signature has been canceled",
             },
         },
+        grup: {
+            title: "Group",
+            action: {
+                new: {
+                    ok: "Group '{{data.codi}}' created successfully",
+                },
+                update: {
+                    ok: "Group '{{data.codi}}' updated successfully",
+                },
+                delete: {
+                    ok: "Group '{{data.codi}}' deleted successfully",
+                },
+            },
+        },
         user: {
             options: {
                 perfil: "My profile",
@@ -1139,6 +1153,7 @@ const translationEn = {
                 anexos: "Attach pending annexes from accepted annotations",
                 anotacio: "Update annotation status in Distribution",
                 prioritat: "Change case priority",
+                refresh: "Refresh data every 10 seconds"
             },
             action: {
                 masives: {

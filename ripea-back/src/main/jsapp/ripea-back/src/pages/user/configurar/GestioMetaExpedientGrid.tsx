@@ -92,7 +92,7 @@ const columns = [
     },
 ]
 
-const GestioGestioMetaExpedientGrid = () => {
+const GestioMetaExpedientGrid = () => {
     const {t} = useTranslation();
     const [springFilter, setSpringFilter] = useState<string>();
 
@@ -112,4 +112,4 @@ const GestioGestioMetaExpedientGrid = () => {
         </CardPage>
     </GridPage>
 }
-export default GestioGestioMetaExpedientGrid;
+export default GestioMetaExpedientGrid;

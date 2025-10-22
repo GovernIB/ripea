@@ -4,30 +4,55 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
+import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
+import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
+import es.caib.ripea.service.intf.dto.MetaExpedientAmbitEnumDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientRevisioEstatEnumDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 
+import java.io.Serializable;
+
 @Getter
 @Setter
 @NoArgsConstructor
 @FieldNameConstants
-@ResourceConfig(quickFilterFields = { "codi", "rol", "descripcio" }, descriptionField = "descripcio")
+@ResourceConfig(
+        quickFilterFields = { "codi", "rol", "descripcio" },
+        descriptionField = "descripcio",
+        artifacts = {
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.FILTER,
+                        code = GrupResource.FILTER_CODE,
+                        formClass = GrupResource.FormFilter.class),
+        }
+)
 public class GrupResource extends BaseAuditableResource<Long> {
-	private static final long serialVersionUID = 4151677501429687311L;
+
+    public static final String FILTER_CODE = "FILTER";
+
 	@NotNull
 	@Size(max = 50)
 	private String codi;
-	@NotNull
+//	@NotNull
 	@Size(max = 50)
 	private String rol;
 	@NotNull
 	@Size(max = 512)
 	private String descripcio;
-	@NotNull
+
 	private ResourceReference<EntitatResource, Long> entitat;
 	private ResourceReference<OrganGestorResource, Long> organGestor;
+
+    @Getter
+    @Setter
+    public static class FormFilter implements Serializable {
+        private String codi;
+        private String descripcio;
+        private ResourceReference<OrganGestorResource, Long> organGestor;
+    }
 }

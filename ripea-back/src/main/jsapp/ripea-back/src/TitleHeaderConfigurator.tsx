@@ -31,6 +31,7 @@ const TITLES: any = {
 
     // Configurar
     '/metaExpedient': "page.user.menu.procediments",
+    '/grup': "page.user.menu.grups",
 };
 
 export const setTitlePage = (title:string) => {
