@@ -41,7 +41,7 @@ public class ActionExecutionException extends RuntimeException {
 			String code,
 			String message,
 			Throwable cause) {
-		super(message != null ? Utils.abbreviate(message, 150) : "", cause);
+		super(message != null ? Utils.abbreviate(message, 250) : "", cause);
 		this.resourceClass = resourceClass;
 		this.id = id;
 		this.code = code;

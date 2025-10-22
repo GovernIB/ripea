@@ -3,12 +3,22 @@
  */
 package es.caib.ripea.persistence.entity;
 
-import es.caib.ripea.plugin.notificacio.EnviamentEstat;
-import es.caib.ripea.service.intf.config.BaseConfig;
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.*;
-import java.util.Date;
+import es.caib.ripea.plugin.notificacio.EnviamentEstat;
+import es.caib.ripea.service.intf.config.BaseConfig;
 
 /**
  * Notib Enviament
@@ -19,21 +29,16 @@ import java.util.Date;
 @EntityListeners(AuditingEntityListener.class)
 public class DocumentEnviamentInteressatEntity extends RipeaAuditable<Long> {
 
-
 	private static final long serialVersionUID = 1L;
 
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "interessat_id")
 	protected InteressatEntity interessat;
-	
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "document_enviament_id")
 	protected DocumentNotificacioEntity notificacio;
-	
 	@Column(name = "not_env_ref", length = 100)
 	private String enviamentReferencia;
-	
-	
 	@Column(name = "not_env_dat_estat", length = 20)
 	private String enviamentDatatEstat; //Notib: notificaEstat
 	@Column(name = "not_env_dat_data")
@@ -45,7 +50,6 @@ public class DocumentEnviamentInteressatEntity extends RipeaAuditable<Long> {
 	private Date enviamentCertificacioData; //Notib: notificaCertificacioData
 	@Column(name = "not_env_cert_orig", length = 20)
 	private String enviamentCertificacioOrigen;
-	
 	@Column(name="not_env_registre_data")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date registreData;
@@ -53,12 +57,10 @@ public class DocumentEnviamentInteressatEntity extends RipeaAuditable<Long> {
 	private Integer registreNumero;
 	@Column(name="not_env_registre_num_formatat", length = 50)
 	private String registreNumeroFormatat;
-	
 	@Column(name = "error")
 	protected Boolean error;
 	@Column(name = "error_desc", length = ERROR_DESC_TAMANY)
 	protected String errorDescripcio;
-
 
 	public static Builder getBuilder(
 			InteressatEntity interessat,
@@ -89,7 +91,6 @@ public class DocumentEnviamentInteressatEntity extends RipeaAuditable<Long> {
 		}
 
 	}
-	
 	
 	public boolean isFinalitzat() {
 		if (enviamentDatatEstat != null && (
@@ -177,8 +178,6 @@ public class DocumentEnviamentInteressatEntity extends RipeaAuditable<Long> {
 	public void setEnviamentCertificacioOrigen(String enviamentCertificacioOrigen) {
 		
 	}
-
-
 	public String getEnviamentDatatEstat() {
 		return enviamentDatatEstat;
 	}
@@ -238,6 +237,22 @@ public class DocumentEnviamentInteressatEntity extends RipeaAuditable<Long> {
 		this.registreNumeroFormatat = registreNumeroFormatat;
 	}
 
+	public String getNomCompletAmbDocument() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(this.getInteressat().getNomComplet());
+		if (this.notificacio!=null && this.notificacio.getDocument()!=null) {
+			if (this.notificacio.getDocument().getNumeroRegistre() != null) {
+				sb.append(this.notificacio.getDocument().getNumeroRegistre());
+				sb.append(" - ");
+			}
+			if (this.notificacio.getDocument().getTipus() != null) {
+				sb.append(this.notificacio.getDocument().getTipus().name());
+				sb.append(": ");
+			}
+			sb.append(this.notificacio.getDocument().getNom());
+		}
+		return sb.toString();
+	}
 
 	private static final int ERROR_DESC_TAMANY = 2000;
 

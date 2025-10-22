@@ -28,6 +28,7 @@ import javax.persistence.Version;
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import antlr.Utils;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.dto.EntregaPostalTipusEnum;
 import es.caib.ripea.service.intf.dto.EntregaPostalViaTipusEnum;

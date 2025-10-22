@@ -1279,12 +1279,20 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                     if (InteressatTipusEnum.InteressatAdministracioEntity.equals(interessatResourceEntity.getTipus())) {
                         anyInteressatIsAdministracio = true;
                     }
-                    if (params.getEntregaPostal()!=null && params.getEntregaPostal() && !interessatResourceEntity.adressaCompleta()) {
-                        throw new ActionExecutionException(
-                        		interessatResourceEntity.getClass(),
-                        		interessatResourceEntity.getId(),
-                        		code,
-                        		messageHelper.getMessage("notificacio.controller.reject.postal"));
+                    if (params.getEntregaPostal()!=null && params.getEntregaPostal()) {
+                    	if (!interessatResourceEntity.adressaCompleta()) {
+	                        throw new ActionExecutionException(
+	                        		interessatResourceEntity.getClass(),
+	                        		interessatResourceEntity.getId(),
+	                        		code,
+	                        		messageHelper.getMessage("notificacio.controller.reject.postal"));
+                    	} else if (!interessatResourceEntity.adressaNormalitzadaCompleta()) {
+	                        throw new ActionExecutionException(
+	                        		interessatResourceEntity.getClass(),
+	                        		interessatResourceEntity.getId(),
+	                        		code,
+	                        		messageHelper.getMessage("notificacio.controller.reject.normalitzada"));
+                    	}
                     }
                 }
 

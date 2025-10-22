@@ -1,29 +1,39 @@
 package es.caib.ripea.service.resourcehelper;
 
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.springframework.stereotype.Component;
+
 import es.caib.ripea.persistence.entity.InteressatEntity;
 import es.caib.ripea.persistence.entity.resourceentity.InteressatResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.InteressatResourceRepository;
 import es.caib.ripea.persistence.repository.InteressatRepository;
-import es.caib.ripea.service.base.helper.ObjectMappingHelper;
+import es.caib.ripea.plugin.dadesext.Municipi;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.ExpedientInteressatHelper;
-import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
+import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.intf.base.exception.ResourceNotFoundException;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
-import es.caib.ripea.service.intf.dto.*;
+import es.caib.ripea.service.intf.dto.EntregaPostalTipusEnum;
+import es.caib.ripea.service.intf.dto.InteressatAdministracioDto;
+import es.caib.ripea.service.intf.dto.InteressatDocumentTipusEnumDto;
+import es.caib.ripea.service.intf.dto.InteressatDto;
+import es.caib.ripea.service.intf.dto.InteressatIdiomaEnumDto;
+import es.caib.ripea.service.intf.dto.InteressatPersonaFisicaDto;
+import es.caib.ripea.service.intf.dto.InteressatPersonaJuridicaDto;
+import es.caib.ripea.service.intf.dto.InteressatTipusEnum;
+import es.caib.ripea.service.intf.dto.PermissionEnumDto;
 import es.caib.ripea.service.intf.model.InteressatResource;
+import es.caib.ripea.service.intf.utils.Utils;
 import lombok.RequiredArgsConstructor;
-import org.apache.poi.ss.usermodel.*;
-import org.springframework.stereotype.Component;
-
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import static com.sun.star.awt.ContainerWindowProvider.create;
 
 @Component
 @RequiredArgsConstructor
@@ -33,6 +43,7 @@ public class InteressatResourceHelper {
     private final InteressatRepository interessatRepository;
     private final ExpedientInteressatHelper expedientInteressatHelper;
     private final ConfigHelper configHelper;
+    private final PluginHelper pluginHelper;
 
     public List<InteressatResource> extreureInteressatsExcel(InputStream excel) {
         List<InteressatResource> interessatsExcel = new ArrayList<>();
@@ -364,6 +375,15 @@ public class InteressatResourceHelper {
         	interessatDto.setAdresaBloc(resource.getAdresaBloc());
         	interessatDto.setAdresaComplement(resource.getAdresaComplement());
         	interessatDto.setAdresaPoblacio(resource.getAdresaPoblacio());
+        	//Emplenam automaticament la població amb el nom del municipi, ja que es obligatori per notificar.
+        	if (!Utils.hasValue(resource.getAdresaPoblacio())) {
+        		try {
+        			Municipi muni = pluginHelper.dadesExternesMunicipisFindByCodi(resource.getProvincia(), resource.getMunicipi());
+        			if (muni!=null) {
+        				interessatDto.setAdresaPoblacio(muni.getNom());
+        			}
+        		} catch (Exception ex) {}
+        	}
         }
         
         interessatDto.setEmail(resource.getEmail());

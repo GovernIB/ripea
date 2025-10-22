@@ -165,4 +165,11 @@ public class InteressatResourceEntity extends BaseAuditableEntity<InteressatReso
 		}
 		return true;
     }
+    
+    public boolean adressaNormalitzadaCompleta() {
+    	if(this.getAdressaTipus()!=null && !this.getAdressaTipus().equals(EntregaPostalTipusEnum.SENSE_NORMALITZAR) && Utils.isEmpty(this.getAdresaPoblacio())) {
+    		return false;
+    	}
+    	return true;
+    }
 }

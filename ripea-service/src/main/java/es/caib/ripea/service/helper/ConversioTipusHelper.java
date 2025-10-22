@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -28,6 +29,7 @@ import es.caib.ripea.persistence.entity.CarpetaEntity;
 import es.caib.ripea.persistence.entity.ConsultaPinbalEntity;
 import es.caib.ripea.persistence.entity.DadaEntity;
 import es.caib.ripea.persistence.entity.DocumentEntity;
+import es.caib.ripea.persistence.entity.DocumentEnviamentInteressatEntity;
 import es.caib.ripea.persistence.entity.DocumentNotificacioEntity;
 import es.caib.ripea.persistence.entity.DocumentPortafirmesEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
@@ -67,6 +69,8 @@ import es.caib.ripea.service.intf.dto.CarpetaDto;
 import es.caib.ripea.service.intf.dto.CodiValorDto;
 import es.caib.ripea.service.intf.dto.ContingutDto;
 import es.caib.ripea.service.intf.dto.DocumentDto;
+import es.caib.ripea.service.intf.dto.DocumentEnviamentInteressatDto;
+import es.caib.ripea.service.intf.dto.DocumentNotificacioDto;
 import es.caib.ripea.service.intf.dto.DocumentPortafirmesDto;
 import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaContingutDto;
@@ -774,7 +778,6 @@ public class ConversioTipusHelper {
 					}
 				});	
 		
-		// SeguimentArxiuPendentsDto --> InteressatEntity
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<InteressatPersonaJuridicaEntity, SeguimentArxiuPendentsDto>() {
 					@Override
@@ -796,7 +799,59 @@ public class ConversioTipusHelper {
 						return getInteressatPendentArxiuFromInteressatDto(deproxyInteressatEntity(source));
 					}
 				});
-		// FI SeguimentArxiuPendentsDto --> InteressatEntity
+		
+		mapperFactory.getConverterFactory().registerConverter(
+				new CustomConverter<DocumentNotificacioEntity, DocumentNotificacioDto>() {
+
+					@Override
+					public DocumentNotificacioDto convert(DocumentNotificacioEntity source, Type<? extends DocumentNotificacioDto> destinationType, MappingContext mappingContext) {
+						DocumentNotificacioDto resultat = new DocumentNotificacioDto();
+						resultat.setId(source.getId());
+						resultat.setTipus(source.getTipus());
+						resultat.setDataProgramada(source.getDataProgramada());
+						resultat.setDataCaducitat(source.getDataCaducitat());
+						resultat.setNotificacioIdentificador(source.getNotificacioIdentificador());
+						resultat.setNotificacioEstat(source.getNotificacioEstat());
+						resultat.setServeiTipusEnum(source.getServeiTipusEnum());
+						resultat.setEntregaPostal(source.getEntregaPostal());
+						Set<DocumentEnviamentInteressatDto> enviaments = new HashSet<DocumentEnviamentInteressatDto>();
+						if (source.getDocumentEnviamentInteressats()!=null) {
+							for (DocumentEnviamentInteressatEntity dei: source.getDocumentEnviamentInteressats()) {
+								enviaments.add(convertir(dei, DocumentEnviamentInteressatDto.class));
+							}
+						}
+						resultat.setDocumentEnviamentInteressats(enviaments);
+						resultat.setRegistreData(source.getRegistreData());
+						resultat.setRegistreNumero(source.getRegistreNumero()!=null?Integer.toString(source.getRegistreNumero()):null);
+						resultat.setRegistreNumeroFormatat(source.getRegistreNumeroFormatat());
+						resultat.setAssumpte(source.getAssumpte());
+						DocumentDto doc = new DocumentDto();
+						doc.setId(source.getDocument().getId());
+						doc.setNom(source.getDocument().getNom());
+						doc.setPareId(source.getDocument().getPareId());
+						resultat.setDocument(doc);
+						OrganGestorDto emisor = new OrganGestorDto();
+						emisor.setCodi(source.getEmisor().getCodi());
+						emisor.setNom(source.getEmisor().getNom());
+						resultat.setEmisor(emisor);
+						resultat.setDataEnviada(source.getDataEnviada());
+						resultat.setDataFinalitzada(source.getDataFinalitzada());
+						resultat.setCreatedDate(
+								source.getCreatedDate() != null ?
+										Date.from(source.getCreatedDate().get().atZone(ZoneId.systemDefault()).toInstant()) : null);
+						if (source.getCreatedBy().isPresent()) {
+			      			UsuariEntity ue = usuariRepository.findByCodi(source.getCreatedBy().get());
+			      			UsuariDto uDto = new UsuariDto();
+			      			uDto.setCodi(ue.getCodi());
+			      			uDto.setNom(ue.getNom());
+			      			uDto.setNif(ue.getNif());
+			      			uDto.setEmail(ue.getEmail());
+			      			resultat.setCreatedBy(uDto);
+						}						
+						resultat.setDataEnviada(source.getDataEnviada());
+						return resultat;
+					}
+				});
 		
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<ExecucioMassivaEntity, ExecucioMassivaDto>() {

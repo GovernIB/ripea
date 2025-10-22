@@ -119,7 +119,7 @@ const NotificarForm = () => {
     );
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="tipus" hiddenEnumValues={['MANUAL']}/>
+        <GridFormField xs={12} name="tipus" required hiddenEnumValues={['MANUAL']}/>
         <GridFormField xs={12} name="estat" required disabled/>
 
         <GridFormField xs={9.5} name="interessats" multiple filter={interessatsFilter}/>
