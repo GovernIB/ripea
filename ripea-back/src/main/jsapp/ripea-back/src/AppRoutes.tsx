@@ -24,6 +24,7 @@ import RevisioMetaExpedientGrid from "./pages/user/consultes/RevisioMetaExpedien
 import ContingutGrid from "./pages/user/consultes/ContingutGrid.tsx";
 import GestioMetaExpedientGrid from "./pages/user/configurar/GestioMetaExpedientGrid.tsx";
 import GrupGrid from "./pages/user/configurar/GrupGrid.tsx";
+import OrganGestorGrid from "./pages/user/configurar/OrganGestorGrid.tsx";
 
 const AppRoutes: React.FC = () => {
     return <Routes>
@@ -63,6 +64,7 @@ const AppRoutes: React.FC = () => {
         {/* Configurar */}
         <Route path="metaExpedient" element={<GestioMetaExpedientGrid/>} />
         <Route path="grup" element={<GrupGrid/>} />
+        <Route path="organgestor" element={<OrganGestorGrid/>} />
 
         <Route path="*" element={<NotFoundPage />} />
     </Routes>;

@@ -1093,6 +1093,14 @@ const translationEs = {
                 },
             },
         },
+        organGestor: {
+            title: "Órgano Gestor",
+            action: {
+                update: {
+                    ok: "Órgano Gestor '{{data.codi}}' eliminado correctamente",
+                },
+            },
+        },
         user: {
             options: {
                 perfil: "Mi perfil",

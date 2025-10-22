@@ -1093,6 +1093,14 @@ const translationCa = {
                 },
             },
         },
+        organGestor: {
+            title: "Òrgan Gestor",
+            action: {
+                update: {
+                    ok: "Òrgan Gestor '{{data.codi}}' esborrat correctament",
+                },
+            },
+        },
         user: {
             options: {
                 perfil: "El meu perfil",

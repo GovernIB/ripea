@@ -350,7 +350,7 @@ const useMenuAdmin = () => {
                     id: 'organs',
                     title: t('page.user.menu.organs'),
                     // icon: '',
-                    onClick: () => toProgramaAntic('organgestor'),
+                    to: '/organgestor',
                 },
                 {
                     id: 'url',

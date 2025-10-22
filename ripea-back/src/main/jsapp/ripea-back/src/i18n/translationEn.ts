@@ -1093,6 +1093,14 @@ const translationEn = {
                 },
             },
         },
+        organGestor: {
+            title: "Managing Body",
+            action: {
+                update: {
+                    ok: "Managing Body '{{data.codi}}' deleted successfully",
+                },
+            },
+        },
         user: {
             options: {
                 perfil: "My profile",
