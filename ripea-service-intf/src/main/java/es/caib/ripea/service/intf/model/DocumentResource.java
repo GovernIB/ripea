@@ -489,7 +489,7 @@ public class DocumentResource extends NodeResource {
     @FieldNameConstants
     public static class NotificarFormAction implements Serializable {
         @NotNull
-        private DocumentNotificacioTipusEnumDto tipus;
+        private DocumentNotificacioTipusEnumDto tipus = DocumentNotificacioTipusEnumDto.NOTIFICACIO;
         @NotNull
         private DocumentNotificacioEstatEnumDto estat = DocumentNotificacioEstatEnumDto.PENDENT;
         @NotNull
