@@ -438,7 +438,7 @@ const translationCa = {
 						label: "Selecciona els grups de l'interessat",
 					},
 					interessats: {
-						label: "Selecciona els interessats del grup",
+						label: "Selecciona els interessats que formaran part d'aquest grup",
 					},
 				},
 			},

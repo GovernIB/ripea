@@ -438,7 +438,7 @@ const translationEs = {
 						label: "Selecciona los grupos del interesado",
 					},
 					interessats: {
-						label: "Selecciona los interesados del grupo",
+						label: "Selecciona los interesados que formarán parte de este grupo",
 					},
 				},
 			},
