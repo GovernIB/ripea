@@ -1115,6 +1115,22 @@ const translationCa = {
                 },
             },
         },
+        permision: {
+            title: "Permisos",
+            action: {
+                new: {
+                    title: "Crear nou permís",
+                    ok: "El permís per '{{data.principal}} {{data.sid}}' s'ha creat correctament",
+                },
+                update: {
+                    title: "Modificar permís",
+                    ok: "El permís per '{{data.principal}} {{data.sid}}' s'ha modificat correctament",
+                },
+                delete: {
+                    ok: "El permís per '{{data.principal}} {{data.sid}}' s'ha esborrat correctament",
+                },
+            },
+        },
         user: {
             options: {
                 perfil: "El meu perfil",

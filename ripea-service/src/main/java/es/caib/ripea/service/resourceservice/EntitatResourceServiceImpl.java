@@ -3,6 +3,7 @@ package es.caib.ripea.service.resourceservice;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -59,7 +60,7 @@ public class EntitatResourceServiceImpl extends BaseMutableResourceService<Entit
     	}
 
         List<Filter> result = filters.stream()
-                .filter(f -> f!=null && !f.isEmpty())
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
         return result.isEmpty() ? null : FilterBuilder.and(result).generate();

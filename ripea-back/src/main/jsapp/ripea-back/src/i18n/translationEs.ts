@@ -1115,6 +1115,22 @@ const translationEs = {
                 },
             },
         },
+        permision: {
+            title: "Permisos",
+            action: {
+                new: {
+                    title: "Crear nuevo permiso",
+                    ok: "El permiso para '{{data.principal}} {{data.sid}}' se ha creado correctamente",
+                },
+                update: {
+                    title: "Modificar permiso",
+                    ok: "El permiso para '{{data.principal}} {{data.sid}}' se ha modificado correctamente",
+                },
+                delete: {
+                    ok: "El permiso para '{{data.principal}} {{data.sid}}' se ha eliminado correctamente",
+                },
+            },
+        },
         user: {
             options: {
                 perfil: "Mi perfil",

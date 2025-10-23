@@ -366,7 +366,7 @@ const useMenuAdmin = () => {
                     id: 'permisos',
                     title: t('page.user.menu.permisos'),
                     // icon: '',
-                    onClick: () => toProgramaAntic('permis'),
+                    to: '/permis',
                 },
             ],
         },

@@ -26,6 +26,7 @@ import GestioMetaExpedientGrid from "./pages/user/configurar/GestioMetaExpedient
 import GrupGrid from "./pages/user/configurar/GrupGrid.tsx";
 import OrganGestorGrid from "./pages/user/configurar/OrganGestorGrid.tsx";
 import TipusDocumentalGrid from "./pages/user/configurar/TipusDocumentalGrid.tsx";
+import PermisosEntitatGrid from "./pages/user/configurar/PermisosEntitatGrid.tsx";
 
 const AppRoutes: React.FC = () => {
     return <Routes>
@@ -67,6 +68,7 @@ const AppRoutes: React.FC = () => {
         <Route path="tipusDocumental" element={<TipusDocumentalGrid/>} />
         <Route path="grup" element={<GrupGrid/>} />
         <Route path="organgestor" element={<OrganGestorGrid/>} />
+        <Route path="permis" element={<PermisosEntitatGrid/>} />
 
         <Route path="*" element={<NotFoundPage />} />
     </Routes>;

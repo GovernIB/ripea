@@ -1115,6 +1115,22 @@ const translationEn = {
                 },
             },
         },
+        permision: {
+            title: "Permissions",
+            action: {
+                new: {
+                    title: "Create new permission",
+                    ok: "Permission for '{{data.principal}} {{data.sid}}' has been created successfully",
+                },
+                update: {
+                    title: "Edit permission",
+                    ok: "Permission for '{{data.principal}} {{data.sid}}' has been updated successfully",
+                },
+                delete: {
+                    ok: "Permission for '{{data.principal}} {{data.sid}}' has been deleted successfully",
+                },
+            },
+        },
         user: {
             options: {
                 perfil: "My profile",

@@ -34,6 +34,7 @@ const TITLES: any = {
     '/tipusDocumental': "page.user.menu.nti",
     '/grup': "page.user.menu.grups",
     '/organgestor': "page.user.menu.organs",
+    '/permis': "page.user.menu.permisos",
 };
 
 export const setTitlePage = (title:string) => {
