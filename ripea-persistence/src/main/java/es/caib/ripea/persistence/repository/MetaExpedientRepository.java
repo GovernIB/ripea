@@ -59,6 +59,48 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			@Param("revisioEstats") MetaExpedientRevisioEstatEnumDto[] revisioEstats,
 			Sort sort);
 	
+	@Query(	"select me.id from " +
+			"    MetaExpedientEntity me left join me.metaExpedientOrganGestors meogp " +
+			"where " +
+			"    me.entitat = :entitat " +
+			"and (" +
+			"     (:esNullIdsMetaExpedientsPermesos = false and (me.id in (:idsMetaExpedientsPermesos0)" +
+			"			or me.id in (:idsMetaExpedientsPermesos1)" +
+			"			or me.id in (:idsMetaExpedientsPermesos2)" +
+			"			or me.id in (:idsMetaExpedientsPermesos3))) " +
+			"     or (:esNullIdsOrgansPermesos = false and (meogp.organGestor.id in (:idsOrgansPermesos0)" +
+			"			or meogp.organGestor.id in (:idsOrgansPermesos1)" +
+			"			or meogp.organGestor.id in (:idsOrgansPermesos2)" +
+			"			or meogp.organGestor.id in (:idsOrgansPermesos3))) " +
+			"     or (:esNullIdsMetaExpedientOrganPairsPermesos = false and meogp.id in (:idsMetaExpedientOrganPairsPermesos)) " +
+			"     or (:esNullIdsOrgansAmbProcedimentsComunsPermesos = false and meogp.organGestor.id in (:idsOrgansAmbProcedimentsComunsPermesos) and me.id in (:idsProcedimentsComuns))) " +
+			// Un cop superada la select anterior, es procedeix a afinar per permisos per procediment:
+			// - Per admin i superadmin: es compleix la primera condicio = No filtra
+			// - Per la resta: el procediment no ha de requerir permis directe o en cas contrari, s'ha de tenir el permis directe de lectura.
+			"and (:isAdmin = true or :esNullIdsMetaExpedientsPermesos = true or me.permisDirecte = false or ("+ 
+					"				me.id in (:idsMetaExpedientsPermesos0)" +
+					"			or	me.id in (:idsMetaExpedientsPermesos1)" +
+					"			or	me.id in (:idsMetaExpedientsPermesos2)" +
+					"			or	me.id in (:idsMetaExpedientsPermesos3)))")
+	List<Long> findMetaExpedientsPermesos(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("esNullIdsMetaExpedientsPermesos") boolean esNullIdsMetaExpedientsPermesos, 
+			@Param("idsMetaExpedientsPermesos0") List<Long> idsMetaExpedientsPermesos0,
+			@Param("idsMetaExpedientsPermesos1") List<Long> idsMetaExpedientsPermesos1,
+			@Param("idsMetaExpedientsPermesos2") List<Long> idsMetaExpedientsPermesos2,
+			@Param("idsMetaExpedientsPermesos3") List<Long> idsMetaExpedientsPermesos3,
+			@Param("esNullIdsOrgansPermesos") boolean esNullIdsOrgansPermesos,
+			@Param("idsOrgansPermesos0") List<Long> idsOrgansPermesos0,
+			@Param("idsOrgansPermesos1") List<Long> idsOrgansPermesos1,
+			@Param("idsOrgansPermesos2") List<Long> idsOrgansPermesos2,
+			@Param("idsOrgansPermesos3") List<Long> idsOrgansPermesos3,
+			@Param("esNullIdsMetaExpedientOrganPairsPermesos") boolean esNullIdsMetaExpedientOrganPairsPermesos,
+			@Param("idsMetaExpedientOrganPairsPermesos") List<Long> idsMetaExpedientOrganPairsPermesos,
+			@Param("esNullIdsOrgansAmbProcedimentsComunsPermesos") boolean esNullIdsOrgansAmbProcedimentsComunsPermesos, 
+			@Param("idsOrgansAmbProcedimentsComunsPermesos") List<Long> idsOrgansAmbProcedimentsComunsPermesos,
+			@Param("idsProcedimentsComuns") List<Long> idsProcedimentsComuns,
+			@Param("isAdmin") boolean isAdmin);
+	
 	@Query(	"select me from " +
 			"    MetaExpedientEntity me left join me.organGestor org " +
 			"where " +
