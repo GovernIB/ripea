@@ -179,7 +179,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			}
 			
 			//Ordenam els fills, les carpetes primer, despres els documents
-			reordenaFillsCarpetesFirst(contingut);
+//			reordenaFillsCarpetesFirst(contingut);
 
 			omplirModelPerMostrarContingut(
 					request,
