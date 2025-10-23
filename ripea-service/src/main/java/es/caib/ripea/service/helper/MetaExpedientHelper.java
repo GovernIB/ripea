@@ -150,7 +150,7 @@ public class MetaExpedientHelper {
 			return sequencia.getValor() + 1;
 		}
 	}
-
+	
 	public List<Long> findMetaExpedientIdsFiltratsAmbPermisosOrganGestor(Long entitatId, Long organGestorId, boolean hasPermisAdmComu) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false, false);
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();

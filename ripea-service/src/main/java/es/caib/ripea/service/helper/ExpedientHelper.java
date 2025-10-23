@@ -2095,6 +2095,31 @@ public class ExpedientHelper {
 		return permisosPerExpedientsDto;
 	}
 	
+	public List<Long> findProcedimentsPermesos(
+			EntitatEntity entitatEntity,
+			String rolActual,
+			Long organActual) {
+		PermisosPerExpedientsDto permisosPerExpedients = findPermisosPerExpedients(entitatEntity.getId(), rolActual, organActual);
+		return metaExpedientRepository.findMetaExpedientsPermesos(
+				entitatEntity,
+				permisosPerExpedients.getIdsMetaExpedientsPermesos() == null,
+				permisosPerExpedients.getIdsMetaExpedientsPermesos(0),
+				permisosPerExpedients.getIdsMetaExpedientsPermesos(1),
+				permisosPerExpedients.getIdsMetaExpedientsPermesos(2),
+				permisosPerExpedients.getIdsMetaExpedientsPermesos(3),
+				permisosPerExpedients.getIdsOrgansPermesos() == null,
+				permisosPerExpedients.getIdsOrgansPermesos(0),
+				permisosPerExpedients.getIdsOrgansPermesos(1),
+				permisosPerExpedients.getIdsOrgansPermesos(2),
+				permisosPerExpedients.getIdsOrgansPermesos(3),
+				permisosPerExpedients.getIdsMetaExpedientOrganPairsPermesos() == null,
+				permisosPerExpedients.getIdsMetaExpedientOrganPairsPermesos(),
+				permisosPerExpedients.getIdsOrgansAmbProcedimentsComunsPermesos() == null,
+				permisosPerExpedients.getIdsOrgansAmbProcedimentsComunsPermesos(),
+				permisosPerExpedients.getIdsProcedimentsComuns(),
+				rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_SUPER"));
+	}
+	
 	public PermisosPerExpedientsDto findPermisosPerExpedients(
 			Long entitatId,
 			String rolActual,

@@ -102,6 +102,7 @@ import es.caib.ripea.service.intf.model.ExpedientResource.ImportarDocumentsZipFo
 import es.caib.ripea.service.intf.model.ExpedientResource.ImportarExpedientFormAction;
 import es.caib.ripea.service.intf.model.ExpedientResource.TancarExpedientFormAction;
 import es.caib.ripea.service.intf.model.InteressatResource;
+import es.caib.ripea.service.intf.model.MetaExpedientOrganGestorResource;
 import es.caib.ripea.service.intf.model.MetaExpedientResource;
 import es.caib.ripea.service.intf.model.NodeResource.MassiveAction;
 import es.caib.ripea.service.intf.model.UsuariResource;
@@ -239,30 +240,35 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		}
 		
 		Filter filtreNoEliminats = FilterBuilder.and(FilterBuilder.equal(ContingutResource.Fields.esborrat, "0"));
+		
+		/**
+		
 		Filter filtrePermisos = null;
-
-        List<String> permesosClausulesIn = Utils.getIdsEnGruposMil(
-        		expedientHelper.findExpedientsPermesosIds(entitatEntity, permisosPerExpedients, rolActual));
-        if (permesosClausulesIn!=null) {
-	        for (String aux: permesosClausulesIn) {
-		        if (aux != null && !aux.isEmpty()) {
-		        	filtrePermisos = FilterBuilder.or(filtrePermisos, Filter.parse("id IN (" + aux + ")"));
+		//Per Administtrador, com que veu tots els expedients de la entitat, no fa falta montar la clausula ID IN (...)
+		//Ja que a més, hi havia tants de resultats, que donava error.
+		if (!rolActual.equals("IPA_ADMIN")) {
+			List<Long> expedientsPermesos = expedientHelper.findExpedientsPermesosIds(entitatEntity, permisosPerExpedients, rolActual); 
+	        List<String> permesosClausulesIn = Utils.getIdsEnGruposMil(expedientsPermesos);
+	        if (permesosClausulesIn!=null) {
+		        for (String aux: permesosClausulesIn) {
+			        if (aux != null && !aux.isEmpty()) {
+			        	filtrePermisos = FilterBuilder.or(filtrePermisos, Filter.parse("id IN (" + aux + ")"));
+			        }
 		        }
 	        }
-        }
-        
-		//Si no es té permis per cap expedient, no retornam resultats
-		if (permesosClausulesIn==null || permesosClausulesIn.size()==0) {
-			return FilterBuilder.equal("id", 0).generate();
+	        
+			//Si no es té permis per cap expedient, no retornam resultats
+			if (permesosClausulesIn==null || permesosClausulesIn.size()==0) {
+				return FilterBuilder.equal("id", 0).generate();
+			}
 		}
 
 		Filter filtreResultat = FilterBuilder.and(filtreFrontAndEntitat, filtreNoEliminats, filtrePermisos);
-        
-        return filtreResultat.generate();
-//
-//        /**
-//         * Procediment (meta-expedients) amb permisos
-//         */
+		        
+        */
+
+//		boolean algunPermisAplicat = false;
+//		//Procediment (meta-expedients) amb permisos
 //        String procedimentId = ExpedientResource.Fields.metaExpedient + ".id";
 //        Filter filtreProcedimentsPermesos = null; 
 //        List<String> grupsClausulesIn = permisosPerExpedients.getIdsProcedimentsGruposMil();
@@ -270,16 +276,15 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 //	        for (String aux: grupsClausulesIn) {
 //		        if (aux != null && !aux.isEmpty()) {
 //		        	filtreProcedimentsPermesos = FilterBuilder.or(filtreProcedimentsPermesos, Filter.parse(procedimentId + " IN (" + aux + ")"));
+//		        	algunPermisAplicat = true;
 //		        }
 //	        }
 //        }
 //
 //        //No aplica filtre permis directe procediment
 //        Filter filtreProcedimentPermisDirecte = null;
-//        if (!rolActual.equals("IPA_ADMIN") && 
-//        	!rolActual.equals("IPA_SUPER") && 
-//        	permisosPerExpedients.getIdsMetaExpedientsPermesos()!=null &&
-//                !permisosPerExpedients.getIdsMetaExpedientsPermesos().isEmpty()) {
+//        if (!rolActual.equals("IPA_ADMIN") && !rolActual.equals("IPA_SUPER") && 
+//        	permisosPerExpedients.getIdsMetaExpedientsPermesos()!=null && !permisosPerExpedients.getIdsMetaExpedientsPermesos().isEmpty()) {
 //	            filtreProcedimentPermisDirecte = FilterBuilder.or(
 //	            		FilterBuilder.equal(ExpedientResource.Fields.metaExpedient+"."+MetaExpedientResource.Fields.permisDirecte, false), //Permis directe
 //	            		filtreProcedimentsPermesos
@@ -298,6 +303,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 //    	        for (String aux: grupsGrupClausulesIn) {
 //    		        if (aux != null && !aux.isEmpty()) {
 //    		        	filtreGrupsPermesos = FilterBuilder.or(filtreGrupsPermesos, Filter.parse(grupId + " IN (" + aux + ")"));
+//    		        	algunPermisAplicat = true;
 //    		        }
 //    	        }
 //            }
@@ -307,13 +313,78 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 //            }
 //        }
 //
-//        Filter filtreNoEliminats = FilterBuilder.and(FilterBuilder.equal(ContingutResource.Fields.esborrat, "0"));
+//        //Si no es té permis per cap objecte, no retornam resultats
+//        if (!rolActual.equals("IPA_ADMIN") && !algunPermisAplicat) {
+//        	return FilterBuilder.equal("id", 0).generate();
+//        }
+//        
 //        Filter filtreResultat = FilterBuilder.and(
 //        		filtreNoEliminats,
-//        		filtreEntitatSessio,
+//        		filtreFrontAndEntitat,
 //        		filtreProcedimentsPermesos,
 //        		filtreProcedimentPermisDirecte,
 //        		filtreGrupsPermesos);
+        
+		//Procediment (meta-expedients) amb permisos
+	      Filter filtreProcedimentsPermesos = null;
+	      Filter filtreOrgansPermesos = null;
+	      Filter filtreGrupsPermesos = null;
+	      if (!rolActual.equals("IPA_ADMIN")) {
+	    	  
+	    	  String procedimentId = ExpedientResource.Fields.metaExpedient + ".id";
+	    	  List<Long> procedimentsPermesos = expedientHelper.findProcedimentsPermesos(
+					entitatEntity,
+					rolActual,
+					ogEntity!=null?ogEntity.getId():null); 
+	    	  
+				//Si no es té permis per cap procediment, no retornam resultats
+				if (procedimentsPermesos==null || procedimentsPermesos.size()==0) {
+					return FilterBuilder.equal("id", 0).generate();
+				}
+	    	  
+	    	  List<String> permesosClausulesIn = Utils.getIdsEnGruposMil(procedimentsPermesos);
+		      if (permesosClausulesIn!=null) {
+			        for (String aux: permesosClausulesIn) {
+				        if (aux != null && !aux.isEmpty()) {
+				        	filtreProcedimentsPermesos = FilterBuilder.or(filtreProcedimentsPermesos, Filter.parse(procedimentId + " IN (" + aux + ")"));
+				        }
+			        }
+		      }
+		      
+		      //Si es treballa amb un organ gestor, s'ha de filtrar per expedients d'aquest organ gestor i fills
+		      if (rolActual.equals("IPA_ORGAN_ADMIN") || rolActual.equals("IPA_DISSENY")) {
+		    	  	String campOrganId = ExpedientResource.Fields.metaexpedientOrganGestorPares + "." + MetaExpedientOrganGestorResource.Fields.organGestor + ".id";
+			        List<String> organsActualAndFillsClausulesIn = Utils.getIdsEnGruposMil(permisosPerExpedients.getIdsOrgansPermesos());
+				      if (organsActualAndFillsClausulesIn!=null) {
+					        for (String aux: organsActualAndFillsClausulesIn) {
+						        if (aux != null && !aux.isEmpty()) {
+						        	filtreOrgansPermesos = FilterBuilder.or(filtreOrgansPermesos, Filter.parse(campOrganId + " IN (" + aux + ")"));
+						        }
+					        }
+				      }
+		      }
+		      
+		      //Aplica filtre de grups
+		      if (!rolActual.equals("IPA_ADMIN") && !rolActual.equals("IPA_ORGAN_ADMIN")) {
+		    	  String grupId = ExpedientResource.Fields.grup + ".id";
+					List<String> grupsClausulesIn = Utils.getIdsEnGruposMil(permisosPerExpedients.getIdsGrupsPermesos());
+					  if (grupsClausulesIn!=null && grupsClausulesIn.size()>0) {
+					        for (String aux: grupsClausulesIn) {
+						        if (aux != null && !aux.isEmpty()) {
+						        	filtreGrupsPermesos = FilterBuilder.or(filtreGrupsPermesos, Filter.parse(grupId + " IN (" + aux + ")"));
+						        }
+					        }
+					        
+			            if (filtreGrupsPermesos!=null) {
+			            	filtreGrupsPermesos = FilterBuilder.or(filtreGrupsPermesos, Filter.parse(grupId + " IS NULL"));
+			            }
+					  }
+		      }
+	      }
+		
+		Filter filtreResultat = FilterBuilder.and(filtreFrontAndEntitat, filtreNoEliminats, filtreProcedimentsPermesos, filtreOrgansPermesos, filtreGrupsPermesos);
+		
+        return filtreResultat.generate();
     }
     
     @Override
