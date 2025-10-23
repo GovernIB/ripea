@@ -25,6 +25,7 @@ import ContingutGrid from "./pages/user/consultes/ContingutGrid.tsx";
 import GestioMetaExpedientGrid from "./pages/user/configurar/GestioMetaExpedientGrid.tsx";
 import GrupGrid from "./pages/user/configurar/GrupGrid.tsx";
 import OrganGestorGrid from "./pages/user/configurar/OrganGestorGrid.tsx";
+import TipusDocumentalGrid from "./pages/user/configurar/TipusDocumentalGrid.tsx";
 
 const AppRoutes: React.FC = () => {
     return <Routes>
@@ -63,6 +64,7 @@ const AppRoutes: React.FC = () => {
 
         {/* Configurar */}
         <Route path="metaExpedient" element={<GestioMetaExpedientGrid/>} />
+        <Route path="tipusDocumental" element={<TipusDocumentalGrid/>} />
         <Route path="grup" element={<GrupGrid/>} />
         <Route path="organgestor" element={<OrganGestorGrid/>} />
 

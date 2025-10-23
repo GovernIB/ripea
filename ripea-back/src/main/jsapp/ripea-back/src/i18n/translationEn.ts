@@ -1101,6 +1101,20 @@ const translationEn = {
                 },
             },
         },
+        tipusDocumental: {
+            title: "Document type",
+            action: {
+                new: {
+                    ok: "Document type '{{data.codi}}' created successfully",
+                },
+                update: {
+                    ok: "Document type '{{data.codi}}' updated successfully",
+                },
+                delete: {
+                    ok: "Document type '{{data.codi}}' deleted successfully",
+                },
+            },
+        },
         user: {
             options: {
                 perfil: "My profile",

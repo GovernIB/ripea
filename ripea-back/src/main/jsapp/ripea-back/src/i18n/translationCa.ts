@@ -1101,6 +1101,20 @@ const translationCa = {
                 },
             },
         },
+        tipusDocumental: {
+            title: "Tipus documental",
+            action: {
+                new: {
+                    ok: "Tipus documental '{{data.codi}}' creat correctament",
+                },
+                update: {
+                    ok: "Tipus documental '{{data.codi}}' modificat correctament",
+                },
+                delete: {
+                    ok: "Tipus documental '{{data.codi}}' esborrat correctament",
+                },
+            },
+        },
         user: {
             options: {
                 perfil: "El meu perfil",

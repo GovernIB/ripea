@@ -330,7 +330,7 @@ const useMenuAdmin = () => {
                     id: 'nti',
                     title: t('page.user.menu.nti'),
                     // icon: '',
-                    onClick: () => toProgramaAntic('tipusDocumental'),
+                    to: '/tipusDocumental',
                     hidden: user?.sessionScope?.isTipusDocumentsEnabled,
                 },
                 {

@@ -31,6 +31,7 @@ const TITLES: any = {
 
     // Configurar
     '/metaExpedient': "page.user.menu.procediments",
+    '/tipusDocumental': "page.user.menu.nti",
     '/grup': "page.user.menu.grups",
     '/organgestor': "page.user.menu.organs",
 };
