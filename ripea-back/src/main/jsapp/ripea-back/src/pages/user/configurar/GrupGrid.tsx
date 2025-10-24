@@ -3,7 +3,7 @@ import {useState} from "react";
 import {GridPage} from "reactlib";
 import {CardPage} from "../../../components/CardData.tsx";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
-import {Grid} from "@mui/material";
+import {Button, Grid, Icon} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
@@ -61,6 +61,15 @@ const columns = [
         field: 'organGestor',
         flex: 1,
     },
+    {
+        filed: 'permis',
+        headerName: '',
+        sortable: false,
+        flex: 0.25,
+        renderCell: (params:any) => <Button href={`/grupPermis/${params?.id}/permis`} variant={'contained'}>
+            <Icon>key</Icon>
+        </Button>
+    }
 ]
 
 const GrupGrid = () => {

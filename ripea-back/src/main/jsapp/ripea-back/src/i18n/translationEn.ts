@@ -1117,6 +1117,10 @@ const translationEn = {
         },
         permision: {
             title: "Permissions",
+            tabs: {
+                expedient: "Case management",
+                admin: "Administration and design",
+            },
             action: {
                 new: {
                     title: "Create new permission",
@@ -1127,6 +1131,8 @@ const translationEn = {
                     ok: "Permission for '{{data.principal}} {{data.sid}}' has been updated successfully",
                 },
                 delete: {
+                    check: "¿Está seguro de que desea continuar con esta acción?",
+                    description: "Una vez eliminada, no se podrá recuperar",
                     ok: "Permission for '{{data.principal}} {{data.sid}}' has been deleted successfully",
                 },
             },

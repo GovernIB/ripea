@@ -1117,6 +1117,10 @@ const translationCa = {
         },
         permision: {
             title: "Permisos",
+            tabs: {
+                expedient: "Gestió d'expedients",
+                admin: "Administració i disseny",
+            },
             action: {
                 new: {
                     title: "Crear nou permís",
@@ -1127,6 +1131,8 @@ const translationCa = {
                     ok: "El permís per '{{data.principal}} {{data.sid}}' s'ha modificat correctament",
                 },
                 delete: {
+                    check: "Està segur que vol continuar amb aquesta acció?",
+                    description: "Un cop esborrada no es podrà recuperar",
                     ok: "El permís per '{{data.principal}} {{data.sid}}' s'ha esborrat correctament",
                 },
             },
@@ -1158,6 +1164,7 @@ const translationCa = {
                 procediments: "Gestió de procediments",
                 procedimentsTitle: "L'entitat té procediments amb òrgans gestors no actualitzats",
                 grups: "Grups",
+                grupPermis: "Permisos del grup",
                 revisar: "Revisió de procediments",
                 tasca: "Tasques",
                 flux: "Fluxos de firma",
@@ -1176,6 +1183,7 @@ const translationCa = {
                 nti: "Tipus documentals NTI",
                 dominis: "Dominis",
                 organs: "Òrgans gestors",
+                organPermis: "Permisos de l'òrgan gestor: {{nom}}",
                 url: "URLs d'instrucció",
                 permisos: "Permisos de l'entitat"
             },

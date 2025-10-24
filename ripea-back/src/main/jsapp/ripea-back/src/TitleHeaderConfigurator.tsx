@@ -33,7 +33,9 @@ const TITLES: any = {
     '/metaExpedient': "page.user.menu.procediments",
     '/tipusDocumental': "page.user.menu.nti",
     '/grup': "page.user.menu.grups",
+    // '/grupPermis/:id/permis': "page.user.menu.grupPermis",
     '/organgestor': "page.user.menu.organs",
+    // '/organgestor/:id/permis': "page.user.menu.organPermis",
     '/permis': "page.user.menu.permisos",
 };
 
@@ -46,6 +48,7 @@ const TitleHeaderConfigurator = () => {
     const location = useLocation();
 
     useEffect(() => {
+        console.log(location, location.pathname, TITLES[location.pathname])
         setTitlePage(t(TITLES[location.pathname]));
     }, [location.pathname]);
 

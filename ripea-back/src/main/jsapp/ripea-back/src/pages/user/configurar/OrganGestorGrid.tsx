@@ -2,8 +2,8 @@ import {useTranslation} from "react-i18next";
 import {useState} from "react";
 import {GridPage} from "reactlib";
 import {CardPage} from "../../../components/CardData.tsx";
-import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
-import {Grid} from "@mui/material";
+import StyledMuiGrid, {ToolbarButton} from "../../../components/StyledMuiGrid.tsx";
+import {Button, Grid, Icon} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
@@ -74,6 +74,15 @@ const columns = [
         field: 'estat',
         flex: 1,
     },
+    {
+        filed: 'permis',
+        headerName: '',
+        sortable: false,
+        flex: 0.25,
+        renderCell: (params:any) => <Button href={`/organgestor/${params?.id}/permis`} variant={'contained'}>
+            <Icon>key</Icon>
+        </Button>
+    }
 ]
 
 const OrganGestorGrid = () => {
@@ -106,7 +115,17 @@ const OrganGestorGrid = () => {
                 // TODO: revisar accions
                 rowAdditionalActions={actions}
 
+                toolbarElementsWithPositions={[
+                    {
+                        position: 3,
+                        element: <ToolbarButton
+                            // title={t('common.create')}
+                            icon={'cached'} onClick={()=>handelCreate(id)} color={'primary'}/>,
+                    },
+                ]}
+
                 toolbarHideCreate
+                toolbarHideRefresh
                 popupEditFormI18nKeys={{
                     updateSuccess: 'page.organGestor.action.update.ok',
                 }}

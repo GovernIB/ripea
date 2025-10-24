@@ -1117,6 +1117,10 @@ const translationEs = {
         },
         permision: {
             title: "Permisos",
+            tabs: {
+                expedient: "Gestión de expedientes",
+                admin: "Administración y diseño",
+            },
             action: {
                 new: {
                     title: "Crear nuevo permiso",
@@ -1127,6 +1131,8 @@ const translationEs = {
                     ok: "El permiso para '{{data.principal}} {{data.sid}}' se ha modificado correctamente",
                 },
                 delete: {
+                    check: "¿Está seguro de que desea continuar con esta acción?",
+                    description: "Una vez eliminada, no se podrá recuperar",
                     ok: "El permiso para '{{data.principal}} {{data.sid}}' se ha eliminado correctamente",
                 },
             },
