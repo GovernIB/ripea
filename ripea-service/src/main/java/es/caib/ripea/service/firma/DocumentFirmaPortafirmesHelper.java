@@ -389,11 +389,8 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 			// ========================================== DOCUMENT WAS REBUTJAT EN PORTAFIRMES ==============================================
 			} else if (PortafirmesCallbackEstatEnumDto.REBUTJAT.equals(callbackEstat)) {
 				cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedient().getId());
-				documentPortafirmes.getDocument().updateEstat(
-						DocumentEstatEnumDto.REDACCIO);
-				documentPortafirmes.updateProcessat(
-						false,
-						new Date());
+				documentPortafirmes.getDocument().updateEstat(DocumentEstatEnumDto.REDACCIO);
+				documentPortafirmes.updateProcessat(false, new Date());
 				logAll(documentPortafirmes, LogTipusEnumDto.PFIRMA_REBUIG);
 				alertaHelper.crearAlerta(
 						"La firma del document " + document.getNom() + " ha estat rebutjada " + 

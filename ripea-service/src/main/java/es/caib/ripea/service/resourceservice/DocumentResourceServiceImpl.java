@@ -1366,7 +1366,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
                 if (fluxosDto != null) {
                     for (PortafirmesFluxRespostaDto flx : fluxosDto) {
-                        resultat.add(new FieldOption(flx.getFluxId(), flx.getNom()));
+                        resultat.add(new FieldOption(flx.getFluxId(), "[" + flx.getDescripcio() + "] > " + flx.getNom()));
                     }
                 }
             }
@@ -1377,7 +1377,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                             .collect(Collectors.toList());
                 } catch (Exception e) {}
             }
-            resultat.sort(Comparator.comparing(FieldOption::getDescription));
+            resultat.sort(Comparator.comparing(FieldOption::getDescription).reversed());
             return resultat;
         }
 

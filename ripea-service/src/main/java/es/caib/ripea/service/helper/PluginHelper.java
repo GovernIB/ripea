@@ -266,6 +266,7 @@ public class PluginHelper {
 	@Autowired private ContingutHelper contingutHelper;
 	@Autowired private DocumentNotificacioHelper documentNotificacioHelper;
 	@Autowired private ApplicationHelper applicationHelper;
+	@Autowired private MessageHelper messageHelper;
 	
 	@Autowired private DocumentEnviamentInteressatRepository documentEnviamentInteressatRepository;
 	@Autowired private ExpedientPeticioRepository expedientPeticioRepository;
@@ -4021,6 +4022,7 @@ public class PluginHelper {
 					PortafirmesFluxRespostaDto resposta = new PortafirmesFluxRespostaDto();
 					resposta.setFluxId(plantilla.getFluxId());
 					resposta.setNom(plantilla.getNom());
+					resposta.setDescripcio(messageHelper.getMessage("portafirmesRecuperarPlantillesDisponibles.origen.comu"));
 					respostesDto.add(resposta);
 				}
 			}
@@ -4032,6 +4034,7 @@ public class PluginHelper {
 					PortafirmesFluxRespostaDto fluxUsuari = new PortafirmesFluxRespostaDto();
 					fluxUsuari.setFluxId(fluxFirmaUsuari.getPortafirmesFluxId());
 					fluxUsuari.setNom(fluxFirmaUsuari.getDescripcio());
+					fluxUsuari.setDescripcio(messageHelper.getMessage("portafirmesRecuperarPlantillesDisponibles.origen.usuari"));
 					fluxUsuari.setUsuariActual(true);
 					respostesDto.add(fluxUsuari);
 				}
@@ -4046,6 +4049,7 @@ public class PluginHelper {
 						PortafirmesFluxRespostaDto fluxDefault = new PortafirmesFluxRespostaDto();
 						fluxDefault.setFluxId(fluxProcediment.getPortafirmesFluxId());
 						fluxDefault.setNom(fluxProcediment.getPortafirmesFluxDesc());
+						fluxDefault.setDescripcio(messageHelper.getMessage("portafirmesRecuperarPlantillesDisponibles.origen.proced"));
 						fluxDefault.setProcedimentDefault(true);
 						respostesDto.add(fluxDefault);
 					}
@@ -5418,8 +5422,7 @@ public class PluginHelper {
 		if (certificacioRetornat) {
 
 			if (getPropertyGuardarCertificacioExpedient()) {
-				boolean certificacioJaGuardat = documentEnviamentInteressatEntity
-						.getEnviamentCertificacioData() != null;
+				boolean certificacioJaGuardat = documentEnviamentInteressatEntity.getEnviamentCertificacioData() != null;
 				if (!certificacioJaGuardat) {
 					MetaDocumentEntity metaDocument = metaDocumentRepository.findByEntitatAndTipusGeneric(
 							true,
@@ -5440,28 +5443,28 @@ public class PluginHelper {
 				}
 
 			} else {
-				// saves in gestio documental but never uses it?
+				//Guarda la certificació al gestor documental com a backup, pero sembla que no es llegeix en cap moment
 				byte[] certificacio = resposta.getCertificacioContingut();
 				String gestioDocumentalId = notificacio.getEnviamentCertificacioArxiuId();
+				boolean eliminadaAnteriorCertificacio = false;
+				//Borra la certificació anterior si existia i era anterior a la nova data (obsoleta)
 				if (gestioDocumentalId!=null && 
 					documentEnviamentInteressatEntity.getEnviamentCertificacioData()!=null &&
-					resposta.getCertificacioData()!=null &&
 					documentEnviamentInteressatEntity.getEnviamentCertificacioData().before(resposta.getCertificacioData())) {
 					gestioDocumentalDelete(gestioDocumentalId, GESDOC_AGRUPACIO_CERTIFICACIONS);
+					eliminadaAnteriorCertificacio = true;
 				}
-				if (gestioDocumentalId == null || (
-						documentEnviamentInteressatEntity.getEnviamentCertificacioData()!=null &&
-						resposta.getCertificacioData()!=null &&
-						documentEnviamentInteressatEntity.getEnviamentCertificacioData().before(resposta.getCertificacioData()))) {
+				//Guarda la nova certificació si no existia o es més recent que la anterior
+				if (gestioDocumentalId == null || eliminadaAnteriorCertificacio) {
 					gestioDocumentalId = gestioDocumentalCreate(PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS, new ByteArrayInputStream(certificacio));
 				}
 				notificacio.setEnviamentCertificacioArxiuId(gestioDocumentalId);
 			}
 		}
 
-		if (resposta.getEstat() == es.caib.ripea.plugin.notificacio.EnviamentEstat.NOTIFICADA) {
+		if (es.caib.ripea.plugin.notificacio.EnviamentEstat.NOTIFICADA.equals(resposta.getEstat())) {
 			logAll(notificacio, LogTipusEnumDto.NOTIFICACIO_CERTIFICADA, null);
-		} else if (resposta.getEstat() == es.caib.ripea.plugin.notificacio.EnviamentEstat.REBUTJADA) {
+		} else if (es.caib.ripea.plugin.notificacio.EnviamentEstat.REBUTJADA.equals(resposta.getEstat())) { 
 			logAll(notificacio, LogTipusEnumDto.NOTIFICACIO_REBUTJADA, null);
 		}
 
