@@ -1,5 +1,5 @@
-import {useRef} from "react";
-import {Alert, Grid} from "@mui/material";
+import {useRef, useState} from "react";
+import {Alert, Typography, Backdrop, Box, CircularProgress, Grid} from "@mui/material";
 import {MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import GridFormField from "../../../components/GridFormField.tsx";
@@ -19,7 +19,7 @@ const ImportarForm = () => {
         <GridFormField xs={12} name="tipusImportacio" required/>
         <GridFormField xs={12} name="codiEni" hidden={data?.tipusImportacio!="CODI_ENI"} required/>
         <GridFormField xs={6} name="numeroRegistre" hidden={data?.tipusImportacio!="NUMERO_REGISTRE"} required/>
-        <GridFormField xs={6} name="dataPresentacio" type={"date"} hidden={data?.tipusImportacio!="NUMERO_REGISTRE"} required/>
+        <GridFormField xs={6} name="dataPresentacio" type={"datetime-local"} hidden={data?.tipusImportacio!="NUMERO_REGISTRE"} required/>
         <GridFormField xs={12} name="carpeta"
                        filter={filterCarpeta}
                        disabled={data?.novaCarpetaNom}/>
@@ -33,7 +33,11 @@ const ImportarForm = () => {
 
 const Importar = (props:any) => {
     const { t } = useTranslation();
-    return <FormActionDialog
+	const [loading, setLoading] = useState(false);
+	
+    return 	(
+		    <>
+	<FormActionDialog
         resourceName={"expedientResource"}
         action={"IMPORT_DOCS"}
         title={t('page.document.action.import.title')}
@@ -41,10 +45,25 @@ const Importar = (props:any) => {
             {icon: 'save', text: t('common.import'), componentProps: { variant: 'contained' }, value: true },
             {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
         ]}
+		onSubmit={() => setLoading(true)}
+		onSuccess={() => setLoading(false)}
+		onError={() => setLoading(false)}
+		onClose={() => setLoading(false)}
         {...props}
     >
         <ImportarForm/>
     </FormActionDialog>
+	
+	<Backdrop open={loading} sx={{ zIndex: 1400, color: "#fff" }}>
+		<Box textAlign="center">	
+			<CircularProgress color="inherit" />
+				<Typography mt={2}>
+					{t("common.processing", "Procesando...")}
+				</Typography>
+		</Box>
+	</Backdrop>	
+	</>
+ );		  
 }
 
 const useImportar = (entity:any, refresh?: () => void) => {

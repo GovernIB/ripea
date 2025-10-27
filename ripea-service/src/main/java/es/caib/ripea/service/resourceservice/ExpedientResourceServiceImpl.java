@@ -100,6 +100,7 @@ import es.caib.ripea.service.intf.dto.ImportacioDto;
 import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
 import es.caib.ripea.service.intf.dto.PermisosPerExpedientsDto;
 import es.caib.ripea.service.intf.dto.ResultatConsultaDto;
+import es.caib.ripea.service.intf.dto.TipusRegistreEnumDto;
 import es.caib.ripea.service.intf.model.ContingutResource;
 import es.caib.ripea.service.intf.model.DocumentResource;
 import es.caib.ripea.service.intf.model.EntitatResource;
@@ -1143,6 +1144,13 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 					destiId = params.getCarpeta().getId();
 				}
 				ImportacioDto importacioDto = new ImportacioDto();
+				importacioDto.setTipusImportacio(params.getTipusImportacio());
+				importacioDto.setNumeroRegistre(params.getNumeroRegistre());
+				importacioDto.setCodiEni(params.getCodiEni());
+				importacioDto.setDataPresentacioFormatted(params.getDataPresentacio());
+				importacioDto.setTipusRegistre(TipusRegistreEnumDto.ENTRADA);
+				importacioDto.setDestiId(String.valueOf(destiId));
+				
 				contingutHelper.importarDocuments(entitatEntity.getId(), destiId, importacioDto, new HashMap<String, String>(), new ArrayList<DocumentDto>());
 				return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
 			} catch (Exception ex) {

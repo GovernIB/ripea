@@ -470,7 +470,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
     	private TipusImportEnumDto tipusImportacio = TipusImportEnumDto.NUMERO_REGISTRE;
     	private String codiEni;
     	private String numeroRegistre;
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy", timezone="Europe/Madrid")
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone="Europe/Madrid")
         private Date dataPresentacio;
     	private ResourceReference<CarpetaResource, Long> carpeta;
         private String novaCarpetaNom;
