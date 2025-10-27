@@ -440,7 +440,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     private class CountPerspectiveApplicator implements PerspectiveApplicator<DocumentResourceEntity, DocumentResource> {
         @Override
         public void applySingle(String code, DocumentResourceEntity entity, DocumentResource resource) throws PerspectiveApplicationException {
-            resource.setNumMetaDades(entity.getMetaNode().getMetaDades().size());
+        	if (entity.getMetaNode() != null)
+        		resource.setNumMetaDades(entity.getMetaNode().getMetaDades().size());
             resource.setNumMoviments(contingutMovimentRepository.countByContingutId(entity.getId()));
         }
     }

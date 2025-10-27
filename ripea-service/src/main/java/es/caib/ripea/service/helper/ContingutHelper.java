@@ -3243,11 +3243,14 @@ public class ContingutHelper {
 		documentAlreadyHasExpedient = new HashMap<String, String>();
 		
 		// ### CREA O RECUPERA CARPETA/EXPEDIENT DESTÍ
-		Map<String, Long> desti = carpetaHelper.crearEstructuraCarpetes(
-				entitatId, 
-				params.getEstructuraCarpetes(), 
-				expedientSuperior.getId(), 
-				params.getDestiId());
+		Map<String, Long> desti = new HashMap<String, Long>();
+		if (params.getEstructuraCarpetes() != null) {
+			desti = carpetaHelper.crearEstructuraCarpetes(
+					entitatId, 
+					params.getEstructuraCarpetes(), 
+					expedientSuperior.getId(), 
+					params.getDestiId());
+		}
 		
 		Long destiId = null;
 		try {
