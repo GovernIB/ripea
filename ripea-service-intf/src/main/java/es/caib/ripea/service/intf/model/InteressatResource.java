@@ -149,7 +149,7 @@ public class InteressatResource extends BaseAuditableResource<Long> {
 	
 	@Size(max = 160)
 	protected String email;
-	@Size(max = 20)
+	@Size(min = 9, max = 20)
 	protected String telefon;
 	@Size(max = 160)
 	protected String observacions;

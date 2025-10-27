@@ -3,21 +3,33 @@
  */
 package es.caib.ripea.back.command;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
+
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 import es.caib.ripea.back.command.InteressatCommand.Administracio;
 import es.caib.ripea.back.command.InteressatCommand.PersonaFisica;
 import es.caib.ripea.back.command.InteressatCommand.PersonaJuridica;
 import es.caib.ripea.back.command.InteressatCommand.Repres;
 import es.caib.ripea.back.helper.ConversioTipusHelper;
-import es.caib.ripea.back.validation.*;
-import es.caib.ripea.service.intf.dto.*;
+import es.caib.ripea.back.validation.InteressatDocument;
+import es.caib.ripea.back.validation.InteressatEmail;
+import es.caib.ripea.back.validation.InteressatNoRepetit;
+import es.caib.ripea.back.validation.InteressatPais;
+import es.caib.ripea.back.validation.InteressatTelefon;
+import es.caib.ripea.back.validation.RepresentantNotSameInteressat;
+import es.caib.ripea.service.intf.dto.InteressatAdministracioDto;
+import es.caib.ripea.service.intf.dto.InteressatDocumentTipusEnumDto;
+import es.caib.ripea.service.intf.dto.InteressatDto;
+import es.caib.ripea.service.intf.dto.InteressatIdiomaEnumDto;
+import es.caib.ripea.service.intf.dto.InteressatPersonaFisicaDto;
+import es.caib.ripea.service.intf.dto.InteressatPersonaJuridicaDto;
+import es.caib.ripea.service.intf.dto.InteressatTipusEnumDto;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import javax.validation.constraints.NotEmpty;
-
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
 
 
 /**
@@ -26,6 +38,7 @@ import javax.validation.constraints.Size;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @InteressatEmail(groups = {PersonaFisica.class, PersonaJuridica.class, Administracio.class})
+@InteressatTelefon(groups = {PersonaFisica.class, PersonaJuridica.class, Administracio.class})
 @InteressatNoRepetit(groups = {PersonaFisica.class, PersonaJuridica.class, Administracio.class})
 @InteressatPais(groups = {PersonaFisica.class, PersonaJuridica.class, Administracio.class})
 @InteressatDocument(groups = {PersonaFisica.class, PersonaJuridica.class})
