@@ -50,7 +50,7 @@ $(document).ready(function() {
 					});
 				} else {
 					$.each(data, function(i, val) {
-						selUsuaris.append("<option value=\"" + val.codi + "\">" + val.codi + "</option>");
+						selUsuaris.append("<option value=\"" + val.codi + "\">" + val.codi + " (" + val.descripcio + ")" + "</option>");
 					});
 				}
 			}
