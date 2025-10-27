@@ -223,10 +223,103 @@ export const lightTheme = createTheme( merge( base, {
     },
 }));
 
-export const darkTheme = createTheme( merge( base, {
+export const darkTheme = createTheme({
+  palette: {
+    mode: 'dark',
+    background: {
+      default: '#121212', // fondo general
+      paper: '#1e1e1e',   // fondo de tarjetas, diálogos, etc.
+    },
+    primary: {
+      main: '#90caf9',    // azul claro para botones y enlaces
+      contrastText: '#000000',
+    },
+    secondary: {
+      main: '#f48fb1',    // rosa suave como color secundario
+      contrastText: '#000000',
+    },
+    error: {
+      main: '#f44336',
+    },
+    warning: {
+      main: '#ffa726',
+    },
+    info: {
+      main: '#29b6f6',
+    },
+    success: {
+      main: '#66bb6a',
+    },
+    text: {
+      primary: '#ffffff',
+      secondary: '#bbbbbb',
+      disabled: '#777777',
+    },
+    divider: '#333333',
+    action: {
+      active: '#ffffff',
+      hover: '#333333',
+      selected: '#444444',
+      disabled: '#555555',
+      disabledBackground: '#2c2c2c',
+    },
+  },
+  components: {
+	MuiDataGrid: {
+	    styleOverrides: {
+	        row: {
+	            '&.even': {
+	                color: 'black',
+	                ".MuiSvgIcon-root": {
+	                    color: "black"
+	                },
+	            },
+	        },
+	    }
+	},
+	MuiAlert: {
+	    styleOverrides: {
+	        // standardSuccess: {
+	        //     backgroundColor: theme.palette.success.dark,
+	        // },
+	        standardInfo: {
+	            backgroundColor: '#08335a',
+	        },
+	        // standardError: {
+	        //     backgroundColor: theme.palette.error.dark,
+	        // },
+	    },
+	},	
+    MuiCardHeader: {
+      styleOverrides: {
+        root: {
+          backgroundColor: '#2a2a2a !important',
+        },
+        title: {
+          color: '#ffffff',
+        },
+        subheader: {
+          color: '#aaaaaa',
+        },
+      },
+    },
+    MuiAppBar: {
+      styleOverrides: {
+        colorPrimary: {
+          backgroundColor: '#1f1f1f',
+        },
+      },
+    },
+  },
+});
+
+
+/*export const darkTheme = createTheme( merge( base, {
     palette: {
         mode: 'dark',
         background: { default: '#121212', paper: '#1d1d1d' },
+//		primary: { main: '#990000', contrastText: '#009900' },
+//		secondary: { main: '#990000', contrastText: '#009900' }
     },
     components: {
         MuiDataGrid: {
@@ -255,6 +348,6 @@ export const darkTheme = createTheme( merge( base, {
             },
         },
     }
-}));
+}));*/
 
 // export const theme = createTheme({...base});
