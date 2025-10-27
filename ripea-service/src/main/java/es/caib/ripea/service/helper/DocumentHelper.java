@@ -1028,11 +1028,39 @@ public class DocumentHelper {
 	}
 	
 	public String getEnllacCsv(Long entitatId, Long documentId) {
+		String ntiCsv = null;
 		String urlValidacio = configHelper.getConfig(PropertyConfig.CONCSV_BASE_URL);
 		DocumentEntity documentEntity = documentRepository.findById(documentId).orElse(null);
-		if (Utils.hasValue(urlValidacio) && documentEntity!=null && documentEntity.getNtiCsv()!=null) {
+		
+		// Propietat anterior
+		if (!Utils.hasValue(urlValidacio)) {
+			urlValidacio = configHelper.getConfig(PropertyConfig.VALIDACIO_URL_IMPRIMIBLES);
+		}
+		
+		if (documentEntity != null) {
+			ntiCsv = documentEntity.getNtiCsv();
+		}
+		
+		if (Utils.hasValue(urlValidacio) && ntiCsv != null) {
 			return urlValidacio + documentEntity.getNtiCsv();
 		}
+		
+		if (Utils.hasValue(urlValidacio) && ntiCsv == null) {
+			Document document = pluginHelper.arxiuDocumentConsultar(
+					documentEntity, 
+					documentEntity.getArxiuUuid(), 
+					null, 
+					false);
+			
+			if (document == null || document.getMetadades() == null || document.getMetadades().getMetadadesAddicionals() == null) {
+				return null;
+			}
+			
+			String csv = (String)document.getMetadades().getMetadadesAddicionals().get("csv");
+			
+			return urlValidacio + csv;
+		}
+		
 		return null;
 	}
 	
