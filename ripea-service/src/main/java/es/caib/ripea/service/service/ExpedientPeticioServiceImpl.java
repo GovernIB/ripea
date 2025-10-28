@@ -145,12 +145,11 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		}
 		if (cacheHelper.mostrarLogsCercadorAnotacio())
     		log.info("comprovarEntitat time:  " + (System.currentTimeMillis() - t2) + " ms");
-		
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
 		long t3 = System.currentTimeMillis();
 		PermisosPerAnotacions permisosPerAnotacions = expedientPeticioHelper.findPermisosPerAnotacions(
 				entitatId,
-				auth!=null?auth.getName():null,
+				null,
 				rolActual, 
 				organActualId);
 		if (cacheHelper.mostrarLogsCercadorAnotacio())
