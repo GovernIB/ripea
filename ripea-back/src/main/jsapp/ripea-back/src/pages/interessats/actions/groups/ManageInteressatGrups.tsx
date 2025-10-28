@@ -17,8 +17,8 @@ const InteressatsManageGrupsForm = () => {
 	
 	// Filtro de grupos del expediente
 	const filter = useMemo(() => builder.and(
-		builder.eq("expedient.id", data?.entity?.id)
-	), [data?.entity?.id]);
+		builder.eq("expedient.id", data?.expedient?.id)
+	), [data?.expedient?.id]);
 	
 	const selectionModel = useMemo(()=>{
 	    return data?.grups?.map?.((a:any) => a.id)
