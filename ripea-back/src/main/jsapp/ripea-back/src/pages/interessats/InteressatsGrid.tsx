@@ -1,6 +1,6 @@
 import React, {useEffect, useMemo, useRef, useState} from "react";
-import {Icon} from "@mui/material";
-import { GridPage, useMuiDataGridApiRef, useResourceApiService } from 'reactlib';
+import {Chip, Icon} from "@mui/material";
+import { useMuiDataGridApiRef, useResourceApiService } from 'reactlib';
 import {useTranslation} from "react-i18next";
 import StyledMuiGrid, {ToolbarButton} from "../../components/StyledMuiGrid.tsx";
 import useInteressatActions, {useActions} from "./details/InteressatActions.tsx";
@@ -11,7 +11,8 @@ import {InteressatsGridForm} from "./InteressatsGridForm.tsx";
 import {MenuActionButton} from "../../components/MenuButton.tsx";
 import {useUserSession} from "../../components/Session.tsx";
 import useInteressatDetail from "./details/InteressatDetail.tsx";
-import useCreateGrup from "./groups/actions/CreateGrup.tsx";
+import {useCreateGrup} from "./actions/groups/ModifyGrup.tsx";
+import {useGrupGridDialog} from "./GrupGrid.tsx";
 
 const perspectives = ['REPRESENTANT', 'GRUPS']
 const sortModel:any = [{field: 'id', sort: 'asc'}]
@@ -55,7 +56,6 @@ export const useInteressatsAmbGrups = (expedientId: number) => {
   
   return {
     isReady: apiGrupReady,
-	setGrups,
     grups,
     refresh,
   };
@@ -68,28 +68,32 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
     const [selectedRows, setSelectedRows] = useState<any[]>([]);
 	const idToOriginalIdRef = useRef<Record<string, any>>({});
 	
-	const { isReady, setGrups, grups, refresh: refreshInteressats } = useInteressatsAmbGrups(entity?.id);
-	
-	
-	const getTipusLabel = (row: any) => {
-	    if (!row) return '';
-
-	    switch (row.tipus) {
-	        case 'InteressatPersonaFisicaEntity':
-	            return t('page.interessat.grid.tipus.personaFisica'); // Persona física
-	        case 'InteressatPersonaJuridicaEntity':
-	            return t('page.interessat.grid.tipus.personaJuridica'); // Persona jurídica
-	        case 'InteressatAdministracioEntity':
-	            return t('page.interessat.grid.tipus.administrador'); // Grupo
-	        default:
-	            return row.tipus || '';
-	    }
-	};
+	// const { isReady, grups, refresh: refreshInteressats } = useInteressatsAmbGrups(entity?.id);
+	//
+	//
+	// const getTipusLabel = (row: any) => {
+	//     if (!row) return '';
+    //
+	//     switch (row.tipus) {
+	//         case 'InteressatPersonaFisicaEntity':
+	//             return t('page.interessat.grid.tipus.personaFisica'); // Persona física
+	//         case 'InteressatPersonaJuridicaEntity':
+	//             return t('page.interessat.grid.tipus.personaJuridica'); // Persona jurídica
+	//         case 'InteressatAdministracioEntity':
+	//             return t('page.interessat.grid.tipus.administrador'); // Grupo
+	//         default:
+	//             return row.tipus || '';
+	//     }
+	// };
 	
     const columns = [
         {
+            field: 'tipus',
+            flex: 0.5,
+        },
+        {
             field: 'documentNum',
-            flex: 0.4,
+            flex: 0.5,
         },
         {
             field: 'nomComplet',// organNom
@@ -110,12 +114,19 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
                     <Icon title={t('page.contingut.alert.guardarPendent')} color={'error'}>warning</Icon>}
             </>,
         },
+        {
+            field: 'grups',
+            headerName: t('page.interessat.grup.title'),
+            flex: 1,
+            renderCell: (params:any) => params?.row?.grups
+                ?.map?.((g:any) => <Chip label={g?.description} size={"small"}/>),
+        },
     ];
 
     const apiRef = useMuiDataGridApiRef()
 
     const refresh = ()=> {
-		refreshInteressats();
+		// refreshInteressats();
         apiRef?.current?.refresh()
     }
 
@@ -123,8 +134,8 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
     const {exportar} = useActions(refresh);
     const {excelInteressats} = useExpedientActions(refresh);
     const {handleShow: handleImport, content: contentImport} = useImport(entity, refresh);
-	const {handleShow: handleCreateGrup, content: contentGrup} = useCreateGrup(entity, refresh, setGrups);
     const {handleOpen, dialog} = useInteressatDetail();
+    const {handleOpen: handleGrup, dialog: dialogGrup} = useGrupGridDialog(entity);
 
     return <>
         <StyledMuiGrid
@@ -179,9 +190,9 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
 				{
 					position: 0,
 				    element: <ToolbarButton icon={'groups'}
-				    						onClick={()=>handleCreateGrup()}
+				    						onClick={()=>handleGrup()}
 				                            hidden={!entity?.potModificar}
-                   >{t('page.interessat.grup.action.new.label')}</ToolbarButton>
+                   >{t('page.interessat.grup.title')}</ToolbarButton>
 				},
                 {
                     position: 0,
@@ -209,78 +220,10 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
                     />,
                 }
             ]}
-			groupingColDef={{
-			  disableColumnMenu: true,
-			  headerName: t('page.interessat.grid.tipus.label'),
-			  flex: 1,
-			  valueGetter: (value: any, row: any) => getTipusLabel(row),
-			}}
-			treeData
-			isGroupExpandedByDefault={() => true}
-			treeDataAdditionalRows={(interessats) => {
-			
-			  if (!interessats || !Array.isArray(interessats)) return [];
 
-			  // Grupos como filas raíz
-			  const grupRows = (grups ?? []).map(g => ({
-			    id: `grup_${g.id}`,      // id único para grupos
-				_originalId: g.id,
-			    isGroup: true,
-				_originalNom: g.nom,
-				interessats: g.interessats,
-			    tipus: g.nom,
-			  }));
-
-			  // Interesados duplicados por grupo
-			  const interessatRows = interessats.flatMap(int =>
-			    int.grups.map(g => ({
-			      ...int,
-			      id: g ? `${int.id}_grup_${g.id}` : `${int.id}_nogrup`, // id único
-			      parentId: g ? `grup_${g.id}` : null,
-			      _originalId: int.id,  // guardamos id original para llamadas a API
-			    }))
-			  );
-			  
-			  const allRows = [...grupRows, ...interessatRows];
-			  
-			  // Construimos el mapa de id => _originalId
-			  const map: Record<string, any> = {};
-			  allRows.forEach(r => { map[r.id] = r._originalId; });
-			  idToOriginalIdRef.current = map;
-			  
-			  return allRows;;
-			}}
-			
-			getTreeDataPath={(row: any) => {
-			  if (row.isGroup) return [row._originalNom]; // ruta única para grupo
-			  if (row.parentId) {
-			    const grup = grups.find(g => `grup_${g.id}` === row.parentId);
-			    return [grup?.nom ?? 'Sense grup', `${row.nomComplet}-${row._originalId}`];
-			  }
-
-			  //const isInAnyGroup = grups.some(g => g.interessats?.some(i => i.id === row.id));
-			 			 
-			   //if (!isInAnyGroup) {
-			     return [row.nomComplet + '-' + row._originalId];
-			   //}
-
-			   // Si está en algún grupo, no devolvemos path (ya se mostrará bajo el gruo
-			   //return []; 
-			}}
-
-
-			loading={!isReady}
-			onRefresh={refreshInteressats}
             onRowClick={(params: any) => {
-				const row = params?.row;
-				if (!row.isGroup) {
 					handleOpen(params?.row?.id, params?.row);
-				}
 			}}
-			isRowSelectable={(row: any) => {
-			  return row?.id;
-			}}
-			isrowcl
             popupEditFormI18nKeys={{
                 createSuccess: 'page.interessat.action.new.ok',
                 updateSuccess: 'page.interessat.action.update.ok',
@@ -288,7 +231,7 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
         />
         {dialog}
         {contentImport}
-		{contentGrup}
+        {dialogGrup}
         {components}
     </>
 }

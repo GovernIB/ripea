@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import StyledMuiGrid from "../../../../components/StyledMuiGrid.tsx";
 import { Typography } from "@mui/material";
-import * as builder from '../../../../util/springFilterUtils';
+import * as builder from '../../../../util/springFilterUtils.ts';
 import { MuiFormDialog, MuiFormDialogApi, useBaseAppContext, useFormContext } from "reactlib";
 
 const sortModel: any = [{ field: 'nom', sort: 'asc' }];
@@ -12,31 +12,28 @@ const columns = [
   { field: 'descripcio', flex: 0.6 },
 ];
 
-const InteressatsManageGrupsForm = (props: { expedientId:number }) => {
-	const { expedientId } = props;
-	const { data, apiRef } = useFormContext();
-	const { t } = useTranslation();
+const InteressatsManageGrupsForm = () => {
+	const { data, fields, apiRef } = useFormContext();
 	
 	// Filtro de grupos del expediente
 	const filter = useMemo(() => builder.and(
-		builder.eq("expedient.id", expedientId)
-	), [expedientId]);
+		builder.eq("expedient.id", data?.entity?.id)
+	), [data?.entity?.id]);
 	
 	const selectionModel = useMemo(()=>{
-	    return data?.grups?.map((a:any) => a.id)
+	    return data?.grups?.map?.((a:any) => a.id)
 	}, [])
 
 	const [selectedRows, setSelectedRows] = useState<any[]>(selectionModel || []);
 	
 	useEffect(() => {
-		console.log(selectedRows?.map(id => ({ id })))
 		apiRef?.current?.setFieldValue("grups", selectedRows?.map(id => ({ id })))
 	}, [selectedRows]);
 
 	return (
 	    <>
 	      <Typography variant="subtitle2">
-	        {t('page.interessat.grup.action.grups.label')}
+              {fields?.find?.(item => item?.name === 'grups')?.label || ''}
 	      </Typography>
 
 	      <StyledMuiGrid
@@ -59,7 +56,6 @@ const InteressatsManageGrupsForm = (props: { expedientId:number }) => {
 
 const ManageInteressatGrups = (props:any) => {
     const { t } = useTranslation();
-	const { entity } = props
 
     return (
         <MuiFormDialog
@@ -72,30 +68,30 @@ const ManageInteressatGrups = (props:any) => {
 			]}
             {...props}
         >
-            <InteressatsManageGrupsForm expedientId={entity?.id}/>
+            <InteressatsManageGrupsForm/>
         </MuiFormDialog>
     );
 };
 
-const useManageInteressatGrups = (entity: any, refresh?: () => void) => {
+const useManageInteressatGrups = (refresh?: () => void) => {
     const { t } = useTranslation();
     const formApiRef = useRef<MuiFormDialogApi>();
     const { temporalMessageShow } = useBaseAppContext();
 
-    const handleShow = (id:any, grups:any) => {
-        formApiRef.current?.show?.(id, { grups: grups })
+    const handleShow = (id:any, row:any) => {
+        formApiRef.current?.show?.(id, { grups: row?.grups })
             .then(() => {
                 refresh?.()
 				temporalMessageShow(null, t('page.interessat.action.gestGrups.ok'));
             })
             .catch((error: any) => {
-                temporalMessageShow(null, error?.message || t('common.error'), 'error');
+                error?.message && temporalMessageShow(null, error?.message, 'error');
             });
     };
 
     return {
         handleShow,
-        dialog: <ManageInteressatGrups entity={entity} apiRef={formApiRef} />
+        dialog: <ManageInteressatGrups apiRef={formApiRef} />
     };
 };
 

@@ -434,12 +434,6 @@ const translationEs = {
 					    description: "Una vez borrado no se prodra recuperar",
 					    ok: "El grupo {{data.nom}} se ha borrado correctamente",
 					},
-					grups: {
-						label: "Selecciona los grupos del interesado",
-					},
-					interessats: {
-						label: "Selecciona los interesados que formarán parte de este grupo",
-					},
 				},
 			},
         },

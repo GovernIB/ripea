@@ -492,9 +492,11 @@ public class DocumentResource extends NodeResource {
         private DocumentNotificacioTipusEnumDto tipus = DocumentNotificacioTipusEnumDto.NOTIFICACIO;
         @NotNull
         private DocumentNotificacioEstatEnumDto estat = DocumentNotificacioEstatEnumDto.PENDENT;
+        @ResourceField(onChangeActive = true)
         private List<ResourceReference<InteressatGrupResource, Long>> grups = new ArrayList<>();
         @NotNull
         @NotEmpty
+        @ResourceField(onChangeActive = true)
         private List<ResourceReference<InteressatResource, Long>> interessats = new ArrayList<>();
         @NotNull
         private String concepte;
@@ -516,6 +518,8 @@ public class DocumentResource extends NodeResource {
 
         @Transient
         private boolean permetreEnviamentPostal;
+        @Transient
+        private List<ResourceReference<InteressatResource, Long>> interessatsAmbAvis = new ArrayList<>();
 
         @Transient
         private ResourceReference<ExpedientResource, Long> expedient;
