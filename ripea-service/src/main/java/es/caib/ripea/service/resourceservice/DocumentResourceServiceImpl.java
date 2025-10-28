@@ -164,8 +164,10 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 			//Camps transient per inicialitzar al carregar el formulari
 	        target.setPluginSummarizeActiu(Utils.hasValue(configHelper.getConfig(PropertyConfig.SUMMARIZE_PLUGIN_CLASS)));
 	        target.setFuncionariHabilitatDigitalib(rolHelper.doesCurrentUserHasRol("DIB_USER"));
-
-            if(previous.getAdjunt()!=null) {
+	        target.setDeteccioFirmaAutomaticaActiva(configHelper.getAsBoolean(PropertyConfig.DETECCIO_FIRMA_AUTOMATICA));
+	        target.setDocumentFirmaTipus(DocumentFirmaTipusEnumDto.SENSE_FIRMA);
+	        
+	        if(previous.getAdjunt()!=null) {
                 new AdjuntOnchangeLogicProcessor().onChange(id, previous, DocumentResource.Fields.adjunt, previous.getAdjunt(), answers, previousFieldNames, target);
             }
 		}
@@ -593,7 +595,10 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         @Override
         public void onChange(Serializable id, DocumentResource previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource target) {
             if (previous.getDocumentFirmaTipus()!=DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA){
-                target.setDocumentFirmaTipus((fieldValue != null && (Boolean) fieldValue)
+            	boolean isDeteccioFirmaAutomaticaActiva = configHelper.getAsBoolean(PropertyConfig.DETECCIO_FIRMA_AUTOMATICA);
+            	boolean ambFirma = fieldValue != null && (Boolean) fieldValue;
+            	
+            	target.setDocumentFirmaTipus(((ambFirma && isDeteccioFirmaAutomaticaActiva) || previous.getFirmaAdjunt() != null)
                         ?DocumentFirmaTipusEnumDto.FIRMA_SEPARADA
                         :DocumentFirmaTipusEnumDto.SENSE_FIRMA);
             }
