@@ -2000,46 +2000,49 @@ public class ExpedientHelper {
 			//En principi el dissenyador no pot accedir al llistat de expedients, pero si en un futur pot, hauria de passar per aqui.
 			
 			//Aquets dos rols treballen amb l'organ seleccionat a la capçalera + fills
+			//Si no hi ha organ seleccionat, no es pot obtenir cap permis, ni per procediments comuns.
 			if (organActual!=null) {
+				
 				idsOrgansPermesos = organGestorCacheHelper.getIdsOrgansFills(entitat.getCodi(), organGestorRepository.findById(organActual).get().getCodi());
-			}
 			
-			//Permisos que s'han donat a un procediment NO comú
-			idsMetaExpedientsPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
-					MetaNodeEntity.class,
-					ExtendedPermission.READ));
-			
-			List<Long> aux = new ArrayList<Long>();
-			if (idsMetaExpedientsPermesos!=null && idsMetaExpedientsPermesos.size()>0) {
-				if (idsOrgansPermesos==null) { idsOrgansPermesos = new ArrayList<Long>(); }
-				for (Long metaExpId: idsMetaExpedientsPermesos) {
-					MetaExpedientEntity mEx = metaExpedientRepository.findById(metaExpId).orElse(null);
-					if(mEx!=null && mEx.getOrganGestor()!=null && idsOrgansPermesos.contains(mEx.getOrganGestor().getId())) {
-						aux.add(metaExpId);
-					}
-				}
-			}
-			
-			List<Long> meComuns = metaExpedientRepository.findProcedimentsComunsActiveIds(entitat);
-			if (meComuns!=null && meComuns.size()>0) {
-				//Permisos que s'han donat a un procediment comú (indicant OG)
-				List<Long> permisMetaOrganGestor = toListLong(permisosHelper.getObjectsIdsWithPermission(
-						MetaExpedientOrganGestorEntity.class,
+				//Permisos que s'han donat a un procediment NO comú
+				idsMetaExpedientsPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
+						MetaNodeEntity.class,
 						ExtendedPermission.READ));
 				
-				for (Long metaExpComId: meComuns) {
-					MetaExpedientEntity mExcom = metaExpedientRepository.findById(metaExpComId).orElse(null);
-
-					if (mExcom!=null && !mExcom.isPermisDirecte() || permisMetaExpOrgan(permisMetaOrganGestor, mExcom.getId(), idsOrgansPermesos)) {
-						aux.add(metaExpComId);
+				List<Long> aux = new ArrayList<Long>();
+				if (idsMetaExpedientsPermesos!=null && idsMetaExpedientsPermesos.size()>0) {
+					if (idsOrgansPermesos==null) { idsOrgansPermesos = new ArrayList<Long>(); }
+					for (Long metaExpId: idsMetaExpedientsPermesos) {
+						MetaExpedientEntity mEx = metaExpedientRepository.findById(metaExpId).orElse(null);
+						if(mEx!=null && mEx.getOrganGestor()!=null && idsOrgansPermesos.contains(mEx.getOrganGestor().getId())) {
+							aux.add(metaExpId);
+						}
 					}
 				}
-			}
-
-			if (aux.size()>0) {
-				idsMetaExpedientsPermesos = aux;
-			} else {
-				idsMetaExpedientsPermesos = null;
+				
+				List<Long> meComuns = metaExpedientRepository.findProcedimentsComunsActiveIds(entitat);
+				if (meComuns!=null && meComuns.size()>0) {
+					//Permisos que s'han donat a un procediment comú (indicant OG)
+					List<Long> permisMetaOrganGestor = toListLong(permisosHelper.getObjectsIdsWithPermission(
+							MetaExpedientOrganGestorEntity.class,
+							ExtendedPermission.READ));
+					
+					for (Long metaExpComId: meComuns) {
+						MetaExpedientEntity mExcom = metaExpedientRepository.findById(metaExpComId).orElse(null);
+	
+						if (mExcom!=null && !mExcom.isPermisDirecte() || permisMetaExpOrgan(permisMetaOrganGestor, mExcom.getId(), idsOrgansPermesos)) {
+							aux.add(metaExpComId);
+						}
+					}
+				}
+	
+				if (aux.size()>0) {
+					idsMetaExpedientsPermesos = aux;
+				} else {
+					idsMetaExpedientsPermesos = null;
+				}
+			
 			}
 
 		}else {
@@ -2171,49 +2174,52 @@ public class ExpedientHelper {
 			
 			//Aquets dos rols treballen amb l'organ seleccionat a la capçalera + fills
 			if (organActual!=null) {
+				
+				//Obtenim els organs permesos, a la select apareixeran els procediments d'aquets organs, 
+				//ndependenment de lo que hi hagi a la llista de idsMetaExpedientsPermesos posterior.
 				idsOrgansPermesos = organGestorCacheHelper.getIdsOrgansFills(entitat.getCodi(), organGestorRepository.findById(organActual).get().getCodi());
-			}
 			
-			//Permisos que s'han donat a un procediment NO comú
-			idsMetaExpedientsPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
-					MetaNodeEntity.class,
-					ExtendedPermission.READ));
-			
-			List<Long> aux = new ArrayList<Long>();
-			if (idsMetaExpedientsPermesos!=null && idsMetaExpedientsPermesos.size()>0) {
-				if (idsOrgansPermesos==null) { idsOrgansPermesos = new ArrayList<Long>(); }
-				for (Long metaExpId: idsMetaExpedientsPermesos) {
-					MetaExpedientEntity mEx = metaExpedientRepository.findById(metaExpId).orElse(null);
-					if(mEx!=null && mEx.getOrganGestor()!=null && idsOrgansPermesos.contains(mEx.getOrganGestor().getId())) {
-						aux.add(metaExpId);
-					}
-				}
-			}
-			
-			List<Long> meComuns = metaExpedientRepository.findProcedimentsComunsActiveIds(entitat);
-			if (meComuns!=null && meComuns.size()>0) {
-				//Permisos que s'han donat a un procediment comú (indicant OG)
-				List<Long> permisMetaOrganGestor = toListLong(permisosHelper.getObjectsIdsWithPermission(
-						MetaExpedientOrganGestorEntity.class,
+				//Permisos que s'han donat directament a un procediment
+				idsMetaExpedientsPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
+						MetaNodeEntity.class,
 						ExtendedPermission.READ));
 				
-				for (Long metaExpComId: meComuns) {
-					MetaExpedientEntity mExcom = metaExpedientRepository.findById(metaExpComId).orElse(null);
-
-					if (mExcom!=null && !mExcom.isPermisDirecte() || permisMetaExpOrgan(permisMetaOrganGestor, mExcom.getId(), idsOrgansPermesos)) {
-						aux.add(metaExpComId);
+				List<Long> aux = new ArrayList<Long>();
+				if (idsMetaExpedientsPermesos!=null && idsMetaExpedientsPermesos.size()>0) {
+					if (idsOrgansPermesos==null) { idsOrgansPermesos = new ArrayList<Long>(); }
+					for (Long metaExpId: idsMetaExpedientsPermesos) {
+						MetaExpedientEntity mEx = metaExpedientRepository.findById(metaExpId).orElse(null);
+						if(mEx!=null && mEx.getOrganGestor()!=null && idsOrgansPermesos.contains(mEx.getOrganGestor().getId())) {
+							aux.add(metaExpId);
+						}
 					}
 				}
-			}
-			
-//			idsMetaExpedientOrganPairsPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
-//					MetaExpedientOrganGestorEntity.class,
-//					ExtendedPermission.READ));
-			
-			if (aux.size()>0) {
-				idsMetaExpedientsPermesos = aux;
-			} else {
-				idsMetaExpedientsPermesos = null;
+				
+				List<Long> meComuns = metaExpedientRepository.findProcedimentsComunsActiveIds(entitat);
+				if (meComuns!=null && meComuns.size()>0) {
+					//Permisos que s'han donat a un procediment comú (indicant OG)
+					List<Long> permisMetaOrganGestor = toListLong(permisosHelper.getObjectsIdsWithPermission(
+							MetaExpedientOrganGestorEntity.class,
+							ExtendedPermission.READ));
+					
+					for (Long metaExpComId: meComuns) {
+						MetaExpedientEntity mExcom = metaExpedientRepository.findById(metaExpComId).orElse(null);
+	
+						if (mExcom!=null && !mExcom.isPermisDirecte() || permisMetaExpOrgan(permisMetaOrganGestor, mExcom.getId(), idsOrgansPermesos)) {
+							aux.add(metaExpComId);
+						}
+					}
+				}
+				
+	//			idsMetaExpedientOrganPairsPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
+	//					MetaExpedientOrganGestorEntity.class,
+	//					ExtendedPermission.READ));
+				
+				if (aux.size()>0) {
+					idsMetaExpedientsPermesos = aux;
+				} else {
+					idsMetaExpedientsPermesos = null;
+				}
 			}
 
 		}else {
