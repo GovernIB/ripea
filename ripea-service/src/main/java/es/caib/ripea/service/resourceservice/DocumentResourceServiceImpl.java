@@ -12,6 +12,7 @@ import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -21,11 +22,6 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
-import es.caib.ripea.persistence.entity.resourceentity.*;
-import es.caib.ripea.persistence.entity.resourcerepository.*;
-import es.caib.ripea.persistence.repository.*;
-import es.caib.ripea.service.intf.dto.*;
-import es.caib.ripea.service.intf.model.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.fundaciobit.apisib.apifirmasimple.v1.beans.FirmaSimpleStartTransactionRequest;
@@ -38,6 +34,26 @@ import es.caib.ripea.persistence.entity.ContingutEntity;
 import es.caib.ripea.persistence.entity.DocumentEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.ViaFirmaUsuariEntity;
+import es.caib.ripea.persistence.entity.resourceentity.DocumentResourceEntity;
+import es.caib.ripea.persistence.entity.resourceentity.ExpedientResourceEntity;
+import es.caib.ripea.persistence.entity.resourceentity.InteressatGrupResourceEntity;
+import es.caib.ripea.persistence.entity.resourceentity.InteressatResourceEntity;
+import es.caib.ripea.persistence.entity.resourceentity.MetaDocumentResourceEntity;
+import es.caib.ripea.persistence.entity.resourceentity.RegistreAnnexResourceEntity;
+import es.caib.ripea.persistence.entity.resourceentity.UsuariResourceEntity;
+import es.caib.ripea.persistence.entity.resourcerepository.ContingutResourceRepository;
+import es.caib.ripea.persistence.entity.resourcerepository.DocumentResourceRepository;
+import es.caib.ripea.persistence.entity.resourcerepository.InteressatGrupResourceRepository;
+import es.caib.ripea.persistence.entity.resourcerepository.InteressatResourceRepository;
+import es.caib.ripea.persistence.entity.resourcerepository.MetaDocumentResourceRepository;
+import es.caib.ripea.persistence.entity.resourcerepository.RegistreAnnexResourceRepository;
+import es.caib.ripea.persistence.entity.resourcerepository.UsuariResourceRepository;
+import es.caib.ripea.persistence.repository.ContingutMovimentRepository;
+import es.caib.ripea.persistence.repository.ContingutRepository;
+import es.caib.ripea.persistence.repository.DocumentNotificacioRepository;
+import es.caib.ripea.persistence.repository.DocumentPortafirmesRepository;
+import es.caib.ripea.persistence.repository.DocumentRepository;
+import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.firma.DocumentFirmaPortafirmesHelper;
 import es.caib.ripea.service.firma.DocumentFirmaViaFirmaHelper;
@@ -67,14 +83,48 @@ import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ReportFileType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.config.PropertyConfig;
+import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
+import es.caib.ripea.service.intf.dto.ArxiuFirmaDto;
+import es.caib.ripea.service.intf.dto.DigitalitzacioPerfilDto;
+import es.caib.ripea.service.intf.dto.DigitalitzacioTransaccioRespostaDto;
+import es.caib.ripea.service.intf.dto.DocumentDto;
+import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentFirmaTipusEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentNotificacioDto;
+import es.caib.ripea.service.intf.dto.DocumentNotificacioEstatEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentNotificacioTipusEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentPublicacioDto;
+import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentVersioDto;
+import es.caib.ripea.service.intf.dto.FitxerDto;
+import es.caib.ripea.service.intf.dto.InteressatDocumentTipusEnumDto;
+import es.caib.ripea.service.intf.dto.InteressatTipusEnum;
+import es.caib.ripea.service.intf.dto.MetaDocumentFirmaFluxTipusEnumDto;
+import es.caib.ripea.service.intf.dto.MetaNodeDto;
+import es.caib.ripea.service.intf.dto.MunicipiDto;
+import es.caib.ripea.service.intf.dto.PaisDto;
+import es.caib.ripea.service.intf.dto.PinbalConsultaDto;
+import es.caib.ripea.service.intf.dto.PortafirmesFluxRespostaDto;
+import es.caib.ripea.service.intf.dto.PortafirmesIniciFluxRespostaDto;
+import es.caib.ripea.service.intf.dto.Resum;
+import es.caib.ripea.service.intf.dto.SignatureInfoDto;
+import es.caib.ripea.service.intf.dto.UsuariDto;
+import es.caib.ripea.service.intf.dto.ViaFirmaDispositiuDto;
+import es.caib.ripea.service.intf.dto.ViaFirmaEnviarDto;
 import es.caib.ripea.service.intf.exception.ValidationException;
+import es.caib.ripea.service.intf.model.DocumentResource;
 import es.caib.ripea.service.intf.model.DocumentResource.IniciarFirmaSimple;
 import es.caib.ripea.service.intf.model.DocumentResource.NewDocPinbalForm;
 import es.caib.ripea.service.intf.model.DocumentResource.NotificarDocumentsZipFormAction;
 import es.caib.ripea.service.intf.model.DocumentResource.NotificarFormAction;
 import es.caib.ripea.service.intf.model.DocumentResource.UpdateTipusDocumentFormAction;
 import es.caib.ripea.service.intf.model.DocumentResource.ViaFirmaForm;
+import es.caib.ripea.service.intf.model.ExpedientResource;
+import es.caib.ripea.service.intf.model.InteressatGrupResource;
+import es.caib.ripea.service.intf.model.InteressatResource;
+import es.caib.ripea.service.intf.model.MetaDocumentResource;
 import es.caib.ripea.service.intf.model.NodeResource.MassiveAction;
+import es.caib.ripea.service.intf.model.UsuariResource;
 import es.caib.ripea.service.intf.resourceservice.DocumentResourceService;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.resourcehelper.ContingutResourceHelper;
@@ -1221,14 +1271,14 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                         break;
 
                     case DocumentResource.NotificarFormAction.Fields.grups:
-                        List<InteressatResourceEntity> interessats = new ArrayList<>();
+                    	Set<InteressatResourceEntity> interessatSet = new LinkedHashSet<>();
                         List<Long> ids = ((List<ResourceReference<InteressatGrupResource, Long>>) fieldValue).stream()
                                 .map(ResourceReference::getId).collect(Collectors.toList());
                         List<InteressatGrupResourceEntity> grups = interessatGrupResourceRepository.findAllById(ids);
                         for (InteressatGrupResourceEntity grup : grups) {
-                            interessats.addAll(grup.getInteressats());
+                        	interessatSet.addAll(grup.getInteressats());
                         }
-
+                        List<InteressatResourceEntity> interessats = new ArrayList<>(interessatSet);
                         List<ResourceReference<InteressatResource, Long>> interessatsResourceList = interessats.stream()
                                 .map(i->ResourceReference.<InteressatResource, Long>toResourceReference(i.getId(), i.getCodiNom()))
                                 .collect(Collectors.toList());

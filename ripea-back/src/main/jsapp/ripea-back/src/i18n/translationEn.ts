@@ -419,7 +419,7 @@ const translationEn = {
                 jaExistentExpedient: "Already exists in the case file",
             },
 			grup: {
-				title: "Group",
+				title: "Groups of interested parties",
 				action: {
 					new: {
 						label: "New Group",

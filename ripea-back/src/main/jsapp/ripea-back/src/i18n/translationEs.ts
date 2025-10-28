@@ -419,7 +419,7 @@ const translationEs = {
                 jaExistentExpedient: "Ya existe en el expediente",
             },
 			grup: {
-				title: "Grupo",
+				title: "Grupos de interesados",
 				action: {
 					new: {
 						label: "Nuevo Grupo",

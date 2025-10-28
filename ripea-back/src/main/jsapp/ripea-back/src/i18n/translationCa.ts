@@ -419,7 +419,7 @@ const translationCa = {
                 jaExistentExpedient: "Ja existeix a l'expedient",
             },
 			grup: {
-				title: "Grup",
+				title: "Grups d'interessats",
 				action: {
 					new: {
 						label: "Nou Grup",

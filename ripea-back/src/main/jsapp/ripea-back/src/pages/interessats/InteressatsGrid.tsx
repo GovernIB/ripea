@@ -189,10 +189,9 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
                 },
 				{
 					position: 0,
-				    element: <ToolbarButton icon={'groups'}
-				    						onClick={()=>handleGrup()}
+				    element: <ToolbarButton onClick={()=>handleGrup()}
 				                            hidden={!entity?.potModificar}
-                   >{t('page.interessat.grup.title')}</ToolbarButton>
+                   ><Icon sx={{ mr: 1 }}>groups</Icon>{t('page.interessat.grup.title')}</ToolbarButton>
 				},
                 {
                     position: 0,
