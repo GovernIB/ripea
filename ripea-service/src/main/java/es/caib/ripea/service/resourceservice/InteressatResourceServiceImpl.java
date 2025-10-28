@@ -410,13 +410,12 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
             // Si el interesado pertenece a grupos, los mapeamos
             if (entity.getGrups() != null && !entity.getGrups().isEmpty()) {
                 List<ResourceReference<InteressatGrupResource, Long>> grups = entity.getGrups().stream()
-                        .map(grupEntity -> {
-                            InteressatGrupResource grupResource = objectMappingHelper.newInstanceMap(grupEntity, InteressatGrupResource.class);
-                            return ResourceReference.<InteressatGrupResource, Long>toResourceReference(
-                                    grupResource.getId(),
-                                    grupResource.getNom()
-                            );
-                        })
+                        .map(grupEntity ->
+                            ResourceReference.<InteressatGrupResource, Long>toResourceReference(
+                                    grupEntity.getId(),
+                                    grupEntity.getNom()
+                            )
+                        )
                         .collect(Collectors.toList());
                 resource.setGrups(grups);
             } else {

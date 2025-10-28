@@ -101,34 +101,6 @@ const AdditionalInfo = (props:any) => {
     />
 }
 
-async function loadInteressatsFromGrups(
-    selectedGrups: any[],
-    formApiRef: any,
-    seleccionats: any[],
-    apiFindAllGrups: any
-) {
-    formApiRef?.current?.setFieldValue('grups', selectedGrups || []);
-
-    const grupIds = selectedGrups.map(g => g.id);
-    const filter = builder.inside('id', grupIds);
-
-    try {
-        const res = await apiFindAllGrups({ filter, unpaged: true, perspectives: ["INTERESSATS"] });
-        const grups = res.rows || [];
-
-        const interessatsGrups = grups.flatMap(g => g.interessats || []);
-
-        const existingIds = seleccionats.map(i => i.id);
-        const nous = interessatsGrups.filter(i => !existingIds.includes(i.id));
-
-        const updatedInteressats = [...seleccionats, ...nous];
-		
-        formApiRef?.current?.setFieldValue('interessats', updatedInteressats);
-    } catch (e) {
-        console.error('Error cargando interesados de los grupos', e);
-    }
-}
-
 const NotificarForm = () => {
     const { t } = useTranslation();
     const { data, apiRef: formApiRef } = useFormContext();
@@ -150,23 +122,30 @@ const NotificarForm = () => {
         builder.eq("expedient.id", data?.expedient?.id),
         builder.eq('esRepresentant', false),
     );
-	
-	const { isReady: apiIsReady, find: apiFindAllGrups } = useResourceApiService('interessatGrupResource');
 
-	const carregarInteressats = (selectedGrups: any[]) => {
-	    loadInteressatsFromGrups(
-	        selectedGrups,
-	        formApiRef,
-	        data?.interessats || [],
-	        apiFindAllGrups
-	    );
-	}
-	
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
+        {data?.interessatsAmbAvis?.length > 0 &&
+            <Alert severity={"warning"}>
+                Hi ha notificacions amb destinatari sense NIF/NIE. Aquestes notficacions no es poden enviar a la carpeta ciutadana, degut a que és necessari un NIF o NIE per a accedir-hi.
+                <br/><br/>
+                <ul>
+                    <li><b>Si ha marcat entrega postal:</b> La notificació s'enviarà per correu postal, sempre que l'òrgan gestor tengui un CIE (Centre de Impressió i Ensobrat) definit.</li>
+                    <li><b>Si NO ha seleccionat entrega postal:</b> La notificació telemàtica no es realitzarà. En el seu lloc s'enviarà un correu electrònic d'avís informant al titular que en breu rebrà una notificació per correu postal. <u>És necessari que feu la notificació en Paper.</u></li>
+                </ul>
+
+                <br/>Els notificacions sense NIF/NIE són els següents:<br/>
+                <ul>
+                    {data?.interessatsAmbAvis?.map?.((i:any, index:any)=>
+                        <li>Notificació {index + 1} - Titular : {i?.description} </li>
+                    )}
+                </ul>
+            </Alert>
+        }
+
         <GridFormField xs={12} name="tipus" required hiddenEnumValues={['MANUAL']}/>
         <GridFormField xs={12} name="estat" required disabled/>
 
-		<GridFormField xs={12} name="grups" multiple filter={grupsFilter} onChange={carregarInteressats}/>
+		<GridFormField xs={12} name="grups" multiple filter={grupsFilter}/>
         <GridFormField xs={9.5} name="interessats" multiple filter={interessatsFilter}/>
 
         <GridButton

@@ -195,10 +195,6 @@ public class InteressatResource extends BaseAuditableResource<Long> {
     	return Utils.getNomComplet(this.tipus,this.nom, this.llinatge1, this.llinatge2, this.raoSocial, this.organCodi);
 	}
     
-    public List<ResourceReference<InteressatGrupResource, Long>> getGrups() {
-    	return this.grups;
-    }
-    
     @Getter
     @Setter
     @FieldNameConstants

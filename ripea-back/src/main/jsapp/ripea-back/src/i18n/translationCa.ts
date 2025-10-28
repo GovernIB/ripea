@@ -434,12 +434,6 @@ const translationCa = {
 					    description: "Un cop esborrat no es podrà recuperar",
 					    ok: "El grup {{data.nom}} s'ha esborrat correctament",
 					},
-					grups: {
-						label: "Selecciona els grups de l'interessat",
-					},
-					interessats: {
-						label: "Selecciona els interessats que formaran part d'aquest grup",
-					},
 				},
 			},
         },

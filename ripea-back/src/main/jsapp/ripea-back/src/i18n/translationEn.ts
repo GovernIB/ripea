@@ -434,12 +434,6 @@ const translationEn = {
 					    description: "Once deleted, it cannot be recovered",
 					    ok: "The group {{data.nom}} was deleted successfully",
 					},
-					grups: {
-						label: "Select the interested party's groups",
-					},
-					interessats: {
-						label: "Select the group's interested parties",
-					},
 				},
 			},
         },
