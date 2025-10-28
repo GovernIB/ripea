@@ -751,7 +751,7 @@ public class CacheHelper {
 		
 		PermisosPerAnotacions permisosPerAnotacions = expedientPeticioHelper.findPermisosPerAnotacions(
 				entitat.getId(),
-				usuariCodi,
+				null,
 				rolActual,
 				organActualId);
 
