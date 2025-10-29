@@ -14,8 +14,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
+import org.springframework.data.annotation.Transient;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Getter
 @Setter
@@ -29,11 +31,15 @@ import java.io.Serializable;
                         type = ResourceArtifactType.FILTER,
                         code = OrganGestorResource.FILTER_CODE,
                         formClass = OrganGestorResource.FormFilter.class),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.PERSPECTIVE,
+                        code = OrganGestorResource.PERSPECTIVE_PATH_CODE),
         }
 )
 public class OrganGestorResource extends BaseAuditableResource<Long> {
 
     public static final String FILTER_CODE = "FILTER";
+    public static final String PERSPECTIVE_PATH_CODE = "PATH";
 
 	private static final long serialVersionUID = 5991380448523763516L;
 	@NotNull
@@ -58,6 +64,9 @@ public class OrganGestorResource extends BaseAuditableResource<Long> {
     public String getCodiINom() {
 		return codi + " - " + nom;
 	}
+
+    @Transient private List<String> pathName;
+    @Transient private List<OrganGestorResource> path;
 
     @Getter
     @Setter

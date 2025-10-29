@@ -240,6 +240,7 @@ const DocumentsGrid = (props: any) => {
                         columns={additionalColumns}
                         rowActionsColumnIndex={4}
                         paginationActive={false}
+                        autoHeight
                         filter={commonFilter}
                         perspectives={perspectives}
                         staticSortModel={sortModel}

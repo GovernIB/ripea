@@ -1,12 +1,15 @@
 import {useTranslation} from "react-i18next";
-import {useState} from "react";
+import React, {useState} from "react";
 import {GridPage} from "reactlib";
 import {CardPage} from "../../../components/CardData.tsx";
 import StyledMuiGrid, {ToolbarButton} from "../../../components/StyledMuiGrid.tsx";
-import {Button, Grid, Icon} from "@mui/material";
+import {Box, Button, Grid, Icon} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
+import MetaExpedient from "../../contingut/details/MetaExpedient.tsx";
+import ContingutIcon from "../../contingut/details/ContingutIcon.tsx";
+import {GridTreeDataGroupingCell} from "@mui/x-data-grid-pro";
 
 const OrganGestorFilterForm = () => {
     return <>
@@ -46,48 +49,20 @@ const OrganGestorForm = () => {
         <GridFormField xs={12} name="codi" disabled readOnly/>
         <GridFormField xs={12} name="nom" disabled readOnly/>
         <GridFormField xs={12} name="pare" disabled readOnly/>
-        <GridFormField xs={12} name="cif"/>
+        <GridFormField xs={12} name="cif" disabled readOnly/>
         <GridFormField xs={12} name="utilitzarCifPinbal"/>
         <GridFormField xs={12} name="permetreEnviamentPostal"/>
     </Grid>
 }
 
 const sortModel: any = [{field: 'nom', sort: 'asc'}]
-const columns = [
-    {
-        field: 'codi',
-        flex: 0.5,
-    },
-    {
-        field: 'nom',
-        flex: 1,
-    },
-    {
-        field: 'pare',
-        flex: 1,
-    },
-    {
-        field: 'cif',
-        flex: 0.5,
-    },
-    {
-        field: 'estat',
-        flex: 0.5,
-    },
-    {
-        filed: 'permis',
-        headerName: '',
-        sortable: false,
-        flex: 0.25,
-        renderCell: (params:any) => <Button href={`/organgestor/${params?.id}/permis`} variant={'contained'}>
-            <Icon>key</Icon>
-        </Button>
-    }
-]
+const perspectives: any = ['PATH']
+const namedQueries: any = ['ENTITY']
 
 const OrganGestorGrid = () => {
     const {t} = useTranslation();
     const [springFilter, setSpringFilter] = useState<string>();
+    const [treeView, setTreeView] = useState<boolean>(false);
 
     const actions = [
         {
@@ -97,6 +72,42 @@ const OrganGestorGrid = () => {
             clickShowUpdateDialog: true,
         },
     ]
+
+    const columns = [
+        {
+            field: 'codi',
+            flex: 0.5,
+            hidden: treeView
+        },
+        {
+            field: 'nom',
+            flex: 1,
+            hidden: treeView
+        },
+        {
+            field: 'pare',
+            flex: 1,
+            hidden: treeView
+        },
+        {
+            field: 'cif',
+            flex: 0.5,
+        },
+        {
+            field: 'estat',
+            flex: 0.5,
+        },
+        {
+            filed: 'permis',
+            headerName: '',
+            sortable: false,
+            flex: 0.25,
+            renderCell: (params:any) => <Button href={`/organgestor/${params?.row?.id}/permis`} variant={'contained'}>
+                <Icon>key</Icon>
+            </Button>
+        }
+    ]
+        .filter((col:any)=>!col?.hidden);
 
     return <GridPage disableMargins>
         <CardPage title={t('page.user.menu.organs')}>
@@ -110,28 +121,55 @@ const OrganGestorGrid = () => {
                 columns={columns}
                 // TODO: revisar filtre
                 filter={springFilter}
+                perspectives={treeView ?perspectives :[]}
+                namedQueries={namedQueries}
                 sortModel={sortModel}
 
-                // TODO: revisar accions
                 rowAdditionalActions={actions}
 
                 toolbarElementsWithPositions={[
                     {
                         position: 3,
                         element: <ToolbarButton
-                            // title={t('common.create')}
                             icon={'cached'}
                             color={'primary'}/>,
                     },
                     {
                         position: 3,
                         element: <ToolbarButton
-                            // title={t('common.create')}
                             icon={'visibility'}
-                            variant={"contained"}
+                            variant={treeView ?"contained" :"outlined"}
+                            onClick={()=>setTreeView(prev=>!prev)}
                             color={'primary'}/>,
                     },
                 ]}
+
+                paginationActive={!treeView}
+                autoHeight={treeView}
+                treeData={treeView}
+                groupingColDef={{
+                    headerName: t('page.contingut.grid.nom'),
+                    flex: 1,
+                    valueFormatter: (value: any, row: any) => row?.codi +" - "+ row?.nom,
+                }}
+                treeDataAdditionalRows={(_rows: any) => {
+                    const additionalRows: any[] = [];
+                        if (_rows!=null && treeView){
+                            for (const row of _rows) {
+                                for (const r of row?.path) {
+                                    if (!additionalRows.map((b:any) => b.id).includes(r?.id)
+                                        && !_rows.map((b:any) => b.id).includes(r?.id))
+                                    {
+                                        additionalRows.push(r)
+                                    }
+                                }
+                            }
+                        }
+                    return additionalRows;
+                }}
+                getTreeDataPath={(row: any): string[] => {
+                        return !!row?.pathName ?row?.pathName :[`${row.id}`];
+                }}
 
                 toolbarHideCreate
                 toolbarHideRefresh
