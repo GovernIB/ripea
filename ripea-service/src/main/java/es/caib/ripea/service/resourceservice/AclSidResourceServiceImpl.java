@@ -2,13 +2,12 @@ package es.caib.ripea.service.resourceservice;
 
 import com.turkraft.springfilter.FilterBuilder;
 import com.turkraft.springfilter.parser.Filter;
-import es.caib.ripea.persistence.entity.AclSidEntity;
-import es.caib.ripea.persistence.entity.EntitatEntity;
-import es.caib.ripea.persistence.entity.GrupEntity;
-import es.caib.ripea.persistence.entity.OrganGestorEntity;
+import es.caib.ripea.persistence.entity.*;
 import es.caib.ripea.persistence.entity.resourceentity.*;
 import es.caib.ripea.persistence.entity.resourcerepository.EntitatResourceRepository;
-import es.caib.ripea.persistence.repository.AclSidRepository;
+import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientOrganGestorResourceRepository;
+import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientResourceRepository;
+import es.caib.ripea.persistence.entity.resourcerepository.OrganGestorResourceRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.ConfigHelper;
@@ -16,25 +15,21 @@ import es.caib.ripea.service.helper.PermisosHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
-import es.caib.ripea.service.intf.base.model.FieldOption;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
-import es.caib.ripea.service.intf.dto.ExtendedPermissionEnum;
 import es.caib.ripea.service.intf.dto.PermisDto;
-import es.caib.ripea.service.intf.dto.PrincipalTipusEnumDto;
 import es.caib.ripea.service.intf.model.*;
 import es.caib.ripea.service.intf.resourceservice.AclSidResourceService;
 import es.caib.ripea.service.intf.utils.Utils;
-import es.caib.ripea.service.permission.ExtendedPermission;
+import es.caib.ripea.service.resourcehelper.AclResourceHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.acls.model.Permission;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.PostConstruct;
 import java.io.Serializable;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -44,8 +39,13 @@ public class AclSidResourceServiceImpl extends BaseMutableResourceService<AclSid
 
     private final ConfigHelper configHelper;
     private final PermisosHelper permisosHelper;
+    private final AclResourceHelper aclResourceHelper;
     private final EntitatResourceRepository entitatResourceRepository;
     private final OrganGestorRepository organGestorRepository;
+    private final MetaExpedientOrganGestorResourceRepository metaExpedientOrganGestorResourceRepository;
+    private final MetaExpedientResourceRepository metaExpedientResourceRepository;
+    private final OrganGestorResourceRepository organGestorResourceRepository;
+    private final TransactionTemplate transactionTemplate;
 
     @PostConstruct
     public void init() {
@@ -54,9 +54,16 @@ public class AclSidResourceServiceImpl extends BaseMutableResourceService<AclSid
         register(AclSidResource.ACTION_DELETE_PERMISION_CODE, new DeletePermisionActionExecutor());
     }
 
+    private Filter filterObject(String clss, String id) {
+        return FilterBuilder.exists(
+                FilterBuilder.and(
+                        FilterBuilder.equal(AclSidResource.Fields.entries + "." + AclEntryResource.Fields.aclObjectIdentity + "." + AclObjIdentityResource.Fields.classEntity + "." + AclClassResource.Fields.classname, clss),
+                        FilterBuilder.equal(AclSidResource.Fields.entries + "." + AclEntryResource.Fields.aclObjectIdentity + "." + AclObjIdentityResource.Fields.objectId, id)
+                ));
+    }
+
     @Override
     protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
-        boolean undo = true;
         List<Filter> filters = new ArrayList<>();
 
         filters.add(
@@ -65,45 +72,22 @@ public class AclSidResourceServiceImpl extends BaseMutableResourceService<AclSid
 
         Map<String, String> mapaNamedQueries = Utils.namedQueriesToMap(namedQueries);
         if (!mapaNamedQueries.isEmpty()) {
-            if (mapaNamedQueries.containsKey("ENTITY")) {
-                undo = false;
+            if (mapaNamedQueries.containsKey(AclSidResource.ClassType.ENTITY.name())) {
                 String entitatActualCodi = configHelper.getEntitatActualCodi();
                 EntitatResourceEntity entitat = entitatResourceRepository.findByCodi(entitatActualCodi);
-                filters.add(
-                        FilterBuilder.exists(
-                                FilterBuilder.and(
-                                        FilterBuilder.equal(AclSidResource.Fields.entries + "." + AclEntryResource.Fields.aclObjectIdentity + "." + AclObjIdentityResource.Fields.classEntity + "." + AclClassResource.Fields.classname, EntitatEntity.class.getName()),
-                                        FilterBuilder.equal(AclSidResource.Fields.entries + "." + AclEntryResource.Fields.aclObjectIdentity + "." + AclObjIdentityResource.Fields.objectId, entitat.getId())
-                                ))
-                );
+                filters.add(filterObject(EntitatEntity.class.getName(), String.valueOf(entitat.getId())));
             }
-            if (mapaNamedQueries.containsKey("GRUP") && mapaNamedQueries.get("GRUP") != null) {
-                undo = false;
-                filters.add(
-                        FilterBuilder.exists(
-                                FilterBuilder.and(
-                                        FilterBuilder.equal(AclSidResource.Fields.entries + "." + AclEntryResource.Fields.aclObjectIdentity + "." + AclObjIdentityResource.Fields.classEntity + "." + AclClassResource.Fields.classname, GrupEntity.class.getName()),
-                                        FilterBuilder.equal(AclSidResource.Fields.entries + "." + AclEntryResource.Fields.aclObjectIdentity + "." + AclObjIdentityResource.Fields.objectId, mapaNamedQueries.get("GRUP"))
-                                ))
-                );
+            if (mapaNamedQueries.containsKey(AclSidResource.ClassType.GRUP.name()) && mapaNamedQueries.get(AclSidResource.ClassType.GRUP.name()) != null) {
+                filters.add(filterObject(GrupEntity.class.getName(), mapaNamedQueries.get(AclSidResource.ClassType.GRUP.name())));
             }
-            if (mapaNamedQueries.containsKey("ORGAN") && mapaNamedQueries.get("ORGAN") != null) {
-                undo = false;
-                filters.add(
-                        FilterBuilder.exists(
-                                FilterBuilder.and(
-                                        FilterBuilder.equal(AclSidResource.Fields.entries + "." + AclEntryResource.Fields.aclObjectIdentity + "." + AclObjIdentityResource.Fields.classEntity + "." + AclClassResource.Fields.classname, OrganGestorEntity.class.getName()),
-                                        FilterBuilder.equal(AclSidResource.Fields.entries + "." + AclEntryResource.Fields.aclObjectIdentity + "." + AclObjIdentityResource.Fields.objectId, mapaNamedQueries.get("ORGAN"))
-                                ))
-                );
+            if (mapaNamedQueries.containsKey(AclSidResource.ClassType.ORGAN.name()) && mapaNamedQueries.get(AclSidResource.ClassType.ORGAN.name()) != null) {
+                filters.add(filterObject(OrganGestorEntity.class.getName(), mapaNamedQueries.get(AclSidResource.ClassType.ORGAN.name())));
+            }
+            if (mapaNamedQueries.containsKey(AclSidResource.ClassType.MET_NOD.name()) && mapaNamedQueries.get(AclSidResource.ClassType.MET_NOD.name()) != null) {
+                filters.add(filterObject(MetaNodeEntity.class.getName(), mapaNamedQueries.get(AclSidResource.ClassType.MET_NOD.name())));
             }
         }
 
-        if (undo) {
-//            filters.add(
-//                    FilterBuilder.equal("id", 0)
-//            );
-        }
         List<Filter> result = filters.stream()
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
@@ -116,45 +100,10 @@ public class AclSidResourceServiceImpl extends BaseMutableResourceService<AclSid
         return super.getPerspectiveApplicator(code.split("#")[0]);
     }
 
-    public List<AclEntryResourceEntity> filterEntries(List<AclEntryResourceEntity> entities, String classname, Long objectId) {
-        return entities.stream()
-                .filter(entry ->
-                        entry.getAclObjectIdentity().getClassEntity().getClassname().equals(classname)
-                                && entry.getAclObjectIdentity().getObjectId().equals(objectId)
-                )
-                .collect(Collectors.toList());
-    }
-
-    private class PermisionPerspectiveApplicator implements PerspectiveApplicator<AclSidResourceEntity, AclSidResource> {
+    public class PermisionPerspectiveApplicator implements PerspectiveApplicator<AclSidResourceEntity, AclSidResource> {
         @Override
         public void applySingle(String code, AclSidResourceEntity entity, AclSidResource resource) throws PerspectiveApplicationException {
-            if (code.contains("ENTITY")) {
-                String entitatActualCodi = configHelper.getEntitatActualCodi();
-                EntitatResourceEntity entitat = entitatResourceRepository.findByCodi(entitatActualCodi);
-                resource.setMasks(filterEntries(entity.getEntries(), EntitatEntity.class.getName(), entitat.getId()).stream()
-                        .map(AclEntryResourceEntity::getMask)
-                        .collect(Collectors.toList()));
-            }
-            if (code.contains("GRUP") && code.split("#").length == 3) {
-                resource.setMasks(filterEntries(entity.getEntries(), GrupEntity.class.getName(), Long.valueOf(code.split("#")[2])).stream()
-                        .map(AclEntryResourceEntity::getMask)
-                        .collect(Collectors.toList()));
-            }
-            if (code.contains("ORGAN") && code.split("#").length == 3) {
-                resource.setMasks(filterEntries(entity.getEntries(), OrganGestorEntity.class.getName(), Long.valueOf(code.split("#")[2])).stream()
-                        .map(AclEntryResourceEntity::getMask)
-                        .collect(Collectors.toList()));
-            }
-            resource.setAdmin(resource.getMasks().contains(ExtendedPermissionEnum.ADMINISTRATION));
-            resource.setAdminLectura(resource.getMasks().contains(ExtendedPermissionEnum.ADMINISTRATION_READ));
-            resource.setUser(resource.getMasks().contains(ExtendedPermissionEnum.READ));
-            resource.setRead(resource.getMasks().contains(ExtendedPermissionEnum.READ));
-            resource.setCreate(resource.getMasks().contains(ExtendedPermissionEnum.CREATE));
-            resource.setWrite(resource.getMasks().contains(ExtendedPermissionEnum.WRITE));
-            resource.setDelete(resource.getMasks().contains(ExtendedPermissionEnum.DELETE));
-            resource.setProcedimentsComuns(resource.getMasks().contains(ExtendedPermissionEnum.COMU));
-            resource.setAdminComuns(resource.getMasks().contains(ExtendedPermissionEnum.ADM_COMU));
-            resource.setDisseny(resource.getMasks().contains(ExtendedPermissionEnum.DISSENY));
+            aclResourceHelper.applyPermisos(code, entity.getEntries(), resource);
         }
     }
 
@@ -165,7 +114,7 @@ public class AclSidResourceServiceImpl extends BaseMutableResourceService<AclSid
             permis.setPrincipalTipus(params.getPrincipal());
             permis.setPrincipalNom(params.getSid());
 
-            switch (params.getClassType()){
+            switch (params.getClassType()) {
                 case ENTITY:
                     permis.setAdministration(params.isAdmin());
                     permis.setAdministrationLectura(params.isAdminLectura());
@@ -190,12 +139,55 @@ public class AclSidResourceServiceImpl extends BaseMutableResourceService<AclSid
                     permis.setDisseny(params.isDisseny());
                     permisosHelper.updatePermis(params.getObjectId(), OrganGestorEntity.class, permis);
                     break;
+                case MET_NOD:
+                    permis.setAdministration(params.isAdmin());
+                    permis.setRead(params.isRead());
+                    permis.setCreate(params.isCreate());
+                    permis.setWrite(params.isWrite());
+                    permis.setDelete(params.isDelete());
+                    permis.setStatistics(params.isEstadistic());
+                    permisosHelper.updatePermis(params.getObjectId(), MetaNodeEntity.class, permis);
+                    break;
+                case MET_EXP_ORG:
+                    AtomicReference<Long> id = new AtomicReference<>(params.getObjectId());
+                    if (id.get() == null) {
+                        Optional<MetaExpedientOrganGestorResourceEntity> metaExpOrgan = metaExpedientOrganGestorResourceRepository
+                                .findByMetaExpedientIdAndOrganGestorId(params.getProcedimentId(), params.getOrganGestor().getId());
+
+                        metaExpOrgan.ifPresentOrElse((m) -> id.set(m.getId()),
+                                () -> id.set(getNewMetaExpedientOrganGestor(params.getProcedimentId(), params.getOrganGestor().getId())));
+                    }
+
+                    permis.setAdministration(params.isAdmin());
+                    permis.setRead(params.isRead());
+                    permis.setCreate(params.isCreate());
+                    permis.setWrite(params.isWrite());
+                    permis.setDelete(params.isDelete());
+                    permis.setStatistics(params.isEstadistic());
+                    permisosHelper.updatePermis(id.get(), MetaExpedientOrganGestorEntity.class, permis);
+                    break;
             }
             return params;
         }
 
+        private Long getNewMetaExpedientOrganGestor(Long metaExpedientId, Long organGestorId) {
+            return transactionTemplate.execute(status -> {
+                try {
+                    MetaExpedientResourceEntity metaExpedientResourceEntity = metaExpedientResourceRepository.findById(metaExpedientId).orElse(null);
+                    OrganGestorResourceEntity organGestorResourceEntity = organGestorResourceRepository.findById(organGestorId).orElse(null);
+                    MetaExpedientOrganGestorResourceEntity metaExpedientOrganGestorResourceEntity = new MetaExpedientOrganGestorResourceEntity(metaExpedientResourceEntity, organGestorResourceEntity);
+                    MetaExpedientOrganGestorResourceEntity savedNewMetaExpedientOrganGestorResourceEntity = metaExpedientOrganGestorResourceRepository.saveAndFlush(metaExpedientOrganGestorResourceEntity);
+                    return savedNewMetaExpedientOrganGestorResourceEntity.getId();
+                } catch (Exception e) {
+                    throw e;
+                }
+            });
+        }
+
         @Override
-        public void onChange(Serializable id, AclSidResource.ModifyPermisionFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, AclSidResource.ModifyPermisionFormAction target) {
+        public void onChange(Serializable id, AclSidResource.ModifyPermisionFormAction previous, String
+                fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[]
+                                     previousFieldNames, AclSidResource.ModifyPermisionFormAction target) {
             if (AclSidResource.ClassType.ORGAN.equals(previous.getClassType())) {
                 if (fieldName == null) {
                     if (previous.getOrganGestor() == null) {
@@ -225,6 +217,19 @@ public class AclSidResourceServiceImpl extends BaseMutableResourceService<AclSid
                             break;
                     }
                 }
+            } else if (AclSidResource.ClassType.MET_NOD.equals(previous.getClassType())
+                    || AclSidResource.ClassType.MET_EXP_ORG.equals(previous.getClassType())) {
+                if (fieldName != null) {
+                    switch (fieldName) {
+                        case AclSidResource.ModifyPermisionFormAction.Fields.all:
+                            target.setRead((Boolean) fieldValue);
+                            target.setCreate((Boolean) fieldValue);
+                            target.setWrite((Boolean) fieldValue);
+                            target.setDelete((Boolean) fieldValue);
+                            target.setEstadistic((Boolean) fieldValue);
+                            break;
+                    }
+                }
             }
         }
     }
@@ -236,7 +241,7 @@ public class AclSidResourceServiceImpl extends BaseMutableResourceService<AclSid
             permis.setPrincipalTipus(entity.getPrincipal());
             permis.setPrincipalNom(entity.getSid());
 
-            switch (params.getClassType()){
+            switch (params.getClassType()) {
                 case ENTITY:
                     String entitatActualCodi = configHelper.getEntitatActualCodi();
                     EntitatResourceEntity entitat = entitatResourceRepository.findByCodi(entitatActualCodi);
@@ -247,6 +252,14 @@ public class AclSidResourceServiceImpl extends BaseMutableResourceService<AclSid
                     break;
                 case ORGAN:
                     permisosHelper.updatePermis(params.getObjectId(), OrganGestorEntity.class, permis);
+                    break;
+                case MET_NOD:
+                    permisosHelper.updatePermis(params.getObjectId(), MetaNodeEntity.class, permis);
+                    break;
+                case MET_EXP_ORG:
+                    Optional<MetaExpedientOrganGestorResourceEntity> metaExpOrgan = metaExpedientOrganGestorResourceRepository
+                            .findByMetaExpedientIdAndOrganGestorId(params.getProcedimentId(), params.getOrganGestor().getId());
+                    metaExpOrgan.ifPresent(m -> permisosHelper.updatePermis(m.getId(), MetaExpedientOrganGestorEntity.class, permis) );
                     break;
             }
             return objectMappingHelper.newInstanceMap(entity, AclSidResource.class);

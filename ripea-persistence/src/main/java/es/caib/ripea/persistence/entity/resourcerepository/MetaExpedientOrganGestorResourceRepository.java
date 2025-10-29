@@ -1,5 +1,6 @@
 package es.caib.ripea.persistence.entity.resourcerepository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.repository.query.Param;
@@ -14,4 +15,7 @@ public interface MetaExpedientOrganGestorResourceRepository extends BaseReposito
 	Optional<MetaExpedientOrganGestorResourceEntity> findByMetaExpedientAndOrganGestor(
 			@Param("metaExpedient") MetaExpedientResourceEntity metaExpedient,
 			@Param("organGestor") OrganGestorResourceEntity organGestor);
+	Optional<MetaExpedientOrganGestorResourceEntity> findByMetaExpedientIdAndOrganGestorId(Long metaExpedient, Long organGestor);
+
+    List<MetaExpedientOrganGestorResourceEntity> findAllByMetaExpedientId(Long id);
 }

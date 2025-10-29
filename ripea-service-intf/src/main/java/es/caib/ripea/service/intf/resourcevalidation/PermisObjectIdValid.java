@@ -7,10 +7,10 @@ import javax.validation.Payload;
 import java.lang.annotation.*;
 
 @Documented
-@Constraint(validatedBy = PermisValidator.class)
+@Constraint(validatedBy = PermisObjectIdValidator.class)
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface PermisValid {
+public @interface PermisObjectIdValid {
     String message() default "{javax.validation.constraints.NotNull.message}";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};

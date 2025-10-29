@@ -1,7 +1,13 @@
 import { useRef } from "react";
 import { useTranslation } from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
-import {useBaseAppContext, useConfirmDialogButtons, useFormContext, useResourceApiService} from "reactlib";
+import {
+    MuiFormDialogApi,
+    useBaseAppContext,
+    useConfirmDialogButtons,
+    useFormContext,
+    useResourceApiService
+} from "reactlib";
 import {Grid} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
 import {CardData} from "../../../components/CardData.tsx";
@@ -10,6 +16,7 @@ export const usePermisActions = (refresh?: () => void) => {
     const { t } = useTranslation();
 
     const {
+        isReady: apiIsReady,
         artifactAction: apiAction,
     } = useResourceApiService('aclSidResource');
     const {messageDialogShow, temporalMessageShow} = useBaseAppContext();
@@ -38,7 +45,8 @@ export const usePermisActions = (refresh?: () => void) => {
             });
     }
     return {
-        eliminar
+        apiIsReady,
+        eliminar,
     }
 }
 
@@ -48,7 +56,7 @@ const usePermisDialog = ({
                                     isModify = false,
                                     refresh,
                                 }: {
-    classType: "ORGAN" | "GRUP" | "ENTITY";
+    classType: "ORGAN" | "GRUP" | "ENTITY" | "MET_NOD" | "MET_EXP_ORG";
     form: any;
     isModify?: boolean;
     refresh?: () => void;
@@ -57,11 +65,12 @@ const usePermisDialog = ({
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
 
-    const handleShow = (id?: any, row?: any): void => {
+    const handleShow = (id?: any, row?: any, additionalData?: any): void => {
         apiRef.current?.show?.(undefined, {
             ...(row ?? {}),
             classType,
             objectId: id,
+            ...(additionalData || {})
         });
     };
 
@@ -108,6 +117,62 @@ const usePermisDialog = ({
     };
 };
 
+
+// MetaExpedientOrgan
+const PermisMetaExpedientOrganCreateForm = () => {
+    return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
+        <GridFormField xs={12} name="principal" required/>
+        <GridFormField xs={12} name="sid"/>
+        <GridFormField xs={12} name="organGestor" required/>
+
+        <GridFormField xs={12} name="all"/>
+        <Grid item xs={2}/><GridFormField xs={10} name="create"/>
+        <Grid item xs={2}/><GridFormField xs={10} name="read"/>
+        <Grid item xs={2}/><GridFormField xs={10} name="write"/>
+        <Grid item xs={2}/><GridFormField xs={10} name="delete"/>
+        <Grid item xs={2}/><GridFormField xs={10} name="estadistic"/>
+    </Grid>
+}
+export const usePermisMetaExpedientOrganCreate = (refresh?: () => void) =>
+    usePermisDialog({
+        classType: "MET_EXP_ORG",
+        form: <PermisMetaExpedientOrganCreateForm/>,
+        refresh,
+    });
+export const usePermisMetaExpedientOrganModify = (refresh?: () => void) =>
+    usePermisDialog({
+        classType: "MET_EXP_ORG",
+        form: <PermisMetaExpedientOrganCreateForm/>,
+        isModify: true,
+        refresh,
+    });
+// MetaExpedientNode
+const PermisMetaExpedientNodeCreateForm = () => {
+    return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
+        <GridFormField xs={12} name="principal" required/>
+        <GridFormField xs={12} name="sid"/>
+
+        <GridFormField xs={12} name="all"/>
+        <Grid item xs={2}/><GridFormField xs={10} name="create"/>
+        <Grid item xs={2}/><GridFormField xs={10} name="read"/>
+        <Grid item xs={2}/><GridFormField xs={10} name="write"/>
+        <Grid item xs={2}/><GridFormField xs={10} name="delete"/>
+        <Grid item xs={2}/><GridFormField xs={10} name="estadistic"/>
+    </Grid>
+}
+export const usePermisMetaExpedientNodeCreate = (refresh?: () => void) =>
+    usePermisDialog({
+        classType: "MET_NOD",
+        form: <PermisMetaExpedientNodeCreateForm/>,
+        refresh,
+    });
+export const usePermisMetaExpedientNodeModify = (refresh?: () => void) =>
+    usePermisDialog({
+        classType: "MET_NOD",
+        form: <PermisMetaExpedientNodeCreateForm/>,
+        isModify: true,
+        refresh,
+    });
 
 // OrganGestor
 const PermisOrganGestorCreateForm = () => {

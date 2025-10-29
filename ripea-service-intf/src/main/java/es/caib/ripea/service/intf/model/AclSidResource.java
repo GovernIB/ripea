@@ -9,7 +9,7 @@ import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.ExtendedPermissionEnum;
 import es.caib.ripea.service.intf.dto.PrincipalTipusEnumDto;
-import es.caib.ripea.service.intf.resourcevalidation.PermisValid;
+import es.caib.ripea.service.intf.resourcevalidation.PermisObjectIdValid;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -63,14 +63,17 @@ public class AclSidResource extends BaseResource<Long> {
     @Transient private boolean procedimentsComuns;// COMU
     @Transient private boolean adminComuns;// ADM_COMU
     @Transient private boolean disseny;// DISSENY
+    @Transient private boolean estadistic;// STATISTICS
 
-    @JsonIgnore @Transient private List<ExtendedPermissionEnum> masks;
+    @Transient private ResourceReference<OrganGestorResource, Long> organGestor;
+
+    @JsonIgnore @Transient private List<ExtendedPermissionEnum> masks = new ArrayList<>();
     private List<ResourceReference<AclEntryResource, Long>> entries = new ArrayList<>();
 
     @Getter
     @Setter
     @FieldNameConstants
-    @PermisValid
+    @PermisObjectIdValid
     public static class ModifyPermisionFormAction extends DeletePermisionFormAction {
         @NotNull
         private PrincipalTipusEnumDto principal;
@@ -90,22 +93,26 @@ public class AclSidResource extends BaseResource<Long> {
         @ResourceField(onChangeActive = true)
         private boolean adminComuns;
         private boolean disseny;
+        private boolean estadistic;
         @ResourceField(onChangeActive = true)
         @Transient private boolean all;
-        private ResourceReference<OrganGestorResource, Long> organGestor;
     }
     @Getter
     @Setter
     @FieldNameConstants
-    @PermisValid
+    @PermisObjectIdValid
     public static class DeletePermisionFormAction implements Serializable {
         @NotNull
         private ClassType classType;
         private Long objectId;
+        private ResourceReference<OrganGestorResource, Long> organGestor;
+        private Long procedimentId;
     }
     public enum ClassType {
         ENTITY,
         GRUP,
         ORGAN,
+        MET_EXP_ORG,
+        MET_NOD,
     }
 }

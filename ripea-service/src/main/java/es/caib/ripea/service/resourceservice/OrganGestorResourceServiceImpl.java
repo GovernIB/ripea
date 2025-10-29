@@ -105,7 +105,7 @@ public class OrganGestorResourceServiceImpl extends BaseMutableResourceService<O
         
         if (isSuper) {
         	//No s'aplica ni el filtre per entitat, perque superusuari no treballa amb entitat seleccionada.
-        	return filtreBase.generate();
+        	return filtreBase!=null ?filtreBase.generate() :null;
         } else { 
         	
             Filter filtreEntitat = FilterBuilder.equal(

@@ -2,8 +2,8 @@ import {useTranslation} from "react-i18next";
 import {useState} from "react";
 import {GridPage, useFormContext} from "reactlib";
 import {CardPage} from "../../../components/CardData.tsx";
-import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
-import {Grid, Icon} from "@mui/material";
+import StyledMuiGrid, {ToolbarButton} from "../../../components/StyledMuiGrid.tsx";
+import {Button, Grid, Icon} from "@mui/material";
 import GridFormField, {GridButtonField} from "../../../components/GridFormField.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
@@ -30,7 +30,7 @@ const springFilterBuilder = (data:any) => {
         builder.eq('organGestor.id', data?.organGestor?.id),
         builder.eq('actiu', data?.actiu),
         builder.eq('permisDirecte', data?.permisDirecte),
-        builder.equals('organGestor.id', null, data?.ambit == 'COMUNS'),
+        data?.ambit && builder.equals('organGestor.id', null, data?.ambit == 'COMUNS'),
     );
 }
 
@@ -90,11 +90,35 @@ const columns = [
         flex: 0.5,
         renderCell: (params:any) => (params?.row?.actiu && <Icon>check</Icon>),
     },
+    {
+        filed: 'permis',
+        headerName: '',
+        sortable: false,
+        flex: 0.5,
+        renderCell: (params:any) => <Button href={`/metaExpedient/${params?.id}/permis`} variant={'contained'}>
+            <Icon>key</Icon>
+        </Button>
+    }
 ]
 
 const GestioMetaExpedientGrid = () => {
     const {t} = useTranslation();
     const [springFilter, setSpringFilter] = useState<string>();
+
+    const actions = [
+        {
+            label: t('common.update'),
+            icon: "edit",
+            showInMenu: true,
+            // clickShowUpdateDialog: true,
+        },
+        {
+            label: t('common.delete'),
+            icon: "delete",
+            showInMenu: true,
+            // clickTriggerDelete: true,
+        },
+    ]
 
     return <GridPage disableMargins>
         <CardPage title={t('page.user.menu.procediments')}>
@@ -107,7 +131,29 @@ const GestioMetaExpedientGrid = () => {
                 filter={springFilter}
                 sortModel={sortModel}
 
-                toolbarHideCreate
+                rowAdditionalActions={actions}
+
+                toolbarElementsWithPositions={[
+                    {
+                        position: 2,
+                        element: <ToolbarButton
+                            // title={t('common.create')}
+                            icon={'download'}
+                            onClick={()=>{}}
+                            variant={"contained"}
+                            color={'success'}/>,
+                    },
+                    {
+                        position: 2,
+                        element: <ToolbarButton
+                            // title={t('common.create')}
+                            icon={'cached'}
+                            onClick={()=>{}}
+                            color={'primary'}/>,
+                    },
+                ]}
+
+                toolbarHideRefresh
             />
         </CardPage>
     </GridPage>

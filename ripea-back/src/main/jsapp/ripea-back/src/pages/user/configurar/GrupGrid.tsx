@@ -51,7 +51,7 @@ const sortModel: any = [{field: 'codi', sort: 'asc'}]
 const columns = [
     {
         field: 'codi',
-        flex: 1,
+        flex: 0.5,
     },
     {
         field: 'descripcio',

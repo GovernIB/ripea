@@ -29,6 +29,7 @@ import TipusDocumentalGrid from "./pages/user/configurar/TipusDocumentalGrid.tsx
 import PermisEntitatGrid from "./pages/user/configurar/PermisEntitatGrid.tsx";
 import PermisGrupGrid from "./pages/user/configurar/PermisGrupGrid.tsx";
 import PermisOrganGestorGrid from "./pages/user/configurar/PermisOrganGestorGrid.tsx";
+import PermisMetaExpedientGrid from "./pages/user/configurar/PermisMetaExpedientGrid.tsx";
 
 const AppRoutes: React.FC = () => {
     return <Routes>
@@ -67,6 +68,7 @@ const AppRoutes: React.FC = () => {
 
         {/* Configurar */}
         <Route path="metaExpedient" element={<GestioMetaExpedientGrid/>} />
+        <Route path="metaExpedient/:id/permis" element={<PermisMetaExpedientGrid/>} />
         <Route path="tipusDocumental" element={<TipusDocumentalGrid/>} />
         <Route path="grup" element={<GrupGrid/>} />
         <Route path="grupPermis/:id/permis" element={<PermisGrupGrid/>} />

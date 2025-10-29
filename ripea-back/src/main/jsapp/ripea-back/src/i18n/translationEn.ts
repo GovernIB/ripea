@@ -1117,6 +1117,16 @@ const translationEn = {
         },
         permision: {
             title: "Permissions",
+            grid: {
+                organGestor: "Managing body",
+                principal: "Type",
+                sid: "Principal",
+                create: "Create",
+                read: "View",
+                write: "Edit",
+                delete: "Delete",
+                estadistic: "Statistics",
+            },
             tabs: {
                 expedient: "Case management",
                 admin: "Administration and design",
@@ -1162,6 +1172,7 @@ const translationEn = {
 
                 anotacions: "Annotations",
                 procediments: "Procedure management",
+                procedimentPermis: "Procedure permissions: {{nom}}",
                 procedimentsTitle: "The entity has procedures with outdated managing bodies",
                 grups: "Groups",
                 revisar: "Procedure review",

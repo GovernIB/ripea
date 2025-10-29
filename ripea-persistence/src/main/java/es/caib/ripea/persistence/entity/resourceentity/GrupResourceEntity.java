@@ -26,8 +26,8 @@ import lombok.Setter;
 @NoArgsConstructor
 public class GrupResourceEntity extends BaseAuditableEntity<GrupResource> {
 
-	@Column(name = "rol", length = 50, nullable = false)
-	private String rol;
+//	@Column(name = "rol", length = 50, nullable = false)
+//	private String rol;
 	@Column(name = "codi", length = 50, nullable = false)
 	private String codi;
 	@Column(name = "descripcio", length = 512, nullable = false)

@@ -39,8 +39,8 @@ public class GrupResource extends BaseAuditableResource<Long> {
 	@Size(max = 50)
 	private String codi;
 //	@NotNull
-	@Size(max = 50)
-	private String rol;
+//	@Size(max = 50)
+//	private String rol;
 	@NotNull
 	@Size(max = 512)
 	private String descripcio;

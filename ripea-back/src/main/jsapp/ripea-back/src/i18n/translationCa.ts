@@ -1117,6 +1117,16 @@ const translationCa = {
         },
         permision: {
             title: "Permisos",
+            grid: {
+                organGestor: "Organ gestor",
+                principal: "Tipus",
+                sid: "Principal",
+                create: "Consulta",
+                read: "Creació",
+                write: "Modificació",
+                delete: "Eliminació",
+                estadistic: "Estadístiques",
+            },
             tabs: {
                 expedient: "Gestió d'expedients",
                 admin: "Administració i disseny",
@@ -1162,6 +1172,7 @@ const translationCa = {
 
                 anotacions: "Anotacions",
                 procediments: "Gestió de procediments",
+                procedimentPermis: "Permisos del procediment: {{nom}}",
                 procedimentsTitle: "L'entitat té procediments amb òrgans gestors no actualitzats",
                 grups: "Grups",
                 grupPermis: "Permisos del grup",

@@ -83,10 +83,10 @@ const PermisOrganGestorGrid = ()=> {
         if(apiIsReady && id){
             apiGetOne(id)
                 .then((app) => setEntity(app))
-                .catch((error) => {
-                    handleClose()
-                    temporalMessageShow(null, error?.message, 'error');
-                });
+                // .catch((error) => {
+                //     handleClose()
+                //     temporalMessageShow(null, error?.message, 'error');
+                // });
         } else {
             setEntity(undefined)
         }

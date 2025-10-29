@@ -56,7 +56,7 @@ const sortModel: any = [{field: 'nom', sort: 'asc'}]
 const columns = [
     {
         field: 'codi',
-        flex: 1,
+        flex: 0.5,
     },
     {
         field: 'nom',
@@ -68,11 +68,11 @@ const columns = [
     },
     {
         field: 'cif',
-        flex: 1,
+        flex: 0.5,
     },
     {
         field: 'estat',
-        flex: 1,
+        flex: 0.5,
     },
     {
         filed: 'permis',
@@ -120,7 +120,16 @@ const OrganGestorGrid = () => {
                         position: 3,
                         element: <ToolbarButton
                             // title={t('common.create')}
-                            icon={'cached'} onClick={()=>handelCreate(id)} color={'primary'}/>,
+                            icon={'cached'}
+                            color={'primary'}/>,
+                    },
+                    {
+                        position: 3,
+                        element: <ToolbarButton
+                            // title={t('common.create')}
+                            icon={'visibility'}
+                            variant={"contained"}
+                            color={'primary'}/>,
                     },
                 ]}
 

@@ -8,8 +8,6 @@ import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
-import es.caib.ripea.service.intf.dto.MetaExpedientAmbitEnumDto;
-import es.caib.ripea.service.intf.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.OrganEstatEnumDto;
 import es.caib.ripea.service.intf.dto.TipusTransicioEnumDto;
 import lombok.Getter;

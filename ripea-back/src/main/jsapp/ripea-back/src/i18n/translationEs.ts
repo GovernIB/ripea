@@ -1117,6 +1117,16 @@ const translationEs = {
         },
         permision: {
             title: "Permisos",
+            grid: {
+                organGestor: "Órgano gestor",
+                principal: "Tipo",
+                sid: "Principal",
+                create: "Creación",
+                read: "Consulta",
+                write: "Modificación",
+                delete: "Eliminación",
+                estadistic: "Estadísticas",
+            },
             tabs: {
                 expedient: "Gestión de expedientes",
                 admin: "Administración y diseño",
@@ -1162,6 +1172,7 @@ const translationEs = {
 
                 anotacions: "Anotaciones",
                 procediments: "Gestión de procedimientos",
+                procedimentPermis: "Permisos del procedimiento: {{nom}}",
                 procedimentsTitle: "La entidad tiene procedimientos con órganos gestores no actualizados",
                 grups: "Grupos",
                 revisar: "Revisión de procedimientos",

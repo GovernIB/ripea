@@ -1,15 +1,10 @@
 package es.caib.ripea.persistence.entity.resourceentity;
 
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.ForeignKey;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import es.caib.ripea.persistence.base.entity.BaseAuditableEntity;
 import es.caib.ripea.service.intf.config.BaseConfig;
-import es.caib.ripea.service.intf.model.GrupResource;
+import es.caib.ripea.service.intf.model.MetaExpedientOrganGestorResource;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -19,7 +14,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class MetaExpedientOrganGestorResourceEntity extends BaseAuditableEntity<GrupResource> {
+public class MetaExpedientOrganGestorResourceEntity extends BaseAuditableEntity<MetaExpedientOrganGestorResource> {
 
 	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(
@@ -32,4 +27,9 @@ public class MetaExpedientOrganGestorResourceEntity extends BaseAuditableEntity<
 			name = "organ_gestor_id",
 			foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "organ_metaexporg_fk"))
 	private OrganGestorResourceEntity organGestor;
+
+    public MetaExpedientOrganGestorResourceEntity(MetaExpedientResourceEntity metaExpedient, OrganGestorResourceEntity organGestor) {
+        this.metaExpedient = metaExpedient;
+        this.organGestor = organGestor;
+    }
 }
