@@ -277,8 +277,8 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             icon: "delete",
             showInMenu: true,
             onClick: eliminar,
-            hidden: (row:any) => !entity?.potModificar || !isDocument(row) || (row?.arxiuEstat == 'DEFINITIU' || (row?.arxiuEstat == 'DEFINITIU' && !user?.sessionScope?.permesEsborrarFinals)),
-        },        
+            hidden: (row:any) => !entity?.potModificar || !isDocument(row) || (row?.arxiuEstat == 'DEFINITIU' && !user?.sessionScope?.permesEsborrarFinals)
+        },
         {
             label: <Divider sx={{width: '100%'}} color={"none"}/>,
             showInMenu: true,

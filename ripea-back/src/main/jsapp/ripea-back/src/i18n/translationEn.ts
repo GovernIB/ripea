@@ -699,7 +699,7 @@ const translationEn = {
                     ok: "The document {{data.nom}} has been updated successfully"
                 },
                 delete: {
-                    label: "Delete...",
+                    label: "Delete",
                     check: "Are you sure you want to continue with this action?",
                     description: "Once deleted it cannot be recovered",
                     ok: "The document {{data.nom}} has been deleted successfully"

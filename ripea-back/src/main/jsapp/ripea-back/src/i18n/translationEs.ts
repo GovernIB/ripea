@@ -699,7 +699,7 @@ const translationEs = {
                     ok: "El documento {{data.nom}} se ha modificado correctamente"
                 },
                 delete: {
-                    label: "Borrar...",
+                    label: "Borrar",
                     check: "¿Está seguro de que quiere seguir con esta acción?",
                     description: "Una vez borrado no se podrá recuperar.",
                     ok: "El documento {{data.nom}} se ha eliminado correctamente"
