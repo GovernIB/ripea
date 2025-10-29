@@ -8,10 +8,22 @@ import {iniciaDescargaBlob} from "../../expedient/details/CommonActions.tsx";
 import {useCopiar, useMoure} from "../actions/Moure.tsx";
 
 const useActions = (refresh?:()=>void) => {
+
     const { t } = useTranslation();
-    const { artifactReport: apiReport, delete: apiDelete } = useResourceApiService('carpetaResource');
+    const { artifactReport: apiReport, delete: apiDelete, artifactAction: apiAction, } = useResourceApiService('carpetaResource');
     const { messageDialogShow, temporalMessageShow } = useBaseAppContext();
     const confirmDialogComponentProps = {maxWidth: 'sm', fullWidth: true};
+
+    const action = (id:any, code:string, mssg:string) => {
+        apiAction(id, {code})
+            .then(()=>{
+                refresh?.()
+                temporalMessageShow(null, mssg, 'success');
+            })
+            .catch((error) => {
+                temporalMessageShow(null, error?.message, 'error');
+            });
+    }
 
     const report = (id:any, code:string, msg:string, fileType:any) => {
         apiReport(id, {code: code, fileType})
@@ -55,10 +67,12 @@ const useActions = (refresh?:()=>void) => {
 
     const exportarPDF = (id:any) => report(id, 'EXPORTAR_INDEX_PDF', t('page.expedient.action.exportPDF.ok'),'PDF')
     const exportarEXCEL = (id:any) => report(id, 'EXPORTAR_INDEX_XLS', t('page.expedient.action.exportEXCEL.ok'),'XLSX')
+    const guardarArxiu = (id:any, row:any) => action(id, 'GUARDAR_ARXIU', t('page.contingut.action.guardarArxiu.ok', {contingut: row?.nom}))
 
     return {
         eliminar,
         exportarPDF,
+        guardarArxiu,
         exportarEXCEL,
     }
 }
@@ -67,13 +81,20 @@ const useCarpetaActions = (entity:any, refresh?: () => void) => {
     const { t } = useTranslation();
     const { value: user } = useUserSession()
 
-    const { eliminar, exportarPDF, exportarEXCEL } = useActions(refresh)
+    const { eliminar, exportarPDF, exportarEXCEL, guardarArxiu } = useActions(refresh)
     const {handleOpen: handleHistoricOpen, dialog: dialogHistoric} = useHistoric();
     const {handleShow: handleModifyCarpeta, content: contentModifyCarpeta} = useModificar(refresh)
     const {handleShow: handleMoure, content: contentMoure} = useMoure(refresh)
     const {handleShow: handleCopiar, content: contentCopiar} = useCopiar(refresh)
 
     const actions = [
+        {
+            label: t('page.contingut.action.guardarArxiu.label'),
+            icon: 'autorenew',
+            showInMenu: true,
+            onClick: guardarArxiu,
+            hidden: (row:any) => row?.arxiuUuid
+        }, 
         /*{
             label: t('page.carpeta.action.update.label'),
             icon: 'edit',

@@ -41,15 +41,20 @@ import lombok.experimental.FieldNameConstants;
                         type = ResourceArtifactType.ACTION,
                         code = CarpetaResource.ACTION_MOURE_COPIAR,
                         formClass = CarpetaResource.MoureCopiarFormAction.class,
-                        requiresId = true),		
+                        requiresId = true),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = CarpetaResource.ACTION_GUARDAR_ARXIU,
+                        requiresId = true),                
         }
 )
 public class CarpetaResource extends ContingutResource {
 	
 	public static final String ACTION_MODIFICAR_NOM			= "MODIFICAR_NOM";
 	public static final String ACTION_MOURE_COPIAR			= "MOURE_COPIAR";
-	public static final String REPORT_EXPORTAR_INDEX_PDF = "EXPORTAR_INDEX_PDF";
-	public static final String REPORT_EXPORTAR_INDEX_XLS = "EXPORTAR_INDEX_XLS";
+	public static final String REPORT_EXPORTAR_INDEX_PDF 	= "EXPORTAR_INDEX_PDF";
+	public static final String REPORT_EXPORTAR_INDEX_XLS 	= "EXPORTAR_INDEX_XLS";
+	public static final String ACTION_GUARDAR_ARXIU 		= "GUARDAR_ARXIU";
 	
 	private ResourceReference<ExpedientResource, Long> expedientRelacionat;
 	

@@ -76,6 +76,7 @@ public class CarpetaResourceServiceImpl extends BaseMutableResourceService<Carpe
         register(CarpetaResource.REPORT_EXPORTAR_INDEX_PDF,	new ExportIdexPdfGenerator());
         register(CarpetaResource.REPORT_EXPORTAR_INDEX_XLS,	new ExportIdexXlsGenerator());
         register(CarpetaResource.ACTION_MOURE_COPIAR, new MoureCopiarActionExecutor());
+        register(CarpetaResource.ACTION_GUARDAR_ARXIU, new GuardarArxiuActionExecutor());
     }
 	
     @Override
@@ -283,4 +284,25 @@ public class CarpetaResourceServiceImpl extends BaseMutableResourceService<Carpe
 		}
     }
 
+    private class GuardarArxiuActionExecutor implements ActionExecutor<CarpetaResourceEntity, Serializable, Serializable> {
+
+		@Override
+		public void onChange(Serializable id, Serializable previous, String fieldName, Object fieldValue,Map<String, AnswerValue> answers, String[] previousFieldNames, Serializable target) {}
+
+		@Override
+		public Serializable exec(String code, CarpetaResourceEntity entity, Serializable params) throws ActionExecutionException {
+			try {
+				if (entity.getArxiuUuid() == null) {
+					CarpetaEntity carpetaEntity = carpetaRepository.findById(entity.getId()).orElse(null);
+					if (carpetaEntity!=null) {
+						contingutHelper.arxiuPropagarModificacio(carpetaEntity);
+					}
+				}
+				return objectMappingHelper.newInstanceMap(entity, CarpetaResource.class);
+			} catch (Exception e) {
+				excepcioLogHelper.addExcepcio("/carpeta/"+entity.getId()+"/GuardarArxiuActionExecutor", e);
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, e.getMessage());
+			}
+		}
+    }
 }
