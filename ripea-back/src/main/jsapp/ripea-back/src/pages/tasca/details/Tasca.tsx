@@ -57,7 +57,7 @@ const Tasca = () => {
             <Button
                 variant="outlined"
                 color={"inherit"}
-                sx={{ borderRadius: '4px', backgroundColor: 'white', padding: '0px 10px'}}
+                sx={{ borderRadius: '4px', padding: '0px 10px'}}
                 onClick={()=>navigate(-1)}
             >
                 <Icon>arrow_back</Icon>
@@ -67,7 +67,7 @@ const Tasca = () => {
                 <Button
                     variant="outlined"
                     color={"inherit"}
-                    sx={{ borderRadius: '4px', backgroundColor: 'white', padding: '0px 10px'}}
+                    sx={{ borderRadius: '4px', padding: '0px 10px'}}
                     onClick={()=> {
                         changeEstat(tasca?.id, 'INICIADA', t('page.tasca.action.iniciar.ok'))
                         navigate(-1)
@@ -81,7 +81,7 @@ const Tasca = () => {
                 <Button
                     variant="outlined"
                     color={"inherit"}
-                    sx={{ borderRadius: '4px', backgroundColor: 'white', padding: '0px 10px'}}
+                    sx={{ borderRadius: '4px', padding: '0px 10px'}}
                     onClick={()=> {
                         changeEstat(tasca?.id, 'FINALITZADA', t('page.tasca.action.finalitzar.ok'))
                         navigate(-1)
@@ -104,7 +104,7 @@ const Tasca = () => {
         </Box>
     </Box>;
 
-    return <GridPage disableMargins style={{ backgroundColor: 'white' }}>
+    return <GridPage disableMargins>
         <Load value={expedient && tasca} noEffect>
             <Card>
                 <CardHeader title={headerMain} sx={{

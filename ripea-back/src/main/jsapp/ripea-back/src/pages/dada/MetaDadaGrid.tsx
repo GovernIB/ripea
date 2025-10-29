@@ -18,7 +18,6 @@ export const StyledDadaValor = (props: any) => {
     const {valor} = props;
     const style = {
                 border: '1px solid lightgray',
-                backgroundColor: '#e5f6fd',
                 borderRadius: '4px',
                 padding: '2px 6px',
                 marginRight: '4px',

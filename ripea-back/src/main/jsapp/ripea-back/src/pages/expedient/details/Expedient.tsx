@@ -125,7 +125,7 @@ const ExpedientAlert = (props:any) => {
         {expedient?.agafatPer?.id != user?.codi && expedient?.potModificar &&
             <Alert severity="info"
                    action={
-                       <Button sx={{py:0, backgroundColor: 'white'}} 
+                       <Button sx={{py:0}} 
                        onClick={()=>agafar(expedient?.id, expedient)} variant="outlined">
                            <Icon>lock</Icon>
 						   <Typography variant={"subtitle2"}>{t('page.expedient.action.agafar.label')}</Typography>
@@ -139,7 +139,7 @@ const ExpedientAlert = (props:any) => {
         { expedient?.numAlert!=0 && (count === null || count !== 0) &&
             <Alert severity="warning"
                    action={
-                       <Button  sx={{py: 0, backgroundColor: 'white'}} variant="outlined"
+                       <Button  sx={{py: 0}} variant="outlined"
                                 onClick={() => handelAlert(expedient?.id, expedient)}>
                             <Icon>search</Icon>
                            <Typography variant={"subtitle2"}>{t('common.consult')}</Typography>
@@ -150,7 +150,7 @@ const ExpedientAlert = (props:any) => {
         { !expedient?.valid &&
             <Alert severity="warning"
                    action={
-                       <Button  sx={{py: 0, backgroundColor: 'white'}} variant="outlined"
+                       <Button  sx={{py: 0}} variant="outlined"
                                 onClick={() => hanldeErrorValidacio(expedient?.id, expedient)}>
                             <Icon>search</Icon>
                            <Typography variant={"subtitle2"}>{t('common.consult')}</Typography>
@@ -263,7 +263,7 @@ const Expedient = () => {
             <Typography variant="h4" sx={{ display: 'flex' }}>{expedient?.nom}</Typography>
         </Box>
         <Box>
-            <Typography variant={"subtitle1"} bgcolor={"white"} sx={{border}} px={1} hidden={!expedient?.agafatPer}>
+            <Typography variant={"subtitle1"} sx={{border}} px={1} hidden={!expedient?.agafatPer}>
                 {t('page.expedient.title')} {t('page.expedient.detall.agafatPer')}: {expedient?.agafatPer?.description}
                 {expedient?.agafatPer?.id == user?.codi &&
                     <IconButton aria-label="lock_open" color={"inherit"} onClick={() => alliberar(id, expedient)} title={t('page.expedient.action.lliberar.label')}>
