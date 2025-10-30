@@ -23,15 +23,15 @@ export const App: React.FC = () => {
     const { value: entitat } = useEntitatSession()
     const entitatLogo = useMemo(() => {
         return entitat?.logoImgBytes ? `data:image/png;base64,${entitat?.logoImgBytes}` : goib_logo;
-    }, [entitat]);
+    }, [entitat?.logoImgBytes]);
     const ripeaLogo = useMemo(() => {
         return entitat?.logoRipeaBytes ? `data:image/png;base64,${entitat?.logoRipeaBytes}` : logo;
-    }, [entitat]);
+    }, [entitat?.logoRipeaBytes]);
     const backgroundColor = useMemo(() => {
         return entitat?.capsaleraColorFons
-    }, [entitat]);
+    }, [entitat?.capsaleraColorFons]);
     useEffect(() => {
-        changeFavicon(entitat?.logoImgBytes ?entitatLogo :logo_caib)
+        changeFavicon(entitatLogo)
     }, [entitatLogo]);
     return <BaseApp
         code="cmd"

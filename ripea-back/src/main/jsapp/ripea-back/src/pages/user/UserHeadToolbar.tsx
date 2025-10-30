@@ -82,8 +82,9 @@ const UserHeadToolbar = () => {
     const location = useLocation();
 
     const menuLogo = useMemo(() => {
+        console.log("logoMenuBytes", entitat?.logoMenuBytes)
         return entitat?.logoMenuBytes ? `data:image/png;base64,${entitat?.logoMenuBytes}` : logo;
-    }, [entitat]);
+    }, [entitat?.logoMenuBytes]);
 
     const isRolActualSupAdmin = user?.rolActual == 'IPA_SUPER';
     const isRolActualAdmin = user?.rolActual == 'IPA_ADMIN';
