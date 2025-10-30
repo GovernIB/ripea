@@ -127,6 +127,7 @@ const translationCa = {
         comment: {
             expedient: "Comentaris de l'expedient",
             tasca: "Comentaris de la tasca",
+            metaExpedient: "Comentaris del procediment",
         },
         contingut: {
             grid: {

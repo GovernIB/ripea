@@ -74,7 +74,7 @@ const columns = [
     },
     {
         field: 'servei',
-        flex: 0.5,
+        flex: 1,
     },
     {
         field: 'createdByFullName',
@@ -82,7 +82,7 @@ const columns = [
     },
     {
         field: 'createdDate',
-        flex: 1,
+        flex: 0.75,
         valueFormatter: (value: any) => formatDate(value),
     },
     {

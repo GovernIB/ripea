@@ -89,6 +89,8 @@ public class MetaExpedientResource extends MetaNodeResource {
 	private ResourceReference<OrganGestorResource, Long> organGestor;
 	private ResourceReference<GrupResource, Long> grupPerDefecte;
 
+    @Transient int numComentaris;
+
 	@Transient private List<ResourceReference<ExpedientEstatResource, Long>> estats;
 	@Transient private List<ResourceReference<MetaExpedientOrganGestorResource, Long>> metaExpedientOrganGestors;
 

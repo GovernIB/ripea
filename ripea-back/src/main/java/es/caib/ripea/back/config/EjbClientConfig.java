@@ -345,6 +345,12 @@ public class EjbClientConfig {
 	public LocalStatelessSessionProxyFactoryBean metaExpedientResourceService() {
 		return getLocalEjbFactoyBean(MetaExpedientResourceService.class);
 	}
+
+	@Bean
+	@ConditionalOnWarDeployment
+	public LocalStatelessSessionProxyFactoryBean metaExpedientComentariResourceService() {
+		return getLocalEjbFactoyBean(MetaExpedientComentariResourceService.class);
+	}
 	
 	@Bean
 	@ConditionalOnWarDeployment

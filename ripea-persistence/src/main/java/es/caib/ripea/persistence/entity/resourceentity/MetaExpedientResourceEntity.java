@@ -104,6 +104,12 @@ public class MetaExpedientResourceEntity extends MetaNodeResourceEntity<MetaExpe
 	@Column(name = "interessat_obligatori", nullable = false)
 	private boolean interessatObligatori;
 
+    @OneToMany(
+            mappedBy = "metaExpedient",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
+    private List<MetaExpedientComentariResourceEntity> comentaris = new ArrayList<>();
+
 	public boolean isComu() {
 		if (organGestor == null) {
 			return true;

@@ -127,6 +127,7 @@ const translationEn = {
         comment: {
             expedient: "Expedient Comments",
             tasca: "Task Comments",
+            metaExpedient: "Procedure comments",
         },
         contingut: {
             grid: {

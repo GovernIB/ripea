@@ -1,6 +1,6 @@
 import {useTranslation} from "react-i18next";
 import {useState} from "react";
-import {GridPage} from "reactlib";
+import {GridPage, useMuiDataGridApiRef} from "reactlib";
 import {CardPage} from "../../../components/CardData.tsx";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import {Grid, Icon, Typography} from "@mui/material";
@@ -8,6 +8,7 @@ import GridFormField from "../../../components/GridFormField.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
+import {CommentDialog} from "../../CommentDialog.tsx";
 
 const RevisioMetaExpedientFilterForm = () => {
     return <>
@@ -125,15 +126,38 @@ const columns = [
 
 const RevisioMetaExpedientGrid = () => {
     const {t} = useTranslation();
+    const apiRef = useMuiDataGridApiRef();
     const [springFilter, setSpringFilter] = useState<string>();
+
+    const refresh = () => {
+        apiRef?.current?.refresh?.();
+    }
+
+    const columnsAddition :any[] = [
+        ...columns,
+        {
+            field: 'numComentaris',
+            headerName: '',
+            sortable: false,
+            flex: 0.25,
+            renderCell: (params: any) => <CommentDialog
+                entity={params?.row}
+                title={`${t('page.comment.metaExpedient')}: ${params?.row?.nom}`}
+                resourceName={'metaExpedientComentariResource'}
+                resourceReference={'metaExpedient'}
+                onClose={refresh}
+            />,
+        },
+    ]
 
     return <GridPage disableMargins>
         <CardPage title={t('page.user.menu.revisar')}>
             <RevisioMetaExpedientFilter onSpringFilterChange={setSpringFilter}/>
 
             <StyledMuiGrid
+                apiRef={apiRef}
                 resourceName={"metaExpedientResource"}
-                columns={columns}
+                columns={columnsAddition}
                 // TODO: revisar filtre
                 filter={springFilter}
                 sortModel={sortModel}

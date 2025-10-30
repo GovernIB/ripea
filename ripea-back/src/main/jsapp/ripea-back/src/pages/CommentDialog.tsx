@@ -14,7 +14,6 @@ import {
     useResourceApiService,
     useBaseAppContext,
     useMuiContentDialog,
-    useCloseDialogButtons,
     useFormApiRef
 } from 'reactlib';
 import { formatDate } from '../util/dateUtils';
@@ -25,7 +24,7 @@ const myComment = {...comment, bgcolor: '#a5d6a7', alignSelf: 'end'}
 const otherComment = {...comment, bgcolor: '#e0e0e0'}
 
 const Comments = (props: any) => {
-    const { resourceName, id, resourceReference } = props;
+    const { resourceName, id, resourceReference, readOnly } = props;
     const { value: user } = useUserSession();
     const {
         isReady: apiIsReady,
@@ -79,28 +78,30 @@ const Comments = (props: any) => {
                 <Typography variant="caption" color="textDisabled">{formatDate(a?.createdDate)}</Typography>
             </Grid>
         )}
-        <Grid size={12}>
-            <MuiForm
-                resourceName={resourceName}
-                hiddenToolbar
-                additionalData={{
-                    [resourceReference]: { id },
-                }}
-                apiRef={formApiRef}
-                commonFieldComponentProps={{ size: 'small' }}>
-                <Grid container columnSpacing={1} rowSpacing={1}>
-                    <Grid size={12} sx={{ display: 'flex' }}>
-                        <FormField name="text" />
-                        <Button onClick={handleButtonClick} startIcon={<Icon>send</Icon>} variant="contained">Envia</Button>
+        {!readOnly &&
+            <Grid size={12}>
+                <MuiForm
+                    resourceName={resourceName}
+                    hiddenToolbar
+                    additionalData={{
+                        [resourceReference]: { id },
+                    }}
+                    apiRef={formApiRef}
+                    commonFieldComponentProps={{ size: 'small' }}>
+                    <Grid container columnSpacing={1} rowSpacing={1}>
+                        <Grid size={12} sx={{ display: 'flex' }}>
+                            <FormField name="text" />
+                            <Button onClick={handleButtonClick} startIcon={<Icon>send</Icon>} variant="contained">Envia</Button>
+                        </Grid>
                     </Grid>
-                </Grid>
-            </MuiForm>
-        </Grid>
+                </MuiForm>
+            </Grid>
+        }
     </Grid>;
 }
 
 export const CommentDialog = (props: any) => {
-    const { entity, title, resourceName, resourceReference, onClose, iconStyle } = props;
+    const { entity, title, resourceName, resourceReference, onClose, iconStyle, readOnly = false } = props;
     const [dialogShow, dialogComponent] = useMuiContentDialog();
     const { t } = useBaseAppContext();
     const closeButtons = [{
@@ -116,7 +117,8 @@ export const CommentDialog = (props: any) => {
                 <Comments 
                     resourceName={resourceName}
                     id={entity?.id}
-                    resourceReference={resourceReference} />
+                    resourceReference={resourceReference}
+                    readOnly={readOnly}/>
             </>,
             closeButtons,
             { maxWidth: 'md', fullWidth: true }).

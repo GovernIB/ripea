@@ -38,7 +38,7 @@ const springFilterBuilder = (data:any) => {
         builder.eq("prioritat", `${data?.prioritat}`),
         builder.betweenDates("dataInici", data?.dataInici, data?.dataFi),
         builder.betweenDates("dataLimit", data?.dataLimitInici, data?.dataLimitFi),
-        builder.inside("estat", ...(data?.estats.map((v:any)=>`'${v}'`) ?? []))
+        builder.inside("estat", ...(data?.estats?.map?.((v:any)=>`'${v}'`) ?? []))
     );
     // console.log('>>> springFilterBuilder:', filterStr)
     return filterStr;
