@@ -82,7 +82,6 @@ const UserHeadToolbar = () => {
     const location = useLocation();
 
     const menuLogo = useMemo(() => {
-        console.log("logoMenuBytes", entitat?.logoMenuBytes)
         return entitat?.logoMenuBytes ? `data:image/png;base64,${entitat?.logoMenuBytes}` : logo;
     }, [entitat?.logoMenuBytes]);
 
