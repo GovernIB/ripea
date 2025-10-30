@@ -43,6 +43,10 @@ public class EntitatResourceEntity extends BaseAuditableEntity<EntitatResource> 
 	private boolean activa = true;
 	@Column(name = "logo_img")
 	private byte[] logoImgBytes;
+	@Column(name = "logo_ripea")
+	private byte[] logoRipeaBytes;
+	@Column(name = "logo_menu")
+	private byte[] logoMenuBytes;	
 	@Column(name = "capsalera_color_fons", length = 7)
 	private String capsaleraColorFons;
 	@Column(name = "capsalera_color_lletra", length = 7)

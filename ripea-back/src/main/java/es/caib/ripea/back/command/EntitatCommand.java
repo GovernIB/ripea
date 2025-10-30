@@ -18,17 +18,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Command per al manteniment d'entitats.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Getter @Setter
 @CodiEntitatNoRepetit(campId = "id", campCodi = "codi")
 public class EntitatCommand {
 
 	private Long id;
-
+	
 	@NotEmpty @Size(max=64)
 	private String codi;
 	@NotEmpty @Size(max=256)
@@ -39,10 +34,13 @@ public class EntitatCommand {
 	private String unitatArrel;
 	private MultipartFile logoImg;
 	private boolean logo;
+	private MultipartFile ripeaImg;
+	private boolean logoRipea;
+	private MultipartFile menuImg;
+	private boolean logoMenu;	
 	private String capsaleraColorFons;
 	private String capsaleraColorLletra;
 	private boolean permetreEnviamentPostal;
-
 	
 	public String getCapsaleraColorLletra() {
 		return capsaleraColorLletra;
@@ -99,6 +97,7 @@ public class EntitatCommand {
 			boolean logo) {
 		this.logo = logo;
 	}
+	
 	public static List<EntitatCommand> toEntitatCommands(
 			List<EntitatDto> dtos) {
 		List<EntitatCommand> commands = new ArrayList<EntitatCommand>();
@@ -116,6 +115,8 @@ public class EntitatCommand {
 				dto,
 				EntitatCommand.class);
 		entitat.setLogo(dto.getLogoImgBytes() != null ? true : false);
+		entitat.setLogoRipea(dto.getRipeaImgBytes() != null ? true : false);
+		entitat.setLogoMenu(dto.getMenuImgBytes() != null ? true : false);
 		return entitat;
 	}
 	public static EntitatDto asDto(EntitatCommand command) throws IOException {
@@ -123,6 +124,8 @@ public class EntitatCommand {
 				command,
 				EntitatDto.class);
 		entitat.setLogoImgBytes(command.getLogoImg() != null ? command.getLogoImg().getBytes() : null);
+		entitat.setRipeaImgBytes(command.getRipeaImg() != null ? command.getRipeaImg().getBytes() : null);
+		entitat.setMenuImgBytes(command.getMenuImg() != null ? command.getMenuImg().getBytes() : null);
 		return entitat;
 	}
 

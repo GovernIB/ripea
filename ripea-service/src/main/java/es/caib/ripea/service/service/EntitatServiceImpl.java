@@ -49,9 +49,18 @@ public class EntitatServiceImpl implements EntitatService {
 	public EntitatDto create(EntitatDto entitat) {
 
 		logger.debug("Creant una nova entitat (entitat=" + entitat + ")");
-		EntitatEntity entity = EntitatEntity.getBuilder(entitat.getCodi(), entitat.getNom(), entitat.getDescripcio(), entitat.getCif(),
-								entitat.getUnitatArrel()).logoImgBytes(entitat.getLogoImgBytes()).capsaleraColorFons(entitat.getCapsaleraColorFons()).
-								capsaleraColorLletra(entitat.getCapsaleraColorLletra()).build();
+		EntitatEntity entity = EntitatEntity.getBuilder(
+				entitat.getCodi(),
+				entitat.getNom(),
+				entitat.getDescripcio(),
+				entitat.getCif(),
+				entitat.getUnitatArrel())
+				.logoImgBytes(entitat.getLogoImgBytes())
+				.logoRipeaBytes(entitat.getRipeaImgBytes())
+				.logoMenuBytes(entitat.getMenuImgBytes())
+				.capsaleraColorFons(entitat.getCapsaleraColorFons())
+				.capsaleraColorLletra(entitat.getCapsaleraColorLletra())
+				.build();
 		configHelper.crearConfigsEntitat(entitat.getCodi());
 		return conversioTipusHelper.convertir(entitatRepository.save(entity), EntitatDto.class);
 	}
@@ -70,12 +79,23 @@ public class EntitatServiceImpl implements EntitatService {
 				entitat.getCapsaleraColorFons(),
 				entitat.getCapsaleraColorLletra(),
                 entitat.isPermetreEnviamentPostal());
-
 	
 		if (Utils.isNotEmpty(entitat.getLogoImgBytes())) {
 			entity.updateLogoImgBytes(entitat.getLogoImgBytes());
 		} else if (!entitat.isLogo()) {
 			entity.updateLogoImgBytes(null);
+		}
+		
+		if (Utils.isNotEmpty(entitat.getRipeaImgBytes())) {
+			entity.updateRipeaImgBytes(entitat.getRipeaImgBytes());
+		} else if (!entitat.isLogoRipea()) {
+			entity.updateRipeaImgBytes(null);
+		}
+		
+		if (Utils.isNotEmpty(entitat.getMenuImgBytes())) {
+			entity.updateMenuImgBytes(entitat.getMenuImgBytes());
+		} else if (!entitat.isLogoMenu()) {
+			entity.updateMenuImgBytes(null);
 		}
 
 		return conversioTipusHelper.convertir(entity, EntitatDto.class);

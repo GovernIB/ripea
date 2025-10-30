@@ -37,6 +37,10 @@ public class EntitatDto extends AuditoriaDto {
 	
 	private byte[] logoImgBytes;
 	private boolean logo;
+	private byte[] ripeaImgBytes;
+	private boolean logoRipea;
+	private byte[] menuImgBytes;
+	private boolean logoMenu;
 	private String capsaleraColorFons;
 	private String capsaleraColorLletra;
     private boolean permetreEnviamentPostal;

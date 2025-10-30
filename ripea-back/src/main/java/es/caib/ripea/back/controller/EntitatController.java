@@ -163,15 +163,23 @@ public class EntitatController extends BaseUserController {
 	
 	@RequestMapping(value = "/getEntitatLogo", method = RequestMethod.GET)
 	public String getEntitatLogo(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
 		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request, entitatService);
 		// If there is logo defined for entitat (in database) return it, if not return logo defined for application (in properties file)
 		byte [] logo = entitatActual.getLogoImgBytes() != null ? entitatActual.getLogoImgBytes() : entitatService.getLogo();
 		try {
 			writeFileToResponse(null, logo, response);
-		} catch (Exception ex) {
-			System.out.println(ex.getMessage());
-		}
+		} catch (Exception ex) {}
+		return null;
+	}
+	
+	@RequestMapping(value = "/getRipeaLogo", method = RequestMethod.GET)
+	public String getRipeaLogo(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request, entitatService);
+		// If there is logo defined for entitat (in database) return it, if not return logo defined for application (in properties file)
+		byte [] logo = entitatActual.getRipeaImgBytes() != null ? entitatActual.getRipeaImgBytes() : null;
+		try {
+			writeFileToResponse(null, logo, response);
+		} catch (Exception ex) {}
 		return null;
 	}
 

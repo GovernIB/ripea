@@ -46,6 +46,38 @@
 					$(pare).find('div.alert.alert-danger').remove();
 				}
 		  });
+		  $('#ripeaImg').change(function(){
+			    var path = $(this).val();
+			    if (path) {
+			     	$('#logoRipea').val(true);
+				} else {
+					$('#logoRipea').val(false);
+				}
+			    let tamany = $(this)[0].files[0].size;
+			    var pare = $(this).closest('.fileinput').parent();
+				if (tamany>maxTamanyFitxerUpload) {
+					$(pare).find('div.alert.alert-danger').remove();
+					$(pare).append('<div class="alert alert-danger" style="padding-top: 5px; padding-bottom: 5px; padding-left: 10px; margin-bottom: 0px;" role="alert"><span><spring:message code="MaxFileUploadSize"/></span></div>');
+				} else {
+					$(pare).find('div.alert.alert-danger').remove();
+				}
+		  });
+		  $('#menuImg').change(function(){
+			    var path = $(this).val();
+			    if (path) {
+			     	$('#logoMenu').val(true);
+				} else {
+					$('#logoMenu').val(false);
+				}
+			    let tamany = $(this)[0].files[0].size;
+			    var pare = $(this).closest('.fileinput').parent();
+				if (tamany>maxTamanyFitxerUpload) {
+					$(pare).find('div.alert.alert-danger').remove();
+					$(pare).append('<div class="alert alert-danger" style="padding-top: 5px; padding-bottom: 5px; padding-left: 10px; margin-bottom: 0px;" role="alert"><span><spring:message code="MaxFileUploadSize"/></span></div>');
+				} else {
+					$(pare).find('div.alert.alert-danger').remove();
+				}
+		  });		  
 		});
 	</script>	
 </head>
@@ -64,6 +96,20 @@
 			fileName="${entitatCommand.logo ? 'logo' : ''}" 
 			doNotShowErrors="1"/>
 		<form:hidden path="logo"/>
+		<rip:inputFile 
+			name="ripeaImg" 
+			textKey="entitat.form.camp.ripeaImg"
+			comment="entitat.form.MAX_UPLOAD_SIZE" 
+			fileName="${entitatCommand.logoRipea ? 'logoRipea' : ''}" 
+			doNotShowErrors="1"/>
+		<form:hidden path="logoRipea"/>
+		<rip:inputFile 
+			name="menuImg" 
+			textKey="entitat.form.camp.menuImg"
+			comment="entitat.form.MAX_UPLOAD_SIZE" 
+			fileName="${entitatCommand.logoMenu ? 'logoMenu' : ''}" 
+			doNotShowErrors="1"/>
+		<form:hidden path="logoMenu"/>			
 		<rip:inputText name="capsaleraColorFons" textKey="entitat.form.camp.capsaleraColorFons"/>
 		<rip:inputText name="capsaleraColorLletra" textKey="entitat.form.camp.capsaleraColorLletra"/>
 		<rip:inputCheckbox name="permetreEnviamentPostal" textKey="notificacio.form.entregapostal.permes"/>

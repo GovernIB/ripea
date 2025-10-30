@@ -3,15 +3,25 @@
  */
 package es.caib.ripea.persistence.entity;
 
-import es.caib.ripea.service.intf.config.BaseConfig;
-import lombok.Getter;
-import lombok.Setter;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import javax.persistence.*;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Version;
+
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import es.caib.ripea.service.intf.config.BaseConfig;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Classe del model de dades que representa una Entitat.
@@ -42,6 +52,10 @@ public class EntitatEntity extends RipeaAuditable<Long> {
 	private long version = 0;
 	@Column(name = "logo_img")
 	private byte[] logoImgBytes;
+	@Column(name = "logo_ripea")
+	private byte[] logoRipeaBytes;
+	@Column(name = "logo_menu")
+	private byte[] logoMenuBytes;
 	@Column(name = "capsalera_color_fons", length = 7)
 	private String capsaleraColorFons;
 	@Column(name = "capsalera_color_lletra", length = 7)
@@ -74,13 +88,19 @@ public class EntitatEntity extends RipeaAuditable<Long> {
         this.permetreEnviamentPostal = permetreEnviamentPostal;
     }
 	
-	public void updateLogoImgBytes(
-			byte[] logoImgBytes) {
-		this.logoImgBytes = logoImgBytes;
+	public void updateLogoImgBytes(byte[] imgBytes) {
+		this.logoImgBytes = imgBytes;
 	}
 	
-	public void updateActiva(
-			boolean activa) {
+	public void updateRipeaImgBytes(byte[] imgBytes) {
+		this.logoRipeaBytes = imgBytes;
+	}
+	
+	public void updateMenuImgBytes(byte[] imgBytes) {
+		this.logoMenuBytes = imgBytes;
+	}
+	
+	public void updateActiva(boolean activa) {
 		this.activa = activa;
 	}
 
@@ -141,6 +161,14 @@ public class EntitatEntity extends RipeaAuditable<Long> {
 			built.logoImgBytes = logoImgBytes;
 			return this;
 		}
+		public Builder logoRipeaBytes(byte[] logoRipeaBytes) {
+			built.logoRipeaBytes = logoRipeaBytes;
+			return this;
+		}
+		public Builder logoMenuBytes(byte[] logoMenuBytes) {
+			built.logoMenuBytes = logoMenuBytes;
+			return this;
+		}
 		public Builder capsaleraColorFons(String capsaleraColorFons) {
 			built.capsaleraColorFons = capsaleraColorFons;
 			return this;
@@ -190,7 +218,4 @@ public class EntitatEntity extends RipeaAuditable<Long> {
 				"cif: " + this.cif + ", " +
 				"unitatArrel: " + this.unitatArrel + "]";
 	}
-
-	private static final long serialVersionUID = -2299453443943600172L;
-
 }

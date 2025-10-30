@@ -276,7 +276,14 @@ body {
                         </c:choose>
                     </div>
                     <div id="app-logo" class="pull-left">
-                        <img src="<c:url value="/img/logo.png"/>" height="65" alt="RIPEA" />
+                        <c:choose>
+                            <c:when test="${sessionScope['EntitatHelper.entitatActual'].logoRipeaBytes!=null && fn:length(sessionScope['EntitatHelper.entitatActual'].logoRipeaBytes)!=0}">
+                                <img src="<c:url value="/entitat/getRipeaLogo"/>"  height="65" alt="Govern de les Illes Balears" />
+                            </c:when>
+                            <c:otherwise>
+                                <img src="<c:url value="/img/logo.png"/>" height="65" alt="RIPEA" />
+                            </c:otherwise>
+                        </c:choose>
                     </div>
                 </div>
             </div>
