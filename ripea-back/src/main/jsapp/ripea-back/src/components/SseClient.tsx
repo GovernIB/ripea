@@ -40,7 +40,7 @@ export const useTasquesSession = () => {
 export const SseClient: React.FC = () => {
     
   const eventSourceRef = useRef<EventSource | null>(null);
-  const { save: saveSession, removeAll } = useSseClientSession();
+  const { get, save: saveSession, removeAll } = useSseClientSession();
   const { value: user } = useUserSession();
   const { apiUrl } = useResourceApiContext();
 
@@ -58,6 +58,9 @@ export const SseClient: React.FC = () => {
 
   useEffect(() => {
       if(user && user?.codi) {
+          const alreadyConnected = get(sseConnectedKey);
+          if (alreadyConnected) return;
+
           // Funció per a connectar amb el servidor SSE
           const connectToSSE = () => {
               // Tancar la connexió anterior si existeix
@@ -114,7 +117,7 @@ export const SseClient: React.FC = () => {
               saveSession(sseConnectedKey, false)
           };
       }
-  }, [user]);
+  }, [user?.codi]);
 
   // Aquest component no renderitza res visible
   return null;

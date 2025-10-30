@@ -1,6 +1,6 @@
-import React, {useEffect, useMemo, useRef, useState} from "react";
+import React, {useRef, useState} from "react";
 import {Chip, Icon} from "@mui/material";
-import { useMuiDataGridApiRef, useResourceApiService } from 'reactlib';
+import { useMuiDataGridApiRef } from 'reactlib';
 import {useTranslation} from "react-i18next";
 import StyledMuiGrid, {ToolbarButton} from "../../components/StyledMuiGrid.tsx";
 import useInteressatActions, {useActions} from "./details/InteressatActions.tsx";
@@ -11,7 +11,6 @@ import {InteressatsGridForm} from "./InteressatsGridForm.tsx";
 import {MenuActionButton} from "../../components/MenuButton.tsx";
 import {useUserSession} from "../../components/Session.tsx";
 import useInteressatDetail from "./details/InteressatDetail.tsx";
-import {useCreateGrup} from "./actions/groups/ModifyGrup.tsx";
 import {useGrupGridDialog} from "./GrupGrid.tsx";
 
 const perspectives = ['REPRESENTANT', 'GRUPS']
@@ -23,68 +22,12 @@ interface DetailGridProps {
     onRowCountChange?: (number: number) => void,
 }
 
-export const useInteressatsAmbGrups = (expedientId: number) => {
-
-  const {
-    isReady: apiGrupReady,
-    find: apiFindGrups,
-  } = useResourceApiService("interessatGrupResource");
-
-  const [grups, setGrups] = useState<any[]>([]);
-
-  const commonFilter = useMemo(() => builder.and(
-      builder.or(
-          builder.eq('expedient.id', expedientId)
-      )
-  ), [expedientId]);
-  
-  const refresh = () => {
-    if (expedientId) {
-      apiFindGrups({
-        filter: commonFilter,
-        unpaged: true,
-		perspectives: ["INTERESSATS"],
-      })
-        .then((res) => setGrups(res.rows))
-        .catch(() => setGrups([]));
-    }
-  };
-
-  useEffect(() => {
-    if (apiGrupReady) refresh();
-  }, [apiGrupReady, expedientId]);
-  
-  return {
-    isReady: apiGrupReady,
-    grups,
-    refresh,
-  };
-};
-
 const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
     const {entity, num, onRowCountChange} = props
     const { t } = useTranslation();
     const { value: user } = useUserSession()
     const [selectedRows, setSelectedRows] = useState<any[]>([]);
 	const idToOriginalIdRef = useRef<Record<string, any>>({});
-	
-	// const { isReady, grups, refresh: refreshInteressats } = useInteressatsAmbGrups(entity?.id);
-	//
-	//
-	// const getTipusLabel = (row: any) => {
-	//     if (!row) return '';
-    //
-	//     switch (row.tipus) {
-	//         case 'InteressatPersonaFisicaEntity':
-	//             return t('page.interessat.grid.tipus.personaFisica'); // Persona física
-	//         case 'InteressatPersonaJuridicaEntity':
-	//             return t('page.interessat.grid.tipus.personaJuridica'); // Persona jurídica
-	//         case 'InteressatAdministracioEntity':
-	//             return t('page.interessat.grid.tipus.administrador'); // Grupo
-	//         default:
-	//             return row.tipus || '';
-	//     }
-	// };
 	
     const columns = [
         {
