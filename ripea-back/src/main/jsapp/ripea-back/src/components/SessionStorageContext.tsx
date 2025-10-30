@@ -25,8 +25,11 @@ export const SessionStorageProvider = ({ children }: { children: React.ReactNode
     });
 
     const setValue = (key: string, value: any) => {
-        sessionStorage.setItem(key, JSON.stringify(value));
-        setData((prev) => ({ ...prev, [key]: value }));
+        setData((prev) => {
+            if (prev[key] === value) return prev; // no cambia → evita re-render
+            sessionStorage.setItem(key, JSON.stringify(value));
+            return { ...prev, [key]: value };
+        });
     };
 
     const removeValue = (key: string) => {
@@ -41,9 +44,12 @@ export const SessionStorageProvider = ({ children }: { children: React.ReactNode
     // Detectar cambios externos al sessionStorage (ej: otras pestañas)
     useEffect(() => {
         const handleStorage = (e: StorageEvent) => {
-            if (e.storageArea === sessionStorage) {
+            if (e.storageArea === sessionStorage && e.key) {
                 const newValue = e.newValue ? JSON.parse(e.newValue) : null;
-                setData((prev) => ({ ...prev, [e.key!]: newValue }));
+                setData((prev) => {
+                    if (prev[e.key!] === newValue) return prev; // No cambiar → evita re-render
+                    return { ...prev, [e.key!]: newValue };
+                });
             }
         };
         window.addEventListener('storage', handleStorage);

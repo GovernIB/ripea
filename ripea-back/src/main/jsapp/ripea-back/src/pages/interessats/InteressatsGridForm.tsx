@@ -1,9 +1,9 @@
 import {useTranslation} from "react-i18next";
 import {useFormContext} from "reactlib";
-import {useSession} from "../../components/SessionStorageContext.tsx";
 import {Grid} from "@mui/material";
 import GridFormField, {GridButtonField} from "../../components/GridFormField.tsx";
 import StyledMuiFilter from "../../components/StyledMuiFilter.tsx";
+import {useState} from "react";
 
 const InteressatsGridFormFilter = () => {
     const {data} = useFormContext()
@@ -22,7 +22,7 @@ const InteressatsGridFormFilter = () => {
 export const InteressatsGridForm = () => {
     const { t } = useTranslation();
     const {data} = useFormContext()
-    const { value } = useSession("UNITAT_ORGANITZATIVA_FILTER");
+    const [value, setValue] = useState<{}>({})
     const filterButtons = [
         {
             value: 'search',
@@ -43,8 +43,9 @@ export const InteressatsGridForm = () => {
                 <StyledMuiFilter
                     resourceName={"interessatResource"}
                     code={"UNITAT_ORGANITZATIVA_FILTER"}
-                    springFilterBuilder={()=>{}}
-                    onSpringFilterChange={()=>{}}
+                    sessionKey={null}
+                    springFilterBuilder={(data:any)=> setValue(data)}
+                    onSpringFilterChange={() => {}}
                     buttons={filterButtons}
                 >
                     <InteressatsGridFormFilter/>
@@ -53,7 +54,7 @@ export const InteressatsGridForm = () => {
         }
 
         {data?.tipus === 'InteressatAdministracioEntity' && <GridFormField xs={11} name="organCodi"
-                                                                           requestParams={{...(value ?? []), isInteressatAdministracio: data?.tipus == 'InteressatAdministracioEntity'}}
+                                                                           requestParams={{...(value ?? {}), isInteressatAdministracio: data?.tipus == 'InteressatAdministracioEntity'}}
                                                                            required autocomplete/>}
         <GridButtonField xs={1} name={"filter"} icon={"search"} hidden={data?.tipus != 'InteressatAdministracioEntity'}/>
 

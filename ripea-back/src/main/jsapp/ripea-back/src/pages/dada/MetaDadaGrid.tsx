@@ -40,15 +40,12 @@ const MetaDadaGrid = (props: { entity:any, onRowCountChange?: ((value:number) =>
         if (id) {
             const filter = builder.eq('node.id', id)
             apiFindAll({unpaged: true, filter})
-                .then((result) => setDades(result?.rows))
+                .then((result) => {
+                    setDades(result?.rows)
+                    onRowCountChange?.(result?.rows?.length)
+                })
         }
     }
-
-    useEffect(() => {
-        if(dades){
-            onRowCountChange?.(dades?.length)
-        }
-    }, [dades]);
 
     const refresh = () => {
         apiRef.current.refresh();

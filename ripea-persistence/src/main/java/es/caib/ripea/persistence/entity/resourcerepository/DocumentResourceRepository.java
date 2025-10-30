@@ -68,4 +68,6 @@ public interface DocumentResourceRepository extends BaseRepository<DocumentResou
     List<DocumentResourceEntity> findDocumentsPendentsReintentsArxiu(
             @Param("expedient") ExpedientResourceEntity expedient,
             @Param("arxiuMaxReintentsDocuments") int arxiuMaxReintentsDocuments);
+
+    int countAllByExpedientIdAndEsborrat(Long expedientId, int esborrat);
 }
