@@ -53,9 +53,9 @@ public class EntitatEntity extends RipeaAuditable<Long> {
 	@Column(name = "logo_img")
 	private byte[] logoImgBytes;
 	@Column(name = "logo_ripea")
-	private byte[] logoRipeaBytes;
+	private byte[] ripeaImgBytes;
 	@Column(name = "logo_menu")
-	private byte[] logoMenuBytes;
+	private byte[] menuImgBytes;
 	@Column(name = "capsalera_color_fons", length = 7)
 	private String capsaleraColorFons;
 	@Column(name = "capsalera_color_lletra", length = 7)
@@ -93,11 +93,11 @@ public class EntitatEntity extends RipeaAuditable<Long> {
 	}
 	
 	public void updateRipeaImgBytes(byte[] imgBytes) {
-		this.logoRipeaBytes = imgBytes;
+		this.ripeaImgBytes = imgBytes;
 	}
 	
 	public void updateMenuImgBytes(byte[] imgBytes) {
-		this.logoMenuBytes = imgBytes;
+		this.menuImgBytes = imgBytes;
 	}
 	
 	public void updateActiva(boolean activa) {
@@ -162,11 +162,11 @@ public class EntitatEntity extends RipeaAuditable<Long> {
 			return this;
 		}
 		public Builder logoRipeaBytes(byte[] logoRipeaBytes) {
-			built.logoRipeaBytes = logoRipeaBytes;
+			built.ripeaImgBytes = logoRipeaBytes;
 			return this;
 		}
 		public Builder logoMenuBytes(byte[] logoMenuBytes) {
-			built.logoMenuBytes = logoMenuBytes;
+			built.menuImgBytes = logoMenuBytes;
 			return this;
 		}
 		public Builder capsaleraColorFons(String capsaleraColorFons) {

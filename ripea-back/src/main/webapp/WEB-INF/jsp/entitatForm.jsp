@@ -92,21 +92,21 @@
 		<rip:inputFile 
 			name="logoImg" 
 			textKey="entitat.form.camp.logoImg"
-			comment="entitat.form.MAX_UPLOAD_SIZE" 
+			comment="entitat.form.IMG_FORMAT_LOGO" 
 			fileName="${entitatCommand.logo ? 'logo' : ''}" 
 			doNotShowErrors="1"/>
 		<form:hidden path="logo"/>
 		<rip:inputFile 
 			name="ripeaImg" 
 			textKey="entitat.form.camp.ripeaImg"
-			comment="entitat.form.MAX_UPLOAD_SIZE" 
+			comment="entitat.form.IMG_FORMAT_RIP" 
 			fileName="${entitatCommand.logoRipea ? 'logoRipea' : ''}" 
 			doNotShowErrors="1"/>
 		<form:hidden path="logoRipea"/>
 		<rip:inputFile 
 			name="menuImg" 
 			textKey="entitat.form.camp.menuImg"
-			comment="entitat.form.MAX_UPLOAD_SIZE" 
+			comment="entitat.form.IMG_FORMAT_MENU" 
 			fileName="${entitatCommand.logoMenu ? 'logoMenu' : ''}" 
 			doNotShowErrors="1"/>
 		<form:hidden path="logoMenu"/>			
