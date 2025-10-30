@@ -98,7 +98,7 @@ const StyledMuiFilter = (props:any) => {
         springFilterBuilder={springFilterBuilder}
         onSpringFilterChange={onSpringFilterChange}
         onDataChange={(data:any) => {
-            if (data && Object.keys(data).length > 0 && (!!sessionKey && (!filterData || data != filterData))) {
+            if (data && Object.keys(data).length > 0 && (!!sessionKey && !filterData)) {
                 cercar()
             }
         }}

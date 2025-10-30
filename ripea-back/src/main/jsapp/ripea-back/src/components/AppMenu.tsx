@@ -9,9 +9,10 @@ const menuIcon = 'menu';
 
 export interface AppMenuProps {
   menuEntries: MenuEntry[];
+  logo?: string
 }
 
-export const AppMenu: React.FC<AppMenuProps> = ({ menuEntries }) => {
+export const AppMenu: React.FC<AppMenuProps> = ({ menuEntries, logo }) => {
   const [open, setOpen] = React.useState(false);
   const { value: entitat } = useEntitatSession()
 
@@ -32,6 +33,7 @@ export const AppMenu: React.FC<AppMenuProps> = ({ menuEntries }) => {
       </IconButton>
       {open && <SideMenu
           entries={menuEntries}
+          logo={logo}
           drawerWidth={350}
           iconClicked={open}
           onTitleClose={() => setOpen(false)}

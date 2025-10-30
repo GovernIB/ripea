@@ -1,18 +1,18 @@
-import React, {useCallback, useState} from "react";
+import React, {useCallback, useMemo} from "react";
 import {Grid, Button, Icon} from "@mui/material";
 import {StyledBadge} from "../../components/StyledBadge.tsx";
 import {useEntitatSession, useUserSession} from "../../components/Session.tsx";
 import {useTranslation} from "react-i18next";
 import useExecucioMassiva from "./actions/ExecucioMassivaGrid.tsx";
 import {useNotificacionsSession, useTasquesSession} from "../../components/SseClient.tsx";
-import {MenuEntry, useResourceApiContext} from "reactlib";
+import {useResourceApiContext} from "reactlib";
 import AppMenu from "../../components/AppMenu.tsx";
 import {
     Link as RouterLink,
     LinkProps as RouterLinkProps,
     useLocation,
 } from 'react-router-dom';
-import theme from "../../theme.ts";
+import logo from '../../assets/goib_escut_logo.png';
 
 export const icons = {
     expedient: 'folder',
@@ -66,11 +66,6 @@ const generateMenuItems = (appMenuEntries: any[]) => {
         ))
         : [];
 }
-const generateAppMenu = (menuEntries: MenuEntry[] | undefined) => {
-    return menuEntries?.length
-        ? [<AppMenu key="app_menu" menuEntries={menuEntries} />]
-        : [];
-}
 
 const AppMenuBadge = (props:any) => {
     return <StyledBadge textcolor={'white'} badgecolor={'primary'} {...props}/>
@@ -82,8 +77,13 @@ const MenuBadge = (props:any) => {
 const UserHeadToolbar = () => {
     const { t } = useTranslation();
     const { value: user } = useUserSession();
+    const { value: entitat } = useEntitatSession()
     const { toProgramaAntic } = useToProgramaAntic()
     const location = useLocation();
+
+    const menuLogo = useMemo(() => {
+        return entitat?.logoMenuBytes ? `data:image/png;base64,${entitat?.logoMenuBytes}` : logo;
+    }, [entitat]);
 
     const isRolActualSupAdmin = user?.rolActual == 'IPA_SUPER';
     const isRolActualAdmin = user?.rolActual == 'IPA_ADMIN';
@@ -152,7 +152,7 @@ const UserHeadToolbar = () => {
     return <Grid container rowSpacing={1} columnSpacing={1} item xs={8} flexDirection={"row"} alignContent={'center'} justifyContent={'end'}>
         <Grid item xs={10} display={"flex"} justifyContent={"end"}>{...generateMenuItems(appMenuEntries)} {/* Menu */}</Grid>
         <Grid item xs={1} display={"flex"} justifyContent={"center"}>
-            {...generateAppMenu(menuEntries)} {/* Side Menu */}
+            {menuEntries?.length && <AppMenu key="app_menu" menuEntries={menuEntries} logo={menuLogo}/>} {/* Side Menu */}
             {...contents} {/* Additional content */}
         </Grid>
     </Grid>

@@ -18,7 +18,6 @@ import {
     CSSObject
 } from '@mui/material/styles';
 import {useBaseAppContext, useSmallScreen, useSmallHeader} from "reactlib";
-import logo from '../assets/goib_escut_logo.png';
 import SideWrapper from "./SideWrapper";
 
 export type MenuEntry = {
@@ -251,7 +250,7 @@ const sideMenuClass = 'side-menu';
 const titol = "Menú";
 const closeIcon = 'close';
 
-export const Menu: React.FC<MenuProps & { onClose?: () => void }> = (props) => {
+export const Menu: React.FC<MenuProps & { onClose?: () => void, logo?: string }> = (props) => {
     const {
         title,
         entries,
@@ -260,6 +259,7 @@ export const Menu: React.FC<MenuProps & { onClose?: () => void }> = (props) => {
         iconClicked,
         drawerWidth = 240,
         onClose,
+        logo
     } = props;
     const smallScreen = useSmallScreen();
     const smallHeader = useSmallHeader();

@@ -6,15 +6,11 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
-import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
-import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
-
-import org.springframework.data.annotation.Transient;
 
 @Getter
 @Setter
@@ -42,7 +38,9 @@ public class EntitatResource extends BaseAuditableResource<Long> {
 	private String unitatArrel;
 	private boolean activa;
     private byte[] logoImgBytes;
-	@Size(max = 7)
+    private byte[] logoRipeaBytes;
+    private byte[] logoMenuBytes;
+    @Size(max = 7)
 	private String capsaleraColorFons;
 	@Size(max = 7)
 	private String capsaleraColorLletra;

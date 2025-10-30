@@ -24,6 +24,9 @@ export const App: React.FC = () => {
     const entitatLogo = useMemo(() => {
         return entitat?.logoImgBytes ? `data:image/png;base64,${entitat?.logoImgBytes}` : goib_logo;
     }, [entitat]);
+    const ripeaLogo = useMemo(() => {
+        return entitat?.logoRipeaBytes ? `data:image/png;base64,${entitat?.logoRipeaBytes}` : logo;
+    }, [entitat]);
     const backgroundColor = useMemo(() => {
         return entitat?.capsaleraColorFons
     }, [entitat]);
@@ -41,7 +44,7 @@ export const App: React.FC = () => {
             mr: 4,
             borderRight: `2px solid ${ entitat?.capsaleraColorLletra ?? '#000' }`
         }}
-        title={<img src={logo} style={{ height: '80px', paddingTop: '5px' }} />}
+        title={<img src={ripeaLogo} style={{ height: '80px', paddingTop: '5px' }} />}
         version={version}
         appbarBackgroundColor={backgroundColor ?? "#FFFFFF"}>
         <TitleHeaderConfigurator/>
