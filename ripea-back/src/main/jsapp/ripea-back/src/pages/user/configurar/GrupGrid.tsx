@@ -4,6 +4,7 @@ import {GridPage} from "reactlib";
 import {CardPage} from "../../../components/CardData.tsx";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import {Button, Grid, Icon} from "@mui/material";
+import { Link } from "react-router-dom";
 import GridFormField from "../../../components/GridFormField.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
@@ -66,7 +67,7 @@ const columns = [
         headerName: '',
         sortable: false,
         flex: 0.25,
-        renderCell: (params:any) => <Button href={`/grupPermis/${params?.id}/permis`} variant={'contained'}>
+        renderCell: (params:any) => <Button component={Link} to={`/grupPermis/${params?.row?.id}/permis`} variant={'contained'}>
             <Icon>key</Icon>
         </Button>
     }

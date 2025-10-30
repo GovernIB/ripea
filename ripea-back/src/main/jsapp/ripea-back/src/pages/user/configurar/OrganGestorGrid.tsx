@@ -1,15 +1,13 @@
 import {useTranslation} from "react-i18next";
-import React, {useState} from "react";
+import {useState} from "react";
 import {GridPage} from "reactlib";
 import {CardPage} from "../../../components/CardData.tsx";
 import StyledMuiGrid, {ToolbarButton} from "../../../components/StyledMuiGrid.tsx";
-import {Box, Button, Grid, Icon} from "@mui/material";
+import {Button, Grid, Icon} from "@mui/material";
+import { Link } from "react-router-dom";
 import GridFormField from "../../../components/GridFormField.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
-import MetaExpedient from "../../contingut/details/MetaExpedient.tsx";
-import ContingutIcon from "../../contingut/details/ContingutIcon.tsx";
-import {GridTreeDataGroupingCell} from "@mui/x-data-grid-pro";
 
 const OrganGestorFilterForm = () => {
     return <>
@@ -102,7 +100,7 @@ const OrganGestorGrid = () => {
             headerName: '',
             sortable: false,
             flex: 0.25,
-            renderCell: (params:any) => <Button href={`/organgestor/${params?.row?.id}/permis`} variant={'contained'}>
+            renderCell: (params:any) => <Button component={Link} to={`/organgestor/${params?.row?.id}/permis`} variant={'contained'}>
                 <Icon>key</Icon>
             </Button>
         }
