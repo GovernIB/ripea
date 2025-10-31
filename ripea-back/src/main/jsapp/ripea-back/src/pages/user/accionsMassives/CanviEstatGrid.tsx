@@ -108,6 +108,7 @@ export const CanviEstatMuiGrid = (props:any) => {
     />
 }
 
+const perspectives:any = ['ESTAT']
 const CanviEstatGrid = () => {
     const {t} = useTranslation();
     const apiRef = useMuiDataGridApiRef();
@@ -148,6 +149,7 @@ const CanviEstatGrid = () => {
             <CanviEstatMuiGrid
                 apiRef={apiRef}
                 filter={springFilter}
+                perspectives={perspectives}
 
                 rowAdditionalActions={actions}
                 toolbarMassiveActions={massiveActions}

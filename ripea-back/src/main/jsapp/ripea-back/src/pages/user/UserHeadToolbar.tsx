@@ -703,7 +703,6 @@ const useAccionesMassivas = () => {
                     id: 'portafirmes',
                     title: t('page.user.massive.portafirmes'),
                     // icon: '',
-                    // onClick: ()=> toProgramaAntic('massiu/portafirmes'),
                     to: '/massiu/portafirmes',
                 },
                 {
@@ -754,7 +753,7 @@ const useAccionesMassivas = () => {
                     id: 'anotacio',
                     title: t('page.user.massive.anotacio'),
                     // icon: '',
-                    to: 'massiu/expedientPeticioCanviEstatDistribucio',
+                    to: '/massiu/expedientPeticioCanviEstatDistribucio',
                     hidden: !isRolActualAdmin,
                 },
                 {

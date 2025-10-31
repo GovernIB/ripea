@@ -4,6 +4,7 @@ import {useState} from "react";
 import { CardPage } from "../../../components/CardData.tsx";
 import {CanviEstatFilter, CanviEstatMuiGrid} from "./CanviEstatGrid.tsx";
 
+const perspectives:any = ['ESTAT']
 const TancarGrid = () => {
     const {t} = useTranslation();
     const apiRef = useMuiDataGridApiRef();
@@ -40,6 +41,7 @@ const TancarGrid = () => {
                 apiRef={apiRef}
                 filter={springFilter}
                 // TODO: filtrar por expediente puede cerrar
+                perspectives={perspectives}
 
                 rowAdditionalActions={actions}
                 toolbarMassiveActions={massiveActions}

@@ -124,7 +124,7 @@ const sortModel: any = [{field: 'createdDate', sort: 'desc'}]
 const columns = [
     {
         field: 'nom',
-        flex: 1,
+        flex: 0.75,
         renderCell: (params:any) => <>
             {params?.row?.tipus == "EXPEDIENT" && <Icon>folder_open</Icon>}
             {params?.row?.tipus == "CARPETA" && <Icon>folder</Icon>}
@@ -157,12 +157,17 @@ const columns = [
     {
         field: 'expedient',
         headerName: '',
-        flex: 1.75,
+        flex: 2,
         renderCell: (params:any) => <>
             {/** TODO: revisar columna ubicación */}
             {!!params?.row?.expedient?.id && <>/<a href={`/contingut/${params?.row?.expedient?.id}`} style={{ display: 'flex', alignItems: 'center' }}><Icon>folder_open</Icon>{params?.formattedValue}</a></>}
             {params?.row?.pare?.id != params?.row?.expedient?.id ?<>/.../<Icon>folder</Icon>{params?.row?.pare?.description}</> :"" }
-            {!!params?.row?.fitxerNom && <>/<Icon>description</Icon>{params?.row?.fitxerNom}</>}
+            {/*{!!params?.row?.fitxerNom && <>/<Icon>description</Icon>{params?.row?.fitxerNom}</>}*/}
+            /
+            {params?.row?.tipus == "EXPEDIENT" && <Icon>folder_open</Icon>}
+            {params?.row?.tipus == "CARPETA" && <Icon>folder</Icon>}
+            {params?.row?.tipus == "DOCUMENT" && <Icon>description</Icon>}
+            {params?.row?.nom}
         </>,
     },
 ]

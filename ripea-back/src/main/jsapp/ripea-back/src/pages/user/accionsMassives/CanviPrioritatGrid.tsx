@@ -4,6 +4,7 @@ import {useState} from "react";
 import { CardPage } from "../../../components/CardData.tsx";
 import {CanviEstatFilter, CanviEstatMuiGrid} from "./CanviEstatGrid.tsx";
 
+const perspectives:any = ['ESTAT']
 const CanviPrioritatGrid = () => {
     const {t} = useTranslation();
     const apiRef = useMuiDataGridApiRef();
@@ -39,6 +40,7 @@ const CanviPrioritatGrid = () => {
             <CanviEstatMuiGrid
                 apiRef={apiRef}
                 filter={springFilter}
+                perspectives={perspectives}
 
                 rowAdditionalActions={actions}
                 toolbarMassiveActions={massiveActions}
