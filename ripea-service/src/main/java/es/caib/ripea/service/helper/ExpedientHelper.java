@@ -2862,23 +2862,28 @@ public class ExpedientHelper {
 			}
 		}
 		// check if already exists in arxiu
-		Expedient expedient = pluginHelper.arxiuExpedientConsultar(expedientEntity);
-		boolean carpetaExistsInArxiu = false;
 		String carpetaUuid = null;
-		if (expedient.getContinguts() != null) {
-			for (ContingutArxiu contingutArxiu : expedient.getContinguts()) {
-				String replacedNom = ArxiuConversioHelper.revisarContingutNom(nom);
-				if (contingutArxiu.getTipus() == ContingutTipus.CARPETA &&
-						contingutArxiu.getNom().equals(replacedNom)) {
-					carpetaExistsInArxiu = true;
-					carpetaUuid = contingutArxiu.getIdentificador();
+		boolean carpetaExistsInArxiu = false;
+	
+		if (!contingutHelper.isCarpetaLogica()) {
+			Expedient expedient = pluginHelper.arxiuExpedientConsultar(expedientEntity);
+			if (expedient.getContinguts() != null) {
+				for (ContingutArxiu contingutArxiu : expedient.getContinguts()) {
+					String replacedNom = ArxiuConversioHelper.revisarContingutNom(nom);
+					if (contingutArxiu.getTipus() == ContingutTipus.CARPETA &&
+							contingutArxiu.getNom().equals(replacedNom)) {
+						carpetaExistsInArxiu = true;
+						carpetaUuid = contingutArxiu.getIdentificador();
+					}
 				}
 			}
 		}
+		
 		if (carpetaExistsInDB && carpetaExistsInArxiu && carpetaEntity.getArxiuUuid() == null) {
 			carpetaEntity.updateArxiu(carpetaUuid);
 		}
-		if (!carpetaExistsInDB || !carpetaExistsInArxiu) {
+		
+		if (!carpetaExistsInDB || (!contingutHelper.isCarpetaLogica() && !carpetaExistsInArxiu)) {
 			CarpetaDto carpetaDto = carpetaHelper.create(
 					entitatId,
 					expedientEntity.getId(),
