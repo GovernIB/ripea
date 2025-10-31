@@ -63,13 +63,11 @@ public class AjaxUserController extends BaseUserController {
 		return null;
 	}
 	
-	@RequestMapping(value = "/getRipeaLogo", method = RequestMethod.GET)
-	public String getRipeaLogo(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	@RequestMapping(value = "/getFaviconLogo", method = RequestMethod.GET)
+	public String getFaviconLogo(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request, entitatService);
-		// If there is logo defined for entitat (in database) return it, if not return logo defined for application (in properties file)
-		byte [] logo = entitatActual.getRipeaImgBytes() != null ? entitatActual.getRipeaImgBytes() : null;
 		try {
-			writeFileToResponse(null, logo, response);
+			writeFileToResponse(null, entitatActual.getFaviconImgBytes(), response);
 		} catch (Exception ex) {}
 		return null;
 	}

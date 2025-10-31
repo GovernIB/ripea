@@ -89,29 +89,58 @@
 		<rip:inputText name="nom" textKey="entitat.form.camp.nom" required="true"/>
 		<rip:inputText name="cif" textKey="entitat.form.camp.cif" required="true"/>
 		<rip:inputText name="unitatArrel" textKey="entitat.form.camp.unitat.codi" required="true"/>
-		<rip:inputFile 
-			name="logoImg" 
-			textKey="entitat.form.camp.logoImg"
-			comment="entitat.form.IMG_FORMAT_LOGO" 
-			fileName="${entitatCommand.logo ? 'logo' : ''}" 
-			doNotShowErrors="1"/>
-		<form:hidden path="logo"/>
-		<rip:inputFile 
-			name="ripeaImg" 
-			textKey="entitat.form.camp.ripeaImg"
-			comment="entitat.form.IMG_FORMAT_RIP" 
-			fileName="${entitatCommand.logoRipea ? 'logoRipea' : ''}" 
-			doNotShowErrors="1"/>
-		<form:hidden path="logoRipea"/>
-		<rip:inputFile 
-			name="menuImg" 
-			textKey="entitat.form.camp.menuImg"
-			comment="entitat.form.IMG_FORMAT_MENU" 
-			fileName="${entitatCommand.logoMenu ? 'logoMenu' : ''}" 
-			doNotShowErrors="1"/>
-		<form:hidden path="logoMenu"/>			
-		<rip:inputText name="capsaleraColorFons" textKey="entitat.form.camp.capsaleraColorFons"/>
-		<rip:inputText name="capsaleraColorLletra" textKey="entitat.form.camp.capsaleraColorLletra"/>
+		<fieldset>
+			<legend><spring:message code="entitat.form.lightFields"/></legend>			
+			<rip:inputFile 
+				name="logoImg" 
+				textKey="entitat.form.camp.logoImg"
+				comment="entitat.form.IMG_FORMAT_LOGO" 
+				fileName="${entitatCommand.logo ? 'logo' : ''}" 
+				doNotShowErrors="1"/>
+			<form:hidden path="logo"/>
+			<rip:inputFile 
+				name="menuImg" 
+				textKey="entitat.form.camp.menuImg"
+				comment="entitat.form.IMG_FORMAT_40" 
+				fileName="${entitatCommand.logoMenu ? 'logoMenu' : ''}" 
+				doNotShowErrors="1"/>
+			<form:hidden path="logoMenu"/>			
+			<rip:inputFile 
+				name="faviconImg" 
+				textKey="entitat.form.camp.favicon"
+				comment="entitat.form.IMG_FORMAT_40" 
+				fileName="${entitatCommand.logoFavicon ? 'logoFavicon' : ''}" 
+				doNotShowErrors="1"/>
+			<form:hidden path="logoFavicon"/>			
+			<rip:inputText name="capsaleraColorFons" textKey="entitat.form.camp.capsaleraColorFons"/>
+			<rip:inputText name="capsaleraColorLletra" textKey="entitat.form.camp.capsaleraColorLletra"/>
+		</fieldset>
+		<fieldset>
+			<legend><spring:message code="entitat.form.blackFields"/></legend>			
+			<rip:inputFile 
+				name="blackLogoImg" 
+				textKey="entitat.form.camp.logoImg"
+				comment="entitat.form.IMG_FORMAT_LOGO" 
+				fileName="${entitatCommand.blackLogo ? 'blackLogo' : ''}" 
+				doNotShowErrors="1"/>
+			<form:hidden path="blackLogo"/>
+			<rip:inputFile 
+				name="blackMenuImg" 
+				textKey="entitat.form.camp.menuImg"
+				comment="entitat.form.IMG_FORMAT_40" 
+				fileName="${entitatCommand.blackMenu ? 'blackMenu' : ''}" 
+				doNotShowErrors="1"/>
+			<form:hidden path="blackMenu"/>				
+			<rip:inputFile 
+				name="blackFaviconImg" 
+				textKey="entitat.form.camp.favicon"
+				comment="entitat.form.IMG_FORMAT_40" 
+				fileName="${entitatCommand.blackFavicon ? 'blackFavicon' : ''}" 
+				doNotShowErrors="1"/>
+			<form:hidden path="blackFavicon"/>		
+			<rip:inputText name="blackCapsaleraColorFons" textKey="entitat.form.camp.capsaleraColorFons"/>
+			<rip:inputText name="blackCapsaleraColorLletra" textKey="entitat.form.camp.capsaleraColorLletra"/>
+		</fieldset>		
 		<rip:inputCheckbox name="permetreEnviamentPostal" textKey="notificacio.form.entregapostal.permes"/>
 		<div id="modal-botons">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span>

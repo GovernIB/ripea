@@ -50,16 +50,31 @@ public class EntitatEntity extends RipeaAuditable<Long> {
 	private Set<MetaNodeEntity> metaNodes = new HashSet<MetaNodeEntity>();
 	@Version
 	private long version = 0;
+	
+	//Dades de configuracio modo light
 	@Column(name = "logo_img")
 	private byte[] logoImgBytes;
 	@Column(name = "logo_ripea")
-	private byte[] ripeaImgBytes;
+	private byte[] faviconImgBytes;
 	@Column(name = "logo_menu")
 	private byte[] menuImgBytes;
 	@Column(name = "capsalera_color_fons", length = 7)
 	private String capsaleraColorFons;
 	@Column(name = "capsalera_color_lletra", length = 7)
 	private String capsaleraColorLletra;
+	
+	//Dades de configuracio modo dark
+	@Column(name = "black_logo_img")
+	private byte[] blackLogoImgBytes;
+	@Column(name = "black_logo_ripea")
+	private byte[] blackFaviconImgBytes;
+	@Column(name = "black_logo_menu")
+	private byte[] blackMenuImgBytes;
+	@Column(name = "black_capsalera_color_fons", length = 7)
+	private String blackCapsaleraColorFons;
+	@Column(name = "black_capsalera_color_lletra", length = 7)
+	private String blackCapsaleraColorLletra;	
+	
 	@Column(name = "data_sincronitzacio")
 	@Temporal(TemporalType.TIMESTAMP)
 	Date dataSincronitzacio;
@@ -92,12 +107,32 @@ public class EntitatEntity extends RipeaAuditable<Long> {
 		this.logoImgBytes = imgBytes;
 	}
 	
-	public void updateRipeaImgBytes(byte[] imgBytes) {
-		this.ripeaImgBytes = imgBytes;
+	public void updateFaviconImgBytes(byte[] imgBytes) {
+		this.faviconImgBytes = imgBytes;
 	}
 	
 	public void updateMenuImgBytes(byte[] imgBytes) {
 		this.menuImgBytes = imgBytes;
+	}
+	
+	public void updateBlackLogoImgBytes(byte[] imgBytes) {
+		this.blackLogoImgBytes = imgBytes;
+	}
+	
+	public void updateBlackFaviconImgBytes(byte[] imgBytes) {
+		this.blackFaviconImgBytes = imgBytes;
+	}
+	
+	public void updateBlackMenuImgBytes(byte[] imgBytes) {
+		this.blackMenuImgBytes = imgBytes;
+	}
+	
+	public void updateBlackCapsaleraColorFons(String color) {
+		this.blackCapsaleraColorFons = color;
+	}
+	
+	public void updateBlackCapsaleraColorLletra(String color) {
+		this.capsaleraColorLletra = color;
 	}
 	
 	public void updateActiva(boolean activa) {
@@ -161,8 +196,8 @@ public class EntitatEntity extends RipeaAuditable<Long> {
 			built.logoImgBytes = logoImgBytes;
 			return this;
 		}
-		public Builder logoRipeaBytes(byte[] logoRipeaBytes) {
-			built.ripeaImgBytes = logoRipeaBytes;
+		public Builder logoFaviconBytes(byte[] logoRipeaBytes) {
+			built.faviconImgBytes = logoRipeaBytes;
 			return this;
 		}
 		public Builder logoMenuBytes(byte[] logoMenuBytes) {
@@ -173,14 +208,31 @@ public class EntitatEntity extends RipeaAuditable<Long> {
 			built.capsaleraColorFons = capsaleraColorFons;
 			return this;
 		}
-
 		public Builder capsaleraColorLletra(String capsaleraColorLletra) {
 			built.capsaleraColorLletra = capsaleraColorLletra;
 			return this;
 		}
+		public Builder blackLogoImgBytes(byte[] logoImgBytes) {
+			built.blackLogoImgBytes = logoImgBytes;
+			return this;
+		}
+		public Builder blackFaviconBytes(byte[] logoRipeaBytes) {
+			built.blackFaviconImgBytes = logoRipeaBytes;
+			return this;
+		}
+		public Builder blackLogoMenuBytes(byte[] logoMenuBytes) {
+			built.blackMenuImgBytes = logoMenuBytes;
+			return this;
+		}
+		public Builder blackCapsaleraColorFons(String capsaleraColorFons) {
+			built.blackCapsaleraColorFons = capsaleraColorFons;
+			return this;
+		}
+		public Builder blackCapsaleraColorLletra(String capsaleraColorLletra) {
+			built.blackCapsaleraColorLletra = capsaleraColorLletra;
+			return this;
+		}		
 	}
-	
-	
 
 	@Override
 	public int hashCode() {

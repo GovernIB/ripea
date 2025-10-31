@@ -52,7 +52,14 @@
     <link href="<c:url value="/webjars/bootstrap/3.3.6/dist/css/bootstrap.min.css"/>" rel="stylesheet"/>
     <link href="<c:url value="/webjars/font-awesome/4.7.0/css/font-awesome.min.css"/>" rel="stylesheet"/>
     <link href="<c:url value="/css/estils.css"/>" rel="stylesheet">
-    <link rel="shortcut icon" href="<c:url value="/img/favicon.png"/>" type="image/x-icon" />
+    <c:choose>
+    <c:when test="${sessionScope['EntitatHelper.entitatActual'].faviconImgBytes!=null && fn:length(sessionScope['EntitatHelper.entitatActual'].faviconImgBytes)!=0}">
+    	<link rel="shortcut icon" href="<c:url value="/userajax/getFaviconLogo"/>" type="image/x-icon" />
+    </c:when>
+    <c:otherwise>
+    	<link rel="shortcut icon" href="<c:url value="/img/favicon.png"/>" type="image/x-icon" />
+    </c:otherwise>
+    </c:choose>
     <script src="<c:url value="/webjars/jquery/1.12.4/dist/jquery.min.js"/>"></script>
     <!-- Llibreria per a compatibilitat amb HTML5 -->
     <!--[if lt IE 9]>
@@ -276,14 +283,7 @@ body {
                         </c:choose>
                     </div>
                     <div id="app-logo" class="pull-left">
-                        <c:choose>
-                            <c:when test="${sessionScope['EntitatHelper.entitatActual'].ripeaImgBytes!=null && fn:length(sessionScope['EntitatHelper.entitatActual'].ripeaImgBytes)!=0}">
-                                <img src="<c:url value="/userajax/getRipeaLogo"/>"  height="65" alt="Govern de les Illes Balears" />
-                            </c:when>
-                            <c:otherwise>
-                                <img src="<c:url value="/img/logo.png"/>" height="65" alt="RIPEA" />
-                            </c:otherwise>
-                        </c:choose>
+						<img src="<c:url value="/img/logo.png"/>" height="65" alt="RIPEA" />
                     </div>
                 </div>
             </div>

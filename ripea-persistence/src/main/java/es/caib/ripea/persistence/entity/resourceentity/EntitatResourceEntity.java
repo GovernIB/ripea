@@ -41,16 +41,31 @@ public class EntitatResourceEntity extends BaseAuditableEntity<EntitatResource> 
 	private String unitatArrel;
 	@Column(name = "activa")
 	private boolean activa = true;
+
+	//Dades de configuracio modo light
 	@Column(name = "logo_img")
 	private byte[] logoImgBytes;
 	@Column(name = "logo_ripea")
-	private byte[] logoRipeaBytes;
+	private byte[] faviconImgBytes;
 	@Column(name = "logo_menu")
-	private byte[] logoMenuBytes;	
+	private byte[] menuImgBytes;
 	@Column(name = "capsalera_color_fons", length = 7)
 	private String capsaleraColorFons;
 	@Column(name = "capsalera_color_lletra", length = 7)
 	private String capsaleraColorLletra;
+	
+	//Dades de configuracio modo dark
+	@Column(name = "black_logo_img")
+	private byte[] blackLogoImgBytes;
+	@Column(name = "black_logo_ripea")
+	private byte[] blackFaviconImgBytes;
+	@Column(name = "black_logo_menu")
+	private byte[] blackMenuImgBytes;
+	@Column(name = "black_capsalera_color_fons", length = 7)
+	private String blackCapsaleraColorFons;
+	@Column(name = "black_capsalera_color_lletra", length = 7)
+	private String blackCapsaleraColorLletra;
+
 	@Column(name = "data_sincronitzacio")
 	@Temporal(TemporalType.TIMESTAMP)
 	Date dataSincronitzacio;
