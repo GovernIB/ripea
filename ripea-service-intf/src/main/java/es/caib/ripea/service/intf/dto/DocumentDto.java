@@ -84,6 +84,8 @@ public class DocumentDto extends NodeDto {
 	private Set<ArbreJsonDto> estructuraCarpetes;
 	private String destiId;
 	
+	private String rutaZip;
+	
 	public String getFitxerExtension() {
 		if (fitxerNom != null) {
 			return fitxerNom.substring(

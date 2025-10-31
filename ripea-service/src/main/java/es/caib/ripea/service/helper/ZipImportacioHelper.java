@@ -19,8 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import es.caib.ripea.persistence.entity.ContingutEntity;
-import es.caib.ripea.service.intf.config.PropertyConfig;
-import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentDto;
 import es.caib.ripea.service.intf.dto.DocumentFirmaTipusEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentNtiEstadoElaboracionEnumDto;
@@ -31,7 +29,6 @@ import es.caib.ripea.service.intf.dto.ProgresProcessamentZipDto;
 import es.caib.ripea.service.intf.dto.SignatureInfoDto;
 import es.caib.ripea.service.intf.service.CarpetaService;
 import es.caib.ripea.service.intf.service.DocumentService;
-import es.caib.ripea.service.intf.utils.Utils;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -43,14 +40,16 @@ public class ZipImportacioHelper {
 	private final static DocumentNtiEstadoElaboracionEnumDto NTI_ESTADO_ELABORACION = DocumentNtiEstadoElaboracionEnumDto.EE99; // Altres
 	private final static NtiOrigenEnumDto NTI_ORIGEN = NtiOrigenEnumDto.O0; // Ciutadà
 	
-    @Autowired private DocumentService documentService;
-    @Autowired private CarpetaService carpetaService;
-    @Autowired private ContingutHelper contingutHelper;
-    @Autowired private CarpetaHelper carpetaHelper;
-    @Autowired private ConfigHelper configHelper;
-    @Autowired private PluginHelper pluginHelper;
-    @Autowired private EntityComprovarHelper entityComprovarHelper;
-    @Autowired private MessageHelper messageHelper;
+    @Autowired
+    private DocumentService documentService;
+    @Autowired
+    private CarpetaService carpetaService;
+    @Autowired
+    private CarpetaHelper carpetaHelper;
+    @Autowired
+    private EntityComprovarHelper entityComprovarHelper;
+    @Autowired
+	private MessageHelper messageHelper;
     
     private final Map<String, List<String>> ubicacioDocuments = new HashMap<>();
     private final Map<Long, ProgresProcessamentZipDto> mapProgres = new HashMap<>();
@@ -70,32 +69,12 @@ public class ZipImportacioHelper {
         var documents = convertirDocumentDto(mapDocuments);
 
         for (var documentDto : documents) {
-        	
-            assignarCarpeta(documentDto, entitatId, pareId);
+            assignarCarpeta(
+            		documentDto, 
+            		entitatId, 
+            		pareId);
 
             progres.addInfo(messageHelper.getMessage("contingut.boto.crear.document.multiple.proces", new Object[]{documentDto.getFitxerNom()}));
-            
-            int numDocs = contingutHelper.checkUniqueContraint(documentDto.getNom(), documentDto.getPareId(), entitatId, ContingutTipusEnumDto.DOCUMENT);
-            
-            if (numDocs>0) {
-            	numDocs++;
-            	documentDto.setNom(documentDto.getNom()+"_("+numDocs+")");
-            }
-            
-			//Content type ampliat
-			String contentTypeDoc = Utils.getFitxerContentType(documentDto.getFitxerNom(), documentDto.getFitxerContentType());
-            
-			//1.- comprovar la firma del document com es faria desde el formulari de contingut
-			if (Boolean.parseBoolean(configHelper.getConfig(PropertyConfig.DETECCIO_FIRMA_AUTOMATICA))) {
-            	SignatureInfoDto signatureInfoDto = pluginHelper.detectaFirmaDocument(
-            			documentDto.getFitxerContingut(),
-            			contentTypeDoc);
-            	
-            	if (signatureInfoDto.isSigned()) {
-            		documentDto.setAmbFirma(true);
-            		documentDto.setDocumentFirmaTipus(DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA);
-            	}
-			}
             
             documentService.create(entitatId,
                                    documentDto.getPareId(),
@@ -115,7 +94,7 @@ public class ZipImportacioHelper {
 
     private void assignarCarpeta(DocumentDto documentDto, Long entitatId, Long pareId) {
         var nomFitxer = documentDto.getFitxerNom();
-        var ubicacio = ubicacioDocuments.get(nomFitxer);
+        var ubicacio = ubicacioDocuments.get(documentDto.getRutaZip());
 
         if (ubicacio != null) {
             var pare = entityComprovarHelper.comprovarContingut(pareId);
@@ -140,15 +119,15 @@ public class ZipImportacioHelper {
                 if (entry.isDirectory()) continue;
 
                 var path = Paths.get(entry.getName()).getParent();
-                var nomFitxer = Paths.get(entry.getName()).getFileName().toString().toLowerCase();
-
+                var rutaCompleta = entry.getName();
+                
                 if (path != null) {
                     var ubicacio = new ArrayList<String>();
                     path.forEach(p -> ubicacio.add(p.toString()));
-                    ubicacioDocuments.put(nomFitxer, ubicacio);
+                    ubicacioDocuments.put(rutaCompleta, ubicacio);
                 }
 
-                mapDocuments.put(nomFitxer, llegirBytes(zis));
+                mapDocuments.put(rutaCompleta, llegirBytes(zis));
                 zis.closeEntry();
             }
         }
@@ -187,11 +166,13 @@ public class ZipImportacioHelper {
         return documents;
     }
 
-    private DocumentDto nouDocument(String fitxerNom, byte[] contingut) {
+    private DocumentDto nouDocument(String rutaCompleta, byte[] contingut) {
         var documentDto = new DocumentDto();
+        String fitxerNom = Paths.get(rutaCompleta).getFileName().toString();
         String nom = FilenameUtils.removeExtension(fitxerNom);
         String mimeType = MimeTypeUtils.getMimeType(fitxerNom);
         
+        documentDto.setRutaZip(rutaCompleta);
         documentDto.setNom(nom);
         documentDto.setFitxerNom(fitxerNom);
         documentDto.setFitxerContingut(contingut);
@@ -205,7 +186,7 @@ public class ZipImportacioHelper {
         documentDto.setNtiEstadoElaboracion(NTI_ESTADO_ELABORACION);
         documentDto.setNtiTipoDocumental(NTI_TIPO_DOCUMENTAL);
         
-        //validarFirmes(mimeType, contingut, documentDto);
+        validarFirmes(mimeType, contingut, documentDto);
         
         return documentDto;
     }
@@ -239,19 +220,13 @@ public class ZipImportacioHelper {
                 ? carpeta.getId()
                 : crearCarpeta(entitatId, pareId, nomFitxer, nomCarpeta);
 
-        return crearCarpetaRecursiu(entitatId, pare, carpetaId, nomFitxer, ubicacio);
+        return crearCarpetaRecursiu(entitatId, carpeta, carpetaId, nomFitxer, ubicacio);
     }
 
     private Long crearCarpeta(Long entitatId, Long pareId, String nomFitxer, String nomCarpeta) {
         log.info("Creant la carpeta {} pel document {}", nomCarpeta, nomFitxer);
-        
-        Long idCarpetaExistent = contingutHelper.existCarpetaByNom(nomCarpeta, pareId, entitatId);
-                
-        if (idCarpetaExistent!=null) {
-        	return idCarpetaExistent;
-        } else {
-            var carpeta = carpetaService.create(entitatId, pareId, nomCarpeta);
-            return carpeta != null ? carpeta.getId() : null;        	
-        }
+        var carpeta = carpetaService.create(entitatId, pareId, nomCarpeta);
+        return carpeta != null ? carpeta.getId() : null;
     }
+
 }
