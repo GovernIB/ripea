@@ -759,6 +759,60 @@ public class ConversioTipusHelper {
 					}
 				});	
 		
+		mapperFactory.classMap(DocumentPortafirmesEntity.class, DocumentPortafirmesDto.class) 
+	      	.exclude("annexos")
+	        .byDefault()
+	        .register();
+		
+		mapperFactory.getConverterFactory().registerConverter(
+				new CustomConverter<DocumentPortafirmesEntity, DocumentPortafirmesDto>() {
+					@Override
+					public DocumentPortafirmesDto convert(DocumentPortafirmesEntity source,
+							Type<? extends DocumentPortafirmesDto> destinationType, MappingContext mappingContext) {
+						DocumentPortafirmesDto resultat = new DocumentPortafirmesDto();
+						resultat.setId(source.getId());
+						resultat.setEstat(source.getEstat());
+						resultat.setAssumpte(source.getAssumpte());
+						resultat.setObservacions(source.getObservacions());
+						resultat.setEnviatData(source.getEnviatData());
+						resultat.setProcessatData(source.getProcessatData());
+						resultat.setCancelatData(source.getCancelatData());
+						resultat.setIntentNum(source.getIntentNum());
+						DocumentDto doc = new DocumentDto();
+						doc.setId(source.getDocument().getId());
+						doc.setNom(source.getDocument().getNom());
+						doc.setPareId(source.getDocument().getPareId());
+						resultat.setDocument(doc);
+						resultat.setError(source.isError());
+						resultat.setErrorDescripcio(source.getErrorDescripcio());
+						//Dades especifiques de portafirmes:
+						resultat.setPrioritat(source.getPrioritat());
+						resultat.setCaducitatData(source.getCaducitatData());
+						resultat.setDocumentTipus(source.getDocumentTipus());
+						resultat.setResponsables(source.getResponsables());
+						resultat.setSequenciaTipus(source.getSequenciaTipus());
+						resultat.setFluxTipus(source.getFluxTipus());
+						resultat.setFluxId(source.getFluxId());
+						resultat.setPortafirmesId(source.getPortafirmesId());
+						resultat.setCallbackEstat(source.getCallbackEstat());
+						resultat.setMotiuRebuig(source.getMotiuRebuig());
+						//Dades de auditoria
+						resultat.setCreatedDate(
+								source.getCreatedDate() != null ?
+										Date.from(source.getCreatedDate().get().atZone(ZoneId.systemDefault()).toInstant()) : null);
+						if (source.getCreatedBy().isPresent()) {
+			      			UsuariEntity ue = usuariRepository.findByCodi(source.getCreatedBy().get());
+			      			UsuariDto uDto = new UsuariDto();
+			      			uDto.setCodi(ue.getCodi());
+			      			uDto.setNom(ue.getNom());
+			      			uDto.setNif(ue.getNif());
+			      			uDto.setEmail(ue.getEmail());
+			      			resultat.setCreatedBy(uDto);
+						};
+						return resultat;
+					}
+				});
+		
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<DocumentNotificacioEntity, DocumentNotificacioDto>() {
 
@@ -1104,11 +1158,6 @@ public class ConversioTipusHelper {
           			target.setOrganNom(interessat.getOrganNom());
           		}
 	        })
-	        .byDefault()
-	        .register();
-      
-	      mapperFactory.classMap(DocumentPortafirmesEntity.class, DocumentPortafirmesDto.class) 
-	      	.exclude("annexos")
 	        .byDefault()
 	        .register();
 	      

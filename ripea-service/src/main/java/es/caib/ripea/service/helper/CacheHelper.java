@@ -574,10 +574,11 @@ public class CacheHelper {
 	}
 
 	@Cacheable(value = "enviamentsPortafirmesAmbErrorPerExpedient", key="#expedient")
-	public boolean hasEnviamentsPortafirmesAmbErrorPerExpedient(
-			ExpedientEntity expedient) {
+	public boolean hasEnviamentsPortafirmesAmbErrorPerExpedient(ExpedientEntity expedient) {
 		boolean errorLastEnviament = false;
-		for (ContingutEntity contingut : expedient.getFills()) {
+		//Agafant els fills del expedient, no es contemplen documents dins carpetes
+		List<DocumentEntity> documentsExpedient = documentRepository.findByExpedientAndEsborrat(expedient, 0);
+		for (ContingutEntity contingut : documentsExpedient) {
 			if (contingut instanceof DocumentEntity) {
 				List<DocumentPortafirmesEntity> enviamentsPortafirmes = documentPortafirmesRepository.findByDocumentOrderByCreatedDateDesc(
 						(DocumentEntity) contingut);

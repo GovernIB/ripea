@@ -110,12 +110,14 @@ public class PortafirmesPluginPortafib extends RipeaAbstractPluginProperties imp
 			List<PortafirmesDocument> annexos,
 			boolean signarAnnexos,
 			String idTransaccio) throws SistemaExternException {
-		
-		boolean throwException = false; // throwException = true;
-		if (throwException) {
-			throw new RuntimeException("Mock exception enviar portafirmes ");
-		}
+
 		try {
+			
+			boolean throwException = false; // throwException = true;
+			if (throwException) {
+				throw new Exception("Mock exception enviar portafirmes ");
+			}
+			
 			long peticioDeFirmaId = 0;
 			FirmaAsyncSimpleSignatureRequestWithSignBlockList signatureRequest = new FirmaAsyncSimpleSignatureRequestWithSignBlockList();
 
