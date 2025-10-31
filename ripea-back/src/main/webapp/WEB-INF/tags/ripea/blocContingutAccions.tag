@@ -232,11 +232,33 @@
 	<%--			</c:when>--%>
 			</c:choose>
 			
-			<c:if test="${(empty mostrarObrir or mostrarObrir)}">
-				<c:if test="${(!contingut.carpeta and !isTasca)}">
-					<%---- Detalls ----%>
-					<li class="${(contingut.document && contingut.gesDocAdjuntId!=null) ? 'disabled' : ''}"><a href="<c:url value="/contingut/${contingut.id}"/>" data-toggle="modal" ><span class="fa fa-folder-open-o"></span>&nbsp;<spring:message code="comu.boto.detalls"/></a></li>
+			<%-- VERSIO APB --%>
+			<c:if test="${isCreacioCarpetesLogica}">
+				<c:if test="${(empty mostrarObrir or mostrarObrir)}">
+					<c:choose>
+						<c:when test="${contingut.carpeta}">
+							<li><a href="${(not empty contingut.expedientRelacionat) ? contingut.expedientRelacionat.id : contingut.id}"><span class="fa fa-folder-open-o"></span>&nbsp;<spring:message code="comu.boto.detalls"/></a></li>
+						</c:when>
+						<c:otherwise>
+							<c:if test="${!isTasca}">
+								<%---- Consultar ----%>
+								<li class="${(contingut.document && contingut.gesDocAdjuntId!=null) ? 'disabled' : ''}"><a href="<c:url value="/contingut/${contingut.id}"/>" data-toggle="modal" ><span class="fa fa-folder-open-o"></span>&nbsp;<spring:message code="comu.boto.detalls"/></a></li>
+							</c:if>
+						</c:otherwise>
+					</c:choose>
+					
 					<c:set var="mostrarSeparador" value="${true}"/>
+				</c:if>
+			</c:if>
+			
+			<%-- VERSIO CAIB --%>
+			<c:if test="${!isCreacioCarpetesLogica}">
+				<c:if test="${(empty mostrarObrir or mostrarObrir)}">
+					<c:if test="${(!contingut.carpeta and !isTasca)}">
+						<%---- Detalls ----%>
+						<li class="${(contingut.document && contingut.gesDocAdjuntId!=null) ? 'disabled' : ''}"><a href="<c:url value="/contingut/${contingut.id}"/>" data-toggle="modal" ><span class="fa fa-folder-open-o"></span>&nbsp;<spring:message code="comu.boto.detalls"/></a></li>
+						<c:set var="mostrarSeparador" value="${true}"/>
+					</c:if>
 				</c:if>
 			</c:if>
 			
@@ -269,7 +291,10 @@
 					</c:when>
 					<%--- Carpeta ---%>
 					<c:when test="${contingut.carpeta && isCreacioCarpetesActiva}">
-	<%--					<li><a href="<c:url value="/contingut/${contingut.pare.id}/carpeta/${contingut.id}"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.modificar"/>...</a></li> --%>
+						<%-- Només per APB --%>
+						<c:if test="${isCreacioCarpetesLogica}">
+							<li><a href="<c:url value="/contingut/${contingut.pare.id}/carpeta/${contingut.id}"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.modificar"/>...</a></li>
+						</c:if>
 						<c:set var="mostrarSeparador" value="${true}"/>
 						<li><a href="<c:url value="/contingut/carpeta/${contingut.id}/generarIndex/PDF"/>"><span class="fa fa-list-ol"></span>&nbsp;<spring:message code="carpeta.list.user.recuperar.index.pdf"/>...</a></li>
 						<c:set var="mostrarSeparador" value="${true}"/>
