@@ -88,7 +88,7 @@ const PermisMetaExpedientOrganGrid = (props:any) => {
             label: t('common.delete'),
             icon: "delete",
             showInMenu: true,
-            onClick: (rowId:any, row:any) => eliminar(rowId, {
+            onClick: (rowId:any, row:any) => eliminar(row?.originalId, {
                 classType: 'MET_EXP_ORG',
                 procedimentId: id,
                 organGestor: row?.organGestor
@@ -132,9 +132,14 @@ const PermisMetaExpedientOrganGrid = (props:any) => {
                 if (_rows!=null){
                     for (const row of _rows) {
                         for (const sid of row?.sids) {
-                            if (!additionalRows.map((b) => b.id).includes(sid.id)) {
-                                sid.pareId = row?.id
-                                additionalRows.push(sid)
+                            const newId = row?.id+"-"+sid.id
+                            if (!additionalRows.map((b) => b.id).includes(newId)) {
+                                additionalRows.push({
+                                    ...sid,
+                                    pareId: row?.id,
+                                    originalId: sid.id,
+                                    id: newId,
+                                })
                             }
                         }
                     }
