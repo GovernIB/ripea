@@ -27,7 +27,7 @@ export const AppMenu: React.FC<AppMenuProps> = ({ menuEntries, logo }) => {
         onClick={toggleMenu}
         edge="start"
         // sx={{ mr: 2 }}
-        style={{ color: entitat?.capsaleraColorLletra ?? '#000' }}
+        style={{color: entitat?.conf?.colorLletra}}
       >
         <Icon sx={{ fontSize: '24px', m: 0 }} fontSize={'medium'}>{menuIcon}</Icon>
       </IconButton>

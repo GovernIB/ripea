@@ -37,14 +37,21 @@ public class EntitatResource extends BaseAuditableResource<Long> {
 	@Size(max = 9)
 	private String unitatArrel;
 	private boolean activa;
-    private byte[] logoImgBytes;
-    private byte[] logoRipeaBytes;
-    private byte[] logoMenuBytes;
-    @Size(max = 7)
-	private String capsaleraColorFons;
-	@Size(max = 7)
-	private String capsaleraColorLletra;
 	private Date dataSincronitzacio;
 	private Date dataActualitzacio;
 	private boolean permetreEnviamentPostal;
+
+    //Dades de configuracio modo light
+    private byte[] logoImgBytes;
+    private byte[] faviconImgBytes;
+    private byte[] menuImgBytes;
+    private String capsaleraColorFons;
+    private String capsaleraColorLletra;
+
+    //Dades de configuracio modo dark
+    private byte[] blackLogoImgBytes;
+    private byte[] blackFaviconImgBytes;
+    private byte[] blackMenuImgBytes;
+    private String blackCapsaleraColorFons;
+    private String blackCapsaleraColorLletra;
 }

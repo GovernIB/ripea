@@ -103,11 +103,23 @@ export const useEntitatSession = () => {
         }
     },[apiIsReady])
 
-    // useEffect(()=>{
-    //     console.log(">>>> entitat", value)
-    // },[value])
+    const logo = useMemo(() => {
+        return !(user?.conf?.modeFosc) ? value?.logoImgBytes : value?.blackLogoImgBytes
+    }, [value?.logoImgBytes, value?.blackLogoImgBytes, user?.conf?.modeFosc]);
+    const favicon = useMemo(() => {
+        return !(user?.conf?.modeFosc) ? value?.faviconImgBytes : value?.blackFaviconImgBytes
+    }, [value?.faviconImgBytes, value?.blackFaviconImgBytes, user?.conf?.modeFosc]);
+    const menuicon = useMemo(() => {
+        return !(user?.conf?.modeFosc) ? value?.menuImgBytes : value?.blackMenuImgBytes
+    }, [value?.menuImgBytes, value?.blackMenuImgBytes, user?.conf?.modeFosc]);
+    const colorFons = useMemo(() => {
+        return (!(user?.conf?.modeFosc) ? value?.capsaleraColorFons : value?.blackCapsaleraColorFons) || "#FFFFFF"
+    }, [value?.capsaleraColorFons, value?.blackCapsaleraColorFons, user?.conf?.modeFosc]);
+    const colorLletra = useMemo(() => {
+        return (!(user?.conf?.modeFosc) ? value?.capsaleraColorLletra : value?.blackCapsaleraColorLletra) || '#000'
+    }, [value?.capsaleraColorLletra, value?.blackCapsaleraColorLletra, user?.conf?.modeFosc]);
 
-    return { value, remove }
+    return { value : {...value, conf: {logo, favicon, menuicon, colorFons, colorLletra}}, remove }
 }
 
 export const useOrganSession = () => {
@@ -141,10 +153,6 @@ export const useOrganSession = () => {
             refresh()
         }
     },[apiIsReady])
-
-    // useEffect(()=>{
-    //     console.log(">>>> organ", value)
-    // },[value])
 
     return { value, remove }
 }

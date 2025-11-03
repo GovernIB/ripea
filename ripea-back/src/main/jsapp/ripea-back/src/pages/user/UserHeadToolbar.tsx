@@ -12,7 +12,7 @@ import {
     LinkProps as RouterLinkProps,
     useLocation,
 } from 'react-router-dom';
-import logo from '../../assets/goib_escut_logo.png';
+import {getImgFromBytes} from "../../App.tsx";
 
 export const icons = {
     expedient: 'folder',
@@ -55,7 +55,7 @@ const generateMenuItems = (appMenuEntries: any[]) => {
             <Button
                 className="appMenuItem"
                 key={entry.id}
-                style={{ color: entitat?.capsaleraColorLletra ?? '#000', marginLeft: 0, ...entry?.componentProps }}
+                style={{ color: entitat?.conf?.colorLletra, marginLeft: 0, ...entry?.componentProps }}
                 component={Link}
                 to={entry.to} // Navegació amb React Router
                 onClick={entry?.onClick}
@@ -82,8 +82,8 @@ const UserHeadToolbar = () => {
     const location = useLocation();
 
     const menuLogo = useMemo(() => {
-        return entitat?.logoMenuBytes ? `data:image/png;base64,${entitat?.logoMenuBytes}` : logo;
-    }, [entitat?.logoMenuBytes]);
+        return getImgFromBytes(entitat?.conf?.menuicon)
+    }, [entitat?.conf?.menuicon]);
 
     const isRolActualSupAdmin = user?.rolActual == 'IPA_SUPER';
     const isRolActualAdmin = user?.rolActual == 'IPA_ADMIN';

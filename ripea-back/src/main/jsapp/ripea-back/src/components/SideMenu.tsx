@@ -293,8 +293,8 @@ export const Menu: React.FC<MenuProps & { onClose?: () => void, logo?: string }>
     }
     const drawerContent = <SideWrapper onOutsideClick={handleMenuItemClick}>
         <Box sx={{ mt: smallHeader ? 1 : 1 }} >
-            {logo ? <Box sx={{ display: 'flex', mr: 2, pt: 1, pr: 2, cursor: 'pointer', 'img': { height: '38px' }, pl: 4 }}>
-                <img src={logo} alt="logo" />
+            <Box sx={{ display: 'flex', mr: 2, pt: 1, pr: 2, cursor: 'pointer', 'img': { height: '38px' }, pl: 4 }}>
+                {logo && <img src={logo} alt="logo"/>}
                 <Typography
                     variant="h6"
                     component="span"
@@ -311,7 +311,7 @@ export const Menu: React.FC<MenuProps & { onClose?: () => void, logo?: string }>
                 >
                     <Icon fontSize={'medium'}>{closeIcon}</Icon>
                 </IconButton>
-            </Box> : null}
+            </Box>
             <Divider sx={{ color: '#F6F6F6', mb: 2, mt: 1 }}/>
         </Box>
         {title && <MenuTitle title={title} onClose={onTitleClose} />}
