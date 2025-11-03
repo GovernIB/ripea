@@ -2,6 +2,7 @@ import React, {useEffect} from 'react';
 import {BaseApp} from './components/BaseApp';
 import ripea_logo from './assets/Drassana_RIP_DRA_COL.svg';
 import favicon from './assets/favicon.png'
+import governLogo from './assets/govern-logo.png'
 import AppRoutes from './AppRoutes';
 import {useEntitatSession} from "./components/Session.tsx";
 import TitleHeaderConfigurator from "./TitleHeaderConfigurator.tsx";
@@ -29,7 +30,7 @@ export const App: React.FC = () => {
     }, [entitat?.conf?.favicon, favicon]);
     return <BaseApp
         code="cmd"
-        logo={getImgFromBytes(entitat?.conf?.logo)}
+        logo={getImgFromBytes(entitat?.conf?.logo) || governLogo}
         style={{ height: '64px' }}
         logoStyle={{
             '& img': { height: '49px' },

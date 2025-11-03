@@ -13,6 +13,7 @@ import {
     useLocation,
 } from 'react-router-dom';
 import {getImgFromBytes} from "../../App.tsx";
+import goib_escut_logo from "../../assets/goib_escut_logo.png"
 
 export const icons = {
     expedient: 'folder',
@@ -82,7 +83,7 @@ const UserHeadToolbar = () => {
     const location = useLocation();
 
     const menuLogo = useMemo(() => {
-        return getImgFromBytes(entitat?.conf?.menuicon)
+        return getImgFromBytes(entitat?.conf?.menuicon) || goib_escut_logo
     }, [entitat?.conf?.menuicon]);
 
     const isRolActualSupAdmin = user?.rolActual == 'IPA_SUPER';
