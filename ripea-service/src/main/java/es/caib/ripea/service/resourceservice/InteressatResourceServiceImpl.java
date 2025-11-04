@@ -18,8 +18,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
+import javax.validation.constraints.Size;
 import javax.validation.groups.Default;
 
+import es.caib.ripea.service.intf.dto.*;
 import org.hibernate.Hibernate;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.stereotype.Service;
@@ -68,16 +70,6 @@ import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ReportFileType;
 import es.caib.ripea.service.intf.base.model.Resource;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
-import es.caib.ripea.service.intf.dto.ComunitatDto;
-import es.caib.ripea.service.intf.dto.EntregaPostalTipusEnum;
-import es.caib.ripea.service.intf.dto.InteressatDocumentTipusEnumDto;
-import es.caib.ripea.service.intf.dto.InteressatImportacioTipusDto;
-import es.caib.ripea.service.intf.dto.InteressatTipusEnum;
-import es.caib.ripea.service.intf.dto.MunicipiDto;
-import es.caib.ripea.service.intf.dto.NivellAdministracioDto;
-import es.caib.ripea.service.intf.dto.PaisDto;
-import es.caib.ripea.service.intf.dto.ProvinciaDto;
-import es.caib.ripea.service.intf.dto.UnitatOrganitzativaDto;
 import es.caib.ripea.service.intf.model.ExpedientResource;
 import es.caib.ripea.service.intf.model.InteressatGrupResource;
 import es.caib.ripea.service.intf.model.InteressatResource;
@@ -435,7 +427,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
 
             if (fieldValue!=null && fieldValue.toString().length()==9 && !fieldValue.toString().equals(previous.getDocumentNum())) {
             	
-            	InteressatEntity interessatExistent = interessatRepository.findByExpedientIdAndDocumentNum(previous.getExpedient().getId(), fieldValue.toString());
+            	InteressatResourceEntity interessatExistent = interessatResourceRepository.findByExpedientIdAndDocumentNum(previous.getExpedient().getId(), fieldValue.toString()).orElse(null);
             	
 				if (interessatExistent!=null) {
 
@@ -454,34 +446,48 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
 //                    	target.setId(interessatExistent.getId());
 						target.setDocumentTipus(interessatExistent.getDocumentTipus());
 						target.setNom(interessatExistent.getNom());
-						target.setPais(interessatExistent.getPais());
-						target.setProvincia(interessatExistent.getProvincia());
-						target.setMunicipi(interessatExistent.getMunicipi());
-						target.setCodiPostal(interessatExistent.getCodiPostal());
-						target.setAdresa(interessatExistent.getAdresa());
-						target.setEmail(interessatExistent.getEmail());
-						target.setTelefon(interessatExistent.getTelefon());
-						target.setObservacions(interessatExistent.getObservacions());
-						target.setPreferenciaIdioma(interessatExistent.getPreferenciaIdioma());
-						target.setEntregaDeh(interessatExistent.getEntregaDeh());
-						target.setEntregaDehObligat(interessatExistent.getEntregaDehObligat());
-						
+                        target.setEmail(interessatExistent.getEmail());
+                        target.setTelefon(interessatExistent.getTelefon());
+                        target.setObservacions(interessatExistent.getObservacions());
+                        target.setPreferenciaIdioma(interessatExistent.getPreferenciaIdioma());
+                        target.setEntregaDeh(interessatExistent.getEntregaDeh());
+                        target.setEntregaDehObligat(interessatExistent.getEntregaDehObligat());
+
+                        target.setTipus(interessatExistent.getTipus());
 						switch (interessatExistent.getTipus()) {
-							case ADMINISTRACIO: 
-								InteressatAdministracioEntity interessatAdmExistent = (InteressatAdministracioEntity)interessatExistent;
-								target.setOrganCodi(interessatAdmExistent.getOrganCodi());
-								target.setOrganNom(interessatAdmExistent.getOrganNom());
+							case InteressatAdministracioEntity:
+								target.setOrganCodi(interessatExistent.getOrganCodi());
+								target.setOrganNom(interessatExistent.getOrganNom());
 								break;
-							case PERSONA_FISICA: 
-								InteressatPersonaFisicaEntity interessatFisExistent = (InteressatPersonaFisicaEntity)interessatExistent; 
-								target.setLlinatge1(interessatFisExistent.getLlinatge1());
-								target.setLlinatge2(interessatFisExistent.getLlinatge2());
+							case InteressatPersonaFisicaEntity:
+								target.setLlinatge1(interessatExistent.getLlinatge1());
+								target.setLlinatge2(interessatExistent.getLlinatge2());
 								break;
-							case PERSONA_JURIDICA: 
-								InteressatPersonaJuridicaEntity interessatJuridExistent = (InteressatPersonaJuridicaEntity)interessatExistent;
-								target.setRaoSocial(interessatJuridExistent.getRaoSocial());
+							case InteressatPersonaJuridicaEntity:
+								target.setRaoSocial(interessatExistent.getRaoSocial());
 								break;
 						}
+
+                        // Adreça
+                        target.setPais(interessatExistent.getPais());
+                        target.setProvincia(interessatExistent.getProvincia());
+                        target.setMunicipi(interessatExistent.getMunicipi());
+                        target.setCodiPostal(interessatExistent.getCodiPostal());
+                        target.setAdresa(interessatExistent.getAdresa());
+                        target.setAdressaTipus(interessatExistent.getAdressaTipus());
+                        target.setAdressaTipusVia(interessatExistent.getAdressaTipusVia());
+
+                        target.setAdressaNumCasa(interessatExistent.getAdressaNumCasa());
+                        target.setAdresaQualificador(interessatExistent.getAdresaQualificador());
+                        target.setAdresaPuntKm(interessatExistent.getAdresaPuntKm());
+                        target.setAdresaApartatCorreus(interessatExistent.getAdresaApartatCorreus());
+                        target.setAdresaPortal(interessatExistent.getAdresaPortal());
+                        target.setAdresaEscala(interessatExistent.getAdresaEscala());
+                        target.setAdresaPlanta(interessatExistent.getAdresaPlanta());
+                        target.setAdresaPorta(interessatExistent.getAdresaPorta());
+                        target.setAdresaBloc(interessatExistent.getAdresaBloc());
+                        target.setAdresaComplement(interessatExistent.getAdresaComplement());
+                        target.setAdresaPoblacio(interessatExistent.getAdresaPoblacio());
 					}
 				}
             }
