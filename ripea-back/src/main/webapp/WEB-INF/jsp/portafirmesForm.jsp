@@ -341,17 +341,28 @@ a.btn.input-group-addon.portafirmesResponsables_btn2 {
 					var idTransaccio = transaccioResponse.idTransaccio;
 					if (idTransaccio) {
 						// Tancar transacció en tancar navegador
-						window.addEventListener('beforeunload', function () {
-							event.preventDefault();
-							event.returnValue = '';
-							
-						    const url = "<c:url value='/document/portafirmes/tancarTransaccio/" + idTransaccio + "'/>";
+						const beforeUnloadHandler = function (event) {
+					        if (window._isSubmittingForm) return;
+
+					        event.preventDefault();
+					        event.returnValue = '';
+
+					        console.log("Tancant transacció abans de sortir...");
+
+					        const url = "<c:url value='/document/portafirmes/tancarTransaccio/" + idTransaccio + "'/>";
 						    const data = JSON.stringify({ idTransaccio: idTransaccio });
 						    
 						    navigator.sendBeacon(url, data);
 						    
 						    localStorage.removeItem('tmpTransaccioId');
-						});
+					    };
+					    
+					    window.addEventListener('beforeunload', beforeUnloadHandler);
+					    
+					    document.addEventListener('submit', function () {
+					        window._isSubmittingForm = true;
+					        window.removeEventListener('beforeunload', beforeUnloadHandler);
+					    }, true);
 					}
 					localStorage.setItem('tmpTransaccioId', transaccioResponse.idTransaccio);
 					$('.content').addClass("hidden");
