@@ -294,7 +294,7 @@ export const useCommonActions = (refresh?: () => void) => {
             icon: "lock",
             showInMenu: true,
             onClick: agafar,
-            hidden: (row:any) => isAgafatUsuariActual(row) || !row?.potModificar
+            hidden: (row:any) => isAgafatUsuariActual(row) || !row?.usuariActualWrite
         },
         {
             label: t('page.expedient.action.retornar.label'),

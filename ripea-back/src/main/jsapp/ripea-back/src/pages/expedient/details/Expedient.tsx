@@ -122,7 +122,7 @@ const ExpedientAlert = (props:any) => {
     const {handleOpen: hanldeErrorValidacio, dialog: dialogErrorValidacio} = useErrorValidacio();
 
     return <>
-        {expedient?.agafatPer?.id != user?.codi && expedient?.potModificar &&
+        {expedient?.agafatPer?.id != user?.codi && expedient?.usuariActualWrite &&
             <Alert severity="info"
                    action={
                        <Button sx={{py:0}} 
