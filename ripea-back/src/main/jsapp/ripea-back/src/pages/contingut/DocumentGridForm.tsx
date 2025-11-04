@@ -43,21 +43,12 @@ const ScanerTabForm = () => {
 const FileTabForm = () => {
     const { data } = useFormContext();
 
-	if (data.deteccioFirmaAutomaticaActiva) {
-	    return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-	        <FileFormField xs={12} name="adjunt" required/>
-	        <GridFormField xs={6} name="hasFirma" hidden={!data.adjunt} disabled={data.documentFirmaTipus == "FIRMA_ADJUNTA"} />
-	        <GridFormField xs={6} name="documentFirmaTipus" hidden={!data.adjunt} disabled />
-	        <FileFormField xs={12} name="firmaAdjunt" hidden={data.documentFirmaTipus != "FIRMA_SEPARADA"} required/>
-	    </Grid>
-	}
-	
-	return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-	    <FileFormField xs={12} name="adjunt" required/>
-	    <GridFormField xs={6} name="hasFirma"/>
-	    <GridFormField xs={6} name="documentFirmaTipus" hidden={!data.hasFirma}/>
-	    <FileFormField xs={12} name="firmaAdjunt" hidden={!data.hasFirma || data.documentFirmaTipus != "FIRMA_SEPARADA"} required/>
-	</Grid>
+    return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
+        <FileFormField xs={12} name="adjunt" required/>
+        <GridFormField xs={6} name="hasFirma" hidden={!data.adjunt} disabled={data?.deteccioFirmaAutomaticaActiva && data?.documentFirmaTipus == "FIRMA_ADJUNTA"} />
+        <GridFormField xs={6} name="documentFirmaTipus" hidden={!data?.adjunt || !data?.hasFirma} disabled={data?.deteccioFirmaAutomaticaActiva} required/>
+        <FileFormField xs={12} name="firmaAdjunt" hidden={!data?.hasFirma || data?.documentFirmaTipus != "FIRMA_SEPARADA"} required/>
+    </Grid>
 }
 
 const DocumentsGridForm = () => {
