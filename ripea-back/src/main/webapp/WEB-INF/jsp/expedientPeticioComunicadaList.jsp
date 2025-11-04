@@ -146,8 +146,8 @@ table.dataTable td {
 		<thead>
 			<tr>
 				<th data-col-name="id" data-visible="false"></th>
-				<th data-col-name="identificador" width="20%"><spring:message code="expedient.peticio.list.columna.numero"/></th>
-				<th data-col-name="dataAlta" data-type="datetime" data-converter="datetime"><spring:message code="expedient.peticio.list.columna.comunicacio"/></th>
+				<th data-col-name="identificador" width="12%"><spring:message code="expedient.peticio.list.columna.numero"/></th>
+				<th data-col-name="dataAlta" width="10%" data-type="datetime" data-converter="datetime"><spring:message code="expedient.peticio.list.columna.comunicacio"/></th>
 				<th data-col-name="estat" width="10%"  data-orderable="false" data-template="#cellEstatTemplate">
 					<spring:message code="expedient.peticio.list.columna.estat"/>
 					<script id="cellEstatTemplate" type="text/x-jsrender">
@@ -173,13 +173,13 @@ table.dataTable td {
 					</script>
 				</th>
 
-				<th data-col-name="consultaWsErrorDescShort" width="45%" data-orderable="false" data-template="#cellConsultaWsErrorDesc">
+				<th data-col-name="consultaWsErrorDescShort" width="*" data-orderable="false" data-template="#cellConsultaWsErrorDesc">
 					<spring:message code="expedient.peticio.list.columna.consultaWsErrorDesc"/>
 					<script id="cellConsultaWsErrorDesc" type="text/x-jsrender">
 						<span title="{{:consultaWsErrorDesc}}">{{:consultaWsErrorDescShort}}</span>
 					</script>
 				</th>
-				<th data-col-name="consultaWsErrorDate" data-type="datetime" data-converter="datetime"><spring:message code="expedient.peticio.list.columna.consultaWsErrorDate"/></th>
+				<th data-col-name="consultaWsErrorDate" width="10%" data-type="datetime" data-converter="datetime"><spring:message code="expedient.peticio.list.columna.consultaWsErrorDate"/></th>
 				
 				<th data-col-name="pendentCanviEstatDistribucio" data-template="#cellPendentCanviEstatDistribucio" width="1%" data-orderable="false">
 					<spring:message code="expedient.peticio.list.columna.pendentCanviEstatDistribucio"/>
@@ -190,7 +190,7 @@ table.dataTable td {
 				<th data-col-name="reintentsCanviEstatDistribucio" data-orderable="false" width="1%"><spring:message code="expedient.peticio.list.columna.reintentsCanviEstatDistribucio"/></th>
 				<th data-col-name="anotacioId" data-orderable="false" width="5%">Id</th>
 				
-				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="15%">
+				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="8%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
 						{{if estat == 'CREAT'}}
 							<a href="<c:url value="/expedientPeticioComunicades/comunicadaConsultar/{{:id}}"/>" class="btn btn-default" ><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.consultar"/></a>

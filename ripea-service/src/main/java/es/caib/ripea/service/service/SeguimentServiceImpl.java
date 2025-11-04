@@ -325,8 +325,9 @@ public class SeguimentServiceImpl implements SeguimentService {
 		ordenacioMap.put("expedientNom", new String[] { "expedient.nom" });
 		ordenacioMap.put("tascaNom", new String[] { "metaExpedientTasca.nom" });
 		ordenacioMap.put("tascaEstat", new String[] { "estat" });
-		ordenacioMap.put("responsableActualNom", new String[] { "responsable.nom" });
+		ordenacioMap.put("responsableActualNom", new String[] { "responsableActual.nom" });
 		ordenacioMap.put("data", new String[] { "dataInici" });
+		ordenacioMap.remove("responsable");
 		
 		UsuariEntity responsable = filtre.getResponsableCodi() != null ? usuariHelper.getUsuariByCodi(filtre.getResponsableCodi()) : null;
 		MetaExpedientTascaEntity metaExpedientTascaEntity = filtre.getMetaExpedientTascaId() != null ? metaExpedientTascaRepository.getOne(filtre.getMetaExpedientTascaId()) : null;

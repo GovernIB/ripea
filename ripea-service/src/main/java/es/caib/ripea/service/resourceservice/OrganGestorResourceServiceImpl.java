@@ -10,21 +10,20 @@ import com.turkraft.springfilter.FilterBuilder;
 import com.turkraft.springfilter.parser.Filter;
 
 import es.caib.ripea.persistence.entity.EntitatEntity;
-import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.entity.resourceentity.OrganGestorResourceEntity;
-import es.caib.ripea.persistence.repository.MetaExpedientRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
-import es.caib.ripea.service.helper.OrganGestorHelper;
+import es.caib.ripea.service.helper.OrganismeHelper;
 import es.caib.ripea.service.intf.dto.OrganismeDto;
 import es.caib.ripea.service.intf.model.EntitatResource;
 import es.caib.ripea.service.intf.model.MetaExpedientResource;
 import es.caib.ripea.service.intf.model.OrganGestorResource;
 import es.caib.ripea.service.intf.resourceservice.OrganGestorResourceService;
 import es.caib.ripea.service.intf.utils.Utils;
+import es.caib.ripea.service.permission.ExtendedPermission;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -39,10 +38,8 @@ import lombok.extern.slf4j.Slf4j;
 public class OrganGestorResourceServiceImpl extends BaseMutableResourceService<OrganGestorResource, Long, OrganGestorResourceEntity> implements OrganGestorResourceService {
 	
 	private final OrganGestorRepository organGestorRepository;
-	private final MetaExpedientRepository metaExpedientRepository;
-	
 	private final ConfigHelper configHelper;
-	private final OrganGestorHelper organGestorHelper;
+	private final OrganismeHelper organismeHelper;
 	private final EntityComprovarHelper entityComprovarHelper;
 	
     @Override
@@ -57,49 +54,60 @@ public class OrganGestorResourceServiceImpl extends BaseMutableResourceService<O
 		boolean isDissenyOrgan 	= "IPA_DISSENY".equals(rolActual);
 		boolean isSuper 		= "IPA_SUPER".equals(rolActual);
 		
+		EntitatEntity entitat 		= entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true,false);
+		OrganGestorEntity ogEntity	= null;
+		
     	/**
     	 * Named querys exclusives
     	 */
         Map<String, String> mapaNamedQueries =  Utils.namedQueriesToMap(namedQueries);
     	if (mapaNamedQueries.size()>0) {
     		if (mapaNamedQueries.containsKey("EXPEDIENT_FORM")) {
+    			
     			Long procedimentId = Long.parseLong(mapaNamedQueries.get("EXPEDIENT_FORM"));
     			Filter filtreOrgansProcediment = null;
+    			
     			if (procedimentId>0) {
-	    			MetaExpedientEntity metaExpedientEntity = metaExpedientRepository.findById(procedimentId).get();
-	    			if (!metaExpedientEntity.isComu()) {
-	    				List<OrganismeDto> organsGestorsProcediment = organGestorHelper.findDescendents(
-	    						configHelper.getEntitatActualCodi(),
-	    						metaExpedientEntity.getOrganGestor().getId(),
-	    						null);
-	    				List<Long> organsIds = new ArrayList<Long>();
-						for (OrganismeDto og: organsGestorsProcediment) {
-							organsIds.add(og.getId());
-						}
-	    				List<String> grupsOrgansProcedimentIn = Utils.getIdsEnGruposMil(organsIds);
-	    				
-	    		        if (grupsOrgansProcedimentIn!=null) {
-	    			        for (String aux: grupsOrgansProcedimentIn) {
-	    				        if (aux != null && !aux.isEmpty()) {
-	    				        	filtreOrgansProcediment = FilterBuilder.or(filtreOrgansProcediment, Filter.parse("id IN (" + aux + ")"));
-	    				        }
-	    			        }
-	    		        }
-	    			}
+    				
+    				if (organActualCodi!=null) {
+    					ogEntity	= organGestorRepository.findByEntitatIdAndCodi(entitat.getId(), organActualCodi);
+    				}
+   				
+    				List<OrganismeDto> organismesPermesosCreacioExp = organismeHelper.findPermesosByEntitatAndExpedientTipusIdAndFiltre(
+    						entitat,
+    						procedimentId,
+    						ExtendedPermission.CREATE,
+    						null,
+    						null,
+    						rolActual,
+    						ogEntity!=null?ogEntity.getId():null);
+    				
+    				List<Long> organsIds = new ArrayList<Long>();
+					for (OrganismeDto ogCodi: organismesPermesosCreacioExp) {
+						organsIds.add(ogCodi.getId());
+					}
+					
+					List<String> grupsOrgansPermesosClausulesIn = Utils.getIdsEnGruposMil(organsIds);
+			        if (grupsOrgansPermesosClausulesIn!=null) {
+				        for (String aux: grupsOrgansPermesosClausulesIn) {
+					        if (aux != null && !aux.isEmpty()) {
+					        	filtreOrgansProcediment = FilterBuilder.or(filtreOrgansProcediment, Filter.parse("id" + " IN (" + aux + ")"));
+					        }
+				        }
+			        }
+    			}
+    			
+    			if (filtreOrgansProcediment!=null) {
+    				return filtreOrgansProcediment.generate();
     			} else {
     				return FilterBuilder.equal("id", 0).generate();
-    				// ----------------> return
     			}
-				return filtreOrgansProcediment.generate();
-				// ----------------> return
     		}
     	}
 		
     	/**
     	 * Filtres ordinaris
     	 */
-    	
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true,false);
         Filter filtreBase = (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null;
         Filter filtreResultat = null;
         

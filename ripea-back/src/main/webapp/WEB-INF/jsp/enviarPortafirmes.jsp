@@ -398,7 +398,7 @@
 				url: "<c:url value="/modal/document/portafirmes/iniciarTransaccio"/>",
 				success: function(transaccioResponse, textStatus, XmlHttpRequest) {
 					if (transaccioResponse != null && !transaccioResponse.error) {
-						String idTransaccio = transaccioResponse.idTransaccio;
+						var idTransaccio = transaccioResponse.idTransaccio;
 						if (idTransaccio) {
 							// Tancar transacció en tancar navegador
 							window.addEventListener('beforeunload', function () {

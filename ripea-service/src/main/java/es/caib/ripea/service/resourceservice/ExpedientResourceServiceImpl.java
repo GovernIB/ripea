@@ -1561,33 +1561,39 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
                 ExpedientResource target) {
 
             if (fieldValue != null) {
-                ResourceReference<MetaExpedientResource, Long> reference =
-                        (ResourceReference<MetaExpedientResource, Long>) fieldValue;
-                Optional<MetaExpedientResourceEntity> metaExpedientResourceOptional =
-                        metaExpedientResourceRepository.findById(reference.getId());
-
+            	
+                ResourceReference<MetaExpedientResource, Long> reference = (ResourceReference<MetaExpedientResource, Long>) fieldValue;
+                Optional<MetaExpedientResourceEntity> metaExpedientResourceOptional = metaExpedientResourceRepository.findById(reference.getId());
+                
                 metaExpedientResourceOptional.ifPresent((metaExpedientResourceEntity) -> {
-                    MetaExpedientResource metaExpedientResource =
-                            objectMappingHelper.newInstanceMap(metaExpedientResourceEntity, MetaExpedientResource.class);
-
+                    
+                	MetaExpedientResource metaExpedientResource = objectMappingHelper.newInstanceMap(metaExpedientResourceEntity, MetaExpedientResource.class);
                     target.setGestioAmbGrupsActiva(metaExpedientResource.isGestioAmbGrupsActiva());
+                    
+                    //Calcular la sequència
+                    if (previous.getAny() != null) {
+                        Optional<Long> sequencia = metaExpedientSequenciaResourceRepository
+                                .findValorByMetaExpedientAndAny(metaExpedientResourceEntity, previous.getAny());
+
+                        sequencia.ifPresentOrElse(
+                                (value) -> target.setSequencia(value + 1),
+                                () -> target.setSequencia(1L)
+                        );
+                    }
+                    
                     if (metaExpedientResource.getOrganGestor() != null) {
                         target.setOrganGestor(metaExpedientResource.getOrganGestor());
                         target.setDisableOrganGestor(true);
-                        if (previous.getAny() != null) {
-                            Optional<Long> sequencia = metaExpedientSequenciaResourceRepository
-                                    .findValorByMetaExpedientAndAny(metaExpedientResourceEntity, previous.getAny());
-
-                            sequencia.ifPresentOrElse(
-                                    (value) -> target.setSequencia(value + 1),
-                                    () -> target.setSequencia(1L)
-                            );
-                        }
+                    } else {
+                    	//Procediment comú
+                    	target.setDisableOrganGestor(false);
                     }
                 });
             } else {
+            	//Sense procediment seleccionat al formulari
                 target.setGestioAmbGrupsActiva(false);
                 target.setOrganGestor(null);
+                target.setDisableOrganGestor(true);
                 target.setSequencia(null);
             }
         }

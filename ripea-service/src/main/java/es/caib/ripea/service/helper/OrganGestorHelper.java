@@ -71,7 +71,7 @@ public class OrganGestorHelper {
 	@Autowired private RegistreAnnexRepository registreAnnexRepository;
 	@Autowired private MetaDocumentRepository metaDocumentRepository;
     @Autowired private ConversioTipusHelper conversioTipusHelper;
-
+    
 	public static final String ORGAN_NO_SYNC = "Hi ha canvis pendents de sincronitzar a l'organigrama";
     @Autowired private OrganGestorCacheHelper organGestorCacheHelper;
 
@@ -229,21 +229,17 @@ public class OrganGestorHelper {
 
 	}
 
-	public List<OrganismeDto> findArrelFills(
-			String entitatCodi,
-			String filtre) {
 
+	
+	public List<OrganismeDto> findArrelFills(String entitatCodi, String filtre) {
 		List<OrganismeDto> organismesByEntitat = organGestorCacheHelper.findOrganismesByEntitat(entitatCodi);
 		return filtrarOrganismes(filtre, organismesByEntitat);
 	}
 
-	public List<OrganismeDto> findDescendents(
-			String entitatCodi,
-			Long organId,
-			String filtre) {
-		if (organId == null)
+	public List<OrganismeDto> findDescendents(String entitatCodi, Long organId, String filtre) {
+		if (organId == null) {
 			return new ArrayList<>();
-
+		}
 		OrganGestorEntity organ = organGestorRepository.getOne(organId);
 		List<OrganismeDto> organismesByEntitat = organGestorCacheHelper.getOrganismesDescendentsByOrgan(entitatCodi, organ.getCodi());
 		return filtrarOrganismes(filtre, organismesByEntitat);
@@ -269,7 +265,6 @@ public class OrganGestorHelper {
 		OrganGestorEntity organ = organGestorRepository.getOne(organId);
 		return organGestorCacheHelper.getCodisOrgansFills(entitatCodi, organ.getCodi());
 	}
-
 
 	private List<OrganismeDto> filtrarOrganismes(String filtre, List<OrganismeDto> organismes) {
 		if (StringUtils.isEmpty(filtre))

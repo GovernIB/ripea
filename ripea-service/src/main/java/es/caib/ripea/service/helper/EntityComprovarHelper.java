@@ -585,7 +585,7 @@ public class EntityComprovarHelper {
 			logger.info("[DOC] Comprovant metadDocument-metaExpedient. Obtingut metaDocument (" +
 					"metaDocumentNom=" + metaDocument.getNom() + ", " +
 					"metaDocumentId=" + metaDocument.getId() + ", " +
-					"metaDocument.metaExpedientId=" + metaDocument.getMetaExpedient().getId() + ")");
+					"metaDocument.metaExpedientId=" + (metaDocument.getMetaExpedient()!=null?metaDocument.getMetaExpedient().getId():"null") + ")");
 
 		EntitatEntity metaDocumentEntitat = metaDocument.getEntitat();
 		if (HibernateHelper.isProxy(metaDocumentEntitat)) {
@@ -599,14 +599,14 @@ public class EntityComprovarHelper {
 			throw new ValidationException(id, MetaDocumentEntity.class, "L'entitat especificada (id="
 			        + entitat.getId() + ") no coincideix amb l'entitat del meta-document");
 		}
-		if (metaExpedient != null && !metaExpedient.getId().equals(metaDocument.getMetaExpedient().getId())) {
+		if (metaExpedient != null && metaDocument.getMetaExpedient()!=null && !metaExpedient.getId().equals(metaDocument.getMetaExpedient().getId())) {
 			throw new ValidationException(id, MetaDocumentEntity.class,
 					"El meta-expedient especificat (id=" + metaExpedient.getId() + ") " +
 					"no coincideix amb el meta-expedient del meta-document (" + metaDocument.getMetaExpedient().getId() + ")");
 		}
 		if (cacheHelper.mostrarLogsCreacioContingut())
 			logger.info("[DOC] Comprovat metadDocument-metaExpedient (" +
-					"metaExpedientId=" + metaDocument.getMetaExpedient().getId() + ", " +
+					"metaExpedientId=" + (metaDocument.getMetaExpedient()!=null?metaDocument.getMetaExpedient().getId():"null") + ", " +
 					"metaDocumentId=" + metaDocument.getId() + ")");
 		return metaDocument;
 	}
