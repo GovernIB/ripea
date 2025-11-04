@@ -336,6 +336,9 @@ const translationCa = {
                     title: "Reobrir tasca",
                     ok: "La tasca s'ha reobert correctament",
                 },
+                comment: {
+                    ok: "Comentari afegit a la tasca '{{data.expedientTasca.description}}'",
+                },
             },
         },
         interessat: {
@@ -582,6 +585,9 @@ const translationCa = {
                     label: "Importar documents als expedients seleccionats",
                     title: "Importar documents a expedients",
                     warning: "Els expedients han de pertanyer al mateix procediment",
+                },
+                comment: {
+                    ok: "Comentari afegit a l'expedient '{{data.expedient.description}}'",
                 },
             },
             alert: {

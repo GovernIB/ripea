@@ -6,7 +6,7 @@ import {useNavigate} from "react-router-dom";
 import {formatDate} from '../../util/dateUtils';
 import GridFormField from "../../components/GridFormField.tsx";
 import {useCommonActions} from "./details/CommonActions.tsx";
-import {CommentDialog} from "../CommentDialog.tsx";
+import {ExpedientComment} from "../CommentDialog.tsx";
 import {FollowersDialog} from "../FollowersDialog.tsx";
 import ExpedientFilter from "./ExpedientFilter.tsx";
 import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
@@ -239,11 +239,8 @@ const ExpedientGrid = () => {
             headerName: '',
             sortable: false,
             flex: 0.25,
-            renderCell: (params: any) => <CommentDialog
+            renderCell: (params: any) => <ExpedientComment
                 entity={params?.row}
-                title={`${t('page.comment.expedient')}: ${params?.row?.nom}`}
-                resourceName={'expedientComentariResource'}
-                resourceReference={'expedient'}
                 onClose={refresh}
             />,
             hidden: !user?.conf?.expedientListComentaris,

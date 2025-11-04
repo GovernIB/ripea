@@ -12,7 +12,7 @@ import AnotacionsExpedientGrid from "../../anotacioExpedient/AnotacionsExpedient
 import ExpedientActionButton from "./ExpedientActionButton.tsx";
 import MetaDadaGrid from "../../dada/MetaDadaGrid.tsx";
 import {StyledEstat, StyledPrioritat} from "../ExpedientGrid.tsx";
-import {CommentDialog} from "../../CommentDialog.tsx";
+import {CommentDialog, ExpedientComment} from "../../CommentDialog.tsx";
 import RemesaGrid from "../../remesa/RemesaGrid.tsx";
 import PublicacioGrid from "../../publicacio/PublicacioGrid.tsx";
 import {CardData, CardPage, ContenidoData} from "../../../components/CardData.tsx";
@@ -287,11 +287,8 @@ const Expedient = () => {
                             <TabComponent
                                 tabs={tabs}
                                 variant="scrollable"
-                                headerAdditionalData={expedient?.potModificar ?<CommentDialog
-                                    entity={expedient}
-                                    title={`${t('page.comment.expedient')}: ${expedient?.nom}`}
-                                    resourceName={'expedientComentariResource'}
-                                    resourceReference={'expedient'} /> : <></>}
+                                headerAdditionalData={expedient?.potModificar
+                                    ?<ExpedientComment entity={expedient}/> : <></>}
                             />
                         </Box>
                     </Grid>

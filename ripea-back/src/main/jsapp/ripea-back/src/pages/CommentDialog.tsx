@@ -18,13 +18,14 @@ import {
 } from 'reactlib';
 import { formatDate } from '../util/dateUtils';
 import { useUserSession } from '../components/Session';
+import {useTranslation} from "react-i18next";
 
 const comment = {borderRadius: 2, px: 2, py: 1}
 const myComment = {...comment, bgcolor: '#a5d6a7', alignSelf: 'end'}
 const otherComment = {...comment, bgcolor: '#e0e0e0'}
 
 const Comments = (props: any) => {
-    const { resourceName, id, resourceReference } = props;
+    const { resourceName, id, resourceReference, i18nKeys } = props;
     const { value: user } = useUserSession();
     const {
         isReady: apiIsReady,
@@ -87,7 +88,8 @@ const Comments = (props: any) => {
                         [resourceReference]: { id },
                     }}
                     apiRef={formApiRef}
-                    commonFieldComponentProps={{ size: 'small' }}>
+                    commonFieldComponentProps={{ size: 'small' }}
+                    i18nKeys={i18nKeys}>
                     <Grid container columnSpacing={1} rowSpacing={1}>
                         <Grid size={12} sx={{ display: 'flex' }}>
                             <FormField name="text" />
@@ -101,7 +103,7 @@ const Comments = (props: any) => {
 }
 
 export const CommentDialog = (props: any) => {
-    const { entity, title, resourceName, resourceReference, onClose, iconStyle } = props;
+    const { entity, title, resourceName, resourceReference, onClose, iconStyle, i18nKeys = {} } = props;
     const [dialogShow, dialogComponent] = useMuiContentDialog();
     const { t } = useBaseAppContext();
     const closeButtons = [{
@@ -114,10 +116,11 @@ export const CommentDialog = (props: any) => {
         dialogShow(
             title,
             <>
-                <Comments 
+                <Comments
                     resourceName={resourceName}
                     id={entity?.id}
-                    resourceReference={resourceReference} />
+                    resourceReference={resourceReference}
+                    i18nKeys={i18nKeys}/>
             </>,
             closeButtons,
             { maxWidth: 'md', fullWidth: true }).
@@ -133,4 +136,32 @@ export const CommentDialog = (props: any) => {
         </IconButton>
         {dialogComponent}
     </>;
+}
+
+export const ExpedientComment = (props: any) => {
+    const { entity } = props;
+    const { t } = useTranslation();
+    return <CommentDialog
+        {...props}
+        title={`${t('page.comment.expedient')}: ${entity?.nom}`}
+        resourceName={'expedientComentariResource'}
+        resourceReference={'expedient'}
+        i18nKeys={{
+            createSuccess: 'page.expedient.action.comment.ok',
+        }}
+    />
+}
+
+export const TascaComment = (props: any) => {
+    const { entity } = props;
+    const { t } = useTranslation();
+    return <CommentDialog
+        {...props}
+        title={`${t('page.comment.tasca')}: ${entity?.metaExpedientTascaDescription}`}
+        resourceName={'expedientTascaComentariResource'}
+        resourceReference={'expedientTasca'}
+        i18nKeys={{
+            createSuccess: 'page.tasca.action.comment.ok',
+        }}
+    />
 }

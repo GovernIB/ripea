@@ -336,6 +336,9 @@ const translationEs = {
                     title: "Reabrir tarea",
                     ok: "La tarea se ha reabierto correctamente",
                 },
+                comment: {
+                    ok: "Comentario añadido a la tarea '{{data.expedientTasca.description}}'",
+                },
             },
         },
         interessat: {
@@ -582,6 +585,9 @@ const translationEs = {
                     label: "Importar documentos a los expedientes seleccionados",
                     title: "Importar documentos a expedientes",
                     warning: "Los expedientes deben pertenecer al mismo procedimiento",
+                },
+                comment: {
+                    ok: "Comentario añadido al expediente '{{data.expedient.description}}'",
                 },
             },
             alert: {

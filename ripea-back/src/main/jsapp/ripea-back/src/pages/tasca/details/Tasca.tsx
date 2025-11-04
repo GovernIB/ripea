@@ -7,7 +7,7 @@ import {Button, Grid2 as Grid, Icon, Typography, Box, Card, CardHeader, CardCont
 import {icons} from "../../user/UserHeadToolbar.tsx";
 import {ExpedientInfo} from "../../expedient/details/Expedient.tsx";
 import DocumentsGrid from "../../contingut/DocumentsGrid.tsx";
-import {CommentDialog} from "../../CommentDialog.tsx";
+import {TascaComment} from "../../CommentDialog.tsx";
 import {useActions} from "./TascaActions.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 
@@ -91,13 +91,10 @@ const Tasca = () => {
                     {t('page.tasca.action.finalitzar.label')}
                 </Button>
             }
-            <CommentDialog
+            <TascaComment
                 entity={tasca}
                 iconStyle={{ fontSize: '1.2em'}}
                 sx={{ padding: '0px 10px' }}
-                title={`${t('page.comment.tasca')}: ${tasca?.metaExpedientTascaDescription}`}
-                resourceName={'expedientTascaComentariResource'}
-                resourceReference={'expedientTasca'}
                 componentProps={{variant: "outlined", sx: { borderRadius: '4px' }}}
                 readOnly={tasca?.usuariActualOnlyObservador}
             />

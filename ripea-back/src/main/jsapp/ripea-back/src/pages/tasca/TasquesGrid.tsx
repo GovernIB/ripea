@@ -2,7 +2,7 @@ import {useMuiDataGridApiRef,GridPage} from 'reactlib';
 import {useTranslation} from "react-i18next";
 import { formatDate } from "../../util/dateUtils.ts";
 import {StyledPrioritat} from "../expedient/ExpedientGrid.tsx";
-import {CommentDialog} from "../CommentDialog.tsx";
+import {TascaComment} from "../CommentDialog.tsx";
 import StyledMuiGrid from '../../components/StyledMuiGrid.tsx';
 import TasquesGridFilter from "./TasquesGridFilter.tsx";
 import {useMemo, useState} from "react";
@@ -88,11 +88,8 @@ const TasquesGrid = () => {
             headerName: '',
             sortable: false,
             flex: 0.25,
-            renderCell: (params: any) => <CommentDialog
+            renderCell: (params: any) => <TascaComment
                 entity={params?.row}
-                title={`${t('page.comment.tasca')}: ${params?.row?.metaExpedientTascaDescription}`}
-                resourceName={'expedientTascaComentariResource'}
-                resourceReference={'expedientTasca'}
                 readOnly={params?.row?.usuariActualOnlyObservador}
                 onClose={refresh}
             />
