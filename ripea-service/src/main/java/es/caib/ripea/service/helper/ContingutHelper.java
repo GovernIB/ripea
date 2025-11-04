@@ -2905,7 +2905,7 @@ public class ContingutHelper {
 	}
 	
 	public int checkUniqueContraint (String nom, ContingutEntity pare, EntitatEntity entitat, ContingutTipusEnumDto tipus) {
-		return checkUniqueContraint(nom, pare.getId(), entitat.getId(), tipus);
+		return checkUniqueContraint(nom, pare!=null ?pare.getId() :null, entitat.getId(), tipus);
 	}
 
 	public String getBaseDir() {

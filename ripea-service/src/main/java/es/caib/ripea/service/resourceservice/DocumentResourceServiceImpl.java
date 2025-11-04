@@ -1457,7 +1457,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 	        	List<String> pfResponsables = new ArrayList<String>();
 	        	if (params.getResponsables()!=null) {
 	        		for (ResourceReference <UsuariResource, String> usuari: params.getResponsables()) {
-	        			pfResponsables.add(usuariResourceRepository.findById(usuari.getId()).get().getNif());
+                        usuariResourceRepository.findById(usuari.getId())
+                                        .ifPresent(user -> pfResponsables.add(user.getNif()));
 	        		}
 	        	}
 	        	if (params.getNifsManuals()!=null) {
