@@ -6,13 +6,8 @@ import StyledMuiFilter from "../../components/StyledMuiFilter.tsx";
 import * as builder from '../../util/springFilterUtils';
 
 const ExpedientFilterForm = () => {
-
     const {data} = useFormContext()
     const { value: user } = useUserSession();
-    const xsValue = user?.rolActual != "tothom" ? 7.6 : 6.6;
-    const filterMetaExpedient = data?.organGestor && builder.and(
-        builder.eq('organGestor.id', data?.organGestor?.id),
-    );
 
     if (!data?.advanced) {
         return <>
@@ -22,6 +17,10 @@ const ExpedientFilterForm = () => {
             <GridFormField xs={2.4} name="dataCreacioFinal"/>
         </>
     }
+
+    const filterMetaExpedient = builder.and(
+        builder.eq('organGestor.id', data?.organGestor?.id),
+    );
 
     return <>
         <GridFormField xs={3} name="numero"/>
@@ -50,7 +49,7 @@ const ExpedientFilterForm = () => {
         <GridButtonField xs={1} name={'agafat'} icon={'lock'}/>
         <GridButtonField xs={1} name={'pendentFirmar'} icon={'edit'}/>
         <GridButtonField xs={1} name={'seguit'} icon={'group_add'} hidden={user?.rolActual != "tothom"}/>
-        <Grid item xs={xsValue}/>
+        <Grid item xs={user?.rolActual != "tothom" ? 7.6 : 6.6}/>
     </>
 }
 

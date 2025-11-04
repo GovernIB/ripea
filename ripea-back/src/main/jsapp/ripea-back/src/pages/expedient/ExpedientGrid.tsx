@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useMemo, useState} from "react";
 import {Typography, Icon, Grid} from "@mui/material";
 import {GridPage, useFormContext, useMuiDataGridApiRef,} from 'reactlib';
 import {useTranslation} from "react-i18next";
@@ -153,7 +153,7 @@ const ExpedientGrid = () => {
     const {handleOpen: handelAlert, dialog: dialogAlert} = useAlerta();
     const {handleOpen: hanldeErrorValidacio, dialog: dialogErrorValidacio} = useErrorValidacio();
 
-    const columnsAddition :any[] = [
+    const columnsAddition :any[] = useMemo(() => [
         ...beforeAvis,
         {
             headerName: t('page.expedient.detall.avisos'),
@@ -256,7 +256,7 @@ const ExpedientGrid = () => {
             renderCell: (params: any) => <FollowersDialog entity={params?.row}/>
         },
     ]
-        .filter((col:any)=>!col?.hidden);
+        .filter((col:any)=>!col?.hidden), [user]);
 
     return <GridPage disableMargins>
         <CardPage title={t('page.expedient.filter.title')}>
