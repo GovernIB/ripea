@@ -24,7 +24,9 @@ import java.util.zip.ZipOutputStream;
 
 import javax.annotation.PostConstruct;
 
+import es.caib.ripea.service.helper.*;
 import es.caib.ripea.service.intf.dto.*;
+import es.caib.ripea.service.resourcehelper.ContingutLogResourceHelper;
 import org.apache.commons.collections4.CollectionUtils;
 import org.hibernate.Hibernate;
 import org.springframework.security.core.Authentication;
@@ -61,21 +63,6 @@ import es.caib.ripea.persistence.repository.ExpedientRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
-import es.caib.ripea.service.helper.ApplicationHelper;
-import es.caib.ripea.service.helper.CacheHelper;
-import es.caib.ripea.service.helper.CarpetaHelper;
-import es.caib.ripea.service.helper.ConfigHelper;
-import es.caib.ripea.service.helper.ContingutHelper;
-import es.caib.ripea.service.helper.DocumentHelper;
-import es.caib.ripea.service.helper.DominiHelper;
-import es.caib.ripea.service.helper.EntityComprovarHelper;
-import es.caib.ripea.service.helper.ExcepcioLogHelper;
-import es.caib.ripea.service.helper.ExecucioMassivaHelper;
-import es.caib.ripea.service.helper.ExpedientHelper;
-import es.caib.ripea.service.helper.MessageHelper;
-import es.caib.ripea.service.helper.MetaDocumentHelper;
-import es.caib.ripea.service.helper.PluginHelper;
-import es.caib.ripea.service.helper.ZipImportacioHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
@@ -130,6 +117,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     private final ExpedientResourceRepository expedientResourceRepository;
     private final MetaExpedientResourceRepository metaExpedientResourceRepository;
     private final MetaExpedientSequenciaResourceRepository metaExpedientSequenciaResourceRepository;
+    private final MetaExpedientRepository metaExpedientRepository;
 
     private final ContingutResourceHelper contingutResourceHelper;
     private final ApplicationHelper applicationHelper;
@@ -147,7 +135,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     private final MetaDocumentHelper metaDocumentHelper;
     private final ZipImportacioHelper zipImportacioHelper;
     private final MessageHelper messageHelper;
-    private final MetaExpedientRepository metaExpedientRepository;
+    private final ContingutLogResourceHelper contingutLogResourceHelper;
 
     @PostConstruct
     public void init() {
@@ -181,7 +169,8 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         register(ExpedientResource.ACTION_MASSIVE_DELETE_CODE, new DeleteActionExecutor());
         register(ExpedientResource.ACTION_MASSIVE_REOBRIR_CODE, new ReobrirActionExecutor());
         register(ExpedientResource.ACTION_MASSIVE_IMPORT_DOCS, new ImportarDocumentsMassiu());
-        
+        register(ExpedientResource.ACTION_MASSIVE_RELACIONAR_CODE, new RelacionarActionExecutor());
+
         register(ExpedientResource.ACTION_TANCAR_CODE, new TancarActionExecutor());
         register(ExpedientResource.ACTION_IMPORTAR_CODE, new ImportarActionExecutor());
         register(ExpedientResource.ACTION_SYNC_ARXIU, new SincronitzarArxiuActionExecutor());
@@ -313,24 +302,6 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     		applicationHelper.stopTimer(sample, "METRICS@Subsystem_Expedient.list", "resultado", "error");
     		throw e;
     	}
-    }
-    
-    @Override
-    protected void beforeUpdateSave(ExpedientResourceEntity entity, ExpedientResource resource, Map<String, AnswerValue> answers) {
-        if(resource.getRelacionatsAmb()!=null) {
-            if(!resource.getRelacionatsAmb().isEmpty()) {
-                entity.setRelacionatsAmb(expedientResourceRepository.findAllById(resource.getRelacionatsAmb().stream().map(ResourceReference::getId).collect(Collectors.toList())));
-            }else {
-                entity.getRelacionatsAmb().clear();
-            }
-        }
-        if(resource.getRelacionatsPer()!=null) {
-            if(!resource.getRelacionatsPer().isEmpty()) {
-                entity.setRelacionatsPer(expedientResourceRepository.findAllById(resource.getRelacionatsPer().stream().map(ResourceReference::getId).collect(Collectors.toList())));
-            }else {
-                entity.getRelacionatsPer().clear();
-            }
-        }
     }
 
     @Override
@@ -574,6 +545,48 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         }
     }
 
+    private class RelacionarActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.RelacionarAction, Serializable> {
+
+        @Override
+        public Serializable exec(String code, ExpedientResourceEntity entity, ExpedientResource.RelacionarAction params) throws ActionExecutionException {
+            List<ExpedientResourceEntity> expedientResourceEntityList = expedientResourceRepository.findAllById(params.getIds());
+            if (ExpedientResource.RelacionarAction.Action.ADD.equals(params.getAction())) {
+                for (ExpedientResourceEntity expedientResourceEntity : expedientResourceEntityList) {
+                    if (!entity.getRelacionatsAmb().contains(expedientResourceEntity)) {
+                        entity.getRelacionatsAmb().add(expedientResourceEntity);
+                        contingutLogResourceHelper.crearRelacioExpedientLog(entity, expedientResourceEntity.getId());
+                    }
+                }
+
+                // REMOVE IF UNSELECT
+                List<ExpedientResourceEntity> toRemove = new ArrayList<>();
+                for (ExpedientResourceEntity expedientResourceEntity : entity.getRelacionatsAmb()) {
+                    if (!expedientResourceEntityList.contains(expedientResourceEntity)) {
+                        toRemove.add(expedientResourceEntity);
+                    }
+                }
+                for (ExpedientResourceEntity expedientResourceEntity : toRemove) {
+                    entity.getRelacionatsAmb().remove(expedientResourceEntity);
+                    contingutLogResourceHelper.eliminarRelacioExpedientLog(entity, expedientResourceEntity.getId());
+                }
+            } else {
+                for (ExpedientResourceEntity expedientResourceEntity : expedientResourceEntityList) {
+                    if (entity.getRelacionatsAmb().contains(expedientResourceEntity)) {
+                        entity.getRelacionatsAmb().remove(expedientResourceEntity);
+                        contingutLogResourceHelper.eliminarRelacioExpedientLog(entity, expedientResourceEntity.getId());
+                    }
+                    if (entity.getRelacionatsPer().contains(expedientResourceEntity)) {
+                        entity.getRelacionatsPer().remove(expedientResourceEntity);
+                        contingutLogResourceHelper.eliminarRelacioExpedientLog(entity, expedientResourceEntity.getId());
+                    }
+                }
+            }
+            return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
+        }
+
+        @Override
+        public void onChange(Serializable id, ExpedientResource.RelacionarAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientResource.RelacionarAction target) {}
+    }
     private class AgafarActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
 
         @Override

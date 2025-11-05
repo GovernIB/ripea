@@ -50,7 +50,6 @@ export const useActions = (refresh?: () => void) => {
     const navigate = useNavigate();
 
     const {
-        patch: apiPatch,
         artifactAction: apiAction,
 		artifactReport: apiReport,
     } = useResourceApiService('expedientResource');
@@ -156,10 +155,7 @@ export const useActions = (refresh?: () => void) => {
             confirmDialogComponentProps)
             .then((value: any) => {
                 if (value) {
-                    const relacionatsPer:any = row?.relacionatsPer.filter((r:any)=>r.id!=relacioId);
-                    const relacionatsAmb:any = row?.relacionatsAmb.filter((r:any)=>r.id!=relacioId);
-
-                    apiPatch(id,{data: {relacionatsPer, relacionatsAmb} })
+                    apiAction(id,{ code: 'RELACIONAR', data: {ids: [relacioId], action: 'REMOVE'} })
                         .then(() => {
                             refresh?.()
                             temporalMessageShow(null, t('page.expedient.action.relacio.ok', {expedient: row?.nom}), 'success');

@@ -12,7 +12,7 @@ import AnotacionsExpedientGrid from "../../anotacioExpedient/AnotacionsExpedient
 import ExpedientActionButton from "./ExpedientActionButton.tsx";
 import MetaDadaGrid from "../../dada/MetaDadaGrid.tsx";
 import {StyledEstat, StyledPrioritat} from "../ExpedientGrid.tsx";
-import {CommentDialog, ExpedientComment} from "../../CommentDialog.tsx";
+import {ExpedientComment} from "../../CommentDialog.tsx";
 import RemesaGrid from "../../remesa/RemesaGrid.tsx";
 import PublicacioGrid from "../../publicacio/PublicacioGrid.tsx";
 import {CardData, CardPage, ContenidoData} from "../../../components/CardData.tsx";
