@@ -42,7 +42,9 @@
 	</div>
 	<rip:inputSelect name="prioritat" optionEnum="PrioritatEnumDto" emptyOption="false" textKey="contingut.expedient.form.camp.prioritat" templateResultFunction="showColorPriritats" labelSize="2"/>
 	<rip:inputTextarea name="prioritatMotiu" textKey="expedient.form.prioritat.motiu" required="true" labelSize="2"></rip:inputTextarea>
-	<rip:inputSelect name="seguidor" textKey="contingut.expedient.form.camp.seguidor" labelSize="2" optionEnum="SiNoEnumDto"/>
+	<c:if test="${empty expedientCommand.id}">
+		<rip:inputCheckbox name="seguidor" textKey="contingut.expedient.form.camp.seguidor" labelSize="2"/>
+	</c:if>
 	<div id="modal-botons" class="well">
 		<button type="submit" class="btn btn-success"><span class="fa fa-save"></span>
 			<c:choose>

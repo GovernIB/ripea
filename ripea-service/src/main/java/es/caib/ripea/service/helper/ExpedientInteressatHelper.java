@@ -1029,6 +1029,12 @@ public class ExpedientInteressatHelper {
 		
 		Exception exception = null;
 		try {
+			
+			boolean throwExcepcionAbans = false;
+			if (throwExcepcionAbans) {
+				throw new RuntimeException("Mock excepcion abans de modificar expedient en arxiu");
+			}			
+			
 			contingutHelper.arxiuPropagarModificacio(expedient);
 			
 			updateArxiuIntentInteressats(

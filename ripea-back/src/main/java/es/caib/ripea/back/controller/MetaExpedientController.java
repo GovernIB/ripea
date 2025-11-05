@@ -425,9 +425,12 @@ public class MetaExpedientController extends BaseAdminController {
 				fileNom = fileNom.substring(0, 60);
 			}
 			
+			response.setContentType("application/json; charset=UTF-8");
+			response.setCharacterEncoding("UTF-8");
+			
 			writeFileToResponse(
 					fileNom + "_export.json",
-					json.getBytes(),
+					json.getBytes(StandardCharsets.UTF_8),
 					response);
 		} catch (IOException e) {
 			throw new RuntimeException(e);

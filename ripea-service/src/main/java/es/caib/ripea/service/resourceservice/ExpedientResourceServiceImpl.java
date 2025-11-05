@@ -607,7 +607,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
             				false,
             				false,
             				null);
-            		expedientHelper.agafar(params.getIds().get(0), auth.getName());
+            		expedientHelper.agafar(params.getIds().get(0), auth.getName(), null);
             	}
             }
             return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);

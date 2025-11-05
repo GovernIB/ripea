@@ -949,7 +949,7 @@ public class PortafirmesPluginPortafib extends RipeaAbstractPluginProperties imp
 		return Boolean.valueOf(getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.PORTAFIB_PLUGIN_ENVIAR_URL_EXP),	"false"));
 	}
 	private String getUrlExpedient() {
-		return getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.BASE_URL));
+		return getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.PORTAFIB_PLUGIN_URL_EXP));
 	}
 	@Override
 	public String getEndpointURL() {

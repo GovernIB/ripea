@@ -493,7 +493,7 @@ public class ExecucioMassivaHelper {
 		Throwable exc = null;
 		try {
 			if (ExecucioMassivaTipusDto.AGAFAR_EXPEDIENT.equals(accio)){
-				expedientHelper.agafar(emc.getElementId(), emc.getCreatedBy().get());
+				expedientHelper.agafar(emc.getElementId(), emc.getCreatedBy().get(), "Exec. massiva "+emc.getId());
 			} else if (ExecucioMassivaTipusDto.ALLIBERAR_EXPEDIENT.equals(accio)){
 				expedientHelper.alliberar(emc.getElementId());
 			} else if (ExecucioMassivaTipusDto.RETORNAR_EXPEDIENT.equals(accio)){

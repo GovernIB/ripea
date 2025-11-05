@@ -325,8 +325,7 @@ public class ExpedientHelper {
 				expedient.updateEstatAdditional(estatInicial);
 				// if estat has usuari responsable agafar expedient by this user
 				if (estatInicial.getResponsableCodi() != null) {
-					agafar(expedient, estatInicial.getResponsableCodi());
-					
+					agafar(expedient, estatInicial.getResponsableCodi(), "Responsable de "+estatInicial.getNom());
 				}
 			}
 			
@@ -388,23 +387,20 @@ public class ExpedientHelper {
 		return arxiuPropagarExpedientAmbInteressats(expedientId);
 	}
 	
-	public boolean arxiuPropagarExpedientAmbInteressats(
-			Long expedientId) {
+	public boolean arxiuPropagarExpedientAmbInteressats(Long expedientId) {
 
 		if (cacheHelper.mostrarLogsCreacioContingut())
-			logger.info(
-				"Expedient crear ARXIU Helper START(" +
-						"expedientId=" + expedientId + ")");
-		ExpedientEntity expedient = expedientRepository.getOne(expedientId);
-
-		Exception exception = expedientInteressatHelper.arxiuPropagarInteressats(expedient, null);
+			logger.info("Expedient crear ARXIU Helper START(expedientId=" + expedientId + ")");
 		
+		ExpedientEntity expedient = expedientRepository.getOne(expedientId);
+		Exception exception = expedientInteressatHelper.arxiuPropagarInteressats(expedient, null);		
 		expedient.updateArxiuIntent(true);
 		
-		boolean throwExcepcion = false;//throwExcepcion = true;
+		boolean throwExcepcion = false;
 		if (throwExcepcion) {
 			throw new RuntimeException("Mock excepcion després de crear expedient en arxiu");
 		}
+		
 		if (cacheHelper.mostrarLogsCreacioContingut())
 			logger.info(
 					"Expedient crear ARXIU Helper END(" +
@@ -898,7 +894,7 @@ public class ExpedientHelper {
 					false,
 					false,
 					rolActual);
-			agafar(expedient, usuariHelper.getUsuariAutenticat().getCodi());
+			agafar(expedient, usuariHelper.getUsuariAutenticat().getCodi(), null);
 		}
 		
 		relateExpedientWithPeticioAndSetAnnexosPendent(expedientPeticioId, expedientId);
@@ -1563,11 +1559,11 @@ public class ExpedientHelper {
 		return dto;
 	}
 	
-	public String agafar(Long expedientId, String usuariCodi) {
-		return agafar(expedientRepository.findById(expedientId).get(), usuariCodi);
+	public String agafar(Long expedientId, String usuariCodi, String motiu) {
+		return agafar(expedientRepository.findById(expedientId).get(), usuariCodi, motiu);
 	}
 	
-	public String agafar(ExpedientEntity expedient, String usuariCodi) {
+	public String agafar(ExpedientEntity expedient, String usuariCodi, String motiu) {
 
 		ExpedientEntity expedientSuperior = contingutHelper.getExpedientSuperior(expedient, false, false, false, null);
 		if (expedientSuperior != null) {
@@ -1582,7 +1578,7 @@ public class ExpedientHelper {
 			// Avisa a l'usuari que li han pres
 			emailHelper.contingutAgafatPerAltreUsusari(expedient, usuariOriginal, usuariNou);
 		}
-		contingutLogHelper.log(expedient, LogTipusEnumDto.AGAFAR, usuariCodi, null, false, false);
+		contingutLogHelper.log(expedient, LogTipusEnumDto.AGAFAR, usuariCodi, motiu, false, false);
 
 		return expedient.getNom();
 	}

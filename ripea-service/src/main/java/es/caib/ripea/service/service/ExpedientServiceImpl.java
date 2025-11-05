@@ -807,7 +807,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				false,
 				null);
-		return expedientHelper.agafar(expedient, usuariHelper.getUsuariAutenticat().getCodi());
+		return expedientHelper.agafar(expedient, usuariHelper.getUsuariAutenticat().getCodi(), "Afagar");
 	}
 
 	@Transactional
@@ -826,7 +826,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				null);
 		
-		expedientHelper.agafar(expedient, usuariCodi);
+		expedientHelper.agafar(expedient, usuariCodi, "Assignar");
 	}
 
 	@Transactional
@@ -837,7 +837,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 						", " + "id=" + id + ", " + "usuariCodi=" + usuariCodi + ")");
 		ExpedientEntity expedient = expedientRepository.getOne(id);
 
-		return expedientHelper.agafar(expedient, usuariCodi);
+		return expedientHelper.agafar(expedient, usuariCodi, "Agafar");
 	}
 
 	@Transactional
