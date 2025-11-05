@@ -644,14 +644,17 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         @Override
         public void onChange(Serializable id, DocumentResource previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource target) {
             boolean isDeteccioFirmaAutomaticaActiva = configHelper.getAsBoolean(PropertyConfig.DETECCIO_FIRMA_AUTOMATICA);
+            boolean ambFirma = fieldValue != null && (Boolean) fieldValue;
+            
             if (isDeteccioFirmaAutomaticaActiva) {
                 if (!DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA.equals(previous.getDocumentFirmaTipus())) {
-                    boolean ambFirma = fieldValue != null && (Boolean) fieldValue;
-
                     target.setDocumentFirmaTipus(ambFirma
                             ? DocumentFirmaTipusEnumDto.FIRMA_SEPARADA
                             : DocumentFirmaTipusEnumDto.SENSE_FIRMA);
                 }
+            } else if (ambFirma && DocumentFirmaTipusEnumDto.SENSE_FIRMA.equals(previous.getDocumentFirmaTipus())) {
+            	//Quant no hi ha detecció de firma, i s'ha marcat document amb firma, preseleccionar firma adjunta (el cas mes probable)
+            	target.setDocumentFirmaTipus(DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA);
             }
         }
     }

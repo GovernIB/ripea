@@ -1581,7 +1581,12 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
                 metaExpedientResourceOptional.ifPresent((metaExpedientResourceEntity) -> {
                     
                 	MetaExpedientResource metaExpedientResource = objectMappingHelper.newInstanceMap(metaExpedientResourceEntity, MetaExpedientResource.class);
-                    target.setGestioAmbGrupsActiva(metaExpedientResource.isGestioAmbGrupsActiva());
+                    if (metaExpedientResource.isGestioAmbGrupsActiva()) {
+                    	target.setGestioAmbGrupsActiva(true);
+                    } else {
+                    	target.setGestioAmbGrupsActiva(false);
+                    	target.setGrup(null);
+                    }
                     
                     //Calcular la sequència
                     if (previous.getAny() != null) {
