@@ -1339,7 +1339,7 @@
 		var $tableDocuments = $("#table-documents");
 		var $selectedCarpeta = $tableDocuments.find('tr[id="' + carpetaId + '"]');
 		$selectedCarpeta.nextUntil(':not([data-pnode="treetable-' + carpetaId + '"])').remove();
-		$selectedCarpeta.after("<tr class='loading_carpeta'><td></td><td colspan='7' style='padding-left: 10px; text-align: center;'><img src='/ripea/img/loading.gif'></td></tr>");
+		$selectedCarpeta.after('<tr class="loading_carpeta"><td></td><td colspan="7" style="padding-left: 10px; text-align: center;"><img src="<c:url value="/img/loading.gif"/>"/></td></tr>');
 	}
 </script>
 
