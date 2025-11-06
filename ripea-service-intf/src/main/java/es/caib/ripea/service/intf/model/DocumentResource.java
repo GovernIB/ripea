@@ -625,7 +625,7 @@ public class DocumentResource extends NodeResource {
         resultat.setFitxerNom(this.fitxerNom);
         resultat.setFitxerContingut(this.getFitxerContingut());
         resultat.setFitxerContentType(getFitxerContentType());
-        resultat.setAmbFirma(this.hasFirma);
+        resultat.setAmbFirma(this.hasFirma!=null?this.hasFirma:false);
         switch (this.getDocumentFirmaTipus()) {
             case FIRMA_ADJUNTA:
                 resultat.setTipusFirma(DocumentTipusFirmaEnumDto.ADJUNT);
