@@ -159,6 +159,11 @@ import lombok.experimental.FieldNameConstants;
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientResource.ACTION_MASSIVE_REOBRIR_CODE,
                         formClass = ExpedientResource.MassiveAction.class),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = ExpedientResource.ACTION_MASSIVE_RELACIONAR_CODE,
+                        formClass = ExpedientResource.RelacionarAction.class,
+                        requiresId = true),
 				@ResourceConfigArtifact(
 						type = ResourceArtifactType.REPORT,
 						code = ExpedientResource.REPORT_MASSIVE_EXPORT_ODS_CODE,
@@ -226,6 +231,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
 	public static final String ACTION_MASSIVE_RETORNAR_CODE = "RETORNAR";
 	public static final String ACTION_MASSIVE_DELETE_CODE = "ESBORRAR";
 	public static final String ACTION_MASSIVE_REOBRIR_CODE = "REOBRIR";
+	public static final String ACTION_MASSIVE_RELACIONAR_CODE = "RELACIONAR";
 	public static final String ACTION_MASSIVE_IMPORT_DOCS = "IMPORT_DOCS_MASS";
 	
 	public static final String ACTION_TANCAR_CODE = "TANCAR";
@@ -454,6 +460,19 @@ public class ExpedientResource extends NodeResource implements Serializable {
         @Transient @ResourceField(enumType = true)
         private String tipusDocument;
     }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @FieldNameConstants
+    public static class RelacionarAction implements Serializable {
+        private List<Long> ids;
+        private Action action;
+        public enum Action {
+            ADD,
+            REMOVE,
+        }
+    }
     
     @Getter
     @Setter
@@ -480,7 +499,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
     	private TipusImportEnumDto tipusImportacio = TipusImportEnumDto.NUMERO_REGISTRE;
     	private String codiEni;
     	private String numeroRegistre;
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy", timezone="Europe/Madrid")
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone="Europe/Madrid")
         private Date dataPresentacio;
     	private ResourceReference<CarpetaResource, Long> carpeta;
         private String novaCarpetaNom;

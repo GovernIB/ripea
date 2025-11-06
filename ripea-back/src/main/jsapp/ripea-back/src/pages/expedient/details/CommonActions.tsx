@@ -50,7 +50,6 @@ export const useActions = (refresh?: () => void) => {
     const navigate = useNavigate();
 
     const {
-        patch: apiPatch,
         artifactAction: apiAction,
 		artifactReport: apiReport,
     } = useResourceApiService('expedientResource');
@@ -156,10 +155,7 @@ export const useActions = (refresh?: () => void) => {
             confirmDialogComponentProps)
             .then((value: any) => {
                 if (value) {
-                    const relacionatsPer:any = row?.relacionatsPer.filter((r:any)=>r.id!=relacioId);
-                    const relacionatsAmb:any = row?.relacionatsAmb.filter((r:any)=>r.id!=relacioId);
-
-                    apiPatch(id,{data: {relacionatsPer, relacionatsAmb} })
+                    apiAction(id,{ code: 'RELACIONAR', data: {ids: [relacioId], action: 'REMOVE'} })
                         .then(() => {
                             refresh?.()
                             temporalMessageShow(null, t('page.expedient.action.relacio.ok', {expedient: row?.nom}), 'success');
@@ -242,7 +238,7 @@ export const useCommonActions = (refresh?: () => void) => {
         return row?.agafatPer?.id == user?.codi
     }
     const isUsuariActualWrite = (row:any) :boolean => {
-        return row?.usuariActualWrite
+        return row?.usuariActualWrite || user?.rolActual == "IPA_ADMIN_LECTURA"
     }
     const isAdminOAdminOrgan = (row:any) :boolean => {
         return (isRolActualAdmin && permisos?.permisAdministrador) || ( isRolActualOrganAdmin && permisos?.organs?.some((e:any)=>e.id == row?.organGestor?.id) )
@@ -294,7 +290,7 @@ export const useCommonActions = (refresh?: () => void) => {
             icon: "lock",
             showInMenu: true,
             onClick: agafar,
-            hidden: (row:any) => isAgafatUsuariActual(row) || !row?.potModificar
+            hidden: (row:any) => isAgafatUsuariActual(row) || !row?.usuariActualWrite
         },
         {
             label: t('page.expedient.action.retornar.label'),

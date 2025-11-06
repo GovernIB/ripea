@@ -12,6 +12,7 @@ import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -21,8 +22,6 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
-import es.caib.ripea.persistence.entity.resourcerepository.*;
-import es.caib.ripea.service.intf.dto.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.fundaciobit.apisib.apifirmasimple.v1.beans.FirmaSimpleStartTransactionRequest;
@@ -37,10 +36,18 @@ import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.ViaFirmaUsuariEntity;
 import es.caib.ripea.persistence.entity.resourceentity.DocumentResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.ExpedientResourceEntity;
+import es.caib.ripea.persistence.entity.resourceentity.InteressatGrupResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.InteressatResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaDocumentResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.RegistreAnnexResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.UsuariResourceEntity;
+import es.caib.ripea.persistence.entity.resourcerepository.ContingutResourceRepository;
+import es.caib.ripea.persistence.entity.resourcerepository.DocumentResourceRepository;
+import es.caib.ripea.persistence.entity.resourcerepository.InteressatGrupResourceRepository;
+import es.caib.ripea.persistence.entity.resourcerepository.InteressatResourceRepository;
+import es.caib.ripea.persistence.entity.resourcerepository.MetaDocumentResourceRepository;
+import es.caib.ripea.persistence.entity.resourcerepository.RegistreAnnexResourceRepository;
+import es.caib.ripea.persistence.entity.resourcerepository.UsuariResourceRepository;
 import es.caib.ripea.persistence.repository.ContingutMovimentRepository;
 import es.caib.ripea.persistence.repository.ContingutRepository;
 import es.caib.ripea.persistence.repository.DocumentNotificacioRepository;
@@ -76,6 +83,34 @@ import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ReportFileType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.config.PropertyConfig;
+import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
+import es.caib.ripea.service.intf.dto.ArxiuFirmaDto;
+import es.caib.ripea.service.intf.dto.DigitalitzacioPerfilDto;
+import es.caib.ripea.service.intf.dto.DigitalitzacioTransaccioRespostaDto;
+import es.caib.ripea.service.intf.dto.DocumentDto;
+import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentFirmaTipusEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentNotificacioDto;
+import es.caib.ripea.service.intf.dto.DocumentNotificacioEstatEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentNotificacioTipusEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentPublicacioDto;
+import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentVersioDto;
+import es.caib.ripea.service.intf.dto.FitxerDto;
+import es.caib.ripea.service.intf.dto.InteressatDocumentTipusEnumDto;
+import es.caib.ripea.service.intf.dto.InteressatTipusEnum;
+import es.caib.ripea.service.intf.dto.MetaDocumentFirmaFluxTipusEnumDto;
+import es.caib.ripea.service.intf.dto.MetaNodeDto;
+import es.caib.ripea.service.intf.dto.MunicipiDto;
+import es.caib.ripea.service.intf.dto.PaisDto;
+import es.caib.ripea.service.intf.dto.PinbalConsultaDto;
+import es.caib.ripea.service.intf.dto.PortafirmesFluxRespostaDto;
+import es.caib.ripea.service.intf.dto.PortafirmesIniciFluxRespostaDto;
+import es.caib.ripea.service.intf.dto.Resum;
+import es.caib.ripea.service.intf.dto.SignatureInfoDto;
+import es.caib.ripea.service.intf.dto.UsuariDto;
+import es.caib.ripea.service.intf.dto.ViaFirmaDispositiuDto;
+import es.caib.ripea.service.intf.dto.ViaFirmaEnviarDto;
 import es.caib.ripea.service.intf.exception.ValidationException;
 import es.caib.ripea.service.intf.model.DocumentResource;
 import es.caib.ripea.service.intf.model.DocumentResource.IniciarFirmaSimple;
@@ -85,6 +120,7 @@ import es.caib.ripea.service.intf.model.DocumentResource.NotificarFormAction;
 import es.caib.ripea.service.intf.model.DocumentResource.UpdateTipusDocumentFormAction;
 import es.caib.ripea.service.intf.model.DocumentResource.ViaFirmaForm;
 import es.caib.ripea.service.intf.model.ExpedientResource;
+import es.caib.ripea.service.intf.model.InteressatGrupResource;
 import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.model.MetaDocumentResource;
 import es.caib.ripea.service.intf.model.NodeResource.MassiveAction;
@@ -94,7 +130,6 @@ import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.resourcehelper.ContingutResourceHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -131,6 +166,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     private final ContingutRepository contingutRepository;
     private final DocumentRepository documentRepository;
     private final EntitatRepository entitatRepository;
+    private final InteressatGrupResourceRepository interessatGrupResourceRepository;
 
     @PostConstruct
     public void init() {
@@ -178,8 +214,10 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 			//Camps transient per inicialitzar al carregar el formulari
 	        target.setPluginSummarizeActiu(Utils.hasValue(configHelper.getConfig(PropertyConfig.SUMMARIZE_PLUGIN_CLASS)));
 	        target.setFuncionariHabilitatDigitalib(rolHelper.doesCurrentUserHasRol("DIB_USER"));
-
-            if(previous.getAdjunt()!=null) {
+	        target.setDeteccioFirmaAutomaticaActiva(configHelper.getAsBoolean(PropertyConfig.DETECCIO_FIRMA_AUTOMATICA));
+	        target.setDocumentFirmaTipus(DocumentFirmaTipusEnumDto.SENSE_FIRMA);
+	        
+	        if(previous.getAdjunt()!=null) {
                 new AdjuntOnchangeLogicProcessor().onChange(id, previous, DocumentResource.Fields.adjunt, previous.getAdjunt(), answers, previousFieldNames, target);
             }
 		}
@@ -220,7 +258,12 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     public DocumentResource create(DocumentResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
     	try {
     		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
-    		ContingutEntity pare = contingutRepository.findById(resource.getExpedient().getId()).get();
+			ContingutEntity pare = null;
+    		if (resource.getCarpeta()!=null) {
+    			pare = contingutRepository.findById(resource.getCarpeta().getId()).get();	
+    		} else {
+    			pare = contingutRepository.findById(resource.getExpedient().getId()).get();
+    		}
     		DocumentDto documentCreat = documentHelper.crearDocument(
     				entitatEntity.getId(),
                     resource.toDocumentDto(),
@@ -229,13 +272,13 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     				false,
     				true);
     		resource.setId(documentCreat.getId());
-    		return resource;
     	} catch (ValidationException ex) {
     		throw ex;
     	} catch (Exception ex) {
     		excepcioLogHelper.addExcepcio("/document/"+resource.getId()+"/create", ex);
+    		throw ex;
     	}
-    	return null;
+    	return resource;
     }
     
     @Override
@@ -250,10 +293,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     }
     
     @Override
-    @Transactional
 	public DocumentResource update(Long id, DocumentResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotFoundException {
     	try {
-    		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
     		DocumentEntity documentActual = documentRepository.findById(resource.getId()).get();
     		if (resource.isOrdrePatch()) {
     			DocumentResourceEntity documentResourceActual = documentResourceRepository.findById(resource.getId()).get();
@@ -268,7 +309,18 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 						reorderPreviousParentId,
 						true,
 						false);
+				//mourer també al arxiu
+				boolean parentIdChanged = !Objects.equals(documentResourceActual.getOrderParentId(), reorderPreviousParentId);
+				if (parentIdChanged) {
+					ContingutEntity contingutPare = contingutRepository.findById(documentResourceActual.getOrderParentId()).get();
+//					pluginHelper.arxiuDocumentMoure(documentActual.getArxiuUuid(), contingutPare.getArxiuUuid());
+					contingutHelper.arxiuDocumentPropagarMoviment(
+							documentActual.getArxiuUuid(),
+							contingutPare,
+							documentActual.getExpedient().getArxiuUuid());
+				}
     		} else {
+    			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
         		DocumentDto documentCreat = documentHelper.updateDocument(
         				entitatEntity.getId(),
         				documentActual,
@@ -276,11 +328,10 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         				true);
         		resource.setId(documentCreat.getId());
     		}
-    		return resource;
     	} catch (Exception ex) {
     		excepcioLogHelper.addExcepcio("/document/"+resource.getId()+"/update", ex);
     	}
-    	return null;
+    	return resource;
     }
 
     @Override
@@ -398,7 +449,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     private class CountPerspectiveApplicator implements PerspectiveApplicator<DocumentResourceEntity, DocumentResource> {
         @Override
         public void applySingle(String code, DocumentResourceEntity entity, DocumentResource resource) throws PerspectiveApplicationException {
-            resource.setNumMetaDades(entity.getMetaNode().getMetaDades().size());
+        	if (entity.getMetaNode() != null)
+        		resource.setNumMetaDades(entity.getMetaNode().getMetaDades().size());
             resource.setNumMoviments(contingutMovimentRepository.countByContingutId(entity.getId()));
         }
     }
@@ -522,7 +574,6 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
         @Override
         public void onChange(Serializable id, DocumentResource previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource target) {
-
             if (fieldValue != null) {
                 FileReference adjunt = (FileReference) fieldValue;
 
@@ -593,10 +644,18 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     private class HasFirmaOnchangeLogicProcessor implements OnChangeLogicProcessor<DocumentResource> {
         @Override
         public void onChange(Serializable id, DocumentResource previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource target) {
-            if (previous.getDocumentFirmaTipus()!=DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA){
-                target.setDocumentFirmaTipus((fieldValue != null && (Boolean) fieldValue)
-                        ?DocumentFirmaTipusEnumDto.FIRMA_SEPARADA
-                        :DocumentFirmaTipusEnumDto.SENSE_FIRMA);
+            boolean isDeteccioFirmaAutomaticaActiva = configHelper.getAsBoolean(PropertyConfig.DETECCIO_FIRMA_AUTOMATICA);
+            boolean ambFirma = fieldValue != null && (Boolean) fieldValue;
+            
+            if (isDeteccioFirmaAutomaticaActiva) {
+                if (!DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA.equals(previous.getDocumentFirmaTipus())) {
+                    target.setDocumentFirmaTipus(ambFirma
+                            ? DocumentFirmaTipusEnumDto.FIRMA_SEPARADA
+                            : DocumentFirmaTipusEnumDto.SENSE_FIRMA);
+                }
+            } else if (ambFirma && DocumentFirmaTipusEnumDto.SENSE_FIRMA.equals(previous.getDocumentFirmaTipus())) {
+            	//Quant no hi ha detecció de firma, i s'ha marcat document amb firma, preseleccionar firma adjunta (el cas mes probable)
+            	target.setDocumentFirmaTipus(DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA);
             }
         }
     }
@@ -1220,6 +1279,46 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                             }
                         }
                         break;
+
+                    case DocumentResource.NotificarFormAction.Fields.grups:
+                    	Set<InteressatResourceEntity> interessatSet = new LinkedHashSet<>();
+                        List<Long> ids = ((List<ResourceReference<InteressatGrupResource, Long>>) fieldValue).stream()
+                                .map(ResourceReference::getId).collect(Collectors.toList());
+                        List<InteressatGrupResourceEntity> grups = interessatGrupResourceRepository.findAllById(ids);
+                        for (InteressatGrupResourceEntity grup : grups) {
+                        	interessatSet.addAll(grup.getInteressats());
+                        }
+                        List<InteressatResourceEntity> interessats = new ArrayList<>(interessatSet);
+                        List<ResourceReference<InteressatResource, Long>> interessatsResourceList = interessats.stream()
+                                .map(i->ResourceReference.<InteressatResource, Long>toResourceReference(i.getId(), i.getCodiNom()))
+                                .collect(Collectors.toList());
+                        target.setInteressats(interessatsResourceList);
+                        break;
+
+                    case NotificarFormAction.Fields.interessats:
+                        List<InteressatResourceEntity> interesats = interessatResourceRepository.findAllById(((List<ResourceReference<InteressatResource, Long>>) fieldValue).stream()
+                                .map(ResourceReference::getId).collect(Collectors.toList()));
+                        List<ResourceReference<InteressatResource, Long>> interessatsAmbAvis = new ArrayList<>();
+                        for (InteressatResourceEntity interessat : interesats) {
+                            if (
+                                    (interessat.getRepresentant() == null && interessat.getDocumentTipus()!=InteressatDocumentTipusEnumDto.NIF && interessat.getDocumentTipus()!=InteressatDocumentTipusEnumDto.DOCUMENT_IDENTIFICATIU_ESTRANGERS && interessat.getDocumentTipus()!=InteressatDocumentTipusEnumDto.ESTRANGER_EIDAS)
+                                            || (interessat.getRepresentant() != null && interessat.getRepresentant().getDocumentTipus()!=InteressatDocumentTipusEnumDto.NIF && interessat.getRepresentant().getDocumentTipus()!=InteressatDocumentTipusEnumDto.DOCUMENT_IDENTIFICATIU_ESTRANGERS && interessat.getRepresentant().getDocumentTipus()!=InteressatDocumentTipusEnumDto.ESTRANGER_EIDAS)
+                            ) {
+                                if(interessat.getRepresentant() == null){
+                                    interessatsAmbAvis.add(ResourceReference.toResourceReference(
+                                            interessat.getId(),
+                                            interessat.getNomComplet()
+                                    ));
+                                }else {
+                                    interessatsAmbAvis.add(ResourceReference.toResourceReference(
+                                            interessat.getRepresentant().getId(),
+                                            interessat.getRepresentant().getNomComplet()
+                                    ));
+                                }
+                            }
+                        }
+                        target.setInteressatsAmbAvis(interessatsAmbAvis);
+                        break;
                 }
             }
 		}
@@ -1237,12 +1336,20 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                     if (InteressatTipusEnum.InteressatAdministracioEntity.equals(interessatResourceEntity.getTipus())) {
                         anyInteressatIsAdministracio = true;
                     }
-                    if (params.getEntregaPostal()!=null && params.getEntregaPostal() && !interessatResourceEntity.adressaCompleta()) {
-                        throw new ActionExecutionException(
-                        		interessatResourceEntity.getClass(),
-                        		interessatResourceEntity.getId(),
-                        		code,
-                        		messageHelper.getMessage("notificacio.controller.reject.postal"));
+                    if (params.getEntregaPostal()!=null && params.getEntregaPostal()) {
+                    	if (!interessatResourceEntity.adressaCompleta()) {
+	                        throw new ActionExecutionException(
+	                        		interessatResourceEntity.getClass(),
+	                        		interessatResourceEntity.getId(),
+	                        		code,
+	                        		messageHelper.getMessage("notificacio.controller.reject.postal"));
+                    	} else if (!interessatResourceEntity.adressaNormalitzadaCompleta()) {
+	                        throw new ActionExecutionException(
+	                        		interessatResourceEntity.getClass(),
+	                        		interessatResourceEntity.getId(),
+	                        		code,
+	                        		messageHelper.getMessage("notificacio.controller.reject.normalitzada"));
+                    	}
                     }
                 }
 
@@ -1316,7 +1423,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
                 if (fluxosDto != null) {
                     for (PortafirmesFluxRespostaDto flx : fluxosDto) {
-                        resultat.add(new FieldOption(flx.getFluxId(), flx.getNom()));
+                        resultat.add(new FieldOption(flx.getFluxId(), "[" + flx.getDescripcio() + "] > " + flx.getNom()));
                     }
                 }
             }
@@ -1327,7 +1434,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                             .collect(Collectors.toList());
                 } catch (Exception e) {}
             }
-            resultat.sort(Comparator.comparing(FieldOption::getDescription));
+            resultat.sort(Comparator.comparing(FieldOption::getDescription).reversed());
             return resultat;
         }
 
@@ -1354,7 +1461,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 	        	List<String> pfResponsables = new ArrayList<String>();
 	        	if (params.getResponsables()!=null) {
 	        		for (ResourceReference <UsuariResource, String> usuari: params.getResponsables()) {
-	        			pfResponsables.add(usuariResourceRepository.findById(usuari.getId()).get().getNif());
+                        usuariResourceRepository.findById(usuari.getId())
+                                        .ifPresent(user -> pfResponsables.add(user.getNif()));
 	        		}
 	        	}
 	        	if (params.getNifsManuals()!=null) {

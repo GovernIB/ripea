@@ -368,6 +368,9 @@ const translationEn = {
                     title: "Reopen task",
                     ok: "The task has been reopened successfully",
                 },
+                comment: {
+                    ok: "Comment added to the task '{{data.expedientTasca.description}}'",
+                },
             },
         },
         interessat: {
@@ -430,15 +433,44 @@ const translationEn = {
                     title: "Import stakeholders from Registry",
                     ok: "Stakeholders successfully imported",
                 },
+				gestGrups: {
+				    label: "Manage groups",
+					title: "Manage groups",
+				    ok: "Groups successfully modified",
+				},
             },
             grid: {
                 title: "Interested parties from file",
                 representant: "Representative",
+				tipus: {
+					label: "Type",
+					personaFisica: "Fisic person",
+					personaJuridica: "Legal entity",
+					administrador: "Administrator",
+				},
             },
             alert: {
                 incapacitat: "If the holder has a disability, it is mandatory to indicate a recipient.",
                 jaExistentExpedient: "Already exists in the case file",
             },
+			grup: {
+				title: "Groups of interested parties",
+				action: {
+					new: {
+						label: "New Group",
+						ok: "Group created successfully",
+					},
+					update: {
+						ok: "Group updated successfully",
+					},
+					delete: {
+					    label: "Delete Group Party",
+					    check: "Are you sure you want to proceed with this action?",
+					    description: "Once deleted, it cannot be recovered",
+					    ok: "The group {{data.nom}} was deleted successfully",
+					},
+				},
+			},
         },
         expedient: {
             title: "Case file",
@@ -586,6 +618,9 @@ const translationEn = {
                     title: "Import documents into cases",
                     warning: "The cases must belong to the same procedure",
                 },
+                comment: {
+                    ok: "Comment added to the case '{{data.expedient.description}}'",
+                },
             },
             alert: {
                 owner: "You must reserve the case file in order to edit it",
@@ -703,7 +738,7 @@ const translationEn = {
                     ok: "The document {{data.nom}} has been updated successfully"
                 },
                 delete: {
-                    label: "Delete...",
+                    label: "Delete",
                     check: "Are you sure you want to continue with this action?",
                     description: "Once deleted it cannot be recovered",
                     ok: "The document {{data.nom}} has been deleted successfully"

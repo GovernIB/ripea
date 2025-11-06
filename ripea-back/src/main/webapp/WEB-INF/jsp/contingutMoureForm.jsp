@@ -26,16 +26,18 @@ $(document).ready(function() {
 	var arbre = $('#arbreCarpetes');
 	
 	$('form').on('submit', function(){
-	    // Obtener la carpeta seleccionada en jstree
-	    var selectedNode = arbre.jstree('get_selected', true)[0];
-		var json = arbre.data().jstree.get_json()
-		var jsonString = JSON.stringify(json);
-
-		$('#estructuraCarpetesJson').val(jsonString);
-
-		if (selectedNode) {
-	    	$('#destiId').val(selectedNode.id);
-	    }
+		if (arbre.data()) {
+		    // Obtener la carpeta seleccionada en jstree
+		    var selectedNode = arbre.jstree('get_selected', true)[0];
+			var json = arbre.data().jstree.get_json()
+			var jsonString = JSON.stringify(json);
+	
+			$('#estructuraCarpetesJson').val(jsonString);
+	
+			if (selectedNode) {
+		    	$('#destiId').val(selectedNode.id);
+		    }
+		}
 	});
 });
 </script>
@@ -44,6 +46,7 @@ $(document).ready(function() {
 	<form:form action="" class="form-horizontal" modelAttribute="contingutMoureCopiarEnviarCommand">
 		<form:hidden path="origenIds"/>
 		<form:hidden path="origenId"/>
+		<form:hidden path="accio"/>
 		<rip:inputFixed textKey="contingut.moure.camp.origen">
 		<c:choose>
 			<c:when test="${not empty documentsOrigen}">
@@ -70,7 +73,6 @@ $(document).ready(function() {
 			</c:otherwise>
 		</c:choose>
 		
-<%-- 		<rip:inputFileChooser name="destiId" contingutOrigen="${contingutOrigen}" textKey="contingut.moure.camp.desti" required="true"/> --%>
 		<div id="modal-botons" class="well">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.moure"/></button>
 			<a href="<c:url value="/contenidor/${contingutOrigen.pare.id}"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>

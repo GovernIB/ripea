@@ -3,19 +3,13 @@
  */
 package es.caib.ripea.back.controller;
 
-import es.caib.ripea.back.command.ConfigCommand;
-import es.caib.ripea.back.command.EntitatCommand;
-import es.caib.ripea.back.helper.DatatablesHelper;
-import es.caib.ripea.back.helper.DatatablesHelper.DatatablesResponse;
-import es.caib.ripea.back.helper.EntitatHelper;
-import es.caib.ripea.back.helper.ExceptionHelper;
-import es.caib.ripea.back.helper.MissatgesHelper;
-import es.caib.ripea.service.intf.dto.EntitatDto;
-import es.caib.ripea.service.intf.dto.config.ConfigDto;
-import es.caib.ripea.service.intf.dto.config.ConfigGroupDto;
-import es.caib.ripea.service.intf.exception.NotFoundException;
-import es.caib.ripea.service.intf.service.ConfigService;
-import es.caib.ripea.service.intf.service.EntitatService;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -26,12 +20,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import es.caib.ripea.back.command.ConfigCommand;
+import es.caib.ripea.back.command.EntitatCommand;
+import es.caib.ripea.back.helper.DatatablesHelper;
+import es.caib.ripea.back.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.back.helper.ExceptionHelper;
+import es.caib.ripea.back.helper.MissatgesHelper;
+import es.caib.ripea.service.intf.dto.EntitatDto;
+import es.caib.ripea.service.intf.dto.config.ConfigDto;
+import es.caib.ripea.service.intf.dto.config.ConfigGroupDto;
+import es.caib.ripea.service.intf.exception.NotFoundException;
+import es.caib.ripea.service.intf.service.ConfigService;
+import es.caib.ripea.service.intf.service.EntitatService;
 
 /**
  * Controlador per al manteniment d'entitats.
@@ -159,20 +159,6 @@ public class EntitatController extends BaseUserController {
 					new Object[] { resultat.getNom() });
 
 		}
-	}
-	
-	@RequestMapping(value = "/getEntitatLogo", method = RequestMethod.GET)
-	public String getEntitatLogo(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
-		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request, entitatService);
-		// If there is logo defined for entitat (in database) return it, if not return logo defined for application (in properties file)
-		byte [] logo = entitatActual.getLogoImgBytes() != null ? entitatActual.getLogoImgBytes() : entitatService.getLogo();
-		try {
-			writeFileToResponse(null, logo, response);
-		} catch (Exception ex) {
-			System.out.println(ex.getMessage());
-		}
-		return null;
 	}
 
 	@RequestMapping(value = "/{entitatId}/enable", method = RequestMethod.GET)

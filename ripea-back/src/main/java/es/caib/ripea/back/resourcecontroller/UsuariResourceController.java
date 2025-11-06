@@ -110,7 +110,10 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
         String rolActual = RolHelper.getRolActual(request);
         List<String> roles = RolHelper.getRolsUsuariActual(request);
         List<String> rolesAuth = SecurityContextHolder.getContext().getAuthentication().getAuthorities()
-                .stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList());
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .filter(role -> role.startsWith("IPA_") || role.equals("tothom"))
+                .collect(Collectors.toList());
 
         UserPermissionInfo userPermissionInfo = ((UsuariResourceService) readonlyResourceService).getCurrentUserPermissionInfo();
         userPermissionInfo.setEntitatActualId(entitatActual != null ? entitatActual.getId() : null);
@@ -157,7 +160,7 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
         response.put("teAccesEstadistiques", ExpedientHelper.teAccesEstadistiques(request));
         response.put("isMostrarSeguimentEnviamentsUsuariActiu", SeguimentEnviamentsUsuariHelper.isMostrarSeguimentEnviamentsUsuariActiu(request));
         response.put("isConvertirDefinitiuActiu", ExpedientHelper.isConversioDefinitiuActiva(request));
-        response.put("isUrlValidacioDefinida", ExpedientHelper.isUrlValidacioDefinida(request));
+        response.put("isUrlValidacioDefinida", aplicacioService.propertyFindByNom(PropertyConfig.VALIDACIO_URL_IMPRIMIBLES)!=null);
 
         response.put("isDocumentsGeneralsEnabled", request.getSession().getAttribute("SessionHelper.isDocumentsGeneralsEnabled"));
         response.put("isTipusDocumentsEnabled", request.getSession().getAttribute("SessionHelper.isTipusDocumentsEnabled"));
@@ -180,10 +183,15 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
         response.put("isImportacioRelacionatsActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.IMPORTACIO_RELACIONATS_ACTIVA)));
         response.put("isWsUsuariEntitatActiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.PORTAFIB_PLUGIN_USUARISPF_WS)));
         response.put("ordenacioContingutPermesa", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.ORDENACIO_CONTINGUT_ACTIU)));
-        List<GrupDto> grupsPermesos = grupService.findGrupsPermesosProcedimentsGestioActiva(
-        		userPermissionInfo.getEntitatActualId(),
-        		userPermissionInfo.getRolActual(),
-        		RolHelper.isRolActualAdministradorOrgan(request) ? organActual != null ? organActual.getId() : null : null);
+        response.put("moureMateixExpedients", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.MOURE_MATEIX_EXPEDIENTS)));
+        response.put("permesEsborrarFinals", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.PERMATRE_ESBORRAR_FINAL)));
+        List<GrupDto> grupsPermesos = null;
+        if (organActual!=null) {
+        	grupsPermesos = grupService.findGrupsPermesosProcedimentsGestioActiva(
+	        		userPermissionInfo.getEntitatActualId(),
+	        		userPermissionInfo.getRolActual(),
+	        		RolHelper.isRolActualAdministradorOrgan(request) ? organActual.getId() : null);
+        }
         response.put("isFiltreGrupsVisible", (grupsPermesos!=null && !grupsPermesos.isEmpty()));
         return response;
     }

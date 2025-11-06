@@ -1,5 +1,6 @@
 package es.caib.ripea.back.controller;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -7,6 +8,7 @@ import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -19,9 +21,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import es.caib.ripea.back.helper.EntitatHelper;
 import es.caib.ripea.back.helper.EnumHelper.HtmlOption;
+import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.service.AplicacioService;
+import es.caib.ripea.service.intf.service.EntitatService;
 import es.caib.ripea.service.intf.service.SegonPlaService;
 
 /**
@@ -35,6 +40,7 @@ public class AjaxUserController extends BaseUserController {
 
 	@Autowired private AplicacioService aplicacioService;
 	@Autowired private SegonPlaService segonPlaService;
+	@Autowired private EntitatService entitatService;
 
 	@RequestMapping(value = "/usuari/{codi}", method = RequestMethod.GET)
 	@ResponseBody
@@ -44,6 +50,26 @@ public class AjaxUserController extends BaseUserController {
 			Model model) {
 		UsuariDto aux = aplicacioService.findUsuariAmbCodi(codi);
 		return aux;
+	}
+	
+	@RequestMapping(value = "/getEntitatLogo", method = RequestMethod.GET)
+	public String getEntitatLogo(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request, entitatService);
+		// If there is logo defined for entitat (in database) return it, if not return logo defined for application (in properties file)
+		byte [] logo = entitatActual.getLogoImgBytes() != null ? entitatActual.getLogoImgBytes() : entitatService.getLogo();
+		try {
+			writeFileToResponse(null, logo, response);
+		} catch (Exception ex) {}
+		return null;
+	}
+	
+	@RequestMapping(value = "/getFaviconLogo", method = RequestMethod.GET)
+	public String getFaviconLogo(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request, entitatService);
+		try {
+			writeFileToResponse(null, entitatActual.getFaviconImgBytes(), response);
+		} catch (Exception ex) {}
+		return null;
 	}
 	
 	@RequestMapping(value = "/stats/{dataTextddmmyyyy}", method = RequestMethod.GET)

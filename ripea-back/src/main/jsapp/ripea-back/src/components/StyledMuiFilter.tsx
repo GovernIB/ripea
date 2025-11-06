@@ -70,17 +70,17 @@ const StyledMuiFilter = (props:any) => {
 
     const cercar = ()=> {
         apiRef?.current?.filter?.()
-        saveFilterData(formApiRef?.current?.getData?.())
+        !!sessionKey && saveFilterData(formApiRef?.current?.getData?.())
     }
     const netejar = ()=> {
-        saveFilterData(null)
+        !!sessionKey && saveFilterData(null)
         apiRef?.current?.clear?.()
     }
 
     const { value: filterData, save: saveFilterData } = useSession(sessionKey);
 
     useEffect(() => {
-        if (filterData && onSpringFilterChange && springFilterBuilder) {
+        if (!!sessionKey && filterData && onSpringFilterChange && springFilterBuilder) {
             onSpringFilterChange(springFilterBuilder(filterData));
         }
     }, []);
@@ -98,7 +98,7 @@ const StyledMuiFilter = (props:any) => {
         springFilterBuilder={springFilterBuilder}
         onSpringFilterChange={onSpringFilterChange}
         onDataChange={(data:any) => {
-            if (data && Object.keys(data).length > 0 && !filterData) {
+            if (data && Object.keys(data).length > 0 && (!!sessionKey && !filterData)) {
                 cercar()
             }
         }}

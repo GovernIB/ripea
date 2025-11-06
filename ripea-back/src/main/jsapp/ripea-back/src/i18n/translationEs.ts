@@ -368,6 +368,9 @@ const translationEs = {
                     title: "Reabrir tarea",
                     ok: "La tarea se ha reabierto correctamente",
                 },
+                comment: {
+                    ok: "Comentario añadido a la tarea '{{data.expedientTasca.description}}'",
+                },
             },
         },
         interessat: {
@@ -429,16 +432,45 @@ const translationEs = {
                     label: "Importar interesados desde Registro...",
                     title: "Importar interesados desde Registro",
                     ok: "Interesados importados correctamente",
-                }
+                },
+				gestGrups: {
+				    label: "Gestionar grupos",
+					title: "Gestionar grupos",
+				    ok: "Grupos modificados correctamente",
+				},
             },
             grid: {
                 title: "Interesados del fichero",
                 representant: "Representante",
+				tipus: {
+					label: "Tipo",
+					personaFisica: "Persona física",
+					personaJuridica: "Persona jurídica",
+					administrador: "Administrador",
+				},
             },
             alert: {
                 incapacitat: "En caso de titular con incapacidad es obligatorio indicar un destinatario.",
                 jaExistentExpedient: "Ya existe en el expediente",
             },
+			grup: {
+				title: "Grupos de interesados",
+				action: {
+					new: {
+						label: "Nuevo Grupo",
+						ok: "Grupo creado correctamente",
+					},
+					update: {
+						ok: "Grupo modificado correctamente",
+					},
+					delete: {
+					    label: "Borrar Grupo",
+					    check: "Esta seguro de que quiere seguir con esta acción?",
+					    description: "Una vez borrado no se prodra recuperar",
+					    ok: "El grupo {{data.nom}} se ha borrado correctamente",
+					},
+				},
+			},
         },
         expedient: {
             title: "Expediente",
@@ -586,6 +618,9 @@ const translationEs = {
                     title: "Importar documentos a expedientes",
                     warning: "Los expedientes deben pertenecer al mismo procedimiento",
                 },
+                comment: {
+                    ok: "Comentario añadido al expediente '{{data.expedient.description}}'",
+                },
             },
             alert: {
                 owner: "Es necesario reservar el expediente para poder modificarlo",
@@ -703,7 +738,7 @@ const translationEs = {
                     ok: "El documento {{data.nom}} se ha modificado correctamente"
                 },
                 delete: {
-                    label: "Borrar...",
+                    label: "Borrar",
                     check: "¿Está seguro de que quiere seguir con esta acción?",
                     description: "Una vez borrado no se podrá recuperar.",
                     ok: "El documento {{data.nom}} se ha eliminado correctamente"
@@ -1153,7 +1188,8 @@ const translationEs = {
                 perfil: "Mi perfil",
                 manual: "Manual de Usuario",
                 manualAdmin: "Manual de los Administradores",
-                logout: "Desconectar"
+                logout: "Desconectar",
+                noOrgans: "Ningún órgano gestor asignado"
             },
             menu: {
                 entitat: "Entidades",

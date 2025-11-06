@@ -1,20 +1,11 @@
-/**
- * 
- */
 package es.caib.ripea.service.intf.dto;
 
+import java.util.List;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import java.util.List;
-
-/**
- * Informació d'una entitat.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Getter @Setter
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 public class EntitatDto extends AuditoriaDto {
@@ -35,10 +26,26 @@ public class EntitatDto extends AuditoriaDto {
 	private boolean usuariActualAdministration;
 	private boolean usuariActualAdministrationRead;
 	
+	//Dades de configuracio modo light
 	private byte[] logoImgBytes;
 	private boolean logo;
+	private byte[] faviconImgBytes;
+	private boolean logoFavicon;
+	private byte[] menuImgBytes;
+	private boolean logoMenu;
 	private String capsaleraColorFons;
 	private String capsaleraColorLletra;
+	
+	//Dades de configuracio modo dark
+	private byte[] blackLogoImgBytes;
+	private boolean blackLogo;
+	private byte[] blackFaviconImgBytes;
+	private boolean blackFavicon;
+	private byte[] blackMenuImgBytes;
+	private boolean blackMenu;
+	private String blackCapsaleraColorFons;
+	private String blackCapsaleraColorLletra;	
+	
     private boolean permetreEnviamentPostal;
 	
 	public boolean isUsuariActualTeOrgans() {

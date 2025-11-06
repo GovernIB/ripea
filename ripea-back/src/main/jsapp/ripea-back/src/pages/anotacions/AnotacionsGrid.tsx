@@ -6,7 +6,7 @@ import StyledMuiGrid from '../../components/StyledMuiGrid.tsx';
 import {CardPage} from "../../components/CardData.tsx";
 import AnotacioFilter from "./AnotacioFilter.tsx";
 import Load from "../../components/Load.tsx";
-import {useState} from "react";
+import {useMemo, useState} from "react";
 import {Grid} from "@mui/material";
 import GridFormField from "../../components/GridFormField.tsx";
 import {GridSortDirection} from "@mui/x-data-grid-pro";
@@ -35,7 +35,7 @@ const AnotacionsGrid = () => {
     const [load, setLoad] = useState<boolean>(false);
     const apiRef = useMuiDataGridApiRef();
 
-    const columns = [
+    const columns = useMemo(() => [
         {
             field: 'identificador',
             flex: 0.75,
@@ -93,7 +93,7 @@ const AnotacionsGrid = () => {
             flex: 0.5,
             valueFormatter: (value: any) => formatDate(value)
         },
-    ];
+    ], []);
 
     const refresh = () => {
         apiRef?.current?.refresh?.();

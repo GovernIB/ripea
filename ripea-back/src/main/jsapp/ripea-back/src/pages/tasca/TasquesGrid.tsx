@@ -2,13 +2,12 @@ import {useMuiDataGridApiRef,GridPage} from 'reactlib';
 import {useTranslation} from "react-i18next";
 import { formatDate } from "../../util/dateUtils.ts";
 import {StyledPrioritat} from "../expedient/ExpedientGrid.tsx";
-import {CommentDialog} from "../CommentDialog.tsx";
+import {TascaComment} from "../CommentDialog.tsx";
 import StyledMuiGrid from '../../components/StyledMuiGrid.tsx';
 import TasquesGridFilter from "./TasquesGridFilter.tsx";
-import {useState} from "react";
+import {useMemo, useState} from "react";
 import Load from "../../components/Load.tsx";
 import { CardPage } from "../../components/CardData.tsx";
-import * as builder from "../../util/springFilterUtils.ts";
 import {useUserSession} from "../../components/Session.tsx";
 import {Icon, Typography} from "@mui/material";
 import useTascaActions from "./details/TascaActions.tsx";
@@ -16,6 +15,7 @@ import {useNavigate} from "react-router-dom";
 import useTascaDetail from "./details/TascaDetail.tsx";
 
 const sortModel:any = [{field: 'dataInici', sort: 'desc'}];
+const namedQueries:any = ['USUARI_RELACIONAT'];
 const TasquesGrid = () => {
     const { t } = useTranslation();
     const { value: user } = useUserSession();
@@ -25,7 +25,11 @@ const TasquesGrid = () => {
     const [springFilter, setSpringFilter] = useState<string>();
     const [load, setLoad] = useState<boolean>(false);
 
-    const columns = [
+    const refresh = () => {
+        apiRef?.current?.refresh?.();
+    }
+
+    const columns = useMemo(() => [
         {
             field: 'expedient',
             flex: 0.5,
@@ -84,21 +88,13 @@ const TasquesGrid = () => {
             headerName: '',
             sortable: false,
             flex: 0.25,
-            renderCell: (params: any) => <CommentDialog
+            renderCell: (params: any) => <TascaComment
                 entity={params?.row}
-                title={`${t('page.comment.tasca')}: ${params?.row?.metaExpedientTascaDescription}`}
-                resourceName={'expedientTascaComentariResource'}
-                resourceReference={'expedientTasca'}
                 readOnly={params?.row?.usuariActualOnlyObservador}
                 onClose={refresh}
             />
         },
-    ];
-
-    const refresh = () => {
-        setLoad(true);
-        apiRef?.current?.refresh?.();
-    }
+    ], []);
 
     const { actions, components, isTramitable } = useTascaActions({potModificar: true}, refresh)
     const { handleOpen, dialog } = useTascaDetail();
@@ -117,11 +113,8 @@ const TasquesGrid = () => {
                     apiRef={apiRef}
                     resourceName="expedientTascaResource"
                     columns={columns}
-                    filter={builder.and(
-                        builder.eq("expedient.esborrat", 0),
-                        springFilter,
-                    )}
-                    namedQueries={['USUARI_RELACIONAT']}
+                    filter={springFilter}
+                    namedQueries={namedQueries}
                     sortModel={sortModel}
                     rowAdditionalActions={actions}
                     onRowClick={(params: any) => {
@@ -150,7 +143,6 @@ const TasquesGrid = () => {
                             }
                     }}
                     toolbarHide
-                    paginationActive
                     readOnly
                 />
                 {components}

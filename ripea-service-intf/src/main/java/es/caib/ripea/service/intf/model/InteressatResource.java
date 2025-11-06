@@ -43,6 +43,9 @@ import lombok.experimental.FieldNameConstants;
                         formClass = InteressatResource.UnitatOrganitzativaFormFilter.class),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
+                        code = InteressatResource.PERSPECTIVE_GRUPS_CODE),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.PERSPECTIVE,
                         code = InteressatResource.PERSPECTIVE_REPRESENTANT_CODE),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
@@ -71,6 +74,7 @@ import lombok.experimental.FieldNameConstants;
 )
 public class InteressatResource extends BaseAuditableResource<Long> {
 
+	public static final String PERSPECTIVE_GRUPS_CODE = "GRUPS";
     public static final String PERSPECTIVE_REPRESENTANT_CODE = "REPRESENTANT";
     public static final String PERSPECTIVE_ADRESSA_CODE = "ADRESSA";
     public static final String ACTION_EXPORTAR_CODE  = "EXPORTAR";
@@ -145,7 +149,7 @@ public class InteressatResource extends BaseAuditableResource<Long> {
 	
 	@Size(max = 160)
 	protected String email;
-	@Size(max = 20)
+	@Size(min = 9, max = 20)
 	protected String telefon;
 	@Size(max = 160)
 	protected String observacions;
@@ -179,6 +183,8 @@ public class InteressatResource extends BaseAuditableResource<Long> {
     @Transient private String provinciaNom;
     @Transient private String municipiNom;
     
+    protected List<ResourceReference<InteressatGrupResource, Long>> grups;
+    
     @Transient
 	public String getCodiNom() {
     	return Utils.getCodiNom(this.tipus, this.documentNum, this.nom, this.llinatge1, this.llinatge2, this.raoSocial, this.organCodi);
@@ -188,7 +194,7 @@ public class InteressatResource extends BaseAuditableResource<Long> {
 	public String getNomComplet() {
     	return Utils.getNomComplet(this.tipus,this.nom, this.llinatge1, this.llinatge2, this.raoSocial, this.organCodi);
 	}
-
+    
     @Getter
     @Setter
     @FieldNameConstants

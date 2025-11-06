@@ -1,5 +1,5 @@
-import React, {useState} from "react";
-import {Icon} from "@mui/material";
+import React, {useRef, useState} from "react";
+import {Chip, Icon} from "@mui/material";
 import { useMuiDataGridApiRef } from 'reactlib';
 import {useTranslation} from "react-i18next";
 import StyledMuiGrid, {ToolbarButton} from "../../components/StyledMuiGrid.tsx";
@@ -11,8 +11,9 @@ import {InteressatsGridForm} from "./InteressatsGridForm.tsx";
 import {MenuActionButton} from "../../components/MenuButton.tsx";
 import {useUserSession} from "../../components/Session.tsx";
 import useInteressatDetail from "./details/InteressatDetail.tsx";
+import {useGrupGridDialog} from "./GrupGrid.tsx";
 
-const perspectives = ['REPRESENTANT']
+const perspectives = ['REPRESENTANT', 'GRUPS']
 const sortModel:any = [{field: 'id', sort: 'asc'}]
 
 interface DetailGridProps {
@@ -26,7 +27,8 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
     const { t } = useTranslation();
     const { value: user } = useUserSession()
     const [selectedRows, setSelectedRows] = useState<any[]>([]);
-
+	const idToOriginalIdRef = useRef<Record<string, any>>({});
+	
     const columns = [
         {
             field: 'tipus',
@@ -34,7 +36,7 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
         },
         {
             field: 'documentNum',
-            flex: 0.4,
+            flex: 0.5,
         },
         {
             field: 'nomComplet',// organNom
@@ -42,7 +44,7 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
             valueFormatter: (value: any, row:any) => value ?? row?.organNom,
             renderCell: (params:any) => <>
                 {params?.formattedValue}
-                {!params?.row?.arxiuPropagat &&
+                {!params?.row?.isGroup && !params?.row?.arxiuPropagat &&
                     <Icon title={t('page.contingut.alert.guardarPendent')} color={'error'}>warning</Icon>}
             </>
         },
@@ -55,11 +57,19 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
                     <Icon title={t('page.contingut.alert.guardarPendent')} color={'error'}>warning</Icon>}
             </>,
         },
+        {
+            field: 'grups',
+            headerName: t('page.interessat.grup.title'),
+            flex: 1,
+            renderCell: (params:any) => params?.row?.grups
+                ?.map?.((g:any) => <Chip label={g?.description} size={"small"}/>),
+        },
     ];
 
     const apiRef = useMuiDataGridApiRef()
 
     const refresh = ()=> {
+		// refreshInteressats();
         apiRef?.current?.refresh()
     }
 
@@ -68,21 +78,23 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
     const {excelInteressats} = useExpedientActions(refresh);
     const {handleShow: handleImport, content: contentImport} = useImport(entity, refresh);
     const {handleOpen, dialog} = useInteressatDetail();
+    const {handleOpen: handleGrup, dialog: dialogGrup} = useGrupGridDialog(entity);
 
     return <>
         <StyledMuiGrid
             resourceName="interessatResource"
             popupEditFormDialogResourceTitle={t('page.interessat.title')}
             columns={columns}
-            // paginationActive
+            paginationActive={false}
+            autoHeight
             apiRef={apiRef}
             filter={builder.and(
                 builder.eq('expedient.id', entity?.id),
                 builder.eq('esRepresentant', false)
             )}
-            sortModel={sortModel}
+            staticSortModel={sortModel}
             perspectives={perspectives}
-            disableColumnSorting
+            // disableColumnSorting
             popupEditCreateActive
             popupEditFormContent={<InteressatsGridForm/>}
             formAdditionalData={{
@@ -104,7 +116,10 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
                 {
                     position: 0,
                     element: <ToolbarButton icon={'upload'}
-                                            onClick={()=>exportar(selectedRows, entity)}
+                                            onClick={()=> {
+												const originalIds = selectedRows.map(id => idToOriginalIdRef.current[id] ?? id);
+												exportar(originalIds, entity)
+											}}
                                             disabled={selectedRows?.length==0}
                     >{t('page.interessat.action.exportar.label')}</ToolbarButton>
                 },
@@ -115,6 +130,12 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
                                             hidden={!entity?.potModificar}
                     >{t('page.interessat.action.importar.label')}</ToolbarButton>
                 },
+				{
+					position: 0,
+				    element: <ToolbarButton onClick={()=>handleGrup()}
+				                            hidden={!entity?.potModificar}
+                   ><Icon sx={{ mr: 1 }}>groups</Icon>{t('page.interessat.grup.title')}</ToolbarButton>
+				},
                 {
                     position: 0,
                     element: <ToolbarButton icon={'description'}
@@ -141,7 +162,10 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
                     />,
                 }
             ]}
-            onRowClick={(params: any) => handleOpen(params?.row?.id, params?.row) }
+
+            onRowClick={(params: any) => {
+					handleOpen(params?.row?.id, params?.row);
+			}}
             popupEditFormI18nKeys={{
                 createSuccess: 'page.interessat.action.new.ok',
                 updateSuccess: 'page.interessat.action.update.ok',
@@ -149,6 +173,7 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
         />
         {dialog}
         {contentImport}
+        {dialogGrup}
         {components}
     </>
 }

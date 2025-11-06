@@ -117,7 +117,6 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		long t1 = System.currentTimeMillis();
 		if (cacheHelper.mostrarLogsCercadorAnotacio())
 			log.info("findAmbFiltre start(" + "entitatId=" + entitatId + ", filtre=" + filtre + ", paginacioParams=" + paginacioParams + ", rolActual=" + rolActual + ", organActualId=" + organActualId +")");
-
 		
 		long t2 = System.currentTimeMillis();
 		final EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
@@ -146,8 +145,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		}
 		if (cacheHelper.mostrarLogsCercadorAnotacio())
     		log.info("comprovarEntitat time:  " + (System.currentTimeMillis() - t2) + " ms");
-		
-		
+
 		long t3 = System.currentTimeMillis();
 		PermisosPerAnotacions permisosPerAnotacions = expedientPeticioHelper.findPermisosPerAnotacions(
 				entitatId,

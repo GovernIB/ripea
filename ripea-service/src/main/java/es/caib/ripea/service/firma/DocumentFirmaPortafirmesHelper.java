@@ -171,13 +171,12 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 			}
 		}
 		
-		// Si l'enviament produeix excepcions la retorna
+		//Si l'enviament produeix excepcions la retorna
+		//Es fa un evict dels enviaments cacheats dins la funció
 		SistemaExternException sex = portafirmesEnviar(documentPortafirmes, annexos, transaccioId);
-		cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedient().getId());
-		if (sex != null) {
-			throw sex;
-		}
+		if (sex != null) { throw sex; }
 
+		//Si ha donat error, no es guarden els canvis
 		documentPortafirmes = documentPortafirmesRepository.save(documentPortafirmes);
 		document.updateEstat(DocumentEstatEnumDto.FIRMA_PENDENT);
 		documentPortafirmes.updateAnnexos(annexos);
@@ -253,7 +252,8 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 	public SistemaExternException portafirmesEnviar(DocumentPortafirmesEntity documentPortafirmes, List<DocumentEntity> annexos, String transaccioId) {
 		
 		DocumentEntity document = documentPortafirmes.getDocument();
-		
+		SistemaExternException resultat = null;
+
 		try {
 			String portafirmesId = pluginHelper.portafirmesUpload(
 					document,
@@ -267,15 +267,17 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 					annexos,
 					transaccioId);
 			documentPortafirmes.updateEnviat(new Date(), portafirmesId);
-			return null;
 		} catch (SistemaExternException ex) {
 			Throwable rootCause = ExceptionUtils.getRootCause(ex);
 			if (rootCause == null) rootCause = ex;
 			documentPortafirmes.updateEnviatError(
 					ExceptionUtils.getStackTrace(rootCause),
 					null);
-			return ex;
+			resultat = ex;
 		}
+		cacheHelper.evictEnviamentsPortafirmesAmbErrorPerExpedient(document.getExpedient());
+		cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedient().getId());
+		return resultat;
 	}
 
 	/**
@@ -389,11 +391,8 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 			// ========================================== DOCUMENT WAS REBUTJAT EN PORTAFIRMES ==============================================
 			} else if (PortafirmesCallbackEstatEnumDto.REBUTJAT.equals(callbackEstat)) {
 				cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedient().getId());
-				documentPortafirmes.getDocument().updateEstat(
-						DocumentEstatEnumDto.REDACCIO);
-				documentPortafirmes.updateProcessat(
-						false,
-						new Date());
+				documentPortafirmes.getDocument().updateEstat(DocumentEstatEnumDto.REDACCIO);
+				documentPortafirmes.updateProcessat(false, new Date());
 				logAll(documentPortafirmes, LogTipusEnumDto.PFIRMA_REBUIG);
 				alertaHelper.crearAlerta(
 						"La firma del document " + document.getNom() + " ha estat rebutjada " + 

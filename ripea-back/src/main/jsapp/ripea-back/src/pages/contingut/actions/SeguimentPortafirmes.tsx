@@ -7,6 +7,7 @@ import {formatDate} from "../../../util/dateUtils.ts";
 import Load from "../../../components/Load.tsx";
 import * as builder from '../../../util/springFilterUtils.ts'
 import Iframe from "../../../components/Iframe.tsx";
+import {useUserSession} from "../../../components/Session.tsx";
 
 export const SeguimentPortafirmes = (props:any) => {
     const {entity} = props;
@@ -35,6 +36,7 @@ export const SeguimentPortafirmes = (props:any) => {
 const useSeguimentPortafirmes = (potModificar:boolean, refresh?: () => void) => {
     const { t } = useTranslation();
     const {temporalMessageShow} = useBaseAppContext();
+    const { value: user } = useUserSession();
 
     const {
         isReady: apiIsReady,
@@ -81,7 +83,7 @@ const useSeguimentPortafirmes = (potModificar:boolean, refresh?: () => void) => 
             value: 'cancel',
             text: t('page.document.action.cancel.label'),
             icon: 'cancel',
-            hidden: !(entity?.estat == 'ENVIAT' && potModificar),
+            hidden: !(entity?.estat == 'ENVIAT' && potModificar && user?.rolActual != "IPA_ADMIN_LECTURA"),
             componentProps: { variant: 'contained' }
         },
         {
@@ -100,13 +102,10 @@ const useSeguimentPortafirmes = (potModificar:boolean, refresh?: () => void) => 
             componentProps={{ fullWidth: true, maxWidth: 'xl'}}
             buttons={buttons}
             buttonCallback={(value :any) :void=>{
-                if (value=='close') {
-                    handleClose();
-                }
-                if (value=='cancel' && entity?.estat == 'ENVIAT' && potModificar) {
+                if (value=='cancel' && entity?.estat == 'ENVIAT' && potModificar && user?.rolActual != "IPA_ADMIN_LECTURA") {
                     cancelarFirma(entity?.id)
-                    handleClose();
                 }
+                handleClose();
             }}
         >
             <SeguimentPortafirmes entity={entity}/>

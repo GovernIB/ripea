@@ -7,7 +7,7 @@ import {Button, Grid2 as Grid, Icon, Typography, Box} from "@mui/material";
 import {icons} from "../../user/UserHeadToolbar.tsx";
 import {ExpedientInfo} from "../../expedient/details/Expedient.tsx";
 import DocumentsGrid from "../../contingut/DocumentsGrid.tsx";
-import {CommentDialog} from "../../CommentDialog.tsx";
+import {TascaComment} from "../../CommentDialog.tsx";
 import {useActions} from "./TascaActions.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import {CardPage} from "../../../components/CardData.tsx";
@@ -58,7 +58,7 @@ const Tasca = () => {
             <Button
                 variant="outlined"
                 color={"inherit"}
-                sx={{ borderRadius: '4px', backgroundColor: 'white', padding: '0px 10px'}}
+                sx={{ borderRadius: '4px', padding: '0px 10px'}}
                 onClick={()=>navigate(-1)}
             >
                 <Icon>arrow_back</Icon>
@@ -68,7 +68,7 @@ const Tasca = () => {
                 <Button
                     variant="outlined"
                     color={"inherit"}
-                    sx={{ borderRadius: '4px', backgroundColor: 'white', padding: '0px 10px'}}
+                    sx={{ borderRadius: '4px', padding: '0px 10px'}}
                     onClick={()=> {
                         changeEstat(tasca?.id, 'INICIADA', t('page.tasca.action.iniciar.ok'))
                         navigate(-1)
@@ -82,7 +82,7 @@ const Tasca = () => {
                 <Button
                     variant="outlined"
                     color={"inherit"}
-                    sx={{ borderRadius: '4px', backgroundColor: 'white', padding: '0px 10px'}}
+                    sx={{ borderRadius: '4px', padding: '0px 10px'}}
                     onClick={()=> {
                         changeEstat(tasca?.id, 'FINALITZADA', t('page.tasca.action.finalitzar.ok'))
                         navigate(-1)
@@ -92,20 +92,17 @@ const Tasca = () => {
                     {t('page.tasca.action.finalitzar.label')}
                 </Button>
             }
-            <CommentDialog
+            <TascaComment
                 entity={tasca}
                 iconStyle={{ fontSize: '1.2em'}}
                 sx={{ padding: '0px 10px' }}
-                title={`${t('page.comment.tasca')}: ${tasca?.metaExpedientTascaDescription}`}
-                resourceName={'expedientTascaComentariResource'}
-                resourceReference={'expedientTasca'}
                 componentProps={{variant: "outlined", sx: { borderRadius: '4px' }}}
                 readOnly={tasca?.usuariActualOnlyObservador}
             />
         </Box>
     </Box>;
 
-    return <GridPage disableMargins style={{ backgroundColor: 'white' }}>
+    return <GridPage disableMargins>
         <Load value={expedient && tasca} noEffect>
             <CardPage header={headerMain}>
                 <Grid container spacing={2}>

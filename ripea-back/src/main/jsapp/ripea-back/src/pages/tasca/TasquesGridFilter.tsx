@@ -15,9 +15,11 @@ const TasquesGridFilterForm = () => {
         </>
     }
 
+    const expedientFilter = builder.and(builder.eq("metaExpedient", data?.metaExpedient))
+
     return <>
         <GridFormField xs={3} name="metaExpedient"/>
-        <GridFormField xs={3} name="expedient" filter={builder.and(builder.eq("metaExpedient", data?.metaExpedient))}/>
+        <GridFormField xs={3} name="expedient" filter={expedientFilter}/>
         <GridFormField xs={2} name="metaExpedientTasca"/>
         <GridFormField xs={2} name="titol"/>
         <GridFormField xs={2} name="prioritat"/>
@@ -30,18 +32,17 @@ const TasquesGridFilterForm = () => {
 }
 
 const springFilterBuilder = (data:any) => {
-    const filterStr: string = builder.and(
+    return builder.and(
         builder.eq("expedient.metaExpedient.id", data?.metaExpedient?.id),
         builder.eq("expedient.id", data?.expedient?.id),
         builder.eq("metaExpedientTasca.id", data?.metaExpedientTasca?.id),
         builder.like("titol", data?.titol),
-        builder.eq("prioritat", `${data?.prioritat}`),
+        builder.eq("prioritat", `'${data?.prioritat}'`),
         builder.betweenDates("dataInici", data?.dataInici, data?.dataFi),
         builder.betweenDates("dataLimit", data?.dataLimitInici, data?.dataLimitFi),
-        builder.inside("estat", ...(data?.estats?.map?.((v:any)=>`'${v}'`) ?? []))
+        builder.inside("estat", ...(data?.estats?.map?.((v:any)=>`'${v}'`) ?? [])),
+        builder.eq("expedient.esborrat", 0)
     );
-    // console.log('>>> springFilterBuilder:', filterStr)
-    return filterStr;
 }
 
 const TasquesGridFilter = (props:any) => {

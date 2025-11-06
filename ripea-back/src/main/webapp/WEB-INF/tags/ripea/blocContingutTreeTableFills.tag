@@ -22,11 +22,10 @@
 		</c:if>
 
 		<tr id="${fill.id}"
-			class="element-draggable <c:if test="${not fill.document}"> element-droppable</c:if><c:if test="${fill.document}"> isDocument</c:if><c:if test="${fill.document && firmat}"> firmat</c:if><c:if test="${fill.document && fill.pdf}"> isPdf</c:if> <c:if test="${fill.document && fill.arxiuUuid == null}"> isPendentGuardarEnArxiu</c:if><c:if test="${fill.carpeta && fill.hasFills}">hasFills</c:if>"
+			class="element-draggable element-droppable<c:if test="${fill.document}"> isDocument</c:if><c:if test="${fill.document && firmat}"> firmat</c:if><c:if test="${fill.document && fill.pdf}"> isPdf</c:if> <c:if test="${fill.document && fill.arxiuUuid == null}"> isPendentGuardarEnArxiu</c:if><c:if test="${fill.carpeta && fill.hasFills}">hasFills</c:if>"
 			data-expedient-id="${expedient.id}" 
 			data-node="treetable-${fill.id}"
 			data-pnode="treetable-${contingut.id}">
-			
 
 			<%------------ checkbox ----------%>
 			<td><c:if test="${fill.document}">
@@ -38,7 +37,6 @@
 				<rip:blocIconaContingut contingut="${fill}" /> 
 				<rip:blocContingutNomAmbIcons contingut="${fill}" /> 
 			</td>
-
 
 			<%------------ Descripció ----------%>
 			<td><c:if test="${fill.document}">
@@ -63,7 +61,7 @@
 			<%------------ sort ----------%>
 			<c:if test="${expedientAgafatPerUsuariActual && isOrdenacioPermesa}">
 				<td class="ordre-col" title="<spring:message code="contingut.sort.titol"/>"><span
-					class="fa fa-sort"></span></td>
+					class="fa fa-arrows-v"></span></td>
 			</c:if>
 
 			

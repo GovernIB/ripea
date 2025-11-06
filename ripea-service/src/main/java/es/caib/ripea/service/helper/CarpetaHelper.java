@@ -63,7 +63,7 @@ public class CarpetaHelper {
 				+ "arxiuUuid=" + arxiuUuid + ")");
 		
 		ContingutEntity pare = pareId != null ? contingutRepository.getOne(pareId) : null;
-		if (! checkCarpetaUniqueContraint(nom, pare, entitatId)) {
+		if (checkCarpetaUniqueContraint(nom, pare, entitatId)>0) {
 			throw new ContingutNotUniqueException();
 		}
 		
@@ -105,6 +105,7 @@ public class CarpetaHelper {
 			carpetaEntity = carpetaRepository.save(carpetaEntity);
 			pare.addFill(carpetaEntity);
 			contingutRepository.save(pare);
+			contingutHelper.reOrdenaContingut(carpetaEntity, null);
 			// Registra al log la creació de la carpeta
 			contingutLogHelper.logCreacio(
 					carpetaEntity,
@@ -132,7 +133,7 @@ public class CarpetaHelper {
 				false,
 				false,
 				false, false, true, null);
-		if (! checkCarpetaUniqueContraint(nom, contingut.getPare(), entitatId)) {
+		if (checkCarpetaUniqueContraint(nom, contingut.getPare(), entitatId)>0) {
 			throw new ContingutNotUniqueException();
 		}
 		CarpetaEntity carpeta = entityComprovarHelper.comprovarCarpeta(contingut.getEntitat(), id);
@@ -313,7 +314,7 @@ public class CarpetaHelper {
 				ExpedientCarpetaArbreDto.class);
 	}
 
-	private boolean checkCarpetaUniqueContraint (String nom, ContingutEntity pare, Long entitatId) {
+	private int checkCarpetaUniqueContraint (String nom, ContingutEntity pare, Long entitatId) {
 		EntitatEntity entitat = entitatId != null ? entitatRepository.getOne(entitatId) : null;
 		return  contingutHelper.checkUniqueContraint(nom, pare, entitat, ContingutTipusEnumDto.CARPETA);
 	}

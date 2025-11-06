@@ -34,6 +34,7 @@ public class PropertyConfig {
 	public static final String CAPSALERA_LLETRA	= "es.caib.ripea.capsalera.color.lletra";
 	public static final String CLAU_ENCRIPTACIO	= "es.caib.ripea.encription.key";
 	public static final String MAX_UPLOAD_FILE	= "es.caib.ripea.maxUploadSize";
+	public static final String REACT_ACTIU		= "es.caib.ripea.reactActivat";
 
 	public static final String PINBAL_BASE_URL 		= "es.caib.ripea.pinbal.base.url";
 	public static final String PINBAL_USER 			= "es.caib.ripea.pinbal.user";
@@ -101,7 +102,9 @@ public class PropertyConfig {
 	public static final String PORTAFIB_PLUGIN_DEBUG			= "es.caib.ripea.plugin.portafirmes.portafib.log.actiu";
 	public static final String PORTAFIB_PLUGIN_PERFIL			= "es.caib.ripea.plugin.portafirmes.portafib.perfil";
 	public static final String PORTAFIB_PLUGIN_PERSONA_CARREC	= "es.caib.ripea.plugin.portafirmes.carrer.mostrar.persona";
+	//Aquestes dues properties van juntes, veurer PortafirmesPluginPortafib (170)
 	public static final String PORTAFIB_PLUGIN_ENVIAR_URL_EXP	= "es.caib.ripea.plugin.portafirmes.portafib.enviar.url.expedient";
+	public static final String PORTAFIB_PLUGIN_URL_EXP			= "es.caib.ripea.plugin.portafirmes.portafib.url.expedient";
 
 	public static final String PORTAFIB_PLUGIN_FLUX_URL			= "es.caib.ripea.plugin.portafirmes.firmasimpleflux.url";
 	public static final String PORTAFIB_PLUGIN_FLUX_USR			= "es.caib.ripea.plugin.portafirmes.firmasimpleflux.username";

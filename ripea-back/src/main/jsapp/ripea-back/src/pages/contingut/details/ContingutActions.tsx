@@ -194,6 +194,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             label: t('page.document.title')+"...",
             icon: "description",
             onClick: () => apiRef?.current?.showCreateDialog?.(),
+            hidden: !entity?.potModificar,
         },
         {
             label: t('page.document.action.pinbal.label'),
@@ -211,13 +212,12 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             label: t('page.document.action.import.label'),
             icon: "upload_file",
             onClick: handleImportar,
-            disabled: !user?.sessionScope?.isMostrarImportacio,
+            hidden: !user?.sessionScope?.isMostrarImportacio,
         },
 		{
 		    label: t('page.document.action.importZip.label'),
 		    icon: "upload_file",
 		    onClick: handleImportarZip,
-		    disabled: !user?.sessionScope?.isMostrarImportacio,
 		},
         {
             label: t('page.contingut.action.importarExpedient.label'),
@@ -277,8 +277,8 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             icon: "delete",
             showInMenu: true,
             onClick: eliminar,
-            hidden: (row:any) => !entity?.potModificar || !isDocument(row) || row?.estat == 'DEFINITIU',
-        },        
+            hidden: (row:any) => !entity?.potModificar || !isDocument(row) || (row?.arxiuEstat == 'DEFINITIU' && !user?.sessionScope?.permesEsborrarFinals)
+        },
         {
             label: <Divider sx={{width: '100%'}} color={"none"}/>,
             showInMenu: true,
@@ -290,7 +290,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             showInMenu: true,
 			onClick: (id:any) => apiDownload(id, 'adjunt', t('page.document.action.descarregarOriginal.ok')),
             hidden: (row:any) => !isDigitalOrImportat(row),
-        },        
+        },
         {
             label: t('page.document.action.imprimible.label'),
             icon: "download",
@@ -298,13 +298,6 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
 			onClick: (id:any) => apiDownload(id, 'imprimible', t('page.document.action.imprimible.ok')),
             disabled: (row:any) => isInOptions(row?.fitxerExtension, 'xsig'),
             hidden: (row:any) => !isDigitalOrImportat(row) || !( (row?.arxiuEstat=='DEFINITIU' || row?.estat=='FIRMA_PARCIAL') || user?.sessionScope?.imprimibleNoFirmats),
-        },
-        {
-            label: t('page.document.action.original.label'),
-            icon: "download",
-            showInMenu: true,
-			onClick: (id:any) => apiDownload(id, 'adjunt', t('page.document.action.original.label.ok')),
-            hidden: (row:any) => !isDigitalOrImportat(row),
         },
         {
             label: t('page.document.action.original.label'),

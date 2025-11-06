@@ -109,7 +109,7 @@ public class DocumentEnviamentController extends BaseUserController {
 		}
 		
 		if (nifsErrorPostal) {
-			bindingResult.reject("notificacio.controller.reject.postal");
+			bindingResult.reject("notificacio.controller.reject.postal", getMessage(request, "notificacio.controller.reject.postal"));
 		}
 
         try {

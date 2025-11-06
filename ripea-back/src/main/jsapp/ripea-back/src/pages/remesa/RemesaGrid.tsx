@@ -78,7 +78,7 @@ const RemesaGridForm = () => {
     </Grid>
 }
 
-const sortModel:any = [{field: 'id', sort: 'asc'}];
+const sortModel:any = [{field: 'id', sort: 'desc'}];
 const columns = [
     {
         field: 'tipus',
@@ -142,6 +142,9 @@ const RemesaGrid = (props:any) => {
             popupEditFormI18nKeys={{
                 updateSuccess: 'page.notificacio.action.update.ok',
             }}
+
+            paginationActive={false}
+            autoHeight
         />
         {components}
         {dialog}

@@ -9,9 +9,10 @@ const menuIcon = 'menu';
 
 export interface AppMenuProps {
   menuEntries: MenuEntry[];
+  logo?: string
 }
 
-export const AppMenu: React.FC<AppMenuProps> = ({ menuEntries }) => {
+export const AppMenu: React.FC<AppMenuProps> = ({ menuEntries, logo }) => {
   const [open, setOpen] = React.useState(false);
   const { value: entitat } = useEntitatSession()
 
@@ -26,12 +27,13 @@ export const AppMenu: React.FC<AppMenuProps> = ({ menuEntries }) => {
         onClick={toggleMenu}
         edge="start"
         // sx={{ mr: 2 }}
-        style={{ color: entitat?.capsaleraColorLletra ?? '#000' }}
+        style={{color: entitat?.conf?.colorLletra}}
       >
         <Icon sx={{ fontSize: '24px', m: 0 }} fontSize={'medium'}>{menuIcon}</Icon>
       </IconButton>
       {open && <SideMenu
           entries={menuEntries}
+          logo={logo}
           drawerWidth={350}
           iconClicked={open}
           onTitleClose={() => setOpen(false)}

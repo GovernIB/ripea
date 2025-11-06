@@ -26,7 +26,7 @@ export const GridButtonField = (props:any) => {
 
     return <Load value={apiRef} noEffect><GridButton
         onClick={()=>{
-            apiRef?.current?.setFieldValue(name, !data?.[name])
+            apiRef?.current?.setFieldValue?.(name, !data?.[name])
         }}
         variant={ data?.[name] ?"contained":"outlined" }
         title={fields?.find?.(item => item?.name === name)?.label || ''}

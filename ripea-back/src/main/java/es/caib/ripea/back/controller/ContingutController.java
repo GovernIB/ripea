@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.ConnectException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -69,6 +71,7 @@ import es.caib.ripea.service.intf.dto.PermissionEnumDto;
 import es.caib.ripea.service.intf.dto.ResultDocumentsSenseContingut;
 import es.caib.ripea.service.intf.dto.TascaEstatEnumDto;
 import es.caib.ripea.service.intf.dto.UsuariDto;
+import es.caib.ripea.service.intf.exception.ValidationException;
 import es.caib.ripea.service.intf.registre.RegistreTipusEnum;
 import es.caib.ripea.service.intf.service.AlertaService;
 import es.caib.ripea.service.intf.service.AplicacioService;
@@ -93,6 +96,7 @@ import es.caib.ripea.service.intf.service.URLInstruccioService;
 public class ContingutController extends BaseUserOAdminOOrganController {
 
 	private static final String SESSION_ATTRIBUTE_SELECCIO = "ContingutDocumentController.session.seleccio";
+	private static enum MourerCopiarVincular {MOURER, COPIAR, VINCULAR}
 	
 	@Autowired private AplicacioService aplicacioService;
 	@Autowired private ContingutService contingutService;
@@ -172,6 +176,9 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 					((DocumentDto) contingut).setFitxerTamany(tamany);
 				}
 			}
+			
+			//Ordenam els fills, les carpetes primer, despres els documents
+//			reordenaFillsCarpetesFirst(contingut);
 
 			omplirModelPerMostrarContingut(
 					request,
@@ -294,6 +301,22 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 		}
 	}
 	
+	private void reordenaFillsCarpetesFirst(ContingutDto contingut) {
+		List<ContingutDto> fillsReordenats = new ArrayList<ContingutDto>();
+		if (contingut.getFills()!=null) {
+			for (ContingutDto fill: contingut.getFills()) {
+				if (fill.isCarpeta()) {
+					reordenaFillsCarpetesFirst(fill);
+					fillsReordenats.add(fill);
+				}
+			}
+			for (ContingutDto fill: contingut.getFills()) {
+				if (fill.isDocument()) { fillsReordenats.add(fill); }
+			}
+		}
+		contingut.setFills(fillsReordenats);
+	}
+	
 	@RequestMapping(value = "/contingut/tag/{contingutId}", method = RequestMethod.GET)
 	public String contingutTagGet(
 			HttpServletRequest request,
@@ -347,6 +370,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 		model.addAttribute("isMantenirEstatCarpetaActiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.MANTENIR_ESTAT_CARPETA)));
 		model.addAttribute("imprimibleNoFirmats", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.IMPRIMIBLE_NO_FIRMAT_ACTIU)));
 		model.addAttribute("convertirDefinitiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.CONVERSIO_DEFINITIU)));
+		model.addAttribute("isFirmaBiometrica", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.FIRMA_BIOMETRICA_ACTIVA)));
 		
 		//model.addAttribute("paddingCurrentFill", 60 * contingut.getPath().size());
 		
@@ -472,20 +496,17 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 				entitatActual,
 				contingutOrigenId,
 				docsIdx,
-				model);
-		ContingutDto contingutOrigen = contingutService.getBasicInfo(
-				contingutOrigenId, 
-				true);
-		ContingutMoureCopiarEnviarCommand command = new ContingutMoureCopiarEnviarCommand();
-		if (docsIdx != null && !docsIdx.isEmpty() && (contingutOrigen instanceof CarpetaDto || contingutOrigen instanceof ExpedientDto)) {
-			command.setOrigenIds(
-					docsIdx.toArray(new Long[docsIdx.size()]));
-		} else {
-			command.setOrigenId(contingutOrigenId);
-		}
-		model.addAttribute("moureMateixExpedients", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.MOURE_MATEIX_EXPEDIENTS)));
-		model.addAttribute(command);
+				model,
+				MourerCopiarVincular.MOURER);
 		return "contingutMoureForm";
+	}
+	
+	private void errorsBindingToMessage(HttpServletRequest request, BindingResult bindingResult) {
+		StringBuilder sb = new StringBuilder();
+		for (FieldError error : bindingResult.getFieldErrors()) {
+			sb.append(error.getDefaultMessage()).append(". ");
+		}
+		MissatgesHelper.error(request, sb.toString());
 	}
 	
 	@RequestMapping(value = "/contingut/{contingutOrigenId}/moure", method = RequestMethod.POST)
@@ -502,14 +523,17 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 						request,
 						SESSION_ATTRIBUTE_SELECCIO);
 		if (bindingResult.hasErrors()) {
+			errorsBindingToMessage(request, bindingResult);
 			omplirModelPerMoureOCopiarVincular(
 					request,
 					entitatActual,
 					contingutOrigenId,
 					docsIdx,
-					model);
+					model,
+					MourerCopiarVincular.MOURER);
 			return "contingutMoureForm";
 		}
+		
 		if (docsIdx != null && !docsIdx.isEmpty()) {
 			for (Long docIdx : docsIdx) {
 				contingutService.move(
@@ -541,30 +565,91 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 		ContingutDto contingutOrigen = contingutService.findAmbIdUser(
 				entitatActual.getId(),
 				contingutOrigenId,
-				true,
+				false,
 				false, 
-				true, 
+				false, 
 				null, 
 				null);
-		
-		boolean isTheSame = false;
-		if (contingutOrigen.getPare().getId().equals(contingutDestiId)) {
-			isTheSame = true;
+		ContingutDto contingutDesti = contingutService.findAmbIdUser(
+				entitatActual.getId(),
+				contingutDestiId,
+				true,
+				false, 
+				false, 
+				null, 
+				null);
+			
+		//Comprovam si s'ha canviat el pare, en tal cas s'ha de mourer, sino es una ordenació.
+		boolean justSorting = false;
+		/**
+		 * Casos en que NO s'ha de mourer contingut: 
+		 * 1.- Quant els dos son documents dins el mateix pare.
+		 * 2.- Qant es mou una carpeta o document a una altre carpeta que ja es el seu pare.
+		 * 3.- Qant es mou una carpeta sobre un document dins el mateix pare.
+		 */
+		boolean casPrimer = contingutOrigen.isDocument() && contingutDesti.isDocument() && contingutOrigen.getPare().getId().equals(contingutDesti.getPare().getId());
+		boolean casSegon  = 								contingutDesti.isCarpeta()  && contingutOrigen.getPare().getId().equals(contingutDesti.getId());
+		boolean casTercer = contingutOrigen.isCarpeta()  && contingutDesti.isDocument()  && contingutOrigen.getPare().getId().equals(contingutDesti.getPare().getId());
+		if (casPrimer || casSegon || casTercer) {
+			justSorting = true;
 		}
-		if (!isTheSame) {
-			try {
+		
+		Long destiId = contingutDestiId;
+		if (!contingutDesti.isCarpeta()) {
+			//Si el destí es un document, s'ha de mourer al pare del destí, i posteriorment reordenar
+			destiId = contingutDesti.getPare().getId();
+		}
+
+		try {
+			if (!justSorting) {
 				contingutService.move(
 						entitatActual.getId(),
 						contingutOrigenId,
-						contingutDestiId, 
+						destiId, 
 						RolHelper.getRolActual(request));
-			} catch (Exception ex) {
-				return getAjaxControllerReturnValueError(
-						request, 
-						"redirect:../../" + contingutOrigen.getExpedientPare().getId(), 
-						"contingut.controller.element.mogut.ko", 
-						ex);
 			}
+			
+			List<ContingutDto> contingutFillsDestiPare = contingutService.getFillsBasicInfo(destiId);
+			
+			Map<Integer, Long> orderedElements = new HashMap<Integer, Long>();
+			if (contingutFillsDestiPare!=null) {
+				int ordreAssignat = 0;
+				for (ContingutDto fill: contingutFillsDestiPare) {
+					if (fill.getId().equals(contingutDestiId)) {
+						//Estam recorrent el element sobre el que hem amollat el cursor
+						//El element origen s'insertará darrera aquest.
+						orderedElements.put(ordreAssignat, fill.getId());
+						ordreAssignat++;
+						orderedElements.put(ordreAssignat, contingutOrigenId);
+						ordreAssignat++;
+					} else if (fill.getId().equals(contingutOrigenId)) {
+						//no feim res, ja l'hem insertat abans
+					} else {
+						//qualsevol altre element del pare
+						orderedElements.put(ordreAssignat, fill.getId());
+						ordreAssignat++;
+					}
+				}
+			}
+			
+			contingutService.order(entitatActual.getId(), destiId, orderedElements);
+		} catch (Exception ex) {
+			
+			if (ex instanceof ValidationException) {
+				MissatgesHelper.error(request, getMessage(request, "contingut.controller.element.mogut.ko")+": "+ex.getMessage());
+				return "redirect:../../" + contingutOrigen.getExpedientPare().getId();
+			}
+			
+			if (ex.getCause()!=null && ex.getCause() instanceof ValidationException) {
+				MissatgesHelper.error(request, getMessage(request, "contingut.controller.element.mogut.ko")+": "+ex.getCause().getMessage());
+				return "redirect:../../" + contingutOrigen.getExpedientPare().getId();
+			}
+
+			return getAjaxControllerReturnValueError(
+					request, 
+					"redirect:../../" + contingutOrigen.getExpedientPare().getId(), 
+					"contingut.controller.element.mogut.ko", 
+					ex);
 		}
 
 		return getAjaxControllerReturnValueSuccess(
@@ -597,10 +682,8 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 				entitatActual,
 				contingutOrigenId,
 				null,
-				model);
-		ContingutMoureCopiarEnviarCommand command = new ContingutMoureCopiarEnviarCommand();
-		command.setOrigenId(contingutOrigenId);
-		model.addAttribute(command);
+				model,
+				MourerCopiarVincular.COPIAR);
 		return "contingutCopiarForm";
 	}
 	
@@ -613,12 +696,14 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
+			errorsBindingToMessage(request, bindingResult);
 			omplirModelPerMoureOCopiarVincular(
 					request,
 					entitatActual,
 					contingutOrigenId,
 					null,
-					model);
+					model,
+					MourerCopiarVincular.COPIAR);
 			return "contingutCopiarForm";
 		}
 		ContingutDto contingutCreat = contingutService.copy(
@@ -643,11 +728,8 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 				entitatActual,
 				contingutOrigenId,
 				null,
-				model);
-		ContingutMoureCopiarEnviarCommand command = new ContingutMoureCopiarEnviarCommand();
-		command.setOrigenId(contingutOrigenId);
-		model.addAttribute("moureMateixExpedients", false);
-		model.addAttribute(command);
+				model,
+				MourerCopiarVincular.VINCULAR);
 		return "contingutVincularForm";
 	}
 	
@@ -660,12 +742,14 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
+			errorsBindingToMessage(request, bindingResult);
 			omplirModelPerMoureOCopiarVincular(
 					request,
 					entitatActual,
 					contingutOrigenId,
 					null,
-					model);
+					model,
+					MourerCopiarVincular.VINCULAR);
 			return "contingutVincularForm";
 		}
 		Long contingutCreatId = contingutService.link(
@@ -1093,7 +1177,8 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			EntitatDto entitatActual,
 			Long contingutOrigenId,
 			Set<Long> docsIdx,
-			Model model) {
+			Model model,
+			MourerCopiarVincular accio) {
 		ContingutDto contingutOrigen = contingutService.findAmbIdUser(
 				entitatActual.getId(),
 				contingutOrigenId,
@@ -1118,9 +1203,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			model.addAttribute("isVistaArbreMoureDocuments", true);
 			List<ExpedientDto> expedientsMetaExpedient = null;
 			boolean moureEntreExpedients = ! Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.MOURE_MATEIX_EXPEDIENTS));
-			
 			Long metaExpedientId = (contingutOrigen instanceof ExpedientDto) ? ((ExpedientDto)contingutOrigen).getMetaNode().getId() : contingutOrigen.getExpedientPare().getMetaNode().getId();
-							
 			if (moureEntreExpedients) {
 				expedientsMetaExpedient = expedientService.findByEntitatAndMetaExpedient(
 						entitatActual.getId(), 
@@ -1136,6 +1219,32 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 					RolHelper.getRolActual(request));
 			
 			model.addAttribute("carpetes", carpetes);
+		}
+		
+		ContingutMoureCopiarEnviarCommand command = new ContingutMoureCopiarEnviarCommand();
+		command.setAccio(accio.toString());
+		
+		switch (accio) {
+		case MOURER:
+			ContingutDto contingutOrigen2 = contingutService.getBasicInfo(contingutOrigenId, true);
+			if (docsIdx != null && !docsIdx.isEmpty() && (contingutOrigen2 instanceof CarpetaDto || contingutOrigen2 instanceof ExpedientDto)) {
+				command.setOrigenIds(docsIdx.toArray(new Long[docsIdx.size()]));
+			} else {
+				command.setOrigenId(contingutOrigenId);
+			}
+			model.addAttribute("moureMateixExpedients", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.MOURE_MATEIX_EXPEDIENTS)));
+			model.addAttribute(command);			
+			break;
+		case COPIAR:
+			command.setOrigenId(contingutOrigenId);
+			model.addAttribute("moureMateixExpedients", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.MOURE_MATEIX_EXPEDIENTS)));
+			model.addAttribute(command);		
+			break;
+		case VINCULAR: 
+			command.setOrigenId(contingutOrigenId);
+			model.addAttribute("moureMateixExpedients", false);
+			model.addAttribute(command);
+			break;
 		}
 	}
 

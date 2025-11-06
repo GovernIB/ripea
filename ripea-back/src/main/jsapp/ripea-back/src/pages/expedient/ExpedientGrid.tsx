@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useMemo, useState} from "react";
 import {Typography, Icon, Grid} from "@mui/material";
 import {GridPage, useFormContext, useMuiDataGridApiRef,} from 'reactlib';
 import {useTranslation} from "react-i18next";
@@ -6,7 +6,7 @@ import {useNavigate} from "react-router-dom";
 import {formatDate} from '../../util/dateUtils';
 import GridFormField from "../../components/GridFormField.tsx";
 import {useCommonActions} from "./details/CommonActions.tsx";
-import {CommentDialog} from "../CommentDialog.tsx";
+import {ExpedientComment} from "../CommentDialog.tsx";
 import {FollowersDialog} from "../FollowersDialog.tsx";
 import ExpedientFilter from "./ExpedientFilter.tsx";
 import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
@@ -45,7 +45,7 @@ export const ExpedientGridForm = () => {
                        hidden={!data?.grup && !data?.gestioAmbGrupsActiva} required/>
         <GridFormField xs={12} name="prioritat" required/>
         <GridFormField xs={12} name="prioritatMotiu" type={"textarea"} hidden={data?.prioritat == 'B_NORMAL'} required/>
-        <GridFormField xs={12} name="asignarSeguidor" required/>
+        <GridFormField xs={12} name="asignarSeguidor" required hidden={!!data?.id}/>
     </Grid>
 }
 
@@ -153,7 +153,7 @@ const ExpedientGrid = () => {
     const {handleOpen: handelAlert, dialog: dialogAlert} = useAlerta();
     const {handleOpen: hanldeErrorValidacio, dialog: dialogErrorValidacio} = useErrorValidacio();
 
-    const columnsAddition :any[] = [
+    const columnsAddition :any[] = useMemo(() => [
         ...beforeAvis,
         {
             headerName: t('page.expedient.detall.avisos'),
@@ -239,11 +239,8 @@ const ExpedientGrid = () => {
             headerName: '',
             sortable: false,
             flex: 0.25,
-            renderCell: (params: any) => <CommentDialog
+            renderCell: (params: any) => <ExpedientComment
                 entity={params?.row}
-                title={`${t('page.comment.expedient')}: ${params?.row?.nom}`}
-                resourceName={'expedientComentariResource'}
-                resourceReference={'expedient'}
                 onClose={refresh}
             />,
             hidden: !user?.conf?.expedientListComentaris,
@@ -256,7 +253,7 @@ const ExpedientGrid = () => {
             renderCell: (params: any) => <FollowersDialog entity={params?.row}/>
         },
     ]
-        .filter((col:any)=>!col?.hidden);
+        .filter((col:any)=>!col?.hidden), [user]);
 
     return <GridPage disableMargins>
         <CardPage title={t('page.expedient.filter.title')}>

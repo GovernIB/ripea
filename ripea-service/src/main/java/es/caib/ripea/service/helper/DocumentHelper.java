@@ -103,7 +103,7 @@ public class DocumentHelper {
 		ExpedientEntity expedient = pare.getExpedientPare();
 		
 		EntitatEntity entitat = entitatId != null ? entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false, false) : null;
-		if (entitat!=null && !contingutHelper.checkUniqueContraint(document.getNom(), pare, entitat, ContingutTipusEnumDto.DOCUMENT)) {
+		if (entitat!=null && contingutHelper.checkUniqueContraint(document.getNom(), pare, entitat, ContingutTipusEnumDto.DOCUMENT)>0) {
 			throw new ContingutNotUniqueException();
 		}
 		
@@ -313,6 +313,8 @@ public class DocumentHelper {
 
 		entity.updateArxiuIntent(true);
 
+		contingutHelper.reOrdenaContingut(entity, null);
+		
 		if (returnDetail)		
 			dto = toDocumentDto(entity);
 		else
@@ -371,7 +373,7 @@ public class DocumentHelper {
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(documentEntity.getId()));
 
 		EntitatEntity entitat = entitatId != null ? entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false, false) : null;
-		if (!contingutHelper.checkUniqueContraint(document.getNom(), null, entitat, ContingutTipusEnumDto.DOCUMENT)) {
+		if (contingutHelper.checkUniqueContraint(document.getNom(), null, entitat, ContingutTipusEnumDto.DOCUMENT)>0) {
 			throw new ContingutNotUniqueException();
 		}
 		
@@ -619,7 +621,7 @@ public class DocumentHelper {
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(documentEntity.getId()));
 
 		EntitatEntity entitat = entitatId != null ? entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false, false) : null;
-		if (!contingutHelper.checkUniqueContraint(documentEntity.getNom(), null, entitat, ContingutTipusEnumDto.DOCUMENT)) {
+		if (contingutHelper.checkUniqueContraint(documentEntity.getNom(), null, entitat, ContingutTipusEnumDto.DOCUMENT)>0) {
 			throw new ContingutNotUniqueException();
 		}
 		
@@ -1026,11 +1028,39 @@ public class DocumentHelper {
 	}
 	
 	public String getEnllacCsv(Long entitatId, Long documentId) {
+		String ntiCsv = null;
 		String urlValidacio = configHelper.getConfig(PropertyConfig.CONCSV_BASE_URL);
 		DocumentEntity documentEntity = documentRepository.findById(documentId).orElse(null);
-		if (Utils.hasValue(urlValidacio) && documentEntity!=null && documentEntity.getNtiCsv()!=null) {
+		
+		// Propietat anterior
+		if (!Utils.hasValue(urlValidacio)) {
+			urlValidacio = configHelper.getConfig(PropertyConfig.VALIDACIO_URL_IMPRIMIBLES);
+		}
+		
+		if (documentEntity != null) {
+			ntiCsv = documentEntity.getNtiCsv();
+		}
+		
+		if (Utils.hasValue(urlValidacio) && ntiCsv != null) {
 			return urlValidacio + documentEntity.getNtiCsv();
 		}
+		
+		if (Utils.hasValue(urlValidacio) && ntiCsv == null) {
+			Document document = pluginHelper.arxiuDocumentConsultar(
+					documentEntity, 
+					documentEntity.getArxiuUuid(), 
+					null, 
+					false);
+			
+			if (document == null || document.getMetadades() == null || document.getMetadades().getMetadadesAddicionals() == null) {
+				return null;
+			}
+			
+			String csv = (String)document.getMetadades().getMetadadesAddicionals().get("csv");
+			
+			return urlValidacio + csv;
+		}
+		
 		return null;
 	}
 	

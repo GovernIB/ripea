@@ -539,7 +539,7 @@ public class ContingutServiceImpl implements ContingutService {
 
 		List<ContingutDto> contingutsDto = new ArrayList<>();
 
-		List<ContingutEntity> continguts = contingutRepository.findByPareIdAndEsborrat(contingutId, 0);
+		List<ContingutEntity> continguts = contingutRepository.findByPareIdAndEsborratOrderByOrdreAsc(contingutId, 0);
 
 		if (Utils.isNotEmpty(continguts)) {
 

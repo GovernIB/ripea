@@ -251,7 +251,7 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 					"No s'ha pogut enviar la notificació (" +
 					"emisorDir3Codi=" + notificacio.getEmisorDir3Codi() + ", " +
 					"enviamentTipus=" + notificacio.getEnviamentTipus() + ", " +
-					"concepte=" + notificacio.getConcepte() + ")",
+					"concepte=" + notificacio.getConcepte() + "): "+ex.getMessage(),
 					ex);
 		}
 	}

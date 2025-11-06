@@ -5,10 +5,11 @@ import java.util.List;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
-import es.caib.comanda.ms.salut.model.AppInfo;
+
 import es.caib.comanda.ms.salut.model.ContextInfo;
 import es.caib.comanda.ms.salut.model.IntegracioInfo;
 import es.caib.comanda.ms.salut.model.SalutInfo;
+import es.caib.comanda.ms.salut.model.SubsistemaInfo;
 import es.caib.ripea.ejb.base.AbstractServiceEjb;
 import es.caib.ripea.service.intf.service.SalutService;
 import lombok.experimental.Delegate;
@@ -31,7 +32,7 @@ public class SalutServiceEjb extends AbstractServiceEjb<SalutService> implements
 
 	@Override
 	@PermitAll
-	public List<AppInfo> getSubsistemes() {
+	public List<SubsistemaInfo> getSubsistemes() {
 		return delegateService.getSubsistemes();
 	}
 

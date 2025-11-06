@@ -318,6 +318,7 @@ public class DocumentResource extends NodeResource {
     @Transient private String digitalitzacioProcesUrl;
     @Transient private MetaDocumentResource metaDocumentInfo;
     @Transient private ResourceReference<CarpetaResource, Long> carpeta;
+    @Transient private boolean isDeteccioFirmaAutomaticaActiva;
 
     public String getFitxerExtension() {
         if (fitxerNom != null) {
@@ -495,11 +496,14 @@ public class DocumentResource extends NodeResource {
     @FieldNameConstants
     public static class NotificarFormAction implements Serializable {
         @NotNull
-        private DocumentNotificacioTipusEnumDto tipus;
+        private DocumentNotificacioTipusEnumDto tipus = DocumentNotificacioTipusEnumDto.NOTIFICACIO;
         @NotNull
         private DocumentNotificacioEstatEnumDto estat = DocumentNotificacioEstatEnumDto.PENDENT;
+        @ResourceField(onChangeActive = true)
+        private List<ResourceReference<InteressatGrupResource, Long>> grups = new ArrayList<>();
         @NotNull
         @NotEmpty
+        @ResourceField(onChangeActive = true)
         private List<ResourceReference<InteressatResource, Long>> interessats = new ArrayList<>();
         @NotNull
         private String concepte;
@@ -521,6 +525,8 @@ public class DocumentResource extends NodeResource {
 
         @Transient
         private boolean permetreEnviamentPostal;
+        @Transient
+        private List<ResourceReference<InteressatResource, Long>> interessatsAmbAvis = new ArrayList<>();
 
         @Transient
         private ResourceReference<ExpedientResource, Long> expedient;
@@ -636,7 +642,7 @@ public class DocumentResource extends NodeResource {
         resultat.setFitxerNom(this.fitxerNom);
         resultat.setFitxerContingut(this.getFitxerContingut());
         resultat.setFitxerContentType(getFitxerContentType());
-        resultat.setAmbFirma(this.hasFirma);
+        resultat.setAmbFirma(this.hasFirma!=null?this.hasFirma:false);
         switch (this.getDocumentFirmaTipus()) {
             case FIRMA_ADJUNTA:
                 resultat.setTipusFirma(DocumentTipusFirmaEnumDto.ADJUNT);

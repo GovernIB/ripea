@@ -79,12 +79,12 @@ export const useExpedientsCarpetes = (commonFilter: string) => {
     const [expedients, setExpedients] = useState<any[]>([]);
     const [carpetes, setCarpetes] = useState<any[]>([]);
     const findExpedients = () => {
-        apiExpedientFindAll({perspectives, unpaged: true, filter: commonFilter})
+        return apiExpedientFindAll({perspectives, unpaged: true, filter: commonFilter})
             .then((result)=> setExpedients(result.rows))
             .catch(()=> setExpedients([]))
     }
     const findCarpetes = () => {
-        apiCarpetaFindAll({perspectives, unpaged: true, filter: commonFilter})
+        return apiCarpetaFindAll({perspectives, unpaged: true, filter: commonFilter})
             .then((result)=> setCarpetes(result.rows))
             .catch(()=> setCarpetes([]))
     }
@@ -98,9 +98,8 @@ export const useExpedientsCarpetes = (commonFilter: string) => {
             findCarpetes();
         }
     }, [apiCarpetaIsReady]);
-    const refresh = () => {
-        findExpedients();
-        findCarpetes();
+    const refresh = async () => {
+        await Promise.allSettled([findExpedients(), findCarpetes()]);
     }
     return {
         isReady: apiExpedientIsReady && apiCarpetaIsReady,
@@ -175,9 +174,9 @@ const DocumentsGrid = (props: any) => {
         expedients,
         refresh: refreshTree
     } = useExpedientsCarpetes(commonFilter);
-    const refresh = () => {
+    const refresh = async () => {
         if (vista == View.carpeta || vista == View.icona) {
-            refreshTree()
+            await refreshTree()
         }
         gridApiRef?.current?.refresh?.();
     }
@@ -201,24 +200,24 @@ const DocumentsGrid = (props: any) => {
     const handleDragEnd = (event: any) => {
         const sourceData = event.active.data.current;
         const targetData = event.over.data.current;
-        console.log('>>> ', sourceData.nom, '(', sourceData.ordre, ')->', targetData.nom, '(', targetData.ordre, ')')
-        const patchData = {
-            ...(targetData.tipus === 'DOCUMENT' && { ordre: targetData.ordre }),
-            pare: { id: targetData.tipus === 'DOCUMENT' ? targetData.pare.id : targetData.id },
-            ordrePatch: true
-        };
-        if (sourceData.ordre != targetData.ordre || sourceData.pare.id != targetData.pare.id) {
+        //console.log('>>> ', sourceData.nom, '(', sourceData.ordre, ')->', targetData.nom, '(', targetData.ordre, ')')
+        if (sourceData.id != targetData.id || sourceData.pare.id != targetData.pare.id) {
+            const patchData = {
+                ...(targetData.tipus === 'DOCUMENT' && { ordre: targetData.ordre }),
+                pare: { id: targetData.tipus === 'DOCUMENT' ? targetData.pare.id : targetData.id },
+                ordrePatch: true
+            };
             if (sourceData.tipus === 'DOCUMENT') {
-                console.log('>>> document patch', patchData)
+                //console.log('>>> document patch', patchData)
                 if (apiDocumentIsReady) {
-                    apiDocumentPatch(sourceData.id, {data: patchData}).then(() => gridApiRef.current.refresh());
+                    apiDocumentPatch(sourceData.id, {data: patchData}).then(() => refresh());
                 } else {
                     console.error('Servei de l\'API pels documents no disponible')
                 }
             } else if (sourceData.tipus === 'CARPETA') {
-                console.log('>>> carpeta patch', patchData)
+                //console.log('>>> carpeta patch', patchData)
                 if (apiCarpetaIsReady) {
-                    apiCarpetaPatch(sourceData.id, {data: patchData}).then(() => gridApiRef.current.refresh());
+                    apiCarpetaPatch(sourceData.id, {data: patchData}).then(() => refresh());
                 } else {
                     console.error('Servei de l\'API per les carpetes no disponible')
                 }
@@ -321,14 +320,14 @@ const DocumentsGrid = (props: any) => {
                             }
                         }}
                         rowExpansionChange={(params: any) => {
-                            addFolderExpand(params.id, params.childrenExpanded)
+                            addFolderExpand(params.groupingKey, params.childrenExpanded)
                         }}
                         isGroupExpandedByDefault={(params) => {
-                            const value = getFolderExpand(`${params?.id}`)
+                            const value = getFolderExpand(`${params?.groupingKey}`)
                             if (value !== undefined) {
                                 return value
                             }
-                            addFolderExpand(`${params?.id}`, expand)
+                            addFolderExpand(`${params?.groupingKey}`, expand)
                             return expand
                         }}
                         toolbarElementsWithPositions={[

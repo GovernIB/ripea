@@ -70,6 +70,7 @@ import es.caib.ripea.service.intf.dto.PaginaDto;
 import es.caib.ripea.service.intf.dto.PermissionEnumDto;
 import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
 import es.caib.ripea.service.intf.dto.RespostaPublicacioComentariDto;
+import es.caib.ripea.service.intf.dto.SiNoEnumDto;
 import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.exception.ArxiuJaGuardatException;
 import es.caib.ripea.service.intf.exception.ExpedientTancarSenseDocumentsDefinitiusException;
@@ -657,7 +658,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					null,
 					command.getPrioritat(),
 					command.getPrioritatMotiu(),
-					command.getSeguidor());
+					command.isSeguidor()?SiNoEnumDto.SI:SiNoEnumDto.NO);
 			
 			model.addAttribute("redirectUrlAfterClosingModal", "contingut/" + expedientDto.getId());
 			

@@ -34,13 +34,21 @@ public interface ContingutRepository extends JpaRepository<ContingutEntity, Long
 			+ "    SELECT COUNT(*) - 1 FROM hijos", nativeQuery = true)
 	int countByPareIdPostgres(@Param("pareId")Long pareId);
 	
-	List<ContingutEntity> findByNomAndTipusAndPareAndEntitatAndEsborrat(
-			String nom,
-			ContingutTipusEnumDto tipus,
-			ContingutEntity pare,
-			EntitatEntity entitat,
-			int esborrat);
+	@Query("SELECT c FROM ContingutEntity c WHERE LOWER(c.nom) = LOWER(:nom) AND c.tipus = :tipus AND c.pare.id = :pareId AND c.entitat.id = :entitatId AND c.esborrat = :esborrat")
+	List<ContingutEntity> findCarpetaByNomIgnoreCase(
+		    @Param("nom") String nom,
+		    @Param("tipus") ContingutTipusEnumDto tipus,
+		    @Param("pareId") Long pareId,
+		    @Param("entitatId") Long entitatId,
+		    @Param("esborrat") int esborrat);
 
+	List<ContingutEntity> findByNomAndTipusAndPareIdAndEntitatIdAndEsborrat(
+		    String nom,
+		    ContingutTipusEnumDto tipus,
+		    Long pareId,
+		    Long entitatId,
+		    int esborrat);
+	
 	@Query("select c " + 
 			"from ContingutEntity c " + 
 			"where c.pare = :pare " + 
@@ -80,7 +88,7 @@ public interface ContingutRepository extends JpaRepository<ContingutEntity, Long
 			String nom,
 			int esborrat);
 	
-	List<ContingutEntity> findByPareIdAndEsborrat(
+	List<ContingutEntity> findByPareIdAndEsborratOrderByOrdreAsc(
 			Long pareId,
 			int esborrat);
 	

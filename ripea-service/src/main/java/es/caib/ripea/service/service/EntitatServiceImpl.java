@@ -49,9 +49,23 @@ public class EntitatServiceImpl implements EntitatService {
 	public EntitatDto create(EntitatDto entitat) {
 
 		logger.debug("Creant una nova entitat (entitat=" + entitat + ")");
-		EntitatEntity entity = EntitatEntity.getBuilder(entitat.getCodi(), entitat.getNom(), entitat.getDescripcio(), entitat.getCif(),
-								entitat.getUnitatArrel()).logoImgBytes(entitat.getLogoImgBytes()).capsaleraColorFons(entitat.getCapsaleraColorFons()).
-								capsaleraColorLletra(entitat.getCapsaleraColorLletra()).build();
+		EntitatEntity entity = EntitatEntity.getBuilder(
+				entitat.getCodi(),
+				entitat.getNom(),
+				entitat.getDescripcio(),
+				entitat.getCif(),
+				entitat.getUnitatArrel())
+				.logoImgBytes(entitat.getLogoImgBytes())
+				.logoMenuBytes(entitat.getMenuImgBytes())
+				.logoFaviconBytes(entitat.getFaviconImgBytes())
+				.capsaleraColorFons(entitat.getCapsaleraColorFons())
+				.capsaleraColorLletra(entitat.getCapsaleraColorLletra())
+				.blackLogoImgBytes(entitat.getBlackLogoImgBytes())
+				.blackLogoMenuBytes(entitat.getBlackMenuImgBytes())
+				.blackFaviconBytes(entitat.getBlackFaviconImgBytes())
+				.blackCapsaleraColorFons(entitat.getBlackCapsaleraColorFons())
+				.blackCapsaleraColorLletra(entitat.getBlackCapsaleraColorLletra())
+				.build();
 		configHelper.crearConfigsEntitat(entitat.getCodi());
 		return conversioTipusHelper.convertir(entitatRepository.save(entity), EntitatDto.class);
 	}
@@ -70,13 +84,45 @@ public class EntitatServiceImpl implements EntitatService {
 				entitat.getCapsaleraColorFons(),
 				entitat.getCapsaleraColorLletra(),
                 entitat.isPermetreEnviamentPostal());
-
 	
 		if (Utils.isNotEmpty(entitat.getLogoImgBytes())) {
 			entity.updateLogoImgBytes(entitat.getLogoImgBytes());
 		} else if (!entitat.isLogo()) {
 			entity.updateLogoImgBytes(null);
 		}
+		
+		if (Utils.isNotEmpty(entitat.getMenuImgBytes())) {
+			entity.updateMenuImgBytes(entitat.getMenuImgBytes());
+		} else if (!entitat.isLogoMenu()) {
+			entity.updateMenuImgBytes(null);
+		}
+		
+		if (Utils.isNotEmpty(entitat.getFaviconImgBytes())) {
+			entity.updateFaviconImgBytes(entitat.getFaviconImgBytes());
+		} else if (!entitat.isLogoFavicon()) {
+			entity.updateFaviconImgBytes(null);
+		}
+		
+		if (Utils.isNotEmpty(entitat.getBlackLogoImgBytes())) {
+			entity.updateBlackLogoImgBytes(entitat.getBlackLogoImgBytes());
+		} else if (!entitat.isBlackLogo()) {
+			entity.updateBlackLogoImgBytes(null);
+		}
+		
+		if (Utils.isNotEmpty(entitat.getBlackMenuImgBytes())) {
+			entity.updateBlackMenuImgBytes(entitat.getBlackMenuImgBytes());
+		} else if (!entitat.isBlackMenu()) {
+			entity.updateBlackMenuImgBytes(null);
+		}
+		
+		if (Utils.isNotEmpty(entitat.getBlackFaviconImgBytes())) {
+			entity.updateBlackFaviconImgBytes(entitat.getBlackFaviconImgBytes());
+		} else if (!entitat.isBlackFavicon()) {
+			entity.updateBlackFaviconImgBytes(null);
+		}
+		
+		entity.setBlackCapsaleraColorFons(entitat.getBlackCapsaleraColorFons());
+		entity.setBlackCapsaleraColorLletra(entitat.getBlackCapsaleraColorLletra());
 
 		return conversioTipusHelper.convertir(entity, EntitatDto.class);
 	}

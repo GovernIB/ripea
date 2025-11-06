@@ -5,6 +5,7 @@ import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import Load from "../../../components/Load.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import * as builder from "../../../util/springFilterUtils.ts";
+import {useUserSession} from "../../../components/Session.tsx";
 
 const useActions = (refresh?: () => void) => {
     const { t } = useTranslation();
@@ -60,28 +61,29 @@ const Alerta = (props:any) => {
     const {entity, onRowCountChange} = props
     const { t } = useTranslation();
     const apiRef = useMuiDataGridApiRef();
+    const { value: user } = useUserSession();
 
     const refresh = () => {
         apiRef?.current?.refresh?.();
     }
 
     const {llegit, massiveLlegit} = useActions(refresh);
-    const actions =[
+    const actions = user?.rolActual != "IPA_ADMIN_LECTURA" ?[
         {
             label: t('page.alert.action.read.label'),
             icon: "mark_email_read",
             showInMenu: false,
             onClick: llegit,
         },
-    ]
-    const massiveActions =[
+    ] :undefined
+    const massiveActions = user?.rolActual != "IPA_ADMIN_LECTURA" ?[
         {
             label: t('page.alert.action.read.label'),
             icon: "mark_email_read",
             showInMenu: true,
             onClick: massiveLlegit,
         },
-    ]
+    ] :undefined
 
     return <StyledMuiGrid
         resourceName={"alertaResource"}

@@ -325,8 +325,7 @@ public class ExpedientHelper {
 				expedient.updateEstatAdditional(estatInicial);
 				// if estat has usuari responsable agafar expedient by this user
 				if (estatInicial.getResponsableCodi() != null) {
-					agafar(expedient, estatInicial.getResponsableCodi());
-					
+					agafar(expedient, estatInicial.getResponsableCodi(), "Responsable de "+estatInicial.getNom());
 				}
 			}
 			
@@ -388,23 +387,20 @@ public class ExpedientHelper {
 		return arxiuPropagarExpedientAmbInteressats(expedientId);
 	}
 	
-	public boolean arxiuPropagarExpedientAmbInteressats(
-			Long expedientId) {
+	public boolean arxiuPropagarExpedientAmbInteressats(Long expedientId) {
 
 		if (cacheHelper.mostrarLogsCreacioContingut())
-			logger.info(
-				"Expedient crear ARXIU Helper START(" +
-						"expedientId=" + expedientId + ")");
-		ExpedientEntity expedient = expedientRepository.getOne(expedientId);
-
-		Exception exception = expedientInteressatHelper.arxiuPropagarInteressats(expedient, null);
+			logger.info("Expedient crear ARXIU Helper START(expedientId=" + expedientId + ")");
 		
+		ExpedientEntity expedient = expedientRepository.getOne(expedientId);
+		Exception exception = expedientInteressatHelper.arxiuPropagarInteressats(expedient, null);		
 		expedient.updateArxiuIntent(true);
 		
-		boolean throwExcepcion = false;//throwExcepcion = true;
+		boolean throwExcepcion = false;
 		if (throwExcepcion) {
 			throw new RuntimeException("Mock excepcion després de crear expedient en arxiu");
 		}
+		
 		if (cacheHelper.mostrarLogsCreacioContingut())
 			logger.info(
 					"Expedient crear ARXIU Helper END(" +
@@ -898,7 +894,7 @@ public class ExpedientHelper {
 					false,
 					false,
 					rolActual);
-			agafar(expedient, usuariHelper.getUsuariAutenticat().getCodi());
+			agafar(expedient, usuariHelper.getUsuariAutenticat().getCodi(), null);
 		}
 		
 		relateExpedientWithPeticioAndSetAnnexosPendent(expedientPeticioId, expedientId);
@@ -1563,11 +1559,11 @@ public class ExpedientHelper {
 		return dto;
 	}
 	
-	public String agafar(Long expedientId, String usuariCodi) {
-		return agafar(expedientRepository.findById(expedientId).get(), usuariCodi);
+	public String agafar(Long expedientId, String usuariCodi, String motiu) {
+		return agafar(expedientRepository.findById(expedientId).get(), usuariCodi, motiu);
 	}
 	
-	public String agafar(ExpedientEntity expedient, String usuariCodi) {
+	public String agafar(ExpedientEntity expedient, String usuariCodi, String motiu) {
 
 		ExpedientEntity expedientSuperior = contingutHelper.getExpedientSuperior(expedient, false, false, false, null);
 		if (expedientSuperior != null) {
@@ -1582,7 +1578,7 @@ public class ExpedientHelper {
 			// Avisa a l'usuari que li han pres
 			emailHelper.contingutAgafatPerAltreUsusari(expedient, usuariOriginal, usuariNou);
 		}
-		contingutLogHelper.log(expedient, LogTipusEnumDto.AGAFAR, usuariCodi, null, false, false);
+		contingutLogHelper.log(expedient, LogTipusEnumDto.AGAFAR, usuariCodi, motiu, false, false);
 
 		return expedient.getNom();
 	}
@@ -1909,6 +1905,9 @@ public class ExpedientHelper {
 		ExpedientFiltreCalculat expedientFiltreCalculat = new ExpedientFiltreCalculat();
 		ExpedientFiltreDto filtre = new ExpedientFiltreDto();
 		
+		boolean isAdmin 		= rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ADMIN_LECTURA") || rolActual.equals("IPA_SUPER");
+		boolean noFiltreGrups	= rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ADMIN_LECTURA") || rolActual.equals("IPA_ORGAN_ADMIN");
+		
 		return expedientRepository.findIdsByEntitatAndFiltre(
 				entitatEntity,
 				permisosPerExpedients.getIdsMetaExpedientsPermesos() == null,
@@ -1963,8 +1962,8 @@ public class ExpedientHelper {
 				filtre.getMetaExpedientDominiValor(),
 				permisosPerExpedients.getIdsGrupsPermesos() == null,
 				permisosPerExpedients.getIdsGrupsPermesos(),
-				rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_SUPER"), //No aplica filtre permis directe procediment
-				rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN"), //No aplica filtre grups
+				isAdmin, //No aplica filtre permis directe procediment
+				noFiltreGrups, //No aplica filtre grups
 				filtre.isAmbFirmaPendent(),
 				Utils.isEmpty(filtre.getNumeroRegistre()),
 				! Utils.isEmpty(filtre.getNumeroRegistre()) ? filtre.getNumeroRegistre() : "",
@@ -1997,46 +1996,49 @@ public class ExpedientHelper {
 			//En principi el dissenyador no pot accedir al llistat de expedients, pero si en un futur pot, hauria de passar per aqui.
 			
 			//Aquets dos rols treballen amb l'organ seleccionat a la capçalera + fills
+			//Si no hi ha organ seleccionat, no es pot obtenir cap permis, ni per procediments comuns.
 			if (organActual!=null) {
+				
 				idsOrgansPermesos = organGestorCacheHelper.getIdsOrgansFills(entitat.getCodi(), organGestorRepository.findById(organActual).get().getCodi());
-			}
 			
-			//Permisos que s'han donat a un procediment NO comú
-			idsMetaExpedientsPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
-					MetaNodeEntity.class,
-					ExtendedPermission.READ));
-			
-			List<Long> aux = new ArrayList<Long>();
-			if (idsMetaExpedientsPermesos!=null && idsMetaExpedientsPermesos.size()>0) {
-				if (idsOrgansPermesos==null) { idsOrgansPermesos = new ArrayList<Long>(); }
-				for (Long metaExpId: idsMetaExpedientsPermesos) {
-					MetaExpedientEntity mEx = metaExpedientRepository.findById(metaExpId).orElse(null);
-					if(mEx!=null && mEx.getOrganGestor()!=null && idsOrgansPermesos.contains(mEx.getOrganGestor().getId())) {
-						aux.add(metaExpId);
-					}
-				}
-			}
-			
-			List<Long> meComuns = metaExpedientRepository.findProcedimentsComunsActiveIds(entitat);
-			if (meComuns!=null && meComuns.size()>0) {
-				//Permisos que s'han donat a un procediment comú (indicant OG)
-				List<Long> permisMetaOrganGestor = toListLong(permisosHelper.getObjectsIdsWithPermission(
-						MetaExpedientOrganGestorEntity.class,
+				//Permisos que s'han donat a un procediment NO comú
+				idsMetaExpedientsPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
+						MetaNodeEntity.class,
 						ExtendedPermission.READ));
 				
-				for (Long metaExpComId: meComuns) {
-					MetaExpedientEntity mExcom = metaExpedientRepository.findById(metaExpComId).orElse(null);
-
-					if (mExcom!=null && !mExcom.isPermisDirecte() || permisMetaExpOrgan(permisMetaOrganGestor, mExcom.getId(), idsOrgansPermesos)) {
-						aux.add(metaExpComId);
+				List<Long> aux = new ArrayList<Long>();
+				if (idsMetaExpedientsPermesos!=null && idsMetaExpedientsPermesos.size()>0) {
+					if (idsOrgansPermesos==null) { idsOrgansPermesos = new ArrayList<Long>(); }
+					for (Long metaExpId: idsMetaExpedientsPermesos) {
+						MetaExpedientEntity mEx = metaExpedientRepository.findById(metaExpId).orElse(null);
+						if(mEx!=null && mEx.getOrganGestor()!=null && idsOrgansPermesos.contains(mEx.getOrganGestor().getId())) {
+							aux.add(metaExpId);
+						}
 					}
 				}
-			}
-
-			if (aux.size()>0) {
-				idsMetaExpedientsPermesos = aux;
-			} else {
-				idsMetaExpedientsPermesos = null;
+				
+				List<Long> meComuns = metaExpedientRepository.findProcedimentsComunsActiveIds(entitat);
+				if (meComuns!=null && meComuns.size()>0) {
+					//Permisos que s'han donat a un procediment comú (indicant OG)
+					List<Long> permisMetaOrganGestor = toListLong(permisosHelper.getObjectsIdsWithPermission(
+							MetaExpedientOrganGestorEntity.class,
+							ExtendedPermission.READ));
+					
+					for (Long metaExpComId: meComuns) {
+						MetaExpedientEntity mExcom = metaExpedientRepository.findById(metaExpComId).orElse(null);
+	
+						if (mExcom!=null && !mExcom.isPermisDirecte() || permisMetaExpOrgan(permisMetaOrganGestor, mExcom.getId(), idsOrgansPermesos)) {
+							aux.add(metaExpComId);
+						}
+					}
+				}
+	
+				if (aux.size()>0) {
+					idsMetaExpedientsPermesos = aux;
+				} else {
+					idsMetaExpedientsPermesos = null;
+				}
+			
 			}
 
 		}else {
@@ -2117,6 +2119,31 @@ public class ExpedientHelper {
 		return permisosPerExpedientsDto;
 	}
 	
+	public List<Long> findProcedimentsPermesos(
+			EntitatEntity entitatEntity,
+			String rolActual,
+			Long organActual) {
+		PermisosPerExpedientsDto permisosPerExpedients = findPermisosPerExpedients(entitatEntity.getId(), rolActual, organActual);
+		return metaExpedientRepository.findMetaExpedientsPermesos(
+				entitatEntity,
+				permisosPerExpedients.getIdsMetaExpedientsPermesos() == null,
+				permisosPerExpedients.getIdsMetaExpedientsPermesos(0),
+				permisosPerExpedients.getIdsMetaExpedientsPermesos(1),
+				permisosPerExpedients.getIdsMetaExpedientsPermesos(2),
+				permisosPerExpedients.getIdsMetaExpedientsPermesos(3),
+				permisosPerExpedients.getIdsOrgansPermesos() == null,
+				permisosPerExpedients.getIdsOrgansPermesos(0),
+				permisosPerExpedients.getIdsOrgansPermesos(1),
+				permisosPerExpedients.getIdsOrgansPermesos(2),
+				permisosPerExpedients.getIdsOrgansPermesos(3),
+				permisosPerExpedients.getIdsMetaExpedientOrganPairsPermesos() == null,
+				permisosPerExpedients.getIdsMetaExpedientOrganPairsPermesos(),
+				permisosPerExpedients.getIdsOrgansAmbProcedimentsComunsPermesos() == null,
+				permisosPerExpedients.getIdsOrgansAmbProcedimentsComunsPermesos(),
+				permisosPerExpedients.getIdsProcedimentsComuns(),
+				rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_SUPER"));
+	}
+	
 	public PermisosPerExpedientsDto findPermisosPerExpedients(
 			Long entitatId,
 			String rolActual,
@@ -2143,49 +2170,52 @@ public class ExpedientHelper {
 			
 			//Aquets dos rols treballen amb l'organ seleccionat a la capçalera + fills
 			if (organActual!=null) {
+				
+				//Obtenim els organs permesos, a la select apareixeran els procediments d'aquets organs, 
+				//ndependenment de lo que hi hagi a la llista de idsMetaExpedientsPermesos posterior.
 				idsOrgansPermesos = organGestorCacheHelper.getIdsOrgansFills(entitat.getCodi(), organGestorRepository.findById(organActual).get().getCodi());
-			}
 			
-			//Permisos que s'han donat a un procediment NO comú
-			idsMetaExpedientsPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
-					MetaNodeEntity.class,
-					ExtendedPermission.READ));
-			
-			List<Long> aux = new ArrayList<Long>();
-			if (idsMetaExpedientsPermesos!=null && idsMetaExpedientsPermesos.size()>0) {
-				if (idsOrgansPermesos==null) { idsOrgansPermesos = new ArrayList<Long>(); }
-				for (Long metaExpId: idsMetaExpedientsPermesos) {
-					MetaExpedientEntity mEx = metaExpedientRepository.findById(metaExpId).orElse(null);
-					if(mEx!=null && mEx.getOrganGestor()!=null && idsOrgansPermesos.contains(mEx.getOrganGestor().getId())) {
-						aux.add(metaExpId);
-					}
-				}
-			}
-			
-			List<Long> meComuns = metaExpedientRepository.findProcedimentsComunsActiveIds(entitat);
-			if (meComuns!=null && meComuns.size()>0) {
-				//Permisos que s'han donat a un procediment comú (indicant OG)
-				List<Long> permisMetaOrganGestor = toListLong(permisosHelper.getObjectsIdsWithPermission(
-						MetaExpedientOrganGestorEntity.class,
+				//Permisos que s'han donat directament a un procediment
+				idsMetaExpedientsPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
+						MetaNodeEntity.class,
 						ExtendedPermission.READ));
 				
-				for (Long metaExpComId: meComuns) {
-					MetaExpedientEntity mExcom = metaExpedientRepository.findById(metaExpComId).orElse(null);
-
-					if (mExcom!=null && !mExcom.isPermisDirecte() || permisMetaExpOrgan(permisMetaOrganGestor, mExcom.getId(), idsOrgansPermesos)) {
-						aux.add(metaExpComId);
+				List<Long> aux = new ArrayList<Long>();
+				if (idsMetaExpedientsPermesos!=null && idsMetaExpedientsPermesos.size()>0) {
+					if (idsOrgansPermesos==null) { idsOrgansPermesos = new ArrayList<Long>(); }
+					for (Long metaExpId: idsMetaExpedientsPermesos) {
+						MetaExpedientEntity mEx = metaExpedientRepository.findById(metaExpId).orElse(null);
+						if(mEx!=null && mEx.getOrganGestor()!=null && idsOrgansPermesos.contains(mEx.getOrganGestor().getId())) {
+							aux.add(metaExpId);
+						}
 					}
 				}
-			}
-			
-//			idsMetaExpedientOrganPairsPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
-//					MetaExpedientOrganGestorEntity.class,
-//					ExtendedPermission.READ));
-			
-			if (aux.size()>0) {
-				idsMetaExpedientsPermesos = aux;
-			} else {
-				idsMetaExpedientsPermesos = null;
+				
+				List<Long> meComuns = metaExpedientRepository.findProcedimentsComunsActiveIds(entitat);
+				if (meComuns!=null && meComuns.size()>0) {
+					//Permisos que s'han donat a un procediment comú (indicant OG)
+					List<Long> permisMetaOrganGestor = toListLong(permisosHelper.getObjectsIdsWithPermission(
+							MetaExpedientOrganGestorEntity.class,
+							ExtendedPermission.READ));
+					
+					for (Long metaExpComId: meComuns) {
+						MetaExpedientEntity mExcom = metaExpedientRepository.findById(metaExpComId).orElse(null);
+	
+						if (mExcom!=null && !mExcom.isPermisDirecte() || permisMetaExpOrgan(permisMetaOrganGestor, mExcom.getId(), idsOrgansPermesos)) {
+							aux.add(metaExpComId);
+						}
+					}
+				}
+				
+	//			idsMetaExpedientOrganPairsPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
+	//					MetaExpedientOrganGestorEntity.class,
+	//					ExtendedPermission.READ));
+				
+				if (aux.size()>0) {
+					idsMetaExpedientsPermesos = aux;
+				} else {
+					idsMetaExpedientsPermesos = null;
+				}
 			}
 
 		}else {
@@ -2856,23 +2886,28 @@ public class ExpedientHelper {
 			}
 		}
 		// check if already exists in arxiu
-		Expedient expedient = pluginHelper.arxiuExpedientConsultar(expedientEntity);
-		boolean carpetaExistsInArxiu = false;
 		String carpetaUuid = null;
-		if (expedient.getContinguts() != null) {
-			for (ContingutArxiu contingutArxiu : expedient.getContinguts()) {
-				String replacedNom = ArxiuConversioHelper.revisarContingutNom(nom);
-				if (contingutArxiu.getTipus() == ContingutTipus.CARPETA &&
-						contingutArxiu.getNom().equals(replacedNom)) {
-					carpetaExistsInArxiu = true;
-					carpetaUuid = contingutArxiu.getIdentificador();
+		boolean carpetaExistsInArxiu = false;
+	
+		if (!contingutHelper.isCarpetaLogica()) {
+			Expedient expedient = pluginHelper.arxiuExpedientConsultar(expedientEntity);
+			if (expedient.getContinguts() != null) {
+				for (ContingutArxiu contingutArxiu : expedient.getContinguts()) {
+					String replacedNom = ArxiuConversioHelper.revisarContingutNom(nom);
+					if (contingutArxiu.getTipus() == ContingutTipus.CARPETA &&
+							contingutArxiu.getNom().equals(replacedNom)) {
+						carpetaExistsInArxiu = true;
+						carpetaUuid = contingutArxiu.getIdentificador();
+					}
 				}
 			}
 		}
+		
 		if (carpetaExistsInDB && carpetaExistsInArxiu && carpetaEntity.getArxiuUuid() == null) {
 			carpetaEntity.updateArxiu(carpetaUuid);
 		}
-		if (!carpetaExistsInDB || !carpetaExistsInArxiu) {
+		
+		if (!carpetaExistsInDB || (!contingutHelper.isCarpetaLogica() && !carpetaExistsInArxiu)) {
 			CarpetaDto carpetaDto = carpetaHelper.create(
 					entitatId,
 					expedientEntity.getId(),

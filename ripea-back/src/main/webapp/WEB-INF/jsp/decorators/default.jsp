@@ -52,7 +52,14 @@
     <link href="<c:url value="/webjars/bootstrap/3.3.6/dist/css/bootstrap.min.css"/>" rel="stylesheet"/>
     <link href="<c:url value="/webjars/font-awesome/4.7.0/css/font-awesome.min.css"/>" rel="stylesheet"/>
     <link href="<c:url value="/css/estils.css"/>" rel="stylesheet">
-    <link rel="shortcut icon" href="<c:url value="/img/favicon.png"/>" type="image/x-icon" />
+    <c:choose>
+    <c:when test="${sessionScope['EntitatHelper.entitatActual'].faviconImgBytes!=null && fn:length(sessionScope['EntitatHelper.entitatActual'].faviconImgBytes)!=0}">
+    	<link rel="shortcut icon" href="<c:url value="/userajax/getFaviconLogo"/>" type="image/x-icon" />
+    </c:when>
+    <c:otherwise>
+    	<link rel="shortcut icon" href="<c:url value="/img/favicon.png"/>" type="image/x-icon" />
+    </c:otherwise>
+    </c:choose>
     <script src="<c:url value="/webjars/jquery/1.12.4/dist/jquery.min.js"/>"></script>
     <!-- Llibreria per a compatibilitat amb HTML5 -->
     <!--[if lt IE 9]>
@@ -267,8 +274,8 @@ body {
                     <div id="govern-logo" class="pull-left">
                         <%-- If logo is defined for application in properties file or for entitat in db then take the logo from there, in other case take default logo from the img folder --%>                 
                         <c:choose>
-                            <c:when test="${not isRolActualSuperusuari && (sessionScope['SessionHelper.capsaleraLogo']!=null  && not empty sessionScope['SessionHelper.capsaleraLogo'] || sessionScope['EntitatHelper.entitatActual'].logoImgBytes!=null && fn:length(sessionScope['EntitatHelper.entitatActual'].logoImgBytes)!=0)}">
-                                <img src="<c:url value="/entitat/getEntitatLogo"/>"  height="65" alt="Govern de les Illes Balears" />
+                            <c:when test="${sessionScope['EntitatHelper.entitatActual'].logoImgBytes!=null && fn:length(sessionScope['EntitatHelper.entitatActual'].logoImgBytes)!=0}">
+                                <img src="<c:url value="/userajax/getEntitatLogo"/>"  height="65" alt="Govern de les Illes Balears" />
                             </c:when>
                             <c:otherwise>
                                 <img src="<c:url value="/img/govern-logo.png"/>"  height="65" alt="Govern de les Illes Balears" />
@@ -276,7 +283,7 @@ body {
                         </c:choose>
                     </div>
                     <div id="app-logo" class="pull-left">
-                        <img src="<c:url value="/img/logo.png"/>" height="65" alt="RIPEA" />
+						<img src="<c:url value="/img/logo.png"/>" height="65" alt="RIPEA" />
                     </div>
                 </div>
             </div>
@@ -318,8 +325,12 @@ body {
                     </c:when>
                     <c:when test="${isRolActualAdministrador}">
                         <%---- Expedients ----%>
-                        <a href="<c:url value="/reactapp/expedient"></c:url>" class="btn btn-default"><span class="fa fa-folder" style="color: #004b99;"></span> <spring:message code="decorator.menu.expedients.new"/></a>
-                        <a href="<c:url value="/expedient"></c:url>"class="btn btn-primary"><spring:message code="decorator.menu.expedients"/></a>
+
+                        <c:if test="${sessionScope['SessionHelper.isReactActiu']!=null  && sessionScope['SessionHelper.isReactActiu']}">
+                        	<a href="<c:url value="/reactapp/expedient"></c:url>" class="btn btn-default"><span class="fa fa-folder" style="color: #004b99;"></span> <spring:message code="decorator.menu.expedients.new"/></a>
+                        </c:if>
+                        <a href="<c:url value="/expedient"></c:url>"class="btn btn-primary"><spring:message code="decorator.menu.expedients"/></a>                              
+
                         <%---- Annotacions pendents ----%>
                         <a href="<c:url value="/expedientPeticio"></c:url>" class="btn btn-primary">
                             <spring:message code="decorator.menu.expedientPeticions"/>
@@ -410,7 +421,9 @@ body {
                     </c:when>
                     <c:when test="${isRolActualAdministradorOrgan}">
                         <%---- Expedients ----%>
-                        <a href="<c:url value="/reactapp/expedient"></c:url>" class="btn btn-default"><span class="fa fa-folder" style="color: #004b99;"></span> <spring:message code="decorator.menu.expedients.new"/></a>
+                        <c:if test="${sessionScope['SessionHelper.isReactActiu']!=null  && sessionScope['SessionHelper.isReactActiu']}">
+                        	<a href="<c:url value="/reactapp/expedient"></c:url>" class="btn btn-default"><span class="fa fa-folder" style="color: #004b99;"></span> <spring:message code="decorator.menu.expedients.new"/></a>
+                        </c:if>
                         <a href="<c:url value="/expedient"></c:url>"class="btn btn-primary"><spring:message code="decorator.menu.expedients"/></a>
                         <%---- Annotacions pendents ----%>
                         <a href="<c:url value="/expedientPeticio"></c:url>"class="btn btn-primary">
@@ -431,7 +444,9 @@ body {
                         <a href="<c:url value="/grup"></c:url>"class="btn btn-primary"><spring:message code="decorator.menu.grups"/></a>
                     </c:when>
                     <c:when test="${isRolActualUsuari}">
-                        <a href="<c:url value="/reactapp/expedient"></c:url>" class="btn btn-default"><span class="fa fa-folder" style="color: #004b99;"></span> <spring:message code="decorator.menu.expedients.new"/></a>
+                    	<c:if test="${sessionScope['SessionHelper.isReactActiu']!=null  && sessionScope['SessionHelper.isReactActiu']}">
+                        	<a href="<c:url value="/reactapp/expedient"></c:url>" class="btn btn-default"><span class="fa fa-folder" style="color: #004b99;"></span> <spring:message code="decorator.menu.expedients.new"/></a>
+                        </c:if>
                         <%---- Expedients ----%>
                         <a href="<c:url value="/expedient"></c:url>"class="btn btn-primary"><spring:message code="decorator.menu.expedients"/></a>
                         <%---- Annotacions pendents ----%>

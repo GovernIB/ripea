@@ -585,7 +585,7 @@ public class EntityComprovarHelper {
 			logger.info("[DOC] Comprovant metadDocument-metaExpedient. Obtingut metaDocument (" +
 					"metaDocumentNom=" + metaDocument.getNom() + ", " +
 					"metaDocumentId=" + metaDocument.getId() + ", " +
-					"metaDocument.metaExpedientId=" + metaDocument.getMetaExpedient().getId() + ")");
+					"metaDocument.metaExpedientId=" + (metaDocument.getMetaExpedient()!=null?metaDocument.getMetaExpedient().getId():"null") + ")");
 
 		EntitatEntity metaDocumentEntitat = metaDocument.getEntitat();
 		if (HibernateHelper.isProxy(metaDocumentEntitat)) {
@@ -599,14 +599,14 @@ public class EntityComprovarHelper {
 			throw new ValidationException(id, MetaDocumentEntity.class, "L'entitat especificada (id="
 			        + entitat.getId() + ") no coincideix amb l'entitat del meta-document");
 		}
-		if (metaExpedient != null && !metaExpedient.getId().equals(metaDocument.getMetaExpedient().getId())) {
+		if (metaExpedient != null && metaDocument.getMetaExpedient()!=null && !metaExpedient.getId().equals(metaDocument.getMetaExpedient().getId())) {
 			throw new ValidationException(id, MetaDocumentEntity.class,
 					"El meta-expedient especificat (id=" + metaExpedient.getId() + ") " +
 					"no coincideix amb el meta-expedient del meta-document (" + metaDocument.getMetaExpedient().getId() + ")");
 		}
 		if (cacheHelper.mostrarLogsCreacioContingut())
 			logger.info("[DOC] Comprovat metadDocument-metaExpedient (" +
-					"metaExpedientId=" + metaDocument.getMetaExpedient().getId() + ", " +
+					"metaExpedientId=" + (metaDocument.getMetaExpedient()!=null?metaDocument.getMetaExpedient().getId():"null") + ", " +
 					"metaDocumentId=" + metaDocument.getId() + ")");
 		return metaDocument;
 	}
@@ -1156,6 +1156,22 @@ public class EntityComprovarHelper {
 		return isAdminEntitat;
 	}
 	
+	public boolean isAdminLecturaEntitat(Long procedimentId) {
+		
+		if (cacheHelper.mostrarLogsPermisos())
+			logger.info("isAdminEntitat( procedimentId=" + procedimentId + ")");
+		
+		MetaExpedientEntity procediment = metaExpedientRepository.getOne(procedimentId);
+		
+		boolean isAdminEntitat = false;
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		EntitatEntity entitat = procediment.getEntitat();
+		if (auth.getAuthorities().contains(new SimpleGrantedAuthority("IPA_ADMIN_LECTURA"))) {
+			isAdminEntitat = permisosHelper.isGrantedAll(entitat.getId(), EntitatEntity.class, new Permission[] { ExtendedPermission.ADMINISTRATION_READ }, auth);
+		} 
+		return isAdminEntitat;
+	}
+	
 	
 	public boolean isAdminOrgan(Long organGestorId) {
 		
@@ -1450,7 +1466,7 @@ public class EntityComprovarHelper {
 		if (cacheHelper.mostrarLogsPermisos())
 			logger.info("comprovarPermisExpedient (expedientId=" + expedientId + ", permission=" + permissionName + ", user=" + authObject.getName() + ", roles="+authObject.getAuthorities());
 		
-		if (!isAdminEntitat(procedimentId)) {
+		if (!isAdminEntitat(procedimentId) && !isAdminLecturaEntitat(procedimentId)) {
 
 			if (cacheHelper.mostrarLogsPermisos())
 				logger.info("comprovarPermisExpedient: El usuari no es administrador de la entitat. Continuam comprovant nivells més baixos.");

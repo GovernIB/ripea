@@ -1,6 +1,6 @@
 import {useEffect, useMemo, useRef, useState} from "react";
 import {
-    useBaseAppContext, MuiFormDialog, useFormContext, MuiFormDialogApi
+    useBaseAppContext, useFormContext, MuiFormDialogApi
 } from "reactlib";
 import {useTranslation} from "react-i18next";
 import GridFormField from "../../../components/GridFormField.tsx";
@@ -11,6 +11,7 @@ import * as builder from "../../../util/springFilterUtils.ts";
 import {StyledEstat} from "../ExpedientGrid.tsx";
 import Load from "../../../components/Load.tsx";
 import {springFilterBuilder as expedientFilterBuilder} from "../ExpedientFilter.tsx";
+import FormActionDialog from "../../../components/FormActionDialog.tsx";
 
 const sortModel:any = [{ field: 'createdDate', sort: 'desc' }];
 const perspectives = ["ESTAT"];
@@ -82,7 +83,7 @@ const ActionFilter = (props:any) => {
 const RelacionarForm= () => {
     const {data, apiRef} = useFormContext();
     const selectionModel = useMemo(()=>{
-        return data?.relacionatsAmb?.map((a:any) => a.id)
+        return data?.ids
     }, [])
 
     const [springFilter, setSpringFilter] = useState<string>();
@@ -90,7 +91,7 @@ const RelacionarForm= () => {
     const [load, setLoad] = useState<boolean>(false);
 
     useEffect(() => {
-        apiRef?.current?.setFieldValue("relacionatsAmb", selectedRows?.map(id => ({ id })))
+        apiRef?.current?.setFieldValue("ids", selectedRows)
     }, [selectedRows]);
 
     return <Load value={selectionModel} noEffect>
@@ -143,10 +144,10 @@ const RelacionarForm= () => {
 const Relacionar = (props:any) => {
     const { t } = useTranslation();
 
-    return <MuiFormDialog
+    return <FormActionDialog
         resourceName={'expedientResource'}
+        action={'RELACIONAR'}
         title={t('page.expedient.action.relacio.title')}
-        onClose={(reason?: string) => reason !== 'backdropClick'}
         dialogButtons={[
             {icon: 'link', text: t('common.relateSelected'), componentProps: { variant: 'contained' }, value: true },
             {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
@@ -154,7 +155,7 @@ const Relacionar = (props:any) => {
         {...props}
     >
         <RelacionarForm/>
-    </MuiFormDialog>
+    </FormActionDialog>
 }
 
 const useRelacionar= (refresh?: () => void) => {
@@ -163,19 +164,16 @@ const useRelacionar= (refresh?: () => void) => {
     const {temporalMessageShow} = useBaseAppContext();
 
     const handleShow = (id:any, row:any) :void => {
-        formApiRef.current?.show?.(id,{ relacionatsAmb: row?.relacionatsAmb })
-            .then(() => {
-                refresh?.()
-                temporalMessageShow(null, t('page.expedient.action.relacio.ok', {expedient: row?.nom}), 'success');
-            })
-            .catch((error:any) :void => {
-                error?.message && temporalMessageShow(null, error?.message, 'error');
-            });
+        formApiRef.current?.show?.(id,{ ids: row?.relacionatsAmb?.map((a:any) => a.id), action: 'ADD' })
+    }
+    const onSuccess = (result: any): void => {
+        refresh?.()
+        temporalMessageShow(null, t('page.expedient.action.relacio.ok', {expedient: result?.nom}), 'success');
     }
 
     return {
         handleShow,
-        content: <Relacionar apiRef={formApiRef}/>
+        content: <Relacionar apiRef={formApiRef} onSuccess={onSuccess}/>
     }
 }
 export default useRelacionar;

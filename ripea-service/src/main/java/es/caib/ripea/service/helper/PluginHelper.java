@@ -268,7 +268,7 @@ public class PluginHelper {
 	@Autowired private DocumentNotificacioHelper documentNotificacioHelper;
 	@Autowired private ApplicationHelper applicationHelper;
 	@Autowired private DocumentService documentService;
-	
+	@Autowired private MessageHelper messageHelper;	
 	@Autowired private DocumentEnviamentInteressatRepository documentEnviamentInteressatRepository;
 	@Autowired private ExpedientPeticioRepository expedientPeticioRepository;
 	@Autowired private FluxFirmaUsuariRepository fluxFirmaUsuariRepository;
@@ -2393,6 +2393,101 @@ public class PluginHelper {
 		}
 	}
 
+	public String arxiuDocumentMoure(String uuid, String uuidDesti) {
+
+		String accioDescripcio = "Moure document";
+		Map<String, String> accioParams = new HashMap<String, String>();
+
+		accioParams.put(
+				"arxiuUuidOrigen",
+				uuid);
+		accioParams.put(
+				"uuidDesti",
+				uuidDesti);
+		
+		long t0 = System.currentTimeMillis();
+		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
+		try {
+			boolean throwException = false;// throwException = true
+			if (throwException) {
+				throw new RuntimeException("Mock excepcion moving document ");
+			}
+			ContingutArxiu nouDocumentArxiu = null;
+			try {
+				nouDocumentArxiu = arxiuPluginWrapper.getPlugin().documentMoure(uuid, uuidDesti);
+			} catch (Exception e) {
+
+				if (e.getMessage().contains(
+						"Duplicate child name not allowed")
+						|| e.getMessage().contains(
+								"Petición mal formada")) {
+					logger.info(
+							"Document already moved in arxiu:" + e.getMessage());
+
+					Document document = arxiuPluginWrapper.getPlugin().documentDetalls(
+							uuid,
+							null,
+							false);
+					logger.info(
+							"Document to move name=" + document.getNom() + ", uuid=" + document.getIdentificador());
+					Carpeta carpeta = arxiuPluginWrapper.getPlugin().carpetaDetalls(
+							uuidDesti);
+
+					String uuidDocumentMovido = null;
+					for (ContingutArxiu contingutArxiu : carpeta.getContinguts()) {
+						logger.info(
+								"Searching document moved: name=" + contingutArxiu.getNom() + ", uuid="
+										+ contingutArxiu.getIdentificador());
+						if (document.getNom().equals(
+								contingutArxiu.getNom())) {
+							logger.info(
+									"Document moved found: name=" + contingutArxiu.getNom() + ", uuid="
+											+ contingutArxiu.getIdentificador());
+							uuidDocumentMovido = contingutArxiu.getIdentificador();
+							break;
+						}
+					}
+					if (uuidDocumentMovido != null) {
+						return uuidDocumentMovido;
+					} else {
+						throw e;
+					}
+				} else {
+					throw e;
+				}
+			}
+
+			boolean throwException1 = false;// throwException1 = true
+			if (throwException1) {
+				throw new RuntimeException("Mock excepcion after moving document ");
+			}
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_ARXIU,
+					accioDescripcio,
+					arxiuPluginWrapper.getEndpoint(),
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0);
+			if (nouDocumentArxiu != null) {
+				return nouDocumentArxiu.getIdentificador();
+			} else {
+				return null;
+			}
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_ARXIU,
+					accioDescripcio,
+					arxiuPluginWrapper.getEndpoint(),
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, errorDescripcio, ex);
+		}
+	}
+	
 	public String arxiuDocumentMoure(
 			String uuid,
 			String uuidDesti,
@@ -3928,6 +4023,7 @@ public class PluginHelper {
 					PortafirmesFluxRespostaDto resposta = new PortafirmesFluxRespostaDto();
 					resposta.setFluxId(plantilla.getFluxId());
 					resposta.setNom(plantilla.getNom());
+					resposta.setDescripcio(messageHelper.getMessage("portafirmesRecuperarPlantillesDisponibles.origen.comu"));
 					respostesDto.add(resposta);
 				}
 			}
@@ -3939,6 +4035,7 @@ public class PluginHelper {
 					PortafirmesFluxRespostaDto fluxUsuari = new PortafirmesFluxRespostaDto();
 					fluxUsuari.setFluxId(fluxFirmaUsuari.getPortafirmesFluxId());
 					fluxUsuari.setNom(fluxFirmaUsuari.getDescripcio());
+					fluxUsuari.setDescripcio(messageHelper.getMessage("portafirmesRecuperarPlantillesDisponibles.origen.usuari"));
 					fluxUsuari.setUsuariActual(true);
 					respostesDto.add(fluxUsuari);
 				}
@@ -3953,6 +4050,7 @@ public class PluginHelper {
 						PortafirmesFluxRespostaDto fluxDefault = new PortafirmesFluxRespostaDto();
 						fluxDefault.setFluxId(fluxProcediment.getPortafirmesFluxId());
 						fluxDefault.setNom(fluxProcediment.getPortafirmesFluxDesc());
+						fluxDefault.setDescripcio(messageHelper.getMessage("portafirmesRecuperarPlantillesDisponibles.origen.proced"));
 						fluxDefault.setProcedimentDefault(true);
 						respostesDto.add(fluxDefault);
 					}
@@ -5268,7 +5366,7 @@ public class PluginHelper {
 			RespostaConsultaEstatNotificacio respostaNotificioEstat = notificacioPlugin.consultarNotificacio(
 					notificacio.getNotificacioIdentificador());
 			
-			if (respostaNotificioEstat.isError()) {
+			if (!respostaNotificioEstat.isError()) {
 				
 				notificacio.updateNotificacioEstat(
 						respostaNotificioEstat.getEstat(),
@@ -5325,8 +5423,7 @@ public class PluginHelper {
 		if (certificacioRetornat) {
 
 			if (getPropertyGuardarCertificacioExpedient()) {
-				boolean certificacioJaGuardat = documentEnviamentInteressatEntity
-						.getEnviamentCertificacioData() != null;
+				boolean certificacioJaGuardat = documentEnviamentInteressatEntity.getEnviamentCertificacioData() != null;
 				if (!certificacioJaGuardat) {
 					MetaDocumentEntity metaDocument = metaDocumentRepository.findByEntitatAndTipusGeneric(
 							true,
@@ -5359,28 +5456,28 @@ public class PluginHelper {
 				}
 
 			} else {
-				// saves in gestio documental but never uses it?
+				//Guarda la certificació al gestor documental com a backup, pero sembla que no es llegeix en cap moment
 				byte[] certificacio = resposta.getCertificacioContingut();
 				String gestioDocumentalId = notificacio.getEnviamentCertificacioArxiuId();
+				boolean eliminadaAnteriorCertificacio = false;
+				//Borra la certificació anterior si existia i era anterior a la nova data (obsoleta)
 				if (gestioDocumentalId!=null && 
 					documentEnviamentInteressatEntity.getEnviamentCertificacioData()!=null &&
-					resposta.getCertificacioData()!=null &&
 					documentEnviamentInteressatEntity.getEnviamentCertificacioData().before(resposta.getCertificacioData())) {
 					gestioDocumentalDelete(gestioDocumentalId, GESDOC_AGRUPACIO_CERTIFICACIONS);
+					eliminadaAnteriorCertificacio = true;
 				}
-				if (gestioDocumentalId == null || (
-						documentEnviamentInteressatEntity.getEnviamentCertificacioData()!=null &&
-						resposta.getCertificacioData()!=null &&
-						documentEnviamentInteressatEntity.getEnviamentCertificacioData().before(resposta.getCertificacioData()))) {
+				//Guarda la nova certificació si no existia o es més recent que la anterior
+				if (gestioDocumentalId == null || eliminadaAnteriorCertificacio) {
 					gestioDocumentalId = gestioDocumentalCreate(PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS, new ByteArrayInputStream(certificacio));
 				}
 				notificacio.setEnviamentCertificacioArxiuId(gestioDocumentalId);
 			}
 		}
 
-		if (resposta.getEstat() == es.caib.ripea.plugin.notificacio.EnviamentEstat.NOTIFICADA) {
+		if (es.caib.ripea.plugin.notificacio.EnviamentEstat.NOTIFICADA.equals(resposta.getEstat())) {
 			logAll(notificacio, LogTipusEnumDto.NOTIFICACIO_CERTIFICADA, null);
-		} else if (resposta.getEstat() == es.caib.ripea.plugin.notificacio.EnviamentEstat.REBUTJADA) {
+		} else if (es.caib.ripea.plugin.notificacio.EnviamentEstat.REBUTJADA.equals(resposta.getEstat())) { 
 			logAll(notificacio, LogTipusEnumDto.NOTIFICACIO_REBUTJADA, null);
 		}
 

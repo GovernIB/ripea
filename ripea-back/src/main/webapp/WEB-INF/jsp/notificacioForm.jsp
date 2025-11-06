@@ -238,7 +238,7 @@ function getNotificacionsSenseNif() {
 		if (notificacio.titular.personaFisica) {
 			//if selected
 			if (interessatsSelected != null && notificacio.titular != null && interessatsSelected.includes(notificacio.titular.id.toString())) {
-	    		if ((notificacio.destinatari == null && notificacio.titular.documentTipus!='NIF' && notificacio.titular.documentTipus!='DOCUMENT_IDENTIFICATIU_ESTRANGERS') || (notificacio.destinatari != null && notificacio.destinatari.documentTipus!='NIF' && notificacio.destinatari.documentTipus!='DOCUMENT_IDENTIFICATIU_ESTRANGERS')) {
+	    		if ((notificacio.destinatari == null && notificacio.titular.documentTipus!='NIF' && notificacio.titular.documentTipus!='DOCUMENT_IDENTIFICATIU_ESTRANGERS' && notificacio.titular.documentTipus!='ESTRANGER_EIDAS') || (notificacio.destinatari != null && notificacio.destinatari.documentTipus!='NIF' && notificacio.destinatari.documentTipus!='DOCUMENT_IDENTIFICATIU_ESTRANGERS' && notificacio.destinatari.documentTipus!='ESTRANGER_EIDAS')) {
 	    			notificacionsSenseNif.push(notificacio);
 				}
 			}

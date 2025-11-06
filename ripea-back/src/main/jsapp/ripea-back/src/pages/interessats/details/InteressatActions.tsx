@@ -9,6 +9,7 @@ import useInteressatDetail from "./InteressatDetail.tsx";
 import useCreate, {useCreateRepresentant} from "../actions/Create.tsx";
 import {iniciaDescargaJSON} from "../../expedient/details/CommonActions.tsx";
 import useImportarSGD from "../actions/ImportarSGD.tsx";
+import useManageInteressatGrups from "../actions/groups/ManageInteressatGrups.tsx";
 
 export const useActions = (refresh?: () => void) => {
     const { t } = useTranslation();
@@ -99,12 +100,13 @@ const useInteressatActions = (entity:any, refresh?: () => void) => {
     const {create, content: contentCreate} = useCreate(refresh)
     const {create: createRepresentent, update: updateRepresentent, content} = useCreateRepresentant(refresh)
     const {handleShow: handleImportarSGD, content: contentImportarSGD} = useImportarSGD(entity, refresh)
+    const {handleShow: handleManageInteressatGrups, dialog: dialogManageInteressatGrups} = useManageInteressatGrups(refresh);
 
     const createActions = [
         {
             label: t('page.interessat.title')+"...",
             icon: 'person_add',
-            showInMenu: true,
+            showInMenu: false,
             onClick: () => create({
                 expedient: {id: entity?.id},
                 esRepresentant: false,
@@ -138,42 +140,49 @@ const useInteressatActions = (entity:any, refresh?: () => void) => {
             label: t('common.update'),
             icon: 'edit',
             showInMenu: true,
-            clickShowUpdateDialog: true,
+			clickShowUpdateDialog: true,
             hidden: !entity?.potModificar,
         },
         {
-            label: t('page.interessat.action.delete.label'),
-            icon: "delete",
+            label: t('page.interessat.action.gestGrups.label'),
+            icon: "groups",
             showInMenu: true,
-            onClick: deleteInteressat,
+            onClick: handleManageInteressatGrups,
             hidden: !entity?.potModificar,
         },
+		{
+		    label: t('page.interessat.action.delete.label'),
+		    icon: "delete",
+		    showInMenu: true,
+		    onClick: deleteInteressat,
+		    hidden: !entity?.potModificar,
+		},
         {
             label: <Divider sx={{px: 1, width: '100%'}} color={"none"}/>,
             showInMenu: true,
             disabled: true,
-            hidden: (row: any) => row?.tipus == 'InteressatAdministracioEntity' || !entity?.potModificar,
+            hidden: (row: any) => (row?.tipus == 'InteressatAdministracioEntity' || !entity?.potModificar),
         },
         {
             label: t('page.interessat.action.createRep.label'),
             icon: "add",
             showInMenu: true,
             onClick: createRepresentent,
-            hidden: (row: any) => row?.representant || row?.tipus == 'InteressatAdministracioEntity' || !entity?.potModificar,
+            hidden: (row: any) => (row?.representant || row?.tipus == 'InteressatAdministracioEntity' || !entity?.potModificar),
         },
         {
             label: t('page.interessat.action.updateRep.label'),
             icon: "edit",
             showInMenu: true,
             onClick: updateRepresentent,
-            hidden: (row: any) => !row?.representant || row?.tipus == 'InteressatAdministracioEntity' || !entity?.potModificar,
+            hidden: (row: any) => (!row?.representant || row?.tipus == 'InteressatAdministracioEntity' || !entity?.potModificar),
         },
         {
             label: t('page.interessat.action.deleteRep.label'),
             icon: "delete",
             showInMenu: true,
             onClick: deleteRepresentent,
-            hidden: (row: any) => !row?.representant || row?.tipus == 'InteressatAdministracioEntity' || !entity?.potModificar,
+            hidden: (row: any) => (!row?.representant || row?.tipus == 'InteressatAdministracioEntity' || !entity?.potModificar),
         },
     ];
 
@@ -182,6 +191,7 @@ const useInteressatActions = (entity:any, refresh?: () => void) => {
         {dialogDetail}
         {contentCreate}
         {contentImportarSGD}
+		{dialogManageInteressatGrups}
     </>;
 
     return {

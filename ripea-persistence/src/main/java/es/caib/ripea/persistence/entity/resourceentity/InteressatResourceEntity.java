@@ -1,5 +1,6 @@
 package es.caib.ripea.persistence.entity.resourceentity;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -11,6 +12,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.ForeignKey;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -148,7 +150,11 @@ public class InteressatResourceEntity extends BaseAuditableEntity<InteressatReso
 
     @OneToMany(mappedBy = "representant", cascade = {CascadeType.DETACH}, fetch = FetchType.LAZY)
     protected List<InteressatResourceEntity> representats;
-
+    
+    
+    @ManyToMany(mappedBy = "interessats", fetch = FetchType.LAZY)
+    protected List<InteressatGrupResourceEntity> grups = new ArrayList<>();
+	
 	public String getCodiNom() {
 		return Utils.getCodiNom(this.tipus, this.documentNum, this.nom, this.llinatge1, this.llinatge2, this.raoSocial, this.organCodi);
     }
@@ -164,5 +170,16 @@ public class InteressatResourceEntity extends BaseAuditableEntity<InteressatReso
 				return false;
 		}
 		return true;
+    }
+    
+    public boolean adressaNormalitzadaCompleta() {
+    	if(this.getAdressaTipus()!=null && !this.getAdressaTipus().equals(EntregaPostalTipusEnum.SENSE_NORMALITZAR) && Utils.isEmpty(this.getAdresaPoblacio())) {
+    		return false;
+    	}
+    	return true;
+    }
+    
+    public List<InteressatGrupResourceEntity> getGrups() {
+    	return this.grups;
     }
 }

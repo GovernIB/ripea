@@ -10,7 +10,7 @@ export const ThemeUserProvider = ({ children }: { children: React.ReactNode }) =
     const theme = useMemo(() => {
         // console.log(">>> user", user)
         return (user?.conf?.modeFosc) ? darkTheme : lightTheme
-    }, [user]);
+    }, [user?.conf?.modeFosc]);
 
     return (
         <ThemeProvider theme={theme}>

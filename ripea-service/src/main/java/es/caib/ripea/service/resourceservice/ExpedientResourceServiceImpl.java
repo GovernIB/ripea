@@ -24,6 +24,9 @@ import java.util.zip.ZipOutputStream;
 
 import javax.annotation.PostConstruct;
 
+import es.caib.ripea.service.helper.*;
+import es.caib.ripea.service.intf.dto.*;
+import es.caib.ripea.service.resourcehelper.ContingutLogResourceHelper;
 import org.apache.commons.collections4.CollectionUtils;
 import org.hibernate.Hibernate;
 import org.springframework.security.core.Authentication;
@@ -60,21 +63,6 @@ import es.caib.ripea.persistence.repository.ExpedientRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
-import es.caib.ripea.service.helper.ApplicationHelper;
-import es.caib.ripea.service.helper.CacheHelper;
-import es.caib.ripea.service.helper.CarpetaHelper;
-import es.caib.ripea.service.helper.ConfigHelper;
-import es.caib.ripea.service.helper.ContingutHelper;
-import es.caib.ripea.service.helper.DocumentHelper;
-import es.caib.ripea.service.helper.DominiHelper;
-import es.caib.ripea.service.helper.EntityComprovarHelper;
-import es.caib.ripea.service.helper.ExcepcioLogHelper;
-import es.caib.ripea.service.helper.ExecucioMassivaHelper;
-import es.caib.ripea.service.helper.ExpedientHelper;
-import es.caib.ripea.service.helper.MessageHelper;
-import es.caib.ripea.service.helper.MetaDocumentHelper;
-import es.caib.ripea.service.helper.PluginHelper;
-import es.caib.ripea.service.helper.ZipImportacioHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
@@ -86,20 +74,6 @@ import es.caib.ripea.service.intf.base.model.FieldOption;
 import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ReportFileType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
-import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
-import es.caib.ripea.service.intf.dto.CodiValorDto;
-import es.caib.ripea.service.intf.dto.DocumentAmbTipusDto;
-import es.caib.ripea.service.intf.dto.DocumentDto;
-import es.caib.ripea.service.intf.dto.ElementTipusEnumDto;
-import es.caib.ripea.service.intf.dto.ExecucioMassivaContingutDto;
-import es.caib.ripea.service.intf.dto.ExecucioMassivaDto;
-import es.caib.ripea.service.intf.dto.ExecucioMassivaTipusDto;
-import es.caib.ripea.service.intf.dto.FileNameOption;
-import es.caib.ripea.service.intf.dto.FitxerDto;
-import es.caib.ripea.service.intf.dto.ImportacioDto;
-import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
-import es.caib.ripea.service.intf.dto.PermisosPerExpedientsDto;
-import es.caib.ripea.service.intf.dto.ResultatConsultaDto;
 import es.caib.ripea.service.intf.model.ContingutResource;
 import es.caib.ripea.service.intf.model.DocumentResource;
 import es.caib.ripea.service.intf.model.EntitatResource;
@@ -113,6 +87,7 @@ import es.caib.ripea.service.intf.model.ExpedientResource.ImportarExpedientFormA
 import es.caib.ripea.service.intf.model.ExpedientResource.MassiveImportDocsAction;
 import es.caib.ripea.service.intf.model.ExpedientResource.TancarExpedientFormAction;
 import es.caib.ripea.service.intf.model.InteressatResource;
+import es.caib.ripea.service.intf.model.MetaExpedientOrganGestorResource;
 import es.caib.ripea.service.intf.model.MetaExpedientResource;
 import es.caib.ripea.service.intf.model.NodeResource.MassiveAction;
 import es.caib.ripea.service.intf.model.UsuariResource;
@@ -142,6 +117,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     private final ExpedientResourceRepository expedientResourceRepository;
     private final MetaExpedientResourceRepository metaExpedientResourceRepository;
     private final MetaExpedientSequenciaResourceRepository metaExpedientSequenciaResourceRepository;
+    private final MetaExpedientRepository metaExpedientRepository;
 
     private final ContingutResourceHelper contingutResourceHelper;
     private final ApplicationHelper applicationHelper;
@@ -159,7 +135,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     private final MetaDocumentHelper metaDocumentHelper;
     private final ZipImportacioHelper zipImportacioHelper;
     private final MessageHelper messageHelper;
-    private final MetaExpedientRepository metaExpedientRepository;
+    private final ContingutLogResourceHelper contingutLogResourceHelper;
 
     @PostConstruct
     public void init() {
@@ -193,7 +169,8 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         register(ExpedientResource.ACTION_MASSIVE_DELETE_CODE, new DeleteActionExecutor());
         register(ExpedientResource.ACTION_MASSIVE_REOBRIR_CODE, new ReobrirActionExecutor());
         register(ExpedientResource.ACTION_MASSIVE_IMPORT_DOCS, new ImportarDocumentsMassiu());
-        
+        register(ExpedientResource.ACTION_MASSIVE_RELACIONAR_CODE, new RelacionarActionExecutor());
+
         register(ExpedientResource.ACTION_TANCAR_CODE, new TancarActionExecutor());
         register(ExpedientResource.ACTION_IMPORTAR_CODE, new ImportarActionExecutor());
         register(ExpedientResource.ACTION_SYNC_ARXIU, new SincronitzarArxiuActionExecutor());
@@ -260,102 +237,72 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     		}
        
     		Filter filtreNoEliminats = FilterBuilder.and(FilterBuilder.equal(ContingutResource.Fields.esborrat, "0"));
-    		Filter filtrePermisos = null;
-
-            List<String> permesosClausulesIn = Utils.getIdsEnGruposMil(
-            		expedientHelper.findExpedientsPermesosIds(entitatEntity, permisosPerExpedients, rolActual));
-            if (permesosClausulesIn!=null) {
-    	        for (String aux: permesosClausulesIn) {
-    		        if (aux != null && !aux.isEmpty()) {
-    		        	filtrePermisos = FilterBuilder.or(filtrePermisos, Filter.parse("id IN (" + aux + ")"));
-    			
-    		        }
-    	        }
-            }
-
-    		Filter filtreResultat = FilterBuilder.and(filtreFrontAndEntitat, filtreNoEliminats, filtrePermisos);
-	    
-			applicationHelper.stopTimer(sample, "METRICS@Subsystem_Expedient.list", "resultado", "exito");		
+    		
+    		//Procediment (meta-expedients) amb permisos
+			  Filter filtreProcedimentsPermesos = null;
+			  Filter filtreOrgansPermesos = null;
+			  Filter filtreGrupsPermesos = null;
+			  if (!rolActual.equals("IPA_ADMIN") && !rolActual.equals("IPA_ADMIN_LECTURA")) {
+			  
+				  String procedimentId = ExpedientResource.Fields.metaExpedient + ".id";
+				  List<Long> procedimentsPermesos = expedientHelper.findProcedimentsPermesos(
+						entitatEntity,
+						rolActual,
+						ogEntity!=null?ogEntity.getId():null); 
+				  
+					//Si no es té permis per cap procediment, no retornam resultats
+				if (procedimentsPermesos==null || procedimentsPermesos.size()==0) {
+					return FilterBuilder.equal("id", 0).generate();
+					}
+				  
+				  List<String> permesosClausulesIn = Utils.getIdsEnGruposMil(procedimentsPermesos);
+				  if (permesosClausulesIn!=null) {
+				        for (String aux: permesosClausulesIn) {
+					        if (aux != null && !aux.isEmpty()) {
+					        	filtreProcedimentsPermesos = FilterBuilder.or(filtreProcedimentsPermesos, Filter.parse(procedimentId + " IN (" + aux + ")"));
+					        }
+				        }
+				  }
+				  
+				  //Si es treballa amb un organ gestor, s'ha de filtrar per expedients d'aquest organ gestor i fills
+				  if (rolActual.equals("IPA_ORGAN_ADMIN") || rolActual.equals("IPA_DISSENY")) {
+				  	String campOrganId = ExpedientResource.Fields.metaexpedientOrganGestorPares + "." + MetaExpedientOrganGestorResource.Fields.organGestor + ".id";
+				    List<String> organsActualAndFillsClausulesIn = Utils.getIdsEnGruposMil(permisosPerExpedients.getIdsOrgansPermesos());
+				      if (organsActualAndFillsClausulesIn!=null) {
+					        for (String aux: organsActualAndFillsClausulesIn) {
+						        if (aux != null && !aux.isEmpty()) {
+						        	filtreOrgansPermesos = FilterBuilder.or(filtreOrgansPermesos, Filter.parse(campOrganId + " IN (" + aux + ")"));
+							        }
+						        }
+					      }
+				  }
+				  
+				  //Aplica filtre de grups
+				  if (!rolActual.equals("IPA_ADMIN") && !rolActual.equals("IPA_ORGAN_ADMIN") && !rolActual.equals("IPA_ADMIN_LECTURA")) {
+				  String grupId = ExpedientResource.Fields.grup + ".id";
+					List<String> grupsClausulesIn = Utils.getIdsEnGruposMil(permisosPerExpedients.getIdsGrupsPermesos());
+					  if (grupsClausulesIn!=null && grupsClausulesIn.size()>0) {
+					        for (String aux: grupsClausulesIn) {
+						        if (aux != null && !aux.isEmpty()) {
+						        	filtreGrupsPermesos = FilterBuilder.or(filtreGrupsPermesos, Filter.parse(grupId + " IN (" + aux + ")"));
+						        }
+					        }
+					        
+				        if (filtreGrupsPermesos!=null) {
+				        	filtreGrupsPermesos = FilterBuilder.or(filtreGrupsPermesos, Filter.parse(grupId + " IS NULL"));
+					            }
+							  }
+				      }
+			  }
 			
-	        return filtreResultat.generate();
+			  Filter filtreResultat = FilterBuilder.and(filtreFrontAndEntitat, filtreNoEliminats, filtreProcedimentsPermesos, filtreOrgansPermesos, filtreGrupsPermesos);
+			
+			  return filtreResultat.generate();
         
     	} catch (Exception e) {
     		applicationHelper.stopTimer(sample, "METRICS@Subsystem_Expedient.list", "resultado", "error");
     		throw e;
     	}
-//
-//        /**
-//         * Procediment (meta-expedients) amb permisos
-//         */
-//        String procedimentId = ExpedientResource.Fields.metaExpedient + ".id";
-//        Filter filtreProcedimentsPermesos = null; 
-//        List<String> grupsClausulesIn = permisosPerExpedients.getIdsProcedimentsGruposMil();
-//        if (grupsClausulesIn!=null) {
-//	        for (String aux: grupsClausulesIn) {
-//		        if (aux != null && !aux.isEmpty()) {
-//		        	filtreProcedimentsPermesos = FilterBuilder.or(filtreProcedimentsPermesos, Filter.parse(procedimentId + " IN (" + aux + ")"));
-//		        }
-//	        }
-//        }
-//
-//        //No aplica filtre permis directe procediment
-//        Filter filtreProcedimentPermisDirecte = null;
-//        if (!rolActual.equals("IPA_ADMIN") && 
-//        	!rolActual.equals("IPA_SUPER") && 
-//        	permisosPerExpedients.getIdsMetaExpedientsPermesos()!=null &&
-//                !permisosPerExpedients.getIdsMetaExpedientsPermesos().isEmpty()) {
-//	            filtreProcedimentPermisDirecte = FilterBuilder.or(
-//	            		FilterBuilder.equal(ExpedientResource.Fields.metaExpedient+"."+MetaExpedientResource.Fields.permisDirecte, false), //Permis directe
-//	            		filtreProcedimentsPermesos
-//	            );
-//        }
-//        
-//        //No aplica filtre grup
-//        Filter filtreGrupsPermesos = null;
-//        if (!rolActual.equals("IPA_ADMIN") && !rolActual.equals("IPA_ORGAN_ADMIN")) {
-//            /**
-//             * Expedient dins un grups dels permesos o no tenir grup
-//             */
-//            String grupId = ExpedientResource.Fields.grup + ".id";
-//            List<String> grupsGrupClausulesIn = permisosPerExpedients.getIdsProcedimentsGruposMil();
-//            if (grupsGrupClausulesIn!=null) {
-//    	        for (String aux: grupsGrupClausulesIn) {
-//    		        if (aux != null && !aux.isEmpty()) {
-//    		        	filtreGrupsPermesos = FilterBuilder.or(filtreGrupsPermesos, Filter.parse(grupId + " IN (" + aux + ")"));
-//    		        }
-//    	        }
-//            }
-//            
-//            if (filtreGrupsPermesos!=null) {
-//            	filtreGrupsPermesos = FilterBuilder.or(filtreGrupsPermesos, Filter.parse(grupId + " IS NULL"));
-//            }
-//        }
-//
-//        Filter filtreNoEliminats = FilterBuilder.and(FilterBuilder.equal(ContingutResource.Fields.esborrat, "0"));
-//        Filter filtreResultat = FilterBuilder.and(
-//        		filtreNoEliminats,
-//        		filtreEntitatSessio,
-//        		filtreProcedimentsPermesos,
-//        		filtreProcedimentPermisDirecte,
-//        		filtreGrupsPermesos);
-    }
-    
-    @Override
-    protected void beforeUpdateSave(ExpedientResourceEntity entity, ExpedientResource resource, Map<String, AnswerValue> answers) {
-        if(resource.getRelacionatsAmb()!=null) {
-            if(!resource.getRelacionatsAmb().isEmpty()) {
-                entity.setRelacionatsAmb(expedientResourceRepository.findAllById(resource.getRelacionatsAmb().stream().map(ResourceReference::getId).collect(Collectors.toList())));
-            }else {
-                entity.getRelacionatsAmb().clear();
-            }
-        }
-        if(resource.getRelacionatsPer()!=null) {
-            if(!resource.getRelacionatsPer().isEmpty()) {
-                entity.setRelacionatsPer(expedientResourceRepository.findAllById(resource.getRelacionatsPer().stream().map(ResourceReference::getId).collect(Collectors.toList())));
-            }else {
-                entity.getRelacionatsPer().clear();
-            }
-        }
     }
 
     @Override
@@ -475,9 +422,9 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
             resource.setNumAnotacions(entity.getPeticions().size());
             resource.setNumPublicacions(entity.getPublicacions().size());
             resource.setNumRemeses(entity.getNotificacions().size());
-            resource.setNumMetaDades(entity.getMetaNode().getMetaDades().size());
+            resource.setNumMetaDades(entity.getDades().size());
             resource.setNumDades(dadaRepository.countByNodeId(entity.getId()));
-            resource.setNumContingut(contingutHelper.getFillsHierarchicalCount(entity.getId()));
+            resource.setNumContingut(documentResourceRepository.countAllByExpedientIdAndEsborrat(entity.getId(), 0));
             resource.setNumMoviments(contingutMovimentRepository.countByContingutId(entity.getId()));
             resource.setNumComentaris(entity.getComentaris().size());
             resource.setNumSeguidors(entity.getSeguidors().size());
@@ -599,6 +546,48 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         }
     }
 
+    private class RelacionarActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.RelacionarAction, Serializable> {
+
+        @Override
+        public Serializable exec(String code, ExpedientResourceEntity entity, ExpedientResource.RelacionarAction params) throws ActionExecutionException {
+            List<ExpedientResourceEntity> expedientResourceEntityList = expedientResourceRepository.findAllById(params.getIds());
+            if (ExpedientResource.RelacionarAction.Action.ADD.equals(params.getAction())) {
+                for (ExpedientResourceEntity expedientResourceEntity : expedientResourceEntityList) {
+                    if (!entity.getRelacionatsAmb().contains(expedientResourceEntity)) {
+                        entity.getRelacionatsAmb().add(expedientResourceEntity);
+                        contingutLogResourceHelper.crearRelacioExpedientLog(entity, expedientResourceEntity.getId());
+                    }
+                }
+
+                // REMOVE IF UNSELECT
+                List<ExpedientResourceEntity> toRemove = new ArrayList<>();
+                for (ExpedientResourceEntity expedientResourceEntity : entity.getRelacionatsAmb()) {
+                    if (!expedientResourceEntityList.contains(expedientResourceEntity)) {
+                        toRemove.add(expedientResourceEntity);
+                    }
+                }
+                for (ExpedientResourceEntity expedientResourceEntity : toRemove) {
+                    entity.getRelacionatsAmb().remove(expedientResourceEntity);
+                    contingutLogResourceHelper.eliminarRelacioExpedientLog(entity, expedientResourceEntity.getId());
+                }
+            } else {
+                for (ExpedientResourceEntity expedientResourceEntity : expedientResourceEntityList) {
+                    if (entity.getRelacionatsAmb().contains(expedientResourceEntity)) {
+                        entity.getRelacionatsAmb().remove(expedientResourceEntity);
+                        contingutLogResourceHelper.eliminarRelacioExpedientLog(entity, expedientResourceEntity.getId());
+                    }
+                    if (entity.getRelacionatsPer().contains(expedientResourceEntity)) {
+                        entity.getRelacionatsPer().remove(expedientResourceEntity);
+                        contingutLogResourceHelper.eliminarRelacioExpedientLog(entity, expedientResourceEntity.getId());
+                    }
+                }
+            }
+            return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
+        }
+
+        @Override
+        public void onChange(Serializable id, ExpedientResource.RelacionarAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientResource.RelacionarAction target) {}
+    }
     private class AgafarActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
 
         @Override
@@ -619,7 +608,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
             				false,
             				false,
             				null);
-            		expedientHelper.agafar(params.getIds().get(0), auth.getName());
+            		expedientHelper.agafar(params.getIds().get(0), auth.getName(), null);
             	}
             }
             return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
@@ -1155,6 +1144,13 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 					destiId = params.getCarpeta().getId();
 				}
 				ImportacioDto importacioDto = new ImportacioDto();
+				importacioDto.setTipusImportacio(params.getTipusImportacio());
+				importacioDto.setNumeroRegistre(params.getNumeroRegistre());
+				importacioDto.setCodiEni(params.getCodiEni());
+				importacioDto.setDataPresentacioFormatted(params.getDataPresentacio());
+				importacioDto.setTipusRegistre(TipusRegistreEnumDto.ENTRADA);
+				importacioDto.setDestiId(String.valueOf(destiId));
+				
 				contingutHelper.importarDocuments(entitatEntity.getId(), destiId, importacioDto, new HashMap<String, String>(), new ArrayList<DocumentDto>());
 				return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
 			} catch (Exception ex) {
@@ -1579,33 +1575,44 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
                 ExpedientResource target) {
 
             if (fieldValue != null) {
-                ResourceReference<MetaExpedientResource, Long> reference =
-                        (ResourceReference<MetaExpedientResource, Long>) fieldValue;
-                Optional<MetaExpedientResourceEntity> metaExpedientResourceOptional =
-                        metaExpedientResourceRepository.findById(reference.getId());
-
+            	
+                ResourceReference<MetaExpedientResource, Long> reference = (ResourceReference<MetaExpedientResource, Long>) fieldValue;
+                Optional<MetaExpedientResourceEntity> metaExpedientResourceOptional = metaExpedientResourceRepository.findById(reference.getId());
+                
                 metaExpedientResourceOptional.ifPresent((metaExpedientResourceEntity) -> {
-                    MetaExpedientResource metaExpedientResource =
-                            objectMappingHelper.newInstanceMap(metaExpedientResourceEntity, MetaExpedientResource.class);
+                    
+                	MetaExpedientResource metaExpedientResource = objectMappingHelper.newInstanceMap(metaExpedientResourceEntity, MetaExpedientResource.class);
+                    if (metaExpedientResource.isGestioAmbGrupsActiva()) {
+                    	target.setGestioAmbGrupsActiva(true);
+                    } else {
+                    	target.setGestioAmbGrupsActiva(false);
+                    	target.setGrup(null);
+                    }
+                    
+                    //Calcular la sequència
+                    if (previous.getAny() != null) {
+                        Optional<Long> sequencia = metaExpedientSequenciaResourceRepository
+                                .findValorByMetaExpedientAndAny(metaExpedientResourceEntity, previous.getAny());
 
-                    target.setGestioAmbGrupsActiva(metaExpedientResource.isGestioAmbGrupsActiva());
+                        sequencia.ifPresentOrElse(
+                                (value) -> target.setSequencia(value + 1),
+                                () -> target.setSequencia(1L)
+                        );
+                    }
+                    
                     if (metaExpedientResource.getOrganGestor() != null) {
                         target.setOrganGestor(metaExpedientResource.getOrganGestor());
                         target.setDisableOrganGestor(true);
-                        if (previous.getAny() != null) {
-                            Optional<Long> sequencia = metaExpedientSequenciaResourceRepository
-                                    .findValorByMetaExpedientAndAny(metaExpedientResourceEntity, previous.getAny());
-
-                            sequencia.ifPresentOrElse(
-                                    (value) -> target.setSequencia(value + 1),
-                                    () -> target.setSequencia(1L)
-                            );
-                        }
+                    } else {
+                    	//Procediment comú
+                    	target.setDisableOrganGestor(false);
                     }
                 });
             } else {
+            	//Sense procediment seleccionat al formulari
                 target.setGestioAmbGrupsActiva(false);
                 target.setOrganGestor(null);
+                target.setDisableOrganGestor(true);
                 target.setSequencia(null);
             }
         }

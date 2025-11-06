@@ -1,8 +1,10 @@
 package es.caib.ripea.service.intf.dto;
 
-import lombok.Data;
 import java.io.Serializable;
 import java.util.Date;
+
+import es.caib.comanda.ms.salut.model.SalutNivell;
+import lombok.Data;
 
 @Data
 public class AvisDto implements Serializable {
@@ -16,4 +18,13 @@ public class AvisDto implements Serializable {
 	private AvisNivellEnumDto avisNivell;
 	private Boolean avisAdministrador;
 	private Long entitatId;
+	
+	public SalutNivell getSalutNivellComanda() {
+		switch (this.avisNivell) {
+			case ERROR: return SalutNivell.ERROR;
+			case INFO: return SalutNivell.INFO;
+			case WARNING: return SalutNivell.WARN;
+		}
+		return null;
+	}
 }

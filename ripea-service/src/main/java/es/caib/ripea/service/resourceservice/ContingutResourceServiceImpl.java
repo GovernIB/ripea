@@ -11,6 +11,6 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ContingutResourceServiceImpl extends BaseMutableResourceService<ContingutResource, Long, ContingutResourceEntity<ContingutResource>> implements ContingutResourceService {
-
-}
+public class ContingutResourceServiceImpl 
+extends BaseMutableResourceService<ContingutResource, Long, ContingutResourceEntity<ContingutResource>> 
+implements ContingutResourceService {}

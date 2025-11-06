@@ -146,6 +146,7 @@ public class PermissionHelper {
 			if (targetType.endsWith(".RegistreInteressatResource")) { return userPermissions.isConsulta(); }
 			if (targetType.endsWith(".RegistreResource")) { return userPermissions.isConsulta(); }
 			if (targetType.endsWith(".ValidacioErrorResource")) { return userPermissions.isConsulta(); }
+			if (targetType.endsWith(".InteressatGrupResource")) { return userPermissions.isConsulta(); }			
 		}
 		//Es retorna false per defecte, quant es crei un nou recurs, s'ha de venir aqui a colocar-lo en el nivell adequat.
 		return false;

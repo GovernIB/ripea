@@ -203,14 +203,12 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
             resourceName={resourceName}
             filter={filter}
             // autoHeight
-            // key={user?.conf?.numElementsPagina}
+            key={user?.conf?.numElementsPagina}
             paginationActive
-
             titleDisabled
             disableColumnMenu
             disableColumnSorting={!!staticSortModel}
             staticSortModel={staticSortModel}
-
             {...others}
             apiRef={apiRef}
             datagridApiRef={datagridApiRef}

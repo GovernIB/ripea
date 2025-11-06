@@ -9,6 +9,7 @@ import * as builder from '../../../util/springFilterUtils.ts'
 import IconButton from "@mui/material/IconButton";
 import TabComponent from "../../../components/TabComponent.tsx";
 import Box from "@mui/material/Box";
+import {useUserSession} from "../../../components/Session.tsx";
 
 const Dades = (props:any) => {
     const {entity} = props;
@@ -75,6 +76,7 @@ const Errors = (props:any) => {
 const useSeguimentViafirma = (potModificar:boolean, refresh?: () => void) => {
     const { t } = useTranslation();
     const {temporalMessageShow} = useBaseAppContext();
+    const { value: user } = useUserSession();
 
     const {
         isReady: apiIsReady,
@@ -125,7 +127,7 @@ const useSeguimentViafirma = (potModificar:boolean, refresh?: () => void) => {
             value: 'cancel',
             text: t('page.document.action.cancel.label'),
             icon: 'cancel',
-            hidden: !(entity?.estat == 'ENVIAT' && potModificar),
+            hidden: !(entity?.estat == 'ENVIAT' && potModificar && user?.rolActual != "IPA_ADMIN_LECTURA"),
             componentProps: { variant: 'contained' }
         },
         {
@@ -158,13 +160,10 @@ const useSeguimentViafirma = (potModificar:boolean, refresh?: () => void) => {
             componentProps={{ fullWidth: true, maxWidth: 'md'}}
             buttons={buttons}
             buttonCallback={(value :any) :void=>{
-                if (value=='close') {
-                    handleClose();
-                }
-                if (value=='cancel' && entity?.estat == 'ENVIAT' && potModificar) {
+                if (value=='cancel' && entity?.estat == 'ENVIAT' && potModificar && user?.rolActual != "IPA_ADMIN_LECTURA") {
                     cancelarFirma(entity?.id)
-                    handleClose();
                 }
+                handleClose();
             }}
         >
             <Load value={entity}>

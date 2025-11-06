@@ -386,7 +386,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 						expedientEstatDto,
 						rolActual,
 						organId);
-				
+				//Al haver creat el estat, recorrem les tasques per si aquest estat estava referenciat, actualizar el ID.
 				if (procedimentImportat.getTasques() != null) {
 					for (MetaExpedientTascaDto metaExpedientTascaDto : procedimentImportat.getTasques()) {
 						if (metaExpedientTascaDto.getEstatIdCrearTasca() != null && metaExpedientTascaDto.getEstatIdCrearTasca().equals(expedientEstatDto.getId())) {
@@ -571,8 +571,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 							organId);
 					expedientEstatCreatedId = expedientEstatCreated.getId();
 				} else {
-					expedientEstatHelper.updateExpedientEstat(metaExpedientEntity, expEstatEntity, entitatId, expedientEstatDto, rolActual, organId);
-					expedientEstatCreatedId = expedientEstatDto.getId();
+					ExpedientEstatEntity expedientEstatUpdated = expedientEstatHelper.updateExpedientEstat(metaExpedientEntity, expEstatEntity, entitatId, expedientEstatDto, rolActual, organId);
+					expedientEstatCreatedId = expedientEstatUpdated.getId();
 				}
 				
 				//Actualitzam el estat inicial per defecte al crear una tasca amb el ID que acabam de crear/actualitzar

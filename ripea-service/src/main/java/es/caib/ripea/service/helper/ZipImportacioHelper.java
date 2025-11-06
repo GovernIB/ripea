@@ -94,7 +94,7 @@ public class ZipImportacioHelper {
 
     private void assignarCarpeta(DocumentDto documentDto, Long entitatId, Long pareId) {
         var nomFitxer = documentDto.getFitxerNom();
-        var ubicacio = ubicacioDocuments.get(nomFitxer);
+        var ubicacio = ubicacioDocuments.get(documentDto.getRutaZip());
 
         if (ubicacio != null) {
             var pare = entityComprovarHelper.comprovarContingut(pareId);
@@ -119,15 +119,15 @@ public class ZipImportacioHelper {
                 if (entry.isDirectory()) continue;
 
                 var path = Paths.get(entry.getName()).getParent();
-                var nomFitxer = Paths.get(entry.getName()).getFileName().toString().toLowerCase();
-
+                var rutaCompleta = entry.getName();
+                
                 if (path != null) {
                     var ubicacio = new ArrayList<String>();
                     path.forEach(p -> ubicacio.add(p.toString()));
-                    ubicacioDocuments.put(nomFitxer, ubicacio);
+                    ubicacioDocuments.put(rutaCompleta, ubicacio);
                 }
 
-                mapDocuments.put(nomFitxer, llegirBytes(zis));
+                mapDocuments.put(rutaCompleta, llegirBytes(zis));
                 zis.closeEntry();
             }
         }
@@ -166,11 +166,13 @@ public class ZipImportacioHelper {
         return documents;
     }
 
-    private DocumentDto nouDocument(String fitxerNom, byte[] contingut) {
+    private DocumentDto nouDocument(String rutaCompleta, byte[] contingut) {
         var documentDto = new DocumentDto();
+        String fitxerNom = Paths.get(rutaCompleta).getFileName().toString();
         String nom = FilenameUtils.removeExtension(fitxerNom);
         String mimeType = MimeTypeUtils.getMimeType(fitxerNom);
         
+        documentDto.setRutaZip(rutaCompleta);
         documentDto.setNom(nom);
         documentDto.setFitxerNom(fitxerNom);
         documentDto.setFitxerContingut(contingut);
@@ -184,7 +186,7 @@ public class ZipImportacioHelper {
         documentDto.setNtiEstadoElaboracion(NTI_ESTADO_ELABORACION);
         documentDto.setNtiTipoDocumental(NTI_TIPO_DOCUMENTAL);
         
-        //validarFirmes(mimeType, contingut, documentDto);
+        validarFirmes(mimeType, contingut, documentDto);
         
         return documentDto;
     }
@@ -218,7 +220,7 @@ public class ZipImportacioHelper {
                 ? carpeta.getId()
                 : crearCarpeta(entitatId, pareId, nomFitxer, nomCarpeta);
 
-        return crearCarpetaRecursiu(entitatId, pare, carpetaId, nomFitxer, ubicacio);
+        return crearCarpetaRecursiu(entitatId, carpeta, carpetaId, nomFitxer, ubicacio);
     }
 
     private Long crearCarpeta(Long entitatId, Long pareId, String nomFitxer, String nomCarpeta) {

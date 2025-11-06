@@ -87,12 +87,11 @@ public class DocumentNotificacioInteressatHelper {
 			}
 		}
 
-		DocumentNotificacioDto dto = conversioTipusHelper.convertir(notificacioEntity, DocumentNotificacioDto.class);
-
 		String destinitariAmbDocument = "";
-		for (InteressatDto interessatDto : dto.getInteressats()) {
+		for (DocumentEnviamentInteressatEntity interessatDto : notificacioEntity.getDocumentEnviamentInteressats()) {
 			destinitariAmbDocument += interessatDto.getNomCompletAmbDocument();
 		}
+
 		cacheHelper.evictErrorsValidacioPerNode(expedientEntity.getId());
 		cacheHelper.evictNotificacionsPendentsPerExpedient(expedientEntity);
 		logAll(notificacioEntity, LogTipusEnumDto.NOTIFICACIO_ENVIADA, destinitariAmbDocument);

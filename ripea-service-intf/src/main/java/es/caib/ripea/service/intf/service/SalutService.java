@@ -1,14 +1,15 @@
 package es.caib.ripea.service.intf.service;
 
 import java.util.List;
-import es.caib.comanda.ms.salut.model.AppInfo;
+
 import es.caib.comanda.ms.salut.model.ContextInfo;
 import es.caib.comanda.ms.salut.model.IntegracioInfo;
 import es.caib.comanda.ms.salut.model.SalutInfo;
+import es.caib.comanda.ms.salut.model.SubsistemaInfo;
 
 public interface SalutService {
     public List<IntegracioInfo> getIntegracions();
-    public List<AppInfo> getSubsistemes();
+    public List<SubsistemaInfo> getSubsistemes();
     public List<ContextInfo> getContexts(String baseUrl);
     public SalutInfo checkSalut(String versio, String performanceUrl);
 }

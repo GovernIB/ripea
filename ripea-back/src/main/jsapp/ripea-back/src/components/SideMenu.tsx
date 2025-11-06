@@ -18,7 +18,6 @@ import {
     CSSObject
 } from '@mui/material/styles';
 import {useBaseAppContext, useSmallScreen, useSmallHeader} from "reactlib";
-import logo from '../assets/goib_escut_logo.png';
 import SideWrapper from "./SideWrapper";
 
 export type MenuEntry = {
@@ -251,7 +250,7 @@ const sideMenuClass = 'side-menu';
 const titol = "Menú";
 const closeIcon = 'close';
 
-export const Menu: React.FC<MenuProps & { onClose?: () => void }> = (props) => {
+export const Menu: React.FC<MenuProps & { onClose?: () => void, logo?: string }> = (props) => {
     const {
         title,
         entries,
@@ -260,6 +259,7 @@ export const Menu: React.FC<MenuProps & { onClose?: () => void }> = (props) => {
         iconClicked,
         drawerWidth = 240,
         onClose,
+        logo
     } = props;
     const smallScreen = useSmallScreen();
     const smallHeader = useSmallHeader();
@@ -293,8 +293,8 @@ export const Menu: React.FC<MenuProps & { onClose?: () => void }> = (props) => {
     }
     const drawerContent = <SideWrapper onOutsideClick={handleMenuItemClick}>
         <Box sx={{ mt: smallHeader ? 1 : 1 }} >
-            {logo ? <Box sx={{ display: 'flex', mr: 2, pt: 1, pr: 2, cursor: 'pointer', 'img': { height: '38px' }, pl: 4 }}>
-                <img src={logo} alt="logo" />
+            <Box sx={{ display: 'flex', mr: 2, pt: 1, pr: 2, cursor: 'pointer', 'img': { height: '38px' }, pl: 4 }}>
+                {logo && <img src={logo} alt="logo"/>}
                 <Typography
                     variant="h6"
                     component="span"
@@ -311,7 +311,7 @@ export const Menu: React.FC<MenuProps & { onClose?: () => void }> = (props) => {
                 >
                     <Icon fontSize={'medium'}>{closeIcon}</Icon>
                 </IconButton>
-            </Box> : null}
+            </Box>
             <Divider sx={{ color: '#F6F6F6', mb: 2, mt: 1 }}/>
         </Box>
         {title && <MenuTitle title={title} onClose={onTitleClose} />}

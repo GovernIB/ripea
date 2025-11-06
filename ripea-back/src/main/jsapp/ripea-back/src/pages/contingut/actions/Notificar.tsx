@@ -14,6 +14,16 @@ const Notificacio = (props:any) => {
     const { t } = useTranslation();
     const representant = entity?.representantInfo
 
+    const direccion = [
+        !representant ?entity?.codiPostal :representant?.codiPostal,
+        entity?.municipiNom,
+        [entity?.provinciaNom, entity?.paisNom].filter(Boolean).join(' '),
+        // !representant ?entity?.adresa :representant?.adresa,
+    ]
+        .flat()               // aplana posibles arrays
+        .filter(Boolean)      // elimina undefined, null, '' o false
+        .join(', ');          // une con coma y espacio
+
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
 
         { entity?.incapacitat == true && (!entity?.representant || entity?.representant?.incapacitat) &&
@@ -27,10 +37,12 @@ const Notificacio = (props:any) => {
             <ContenidoData title={t('page.interessat.detall.email')}>{entity?.email}</ContenidoData>
             <ContenidoData title={t('page.interessat.detall.telefon')}>{entity?.telefon}</ContenidoData>
             <ContenidoData title={t('page.interessat.detall.incapacitat')}>{entity?.incapacitat}</ContenidoData>
-
-            <CardData title={t('page.interessat.detall.direccioPostal')} hidden={representant || !entregaPostal}>
-                <ContenidoData title={t('page.interessat.detall.direccio')}>{entity?.paisNom} {entity?.provinciaNom} {entity?.municipiNom} {entity?.codiPostal} {entity?.adresa}</ContenidoData>
-            </CardData>
+            <ContenidoData hidden={!!representant || !entregaPostal} title={<><Icon sx={{mr:1}}>place</Icon>{t('page.interessat.detall.direccioPostal')}</>}>
+                {(entity?.adressaTipus == "NACIONAL" || entity?.adressaTipus == "ESTRANGER") && <>{entity?.adressaTipusVia} {entity?.adresa} {entity?.adressaNumCasa}</>}
+                {entity?.adressaTipus == "APARTAT_CORREUS" && <>{entity?.adressaTipusVia} {entity?.adresa} {entity?.adressaNumCasa} {entity?.adresaApartatCorreus}</>}
+                {entity?.adressaTipus == "SENSE_NORMALITZAR" && <>{entity?.adresa}</>}
+            </ContenidoData>
+            <ContenidoData hidden={!!representant || !entregaPostal}>{direccion}</ContenidoData>
 
             <CardData title={t('page.interessat.rep')} hidden={!representant}>
                 <ContenidoData title={t('page.interessat.detall.nif')}>{representant?.documentNum}</ContenidoData>
@@ -39,10 +51,12 @@ const Notificacio = (props:any) => {
                 <ContenidoData title={t('page.interessat.detall.email')}>{representant?.email}</ContenidoData>
                 <ContenidoData title={t('page.interessat.detall.telefon')}>{representant?.telefon}</ContenidoData>
                 <ContenidoData title={t('page.interessat.detall.incapacitat')}>{representant?.incapacitat}</ContenidoData>
-            </CardData>
-
-            <CardData title={t('page.interessat.detall.direccioPostal')} hidden={!representant || !entregaPostal}>
-                <ContenidoData title={t('page.interessat.detall.direccio')}>{entity?.paisNom} {entity?.provinciaNom} {entity?.municipiNom} {representant?.codiPostal} {representant?.adresa}</ContenidoData>
+                <ContenidoData hidden={!entregaPostal} title={<><Icon sx={{mr:1}}>place</Icon>{t('page.interessat.detall.direccioPostal')}</>}>
+                    {(representant?.adressaTipus == "NACIONAL" || representant?.adressaTipus == "ESTRANGER") && <>{representant?.adressaTipusVia} {representant?.adresa} {representant?.adressaNumCasa}</>}
+                    {representant?.adressaTipus == "APARTAT_CORREUS" && <>{representant?.adressaTipusVia} {representant?.adresa} {representant?.adressaNumCasa} {representant?.adresaApartatCorreus}</>}
+                    {representant?.adressaTipus == "SENSE_NORMALITZAR" && <>{representant?.adresa}</>}
+                </ContenidoData>
+                <ContenidoData hidden={!entregaPostal}>{direccion}</ContenidoData>
             </CardData>
         </CardData>
     </Grid>
@@ -91,6 +105,7 @@ const NotificarForm = () => {
     const { t } = useTranslation();
     const { data, apiRef: formApiRef } = useFormContext();
 
+	
     const { create, content } = useCreate()
     const onCreateInteressat = (result?:any)=> {
         formApiRef?.current?.setFieldValue('interessats', [...data?.interessats, {
@@ -99,15 +114,38 @@ const NotificarForm = () => {
         }])
     }
 
+	const grupsFilter: string = builder.and(
+	    builder.eq("expedient.id", data?.expedient?.id)
+	);
+	
     const interessatsFilter: string = builder.and(
         builder.eq("expedient.id", data?.expedient?.id),
         builder.eq('esRepresentant', false),
     );
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="tipus"/>
+        {data?.interessatsAmbAvis?.length > 0 &&
+            <Alert severity={"warning"}>
+                Hi ha notificacions amb destinatari sense NIF/NIE. Aquestes notficacions no es poden enviar a la carpeta ciutadana, degut a que és necessari un NIF o NIE per a accedir-hi.
+                <br/><br/>
+                <ul>
+                    <li><b>Si ha marcat entrega postal:</b> La notificació s'enviarà per correu postal, sempre que l'òrgan gestor tengui un CIE (Centre de Impressió i Ensobrat) definit.</li>
+                    <li><b>Si NO ha seleccionat entrega postal:</b> La notificació telemàtica no es realitzarà. En el seu lloc s'enviarà un correu electrònic d'avís informant al titular que en breu rebrà una notificació per correu postal. <u>És necessari que feu la notificació en Paper.</u></li>
+                </ul>
+
+                <br/>Els notificacions sense NIF/NIE són els següents:<br/>
+                <ul>
+                    {data?.interessatsAmbAvis?.map?.((i:any, index:any)=>
+                        <li>Notificació {index + 1} - Titular : {i?.description} </li>
+                    )}
+                </ul>
+            </Alert>
+        }
+
+        <GridFormField xs={12} name="tipus" required hiddenEnumValues={['MANUAL']}/>
         <GridFormField xs={12} name="estat" required disabled/>
 
+		<GridFormField xs={12} name="grups" multiple filter={grupsFilter}/>
         <GridFormField xs={9.5} name="interessats" multiple filter={interessatsFilter}/>
 
         <GridButton

@@ -45,16 +45,16 @@ const FileTabForm = () => {
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <FileFormField xs={12} name="adjunt" required/>
-        <GridFormField xs={6} name="hasFirma" hidden={!data.adjunt} disabled={data.documentFirmaTipus == "FIRMA_ADJUNTA"} />
-        <GridFormField xs={6} name="documentFirmaTipus" hidden={!data.adjunt} disabled />
-        <FileFormField xs={12} name="firmaAdjunt" hidden={data.documentFirmaTipus != "FIRMA_SEPARADA"} required/>
+        <GridFormField xs={6} name="hasFirma" hidden={!data.adjunt} disabled={data?.deteccioFirmaAutomaticaActiva && data?.documentFirmaTipus == "FIRMA_ADJUNTA"} />
+        <GridFormField xs={6} name="documentFirmaTipus" hidden={!data?.adjunt || !data?.hasFirma} disabled={data?.deteccioFirmaAutomaticaActiva} required/>
+        <FileFormField xs={12} name="firmaAdjunt" hidden={!data?.hasFirma || data?.documentFirmaTipus != "FIRMA_SEPARADA"} required/>
     </Grid>
 }
 
 const DocumentsGridForm = () => {
     const { t } = useTranslation();
-    const { data, apiRef } = useFormContext();
-    const { value: user } = useUserSession()
+    const { data, apiRef, id } = useFormContext();
+	const { value: user } = useUserSession();
     const { artifactAction: apiAction } = useResourceApiService('documentResource');
 
     const actualizarDatos = () => {
@@ -73,10 +73,11 @@ const DocumentsGridForm = () => {
         builder.eq("metaExpedient.id", data?.metaExpedient?.id),
         builder.eq("actiu", true),
     );
-    const carpetaFilter: string = builder.and(
-        builder.eq("expedient.id", data?.expedient?.id),
-        builder.eq("esborrat", 0),
-    );
+	
+	const carpetaFilter: string = builder.and(
+	    builder.eq("expedient.id", data?.expedient?.id),
+	    builder.eq("esborrat", 0),
+	);
 
     const tabs = [
         {
@@ -113,9 +114,11 @@ const DocumentsGridForm = () => {
         <GridFormField xs={12} name="ntiOrigen" required />
         <GridFormField xs={12} name="ntiEstadoElaboracion" required />
 
-        <GridFormField xs={12} name="carpeta"
-                       filter={carpetaFilter}
-                       hidden={!user?.sessionScope?.isCreacioCarpetesActiva}/>
+        {id==null &&
+            <GridFormField xs={12} name="carpeta"
+                        filter={carpetaFilter}
+                        hidden={!user?.sessionScope?.isCreacioCarpetesActiva}/>
+        }
 
         <Grid item xs={12}>
             <TabComponent

@@ -22,6 +22,14 @@ public class RolHelper {
 		}
 	}
 	
+	public static boolean isAdminLecturaEntitat(String rolActual) {
+		if (rolActual != null && rolActual.equals("IPA_ADMIN_LECTURA")) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 	public static boolean isAdminOrgan(String rolActual) {
 		if (rolActual != null && rolActual.equals("IPA_ORGAN_ADMIN")) {
 			return true;

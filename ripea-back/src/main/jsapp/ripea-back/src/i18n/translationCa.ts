@@ -368,6 +368,9 @@ const translationCa = {
                     title: "Reobrir tasca",
                     ok: "La tasca s'ha reobert correctament",
                 },
+                comment: {
+                    ok: "Comentari afegit a la tasca '{{data.expedientTasca.description}}'",
+                },
             },
         },
         interessat: {
@@ -430,15 +433,44 @@ const translationCa = {
                     title: "Importar interessats des de Registre",
                     ok: "Interessats importats correctament",
                 },
+				gestGrups: {
+				    label: "Gestionar grups",
+					title: "Gestionar grups",
+				    ok: "Grups modificats correctament",
+				},
             },
             grid: {
                 title: "Interessats del fitxer",
                 representant: "Representant",
+				tipus: {
+					label: "Tipus",
+					personaFisica: "Persona física",
+					personaJuridica: "Persona jurídica",
+					administrador: "Administrador",
+				},
             },
             alert: {
                 incapacitat: "En cas de titular amb discapacitat és obligatori indicar un destinatari.",
                 jaExistentExpedient: "Ja existeix a l'expedient",
             },
+			grup: {
+				title: "Grups d'interessats",
+				action: {
+					new: {
+						label: "Nou Grup",
+						ok: "Grup creat correctament",
+					},
+					update: {
+						ok: "Grup modificat correctament",
+					},
+					delete: {
+					    label: "Esborrar Grup",
+					    check: "Esteu segur que voleu continuar amb aquesta acció?",
+					    description: "Un cop esborrat no es podrà recuperar",
+					    ok: "El grup {{data.nom}} s'ha esborrat correctament",
+					},
+				},
+			},
         },
         expedient: {
             title: "Expedient",
@@ -586,6 +618,9 @@ const translationCa = {
                     title: "Importar documents a expedients",
                     warning: "Els expedients han de pertanyer al mateix procediment",
                 },
+                comment: {
+                    ok: "Comentari afegit a l'expedient '{{data.expedient.description}}'",
+                },
             },
             alert: {
                 owner: "És necessari reservar l’expedient per poder-lo modificar",
@@ -703,7 +738,7 @@ const translationCa = {
                     ok: "El document {{data.nom}} s'ha modificat correctament"
                 },
                 delete: {
-                    label: "Esborrar...",
+                    label: "Esborrar",
                     check: "Està segur que vol continuar amb aquesta acció?",
                     description: "Un cop esborrat no es podrà recuperar",
                     ok: "El document {{data.nom}} s'ha eliminat correctament"
@@ -1153,7 +1188,8 @@ const translationCa = {
                 perfil: "El meu perfil",
                 manual: "Manual d'usuari",
                 manualAdmin: "Manual dels administradors",
-                logout: "Desconnectar"
+                logout: "Desconnectar",
+                noOrgans: "Cap organ gestor assignat"
             },
             menu: {
                 entitat: "Entitats",

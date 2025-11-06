@@ -807,7 +807,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				false,
 				null);
-		return expedientHelper.agafar(expedient, usuariHelper.getUsuariAutenticat().getCodi());
+		return expedientHelper.agafar(expedient, usuariHelper.getUsuariAutenticat().getCodi(), "Afagar");
 	}
 
 	@Transactional
@@ -826,7 +826,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				null);
 		
-		expedientHelper.agafar(expedient, usuariCodi);
+		expedientHelper.agafar(expedient, usuariCodi, "Assignar");
 	}
 
 	@Transactional
@@ -837,7 +837,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 						", " + "id=" + id + ", " + "usuariCodi=" + usuariCodi + ")");
 		ExpedientEntity expedient = expedientRepository.getOne(id);
 
-		return expedientHelper.agafar(expedient, usuariCodi);
+		return expedientHelper.agafar(expedient, usuariCodi, "Agafar");
 	}
 
 	@Transactional
@@ -1295,6 +1295,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 			ResultEnumDto resultEnum) {
 		
 	    Timer.Sample sample = Timer.start(applicationHelper.getMeterRegistry());
+
 	    try {		
 		
 			ResultDto<ExpedientDto> result = new ResultDto<ExpedientDto>();
@@ -1314,11 +1315,10 @@ public class ExpedientServiceImpl implements ExpedientService {
 					rolActual,
 					organActual);
 					
-			ExpedientFiltreCalculat expedientFiltreCalculat = calculateFilter(
-					filtre,
-					expedientId,
-					entitatId,
-					rolActual);
+			ExpedientFiltreCalculat expedientFiltreCalculat = calculateFilter(filtre, expedientId, entitatId, rolActual);
+			
+			boolean isAdmin 		= rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ADMIN_LECTURA") || rolActual.equals("IPA_SUPER");
+			boolean noFiltreGrups	= rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ADMIN_LECTURA") || rolActual.equals("IPA_ORGAN_ADMIN");
 			
 			if (resultEnum == ResultEnumDto.PAGE) {
 				
@@ -1329,9 +1329,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 				ordenacioMap.put("agafatPer.codiAndNom", new String[] {"agafatPer.codi"});
 				ordenacioMap.put("estat", new String[] {"estatAdditional", "estat", "id"});
 				paginacioParams.eliminaCampOrdenacio("tipusStr");
-
-				boolean isAdmin 		= rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ADMIN_LECTURA") || rolActual.equals("IPA_SUPER");
-				boolean noFiltreGrups	= rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ADMIN_LECTURA") || rolActual.equals("IPA_ORGAN_ADMIN");
 
 				Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap);
 				Page<ExpedientEntity> paginaExpedients = expedientRepository.findByEntitatAndPermesosAndFiltre(
@@ -1476,8 +1473,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 						filtre.getMetaExpedientDominiValor(),
 						permisosPerExpedients.getIdsGrupsPermesos() == null,
 						permisosPerExpedients.getIdsGrupsPermesos(),
-						rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_SUPER"), //No aplica filtre permis directe procediment
-						rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN"), //No aplica filtre grups
+						isAdmin, //No aplica filtre permis directe procediment
+						noFiltreGrups, //No aplica filtre grups
 						filtre.isAmbFirmaPendent(),
 						Utils.isEmpty(filtre.getNumeroRegistre()),
 						! Utils.isEmpty(filtre.getNumeroRegistre()) ? filtre.getNumeroRegistre() : "",

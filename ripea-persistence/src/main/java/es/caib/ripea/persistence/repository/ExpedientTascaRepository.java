@@ -155,16 +155,15 @@ public interface ExpedientTascaRepository extends JpaRepository<ExpedientTascaEn
 		@Param("responsable") UsuariEntity responsable);
 
 
-	@Query("select et from " +
-		"    ExpedientTascaEntity et " +
-		"left join et.responsables responsable " +
+	@Query("from ExpedientTascaEntity et " +
 		"where " +
 		"    (et.expedient.entitat = :entitat) " +
-		"and (:esNullExpedientNom = true or lower(et.expedient.nom) like lower('%'||:expedientNom||'%')) " +
+		"and (:esNullExpedientNom = true or lower(et.expedient.nom) like lower(concat(concat('%', :expedientNom), '%'))) " +
 		"and (:esNullMetaTasca = true or et.metaExpedientTasca = :metaTasca) " +
 		"and (:esNullDataInici = true or et.createdDate >= :dataInici) " +
 		"and (:esNullDataFinal = true or et.createdDate <= :dataFinal) " +
-		"and (:esNullResponsable = true or responsable = :responsable)" +
+//		"and (:esNullResponsable = true or :responsable IN et.responsables)" +
+		"and (:esNullResponsable = true or EXISTS (SELECT 1 FROM et.responsables r WHERE r = :responsable))" +
 		"and (:esNullEstat = true or et.estat = :estat) ")
 	public Page<ExpedientTascaEntity> findAmbFiltrePaginat(
 		@Param("entitat") EntitatEntity entitat,

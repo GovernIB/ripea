@@ -152,7 +152,7 @@ public class MetaExpedientHelper {
 			return sequencia.getValor() + 1;
 		}
 	}
-
+	
 	public List<Long> findMetaExpedientIdsFiltratsAmbPermisosOrganGestor(Long entitatId, Long organGestorId, boolean hasPermisAdmComu) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false, false);
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -428,6 +428,14 @@ public class MetaExpedientHelper {
 	public MetaExpedientTascaEntity tascaUpdate(
 			MetaExpedientTascaEntity metaExpTascaEntity,
 			MetaExpedientTascaDto metaExpedientTasca) throws NotFoundException {
+		
+		ExpedientEstatEntity estatCrearTasca = null; 
+		if (metaExpedientTasca.getEstatIdCrearTasca()!=null) 
+			estatCrearTasca = expedientEstatRepository.findById(metaExpedientTasca.getEstatIdCrearTasca()).orElse(null);
+		ExpedientEstatEntity estatFinalitzarTasca = null;
+		if (metaExpedientTasca.getEstatIdFinalitzarTasca()!=null) 
+			estatFinalitzarTasca = expedientEstatRepository.findById(metaExpedientTasca.getEstatIdFinalitzarTasca()).orElse(null);
+		
 		metaExpTascaEntity.update(
 				metaExpedientTasca.getCodi(),
 				metaExpedientTasca.getNom(),
@@ -436,8 +444,8 @@ public class MetaExpedientHelper {
 				metaExpedientTasca.getDataLimit(),
 				metaExpedientTasca.getDuracio(),
 				metaExpedientTasca.getPrioritat(),
-				metaExpedientTasca.getEstatIdCrearTasca()==null?null:expedientEstatRepository.getOne(metaExpedientTasca.getEstatIdCrearTasca()),
-				metaExpedientTasca.getEstatIdFinalitzarTasca()==null?null:expedientEstatRepository.getOne(metaExpedientTasca.getEstatIdFinalitzarTasca()));
+				estatCrearTasca,
+				estatFinalitzarTasca);
 		return metaExpTascaEntity;
 	}
 
@@ -457,14 +465,14 @@ public class MetaExpedientHelper {
 							metaExpedientId + ", " + "metaExpedientTasca=" + metaExpedientTasca + ")");
 			
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-	
 			MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
-	
-			Long idEstatCrear = metaExpedientTasca.getEstatIdCrearTasca();
-			ExpedientEstatEntity estatCrearTasca = idEstatCrear != null ? expedientEstatRepository.getOne(idEstatCrear) : null;
-			Long idEstatFinalitzar = metaExpedientTasca.getEstatIdFinalitzarTasca();
-			ExpedientEstatEntity estatFinalitzarTasca = idEstatFinalitzar != null ? expedientEstatRepository.getOne(
-					idEstatFinalitzar) : null;
+			ExpedientEstatEntity estatCrearTasca = null; 
+			if (metaExpedientTasca.getEstatIdCrearTasca()!=null) 
+				estatCrearTasca = expedientEstatRepository.findById(metaExpedientTasca.getEstatIdCrearTasca()).orElse(null);
+			ExpedientEstatEntity estatFinalitzarTasca = null;
+			if (metaExpedientTasca.getEstatIdFinalitzarTasca()!=null) 
+				estatFinalitzarTasca = expedientEstatRepository.findById(metaExpedientTasca.getEstatIdFinalitzarTasca()).orElse(null);
+			
 			MetaExpedientTascaEntity entity = MetaExpedientTascaEntity.getBuilder(
 					metaExpedientTasca.getCodi(),
 					metaExpedientTasca.getNom(),

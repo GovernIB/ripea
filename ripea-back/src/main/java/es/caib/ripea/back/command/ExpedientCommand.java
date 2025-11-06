@@ -52,7 +52,7 @@ public class ExpedientCommand extends ContenidorCommand {
 	@NotNull(groups = {Create.class, Update.class})
 	private PrioritatEnumDto prioritat;
 	private String prioritatMotiu;
-	private SiNoEnumDto seguidor = SiNoEnumDto.NO;
+	private boolean seguidor = false;
 	
 	public void setTancatMotiu(String tancatMotiu) {
 		this.tancatMotiu = Utils.trim(tancatMotiu);

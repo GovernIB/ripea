@@ -1,8 +1,8 @@
-import React, {useEffect, useMemo} from 'react';
+import React, {useEffect} from 'react';
 import {BaseApp} from './components/BaseApp';
-import logo from './assets/Drassana_RIP_DRA_COL.svg';
-import goib_logo from './assets/goib_logo.svg';
-import logo_caib from '../public/logo_caib.svg';
+import ripea_logo from './assets/Drassana_RIP_DRA_COL.svg';
+import favicon from './assets/favicon.png'
+import governLogo from './assets/govern-logo.png'
 import AppRoutes from './AppRoutes';
 import {useEntitatSession} from "./components/Session.tsx";
 import TitleHeaderConfigurator from "./TitleHeaderConfigurator.tsx";
@@ -18,32 +18,30 @@ const changeFavicon = (faviconUrl:any) => {
     document.getElementsByTagName('head')[0].appendChild(link);
 };
 
+export const getImgFromBytes = (img:string) :string | undefined => {
+    return img ?`data:image/png;base64,${img}` :undefined;
+}
+
 export const App: React.FC = () => {
     const version = '1.0.1';
     const { value: entitat } = useEntitatSession()
-    const entitatLogo = useMemo(() => {
-        return entitat?.logoImgBytes ? `data:image/png;base64,${entitat?.logoImgBytes}` : goib_logo;
-    }, [entitat]);
-    const backgroundColor = useMemo(() => {
-        return entitat?.capsaleraColorFons
-    }, [entitat]);
     useEffect(() => {
-        changeFavicon(entitat?.logoImgBytes ?entitatLogo :logo_caib)
-    }, [entitatLogo]);
+        changeFavicon(entitat?.conf?.favicon || favicon)
+    }, [entitat?.conf?.favicon, favicon]);
     return <BaseApp
         code="cmd"
-        logo={entitatLogo}
+        logo={getImgFromBytes(entitat?.conf?.logo) || governLogo}
         style={{ height: '64px' }}
         logoStyle={{
             '& img': { height: '49px' },
             pl: 2,
             pr: 4,
             mr: 4,
-            borderRight: `2px solid ${ entitat?.capsaleraColorLletra ?? '#000' }`
+            borderRight: `2px solid ${entitat?.conf?.colorLletra}`
         }}
-        title={<img src={logo} style={{ height: '80px', paddingTop: '5px' }} />}
+        title={<img src={ripea_logo} style={{ height: '80px', paddingTop: '5px' }} />}
         version={version}
-        appbarBackgroundColor={backgroundColor ?? "#FFFFFF"}>
+        appbarBackgroundColor={entitat?.conf?.colorFons}>
         <TitleHeaderConfigurator/>
         <AppRoutes/>
     </BaseApp>;

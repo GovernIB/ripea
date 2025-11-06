@@ -154,6 +154,13 @@ public class ContingutMassiuController extends BaseUserOAdminOOrganController {
 			}
 			
 		}
+		
+		//Resetejam la seleccio
+		RequestSessionHelper.actualitzarObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_SELECCIO,
+				new HashSet<Long>());
+		
 		return this.getModalControllerReturnValueSuccess(
 				request,
 				"redirect:/massiu/definitiu",
