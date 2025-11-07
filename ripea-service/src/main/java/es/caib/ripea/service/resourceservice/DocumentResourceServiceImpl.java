@@ -368,8 +368,9 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         
         resource.setHasFirma(resource.getDocumentFirmaTipus()!=DocumentFirmaTipusEnumDto.SENSE_FIRMA);
         resource.setMetaDocumentInfo(objectMappingHelper.newInstanceMap(Hibernate.unproxy(entity.getMetaDocument()), MetaDocumentResource.class));
+        resource.setFirmaParcial(DocumentEstatEnumDto.FIRMA_PARCIAL.equals(entity.getEstat()));
         
-    	if (entity.getCreatedBy()!=null) {
+        if (entity.getCreatedBy()!=null) {
     		UsuariResourceEntity usuariResourceEntity = usuariResourceRepository.findById(entity.getCreatedBy()).orElse(null);
     		if (usuariResourceEntity!=null) {
     			resource.setCreatedByFullName(usuariResourceEntity.getNom() + " (" + usuariResourceEntity.getCodi() + ")");

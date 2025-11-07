@@ -293,7 +293,10 @@ public class DocumentResource extends NodeResource {
     @NotNull
 	private DocumentFirmaTipusEnumDto documentFirmaTipus;
 	private ResourceReference<ExpedientEstatResource, Long> expedientEstatAdditional;
-
+	
+    @ResourceField(onChangeActive = true)
+    public Boolean firmaParcial;
+    
     @NotNull
     @Transient
     @ResourceField(onChangeActive = true)
@@ -344,6 +347,10 @@ public class DocumentResource extends NodeResource {
     	if (Utils.hasValue(this.firmaContentType)) { return this.firmaContentType; }
     	if (this.firmaAdjunt!=null && Utils.hasValue(this.firmaAdjunt.getContentType())) { return this.firmaAdjunt.getContentType(); }
     	return "application/octet-stream";
+    }
+    
+    public boolean isFirmaParcial() {
+    	return DocumentEstatEnumDto.FIRMA_PARCIAL.equals(this.estat);
     }
     
     @Getter
@@ -643,6 +650,7 @@ public class DocumentResource extends NodeResource {
         resultat.setFitxerContingut(this.getFitxerContingut());
         resultat.setFitxerContentType(getFitxerContentType());
         resultat.setAmbFirma(this.hasFirma!=null?this.hasFirma:false);
+        resultat.setEstat(this.firmaParcial!=null && this.firmaParcial ? DocumentEstatEnumDto.FIRMA_PARCIAL : this.estat);
         switch (this.getDocumentFirmaTipus()) {
             case FIRMA_ADJUNTA:
                 resultat.setTipusFirma(DocumentTipusFirmaEnumDto.ADJUNT);

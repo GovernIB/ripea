@@ -202,6 +202,10 @@ public class DocumentHelper {
 		entity.setIdioma(document.getIdioma());
 		entity.setResolucion(document.getResolucion());
 		
+		if (entity.isFirmat() && document.isFirmaParcial()) {
+			entity.setEstat(DocumentEstatEnumDto.FIRMA_PARCIAL);
+		}
+		
 		FitxerDto fitxer = new FitxerDto(
 				document.getFitxerNom(),
 				document.getFitxerContentType(),
@@ -246,7 +250,7 @@ public class DocumentHelper {
 			}
 		}
 		
-		ArxiuEstatEnumDto arxiuEstat = getArxiuEstat(documentFirmaTipus, null);
+		ArxiuEstatEnumDto arxiuEstat = getArxiuEstat(documentFirmaTipus, null, document.isFirmaParcial());
 		
 		try {
 			if (entity.getExpedient().getArxiuUuid() != null && expedient.getTancatData()==null) {
@@ -279,7 +283,7 @@ public class DocumentHelper {
 				contingutHelper.arxiuPropagarModificacio(
 						entity,
 						fitxer,
-						arxiuEstat == ArxiuEstatEnumDto.ESBORRANY ? DocumentFirmaTipusEnumDto.SENSE_FIRMA : documentFirmaTipus,
+						(arxiuEstat == ArxiuEstatEnumDto.ESBORRANY && !entity.isFirmaParcial()) ? DocumentFirmaTipusEnumDto.SENSE_FIRMA : documentFirmaTipus,
 						firmes,
 						arxiuEstat);
 				
@@ -323,10 +327,10 @@ public class DocumentHelper {
 		return dto;
 	}
 
-	public ArxiuEstatEnumDto getArxiuEstat(DocumentFirmaTipusEnumDto documentFirmaTipus, DocumentEstatEnumDto estatAnterior) {
+	public ArxiuEstatEnumDto getArxiuEstat(DocumentFirmaTipusEnumDto documentFirmaTipus, DocumentEstatEnumDto estatAnterior, boolean firmaParcial) {
 		boolean isFirmatPujatArxiu = documentFirmaTipus != DocumentFirmaTipusEnumDto.SENSE_FIRMA && isFirmatPujatManualmentDefinitu();
 		boolean isEsborranyConvertit = documentFirmaTipus == DocumentFirmaTipusEnumDto.SENSE_FIRMA && (estatAnterior != null && estatAnterior.equals(DocumentEstatEnumDto.DEFINITIU));
-		return (isFirmatPujatArxiu || isEsborranyConvertit) ? ArxiuEstatEnumDto.DEFINITIU : ArxiuEstatEnumDto.ESBORRANY;
+		return ((!firmaParcial && isFirmatPujatArxiu) || isEsborranyConvertit) ? ArxiuEstatEnumDto.DEFINITIU : ArxiuEstatEnumDto.ESBORRANY;
 	}
 	
 	public ArxiuFirmaDto getArxiuFirmaPades(String nom, byte[] contingut){
@@ -539,7 +543,7 @@ public class DocumentHelper {
 
 		if (arxiuDocument == null || arxiuDocument.getEstat() == DocumentEstat.ESBORRANY || isPropagarModificacioDefinitiusActiva()) {
 
-			ArxiuEstatEnumDto arxiuEstat = getArxiuEstat(documentFirmaTipus, estatAnterior);
+			ArxiuEstatEnumDto arxiuEstat = getArxiuEstat(documentFirmaTipus, estatAnterior, documentEntity.isFirmaParcial());
 
 			if (arxiuEstat == ArxiuEstatEnumDto.ESBORRANY && documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_SEPARADA) {
 				pluginHelper.arxiuPropagarFirmaSeparada(
@@ -1674,7 +1678,7 @@ public class DocumentHelper {
 							true);
 				}
 		
-				ArxiuEstatEnumDto arxiuEstat = getArxiuEstat(documentFirmaTipus, null);
+				ArxiuEstatEnumDto arxiuEstat = getArxiuEstat(documentFirmaTipus, null, documentEntity.isFirmaParcial());
 				
 				if (arxiuEstat == ArxiuEstatEnumDto.ESBORRANY && documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_SEPARADA) {
 					pluginHelper.arxiuPropagarFirmaSeparada(

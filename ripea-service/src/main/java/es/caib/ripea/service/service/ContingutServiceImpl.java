@@ -434,8 +434,8 @@ public class ContingutServiceImpl implements ContingutService {
 								true);
 					} 
 					
-					ArxiuEstatEnumDto arxiuEstat = documentHelper.getArxiuEstat(documentFirmaTipus, null);
-					
+					ArxiuEstatEnumDto arxiuEstat = documentHelper.getArxiuEstat(documentFirmaTipus, null, document.isFirmaParcial());
+							
 					if (arxiuEstat == ArxiuEstatEnumDto.ESBORRANY && documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_SEPARADA) {
 						pluginHelper.arxiuPropagarFirmaSeparada(
 								document,

@@ -2225,7 +2225,7 @@ public class ContingutHelper {
 					desti.getArxiuUuid());
 			copia.setArxiuUuid(contingutArxiu.getIdentificador());
 			DocumentEntity copiaDoc = (DocumentEntity)copia;
-			copiaDoc.setArxiuEstat(documentHelper.getArxiuEstat(copiaDoc.getDocumentFirmaTipus(), null));
+			copiaDoc.setArxiuEstat(documentHelper.getArxiuEstat(copiaDoc.getDocumentFirmaTipus(), null, copiaDoc.isFirmaParcial()));
 		} else if (contingut instanceof CarpetaEntity) {
 			ContingutArxiu contingutArxiu = pluginHelper.arxiuCarpetaCopiar(
 					(CarpetaEntity)contingut,
