@@ -18,12 +18,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
-import javax.validation.constraints.Size;
 import javax.validation.groups.Default;
 
-import es.caib.ripea.service.intf.dto.*;
 import org.hibernate.Hibernate;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.DataBinder;
@@ -36,10 +33,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import es.caib.ripea.persistence.entity.EntitatEntity;
-import es.caib.ripea.persistence.entity.InteressatAdministracioEntity;
 import es.caib.ripea.persistence.entity.InteressatEntity;
-import es.caib.ripea.persistence.entity.InteressatPersonaFisicaEntity;
-import es.caib.ripea.persistence.entity.InteressatPersonaJuridicaEntity;
 import es.caib.ripea.persistence.entity.resourceentity.InteressatGrupResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.InteressatResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.InteressatGrupResourceRepository;
@@ -70,6 +64,16 @@ import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ReportFileType;
 import es.caib.ripea.service.intf.base.model.Resource;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
+import es.caib.ripea.service.intf.dto.ComunitatDto;
+import es.caib.ripea.service.intf.dto.EntregaPostalTipusEnum;
+import es.caib.ripea.service.intf.dto.InteressatDocumentTipusEnumDto;
+import es.caib.ripea.service.intf.dto.InteressatImportacioTipusDto;
+import es.caib.ripea.service.intf.dto.InteressatTipusEnum;
+import es.caib.ripea.service.intf.dto.MunicipiDto;
+import es.caib.ripea.service.intf.dto.NivellAdministracioDto;
+import es.caib.ripea.service.intf.dto.PaisDto;
+import es.caib.ripea.service.intf.dto.ProvinciaDto;
+import es.caib.ripea.service.intf.dto.UnitatOrganitzativaDto;
 import es.caib.ripea.service.intf.model.ExpedientResource;
 import es.caib.ripea.service.intf.model.InteressatGrupResource;
 import es.caib.ripea.service.intf.model.InteressatResource;
@@ -80,11 +84,6 @@ import es.caib.ripea.service.resourcehelper.InteressatResourceHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * Implementació del servei de gestió d'expedients.
- *
- * @author Límit Tecnologies
- */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -98,14 +97,11 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
     private final PluginHelper pluginHelper;
     private final CacheHelper cacheHelper;
     private final MessageHelper messageHelper;
-
     private final EntitatRepository entitatRepository;
     private final InteressatRepository interessatRepository;
     private final InteressatResourceRepository interessatResourceRepository;
     private final InteressatGrupResourceRepository interessatGrupResourceRepository;
-
     private final SmartValidator validator;
-    private final DataSourceProperties mainDataSourceProperties;
 
     @PostConstruct
     public void init() {
@@ -166,7 +162,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
                     params.putAll(requestParameterMap);
                 	resultat = new ProvinciaFieldOptionsProvider().getOptions(fieldName, params);
                     break;
-                case UnitatOrganitzativaFormFilter.Fields.municipi:
+                case UnitatOrganitzativaFormFilter.Fields.municipiUo:
                 	resultat = new MunicipiFieldOptionsProvider().getOptions(fieldName, requestParameterMap);
                     break;
             }
@@ -186,6 +182,9 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
                     case InteressatPersonaJuridicaEntity:
                         target.setDocumentTipus(InteressatDocumentTipusEnumDto.NIF);
                         target.setOrganCodi(null);
+                        target.setPais(previous.getPais()); //Mantenim dades basiques de adressa, possiblement siguin les per defecte.
+	                    target.setProvincia(previous.getProvincia());
+	                    target.setMunicipi(previous.getMunicipi());
                         break;
                     case InteressatAdministracioEntity:
                     	target.setAdressaTipus(EntregaPostalTipusEnum.SENSE_NORMALITZAR);
@@ -214,17 +213,17 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
                 target.setCodiPostal(uoDto.getCodiPostal());
                 target.setAdresa(uoDto.getAdressa());
                 target.setDocumentNum(uoDto.getNifCif());
-                target.setEmail("");
-                target.setTelefon("");
-                target.setObservacions("");
+                target.setEmail(null);
+                target.setTelefon(null);
+                target.setObservacions(null);
             } else {
-            	target.setNom("");
-                target.setPais("");
-                target.setProvincia("");
-                target.setMunicipi("");
-                target.setCodiPostal("");
-                target.setAdresa("");
-                target.setDocumentNum("");
+            	target.setNom(null);
+                target.setPais(null);
+                target.setProvincia(null);
+                target.setMunicipi(null);
+                target.setCodiPostal(null);
+                target.setAdresa(null);
+                target.setDocumentNum(null);
             }
         }
     }
@@ -273,7 +272,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
 					String nivellAdm = getFromMap(UnitatOrganitzativaFormFilter.Fields.nivell, mutableMap);
 					String comunitat = getFromMap(UnitatOrganitzativaFormFilter.Fields.comunitatAutonoma, mutableMap);
 					String provincia = getFromMap(UnitatOrganitzativaFormFilter.Fields.provincia, mutableMap);
-					String municipi = getFromMap(UnitatOrganitzativaFormFilter.Fields.municipi, mutableMap);
+					String municipi = getFromMap(UnitatOrganitzativaFormFilter.Fields.municipiUo, mutableMap);
 	                Boolean arrel = Boolean.parseBoolean(getFromMap(UnitatOrganitzativaFormFilter.Fields.unitatArrel, mutableMap));
 					uos = pluginHelper.unitatsOrganitzativesFindByFiltre(codiDir3, denominacio, nivellAdm, comunitat, provincia, municipi, arrel);
 				}
@@ -333,7 +332,11 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
 				List<MunicipiDto> municipis = cacheHelper.findMunicipisPerProvincia(provinciaCodi);
 				if (municipis!=null) {
 					for (MunicipiDto municipi: municipis) {
-						resultat.add(new FieldOption(municipi.getCodi(), municipi.getNom()));
+						if ("municipiUo".equals(fieldName)) {
+							resultat.add(new FieldOption(municipi.getCodi()+"-"+municipi.getCodiEntitatGeografica(), municipi.getNom()));
+						} else {
+							resultat.add(new FieldOption(municipi.getCodi(), municipi.getNom()));
+						}
 					}
 				}
 			}
@@ -476,7 +479,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
                         target.setAdresa(interessatExistent.getAdresa());
                         target.setAdressaTipus(interessatExistent.getAdressaTipus());
                         target.setAdressaTipusVia(interessatExistent.getAdressaTipusVia());
-
+                        
                         target.setAdressaNumCasa(interessatExistent.getAdressaNumCasa());
                         target.setAdresaQualificador(interessatExistent.getAdresaQualificador());
                         target.setAdresaPuntKm(interessatExistent.getAdresaPuntKm());

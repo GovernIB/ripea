@@ -5,6 +5,7 @@ import { useOptionalDataGridContext } from '../datagrid/DataGridContext';
 
 type MuiFilterProps = FilterProps & {
     componentProps?: any;
+    disableGridBinding?: boolean;
 }
 
 export const MuiFilter: React.FC<MuiFilterProps> = (props) => {
@@ -12,11 +13,12 @@ export const MuiFilter: React.FC<MuiFilterProps> = (props) => {
         componentProps,
         onSpringFilterChange,
         children,
+        disableGridBinding,
         ...otherProps
     } = props;
     const gridContext = useOptionalDataGridContext();
     const handleSpringFilterChange = (filter: string | undefined) => {
-        if (gridContext != null) {
+        if (gridContext != null && !disableGridBinding) {
             gridContext.apiRef.current?.setFilter(filter);
         }
         onSpringFilterChange?.(filter);

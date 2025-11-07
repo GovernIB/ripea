@@ -232,7 +232,7 @@ public class InteressatResource extends BaseAuditableResource<Long> {
         @ResourceField(enumType = true)
         private String provincia;
         @ResourceField(enumType = true)
-        private String municipi;
+        private String municipiUo;
         private String nif;
         private String nom;
         private boolean unitatArrel;

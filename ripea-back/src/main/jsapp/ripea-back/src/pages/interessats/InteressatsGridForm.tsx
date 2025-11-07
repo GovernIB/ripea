@@ -12,7 +12,7 @@ const InteressatsGridFormFilter = () => {
         <GridFormField xs={6} name="nivell"/>
         <GridFormField xs={6} name="comunitatAutonoma"/>
         <GridFormField xs={6} name="provincia" requestParams={{comunitatAutonoma: data?.comunitatAutonoma}}/>
-        <GridFormField xs={6} name="municipi" requestParams={{provincia: data?.provincia}}/>
+        <GridFormField xs={6} name="municipiUo" requestParams={{provincia: data?.provincia}}/>
         <GridFormField xs={6} name="nif"/>
         <GridFormField xs={6} name="nom"/>
         <GridFormField xs={9.6} name="unitatArrel" type={"checkbox"}/>
@@ -47,6 +47,7 @@ export const InteressatsGridForm = () => {
                     springFilterBuilder={(data:any)=> setValue(data)}
                     onSpringFilterChange={() => {}}
                     buttons={filterButtons}
+                    disableGridBinding={true} // <-- evitar que la búsqueda actualice el grid
                 >
                     <InteressatsGridFormFilter/>
                 </StyledMuiFilter>
