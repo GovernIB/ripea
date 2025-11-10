@@ -99,6 +99,7 @@ export const useActions = (refresh?: () => void) => {
     const syncArxiu= (id:any): void => {
         apiAction(undefined, {code: 'SYNC_ARXIU', data:{ ids: [id], massivo: false }})
             .then((result) => {
+                refresh?.()
                 const success = result.filter((r:any)=>r?.codi=='OK')
                 const info = result.filter((r:any)=>r?.codi=='INFO')
                 const error = result.filter((r:any)=>r?.codi=='ERROR')
