@@ -341,7 +341,7 @@ export const useCommonActions = (refresh?: () => void) => {
             icon: "undo",
             showInMenu: true,
             onClick: reobrir,
-            hidden: (row:any) => !isTancat(row) || !user?.sessionScope?.isReobrirPermes || !( !user?.sessionScope?.isTancamentLogicActiu || row?.tancatData) || !row?.potModificar,
+            hidden: (row:any) => !isTancat(row) || !user?.sessionScope?.isReobrirPermes || (user?.sessionScope?.isTancamentLogicActiu && row?.tancatData),
         },
         {
             label: t('page.expedient.action.eliminar.label'),
