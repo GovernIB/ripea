@@ -2682,24 +2682,24 @@ public class ContingutHelper {
 		if (expedient.getArxiuUuid() == null) {
 			Exception exception = expedientInteressatHelper.guardarExpedientAndInteressatsArxiu(expedient.getId());
 			if (exception != null) {
-				return setResultatSync(ERROR, "S'ha produït un error al intentar desar l'expedient a l'arxiu: " + exception.getMessage());
-			}
-			return setResultatSync(OK, "Expedient desat a l'arxiu.");
+				return setResultatSync(ERROR, messageHelper.getMessage("contingutHelper.sincronitzaExpedient.error") + " " + exception.getMessage());
+			};
+			return setResultatSync(OK, messageHelper.getMessage("contingutHelper.sincronitzaExpedient.expOk"));
 		} else {
 			// Si ja està guardat, sincronitzam l'estat
 			es.caib.plugins.arxiu.api.Expedient arxiuExpedient = pluginHelper.arxiuExpedientConsultar(expedient);
 			if (arxiuExpedient == null)
-				return setResultatSync(ERROR, "S'ha produït un error al intentar actualitzar l'estat de l'expedient a l'arxiu: no s'ha trobat l'expedient a l'arxiu.");
+				return setResultatSync(ERROR, messageHelper.getMessage("contingutHelper.sincronitzaExpedient.error") + " " + messageHelper.getMessage("contingutHelper.sincronitzaExpedient.notFound"));
 			ExpedientMetadades metadades = arxiuExpedient.getMetadades();
 			ExpedientEstatEnumDto estat = getExpedientEstat(metadades);
 			if (estat != null && !estat.equals(expedient.getEstat())) {
 				expedient.updateEstat(estat, ExpedientEstatEnumDto.TANCAT.equals(estat) ? "Sincronització amb l'estat de l'arxiu" : null);
-				return setResultatSync(OK, "Expedient actualitzat a l'estat " + estat);
+				return setResultatSync(OK, messageHelper.getMessage("contingutHelper.sincronitzaExpedient.ok") + " " + estat);
 			}
 
 			if (cacheHelper.mostrarLogsIntegracio())
 				logger.info("[SYNC] L'expedient no necessita ser actualitzat");
-			return setResultatSync(INFO, "L'expedient no necessita ser actualitzat.");
+			return setResultatSync(INFO, messageHelper.getMessage("contingutHelper.sincronitzaExpedient.noNeed"));
 		}
 	}
 	
@@ -2729,7 +2729,7 @@ public class ContingutHelper {
 				if (carpeta.getArxiuUuid() == null) {
 					resultat.add(sincronitzarCarpeta(carpeta));
 				} else {
-					resultat.add(setResultatSync(INFO, "La carpeta " + carpeta.getNom() + " no necesita ser actualitzada."));
+					resultat.add(setResultatSync(INFO, messageHelper.getMessage("contingutHelper.sincronitzaExpedient.carpet", new Object[] {carpeta.getNom()})));
 				}
 			}
 		}
@@ -2783,22 +2783,23 @@ public class ContingutHelper {
 			try {
 				exception = documentHelper.guardarDocumentArxiu(document.getId());
 				if (exception == null)
-					return setResultatSync(OK, "El document " + document.getNom() + " s'ha guardat a l'arxiu.");
+					return setResultatSync(OK, messageHelper.getMessage("contingutHelper.sincronitzaExpedient.docOk", new Object[] {document.getNom()}));
 			} catch (Exception e) {
 				exception = e;
 			}
-			return setResultatSync(ERROR, "S'ha produït un error al intentar desar el document " + document.getNom() + " a l'arxiu: " + exception.getMessage());
+			return setResultatSync(ERROR, 
+					messageHelper.getMessage("contingutHelper.sincronitzaExpedient.docKo", new Object[] {document.getNom()}) + " " + exception.getMessage());
 		} else if (isPendentMoureArxiu(document)) {
 			try {
 				exception = expedientHelper.moveDocumentArxiuNewTransaction(document.getAnnexos().get(0).getId());
 				if (exception == null)
-					return setResultatSync(OK, "S'ha mogut el document" + document.getNom() + " a l'arxiu.");
+					return setResultatSync(OK, messageHelper.getMessage("contingutHelper.sincronitzaExpedient.docMoveOk", new Object[] {document.getNom()}));
 			} catch (Exception e) {
 				exception = e;
 			}
 			return CodiValorDto.builder()
 					.codi("ERROR")
-					.valor("S'ha produït un error al intentar moure el document " + document.getNom() + " a l'arxiu: " + exception.getMessage()).build();
+					.valor(messageHelper.getMessage("contingutHelper.sincronitzaExpedient.docMoveKo", new Object[] {document.getNom()}) + " " + exception.getMessage()).build();
 		} else if (!StringUtils.isEmpty(document.getGesDocFirmatId())) {
 
 			try {
@@ -2806,13 +2807,13 @@ public class ContingutHelper {
 						document.getEntitat().getId(),
 						document);
 				if (exception == null)
-					return setResultatSync(OK, "El document " + document.getNom() + "s'ha guardat a l'arxiu.");
+					return setResultatSync(OK, messageHelper.getMessage("contingutHelper.sincronitzaExpedient.docOk", new Object[] {document.getNom()}));
 			} catch (Exception e) {
 				exception = e;
 			}
 			return CodiValorDto.builder()
 					.codi("ERROR")
-					.valor("S'ha produït un error al intentar desar el document " + document.getNom() + " a l'arxiu: " + exception.getMessage()).build();
+					.valor(messageHelper.getMessage("contingutHelper.sincronitzaExpedient.docKo", new Object[] {document.getNom()}) + " " + exception.getMessage()).build();
 		} else {
 		// Actualitzar estat
 			Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(document.getArxiuUuid());
@@ -2823,9 +2824,10 @@ public class ContingutHelper {
 						&& !DocumentEstatEnumDto.DEFINITIU.equals(document.getEstat())) {
 					document.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
 				}
-				return setResultatSync(OK, "Document " + document.getNom() + " actualitzat a l'estat " + estat);
+				
+				return setResultatSync(OK, messageHelper.getMessage("contingutHelper.sincronitzaExpedient.docKo", new Object[] {document.getNom(), estat}));
 			}
-			return setResultatSync(INFO, "El document no necessita ser actualitzat.");
+			return setResultatSync(INFO, messageHelper.getMessage("contingutHelper.sincronitzaExpedient.docNoNeed"));
 		}
 	}
 	

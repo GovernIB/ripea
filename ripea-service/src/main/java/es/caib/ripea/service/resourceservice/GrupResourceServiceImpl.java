@@ -41,6 +41,14 @@ public class GrupResourceServiceImpl extends BaseMutableResourceService<GrupReso
     @Override
     protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
     	
+        String entitatActualCodi = configHelper.getEntitatActualCodi();
+        String rolActual		 = configHelper.getRolActual();
+    	
+    	EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true,false);
+    	OrganGestorEntity ogEntity = organGestorRepository.findByEntitatAndCodi(entitat, configHelper.getOrganActualCodi());
+    	
+    	Filter filtreGrupsPermesos = getFiltreGrupsPermesos(entitat.getId(), rolActual, ogEntity != null ?ogEntity.getId() :null);
+    	
         Map<String, String> mapaNamedQueries =  Utils.namedQueriesToMap(namedQueries);
     	if (mapaNamedQueries.size()>0) {
     		/**
@@ -76,78 +84,36 @@ public class GrupResourceServiceImpl extends BaseMutableResourceService<GrupReso
     				// ----------------> return sense resultats
     			}
     			
-				return filtreGrupsProcediment.generate();
-				// ----------------> return amb resultats
+    			Filter filtreResultat = FilterBuilder.and(filtreGrupsProcediment, filtreGrupsPermesos);
+				return filtreResultat.generate();
+				// ----------------> return amb resultats: grups permesos del procediment
     		}
     		
     		/**
     		 * S'utilitza en el filtre de expedient, per obtenir els grups que pot veurer un usuari amb rol determinat
     		 */
     		if (mapaNamedQueries.containsKey("BY_PERMISOS_USUARI")) {
-    			
-    			String entitatActualCodi = configHelper.getEntitatActualCodi();
-    			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true,false);
-    			OrganGestorEntity ogEntity = organGestorRepository.findByEntitatAndCodi(entitat, configHelper.getOrganActualCodi());
-    			List<GrupEntity> grupsPermesos = entityComprovarHelper.findGrupsPermesosProcedimentsGestioActiva(entitat.getId(), configHelper.getRolActual(), ogEntity != null ?ogEntity.getId() :null);
-    			
-    			Filter filtreGrupsProcediment = null;
-    			if (grupsPermesos!=null && !grupsPermesos.isEmpty()) {
-	    			List<Long> grupsIds = new ArrayList<Long>();
-                    for (GrupEntity ge : grupsPermesos) {
-                        grupsIds.add(ge.getId());
-                    }
-                    List<String> grupsOrgansProcedimentIn = Utils.getIdsEnGruposMil(grupsIds);
-			        for (String aux: grupsOrgansProcedimentIn) {
-				        if (aux != null && !aux.isEmpty()) {
-				        	filtreGrupsProcediment = FilterBuilder.or(filtreGrupsProcediment, Filter.parse("id IN (" + aux + ")"));
-				        }
-			        }
-			        
-					return filtreGrupsProcediment.generate();
-					// ----------------> return amb resultats
+    			if (filtreGrupsPermesos!=null) {
+					return filtreGrupsPermesos.generate();
     			} else {
     				return FilterBuilder.equal("id", 0).generate();
-    				// ----------------> return sense resultats
     			}
     		}
     	}
-    	
-        String entitatActualCodi = configHelper.getEntitatActualCodi();
-        String organActualCodi	 = configHelper.getOrganActualCodi();
-        String rolActual		 = configHelper.getRolActual();
-        Permission permis = ExtendedPermission.READ;
-		boolean isAdmin = "IPA_ADMIN".equals(rolActual);
-		boolean isAdminOrgan = "IPA_ORGAN_ADMIN".equals(rolActual);
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true,false);
 		
         Filter filtreBase = FilterBuilder.and(
                 (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null,
                 FilterBuilder.equal(MetaExpedientResource.Fields.entitat + "." + EntitatResource.Fields.codi, 
                 		entitatActualCodi != null?entitatActualCodi:"................................................................................")
         );
-        
-        Filter filtreResultat = null;
-        
-		/*List<Long> organPermisosIds = permisosHelper.getObjectsIdsWithPermission(OrganGestorEntity.class, isAdminOrgan ? ExtendedPermission.ADMINISTRATION : permis);
-		List<String> organIdsVigents = organGestorRepository.findCodisByEntitatAndVigentIds(entitat, Utils.getNullIfEmpty(organPermisosIds));
-		List<Long> organsIds = new ArrayList<Long>();
-		for (String ogCodi: organIdsVigents) {
-			organsIds.addAll(organGestorCacheHelper.getIdsOrgansFills(entitatActualCodi, ogCodi));
-		}
-        
-		//Organs gestors amb permisos
-        String ogCodi = GrupResource.Fields.organGestor + ".id";
-        Filter filtreOrgansPermesos = null;
-        List<String> grupsOrgansPermesosClausulesIn = Utils.getIdsEnGruposMil(organsIds);
-        if (grupsOrgansPermesosClausulesIn!=null) {
-	        for (String aux: grupsOrgansPermesosClausulesIn) {
-		        if (aux != null && !aux.isEmpty()) {
-	        		filtreOrgansPermesos = FilterBuilder.or(filtreOrgansPermesos, Filter.parse(ogCodi + " IN (" + aux + ")"));
-		        }
-	        }
-        }*/
-		
-        List<GrupEntity> grupsPermesos = entityComprovarHelper.findGrupsPermesosProcedimentsGestioActiva(entitat.getId(), rolActual, null);
+
+		Filter filtreResultat = FilterBuilder.and(filtreBase, filtreGrupsPermesos);        
+        return filtreResultat.generate();
+    }
+    
+    private Filter getFiltreGrupsPermesos(Long entitatId, String rolActual, Long organId) {
+    	
+        List<GrupEntity> grupsPermesos = entityComprovarHelper.findGrupsPermesosProcedimentsGestioActiva(entitatId, rolActual, organId);
 		List<Long> grupsIds = new ArrayList<Long>();
 		if (grupsPermesos.size()>0) {
 			for (GrupEntity grup: grupsPermesos) {
@@ -155,20 +121,18 @@ public class GrupResourceServiceImpl extends BaseMutableResourceService<GrupReso
 			}
 		} else {
 			grupsIds.add(0l); //No te permisos sobre cap grup, forçam a que no apareixi cap 
-		}
-		
+		}    	
+    	
 		Filter filtreGrupsPermesos = null;
 		List<String> grupsPermesosClausulesIn = Utils.getIdsEnGruposMil(grupsIds);
-		if (grupsPermesosClausulesIn!=null) {
+		if (grupsPermesosClausulesIn!=null && grupsPermesosClausulesIn.size()>0) {
 	        for (String aux: grupsPermesosClausulesIn) {
 		        if (aux != null && !aux.isEmpty()) {
 	        		filtreGrupsPermesos = FilterBuilder.or(filtreGrupsPermesos, Filter.parse("id IN (" + aux + ")"));
 		        }
 	        }
         }
-        
-        filtreResultat = FilterBuilder.and(filtreBase, filtreGrupsPermesos);
-        
-        return filtreResultat.generate();
+		
+		return filtreGrupsPermesos;
     }
 }
