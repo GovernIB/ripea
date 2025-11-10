@@ -355,23 +355,35 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
                                 MetaExpedientResource metaExpedientResource =
                                         objectMappingHelper.newInstanceMap(metaExpedientResourceEntity, MetaExpedientResource.class);
 
-                                target.setGestioAmbGrupsActiva(metaExpedientResource.isGestioAmbGrupsActiva());
+                                if (metaExpedientResource.isGestioAmbGrupsActiva()) {
+                                    target.setGestioAmbGrupsActiva(true);
+                                } else {
+                                    target.setGestioAmbGrupsActiva(false);
+                                    target.setGrup(null);
+                                }
+
+                                if (previous.getAny() != null) {
+                                    Optional<Long> sequencia = metaExpedientSequenciaResourceRepository
+                                            .findValorByMetaExpedientAndAny(metaExpedientResourceEntity, previous.getAny());
+
+                                    sequencia.ifPresentOrElse(
+                                            (value) -> target.setSequencia(value + 1),
+                                            () -> target.setSequencia(1L)
+                                    );
+                                }
+
                                 if (metaExpedientResource.getOrganGestor() != null) {
                                     target.setOrganGestor(metaExpedientResource.getOrganGestor());
-                                    if (previous.getAny() != null) {
-                                        Optional<Long> sequencia = metaExpedientSequenciaResourceRepository
-                                                .findValorByMetaExpedientAndAny(metaExpedientResourceEntity, previous.getAny());
-
-                                        sequencia.ifPresentOrElse(
-                                                (value) -> target.setSequencia(value + 1),
-                                                () -> target.setSequencia(1L)
-                                        );
-                                    }
+                                    target.setDisableOrganGestor(true);
+                                } else {
+                                    //Procediment comú
+                                    target.setDisableOrganGestor(false);
                                 }
                             });
                         } else {
                             target.setGestioAmbGrupsActiva(false);
                             target.setOrganGestor(null);
+                            target.setDisableOrganGestor(true);
                             target.setSequencia(null);
                         }
                         break;

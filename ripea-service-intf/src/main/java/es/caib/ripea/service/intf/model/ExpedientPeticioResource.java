@@ -132,6 +132,7 @@ public class ExpedientPeticioResource extends BaseAuditableResource<Long> {
     	private Integer any = Year.now().getValue();
     	private Long sequencia;
         @Transient boolean gestioAmbGrupsActiva;
+        @Transient private boolean disableOrganGestor = false;
         private ResourceReference<GrupResource, Long> grup;
     	private boolean associarInteressats = true;
     	private boolean agafarExpedient = true;
