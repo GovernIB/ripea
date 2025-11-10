@@ -113,7 +113,7 @@ const TasquesExpedientGrid = (props: any) => {
             autoHeight
             filter={builder.eq('expedient.id', entity?.id)}
             perspectives={perspectives}
-            staticSortModel={sortModel}
+            sortModel={sortModel}
             onRowCountChange={onRowCountChange}
             popupEditCreateActive
 			toolbarCreateTitle={t('page.tasca.action.new.label')}

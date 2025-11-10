@@ -94,7 +94,7 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
             autoHeight
             apiRef={apiRef}
             filter={filter}
-            staticSortModel={sortModel}
+            sortModel={sortModel}
             perspectives={perspectives}
             // disableColumnSorting
             popupEditCreateActive

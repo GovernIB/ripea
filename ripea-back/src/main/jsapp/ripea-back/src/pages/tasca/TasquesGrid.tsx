@@ -13,6 +13,7 @@ import {Icon, Typography} from "@mui/material";
 import useTascaActions from "./details/TascaActions.tsx";
 import {useNavigate} from "react-router-dom";
 import useTascaDetail from "./details/TascaDetail.tsx";
+import {GridSortDirection} from "@mui/x-data-grid-pro";
 
 const sortModel:any = [{field: 'dataInici', sort: 'desc'}];
 const namedQueries:any = ['USUARI_RELACIONAT'];
@@ -41,6 +42,11 @@ const TasquesGrid = () => {
         {
             field: 'metaExpedientTascaDescription',
             flex: 0.6,
+            sortProcessor: (field: string, sort: GridSortDirection) => {
+                return [
+                    { field: "metaExpedientTasca.descripcio", sort },
+                ]
+            }
         },
         {
             field: 'titol',
