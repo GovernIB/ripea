@@ -22,6 +22,8 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
+import es.caib.ripea.service.intf.dto.*;
+import es.caib.ripea.service.intf.service.AplicacioService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.fundaciobit.apisib.apifirmasimple.v1.beans.FirmaSimpleStartTransactionRequest;
@@ -83,34 +85,6 @@ import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ReportFileType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.config.PropertyConfig;
-import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
-import es.caib.ripea.service.intf.dto.ArxiuFirmaDto;
-import es.caib.ripea.service.intf.dto.DigitalitzacioPerfilDto;
-import es.caib.ripea.service.intf.dto.DigitalitzacioTransaccioRespostaDto;
-import es.caib.ripea.service.intf.dto.DocumentDto;
-import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
-import es.caib.ripea.service.intf.dto.DocumentFirmaTipusEnumDto;
-import es.caib.ripea.service.intf.dto.DocumentNotificacioDto;
-import es.caib.ripea.service.intf.dto.DocumentNotificacioEstatEnumDto;
-import es.caib.ripea.service.intf.dto.DocumentNotificacioTipusEnumDto;
-import es.caib.ripea.service.intf.dto.DocumentPublicacioDto;
-import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
-import es.caib.ripea.service.intf.dto.DocumentVersioDto;
-import es.caib.ripea.service.intf.dto.FitxerDto;
-import es.caib.ripea.service.intf.dto.InteressatDocumentTipusEnumDto;
-import es.caib.ripea.service.intf.dto.InteressatTipusEnum;
-import es.caib.ripea.service.intf.dto.MetaDocumentFirmaFluxTipusEnumDto;
-import es.caib.ripea.service.intf.dto.MetaNodeDto;
-import es.caib.ripea.service.intf.dto.MunicipiDto;
-import es.caib.ripea.service.intf.dto.PaisDto;
-import es.caib.ripea.service.intf.dto.PinbalConsultaDto;
-import es.caib.ripea.service.intf.dto.PortafirmesFluxRespostaDto;
-import es.caib.ripea.service.intf.dto.PortafirmesIniciFluxRespostaDto;
-import es.caib.ripea.service.intf.dto.Resum;
-import es.caib.ripea.service.intf.dto.SignatureInfoDto;
-import es.caib.ripea.service.intf.dto.UsuariDto;
-import es.caib.ripea.service.intf.dto.ViaFirmaDispositiuDto;
-import es.caib.ripea.service.intf.dto.ViaFirmaEnviarDto;
 import es.caib.ripea.service.intf.exception.ValidationException;
 import es.caib.ripea.service.intf.model.DocumentResource;
 import es.caib.ripea.service.intf.model.DocumentResource.IniciarFirmaSimple;
@@ -153,6 +127,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 	private final DocumentFirmaViaFirmaHelper firmaViaFirmaHelper;
 	private final UsuariHelper usuariHelper;
 	private final MessageHelper messageHelper;
+    private final AplicacioService aplicacioService;
 
     private final UsuariResourceRepository usuariResourceRepository;
 	private final ContingutResourceRepository contingutResourceRepository;
@@ -678,7 +653,23 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         }
 
         @Override
-        public void onChange(Serializable id, DocumentResource.EnviarViaEmailFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource.EnviarViaEmailFormAction target) {}
+        public void onChange(Serializable id, DocumentResource.EnviarViaEmailFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource.EnviarViaEmailFormAction target) {
+            if (fieldName == null) {
+                DocumentResourceEntity entity = documentResourceRepository.findById((Long) id).orElse(null);
+                if (entity != null) {
+                    if (
+                        (entity.getDocumentTipus() == DocumentTipusEnumDto.DIGITAL || entity.getDocumentTipus() == DocumentTipusEnumDto.IMPORTAT)
+                            || !(
+                                    (entity.getArxiuEstat() == ArxiuEstatEnumDto.DEFINITIU || entity.getEstat() == DocumentEstatEnumDto.FIRMA_PARCIAL)
+                                            || Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.IMPRIMIBLE_NO_FIRMAT_ACTIU))
+                            )
+                    ) {
+                        target.setVersioDocument(VersioDocumentEnum.ORIGINAL);
+                        target.setDisableVersioDocument(true);
+                    }
+                }
+            }
+        }
     }
     
     private class CanviTipusDocumentsActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.UpdateTipusDocumentFormAction, DocumentResource> {
