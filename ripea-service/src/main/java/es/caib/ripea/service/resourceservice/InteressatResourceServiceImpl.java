@@ -89,7 +89,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class InteressatResourceServiceImpl extends BaseMutableResourceService<InteressatResource, Long, InteressatResourceEntity> implements InteressatResourceService {
 
-	private final UnitatOrganitzativaHelper unitatOrganitzativaHelper;
+    private final UnitatOrganitzativaHelper unitatOrganitzativaHelper;
     private final ExpedientInteressatHelper expedientInteressatHelper;
     private final InteressatResourceHelper interessatResourceHelper;
     private final ExcepcioLogHelper excepcioLogHelper;
@@ -106,7 +106,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
     @PostConstruct
     public void init() {
 
-    	register(InteressatResource.PERSPECTIVE_GRUPS_CODE, new GrupsPerspectiveApplicator());
+        register(InteressatResource.PERSPECTIVE_GRUPS_CODE, new GrupsPerspectiveApplicator());
         register(InteressatResource.PERSPECTIVE_REPRESENTANT_CODE, new RespresentantPerspectiveApplicator());
         register(InteressatResource.PERSPECTIVE_ADRESSA_CODE, new AdressaPerspectiveApplicator());
         register(InteressatResource.ACTION_EXPORTAR_CODE, new ExportarReportGenerator());
@@ -114,11 +114,11 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
         register(InteressatResource.ACTION_GUARDAR_ARXIU, new GuardarArxiuActionExecutor());
         register(InteressatResource.ACTION_DELETE_INTERESSAT, new DeleteInteressatActionExecutor());
         register(InteressatResource.ACTION_DELETE_REPRESENTANT, new DeleteRepresentantActionExecutor());
-        
+
         register(InteressatResource.Fields.tipus, new TipusOnchangeLogicProcessor());
         register(InteressatResource.Fields.organCodi, new UnitatsOrganitzativesOnchangeLogicProcessor());
         register(InteressatResource.Fields.documentNum, new NumDocOnchangeLogicProcessor());
-        
+
         register(InteressatResource.Fields.municipi, new MunicipiFieldOptionsProvider());
         register(InteressatResource.Fields.provincia, new ProvinciaFieldOptionsProvider());
         register(InteressatResource.Fields.pais, new PaisFieldOptionsProvider());
@@ -131,8 +131,8 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
     public List<InteressatResource> findBySpringFilter(String springFilter) {
         FilterSpecification<InteressatResourceEntity> spec = new FilterSpecification<>(springFilter);
         return interessatResourceRepository.findAll(spec).stream()
-                   .map(interesatEntity -> objectMappingHelper.newInstanceMap(interesatEntity, InteressatResource.class))
-                   .collect(Collectors.toList());
+                .map(interesatEntity -> objectMappingHelper.newInstanceMap(interesatEntity, InteressatResource.class))
+                .collect(Collectors.toList());
     }
 
     private class FilterOnchangeLogicProcessor implements FilterProcessor<UnitatOrganitzativaFormFilter> {
@@ -141,70 +141,71 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
             List<FieldOption> resultat = new ArrayList<FieldOption>();
             switch (fieldName) {
                 case UnitatOrganitzativaFormFilter.Fields.nivell:
-        			List<NivellAdministracioDto> nivells = cacheHelper.findNivellAdministracio();
-        			if (nivells!=null) {
-        				for (NivellAdministracioDto nvl: nivells) {
-        					resultat.add(new FieldOption(nvl.getCodi().toString(), nvl.getDescripcio()));
-        				}
-        			}                	
-                	break;
+                    List<NivellAdministracioDto> nivells = cacheHelper.findNivellAdministracio();
+                    if (nivells != null) {
+                        for (NivellAdministracioDto nvl : nivells) {
+                            resultat.add(new FieldOption(nvl.getCodi().toString(), nvl.getDescripcio()));
+                        }
+                    }
+                    break;
                 case UnitatOrganitzativaFormFilter.Fields.comunitatAutonoma:
-        			List<ComunitatDto> comunitats = cacheHelper.findComunitats();
-        			if (comunitats!=null) {
-        				for (ComunitatDto cmnt: comunitats) {
-        					resultat.add(new FieldOption(cmnt.getCodi(), cmnt.getNom()));
-        				}
-        			}
+                    List<ComunitatDto> comunitats = cacheHelper.findComunitats();
+                    if (comunitats != null) {
+                        for (ComunitatDto cmnt : comunitats) {
+                            resultat.add(new FieldOption(cmnt.getCodi(), cmnt.getNom()));
+                        }
+                    }
                     break;
                 case UnitatOrganitzativaFormFilter.Fields.provincia:
                     Map<String, String[]> params = new HashMap<>();
                     params.put("pais", new String[]{"724"});
                     params.putAll(requestParameterMap);
-                	resultat = new ProvinciaFieldOptionsProvider().getOptions(fieldName, params);
+                    resultat = new ProvinciaFieldOptionsProvider().getOptions(fieldName, params);
                     break;
                 case UnitatOrganitzativaFormFilter.Fields.municipiUo:
-                	resultat = new MunicipiFieldOptionsProvider().getOptions(fieldName, requestParameterMap);
+                    resultat = new MunicipiFieldOptionsProvider().getOptions(fieldName, requestParameterMap);
                     break;
             }
             return resultat;
         }
 
         @Override
-        public void onChange(Serializable id, UnitatOrganitzativaFormFilter previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, UnitatOrganitzativaFormFilter target) {}
+        public void onChange(Serializable id, UnitatOrganitzativaFormFilter previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, UnitatOrganitzativaFormFilter target) {
+        }
     }
-    
+
     private class TipusOnchangeLogicProcessor implements OnChangeLogicProcessor<InteressatResource> {
         @Override
         public void onChange(Serializable id, InteressatResource previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, InteressatResource target) {
-            if (fieldValue!=null) {
-                switch ((InteressatTipusEnum)fieldValue){
+            if (fieldValue != null) {
+                switch ((InteressatTipusEnum) fieldValue) {
                     case InteressatPersonaFisicaEntity:
                     case InteressatPersonaJuridicaEntity:
                         target.setDocumentTipus(InteressatDocumentTipusEnumDto.NIF);
                         target.setOrganCodi(null);
-                        target.setPais(previous.getPais()); //Mantenim dades basiques de adressa, possiblement siguin les per defecte.
-	                    target.setProvincia(previous.getProvincia());
-	                    target.setMunicipi(previous.getMunicipi());
+//                        target.setPais(previous.getPais());
+//	                    target.setProvincia(previous.getProvincia());
+//	                    target.setMunicipi(previous.getMunicipi());
                         break;
                     case InteressatAdministracioEntity:
-                    	target.setAdressaTipus(EntregaPostalTipusEnum.SENSE_NORMALITZAR);
+                        target.setAdressaTipus(EntregaPostalTipusEnum.SENSE_NORMALITZAR);
                         target.setDocumentTipus(InteressatDocumentTipusEnumDto.CODI_ORIGEN);
                         target.setDocumentNum(null);
                         target.setCodiPostal(null);
                         target.setAdresa(null);
-	                    target.setPais(null); //Posam la adreça null ja que es carregarà automaticament al seleccionar una unitat administrativa
-	                    target.setProvincia(null);
-	                    target.setMunicipi(null);
+                        target.setPais(null); //Posam la adreça null ja que es carregarà automaticament al seleccionar una unitat administrativa
+                        target.setProvincia(null);
+                        target.setMunicipi(null);
                         break;
                 }
             }
         }
     }
-    
+
     private class UnitatsOrganitzativesOnchangeLogicProcessor implements OnChangeLogicProcessor<InteressatResource> {
         @Override
         public void onChange(Serializable id, InteressatResource previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, InteressatResource target) {
-            if (fieldValue!=null) {
+            if (fieldValue != null) {
                 UnitatOrganitzativaDto uoDto = unitatOrganitzativaHelper.findAmbCodiAndAdressafisica(fieldValue.toString());
                 target.setNom(Utils.abbreviate(uoDto.getDenominacio(), 30));
                 target.setPais(uoDto.getCodiPais());
@@ -216,149 +217,141 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
                 target.setEmail(null);
                 target.setTelefon(null);
                 target.setObservacions(null);
-            } else {
-            	target.setNom(null);
-                target.setPais(null);
-                target.setProvincia(null);
-                target.setMunicipi(null);
-                target.setCodiPostal(null);
-                target.setAdresa(null);
-                target.setDocumentNum(null);
             }
         }
     }
 
     public class PaisFieldOptionsProvider implements FieldOptionsProvider {
-		public List<FieldOption> getOptions(String fieldName, Map<String,String[]> requestParameterMap) {
-			List<PaisDto> paisos = cacheHelper.findPaisos();
-			List<FieldOption> resultat = new ArrayList<FieldOption>();
-			if (paisos!=null) {
-				for (PaisDto pais: paisos) {
-					resultat.add(new FieldOption(pais.getCodi(), pais.getNom()));
-				}
-			}
-			resultat.sort(Comparator.comparing(FieldOption::getDescription));
-			return resultat;
-		}
-	}
-    
+        public List<FieldOption> getOptions(String fieldName, Map<String, String[]> requestParameterMap) {
+            List<PaisDto> paisos = cacheHelper.findPaisos();
+            List<FieldOption> resultat = new ArrayList<FieldOption>();
+            if (paisos != null) {
+                for (PaisDto pais : paisos) {
+                    resultat.add(new FieldOption(pais.getCodi(), pais.getNom()));
+                }
+            }
+            resultat.sort(Comparator.comparing(FieldOption::getDescription));
+            return resultat;
+        }
+    }
+
     public class UnitatsOrganitzativesOptionsProvider implements FieldOptionsProvider {
-        
-    	private String getFromMap(String param, Map<String,String[]> requestParameterMap){
-            return (requestParameterMap.containsKey(param) && requestParameterMap.get(param).length>0)
+
+        private String getFromMap(String param, Map<String, String[]> requestParameterMap) {
+            return (requestParameterMap.containsKey(param) && requestParameterMap.get(param).length > 0)
                     ? requestParameterMap.get(param)[0]
                     : "";
         }
 
-		public List<FieldOption> getOptions(String fieldName, Map<String,String[]> requestParameterMap) {
-			
-			//Evitar java.lang.IllegalStateException: No modifications are allowed to a locked ParameterMap
-			Map<String, String[]> mutableMap = new HashMap<>(requestParameterMap);
-			
-			List<UnitatOrganitzativaDto> uos = null;
+        public List<FieldOption> getOptions(String fieldName, Map<String, String[]> requestParameterMap) {
+
+            //Evitar java.lang.IllegalStateException: No modifications are allowed to a locked ParameterMap
+            Map<String, String[]> mutableMap = new HashMap<>(requestParameterMap);
+
+            List<UnitatOrganitzativaDto> uos = null;
             boolean recuperarValors = Boolean.parseBoolean(getFromMap("isInteressatAdministracio", mutableMap));
             mutableMap.remove("isInteressatAdministracio");
             List<FieldOption> resultat = new ArrayList<FieldOption>();
-            
+
             if (recuperarValors) {
-				if (mutableMap.isEmpty()) {
-					String entitatActual = configHelper.getEntitatActualCodi();
-					if (Utils.hasValue(entitatActual)) {
-						uos = cacheHelper.findUnitatsOrganitzativesPerEntitat(entitatActual).toDadesList();
-					}
-				} else {
-					String codiDir3 = getFromMap(UnitatOrganitzativaFormFilter.Fields.nif, mutableMap);
-					String denominacio = getFromMap(UnitatOrganitzativaFormFilter.Fields.nom, mutableMap);
-					String nivellAdm = getFromMap(UnitatOrganitzativaFormFilter.Fields.nivell, mutableMap);
-					String comunitat = getFromMap(UnitatOrganitzativaFormFilter.Fields.comunitatAutonoma, mutableMap);
-					String provincia = getFromMap(UnitatOrganitzativaFormFilter.Fields.provincia, mutableMap);
-					String municipi = getFromMap(UnitatOrganitzativaFormFilter.Fields.municipiUo, mutableMap);
-	                Boolean arrel = Boolean.parseBoolean(getFromMap(UnitatOrganitzativaFormFilter.Fields.unitatArrel, mutableMap));
-					uos = pluginHelper.unitatsOrganitzativesFindByFiltre(codiDir3, denominacio, nivellAdm, comunitat, provincia, municipi, arrel);
-				}
-				if (uos!=null) {
-					for (UnitatOrganitzativaDto uo: uos) {
-						resultat.add(new FieldOption(uo.getCodi(), uo.getDenominacio()));
-					}
-				}
+                if (mutableMap.isEmpty()) {
+                    String entitatActual = configHelper.getEntitatActualCodi();
+                    if (Utils.hasValue(entitatActual)) {
+                        uos = cacheHelper.findUnitatsOrganitzativesPerEntitat(entitatActual).toDadesList();
+                    }
+                } else {
+                    String codiDir3 = getFromMap(UnitatOrganitzativaFormFilter.Fields.nif, mutableMap);
+                    String denominacio = getFromMap(UnitatOrganitzativaFormFilter.Fields.nom, mutableMap);
+                    String nivellAdm = getFromMap(UnitatOrganitzativaFormFilter.Fields.nivell, mutableMap);
+                    String comunitat = getFromMap(UnitatOrganitzativaFormFilter.Fields.comunitatAutonoma, mutableMap);
+                    String provincia = getFromMap(UnitatOrganitzativaFormFilter.Fields.provincia, mutableMap);
+                    String municipi = getFromMap(UnitatOrganitzativaFormFilter.Fields.municipiUo, mutableMap);
+                    Boolean arrel = Boolean.parseBoolean(getFromMap(UnitatOrganitzativaFormFilter.Fields.unitatArrel, mutableMap));
+                    uos = pluginHelper.unitatsOrganitzativesFindByFiltre(codiDir3, denominacio, nivellAdm, comunitat, provincia, municipi, arrel);
+                }
+                if (uos != null) {
+                    for (UnitatOrganitzativaDto uo : uos) {
+                        resultat.add(new FieldOption(uo.getCodi(), uo.getDenominacio()));
+                    }
+                }
             }
             resultat.sort(Comparator.comparing(FieldOption::getDescription));
-			return resultat;
-		}
+            return resultat;
+        }
     }
-    
+
     public class ProvinciaFieldOptionsProvider implements FieldOptionsProvider {
-		public List<FieldOption> getOptions(String fieldName, Map<String,String[]> requestParameterMap) {
-			
-			String[] requestParam = requestParameterMap.get(InteressatResource.Fields.pais);
-			String paisCodi = requestParam!=null?requestParam[0]:"";
-			
-			List<FieldOption> resultat = new ArrayList<FieldOption>();
-			List<ProvinciaDto> provincies = null;
-					
-			if (paisCodi!=null && paisCodi.equals("724")) {
-				provincies = cacheHelper.findProvincies();
-			}
-			
-			String[] requestParamCA = requestParameterMap.get(InteressatResource.UnitatOrganitzativaFormFilter.Fields.comunitatAutonoma);
-			if (requestParamCA!=null && requestParamCA.length>0 && Utils.hasValue(requestParamCA[0])) {
-				provincies = cacheHelper.findProvinciesPerComunitat(requestParamCA[0]);
-			}
-			
-			if (provincies!=null) {
-				for (ProvinciaDto prov: provincies) {
-					resultat.add(new FieldOption(prov.getCodi(), prov.getNom()));
-				}
-			}
-				
-			resultat.sort(Comparator.comparing(FieldOption::getDescription));
-			return resultat;
-		}
-	}
-    
+        public List<FieldOption> getOptions(String fieldName, Map<String, String[]> requestParameterMap) {
+
+            String[] requestParam = requestParameterMap.get(InteressatResource.Fields.pais);
+            String paisCodi = requestParam != null ? requestParam[0] : "";
+
+            List<FieldOption> resultat = new ArrayList<FieldOption>();
+            List<ProvinciaDto> provincies = null;
+
+            if (paisCodi != null && paisCodi.equals("724")) {
+                provincies = cacheHelper.findProvincies();
+            }
+
+            String[] requestParamCA = requestParameterMap.get(InteressatResource.UnitatOrganitzativaFormFilter.Fields.comunitatAutonoma);
+            if (requestParamCA != null && requestParamCA.length > 0 && Utils.hasValue(requestParamCA[0])) {
+                provincies = cacheHelper.findProvinciesPerComunitat(requestParamCA[0]);
+            }
+
+            if (provincies != null) {
+                for (ProvinciaDto prov : provincies) {
+                    resultat.add(new FieldOption(prov.getCodi(), prov.getNom()));
+                }
+            }
+
+            resultat.sort(Comparator.comparing(FieldOption::getDescription));
+            return resultat;
+        }
+    }
+
     public class MunicipiFieldOptionsProvider implements FieldOptionsProvider {
-		public List<FieldOption> getOptions(String fieldName, Map<String,String[]> requestParameterMap) {
-			
-			String[] requestParam = requestParameterMap.get(InteressatResource.Fields.provincia);
-			String provinciaCodi = requestParam!=null?requestParam[0]:"";
-			
-			if (!Utils.hasValue(provinciaCodi)) {
-				String[] provinciaFilter = requestParameterMap.get(InteressatResource.UnitatOrganitzativaFormFilter.Fields.provincia);
-				provinciaCodi = provinciaFilter!=null?provinciaFilter[0]:"";
-			}
-			
-			List<FieldOption> resultat = new ArrayList<FieldOption>();
-			if (Utils.hasValue(provinciaCodi)) {
-				List<MunicipiDto> municipis = cacheHelper.findMunicipisPerProvincia(provinciaCodi);
-				if (municipis!=null) {
-					for (MunicipiDto municipi: municipis) {
-						if ("municipiUo".equals(fieldName)) {
-							resultat.add(new FieldOption(municipi.getCodi()+"-"+municipi.getCodiEntitatGeografica(), municipi.getNom()));
-						} else {
-							resultat.add(new FieldOption(municipi.getCodi(), municipi.getNom()));
-						}
-					}
-				}
-			}
-			resultat.sort(Comparator.comparing(FieldOption::getDescription));
-			return resultat;
-		}
-	}
-    
+        public List<FieldOption> getOptions(String fieldName, Map<String, String[]> requestParameterMap) {
+
+            String[] requestParam = requestParameterMap.get(InteressatResource.Fields.provincia);
+            String provinciaCodi = requestParam != null ? requestParam[0] : "";
+
+            if (!Utils.hasValue(provinciaCodi)) {
+                String[] provinciaFilter = requestParameterMap.get(InteressatResource.UnitatOrganitzativaFormFilter.Fields.provincia);
+                provinciaCodi = provinciaFilter != null ? provinciaFilter[0] : "";
+            }
+
+            List<FieldOption> resultat = new ArrayList<FieldOption>();
+            if (Utils.hasValue(provinciaCodi)) {
+                List<MunicipiDto> municipis = cacheHelper.findMunicipisPerProvincia(provinciaCodi);
+                if (municipis != null) {
+                    for (MunicipiDto municipi : municipis) {
+                        if ("municipiUo".equals(fieldName)) {
+                            resultat.add(new FieldOption(municipi.getCodi() + "-" + municipi.getCodiEntitatGeografica(), municipi.getNom()));
+                        } else {
+                            resultat.add(new FieldOption(municipi.getCodi(), municipi.getNom()));
+                        }
+                    }
+                }
+            }
+            resultat.sort(Comparator.comparing(FieldOption::getDescription));
+            return resultat;
+        }
+    }
+
     @Override
     protected void afterConversion(InteressatResourceEntity entity, InteressatResource resource) {
         resource.setHasRepresentats(!entity.getRepresentats().isEmpty());
     }
-    
+
     @Override
     public InteressatResource create(InteressatResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
         return interessatResourceHelper.create(resource);
     }
-    
-	@Override
-	public InteressatResource update(Long id, InteressatResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotFoundException {
-		return interessatResourceHelper.update(resource);
-	}
+
+    @Override
+    public InteressatResource update(Long id, InteressatResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotFoundException {
+        return interessatResourceHelper.update(resource);
+    }
 
     private class RespresentantPerspectiveApplicator implements PerspectiveApplicator<InteressatResourceEntity, InteressatResource> {
         @Override
@@ -368,36 +361,36 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
             }
         }
     }
-    
+
     private class AdressaPerspectiveApplicator implements PerspectiveApplicator<InteressatResourceEntity, InteressatResource> {
-    	
-    	private void carregaDadesAdressa(InteressatResourceEntity entity, InteressatResource resource) {
-        	if (Utils.hasValue(resource.getPais())) {
-        		Pais pais = pluginHelper.dadesExternesPaisFindByCodi(resource.getPais());
-        		resource.setPaisNom(pais!=null?pais.getNom():"");
-        	}
-        	if (Utils.hasValue(resource.getProvincia())) {
-        		Provincia prov = pluginHelper.dadesExternesProvinciesFindByCodi(resource.getProvincia());
-        		resource.setProvinciaNom(prov!=null?prov.getNom():"");
-        		
-            	if (Utils.hasValue(resource.getMunicipi())) {
-            		Municipi muni = pluginHelper.dadesExternesMunicipisFindByCodi(resource.getProvincia(), resource.getMunicipi());
-            		resource.setMunicipiNom(muni!=null?muni.getNom():"");
-            	}
-        	}
-    	}
-    	
+
+        private void carregaDadesAdressa(InteressatResourceEntity entity, InteressatResource resource) {
+            if (Utils.hasValue(resource.getPais())) {
+                Pais pais = pluginHelper.dadesExternesPaisFindByCodi(resource.getPais());
+                resource.setPaisNom(pais != null ? pais.getNom() : "");
+            }
+            if (Utils.hasValue(resource.getProvincia())) {
+                Provincia prov = pluginHelper.dadesExternesProvinciesFindByCodi(resource.getProvincia());
+                resource.setProvinciaNom(prov != null ? prov.getNom() : "");
+
+                if (Utils.hasValue(resource.getMunicipi())) {
+                    Municipi muni = pluginHelper.dadesExternesMunicipisFindByCodi(resource.getProvincia(), resource.getMunicipi());
+                    resource.setMunicipiNom(muni != null ? muni.getNom() : "");
+                }
+            }
+        }
+
         @Override
         public void applySingle(String code, InteressatResourceEntity entity, InteressatResource resource) throws PerspectiveApplicationException {
-        	carregaDadesAdressa(entity, resource);
-        	if (entity.getRepresentant()!=null) {
-        		carregaDadesAdressa(entity.getRepresentant(), resource);
-        	}
+            carregaDadesAdressa(entity, resource);
+            if (entity.getRepresentant() != null) {
+                carregaDadesAdressa(entity.getRepresentant(), resource);
+            }
         }
     }
 
     private class GrupsPerspectiveApplicator implements PerspectiveApplicator<InteressatResourceEntity, InteressatResource> {
-    	
+
         @Override
         public void applySingle(String code, InteressatResourceEntity entity, InteressatResource resource)
                 throws PerspectiveApplicationException {
@@ -406,10 +399,10 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
             if (entity.getGrups() != null && !entity.getGrups().isEmpty()) {
                 List<ResourceReference<InteressatGrupResource, Long>> grups = entity.getGrups().stream()
                         .map(grupEntity ->
-                            ResourceReference.<InteressatGrupResource, Long>toResourceReference(
-                                    grupEntity.getId(),
-                                    grupEntity.getNom()
-                            )
+                                ResourceReference.<InteressatGrupResource, Long>toResourceReference(
+                                        grupEntity.getId(),
+                                        grupEntity.getNom()
+                                )
                         )
                         .collect(Collectors.toList());
                 resource.setGrups(grups);
@@ -418,9 +411,9 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
                 resource.setGrups(Collections.emptyList());
             }
         }
-        
+
     }
-    
+
     private class NumDocOnchangeLogicProcessor implements OnChangeLogicProcessor<InteressatResource> {
 
         public static final String NOT_REPRESENT_HIMSELF = "NOT_REPRESENT_HIMSELF";
@@ -428,27 +421,27 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
         @Override
         public void onChange(Serializable id, InteressatResource previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, InteressatResource target) {
 
-            if (fieldValue!=null && fieldValue.toString().length()==9 && !fieldValue.toString().equals(previous.getDocumentNum())) {
-            	
-            	InteressatResourceEntity interessatExistent = interessatResourceRepository.findByExpedientIdAndDocumentNum(previous.getExpedient().getId(), fieldValue.toString()).orElse(null);
-            	
-				if (interessatExistent!=null) {
+            if (fieldValue != null && fieldValue.toString().length() == 9 && !fieldValue.toString().equals(previous.getDocumentNum())) {
 
-					//Controlar que el interessat no es representa a ell mateix
+                InteressatResourceEntity interessatExistent = interessatResourceRepository.findByExpedientIdAndDocumentNum(previous.getExpedient().getId(), fieldValue.toString()).orElse(null);
+
+                if (interessatExistent != null) {
+
+                    //Controlar que el interessat no es representa a ell mateix
                     if (
-                    		(previous.getRepresentat()!=null && Objects.equals(previous.getRepresentat().getId(), interessatExistent.getId()))
-                    		|| (previous.getRepresentant()!=null && Objects.equals(previous.getRepresentant().getId(), interessatExistent.getId()))
-                    ){
+                            (previous.getRepresentat() != null && Objects.equals(previous.getRepresentat().getId(), interessatExistent.getId()))
+                                    || (previous.getRepresentant() != null && Objects.equals(previous.getRepresentant().getId(), interessatExistent.getId()))
+                    ) {
                         if (answers.containsKey(NOT_REPRESENT_HIMSELF)) {
                             target.setDocumentNum(null);
                         } else {
                             throw new AnswerRequiredException(InteressatResource.class, NOT_REPRESENT_HIMSELF, messageHelper.getMessage("es.caib.ripea.service.intf.resourcevalidation.InteressatValid.representHimself"));
                         }
                     } else if (!interessatExistent.getId().equals(previous.getId())) {
-                    	//Controlar que no estam introduint un interessat repetit
+                        //Controlar que no estam introduint un interessat repetit
 //                    	target.setId(interessatExistent.getId());
-						target.setDocumentTipus(interessatExistent.getDocumentTipus());
-						target.setNom(interessatExistent.getNom());
+                        target.setDocumentTipus(interessatExistent.getDocumentTipus());
+                        target.setNom(interessatExistent.getNom());
                         target.setEmail(interessatExistent.getEmail());
                         target.setTelefon(interessatExistent.getTelefon());
                         target.setObservacions(interessatExistent.getObservacions());
@@ -457,19 +450,19 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
                         target.setEntregaDehObligat(interessatExistent.getEntregaDehObligat());
 
                         target.setTipus(interessatExistent.getTipus());
-						switch (interessatExistent.getTipus()) {
-							case InteressatAdministracioEntity:
-								target.setOrganCodi(interessatExistent.getOrganCodi());
-								target.setOrganNom(interessatExistent.getOrganNom());
-								break;
-							case InteressatPersonaFisicaEntity:
-								target.setLlinatge1(interessatExistent.getLlinatge1());
-								target.setLlinatge2(interessatExistent.getLlinatge2());
-								break;
-							case InteressatPersonaJuridicaEntity:
-								target.setRaoSocial(interessatExistent.getRaoSocial());
-								break;
-						}
+                        switch (interessatExistent.getTipus()) {
+                            case InteressatAdministracioEntity:
+                                target.setOrganCodi(interessatExistent.getOrganCodi());
+                                target.setOrganNom(interessatExistent.getOrganNom());
+                                break;
+                            case InteressatPersonaFisicaEntity:
+                                target.setLlinatge1(interessatExistent.getLlinatge1());
+                                target.setLlinatge2(interessatExistent.getLlinatge2());
+                                break;
+                            case InteressatPersonaJuridicaEntity:
+                                target.setRaoSocial(interessatExistent.getRaoSocial());
+                                break;
+                        }
 
                         // Adreça
                         target.setPais(interessatExistent.getPais());
@@ -479,7 +472,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
                         target.setAdresa(interessatExistent.getAdresa());
                         target.setAdressaTipus(interessatExistent.getAdressaTipus());
                         target.setAdressaTipusVia(interessatExistent.getAdressaTipusVia());
-                        
+
                         target.setAdressaNumCasa(interessatExistent.getAdressaNumCasa());
                         target.setAdresaQualificador(interessatExistent.getAdresaQualificador());
                         target.setAdresaPuntKm(interessatExistent.getAdresaPuntKm());
@@ -491,72 +484,73 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
                         target.setAdresaBloc(interessatExistent.getAdresaBloc());
                         target.setAdresaComplement(interessatExistent.getAdresaComplement());
                         target.setAdresaPoblacio(interessatExistent.getAdresaPoblacio());
-					}
-				}
+                    }
+                }
             }
         }
     }
 
-    private class ExportarReportGenerator implements ReportGenerator<InteressatResourceEntity,InteressatResource.ExportInteressatsFormAction, Serializable> {
+    private class ExportarReportGenerator implements ReportGenerator<InteressatResourceEntity, InteressatResource.ExportInteressatsFormAction, Serializable> {
 
         @Override
-        public void onChange(Serializable id, InteressatResource.ExportInteressatsFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, InteressatResource.ExportInteressatsFormAction target) {}
+        public void onChange(Serializable id, InteressatResource.ExportInteressatsFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, InteressatResource.ExportInteressatsFormAction target) {
+        }
 
         @Override
         public DownloadableFile generateFile(String code, List<?> data, ReportFileType fileType, OutputStream out) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            Long expedientId = (Long)data.get(0);
-            ExpedientResource.MassiveAction params = (ExpedientResource.MassiveAction)data.get(1);
+            Long expedientId = (Long) data.get(0);
+            ExpedientResource.MassiveAction params = (ExpedientResource.MassiveAction) data.get(1);
             try {
-            	
-            	Set<Long> grupIdsSeleccionados = params.getIds().stream()
-            	        .filter(id -> interessatGrupResourceRepository.existsById(id))
-            	        .collect(Collectors.toSet());
 
-            	List<Object> exportList = new ArrayList<>();
-            	Set<Long> interessatIds = new HashSet<>();
-            	// Exportamos todos los grupos seleccionados con sus interesados
-            	for (Long grupId : grupIdsSeleccionados) {
-            	    InteressatGrupResourceEntity interessatGrupResourceEntity = interessatGrupResourceRepository.findById(grupId).orElseThrow();
-            	    InteressatGrupResource interessatGrupResource = objectMappingHelper.newInstanceMap(interessatGrupResourceEntity, InteressatGrupResource.class);
-            	     
+                Set<Long> grupIdsSeleccionados = params.getIds().stream()
+                        .filter(id -> interessatGrupResourceRepository.existsById(id))
+                        .collect(Collectors.toSet());
+
+                List<Object> exportList = new ArrayList<>();
+                Set<Long> interessatIds = new HashSet<>();
+                // Exportamos todos los grupos seleccionados con sus interesados
+                for (Long grupId : grupIdsSeleccionados) {
+                    InteressatGrupResourceEntity interessatGrupResourceEntity = interessatGrupResourceRepository.findById(grupId).orElseThrow();
+                    InteressatGrupResource interessatGrupResource = objectMappingHelper.newInstanceMap(interessatGrupResourceEntity, InteressatGrupResource.class);
+
                     List<InteressatResource> interessats = interessatGrupResourceEntity.getInteressats().stream()
                             .map(interessatEntity -> {
                                 InteressatResource interessatResource = objectMappingHelper.newInstanceMap(interessatEntity, InteressatResource.class);
-								new RespresentantPerspectiveApplicator().applySingle(InteressatResource.PERSPECTIVE_REPRESENTANT_CODE, interessatEntity, interessatResource);
-								new GrupsPerspectiveApplicator().applySingle(InteressatResource.PERSPECTIVE_GRUPS_CODE, interessatEntity, interessatResource);
-								
-								return interessatResource;
+                                new RespresentantPerspectiveApplicator().applySingle(InteressatResource.PERSPECTIVE_REPRESENTANT_CODE, interessatEntity, interessatResource);
+                                new GrupsPerspectiveApplicator().applySingle(InteressatResource.PERSPECTIVE_GRUPS_CODE, interessatEntity, interessatResource);
+
+                                return interessatResource;
                             })
                             .collect(Collectors.toList());
-                    
+
 //            	    interessatGrupResource.setInteressatsDetallats(interessats);
-            	    
+
                     for (InteressatResource interessat : interessats) {
-                    	if (interessat.getId() != null && interessatIds.add(interessat.getId()))
-                    		exportList.add(interessat);
+                        if (interessat.getId() != null && interessatIds.add(interessat.getId()))
+                            exportList.add(interessat);
                     }
-            	}
+                }
 
-            	// Ahora exportamos los interesados individuales, excluyendo los que ya están en grupos seleccionados
-            	interessatResourceRepository.findAllById(params.getIds()).forEach(interessatEntity -> {
-            	    boolean perteneceAGrupoSeleccionado = interessatEntity.getGrups().stream()
-            	            .anyMatch(g -> grupIdsSeleccionados.contains(g.getId()));
+                // Ahora exportamos los interesados individuales, excluyendo los que ya están en grupos seleccionados
+                interessatResourceRepository.findAllById(params.getIds()).forEach(interessatEntity -> {
+                    boolean perteneceAGrupoSeleccionado = interessatEntity.getGrups().stream()
+                            .anyMatch(g -> grupIdsSeleccionados.contains(g.getId()));
 
-            	    if (!perteneceAGrupoSeleccionado) {
-            	        InteressatResource interessatResource = objectMappingHelper.newInstanceMap(interessatEntity, InteressatResource.class);
-						new RespresentantPerspectiveApplicator().applySingle(InteressatResource.PERSPECTIVE_REPRESENTANT_CODE, interessatEntity, interessatResource);
-            	        new GrupsPerspectiveApplicator().applySingle(InteressatResource.PERSPECTIVE_GRUPS_CODE, interessatEntity, interessatResource);
-            	        
-            	        exportList.add(interessatResource);
-            	    }
-            	});
-            	
-            	ObjectMapper objectMapper = new ObjectMapper();
-            	objectMapper.registerModule(new JavaTimeModule());
-            	objectMapper.writerWithDefaultPrettyPrinter().writeValue(baos, exportList);
+                    if (!perteneceAGrupoSeleccionado) {
+                        InteressatResource interessatResource = objectMappingHelper.newInstanceMap(interessatEntity, InteressatResource.class);
+                        new RespresentantPerspectiveApplicator().applySingle(InteressatResource.PERSPECTIVE_REPRESENTANT_CODE, interessatEntity, interessatResource);
+                        new GrupsPerspectiveApplicator().applySingle(InteressatResource.PERSPECTIVE_GRUPS_CODE, interessatEntity, interessatResource);
+
+                        exportList.add(interessatResource);
+                    }
+                });
+
+                ObjectMapper objectMapper = new ObjectMapper();
+                objectMapper.registerModule(new JavaTimeModule());
+                objectMapper.writerWithDefaultPrettyPrinter().writeValue(baos, exportList);
                 return new DownloadableFile("Interessats_expedient_" + expedientId + ".json", "application/json", baos.toByteArray());
-                
+
 //                ObjectMapper objectMapper = new ObjectMapper();
 //                objectMapper.registerModule(new JavaTimeModule());
 //                objectMapper.writerWithDefaultPrettyPrinter().writeValue(baos,
@@ -590,73 +584,76 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
 
     private class DeleteRepresentantActionExecutor implements ActionExecutor<InteressatResourceEntity, Serializable, Serializable> {
 
-		@Override
-		public void onChange(Serializable id, Serializable previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, Serializable target) {}
+        @Override
+        public void onChange(Serializable id, Serializable previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, Serializable target) {
+        }
 
-		@Override
-		public Serializable exec(String code, InteressatResourceEntity entity, Serializable params) throws ActionExecutionException {
-			try {
-				EntitatEntity entitat = entitatRepository.findByCodi(configHelper.getEntitatActualCodi());
-				expedientInteressatHelper.deleteRepresentant(
-						entitat.getId(),
-						entity.getExpedient().getId(),
-						entity.getId(),
-						entity.getRepresentant().getId(),
-						configHelper.getRolActual());
+        @Override
+        public Serializable exec(String code, InteressatResourceEntity entity, Serializable params) throws ActionExecutionException {
+            try {
+                EntitatEntity entitat = entitatRepository.findByCodi(configHelper.getEntitatActualCodi());
+                expedientInteressatHelper.deleteRepresentant(
+                        entitat.getId(),
+                        entity.getExpedient().getId(),
+                        entity.getId(),
+                        entity.getRepresentant().getId(),
+                        configHelper.getRolActual());
             } catch (Exception e) {
-                excepcioLogHelper.addExcepcio("/expedient/interessats/"+entity.getId()+"/DeleteRepresentantArxiuActionExecutor", e);
-				String message = messageHelper.getMessage("message.common.action.error")+": "+e.getMessage();
-				throw new ActionExecutionException(getResourceClass(), entity.getRepresentant().getId(), code, message);
+                excepcioLogHelper.addExcepcio("/expedient/interessats/" + entity.getId() + "/DeleteRepresentantArxiuActionExecutor", e);
+                String message = messageHelper.getMessage("message.common.action.error") + ": " + e.getMessage();
+                throw new ActionExecutionException(getResourceClass(), entity.getRepresentant().getId(), code, message);
             }
-			//Dada per mostrar al missatge de OK, retornar el entity convertit a InteressatResource dona error perque no el troba
-			return "{ \"documentNum\": \""+entity.getRepresentant().getDocumentNum()+"\" }";
-		}
+            //Dada per mostrar al missatge de OK, retornar el entity convertit a InteressatResource dona error perque no el troba
+            return "{ \"documentNum\": \"" + entity.getRepresentant().getDocumentNum() + "\" }";
+        }
     }
-    
+
     private class DeleteInteressatActionExecutor implements ActionExecutor<InteressatResourceEntity, Serializable, Serializable> {
 
-		@Override
-		public void onChange(Serializable id, Serializable previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, Serializable target) {}
+        @Override
+        public void onChange(Serializable id, Serializable previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, Serializable target) {
+        }
 
-		@Override
-		public Serializable exec(String code, InteressatResourceEntity entity, Serializable params) throws ActionExecutionException {
-			try {
-				EntitatEntity entitat = entitatRepository.findByCodi(configHelper.getEntitatActualCodi());
-				expedientInteressatHelper.delete(
-						entitat.getId(),
-						entity.getExpedient().getId(),
-						entity.getId(),
-						configHelper.getRolActual());
+        @Override
+        public Serializable exec(String code, InteressatResourceEntity entity, Serializable params) throws ActionExecutionException {
+            try {
+                EntitatEntity entitat = entitatRepository.findByCodi(configHelper.getEntitatActualCodi());
+                expedientInteressatHelper.delete(
+                        entitat.getId(),
+                        entity.getExpedient().getId(),
+                        entity.getId(),
+                        configHelper.getRolActual());
             } catch (Exception e) {
-                excepcioLogHelper.addExcepcio("/expedient/interessats/"+entity.getId()+"/DeleteInteressatActionExecutor", e);
-				String message = messageHelper.getMessage("message.common.action.error")+": "+e.getMessage();
-				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, message);
+                excepcioLogHelper.addExcepcio("/expedient/interessats/" + entity.getId() + "/DeleteInteressatActionExecutor", e);
+                String message = messageHelper.getMessage("message.common.action.error") + ": " + e.getMessage();
+                throw new ActionExecutionException(getResourceClass(), entity.getId(), code, message);
             }
-			//Dada per mostrar al missatge de OK, retornar el entity convertit a InteressatResource dona error perque no el troba
-			return "{ \"documentNum\": \""+entity.getDocumentNum()+"\" }";
-		}
+            //Dada per mostrar al missatge de OK, retornar el entity convertit a InteressatResource dona error perque no el troba
+            return "{ \"documentNum\": \"" + entity.getDocumentNum() + "\" }";
+        }
     }
-    
+
     private class GuardarArxiuActionExecutor implements ActionExecutor<InteressatResourceEntity, Serializable, Serializable> {
 
-		@Override
-		public void onChange(Serializable id, Serializable previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, Serializable target) {}
+        @Override
+        public void onChange(Serializable id, Serializable previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, Serializable target) {
+        }
 
-		@Override
-		public Serializable exec(String code, InteressatResourceEntity entity, Serializable params) throws ActionExecutionException {
-			try {
-				Exception errorGuardant = expedientInteressatHelper.guardarInteressatsArxiu(entity.getExpedient().getId());
-				if (errorGuardant!=null) {
-					excepcioLogHelper.addExcepcio("/expedient/interessat/"+entity.getId()+"GuardarArxiuActionExecutor.onChange", errorGuardant);
-					throw new ActionExecutionException(getResourceClass(), entity.getId(), code, errorGuardant);
-				}
+        @Override
+        public Serializable exec(String code, InteressatResourceEntity entity, Serializable params) throws ActionExecutionException {
+            try {
+                Exception errorGuardant = expedientInteressatHelper.guardarInteressatsArxiu(entity.getExpedient().getId());
+                if (errorGuardant != null) {
+                    excepcioLogHelper.addExcepcio("/expedient/interessat/" + entity.getId() + "GuardarArxiuActionExecutor.onChange", errorGuardant);
+                    throw new ActionExecutionException(getResourceClass(), entity.getId(), code, errorGuardant);
+                }
             } catch (Exception e) {
-                excepcioLogHelper.addExcepcio("/expedient/interessats/"+entity.getId()+"GuardarArxiuActionExecutor.onChange", e);
-				String message = messageHelper.getMessage("message.common.action.error")+": "+e.getMessage();
-				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, message);
+                excepcioLogHelper.addExcepcio("/expedient/interessats/" + entity.getId() + "GuardarArxiuActionExecutor.onChange", e);
+                String message = messageHelper.getMessage("message.common.action.error") + ": " + e.getMessage();
+                throw new ActionExecutionException(getResourceClass(), entity.getId(), code, message);
             }
-			return objectMappingHelper.newInstanceMap(entity, InteressatResource.class);
-		}
+            return objectMappingHelper.newInstanceMap(entity, InteressatResource.class);
+        }
     }
 
     private class ImportarInteressatsActionExecutor implements ActionExecutor<InteressatResourceEntity, InteressatResource.ImportarInteressatsFormAction, Serializable> {
@@ -683,32 +680,34 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
 
             if (InteressatResource.ImportarInteressatsFormAction.Fields.fitxerJsonInteressats.equals(fieldName)) {
                 List<InteressatResource> listaInteressatsFitxer = new ArrayList<InteressatResource>();
-                if (fieldValue!=null) {
+                if (fieldValue != null) {
                     if (!answers.containsKey(NOT_COMPATIBLE)) {
                         try {
                             if (previous.getTipusImportacio().equals(InteressatImportacioTipusDto.JSON)) {
                                 ObjectMapper objectMapper = new ObjectMapper();
                                 objectMapper.registerModule(new JavaTimeModule());
                                 objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-                                
+
                                 List<InteressatResource> interesatsIndependents = objectMapper.readValue(
-                                    ((FileReference) fieldValue).getContent(),
-                                    new TypeReference<List<InteressatResource>>() {}
+                                        ((FileReference) fieldValue).getContent(),
+                                        new TypeReference<List<InteressatResource>>() {
+                                        }
                                 );
 
                                 List<InteressatGrupResource> grupsFitxer = objectMapper.readValue(
-                                    ((FileReference) fieldValue).getContent(),
-                                    new TypeReference<List<InteressatGrupResource>>() {}
+                                        ((FileReference) fieldValue).getContent(),
+                                        new TypeReference<List<InteressatGrupResource>>() {
+                                        }
                                 );
 
                                 List<InteressatResource> interesatsDeGrups = grupsFitxer.stream()
-                                    .filter(g -> g.getInteressatsDetallats() != null)
-                                    .flatMap(g -> g.getInteressatsDetallats().stream())
-                                    .collect(Collectors.toList());
+                                        .filter(g -> g.getInteressatsDetallats() != null)
+                                        .flatMap(g -> g.getInteressatsDetallats().stream())
+                                        .collect(Collectors.toList());
 
                                 listaInteressatsFitxer.addAll(interesatsIndependents);
                                 listaInteressatsFitxer.addAll(interesatsDeGrups);
-                                
+
                             } else {
                                 InputStream excelStream = new ByteArrayInputStream(((FileReference) fieldValue).getContent());
                                 listaInteressatsFitxer = interessatResourceHelper.extreureInteressatsExcel(excelStream);
@@ -725,16 +724,18 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
                         //Només fem la consulta en cas necessari
                         List<InteressatEntity> interessatsExpActual = interessatRepository.findByExpedientId(previous.getExpedient().getId());
                         long idAssignat = 1L;
-                        for (InteressatResource interessatResource: listaInteressatsFitxer) {
-                            if (interessatsExpActual!=null) {
-                                for (InteressatEntity interessatExp: interessatsExpActual) {
+                        for (InteressatResource interessatResource : listaInteressatsFitxer) {
+                            if (interessatsExpActual != null) {
+                                for (InteressatEntity interessatExp : interessatsExpActual) {
                                     if (interessatExp.getDocumentNum().equalsIgnoreCase(interessatResource.getDocumentNum())) {
                                         interessatResource.setJaExistentExpedient(true);
                                         break;
                                     }
                                 }
                             }
-                            if (interessatResource.getId()==null) { interessatResource.setId(idAssignat++); }
+                            if (interessatResource.getId() == null) {
+                                interessatResource.setId(idAssignat++);
+                            }
                             interessatResource.setExpedient(previous.getExpedient());
                             interessatResource.setErrors(validate(interessatResource));
                         }
@@ -750,14 +751,14 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
                 String mssg = interessatResourceHelper.importarInteressats(
                         params.getExpedient().getId(),
                         params.getInteressatsPerImportar().stream()
-                                .filter(i->validate(i).isEmpty())
+                                .filter(i -> validate(i).isEmpty())
                                 .collect(Collectors.toList())
                 );
-                return "{ \"mssg\": \""+mssg+"\" }";
+                return "{ \"mssg\": \"" + mssg + "\" }";
             } catch (Exception e) {
-                excepcioLogHelper.addExcepcio("/expedient/"+params.getExpedient().getId()+"/ImportarInteressatsActionExecutor", e);
-                String message = messageHelper.getMessage("message.common.action.error")+": "+e.getMessage();
-				throw new ActionExecutionException(getResourceClass(), params.getExpedient().getId(), code, message);
+                excepcioLogHelper.addExcepcio("/expedient/" + params.getExpedient().getId() + "/ImportarInteressatsActionExecutor", e);
+                String message = messageHelper.getMessage("message.common.action.error") + ": " + e.getMessage();
+                throw new ActionExecutionException(getResourceClass(), params.getExpedient().getId(), code, message);
             }
         }
     }

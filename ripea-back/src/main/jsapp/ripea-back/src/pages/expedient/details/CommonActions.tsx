@@ -122,6 +122,7 @@ export const useActions = (refresh?: () => void) => {
                 if (value) {
                     apiAction(undefined, {code: 'ESBORRAR', data:{ ids: [id], massivo: false }})
                         .then(() => {
+                            refresh?.()
                             navigate("/expedient")
                             temporalMessageShow(null, t('page.expedient.action.eliminar.ok', {data: row}), 'success');
                         })
