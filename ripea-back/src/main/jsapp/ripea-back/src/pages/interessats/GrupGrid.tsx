@@ -18,7 +18,8 @@ const CrearGrupForm = () => {
 
     // Filtro de grupos del expediente
     const filter = useMemo(() => builder.and(
-        builder.eq("expedient.id", data?.expedient?.id)
+        builder.eq("expedient.id", data?.expedient?.id),
+        builder.eq('esRepresentant', false),
     ), [data?.expedient?.id]);
 
     const selectionModel = useMemo(() => {

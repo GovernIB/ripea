@@ -1,4 +1,4 @@
-import React, {useRef, useState} from "react";
+import React, {useMemo, useRef, useState} from "react";
 import {Chip, Icon} from "@mui/material";
 import { useMuiDataGridApiRef } from 'reactlib';
 import {useTranslation} from "react-i18next";
@@ -28,6 +28,11 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
     const { value: user } = useUserSession()
     const [selectedRows, setSelectedRows] = useState<any[]>([]);
 	const idToOriginalIdRef = useRef<Record<string, any>>({});
+
+    const filter = useMemo(() => builder.and(
+        builder.eq('expedient.id', entity?.id),
+        builder.eq('esRepresentant', false)
+    ),[entity])
 	
     const columns = [
         {
@@ -88,10 +93,7 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
             paginationActive={false}
             autoHeight
             apiRef={apiRef}
-            filter={builder.and(
-                builder.eq('expedient.id', entity?.id),
-                builder.eq('esRepresentant', false)
-            )}
+            filter={filter}
             staticSortModel={sortModel}
             perspectives={perspectives}
             // disableColumnSorting
