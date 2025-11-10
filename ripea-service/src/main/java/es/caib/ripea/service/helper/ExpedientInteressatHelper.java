@@ -581,6 +581,8 @@ public class ExpedientInteressatHelper {
 				return;
 			}
 
+			interessatGrupRepository.deleteRelacionsInteressatGrup(interessat.getId());
+			
 			interessatRepository.delete(interessat);
 			expedient.deleteInteressat(interessat);
 			

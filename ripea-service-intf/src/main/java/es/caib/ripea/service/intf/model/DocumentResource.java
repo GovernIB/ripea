@@ -521,7 +521,8 @@ public class DocumentResource extends NodeResource {
         private boolean permetreEnviamentPostal;
         @Transient
         private List<ResourceReference<InteressatResource, Long>> interessatsAmbAvis = new ArrayList<>();
-
+        @Transient 
+        private boolean administracioSir = false;
         @Transient
         private ResourceReference<ExpedientResource, Long> expedient;
     }

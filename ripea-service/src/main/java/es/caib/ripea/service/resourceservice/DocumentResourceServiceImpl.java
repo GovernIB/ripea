@@ -1299,25 +1299,28 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                         List<InteressatResourceEntity> interesats = interessatResourceRepository.findAllById(((List<ResourceReference<InteressatResource, Long>>) fieldValue).stream()
                                 .map(ResourceReference::getId).collect(Collectors.toList()));
                         List<ResourceReference<InteressatResource, Long>> interessatsAmbAvis = new ArrayList<>();
-                        for (InteressatResourceEntity interessat : interesats) {
-                            if (
-                                    (interessat.getRepresentant() == null && interessat.getDocumentTipus()!=InteressatDocumentTipusEnumDto.NIF && interessat.getDocumentTipus()!=InteressatDocumentTipusEnumDto.DOCUMENT_IDENTIFICATIU_ESTRANGERS && interessat.getDocumentTipus()!=InteressatDocumentTipusEnumDto.ESTRANGER_EIDAS)
-                                            || (interessat.getRepresentant() != null && interessat.getRepresentant().getDocumentTipus()!=InteressatDocumentTipusEnumDto.NIF && interessat.getRepresentant().getDocumentTipus()!=InteressatDocumentTipusEnumDto.DOCUMENT_IDENTIFICATIU_ESTRANGERS && interessat.getRepresentant().getDocumentTipus()!=InteressatDocumentTipusEnumDto.ESTRANGER_EIDAS)
-                            ) {
-                                if(interessat.getRepresentant() == null){
-                                    interessatsAmbAvis.add(ResourceReference.toResourceReference(
-                                            interessat.getId(),
-                                            interessat.getNomComplet()
-                                    ));
-                                }else {
-                                    interessatsAmbAvis.add(ResourceReference.toResourceReference(
-                                            interessat.getRepresentant().getId(),
-                                            interessat.getRepresentant().getNomComplet()
-                                    ));
-                                }
+                        boolean administracioSir = false;
+                        for (InteressatResourceEntity titular : interesats) {
+                        	InteressatResourceEntity destinatari = titular.getRepresentant()!=null?titular.getRepresentant():null;
+                        	if (InteressatTipusEnum.InteressatPersonaFisicaEntity.equals(titular.getTipus())) {
+	                            if ((destinatari == null && titular.getDocumentTipus()!=InteressatDocumentTipusEnumDto.NIF && titular.getDocumentTipus()!=InteressatDocumentTipusEnumDto.DOCUMENT_IDENTIFICATIU_ESTRANGERS)
+	                            ||  (destinatari != null && destinatari.getDocumentTipus()!=InteressatDocumentTipusEnumDto.NIF && destinatari.getDocumentTipus()!=InteressatDocumentTipusEnumDto.DOCUMENT_IDENTIFICATIU_ESTRANGERS)
+	                            ) {
+	                                if(destinatari == null){
+	                                    interessatsAmbAvis.add(ResourceReference.toResourceReference(titular.getId(), titular.getNomComplet()
+	                                    ));
+	                                }else {
+	                                    interessatsAmbAvis.add(ResourceReference.toResourceReference(destinatari.getId(), destinatari.getNomComplet()
+	                                    ));
+	                                }
+	                            }
+                        	}
+                            if (InteressatTipusEnum.InteressatAdministracioEntity.equals(titular.getTipus()) && titular.getAmbOficinaSir()!=null && titular.getAmbOficinaSir().booleanValue()) {
+                            	administracioSir = true;
                             }
                         }
                         target.setInteressatsAmbAvis(interessatsAmbAvis);
+                        target.setAdministracioSir(administracioSir);
                         break;
                 }
             }
