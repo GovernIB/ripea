@@ -58,7 +58,7 @@ const Tasca = () => {
                 variant="outlined"
                 color={"inherit"}
                 sx={{ borderRadius: '4px', padding: '0px 10px'}}
-                onClick={()=>navigate(-1)}
+                onClick={()=>navigate('/usuariTasca')}
             >
                 <Icon>arrow_back</Icon>
                 {t('common.back')}
@@ -70,7 +70,7 @@ const Tasca = () => {
                     sx={{ borderRadius: '4px', padding: '0px 10px'}}
                     onClick={()=> {
                         changeEstat(tasca?.id, 'INICIADA', t('page.tasca.action.iniciar.ok'))
-                        navigate(-1)
+                        // navigate('/usuariTasca')
                     }}
                 >
                     <Icon>play_arrow</Icon>
@@ -84,7 +84,7 @@ const Tasca = () => {
                     sx={{ borderRadius: '4px', padding: '0px 10px'}}
                     onClick={()=> {
                         changeEstat(tasca?.id, 'FINALITZADA', t('page.tasca.action.finalitzar.ok'))
-                        navigate(-1)
+                        navigate('/usuariTasca')
                     }}
                 >
                     <Icon>check</Icon>
