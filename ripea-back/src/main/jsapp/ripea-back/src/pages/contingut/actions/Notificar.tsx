@@ -73,14 +73,14 @@ const NotificarForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         {data?.interessatsAmbAvis?.length > 0 &&
             <Alert severity={"warning"}>
-                Hi ha notificacions amb destinatari sense NIF/NIE. Aquestes notficacions no es poden enviar a la carpeta ciutadana, degut a que és necessari un NIF o NIE per a accedir-hi.
+                {t('page.document.action.notificar.alert.interessatsAmbAvis.title')}
                 <br/><br/>
                 <ul>
-                    <li><b>Si ha marcat entrega postal:</b> La notificació s'enviarà per correu postal, sempre que l'òrgan gestor tengui un CIE (Centre de Impressió i Ensobrat) definit.</li>
-                    <li><b>Si NO ha seleccionat entrega postal:</b> La notificació telemàtica no es realitzarà. En el seu lloc s'enviarà un correu electrònic d'avís informant al titular que en breu rebrà una notificació per correu postal. <u>És necessari que feu la notificació en Paper.</u></li>
+                    <li><b>{t('page.document.action.notificar.alert.interessatsAmbAvis.marcat.title')}</b> {t('page.document.action.notificar.alert.interessatsAmbAvis.marcat.description')}</li>
+                    <li><b>{t('page.document.action.notificar.alert.interessatsAmbAvis.noMarcat.title')}</b> {t('page.document.action.notificar.alert.interessatsAmbAvis.noMarcat.description')} <u>{t('page.document.action.notificar.alert.interessatsAmbAvis.noMarcat.warning')}</u></li>
                 </ul>
 
-                <br/>Els notificacions sense NIF/NIE són els següents:<br/>
+                <br/>{t('page.document.action.notificar.alert.interessatsAmbAvis.description')}<br/>
                 <ul>
                     {data?.interessatsAmbAvis?.map?.((i:any, index:any)=>
                         <li>Notificació {index + 1} - Titular : {i?.description} </li>
@@ -88,6 +88,10 @@ const NotificarForm = () => {
                 </ul>
             </Alert>
         }
+        {data?.administracioSir &&
+            <Alert severity={'warning'}>
+                {t('page.document.action.notificar.alert.administracioSir.title')}<b>{t('page.document.action.notificar.alert.administracioSir.warning')}</b>
+            </Alert>}
 
         <GridFormField xs={12} name="tipus" required hiddenEnumValues={['MANUAL']}/>
         <GridFormField xs={12} name="estat" required disabled/>

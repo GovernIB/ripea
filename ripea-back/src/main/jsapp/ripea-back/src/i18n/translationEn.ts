@@ -826,6 +826,25 @@ const translationEn = {
                     label: "Notify or communicate...",
                     title: "Create document notification",
                     ok: "Notification created successfully",
+                    alert: {
+                        interessatsAmbAvis: {
+                            title: "There are notifications with recipients without a NIF/NIE. These notifications cannot be sent to the citizen folder, as a NIF or NIE is required to access it.",
+                            description: "The notifications without NIF/NIE are the following:",
+                            marcat: {
+                                title: "If postal delivery is selected:",
+                                description: "The notification will be sent by postal mail, provided that the managing body has a defined CIE (Printing and Enveloping Center).",
+                            },
+                            noMarcat: {
+                                title: "If postal delivery is NOT selected:",
+                                description: "The electronic notification will not be carried out. Instead, an email will be sent to inform the recipient that they will soon receive a notification by postal mail.",
+                                warning: "It is necessary to make the notification on paper."
+                            },
+                        },
+                        administracioSir: {
+                            title: "One of the selected recipients is a SIR administration.",
+                            warning: "ALL deliveries will be sent as COMMUNICATION type.",
+                        },
+                    }
                 },
                 notificarMasiva: {
                     label: "Notify or communicate...",

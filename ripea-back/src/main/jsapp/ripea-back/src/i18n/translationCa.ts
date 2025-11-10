@@ -826,6 +826,25 @@ const translationCa = {
                     label: "Notificar o comunicar...",
                     title: "Crear notificació document",
                     ok: "Notificació creada correctament",
+                    alert: {
+                        interessatsAmbAvis: {
+                            title: "Hi ha notificacions amb destinatari sense NIF/NIE. Aquestes notficacions no es poden enviar a la carpeta ciutadana, degut a que és necessari un NIF o NIE per a accedir-hi.",
+                            description: "Els notificacions sense NIF/NIE són els següents:",
+                            marcat: {
+                                title: "Si ha marcat entrega postal:",
+                                description: "La notificació s'enviarà per correu postal, sempre que l'òrgan gestor tengui un CIE (Centre de Impressió i Ensobrat) definit.",
+                            },
+                            noMarcat: {
+                                title: "Si NO ha seleccionat entrega postal:",
+                                description: "La notificació telemàtica no es realitzarà. En el seu lloc s'enviarà un correu electrònic d'avís informant al titular que en breu rebrà una notificació per correu postal.",
+                                warning: "És necessari que feu la notificació en Paper."
+                            },
+                        },
+                        administracioSir: {
+                            title: "Uno de los interesados seleccionados es una administración SIR.",
+                            warning: "TODOS los envíos se realizarán de tipo COMUNICACIÓN",
+                        },
+                    }
                 },
                 notificarMasiva: {
                     label: "Notificar o comunicar...",
