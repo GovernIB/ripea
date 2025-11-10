@@ -11,6 +11,8 @@ import org.springframework.core.env.Environment;
 import es.caib.ripea.service.intf.model.DocumentResource;
 import org.springframework.stereotype.Component;
 
+import java.util.regex.Pattern;
+
 @Component
 @RequiredArgsConstructor
 public class AdjuntValidator implements ConstraintValidator<AdjuntValid, DocumentResource>{
@@ -25,28 +27,61 @@ public class AdjuntValidator implements ConstraintValidator<AdjuntValid, Documen
         return String.format("%.2f %s", bytes / Math.pow(1024, exp), pre);
     }
 
+    private static final String REGEX = "^ES_[A-Z0-9]{9}_[0-9]{4}_[A-Z0-9]{1,30}$";
+    private static final Pattern PATTERN = Pattern.compile(REGEX);
+
+    public static boolean esValidoDocumentoOrigen(String codigo) {
+        if (codigo == null) {
+            return false;
+        }
+        return PATTERN.matcher(codigo).matches();
+    }
+
 	@Override
 	public boolean isValid(DocumentResource resource, ConstraintValidatorContext context) {
+        boolean valid = true;
+
+        if (resource.getNtiEstadoElaboracion() != null) {
+            if (resource.getNtiIdDocumentoOrigen() == null) {
+                valid = false;
+                context
+                        .buildConstraintViolationWithTemplate("{javax.validation.constraints.NotNull.message}")
+                        .addPropertyNode(DocumentResource.Fields.ntiIdDocumentoOrigen)
+                        .addConstraintViolation()
+                        .disableDefaultConstraintViolation();
+            } else {
+                if (!esValidoDocumentoOrigen(resource.getNtiIdDocumentoOrigen())) {
+                    valid = false;
+                    context
+                            .buildConstraintViolationWithTemplate("{es.caib.ripea.service.intf.resourcevalidation.AdjuntValid.ntiIdDocumentoOrigen}")
+                            .addPropertyNode(DocumentResource.Fields.ntiIdDocumentoOrigen)
+                            .addConstraintViolation()
+                            .disableDefaultConstraintViolation();
+                }
+            }
+        }
+
+        // Adjunts
         int maxLength = Integer.parseInt(springEnvironment.getProperty("es.caib.ripea.maxUploadSize", "52428800"));
         String formatedMaxLength = formatByteCount(maxLength);
         String message = messageSource.getMessage("es.caib.ripea.service.intf.resourcevalidation.AdjuntValid.adjunt", new Object[]{formatedMaxLength}, LocaleContextHolder.getLocale());
 
-		if (resource.getAdjunt()!=null && (long) maxLength < resource.getAdjunt().getContentLength()) {
+        if (resource.getAdjunt()!=null && (long) maxLength < resource.getAdjunt().getContentLength()) {
+            valid = false;
             context
                 .buildConstraintViolationWithTemplate(message)
                 .addPropertyNode(DocumentResource.Fields.adjunt)
                 .addConstraintViolation()
                 .disableDefaultConstraintViolation();
-            return false;
 		}
 
 		if (resource.getFirmaAdjunt()!=null && resource.getFirmaAdjunt().getContentLength()!=null && (long) maxLength < resource.getFirmaAdjunt().getContentLength()) {
+            valid = false;
             context
                 .buildConstraintViolationWithTemplate(message)
                 .addPropertyNode(DocumentResource.Fields.firmaAdjunt)
                 .addConstraintViolation()
                 .disableDefaultConstraintViolation();
-            return false;
 		}
 
         if (resource.getHasFirma() != null 
@@ -55,14 +90,14 @@ public class AdjuntValidator implements ConstraintValidator<AdjuntValid, Documen
                 && (resource.getFirmaAdjunt()==null || resource.getFirmaAdjunt().getContentLength()==null)
 		        && !resource.isOrdrePatch()
         ){
+            valid = false;
             context
                     .buildConstraintViolationWithTemplate("{javax.validation.constraints.NotNull.message}")
                     .addPropertyNode(DocumentResource.Fields.firmaAdjunt)
                     .addConstraintViolation()
                     .disableDefaultConstraintViolation();
-            return false;
         }
 
-        return true;
+        return valid;
 	}
 }
