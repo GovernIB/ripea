@@ -3,6 +3,7 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 import es.caib.ripea.service.intf.dto.DocumentFirmaTipusEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentNtiEstadoElaboracionEnumDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -41,7 +42,9 @@ public class AdjuntValidator implements ConstraintValidator<AdjuntValid, Documen
 	public boolean isValid(DocumentResource resource, ConstraintValidatorContext context) {
         boolean valid = true;
 
-        if (resource.getNtiEstadoElaboracion() != null) {
+        if (resource.getNtiEstadoElaboracion() != null
+                && resource.getNtiEstadoElaboracion() != DocumentNtiEstadoElaboracionEnumDto.EE01
+                && resource.getNtiEstadoElaboracion() != DocumentNtiEstadoElaboracionEnumDto.EE99) {
             if (resource.getNtiIdDocumentoOrigen() == null) {
                 valid = false;
                 context

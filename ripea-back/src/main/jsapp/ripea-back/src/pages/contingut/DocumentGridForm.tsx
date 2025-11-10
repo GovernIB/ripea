@@ -32,7 +32,10 @@ const ScanerTabForm = () => {
 
         <GridFormField xs={12} name="ntiIdDocumentoOrigen"
                        componentProps={{ title: t('page.document.detall.documentOrigenFormat') }}
-                       required={!!data?.ntiEstadoElaboracion} />
+                       required={!!data?.ntiEstadoElaboracion}
+                       hidden={!data?.ntiEstadoElaboracion
+                           || data?.ntiEstadoElaboracion == 'EE01'
+                           || data?.ntiEstadoElaboracion == 'EE99'}/>
         <GridFormField xs={12} name="digitalitzacioPerfil"/>
 
         <Grid item xs={12}>
