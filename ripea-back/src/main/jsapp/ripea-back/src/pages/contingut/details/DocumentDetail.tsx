@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {Alert, Box, Grid, Icon} from "@mui/material";
+import {Alert, Box, Button, Grid, Icon, Typography} from "@mui/material";
 import {BasePage, GridPage, useResourceApiService, MuiDialog, useBaseAppContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import TabComponent from "../../../components/TabComponent.tsx";
@@ -9,6 +9,7 @@ import MetaDadaGrid from "../../dada/MetaDadaGrid.tsx";
 import Load from "../../../components/Load.tsx";
 import {useActions} from "./ContingutActions.tsx";
 import {icons} from "../../user/UserHeadToolbar.tsx";
+import useErrorValidacio from "../../expedient/details/ErrorValidacio.tsx";
 
 const Contenido = (props:any) => {
     const {entity} = props;
@@ -35,14 +36,14 @@ const Contenido = (props:any) => {
 }
 
 const Dada = (props:any) => {
-    const { entity, potModificar, onRowCountChange } = props
+    const { entity, potModificar, onRowCountChange, refresh } = props
     if (entity!=null && potModificar!=null) {
         entity['potModificar'] = potModificar;
     }
 
     return <GridPage>
         <Box width={'100%'} height={110 + 52 * 4}>
-            <MetaDadaGrid entity={entity} onRowCountChange={onRowCountChange}/>
+            <MetaDadaGrid entity={entity} onRowCountChange={onRowCountChange} onRefresh={refresh}/>
         </Box>
     </GridPage>
 }
@@ -94,7 +95,7 @@ export const Firmes = (props:any) => {
 }
 
 const perspectives = ['VERSIONS', 'COUNT', 'FIRMES']
-const useDocumentDetail = (expedient:any) => {
+const useDocumentDetail = (expedient:any, refresh?: () => void) => {
     const { t } = useTranslation();
 
     const {
@@ -108,6 +109,7 @@ const useDocumentDetail = (expedient:any) => {
     const [numDades, setNumDades] = useState<number>(entity?.numDades);
 
     const {apiDownload} = useActions()
+    const {handleOpen: hanldeErrorValidacio, dialog: dialogErrorValidacio} = useErrorValidacio();
 
     const handleOpen = (id:any) => {
         if(apiIsReady && id){
@@ -137,7 +139,7 @@ const useDocumentDetail = (expedient:any) => {
         {
             value: "dades",
             label: t('page.contingut.tabs.dades'),
-            content: <Dada entity={entity} potModificar={expedient?.potModificar} onRowCountChange={setNumDades}/>,
+            content: <Dada entity={entity} potModificar={expedient?.potModificar} onRowCountChange={setNumDades} refresh={refresh}/>,
             badge: numDades ?? entity?.numDades,
             hidden: !entity?.numMetaDades,
         },
@@ -192,6 +194,17 @@ const useDocumentDetail = (expedient:any) => {
                 handleClose();
             }}
         >
+            {!entity?.valid &&
+                <Alert severity="warning"
+                       action={
+                           <Button  sx={{py: 0}} variant="outlined"
+                                    onClick={() => hanldeErrorValidacio(entity?.id, entity)}>
+                               <Icon>search</Icon>
+                               <Typography variant={"subtitle2"}>{t('common.consult')}</Typography>
+                           </Button>
+                       }
+                >{t('page.contingut.alert.valid')}</Alert>}
+            {dialogErrorValidacio}
             <TabComponent
                 indicatorColor={"primary"}
                 textColor={"primary"}

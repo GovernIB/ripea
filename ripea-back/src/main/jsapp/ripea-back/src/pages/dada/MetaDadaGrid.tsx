@@ -26,9 +26,9 @@ export const StyledDadaValor = (props: any) => {
     return <Typography variant="caption" sx={style}> {valor} </Typography>
 }
 
-const MetaDadaGrid = (props: { entity:any, onRowCountChange?: ((value:number) => void) }) => {
+const MetaDadaGrid = (props: any) => {
     const apiRef = useMuiDataGridApiRef()
-    const { entity, onRowCountChange } = props
+    const { entity, onRowCountChange, onRefresh } = props
     const { t } = useTranslation();
     const {
         isReady,
@@ -49,6 +49,7 @@ const MetaDadaGrid = (props: { entity:any, onRowCountChange?: ((value:number) =>
 
     const refresh = () => {
         apiRef.current.refresh();
+        onRefresh?.();
         findByExpedient(entity?.id)
     }
 
