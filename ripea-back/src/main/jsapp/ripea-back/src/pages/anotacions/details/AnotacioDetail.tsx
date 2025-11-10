@@ -162,6 +162,7 @@ const Interessats = (props:any) => {
             disableColumnSorting
             readOnly
             autoHeight
+            disabledPagination
 
             onRowCountChange={onRowCountChange}
             onRowClick={(params: any) => {
@@ -252,6 +253,7 @@ const Annexos = (props:any) => {
             rowAdditionalActions={actions}
             readOnly
             autoHeight
+            disabledPagination
 
             onRowCountChange={onRowCountChange}
             onRowClick={(params: any) => {
