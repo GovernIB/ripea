@@ -18,6 +18,7 @@ const translationEn = {
         detail: "Details",
         refresh: "Refresh",
         clear: "Clear",
+        back: "Back",
         search: "Filter",
         options: "Options",
         select: {

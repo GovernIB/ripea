@@ -61,7 +61,7 @@ const Tasca = () => {
                 onClick={()=>navigate(-1)}
             >
                 <Icon>arrow_back</Icon>
-                {t('page.expedient.action.retornar.label')}
+                {t('common.back')}
             </Button>
             {tasca?.estat == 'PENDENT' &&
                 <Button
@@ -73,7 +73,7 @@ const Tasca = () => {
                         navigate(-1)
                     }}
                 >
-                    <Icon>check</Icon>
+                    <Icon>play_arrow</Icon>
                     {t('page.tasca.action.iniciar.label')}
                 </Button>
             }
@@ -87,7 +87,7 @@ const Tasca = () => {
                         navigate(-1)
                     }}
                 >
-                    <Icon>arrow_right</Icon>
+                    <Icon>check</Icon>
                     {t('page.tasca.action.finalitzar.label')}
                 </Button>
             }

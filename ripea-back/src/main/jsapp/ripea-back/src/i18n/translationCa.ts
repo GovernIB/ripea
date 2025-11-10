@@ -18,6 +18,7 @@ const translationCa = {
         detail: "Detalls",
         refresh: "Refrescar",
         clear: "Netejar",
+        back: "Tornar",
         search: "Filtrar",
         options: "Opcions",
         select: {

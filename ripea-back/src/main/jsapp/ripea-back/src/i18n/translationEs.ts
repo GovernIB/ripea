@@ -18,6 +18,7 @@ const translationEs = {
         detail: "Detalles",
         refresh: "Refrescar",
         clear: "Limpiar",
+        back: "Volver",
         search: "Buscar",
         options: "Opciones",
         select: {
