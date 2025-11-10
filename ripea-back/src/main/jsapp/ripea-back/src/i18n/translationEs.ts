@@ -29,7 +29,6 @@ const translationEs = {
         consult: "Consultar",
         filter: "Filtrar",
         downloadSelected: "Descargar contenido seleccionado",
-        relateSelected: "Relacionar contenido seleccionado",
 		processing: "Procesando..."
     },
     enum: {
@@ -572,6 +571,7 @@ const translationEs = {
                     label: "Relacionar...",
                     title: "Relacionar expediente",
                     ok: "Las relaciones del expediente '{{expedient}}' han cambiado correctamente.",
+                    labelDialog: "Relacionar",
                 },
                 eliminarRelacio: {
                     label: "Eliminar relación",

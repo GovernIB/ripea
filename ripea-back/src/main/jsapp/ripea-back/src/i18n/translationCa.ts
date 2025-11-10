@@ -29,7 +29,6 @@ const translationCa = {
         consult: "Consulta",
         filter: "Filtrar",
         downloadSelected: "Descarrega contingut seleccionat",
-        relateSelected: "Relaciona contingut seleccionat",
 		processing: "Processant..."
     },
     enum: {
@@ -572,6 +571,7 @@ const translationCa = {
                     label: "Relacionar...",
                     title: "Relacionar expedient",
                     ok: "Les relacions de l’expedient '{{expedient}}' han canviat correctament.",
+                    labelDialog: "Relacionar",
                 },
                 eliminarRelacio: {
                     label: "Eliminar relació",

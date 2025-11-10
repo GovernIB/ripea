@@ -29,7 +29,6 @@ const translationEn = {
         consult: "Consult",
         filter: "Filter",
         downloadSelected: "Download selected content",
-        relateSelected: "Relate selected content",
 		processing: "Processing..."
     },
     enum: {
@@ -572,6 +571,7 @@ const translationEn = {
                     label: "Relate...",
                     title: "Relate case file",
                     ok: "Relations of case file '{{expedient}}' were updated successfully.",
+                    labelDialog: "Relate",
                 },
                 eliminarRelacio: {
                     label: "Delete relation",

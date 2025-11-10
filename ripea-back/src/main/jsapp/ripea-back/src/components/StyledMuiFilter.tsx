@@ -55,6 +55,7 @@ const StyledMuiFilter = (props:any) => {
     const {
         buttons = defaultButtons,
         buttonCallback = callback,
+        buttonGridProps,
         apiRef = filterRef,
         formApiRef = formRef,
         springFilterBuilder,
@@ -107,7 +108,7 @@ const StyledMuiFilter = (props:any) => {
         <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
             {children}
 
-            <Grid item xs={2.4} sx={{ display: 'flex', justifyContent: 'end' }}>
+            <Grid item xs={2.4} sx={{ display: 'flex', justifyContent: 'end' }} {...buttonGridProps}>
                 {advancedSearch && <GridButtonField name={"advanced"} icon={"filter_list"}/>}
                 {
                     buttons?.map((button:FilterButtonProps)=>

@@ -12,6 +12,8 @@ import {StyledEstat} from "../ExpedientGrid.tsx";
 import Load from "../../../components/Load.tsx";
 import {springFilterBuilder as expedientFilterBuilder} from "../ExpedientFilter.tsx";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
+import {GridSortDirection} from "@mui/x-data-grid-pro";
+import {Grid} from "@mui/material";
 
 const sortModel:any = [{ field: 'createdDate', sort: 'desc' }];
 const perspectives = ["ESTAT"];
@@ -32,7 +34,14 @@ const columns = [
     {
         field: 'estat',
         flex: 0.5,
-        renderCell: (params: any) => <StyledEstat entity={params?.row} icon={"folder"}>{params.formattedValue}</StyledEstat>
+        renderCell: (params: any) => <StyledEstat entity={params?.row} icon={"folder"}>{params.formattedValue}</StyledEstat>,
+        sortProcessor: (field: string, sort: GridSortDirection) => {
+            return [
+                { field: "estatAdditional", sort },
+                { field: field, sort },
+                { field: "id", sort }
+            ]
+        }
     },
     {
         field: 'createdDate',
@@ -60,10 +69,11 @@ const ActionFilterFrom = () => {
     );
 
     return <>
-        <GridFormField xs={2.4} name="metaExpedient" filter={filterMetaExpedient}/>
-        <GridFormField xs={2.4} name="numero"/>
-        <GridFormField xs={2.4} name="nom"/>
-        <GridFormField xs={2.4} name="estat" requestParams={{metaExpedientId: data?.metaExpedient?.id}}/>
+        <GridFormField xs={4} name="metaExpedient" filter={filterMetaExpedient}/>
+        <GridFormField xs={3} name="numero"/>
+        <GridFormField xs={3} name="nom"/>
+        <GridFormField xs={2} name="estat" requestParams={{metaExpedientId: data?.metaExpedient?.id}}/>
+        <Grid item xs={9}/>
     </>
 }
 
@@ -75,6 +85,7 @@ const ActionFilter = (props:any) => {
         code="EXPEDIENT_FILTER"
         springFilterBuilder={springFilterBuilder}
         onSpringFilterChange={onSpringFilterChange}
+        buttonGridProps={{xs: 3}}
     >
         <ActionFilterFrom/>
     </StyledMuiFilter>
@@ -148,8 +159,8 @@ const Relacionar = (props:any) => {
         resourceName={'expedientResource'}
         action={'RELACIONAR'}
         title={t('page.expedient.action.relacio.title')}
-        dialogButtons={[
-            {icon: 'link', text: t('common.relateSelected'), componentProps: { variant: 'contained' }, value: true },
+        formDialogButtons={[
+            {icon: 'link', text: t('page.expedient.action.relacio.labelDialog'), componentProps: { variant: 'contained' }, value: true },
             {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
         ]}
         {...props}
