@@ -15,7 +15,7 @@ const TasquesGridFilterForm = () => {
         </>
     }
 
-    const expedientFilter = builder.and(builder.eq("metaExpedient", data?.metaExpedient))
+    const expedientFilter = builder.and(builder.eq("metaExpedient.id", data?.metaExpedient?.id))
 
     return <>
         <GridFormField xs={3} name="metaExpedient"/>
