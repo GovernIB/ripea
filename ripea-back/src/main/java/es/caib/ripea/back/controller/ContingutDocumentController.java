@@ -148,7 +148,12 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			HttpServletRequest request,
 			@PathVariable Long contingutId,
 			Model model) throws ClassNotFoundException, IOException {
-		return documentService.updateCsvInfo(contingutId).getNtiCsv();
+		try {
+			return documentService.updateCsvInfo(contingutId);
+		} catch (Exception ex) {
+			logger.error("Error al getCsvInfo del document "+contingutId, ex);
+			return "";
+		}
 	}
 	
 	@RequestMapping(value = "/{pareId}/document/modificar/{documentId}", method = RequestMethod.GET)

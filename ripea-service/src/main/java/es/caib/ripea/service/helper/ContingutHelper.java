@@ -1964,7 +1964,7 @@ public class ContingutHelper {
 				contingutDesti,
 				null);
 		
-		reOrdenaContingut(contingutOrigen, null);
+		reOrdenaContingut(contingutOrigen, contingutOrigen.getOrdre());
 		
 		contingutLogHelper.log(
 				contingutOrigen,
@@ -2461,7 +2461,7 @@ public class ContingutHelper {
 			if (fills!=null) {
 				for (ContingutEntity c: fills) {
 					if (ordreAssignat==null) {
-						//No té ordre assignat, reordenam els germans i al nou element el deixam per el final
+						//No té ordre assignat, reordenam els germans i al nou element el colocam al principi
 						if (!c.getId().equals(nouContingutEntity.getId())) {
 							c.setOrdre(ordreNou);
 							ordreNou++;
@@ -2477,7 +2477,7 @@ public class ContingutHelper {
 					}
 				}
 			}
-			nouContingutEntity.setOrdre(ordreAssignat==null?ordreNou:ordreAssignat);
+			nouContingutEntity.setOrdre(ordreAssignat==null?0:ordreAssignat);
 		}
 	}
 

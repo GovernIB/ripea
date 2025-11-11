@@ -646,7 +646,7 @@ public class DocumentServiceEjb extends AbstractServiceEjb<DocumentService> impl
 
 	@Override
 	@RolesAllowed("**")
-	public DocumentDto updateCsvInfo(Long documentId) throws NotFoundException {
+	public String updateCsvInfo(Long documentId) throws NotFoundException {
 		return delegateService.updateCsvInfo(documentId);
 	}
 

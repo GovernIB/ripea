@@ -1551,12 +1551,12 @@ public class DocumentServiceImpl implements DocumentService {
 
 	@Override
 	@Transactional
-	public DocumentDto updateCsvInfo(Long documentId) throws NotFoundException {
+	public String updateCsvInfo(Long documentId) throws NotFoundException {
 		DocumentEntity documentEntity = documentRepository.findById(documentId).orElse(null);
 		if (documentEntity!=null && Utils.hasValue(documentEntity.getArxiuUuid())) {
 			Document documentArxiu = pluginHelper.arxiuDocumentConsultar(documentEntity, documentEntity.getArxiuUuid(), null, false);
 			pluginHelper.propagarMetadadesDocument(documentArxiu, documentEntity);
-			return conversioTipusHelper.convertir(documentEntity, DocumentDto.class);
+			return documentEntity.getNtiCsv();
 		}
 		return null;
 	}

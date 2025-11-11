@@ -131,7 +131,7 @@ public interface DocumentService {
 	 * https://github.com/GovernIB/ripea/issues/1451
 	 */
 	@PreAuthorize("isAuthenticated()")
-	public DocumentDto updateCsvInfo(Long documentId) throws NotFoundException;
+	public String updateCsvInfo(Long documentId) throws NotFoundException;
 	
 	/**
 	 * Consulta les versions d'un document.
