@@ -187,7 +187,7 @@ const DocumentsGrid = (props: any) => {
 
     const additionalColumns = useMemo(()=>[
         ...columns,
-        ...(vista == View.carpeta && entity?.potModificarContingut && user?.sessionScope?.ordenacioContingutPermesa ? [{
+        ...(vista == View.carpeta && (entity?.potModificarContingut || entity?.potModificar) && user?.sessionScope?.ordenacioContingutPermesa ? [{
             renderCell: () => <DraggableGridRowHandler />,
             flex: 0.1
         }] : [])
@@ -231,7 +231,7 @@ const DocumentsGrid = (props: any) => {
 
     return <>
         <Load value={entity && isReady}>
-            <DropZone onDrop={onDrop} disabled={!entity?.potModificarContingut}>
+            <DropZone onDrop={onDrop} disabled={!(entity?.potModificarContingut || entity?.potModificar)}>
                 <DndContext onDragEnd={handleDragEnd}>
                     <StyledMuiGrid
                         resourceName={"documentResource"}
@@ -353,7 +353,7 @@ const DocumentsGrid = (props: any) => {
                                 position: 3,
                                 element: <MenuActionButton
                                     id={'createDocument'}
-                                    hidden={!entity?.potModificarContingut}
+                                    hidden={!(entity?.potModificarContingut || entity?.potModificar)}
                                     buttonLabel={t('page.contingut.action.create.label')}
                                     buttonProps={{
                                         startIcon: <Icon>add</Icon>,

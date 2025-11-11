@@ -49,21 +49,21 @@ const useContingutMassiveActions = (entity:any, refresh?: () => void) => {
             icon: "mail",
             showInMenu: true,
             onClick: handleNotificar,
-            hidden: !entity?.potModificarContingut,
+            hidden: !entity?.potModificar,
         },
         {
             label: t('page.contingut.action.move.title'),
             icon: "open_with",
             showInMenu: true,
             onClick: (ids:any[])=>handleMoure(ids, entity),
-            hidden: !entity?.potModificarContingut,
+            hidden: !entity?.potModificar,
         },
         {
             label: t('page.document.action.changeType.title'),
             icon: "edit",
             showInMenu: true,
             onClick: handleCanviTipus,
-            hidden: !entity?.potModificarContingut,
+            hidden: !entity?.potModificar,
         },
     ]
 

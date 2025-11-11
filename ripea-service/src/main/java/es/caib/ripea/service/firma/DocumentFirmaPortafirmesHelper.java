@@ -132,7 +132,7 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 					DocumentEntity.class,
 					"Aquest document te enviaments al portafirmes pendents");
 		}
-		if (!Utils.hasValue(portafirmesFluxId)) {
+		if (MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB.equals(portafirmesFluxTipus) && !Utils.hasValue(portafirmesFluxId)) {
 			throw new ValidationException(
 					document.getId(),
 					DocumentEntity.class,

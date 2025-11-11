@@ -1249,13 +1249,23 @@ public class ContingutHelper {
 						ContingutEntity.class,
 						"L'expedient al qual pertany el contingut no està agafat per cap usuari");
 			}
-
+		
 			if (!auth.getName().equals(agafatPer.getCodi())) {
-				throw new ValidationException(
-						contingutId,
-						ContingutEntity.class,
-						"L'expedient al qual pertany el contingut no està agafat per l'usuari actual (" +
-						"usuariActualCodi=" + auth.getName() + ")");
+				
+				boolean permisosPerTasca = false;
+				UsuariEntity usuariEntity = usuariRepository.findById(SecurityContextHolder.getContext().getAuthentication().getName()).orElse(null);
+				if (usuariEntity!=null && expedient.getId()!=null) {
+					permisosPerTasca = expedientTascaRepository.countTasquesResponsableExpedient(usuariEntity, expedient.getId())>0;
+		    	}
+				
+				//Abans de donar error per no tenir l'expedient agafat, miram si l'usuari es responsable de alguna tasca del expedient
+				if (!permisosPerTasca) {
+					throw new ValidationException(
+							contingutId,
+							ContingutEntity.class,
+							"L'expedient al qual pertany el contingut no està agafat per l'usuari actual (" +
+							"usuariActualCodi=" + auth.getName() + ")");
+				}
 			}
 		}
 
