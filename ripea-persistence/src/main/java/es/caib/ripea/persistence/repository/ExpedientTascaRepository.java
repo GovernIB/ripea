@@ -146,14 +146,21 @@ public interface ExpedientTascaRepository extends JpaRepository<ExpedientTascaEn
 		"    count(tasca) " +
 		"from " +
 		"    ExpedientTascaEntity tasca " +
-		"join tasca.responsables responsable " +
-		"left join tasca.observadors observador " +
 		"where " +
-		"       (responsable = :responsable or observador = :responsable or tasca.delegat = :responsable) " +
-		"    and (tasca.estat='PENDENT' or tasca.estat='INICIADA')")
-	long countTasquesPendents(
-		@Param("responsable") UsuariEntity responsable);
-
+		"	(:responsable MEMBER OF tasca.responsables or :responsable MEMBER OF tasca.observadors or :responsable = tasca.delegat) " +
+		"	and (tasca.estat='PENDENT' or tasca.estat='INICIADA' or tasca.estat='AGAFADA') " +
+		"	and (tasca.expedient.esborrat = 0) ")
+	long countTasquesPendents(@Param("responsable") UsuariEntity responsable);
+	
+	@Query("select " +
+			"    count(tasca) " +
+			"from " +
+			"    ExpedientTascaEntity tasca " +
+			"where " +
+			"	(:responsable MEMBER OF tasca.responsables or :responsable = tasca.delegat) " +
+			"	and (tasca.estat='PENDENT' or tasca.estat='INICIADA' or tasca.estat='AGAFADA') " +
+			"	and (tasca.expedient.id = :expedientId) ")
+		long countTasquesResponsableExpedient(@Param("responsable") UsuariEntity responsable, @Param("expedientId") Long expedientId);
 
 	@Query("from ExpedientTascaEntity et " +
 		"where " +

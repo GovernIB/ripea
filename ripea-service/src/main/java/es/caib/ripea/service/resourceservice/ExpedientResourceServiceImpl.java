@@ -24,9 +24,6 @@ import java.util.zip.ZipOutputStream;
 
 import javax.annotation.PostConstruct;
 
-import es.caib.ripea.service.helper.*;
-import es.caib.ripea.service.intf.dto.*;
-import es.caib.ripea.service.resourcehelper.ContingutLogResourceHelper;
 import org.apache.commons.collections4.CollectionUtils;
 import org.hibernate.Hibernate;
 import org.springframework.security.core.Authentication;
@@ -46,6 +43,7 @@ import es.caib.ripea.persistence.entity.ExpedientEstatEntity;
 import es.caib.ripea.persistence.entity.MetaDocumentEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
+import es.caib.ripea.persistence.entity.UsuariEntity;
 import es.caib.ripea.persistence.entity.resourceentity.ExpedientResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.UsuariResourceEntity;
@@ -60,9 +58,26 @@ import es.caib.ripea.persistence.repository.DadaRepository;
 import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.persistence.repository.ExpedientEstatRepository;
 import es.caib.ripea.persistence.repository.ExpedientRepository;
+import es.caib.ripea.persistence.repository.ExpedientTascaRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
+import es.caib.ripea.persistence.repository.UsuariRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
+import es.caib.ripea.service.helper.ApplicationHelper;
+import es.caib.ripea.service.helper.CacheHelper;
+import es.caib.ripea.service.helper.CarpetaHelper;
+import es.caib.ripea.service.helper.ConfigHelper;
+import es.caib.ripea.service.helper.ContingutHelper;
+import es.caib.ripea.service.helper.DocumentHelper;
+import es.caib.ripea.service.helper.DominiHelper;
+import es.caib.ripea.service.helper.EntityComprovarHelper;
+import es.caib.ripea.service.helper.ExcepcioLogHelper;
+import es.caib.ripea.service.helper.ExecucioMassivaHelper;
+import es.caib.ripea.service.helper.ExpedientHelper;
+import es.caib.ripea.service.helper.MessageHelper;
+import es.caib.ripea.service.helper.MetaDocumentHelper;
+import es.caib.ripea.service.helper.PluginHelper;
+import es.caib.ripea.service.helper.ZipImportacioHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
@@ -74,6 +89,21 @@ import es.caib.ripea.service.intf.base.model.FieldOption;
 import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ReportFileType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
+import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
+import es.caib.ripea.service.intf.dto.CodiValorDto;
+import es.caib.ripea.service.intf.dto.DocumentAmbTipusDto;
+import es.caib.ripea.service.intf.dto.DocumentDto;
+import es.caib.ripea.service.intf.dto.ElementTipusEnumDto;
+import es.caib.ripea.service.intf.dto.ExecucioMassivaContingutDto;
+import es.caib.ripea.service.intf.dto.ExecucioMassivaDto;
+import es.caib.ripea.service.intf.dto.ExecucioMassivaTipusDto;
+import es.caib.ripea.service.intf.dto.FileNameOption;
+import es.caib.ripea.service.intf.dto.FitxerDto;
+import es.caib.ripea.service.intf.dto.ImportacioDto;
+import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
+import es.caib.ripea.service.intf.dto.PermisosPerExpedientsDto;
+import es.caib.ripea.service.intf.dto.ResultatConsultaDto;
+import es.caib.ripea.service.intf.dto.TipusRegistreEnumDto;
 import es.caib.ripea.service.intf.model.ContingutResource;
 import es.caib.ripea.service.intf.model.DocumentResource;
 import es.caib.ripea.service.intf.model.EntitatResource;
@@ -94,6 +124,7 @@ import es.caib.ripea.service.intf.model.UsuariResource;
 import es.caib.ripea.service.intf.resourceservice.ExpedientResourceService;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.permission.ExtendedPermission;
+import es.caib.ripea.service.resourcehelper.ContingutLogResourceHelper;
 import es.caib.ripea.service.resourcehelper.ContingutResourceHelper;
 import io.micrometer.core.instrument.Timer;
 import lombok.RequiredArgsConstructor;
@@ -106,6 +137,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
 	private final EntitatRepository entitatRepository;
 	private final ExpedientRepository expedientRepository;
+	private final ExpedientTascaRepository expedientTascaRepository;
 	private final OrganGestorRepository organGestorRepository;
 	private final ExpedientEstatRepository expedientEstatRepository;
     private final DocumentResourceRepository documentResourceRepository;
@@ -114,6 +146,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 	private final ContingutMovimentRepository contingutMovimentRepository;	
 	
     private final UsuariResourceRepository usuariResourceRepository;
+    private final UsuariRepository usuariRepository;
     private final ExpedientResourceRepository expedientResourceRepository;
     private final MetaExpedientResourceRepository metaExpedientResourceRepository;
     private final MetaExpedientSequenciaResourceRepository metaExpedientSequenciaResourceRepository;
@@ -345,6 +378,10 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		resource.setAmbNotificacionsPendents(cacheHelper.hasNotificacionsPendentsPerExpedient(expedientEntity));
 		resource.setDataDarrerEnviament(cacheHelper.getDataDarrerEnviament(expedientEntity));
 		resource.setPotModificar(entityComprovarHelper.comprovarSiEsPotModificarExpedient(expedientEntity));
+		UsuariEntity usuariEntity = usuariRepository.findById(SecurityContextHolder.getContext().getAuthentication().getName()).orElse(null);
+		if (usuariEntity!=null && entity.getId()!=null) {
+			resource.setPotModificarContingut(expedientTascaRepository.countTasquesResponsableExpedient(usuariEntity, entity.getId())>0);
+    	}
 		resource.setHasEsborranys(documentResourceRepository.hasFillsEsborranys(expedientEntity.getId()));
 	}
 
