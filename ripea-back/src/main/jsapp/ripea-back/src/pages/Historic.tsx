@@ -16,13 +16,13 @@ const columnsAccions = [
         valueFormatter: (value: any) => formatDate(value),
     },
     {
-        field: 'createdBy',
+        field: 'createdByFullName',
         flex: 0.5,
     },
     {
         field: 'tipus',
         flex: 0.5,
-        valueFormatter: (value: any, row:any)=> row?.secundari ?row?.objecte :value
+        renderCell: (params: any) => params?.row?.secundari ?params?.row?.mssg :params?.formattedValue,
     },
 ]
 
@@ -104,9 +104,9 @@ const useAccioDialog = () => {
 
             <CardData title={t('page.contingut.log.causa')} hidden={!entity?.pare}>
                 <ContenidoData title={t('common.action')}>
-                    {formatDate(entity?.pare?.createdDate)} | {entity?.pare?.createdBy} | {(entity?.pare?.objecteLogTipus ?? entity?.pare?.tipus)}
+                    {formatDate(entity?.pare?.createdDate)} | {entity?.pare?.createdByFullName} | {entity?.pare?.tipusString}
                 </ContenidoData>
-                <ContenidoData title={t('page.contingut.log.objecte')}>{entity?.objecte} {!!entity?.objecteNom ?' - '+entity?.objecteNom :''}</ContenidoData>
+                <ContenidoData title={t('page.contingut.log.objecte')}>{entity?.pare?.mssg} {entity?.pare?.objecteNom ?' - '+entity?.pare?.objecteNom :''}</ContenidoData>
                 <ContenidoData title={t('page.contingut.log.param1')} xs={6}>{entity?.pare?.param1}</ContenidoData>
                 <ContenidoData title={t('page.contingut.log.param2')} xs={6}>{entity?.pare?.param2}</ContenidoData>
             </CardData>

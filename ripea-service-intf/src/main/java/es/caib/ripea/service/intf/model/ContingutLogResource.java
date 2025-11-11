@@ -25,16 +25,11 @@ public class ContingutLogResource extends BaseAuditableResource<Long> {
 //    private ResourceReference<ContingutMovimentResource, Long> contingutMoviment;
 //    private ResourceReference<ContingutLogResource, Long> pare;
 
-    @Transient
-    private ContingutMovimentResource moviment;
-    @Transient
-    private ContingutLogResource pare;
-    @Transient
-    private String objecteNom;
-    @Transient
-    public String getObjecte(){
-        return objecteId!=null ?(objecteLogTipus!=null ?objecteLogTipus :"") + " [" + objecteTipus + "#" + objecteId + "]" :null;
-    }
+    @Transient private ContingutMovimentResource moviment;
+    @Transient private ContingutLogResource pare;
+    @Transient private String mssg;
+    @Transient private String tipusString;
+    @Transient private String objecteNom;
 
     public boolean isSecundari() {
         return tipus.equals(LogTipusEnumDto.MODIFICACIO) && objecteId != null;
