@@ -160,8 +160,8 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
     const {handleOpen: handleDetallOpen, dialog: dialogDetall} = useDocumentDetail(entity, refresh);
     const {handleOpen: handleHistoricOpen, dialog: dialogHistoric} = useHistoric();
     const {handleOpen: handleVisualitzarOpen, dialog: dialogVisualitzar, isValid} = useVisualitzar();
-    const {handleOpen: handleSeguimentOpen, dialog: dialogSeguiment} = useSeguimentPortafirmes(entity?.potModificar, refresh);
-    const {handleOpen: handleSeguimentVfOpen, dialog: dialogSeguimentVf} = useSeguimentViafirma(entity?.potModificar, refresh);
+    const {handleOpen: handleSeguimentOpen, dialog: dialogSeguiment} = useSeguimentPortafirmes(entity?.potModificarContingut, refresh);
+    const {handleOpen: handleSeguimentVfOpen, dialog: dialogSeguimentVf} = useSeguimentViafirma(entity?.potModificarContingut, refresh);
     const {handleOpen: handleArxiuOpen, dialog: arxiuDialog} = useInformacioArxiu('documentResource', 'ARXIU_DOCUMENT');
     const {handleShow: handleMoureShow, content: contentMoure} = useMoure(refresh);
     const {handleShow: handleCopiarShow, content: contentCopiar} = useCopiar(refresh);
@@ -194,7 +194,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             label: t('page.document.title')+"...",
             icon: "description",
             onClick: () => apiRef?.current?.showCreateDialog?.(),
-            hidden: !entity?.potModificar,
+            hidden: !entity?.potModificarContingut,
         },
         {
             label: t('page.document.action.pinbal.label'),
@@ -248,7 +248,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             showInMenu: true,
             clickShowUpdateDialog: true,
             disabled: (row:any) => row?.arxiuUuid == null || row?.gesDocFirmatId != null,
-            hidden: (row:any) => !entity?.potModificar || (isInOptions(row?.arxiuEstat, 'DEFINITIU') && !isPermesModificarCustodiatsVar(row)) ||  isInOptions(row?.estat, 'FIRMA_PENDENT'),
+            hidden: (row:any) => !entity?.potModificarContingut || (isInOptions(row?.arxiuEstat, 'DEFINITIU') && !isPermesModificarCustodiatsVar(row)) ||  isInOptions(row?.estat, 'FIRMA_PENDENT'),
         },
         {
             label: t('page.contingut.action.move.label'),
@@ -256,28 +256,28 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             showInMenu: true,
             onClick: handleMoureShow,
             disabled: (row:any) => row?.gesDocAdjuntId!=null,
-            hidden: !entity?.potModificar,
+            hidden: !entity?.potModificarContingut,
         },
         {
             label: t('page.contingut.action.copy.label'),
             icon: "file_copy",
             showInMenu: true,
             onClick: handleCopiarShow,
-            hidden: !entity?.potModificar || !user?.sessionScope?.isMostrarCopiar,
+            hidden: !entity?.potModificarContingut || !user?.sessionScope?.isMostrarCopiar,
         },
         {
             label: t('page.contingut.action.vincular.label'),
             icon: "link",
             showInMenu: true,
             onClick: handleVincularShow,
-            hidden: !entity?.potModificar || !user?.sessionScope?.isMostrarVincular,
+            hidden: !entity?.potModificarContingut || !user?.sessionScope?.isMostrarVincular,
         },
         {
             label: t('page.document.action.delete.label'),
             icon: "delete",
             showInMenu: true,
             onClick: eliminar,
-            hidden: (row:any) => !entity?.potModificar || !isDocument(row) || (row?.arxiuEstat == 'DEFINITIU' && !user?.sessionScope?.permesEsborrarFinals)
+            hidden: (row:any) => !entity?.potModificarContingut || !isDocument(row) || (row?.arxiuEstat == 'DEFINITIU' && !user?.sessionScope?.permesEsborrarFinals)
         },
         {
             label: <Divider sx={{width: '100%'}} color={"none"}/>,
@@ -335,7 +335,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             showInMenu: true,
             onClick: handleEviarPortafirmesShow,
             disabled: (row:any) => !row?.valid || row?.gesDocAdjuntId!=null,
-            hidden : (row:any) => !entity?.potModificar || !row?.metaDocumentInfo?.firmaPortafirmesActiva || !isFirmaActiva(row),
+            hidden : (row:any) => !entity?.potModificarContingut || !row?.metaDocumentInfo?.firmaPortafirmesActiva || !isFirmaActiva(row),
         },
         {
             label: t('page.document.action.firmar.label'),
@@ -343,7 +343,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             showInMenu: true,
             onClick: handleFirmaShow,
             disabled: (row:any) => !row?.valid || row?.gesDocAdjuntId!=null,
-            hidden: (row:any) => !entity?.potModificar || !row?.metaDocumentInfo?.firmaPassarelaActiva || !isFirmaActiva(row),
+            hidden: (row:any) => !entity?.potModificarContingut || !row?.metaDocumentInfo?.firmaPassarelaActiva || !isFirmaActiva(row),
         },
         {
             label: t('page.document.action.viaFirma.label'),
@@ -351,7 +351,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             showInMenu: true,
             onClick: handleEnviarViaFirma,
             disabled: (row:any) => !row?.valid || row?.gesDocAdjuntId!=null,
-            hidden: (row:any) => !entity?.potModificar || !row?.metaDocumentInfo?.firmaBiometricaActiva || !isFirmaActiva(row),
+            hidden: (row:any) => !entity?.potModificarContingut || !row?.metaDocumentInfo?.firmaBiometricaActiva || !isFirmaActiva(row),
         },
         {
             label: entity?.metaExpedientInfo?.tipusClassificacio == 'SIA' // notificar/comunicar
@@ -360,14 +360,14 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             icon: "mail",
             showInMenu: true,
             onClick: handleNotificarShow,
-            hidden: (row:any) => !entity?.potModificar || !(row?.documentFirmaTipus != 'SENSE_FIRMA' && row?.arxiuUuid || isInOptions(row?.fitxerExtension, 'zip')),
+            hidden: (row:any) => !entity?.potModificarContingut || !(row?.documentFirmaTipus != 'SENSE_FIRMA' && row?.arxiuUuid || isInOptions(row?.fitxerExtension, 'zip')),
         },
         {
             label: t('page.document.action.publicar.label'),
             icon: "publish",
             showInMenu: true,
             onClick: handlePublicarShow,
-            hidden: (row:any) => !entity?.potModificar || !(row?.documentFirmaTipus != 'SENSE_FIRMA' && row?.arxiuUuid || isInOptions(row?.fitxerExtension, 'zip')) || !user?.sessionScope?.isMostrarPublicar
+            hidden: (row:any) => !entity?.potModificarContingut || !(row?.documentFirmaTipus != 'SENSE_FIRMA' && row?.arxiuUuid || isInOptions(row?.fitxerExtension, 'zip')) || !user?.sessionScope?.isMostrarPublicar
         },
         {
             label: t('page.document.action.mail.label'),
@@ -399,13 +399,13 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             icon: "check_circle",
             showInMenu: true,
             onClick: definitiu,
-            hidden: (row:any) => !entity?.potModificar || !isInOptions(row?.estat, 'REDACCIO' , 'FIRMA_PARCIAL') || !isInOptions(row?.documentTipus, 'DIGITAL') || !user?.sessionScope?.isConvertirDefinitiuActiu,
+            hidden: (row:any) => !entity?.potModificarContingut || !isInOptions(row?.estat, 'REDACCIO' , 'FIRMA_PARCIAL') || !isInOptions(row?.documentTipus, 'DIGITAL') || !user?.sessionScope?.isConvertirDefinitiuActiu,
         },
         {
             label: <Divider sx={{width: '100%'}} color={"none"}/>,
             showInMenu: true,
             disabled: true,
-            hidden: (row:any) => !entity?.potModificar || !isInOptions(row?.estat, 'REDACCIO' , 'FIRMA_PARCIAL') || !isInOptions(row?.documentTipus, 'DIGITAL') || !user?.sessionScope?.isConvertirDefinitiuActiu,
+            hidden: (row:any) => !entity?.potModificarContingut || !isInOptions(row?.estat, 'REDACCIO' , 'FIRMA_PARCIAL') || !isInOptions(row?.documentTipus, 'DIGITAL') || !user?.sessionScope?.isConvertirDefinitiuActiu,
         },
         {
             label: t('page.contingut.action.history.label'),
