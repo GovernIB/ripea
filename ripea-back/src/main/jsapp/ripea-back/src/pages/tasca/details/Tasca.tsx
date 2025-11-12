@@ -69,8 +69,7 @@ const Tasca = () => {
                     color={"inherit"}
                     sx={{ borderRadius: '4px', padding: '0px 10px'}}
                     onClick={()=> {
-                        changeEstat(tasca?.id, 'INICIADA', t('page.tasca.action.iniciar.ok'))
-                        // navigate('/usuariTasca')
+                        changeEstat(tasca?.id, 'INICIADA', t('page.tasca.action.iniciar.ok'), () => window.location.reload())
                     }}
                 >
                     <Icon>play_arrow</Icon>
@@ -83,8 +82,7 @@ const Tasca = () => {
                     color={"inherit"}
                     sx={{ borderRadius: '4px', padding: '0px 10px'}}
                     onClick={()=> {
-                        changeEstat(tasca?.id, 'FINALITZADA', t('page.tasca.action.finalitzar.ok'))
-                        navigate('/usuariTasca')
+                        changeEstat(tasca?.id, 'FINALITZADA', t('page.tasca.action.finalitzar.ok'), () => navigate('/usuariTasca'))
                     }}
                 >
                     <Icon>check</Icon>
