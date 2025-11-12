@@ -48,8 +48,8 @@ const componentsEs = {
     },
     grid: {
         selection: {
-            one: '1 selected row ',
-            multiple: '{{count}} selected rows',
+            one: '1 fila seleccionada',
+            multiple: '{{count}} filas seleccionadas',
         },
         pageInfo: '{{from}} a {{to}} de {{count}}',
     },
