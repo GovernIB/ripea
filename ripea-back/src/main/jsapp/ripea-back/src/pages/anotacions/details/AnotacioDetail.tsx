@@ -162,8 +162,7 @@ const Interessats = (props:any) => {
             disableColumnSorting
             readOnly
             autoHeight
-            disabledPagination
-
+            paginationActive={false}
             onRowCountChange={onRowCountChange}
             onRowClick={(params: any) => {
                 if (params?.row?.tipus != "ADMINISTRACIO") {
@@ -253,8 +252,7 @@ const Annexos = (props:any) => {
             rowAdditionalActions={actions}
             readOnly
             autoHeight
-            disabledPagination
-
+            paginationActive={false}
             onRowCountChange={onRowCountChange}
             onRowClick={(params: any) => {
                 if (isValid(params?.row)) {

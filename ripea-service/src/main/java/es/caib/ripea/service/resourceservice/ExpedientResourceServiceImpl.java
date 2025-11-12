@@ -26,6 +26,7 @@ import javax.annotation.PostConstruct;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.hibernate.Hibernate;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -232,6 +233,49 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     }
     
     @Override
+    protected <P> Specification<P> toProcessedSpecification(
+        String quickFilter,
+        String filter,
+        String[] namedFilters) {
+
+		Specification<P> processedSpecification = getSpringFilterSpecification(
+				buildSpringFilterForQuickFilter(
+						getResourceClass(),
+						null,
+						quickFilter));
+		
+		processedSpecification = appendSpecificationWithAnd(processedSpecification, getSpringFilterSpecification(filter));
+		processedSpecification = appendSpecificationWithAnd(processedSpecification, 
+				getSpringFilterSpecification(
+						additionalSpringFilter(filter, namedFilters)));
+		
+		if (namedFilters != null) {
+			for (String namedFilter: namedFilters) {
+				Specification<P> namedSpecification = null;
+				String namedSpringFilter = namedFilterToSpringFilter(namedFilter);
+				if (namedSpringFilter != null) {
+					namedSpecification = getSpringFilterSpecification(namedSpringFilter);
+				} else {
+					namedSpecification = namedFilterToSpecification(namedFilter);
+				}
+				processedSpecification = appendSpecificationWithAnd(processedSpecification, namedSpecification);
+			}
+		}
+		Specification<P> finalSpecification = processSpecification(processedSpecification);
+		
+		Specification<P> distinctSpecification = (root, query, criteriaBuilder) -> {
+			if (finalSpecification!=null) {
+				query.distinct(true);
+				return finalSpecification.toPredicate(root, query, criteriaBuilder);
+			} else {
+				return null;
+			}
+		};
+		
+		return distinctSpecification != null ? distinctSpecification : Specification.where(null);
+    }
+    
+    @Override
     protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
     	
         Timer.Sample sample = Timer.start(applicationHelper.getMeterRegistry());
@@ -254,82 +298,75 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         	if (mapaNamedQueries.size()>0 && mapaNamedQueries.containsKey("WITHOUT_PERMISION_CHECK")) {
                 return filtreFrontAndEntitat.generate();
         	}
-
-            EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true, false);
-            OrganGestorEntity ogEntity	= organGestorRepository.findByEntitatIdAndCodi(entitatEntity.getId(), organActualCodi);
-            
-    		PermisosPerExpedientsDto permisosPerExpedients = expedientHelper.findPermisosPerExpedients(
-    				entitatEntity.getId(),
-    				rolActual,
-    				ogEntity!=null?ogEntity.getId():null);
-
-    		//Si no es té permis per cap banda, no retornam resultats
-    		if (permisosPerExpedients.capPermis()) {
-    			return FilterBuilder.equal("id", 0).generate();
-    		}
        
     		Filter filtreNoEliminats = FilterBuilder.and(FilterBuilder.equal(ContingutResource.Fields.esborrat, "0"));
     		
-    		//Procediment (meta-expedients) amb permisos
-			  Filter filtreProcedimentsPermesos = null;
-			  Filter filtreOrgansPermesos = null;
-			  Filter filtreGrupsPermesos = null;
-			  if (!rolActual.equals("IPA_ADMIN") && !rolActual.equals("IPA_ADMIN_LECTURA")) {
-			  
-				  String procedimentId = ExpedientResource.Fields.metaExpedient + ".id";
-				  List<Long> procedimentsPermesos = expedientHelper.findProcedimentsPermesos(
-						entitatEntity,
-						rolActual,
-						ogEntity!=null?ogEntity.getId():null); 
-				  
-					//Si no es té permis per cap procediment, no retornam resultats
-				if (procedimentsPermesos==null || procedimentsPermesos.size()==0) {
-					return FilterBuilder.equal("id", 0).generate();
-					}
-				  
-				  List<String> permesosClausulesIn = Utils.getIdsEnGruposMil(procedimentsPermesos);
-				  if (permesosClausulesIn!=null) {
-				        for (String aux: permesosClausulesIn) {
-					        if (aux != null && !aux.isEmpty()) {
-					        	filtreProcedimentsPermesos = FilterBuilder.or(filtreProcedimentsPermesos, Filter.parse(procedimentId + " IN (" + aux + ")"));
-					        }
+			Filter filtrePermisosVaris = null;
+			Filter filtreProcedimentsDirectes = null;
+			Filter filtreGrupsPermesos = null;
+			
+			if (!rolActual.equals("IPA_ADMIN") && !rolActual.equals("IPA_ADMIN_LECTURA")) {
+
+	            EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true, false);
+	            OrganGestorEntity ogEntity	= organGestorRepository.findByEntitatIdAndCodi(entitatEntity.getId(), organActualCodi);
+				
+	    		PermisosPerExpedientsDto permisosPerExpedients = expedientHelper.findPermisosPerExpedients(
+	    				entitatEntity.getId(),
+	    				rolActual,
+	    				ogEntity!=null?ogEntity.getId():null);
+
+	    		//Si no es té permis per cap banda, no retornam resultats
+	    		if (permisosPerExpedients.capPermis()) {
+	    			return FilterBuilder.equal("id", 0).generate();
+	    		}				
+				
+				filtrePermisosVaris = getFiltrePermisos(permisosPerExpedients);
+
+				//APLICA FILTRE PERMIS DIRECTE A PROCEDIMENTS
+				if (!rolActual.equals("IPA_ADMIN") && !rolActual.equals("IPA_SUPER") && !rolActual.equals("IPA_ADMIN_LECTURA") && 
+					permisosPerExpedients.getIdsMetaExpedientsPermesos()!=null) {
+					
+					String campPermisDir = ExpedientResource.Fields.metaExpedient + "." + MetaExpedientResource.Fields.permisDirecte;
+					String procedimentId = ExpedientResource.Fields.metaExpedient + ".id";
+					
+					Filter filtreProcedimentPermisDirecte = Filter.parse(campPermisDir + "!true");
+					Filter filtreProcediments = null;
+			    	List<String> permesosClausulesIn = Utils.getIdsEnGruposMil(permisosPerExpedients.getIdsMetaExpedientsPermesos());
+			        for (String aux: permesosClausulesIn) {
+				        if (aux != null && !aux.isEmpty()) {
+				        	filtreProcediments = FilterBuilder.or(filtreProcediments, Filter.parse(procedimentId + " IN (" + aux + ")"));
 				        }
-				  }
-				  
-				  //Si es treballa amb un organ gestor, s'ha de filtrar per expedients d'aquest organ gestor i fills
-				  if (rolActual.equals("IPA_ORGAN_ADMIN") || rolActual.equals("IPA_DISSENY")) {
-				  	String campOrganId = ExpedientResource.Fields.metaexpedientOrganGestorPares + "." + MetaExpedientOrganGestorResource.Fields.organGestor + ".id";
-				    List<String> organsActualAndFillsClausulesIn = Utils.getIdsEnGruposMil(permisosPerExpedients.getIdsOrgansPermesos());
-				      if (organsActualAndFillsClausulesIn!=null) {
-					        for (String aux: organsActualAndFillsClausulesIn) {
-						        if (aux != null && !aux.isEmpty()) {
-						        	filtreOrgansPermesos = FilterBuilder.or(filtreOrgansPermesos, Filter.parse(campOrganId + " IN (" + aux + ")"));
-							        }
-						        }
-					      }
-				  }
-				  
-				  //Aplica filtre de grups
-				  if (!rolActual.equals("IPA_ADMIN") && !rolActual.equals("IPA_ORGAN_ADMIN") && !rolActual.equals("IPA_ADMIN_LECTURA")) {
-				  String grupId = ExpedientResource.Fields.grup + ".id";
+			        }
+			        
+			        filtreProcedimentsDirectes = FilterBuilder.or(filtreProcedimentPermisDirecte, filtreProcediments);
+				}
+				
+				//APLICA FILTRE DE GRUPS
+				/** (:noFiltreGrups = true or (e.grup is null or (:esNullIdsGrupsPermesos = false and e.grup.id in (:idsGrupsPermesos)))) */
+				if (!rolActual.equals("IPA_ADMIN") && !rolActual.equals("IPA_ORGAN_ADMIN") && !rolActual.equals("IPA_ADMIN_LECTURA")) {
+					String grupId = ExpedientResource.Fields.grup + ".id";
 					List<String> grupsClausulesIn = Utils.getIdsEnGruposMil(permisosPerExpedients.getIdsGrupsPermesos());
-					  if (grupsClausulesIn!=null && grupsClausulesIn.size()>0) {
-					        for (String aux: grupsClausulesIn) {
-						        if (aux != null && !aux.isEmpty()) {
-						        	filtreGrupsPermesos = FilterBuilder.or(filtreGrupsPermesos, Filter.parse(grupId + " IN (" + aux + ")"));
-						        }
-					        }
-					        
-				        if (filtreGrupsPermesos!=null) {
-				        	filtreGrupsPermesos = FilterBuilder.or(filtreGrupsPermesos, Filter.parse(grupId + " IS NULL"));
-					            }
-							  }
-				      }
-			  }
+					if (grupsClausulesIn!=null && grupsClausulesIn.size()>0) {
+						for (String aux: grupsClausulesIn) {
+							if (aux != null && !aux.isEmpty()) {
+								filtreGrupsPermesos = FilterBuilder.or(filtreGrupsPermesos, Filter.parse(grupId + " IN (" + aux + ")"));
+							}
+						}
+						filtreGrupsPermesos = FilterBuilder.or(Filter.parse(ExpedientResource.Fields.grup + " IS NULL"), filtreGrupsPermesos);
+					} else {
+						filtreGrupsPermesos = Filter.parse(ExpedientResource.Fields.grup + " IS NULL");
+					}
+				}
+			}
 			
-			  Filter filtreResultat = FilterBuilder.and(filtreFrontAndEntitat, filtreNoEliminats, filtreProcedimentsPermesos, filtreOrgansPermesos, filtreGrupsPermesos);
+			Filter filtreResultat = FilterBuilder.and(
+					filtreFrontAndEntitat,
+					filtreNoEliminats,
+					filtrePermisosVaris,
+					filtreProcedimentsDirectes,
+					filtreGrupsPermesos);
 			
-			  return filtreResultat.generate();
+			return filtreResultat.generate();
         
     	} catch (Exception e) {
     		applicationHelper.stopTimer(sample, "METRICS@Subsystem_Expedient.list", "resultado", "error");
@@ -337,6 +374,94 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     	}
     }
 
+    private Filter getFiltrePermisos(PermisosPerExpedientsDto permisosPerExpedients) {
+    	
+    	/**
+	 	"and (" +
+		"     (:esNullIdsMetaExpedientsPermesos = false and (e.metaExpedient.id in (:idsMetaExpedientsPermesos0))) " +
+		"     or (:esNullIdsOrgansPermesos = false and (meogp.organGestor.id in (:idsOrgansPermesos0))) " +
+		"     or (:esNullIdsMetaExpedientOrganPairsPermesos = false and meogp.id in (:idsMetaExpedientOrganPairsPermesos)) " +
+		"     or (:esNullIdsOrgansAmbProcedimentsComunsPermesos = false and meogp.organGestor.id in (:idsOrgansAmbProcedimentsComunsPermesos) and e.metaExpedient.id in (:idsProcedimentsComuns))
+		) " +
+    	 */
+    	
+    	Filter filtrePermisos = null;
+    	
+    	/** (:esNullIdsMetaExpedientsPermesos = false and (e.metaExpedient.id in (:idsMetaExpedientsPermesos0))) " */
+    	//MetaExpedients permesos: ExtendedPermission.READ --> MetaNodeEntity.class
+    	Filter filtreMetaExpedientsPermesos = null;
+    	String procedimentId = ExpedientResource.Fields.metaExpedient + ".id";
+    	List<String> permesosClausulesIn = Utils.getIdsEnGruposMil(permisosPerExpedients.getIdsMetaExpedientsPermesos());
+    	if (permesosClausulesIn!=null) {
+	        for (String aux: permesosClausulesIn) {
+		        if (aux != null && !aux.isEmpty()) {
+		        	filtreMetaExpedientsPermesos = FilterBuilder.or(filtreMetaExpedientsPermesos, Filter.parse(procedimentId + " IN (" + aux + ")"));
+		        }
+	        }
+    	}
+		
+    	/** (:esNullIdsOrgansPermesos = false and (meogp.organGestor.id in (:idsOrgansPermesos0))) */
+    	//Organs gestors permesos (nomes admin organ): Organ actual capçalera + fills
+    	Filter filtreOrgansPermesos = null;
+	  	String campOrganId = ExpedientResource.Fields.metaexpedientOrganGestorPares + "." + MetaExpedientOrganGestorResource.Fields.organGestor + ".id";
+	    List<String> organsActualAndFillsClausulesIn = Utils.getIdsEnGruposMil(permisosPerExpedients.getIdsOrgansPermesos());
+	    if (organsActualAndFillsClausulesIn!=null) {
+	    	for (String aux: organsActualAndFillsClausulesIn) {
+	    		if (aux != null && !aux.isEmpty()) {
+	    			filtreOrgansPermesos = FilterBuilder.or(filtreOrgansPermesos, Filter.parse(campOrganId + " IN (" + aux + ")"));
+	    		}
+	    	}
+	    }
+    	
+    	//MetaExpedientOrganPairsPermesos (nomes usuaris tothom): ExtendedPermission.READ --> MetaExpedientOrganGestorEntity.class
+	    //Permisos que s'han donat sobre procediments comuns, a on es pot seleccionar organ gestor.
+	    /** (:esNullIdsMetaExpedientOrganPairsPermesos = false and meogp.id in (:idsMetaExpedientOrganPairsPermesos)) */
+    	Filter filtreMetaExpedientOrganPairsPermesos = null;
+	  	String campMetaExpOrganId = ExpedientResource.Fields.metaexpedientOrganGestorPares + ".id";
+	    List<String> organsMetaExpClausulesIn = Utils.getIdsEnGruposMil(permisosPerExpedients.getIdsMetaExpedientOrganPairsPermesos());
+	    if (organsMetaExpClausulesIn!=null) {
+	    	for (String aux: organsMetaExpClausulesIn) {
+	    		if (aux != null && !aux.isEmpty()) {
+	    			filtreMetaExpedientOrganPairsPermesos = FilterBuilder.or(filtreMetaExpedientOrganPairsPermesos, Filter.parse(campMetaExpOrganId + " IN (" + aux + ")"));
+	    		}
+	    	}
+	    }
+    	
+    	//OrgansAmbProcedimentsComunsPermesos (nomes usuaris tothom): ExtendedPermission.COMU + ExtendedPermission.READ --> OrganGestorEntity.class
+	    //Permisos que s'han donat sobre OrganGestor
+	    /** (:esNullIdsOrgansAmbProcedimentsComunsPermesos = false and meogp.organGestor.id in (:idsOrgansAmbProcedimentsComunsPermesos) 
+	     * 	and e.metaExpedient.id in (:idsProcedimentsComuns)) */
+    	Filter filtreOrgansAmbProcedimentsComunsPermesos = null;
+	  	String campMetaExpOrganComuId = ExpedientResource.Fields.metaexpedientOrganGestorPares + "." + MetaExpedientOrganGestorResource.Fields.organGestor + ".id";
+	    List<String> organsMetaExpComunsClausulesIn = Utils.getIdsEnGruposMil(permisosPerExpedients.getIdsOrgansAmbProcedimentsComunsPermesos());
+	    if (organsMetaExpComunsClausulesIn!=null) {
+	    	for (String aux: organsMetaExpComunsClausulesIn) {
+	    		if (aux != null && !aux.isEmpty()) {
+	    			filtreOrgansAmbProcedimentsComunsPermesos = FilterBuilder.or(filtreOrgansAmbProcedimentsComunsPermesos, Filter.parse(campMetaExpOrganComuId + " IN (" + aux + ")"));
+	    		}
+	    	}
+	    	
+	    	Filter filtreIdsProcedimentsComuns = null;
+		  	String campMetaExpId = ExpedientResource.Fields.metaExpedient + ".id";
+		    List<String> idsProcedimentsComunsClausulesIn = Utils.getIdsEnGruposMil(permisosPerExpedients.getIdsProcedimentsComuns());
+		    if (idsProcedimentsComunsClausulesIn!=null) {
+		    	for (String aux: idsProcedimentsComunsClausulesIn) {
+		    		if (aux != null && !aux.isEmpty()) {
+		    			filtreIdsProcedimentsComuns = FilterBuilder.or(filtreIdsProcedimentsComuns, Filter.parse(campMetaExpId + " IN (" + aux + ")"));
+		    		}
+		    	}
+		    }
+		    
+		    if (filtreOrgansAmbProcedimentsComunsPermesos!=null) {
+		    	filtreOrgansAmbProcedimentsComunsPermesos = FilterBuilder.and(filtreOrgansAmbProcedimentsComunsPermesos, filtreIdsProcedimentsComuns);
+		    }
+	    }
+    	
+    	filtrePermisos = FilterBuilder.or(filtreMetaExpedientsPermesos, filtreOrgansPermesos, filtreMetaExpedientOrganPairsPermesos, filtreOrgansAmbProcedimentsComunsPermesos);
+    	
+    	return filtrePermisos;
+    }
+    
     @Override
     protected void afterConversion(ExpedientResourceEntity entity, ExpedientResource resource) {
         resource.setGestioAmbGrupsActiva(entity.getMetaExpedient().isGestioAmbGrupsActiva());

@@ -29,15 +29,7 @@ const ScanerTabForm = () => {
         <Grid item xs={12} hidden={!data?.scaned}>
             <Alert severity={"success"}>{t('page.document.alert.scaned')}</Alert>
         </Grid>
-
-        <GridFormField xs={12} name="ntiIdDocumentoOrigen"
-                       componentProps={{ title: t('page.document.detall.documentOrigenFormat') }}
-                       required={!!data?.ntiEstadoElaboracion}
-                       hidden={!data?.ntiEstadoElaboracion
-                           || data?.ntiEstadoElaboracion == 'EE01'
-                           || data?.ntiEstadoElaboracion == 'EE99'}/>
         <GridFormField xs={12} name="digitalitzacioPerfil"/>
-
         <Grid item xs={12}>
             <Iframe src={data?.digitalitzacioProcesUrl} />
         </Grid>
@@ -116,18 +108,19 @@ const DocumentsGridForm = () => {
         <GridFormField xs={12} name="dataCaptura" type={"date"} disabled required />
         <GridFormField xs={12} name="ntiOrigen" required />
         <GridFormField xs={12} name="ntiEstadoElaboracion" required />
-
+		<GridFormField xs={12} name="ntiIdDocumentoOrigen"
+		               componentProps={{ title: t('page.document.detall.documentOrigenFormat') }}
+		               required={!!data?.ntiEstadoElaboracion}
+		               hidden={!data?.ntiEstadoElaboracion
+		                   || data?.ntiEstadoElaboracion == 'EE01'
+		                   || data?.ntiEstadoElaboracion == 'EE99'}/>		
         {id==null &&
             <GridFormField xs={12} name="carpeta"
                         filter={carpetaFilter}
                         hidden={!user?.sessionScope?.isCreacioCarpetesActiva}/>
         }
-
         <Grid item xs={12}>
-            <TabComponent
-                tabs={tabs}
-                variant="scrollable"
-            />
+            <TabComponent tabs={tabs} variant="scrollable"/>
         </Grid>
     </Grid>
 }

@@ -21,15 +21,15 @@ const perspectives = ["ESTAT"];
 const columns = [
     {
         field: 'metaExpedient',
-        flex: 0.5,
+        flex: 1.6,
     },
     {
         field: 'numero',
-        flex: 0.5,
+        flex: 1,
     },
     {
         field: 'nom',
-        flex: 0.5,
+        flex: 1.6,
     },
     {
         field: 'estat',
@@ -69,11 +69,10 @@ const ActionFilterFrom = () => {
     );
 
     return <>
-        <GridFormField xs={4} name="metaExpedient" filter={filterMetaExpedient}/>
-        <GridFormField xs={3} name="numero"/>
-        <GridFormField xs={3} name="nom"/>
+        <GridFormField xs={3} name="metaExpedient" filter={filterMetaExpedient}/>
+        <GridFormField xs={2} name="numero"/>
+        <GridFormField xs={2} name="nom"/>
         <GridFormField xs={2} name="estat" requestParams={{metaExpedientId: data?.metaExpedient?.id}}/>
-        <Grid item xs={9}/>
     </>
 }
 
@@ -159,6 +158,7 @@ const Relacionar = (props:any) => {
         resourceName={'expedientResource'}
         action={'RELACIONAR'}
         title={t('page.expedient.action.relacio.title')}
+        formDialogComponentProps={{fullWidth: true, maxWidth: 'xl'}}
         formDialogButtons={[
             {icon: 'link', text: t('page.expedient.action.relacio.labelDialog'), componentProps: { variant: 'contained' }, value: true },
             {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },

@@ -658,7 +658,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                 DocumentResourceEntity entity = documentResourceRepository.findById((Long) id).orElse(null);
                 if (entity != null) {
                     if (
-                        (entity.getDocumentTipus() == DocumentTipusEnumDto.DIGITAL || entity.getDocumentTipus() == DocumentTipusEnumDto.IMPORTAT)
+                        !(entity.getDocumentTipus() == DocumentTipusEnumDto.DIGITAL || entity.getDocumentTipus() == DocumentTipusEnumDto.IMPORTAT)
                             || !(
                                     (entity.getArxiuEstat() == ArxiuEstatEnumDto.DEFINITIU || entity.getEstat() == DocumentEstatEnumDto.FIRMA_PARCIAL)
                                             || Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.IMPRIMIBLE_NO_FIRMAT_ACTIU))
