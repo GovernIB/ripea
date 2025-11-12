@@ -293,18 +293,19 @@ public class IndexBatchHelper {
 		        linkStyle.setAlignment(HorizontalAlignment.LEFT);
 		        linkStyle.setVerticalAlignment(VerticalAlignment.TOP);
 		       
-		     	// Enllaç csv
-		     	String csv = document.getNtiCsv() != null ? getCsvUrl() + document.getNtiCsv() : "";
-		     	if (csv.isEmpty() && arxiuDetall != null && !arxiuDetall.getMetadadesAddicionals().isEmpty()) {
-		     		String metadadaAddicionalCsv = (String) arxiuDetall.getMetadadesAddicionals().get("csv");
-		     		csv = metadadaAddicionalCsv != null ? getCsvUrl() + metadadaAddicionalCsv : "";
-			     }
-		        org.apache.poi.ss.usermodel.Cell cellCsv = dataRow.createCell(colIdx++);
-		        cellCsv.setCellValue(csv);
+		     	// Enllaç descarrega
+		        String enllacDescarrega = "", titolDescarrega = "";
+		        if (getBaseUrl() != null && ! getBaseUrl().isEmpty()) {
+		        	titolDescarrega = messageHelper.getMessage("expedient.service.exportacio.index.link.descarregar");
+		        	enllacDescarrega = getBaseUrl() + "/contingut/" + document.getPareId()	+ "/document/" + document.getId() + "/descarregar";
+		        }
+
+		        org.apache.poi.ss.usermodel.Cell cellDescarrega = dataRow.createCell(colIdx++);
+		        cellDescarrega.setCellValue(titolDescarrega);
 		        Hyperlink hyperlink = workbook.getCreationHelper().createHyperlink(HyperlinkType.URL);
-				hyperlink.setAddress(csv);
-				cellCsv.setHyperlink(hyperlink);
-				cellCsv.setCellStyle(linkStyle);
+				hyperlink.setAddress(enllacDescarrega);
+				cellDescarrega.setHyperlink(hyperlink);
+				cellDescarrega.setCellStyle(linkStyle);
 
 				dataRow.setRowStyle(cellDataStyle);
 			}
@@ -394,27 +395,27 @@ public class IndexBatchHelper {
 			//Nº
 			String nextVal = num.scale() > 0 ? String.valueOf(num.doubleValue()) : String.valueOf(num.intValue());
 			if (!isRelacio)
-				taulaDocuments.addCell(crearCellaContingut(nextVal, null, false));
+				taulaDocuments.addCell(crearCellaContingut(nextVal, null, null));
 			
 			// Nom document
 			String nom = document.getNom() != null ? document.getNom() : "";
-			taulaDocuments.addCell(crearCellaContingut(nom, null, false));
+			taulaDocuments.addCell(crearCellaContingut(nom, null, null));
 			
 			if (isMostrarCampsAddicionals() && arxiuDetall != null && arxiuDetall.getMetadadesAddicionals() != null) {
 				// Nom natural
 				Object tituloDocMet = arxiuDetall.getMetadadesAddicionals().get("tituloDoc");
 				String tituloDoc = tituloDocMet != null ? tituloDocMet.toString() : "";
-				taulaDocuments.addCell(crearCellaContingut(tituloDoc, null, false));
+				taulaDocuments.addCell(crearCellaContingut(tituloDoc, null, null));
 			}
 	
 			// Descripció
 			String descripcio = document.getDescripcio() != null ? document.getDescripcio() : "";
-			taulaDocuments.addCell(crearCellaContingut(descripcio, null, false));
+			taulaDocuments.addCell(crearCellaContingut(descripcio, null, null));
 	
 			
 			// Tipus documental
 			String tipusDocumental = document.getNtiTipoDocumental() != null ? messageHelper.getMessage("document.nti.tipdoc.enum." + document.getNtiTipoDocumental()) : "";
-			taulaDocuments.addCell(crearCellaContingut(tipusDocumental, null, false));
+			taulaDocuments.addCell(crearCellaContingut(tipusDocumental, null, null));
 			
 			// Tipus document
 			String tipusDocument = document.getDocumentTipus() != null ? messageHelper.getMessage("document.tipus.enum." + document.getDocumentTipus()) : "";
@@ -435,25 +436,26 @@ public class IndexBatchHelper {
 					}
 				}
 			}
-			taulaDocuments.addCell(crearCellaContingut(tipusDocument, subTitols, false));
+			taulaDocuments.addCell(crearCellaContingut(tipusDocument, subTitols, null));
 	
 			// Data creació
 			SimpleDateFormat sdt = new SimpleDateFormat("dd-MM-yyyy");
 			String dataCreacio = document.getCreatedDate() != null ?
 					sdt.format(Date.from(document.getCreatedDate().get().atZone(ZoneId.systemDefault()).toInstant())) : "";
-			taulaDocuments.addCell(crearCellaContingut(dataCreacio, null, false));
+			taulaDocuments.addCell(crearCellaContingut(dataCreacio, null, null));
 			
-			// Enllaç csv
-			String csv = document.getNtiCsv() != null ? getCsvUrl() + document.getNtiCsv() : "";
-			if (csv.isEmpty() && arxiuDetall != null && !arxiuDetall.getMetadadesAddicionals().isEmpty()) {
-				String metadadaAddicionalCsv = (String) arxiuDetall.getMetadadesAddicionals().get("csv");
-				csv = metadadaAddicionalCsv != null ? getCsvUrl() + metadadaAddicionalCsv : "";
-			}
-			taulaDocuments.addCell(crearCellaContingut(csv, null, true));
+//			// Enllaç descarrega
+	        String enllacDescarrega = "", titolDescarrega = "-";
+	        if (getBaseUrl() != null && ! getBaseUrl().isEmpty()) {
+	        	titolDescarrega = messageHelper.getMessage("expedient.service.exportacio.index.link.descarregar");
+	        	enllacDescarrega = getBaseUrl() + "/contingut/" + document.getPareId()	+ "/document/" + document.getId() + "/descarregar";
+	        }
+	        
+			taulaDocuments.addCell(crearCellaContingut(titolDescarrega, null, enllacDescarrega));
 			
 			// Data captura
 			String dataCaptura = document.getDataCaptura() != null ? sdt.format(document.getDataCaptura()) : "";
-			taulaDocuments.addCell(crearCellaContingut(dataCaptura, null, false));	
+			taulaDocuments.addCell(crearCellaContingut(dataCaptura, null, null));	
 			
 			if (aplicacioService.mostrarLogsRendiment())
 	    		logger.info("crearNovaFila informació bàsica end (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t1) + " ms");
@@ -493,7 +495,7 @@ public class IndexBatchHelper {
 				}
 				
 				if (!document.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT))
-					taulaDocuments.addCell(crearCellaContingut(messageHelper.getMessage("expedient.service.exportacio.index.estat." + estatNotificacio), null, false));
+					taulaDocuments.addCell(crearCellaContingut(messageHelper.getMessage("expedient.service.exportacio.index.estat." + estatNotificacio), null, null));
 			}
 			
 			if (document.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT)) {
@@ -508,12 +510,12 @@ public class IndexBatchHelper {
 					String missatgeEstatNotificacio = messageHelper.getMessage("expedient.service.exportacio.index.estat." + estatNotificacio);
 					subTitols.add(missatgeEstatNotificacio);
 				}
-				taulaDocuments.addCell(crearCellaContingut(messageHelper.getMessage("expedient.service.exportacio.index.estat.firmat"), subTitols, false));
+				taulaDocuments.addCell(crearCellaContingut(messageHelper.getMessage("expedient.service.exportacio.index.estat.firmat"), subTitols, null));
 			} 
 			
 			
 			if (!hasNotificacions && !document.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT)){
-				taulaDocuments.addCell(crearCellaContingut("-", null, false));
+				taulaDocuments.addCell(crearCellaContingut("-", null, null));
 			}
 		} else {
 			CarpetaEntity carpeta = (CarpetaEntity)contingut;
@@ -521,7 +523,7 @@ public class IndexBatchHelper {
 				BigDecimal sum = new BigDecimal(1);
 				num = num.add(sum);
 				String nextVal = num.scale() > 0 ? String.valueOf(num.doubleValue()) : String.valueOf(num.intValue());
-				taulaDocuments.addCell(crearCellaContingut(nextVal, null, false));
+				taulaDocuments.addCell(crearCellaContingut(nextVal, null, null));
 			}
 			if (carpeta.getExpedientRelacionat() != null)
 				taulaDocuments.addCell(crearCellaUnica(carpeta.getNom(), carpeta.getExpedientRelacionat().getId(), isRelacio));
@@ -570,7 +572,7 @@ public class IndexBatchHelper {
 		return titolCell;
 	}
 	
-	private PdfPCell crearCellaContingut(String titol, List<String> subTitols, boolean isLink) {
+	private PdfPCell crearCellaContingut(String titol, List<String> subTitols, String enllac) {
 		PdfPCell titolCell = new PdfPCell();
 		Paragraph titolParagraph = new Paragraph(titol, frutiger6);
 		titolParagraph.setAlignment(Element.ALIGN_CENTER);
@@ -584,8 +586,8 @@ public class IndexBatchHelper {
 		}
 		titolCell.setPaddingBottom(6f);
 		titolCell.setBorderWidth((float) 0.5);
-		if (titol != null && !titol.isEmpty() && isLink) {
-			titolCell.setCellEvent(new LinkInCell(titol));
+		if (enllac != null && !enllac.isEmpty()) {
+			titolCell.setCellEvent(new LinkInCell(enllac));
 		}
 		return titolCell;
 	}
@@ -612,8 +614,8 @@ public class IndexBatchHelper {
 		return configHelper.getAsBoolean(PropertyConfig.INDEX_CAMPS_ADDICIONALS);
 	}
 
-	private String getCsvUrl() throws NoSuchFileException, IOException {
-		return configHelper.getConfig(PropertyConfig.VALIDACIO_URL_IMPRIMIBLES);
+	private String getBaseUrl() throws NoSuchFileException, IOException {
+		return configHelper.getConfig(PropertyConfig.BASE_URL);
 	}
 
 	protected enum DocumentNotificacioEstatEnumCustom {PENDENT, REGISTRAT, ENVIAT, NOTIFICAT};
