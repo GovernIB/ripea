@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState} from "react";
+import {useEffect, useMemo, useRef, useState} from "react";
 import {Grid} from "@mui/material";
 import {FormField, MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
 import {useTranslation} from "react-i18next";
@@ -193,8 +193,12 @@ const AcceptarTabInteressats = () => {
 }
 
 const AcceptarForm = () => {
-    const {data} =useFormContext();
+    const {data, fieldErrors} =useFormContext();
     const { t } = useTranslation();
+
+    const annexosError:boolean|undefined = useMemo(() =>
+            fieldErrors?.some?.(e => e.field === "annexos")
+    , [fieldErrors])
 
     const tabs = [
         {
@@ -206,6 +210,7 @@ const AcceptarForm = () => {
             value: 'annexos',
             label: t('page.anotacio.tabs.annexos'),
             content: <AcceptarTabAnnexos/>,
+            error: annexosError,
         },
         {
             value: 'interessats',
