@@ -2158,6 +2158,7 @@ public class ExpedientHelper {
 		List<Long> procedimentsComunsIds = null;
 		List<Long> idsOrgansAmbProcedimentsComunsPermesos = null;
 		List<Long> idsGrupsPermesos = null;
+		List<Long> organsComunsAndFills = null;
 
 		if (rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ADMIN_LECTURA")) {
 
@@ -2233,6 +2234,17 @@ public class ExpedientHelper {
 					OrganGestorEntity.class,
 					ExtendedPermission.COMU,
 					ExtendedPermission.READ));
+			
+			
+			if (idsOrgansAmbProcedimentsComunsPermesos!=null && idsOrgansAmbProcedimentsComunsPermesos.size()>0) {
+				organsComunsAndFills = new ArrayList<Long>();
+				for (Long organComu: idsOrgansAmbProcedimentsComunsPermesos) {
+					organsComunsAndFills.addAll(
+							organGestorCacheHelper.getIdsOrgansFills(
+									entitat.getCodi(),
+									organGestorRepository.findById(organComu).get().getCodi()));
+				}
+			}
 
 			procedimentsComunsIds = metaExpedientRepository.findProcedimentsComunsActiveIds(entitat);
 
@@ -2247,6 +2259,7 @@ public class ExpedientHelper {
 		permisosPerExpedientsDto.setIdsOrgansAmbProcedimentsComunsPermesos(idsOrgansAmbProcedimentsComunsPermesos);
 		permisosPerExpedientsDto.setIdsProcedimentsComuns(procedimentsComunsIds);
 		permisosPerExpedientsDto.setIdsGrupsPermesos(idsGrupsPermesos);
+		permisosPerExpedientsDto.setIdsOrgansComunsAndFills(organsComunsAndFills);
 
         if (cacheHelper.mostrarLogsPermisos()) {
             logger.info(rolActual+" - findPermisosPerExpedients > idsOrgansPermesos (" + (idsOrgansPermesos!=null?idsOrgansPermesos.toString():"NULL") + ")");

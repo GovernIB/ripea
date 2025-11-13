@@ -21,6 +21,7 @@ public class PermisosPerExpedientsDto  {
 	List<Long> idsOrgansAmbProcedimentsComunsPermesos;
 	List<Long> idsProcedimentsComuns;
 	List<Long> idsGrupsPermesos;
+	List<Long> idsOrgansComunsAndFills;
 
 	private List<List<Long>> idsMetaExpedientsPermesosSplit;
 	private List<List<Long>> idsOrgansPermesosSplit;
@@ -28,6 +29,7 @@ public class PermisosPerExpedientsDto  {
 	private List<List<Long>> idsMetaExpedientOrganPairsPermesosSplit;
 	private List<List<Long>> idsOrgansAmbProcedimentsComunsPermesosSplit;
 	private List<List<Long>> idsProcedimentsComunsSplit;
+	private List<List<Long>> idsOrgansComunsAndFillsSplit;
 
 	public List<Long> getIdsMetaExpedientsPermesos() {
 		return Utils.getNullIfEmpty(idsMetaExpedientsPermesos) ;
@@ -50,7 +52,10 @@ public class PermisosPerExpedientsDto  {
 	public List<Long> getIdsGrupsPermesos() {
 		return Utils.getNullIfEmpty(idsGrupsPermesos);
 	}
-
+	public List<Long> getIdsOrgansComunsAndFills() {
+		return Utils.getNullIfEmpty(idsOrgansComunsAndFills) ;
+	}
+	
 	public void setIdsMetaExpedientsPermesos(List<Long> idsMetaExpedientsPermesos) {
 		this.idsMetaExpedientsPermesos = idsMetaExpedientsPermesos;
 		this.idsMetaExpedientsPermesosSplit = listSplit(idsMetaExpedientsPermesos);
@@ -118,6 +123,10 @@ public class PermisosPerExpedientsDto  {
     
     public List<String> getIdsProcedimentsComunsGruposMil() {
     	return Utils.getIdsEnGruposMil(this.idsProcedimentsComuns);
+    }
+    
+    public List<String> getIdsOrgansComunsAndFillsGruposMil() {
+    	return Utils.getIdsEnGruposMil(this.idsOrgansComunsAndFills);
     }
 
 	private static <T> List<List<T>> listSplit(List<T> list) {

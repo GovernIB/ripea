@@ -19,15 +19,11 @@ import javax.persistence.*;
 @EntityListeners(AuditingEntityListener.class)
 public class MetaExpedientOrganGestorEntity extends RipeaAuditable<Long> {
 
-	@ManyToOne(
-			optional = false,
-			fetch = FetchType.EAGER)
+	@ManyToOne(optional = false, fetch = FetchType.EAGER)
 	@JoinColumn(name = "meta_expedient_id")
 	@ForeignKey(name = BaseConfig.DB_PREFIX + "metaexp_metaexporg_fk")
 	private MetaExpedientEntity metaExpedient;
-	@ManyToOne(
-			optional = false,
-			fetch = FetchType.EAGER)
+	@ManyToOne(optional = false, fetch = FetchType.EAGER)
 	@JoinColumn(name = "organ_gestor_id")
 	@ForeignKey(name = BaseConfig.DB_PREFIX + "organ_metaexporg_fk")
 	private OrganGestorEntity organGestor;

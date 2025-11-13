@@ -9,7 +9,7 @@ import javax.persistence.Table;
 
 import es.caib.ripea.persistence.base.entity.BaseAuditableEntity;
 import es.caib.ripea.service.intf.config.BaseConfig;
-import es.caib.ripea.service.intf.model.GrupResource;
+import es.caib.ripea.service.intf.model.MetaExpedientOrganGestorResource;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -19,7 +19,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class MetaExpedientOrganGestorResourceEntity extends BaseAuditableEntity<GrupResource> {
+public class MetaExpedientOrganGestorResourceEntity extends BaseAuditableEntity<MetaExpedientOrganGestorResource> {
 
 	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(
@@ -27,7 +27,7 @@ public class MetaExpedientOrganGestorResourceEntity extends BaseAuditableEntity<
 			foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "metaexp_metaexporg_fk"))
 	private MetaExpedientResourceEntity metaExpedient;
 
-	@ManyToOne(optional = true, fetch = FetchType.LAZY)
+	@ManyToOne(optional = false, fetch = FetchType.EAGER)
 	@JoinColumn(
 			name = "organ_gestor_id",
 			foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "organ_metaexporg_fk"))

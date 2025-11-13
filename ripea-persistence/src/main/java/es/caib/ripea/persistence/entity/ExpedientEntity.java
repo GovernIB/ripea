@@ -162,7 +162,6 @@ public class ExpedientEntity extends NodeEntity {
 			orphanRemoval = true)
 	private List<ExpedientOrganPareEntity> organGestorPares = new ArrayList<ExpedientOrganPareEntity>();
 	
-	
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(
 	  name = BaseConfig.DB_PREFIX + "expedient_organpare",

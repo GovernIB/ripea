@@ -23,6 +23,7 @@ import javax.persistence.TemporalType;
 
 import org.hibernate.annotations.Where;
 
+import es.caib.ripea.persistence.entity.ExpedientOrganPareEntity;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
@@ -176,17 +177,17 @@ public class ExpedientResourceEntity extends NodeResourceEntity<ExpedientResourc
 			foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "organ_gestor_exp_fk"))
 	private OrganGestorResourceEntity organGestor;
 
-//	@OneToMany(
-//			mappedBy = "expedient",
-//			cascade = CascadeType.ALL,
-//			orphanRemoval = true)
-//	private List<ExpedientOrganPareEntity> organGestorPares = new ArrayList<ExpedientOrganPareEntity>();
+	@OneToMany(
+			mappedBy = "expedient",
+			cascade = CascadeType.ALL,
+			orphanRemoval = true)
+	private List<ExpedientOrganPareResourceEntity> organGestorPares = new ArrayList<ExpedientOrganPareResourceEntity>();
 
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(
-			name = BaseConfig.DB_PREFIX + "expedient_organpare",
-			joinColumns = {@JoinColumn(name = "expedient_id", referencedColumnName = "id")},
-			inverseJoinColumns = {@JoinColumn(name = "meta_expedient_organ_id", referencedColumnName = "id")})
+	  name = BaseConfig.DB_PREFIX + "expedient_organpare",
+	  joinColumns = @JoinColumn(name = "expedient_id"), 
+	  inverseJoinColumns = @JoinColumn(name = "meta_expedient_organ_id"))
 	Set<MetaExpedientOrganGestorResourceEntity> metaexpedientOrganGestorPares;
 
 	@Column(name = "prioritat")
