@@ -817,6 +817,8 @@ const translationEn = {
                     cancel: "Cancel sending",
                     title: "Signature details",
                     ok: "The signature has been cancelled successfully",
+                    check: "Are you sure you want to continue with this action?",
+                    description: "Once deleted, it cannot be recovered",
                 },
                 cancel: {
                     label: "Cancel sending",

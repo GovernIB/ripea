@@ -35,7 +35,6 @@ type StyledMuiGridProps = MuiDataGridProps & {
     formInitOnChange?:boolean,
     rowExpansionChange?: ( params:any, event:any, details:any ) => void,
     onRefresh?: () => any,
-    disabledPagination?:boolean,
 }
 
 const StyledMuiGrid = (props:StyledMuiGridProps) => {
@@ -68,7 +67,6 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
         rowHideUpdateButton = true,
         rowHideDeleteButton = true,
         toolbarHideQuickFilter = true,
-        disabledPagination = false,
         rowExpansionChange,
         onRefresh,
         ...others
@@ -148,7 +146,7 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
     }, [columns])
 
     const paginationProps = useMemo(() => {
-        return user?.conf?.numElementsPagina != null && !disabledPagination
+        return user?.conf?.numElementsPagina != null
             ? {
                 autoHeight: true,
                 paginationModel: {page: 0, pageSize: +user?.conf?.numElementsPagina},

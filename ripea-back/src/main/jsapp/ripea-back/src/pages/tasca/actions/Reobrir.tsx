@@ -31,7 +31,7 @@ const useReobrir = (refresh?: () => void) => {
     const {temporalMessageShow} = useBaseAppContext();
 
     const handleShow = (id:any, row:any) :void => {
-        apiRef.current?.show?.(id,{responsableActual:row?.responsableActual})
+        apiRef.current?.show?.(id,{responsables: row?.responsableActual ?[row?.responsableActual] :[]})
     }
     const onSuccess = () :void => {
         refresh?.()

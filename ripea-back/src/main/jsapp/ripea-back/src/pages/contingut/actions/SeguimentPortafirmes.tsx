@@ -1,6 +1,6 @@
 import {useState} from "react";
 import {Grid} from "@mui/material";
-import {MuiDialog, useBaseAppContext, useResourceApiService} from "reactlib";
+import {MuiDialog, useBaseAppContext, useConfirmDialogButtons, useResourceApiService} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {CardData, ContenidoData} from "../../../components/CardData.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
@@ -31,29 +31,52 @@ const SeguimentPortafirmes = (props:any) => {
     </Load>
 }
 
+const useActions = (refresh?: () => void) => {
+    const { t } = useTranslation();
+    const {
+        artifactAction: apiAction,
+    } = useResourceApiService('documentPortafirmesResource')
+    const {messageDialogShow, temporalMessageShow} = useBaseAppContext();
+    const confirmDialogButtons = useConfirmDialogButtons();
+    const confirmDialogComponentProps = {maxWidth: 'sm', fullWidth: true};
+
+    const cancelarFirma = (id:any) => {
+        messageDialogShow(
+            t('page.document.action.seguiment.check'),
+            t('page.document.action.seguiment.description'),
+            confirmDialogButtons,
+            confirmDialogComponentProps)
+            .then((value: any) => {
+                if (value) {
+                    apiAction(id, {code: 'CANCEL_FIRMA'})
+                        .then(() => {
+                            refresh?.()
+                            temporalMessageShow(null, t('page.document.action.seguiment.ok'), 'success');
+                        })
+                        .catch((error) => {
+                            temporalMessageShow(null, error?.message, 'error');
+                        });
+                }
+            });
+    }
+
+    return {
+        cancelarFirma
+    }
+}
+
 const useSeguimentPortafirmes = (potModificar:boolean, refresh?: () => void) => {
     const { t } = useTranslation();
-    const {temporalMessageShow} = useBaseAppContext();
     const { value: user } = useUserSession();
 
     const {
         isReady: apiIsReady,
         find: apiFind,
-        artifactAction: apiAction,
     } = useResourceApiService('documentPortafirmesResource')
     const [open, setOpen] = useState(false);
     const [entity, setEntity] = useState<any>();
 
-    const cancelarFirma = (id:any) => {
-        apiAction(id, {code: 'CANCEL_FIRMA'})
-            .then(()=>{
-                refresh?.()
-                temporalMessageShow(null, t('page.document.action.seguiment.ok'), 'success');
-            })
-            .catch((error) => {
-                temporalMessageShow(null, error?.message, 'error');
-            });
-    }
+    const {cancelarFirma} = useActions(refresh)
 
     const handleOpen = (id:any) => {
         if (apiIsReady && id){
@@ -103,7 +126,9 @@ const useSeguimentPortafirmes = (potModificar:boolean, refresh?: () => void) => 
                 if (value=='cancel' && entity?.estat == 'ENVIAT' && potModificar && user?.rolActual != "IPA_ADMIN_LECTURA") {
                     cancelarFirma(entity?.id)
                 }
-                handleClose();
+                if (value=='close') {
+                    handleClose();
+                }
             }}
         >
             <SeguimentPortafirmes entity={entity}/>
