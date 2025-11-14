@@ -51,6 +51,16 @@ const base: ThemeOptions = {
                 },
             },
         },
+		MuiDrawer: {
+			styleOverrides: {
+			    paper: {
+					right: 0,
+					left: 'auto',					
+					backgroundColor: '#004B99',
+					color: '#fff'
+			    },
+			},
+		},
         MuiPaper: {            
             styleOverrides: {
                 root: {
@@ -268,7 +278,7 @@ export const darkTheme = createTheme({
 	MuiCssBaseline: {
 	      styleOverrides: {
 	        'div[class*="MuiBox-root"]': {
-	          backgroundColor: 'black',
+	          backgroundColor: '#2d2d2d',
 	          color: 'white',
 	        },
 			// Excluye los Box dentro de header
@@ -308,7 +318,7 @@ export const darkTheme = createTheme({
 	        row: {
                 color: 'white',
 				borderBottom: '1px solid grey',
-				background: 'black !important',
+				background: '#212830 !important',
 				'&:hover': {
 				        backgroundColor: '#222222 !important', // color al pasar el ratón
 				      },
@@ -322,7 +332,7 @@ export const darkTheme = createTheme({
 	            '&:last-child': {
 	                paddingBottom: '10px', // Per modificar el padding inferior de l'últim element
 	            },
-				backgroundColor: 'black !important', // fondo deshabilitado
+				backgroundColor: '#2d2d2d !important', // fondo deshabilitado
 	        },
 	    },
 	},
@@ -373,34 +383,6 @@ export const darkTheme = createTheme({
 	    },
 	  },
 	},
-	
-//	MuiButton: {
-//	      styleOverrides: {
-//	        root: ({ ownerState, theme }) => ({
-//	          ...(ownerState.disabled && {
-//	            color: 'red',
-//	            borderColor: theme.palette.grey[700],
-//	            backgroundColor: theme.palette.action.disabledBackground,
-//	            cursor: 'not-allowed',
-//	            opacity: 0.6,
-//	            '& .MuiChip-root': {
-//	              backgroundColor: theme.palette.grey[800],
-//	              color: '#90caf9',
-//	            },
-//	            '& .MuiIcon-root': {
-//	              color: '#90caf9',
-//	            },
-//		      '&.Mui-disabled': {
-//		        color: '#777777', // texto deshabilitado
-//		        backgroundColor: '#2c2c2c', // fondo deshabilitado
-//		        borderColor: '#444444', // si es outlined
-//		        opacity: 0.6, // opcional para dar efecto visual
-//		        cursor: 'not-allowed',
-//		      },
-//	          }),
-//	        }),
-//	      },
-//	    },
 	MuiInputBase: {
 		styleOverrides: {
 			root: {
@@ -429,7 +411,13 @@ export const darkTheme = createTheme({
 	            fontSize: '1.5rem',     // Mida de la font
 	            lineHeight: 1.2,         // Alçada de línia
 	            fontWeight: 400,
-	        }
+	        },
+			body1: {
+				color: 'white !important',
+			},
+			root: {
+				color: 'darkgrey !important',
+			}
 	    },
 	},	
 	MuiButtonGroup: {
@@ -451,6 +439,16 @@ export const darkTheme = createTheme({
 	        }
 	    }
 	},
+	MuiDrawer: {
+		styleOverrides: {
+		    paper: {
+				right: 0,
+				left: 'auto',
+				backgroundColor: '#2d2d2d',
+				color: '#fff'
+		    },
+		},
+	},	
 	MuiIcon: {
 	    styleOverrides: {
 	        root: {
@@ -483,7 +481,7 @@ export const darkTheme = createTheme({
 	    styleOverrides: {
 			'div[class*="MuiGrid-root"]': {
 				color: 'white !important',
-				backgroundColor: '#1e1e1e !important',
+				backgroundColor: 'red !important',
 			},
 			// Excluye los Box dentro de header
 			'header div[class*="MuiGrid-root"]': {
@@ -495,16 +493,16 @@ export const darkTheme = createTheme({
 	MuiAlert: {
 	    styleOverrides: {
 	         standardSuccess: {
-	             backgroundColor: '#2f5b07',
+	             backgroundColor: '#4c5d3e',
 	         },
 	        standardInfo: {
-	            backgroundColor: '#08335a',
+	            backgroundColor: '#2e4255',
 	        },
 			standardWarning: {
-				backgroundColor: '#533915',			
+				backgroundColor: '#554a3b',			
 			},
 	         standardError: {
-	             backgroundColor: '#5b0707',
+	             backgroundColor: '#4f3333',
 	         },
 	    },
 	},

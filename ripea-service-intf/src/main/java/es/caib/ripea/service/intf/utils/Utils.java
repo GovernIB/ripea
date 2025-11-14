@@ -571,12 +571,12 @@ public class Utils {
     	return null;
     }
     
-	public static String getCodiNom(InteressatTipusEnum tipus, String documentNum, String nom, String llinatge1, String llinatge2, String raoSocial, String organCodi) {
-		String resultat = documentNum + " - " + getNomComplet(tipus, nom, llinatge1, llinatge2, raoSocial, organCodi);
+	public static String getCodiNom(InteressatTipusEnum tipus, String documentNum, String nom, String llinatge1, String llinatge2, String raoSocial, String organNom) {
+		String resultat = documentNum + " - " + getNomComplet(tipus, nom, llinatge1, llinatge2, raoSocial, organNom);
         return (" - ".equals(resultat)?null:resultat);
     }
 
-	public static String getNomComplet(InteressatTipusEnum tipus, String nom, String llinatge1, String llinatge2, String raoSocial, String organCodi) {
+	public static String getNomComplet(InteressatTipusEnum tipus, String nom, String llinatge1, String llinatge2, String raoSocial, String organNom) {
 		if (tipus!=null) {
 			switch (tipus) {
 				case InteressatPersonaFisicaEntity:
@@ -596,7 +596,7 @@ public class Utils {
 				case InteressatPersonaJuridicaEntity:
 					return raoSocial;
 				case InteressatAdministracioEntity:
-					return Utils.hasValue(nom)?nom:organCodi;
+					return Utils.hasValue(nom)?nom:Utils.hasValue(organNom)?organNom:"Administració";
 				default:
 					return null;
 			}

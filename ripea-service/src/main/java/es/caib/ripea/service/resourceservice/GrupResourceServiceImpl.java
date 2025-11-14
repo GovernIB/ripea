@@ -45,7 +45,10 @@ public class GrupResourceServiceImpl extends BaseMutableResourceService<GrupReso
         String rolActual		 = configHelper.getRolActual();
     	
     	EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true,false);
-    	OrganGestorEntity ogEntity = organGestorRepository.findByEntitatAndCodi(entitat, configHelper.getOrganActualCodi());
+    	OrganGestorEntity ogEntity = null;
+    	if (rolActual.equals("IPA_ORGAN_ADMIN") || rolActual.equals("IPA_DISSENY")) {
+    		organGestorRepository.findByEntitatAndCodi(entitat, configHelper.getOrganActualCodi());
+    	}
     	
     	Filter filtreGrupsPermesos = getFiltreGrupsPermesos(entitat.getId(), rolActual, ogEntity != null ?ogEntity.getId() :null);
     	

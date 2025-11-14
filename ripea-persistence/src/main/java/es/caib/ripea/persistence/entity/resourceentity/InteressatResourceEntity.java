@@ -156,11 +156,11 @@ public class InteressatResourceEntity extends BaseAuditableEntity<InteressatReso
     protected List<InteressatGrupResourceEntity> grups = new ArrayList<>();
 	
 	public String getCodiNom() {
-		return Utils.getCodiNom(this.tipus, this.documentNum, this.nom, this.llinatge1, this.llinatge2, this.raoSocial, this.organCodi);
+		return Utils.getCodiNom(this.tipus, this.documentNum, this.nom, this.llinatge1, this.llinatge2, this.raoSocial, this.organNom);
     }
 
 	public String getNomComplet() {
-		return Utils.getNomComplet(this.tipus,this.nom, this.llinatge1, this.llinatge2, this.raoSocial, this.organCodi);
+		return Utils.getNomComplet(this.tipus,this.nom, this.llinatge1, this.llinatge2, this.raoSocial, this.organNom);
 	}
     
     public boolean adressaCompleta() {

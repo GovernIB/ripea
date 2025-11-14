@@ -325,10 +325,7 @@ export const Menu: React.FC<MenuProps & { onClose?: () => void, logo?: string }>
         variant={'permanent'}
         open={!shrink}
         {...{ width: drawerWidth }}
-        sx={{
-            position: 'absolute', top: 0, right: 0,
-            '& .MuiDrawer-paper': { right: 0, left: 'auto', backgroundColor: '#004B99', color: '#fff' },
-        }}>
+        sx={{position: 'absolute', top: 0, right: 0, left: 'auto'}}>
         {drawerContent}
     </ShrinkableDrawer>;
 }

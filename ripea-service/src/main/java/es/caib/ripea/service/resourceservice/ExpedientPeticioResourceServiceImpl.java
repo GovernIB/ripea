@@ -97,7 +97,6 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
         register(ExpedientPeticioResource.ACTION_REBUTJAR_ANOTACIO, new RebutjarAnotacioActionExecutor());
         register(ExpedientPeticioResource.ACTION_ACCEPTAR_ANOTACIO, new AcceptarAnotacioActionExecutor());
         register(ExpedientPeticioResource.ACTION_ESTAT_DISTRIBUCIO, new CanviEstatDistribucioActionExecutor());        
-        register(ExpedientPeticioResource.Fields.metaExpedient, new MetaExpedientOnchangeLogicProcessor());
     }
 
     @Override
@@ -195,18 +194,6 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
     		excepcioLogHelper.addExcepcio("/anotacio/"+resource.getId()+"/update", ex);
     	}
     	return null;
-    }
-
-    // TODO: revisar o borrar
-    private class MetaExpedientOnchangeLogicProcessor implements OnChangeLogicProcessor<ExpedientPeticioResource> {
-		@Override
-		public void onChange(Serializable id, ExpedientPeticioResource previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, ExpedientPeticioResource target) {
-			if (fieldValue != null) {
-				
-			} else {
-				target.setGrup(null);
-			}
-		}
     }
     
     private class RegistrePerspectiveApplicator implements PerspectiveApplicator<ExpedientPeticioResourceEntity, ExpedientPeticioResource> {

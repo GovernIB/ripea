@@ -317,11 +317,11 @@ public class ExpedientResource extends NodeResource implements Serializable {
 	private Date arxiuIntentData;
 	private int arxiuReintents;
 	private boolean arxiuPropagat;
-
+	
 	// Registre
 	@Size(max = 4000)
 	private String registresImportats;
-
+	
 	// NTI
 	@NotNull
 	@Size(max = 5)
@@ -332,7 +332,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
 //	@NotNull
 	@Size(max = 9)
 	private String ntiOrgano;
-
+	
 	// Sistra
 	@Size(max = 16)
 	private String sistraBantelNum;
@@ -341,7 +341,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
 	private String sistraUnitatAdministrativa;
 	@Size(max = 100)
 	private String sistraClau;
-
+	
 	// Prioritat
 	private PrioritatEnumDto prioritat = PrioritatEnumDto.B_NORMAL;
 	@Size(max = 1024)
@@ -364,21 +364,14 @@ public class ExpedientResource extends NodeResource implements Serializable {
     @Transient private int numTasques;
     @Transient private int numAlert;
     @Transient private boolean disableOrganGestor = false;
-    
-    // Elecció seguir o no expedient
-    @Transient private SiNoEnumDto asignarSeguidor = SiNoEnumDto.NO;
-
-    @Transient
-    private ArxiuDetallDto arxiu;
-
+    @Transient private boolean asignarSeguidor = false;
+    @Transient private ArxiuDetallDto arxiu;
     @Transient private Date dataDarrerEnviament;
     @Transient private boolean potModificar;
     @Transient private boolean potModificarContingut;
-
     @Transient private List<ResourceReference<ExpedientResource, Long>> relacionatsPer;
     @Transient private List<ResourceReference<ExpedientResource, Long>> relacionatsAmb;
     @Transient private List<ResourceReference<DocumentResource, Long>> documentObligatorisAlTancar = new ArrayList<>();
-
     @Transient private boolean conteDocuments;
     @Transient private boolean conteDocumentsFirmats;
     @Transient private boolean conteDocumentsEnProcessDeFirma;

@@ -69,6 +69,14 @@ public class AcceptarAnotacioValidator implements ConstraintValidator<AcceptarAn
                         .disableDefaultConstraintViolation();
                 valid = false;
             }
+            if (resource.getOrganGestor() == null){
+                context
+                        .buildConstraintViolationWithTemplate("{javax.validation.constraints.NotNull.message}")
+                        .addPropertyNode(AcceptarAnotacioForm.Fields.organGestor)
+                        .addConstraintViolation()
+                        .disableDefaultConstraintViolation();
+                valid = false;
+            }
         }
 
         if (ExpedientPeticioAccioEnumDto.INCORPORAR.equals(resource.getAccio())){

@@ -136,7 +136,6 @@ public class ExpedientPeticioResource extends BaseAuditableResource<Long> {
         private ResourceReference<GrupResource, Long> grup;
     	private boolean associarInteressats = true;
     	private boolean agafarExpedient = true;
-    	@NotNull
     	private ResourceReference<OrganGestorResource, Long> organGestor;
         @NotNull
     	private List<Long> interessats;

@@ -817,8 +817,8 @@ const translationEs = {
                     cancel: "Cancelar envío",
                     title: "Detalles de la firma",
                     ok: "La firma ha sido cancelada correctamente",
-                    check: "¿Está seguro de que desea continuar con esta acción?",
-                    description: "Una vez eliminado, no se podrá recuperar",
+                    check: "Confirme la acción",
+                    description: "¿Seguro que desea cancelar la firma actualmente en proceso?",
                 },
                 cancel: {
                     label: "Cancelar envío",

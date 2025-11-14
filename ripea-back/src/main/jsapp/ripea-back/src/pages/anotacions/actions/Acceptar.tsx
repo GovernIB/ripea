@@ -23,9 +23,10 @@ const AcceptarTabExpedient = () => {
                 <GridFormField xs={12} name="prioritat" required/>
                 <GridFormField xs={12} name="prioritatMotiu" type={"textarea"} hidden={data?.prioritat == "B_NORMAL"} required/>
                 <GridFormField xs={12} name="organGestor"
-                               disabled={!data?.metaExpedient || data?.disableOrganGestor}
-                               readOnly={!data?.metaExpedient || data?.disableOrganGestor}
-                               required/>
+                            namedQueries={[`EXPEDIENT_FORM#${data?.metaExpedient?.id ?? 0}`]}
+                            disabled={!data?.metaExpedient || data?.disableOrganGestor}
+                            readOnly={!data?.metaExpedient || data?.disableOrganGestor}
+                            required/>
                 <GridFormField xs={6} name="sequencia" required disabled readOnly/>
                 <GridFormField xs={6} name="any" required/>
                 <GridFormField xs={12} name="grup"
@@ -35,7 +36,12 @@ const AcceptarTabExpedient = () => {
         }
         {data?.accio == "INCORPORAR" &&
             <>
-                <GridFormField xs={12} name="expedient" required/>
+                <GridFormField xs={12} name="expedient"
+                        filter={builder.and(
+                           builder.eq('metaExpedient.id', data?.metaExpedient?.id),
+						   builder.eq('esborrat', 0),
+                       )}                
+                required/>
                 <GridFormField xs={12} name="agafarExpedient"/>
             </>
         }

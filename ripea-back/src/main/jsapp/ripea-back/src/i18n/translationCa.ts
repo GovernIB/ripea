@@ -817,8 +817,8 @@ const translationCa = {
                     cancel: "Cancel·la enviament",
                     title: "Detalls de la firma",
                     ok: "La signatura ha estat cancel·lada correctament",
-                    check: "Està segur que vol continuar amb aquesta acció?",
-                    description: "Un cop esborrat no es podrà recuperar",
+                    check: "Confirmau l'acció",
+                    description: "Segur que voleu cancel·lar la firma actualment en procés?",
                 },
                 cancel: {
                     label: "Cancel·la enviament",

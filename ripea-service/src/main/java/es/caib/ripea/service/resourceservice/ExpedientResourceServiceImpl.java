@@ -23,8 +23,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import javax.annotation.PostConstruct;
-import javax.persistence.criteria.Join;
-import javax.persistence.criteria.JoinType;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.hibernate.Hibernate;
@@ -47,7 +45,6 @@ import es.caib.ripea.persistence.entity.MetaDocumentEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.entity.UsuariEntity;
-import es.caib.ripea.persistence.entity.resourceentity.ExpedientOrganPareResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.ExpedientResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.UsuariResourceEntity;
@@ -107,6 +104,7 @@ import es.caib.ripea.service.intf.dto.ImportacioDto;
 import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
 import es.caib.ripea.service.intf.dto.PermisosPerExpedientsDto;
 import es.caib.ripea.service.intf.dto.ResultatConsultaDto;
+import es.caib.ripea.service.intf.dto.SiNoEnumDto;
 import es.caib.ripea.service.intf.dto.TipusRegistreEnumDto;
 import es.caib.ripea.service.intf.model.ContingutResource;
 import es.caib.ripea.service.intf.model.DocumentResource;
@@ -124,7 +122,6 @@ import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.model.MetaExpedientOrganGestorResource;
 import es.caib.ripea.service.intf.model.MetaExpedientResource;
 import es.caib.ripea.service.intf.model.NodeResource.MassiveAction;
-import es.caib.ripea.service.intf.model.OrganGestorResource;
 import es.caib.ripea.service.intf.model.UsuariResource;
 import es.caib.ripea.service.intf.resourceservice.ExpedientResourceService;
 import es.caib.ripea.service.intf.utils.Utils;
@@ -585,7 +582,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 					configHelper.getRolActual(),
 					resource.getPrioritat(),
 					resource.getPrioritatMotiu(),
-					resource.getAsignarSeguidor());
+					resource.isAsignarSeguidor()?SiNoEnumDto.SI:SiNoEnumDto.NO);
 			
 			expedientHelper.arxiuPropagarExpedientAmbInteressatsNewTransaction(expedientId);
 			

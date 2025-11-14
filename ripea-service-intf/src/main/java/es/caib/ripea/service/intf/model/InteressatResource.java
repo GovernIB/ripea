@@ -187,12 +187,12 @@ public class InteressatResource extends BaseAuditableResource<Long> {
     
     @Transient
 	public String getCodiNom() {
-    	return Utils.getCodiNom(this.tipus, this.documentNum, this.nom, this.llinatge1, this.llinatge2, this.raoSocial, this.organCodi);
+    	return Utils.getCodiNom(this.tipus, this.documentNum, this.nom, this.llinatge1, this.llinatge2, this.raoSocial, this.organNom);
     }
 
     @Transient
 	public String getNomComplet() {
-    	return Utils.getNomComplet(this.tipus,this.nom, this.llinatge1, this.llinatge2, this.raoSocial, this.organCodi);
+    	return Utils.getNomComplet(this.tipus,this.nom, this.llinatge1, this.llinatge2, this.raoSocial, this.organNom);
 	}
     
     @Getter
