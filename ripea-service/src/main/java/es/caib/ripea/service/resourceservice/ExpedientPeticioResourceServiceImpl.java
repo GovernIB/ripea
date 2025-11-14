@@ -455,7 +455,7 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 							rolActual,
 							params.getPrioritat(),
 							params.getPrioritatMotiu(),
-							SiNoEnumDto.NO);
+							params.isSeguidor()?SiNoEnumDto.SI:SiNoEnumDto.NO);
 				} else {
 	                /**
 	                 * ExpedientServiceImpl.incorporar

@@ -177,6 +177,7 @@ public class ExpedientPeticioResource extends BaseAuditableResource<Long> {
         private Map<Long, String> annexos = new HashMap<>();
         @Transient @ResourceField(enumType = true)
         private String tipusDocument;
+        private boolean seguidor;
     }
     
     @Getter

@@ -28,6 +28,7 @@ const AcceptarTabExpedient = () => {
                 <GridFormField xs={12} name="grup"
                                namedQueries={[`BY_PROCEDIMENT#${data?.metaExpedient?.id ?? 0}`]}
                                hidden={!data?.grup && !data?.gestioAmbGrupsActiva} required/>
+				<GridFormField xs={12} name="seguidor"/>
             </>
         }
         {data?.accio == "INCORPORAR" &&

@@ -847,7 +847,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 						interessatsAccionsMap,
 						expedientPeticioAcceptarCommand.getPrioritat(),
 						expedientPeticioAcceptarCommand.getPrioritatMotiu(),
-						SiNoEnumDto.NO);
+						expedientPeticioAcceptarCommand.isSeguidor()?SiNoEnumDto.SI:SiNoEnumDto.NO);
 				processatOk = expedientDto.isProcessatOk();
 				expCreatArxiuOk = expedientDto.isExpCreatArxiuOk();
 				expedientId = expedientDto.getId();

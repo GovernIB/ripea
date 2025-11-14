@@ -40,6 +40,7 @@ public class ExpedientPeticioAcceptarCommand {
     
 	private Long grupId;
 	private boolean gestioAmbGrupsActiva;
+	private boolean seguidor;
 	
 	public void setNewExpedientTitol(String newExpedientTitol) {
 		this.newExpedientTitol = Utils.trim(newExpedientTitol);
