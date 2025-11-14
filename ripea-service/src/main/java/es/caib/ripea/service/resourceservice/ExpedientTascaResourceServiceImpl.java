@@ -123,7 +123,7 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
 	        }
 	
 	        List<Filter> result = filters.stream()
-	                .filter(f -> f!=null && !String.valueOf(f).isEmpty())
+                    .filter(Objects::nonNull)
 	                .collect(Collectors.toList());
 	
 	        applicationHelper.stopTimer(sample, "METRICS@Subsystem_Expedient.tasquesUserList", "resultado", "exito");

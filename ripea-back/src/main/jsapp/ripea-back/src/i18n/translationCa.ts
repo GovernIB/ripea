@@ -30,13 +30,14 @@ const translationCa = {
         consult: "Consulta",
         filter: "Filtrar",
         downloadSelected: "Descarrega contingut seleccionat",
-		processing: "Processant..."
+        relateSelected: "Relaciona contingut seleccionat",
+        processing: "Processant..."
     },
     enum: {
         rol: {
             IPA_SUPER: "Superusuari",
             IPA_ADMIN: "Administrador d'entitat",
-			IPA_ADMIN_LECTURA: "Administrador (lectura)",
+            IPA_ADMIN_LECTURA: "Administrador (lectura)",
             IPA_DISSENY: "Dissenyador d'òrgan gestor",
             IPA_ORGAN_ADMIN: "Administrador d'òrgan gestor",
             IPA_REVISIO: "Revisor de procediments",
@@ -127,23 +128,49 @@ const translationCa = {
             TRAVESIA: "Travessia",
             URBANIZACION: "Urbanització",
             VIA: "Via",
+		},
+        documentEnviamentEstat: {
+            PENDENT: "Pendent",
+            ENVIAT: "Enviat",
+            PROCESSAT: "Processat",
+            REBUTJAT: "Rebutjat",
+            CANCELAT: "Cancelat",
+        },
+        tipusSequencia: {
+            SERIE: "Serie",
+            PARALEL: "Paralela",
         },
     },
     navigate: {
         expedient: "Cercador d'expedients",
         expedientPeticio: "Cercador d'anotacions de registre",
         usuariTasca: "Tasques",
+        massiu: {
+            portafirmes: "Acció massiva: enviar documents al portafirmes",
+            firmasimpleweb: "Acció massiva: firmar documents des del navegador",
+            canviEstat: "Acció massiva: Canvi d'estat d'expedients",
+            tancament: "Acció massiva: Tancament d'expedients",
+            seguimentArxiuPendents: "Acció massiva: Custodiar elements pendents",
+            csv: "Acció massiva: copiar enllaç CSV",
+            definitiu: "Acció massiva: marcar documents com definitius",
+            canviPrioritats: "Acció massiva: Canvi de prioritat d'expedients",
+            expedientPeticioCanviEstatDistribucio: "Acció massiva: Actualitzar estat de les anotacions a Distribució",
+        },
     },
     page: {
         comment: {
             expedient: "Comentaris de l'expedient",
             tasca: "Comentaris de la tasca",
+            metaExpedient: "Comentaris del procediment",
         },
         contingut: {
             grid: {
                 nom: "Nom",
             },
             detalle: {
+                title: "Detalls del contingut",
+                nom: "Nom",
+                data: "Data",
                 numero: "Número",
                 titol: "Títol",
                 metaExpedient: "Tipus",
@@ -226,7 +253,13 @@ const translationCa = {
                 seguimentvf: {
                     label: "Seguiment Viafirma",
                     title: "Detalls de la firma",
-                }
+                },
+                custodiar: {
+                    label: "Custodiar",
+                },
+                replay: {
+                    label: "Recuperar",
+                },
             },
             history: {
                 create: "Creació",
@@ -636,6 +669,7 @@ const translationCa = {
                 errorNotificacio: "Aquest expedient té notificacions amb errors",
                 ambEnviamentsPendents: "Aquest expedient té enviaments pendents de Portasignatures",
                 ambNotificacionsPendents: "Aquest expedient té notificacions pendents",
+                canviEstat: "És necessari seleccionar un procediment per poder realitzar l'acció massiva",
             },
             modal: {
                 seguidors: "Seguidors de l’expedient",
@@ -754,11 +788,11 @@ const translationCa = {
                     title: "Importació de documents des del SGD",
                     ok: "Documents importats correctament",
                 },
-				importZip: {
-				    label: "Importar des de ZIP...",
-				    title: "Importació de documents des d'un ZIP",
-				    ok: "Documents importats correctament",
-				},
+                importZip: {
+                    label: "Importar des de ZIP...",
+                    title: "Importació de documents des d'un ZIP",
+                    ok: "Documents importats correctament",
+                },
                 detall: {
                     label: "Detalls",
                 },
@@ -895,6 +929,7 @@ const translationCa = {
                 folder: "En cas de no seleccionar una carpeta s'importaran els documents directament a l'expedient.",
                 scaned: "El procés d'escaneig s'ha realitzat amb èxit.",
                 view: "Nomes per PDF, ODT i DOCX",
+                portafirmes: "És necessari seleccionar un procediment i un tipus de document per poder realitzar l'acció massiva",
             },
             versio: {
                 title: "Versió",
@@ -931,7 +966,7 @@ const translationCa = {
             mensajeToolbar: {
                 permis: "No teniu permisos per gestionar els valors d'aquesta dada.",
                 maxDades: "Aquest tipus de dada només permet indicar un únic valor.",
-            }, 
+            },
             action: {
                 new: {
                     label: "Afegir valor per la dada",
@@ -1106,6 +1141,8 @@ const translationCa = {
                 prioritat: "Prioritat",
                 documentTipusNom: "Tipus de document",
                 fluxTipus: "Tipus de flux",
+                responsables: "Responsables",
+                sequenciaTipus: "Tipus sequencia firma",
                 portafirmesId: "ID Portafirmes",
             },
         },
@@ -1134,6 +1171,74 @@ const translationCa = {
                 cancelat: "S'ha cancelat la firma",
             },
         },
+        grup: {
+            title: "Grup",
+            action: {
+                new: {
+                    ok: "Grup '{{data.codi}}' creat correctament",
+                },
+                update: {
+                    ok: "Grup '{{data.codi}}' modificat correctament",
+                },
+                delete: {
+                    ok: "Grup '{{data.codi}}' esborrat correctament",
+                },
+            },
+        },
+        organGestor: {
+            title: "Òrgan Gestor",
+            action: {
+                update: {
+                    ok: "Òrgan Gestor '{{data.codi}}' esborrat correctament",
+                },
+            },
+        },
+        tipusDocumental: {
+            title: "Tipus documental",
+            action: {
+                new: {
+                    ok: "Tipus documental '{{data.codi}}' creat correctament",
+                },
+                update: {
+                    ok: "Tipus documental '{{data.codi}}' modificat correctament",
+                },
+                delete: {
+                    ok: "Tipus documental '{{data.codi}}' esborrat correctament",
+                },
+            },
+        },
+        permision: {
+            title: "Permisos",
+            grid: {
+                organGestor: "Organ gestor",
+                principal: "Tipus",
+                sid: "Principal",
+                create: "Consulta",
+                read: "Creació",
+                write: "Modificació",
+                delete: "Eliminació",
+                estadistic: "Estadístiques",
+            },
+            tabs: {
+                expedient: "Gestió d'expedients",
+                admin: "Administració i disseny",
+            },
+            action: {
+                new: {
+                    title: "Crear nou permís",
+                    ok: "El permís per '{{data.principal}} {{data.sid}}' s'ha creat correctament",
+                },
+                update: {
+                    title: "Modificar permís",
+                    ok: "El permís per '{{data.principal}} {{data.sid}}' s'ha modificat correctament",
+                },
+                delete: {
+                    check: "Està segur que vol continuar amb aquesta acció?",
+                    description: "Un cop esborrada no es podrà recuperar",
+                    ok: "El permís per '{{data.principal}} {{data.sid}}' s'ha esborrat correctament",
+                },
+            },
+        },
         user: {
             options: {
                 perfil: "El meu perfil",
@@ -1159,9 +1264,11 @@ const translationCa = {
                 backVersio: "Interfície clàssica",
 
                 anotacions: "Anotacions",
-                procediments: "Procediments",
+                procediments: "Gestió de procediments",
+                procedimentPermis: "Permisos del procediment: {{nom}}",
                 procedimentsTitle: "L'entitat té procediments amb òrgans gestors no actualitzats",
                 grups: "Grups",
+                grupPermis: "Permisos del grup",
                 revisar: "Revisió de procediments",
                 tasca: "Tasques",
                 flux: "Fluxos de firma",
@@ -1180,6 +1287,7 @@ const translationCa = {
                 nti: "Tipus documentals NTI",
                 dominis: "Dominis",
                 organs: "Òrgans gestors",
+                organPermis: "Permisos de l'òrgan gestor: {{nom}}",
                 url: "URLs d'instrucció",
                 permisos: "Permisos de l'entitat"
             },

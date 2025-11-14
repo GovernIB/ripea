@@ -218,6 +218,7 @@ import es.caib.ripea.service.intf.dto.config.ConfigDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.exception.SistemaExternException;
 import es.caib.ripea.service.intf.service.AplicacioService;
+import es.caib.ripea.service.intf.service.DocumentService;
 import es.caib.ripea.service.intf.utils.Utils;
 import io.micrometer.core.instrument.Timer;
 
@@ -266,8 +267,8 @@ public class PluginHelper {
 	@Autowired private ContingutHelper contingutHelper;
 	@Autowired private DocumentNotificacioHelper documentNotificacioHelper;
 	@Autowired private ApplicationHelper applicationHelper;
-	@Autowired private MessageHelper messageHelper;
-	
+	@Autowired private DocumentService documentService;
+	@Autowired private MessageHelper messageHelper;	
 	@Autowired private DocumentEnviamentInteressatRepository documentEnviamentInteressatRepository;
 	@Autowired private ExpedientPeticioRepository expedientPeticioRepository;
 	@Autowired private FluxFirmaUsuariRepository fluxFirmaUsuariRepository;
@@ -5433,13 +5434,25 @@ public class PluginHelper {
 							documentEnviamentInteressatEntity,
 							metaDocument,
 							resposta);
-					documentHelper.crearDocument(
+					document = documentHelper.crearDocument(
 							null,
 							document,
 							notificacio.getDocument().getPare(),
 							true,
 							false,
 							true);
+					
+					if (! document.isAmbFirma()) {
+						try {
+							documentService.documentActualitzarEstat(
+									document.getEntitat().getId(),
+									document.getId(),
+									DocumentEstatEnumDto.DEFINITIU);
+						} catch (Exception e) {
+							logger.error("Hi ha hagut un error actualitzant l'estat de la certificació {} a definitiu. Error: {}", document.getFitxerNom(), e.getMessage());
+							e.printStackTrace();
+						}
+					}
 				}
 
 			} else {

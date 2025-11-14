@@ -41,6 +41,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Inheritance(strategy = InheritanceType.JOINED)
+
 public abstract class ContingutResourceEntity<R> extends BaseAuditableEntity<R> implements ReorderableEntity<Long> {
 
 	@Column(name = "nom", length = 256, nullable = false)

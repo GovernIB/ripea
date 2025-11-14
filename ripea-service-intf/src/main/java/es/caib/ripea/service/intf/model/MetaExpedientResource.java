@@ -1,10 +1,14 @@
 package es.caib.ripea.service.intf.model;
 
+import java.io.Serializable;
 import java.util.List;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
+import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
+import es.caib.ripea.service.intf.dto.MetaExpedientAmbitEnumDto;
 import org.springframework.data.annotation.Transient;
 
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
@@ -28,9 +32,22 @@ import lombok.experimental.FieldNameConstants;
 @NoArgsConstructor
 @ResourceConfig(
 		quickFilterFields = { "codi", "nom" },
-		descriptionField = "nomClassificacio"
+		descriptionField = "nomClassificacio",
+        artifacts = {
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.FILTER,
+                        code = MetaExpedientResource.FILTER_REVISIO_CODE,
+                        formClass = MetaExpedientResource.GestioRevisioFormFilter.class),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.FILTER,
+                        code = MetaExpedientResource.FILTER_GESTIO_CODE,
+                        formClass = MetaExpedientResource.GestioRevisioFormFilter.class),
+        }
 )
 public class MetaExpedientResource extends MetaNodeResource {
+
+    public static final String FILTER_REVISIO_CODE = "FILTER_REVISIO";
+    public static final String FILTER_GESTIO_CODE = "FILTER_GESTIO";
 
 	@NotNull
 	@Size(max = 64)
@@ -45,7 +62,6 @@ public class MetaExpedientResource extends MetaNodeResource {
 	@Size(max = 64)
 	private String codiPropi;
 	@NotNull
-	@Size(max = 3)
 	private TipusClassificacioEnumDto tipusClassificacio;
 	@NotNull
 	@Size(max = 30)
@@ -59,11 +75,9 @@ public class MetaExpedientResource extends MetaNodeResource {
 	private boolean permetMetadocsGenerals;
 	private boolean gestioAmbGrupsActiva;
 	private boolean permisDirecte = false;
-	@Size(max = 8)
 	private MetaExpedientRevisioEstatEnumDto revisioEstat;
 	@Size(max = 1024)
 	private String revisioComentari;
-	@Size(max = 10)
 	private CrearReglaDistribucioEstatEnumDto crearReglaDistribucioEstat;
 	@Size(max = 1024)
 	private String crearReglaDistribucioError;
@@ -75,10 +89,34 @@ public class MetaExpedientResource extends MetaNodeResource {
 	private ResourceReference<OrganGestorResource, Long> organGestor;
 	private ResourceReference<GrupResource, Long> grupPerDefecte;
 
+    @Transient int numComentaris;
+
 	@Transient private List<ResourceReference<ExpedientEstatResource, Long>> estats;
 	@Transient private List<ResourceReference<MetaExpedientOrganGestorResource, Long>> metaExpedientOrganGestors;
 
+    public boolean isComu() {
+        if (organGestor == null) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public String getNomClassificacio() {
         return nom + " (" + classificacio +")";
+    }
+
+    @Getter
+    @Setter
+    public static class GestioRevisioFormFilter implements Serializable {
+        private String codi;
+        private String classificacio;
+        private String nom;
+        private MetaExpedientRevisioEstatEnumDto revisioEstat;
+        private ResourceReference<OrganGestorResource, Long> organGestor;
+
+        private Boolean actiu;
+        private MetaExpedientAmbitEnumDto ambit;
+        private boolean permisDirecte;
     }
 }

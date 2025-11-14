@@ -30,13 +30,14 @@ const translationEs = {
         consult: "Consultar",
         filter: "Filtrar",
         downloadSelected: "Descargar contenido seleccionado",
-		processing: "Procesando..."
+        relateSelected: "Relacionar contenido seleccionado",
+        processing: "Procesando...",
     },
     enum: {
         rol: {
             IPA_SUPER: "Superusuario",
             IPA_ADMIN: "Administrador de entidad",
-			IPA_ADMIN_LECTURA: "Administrador (lectura)",
+            IPA_ADMIN_LECTURA: "Administrador (lectura)",
             IPA_DISSENY: "Diseñador de Órgano gestor",
             IPA_ORGAN_ADMIN: "Administrador de Órgano gestor",
             IPA_REVISIO: "Revisor de procedimientos",
@@ -53,12 +54,12 @@ const translationEs = {
             A_BAIXA: "Baja",
             BAIXA: "Baja",
             NORMAL: "Normal",
-            ALTA: "Alta",            
+            ALTA: "Alta",
         },
         fluxTipus: {
             SIMPLE: "Simple",
             PORTAFIB: "Portafib",
-        },        
+        },
         estat: {
             TANCAT: "Cerrado",
             OBERT: "Abierto",
@@ -67,7 +68,7 @@ const translationEs = {
             INICIAT: "Iniciado",
             FIRMAT: "Firmado",
             REBUTJAT: "Rechazado",
-            PARCIAL: "Parcial",            
+            PARCIAL: "Parcial",
         },
         origen: {
             O0: "Ciudadano",
@@ -127,23 +128,49 @@ const translationEs = {
             TRAVESIA: "Travesía",
             URBANIZACION: "Urbanización",
             VIA: "Vía",
+		},
+        documentEnviamentEstat: {
+            PENDENT: "Pendiente",
+            ENVIAT: "Enviado",
+            PROCESSAT: "Procesado",
+            REBUTJAT: "Rechazado",
+            CANCELAT: "Cancelado",
+        },
+        tipusSequencia: {
+            SERIE: "Serie",
+            PARALEL: "Paralela",
         },
     },
     navigate: {
         expedient: "Buscador de expedientes",
         expedientPeticio: "Buscador de anotaciones de registro",
         usuariTasca: "Tareas",
+        massiu: {
+            portafirmes: "Acción masiva: enviar documentos al portafirmas",
+            firmasimpleweb: "Acción masiva: firmar documentos desde el navegador",
+            canviEstat: "Acción masiva: Cambio de estado de expedientes",
+            tancament: "Acción masiva: Cierre de expedientes",
+            seguimentArxiuPendents: "Acción masiva: Custodiar elementos pendientes",
+            csv: "Acción masiva: copiar enlace CSV",
+            definitiu: "Acción masiva: marcar documentos como definitivos",
+            canviPrioritats: "Acción masiva: Cambio de prioridad de expedientes",
+            expedientPeticioCanviEstatDistribucio: "Acción masiva: Actualizar estado de las anotaciones en Distribución",
+        },
     },
     page: {
         comment: {
             expedient: "Comentarios del expediente",
             tasca: "Comentarios de la tarea",
+            metaExpedient: "Comentarios del procedimiento",
         },
         contingut: {
             grid: {
                 nom: "Nombre",
             },
             detalle: {
+                title: "Content details",
+                nom: "Name",
+                data: "Date",
                 numero: "Numero",
                 titol: "Titulo",
                 metaExpedient: "Tipo",
@@ -222,11 +249,17 @@ const translationEs = {
                 seguimentPortafirmes: {
                     label: "Seguimiento Portafirmas",
                     title: "Seguimiento Portafirmas",
-                }, 
+                },
                 seguimentvf: {
                     label: "Seguiment Viafirma",
                     title: "Detalles de la firma",
-                }                              
+                },
+                custodiar: {
+                    label: "Custodiar",
+                },
+                replay: {
+                    label: "Recover",
+                },
             },
             history: {
                 create: "Creación",
@@ -576,7 +609,7 @@ const translationEs = {
                 exportDocs: {
                     label: "Exportar los documentos de los expedientes seleccionados",
                     ok: "Los documentos se han exportado correctamente",
-                },                
+                },
                 export: {
                     label: "Exportar los documentos...",
                     title: "Exportar documentos",
@@ -636,6 +669,7 @@ const translationEs = {
                 errorNotificacio: "Este expediente tiene notificaciones con errores",
                 ambEnviamentsPendents: "Este expediente tiene envíos pendientes de Portafirmas",
                 ambNotificacionsPendents: "Este expediente tiene notificaciones pendientes",
+                canviEstat: "Es necesario seleccionar un procedimiento para poder realizar la acción masiva",
             },
             modal: {
                 seguidors: "Seguidores del expediente",
@@ -754,11 +788,11 @@ const translationEs = {
                     title: "Importación de documentos desde el SGD",
                     ok: "Documentos importados correctamente",
                 },
-				importZip: {
-				    label: "Importar desde ZIP...",
-				    title: "Importación de documentos desde un ZIP",
-				    ok: "Documentos importados correctamente",
-				},
+                importZip: {
+                    label: "Importar desde ZIP...",
+                    title: "Importación de documentos desde un ZIP",
+                    ok: "Documentos importados correctamente",
+                },
                 detall: {
                     label: "Detalles",
                 },
@@ -895,6 +929,7 @@ const translationEs = {
                 folder: "En caso de no seleccionar una carpeta se importarán los documentos directamente en el expediente.",
                 scaned: "El proceso de escaneo se ha realizado con éxito.",
                 view: "Solo para PDF, ODT y DOCX",
+                portafirmes: "Es necesario seleccionar un procedimiento y un tipo de documento para poder realizar la acción masiva",
             },
             versio: {
                 title: "Versión",
@@ -931,7 +966,7 @@ const translationEs = {
             mensajeToolbar: {
                 permis: "No tienes permiso para gestionar los valores de este dato.",
                 maxDades: "Este tipo de dato solo permite indicar un único valor.",
-            },             
+            },
             action: {
                 new: {
                     label: "Añadir valor para el dato",
@@ -1106,6 +1141,8 @@ const translationEs = {
                 prioritat: "Prioridad",
                 documentTipusNom: "Tipo de documento",
                 fluxTipus: "Tipo de flujo",
+                responsables: "Responsables",
+                sequenciaTipus: "Tipo de secuencia de firma",
                 portafirmesId: "ID Portafirmes",
             },
         },
@@ -1134,6 +1171,74 @@ const translationEs = {
                 cancelat: "Se ha cancelado la firma",
             },
         },
+        grup: {
+            title: "Grupo",
+            action: {
+                new: {
+                    ok: "Grupo '{{data.codi}}' creado correctamente",
+                },
+                update: {
+                    ok: "Grupo '{{data.codi}}' modificado correctamente",
+                },
+                delete: {
+                    ok: "Grupo '{{data.codi}}' eliminado correctamente",
+                },
+            },
+        },
+        organGestor: {
+            title: "Órgano Gestor",
+            action: {
+                update: {
+                    ok: "Órgano Gestor '{{data.codi}}' eliminado correctamente",
+                },
+            },
+        },
+        tipusDocumental: {
+            title: "Tipo documental",
+            action: {
+                new: {
+                    ok: "Tipo documental '{{data.codi}}' creado correctamente",
+                },
+                update: {
+                    ok: "Tipo documental '{{data.codi}}' modificado correctamente",
+                },
+                delete: {
+                    ok: "Tipo documental '{{data.codi}}' eliminado correctamente",
+                },
+            },
+        },
+        permision: {
+            title: "Permisos",
+            grid: {
+                organGestor: "Órgano gestor",
+                principal: "Tipo",
+                sid: "Principal",
+                create: "Creación",
+                read: "Consulta",
+                write: "Modificación",
+                delete: "Eliminación",
+                estadistic: "Estadísticas",
+            },
+            tabs: {
+                expedient: "Gestión de expedientes",
+                admin: "Administración y diseño",
+            },
+            action: {
+                new: {
+                    title: "Crear nuevo permiso",
+                    ok: "El permiso para '{{data.principal}} {{data.sid}}' se ha creado correctamente",
+                },
+                update: {
+                    title: "Modificar permiso",
+                    ok: "El permiso para '{{data.principal}} {{data.sid}}' se ha modificado correctamente",
+                },
+                delete: {
+                    check: "¿Está seguro de que desea continuar con esta acción?",
+                    description: "Una vez eliminada, no se podrá recuperar",
+                    ok: "El permiso para '{{data.principal}} {{data.sid}}' se ha eliminado correctamente",
+                },
+            },
+        },
         user: {
             options: {
                 perfil: "Mi perfil",
@@ -1159,7 +1264,8 @@ const translationEs = {
                 backVersio: "Interfaz clásica",
 
                 anotacions: "Anotaciones",
-                procediments: "Procedimientos",
+                procediments: "Gestión de procedimientos",
+                procedimentPermis: "Permisos del procedimiento: {{nom}}",
                 procedimentsTitle: "La entidad tiene procedimientos con órganos gestores no actualizados",
                 grups: "Grupos",
                 revisar: "Revisión de procedimientos",

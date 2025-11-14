@@ -1147,9 +1147,7 @@ public class ContingutHelper {
 			logger.debug("[CERT] El fitxer s'ha generat correctament amb nom: " + dto.getFitxerNom());
 
 //			## Comprovar si la certificació està firmada
-			if (isCertificacioAmbFirma(resposta.getCertificacioContingut())) {
-				dto.setAmbFirma(true);
-			}
+			validarFirmaCertificacio(resposta, dto);
 		}
 		dto.setVersioCount(0);
 		dto.setDataCaptura(new Date());
@@ -1168,6 +1166,26 @@ public class ContingutHelper {
 				MetaDocumentDto.class);
 		dto.setMetaNode(metaNode);
 		return dto;
+	}
+
+	private void validarFirmaCertificacio(RespostaConsultaEstatEnviament resposta, DocumentDto dto) {
+		try {
+			if (isCertificacioAmbFirma(resposta.getCertificacioContingut())) {
+				pluginHelper.validaSignaturaObtenirFirmes(
+						dto.getFitxerNom(), 
+						resposta.getCertificacioContingut(), 
+						null, 
+						resposta.getCertificacioTipusMime(),
+						true);
+				
+				
+				dto.setAmbFirma(true);
+			}
+		} catch (Exception e) {
+			dto.setAmbFirma(false);
+			logger.error("Hi ha hagut un error validant la firma de la certificació {}, error: {} ", dto.getFitxerNom(), e.getMessage());
+			e.printStackTrace();
+		}
 	}
 
 	public NodeEntity comprovarNodeDinsExpedientModificable(
@@ -2217,7 +2235,7 @@ public class ContingutHelper {
 					desti.getArxiuUuid());
 			copia.setArxiuUuid(contingutArxiu.getIdentificador());
 			DocumentEntity copiaDoc = (DocumentEntity)copia;
-			copiaDoc.setArxiuEstat(documentHelper.getArxiuEstat(copiaDoc.getDocumentFirmaTipus(), null));
+			copiaDoc.setArxiuEstat(documentHelper.getArxiuEstat(copiaDoc.getDocumentFirmaTipus(), null, copiaDoc.isFirmaParcial()));
 		} else if (contingut instanceof CarpetaEntity) {
 			ContingutArxiu contingutArxiu = pluginHelper.arxiuCarpetaCopiar(
 					(CarpetaEntity)contingut,

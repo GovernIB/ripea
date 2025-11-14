@@ -3,13 +3,14 @@ import {useTranslation} from "react-i18next";
 import {useNavigate, useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
 import Load from "../../../components/Load.tsx";
-import {Button, Grid2 as Grid, Icon, Typography, Box, Card, CardHeader, CardContent} from "@mui/material";
+import {Button, Grid2 as Grid, Icon, Typography, Box} from "@mui/material";
 import {icons} from "../../user/UserHeadToolbar.tsx";
 import {ExpedientInfo} from "../../expedient/details/Expedient.tsx";
 import DocumentsGrid from "../../contingut/DocumentsGrid.tsx";
 import {TascaComment} from "../../CommentDialog.tsx";
 import {useActions} from "./TascaActions.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
+import {CardPage} from "../../../components/CardData.tsx";
 
 const expedientPerspectives = ['COUNT', 'ESTAT', 'RELACIONAT', 'AMB_PINBAL', "META_EXPEDIENT"]
 const expedientNamedQueries = ['WITHOUT_PERMISION_CHECK'];
@@ -45,7 +46,7 @@ const Tasca = () => {
         }
     },[apiTascaIsReady])
 
-    const headerMain = <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+    const headerMain = <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Box sx={{ display: 'flex', alignItems: 'center'}}>
             <Icon sx={{ fontSize: '2rem' }}>{icons.tasca}</Icon>
             <Typography variant="h4" sx={{ display: 'flex' }}>{tasca?.metaExpedientTasca?.description}</Typography>
@@ -101,23 +102,16 @@ const Tasca = () => {
 
     return <GridPage disableMargins>
         <Load value={expedient && tasca} noEffect>
-            <Card>
-                <CardHeader title={headerMain} sx={{
-                    backgroundColor: '#f5f5f5',
-                    borderTop: '1px solid #e3e3e3',
-                    borderBottom: '1px solid #e3e3e3',
-                }} />
-                <CardContent>
-                    <Grid container spacing={2}>
-                        <Grid size={3}>
-                            <ExpedientInfo title={tasca?.expedient?.description} entity={expedient} xs={3} readOnly/>
-                        </Grid>
-                        <Grid size={9}>
-                            <DocumentsGrid entity={expedient}/>
-                        </Grid>
+            <CardPage header={headerMain}>
+                <Grid container spacing={2}>
+                    <Grid size={3}>
+                        <ExpedientInfo title={tasca?.expedient?.description} entity={expedient} readOnly/>
                     </Grid>
-                </CardContent>
-            </Card>
+                    <Grid size={9}>
+                        <DocumentsGrid entity={expedient}/>
+                    </Grid>
+                </Grid>
+            </CardPage>
         </Load>
     </GridPage>
 }

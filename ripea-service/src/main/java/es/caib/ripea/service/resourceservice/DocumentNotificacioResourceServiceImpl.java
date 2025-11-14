@@ -5,10 +5,13 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
 import es.caib.ripea.service.helper.*;
+import es.caib.ripea.service.intf.base.model.ResourceReference;
+import es.caib.ripea.service.intf.model.InteressatResource;
 import org.springframework.stereotype.Service;
 
 import es.caib.ripea.persistence.entity.DocumentEntity;
@@ -64,6 +67,12 @@ public class DocumentNotificacioResourceServiceImpl extends BaseMutableResourceS
     protected void afterConversion(DocumentNotificacioResourceEntity entity, DocumentNotificacioResource resource) {
         resource.setFitxerNom(entity.getDocument().getFitxerNom());
         resource.setHasDocumentInteressats(!entity.getDocumentInteressats().isEmpty());
+        resource.setProcediment(ResourceReference.toResourceReference(
+                entity.getExpedient().getMetaExpedient().getId(),
+                entity.getExpedient().getMetaExpedient().getNomClassificacio()));
+        resource.setDestinatari(
+                objectMappingHelper.newInstanceMap(entity.getDocumentInteressats().iterator().next().getInteressat(), InteressatResource.class)
+        );
     }
 
     @Override

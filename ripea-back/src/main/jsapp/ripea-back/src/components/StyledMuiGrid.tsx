@@ -35,6 +35,8 @@ type StyledMuiGridProps = MuiDataGridProps & {
     formInitOnChange?:boolean,
     rowExpansionChange?: ( params:any, event:any, details:any ) => void,
     onRefresh?: () => any,
+    disabledMassiveDefSelector?: boolean,
+    hiddenMassiveDefSelector?: boolean,
 }
 
 const StyledMuiGrid = (props:StyledMuiGridProps) => {
@@ -69,6 +71,8 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
         toolbarHideQuickFilter = true,
         rowExpansionChange,
         onRefresh,
+        disabledMassiveDefSelector = false,
+        hiddenMassiveDefSelector = false,
         ...others
     } = props
     const [gridRows, setGridRows] = useState<any[]>([]);
@@ -94,6 +98,8 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
                 setSelectedRows={setGridSelectedRows}
                 filter={filter}
                 actions={toolbarMassiveActions ?? []}
+                disabledDefSelector={disabledMassiveDefSelector}
+                hiddenDefSelector={hiddenMassiveDefSelector}
             />,
             hidden: !toolbarMassiveActions || readOnly,
         },
@@ -199,7 +205,10 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
             // autoHeight
             key={user?.conf?.numElementsPagina}
             paginationActive
-
+            titleDisabled
+            disableColumnMenu
+            disableColumnSorting={!!staticSortModel}
+            staticSortModel={staticSortModel}
             {...others}
             apiRef={apiRef}
             datagridApiRef={datagridApiRef}
@@ -214,11 +223,6 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
                 setSelectedRows([...newSelection]);
                 onRowSelectionModelChange?.(newSelection, details);
             }}
-
-            titleDisabled
-            disableColumnMenu
-            disableColumnSorting={!!staticSortModel}
-            staticSortModel={staticSortModel}
 
             selectionActive={selectionActive || (!!toolbarMassiveActions && !readOnly)}
             checkboxSelection={selectionActive || (!!toolbarMassiveActions && !readOnly)}

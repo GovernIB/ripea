@@ -43,6 +43,7 @@ const FileTabForm = () => {
         <GridFormField xs={6} name="hasFirma" hidden={!data.adjunt} disabled={data?.deteccioFirmaAutomaticaActiva && data?.documentFirmaTipus == "FIRMA_ADJUNTA"} />
         <GridFormField xs={6} name="documentFirmaTipus" hidden={!data?.adjunt || !data?.hasFirma} disabled={data?.deteccioFirmaAutomaticaActiva} required/>
         <FileFormField xs={12} name="firmaAdjunt" hidden={!data?.hasFirma || data?.documentFirmaTipus != "FIRMA_SEPARADA"} required/>
+		<GridFormField xs={6} name="firmaParcial" hidden={!data?.hasFirma} />
     </Grid>
 }
 
@@ -51,7 +52,15 @@ const DocumentsGridForm = () => {
     const { data, apiRef, id } = useFormContext();
 	const { value: user } = useUserSession();
     const { artifactAction: apiAction } = useResourceApiService('documentResource');
-
+	
+	const isPermesModificarCustodiatsVar = () => {
+	    return user?.sessionScope?.isPermesModificarCustodiats && isInOptions(data?.estat, 'CUSTODIAT', 'FIRMAT', 'FIRMA_PARCIAL', 'DEFINITIU')
+	}
+	
+	const isInOptions = (value:string, ...options:string[]) => {
+	    return options.includes(value)
+	}
+	
     const actualizarDatos = () => {
         if (data?.adjunt && data.pluginSummarizeActiu) {
             apiAction(undefined, { code: "RESUM_IA", data: { adjunt: data?.adjunt } })
@@ -119,9 +128,14 @@ const DocumentsGridForm = () => {
                         filter={carpetaFilter}
                         hidden={!user?.sessionScope?.isCreacioCarpetesActiva}/>
         }
-        <Grid item xs={12}>
-            <TabComponent tabs={tabs} variant="scrollable"/>
-        </Grid>
+		{!isPermesModificarCustodiatsVar() &&	
+	        <Grid item xs={12}>
+	            <TabComponent
+	                tabs={tabs}
+	                variant="scrollable"
+	            />
+	        </Grid>
+		}
     </Grid>
 }
 export default DocumentsGridForm;

@@ -255,7 +255,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 	public ResourceArtifact artifactGetOne(ResourceArtifactType type, String code) throws ArtifactNotFoundException {
 		log.debug("Querying artifact form class (type={}, code={})", type, code);
 		if (type == ResourceArtifactType.PERSPECTIVE) {
-			PerspectiveApplicator<?, ?> perspectiveApplicator = perspectiveApplicatorMap.get(code);
+			PerspectiveApplicator<?, ?> perspectiveApplicator = getPerspectiveApplicator(code);
 			if (perspectiveApplicator != null) {
 				return new ResourceArtifact(
 						ResourceArtifactType.PERSPECTIVE,
@@ -485,12 +485,16 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		return entities.stream().map(this::entityToResource).collect(Collectors.toList());
 	}
 
+    protected PerspectiveApplicator<E, R> getPerspectiveApplicator(String code) {
+        return perspectiveApplicatorMap.get(code);
+    }
+
 	protected void applyPerspectives(
 			List<E> entities,
 			List<R> resources,
 			String[] perspectives) throws ArtifactNotFoundException {
 		Arrays.stream(perspectives).forEach(p -> {
-			PerspectiveApplicator<E, R> perspectiveApplicator = perspectiveApplicatorMap.get(p);
+			PerspectiveApplicator<E, R> perspectiveApplicator = getPerspectiveApplicator(p);
 			if (perspectiveApplicator != null) {
 				boolean modified = perspectiveApplicator.applyMultiple(p, entities, resources);
 				if (!modified) {
@@ -512,7 +516,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 			R resource,
 			String[] perspectives) {
 		Arrays.stream(perspectives).forEach(p -> {
-			PerspectiveApplicator<E, R> perspectiveApplicator = perspectiveApplicatorMap.get(p);
+			PerspectiveApplicator<E, R> perspectiveApplicator = getPerspectiveApplicator(p);
 			if (perspectiveApplicator != null) {
 				perspectiveApplicator.applySingle(p, entity, resource);
 			} else {

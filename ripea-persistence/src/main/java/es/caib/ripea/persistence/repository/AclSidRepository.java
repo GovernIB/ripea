@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public interface AclSidRepository extends JpaRepository<AclSidEntity, Long> {
@@ -37,4 +38,6 @@ public interface AclSidRepository extends JpaRepository<AclSidEntity, Long> {
 	@Modifying
  	@Query(value = "UPDATE IPA_ACL_SID SET SID = :codiNou WHERE SID = :codiAntic AND PRINCIPAL = 1", nativeQuery = true)
 	public int updateUsuariPermis(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
+
+    Optional<AclSidEntity> findByPrincipalAndSid(boolean principal, String sid);
 }

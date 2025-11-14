@@ -11,16 +11,12 @@ import com.turkraft.springfilter.parser.Filter;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientResourceEntity;
-import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.MetaExpedientHelper;
-import es.caib.ripea.service.helper.OrganGestorCacheHelper;
-import es.caib.ripea.service.helper.PermisosHelper;
 import es.caib.ripea.service.intf.model.EntitatResource;
 import es.caib.ripea.service.intf.model.MetaExpedientResource;
-import es.caib.ripea.service.intf.model.OrganGestorResource;
 import es.caib.ripea.service.intf.resourceservice.MetaExpedientResourceService;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.permission.ExtendedPermission;
@@ -37,14 +33,10 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService<MetaExpedientResource, Long, MetaExpedientResourceEntity> implements MetaExpedientResourceService {
 
-	private final OrganGestorRepository organGestorRepository;
-	
 	private final ConfigHelper configHelper;
-	private final PermisosHelper permisosHelper;
 	private final MetaExpedientHelper metaExpedientHelper;
 	private final EntityComprovarHelper entityComprovarHelper;
-	private final OrganGestorCacheHelper organGestorCacheHelper;
-	
+
     @Override
     protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
 
@@ -180,5 +172,10 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 //        	filtreResultat = filtreBase;
 //        	
 //        }
+    }
+
+    @Override
+    protected void afterConversion(MetaExpedientResourceEntity entity, MetaExpedientResource resource) {
+        resource.setNumComentaris(entity.getComentaris().size());
     }
 }

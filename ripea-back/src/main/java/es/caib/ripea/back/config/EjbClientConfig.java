@@ -3,6 +3,7 @@
  */
 package es.caib.ripea.back.config;
 
+import es.caib.ripea.service.intf.resourceservice.*;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWarDeployment;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,6 +12,7 @@ import org.springframework.ejb.access.LocalStatelessSessionProxyFactoryBean;
 import es.caib.ripea.service.intf.base.service.PermissionEvaluatorService;
 import es.caib.ripea.service.intf.base.service.ResourceApiService;
 import es.caib.ripea.service.intf.config.BaseConfig;
+
 import es.caib.ripea.service.intf.resourceservice.AlertaResourceService;
 import es.caib.ripea.service.intf.resourceservice.CarpetaResourceService;
 import es.caib.ripea.service.intf.resourceservice.ContingutLogResourceService;
@@ -375,6 +377,12 @@ public class EjbClientConfig {
 	public LocalStatelessSessionProxyFactoryBean metaExpedientResourceService() {
 		return getLocalEjbFactoyBean(MetaExpedientResourceService.class);
 	}
+
+	@Bean
+	@ConditionalOnWarDeployment
+	public LocalStatelessSessionProxyFactoryBean metaExpedientComentariResourceService() {
+		return getLocalEjbFactoyBean(MetaExpedientComentariResourceService.class);
+	}
 	
 	@Bean
 	@ConditionalOnWarDeployment
@@ -495,6 +503,42 @@ public class EjbClientConfig {
 	public LocalStatelessSessionProxyFactoryBean alertaResourceServiceEjb() {
 		return getLocalEjbFactoyBean(AlertaResourceService.class);
 	}
+
+    @Bean
+    @ConditionalOnWarDeployment
+    public LocalStatelessSessionProxyFactoryBean consultaPinbalResourceServiceEjb() {
+        return getLocalEjbFactoyBean(ConsultaPinbalResourceService.class);
+    }
+
+    @Bean
+    @ConditionalOnWarDeployment
+    public LocalStatelessSessionProxyFactoryBean pinbalServeiResourceServiceEjb() {
+        return getLocalEjbFactoyBean(PinbalServeiResourceService.class);
+    }
+
+    @Bean
+    @ConditionalOnWarDeployment
+    public LocalStatelessSessionProxyFactoryBean contingutResourceServiceEjb() {
+        return getLocalEjbFactoyBean(ContingutResourceService.class);
+    }
+
+    @Bean
+    @ConditionalOnWarDeployment
+    public LocalStatelessSessionProxyFactoryBean tipusDocumentalResourceServiceEjb() {
+        return getLocalEjbFactoyBean(TipusDocumentalResourceService.class);
+    }
+
+    @Bean
+    @ConditionalOnWarDeployment
+    public LocalStatelessSessionProxyFactoryBean aclSidResourceServiceEjb() {
+        return getLocalEjbFactoyBean(AclSidResourceService.class);
+    }
+
+    @Bean
+    @ConditionalOnWarDeployment
+    public LocalStatelessSessionProxyFactoryBean aclObjIdentityResourceServiceEjb() {
+        return getLocalEjbFactoyBean(AclObjIdentityResourceService.class);
+    }
 	
 	@Bean
 	@ConditionalOnWarDeployment

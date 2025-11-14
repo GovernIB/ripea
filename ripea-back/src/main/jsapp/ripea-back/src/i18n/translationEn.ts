@@ -30,13 +30,14 @@ const translationEn = {
         consult: "Consult",
         filter: "Filter",
         downloadSelected: "Download selected content",
-		processing: "Processing..."
+        relateSelected: "Relate selected content",
+		processing: "Processing...",
     },
     enum: {
         rol: {
             IPA_SUPER: "Superuser",
             IPA_ADMIN: "Administrator",
-			IPA_ADMIN_LECTURA: "Administrator (read)",
+            IPA_ADMIN_LECTURA: "Administrator (read)",
             IPA_DISSENY: "Designer",
             IPA_ORGAN_ADMIN: "Organ Administrator",
             IPA_REVISIO: "Reviewer",
@@ -127,23 +128,49 @@ const translationEn = {
             TRAVESIA: "Crossing",
             URBANIZACION: "Urbanization",
             VIA: "Way",
+		},
+        documentEnviamentEstat: {
+            PENDENT: "Pending",
+            ENVIAT: "Sent",
+            PROCESSAT: "Processed",
+            REBUTJAT: "Rejected",
+            CANCELAT: "Cancelled",
+        },
+        tipusSequencia: {
+            SERIE: "Serial",
+            PARALEL: "Parallel",
         },
     },
     navigate: {
         expedient: "Case search",
         expedientPeticio: "Registry entries search",
         usuariTasca: "Tasks",
+        massiu: {
+            portafirmes: "Mass action: send documents to the signature portal",
+            firmasimpleweb: "Mass action: sign documents from the browser",
+            canviEstat: "Mass action: Change case status",
+            tancament: "Mass action: Close cases",
+            seguimentArxiuPendents: "Mass action: Archive pending items",
+            csv: "Mass action: copy CSV link",
+            definitiu: "Mass action: mark documents as definitive",
+            canviPrioritats: "Mass action: Change case priority",
+            expedientPeticioCanviEstatDistribucio: "Mass action: Update the status of records in Distribution",
+        },
     },
     page: {
         comment: {
             expedient: "Expedient Comments",
             tasca: "Task Comments",
+            metaExpedient: "Procedure comments",
         },
         contingut: {
             grid: {
                 nom: "Name",
             },
             detalle: {
+                title: "Detalles del contenido",
+                nom: "Nombre",
+                data: "Fecha",
                 numero: "Number",
                 titol: "Title",
                 metaExpedient: "Type",
@@ -226,6 +253,12 @@ const translationEn = {
                 seguimentvf: {
                     label: "Viafirma tracking",
                     title: "Signature details",
+                },
+                custodiar: {
+                    label: "Archive",
+                },
+                replay: {
+                    label: "Recuperar",
                 },
             },
             history: {
@@ -636,6 +669,7 @@ const translationEn = {
                 errorNotificacio: "This case file has notification errors",
                 ambEnviamentsPendents: "This case file has pending sends to signature portal",
                 ambNotificacionsPendents: "This case file has pending notifications",
+                canviEstat: "It is necessary to select a procedure in order to perform the mass action",
             },
             modal: {
                 seguidors: "Case file followers",
@@ -754,11 +788,11 @@ const translationEn = {
                     title: "Import documents from SGD",
                     ok: "Documents imported successfully",
                 },
-				importZip: {
-				    label: "Import documents from ZIP...",
-				    title: "Import documentos from ZIP",
-				    ok: "Documents imported successfully",
-				},
+                importZip: {
+                    label: "Import documents from ZIP...",
+                    title: "Import documentos from ZIP",
+                    ok: "Documents imported successfully",
+                },
                 detall: {
                     label: "Details",
                 },
@@ -865,6 +899,10 @@ const translationEn = {
                     label: "Original document",
                     ok: "The original document has been downloaded successfully"
                 },
+                descarregarImprimible: {
+                    label: "Download authentic copy",
+                    ok: "The authentic copy has been downloaded successfully",
+                },
                 changeType: {
                     label: "Change type...",
                     title: "Change type",
@@ -891,6 +929,7 @@ const translationEn = {
                 folder: "If no folder is selected, documents will be imported directly into the file.",
                 scaned: "The scanning process was successful.",
                 view: "Only for PDF, ODT and DOCX",
+                portafirmes: "Es necesario seleccionar un procedimiento y un tipo de documento para poder realizar la acción masiva",
             },
             versio: {
                 title: "Version",
@@ -1102,6 +1141,8 @@ const translationEn = {
                 prioritat: "Priority",
                 documentTipusNom: "Document type",
                 fluxTipus: "Flow type",
+                responsables: "Responsible persons",
+                sequenciaTipus: "Signature sequence type",
                 portafirmesId: "Portafirmes ID",
             },
         },
@@ -1130,6 +1171,74 @@ const translationEn = {
                 cancelat: "The signature has been canceled",
             },
         },
+        grup: {
+            title: "Group",
+            action: {
+                new: {
+                    ok: "Group '{{data.codi}}' created successfully",
+                },
+                update: {
+                    ok: "Group '{{data.codi}}' updated successfully",
+                },
+                delete: {
+                    ok: "Group '{{data.codi}}' deleted successfully",
+                },
+            },
+        },
+        organGestor: {
+            title: "Managing Body",
+            action: {
+                update: {
+                    ok: "Managing Body '{{data.codi}}' deleted successfully",
+                },
+            },
+        },
+        tipusDocumental: {
+            title: "Document type",
+            action: {
+                new: {
+                    ok: "Document type '{{data.codi}}' created successfully",
+                },
+                update: {
+                    ok: "Document type '{{data.codi}}' updated successfully",
+                },
+                delete: {
+                    ok: "Document type '{{data.codi}}' deleted successfully",
+                },
+            },
+        },
+        permision: {
+            title: "Permissions",
+            grid: {
+                organGestor: "Managing body",
+                principal: "Type",
+                sid: "Principal",
+                create: "Create",
+                read: "View",
+                write: "Edit",
+                delete: "Delete",
+                estadistic: "Statistics",
+            },
+            tabs: {
+                expedient: "Case management",
+                admin: "Administration and design",
+            },
+            action: {
+                new: {
+                    title: "Create new permission",
+                    ok: "Permission for '{{data.principal}} {{data.sid}}' has been created successfully",
+                },
+                update: {
+                    title: "Edit permission",
+                    ok: "Permission for '{{data.principal}} {{data.sid}}' has been updated successfully",
+                },
+                delete: {
+                    check: "¿Está seguro de que desea continuar con esta acción?",
+                    description: "Una vez eliminada, no se podrá recuperar",
+                    ok: "Permission for '{{data.principal}} {{data.sid}}' has been deleted successfully",
+                },
+            },
+        },
         user: {
             options: {
                 perfil: "My profile",
@@ -1154,7 +1263,8 @@ const translationEn = {
                 backVersio: "Classic interface",
 
                 anotacions: "Annotations",
-                procediments: "Procedures",
+                procediments: "Procedure management",
+                procedimentPermis: "Procedure permissions: {{nom}}",
                 procedimentsTitle: "The entity has procedures with outdated managing bodies",
                 grups: "Groups",
                 revisar: "Procedure review",
@@ -1190,6 +1300,7 @@ const translationEn = {
                 anexos: "Attach pending annexes from accepted annotations",
                 anotacio: "Update annotation status in Distribution",
                 prioritat: "Change case priority",
+                refresh: "Refresh data every 10 seconds"
             },
             action: {
                 masives: {

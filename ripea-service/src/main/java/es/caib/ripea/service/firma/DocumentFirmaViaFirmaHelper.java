@@ -200,7 +200,7 @@ public class DocumentFirmaViaFirmaHelper extends DocumentFirmaHelper{
 					documentViaFirma.updateProcessat(true, new Date());
 					List<ArxiuFirmaDto> firmes = pluginHelper.validaSignaturaObtenirFirmes(viaFirmaDocument.getNomFitxer(), contingut, null, "application/pdf", true);
 					document.updateDocumentFirmaTipus(DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA);
-					ArxiuEstatEnumDto arxiuEstat =  documentViaFirma.isFirmaParcial() ? ArxiuEstatEnumDto.ESBORRANY : documentHelper.getArxiuEstat(DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA, null);
+					ArxiuEstatEnumDto arxiuEstat =  documentViaFirma.isFirmaParcial() ? ArxiuEstatEnumDto.ESBORRANY : documentHelper.getArxiuEstat(DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA, null, false);
 					contingutHelper.arxiuPropagarModificacio(
 							document,
 							firmes.get(0).getFitxer(),

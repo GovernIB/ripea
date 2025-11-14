@@ -1,0 +1,99 @@
+import {useTranslation} from "react-i18next";
+import {useState} from "react";
+import {GridPage} from "reactlib";
+import {CardPage} from "../../../components/CardData.tsx";
+import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
+import {formatDate} from "../../../util/dateUtils.ts";
+import {GridSortDirection} from "@mui/x-data-grid-pro";
+import GridFormField from "../../../components/GridFormField.tsx";
+import {Grid} from "@mui/material";
+import * as builder from "../../../util/springFilterUtils.ts";
+import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
+
+const ExpedientsPendentsFilterForm = () => {
+    return <>
+        <GridFormField xs={4} name="numRegistre"/>
+        <GridFormField xs={4} name="extracte"/>
+        <GridFormField xs={4} name="metaExpedient"/>
+        <GridFormField xs={4} name="dataRecepcioInicial" type={"date"}/>
+        <GridFormField xs={4} name="dataRecepcioFinal" type={"date"}/>
+        <Grid item xs={1.6}/>
+    </>
+}
+
+const springFilterBuilder = (data:any) => {
+    return builder.and(
+        builder.like("identificador", data.numRegistre),
+        builder.like("registre.extracte", data.extracte),
+        builder.eq("metaExpedient.id", data?.metaExpedient?.id),
+        builder.betweenDates("registre.data", data.dataRecepcioInicial, data.dataRecepcioFinal),
+        builder.eq('estat', "'PENDENT'"),
+    );
+}
+
+const ExpedientsPendentsFilter = (props: any) => {
+    const {onSpringFilterChange} = props;
+
+    return <StyledMuiFilter
+        resourceName={"expedientPeticioResource"}
+        code={"ANOTACIO_FILTER"}
+        sessionKey={"ANOTACIO_PENDENT_FILTER"}
+        springFilterBuilder={springFilterBuilder}
+        onSpringFilterChange={onSpringFilterChange}
+    >
+        <ExpedientsPendentsFilterForm/>
+    </StyledMuiFilter>
+}
+
+// Grid
+const sortModel: any = [{field: 'registreInfo.data', sort: 'desc'}]
+const perspectives = ['REGISTRE'];
+const namedQueries = ['LLISTAT_ANOTACIONS'];
+
+const ExpedientsPendentsGrid = () => {
+    const {t} = useTranslation();
+    const [springFilter, setSpringFilter] = useState<string>();
+
+    const columns = [
+        {
+            field: 'identificador',
+            flex: 0.75,
+        },
+        {
+            field: 'registreInfo.extracte',
+            headerName: t('page.registre.grid.extracte'),
+            flex: 1,
+        },
+        {
+            field: 'metaExpedient',
+            flex: 1,
+        },
+        {
+            field: 'registreInfo.data',
+            headerName: t('page.registre.grid.dataRecepcio'),
+            flex: 0.75,
+            valueFormatter: (value: any) => formatDate(value),
+            sortProcessor: (field: string, sort: GridSortDirection) => {
+                return [{field: 'registre.data', sort}];
+            },
+        },
+    ]
+
+    return <GridPage disableMargins>
+        <CardPage title={t('page.user.menu.pendents')}>
+            <ExpedientsPendentsFilter onSpringFilterChange={setSpringFilter}/>
+
+            <StyledMuiGrid
+                resourceName={"expedientPeticioResource"}
+                columns={columns}
+                // TODO: Revisar filtre
+                filter={springFilter}
+                perspectives={perspectives}
+                namedQueries={namedQueries}
+                sortModel={sortModel}
+                readOnly
+            />
+        </CardPage>
+    </GridPage>
+}
+export default ExpedientsPendentsGrid;

@@ -19,10 +19,12 @@ type MassiveActionSelectorProps = {
     setSelectedRows: (value:any[]) => void
     actions: MassiveActionProps[]
     filter?: string
+    disabledDefSelector?: boolean,
+    hiddenDefSelector?: boolean,
 }
 
 const MassiveActionSelector: React.FC<MassiveActionSelectorProps> = (props:MassiveActionSelectorProps) => {
-    const {resourceName, filter, selectedRows, setSelectedRows, actions } = props;
+    const {resourceName, filter, selectedRows, setSelectedRows, disabledDefSelector, hiddenDefSelector, actions } = props;
     const { t } = useTranslation();
 
     const {
@@ -51,13 +53,17 @@ const MassiveActionSelector: React.FC<MassiveActionSelectorProps> = (props:Massi
             label: t('common.select.all'),
             icon: "check_box",
             showInMenu: true,
-            onClick: handleSelectAll
+            onClick: handleSelectAll,
+            disabled: disabledDefSelector,
+            hidden: hiddenDefSelector,
         },
         {
             label: t('common.select.clear'),
             icon: "check_box_outline_blank",
             showInMenu: true,
-            onClick: handleClearSelection
+            onClick: handleClearSelection,
+            disabled: disabledDefSelector,
+            hidden: hiddenDefSelector,
         },
         ...actions.filter(action=>!action?.showInMenu)
             .map(({ disabled, ...rest }) => ({
@@ -92,7 +98,7 @@ const MassiveActionSelector: React.FC<MassiveActionSelectorProps> = (props:Massi
             {
                 buttonActions.map((action:any, index:number)=>
                     !(typeof action.hidden === 'function' ? action.hidden(selectedRows) : action.hidden)
-                    && <Tooltip title={action?.title} key={`action-${index}`}>
+                    && <Tooltip title={action?.label} key={`action-${index}`}>
                         <Button
                             onClick={()=>action?.onClick?.(selectedRows)}
                             disabled={typeof action?.disabled === 'function' ? action?.disabled(selectedRows) : action?.disabled}

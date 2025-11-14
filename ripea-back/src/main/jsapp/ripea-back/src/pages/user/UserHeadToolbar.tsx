@@ -168,7 +168,7 @@ const useMenuSupAdmin = () => {
             id: 'entitat',
             title: t('page.user.menu.entitat'),
             icon: 'account_balance',
-            to: '/entitat',
+            onClick: () => toProgramaAntic('entitat'),
         },
         {
             id: 'integracions',
@@ -282,14 +282,14 @@ const useMenuAdmin = () => {
             icon: icons.anotacio,
             to: '/expedientPeticio',
         },
-        {
-            id: 'procediments',
-            title: t('page.user.menu.procediments'),
-            badge: user?.sessionScope?.organsNoSincronitzats,
-            hover: t('page.user.menu.procedimentsTitle'),
-            // icon: '',
-            onClick: () => toProgramaAntic('metaExpedient'),
-        },
+        // {
+        //     id: 'procediments',
+        //     title: t('page.user.menu.procediments'),
+        //     badge: user?.sessionScope?.organsNoSincronitzats,
+        //     hover: t('page.user.menu.procedimentsTitle'),
+        //     // icon: '',
+        //     to: '/metaExpedient',
+        // },
     ];
     const entries = [
         {
@@ -316,7 +316,7 @@ const useMenuAdmin = () => {
                     barge: user?.sessionScope?.organsNoSincronitzats,
                     hover: t('page.user.menu.procedimentsTitle'),
                     // icon: '',
-                    onClick: () => toProgramaAntic('metaExpedient'),
+                    to: '/metaExpedient',
                 },
                 {
                     id: 'documents',
@@ -332,7 +332,7 @@ const useMenuAdmin = () => {
                     id: 'nti',
                     title: t('page.user.menu.nti'),
                     // icon: '',
-                    onClick: () => toProgramaAntic('tipusDocumental'),
+                    to: '/tipusDocumental',
                     hidden: user?.sessionScope?.isTipusDocumentsEnabled,
                 },
                 {
@@ -346,13 +346,13 @@ const useMenuAdmin = () => {
                     id: 'grups',
                     title: t('page.user.menu.grups'),
                     // icon: '',
-                    onClick: () => toProgramaAntic('grup'),
+                    to: '/grup',
                 },
                 {
                     id: 'organs',
                     title: t('page.user.menu.organs'),
                     // icon: '',
-                    onClick: () => toProgramaAntic('organgestor'),
+                    to: '/organgestor',
                 },
                 {
                     id: 'url',
@@ -368,7 +368,7 @@ const useMenuAdmin = () => {
                     id: 'permisos',
                     title: t('page.user.menu.permisos'),
                     // icon: '',
-                    onClick: () => toProgramaAntic('permis'),
+                    to: '/permis',
                 },
             ],
         },
@@ -381,7 +381,7 @@ const useMenuAdmin = () => {
                     id: 'continguts',
                     title: t('page.user.menu.continguts'),
                     // icon: '',
-                    onClick: () => toProgramaAntic('contingutAdmin'),
+                    to: 'contingutAdmin',
                 },
                 {
                     id: 'dadesEstadistiques',
@@ -393,44 +393,44 @@ const useMenuAdmin = () => {
                     id: 'revisar',
                     title: t('page.user.menu.revisar'),
                     // icon: '',
-                    onClick: () => toProgramaAntic('metaExpedientRevisio'),
+                    to: '/metaExpedientRevisio',
                     hidden: !user?.sessionScope?.revisioActiva,
                 },
                 {
                     id: 'portafib',
                     title: t('page.user.menu.portafib'),
                     // icon: '',
-                    onClick: () => toProgramaAntic('seguimentPortafirmes'),
+                    to: '/seguimentPortafirmes',
                 },
                 {
                     id: 'notib',
                     title: t('page.user.menu.notib'),
                     // icon: '',
-                    onClick: () => toProgramaAntic('seguimentNotificacions'),
+                    to: '/seguimentNotificacions',
                 },
                 {
                     id: 'pinbalEnviades',
                     title: t('page.user.menu.pinbalEnviades'),
                     // icon: '',
-                    onClick: () => toProgramaAntic('seguimentPinbal'),
+                    to: '/seguimentPinbal',
                 },
                 {
                     id: 'assignacio',
                     title: t('page.user.menu.assignacio'),
                     // icon: '',
-                    onClick: () => toProgramaAntic('seguimentTasques'),
+                    to: '/seguimentTasques',
                 },
                 {
                     id: 'pendents',
                     title: t('page.user.menu.pendents'),
                     // icon: '',
-                    onClick: () => toProgramaAntic('seguimentExpedientsPendents'),
+                    to: '/seguimentExpedientsPendents',
                 },
                 {
                     id: 'comunicades',
                     title: t('page.user.menu.comunicades'),
                     // icon: '',
-                    onClick: () => toProgramaAntic('expedientPeticioComunicades'),
+                    to: '/expedientPeticioComunicades',
                 },
             ],
         },
@@ -447,7 +447,6 @@ const useMenuAdmin = () => {
 const useMenuAdminLectura = () => {
     const { value: user } = useUserSession();
     const { t } = useTranslation();
-    const { toProgramaAntic } = useToProgramaAntic();
 
     const appEntries:any[] = [
         {
@@ -462,7 +461,7 @@ const useMenuAdminLectura = () => {
             badge: user?.sessionScope?.organsNoSincronitzats,
             hover: t('page.user.menu.procedimentsTitle'),
             // icon: '',
-            onClick: () => toProgramaAntic('metaExpedient'),
+            to: '/metaExpedient',
         },
     ];
     const entries = [
@@ -478,7 +477,7 @@ const useMenuAdminLectura = () => {
             barge: user?.sessionScope?.organsNoSincronitzats,
             hover: t('page.user.menu.procedimentsTitle'),
             // icon: '',
-            onClick: () => toProgramaAntic('metaExpedient'),
+            to: '/metaExpedient',
         },
     ]
     const content = <>
@@ -494,7 +493,6 @@ const useMenuAdminOrgan = () => {
     const { value: user } = useUserSession();
     const { value: numNotif } = useNotificacionsSession()
     const { t } = useTranslation();
-    const { toProgramaAntic } = useToProgramaAntic();
 
     const appEntries:any[] = [
         {
@@ -516,7 +514,7 @@ const useMenuAdminOrgan = () => {
             badge: user?.sessionScope?.organsNoSincronitzats,
             hover: t('page.user.menu.procedimentsTitle'),
             // icon: '',
-            onClick: () => toProgramaAntic('metaExpedient'),
+            to: '/metaExpedient',
         },
     ];
     const entries = [
@@ -544,13 +542,13 @@ const useMenuAdminOrgan = () => {
                     badge: user?.sessionScope?.organsNoSincronitzats,
                     hover: t('page.user.menu.procedimentsTitle'),
                     // icon: '',
-                    onClick: () => toProgramaAntic('metaExpedient'),
+                    to: '/metaExpedient',
                 },
                 {
                     id: 'grups',
                     title: t('page.user.menu.grups'),
                     // icon: '',
-                    onClick: () => toProgramaAntic('grup'),
+                    to: '/grup',
                 },
             ],
         },
@@ -566,7 +564,6 @@ const useMenuAdminOrgan = () => {
 }
 const useMenuDissenyOrgan = () => {
     const { t } = useTranslation();
-    const { toProgramaAntic } = useToProgramaAntic();
 
     const appEntries:any[] = [];
     const entries = [
@@ -574,13 +571,13 @@ const useMenuDissenyOrgan = () => {
             id: 'procediments',
             title: t('page.user.menu.procediments'),
             // icon: '',
-            onClick: () => toProgramaAntic('metaExpedient'),
+            to: '/metaExpedient',
         },
         {
             id: 'grups',
             title: t('page.user.menu.grups'),
             // icon: '',
-            onClick: () => toProgramaAntic('grup'),
+            to: '/grup',
         },
     ]
     const content = <>
@@ -666,14 +663,14 @@ const useMenuUsuari = () => {
                     id: 'portafib',
                     title: t('page.user.menu.portafib'),
                     // icon: '',
-                    onClick: () => toProgramaAntic('seguimentPortafirmes'),
+                    to: '/seguimentPortafirmes',
                     hidden: !user?.sessionScope?.isMostrarSeguimentEnviamentsUsuariActiu,
                 },
                 {
                     id: 'notib',
                     title: t('page.user.menu.notib'),
                     // icon: '',
-                    onClick: () => toProgramaAntic('seguimentNotificacions'),
+                    to: 'seguimentNotificacions',
                     hidden: !user?.sessionScope?.isMostrarSeguimentEnviamentsUsuariActiu,
                 },
             ],
@@ -708,44 +705,44 @@ const useAccionesMassivas = () => {
                     id: 'portafirmes',
                     title: t('page.user.massive.portafirmes'),
                     // icon: '',
-                    onClick: ()=> toProgramaAntic('massiu/portafirmes'),
+                    to: '/massiu/portafirmes',
                 },
                 {
                     id: 'firmar',
                     title: t('page.user.massive.firmar'),
                     // icon: '',
-                    onClick: ()=> toProgramaAntic('massiu/firmasimpleweb'),
+                    to: '/massiu/firmasimpleweb',
                 },
                 {
                     id: 'marcar',
                     title: t('page.user.massive.marcar'),
                     // icon: '',
-                    onClick: ()=> toProgramaAntic('massiu/definitiu'),
+                    to: '/massiu/definitiu',
                     hidden: !user?.sessionScope?.isConvertirDefinitiuActiu,
                 },
                 {
                     id: 'estat',
                     title: t('page.user.massive.estat'),
                     // icon: '',
-                    onClick: ()=> toProgramaAntic('massiu/canviEstat'),
+                    to: '/massiu/canviEstat',
                 },
                 {
                     id: 'tancar',
                     title: t('page.user.massive.tancar'),
                     // icon: '',
-                    onClick: ()=> toProgramaAntic('massiu/tancament'),
+                    to: '/massiu/tancament',
                 },
                 {
                     id: 'custodiar',
                     title: t('page.user.massive.custodiar'),
                     // icon: '',
-                    onClick: ()=> toProgramaAntic('seguimentArxiuPendents'),
+                    to: '/seguimentArxiuPendents',
                 },
                 {
                     id: 'csv',
                     title: t('page.user.massive.csv'),
                     // icon: '',
-                    onClick: ()=> toProgramaAntic('massiu/csv'),
+                    to: '/massiu/csv',
                     hiddden: !user?.sessionScope?.isUrlValidacioDefinida,
                 },
                 {
@@ -758,14 +755,14 @@ const useAccionesMassivas = () => {
                     id: 'anotacio',
                     title: t('page.user.massive.anotacio'),
                     // icon: '',
-                    onClick: ()=> toProgramaAntic('massiu/expedientPeticioCanviEstatDistribucio'),
+                    to: '/massiu/expedientPeticioCanviEstatDistribucio',
                     hidden: !isRolActualAdmin,
                 },
                 {
                     id: 'prioritat',
                     title: t('page.user.massive.prioritat'),
                     // icon: '',
-                    onClick: ()=> toProgramaAntic('massiu/canviPrioritats'),
+                    to: '/massiu/canviPrioritats',
                 },
                 {
                     divider: true,

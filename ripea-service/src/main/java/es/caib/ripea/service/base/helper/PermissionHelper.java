@@ -97,11 +97,17 @@ public class PermissionHelper {
 			if (targetType.endsWith(".GrupResource")) { return userPermissions.isAdmin(); }
 			if (targetType.endsWith(".HistoricResource")) { return userPermissions.isAdmin(); }
 			if (targetType.endsWith(".MetaExpedientResource")) { return userPermissions.isAdmin(); }
+			if (targetType.endsWith(".MetaExpedientComentariResource")) { return userPermissions.isAdmin(); }
 			if (targetType.endsWith(".MetaExpedientOrganGestorResource")) { return userPermissions.isAdmin(); }
 			if (targetType.endsWith(".MetaExpedientTascaResource")) { return userPermissions.isAdmin(); }
 			if (targetType.endsWith(".MetaExpedientTascaValidacioResource")) { return userPermissions.isAdmin(); }
 			if (targetType.endsWith(".DominiResource")) { return userPermissions.isAdmin(); }
 			if (targetType.endsWith(".TipusDocumentalResource")) { return userPermissions.isAdmin(); }
+			if (targetType.endsWith(".ConsultaPinbalResource")) { return userPermissions.isAdmin(); }
+			if (targetType.endsWith(".AclClassResource")) { return userPermissions.isAdmin(); }
+			if (targetType.endsWith(".AclEntryResource")) { return userPermissions.isAdmin(); }
+			if (targetType.endsWith(".AclSidResource")) { return userPermissions.isAdmin(); }
+			if (targetType.endsWith(".AclObjIdentityResource")) { return userPermissions.isAdmin(); }
 			//Modificació de procediments
 			if (targetType.endsWith(".MetaDadaResource")) { return userPermissions.isAdmin() || userPermissions.isDisseny() || userPermissions.isRevisio(); }
 			if (targetType.endsWith(".MetaDocumentResource")) { return userPermissions.isAdmin() || userPermissions.isDisseny() || userPermissions.isRevisio(); }

@@ -310,7 +310,7 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 					}
 					
 					boolean isFirmaParcial = documentPortafirmes.getFirmaParcial() != null && documentPortafirmes.getFirmaParcial();
-					ArxiuEstatEnumDto arxiuEstat = isFirmaParcial ? ArxiuEstatEnumDto.ESBORRANY : documentHelper.getArxiuEstat(DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA, null);
+					ArxiuEstatEnumDto arxiuEstat = isFirmaParcial ? ArxiuEstatEnumDto.ESBORRANY : documentHelper.getArxiuEstat(DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA, null, false);
 
 					// ============================== SAVE IN ARXIU ==========================					
 					if (portafirmesDocument.getTipusFirma() == null || portafirmesDocument.getTipusFirma().isEmpty() || portafirmesDocument.getTipusFirma().equals("PAdES")) {

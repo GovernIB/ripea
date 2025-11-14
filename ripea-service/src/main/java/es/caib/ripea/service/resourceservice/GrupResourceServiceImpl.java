@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import es.caib.ripea.persistence.entity.resourceentity.EntitatResourceEntity;
+import es.caib.ripea.persistence.entity.resourcerepository.EntitatResourceRepository;
+import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.stereotype.Service;
 
@@ -37,7 +40,8 @@ public class GrupResourceServiceImpl extends BaseMutableResourceService<GrupReso
 	private final EntityComprovarHelper entityComprovarHelper;
 	private final MetaExpedientRepository metaExpedientRepository;
 	private final OrganGestorRepository organGestorRepository;
-	
+	private final EntitatResourceRepository entitatResourceRepository;
+
     @Override
     protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
     	
@@ -137,5 +141,12 @@ public class GrupResourceServiceImpl extends BaseMutableResourceService<GrupReso
         }
 		
 		return filtreGrupsPermesos;
+    }
+
+    @Override
+    protected void beforeCreateSave(GrupResourceEntity entity, GrupResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
+        String entitatActualCodi = configHelper.getEntitatActualCodi();
+        EntitatResourceEntity entitat = entitatResourceRepository.findByCodi(entitatActualCodi);
+        entity.setEntitat(entitat);
     }
 }

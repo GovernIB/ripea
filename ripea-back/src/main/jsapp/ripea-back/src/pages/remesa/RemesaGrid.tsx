@@ -20,7 +20,7 @@ export const EstatMessage = (props:any) => {
             <Typography sx={{fontSize: '0.8rem', paddingRight: '5px'}}>{children}</Typography>
     </Typography>
 }
-const StyledEstat = (props:any) => {
+export const StyledEstat = (props:any) => {
     const { entity, children } = props;
     const { t } = useTranslation()
 
@@ -33,6 +33,11 @@ const StyledEstat = (props:any) => {
                 }
             </>
         case 'REGISTRADA':
+            if (entity?.error) {
+                return <EstatMessage icon={"warning"} color={'error'}>{children}</EstatMessage>
+            } else {
+                return <EstatMessage icon={"info"} color={'info'}>{children}</EstatMessage>
+            }
         case 'PROCESSADA':
         case 'ENVIADA':
             return <EstatMessage icon={"info"} color={'info'}>{children}</EstatMessage>

@@ -1,8 +1,13 @@
 package es.caib.ripea.service.resourceservice;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+import javax.annotation.PostConstruct;
 
 import org.springframework.stereotype.Service;
 
@@ -17,6 +22,7 @@ import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.OrganismeHelper;
+import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
 import es.caib.ripea.service.intf.dto.OrganismeDto;
 import es.caib.ripea.service.intf.model.EntitatResource;
 import es.caib.ripea.service.intf.model.MetaExpedientResource;
@@ -41,9 +47,16 @@ public class OrganGestorResourceServiceImpl extends BaseMutableResourceService<O
 	private final ConfigHelper configHelper;
 	private final OrganismeHelper organismeHelper;
 	private final EntityComprovarHelper entityComprovarHelper;
+
+    @PostConstruct
+    public void init() {
+        register(OrganGestorResource.PERSPECTIVE_PATH_CODE, new PathPerspectiveApplicator());
+    }
 	
     @Override
     protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
+        List<Filter> filters = new ArrayList<>();
+        filters.add((currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null);
     	
         String entitatActualCodi = configHelper.getEntitatActualCodi();
         String organActualCodi	 = configHelper.getOrganActualCodi();
@@ -61,7 +74,15 @@ public class OrganGestorResourceServiceImpl extends BaseMutableResourceService<O
     	 * Named querys exclusives
     	 */
         Map<String, String> mapaNamedQueries =  Utils.namedQueriesToMap(namedQueries);
-    	if (mapaNamedQueries.size()>0) {
+    	if (!mapaNamedQueries.isEmpty()) {
+    		if (mapaNamedQueries.containsKey("ENTITY")) {
+                filters.add(
+                    FilterBuilder.and(
+                            FilterBuilder.equal(OrganGestorResource.Fields.entitat + "." + EntitatResource.Fields.codi,
+                                    entitatActualCodi != null?entitatActualCodi:"................................................................................")
+                    )
+                );
+            }
     		if (mapaNamedQueries.containsKey("EXPEDIENT_FORM")) {
     			
     			Long procedimentId = Long.parseLong(mapaNamedQueries.get("EXPEDIENT_FORM"));
@@ -103,6 +124,11 @@ public class OrganGestorResourceServiceImpl extends BaseMutableResourceService<O
     				return FilterBuilder.equal("id", 0).generate();
     			}
     		}
+
+            List<Filter> result = filters.stream()
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+            return result.isEmpty() ? null : FilterBuilder.and(result).generate();
     	}
 		
     	/**
@@ -113,7 +139,7 @@ public class OrganGestorResourceServiceImpl extends BaseMutableResourceService<O
         
         if (isSuper) {
         	//No s'aplica ni el filtre per entitat, perque superusuari no treballa amb entitat seleccionada.
-        	return filtreBase.generate();
+        	return filtreBase!=null ?filtreBase.generate() :null;
         } else { 
         	
             Filter filtreEntitat = FilterBuilder.equal(
@@ -171,5 +197,32 @@ public class OrganGestorResourceServiceImpl extends BaseMutableResourceService<O
         }
 
         return filtreResultat.generate();
+    }
+
+    public class PathPerspectiveApplicator implements PerspectiveApplicator<OrganGestorResourceEntity, OrganGestorResource> {
+        private List<String> getPathName(OrganGestorResourceEntity entity, List<String> path) {
+            path.add(String.valueOf(entity.getId()));
+            if (entity.getPare()!=null){
+                return getPathName(entity.getPare(), path);
+            }
+            Collections.reverse(path);
+            return path;
+        }
+        private List<OrganGestorResource> getPath(OrganGestorResourceEntity entity, List<OrganGestorResource> path) {
+            OrganGestorResource resource = objectMappingHelper.newInstanceMap(entity, OrganGestorResource.class);
+            resource.setPathName(getPathName(entity, new ArrayList<>()));
+            path.add(resource);
+            if (entity.getPare()!=null){
+                return getPath(entity.getPare(), path);
+            }
+            Collections.reverse(path);
+            return path;
+        }
+
+        @Override
+        public void applySingle(String code, OrganGestorResourceEntity entity, OrganGestorResource resource) throws PerspectiveApplicationException {
+            resource.setPathName(getPathName(entity, new ArrayList<>()));
+            resource.setPath(getPath(entity, new ArrayList<>()));
+        }
     }
 }

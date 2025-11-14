@@ -225,6 +225,11 @@ public class DocumentEntity extends NodeEntity {
 				DocumentEstatEnumDto.CUSTODIAT.equals(estat);
 	}
 
+	@Transient
+	public boolean isFirmaParcial() {
+		return DocumentEstatEnumDto.FIRMA_PARCIAL.equals(estat);
+	}
+	
 	public void updateTipusDocument(
 			MetaDocumentEntity metaDocument, 
 			NtiOrigenEnumDto ntiOrigen,

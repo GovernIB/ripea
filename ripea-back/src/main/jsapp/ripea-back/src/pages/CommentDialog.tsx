@@ -25,7 +25,7 @@ const myComment = {...comment, bgcolor: '#a5d6a7', alignSelf: 'end'}
 const otherComment = {...comment, bgcolor: '#e0e0e0'}
 
 const Comments = (props: any) => {
-    const { resourceName, id, resourceReference, i18nKeys } = props;
+    const { resourceName, id, resourceReference, readOnly, i18nKeys } = props;
     const { value: user } = useUserSession();
     const {
         isReady: apiIsReady,
@@ -79,7 +79,8 @@ const Comments = (props: any) => {
                 <Typography variant="caption" color="textDisabled">{formatDate(a?.createdDate)}</Typography>
             </Grid>
         )}
-        { user?.rolActual != "IPA_ADMIN_LECTURA" &&
+
+        {!readOnly && user?.rolActual != "IPA_ADMIN_LECTURA" &&
             <Grid size={12}>
                 <MuiForm
                     resourceName={resourceName}
@@ -103,7 +104,7 @@ const Comments = (props: any) => {
 }
 
 export const CommentDialog = (props: any) => {
-    const { entity, title, resourceName, resourceReference, onClose, iconStyle, i18nKeys = {} } = props;
+    const { entity, title, resourceName, resourceReference, onClose, iconStyle, i18nKeys = {}, readOnly = false } = props;
     const [dialogShow, dialogComponent] = useMuiContentDialog();
     const { t } = useBaseAppContext();
     const closeButtons = [{
@@ -120,6 +121,7 @@ export const CommentDialog = (props: any) => {
                     resourceName={resourceName}
                     id={entity?.id}
                     resourceReference={resourceReference}
+                    readOnly={readOnly}
                     i18nKeys={i18nKeys}/>
             </>,
             closeButtons,
