@@ -45,7 +45,7 @@ const columns = [
     },
     {
         field: 'createdDate',
-        flex: 0.5,
+        flex: 0.6,
         valueFormatter: (value: any) => formatDate(value),
     },
 ]

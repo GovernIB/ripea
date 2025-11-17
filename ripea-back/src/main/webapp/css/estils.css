@@ -606,6 +606,11 @@ dd.no_color {
     top: 4px;
 }
 
+.modal-footer {
+	position: relative;
+    background-color: white;
+}
+
 .vermell { color: #e99ca8; }
 .verd    { color: #9cc976; }
 .taronja { color: #ffcc63; }
