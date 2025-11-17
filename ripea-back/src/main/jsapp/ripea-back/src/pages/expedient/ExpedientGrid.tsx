@@ -32,7 +32,8 @@ export const ExpedientGridForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField  xs={12} name="metaExpedient"
                         hidden={!!data?.id}
-                        filter={filterMetaExpedientCrear}/>
+                        filter={filterMetaExpedientCrear}
+                        namedQueries={[ data?.id ? 'EXPEDIENT_UPDATE' : 'EXPEDIENT_CREATE' ]}/>
         <GridFormField xs={12} name="nom"/>
         <GridFormField xs={12} name="organGestor"
                        namedQueries={[`EXPEDIENT_FORM#${data?.metaExpedient?.id || 0}`]}

@@ -2,6 +2,7 @@ package es.caib.ripea.service.resourceservice;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
@@ -11,16 +12,12 @@ import com.turkraft.springfilter.parser.Filter;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientResourceEntity;
-import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.MetaExpedientHelper;
-import es.caib.ripea.service.helper.OrganGestorCacheHelper;
-import es.caib.ripea.service.helper.PermisosHelper;
 import es.caib.ripea.service.intf.model.EntitatResource;
 import es.caib.ripea.service.intf.model.MetaExpedientResource;
-import es.caib.ripea.service.intf.model.OrganGestorResource;
 import es.caib.ripea.service.intf.resourceservice.MetaExpedientResourceService;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.permission.ExtendedPermission;
@@ -37,15 +34,11 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService<MetaExpedientResource, Long, MetaExpedientResourceEntity> implements MetaExpedientResourceService {
 
-	private final OrganGestorRepository organGestorRepository;
-	
 	private final ConfigHelper configHelper;
-	private final PermisosHelper permisosHelper;
 	private final MetaExpedientHelper metaExpedientHelper;
 	private final EntityComprovarHelper entityComprovarHelper;
-	private final OrganGestorCacheHelper organGestorCacheHelper;
-	
-    @Override
+
+	@Override
     protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
 
         String entitatActualCodi = configHelper.getEntitatActualCodi();
@@ -59,6 +52,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 		boolean usuariFiltreOrgan = isAdminOrgan || isDissenyador;
         
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true,false);
+    	Map<String, String> mapaNamedQueries =  Utils.namedQueriesToMap(namedQueries);
 		
 		Filter filtreBase = null;
 		//Si ja ve un filtre definit per entitat, no aplicarem el filtre de entitat actual.
@@ -76,15 +70,38 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 //        }
         
         List<Long> procsPermesosIds = new ArrayList<Long>();
-        List<MetaExpedientEntity> metaExpPermesos = metaExpedientHelper.findAmbPermis(
-        		entitat.getId(),
-        		ExtendedPermission.READ,
-        		false, //nomesActius --> Aquest filtre s'aplica en el currentSpringFilter si es necessari.
-        		null, //filtreNomOrCodiSia
-        		isAdmin,
-        		isAdminOrgan,
-        		organGestorFiltre!=null?Long.parseLong(organGestorFiltre):null, //organId
-        		organGestorFiltre!=null); //comú
+        List<MetaExpedientEntity> metaExpPermesos = null;
+        if (mapaNamedQueries.size()>0 && mapaNamedQueries.containsKey("EXPEDIENT_CREATE")) {
+            metaExpPermesos = metaExpedientHelper.findAmbPermis(
+            		entitat.getId(),
+            		ExtendedPermission.CREATE,
+            		true, //nomesActius
+            		null, //filtreNomOrCodiSia
+            		isAdmin,
+            		isAdminOrgan,
+            		null, //organId
+            		false); //comú
+        } else if (mapaNamedQueries.size()>0 && mapaNamedQueries.containsKey("EXPEDIENT_UPDATE")) {
+            metaExpPermesos = metaExpedientHelper.findAmbPermis(
+            		entitat.getId(),
+            		ExtendedPermission.WRITE,
+            		false, //nomesActius
+            		null, //filtreNomOrCodiSia
+            		isAdmin,
+            		isAdminOrgan,
+            		null, //organId
+            		false); //comú
+        } else { //Llistat de procediments
+            metaExpPermesos = metaExpedientHelper.findAmbPermis(
+            		entitat.getId(),
+            		ExtendedPermission.READ,
+            		false, //nomesActius
+            		null, //filtreNomOrCodiSia
+            		isAdmin,
+            		isAdminOrgan,
+            		null, //organId
+            		false); //comú
+        }
         
 		if (metaExpPermesos==null || metaExpPermesos.size()==0) {
 			return FilterBuilder.equal("id", 0).generate();
