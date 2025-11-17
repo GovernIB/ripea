@@ -367,7 +367,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 			//Si ets rol tothom, ara mateix estarien arribant tots els expedients de procediments comuns
 			//Pero nomes volem els dels OGs amb permisos o nivells inferiors, no superiors
 			if (rolActual.equals("tothom") && permisosPerExpedients.getIdsProcedimentsComuns()!=null) {
-				String campProcComu	 = ExpedientResource.Fields.metaExpedient + "." + MetaExpedientResource.Fields.organGestor;
+/*				String campProcComu	 = ExpedientResource.Fields.metaExpedient + "." + MetaExpedientResource.Fields.organGestor;
 				String campOgExpedient = ExpedientResource.Fields.organGestor + ".id";
 				Filter filtreProcedimentComu = Filter.parse(campProcComu + " IS NOT NULL");
 				Filter filtreOgComunsExpedient = null;
@@ -381,7 +381,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 					}
 				}
 				
-				filtreExpOrgansComuns = FilterBuilder.or(filtreProcedimentComu, filtreOgComunsExpedient);
+				filtreExpOrgansComuns = FilterBuilder.or(filtreProcedimentComu, filtreOgComunsExpedient);*/
 			}
 			
 			String expOgId = ExpedientResource.Fields.organGestor + ".id";
@@ -399,7 +399,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 					filtreNoEliminats,
 					filtrePermisosVaris,
 					filtreProcedimentsDirectes,
-					filtreExpOrgansComuns,
+//					filtreExpOrgansComuns,
 					filtreOrgansPermesos,
 					filtreGrupsPermesos);
 			
@@ -477,8 +477,6 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 	    //Permisos que s'han donat sobre OrganGestor
 	    /** (:esNullIdsOrgansAmbProcedimentsComunsPermesos = false and meogp.organGestor.id in (:idsOrgansAmbProcedimentsComunsPermesos) 
 	     * 	and e.metaExpedient.id in (:idsProcedimentsComuns)) */
-	    
-	    /*
     	Filter filtreOrgansAmbProcedimentsComunsPermesos = null;
 	  	String campMetaExpOrganComuId = ExpedientResource.Fields.metaExpedient + "." + MetaExpedientResource.Fields.metaExpedientOrganGestors + "." + MetaExpedientOrganGestorResource.Fields.organGestor + ".id";
 	    List<String> organsMetaExpComunsClausulesIn = Utils.getIdsEnGruposMil(permisosPerExpedients.getIdsOrgansAmbProcedimentsComunsPermesos());
@@ -504,13 +502,12 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		    	filtreOrgansAmbProcedimentsComunsPermesos = FilterBuilder.and(filtreOrgansAmbProcedimentsComunsPermesos, filtreIdsProcedimentsComuns);
 		    }
 	    }
-	    */
     	
     	filtrePermisos = FilterBuilder.or(
     			filtreMetaExpedientsPermesos,
     			filtreOrgansPermesos,
-    			filtreMetaExpedientOrganPairsPermesos);
-//    			, filtreOrgansAmbProcedimentsComunsPermesos);
+    			filtreMetaExpedientOrganPairsPermesos
+    			, filtreOrgansAmbProcedimentsComunsPermesos);
     	
     	return filtrePermisos;
     }
