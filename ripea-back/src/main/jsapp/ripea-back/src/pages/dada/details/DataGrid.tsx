@@ -74,6 +74,7 @@ const DataGrid = (props:any) => {
         }
         staticSortModel={sortModel}
         columns={columns}
+        paginationActive={false}
         popupEditCreateActive
         popupEditFormContent={<DadaForm/>}
         formAdditionalData={{

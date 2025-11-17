@@ -633,7 +633,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
             resource.setNumAnotacions(entity.getPeticions().size());
             resource.setNumPublicacions(entity.getPublicacions().size());
             resource.setNumRemeses(entity.getNotificacions().size());
-            resource.setNumMetaDades(entity.getDades().size());
+            resource.setNumMetaDades(entity.getMetaExpedient().getMetaDades()!=null?entity.getMetaExpedient().getMetaDades().size():0);
             resource.setNumDades(dadaRepository.countByNodeId(entity.getId()));
             resource.setNumContingut(documentResourceRepository.countAllByExpedientIdAndEsborrat(entity.getId(), 0));
             resource.setNumMoviments(contingutMovimentRepository.countByContingutId(entity.getId()));
