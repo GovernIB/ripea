@@ -25,7 +25,7 @@ const SeguimentPortafirmes = (props:any) => {
             </CardData>
 
             <Grid item xs={6}>
-                <Iframe src={entity?.urlFluxSeguiment} style={{ height: '100%' }}/>
+                <Iframe isPDF={false} src={entity?.urlFluxSeguiment} style={{ height: '100%' }}/>
             </Grid>
         </Grid>
     </Load>

@@ -5,16 +5,18 @@ import { defaultLayoutPlugin } from "@react-pdf-viewer/default-layout";
 import '@react-pdf-viewer/core/lib/styles/index.css';
 import '@react-pdf-viewer/default-layout/lib/styles/index.css';
 
-// const commonProps = { width: '100%', height: '500px', border: '1px solid lightgray', borderRadius: '4px' }
+ const commonProps = { width: '100%', height: '500px', border: '1px solid lightgray', borderRadius: '4px' }
 
 const Iframe = (props:any) => {
-    const { src, hidden, style, ...other } = props
+    const { src, hidden, style, isPDF, ...other } = props
 
     if(!src || hidden) {
         return <></>
     }
 
-    // return <iframe src={src} {...other} style={{...commonProps, ...style}}/>
+    if (!isPDF) {
+        return <iframe src={src} {...other} style={{...commonProps, ...style}}/>
+    }
 
     const defaultLayoutPluginInstance = defaultLayoutPlugin();
     return (
