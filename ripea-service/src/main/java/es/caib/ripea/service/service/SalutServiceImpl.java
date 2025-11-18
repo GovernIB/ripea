@@ -15,7 +15,6 @@ import java.util.concurrent.TimeUnit;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
-import es.caib.comanda.ms.salut.model.AppInfo;
 import es.caib.comanda.ms.salut.model.ContextInfo;
 import es.caib.comanda.ms.salut.model.DetallSalut;
 import es.caib.comanda.ms.salut.model.EstatSalut;
@@ -278,23 +277,46 @@ public class SalutServiceImpl implements SalutService{
 			EstatSalut salutDb,
 			List<IntegracioSalut> salutIntegracions,
 			List<SubsistemaSalut> subsistemesSalut) {
+
+		int totalLatencia= salutDb.getLatencia();
+		int numPartsLatencia = 1;
 		
-		//JA començam amb les dades de la petició a BBDD
-		Long totalPeticionsOk		= 1l;
-		int totalLatenciaPeticionsOk= salutDb.getLatencia();
-		
+		//La latencia de les integracios i subsistemes, es el temps_mitj/numPeticions
+		//Per tant nomes hem de dividir les latencies per el nombre total de integracions que han aportat al càlcul.
 		if (salutIntegracions.size()>0) {
+			int latenciaTotalIntegracions = 0;
+			int integracionsAmbPeticions = 0;
 			for (IntegracioSalut is: salutIntegracions) {
-				totalPeticionsOk = totalPeticionsOk + (is.getPeticions().getTotalOk()!=null?is.getPeticions().getTotalOk():0l);
-//				is.getPeticions().getPeticionsPerEntorn().get("").get
+				int latenciaIntegracio = is.getLatencia()!=null?is.getLatencia():0;
+				if (latenciaIntegracio>0) {
+					latenciaTotalIntegracions = latenciaTotalIntegracions + (latenciaIntegracio);
+					integracionsAmbPeticions++; //Si hi ha latencia es que hi ha hagut alguna petició
+				}
+			}
+			if (integracionsAmbPeticions>0) {
+				totalLatencia = totalLatencia + (latenciaTotalIntegracions/integracionsAmbPeticions);
+				numPartsLatencia++;
 			}
 		}
+		
 		if (subsistemesSalut.size()>0) {
+			int latenciaTotalsubsistemes = 0;
+			int subsistemesAmbPeticions = 0;
 			for (SubsistemaSalut ss: subsistemesSalut) {
-				totalPeticionsOk = totalPeticionsOk + (ss.getTotalOk()!=null?ss.getTotalOk():0l);
+				int latenciaSubsistema = ss.getLatencia()!=null?ss.getLatencia():0;
+				if (latenciaSubsistema>0) {
+					latenciaTotalsubsistemes = latenciaTotalsubsistemes + (latenciaSubsistema);
+					subsistemesAmbPeticions++;
+				}
+			}
+			if (subsistemesAmbPeticions>0) {
+				totalLatencia = totalLatencia + (latenciaTotalsubsistemes/subsistemesAmbPeticions);
+				numPartsLatencia++;
 			}
 		}
-		return (int)(totalLatenciaPeticionsOk/totalPeticionsOk);
+		
+		//Latencia mitja entre BBDD, integracions i subsistemes.
+		return (int)(totalLatencia/numPartsLatencia);
 	}
 
     private EstatSalut checkDatabase() {
@@ -513,59 +535,59 @@ public class SalutServiceImpl implements SalutService{
 				"METRICS@Integracions.firmaServidor",
 				"METRICS@Integracions.firmaSimpleWeb"};
 		IntegracioPeticions ipPFI = new IntegracioPeticions();
-		ipUSR.setPeticionsPerEntorn(getPeticionsPerEntorn(IntegracioApp.PFI.toString(), codesFSPFI));
+		ipPFI.setPeticionsPerEntorn(getPeticionsPerEntorn(IntegracioApp.PFI.toString(), codesFSPFI));
 		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.PFI.toString(), ipPFI));
     	
 		String[] codesFSARX = {"METRICS@Integracions.arxiu"};
 		IntegracioPeticions ipARX = new IntegracioPeticions();
-		ipUSR.setPeticionsPerEntorn(getPeticionsPerEntorn(IntegracioApp.ARX.toString(), codesFSARX)); 
+		ipARX.setPeticionsPerEntorn(getPeticionsPerEntorn(IntegracioApp.ARX.toString(), codesFSARX)); 
 		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.ARX.toString(), ipARX));
 		
 		String[] codesFSPBL = {"METRICS@Integracions.pinbal"};
 		IntegracioPeticions ipPBL = new IntegracioPeticions();
-		ipUSR.setPeticionsPerEntorn(getPeticionsPerEntorn(IntegracioApp.PBL.toString(), codesFSPBL)); 
+		ipPBL.setPeticionsPerEntorn(getPeticionsPerEntorn(IntegracioApp.PBL.toString(), codesFSPBL)); 
 		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.PBL.toString(), ipPBL));
 
 		String[] codesFSDIS = {"METRICS@Integracions.distribucio"};
 		IntegracioPeticions ipDIS = new IntegracioPeticions();
-		ipUSR.setPeticionsPerEntorn(getPeticionsPerEntorn(IntegracioApp.DIS.toString(), codesFSDIS)); 
+		ipDIS.setPeticionsPerEntorn(getPeticionsPerEntorn(IntegracioApp.DIS.toString(), codesFSDIS)); 
 		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.DIS.toString(), ipDIS));
 		
 		String[] codesFSCDO = {"METRICS@Integracions.conversio"};
 		IntegracioPeticions ipCDO = new IntegracioPeticions();
-		ipUSR.setPeticionsPerEntorn(getPeticionsPerEntorn(IntegracioApp.CDO.toString(), codesFSCDO));
+		ipCDO.setPeticionsPerEntorn(getPeticionsPerEntorn(IntegracioApp.CDO.toString(), codesFSCDO));
 		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.CDO.toString(), ipCDO));
 		
 		String[] codesFSDIR = {"METRICS@Integracions.dir3"}; //getUnitatsOrganitzativesPlugin, getDadesExternesPlugin
 		IntegracioPeticions ipDIR = new IntegracioPeticions();
-		ipUSR.setPeticionsPerEntorn(getPeticionsPerEntorn(IntegracioApp.DIR.toString(), codesFSDIR));
+		ipDIR.setPeticionsPerEntorn(getPeticionsPerEntorn(IntegracioApp.DIR.toString(), codesFSDIR));
 		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.DIR.toString(), ipDIR));
 		
 		String[] codesFSNOT = {"METRICS@Integracions.notib"};
 		IntegracioPeticions ipNOT = new IntegracioPeticions();
-		ipUSR.setPeticionsPerEntorn(getPeticionsPerEntorn(IntegracioApp.NOT.toString(), codesFSNOT)); 
+		ipNOT.setPeticionsPerEntorn(getPeticionsPerEntorn(IntegracioApp.NOT.toString(), codesFSNOT)); 
 		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.NOT.toString(), ipNOT));
 		
 		if (Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.FIRMA_BIOMETRICA_ACTIVA))) {
 			String[] codesFSVIF = {"METRICS@Integracions.viafirma"};
 			IntegracioPeticions ipVIF = new IntegracioPeticions();
-			ipUSR.setPeticionsPerEntorn(getPeticionsPerEntorn(IntegracioApp.VIF.toString(), codesFSVIF)); 
+			ipVIF.setPeticionsPerEntorn(getPeticionsPerEntorn(IntegracioApp.VIF.toString(), codesFSVIF)); 
 			integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.VIF.toString(), ipVIF));
 		}
 		
 		String[] codesFSDIB = {"METRICS@Integracions.digitalitzacio"};
 		IntegracioPeticions ipDIB = new IntegracioPeticions();
-		ipUSR.setPeticionsPerEntorn(getPeticionsPerEntorn(IntegracioApp.DIB.toString(), codesFSDIB));
+		ipDIB.setPeticionsPerEntorn(getPeticionsPerEntorn(IntegracioApp.DIB.toString(), codesFSDIB));
 		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.DIB.toString(), ipDIB));
 		
 		String[] codesFSVFI = {"METRICS@Integracions.validaFirma"};
 		IntegracioPeticions ipVFI = new IntegracioPeticions();
-		ipUSR.setPeticionsPerEntorn(getPeticionsPerEntorn(IntegracioApp.VFI.toString(), codesFSVFI)); 
+		ipVFI.setPeticionsPerEntorn(getPeticionsPerEntorn(IntegracioApp.VFI.toString(), codesFSVFI)); 
 		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.VFI.toString(), ipVFI));
 		
 		String[] codesFSRSC = {"METRICS@Integracions.rolsac"}; //getProcedimentPlugin
 		IntegracioPeticions ipRSC = new IntegracioPeticions();
-		ipUSR.setPeticionsPerEntorn(getPeticionsPerEntorn(IntegracioApp.RSC.toString(), codesFSRSC)); 
+		ipRSC.setPeticionsPerEntorn(getPeticionsPerEntorn(IntegracioApp.RSC.toString(), codesFSRSC)); 
 		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.RSC.toString(), ipRSC));
     	
     	return integracionsSalut;

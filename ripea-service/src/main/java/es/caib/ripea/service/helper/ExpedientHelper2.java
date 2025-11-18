@@ -38,6 +38,7 @@ import es.caib.ripea.service.intf.dto.ExecucioMassivaEstatDto;
 import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientTascaValidacioDto;
+import es.caib.ripea.service.intf.dto.TascaEstatEnumDto;
 import es.caib.ripea.service.intf.dto.ValidacioErrorDto;
 import es.caib.ripea.service.intf.exception.SistemaExternException;
 import es.caib.ripea.service.intf.exception.ValidationException;
@@ -93,9 +94,11 @@ public class ExpedientHelper2 {
 		List<ExpedientTascaEntity> tasquesExpedient = expedientTascaRepository.findByExpedient(expedient, null);
 		if (tasquesExpedient!=null) {
 			for (ExpedientTascaEntity tasca: tasquesExpedient) {
-				List<MetaExpedientTascaValidacioDto> validacions = tascaHelper.getValidacionsPendentsTasca(tasca.getId());
-				if (validacions!=null && validacions.size()>0) {
-					throw new ValidationException("No es pot tancar un expedient amb tasques que no superen les validacions definides al procediment");
+				if (!TascaEstatEnumDto.CANCELLADA.equals(tasca.getEstat())) {
+					List<MetaExpedientTascaValidacioDto> validacions = tascaHelper.getValidacionsPendentsTasca(tasca.getId());
+					if (validacions!=null && validacions.size()>0) {
+						throw new ValidationException("No es pot tancar un expedient amb tasques que no superen les validacions definides al procediment");
+					}
 				}
 			}
 		}

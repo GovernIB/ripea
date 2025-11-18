@@ -1675,7 +1675,7 @@ public class PluginHelper {
 				integracioAccio.getParametres(),
 				IntegracioAccioTipusEnumDto.ENVIAMENT,
 				System.currentTimeMillis() - integracioAccio.getTempsInici());
-		applicationHelper.stopTimer(sample, "METRICS@Integracions.dadesUsuari", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
+		applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 	}
 
 	private SistemaExternException arxiuEnviamentError(
@@ -1693,7 +1693,7 @@ public class PluginHelper {
 				System.currentTimeMillis() - integracioAccio.getTempsInici(),
 				errorDescripcio,
 				ex);
-		applicationHelper.stopTimer(sample, "METRICS@Integracions.dadesUsuari", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
+		applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 		return new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, errorDescripcio, ex);
 	}
 
