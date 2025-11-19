@@ -105,7 +105,7 @@ public class InteressatResource extends BaseAuditableResource<Long> {
 	
 	@NotNull
 	protected InteressatDocumentTipusEnumDto documentTipus = InteressatDocumentTipusEnumDto.NIF;
-	@Size(max = 17)
+	@Size(max = 36)
     @ResourceField(onChangeActive = true)
 	protected String documentNum;
 	@Size(max = 4)

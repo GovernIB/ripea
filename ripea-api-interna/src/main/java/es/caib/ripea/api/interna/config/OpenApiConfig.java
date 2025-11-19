@@ -1,17 +1,20 @@
 package es.caib.ripea.api.interna.config;
 
+import java.io.IOException;
+import java.util.TimeZone;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
+
+import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
-import java.io.IOException;
-import java.util.jar.Attributes;
-import java.util.jar.Manifest;
 
 @Slf4j
 @Configuration("apiInternaOpenApiConfig")
@@ -35,5 +38,10 @@ public class OpenApiConfig {
 				contact(new Contact().email("ripea.suport@limit.es")).
 				version(version));
 		return openapi;
+	}
+	
+	@Bean
+	public Jackson2ObjectMapperBuilderCustomizer jacksonTimeZoneCustomizer() {
+	    return builder -> builder.timeZone(TimeZone.getTimeZone("Europe/Madrid"));
 	}
 }

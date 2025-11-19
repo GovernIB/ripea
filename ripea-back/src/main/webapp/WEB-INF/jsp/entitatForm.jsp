@@ -84,11 +84,15 @@
 <body>
 	<c:set var="formAction"><rip:modalUrl value="/entitat"/></c:set>
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="entitatCommand" role="form" enctype="multipart/form-data">
+		
 		<form:hidden path="id"/>
+		
 		<rip:inputText name="codi" textKey="entitat.form.camp.codi" required="true" readonly="${!empty entitatCommand.id}"/>
 		<rip:inputText name="nom" textKey="entitat.form.camp.nom" required="true"/>
 		<rip:inputText name="cif" textKey="entitat.form.camp.cif" required="true"/>
 		<rip:inputText name="unitatArrel" textKey="entitat.form.camp.unitat.codi" required="true"/>
+		<rip:inputCheckbox name="permetreEnviamentPostal" textKey="notificacio.form.entregapostal.permes"/>
+		
 		<fieldset>
 			<legend><spring:message code="entitat.form.lightFields"/></legend>			
 			<rip:inputFile 
@@ -115,6 +119,7 @@
 			<rip:inputText name="capsaleraColorFons" textKey="entitat.form.camp.capsaleraColorFons"/>
 			<rip:inputText name="capsaleraColorLletra" textKey="entitat.form.camp.capsaleraColorLletra"/>
 		</fieldset>
+		
 		<fieldset>
 			<legend><spring:message code="entitat.form.blackFields"/></legend>			
 			<rip:inputFile 
@@ -141,7 +146,7 @@
 			<rip:inputText name="blackCapsaleraColorFons" textKey="entitat.form.camp.capsaleraColorFons"/>
 			<rip:inputText name="blackCapsaleraColorLletra" textKey="entitat.form.camp.capsaleraColorLletra"/>
 		</fieldset>		
-		<rip:inputCheckbox name="permetreEnviamentPostal" textKey="notificacio.form.entregapostal.permes"/>
+		
 		<div id="modal-botons">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span>
 				<c:choose>
