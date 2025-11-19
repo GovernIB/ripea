@@ -656,9 +656,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     private class MetaExpedientPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
         @Override
         public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
-            if (entity.getEstatAdditional()!=null) {
-                resource.setMetaExpedientInfo(objectMappingHelper.newInstanceMap(Hibernate.unproxy(entity.getMetaExpedient()), MetaExpedientResource.class));
-            }
+        	resource.setMetaExpedientInfo(objectMappingHelper.newInstanceMap(Hibernate.unproxy(entity.getMetaExpedient()), MetaExpedientResource.class));
         }
     }
 
