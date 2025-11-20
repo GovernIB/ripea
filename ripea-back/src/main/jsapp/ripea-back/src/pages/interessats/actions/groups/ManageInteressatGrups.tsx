@@ -3,7 +3,8 @@ import { useTranslation } from "react-i18next";
 import StyledMuiGrid from "../../../../components/StyledMuiGrid.tsx";
 import { Typography } from "@mui/material";
 import * as builder from '../../../../util/springFilterUtils.ts';
-import { MuiFormDialog, MuiFormDialogApi, useBaseAppContext, useFormContext } from "reactlib";
+import { MuiFormDialogApi, useBaseAppContext, useFormContext } from "reactlib";
+import FormActionDialog from "../../../../components/FormActionDialog.tsx";
 
 const sortModel: any = [{ field: 'nom', sort: 'asc' }];
 
@@ -14,6 +15,7 @@ const columns = [
 
 const InteressatsManageGrupsForm = () => {
 	const { data, fields, apiRef } = useFormContext();
+    console.log("data", data)
 	
 	// Filtro de grupos del expediente
 	const filter = useMemo(() => builder.and(
@@ -58,10 +60,10 @@ const ManageInteressatGrups = (props:any) => {
     const { t } = useTranslation();
 
     return (
-        <MuiFormDialog
+        <FormActionDialog
             resourceName={"interessatResource"}
+            action={"GESTIONAR_GRUPS"}
             title={t('page.interessat.action.gestGrups.title')}
-            onClose={(reason?: string) => reason !== 'backdropClick'}
 			dialogButtons={[
 			    {icon: 'save', text: t('common.update'), componentProps: { variant: 'contained' }, value: true },
 			    {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
@@ -69,7 +71,7 @@ const ManageInteressatGrups = (props:any) => {
             {...props}
         >
             <InteressatsManageGrupsForm/>
-        </MuiFormDialog>
+        </FormActionDialog>
     );
 };
 
@@ -79,19 +81,16 @@ const useManageInteressatGrups = (refresh?: () => void) => {
     const { temporalMessageShow } = useBaseAppContext();
 
     const handleShow = (id:any, row:any) => {
-        formApiRef.current?.show?.(id, { grups: row?.grups })
-            .then(() => {
-                refresh?.()
-				temporalMessageShow(null, t('page.interessat.action.gestGrups.ok'));
-            })
-            .catch((error: any) => {
-                error?.message && temporalMessageShow(null, error?.message, 'error');
-            });
+        formApiRef.current?.show?.(id, { grups: row?.grups, expedient: row?.expedient })
     };
+    const onSuccess = () => {
+        refresh?.()
+        temporalMessageShow(null, t('page.interessat.action.gestGrups.ok'), 'success');
+    }
 
     return {
         handleShow,
-        dialog: <ManageInteressatGrups apiRef={formApiRef} />
+        dialog: <ManageInteressatGrups apiRef={formApiRef} onSuccess={onSuccess} />
     };
 };
 
