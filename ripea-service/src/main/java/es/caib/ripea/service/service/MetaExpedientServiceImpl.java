@@ -1820,4 +1820,10 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		return resultat;
 	}
 
+	@Override
+	@Transactional
+	public String initMetaDocumentFlux() throws Exception {
+		return metaDocumentHelper.initMetaDocumentFlux();
+	}
+
 }

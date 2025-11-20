@@ -4,6 +4,9 @@ import es.caib.ripea.back.helper.RolHelper;
 import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientDto;
 import es.caib.ripea.service.intf.service.MetaExpedientService;
+import es.caib.ripea.service.intf.utils.Utils;
+
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -26,6 +29,16 @@ public class AjaxMetaExpedientController extends BaseUserOAdminOOrganController 
 
 	@Autowired private MetaExpedientService metaExpedientService;
 
+	@RequestMapping(value = "/initMetaDocumentFlux", method = RequestMethod.GET)
+	@ResponseBody
+	public String get(HttpServletRequest request, Model model) {
+		try {
+			return metaExpedientService.initMetaDocumentFlux();
+		} catch (Exception e) {
+			return ExceptionUtils.getStackTrace(e);
+		}
+	}
+	
 	@RequestMapping(value = "/metaexpedients/{text}/{organId}", method = RequestMethod.GET)
 	@ResponseBody
 	public List<MetaExpedientDto> get(

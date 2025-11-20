@@ -101,6 +101,12 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 	@OneToMany(mappedBy = "metaDocument", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<MetaDocumentFluxPortafibEntity> fluxosFirma = new ArrayList<MetaDocumentFluxPortafibEntity>();
 	
+	//TODO: Eliminar camp en versió 1.0.4 o superior (també del repositori findWhereFluxNotNull)
+	//i la funcio initMetaDocumentFlux de MetaExpedientService
+	@Column(name = "portafirmes_fluxid", length = 64)
+	private String portafirmesFluxId;
+	public String getPortafirmesFluxId() { return portafirmesFluxId; }
+	
 	/** * --------------------------------------------- * */
 
 	public MultiplicitatEnumDto getMultiplicitat() {

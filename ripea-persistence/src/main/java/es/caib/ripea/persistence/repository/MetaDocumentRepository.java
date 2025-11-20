@@ -128,4 +128,7 @@ public interface MetaDocumentRepository extends JpaRepository<MetaDocumentEntity
 			@Param("metaExpedient") MetaExpedientEntity metaExpedient);
 	
 	MetaDocumentEntity findByMetaExpedientAndPerDefecteTrue(MetaExpedientEntity metaExpedient);
+	
+	@Query("from MetaDocumentEntity md where md.portafirmesFluxId is not null order by md.id asc")
+	List<MetaDocumentEntity> findWhereFluxNotNull();
 }
