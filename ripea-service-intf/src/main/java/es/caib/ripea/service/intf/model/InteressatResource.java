@@ -70,6 +70,11 @@ import lombok.experimental.FieldNameConstants;
                         type = ResourceArtifactType.ACTION,
                         code = InteressatResource.ACTION_DELETE_REPRESENTANT,
                         requiresId = true),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = InteressatResource.ACTION_GESTIONAR_GRUPS,
+                        formClass = InteressatResource.GestionarGrupsFrom.class,
+                        requiresId = true),
         }
 )
 public class InteressatResource extends BaseAuditableResource<Long> {
@@ -82,6 +87,7 @@ public class InteressatResource extends BaseAuditableResource<Long> {
     public static final String ACTION_GUARDAR_ARXIU  = "GUARDAR_ARXIU";
     public static final String ACTION_DELETE_INTERESSAT  = "DELETE_INTERESSAT";
     public static final String ACTION_DELETE_REPRESENTANT  = "DELETE_REPRESENTANT";
+    public static final String ACTION_GESTIONAR_GRUPS  = "GESTIONAR_GRUPS";
     public static final String FILTER_CODE = "UNITAT_ORGANITZATIVA_FILTER";
 
 	@NotNull
@@ -236,5 +242,13 @@ public class InteressatResource extends BaseAuditableResource<Long> {
         private String nif;
         private String nom;
         private boolean unitatArrel;
+    }
+
+    @Getter
+    @Setter
+    @FieldNameConstants
+    public static class GestionarGrupsFrom implements Serializable {
+        @NotNull
+        private List<ResourceReference<InteressatGrupResource, Long>> grups;
     }
 }

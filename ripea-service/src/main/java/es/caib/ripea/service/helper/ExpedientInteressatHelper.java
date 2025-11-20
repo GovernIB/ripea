@@ -440,19 +440,6 @@ public class ExpedientInteressatHelper {
 			arxiuPropagarInteressats(expedient, interessatRepresentantEntity);
 		}
 		
-		List<Long> grupsId = Optional.ofNullable(interessatRepresentant.getGrupsId())
-		        .orElse(Collections.emptyList());
-		
-		// Eliminar asociaciones actuales
-		new ArrayList<>(interessatRepresentantEntity.getGrups())
-		        .forEach(interessatRepresentantEntity::removeGrup);
-		
-		// Añadir nuevas asociaciones si las hay
-		if (!grupsId.isEmpty()) {
-		    List<InteressatGrupEntity> nuevosGrups = interessatGrupRepository.findByIdIn(grupsId);
-		    nuevosGrups.forEach(interessatRepresentantEntity::addGrup);
-		}
-		
 		return interessatRepresentantEntity;
 	}
 
