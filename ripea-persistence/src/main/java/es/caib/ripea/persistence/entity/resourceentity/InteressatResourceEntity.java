@@ -143,8 +143,8 @@ public class InteressatResourceEntity extends BaseAuditableEntity<InteressatReso
             name = BaseConfig.DB_PREFIX + "interessat_grup_rel",
             joinColumns = @JoinColumn(name = "interessat_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "grup_id", referencedColumnName = "id"),
-            foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "interessat_gruprel_inter_fk"),
-            inverseForeignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "interessat_gruprel_grup_fk")
+            foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "inter_gruprel_inter_fk"),
+            inverseForeignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "inter_gruprel_grup_fk")
     )
     protected List<InteressatGrupResourceEntity> grups = new ArrayList<>();
 	

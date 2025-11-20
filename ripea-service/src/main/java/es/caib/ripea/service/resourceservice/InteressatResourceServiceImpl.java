@@ -351,7 +351,12 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
 
     @Override
     public InteressatResource update(Long id, InteressatResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotFoundException {
-        return interessatResourceHelper.update(resource);
+    	try {
+    		return interessatResourceHelper.update(resource);
+    	} catch (Exception ex) {
+    		log.error("Error update InteressatResource", ex);
+    		return resource;
+    	}
     }
 
     private class RespresentantPerspectiveApplicator implements PerspectiveApplicator<InteressatResourceEntity, InteressatResource> {

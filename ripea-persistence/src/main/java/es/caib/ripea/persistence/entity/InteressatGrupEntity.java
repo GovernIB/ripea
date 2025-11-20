@@ -55,8 +55,8 @@ public class InteressatGrupEntity extends RipeaAuditable<Long> {
 	    name = BaseConfig.DB_PREFIX + "interessat_grup_rel",
 	    joinColumns = @JoinColumn(name = "grup_id", referencedColumnName = "id"),
 	    inverseJoinColumns = @JoinColumn(name = "interessat_id", referencedColumnName = "id"),
-	    foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "interessat_gruprel_grup_fk"),
-	    inverseForeignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "interessat_gruprel_inter_fk")
+	    foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "inter_gruprel_grup_fk"),
+	    inverseForeignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "inter_gruprel_inter_fk")
 	)
 	protected List<InteressatEntity> interessats;
 	
