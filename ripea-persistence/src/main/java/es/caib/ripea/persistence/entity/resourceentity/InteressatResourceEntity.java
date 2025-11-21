@@ -4,21 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.ForeignKey;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.Version;
+import javax.persistence.*;
 
 import es.caib.ripea.persistence.base.entity.BaseAuditableEntity;
 import es.caib.ripea.service.intf.config.BaseConfig;
@@ -152,7 +138,14 @@ public class InteressatResourceEntity extends BaseAuditableEntity<InteressatReso
     protected List<InteressatResourceEntity> representats;
     
     
-    @ManyToMany(mappedBy = "interessats", fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = BaseConfig.DB_PREFIX + "interessat_grup_rel",
+            joinColumns = @JoinColumn(name = "interessat_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "grup_id", referencedColumnName = "id"),
+            foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "inter_gruprel_inter_fk"),
+            inverseForeignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "inter_gruprel_grup_fk")
+    )
     protected List<InteressatGrupResourceEntity> grups = new ArrayList<>();
 	
 	public String getCodiNom() {

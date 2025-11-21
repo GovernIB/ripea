@@ -26,7 +26,7 @@ export const App: React.FC = () => {
     const version = '1.0.1';
     const { value: entitat } = useEntitatSession()
     useEffect(() => {
-        changeFavicon(entitat?.conf?.favicon || favicon)
+        changeFavicon(getImgFromBytes(entitat?.conf?.favicon) || favicon)
     }, [entitat?.conf?.favicon, favicon]);
     return <BaseApp
         code="cmd"

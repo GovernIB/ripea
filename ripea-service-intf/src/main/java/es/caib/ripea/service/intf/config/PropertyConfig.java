@@ -219,6 +219,14 @@ public class PropertyConfig {
 	public static final String DIGITALITZACIO_PLUGIN_DEBUG			= "es.caib.ripea.plugin.digitalitzacio.log";
 	public static final String DIGITALITZACIO_PLUGIN_ENDPOINT		= "es.caib.ripea.plugin.digitalitzacio.endpointName";
 	public static final String DIGITALITZACIO_PLUGIN_SCANNER_MOCK	= "es.caib.ripea.plugin.digitalitzacio.scanner.mock";
+
+	public static final String COMANDA_PLUGIN_ACTIU					= "es.caib.ripea.plugin.comanda.actiu";
+	public static final String COMANDA_PLUGIN_ENTORN				= "es.caib.ripea.plugin.comanda.entorn";
+	public static final String COMANDA_PLUGIN_CLASS					= "es.caib.ripea.plugin.comanda.class";
+	public static final String COMANDA_PLUGIN_URL					= "es.caib.ripea.plugin.comanda.baseurl";
+	public static final String COMANDA_PLUGIN_USR					= "es.caib.ripea.plugin.comanda.user";
+	public static final String COMANDA_PLUGIN_PWR					= "es.caib.ripea.plugin.comanda.password";
+	public static final String COMANDA_PLUGIN_ENDPOINT				= "es.caib.ripea.plugin.comanda.endpointName";
 	
 	public static final String REINTENTAR_CANVI_ESTAT_DISTRIBUCIO 					= "es.caib.ripea.segonpla.reintentar.anotacions.pendents.enviar.distribucio";	
 	public static final String ENVIAR_EMAILS_PENDENTS_PROCEDIMENT_COMENTARI_CRON 	= "es.caib.ripea.segonpla.email.enviament.procediment.comentari.cron";	

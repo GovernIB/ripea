@@ -43,14 +43,7 @@ public class InteressatGrupResourceEntity extends BaseAuditableEntity<Interessat
 			foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "interessat_grupexped_fk"))
 	protected ExpedientResourceEntity expedient;
 	
-	@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(
-	    name = BaseConfig.DB_PREFIX + "interessat_grup_rel",
-	    joinColumns = @JoinColumn(name = "grup_id", referencedColumnName = "id"),
-	    inverseJoinColumns = @JoinColumn(name = "interessat_id", referencedColumnName = "id"),
-	    foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "interessat_gruprel_grup_fk"),
-	    inverseForeignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "interessat_gruprel_inter_fk")
-	)
+	@ManyToMany(mappedBy = "grups", fetch = FetchType.LAZY)
 	protected List<InteressatResourceEntity> interessats;
 	
 }

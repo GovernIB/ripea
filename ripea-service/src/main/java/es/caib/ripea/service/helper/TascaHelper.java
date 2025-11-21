@@ -61,6 +61,7 @@ public class TascaHelper {
 	@Autowired private ContingutHelper contingutHelper;
 	@Autowired private CacheHelper cacheHelper;
 	@Autowired private ApplicationHelper applicationHelper;
+	@Autowired private PluginHelper pluginHelper;
 
 	public List<MetaExpedientTascaValidacioDto> getValidacionsPendentsTasca(Long expedientTascaId) {
 		List<MetaExpedientTascaValidacioDto> resultat = new ArrayList<MetaExpedientTascaValidacioDto>();
@@ -211,6 +212,8 @@ public class TascaHelper {
 		
 		logAccioTasca(expedientTascaEntity, LogTipusEnumDto.CANVI_DATALIMIT_TASCA);
 		
+		pluginHelper.comandaTascaSend(expedientTascaEntity);
+		
 		return expedientTascaEntity;
 	}
 	
@@ -305,6 +308,8 @@ public class TascaHelper {
 			//Notificar event als usuaris afectats
 			eventService.notifyTasquesPendents(expedientTascaEntity.getResponsablesAndObservadorsCodis(true));
 			
+			pluginHelper.comandaTascaSend(expedientTascaEntity);
+			
 			applicationHelper.stopTimer(sample, "METRICS@Subsystem_Expedient.createTasca", "resultado", "exito");
 			
     		return expedientTascaEntity;
@@ -350,6 +355,8 @@ public class TascaHelper {
 		//Notificar event als usuaris afectats
 		eventService.notifyTasquesPendents(List.of(auth.getName()));
 		
+		pluginHelper.comandaTascaSend(expedientTascaEntity);
+		
 		logAccioTasca(expedientTascaEntity, LogTipusEnumDto.CANCELAR_DELEGACIO_TASCA);
 		return expedientTascaEntity;
 	}
@@ -371,6 +378,8 @@ public class TascaHelper {
 		
 		//Notificar event als usuaris afectats
 		eventService.notifyTasquesPendents(List.of(delegat.getCodi()));
+		
+		pluginHelper.comandaTascaSend(expedientTascaEntity);
 		
 		logAccioTasca(expedientTascaEntity, LogTipusEnumDto.DELEGAR_TASCA);
 		return expedientTascaEntity;
@@ -395,6 +404,8 @@ public class TascaHelper {
 		//Notificar event als usuaris afectats
 		eventService.notifyTasquesPendents(expedientTascaEntity.getResponsablesAndObservadorsCodis(false));
 		
+		pluginHelper.comandaTascaSend(expedientTascaEntity);
+		
 		logAccioTasca(expedientTascaEntity, LogTipusEnumDto.CANVI_RESPONSABLES);
 		return expedientTascaEntity;
 	}
@@ -408,14 +419,14 @@ public class TascaHelper {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			UsuariEntity responsableActual = usuariRepository.findById(auth.getName()).orElse(null);
 			if (responsableActual==null) throw new NotFoundException(auth.getName(), UsuariEntity.class);
-			ExpedientTascaEntity tasca = expedientTascaRepository.getOne(tascaId);
+			ExpedientTascaEntity tascaEntity = expedientTascaRepository.getOne(tascaId);
 	
 			try {
-				tasca = comprovarTasca(tascaId);
+				tascaEntity = comprovarTasca(tascaId);
 			} catch (Exception e) {
 				contingutHelper.comprovarContingutDinsExpedientModificable(
-					tasca.getExpedient().getEntitat().getId(),
-					tasca.getExpedient().getId(),
+					tascaEntity.getExpedient().getEntitat().getId(),
+					tascaEntity.getExpedient().getId(),
 					false,
 					true,
 					false,
@@ -425,53 +436,55 @@ public class TascaHelper {
 					rolActual);
 			}
 	
-			TascaEstatEnumDto tascaEstatAnterior = tasca.getEstat();
+			TascaEstatEnumDto tascaEstatAnterior = tascaEntity.getEstat();
 	
 			if (tascaEstat == TascaEstatEnumDto.REBUTJADA) {
-				tasca.updateRebutjar(motiu);
+				tascaEntity.updateRebutjar(motiu);
 			} else {
-				tasca.updateEstat(tascaEstat);
+				tascaEntity.updateEstat(tascaEstat);
 			}
 	
 			if (tascaEstat == TascaEstatEnumDto.FINALITZADA || tascaEstat == TascaEstatEnumDto.CANCELLADA || tascaEstat == TascaEstatEnumDto.REBUTJADA) {
-				tasca.updateDelegat(null);
+				tascaEntity.updateDelegat(null);
 			}
 	
 			if (tascaEstat == TascaEstatEnumDto.INICIADA) {
-				tasca.updateResponsableActual(responsableActual);
+				tascaEntity.updateResponsableActual(responsableActual);
 			}
 	
-			ExpedientEntity expedientEntity = tasca.getExpedient();
+			ExpedientEntity expedientEntity = tascaEntity.getExpedient();
 	
-			if (tascaEstat == TascaEstatEnumDto.FINALITZADA && tasca.getMetaTasca().getEstatFinalitzarTasca() != null) {
-				expedientEntity.updateEstatAdditional(tasca.getMetaTasca().getEstatFinalitzarTasca());
+			if (tascaEstat == TascaEstatEnumDto.FINALITZADA && tascaEntity.getMetaTasca().getEstatFinalitzarTasca() != null) {
+				expedientEntity.updateEstatAdditional(tascaEntity.getMetaTasca().getEstatFinalitzarTasca());
 			}
 	
 			// Tornar a l'estat inicial 'OBERT' si no hi ha un estat addicional en finalitzar tasca
 			if (tascaEstat == TascaEstatEnumDto.FINALITZADA
-				&& tasca.getMetaTasca().getEstatFinalitzarTasca() == null
+				&& tascaEntity.getMetaTasca().getEstatFinalitzarTasca() == null
 				&& expedientEntity.getEstatAdditional() != null) {
 				expedientEntity.updateEstatAdditional(null);
 			}
 	
-			emailHelper.enviarEmailCanviarEstatTasca(tasca, tascaEstatAnterior);
+			emailHelper.enviarEmailCanviarEstatTasca(tascaEntity, tascaEstatAnterior);
 	
-			for (UsuariEntity responsable : tasca.getResponsables()) {
+			for (UsuariEntity responsable : tascaEntity.getResponsables()) {
 				cacheHelper.evictCountTasquesPendents(responsable.getCodi());
 			}
 			
-			if (tasca.getObservadors() != null) {
-				for (UsuariEntity observador : tasca.getObservadors()) {
+			if (tascaEntity.getObservadors() != null) {
+				for (UsuariEntity observador : tascaEntity.getObservadors()) {
 					cacheHelper.evictCountTasquesPendents(observador.getCodi());
 				}
 			}
 	
 			//Notificar event als usuaris afectats
-			eventService.notifyTasquesPendents(tasca.getResponsablesAndObservadorsCodis(true));
+			eventService.notifyTasquesPendents(tascaEntity.getResponsablesAndObservadorsCodis(true));
 			
-			logAccioTasca(tasca, LogTipusEnumDto.CANVI_ESTAT);
+			pluginHelper.comandaTascaSend(tascaEntity);
+			
+			logAccioTasca(tascaEntity, LogTipusEnumDto.CANVI_ESTAT);
 			applicationHelper.stopTimer(sample, "METRICS@Subsystem_Expedient.canviEstatTasca", "resultado", "exito");
-			return tasca;
+			return tascaEntity;
 			
 		} catch (Exception e) {
 			applicationHelper.stopTimer(sample, "METRICS@Subsystem_Expedient.canviEstatTasca", "resultado", "error");

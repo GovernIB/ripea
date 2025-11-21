@@ -69,8 +69,10 @@ const TancarForm = () => {
     }, [selectedRows]);
 
     const selectedModel: any[] = useMemo(() => {
-        return entity?.documentObligatorisAlTancar?.map?.((row: any) => row?.id) ?? []
-    }, [entity])
+        const defaultSelection = entity?.documentObligatorisAlTancar?.map?.((row: any) => row?.id) ?? []
+        formApiRef?.current?.setFieldValue('documentsPerFirmar', defaultSelection);
+        return defaultSelection;
+    }, [entity?.documentObligatorisAlTancar])
 
     return <Load value={entity}>
         <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>

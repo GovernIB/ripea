@@ -12,4 +12,5 @@ public interface MetaDocumentFluxPortafibRepository extends JpaRepository<MetaDo
 	
 	public List<MetaDocumentFluxPortafibEntity> findByMetaDocumentId(Long metaDocumentId);
 
+	public MetaDocumentFluxPortafibEntity findByMetaDocumentIdAndPortafirmesFluxId(Long metaDocumentId, String portafirmesFluxId);
 }

@@ -221,7 +221,8 @@ public class ExpressionGenerator extends com.turkraft.springfilter.parser.genera
 			pathJavaType = databasePath.getJavaType();
 			if (Collection.class.isAssignableFrom(pathJavaType)) {
 				String fieldName = path.substring(0, path.length() - ".id".length());
-				Field collectionField = Objects.requireNonNull(ReflectionUtils.findField(root.getJavaType(), fieldName));
+//				Field collectionField = Objects.requireNonNull(ReflectionUtils.findField(root.getJavaType(), fieldName));
+				Field collectionField = ReflectionFieldResolver.findNestedField(root.getJavaType(), fieldName);
 				pathJavaType = ResolvableType.forField(collectionField).getGeneric(0).resolve();
 			}
 		}

@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -30,18 +31,38 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RestController
 @Tag(name = "Integració comanda - RIPEA", description = "Publicació de dades estadístiques de l'aplicació")
-public class EstadistiquesController {
+public class EstadistiquesController extends BaseApiInternaController {
 
 	private final SegonPlaService segonPlaService;
+	private ManifestInfo manifestInfo;
+	
+	protected ManifestInfo getManifestInfo() throws IOException {
+        if (manifestInfo == null) {
+            manifestInfo = buildManifestInfo();
+        }
+        return manifestInfo;
+    }
 	
     @GetMapping("/estadistiquesInfo")
     public EstadistiquesInfo statsInfo() throws IOException {
     	autenticaAmbRolTothom();
         List<DimensioDesc> dimensions  = segonPlaService.getDimensionsInfo();
         List<IndicadorDesc> indicadors = segonPlaService.getIndicadorsInfo();
-        return EstadistiquesInfo.builder().codi("RIP").dimensions(dimensions).indicadors(indicadors).build();
+        return EstadistiquesInfo.builder()
+        		.codi("RIP")
+        		.data(Calendar.getInstance().getTime())
+        		.versio(getManifestInfo().getVersion())
+        		.dimensions(dimensions)
+        		.indicadors(indicadors).build();
     }
 	
+    @GetMapping("/estadistiques")
+    public RegistresEstadistics estadistiques(HttpServletRequest request) throws Exception {
+        LocalDate ayer = LocalDate.now().minusDays(1);
+        DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+    	return estadistiques(request, ayer.format(formato));
+    }
+    
     @GetMapping("/estadistiques/of/{data}")
     public RegistresEstadistics estadistiques(HttpServletRequest request, @PathVariable String data) throws Exception {
     	autenticaAmbRolTothom();

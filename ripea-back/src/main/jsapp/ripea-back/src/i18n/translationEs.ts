@@ -311,7 +311,7 @@ const translationEs = {
                     ok: "La anotación se ha rechazado correctamente",
                 },
                 canviProcediment: {
-                    label: "Cambiar procedimiento",
+                    label: "Modificar...",
                     title: "Cambiar procedimiento",
                     ok: "La anotación {{data.identificador}} se ha modificado correctamente",
                 },

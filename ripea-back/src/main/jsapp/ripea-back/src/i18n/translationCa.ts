@@ -311,7 +311,7 @@ const translationCa = {
                     ok: "L'anotació s'ha rebutjat correctament",
                 },
                 canviProcediment: {
-                    label: "Canviar procediment",
+                    label: "Modificar...",
                     title: "Canviar procediment",
                     ok: "L'anotació {{data.identificador}} s'ha modificat correctament",
                 },

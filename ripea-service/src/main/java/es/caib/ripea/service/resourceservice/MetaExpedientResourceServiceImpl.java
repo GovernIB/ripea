@@ -2,6 +2,7 @@ package es.caib.ripea.service.resourceservice;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
@@ -37,7 +38,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 	private final MetaExpedientHelper metaExpedientHelper;
 	private final EntityComprovarHelper entityComprovarHelper;
 
-    @Override
+	@Override
     protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
 
         String entitatActualCodi = configHelper.getEntitatActualCodi();
@@ -51,6 +52,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 		boolean usuariFiltreOrgan = isAdminOrgan || isDissenyador;
         
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true,false);
+    	Map<String, String> mapaNamedQueries =  Utils.namedQueriesToMap(namedQueries);
 		
 		Filter filtreBase = null;
 		//Si ja ve un filtre definit per entitat, no aplicarem el filtre de entitat actual.
@@ -68,15 +70,38 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 //        }
         
         List<Long> procsPermesosIds = new ArrayList<Long>();
-        List<MetaExpedientEntity> metaExpPermesos = metaExpedientHelper.findAmbPermis(
-        		entitat.getId(),
-        		ExtendedPermission.READ,
-        		false, //nomesActius --> Aquest filtre s'aplica en el currentSpringFilter si es necessari.
-        		null, //filtreNomOrCodiSia
-        		isAdmin,
-        		isAdminOrgan,
-        		organGestorFiltre!=null?Long.parseLong(organGestorFiltre):null, //organId
-        		organGestorFiltre!=null); //comú
+        List<MetaExpedientEntity> metaExpPermesos = null;
+        if (mapaNamedQueries.size()>0 && mapaNamedQueries.containsKey("EXPEDIENT_CREATE")) {
+            metaExpPermesos = metaExpedientHelper.findAmbPermis(
+            		entitat.getId(),
+            		ExtendedPermission.CREATE,
+            		true, //nomesActius
+            		null, //filtreNomOrCodiSia
+            		isAdmin,
+            		isAdminOrgan,
+            		null, //organId
+            		false); //comú
+        } else if (mapaNamedQueries.size()>0 && mapaNamedQueries.containsKey("EXPEDIENT_UPDATE")) {
+            metaExpPermesos = metaExpedientHelper.findAmbPermis(
+            		entitat.getId(),
+            		ExtendedPermission.WRITE,
+            		false, //nomesActius
+            		null, //filtreNomOrCodiSia
+            		isAdmin,
+            		isAdminOrgan,
+            		null, //organId
+            		false); //comú
+        } else { //Llistat de procediments
+            metaExpPermesos = metaExpedientHelper.findAmbPermis(
+            		entitat.getId(),
+            		ExtendedPermission.READ,
+            		false, //nomesActius
+            		null, //filtreNomOrCodiSia
+            		isAdmin,
+            		isAdminOrgan,
+            		null, //organId
+            		false); //comú
+        }
         
 		if (metaExpPermesos==null || metaExpPermesos.size()==0) {
 			return FilterBuilder.equal("id", 0).generate();

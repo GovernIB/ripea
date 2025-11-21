@@ -11,11 +11,19 @@ import useVisualitzar from "./Visualitzar.tsx";
 import useRegistreInteressatDetail from "../details/RegistreInteressatDetail.tsx";
 
 const AcceptarTabExpedient = () => {
+
     const {data} =useFormContext();
 
+    const filterMetaExpedientAnotacioCrear = builder.and(
+        builder.eq('actiu', true),
+        builder.eq('revisioEstat', "'REVISAT'"),
+    );
+    
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField xs={12} name="accio" required/>
-        <GridFormField xs={12} name="metaExpedient" required/>
+        <GridFormField xs={12} name="metaExpedient" required
+            filter={filterMetaExpedientAnotacioCrear}
+            namedQueries={['EXPEDIENT_CREATE']}/>
 
         {data?.accio == "CREAR" &&
             <>
@@ -152,6 +160,7 @@ const columnsInteressats = [
         flex: 1,
     },
 ]
+
 const AcceptarTabInteressats = () => {
     const { t } = useTranslation()
     const {data, apiRef} = useFormContext();

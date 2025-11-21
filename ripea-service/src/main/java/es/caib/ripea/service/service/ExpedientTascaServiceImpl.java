@@ -71,6 +71,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 	@Autowired private PaginacioHelper paginacioHelper;
 	@Autowired private TascaHelper tascaHelper;
 	@Autowired private ApplicationHelper applicationHelper;
+	
 
 	@Transactional(readOnly = true)
 	@Override

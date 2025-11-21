@@ -1,15 +1,14 @@
-/**
- * 
- */
 package es.caib.ripea.service.intf.dto;
-
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
+
+import org.springframework.web.util.HtmlUtils;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 
 /**
@@ -40,6 +39,20 @@ public class IntegracioAccioDto implements Serializable {
 	private String excepcioMessage;
 	private String excepcioStacktrace;
 
+	public String getExcepcioMessage() {
+		if (excepcioMessage!=null)
+			return HtmlUtils.htmlEscape(excepcioMessage);
+		else
+			return "";
+	}
+	
+	public String getExcepcioStacktrace() {
+		if (excepcioStacktrace!=null)
+			return HtmlUtils.htmlEscape(excepcioStacktrace);
+		else
+			return "";
+	}
+	
 	public int getParametresCount() {
 		if (parametres == null) {
 			return 0;

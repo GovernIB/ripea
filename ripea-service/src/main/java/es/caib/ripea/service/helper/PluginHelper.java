@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.ZoneId;
@@ -39,6 +40,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -48,6 +51,10 @@ import com.itextpdf.text.pdf.AcroFields;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.tool.xml.Experimental;
 
+import es.caib.comanda.ms.broker.model.Avis;
+import es.caib.comanda.ms.broker.model.AvisTipus;
+import es.caib.comanda.ms.broker.model.Tasca;
+import es.caib.comanda.ms.broker.model.TascaEstat;
 import es.caib.distribucio.rest.client.integracio.domini.Annex;
 import es.caib.distribucio.rest.client.integracio.domini.AnotacioRegistreEntrada;
 import es.caib.distribucio.rest.client.integracio.domini.AnotacioRegistreId;
@@ -81,6 +88,7 @@ import es.caib.ripea.persistence.entity.DocumentPortafirmesEntity;
 import es.caib.ripea.persistence.entity.DocumentViaFirmaEntity;
 import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.entity.ExpedientPeticioEntity;
+import es.caib.ripea.persistence.entity.ExpedientTascaEntity;
 import es.caib.ripea.persistence.entity.FluxFirmaUsuariEntity;
 import es.caib.ripea.persistence.entity.InteressatAdministracioEntity;
 import es.caib.ripea.persistence.entity.InteressatEntity;
@@ -101,6 +109,7 @@ import es.caib.ripea.persistence.repository.UsuariRepository;
 import es.caib.ripea.plugin.PropertiesHelper;
 import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternNoTrobatException;
+import es.caib.ripea.plugin.comanda.ComandaCaibPlugin;
 import es.caib.ripea.plugin.conversio.ConversioArxiu;
 import es.caib.ripea.plugin.conversio.ConversioPlugin;
 import es.caib.ripea.plugin.dadesext.ComunitatAutonoma;
@@ -213,12 +222,14 @@ import es.caib.ripea.service.intf.dto.TipusImportEnumDto;
 import es.caib.ripea.service.intf.dto.TipusViaDto;
 import es.caib.ripea.service.intf.dto.UnitatOrganitzativaDto;
 import es.caib.ripea.service.intf.dto.UsuariDto;
+import es.caib.ripea.service.intf.dto.ValidacioErrorDto;
 import es.caib.ripea.service.intf.dto.ViaFirmaDispositiuDto;
 import es.caib.ripea.service.intf.dto.config.ConfigDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.exception.SistemaExternException;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.DocumentService;
+import es.caib.ripea.service.intf.utils.DateUtil;
 import es.caib.ripea.service.intf.utils.Utils;
 import io.micrometer.core.instrument.Timer;
 
@@ -251,6 +262,7 @@ public class PluginHelper {
 	private Map<String, FirmaWebPlugin> firmaSimpleWebPlugins = new HashMap<>();
 	private Map<String, SummarizePlugin> summarizePlugins = new HashMap<>();
 	private Map<String, DistribucioPlugin> distribucioPlugins = new HashMap<>();
+	private Map<String, ComandaCaibPlugin> comandaPlugins = new HashMap<>();
 
 	@Autowired private ConversioTipusHelper conversioTipusHelper;
 	@Autowired private IntegracioHelper integracioHelper;
@@ -1676,7 +1688,7 @@ public class PluginHelper {
 				integracioAccio.getParametres(),
 				IntegracioAccioTipusEnumDto.ENVIAMENT,
 				System.currentTimeMillis() - integracioAccio.getTempsInici());
-		applicationHelper.stopTimer(sample, "METRICS@Integracions.dadesUsuari", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
+		applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 	}
 
 	private SistemaExternException arxiuEnviamentError(
@@ -1694,7 +1706,7 @@ public class PluginHelper {
 				System.currentTimeMillis() - integracioAccio.getTempsInici(),
 				errorDescripcio,
 				ex);
-		applicationHelper.stopTimer(sample, "METRICS@Integracions.dadesUsuari", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
+		applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 		return new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, errorDescripcio, ex);
 	}
 
@@ -6112,6 +6124,313 @@ public class PluginHelper {
 		}
 	}
 	
+	public void comandaTascaSend(ExpedientTascaEntity tascaEntity) {
+		
+		if (configHelper.getAsBoolean(PropertyConfig.COMANDA_PLUGIN_ACTIU)) {
+		
+			Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
+			long t0 = System.currentTimeMillis();
+			String accioDescripcio = "Enviament de una tasca";
+			Map<String, String> accioParams = new HashMap<String, String>();
+			accioParams.put("prodeciment", tascaEntity.getMetaTasca().getMetaExpedient().getNom());
+			accioParams.put("titol", tascaEntity.getTitol());
+			ComandaCaibPlugin comandaCaibPlugin = getComandaPlugin();
+			String endpoint = comandaCaibPlugin.getEndpointURL();
+			
+			try {
+				
+				ResponseEntity<String> resultat = comandaCaibPlugin.sendTasca(tascaRipeaToComanda(tascaEntity));
+				
+				if (resultat.getStatusCode().equals(HttpStatus.OK)) {
+					integracioHelper.addAccioOk(
+							IntegracioHelper.INTCODI_COMANDA,
+							accioDescripcio,
+							endpoint,
+							accioParams,
+							IntegracioAccioTipusEnumDto.ENVIAMENT,
+							System.currentTimeMillis() - t0);
+					applicationHelper.stopTimer(sample, "METRICS@Integracions.comanda", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
+				} else {
+					String errorDescripcio = "Error en la resposta al enviar una tasca a comanda.";
+					integracioHelper.addAccioError(
+							IntegracioHelper.INTCODI_COMANDA,
+							accioDescripcio,
+							endpoint,
+							accioParams,
+							IntegracioAccioTipusEnumDto.ENVIAMENT,
+							System.currentTimeMillis() - t0,
+							errorDescripcio,
+							null);
+					applicationHelper.stopTimer(sample, "METRICS@Integracions.comanda", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
+				}
+							
+			} catch (Exception ex) {
+				String errorDescripcio = "Error al enviar una tasca a comanda.";
+				integracioHelper.addAccioError(
+						IntegracioHelper.INTCODI_COMANDA,
+						accioDescripcio,
+						endpoint,
+						accioParams,
+						IntegracioAccioTipusEnumDto.ENVIAMENT,
+						System.currentTimeMillis() - t0,
+						errorDescripcio,
+						ex);
+				applicationHelper.stopTimer(sample, "METRICS@Integracions.comanda", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
+			}
+		}
+	}
+	
+	private Tasca tascaRipeaToComanda(ExpedientTascaEntity tascaEntity) throws Exception {
+		
+		TascaEstat estatTascaComanda = TascaEstat.PENDENT;
+		if (tascaEntity.getEstat()!=null) {
+			switch (tascaEntity.getEstat()) {
+			case AGAFADA:
+				estatTascaComanda = TascaEstat.INICIADA;
+				break;
+			case CANCELLADA:
+				estatTascaComanda = TascaEstat.CANCELADA;
+				break;
+			case FINALITZADA:
+				estatTascaComanda = TascaEstat.FINALITZADA;
+				break;
+			case INICIADA:
+				estatTascaComanda = TascaEstat.INICIADA;
+				break;
+			case REBUTJADA:
+				estatTascaComanda = TascaEstat.FINALITZADA;
+				break;				
+			default:
+				estatTascaComanda = TascaEstat.PENDENT;
+				break;
+			}
+		}
+		
+		List<String> usuarisAmbPermis = new ArrayList<String>();
+		if (tascaEntity.getResponsables()!=null) {
+			for (UsuariEntity responsable: tascaEntity.getResponsables()) {
+				usuarisAmbPermis.add(responsable.getCodi());
+			}
+		}
+		
+		String redireccio = configHelper.getConfig(PropertyConfig.BASE_URL) + "/contingut/"+tascaEntity.getExpedient().getId()+"?tascaId="+tascaEntity.getId()+"&origenTasques=true";
+		
+		Tasca resultat = Tasca.builder()
+                .appCodi("RIP")
+                .entornCodi(configHelper.getConfig(PropertyConfig.COMANDA_PLUGIN_ENTORN))
+                .identificador(tascaEntity.getId() + "")
+                .tipus(tascaEntity.getMetaTasca().getNom())
+                .nom(tascaEntity.getTitol())
+                .descripcio(tascaEntity.getObservacions())
+                .dataInici(tascaEntity.getDataInici())
+                .dataFi(tascaEntity.getDataFi())
+                .dataCaducitat(tascaEntity.getDataLimit())
+                .estat(estatTascaComanda)
+                .estatDescripcio(tascaEntity.getMotiuRebuig())
+                .numeroExpedient(tascaEntity.getExpedient().getCodi()+"/"+tascaEntity.getExpedient().getNumero()+"/"+tascaEntity.getExpedient().getAny())
+                .responsable(tascaEntity.getResponsableActual()!=null?tascaEntity.getResponsableActual().getCodi():null)
+                .usuarisAmbPermis(usuarisAmbPermis)
+                .grupsAmbPermis(null)
+                .redireccio(new URL(redireccio))
+                .grup(tascaEntity.getExpedient().getGrup()!=null?tascaEntity.getExpedient().getGrup().getCodi():null)
+                .build();
+		return resultat;
+	}
+	
+	private Avis anotacioRipeaToAvisComanda(ExpedientPeticioEntity expedientPeticioEntity) throws Exception {
+		String redireccio = configHelper.getConfig(PropertyConfig.BASE_URL) + "/expedientPeticio/"+expedientPeticioEntity.getId();
+		Avis avisComanda = Avis.builder()
+                .appCodi("RIP")
+                .dataFi(DateUtil.addToDate(expedientPeticioEntity.getDataAlta(), Calendar.MONTH, 3))
+                .dataInici(expedientPeticioEntity.getDataAlta())
+                .entornCodi(configHelper.getConfig(PropertyConfig.COMANDA_PLUGIN_ENTORN))
+                .identificador("ANOTACIO#"+expedientPeticioEntity.getId())
+                .nom(expedientPeticioEntity.getRegistre().getExtracte())
+                .descripcio(expedientPeticioEntity.getObservacions())
+                .tipus(AvisTipus.INFO)
+                .redireccio(new URL(redireccio))
+                .grup(expedientPeticioEntity.getGrup()!=null?expedientPeticioEntity.getGrup().getCodi():null)
+                .build();
+		return avisComanda;
+	}
+	
+	private Avis anotacioRipeaToAvisComanda(ExpedientEntity expedient, List<ValidacioErrorDto> errors) throws Exception {
+		//Els avisos tendran una duració de 10 dies a comanda
+		Date dataFi = DateUtil.addToDate(Calendar.getInstance().getTime(), Calendar.DATE, 10);
+		String descripcio = "L'expedient no té avisos en aquests moments.";
+		//Si ja no hi ha avisos per aquest node, es deixa de mostrar a comanda posant una data inferior a avui
+		if (errors==null || errors.size()==0) {
+			dataFi = DateUtil.addToDate(Calendar.getInstance().getTime(), Calendar.DATE, -1);
+		} else {
+			for (ValidacioErrorDto err: errors) {
+				if (err.getMetaDada()!=null) {
+					descripcio = "No s'ha informat la dada: "+err.getMetaDada().getNom();
+				} else if (err.getTipusValidacio()!=null) {
+					
+					switch (err.getTipusValidacio()) {
+						case INTERESSATS:
+							descripcio = "No s'ha informat cap interessat.";
+							break;
+						case METADOCUMENT:
+							if (err.getMetaDocument()==null) {
+								descripcio = "Hi ha documents sense tipus assignat.";
+							} else {
+								descripcio = "Falta aportar el document: "+err.getMetaDocument().getNom();
+							}
+							break;
+						case MULTIPLICITAT:
+							if (err.getMetaDocument()!=null) {
+								descripcio = "Falta aportar el document: "+err.getMetaDocument().getNom();
+							} else if (err.getMetaDada()!=null) {
+								descripcio = "No s'ha informat la dada: "+err.getMetaDada().getNom();
+							}
+							break;
+						case NOTIFICACIONS:
+							descripcio = "Notificacions pendents.";
+							break;
+						default:
+							break;
+					}
+				} else {
+					descripcio+="Tipus de validacio desconegut";
+					if (err.getMetaDada()!=null) {
+						descripcio+=", per la metadada "+err.getMetaDada().getNom();
+					}
+					if (err.getMetaDocument()!=null) {
+						descripcio+=", per el metadocument "+err.getMetaDocument().getNom();
+					}
+					if (err.getMultiplicitat()!=null) {
+						descripcio+=" que té una multiplicitat "+err.getMultiplicitat().toString();
+					}
+					descripcio+=". ";
+				}
+			}
+		}		
+		
+		String redireccio = configHelper.getConfig(PropertyConfig.BASE_URL) + "/contingut/"+expedient.getId();
+		Avis avisComanda = Avis.builder()
+                .appCodi("RIP")
+                .dataFi(dataFi)
+                .dataInici(Calendar.getInstance().getTime())
+                .entornCodi(configHelper.getConfig(PropertyConfig.COMANDA_PLUGIN_ENTORN))
+                .identificador(expedient.getId()+"")
+                .nom(expedient.getCodi()+"/"+expedient.getNumero()+"/"+expedient.getAny())
+                .descripcio(descripcio)
+                .tipus(AvisTipus.ALERTA)
+                .redireccio(new URL(redireccio))
+                .grup(expedient.getGrup()!=null?expedient.getGrup().getCodi():null)
+                .build();
+		return avisComanda;
+	}
+	
+	public void comandaAvisSend(ExpedientPeticioEntity expedientPeticioEntity) {
+		
+		if (configHelper.getAsBoolean(PropertyConfig.COMANDA_PLUGIN_ACTIU)) {
+		
+			Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
+			long t0 = System.currentTimeMillis();
+			String accioDescripcio = "Enviament de un avís";
+			Map<String, String> accioParams = new HashMap<String, String>();
+			ComandaCaibPlugin comandaCaibPlugin = getComandaPlugin();
+			String endpoint = comandaCaibPlugin.getEndpointURL();
+			
+			try {
+				Avis avisComanda = anotacioRipeaToAvisComanda(expedientPeticioEntity);
+				ResponseEntity<String> resultat = comandaCaibPlugin.sendAvis(avisComanda);
+				accioParams.put("nom", avisComanda.getNom());
+				if (resultat.getStatusCode().equals(HttpStatus.OK)) {
+					integracioHelper.addAccioOk(
+							IntegracioHelper.INTCODI_COMANDA,
+							accioDescripcio,
+							endpoint,
+							accioParams,
+							IntegracioAccioTipusEnumDto.ENVIAMENT,
+							System.currentTimeMillis() - t0);
+					applicationHelper.stopTimer(sample, "METRICS@Integracions.comanda", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
+				} else {
+					String errorDescripcio = "Error en la resposta al enviar un avís a comanda.";
+					integracioHelper.addAccioError(
+							IntegracioHelper.INTCODI_COMANDA,
+							accioDescripcio,
+							endpoint,
+							accioParams,
+							IntegracioAccioTipusEnumDto.ENVIAMENT,
+							System.currentTimeMillis() - t0,
+							errorDescripcio,
+							null);
+					applicationHelper.stopTimer(sample, "METRICS@Integracions.comanda", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");				
+				}
+				
+			} catch (Exception ex) {
+				String errorDescripcio = "Error al enviar un avís a comanda.";
+				integracioHelper.addAccioError(
+						IntegracioHelper.INTCODI_COMANDA,
+						accioDescripcio,
+						endpoint,
+						accioParams,
+						IntegracioAccioTipusEnumDto.ENVIAMENT,
+						System.currentTimeMillis() - t0,
+						errorDescripcio,
+						ex);
+				applicationHelper.stopTimer(sample, "METRICS@Integracions.comanda", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
+			}
+		}
+	}
+	
+	public void comandaAvisSend(ExpedientEntity expedient, List<ValidacioErrorDto> errors) {
+		
+		if (configHelper.getAsBoolean(PropertyConfig.COMANDA_PLUGIN_ACTIU)) {
+		
+			Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
+			long t0 = System.currentTimeMillis();
+			String accioDescripcio = "Enviament de un avís";
+			Map<String, String> accioParams = new HashMap<String, String>();
+			ComandaCaibPlugin comandaCaibPlugin = getComandaPlugin();
+			String endpoint = comandaCaibPlugin.getEndpointURL();
+			
+			try {
+				Avis avisComanda = anotacioRipeaToAvisComanda(expedient, errors);
+				ResponseEntity<String> resultat = comandaCaibPlugin.sendAvis(avisComanda);
+				accioParams.put("nom", avisComanda.getNom());
+				if (resultat.getStatusCode().equals(HttpStatus.OK)) {
+					integracioHelper.addAccioOk(
+							IntegracioHelper.INTCODI_COMANDA,
+							accioDescripcio,
+							endpoint,
+							accioParams,
+							IntegracioAccioTipusEnumDto.ENVIAMENT,
+							System.currentTimeMillis() - t0);
+					applicationHelper.stopTimer(sample, "METRICS@Integracions.comanda", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
+				} else {
+					String errorDescripcio = "Error en la resposta al enviar un avís a comanda.";
+					integracioHelper.addAccioError(
+							IntegracioHelper.INTCODI_COMANDA,
+							accioDescripcio,
+							endpoint,
+							accioParams,
+							IntegracioAccioTipusEnumDto.ENVIAMENT,
+							System.currentTimeMillis() - t0,
+							errorDescripcio,
+							null);
+					applicationHelper.stopTimer(sample, "METRICS@Integracions.comanda", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");				
+				}
+				
+			} catch (Exception ex) {
+				String errorDescripcio = "Error al enviar un avís a comanda.";
+				integracioHelper.addAccioError(
+						IntegracioHelper.INTCODI_COMANDA,
+						accioDescripcio,
+						endpoint,
+						accioParams,
+						IntegracioAccioTipusEnumDto.ENVIAMENT,
+						System.currentTimeMillis() - t0,
+						errorDescripcio,
+						ex);
+				applicationHelper.stopTimer(sample, "METRICS@Integracions.comanda", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
+			}
+		}
+	}
+	
 	private ArbreNodeDto<UnitatOrganitzativaDto> getNodeArbreUnitatsOrganitzatives(
 			UnitatOrganitzativa unitatOrganitzativa,
 			List<UnitatOrganitzativa> unitatsOrganitzatives,
@@ -7326,6 +7645,42 @@ public class PluginHelper {
 		}
 	}
 	
+	private ComandaCaibPlugin getComandaPlugin() {
+		String entitatCodi = configHelper.getEntitatActualCodi();
+		if (entitatCodi == null) {
+			entitatCodi = "_BACKGROUND_";
+		}
+		String organCodi = configHelper.getOrganActualCodi();
+		return getComandaPlugin(entitatCodi, organCodi);
+	}
+	
+	private ComandaCaibPlugin getComandaPlugin(String entitatCodi, String organCodi) {
+
+		ComandaCaibPlugin plugin = comandaPlugins.get(entitatCodi);
+		if (plugin != null) { return plugin; }
+		
+		String pluginClass = getPropertyPluginComanda();
+		
+		if (StringUtils.isEmpty(pluginClass)) {
+			throw new SistemaExternException(IntegracioHelper.INTCODI_COMANDA, "No està configurada la classe per al plugin de comanda");
+		}
+		
+		try {
+			Class<?> clazz = Class.forName(pluginClass);
+			plugin = (ComandaCaibPlugin) clazz.getDeclaredConstructor(
+					String.class,
+					Properties.class).newInstance(
+							ConfigDto.prefix + ".",
+							configHelper.getGroupPropertiesEntitatOrGeneral(Arrays.asList(IntegracioHelper.INTCODI_COMANDA), entitatCodi));
+			comandaPlugins.put(entitatCodi,plugin);
+			return plugin;
+
+		} catch (Exception ex) {
+			throw new SistemaExternException(IntegracioHelper.INTCODI_COMANDA,
+					"Error al crear la instància del plugin de comanda", ex);
+		}
+	}
+	
 	private DadesExternesPlugin getDadesExternesPlugin(String entitatCodi, String organCodi) {
 
 		DadesExternesPlugin plugin = dadesExternesPlugins.get(entitatCodi);
@@ -8020,6 +8375,10 @@ public class PluginHelper {
 
 	private String getPropertyPluginDadesExternes() {
 		return configHelper.getConfig(PropertyConfig.DADESEXT_PLUGIN_DIR3_CLASS);
+	}
+	
+	private String getPropertyPluginComanda() {
+		return configHelper.getConfig(PropertyConfig.COMANDA_PLUGIN_CLASS);
 	}
 
 	private String getPropertyPluginDadesExternesPinbal() {

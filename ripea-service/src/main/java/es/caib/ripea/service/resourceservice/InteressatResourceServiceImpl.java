@@ -114,6 +114,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
         register(InteressatResource.ACTION_GUARDAR_ARXIU, new GuardarArxiuActionExecutor());
         register(InteressatResource.ACTION_DELETE_INTERESSAT, new DeleteInteressatActionExecutor());
         register(InteressatResource.ACTION_DELETE_REPRESENTANT, new DeleteRepresentantActionExecutor());
+        register(InteressatResource.ACTION_GESTIONAR_GRUPS, new GestionarGrupsActionExecutor());
 
         register(InteressatResource.Fields.tipus, new TipusOnchangeLogicProcessor());
         register(InteressatResource.Fields.organCodi, new UnitatsOrganitzativesOnchangeLogicProcessor());
@@ -350,7 +351,12 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
 
     @Override
     public InteressatResource update(Long id, InteressatResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotFoundException {
-        return interessatResourceHelper.update(resource);
+    	try {
+    		return interessatResourceHelper.update(resource);
+    	} catch (Exception ex) {
+    		log.error("Error update InteressatResource", ex);
+    		return resource;
+    	}
     }
 
     private class RespresentantPerspectiveApplicator implements PerspectiveApplicator<InteressatResourceEntity, InteressatResource> {
@@ -579,6 +585,21 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
             parametres.add(params.getExpedient().getId());
             parametres.add(params);
             return parametres;
+        }
+    }
+
+    private class GestionarGrupsActionExecutor implements ActionExecutor<InteressatResourceEntity, InteressatResource.GestionarGrupsFrom, Serializable> {
+
+        @Override
+        public Serializable exec(String code, InteressatResourceEntity entity, InteressatResource.GestionarGrupsFrom params) throws ActionExecutionException {
+            List<Long> ids = params.getGrups().stream().map(ResourceReference::getId).collect(Collectors.toList());
+            List<InteressatGrupResourceEntity> grups = interessatGrupResourceRepository.findAllById(ids);
+            entity.setGrups(grups);
+            return objectMappingHelper.newInstanceMap(entity, InteressatResource.class);
+        }
+
+        @Override
+        public void onChange(Serializable id, InteressatResource.GestionarGrupsFrom previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, InteressatResource.GestionarGrupsFrom target) {
         }
     }
 

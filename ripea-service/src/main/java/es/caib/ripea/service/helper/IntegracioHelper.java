@@ -51,6 +51,7 @@ public class IntegracioHelper {
 	public static final String INTCODI_PROCEDIMENT = "GESCONADM";
 	public static final String INTCODI_SUMMARIZE = "SUMMARIZE";
 	public static final String INTCODI_DISTRIBUCIO = "DISTRIBUCIO";
+	public static final String INTCODI_COMANDA = "COMANDA";
 	
 	private Map<String, LinkedList<IntegracioAccioDto>> accionsIntegracio = Collections.synchronizedMap(new HashMap<String, LinkedList<IntegracioAccioDto>>());
 	private Map<String, Integer> maxAccionsIntegracio = new HashMap<String, Integer>();
@@ -75,6 +76,7 @@ public class IntegracioHelper {
 		integracions.add(novaIntegracio(INTCODI_DIGITALITZACIO));
 		integracions.add(novaIntegracio(INTCODI_VALIDASIG));
 		integracions.add(novaIntegracio(INTCODI_PROCEDIMENT));
+		integracions.add(novaIntegracio(INTCODI_COMANDA));
 		return integracions;
 	}
 

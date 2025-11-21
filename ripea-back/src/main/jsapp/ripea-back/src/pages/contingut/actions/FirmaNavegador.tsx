@@ -55,7 +55,7 @@ export const useFirmaNavegador = (refresh?: () => void) => {
         apiRef.current?.show?.(id);
     }
     const formDialogResultProcessor = (result: any) => {
-        return <Iframe src={result?.url}/>
+        return <Iframe isPDF={false} src={result?.url}/>
     }
 
     return {

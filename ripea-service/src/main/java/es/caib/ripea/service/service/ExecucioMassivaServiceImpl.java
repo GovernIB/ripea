@@ -298,9 +298,9 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 						logger.error("No s'ha pogut enviar el correu de finalització d'accio massiva", e);
 					}
 				}
+				
+				applicationHelper.stopTimer(sample, "METRICS@Subsystem_Background.userMassiveAction", "resultado", "exito");
 			}
-			
-			applicationHelper.stopTimer(sample, "METRICS@Subsystem_Background.userMassiveAction", "resultado", "exito");
 			
 		} catch (Exception e) {
 			logger.error("Error al fer execucio massiva", e);

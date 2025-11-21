@@ -294,6 +294,8 @@ public class CacheHelper {
 				errors.add(crearValidacioError(null, null, ErrorsValidacioTipusEnumDto.INTERESSATS));
 			}
 			
+			pluginHelper.comandaAvisSend(expedient, errors);
+			
 			//Validar les tasques del expedient
 			/*List<ExpedientTascaEntity> tasquesExpedient = expedientTascaRepository.findByExpedient(expedient, null);
 			if (tasquesExpedient!=null) {

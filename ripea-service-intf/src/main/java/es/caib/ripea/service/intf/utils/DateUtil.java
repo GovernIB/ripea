@@ -189,7 +189,12 @@ public class DateUtil {
 		return calendar.getTime();
 	}
 	
-	
-	
+	public static Date addToDate(Date fechaInicio, int calendarField, int valorSumaResta) {
+		if (fechaInicio==null) return null;
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(fechaInicio);
+        cal.add(Calendar.MONTH, 3);
+        return cal.getTime();
+	}
 
 }

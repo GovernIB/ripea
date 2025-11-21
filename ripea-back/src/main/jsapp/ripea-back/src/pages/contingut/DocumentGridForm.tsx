@@ -31,7 +31,7 @@ const ScanerTabForm = () => {
         </Grid>
         <GridFormField xs={12} name="digitalitzacioPerfil"/>
         <Grid item xs={12}>
-            <Iframe src={data?.digitalitzacioProcesUrl} />
+            <Iframe isPDF={false} src={data?.digitalitzacioProcesUrl} />
         </Grid>
     </Grid>
 }
