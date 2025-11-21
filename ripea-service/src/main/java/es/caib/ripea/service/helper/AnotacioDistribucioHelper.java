@@ -1,6 +1,5 @@
 package es.caib.ripea.service.helper;
 
-import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -106,6 +105,8 @@ public class AnotacioDistribucioHelper {
 				 */
 				expedientPeticioHelper.crearRegistrePerPeticio(registre, expedientPeticioEntity, metaExpedientEntity, entitat);
 
+				pluginHelper.comandaAvisSend(expedientPeticioEntity);
+				
 				if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
 					logger.info("anotacioGuardar crearRegistrePerPeticio end (" + identificador + ", " + expedientPeticioId + "):  " + (System.currentTimeMillis() - t3) + " ms");
 				
@@ -195,7 +196,3 @@ public class AnotacioDistribucioHelper {
 	
 	private static final Logger logger = LoggerFactory.getLogger(AnotacioDistribucioHelper.class);
 }
-	
-	
-	
-

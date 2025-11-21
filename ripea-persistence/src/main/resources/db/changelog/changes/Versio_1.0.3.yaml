@@ -76,6 +76,12 @@ databaseChangeLog:
           stripComments: true
           relativeToChangelogFile: true
       - sqlFile:
+          dbms: oracle
+          path: ../scripts/oracle/Versio_1.0.3_DML_5.sql
+          splitStatements: true
+          stripComments: true
+          relativeToChangelogFile: true
+      - sqlFile:
           dbms: postgresql
           path: ../scripts/postgres/Versio_1.0.3_DDL.sql
           splitStatements: true
@@ -144,6 +150,12 @@ databaseChangeLog:
       - sqlFile:
           dbms: postgresql
           path: ../scripts/postgres/Versio_1.0.3_DML_4.sql
+          splitStatements: true
+          stripComments: true
+          relativeToChangelogFile: true
+      - sqlFile:
+          dbms: postgresql
+          path: ../scripts/postgres/Versio_1.0.3_DML_5.sql
           splitStatements: true
           stripComments: true
           relativeToChangelogFile: true
