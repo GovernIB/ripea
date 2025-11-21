@@ -1,6 +1,10 @@
 package es.caib.ripea.persistence.entity.resourceentity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -11,8 +15,10 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import es.caib.ripea.persistence.entity.MetaDocumentFluxPortafibEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.PinbalServeiEntity;
 import es.caib.ripea.service.intf.config.BaseConfig;
@@ -41,8 +47,6 @@ public class MetaDocumentResourceEntity extends MetaNodeResourceEntity<MetaDocum
 	private boolean firmaPortafirmesActiva;
 	@Column(name = "portafirmes_doctip", length = 64)
 	private String portafirmesDocumentTipus;
-	@Column(name = "portafirmes_fluxid", length = 64)
-	private String portafirmesFluxId;
 	@Column(name = "portafirmes_respons", length = 512)
 	private String portafirmesResponsables;
 	@Enumerated(EnumType.STRING)
@@ -107,4 +111,7 @@ public class MetaDocumentResourceEntity extends MetaNodeResourceEntity<MetaDocum
 	
 	@Column(name = "per_defecte")
 	private boolean perDefecte;
+	
+	@OneToMany(mappedBy = "metaDocument", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<MetaDocumentFluxPortafibEntity> fluxosFirma = new ArrayList<MetaDocumentFluxPortafibEntity>();
 }

@@ -1533,7 +1533,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         			//Aquets els afegeix opcionalment l'usuari en el moment de enviar a firmar
         			target.setNifsManuals(null);
         		} else {
-        			target.setPortafirmesEnviarFluxId(metaDocumentResourceEntity.getPortafirmesFluxId());
+//        			target.setPortafirmesEnviarFluxId(metaDocumentResourceEntity.getPortafirmesFluxId());
         			String dadesURL = documentResourceEntity.getExpedient().getId()+"#"+documentResourceEntity.getId()+"#"+SecurityContextHolder.getContext().getAuthentication().getName();
     				String paramSecure = Utils.encripta(dadesURL, configHelper.getConfig(PropertyConfig.CLAU_ENCRIPTACIO));
     				String urlReturnToRipea = configHelper.getConfig(PropertyConfig.BASE_URL) + "/modal/document/event/portafirmes/flux/"+paramSecure+"/";
