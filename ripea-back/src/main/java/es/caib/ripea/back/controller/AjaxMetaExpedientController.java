@@ -1,12 +1,9 @@
 package es.caib.ripea.back.controller;
 
-import es.caib.ripea.back.helper.RolHelper;
-import es.caib.ripea.service.intf.dto.EntitatDto;
-import es.caib.ripea.service.intf.dto.MetaExpedientDto;
-import es.caib.ripea.service.intf.service.MetaExpedientService;
-import es.caib.ripea.service.intf.utils.Utils;
+import java.util.List;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,8 +12,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.List;
+import es.caib.ripea.back.helper.RolHelper;
+import es.caib.ripea.service.intf.dto.EntitatDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientDto;
+import es.caib.ripea.service.intf.service.MetaExpedientService;
 
 /**
  * Controlador per a les consultes ajax dels metaexpedients.
@@ -28,16 +27,6 @@ import java.util.List;
 public class AjaxMetaExpedientController extends BaseUserOAdminOOrganController {
 
 	@Autowired private MetaExpedientService metaExpedientService;
-
-	@RequestMapping(value = "/initMetaDocumentFlux", method = RequestMethod.GET)
-	@ResponseBody
-	public String get(HttpServletRequest request, Model model) {
-		try {
-			return metaExpedientService.initMetaDocumentFlux();
-		} catch (Exception e) {
-			return ExceptionUtils.getStackTrace(e);
-		}
-	}
 	
 	@RequestMapping(value = "/metaexpedients/{text}/{organId}", method = RequestMethod.GET)
 	@ResponseBody

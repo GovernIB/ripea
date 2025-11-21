@@ -33,9 +33,7 @@ import es.caib.ripea.persistence.repository.PinbalServeiRepository;
 import es.caib.ripea.persistence.repository.UsuariRepository;
 import es.caib.ripea.service.intf.dto.MetaDocumentDto;
 import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
-import es.caib.ripea.service.intf.dto.PortafirmesFluxInfoDto;
 import es.caib.ripea.service.intf.exception.SistemaExternException;
-import es.caib.ripea.service.intf.utils.Utils;
 import io.micrometer.core.instrument.Timer;
 
 @Component
@@ -371,44 +369,6 @@ public class MetaDocumentHelper {
 	
 	public List<MetaDocumentEntity> findMetaDocumentsPinbalDisponiblesPerCreacio(Long expedientId) {
 		return findMetaDocumentsPinbalDisponiblesPerCreacio(expedientRepository.findById(expedientId).get());
-	}
-	
-	public String initMetaDocumentFlux() throws Exception {
-		String resultat = "";
-		
-		List<MetaDocumentEntity> metaDocuments = metaDocumentRepository.findWhereFluxNotNull();
-		
-		if (metaDocuments!=null) {
-			for (MetaDocumentEntity metaDocEntity: metaDocuments) {
-				if (Utils.hasValue(metaDocEntity.getPortafirmesFluxId())) {
-					//Si el metadocument tenia un flux de firma definit (abans només en podia tenir un)
-					//Cercam si ja consta a la taula 1-N de fluxos IPA_METADOCUMENTFLUX (sino el crearem)
-					MetaDocumentFluxPortafibEntity metaDocFluxEntity = metaDocumentFluxPortafibRepository.findByMetaDocumentIdAndPortafirmesFluxId(
-							metaDocEntity.getId(),
-							metaDocEntity.getPortafirmesFluxId());
-					
-					if (metaDocFluxEntity==null) {
-						metaDocFluxEntity = new MetaDocumentFluxPortafibEntity();
-						metaDocFluxEntity.setMetaDocument(metaDocEntity);
-						metaDocFluxEntity.setPortafirmesFluxId(metaDocEntity.getPortafirmesFluxId());
-					}
-					
-					//Obtenim la descripció del flux de portafib
-					try {
-						PortafirmesFluxInfoDto fluxInfo = pluginHelper.portafirmesRecuperarInfoFluxDeFirma(metaDocEntity.getPortafirmesFluxId(), "ca", false);
-						metaDocFluxEntity.setPortafirmesFluxDesc(fluxInfo.getDescripcio());
-					} catch (Exception pfEx) {
-						metaDocFluxEntity.setPortafirmesFluxDesc("Flux "+metaDocEntity.getPortafirmesFluxId());
-					}
-					
-					metaDocumentFluxPortafibRepository.save(metaDocFluxEntity);
-					
-					resultat+="- Configurat fluxe " + metaDocFluxEntity.getPortafirmesFluxId() +" per el document " +  metaDocEntity.getId()+".</br>";
-				}
-			}
-		}
-		
-		return resultat;
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(MetaDocumentHelper.class);
