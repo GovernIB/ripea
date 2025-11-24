@@ -159,9 +159,11 @@ public class DocumentResourceEntity extends NodeResourceEntity<DocumentResource>
     @Where(clause = "dtype = 'DocumentPortafirmesEntity'")
     private List<DocumentPortafirmesResourceEntity> portafirmes = new ArrayList<>();
 	
-	public MetaDocumentResourceEntity getMetaDocument() {
-		return (MetaDocumentResourceEntity)getMetaNode();
-	}
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@JoinColumn(
+			name = "metaDocument_id",
+			foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "doc_metadoc_fk"))
+	private MetaDocumentResourceEntity metaDocument;
 	
 	public void updateEstat(DocumentEstatEnumDto estat) {
 		this.estat = estat;

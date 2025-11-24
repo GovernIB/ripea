@@ -4,10 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import es.caib.ripea.persistence.entity.resourceentity.EntitatResourceEntity;
-import es.caib.ripea.persistence.entity.resourcerepository.EntitatResourceRepository;
-import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
-import org.springframework.security.acls.model.Permission;
 import org.springframework.stereotype.Service;
 
 import com.turkraft.springfilter.FilterBuilder;
@@ -16,18 +12,20 @@ import com.turkraft.springfilter.parser.Filter;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.GrupEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
+import es.caib.ripea.persistence.entity.resourceentity.EntitatResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.GrupResourceEntity;
+import es.caib.ripea.persistence.entity.resourcerepository.EntitatResourceRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
+import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.model.EntitatResource;
 import es.caib.ripea.service.intf.model.GrupResource;
 import es.caib.ripea.service.intf.model.MetaExpedientResource;
 import es.caib.ripea.service.intf.resourceservice.GrupResourceService;
 import es.caib.ripea.service.intf.utils.Utils;
-import es.caib.ripea.service.permission.ExtendedPermission;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 

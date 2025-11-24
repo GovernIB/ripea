@@ -1,14 +1,43 @@
 package es.caib.ripea.persistence.entity;
 
-import es.caib.ripea.service.intf.config.BaseConfig;
-import es.caib.ripea.service.intf.dto.*;
-import lombok.Getter;
-import lombok.Setter;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
+import javax.persistence.Basic;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Transient;
+
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.*;
-import java.util.*;
+import es.caib.ripea.service.intf.config.BaseConfig;
+import es.caib.ripea.service.intf.dto.ArxiuEstatEnumDto;
+import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentFirmaTipusEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentNtiEstadoElaboracionEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentNtiTipoFirmaEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
+import es.caib.ripea.service.intf.dto.NtiOrigenEnumDto;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = BaseConfig.DB_PREFIX + "document")
@@ -16,6 +45,11 @@ import java.util.*;
 @Getter @Setter
 public class DocumentEntity extends NodeEntity {
 
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@JoinColumn(name = "metaDocument_id")
+	@ForeignKey(name = BaseConfig.DB_PREFIX + "doc_metadoc_fk")
+	private MetaDocumentEntity metaDocument;
+	
 	@Column(name = "tipus", nullable = false)
 	private DocumentTipusEnumDto documentTipus;
 	@Column(name = "estat", nullable = false)
@@ -235,6 +269,7 @@ public class DocumentEntity extends NodeEntity {
 			NtiOrigenEnumDto ntiOrigen,
 			DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion,
 			String ntiTipoDocumental) {
+		this.metaDocument = metaDocument;
 		this.metaNode = metaDocument;
 		if (ntiOrigen != null) {
 			this.ntiOrigen = ntiOrigen;
@@ -247,8 +282,8 @@ public class DocumentEntity extends NodeEntity {
 		}
 	}
 
-	public void updateTipusDocument(
-			MetaDocumentEntity metaDocument) {
+	public void updateTipusDocument(MetaDocumentEntity metaDocument) {
+		this.metaDocument = metaDocument;
 		this.metaNode = metaDocument;
 	}
 	
@@ -503,6 +538,7 @@ public class DocumentEntity extends NodeEntity {
 			built.ntiEstadoElaboracion = ntiEstadoElaboracion;
 			built.ntiTipoDocumental = ntiTipoDocumental;
 			built.metaNode = metaNode;
+			built.metaDocument = (MetaDocumentEntity)metaNode;
 			built.pare = pare;
 			built.entitat = entitat;
 			built.expedient = expedient;

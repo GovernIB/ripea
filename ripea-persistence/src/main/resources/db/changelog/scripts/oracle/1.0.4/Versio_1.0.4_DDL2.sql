@@ -1,0 +1,3 @@
+--1732 Migrar accions massives a REACT
+ALTER TABLE IPA_DOCUMENT ADD metaDocument_id NUMBER(38,0);
+ALTER TABLE IPA_DOCUMENT ADD CONSTRAINT ipa_doc_metadoc_fk FOREIGN KEY (metaDocument_id) REFERENCES IPA_METADOCUMENT(id);

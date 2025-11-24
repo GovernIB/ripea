@@ -55,7 +55,7 @@ const sortModel: any = [{field: 'createdDate', sort: 'desc'}]
 const columns = [
     {
         field: 'nom',
-        flex: 0.5,
+        flex: 0.8,
     },
     {
         field: 'metaDocument',
@@ -63,16 +63,16 @@ const columns = [
     },
     {
         field: 'expedient',
-        flex: 0.75,
+        flex: 0.6,
         renderCell: (params:any) => <a href={`/contingut/${params?.row?.expedient?.id}`}>{params?.formattedValue}</a>,
     },
     {
         field: 'createdDate',
-        flex: 0.55,
+        flex: 0.5,
     },
     {
         field: 'createdByFullName',
-        flex: 0.45,
+        flex: 0.6,
     },
 ]
 
@@ -124,16 +124,12 @@ const EnviarPortafirmesGrid = () => {
                 resourceName={"documentResource"}
                 columns={columns}
                 filter={springFilter}
-                // TODO: filtrar por permisos y enviable a portafirma
+                namedQueries={['MASSIU_PORTAFIRMES']}
                 sortModel={sortModel}
-
                 rowAdditionalActions={actions}
                 toolbarMassiveActions={massiveActions}
                 isRowSelectable={() => haveRequirements}
-
                 disabledMassiveDefSelector={!haveRequirements}
-                // hiddenMassiveDefSelector={true}
-
                 toolbarHideCreate
             />
         </CardPage>

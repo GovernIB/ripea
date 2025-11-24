@@ -22,8 +22,6 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
-import es.caib.ripea.service.intf.dto.*;
-import es.caib.ripea.service.intf.service.AplicacioService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.fundaciobit.apisib.apifirmasimple.v1.beans.FirmaSimpleStartTransactionRequest;
@@ -31,10 +29,14 @@ import org.hibernate.Hibernate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import com.turkraft.springfilter.FilterBuilder;
+import com.turkraft.springfilter.parser.Filter;
+
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.ripea.persistence.entity.ContingutEntity;
 import es.caib.ripea.persistence.entity.DocumentEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.ViaFirmaUsuariEntity;
 import es.caib.ripea.persistence.entity.resourceentity.DocumentResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.ExpedientResourceEntity;
@@ -67,8 +69,10 @@ import es.caib.ripea.service.helper.DocumentNotificacioHelper;
 import es.caib.ripea.service.helper.EmailHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
+import es.caib.ripea.service.helper.ExecucioMassivaHelper;
 import es.caib.ripea.service.helper.ExpedientHelper;
 import es.caib.ripea.service.helper.MessageHelper;
+import es.caib.ripea.service.helper.MetaExpedientHelper;
 import es.caib.ripea.service.helper.PinbalHelper;
 import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.helper.RolHelper;
@@ -85,7 +89,42 @@ import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ReportFileType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.config.PropertyConfig;
+import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
+import es.caib.ripea.service.intf.dto.ArxiuEstatEnumDto;
+import es.caib.ripea.service.intf.dto.ArxiuFirmaDto;
+import es.caib.ripea.service.intf.dto.DigitalitzacioPerfilDto;
+import es.caib.ripea.service.intf.dto.DigitalitzacioTransaccioRespostaDto;
+import es.caib.ripea.service.intf.dto.DocumentDto;
+import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentFirmaTipusEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentNotificacioDto;
+import es.caib.ripea.service.intf.dto.DocumentNotificacioEstatEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentNotificacioTipusEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentPublicacioDto;
+import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentVersioDto;
+import es.caib.ripea.service.intf.dto.ElementTipusEnumDto;
+import es.caib.ripea.service.intf.dto.ExecucioMassivaContingutDto;
+import es.caib.ripea.service.intf.dto.ExecucioMassivaDto;
+import es.caib.ripea.service.intf.dto.ExecucioMassivaTipusDto;
+import es.caib.ripea.service.intf.dto.FitxerDto;
+import es.caib.ripea.service.intf.dto.InteressatDocumentTipusEnumDto;
+import es.caib.ripea.service.intf.dto.InteressatTipusEnum;
+import es.caib.ripea.service.intf.dto.MetaDocumentFirmaFluxTipusEnumDto;
+import es.caib.ripea.service.intf.dto.MetaNodeDto;
+import es.caib.ripea.service.intf.dto.MunicipiDto;
+import es.caib.ripea.service.intf.dto.PaisDto;
+import es.caib.ripea.service.intf.dto.PinbalConsultaDto;
+import es.caib.ripea.service.intf.dto.PortafirmesFluxRespostaDto;
+import es.caib.ripea.service.intf.dto.PortafirmesIniciFluxRespostaDto;
+import es.caib.ripea.service.intf.dto.Resum;
+import es.caib.ripea.service.intf.dto.SignatureInfoDto;
+import es.caib.ripea.service.intf.dto.UsuariDto;
+import es.caib.ripea.service.intf.dto.VersioDocumentEnum;
+import es.caib.ripea.service.intf.dto.ViaFirmaDispositiuDto;
+import es.caib.ripea.service.intf.dto.ViaFirmaEnviarDto;
 import es.caib.ripea.service.intf.exception.ValidationException;
+import es.caib.ripea.service.intf.model.ContingutResource;
 import es.caib.ripea.service.intf.model.DocumentResource;
 import es.caib.ripea.service.intf.model.DocumentResource.IniciarFirmaSimple;
 import es.caib.ripea.service.intf.model.DocumentResource.NewDocPinbalForm;
@@ -93,13 +132,16 @@ import es.caib.ripea.service.intf.model.DocumentResource.NotificarDocumentsZipFo
 import es.caib.ripea.service.intf.model.DocumentResource.NotificarFormAction;
 import es.caib.ripea.service.intf.model.DocumentResource.UpdateTipusDocumentFormAction;
 import es.caib.ripea.service.intf.model.DocumentResource.ViaFirmaForm;
+import es.caib.ripea.service.intf.model.EntitatResource;
 import es.caib.ripea.service.intf.model.ExpedientResource;
 import es.caib.ripea.service.intf.model.InteressatGrupResource;
 import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.model.MetaDocumentResource;
+import es.caib.ripea.service.intf.model.MetaExpedientResource;
 import es.caib.ripea.service.intf.model.NodeResource.MassiveAction;
 import es.caib.ripea.service.intf.model.UsuariResource;
 import es.caib.ripea.service.intf.resourceservice.DocumentResourceService;
+import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.resourcehelper.ContingutResourceHelper;
 import lombok.RequiredArgsConstructor;
@@ -127,6 +169,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 	private final DocumentFirmaViaFirmaHelper firmaViaFirmaHelper;
 	private final UsuariHelper usuariHelper;
 	private final MessageHelper messageHelper;
+	private final MetaExpedientHelper metaExpedientHelper;
+	private final ExecucioMassivaHelper execucioMassivaHelper;
     private final AplicacioService aplicacioService;
 
     private final UsuariResourceRepository usuariResourceRepository;
@@ -181,6 +225,86 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         register(DocumentResource.Fields.digitalitzacioPerfil, new DigitalitzacioPerfilOnchangeLogicProcessor());
         register(DocumentResource.ViaFirmaForm.Fields.viaFirmaDispositiuCodi, new ViaFirmaDispositiuOptionsProvider());
         register(null, new InitialOnChangeDocumentResourceLogicProcessor());
+    }
+    
+    @Override
+    protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
+    	
+        String entitatActualCodi = configHelper.getEntitatActualCodi();
+        String rolActual		 = configHelper.getRolActual();
+    	EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true,false);
+    	
+    	Filter filtreMetaExpedientsPermesos = null;
+    	Filter filtreUsuari = (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null;
+    	
+        Filter filtreBase = FilterBuilder.and(
+        		filtreUsuari,
+                FilterBuilder.equal(MetaExpedientResource.Fields.entitat + "." + EntitatResource.Fields.codi, 
+                		entitatActualCodi != null?entitatActualCodi:"................................................................................")
+        );
+    	
+        Map<String, String> mapaNamedQueries =  Utils.namedQueriesToMap(namedQueries);
+    	if (mapaNamedQueries.size()>0) {
+    		
+    		if (mapaNamedQueries.containsKey("MASSIU_PORTAFIRMES")) {
+    			
+    			List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitat.getId(), rolActual);
+    			
+    			if (metaExpedientsPermesos==null || metaExpedientsPermesos.size()==0) {
+    				//Sense permisos
+    				return FilterBuilder.equal("id", 0).generate();
+    			} else {
+	    			
+    				List<Long> metaExpedientsPermesosIds = new ArrayList<Long>();			
+	    			
+    				for (MetaExpedientEntity mex: metaExpedientsPermesos) {
+    					metaExpedientsPermesosIds.add(mex.getId());
+    				}
+    				
+	    			String procedimentId = DocumentResource.Fields.expedient + "." + ExpedientResource.Fields.metaExpedient + ".id";
+			    	List<String> permesosClausulesIn = Utils.getIdsEnGruposMil(metaExpedientsPermesosIds);
+			        for (String aux: permesosClausulesIn) {
+				        if (aux != null && !aux.isEmpty()) {
+				        	filtreMetaExpedientsPermesos = FilterBuilder.or(filtreMetaExpedientsPermesos, Filter.parse(procedimentId + " IN (" + aux + ")"));
+				        }
+			        }
+			        
+			        String documentEstatField = DocumentResource.Fields.estat;
+//			        Filter filtreEstatEsborrany = Filter.parse(documentEstatField + "=0");
+			        Filter filtreEstatEsborrany = FilterBuilder.equal(documentEstatField, DocumentEstatEnumDto.REDACCIO.toString()); //ESBORRANY
+			        
+			        String documentEsborratField = ContingutResource.Fields.esborrat;
+//			        Filter filtreNoEsborrat = Filter.parse(documentEsborratField + "<>0"); //NO BORRAT
+			        Filter filtreNoEsborrat = FilterBuilder.equal(documentEsborratField, 0); //NO BORRAT
+			        
+			        String docAdjuntField = DocumentResource.Fields.gesDocAdjuntId;
+			        
+//			        Filter filtreNoAdjunt = Filter.parse(docAdjuntField + " is null");
+			        Filter filtreNoAdjunt = FilterBuilder.isNull(docAdjuntField);
+			        
+			        String documentTipusField = DocumentResource.Fields.documentTipus;
+//			        Filter filtreTipusDoc = Filter.parse(documentTipusField + "=0"); //DIGITAL
+			        Filter filtreTipusDoc = FilterBuilder.equal(documentTipusField, DocumentTipusEnumDto.DIGITAL.toString()); //DIGITAL
+			        
+			        String metaDocPortafirmes = DocumentResource.Fields.metaDocument + "." + MetaDocumentResource.Fields.firmaPortafirmesActiva;
+//			        Filter filtrePfActiu = Filter.parse(metaDocPortafirmes + "=1"); //ENVIAMENT A PF ACTIU
+			        Filter filtrePfActiu = FilterBuilder.equal(metaDocPortafirmes, true); //ENVIAMENT A PF ACTIU		        
+			        
+			        Filter resultat = FilterBuilder.and(
+			        		filtreBase, //Entitat i filtre del usuari
+			        		filtreMetaExpedientsPermesos,
+			        		filtreEstatEsborrany,
+			        		filtreNoEsborrat,
+			        		filtreNoAdjunt,
+			        		filtreTipusDoc,
+			        		filtrePfActiu);
+			        
+			        return resultat.generate();
+    			}
+    		}
+    	}
+        
+        return filtreBase.generate();
     }
     
     public class InitialOnChangeDocumentResourceLogicProcessor implements OnChangeLogicProcessor<DocumentResource> {
@@ -1396,6 +1520,27 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
             }
             return map;
         }
+        
+        private List<String> getNifsResponsables(DocumentResource.EnviarPortafirmesFormAction params) {
+	    	List<String> pfResponsables = new ArrayList<String>();
+	    	if (params.getResponsables()!=null) {
+	    		for (ResourceReference <UsuariResource, String> usuari: params.getResponsables()) {
+	                usuariResourceRepository.findById(usuari.getId())
+	                                .ifPresent(user -> pfResponsables.add(user.getNif()));
+	    		}
+	    	}
+	    	if (params.getNifsManuals()!=null) {
+	    		if(params.getNifsManuals().indexOf(",")>0) {
+	    			pfResponsables.addAll(Arrays.asList(params.getNifsManuals().split(",")));
+	    		} else {
+	    			pfResponsables.add(params.getNifsManuals());
+	    		}
+	    	}
+	    	if (params.getCarrecs()!=null) {
+	    		pfResponsables.addAll(params.getCarrecs());
+	    	}
+	    	return pfResponsables;
+        }
 
         @Override
         public List<FieldOption> getOptions(String fieldName, Map<String, String[]> requestParameterMap) {
@@ -1438,63 +1583,80 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
         	try {
         	
-	        	Long entitatId  = entity.getEntitat().getId();
-	        	Long documentId = entity.getId();
-	        	String rolActual = configHelper.getRolActual();
-	        	
-	        	DocumentEntity document = documentHelper.comprovarDocument(
-	        			entitatId,
-						documentId,
-						false,
-						true,
-						false,
-						false, 
-						false, 
-						rolActual);
-	        	
-	        	//Unificar els portafirmes responsables en un array de NIFS
-	        	List<String> pfResponsables = new ArrayList<String>();
-	        	if (params.getResponsables()!=null) {
-	        		for (ResourceReference <UsuariResource, String> usuari: params.getResponsables()) {
-                        usuariResourceRepository.findById(usuari.getId())
-                                        .ifPresent(user -> pfResponsables.add(user.getNif()));
-	        		}
-	        	}
-	        	if (params.getNifsManuals()!=null) {
-	        		if(params.getNifsManuals().indexOf(",")>0) {
-	        			pfResponsables.addAll(Arrays.asList(params.getNifsManuals().split(",")));
-	        		} else {
-	        			pfResponsables.add(params.getNifsManuals());
-	        		}
-	        	}
-	        	if (params.getCarrecs()!=null) {
-	        		pfResponsables.addAll(params.getCarrecs());
-	        	}
-	        	
-	        	List<Long> annexosIds = new ArrayList<Long>();
-	        	if (params.getAnnexos()!=null) {
-	        		for (ResourceReference <DocumentResource, Long> annex: params.getAnnexos()) {
-	        			annexosIds.add(annex.getId());
-	        		}
-	        	}
-	        	
-	        	//Enviam com a parametre transactionID si s'ha creat un flux temporal, sino enviam el fluxId
-				firmaPortafirmesHelper.portafirmesEnviar(
-						entitatId,
-						document,
-						params.getMotiu(),
-						params.getPrioritat(),
-						null,
-						params.getPortafirmesEnviarFluxId(),
-						pfResponsables.toArray(new String[0]),
-						params.getPortafirmesSequenciaTipus(),
-						params.getPortafirmesFluxTipus(),
-						annexosIds.toArray(new Long[0]),
-						params.getFluxCreat()!=null?params.getFluxCreat().getFluxId():null,
-						params.isAvisFirmaParcial(),
-						params.isFirmaParcial());
-	        	
-	        	return objectMappingHelper.newInstanceMap(entity, DocumentResource.class);
+        		if (!params.isMassivo()) {
+        		
+		        	Long entitatId  = entity.getEntitat().getId();
+		        	Long documentId = entity.getId();
+		        	String rolActual = configHelper.getRolActual();
+		        	
+		        	DocumentEntity document = documentHelper.comprovarDocument(
+		        			entitatId,
+							documentId,
+							false,
+							true,
+							false,
+							false, 
+							false, 
+							rolActual);
+		        	
+		        	//Unificar els portafirmes responsables en un array de NIFS
+		        	List<String> pfResponsables = getNifsResponsables(params);
+		        	
+		        	List<Long> annexosIds = new ArrayList<Long>();
+		        	if (params.getAnnexos()!=null) {
+		        		for (ResourceReference <DocumentResource, Long> annex: params.getAnnexos()) {
+		        			annexosIds.add(annex.getId());
+		        		}
+		        	}
+		        	
+		        	//Enviam com a parametre transactionID si s'ha creat un flux temporal, sino enviam el fluxId
+					firmaPortafirmesHelper.portafirmesEnviar(
+							entitatId,
+							document,
+							params.getMotiu(),
+							params.getPrioritat(),
+							null,
+							params.getPortafirmesEnviarFluxId(),
+							pfResponsables.toArray(new String[0]),
+							params.getPortafirmesSequenciaTipus(),
+							params.getPortafirmesFluxTipus(),
+							annexosIds.toArray(new Long[0]),
+							params.getFluxCreat()!=null?params.getFluxCreat().getFluxId():null,
+							params.isAvisFirmaParcial(),
+							params.isFirmaParcial());
+		        	
+		        	return objectMappingHelper.newInstanceMap(entity, DocumentResource.class);
+        		
+        		} else {
+        			
+	            	List<ExecucioMassivaContingutDto> elementsMassiva = execucioMassivaHelper.getMassivaContingutFromIds(params.getIds());
+	            	
+		        	//Unificar els portafirmes responsables en un array de NIFS
+		        	List<String> pfResponsables = getNifsResponsables(params);
+	            	
+	    			ExecucioMassivaDto execMassDto = new ExecucioMassivaDto(
+	    					ExecucioMassivaTipusDto.PORTASIGNATURES,
+	    					params.getDataInici()!=null?params.getDataInici():new Date(),
+	    					null,
+	    					configHelper.getRolActual());
+	    			
+	    			execMassDto.setEnviarCorreu(params.isEnviarCorreu());
+	    			execMassDto.setMotiu(params.getMotiu());
+	    			execMassDto.setPrioritat(params.getPrioritat());
+	    			execMassDto.setPortafirmesResponsables(pfResponsables.toArray(new String[0]));
+	    			execMassDto.setPortafirmesSequenciaTipus(params.getPortafirmesSequenciaTipus());
+	    			execMassDto.setPortafirmesFluxId(params.getPortafirmesEnviarFluxId());
+	    			execMassDto.setPortafirmesTransaccioId(params.getFluxCreat()!=null?params.getFluxCreat().getFluxId():null);
+	    			execMassDto.setContingutIds(params.getIds());
+	    			execMassDto.setRolActual(configHelper.getRolActual());
+	    			execMassDto.setPortafirmesAvisFirmaParcial(params.isAvisFirmaParcial());
+	    			execMassDto.setPortafirmesFirmaParcial(params.isFirmaParcial());
+	    			
+	    			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+	    			execucioMassivaHelper.saveExecucioMassiva(entitatEntity, execMassDto, elementsMassiva, ElementTipusEnumDto.DOCUMENT);
+        			
+	    			return objectMappingHelper.newInstanceMap(entity, DocumentResource.class);
+        		}
         	
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/document/"+entity.getId()+"/EnviarPortafirmesActionExecutor", e);

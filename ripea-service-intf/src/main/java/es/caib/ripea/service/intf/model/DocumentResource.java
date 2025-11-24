@@ -292,16 +292,17 @@ public class DocumentResource extends NodeResource {
 	private ArxiuEstatEnumDto arxiuEstat;
     @NotNull
 	private DocumentFirmaTipusEnumDto documentFirmaTipus;
+    
 	private ResourceReference<ExpedientEstatResource, Long> expedientEstatAdditional;
-	
-    @ResourceField(onChangeActive = true)
-    public Boolean firmaParcial;
+    @NotNull
+    private ResourceReference<ExpedientResource, Long> expedient;
     
     @NotNull
-    @Transient
     @ResourceField(onChangeActive = true)
     public ResourceReference<MetaDocumentResource, Long> metaDocument;
-
+    
+    @ResourceField(onChangeActive = true)
+    public Boolean firmaParcial;
     @Transient
     @ResourceField(onChangeActive = true)
     public Boolean hasFirma;
@@ -545,7 +546,7 @@ public class DocumentResource extends NodeResource {
     @Setter
     @FieldNameConstants
     @EnviarPortafirmesValid
-    public static class EnviarPortafirmesFormAction implements Serializable {
+    public static class EnviarPortafirmesFormAction extends MassiveAction {
 		private static final long serialVersionUID = -763974048421192748L;
 		@NotNull
         private String motiu;
@@ -578,6 +579,10 @@ public class DocumentResource extends NodeResource {
         @Transient private MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus;
         @Transient private PortafirmesFluxRespostaDto fluxCreat;
         @Transient private String idTransaccio;
+        
+        //CAMPS NOMES VISIBLES A ACCIO MASSIVA
+        private Date dataInici;
+        private boolean enviarCorreu;
     }
     
     @Getter
