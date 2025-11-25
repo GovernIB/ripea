@@ -868,6 +868,12 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("entitat") EntitatEntity entitat,
 			@Param("numeroExpedient") String numeroExpedient);
 
+	@Query(	"select distinct e.id " +
+			"from ExpedientEntity e " +
+			"where e.esborrat = 0 and e.tancatData is null and e.createdDate >= :creacioInici"
+			)
+	public List<Long> findNotEsborratDarrersMesos(@Param("creacioInici") LocalDateTime creacioInici);
+	
 	/**
 	 * ACTUALITZACIO CODU USUARI
 	 */

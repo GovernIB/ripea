@@ -193,7 +193,7 @@ public class DateUtil {
 		if (fechaInicio==null) return null;
         Calendar cal = Calendar.getInstance();
         cal.setTime(fechaInicio);
-        cal.add(Calendar.MONTH, 3);
+        cal.add(calendarField, valorSumaResta);
         return cal.getTime();
 	}
 

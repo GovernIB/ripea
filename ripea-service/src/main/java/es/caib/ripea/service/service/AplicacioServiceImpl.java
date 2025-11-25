@@ -1,6 +1,8 @@
 package es.caib.ripea.service.service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Properties;
 
@@ -89,6 +91,7 @@ import es.caib.ripea.service.intf.dto.IntegracioFiltreDto;
 import es.caib.ripea.service.intf.dto.PaginaDto;
 import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
 import es.caib.ripea.service.intf.dto.UsuariDto;
+import es.caib.ripea.service.intf.dto.ValidacioErrorDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.permission.ExtendedPermission;
@@ -897,5 +900,64 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Override
 	public void stopTimer(Sample sample, String metricCode, String... tags) {
 		applicationHelper.stopTimer(sample, metricCode, tags);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<Long> getTasquesComanda() {
+		return expedientTascaRepository.findTasquesPendents();
+	}
+	
+	
+	@Override
+	@Transactional
+	public String executeTascaComanda(Long tascaId) throws Exception {
+		
+		String resultat = "";
+		
+		if (configHelper.getAsBoolean(PropertyConfig.COMANDA_PLUGIN_ACTIU)) {
+			try {
+				pluginHelper.comandaTascaSendNoLog(expedientTascaRepository.findById(tascaId).get());
+				resultat+="Enviada a Comanda tasca amb id="+tascaId+"</br>";
+			} catch (Exception ex) {
+				throw new Exception("Error al enviar a Comanda tasca amb id="+tascaId+": "+ex.getMessage());
+			}
+		} else {
+			throw new Exception("El plugin de comanda no esta actiu.");
+		}
+		
+		return resultat;
+	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public List<Long> getAvisosComanda() {
+		Calendar cal = Calendar.getInstance();
+		cal.add(Calendar.MONTH, -3);
+		LocalDateTime ldt = LocalDateTime.ofInstant(cal.toInstant(), cal.getTimeZone().toZoneId());
+		return expedientRepository.findNotEsborratDarrersMesos(ldt);
+	}
+	
+	@Override
+	@Transactional
+	public String executeAvisComanda(Long expedientId) throws Exception {
+		String resultat = "";
+		if (configHelper.getAsBoolean(PropertyConfig.COMANDA_PLUGIN_ACTIU)) {
+			try {
+				List<ValidacioErrorDto> errors = cacheHelper.findErrorsValidacioPerNode(expedientId, false);
+				if (errors!=null && errors.size()>0) {
+					pluginHelper.comandaAvisSendNoLog(expedientRepository.findById(expedientId).get(), errors);
+					resultat+=""+errors.size()+" avisos del expedient "+expedientId+" actualitzats a Comanda.";
+				} else {
+					resultat+="L'expedient "+expedientId+" no té avisos actius.";
+				}
+			} catch (Exception ex) {
+				throw new Exception("Error al enviar a Comanda els avisos del expedient "+expedientId+": "+ex.getMessage());
+			}
+		} else {
+			throw new Exception("El plugin de comanda no esta actiu.");
+		}
+		
+		return resultat;
 	}
 }

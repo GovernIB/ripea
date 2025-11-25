@@ -258,4 +258,16 @@ public interface AplicacioService {
 	
 	@PermitAll
 	public String getMetriquesJSON() throws Exception;
+	
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	public List<Long> getTasquesComanda();
+	
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	public String executeTascaComanda(Long tascaId) throws Exception;
+	
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	public List<Long> getAvisosComanda();
+	
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	public String executeAvisComanda(Long expedientId) throws Exception;
 }
