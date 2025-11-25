@@ -9,7 +9,7 @@ import {iniciaDescargaBlob, useCommonActions} from "../../expedient/details/Comm
 import {useMoure, useCopiar, useVincular} from "../actions/Moure.tsx";
 import useNotificar from "../actions/Notificar.tsx";
 import usePublicar from "../actions/Publicar.tsx";
-import useEnviarPortafirmes from "../actions/EnviarPortafirmes.tsx";
+import {useEnviarPortafirmes} from "../actions/EnviarPortafirmes.tsx";
 import useVisualitzar from "../actions/Visualitzar.tsx";
 import useEnviarViaEmail from "../actions/EnviarViaEmail.tsx";
 import useSeguimentPortafirmes from "../actions/SeguimentPortafirmes.tsx";

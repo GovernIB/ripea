@@ -131,7 +131,7 @@ const EnviarPortafirmesForm = forwardRef((props, ref) => {
     
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
 
-        { data?.extension != 'pdf' &&
+        { !data?.massivo && data?.extension != 'pdf' &&
             <Grid xs={12}>
                 <Alert severity={'warning'}
                        action={
@@ -146,6 +146,8 @@ const EnviarPortafirmesForm = forwardRef((props, ref) => {
         }
         {dialog}
 
+        <GridFormField xs={12} name="dataInici" hidden={!data?.massivo}/>
+        <GridFormField xs={12} name="enviarCorreu" hidden={!data?.massivo}/>
         <GridFormField xs={12} name="motiu"/>
         <GridFormField xs={12} name="prioritat" required/>
 
@@ -159,7 +161,7 @@ const EnviarPortafirmesForm = forwardRef((props, ref) => {
 
         {/* PORTAFIB */}
         {data?.portafirmesFluxTipus=='PORTAFIB' && <>
-            <GridFormField xs={12} name="annexos" multiple filter={filterAnnexos}/>
+            <GridFormField xs={12} name="annexos" multiple filter={filterAnnexos} hidden={data?.massivo}/>
             <GridFormField xs={10} name="portafirmesEnviarFluxId"
                            componentProps={{title: t('page.document.detall.flux')}}
                            requestParams={{additionalOption: 
@@ -226,17 +228,19 @@ const EnviarPortafirmes = (props:any) => {
     </FormActionDialog>
 }
 
-const useEnviarPortafirmes = (refresh?: () => void) => {
+export const useEnviarPortafirmes = (refresh?: () => void) => {
     const { t } = useTranslation();
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
 
     const handleShow = (id:any, row:any) :void => {
-        apiRef.current?.show?.(id, {
+        apiRef.current?.show?.(undefined, {
             motiu: `Tramitació de l'expedient [${row?.expedient?.description}]`,
             expedient: row?.expedient,
             metaDocument: row?.metaDocument,
             extension: row?.fitxerExtension,
+            ids: [id],
+            massivo: false,
         })
     }
     const onSuccess = (result:any) :void => {
@@ -249,4 +253,24 @@ const useEnviarPortafirmes = (refresh?: () => void) => {
         content: <EnviarPortafirmes apiRef={apiRef} onSuccess={onSuccess}/>
     }
 }
-export default useEnviarPortafirmes;
+export const useEnviarPortafirmesMassive = (refresh?: () => void) => {
+    const { t } = useTranslation();
+    const apiRef = useRef<MuiFormDialogApi>();
+    const {temporalMessageShow} = useBaseAppContext();
+
+    const handleShow = (ids:any[], additionalData:any) :void => {
+        apiRef.current?.show?.(undefined, {
+            ids,
+            massivo: true,
+        })
+    }
+    const onSuccess = () :void => {
+        refresh?.()
+        temporalMessageShow(null, t('page.expedient.results.actionBackgroundOk'), 'info');
+    }
+
+    return {
+        handleShow,
+        content: <EnviarPortafirmes apiRef={apiRef} onSuccess={onSuccess}/>
+    }
+}
