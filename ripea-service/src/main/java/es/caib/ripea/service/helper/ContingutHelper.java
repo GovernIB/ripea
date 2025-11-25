@@ -598,7 +598,7 @@ public class ContingutHelper {
 		}
 		dto.setAgafatPer(conversioTipusHelper.convertir(expedient.getAgafatPer(), UsuariDto.class));
 
-        List<ValidacioErrorDto> errorsValidacio = cacheHelper.findErrorsValidacioPerNode(expedient.getId());
+        List<ValidacioErrorDto> errorsValidacio = cacheHelper.findErrorsValidacioPerNode(expedient.getId(), true);
         dto.setValid(errorsValidacio.isEmpty());
         dto.setNotificacionsCaducades(expedientHelper.expedientTeNotificacionsCaducades(expedient));
 		dto.setNumSeguidors(expedient.getSeguidors().size());
@@ -934,7 +934,7 @@ public class ContingutHelper {
 	}
 
 	private void setValidationProperties(DocumentDto dto, DocumentEntity document) {
-		dto.setValid(cacheHelper.findErrorsValidacioPerNode(document.getId()).isEmpty());
+		dto.setValid(cacheHelper.findErrorsValidacioPerNode(document.getId(), true).isEmpty());
 		dto.setValidacioFirmaCorrecte(document.isValidacioFirmaCorrecte());
 		dto.setValidacioFirmaErrorMsg(document.getValidacioFirmaErrorMsg());
 	}

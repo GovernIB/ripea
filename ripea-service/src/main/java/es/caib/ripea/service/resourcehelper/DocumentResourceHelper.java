@@ -81,7 +81,7 @@ public class DocumentResourceHelper {
 		if (!DocumentTipusEnumDto.DIGITAL.equals(document.getDocumentTipus())) {
 			throw new ValidationException(document.getId(), DocumentEntity.class, "El document a enviar al portafirmes no és del tipus " + DocumentTipusEnumDto.DIGITAL);
 		}
-		if (!cacheHelper.findErrorsValidacioPerNode(document.getId()).isEmpty()) {
+		if (!cacheHelper.findErrorsValidacioPerNode(document.getId(), true).isEmpty()) {
 			throw new ValidationException(document.getId(), DocumentEntity.class, "El document a enviar al portafirmes te alertes de validació");
 		}		
 		if (DocumentEstatEnumDto.FIRMAT.equals(document.getEstat()) || DocumentEstatEnumDto.CUSTODIAT.equals(document.getEstat())) {

@@ -623,5 +623,8 @@ public interface MetaExpedientService {
 	public boolean hasPermissionForAnyProcediment(Long entitatId, String rolActual, PermissionEnumDto permis);
 
 	@PreAuthorize("hasRole('IPA_ADMIN')")
-	public String initMetaDocumentFlux() throws Exception;
+	public List<Long> getMetaDocumentFluxosIds();
+	
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	public String initMetaDocumentFlux(Long metaDocId) throws Exception;
 }

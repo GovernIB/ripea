@@ -572,7 +572,13 @@ public class MetaExpedientServiceEjb extends AbstractServiceEjb<MetaExpedientSer
 	
 	@Override
 	@RolesAllowed({"IPA_ADMIN"})
-	public String initMetaDocumentFlux() throws Exception {
-		return delegateService.initMetaDocumentFlux();
+	public List<Long> getMetaDocumentFluxosIds() {
+		return delegateService.getMetaDocumentFluxosIds();
+	}
+	
+	@Override
+	@RolesAllowed({"IPA_ADMIN"})
+	public String initMetaDocumentFlux(Long metaDocId) throws Exception {
+		return delegateService.initMetaDocumentFlux(metaDocId);
 	}
 }

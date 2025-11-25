@@ -373,39 +373,36 @@ public class MetaDocumentHelper {
 		return findMetaDocumentsPinbalDisponiblesPerCreacio(expedientRepository.findById(expedientId).get());
 	}
 	
-	public String initMetaDocumentFlux() throws Exception {
-		String resultat = "";
+	public String initMetaDocumentFlux(Long metaDocId) throws Exception {
 		
-		List<MetaDocumentEntity> metaDocuments = metaDocumentRepository.findWhereFluxNotNull();
+		String resultat = "";		
 		
-		if (metaDocuments!=null) {
-			for (MetaDocumentEntity metaDocEntity: metaDocuments) {
-				if (Utils.hasValue(metaDocEntity.getPortafirmesFluxId())) {
-					//Si el metadocument tenia un flux de firma definit (abans només en podia tenir un)
-					//Cercam si ja consta a la taula 1-N de fluxos IPA_METADOCUMENTFLUX (sino el crearem)
-					MetaDocumentFluxPortafibEntity metaDocFluxEntity = metaDocumentFluxPortafibRepository.findByMetaDocumentIdAndPortafirmesFluxId(
-							metaDocEntity.getId(),
-							metaDocEntity.getPortafirmesFluxId());
-					
-					if (metaDocFluxEntity==null) {
-						metaDocFluxEntity = new MetaDocumentFluxPortafibEntity();
-						metaDocFluxEntity.setMetaDocument(metaDocEntity);
-						metaDocFluxEntity.setPortafirmesFluxId(metaDocEntity.getPortafirmesFluxId());
-					}
-					
-					//Obtenim la descripció del flux de portafib
-					try {
-						PortafirmesFluxInfoDto fluxInfo = pluginHelper.portafirmesRecuperarInfoFluxDeFirma(metaDocEntity.getPortafirmesFluxId(), "ca", false);
-						metaDocFluxEntity.setPortafirmesFluxDesc(fluxInfo.getDescripcio());
-					} catch (Exception pfEx) {
-						metaDocFluxEntity.setPortafirmesFluxDesc("Flux "+metaDocEntity.getPortafirmesFluxId());
-					}
-					
-					metaDocumentFluxPortafibRepository.save(metaDocFluxEntity);
-					
-					resultat+="- Configurat fluxe " + metaDocFluxEntity.getPortafirmesFluxId() +" per el document " +  metaDocEntity.getId()+".</br>";
-				}
+		MetaDocumentEntity metaDocEntity = metaDocumentRepository.findById(metaDocId).get();
+		
+		if (Utils.hasValue(metaDocEntity.getPortafirmesFluxId())) {
+			//Si el metadocument tenia un flux de firma definit (abans només en podia tenir un)
+			//Cercam si ja consta a la taula 1-N de fluxos IPA_METADOCUMENTFLUX (sino el crearem)
+			MetaDocumentFluxPortafibEntity metaDocFluxEntity = metaDocumentFluxPortafibRepository.findByMetaDocumentIdAndPortafirmesFluxId(
+					metaDocEntity.getId(),
+					metaDocEntity.getPortafirmesFluxId());
+			
+			if (metaDocFluxEntity==null) {
+				metaDocFluxEntity = new MetaDocumentFluxPortafibEntity();
+				metaDocFluxEntity.setMetaDocument(metaDocEntity);
+				metaDocFluxEntity.setPortafirmesFluxId(metaDocEntity.getPortafirmesFluxId());
 			}
+			
+			//Obtenim la descripció del flux de portafib
+			try {
+				PortafirmesFluxInfoDto fluxInfo = pluginHelper.portafirmesRecuperarInfoFluxDeFirma(metaDocEntity.getPortafirmesFluxId(), "ca", false);
+				metaDocFluxEntity.setPortafirmesFluxDesc(fluxInfo.getDescripcio());
+			} catch (Exception pfEx) {
+				metaDocFluxEntity.setPortafirmesFluxDesc("Flux "+metaDocEntity.getPortafirmesFluxId());
+			}
+			
+			metaDocumentFluxPortafibRepository.save(metaDocFluxEntity);
+			
+			resultat+="- Configurat fluxe " + metaDocFluxEntity.getPortafirmesFluxId() +" per el document " +  metaDocEntity.getId()+".</br>";
 		}
 		
 		return resultat;

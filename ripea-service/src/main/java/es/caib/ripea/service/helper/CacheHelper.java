@@ -201,7 +201,7 @@ public class CacheHelper {
 	public void evictOrganismesEntitatAmbPermisDisseny(Long entitatId, String usuariCodi) {}
 
 	@Cacheable(value = "errorsValidacioNode", key = "#nodeId")
-	public List<ValidacioErrorDto> findErrorsValidacioPerNode(Long nodeId) {
+	public List<ValidacioErrorDto> findErrorsValidacioPerNode(Long nodeId, boolean sendComanda) {
 
 		logger.debug("Consulta dels errors de validació pel node (nodeId=" + nodeId + ")");
 		
@@ -294,7 +294,8 @@ public class CacheHelper {
 				errors.add(crearValidacioError(null, null, ErrorsValidacioTipusEnumDto.INTERESSATS));
 			}
 			
-			pluginHelper.comandaAvisSend(expedient, errors);
+			if (sendComanda)
+				pluginHelper.comandaAvisSend(expedient, errors);
 			
 			//Validar les tasques del expedient
 			/*List<ExpedientTascaEntity> tasquesExpedient = expedientTascaRepository.findByExpedient(expedient, null);

@@ -8,6 +8,8 @@ import es.caib.ripea.service.intf.utils.Utils;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,12 +32,35 @@ public class AjaxMetaExpedientController extends BaseUserOAdminOOrganController 
 	@Autowired private MetaExpedientService metaExpedientService;
 
 	@RequestMapping(value = "/initMetaDocumentFlux", method = RequestMethod.GET)
+	public String initMetaDocumentFlux(
+			HttpServletRequest request,
+			Model model) {
+		model.addAttribute("titolProces", "Actualitzar nom dels fluxes de tipus de documents");
+		model.addAttribute("urlTotalIteracions", "getDocumentsFlux");
+		model.addAttribute("urlInteracioIndividual", "executeRenomFlux");
+		return "util/processAjax";
+	}
+
+	@RequestMapping(value = "/getDocumentsFlux", method = RequestMethod.GET)
 	@ResponseBody
-	public String get(HttpServletRequest request, Model model) {
+	public List<Long> getDocumentsFlux(
+			HttpServletRequest request,
+			Model model) {
+		return metaExpedientService.getMetaDocumentFluxosIds();
+	}
+	
+	@RequestMapping(value = "/executeRenomFlux/{metaDocId}", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<String> executeRenomFlux(
+			HttpServletRequest request,
+			@PathVariable Long metaDocId,
+			Model model) {
 		try {
-			return metaExpedientService.initMetaDocumentFlux();
+			String resultat = metaExpedientService.initMetaDocumentFlux(metaDocId);
+			return ResponseEntity.ok(resultat);
 		} catch (Exception e) {
-			return ExceptionUtils.getStackTrace(e);
+			String message = "Error al recuperar el nom del flux per el metadocument amb ID="+metaDocId+": "+e.getMessage();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(message);
 		}
 	}
 	

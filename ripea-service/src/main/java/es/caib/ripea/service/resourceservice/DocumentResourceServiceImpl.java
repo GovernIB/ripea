@@ -327,7 +327,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                 null
         ));
         
-        resource.setErrors(cacheHelper.findErrorsValidacioPerNode(entity.getId()));
+        resource.setErrors(cacheHelper.findErrorsValidacioPerNode(entity.getId(), false));
         resource.setValid(resource.getErrors().isEmpty());
         
         resource.setAmbNotificacions(!entity.getNotificacions().isEmpty());
