@@ -476,7 +476,8 @@ public class ContingutServiceImpl implements ContingutService {
 	public void move(
 			Long entitatId,
 			Long contingutOrigenId,
-			Long contingutDestiId, 
+			Long contingutDestiId,
+			String carpetaNova,
 			String rolActual) {
 		
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(contingutOrigenId));
@@ -485,7 +486,7 @@ public class ContingutServiceImpl implements ContingutService {
 				+ "contingutOrigenId=" + contingutOrigenId + ", "
 				+ "contingutDestiId=" + contingutDestiId + ")");
 		
-		contingutHelper.move(entitatId, contingutOrigenId, contingutDestiId, rolActual);
+		contingutHelper.move(entitatId, contingutOrigenId, contingutDestiId, carpetaNova, rolActual);
 	}
 
 	@Transactional

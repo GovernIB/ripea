@@ -73,6 +73,7 @@ public class CarpetaResource extends ContingutResource {
         private ResourceReference<ExpedientResource, Long> expedient;
         private ResourceReference<CarpetaResource, Long> carpeta;
         private String motiu;
+        private String carpetaNova;
         @NotNull
         private Action action = Action.MOURE;
 

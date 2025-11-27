@@ -185,8 +185,8 @@ public class ExpedientHelper {
 		return contingutVista == ContingutVistaEnumDto.TREETABLE_PER_ESTAT;
 	}
 
-	public boolean isVistaArbreMoureDocuments(HttpServletRequest request) {
+	public boolean isVistaDesplegableMoureDocuments(HttpServletRequest request) {
 		MoureDestiVistaEnumDto contingutVista = getVistaMoureActiva(request);
-		return contingutVista == MoureDestiVistaEnumDto.ARBRE;
+		return contingutVista == MoureDestiVistaEnumDto.DESPLEGABLE;
 	}
 }

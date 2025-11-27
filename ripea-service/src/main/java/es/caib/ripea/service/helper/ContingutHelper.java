@@ -45,6 +45,7 @@ import es.caib.plugins.arxiu.api.Carpeta;
 import es.caib.plugins.arxiu.api.ContingutArxiu;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentMetadades;
+import es.caib.plugins.arxiu.api.Expedient;
 import es.caib.plugins.arxiu.api.ExpedientMetadades;
 import es.caib.plugins.arxiu.caib.ArxiuCaibException;
 import es.caib.ripea.persistence.entity.CarpetaEntity;
@@ -52,8 +53,10 @@ import es.caib.ripea.persistence.entity.ContingutEntity;
 import es.caib.ripea.persistence.entity.ContingutMovimentEntity;
 import es.caib.ripea.persistence.entity.DadaEntity;
 import es.caib.ripea.persistence.entity.DocumentEntity;
+import es.caib.ripea.persistence.entity.DocumentEnviamentEntity;
 import es.caib.ripea.persistence.entity.DocumentEnviamentInteressatEntity;
 import es.caib.ripea.persistence.entity.DocumentNotificacioEntity;
+import es.caib.ripea.persistence.entity.DocumentPortafirmesEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.entity.ExpedientEstatEntity;
@@ -1899,9 +1902,25 @@ public class ContingutHelper {
 	public void move(
 			Long entitatId,
 			Long contingutOrigenId,
-			Long contingutDestiId, 
+			Long contingutDestiId,
+			String carpetaNova,
 			String rolActual) {
 
+		if (!StringUtils.isEmpty(carpetaNova)) {
+			CarpetaDto carpeta = carpetaHelper.create(
+					entitatId,
+					contingutDestiId,
+					carpetaNova,
+					false,
+					null,
+					false,
+					null, 
+					false, 
+					null, 
+					false);
+			contingutDestiId = carpeta.getId();
+		}
+		
 		ContingutEntity contingutOrigen = comprovarContingutDinsExpedientModificable(
 				entitatId,
 				contingutOrigenId,
@@ -2010,6 +2029,32 @@ public class ContingutHelper {
 			pluginHelper.arxiuCarpetaMoure(
 					(CarpetaEntity)contingutOrigen,
 					contingutDesti.getArxiuUuid());
+		} else if (contingutOrigen instanceof CarpetaEntity && isCarpetaLogica()) {
+			// Carpeta lògica: moure els documents fills cap al nou expedient
+			arxiuCarpetaLogicaPropagarMoviment(
+					contingutOrigen,
+					expedientDesti.getArxiuUuid());
+		}
+	}
+
+	public void arxiuCarpetaLogicaPropagarMoviment(
+			ContingutEntity origen,
+			String uuidExpedientDesti) {
+		Set<ContingutEntity> fills = origen.getFills();
+		
+		for (ContingutEntity fill : fills) {
+			if (fill instanceof DocumentEntity) {
+				 pluginHelper.arxiuDocumentMoure(
+						fill.getArxiuUuid(),
+						null,
+						uuidExpedientDesti);
+			}
+			
+			if (fill instanceof CarpetaEntity) {
+				arxiuCarpetaLogicaPropagarMoviment(
+						fill, 
+						uuidExpedientDesti);
+			}	
 		}
 	}
 	
@@ -2029,8 +2074,7 @@ public class ContingutHelper {
 				desti.getId(),
 				usuariHelper.getUsuariAutenticat(),
 				comentari).build();
-		contingut.updateDarrerMoviment(
-				contenidorMovimentRepository.save(contenidorMoviment));
+		contingut.updateDarrerMoviment(contenidorMovimentRepository.save(contenidorMoviment));
 		contingut.updatePare(desti);
 
 		if (desti.getExpedient() == null) {
@@ -2038,8 +2082,64 @@ public class ContingutHelper {
 		} else {
 			contingut.updateExpedient(desti.getExpedient());
 		}
+		
+		if (contingut instanceof CarpetaEntity) {
+			moureContingutFill(contingut, desti, comentari);
+		}
+		
+		if (contingut instanceof DocumentEntity) {
+			moureEnviaments(contingut);
+		}
 
 		return contenidorMoviment;
+	}
+	
+	private void moureContingutFill(ContingutEntity origen, ContingutEntity desti, String comentari) {
+	    List<ContingutEntity> fills = contingutRepository.findByPareAndEsborratAndOrdenat(origen, 0);
+
+	    for (ContingutEntity fill : fills) {
+
+			ContingutMovimentEntity contenidorMoviment = ContingutMovimentEntity.getBuilder(
+					fill.getId(),
+					fill.getPare().getId(),
+					desti.getId(),
+					usuariHelper.getUsuariAutenticat(),
+					comentari).build();
+			fill.updateDarrerMoviment(contenidorMovimentRepository.save(contenidorMoviment));
+	    	
+			if (desti.getExpedient() == null) {
+				fill.updateExpedient((ExpedientEntity) desti);
+			} else {
+				fill.updateExpedient(desti.getExpedient());
+			}
+	    	
+			if (fill instanceof DocumentEntity) {
+				moureEnviaments(fill);
+			}
+			
+	        if (fill instanceof CarpetaEntity) {
+	            moureContingutFill(fill, desti, comentari);
+	        }
+	    }
+	}
+
+	private void moureEnviaments(ContingutEntity contingut) {
+		ExpedientEntity expedient = contingut.getExpedient();
+		
+		List<DocumentPortafirmesEntity> enviaments = documentPortafirmesRepository.findByDocument((DocumentEntity)contingut);
+	    
+	    for (DocumentEnviamentEntity enviament : enviaments) {
+	        enviament.updateExpedient(expedient);
+	    }
+	    
+	    List<DocumentNotificacioEntity> notificacions = documentNotificacioRepository.findByDocumentOrderByCreatedDateAsc((DocumentEntity)contingut);
+	    
+	    for (DocumentNotificacioEntity notificacio : notificacions) {
+	    	notificacio.updateExpedient(expedient);
+	    }
+	    
+	    cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(expedient.getId());
+	    cacheHelper.evictNotificacionsPendentsPerExpedient(expedient);
 	}
 
 	public ContingutEntity findContingutArrel(
@@ -2229,6 +2329,10 @@ public class ContingutHelper {
 			ContingutEntity contingut,
 			ContingutEntity desti,
 			ContingutEntity copia) {
+		if (desti instanceof CarpetaEntity && isCarpetaLogica()) {
+			desti = desti.getExpedient();
+		}
+		
 		if (contingut instanceof DocumentEntity) {
 			ContingutArxiu contingutArxiu = pluginHelper.arxiuDocumentCopiar(
 					(DocumentEntity)contingut,
@@ -2236,11 +2340,13 @@ public class ContingutHelper {
 			copia.setArxiuUuid(contingutArxiu.getIdentificador());
 			DocumentEntity copiaDoc = (DocumentEntity)copia;
 			copiaDoc.setArxiuEstat(documentHelper.getArxiuEstat(copiaDoc.getDocumentFirmaTipus(), null, copiaDoc.isFirmaParcial()));
-		} else if (contingut instanceof CarpetaEntity) {
+		} else if (contingut instanceof CarpetaEntity && !isCarpetaLogica()) {
 			ContingutArxiu contingutArxiu = pluginHelper.arxiuCarpetaCopiar(
 					(CarpetaEntity)contingut,
 					desti.getArxiuUuid());
 			copia.setArxiuUuid(contingutArxiu.getIdentificador());
+		} else if (contingut instanceof CarpetaEntity && isCarpetaLogica()) {
+			// TODO: copiar recursivament el contingut d'una carpeta lògica cap a l'expedient destí, de moment no s'utilitza
 		}
 	}
 
@@ -2283,8 +2389,6 @@ public class ContingutHelper {
 
 			return identificador;
 	}
-
-
 
 	private List<ContingutEntity> getPathContingut(
 			ContingutEntity contingut) {

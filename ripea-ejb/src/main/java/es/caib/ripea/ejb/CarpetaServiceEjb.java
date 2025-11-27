@@ -61,8 +61,8 @@ public class CarpetaServiceEjb extends AbstractServiceEjb<CarpetaService> implem
 
 	@Override
 	@RolesAllowed("**")
-	public List<CarpetaDto> findByEntitatAndExpedient(Long entitatId, Long expedientId) throws NotFoundException {
-		return delegateService.findByEntitatAndExpedient(entitatId, expedientId);
+	public List<CarpetaDto> findByEntitatAndExpedient(Long entitatId, Long expedientId, String rolActual) throws NotFoundException {
+		return delegateService.findByEntitatAndExpedient(entitatId, expedientId, rolActual);
 	}
 
 	@Override

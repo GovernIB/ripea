@@ -92,8 +92,10 @@ public class ContingutServiceEjb extends AbstractServiceEjb<ContingutService> im
 	public void move(
 			Long entitatId,
 			Long contingutOrigenId,
-			Long contingutDestiId, String rolActual) {
-		delegateService.move(entitatId, contingutOrigenId, contingutDestiId, rolActual);
+			Long contingutDestiId,
+			String carpetaNova,
+			String rolActual) {
+		delegateService.move(entitatId, contingutOrigenId, contingutDestiId, carpetaNova, rolActual);
 	}
 	
 	@Override

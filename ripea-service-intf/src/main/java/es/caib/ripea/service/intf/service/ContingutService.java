@@ -117,7 +117,7 @@ public interface ContingutService {
 	public void move(
 			Long entitatId,
 			Long contingutOrigenId,
-			Long contingutDestiId, String rolActual) throws NotFoundException, ValidationException;
+			Long contingutDestiId, String carpetaNova, String rolActual) throws NotFoundException, ValidationException;
 
 	/**
 	 * Copia un contingut al destí especificat.

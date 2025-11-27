@@ -85,20 +85,20 @@ public class CarpetaServiceImpl implements CarpetaService {
 
 	@Transactional
 	@Override
-	public List<CarpetaDto> findByEntitatAndExpedient(Long entitatId, Long expedientId) throws NotFoundException {
+	public List<CarpetaDto> findByEntitatAndExpedient(Long entitatId, Long expedientId, String rolActual) throws NotFoundException {
 		logger.debug("Obtenint la carpeta ("
 				+ "entitatId=" + entitatId + ", "
 				+ "expedientId=" + expedientId + ")");
 		List<CarpetaDto> carpetes = new ArrayList<CarpetaDto>();
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				expedientId, 
+				false, 
 				true, 
-				true, 
 				false, 
 				false, 
 				false, 
-				null);
-		List<CarpetaEntity> carpetesEntity = carpetaRepository.findByPare(expedient);
+				rolActual);
+		List<CarpetaEntity> carpetesEntity = carpetaRepository.findByExpedientAndEsborrat(expedient, 0);
 		for (CarpetaEntity carpetaEntity : carpetesEntity) {
 			carpetes.add(carpetaHelper.toCarpetaDto(carpetaEntity));
 		}

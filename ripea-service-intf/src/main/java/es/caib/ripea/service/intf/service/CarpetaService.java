@@ -91,7 +91,8 @@ public interface CarpetaService {
 	@PreAuthorize("isAuthenticated()")
 	public List<CarpetaDto> findByEntitatAndExpedient(
 			Long entitatId,
-			Long expedientId) throws NotFoundException;
+			Long expedientId,
+			String rolActual) throws NotFoundException;
 	
 	/**
 	 * Recupera estructura carpetes d'un expedient

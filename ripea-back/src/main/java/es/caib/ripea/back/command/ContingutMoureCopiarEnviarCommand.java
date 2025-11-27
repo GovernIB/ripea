@@ -3,11 +3,11 @@
  */
 package es.caib.ripea.back.command;
 
-import es.caib.ripea.back.validation.DestiNotEmpty;
+import javax.validation.constraints.Size;
+
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import es.caib.ripea.back.validation.DestiNotEmpty;
 
 /**
  * Command per a copiar, moure o enviar contenidors.
@@ -18,10 +18,13 @@ import javax.validation.constraints.Size;
 public class ContingutMoureCopiarEnviarCommand {
 
 	protected String accio;
+	protected Long expedientOrigenId;
 	protected Long origenId;
 	protected Long[] origenIds;
-	@NotNull
 	protected Long destiId;
+	protected Long expedientDestiId;
+	protected Long carpetaDestiId;
+	protected String carpetaNova;
 	@Size(max=256)
 	protected String comentariEnviar;
 
@@ -40,12 +43,6 @@ public class ContingutMoureCopiarEnviarCommand {
 	public void setOrigenIds(Long[] origenIds) {
 		this.origenIds = origenIds;
 	}
-	public Long getDestiId() {
-		return destiId;
-	}
-	public void setDestiId(Long destiId) {
-		this.destiId = destiId;
-	}
 	public String getComentariEnviar() {
 		return comentariEnviar;
 	}
@@ -58,7 +55,36 @@ public class ContingutMoureCopiarEnviarCommand {
 	public void setEstructuraCarpetesJson(String estructuraCarpetesJson) {
 		this.estructuraCarpetesJson = estructuraCarpetesJson;
 	}
-	
+	public Long getDestiId() {
+		return destiId;
+	}
+	public void setDestiId(Long destiId) {
+		this.destiId = destiId;
+	}
+	public Long getExpedientOrigenId() {
+		return expedientOrigenId;
+	}
+	public void setExpedientOrigenId(Long expedientOrigenId) {
+		this.expedientOrigenId = expedientOrigenId;
+	}
+	public Long getExpedientDestiId() {
+		return expedientDestiId;
+	}
+	public void setExpedientDestiId(Long expedientDestiId) {
+		this.expedientDestiId = expedientDestiId;
+	}
+	public Long getCarpetaDestiId() {
+		return carpetaDestiId;
+	}
+	public void setCarpetaDestiId(Long carpetaDestiId) {
+		this.carpetaDestiId = carpetaDestiId;
+	}
+	public String getCarpetaNova() {
+		return carpetaNova;
+	}
+	public void setCarpetaNova(String carpetaNova) {
+		this.carpetaNova = carpetaNova;
+	}
 	public String getAccio() {
 		return accio;
 	}

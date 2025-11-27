@@ -156,6 +156,10 @@ public abstract class DocumentEnviamentEntity extends RipeaAuditable<Long> { //T
 		this.intentData = null;
 		this.intentProximData = null;
 	}
+	
+	public void updateExpedient(ExpedientEntity expedient) {
+		this.expedient = expedient;
+	}
 
 	public String toString() {
 		return ReflectionToStringBuilder.toString(this);

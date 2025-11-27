@@ -9,41 +9,65 @@
 <html>
 <head>
 	<title>${titol}</title>
+	<link href="<c:url value="/webjars/select2/4.0.6-rc.1/dist/css/select2.min.css"/>" rel="stylesheet"/>
+	<link href="<c:url value="/webjars/select2-bootstrap-theme/0.1.0-beta.4/dist/select2-bootstrap.min.css"/>" rel="stylesheet"/>
+	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/select2.min.js"/>"></script>
+	<script src="<c:url value="/webjars/select2/4.0.5/dist/js/i18n/${requestLocale}.js"/>"></script>
+	<script src="<c:url value="/webjars/jquery-ui/1.12.1/jquery-ui.min.js"/>"></script>
+	<link href="<c:url value="/webjars/jquery-ui/1.12.1/jquery-ui.css"/>" rel="stylesheet"></link>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<script src="<c:url value="/js/JSOG.js"/>"></script>
-	<link href="<c:url value="/webjars/jstree/3.2.1/dist/themes/default/style.min.css"/>" rel="stylesheet">
-	<script src="<c:url value="/webjars/jstree/3.2.1/dist/jstree.min.js"/>"></script>
 	<rip:modalHead/>
-<style type="text/css">
-#arbreCarpetes a {
-    white-space: normal !important;
-    height: auto;
-    padding: 1px 2px;
-}
-</style>
 <script type="text/javascript">
 $(document).ready(function() {
-	var arbre = $('#arbreCarpetes');
 	
-	$('form').on('submit', function(){
-		if (arbre.data()) {
-		    // Obtener la carpeta seleccionada en jstree
-		    var selectedNode = arbre.jstree('get_selected', true)[0];
-			var json = arbre.data().jstree.get_json()
-			var jsonString = JSON.stringify(json);
-	
-			$('#estructuraCarpetesJson').val(jsonString);
-	
-			if (selectedNode) {
-		    	$('#destiId').val(selectedNode.id);
-		    }
+	if (${!moureMateixExpedients}) {
+		const expedientDesti = $('#expedientDestiId');
+		//expedientDesti.val(${expedientOrigenId});
+		
+		expedientDesti.on('change', function() {
+			var expedientSeleccionat = $(this).val();
+			
+			recuperarCarpetes(expedientSeleccionat);
+		});
+		
+		expedientDesti.trigger('change');
+	} else {
+		recuperarCarpetes(${expedientOrigenId});
+	}
+});
+
+function recuperarCarpetes(expedientId) {
+	$.ajax({
+		type: 'GET',
+		url: '<c:url value="/contingut/moure/"/>' + expedientId + '/carpetes',
+		success: function (data) {
+			var items = [];
+			const selCarpetaDesti = $('select#carpetaDestiId');
+			selCarpetaDesti.empty();
+			selCarpetaDesti.append("<option value=\"\"></option>");
+			
+			$.each(data, function(i, val) {
+				selCarpetaDesti.append('<option value="' + val.id + '">' + val.nom + '</option>');
+			});
+			
+			var select2Options = {
+					theme: 'bootstrap', 
+					width: '100%', 
+					minimumResultsForSearch: 6, 
+					allowClear: true, 
+					placeholder: "",
+					language: "${requestLocale}"
+			}
+			selCarpetaDesti.select2(select2Options);
 		}
 	});
-});
+}
 </script>
 </head>
 <body>
 	<form:form action="" class="form-horizontal" modelAttribute="contingutMoureCopiarEnviarCommand">
+		<form:hidden path="expedientOrigenId"/>
 		<form:hidden path="origenIds"/>
 		<form:hidden path="origenId"/>
 		<form:hidden path="accio"/>
@@ -64,9 +88,12 @@ $(document).ready(function() {
 		</rip:inputFixed>
 		
 		<c:choose>
-			<c:when test="${isVistaArbreMoureDocuments}">
-				<rip:arbreMultiple name="estructuraCarpetesJson" id="arbreCarpetes" withlabel="true" textKey="contingut.importacio.form.camp.desti" atributId="id" atributNom="nom" arbre="${carpetes}" selectMultiple="${false}" required="true"/>				
-				<form:hidden path="destiId"/>
+			<c:when test="${isVistaDesplegableMoureDocuments}">
+				<c:if test="${! moureMateixExpedients}">
+					<rip:inputSelect name="expedientDestiId" emptyOption="true" optionMinimumResultsForSearch="6" optionItems="${expedients}" optionTextAttribute="nom" optionValueAttribute="id" textKey="contingut.moure.camp.expedient.desti" required="true"/>
+				</c:if>
+				<rip:inputSelect name="carpetaDestiId" textKey="contingut.moure.camp.carpeta.desti"/>
+				<rip:inputText name="carpetaNova" textKey="contingut.moure.camp.carpeta.nova"/>
 			</c:when>
 			<c:otherwise>
 				<rip:inputFileChooserMultipleExpedients name="destiId" contingutOrigen="${contingutOrigen}" documentsOrigen="${documentsOrigen}" ocultarDocuments="true" textKey="contingut.moure.camp.desti" required="true"/>

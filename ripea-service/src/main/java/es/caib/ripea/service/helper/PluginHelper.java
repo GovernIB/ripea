@@ -3078,8 +3078,8 @@ public class PluginHelper {
 			if (moureDocument) {
 				// Si és de registre moure el document
 				ContingutArxiu nouContingut = arxiuPluginWrapper.getPlugin().documentCopiar(
-						arxiuUuidPare,
-						arxiuUuid);
+						arxiuUuid,
+						arxiuUuidPare);
 				document = arxiuPluginWrapper.getPlugin().documentDetalls(
 						nouContingut.getIdentificador(),
 						null,

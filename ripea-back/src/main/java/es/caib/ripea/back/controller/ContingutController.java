@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -46,7 +47,6 @@ import es.caib.ripea.back.helper.SessioHelper;
 import es.caib.ripea.plugin.notificacio.EnviamentEstat;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.AlertaDto;
-import es.caib.ripea.service.intf.dto.ArbreDto;
 import es.caib.ripea.service.intf.dto.CarpetaDto;
 import es.caib.ripea.service.intf.dto.CodiValorDto;
 import es.caib.ripea.service.intf.dto.ContingutDto;
@@ -56,7 +56,6 @@ import es.caib.ripea.service.intf.dto.DocumentDto;
 import es.caib.ripea.service.intf.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentEnviamentTipusEnumDto;
 import es.caib.ripea.service.intf.dto.EntitatDto;
-import es.caib.ripea.service.intf.dto.ExpedientCarpetaArbreDto;
 import es.caib.ripea.service.intf.dto.ExpedientDto;
 import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.dto.ExpedientTascaDto;
@@ -534,19 +533,26 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			return "contingutMoureForm";
 		}
 		
+		Long destiId = Optional.ofNullable(command.getCarpetaDestiId())
+	            .or(() -> Optional.ofNullable(command.getExpedientDestiId()))
+	            .or(() -> Optional.ofNullable(command.getDestiId())) // <-- Vista llista
+	            .orElse(command.getExpedientOrigenId()); // <-- Mateix expedient
+		
 		if (docsIdx != null && !docsIdx.isEmpty()) {
 			for (Long docIdx : docsIdx) {
 				contingutService.move(
 						entitatActual.getId(),
 						docIdx,
-						command.getDestiId(), 
+						destiId,
+						command.getCarpetaNova(),
 						RolHelper.getRolActual(request));
 			}
 		} else {
 			contingutService.move(
 					entitatActual.getId(),
 					contingutOrigenId,
-					command.getDestiId(), 
+					destiId,
+					command.getCarpetaNova(),
 					RolHelper.getRolActual(request));
 		}
 		return getModalControllerReturnValueSuccess(
@@ -606,6 +612,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 						entitatActual.getId(),
 						contingutOrigenId,
 						destiId, 
+						null,
 						RolHelper.getRolActual(request));
 			}
 			
@@ -706,10 +713,15 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 					MourerCopiarVincular.COPIAR);
 			return "contingutCopiarForm";
 		}
+		Long destiId = Optional.ofNullable(command.getCarpetaDestiId())
+	            .or(() -> Optional.ofNullable(command.getExpedientDestiId()))
+	            .or(() -> Optional.ofNullable(command.getDestiId())) // <-- Vista llista
+	            .orElse(command.getExpedientOrigenId()); // <-- Mateix expedient
+		
 		ContingutDto contingutCreat = contingutService.copy(
 				entitatActual.getId(),
 				contingutOrigenId,
-				command.getDestiId(),
+				destiId,
 				true);
 		return getModalControllerReturnValueSuccess(
 				request,
@@ -752,10 +764,13 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 					MourerCopiarVincular.VINCULAR);
 			return "contingutVincularForm";
 		}
+		Long destiId = Optional.ofNullable(command.getExpedientDestiId())
+	            .orElse(command.getDestiId()); // <-- Vista llista
+		
 		Long contingutCreatId = contingutService.link(
 				entitatActual.getId(),
 				contingutOrigenId,
-				command.getDestiId(),
+				destiId,
 				true);
 		return getModalControllerReturnValueSuccess(
 				request,
@@ -1171,7 +1186,22 @@ public class ContingutController extends BaseUserOAdminOOrganController {
     		logger.info("omplirModelPerMostrarContingut time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t1) + " ms");
 		
 	}
-
+	
+	@RequestMapping(value = "/contingut/moure/{expedientId}/carpetes", method = RequestMethod.GET)
+	@ResponseBody
+	public List<CarpetaDto> obtenirCarpetesExpedient(
+			HttpServletRequest request,
+			@PathVariable Long expedientId,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		List<CarpetaDto> carpetesDesti = carpetaService.findByEntitatAndExpedient(
+				entitatActual.getId(), 
+				expedientId,
+				RolHelper.getRolActual(request));
+		
+		return carpetesDesti;
+	}
+	
 	private void omplirModelPerMoureOCopiarVincular(
 			HttpServletRequest request,
 			EntitatDto entitatActual,
@@ -1194,35 +1224,50 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 					"documentsOrigen",
 					documentsOrigen);
 		}
+		Long expedientOrigenId = contingutOrigen.getExpedientId();
+		model.addAttribute("expedientOrigenId", expedientOrigenId);
 		model.addAttribute(
 				"contingutOrigen",
 				contingutOrigen);
 		
-		boolean isVistaArbreMoureDocuments = expedientHelper.isVistaArbreMoureDocuments(request);
-		if (isVistaArbreMoureDocuments) {
-			model.addAttribute("isVistaArbreMoureDocuments", true);
-			List<ExpedientDto> expedientsMetaExpedient = null;
+		boolean isVistaDesplegableMoureDocuments = expedientHelper.isVistaDesplegableMoureDocuments(request);
+		if (isVistaDesplegableMoureDocuments) {
+			model.addAttribute("isVistaDesplegableMoureDocuments", true);
+//			List<ExpedientDto> expedientsMetaExpedient = null;
+//			boolean moureEntreExpedients = ! Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.MOURE_MATEIX_EXPEDIENTS));
+//			Long metaExpedientId = (contingutOrigen instanceof ExpedientDto) ? ((ExpedientDto)contingutOrigen).getMetaNode().getId() : contingutOrigen.getExpedientPare().getMetaNode().getId();
+//			if (moureEntreExpedients) {
+//				expedientsMetaExpedient = expedientService.findByEntitatAndMetaExpedient(
+//						entitatActual.getId(), 
+//						metaExpedientId, 
+//						RolHelper.getRolActual(request), 
+//						EntitatHelper.getOrganGestorActualId(request));
+//			}
+//			
+//			List<ArbreDto<ExpedientCarpetaArbreDto>> carpetes = carpetaService.findArbreCarpetesExpedient(
+//					entitatActual.getId(),
+//					expedientsMetaExpedient,
+//					contingutOrigen.getExpedientId(),
+//					RolHelper.getRolActual(request));
+//			
+//			model.addAttribute("carpetes", carpetes);
 			boolean moureEntreExpedients = ! Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.MOURE_MATEIX_EXPEDIENTS));
-			Long metaExpedientId = (contingutOrigen instanceof ExpedientDto) ? ((ExpedientDto)contingutOrigen).getMetaNode().getId() : contingutOrigen.getExpedientPare().getMetaNode().getId();
 			if (moureEntreExpedients) {
-				expedientsMetaExpedient = expedientService.findByEntitatAndMetaExpedient(
-						entitatActual.getId(), 
+				model.addAttribute("mostrarExpedients", true);
+				Long metaExpedientId = (contingutOrigen instanceof ExpedientDto) ? ((ExpedientDto)contingutOrigen).getMetaNode().getId() : contingutOrigen.getExpedientPare().getMetaNode().getId();
+				List<ExpedientDto> expedientsMetaExpedient = expedientService.findByEntitatAndMetaExpedient(
+						entitatActual.getId(),
 						metaExpedientId, 
-						RolHelper.getRolActual(request), 
+						RolHelper.getRolActual(request),
 						EntitatHelper.getOrganGestorActualId(request));
+				
+				model.addAttribute("expedients", expedientsMetaExpedient);
 			}
-			
-			List<ArbreDto<ExpedientCarpetaArbreDto>> carpetes = carpetaService.findArbreCarpetesExpedient(
-					entitatActual.getId(),
-					expedientsMetaExpedient,
-					contingutOrigen.getExpedientId(),
-					RolHelper.getRolActual(request));
-			
-			model.addAttribute("carpetes", carpetes);
 		}
 		
 		ContingutMoureCopiarEnviarCommand command = new ContingutMoureCopiarEnviarCommand();
 		command.setAccio(accio.toString());
+		command.setExpedientOrigenId(expedientOrigenId);
 		
 		switch (accio) {
 		case MOURER:

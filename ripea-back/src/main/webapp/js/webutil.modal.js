@@ -161,7 +161,7 @@
 					modalobj.on('show.bs.modal', function () {
 						iframe.empty();
 						if (settings.height)
-							iframe.css('height', '' + settings.height + 'px');
+							iframe.css('height', '' + settings.height);
 						iframe.attr("src", settings.contentUrl);
 						iframe.load(function() {
 							// S'oculta l'icona loader

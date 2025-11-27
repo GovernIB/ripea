@@ -7,10 +7,13 @@ import FormActionDialog from "../../../components/FormActionDialog.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import {useUserSession} from "../../../components/Session.tsx";
 
-const MoureForm = () => {
+const MoureForm = (props:any) => {
+	const { tipus } = props;
     const { data } = useFormContext();
     const { value: user } = useUserSession();
 
+	console.log(tipus);
+	
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField xs={12} name="contingut" readOnly disabled hidden={data?.massivo}/>
         <GridFormField xs={12} name="expedient" namedQueries={['AGAFAT']} hidden={user?.sessionScope?.moureMateixExpedients} required/>
@@ -21,12 +24,17 @@ const MoureForm = () => {
                            builder.eq('expedient.id', data?.expedient?.id),
 						   builder.eq('esborrat', 0),
                        )}/>
+		<GridFormField xs={12} name="carpetaNova"
+					   readOnly={!data?.expedient}
+		               disabled={!data?.expedient}
+					   hidden={tipus != 'MOURE'}/>
         <GridFormField xs={12} name="motiu" type={"textarea"}/>
         {/*<GridFormField xs={12} name="action" required/>*/}
     </Grid>
 }
 
 const Moure = (props:any) => {
+	const { tipus } = props;
     const { t } = useTranslation();
     return <FormActionDialog
         resourceName={"documentResource"}
@@ -37,13 +45,12 @@ const Moure = (props:any) => {
         ]}
         {...props}
     >
-        <MoureForm/>
+        <MoureForm tipus={tipus}/>
     </FormActionDialog>
 }
 
 const useAction = (code:string, title:string, onSuccess?: (result:any) => void) => {
     const apiRef = useRef<MuiFormDialogApi>();
-
     const handleShow = (id:any, row:any) :void => {
         const carpeta = row?.expedient?.id != row?.pare?.id ?row?.pare :null
         apiRef.current?.show?.(undefined, {
@@ -58,7 +65,7 @@ const useAction = (code:string, title:string, onSuccess?: (result:any) => void) 
 
     return {
         handleShow,
-        content: <Moure apiRef={apiRef} title={title} onSuccess={onSuccess}/>
+        content: <Moure apiRef={apiRef} title={title} onSuccess={onSuccess} tipus={code}/>
     }
 }
 const useMassiveAction = (code:string, title:string, onSuccess?: () => void) => {
