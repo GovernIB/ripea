@@ -6,6 +6,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.domain.Sort;
 
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
@@ -17,18 +18,14 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 
-/**
- * Informació d'una aplicació a monitoritzar.
- *
- * @author Límit Tecnologies
- */
 @Getter
 @Setter
 @FieldNameConstants
 @NoArgsConstructor
 @ResourceConfig(
 		quickFilterFields = { "codi", "nom" },
-		descriptionField = "nomClassificacio"
+		descriptionField = "nomClassificacio",
+		defaultSortFields = { @ResourceConfig.ResourceSort(field = "nom", direction = Sort.Direction.ASC) }
 )
 public class MetaExpedientResource extends MetaNodeResource {
 
@@ -81,4 +78,6 @@ public class MetaExpedientResource extends MetaNodeResource {
     public String getNomClassificacio() {
         return nom + " (" + classificacio +")";
     }
+    
+    private static final long serialVersionUID = -7526532893601431955L;
 }
