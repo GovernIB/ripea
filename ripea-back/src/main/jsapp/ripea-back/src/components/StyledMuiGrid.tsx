@@ -169,10 +169,6 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
                         text-overflow: ellipsis !important;
                     }
                     
-                    .css-d0uhtl {
-                        margin-left: 45px;
-                    }
-                    
                     .MuiDataGrid-checkboxInput {
                         transform: scale(0.8);
                     }
