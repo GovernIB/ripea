@@ -1460,9 +1460,16 @@ public class ContingutHelper {
 		}
 		
 		if ((conteDocumentsDefinitius(contingut) && isPermesEsborrarFinals()) || !conteDocumentsDefinitius(contingut)) {
-			// Marca el contingut i tots els seus fills com a esborrats
-			//  de forma recursiva
-			marcarEsborrat(contingut);
+			if (!conteDocumentsAnotacions(contingut)) {
+				//Marca el contingut i tots els seus fills com a esborrats de forma recursiva
+				marcarEsborrat(contingut);
+			} else {
+				logger.error("Aquest contingut prové d'una anotació o conté documents que provenen de una anotació (contingutId=" + contingut.getId() + ")");
+				throw new ValidationException(
+						contingut.getId(),
+						ContingutEntity.class,
+						"Aquest contingut prové d'una anotació o conté documents que provenen de una anotació (contingutId=" + contingut.getId() + ")");
+			}
 		} else {
 			logger.error("Aquest contingut és definitiu o conté definitius i no es pot esborrar (contingutId=" + contingut.getId() + ")");
 			throw new ValidationException(
@@ -1532,6 +1539,22 @@ public class ContingutHelper {
 		} else if (deproxied instanceof DocumentEntity) {
 			DocumentEntity document = (DocumentEntity)deproxied;
 			conteDefinitius = document.isArxiuEstatDefinitiu();
+		}
+		return conteDefinitius;
+	}
+	
+	public boolean conteDocumentsAnotacions(ContingutEntity contingut) {
+		boolean conteDefinitius = false;
+		ContingutEntity deproxied = HibernateHelper.deproxy(contingut);
+		if (deproxied instanceof ExpedientEntity || deproxied instanceof CarpetaEntity) {
+			for (ContingutEntity contingutFill: contingut.getFills()) {
+				conteDefinitius = conteDocumentsAnotacions(contingutFill);
+				if (conteDefinitius)
+					break;
+			}
+		} else if (deproxied instanceof DocumentEntity) {
+			DocumentEntity document = (DocumentEntity)deproxied;
+			conteDefinitius = CollectionUtils.isNotEmpty(document.getAnnexos());
 		}
 		return conteDefinitius;
 	}

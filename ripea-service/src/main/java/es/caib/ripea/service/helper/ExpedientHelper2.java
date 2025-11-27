@@ -129,7 +129,7 @@ public class ExpedientHelper2 {
 		for (DocumentEntity docToDelete : docsToDelete) {
 			
 			if (CollectionUtils.isNotEmpty(docToDelete.getAnnexos())) {
-				throw new ValidationException("No está permitido esborrar documents procedents d'anotacions");
+				throw new ValidationException("S'ha trobat un document eliminat procedent d'una anotació");
 			}
 			
 			documentHelper.deleteDefinitiu(docToDelete);
