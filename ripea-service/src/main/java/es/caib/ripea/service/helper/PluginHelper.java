@@ -5218,7 +5218,7 @@ public class PluginHelper {
 					accioDescripcio,
 					notificacioPlugin.getEndpointURL(),
 					accioParams,
-					IntegracioAccioTipusEnumDto.RECEPCIO,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
