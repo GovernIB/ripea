@@ -27,7 +27,6 @@ export const ExpedientGridForm = () => {
     const {data} = useFormContext();
     const filterMetaExpedientCrear = builder.and(
         builder.eq('actiu', true),
-        builder.eq('revisioEstat', "'REVISAT'"),
     );
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField  xs={12} name="metaExpedient"
@@ -46,7 +45,7 @@ export const ExpedientGridForm = () => {
                        hidden={!data?.grup && !data?.gestioAmbGrupsActiva} required/>
         <GridFormField xs={12} name="prioritat" required/>
         <GridFormField xs={12} name="prioritatMotiu" type={"textarea"} hidden={data?.prioritat == 'B_NORMAL'} required/>
-        <GridFormField xs={12} name="asignarSeguidor" type={"checkbox"} required hidden={!!data?.id}/>
+        <GridFormField xs={12} name="asignarSeguidor" type={"checkbox"} hidden={!!data?.id}/>
     </Grid>
 }
 

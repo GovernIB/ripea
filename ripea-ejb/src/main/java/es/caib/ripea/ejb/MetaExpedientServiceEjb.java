@@ -569,5 +569,4 @@ public class MetaExpedientServiceEjb extends AbstractServiceEjb<MetaExpedientSer
 			boolean checkAdmin) {
 		return delegateService.getAndCheckOrganPermission(entitatId, id, organActual, checkAdmin);
 	}
-
 }

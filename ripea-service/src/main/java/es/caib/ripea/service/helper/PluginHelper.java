@@ -5219,7 +5219,7 @@ public class PluginHelper {
 					accioDescripcio,
 					notificacioPlugin.getEndpointURL(),
 					accioParams,
-					IntegracioAccioTipusEnumDto.RECEPCIO,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
@@ -6124,6 +6124,10 @@ public class PluginHelper {
 		}
 	}
 	
+	public void comandaTascaSendNoLog(ExpedientTascaEntity tascaEntity) throws Exception {
+		getComandaPlugin().sendTasca(tascaRipeaToComanda(tascaEntity));
+	}
+	
 	public void comandaTascaSend(ExpedientTascaEntity tascaEntity) {
 		
 		if (configHelper.getAsBoolean(PropertyConfig.COMANDA_PLUGIN_ACTIU)) {
@@ -6375,6 +6379,12 @@ public class PluginHelper {
 				applicationHelper.stopTimer(sample, "METRICS@Integracions.comanda", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			}
 		}
+	}
+	
+	public void comandaAvisSendNoLog(ExpedientEntity expedient, List<ValidacioErrorDto> errors) throws Exception {
+		ComandaCaibPlugin comandaCaibPlugin = getComandaPlugin();
+		Avis avisComanda = anotacioRipeaToAvisComanda(expedient, errors);
+		comandaCaibPlugin.sendAvis(avisComanda);
 	}
 	
 	public void comandaAvisSend(ExpedientEntity expedient, List<ValidacioErrorDto> errors) {

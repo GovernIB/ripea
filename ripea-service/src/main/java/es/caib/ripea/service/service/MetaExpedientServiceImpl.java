@@ -41,6 +41,7 @@ import es.caib.ripea.persistence.repository.DominiRepository;
 import es.caib.ripea.persistence.repository.ExpedientEstatRepository;
 import es.caib.ripea.persistence.repository.ExpedientRepository;
 import es.caib.ripea.persistence.repository.GrupRepository;
+import es.caib.ripea.persistence.repository.MetaDocumentRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientComentariRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientOrganGestorRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientRepository;
@@ -143,6 +144,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	@Autowired private HistoricExpedientRepository historicExpedientRepository;
 	@Autowired private HistoricInteressatRepository historicInteressatRepository;
 	@Autowired private HistoricUsuariRepository historicUsuariRepository;
+	@Autowired private MetaDocumentRepository metaDocumentRepository;
 	@Autowired private MetaExpedientTascaValidacioRepository metaExpedientTascaValidacioRepository;
 	@Autowired private DistribucioReglaHelper distribucioReglaHelper;
 	@Autowired private CacheHelper cacheHelper;
@@ -1819,5 +1821,4 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		
 		return resultat;
 	}
-
 }

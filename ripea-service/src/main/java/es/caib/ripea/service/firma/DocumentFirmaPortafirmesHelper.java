@@ -107,7 +107,7 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 					DocumentEntity.class,
 					"El document a enviar al portafirmes no és del tipus " + DocumentTipusEnumDto.DIGITAL);
 		}
-		if (!cacheHelper.findErrorsValidacioPerNode(document.getId()).isEmpty()) {
+		if (!cacheHelper.findErrorsValidacioPerNode(document.getId(), true).isEmpty()) {
 			throw new ValidationException(
 					document.getId(),
 					DocumentEntity.class,
@@ -381,12 +381,14 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 							"id=" + documentPortafirmes.getId() + ", " +
 							"portafirmesId=" + documentPortafirmes.getPortafirmesId() + ")",
 							ex);
-					cacheHelper.evictEnviamentsPortafirmesAmbErrorPerExpedient(document.getExpedient());
 					documentPortafirmes.updateProcessatError(
 							ExceptionUtils.getStackTrace(ExceptionHelper.getRootCauseOrItself(ex)),
 							null);
 					throw ex;
 				}
+				
+				//Tant si ha anat be (llevar possibles errors previs) com si ha fallat (mostrar nous errors)
+				cacheHelper.evictEnviamentsPortafirmesAmbErrorPerExpedient(document.getExpedient());
 				
 			// ========================================== DOCUMENT WAS REBUTJAT EN PORTAFIRMES ==============================================
 			} else if (PortafirmesCallbackEstatEnumDto.REBUTJAT.equals(callbackEstat)) {

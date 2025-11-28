@@ -152,6 +152,11 @@ public interface ExpedientTascaRepository extends JpaRepository<ExpedientTascaEn
 		"	and (tasca.expedient.esborrat = 0) ")
 	long countTasquesPendents(@Param("responsable") UsuariEntity responsable);
 	
+	@Query("select tasca.id from ExpedientTascaEntity tasca " +
+		"where (tasca.estat='PENDENT' or tasca.estat='INICIADA' or tasca.estat='AGAFADA') " +
+		"  and (tasca.expedient.esborrat = 0) ")
+	List<Long> findTasquesPendents();
+	
 	@Query("select " +
 			"    count(tasca) " +
 			"from " +

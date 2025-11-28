@@ -451,7 +451,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                 null
         ));
         
-        resource.setErrors(cacheHelper.findErrorsValidacioPerNode(entity.getId()));
+        resource.setErrors(cacheHelper.findErrorsValidacioPerNode(entity.getId(), false));
         resource.setValid(resource.getErrors().isEmpty());
         
         resource.setAmbNotificacions(!entity.getNotificacions().isEmpty());
@@ -1673,7 +1673,10 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         		target.setMostrarFirmaParcial(configHelper.getAsBoolean(PropertyConfig.FIRMA_PARCIAL));
         		target.setMostrarAvisFirmaParcial(configHelper.getAsBoolean(PropertyConfig.AVIS_FIRMA_PARCIAL));
         		
-        		DocumentResourceEntity documentResourceEntity = documentResourceRepository.findById(((Long)id).longValue()).get();
+        		//Pot venir com a execució massiva o individual
+        		Long documentId = previous.getIds().get(0);
+        		
+        		DocumentResourceEntity documentResourceEntity = documentResourceRepository.findById(documentId).get();
         		MetaDocumentResourceEntity metaDocumentResourceEntity = documentResourceEntity.getMetaDocument();
         		target.setPortafirmesFluxTipus(metaDocumentResourceEntity.getPortafirmesFluxTipus());
         		
@@ -1694,8 +1697,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         			//Al carregar la modal de enviament a PF, no hi ha NIFs, ja que no es configuren NIFs al procediment
         			//Aquets els afegeix opcionalment l'usuari en el moment de enviar a firmar
         			target.setNifsManuals(null);
-        		} else {
-//        			target.setPortafirmesEnviarFluxId(metaDocumentResourceEntity.getPortafirmesFluxId());
+        		} else if (!previous.isMassivo()){
+        			//Carregar la URL de flux de FIRMA
         			String dadesURL = documentResourceEntity.getExpedient().getId()+"#"+documentResourceEntity.getId()+"#"+SecurityContextHolder.getContext().getAuthentication().getName();
     				String paramSecure = Utils.encripta(dadesURL, configHelper.getConfig(PropertyConfig.CLAU_ENCRIPTACIO));
     				String urlReturnToRipea = configHelper.getConfig(PropertyConfig.BASE_URL) + "/modal/document/event/portafirmes/flux/"+paramSecure+"/";

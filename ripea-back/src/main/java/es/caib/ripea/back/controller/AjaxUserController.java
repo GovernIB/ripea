@@ -14,6 +14,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -42,6 +44,70 @@ public class AjaxUserController extends BaseUserController {
 	@Autowired private SegonPlaService segonPlaService;
 	@Autowired private EntitatService entitatService;
 
+	@RequestMapping(value = "/initTasquesComanda", method = RequestMethod.GET)
+	public String initTasquesComanda(
+			HttpServletRequest request,
+			Model model) {
+		model.addAttribute("titolProces", "Inicialitzar tasques Comanda");
+		model.addAttribute("urlTotalIteracions", "getTasquesComanda");
+		model.addAttribute("urlInteracioIndividual", "executeTascaComanda");
+		return "util/processAjax";
+	}
+
+	@RequestMapping(value = "/getTasquesComanda", method = RequestMethod.GET)
+	@ResponseBody
+	public List<Long> getTasquesComanda(
+			HttpServletRequest request,
+			Model model) {
+		return aplicacioService.getTasquesComanda();
+	}
+	
+	@RequestMapping(value = "/executeTascaComanda/{tascaId}", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<String> executeTascaComanda(
+			HttpServletRequest request,
+			@PathVariable Long tascaId,
+			Model model) {
+		try {
+			String resultat = aplicacioService.executeTascaComanda(tascaId);
+			return ResponseEntity.ok(resultat); // HTTP 200
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage()); // HTTP 500
+		}
+	}
+	
+	@RequestMapping(value = "/initAvisosComanda", method = RequestMethod.GET)
+	public String initAvisosComanda(
+			HttpServletRequest request,
+			Model model) {
+		model.addAttribute("titolProces", "Inicialitzar avisos Comanda");
+		model.addAttribute("urlTotalIteracions", "getAvisosComanda");
+		model.addAttribute("urlInteracioIndividual", "executeAvisComanda");
+		return "util/processAjax";
+	}
+	
+	@RequestMapping(value = "/getAvisosComanda", method = RequestMethod.GET)
+	@ResponseBody
+	public List<Long> getAvisosComanda(
+			HttpServletRequest request,
+			Model model) {
+		return aplicacioService.getAvisosComanda();
+	}
+	
+	@RequestMapping(value = "/executeAvisComanda/{expedientId}", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<String> executeAvisComanda(
+			HttpServletRequest request,
+			@PathVariable Long expedientId,
+			Model model) {
+		try {
+			String resultat = aplicacioService.executeAvisComanda(expedientId);
+			return ResponseEntity.ok(resultat); // HTTP 200
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage()); // HTTP 500
+		}
+	}
+	
 	@RequestMapping(value = "/usuari/{codi}", method = RequestMethod.GET)
 	@ResponseBody
 	public UsuariDto getByCodi(

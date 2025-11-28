@@ -1032,9 +1032,18 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 			if (dimensioEntity==null) {
 				dimensioEntity = new ExplotacioDimensioEntity();
 				EntitatEntity entitatEntity = entitatRepository.findById(dim.getEntitatId()).orElse(null);
-				MetaExpedientEntity metaExpedientEntity = metaExpedientRepository.findById(dim.getProcedimentId()).orElse(null);
-				OrganGestorEntity organGestorEntity = organGestorRepository.findById(dim.getOrganId()).orElse(null);
-				UsuariEntity usuariEntity = usuariRepository.findById(dim.getUsuariCodi()).orElse(null);
+				MetaExpedientEntity metaExpedientEntity = null;
+				if (dim.getProcedimentId()!=null) {
+					metaExpedientEntity = metaExpedientRepository.findById(dim.getProcedimentId()).orElse(null);
+				}
+				OrganGestorEntity organGestorEntity = null;
+				if (dim.getOrganId()!=null) {
+					organGestorEntity = organGestorRepository.findById(dim.getOrganId()).orElse(null);
+				}
+				UsuariEntity usuariEntity = null;
+				if (dim.getUsuariCodi()!=null) {
+					usuariEntity = usuariRepository.findById(dim.getUsuariCodi()).orElse(null);
+				}
 				if (entitatEntity!=null && metaExpedientEntity!=null) {
 					dimensioEntity.inicializaDimensio(entitatEntity, metaExpedientEntity, organGestorEntity, usuariEntity);
 					dimensioEntity = explotacioDimensioRepository.save(dimensioEntity);

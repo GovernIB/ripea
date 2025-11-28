@@ -10,6 +10,7 @@ import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.dto.MetaExpedientAmbitEnumDto;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.domain.Sort;
 
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
@@ -21,11 +22,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 
-/**
- * Informació d'una aplicació a monitoritzar.
- *
- * @author Límit Tecnologies
- */
 @Getter
 @Setter
 @FieldNameConstants
@@ -42,7 +38,8 @@ import lombok.experimental.FieldNameConstants;
                         type = ResourceArtifactType.FILTER,
                         code = MetaExpedientResource.FILTER_GESTIO_CODE,
                         formClass = MetaExpedientResource.GestioRevisioFormFilter.class),
-        }
+        },
+		defaultSortFields = { @ResourceConfig.ResourceSort(field = "nom", direction = Sort.Direction.ASC) }
 )
 public class MetaExpedientResource extends MetaNodeResource {
 
@@ -119,4 +116,6 @@ public class MetaExpedientResource extends MetaNodeResource {
         private MetaExpedientAmbitEnumDto ambit;
         private boolean permisDirecte;
     }
+    
+    private static final long serialVersionUID = -7526532893601431955L;
 }

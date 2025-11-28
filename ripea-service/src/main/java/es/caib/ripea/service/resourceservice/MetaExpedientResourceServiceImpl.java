@@ -16,6 +16,8 @@ import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.MetaExpedientHelper;
+import es.caib.ripea.service.intf.config.PropertyConfig;
+import es.caib.ripea.service.intf.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.service.intf.model.EntitatResource;
 import es.caib.ripea.service.intf.model.MetaExpedientResource;
 import es.caib.ripea.service.intf.resourceservice.MetaExpedientResourceService;
@@ -71,6 +73,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
         
         List<Long> procsPermesosIds = new ArrayList<Long>();
         List<MetaExpedientEntity> metaExpPermesos = null;
+        Filter revisioActiva = null; //Dependrà de la propietat PropertyConfig.METAEXPEDIENT_REVISIO_ACTIVA
         if (mapaNamedQueries.size()>0 && mapaNamedQueries.containsKey("EXPEDIENT_CREATE")) {
             metaExpPermesos = metaExpedientHelper.findAmbPermis(
             		entitat.getId(),
@@ -81,6 +84,11 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
             		isAdminOrgan,
             		null, //organId
             		false); //comú
+            
+            if (metaExpedientHelper.isRevisioActiva()) {
+            	revisioActiva = Filter.parse(MetaExpedientResource.Fields.revisioEstat+":'"+MetaExpedientRevisioEstatEnumDto.REVISAT.toString()+"'");
+            }
+            
         } else if (mapaNamedQueries.size()>0 && mapaNamedQueries.containsKey("EXPEDIENT_UPDATE")) {
             metaExpPermesos = metaExpedientHelper.findAmbPermis(
             		entitat.getId(),
@@ -121,82 +129,9 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 	        }
         }
         
-		Filter filtreResultat = FilterBuilder.and(filtreBase, filtrePermisos);
+		Filter filtreResultat = FilterBuilder.and(filtreBase, revisioActiva, filtrePermisos);
         
         return filtreResultat.generate();
-        
-//        if (!isAdmin) {
-//        
-//	        List<Long> metaExpedientIds = permisosHelper.getObjectsIdsWithPermission(MetaNodeEntity.class, permis);
-//			List<Long> organPermisosIds = permisosHelper.getObjectsIdsWithPermission(OrganGestorEntity.class, isAdminOrgan ? ExtendedPermission.ADMINISTRATION : permis);
-//			List<String> organIdsVigents = organGestorRepository.findCodisByEntitatAndVigentIds(entitat, Utils.getNullIfEmpty(organPermisosIds));
-//			List<Long> organsIds = new ArrayList<Long>();
-//			for (String ogCodi: organIdsVigents) {
-//				organsIds.addAll(organGestorCacheHelper.getIdsOrgansFills(entitatActualCodi, ogCodi));
-//			}
-//			List<Long> metaExpedientOrganIds = permisosHelper.getObjectsIdsWithPermission(MetaExpedientOrganGestorEntity.class,	permis);
-//			List<Long> organProcedimentsComunsIds = permisosHelper.getObjectsIdsWithTwoPermissions(OrganGestorEntity.class, ExtendedPermission.COMU, permis);
-//			List<Long> organAdmIds = permisosHelper.getObjectsIdsWithPermission(OrganGestorEntity.class, ExtendedPermission.ADM_COMU);
-//			boolean accessAllComu = false;
-//			if (Utils.isNotEmpty(organProcedimentsComunsIds) || Utils.isNotEmpty(organAdmIds)) {
-//				accessAllComu = true;
-//			}
-//			
-//	        /**
-//	         * Procediment (meta-expedients) amb permisos
-//	         */
-//	        String procedimentId = "id";
-//	        Filter filtreProcedimentsPermesos = null;
-//	        List<String> grupsClausulesIn = Utils.getIdsEnGruposMil(metaExpedientIds);
-//	        if (grupsClausulesIn!=null) {
-//		        for (String aux: grupsClausulesIn) {
-//			        if (aux != null && !aux.isEmpty()) {
-//			        	filtreProcedimentsPermesos = FilterBuilder.or(filtreProcedimentsPermesos, Filter.parse(procedimentId + " IN (" + aux + ")"));
-//			        }
-//		        }
-//	        }
-//			
-//	        /**
-//	         * Organs gestors amb permisos
-//	         */
-//	        String ogCodi = MetaExpedientResource.Fields.organGestor + ".id";
-//	        Filter filtreOrgansPermesos = null;
-//	        List<String> grupsOrgansPermesosClausulesIn = Utils.getIdsEnGruposMil(organsIds);
-//	        if (grupsOrgansPermesosClausulesIn!=null) {
-//		        for (String aux: grupsOrgansPermesosClausulesIn) {
-//			        if (aux != null && !aux.isEmpty()) {
-//		        		filtreOrgansPermesos = FilterBuilder.or(filtreOrgansPermesos, Filter.parse(ogCodi + " IN (" + aux + ")"));
-//			        }
-//		        }
-//	        }
-//	        
-//	        /**
-//	         * Meta expedient - Organs gestors amb permisos
-//	         */
-//	        String meOgCodi = MetaExpedientResource.Fields.metaExpedientOrganGestors + ".id";
-//	        Filter filtreMetaExpedientOrgansPermesos = null;
-//	        List<String> metaExpedientOrgansPermesosClausulesIn = Utils.getIdsEnGruposMil(metaExpedientOrganIds);
-//	        if (metaExpedientOrgansPermesosClausulesIn!=null) {
-//		        for (String aux: metaExpedientOrgansPermesosClausulesIn) {
-//			        if (aux != null && !aux.isEmpty()) {
-//			        	filtreMetaExpedientOrgansPermesos = FilterBuilder.or(filtreMetaExpedientOrgansPermesos, Filter.parse(meOgCodi + " IN (" + aux + ")"));
-//			        }
-//		        }
-//	        }
-//	        
-//	      //Combinam els 3 filtres anteriors
-//	        Filter combinedFilterProcedimentsOr = FilterBuilder.or(
-//	        		filtreProcedimentsPermesos,
-//	        		filtreOrgansPermesos,
-//	        		filtreMetaExpedientOrgansPermesos);
-//        
-//        	filtreResultat = FilterBuilder.and(filtreBase, combinedFilterProcedimentsOr);
-//        	
-//        } else {
-//        	
-//        	filtreResultat = filtreBase;
-//        	
-//        }
     }
 
     @Override

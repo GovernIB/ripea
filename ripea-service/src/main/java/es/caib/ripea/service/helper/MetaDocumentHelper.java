@@ -370,6 +370,8 @@ public class MetaDocumentHelper {
 	public List<MetaDocumentEntity> findMetaDocumentsPinbalDisponiblesPerCreacio(Long expedientId) {
 		return findMetaDocumentsPinbalDisponiblesPerCreacio(expedientRepository.findById(expedientId).get());
 	}
-	
+
+	public String initMetaDocumentFlux(Long metaDocId) throws Exception {return "";}
+
 	private static final Logger logger = LoggerFactory.getLogger(MetaDocumentHelper.class);
 }
