@@ -1,0 +1,1 @@
+UPDATE IPA_CONFIG SET TYPE_CODE='PASSWORD' WHERE KEY='es.caib.ripea.plugin.comanda.password';
