@@ -103,7 +103,7 @@ import lombok.experimental.FieldNameConstants;
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = DocumentResource.ACTION_FIRMA_WEB_INI,
-                        formClass = DocumentResource.IniciarFirmaSimple.class,
+                        formClass = DocumentResource.IniciarFirmaNavegador.class,
                         requiresId = true),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
@@ -366,7 +366,7 @@ public class DocumentResource extends NodeResource {
     
     @Getter
     @Setter
-    public static class IniciarFirmaSimple implements Serializable {
+    public static class IniciarFirmaNavegador extends MassiveAction {
     	@NotNull
     	private String motiu;
     }

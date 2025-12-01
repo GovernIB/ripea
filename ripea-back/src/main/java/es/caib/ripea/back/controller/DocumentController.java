@@ -53,6 +53,7 @@ import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.dto.VersioDocumentEnum;
 import es.caib.ripea.service.intf.dto.ViaFirmaDispositiuDto;
 import es.caib.ripea.service.intf.dto.ViaFirmaUsuariDto;
+import es.caib.ripea.service.intf.dto.FirmaResultatDto.FirmaSignatureStatus;
 import es.caib.ripea.service.intf.exception.ResponsableNoValidPortafirmesException;
 import es.caib.ripea.service.intf.model.sse.FirmaFinalitzadaEvent;
 import es.caib.ripea.service.intf.service.AplicacioService;
@@ -483,24 +484,28 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 		String data = Utils.desencripta(dades, aplicacioService.propertyFindByNom("es.caib.ripea.encription.key"));
 		String[] dataSplri = data.split("#");
 		Long expedientId = Long.parseLong(dataSplri[0]);
-		Long documentId = Long.parseLong(dataSplri[1]);
+//		Long documentId = Long.parseLong(dataSplri[1]);
         
 		//Comunicam a PF que la firma ha finalitzat
 		FirmaResultatDto firmaResultat =  documentService.firmaSimpleWebEnd(transactionID);
 		String resultat = null;
 		if (StatusEnumDto.OK.equals(firmaResultat.getStatus())) {
-			if (StatusEnumDto.OK.equals(firmaResultat.getSignatures().get(0).getStatus())) {
-				expedientId = documentService.processarFirmaClient(
-						getEntitatActualComprovantPermisos(request).getId(),
-						documentId,
-						firmaResultat.getSignatures().get(0).getFitxerFirmatNom(),
-						firmaResultat.getSignatures().get(0).getFitxerFirmatContingut(),
-						RolHelper.getRolActual(request),
-						tascaId);
-				if (!Utils.hasValue(firmaResultat.getMsg())) {
-					firmaResultat.setMsg("La firma ha finalitzat correctament.");
+			
+			for (FirmaSignatureStatus firmaSignatureStatus : firmaResultat.getSignatures()) {
+			
+				if (StatusEnumDto.OK.equals(firmaResultat.getSignatures().get(0).getStatus())) {
+					expedientId = documentService.processarFirmaClient(
+							getEntitatActualComprovantPermisos(request).getId(),
+							Long.valueOf(firmaSignatureStatus.getSignID()),
+							firmaResultat.getSignatures().get(0).getFitxerFirmatNom(),
+							firmaResultat.getSignatures().get(0).getFitxerFirmatContingut(),
+							RolHelper.getRolActual(request),
+							tascaId);
+					if (!Utils.hasValue(firmaResultat.getMsg())) {
+						firmaResultat.setMsg("La firma ha finalitzat correctament.");
+					}
+					resultat = "La firma ha finalitzat correctament. Podeu tancar la finestra.";
 				}
-				resultat = "La firma ha finalitzat correctament. Podeu tancar la finestra.";
 			}
 		}
 		if (resultat==null) {

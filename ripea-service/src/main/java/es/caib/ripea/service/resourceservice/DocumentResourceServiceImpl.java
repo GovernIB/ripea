@@ -126,7 +126,7 @@ import es.caib.ripea.service.intf.dto.ViaFirmaEnviarDto;
 import es.caib.ripea.service.intf.exception.ValidationException;
 import es.caib.ripea.service.intf.model.ContingutResource;
 import es.caib.ripea.service.intf.model.DocumentResource;
-import es.caib.ripea.service.intf.model.DocumentResource.IniciarFirmaSimple;
+import es.caib.ripea.service.intf.model.DocumentResource.IniciarFirmaNavegador;
 import es.caib.ripea.service.intf.model.DocumentResource.NewDocPinbalForm;
 import es.caib.ripea.service.intf.model.DocumentResource.NotificarDocumentsZipFormAction;
 import es.caib.ripea.service.intf.model.DocumentResource.NotificarFormAction;
@@ -246,7 +246,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         Map<String, String> mapaNamedQueries =  Utils.namedQueriesToMap(namedQueries);
     	if (mapaNamedQueries.size()>0) {
     		
-    		if (mapaNamedQueries.containsKey("MASSIU_PORTAFIRMES")) {
+    		if (mapaNamedQueries.containsKey("MASSIU_PORTAFIRMES") || mapaNamedQueries.containsKey("MASSIU_PASARELA")) {
     			
     			List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitat.getId(), rolActual);
     			
@@ -270,25 +270,26 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 			        }
 			        
 			        String documentEstatField = DocumentResource.Fields.estat;
-//			        Filter filtreEstatEsborrany = Filter.parse(documentEstatField + "=0");
 			        Filter filtreEstatEsborrany = FilterBuilder.equal(documentEstatField, DocumentEstatEnumDto.REDACCIO.toString()); //ESBORRANY
 			        
 			        String documentEsborratField = ContingutResource.Fields.esborrat;
-//			        Filter filtreNoEsborrat = Filter.parse(documentEsborratField + "<>0"); //NO BORRAT
 			        Filter filtreNoEsborrat = FilterBuilder.equal(documentEsborratField, 0); //NO BORRAT
 			        
 			        String docAdjuntField = DocumentResource.Fields.gesDocAdjuntId;
 			        
-//			        Filter filtreNoAdjunt = Filter.parse(docAdjuntField + " is null");
 			        Filter filtreNoAdjunt = FilterBuilder.isNull(docAdjuntField);
 			        
 			        String documentTipusField = DocumentResource.Fields.documentTipus;
-//			        Filter filtreTipusDoc = Filter.parse(documentTipusField + "=0"); //DIGITAL
 			        Filter filtreTipusDoc = FilterBuilder.equal(documentTipusField, DocumentTipusEnumDto.DIGITAL.toString()); //DIGITAL
 			        
-			        String metaDocPortafirmes = DocumentResource.Fields.metaDocument + "." + MetaDocumentResource.Fields.firmaPortafirmesActiva;
-//			        Filter filtrePfActiu = Filter.parse(metaDocPortafirmes + "=1"); //ENVIAMENT A PF ACTIU
-			        Filter filtrePfActiu = FilterBuilder.equal(metaDocPortafirmes, true); //ENVIAMENT A PF ACTIU		        
+			        Filter filtrePfActiu = null;
+			        if (mapaNamedQueries.containsKey("MASSIU_PORTAFIRMES")) {
+			        	String metaDocPortafirmes = DocumentResource.Fields.metaDocument + "." + MetaDocumentResource.Fields.firmaPortafirmesActiva;
+			        	filtrePfActiu = FilterBuilder.equal(metaDocPortafirmes, true); //ENVIAMENT A PF ACTIU
+			        } else if (mapaNamedQueries.containsKey("MASSIU_PASARELA")) {
+			        	String metaDocPortafirmes = DocumentResource.Fields.metaDocument + "." + MetaDocumentResource.Fields.firmaPassarelaActiva;
+			        	filtrePfActiu = FilterBuilder.equal(metaDocPortafirmes, true); //ENVIAMENT A PF ACTIU
+			        }
 			        
 			        Filter resultat = FilterBuilder.and(
 			        		filtreBase, //Entitat i filtre del usuari
@@ -1284,28 +1285,38 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 		}
     }
     
-    private class IniciarFirmaWebActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.IniciarFirmaSimple, Serializable> {
+    private class IniciarFirmaWebActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.IniciarFirmaNavegador, Serializable> {
 
 		@Override
-		public void onChange(Serializable id, IniciarFirmaSimple previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, IniciarFirmaSimple target) {
+		public void onChange(Serializable id, IniciarFirmaNavegador previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, IniciarFirmaNavegador target) {
 			if (fieldName==null) {
 				//initialOnChange --> Carregar un valor per defecte per el motiu
-				String expNom = documentResourceRepository.findById((Long)id).get().getExpedient().getNom();
-				target.setMotiu("Tramitació del expedient RIPEA: "+expNom);
+				if (!previous.isMassivo()) {
+					String expNom = documentResourceRepository.findById((Long)id).get().getExpedient().getNom();
+					target.setMotiu("Tramitació del expedient RIPEA: "+expNom);
+				}
 			}
 		}
 
 		@Override
-		public Serializable exec(String code, DocumentResourceEntity entity, IniciarFirmaSimple params) throws ActionExecutionException {
+		public Serializable exec(String code, DocumentResourceEntity entity, IniciarFirmaNavegador params) throws ActionExecutionException {
+			
 			try {
+				
     			String dadesURL = entity.getExpedient().getId()+"#"+entity.getId()+"#"+SecurityContextHolder.getContext().getAuthentication().getName();
 				String paramSecure = Utils.encripta(dadesURL, configHelper.getConfig(PropertyConfig.CLAU_ENCRIPTACIO));
 				String urlReturnToRipea = configHelper.getConfig(PropertyConfig.BASE_URL) + "/modal/document/event/" + paramSecure + "/firmaSimpleWebEnd";
 				EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
-				FitxerDto fitxerDto = documentHelper.convertirPdfPerFirmaClient(entitatEntity.getId(), entity.getId());
-                Map<String, String> result = new HashMap<>();
-                result.put("url", pluginHelper.firmaSimpleWebStart(Arrays.asList(fitxerDto), params.getMotiu(), urlReturnToRipea, FirmaSimpleStartTransactionRequest.VIEW_FULLSCREEN));
+				
+				List<FitxerDto> fitxersFirma = new ArrayList<FitxerDto>();
+				for (Long idDoc: params.getIds()) {
+					fitxersFirma.add(documentHelper.convertirPdfPerFirmaClient(entitatEntity.getId(), idDoc));
+				}
+				
+				Map<String, String> result = new HashMap<>();
+                result.put("url", pluginHelper.firmaSimpleWebStart(fitxersFirma, params.getMotiu(), urlReturnToRipea, FirmaSimpleStartTransactionRequest.VIEW_FULLSCREEN));
                 return (Serializable)result;
+                
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/document/"+entity.getId()+"/IniciarFirmaWebActionExecutor", e);
 				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, messageHelper.getMessage("document.iniciarFirmaWeb.reject", new Object[]{e.getMessage()}));

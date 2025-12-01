@@ -1,15 +1,17 @@
 import {useTranslation} from "react-i18next";
 import {GridPage, useMuiDataGridApiRef} from "reactlib";
+import {Link} from "@mui/material";
 import {useState} from "react";
 import {CardPage} from "../../../components/CardData.tsx";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import {EnviarPortafirmesFilter} from "./EnviarPortafirmesGrid.tsx";
 
+const namedQueries: string[] = ['MASSIU_PASARELA']
 const sortModel: any = [{field: 'createdDate', sort: 'desc'}]
 const columns = [
     {
         field: 'nom',
-        flex: 0.5,
+        flex: 0.8,
     },
     {
         field: 'metaDocument',
@@ -17,16 +19,17 @@ const columns = [
     },
     {
         field: 'expedient',
-        flex: 0.75,
-        renderCell: (params:any) => <a href={`/contingut/${params?.row?.expedient?.id}`}>{params?.formattedValue}</a>,
+        flex: 0.6,
+        renderCell: (params:any) => <Link href={`/contingut/${params?.row?.expedient?.id}`}>{params?.formattedValue}</Link>,
     },
     {
         field: 'createdDate',
-        flex: 0.55,
+        flex: 0.5,
     },
     {
         field: 'createdByFullName',
-        flex: 0.45,
+        flex: 0.6,
+		sortProcessor: (field: string, sort: GridSortDirection) => [ { field: "createdBy", sort } ]
     },
 ]
 
@@ -66,12 +69,10 @@ const FirmaNavegadorGrid = () => {
                 resourceName={"documentResource"}
                 columns={columns}
                 filter={springFilter}
-                // TODO: filtrar por permisos y pot firmar al navegador
+				namedQueries={namedQueries}
                 sortModel={sortModel}
-
                 rowAdditionalActions={actions}
                 toolbarMassiveActions={massiveActions}
-
                 toolbarHideCreate
             />
         </CardPage>
