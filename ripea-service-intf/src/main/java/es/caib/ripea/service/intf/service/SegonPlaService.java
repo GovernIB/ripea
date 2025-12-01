@@ -14,15 +14,15 @@ import es.caib.ripea.service.intf.dto.ExplotFetsAmbDimensioDto;
 @PreAuthorize("isAuthenticated()")
 public interface SegonPlaService {
 
-	void consultarIGuardarAnotacionsPeticionsPendents() throws Throwable;
+	int consultarIGuardarAnotacionsPeticionsPendents() throws Throwable;
 
 	void buidarCacheDominis();
 
-	void enviarEmailsPendentsAgrupats();
+	int enviarEmailsPendentsAgrupats();
 
 	void testEmailsAgrupats();
 
-	void guardarExpedientsDocumentsArxiu();
+	int guardarExpedientsDocumentsArxiu();
 
 	void guardarInteressatsArxiu();
 

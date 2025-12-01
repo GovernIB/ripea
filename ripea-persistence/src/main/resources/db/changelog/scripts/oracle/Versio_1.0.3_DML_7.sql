@@ -1,0 +1,1 @@
+UPDATE ipa_config SET jboss_property = 0, "VALUE" = 'DEV' WHERE "KEY" = 'es.caib.ripea.plugin.comanda.entorn';
