@@ -1032,7 +1032,10 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 			
 			if (dimensioEntity==null) {
 				dimensioEntity = new ExplotacioDimensioEntity();
-				EntitatEntity entitatEntity = entitatRepository.findById(dim.getEntitatId()).orElse(null);
+				EntitatEntity entitatEntity = null;
+				if (dim.getEntitatId()!=null) {
+					entitatEntity = entitatRepository.findById(dim.getEntitatId()).orElse(null);
+				}
 				MetaExpedientEntity metaExpedientEntity = null;
 				if (dim.getProcedimentId()!=null) {
 					metaExpedientEntity = metaExpedientRepository.findById(dim.getProcedimentId()).orElse(null);

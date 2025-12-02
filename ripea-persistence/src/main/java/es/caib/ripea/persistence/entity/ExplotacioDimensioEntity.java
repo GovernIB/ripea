@@ -42,12 +42,18 @@ public class ExplotacioDimensioEntity extends RipeaPersistable<Long> {
 			MetaExpedientEntity metaExpedientEntity,
 			OrganGestorEntity organGestorEntity,
 			UsuariEntity usuariEntity) {
-		this.setEntitat(entitatEntity);
-		this.setEntitatCodi(entitatEntity.getCodi());
-		this.setProcediment(metaExpedientEntity);
-		this.setProcedimentCodi(metaExpedientEntity.getCodi());
-		this.setOrganGestor(organGestorEntity);
-		this.setOrganCodi(organGestorEntity.getCodi());
+		if (entitatEntity!=null) {
+			this.setEntitat(entitatEntity);
+			this.setEntitatCodi(entitatEntity.getCodi());
+		}
+		if (metaExpedientEntity!=null) {
+			this.setProcediment(metaExpedientEntity);
+			this.setProcedimentCodi(metaExpedientEntity.getCodi());
+		}
+		if (organGestorEntity!=null) {
+			this.setOrganGestor(organGestorEntity);
+			this.setOrganCodi(organGestorEntity.getCodi());
+		}
 		this.setUsuari(usuariEntity);
 	}
 }
