@@ -64,10 +64,10 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-tx</artifactId>
 		</dependency>
-		<dependency>
+		<!--dependency>
 			<groupId>org.keycloak</groupId>
 			<artifactId>keycloak-core</artifactId>
-		</dependency>
+		</dependency-->
 		<dependency>
 			<groupId>javax.ejb</groupId>
 			<artifactId>javax.ejb-api</artifactId>
@@ -93,5 +93,10 @@
 			<artifactId>ripea-service-intf</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>ripea-plugin-intf</artifactId>
+			<version>${project.version}</version>
+		</dependency>		
 	</dependencies>
 </project>
