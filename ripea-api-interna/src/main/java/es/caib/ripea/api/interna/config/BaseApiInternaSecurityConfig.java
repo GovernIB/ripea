@@ -37,7 +37,8 @@ public class BaseApiInternaSecurityConfig {
 				new AntPathRequestMatcher("/appInfo"),
 				new AntPathRequestMatcher("/salut"),
 				new AntPathRequestMatcher("/estadistiquesInfo"),
-				new AntPathRequestMatcher("/estadistiques/**/*")
+//				new AntPathRequestMatcher("/estadistiques"),
+				new AntPathRequestMatcher("/estadistiques/**")
 		};
 	}
 

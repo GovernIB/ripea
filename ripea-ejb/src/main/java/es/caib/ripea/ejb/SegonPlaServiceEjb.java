@@ -28,8 +28,8 @@ public class SegonPlaServiceEjb extends AbstractServiceEjb<SegonPlaService> impl
 
 	@Override
 	@RolesAllowed("**")
-	public void consultarIGuardarAnotacionsPeticionsPendents() throws Throwable {
-		delegateService.consultarIGuardarAnotacionsPeticionsPendents();
+	public int consultarIGuardarAnotacionsPeticionsPendents() throws Throwable {
+		return delegateService.consultarIGuardarAnotacionsPeticionsPendents();
 	}
 
 	@Override
@@ -40,8 +40,8 @@ public class SegonPlaServiceEjb extends AbstractServiceEjb<SegonPlaService> impl
 
 	@Override
 	@RolesAllowed("**")
-	public void enviarEmailsPendentsAgrupats() {
-		delegateService.enviarEmailsPendentsAgrupats();
+	public int enviarEmailsPendentsAgrupats() {
+		return delegateService.enviarEmailsPendentsAgrupats();
 	}
 
 	@Override
@@ -52,8 +52,8 @@ public class SegonPlaServiceEjb extends AbstractServiceEjb<SegonPlaService> impl
 
 	@Override
 	@RolesAllowed("**")
-	public void guardarExpedientsDocumentsArxiu() {
-		delegateService.guardarExpedientsDocumentsArxiu();
+	public int guardarExpedientsDocumentsArxiu() {
+		return delegateService.guardarExpedientsDocumentsArxiu();
 	}
 
 	@Override

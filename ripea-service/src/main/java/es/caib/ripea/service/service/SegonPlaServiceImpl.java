@@ -5,9 +5,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -137,7 +135,7 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	 * Obtain registres from DISTRIBUCIO for created peticions and save them in DB
 	 */
 	@Override
-	public void consultarIGuardarAnotacionsPeticionsPendents() throws Throwable {
+	public int consultarIGuardarAnotacionsPeticionsPendents() throws Throwable {
 
 		if (cacheHelper.mostrarLogsSegonPla())
 			logger.info("Execució de tasca periòdica: consultar i guardar anotacions per peticions pedents de creacio del expedients");
@@ -162,6 +160,7 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 		if (cacheHelper.mostrarLogsSegonPla())
 			logger.info("Fin de tasca periòdica: consultar i guardar anotacions per peticions pedents de creacio del expedients :  " + (System.currentTimeMillis() - t1) + " ms");
 		
+		return peticionsId==null?0:peticionsId.size();
 	}
 
 	@Override
@@ -236,7 +235,7 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	
 	@Override
 	@Transactional
-	public void enviarEmailsPendentsAgrupats() {
+	public int enviarEmailsPendentsAgrupats() {
 		
 		long t1 = System.currentTimeMillis();
 		if (cacheHelper.mostrarLogsSegonPla())
@@ -285,6 +284,7 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 		if (cacheHelper.mostrarLogsSegonPla())
 			logger.info("Fin de tasca periòdica: Enviar correus pendents agrupats :  " + (System.currentTimeMillis() - t1) + " ms");
 
+		return emailsPendentsMap.size();
 	}
 	
 	public void enviarEmailsPendentsAgrupats(
@@ -381,7 +381,7 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 
 	@Override
 	@Transactional
-	public void guardarExpedientsDocumentsArxiu() {
+	public int guardarExpedientsDocumentsArxiu() {
 		long t1 = System.currentTimeMillis();
 		if (cacheHelper.mostrarLogsSegonPla())
 			logger.info("Execució tasca periòdica: Guardar expedients i documents en arxiu");
@@ -424,6 +424,7 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 		if (cacheHelper.mostrarLogsSegonPla())
 			logger.info("Fin de tasca periòdica: Guardar expedients i documents en arxiu :  " + (System.currentTimeMillis() - t1) + " ms");
 
+		return pendents==null?0:pendents.size();
 	}
 
 	@Override
@@ -1031,7 +1032,10 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 			
 			if (dimensioEntity==null) {
 				dimensioEntity = new ExplotacioDimensioEntity();
-				EntitatEntity entitatEntity = entitatRepository.findById(dim.getEntitatId()).orElse(null);
+				EntitatEntity entitatEntity = null;
+				if (dim.getEntitatId()!=null) {
+					entitatEntity = entitatRepository.findById(dim.getEntitatId()).orElse(null);
+				}
 				MetaExpedientEntity metaExpedientEntity = null;
 				if (dim.getProcedimentId()!=null) {
 					metaExpedientEntity = metaExpedientRepository.findById(dim.getProcedimentId()).orElse(null);

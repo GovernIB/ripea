@@ -45,7 +45,7 @@
 		</dependency>
 		<dependency>
 			<groupId>ma.glasnost.orika</groupId>
-			<artifactId>orika-core</artifactId>
+			<artifactId>orika-core</artifactId>			
 		</dependency>
 		<dependency>
 			<groupId>org.apache.pdfbox</groupId>
@@ -63,11 +63,6 @@
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>ripea-plugin-intf</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 		<!-- WEBJARS -->
 		<dependency>
@@ -262,7 +257,7 @@
 				</dependency>
 				<dependency>
 					<groupId>${project.groupId}</groupId>
-					<artifactId>ripea-service</artifactId>
+					<artifactId>ripea-service-intf</artifactId>
 					<version>${project.version}</version>
 				</dependency>
 				<dependency>
@@ -352,7 +347,7 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-war-plugin</artifactId>
 						<configuration>
-							<packagingExcludes>**/RipeaBackBootApp.class,**/SpringBootWebSecurityConfig.class</packagingExcludes>
+							<packagingExcludes>**/RipeaBackBootApp.class,**/SpringBootWebSecurityConfig.class,WEB-INF/lib/jsr311-api-*.jar</packagingExcludes>							
 							<attachClasses>true</attachClasses>
 							<archive>
 								<manifestEntries>

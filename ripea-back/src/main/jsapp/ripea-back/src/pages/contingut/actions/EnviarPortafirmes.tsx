@@ -153,7 +153,7 @@ const EnviarPortafirmesForm = forwardRef((props, ref) => {
 
         {/* SIMPLE */}
         {data?.portafirmesFluxTipus=='SIMPLE' && <>
-            <GridFormField xs={12} name="responsables" multiple filter={filterResponsables}/>
+            <GridFormField xs={12} name="responsables" multiple autocomplete filter={filterResponsables} namedQueries={[`ADD_PLUGIN_USERS`]}/>
             <GridFormField xs={12} name={"nifsManuals"} multiple/>
             <GridFormField xs={12} name={"carrecs"} multiple hidden={!user?.sessionScope?.isWsUsuariEntitatActiu}/>
             <GridFormField xs={12} name="portafirmesSequenciaTipus" required/>

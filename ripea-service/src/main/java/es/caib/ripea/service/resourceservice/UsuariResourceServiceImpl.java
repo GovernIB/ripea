@@ -1,22 +1,18 @@
 package es.caib.ripea.service.resourceservice;
 
-import es.caib.ripea.persistence.entity.resourceentity.UsuariResourceEntity;
-import es.caib.ripea.service.base.service.BaseMutableResourceService;
-import es.caib.ripea.service.base.service.BaseMutableResourceService.FieldOptionsProvider;
-import es.caib.ripea.service.helper.RolHelper;
-import es.caib.ripea.service.intf.base.exception.ResourceNotFoundException;
-import es.caib.ripea.service.intf.base.model.FieldOption;
-import es.caib.ripea.service.intf.base.permission.UserPermissionInfo;
-import es.caib.ripea.service.intf.base.permission.UserPermissionInfo.PermisosEntitat;
-import es.caib.ripea.service.intf.config.BaseConfig;
-import es.caib.ripea.service.intf.model.InteressatResource;
-import es.caib.ripea.service.intf.model.UsuariResource;
-import es.caib.ripea.service.intf.resourceservice.UsuariResourceService;
-import es.caib.ripea.service.intf.utils.Utils;
-import es.caib.ripea.service.resourcehelper.UsuariResourceHelper;
-import es.caib.ripea.service.resourceservice.InteressatResourceServiceImpl.MunicipiFieldOptionsProvider;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import javax.annotation.PostConstruct;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -25,15 +21,22 @@ import org.springframework.transaction.annotation.Transactional;
 import com.turkraft.springfilter.FilterBuilder;
 import com.turkraft.springfilter.parser.Filter;
 
-import javax.annotation.PostConstruct;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import es.caib.ripea.persistence.entity.resourceentity.UsuariResourceEntity;
+import es.caib.ripea.service.base.service.BaseMutableResourceService;
+import es.caib.ripea.service.helper.RolHelper;
+import es.caib.ripea.service.intf.base.exception.ResourceNotFoundException;
+import es.caib.ripea.service.intf.base.model.FieldOption;
+import es.caib.ripea.service.intf.base.permission.UserPermissionInfo;
+import es.caib.ripea.service.intf.base.permission.UserPermissionInfo.PermisosEntitat;
+import es.caib.ripea.service.intf.config.BaseConfig;
+import es.caib.ripea.service.intf.dto.UsuariDto;
+import es.caib.ripea.service.intf.model.UsuariResource;
+import es.caib.ripea.service.intf.resourceservice.UsuariResourceService;
+import es.caib.ripea.service.intf.service.AplicacioService;
+import es.caib.ripea.service.intf.utils.Utils;
+import es.caib.ripea.service.resourcehelper.UsuariResourceHelper;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Implementació del servei de gestió d'usuaris.
@@ -46,6 +49,7 @@ import java.util.Optional;
 public class UsuariResourceServiceImpl extends BaseMutableResourceService<UsuariResource, String, UsuariResourceEntity> implements UsuariResourceService {
 
     private final UsuariResourceHelper usuariResourceHelper;
+    private final AplicacioService aplicacioService;
     
     @PostConstruct
     public void init() {
@@ -61,6 +65,38 @@ public class UsuariResourceServiceImpl extends BaseMutableResourceService<Usuari
     	Filter filtreResultat = FilterBuilder.and(filtreBase, filtreNom1, filtreNom2);
     	return filtreResultat.generate();
     }
+    
+    @Override
+	public Page<UsuariResource> findPage(
+			String quickFilter,
+			String filter,
+			String[] namedQueries,
+			String[] perspectives,
+			Pageable pageable) {
+		
+    	Page<UsuariResource> usuarisBBDD = super.findPage(quickFilter, filter, namedQueries, perspectives, pageable);
+    			
+    	if (usuarisBBDD==null || usuarisBBDD.isEmpty()) {
+    		Map<String, String> mapaNamedQueries =  Utils.namedQueriesToMap(namedQueries);
+    		if (mapaNamedQueries.size()>0 && mapaNamedQueries.containsKey("ADD_PLUGIN_USERS") && quickFilter!=null) {
+    			List<UsuariDto> usuarisAddicionals = aplicacioService.findUsuariAmbTextDades(quickFilter);
+    			List<UsuariResource> usuarisResources = new ArrayList<UsuariResource>();
+    			if (usuarisAddicionals!=null) {
+    				for (UsuariDto userExt: usuarisAddicionals) {
+    					UsuariResource ur = new UsuariResource();
+    					ur.setNif(userExt.getNif());
+    					ur.setNom(userExt.getNom());
+    					ur.setCodi(userExt.getCodi());
+    					usuarisResources.add(ur);
+    				}
+    				//No es pot modificar la "Page" inicial: java.util.Collections$UnmodifiableCollection.add(Collections.java:1058)
+    				return new PageImpl<>(usuarisResources, usuarisBBDD.getPageable(), usuarisBBDD.getTotalElements() + usuarisAddicionals.size());
+    			}
+    		}
+    	}
+    	
+    	return usuarisBBDD;
+	}
     
     public class ElementsPaginaOptionsProvider implements FieldOptionsProvider {
 		public List<FieldOption> getOptions(String fieldName, Map<String,String[]> requestParameterMap) {

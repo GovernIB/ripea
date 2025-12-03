@@ -56,7 +56,7 @@ public class ComandaCaibPluginImpl extends RipeaAbstractPluginProperties impleme
         if (url == null) {
             throw new Exception("La propietat es.caib.ripea.plugin.comanda.url.base no pot ser null");
         }
-        url += (url.charAt(url.length()-1) != '/' ? "/" : "") + "api/jms/tasques";
+        url += (url.charAt(url.length()-1) != '/' ? "/" : "") + "jms/tasques";
         return getRestTemplate().postForEntity(url, requestEntity, String.class);
 	}
 
@@ -77,7 +77,7 @@ public class ComandaCaibPluginImpl extends RipeaAbstractPluginProperties impleme
         if (url == null) {
             throw new Exception("La propietat es.caib.ripea.plugin.comanda.url.base no pot ser null");
         }
-        url += (url.charAt(url.length()-1) != '/' ? "/" : "") + "api/jms/avisos";
+        url += (url.charAt(url.length()-1) != '/' ? "/" : "") + "jms/avisos";
         return getRestTemplate().postForEntity(url, requestEntity, String.class);
 	}
 	

@@ -194,9 +194,11 @@ public class SchedulingConfig implements SchedulingConfigurer {
 						monitorTasquesService.inici(codiConsultarIGuardarAnotacionsPendents);
 						try {
 							createAuthenticationContext();
-							segonPlaService.consultarIGuardarAnotacionsPeticionsPendents();
+							int numPeticions = segonPlaService.consultarIGuardarAnotacionsPeticionsPendents();
 							monitorTasquesService.fi(codiConsultarIGuardarAnotacionsPendents);
-							aplicacioService.stopTimer(sample, "METRICS@Subsystem_Background.consultarIGuardarAnotacions", "resultado", "exito");
+							if (numPeticions>0) {
+								aplicacioService.stopTimer(sample, "METRICS@Subsystem_Background.consultarIGuardarAnotacions", "resultado", "exito");
+							}
 						} catch (Throwable th) {
 							tractarErrorTascaSegonPla(th, codiConsultarIGuardarAnotacionsPendents);
 							aplicacioService.stopTimer(sample, "METRICS@Subsystem_Background.consultarIGuardarAnotacions", "resultado", "error");
@@ -273,9 +275,11 @@ public class SchedulingConfig implements SchedulingConfigurer {
                     	monitorTasquesService.inici(codiEnviarEmailsAgrupats);
                         try {
                         	createAuthenticationContext();
-                        	segonPlaService.enviarEmailsPendentsAgrupats();
+                        	int emails = segonPlaService.enviarEmailsPendentsAgrupats();
                         	monitorTasquesService.fi(codiEnviarEmailsAgrupats);
-                        	aplicacioService.stopTimer(sample, "METRICS@Subsystem_Background.enviarEmailsAgrupats", "resultado", "exito");                       	
+                        	if (emails>0) {
+                        		aplicacioService.stopTimer(sample, "METRICS@Subsystem_Background.enviarEmailsAgrupats", "resultado", "exito");
+                        	}
                         } catch(Throwable th) {
                         	tractarErrorTascaSegonPla(th, codiEnviarEmailsAgrupats);
                         	aplicacioService.stopTimer(sample, "METRICS@Subsystem_Background.enviarEmailsAgrupats", "resultado", "error");                     	
@@ -297,9 +301,11 @@ public class SchedulingConfig implements SchedulingConfigurer {
 						monitorTasquesService.inici(codiGuardarEnArxiuContingutsPendents);
 						try {
 							createAuthenticationContext();
-	                        segonPlaService.guardarExpedientsDocumentsArxiu();
+	                        int numDocs = segonPlaService.guardarExpedientsDocumentsArxiu();
 							monitorTasquesService.fi(codiGuardarEnArxiuContingutsPendents);
-							aplicacioService.stopTimer(sample, "METRICS@Subsystem_Background.guardarEnArxiuContingutsPendents", "resultado", "exito");
+							if (numDocs>0) {
+								aplicacioService.stopTimer(sample, "METRICS@Subsystem_Background.guardarEnArxiuContingutsPendents", "resultado", "exito");
+							}
 						} catch (Throwable th) {
 							tractarErrorTascaSegonPla(th, codiGuardarEnArxiuContingutsPendents);
 							aplicacioService.stopTimer(sample, "METRICS@Subsystem_Background.guardarEnArxiuContingutsPendents", "resultado", "error");
