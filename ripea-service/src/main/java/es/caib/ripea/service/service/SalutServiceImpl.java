@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import es.caib.comanda.ms.salut.helper.EstatHelper;
 import es.caib.comanda.ms.salut.model.ContextInfo;
 import es.caib.comanda.ms.salut.model.DetallSalut;
 import es.caib.comanda.ms.salut.model.EstatSalut;
@@ -233,7 +234,7 @@ public class SalutServiceImpl implements SalutService{
 		EstatSalut salutDb = checkDatabase();		
 		List<IntegracioSalut> salutIntegracions = checkIntegracions();
 		List<SubsistemaSalut> subsistemesSalut = checkSubsistemes();
-		List<DetallSalut> salutAltres = checkAltres(); 		//Comparar amb MonitorSystemController
+//		List<DetallSalut> salutAltres = checkAltres(); 		//Comparar amb MonitorSystemController
 		List<MissatgeSalut> missatgesSalut = checkMissatges();
 		
 		//Estat de salut general (depen de tots els altres)
@@ -250,7 +251,7 @@ public class SalutServiceImpl implements SalutService{
                 .bd(salutDb)
                 .integracions(salutIntegracions)
                 .subsistemes(subsistemesSalut)
-                .altres(salutAltres)
+//                .altres(salutAltres)
                 .missatges(missatgesSalut)
                 .build();
 	}
@@ -713,7 +714,10 @@ public class SalutServiceImpl implements SalutService{
         
     	final long ok = (totalPeticionsOk != null) ? totalPeticionsOk : 0L;
         final long ko = (totalPeticionsError != null) ? totalPeticionsError : 0L;
-        final long total = ok + ko;
+        
+        return EstatHelper.calculaEstat(ok, ko);
+        
+        /*final long total = ok + ko;
 
         if (total==0) {
         	return EstatSalutEnum.UNKNOWN;
@@ -732,7 +736,7 @@ public class SalutServiceImpl implements SalutService{
         	return EstatSalutEnum.UP;
         } else {
             return EstatSalutEnum.WARN; // 5-10%
-        }
+        }*/
     }
     
     public List<MissatgeSalut> checkMissatges() {
