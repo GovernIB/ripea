@@ -14,8 +14,6 @@ public class ExcepcioLogHelper {
 
 	private LinkedList<ExcepcioLogDto> excepcions = new LinkedList<>();
 
-
-
 	public List<ExcepcioLogDto> findAll() {
 		int index = 0;
 		for (ExcepcioLogDto excepcio: excepcions) {
@@ -33,5 +31,17 @@ public class ExcepcioLogHelper {
 		}
 		excepcions.addFirst(new ExcepcioLogDto(uri, exception));
 	}
+	
+	@Synchronized
+	public void addExcepcio(String uri, Throwable exception, String param1, String param2) {
+		if (exception == null) return;
 
+		while (excepcions.size() >= DEFAULT_MAX_EXCEPCIONS) {
+			excepcions.removeLast();
+		}
+		ExcepcioLogDto exc = new ExcepcioLogDto(uri, exception);
+		exc.setParam1(param1);
+		exc.setParam2(param2);
+		excepcions.addFirst(exc);
+	}
 }

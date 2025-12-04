@@ -33,11 +33,7 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 	@Autowired private ConversioTipusHelper conversioTipusHelper;
 	@Autowired private ContingutHelper contingutHelper;
 	@Autowired private PaginacioHelper paginacioHelper;
-	@Autowired private UsuariHelper usuariHelper;
-	@Autowired private EmailHelper emailHelper;
 	@Autowired private EntityComprovarHelper entityComprovarHelper;
-	@Autowired private MessageHelper messageHelper;
-	@Autowired private ContingutLogHelper contingutLogHelper;
 	@Autowired private MetaExpedientHelper metaExpedientHelper;
 	@Autowired private ExpedientRepository expedientRepository;
 	@Autowired private UsuariRepository usuariRepository;
@@ -212,58 +208,12 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 				"entitatId=" + entitatId + ", " +
 				"expedientId=" + expedientId + ", " +
 				"estatId=" + estatId + ")");
+
 		entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				expedientId,
-				false,
-				false,
-				true,
-				false,
-				false,
-				null);
-		entityComprovarHelper.comprovarEstatExpedient(entitatId, expedientId, ExpedientEstatEnumDto.OBERT);
-		ExpedientEstatEntity estat;
-		if (estatId != null) {
-			estat = expedientEstatRepository.getOne(estatId);
-		} else { // if it is null it means that "OBERT" state was choosen
-			estat = null;
-		}
-		String codiEstatAnterior;
-		if (expedient.getEstatAdditional() != null) {
-			codiEstatAnterior = expedient.getEstatAdditional().getCodi();
-		} else {
-			codiEstatAnterior = messageHelper.getMessage("expedient.estat.enum.OBERT");
-		}
-		expedient.updateEstatAdditional(
-				estat);
-		// log change of state
-		String codiEstatNou;
-		if (expedient.getEstatAdditional() != null) {
-			codiEstatNou = expedient.getEstatAdditional().getCodi();
-		} else {
-			codiEstatNou = messageHelper.getMessage("expedient.estat.enum.OBERT");
-		}
-		if(!codiEstatAnterior.equals(codiEstatNou)){
-			contingutLogHelper.log(
-					expedient,
-					LogTipusEnumDto.CANVI_ESTAT,
-					codiEstatAnterior,
-					codiEstatNou,
-					false,
-					false);
-		}
 		
-		// if new state has usuari responsable agafar by this user
-		if (estat != null && estat.getResponsableCodi() != null) {
-			agafarByUserWithCodi(
-					entitatId, 
-					expedientId,
-					estat.getResponsableCodi());
-		}
+		ExpedientEntity expedient = expedientEstatHelper.updateEstatAdditional(entitatId, expedientId, estatId);
 		
-		return toExpedientDto(
-				expedient,
-				false);
+		return toExpedientDto(expedient,false);
 	}
 
 	@Override
@@ -288,38 +238,6 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 		return conversioTipusHelper.convertir(
 				entity,
 				ExpedientEstatDto.class);
-	}
-
-
-	private void agafarByUserWithCodi(
-			Long entitatId,
-			Long expedientId,
-			String codi) {
-		logger.debug("Agafant l'expedient com a usuari ("
-				+ "entitatId=" + entitatId + ", "
-				+ "expedientId=" + expedientId + ", "
-				+ "usuari=" + codi + ")");
-		ExpedientEntity expedient = expedientRepository.getOne(expedientId);
-
-		// Agafa l'expedient. Si l'expedient pertany a un altre usuari li pren
-		UsuariEntity usuariOriginal = expedient.getAgafatPer();
-		UsuariEntity usuariNou = usuariHelper.getUsuariByCodi(codi);
-		
-		expedient.updateAgafatPer(usuariNou);
-		if (usuariOriginal != null) {
-			// Avisa a l'usuari que li han pres
-			emailHelper.contingutAgafatPerAltreUsusari(
-					expedient,
-					usuariOriginal,
-					usuariNou);
-		}
-		contingutLogHelper.log(
-				expedient,
-				LogTipusEnumDto.AGAFAR,
-				null,
-				null,
-				false,
-				false);
 	}
 
 	@Override

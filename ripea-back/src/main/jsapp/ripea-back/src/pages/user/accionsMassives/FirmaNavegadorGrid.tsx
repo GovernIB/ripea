@@ -24,7 +24,7 @@ const columns = [
     },
     {
         field: 'createdDate',
-        flex: 0.5,
+        flex: 0.4,
     },
     {
         field: 'createdByFullName',

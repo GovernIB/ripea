@@ -53,6 +53,7 @@ const springExpedientFilterBuilder = (data: any) => {
     );
 }
 
+const namedQueriesExpedient: string[] = ['MASSIVE_ACTION_QUERY', 'MASSIVE_ARXIU_PENDENT']
 const expedientColumns = [
     {
         field: 'nom',
@@ -110,18 +111,17 @@ const CustodiarExpedientsPendentsGrid = () => {
             resourceName={"expedientResource"}
             columns={expedientColumns}
             filter={springFilter}
-            // TODO: filtrar pot custodiar
             sortModel={sortModel}
-
+            namedQueries={namedQueriesExpedient}
             rowAdditionalActions={actions}
             toolbarMassiveActions={massiveActions}
-
             toolbarHideCreate
         />
     </GridPage>
 }
 
 // Document
+const namedQueriesDocument: string[] = ['MASSIU_PENDENT_ARXIU']
 const springDocumentFilterBuilder = (data: any) => {
     return builder.and(
         builder.like("nom", data?.nom),
@@ -193,9 +193,8 @@ const CustodiarDocumentsPendentsGrid = () => {
             resourceName={"documentResource"}
             columns={documentColumns}
             filter={springFilter}
-            // TODO: filtrar pot custodiar
             sortModel={sortModel}
-
+            namedQueries={namedQueriesDocument}
             rowAdditionalActions={actions}
             toolbarMassiveActions={massiveActions}
 
@@ -205,6 +204,7 @@ const CustodiarDocumentsPendentsGrid = () => {
 }
 
 // Interessat
+const namedQueriesInteressat: string[] = ['MASSIU_PENDENT_ARXIU']
 const springInteressatFilterBuilder = (data: any) => {
     return builder.and(
         builder.like("nom", data?.nom),
@@ -276,12 +276,10 @@ const CustodiarInteressatsPendentsGrid = () => {
             resourceName={"interessatResource"}
             columns={interessatColumns}
             filter={springFilter}
-            // TODO: filtrar pot custodiar
             sortModel={sortModel}
-
+            namedQueries={namedQueriesInteressat}
             rowAdditionalActions={actions}
             toolbarMassiveActions={massiveActions}
-
             toolbarHideCreate
         />
     </GridPage>

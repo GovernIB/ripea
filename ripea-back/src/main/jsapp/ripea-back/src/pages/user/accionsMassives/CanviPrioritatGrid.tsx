@@ -4,6 +4,7 @@ import {useState} from "react";
 import { CardPage } from "../../../components/CardData.tsx";
 import {CanviEstatFilter, CanviEstatMuiGrid} from "./CanviEstatGrid.tsx";
 
+const namedQueries: string[] = ['MASSIVE_ACTION_QUERY']
 const perspectives:any = ['ESTAT']
 const CanviPrioritatGrid = () => {
     const {t} = useTranslation();
@@ -41,7 +42,7 @@ const CanviPrioritatGrid = () => {
                 apiRef={apiRef}
                 filter={springFilter}
                 perspectives={perspectives}
-
+                namedQueries={namedQueries}
                 rowAdditionalActions={actions}
                 toolbarMassiveActions={massiveActions}
             />

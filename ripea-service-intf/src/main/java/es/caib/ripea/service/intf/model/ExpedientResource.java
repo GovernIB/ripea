@@ -3,13 +3,14 @@ package es.caib.ripea.service.intf.model;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.Year;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import es.caib.ripea.service.intf.resourcevalidation.MassiveImportDocValid;
 import org.springframework.data.annotation.Transient;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -25,10 +26,10 @@ import es.caib.ripea.service.intf.dto.DocumentAmbTipusDto;
 import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.dto.FileNameOption;
 import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
-import es.caib.ripea.service.intf.dto.SiNoEnumDto;
 import es.caib.ripea.service.intf.dto.TipusImportEnumDto;
 import es.caib.ripea.service.intf.resourcevalidation.ExpedientValid;
 import es.caib.ripea.service.intf.resourcevalidation.ImportarDocumentValid;
+import es.caib.ripea.service.intf.resourcevalidation.MassiveImportDocValid;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -126,6 +127,16 @@ import lombok.experimental.FieldNameConstants;
                         code = ExpedientResource.ACTION_TANCAR_CODE,
                         formClass = ExpedientResource.TancarExpedientFormAction.class,
                         requiresId = true),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = ExpedientResource.ACTION_CANVI_PRIORITAT_CODE,
+                        formClass = ExpedientResource.CanviPrioritatExpedientFormAction.class,
+                        requiresId = true),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = ExpedientResource.ACTION_CANVI_ESTAT_CODE,
+                        formClass = ExpedientResource.CanviEstatExpedientFormAction.class,
+                        requiresId = true),                
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientResource.ACTION_IMPORTAR_CODE,
@@ -235,6 +246,8 @@ public class ExpedientResource extends NodeResource implements Serializable {
 	public static final String ACTION_MASSIVE_IMPORT_DOCS = "IMPORT_DOCS_MASS";
 	
 	public static final String ACTION_TANCAR_CODE = "TANCAR";
+	public static final String ACTION_CANVI_PRIORITAT_CODE = "CANVI_PRIORITAT";
+	public static final String ACTION_CANVI_ESTAT_CODE = "CANVI_ESTAT";
 	public static final String ACTION_IMPORTAR_CODE = "IMPORTAR";
 	public static final String REPORT_EXPORT_SELECTED_DOCS = "EXPORT_SELECTED_DOCS";
 	public static final String ACTION_SYNC_ARXIU = "SYNC_ARXIU";
@@ -470,10 +483,24 @@ public class ExpedientResource extends NodeResource implements Serializable {
     
     @Getter
     @Setter
-    public static class TancarExpedientFormAction implements Serializable {
+    public static class TancarExpedientFormAction extends MassiveAction {
         @NotNull
         private String motiu;
         private List<Long> documentsPerFirmar;
+    }
+    
+    @Getter
+    @Setter
+    public static class CanviEstatExpedientFormAction extends MassiveAction {
+        @NotNull
+        private ResourceReference<ExpedientEstatResource, Long> estatAdditional;
+    }
+    
+    @Getter
+    @Setter
+    public static class CanviPrioritatExpedientFormAction extends MassiveAction {
+        @NotNull
+        private PrioritatEnumDto prioritat;
     }
     
     @Getter

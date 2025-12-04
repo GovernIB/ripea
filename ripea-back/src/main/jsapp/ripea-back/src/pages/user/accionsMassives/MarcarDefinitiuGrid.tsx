@@ -3,36 +3,34 @@ import { CardPage } from "../../../components/CardData.tsx";
 import {useTranslation} from "react-i18next";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import {useState} from "react";
-import {Icon} from "@mui/material";
+import {Link} from "@mui/material";
 import {EnviarPortafirmesFilter} from "./EnviarPortafirmesGrid.tsx";
+import {GridSortDirection} from "@mui/x-data-grid-pro";
 
+const namedQueries: string[] = ['MASSIU_PORTAFIRMES']
 const sortModel: any = [{field: 'createdDate', sort: 'desc'}]
 const columns = [
     {
         field: 'nom',
-        flex: 0.75,
+        flex: 0.8,
     },
     {
         field: 'metaDocument',
-        flex: 0.5,
+        flex: 0.6,
     },
     {
         field: 'expedient',
-        flex: 1.75,
-        renderCell: (params:any) => <>
-            {/** TODO: revisar columna ubicación */}
-            /<a href={`/contingut/${params?.row?.expedient?.id}`} style={{ display: 'flex', alignItems: 'center' }}><Icon>folder_open</Icon>{params?.formattedValue}</a>
-            {params?.row?.pare?.id != params?.row?.expedient?.id ?<>/.../<Icon>folder</Icon>{params?.row?.pare?.description}</> :"" }
-            /<Icon>description</Icon>{params?.row?.fitxerNom}
-        </>,
+        flex: 0.6,
+        renderCell: (params:any) => <Link href={`/contingut/${params?.row?.expedient?.id}`}>{params?.formattedValue}</Link>,
     },
     {
         field: 'createdDate',
-        flex: 0.5,
+        flex: 0.4,
     },
     {
         field: 'createdByFullName',
-        flex: 0.5,
+        flex: 0.6,
+        sortProcessor: (field: string, sort: GridSortDirection) => [ { field: "createdBy", sort } ]
     },
 ]
 
@@ -68,12 +66,10 @@ const MarcarDefinitiuGrid = () => {
                 resourceName={"documentResource"}
                 columns={columns}
                 filter={springFilter}
-                // TODO: filtrar por permisos y puede marcar definitivo
+                namedQueries={namedQueries}
                 sortModel={sortModel}
-
                 rowAdditionalActions={actions}
                 toolbarMassiveActions={massiveActions}
-
                 toolbarHideCreate
             />
         </CardPage>

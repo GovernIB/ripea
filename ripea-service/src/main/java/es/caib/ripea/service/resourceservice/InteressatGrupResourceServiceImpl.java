@@ -62,7 +62,6 @@ public class InteressatGrupResourceServiceImpl extends BaseMutableResourceServic
                    .map(interesatEntity -> objectMappingHelper.newInstanceMap(interesatEntity, InteressatGrupResource.class))
                    .collect(Collectors.toList());
     }
-    
 
     public class InteressatsPerspectiveApplicator implements PerspectiveApplicator<InteressatGrupResourceEntity, InteressatGrupResource> {
     	

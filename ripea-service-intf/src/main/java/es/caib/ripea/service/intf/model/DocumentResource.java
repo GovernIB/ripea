@@ -306,6 +306,8 @@ public class DocumentResource extends NodeResource {
     @Transient
     @ResourceField(onChangeActive = true)
     public Boolean hasFirma;
+    
+    @Transient private List<ResourceReference<RegistreAnnexResource, Long>> annexos;
     @Transient private ArxiuDetallDto arxiu;
     @Transient private List<DocumentVersioDto> versions;
     @Transient private List<ArxiuFirmaDto> firmes;

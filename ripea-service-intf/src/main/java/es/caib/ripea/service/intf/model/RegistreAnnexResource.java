@@ -1,26 +1,33 @@
 package es.caib.ripea.service.intf.model;
 
+import java.util.Date;
+import java.util.List;
+
+import org.springframework.data.annotation.Transient;
+
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
-import es.caib.ripea.service.intf.dto.*;
+import es.caib.ripea.service.intf.dto.ArxiuEstatEnumDto;
+import es.caib.ripea.service.intf.dto.ArxiuFirmaDto;
+import es.caib.ripea.service.intf.dto.NtiTipoDocumentoEnumDto;
+import es.caib.ripea.service.intf.dto.RegistreAnnexEstatEnumDto;
+import es.caib.ripea.service.intf.dto.SicresTipoDocumentoEnumDto;
+import es.caib.ripea.service.intf.dto.SicresValidezDocumentoEnumDto;
 import es.caib.ripea.service.intf.registre.RegistreAnnexFirmaTipusEnum;
 import es.caib.ripea.service.intf.registre.RegistreAnnexNtiEstadoElaboracionEnum;
 import es.caib.ripea.service.intf.registre.RegistreAnnexNtiOrigenEnum;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.data.annotation.Transient;
-
-import java.io.Serializable;
-import java.util.Date;
-import java.util.List;
+import lombok.experimental.FieldNameConstants;
 
 @Getter
 @Setter
 @NoArgsConstructor
+@FieldNameConstants
 @ResourceConfig(
 		quickFilterFields = { "nom" },
 		descriptionField = "observacions",

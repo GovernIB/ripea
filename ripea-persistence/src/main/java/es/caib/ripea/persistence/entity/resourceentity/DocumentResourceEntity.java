@@ -20,6 +20,7 @@ import javax.persistence.TemporalType;
 
 import org.hibernate.annotations.Where;
 
+import es.caib.ripea.persistence.entity.RegistreAnnexEntity;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.dto.ArxiuEstatEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
@@ -164,6 +165,11 @@ public class DocumentResourceEntity extends NodeResourceEntity<DocumentResource>
 			name = "metaDocument_id",
 			foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "doc_metadoc_fk"))
 	private MetaDocumentResourceEntity metaDocument;
+	
+	//TODO: No sé perque hi ha un llistat d'annexos que apunten al document, si tant per crear expedient com per incorporar, partint de una anotació
+	//es crea sempre un document per annex, i l'annex apunta a aquest document.
+	@OneToMany(mappedBy = "document")
+	private List<RegistreAnnexResourceEntity> annexos = new ArrayList<RegistreAnnexResourceEntity>();
 	
 	public void updateEstat(DocumentEstatEnumDto estat) {
 		this.estat = estat;

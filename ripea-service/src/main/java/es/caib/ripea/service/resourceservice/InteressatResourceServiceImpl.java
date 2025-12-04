@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 import javax.validation.groups.Default;
@@ -31,9 +32,12 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.turkraft.springfilter.FilterBuilder;
+import com.turkraft.springfilter.parser.Filter;
 
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.InteressatEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.resourceentity.InteressatGrupResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.InteressatResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.InteressatGrupResourceRepository;
@@ -47,9 +51,11 @@ import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.base.springfilter.FilterSpecification;
 import es.caib.ripea.service.helper.CacheHelper;
 import es.caib.ripea.service.helper.ConfigHelper;
+import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
 import es.caib.ripea.service.helper.ExpedientInteressatHelper;
 import es.caib.ripea.service.helper.MessageHelper;
+import es.caib.ripea.service.helper.MetaExpedientHelper;
 import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.helper.UnitatOrganitzativaHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
@@ -74,6 +80,9 @@ import es.caib.ripea.service.intf.dto.NivellAdministracioDto;
 import es.caib.ripea.service.intf.dto.PaisDto;
 import es.caib.ripea.service.intf.dto.ProvinciaDto;
 import es.caib.ripea.service.intf.dto.UnitatOrganitzativaDto;
+import es.caib.ripea.service.intf.model.ContingutResource;
+import es.caib.ripea.service.intf.model.DocumentResource;
+import es.caib.ripea.service.intf.model.EntitatResource;
 import es.caib.ripea.service.intf.model.ExpedientResource;
 import es.caib.ripea.service.intf.model.InteressatGrupResource;
 import es.caib.ripea.service.intf.model.InteressatResource;
@@ -96,7 +105,9 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
     private final ConfigHelper configHelper;
     private final PluginHelper pluginHelper;
     private final CacheHelper cacheHelper;
+    private final EntityComprovarHelper entityComprovarHelper;
     private final MessageHelper messageHelper;
+    private final MetaExpedientHelper metaExpedientHelper;
     private final EntitatRepository entitatRepository;
     private final InteressatRepository interessatRepository;
     private final InteressatResourceRepository interessatResourceRepository;
@@ -128,6 +139,65 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
         register(InteressatResource.FILTER_CODE, new FilterOnchangeLogicProcessor());
     }
 
+    @Override
+    protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
+
+    	String entitatActualCodi = configHelper.getEntitatActualCodi();
+        String rolActual		 = configHelper.getRolActual();
+    	EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true,false);
+    	
+        Filter filtreBase = FilterBuilder.and(
+                (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null,
+                FilterBuilder.equal(InteressatResource.Fields.expedient + "." +ContingutResource.Fields.entitat + "." + EntitatResource.Fields.codi, 
+                		entitatActualCodi != null?entitatActualCodi:"................................................................................")
+        );
+        
+        Map<String, String> mapaNamedQueries =  Utils.namedQueriesToMap(namedQueries);
+    	if (mapaNamedQueries.size()>0) {
+    		
+    		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitat.getId(), rolActual);
+    		
+    		if (metaExpedientsPermesos==null || metaExpedientsPermesos.size()==0) {
+				//Sense permisos
+				return FilterBuilder.equal("id", 0).generate();
+			}
+    		
+    		Filter filtreMetaExpedientsPermesos	= null;
+    		Filter filtreInteressatNoPropagat	= null;
+    		Filter filtreExpedientNoEsborrat	= null;
+    		if (mapaNamedQueries.containsKey("MASSIU_PENDENT_ARXIU")) {
+				List<Long> metaExpedientsPermesosIds = new ArrayList<Long>();			
+    			
+				for (MetaExpedientEntity mex: metaExpedientsPermesos) {
+					metaExpedientsPermesosIds.add(mex.getId());
+				}
+				
+    			String procedimentId = InteressatResource.Fields.expedient + "." + ExpedientResource.Fields.metaExpedient + ".id";
+		    	List<String> permesosClausulesIn = Utils.getIdsEnGruposMil(metaExpedientsPermesosIds);
+		        for (String aux: permesosClausulesIn) {
+			        if (aux != null && !aux.isEmpty()) {
+			        	filtreMetaExpedientsPermesos = FilterBuilder.or(filtreMetaExpedientsPermesos, Filter.parse(procedimentId + " IN (" + aux + ")"));
+			        }
+		        }
+		        
+		        String expedientNoEsborratField = InteressatResource.Fields.expedient + "." + ContingutResource.Fields.esborrat;
+		        filtreExpedientNoEsborrat = FilterBuilder.equal(expedientNoEsborratField, 0);
+		        
+		        filtreInteressatNoPropagat = FilterBuilder.equal(InteressatResource.Fields.arxiuPropagat, 0);
+    		}
+    		
+    		Filter resultat = FilterBuilder.and(
+	        		filtreBase,
+	        		filtreMetaExpedientsPermesos,
+	        		filtreInteressatNoPropagat,
+	        		filtreExpedientNoEsborrat);
+    		
+    		return resultat.generate();
+    	}
+        
+        return filtreBase.generate();
+    }
+    
     @Override
     public List<InteressatResource> findBySpringFilter(String springFilter) {
         FilterSpecification<InteressatResourceEntity> spec = new FilterSpecification<>(springFilter);

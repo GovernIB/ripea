@@ -543,6 +543,16 @@ public class Utils {
 		return resultat;
 	}
 	
+	public static String getIdsSeparatsComa(List<Long> ids) {
+		if (ids!=null) {
+			return ids.stream()
+	                .map(String::valueOf)   // convierte cada Long a String
+	                .collect(Collectors.joining(",")); // une con comas
+		} else {
+			return "null";
+		}
+	}
+	
     public static List<String> getIdsEnGruposMil(List<Long> ids) {
     	int maxSize = 1000;
     	if (ids!=null && ids.size()>0) {

@@ -59,6 +59,7 @@ export const CanviEstatFilter = (props: any) => {
     </StyledMuiFilter>
 }
 
+const namedQueries: string[] = ['MASSIVE_ACTION_QUERY']
 const sortModel: any = [{field: 'createdDate', sort: 'desc'}]
 const columns = [
     {
@@ -68,7 +69,7 @@ const columns = [
     },
     {
         field: 'metaExpedient',
-        flex: 1.5,
+        flex: 1,
     },
     {
         field: 'estat',
@@ -84,16 +85,16 @@ const columns = [
     },
     {
         field: 'prioritat',
-        flex: 0.45,
+        flex: 0.5,
         renderCell: (params: any) => <StyledPrioritat entity={params?.row}>{params.formattedValue}</StyledPrioritat>
     },
     {
         field: 'createdDate',
-        flex: 1,
+        flex: 0.5,
     },
     {
         field: 'createdByFullName',
-        flex: 0.5,
+        flex: 0.8,
     },
 ]
 
@@ -102,7 +103,6 @@ export const CanviEstatMuiGrid = (props:any) => {
         resourceName={"expedientResource"}
         columns={columns}
         sortModel={sortModel}
-
         toolbarHideCreate
         {...props}
     />
@@ -150,11 +150,10 @@ const CanviEstatGrid = () => {
                 apiRef={apiRef}
                 filter={springFilter}
                 perspectives={perspectives}
-
+                namedQueries={namedQueries}
                 rowAdditionalActions={actions}
                 toolbarMassiveActions={massiveActions}
                 isRowSelectable={() => haveRequirements}
-
                 disabledMassiveDefSelector={!haveRequirements}
             />
         </CardPage>
