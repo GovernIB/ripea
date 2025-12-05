@@ -45,14 +45,18 @@ import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.ArxiuEstatEnumDto;
 import es.caib.ripea.service.intf.dto.ExpedientPeticioAccioEnumDto;
+import es.caib.ripea.service.intf.dto.ExpedientPeticioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.ExpedientPeticioEstatViewEnumDto;
 import es.caib.ripea.service.intf.dto.InteressatAssociacioAccioEnum;
 import es.caib.ripea.service.intf.dto.NtiTipoDocumentoEnumDto;
 import es.caib.ripea.service.intf.dto.SiNoEnumDto;
+import es.caib.ripea.service.intf.model.ContingutResource;
+import es.caib.ripea.service.intf.model.DocumentResource;
 import es.caib.ripea.service.intf.model.ExpedientPeticioResource;
 import es.caib.ripea.service.intf.model.ExpedientPeticioResource.AcceptarAnotacioForm;
 import es.caib.ripea.service.intf.model.ExpedientPeticioResource.RebutjarAnotacioForm;
 import es.caib.ripea.service.intf.model.MetaExpedientResource;
+import es.caib.ripea.service.intf.model.NodeResource.MassiveAction;
 import es.caib.ripea.service.intf.model.RegistreAnnexResource;
 import es.caib.ripea.service.intf.model.RegistreInteressatResource;
 import es.caib.ripea.service.intf.model.RegistreResource;
@@ -111,6 +115,8 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
         		entitat!=null?entitat.getUnitatArrel():"................................................................................");
         
         Filter filtrePermesos = null;
+        Filter filtreEstat = null;
+        Filter filtrePendentCanviEstat = null;
         Map<String, String> mapaNamedQueries =  Utils.namedQueriesToMap(namedQueries);
     	if (!mapaNamedQueries.isEmpty()) {
     		if (mapaNamedQueries.containsKey("LLISTAT_ANOTACIONS")) {
@@ -180,10 +186,18 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 				        filtrePermesos = FilterBuilder.and(filtreProcedimentsPermesos, filterGEstioGrupsActius);
 					}
     			}
+    		} else if (mapaNamedQueries.containsKey("MASSIU_ANOTACIONS_ESTAT")) {
+        		filtreEstat = FilterBuilder.notEqual(ExpedientPeticioResource.Fields.estat, ExpedientPeticioEstatEnumDto.CREAT);
+        		filtrePendentCanviEstat = FilterBuilder.equal(ExpedientPeticioResource.Fields.pendentCanviEstatDistribucio, true);
     		}
     	}
         
-        return FilterBuilder.and(filtreBase, filtreEntitat, filtrePermesos).generate();
+        return FilterBuilder.and(
+        		filtreBase,
+        		filtreEntitat,
+        		filtrePermesos,
+        		filtreEstat,
+        		filtrePendentCanviEstat).generate();
     }
     
     @Override
@@ -547,19 +561,23 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 		}
     }
     
-    private class CanviEstatDistribucioActionExecutor implements ActionExecutor<ExpedientPeticioResourceEntity, Serializable, Serializable> {
+    private class CanviEstatDistribucioActionExecutor implements ActionExecutor<ExpedientPeticioResourceEntity, MassiveAction, Serializable> {
 
 		@Override
-		public void onChange(Serializable id, Serializable previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, Serializable target) {}
+		public void onChange(Serializable id, MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {}
 
 		@Override
-		public Serializable exec(String code, ExpedientPeticioResourceEntity entity, Serializable params) throws ActionExecutionException {
+		public Serializable exec(String code, ExpedientPeticioResourceEntity entity, MassiveAction params) throws ActionExecutionException {
+			String petIdsStr = entity.getId()!=null?entity.getId().toString():Utils.getIdsSeparatsComa(params.getIds());
 			try {
-				expedientPeticioHelper.reintentarCanviEstatDistribucio(entity.getId());
+				for (Long petId: params.getIds()) {
+					expedientPeticioHelper.reintentarCanviEstatDistribucio(petId);
+				}
 				return objectMappingHelper.newInstanceMap(entity, ExpedientPeticioResource.class);
 			} catch (Exception e) {
-				excepcioLogHelper.addExcepcio("/anotacio/"+entity.getId()+"/RebutjarAnotacioActionExecutor", e);
-				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, messageHelper.getMessage("expedientPeticio.canviEstatDistribucio.reject", new Object[]{e.getMessage()}));
+				excepcioLogHelper.addExcepcio("/anotacio/CanviEstatDistribucioActionExecutor", e, petIdsStr, "massiu="+params.isMassivo());
+				String message = messageHelper.getMessage("message.common.action.error")+": "+e.getMessage();
+				throw new ActionExecutionException(getResourceClass(), petIdsStr, code, message);
 			}
 		}
     }
