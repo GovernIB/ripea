@@ -7,8 +7,14 @@ import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import * as builder from "../../../util/springFilterUtils.ts";
 import GridFormField from "../../../components/GridFormField.tsx";
-import {Grid} from "@mui/material";
+import {Grid, Link} from "@mui/material";
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
+import {useActions as useDocumentActions} from "../../contingut/details/ContingutActions.tsx";
+import {useMassiveActions as useDocumentMassiveActions} from "../../contingut/details/ContingutMassiveActions.tsx";
+import {useActions as useExpedientActions} from "../../expedient/details/CommonActions.tsx";
+import {useMassiveActions as useExpedientMassiveActions} from "../../expedient/details/ExpedientMassiveActions.tsx";
+
+import {useActions as useInteressatActions, useMassiveActions as useInteressatMassiveActions} from "../../interessats/details/InteressatActions.tsx";
 
 const sortModel:any = [{field: 'createdDate', sort: 'desc'}]
 const CustodiarPendentsFilterFrom = (props:any) => {
@@ -58,7 +64,7 @@ const expedientColumns = [
     {
         field: 'nom',
         flex: 1,
-        renderCell: (params:any) => <a href={`/contingut/${params?.id}`}>{params?.formattedValue}</a>,
+        renderCell: (params:any) => <Link href={`/contingut/${params?.id}`}>{params?.formattedValue}</Link>,
     },
     {
         field: 'metaExpedient',
@@ -83,20 +89,23 @@ const CustodiarExpedientsPendentsGrid = () => {
     const refresh = () => {
         apiRef?.current?.refresh?.();
     }
+    const {syncArxiu} = useExpedientActions(refresh);
+    const {syncArxiu: syncArxiuMassive} = useExpedientMassiveActions(refresh);
 
     const actions = [
         {
             label: t('page.contingut.action.custodiar.label'),
             icon: "autorenew",
             showInMenu: false,
+            onClick: syncArxiu,
         },
     ]
-    // TODO: crear acción massiva
     const massiveActions = [
         {
             label: t('page.contingut.action.custodiar.label'),
             icon: "autorenew",
             showInMenu: false,
+            onClick: syncArxiuMassive,
         },
     ]
 
@@ -139,7 +148,7 @@ const documentColumns = [
     {
         field: 'expedient',
         flex: 1.5,
-        renderCell: (params:any) => <a href={`/contingut/${params?.row?.expedient?.id}`}>{params?.formattedValue}</a>,
+        renderCell: (params:any) => <Link href={`/contingut/${params?.row?.expedient?.id}`}>{params?.formattedValue}</Link>,
     },
     // {
     //     field: 'metaNode',
@@ -165,19 +174,22 @@ const CustodiarDocumentsPendentsGrid = () => {
         apiRef?.current?.refresh?.();
     }
 
+    const {guardarArxiu} = useDocumentActions(refresh)
+    const {guardarArxiu: guardarArxiuMassive} = useDocumentMassiveActions(refresh)
     const actions = [
         {
             label: t('page.contingut.action.custodiar.label'),
             icon: "autorenew",
             showInMenu: false,
+            onClick: guardarArxiu,
         },
     ]
-    // TODO: crear acción massiva
     const massiveActions = [
         {
             label: t('page.contingut.action.custodiar.label'),
             icon: "autorenew",
             showInMenu: false,
+            onClick: guardarArxiuMassive,
         },
     ]
 
@@ -222,7 +234,7 @@ const interessatColumns = [
     {
         field: 'expedient',
         flex: 1.5,
-        renderCell: (params:any) => <a href={`/contingut/${params?.row?.expedient?.id}`}>{params?.formattedValue}</a>,
+        renderCell: (params:any) => <Link href={`/contingut/${params?.row?.expedient?.id}`}>{params?.formattedValue}</Link>,
     },
     // {
     //     field: 'metaNode',
@@ -247,20 +259,23 @@ const CustodiarInteressatsPendentsGrid = () => {
     const refresh = () => {
         apiRef?.current?.refresh?.();
     }
+    const {guardarArxiu} = useInteressatActions(refresh)
+    const {guardarArxiu: guardarArxiuMassive} = useInteressatMassiveActions(refresh)
 
     const actions = [
         {
             label: t('page.contingut.action.custodiar.label'),
             icon: "autorenew",
             showInMenu: false,
+            onClick: guardarArxiu,
         },
     ]
-    // TODO: crear acción massiva
     const massiveActions = [
         {
             label: t('page.contingut.action.custodiar.label'),
             icon: "autorenew",
             showInMenu: false,
+            onClick: guardarArxiuMassive,
         },
     ]
 

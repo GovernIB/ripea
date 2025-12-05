@@ -39,6 +39,7 @@ export const useMassiveActions = (refresh?: () => void)=> {
     const follow	= (ids: any[]): void => { massiveAction(ids, 'FOLLOW', t('page.expedient.results.actionBackgroundOk'));}
     const unfollow 	= (ids: any[]): void => { massiveAction(ids, 'UNFOLLOW', t('page.expedient.results.actionBackgroundOk'));}
 	const esborrar 	= (ids: any[]): void => { massiveAction(ids, 'ESBORRAR', t('page.expedient.results.actionBackgroundOk'));}
+	const syncArxiu = (ids: any[]): void => { massiveAction(ids, 'SYNC_ARXIU', t('page.expedient.results.actionBackgroundOk'));}
 
 	const exportExcel 	= (ids: any[]): void => { massiveReport(ids, 'EXPORT_EXCEL', t('page.expedient.results.actionBackgroundOk'), 'XLSX');}
 	const exportCsv		= (ids: any[]): void => { massiveReport(ids, 'EXPORT_CSV', t('page.expedient.results.actionBackgroundOk'), 'CSV');}
@@ -49,6 +50,7 @@ export const useMassiveActions = (refresh?: () => void)=> {
 	const exportInside	= (ids: any[]): void => { massiveReport(ids, 'EXPORT_INSIDE', t('page.expedient.results.actionBackgroundOk'), 'ZIP');}
 
     return {
+        syncArxiu,
         agafar,
 		alliberar,
 		retornar,
