@@ -16,6 +16,7 @@ import es.caib.ripea.service.intf.dto.NtiTipoDocumentoEnumDto;
 import es.caib.ripea.service.intf.dto.RegistreAnnexEstatEnumDto;
 import es.caib.ripea.service.intf.dto.SicresTipoDocumentoEnumDto;
 import es.caib.ripea.service.intf.dto.SicresValidezDocumentoEnumDto;
+import es.caib.ripea.service.intf.model.NodeResource.MassiveAction;
 import es.caib.ripea.service.intf.registre.RegistreAnnexFirmaTipusEnum;
 import es.caib.ripea.service.intf.registre.RegistreAnnexNtiEstadoElaboracionEnum;
 import es.caib.ripea.service.intf.registre.RegistreAnnexNtiOrigenEnum;
@@ -39,12 +40,20 @@ import lombok.experimental.FieldNameConstants;
                         type = ResourceArtifactType.REPORT,
                         code = RegistreAnnexResource.REPORT_DOWNLOAD_ANNEX,
                         requiresId = true),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = RegistreAnnexResource.ACTION_REINTENTAR_CODE,
+                        formClass = MassiveAction.class,
+                        requiresId = true),                
 		}
 )
 public class RegistreAnnexResource extends BaseAuditableResource<Long> {
 
+	private static final long serialVersionUID = 1245578504295972456L;
+	
 	public static final String REPORT_DOWNLOAD_ANNEX	= "DOWNLOAD_ANNEX";
 	public static final String PERSPECTIVE_FIRMES 		= "FIRMES";
+	public static final String ACTION_REINTENTAR_CODE	= "REINTENTAR";
 	
     private String firmaPerfil;
     private long firmaTamany;

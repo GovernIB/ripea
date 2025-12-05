@@ -26,14 +26,11 @@ import java.util.Date;
 @Getter
 @Table(name = BaseConfig.DB_PREFIX + "registre_annex")
 @EntityListeners(AuditingEntityListener.class)
-@SuppressWarnings("serial")
 public class RegistreAnnexEntity extends RipeaAuditable<Long> {
 
-//	@Lob
 	@Basic(fetch = FetchType.LAZY)
 	@Column(name = "contingut")
 	private byte[] contingut;
-//	@Lob
 	@Basic(fetch = FetchType.LAZY)
 	@Column(name = "firma_contingut")
 	private byte[] firmaContingut;
@@ -97,19 +94,12 @@ public class RegistreAnnexEntity extends RipeaAuditable<Long> {
 	@JoinColumn(name = "registre_id")
 	@ForeignKey(name = BaseConfig.DB_PREFIX + "annex_registre_fk")
 	private RegistreEntity registre;
-	
-	
+		
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "document_id")
 	@ForeignKey(name = BaseConfig.DB_PREFIX + "annex_document_fk")
 	private DocumentEntity document;
-	
-	
-//	// arxiu doesn't allow multiple dispatch of the same document (after more than two dispatches it giver error in arxiu) that's why for another dispatch we use result of previous dispatch
-//	@Column(name = "uuid_dispatched", length = 100)
-//	private String uuidDispatched;
-	
-	
+
 	public static Builder getBuilder(
 			 String nom,
 			 Date ntiFechaCaptura,

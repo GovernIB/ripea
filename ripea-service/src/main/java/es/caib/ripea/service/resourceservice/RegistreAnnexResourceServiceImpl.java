@@ -10,17 +10,38 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.stereotype.Service;
 
+import com.turkraft.springfilter.FilterBuilder;
+import com.turkraft.springfilter.parser.Filter;
+
 import es.caib.plugins.arxiu.api.Document;
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.entity.resourceentity.RegistreAnnexResourceEntity;
+import es.caib.ripea.persistence.repository.OrganGestorRepository;
+import es.caib.ripea.persistence.repository.RegistreAnnexRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
+import es.caib.ripea.service.helper.ConfigHelper;
+import es.caib.ripea.service.helper.EntityComprovarHelper;
+import es.caib.ripea.service.helper.ExcepcioLogHelper;
+import es.caib.ripea.service.helper.ExpedientHelper;
+import es.caib.ripea.service.helper.ExpedientPeticioHelper;
+import es.caib.ripea.service.helper.MessageHelper;
+import es.caib.ripea.service.helper.PermisosPerAnotacions;
 import es.caib.ripea.service.helper.PluginHelper;
+import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
 import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
 import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.base.model.ReportFileType;
+import es.caib.ripea.service.intf.dto.CodiValorDto;
+import es.caib.ripea.service.intf.model.ContingutResource;
+import es.caib.ripea.service.intf.model.EntitatResource;
+import es.caib.ripea.service.intf.model.InteressatResource;
+import es.caib.ripea.service.intf.model.NodeResource.MassiveAction;
 import es.caib.ripea.service.intf.model.RegistreAnnexResource;
 import es.caib.ripea.service.intf.resourceservice.RegistreAnnexResourceService;
+import es.caib.ripea.service.intf.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -30,11 +51,74 @@ import lombok.extern.slf4j.Slf4j;
 public class RegistreAnnexResourceServiceImpl extends BaseMutableResourceService<RegistreAnnexResource, Long, RegistreAnnexResourceEntity> implements RegistreAnnexResourceService {
 
 	private final PluginHelper pluginHelper;
+	private final ConfigHelper configHelper;
+	private final MessageHelper messageHelper;
+	private final ExpedientHelper expedientHelper;
+	private final ExcepcioLogHelper excepcioLogHelper;
+	private final EntityComprovarHelper entityComprovarHelper;
+	private final ExpedientPeticioHelper expedientPeticioHelper;
+	
+	private final RegistreAnnexRepository registreAnnexRepository;
+	private final OrganGestorRepository organGestorRepository;
 	
     @PostConstruct
     public void init() {
     	register(RegistreAnnexResource.REPORT_DOWNLOAD_ANNEX, new DescarregarAnnexReportGenerator());
         register(RegistreAnnexResource.PERSPECTIVE_FIRMES, new AnnexFirmesPerspectiveApplicator());
+        register(RegistreAnnexResource.ACTION_REINTENTAR_CODE, new ReintentarArxiuActionExecutor());
+    }
+    
+    @Override
+    protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
+    	
+    	String entitatActualCodi = configHelper.getEntitatActualCodi();
+        String rolActual		 = configHelper.getRolActual();
+    	EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true,false);
+    	
+    	Filter filtreIdsPermesos = null;
+        Filter filtreBase = FilterBuilder.and(
+                (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null,
+                FilterBuilder.equal(InteressatResource.Fields.expedient + "." +ContingutResource.Fields.entitat + "." + EntitatResource.Fields.codi, 
+                		entitatActualCodi != null?entitatActualCodi:"................................................................................")
+        );
+        
+        Map<String, String> mapaNamedQueries =  Utils.namedQueriesToMap(namedQueries);
+    	if (mapaNamedQueries.size()>0 && mapaNamedQueries.containsKey("MASSIU_PENDENT_PROCESSAR")) {
+    		
+    		OrganGestorEntity ogEntity	= organGestorRepository.findByEntitatIdAndCodi(entitat.getId(), configHelper.getOrganActualCodi());
+    		
+    		PermisosPerAnotacions permisosPerAnotacions = expedientPeticioHelper.findPermisosPerAnotacions(
+    				entitat.getId(),
+    				null,
+    				rolActual, 
+    				ogEntity.getId());
+    		
+    		List<Long> idsAnexesPendentsProcessar = registreAnnexRepository.findIdsPendentsProcesar(
+    				entitat,
+    				rolActual, 
+					permisosPerAnotacions.getProcedimentsPermesos(),
+					permisosPerAnotacions.getAdminOrganCodisOrganAmbDescendents(),
+					permisosPerAnotacions.isAdminOrganHasPermisAdminComu(),
+					true, "", //filtre nom
+					true, "", //filtre numero
+					true, null, //filtre data inici
+					true, null, //filtre data fi
+					true, null, //filtre metaExpedient
+					true, null //filtre expedient
+			);
+        	
+        	List<String> permesosClausulesIn = Utils.getIdsEnGruposMil(idsAnexesPendentsProcessar);
+        	if (permesosClausulesIn!=null) {
+    	        for (String aux: permesosClausulesIn) {
+    		        if (aux != null && !aux.isEmpty()) {
+    		        	filtreIdsPermesos = FilterBuilder.or(filtreIdsPermesos, Filter.parse("id IN (" + aux + ")"));
+    		        }
+    	        }
+        	}
+    	}
+    	
+    	Filter filtreResultat = FilterBuilder.and(filtreBase, filtreIdsPermesos);
+    	return filtreResultat.generate();
     }
     
     private class AnnexFirmesPerspectiveApplicator implements PerspectiveApplicator<RegistreAnnexResourceEntity, RegistreAnnexResource> {
@@ -68,6 +152,31 @@ public class RegistreAnnexResourceServiceImpl extends BaseMutableResourceService
             parametres.add(entity.getUuid());
             return parametres;
 		}
-    	
     }
+    
+    private class ReintentarArxiuActionExecutor implements ActionExecutor<RegistreAnnexResourceEntity, MassiveAction, Serializable> {
+
+		@Override
+		public void onChange(Serializable id, MassiveAction previous, String fieldName, Object fieldValue,Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {}
+
+		@Override
+		public Serializable exec(String code, RegistreAnnexResourceEntity entity, MassiveAction params) throws ActionExecutionException {
+			String annexIdsStr = entity.getId()!=null?entity.getId().toString():Utils.getIdsSeparatsComa(params.getIds());
+			try {
+				List<CodiValorDto> resultat = new ArrayList<>();
+	        	
+				for (Long idAnn: params.getIds()) {
+					Exception errorReintentant = expedientHelper.moveDocumentArxiuNewTransaction(idAnn);
+					resultat.add(new CodiValorDto(idAnn.toString(), errorReintentant!=null?errorReintentant.getMessage():"OK"));
+				}
+				
+	        	return (Serializable)resultat;
+			} catch (Exception e) {
+				excepcioLogHelper.addExcepcio("/annexPeticio/ReintentarArxiuActionExecutor", e, annexIdsStr, "massiu="+params.isMassivo());
+				String message = messageHelper.getMessage("message.common.action.error")+": "+e.getMessage();
+				throw new ActionExecutionException(getResourceClass(), entity==null?null:entity.getId(), code, message);
+			}
+		}
+    }
+
 }
