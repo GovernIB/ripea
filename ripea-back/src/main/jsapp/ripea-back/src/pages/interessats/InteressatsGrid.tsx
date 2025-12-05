@@ -3,7 +3,7 @@ import {Chip, Icon} from "@mui/material";
 import { useMuiDataGridApiRef } from 'reactlib';
 import {useTranslation} from "react-i18next";
 import StyledMuiGrid, {ToolbarButton} from "../../components/StyledMuiGrid.tsx";
-import useInteressatActions, {useActions} from "./details/InteressatActions.tsx";
+import useInteressatActions, {useMassiveActions} from "./details/InteressatActions.tsx";
 import * as builder from "../../util/springFilterUtils.ts";
 import useImport from "./actions/Import.tsx";
 import {useActions as useExpedientActions} from "../expedient/details/CommonActions.tsx"
@@ -79,7 +79,7 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
     }
 
     const {actions, createActions, components} = useInteressatActions(entity, refresh)
-    const {exportar} = useActions(refresh);
+    const {exportar} = useMassiveActions(refresh);
     const {excelInteressats} = useExpedientActions(refresh);
     const {handleShow: handleImport, content: contentImport} = useImport(entity, refresh);
     const {handleOpen, dialog} = useInteressatDetail();

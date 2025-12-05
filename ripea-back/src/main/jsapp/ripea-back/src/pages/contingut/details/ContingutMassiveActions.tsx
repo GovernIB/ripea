@@ -36,6 +36,7 @@ export const useMassiveActions = (refresh?: () => void) => {
     }
 
     const download = (ids: any[]): void => { massiveReport(ids, 'DESCARREGAR_MASSIU', t('page.expedient.results.actionOk'), 'ZIP'); }
+    const guardarArxiu = (ids: any[]): void => { massiveAction(ids, 'GUARDAR_ARXIU', t('page.expedient.results.actionOk')); }
     const definitiu = (ids: any[]) => {
         messageDialogShow(
             '',
@@ -49,7 +50,7 @@ export const useMassiveActions = (refresh?: () => void) => {
             });
     }
 
-    return {download, definitiu}
+    return {guardarArxiu, download, definitiu}
 }
 
 const useContingutMassiveActions = (entity:any, refresh?: () => void) => {
