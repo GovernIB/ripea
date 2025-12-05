@@ -1,35 +1,47 @@
 package es.caib.ripea.back.controller;
 
-import es.caib.ripea.back.command.SeguimentArxiuPendentsFiltreCommand;
-import es.caib.ripea.back.helper.*;
-import es.caib.ripea.back.helper.DatatablesHelper.DatatablesResponse;
-import es.caib.ripea.service.intf.dto.*;
-import es.caib.ripea.service.intf.service.AplicacioService;
-import es.caib.ripea.service.intf.service.ExecucioMassivaService;
-import es.caib.ripea.service.intf.service.MetaExpedientService;
-import es.caib.ripea.service.intf.service.SeguimentService;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-import org.joda.time.LocalDateTime;
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.propertyeditors.CustomDateEditor;
-import org.springframework.beans.propertyeditors.StringArrayPropertyEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-
-import java.text.SimpleDateFormat;
-import java.util.*;
+import es.caib.ripea.back.command.SeguimentArxiuPendentsFiltreCommand;
+import es.caib.ripea.back.helper.DatatablesHelper;
+import es.caib.ripea.back.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.back.helper.EntitatHelper;
+import es.caib.ripea.back.helper.MissatgesHelper;
+import es.caib.ripea.back.helper.RequestSessionHelper;
+import es.caib.ripea.back.helper.RolHelper;
+import es.caib.ripea.service.intf.dto.ArxiuPendentTipusEnumDto;
+import es.caib.ripea.service.intf.dto.ElementTipusEnumDto;
+import es.caib.ripea.service.intf.dto.EntitatDto;
+import es.caib.ripea.service.intf.dto.ExecucioMassivaContingutDto;
+import es.caib.ripea.service.intf.dto.ExecucioMassivaDto;
+import es.caib.ripea.service.intf.dto.ExecucioMassivaEstatDto;
+import es.caib.ripea.service.intf.dto.ExecucioMassivaTipusDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientDto;
+import es.caib.ripea.service.intf.dto.PaginaDto;
+import es.caib.ripea.service.intf.dto.ResultEnumDto;
+import es.caib.ripea.service.intf.dto.SeguimentArxiuPendentsDto;
+import es.caib.ripea.service.intf.service.AplicacioService;
+import es.caib.ripea.service.intf.service.ExecucioMassivaService;
+import es.caib.ripea.service.intf.service.MetaExpedientService;
+import es.caib.ripea.service.intf.service.SeguimentService;
 
 /**
  * Controlador per al manteniment de seguiment de elements pendents de guardar a dins l'arxiu
