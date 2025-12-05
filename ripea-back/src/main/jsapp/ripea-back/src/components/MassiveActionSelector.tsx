@@ -19,12 +19,13 @@ type MassiveActionSelectorProps = {
     setSelectedRows: (value:any[]) => void
     actions: MassiveActionProps[]
     filter?: string
+    namedQueries?: string[];
     disabledDefSelector?: boolean,
     hiddenDefSelector?: boolean,
 }
 
 const MassiveActionSelector: React.FC<MassiveActionSelectorProps> = (props:MassiveActionSelectorProps) => {
-    const {resourceName, filter, selectedRows, setSelectedRows, disabledDefSelector, hiddenDefSelector, actions } = props;
+    const {resourceName, filter, namedQueries, selectedRows, setSelectedRows, disabledDefSelector, hiddenDefSelector, actions } = props;
     const { t } = useTranslation();
 
     const {
@@ -35,7 +36,7 @@ const MassiveActionSelector: React.FC<MassiveActionSelectorProps> = (props:Massi
     // Handle selection actions
     const handleSelectAll = () => {
         if (apiIsReady) {
-            apiFindAll({unpaged: true, filter: filter})
+            apiFindAll({unpaged: true, filter: filter, namedQueries: namedQueries})
                 .then((app) => {
                     const allIds = app?.rows?.map(row=>row?.id)
                     setSelectedRows(allIds);

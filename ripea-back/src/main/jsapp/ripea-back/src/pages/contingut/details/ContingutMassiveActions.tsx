@@ -49,8 +49,23 @@ export const useMassiveActions = (refresh?: () => void) => {
                 }
             });
     }
+    const enllacCSV = (ids: any[]) => {
+        apiAction(undefined, {code: 'GET_CSV_LINK', data: {ids, massivo: true}})
+            .then((result) => {
+                navigator.clipboard.writeText(result?.url)
+                    .then(()=>{
+                        temporalMessageShow(null, t('page.document.action.csv.ok'), 'success');
+                    })
+                    .catch((error) => {
+                        temporalMessageShow(null, error?.message, 'error');
+                    });
+            })
+            .catch((error) => {
+                temporalMessageShow(null, error?.message, 'error');
+            });
+    }
 
-    return {guardarArxiu, download, definitiu}
+    return {guardarArxiu, download, definitiu, enllacCSV}
 }
 
 const useContingutMassiveActions = (entity:any, refresh?: () => void) => {

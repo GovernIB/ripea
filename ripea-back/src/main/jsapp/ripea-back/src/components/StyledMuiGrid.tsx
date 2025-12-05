@@ -48,6 +48,7 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
     const {
         resourceName,
         filter,
+        namedQueries,
         columns,
         apiRef = gridApiRef,
         datagridApiRef = dataApiRef,
@@ -97,6 +98,7 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
                 selectedRows={selectedRows}
                 setSelectedRows={setGridSelectedRows}
                 filter={filter}
+                namedQueries={namedQueries}
                 actions={toolbarMassiveActions ?? []}
                 disabledDefSelector={disabledMassiveDefSelector}
                 hiddenDefSelector={hiddenMassiveDefSelector}
@@ -198,6 +200,7 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
         <MuiGrid
             resourceName={resourceName}
             filter={filter}
+            namedQueries={namedQueries}
             // autoHeight
             key={user?.conf?.numElementsPagina}
             paginationActive

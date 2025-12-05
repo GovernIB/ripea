@@ -6,6 +6,8 @@ import {useState} from "react";
 import {GridSortDirection} from "@mui/x-data-grid-pro";
 import {Link} from "@mui/material";
 import {EnviarPortafirmesFilter} from "./EnviarPortafirmesGrid.tsx";
+import {useActions} from "../../contingut/details/ContingutActions.tsx";
+import {useMassiveActions} from "../../contingut/details/ContingutMassiveActions.tsx";
 
 const namedQueriesCsv: string[] = ['MASSIU_ENLLAC_CSV']
 const sortModel: any = [{field: 'createdDate', sort: 'desc'}]
@@ -39,19 +41,23 @@ const CopiarEnllacCSVGrid = () => {
     const apiRef = useMuiDataGridApiRef();
     const [springFilter, setSpringFilter] = useState<string>();
 
+    const {getLinkCSV} = useActions()
+    const {enllacCSV} = useMassiveActions()
+
     const actions = [
         {
             label: t('page.document.action.csv.label'),
             icon: "file_copy",
             showInMenu: false,
+            onClick: getLinkCSV,
         },
     ]
-    // TODO: crear acción massiva
     const massiveActions = [
         {
             label: t('page.document.action.csv.label'),
             icon: "file_copy",
             showInMenu: false,
+            onClick: enllacCSV,
         },
     ]
 
