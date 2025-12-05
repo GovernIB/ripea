@@ -94,8 +94,7 @@ import lombok.experimental.FieldNameConstants;
                         requiresId = true),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
-                        code = DocumentResource.ACTION_CONVERTIR_DEFINITIU,
-                        requiresId = true),
+                        code = DocumentResource.ACTION_CONVERTIR_DEFINITIU),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = DocumentResource.ACTION_GUARDAR_ARXIU,
@@ -103,8 +102,7 @@ import lombok.experimental.FieldNameConstants;
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = DocumentResource.ACTION_FIRMA_WEB_INI,
-                        formClass = DocumentResource.IniciarFirmaNavegador.class,
-                        requiresId = true),
+                        formClass = DocumentResource.IniciarFirmaNavegador.class),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = DocumentResource.ACTION_VIA_FIRMA,
@@ -131,8 +129,7 @@ import lombok.experimental.FieldNameConstants;
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = DocumentResource.ACTION_ENVIAR_PORTAFIRMES_CODE,
-                        formClass = DocumentResource.EnviarPortafirmesFormAction.class,
-                        requiresId = true),
+                        formClass = DocumentResource.EnviarPortafirmesFormAction.class),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = DocumentResource.ACTION_RESUM_IA,

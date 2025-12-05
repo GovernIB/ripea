@@ -258,7 +258,7 @@ export const useEnviarPortafirmesMassive = (refresh?: () => void) => {
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
 
-    const handleShow = (ids:any[], additionalData:any) :void => {
+    const handleShow = (ids:any[]) :void => {
         apiRef.current?.show?.(undefined, {
             ids,
             massivo: true,

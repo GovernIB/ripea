@@ -49,7 +49,7 @@ const TitleHeaderConfigurator = () => {
     const location = useLocation();
 
     useEffect(() => {
-        console.log(location, location.pathname, TITLES[location.pathname])
+        // console.log(location, location.pathname, TITLES[location.pathname])
         setTitlePage(t(TITLES[location.pathname]));
     }, [location.pathname]);
 

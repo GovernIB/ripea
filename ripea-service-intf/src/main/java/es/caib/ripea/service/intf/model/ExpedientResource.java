@@ -125,18 +125,15 @@ import lombok.experimental.FieldNameConstants;
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientResource.ACTION_TANCAR_CODE,
-                        formClass = ExpedientResource.TancarExpedientFormAction.class,
-                        requiresId = true),
+                        formClass = ExpedientResource.TancarExpedientFormAction.class),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientResource.ACTION_CANVI_PRIORITAT_CODE,
-                        formClass = ExpedientResource.CanviPrioritatExpedientFormAction.class,
-                        requiresId = true),
+                        formClass = ExpedientResource.CanviPrioritatExpedientFormAction.class),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientResource.ACTION_CANVI_ESTAT_CODE,
-                        formClass = ExpedientResource.CanviEstatExpedientFormAction.class,
-                        requiresId = true),                
+                        formClass = ExpedientResource.CanviEstatExpedientFormAction.class),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientResource.ACTION_IMPORTAR_CODE,
@@ -492,6 +489,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
     @Getter
     @Setter
     public static class CanviEstatExpedientFormAction extends MassiveAction {
+        @Transient private String nom;
         @NotNull
         private ResourceReference<ExpedientEstatResource, Long> estatAdditional;
     }
@@ -499,6 +497,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
     @Getter
     @Setter
     public static class CanviPrioritatExpedientFormAction extends MassiveAction {
+        @Transient private String nom;
         @NotNull
         private PrioritatEnumDto prioritat;
     }

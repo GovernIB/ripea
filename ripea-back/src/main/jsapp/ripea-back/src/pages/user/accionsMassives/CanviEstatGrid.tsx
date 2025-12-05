@@ -3,13 +3,14 @@ import {GridPage, useFormContext, useMuiDataGridApiRef} from "reactlib";
 import {useMemo, useState} from "react";
 import { CardPage } from "../../../components/CardData.tsx";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
-import {Alert, Grid} from "@mui/material";
+import {Alert, Grid, Link} from "@mui/material";
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import GridFormField from "../../../components/GridFormField.tsx";
 import {GridSortDirection} from "@mui/x-data-grid-pro";
 import {StyledEstat, StyledPrioritat} from "../../expedient/ExpedientGrid.tsx";
 import {useSession} from "../../../components/SessionStorageContext.tsx";
+import useCambiarEstat, {useCambiarEstatMassive} from "../../expedient/actions/CambiarEstat.tsx";
 
 const CanviEstatFilterFrom = (props:any) => {
     const { findExpedientByName = false } = props;
@@ -19,11 +20,10 @@ const CanviEstatFilterFrom = (props:any) => {
 
     return <>
         <GridFormField xs={3} name="procediment"/>
-        {!!findExpedientByName
+        {findExpedientByName
             ? <GridFormField xs={3} name="nom"/>
             : <GridFormField xs={3} name="expedient" filter={expedientFilter}/>
         }
-
 
         <GridFormField xs={3} name="dataCreacioInici" type={"date"}/>
         <GridFormField xs={3} name="dataCreacioFi" type={"date"}/>
@@ -65,7 +65,7 @@ const columns = [
     {
         field: 'nom',
         flex: 1,
-        renderCell: (params:any) => <a href={`/contingut/${params?.id}`}>{params?.formattedValue}</a>,
+        renderCell: (params:any) => <Link href={`/contingut/${params?.id}`}>{params?.formattedValue}</Link>,
     },
     {
         field: 'metaExpedient',
@@ -122,19 +122,23 @@ const CanviEstatGrid = () => {
         apiRef?.current?.refresh?.();
     }
 
+    const {handleShow: handleCanviEstat, content: contentCanviEstat} = useCambiarEstat(refresh)
+    const {handleShow: handleCanviEstatMassive, content: contentCanviEstatMassive} = useCambiarEstatMassive(refresh)
+
     const actions = [
         {
             label: t('page.document.action.portafirmes.label'),
             icon: "logout",
             showInMenu: false,
+            onClick: handleCanviEstat,
         },
     ]
-    // TODO: crear acción massiva
     const massiveActions = [
         {
             label: t('page.document.action.portafirmes.label'),
             icon: "logout",
             showInMenu: false,
+            onClick: handleCanviEstatMassive,
         },
     ]
 
@@ -157,6 +161,8 @@ const CanviEstatGrid = () => {
                 disabledMassiveDefSelector={!haveRequirements}
             />
         </CardPage>
+        {contentCanviEstat}
+        {contentCanviEstatMassive}
     </GridPage>
 }
 export default CanviEstatGrid;

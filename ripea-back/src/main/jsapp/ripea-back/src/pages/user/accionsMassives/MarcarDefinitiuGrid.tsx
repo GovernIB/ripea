@@ -6,6 +6,8 @@ import {useState} from "react";
 import {Link} from "@mui/material";
 import {EnviarPortafirmesFilter} from "./EnviarPortafirmesGrid.tsx";
 import {GridSortDirection} from "@mui/x-data-grid-pro";
+import {useActions} from "../../contingut/details/ContingutActions.tsx";
+import {useMassiveActions} from "../../contingut/details/ContingutMassiveActions.tsx";
 
 const namedQueries: string[] = ['MASSIU_PORTAFIRMES']
 const sortModel: any = [{field: 'createdDate', sort: 'desc'}]
@@ -39,19 +41,27 @@ const MarcarDefinitiuGrid = () => {
     const apiRef = useMuiDataGridApiRef();
     const [springFilter, setSpringFilter] = useState<string>();
 
+    const refresh = () => {
+        apiRef?.current?.refresh?.();
+    }
+
+    const {definitiu} = useActions(refresh)
+    const {definitiu: definitiuMassive} = useMassiveActions(refresh)
+
     const actions = [
         {
             label: t('page.document.action.definitive.label'),
             icon: "check_circle",
             showInMenu: false,
+            onClick: definitiu,
         },
     ]
-    // TODO: crear acción massiva
     const massiveActions = [
         {
             label: t('page.document.action.definitive.label'),
             icon: "check_circle",
             showInMenu: false,
+            onClick: definitiuMassive,
         },
     ]
 

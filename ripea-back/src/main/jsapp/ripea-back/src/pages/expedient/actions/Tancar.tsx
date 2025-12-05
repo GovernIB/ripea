@@ -1,5 +1,5 @@
 import {useEffect, useMemo, useRef, useState} from "react";
-import {Grid, Alert} from "@mui/material";
+import {Grid, Alert, Box} from "@mui/material";
 import {MuiFormDialogApi, useBaseAppContext, useFormContext, useResourceApiService} from "reactlib";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
@@ -8,14 +8,15 @@ import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import Load from "../../../components/Load.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import * as builder from "../../../util/springFilterUtils.ts";
+import ContingutIcon from "../../contingut/details/ContingutIcon.tsx";
 
 const columns = [
+    // {
+    //     field: 'nom',
+    //     flex: 0.5,
+    // },
     {
-        field: 'nom',
-        flex: 0.5,
-    },
-    {
-        field: 'tipus',
+        field: 'metaDocument',
         flex: 0.5,
     },
     {
@@ -30,37 +31,38 @@ const columns = [
 ]
 const TancarForm = () => {
     const { t } = useTranslation();
-    const {apiRef: formApiRef} = useFormContext();
+    const {data, apiRef: formApiRef} = useFormContext();
     const [selectedRows, setSelectedRows] = useState<any[]>([]);
     const [rowsCount, setRowsCount] = useState<any>();
-    const [entity, setEntity] = useState<any>();
+    const [entities, setEntities] = useState<any>();
 
-    const filter = builder.and(
-        builder.eq('expedient.id', entity?.id),
+    const filter = useMemo(() => builder.and(
+        builder.inside('expedient.id', data?.ids),
         builder.or(
             builder.eq('estat', "'REDACCIO'"),
             builder.eq('arxiuUuid', null),
         ),
         builder.eq('esborrat', 0),
-    )
+    ), [data?.ids])
 
     const {
         isReady: apiIsReady,
-        getOne: apiGetOne,
+        find: apiFind,
     } = useResourceApiService('expedientResource');
 
     useEffect(() => {
-        const id = formApiRef?.current?.getId?.()
-        if (apiIsReady && id) {
-            apiGetOne(id, {
+        if (apiIsReady && data?.ids) {
+            apiFind({
+                filter: builder.inside('id', data?.ids),
+                unpaged: true,
                 perspectives: [
                     'DOCUMENTS_OBLIGATORIS_TANCAR',// documentObligatorisAlTancar
                     'NOTIFICACIONS_CADUCADES',// conteNotificacionsCaducades
                     'DOCUMENTS_NO_MOGUTS',// conteDocumentsDeAnotacionesNoMogutsASerieFinal
                 ]
             })
-                .then((app) => setEntity(app))
-                .catch(() => setEntity(undefined))
+                .then((app) => setEntities(app?.rows))
+                .catch(() => setEntities(undefined))
         }
     }, [apiIsReady]);
 
@@ -68,13 +70,21 @@ const TancarForm = () => {
         formApiRef?.current?.setFieldValue('documentsPerFirmar', selectedRows);
     }, [selectedRows]);
 
+    const temp = useMemo(()=>{
+        return {
+            documentObligatorisAlTancar: entities?.flatMap?.((e:any) => e?.documentObligatorisAlTancar),
+            conteNotificacionsCaducades: entities?.some?.((e:any) => e?.conteNotificacionsCaducades),
+            conteDocumentsDeAnotacionesNoMogutsASerieFinal: entities?.some?.((e:any) => e?.conteDocumentsDeAnotacionesNoMogutsASerieFinal),
+        }
+    },[entities])
+
     const selectedModel: any[] = useMemo(() => {
-        const defaultSelection = entity?.documentObligatorisAlTancar?.map?.((row: any) => row?.id) ?? []
+        const defaultSelection = temp?.documentObligatorisAlTancar?.map?.((row: any) => row?.id) ?? []
         formApiRef?.current?.setFieldValue('documentsPerFirmar', defaultSelection);
         return defaultSelection;
-    }, [entity?.documentObligatorisAlTancar])
+    }, [temp?.documentObligatorisAlTancar])
 
-    return <Load value={entity}>
+    return <Load value={entities && temp}>
         <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
             <Grid item xs={12} hidden={!rowsCount}>
                 <Alert severity={"info"}>{t('page.expedient.alert.borradors')}</Alert>
@@ -87,21 +97,53 @@ const TancarForm = () => {
                         filter={filter}
                         selectionActive
                         rowSelectionModel={selectedModel}
-                        isRowSelectable={(params) => !selectedModel.includes(params.row?.id)}
+                        isRowSelectable={(params) => !selectedModel.includes(params.row?.id) && params.row?.tipus=="DOCUMENT"}
                         onRowCountChange={setRowsCount}
                         onRowSelectionModelChange={(newSelection) => {
                             setSelectedRows([...newSelection]);
                         }}
-                        height={162 + 52 * 4}
+                        autoHeight
+                        paginationActive={false}
                         readOnly
+
+                        groupingColDef={{
+                            headerName: t('page.contingut.grid.nom'),
+                            flex: 1,
+                            valueFormatter: (value: any, row: any) => {
+                                if (row?.id) {
+                                    return <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                        <ContingutIcon entity={row} />
+                                    </Box>
+                                }
+                                return value;
+                            },
+                        }}
+                        treeData
+                        treeDataAdditionalRows={(_rows: any) => {
+                            const additionalRows: any[] = [];
+                            if (_rows!=null && entities!=null){
+                                for (const entity of entities) {
+                                    if (!additionalRows.map((b) => b.id).includes(entity?.id)) {
+                                        additionalRows.push(entity)
+                                    }
+                                }
+                            }
+                            return additionalRows;
+                        }}
+                        getTreeDataPath={(row: any): string[] => {
+                            return row?.expedient ?[`${row?.expedient?.id}`, `${row.id}`] :[`${row.id}`]
+                        }}
+                        isGroupExpandedByDefault={() => {
+                            return true;
+                        }}
                     />
                 </Load>
             </Grid>
 
-            <Grid item xs={12} hidden={!entity?.conteNotificacionsCaducades}>
+            <Grid item xs={12} hidden={!temp?.conteNotificacionsCaducades}>
                 <Alert severity={"warning"}>{t('page.expedient.alert.notificacio')}</Alert>
             </Grid>
-            <Grid item xs={12} hidden={!entity?.conteDocumentsDeAnotacionesNoMogutsASerieFinal}>
+            <Grid item xs={12} hidden={!temp?.conteDocumentsDeAnotacionesNoMogutsASerieFinal}>
                 <Alert severity={"warning"}>{t('page.expedient.alert.documents')}</Alert>
             </Grid>
 
@@ -126,17 +168,41 @@ const Tancar = (props: any) => {
         <TancarForm/>
     </FormActionDialog>
 }
-const useTancar = (refresh?: () => void) => {
+export const useTancar = (refresh?: () => void) => {
     const { t } = useTranslation();
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
 
     const handleShow = (id: any): void => {
-        apiRef.current?.show?.(id)
+        apiRef.current?.show?.(undefined, {
+            ids: [id],
+            massivo: false,
+        })
     }
     const onSuccess = (result: any): void => {
         refresh?.()
         temporalMessageShow(null, t('page.expedient.action.close.title', {expedient: result?.nom}), 'success');
+    }
+
+    return {
+        handleShow,
+        content: <Tancar apiRef={apiRef} onSuccess={onSuccess}/>
+    }
+}
+export const useTancarMassive = (refresh?: () => void) => {
+    const { t } = useTranslation();
+    const apiRef = useRef<MuiFormDialogApi>();
+    const {temporalMessageShow} = useBaseAppContext();
+
+    const handleShow = (ids: any[]): void => {
+        apiRef.current?.show?.(undefined, {
+            ids,
+            massivo: true,
+        })
+    }
+    const onSuccess = (): void => {
+        refresh?.()
+        temporalMessageShow(null, t('page.expedient.results.actionBackgroundOk'), 'info');
     }
 
     return {

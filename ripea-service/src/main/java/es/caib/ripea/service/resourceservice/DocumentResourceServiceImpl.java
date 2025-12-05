@@ -1348,15 +1348,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     private class IniciarFirmaWebActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.IniciarFirmaNavegador, Serializable> {
 
 		@Override
-		public void onChange(Serializable id, IniciarFirmaNavegador previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, IniciarFirmaNavegador target) {
-			if (fieldName==null) {
-				//initialOnChange --> Carregar un valor per defecte per el motiu
-				if (!previous.isMassivo()) {
-					String expNom = documentResourceRepository.findById((Long)id).get().getExpedient().getNom();
-					target.setMotiu("Tramitació del expedient RIPEA: "+expNom);
-				}
-			}
-		}
+		public void onChange(Serializable id, IniciarFirmaNavegador previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, IniciarFirmaNavegador target) {}
 
 		@Override
 		public Serializable exec(String code, DocumentResourceEntity entity, IniciarFirmaNavegador params) throws ActionExecutionException {

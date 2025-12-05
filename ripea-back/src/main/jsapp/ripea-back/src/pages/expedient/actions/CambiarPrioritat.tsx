@@ -8,49 +8,72 @@ const CambiarPrioritatForm = () => {
     const {data} = useFormContext();
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="nom" disabled readOnly/>
+        <GridFormField xs={12} name="nom" disabled readOnly hidden={data?.massivo}/>
         <GridFormField xs={12} name="prioritat" required/>
         <GridFormField xs={12} name="prioritatMotiu" type={"textarea"} hidden={data?.prioritat=='B_NORMAL'} required/>
     </Grid>
 }
 
-export const CambiarPrioritat = (props: { apiRef:any }) => {
+export const CambiarPrioritat = (props:any) => {
     const { t } = useTranslation();
-    const { apiRef } = props;
 
     return <MuiFormDialog
         resourceName={"expedientResource"}
         title={t('page.expedient.action.changePrioritat.title')}
-        onClose={(reason?: string) => reason !== 'backdropClick'}
+        code={"CANVI_PRIORITAT"}
         dialogButtons={[
             {icon: 'save', text: t('common.save'), componentProps: { variant: 'contained' }, value: true },
             {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
         ]}
-        apiRef={apiRef}
+        {...props}
     >
         <CambiarPrioritatForm/>
     </MuiFormDialog>
 }
 
-const useCambiarPrioritat = (refresh?: () => void) => {
+export const useCambiarPrioritat = (refresh?: () => void) => {
     const { t } = useTranslation();
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
 
     const handleShow = (id:any, row:any) :void => {
-        apiRef.current?.show?.(id)
-            .then(() => {
-                refresh?.()
-                temporalMessageShow(null, t('page.expedient.action.changePrioritat.ok', {expedient: row?.nom}), 'success');
-            })
-            .catch((error) => {
-                error?.message && temporalMessageShow(null, error?.message, 'error');
-            });
+        apiRef.current?.show?.(undefined, {
+            ids: [id],
+            massivo: false,
+            nom: row?.nom,
+            prioritat: row?.prioritat,
+        })
+    }
+    const onSuccess = (response:any) :void => {
+        refresh?.()
+        temporalMessageShow(null, t('page.expedient.action.changePrioritat.ok', {expedient: response?.nom}), 'success');
     }
 
     return {
         handleShow,
-        content: <CambiarPrioritat apiRef={apiRef}/>
+        content: <CambiarPrioritat apiRef={apiRef} onSuccess={onSuccess}/>
+    }
+}
+
+export const useCambiarPrioritatMassive = (refresh?: () => void) => {
+    const { t } = useTranslation();
+    const apiRef = useRef<MuiFormDialogApi>();
+    const {temporalMessageShow} = useBaseAppContext();
+
+    const handleShow = (ids:any[]) :void => {
+        apiRef.current?.show?.(undefined, {
+            ids,
+            massivo: true,
+        })
+    }
+    const onSuccess = () :void => {
+        refresh?.()
+        temporalMessageShow(null, t('page.expedient.results.actionBackgroundOk'), 'info');
+    }
+
+    return {
+        handleShow,
+        content: <CambiarPrioritat apiRef={apiRef} onSuccess={onSuccess}/>
     }
 }
 export default useCambiarPrioritat;

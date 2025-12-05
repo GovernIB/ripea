@@ -3,6 +3,7 @@ import {GridPage, useMuiDataGridApiRef} from "reactlib";
 import {useState} from "react";
 import { CardPage } from "../../../components/CardData.tsx";
 import {CanviEstatFilter, CanviEstatMuiGrid} from "./CanviEstatGrid.tsx";
+import useCambiarPrioritat, {useCambiarPrioritatMassive} from "../../expedient/actions/CambiarPrioritat.tsx";
 
 const namedQueries: string[] = ['MASSIVE_ACTION_QUERY']
 const perspectives:any = ['ESTAT']
@@ -15,19 +16,23 @@ const CanviPrioritatGrid = () => {
         apiRef?.current?.refresh?.();
     }
 
+    const {handleShow: handleCanviPrior, content: contentCanviPrior} = useCambiarPrioritat(refresh)
+    const {handleShow: handleCanviPriorMassive, content: contentCanviPriorMassive} = useCambiarPrioritatMassive(refresh)
+
     const actions = [
         {
             label: t('page.expedient.action.changePrioritat.label'),
             icon: "logout",
             showInMenu: false,
+            onClick: handleCanviPrior,
         },
     ]
-    // TODO: crear acción massiva
     const massiveActions = [
         {
             label: t('page.expedient.action.changePrioritat.label'),
             icon: "logout",
             showInMenu: false,
+            onClick: handleCanviPriorMassive,
         },
     ]
 
@@ -47,6 +52,8 @@ const CanviPrioritatGrid = () => {
                 toolbarMassiveActions={massiveActions}
             />
         </CardPage>
+        {contentCanviPrior}
+        {contentCanviPriorMassive}
     </GridPage>
 }
 export default CanviPrioritatGrid;

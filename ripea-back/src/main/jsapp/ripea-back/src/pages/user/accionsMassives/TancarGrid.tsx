@@ -3,6 +3,7 @@ import {GridPage, useMuiDataGridApiRef} from "reactlib";
 import {useState} from "react";
 import { CardPage } from "../../../components/CardData.tsx";
 import {CanviEstatFilter, CanviEstatMuiGrid} from "./CanviEstatGrid.tsx";
+import useTancar, {useTancarMassive} from "../../expedient/actions/Tancar.tsx";
 
 const namedQueries: string[] = ['MASSIVE_ACTION_QUERY']
 const perspectives:any = ['ESTAT']
@@ -15,19 +16,23 @@ const TancarGrid = () => {
         apiRef?.current?.refresh?.();
     }
 
+    const {handleShow: handleTancar, content: contentTancar} = useTancar(refresh)
+    const {handleShow: handleTancarMassive, content: contentTancarMassive} = useTancarMassive(refresh)
+
     const actions = [
         {
-            label: t('page.document.action.close.label'),
+            label: t('page.expedient.action.close.label'),
             icon: "check",
             showInMenu: false,
+            onClick: handleTancar,
         },
     ]
-    // TODO: crear acción massiva
     const massiveActions = [
         {
-            label: t('page.document.action.close.label'),
+            label: t('page.expedient.action.close.label'),
             icon: "check",
             showInMenu: false,
+            onClick: handleTancarMassive,
         },
     ]
 
@@ -47,6 +52,8 @@ const TancarGrid = () => {
                 toolbarMassiveActions={massiveActions}
             />
         </CardPage>
+        {contentTancar}
+        {contentTancarMassive}
     </GridPage>
 }
 export default TancarGrid;

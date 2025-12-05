@@ -1,15 +1,28 @@
 import {useTranslation} from "react-i18next";
 import {useMoure} from "../actions/Moure.tsx";
-import {useBaseAppContext, useResourceApiService} from "reactlib";
+import {useBaseAppContext, useConfirmDialogButtons, useResourceApiService} from "reactlib";
 import useNotificarMassive from "../actions/NotificarMassive.tsx";
 import useCanviTipus from "../actions/CanviTipus.tsx";
 import {iniciaDescargaBlob} from "../../expedient/details/CommonActions.tsx";
 
-const useMassiveActions = (refresh?: () => void) => {
+export const useMassiveActions = (refresh?: () => void) => {
     const { t } = useTranslation();
-    const {temporalMessageShow} = useBaseAppContext();
-    const {artifactReport: apiReport} = useResourceApiService('documentResource');
+    const {artifactAction: apiAction, artifactReport: apiReport} = useResourceApiService('documentResource');
+    const {messageDialogShow, temporalMessageShow} = useBaseAppContext();
+    const confirmDialogButtons = useConfirmDialogButtons();
+    const confirmDialogComponentProps = {maxWidth: 'sm', fullWidth: true};
 
+    const massiveAction = (ids:any, code:string, msg:string) => {
+        return apiAction(undefined, {code :code, data:{ ids, massivo: true }})
+            .then((result) => {
+                refresh?.();
+                iniciaDescargaBlob(result);
+                temporalMessageShow(null, msg, 'info');
+            })
+            .catch((error) => {
+                temporalMessageShow(null, error?.message, 'error');
+            });
+    }
     const massiveReport = (ids:any, code:string, msg:string, fileType:any) => {
         return apiReport(undefined, {code :code, data:{ ids, massivo: true }, fileType})
             .then((result) => {
@@ -23,8 +36,20 @@ const useMassiveActions = (refresh?: () => void) => {
     }
 
     const download = (ids: any[]): void => { massiveReport(ids, 'DESCARREGAR_MASSIU', t('page.expedient.results.actionOk'), 'ZIP'); }
+    const definitiu = (ids: any[]) => {
+        messageDialogShow(
+            '',
+            t('page.document.action.definitive.description'),
+            confirmDialogButtons,
+            confirmDialogComponentProps)
+            .then((value: any) => {
+                if (value) {
+                    massiveAction(ids, 'CONVERTIR_DEFINITIU', t('page.expedient.results.actionBackgroundOk'))
+                }
+            });
+    }
 
-    return {download}
+    return {download, definitiu}
 }
 
 const useContingutMassiveActions = (entity:any, refresh?: () => void) => {
