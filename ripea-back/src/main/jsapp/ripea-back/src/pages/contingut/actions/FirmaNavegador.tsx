@@ -24,8 +24,7 @@ const FirmaNavegador = (props: any) => {
         formDialogButtons={[
             {icon: 'play_arrow', text: t('page.document.action.firma.button'), componentProps: { variant: 'contained' }, value: true },
             {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
-        ]}        
-        initialOnChange
+        ]}
         {...props}
     >
         <FirmaNavegadorForm/>
@@ -51,8 +50,46 @@ export const useFirmaNavegador = (refresh?: () => void) => {
 		refresh?.();
     })
 
-    const handleShow = (id: any): void => {
-        apiRef.current?.show?.(id);
+    const handleShow = (id: any, row: any): void => {
+        apiRef.current?.show?.(undefined, {
+            ids: [id],
+            massivo: false,
+            motiu: "Tramitació del expedient RIPEA: " + row?.expedient?.description
+        });
+    }
+    const formDialogResultProcessor = (result: any) => {
+        return <Iframe isPDF={false} src={result?.url}/>
+    }
+
+    return {
+        handleShow,
+        content: <FirmaNavegador apiRef={apiRef} formDialogResultProcessor={formDialogResultProcessor}/>
+    }
+}
+export const useFirmaNavegadorMassive = (refresh?: () => void) => {
+    const apiRef = useRef<MuiFormDialogApi>();
+    const {temporalMessageShow} = useBaseAppContext();
+    const { onChange } = useFirmaFinalitzadaSession();
+    const { value: user } = useUserSession();
+
+    onChange((firma) => {
+		if (user?.codi==firma?.usuari) {
+	        const severiry =
+	            firma?.status == 'OK' ? 'success'
+	                : firma?.status == 'WARNING' ? 'warning'
+	                    : firma?.status == 'ERROR' ? 'error'
+	                        : 'info';
+	        apiRef?.current?.close?.();
+	        temporalMessageShow(null, firma?.msg, severiry);
+		}
+		refresh?.();
+    })
+
+    const handleShow = (ids: any[]): void => {
+        apiRef.current?.show?.(undefined, {
+            ids,
+            massivo: true,
+        });
     }
     const formDialogResultProcessor = (result: any) => {
         return <Iframe isPDF={false} src={result?.url}/>

@@ -5,6 +5,8 @@ import {useState} from "react";
 import {CardPage} from "../../../components/CardData.tsx";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import {EnviarPortafirmesFilter} from "./EnviarPortafirmesGrid.tsx";
+import {GridSortDirection} from "@mui/x-data-grid-pro";
+import useFirmaNavegador, {useFirmaNavegadorMassive} from "../../contingut/actions/FirmaNavegador.tsx";
 
 const namedQueries: string[] = ['MASSIU_PASARELA']
 const sortModel: any = [{field: 'createdDate', sort: 'desc'}]
@@ -42,19 +44,23 @@ const FirmaNavegadorGrid = () => {
         apiRef?.current?.refresh?.();
     }
 
+    const {handleShow: handleFirmaShow, content: contentFirma} = useFirmaNavegador(refresh);
+    const {handleShow: handleFirmaMassive, content: contentFirmaMassive} = useFirmaNavegadorMassive(refresh);
+
     const actions = [
         {
             label: t('page.document.action.firma.label'),
             icon: "edit_document",
             showInMenu: false,
+            onClick: handleFirmaShow,
         },
     ]
-    // TODO: crear acción massiva
     const massiveActions = [
         {
             label: t('page.document.action.firma.label'),
             icon: "edit_document",
             showInMenu: false,
+            onClick: handleFirmaMassive,
         },
     ]
 
@@ -76,6 +82,8 @@ const FirmaNavegadorGrid = () => {
                 toolbarHideCreate
             />
         </CardPage>
+        {contentFirma}
+        {contentFirmaMassive}
     </GridPage>
 }
 export default FirmaNavegadorGrid;
