@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import es.caib.ripea.back.interceptor.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -33,27 +34,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.opensymphony.sitemesh.webapp.SiteMeshFilter;
 
-import es.caib.ripea.back.interceptor.AccesAdminEntitatInterceptor;
-import es.caib.ripea.back.interceptor.AccesAdminEntitatOAdminOrganORevisorInterceptor;
-import es.caib.ripea.back.interceptor.AccesAdminEntitatORevisorInterceptor;
-import es.caib.ripea.back.interceptor.AccesAdminEntitatOrUsuariInterceptor;
-import es.caib.ripea.back.interceptor.AccesFluxosFirmaUsuariInterceptor;
-import es.caib.ripea.back.interceptor.AccesSuperInterceptor;
-import es.caib.ripea.back.interceptor.AccesURLsInstruccioInterceptor;
-import es.caib.ripea.back.interceptor.AjaxInterceptor;
-import es.caib.ripea.back.interceptor.AnotacionsPendentsInterceptor;
-import es.caib.ripea.back.interceptor.AplicacioInterceptor;
-import es.caib.ripea.back.interceptor.AvisosInterceptor;
-import es.caib.ripea.back.interceptor.ExpedientsInterceptor;
-import es.caib.ripea.back.interceptor.FluxFirmaInterceptor;
-import es.caib.ripea.back.interceptor.LlistaEntitatsInterceptor;
-import es.caib.ripea.back.interceptor.LlistaRolsInterceptor;
-import es.caib.ripea.back.interceptor.MetaExpedientInterceptor;
-import es.caib.ripea.back.interceptor.ModalInterceptor;
-import es.caib.ripea.back.interceptor.NodecoInterceptor;
-import es.caib.ripea.back.interceptor.SeguimentEnviamentsUsuariInterceptor;
-import es.caib.ripea.back.interceptor.SessioInterceptor;
-import es.caib.ripea.back.interceptor.TasquesPendentsInterceptor;
 import es.caib.ripea.service.intf.base.model.UnpagedButSorted;
 
 /**
@@ -86,6 +66,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 	@Autowired private AccesURLsInstruccioInterceptor accesURLsInstruccioInterceptor;
 	@Autowired private AccesFluxosFirmaUsuariInterceptor accesFluxosFirmaUsuariInterceptor;
 	@Autowired private AccesSuperInterceptor accesSuperInterceptor;
+	@Autowired private ResourceServiceLocatorInterceptor resourceServiceLocatorInterceptor;
 
 	public static final int MAX_UPLOAD_SIZE = 52428800;
 	
@@ -173,10 +154,12 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
 		registry.addInterceptor(metaExpedientInterceptor).excludePathPatterns(excludedPathPatterns);
 		registry.addInterceptor(aplicacioInterceptor).excludePathPatterns(excludedPathPatterns);
-		//Per processar autenticacio, no excloem /api/**
+		// Per processar autenticacio, no excloem /api/**
 		registry.addInterceptor(sessioInterceptor).excludePathPatterns(excludedSessionPathPatterns);
-		//Per actualitzar entitat i organ gestor a l threadLocal, no excloem /api/**
-		registry.addInterceptor(llistaEntitatsInterceptor).excludePathPatterns(excludedSessionPathPatterns); 
+		// Per actualitzar entitat i organ gestor al threadLocal, no excloem /api/**
+		registry.addInterceptor(llistaEntitatsInterceptor).excludePathPatterns(excludedSessionPathPatterns);
+		// Per a configurar el ResourceServiceLocator al threadLocal, no excloem /api/**
+		registry.addInterceptor(resourceServiceLocatorInterceptor).excludePathPatterns(excludedPathPatterns);
 		registry.addInterceptor(llistaRolsInterceptor).excludePathPatterns(excludedPathPatterns);
 		registry.addInterceptor(modalInterceptor).excludePathPatterns(excludedPathPatterns);
 		registry.addInterceptor(nodecoInterceptor).excludePathPatterns(excludedPathPatterns);
@@ -187,6 +170,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 		registry.addInterceptor(seguimentEnviamentsUsuariInterceptor).excludePathPatterns(excludedPathPatterns);
 		registry.addInterceptor(avisosInterceptor).excludePathPatterns(excludedPathPatterns);
 		registry.addInterceptor(fluxFirmaInterceptor).excludePathPatterns(excludedPathPatterns);
+
 		registry.addInterceptor(accesAdminEntitatOAdminOrganORevisorInterceptor).
 				addPathPatterns(
 						"/metaExpedient**",

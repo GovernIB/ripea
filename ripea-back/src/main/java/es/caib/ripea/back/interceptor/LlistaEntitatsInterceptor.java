@@ -41,4 +41,5 @@ public class LlistaEntitatsInterceptor implements AsyncHandlerInterceptor {
 		}
 		return true;
 	}
+
 }
