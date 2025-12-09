@@ -7,7 +7,7 @@ import {
 import {useTranslation} from "react-i18next";
 import useInteressatDetail from "./InteressatDetail.tsx";
 import useCreate, {useCreateRepresentant} from "../actions/Create.tsx";
-import {iniciaDescargaJSON} from "../../expedient/details/CommonActions.tsx";
+import {iniciaDescargaBlob, iniciaDescargaJSON} from "../../expedient/details/CommonActions.tsx";
 import useImportarSGD from "../actions/ImportarSGD.tsx";
 import useManageInteressatGrups from "../actions/groups/ManageInteressatGrups.tsx";
 
@@ -20,25 +20,13 @@ export const useActions = (refresh?: () => void) => {
 
     const {
         artifactAction: apiAction,
-        artifactReport: apiReport,
     } = useResourceApiService('interessatResource');
 
     const guardarArxiu = (id:any, row:any) => {
-        apiAction(id, {code: 'GUARDAR_ARXIU'})
+        apiAction(undefined, {code: 'GUARDAR_ARXIU', data:{ ids: [id], massivo: false}})
             .then(()=>{
                 refresh?.()
                 temporalMessageShow(null, t('page.contingut.action.guardarArxiu.ok', {contingut: row?.codiNom}), 'success');
-            })
-            .catch((error) => {
-                error?.message && temporalMessageShow(null, error?.message, 'error');
-            });
-    }
-
-    const exportar = (ids:any[], entity:any) => {
-        return apiReport(undefined, {code :'EXPORTAR', data:{ ids: ids, massivo: true, expedient: {id: entity?.id, description: entity?.nom,} }, fileType: 'JSON'})
-            .then((result) => {
-                iniciaDescargaJSON(result);
-                temporalMessageShow(null, t('page.interessat.action.exportar.ok'), 'info');
             })
             .catch((error) => {
                 error?.message && temporalMessageShow(null, error?.message, 'error');
@@ -86,9 +74,46 @@ export const useActions = (refresh?: () => void) => {
 
     return {
         guardarArxiu,
-        exportar,
         deleteRepresentent,
         deleteInteressat,
+    }
+}
+export const useMassiveActions = (refresh?: () => void) => {
+    const { t } = useTranslation();
+
+    const {
+        artifactAction: apiAction,
+        artifactReport: apiReport
+    } = useResourceApiService('interessatResource');
+    const {temporalMessageShow} = useBaseAppContext();
+
+    const massiveAction = (ids:any, code:string, msg:string) => {
+        return apiAction(undefined, {code :code, data:{ ids, massivo: true }})
+            .then((result) => {
+                refresh?.();
+                iniciaDescargaBlob(result);
+                temporalMessageShow(null, msg, 'info');
+            })
+            .catch((error) => {
+                temporalMessageShow(null, error?.message, 'error');
+            });
+    }
+
+    const guardarArxiu = (ids: any[]): void => { massiveAction(ids, 'GUARDAR_ARXIU', t('page.expedient.results.actionOk')); }
+    const exportar = (ids:any[], entity:any) => {
+        return apiReport(undefined, {code :'EXPORTAR', data:{ ids: ids, massivo: true, expedient: {id: entity?.id, description: entity?.nom,} }, fileType: 'JSON'})
+            .then((result) => {
+                iniciaDescargaJSON(result);
+                temporalMessageShow(null, t('page.interessat.action.exportar.ok'), 'info');
+            })
+            .catch((error) => {
+                error?.message && temporalMessageShow(null, error?.message, 'error');
+            });
+    }
+
+    return {
+        guardarArxiu,
+        exportar,
     }
 }
 

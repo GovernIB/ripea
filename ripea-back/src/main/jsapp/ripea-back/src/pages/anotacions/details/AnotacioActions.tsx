@@ -17,17 +17,6 @@ export const useActions = (refresh?: () => void) => {
     } = useResourceApiService('expedientPeticioResource');
     const {temporalMessageShow} = useBaseAppContext();
 
-    const action = (id:any, code:any, mssg:any) => {
-        apiAction(id, {code})
-            .then(() => {
-                refresh?.();
-                temporalMessageShow(null, mssg, 'success');
-            })
-            .catch((error) => {
-                temporalMessageShow(null, error.message, 'error');
-            });
-    }
-
     const report = (id:any, code:any, mssg:any, fileType:any) => {
         apiReport(id, {code, fileType})
             .then((result) => {
@@ -39,11 +28,44 @@ export const useActions = (refresh?: () => void) => {
             });
     }
 
-    const canviEstatDistribucio = (id:any) => action(id, 'ESTAT_DISTRIBUCIO', t('page.anotacio.action.canviEstatDistribucio.ok'))
     const downloadJustificant = (id:any) => report(id, 'DOWNLOAD_JUSTIFICANT', t('page.anotacio.action.justificant.ok'), 'PDF')
+
+    const canviEstatDistribucio = (id:any) => {
+        apiAction(undefined, {code: 'ESTAT_DISTRIBUCIO', data: {ids: [id], massivo: false}})
+            .then(() => {
+                refresh?.();
+                temporalMessageShow(null, t('page.anotacio.action.canviEstatDistribucio.ok'), 'success');
+            })
+            .catch((error) => {
+                temporalMessageShow(null, error.message, 'error');
+            });
+    }
 
     return {
         downloadJustificant,
+        canviEstatDistribucio,
+    }
+}
+export const useMassiveActions = (refresh?: () => void) => {
+    const { t } = useTranslation();
+
+    const {
+        artifactAction: apiAction,
+    } = useResourceApiService('expedientPeticioResource');
+    const {temporalMessageShow} = useBaseAppContext();
+
+    const canviEstatDistribucio = (ids:any[]) => {
+        apiAction(undefined, {code: 'ESTAT_DISTRIBUCIO', data: {ids: [ids], massivo: false}})
+            .then(() => {
+                refresh?.();
+                temporalMessageShow(null, t('page.expedient.results.actionBackgroundOk'), 'info');
+            })
+            .catch((error) => {
+                temporalMessageShow(null, error.message, 'error');
+            });
+    }
+
+    return {
         canviEstatDistribucio,
     }
 }

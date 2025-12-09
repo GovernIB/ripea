@@ -8,6 +8,7 @@ import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import GridFormField, {GridButtonField} from "../../../components/GridFormField.tsx";
 import {Grid} from "@mui/material";
+import {useActions, useMassiveActions} from "../../anotacions/details/AnotacioActions.tsx";
 
 const ActualitzarEstatAnotacioFilterFrom = () => {
     return <>
@@ -42,6 +43,7 @@ const ActualitzarEstatAnotacioFilter = (props: any) => {
 
 }
 
+const namedQueriesAnotacions: string[] = ['MASSIU_ANOTACIONS_ESTAT']
 const sortModel: any = [{field: 'dataAlta', sort: 'desc'}]
 const columns = [
     {
@@ -68,19 +70,23 @@ const ActualitzarEstatAnotacioGrid = () => {
         apiRef?.current?.refresh?.();
     }
 
+    const { canviEstatDistribucio } = useActions(refresh)
+    const { canviEstatDistribucio: canviMassiuEstatDis } = useMassiveActions(refresh)
+
     const actions = [
         {
-            label: t(''),
+            label: t('page.anotacio.action.canviEstatDistribucio.label'),
             icon: "autorenew",
             showInMenu: false,
+            onClick: canviEstatDistribucio,
         },
     ]
-    // TODO: crear acción massiva
     const massiveActions = [
         {
-            label: t(''),
+            label: t('page.anotacio.action.canviEstatDistribucio.label'),
             icon: "autorenew",
             showInMenu: false,
+            onClick: canviMassiuEstatDis,
         },
     ]
 
@@ -94,10 +100,9 @@ const ActualitzarEstatAnotacioGrid = () => {
                 columns={columns}
                 filter={springFilter}
                 sortModel={sortModel}
-
+                namedQueries={namedQueriesAnotacions}
                 rowAdditionalActions={actions}
                 toolbarMassiveActions={massiveActions}
-
                 toolbarHideCreate
             />
         </CardPage>

@@ -125,8 +125,7 @@ import lombok.experimental.FieldNameConstants;
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientResource.ACTION_TANCAR_CODE,
-                        formClass = ExpedientResource.TancarExpedientFormAction.class,
-                        requiresId = true),
+                        formClass = ExpedientResource.TancarExpedientFormAction.class),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientResource.ACTION_CANVI_PRIORITAT_CODE,

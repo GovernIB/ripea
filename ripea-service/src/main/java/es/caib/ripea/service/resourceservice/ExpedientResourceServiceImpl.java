@@ -824,10 +824,10 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         @Override
         public void onChange(Serializable id, ExpedientResource.RelacionarAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientResource.RelacionarAction target) {}
     }
-    private class AgafarActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
+    private class AgafarActionExecutor implements ActionExecutor<ExpedientResourceEntity, MassiveAction, Serializable> {
 
         @Override
-        public Serializable exec(String code, ExpedientResourceEntity entity, ExpedientResource.MassiveAction params) throws ActionExecutionException {
+        public Serializable exec(String code, ExpedientResourceEntity entity, MassiveAction params) throws ActionExecutionException {
         	Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             if (auth!=null) {
             	if (params.isMassivo()) {
@@ -851,12 +851,12 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         }
 
         @Override
-        public void onChange(Serializable id, ExpedientResource.MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientResource.MassiveAction target) {}
+        public void onChange(Serializable id, MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {}
     }
-    private class AlliberarActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
+    private class AlliberarActionExecutor implements ActionExecutor<ExpedientResourceEntity, MassiveAction, Serializable> {
 
         @Override
-        public Serializable exec(String code, ExpedientResourceEntity entity, ExpedientResource.MassiveAction params) throws ActionExecutionException {
+        public Serializable exec(String code, ExpedientResourceEntity entity, MassiveAction params) throws ActionExecutionException {
         	Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             if (auth!=null) {
             	if (params.isMassivo()) {
@@ -880,9 +880,9 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         }
 
         @Override
-        public void onChange(Serializable id, ExpedientResource.MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientResource.MassiveAction target) {}
+        public void onChange(Serializable id, MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {}
     }
-    private class RetornarActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
+    private class RetornarActionExecutor implements ActionExecutor<ExpedientResourceEntity, MassiveAction, Serializable> {
 
 		@Override
 		public Serializable exec(String code, ExpedientResourceEntity entity, MassiveAction params) throws ActionExecutionException {
@@ -913,10 +913,10 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		public void onChange(Serializable id, MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {}
     }
     
-    private class FollowActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
+    private class FollowActionExecutor implements ActionExecutor<ExpedientResourceEntity, MassiveAction, Serializable> {
 
         @Override
-        public Serializable exec(String code, ExpedientResourceEntity entity, ExpedientResource.MassiveAction params) throws ActionExecutionException {
+        public Serializable exec(String code, ExpedientResourceEntity entity, MassiveAction params) throws ActionExecutionException {
         	Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             if (auth!=null) {
             	if (params.isMassivo()) {
@@ -932,13 +932,13 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         }
 
         @Override
-        public void onChange(Serializable id, ExpedientResource.MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientResource.MassiveAction target) {}
+        public void onChange(Serializable id, MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {}
     }
     
-    private class UnFollowActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
+    private class UnFollowActionExecutor implements ActionExecutor<ExpedientResourceEntity, MassiveAction, Serializable> {
 
         @Override
-        public Serializable exec(String code, ExpedientResourceEntity entity, ExpedientResource.MassiveAction params) throws ActionExecutionException {
+        public Serializable exec(String code, ExpedientResourceEntity entity, MassiveAction params) throws ActionExecutionException {
         	Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             if (auth!=null) {
             	if (params.isMassivo()) {
@@ -954,7 +954,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         }
 
         @Override
-        public void onChange(Serializable id, ExpedientResource.MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientResource.MassiveAction target) {}
+        public void onChange(Serializable id, MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {}
     }
     
     private class ImportarDocumentsMassiu implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.MassiveImportDocsAction, Serializable> {
@@ -1086,7 +1086,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		}    	
     }
     
-    private class ReobrirActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
+    private class ReobrirActionExecutor implements ActionExecutor<ExpedientResourceEntity, MassiveAction, Serializable> {
 
 		@Override
 		public void onChange(Serializable id, MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {}
@@ -1111,10 +1111,10 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		}
     }
     
-    private class DeleteActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
+    private class DeleteActionExecutor implements ActionExecutor<ExpedientResourceEntity, MassiveAction, Serializable> {
 
         @Override
-        public Serializable exec(String code, ExpedientResourceEntity entity, ExpedientResource.MassiveAction params) throws ActionExecutionException {
+        public Serializable exec(String code, ExpedientResourceEntity entity, MassiveAction params) throws ActionExecutionException {
         	Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             if (auth!=null) {
             	String rolActual = configHelper.getRolActual();
@@ -1138,7 +1138,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         }
 
         @Override
-        public void onChange(Serializable id, ExpedientResource.MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientResource.MassiveAction target) {}
+        public void onChange(Serializable id, MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {}
     }
     
     private class TancarActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.TancarExpedientFormAction, Serializable> {
@@ -1255,12 +1255,12 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         return resultat.toArray(new Long[0]);
     }
     
-    private class ExportOdsGenerator implements ReportGenerator<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
+    private class ExportOdsGenerator implements ReportGenerator<ExpedientResourceEntity, MassiveAction, Serializable> {
 
     	@Override
 		public DownloadableFile generateFile(String code, List<?> data, ReportFileType fileType, OutputStream out) {
     		try {
-    			ExpedientResource.MassiveAction params = (ExpedientResource.MassiveAction)data.get(1);
+    			MassiveAction params = (MassiveAction)data.get(1);
 				DownloadableFile resultat = new DownloadableFile("BACKGROUND", "application/"+fileType, null);
             	List<ExecucioMassivaContingutDto> elementsMassiva = execucioMassivaHelper.getMassivaContingutFromIds(params.getIds());
     			ExecucioMassivaDto execMassDto = new ExecucioMassivaDto(ExecucioMassivaTipusDto.EXPORTAR_EXCEL, new Date(), null, configHelper.getRolActual());
@@ -1285,12 +1285,12 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		public void onChange(Serializable id, MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {}
     }
     
-    private class ExportCsvGenerator implements ReportGenerator<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
+    private class ExportCsvGenerator implements ReportGenerator<ExpedientResourceEntity, MassiveAction, Serializable> {
 
     	@Override
 		public DownloadableFile generateFile(String code, List<?> data, ReportFileType fileType, OutputStream out) {
     		try {
-    			ExpedientResource.MassiveAction params = (ExpedientResource.MassiveAction)data.get(1);
+    			MassiveAction params = (MassiveAction)data.get(1);
             	DownloadableFile resultat = new DownloadableFile("BACKGROUND", "application/"+fileType, null);
             	List<ExecucioMassivaContingutDto> elementsMassiva = execucioMassivaHelper.getMassivaContingutFromIds(params.getIds());
     			ExecucioMassivaDto execMassDto = new ExecucioMassivaDto(ExecucioMassivaTipusDto.EXPORTAR_CSV, new Date(), null, configHelper.getRolActual());
@@ -1315,12 +1315,12 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		public void onChange(Serializable id, MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {}
     }
     
-    private class ExportIndexZipGenerator implements ReportGenerator<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
+    private class ExportIndexZipGenerator implements ReportGenerator<ExpedientResourceEntity, MassiveAction, Serializable> {
 
     	@Override
 		public DownloadableFile generateFile(String code, List<?> data, ReportFileType fileType, OutputStream out) {
     		try {
-				ExpedientResource.MassiveAction params = (ExpedientResource.MassiveAction)data.get(1);
+				MassiveAction params = (MassiveAction)data.get(1);
             	DownloadableFile resultat = new DownloadableFile("BACKGROUND", "application/"+fileType, null);
             	List<ExecucioMassivaContingutDto> elementsMassiva = execucioMassivaHelper.getMassivaContingutFromIds(params.getIds());
     			ExecucioMassivaDto execMassDto = new ExecucioMassivaDto(ExecucioMassivaTipusDto.EXPORTAR_INDEX_ZIP, new Date(), null, configHelper.getRolActual());
@@ -1345,7 +1345,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		public void onChange(Serializable id, MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {}
     }
 
-    private class ExportSelectedDocsGenerator implements ReportGenerator<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
+    private class ExportSelectedDocsGenerator implements ReportGenerator<ExpedientResourceEntity, MassiveAction, Serializable> {
 
 		@Override
 		public void onChange(Serializable id, MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {}
@@ -1365,7 +1365,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     		
     		try {		
 	    		
-	    		ExpedientResource.MassiveAction params = (ExpedientResource.MassiveAction)data.get(1);
+	    		MassiveAction params = (MassiveAction)data.get(1);
 	    		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
 
 	        	ExpedientEntity expedientEntity = entityComprovarHelper.comprovarExpedient(
@@ -1475,7 +1475,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		}
     }
 
-    private class SincronitzarArxiuActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
+    private class SincronitzarArxiuActionExecutor implements ActionExecutor<ExpedientResourceEntity, MassiveAction, Serializable> {
 
 		@Override
 		public void onChange(Serializable id, MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {}
@@ -1506,7 +1506,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 				
 	        	return (Serializable)resultat;
 			} catch (Exception e) {
-				excepcioLogHelper.addExcepcio("/document/SincronitzarArxiuActionExecutor", e, expIdStr, "massiu="+params.isMassivo());
+				excepcioLogHelper.addExcepcio("/expedient/SincronitzarArxiuActionExecutor", e, expIdStr, "massiu="+params.isMassivo());
 				String message = messageHelper.getMessage("message.common.action.error")+": "+e.getMessage();
 				throw new ActionExecutionException(getResourceClass(), entity==null?null:entity.getId(), code, message);
 			}
@@ -1586,7 +1586,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         		baos.toByteArray());
 	}
     
-    private class ExportIdexPdfGenerator implements ReportGenerator<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
+    private class ExportIdexPdfGenerator implements ReportGenerator<ExpedientResourceEntity, MassiveAction, Serializable> {
 
     	@Override
 		public DownloadableFile generateFile(String code, List<?> data, ReportFileType fileType, OutputStream out) {
@@ -1596,7 +1596,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     		
     		try {		
 	    		
-	    		ExpedientResource.MassiveAction params = (ExpedientResource.MassiveAction)data.get(1);
+	    		MassiveAction params = (MassiveAction)data.get(1);
 	    		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
 	    		
 	            if (params.isMassivo()) {
@@ -1625,7 +1625,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		}
     	
 		@Override
-		public List<Serializable> generateData(String code, ExpedientResourceEntity entity, ExpedientResource.MassiveAction params)
+		public List<Serializable> generateData(String code, ExpedientResourceEntity entity, MassiveAction params)
 				throws ReportGenerationException {
 			List<Serializable> parametres = new ArrayList<Serializable>();
 			parametres.add(entity!=null?entity.getId():0l);
@@ -1636,7 +1636,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		@Override
 		public void onChange(Serializable id, MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {}
     }
-    private class ExportIdexXlsGenerator implements ReportGenerator<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
+    private class ExportIdexXlsGenerator implements ReportGenerator<ExpedientResourceEntity, MassiveAction, Serializable> {
 
     	@Override
 		public DownloadableFile generateFile(String code, List<?> data, ReportFileType fileType, OutputStream out) {
@@ -1646,7 +1646,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     		
     		try {	    		
 	    		
-	    		ExpedientResource.MassiveAction params = (ExpedientResource.MassiveAction)data.get(1);
+	    		MassiveAction params = (MassiveAction)data.get(1);
 	    		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
 	    		
 	            if (params.isMassivo()) {
@@ -1675,7 +1675,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		}
     	
 		@Override
-		public List<Serializable> generateData(String code, ExpedientResourceEntity entity, ExpedientResource.MassiveAction params)
+		public List<Serializable> generateData(String code, ExpedientResourceEntity entity, MassiveAction params)
 				throws ReportGenerationException {
 			List<Serializable> parametres = new ArrayList<Serializable>();
 			parametres.add(entity!=null?entity.getId():0l);
@@ -1686,7 +1686,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		@Override
 		public void onChange(Serializable id, MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {}
     }
-    private class ExportEniGenerator implements ReportGenerator<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
+    private class ExportEniGenerator implements ReportGenerator<ExpedientResourceEntity, MassiveAction, Serializable> {
 
     	@Override
 		public DownloadableFile generateFile(String code, List<?> data, ReportFileType fileType, OutputStream out) {
@@ -1696,7 +1696,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     		
     		try {	    		
 	    		
-	    		ExpedientResource.MassiveAction params = (ExpedientResource.MassiveAction)data.get(1);
+	    		MassiveAction params = (MassiveAction)data.get(1);
 	    		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
 	    		
 	            if (params.isMassivo()) {
@@ -1721,7 +1721,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		}
     	
 		@Override
-		public List<Serializable> generateData(String code, ExpedientResourceEntity entity, ExpedientResource.MassiveAction params)
+		public List<Serializable> generateData(String code, ExpedientResourceEntity entity, MassiveAction params)
 				throws ReportGenerationException {
 			List<Serializable> parametres = new ArrayList<Serializable>();
 			parametres.add(entity!=null?entity.getId():0l);
@@ -1733,7 +1733,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		public void onChange(Serializable id, MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {}
     }
 
-    private class ExportIndexEniGenerator implements ReportGenerator<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
+    private class ExportIndexEniGenerator implements ReportGenerator<ExpedientResourceEntity, MassiveAction, Serializable> {
 
     	@Override
 		public DownloadableFile generateFile(String code, List<?> data, ReportFileType fileType, OutputStream out) {
@@ -1743,7 +1743,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     		
     		try {	    		
 	    		
-	    		ExpedientResource.MassiveAction params = (ExpedientResource.MassiveAction)data.get(1);
+	    		MassiveAction params = (MassiveAction)data.get(1);
 	    		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
 	    		
 	            if (params.isMassivo()) {
@@ -1769,7 +1769,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		}
     	
 		@Override
-		public List<Serializable> generateData(String code, ExpedientResourceEntity entity, ExpedientResource.MassiveAction params)
+		public List<Serializable> generateData(String code, ExpedientResourceEntity entity, MassiveAction params)
 				throws ReportGenerationException {
 			List<Serializable> parametres = new ArrayList<Serializable>();
 			parametres.add(entity!=null?entity.getId():0l);
@@ -1831,7 +1831,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		}
     }
 
-    private class ExportIdexInsideGenerator implements ReportGenerator<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
+    private class ExportIdexInsideGenerator implements ReportGenerator<ExpedientResourceEntity, MassiveAction, Serializable> {
 
     	@Override
 		public DownloadableFile generateFile(String code, List<?> data, ReportFileType fileType, OutputStream out) {
@@ -1841,7 +1841,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     		
     		try {	    		
 	    		
-	    		ExpedientResource.MassiveAction params = (ExpedientResource.MassiveAction)data.get(1);
+	    		MassiveAction params = (MassiveAction)data.get(1);
 	    		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
 	    		
 	            if (params.isMassivo()) {
@@ -1866,7 +1866,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		}
     	
 		@Override
-		public List<Serializable> generateData(String code, ExpedientResourceEntity entity, ExpedientResource.MassiveAction params)
+		public List<Serializable> generateData(String code, ExpedientResourceEntity entity, MassiveAction params)
 				throws ReportGenerationException {
 			List<Serializable> parametres = new ArrayList<Serializable>();
 			parametres.add(entity!=null?entity.getId():0l);

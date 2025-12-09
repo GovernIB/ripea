@@ -59,7 +59,7 @@ export const useActions = (refresh?: () => void) => {
     }
 
     const enllacCSV = (id:any) => {
-        apiAction(id, {code: 'GET_CSV_LINK'})
+        apiAction(undefined, {code: 'GET_CSV_LINK', data: {ids: [id], massivo: false}})
             .then((result) => {
                 navigator.clipboard.writeText(result?.url)
                     .then(()=>{

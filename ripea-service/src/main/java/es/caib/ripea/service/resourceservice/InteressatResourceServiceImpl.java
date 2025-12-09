@@ -9,6 +9,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -53,6 +54,7 @@ import es.caib.ripea.service.helper.CacheHelper;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
+import es.caib.ripea.service.helper.ExecucioMassivaHelper;
 import es.caib.ripea.service.helper.ExpedientInteressatHelper;
 import es.caib.ripea.service.helper.MessageHelper;
 import es.caib.ripea.service.helper.MetaExpedientHelper;
@@ -71,7 +73,11 @@ import es.caib.ripea.service.intf.base.model.ReportFileType;
 import es.caib.ripea.service.intf.base.model.Resource;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.ComunitatDto;
+import es.caib.ripea.service.intf.dto.ElementTipusEnumDto;
 import es.caib.ripea.service.intf.dto.EntregaPostalTipusEnum;
+import es.caib.ripea.service.intf.dto.ExecucioMassivaContingutDto;
+import es.caib.ripea.service.intf.dto.ExecucioMassivaDto;
+import es.caib.ripea.service.intf.dto.ExecucioMassivaTipusDto;
 import es.caib.ripea.service.intf.dto.InteressatDocumentTipusEnumDto;
 import es.caib.ripea.service.intf.dto.InteressatImportacioTipusDto;
 import es.caib.ripea.service.intf.dto.InteressatTipusEnum;
@@ -87,6 +93,7 @@ import es.caib.ripea.service.intf.model.ExpedientResource;
 import es.caib.ripea.service.intf.model.InteressatGrupResource;
 import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.model.InteressatResource.UnitatOrganitzativaFormFilter;
+import es.caib.ripea.service.intf.model.NodeResource.MassiveAction;
 import es.caib.ripea.service.intf.resourceservice.InteressatResourceService;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.resourcehelper.InteressatResourceHelper;
@@ -106,6 +113,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
     private final PluginHelper pluginHelper;
     private final CacheHelper cacheHelper;
     private final EntityComprovarHelper entityComprovarHelper;
+    private final ExecucioMassivaHelper execucioMassivaHelper;
     private final MessageHelper messageHelper;
     private final MetaExpedientHelper metaExpedientHelper;
     private final EntitatRepository entitatRepository;
@@ -576,7 +584,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
         public DownloadableFile generateFile(String code, List<?> data, ReportFileType fileType, OutputStream out) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             Long expedientId = (Long) data.get(0);
-            ExpedientResource.MassiveAction params = (ExpedientResource.MassiveAction) data.get(1);
+            MassiveAction params = (MassiveAction) data.get(1);
             try {
 
                 Set<Long> grupIdsSeleccionados = params.getIds().stream()
@@ -724,22 +732,40 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
         }
     }
 
-    private class GuardarArxiuActionExecutor implements ActionExecutor<InteressatResourceEntity, Serializable, Serializable> {
+    private class GuardarArxiuActionExecutor implements ActionExecutor<InteressatResourceEntity, MassiveAction, Serializable> {
 
         @Override
-        public void onChange(Serializable id, Serializable previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, Serializable target) {
-        }
+        public void onChange(Serializable id, MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {}
 
         @Override
-        public Serializable exec(String code, InteressatResourceEntity entity, Serializable params) throws ActionExecutionException {
-            try {
-                Exception errorGuardant = expedientInteressatHelper.guardarInteressatsArxiu(entity.getExpedient().getId());
-                if (errorGuardant != null) {
-                    excepcioLogHelper.addExcepcio("/expedient/interessat/" + entity.getId() + "GuardarArxiuActionExecutor.onChange", errorGuardant);
-                    throw new ActionExecutionException(getResourceClass(), entity.getId(), code, errorGuardant);
-                }
+        public Serializable exec(String code, InteressatResourceEntity entity, MassiveAction params) throws ActionExecutionException {
+        	
+        	String intIdsStr = entity.getId()!=null?entity.getId().toString():Utils.getIdsSeparatsComa(params.getIds());
+        	
+        	try {
+        		
+				if (params.isMassivo()) {
+					String entitatActual = configHelper.getEntitatActualCodi();
+					EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatActual, false, false, false, true, false);
+					List<ExecucioMassivaContingutDto> elementsMassiva = execucioMassivaHelper.getMassivaContingutFromIds(params.getIds());
+					ExecucioMassivaDto execMassDto = new ExecucioMassivaDto(
+							ExecucioMassivaTipusDto.CUSTODIAR_ELEMENTS_PENDENTS,
+							new Date(),
+							null,
+							configHelper.getRolActual());
+					execucioMassivaHelper.saveExecucioMassiva(entitatEntity, execMassDto, elementsMassiva, ElementTipusEnumDto.INTERESSAT);	        		
+	        		
+	        	} else {
+        		
+	                Exception errorGuardant = expedientInteressatHelper.guardarInteressatsArxiu(entity.getExpedient().getId());
+	                if (errorGuardant != null) {
+	                	excepcioLogHelper.addExcepcio("/interessat/GuardarArxiuActionExecutor", errorGuardant, intIdsStr, "massiu="+params.isMassivo());
+	                    throw new ActionExecutionException(getResourceClass(), entity.getId(), code, errorGuardant);
+	                }
+
+	        	}
             } catch (Exception e) {
-                excepcioLogHelper.addExcepcio("/expedient/interessats/" + entity.getId() + "GuardarArxiuActionExecutor.onChange", e);
+            	excepcioLogHelper.addExcepcio("/interessat/GuardarArxiuActionExecutor", e, intIdsStr, "massiu="+params.isMassivo());
                 String message = messageHelper.getMessage("message.common.action.error") + ": " + e.getMessage();
                 throw new ActionExecutionException(getResourceClass(), entity.getId(), code, message);
             }

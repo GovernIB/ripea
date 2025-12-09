@@ -70,8 +70,7 @@ import lombok.experimental.FieldNameConstants;
                         requiresId = true),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
-                        code = ExpedientPeticioResource.ACTION_ESTAT_DISTRIBUCIO,
-                        requiresId = true),                 
+                        code = ExpedientPeticioResource.ACTION_ESTAT_DISTRIBUCIO),
         }
 )
 public class ExpedientPeticioResource extends BaseAuditableResource<Long> {
