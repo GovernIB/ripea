@@ -118,10 +118,10 @@ public class RegistreResourceEntity extends BaseAuditableEntity<RegistreResource
 
 
     // removed "cascade = CascadeType.ALL, orphanRemoval = true" because registreRepository.delete(registre) in ExpedientPeticioHelper.crearExpedientsPeticions() was removing also expedientPeticio
-//    @OneToMany(
-//            mappedBy = "registre",
-//            fetch = FetchType.LAZY)
-//    private List<ExpedientPeticioEntity> expedientPeticions = new ArrayList<ExpedientPeticioEntity>();
+    @OneToMany(
+            mappedBy = "registre",
+            fetch = FetchType.LAZY)
+    private List<ExpedientPeticioResourceEntity> expedientPeticions = new ArrayList<>();
 
 
 

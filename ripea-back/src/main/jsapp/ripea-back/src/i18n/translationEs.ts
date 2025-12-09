@@ -155,6 +155,7 @@ const translationEs = {
             definitiu: "Acción masiva: marcar documentos como definitivos",
             canviPrioritats: "Acción masiva: Cambio de prioridad de expedientes",
             expedientPeticioCanviEstatDistribucio: "Acción masiva: Actualizar estado de las anotaciones en Distribución",
+            procesarAnnexosPendents: "Acción masiva: Adjuntar anexos pendientes de anotaciones aceptadas",
         },
     },
     page: {
@@ -322,6 +323,11 @@ const translationEs = {
                 descargarAnnex: {
                     label: "Descargar Anexo",
                     ok: "Anexo descargado correctamente",
+                },
+                procesarAnnexosPendents: {
+                    label: "Adjuntar",
+                    ok: "El anexo se ha procesado correctamente",
+                    info: "Si se ha producido algún error al aceptar una anotación desde la pantalla de Anotaciones, de manera que alguno de los documentos de la anotación no se haya adjuntado al expediente, desde este listado podrá volver a intentar adjuntar el documento al expediente.",
                 },
                 firma: {
                     label: "Firmas",
@@ -987,11 +993,13 @@ const translationEs = {
         registre: {
             grid: {
                 extracte: "Extracto",
-                origenRegistreNumero: "Numero registro",
-                data: "Fecha registro",
+                nomAnnex: "Nombre del anexo",
+                origenRegistreNumero: "Número de registro",
+                data: "Fecha de registro",
                 dataRecepcio: "Fecha de recepción",
                 destiDescripcio: "Destino",
                 interessats: "Interesados",
+                dataExpedient: "Expediente creado el",
             },
             detall: {
                 tipus: "Tipo",

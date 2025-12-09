@@ -155,6 +155,7 @@ const translationEn = {
             definitiu: "Mass action: mark documents as definitive",
             canviPrioritats: "Mass action: Change case priority",
             expedientPeticioCanviEstatDistribucio: "Mass action: Update the status of records in Distribution",
+            procesarAnnexosPendents: "Mass action: Attach pending annexes from accepted entries",
         },
     },
     page: {
@@ -322,6 +323,11 @@ const translationEn = {
                 descargarAnnex: {
                     label: "Download annex",
                     ok: "Annex downloaded successfully",
+                },
+                procesarAnnexosPendents: {
+                    label: "Attach",
+                    ok: "The annex has been processed successfully",
+                    info: "If an error occurred when accepting a record from the Records screen, causing some of the record’s documents not to be attached to the case file, from this list you can try attaching the document to the case file again.",
                 },
                 firma: {
                     label: "Signatures",
@@ -987,11 +993,13 @@ const translationEn = {
         registre: {
             grid: {
                 extracte: "Summary",
+                nomAnnex: "Annex name",
                 origenRegistreNumero: "Registry number",
                 data: "Registration date",
                 dataRecepcio: "Reception date",
                 destiDescripcio: "Destination",
                 interessats: "Interested parties",
+                dataExpedient: "Expedient created on",
             },
             detall: {
                 tipus: "Type",
