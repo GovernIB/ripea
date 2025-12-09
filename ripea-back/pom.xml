@@ -252,13 +252,18 @@
 					<version>${project.version}</version>
 				</dependency>
 				<dependency>
-					<groupId>org.apache.tomcat.embed</groupId>
-					<artifactId>tomcat-embed-jasper</artifactId>
-				</dependency>
-				<dependency>
 					<groupId>${project.groupId}</groupId>
 					<artifactId>ripea-service-intf</artifactId>
 					<version>${project.version}</version>
+				</dependency>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>ripea-service</artifactId>
+					<version>${project.version}</version>
+				</dependency>
+				<dependency>
+					<groupId>org.apache.tomcat.embed</groupId>
+					<artifactId>tomcat-embed-jasper</artifactId>
 				</dependency>
 				<dependency>
 					<groupId>es.caib.notib</groupId>
@@ -323,17 +328,17 @@
 							<groupId>org.springframework.boot</groupId>
 							<artifactId>spring-boot-starter-tomcat</artifactId>
 						</exclusion>
-					</exclusions>			
+					</exclusions>
 				</dependency>
 				<dependency>
 					<groupId>org.springframework</groupId>
 					<artifactId>spring-webmvc</artifactId>
-					<exclusions>						
+					<exclusions>
 						<exclusion>
 							<groupId>org.springframework</groupId>
 							<artifactId>spring-context</artifactId>
 						</exclusion>
-					</exclusions>					
+					</exclusions>
 				</dependency>
 				<dependency>
 					<groupId>org.apache.tomcat.embed</groupId>
