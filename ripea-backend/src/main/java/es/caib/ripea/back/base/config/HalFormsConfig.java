@@ -2,13 +2,13 @@ package es.caib.ripea.back.base.config;
 
 import es.caib.ripea.back.base.controller.MutableResourceController;
 import es.caib.ripea.back.base.controller.ReadonlyResourceController;
+import es.caib.ripea.back.base.util.HalFormsUtil;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceField;
 import es.caib.ripea.service.intf.base.model.Resource;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
-import es.caib.ripea.service.intf.base.util.HalFormsUtil;
 import es.caib.ripea.service.intf.base.util.I18nUtil;
 import es.caib.ripea.service.intf.base.util.TypeUtil;
 import lombok.AllArgsConstructor;

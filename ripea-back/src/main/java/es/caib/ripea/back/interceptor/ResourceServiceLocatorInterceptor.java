@@ -1,7 +1,9 @@
 package es.caib.ripea.back.interceptor;
 
-import es.caib.ripea.service.intf.base.service.ResourceServiceLocator;
+import es.caib.ripea.back.base.util.ResourceServiceLocator;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
@@ -16,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
  * els problemes amb el ResourceServiceLocator que retorna les implementacions dels serveis en comptes de retornar la
  * corresponent instància de l'EJB.
  */
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class ResourceServiceLocatorInterceptor implements AsyncHandlerInterceptor {
@@ -26,9 +29,13 @@ public class ResourceServiceLocatorInterceptor implements AsyncHandlerIntercepto
 	public boolean preHandle(
 			HttpServletRequest request,
 			HttpServletResponse response,
-			Object handler) throws Exception {
-		ResourceServiceLocator instance = applicationContext.getBean(ResourceServiceLocator.class);
-		ResourceServiceLocator.setThreadLocalInstance(instance);
+			Object handler) {
+		try {
+			ResourceServiceLocator instance = applicationContext.getBean(ResourceServiceLocator.class);
+			ResourceServiceLocator.setThreadLocalInstance(instance);
+		} catch (NoSuchBeanDefinitionException ex) {
+			log.warn("Couldn't find any ResourceServiceLocator instance in Spring application context");
+		}
 		return true;
 	}
 
@@ -36,7 +43,7 @@ public class ResourceServiceLocatorInterceptor implements AsyncHandlerIntercepto
 			HttpServletRequest request,
 			HttpServletResponse response,
 			Object handler,
-			@Nullable ModelAndView modelAndView) throws Exception {
+			@Nullable ModelAndView modelAndView) {
 		ResourceServiceLocator.setThreadLocalInstance(null);
 	}
 

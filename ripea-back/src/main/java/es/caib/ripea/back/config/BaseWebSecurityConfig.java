@@ -16,7 +16,7 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
  * 
  * @author Limit Tecnologies
  */
-public class BaseWebSecurityConfig {
+public abstract class BaseWebSecurityConfig {
 
 	public static final String ROLE_PREFIX = "";
 	public static final String LOGOUT_URL = "/usuari/logout";

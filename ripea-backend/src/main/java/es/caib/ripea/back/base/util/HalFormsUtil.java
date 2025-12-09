@@ -1,10 +1,9 @@
-package es.caib.ripea.service.intf.base.util;
+package es.caib.ripea.back.base.util;
 
 import es.caib.ripea.service.intf.base.annotation.ResourceField;
 import es.caib.ripea.service.intf.base.exception.ComponentNotFoundException;
 import es.caib.ripea.service.intf.base.exception.ResourceNotCreatedException;
 import es.caib.ripea.service.intf.base.service.MutableResourceService;
-import es.caib.ripea.service.intf.base.service.ResourceServiceLocator;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;

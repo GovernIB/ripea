@@ -1,6 +1,8 @@
-package es.caib.ripea.service.intf.base.service;
+package es.caib.ripea.back.base.util;
 
 import es.caib.ripea.service.intf.base.exception.ComponentNotFoundException;
+import es.caib.ripea.service.intf.base.service.MutableResourceService;
+import es.caib.ripea.service.intf.base.service.ReadonlyResourceService;
 import es.caib.ripea.service.intf.base.util.TypeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -8,6 +10,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.util.List;
 
 /**
@@ -18,7 +21,7 @@ import java.util.List;
 @Component
 public class ResourceServiceLocator implements ApplicationContextAware {
 
-	@Autowired(required = false)
+	@Autowired
 	protected List<ReadonlyResourceService<?, ?>> resourceServices;
 
 	public ReadonlyResourceService<?, ?> getReadOnlyEntityResourceServiceForResourceClass(

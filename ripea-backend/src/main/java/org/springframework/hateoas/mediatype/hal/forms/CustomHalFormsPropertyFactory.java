@@ -19,10 +19,10 @@
 // S'ha afegit la configuració dels camps amb onChange actiu
 package org.springframework.hateoas.mediatype.hal.forms;
 
+import es.caib.ripea.back.base.util.HalFormsUtil;
 import es.caib.ripea.service.intf.base.annotation.ResourceField;
 import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
-import es.caib.ripea.service.intf.base.util.HalFormsUtil;
 import es.caib.ripea.service.intf.base.util.TypeUtil;
 import org.springframework.context.MessageSourceResolvable;
 import org.springframework.hateoas.AffordanceModel.InputPayloadMetadata;
