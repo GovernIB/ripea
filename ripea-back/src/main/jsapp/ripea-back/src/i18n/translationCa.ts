@@ -155,6 +155,7 @@ const translationCa = {
             definitiu: "Acció massiva: marcar documents com definitius",
             canviPrioritats: "Acció massiva: Canvi de prioritat d'expedients",
             expedientPeticioCanviEstatDistribucio: "Acció massiva: Actualitzar estat de les anotacions a Distribució",
+            procesarAnnexosPendents: "Acció massiva: Adjuntar annexos pendents d'anotacions acceptades",
         },
     },
     page: {
@@ -322,6 +323,11 @@ const translationCa = {
                 descargarAnnex: {
                     label: "Descarregar annex",
                     ok: "Annex descarregat correctament",
+                },
+                procesarAnnexosPendents: {
+                    label: "Adjuntar",
+                    ok: "El annex s'ha processat correctament",
+                    info: "Si s'ha produït algun error al acceptar una anotació des de la pantalla Anotacions, de manera que algun dels documents de l'anotació no s'han adjuntat a l'expedient, des d'aquest llistat podrà tornar a intentar adjuntar el document a l'expedient.",
                 },
                 firma: {
                     label: "Signatures",
@@ -987,11 +993,13 @@ const translationCa = {
         registre: {
             grid: {
                 extracte: "Extracte",
+                nomAnnex: "Nom de l'annex",
                 origenRegistreNumero: "Número de registre",
                 data: "Data de registre",
                 dataRecepcio: "Data de recepció",
                 destiDescripcio: "Destinació",
                 interessats: "Interessats",
+                dataExpedient: "Expedient creat el",
             },
             detall: {
                 tipus: "Tipus",

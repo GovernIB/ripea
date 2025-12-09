@@ -17,6 +17,7 @@ const TITLES: any = {
     '/massiu/definitiu': "navigate.massiu.definitiu",
     '/massiu/canviPrioritats': "navigate.massiu.canviPrioritats",
     '/massiu/expedientPeticioCanviEstatDistribucio': "navigate.massiu.expedientPeticioCanviEstatDistribucio",
+    '/massiu/procesarAnnexosPendents': "navigate.massiu.procesarAnnexosPendents",
 
     // Consultes
     '/contingutAdmin': "page.user.menu.continguts",

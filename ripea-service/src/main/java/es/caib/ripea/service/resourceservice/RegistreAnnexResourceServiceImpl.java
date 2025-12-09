@@ -8,6 +8,10 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
+import es.caib.ripea.persistence.entity.ExpedientPeticioEntity;
+import es.caib.ripea.persistence.entity.resourceentity.ExpedientPeticioResourceEntity;
+import es.caib.ripea.service.intf.model.*;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 
 import com.turkraft.springfilter.FilterBuilder;
@@ -35,11 +39,7 @@ import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
 import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.base.model.ReportFileType;
 import es.caib.ripea.service.intf.dto.CodiValorDto;
-import es.caib.ripea.service.intf.model.ContingutResource;
-import es.caib.ripea.service.intf.model.EntitatResource;
-import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.model.NodeResource.MassiveAction;
-import es.caib.ripea.service.intf.model.RegistreAnnexResource;
 import es.caib.ripea.service.intf.resourceservice.RegistreAnnexResourceService;
 import es.caib.ripea.service.intf.utils.Utils;
 import lombok.RequiredArgsConstructor;
@@ -57,14 +57,15 @@ public class RegistreAnnexResourceServiceImpl extends BaseMutableResourceService
 	private final ExcepcioLogHelper excepcioLogHelper;
 	private final EntityComprovarHelper entityComprovarHelper;
 	private final ExpedientPeticioHelper expedientPeticioHelper;
-	
+
 	private final RegistreAnnexRepository registreAnnexRepository;
 	private final OrganGestorRepository organGestorRepository;
-	
+
     @PostConstruct
     public void init() {
     	register(RegistreAnnexResource.REPORT_DOWNLOAD_ANNEX, new DescarregarAnnexReportGenerator());
         register(RegistreAnnexResource.PERSPECTIVE_FIRMES, new AnnexFirmesPerspectiveApplicator());
+        register(RegistreAnnexResource.PERSPECTIVE_REGISTRE, new AnnexRegistrePerspectiveApplicator());
         register(RegistreAnnexResource.ACTION_REINTENTAR_CODE, new ReintentarArxiuActionExecutor());
     }
     
@@ -78,7 +79,7 @@ public class RegistreAnnexResourceServiceImpl extends BaseMutableResourceService
     	Filter filtreIdsPermesos = null;
         Filter filtreBase = FilterBuilder.and(
                 (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null,
-                FilterBuilder.equal(InteressatResource.Fields.expedient + "." +ContingutResource.Fields.entitat + "." + EntitatResource.Fields.codi, 
+                FilterBuilder.equal(RegistreAnnexResource.Fields.document + "." +ContingutResource.Fields.entitat + "." + EntitatResource.Fields.codi,
                 		entitatActualCodi != null?entitatActualCodi:"................................................................................")
         );
         
@@ -90,8 +91,8 @@ public class RegistreAnnexResourceServiceImpl extends BaseMutableResourceService
     		PermisosPerAnotacions permisosPerAnotacions = expedientPeticioHelper.findPermisosPerAnotacions(
     				entitat.getId(),
     				null,
-    				rolActual, 
-    				ogEntity.getId());
+    				rolActual,
+                    ogEntity!=null ?ogEntity.getId() :null);
     		
     		List<Long> idsAnexesPendentsProcessar = registreAnnexRepository.findIdsPendentsProcesar(
     				entitat,
@@ -129,6 +130,19 @@ public class RegistreAnnexResourceServiceImpl extends BaseMutableResourceService
         	} catch (Exception ex) {
         		//No s'han pogut obtenir les firmes del document en aquets moments, no ha de impedir que es mostri el document.
         	}
+        }
+    }
+
+    private class AnnexRegistrePerspectiveApplicator implements PerspectiveApplicator<RegistreAnnexResourceEntity, RegistreAnnexResource> {
+        @Override
+        public void applySingle(String code, RegistreAnnexResourceEntity entity, RegistreAnnexResource resource) throws PerspectiveApplicationException {
+        	if (entity.getRegistre() != null) {
+                resource.setRegistreInfo(objectMappingHelper.newInstanceMap(entity.getRegistre(), RegistreResource.class));
+                List<ExpedientPeticioResourceEntity> expedientPeticioList = entity.getRegistre().getExpedientPeticions();
+                if (!expedientPeticioList.isEmpty()) {
+                    resource.setExpedientInfo(objectMappingHelper.newInstanceMap(Hibernate.unproxy(expedientPeticioList.get(0).getExpedient()), ExpedientResource.class));
+                }
+            }
         }
     }
     

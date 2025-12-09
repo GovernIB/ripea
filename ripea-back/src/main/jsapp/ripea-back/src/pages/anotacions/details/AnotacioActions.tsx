@@ -69,11 +69,12 @@ export const useMassiveActions = (refresh?: () => void) => {
         canviEstatDistribucio,
     }
 }
-export const useAnexxActions = () => {
+export const useAnexxActions = (refresh?: () => void) => {
     const { t } = useTranslation();
 
     const {
         artifactReport: apiReport,
+        artifactAction: apiAction,
     } = useResourceApiService('registreAnnexResource');
     const {temporalMessageShow} = useBaseAppContext();
 
@@ -89,9 +90,30 @@ export const useAnexxActions = () => {
     }
 
     const download = (id:any) => report(id, 'DOWNLOAD_ANNEX', t('page.anotacio.action.descargarAnnex.ok'), 'PDF')
-
+    const reintentar = (id:any) => {
+        apiAction(undefined, {code: 'REINTENTAR', data: {ids: [id], massivo: false}})
+            .then(() => {
+                refresh?.()
+                temporalMessageShow(null, t('page.anotacio.action.procesarAnnexosPendents.ok'), 'success');
+            })
+            .catch((error) => {
+                temporalMessageShow(null, error.message, 'error');
+            });
+    }
+    const reintentarMassive = (ids:any) => {
+        apiAction(undefined, {code: 'REINTENTAR', data: {ids, massivo: true}})
+            .then(() => {
+                refresh?.()
+                temporalMessageShow(null, t('page.expedient.results.actionBackgroundOk'), 'success');
+            })
+            .catch((error) => {
+                temporalMessageShow(null, error.message, 'error');
+            });
+    }
     return {
-        download
+        reintentar,
+        reintentarMassive,
+        download,
     }
 }
 
