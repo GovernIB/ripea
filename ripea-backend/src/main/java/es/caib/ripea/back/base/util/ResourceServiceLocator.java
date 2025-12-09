@@ -10,8 +10,8 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-import java.util.List;
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * Localitzador de serveis de tipus ResourceService donat un recurs.
@@ -22,12 +22,14 @@ import java.util.List;
 public class ResourceServiceLocator implements ApplicationContextAware {
 
 	@Autowired
-	protected List<ReadonlyResourceService<?, ?>> resourceServices;
+	private ApplicationContext applicationContext;
+
+	private Collection<ReadonlyResourceService> readonlyResourceServices;
 
 	public ReadonlyResourceService<?, ?> getReadOnlyEntityResourceServiceForResourceClass(
 			Class<?> resourceClass) throws ComponentNotFoundException {
 		ReadonlyResourceService<?, ?> resourceServiceFound = null;
-		for (ReadonlyResourceService<?, ?> resourceService: resourceServices) {
+		for (ReadonlyResourceService<?, ?> resourceService: getReadonlyResourceServices()) {
 			Class<?> serviceResourceClass = TypeUtil.getArgumentClassFromGenericSuperclass(
 					resourceService.getClass(),
 					ReadonlyResourceService.class,
@@ -40,7 +42,7 @@ public class ResourceServiceLocator implements ApplicationContextAware {
 		if (resourceServiceFound != null) {
 			return resourceServiceFound;
 		} else {
-			throw new ComponentNotFoundException(resourceClass, "readonlyResourceService");
+			throw new ComponentNotFoundException(resourceClass, "ReadonlyResourceService");
 		}
 	}
 
@@ -54,13 +56,22 @@ public class ResourceServiceLocator implements ApplicationContextAware {
 		}
 	}
 
+	private Collection<ReadonlyResourceService> getReadonlyResourceServices() {
+		if (readonlyResourceServices == null) {
+			Map<String, ReadonlyResourceService> resourceServiceBeans = applicationContext.getBeansOfType(
+					ReadonlyResourceService.class);
+			readonlyResourceServices = resourceServiceBeans.values();
+		}
+		return readonlyResourceServices;
+	}
+
 	private static final ThreadLocal<ResourceServiceLocator> threadLocalInstance = new ThreadLocal<>();
-	private static ApplicationContext applicationContext;
+	private static ApplicationContext staticApplicationContext;
 	public static ResourceServiceLocator getInstance() {
 		if (threadLocalInstance.get() != null) {
 			return threadLocalInstance.get();
-		} else if (applicationContext != null) {
-			return applicationContext.getBean(ResourceServiceLocator.class);
+		} else if (staticApplicationContext != null) {
+			return staticApplicationContext.getBean(ResourceServiceLocator.class);
 		} else {
 			throw new ComponentNotFoundException(ResourceServiceLocator.class);
 		}
@@ -70,7 +81,7 @@ public class ResourceServiceLocator implements ApplicationContextAware {
 	}
 	@Override
 	public void setApplicationContext(@NonNull ApplicationContext applicationContext) {
-		ResourceServiceLocator.applicationContext = applicationContext;
+		ResourceServiceLocator.staticApplicationContext = applicationContext;
 	}
 
 }
