@@ -48,13 +48,13 @@ import java.util.jar.Manifest;
 })
 @ComponentScan(
 		basePackages = { BaseConfig.BASE_PACKAGE },
-		excludeFilters = {
+		useDefaultFilters = false,
+		includeFilters = {
 				@ComponentScan.Filter(
 						type = FilterType.REGEX,
 						pattern = {
-								"es\\.caib\\." + BaseConfig.APP_NAME + "\\.service\\..*",
-								"es\\.caib\\." + BaseConfig.APP_NAME + "\\.persistence\\..*",
-								"es\\.caib\\." + BaseConfig.APP_NAME + "\\.ejb\\..*" })
+								"es\\.caib\\." + BaseConfig.APP_NAME + "\\.back\\..*",
+								"es\\.caib\\." + BaseConfig.APP_NAME + "\\.service.intf.base.util\\..*" })
 		})
 @PropertySource(
 		ignoreResourceNotFound = true,
