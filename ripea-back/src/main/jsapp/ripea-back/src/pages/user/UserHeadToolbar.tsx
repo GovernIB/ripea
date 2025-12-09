@@ -749,7 +749,7 @@ const useAccionesMassivas = () => {
                     id: 'anexos',
                     title: t('page.user.massive.anexos'),
                     // icon: '',
-                    onClick: ()=> toProgramaAntic('massiu/procesarAnnexosPendents'),
+                   to: '/massiu/procesarAnnexosPendents',
                 },
                 {
                     id: 'anotacio',

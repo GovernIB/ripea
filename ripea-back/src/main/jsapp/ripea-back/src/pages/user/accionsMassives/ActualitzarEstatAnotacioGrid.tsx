@@ -43,7 +43,7 @@ const ActualitzarEstatAnotacioFilter = (props: any) => {
 
 }
 
-const namedQueriesAnotacions: string[] = ['MASSIU_ANOTACIONS_ESTAT']
+const namedQuery: string[] = ['MASSIU_ANOTACIONS_ESTAT']
 const sortModel: any = [{field: 'dataAlta', sort: 'desc'}]
 const columns = [
     {
@@ -100,7 +100,7 @@ const ActualitzarEstatAnotacioGrid = () => {
                 columns={columns}
                 filter={springFilter}
                 sortModel={sortModel}
-                namedQueries={namedQueriesAnotacions}
+                namedQueries={namedQuery}
                 rowAdditionalActions={actions}
                 toolbarMassiveActions={massiveActions}
                 toolbarHideCreate

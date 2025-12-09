@@ -1,5 +1,6 @@
 package es.caib.ripea.service.intf.model;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -37,22 +38,30 @@ import lombok.experimental.FieldNameConstants;
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = RegistreAnnexResource.PERSPECTIVE_FIRMES),
                 @ResourceConfigArtifact(
+                        type = ResourceArtifactType.PERSPECTIVE,
+                        code = RegistreAnnexResource.PERSPECTIVE_REGISTRE),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.FILTER,
+                        code = RegistreAnnexResource.ADJUNTAR_ANNEX_FILTER_CODE,
+                        formClass = RegistreAnnexResource.AjuntrAnnexPendentFilter.class),
+                @ResourceConfigArtifact(
                         type = ResourceArtifactType.REPORT,
                         code = RegistreAnnexResource.REPORT_DOWNLOAD_ANNEX,
                         requiresId = true),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = RegistreAnnexResource.ACTION_REINTENTAR_CODE,
-                        formClass = MassiveAction.class,
-                        requiresId = true),                
+                        formClass = MassiveAction.class),
 		}
 )
 public class RegistreAnnexResource extends BaseAuditableResource<Long> {
 
 	private static final long serialVersionUID = 1245578504295972456L;
 	
-	public static final String REPORT_DOWNLOAD_ANNEX	= "DOWNLOAD_ANNEX";
 	public static final String PERSPECTIVE_FIRMES 		= "FIRMES";
+	public static final String PERSPECTIVE_REGISTRE		= "REGISTRE";
+    public static final String ADJUNTAR_ANNEX_FILTER_CODE= "ADJUNTAR_ANNEX_FILTER";
+    public static final String REPORT_DOWNLOAD_ANNEX	= "DOWNLOAD_ANNEX";
 	public static final String ACTION_REINTENTAR_CODE	= "REINTENTAR";
 	
     private String firmaPerfil;
@@ -84,8 +93,21 @@ public class RegistreAnnexResource extends BaseAuditableResource<Long> {
 
     private ResourceReference<RegistreResource, Long> registre;
     private ResourceReference<DocumentResource, Long> document;
-    
+
+    @Transient private RegistreResource registreInfo;
+    @Transient private ExpedientResource expedientInfo;
     @Transient private List<ArxiuFirmaDto> firmes;
+
+    @Getter
+    @Setter
+    public static class AjuntrAnnexPendentFilter implements Serializable {
+        private String nom;
+        private String numero;
+        private ResourceReference<MetaExpedientResource, Long> procediment;
+        private ResourceReference<ExpedientResource, Long> expedient;
+        private Date dataInici;
+        private Date dataFi;
+    }
 
     public String getFitxerExtension() {
         if (nom != null) {

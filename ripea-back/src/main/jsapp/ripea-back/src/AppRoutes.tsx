@@ -30,6 +30,7 @@ import PermisEntitatGrid from "./pages/user/configurar/PermisEntitatGrid.tsx";
 import PermisGrupGrid from "./pages/user/configurar/PermisGrupGrid.tsx";
 import PermisOrganGestorGrid from "./pages/user/configurar/PermisOrganGestorGrid.tsx";
 import PermisMetaExpedientGrid from "./pages/user/configurar/PermisMetaExpedientGrid.tsx";
+import AdjuntarAnnexosPendentsGrid from "./pages/user/accionsMassives/AdjuntarAnnexosPendentsGrid.tsx";
 
 const AppRoutes: React.FC = () => {
     return <Routes>
@@ -53,6 +54,7 @@ const AppRoutes: React.FC = () => {
             <Route path={"definitiu"} element={<MarcarDefinitiuGrid />} />
             <Route path={"canviPrioritats"} element={<CanviPrioritatGrid />} />
             <Route path={"expedientPeticioCanviEstatDistribucio"} element={<ActualitzarEstatAnotacioGrid />} />
+            <Route path={"procesarAnnexosPendents"} element={<AdjuntarAnnexosPendentsGrid />} />
         </Route>
         <Route path="seguimentArxiuPendents" element={<CustodiarElementsPendentsGrid />} />
 
