@@ -8,6 +8,7 @@ import {formatDate} from "../../../util/dateUtils.ts";
 import * as builder from "../../../util/springFilterUtils.ts";
 import GridFormField from "../../../components/GridFormField.tsx";
 import {Grid, Link} from "@mui/material";
+import {Link as RouterLink } from 'react-router-dom';
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
 import {useActions as useDocumentActions} from "../../contingut/details/ContingutActions.tsx";
 import {useMassiveActions as useDocumentMassiveActions} from "../../contingut/details/ContingutMassiveActions.tsx";
@@ -64,7 +65,7 @@ const expedientColumns = [
     {
         field: 'nom',
         flex: 1,
-        renderCell: (params:any) => <Link href={`/contingut/${params?.id}`}>{params?.formattedValue}</Link>,
+        renderCell: (params:any) => <Link component={RouterLink} to={`/contingut/${params?.id}`}>{params?.formattedValue}</Link>,
     },
     {
         field: 'metaExpedient',
@@ -148,7 +149,7 @@ const documentColumns = [
     {
         field: 'expedient',
         flex: 1.5,
-        renderCell: (params:any) => <Link href={`/contingut/${params?.row?.expedient?.id}`}>{params?.formattedValue}</Link>,
+        renderCell: (params:any) => <Link component={RouterLink} to={`/contingut/${params?.row?.expedient?.id}`}>{params?.formattedValue}</Link>,
     },
     // {
     //     field: 'metaNode',
@@ -234,7 +235,7 @@ const interessatColumns = [
     {
         field: 'expedient',
         flex: 1.5,
-        renderCell: (params:any) => <Link href={`/contingut/${params?.row?.expedient?.id}`}>{params?.formattedValue}</Link>,
+        renderCell: (params:any) => <Link component={RouterLink} to={`/contingut/${params?.row?.expedient?.id}`}>{params?.formattedValue}</Link>,
     },
     // {
     //     field: 'metaNode',

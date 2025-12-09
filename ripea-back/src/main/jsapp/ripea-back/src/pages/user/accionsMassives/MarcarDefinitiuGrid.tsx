@@ -4,6 +4,7 @@ import {useTranslation} from "react-i18next";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import {useState} from "react";
 import {Link} from "@mui/material";
+import {Link as RouterLink } from 'react-router-dom';
 import {EnviarPortafirmesFilter} from "./EnviarPortafirmesGrid.tsx";
 import {GridSortDirection} from "@mui/x-data-grid-pro";
 import {useActions} from "../../contingut/details/ContingutActions.tsx";
@@ -23,7 +24,7 @@ const columns = [
     {
         field: 'expedient',
         flex: 0.6,
-        renderCell: (params:any) => <Link href={`/contingut/${params?.row?.expedient?.id}`}>{params?.formattedValue}</Link>,
+        renderCell: (params:any) => <Link component={RouterLink} to={`/contingut/${params?.row?.expedient?.id}`}>{params?.formattedValue}</Link>,
     },
     {
         field: 'createdDate',

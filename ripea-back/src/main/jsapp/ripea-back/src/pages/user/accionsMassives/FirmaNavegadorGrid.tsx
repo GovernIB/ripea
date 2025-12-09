@@ -1,6 +1,7 @@
 import {useTranslation} from "react-i18next";
 import {GridPage, useMuiDataGridApiRef} from "reactlib";
 import {Link} from "@mui/material";
+import {Link as RouterLink } from 'react-router-dom';
 import {useState} from "react";
 import {CardPage} from "../../../components/CardData.tsx";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
@@ -22,7 +23,7 @@ const columns = [
     {
         field: 'expedient',
         flex: 0.6,
-        renderCell: (params:any) => <Link href={`/contingut/${params?.row?.expedient?.id}`}>{params?.formattedValue}</Link>,
+        renderCell: (params:any) => <Link component={RouterLink} to={`/contingut/${params?.row?.expedient?.id}`}>{params?.formattedValue}</Link>,
     },
     {
         field: 'createdDate',
