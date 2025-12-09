@@ -1,7 +1,6 @@
 package es.caib.ripea.service.helper;
 
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -10,10 +9,6 @@ import java.util.Map;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 
 import es.caib.ripea.persistence.entity.EntitatEntity;
@@ -30,6 +25,7 @@ import es.caib.ripea.service.intf.model.sse.AnotacionsPendentsEvent;
 import es.caib.ripea.service.intf.model.sse.AvisosActiusEvent;
 import es.caib.ripea.service.intf.model.sse.CreacioFluxFinalitzatEvent;
 import es.caib.ripea.service.intf.model.sse.FirmaFinalitzadaEvent;
+import es.caib.ripea.service.intf.model.sse.FirmaNavegadorMassivaEvent;
 import es.caib.ripea.service.intf.model.sse.ScanFinalitzatEvent;
 import es.caib.ripea.service.intf.model.sse.TasquesPendentsEvent;
 import lombok.extern.slf4j.Slf4j;
@@ -107,6 +103,14 @@ public class EventHelper {
     public void notifyFirmaNavegadorFinalitzada(FirmaFinalitzadaEvent firmaEvent) {
     	try {
     		jmsTemplate.convertAndSend("firma", firmaEvent);
+    	} catch (Exception ex) {
+    		log.error("Error al notifyFirmaNavegadorFinalitzada a expedients suscrits", ex);
+    	}
+    }
+    
+    public void notifyFirmaNavegadorMassivaFinalitzada(FirmaNavegadorMassivaEvent firmaMassivaEvent) {
+    	try {
+    		jmsTemplate.convertAndSend("firmaNavegadorMassiva", firmaMassivaEvent);
     	} catch (Exception ex) {
     		log.error("Error al notifyFirmaNavegadorFinalitzada a expedients suscrits", ex);
     	}

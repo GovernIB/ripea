@@ -337,7 +337,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
 	            	Filter filtreAgafatsUsuariActual = null;
 	            	if (rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN")) {
-	            		String agafatPerCodi = ExpedientResource.Fields.agafatPer + UsuariResource.Fields.codi;
+	            		String agafatPerCodi = ExpedientResource.Fields.agafatPer + "." + UsuariResource.Fields.codi;
 	            		filtreAgafatsUsuariActual = Filter.parse(agafatPerCodi+":'" + SecurityContextHolder.getContext().getAuthentication().getName() +  "'");
 	            	}
 	            	

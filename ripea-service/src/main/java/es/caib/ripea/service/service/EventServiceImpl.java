@@ -4,11 +4,13 @@ import java.util.List;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import es.caib.ripea.service.intf.dto.UsuariAnotacioDto;
+
 import es.caib.ripea.service.helper.EventHelper;
+import es.caib.ripea.service.intf.dto.UsuariAnotacioDto;
 import es.caib.ripea.service.intf.model.sse.AvisosActiusEvent;
 import es.caib.ripea.service.intf.model.sse.CreacioFluxFinalitzatEvent;
 import es.caib.ripea.service.intf.model.sse.FirmaFinalitzadaEvent;
+import es.caib.ripea.service.intf.model.sse.FirmaNavegadorMassivaEvent;
 import es.caib.ripea.service.intf.model.sse.ScanFinalitzatEvent;
 import es.caib.ripea.service.intf.service.EventService;
 import lombok.RequiredArgsConstructor;
@@ -50,6 +52,11 @@ public class EventServiceImpl implements EventService {
     @Override
     public void notifyFirmaNavegadorFinalitzada(FirmaFinalitzadaEvent firmaEvent) {
     	eventHelper.notifyFirmaNavegadorFinalitzada(firmaEvent);
+    }
+    
+    @Override
+    public void notifyFirmaNavegadorMassivaFinalitzada(FirmaNavegadorMassivaEvent firmaEvent) {
+    	eventHelper.notifyFirmaNavegadorMassivaFinalitzada(firmaEvent);
     }
     
     @Override

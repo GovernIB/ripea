@@ -33,6 +33,7 @@ import es.caib.ripea.service.intf.model.sse.AnotacionsPendentsEvent;
 import es.caib.ripea.service.intf.model.sse.AvisosActiusEvent;
 import es.caib.ripea.service.intf.model.sse.CreacioFluxFinalitzatEvent;
 import es.caib.ripea.service.intf.model.sse.FirmaFinalitzadaEvent;
+import es.caib.ripea.service.intf.model.sse.FirmaNavegadorMassivaEvent;
 import es.caib.ripea.service.intf.model.sse.ScanFinalitzatEvent;
 import es.caib.ripea.service.intf.model.sse.TasquesPendentsEvent;
 import es.caib.ripea.service.intf.service.AplicacioService;
@@ -63,7 +64,7 @@ public class SseResourceController {
     private final Map<Long, List<SseEmitter>> clientsExpedient = new HashMap<>();
     private static final Logger logger = LoggerFactory.getLogger(SseResourceController.class);
     private enum UserEventType {
-        USER_CONNECT, AVISOS, NOTIFICACIONS, TASQUES;
+        USER_CONNECT, AVISOS, NOTIFICACIONS, TASQUES, FIRMA_MASSIVA;
         public String getEventName() { return name().toLowerCase(); }
         public static UserEventType fromEventName(String name) { return UserEventType.valueOf(name.toUpperCase()); }
     }
@@ -223,6 +224,29 @@ public class SseResourceController {
                 	logger.debug("... eliminat emisor de AvisosActiusEvent "+entry.getValue().hashCode()+" del usuari "+entry.getKey()+" per error: "+e.getMessage()+".");
                 }
             }
+    	}
+    }
+    
+    @Async
+    @JmsListener(destination = "firmaNavegadorMassiva")
+    public void handleEventFirmaNavegadorMassiva(FirmaNavegadorMassivaEvent firmaMassiva) {
+    	if (firmaMassiva!=null && firmaMassiva.getFirmaResultat()!=null && firmaMassiva.getFirmaResultat().getUsuari()!=null) {
+    		logger.debug("Actualització de EventFirmaNavegadorMassiva a usuaris...");
+			//Empram iterator per poder eliminar sense problemes elements del mapa mentre el recorrem
+			Iterator<Map.Entry<String, SseEmitter>> iterator = clientsUsuaris.entrySet().iterator();
+			//Els avisos s'envien a tots els usuaris connectats
+			while (iterator.hasNext()) {
+				Map.Entry<String, SseEmitter> usuariClient = iterator.next();
+            	if (firmaMassiva.getFirmaResultat().getUsuari().equals(usuariClient.getKey())) {
+            		try {
+            			usuariClient.getValue().send(SseEmitter.event().name(UserEventType.FIRMA_MASSIVA.getEventName()).data(usuariClient.getKey()));
+            			logger.debug("... comunicats EventFirmaNavegadorMassiva al usuari "+usuariClient.getKey()+" a travers del emissor "+usuariClient.getValue().hashCode()+".");
+    	            } catch (Exception e) {
+    	            	clientsUsuaris.remove(usuariClient.getKey());
+    	            	logger.debug("... eliminat emisor de EventFirmaNavegadorMassiva "+usuariClient.getValue().hashCode()+" del usuari "+usuariClient.getKey()+" per error: "+e.getMessage()+".");
+    	            }	            		
+            	}
+	        }
     	}
     }
     

@@ -267,6 +267,15 @@ public class ExecucioMassivaHelper {
 		execucioMassiva.setVersioImprimible(execMassDto.getVersioImprimible());
 		execucioMassiva.setNomFitxer(execMassDto.getNomFitxer());
 		execucioMassiva.setDocumentNom(execMassDto.getDocumentNom());
+		execucioMassiva.setEnviarCorreu(execMassDto.getEnviarCorreu());
+		execucioMassiva.setMotiu(execMassDto.getMotiu());
+		execucioMassiva.setPrioritat(execMassDto.getPrioritat());
+		execucioMassiva.setPortafirmesResponsables(execMassDto.getPortafirmesResponsables()!=null?String.join(",", execMassDto.getPortafirmesResponsables()):null);
+		execucioMassiva.setPortafirmesSequenciaTipus(execMassDto.getPortafirmesSequenciaTipus());
+		execucioMassiva.setPortafirmesFluxId(execMassDto.getPortafirmesFluxId());
+		execucioMassiva.setPortafirmesTransaccioId(execMassDto.getPortafirmesTransaccioId());
+		execucioMassiva.setPortafirmesAvisFirmaParcial(execMassDto.getPortafirmesAvisFirmaParcial());
+		execucioMassiva.setPortafirmesFirmaParcial(execMassDto.getPortafirmesFirmaParcial());
 		
 		execucioMassiva = execucioMassivaRepository.save(execucioMassiva);
 		
@@ -598,8 +607,8 @@ public class ExecucioMassivaHelper {
 					contingut.getMetaDocument().getPortafirmesFluxTipus(),
 					null,
 					em.getPortafirmesTransaccioId(),
-					em.getPortafirmesAvisFirmaParcial(),
-					em.getPortafirmesFirmaParcial());
+					em.getPortafirmesAvisFirmaParcial()!=null?em.getPortafirmesAvisFirmaParcial().booleanValue():false,
+					em.getPortafirmesFirmaParcial()!=null?em.getPortafirmesFirmaParcial().booleanValue():false);
 		} catch (Exception ex) {
 			logger.error("CONTINGUT MASSIU:" + emc.getId() + ". No s'ha pogut enviar el document al portasignatures", ex);
 			exc = ex;

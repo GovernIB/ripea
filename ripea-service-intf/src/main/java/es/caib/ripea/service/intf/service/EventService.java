@@ -8,6 +8,7 @@ import es.caib.ripea.service.intf.dto.UsuariAnotacioDto;
 import es.caib.ripea.service.intf.model.sse.AvisosActiusEvent;
 import es.caib.ripea.service.intf.model.sse.CreacioFluxFinalitzatEvent;
 import es.caib.ripea.service.intf.model.sse.FirmaFinalitzadaEvent;
+import es.caib.ripea.service.intf.model.sse.FirmaNavegadorMassivaEvent;
 import es.caib.ripea.service.intf.model.sse.ScanFinalitzatEvent;
 
 /**
@@ -23,6 +24,7 @@ public interface EventService {
     public void notifyTasquesPendents(List<String> usuarisAfectats);
     public void notifyFluxFirmaFinalitzat(CreacioFluxFinalitzatEvent fluxEvent);
     public void notifyFirmaNavegadorFinalitzada(FirmaFinalitzadaEvent firmaEvent);
+    public void notifyFirmaNavegadorMassivaFinalitzada(FirmaNavegadorMassivaEvent firmaMassivaEvent);    
     public void notifyScanFinalitzat(ScanFinalitzatEvent firmaEvent);
     public AvisosActiusEvent getAvisosActiusEvent();
     public long getAnotacionsPendents(UsuariAnotacioDto usuariCodi);
