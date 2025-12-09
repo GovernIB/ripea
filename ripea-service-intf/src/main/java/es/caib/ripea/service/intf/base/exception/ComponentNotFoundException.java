@@ -13,6 +13,12 @@ public class ComponentNotFoundException extends NotFoundException {
 	private final Class<?> clazz;
 	private final String type;
 
+	public ComponentNotFoundException(Class<?> clazz) {
+		super("Component " + getComponentInfo(clazz, null));
+		this.clazz = clazz;
+		this.type = null;
+	}
+
 	public ComponentNotFoundException(Class<?> clazz, String type) {
 		super("Component " + getComponentInfo(clazz, type));
 		this.clazz = clazz;
@@ -26,7 +32,7 @@ public class ComponentNotFoundException extends NotFoundException {
 	}
 
 	private static String getComponentInfo(Class<?> clazz, String type) {
-		return "(class=" + clazz.getName() + ", type=" + type + ")";
+		return type == null ? "(class=" + clazz.getName() + ")" : "(class=" + clazz.getName() + ", type=" + type + ")";
 	}
 
 }

@@ -51,13 +51,19 @@ public class ResourceServiceLocator implements ApplicationContextAware {
 		}
 	}
 
+	private static final ThreadLocal<ResourceServiceLocator> threadLocalInstance = new ThreadLocal<>();
 	private static ApplicationContext applicationContext;
 	public static ResourceServiceLocator getInstance() {
-		if (applicationContext != null) {
+		if (threadLocalInstance.get() != null) {
+			return threadLocalInstance.get();
+		} else if (applicationContext != null) {
 			return applicationContext.getBean(ResourceServiceLocator.class);
 		} else {
-			return null;
+			throw new ComponentNotFoundException(ResourceServiceLocator.class);
 		}
+	}
+	public static void setThreadLocalInstance(ResourceServiceLocator instance) {
+		threadLocalInstance.set(instance);
 	}
 	@Override
 	public void setApplicationContext(@NonNull ApplicationContext applicationContext) {
