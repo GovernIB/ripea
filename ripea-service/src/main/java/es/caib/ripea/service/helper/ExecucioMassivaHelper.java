@@ -581,21 +581,21 @@ public class ExecucioMassivaHelper {
 	}	
 
 	private Throwable enviarPortafirmes(ExecucioMassivaContingutEntity emc) throws Exception {
-		ContingutEntity contingut = contingutRepository.getOne(emc.getElementId());
+		DocumentEntity contingut = (DocumentEntity)contingutRepository.findById(emc.getElementId()).get();
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(contingut.getId()));
 		Throwable exc = null;
 		try {
 			ExecucioMassivaEntity em = emc.getExecucioMassiva();
 			firmaPortafirmesHelper.portafirmesEnviar(
 					contingut.getEntitat().getId(),
-					(DocumentEntity)contingut,
+					contingut,
 					em.getMotiu(),
 					em.getPrioritat(),
 					null,
 					em.getPortafirmesFluxId(),
 					em.getPortafirmesResponsables() != null ? em.getPortafirmesResponsables().split(",") : null,
 					em.getPortafirmesSequenciaTipus(),
-					((DocumentEntity) contingut).getMetaDocument().getPortafirmesFluxTipus(),
+					contingut.getMetaDocument().getPortafirmesFluxTipus(),
 					null,
 					em.getPortafirmesTransaccioId(),
 					em.getPortafirmesAvisFirmaParcial(),
