@@ -1646,12 +1646,12 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         @Override
         public DocumentResource exec(String code, DocumentResourceEntity entity, DocumentResource.EnviarPortafirmesFormAction params) throws ActionExecutionException {
 
-        	String docIdStr = entity.getId()!=null?entity.getId().toString():Utils.getIdsSeparatsComa(params.getIds());
-        	
         	try {
         	
         		if (!params.isMassivo()) {
         		
+        			entity = documentResourceRepository.findById(params.getIds().get(0)).get();
+        			
 		        	Long entitatId  = entity.getEntitat().getId();
 		        	Long documentId = entity.getId();
 		        	String rolActual = configHelper.getRolActual();
@@ -1726,6 +1726,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         		}
         	
 			} catch (Exception e) {
+				String docIdStr = Utils.getIdsSeparatsComa(params.getIds());
 				excepcioLogHelper.addExcepcio("/document/EnviarPortafirmesActionExecutor", e, docIdStr, "massiu="+params.isMassivo());
 				String message = messageHelper.getMessage("message.common.action.error")+": "+e.getMessage();
 				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, message);

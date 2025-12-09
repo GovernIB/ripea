@@ -5,6 +5,7 @@ import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import {useState} from "react";
 import {GridSortDirection} from "@mui/x-data-grid-pro";
 import {Link} from "@mui/material";
+import {Link as RouterLink } from 'react-router-dom';
 import {EnviarPortafirmesFilter} from "./EnviarPortafirmesGrid.tsx";
 import {useActions} from "../../contingut/details/ContingutActions.tsx";
 import {useMassiveActions} from "../../contingut/details/ContingutMassiveActions.tsx";
@@ -23,7 +24,7 @@ const columns = [
     {
         field: 'expedient',
         flex: 0.6,
-        renderCell: (params:any) => <Link href={`/contingut/${params?.row?.expedient?.id}`}>{params?.formattedValue}</Link>,
+        renderCell: (params:any) => <Link component={RouterLink} to={`/contingut/${params?.row?.expedient?.id}`}>{params?.formattedValue}</Link>,
     },
     {
         field: 'createdDate',

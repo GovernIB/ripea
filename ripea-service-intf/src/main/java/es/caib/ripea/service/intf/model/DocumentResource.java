@@ -154,7 +154,7 @@ import lombok.experimental.FieldNameConstants;
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.FILTER,
                         code = DocumentResource.MASSIVE_PORTAFIRMES_FILTER_CODE,
-                        formClass = DocumentResource.MassicePortafirmesFilter.class),
+                        formClass = DocumentResource.MassivePortafirmesFilter.class),
         })
 @AdjuntValid(groups = {Resource.OnCreate.class, Resource.OnUpdate.class})
 public class DocumentResource extends NodeResource {
@@ -631,7 +631,7 @@ public class DocumentResource extends NodeResource {
 
     @Getter
     @Setter
-    public static class MassicePortafirmesFilter implements Serializable {
+    public static class MassivePortafirmesFilter implements Serializable {
         private ResourceReference<MetaExpedientResource, Long> procediment;
         private ResourceReference<ExpedientResource, Long> expedient;
         private ResourceReference<MetaDocumentResource, Long> metaDocument;
