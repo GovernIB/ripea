@@ -148,6 +148,11 @@ import lombok.experimental.FieldNameConstants;
                         code = ExpedientResource.ACTION_GUARDAR_ARXIU,
                         formClass = ExpedientResource.MassiveAction.class),
                 @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = ExpedientResource.ACTION_MOURE_TOT_CODE,
+                        formClass = ExpedientResource.MoureTotFormAction.class,
+                        requiresId = true),  
+                @ResourceConfigArtifact(
                         type = ResourceArtifactType.REPORT,
                         code = ExpedientResource.REPORT_EXPORT_SELECTED_DOCS,
                         formClass = ExpedientResource.MassiveAction.class,
@@ -256,6 +261,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
 	public static final String ACTION_IMPORT_DOCS = "IMPORT_DOCS";
 	public static final String ACTION_IMPORT_DOCS_ZIP = "IMPORT_DOCS_ZIP";
 	public static final String ACTION_IMPORT_INTE = "IMPORT_INTE";
+	public static final String ACTION_MOURE_TOT_CODE = "MOURE_TOT";
 	public static final String REPORT_PLANTILLA_EXCEL_INTERESSATS = "PLANTILLA_EXCEL_INTERESSATS";
 	public static final String REPORT_PLANTILLA_DADES_CSV = "PLANTILLA_DADES_CSV";
 	
@@ -413,7 +419,8 @@ public class ExpedientResource extends NodeResource implements Serializable {
     @Transient private boolean ambNotificacionsPendents;
     @Transient private boolean ambDocumentsPinbal;
     @Transient private boolean creacioCarpetesActiva;
-
+    @Transient private boolean isPendentExecucioMassiva;
+    
     @Getter
 	@Setter
     @NoArgsConstructor
@@ -518,6 +525,13 @@ public class ExpedientResource extends NodeResource implements Serializable {
     
     @Getter
     @Setter
+    public static class MoureTotFormAction implements Serializable {
+    	@NotNull
+        private ResourceReference<ExpedientResource, Long> expedientDesti;
+    }
+    
+    @Getter
+    @Setter
     @NoArgsConstructor
     @FieldNameConstants
     @ImportarDocumentValid
@@ -574,4 +588,5 @@ public class ExpedientResource extends NodeResource implements Serializable {
         private Date dataCreacioInici;
         private Date dataCreacioFi;
     }
+    
 }

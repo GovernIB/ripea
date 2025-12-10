@@ -682,6 +682,11 @@ const translationCa = {
                 comment: {
                     ok: "Comentari afegit a l'expedient '{{data.expedient.description}}'",
                 },
+				moureTot: {
+					label: "Moure tot...",
+				    title: "Moure tot a l'expedient destí",
+				    ok: "L'acció massiva per moure l'expedient '{{expedient}}' s'ha creat correctament.",
+	            },
             },
             alert: {
                 owner: "És necessari reservar l’expedient per poder-lo modificar",
@@ -696,6 +701,18 @@ const translationCa = {
                 ambEnviamentsPendents: "Aquest expedient té enviaments pendents de Portasignatures",
                 ambNotificacionsPendents: "Aquest expedient té notificacions pendents",
                 canviEstat: "És necessari seleccionar un procediment per poder realitzar l'acció massiva",
+				moureTot: {
+					info: "L'expedient es troba actualment bloquejat a causa d'una execució en segon pla en curs.\nFins que aquesta finalitzi, no serà possible realitzar modificacions. Consulteu les accions massives pendents per conèixer el seu estat.",
+				  	title: "Estàs a punt d'iniciar una acció massiva que mourà la informació següent cap a l'expedient destí:",
+				  	items: [
+				    	"Els documents i carpetes",
+						"Els interessats",
+				    	"Els seguidors",
+				    	"Els expedients relacionats",
+				    	"Les anotacions de registre",
+				    	"Els comentaris"
+				  ],
+				},
             },
             modal: {
                 seguidors: "Seguidors de l’expedient",

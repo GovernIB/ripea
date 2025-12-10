@@ -354,6 +354,10 @@ public abstract class InteressatEntity extends RipeaAuditable<Long> {
         }
 	}
 	
+	public void updateExpedient(ExpedientEntity expedient) {
+		this.expedient = expedient;
+	}
+	
 	public abstract InteressatTipusEnumDto getTipus();
 
 	public void setRepresentant(InteressatEntity representant) {

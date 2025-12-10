@@ -498,7 +498,8 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 							entitatEntity.getId(),
 							params.isAssociarInteressats(),
 							interessatsAccionsMap,
-							params.isAgafarExpedient());
+							params.isAgafarExpedient(),
+							false);
 				}
 
 				/**

@@ -569,4 +569,11 @@ public interface ExpedientService {
 			Long entitatId, 
 			String numeroExpedient, 
 			String rolActual);
+
+	@PreAuthorize("isAuthenticated()")
+	public void moure(Long entitatId, Long expedientOrigenId, Long expedientDestiId, String rolActual);
+	
+	@PreAuthorize("isAuthenticated()")
+	public boolean isExpedientPendentExecucioMassiva(Long expedientId);
+	
 }

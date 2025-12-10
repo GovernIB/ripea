@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.query.Param;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -303,7 +302,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 					entitatId,
 					associarInteressats,
 					interessatsAccionsMap,
-					agafarExpedient);
+					agafarExpedient,
+					false);
 		}
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.getOne(expedientPeticioId);
 		expedientHelper.inicialitzarExpedientsWithImportacio();
@@ -1767,6 +1767,16 @@ public class ExpedientServiceImpl implements ExpedientService {
 		return usuari.getVistaMoureActual();
 	}
 
+	@Override
+	public void moure(Long entitatId, Long expedientOrigenId, Long expedientDestiId, String rolActual) {
+		expedientHelper.moureEntreExpedients(entitatId, expedientOrigenId, expedientDestiId, rolActual);
+	}
+	
+	@Override
+	public boolean isExpedientPendentExecucioMassiva(Long expedientId) {
+		return expedientHelper.isExpedientPendentExecucioMassiva(expedientId);
+	}
+	
 	private boolean isIncorporacioDuplicadaPermesa() {
 		return configHelper.getAsBoolean(PropertyConfig.INCORPORACIO_ANOTACIO_DUPLICADA);
 	}

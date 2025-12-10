@@ -2,6 +2,7 @@ package es.caib.ripea.persistence.repository;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,6 +15,8 @@ import es.caib.ripea.persistence.entity.ExecucioMassivaEntity;
 
 @Component
 public interface ExecucioMassivaRepository extends JpaRepository<ExecucioMassivaEntity, Long> {
+
+	Optional<ExecucioMassivaEntity> findByExpedientOrigenIdAndDataFiNull(Long expedientOrigenId);
 	
 	List<ExecucioMassivaEntity> findByCreatedByAndEntitatIdOrderByCreatedDateDesc(String createdBy, Long entitatId, Pageable pageable);
 	

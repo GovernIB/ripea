@@ -274,6 +274,7 @@
 					<%--- Expedient ---%>
 					<c:when test="${contingut.expedient && contingut.estat == 'OBERT'}">
 						<li><a href="<c:url value="/expedient/${contingut.id}"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.modificar"/>...</a></li>
+						<li><a href="<c:url value="/expedient/${contingut.id}/moure"/>" data-height="400px" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-arrows"></span>&nbsp;<spring:message code="comu.boto.moure.tot"/>...</a></li>
 						<c:set var="mostrarSeparador" value="${true}"/>
 					</c:when>
 					<%--- Document ---%>

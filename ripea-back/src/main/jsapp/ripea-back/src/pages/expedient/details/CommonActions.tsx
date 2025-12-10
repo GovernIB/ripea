@@ -16,6 +16,7 @@ import useTancar from "../actions/Tancar.tsx";
 import useDescargarDocuments from "../actions/DescargarDocuments.tsx";
 import useModifyExpedient from "../actions/ModifyExpedient.tsx";
 import {useNavigate} from "react-router-dom";
+import useMoureTot from '../actions/MoureTot.tsx';
 
 export const iniciaDescarga = (url:string, fileName:string) => {
     const link = document.createElement('a');
@@ -249,7 +250,8 @@ export const useCommonActions = (refresh?: () => void) => {
     const {handleShow: handleDescargarDocuments, content: contentDescargarDocuments} = useDescargarDocuments();
 
     const {handleShow: handleModifyExpedient, content: contentModifyExpedient} = useModifyExpedient(refresh)
-
+	const {handleShow: handleMoureTot, content: contentMoureTot} = useMoureTot(refresh)
+	
     const isTancat = (row:any) :boolean => {
         return row?.estat != "OBERT"
     }
@@ -277,6 +279,13 @@ export const useCommonActions = (refresh?: () => void) => {
             onClick: handleModifyExpedient,
             hidden: (row:any) => isTancat(row) || !row?.potModificar,
         },
+		{
+		    label: t('page.expedient.action.moureTot.label'),
+		    icon: 'open_with',
+		    showInMenu: true,
+		    onClick: handleMoureTot,
+		    hidden: (row:any) => isTancat(row) || !row?.potModificar,
+		},
         {
             label: <Divider sx={{px: 1, width: '100%'}} color={"none"}/>,
             showInMenu: true,
@@ -465,6 +474,7 @@ export const useCommonActions = (refresh?: () => void) => {
         {contentTancar}
         {contentDescargarDocuments}
         {contentModifyExpedient}
+		{contentMoureTot}
     </>;
 
     return {

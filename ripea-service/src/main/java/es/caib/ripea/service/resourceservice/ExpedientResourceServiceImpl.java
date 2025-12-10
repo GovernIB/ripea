@@ -120,6 +120,7 @@ import es.caib.ripea.service.intf.model.ExpedientResource.ImportarDocumentsForm;
 import es.caib.ripea.service.intf.model.ExpedientResource.ImportarDocumentsZipForm;
 import es.caib.ripea.service.intf.model.ExpedientResource.ImportarExpedientFormAction;
 import es.caib.ripea.service.intf.model.ExpedientResource.MassiveImportDocsAction;
+import es.caib.ripea.service.intf.model.ExpedientResource.MoureTotFormAction;
 import es.caib.ripea.service.intf.model.ExpedientResource.TancarExpedientFormAction;
 import es.caib.ripea.service.intf.model.NodeResource.MassiveAction;
 import es.caib.ripea.service.intf.resourceservice.ExpedientResourceService;
@@ -216,7 +217,8 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         register(ExpedientResource.ACTION_IMPORT_DOCS, new ImportarDocumentsArxiuActionExecutor());
         register(ExpedientResource.ACTION_IMPORT_DOCS_ZIP, new ImportarDocumentsZipArxiuActionExecutor());
         register(ExpedientResource.ACTION_IMPORT_INTE, new ImportarInteressatsArxiuActionExecutor());
-
+        register(ExpedientResource.ACTION_MOURE_TOT_CODE, new MoureTotActionExecutor());
+        
         register(ExpedientResource.PERSPECTIVE_AMB_PINBAL_CODE, new AmbDocumentsPinbalPerspectiveApplicator());
         register(ExpedientResource.PERSPECTIVE_FOLLOWERS, new FollowersPerspectiveApplicator());
         register(ExpedientResource.PERSPECTIVE_COUNT, new CountPerspectiveApplicator());
@@ -613,6 +615,8 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 			resource.setPotModificarContingut(expedientTascaRepository.countTasquesResponsableExpedient(usuariEntity, entity.getId())>0);
     	}
 		resource.setHasEsborranys(documentResourceRepository.hasFillsEsborranys(expedientEntity.getId()));
+		resource.setPendentExecucioMassiva(expedientHelper.isExpedientPendentExecucioMassiva(expedientEntity.getId()));
+		
 	}
 
     @Override
@@ -1538,6 +1542,26 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		}
     }
 
+    private class MoureTotActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.MoureTotFormAction, Serializable> {
+
+    	@Override
+		public void onChange(Serializable id, MoureTotFormAction previous, String fieldName,Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames,MoureTotFormAction target) {}
+
+		@Override
+		public Serializable exec(String code, ExpedientResourceEntity entity, MoureTotFormAction params) throws ActionExecutionException {
+			try {
+				String rolActual = configHelper.getRolActual();
+            	String entitatActual = configHelper.getEntitatActualCodi();
+				EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatActual, false, false, false, true, false);
+				expedientHelper.moureEntreExpedients(entitatEntity.getId(),	entity.getId(), params.getExpedientDesti().getId(), rolActual);			
+				return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
+			} catch (Exception e) {
+				excepcioLogHelper.addExcepcio("/expedient/MoureTotActionExecutor", e);
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, messageHelper.getMessage("expedient.moure.tot.reject", new Object[]{e.getMessage()}));
+			}
+		}
+    }
+    
     private class GuardarArxiuActionExecutor implements ActionExecutor<ExpedientResourceEntity, MassiveAction, Serializable> {
 
 		@Override

@@ -682,6 +682,11 @@ const translationEs = {
                 comment: {
                     ok: "Comentario añadido al expediente '{{data.expedient.description}}'",
                 },
+				moureTot: {
+					label: "Mover todo...",
+				    title: "Mover todo al expediente destino",
+				    ok: "La acción masiva para mover el expediente '{{expedient}}' se ha creado correctamente.",
+				},
             },
             alert: {
                 owner: "Es necesario reservar el expediente para poder modificarlo",
@@ -696,6 +701,18 @@ const translationEs = {
                 ambEnviamentsPendents: "Este expediente tiene envíos pendientes de Portafirmas",
                 ambNotificacionsPendents: "Este expediente tiene notificaciones pendientes",
                 canviEstat: "Es necesario seleccionar un procedimiento para poder realizar la acción masiva",
+				moureTot: {
+					info: "El expediente se encuentra actualmente bloqueado debido a una ejecución en segundo plano en curso.\nHasta que esta finalice, no será posible realizar modificaciones. Consulte las acciones masivas pendientes para conocer su estado.",
+					title: "Estás a punto de iniciar una acción masiva que moverá la siguiente información hacía el expediente destino:",
+					items: [
+						"Los documentos y carpetas",
+					  	"Los interesados",
+					  	"Los seguidores",
+					  	"Los expedientes relacionados",
+					  	"Las anotaciones de registro",
+					  	"Los comentarios"
+					],
+				},
             },
             modal: {
                 seguidors: "Seguidores del expediente",

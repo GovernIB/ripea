@@ -682,6 +682,11 @@ const translationEn = {
                 comment: {
                     ok: "Comment added to the case '{{data.expedient.description}}'",
                 },
+				moureTot: {
+				    label: "Move all...",
+				    title: "Move everything to the destination file",
+				    ok: "The bulk action to move the file '{{expedient}}' has been created successfully.",
+				},
             },
             alert: {
                 owner: "You must reserve the case file in order to edit it",
@@ -696,6 +701,18 @@ const translationEn = {
                 ambEnviamentsPendents: "This case file has pending sends to signature portal",
                 ambNotificacionsPendents: "This case file has pending notifications",
                 canviEstat: "It is necessary to select a procedure in order to perform the mass action",
+				moureTot: {
+					info: "The file is currently locked due to an ongoing background execution.\nUntil it completes, modifications will not be possible. Check pending massive actions to know their status.",
+				  	title: "You are about to start a mass action that will move the following information to the destination file:",
+				  	items: [
+					    "Documents and folders",
+					    "Interested parties",
+					    "Followers",
+					    "Related cases",
+					    "Registry entries",
+					    "Comments"
+				  ],
+				},
             },
             modal: {
                 seguidors: "Case file followers",

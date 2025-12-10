@@ -9,7 +9,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -20,17 +23,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import es.caib.ripea.persistence.entity.ContingutMovimentEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.ExecucioMassivaContingutEntity;
 import es.caib.ripea.persistence.entity.ExecucioMassivaEntity;
 import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.entity.UsuariEntity;
+import es.caib.ripea.persistence.repository.ContingutMovimentRepository;
 import es.caib.ripea.persistence.repository.ContingutRepository;
 import es.caib.ripea.persistence.repository.ExecucioMassivaContingutRepository;
 import es.caib.ripea.persistence.repository.ExecucioMassivaRepository;
@@ -47,6 +56,7 @@ import es.caib.ripea.service.helper.ExecucioMassivaHelper;
 import es.caib.ripea.service.helper.ExpedientHelper;
 import es.caib.ripea.service.helper.MessageHelper;
 import es.caib.ripea.service.helper.PluginHelper;
+import es.caib.ripea.service.helper.UsuariHelper;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.DocumentAmbTipusDto;
 import es.caib.ripea.service.intf.dto.DocumentDto;
@@ -82,7 +92,11 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 	@Autowired private ConfigHelper configHelper;
     @Autowired private ExpedientRepository expedientRepository;
     @Autowired private ApplicationHelper applicationHelper;
+	@Autowired private UsuariHelper usuariHelper;
+	@Autowired private ContingutMovimentRepository contenidorMovimentRepository;
 
+	private final Map<Long, Object> locks = new ConcurrentHashMap<>();
+	
 	@Transactional
 	@Override
 	public void crearExecucioMassiva(Long entitatId, ExecucioMassivaDto dto) throws NotFoundException, ValidationException {
@@ -259,6 +273,8 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 							ExecucioMassivaTipusDto.EXPORTAR_EXCEL.equals(execucioMassiva.getTipus()) || 
 							ExecucioMassivaTipusDto.EXPORTAR_CSV.equals(execucioMassiva.getTipus())) {
 						exportarExpedients(execucioMassiva);
+					} else if (ExecucioMassivaTipusDto.MOURE_EXPEDIENT.equals(execucioMassiva.getTipus())) {
+						moureEntreExpedients(execucioMassiva);
 					} else {
 						
 						for (ExecucioMassivaContingutEntity execucioMassivaItemEntity : execucioMassiva.getContinguts()) {
@@ -459,6 +475,97 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 		}
 	}
 
+	public void moureEntreExpedients(ExecucioMassivaEntity execucioMassiva) {
+		autenticarUsuariEmc(execucioMassiva); // Necessari per executar algunes accions de moure entre expedients
+
+		List<ExecucioMassivaContingutEntity> continguts = execucioMassiva.getContinguts();
+
+		for (ExecucioMassivaContingutEntity execucioMassivaContingut : continguts) {
+			Object lock = locks.computeIfAbsent(execucioMassivaContingut.getId(), k -> new Object());
+			ExecucioMassivaContingutEntity execucioMassivaContingutActual;
+
+			synchronized (lock) {
+				execucioMassivaContingutActual = execucioMassivaContingutRepository.findById(execucioMassivaContingut.getId()).orElseThrow();
+
+				if (execucioMassivaContingutActual.getEstat() != ExecucioMassivaEstatDto.ESTAT_PENDENT) {
+					locks.remove(execucioMassivaContingut.getId());
+					continue;
+				}
+			}
+			
+			try {
+				switch (execucioMassivaContingutActual.getElementTipus()) {
+				case MOURE_CONTINGUT:
+					expedientHelper.moureFills(
+							execucioMassiva.getEntitat().getId(),
+							execucioMassiva.getExpedientOrigenId(), 
+							execucioMassiva.getExpedientDestiId());
+					break;
+				case MOURE_INTERESSATS:
+					expedientHelper.moureInteressats(
+							execucioMassiva.getExpedientOrigenId(),
+							execucioMassiva.getExpedientDestiId());
+					break;
+				case MOURE_SEGUIDORS:
+					expedientHelper.moureSeguidors(
+							execucioMassiva.getExpedientOrigenId(),
+							execucioMassiva.getExpedientDestiId());
+					break;
+				case MOURE_RELACIONS:
+					expedientHelper.moureExpedientsRelacionats(
+							execucioMassiva.getExpedientOrigenId(),
+							execucioMassiva.getExpedientDestiId());
+					break;
+				case MOURE_ANOTACIONS:
+					expedientHelper.moureAnotacionsRegistre(
+							execucioMassiva.getExpedientOrigenId(),
+							execucioMassiva.getExpedientDestiId());
+					break;
+				case MOURE_COMENTARIS:
+					expedientHelper.moureComentaris(
+							execucioMassiva.getExpedientOrigenId(),
+							execucioMassiva.getExpedientDestiId());
+					break;
+				default:
+					break;
+				}
+
+				execucioMassivaContingutActual.updateFinalitzat(new Date());
+
+				ContingutMovimentEntity contenidorMoviment = ContingutMovimentEntity
+						.getBuilder(
+								execucioMassiva.getExpedientOrigenId(), 
+								execucioMassiva.getExpedientOrigenId(),
+								execucioMassiva.getExpedientDestiId(), 
+								usuariHelper.getUsuariAutenticat(),
+								execucioMassivaContingutActual.getElementNom()).build();
+
+				contenidorMovimentRepository.save(contenidorMoviment);
+			} catch (Exception ex) {
+				execucioMassivaContingutActual.updateError(new Date(), ex.getMessage());
+			} finally {
+				execucioMassivaContingutRepository.save(execucioMassivaContingutActual);
+				locks.remove(execucioMassivaContingut.getId());
+			}
+
+		}
+	}
+
+	private void autenticarUsuariEmc(ExecucioMassivaEntity emc) {
+		Optional<String> usuariEmc = emc.getCreatedBy();
+		if (usuariEmc.isPresent()) {
+			List<SimpleGrantedAuthority> authorities = new ArrayList<SimpleGrantedAuthority>();
+			SimpleGrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority("IPA_ADMIN");
+			authorities.add(simpleGrantedAuthority);
+			
+			Authentication authentication =  new UsernamePasswordAuthenticationToken(
+					usuariEmc.get(),
+					"N/A",
+					authorities);
+	        SecurityContextHolder.getContext().setAuthentication(authentication);
+		}
+	}
+	
 	private String getZipRecursNom(String nomEntrada, List<String> nomsArxius) {
 		int contador = 0;
 		for (String nom : nomsArxius) {

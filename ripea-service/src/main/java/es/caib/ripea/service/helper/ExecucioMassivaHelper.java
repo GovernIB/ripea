@@ -276,6 +276,8 @@ public class ExecucioMassivaHelper {
 		execucioMassiva.setPortafirmesTransaccioId(execMassDto.getPortafirmesTransaccioId());
 		execucioMassiva.setPortafirmesAvisFirmaParcial(execMassDto.getPortafirmesAvisFirmaParcial());
 		execucioMassiva.setPortafirmesFirmaParcial(execMassDto.getPortafirmesFirmaParcial());
+		execucioMassiva.setExpedientOrigenId(execMassDto.getExpedientOrigenId());
+		execucioMassiva.setExpedientDestiId(execMassDto.getExpedientDestiId());
 		
 		execucioMassiva = execucioMassivaRepository.save(execucioMassiva);
 		
@@ -283,6 +285,8 @@ public class ExecucioMassivaHelper {
 		for (ExecucioMassivaContingutDto execElement: execElements) {
 			
 			String elementName = null;
+			ElementTipusEnumDto elementTipusContingut = elementTipus;
+			
 			if (elementTipus == ElementTipusEnumDto.EXPEDIENT || elementTipus == ElementTipusEnumDto.DOCUMENT) {
 				elementName = contingutRepository.getOne(execElement.getElementId()).getNom();
 			} else if (elementTipus == ElementTipusEnumDto.INTERESSAT) {
@@ -291,13 +295,16 @@ public class ExecucioMassivaHelper {
 				elementName = expedientPeticioRepository.getOne(execElement.getElementId()).getIdentificador();
 			} else if (elementTipus == ElementTipusEnumDto.ANNEX) {
 				elementName = registreAnnexRepository.getOne(execElement.getElementId()).getNom();
+			} else if (elementTipus == ElementTipusEnumDto.ACCIO) {
+				elementName = execElement.getElementNom();
+				elementTipusContingut = execElement.getElementTipus(); // Acció especifica
 			}
 
 			ExecucioMassivaContingutEntity emc = ExecucioMassivaContingutEntity.getBuilder(
 					execucioMassiva, 
 					execElement.getElementId(), 
 					elementName,
-					elementTipus, 
+					elementTipusContingut, 
 					ordre++).build();
 			
 			emc.updateEstatDataFi(

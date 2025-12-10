@@ -74,6 +74,11 @@ public class ExecucioMassivaEntity extends RipeaAuditable<Long> {
 	@Column(name = "pfirmes_firma_parcial")
 	private Boolean portafirmesFirmaParcial;
 	
+	@Column(name = "exp_origen_id")
+	private Long expedientOrigenId;
+	@Column(name = "exp_desti_id")
+	private Long expedientDestiId;
+	
 	public ExecucioMassivaTipusDto getTipus() {
 		return tipus;
 	}
@@ -181,6 +186,18 @@ public class ExecucioMassivaEntity extends RipeaAuditable<Long> {
 	}
 	public void setPortafirmesFirmaParcial(Boolean portafirmesFirmaParcial) {
 		this.portafirmesFirmaParcial = portafirmesFirmaParcial;
+	}
+	public void setExpedientOrigenId(Long expedientOrigenId) {
+		this.expedientOrigenId = expedientOrigenId;
+	}
+	public void setExpedientDestiId(Long expedientDestiId) {
+		this.expedientDestiId = expedientDestiId;
+	}
+	public Long getExpedientOrigenId() {
+		return expedientOrigenId;
+	}
+	public Long getExpedientDestiId() {
+		return expedientDestiId;
 	}
 	public static Builder getBuilder(
 			ExecucioMassivaTipusDto tipus,

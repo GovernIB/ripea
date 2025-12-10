@@ -2063,7 +2063,7 @@ public class ContingutHelper {
 	public void arxiuCarpetaLogicaPropagarMoviment(
 			ContingutEntity origen,
 			String uuidExpedientDesti) {
-		Set<ContingutEntity> fills = origen.getFills();
+		List<ContingutEntity> fills = contingutRepository.findByPareAndEsborratAndOrdenat(origen, 0);
 		
 		for (ContingutEntity fill : fills) {
 			if (fill instanceof DocumentEntity) {

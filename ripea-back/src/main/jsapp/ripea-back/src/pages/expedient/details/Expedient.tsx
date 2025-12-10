@@ -136,6 +136,9 @@ const ExpedientAlert = (props:any) => {
         { expedient?.estat == "OBERT" && expedient?.hasEsborranys && user?.sessionScope?.isConvertirDefinitiuActiu &&
             <Alert severity="info">{t('page.expedient.alert.esborranys')}</Alert>
         }
+		{ expedient?.estat == "OBERT" && expedient?.pendentExecucioMassiva &&
+		    <Alert severity="info">{t('page.expedient.alert.moureTot.info')}</Alert>
+		}
         { expedient?.numAlert!=0 && (count === null || count !== 0) &&
             <Alert severity="warning"
                    action={

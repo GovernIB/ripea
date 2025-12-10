@@ -35,6 +35,7 @@ import es.caib.ripea.back.command.ContenidorCommand.Update;
 import es.caib.ripea.back.command.ExpedientAssignarCommand;
 import es.caib.ripea.back.command.ExpedientCommand;
 import es.caib.ripea.back.command.ExpedientFiltreCommand;
+import es.caib.ripea.back.command.ExpedientMoureCommand;
 import es.caib.ripea.back.command.ExpedientTancarCommand;
 import es.caib.ripea.back.helper.DatatablesHelper;
 import es.caib.ripea.back.helper.DatatablesHelper.DatatablesResponse;
@@ -2012,7 +2013,69 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		
 		return "redirect:/contingut/" + expedient.getId();
 	}	
-
+	
+	@RequestMapping(value = "/{expedientOrigenId}/moure", method = RequestMethod.GET)
+	public String moureForm(
+			HttpServletRequest request,
+			@PathVariable Long expedientOrigenId,
+			Model model) {
+		omplirModelPerMoure(request, model, expedientOrigenId);
+		return "expedientMoureForm";
+	}
+	
+	@RequestMapping(value = "/{expedientOrigenId}/moure", method = RequestMethod.POST)
+	public String moure(
+			HttpServletRequest request,
+			@PathVariable Long expedientOrigenId,
+			@Valid ExpedientMoureCommand command,
+			BindingResult bindingResult,
+			Model model) {
+		
+		organGestorService.actualitzarOrganCodi(organGestorService.getOrganCodiFromContingutId(expedientOrigenId));
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		
+		if (bindingResult.hasErrors()) {
+			omplirModelPerMoure(request, model, expedientOrigenId);
+			return "expedientMoureForm";
+		}
+		
+		expedientService.moure(
+				entitatActual.getId(), 
+				expedientOrigenId, 
+				command.getExpedientDestiId(), 
+				RolHelper.getRolActual(request));
+		
+		return getModalControllerReturnValueSuccess(
+				request,
+				"redirect:../../" + expedientOrigenId,
+				"contingut.controller.tot.mogut.ok");
+	}
+	
+	private void omplirModelPerMoure(HttpServletRequest request, Model model, Long expedientOrigenId) {
+		organGestorService.actualitzarOrganCodi(organGestorService.getOrganCodiFromContingutId(expedientOrigenId));
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		
+		ExpedientDto expedientOrigen = expedientService.findById(
+				entitatActual.getId(), 
+				expedientOrigenId, 
+				RolHelper.getRolActual(request));
+		
+		Long metaExpedientId = expedientOrigen.getMetaExpedient().getId();
+		List<ExpedientDto> expedientsMetaExpedient = expedientService.findByEntitatAndMetaExpedient(
+				entitatActual.getId(),
+				metaExpedientId, 
+				RolHelper.getRolActual(request),
+				EntitatHelper.getOrganGestorActualId(request));
+		
+		model.addAttribute("expedientOrigen", expedientOrigen);
+		model.addAttribute("expedients", expedientsMetaExpedient);
+		
+		ExpedientMoureCommand command = new ExpedientMoureCommand();
+		command.setExpedientOrigenId(expedientOrigenId);
+		
+		model.addAttribute(command);
+	}
+	
 	private void emplenarFiltreRelacionats(
 			HttpServletRequest request, 
 			Model model, 
