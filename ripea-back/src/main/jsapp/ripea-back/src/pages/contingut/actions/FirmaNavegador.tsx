@@ -6,7 +6,7 @@ import GridFormField from "../../../components/GridFormField.tsx";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 import {useUserSession} from "../../../components/Session.tsx";
 import Iframe from "../../../components/Iframe.tsx";
-import {useFirmaMassivaSession} from "../../../components/SseClient.tsx";
+import {useFirmaFinalitzadaSession} from "../../../components/SseClient.tsx";
 
 const FirmaNavegadorForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
@@ -34,7 +34,7 @@ const FirmaNavegador = (props: any) => {
 export const useFirmaNavegador = (refresh?: () => void) => {
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
-    const { onChange } = useFirmaMassivaSession();
+    const { onChange } = useFirmaFinalitzadaSession();
     const { value: user } = useUserSession();
 
     onChange((firma) => {
@@ -70,7 +70,7 @@ export const useFirmaNavegador = (refresh?: () => void) => {
 export const useFirmaNavegadorMassive = (refresh?: () => void) => {
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
-    const { onChange } = useFirmaMassivaSession();
+    const { onChange } = useFirmaFinalitzadaSession();
     const { value: user } = useUserSession();
 
     onChange((firma) => {

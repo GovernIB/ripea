@@ -5,7 +5,6 @@ import {useResourceApiContext} from "reactlib";
 // Keys for session storage
 const sseExpedientKey = 'sseExpedient';
 const fluxCreateKey = 'flux_creat';
-const firmaFinalitzadaKey = 'firma_finalitzada';
 const scanFinalitzatKey = 'scan_finalitzat';
 const sseConnectedKey = 'exp_connect';
 
@@ -33,7 +32,6 @@ const useTempSession = (key:string) => {
 }
 
 export const useFluxCreateSession = () => useTempSession(fluxCreateKey);
-export const useFirmaFinalitzadaSession = () => useTempSession(firmaFinalitzadaKey);
 export const useScanFinalitzatSession = () => useTempSession(scanFinalitzatKey);
 
 /**
@@ -81,9 +79,6 @@ export const SseExpedient: React.FC<any> = (props:any) => {
 
             // Gestionar l'esdeveniment de flux creat
             addEventListener(eventSource, fluxCreateKey)
-
-            // Gestionar l'esdeveniment de firma finalitzada
-            addEventListener(eventSource, firmaFinalitzadaKey)
 
 			// Gestionar l'esdeveniment de firma finalitzada
 			addEventListener(eventSource, scanFinalitzatKey)

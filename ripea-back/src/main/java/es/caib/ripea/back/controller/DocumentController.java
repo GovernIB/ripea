@@ -45,6 +45,7 @@ import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentPortafirmesDto;
 import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.FirmaResultatDto;
+import es.caib.ripea.service.intf.dto.FirmaResultatDto.FirmaSignatureStatus;
 import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentFirmaFluxTipusEnumDto;
@@ -53,10 +54,8 @@ import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.dto.VersioDocumentEnum;
 import es.caib.ripea.service.intf.dto.ViaFirmaDispositiuDto;
 import es.caib.ripea.service.intf.dto.ViaFirmaUsuariDto;
-import es.caib.ripea.service.intf.dto.FirmaResultatDto.FirmaSignatureStatus;
 import es.caib.ripea.service.intf.exception.ResponsableNoValidPortafirmesException;
 import es.caib.ripea.service.intf.model.sse.FirmaFinalitzadaEvent;
-import es.caib.ripea.service.intf.model.sse.FirmaNavegadorMassivaEvent;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.ContingutService;
 import es.caib.ripea.service.intf.service.DocumentEnviamentService;
@@ -516,8 +515,8 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 			
 			//Tancar totes les modals de firma en navegador del usuari que ha iniciat la firma
 			firmaResultat.setUsuari(dataSplri[2]);
-			FirmaNavegadorMassivaEvent ffe = new FirmaNavegadorMassivaEvent(firmaResultat);
-			eventService.notifyFirmaNavegadorMassivaFinalitzada(ffe);
+			FirmaFinalitzadaEvent ffe = new FirmaFinalitzadaEvent(null, firmaResultat);
+			eventService.notifyFirmaNavegadorFinalitzada(ffe);
 		}
 		if (resultat==null) {
 			resultat = "La firma no s'ha pogut finalitzar: "+firmaResultat.getMsg()+". Tancau la finestra i tornau-ho a provar passats uns minuts.";

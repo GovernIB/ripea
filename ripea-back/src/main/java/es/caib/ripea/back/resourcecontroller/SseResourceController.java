@@ -33,7 +33,6 @@ import es.caib.ripea.service.intf.model.sse.AnotacionsPendentsEvent;
 import es.caib.ripea.service.intf.model.sse.AvisosActiusEvent;
 import es.caib.ripea.service.intf.model.sse.CreacioFluxFinalitzatEvent;
 import es.caib.ripea.service.intf.model.sse.FirmaFinalitzadaEvent;
-import es.caib.ripea.service.intf.model.sse.FirmaNavegadorMassivaEvent;
 import es.caib.ripea.service.intf.model.sse.ScanFinalitzatEvent;
 import es.caib.ripea.service.intf.model.sse.TasquesPendentsEvent;
 import es.caib.ripea.service.intf.service.AplicacioService;
@@ -64,13 +63,13 @@ public class SseResourceController {
     private final Map<Long, List<SseEmitter>> clientsExpedient = new HashMap<>();
     private static final Logger logger = LoggerFactory.getLogger(SseResourceController.class);
     private enum UserEventType {
-        USER_CONNECT, AVISOS, NOTIFICACIONS, TASQUES, FIRMA_MASSIVA;
+        USER_CONNECT, AVISOS, NOTIFICACIONS, TASQUES, FIRMA_FINALITZADA;
         public String getEventName() { return name().toLowerCase(); }
         public static UserEventType fromEventName(String name) { return UserEventType.valueOf(name.toUpperCase()); }
     }
     
     private enum ExpedientEventType {
-        EXP_CONNECT, FLUX_CREAT, FIRMA_FINALITZADA, SCAN_FINALITZAT;
+        EXP_CONNECT, FLUX_CREAT, SCAN_FINALITZAT;
         public String getEventName() { return name().toLowerCase(); }
         public static ExpedientEventType fromEventName(String name) { return ExpedientEventType.valueOf(name.toUpperCase()); }
     }
@@ -89,7 +88,8 @@ public class SseResourceController {
 				FirmaResultatDto frd = new FirmaResultatDto(StatusEnumDto.OK, "Firma ok.");
 				frd.setUsuari("rip_user");
 				FirmaFinalitzadaEvent ffe = new FirmaFinalitzadaEvent(idExpedient, frd);
-				handleEventFirma(ffe);
+				eventService.notifyFirmaNavegadorFinalitzada(ffe);
+//				handleEventFirmaNavegadorFinalitzada(ffe);
 				break;
 			case "FLUX_CREAT":
 				PortafirmesFluxRespostaDto pfrd = new PortafirmesFluxRespostaDto();
@@ -228,8 +228,8 @@ public class SseResourceController {
     }
     
     @Async
-    @JmsListener(destination = "firmaNavegadorMassiva")
-    public void handleEventFirmaNavegadorMassiva(FirmaNavegadorMassivaEvent firmaMassiva) {
+    @JmsListener(destination = "firmaNavegadorFinalitzada")
+    public void handleEventFirmaNavegadorFinalitzada(FirmaFinalitzadaEvent firmaMassiva) {
     	if (firmaMassiva!=null && firmaMassiva.getFirmaResultat()!=null && firmaMassiva.getFirmaResultat().getUsuari()!=null) {
     		logger.debug("Actualització de EventFirmaNavegadorMassiva a usuaris...");
 			//Empram iterator per poder eliminar sense problemes elements del mapa mentre el recorrem
@@ -239,7 +239,7 @@ public class SseResourceController {
 				Map.Entry<String, SseEmitter> usuariClient = iterator.next();
             	if (firmaMassiva.getFirmaResultat().getUsuari().equals(usuariClient.getKey())) {
             		try {
-            			usuariClient.getValue().send(SseEmitter.event().name(UserEventType.FIRMA_MASSIVA.getEventName()).data(usuariClient.getKey()));
+            			usuariClient.getValue().send(SseEmitter.event().name(UserEventType.FIRMA_FINALITZADA.getEventName()).data(usuariClient.getKey()));
             			logger.debug("... comunicats EventFirmaNavegadorMassiva al usuari "+usuariClient.getKey()+" a travers del emissor "+usuariClient.getValue().hashCode()+".");
     	            } catch (Exception e) {
     	            	clientsUsuaris.remove(usuariClient.getKey());
@@ -337,38 +337,38 @@ public class SseResourceController {
     	}
     }
     
-    @Async
-    @JmsListener(destination = "firma")
-    public void handleEventFirma(FirmaFinalitzadaEvent firmaEvent) {
-    	if (firmaEvent!=null && firmaEvent.getExpedientId()!=null) {
-    		logger.debug("Actualització de FirmaFinalitzadaEvent a expedients...");
-			Iterator<Map.Entry<Long, List<SseEmitter>>> iterator = clientsExpedient.entrySet().iterator();
-			while (iterator.hasNext()) {
-				Map.Entry<Long, List<SseEmitter>> expedientClient = iterator.next();
-            	if (firmaEvent.getExpedientId().equals(expedientClient.getKey())) {
-            		List<SseEmitter> emisorsExpedient  = expedientClient.getValue();
-            		List<SseEmitter> emisoresAEliminar = new ArrayList<>();
-            		for (SseEmitter emisor : emisorsExpedient) {
-            			try {
-            				emisor.send(SseEmitter.event().name(ExpedientEventType.FIRMA_FINALITZADA.getEventName()).data(firmaEvent.getFirmaResultat()));
-            				logger.debug("... comunicats FirmaFinalitzadaEvent al expedient "+expedientClient.getKey()+" a travers del emissor "+emisor.hashCode()+".");
-        	            } catch (Exception e) {
-        	            	emisoresAEliminar.add(emisor); //Eliminam el emisor de la llista de emisors del expedient
-        	            	logger.debug("... eliminat emisor de FirmaFinalitzadaEvent "+emisor.hashCode()+" per error "+e.getMessage()+".");
-        	            }
-            		}
-            		emisorsExpedient.removeAll(emisoresAEliminar);
-            		//Si ja no queden emisors per l'expedient, eliminam l'entrada del mapa
-            		if (emisorsExpedient==null || emisorsExpedient.size()==0) {
-            			clientsExpedient.remove(expedientClient.getKey());
-            			logger.debug("... eliminat expedient "+expedientClient.getKey()+" de la llista de events per no tenir cap emisor actiu.");
-            		} else {
-            			clientsExpedient.put(expedientClient.getKey(), emisorsExpedient);
-            		}
-            	}
-	        }
-    	}
-    }
+//    @Async
+//    @JmsListener(destination = "firma")
+//    public void handleEventFirma(FirmaFinalitzadaEvent firmaEvent) {
+//    	if (firmaEvent!=null && firmaEvent.getExpedientId()!=null) {
+//    		logger.debug("Actualització de FirmaFinalitzadaEvent a expedients...");
+//			Iterator<Map.Entry<Long, List<SseEmitter>>> iterator = clientsExpedient.entrySet().iterator();
+//			while (iterator.hasNext()) {
+//				Map.Entry<Long, List<SseEmitter>> expedientClient = iterator.next();
+//            	if (firmaEvent.getExpedientId().equals(expedientClient.getKey())) {
+//            		List<SseEmitter> emisorsExpedient  = expedientClient.getValue();
+//            		List<SseEmitter> emisoresAEliminar = new ArrayList<>();
+//            		for (SseEmitter emisor : emisorsExpedient) {
+//            			try {
+//            				emisor.send(SseEmitter.event().name(ExpedientEventType.FIRMA_FINALITZADA.getEventName()).data(firmaEvent.getFirmaResultat()));
+//            				logger.debug("... comunicats FirmaFinalitzadaEvent al expedient "+expedientClient.getKey()+" a travers del emissor "+emisor.hashCode()+".");
+//        	            } catch (Exception e) {
+//        	            	emisoresAEliminar.add(emisor); //Eliminam el emisor de la llista de emisors del expedient
+//        	            	logger.debug("... eliminat emisor de FirmaFinalitzadaEvent "+emisor.hashCode()+" per error "+e.getMessage()+".");
+//        	            }
+//            		}
+//            		emisorsExpedient.removeAll(emisoresAEliminar);
+//            		//Si ja no queden emisors per l'expedient, eliminam l'entrada del mapa
+//            		if (emisorsExpedient==null || emisorsExpedient.size()==0) {
+//            			clientsExpedient.remove(expedientClient.getKey());
+//            			logger.debug("... eliminat expedient "+expedientClient.getKey()+" de la llista de events per no tenir cap emisor actiu.");
+//            		} else {
+//            			clientsExpedient.put(expedientClient.getKey(), emisorsExpedient);
+//            		}
+//            	}
+//	        }
+//    	}
+//    }
     
     @Async
     @JmsListener(destination = "scan")

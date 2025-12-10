@@ -25,7 +25,6 @@ import es.caib.ripea.service.intf.model.sse.AnotacionsPendentsEvent;
 import es.caib.ripea.service.intf.model.sse.AvisosActiusEvent;
 import es.caib.ripea.service.intf.model.sse.CreacioFluxFinalitzatEvent;
 import es.caib.ripea.service.intf.model.sse.FirmaFinalitzadaEvent;
-import es.caib.ripea.service.intf.model.sse.FirmaNavegadorMassivaEvent;
 import es.caib.ripea.service.intf.model.sse.ScanFinalitzatEvent;
 import es.caib.ripea.service.intf.model.sse.TasquesPendentsEvent;
 import lombok.extern.slf4j.Slf4j;
@@ -102,17 +101,9 @@ public class EventHelper {
     
     public void notifyFirmaNavegadorFinalitzada(FirmaFinalitzadaEvent firmaEvent) {
     	try {
-    		jmsTemplate.convertAndSend("firma", firmaEvent);
+    		jmsTemplate.convertAndSend("firmaNavegadorFinalitzada", firmaEvent);
     	} catch (Exception ex) {
-    		log.error("Error al notifyFirmaNavegadorFinalitzada a expedients suscrits", ex);
-    	}
-    }
-    
-    public void notifyFirmaNavegadorMassivaFinalitzada(FirmaNavegadorMassivaEvent firmaMassivaEvent) {
-    	try {
-    		jmsTemplate.convertAndSend("firmaNavegadorMassiva", firmaMassivaEvent);
-    	} catch (Exception ex) {
-    		log.error("Error al notifyFirmaNavegadorFinalitzada a expedients suscrits", ex);
+    		log.error("Error al notifyFirmaNavegadorFinalitzada a usuaris suscrits", ex);
     	}
     }
     
