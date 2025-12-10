@@ -9,6 +9,7 @@ import {EnviarPortafirmesFilter} from "./EnviarPortafirmesGrid.tsx";
 import {GridSortDirection} from "@mui/x-data-grid-pro";
 import {useActions} from "../../contingut/details/ContingutActions.tsx";
 import {useMassiveActions} from "../../contingut/details/ContingutMassiveActions.tsx";
+import {useGridApiRef as useMuiDatagridApiRef} from "@mui/x-data-grid-pro/hooks/utils/useGridApiRef";
 
 const namedQueries: string[] = ['MASSIU_PORTAFIRMES']
 const sortModel: any = [{field: 'createdDate', sort: 'desc'}]
@@ -40,9 +41,11 @@ const columns = [
 const MarcarDefinitiuGrid = () => {
     const {t} = useTranslation();
     const apiRef = useMuiDataGridApiRef();
+    const dataApiRef = useMuiDatagridApiRef();
     const [springFilter, setSpringFilter] = useState<string>();
 
     const refresh = () => {
+        dataApiRef?.current?.setRowSelectionModel?.([])
         apiRef?.current?.refresh?.();
     }
 
@@ -74,6 +77,7 @@ const MarcarDefinitiuGrid = () => {
 
             <StyledMuiGrid
                 apiRef={apiRef}
+                datagridApiRef={dataApiRef}
                 resourceName={"documentResource"}
                 columns={columns}
                 filter={springFilter}
