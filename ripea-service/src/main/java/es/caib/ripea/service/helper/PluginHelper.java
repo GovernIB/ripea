@@ -155,6 +155,8 @@ import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
 import es.caib.ripea.plugin.unitat.UnitatsOrganitzativesPlugin;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
 import es.caib.ripea.plugin.usuari.DadesUsuariPlugin;
+import es.caib.ripea.plugin.validacio.ValidaSignaturaResposta;
+import es.caib.ripea.plugin.validacio.ValidacioSignaturaPlugin;
 import es.caib.ripea.plugin.viafirma.ViaFirmaDispositiu;
 import es.caib.ripea.plugin.viafirma.ViaFirmaDocument;
 import es.caib.ripea.plugin.viafirma.ViaFirmaParams;
@@ -254,6 +256,7 @@ public class PluginHelper {
 	private Map<String, DadesExternesPlugin> dadesExternesPinbalPlugins = new HashMap<>();
 	private Map<String, IArxiuPluginWrapper> arxiuPlugins = new HashMap<>();
 	private Map<String, IValidateSignaturePluginWrapper> validaSignaturaPlugins = new HashMap<>();
+	private Map<String, ValidacioSignaturaPlugin> validaSignaturaAgilPlugins = new HashMap<>();
 	private Map<String, NotificacioPlugin> notificacioPlugins = new HashMap<>();
 	private Map<String, GestioDocumentalPlugin> gestioDocumentalPlugins = new HashMap<>();
 	private Map<String, FirmaServidorPlugin> firmaServidorPlugins = new HashMap<>();
@@ -4958,6 +4961,10 @@ public class PluginHelper {
 				firmes = Arrays.asList(firma);
 			}
 			
+			if (isValidacioFirmaAgilActiva()) {
+				validaSignaturaAgilObtenirFirmes(firmes, documentContingut);
+			}
+			
 			return firmes;
 			
 		} catch (Exception ex) {
@@ -5494,6 +5501,63 @@ public class PluginHelper {
 		}
 
 		documentEnviamentInteressatEntity.updateEnviamentCertificacioData(resposta.getCertificacioData());
+	}
+
+	private void validaSignaturaAgilObtenirFirmes(List<ArxiuFirmaDto> firmes, byte[] documentContingut) {
+		long t0 = System.currentTimeMillis();
+		Map<String, String> accioParams = new HashMap<String, String>();
+		if (documentContingut != null) {
+			accioParams.put("documentContingut", documentContingut.length + " bytes");
+		}
+		String accioDescripcio = "Obtenir informació de document firmat (firma àgil)";
+		ValidacioSignaturaPlugin validaSignaturaAgilPlugin = null;
+		try {
+			validaSignaturaAgilPlugin = getValidaSignaturaAgilPlugin();
+			ValidaSignaturaResposta resposta = validaSignaturaAgilPlugin.validaSignatura(documentContingut);
+			
+			if (resposta != null && resposta.isValida()) {
+			    if (!firmes.isEmpty()) {
+			        List<ArxiuFirmaDetallDto> detalls = firmes.get(0).getDetalls();
+	
+			        if (detalls == null) {
+			            detalls = new ArrayList<>();
+			            firmes.get(0).setDetalls(detalls);
+			        }
+	
+			        detalls.addAll(resposta.getFirmaDetalls());
+			    }
+			    
+			    integracioHelper.addAccioOk(
+						IntegracioHelper.INTCODI_FIRMAAGIL,
+						accioDescripcio,
+						validaSignaturaAgilPlugin!=null?validaSignaturaAgilPlugin.getEndpointURL():"N/D",
+						accioParams,
+						IntegracioAccioTipusEnumDto.ENVIAMENT,
+						System.currentTimeMillis() - t0);
+			} else if (resposta != null && !resposta.isValida()) {
+				String errorDescripcio = "Error validant la firma àgil del document: " + resposta.getErrMsg();
+				integracioHelper.addAccioError(
+						IntegracioHelper.INTCODI_FIRMAAGIL,
+						accioDescripcio,
+						validaSignaturaAgilPlugin!=null?validaSignaturaAgilPlugin.getEndpointURL():"N/D",
+						accioParams,
+						IntegracioAccioTipusEnumDto.ENVIAMENT,
+						System.currentTimeMillis() - t0,
+						errorDescripcio,
+						null);
+			}
+		} catch (Exception ex) {
+			String errorDescripcio = "Error validant la firma àgil del document: " + ex.getMessage();
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_FIRMAAGIL,
+					accioDescripcio,
+					validaSignaturaAgilPlugin!=null?validaSignaturaAgilPlugin.getEndpointURL():"N/D",
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
+		}
 	}
 
 	private DocumentDto certificacioToDocumentDto(
@@ -7829,6 +7893,74 @@ public class PluginHelper {
 		}
 	}
 
+	private ValidacioSignaturaPlugin getValidaSignaturaAgilPlugin() {
+		String entitatCodi = configHelper.getEntitatActualCodi();
+		if (entitatCodi == null) {
+			throw new RuntimeException("El codi d'entitat actual no pot ser nul");
+		}
+		String organCodi = configHelper.getOrganActualCodi();
+		return getValidaSignaturaAgilPlugin(entitatCodi, organCodi);
+	}
+	
+	private ValidacioSignaturaPlugin getValidaSignaturaAgilPlugin(String entitatCodi, String organCodi) {
+
+		ValidacioSignaturaPlugin plugin = null;
+		
+		if (organCodi != null) {
+			plugin = validaSignaturaAgilPlugins.get(entitatCodi + "." + organCodi);
+			if (plugin != null) { return plugin; }
+			
+			String pluginClassOrgan = configHelper.getConfig(PropertyConfig.VALIDA_FIRMA_AGIL_PLUGIN_CLASS, entitatCodi, organCodi);
+			
+			if (StringUtils.isNotEmpty(pluginClassOrgan)) {
+				
+				try {
+					Class<?> clazz = Class.forName(pluginClassOrgan);
+					Properties propiedades = configHelper.getGroupPropertiesOrganOrEntitatOrGeneral(
+							IntegracioHelper.INTCODI_FIRMAAGIL,
+							entitatCodi,
+							organCodi);
+					ValidacioSignaturaPlugin pluginInstance = (ValidacioSignaturaPlugin) clazz.getDeclaredConstructor(
+							String.class,
+							Properties.class).newInstance(ConfigDto.prefix + ".", propiedades);
+					validaSignaturaAgilPlugins.put(entitatCodi + "." + organCodi, pluginInstance);
+					return pluginInstance;
+				} catch (Exception ex) {
+					throw new SistemaExternException(IntegracioHelper.INTCODI_FIRMAAGIL,
+							"Error al crear la instància del plugin de validació de signatures àgils (" + organCodi + ")",
+							ex);
+				}
+			}
+		}
+
+		// ENTITAT/GENERAL PLUGIN
+		plugin = validaSignaturaAgilPlugins.get(
+				entitatCodi);
+		// loadPluginProperties("VALIDATE_SIGNATURE");
+		if (plugin != null) {
+			return plugin;
+		}
+		String pluginClass = getPropertyPluginValidaSignaturaAgil();
+		if (Strings.isNullOrEmpty(
+				pluginClass)) {
+			return null;
+		}
+		try {
+			Class<?> clazz = Class.forName(pluginClass);
+			Properties propiedades = configHelper.getGroupPropertiesEntitatOrGeneral(
+					IntegracioHelper.INTCODI_FIRMAAGIL,
+					entitatCodi);
+			ValidacioSignaturaPlugin pluginInstance = (ValidacioSignaturaPlugin) clazz.getDeclaredConstructor(
+					String.class,
+					Properties.class).newInstance(ConfigDto.prefix + ".", propiedades);
+			validaSignaturaAgilPlugins.put(entitatCodi, pluginInstance);
+			return pluginInstance;
+		} catch (Exception ex) {
+			throw new SistemaExternException(IntegracioHelper.INTCODI_FIRMAAGIL,
+					"Error al crear la instància del plugin de validació de signatures àgils", ex);
+		}
+	}
+	
 	private NotificacioPlugin getNotificacioPlugin() {
 		String entitatCodi = configHelper.getEntitatActualCodi();
 		if (entitatCodi == null) {
@@ -8486,7 +8618,15 @@ public class PluginHelper {
 	private boolean isObtenirDataFirmaFromAtributDocument() {
 		return configHelper.getAsBoolean(PropertyConfig.OBTENIR_DATA_FIRMA_FROM_ATRIBUT_DOC);
 	}
+	
+	private boolean isValidacioFirmaAgilActiva() {
+		return configHelper.getAsBoolean(PropertyConfig.VALIDA_FIRMA_AGIL_ACTIVA);
+	}
 
+	private String getPropertyPluginValidaSignaturaAgil() {
+		return configHelper.getConfig(PropertyConfig.VALIDA_FIRMA_AGIL_PLUGIN_CLASS);
+	}
+	
 	public void setArxiuPlugin(
 			String entitatCodi,
 			IArxiuPluginWrapper arxiuPlugin) {
@@ -8714,6 +8854,16 @@ public class PluginHelper {
 			} else {
 				return "No hi ha dades de cap anotació per consultar.";
 			}
+		} catch (Exception ex) {
+			return ex.getMessage();
+		}	
+	}
+	
+	public String validaFirmaAgilDiagnostic(DiagnosticFiltreDto filtre) {
+		try {
+			ValidacioSignaturaPlugin validaSignaturaPlugin = getValidaSignaturaAgilPlugin(filtre.getEntitatCodi(), filtre.getOrganCodi());
+			validaSignaturaPlugin.validaSignatura(llegirBytesResourceCore("/samples/blank.pdf"));
+			return null;
 		} catch (Exception ex) {
 			return ex.getMessage();
 		}	
