@@ -7,6 +7,7 @@ import FormActionDialog from "../../../components/FormActionDialog.tsx";
 import {useFirmaFinalitzadaSession} from "../../../components/SseExpedient.tsx";
 import {useUserSession} from "../../../components/Session.tsx";
 import Iframe from "../../../components/Iframe.tsx";
+import {useFirmaMassivaSession} from "../../../components/SseClient.tsx";
 
 const FirmaNavegadorForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
@@ -69,11 +70,12 @@ export const useFirmaNavegador = (refresh?: () => void) => {
 export const useFirmaNavegadorMassive = (refresh?: () => void) => {
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
-    const { onChange } = useFirmaFinalitzadaSession();
+    const { onChange } = useFirmaMassivaSession();
     const { value: user } = useUserSession();
 
     onChange((firma) => {
 		if (user?.codi==firma?.usuari) {
+            // TODO: revisar logica de firma masiva
 	        const severiry =
 	            firma?.status == 'OK' ? 'success'
 	                : firma?.status == 'WARNING' ? 'warning'

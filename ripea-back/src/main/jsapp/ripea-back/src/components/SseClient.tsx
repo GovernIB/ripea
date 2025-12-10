@@ -8,10 +8,30 @@ const sseClientKey = 'sseClient';
 const avisosKey = 'avisos';
 const notificacionsKey = 'notificacions';
 const tasquesKey = 'tasques';
+const sseFirmaMassivaKey = 'firma_massiva';
 const sseConnectedKey = 'user_connect';
 
 const useSseClientSession = () => useSessionList(sseClientKey)
+const useTempSession = (key:string) => {
+    const { get, remove } = useSseClientSession();
+    const onChangeRef = useRef<((newValue?:any) => void) | null>(null);
+    const value = get(key)
 
+    useEffect(() => {
+        if (value && !value?.processada){
+            onChangeRef?.current?.(value);
+            value.processada = true;
+        }
+    }, [value]);
+
+    return {
+        value,
+        onChange: (callback: (newValue?:any) => void) => {
+            onChangeRef.current = callback;
+        },
+        remove: () => remove(key),
+    };
+}
 /**
  * Hook per a utilitzar el client SSE
  * @returns Estat de la connexió SSE
@@ -32,6 +52,7 @@ export const useTasquesSession = () => {
     const { get } = useSseClientSession();
     return { value: get(tasquesKey) };
 }
+export const useFirmaMassivaSession = () => useTempSession(sseFirmaMassivaKey);
 
 /**
  * Component que gestiona la connexió SSE amb el servidor
