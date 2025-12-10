@@ -43,6 +43,7 @@ public class IntegracioHelper {
 	public static final String INTCODI_CALLBACK = "CALLBACK";
 	public static final String INTCODI_DADESEXT = "DADESEXT";
 	public static final String INTCODI_VALIDASIG = "VALIDATE_SIGNATURE";
+	public static final String INTCODI_FIRMAAGIL = "FIRMA_AGIL";
 	public static final String INTCODI_NOTIFICACIO = "NOTIB";
 	public static final String INTCODI_GESDOC = "GES_DOC";
 	public static final String INTCODI_FIRMASERV = "FIRMA_SERVIDOR";
@@ -77,6 +78,7 @@ public class IntegracioHelper {
 		integracions.add(novaIntegracio(INTCODI_VALIDASIG));
 		integracions.add(novaIntegracio(INTCODI_PROCEDIMENT));
 		integracions.add(novaIntegracio(INTCODI_COMANDA));
+		integracions.add(novaIntegracio(INTCODI_FIRMAAGIL));
 		return integracions;
 	}
 

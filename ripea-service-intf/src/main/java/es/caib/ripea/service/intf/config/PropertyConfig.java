@@ -315,6 +315,12 @@ public class PropertyConfig {
 	public static final String MAX_REINTENTS_INTERESSATS 		                    = "es.caib.ripea.segonpla.guardar.arxiu.max.reintents.interessats";
 	public static final String VALIDATE_SIGNATURE_ATTACHED   		                = "es.caib.ripea.firma.detectar.attached.validate.signature";
 
+	public static final String VALIDA_FIRMA_AGIL_ACTIVA								= "es.caib.ripea.plugin.validarsignatura.agil.activa";
+	public static final String VALIDA_FIRMA_AGIL_PLUGIN_CLASS						= "es.caib.ripea.plugin.validarsignatura.agil.class";
+	public static final String VALIDA_FIRMA_AGIL_PLUGIN_URL 						= "es.caib.ripea.plugins.validarsignatura.agil.api.evidenciesib.endpoint";
+	public static final String VALIDA_FIRMA_AGIL_PLUGIN_USERNAME 					= "es.caib.ripea.plugins.validarsignatura.agil.api.evidenciesib.username";
+	public static final String VALIDA_FIRMA_AGIL_PLUGIN_PASSWORD 					= "es.caib.ripea.plugins.validarsignatura.agil.api.evidenciesib.password";
+
 	public static final String PROP_FRONT_API_URL = PROPERTY_PREFIX_FRONT + "api.url";
 
 	public static final Map<String, String> REACT_APP_PROPS_MAP = Map.ofEntries(

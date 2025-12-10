@@ -11,6 +11,7 @@ import GridFormField from "../../../components/GridFormField.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import {useSession} from "../../../components/SessionStorageContext.tsx";
 import {GridSortDirection} from "@mui/x-data-grid-pro";
+import {useGridApiRef as useMuiDatagridApiRef} from "@mui/x-data-grid-pro/hooks/utils/useGridApiRef";
 
 const EnviarPortafirmesFilterForm = () => {
     const {data} = useFormContext();
@@ -83,11 +84,15 @@ const columns = [
 const EnviarPortafirmesGrid = () => {
     const {t} = useTranslation();
     const apiRef = useMuiDataGridApiRef();
+    const dataApiRef = useMuiDatagridApiRef();
     const [springFilter, setSpringFilter] = useState<string>();
 
     const sessionKey = "MASSIVE_PORTAFIRMES_FILTER";
     const { value: filterData } = useSession(sessionKey);
-    const haveRequirements = useMemo(() => !!filterData?.procediment && !!filterData?.metaDocument, [filterData?.procediment, filterData?.metaDocument])
+    const haveRequirements = useMemo(() => {
+        dataApiRef?.current?.setRowSelectionModel?.([])
+        return !!filterData?.procediment && !!filterData?.metaDocument
+    }, [filterData?.procediment, filterData?.metaDocument])
 
     const refresh = () => {
         apiRef?.current?.refresh?.();
@@ -102,8 +107,6 @@ const EnviarPortafirmesGrid = () => {
             icon: "mail",
             showInMenu: false,
             onClick: handleEviarPortafirmesShow,
-            // disabled: (row:any) => !row?.valid || row?.gesDocAdjuntId!=null,
-            // hidden : (row:any) => !entity?.potModificar || !row?.metaDocumentInfo?.firmaPortafirmesActiva || !isFirmaActiva(row),
         },
     ]
     const massiveActions = [
@@ -125,6 +128,7 @@ const EnviarPortafirmesGrid = () => {
 
             <StyledMuiGrid
                 apiRef={apiRef}
+                datagridApiRef={dataApiRef}
                 resourceName={"documentResource"}
                 columns={columns}
                 filter={springFilter}
