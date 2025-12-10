@@ -4,7 +4,6 @@ import {MuiFormDialogApi, useBaseAppContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import GridFormField from "../../../components/GridFormField.tsx";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
-import {useFirmaFinalitzadaSession} from "../../../components/SseExpedient.tsx";
 import {useUserSession} from "../../../components/Session.tsx";
 import Iframe from "../../../components/Iframe.tsx";
 import {useFirmaMassivaSession} from "../../../components/SseClient.tsx";
@@ -35,10 +34,11 @@ const FirmaNavegador = (props: any) => {
 export const useFirmaNavegador = (refresh?: () => void) => {
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
-    const { onChange } = useFirmaFinalitzadaSession();
+    const { onChange } = useFirmaMassivaSession();
     const { value: user } = useUserSession();
 
     onChange((firma) => {
+        debugger;
 		if (user?.codi==firma?.usuari) {
 	        const severiry =
 	            firma?.status == 'OK' ? 'success'
@@ -74,6 +74,7 @@ export const useFirmaNavegadorMassive = (refresh?: () => void) => {
     const { value: user } = useUserSession();
 
     onChange((firma) => {
+        debugger;
 		if (user?.codi==firma?.usuari) {
             // TODO: revisar logica de firma masiva
 	        const severiry =

@@ -303,12 +303,12 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
 			        if (mapaNamedQueries.containsKey("MASSIU_PORTAFIRMES")) {
 			        	String metaDocPortafirmes = DocumentResource.Fields.metaDocument + "." + MetaDocumentResource.Fields.firmaPortafirmesActiva;
-			        	filtrePfActiu = FilterBuilder.equal(metaDocPortafirmes, true); //ENVIAMENT A PF ACTIU
+			        	filtrePfActiu = FilterBuilder.equal(metaDocPortafirmes, true); //ENVIAMENT A PF ACTIU EN EL PROCEDIMENT
 				        String docAdjuntField = DocumentResource.Fields.gesDocAdjuntId;
 				        filtreNoAdjunt = FilterBuilder.isNull(docAdjuntField);
 			        } else if (mapaNamedQueries.containsKey("MASSIU_PASARELA")) {
 			        	String metaDocPortafirmes = DocumentResource.Fields.metaDocument + "." + MetaDocumentResource.Fields.firmaPassarelaActiva;
-			        	filtrePfActiu = FilterBuilder.equal(metaDocPortafirmes, true); //ENVIAMENT A PF ACTIU
+			        	filtrePfActiu = FilterBuilder.equal(metaDocPortafirmes, true); //ENVIAMENT A PF ACTIU EN EL PROCEDIMENT
 				        String docAdjuntField = DocumentResource.Fields.gesDocAdjuntId;
 				        filtreNoAdjunt = FilterBuilder.isNull(docAdjuntField);
 			        } else if (mapaNamedQueries.containsKey("MASSIU_PENDENT_ARXIU")) {

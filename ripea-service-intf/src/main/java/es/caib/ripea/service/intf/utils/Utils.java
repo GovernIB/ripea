@@ -553,6 +553,18 @@ public class Utils {
 		}
 	}
 	
+	public static Long[] csvToLongArray(String csv) {
+	    if (csv == null || csv.trim().isEmpty()) {
+	        return new Long[0]; // Devuelve array vacío si la entrada es nula o vacía
+	    }
+
+	    return Arrays.stream(csv.split(","))
+	                 .map(String::trim)          // elimina espacios
+	                 .filter(s -> !s.isEmpty())  // evita valores vacíos
+	                 .map(Long::valueOf)         // convierte a Long
+	                 .toArray(Long[]::new);      // crea el array
+	}
+	
     public static List<String> getIdsEnGruposMil(List<Long> ids) {
     	int maxSize = 1000;
     	if (ids!=null && ids.size()>0) {

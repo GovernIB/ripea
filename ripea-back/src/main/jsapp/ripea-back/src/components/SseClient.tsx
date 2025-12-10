@@ -108,6 +108,9 @@ export const SseClient: React.FC = () => {
 
               // Gestionar l'esdeveniment de tasques
               addEventListener(eventSource, tasquesKey)
+			  
+			  // Gestionar l'esdeveniment de finma massiva finalitzada
+			  addEventListener(eventSource, sseFirmaMassivaKey)
 
               // Gestionar errors
               eventSource.onerror = (error) => {

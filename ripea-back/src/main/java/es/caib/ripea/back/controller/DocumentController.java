@@ -506,17 +506,18 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 					}
 					resultat = "La firma ha finalitzat correctament. Podeu tancar la finestra.";
 					
-					if (!execMassiva) {
-						firmaResultat.setUsuari(dataSplri[2]);
-						FirmaFinalitzadaEvent ffe = new FirmaFinalitzadaEvent(expedientId, firmaResultat);
-						eventService.notifyFirmaNavegadorFinalitzada(ffe);
-					} else {
-						firmaResultat.setUsuari(dataSplri[2]);
-						FirmaNavegadorMassivaEvent ffe = new FirmaNavegadorMassivaEvent(firmaResultat);
-						eventService.notifyFirmaNavegadorMassivaFinalitzada(ffe);
-					}
+//					if (!execMassiva) {
+//						firmaResultat.setUsuari(dataSplri[2]);
+//						FirmaFinalitzadaEvent ffe = new FirmaFinalitzadaEvent(expedientId, firmaResultat);
+//						eventService.notifyFirmaNavegadorFinalitzada(ffe);
+//					}
 				}
 			}
+			
+			//Tancar totes les modals de firma en navegador del usuari que ha iniciat la firma
+			firmaResultat.setUsuari(dataSplri[2]);
+			FirmaNavegadorMassivaEvent ffe = new FirmaNavegadorMassivaEvent(firmaResultat);
+			eventService.notifyFirmaNavegadorMassivaFinalitzada(ffe);
 		}
 		if (resultat==null) {
 			resultat = "La firma no s'ha pogut finalitzar: "+firmaResultat.getMsg()+". Tancau la finestra i tornau-ho a provar passats uns minuts.";
