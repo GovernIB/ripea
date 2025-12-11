@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.MethodParameter;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -42,7 +41,6 @@ import es.caib.ripea.service.intf.base.model.UnpagedButSorted;
  * @author Limit Tecnologies
  */
 @Configuration
-@DependsOn("ejbClientConfig")
 public class WebMvcConfig implements WebMvcConfigurer {
 
 	@Autowired private MetaExpedientInterceptor metaExpedientInterceptor;
@@ -66,7 +64,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
 	@Autowired private AccesURLsInstruccioInterceptor accesURLsInstruccioInterceptor;
 	@Autowired private AccesFluxosFirmaUsuariInterceptor accesFluxosFirmaUsuariInterceptor;
 	@Autowired private AccesSuperInterceptor accesSuperInterceptor;
-	@Autowired private ResourceServiceLocatorInterceptor resourceServiceLocatorInterceptor;
 
 	public static final int MAX_UPLOAD_SIZE = 52428800;
 	
@@ -159,7 +156,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
 		// Per actualitzar entitat i organ gestor al threadLocal, no excloem /api/**
 		registry.addInterceptor(llistaEntitatsInterceptor).excludePathPatterns(excludedSessionPathPatterns);
 		// Per a configurar el ResourceServiceLocator al threadLocal, no excloem /api/**
-		registry.addInterceptor(resourceServiceLocatorInterceptor).excludePathPatterns(excludedPathPatterns);
 		registry.addInterceptor(llistaRolsInterceptor).excludePathPatterns(excludedPathPatterns);
 		registry.addInterceptor(modalInterceptor).excludePathPatterns(excludedPathPatterns);
 		registry.addInterceptor(nodecoInterceptor).excludePathPatterns(excludedPathPatterns);

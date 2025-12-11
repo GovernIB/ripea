@@ -18,12 +18,13 @@ import java.util.Map;
  */
 public class HalFormsUtil {
 
-	public static Map<String, Object> getNewResourceValues(Class<?> resourceClass) throws ResourceNotCreatedException {
+	public static Map<String, Object> getNewResourceValues(
+			Class<?> resourceClass,
+			ResourceServiceLocator resourceServiceLocator) throws ResourceNotCreatedException {
 		Map<String, Object> values = new HashMap<>();
-		ResourceServiceLocator resourceServiceLocator = ResourceServiceLocator.getInstance();
 		if (resourceServiceLocator != null) {
 			try {
-				MutableResourceService<?, ?> mutableResourceService = ResourceServiceLocator.getInstance().
+				MutableResourceService<?, ?> mutableResourceService = resourceServiceLocator.
 						getMutableEntityResourceServiceForResourceClass(resourceClass);
 				Object newInstance = mutableResourceService.newResourceInstance();
 				if (newInstance != null) {

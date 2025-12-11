@@ -16,6 +16,7 @@
 // S'ha llevat el filtre que evita que les Affordances amb el mètode GET apareguin als templates
 package org.springframework.hateoas.mediatype.hal.forms;
 
+import es.caib.ripea.back.base.util.ResourceServiceLocator;
 import org.springframework.context.MessageSourceResolvable;
 import org.springframework.hateoas.*;
 import org.springframework.hateoas.mediatype.MessageResolver;
@@ -36,10 +37,13 @@ public class CustomHalFormsTemplateBuilder extends HalFormsTemplateBuilder {
 	private final MessageResolver resolver;
 	private final CustomHalFormsPropertyFactory customFactory;
 
-	public CustomHalFormsTemplateBuilder(HalFormsConfiguration configuration, MessageResolver resolver) {
+	public CustomHalFormsTemplateBuilder(
+			HalFormsConfiguration configuration,
+			MessageResolver resolver,
+			ResourceServiceLocator resourceServiceLocator) {
 		super(configuration, resolver);
 		this.resolver = resolver;
-		this.customFactory = new CustomHalFormsPropertyFactory(configuration, resolver);
+		this.customFactory = new CustomHalFormsPropertyFactory(configuration, resolver, resourceServiceLocator);
 	}
 
 	/**

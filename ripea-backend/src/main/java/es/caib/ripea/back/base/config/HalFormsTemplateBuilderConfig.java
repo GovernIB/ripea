@@ -1,5 +1,6 @@
 package es.caib.ripea.back.base.config;
 
+import es.caib.ripea.back.base.util.ResourceServiceLocator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
@@ -23,6 +24,8 @@ public class HalFormsTemplateBuilderConfig {
 	private ApplicationContext applicationContext;
 	@Autowired(required = false)
 	private HalFormsConfiguration halFormsConfiguration;
+	@Autowired
+	private ResourceServiceLocator resourceServiceLocator;
 
 	@PostConstruct
 	public void customizeHalFormsTemplateBuilder() {
@@ -36,7 +39,8 @@ public class HalFormsTemplateBuilderConfig {
 			MessageResolver builderResolver = (MessageResolver) ReflectionUtils.getField(builderResolverField, halFormsTemplateBuilder);
 			CustomHalFormsTemplateBuilder customHalFormsTemplateBuilder = new CustomHalFormsTemplateBuilder(
 					halFormsConfiguration,
-					builderResolver);
+					builderResolver,
+					resourceServiceLocator);
 			ReflectionUtils.setField(builderField, halFormsTemplatePropertyWriter, customHalFormsTemplateBuilder);
 		}
 	}

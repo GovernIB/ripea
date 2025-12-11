@@ -20,6 +20,7 @@
 package org.springframework.hateoas.mediatype.hal.forms;
 
 import es.caib.ripea.back.base.util.HalFormsUtil;
+import es.caib.ripea.back.base.util.ResourceServiceLocator;
 import es.caib.ripea.service.intf.base.annotation.ResourceField;
 import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
@@ -56,6 +57,8 @@ public class CustomHalFormsPropertyFactory {
 
 	private final HalFormsConfiguration configuration;
 	private final MessageResolver resolver;
+	private final ResourceServiceLocator resourceServiceLocator;
+
 
 	/**
 	 * Creates a new {@link CustomHalFormsPropertyFactory} for the given {@link HalFormsConfiguration} and
@@ -64,13 +67,17 @@ public class CustomHalFormsPropertyFactory {
 	 * @param configuration must not be {@literal null}.
 	 * @param resolver must not be {@literal null}.
 	 */
-	public CustomHalFormsPropertyFactory(HalFormsConfiguration configuration, MessageResolver resolver) {
+	public CustomHalFormsPropertyFactory(
+			HalFormsConfiguration configuration,
+			MessageResolver resolver,
+			ResourceServiceLocator resourceServiceLocator) {
 
 		Assert.notNull(configuration, "HalFormsConfiguration must not be null!");
 		Assert.notNull(resolver, "MessageResolver must not be null!");
 
 		this.configuration = configuration;
 		this.resolver = resolver;
+		this.resourceServiceLocator = resourceServiceLocator;
 	}
 
 	/**
@@ -148,7 +155,7 @@ public class CustomHalFormsPropertyFactory {
 
 			HalFormsOptions options = optionsFactory.getOptions(payload, metadata);
 
-			Map<String, Object> values = HalFormsUtil.getNewResourceValues(payload.getType());
+			Map<String, Object> values = HalFormsUtil.getNewResourceValues(payload.getType(), resourceServiceLocator);
 
 			HalFormsProperty property = new HalFormsProperty()
 					.withName(metadata.getName())

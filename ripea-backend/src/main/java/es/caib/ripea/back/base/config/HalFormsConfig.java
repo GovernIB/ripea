@@ -3,6 +3,7 @@ package es.caib.ripea.back.base.config;
 import es.caib.ripea.back.base.controller.MutableResourceController;
 import es.caib.ripea.back.base.controller.ReadonlyResourceController;
 import es.caib.ripea.back.base.util.HalFormsUtil;
+import es.caib.ripea.back.base.util.ResourceServiceLocator;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceField;
@@ -50,6 +51,9 @@ public class HalFormsConfig {
 	private MessageSource messageSource;
 	@Autowired(required = false)
 	private Set<ReadonlyResourceController> resourceControllers;
+	@Autowired
+	private ResourceServiceLocator resourceServiceLocator;
+
 
 	@Bean
 	HalFormsConfiguration halFormsConfiguration() {
@@ -156,7 +160,9 @@ public class HalFormsConfig {
 						optionsResourceClass,
 						formField.getName(),
 						metadata -> {
-							Map<String, Object> newResourceValues = HalFormsUtil.getNewResourceValues(optionsResourceClass);
+							Map<String, Object> newResourceValues = HalFormsUtil.getNewResourceValues(
+									optionsResourceClass,
+									resourceServiceLocator);
 							return HalFormsOptions.
 									inline(getInlineOptionsEnumConstants(formField)).
 									withValueField("id").
@@ -193,7 +199,9 @@ public class HalFormsConfig {
 										artifact,
 										formField,
 										resourceControllerClasses);
-								Map<String, Object> newResourceValues = HalFormsUtil.getNewResourceValues(optionsResourceClass);
+								Map<String, Object> newResourceValues = HalFormsUtil.getNewResourceValues(
+										optionsResourceClass,
+										resourceServiceLocator);
 								return HalFormsOptions.
 										remote(repeatedRemoteOptionsLink).
 										withValueField("id").
@@ -227,7 +235,9 @@ public class HalFormsConfig {
 							metadata -> {
 								// Aquí hem de tornar a calcular el remoteOptionsLink perquè si no ho feim
 								// l'enllaç no inclou el prefix 'http://localhost:8080/webcontext'
-								Map<String, Object> newResourceValues = HalFormsUtil.getNewResourceValues(optionsResourceClass);
+								Map<String, Object> newResourceValues = HalFormsUtil.getNewResourceValues(
+										optionsResourceClass,
+										resourceServiceLocator);
 								Link repeatedRemoteOptionsLink = getRemoteFieldEnumOptionsLink(
 										resourceClass,
 										artifact,
