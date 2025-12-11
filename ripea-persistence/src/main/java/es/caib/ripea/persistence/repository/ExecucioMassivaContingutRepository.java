@@ -3,6 +3,8 @@ package es.caib.ripea.persistence.repository;
 import es.caib.ripea.persistence.entity.ExecucioMassivaContingutEntity;
 import es.caib.ripea.persistence.entity.ExecucioMassivaEntity;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaEstatDto;
+import es.caib.ripea.service.intf.dto.ExecucioMassivaTipusDto;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -33,11 +35,13 @@ public interface ExecucioMassivaContingutRepository extends JpaRepository<Execuc
 			"	and	e.dataFi is null ")
 	public Long findExecucioMassivaContingutId(@Param("ara") Date ara);
 
+	long countByElementIdInAndEstatAndExecucioMassivaTipusNot(List<Long> elementIds, ExecucioMassivaEstatDto estat, ExecucioMassivaTipusDto tipus);
+	
+	//------------------------------------------------------------------------//
+	
 	@Modifying
 	@Query(value = "delete from ipa_massiva_contingut where contingut_id = :contingutId ", nativeQuery = true)
 	int deleteExecucioMassivaFromContingutsOrfes(@Param("contingutId") Long contingutId);
-
-	long countByElementIdInAndEstat(List<Long> elementIds, ExecucioMassivaEstatDto estat);
 	
 	@Modifying
  	@Query(value = "UPDATE IPA_MASSIVA_CONTINGUT " +

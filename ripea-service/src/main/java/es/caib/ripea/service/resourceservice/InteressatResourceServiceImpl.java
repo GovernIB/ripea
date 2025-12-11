@@ -17,7 +17,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 import javax.validation.groups.Default;
@@ -87,7 +86,6 @@ import es.caib.ripea.service.intf.dto.PaisDto;
 import es.caib.ripea.service.intf.dto.ProvinciaDto;
 import es.caib.ripea.service.intf.dto.UnitatOrganitzativaDto;
 import es.caib.ripea.service.intf.model.ContingutResource;
-import es.caib.ripea.service.intf.model.DocumentResource;
 import es.caib.ripea.service.intf.model.EntitatResource;
 import es.caib.ripea.service.intf.model.ExpedientResource;
 import es.caib.ripea.service.intf.model.InteressatGrupResource;
@@ -128,6 +126,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
         register(InteressatResource.PERSPECTIVE_GRUPS_CODE, new GrupsPerspectiveApplicator());
         register(InteressatResource.PERSPECTIVE_REPRESENTANT_CODE, new RespresentantPerspectiveApplicator());
         register(InteressatResource.PERSPECTIVE_ADRESSA_CODE, new AdressaPerspectiveApplicator());
+        register(InteressatResource.PERSPECTIVE_PROCEDIMENT_CODE, new ProcedimentPerspectiveApplicator());
         register(InteressatResource.ACTION_EXPORTAR_CODE, new ExportarReportGenerator());
         register(InteressatResource.ACTION_IMPORTAR_CODE, new ImportarInteressatsActionExecutor());
         register(InteressatResource.ACTION_GUARDAR_ARXIU, new GuardarArxiuActionExecutor());
@@ -446,6 +445,15 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
         }
     }
 
+    private class ProcedimentPerspectiveApplicator implements PerspectiveApplicator<InteressatResourceEntity, InteressatResource> {
+		@Override
+		public void applySingle(String code, InteressatResourceEntity entity, InteressatResource resource) throws PerspectiveApplicationException {
+			resource.setMetaExpedient(ResourceReference.toResourceReference(
+					entity.getExpedient().getMetaExpedient().getId(),
+					entity.getExpedient().getMetaExpedient().getNom()));
+		}
+    }
+    
     private class AdressaPerspectiveApplicator implements PerspectiveApplicator<InteressatResourceEntity, InteressatResource> {
 
         private void carregaDadesAdressa(InteressatResourceEntity entity, InteressatResource resource) {
@@ -495,7 +503,6 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
                 resource.setGrups(Collections.emptyList());
             }
         }
-
     }
 
     private class NumDocOnchangeLogicProcessor implements OnChangeLogicProcessor<InteressatResource> {
@@ -740,8 +747,6 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
         @Override
         public Serializable exec(String code, InteressatResourceEntity entity, MassiveAction params) throws ActionExecutionException {
         	
-        	String intIdsStr = entity.getId()!=null?entity.getId().toString():Utils.getIdsSeparatsComa(params.getIds());
-        	
         	try {
         		
 				if (params.isMassivo()) {
@@ -756,16 +761,24 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
 					execucioMassivaHelper.saveExecucioMassiva(entitatEntity, execMassDto, elementsMassiva, ElementTipusEnumDto.INTERESSAT);	        		
 	        		
 	        	} else {
-        		
+	        		
+	        		entity = interessatResourceRepository.findById(params.getIds().get(0)).get();
 	                Exception errorGuardant = expedientInteressatHelper.guardarInteressatsArxiu(entity.getExpedient().getId());
 	                if (errorGuardant != null) {
-	                	excepcioLogHelper.addExcepcio("/interessat/GuardarArxiuActionExecutor", errorGuardant, intIdsStr, "massiu="+params.isMassivo());
+	                	excepcioLogHelper.addExcepcio(
+	                			"/interessat/GuardarArxiuActionExecutor",
+	                			errorGuardant,
+	                			Utils.getIdsSeparatsComa(params.getIds()),
+	                			"massiu="+params.isMassivo());
 	                    throw new ActionExecutionException(getResourceClass(), entity.getId(), code, errorGuardant);
 	                }
-
 	        	}
             } catch (Exception e) {
-            	excepcioLogHelper.addExcepcio("/interessat/GuardarArxiuActionExecutor", e, intIdsStr, "massiu="+params.isMassivo());
+            	excepcioLogHelper.addExcepcio(
+            			"/interessat/GuardarArxiuActionExecutor",
+            			e,
+            			Utils.getIdsSeparatsComa(params.getIds()),
+            			"massiu="+params.isMassivo());
                 String message = messageHelper.getMessage("message.common.action.error") + ": " + e.getMessage();
                 throw new ActionExecutionException(getResourceClass(), entity.getId(), code, message);
             }

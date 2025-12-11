@@ -18,7 +18,7 @@ const CanviEstatFilterFrom = (props:any) => {
     const { findExpedientByName = false } = props;
     const {data} = useFormContext();
 
-    const expedientFilter = builder.and(builder.eq('metaExpedient.id', data?.procediment?.id));
+    const expedientFilter = builder.and(builder.eq('metaExpedient.id', data?.metaExpedient?.id));
 
     return <>
         <GridFormField xs={3} name="procediment"/>
@@ -29,7 +29,7 @@ const CanviEstatFilterFrom = (props:any) => {
 
         <GridFormField xs={3} name="dataCreacioInici" type={"date"}/>
         <GridFormField xs={3} name="dataCreacioFi" type={"date"}/>
-        <GridFormField xs={3} name="estat" requestParams={{metaExpedientId: data?.procediment?.id, withoutTancar: true}}/>
+        <GridFormField xs={3} name="estat" requestParams={{metaExpedientId: data?.metaExpedient?.id, withoutTancar: true}}/>
         <GridFormField xs={3} name="prioritat"/>
         <Grid item xs={3.6}/>
     </>
@@ -37,7 +37,7 @@ const CanviEstatFilterFrom = (props:any) => {
 
 const springFilterBuilder = (data: any) => {
     return builder.and(
-        builder.eq("metaExpedient.id", data?.procediment?.id),
+        builder.eq("metaExpedient.id", data?.metaExpedient?.id),
         builder.eq("id", data?.expedient?.id),
         builder.like("nom", data?.nom),
         builder.betweenDates("createdDate", data?.dataCreacioInici, data?.dataCreacioFi),
@@ -110,7 +110,7 @@ export const CanviEstatMuiGrid = (props:any) => {
     />
 }
 
-const perspectives:any = ['ESTAT']
+const perspectives:any = ['ESTAT', 'AUDITORIA']
 const CanviEstatGrid = () => {
     const {t} = useTranslation();
     const apiRef = useMuiDataGridApiRef();

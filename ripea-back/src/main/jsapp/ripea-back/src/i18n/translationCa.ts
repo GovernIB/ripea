@@ -669,7 +669,7 @@ const translationCa = {
                 validation: "Aquest expedient té errors de validació",
                 esborranys: "Hi ha documents en estat esborrany (B) que s’han de passar a definitius o eliminar-se si es vol tancar l’expedient.\nAquesta acció farà que els documents formin part de l’expedient definitivament i no es podran eliminar.",
                 borradors: "Aquest expedient conté esborranys que s’eliminaran en tancar-lo. Pot marcar-los per signar-los amb signatura de servidor i evitar-ne l’eliminació. Les firmes no vàlides seran eliminades i es tornaran a signar.",
-                notificacio: "Aquest expedient conté notificacions caducades no finalitzades. Es provarà d’actualitzar-ne l’estat. Les noves dades es desaran a Helium, però no a l’arxiu digital.",
+                notificacio: "Aquest expedient conté notificacions caducades no finalitzades. Es provarà d’actualitzar-ne l’estat. Les noves dades es desaran a RIPEA, però no a l’arxiu digital.",
                 documents: "Aquest expedient conté documents d’anotacions amb errors. Es provaran de reprocesar i, si no és possible, es guardarà una còpia sense signatures originals a l’arxiu digital.",
                 errorEnviament: "Aquest expedient té enviaments amb errors",
                 errorNotificacio: "Aquest expedient té notificacions amb errors",

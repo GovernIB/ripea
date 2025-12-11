@@ -77,23 +77,24 @@ public class SseResourceController {
     /**
      * T E S T I N G
      */
-    @GetMapping("/test/{eventType}/{idExpedient}/send")
+    @GetMapping("/test/{eventType}/{idExpedient}/{userCode}/send")
     @ResponseBody
     public ResponseEntity<String> stream(
     		@PathVariable String eventType,
-    		@PathVariable Long idExpedient) {
+    		@PathVariable Long idExpedient,
+    		@PathVariable String userCode) {
     	if (!"PRO".equalsIgnoreCase(aplicacioService.propertyFindByNom(PropertyConfig.ENTORN))) {
 	    	switch (eventType) {
 			case "FIRMA_FINALITZADA":
 				FirmaResultatDto frd = new FirmaResultatDto(StatusEnumDto.OK, "Firma ok.");
-				frd.setUsuari("rip_user");
-				FirmaFinalitzadaEvent ffe = new FirmaFinalitzadaEvent(idExpedient, frd);
+				frd.setUsuari(userCode);
+				FirmaFinalitzadaEvent ffe = new FirmaFinalitzadaEvent(0l, frd);
 				eventService.notifyFirmaNavegadorFinalitzada(ffe);
 //				handleEventFirmaNavegadorFinalitzada(ffe);
 				break;
 			case "FLUX_CREAT":
 				PortafirmesFluxRespostaDto pfrd = new PortafirmesFluxRespostaDto();
-				pfrd.setUsuari("rip_user");
+				pfrd.setUsuari(userCode);
 				pfrd.setFluxId("flux1234ID");
 				pfrd.setDescripcio("Flux fake 1234");
 				CreacioFluxFinalitzatEvent cffe = new CreacioFluxFinalitzatEvent(idExpedient, pfrd);
@@ -102,7 +103,7 @@ public class SseResourceController {
 			case "SCAN_FINALITZAT":
 				DigitalitzacioResultatDto drd = new DigitalitzacioResultatDto();
 				drd.setNomDocument("Document buid");
-				drd.setUsuari("rip_user");
+				drd.setUsuari(userCode);
 				ScanFinalitzatEvent sfe = new ScanFinalitzatEvent(idExpedient, drd);
 				handleEventScan(sfe);
 			default:

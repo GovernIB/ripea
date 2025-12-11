@@ -1026,6 +1026,7 @@ public class ExpedientInteressatHelper {
 			
 			contingutHelper.arxiuPropagarModificacio(expedient);
 			
+			
 			updateArxiuIntentInteressats(
 					expedient,
 					interessat,

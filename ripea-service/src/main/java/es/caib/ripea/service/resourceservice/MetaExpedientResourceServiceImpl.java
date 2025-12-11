@@ -16,7 +16,6 @@ import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.MetaExpedientHelper;
-import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.service.intf.model.EntitatResource;
 import es.caib.ripea.service.intf.model.MetaExpedientResource;
@@ -44,14 +43,14 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
     protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
 
         String entitatActualCodi = configHelper.getEntitatActualCodi();
-        String organActualCodi	 = configHelper.getOrganActualCodi();
+//        String organActualCodi	 = configHelper.getOrganActualCodi();
         String rolActual		 = configHelper.getRolActual();
-        String organGestorFiltre = Utils.getValorCampFiltre("organGestor.id", currentSpringFilter);
+//        String organGestorFiltre = Utils.getValorCampFiltre("organGestor.id", currentSpringFilter);
         
 		boolean isAdmin = "IPA_ADMIN".equals(rolActual);
 		boolean isAdminOrgan = "IPA_ORGAN_ADMIN".equals(rolActual);
-		boolean isDissenyador = "IPA_DISSENY".equals(rolActual);
-		boolean usuariFiltreOrgan = isAdminOrgan || isDissenyador;
+//		boolean isDissenyador = "IPA_DISSENY".equals(rolActual);
+//		boolean usuariFiltreOrgan = isAdminOrgan || isDissenyador;
         
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true,false);
     	Map<String, String> mapaNamedQueries =  Utils.namedQueriesToMap(namedQueries);
@@ -65,12 +64,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 	                		entitatActualCodi != null?entitatActualCodi:"................................................................................")
 	        );
 		}
-        
-//        if (organActualCodi!=null && usuariFiltreOrgan) {
-//        	Filter filtreOrganGestor = FilterBuilder.equal(MetaExpedientResource.Fields.organGestor+"."+OrganGestorResource.Fields.codi, organActualCodi);
-//        	filtreBase = FilterBuilder.and(filtreBase, filtreOrganGestor);
-//        }
-        
+
         List<Long> procsPermesosIds = new ArrayList<Long>();
         List<MetaExpedientEntity> metaExpPermesos = null;
         Filter revisioActiva = null; //Dependrà de la propietat PropertyConfig.METAEXPEDIENT_REVISIO_ACTIVA

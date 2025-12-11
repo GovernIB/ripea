@@ -51,6 +51,9 @@ import lombok.experimental.FieldNameConstants;
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = InteressatResource.PERSPECTIVE_ADRESSA_CODE),
                 @ResourceConfigArtifact(
+                        type = ResourceArtifactType.PERSPECTIVE,
+                        code = InteressatResource.PERSPECTIVE_PROCEDIMENT_CODE),                
+                @ResourceConfigArtifact(
                         type = ResourceArtifactType.REPORT,
                         code = InteressatResource.ACTION_EXPORTAR_CODE,
                         formClass = InteressatResource.ExportInteressatsFormAction.class),
@@ -61,7 +64,7 @@ import lombok.experimental.FieldNameConstants;
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = InteressatResource.ACTION_GUARDAR_ARXIU,
-                        requiresId = true),
+                        formClass = NodeResource.MassiveAction.class),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = InteressatResource.ACTION_DELETE_INTERESSAT,
@@ -82,6 +85,7 @@ public class InteressatResource extends BaseAuditableResource<Long> {
 	public static final String PERSPECTIVE_GRUPS_CODE = "GRUPS";
     public static final String PERSPECTIVE_REPRESENTANT_CODE = "REPRESENTANT";
     public static final String PERSPECTIVE_ADRESSA_CODE = "ADRESSA";
+    public static final String PERSPECTIVE_PROCEDIMENT_CODE = "PROCEDIMENT";
     public static final String ACTION_EXPORTAR_CODE  = "EXPORTAR";
     public static final String ACTION_IMPORTAR_CODE  = "IMPORTAR";
     public static final String ACTION_GUARDAR_ARXIU  = "GUARDAR_ARXIU";
@@ -188,6 +192,7 @@ public class InteressatResource extends BaseAuditableResource<Long> {
     @Transient private String paisNom;
     @Transient private String provinciaNom;
     @Transient private String municipiNom;
+    @Transient private ResourceReference<MetaExpedientResource, Long> metaExpedient;
     
     protected List<ResourceReference<InteressatGrupResource, Long>> grups;
     

@@ -1,19 +1,13 @@
-/**
- * 
- */
 package es.caib.ripea.service.intf.dto;
 
 import lombok.Getter;
 import lombok.Setter;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
 
 @Getter
 @Setter
 public class ExecucioMassivaContingutDto extends AuditoriaDto {
-
 
 	private Date dataInici;
 	private Date dataFi;
@@ -26,10 +20,7 @@ public class ExecucioMassivaContingutDto extends AuditoriaDto {
 	private ElementTipusEnumDto elementTipus;
 	private Throwable throwable;
 	
-	
-	
-	public ExecucioMassivaContingutDto() {
-	}
+	public ExecucioMassivaContingutDto() {}
 
 	public ExecucioMassivaContingutDto(
 			Date dataInici,
@@ -54,14 +45,9 @@ public class ExecucioMassivaContingutDto extends AuditoriaDto {
 		this.estat = estat;
 	}
 	
-	
-
-	
 	public String getDataFiAmbFormat() {
 		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 		return dataFi != null ? sdf.format(dataFi) : "";
 	}
-
-
 
 }

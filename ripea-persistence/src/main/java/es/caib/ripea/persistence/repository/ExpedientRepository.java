@@ -626,6 +626,8 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"		or document.estat = es.caib.ripea.service.intf.dto.DocumentEstatEnumDto.FIRMA_PENDENT_VIAFIRMA " +
 			"		or document.estat = es.caib.ripea.service.intf.dto.DocumentEstatEnumDto.FIRMA_PARCIAL)) = 0 " +
 			"and (select count(document) from DocumentEntity document where document.expedient = e and document.esborrat = 0) > 0 " +   // at least one document no esborrat
+			"and (select count(document) from DocumentEntity document where " + // no documents sense metadocument
+			"	document.expedient = e and document.metaDocument is null) = 0 " +			
 			"and (select " +
 			"	     	count(metaDada) " +
 			"	  from " +

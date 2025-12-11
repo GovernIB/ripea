@@ -96,6 +96,22 @@ export const useActions = (refresh?: () => void) => {
     const agafar= (id:any, row:any): void => action(id, 'AGAFAR', t('page.expedient.action.agafar.ok', {user: user?.nom, expedient: row?.nom}));
     const retornar= (id:any, row:any) :void => action(id, 'RETORNAR', t('page.expedient.action.retornar.ok', {user: row?.createdBy, expedient: row?.nom}));
 	const alliberar= (id:any, row:any) :void => action(id, 'ALLIBERAR', t('page.expedient.action.lliberar.ok', {expedient: row?.nom}));
+    const guardarArxiu= (id:any): void => {
+        apiAction(undefined, {code: 'GUARDAR_ARXIU', data:{ ids: [id], massivo: false }})
+            .then((result) => {
+                refresh?.()
+                const success = result.filter((r:any)=>r?.codi=='OK')
+                const info = result.filter((r:any)=>r?.codi=='INFO')
+                const error = result.filter((r:any)=>r?.codi=='ERROR')
+
+                success?.length>0 && temporalMessageShow(null, success.map((r:any)=><p>{r?.valor}</p>), 'success');
+                info?.length>0 && temporalMessageShow(null, info.map((r:any)=><p>{r?.valor}</p>), 'info');
+                error?.length>0 && temporalMessageShow(null, error.map((r:any)=><p>{r?.valor}</p>), 'error');
+            })
+            .catch((error) => {
+                temporalMessageShow(null, error?.message, 'error');
+            });
+    }    
     const syncArxiu= (id:any): void => {
         apiAction(undefined, {code: 'SYNC_ARXIU', data:{ ids: [id], massivo: false }})
             .then((result) => {
@@ -194,6 +210,7 @@ export const useActions = (refresh?: () => void) => {
         exportEni,
         exportInside,
         syncArxiu,
+        guardarArxiu,
         eliminarRelacio,
         excelInteressats,
         importarExpedient,

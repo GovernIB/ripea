@@ -85,7 +85,7 @@ public class UsuariResourceServiceImpl extends BaseMutableResourceService<Usuari
     				for (UsuariDto userExt: usuarisAddicionals) {
     					UsuariResource ur = new UsuariResource();
     					ur.setNif(userExt.getNif());
-    					ur.setNom(userExt.getNom());
+    					ur.setNom(userExt.getNom() + "("+userExt.getCodi()+")");
     					ur.setCodi(userExt.getCodi());
     					usuarisResources.add(ur);
     				}

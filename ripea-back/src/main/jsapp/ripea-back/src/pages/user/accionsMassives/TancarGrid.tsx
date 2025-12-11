@@ -5,7 +5,7 @@ import { CardPage } from "../../../components/CardData.tsx";
 import {CanviEstatFilter, CanviEstatMuiGrid} from "./CanviEstatGrid.tsx";
 import useTancar, {useTancarMassive} from "../../expedient/actions/Tancar.tsx";
 
-const namedQueries: string[] = ['MASSIVE_ACTION_QUERY']
+const namedQueries: string[] = ['MASSIVE_ACTION_QUERY', 'MASSIVE_ACTION_TANCAR']
 const perspectives:any = ['ESTAT']
 const TancarGrid = () => {
     const {t} = useTranslation();

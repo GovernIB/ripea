@@ -8,9 +8,6 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
-import es.caib.ripea.persistence.entity.ExpedientPeticioEntity;
-import es.caib.ripea.persistence.entity.resourceentity.ExpedientPeticioResourceEntity;
-import es.caib.ripea.service.intf.model.*;
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +17,7 @@ import com.turkraft.springfilter.parser.Filter;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
+import es.caib.ripea.persistence.entity.resourceentity.ExpedientPeticioResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.RegistreAnnexResourceEntity;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.persistence.repository.RegistreAnnexRepository;
@@ -39,7 +37,12 @@ import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
 import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.base.model.ReportFileType;
 import es.caib.ripea.service.intf.dto.CodiValorDto;
+import es.caib.ripea.service.intf.model.ContingutResource;
+import es.caib.ripea.service.intf.model.EntitatResource;
+import es.caib.ripea.service.intf.model.ExpedientResource;
 import es.caib.ripea.service.intf.model.NodeResource.MassiveAction;
+import es.caib.ripea.service.intf.model.RegistreAnnexResource;
+import es.caib.ripea.service.intf.model.RegistreResource;
 import es.caib.ripea.service.intf.resourceservice.RegistreAnnexResourceService;
 import es.caib.ripea.service.intf.utils.Utils;
 import lombok.RequiredArgsConstructor;
@@ -108,18 +111,25 @@ public class RegistreAnnexResourceServiceImpl extends BaseMutableResourceService
 					true, null //filtre expedient
 			);
         	
-        	List<String> permesosClausulesIn = Utils.getIdsEnGruposMil(idsAnexesPendentsProcessar);
-        	if (permesosClausulesIn!=null) {
-    	        for (String aux: permesosClausulesIn) {
-    		        if (aux != null && !aux.isEmpty()) {
-    		        	filtreIdsPermesos = FilterBuilder.or(filtreIdsPermesos, Filter.parse("id IN (" + aux + ")"));
-    		        }
-    	        }
-        	}
+    		if (idsAnexesPendentsProcessar.isEmpty()) {
+    			return FilterBuilder.equal("id", 0).generate();
+    		} else {
+    		
+		    	List<String> permesosClausulesIn = Utils.getIdsEnGruposMil(idsAnexesPendentsProcessar);
+		    	if (permesosClausulesIn!=null) {
+			        for (String aux: permesosClausulesIn) {
+				        if (aux != null && !aux.isEmpty()) {
+				        	filtreIdsPermesos = FilterBuilder.or(filtreIdsPermesos, Filter.parse("id IN (" + aux + ")"));
+				        }
+			        }
+		    	}
+		    	
+		    	Filter filtreResultat = FilterBuilder.and(filtreBase, filtreIdsPermesos);
+		    	return filtreResultat.generate();
+    		}
     	}
     	
-    	Filter filtreResultat = FilterBuilder.and(filtreBase, filtreIdsPermesos);
-    	return filtreResultat.generate();
+    	return filtreBase.generate();
     }
     
     private class AnnexFirmesPerspectiveApplicator implements PerspectiveApplicator<RegistreAnnexResourceEntity, RegistreAnnexResource> {
@@ -175,7 +185,6 @@ public class RegistreAnnexResourceServiceImpl extends BaseMutableResourceService
 
 		@Override
 		public Serializable exec(String code, RegistreAnnexResourceEntity entity, MassiveAction params) throws ActionExecutionException {
-			String annexIdsStr = entity.getId()!=null?entity.getId().toString():Utils.getIdsSeparatsComa(params.getIds());
 			try {
 				List<CodiValorDto> resultat = new ArrayList<>();
 	        	
@@ -186,9 +195,10 @@ public class RegistreAnnexResourceServiceImpl extends BaseMutableResourceService
 				
 	        	return (Serializable)resultat;
 			} catch (Exception e) {
-				excepcioLogHelper.addExcepcio("/annexPeticio/ReintentarArxiuActionExecutor", e, annexIdsStr, "massiu="+params.isMassivo());
+				String ids = Utils.getIdsSeparatsComa(params.getIds());
+				excepcioLogHelper.addExcepcio("/annexPeticio/ReintentarArxiuActionExecutor",e,ids,"massiu="+params.isMassivo());
 				String message = messageHelper.getMessage("message.common.action.error")+": "+e.getMessage();
-				throw new ActionExecutionException(getResourceClass(), entity==null?null:entity.getId(), code, message);
+				throw new ActionExecutionException(getResourceClass(), ids, code, message);
 			}
 		}
     }

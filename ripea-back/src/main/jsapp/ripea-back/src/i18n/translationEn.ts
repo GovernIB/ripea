@@ -669,7 +669,7 @@ const translationEn = {
                 validation: "This case file has validation errors",
                 esborranys: "There are draft documents (B) that must be finalized or removed in order to close the case file.\nThis action will finalize the documents and they can no longer be deleted.",
                 borradors: "This case file contains drafts that will be deleted when closed. You can mark them to be signed with server signature before closing to avoid deletion. Invalid signatures will be removed and re-signed.",
-                notificacio: "This case file contains expired, uncompleted notifications. An attempt will be made to update their status. Any new information will be saved in Helium, not in the Digital Archive.",
+                notificacio: "This case file contains expired, uncompleted notifications. An attempt will be made to update their status. Any new information will be saved in RIPEA, not in the Digital Archive.",
                 documents: "This case file contains annex documents with errors. They will be reprocessed if possible. Otherwise, a copy will be saved in the Digital Archive without original signatures (both original and copy will remain accessible).",
                 errorEnviament: "This case file has send errors",
                 errorNotificacio: "This case file has notification errors",

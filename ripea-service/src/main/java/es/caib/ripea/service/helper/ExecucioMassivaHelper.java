@@ -304,6 +304,8 @@ public class ExecucioMassivaHelper {
 					execElement.getEstat(),
 					execElement.getDataFi());
 			
+			emc.setError(execElement.getError());
+			
 			Throwable excepcioRetorn = ExceptionHelper.getRootCauseOrItself(execElement.getThrowable());
 			if (excepcioRetorn != null) {
 				String error = ExecucioMassivaHelper.getExceptionString(
@@ -597,8 +599,9 @@ public class ExecucioMassivaHelper {
 					contingut.getEntitat().getId(),
 					emc.getElementId(),
 					emc.getExecucioMassiva().getMotiu(),
-					Utils.csvToLongArray(emc.getElementNom()),
+					Utils.csvToLongArray(emc.getError()),
 					false);
+			emc.setError(null); //Netejam error, que haviem emprat momentaniament per guardar els IDs dels documents.
 		} catch (Exception ex) {
 			logger.error("CONTINGUT MASSIU:" + emc.getId() + ". No s'ha pogut tancar l'expedient", ex);
 			exc = ex;

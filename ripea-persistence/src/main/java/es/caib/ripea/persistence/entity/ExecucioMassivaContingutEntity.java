@@ -73,7 +73,9 @@ public class ExecucioMassivaContingutEntity extends RipeaAuditable<Long> {
 	public String getElementNom() {
 		return elementNom;
 	}
-
+	public void setError(String error) {
+		this.error = error;
+	}
 	public void updateError(
 			Date ara,
 			String error) {

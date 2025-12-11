@@ -142,7 +142,11 @@ import lombok.experimental.FieldNameConstants;
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientResource.ACTION_SYNC_ARXIU,
-                        formClass = ExpedientResource.MassiveAction.class),                
+                        formClass = ExpedientResource.MassiveAction.class),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = ExpedientResource.ACTION_GUARDAR_ARXIU,
+                        formClass = ExpedientResource.MassiveAction.class),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.REPORT,
                         code = ExpedientResource.REPORT_EXPORT_SELECTED_DOCS,
@@ -248,6 +252,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
 	public static final String ACTION_IMPORTAR_CODE = "IMPORTAR";
 	public static final String REPORT_EXPORT_SELECTED_DOCS = "EXPORT_SELECTED_DOCS";
 	public static final String ACTION_SYNC_ARXIU = "SYNC_ARXIU";
+	public static final String ACTION_GUARDAR_ARXIU = "GUARDAR_ARXIU";	
 	public static final String ACTION_IMPORT_DOCS = "IMPORT_DOCS";
 	public static final String ACTION_IMPORT_DOCS_ZIP = "IMPORT_DOCS_ZIP";
 	public static final String ACTION_IMPORT_INTE = "IMPORT_INTE";
