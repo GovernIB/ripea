@@ -43,7 +43,7 @@ const springFilterBuilder = (data: any) => {
         builder.betweenDates("createdDate", data?.dataCreacioInici, data?.dataCreacioFi),
         data.estat && builder.eq("estat", `'OBERT'`),
         data.estat && (data.estat != '0' && data.estat != '-1') && builder.eq("estatAdditional.id", data.estat),
-        builder.eq("prioritat", data?.prioritat),
+        builder.eq("prioritat", `'${data?.prioritat}'`),
     );
 }
 

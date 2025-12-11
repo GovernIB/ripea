@@ -101,7 +101,10 @@ const MassiveActionSelector: React.FC<MassiveActionSelectorProps> = (props:Massi
                     !(typeof action.hidden === 'function' ? action.hidden(selectedRows) : action.hidden)
                     && <Tooltip title={action?.label} key={`action-${index}`}>
                         <Button
-                            onClick={()=>action?.onClick?.(selectedRows)}
+                            onClick={()=> {
+                                action?.onClick?.(selectedRows);
+                                handleClearSelection();
+                            }}
                             disabled={typeof action?.disabled === 'function' ? action?.disabled(selectedRows) : action?.disabled}
                             sx={{ minWidth: '40px', display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: 0.75 }}
                         >
