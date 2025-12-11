@@ -869,4 +869,27 @@ public class Utils {
     	
     	return fitxerContentType;
     }
+    
+    public static String eliminaFiltreCurrentSpringFilter(String currentSpringFilter, String filtreEliminar) {
+        
+    	if (currentSpringFilter!=null && currentSpringFilter.contains(filtreEliminar)) {
+        	
+        	if (currentSpringFilter.contains("AND "+filtreEliminar)) {
+        		currentSpringFilter = currentSpringFilter.replace("AND "+filtreEliminar, "");
+        	} else if (currentSpringFilter.contains(filtreEliminar+" AND")) {
+        		currentSpringFilter = currentSpringFilter.replace(filtreEliminar+" AND", "");
+        	} else {
+        		currentSpringFilter = currentSpringFilter.replace(filtreEliminar, "");
+        	}
+        	
+        	//Elimina espais en blanc i tabulacions extres
+        	currentSpringFilter = currentSpringFilter.replaceAll("\\s+", " ");
+        	
+        	if (currentSpringFilter.equals("()") || currentSpringFilter.equals("( )") || !Utils.hasValue(currentSpringFilter)) {
+        		currentSpringFilter = null;
+        	}
+        }
+    	
+    	return currentSpringFilter;
+    }
 }

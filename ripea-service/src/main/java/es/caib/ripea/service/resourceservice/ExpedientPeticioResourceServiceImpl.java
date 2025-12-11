@@ -121,16 +121,16 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
     	
         String entitatActualCodi = configHelper.getEntitatActualCodi();
         EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true,false);
-        
+
+        Filter filtrePermesos = null;
+        Filter filtreEstat = null;
 		Filter filtreBase = (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null;
         Filter filtreEntitat = FilterBuilder.equal(
         		ExpedientPeticioResource.Fields.registre + "." + RegistreResource.Fields.entitatCodi, 
         		entitat!=null?entitat.getUnitatArrel():"................................................................................");
-        
-        Filter filtrePermesos = null;
-        Filter filtreEstat = null;
-        Filter filtrePendentCanviEstat = null;
+
         Map<String, String> mapaNamedQueries =  Utils.namedQueriesToMap(namedQueries);
+        
     	if (!mapaNamedQueries.isEmpty()) {
     		if (mapaNamedQueries.containsKey("LLISTAT_ANOTACIONS")) {
     			
@@ -139,8 +139,6 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
     			
     			boolean isAdmin 		= "IPA_ADMIN".equals(rolActual);
     			boolean isAdminOrgan 	= "IPA_ORGAN_ADMIN".equals(rolActual);
-//    			boolean isDissenyOrgan 	= "IPA_DISSENY".equals(rolActual);
-//    			boolean isSuper 		= "IPA_SUPER".equals(rolActual);
 
     			//Admin no aplica filtres de permisos
     			if (!isAdmin) {
@@ -148,7 +146,7 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 	    			OrganGestorEntity ogEntity	= organGestorRepository.findByEntitatIdAndCodi(entitat.getId(), organActualCodi);
 					PermisosPerAnotacions permisosPerAnotacions = expedientPeticioHelper.findPermisosPerAnotacions(
 							entitat.getId(),
-							null, //UsuariActual, afaga el autenticat
+							null, //UsuariActual, agafa el autenticat
 							rolActual,
 							ogEntity!=null?ogEntity.getId():null);
 		
@@ -201,7 +199,6 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
     			}
     		} else if (mapaNamedQueries.containsKey("MASSIU_ANOTACIONS_ESTAT")) {
         		filtreEstat = FilterBuilder.notEqual(ExpedientPeticioResource.Fields.estat, ExpedientPeticioEstatEnumDto.CREAT);
-        		filtrePendentCanviEstat = FilterBuilder.equal(ExpedientPeticioResource.Fields.pendentCanviEstatDistribucio, true);
     		}
     	}
         
@@ -209,8 +206,7 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
         		filtreBase,
         		filtreEntitat,
         		filtrePermesos,
-        		filtreEstat,
-        		filtrePendentCanviEstat).generate();
+        		filtreEstat).generate();
     }
     
     @Override

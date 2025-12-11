@@ -125,8 +125,10 @@ const AdjuntarAnnexosPendentsGrid = () => {
 
     return <GridPage disableMargins>
         <CardPage title={t('navigate.massiu.procesarAnnexosPendents')}>
+            
             <Alert severity={'info'} sx={{mb: 1}}>{t('page.anotacio.action.procesarAnnexosPendents.info')}</Alert>
-
+            <Alert severity={'info'} sx={{mb: 1}}>{t('page.expedient.alert.canviEstat')}</Alert>
+            
             <AdjuntarAnnexosPendentsFilter
                 sessionKey={sessionKey}
                 onSpringFilterChange={setSpringFilter}/>

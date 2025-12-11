@@ -23,6 +23,7 @@ import es.caib.ripea.service.intf.dto.ExpedientPeticioAccioEnumDto;
 import es.caib.ripea.service.intf.dto.ExpedientPeticioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.ExpedientPeticioEstatViewEnumDto;
 import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
+import es.caib.ripea.service.intf.model.NodeResource.MassiveAction;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -70,7 +71,8 @@ import lombok.experimental.FieldNameConstants;
                         requiresId = true),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
-                        code = ExpedientPeticioResource.ACTION_ESTAT_DISTRIBUCIO),
+                        code = ExpedientPeticioResource.ACTION_ESTAT_DISTRIBUCIO,
+                        formClass = MassiveAction.class),
         }
 )
 public class ExpedientPeticioResource extends BaseAuditableResource<Long> {
