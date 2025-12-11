@@ -505,6 +505,8 @@ public class ExpedientResource extends NodeResource implements Serializable {
         @Transient private String nom;
         @NotNull
         private PrioritatEnumDto prioritat;
+    	@Size(max = 1024)
+    	private String prioritatMotiu;
     }
     
     @Getter
