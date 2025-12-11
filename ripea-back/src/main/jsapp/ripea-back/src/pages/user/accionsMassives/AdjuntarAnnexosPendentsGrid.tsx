@@ -11,6 +11,7 @@ import {Alert, Grid, Link} from "@mui/material";
 import {useSession} from "../../../components/SessionStorageContext.tsx";
 import {GridSortDirection} from "@mui/x-data-grid-pro";
 import {useAnexxActions} from "../../anotacions/details/AnotacioActions.tsx";
+import {useGridApiRef as useMuiDatagridApiRef} from "@mui/x-data-grid-pro/hooks/utils/useGridApiRef";
 
 const AdjuntarAnnexosPendentsFilterFrom = () => {
     return <>
@@ -59,6 +60,7 @@ const sortModel: any = [{field: 'expedientInfo.createdDate', sort: 'desc'}]
 const AdjuntarAnnexosPendentsGrid = () => {
     const {t} = useTranslation();
     const apiRef = useMuiDataGridApiRef();
+    const dataApiRef = useMuiDatagridApiRef();
     const [springFilter, setSpringFilter] = useState<string>();
 
     const columns = [
@@ -93,7 +95,10 @@ const AdjuntarAnnexosPendentsGrid = () => {
 
     const sessionKey = "ADJUNTAR_ANNEX_FILTER";
     const { value: filterData } = useSession(sessionKey);
-    const haveRequirements = useMemo(() => !!filterData?.procediment, [filterData?.procediment])
+    const haveRequirements = useMemo(() => {
+        dataApiRef?.current?.setRowSelectionModel?.([])
+        return !!filterData?.procediment
+    }, [filterData?.procediment])
 
     const refresh = () => {
         apiRef?.current?.refresh?.();
@@ -128,6 +133,7 @@ const AdjuntarAnnexosPendentsGrid = () => {
 
             <StyledMuiGrid
                 apiRef={apiRef}
+                datagridApiRef={dataApiRef}
                 resourceName={"registreAnnexResource"}
                 columns={columns}
                 filter={springFilter}

@@ -220,7 +220,7 @@
 				<dependency>
 					<groupId>org.fundaciobit.plugins</groupId>
 					<artifactId>plugin-arxiu-apb</artifactId>
-					<version>1.0.3</version>
+					<version>1.0.3.2</version>
 					<exclusions>
 						<exclusion>
 							<groupId>org.fundaciobit.plugins</groupId>

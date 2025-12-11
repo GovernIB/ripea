@@ -1,7 +1,6 @@
 package es.caib.ripea.service.helper;
 
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -10,10 +9,6 @@ import java.util.Map;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 
 import es.caib.ripea.persistence.entity.EntitatEntity;
@@ -106,9 +101,9 @@ public class EventHelper {
     
     public void notifyFirmaNavegadorFinalitzada(FirmaFinalitzadaEvent firmaEvent) {
     	try {
-    		jmsTemplate.convertAndSend("firma", firmaEvent);
+    		jmsTemplate.convertAndSend("firmaNavegadorFinalitzada", firmaEvent);
     	} catch (Exception ex) {
-    		log.error("Error al notifyFirmaNavegadorFinalitzada a expedients suscrits", ex);
+    		log.error("Error al notifyFirmaNavegadorFinalitzada a usuaris suscrits", ex);
     	}
     }
     

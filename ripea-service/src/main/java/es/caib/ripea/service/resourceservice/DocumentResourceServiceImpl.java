@@ -303,12 +303,12 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
 			        if (mapaNamedQueries.containsKey("MASSIU_PORTAFIRMES")) {
 			        	String metaDocPortafirmes = DocumentResource.Fields.metaDocument + "." + MetaDocumentResource.Fields.firmaPortafirmesActiva;
-			        	filtrePfActiu = FilterBuilder.equal(metaDocPortafirmes, true); //ENVIAMENT A PF ACTIU
+			        	filtrePfActiu = FilterBuilder.equal(metaDocPortafirmes, true); //ENVIAMENT A PF ACTIU EN EL PROCEDIMENT
 				        String docAdjuntField = DocumentResource.Fields.gesDocAdjuntId;
 				        filtreNoAdjunt = FilterBuilder.isNull(docAdjuntField);
 			        } else if (mapaNamedQueries.containsKey("MASSIU_PASARELA")) {
 			        	String metaDocPortafirmes = DocumentResource.Fields.metaDocument + "." + MetaDocumentResource.Fields.firmaPassarelaActiva;
-			        	filtrePfActiu = FilterBuilder.equal(metaDocPortafirmes, true); //ENVIAMENT A PF ACTIU
+			        	filtrePfActiu = FilterBuilder.equal(metaDocPortafirmes, true); //ENVIAMENT A PF ACTIU EN EL PROCEDIMENT
 				        String docAdjuntField = DocumentResource.Fields.gesDocAdjuntId;
 				        filtreNoAdjunt = FilterBuilder.isNull(docAdjuntField);
 			        } else if (mapaNamedQueries.containsKey("MASSIU_PENDENT_ARXIU")) {
@@ -1095,7 +1095,6 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
 		@Override
 		public Serializable exec(String code, DocumentResourceEntity entity, MassiveAction params) throws ActionExecutionException {
-			String docIdStr = entity.getId()!=null?entity.getId().toString():Utils.getIdsSeparatsComa(params.getIds());
 			try {
 				if (params.getIds()!=null) {
 					for (Long docId: params.getIds()) {
@@ -1110,6 +1109,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 				}
 				return objectMappingHelper.newInstanceMap(entity, DocumentResource.class);
 			} catch (Exception e) {
+				String docIdStr = Utils.getIdsSeparatsComa(params.getIds());
 				excepcioLogHelper.addExcepcio("/document/ConvertirDefinitiuActionExecutor", e, docIdStr, "massiu="+params.isMassivo());
 				String message = messageHelper.getMessage("message.common.action.error")+": "+e.getMessage();
 				throw new ActionExecutionException(getResourceClass(), docIdStr, code, message);
@@ -1353,16 +1353,20 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 		@Override
 		public Serializable exec(String code, DocumentResourceEntity entity, IniciarFirmaNavegador params) throws ActionExecutionException {
 			
+			String docIdStr = Utils.getIdsSeparatsComa(params.getIds());
+			
 			try {
-//				entity = documentResourceRepository.findById(params.getIds().get(0)).get();
-    			String dadesURL = entity.getExpedient().getId()+"#"+entity.getId()+"#"+SecurityContextHolder.getContext().getAuthentication().getName();
+
+    			String dadesURL = params.isMassivo()+"#"+docIdStr+"#"+SecurityContextHolder.getContext().getAuthentication().getName();
 				String paramSecure = Utils.encripta(dadesURL, configHelper.getConfig(PropertyConfig.CLAU_ENCRIPTACIO));
 				String urlReturnToRipea = configHelper.getConfig(PropertyConfig.BASE_URL) + "/modal/document/event/" + paramSecure + "/firmaSimpleWebEnd";
 				EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
 				
 				List<FitxerDto> fitxersFirma = new ArrayList<FitxerDto>();
 				for (Long idDoc: params.getIds()) {
-					fitxersFirma.add(documentHelper.convertirPdfPerFirmaClient(entitatEntity.getId(), idDoc));
+					FitxerDto fitxerAfirmar = documentHelper.convertirPdfPerFirmaClient(entitatEntity.getId(), idDoc);
+					fitxerAfirmar.setId(idDoc);
+					fitxersFirma.add(fitxerAfirmar);
 				}
 				
 				Map<String, String> result = new HashMap<>();
@@ -1370,9 +1374,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                 return (Serializable)result;
                 
 			} catch (Exception e) {
-				String docIdStr = Utils.getIdsSeparatsComa(params.getIds());
 				excepcioLogHelper.addExcepcio("/document/IniciarFirmaWebActionExecutor", e, docIdStr, "massiu="+params.isMassivo());
-				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, messageHelper.getMessage("document.iniciarFirmaWeb.reject", new Object[]{e.getMessage()}));
+				throw new ActionExecutionException(getResourceClass(), docIdStr, code, messageHelper.getMessage("document.iniciarFirmaWeb.reject", new Object[]{e.getMessage()}));
 			}
 		}
     }
@@ -1728,7 +1731,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 				String docIdStr = Utils.getIdsSeparatsComa(params.getIds());
 				excepcioLogHelper.addExcepcio("/document/EnviarPortafirmesActionExecutor", e, docIdStr, "massiu="+params.isMassivo());
 				String message = messageHelper.getMessage("message.common.action.error")+": "+e.getMessage();
-				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, message);
+				throw new ActionExecutionException(getResourceClass(), docIdStr, code, message);
 			}
         }
 

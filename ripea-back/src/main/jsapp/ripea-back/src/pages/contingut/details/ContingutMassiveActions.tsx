@@ -14,9 +14,9 @@ export const useMassiveActions = (refresh?: () => void) => {
 
     const massiveAction = (ids:any, code:string, msg:string) => {
         return apiAction(undefined, {code :code, data:{ ids, massivo: true }})
-            .then((result) => {
+            .then(() => {
                 refresh?.();
-                iniciaDescargaBlob(result);
+                // iniciaDescargaBlob(result);
                 temporalMessageShow(null, msg, 'info');
             })
             .catch((error) => {
@@ -36,7 +36,17 @@ export const useMassiveActions = (refresh?: () => void) => {
     }
 
     const download = (ids: any[]): void => { massiveReport(ids, 'DESCARREGAR_MASSIU', t('page.expedient.results.actionOk'), 'ZIP'); }
-    const guardarArxiu = (ids: any[]): void => { massiveAction(ids, 'GUARDAR_ARXIU', t('page.expedient.results.actionOk')); }
+    const guardarArxiu = (ids: any[]): void => {
+        apiAction(undefined, {code :'GUARDAR_ARXIU', data:{ ids, massivo: true }})
+            .then((result) => {
+                refresh?.();
+                iniciaDescargaBlob(result);
+                temporalMessageShow(null, t('page.expedient.results.actionOk'), 'info');
+            })
+            .catch((error) => {
+                temporalMessageShow(null, error?.message, 'error');
+            });
+    }
     const definitiu = (ids: any[]) => {
         messageDialogShow(
             '',

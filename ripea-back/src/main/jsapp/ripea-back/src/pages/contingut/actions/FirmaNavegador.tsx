@@ -4,9 +4,9 @@ import {MuiFormDialogApi, useBaseAppContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import GridFormField from "../../../components/GridFormField.tsx";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
-import {useFirmaFinalitzadaSession} from "../../../components/SseExpedient.tsx";
 import {useUserSession} from "../../../components/Session.tsx";
 import Iframe from "../../../components/Iframe.tsx";
+import {useFirmaFinalitzadaSession} from "../../../components/SseClient.tsx";
 
 const FirmaNavegadorForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
@@ -74,6 +74,7 @@ export const useFirmaNavegadorMassive = (refresh?: () => void) => {
 
     onChange((firma) => {
 		if (user?.codi==firma?.usuari) {
+            // TODO: revisar logica de firma masiva
 	        const severiry =
 	            firma?.status == 'OK' ? 'success'
 	                : firma?.status == 'WARNING' ? 'warning'

@@ -93,7 +93,7 @@ export const useActions = (refresh?: () => void) => {
             confirmDialogComponentProps)
             .then((value: any) => {
                 if (value) {
-                    apiAction(undefined, {code: 'CONVERTIR_DEFINITIU', data: {id: [id], massivo: false}})
+                    apiAction(undefined, {code: 'CONVERTIR_DEFINITIU', data: {ids: [id], massivo: false}})
                         .then((result:any)=>{
                             refresh?.()
                             temporalMessageShow(null, t('page.document.action.definitive.ok', {document: result?.nom}), 'success');

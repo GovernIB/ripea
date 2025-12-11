@@ -12,6 +12,7 @@ import {GridSortDirection} from "@mui/x-data-grid-pro";
 import {StyledEstat, StyledPrioritat} from "../../expedient/ExpedientGrid.tsx";
 import {useSession} from "../../../components/SessionStorageContext.tsx";
 import useCambiarEstat, {useCambiarEstatMassive} from "../../expedient/actions/CambiarEstat.tsx";
+import {useGridApiRef as useMuiDatagridApiRef} from "@mui/x-data-grid-pro/hooks/utils/useGridApiRef";
 
 const CanviEstatFilterFrom = (props:any) => {
     const { findExpedientByName = false } = props;
@@ -113,11 +114,15 @@ const perspectives:any = ['ESTAT']
 const CanviEstatGrid = () => {
     const {t} = useTranslation();
     const apiRef = useMuiDataGridApiRef();
+    const dataApiRef = useMuiDatagridApiRef();
     const [springFilter, setSpringFilter] = useState<string>();
 
     const sessionKey = "MASSIVE_CANVI_ESTAT_FILTER";
     const { value: filterData } = useSession(sessionKey);
-    const haveRequirements = useMemo(() => !!filterData?.procediment, [filterData?.procediment])
+    const haveRequirements = useMemo(() => {
+        dataApiRef?.current?.setRowSelectionModel?.([])
+        return !!filterData?.procediment
+    }, [filterData?.procediment])
 
     const refresh = () => {
         apiRef?.current?.refresh?.();
@@ -153,6 +158,7 @@ const CanviEstatGrid = () => {
 
             <CanviEstatMuiGrid
                 apiRef={apiRef}
+                datagridApiRef={dataApiRef}
                 filter={springFilter}
                 perspectives={perspectives}
                 namedQueries={namedQueries}

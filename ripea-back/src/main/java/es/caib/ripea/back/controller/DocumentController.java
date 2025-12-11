@@ -45,6 +45,7 @@ import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentPortafirmesDto;
 import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.FirmaResultatDto;
+import es.caib.ripea.service.intf.dto.FirmaResultatDto.FirmaSignatureStatus;
 import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentFirmaFluxTipusEnumDto;
@@ -53,7 +54,6 @@ import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.dto.VersioDocumentEnum;
 import es.caib.ripea.service.intf.dto.ViaFirmaDispositiuDto;
 import es.caib.ripea.service.intf.dto.ViaFirmaUsuariDto;
-import es.caib.ripea.service.intf.dto.FirmaResultatDto.FirmaSignatureStatus;
 import es.caib.ripea.service.intf.exception.ResponsableNoValidPortafirmesException;
 import es.caib.ripea.service.intf.model.sse.FirmaFinalitzadaEvent;
 import es.caib.ripea.service.intf.service.AplicacioService;
@@ -483,8 +483,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
         
 		String data = Utils.desencripta(dades, aplicacioService.propertyFindByNom("es.caib.ripea.encription.key"));
 		String[] dataSplri = data.split("#");
-		Long expedientId = Long.parseLong(dataSplri[0]);
-//		Long documentId = Long.parseLong(dataSplri[1]);
+		boolean execMassiva = Boolean.parseBoolean(dataSplri[0]);
         
 		//Comunicam a PF que la firma ha finalitzat
 		FirmaResultatDto firmaResultat =  documentService.firmaSimpleWebEnd(transactionID);
@@ -494,7 +493,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 			for (FirmaSignatureStatus firmaSignatureStatus : firmaResultat.getSignatures()) {
 			
 				if (StatusEnumDto.OK.equals(firmaResultat.getSignatures().get(0).getStatus())) {
-					expedientId = documentService.processarFirmaClient(
+					Long expedientId = documentService.processarFirmaClient(
 							getEntitatActualComprovantPermisos(request).getId(),
 							Long.valueOf(firmaSignatureStatus.getSignID()),
 							firmaResultat.getSignatures().get(0).getFitxerFirmatNom(),
@@ -505,15 +504,23 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 						firmaResultat.setMsg("La firma ha finalitzat correctament.");
 					}
 					resultat = "La firma ha finalitzat correctament. Podeu tancar la finestra.";
+					
+//					if (!execMassiva) {
+//						firmaResultat.setUsuari(dataSplri[2]);
+//						FirmaFinalitzadaEvent ffe = new FirmaFinalitzadaEvent(expedientId, firmaResultat);
+//						eventService.notifyFirmaNavegadorFinalitzada(ffe);
+//					}
 				}
 			}
+			
+			//Tancar totes les modals de firma en navegador del usuari que ha iniciat la firma
+			firmaResultat.setUsuari(dataSplri[2]);
+			FirmaFinalitzadaEvent ffe = new FirmaFinalitzadaEvent(null, firmaResultat);
+			eventService.notifyFirmaNavegadorFinalitzada(ffe);
 		}
 		if (resultat==null) {
 			resultat = "La firma no s'ha pogut finalitzar: "+firmaResultat.getMsg()+". Tancau la finestra i tornau-ho a provar passats uns minuts.";
 		}
-		firmaResultat.setUsuari(dataSplri[2]);
-		FirmaFinalitzadaEvent ffe = new FirmaFinalitzadaEvent(expedientId, firmaResultat);
-		eventService.notifyFirmaNavegadorFinalitzada(ffe);
 		return ResponseEntity.ok().header("Content-Type", "text/plain; charset=UTF-8").body(resultat);
 	}
 	

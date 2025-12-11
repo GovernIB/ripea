@@ -94,7 +94,8 @@ import lombok.experimental.FieldNameConstants;
                         formClass = NodeResource.MassiveAction.class),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
-                        code = DocumentResource.ACTION_CONVERTIR_DEFINITIU),
+                        code = DocumentResource.ACTION_CONVERTIR_DEFINITIU,
+                        formClass = NodeResource.MassiveAction.class),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = DocumentResource.ACTION_GUARDAR_ARXIU,

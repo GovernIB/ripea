@@ -267,6 +267,15 @@ public class ExecucioMassivaHelper {
 		execucioMassiva.setVersioImprimible(execMassDto.getVersioImprimible());
 		execucioMassiva.setNomFitxer(execMassDto.getNomFitxer());
 		execucioMassiva.setDocumentNom(execMassDto.getDocumentNom());
+		execucioMassiva.setEnviarCorreu(execMassDto.getEnviarCorreu());
+		execucioMassiva.setMotiu(execMassDto.getMotiu());
+		execucioMassiva.setPrioritat(execMassDto.getPrioritat());
+		execucioMassiva.setPortafirmesResponsables(execMassDto.getPortafirmesResponsables()!=null?String.join(",", execMassDto.getPortafirmesResponsables()):null);
+		execucioMassiva.setPortafirmesSequenciaTipus(execMassDto.getPortafirmesSequenciaTipus());
+		execucioMassiva.setPortafirmesFluxId(execMassDto.getPortafirmesFluxId());
+		execucioMassiva.setPortafirmesTransaccioId(execMassDto.getPortafirmesTransaccioId());
+		execucioMassiva.setPortafirmesAvisFirmaParcial(execMassDto.getPortafirmesAvisFirmaParcial());
+		execucioMassiva.setPortafirmesFirmaParcial(execMassDto.getPortafirmesFirmaParcial());
 		
 		execucioMassiva = execucioMassivaRepository.save(execucioMassiva);
 		
@@ -426,7 +435,7 @@ public class ExecucioMassivaHelper {
 				} else if (ExecucioMassivaTipusDto.CANVI_ESTAT.equals(tipus)){
 					//TODO: Es necessita saber l'estat al qual es vol canviar l'expedient.
 				} else if (ExecucioMassivaTipusDto.TANCAMENT.equals(tipus)){
-					//TODO: Es necessita saber el motiu y els esborranys que es volen firmar.
+					exc = tancarExpedients(emc);
 				} else if (ExecucioMassivaTipusDto.ADJUNTAR_ANNEXOS_PENDENTS.equals(tipus)){
 					//TODO: Veurer com es la logica a MassiuAnnexProcesarController
 				} else if (ExecucioMassivaTipusDto.ACTUALITZAR_ESTAT_ANOTACIONS.equals(tipus)){
@@ -580,11 +589,28 @@ public class ExecucioMassivaHelper {
 		return exc;
 	}	
 
-	private Throwable enviarPortafirmes(ExecucioMassivaContingutEntity emc) throws Exception {
-		DocumentEntity contingut = (DocumentEntity)contingutRepository.findById(emc.getElementId()).get();
-		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(contingut.getId()));
+	private Throwable tancarExpedients (ExecucioMassivaContingutEntity emc) throws Exception {
 		Throwable exc = null;
 		try {
+			ExpedientEntity contingut = (ExpedientEntity)contingutRepository.findById(emc.getElementId()).get();
+			expedientHelper.tancar(
+					contingut.getEntitat().getId(),
+					emc.getElementId(),
+					emc.getExecucioMassiva().getMotiu(),
+					Utils.csvToLongArray(emc.getElementNom()),
+					false);
+		} catch (Exception ex) {
+			logger.error("CONTINGUT MASSIU:" + emc.getId() + ". No s'ha pogut tancar l'expedient", ex);
+			exc = ex;
+		}
+		return exc;
+	}
+	
+	private Throwable enviarPortafirmes(ExecucioMassivaContingutEntity emc) throws Exception {
+		Throwable exc = null;
+		try {
+			DocumentEntity contingut = (DocumentEntity)contingutRepository.findById(emc.getElementId()).get();
+			organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(contingut.getId()));
 			ExecucioMassivaEntity em = emc.getExecucioMassiva();
 			firmaPortafirmesHelper.portafirmesEnviar(
 					contingut.getEntitat().getId(),
@@ -598,8 +624,8 @@ public class ExecucioMassivaHelper {
 					contingut.getMetaDocument().getPortafirmesFluxTipus(),
 					null,
 					em.getPortafirmesTransaccioId(),
-					em.getPortafirmesAvisFirmaParcial(),
-					em.getPortafirmesFirmaParcial());
+					em.getPortafirmesAvisFirmaParcial()!=null?em.getPortafirmesAvisFirmaParcial().booleanValue():false,
+					em.getPortafirmesFirmaParcial()!=null?em.getPortafirmesFirmaParcial().booleanValue():false);
 		} catch (Exception ex) {
 			logger.error("CONTINGUT MASSIU:" + emc.getId() + ". No s'ha pogut enviar el document al portasignatures", ex);
 			exc = ex;

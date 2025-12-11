@@ -45,6 +45,7 @@ import es.caib.ripea.persistence.entity.MetaDocumentEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.entity.UsuariEntity;
+import es.caib.ripea.persistence.entity.resourceentity.DocumentResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.ExpedientResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.UsuariResourceEntity;
@@ -99,6 +100,7 @@ import es.caib.ripea.service.intf.dto.DocumentDto;
 import es.caib.ripea.service.intf.dto.ElementTipusEnumDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaContingutDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaDto;
+import es.caib.ripea.service.intf.dto.ExecucioMassivaEstatDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaTipusDto;
 import es.caib.ripea.service.intf.dto.FileNameOption;
 import es.caib.ripea.service.intf.dto.FitxerDto;
@@ -304,14 +306,14 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
             );
 
         	Map<String, String> mapaNamedQueries =  Utils.namedQueriesToMap(namedQueries);
-        	if (mapaNamedQueries.size()>0 && mapaNamedQueries.containsKey("WITHOUT_PERMISION_CHECK")) {
+        	if (mapaNamedQueries.containsKey("WITHOUT_PERMISION_CHECK")) {
                 return filtreFrontAndEntitat.generate();
         	}
 
         	EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true, false);
         	Filter filtreNoEliminats = FilterBuilder.and(FilterBuilder.equal(ContingutResource.Fields.esborrat, "0"));
         	
-        	if (mapaNamedQueries.size()>0 && mapaNamedQueries.containsKey("MASSIVE_ACTION_QUERY")) {
+        	if (mapaNamedQueries.containsKey("MASSIVE_ACTION_QUERY")) {
         		
         		List<MetaExpedientEntity> procedimentsPermesosAccioMass = metaExpedientHelper.findPermesosAccioMassiva(
         				entitatEntity.getId(),
@@ -337,7 +339,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
 	            	Filter filtreAgafatsUsuariActual = null;
 	            	if (rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN")) {
-	            		String agafatPerCodi = ExpedientResource.Fields.agafatPer + UsuariResource.Fields.codi;
+	            		String agafatPerCodi = ExpedientResource.Fields.agafatPer + "." + UsuariResource.Fields.codi;
 	            		filtreAgafatsUsuariActual = Filter.parse(agafatPerCodi+":'" + SecurityContextHolder.getContext().getAuthentication().getName() +  "'");
 	            	}
 	            	
@@ -349,12 +351,15 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         				);
 	            	}
 	            	
-	            	//El filtre del front inclou estat=OBERT
+	            	//El filtre del front nomes inclou estat=OBERT si filtres, no per defecte
+	            	Filter filtreNoTancats = FilterBuilder.and(FilterBuilder.equal(ExpedientResource.Fields.estat, "0"));
+	            	
 	            	Filter filtreAccioMassiva = FilterBuilder.and(
 	            			filtreProcedimentPermesosAccioMass,
 	            			filtreAgafatsUsuariActual,
 	            			filtreFrontAndEntitat,
 	            			filtreArxiuPendents,
+	            			filtreNoTancats,
 	            			filtreNoEliminats);
 	            	
 	            	return filtreAccioMassiva.generate();
@@ -1158,8 +1163,41 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 							params.getDocumentsPerFirmar().toArray(new Long[0]),
 							false);
 				} else {
-					//TODO: 
-					//Reagrupar documentos por expediente y guardar como accion masiva en segundo plano
+					Map<Long, List<Long>> documentsPerExpedient = new HashMap<Long, List<Long>>();
+					if(params.getIds()!=null && params.getIds().size()>0) {
+						for (Long idDocument: params.getIds()) {
+							DocumentResourceEntity dre = documentResourceRepository.findById(idDocument).get();
+							List<Long> documentsExpActual = new ArrayList<Long>();
+							if (documentsPerExpedient.containsKey(dre.getExpedient().getId())) {
+								documentsExpActual = documentsPerExpedient.get(dre.getExpedient().getId());
+							}
+							documentsExpActual.add(dre.getId());
+							documentsPerExpedient.put(dre.getExpedient().getId(), documentsExpActual);
+						}
+					}
+					
+					if (!documentsPerExpedient.isEmpty()) {
+						//Els continguts de l'execució massiva son els expedients.
+						//Els documents seleccionats per fimar en servidor, els passam com a CSV.
+						List<ExecucioMassivaContingutDto> elementsMassiva = new ArrayList<ExecucioMassivaContingutDto>();
+						for (Map.Entry<Long, List<Long>> entry : documentsPerExpedient.entrySet()) {
+						    
+							ExecucioMassivaContingutDto execMass = new ExecucioMassivaContingutDto(
+									new Date(),
+									null,
+									entry.getKey(),
+									ExecucioMassivaEstatDto.ESTAT_PENDENT);
+							execMass.setElementTipus(ElementTipusEnumDto.EXPEDIENT);
+							execMass.setElementNom(Utils.getIdsSeparatsComa(entry.getValue()));
+							
+							elementsMassiva.add(execMass);
+						}
+						
+		    			ExecucioMassivaDto execMassDto = new ExecucioMassivaDto(ExecucioMassivaTipusDto.TANCAMENT, new Date(), null, configHelper.getRolActual());
+		    			execMassDto.setMotiu(params.getMotiu());
+		    			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+						execucioMassivaHelper.saveExecucioMassiva(entitatEntity, execMassDto, elementsMassiva, ElementTipusEnumDto.EXPEDIENT);
+					}
 				}
 				return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
 			} catch (Exception e) {

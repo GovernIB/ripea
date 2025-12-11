@@ -155,6 +155,33 @@ public class ExecucioMassivaEntity extends RipeaAuditable<Long> {
 			FileNameOption nomFitxer) {
 		this.nomFitxer = nomFitxer;
 	}
+	public void setMotiu(String motiu) {
+		this.motiu = motiu;
+	}
+	public void setPrioritat(PortafirmesPrioritatEnumDto prioritat) {
+		this.prioritat = prioritat;
+	}
+	public void setPortafirmesResponsables(String portafirmesResponsables) {
+		this.portafirmesResponsables = portafirmesResponsables;
+	}
+	public void setPortafirmesSequenciaTipus(MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSequenciaTipus) {
+		this.portafirmesSequenciaTipus = portafirmesSequenciaTipus;
+	}
+	public void setPortafirmesFluxId(String portafirmesFluxId) {
+		this.portafirmesFluxId = portafirmesFluxId;
+	}
+	public void setPortafirmesTransaccioId(String portafirmesTransaccioId) {
+		this.portafirmesTransaccioId = portafirmesTransaccioId;
+	}
+	public void setEnviarCorreu(Boolean enviarCorreu) {
+		this.enviarCorreu = enviarCorreu;
+	}
+	public void setPortafirmesAvisFirmaParcial(Boolean portafirmesAvisFirmaParcial) {
+		this.portafirmesAvisFirmaParcial = portafirmesAvisFirmaParcial;
+	}
+	public void setPortafirmesFirmaParcial(Boolean portafirmesFirmaParcial) {
+		this.portafirmesFirmaParcial = portafirmesFirmaParcial;
+	}
 	public static Builder getBuilder(
 			ExecucioMassivaTipusDto tipus,
 			Date dataInici,
