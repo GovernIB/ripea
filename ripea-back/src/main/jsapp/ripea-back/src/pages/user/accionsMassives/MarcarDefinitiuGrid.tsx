@@ -45,7 +45,6 @@ const MarcarDefinitiuGrid = () => {
     const [springFilter, setSpringFilter] = useState<string>();
 
     const refresh = () => {
-        dataApiRef?.current?.setRowSelectionModel?.([])
         apiRef?.current?.refresh?.();
     }
 

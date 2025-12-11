@@ -1,8 +1,9 @@
-import {MuiFormDialog, MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
+import {MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
 import {Grid} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
 import {useRef} from "react";
 import {useTranslation} from "react-i18next";
+import FormActionDialog from "../../../components/FormActionDialog.tsx";
 
 const CambiarPrioritatForm = () => {
     const {data} = useFormContext();
@@ -17,10 +18,10 @@ const CambiarPrioritatForm = () => {
 export const CambiarPrioritat = (props:any) => {
     const { t } = useTranslation();
 
-    return <MuiFormDialog
+    return <FormActionDialog
         resourceName={"expedientResource"}
         title={t('page.expedient.action.changePrioritat.title')}
-        code={"CANVI_PRIORITAT"}
+        action={"CANVI_PRIORITAT"}
         dialogButtons={[
             {icon: 'save', text: t('common.save'), componentProps: { variant: 'contained' }, value: true },
             {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
@@ -28,7 +29,7 @@ export const CambiarPrioritat = (props:any) => {
         {...props}
     >
         <CambiarPrioritatForm/>
-    </MuiFormDialog>
+    </FormActionDialog>
 }
 
 export const useCambiarPrioritat = (refresh?: () => void) => {
