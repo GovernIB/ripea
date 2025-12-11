@@ -59,7 +59,6 @@ public class CustomHalFormsPropertyFactory {
 	private final MessageResolver resolver;
 	private final ResourceServiceLocator resourceServiceLocator;
 
-
 	/**
 	 * Creates a new {@link CustomHalFormsPropertyFactory} for the given {@link HalFormsConfiguration} and
 	 * {@link MessageResolver}.
