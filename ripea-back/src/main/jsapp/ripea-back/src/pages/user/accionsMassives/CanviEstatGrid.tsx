@@ -41,7 +41,7 @@ const springFilterBuilder = (data: any) => {
         builder.eq("id", data?.expedient?.id),
         builder.like("nom", data?.nom),
         builder.betweenDates("createdDate", data?.dataCreacioInici, data?.dataCreacioFi),
-        builder.eq("estat", `'OBERT'`),
+        data.estat && builder.eq("estat", `'OBERT'`),
         data.estat && (data.estat != '0' && data.estat != '-1') && builder.eq("estatAdditional.id", data.estat),
         builder.eq("prioritat", data?.prioritat),
     );
@@ -144,7 +144,7 @@ const CanviEstatGrid = () => {
             label: t('page.document.action.portafirmes.label'),
             icon: "logout",
             showInMenu: false,
-            onClick: handleCanviEstatMassive,
+            onClick: (ids:any[]) => handleCanviEstatMassive(ids, {metaExpedient: filterData?.procediment}),
         },
     ]
 

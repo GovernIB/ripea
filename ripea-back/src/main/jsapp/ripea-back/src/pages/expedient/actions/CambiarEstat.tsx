@@ -45,6 +45,7 @@ const useCambiarEstat = (refresh?: () => void) => {
             massivo: false,
             nom: row?.nom,
             estatAdditional: row?.estatAdditional,
+            metaExpedient: row?.metaExpedient,
         })
     }
     const onSuccess = (response:any) :void => {
@@ -62,10 +63,11 @@ export const useCambiarEstatMassive = (refresh?: () => void) => {
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
 
-    const handleShow = (ids:any[]) :void => {
+    const handleShow = (ids:any[], additionalData:any = {}) :void => {
         apiRef.current?.show?.(undefined, {
             ids,
             massivo: true,
+            ...additionalData
         })
     }
     const onSuccess = () :void => {
