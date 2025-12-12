@@ -55,7 +55,7 @@ export const useMassiveActions = (refresh?: () => void) => {
     const {temporalMessageShow} = useBaseAppContext();
 
     const canviEstatDistribucio = (ids:any[]) => {
-        apiAction(undefined, {code: 'ESTAT_DISTRIBUCIO', data: {ids: [ids], massivo: false}})
+        apiAction(undefined, {code: 'ESTAT_DISTRIBUCIO', data: {ids, massivo: true}})
             .then(() => {
                 refresh?.();
                 temporalMessageShow(null, t('page.expedient.results.actionBackgroundOk'), 'info');
