@@ -319,6 +319,7 @@ const translationEs = {
                 canviEstatDistribucio: {
                     label: "Cambiar estado a distribución",
                     ok: "El estado ha cambiado correctamente",
+                    massiveOk: "Se ha actualizado el estado de '{{data.num}}' anotaciones",
                 },
                 descargarAnnex: {
                     label: "Descargar Anexo",
@@ -327,6 +328,7 @@ const translationEs = {
                 procesarAnnexosPendents: {
                     label: "Adjuntar",
                     ok: "El anexo se ha procesado correctamente",
+                    massiveOk: "Se han procesado '{{data.num}}' anexos",
                     info: "Si se ha producido algún error al aceptar una anotación desde la pantalla de Anotaciones, de manera que alguno de los documentos de la anotación no se haya adjuntado al expediente, desde este listado podrá volver a intentar adjuntar el documento al expediente.",
                 },
                 firma: {
@@ -629,11 +631,13 @@ const translationEs = {
                     label: "Cambiar prioridad...",
                     title: "Modificar prioridad del expediente",
                     ok: "La prioridad del expediente '{{expedient}}' se ha modificado correctamente.",
+                    massiveOk: "Se ha cambiado la prioridad de '{{data.num}}' expedientes",
                 },
                 changeEstat: {
                     label: "Cambiar estado...",
                     title: "Modificar estado del expediente",
                     ok: "El estado del expediente '{{expedient}}' se ha modificado correctamente.",
+                    massiveOk: "Se ha cambiado el estado de '{{data.num}}' expedientes",
                 },
                 assignar: {
                     label: "Asignar...",
@@ -918,6 +922,7 @@ const translationEs = {
                     label: "Convertir a definitivo",
                     description: "Esta acción hará que los documentos pasen a formar parte del expediente de forma definitiva y no se podrán eliminar.",
                     ok: "Documento '{{document}}' cambiado a definitivo",
+                    massiveOk: "Se han marcado como definitivos '{{data.num}}' documentos",
                 },
             },
             alert: {

@@ -56,9 +56,9 @@ export const useMassiveActions = (refresh?: () => void) => {
 
     const canviEstatDistribucio = (ids:any[]) => {
         apiAction(undefined, {code: 'ESTAT_DISTRIBUCIO', data: {ids, massivo: true}})
-            .then(() => {
+            .then((data:any) => {
                 refresh?.();
-                temporalMessageShow(null, t('page.expedient.results.actionBackgroundOk'), 'info');
+                temporalMessageShow(null, t('page.anotacio.action.canviEstatDistribucio.massiveOk', {data}), 'success');
             })
             .catch((error) => {
                 temporalMessageShow(null, error.message, 'error');
@@ -102,9 +102,9 @@ export const useAnexxActions = (refresh?: () => void) => {
     }
     const reintentarMassive = (ids:any) => {
         apiAction(undefined, {code: 'REINTENTAR', data: {ids, massivo: true}})
-            .then(() => {
+            .then((data:any) => {
                 refresh?.()
-                temporalMessageShow(null, t('page.expedient.results.actionBackgroundOk'), 'success');
+                temporalMessageShow(null, t('page.anotacio.action.procesarAnnexosPendents.massiveOk', {data}), 'success');
             })
             .catch((error) => {
                 temporalMessageShow(null, error.message, 'error');

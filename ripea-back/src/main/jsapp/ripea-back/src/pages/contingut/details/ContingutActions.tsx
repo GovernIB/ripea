@@ -36,17 +36,6 @@ export const useActions = (refresh?: () => void) => {
     const confirmDialogButtons = useConfirmDialogButtons();
     const confirmDialogComponentProps = {maxWidth: 'sm', fullWidth: true};
 
-    const action = (id:any, code:string, mssg:string) => {
-        apiAction(id, {code})
-            .then(()=>{
-                refresh?.()
-                temporalMessageShow(null, mssg, 'success');
-            })
-            .catch((error) => {
-                temporalMessageShow(null, error?.message, 'error');
-            });
-    }
-
     const downloadAdjunt = (id:any, fieldName:string, mssg:string) :void => {
         apiDownload(id,{fieldName})
             .then((result)=>{

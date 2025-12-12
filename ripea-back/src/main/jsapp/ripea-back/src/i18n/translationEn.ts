@@ -319,6 +319,7 @@ const translationEn = {
                 canviEstatDistribucio: {
                     label: "Change state to distribution",
                     ok: "Status has been successfully changed",
+                    massiveOk: "The status of '{{data.num}}' records has been updated",
                 },
                 descargarAnnex: {
                     label: "Download annex",
@@ -327,6 +328,7 @@ const translationEn = {
                 procesarAnnexosPendents: {
                     label: "Attach",
                     ok: "The annex has been processed successfully",
+                    massiveOk: " '{{data.num}}' attachments have been processed",
                     info: "If an error occurred when accepting a record from the Records screen, causing some of the record’s documents not to be attached to the case file, from this list you can try attaching the document to the case file again.",
                 },
                 firma: {
@@ -629,11 +631,13 @@ const translationEn = {
                     label: "Change priority...",
                     title: "Edit case file priority",
                     ok: "Priority of case file '{{expedient}}' was updated successfully.",
+                    massiveOk: "The priority of '{{data.num}}' cases has been changed",
                 },
                 changeEstat: {
                     label: "Change status...",
                     title: "Edit case file status",
                     ok: "Status of case file '{{expedient}}' was updated successfully.",
+                    massiveOk: "The status of '{{data.num}}' cases has been changed",
                 },
                 assignar: {
                     label: "Assign",
@@ -918,6 +922,7 @@ const translationEn = {
                     label: "Convert to definitive",
                     description: "This action will make the documents part of the file definitively and they cannot be deleted.",
                     ok: "Document '{{document}}' changed to definitive",
+                    massiveOk: " '{{data.num}}' documents have been marked as final",
                 },
             },
             alert: {

@@ -12,17 +12,6 @@ export const useMassiveActions = (refresh?: () => void) => {
     const confirmDialogButtons = useConfirmDialogButtons();
     const confirmDialogComponentProps = {maxWidth: 'sm', fullWidth: true};
 
-    const massiveAction = (ids:any, code:string, msg:string) => {
-        return apiAction(undefined, {code :code, data:{ ids, massivo: true }})
-            .then(() => {
-                refresh?.();
-                // iniciaDescargaBlob(result);
-                temporalMessageShow(null, msg, 'info');
-            })
-            .catch((error) => {
-                temporalMessageShow(null, error?.message, 'error');
-            });
-    }
     const massiveReport = (ids:any, code:string, msg:string, fileType:any) => {
         return apiReport(undefined, {code :code, data:{ ids, massivo: true }, fileType})
             .then((result) => {
@@ -55,7 +44,14 @@ export const useMassiveActions = (refresh?: () => void) => {
             confirmDialogComponentProps)
             .then((value: any) => {
                 if (value) {
-                    massiveAction(ids, 'CONVERTIR_DEFINITIU', t('page.expedient.results.actionBackgroundOk'))
+                    return apiAction(undefined, {code :'CONVERTIR_DEFINITIU', data:{ ids, massivo: true }})
+                        .then((data:any) => {
+                            refresh?.();
+                            temporalMessageShow(null, t('page.document.action.definitive.massiveOk', {data}), 'success');
+                        })
+                        .catch((error) => {
+                            temporalMessageShow(null, error?.message, 'error');
+                        });
                 }
             });
     }

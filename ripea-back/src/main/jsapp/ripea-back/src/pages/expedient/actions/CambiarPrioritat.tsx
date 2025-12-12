@@ -67,9 +67,9 @@ export const useCambiarPrioritatMassive = (refresh?: () => void) => {
             massivo: true,
         })
     }
-    const onSuccess = () :void => {
+    const onSuccess = (data:any) :void => {
         refresh?.()
-        temporalMessageShow(null, t('page.expedient.results.actionBackgroundOk'), 'info');
+        temporalMessageShow(null, t('page.expedient.action.changePrioritat.massiveOk', {data}), 'success');
     }
 
     return {

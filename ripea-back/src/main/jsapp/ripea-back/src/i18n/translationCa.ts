@@ -319,6 +319,7 @@ const translationCa = {
                 canviEstatDistribucio: {
                     label: "Canviar estat a distribució",
                     ok: "L'estat ha canviat correctament",
+                    massiveOk: "S'han actualitzat l'estat de '{{data.num}}' anotacions",
                 },
                 descargarAnnex: {
                     label: "Descarregar annex",
@@ -327,6 +328,7 @@ const translationCa = {
                 procesarAnnexosPendents: {
                     label: "Adjuntar",
                     ok: "El annex s'ha processat correctament",
+                    massiveOk: "S'han processat '{{data.num}}' annexos",
                     info: "Si s'ha produït algun error al acceptar una anotació des de la pantalla Anotacions, de manera que algun dels documents de l'anotació no s'han adjuntat a l'expedient, des d'aquest llistat podrà tornar a intentar adjuntar el document a l'expedient.",
                 },
                 firma: {
@@ -629,11 +631,13 @@ const translationCa = {
                     label: "Canviar prioritat...",
                     title: "Modificar prioritat de l’expedient",
                     ok: "La prioritat de l’expedient '{{expedient}}' s’ha modificat correctament.",
+                    massiveOk: "S'han cambiat la prioritat de '{{data.num}}' expedients",
                 },
                 changeEstat: {
                     label: "Canviar estat...",
                     title: "Modificar estat de l’expedient",
                     ok: "L’estat de l’expedient '{{expedient}}' s’ha modificat correctament.",
+                    massiveOk: "S'ha cambiat l'estat a '{{data.num}}' expedients"
                 },
                 assignar: {
                     label: "Assignar...",
@@ -918,6 +922,7 @@ const translationCa = {
                     label: "Convertir a definitiu",
                     description: "Aquesta acció farà que els documents passin a formar part de l'expedient de forma definitiva i no es podran eliminar.",
                     ok: "Document '{{document}}' canviat a definitiu",
+                    massiveOk: "S'han marcat com definitius '{{data.num}}' documents",
                 },
             },
             alert: {
