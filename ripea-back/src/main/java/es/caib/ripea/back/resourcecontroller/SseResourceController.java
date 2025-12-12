@@ -240,7 +240,11 @@ public class SseResourceController {
 				Map.Entry<String, SseEmitter> usuariClient = iterator.next();
             	if (firmaMassiva.getFirmaResultat().getUsuari().equals(usuariClient.getKey())) {
             		try {
-            			usuariClient.getValue().send(SseEmitter.event().name(UserEventType.FIRMA_FINALITZADA.getEventName()).data(usuariClient.getKey()));
+                        Map<String, Object> map = new HashMap<>();
+                        map.put("usuari", usuariClient.getKey());
+                        map.put("status", "OK");
+                        map.put("msg", "Mensaje de prueba");
+            			usuariClient.getValue().send(SseEmitter.event().name(UserEventType.FIRMA_FINALITZADA.getEventName()).data(map));
             			logger.debug("... comunicats EventFirmaNavegadorMassiva al usuari "+usuariClient.getKey()+" a travers del emissor "+usuariClient.getValue().hashCode()+".");
     	            } catch (Exception e) {
     	            	clientsUsuaris.remove(usuariClient.getKey());

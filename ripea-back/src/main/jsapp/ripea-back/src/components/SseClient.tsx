@@ -18,9 +18,9 @@ const useTempSession = (key:string) => {
     const value = get(key)
 
     useEffect(() => {
-        if (value && !value?.processada){
+        if (value){
             onChangeRef?.current?.(value);
-            value.processada = true;
+            onChangeRef.current = () => {};
         }
     }, [value]);
 

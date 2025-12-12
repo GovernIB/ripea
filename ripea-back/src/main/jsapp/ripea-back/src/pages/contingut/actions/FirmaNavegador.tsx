@@ -37,19 +37,6 @@ export const useFirmaNavegador = (refresh?: () => void) => {
     const { onChange } = useFirmaFinalitzadaSession();
     const { value: user } = useUserSession();
 
-    onChange((firma) => {
-		if (user?.codi==firma?.usuari) {
-	        const severiry =
-	            firma?.status == 'OK' ? 'success'
-	                : firma?.status == 'WARNING' ? 'warning'
-	                    : firma?.status == 'ERROR' ? 'error'
-	                        : 'info';	
-	        apiRef?.current?.close?.();
-	        temporalMessageShow(null, firma?.msg, severiry);
-		}
-		refresh?.();
-    })
-
     const handleShow = (id: any, row: any): void => {
         apiRef.current?.show?.(undefined, {
             ids: [id],
@@ -57,13 +44,27 @@ export const useFirmaNavegador = (refresh?: () => void) => {
             motiu: "Tramitació del expedient RIPEA: " + row?.expedient?.description
         });
     }
+    const onSuccess = () => {
+        onChange((firma) => {
+            if (user?.codi==firma?.usuari) {
+                const severiry =
+                    firma?.status == 'OK' ? 'success'
+                        : firma?.status == 'WARNING' ? 'warning'
+                            : firma?.status == 'ERROR' ? 'error'
+                                : 'info';
+                apiRef?.current?.close?.();
+                temporalMessageShow(null, firma?.msg, severiry);
+            }
+            refresh?.();
+        })
+    }
     const formDialogResultProcessor = (result: any) => {
         return <Iframe isPDF={false} src={result?.url}/>
     }
 
     return {
         handleShow,
-        content: <FirmaNavegador apiRef={apiRef} formDialogResultProcessor={formDialogResultProcessor}/>
+        content: <FirmaNavegador apiRef={apiRef} onSuccess={onSuccess} formDialogResultProcessor={formDialogResultProcessor}/>
     }
 }
 export const useFirmaNavegadorMassive = (refresh?: () => void) => {
@@ -72,25 +73,25 @@ export const useFirmaNavegadorMassive = (refresh?: () => void) => {
     const { onChange } = useFirmaFinalitzadaSession();
     const { value: user } = useUserSession();
 
-    onChange((firma) => {
-		if (user?.codi==firma?.usuari) {
-            // TODO: revisar logica de firma masiva
-	        const severiry =
-	            firma?.status == 'OK' ? 'success'
-	                : firma?.status == 'WARNING' ? 'warning'
-	                    : firma?.status == 'ERROR' ? 'error'
-	                        : 'info';
-	        apiRef?.current?.close?.();
-	        temporalMessageShow(null, firma?.msg, severiry);
-		}
-		refresh?.();
-    })
-
     const handleShow = (ids: any[]): void => {
         apiRef.current?.show?.(undefined, {
             ids,
             massivo: true,
         });
+    }
+    const onSuccess = () => {
+        onChange((firma) => {
+            if (user?.codi==firma?.usuari) {
+                const severiry =
+                    firma?.status == 'OK' ? 'success'
+                        : firma?.status == 'WARNING' ? 'warning'
+                            : firma?.status == 'ERROR' ? 'error'
+                                : 'info';
+                apiRef?.current?.close?.();
+                temporalMessageShow(null, firma?.msg, severiry);
+            }
+            refresh?.();
+        })
     }
     const formDialogResultProcessor = (result: any) => {
         return <Iframe isPDF={false} src={result?.url}/>
@@ -98,7 +99,7 @@ export const useFirmaNavegadorMassive = (refresh?: () => void) => {
 
     return {
         handleShow,
-        content: <FirmaNavegador apiRef={apiRef} formDialogResultProcessor={formDialogResultProcessor}/>
+        content: <FirmaNavegador apiRef={apiRef} onSuccess={onSuccess} formDialogResultProcessor={formDialogResultProcessor}/>
     }
 }
 export default useFirmaNavegador;
