@@ -1,6 +1,6 @@
 import {useTranslation} from "react-i18next";
 import {useState} from "react";
-import {GridPage, MuiDialog, useMuiDataGridApiRef} from "reactlib";
+import {GridPage, MuiDialog, useMuiDataGridApiRef, useFormContext} from "reactlib";
 import {CardPage, ContenidoData} from "../../../components/CardData.tsx";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import {Grid, Icon} from "@mui/material";
@@ -17,8 +17,8 @@ const useDetail = () => {
     const [open, setOpen] = useState(false);
     const [entity, setEntity] = useState<any>();
 
-    const handleOpen = (id:any, row:any) => {
-        // console.log(id, row)
+    const handleOpen = (_id:any, row:any) => {
+        // console.log(_id, row)
         setEntity(row)
         setOpen(true);
     }
@@ -78,29 +78,45 @@ const useDetail = () => {
 
 // Filter
 const ContingutFilterForm = () => {
+    const { data } = useFormContext();
+
+    const isExpedient = data?.tipus === 'EXPEDIENT';
+    const isDocument = data?.tipus === 'DOCUMENT';
+    const isOther = data?.tipus && !isExpedient && !isDocument;
+
     return <>
         <GridFormField xs={3} name="nom"/>
         <GridFormField xs={3} name="createdBy"/>
         <GridFormField xs={3} name="tipus"/>
-        <GridFormField xs={3} name="metaNode"/>
-        <GridFormField xs={3} name="dataEsborratInici" type={"date"}/>
-        <GridFormField xs={3} name="dataEsborratFi" type={"date"}/>
-        <GridFormField xs={3} name="esborrat"/>
         <GridFormField xs={3} name="expedient"/>
-        <GridFormField xs={4} name="dataInici" type={"date"}/>
-        <GridFormField xs={4} name="dataFi" type={"date"}/>
+        {/* <GridFormField xs={3} name="metaExpedient" hidden={!isExpedient} disabled={isOther} />
+        <GridFormField xs={3} name="metaDocument" hidden={!isDocument} disabled={isOther} /> */}
+        <GridFormField xs={2} name="dataEsborratInici" type={"date"}/>
+        <GridFormField xs={2} name="dataEsborratFi" type={"date"}/>
+        <GridFormField xs={3} name="esborrat"/>        
+        <GridFormField xs={2} name="dataInici" type={"date"}/>
+        <GridFormField xs={2} name="dataFi" type={"date"}/>
         <Grid item xs={1.6}/>
     </>
 }
 
 const springFilterBuilder = (data:any) => {
+    const esborratFilter =
+        data?.esborrat == null || data?.esborrat === 'ESBORRATS_I_NO_ESBORRATS'
+            ? undefined
+            : data?.esborrat === 'NOMES_ESBORRATS'
+                ? builder.equals('esborrat', 1, true)
+                : data?.esborrat === 'NOMES_NO_ESBORRATS'
+                    ? builder.equals('esborrat', 0, true)
+                    : undefined;
+
     return builder.and(
         builder.like('nom', data?.nom),
-        builder.eq('createdBy', data?.createdBy?.id),
+        builder.eq('createdBy', `'${data?.createdBy?.id}'`),
         builder.eq('tipus', `'${data?.tipus}'`),
-        builder.eq('metaNode.id', data?.metaNode?.id),
+        /*builder.eq('metaNode.id', data?.metaNode?.id),*/
         builder.betweenDates('esborratData', data?.dataEsborratInici, data?.dataEsborratFi),
-        data?.esborrat != null && builder.equals('esborrat', 0, data?.esborrat == "false"),
+        esborratFilter,
         builder.eq('expedient.id', data?.expedient?.id),
         builder.betweenDates('createdDate', data?.dataInici, data?.dataFi),
     );
@@ -120,6 +136,7 @@ const ContingutFilter = (props: any) => {
 }
 
 // Grid
+const perspectives:any = ['AUDITORIA']
 const sortModel: any = [{field: 'createdDate', sort: 'desc'}]
 const columns = [
     {
@@ -142,22 +159,22 @@ const columns = [
     },
     {
         field: 'createdByFullName',
-        flex: 0.5,
+        flex: 0.8,
     },
     {
         field: 'createdDate',
-        flex: 0.75,
+        flex: 0.7,
         valueFormatter: (value: any) => formatDate(value),
     },
     {
         field: 'esborratData',
-        flex: 0.75,
+        flex: 0.7,
         valueFormatter: (value: any) => formatDate(value),
     },
     {
         field: 'expedient',
         headerName: '',
-        flex: 2,
+        flex: 1.5,
         renderCell: (params:any) => <>
             {/** TODO: revisar columna ubicación */}
             {!!params?.row?.expedient?.id && <>/<a href={`/contingut/${params?.row?.expedient?.id}`} style={{ display: 'flex', alignItems: 'center' }}><Icon>folder_open</Icon>{params?.formattedValue}</a></>}
@@ -176,10 +193,6 @@ const ContingutGrid = () => {
     const {t} = useTranslation();
     const apiRef = useMuiDataGridApiRef();
     const [springFilter, setSpringFilter] = useState<string>();
-
-    const refresh = () => {
-        apiRef?.current?.refresh?.();
-    }
 
     const { handleOpen: handleDetail, dialog: dialogDetail} = useDetail();
     const {handleOpen: handleHistoricOpen, dialog: dialogHistoric} = useHistoric();
@@ -219,14 +232,11 @@ const ContingutGrid = () => {
                 apiRef={apiRef}
                 resourceName={"contingutResource"}
                 columns={columns}
-                // TODO: revisar filtre
                 filter={springFilter}
                 sortModel={sortModel}
-
-                // TODO: revisar actions
+                perspectives={perspectives}
                 rowAdditionalActions={actions}
                 toolbarMassiveActions={massiveActions}
-
                 onRowClick={(params: any) => handleDetail(params?.row?.id, params?.row) }
                 toolbarHideCreate
             />

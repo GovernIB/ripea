@@ -88,6 +88,8 @@ public class SseResourceController {
 			case "FIRMA_FINALITZADA":
 				FirmaResultatDto frd = new FirmaResultatDto(StatusEnumDto.OK, "Firma ok.");
 				frd.setUsuari(userCode);
+				frd.setStatus(StatusEnumDto.OK);
+				frd.setMsg("La firma ha finalizat correctament (SSE test)");
 				FirmaFinalitzadaEvent ffe = new FirmaFinalitzadaEvent(0l, frd);
 				eventService.notifyFirmaNavegadorFinalitzada(ffe);
 //				handleEventFirmaNavegadorFinalitzada(ffe);
@@ -230,20 +232,20 @@ public class SseResourceController {
     
     @Async
     @JmsListener(destination = "firmaNavegadorFinalitzada")
-    public void handleEventFirmaNavegadorFinalitzada(FirmaFinalitzadaEvent firmaMassiva) {
-    	if (firmaMassiva!=null && firmaMassiva.getFirmaResultat()!=null && firmaMassiva.getFirmaResultat().getUsuari()!=null) {
+    public void handleEventFirmaNavegadorFinalitzada(FirmaFinalitzadaEvent firmaResultat) {
+    	if (firmaResultat!=null && firmaResultat.getFirmaResultat()!=null && firmaResultat.getFirmaResultat().getUsuari()!=null) {
     		logger.debug("Actualització de EventFirmaNavegadorMassiva a usuaris...");
 			//Empram iterator per poder eliminar sense problemes elements del mapa mentre el recorrem
 			Iterator<Map.Entry<String, SseEmitter>> iterator = clientsUsuaris.entrySet().iterator();
 			//Els avisos s'envien a tots els usuaris connectats
 			while (iterator.hasNext()) {
 				Map.Entry<String, SseEmitter> usuariClient = iterator.next();
-            	if (firmaMassiva.getFirmaResultat().getUsuari().equals(usuariClient.getKey())) {
+            	if (firmaResultat.getFirmaResultat().getUsuari().equals(usuariClient.getKey())) {
             		try {
                         Map<String, Object> map = new HashMap<>();
                         map.put("usuari", usuariClient.getKey());
-                        map.put("status", "OK");
-                        map.put("msg", "Mensaje de prueba");
+                        map.put("status", firmaResultat.getFirmaResultat().getStatus().toString());
+                        map.put("msg", firmaResultat.getFirmaResultat().getMsg());
             			usuariClient.getValue().send(SseEmitter.event().name(UserEventType.FIRMA_FINALITZADA.getEventName()).data(map));
             			logger.debug("... comunicats EventFirmaNavegadorMassiva al usuari "+usuariClient.getKey()+" a travers del emissor "+usuariClient.getValue().hashCode()+".");
     	            } catch (Exception e) {

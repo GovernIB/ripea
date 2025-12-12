@@ -581,7 +581,8 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 				for (Long petId: params.getIds()) {
 					expedientPeticioHelper.reintentarCanviEstatDistribucio(petId);
 				}
-				return objectMappingHelper.newInstanceMap(entity, ExpedientPeticioResource.class);
+				int numElem = params!=null && params.getIds()!=null?params.getIds().size():0;
+				return "{\"num\": \""+numElem+"\"}";
 			} catch (Exception e) {
 				String ids = Utils.getIdsSeparatsComa(params.getIds());
 				excepcioLogHelper.addExcepcio("/anotacio/CanviEstatDistribucioActionExecutor", e, ids, "massiu="+params.isMassivo());

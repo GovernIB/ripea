@@ -1255,7 +1255,8 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 						entity.setPrioritat(params.getPrioritat());
 					}
 				}
-				return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
+				int numElem = params!=null && params.getIds()!=null?params.getIds().size():0;
+				return "{\"num\": \""+numElem+"\"}";
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio(
 						"/expedient/CanviPrioritatActionExecutor", e,
@@ -1283,7 +1284,8 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 								params.getEstatAdditional().getId());
 					}
 				}
-				return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
+				int numElem = params!=null && params.getIds()!=null?params.getIds().size():0;
+				return "{\"num\": \""+numElem+"\"}";
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio(
 						"/expedient/CanviEstatActionExecutor", e,

@@ -189,13 +189,12 @@ public class RegistreAnnexResourceServiceImpl extends BaseMutableResourceService
 		public Serializable exec(String code, RegistreAnnexResourceEntity entity, MassiveAction params) throws ActionExecutionException {
 			try {
 				List<CodiValorDto> resultat = new ArrayList<>();
-	        	
 				for (Long idAnn: params.getIds()) {
 					Exception errorReintentant = expedientHelper.moveDocumentArxiuNewTransaction(idAnn);
 					resultat.add(new CodiValorDto(idAnn.toString(), errorReintentant!=null?errorReintentant.getMessage():"OK"));
 				}
-				
-	        	return (Serializable)resultat;
+				int numElem = params!=null && params.getIds()!=null?params.getIds().size():0;
+				return "{\"num\": \""+numElem+"\"}";
 			} catch (Exception e) {
 				String ids = Utils.getIdsSeparatsComa(params.getIds());
 				excepcioLogHelper.addExcepcio("/annexPeticio/ReintentarArxiuActionExecutor",e,ids,"massiu="+params.isMassivo());

@@ -1,14 +1,13 @@
-/**
- * 
- */
 package es.caib.ripea.back.command;
 
-import es.caib.ripea.back.helper.ConversioTipusHelper;
-import es.caib.ripea.service.intf.dto.ContingutFiltreDto;
-import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
+import java.util.Date;
+
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import java.util.Date;
+import es.caib.ripea.back.helper.ConversioTipusHelper;
+import es.caib.ripea.service.intf.dto.ContenidorFiltreOpcionsEsborratEnum;
+import es.caib.ripea.service.intf.dto.ContingutFiltreDto;
+import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
 
 /**
  * Command per al filtre del localitzador de continguts
@@ -17,12 +16,6 @@ import java.util.Date;
  * @author Limit Tecnologies <limit@limit.es>
  */
 public class ContingutFiltreCommand {
-
-	public enum ContenidorFiltreOpcionsEsborratEnum {
-		NOMES_NO_ESBORRATS,
-		NOMES_ESBORRATS,
-		ESBORRATS_I_NO_ESBORRATS
-	};
 
 	private String nom;
 	private String creador;

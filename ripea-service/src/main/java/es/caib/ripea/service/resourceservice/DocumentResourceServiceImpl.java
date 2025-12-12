@@ -1142,7 +1142,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 						documentHelper.actualitzarEstat(document, DocumentEstatEnumDto.DEFINITIU);
 					}
 				}
-				return objectMappingHelper.newInstanceMap(entity, DocumentResource.class);
+				int numElem = params!=null && params.getIds()!=null?params.getIds().size():0;
+				return "{\"num\": \""+numElem+"\"}";
 			} catch (Exception e) {
 				String docIdStr = Utils.getIdsSeparatsComa(params.getIds());
 				excepcioLogHelper.addExcepcio("/document/ConvertirDefinitiuActionExecutor", e, docIdStr, "massiu="+params.isMassivo());

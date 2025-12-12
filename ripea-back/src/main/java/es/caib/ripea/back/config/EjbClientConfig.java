@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.back.config;
 
 import es.caib.ripea.service.intf.resourceservice.*;
@@ -480,6 +477,11 @@ public class EjbClientConfig {
 	@Bean
 	public LocalStatelessSessionProxyFactoryBean interessatGrupResourceServiceEjb() {
 		return getLocalEjbFactoyBean(InteressatGrupResourceService.class);
+	}
+	
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean metaNodeResourceServiceEjb() {
+		return getLocalEjbFactoyBean(MetaNodeResourceService.class);
 	}
 
 	/*
