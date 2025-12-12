@@ -13,7 +13,7 @@ const Visualitzar = (props: any) => {
 
     return <Load value={entity}>
         <Firmes entity={entity}/>
-        <Iframe isPDF={true} src={getUrl(`contingut/document/${entity?.id}/getImprimibleOrOriginal`)}/>
+        <Iframe isPDF src={getUrl(`contingut/document/${entity?.id}/getImprimibleOrOriginal`)}/>
     </Load>
 }
 

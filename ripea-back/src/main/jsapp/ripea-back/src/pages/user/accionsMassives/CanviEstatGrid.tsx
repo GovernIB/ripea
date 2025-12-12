@@ -114,15 +114,11 @@ const perspectives:any = ['ESTAT', 'AUDITORIA']
 const CanviEstatGrid = () => {
     const {t} = useTranslation();
     const apiRef = useMuiDataGridApiRef();
-    const dataApiRef = useMuiDatagridApiRef();
     const [springFilter, setSpringFilter] = useState<string>();
 
     const sessionKey = "MASSIVE_CANVI_ESTAT_FILTER";
     const { value: filterData } = useSession(sessionKey);
-    const haveRequirements = useMemo(() => {
-        dataApiRef?.current?.setRowSelectionModel?.([])
-        return !!filterData?.procediment
-    }, [filterData?.procediment])
+    const haveRequirements = useMemo(() => !!filterData?.procediment, [filterData?.procediment])
 
     const refresh = () => {
         apiRef?.current?.refresh?.();
@@ -158,7 +154,6 @@ const CanviEstatGrid = () => {
 
             <CanviEstatMuiGrid
                 apiRef={apiRef}
-                datagridApiRef={dataApiRef}
                 filter={springFilter}
                 perspectives={perspectives}
                 namedQueries={namedQueries}

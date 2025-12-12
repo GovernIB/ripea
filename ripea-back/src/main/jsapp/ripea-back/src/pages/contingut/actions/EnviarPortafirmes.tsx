@@ -52,7 +52,7 @@ const useConverdedToPDF = () => {
             }}
         >
             <Load value={entityId}>
-                <Iframe isPDF={true} src={getUrl(`document/convertir/pdf/${entityId}`)}/>
+                <Iframe isPDF src={getUrl(`document/convertir/pdf/${entityId}`)}/>
             </Load>
         </MuiDialog>
 
@@ -199,11 +199,11 @@ const EnviarPortafirmesForm = forwardRef((props, ref) => {
         <GridFormField xs={12} name="avisFirmaParcial" hidden={!data?.mostrarAvisFirmaParcial}/>
 
         <Grid item xs={12} hidden={!data?.portafirmesFluxUrl || !open}>
-            <Iframe isPDF={false} src={data?.portafirmesFluxUrl}/>
+            <Iframe src={data?.portafirmesFluxUrl}/>
         </Grid>
 
         <Grid item xs={12} hidden={!data?.urlInicioFlujoFirma || !openNewFlux}>
-            <Iframe isPDF={false} src={data?.urlInicioFlujoFirma}/>
+            <Iframe src={data?.urlInicioFlujoFirma}/>
         </Grid>
     </Grid>
 });

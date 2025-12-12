@@ -59,7 +59,7 @@ export const useFirmaNavegador = (refresh?: () => void) => {
         })
     }
     const formDialogResultProcessor = (result: any) => {
-        return <Iframe isPDF={false} src={result?.url}/>
+        return <Iframe src={result?.url}/>
     }
 
     return {
@@ -94,7 +94,7 @@ export const useFirmaNavegadorMassive = (refresh?: () => void) => {
         })
     }
     const formDialogResultProcessor = (result: any) => {
-        return <Iframe isPDF={false} src={result?.url}/>
+        return <Iframe src={result?.url}/>
     }
 
     return {
