@@ -84,15 +84,13 @@ const columns = [
 const EnviarPortafirmesGrid = () => {
     const {t} = useTranslation();
     const apiRef = useMuiDataGridApiRef();
-    const dataApiRef = useMuiDatagridApiRef();
     const [springFilter, setSpringFilter] = useState<string>();
 
     const sessionKey = "MASSIVE_PORTAFIRMES_FILTER";
     const { value: filterData } = useSession(sessionKey);
-    const haveRequirements = useMemo(() => {
-        dataApiRef?.current?.setRowSelectionModel?.([])
-        return !!filterData?.procediment && !!filterData?.metaDocument
-    }, [filterData?.procediment, filterData?.metaDocument])
+    const haveRequirements = useMemo(() =>
+        !!filterData?.procediment && !!filterData?.metaDocument,
+        [filterData?.procediment, filterData?.metaDocument])
 
     const refresh = () => {
         apiRef?.current?.refresh?.();
@@ -128,7 +126,6 @@ const EnviarPortafirmesGrid = () => {
 
             <StyledMuiGrid
                 apiRef={apiRef}
-                datagridApiRef={dataApiRef}
                 resourceName={"documentResource"}
                 columns={columns}
                 filter={springFilter}
