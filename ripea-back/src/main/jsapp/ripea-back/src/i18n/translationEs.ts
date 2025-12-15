@@ -167,6 +167,7 @@ const translationEs = {
         contingut: {
             grid: {
                 nom: "Nombre",
+                path: "Ruta del contenido",
             },
             detalle: {
                 title: "Content details",
@@ -259,7 +260,13 @@ const translationEs = {
                     label: "Custodiar",
                 },
                 replay: {
-                    label: "Recover",
+                    label: "Recuperar",
+                    ok: "El contenido se ha recuperado correctamente",
+                    massiveOk: "Los contenidos se han recuperado correctamente",
+                },
+                delete: {
+                    ok: "El contenido se ha eliminado correctamente",
+                    massiveOk: "Los contenidos se han eliminado correctamente",
                 },
             },
             history: {
