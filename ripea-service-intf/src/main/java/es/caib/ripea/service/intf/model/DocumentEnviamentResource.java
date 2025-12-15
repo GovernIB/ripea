@@ -16,7 +16,7 @@ import java.util.*;
 @Getter
 @Setter
 @NoArgsConstructor
-@ResourceConfig(quickFilterFields = { "documentNum", "nom" }, descriptionField = "nom")
+@ResourceConfig(quickFilterFields = { "assumpte"}, descriptionField = "assumpte")
 public abstract class DocumentEnviamentResource extends BaseAuditableResource<Long> {
 
     private DocumentEnviamentEstatEnumDto estat;
