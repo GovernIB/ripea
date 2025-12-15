@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.stereotype.Service;
 
 import com.turkraft.springfilter.FilterBuilder;
@@ -12,10 +14,13 @@ import com.turkraft.springfilter.parser.Filter;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientResourceEntity;
+import es.caib.ripea.persistence.entity.resourceentity.UsuariResourceEntity;
+import es.caib.ripea.persistence.entity.resourcerepository.UsuariResourceRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.MetaExpedientHelper;
+import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
 import es.caib.ripea.service.intf.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.service.intf.model.EntitatResource;
 import es.caib.ripea.service.intf.model.MetaExpedientResource;
@@ -38,7 +43,13 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 	private final ConfigHelper configHelper;
 	private final MetaExpedientHelper metaExpedientHelper;
 	private final EntityComprovarHelper entityComprovarHelper;
+	private final UsuariResourceRepository usuariResourceRepository;
 
+    @PostConstruct
+    public void init() {
+    	register(MetaExpedientResource.PERSPECTIVE_AUDIT_CODE, new AuditoriaPerspectiveApplicator());
+    }
+	
 	@Override
     protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
 
@@ -93,6 +104,11 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
             		isAdminOrgan,
             		null, //organId
             		false); //comú
+        } else if (mapaNamedQueries.size()>0 && mapaNamedQueries.containsKey("CONSULTA_REVISIO_ESTAT")) {
+        	//Volem replicar metaExpedientServiceImpl.findByEntitat
+        	//Nom comprova cap permis, ja que es un manteniment per admins
+        	//Nomes filtra per entitat o els filtres del formulari de cerca.
+        	return filtreBase.generate();
         } else { //Llistat de procediments
             metaExpPermesos = metaExpedientHelper.findAmbPermis(
             		entitat.getId(),
@@ -131,5 +147,21 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
     @Override
     protected void afterConversion(MetaExpedientResourceEntity entity, MetaExpedientResource resource) {
         resource.setNumComentaris(entity.getComentaris().size());
+    }
+    
+    private class AuditoriaPerspectiveApplicator implements PerspectiveApplicator<MetaExpedientResourceEntity, MetaExpedientResource> {
+        @Override
+        public void applySingle(String code, MetaExpedientResourceEntity entity, MetaExpedientResource resource) throws PerspectiveApplicationException {
+        	if (entity.getCreatedBy()!=null) {
+        		UsuariResourceEntity usuariResourceEntity = usuariResourceRepository.findById(entity.getCreatedBy()).orElse(null);
+        		if (usuariResourceEntity!=null) {
+        			resource.setCreatedByFullName(usuariResourceEntity.getNom() + " (" + usuariResourceEntity.getCodi() + ")");
+        		}
+        	}
+        	if (entity.getLastModifiedBy()!=null) {
+        		UsuariResourceEntity usuariResourceEntity = usuariResourceRepository.findById(entity.getLastModifiedBy()).orElse(null);
+        		resource.setLastModifiedByFullName(usuariResourceEntity.getNom() + " (" + usuariResourceEntity.getCodi() + ")");
+        	}
+        }
     }
 }

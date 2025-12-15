@@ -153,19 +153,14 @@ const RevisioMetaExpedientGrid = () => {
     return <GridPage disableMargins>
         <CardPage title={t('page.user.menu.revisar')}>
             <RevisioMetaExpedientFilter onSpringFilterChange={setSpringFilter}/>
-
             <StyledMuiGrid
                 apiRef={apiRef}
                 resourceName={"metaExpedientResource"}
                 columns={columnsAddition}
-                // TODO: revisar filtre
                 filter={springFilter}
                 sortModel={sortModel}
-
-                // TODO: revisar actions
-                // rowAdditionalActions={actions}
-                // toolbarMassiveActions={massiveActions}
-
+                perspectives={['AUDITORIA']}
+                namedQueries={['CONSULTA_REVISIO_ESTAT']}
                 readOnly
             />
         </CardPage>

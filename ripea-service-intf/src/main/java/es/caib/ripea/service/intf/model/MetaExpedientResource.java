@@ -30,6 +30,9 @@ import lombok.experimental.FieldNameConstants;
 		quickFilterFields = { "codi", "nom" },
 		descriptionField = "nomClassificacio",
         artifacts = {
+				@ResourceConfigArtifact(
+						type = ResourceArtifactType.PERSPECTIVE,
+						code = MetaExpedientResource.PERSPECTIVE_AUDIT_CODE),        		
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.FILTER,
                         code = MetaExpedientResource.FILTER_REVISIO_CODE,
@@ -45,6 +48,7 @@ public class MetaExpedientResource extends MetaNodeResource {
 
     public static final String FILTER_REVISIO_CODE = "FILTER_REVISIO";
     public static final String FILTER_GESTIO_CODE = "FILTER_GESTIO";
+    public static final String PERSPECTIVE_AUDIT_CODE = "AUDITORIA";
 
 	@NotNull
 	@Size(max = 64)
@@ -87,7 +91,7 @@ public class MetaExpedientResource extends MetaNodeResource {
 	private ResourceReference<GrupResource, Long> grupPerDefecte;
 
     @Transient int numComentaris;
-
+    @Transient boolean procedimentComu;
 	@Transient private List<ResourceReference<ExpedientEstatResource, Long>> estats;
 	@Transient private List<ResourceReference<MetaExpedientOrganGestorResource, Long>> metaExpedientOrganGestors;
 

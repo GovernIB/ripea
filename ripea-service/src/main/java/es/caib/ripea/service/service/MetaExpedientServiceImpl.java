@@ -1099,24 +1099,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		Utils.addSortDefault(paginacioParams, "nom");
 		
 		return paginacioHelper.toPaginaDto(
-				metaExpedientRepository.findByEntitat(
-						entitat,
-						filtre.getCodi() == null || filtre.getCodi().isEmpty(),
-						filtre.getCodi() != null ? filtre.getCodi().trim() : "",
-						filtre.getNom() == null || filtre.getNom().isEmpty(),
-						filtre.getNom() != null ? filtre.getNom().trim() : "",
-						filtre.getClassificacio() == null || filtre.getClassificacio().isEmpty(),
-						filtre.getClassificacio() != null ? filtre.getClassificacio().trim() : "",
-						filtre.getActiu() == null,
-						filtre.getActiu() != null ? filtre.getActiu().getValue() : null,
-						filtre.getOrganGestorId() == null,
-						filtre.getOrganGestorId() != null ? organGestorRepository.getOne(filtre.getOrganGestorId()) : null,
-						filtre.getAmbit() == null ,
-						filtre.getAmbit() == MetaExpedientAmbitEnumDto.COMUNS ? true : false,
-						filtre.getRevisioEstats()==null || filtre.getRevisioEstats()[0] == null,
-						filtre.getRevisioEstats()==null || filtre.getRevisioEstats()[0] == null ? null : filtre.getRevisioEstats(),
-						filtre.isPermisDirecteActive(),
-						paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap)),
+				metaExpedientHelper.findByEntitat(entitat, filtre, paginacioParams, ordenacioMap),
 				MetaExpedientDto.class,
 				new Converter<MetaExpedientEntity, MetaExpedientDto>() {
 					@Override

@@ -22,6 +22,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -62,10 +63,13 @@ import es.caib.ripea.service.intf.dto.AvisNivellEnumDto;
 import es.caib.ripea.service.intf.dto.CrearReglaDistribucioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.CrearReglaResponseDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientAmbitEnumDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientCarpetaDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientFiltreDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientTascaDto;
+import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
 import es.caib.ripea.service.intf.dto.PermisDto;
 import es.caib.ripea.service.intf.dto.ProcedimentDto;
 import es.caib.ripea.service.intf.dto.ProgresActualitzacioDto;
@@ -103,6 +107,7 @@ public class MetaExpedientHelper {
 	@Autowired private MetaNodeHelper metaNodeHelper;
 	@Autowired private MetaDocumentRepository metaDocumentRepository;
 	@Autowired private ApplicationHelper applicationHelper;
+	@Autowired private PaginacioHelper paginacioHelper;
 
 	public static final String PROCEDIMENT_ORGAN_NO_SYNC = "Hi ha procediments que pertanyen a òrgans no existents en l'organigrama actual";
 
@@ -292,6 +297,31 @@ public class MetaExpedientHelper {
 		permisos.addAll(permisosHelper.findPermisos(id, MetaNodeEntity.class));
 		return permisos;
 
+	}
+	
+	public Page<MetaExpedientEntity> findByEntitat(
+			EntitatEntity entitat,
+			MetaExpedientFiltreDto filtre,
+			PaginacioParamsDto paginacioParams,
+			Map<String, String[]> ordenacioMap) {
+		return metaExpedientRepository.findByEntitat(
+				entitat,
+				filtre.getCodi() == null || filtre.getCodi().isEmpty(),
+				filtre.getCodi() != null ? filtre.getCodi().trim() : "",
+				filtre.getNom() == null || filtre.getNom().isEmpty(),
+				filtre.getNom() != null ? filtre.getNom().trim() : "",
+				filtre.getClassificacio() == null || filtre.getClassificacio().isEmpty(),
+				filtre.getClassificacio() != null ? filtre.getClassificacio().trim() : "",
+				filtre.getActiu() == null,
+				filtre.getActiu() != null ? filtre.getActiu().getValue() : null,
+				filtre.getOrganGestorId() == null,
+				filtre.getOrganGestorId() != null ? organGestorRepository.getOne(filtre.getOrganGestorId()) : null,
+				filtre.getAmbit() == null ,
+				filtre.getAmbit() == MetaExpedientAmbitEnumDto.COMUNS ? true : false,
+				filtre.getRevisioEstats()==null || filtre.getRevisioEstats()[0] == null,
+				filtre.getRevisioEstats()==null || filtre.getRevisioEstats()[0] == null ? null : filtre.getRevisioEstats(),
+				filtre.isPermisDirecteActive(),
+				paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap));
 	}
 
 	public List<MetaExpedientEntity> findAmbPermis(
