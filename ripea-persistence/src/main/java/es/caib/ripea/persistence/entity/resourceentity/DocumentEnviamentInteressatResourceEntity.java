@@ -1,12 +1,9 @@
 package es.caib.ripea.persistence.entity.resourceentity;
 
 import es.caib.ripea.persistence.base.entity.BaseAuditableEntity;
-import es.caib.ripea.persistence.entity.DocumentNotificacioEntity;
-import es.caib.ripea.persistence.entity.InteressatEntity;
 import es.caib.ripea.service.intf.config.BaseConfig;
+import es.caib.ripea.service.intf.dto.EnviamentEstatEnumDto;
 import es.caib.ripea.service.intf.model.DocumentEnviamentInteressatResource;
-import es.caib.ripea.service.intf.model.DocumentNotificacioResource;
-import es.caib.ripea.service.intf.model.InteressatResource;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -34,7 +31,8 @@ public class DocumentEnviamentInteressatResourceEntity extends BaseAuditableEnti
 
 
     @Column(name = "not_env_dat_estat", length = 20)
-    private String enviamentDatatEstat; //Notib: notificaEstat
+    @Enumerated(EnumType.STRING)
+    private EnviamentEstatEnumDto enviamentDatatEstat; //Notib: notificaEstat
     @Column(name = "not_env_dat_data")
     private Date enviamentDatatData; //Notib: notificaEstatData
     @Column(name = "not_env_dat_orig", length = 20)

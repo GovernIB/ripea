@@ -93,7 +93,7 @@ const useCarpetaActions = (entity:any, refresh?: () => void) => {
             icon: 'autorenew',
             showInMenu: true,
             onClick: guardarArxiu,
-            hidden: (row:any) => row?.arxiuUuid
+            hidden: (row:any) => row?.arxiuUuid || user?.sessionScope?.isCreacioCarpetesLogica
         }, 
         /*{
             label: t('page.carpeta.action.update.label'),

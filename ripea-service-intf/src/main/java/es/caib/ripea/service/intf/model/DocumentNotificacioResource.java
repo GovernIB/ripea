@@ -20,8 +20,8 @@ import javax.validation.constraints.NotNull;
 @Setter
 @NoArgsConstructor
 @ResourceConfig(
-        quickFilterFields = { "nom" },
-        descriptionField = "nom",
+        quickFilterFields = { "notificacioIdentificador", "enviamentReferencia", "registreNumero" },
+        descriptionField = "registreNumero",
         artifacts = {
             @ResourceConfigArtifact(
                 type = ResourceArtifactType.ACTION,

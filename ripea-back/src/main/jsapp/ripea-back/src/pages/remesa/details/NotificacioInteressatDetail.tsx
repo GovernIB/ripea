@@ -20,7 +20,7 @@ const Dades = (props:any) => {
 
                 <ContenidoData title={t('page.notificacioInteressat.detall.entregaNif')}>{entity?.entregaNif}</ContenidoData>
                 <ContenidoData title={t('page.notificacioInteressat.detall.classificacio')}>{entity?.classificacio}</ContenidoData>
-                <ContenidoData title={t('page.interessat.detall.entregaDehObligat')}>{t(`enum.siNO.${entity?.interessatInfo?.entregaDehObligat}`)}</ContenidoData>
+                <ContenidoData title={t('page.interessat.detall.entregaDehObligat')} hidden={!entity?.representantInfo?.entregaDehObligat}>{t(`enum.siNO.${entity?.interessatInfo?.entregaDehObligat}`)}</ContenidoData>
                 <ContenidoData title={t('page.notificacio.detall.serveiTipusEnum')}>{entity?.notificacioInfo?.serveiTipusEnum ?? 'NORMAL'}</ContenidoData>
                 <ContenidoData title={t('page.notificacioInteressat.detall.enviamentDatatEstat')}>{entity?.enviamentDatatEstat}</ContenidoData>
             </CardData>
