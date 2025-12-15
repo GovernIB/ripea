@@ -185,6 +185,7 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
         response.put("ordenacioContingutPermesa", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.ORDENACIO_CONTINGUT_ACTIU)));
         response.put("moureMateixExpedients", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.MOURE_MATEIX_EXPEDIENTS)));
         response.put("permesEsborrarFinals", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.PERMATRE_ESBORRAR_FINAL)));
+        response.put("isRevisioActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.METAEXPEDIENT_REVISIO_ACTIVA)));
         List<GrupDto> grupsPermesos = null;
         if (organActual!=null) {
         	grupsPermesos = grupService.findGrupsPermesosProcedimentsGestioActiva(

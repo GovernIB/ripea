@@ -8,7 +8,8 @@ import {EstatMessage} from "../../remesa/RemesaGrid.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
 import GridFormField from "../../../components/GridFormField.tsx";
-import {Grid} from "@mui/material";
+import {Link as RouterLink} from "react-router-dom";
+import {Grid, Link} from "@mui/material";
 
 const ConsultesPinbalFilterForm = () => {
     return <>
@@ -66,7 +67,7 @@ const columns = [
     {
         field: 'expedient',
         flex: 1,
-        renderCell: (params:any) => <a href={`/contingut/${params?.row?.expedient?.id}`}>{params?.formattedValue}</a>,
+        renderCell: (params:any) => <Link component={RouterLink} to={`/contingut/${params?.row?.expedient?.id}`}>{params?.formattedValue}</Link>,
     },
     {
         field: 'metaExpedient',

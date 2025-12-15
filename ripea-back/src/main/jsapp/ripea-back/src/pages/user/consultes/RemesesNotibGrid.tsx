@@ -8,7 +8,8 @@ import {StyledEstat} from "../../remesa/RemesaGrid.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import GridFormField, {GridButtonField} from "../../../components/GridFormField.tsx";
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
-import {Grid} from "@mui/material";
+import {Link as RouterLink} from "react-router-dom";
+import {Grid, Link} from "@mui/material";
 
 // Filter
 const RemesesNotibFilterForm = () => {
@@ -85,7 +86,7 @@ const columns = [
     {
         field: 'expedient',
         flex: 1,
-        renderCell: (params:any) => <a href={`/contingut/${params?.row?.expedient?.id}`}>{params?.formattedValue}</a>,
+        renderCell: (params:any) => <Link component={RouterLink} to={`/contingut/${params?.row?.expedient?.id}`}>{params?.formattedValue}</Link>,
     },
     {
         field: 'assumpte',
@@ -159,15 +160,10 @@ const RemesesNotibGrid = () => {
             <StyledMuiGrid
                 resourceName={"documentNotificacioResource"}
                 columns={columns}
-                // TODO: revisar filtro
-                filter={builder.and(
-                    builder.neq('enviatData', null),
-                    springFilter)}
+                filter={springFilter}
                 sortModel={sortModel}
-
                 rowAdditionalActions={actions}
                 toolbarMassiveActions={massiveActions}
-
                 toolbarHideCreate
             />
         </CardPage>

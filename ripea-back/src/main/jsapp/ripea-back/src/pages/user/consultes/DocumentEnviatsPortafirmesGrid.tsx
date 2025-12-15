@@ -7,7 +7,8 @@ import {formatDate} from "../../../util/dateUtils.ts";
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import GridFormField from "../../../components/GridFormField.tsx";
-import {Grid} from "@mui/material";
+import {Link as RouterLink} from "react-router-dom";
+import {Grid, Link} from "@mui/material";
 import {SeguimentPortafirmes} from "../../contingut/actions/SeguimentPortafirmes.tsx";
 
 // Detail
@@ -97,7 +98,7 @@ const columns = [
     {
         field: 'expedient',
         flex: 1,
-        renderCell: (params:any) => <a href={`/contingut/${params?.row?.expedient?.id}`}>{params?.formattedValue}</a>,
+        renderCell: (params:any) => <Link component={RouterLink} to={`/contingut/${params?.row?.expedient?.id}`}>{params?.formattedValue}</Link>,
     },
     {
         field: 'document',
@@ -145,12 +146,9 @@ const DocumentEnviatsPortafirmesGrid = () => {
             <StyledMuiGrid
                 resourceName={"documentPortafirmesResource"}
                 columns={columns}
-                // TODO: revisar filtro
                 filter={springFilter}
                 sortModel={sortModel}
-
                 rowAdditionalActions={actions}
-
                 readOnly
             />
             {dialog}

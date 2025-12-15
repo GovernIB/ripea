@@ -383,12 +383,12 @@ const useMenuAdmin = () => {
                     // icon: '',
                     to: 'contingutAdmin',
                 },
-                {
+                /*{
                     id: 'dadesEstadistiques',
                     title: t('page.user.menu.dadesEstadistiques'),
                     // icon: '',
                     onClick: () => toProgramaAntic('historic'),
-                },
+                },*/
                 {
                     id: 'revisar',
                     title: t('page.user.menu.revisar'),

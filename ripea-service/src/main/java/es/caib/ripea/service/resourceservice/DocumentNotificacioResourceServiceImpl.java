@@ -14,6 +14,9 @@ import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.model.InteressatResource;
 import org.springframework.stereotype.Service;
 
+import com.turkraft.springfilter.FilterBuilder;
+import com.turkraft.springfilter.parser.Filter;
+
 import es.caib.ripea.persistence.entity.DocumentEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.resourceentity.DocumentNotificacioResourceEntity;
@@ -29,10 +32,15 @@ import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.base.model.ReportFileType;
 import es.caib.ripea.service.intf.dto.DocumentNotificacioTipusEnumDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
+import es.caib.ripea.service.intf.model.ContingutResource;
+import es.caib.ripea.service.intf.model.DocumentEnviamentResource;
 import es.caib.ripea.service.intf.model.DocumentNotificacioResource;
 import es.caib.ripea.service.intf.model.DocumentResource;
+import es.caib.ripea.service.intf.model.EntitatResource;
+import es.caib.ripea.service.intf.model.ExpedientResource;
 import es.caib.ripea.service.intf.model.DocumentNotificacioResource.MassiveAction;
 import es.caib.ripea.service.intf.resourceservice.DocumentNotificacioResourceService;
+import es.caib.ripea.service.intf.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -53,6 +61,7 @@ public class DocumentNotificacioResourceServiceImpl extends BaseMutableResourceS
 	private final EntityComprovarHelper entityComprovarHelper;
 	private final DocumentNotificacioHelper documentNotificacioHelper;
 	private final MessageHelper messageHelper;
+	private final MetaExpedientHelper metaExpedientHelper;
 
 	private final DocumentNotificacioResourceRepository documentNotificacioResourceRepository;
 	
@@ -63,6 +72,40 @@ public class DocumentNotificacioResourceServiceImpl extends BaseMutableResourceS
         register(DocumentNotificacioResource.ACTION_DESCARREGAR_DOC_ENVIAT, new DescarregarDocEnviatReportGenerator());
     }
 
+    @Override
+    protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
+    	
+    	String entitatActualCodi = configHelper.getEntitatActualCodi();
+    	String rolActual		 = configHelper.getRolActual();
+    	
+    	boolean isAdmin = "IPA_ADMIN".equals(rolActual);
+    	
+        Filter filtreBase = FilterBuilder.and(
+                (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null,
+                FilterBuilder.equal(DocumentEnviamentResource.Fields.document + "." + ContingutResource.Fields.entitat + "." + EntitatResource.Fields.codi, 
+                		entitatActualCodi != null?entitatActualCodi:"................................................................................")
+        );
+        
+        Filter filtrePermisos = null;
+        if (!isAdmin) {
+        	EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, true, false, false, false ,false);
+	        List<Long> idMetaExpedientPermesos = metaExpedientHelper.getIdsReadPermesos(entitat.getId());
+	        List<String> permesosClausulesIn = Utils.getIdsEnGruposMil(idMetaExpedientPermesos);
+	        if (permesosClausulesIn!=null) {
+	        	String campProcedimentId = DocumentEnviamentResource.Fields.expedient + "." + ExpedientResource.Fields.metaExpedient +".id";
+		        for (String aux: permesosClausulesIn) {
+			        if (aux != null && !aux.isEmpty()) {
+			        	filtrePermisos = FilterBuilder.or(filtrePermisos, Filter.parse(campProcedimentId+" IN (" + aux + ")"));
+			        }
+		        }
+	        }
+        }
+        
+        Filter filtreResultat = FilterBuilder.and(filtreBase, filtrePermisos);
+        
+        return filtreResultat.generate();
+    }    
+    
     @Override
     protected void afterConversion(DocumentNotificacioResourceEntity entity, DocumentNotificacioResource resource) {
         resource.setFitxerNom(entity.getDocument().getFitxerNom());

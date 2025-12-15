@@ -5,7 +5,8 @@ import {CardPage} from "../../../components/CardData.tsx";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import GridFormField from "../../../components/GridFormField.tsx";
-import {Grid} from "@mui/material";
+import {Link as RouterLink} from "react-router-dom";
+import {Grid, Link} from "@mui/material";
 import * as builder from "../../../util/springFilterUtils.ts";
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
 
@@ -51,7 +52,7 @@ const columns = [
     {
         field: 'expedient',
         flex: 1,
-        renderCell: (params:any) => <a href={`/contingut/${params?.row?.expedient?.id}`}>{params?.formattedValue}</a>,
+        renderCell: (params:any) => <Link component={RouterLink} to={`/contingut/${params?.row?.expedient?.id}`}>{params?.formattedValue}</Link>,
     },
     {
         field: 'titol',
