@@ -7,6 +7,7 @@ import java.util.List;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+import es.caib.ripea.service.intf.dto.EnviamentEstatEnumDto;
 import org.springframework.data.annotation.Transient;
 
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
@@ -49,7 +50,7 @@ public class DocumentEnviamentInteressatResource extends BaseAuditableResource<L
     public static final String REPORT_DESCARREGAR_CERTIFICAT = "DESCARREGAR_CERTIFICAT";
 
     private String enviamentReferencia;
-    private String enviamentDatatEstat;
+    private EnviamentEstatEnumDto enviamentDatatEstat;
     private Date enviamentDatatData;
     private String enviamentDatatOrigen;
     private Date enviamentCertificacioData;
