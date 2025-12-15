@@ -48,8 +48,8 @@ implements ContingutResourceService {
     @PostConstruct
     public void init() {
     	register(ContingutResource.PERSPECTIVE_AUDIT_CODE, new AuditoriaPerspectiveApplicator());
-        register(ContingutResource.ACTION_DELETE_CODE, new DeleteActionExecutor());
-        register(ContingutResource.ACTION_RECUPERAR_CODE, new ReobrirActionExecutor());
+//        register(ContingutResource.ACTION_DELETE_CODE, new DeleteActionExecutor());
+//        register(ContingutResource.ACTION_RECUPERAR_CODE, new ReobrirActionExecutor());
     }
 	
     @Override
@@ -84,52 +84,52 @@ implements ContingutResourceService {
         }
     }
     
-    private class ReobrirActionExecutor implements ActionExecutor<ContingutResourceEntity, MassiveAction, Serializable> {
-
-		@Override
-		public Serializable exec(String code, ContingutResourceEntity entity, MassiveAction params) throws ActionExecutionException {
-			try {
-				if (params.getIds()!=null) {
-					//		contingutService.undelete
-				}
-				int numElem = params!=null && params.getIds()!=null?params.getIds().size():0;
-				return "{\"num\": \""+numElem+"\"}";
-			} catch (Exception e) {
-				String docIdStr = Utils.getIdsSeparatsComa(params.getIds());
-				excepcioLogHelper.addExcepcio("/contingut/ReobrirActionExecutor", e, docIdStr, "massiu="+params.isMassivo());
-				String message = messageHelper.getMessage("message.common.action.error")+": "+e.getMessage();
-				throw new ActionExecutionException(getResourceClass(), docIdStr, code, message);
-			}
-		}
-
-		@Override
-		public void onChange(Serializable id, MassiveAction previous, String fieldName, Object fieldValue,
-				Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {
-		}
-    }
-    
-    private class DeleteActionExecutor implements ActionExecutor<ContingutResourceEntity, MassiveAction, Serializable> {
-
-		@Override
-		public Serializable exec(String code, ContingutResourceEntity entity, MassiveAction params) throws ActionExecutionException {
-			try {
-				if (params.getIds()!=null) {
-					//		contingutServiceImpl.deleteDefinitiu
-				}
-				int numElem = params!=null && params.getIds()!=null?params.getIds().size():0;
-				return "{\"num\": \""+numElem+"\"}";
-			} catch (Exception e) {
-				String docIdStr = Utils.getIdsSeparatsComa(params.getIds());
-				excepcioLogHelper.addExcepcio("/contingut/DeleteActionExecutor", e, docIdStr, "massiu="+params.isMassivo());
-				String message = messageHelper.getMessage("message.common.action.error")+": "+e.getMessage();
-				throw new ActionExecutionException(getResourceClass(), docIdStr, code, message);
-			}
-		}
-
-		@Override
-		public void onChange(Serializable id, MassiveAction previous, String fieldName, Object fieldValue,
-				Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {
-		}
-    }
+//    private class ReobrirActionExecutor implements ActionExecutor<ContingutResourceEntity, MassiveAction, Serializable> {
+//
+//		@Override
+//		public Serializable exec(String code, ContingutResourceEntity entity, MassiveAction params) throws ActionExecutionException {
+//			try {
+//				if (params.getIds()!=null) {
+//					//		contingutService.undelete
+//				}
+//				int numElem = params!=null && params.getIds()!=null?params.getIds().size():0;
+//				return "{\"num\": \""+numElem+"\"}";
+//			} catch (Exception e) {
+//				String docIdStr = Utils.getIdsSeparatsComa(params.getIds());
+//				excepcioLogHelper.addExcepcio("/contingut/ReobrirActionExecutor", e, docIdStr, "massiu="+params.isMassivo());
+//				String message = messageHelper.getMessage("message.common.action.error")+": "+e.getMessage();
+//				throw new ActionExecutionException(getResourceClass(), docIdStr, code, message);
+//			}
+//		}
+//
+//		@Override
+//		public void onChange(Serializable id, MassiveAction previous, String fieldName, Object fieldValue,
+//				Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {
+//		}
+//    }
+//
+//    private class DeleteActionExecutor implements ActionExecutor<ContingutResourceEntity, MassiveAction, Serializable> {
+//
+//		@Override
+//		public Serializable exec(String code, ContingutResourceEntity entity, MassiveAction params) throws ActionExecutionException {
+//			try {
+//				if (params.getIds()!=null) {
+//					//		contingutServiceImpl.deleteDefinitiu
+//				}
+//				int numElem = params!=null && params.getIds()!=null?params.getIds().size():0;
+//				return "{\"num\": \""+numElem+"\"}";
+//			} catch (Exception e) {
+//				String docIdStr = Utils.getIdsSeparatsComa(params.getIds());
+//				excepcioLogHelper.addExcepcio("/contingut/DeleteActionExecutor", e, docIdStr, "massiu="+params.isMassivo());
+//				String message = messageHelper.getMessage("message.common.action.error")+": "+e.getMessage();
+//				throw new ActionExecutionException(getResourceClass(), docIdStr, code, message);
+//			}
+//		}
+//
+//		@Override
+//		public void onChange(Serializable id, MassiveAction previous, String fieldName, Object fieldValue,
+//				Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {
+//		}
+//    }
     
 }

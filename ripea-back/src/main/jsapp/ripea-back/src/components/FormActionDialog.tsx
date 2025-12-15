@@ -37,9 +37,7 @@ const FormActionDialog = (props:FormActionDialogProp) => {
         apiRef,
         formDialogResultProcessor,
         onSuccess,
-        onError = (error:any) => {
-            error?.message && temporalMessageShow(null, error?.description, 'error');
-        },
+        onError = (error:any) => error?.message && temporalMessageShow(null, error?.message, 'error'),
         onClose,
 		onSubmit
     } = props;

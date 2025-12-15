@@ -167,6 +167,7 @@ const translationCa = {
         contingut: {
             grid: {
                 nom: "Nom",
+                path: "Ruta contingut",
             },
             detalle: {
                 title: "Detalls del contingut",
@@ -260,6 +261,12 @@ const translationCa = {
                 },
                 replay: {
                     label: "Recuperar",
+                    ok: "El contingut s'ha recuperat correctament",
+                    massiveOk: "Els continguts s'han recuperat correctament",
+                },
+                delete: {
+                    ok: "El contingut s'ha eliminat correctament",
+                    massiveOk: "Els continguts s'han eliminat correctament",
                 },
             },
             history: {

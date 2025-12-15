@@ -167,6 +167,7 @@ const translationEn = {
         contingut: {
             grid: {
                 nom: "Name",
+                path: "Content path",
             },
             detalle: {
                 title: "Detalles del contenido",
@@ -259,7 +260,13 @@ const translationEn = {
                     label: "Archive",
                 },
                 replay: {
-                    label: "Recuperar",
+                    label: "Recover",
+                    ok: "The content has been recovered successfully",
+                    massiveOk: "The contents have been recovered successfully",
+                },
+                delete: {
+                    ok: "The content has been deleted successfully",
+                    massiveOk: "The contents have been deleted successfully",
                 },
             },
             history: {
