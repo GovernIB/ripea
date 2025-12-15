@@ -1,7 +1,6 @@
 package es.caib.ripea.service.resourceservice;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
@@ -11,18 +10,17 @@ import org.springframework.stereotype.Service;
 import com.turkraft.springfilter.FilterBuilder;
 import com.turkraft.springfilter.parser.Filter;
 
-import es.caib.ripea.persistence.entity.DocumentEntity;
-import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.resourceentity.ContingutResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.UsuariResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.UsuariResourceRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.ConfigHelper;
+import es.caib.ripea.service.helper.ContingutHelper;
+import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
 import es.caib.ripea.service.helper.MessageHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
-import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
 import es.caib.ripea.service.intf.model.ContingutResource;
 import es.caib.ripea.service.intf.model.EntitatResource;
@@ -43,13 +41,14 @@ implements ContingutResourceService {
 	private final UsuariResourceRepository usuariResourceRepository;
 	private final ExcepcioLogHelper excepcioLogHelper;
 	private final MessageHelper messageHelper;
-//	private final EntityComprovarHelper entityComprovarHelper;
+	private final EntityComprovarHelper entityComprovarHelper;
+	private final ContingutHelper contingutHelper;
 	
     @PostConstruct
     public void init() {
     	register(ContingutResource.PERSPECTIVE_AUDIT_CODE, new AuditoriaPerspectiveApplicator());
-        register(ContingutResource.ACTION_DELETE_CODE, new DeleteActionExecutor());
-        register(ContingutResource.ACTION_RECUPERAR_CODE, new ReobrirActionExecutor());
+        register(ContingutResource.ACTION_DELETE_CODE, new DeleteDefinitiuActionExecutor());
+        register(ContingutResource.ACTION_RECUPERAR_CODE, new RecuperarActionExecutor());
     }
 	
     @Override
@@ -84,19 +83,22 @@ implements ContingutResourceService {
         }
     }
     
-    private class ReobrirActionExecutor implements ActionExecutor<ContingutResourceEntity, MassiveAction, Serializable> {
+    private class RecuperarActionExecutor implements ActionExecutor<ContingutResourceEntity<ContingutResource>, MassiveAction, Serializable> {
 
 		@Override
-		public Serializable exec(String code, ContingutResourceEntity entity, MassiveAction params) throws ActionExecutionException {
+		public Serializable exec(String code, ContingutResourceEntity<ContingutResource> entity, MassiveAction params) throws ActionExecutionException {
 			try {
+				entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), true, false, false, false, false);
 				if (params.getIds()!=null) {
-					//		contingutService.undelete
+					for (Long id: params.getIds()) {
+						contingutHelper.undelete(id);
+					}
 				}
 				int numElem = params!=null && params.getIds()!=null?params.getIds().size():0;
 				return "{\"num\": \""+numElem+"\"}";
 			} catch (Exception e) {
 				String docIdStr = Utils.getIdsSeparatsComa(params.getIds());
-				excepcioLogHelper.addExcepcio("/contingut/ReobrirActionExecutor", e, docIdStr, "massiu="+params.isMassivo());
+				excepcioLogHelper.addExcepcio("/contingut/RecuperarActionExecutor", e, docIdStr, "massiu="+params.isMassivo());
 				String message = messageHelper.getMessage("message.common.action.error")+": "+e.getMessage();
 				throw new ActionExecutionException(getResourceClass(), docIdStr, code, message);
 			}
@@ -108,19 +110,22 @@ implements ContingutResourceService {
 		}
     }
     
-    private class DeleteActionExecutor implements ActionExecutor<ContingutResourceEntity, MassiveAction, Serializable> {
+    private class DeleteDefinitiuActionExecutor implements ActionExecutor<ContingutResourceEntity<ContingutResource>, MassiveAction, Serializable> {
 
 		@Override
-		public Serializable exec(String code, ContingutResourceEntity entity, MassiveAction params) throws ActionExecutionException {
+		public Serializable exec(String code, ContingutResourceEntity<ContingutResource> entity, MassiveAction params) throws ActionExecutionException {
 			try {
+				entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), true, false, false, false, false);
 				if (params.getIds()!=null) {
-					//		contingutServiceImpl.deleteDefinitiu
+					for (Long id: params.getIds()) {
+						contingutHelper.deleteDefinitiu(id);
+					}
 				}
 				int numElem = params!=null && params.getIds()!=null?params.getIds().size():0;
 				return "{\"num\": \""+numElem+"\"}";
 			} catch (Exception e) {
 				String docIdStr = Utils.getIdsSeparatsComa(params.getIds());
-				excepcioLogHelper.addExcepcio("/contingut/DeleteActionExecutor", e, docIdStr, "massiu="+params.isMassivo());
+				excepcioLogHelper.addExcepcio("/contingut/DeleteDefinitiuActionExecutor", e, docIdStr, "massiu="+params.isMassivo());
 				String message = messageHelper.getMessage("message.common.action.error")+": "+e.getMessage();
 				throw new ActionExecutionException(getResourceClass(), docIdStr, code, message);
 			}

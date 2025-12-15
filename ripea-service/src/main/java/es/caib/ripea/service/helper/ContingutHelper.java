@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
@@ -45,7 +46,6 @@ import es.caib.plugins.arxiu.api.Carpeta;
 import es.caib.plugins.arxiu.api.ContingutArxiu;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentMetadades;
-import es.caib.plugins.arxiu.api.Expedient;
 import es.caib.plugins.arxiu.api.ExpedientMetadades;
 import es.caib.plugins.arxiu.caib.ArxiuCaibException;
 import es.caib.ripea.persistence.entity.CarpetaEntity;
@@ -2174,6 +2174,151 @@ public class ContingutHelper {
 		return contingutRepository.getOne(contingutActual.getId());
 	}
 
+	public void undelete(Long contingutId) {
+		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(contingutId);
+		undelete(contingut);
+	}
+	
+	public void undelete(ContingutEntity contingut) {
+		// No es comproven permisos perquè això només ho pot fer l'administrador
+		if (contingut.getEsborrat() == 0) {
+			logger.error("Aquest contingut no està esborrat (contingutId=" + contingut.getId() + ")");
+			throw new ValidationException(contingut.getId(), ContingutEntity.class, "Aquest contingut no està esborrat");
+		}
+		
+		if (contingut instanceof DocumentEntity) {
+			String uniqueNameInPare = getUniqueNameInPare(contingut.getNom(), contingut.getPare().getId());
+			contingut.updateNom(uniqueNameInPare);
+		} else {
+			boolean nomDuplicat = contingutRepository.findByPareAndNomAndEsborrat(
+					contingut.getPare(),
+					contingut.getNom(),
+					0) != null;
+			if (nomDuplicat) {
+				throw new ValidationException(
+						contingut.getId(),
+						ContingutEntity.class,
+						"Ja existeix un altre contingut amb el mateix nom dins el mateix pare");
+			}
+		}
+
+		// Recupera el contingut esborrat
+		contingut.updateEsborrat(0);
+
+		// Registra al log la recuperació del contingut
+		contingutLogHelper.log(
+				contingut,
+				LogTipusEnumDto.RECUPERACIO,
+				null,
+				null,
+				true,
+				true);
+
+		if (!conteDocumentsDefinitius(contingut) && !(contingut instanceof DocumentEntity && ((DocumentEntity) contingut).getGesDocAdjuntId() != null)) {
+
+			// Propaga l'acció a l'arxiu
+			FitxerDto fitxer = null;
+
+			if (contingut instanceof ExpedientEntity) {
+				arxiuPropagarModificacio((ExpedientEntity) contingut);
+			} else if (contingut instanceof DocumentEntity) {
+				
+				DocumentEntity document = (DocumentEntity)contingut;
+				if (DocumentTipusEnumDto.DIGITAL.equals(document.getDocumentTipus())) {
+
+					DocumentFirmaTipusEnumDto documentFirmaTipus = document.getDocumentFirmaTipus();
+					List<ArxiuFirmaDto> firmes = null;
+					
+					if (documentFirmaTipus == DocumentFirmaTipusEnumDto.SENSE_FIRMA) {
+						fitxer = fitxerDocumentEsborratLlegir(document);
+					} else if (documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA) {
+						
+						fitxer = fitxerDocumentEsborratLlegir(document);
+						firmes = documentHelper.validaFirmaDocument(
+								document, 
+								fitxer,
+								null, 
+								false, 
+								true);
+						
+					} else if (documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_SEPARADA) {
+						
+						fitxer = fitxerDocumentEsborratLlegir(document);
+						byte[] firmaContingut = firmaSeparadaEsborratLlegir(document);
+						firmes = documentHelper.validaFirmaDocument(
+								document, 
+								fitxer,
+								firmaContingut, 
+								false, 
+								true);
+					} 
+					
+					ArxiuEstatEnumDto arxiuEstat = documentHelper.getArxiuEstat(documentFirmaTipus, null, document.isFirmaParcial());
+							
+					if (arxiuEstat == ArxiuEstatEnumDto.ESBORRANY && documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_SEPARADA) {
+						pluginHelper.arxiuPropagarFirmaSeparada(
+								document,
+								firmes.get(0).getFitxer());
+					}
+					
+					if (firmes == null && Utils.isEmpty(fitxer.getContingut())) {
+						throw new ValidationException("No es pot recuperar el document perquè no conté el contingut");
+					}
+					
+					arxiuPropagarModificacio(
+							document,
+							fitxer,
+							arxiuEstat == ArxiuEstatEnumDto.ESBORRANY ? DocumentFirmaTipusEnumDto.SENSE_FIRMA : documentFirmaTipus,
+							firmes,
+							arxiuEstat);
+				}
+
+			} else if (contingut instanceof CarpetaEntity) {
+				arxiuPropagarModificacio((CarpetaEntity) contingut);
+			}
+
+			if (fitxer != null) {
+				fitxerDocumentEsborratEsborrar((DocumentEntity)contingut);
+			}
+		}
+	}
+	
+	public void deleteDefinitiu(Long contingutId) {
+		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(contingutId);
+		deleteDefinitiu(contingut);
+	}
+	
+	public void deleteDefinitiu(ContingutEntity contingut) {
+		
+		if (contingut.getPare() != null) {
+			contingut.getPare().getFills().remove(contingut);
+		}
+		
+		if (contingut instanceof ExpedientEntity && contingut.getFills() != null && !contingut.getFills().isEmpty()) {
+			
+			List<ContingutEntity> descendants = new ArrayList<>();
+			findDescendants(contingut, descendants, false, true);
+			
+			Iterator<ContingutEntity> itr = descendants.iterator();
+			while (itr.hasNext()) {
+				ContingutEntity cont = itr.next();
+				if (cont.getPare() != null) {
+					cont.getPare().getFills().remove(cont);
+				}
+				if (cont instanceof DocumentEntity) {
+					documentHelper.deleteDefinitiu((DocumentEntity) cont);
+				} else {
+					contingutRepository.delete(cont);
+				}
+				
+			}
+		} else if (contingut instanceof DocumentEntity) {
+			documentHelper.deleteDefinitiu((DocumentEntity) contingut);
+		} else {
+			contingutRepository.delete(contingut);
+		}
+	}
+	
 	public void findDescendants(
 			ContingutEntity contingut,
 			List<ContingutEntity> descendants,
