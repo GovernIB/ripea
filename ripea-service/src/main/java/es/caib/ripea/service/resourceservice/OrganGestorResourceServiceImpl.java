@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
+import es.caib.ripea.service.intf.model.*;
 import org.springframework.stereotype.Service;
 
 import com.turkraft.springfilter.FilterBuilder;
@@ -24,9 +25,6 @@ import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.OrganismeHelper;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
 import es.caib.ripea.service.intf.dto.OrganismeDto;
-import es.caib.ripea.service.intf.model.EntitatResource;
-import es.caib.ripea.service.intf.model.MetaExpedientResource;
-import es.caib.ripea.service.intf.model.OrganGestorResource;
 import es.caib.ripea.service.intf.resourceservice.OrganGestorResourceService;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.permission.ExtendedPermission;
@@ -143,7 +141,7 @@ public class OrganGestorResourceServiceImpl extends BaseMutableResourceService<O
         } else { 
         	
             Filter filtreEntitat = FilterBuilder.equal(
-            		MetaExpedientResource.Fields.entitat + "." + EntitatResource.Fields.codi, 
+                    OrganGestorResource.Fields.entitat + "." + EntitatResource.Fields.codi,
             		entitatActualCodi != null?entitatActualCodi:"................................................................................");
 
             filtreResultat = FilterBuilder.and(filtreBase, filtreEntitat);

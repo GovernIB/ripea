@@ -31,7 +31,11 @@ const translationCa = {
         filter: "Filtrar",
         downloadSelected: "Descarrega contingut seleccionat",
         relateSelected: "Relaciona contingut seleccionat",
-        processing: "Processant..."
+        processing: "Processant...",
+        auditoria: {
+            create: "Creat el {{createdDate}} per '{{createdBy}}'.",
+            update: "Modificat el {{lastModifiedDate}} per '{{lastModifiedBy}}'.",
+        },
     },
     enum: {
         rol: {
@@ -1224,6 +1228,14 @@ const translationCa = {
                 },
                 delete: {
                     ok: "Tipus documental '{{data.codi}}' esborrat correctament",
+                },
+            },
+        },
+        metaExpedient: {
+            title: "Procediment",
+            action: {
+                update: {
+                    ok: "Procediment modificat correctament",
                 },
             },
         },

@@ -32,6 +32,10 @@ const translationEn = {
         downloadSelected: "Download selected content",
         relateSelected: "Relate selected content",
 		processing: "Processing...",
+        auditoria: {
+            create: "Created on {{createdDate}} by '{{createdBy}}'.",
+            update: "Modified on {{lastModifiedDate}} by '{{lastModifiedBy}}'.",
+        },
     },
     enum: {
         rol: {
@@ -1224,6 +1228,14 @@ const translationEn = {
                 },
                 delete: {
                     ok: "Document type '{{data.codi}}' deleted successfully",
+                },
+            },
+        },
+        metaExpedient: {
+            title: "Procedure",
+            action: {
+                update: {
+                    ok: "Procedure updated successfully",
                 },
             },
         },

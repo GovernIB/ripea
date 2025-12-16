@@ -1,15 +1,50 @@
 import {useTranslation} from "react-i18next";
 import {useState} from "react";
-import {GridPage, useMuiDataGridApiRef} from "reactlib";
+import {GridPage, useFormContext, useMuiDataGridApiRef} from "reactlib";
 import {CardPage} from "../../../components/CardData.tsx";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
-import {Grid, Icon, Typography} from "@mui/material";
+import {Alert, Grid, Icon, Typography} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import {CommentDialog} from "../../CommentDialog.tsx";
+import {useUserSession} from "../../../components/Session.tsx";
 
+// Form
+const RevisioMetaExpedientForm = (props:any) => {
+    const {revisor = false} = props;
+    const {t} = useTranslation();
+    const {data} = useFormContext()
+    return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
+        <GridFormField xs={12} name="codi"/>
+        <GridFormField xs={2} name="tipusClassificacio" required/>
+        <GridFormField xs={10} name="classificacio" disabled={data?.tipusClassificacio == 'ID'}/>
+        <GridFormField xs={12} name="nom"/>
+        <GridFormField xs={12} name="descripcio"/>
+        <GridFormField xs={12} name="serieDocumental"/>
+        <GridFormField xs={4} name="procedimentComu"/>
+        <GridFormField xs={8} name="organGestor" required hidden={data?.procedimentComu}/>
+        <GridFormField xs={12} name="expressioNumero"/>
+        <GridFormField xs={4} name="gestioAmbGrupsActiva"/>
+        <GridFormField xs={4} name="interessatObligatori"/>
+        <GridFormField xs={4} name="permisDirecte"/>
+
+        {/*rol actual “IPA_REVISIO”*/}
+        <GridFormField xs={12} name="revisioEstat" disabled={!revisor}/>
+        <GridFormField xs={12} name="revisioComentari" type={'textarea'} disabled={!revisor}/>
+
+        <Grid xs={12} sx={{ pl: '8px', pt: '8px' }}>
+            <Alert severity={'info'}>
+                {t('common.auditoria.create', {createdDate: formatDate(data.createdDate), createdBy: data.createdByFullName})}
+                {data.lastModifiedDate != null &&
+                    t('common.auditoria.update', {lastModifiedDate: formatDate(data.lastModifiedDate), lastModifiedBy: data.lastModifiedByFullName})}
+            </Alert>
+        </Grid>
+    </Grid>
+}
+
+// Filter
 const RevisioMetaExpedientFilterForm = () => {
     return <>
         <GridFormField xs={4} name="codi"/>
@@ -71,7 +106,9 @@ const StyledEstat = (props:any) => {
     return <Typography variant="caption" sx={{...labelStyle, ...style}}>{children}</Typography>
 }
 
-const sortModel: any = [{field: 'lastModifiedDate', sort: 'desc'}]
+const sortModel: any[] = [{field: 'lastModifiedDate', sort: 'desc'}]
+const perspectives: any[] = ['AUDITORIA']
+const namedQueries: any[] = ['CONSULTA_REVISIO_ESTAT']
 const columns = [
     {
         field: 'codi',
@@ -94,9 +131,9 @@ const columns = [
         flex: 1,
     },
     {
-        field: 'comu',
+        field: 'procedimentComu',
         flex: 0.5,
-        renderCell: (params:any) => (params?.row?.comu && <Icon>check</Icon>),
+        renderCell: (params:any) => (params?.row?.procedimentComu && <Icon>check</Icon>),
     },
     {
         field: 'gestioAmbGrupsActiva',
@@ -126,8 +163,11 @@ const columns = [
 
 const RevisioMetaExpedientGrid = () => {
     const {t} = useTranslation();
+    const {value: user} = useUserSession();
     const apiRef = useMuiDataGridApiRef();
     const [springFilter, setSpringFilter] = useState<string>();
+
+    const isRolActualRevisio = user?.rolActual == 'IPA_REVISIO';
 
     const refresh = () => {
         apiRef?.current?.refresh?.();
@@ -159,9 +199,17 @@ const RevisioMetaExpedientGrid = () => {
                 columns={columnsAddition}
                 filter={springFilter}
                 sortModel={sortModel}
-                perspectives={['AUDITORIA']}
-                namedQueries={['CONSULTA_REVISIO_ESTAT']}
-                readOnly
+                perspectives={perspectives}
+                namedQueries={namedQueries}
+
+                toolbarHideCreate
+                rowHideUpdateButton={false}
+                popupEditCreateActive
+                popupEditFormContent={<RevisioMetaExpedientForm revisor={isRolActualRevisio}/>}
+                popupEditFormDialogResourceTitle={t('page.metaExpedient.title')}
+                popupEditFormI18nKeys={{
+                    updateSuccess: 'page.metaExpedient.action.update.ok',
+                }}
             />
         </CardPage>
     </GridPage>

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import es.caib.ripea.service.intf.model.MetaNodeResource;
 import org.springframework.stereotype.Service;
 
 import com.turkraft.springfilter.FilterBuilder;
@@ -108,7 +109,7 @@ public class GrupResourceServiceImpl extends BaseMutableResourceService<GrupReso
 		
         Filter filtreBase = FilterBuilder.and(
                 (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null,
-                FilterBuilder.equal(MetaExpedientResource.Fields.entitat + "." + EntitatResource.Fields.codi, 
+                FilterBuilder.equal(GrupResource.Fields.entitat + "." + EntitatResource.Fields.codi,
                 		entitatActualCodi != null?entitatActualCodi:"................................................................................")
         );
 

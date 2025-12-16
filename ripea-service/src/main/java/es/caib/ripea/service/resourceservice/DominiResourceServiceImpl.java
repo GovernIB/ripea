@@ -29,7 +29,7 @@ public class DominiResourceServiceImpl extends BaseMutableResourceService<Domini
     	
         Filter filtreBase = FilterBuilder.and(
                 (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null,
-                FilterBuilder.equal(MetaExpedientResource.Fields.entitat + "." + EntitatResource.Fields.codi, 
+                FilterBuilder.equal(DominiResource.Fields.entitat + "." + EntitatResource.Fields.codi,
                 		entitatActualCodi != null?entitatActualCodi:"................................................................................")
         );
         
