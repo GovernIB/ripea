@@ -27,12 +27,14 @@ import es.caib.ripea.service.helper.MetaExpedientHelper;
 import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
+import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.ProcedimentDto;
 import es.caib.ripea.service.intf.dto.TipusClassificacioEnumDto;
 import es.caib.ripea.service.intf.model.EntitatResource;
 import es.caib.ripea.service.intf.model.MetaExpedientResource;
 import es.caib.ripea.service.intf.model.MetaNodeResource;
+import es.caib.ripea.service.intf.model.OrganGestorResource;
 import es.caib.ripea.service.intf.resourceservice.MetaExpedientResourceService;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.permission.ExtendedPermission;
@@ -204,22 +206,37 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 					}
 				}
 
-			} else if (	MetaExpedientResource.Fields.tipusClassificacio.equals(fieldName) || 
-						MetaExpedientResource.Fields.organGestor.equals(fieldName)) {
-
-				if (TipusClassificacioEnumDto.ID.equals(target.getTipusClassificacio())) {
-					
+			} else if (MetaExpedientResource.Fields.tipusClassificacio.equals(fieldName)) {
+				 
+				if (TipusClassificacioEnumDto.ID.equals(fieldValue)) {
 					String idCalculat = null;
-					if (target.getOrganGestor()!=null) {
-						Long organActualCodi	 	= target.getOrganGestor().getId();
-						OrganGestorEntity ogEntity	= organGestorRepository.findById(organActualCodi).get();
-						if (ogEntity!=null) {
-							idCalculat = ogEntity.getCodi() +  "_PRO_" + String.format("%030d", System.currentTimeMillis()) + "3F";
-						}
+					if (previous.getOrganGestor()!=null) {
+						idCalculat = getIdCalculadoOrganoGestor(previous.getOrganGestor().getId());
+					}
+					target.setClassificacio(idCalculat);
+				} else {
+					target.setClassificacio(null);
+				}
+				
+			} else if (MetaExpedientResource.Fields.organGestor.equals(fieldName)) {
+				if (TipusClassificacioEnumDto.ID.equals(previous.getTipusClassificacio())) {
+					String idCalculat = null;
+					if (fieldValue != null) {
+						ResourceReference<OrganGestorResource, Long> resourceReference = (ResourceReference<OrganGestorResource, Long>) fieldValue;
+						idCalculat = getIdCalculadoOrganoGestor(resourceReference.getId());
 					}
 					target.setClassificacio(idCalculat);
 				}
 			}
+		}
+    }
+    
+    private String getIdCalculadoOrganoGestor(Long organActualId) {
+    	try {
+    		OrganGestorEntity ogEntity	= organGestorRepository.findById(organActualId).get();
+    		return ogEntity.getCodi() +  "_PRO_" + String.format("%030d", System.currentTimeMillis()) + "3F";
+    	} catch (Exception e) {
+    		return null;	
 		}
     }
     

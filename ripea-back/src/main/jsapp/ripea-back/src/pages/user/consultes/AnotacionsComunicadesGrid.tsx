@@ -1,4 +1,4 @@
-import {GridPage} from "reactlib";
+import {GridPage, useMuiDataGridApiRef} from "reactlib";
 import { CardPage } from "../../../components/CardData";
 import {useState} from "react";
 import {useTranslation} from "react-i18next";
@@ -8,6 +8,7 @@ import {Grid, Icon} from "@mui/material";
 import GridFormField, {GridButtonField} from "../../../components/GridFormField.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
+import {useActions, useMassiveActions} from "../../anotacions/details/AnotacioActions.tsx";
 
 const AnotacionsComunicadesFilterForm = () => {
     return <>
@@ -85,20 +86,30 @@ const columns = [
 const namedQueries = ['LLISTAT_ANOTACIONS', 'CONSULTA_COMUNICADES'];
 const AnotacionsComunicadesGrid = () => {
     const {t} = useTranslation();
+    const apiRef = useMuiDataGridApiRef();
     const [springFilter, setSpringFilter] = useState<string>();
+
+    const refresh = () => {
+        apiRef?.current?.refresh?.();
+    }
+
+    const {consultar} = useActions(refresh);
+    const {consultar: consultarMassive} = useMassiveActions(refresh);
 
     const actions = [
         {
-            label: t('page.user.menu.consultar'),
+            label: t('page.anotacio.action.consultar.label'),
             icon: "autorenew",
             showInMenu: false,
+            onClick: consultar,
         },
     ]
     const massiveActions = [
         {
-            label: t('page.user.menu.consultar'),
+            label: t('page.anotacio.action.consultar.label'),
             icon: "autorenew",
             showInMenu: false,
+            onClick: consultarMassive,
         },
     ]
 
@@ -107,6 +118,7 @@ const AnotacionsComunicadesGrid = () => {
             <AnotacionsComunicadesFilter onSpringFilterChange={setSpringFilter}/>
 
             <StyledMuiGrid
+                apiRef={apiRef}
                 resourceName={"expedientPeticioResource"}
                 columns={columns}
                 filter={springFilter}

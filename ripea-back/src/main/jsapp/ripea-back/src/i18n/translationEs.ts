@@ -345,7 +345,12 @@ const translationEs = {
                 firma: {
                     label: "Firmas",
                     title: "Firmas",
-                }
+                },
+                consultar: {
+                    label: "Consultar",
+                    ok: "La anotación se ha consultado y guardado correctamente",
+                    massiveOk: "Se han consultado y guardado correctamente {{data.num}} anotaciones",
+                },
             }
         },
         tasca: {

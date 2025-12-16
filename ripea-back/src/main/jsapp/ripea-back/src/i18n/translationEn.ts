@@ -345,7 +345,12 @@ const translationEn = {
                 firma: {
                     label: "Signatures",
                     title: "Signatures",
-                }
+                },
+                consultar: {
+                    label: "Consult",
+                    ok: "The entry has been consulted and saved successfully",
+                    massiveOk: "{{data.num}} entries have been consulted and saved successfully",
+                },
             }
         },
         tasca: {

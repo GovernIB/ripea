@@ -19,16 +19,24 @@ const RevisioMetaExpedientForm = (props:any) => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField xs={12} name="codi"/>
         <GridFormField xs={2} name="tipusClassificacio" required/>
-        <GridFormField xs={10} name="classificacio" disabled={data?.tipusClassificacio == 'ID'}/>
+        <GridFormField xs={10} name="classificacio" debounce disabled={data?.tipusClassificacio == 'ID'}/>
+        <Grid item xs={2}/>
+        <Grid item xs={10}>
+            {data?.msgSiaRolsac != null &&
+                <Alert severity={'warning'} sx={{ mt: 0.5 }}>{data.msgSiaRolsac}</Alert>
+            }
+        </Grid>
         <GridFormField xs={12} name="nom"/>
         <GridFormField xs={12} name="descripcio"/>
         <GridFormField xs={12} name="serieDocumental"/>
         <GridFormField xs={4} name="procedimentComu"/>
         <GridFormField xs={8} name="organGestor" required hidden={data?.procedimentComu}/>
         <GridFormField xs={12} name="expressioNumero"/>
-        <GridFormField xs={4} name="gestioAmbGrupsActiva"/>
-        <GridFormField xs={4} name="interessatObligatori"/>
-        <GridFormField xs={4} name="permisDirecte"/>
+
+        <GridFormField xs={6} name="permetMetadocsGenerals"/>
+        <GridFormField xs={6} name="gestioAmbGrupsActiva"/>
+        <GridFormField xs={6} name="interessatObligatori"/>
+        <GridFormField xs={6} name="permisDirecte"/>
 
         {/*rol actual “IPA_REVISIO”*/}
         <GridFormField xs={12} name="revisioEstat" disabled={!revisor}/>
