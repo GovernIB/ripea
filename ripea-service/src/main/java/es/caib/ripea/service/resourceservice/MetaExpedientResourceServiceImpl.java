@@ -1,12 +1,12 @@
 package es.caib.ripea.service.resourceservice;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
-import es.caib.ripea.service.intf.model.MetaNodeResource;
 import org.springframework.stereotype.Service;
 
 import com.turkraft.springfilter.FilterBuilder;
@@ -14,28 +14,31 @@ import com.turkraft.springfilter.parser.Filter;
 
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
+import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.UsuariResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.UsuariResourceRepository;
+import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
+import es.caib.ripea.service.helper.MessageHelper;
 import es.caib.ripea.service.helper.MetaExpedientHelper;
+import es.caib.ripea.service.helper.PluginHelper;
+import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
 import es.caib.ripea.service.intf.dto.MetaExpedientRevisioEstatEnumDto;
+import es.caib.ripea.service.intf.dto.ProcedimentDto;
+import es.caib.ripea.service.intf.dto.TipusClassificacioEnumDto;
 import es.caib.ripea.service.intf.model.EntitatResource;
 import es.caib.ripea.service.intf.model.MetaExpedientResource;
+import es.caib.ripea.service.intf.model.MetaNodeResource;
 import es.caib.ripea.service.intf.resourceservice.MetaExpedientResourceService;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.permission.ExtendedPermission;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * Implementació del servei de gestió de tasques.
- *
- * @author Límit Tecnologies
- */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -45,10 +48,16 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 	private final MetaExpedientHelper metaExpedientHelper;
 	private final EntityComprovarHelper entityComprovarHelper;
 	private final UsuariResourceRepository usuariResourceRepository;
+	private final OrganGestorRepository organGestorRepository;
+	private final PluginHelper pluginHelper;
+	private final MessageHelper messageHelper;
 
     @PostConstruct
     public void init() {
     	register(MetaExpedientResource.PERSPECTIVE_AUDIT_CODE, new AuditoriaPerspectiveApplicator());
+    	register(MetaExpedientResource.Fields.classificacio, new OnchangeLogicProcessor());
+    	register(MetaExpedientResource.Fields.tipusClassificacio, new OnchangeLogicProcessor());
+    	register(MetaExpedientResource.Fields.organGestor, new OnchangeLogicProcessor());
     }
 	
 	@Override
@@ -149,6 +158,69 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
     protected void afterConversion(MetaExpedientResourceEntity entity, MetaExpedientResource resource) {
         resource.setNumComentaris(entity.getComentaris().size());
         resource.setProcedimentComu(entity.getOrganGestor()==null);
+    }
+
+    private class OnchangeLogicProcessor implements OnChangeLogicProcessor<MetaExpedientResource> {
+		@Override
+		public void onChange(Serializable id, MetaExpedientResource previous, String fieldName, Object fieldValue,
+				Map<String, AnswerValue> answers, String[] previousFieldNames, MetaExpedientResource target) {
+			if (MetaExpedientResource.Fields.classificacio.equals(fieldName)) {
+				if (TipusClassificacioEnumDto.SIA.equals(previous.getTipusClassificacio())) {
+					
+					if (fieldValue==null) {
+						target.setMsgSiaRolsac(null);
+					} else {
+						
+						String rolActual = configHelper.getRolActual();
+						boolean rolOrgan = rolActual.equals("IPA_DISSENY") || rolActual.equals("IPA_ORGAN_ADMIN");
+						String entitatActualCodi = configHelper.getEntitatActualCodi();
+						EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true, false);
+						
+						String codiDir3 = null;
+						if (rolOrgan) {
+							String organActualCodi	 = configHelper.getOrganActualCodi();
+							OrganGestorEntity ogEntity	= organGestorRepository.findByEntitatIdAndCodi(entitatEntity.getId(), organActualCodi);
+							if (ogEntity!=null) {
+								codiDir3 = ogEntity.getCodi();
+							}
+						} else {
+							codiDir3 = entitatEntity.getUnitatArrel();
+						}
+						ProcedimentDto procedimentDto = null;
+						String msgSiaRolsac = null;
+						try {
+							if (codiDir3!=null) {
+								procedimentDto = pluginHelper.procedimentFindByCodiSia(codiDir3, fieldValue.toString());
+							}
+						} catch (Exception e) {
+							msgSiaRolsac = messageHelper.getMessage("MetaExpedientResource.msgSiaRolsac.NA");
+						}
+						
+						if (procedimentDto == null) {
+							msgSiaRolsac = messageHelper.getMessage("MetaExpedientResource.msgSiaRolsac.NO");
+						}
+						
+						target.setMsgSiaRolsac(msgSiaRolsac);
+					}
+				}
+
+			} else if (	MetaExpedientResource.Fields.tipusClassificacio.equals(fieldName) || 
+						MetaExpedientResource.Fields.organGestor.equals(fieldName)) {
+
+				if (TipusClassificacioEnumDto.ID.equals(target.getTipusClassificacio())) {
+					
+					String idCalculat = null;
+					if (target.getOrganGestor()!=null) {
+						Long organActualCodi	 	= target.getOrganGestor().getId();
+						OrganGestorEntity ogEntity	= organGestorRepository.findById(organActualCodi).get();
+						if (ogEntity!=null) {
+							idCalculat = ogEntity.getCodi() +  "_PRO_" + String.format("%030d", System.currentTimeMillis()) + "3F";
+						}
+					}
+					target.setClassificacio(idCalculat);
+				}
+			}
+		}
     }
     
     private class AuditoriaPerspectiveApplicator implements PerspectiveApplicator<MetaExpedientResourceEntity, MetaExpedientResource> {

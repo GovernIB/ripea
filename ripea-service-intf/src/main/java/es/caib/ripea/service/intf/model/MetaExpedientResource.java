@@ -7,6 +7,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
+import es.caib.ripea.service.intf.base.annotation.ResourceField;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.dto.MetaExpedientAmbitEnumDto;
 import org.springframework.data.annotation.Transient;
@@ -50,23 +51,19 @@ public class MetaExpedientResource extends MetaNodeResource {
     public static final String FILTER_GESTIO_CODE = "FILTER_GESTIO";
     public static final String PERSPECTIVE_AUDIT_CODE = "AUDITORIA";
 
-//	@NotNull
-//	@Size(max = 64)
-//	private String codi;
-//	@NotNull
-//	@Size(max = 256)
-//	private String nom;
-//	@Size(max = 4000)
-//	private String descripcio;
-//	private boolean actiu = true;
 	@NotNull
 	@Size(max = 64)
 	private String codiPropi;
+	
 	@NotNull
+	@ResourceField(onChangeActive = true)
 	private TipusClassificacioEnumDto tipusClassificacio;
 	@NotNull
 	@Size(max = 30)
+	@ResourceField(onChangeActive = true)
 	private String classificacio;
+	@Transient private String msgSiaRolsac;
+	
 	@NotNull
 	@Size(max = 30)
 	private String serieDocumental;
@@ -85,8 +82,8 @@ public class MetaExpedientResource extends MetaNodeResource {
 	private boolean organNoSincronitzat;
 	private boolean interessatObligatori;
 
-//	private ResourceReference<EntitatResource, Long> entitat;
 	private ResourceReference<MetaExpedientResource, Long> pare;
+	@ResourceField(onChangeActive = true)
 	private ResourceReference<OrganGestorResource, Long> organGestor;
 	private ResourceReference<GrupResource, Long> grupPerDefecte;
 
