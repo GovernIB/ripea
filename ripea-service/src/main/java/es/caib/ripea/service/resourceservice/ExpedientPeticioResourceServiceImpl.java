@@ -36,6 +36,7 @@ import es.caib.ripea.persistence.repository.ExpedientPeticioRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
+import es.caib.ripea.service.helper.AnotacioDistribucioHelper;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.EmailHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
@@ -96,6 +97,7 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 	private final MetaDocumentHelper metaDocumentHelper;
 	private final ExpedientHelper expedientHelper;
 	private final MessageHelper messageHelper;
+	private final AnotacioDistribucioHelper anotacioDistribucioHelper;
 
 	private final OrganGestorRepository organGestorRepository;
 	private final MetaExpedientRepository metaExpedientRepository;
@@ -113,7 +115,8 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
         register(ExpedientPeticioResource.REPORT_DOWNLOAD_JUSTIFICANT, new DescarregarJustificantReportGenerator());
         register(ExpedientPeticioResource.ACTION_REBUTJAR_ANOTACIO, new RebutjarAnotacioActionExecutor());
         register(ExpedientPeticioResource.ACTION_ACCEPTAR_ANOTACIO, new AcceptarAnotacioActionExecutor());
-        register(ExpedientPeticioResource.ACTION_ESTAT_DISTRIBUCIO, new CanviEstatDistribucioActionExecutor());        
+        register(ExpedientPeticioResource.ACTION_ESTAT_DISTRIBUCIO, new CanviEstatDistribucioActionExecutor());
+        register(ExpedientPeticioResource.ACTION_CONSULTAR_I_GUARDAR, new ConsultarGuardarAnotacioPendentActionExecutor());
     }
 
     @Override
@@ -125,11 +128,16 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
         Filter filtrePermesos = null;
         Filter filtreEstat = null;
 		Filter filtreBase = (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null;
-        Filter filtreEntitat = FilterBuilder.equal(
-        		ExpedientPeticioResource.Fields.registre + "." + RegistreResource.Fields.entitatCodi, 
-        		entitat!=null?entitat.getUnitatArrel():"................................................................................");
-
+        Filter filtreEntitat = null;
+        
         Map<String, String> mapaNamedQueries =  Utils.namedQueriesToMap(namedQueries);
+        
+        //El llistat del menú "Consulta > Anotacions comunicades" no filtra per entitat
+        if (mapaNamedQueries.isEmpty() || !mapaNamedQueries.containsKey("CONSULTA_COMUNICADES")) {
+	        FilterBuilder.equal(
+	        		ExpedientPeticioResource.Fields.registre + "." + RegistreResource.Fields.entitatCodi, 
+	        		entitat!=null?entitat.getUnitatArrel():"................................................................................");
+        }
         
     	if (!mapaNamedQueries.isEmpty()) {
     		if (mapaNamedQueries.containsKey("LLISTAT_ANOTACIONS")) {
@@ -566,6 +574,33 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/anotacio/"+entity.getId()+"/RebutjarAnotacioActionExecutor", e);
 				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, messageHelper.getMessage("expedientPeticio.rebutjarAnotacio.reject", new Object[]{e.getMessage()}));
+			}
+		}
+    }
+    
+    private class ConsultarGuardarAnotacioPendentActionExecutor implements ActionExecutor<ExpedientPeticioResourceEntity, MassiveAction, Serializable> {
+
+		@Override
+		public void onChange(Serializable id, MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {}
+
+		@Override
+		public Serializable exec(String code, ExpedientPeticioResourceEntity entity, MassiveAction params) throws ActionExecutionException {
+			try {
+				for (Long petId: params.getIds()) {
+					anotacioDistribucioHelper.consultarIGuardarAnotacioPeticioPendent(petId, true);
+				}
+				int numElem = params!=null && params.getIds()!=null?params.getIds().size():0;
+				return "{\"num\": \""+numElem+"\"}";
+			} catch (Exception e) {
+				String ids = Utils.getIdsSeparatsComa(params.getIds());
+				excepcioLogHelper.addExcepcio("/anotacio/ConsultarGuardarAnotacioPendentActionExecutor", e, ids, "massiu="+params.isMassivo());
+				String message = messageHelper.getMessage("message.common.action.error")+": "+e.getMessage();
+				throw new ActionExecutionException(getResourceClass(), ids, code, message);
+			} catch (Throwable e) {
+				String ids = Utils.getIdsSeparatsComa(params.getIds());
+				excepcioLogHelper.addExcepcio("/anotacio/ConsultarGuardarAnotacioPendentActionExecutor", e, ids, "massiu="+params.isMassivo());
+				String message = messageHelper.getMessage("message.common.action.error")+": "+e.getMessage();
+				throw new ActionExecutionException(getResourceClass(), ids, code, message);
 			}
 		}
     }

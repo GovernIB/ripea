@@ -82,7 +82,7 @@ const columns = [
         flex: 0.5,
     },
 ]
-
+const namedQueries = ['LLISTAT_ANOTACIONS', 'CONSULTA_COMUNICADES'];
 const AnotacionsComunicadesGrid = () => {
     const {t} = useTranslation();
     const [springFilter, setSpringFilter] = useState<string>();
@@ -109,13 +109,11 @@ const AnotacionsComunicadesGrid = () => {
             <StyledMuiGrid
                 resourceName={"expedientPeticioResource"}
                 columns={columns}
-                // TODO: revisar filtre
                 filter={springFilter}
                 sortModel={sortModel}
-
+                namedQueries={namedQueries}
                 rowAdditionalActions={actions}
                 toolbarMassiveActions={massiveActions}
-
                 toolbarHideCreate
             />
         </CardPage>
