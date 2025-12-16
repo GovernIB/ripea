@@ -9,6 +9,7 @@ import {Link as RouterLink} from "react-router-dom";
 import {Grid, Link} from "@mui/material";
 import * as builder from "../../../util/springFilterUtils.ts";
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
+import useTascaDetail from "../../tasca/details/TascaDetail.tsx";
 
 const AssignacioTasquesFilterForm = () => {
     return <>
@@ -82,6 +83,17 @@ const AssignacioTasquesGrid = () => {
     const {t} = useTranslation();
     const [springFilter, setSpringFilter] = useState<string>();
 
+    const { handleOpen, dialog } = useTascaDetail();
+
+    const actions = [
+        {
+            label: t('common.detail'),
+            icon: "info",
+            showInMenu: false,
+            onClick: handleOpen,
+        },
+    ]
+
     return <GridPage disableMargins>
         <CardPage title={t('page.user.menu.assignacio')}>
             <AssignacioTasquesFilter onSpringFilterChange={setSpringFilter}/>
@@ -92,9 +104,11 @@ const AssignacioTasquesGrid = () => {
                 filter={springFilter}
                 perspectives={perspectives}
                 sortModel={sortModel}
+                rowAdditionalActions={actions}
                 readOnly
             />
         </CardPage>
+        {dialog}
     </GridPage>
 }
 export default AssignacioTasquesGrid;

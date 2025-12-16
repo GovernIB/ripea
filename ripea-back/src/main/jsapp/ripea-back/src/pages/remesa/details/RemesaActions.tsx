@@ -16,16 +16,6 @@ export const useActions = (refresh?: () => void) => {
     } = useResourceApiService('documentNotificacioResource');
     const {temporalMessageShow} = useBaseAppContext();
 
-    const action = (id:any, code:any, mssg:any) => {
-        apiAction(id, {code})
-            .then(() => {
-                refresh?.();
-                temporalMessageShow(null, mssg, 'success');
-            })
-            .catch((error) => {
-                temporalMessageShow(null, error.message, 'error');
-            });
-    }
     const report = (id:any, code:any, mssg:any, fileType:any) => {
         apiReport(id, {code, fileType})
             .then((result) => {
@@ -47,12 +37,33 @@ export const useActions = (refresh?: () => void) => {
             });
     }
 
-    const actualitzarEstat = (id: any) => action(id, 'ACTUALITZAR_ESTAT', t('page.notificacio.action.actualitzarEstat.ok'));
     const justificant = (id: any) => reportMassivo(id, 'DESCARREGAR_JUSTIFICANT', t('page.notificacio.action.justificant.ok'), 'ZIP');
     const descarregarDocumentEnviat = (id: any) => report(id, 'DESCARREGAR_DOC_ENVIAT', t('page.notificacio.action.documentEnviat.ok'), 'ZIP');
 
+    const actualitzarEstat = (id: any) => {
+        apiAction(undefined, {code: 'ACTUALITZAR_ESTAT', data:{ids: [id], massivo: false}})
+            .then(() => {
+                refresh?.();
+                temporalMessageShow(null, t('page.notificacio.action.actualitzarEstat.ok'), 'success');
+            })
+            .catch((error) => {
+                temporalMessageShow(null, error.message, 'error');
+            });
+    }
+    const actualitzarEstatMassive = (ids: any[]) => {
+        apiAction(undefined, {code: 'ACTUALITZAR_ESTAT', data:{ids, massivo: true}})
+            .then(() => {
+                refresh?.();
+                temporalMessageShow(null, t('page.notificacio.action.actualitzarEstat.massiveOk'), 'success');
+            })
+            .catch((error) => {
+                temporalMessageShow(null, error.message, 'error');
+            });
+    }
+
     return {
         actualitzarEstat,
+        actualitzarEstatMassive,
         justificant,
         descarregarDocumentEnviat,
     }

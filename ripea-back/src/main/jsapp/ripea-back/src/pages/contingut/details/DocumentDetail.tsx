@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import {Alert, Box, Button, Grid, Icon, Typography} from "@mui/material";
 import {BasePage, GridPage, useResourceApiService, MuiDialog, useBaseAppContext} from "reactlib";
 import {useTranslation} from "react-i18next";
@@ -159,7 +159,7 @@ const useDocumentDetail = (expedient:any, refresh?: () => void) => {
         },
     ]
 
-    let buttons :any[] = [
+    const buttons :any[] = [
         {
             value: 'download',
             text: t('page.document.action.descarregarOriginal.label'),
@@ -215,6 +215,7 @@ const useDocumentDetail = (expedient:any, refresh?: () => void) => {
         </MuiDialog>
 
     return {
+        apiIsReady,
         handleOpen,
         handleClose,
         dialog
