@@ -121,7 +121,7 @@ const StyledEstat = (props:any) => {
 }
 
 const sortModel: any[] = [{field: 'createdDate', sort: 'desc'}]
-const perspectives: any[] = ['DOCUMENT']
+const perspectives: any[] = ['DOCUMENT', 'AUDITORIA']
 const columns = [
     {
         field: 'expedient',
@@ -155,7 +155,6 @@ const columns = [
         flex: 1,
     },
 ]
-const perspectives:any = ['AUDITORIA']
 const ConsultesPinbalGrid = () => {
     const {t} = useTranslation();
     const apiRef = useMuiDataGridApiRef();
@@ -177,7 +176,6 @@ const ConsultesPinbalGrid = () => {
                 resourceName={"consultaPinbalResource"}
                 columns={columns}
                 filter={springFilter}
-                perspectives={perspectives}
                 sortModel={sortModel}
                 perspectives={perspectives}
                 rowAdditionalActions={actions}
