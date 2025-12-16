@@ -135,27 +135,45 @@ public class DocumentNotificacioResourceServiceImpl extends BaseMutableResourceS
     	}
     }
     
-    private class ActualitzarEstatActionExecutor implements ActionExecutor<DocumentNotificacioResourceEntity, Serializable, DocumentNotificacioResource> {
+    private class ActualitzarEstatActionExecutor implements ActionExecutor<DocumentNotificacioResourceEntity, MassiveAction, Serializable> {
 
         @Override
-        public DocumentNotificacioResource exec(String code, DocumentNotificacioResourceEntity entity, Serializable params) throws ActionExecutionException {
-            try {
-            	EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
-            	DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(entitatEntity.getId(), entity.getDocument().getId(), false, true);
-            	if (document!=null) {
-            		documentNotificacioHelper.actualitzarEstat(entity.getId());
-            	} else {
-            		throw new ActionExecutionException(getResourceClass(), entity.getId(), code, messageHelper.getMessage("documentNotificacio.actualitzarEstat.reject.credential"));
-            	}
+        public Serializable exec(String code, DocumentNotificacioResourceEntity entity, MassiveAction params) throws ActionExecutionException {
+        	try {
+        		
+        		if (params.getIds()!=null) {
+        			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+        			for (Long docId: params.getIds()) {
+                    	DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
+                    			entitatEntity.getId(),
+                    			docId,
+                    			false,
+                    			true);
+                    	if (document!=null) {
+                    		documentNotificacioHelper.actualitzarEstat(docId);
+                    	} else {
+                    		throw new ActionExecutionException(
+                    				getResourceClass(),
+                    				docId,
+                    				code,
+                    				messageHelper.getMessage("documentNotificacio.actualitzarEstat.reject.credential"));
+                    	}
+        			}
+        		}
+
+            	int numElem = params!=null && params.getIds()!=null?params.getIds().size():0;
+            	return "{\"num\": \""+numElem+"\"}";
+            	
 			} catch (Exception e) {
-				excepcioLogHelper.addExcepcio("/notificacio/"+entity.getId()+"/DocumentNotificacioResource", e);
-				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, messageHelper.getMessage("documentNotificacio.actualitzarEstat.reject"));
+				String docIdsStr = Utils.getIdsSeparatsComa(params.getIds());
+				excepcioLogHelper.addExcepcio("/notificacio/ActualitzarEstatActionExecutor", e, docIdsStr, "massiu="+params.isMassivo());
+				String message = messageHelper.getMessage("documentNotificacio.actualitzarEstat.reject")+": "+e.getMessage();
+				throw new ActionExecutionException(getResourceClass(), docIdsStr, code, message);
             }
-            return objectMappingHelper.newInstanceMap(entity, DocumentNotificacioResource.class);
         }
 
         @Override
-        public void onChange(Serializable id, Serializable previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, Serializable target) {}
+        public void onChange(Serializable id, MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {}
     }
 
     private class JustificantReportGenerator implements ReportGenerator<DocumentNotificacioResourceEntity, DocumentNotificacioResource.MassiveAction, Serializable> {
