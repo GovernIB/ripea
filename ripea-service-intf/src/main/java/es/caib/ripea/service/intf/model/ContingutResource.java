@@ -36,13 +36,11 @@ import lombok.experimental.FieldNameConstants;
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ContingutResource.ACTION_DELETE_CODE,
-                        formClass = NodeResource.MassiveAction.class,
-                        requiresId = true),
+                        formClass = NodeResource.MassiveAction.class),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ContingutResource.ACTION_RECUPERAR_CODE,
-                        formClass = NodeResource.MassiveAction.class,
-                        requiresId = true),        
+                        formClass = NodeResource.MassiveAction.class),        
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.FILTER,
                         code = ContingutResource.FILTER_CODE,
