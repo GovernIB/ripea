@@ -28,7 +28,7 @@ const springFilterBuilder = (data:any) => {
         builder.eq('metaExpedientTasca.id', data?.metaExpedientTasca?.id),
         builder.eq('estat', `'${data?.estat}'`),
         builder.eq("responsableActual.id", data?.responsable),
-        builder.betweenDates('createdDate', data?.dataInici, data?.dataFi),
+        builder.betweenDates('dataInici', data?.dataInici, data?.dataFi),
     );
 }
 
@@ -77,6 +77,7 @@ const columns = [
     },
 ]
 
+const perspectives:any = ['AUDITORIA']
 const AssignacioTasquesGrid = () => {
     const {t} = useTranslation();
     const [springFilter, setSpringFilter] = useState<string>();
@@ -89,6 +90,7 @@ const AssignacioTasquesGrid = () => {
                 resourceName={"expedientTascaResource"}
                 columns={columns}
                 filter={springFilter}
+                perspectives={perspectives}
                 sortModel={sortModel}
                 readOnly
             />

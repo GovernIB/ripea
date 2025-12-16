@@ -28,7 +28,7 @@ import lombok.experimental.FieldNameConstants;
                         formClass = ConsultaPinbalResource.ConsultaPinbalFormFilter.class),
 				@ResourceConfigArtifact(
 						type = ResourceArtifactType.PERSPECTIVE,
-						code = ContingutResource.PERSPECTIVE_AUDIT_CODE),                
+						code = ConsultaPinbalResource.PERSPECTIVE_AUDIT_CODE),                
         }
 )
 public class ConsultaPinbalResource extends BaseAuditableResource<Long> {

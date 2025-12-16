@@ -36,6 +36,9 @@ import java.util.List;
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = ExpedientTascaResource.PERSPECTIVE_RESPONSABLES_CODE),
+				@ResourceConfigArtifact(
+						type = ResourceArtifactType.PERSPECTIVE,
+						code = ExpedientTascaResource.PERSPECTIVE_AUDIT_CODE),                 
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientTascaResource.ACTION_REABRIR_CODE,
@@ -80,6 +83,7 @@ import java.util.List;
 public class ExpedientTascaResource extends BaseAuditableResource<Long> {
 
     public static final String PERSPECTIVE_RESPONSABLES_CODE = "RESPONSABLES_RESUM";
+    public static final String PERSPECTIVE_AUDIT_CODE = "AUDITORIA";
     public static final String ACTION_CHANGE_ESTAT_CODE = "CHANGE_ESTAT";
     public static final String ACTION_CHANGE_PRIORITAT_CODE = "CHANGE_PRIORITAT";
     public static final String ACTION_CHANGE_DATALIMIT_CODE = "CHANGE_DATALIMIT";
