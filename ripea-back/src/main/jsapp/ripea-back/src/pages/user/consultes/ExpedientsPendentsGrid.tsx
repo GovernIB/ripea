@@ -1,5 +1,5 @@
 import {useTranslation} from "react-i18next";
-import {useState} from "react";
+import {useMemo, useState} from "react";
 import {GridPage} from "reactlib";
 import {CardPage} from "../../../components/CardData.tsx";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
@@ -9,6 +9,7 @@ import GridFormField from "../../../components/GridFormField.tsx";
 import {Grid} from "@mui/material";
 import * as builder from "../../../util/springFilterUtils.ts";
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
+import useAnotacioActions from "../../anotacioExpedient/details/AnotacioActions.tsx";
 
 const ExpedientsPendentsFilterForm = () => {
     return <>
@@ -54,7 +55,7 @@ const ExpedientsPendentsGrid = () => {
     const {t} = useTranslation();
     const [springFilter, setSpringFilter] = useState<string>();
 
-    const columns = [
+    const columns = useMemo(() => [
         {
             field: 'identificador',
             flex: 0.75,
@@ -77,7 +78,9 @@ const ExpedientsPendentsGrid = () => {
                 return [{field: 'registre.data', sort}];
             },
         },
-    ]
+    ], [t])
+
+    const {actions, components} = useAnotacioActions();
 
     return <GridPage disableMargins>
         <CardPage title={t('page.user.menu.pendents')}>
@@ -91,9 +94,11 @@ const ExpedientsPendentsGrid = () => {
                 perspectives={perspectives}
                 namedQueries={namedQueries}
                 sortModel={sortModel}
+                rowAdditionalActions={actions}
                 readOnly
             />
         </CardPage>
+        {components}
     </GridPage>
 }
 export default ExpedientsPendentsGrid;
