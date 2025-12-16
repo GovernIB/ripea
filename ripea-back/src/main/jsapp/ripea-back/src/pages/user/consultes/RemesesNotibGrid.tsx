@@ -1,6 +1,6 @@
 import {useTranslation} from "react-i18next";
 import {useState} from "react";
-import {GridPage} from "reactlib";
+import {GridPage, useMuiDataGridApiRef} from "reactlib";
 import {CardPage} from "../../../components/CardData.tsx";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
@@ -10,6 +10,7 @@ import GridFormField, {GridButtonField} from "../../../components/GridFormField.
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
 import {Link as RouterLink} from "react-router-dom";
 import {Grid, Link} from "@mui/material";
+import {useActions} from "../../remesa/details/RemesaActions.tsx";
 
 // Filter
 const RemesesNotibFilterForm = () => {
@@ -136,13 +137,21 @@ const columns = [
 
 const RemesesNotibGrid = () => {
     const {t} = useTranslation();
+    const apiRef = useMuiDataGridApiRef();
     const [springFilter, setSpringFilter] = useState<string>();
+
+    const refresh = () => {
+        apiRef?.current?.refresh?.();
+    }
+
+    const {actualitzarEstat, actualitzarEstatMassive} = useActions(refresh);
 
     const actions = [
         {
             label: t('page.notificacio.action.actualitzarEstat.label'),
             icon: "autorenew",
             showInMenu: false,
+            onClick: actualitzarEstat,
         },
     ]
     const massiveActions = [
@@ -150,6 +159,7 @@ const RemesesNotibGrid = () => {
             label: t('page.notificacio.action.actualitzarEstat.label'),
             icon: "autorenew",
             showInMenu: false,
+            onClick: actualitzarEstatMassive,
         },
     ]
 
@@ -158,6 +168,7 @@ const RemesesNotibGrid = () => {
             <RemesesNotibFilter onSpringFilterChange={setSpringFilter}/>
 
             <StyledMuiGrid
+                apiRef={apiRef}
                 resourceName={"documentNotificacioResource"}
                 columns={columns}
                 filter={springFilter}
