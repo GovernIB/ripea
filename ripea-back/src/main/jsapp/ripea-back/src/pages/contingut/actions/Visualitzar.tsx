@@ -90,6 +90,7 @@ const useVisualitzar = () => {
         </MuiDialog>
 
     return {
+        apiIsReady,
         handleOpen,
         handleClose,
         dialog,
