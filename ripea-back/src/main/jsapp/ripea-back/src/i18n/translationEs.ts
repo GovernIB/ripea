@@ -32,6 +32,10 @@ const translationEs = {
         downloadSelected: "Descargar contenido seleccionado",
         relateSelected: "Relacionar contenido seleccionado",
         processing: "Procesando...",
+        auditoria: {
+            create: "Creado el {{createdDate}} por '{{createdBy}}'.",
+            update: "Modificado el {{lastModifiedDate}} por '{{lastModifiedBy}}'.",
+        },
     },
     enum: {
         rol: {
@@ -1224,6 +1228,14 @@ const translationEs = {
                 },
                 delete: {
                     ok: "Tipo documental '{{data.codi}}' eliminado correctamente",
+                },
+            },
+        },
+        metaExpedient: {
+            title: "Procedimiento",
+            action: {
+                update: {
+                    ok: "Procedimiento modificado correctamente",
                 },
             },
         },

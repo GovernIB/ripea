@@ -6,6 +6,7 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
+import es.caib.ripea.service.intf.model.MetaNodeResource;
 import org.springframework.stereotype.Service;
 
 import com.turkraft.springfilter.FilterBuilder;
@@ -71,7 +72,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 		if (currentSpringFilter==null || !currentSpringFilter.contains("entitat.id")) {
 	        filtreBase = FilterBuilder.and(
 	                (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null,
-	                FilterBuilder.equal(MetaExpedientResource.Fields.entitat + "." + EntitatResource.Fields.codi, 
+	                FilterBuilder.equal(MetaNodeResource.Fields.entitat + "." + EntitatResource.Fields.codi,
 	                		entitatActualCodi != null?entitatActualCodi:"................................................................................")
 	        );
 		}
@@ -147,6 +148,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
     @Override
     protected void afterConversion(MetaExpedientResourceEntity entity, MetaExpedientResource resource) {
         resource.setNumComentaris(entity.getComentaris().size());
+        resource.setProcedimentComu(entity.getOrganGestor()==null);
     }
     
     private class AuditoriaPerspectiveApplicator implements PerspectiveApplicator<MetaExpedientResourceEntity, MetaExpedientResource> {

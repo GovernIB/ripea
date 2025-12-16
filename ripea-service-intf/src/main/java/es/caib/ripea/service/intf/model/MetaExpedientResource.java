@@ -50,15 +50,15 @@ public class MetaExpedientResource extends MetaNodeResource {
     public static final String FILTER_GESTIO_CODE = "FILTER_GESTIO";
     public static final String PERSPECTIVE_AUDIT_CODE = "AUDITORIA";
 
-	@NotNull
-	@Size(max = 64)
-	private String codi;
-	@NotNull
-	@Size(max = 256)
-	private String nom;
-	@Size(max = 4000)
-	private String descripcio;
-	private boolean actiu = true;
+//	@NotNull
+//	@Size(max = 64)
+//	private String codi;
+//	@NotNull
+//	@Size(max = 256)
+//	private String nom;
+//	@Size(max = 4000)
+//	private String descripcio;
+//	private boolean actiu = true;
 	@NotNull
 	@Size(max = 64)
 	private String codiPropi;
@@ -85,7 +85,7 @@ public class MetaExpedientResource extends MetaNodeResource {
 	private boolean organNoSincronitzat;
 	private boolean interessatObligatori;
 
-	private ResourceReference<EntitatResource, Long> entitat;
+//	private ResourceReference<EntitatResource, Long> entitat;
 	private ResourceReference<MetaExpedientResource, Long> pare;
 	private ResourceReference<OrganGestorResource, Long> organGestor;
 	private ResourceReference<GrupResource, Long> grupPerDefecte;
@@ -94,14 +94,6 @@ public class MetaExpedientResource extends MetaNodeResource {
     @Transient boolean procedimentComu;
 	@Transient private List<ResourceReference<ExpedientEstatResource, Long>> estats;
 	@Transient private List<ResourceReference<MetaExpedientOrganGestorResource, Long>> metaExpedientOrganGestors;
-
-    public boolean isComu() {
-        if (organGestor == null) {
-            return true;
-        } else {
-            return false;
-        }
-    }
 
     public String getNomClassificacio() {
         return nom + " (" + classificacio +")";
