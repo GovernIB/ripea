@@ -345,7 +345,12 @@ const translationCa = {
                 firma: {
                     label: "Signatures",
                     title: "Signatures",
-                }
+                },
+                consultar: {
+                    label: "Consultar",
+                    ok: "L'anotació s'ha consultat y guardat correctament",
+                    massiveOk: "S'ha consultat y guardat correctament {{data.num}} annotations",
+                },
             }
         },
         tasca: {

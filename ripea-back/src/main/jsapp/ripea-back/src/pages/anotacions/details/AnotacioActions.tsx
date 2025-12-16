@@ -40,8 +40,19 @@ export const useActions = (refresh?: () => void) => {
                 temporalMessageShow(null, error.message, 'error');
             });
     }
+    const consultar = (id:any) => {
+        apiAction(undefined, {code: 'CONSULTAR_I_GUARDAR', data: {ids: [id], massivo: false}})
+            .then(() => {
+                refresh?.();
+                temporalMessageShow(null, t('page.anotacio.action.consultar.ok'), 'success');
+            })
+            .catch((error) => {
+                temporalMessageShow(null, error.message, 'error');
+            });
+    }
 
     return {
+        consultar,
         downloadJustificant,
         canviEstatDistribucio,
     }
@@ -64,8 +75,19 @@ export const useMassiveActions = (refresh?: () => void) => {
                 temporalMessageShow(null, error.message, 'error');
             });
     }
+    const consultar = (ids:any[]) => {
+        apiAction(undefined, {code: 'CONSULTAR_I_GUARDAR', data: {ids, massivo: true}})
+            .then((data:any) => {
+                refresh?.();
+                temporalMessageShow(null, t('page.anotacio.action.consultar.massiveOk', {data}), 'success');
+            })
+            .catch((error) => {
+                temporalMessageShow(null, error.message, 'error');
+            });
+    }
 
     return {
+        consultar,
         canviEstatDistribucio,
     }
 }
