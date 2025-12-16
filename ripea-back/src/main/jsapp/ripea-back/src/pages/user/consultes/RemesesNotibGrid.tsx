@@ -69,10 +69,10 @@ const RemesesNotibFilter = (props: any) => {
 }
 
 // Grid
-const sortModel: any = [{field: 'enviatData', sort: 'desc'}]
+const sortModel: any = [{field: 'dataEnviada', sort: 'desc'}]
 const columns = [
     {
-        field: 'enviatData',
+        field: 'dataEnviada',
         flex: 0.75,
         valueFormatter: (value: any) => formatDate(value)
     },

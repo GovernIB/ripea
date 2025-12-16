@@ -17,7 +17,6 @@ import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
-import org.hibernate.Hibernate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +30,7 @@ import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientTascaResourc
 import es.caib.ripea.persistence.entity.resourceentity.UsuariResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.ExpedientTascaResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientTascaResourceRepository;
+import es.caib.ripea.persistence.entity.resourcerepository.UsuariResourceRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.ApplicationHelper;
 import es.caib.ripea.service.helper.ConfigHelper;
@@ -49,7 +49,6 @@ import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
 import es.caib.ripea.service.intf.dto.TascaEstatEnumDto;
 import es.caib.ripea.service.intf.model.ContingutResource;
 import es.caib.ripea.service.intf.model.EntitatResource;
-import es.caib.ripea.service.intf.model.ExpedientResource;
 import es.caib.ripea.service.intf.model.ExpedientTascaResource;
 import es.caib.ripea.service.intf.model.ExpedientTascaResource.DelegarTascaFormAction;
 import es.caib.ripea.service.intf.model.ExpedientTascaResource.ReassignarTascaFormAction;
@@ -75,10 +74,12 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
     private final EntityComprovarHelper entityComprovarHelper;
     private final MessageHelper messageHelper;
     private final ApplicationHelper applicationHelper;
+    private final UsuariResourceRepository usuariResourceRepository;
     
 	@PostConstruct
 	public void init() {
 		register(ExpedientTascaResource.PERSPECTIVE_RESPONSABLES_CODE, new ResponsablesPerspectiveApplicator());
+		register(ExpedientTascaResource.PERSPECTIVE_AUDIT_CODE, new AuditoriaPerspectiveApplicator());
         register(ExpedientTascaResource.Fields.metaExpedientTasca, new MetaExpedientTascaOnchangeLogicProcessor());
         register(ExpedientTascaResource.Fields.duracio, new DuracioOnchangeLogicProcessor());
         register(ExpedientTascaResource.Fields.dataLimit, new DataLimitOnchangeLogicProcessor());
@@ -211,6 +212,22 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
 			}
 		}
 	}
+	
+    private class AuditoriaPerspectiveApplicator implements PerspectiveApplicator<ExpedientTascaResourceEntity, ExpedientTascaResource> {
+        @Override
+        public void applySingle(String code, ExpedientTascaResourceEntity entity, ExpedientTascaResource resource) throws PerspectiveApplicationException {
+        	if (entity.getCreatedBy()!=null) {
+        		UsuariResourceEntity usuariResourceEntity = usuariResourceRepository.findById(entity.getCreatedBy()).orElse(null);
+        		if (usuariResourceEntity!=null) {
+        			resource.setCreatedByFullName(usuariResourceEntity.getNom() + " (" + usuariResourceEntity.getCodi() + ")");
+        		}
+        	}
+        	if (entity.getLastModifiedBy()!=null) {
+        		UsuariResourceEntity usuariResourceEntity = usuariResourceRepository.findById(entity.getLastModifiedBy()).orElse(null);
+        		resource.setLastModifiedByFullName(usuariResourceEntity.getNom() + " (" + usuariResourceEntity.getCodi() + ")");
+        	}
+        }
+    }	
 
     // OnChangeLogicProcessor
     private class MetaExpedientTascaOnchangeLogicProcessor implements OnChangeLogicProcessor<ExpedientTascaResource> {

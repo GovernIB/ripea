@@ -2261,8 +2261,8 @@ public class ContingutHelper {
 								firmes.get(0).getFitxer());
 					}
 					
-					if (firmes == null && Utils.isEmpty(fitxer.getContingut())) {
-						throw new ValidationException("No es pot recuperar el document perquè no conté el contingut");
+					if (firmes == null && (fitxer== null || Utils.isEmpty(fitxer.getContingut()))) {
+						throw new ValidationException("No s'ha pogut recuperar el contingut del document esborrat.");
 					}
 					
 					arxiuPropagarModificacio(

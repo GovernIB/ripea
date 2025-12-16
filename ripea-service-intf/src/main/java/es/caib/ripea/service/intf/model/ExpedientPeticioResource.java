@@ -73,6 +73,10 @@ import lombok.experimental.FieldNameConstants;
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientPeticioResource.ACTION_ESTAT_DISTRIBUCIO,
                         formClass = MassiveAction.class),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = ExpedientPeticioResource.ACTION_CONSULTAR_I_GUARDAR,
+                        formClass = MassiveAction.class),
         }
 )
 public class ExpedientPeticioResource extends BaseAuditableResource<Long> {
@@ -87,6 +91,7 @@ public class ExpedientPeticioResource extends BaseAuditableResource<Long> {
     public static final String ACTION_REBUTJAR_ANOTACIO = "REBUTJAR_ANOTACIO";
     public static final String ACTION_ACCEPTAR_ANOTACIO = "ACCEPTAR_ANOTACIO";
     public static final String ACTION_ESTAT_DISTRIBUCIO = "ESTAT_DISTRIBUCIO";
+    public static final String ACTION_CONSULTAR_I_GUARDAR = "CONSULTAR_I_GUARDAR";
 
 //    private Long id;
     private String identificador;

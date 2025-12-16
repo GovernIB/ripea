@@ -26,7 +26,7 @@ import javax.validation.constraints.NotNull;
             @ResourceConfigArtifact(
                 type = ResourceArtifactType.ACTION,
                 code = DocumentNotificacioResource.ACTION_ACTUALITZAR_ESTAT_CODE,
-                requiresId = true),
+                formClass = DocumentNotificacioResource.MassiveAction.class),
             @ResourceConfigArtifact(
                     type = ResourceArtifactType.ACTION,
                     code = DocumentNotificacioResource.ACTION_ELIMINAR,

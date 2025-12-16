@@ -86,8 +86,8 @@ const springFilterBuilder = (data:any) => {
     return builder.and(
         builder.eq('expedient.id', data?.expedient?.id),
         builder.eq('metaExpedient.id', data?.metaExpedient?.id),
-        builder.eq('servei?.id',  data?.servei?.id),
-        builder.eq('createdBy',  data?.createdBy?.id),
+        builder.eq('servei.id',  data?.servei?.id),
+        builder.eq('createdBy',  `'${data?.createdBy?.id}'`),
         builder.betweenDates('createdDate', data?.createdDateInici, data?.createdDateFi),
         builder.eq('estat', `'${data?.estat}'`),
     );
@@ -155,7 +155,7 @@ const columns = [
         flex: 1,
     },
 ]
-
+const perspectives:any = ['AUDITORIA']
 const ConsultesPinbalGrid = () => {
     const {t} = useTranslation();
     const apiRef = useMuiDataGridApiRef();
@@ -177,6 +177,7 @@ const ConsultesPinbalGrid = () => {
                 resourceName={"consultaPinbalResource"}
                 columns={columns}
                 filter={springFilter}
+                perspectives={perspectives}
                 sortModel={sortModel}
                 perspectives={perspectives}
                 rowAdditionalActions={actions}

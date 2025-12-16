@@ -83,7 +83,7 @@ const columns = [
         flex: 0.5,
     },
 ]
-
+const namedQueries = ['LLISTAT_ANOTACIONS', 'CONSULTA_COMUNICADES'];
 const AnotacionsComunicadesGrid = () => {
     const {t} = useTranslation();
     const apiRef = useMuiDataGridApiRef();
@@ -121,9 +121,9 @@ const AnotacionsComunicadesGrid = () => {
                 apiRef={apiRef}
                 resourceName={"expedientPeticioResource"}
                 columns={columns}
-                // TODO: revisar filtre
                 filter={springFilter}
                 sortModel={sortModel}
+                namedQueries={namedQueries}
                 rowAdditionalActions={actions}
                 toolbarMassiveActions={massiveActions}
                 toolbarHideCreate

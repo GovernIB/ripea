@@ -1,17 +1,20 @@
 package es.caib.ripea.service.intf.model;
 
+import java.io.Serializable;
+import java.util.Date;
+
+import org.springframework.data.annotation.Transient;
+
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
-import es.caib.ripea.service.intf.base.model.*;
-import es.caib.ripea.service.intf.dto.*;
+import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
+import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
+import es.caib.ripea.service.intf.base.model.ResourceReference;
+import es.caib.ripea.service.intf.dto.ConsultaPinbalEstatEnumDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
-import org.springframework.data.annotation.Transient;
-
-import java.io.Serializable;
-import java.util.Date;
 
 @Getter
 @Setter
@@ -25,6 +28,9 @@ import java.util.Date;
                         type = ResourceArtifactType.FILTER,
                         code = ConsultaPinbalResource.FILTER_CODE,
                         formClass = ConsultaPinbalResource.ConsultaPinbalFormFilter.class),
+				@ResourceConfigArtifact(
+						type = ResourceArtifactType.PERSPECTIVE,
+						code = ConsultaPinbalResource.PERSPECTIVE_AUDIT_CODE),                
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = ConsultaPinbalResource.PERSPECTIVE_DOCUMENT_CODE),
@@ -33,6 +39,7 @@ import java.util.Date;
 public class ConsultaPinbalResource extends BaseAuditableResource<Long> {
 
     public static final String FILTER_CODE = "FILTER_CONSULTA_PINBAL";
+    public static final String PERSPECTIVE_AUDIT_CODE = "AUDITORIA";
     public static final String PERSPECTIVE_DOCUMENT_CODE = "DOCUMENT";
 
     private ConsultaPinbalEstatEnumDto estat;
