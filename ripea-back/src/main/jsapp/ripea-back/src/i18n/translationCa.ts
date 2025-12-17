@@ -1238,6 +1238,10 @@ const translationCa = {
         },
         metaExpedient: {
             title: "Procediment",
+            tabs: {
+                dades: "Dades",
+                estat: "Estat revisió",
+            },
             action: {
                 update: {
                     ok: "Procediment modificat correctament",
