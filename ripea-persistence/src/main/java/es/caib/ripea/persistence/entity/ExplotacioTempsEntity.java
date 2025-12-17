@@ -9,7 +9,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Table;
 
-import es.caib.comanda.ms.estadistica.model.DiaSetmanaEnum;
+import es.caib.comanda.model.v1.estadistica.DiaSetmanaEnum;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import lombok.Getter;
 import lombok.Setter;

@@ -56,6 +56,7 @@ public class JBossApiInternaSecurityConfig extends BaseApiInternaSecurityConfig 
 			BaseConfig.ROLE_BSTWS + "," +
 			BaseConfig.ROLE_API_HIST + "," +
 			BaseConfig.ROLE_REVISIO + "," +
+			BaseConfig.ROLE_COMANDA + "," +
 			BaseConfig.ROLE_USER + "}")
 	private String mappableRoles;
 	
