@@ -177,6 +177,7 @@ const ConsultesPinbalGrid = () => {
                 resourceName={"consultaPinbalResource"}
                 columns={columns}
                 filter={springFilter}
+                perspectives={perspectives}
                 sortModel={sortModel}
                 rowAdditionalActions={actions}
                 readOnly

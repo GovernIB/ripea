@@ -144,9 +144,10 @@ public class DocumentNotificacioResourceServiceImpl extends BaseMutableResourceS
         		if (params.getIds()!=null) {
         			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
         			for (Long docId: params.getIds()) {
+        				DocumentNotificacioResourceEntity notificacio = documentNotificacioResourceRepository.findById(docId).get();
                     	DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
                     			entitatEntity.getId(),
-                    			docId,
+                    			notificacio.getDocument().getId(),
                     			false,
                     			true);
                     	if (document!=null) {

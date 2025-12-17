@@ -69,11 +69,11 @@ const columns = [
     },
     {
         field: 'createdByFullName',
-        flex: 0.5,
+        flex: 0.75,
     },
     {
         field: 'dataInici',
-        flex: 0.75,
+        flex: 0.5,
         valueFormatter: (value: any) => formatDate(value),
     },
 ]

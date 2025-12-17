@@ -60,6 +60,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
     	register(MetaExpedientResource.Fields.classificacio, new OnchangeLogicProcessor());
     	register(MetaExpedientResource.Fields.tipusClassificacio, new OnchangeLogicProcessor());
     	register(MetaExpedientResource.Fields.organGestor, new OnchangeLogicProcessor());
+    	register(MetaExpedientResource.Fields.procedimentComu, new OnchangeLogicProcessor());
     }
 	
 	@Override
@@ -166,7 +167,17 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 		@Override
 		public void onChange(Serializable id, MetaExpedientResource previous, String fieldName, Object fieldValue,
 				Map<String, AnswerValue> answers, String[] previousFieldNames, MetaExpedientResource target) {
-			if (MetaExpedientResource.Fields.classificacio.equals(fieldName)) {
+			
+			if (MetaExpedientResource.Fields.procedimentComu.equals(fieldName)) {
+				
+				if (fieldValue==null || (boolean)fieldValue) {
+					target.setOrganGestor(null);
+					target.setClassificacio(null);
+					target.setTipusClassificacio(TipusClassificacioEnumDto.SIA);
+				}
+				
+			} else if (MetaExpedientResource.Fields.classificacio.equals(fieldName)) {
+				
 				if (TipusClassificacioEnumDto.SIA.equals(previous.getTipusClassificacio())) {
 					
 					if (fieldValue==null) {

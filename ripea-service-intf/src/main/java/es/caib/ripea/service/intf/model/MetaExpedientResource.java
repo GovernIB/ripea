@@ -88,6 +88,7 @@ public class MetaExpedientResource extends MetaNodeResource {
 	private ResourceReference<GrupResource, Long> grupPerDefecte;
 
     @Transient int numComentaris;
+    @ResourceField(onChangeActive = true)
     @Transient boolean procedimentComu;
 	@Transient private List<ResourceReference<ExpedientEstatResource, Long>> estats;
 	@Transient private List<ResourceReference<MetaExpedientOrganGestorResource, Long>> metaExpedientOrganGestors;
