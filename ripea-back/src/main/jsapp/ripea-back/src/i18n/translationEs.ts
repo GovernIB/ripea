@@ -1238,6 +1238,10 @@ const translationEs = {
         },
         metaExpedient: {
             title: "Procedimiento",
+            tabs: {
+                dades: "Datos",
+                estat: "Estado de revisión",
+            },
             action: {
                 update: {
                     ok: "Procedimiento modificado correctamente",

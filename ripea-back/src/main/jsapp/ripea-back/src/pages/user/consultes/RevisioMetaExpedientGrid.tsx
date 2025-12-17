@@ -10,21 +10,20 @@ import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import {CommentDialog} from "../../CommentDialog.tsx";
 import {useUserSession} from "../../../components/Session.tsx";
+import TabComponent from "../../../components/TabComponent.tsx";
 
 // Form
 const RevisioMetaExpedientForm = (props:any) => {
     const {revisor = false} = props;
     const {t} = useTranslation();
     const {data} = useFormContext()
-    return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
+
+    const dades = <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField xs={12} name="codi"/>
         <GridFormField xs={2} name="tipusClassificacio" required/>
         <GridFormField xs={10} name="classificacio" debounce disabled={data?.tipusClassificacio == 'ID'}/>
-        <Grid item xs={2}/>
-        <Grid item xs={10}>
-            {data?.msgSiaRolsac != null &&
-                <Alert severity={'warning'} sx={{ mt: 0.5 }}>{data.msgSiaRolsac}</Alert>
-            }
+        <Grid item xs={12} hidden={data?.msgSiaRolsac == null}>
+            <Alert severity={'warning'} sx={{ mt: 0.5 }}>{data.msgSiaRolsac}</Alert>
         </Grid>
         <GridFormField xs={12} name="nom"/>
         <GridFormField xs={12} name="descripcio"/>
@@ -38,10 +37,6 @@ const RevisioMetaExpedientForm = (props:any) => {
         <GridFormField xs={6} name="interessatObligatori"/>
         <GridFormField xs={6} name="permisDirecte"/>
 
-        {/*rol actual “IPA_REVISIO”*/}
-        <GridFormField xs={12} name="revisioEstat" disabled={!revisor}/>
-        <GridFormField xs={12} name="revisioComentari" type={'textarea'} disabled={!revisor}/>
-
         <Grid xs={12} sx={{ pl: '8px', pt: '8px' }}>
             <Alert severity={'info'}>
                 {t('common.auditoria.create', {createdDate: formatDate(data.createdDate), createdBy: data.createdByFullName})}
@@ -50,6 +45,27 @@ const RevisioMetaExpedientForm = (props:any) => {
             </Alert>
         </Grid>
     </Grid>
+
+    const estat = <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
+        {/*rol actual “IPA_REVISIO”*/}
+        <GridFormField xs={12} name="revisioEstat" disabled={!revisor}/>
+        <GridFormField xs={12} name="revisioComentari" type={'textarea'} disabled={!revisor}/>
+    </Grid>
+
+    const tabs = [
+        {
+            value: "dades",
+            label: t('page.metaExpedient.tabs.dades'),
+            content: dades,
+        },
+        {
+            value: "estat",
+            label: t('page.metaExpedient.tabs.estat'),
+            content: estat,
+        },
+    ]
+
+    return <TabComponent tabs={tabs}/>
 }
 
 // Filter
