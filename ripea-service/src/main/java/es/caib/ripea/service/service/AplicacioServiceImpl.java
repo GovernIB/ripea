@@ -87,6 +87,7 @@ import es.caib.ripea.service.intf.dto.ExcepcioLogDto;
 import es.caib.ripea.service.intf.dto.GenericDto;
 import es.caib.ripea.service.intf.dto.IntegracioAccioDto;
 import es.caib.ripea.service.intf.dto.IntegracioDto;
+import es.caib.ripea.service.intf.dto.IntegracioEnumDto;
 import es.caib.ripea.service.intf.dto.IntegracioFiltreDto;
 import es.caib.ripea.service.intf.dto.PaginaDto;
 import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
@@ -409,6 +410,17 @@ public class AplicacioServiceImpl implements AplicacioService {
 		return paginacioHelper.prepararPagina(pagina, pagines, accions);
 	}
 
+	@Override
+	public List<IntegracioAccioDto> getLastIntegracions(IntegracioEnumDto codiIntegracio, int numElements) {
+		List<IntegracioAccioDto> listaAccions = integracioHelper.getLlistaAccions(codiIntegracio.name());
+		if (listaAccions!=null) {
+			int toIndex = Math.min(listaAccions.size(), numElements);
+			return listaAccions.subList(0, toIndex);
+		} else {
+			return new ArrayList<IntegracioAccioDto>();
+		}
+	}
+	
 	@Override
 	public void excepcioSave(String uri, Throwable exception) {
 		try {

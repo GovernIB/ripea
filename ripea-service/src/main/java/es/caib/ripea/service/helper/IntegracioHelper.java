@@ -154,7 +154,7 @@ public class IntegracioHelper {
 		addAccio(integracioCodi, accio);
 	}
 
-	private LinkedList<IntegracioAccioDto> getLlistaAccions(
+	public LinkedList<IntegracioAccioDto> getLlistaAccions(
 			String integracioCodi) {
 			LinkedList<IntegracioAccioDto> accions = accionsIntegracio.get(integracioCodi);
 			if (accions == null) {

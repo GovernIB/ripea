@@ -12,9 +12,6 @@ import java.util.Date;
 @Setter
 public class IntegracioFiltreDto implements Serializable {
 
-    /**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private String entitatCodi;
 	private Date dataInici;
@@ -23,7 +20,4 @@ public class IntegracioFiltreDto implements Serializable {
 	private String descripcio;
 	private IntegracioAccioEstatEnumDto estat;
 
-
-    
 }
-

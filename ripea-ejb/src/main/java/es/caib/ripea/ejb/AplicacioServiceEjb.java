@@ -1,17 +1,28 @@
 package es.caib.ripea.ejb;
 
-import es.caib.ripea.ejb.base.AbstractServiceEjb;
-import es.caib.ripea.service.intf.dto.*;
-import es.caib.ripea.service.intf.service.AplicacioService;
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Timer;
-import lombok.experimental.Delegate;
+import java.util.List;
+import java.util.Properties;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
-import java.util.List;
-import java.util.Properties;
+
+import es.caib.ripea.ejb.base.AbstractServiceEjb;
+import es.caib.ripea.service.intf.dto.DiagnosticFiltreDto;
+import es.caib.ripea.service.intf.dto.EntitatDto;
+import es.caib.ripea.service.intf.dto.ExcepcioLogDto;
+import es.caib.ripea.service.intf.dto.GenericDto;
+import es.caib.ripea.service.intf.dto.IntegracioAccioDto;
+import es.caib.ripea.service.intf.dto.IntegracioDto;
+import es.caib.ripea.service.intf.dto.IntegracioEnumDto;
+import es.caib.ripea.service.intf.dto.IntegracioFiltreDto;
+import es.caib.ripea.service.intf.dto.PaginaDto;
+import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
+import es.caib.ripea.service.intf.dto.UsuariDto;
+import es.caib.ripea.service.intf.service.AplicacioService;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
+import lombok.experimental.Delegate;
 
 @Stateless
 @RolesAllowed("**")
@@ -83,6 +94,12 @@ public class AplicacioServiceEjb extends AbstractServiceEjb<AplicacioService> im
 		return delegateService.integracioFindDarreresAccionsByCodiPaginat(codi, params, filtre);
 	}
 
+	@Override
+	@RolesAllowed("**")
+	public List<IntegracioAccioDto> getLastIntegracions(IntegracioEnumDto codiIntegracio, int numElements) {
+		return delegateService.getLastIntegracions(codiIntegracio, numElements);
+	}
+	
 	@Override
 	@RolesAllowed("**")
 	public void excepcioSave(String uri, Throwable exception) {
