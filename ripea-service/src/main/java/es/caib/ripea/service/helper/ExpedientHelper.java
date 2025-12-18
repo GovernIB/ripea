@@ -104,6 +104,7 @@ import es.caib.ripea.persistence.repository.ExpedientComentariRepository;
 import es.caib.ripea.persistence.repository.ExpedientEstatRepository;
 import es.caib.ripea.persistence.repository.ExpedientPeticioRepository;
 import es.caib.ripea.persistence.repository.ExpedientRepository;
+import es.caib.ripea.persistence.repository.GrupRepository;
 import es.caib.ripea.persistence.repository.InteressatRepository;
 import es.caib.ripea.persistence.repository.MetaDadaRepository;
 import es.caib.ripea.persistence.repository.MetaDocumentRepository;
@@ -194,6 +195,7 @@ public class ExpedientHelper {
 	@Autowired private ConversioTipusHelper conversioTipusHelper;
 	@Autowired private CacheHelper cacheHelper;
 	@Autowired private ExpedientPeticioHelper expedientPeticioHelper;
+	@Autowired private MetaExpedientHelper metaExpedientHelper;
 	@Autowired private PermisosHelper permisosHelper;
 	@Autowired private MetaExpedientRepository metaExpedientRepository;
 	@Autowired private UsuariRepository usuariRepository;
@@ -209,6 +211,7 @@ public class ExpedientHelper {
 	@Autowired private ExpedientComentariRepository expedientComentariRepository;
 	@Autowired private ExecucioMassivaService execucioMassivaService;
 	@Autowired private ExecucioMassivaRepository execucioMassivaRepository;
+	@Autowired private GrupRepository grupRepository;
 	
 	public static List<DocumentDto> expedientsWithImportacio = new ArrayList<DocumentDto>();
 
@@ -1373,6 +1376,38 @@ public class ExpedientHelper {
 		return expedient;
 	}
 	
+	public ExpedientEntity updateExpedient(
+			ExpedientEntity expedient,
+			String nom,
+			int any,
+			Long organGestorId,
+			String rolActual,
+			Long grupId,
+			PrioritatEnumDto prioritat,
+			String prioritatMotiu) {
+		expedient = updateNomExpedient(expedient, nom);
+		//Canvi de any, implica canvi de seq i de número
+		if (expedient.getAny()!=any) {
+			//Calculam la seguent sequencia que li toca per el nou any, amb increment=true
+			long sequenciaMetaExpedient = metaExpedientHelper.obtenirProximaSequenciaExpedient(
+					expedient.getMetaExpedient(),
+					any,
+					true);
+			//Actualitzam any, seq i codi: Hi ha una unique a BBDD (IPA_EXPEDIENT_SEQ_UK)
+			expedient.updateAnySequenciaCodi(
+					any,
+					sequenciaMetaExpedient,
+					expedient.getMetaExpedient().getCodi());
+			//Recalculam el numero del expedient, pot ser per defecte o amb una fórmula.
+			expedient.updateNumero(calcularNumero(expedient));
+		}
+		expedient = updateOrganGestor(expedient, organGestorId, rolActual);
+		if (grupId != null) {
+			expedient.setGrup(grupRepository.getOne(grupId));
+		}
+		expedient = updatePrioritat(expedient, prioritat, prioritatMotiu);
+		return expedient;
+	}
 	
 	public ExpedientEntity updateOrganGestor(ExpedientEntity expedient, Long organGestorId, String rolActual) {
 		Long id = expedient.getOrganGestor() != null ? expedient.getOrganGestor().getId() : null;

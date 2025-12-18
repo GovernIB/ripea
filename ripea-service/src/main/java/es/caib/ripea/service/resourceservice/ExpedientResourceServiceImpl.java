@@ -88,6 +88,7 @@ import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
 import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
+import es.caib.ripea.service.intf.base.exception.ResourceNotFoundException;
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
 import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.base.model.FieldOption;
@@ -653,6 +654,30 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     	}
     }
 
+    @Override
+	public ExpedientResource update(Long id, ExpedientResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotFoundException {
+    	try {
+    		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+    		entityComprovarHelper.comprovarEstatExpedient(entitatEntity.getId(), id, ExpedientEstatEnumDto.OBERT);
+    		String rolActual = configHelper.getRolActual();
+    		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(id, false, false, true, false, false, rolActual);
+    		expedient = expedientHelper.updateExpedient(
+    				expedient,
+    				resource.getNom(),
+    				resource.getAny(),
+    				resource.getOrganGestor()!=null?resource.getOrganGestor().getId():null,
+    				rolActual,
+    				resource.getGrup()!=null?resource.getGrup().getId():null,
+    				resource.getPrioritat(),
+    				resource.getPrioritatMotiu());
+    		contingutHelper.arxiuPropagarModificacio(expedient);
+    		return resource;
+    	} catch (Exception ex) {
+    		excepcioLogHelper.addExcepcio("/expedient/update", ex);
+    		throw ex;
+    	}
+    }
+    
     private class AmbDocumentsPinbalPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
         @Override
         public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {

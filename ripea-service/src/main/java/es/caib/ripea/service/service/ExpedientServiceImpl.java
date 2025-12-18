@@ -429,16 +429,10 @@ public class ExpedientServiceImpl implements ExpedientService {
 		return exception;
 	}
 	
-	
-	
-
-	
 	@Transactional
 	@Override
 	public Exception retryMoverAnnexArxiu(Long registreAnnexId) {
-		
 		Long expedientId = registreAnnexRepository.findExpedientId(registreAnnexId);
-		
 		synchronized (SynchronizationHelper.get0To99Lock(expedientId, SynchronizationHelper.locksExpedients)) {
 			return expedientHelper.moveDocumentArxiuNewTransaction(registreAnnexId);
 		}
@@ -457,27 +451,11 @@ public class ExpedientServiceImpl implements ExpedientService {
 			Long grupId,
 			PrioritatEnumDto prioritat,
 			String prioritatMotiu) {
-		
-		logger.debug(
-				"Actualitzant dades de l'expedient (" + "entitatId=" + entitatId + ", " + "id=" + id + ", " + "nom=" +
-						nom + ")");
+		logger.debug("Actualitzant dades de l'expedient (" + "entitatId=" + entitatId + ", " + "id=" + id + ", " + "nom=" + nom + ")");
 		contingutHelper.comprovarContingutDinsExpedientModificable(entitatId, id, false, true, false, false, false, true, rolActual);
-		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				id,
-				false,
-				false,
-				true,
-				false,
-				false,
-				rolActual);
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(id, false, false, true, false, false, rolActual);
 		entityComprovarHelper.comprovarEstatExpedient(entitatId, id, ExpedientEstatEnumDto.OBERT);
-		expedientHelper.updateNomExpedient(expedient, nom);
-		expedientHelper.updateAnyExpedient(expedient, any);
-		expedientHelper.updateOrganGestor(expedient, organGestorId, rolActual);
-		if (grupId != null) {
-			expedient.setGrup(grupRepository.getOne(grupId));
-		}
-		expedientHelper.updatePrioritat(expedient, prioritat, prioritatMotiu);
+		expedient = expedientHelper.updateExpedient(expedient, nom, any, organGestorId, rolActual, grupId, prioritat, prioritatMotiu);
 		ExpedientDto dto = expedientHelper.toExpedientDto(expedient, false, false, null, false);
 		contingutHelper.arxiuPropagarModificacio(expedient);
 		return dto;
@@ -486,7 +464,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 	@Transactional
 	@Override
 	public ExpedientDto changeExpedientPrioritat(Long entitatId, Long expedientId, PrioritatEnumDto prioritat, String prioritatMotiu) {
-
 		logger.debug("Canviant la prioritat de l'expedient (entitatId=" + entitatId + ", expedientId=" + expedientId + ", prioritat=" + prioritat + ")");
 		entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
@@ -497,7 +474,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				false,
 				null);
-
 		expedientHelper.updatePrioritat(expedient, prioritat, prioritatMotiu);
 		return expedientHelper.toExpedientDto(expedient, false, false, null, false);
 	}
