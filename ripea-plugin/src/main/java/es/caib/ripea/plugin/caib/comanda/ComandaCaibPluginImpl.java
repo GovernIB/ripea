@@ -12,8 +12,8 @@ import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import es.caib.comanda.ms.broker.model.Avis;
-import es.caib.comanda.ms.broker.model.Tasca;
+import es.caib.comanda.model.v1.avis.Avis;
+import es.caib.comanda.model.v1.tasca.Tasca;
 import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.comanda.ComandaCaibPlugin;
 import es.caib.ripea.service.intf.config.PropertyConfig;

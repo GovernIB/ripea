@@ -10,17 +10,21 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import es.caib.comanda.ms.salut.model.AppInfo;
-import es.caib.comanda.ms.salut.model.SalutInfo;
+import es.caib.comanda.model.v1.salut.AppInfo;
+import es.caib.comanda.model.v1.salut.SalutInfo;
+import es.caib.comanda.ms.salut.helper.MonitorHelper;
+import es.caib.ripea.api.interna.config.BaseApiInternaSecurityConfig;
 import es.caib.ripea.service.intf.service.SalutService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @RestController
+@RequestMapping(BaseApiInternaSecurityConfig.VERSIO_API_COMANDA)
 @Tag(name = "Integració comanda - RIPEA", description = "Publicació de dades de salut i informació de l'aplicació")
 public class SalutController extends BaseApiInternaController {
 
@@ -48,6 +52,7 @@ public class SalutController extends BaseApiInternaController {
                 .integracions(salutService.getIntegracions())
                 .subsistemes(salutService.getSubsistemes())
                 .contexts(salutService.getContexts(getBaseUrl(request)))
+                .versioJboss(MonitorHelper.getApplicationServerInfo())
                 .build();
     }
     

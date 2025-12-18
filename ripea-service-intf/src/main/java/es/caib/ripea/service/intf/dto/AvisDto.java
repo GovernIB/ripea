@@ -3,7 +3,7 @@ package es.caib.ripea.service.intf.dto;
 import java.io.Serializable;
 import java.util.Date;
 
-import es.caib.comanda.ms.salut.model.SalutNivell;
+import es.caib.comanda.model.v1.salut.SalutNivell;
 import lombok.Data;
 
 @Data

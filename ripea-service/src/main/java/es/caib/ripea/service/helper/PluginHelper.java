@@ -51,10 +51,10 @@ import com.itextpdf.text.pdf.AcroFields;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.tool.xml.Experimental;
 
-import es.caib.comanda.ms.broker.model.Avis;
-import es.caib.comanda.ms.broker.model.AvisTipus;
-import es.caib.comanda.ms.broker.model.Tasca;
-import es.caib.comanda.ms.broker.model.TascaEstat;
+import es.caib.comanda.model.v1.avis.Avis;
+import es.caib.comanda.model.v1.avis.AvisTipus;
+import es.caib.comanda.model.v1.tasca.Tasca;
+import es.caib.comanda.model.v1.tasca.TascaEstat;
 import es.caib.distribucio.rest.client.integracio.domini.Annex;
 import es.caib.distribucio.rest.client.integracio.domini.AnotacioRegistreEntrada;
 import es.caib.distribucio.rest.client.integracio.domini.AnotacioRegistreId;
