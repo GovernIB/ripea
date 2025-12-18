@@ -110,6 +110,7 @@ import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.ImportacioDto;
 import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
 import es.caib.ripea.service.intf.dto.PermisosPerExpedientsDto;
+import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
 import es.caib.ripea.service.intf.dto.ResultatConsultaDto;
 import es.caib.ripea.service.intf.dto.SiNoEnumDto;
 import es.caib.ripea.service.intf.dto.TipusRegistreEnumDto;
@@ -1270,20 +1271,32 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		@Override
 		public Serializable exec(String code, ExpedientResourceEntity entity, CanviPrioritatExpedientFormAction params) throws ActionExecutionException {
 			try {
+				
+				if (!PrioritatEnumDto.B_NORMAL.equals(params.getPrioritat()) && !Utils.hasValue(params.getPrioritatMotiu())) {
+					throw new Exception("Motiu obligatori.");
+				}
+				String nomExp = "";
 				if (params!=null && params.getIds()!=null) {
 					for (Long idExpedient: params.getIds()) {
-						entity = expedientResourceRepository.findById(idExpedient).get();
-						entity.setPrioritat(params.getPrioritat());
+						ExpedientEntity ee = expedientRepository.findById(idExpedient).get();
+						nomExp = ee.getNom();
+						expedientHelper.updatePrioritat(ee, params.getPrioritat(), params.getPrioritatMotiu());
 					}
 				}
-				int numElem = params!=null && params.getIds()!=null?params.getIds().size():0;
-				return "{\"num\": \""+numElem+"\"}";
+				
+				if (params.isMassivo()) {
+					int numElem = params!=null && params.getIds()!=null?params.getIds().size():0;
+					return "{\"num\": \""+numElem+"\"}";
+				} else {
+					return "{\"nom\": \""+nomExp+"\"}";
+				}
 			} catch (Exception e) {
+				String ids = Utils.getIdsSeparatsComa(params.getIds());
 				excepcioLogHelper.addExcepcio(
 						"/expedient/CanviPrioritatActionExecutor", e,
-						Utils.getIdsSeparatsComa(params.getIds()),
+						ids,
 						"massiu="+params.isMassivo());
-				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, messageHelper.getMessage("expedient.tancar.reject", new Object[]{e.getMessage()}));
+				throw new ActionExecutionException(getResourceClass(), ids, code, messageHelper.getMessage("expedient.tancar.reject", new Object[]{e.getMessage()}));
 			}
 		}
     }
@@ -1296,17 +1309,22 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		@Override
 		public Serializable exec(String code, ExpedientResourceEntity entity, CanviEstatExpedientFormAction params) throws ActionExecutionException {
 			try {
+				String nomExp = "";
 				if (params!=null && params.getIds()!=null) {
 					for (Long idExpedient: params.getIds()) {
 						EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
-						expedientEstatHelper.updateEstatAdditional(
+						nomExp = expedientEstatHelper.updateEstatAdditional(
 								entitatEntity.getId(),
 								idExpedient,
-								params.getEstatAdditional().getId());
+								params.getEstatAdditional().getId()).getNom();
 					}
 				}
-				int numElem = params!=null && params.getIds()!=null?params.getIds().size():0;
-				return "{\"num\": \""+numElem+"\"}";
+				if (params.isMassivo()) {
+					int numElem = params!=null && params.getIds()!=null?params.getIds().size():0;
+					return "{\"num\": \""+numElem+"\"}";
+				} else {
+					return "{\"nom\": \""+nomExp+"\"}";
+				}
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio(
 						"/expedient/CanviEstatActionExecutor", e,
