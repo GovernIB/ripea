@@ -27,6 +27,10 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -3270,7 +3274,7 @@ public class ExpedientHelper {
 		List<DadaEntity> dades = dadaRepository.findByNodeIdInOrderByNodeIdAscMetaDadaCodiAsc(expedientIds);
 		int numColumnes = 10 + metaDades.size();
 		String[] columnes = new String[numColumnes];
-		columnes[0] = messageHelper.getMessage("expedient.service.exportacio.numero");
+		columnes[0] = "Número";
 		columnes[1] = messageHelper.getMessage("expedient.service.exportacio.titol");
 		columnes[2] = messageHelper.getMessage("expedient.service.exportacio.estat");
 		columnes[3] = messageHelper.getMessage("expedient.service.exportacio.datcre");
@@ -3365,24 +3369,24 @@ public class ExpedientHelper {
 		}
 		FitxerDto fitxer = new FitxerDto();
 		if ("ODS".equalsIgnoreCase(format)) {
-			Object[][] filesArray = files.toArray(new Object[files.size()][numColumnes]);
-			TableModel tableModel = new DefaultTableModel(filesArray, columnes);
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			Workbook workbook = new XSSFWorkbook();
-			Sheet sheet = workbook.createSheet("Expedient");
-			for (int i = 0; i < tableModel.getRowCount(); i++) {
-			    Row row = sheet.createRow(i);
-			    for (int j = 0; j < tableModel.getColumnCount(); j++) {
-			        Cell cell = row.createCell(j);
-			        Object aux = tableModel.getValueAt(i, j);
-			        cell.setCellValue(aux!=null?aux.toString():"");
-			    }
-			}
-			workbook.write(baos);
-			workbook.close();
-			fitxer.setNom("exportacio.ods");
-			fitxer.setContentType("application/vnd.oasis.opendocument.spreadsheet");
-			fitxer.setContingut(baos.toByteArray());
+//			Object[][] filesArray = files.toArray(new Object[files.size()][numColumnes]);
+//			TableModel tableModel = new DefaultTableModel(filesArray, columnes);
+//			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//			Workbook workbook = new XSSFWorkbook();
+//			Sheet sheet = workbook.createSheet("Expedient");
+//			for (int i = 0; i < tableModel.getRowCount(); i++) {
+//			    Row row = sheet.createRow(i);
+//			    for (int j = 0; j < tableModel.getColumnCount(); j++) {
+//			        Cell cell = row.createCell(j);
+//			        Object aux = tableModel.getValueAt(i, j);
+//			        cell.setCellValue(aux!=null?aux.toString():"");
+//			    }
+//			}
+//			workbook.write(baos);
+//			workbook.close();
+			fitxer.setNom("exportacio.xlsx");
+			fitxer.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+			fitxer.setContingut(generarContenidoExcel(columnes, files));
 		} else if ("CSV".equalsIgnoreCase(format)) {
 			fitxer.setNom("exportacio.csv");
 			fitxer.setContentType("text/csv");
@@ -3398,6 +3402,49 @@ public class ExpedientHelper {
 		return fitxer;
 	}
 	
+	private byte[] generarContenidoExcel(String[] cols, List<String[]> rows) throws IOException {
+		
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("Datos");
+
+        // Crear estilo para cabecera
+        CellStyle headerStyle = workbook.createCellStyle();
+        Font headerFont = workbook.createFont();
+        headerFont.setBold(true);
+        headerStyle.setFont(headerFont);
+        headerStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+        headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+        // Crear fila de cabecera
+        Row headerRow = sheet.createRow(0);
+        for (int i = 0; i < cols.length; i++) {
+            Cell cell = headerRow.createCell(i);
+            cell.setCellValue(cols[i]);
+            cell.setCellStyle(headerStyle);
+        }
+
+        // Crear filas de datos
+        for (int i = 0; i < rows.size(); i++) {
+            Row row = sheet.createRow(i + 1); // +1 porque la fila 0 es la cabecera
+            String[] data = rows.get(i);
+            for (int j = 0; j < data.length; j++) {
+                Cell cell = row.createCell(j);
+                cell.setCellValue(data[j] != null ? data[j] : "");
+            }
+        }
+
+        // Ajustar automáticamente el ancho de las columnas
+        for (int i = 0; i < cols.length; i++) {
+            sheet.autoSizeColumn(i);
+        }
+
+        // Escribir a un array de bytes
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        workbook.write(baos);
+        workbook.close();
+
+        return baos.toByteArray();
+    }
 	
 	private DocumentNtiTipoFirmaEnumDto toNtiTipoFirma(FirmaTipus firmaTipus) {
 		DocumentNtiTipoFirmaEnumDto documentNtiTipoFirmaEnumDto = null;
