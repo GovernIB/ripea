@@ -57,6 +57,15 @@ const columns = [
         valueFormatter: (value: any) => formatDate(value)
     },
     {
+        field: 'dataActualitzacio',
+        flex: 1,
+        valueFormatter: (value: any) => formatDate(value)
+    },
+    {
+        field: 'reintentsCanviEstatDistribucio',
+        flex: 0.7,
+    },
+    {
         field: 'estat',
         flex: 1,
     },

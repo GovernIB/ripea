@@ -381,6 +381,7 @@ public class ExpedientPeticioHelper {
 				logger.info("Estat canviat (" + pendent.getIdentificador() + "," + pendent.getClauAcces() + ", " + estat + "," + observacions + ")");
 			
 			pendent.setEstatCanviatDistribucio(true);
+			pendent.setDataActualitzacio(new Date());
 
 		} catch (Exception ex) {
 			logger.error("Error al reintentar canvi estat a Distribució de anotacio amb id " + pendent.getId(), ex);
