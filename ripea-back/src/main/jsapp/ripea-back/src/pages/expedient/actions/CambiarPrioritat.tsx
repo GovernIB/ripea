@@ -43,6 +43,7 @@ export const useCambiarPrioritat = (refresh?: () => void) => {
             massivo: false,
             nom: row?.nom,
             prioritat: row?.prioritat,
+            prioritatMotiu: row?.prioritatMotiu,
         })
     }
     const onSuccess = (response:any) :void => {
