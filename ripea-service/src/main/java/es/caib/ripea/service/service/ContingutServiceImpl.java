@@ -944,9 +944,12 @@ public class ContingutServiceImpl implements ContingutService {
 				arxiuDetall.setEniIdentificador(metadades.getIdentificador());
 				arxiuDetall.setSerieDocumental(metadades.getSerieDocumental());
 				arxiuDetall.setEniDataCaptura(metadades.getDataCaptura());
-				
+				String codiCsv = metadades.getCsv();
+				if (Utils.hasValue(codiCsv)) {
+					arxiuDetall.setCsv(codiCsv);
+					arxiuDetall.setCsvLink(configHelper.getConfig(PropertyConfig.CONCSV_BASE_URL));
+				}
 				arxiuDetall.setEniOrigen(ArxiuConversions.getOrigen(metadades.getOrigen()));
-
 				arxiuDetall.setEniEstatElaboracio(ArxiuConversions.getEstatElaboracio(metadades.getEstatElaboracio()));
 				
 				if (metadades.getTipusDocumental() != null) {

@@ -607,6 +607,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         public void applySingle(String code, DocumentResourceEntity entity, DocumentResource resource) throws PerspectiveApplicationException {
             List<DocumentVersioDto> versions = contingutResourceHelper.getVersions(entity);
             resource.setVersions(versions);
+            resource.setCsvLinkUrl(configHelper.getConfig(PropertyConfig.CONCSV_BASE_URL));
         }
     }
     

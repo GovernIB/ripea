@@ -120,6 +120,10 @@
 										<td><spring:message code="expedient.estat.enum.${arxiuDetall.eniEstat}"/></td>
 									</tr>
 								</c:if>
+								<c:if test="${not empty arxiuDetall.csv}">
+									<td><strong><spring:message code="contingut.arxiu.camp.csv"/></strong></td>
+									<td>${arxiuDetall.csv}<c:if test="${not empty arxiuDetall.csvLink}">&nbsp;<a href="${arxiuDetall.csvLink}${arxiuDetall.csv}" target="_blank" title="<spring:message code="contingut.document.camp.firma.csv.enllac"/>"><span class="fa fa-external-link"></span></a></c:if></td>
+								</c:if>								
 								<c:if test="${not empty arxiuDetall.eniDataTancament}">
 									<tr>
 										<td><strong><spring:message code="contingut.arxiu.camp.eni.data.tancament"/></strong></td>

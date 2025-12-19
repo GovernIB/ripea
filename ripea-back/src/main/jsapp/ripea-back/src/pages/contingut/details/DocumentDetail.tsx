@@ -1,5 +1,5 @@
-import {useCallback, useEffect, useState} from "react";
-import {Alert, Box, Button, Grid, Icon, Typography} from "@mui/material";
+import {useState} from "react";
+import {Alert, Box, Button, Grid, Icon, Typography, Link} from "@mui/material";
 import {BasePage, GridPage, useResourceApiService, MuiDialog, useBaseAppContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import TabComponent from "../../../components/TabComponent.tsx";
@@ -27,8 +27,11 @@ const Contenido = (props:any) => {
                 <ContenidoData title={t('page.document.detall.origen')}>{t(`enum.origen.${entity?.ntiOrigen}`)}</ContenidoData>
                 <ContenidoData title={t('page.document.detall.tipoDocumental')}>{entity?.ntiTipoDocumental}</ContenidoData>
                 <ContenidoData title={t('page.document.detall.estadoElaboracion')}>{t(`enum.estatElaboracio.${entity?.ntiEstadoElaboracion}`)}</ContenidoData>
-                <ContenidoData title={t('page.document.detall.csv')}>{entity?.ntiCsv}</ContenidoData>
-                <ContenidoData title={t('page.document.detall.csvRegulacion')}>{entity?.ntiCsvRegulacion}</ContenidoData>
+                <ContenidoData title={t('page.document.detall.csv')} hidden={!entity?.ntiCsv}>
+                    {entity?.ntiCsv} {entity?.csvLinkUrl &&
+                    <Link href={entity?.csvLinkUrl+entity?.ntiCsv} target={"_blank"} rel="noopener noreferrer"><Icon>launch</Icon></Link>}                    
+                </ContenidoData>
+                <ContenidoData title={t('page.document.detall.csvRegulacion')} hidden={!entity?.ntiCsvRegulacion}>{entity?.ntiCsvRegulacion}</ContenidoData>
                 <ContenidoData title={t('page.document.detall.tipoFirma')}>{entity?.ntiTipoFirma && t(`enum.tipoFirma.${entity?.ntiTipoFirma}`)}</ContenidoData>
             </Grid>
         </Load>

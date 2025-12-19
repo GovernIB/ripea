@@ -329,6 +329,7 @@ public class DocumentResource extends NodeResource {
     @Transient private ResourceReference<CarpetaResource, Long> carpeta;
     @Transient private boolean isDeteccioFirmaAutomaticaActiva;
     @Transient private ResourceReference<MetaExpedientResource, Long> metaExpedient;
+    @Transient private String csvLinkUrl;
 
     public String getFitxerExtension() {
         if (fitxerNom != null) {

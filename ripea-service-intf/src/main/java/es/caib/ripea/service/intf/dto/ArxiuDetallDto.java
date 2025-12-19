@@ -32,6 +32,9 @@ public class ArxiuDetallDto extends ArxiuContingutDto {
 	private String eniFormat;
 	private String eniDocumentOrigenId;
 	private String serieDocumental;
+	
+	private String csv;
+	private String csvLink;
 
 	private Map<String, Object> metadadesAddicionals;
 

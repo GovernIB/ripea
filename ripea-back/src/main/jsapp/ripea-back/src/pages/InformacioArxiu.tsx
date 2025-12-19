@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {Grid} from "@mui/material";
+import {Grid, Link, Icon} from "@mui/material";
 import {BasePage, useResourceApiService, MuiDialog, useBaseAppContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {formatDate} from "../util/dateUtils.ts";
@@ -13,7 +13,7 @@ const InformacionArxiu = (props:any) => {
 
     return <BasePage>
         <Load value={arxiu}>
-            <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
+            <Grid container sx={{wordWrap: "break-word" }} direction={"row"} columnSpacing={1} rowSpacing={1}>
                 <ContenidoData title={t('page.arxiu.detall.arxiuUuid')}>{arxiu?.identificador}</ContenidoData>
                 <ContenidoData title={t('page.arxiu.detall.fitxerNom')}>{arxiu?.nom}</ContenidoData>
                 <ContenidoData title={t('page.arxiu.detall.serie')}>{arxiu?.serieDocumental}</ContenidoData>
@@ -31,6 +31,10 @@ const InformacionArxiu = (props:any) => {
                     <ContenidoData title={t('page.arxiu.detall.dataApertura')} hiddenIfEmpty>{formatDate(arxiu?.eniDataObertura)}</ContenidoData>
                     <ContenidoData title={t('page.arxiu.detall.clasificacion')} hiddenIfEmpty>{arxiu?.eniClassificacio}</ContenidoData>
                     <ContenidoData title={t('page.arxiu.detall.estat')} hidden={!arxiu?.eniEstat}>{t(`enum.estat.${arxiu?.eniEstat}`)}</ContenidoData>
+                    <ContenidoData title={t('page.document.detall.csv')} hidden={!arxiu?.csv}>
+                        {arxiu?.csv} {arxiu?.csvLink &&
+                        <Link href={arxiu?.csvLink+arxiu?.csv} target={"_blank"} rel="noopener noreferrer"><Icon>launch</Icon></Link>}
+                    </ContenidoData>
                     <ContenidoData title={t('page.arxiu.detall.dataTancament')} hiddenIfEmpty>{formatDate(arxiu?.eniDataTancament)}</ContenidoData>
                     <ContenidoData title={t('page.arxiu.detall.dataCaptura')} hiddenIfEmpty>{formatDate(arxiu?.eniDataCaptura)}</ContenidoData>
                     <ContenidoData title={t('page.arxiu.detall.origen')} hidden={!arxiu?.eniOrigen}>{t(`enum.origen.${arxiu?.eniOrigen}`)}</ContenidoData>

@@ -29,10 +29,12 @@ import es.caib.ripea.persistence.entity.resourcerepository.ContingutResourceRepo
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.persistence.repository.TipusDocumentalRepository;
 import es.caib.ripea.service.helper.ArxiuConversions;
+import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.ContingutHelper;
 import es.caib.ripea.service.helper.ConversioTipusHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.PluginHelper;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.ArxiuContingutDto;
 import es.caib.ripea.service.intf.dto.ArxiuContingutTipusEnumDto;
 import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
@@ -60,6 +62,7 @@ public class ContingutResourceHelper {
     private final PluginHelper pluginHelper;
     private final ConversioTipusHelper conversioTipusHelper;
     private final ContingutHelper contingutHelper;
+    private final ConfigHelper configHelper;
 
     public boolean contingutHasDocumentsFills(Long contingutPareId) {
 //    	return carpetaResourceRepository.contingutHasDocumentsFills(contingutPareId);
@@ -156,7 +159,11 @@ public class ContingutResourceHelper {
             arxiuDetall.setEniIdentificador(metadades.getIdentificador());
             arxiuDetall.setSerieDocumental(metadades.getSerieDocumental());
             arxiuDetall.setEniDataCaptura(metadades.getDataCaptura());
-
+			String codiCsv = metadades.getCsv();
+			if (Utils.hasValue(codiCsv)) {
+				arxiuDetall.setCsv(codiCsv);
+				arxiuDetall.setCsvLink(configHelper.getConfig(PropertyConfig.CONCSV_BASE_URL));
+			}
             arxiuDetall.setEniOrigen(ArxiuConversions.getOrigen(metadades.getOrigen()));
 
             arxiuDetall.setEniEstatElaboracio(ArxiuConversions.getEstatElaboracio(metadades.getEstatElaboracio()));
