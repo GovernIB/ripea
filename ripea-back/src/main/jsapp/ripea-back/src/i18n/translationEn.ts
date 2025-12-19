@@ -738,6 +738,7 @@ const translationEn = {
                 organ: "Authority",
                 dataCaptura: "Capture date",
                 dataApertura: "Opening date",
+                dataTancament: "Closing date",
                 origen: "Origin",
                 estadoElaboracion: "Drafting status",
                 tipoDocumental: "NTI documentary type",

@@ -31,6 +31,7 @@ const InformacionArxiu = (props:any) => {
                     <ContenidoData title={t('page.arxiu.detall.dataApertura')} hiddenIfEmpty>{formatDate(arxiu?.eniDataObertura)}</ContenidoData>
                     <ContenidoData title={t('page.arxiu.detall.clasificacion')} hiddenIfEmpty>{arxiu?.eniClassificacio}</ContenidoData>
                     <ContenidoData title={t('page.arxiu.detall.estat')} hidden={!arxiu?.eniEstat}>{t(`enum.estat.${arxiu?.eniEstat}`)}</ContenidoData>
+                    <ContenidoData title={t('page.arxiu.detall.dataTancament')} hiddenIfEmpty>{formatDate(arxiu?.eniDataTancament)}</ContenidoData>
                     <ContenidoData title={t('page.arxiu.detall.dataCaptura')} hiddenIfEmpty>{formatDate(arxiu?.eniDataCaptura)}</ContenidoData>
                     <ContenidoData title={t('page.arxiu.detall.origen')} hidden={!arxiu?.eniOrigen}>{t(`enum.origen.${arxiu?.eniOrigen}`)}</ContenidoData>
                     <ContenidoData title={t('page.arxiu.detall.estadoElaboracion')} hidden={!arxiu?.eniEstatElaboracio}>{t(`enum.estatElaboracio.${arxiu?.eniEstatElaboracio}`)}</ContenidoData>

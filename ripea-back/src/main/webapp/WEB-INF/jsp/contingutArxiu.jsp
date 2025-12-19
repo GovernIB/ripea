@@ -120,6 +120,12 @@
 										<td><spring:message code="expedient.estat.enum.${arxiuDetall.eniEstat}"/></td>
 									</tr>
 								</c:if>
+								<c:if test="${not empty arxiuDetall.eniDataTancament}">
+									<tr>
+										<td><strong><spring:message code="contingut.arxiu.camp.eni.data.tancament"/></strong></td>
+										<td><fmt:formatDate value="${arxiuDetall.eniDataTancament}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
+									</tr>
+								</c:if>								
 								<c:if test="${not empty arxiuDetall.eniDataCaptura}">
 									<tr>
 										<td><strong><spring:message code="contingut.arxiu.camp.eni.data.captura"/></strong></td>

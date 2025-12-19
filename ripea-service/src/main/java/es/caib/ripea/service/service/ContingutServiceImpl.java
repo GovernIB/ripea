@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -901,6 +902,14 @@ public class ContingutServiceImpl implements ContingutService {
 				arxiuDetall.setEniIdentificador(metadades.getIdentificador());
 				arxiuDetall.setSerieDocumental(metadades.getSerieDocumental());
 				arxiuDetall.setEniDataObertura(metadades.getDataObertura());
+				try {
+					Object fechaFinExp = arxiuExpedient.getExpedientMetadades().getMetadadaAddicional("eni:fecha_fin_exp");
+					if (fechaFinExp!=null && Utils.hasValue(fechaFinExp.toString())) {
+						OffsetDateTime odt = OffsetDateTime.parse(fechaFinExp.toString());
+						Date dateFinExp = Date.from(odt.toInstant());
+						arxiuDetall.setEniDataTancament(dateFinExp);
+					}
+				} catch (Exception ex) {}
 				arxiuDetall.setEniClassificacio(metadades.getClassificacio());
 				if (metadades.getEstat() != null) {
 					switch (metadades.getEstat()) {

@@ -1112,30 +1112,22 @@ public class PluginHelper {
 	public void arxiuExpedientTancar(ExpedientEntity expedient) {
 		
 		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
-		organGestorHelper.actualitzarOrganCodi(
-				organGestorHelper.getOrganCodiFromContingutId(
-						expedient.getId()));
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(expedient.getId()));
+		
 		String accioDescripcio = "Tancament d'un expedient";
 		Map<String, String> accioParams = new HashMap<String, String>();
-		accioParams.put(
-				"id",
-				expedient.getId().toString());
-		accioParams.put(
-				"títol",
-				expedient.getNom());
-		accioParams.put(
-				"tipus",
-				expedient.getMetaExpedient().getNom());
+		accioParams.put("id", expedient.getId().toString());
+		accioParams.put("títol", expedient.getNom());
+		accioParams.put("tipus", expedient.getMetaExpedient().getNom());
+		
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
 		String endpoint = arxiuPluginWrapper.getEndpoint();
 		
 		try {
-			String arxiuUuid = arxiuPluginWrapper.getPlugin().expedientTancar(
-					expedient.getArxiuUuid());
+			String arxiuUuid = arxiuPluginWrapper.getPlugin().expedientTancar(expedient.getArxiuUuid());
 			if (arxiuUuid != null) {
-				expedient.updateArxiu(
-						arxiuUuid);
+				expedient.updateArxiu(arxiuUuid);
 			}
 			integracioHelper.addAccioOk(
 					IntegracioHelper.INTCODI_ARXIU,

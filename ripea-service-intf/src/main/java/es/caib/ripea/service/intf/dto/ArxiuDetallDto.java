@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.service.intf.dto;
 
 import java.util.Date;
@@ -23,6 +20,7 @@ public class ArxiuDetallDto extends ArxiuContingutDto {
 	private String eniIdentificador;
 	private NtiOrigenEnumDto eniOrigen;
 	private Date eniDataObertura;
+	private Date eniDataTancament;
 	private String eniClassificacio;
 	private ExpedientEstatEnumDto eniEstat;
 	private List<String> eniOrgans;

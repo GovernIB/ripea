@@ -738,6 +738,7 @@ const translationEs = {
                 organ: "Órgano",
                 dataCaptura: "Fecha captura",
                 dataApertura: "Fecha apertura",
+                dataTancament: "Fecha de cierre",
                 origen: "Origen",
                 estadoElaboracion: "Estado elaboración",
                 tipoDocumental: "Tipo documental NTI",

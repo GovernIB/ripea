@@ -738,6 +738,7 @@ const translationCa = {
                 organ: "Òrgan",
                 dataCaptura: "Data de captura",
                 dataApertura: "Data d'obertura",
+                dataTancament: "Data de tancament",
                 origen: "Origen",
                 estadoElaboracion: "Estat d'elaboració",
                 tipoDocumental: "Tipus documental NTI",
