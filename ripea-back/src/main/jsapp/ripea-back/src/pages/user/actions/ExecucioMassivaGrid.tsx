@@ -1,7 +1,7 @@
 import {useTranslation} from "react-i18next";
 import {useEffect, useRef, useState} from "react";
 import {MuiDialog, useBaseAppContext, useMuiDataGridApiRef, useResourceApiService} from "reactlib";
-import {Chip, Checkbox, FormControlLabel, LinearProgress, Box, Icon} from "@mui/material";
+import {Chip, Checkbox, FormControlLabel, LinearProgress, Box, Icon, Tooltip} from "@mui/material";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import {useUserSession} from "../../../components/Session.tsx";
 import Load from "../../../components/Load.tsx";
@@ -243,6 +243,14 @@ const columnsContingut = [
     {
         field: 'elementNom',
         flex: 0.75,
+		renderCell: (params: any) => (
+			<Tooltip title={<span dangerouslySetInnerHTML={{ __html: params.value }} />} arrow>
+			  <span
+			    dangerouslySetInnerHTML={{ __html: params.value }}
+			    style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}
+			  />
+			</Tooltip>
+		  ),
     },
     {
         field: 'estat',
@@ -327,9 +335,9 @@ const useExecucioMassivaContingut = () => {
                 apiRef={gridApiRef}
                 sortModel={sortModelContingut}
                 columns={columnsContingut}
-                // paginationActive
-                // height={110 + 52 * 4}
-                autoHeight
+                paginationActive
+                height={110 + 52 * 4}
+                //autoHeight
                 readOnly
 
                 rowProps={(row: any) => {

@@ -2031,6 +2031,9 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			BindingResult bindingResult,
 			Model model) {
 		
+		if (! isExpedientMoureTotActiva())
+			throw new SecurityException("És necessari activar la propietat '"+ PropertyConfig.MOURE_TOT + "' per poder executar aquesta acció");
+		
 		organGestorService.actualitzarOrganCodi(organGestorService.getOrganCodiFromContingutId(expedientOrigenId));
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		
@@ -2161,6 +2164,10 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 	
 	private boolean isExportacioExcelActiva() {
 		return Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.EXPORTACIO_EXCEL));
+	}
+	
+	private boolean isExpedientMoureTotActiva() {
+		return Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.MOURE_TOT));
 	}
 
 	private ExpedientFiltreCommand getRelacionarFiltreCommand(

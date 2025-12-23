@@ -287,6 +287,7 @@ public class PropertyConfig {
 	public static final String EXPORTACIO_EXCEL                                     = "es.caib.ripea.expedient.exportacio.excel";
 	public static final String EXPORTACIO_INSIDE                                    = "es.caib.ripea.expedient.exportar.inside";
 	public static final String TANCAMENT_LOGIC								        = "es.caib.ripea.expedient.tancament.logic";
+	public static final String MOURE_TOT								        	= "es.caib.ripea.expedient.accio.moure.tot.activa";
 	public static final String OBTENIR_DATA_FIRMA_FROM_ATRIBUT_DOC 					= "es.caib.ripea.obtenir.data.firma.atributs.document";
 	public static final String TANCAMENT_LOGIC_DIES								    = "es.caib.ripea.expedient.tancament.logic.dies";
 	public static final String MANTENIR_ESTAT_CARPETA								= "es.caib.ripea.carpetes.mantenir.estat";

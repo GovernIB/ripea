@@ -284,7 +284,7 @@ export const useCommonActions = (refresh?: () => void) => {
 		    icon: 'open_with',
 		    showInMenu: true,
 		    onClick: handleMoureTot,
-		    hidden: (row:any) => isTancat(row) || !row?.potModificar,
+		    hidden: (row:any) => isTancat(row) || !row?.potModificar || !user?.sessionScope?.isExpedientMoureTotActiu,
 		},
         {
             label: <Divider sx={{px: 1, width: '100%'}} color={"none"}/>,
