@@ -1244,6 +1244,7 @@ const translationCa = {
             title: "Tipus documental",
             action: {
                 new: {
+                    label: "Afegir tipus documental",
                     ok: "Tipus documental '{{data.codi}}' creat correctament",
                 },
                 update: {

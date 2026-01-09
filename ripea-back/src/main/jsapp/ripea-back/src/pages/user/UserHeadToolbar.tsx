@@ -359,7 +359,7 @@ const useMenuAdmin = () => {
                     title: t('page.user.menu.url'),
                     // icon: '',
                     onClick: () => toProgramaAntic('urlInstruccio'),
-                    hidden: !user?.sessionScope?.isDominisEnabled,
+                    hidden: !user?.sessionScope?.isUrlInstruccioEnabled,
                 },
                 {
                     divider: true,

@@ -1244,6 +1244,7 @@ const translationEn = {
             title: "Document type",
             action: {
                 new: {
+                    label: "New document type",
                     ok: "Document type '{{data.codi}}' created successfully",
                 },
                 update: {
