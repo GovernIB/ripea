@@ -406,7 +406,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
         @ResourceField(enumType = true)
         private String dominiValor;
         @ResourceField(onChangeActive = true)
-        private LocalDateTime dataCreacioInici = LocalDateTime.now().withMonth(LocalDateTime.now().getMonth().getValue()-3);
+        private LocalDateTime dataCreacioInici = LocalDateTime.now().minusMonths(3);
         @ResourceField(onChangeActive = true)
         private LocalDateTime dataCreacioFinal;
         private String numeroRegistre;
