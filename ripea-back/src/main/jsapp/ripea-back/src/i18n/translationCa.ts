@@ -36,6 +36,7 @@ const translationCa = {
             create: "Creat el {{createdDate}} per '{{createdBy}}'.",
             update: "Modificat el {{lastModifiedDate}} per '{{lastModifiedBy}}'.",
         },
+        nouPermis: "Nou permís",
     },
     enum: {
         rol: {
@@ -515,7 +516,6 @@ const translationCa = {
 				title: "Grups d'interessats",
 				action: {
 					new: {
-						label: "Nou Grup",
 						ok: "Grup creat correctament",
 					},
 					update: {
@@ -526,7 +526,7 @@ const translationCa = {
 					    check: "Esteu segur que voleu continuar amb aquesta acció?",
 					    description: "Un cop esborrat no es podrà recuperar",
 					    ok: "El grup {{data.nom}} s'ha esborrat correctament",
-					},
+					},                 
 				},
 			},
         },
@@ -1222,6 +1222,7 @@ const translationCa = {
             title: "Grup",
             action: {
                 new: {
+                    label: "Nou Grup",
                     ok: "Grup '{{data.codi}}' creat correctament",
                 },
                 update: {

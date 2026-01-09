@@ -36,6 +36,7 @@ const translationEn = {
             create: "Created on {{createdDate}} by '{{createdBy}}'.",
             update: "Modified on {{lastModifiedDate}} by '{{lastModifiedBy}}'.",
         },
+        nouPermis: "New permission",
     },
     enum: {
         rol: {
@@ -515,7 +516,6 @@ const translationEn = {
 				title: "Groups of interested parties",
 				action: {
 					new: {
-						label: "New Group",
 						ok: "Group created successfully",
 					},
 					update: {
@@ -1222,6 +1222,7 @@ const translationEn = {
             title: "Group",
             action: {
                 new: {
+                    label: "New Group",
                     ok: "Group '{{data.codi}}' created successfully",
                 },
                 update: {

@@ -36,6 +36,7 @@ const translationEs = {
             create: "Creado el {{createdDate}} por '{{createdBy}}'.",
             update: "Modificado el {{lastModifiedDate}} por '{{lastModifiedBy}}'.",
         },
+        nouPermis: "Nuevo permiso",
     },
     enum: {
         rol: {
@@ -515,7 +516,6 @@ const translationEs = {
 				title: "Grupos de interesados",
 				action: {
 					new: {
-						label: "Nuevo Grupo",
 						ok: "Grupo creado correctamente",
 					},
 					update: {
@@ -1222,6 +1222,7 @@ const translationEs = {
             title: "Grupo",
             action: {
                 new: {
+                    label: "Nuevo Grupo",
                     ok: "Grupo '{{data.codi}}' creado correctamente",
                 },
                 update: {
