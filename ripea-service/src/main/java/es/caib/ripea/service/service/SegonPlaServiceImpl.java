@@ -188,7 +188,7 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 			logger.info("Execució tasca periòdica: Buidar cachés dominis");
 		try {
 			//Consulta
-			cacheHelper.evictFindDominisByConsutla();
+			cacheHelper.evictFindDominisByConsulta();
 		} catch (Exception ex) {
 			logger.error("No s'ha pogut buidar la cache de dominis", ex);
 		}

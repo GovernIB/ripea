@@ -4,7 +4,9 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
+import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
+import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,10 +18,18 @@ import lombok.experimental.FieldNameConstants;
 @NoArgsConstructor
 @FieldNameConstants
 @ResourceConfig(
-        quickFilterFields = { "nom" },
-        descriptionField = "nom"
+	quickFilterFields = { "nom" },
+	descriptionField = "nom",
+	artifacts = {
+			@ResourceConfigArtifact(
+					type = ResourceArtifactType.REPORT,
+					code = DominiResource.ACTION_EMPTY_CACHE_CODE,
+					requiresId = true),
+	}
 )
 public class DominiResource extends BaseAuditableResource<Long> {
+
+	public static final String ACTION_EMPTY_CACHE_CODE = "EMPTY_CACHE";
 
 	@NotNull
 	@Size(max = 64)

@@ -577,7 +577,7 @@ public class CacheHelper {
 	}
 	
 	@CacheEvict(value = "resultatConsultaDominis", allEntries=true)
-	public void evictFindDominisByConsutla() {
+	public void evictFindDominisByConsulta() {
 	}
 
 	@Cacheable(value = "enviamentsPortafirmesAmbErrorPerExpedient", key="#expedient")
