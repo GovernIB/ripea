@@ -39,6 +39,7 @@ const TITLES: any = {
     '/organgestor': "page.user.menu.organs",
     // '/organgestor/:id/permis': "page.user.menu.organPermis",
     '/permis': "page.user.menu.permisos",
+    '/domini': "page.user.menu.dominis",
 };
 
 export const setTitlePage = (title:string) => {

@@ -1,10 +1,13 @@
 package es.caib.ripea.service.resourceservice;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
+import es.caib.ripea.persistence.entity.resourceentity.EntitatResourceEntity;
+import es.caib.ripea.persistence.entity.resourcerepository.EntitatResourceRepository;
 import org.springframework.stereotype.Service;
 
 import com.turkraft.springfilter.FilterBuilder;
@@ -29,7 +32,8 @@ public class DominiResourceServiceImpl extends BaseMutableResourceService<Domini
 
 	private final ConfigHelper	configHelper;
 	private final CacheHelper	cacheHelper;
-	
+	private final EntitatResourceRepository entitatResourceRepository;
+
     @PostConstruct
     public void init() {
     	register(DominiResource.ACTION_EMPTY_CACHE_CODE, new BuidarCacheDominisActionExecutor());
@@ -48,6 +52,13 @@ public class DominiResourceServiceImpl extends BaseMutableResourceService<Domini
         
         return filtreBase.generate();
     }
+
+    @Override
+    protected void beforeCreateSave(DominiResourceEntity entity, DominiResource resource, Map<String, AnswerValue> answers) {
+        String entitatActualCodi = configHelper.getEntitatActualCodi();
+        EntitatResourceEntity entitat = entitatResourceRepository.findByCodi(entitatActualCodi);
+        entity.setEntitat(entitat);
+    }
     
     private class BuidarCacheDominisActionExecutor implements ActionExecutor<DominiResourceEntity, Serializable, Serializable> {
 
@@ -59,7 +70,9 @@ public class DominiResourceServiceImpl extends BaseMutableResourceService<Domini
 		public Serializable exec(String code, DominiResourceEntity entity, Serializable params) throws ActionExecutionException {
 			try {
 				cacheHelper.evictFindDominisByConsulta();
-				return "OK";
+                Map<String, String> response = new HashMap<String,String>();
+                response.put("status", "OK");
+                return (Serializable) response;
 			} catch (Exception ex) {
 				throw new ActionExecutionException(getResourceClass(), null, code, ex.getMessage());
 			}

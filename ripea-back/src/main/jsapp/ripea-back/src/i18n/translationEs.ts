@@ -1268,6 +1268,25 @@ const translationEs = {
                 },
             },
         },
+        domini: {
+            title: "Dominio",
+            action: {
+                cleanCache: {
+                    label: "Vaciar caché",
+                    ok: "La caché se ha vaciado correctamente",
+                },
+                new: {
+                    label: "Añadir dominio",
+                    ok: "Dominio creado correctamente",
+                },
+                update: {
+                    ok: "Dominio modificado correctamente",
+                },
+                delete: {
+                    ok: "Dominio eliminado correctamente",
+                },
+            },
+        },
         permision: {
             title: "Permisos",
             grid: {
