@@ -15,20 +15,22 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.constraints.NotNull;
+
 @Getter
 @Setter
 @NoArgsConstructor
 @ResourceConfig(
-        quickFilterFields = { "codi", "nom" },
+        quickFilterFields = { "codi", "nom", "tipus" },
         descriptionField = "nom"
 )
 public class MetaDadaResource extends BaseAuditableResource<Long> {
 
-    private String codi;
-    private String nom;
-    private MetaDadaTipusEnumDto tipus;
+    @NotNull private String codi;
+    @NotNull private String nom;
+    @NotNull private MetaDadaTipusEnumDto tipus = MetaDadaTipusEnumDto.TEXT;
     private String descripcio;
-    private MultiplicitatEnumDto multiplicitat;
+    @NotNull private MultiplicitatEnumDto multiplicitat = MultiplicitatEnumDto.M_1;
     private boolean readOnly;
     private int ordre;
     private boolean activa;

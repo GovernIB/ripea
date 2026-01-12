@@ -32,6 +32,8 @@ import PermisOrganGestorGrid from "./pages/user/configurar/PermisOrganGestorGrid
 import PermisMetaExpedientGrid from "./pages/user/configurar/PermisMetaExpedientGrid.tsx";
 import AdjuntarAnnexosPendentsGrid from "./pages/user/accionsMassives/AdjuntarAnnexosPendentsGrid.tsx";
 import DominiGrid from "./pages/user/configurar/DominiGrid.tsx";
+import MetaDocumentGrid from "./pages/user/configurar/MetaDocumentGrid.tsx";
+import MetaDocumentDadaGrid from "./pages/user/configurar/MetaDocumentDadaGrid.tsx";
 
 const AppRoutes: React.FC = () => {
     return <Routes>
@@ -79,6 +81,8 @@ const AppRoutes: React.FC = () => {
         <Route path="organgestor/:id/permis" element={<PermisOrganGestorGrid/>} />
         <Route path="permis" element={<PermisEntitatGrid/>} />
         <Route path="domini" element={<DominiGrid/>} />
+        <Route path="metaDocument" element={<MetaDocumentGrid/>} />
+        <Route path="metaDocument/:id/metaDada" element={<MetaDocumentDadaGrid/>} />
 
         <Route path="*" element={<NotFoundPage />} />
     </Routes>;

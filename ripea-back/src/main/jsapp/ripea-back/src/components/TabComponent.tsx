@@ -57,6 +57,7 @@ const TabComponent = (props :any) => {
     }, [tabs]);
 
     return <Box sx={{display: 'flex', flexDirection: 'column', height: '100%'}}>
+        <style>{`.MuiTabs-scrollButtons.Mui-disabled {opacity: 0.3;}`}</style>
         <Box sx={{flexGrow: 1, display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%'}}>
             <Tabs
                 value={value}

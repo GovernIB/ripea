@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 
+import javax.validation.constraints.NotNull;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -16,7 +18,9 @@ import lombok.experimental.FieldNameConstants;
 @ResourceConfig(quickFilterFields = { "codi", "nom" }, descriptionField = "nom")
 public class MetaNodeResource extends BaseAuditableResource<Long> {
 	private static final long serialVersionUID = 5537648887756445019L;
+    @NotNull
 	protected String codi;
+    @NotNull
 	protected String nom;
 	protected String descripcio;
 	protected MetaNodeTipusEnum tipus;
