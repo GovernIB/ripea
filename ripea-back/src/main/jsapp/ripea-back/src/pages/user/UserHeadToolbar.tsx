@@ -339,7 +339,7 @@ const useMenuAdmin = () => {
                     id: 'dominis',
                     title: t('page.user.menu.dominis'),
                     // icon: '',
-                    onClick: () => toProgramaAntic('domini'),
+                    to: '/domini',
                     hidden: !user?.sessionScope?.isDominisEnabled,
                 },
                 {

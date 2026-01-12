@@ -1268,6 +1268,25 @@ const translationEn = {
                 },
             },
         },
+        domini: {
+            title: "Domain",
+            action: {
+                cleanCache: {
+                    label: "Clear cache",
+                    ok: "The cache has been cleared successfully",
+                },
+                new: {
+                    label: "Add domain",
+                    ok: "Domain created successfully",
+                },
+                update: {
+                    ok: "Domain updated successfully",
+                },
+                delete: {
+                    ok: "Domain deleted successfully",
+                },
+            },
+        },
         permision: {
             title: "Permissions",
             grid: {

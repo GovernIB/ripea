@@ -1268,6 +1268,25 @@ const translationCa = {
                 },
             },
         },
+        domini: {
+            title: "Domini",
+            action: {
+                cleanCache: {
+                    label: "Buidar cache",
+                    ok: "La cache s'ha buidat correctament",
+                },
+                new: {
+                    label: "Afegir domini",
+                    ok: "Domini creat correctament",
+                },
+                update: {
+                    ok: "Domini modificat correctament",
+                },
+                delete: {
+                    ok: "Domini eliminat correctament",
+                },
+            },
+        },
         permision: {
             title: "Permisos",
             grid: {
