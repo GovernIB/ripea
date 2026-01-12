@@ -1240,6 +1240,8 @@ const translationEn = {
                     ok: "Managing Body '{{data.codi}}' deleted successfully",
                 },
             },
+            actualitzar: "Update òrgans gestors from DIR3",
+            vista: "Change view",
         },
         tipusDocumental: {
             title: "Document type",

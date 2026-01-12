@@ -1240,6 +1240,8 @@ const translationEs = {
                     ok: "Órgano Gestor '{{data.codi}}' eliminado correctamente",
                 },
             },
+            actualitzar: "Actualizar órganos gestores de DIR3",
+            vista: "Cambiar vista",
         },
         tipusDocumental: {
             title: "Tipo documental",

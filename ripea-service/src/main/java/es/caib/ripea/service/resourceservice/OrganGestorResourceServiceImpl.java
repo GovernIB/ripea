@@ -1,5 +1,6 @@
 package es.caib.ripea.service.resourceservice;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -9,7 +10,6 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
-import es.caib.ripea.service.intf.model.*;
 import org.springframework.stereotype.Service;
 
 import com.turkraft.springfilter.FilterBuilder;
@@ -22,9 +22,18 @@ import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
+import es.caib.ripea.service.helper.ExcepcioLogHelper;
+import es.caib.ripea.service.helper.MessageHelper;
+import es.caib.ripea.service.helper.OrganGestorHelper;
 import es.caib.ripea.service.helper.OrganismeHelper;
+import es.caib.ripea.service.helper.PermisosHelper;
+import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
+import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
 import es.caib.ripea.service.intf.dto.OrganismeDto;
+import es.caib.ripea.service.intf.dto.PermisDto;
+import es.caib.ripea.service.intf.model.EntitatResource;
+import es.caib.ripea.service.intf.model.OrganGestorResource;
 import es.caib.ripea.service.intf.resourceservice.OrganGestorResourceService;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.permission.ExtendedPermission;
@@ -44,11 +53,17 @@ public class OrganGestorResourceServiceImpl extends BaseMutableResourceService<O
 	private final OrganGestorRepository organGestorRepository;
 	private final ConfigHelper configHelper;
 	private final OrganismeHelper organismeHelper;
+	private final OrganGestorHelper organGestorHelper;
+	private final PermisosHelper permisosHelper;
+	private final ExcepcioLogHelper excepcioLogHelper;
+	private final MessageHelper messageHelper;
 	private final EntityComprovarHelper entityComprovarHelper;
 
     @PostConstruct
     public void init() {
         register(OrganGestorResource.PERSPECTIVE_PATH_CODE, new PathPerspectiveApplicator());
+        register(OrganGestorResource.PERSPECTIVE_COUNT_PERMISOS, new CountPermisosPerspectiveApplicator());
+        register(OrganGestorResource.DIR3_UPDATE_CODE, new UpdateDir3ActionExecutor());
     }
 	
     @Override
@@ -223,4 +238,30 @@ public class OrganGestorResourceServiceImpl extends BaseMutableResourceService<O
             resource.setPath(getPath(entity, new ArrayList<>()));
         }
     }
+    
+    private class CountPermisosPerspectiveApplicator implements PerspectiveApplicator<OrganGestorResourceEntity, OrganGestorResource> {
+		@Override
+		public void applySingle(String code, OrganGestorResourceEntity entity, OrganGestorResource resource) throws PerspectiveApplicationException {
+			List<PermisDto> permisosGrup = permisosHelper.findPermisos(entity.getId(), OrganGestorEntity.class); 
+			resource.setNumPermisos(permisosGrup!=null?permisosGrup.size():0);
+		}
+    }
+    
+    private class UpdateDir3ActionExecutor implements ActionExecutor<OrganGestorResourceEntity, Serializable, Serializable> {
+		@Override
+		public void onChange(Serializable id, Serializable previous, String fieldName, Object fieldValue,
+				Map<String, AnswerValue> answers, String[] previousFieldNames, Serializable target) {
+		}
+		@Override
+		public Serializable exec(String code, OrganGestorResourceEntity entity, Serializable params) throws ActionExecutionException {
+			try {
+				EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, true, false, false, false);
+				return organGestorHelper.predictSyncDir3OrgansGestors(entitat);
+			} catch (Exception e) {
+				excepcioLogHelper.addExcepcio("/organGestor/UpdateDir3ActionExecutor", e);
+				throw new ActionExecutionException(getResourceClass(), null, code, messageHelper.getMessage("message.common.action.error")+": "+e.getMessage());
+			}				
+		}
+    }
+
 }

@@ -32,14 +32,23 @@ import java.util.List;
                         code = OrganGestorResource.FILTER_CODE,
                         formClass = OrganGestorResource.FormFilter.class),
                 @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = OrganGestorResource.DIR3_UPDATE_CODE,
+                        formClass = Serializable.class),
+                @ResourceConfigArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = OrganGestorResource.PERSPECTIVE_PATH_CODE),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.PERSPECTIVE,
+                        code = OrganGestorResource.PERSPECTIVE_COUNT_PERMISOS),
         }
 )
 public class OrganGestorResource extends BaseAuditableResource<Long> {
 
-    public static final String FILTER_CODE = "FILTER";
-    public static final String PERSPECTIVE_PATH_CODE = "PATH";
+    public static final String FILTER_CODE 					= "FILTER";
+    public static final String PERSPECTIVE_PATH_CODE		= "PATH";
+    public static final String DIR3_UPDATE_CODE				= "DIR3_UPDATE";
+    public static final String PERSPECTIVE_COUNT_PERMISOS	= "COUNT_PERMISOS";
 
 	private static final long serialVersionUID = 5991380448523763516L;
 	@NotNull
@@ -67,6 +76,7 @@ public class OrganGestorResource extends BaseAuditableResource<Long> {
 
     @Transient private List<String> pathName;
     @Transient private List<OrganGestorResource> path;
+    @Transient private int numPermisos;
 
     @Getter
     @Setter
@@ -74,6 +84,6 @@ public class OrganGestorResource extends BaseAuditableResource<Long> {
         private String codi;
         private String nom;
         private ResourceReference<OrganGestorResource, Long> organGestor;
-        private OrganEstatEnumDto estat;
+        private OrganEstatEnumDto estat = OrganEstatEnumDto.V;
     }
 }

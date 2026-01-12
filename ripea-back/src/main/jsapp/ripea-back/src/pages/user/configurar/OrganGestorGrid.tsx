@@ -1,10 +1,10 @@
 import {useTranslation} from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import {useState} from "react";
 import {GridPage} from "reactlib";
 import {CardPage} from "../../../components/CardData.tsx";
 import StyledMuiGrid, {ToolbarButton} from "../../../components/StyledMuiGrid.tsx";
-import {Button, Grid, Icon} from "@mui/material";
-import { Link } from "react-router-dom";
+import {Grid, Icon, Badge, IconButton} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
@@ -54,11 +54,11 @@ const OrganGestorForm = () => {
 }
 
 const sortModel: any = [{field: 'nom', sort: 'asc'}]
-const perspectives: any = ['PATH']
-const namedQueries: any = ['ENTITY']
 
 const OrganGestorGrid = () => {
+
     const {t} = useTranslation();
+    const navigate = useNavigate();
     const [springFilter, setSpringFilter] = useState<string>();
     const [treeView, setTreeView] = useState<boolean>(false);
 
@@ -100,9 +100,16 @@ const OrganGestorGrid = () => {
             headerName: '',
             sortable: false,
             flex: 0.25,
-            renderCell: (params:any) => <Button component={Link} to={`/organgestor/${params?.row?.id}/permis`} variant={'contained'}>
-                <Icon>key</Icon>
-            </Button>
+            renderCell: (params:any) => <IconButton 
+                aria-label="key" 
+                color="inherit"
+                title="Permisos"
+                onClick={(e:any) => { e.stopPropagation(); navigate(`/organgestor/${params?.row?.id}/permis`); }}
+            >
+                <Badge badgeContent={params?.row?.numPermisos} color="primary" showZero>
+                    <Icon>key</Icon>
+                </Badge>
+            </IconButton>
         }
     ]
         .filter((col:any)=>!col?.hidden);
@@ -117,20 +124,16 @@ const OrganGestorGrid = () => {
                 popupEditFormDialogResourceTitle={t('page.organGestor.title')}
                 popupEditFormContent={<OrganGestorForm/>}
                 columns={columns}
-                // TODO: revisar filtre
                 filter={springFilter}
-                perspectives={treeView ?perspectives :[]}
-                namedQueries={namedQueries}
+                perspectives={treeView?['PATH','COUNT_PERMISOS']:['COUNT_PERMISOS']}
                 sortModel={sortModel}
-
                 rowAdditionalActions={actions}
-
                 toolbarElementsWithPositions={[
                     {
                         position: 3,
                         element: <ToolbarButton
                             icon={'cached'}
-                            color={'primary'}/>,
+                            color={'primary'}>&nbsp;{t('page.organGestor.action.actualitzar')}</ToolbarButton>,
                     },
                     {
                         position: 3,
@@ -138,7 +141,7 @@ const OrganGestorGrid = () => {
                             icon={'visibility'}
                             variant={treeView ?"contained" :"outlined"}
                             onClick={()=>setTreeView(prev=>!prev)}
-                            color={'primary'}/>,
+                            color={'primary'}>&nbsp;{t('page.organGestor.action.vista')}</ToolbarButton>,
                     },
                 ]}
 

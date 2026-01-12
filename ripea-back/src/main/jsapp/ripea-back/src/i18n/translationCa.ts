@@ -1239,6 +1239,8 @@ const translationCa = {
                 update: {
                     ok: "Òrgan Gestor '{{data.codi}}' esborrat correctament",
                 },
+                actualitzar: "Actualitzar òrgans gestors de DIR3",
+                vista: "Canvi vista",
             },
         },
         tipusDocumental: {

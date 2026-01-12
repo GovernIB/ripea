@@ -132,12 +132,13 @@ const PermisOrganGestorGrid = ()=> {
                     sortModel={sortModel}
                     namedQueries={[`ORGAN#${id}`]}
                     perspectives={[`PERMISION#ORGAN#${id}`]}
-
                     rowAdditionalActions={actions}
                     toolbarElementsWithPositions={[
                         {
                             position: 3,
-                            element: <ToolbarButton title={t('common.create')} icon={'add'} onClick={()=>handelCreate(id)} color={'primary'}/>,
+                            element: <ToolbarButton title={t('common.create')} icon={'add'} onClick={()=>handelCreate(id)} color={'primary'}>
+                                {t('common.nouPermis')}
+                            </ToolbarButton>,
                         },
                     ]}
                     toolbarHideCreate

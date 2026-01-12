@@ -3,7 +3,7 @@ import {useState} from "react";
 import {GridPage} from "reactlib";
 import {CardPage} from "../../../components/CardData.tsx";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
-import {Button, Grid, Icon, Badge, IconButton} from "@mui/material";
+import {Grid, Icon, Badge, IconButton} from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import GridFormField from "../../../components/GridFormField.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
@@ -79,6 +79,7 @@ const GrupGrid = () => {
             renderCell: (params:any) => <IconButton 
                 aria-label="key" 
                 color="inherit"
+                title="Permisos"
                 onClick={(e:any) => { e.stopPropagation(); navigate(`/grupPermis/${params?.row?.id}/permis`); }}
             >
                 <Badge badgeContent={params?.row?.numPermisos} color="primary" showZero>

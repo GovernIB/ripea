@@ -108,11 +108,10 @@ const DominiGrid = () => {
                     {
                         position: 2,
                         element: <ToolbarButton
-                            title={t('page.domini.action.cleanCache.label')}
                             icon={'cached'}
                             onClick={cleanCache}
                             variant={"contained"}
-                            color={'warning'}/>,
+                            color={'warning'}>{t('page.domini.action.cleanCache.label')}</ToolbarButton>,
                     },
                 ]}
 
