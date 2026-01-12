@@ -1,6 +1,9 @@
 package es.caib.ripea.service.intf.model;
 
+import java.util.List;
+
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
+import es.caib.ripea.service.intf.base.annotation.ResourceField;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentFirmaFluxTipusEnumDto;
@@ -24,7 +27,8 @@ public class MetaDocumentResource extends MetaNodeResource {
 	private boolean firmaPortafirmesActiva;
 	private String portafirmesDocumentTipus;
 	private String portafirmesFluxId;
-	private String portafirmesResponsables;
+	@ResourceField(descriptionField = "nomAndNif")
+	private List<ResourceReference<UsuariResource, String>> portafirmesResponsables;
 	private MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSequenciaTipus;
 	private String portafirmesCustodiaTipus;
 	private boolean firmaPassarelaActiva;
@@ -35,17 +39,15 @@ public class MetaDocumentResource extends MetaNodeResource {
 	private int ordre;
 	private NtiOrigenEnumDto ntiOrigen;
 	private DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion;
-	private String ntiTipoDocumental;
+	private ResourceReference<TipusDocumentalResource, Long> ntiTipoDocumental;
 	private boolean firmaBiometricaActiva;
 	private boolean biometricaLectura;
 	private MetaDocumentTipusGenericEnumDto metaDocumentTipusGeneric;
 	private MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus;
 	private String codiPropi;
 	private boolean pinbalActiu;
-	
 	private ResourceReference<MetaExpedientResource, Long> metaExpedient;
 	private ResourceReference<PinbalServeiResource, Long> pinbalServei;
-	
 	protected String pinbalFinalitat;
 	private boolean pinbalUtilitzarCifOrgan;
 	private boolean perDefecte;
