@@ -323,7 +323,7 @@ const useMenuAdmin = () => {
                     title: t('page.user.menu.documents'),
                     // icon: '',
                     onClick: () => toProgramaAntic('metaDocument'),
-                    hidden: user?.sessionScope?.isDocumentsGeneralsEnabled,
+                    hidden: !user?.sessionScope?.isDocumentsGeneralsEnabled,
                 },
                 {
                     divider: true,
@@ -333,14 +333,14 @@ const useMenuAdmin = () => {
                     title: t('page.user.menu.nti'),
                     // icon: '',
                     to: '/tipusDocumental',
-                    hidden: user?.sessionScope?.isTipusDocumentsEnabled,
+                    hidden: !user?.sessionScope?.isTipusDocumentsEnabled,
                 },
                 {
                     id: 'dominis',
                     title: t('page.user.menu.dominis'),
                     // icon: '',
                     onClick: () => toProgramaAntic('domini'),
-                    hidden: user?.sessionScope?.isDominisEnabled,
+                    hidden: !user?.sessionScope?.isDominisEnabled,
                 },
                 {
                     id: 'grups',
