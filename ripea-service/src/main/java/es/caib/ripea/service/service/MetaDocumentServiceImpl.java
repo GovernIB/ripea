@@ -10,17 +10,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.persistence.entity.ContingutEntity;
-import es.caib.ripea.persistence.entity.DocumentEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.entity.MetaDocumentEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
-import es.caib.ripea.persistence.entity.MetaExpedientTascaValidacioEntity;
-import es.caib.ripea.persistence.repository.DocumentRepository;
 import es.caib.ripea.persistence.repository.ExpedientRepository;
 import es.caib.ripea.persistence.repository.MetaDocumentRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientRepository;
-import es.caib.ripea.persistence.repository.MetaExpedientTascaValidacioRepository;
 import es.caib.ripea.service.helper.CacheHelper;
 import es.caib.ripea.service.helper.ConversioTipusHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
@@ -32,14 +28,12 @@ import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
 import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
-import es.caib.ripea.service.intf.dto.ItemValidacioTascaEnum;
 import es.caib.ripea.service.intf.dto.MetaDocumentDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentTipusGenericEnumDto;
 import es.caib.ripea.service.intf.dto.PaginaDto;
 import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
 import es.caib.ripea.service.intf.dto.PinbalServeiDto;
 import es.caib.ripea.service.intf.dto.PortafirmesDocumentTipusDto;
-import es.caib.ripea.service.intf.exception.ExisteixenDocumentsException;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.service.MetaDocumentService;
 
@@ -47,7 +41,6 @@ import es.caib.ripea.service.intf.service.MetaDocumentService;
 public class MetaDocumentServiceImpl implements MetaDocumentService {
 
 	@Autowired private MetaDocumentRepository metaDocumentRepository;
-	@Autowired private DocumentRepository documentRepository;
 	@Autowired private ConversioTipusHelper conversioTipusHelper;
 	@Autowired private MetaNodeHelper metaNodeHelper;
 	@Autowired private PaginacioHelper paginacioHelper;
@@ -56,7 +49,6 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 	@Autowired private MetaExpedientHelper metaExpedientHelper;
 	@Autowired private MetaDocumentHelper metaDocumentHelper;
 	@Autowired private MetaExpedientRepository metaExpedientRepository;
-	@Autowired private MetaExpedientTascaValidacioRepository metaExpedientTascaValidacioRepository;
 	@Autowired private ExpedientRepository expedientRepository;
 	@Autowired private CacheHelper cacheHelper;
 	
@@ -153,47 +145,9 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 	@Transactional
 	@Override
 	public MetaDocumentDto delete(Long entitatId, Long metaExpedientId, Long id, String rolActual, Long organId) {
-		
 		logger.debug("Esborrant meta-document (entitatId=" + entitatId + ", metaExpedientId=" + metaExpedientId + ", id=" + id + ")");
-		
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				false,
-				false, 
-				false, 
-				true);
-
-		MetaExpedientEntity metaExpedient = null;
-		MetaDocumentEntity metaDocumentEntity = null;
-		
-		if (metaExpedientId!=null) {
-			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
-			metaDocumentEntity = entityComprovarHelper.comprovarMetaDocument(entitat, metaExpedient, id);
-		} else {
-			metaDocumentEntity = metaDocumentRepository.findById(id).get();
-		}
-		
-		List<DocumentEntity> docs = documentRepository.findByMetaNode(metaDocumentEntity);
-		if (docs != null && !docs.isEmpty()) {
-			throw new ExisteixenDocumentsException();
-		}
-		
-		//Eliminar les possibles validacions sobre el document
-		List<MetaExpedientTascaValidacioEntity> validacionsDoc = metaExpedientTascaValidacioRepository.findByItemValidacioAndItemId(
-				ItemValidacioTascaEnum.DOCUMENT,
-				id);
-		
-		if (validacionsDoc!=null && validacionsDoc.size()>0) {
-			metaExpedientTascaValidacioRepository.deleteAll(validacionsDoc);
-		}
-		
-		metaDocumentRepository.delete(metaDocumentEntity);
-		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId(), organId);
-		}
-		
-		return conversioTipusHelper.convertir(metaDocumentEntity, MetaDocumentDto.class);
+		MetaDocumentEntity metaDocumentEliminat = metaDocumentHelper.delete(entitatId, metaExpedientId, id, rolActual, organId);
+		return conversioTipusHelper.convertir(metaDocumentEliminat, MetaDocumentDto.class);
 	}
 	
 	@Override

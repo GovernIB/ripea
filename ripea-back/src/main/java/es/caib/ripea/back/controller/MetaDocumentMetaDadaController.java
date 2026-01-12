@@ -1,34 +1,42 @@
 package es.caib.ripea.back.controller;
 
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
 import es.caib.ripea.back.command.MetaDadaCommand;
-import es.caib.ripea.back.helper.*;
+import es.caib.ripea.back.helper.DatatablesHelper;
 import es.caib.ripea.back.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.back.helper.EntitatHelper;
+import es.caib.ripea.back.helper.EnumHelper;
 import es.caib.ripea.back.helper.EnumHelper.HtmlOption;
+import es.caib.ripea.back.helper.ExceptionHelper;
+import es.caib.ripea.back.helper.MissatgesHelper;
+import es.caib.ripea.back.helper.RolHelper;
 import es.caib.ripea.service.intf.config.PropertyConfig;
-import es.caib.ripea.service.intf.dto.*;
+import es.caib.ripea.service.intf.dto.EntitatDto;
+import es.caib.ripea.service.intf.dto.MetaDadaDto;
+import es.caib.ripea.service.intf.dto.MetaDadaTipusEnumDto;
+import es.caib.ripea.service.intf.dto.MetaDocumentDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientRevisioEstatEnumDto;
+import es.caib.ripea.service.intf.dto.OrganGestorDto;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.DocumentService;
 import es.caib.ripea.service.intf.service.MetaDadaService;
 import es.caib.ripea.service.intf.service.MetaDocumentService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.propertyeditors.CustomDateEditor;
-import org.springframework.beans.propertyeditors.CustomNumberEditor;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-import java.math.BigDecimal;
-import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
 
 /**
  * Controlador per al manteniment de les meta-dades dels meta-expedients.

@@ -22,6 +22,7 @@ import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.entity.MetaDocumentEntity;
 import es.caib.ripea.persistence.entity.MetaDocumentFluxPortafibEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientTascaValidacioEntity;
 import es.caib.ripea.persistence.entity.PinbalServeiEntity;
 import es.caib.ripea.persistence.entity.UsuariEntity;
 import es.caib.ripea.persistence.repository.DocumentRepository;
@@ -29,10 +30,13 @@ import es.caib.ripea.persistence.repository.ExpedientRepository;
 import es.caib.ripea.persistence.repository.MetaDocumentFluxPortafibRepository;
 import es.caib.ripea.persistence.repository.MetaDocumentRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientRepository;
+import es.caib.ripea.persistence.repository.MetaExpedientTascaValidacioRepository;
 import es.caib.ripea.persistence.repository.PinbalServeiRepository;
 import es.caib.ripea.persistence.repository.UsuariRepository;
+import es.caib.ripea.service.intf.dto.ItemValidacioTascaEnum;
 import es.caib.ripea.service.intf.dto.MetaDocumentDto;
 import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
+import es.caib.ripea.service.intf.exception.ExisteixenDocumentsException;
 import es.caib.ripea.service.intf.exception.SistemaExternException;
 import io.micrometer.core.instrument.Timer;
 
@@ -45,7 +49,7 @@ public class MetaDocumentHelper {
 	@Autowired private PluginHelper pluginHelper;
 	@Autowired private CacheHelper cacheHelper;
 	@Autowired private ApplicationHelper applicationHelper;
-	
+	@Autowired private MetaExpedientTascaValidacioRepository metaExpedientTascaValidacioRepository;
 	@Autowired private ExpedientRepository expedientRepository;
 	@Autowired private PinbalServeiRepository pinbalServeiRepository;
 	@Autowired private MetaExpedientRepository metaExpedientRepository;
@@ -53,6 +57,47 @@ public class MetaDocumentHelper {
 	@Autowired private MetaDocumentFluxPortafibRepository metaDocumentFluxPortafibRepository;
 	@Autowired private DocumentRepository documentRepository;
 	@Autowired private UsuariRepository usuariRepository;
+	
+	public MetaDocumentEntity delete(Long entitatId, Long metaExpedientId, Long id, String rolActual, Long organId) {
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				false,
+				false,
+				false, 
+				false, 
+				true);
+
+		MetaExpedientEntity metaExpedient = null;
+		MetaDocumentEntity metaDocumentEntity = null;
+		
+		if (metaExpedientId!=null) {
+			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
+			metaDocumentEntity = entityComprovarHelper.comprovarMetaDocument(entitat, metaExpedient, id);
+		} else {
+			metaDocumentEntity = metaDocumentRepository.findById(id).get();
+		}
+		
+		List<DocumentEntity> docs = documentRepository.findByMetaNode(metaDocumentEntity);
+		if (docs != null && !docs.isEmpty()) {
+			throw new ExisteixenDocumentsException();
+		}
+		
+		//Eliminar les possibles validacions sobre el document
+		List<MetaExpedientTascaValidacioEntity> validacionsDoc = metaExpedientTascaValidacioRepository.findByItemValidacioAndItemId(
+				ItemValidacioTascaEnum.DOCUMENT,
+				id);
+		
+		if (validacionsDoc!=null && validacionsDoc.size()>0) {
+			metaExpedientTascaValidacioRepository.deleteAll(validacionsDoc);
+		}
+		
+		metaDocumentRepository.delete(metaDocumentEntity);
+		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId(), organId);
+		}
+		
+		return metaDocumentEntity;
+	}
 	
 	public MetaDocumentEntity update(
 			Long metaExpedientId,
@@ -111,6 +156,11 @@ public class MetaDocumentHelper {
 		updateFluxos(metaDocumentEntity, metaDocument.getPortafirmesFluxosId());
 		
 		return metaDocumentEntity;
+	}
+	
+	//Es crida desde el servei de BASEBOOT despres del create
+	public void updateFluxosFirmaMetaDoc(Long metaDocumentEntityId, String[] newFluxos) {
+		metaDocumentRepository.findById(metaDocumentEntityId).get();
 	}
 	
 	@Transactional(dontRollbackOn = SistemaExternException.class)
