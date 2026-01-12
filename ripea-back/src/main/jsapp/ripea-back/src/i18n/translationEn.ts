@@ -1028,6 +1028,26 @@ const translationEn = {
         metaDada: {
             title: "Data type",
             detail: "Values of the data '{{metaDada}}'",
+            action: {
+                activar: {
+                    label: "Activate",
+                    ok: "Data type activated",
+                },
+                desactivar: {
+                    label: "Deactivate",
+                    ok: "Data type deactivated",
+                },
+                new: {
+                    label: "New data type",
+                    ok: "Data type created successfully",
+                },
+                update: {
+                    ok: "Data type updated successfully",
+                },
+                delete: {
+                    ok: "Data type deleted successfully",
+                },
+            },
         },
         registre: {
             grid: {
@@ -1270,6 +1290,37 @@ const translationEn = {
                 },
             },
         },
+        metaDocument: {
+            title: "Document type",
+            tabs: {
+                dades: "Data",
+                nti: "NTI data",
+                portafirmes: "Signing with signature workflow",
+                navegador: "Browser-based signing",
+                viaFirma: "Signing via viaFirma",
+                pinbal: "PINBAL",
+            },
+            action: {
+                activar: {
+                    label: "Activate",
+                    ok: "Document type activated",
+                },
+                desactivar: {
+                    label: "Deactivate",
+                    ok: "Document type deactivated",
+                },
+                new: {
+                    label: "New document type",
+                    ok: "Document type created successfully",
+                },
+                update: {
+                    ok: "Document type updated successfully",
+                },
+                delete: {
+                    ok: "Document type deleted successfully",
+                },
+            },
+        },
         domini: {
             title: "Domain",
             action: {
@@ -1326,7 +1377,8 @@ const translationEn = {
                 perfil: "My profile",
                 manual: "User manual",
                 manualAdmin: "Administrator manual",
-                logout: "Log out"
+                logout: "Log out",
+                noOrgans: "No managing body assigned",
             },
             menu: {
                 entitat: "Entities",
@@ -1349,6 +1401,7 @@ const translationEn = {
                 procedimentPermis: "Procedure permissions: {{nom}}",
                 procedimentsTitle: "The entity has procedures with outdated managing bodies",
                 grups: "Groups",
+                grupPermis: "Group permissions",
                 revisar: "Procedure review",
                 tasca: "Tasks",
                 flux: "Signature workflows",
@@ -1364,9 +1417,11 @@ const translationEn = {
                 comunicades: "Communicated annotations",
 
                 documents: "Document types",
+                documentDada: "Metadata of the document type: {{nom}}",
                 nti: "NTI document types",
                 dominis: "Domains",
                 organs: "Managing bodies",
+                organPermis: "Permissions of the managing body: {{nom}}",
                 url: "Instruction URLs",
                 permisos: "Entity permissions"
             },

@@ -322,7 +322,7 @@ const useMenuAdmin = () => {
                     id: 'documents',
                     title: t('page.user.menu.documents'),
                     // icon: '',
-                    onClick: () => toProgramaAntic('metaDocument'),
+                    to: '/metaDocument',
                     hidden: !user?.sessionScope?.isDocumentsGeneralsEnabled,
                 },
                 {

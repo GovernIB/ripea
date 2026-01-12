@@ -1,6 +1,7 @@
 package es.caib.ripea.service.resourceservice;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -51,7 +52,7 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
 	private final DocumentRepository documentRepository;
 	private final OrganGestorRepository organGestorRepository;
 	private final MetaDocumentHelper metaDocumentHelper;
-	private MetaExpedientHelper metaExpedientHelper;
+	private final MetaExpedientHelper metaExpedientHelper;
 	private final EntityComprovarHelper entityComprovarHelper;
 	private final ExcepcioLogHelper excepcioLogHelper;
 	private final ConfigHelper configHelper;
@@ -64,7 +65,7 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
     @Override
     protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
     	
-    	List<String> namedQueriesList = Stream.of(namedQueries).collect(Collectors.toList());
+    	List<String> namedQueriesList = namedQueries!=null ?Stream.of(namedQueries).collect(Collectors.toList()) : Collections.emptyList();
 
         String entitatActualCodi = configHelper.getEntitatActualCodi();
     	

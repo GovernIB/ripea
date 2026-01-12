@@ -1028,6 +1028,26 @@ const translationEs = {
         metaDada: {
             title: "Tipo de dato",
             detail: "Valores del dato '{{metaDada}}'",
+            action: {
+                activar: {
+                    label: "Activar",
+                    ok: "Tipo de dato activado",
+                },
+                desactivar: {
+                    label: "Desactivar",
+                    ok: "Tipo de dato desactivado",
+                },
+                new: {
+                    label: "Nuevo tipo de dato",
+                    ok: "Tipo de dato creado correctamente",
+                },
+                update: {
+                    ok: "Tipo de dato modificado correctamente",
+                },
+                delete: {
+                    ok: "Tipo de dato eliminado correctamente",
+                },
+            },
         },
         registre: {
             grid: {
@@ -1270,6 +1290,37 @@ const translationEs = {
                 },
             },
         },
+        metaDocument: {
+            title: "Tipo de documento",
+            tabs: {
+                dades: "Datos",
+                nti: "Datos NTI",
+                portafirmes: "Firma con portafirmas",
+                navegador: "Firma con navegador",
+                viaFirma: "Firma con viaFirma",
+                pinbal: "PINBAL",
+            },
+            action: {
+                activar: {
+                    label: "Activar",
+                    ok: "Tipo de documento activado",
+                },
+                desactivar: {
+                    label: "Desactivar",
+                    ok: "Tipo de documento desactivado",
+                },
+                new: {
+                    label: "Nuevo tipo de documento",
+                    ok: "Tipo de documento creado correctamente",
+                },
+                update: {
+                    ok: "Tipo de documento modificado correctamente",
+                },
+                delete: {
+                    ok: "Tipo de documento eliminado correctamente",
+                },
+            },
+        },
         domini: {
             title: "Dominio",
             action: {
@@ -1327,7 +1378,7 @@ const translationEs = {
                 manual: "Manual de Usuario",
                 manualAdmin: "Manual de los Administradores",
                 logout: "Desconectar",
-                noOrgans: "Ningún órgano gestor asignado"
+                noOrgans: "Ningún órgano gestor asignado",
             },
             menu: {
                 entitat: "Entidades",
@@ -1350,6 +1401,7 @@ const translationEs = {
                 procedimentPermis: "Permisos del procedimiento: {{nom}}",
                 procedimentsTitle: "La entidad tiene procedimientos con órganos gestores no actualizados",
                 grups: "Grupos",
+                grupPermis: "Permisos del grupo",
                 revisar: "Revisión de procedimientos",
                 tasca: "Tareas",
                 flux: "Flujos de firma",
@@ -1365,9 +1417,11 @@ const translationEs = {
                 comunicades: "Anotaciones comunicadas",
 
                 documents: "Tipos de documentos",
+                documentDada: "Metadatos del tipo de documento: {{nom}}",
                 nti: "Tipos documentales NTI",
                 dominis: "Dominios",
                 organs: "Órganos gestores",
+                organPermis: "Permisos del órgano gestor: {{nom}}",
                 url: "URLs instrucción",
                 permisos: "Permisos de la entidad",
             },

@@ -1028,6 +1028,26 @@ const translationCa = {
         metaDada: {
             title: "Tipus de dada",
             detail: "Valors de la dada '{{metaDada}}'",
+            action: {
+                activar: {
+                    label: "Activar",
+                    ok: "Tipus de dada activada",
+                },
+                desactivar: {
+                    label: "Desactivar",
+                    ok: "Tipus de dada desactivada",
+                },
+                new: {
+                    label: "Nou tipus de dada",
+                    ok: "Tipus de dada creada correctament",
+                },
+                update: {
+                    ok: "Tipus de dada modificada correctament",
+                },
+                delete: {
+                    ok: "Tipus de dada eliminada correctament",
+                },
+            },
         },
         registre: {
             grid: {
@@ -1270,6 +1290,37 @@ const translationCa = {
                 },
             },
         },
+        metaDocument: {
+            title: "Tipus de document",
+            tabs: {
+                dades: "Dades",
+                nti: "Dades NTI",
+                portafirmes: "Firma amb portafirmes",
+                navegador: "Firma amb navegador",
+                viaFirma: "Firma amb viaFirma",
+                pinbal: "PINBAL",
+            },
+            action: {
+                activar: {
+                    label: "Activar",
+                    ok: "Tipus de document activat",
+                },
+                desactivar: {
+                    label: "Desactivar",
+                    ok: "Tipus de document desactivat",
+                },
+                new: {
+                    label: "Nou tipus de document",
+                    ok: "Tipus de document creat correctament",
+                },
+                update: {
+                    ok: "Tipus de document modificat correctament",
+                },
+                delete: {
+                    ok: "Tipus de document eliminat correctament",
+                },
+            },
+        },
         domini: {
             title: "Domini",
             action: {
@@ -1366,6 +1417,7 @@ const translationCa = {
                 comunicades: "Anotacions comunicades",
 
                 documents: "Tipus de documents",
+                documentDada: "Meta-dades del tipus de document: {{nom}}",
                 nti: "Tipus documentals NTI",
                 dominis: "Dominis",
                 organs: "Òrgans gestors",
