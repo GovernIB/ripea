@@ -342,7 +342,11 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 		resource.setErrorEnviamentPortafirmes(isErrorLastEnviament != null ? isErrorLastEnviament : false);
         
         resource.setHasFirma(resource.getDocumentFirmaTipus()!=DocumentFirmaTipusEnumDto.SENSE_FIRMA);
-        resource.setMetaDocumentInfo(objectMappingHelper.newInstanceMap(Hibernate.unproxy(entity.getMetaDocument()), MetaDocumentResource.class));
+        
+        if (entity.getMetaDocument()!=null) {
+        	MetaDocumentResourceEntity metaDocumentResourceEntity = (MetaDocumentResourceEntity) Hibernate.unproxy(entity.getMetaDocument());
+        	resource.setMetaDocumentInfo(objectMappingHelper.newInstanceMap(metaDocumentResourceEntity, MetaDocumentResource.class));
+        }
         
     	if (entity.getCreatedBy()!=null) {
     		UsuariResourceEntity usuariResourceEntity = usuariResourceRepository.findById(entity.getCreatedBy()).orElse(null);
