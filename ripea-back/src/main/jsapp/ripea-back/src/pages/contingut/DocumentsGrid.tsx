@@ -83,8 +83,11 @@ export const useExpedientsCarpetes = (commonFilter: string) => {
             .then((result)=> setExpedients(result.rows))
             .catch(()=> setExpedients([]))
     }
+	
+	const carpetaPerspectives =  ["PATH" , "RESTRICCIONS", "RESPONSABLE_RESTRICCIO"];
+	
     const findCarpetes = () => {
-        return apiCarpetaFindAll({perspectives, unpaged: true, filter: commonFilter})
+        return apiCarpetaFindAll({perspectives: carpetaPerspectives, unpaged: true, filter: commonFilter})
             .then((result)=> setCarpetes(result.rows))
             .catch(()=> setCarpetes([]))
     }
@@ -325,7 +328,23 @@ const DocumentsGrid = (props: any) => {
                         rowExpansionChange={(params: any) => {
                             addFolderExpand(params.groupingKey, params.childrenExpanded)
                         }}
-                        isGroupExpandedByDefault={(params) => {
+                        isGroupExpandedByDefault={(params) => {			
+							const carpeta = carpetes.find(c => c.id === params.groupingKey);
+							if (!carpeta) return expand;
+
+							if (carpeta.restringida) {
+								const isResponsableRestriccio = carpeta?.responsableRestriccio?.id === user?.codi;
+								const isUsuariAmbPermis = carpeta?.restriccions?.some(
+									(restriccio: any) => restriccio?.id === user?.codi
+								) ?? false;
+
+								const isAdmin = user?.rolActual === 'IPA_ADMIN';
+
+								if (!isResponsableRestriccio && !isUsuariAmbPermis && !isAdmin) {
+									return false;
+								}
+							}
+								
                             const value = getFolderExpand(`${params?.groupingKey}`)
                             if (value !== undefined) {
                                 return value

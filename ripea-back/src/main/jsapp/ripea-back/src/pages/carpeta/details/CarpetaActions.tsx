@@ -83,10 +83,24 @@ const useCarpetaActions = (entity:any, refresh?: () => void) => {
 
     const { eliminar, exportarPDF, exportarEXCEL, guardarArxiu } = useActions(refresh)
     const {handleOpen: handleHistoricOpen, dialog: dialogHistoric} = useHistoric();
-    const {handleShow: handleModifyCarpeta, content: contentModifyCarpeta} = useModificar(refresh)
+    const {handleShow: handleModifyCarpeta, content: contentModifyCarpeta} = useModificar(entity, refresh)
     const {handleShow: handleMoure, content: contentMoure} = useMoure(refresh)
     const {handleShow: handleCopiar, content: contentCopiar} = useCopiar(refresh)
 
+	const isUsuariAmbPermis = (row: any) =>
+	    row?.restriccions?.some(
+	        (restriccio: any) => restriccio?.id === user?.codi
+	    ) ?? false;
+	const isResponsableRestriccio = (row: any) => row?.responsableRestriccio?.id === user?.codi;
+	const isRolActualAdmin = user?.rolActual === 'IPA_ADMIN';
+	
+	const potGestionarCarpeta = (row: any) =>
+	    !row?.restringida || 
+		(row?.restringida && (
+	    	isResponsableRestriccio(row) ||
+	    	isRolActualAdmin ||
+	    	isUsuariAmbPermis(row)));
+			
     const actions = [
         {
             label: t('page.contingut.action.guardarArxiu.label'),
@@ -95,33 +109,33 @@ const useCarpetaActions = (entity:any, refresh?: () => void) => {
             onClick: guardarArxiu,
             hidden: (row:any) => row?.arxiuUuid || user?.sessionScope?.isCreacioCarpetesLogica
         }, 
-        /*{
+        {
             label: t('page.carpeta.action.update.label'),
             icon: 'edit',
             showInMenu: true,
             onClick: handleModifyCarpeta,
-            hidden: !entity?.potModificar || !user?.sessionScope?.isCreacioCarpetesActiva,
-        },*/
+            hidden: (row:any) => !entity?.potModificar || !user?.sessionScope?.isCreacioCarpetesActiva || !user?.sessionScope?.isCreacioCarpetesLogica || !potGestionarCarpeta(row),
+        },
         {
             label: t('page.expedient.action.exportPDF.label'),
             icon: 'format_list_numbered',
             showInMenu: true,
             onClick: exportarPDF,
-            hidden: (row:any) => !entity?.potModificar || !user?.sessionScope?.isCreacioCarpetesActiva || !row?.hasDocumentsFills,
+            hidden: (row:any) => !entity?.potModificar || !user?.sessionScope?.isCreacioCarpetesActiva || !row?.hasDocumentsFills || !potGestionarCarpeta(row),
         },
         {
             label: t('page.expedient.action.exportEXCEL.label'),
             icon: 'lists',
             showInMenu: true,
             onClick: exportarEXCEL,
-            hidden: (row:any) => !entity?.potModificar || !user?.sessionScope?.isCreacioCarpetesActiva || !user?.sessionScope?.isExportacioExcelActiva || !row?.hasDocumentsFills,
+            hidden: (row:any) => !entity?.potModificar || !user?.sessionScope?.isCreacioCarpetesActiva || !user?.sessionScope?.isExportacioExcelActiva || !row?.hasDocumentsFills || !potGestionarCarpeta(row),
         },
         {
             label: t('page.contingut.action.move.label'),
             icon: "open_with",
             showInMenu: true,
             onClick: handleMoure,
-            hidden: !entity?.potModificar || !user?.sessionScope?.isCreacioCarpetesActiva,
+            hidden: (row:any) => !entity?.potModificar || !user?.sessionScope?.isCreacioCarpetesActiva || !potGestionarCarpeta(row),
         },
         /*{
             label: t('page.contingut.action.copy.label'),
@@ -135,13 +149,13 @@ const useCarpetaActions = (entity:any, refresh?: () => void) => {
             icon: "delete",
             showInMenu: true,
             onClick: eliminar,
-            hidden: !entity?.potModificar || !user?.sessionScope?.isCreacioCarpetesActiva,
+            hidden: (row:any) => !entity?.potModificar || !user?.sessionScope?.isCreacioCarpetesActiva || !potGestionarCarpeta(row),
         },
         {
             label: <Divider sx={{width: '100%'}} color={"none"}/>,
             showInMenu: true,
             disabled: true,
-            hidden: !entity?.potModificar || !user?.sessionScope?.isCreacioCarpetesActiva,
+            hidden: (row:any) => !entity?.potModificar || !user?.sessionScope?.isCreacioCarpetesActiva || !potGestionarCarpeta(row),
         },
         {
             label: t('page.contingut.action.history.label'),

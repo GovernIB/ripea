@@ -1,5 +1,8 @@
 package es.caib.ripea.persistence.entity.resourceentity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -8,6 +11,8 @@ import javax.persistence.FetchType;
 import javax.persistence.ForeignKey;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -95,6 +100,17 @@ public class UsuariResourceEntity implements ResourceEntity<UsuariResource, Stri
 
     @Column(name = "codi", insertable = false, updatable = false)
     private String id;
+    
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = BaseConfig.DB_PREFIX + "carpeta_usuari_rel",
+            joinColumns = @JoinColumn(name = "usuari_codi", referencedColumnName = "codi"),
+            inverseJoinColumns = @JoinColumn(name = "carpeta_id", referencedColumnName = "id"),
+            foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "carpeta_rel_crp_fk"),
+            inverseForeignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "carpeta_rel_usu_fk")
+    )
+    protected List<CarpetaResourceEntity> carpetes = new ArrayList<>();
+    
 	@Override
 	public String getId() {
 		return this.codi;

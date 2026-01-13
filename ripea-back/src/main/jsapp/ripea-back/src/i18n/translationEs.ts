@@ -1000,7 +1000,13 @@ const translationEs = {
                     description: "Una vez borrado no se prodra recuperar",
                     ok: "Carpeta '{{data.nom}}' eliminada correctamente",
                 }
-            }
+			},
+			restriccions: {
+				 title: "Selecciona los usuarios que tendrán acceso a la carpeta (de entre los que ya tienen acceso al procedimiento)",
+			     notEmpty: {
+				 		message: "Se debe seleccionar al menos un usuario para crear la restricción"	
+				 }
+			}
         },
         dada: {
             title: "valor para el dato '{{metaDada}}'",

@@ -1000,7 +1000,13 @@ const translationEn = {
                     description: "Once deleted, it cannot be recovered",
                     ok: "Folder '{{data.nom}}' deleted successfully",
                 }
-            }
+			},
+			restriccions: {
+				 title: "Select the users who will have access to the folder (from those who already have access to the procedure)",
+			     notEmpty: {
+				 		message: "At least one user must be selected to create the restriction"	
+				 }
+			}
         },
         dada: {
             title: "value for data '{{metaDada}}'",

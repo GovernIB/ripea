@@ -9,6 +9,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import es.caib.ripea.persistence.entity.CarpetaEntity;
@@ -16,10 +17,12 @@ import es.caib.ripea.persistence.entity.ContingutEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.ExpedientCarpetaArbreEntity;
 import es.caib.ripea.persistence.entity.ExpedientEntity;
+import es.caib.ripea.persistence.entity.UsuariEntity;
 import es.caib.ripea.persistence.repository.CarpetaRepository;
 import es.caib.ripea.persistence.repository.ContingutRepository;
 import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.persistence.repository.ExpedientCarpetaArbreRepository;
+import es.caib.ripea.persistence.repository.UsuariRepository;
 import es.caib.ripea.service.intf.dto.ArbreDto;
 import es.caib.ripea.service.intf.dto.ArbreJsonDto;
 import es.caib.ripea.service.intf.dto.ArbreNodeDto;
@@ -41,6 +44,7 @@ public class CarpetaHelper {
 	@Autowired private EntityComprovarHelper entityComprovarHelper;
 	@Autowired private ContingutLogHelper contingutLogHelper;
 	@Autowired private ExpedientCarpetaArbreRepository expedientCarpetaArbreRepository;
+	@Autowired private UsuariRepository usuariRepository; 
 	@Autowired private CacheHelper cacheHelper;
 	
 	public CarpetaDto create(
@@ -124,6 +128,22 @@ public class CarpetaHelper {
 		CarpetaDto dto = toCarpetaDto(carpetaEntity);
 		return dto;
 	}
+	
+	public void restringirCarpeta(Long entitatId, Long carpetaId, boolean restringida, String motiuRestriccio, List<String> usuaris) {
+		String responsableRestriccioCodi = SecurityContextHolder.getContext().getAuthentication().getName();
+		CarpetaEntity carpeta = carpetaRepository.getOne(carpetaId);
+		UsuariEntity responsableRestriccio = usuariRepository.findByCodi(responsableRestriccioCodi);
+		List<UsuariEntity> usuarisRestriccio = usuariRepository.findAllById(usuaris);		
+		carpeta.updateRestriccio(restringida, motiuRestriccio, usuarisRestriccio, responsableRestriccio);
+		
+		contingutLogHelper.log(
+				carpeta,
+				LogTipusEnumDto.RESTRINGIR_CARPETA,
+				responsableRestriccio.getNom(),
+				null,
+				true,
+				true);
+	}
 
 	public void modificarNomCarpeta(Long entitatId, Long id, String nom) {
 		ContingutEntity contingut = contingutHelper.comprovarContingutDinsExpedientModificable(
@@ -133,6 +153,11 @@ public class CarpetaHelper {
 				false,
 				false,
 				false, false, true, null);
+		
+		if (contingut.getNom().equals(nom)) {
+			return;
+		}
+		
 		if (checkCarpetaUniqueContraint(nom, contingut.getPare(), entitatId)>0) {
 			throw new ContingutNotUniqueException();
 		}
