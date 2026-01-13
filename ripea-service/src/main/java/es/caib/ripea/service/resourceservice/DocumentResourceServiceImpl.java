@@ -137,7 +137,6 @@ import es.caib.ripea.service.intf.model.ExpedientResource;
 import es.caib.ripea.service.intf.model.InteressatGrupResource;
 import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.model.MetaDocumentResource;
-import es.caib.ripea.service.intf.model.MetaExpedientResource;
 import es.caib.ripea.service.intf.model.NodeResource.MassiveAction;
 import es.caib.ripea.service.intf.model.UsuariResource;
 import es.caib.ripea.service.intf.resourceservice.DocumentResourceService;
@@ -521,8 +520,12 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 		resource.setErrorEnviamentPortafirmes(isErrorLastEnviament != null ? isErrorLastEnviament : false);
         
         resource.setHasFirma(resource.getDocumentFirmaTipus()!=DocumentFirmaTipusEnumDto.SENSE_FIRMA);
-        resource.setMetaDocumentInfo(objectMappingHelper.newInstanceMap(Hibernate.unproxy(entity.getMetaDocument()), MetaDocumentResource.class));
         resource.setFirmaParcial(DocumentEstatEnumDto.FIRMA_PARCIAL.equals(entity.getEstat()));
+        
+        if (entity.getMetaDocument()!=null) {
+        	MetaDocumentResourceEntity metaDocumentResourceEntity = (MetaDocumentResourceEntity) Hibernate.unproxy(entity.getMetaDocument());
+        	resource.setMetaDocumentInfo(objectMappingHelper.newInstanceMap(metaDocumentResourceEntity, MetaDocumentResource.class));
+        }
         
         if (entity.getCreatedBy()!=null) {
     		UsuariResourceEntity usuariResourceEntity = usuariResourceRepository.findById(entity.getCreatedBy()).orElse(null);
