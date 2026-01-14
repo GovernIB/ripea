@@ -2,6 +2,7 @@ package es.caib.ripea.service.resourceservice;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -20,11 +21,14 @@ import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.entity.MetaDadaEntity;
 import es.caib.ripea.persistence.entity.MetaDocumentEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
+import es.caib.ripea.persistence.entity.TipusDocumentalEntity;
+import es.caib.ripea.persistence.entity.resourceentity.MetaDadaResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaDocumentResourceEntity;
 import es.caib.ripea.persistence.repository.DocumentRepository;
 import es.caib.ripea.persistence.repository.ExpedientRepository;
 import es.caib.ripea.persistence.repository.MetaDadaRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
+import es.caib.ripea.persistence.repository.TipusDocumentalRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
@@ -34,9 +38,15 @@ import es.caib.ripea.service.helper.MetaExpedientHelper;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
 import es.caib.ripea.service.intf.base.exception.ResourceNotFoundException;
+import es.caib.ripea.service.intf.base.model.FieldOption;
+import es.caib.ripea.service.intf.base.model.FileReference;
+import es.caib.ripea.service.intf.base.model.ResourceReference;
+import es.caib.ripea.service.intf.dto.MetaDocumentDto;
 import es.caib.ripea.service.intf.model.ContingutResource;
 import es.caib.ripea.service.intf.model.EntitatResource;
+import es.caib.ripea.service.intf.model.MetaDadaResource;
 import es.caib.ripea.service.intf.model.MetaDocumentResource;
+import es.caib.ripea.service.intf.model.UsuariResource;
 import es.caib.ripea.service.intf.resourceservice.MetaDocumentResourceService;
 import es.caib.ripea.service.intf.utils.Utils;
 import lombok.RequiredArgsConstructor;
@@ -51,6 +61,7 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
 	private final MetaDadaRepository metaDadaRepository;
 	private final DocumentRepository documentRepository;
 	private final OrganGestorRepository organGestorRepository;
+	private final TipusDocumentalRepository tipusDocumentalRepository;
 	private final MetaDocumentHelper metaDocumentHelper;
 	private final MetaExpedientHelper metaExpedientHelper;
 	private final EntityComprovarHelper entityComprovarHelper;
@@ -59,10 +70,26 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
 	
     @PostConstruct
     public void init() {
-    	register(MetaDocumentResource.PERSPECTIVE_COUNT_METADADES, new CountMetaDadesPerspectiveApplicator());
+    	register(MetaDocumentResource.PERSPECTIVE_COUNT_METADADES,	new CountMetaDadesPerspectiveApplicator());
+    	register(MetaDocumentResource.Fields.ntiTipoDocumental, 	new TipusDocFieldOptionsProvider());
     }
-	
-    @Override
+        
+    public class TipusDocFieldOptionsProvider implements FieldOptionsProvider {
+        public List<FieldOption> getOptions(String fieldName, Map<String, String[]> requestParameterMap) {
+            List<FieldOption> resultat = new ArrayList<FieldOption>();
+            List<TipusDocumentalEntity> tipusDocumentalEntity = tipusDocumentalRepository.findAll();
+            if (tipusDocumentalEntity != null) {
+                for (TipusDocumentalEntity tde : tipusDocumentalEntity) {
+                	resultat.add(new FieldOption(
+                			tde.getCodi(),
+                			tde.getNomCatala()!=null?tde.getNomCatala():tde.getNomEspanyol()));
+                }
+            }
+            resultat.sort(Comparator.comparing(FieldOption::getDescription));
+            return resultat;
+        }
+    }
+    
     protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
     	
     	List<String> namedQueriesList = namedQueries!=null ?Stream.of(namedQueries).collect(Collectors.toList()) : Collections.emptyList();
@@ -130,6 +157,18 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
         return FilterBuilder.and(filtreBase, filtreResultat).generate();
     }
     
+    @Override
+    protected void afterConversion(MetaDocumentResourceEntity entity, MetaDocumentResource resource) {
+    	if (entity.getPlantillaContingut()!=null && entity.getPlantillaContingut().length>0) {
+    		FileReference plantilla = new FileReference(
+    				entity.getPlantillaNom(),
+    				entity.getPlantillaContingut(),
+    				entity.getPlantillaContentType(),
+    				new Long(entity.getPlantillaContingut().length));
+    		resource.setPlantilla(plantilla);
+    	}
+    }
+    
     private List<Long> getIdsFromEntitats(List<MetaDocumentEntity> metaDocsList) {
         List<Long> resultat = new ArrayList<>();
         if (metaDocsList != null) {
@@ -149,6 +188,54 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
 		}
     }
     
+	@Override
+	public MetaDocumentResource create(MetaDocumentResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
+		
+		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+		OrganGestorEntity ogEntity	= organGestorRepository.findByEntitatIdAndCodi(entitatEntity.getId(), configHelper.getOrganActualCodi());
+		
+		metaDocumentHelper.create(
+				entitatEntity.getId(),
+				resource.getMetaExpedient()!=null?resource.getMetaExpedient().getId():null,
+				resourceToMetaDocumentDto(resource),
+				resource.getPlantilla()!=null?resource.getPlantilla().getName():null,
+				resource.getPlantilla()!=null?resource.getPlantilla().getContentType():null,
+				resource.getPlantilla()!=null?resource.getPlantilla().getContent():null,
+				configHelper.getRolActual(),
+				ogEntity!=null?ogEntity.getId():null);
+		
+		return resource;
+	}
+    
+	@Override
+	public MetaDocumentResource update(
+			Long id,
+			MetaDocumentResource resource,
+			Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotFoundException {
+		
+		metaDocumentHelper.update(
+				resource.getEntitat().getId(),
+				resourceToMetaDocumentDto(resource),
+				resource.getPlantilla()!=null?resource.getPlantilla().getName():null,
+				resource.getPlantilla()!=null?resource.getPlantilla().getContentType():null,
+				resource.getPlantilla()!=null?resource.getPlantilla().getContent():null);
+		
+		return resource;
+	}
+	
+	private MetaDocumentDto resourceToMetaDocumentDto(MetaDocumentResource resource) {
+		MetaDocumentDto metaDocumentDto = objectMappingHelper.newInstanceMap(resource, MetaDocumentDto.class, "serialVersionUID");
+		if (resource.getPortafirmesResponsables()!=null && resource.getPortafirmesResponsables().size()>0) {
+			String[] responsablesFirma = new String[resource.getPortafirmesResponsables().size()];
+			for (int r=0; r<resource.getPortafirmesResponsables().size(); r++) {
+				ResourceReference<UsuariResource, String> responsable = resource.getPortafirmesResponsables().get(r);
+				responsablesFirma[r] = responsable.getId();
+			}
+			metaDocumentDto.setPortafirmesResponsables(responsablesFirma);
+		}
+		return metaDocumentDto;
+	}
+	
     @Override
     public void delete(Long id, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotFoundException {
     	try {
@@ -159,37 +246,5 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
     		excepcioLogHelper.addExcepcio("/metaDocumentResource/"+id+"/delete", ex);
     		throw new ResourceNotFoundException(getResourceClass(), ex.getMessage());
     	}
-    }
-    
-    @Override
-    protected void afterCreateSave(MetaDocumentResourceEntity entity, MetaDocumentResource resource, Map<String, AnswerRequiredException.AnswerValue> answers, boolean anyOrderChanged) {
-    	
-    	//Replicamos las acciones extra que se producen en MetaDocumentHelper.create a parte de la creación de la entidad en BBDD
-    	
-		if ("IPA_ORGAN_ADMIN".equals(configHelper.getRolActual())) {
-			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
-			OrganGestorEntity ogEntity	= organGestorRepository.findByEntitatIdAndCodi(entitatEntity.getId(), configHelper.getOrganActualCodi());
-			metaExpedientHelper.canviarRevisioADisseny(
-					entity.getEntitat().getId(),
-					entity.getMetaExpedient()!=null?entity.getMetaExpedient().getId():null,
-					ogEntity!=null?ogEntity.getId():null);
-		}
-    	
-		updateFluxosFirma(entity);
-    }
-    
-    @Override
-    protected void afterUpdateSave(MetaDocumentResourceEntity entity, MetaDocumentResource resource, Map<String, AnswerRequiredException.AnswerValue> answers, boolean anyOrderChanged) {
-    	updateFluxosFirma(entity);
-    }
-    
-    private void updateFluxosFirma(MetaDocumentResourceEntity entity) {
-		if (entity.getFluxosFirma()!=null && entity.getFluxosFirma().size()>0) {
-			String[] nombres = new String[3];
-			for (int f=0; f<entity.getFluxosFirma().size(); f++) {
-				nombres[f] = entity.getFluxosFirma().get(f).getPortafirmesFluxId();
-			}
-			metaDocumentHelper.updateFluxosFirmaMetaDoc(entity.getId(), nombres);
-		}
     }
 }

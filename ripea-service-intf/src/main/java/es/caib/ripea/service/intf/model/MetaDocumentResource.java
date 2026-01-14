@@ -1,11 +1,17 @@
 package es.caib.ripea.service.intf.model;
 
+import java.util.List;
+
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
 import org.springframework.data.annotation.Transient;
 
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
-import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
+import es.caib.ripea.service.intf.base.annotation.ResourceField;
 import es.caib.ripea.service.intf.base.model.FileReference;
+import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentFirmaFluxTipusEnumDto;
@@ -13,17 +19,17 @@ import es.caib.ripea.service.intf.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentTipusGenericEnumDto;
 import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
 import es.caib.ripea.service.intf.dto.NtiOrigenEnumDto;
+import es.caib.ripea.service.intf.resourcevalidation.MetaDocumentValid;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 
-import javax.validation.constraints.NotNull;
-
 @Getter
 @Setter
 @NoArgsConstructor
 @FieldNameConstants
+@MetaDocumentValid
 @ResourceConfig(
 		quickFilterFields = { "codi", "nom" },
 		descriptionField = "nom",
@@ -36,27 +42,34 @@ public class MetaDocumentResource extends MetaNodeResource {
 
 	public static final String PERSPECTIVE_COUNT_METADADES = "COUNT_METADADES";
 
-    @NotNull private MultiplicitatEnumDto multiplicitat = MultiplicitatEnumDto.M_1;
+    @NotNull 
+    private MultiplicitatEnumDto multiplicitat = MultiplicitatEnumDto.M_1;
 	private boolean firmaPortafirmesActiva;
+	@Size(max=64)
 	private String portafirmesDocumentTipus;
 	private String portafirmesFluxId;
-//	@NotNull @NotEmpty @ResourceField(descriptionField = "nomAndNif")
-//	private List<ResourceReference<UsuariResource, String>> portafirmesResponsables;
-    @NotNull private MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSequenciaTipus = MetaDocumentFirmaSequenciaTipusEnumDto.SERIE;
+	@ResourceField(descriptionField = "nomAndNif")
+	private List<ResourceReference<UsuariResource, String>> portafirmesResponsables;
+    private MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSequenciaTipus = MetaDocumentFirmaSequenciaTipusEnumDto.SERIE;
+    @Size(max=64)
 	private String portafirmesCustodiaTipus;
 	private boolean firmaPassarelaActiva;
+	@Size(max=64)
 	private String firmaPassarelaCustodiaTipus;
 	private String plantillaNom;
 	private String plantillaContentType;
 	private byte[] plantillaContingut;	
 	private int ordre;
-    @NotNull private NtiOrigenEnumDto ntiOrigen;
-	private DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion;
-//    @NotNull private ResourceReference<TipusDocumentalResource, Long> ntiTipoDocumental;
+    @NotNull 
+    private NtiOrigenEnumDto ntiOrigen;
+    @NotNull 
+    private DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion;
+    @NotNull @ResourceField(enumType = true) 
+    private String ntiTipoDocumental;
 	private boolean firmaBiometricaActiva;
 	private boolean biometricaLectura;
 	private MetaDocumentTipusGenericEnumDto metaDocumentTipusGeneric;
-    @NotNull private MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus = MetaDocumentFirmaFluxTipusEnumDto.SIMPLE;
+    private MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus = MetaDocumentFirmaFluxTipusEnumDto.SIMPLE;
 	private String codiPropi;
 	private boolean pinbalActiu;
 	private ResourceReference<MetaExpedientResource, Long> metaExpedient;
@@ -66,5 +79,5 @@ public class MetaDocumentResource extends MetaNodeResource {
 	private boolean perDefecte;
 
     @Transient private int numMetadades;
-    @Transient private FileReference plantilla;// TODO: mappear los datos a los campos correspondientes
+    @Transient private FileReference plantilla;
 }

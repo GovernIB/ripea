@@ -1,8 +1,9 @@
 import {useTranslation} from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import {GridPage, useBaseAppContext, useFormContext, useMuiDataGridApiRef, useResourceApiService} from "reactlib";
 import {CardPage} from "../../../components/CardData.tsx";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
-import {Alert, Button, Chip, Grid, Icon, Link} from "@mui/material";
+import {Alert, Typography, Grid, Icon, Badge, IconButton} from "@mui/material";
 import GridFormField, {FileFormField} from "../../../components/GridFormField.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import TabComponent from "../../../components/TabComponent.tsx";
@@ -118,33 +119,13 @@ const MetaDocumentForm = () => {
 // Grid
 const sortModel: any = [{field: 'nom', sort: 'asc'}]
 const perspectives = ["COUNT_METADADES"];
-const columns = [
-    {
-        field: 'codi',
-        flex: 1,
-    },
-    {
-        field: 'nom',
-        flex: 1,
-    },
-    {
-        field: 'actiu',
-        flex: 0.5,
-        renderCell: (params:any) => (params?.row?.actiu && <Icon>check</Icon>),
-    },
-    {
-        field: 'id',
-        headerName: '',
-        flex: 0.5,
-        sortable: false,
-        renderCell: (props:any) => <Button component={Link} variant={"outlined"} href={`/metaDocument/${props?.id}/metaDada`}>Meta-dades <Chip label={props?.row?.numMetadades ?? 0}/></Button>
-    },
-]
 
 const MetaDocumentGrid = () => {
-    const {t} = useTranslation();
-    const apiRef = useMuiDataGridApiRef();
 
+    const {t} = useTranslation();
+    const navigate = useNavigate();
+    const apiRef = useMuiDataGridApiRef();
+    
     const refresh = () => {
         apiRef?.current?.refresh?.();
     }
@@ -176,6 +157,39 @@ const MetaDocumentGrid = () => {
             icon: "delete",
             showInMenu: true,
             clickTriggerDelete: true,
+        },
+    ]
+
+    const columns = [
+        {
+            field: 'codi',
+            flex: 1,
+        },
+        {
+            field: 'nom',
+            flex: 1,
+        },
+        {
+            field: 'actiu',
+            flex: 0.5,
+            renderCell: (params:any) => (params?.row?.actiu && <Icon>check</Icon>),
+        },
+        {
+            field: 'id',
+            headerName: '',
+            flex: 0.5,
+            sortable: false,
+            //renderCell: (props:any) => <Button component={Link} variant={"outlined"} href={`/metaDocument/${props?.id}/metaDada`}>Meta-dades <Chip label={props?.row?.numMetadades ?? 0}/></Button>
+            renderCell: (params:any) => <IconButton 
+                aria-label="key" 
+                color="inherit"
+                title={t('page.metaDada.plural')}
+                onClick={(e:any) => { e.stopPropagation(); navigate(`/metaDocument/${params?.row?.id}/metaDada`); }}
+            >
+                <Badge badgeContent={params?.row?.numMetadades} color="primary" showZero>
+                    <Typography sx={{fontSize: '1rem', paddingRight: '10px'}}>{t('page.metaDada.plural')}</Typography>
+                </Badge>
+            </IconButton>
         },
     ]
 

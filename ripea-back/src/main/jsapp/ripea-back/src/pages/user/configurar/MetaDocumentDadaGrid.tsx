@@ -47,13 +47,13 @@ const MetaDocumentDadaForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField xs={12} name="codi"/>
         <GridFormField xs={12} name="nom"/>
-        <GridFormField xs={12} name="tipus" required/>
+        <GridFormField xs={12} name="tipus" disabled={!!data?.id} required/>
         <GridFormField xs={12} name="multiplicitat" required/>
 
         <GridFormField xs={12} name="valorString" hidden={data?.tipus!="TEXT"}/>
-        <GridFormField xs={12} name="valorData" hidden={data?.tipus!="DATA"}/>
+        <GridFormField xs={12} name="valorData" type="date" hidden={data?.tipus!="DATA"}/>
         <GridFormField xs={12} name="valorImport" hidden={data?.tipus!="IMPORT"}/>
-        <GridFormField xs={12} name="valorSencer" hidden={data?.tipus!="SENCER"}/>
+        <GridFormField xs={12} name="valorSencer" decimalScale={0} hidden={data?.tipus!="SENCER"}/>
         <GridFormField xs={12} name="valorFlotant" hidden={data?.tipus!="FLOTANT"}/>
         <GridFormField xs={12} name="valorBoolea" hidden={data?.tipus!="BOOLEA"}/>
         <GridFormField xs={12} name="domini" hidden={data?.tipus!="DOMINI"}/>

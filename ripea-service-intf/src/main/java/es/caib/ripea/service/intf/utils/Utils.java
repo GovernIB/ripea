@@ -8,6 +8,7 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -332,6 +333,12 @@ public class Utils {
 			str = date.format(DateTimeFormatter.ofPattern(format));
 		}
 		return str;
+	}
+	
+	public static Date localDateTimeToDateJava(LocalDateTime localDateTime) {
+		if (localDateTime==null) return null;
+		ZoneId zone = ZoneId.systemDefault();
+		return Date.from(localDateTime.atZone(zone).toInstant());
 	}
 
 	public static String convertDateToString(

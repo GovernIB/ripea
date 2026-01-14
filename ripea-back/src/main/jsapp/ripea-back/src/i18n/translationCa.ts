@@ -1026,26 +1026,27 @@ const translationCa = {
             },
         },
         metaDada: {
-            title: "Tipus de dada",
-            detail: "Valors de la dada '{{metaDada}}'",
+            title: "Meta-dada",
+            plural: "Meta-dades",
+            detail: "Valors de la meta-dada '{{metaDada}}'",
             action: {
                 activar: {
                     label: "Activar",
-                    ok: "Tipus de dada activada",
+                    ok: "Meta-dada activada",
                 },
                 desactivar: {
                     label: "Desactivar",
-                    ok: "Tipus de dada desactivada",
+                    ok: "Meta-dada desactivada",
                 },
                 new: {
-                    label: "Nou tipus de dada",
-                    ok: "Tipus de dada creada correctament",
+                    label: "Nova metadada",
+                    ok: "Meta-dada creada correctament",
                 },
                 update: {
-                    ok: "Tipus de dada modificada correctament",
+                    ok: "Meta-dada modificada correctament",
                 },
                 delete: {
-                    ok: "Tipus de dada eliminada correctament",
+                    ok: "Meta-dada eliminada correctament",
                 },
             },
         },

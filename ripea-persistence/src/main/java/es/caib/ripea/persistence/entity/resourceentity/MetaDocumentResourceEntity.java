@@ -75,6 +75,9 @@ public class MetaDocumentResourceEntity extends MetaNodeResourceEntity<MetaDocum
 	private DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion;
 	@Column(name = "nti_tipdoc", length = 4)
 	private String ntiTipoDocumental;
+//	@ManyToOne(optional = true, fetch = FetchType.LAZY)
+//	@JoinColumn(name = "meta_expedient_id", referencedColumnName  = "codi")
+//	private TipusDocumentalResourceEntity ntiTipoDocumental;	
 	@Column(name = "firma_biometrica")
 	private boolean firmaBiometricaActiva;
 	@Column(name = "biometrica_lectura")

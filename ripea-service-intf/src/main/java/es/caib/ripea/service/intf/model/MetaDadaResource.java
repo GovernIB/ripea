@@ -1,8 +1,10 @@
 package es.caib.ripea.service.intf.model;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
+
+import javax.validation.constraints.NotNull;
 
 import org.springframework.data.annotation.Transient;
 
@@ -14,8 +16,6 @@ import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
@@ -38,7 +38,7 @@ public class MetaDadaResource extends BaseAuditableResource<Long> {
     private Long valorSencer;
     private Double valorFlotant;
     private BigDecimal valorImport;
-    private Date valorData;
+    private LocalDateTime valorData;
     private Boolean valorBoolea;
     private String valorString;
     private ResourceReference<DominiResource, Long> domini;

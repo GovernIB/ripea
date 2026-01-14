@@ -1026,26 +1026,27 @@ const translationEn = {
             },
         },
         metaDada: {
-            title: "Data type",
-            detail: "Values of the data '{{metaDada}}'",
+            title: "Meta-data",
+            plural: "Meta-datas",
+            detail: "Values of the Meta-data '{{metaDada}}'",
             action: {
                 activar: {
                     label: "Activate",
-                    ok: "Data type activated",
+                    ok: "Meta-data activated",
                 },
                 desactivar: {
                     label: "Deactivate",
-                    ok: "Data type deactivated",
+                    ok: "Meta-data deactivated",
                 },
                 new: {
-                    label: "New data type",
-                    ok: "Data type created successfully",
+                    label: "New Meta-data",
+                    ok: "Meta-data created successfully",
                 },
                 update: {
-                    ok: "Data type updated successfully",
+                    ok: "Meta-data updated successfully",
                 },
                 delete: {
-                    ok: "Data type deleted successfully",
+                    ok: "Meta-data deleted successfully",
                 },
             },
         },
