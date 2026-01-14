@@ -116,5 +116,5 @@ public class MetaDocumentResourceEntity extends MetaNodeResourceEntity<MetaDocum
 	private boolean perDefecte;
 	
 	@OneToMany(mappedBy = "metaDocument", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<MetaDocumentFluxPortafibEntity> fluxosFirma = new ArrayList<MetaDocumentFluxPortafibEntity>();
+	private List<MetaDocumentFluxPortafibResourceEntity> fluxosFirma = new ArrayList<MetaDocumentFluxPortafibResourceEntity>();
 }

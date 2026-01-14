@@ -10,7 +10,7 @@ const NotFound: React.FC = () => {
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
-                minHeight: 'calc(100vh - 72px)',
+                minHeight: 'calc(100vh - 172px)',
             }}>
             <Typography variant="h2">{t('page.notFound')}</Typography>
         </Box>

@@ -51,8 +51,8 @@ const MetaDocumentDadaForm = () => {
         <GridFormField xs={12} name="multiplicitat" required/>
 
         <GridFormField xs={12} name="valorString" hidden={data?.tipus!="TEXT"}/>
-        <GridFormField xs={12} name="valorData" type="date" hidden={data?.tipus!="DATA"}/>
-        <GridFormField xs={12} name="valorImport" hidden={data?.tipus!="IMPORT"}/>
+        <GridFormField xs={12} name="valorData" type={"date"} hidden={data?.tipus!="DATA"}/>
+        <GridFormField xs={12} name="valorImport" decimalScale={2} hidden={data?.tipus!="IMPORT"}/>
         <GridFormField xs={12} name="valorSencer" decimalScale={0} hidden={data?.tipus!="SENCER"}/>
         <GridFormField xs={12} name="valorFlotant" hidden={data?.tipus!="FLOTANT"}/>
         <GridFormField xs={12} name="valorBoolea" hidden={data?.tipus!="BOOLEA"}/>

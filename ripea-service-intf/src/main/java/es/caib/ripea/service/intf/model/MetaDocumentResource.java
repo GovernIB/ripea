@@ -47,7 +47,7 @@ public class MetaDocumentResource extends MetaNodeResource {
 	private boolean firmaPortafirmesActiva;
 	@Size(max=64)
 	private String portafirmesDocumentTipus;
-	private String portafirmesFluxId;
+	private List<ResourceReference<MetaDocumentFluxPortafibResource, Long>> fluxosFirma;
 	@ResourceField(descriptionField = "nomAndNif")
 	private List<ResourceReference<UsuariResource, String>> portafirmesResponsables;
     private MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSequenciaTipus = MetaDocumentFirmaSequenciaTipusEnumDto.SERIE;
