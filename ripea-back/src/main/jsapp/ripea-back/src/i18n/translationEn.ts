@@ -1265,9 +1265,23 @@ const translationEn = {
                 update: {
                     ok: "Managing Body '{{data.codi}}' deleted successfully",
                 },
+                actualitzar: {
+                    title: "Synchronization forecast",
+                    label: "Update managing bodies from DIR3",
+                    ok: "The bodies are up to date",
+                    button: "Synchronize",
+                    tabs: {
+                        firstSync: "First synchronization",
+                        split: "Splits",
+                        merge: "Mergers",
+                        subst: "Substitutions",
+                        change: "Attribute changes",
+                        new: "New",
+                        del: "Decommissioned",
+                    },
+                },
+                vista: "Change view",
             },
-            actualitzar: "Update òrgans gestors from DIR3",
-            vista: "Change view",
         },
         tipusDocumental: {
             title: "Document type",

@@ -33,8 +33,7 @@ import java.util.List;
                         formClass = OrganGestorResource.FormFilter.class),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
-                        code = OrganGestorResource.DIR3_UPDATE_CODE,
-                        formClass = Serializable.class),
+                        code = OrganGestorResource.DIR3_UPDATE_CODE),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = OrganGestorResource.PERSPECTIVE_PATH_CODE),

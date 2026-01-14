@@ -1265,9 +1265,23 @@ const translationEs = {
                 update: {
                     ok: "Órgano Gestor '{{data.codi}}' eliminado correctamente",
                 },
+                actualitzar: {
+                    title: "Predicción de sincronización",
+                    label: "Actualizar órganos gestores de DIR3",
+                    ok: "Los órganos están actualizados",
+                    button: "Sincronizar",
+                    tabs: {
+                        firstSync: "Primera sincronización",
+                        split: "Divisiones",
+                        merge: "Fusiones",
+                        subst: "Sustituciones",
+                        change: "Cambios en atributos",
+                        new: "Nuevos",
+                        del: "Extintas",
+                    },
+                },
+                vista: "Cambiar vista",
             },
-            actualitzar: "Actualizar órganos gestores de DIR3",
-            vista: "Cambiar vista",
         },
         tipusDocumental: {
             title: "Tipo documental",
