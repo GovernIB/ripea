@@ -21,6 +21,8 @@ const ContingutIcon = (props:any) => {
                   color={"warning"}>warning</Icon>}
 
         {entity?.nom}
+		
+		{entity?.restringida && <Icon title={entity?.motiuRestriccio}>lock</Icon>}
 
         {!entity?.arxiuUuid && !user?.sessionScope?.isCreacioCarpetesLogica &&
             <Icon title={t('page.contingut.alert.guardarPendent')} color={"error"}>warning</Icon>}

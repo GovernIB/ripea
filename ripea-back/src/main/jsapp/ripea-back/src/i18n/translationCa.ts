@@ -1000,7 +1000,13 @@ const translationCa = {
                     description: "Un cop esborrada no es podrà recuperar",
                     ok: "Carpeta '{{data.nom}}' eliminada correctament",
                 }
-            }
+            },
+			restriccions: {
+				 title: "Selecciona els usuaris que tindran accés a la carpeta (d’entre els que ja tenen accés al procediment)",
+			     notEmpty: {
+				 		message: "S'ha de seleccionar com a mínim un usuari per crear la restricció"	
+				 }
+			}
         },
         dada: {
             title: "valor per a la dada '{{metaDada}}'",
@@ -1260,7 +1266,21 @@ const translationCa = {
                 update: {
                     ok: "Òrgan Gestor '{{data.codi}}' esborrat correctament",
                 },
-                actualitzar: "Actualitzar òrgans gestors de DIR3",
+                actualitzar: {
+                    title: "Predicció de sincronització",
+                    label: "Actualitzar òrgans gestors de DIR3",
+                    ok: "Els òrgans estan actualitzats",
+                    button: "Syncronitzar",
+                    tabs: {
+                        firstSync: "Primera sincronització",
+                        split: "Divisions",
+                        merge: "Fusions",
+                        subst: "Substitucions",
+                        change: "Canvis en atributs",
+                        new: "Nous",
+                        del: "Extingides",
+                    },
+                },
                 vista: "Canvi vista",
             },
         },

@@ -1000,7 +1000,13 @@ const translationEs = {
                     description: "Una vez borrado no se prodra recuperar",
                     ok: "Carpeta '{{data.nom}}' eliminada correctamente",
                 }
-            }
+			},
+			restriccions: {
+				 title: "Selecciona los usuarios que tendrán acceso a la carpeta (de entre los que ya tienen acceso al procedimiento)",
+			     notEmpty: {
+				 		message: "Se debe seleccionar al menos un usuario para crear la restricción"	
+				 }
+			}
         },
         dada: {
             title: "valor para el dato '{{metaDada}}'",
@@ -1260,9 +1266,23 @@ const translationEs = {
                 update: {
                     ok: "Órgano Gestor '{{data.codi}}' eliminado correctamente",
                 },
+                actualitzar: {
+                    title: "Predicción de sincronización",
+                    label: "Actualizar órganos gestores de DIR3",
+                    ok: "Los órganos están actualizados",
+                    button: "Sincronizar",
+                    tabs: {
+                        firstSync: "Primera sincronización",
+                        split: "Divisiones",
+                        merge: "Fusiones",
+                        subst: "Sustituciones",
+                        change: "Cambios en atributos",
+                        new: "Nuevos",
+                        del: "Extintas",
+                    },
+                },
+                vista: "Cambiar vista",
             },
-            actualitzar: "Actualizar órganos gestores de DIR3",
-            vista: "Cambiar vista",
         },
         tipusDocumental: {
             title: "Tipo documental",

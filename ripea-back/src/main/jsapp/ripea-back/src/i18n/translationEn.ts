@@ -1000,7 +1000,13 @@ const translationEn = {
                     description: "Once deleted, it cannot be recovered",
                     ok: "Folder '{{data.nom}}' deleted successfully",
                 }
-            }
+			},
+			restriccions: {
+				 title: "Select the users who will have access to the folder (from those who already have access to the procedure)",
+			     notEmpty: {
+				 		message: "At least one user must be selected to create the restriction"	
+				 }
+			}
         },
         dada: {
             title: "value for data '{{metaDada}}'",
@@ -1260,9 +1266,23 @@ const translationEn = {
                 update: {
                     ok: "Managing Body '{{data.codi}}' deleted successfully",
                 },
+                actualitzar: {
+                    title: "Synchronization forecast",
+                    label: "Update managing bodies from DIR3",
+                    ok: "The bodies are up to date",
+                    button: "Synchronize",
+                    tabs: {
+                        firstSync: "First synchronization",
+                        split: "Splits",
+                        merge: "Mergers",
+                        subst: "Substitutions",
+                        change: "Attribute changes",
+                        new: "New",
+                        del: "Decommissioned",
+                    },
+                },
+                vista: "Change view",
             },
-            actualitzar: "Update òrgans gestors from DIR3",
-            vista: "Change view",
         },
         tipusDocumental: {
             title: "Document type",
