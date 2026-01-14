@@ -63,7 +63,7 @@ public class SseResourceController {
     private final Map<Long, List<SseEmitter>> clientsExpedient = new HashMap<>();
     private static final Logger logger = LoggerFactory.getLogger(SseResourceController.class);
     private enum UserEventType {
-        USER_CONNECT, AVISOS, NOTIFICACIONS, TASQUES, FIRMA_FINALITZADA;
+        USER_CONNECT, AVISOS, NOTIFICACIONS, TASQUES, FIRMA_FINALITZADA, FLUX_FINALITZAT;
         public String getEventName() { return name().toLowerCase(); }
         public static UserEventType fromEventName(String name) { return UserEventType.valueOf(name.toUpperCase()); }
     }
@@ -304,6 +304,29 @@ public class SseResourceController {
 	            	}
             	}
 	        }
+    	}
+    }
+    
+    @Async
+    @JmsListener(destination = "fluxCreatEditat")
+    public void handleEventFluxCreatEditat(CreacioFluxFinalitzatEvent fluxEvent) {
+    	if (fluxEvent!=null && fluxEvent.getUsuariCodi()!=null) {
+    		logger.debug("Actualització de AnotacionsPendentsEvent a usuaris...");
+			//Empram iterator per poder eliminar sense problemes elements del mapa mentre el recorrem
+			Iterator<Map.Entry<String, SseEmitter>> iterator = clientsUsuaris.entrySet().iterator();
+			//Els avisos s'envien a tots els usuaris connectats
+			while (iterator.hasNext()) {
+				Map.Entry<String, SseEmitter> usuariClient = iterator.next();
+            	if (fluxEvent.getUsuariCodi().equals(usuariClient.getKey())) {
+            		try {
+            			usuariClient.getValue().send(SseEmitter.event().name(UserEventType.FLUX_FINALITZAT.getEventName()).data(fluxEvent));
+            			logger.debug("... comunicats CreacioFluxFinalitzatEvent al usuari "+usuariClient.getKey()+" a travers del emissor "+usuariClient.getValue().hashCode()+".");
+            		} catch (Exception e) {
+    	            	clientsUsuaris.remove(usuariClient.getKey());
+    	            	logger.debug("... eliminat emisor de CreacioFluxFinalitzatEvent "+usuariClient.getValue().hashCode()+" del usuari "+usuariClient.getKey()+" per error: "+e.getMessage()+".");
+    	            }
+            	}
+			}
     	}
     }
     

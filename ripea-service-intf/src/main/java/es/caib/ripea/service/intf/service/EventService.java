@@ -22,6 +22,7 @@ public interface EventService {
     public void notifyAnotacionsPendents(List<UsuariAnotacioDto> usuarisAfectats);
     public void notifyTasquesPendents(List<String> usuarisAfectats);
     public void notifyFluxFirmaFinalitzat(CreacioFluxFinalitzatEvent fluxEvent);
+    public void notifyFluxFirmaCreat(CreacioFluxFinalitzatEvent fluxEvent);
     public void notifyFirmaNavegadorFinalitzada(FirmaFinalitzadaEvent firmaEvent);
     public void notifyScanFinalitzat(ScanFinalitzatEvent firmaEvent);
     public AvisosActiusEvent getAvisosActiusEvent();

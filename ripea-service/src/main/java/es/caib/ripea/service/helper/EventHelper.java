@@ -99,6 +99,14 @@ public class EventHelper {
     	}
     }
     
+    public void notifyFluxFirmaCreat(CreacioFluxFinalitzatEvent fluxEvent) {
+    	try {
+    		jmsTemplate.convertAndSend("fluxCreatEditat", fluxEvent);
+    	} catch (Exception ex) {
+    		log.error("Error al notifyFluxFirmaFinalitzat a expedients suscrits", ex);
+    	}
+    }
+    
     public void notifyFirmaNavegadorFinalitzada(FirmaFinalitzadaEvent firmaEvent) {
     	try {
     		jmsTemplate.convertAndSend("firmaNavegadorFinalitzada", firmaEvent);

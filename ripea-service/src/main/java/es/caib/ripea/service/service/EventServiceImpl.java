@@ -78,4 +78,9 @@ public class EventServiceImpl implements EventService {
         log.debug("Notificació dels avisos activats o desactivats per data.");
         notifyAvisosActius();
     }
+
+	@Override
+	public void notifyFluxFirmaCreat(CreacioFluxFinalitzatEvent fluxEvent) {
+		eventHelper.notifyFluxFirmaCreat(fluxEvent);
+	}
 }

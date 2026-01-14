@@ -1,5 +1,6 @@
 package es.caib.ripea.service.resourceservice;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -10,6 +11,8 @@ import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.turkraft.springfilter.FilterBuilder;
@@ -22,32 +25,34 @@ import es.caib.ripea.persistence.entity.MetaDadaEntity;
 import es.caib.ripea.persistence.entity.MetaDocumentEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.entity.TipusDocumentalEntity;
-import es.caib.ripea.persistence.entity.resourceentity.MetaDadaResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaDocumentResourceEntity;
 import es.caib.ripea.persistence.repository.DocumentRepository;
 import es.caib.ripea.persistence.repository.ExpedientRepository;
 import es.caib.ripea.persistence.repository.MetaDadaRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.persistence.repository.TipusDocumentalRepository;
+import es.caib.ripea.persistence.repository.UsuariRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
 import es.caib.ripea.service.helper.MetaDocumentHelper;
-import es.caib.ripea.service.helper.MetaExpedientHelper;
+import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.helper.UsuariHelper;
+import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
+import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
 import es.caib.ripea.service.intf.base.exception.ResourceNotFoundException;
 import es.caib.ripea.service.intf.base.model.FieldOption;
 import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.MetaDocumentDto;
 import es.caib.ripea.service.intf.dto.PinbalServeiDto;
 import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.model.ContingutResource;
 import es.caib.ripea.service.intf.model.EntitatResource;
-import es.caib.ripea.service.intf.model.MetaDadaResource;
 import es.caib.ripea.service.intf.model.MetaDocumentResource;
 import es.caib.ripea.service.intf.model.UsuariResource;
 import es.caib.ripea.service.intf.resourceservice.MetaDocumentResourceService;
@@ -63,6 +68,7 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
 	private final ExpedientRepository expedientRepository;
 	private final MetaDadaRepository metaDadaRepository;
 	private final DocumentRepository documentRepository;
+	private final UsuariRepository usuariRepository;
 	private final OrganGestorRepository organGestorRepository;
 	private final TipusDocumentalRepository tipusDocumentalRepository;
 	private final MetaDocumentHelper metaDocumentHelper;
@@ -70,13 +76,64 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
 	private final EntityComprovarHelper entityComprovarHelper;
 	private final ExcepcioLogHelper excepcioLogHelper;
 	private final ConfigHelper configHelper;
+	private final PluginHelper pluginHelper;
 	
     @PostConstruct
     public void init() {
     	register(MetaDocumentResource.PERSPECTIVE_COUNT_METADADES,	new CountMetaDadesPerspectiveApplicator());
     	register(MetaDocumentResource.Fields.ntiTipoDocumental, 	new TipusDocFieldOptionsProvider());
+    	register(MetaDocumentResource.ACTION_CREACIO_FLUXE_CODE, 	new CrearFluxeFirmaActionExecutor());
+    	register(MetaDocumentResource.ACTION_EDITAR_FLUXE_CODE, 	new EditarFluxeFirmaActionExecutor());
     }
         
+    private class CrearFluxeFirmaActionExecutor implements ActionExecutor<MetaDocumentResourceEntity, Serializable, String> {
+
+		@Override
+		public void onChange(Serializable id, Serializable previous, String fieldName, Object fieldValue,
+				Map<String, AnswerValue> answers, String[] previousFieldNames, Serializable target) {
+		}
+
+		@Override
+		public String exec(String code, MetaDocumentResourceEntity entity, Serializable params) throws ActionExecutionException {
+			try {
+				String dadesURL		= configHelper.getEntitatActualCodi()+"#"+entity.getId()+"#"+SecurityContextHolder.getContext().getAuthentication().getName();
+				String paramSecure	= Utils.encripta(dadesURL, configHelper.getConfig(PropertyConfig.CLAU_ENCRIPTACIO));
+				String urlReturn	= configHelper.getConfig(PropertyConfig.BASE_URL) + "/metaDocument/flux/event/"+paramSecure+"/returnurl/";
+				return pluginHelper.portafirmesIniciarFluxDeFirma(true, urlReturn).getUrlRedireccio();
+			} catch (Exception e) {
+				excepcioLogHelper.addExcepcio("/meta-document/CrearFluxeFirmaActionExecutor", e);
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, e.getMessage());
+			}
+		}
+    }
+    
+    private class EditarFluxeFirmaActionExecutor implements ActionExecutor<MetaDocumentResourceEntity, String, String> {
+
+		@Override
+		public void onChange(Serializable id, String previous, String fieldName, Object fieldValue,
+				Map<String, AnswerValue> answers, String[] previousFieldNames, String target) {
+		}
+
+		@Override
+		public String exec(String code, MetaDocumentResourceEntity entity, String fluxeId) throws ActionExecutionException {
+			try {
+				String dadesURL		= configHelper.getEntitatActualCodi()+"#"+entity.getId()+"#"+SecurityContextHolder.getContext().getAuthentication().getName();
+				String paramSecure	= Utils.encripta(dadesURL, configHelper.getConfig(PropertyConfig.CLAU_ENCRIPTACIO));
+				String urlReturn = configHelper.getConfig(PropertyConfig.BASE_URL) + "/metaDocument/flux/event/"+paramSecure+"/returnurl/";
+				Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+				String idioma = usuariRepository.getOne(auth.getName()).getIdioma();
+				return pluginHelper.portafirmesRecuperarUrlPlantilla(
+						fluxeId,
+						idioma!=null?idioma:"ca",
+						urlReturn,
+						true);
+			} catch (Exception e) {
+				excepcioLogHelper.addExcepcio("/meta-document/EditarFluxeFirmaActionExecutor", e);
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, e.getMessage());
+			}
+		}
+    }
+    
     public class TipusDocFieldOptionsProvider implements FieldOptionsProvider {
         public List<FieldOption> getOptions(String fieldName, Map<String, String[]> requestParameterMap) {
             List<FieldOption> resultat = new ArrayList<FieldOption>();
