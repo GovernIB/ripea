@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import {Routes, Route, Navigate, Outlet} from 'react-router-dom';
 import NotFoundPage from './pages/NotFound';
 import Expedient from './pages/expedient/details/Expedient.tsx';
 import ExpedientGrid from './pages/expedient/ExpedientGrid';
@@ -34,59 +34,79 @@ import AdjuntarAnnexosPendentsGrid from "./pages/user/accionsMassives/AdjuntarAn
 import DominiGrid from "./pages/user/configurar/DominiGrid.tsx";
 import MetaDocumentGrid from "./pages/user/configurar/MetaDocumentGrid.tsx";
 import MetaDocumentDadaGrid from "./pages/user/configurar/MetaDocumentDadaGrid.tsx";
+import {useUserSession} from "./components/Session.tsx";
+
+const ProtectedRoute = ({ allowedRoles = [] }: any) => {
+    const {value: user} = useUserSession();
+
+    // console.log("rol:", user.rolActual, allowedRoles)
+    if (!allowedRoles.includes(user.rolActual)) {
+        return <NotFoundPage />;
+    }
+
+    return <Outlet />;
+};
 
 const AppRoutes: React.FC = () => {
     return <Routes>
         <Route path="/" element={<Navigate to="/expedient" />} />
-        <Route path="expedient">
-            <Route index element={<ExpedientGrid />} />
-            {/*<Route path=":id" element={<Expedient />} />*/}
-        </Route>
+        <Route path="expedient" element={<ExpedientGrid />}/>
         <Route path="contingut/:id" element={<Expedient />} />
         <Route path="contingut/:id/tasca/:tascaId" element={<Tasca />} />
         <Route path="expedientPeticio" element={<AnotacionsGrid />} />
         <Route path="usuariTasca" element={<TasquesGrid />} />
 
         {/* Accions massives */}
-        <Route path="massiu">
-            <Route path={"portafirmes"} element={<EnviarPortafirmesGrid />} />
-            <Route path={"firmasimpleweb"} element={<FirmaNavegadorGrid />} />
-            <Route path={"canviEstat"} element={<CanviEstatGrid />} />
-            <Route path={"tancament"} element={<TancarGrid />} />
-            <Route path={"csv"} element={<CopiarEnllacCSVGrid />} />
-            <Route path={"definitiu"} element={<MarcarDefinitiuGrid />} />
-            <Route path={"canviPrioritats"} element={<CanviPrioritatGrid />} />
-            <Route path={"expedientPeticioCanviEstatDistribucio"} element={<ActualitzarEstatAnotacioGrid />} />
-            <Route path={"procesarAnnexosPendents"} element={<AdjuntarAnnexosPendentsGrid />} />
+        <Route element={<ProtectedRoute allowedRoles={['IPA_ADMIN', 'IPA_ORGAN_ADMIN', 'tothom']} />}>
+            <Route path="massiu">
+                <Route path={"portafirmes"} element={<EnviarPortafirmesGrid />} />
+                <Route path={"firmasimpleweb"} element={<FirmaNavegadorGrid />} />
+                <Route path={"canviEstat"} element={<CanviEstatGrid />} />
+                <Route path={"tancament"} element={<TancarGrid />} />
+                <Route path={"csv"} element={<CopiarEnllacCSVGrid />} />
+                <Route path={"definitiu"} element={<MarcarDefinitiuGrid />} />
+                <Route path={"canviPrioritats"} element={<CanviPrioritatGrid />} />
+                <Route path={"expedientPeticioCanviEstatDistribucio"} element={<ActualitzarEstatAnotacioGrid />} />
+                <Route path={"procesarAnnexosPendents"} element={<AdjuntarAnnexosPendentsGrid />} />
+            </Route>
+            <Route path="seguimentArxiuPendents" element={<CustodiarElementsPendentsGrid />} />
         </Route>
-        <Route path="seguimentArxiuPendents" element={<CustodiarElementsPendentsGrid />} />
 
         {/* Consultes */}
-        <Route path="contingutAdmin" element={<ContingutGrid/>} />
-        <Route path="metaExpedientRevisio" element={<RevisioMetaExpedientGrid />} />
-        <Route path="seguimentPortafirmes" element={<DocumentEnviatsPortafirmesGrid />} />
-        <Route path="seguimentNotificacions" element={<RemesesNotibGrid />} />
-        <Route path="seguimentPinbal" element={<ConsultesPinbalGrid />} />
-        <Route path="seguimentTasques" element={<AssignacioTasquesGrid />} />
-        <Route path="seguimentExpedientsPendents" element={<ExpedientsPendentsGrid />} />
-        <Route path="expedientPeticioComunicades" element={<AnotacionsComunicadesGrid/>} />
+        <Route element={<ProtectedRoute allowedRoles={['IPA_ADMIN']} />}>
+            <Route path="contingutAdmin" element={<ContingutGrid/>} />
+            <Route path="metaExpedientRevisio" element={<RevisioMetaExpedientGrid />} />
+            <Route path="seguimentNotificacions" element={<RemesesNotibGrid />} />
+            <Route path="seguimentPinbal" element={<ConsultesPinbalGrid />} />
+            <Route path="seguimentTasques" element={<AssignacioTasquesGrid />} />
+            <Route path="seguimentExpedientsPendents" element={<ExpedientsPendentsGrid />} />
+            <Route path="expedientPeticioComunicades" element={<AnotacionsComunicadesGrid/>} />
+        </Route>
+        <Route element={<ProtectedRoute allowedRoles={['IPA_ADMIN', 'tothom']} />}>
+            <Route path="seguimentPortafirmes" element={<DocumentEnviatsPortafirmesGrid />} />
+        </Route>
 
         {/* Configurar */}
-        <Route path="metaExpedient" element={<GestioMetaExpedientGrid/>} />
-        <Route path="metaExpedient/:id/permis" element={<PermisMetaExpedientGrid/>} />
-        <Route path="tipusDocumental" element={<TipusDocumentalGrid/>} />
-        <Route path="grup" element={<GrupGrid/>} />
-        <Route path="grupPermis/:id/permis" element={<PermisGrupGrid/>} />
-        <Route path="organgestor" element={<OrganGestorGrid/>} />
-        <Route path="organgestor/:id/permis" element={<PermisOrganGestorGrid/>} />
-        <Route path="permis" element={<PermisEntitatGrid/>} />
-        <Route path="domini" element={<DominiGrid/>} />
-        <Route path="metaDocument" element={<MetaDocumentGrid/>} />
-        <Route path="metaDocument/:id/metaDada" element={<MetaDocumentDadaGrid/>} />
+        <Route element={<ProtectedRoute allowedRoles={['IPA_ADMIN', 'IPA_ADMIN_LECTURA', 'IPA_ORGAN_ADMIN', 'IPA_DISSENY']} />}>
+            <Route path="metaExpedient" element={<GestioMetaExpedientGrid/>} />
+            <Route path="metaExpedient/:id/permis" element={<PermisMetaExpedientGrid/>} />
+        </Route>
+        <Route element={<ProtectedRoute allowedRoles={['IPA_ADMIN', 'IPA_ORGAN_ADMIN', 'IPA_DISSENY']} />}>
+            <Route path="grup" element={<GrupGrid/>} />
+            <Route path="grupPermis/:id/permis" element={<PermisGrupGrid/>} />
+        </Route>
+        <Route element={<ProtectedRoute allowedRoles={['IPA_ADMIN']} />}>
+            <Route path="tipusDocumental" element={<TipusDocumentalGrid/>} />
+            <Route path="organgestor" element={<OrganGestorGrid/>} />
+            <Route path="organgestor/:id/permis" element={<PermisOrganGestorGrid/>} />
+            <Route path="permis" element={<PermisEntitatGrid/>} />
+            <Route path="domini" element={<DominiGrid/>} />
+            <Route path="metaDocument" element={<MetaDocumentGrid/>} />
+            <Route path="metaDocument/:id/metaDada" element={<MetaDocumentDadaGrid/>} />
+        </Route>
 
         <Route path="*" element={<NotFoundPage />} />
     </Routes>;
 }
-// massiu/portafirmes
 
 export default AppRoutes;

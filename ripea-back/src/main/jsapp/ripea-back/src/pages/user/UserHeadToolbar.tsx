@@ -188,7 +188,7 @@ const useMenuSupAdmin = () => {
             id: 'entitat',
             title: t('page.user.menu.entitat'),
             icon: 'account_balance',
-            to: '/entitat',
+            onClick: () => toProgramaAntic('entitat'),
         },
         {
             id: 'avisos',
@@ -690,7 +690,6 @@ const useAccionesMassivas = () => {
     const { value: user } = useUserSession();
     const isRolActualAdmin = user?.rolActual == 'IPA_ADMIN';
     const { t } = useTranslation();
-    const { toProgramaAntic } = useToProgramaAntic();
 
     const {handleOpen, dialog} = useExecucioMassiva();
 

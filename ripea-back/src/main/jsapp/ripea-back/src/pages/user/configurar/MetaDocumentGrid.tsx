@@ -7,6 +7,7 @@ import {Alert, Typography, Grid, Icon, Badge, IconButton} from "@mui/material";
 import GridFormField, {FileFormField} from "../../../components/GridFormField.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import TabComponent from "../../../components/TabComponent.tsx";
+import {useMemo} from "react";
 
 const useActions = (refresh?: () => void) => {
     const {t} = useTranslation();
@@ -41,11 +42,51 @@ const useActions = (refresh?: () => void) => {
 }
 
 // Form
+const portafibColumns = [
+    {
+        field: 'portafirmesFluxId',
+        flex: 1,
+    },
+    {
+        field: 'portafirmesFluxDesc',
+        flex: 1,
+    },
+]
+const PortafirmesMetaDocumentForm = () => {
+    const {data} = useFormContext()
+    const filterResponsables = builder.neq('nif', null)
+
+    const filter = useMemo(() => {
+        return builder.inside("id",
+            data?.fluxosFirma?.length > 0
+                ? data?.fluxosFirma?.map(flux => (flux?.id))
+                : [0])
+    }, [data?.fluxosFirma])
+
+    return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
+        <GridFormField xs={12} name="firmaPortafirmesActiva"/>
+        <GridFormField xs={12} name="portafirmesFluxTipus" required/>
+        {data?.portafirmesFluxTipus == "SIMPLE" && <>
+            <GridFormField xs={12} name="portafirmesResponsables" multiple autocomplete
+                           filter={filterResponsables} namedQueries={[`ADD_PLUGIN_USERS`]}/>
+            <GridFormField xs={12} name="portafirmesSequenciaTipus" required/>
+        </>}
+        {data?.portafirmesFluxTipus == "PORTAFIB" && <>
+            <GridFormField xs={12} name="fluxosFirma" multiple required/>
+            <StyledMuiGrid
+                resourceName={'metaDocumentFluxPortafibResource'}
+                columns={portafibColumns}
+                filter={filter}
+                toolbarHide
+                sx={{ ml: 1, mt: 1 }}
+            />
+        </>}
+    </Grid>
+}
+
 const MetaDocumentForm = () => {
     const {t} = useTranslation();
     const {fieldErrors} = useFormContext()
-
-    const filterResponsables = builder.neq('nif', null)
 
     const tabs = [
         {
@@ -77,13 +118,7 @@ const MetaDocumentForm = () => {
         {
             value: "portafirmes",
             label: t('page.metaDocument.tabs.portafirmes'),
-            content: <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-                <GridFormField xs={12} name="firmaPortafirmesActiva"/>
-                <GridFormField xs={12} name="portafirmesFluxTipus" required/>
-                <GridFormField xs={12} name="portafirmesResponsables" multiple autocomplete
-                               filter={filterResponsables} namedQueries={[`ADD_PLUGIN_USERS`]}/>
-                <GridFormField xs={12} name="portafirmesSequenciaTipus" required/>
-            </Grid>,
+            content: <PortafirmesMetaDocumentForm/>,
         },
         {
             value: "navegador",
@@ -113,7 +148,7 @@ const MetaDocumentForm = () => {
         },
     ]
 
-    return <TabComponent tabs={tabs} scrollButtons variant="scrollable"/>
+    return <TabComponent tabs={tabs} scrollButtons/>
 }
 
 // Grid
@@ -208,6 +243,7 @@ const MetaDocumentGrid = () => {
                 perspectives={perspectives}
                 rowAdditionalActions={actions}
 
+                popupEditFormDialogComponentProps={{ fullWidth: true, maxWidth: 'lg' }}
                 toolbarCreateTitle={t('page.metaDocument.action.new.label')}
                 popupEditFormI18nKeys={{
                     createSuccess: 'page.metaDocument.action.new.ok',
