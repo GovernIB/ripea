@@ -1,6 +1,6 @@
 import {useTranslation} from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import {useEffect, useMemo, useRef, useState} from "react";
+import {useMemo, useRef, useState} from "react";
 import {GridPage, MuiDialog, useResourceApiService} from "reactlib";
 import {CardData, CardPage} from "../../../components/CardData.tsx";
 import StyledMuiGrid, {ToolbarButton} from "../../../components/StyledMuiGrid.tsx";
@@ -53,21 +53,16 @@ const NodeGrup = (props: any) => {
 const useActions = (refresh?: () => void) => {
     const [prediccio, setPrediccio] = useState<any>();
     const {
-        isReady: apiIsReady,
         artifactAction: apiAction,
     } = useResourceApiService('organGestorResource');
 
-    useEffect(() => {
-        if (apiIsReady) {
-            apiAction(undefined, {code: "DIR3_UPDATE"})
-                .then((res) => {
-                    setPrediccio(res)
-                })
-                .catch(() => {
-                    setPrediccio(undefined)
-                });
-        }
-    }, [apiIsReady]);
+    const getPrediccio = () => {
+        setPrediccio(undefined)
+        apiAction(undefined, {code: "DIR3_UPDATE"})
+            .then((res) => {
+                setPrediccio(res)
+            })
+    };
 
     const descargarPDF = async (element:HTMLElement) => {
         const canvas = await html2canvas(element, {
@@ -105,6 +100,7 @@ const useActions = (refresh?: () => void) => {
 
     return {
         prediccio,
+        getPrediccio,
         descargarPDF,
     }
 }
@@ -115,6 +111,7 @@ const useOrganGestorSyncDialog = () => {
     const ref = useRef();
 
     const handleOpen = () => {
+        getPrediccio();
         setOpen(true);
     }
 
@@ -124,7 +121,7 @@ const useOrganGestorSyncDialog = () => {
         }
     };
 
-    const {prediccio, descargarPDF} = useActions(handleClose);
+    const {prediccio, getPrediccio, descargarPDF} = useActions(handleClose);
     // const changed = useMemo(() => (
     //     prediccio?.unitatsVigents?.filter?.((unitat:any) => unitat.oldDenominacio!=unitat.denominacioCooficial)
     // ), [prediccio])
