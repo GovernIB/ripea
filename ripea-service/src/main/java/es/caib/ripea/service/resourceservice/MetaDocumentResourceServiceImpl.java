@@ -35,6 +35,7 @@ import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
 import es.caib.ripea.service.helper.MetaDocumentHelper;
 import es.caib.ripea.service.helper.MetaExpedientHelper;
+import es.caib.ripea.service.helper.UsuariHelper;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
 import es.caib.ripea.service.intf.base.exception.ResourceNotFoundException;
@@ -42,6 +43,8 @@ import es.caib.ripea.service.intf.base.model.FieldOption;
 import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.MetaDocumentDto;
+import es.caib.ripea.service.intf.dto.PinbalServeiDto;
+import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.model.ContingutResource;
 import es.caib.ripea.service.intf.model.EntitatResource;
 import es.caib.ripea.service.intf.model.MetaDadaResource;
@@ -63,7 +66,7 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
 	private final OrganGestorRepository organGestorRepository;
 	private final TipusDocumentalRepository tipusDocumentalRepository;
 	private final MetaDocumentHelper metaDocumentHelper;
-	private final MetaExpedientHelper metaExpedientHelper;
+	private final UsuariHelper usuariHelper;
 	private final EntityComprovarHelper entityComprovarHelper;
 	private final ExcepcioLogHelper excepcioLogHelper;
 	private final ConfigHelper configHelper;
@@ -214,7 +217,7 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
 			Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotFoundException {
 		
 		metaDocumentHelper.update(
-				resource.getEntitat().getId(),
+				resource.getMetaExpedient()!=null?resource.getMetaExpedient().getId():null,
 				resourceToMetaDocumentDto(resource),
 				resource.getPlantilla()!=null?resource.getPlantilla().getName():null,
 				resource.getPlantilla()!=null?resource.getPlantilla().getContentType():null,
@@ -223,8 +226,37 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
 		return resource;
 	}
 	
+	@Override
+	protected MetaDocumentResource entityToResource(MetaDocumentResourceEntity entity) {
+		MetaDocumentResource metaDocumentResource = objectMappingHelper.newInstanceMap(
+				entity,
+				getResourceClass(),
+				"portafirmesResponsables");
+		if (Utils.hasValue(entity.getPortafirmesResponsables())) {
+			List<ResourceReference<UsuariResource, String>> responsables = new ArrayList<>();
+			String[] pfResponsables = entity.getPortafirmesResponsables().split(",");
+            for (String codi : pfResponsables) {
+            	UsuariDto usuariResponsable = usuariHelper.findUsuariCarrecAmbCodiDades(codi);
+                if (usuariResponsable != null) {
+                	String txtDisplay = usuariResponsable.getNom() + " (" + Utils.nifMask(usuariResponsable.getNif()) +")";
+                    responsables.add(ResourceReference.toResourceReference(usuariResponsable.getCodi(), txtDisplay));
+                }
+            }
+            metaDocumentResource.setPortafirmesResponsables(responsables);
+		}
+		if (entity.getPinbalServei()!=null) {
+			metaDocumentResource.setPinbalServei(ResourceReference.toResourceReference(
+					entity.getPinbalServei().getId(),
+					entity.getPinbalServei().getNom()));
+		}
+		return metaDocumentResource;
+	}
+	
 	private MetaDocumentDto resourceToMetaDocumentDto(MetaDocumentResource resource) {
-		MetaDocumentDto metaDocumentDto = objectMappingHelper.newInstanceMap(resource, MetaDocumentDto.class, "serialVersionUID");
+		MetaDocumentDto metaDocumentDto = objectMappingHelper.newInstanceMap(
+				resource,
+				MetaDocumentDto.class,
+				"serialVersionUID", "createdBy", "createdDate", "lastModifiedBy", "lastModifiedDate");
 		if (resource.getPortafirmesResponsables()!=null && resource.getPortafirmesResponsables().size()>0) {
 			String[] responsablesFirma = new String[resource.getPortafirmesResponsables().size()];
 			for (int r=0; r<resource.getPortafirmesResponsables().size(); r++) {
@@ -232,6 +264,11 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
 				responsablesFirma[r] = responsable.getId();
 			}
 			metaDocumentDto.setPortafirmesResponsables(responsablesFirma);
+		}
+		if (resource.getPinbalServei()!=null) {
+			PinbalServeiDto pinbalServeiDto = new PinbalServeiDto();
+			pinbalServeiDto.setId(resource.getPinbalServei().getId());
+			metaDocumentDto.setPinbalServei(pinbalServeiDto);
 		}
 		return metaDocumentDto;
 	}
