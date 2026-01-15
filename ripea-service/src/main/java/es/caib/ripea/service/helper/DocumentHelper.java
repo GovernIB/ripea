@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 import java.util.zip.ZipEntry;
@@ -64,12 +65,15 @@ import es.caib.ripea.service.intf.dto.DocumentNtiTipoFirmaEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentOrigenEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentPublicacioDto;
 import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentTipusFirmaEnumDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
 import es.caib.ripea.service.intf.dto.NtiOrigenEnumDto;
 import es.caib.ripea.service.intf.dto.PermissionEnumDto;
+import es.caib.ripea.service.intf.dto.ProgresProcessamentZipDto;
+import es.caib.ripea.service.intf.dto.SignatureInfoDto;
 import es.caib.ripea.service.intf.exception.ArxiuJaGuardatException;
 import es.caib.ripea.service.intf.exception.ContingutNotUniqueException;
 import es.caib.ripea.service.intf.exception.ValidacioFirmaException;
@@ -90,6 +94,7 @@ public class DocumentHelper {
 	@Autowired private OrganGestorHelper organGestorHelper;
 	@Autowired private DocumentFirmaAppletHelper firmaAppletHelper;
 	@Autowired private ConversioTipusHelper conversioTipusHelper;
+	@Autowired private CarpetaHelper carpetaHelper;
 	@Autowired private DocumentPublicacioRepository documentPublicacioRepository;
 	
 	public DocumentDto crearDocument(
@@ -326,6 +331,86 @@ public class DocumentHelper {
 
 		return dto;
 	}
+	
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public void processarDocumentNewTransaction(
+			Map<String, List<String>> ubicacioDocuments,
+			ProgresProcessamentZipDto progres,
+			Long entitatId,
+			DocumentDto documentDto,
+			Long pareId,
+			String rolActual) {
+		
+        assignarCarpeta(
+        		ubicacioDocuments,
+        		documentDto, 
+        		entitatId, 
+        		pareId);
+         
+        validarFirmesAmbProgres(documentDto, progres);
+        
+		ContingutEntity pare = null;
+		pare = contingutHelper.comprovarContingutDinsExpedientModificable(
+				entitatId,
+				documentDto.getPareId(),
+				false,
+				false,
+				false,
+				false, 
+				false, 
+				true, 
+				rolActual);
+		
+		crearDocument(
+				entitatId,
+				documentDto,
+				pare,
+				false,
+				true,
+				false);
+	}
+	
+    private void assignarCarpeta(Map<String, List<String>> ubicacioDocuments, DocumentDto documentDto, Long entitatId, Long pareId) {
+        var nomFitxer = documentDto.getFitxerNom();
+        var ubicacio = ubicacioDocuments.get(documentDto.getRutaZip());
+
+        if (ubicacio != null) {
+            var pare = entityComprovarHelper.comprovarContingut(pareId);
+            var carpetaId = carpetaHelper.crearCarpetaRecursiu(
+            		entitatId, 
+            		pare, 
+            		pareId, 
+            		nomFitxer, 
+            		ubicacio.iterator());
+            documentDto.setPareId(carpetaId);
+        } else {
+            documentDto.setPareId(pareId);
+        }
+    }
+    
+    private void validarFirmesAmbProgres(DocumentDto documentDto, ProgresProcessamentZipDto progres) {
+        try {
+            progres.addInfo("Validant les firmes del document: " + documentDto.getFitxerNom());
+
+            SignatureInfoDto signatureInfo =
+                    pluginHelper.detectaFirmaDocument(documentDto.getFitxerContingut(), documentDto.getFitxerContentType());
+
+            if (signatureInfo.isSigned()) {
+                documentDto.setAmbFirma(!signatureInfo.isError());
+                documentDto.setDocumentFirmaTipus(DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA);
+                documentDto.setTipusFirma(DocumentTipusFirmaEnumDto.ADJUNT);
+                documentDto.setValidacioFirmaCorrecte(!signatureInfo.isError());
+                documentDto.setValidacioFirmaErrorMsg(signatureInfo.getErrorMsg());
+            } else {
+                documentDto.setAmbFirma(false);
+                documentDto.setDocumentFirmaTipus(DocumentFirmaTipusEnumDto.SENSE_FIRMA);
+            }
+        } catch (Exception e) {
+            progres.setError(true);
+            progres.setErrorMsg("Error validant firma del document: " + documentDto.getFitxerNom() + " [Excepció: " + e.getMessage() + "]");
+            logger.error("Error validant firma del document: " + documentDto.getFitxerNom(), e);
+        }
+    }
 
 	public ArxiuEstatEnumDto getArxiuEstat(DocumentFirmaTipusEnumDto documentFirmaTipus, DocumentEstatEnumDto estatAnterior, boolean firmaParcial) {
 		boolean isFirmatPujatArxiu = documentFirmaTipus != DocumentFirmaTipusEnumDto.SENSE_FIRMA && isFirmatPujatManualmentDefinitu();

@@ -46,7 +46,7 @@ public class ProgresProcessamentZipDto {
 	}
 	
 	public boolean isFinished() {
-		return numOperacions.equals(numOperacionsRealitzades);
+		return progres == 100;
 	}
 	
 	@Getter @Setter @AllArgsConstructor @NoArgsConstructor

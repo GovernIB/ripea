@@ -3,9 +3,10 @@ package es.caib.ripea.service.resourceservice;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.chrono.ChronoLocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -100,6 +101,7 @@ import es.caib.ripea.service.intf.dto.CodiValorDto;
 import es.caib.ripea.service.intf.dto.DocumentAmbTipusDto;
 import es.caib.ripea.service.intf.dto.DocumentDto;
 import es.caib.ripea.service.intf.dto.ElementTipusEnumDto;
+import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaContingutDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaEstatDto;
@@ -114,6 +116,7 @@ import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
 import es.caib.ripea.service.intf.dto.ResultatConsultaDto;
 import es.caib.ripea.service.intf.dto.SiNoEnumDto;
 import es.caib.ripea.service.intf.dto.TipusRegistreEnumDto;
+import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.model.ExpedientResource.CanviEstatExpedientFormAction;
 import es.caib.ripea.service.intf.model.ExpedientResource.CanviPrioritatExpedientFormAction;
 import es.caib.ripea.service.intf.model.ExpedientResource.ExpedientFilterForm;
@@ -126,6 +129,7 @@ import es.caib.ripea.service.intf.model.ExpedientResource.MoureTotFormAction;
 import es.caib.ripea.service.intf.model.ExpedientResource.TancarExpedientFormAction;
 import es.caib.ripea.service.intf.model.NodeResource.MassiveAction;
 import es.caib.ripea.service.intf.resourceservice.ExpedientResourceService;
+import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.permission.ExtendedPermission;
 import es.caib.ripea.service.resourcehelper.ContingutLogResourceHelper;
@@ -175,7 +179,8 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     private final ZipImportacioHelper zipImportacioHelper;
     private final MessageHelper messageHelper;
     private final ContingutLogResourceHelper contingutLogResourceHelper;
-
+    private final AplicacioService aplicacioService;
+    
     @PostConstruct
     public void init() {
         
@@ -1509,16 +1514,21 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		        ContingutEntity pare = contingutRepository.findById(entity.getId()).orElseThrow();
 
 		        FileReference zipFile = params.getDocumentZip();
-		        try (InputStream inputStream = new ByteArrayInputStream(zipFile.getContent())) {
-		            int total = zipImportacioHelper.descomprimirZip(
-		                    inputStream,
-		                    configHelper.getRolActual(),
-		                    pare.getId(),
-		                    null, // tascaId
-		                    entitatEntity.getId()
-		            );
-		            log.info("S'han importat {} documents des del ZIP", total);
-		        }
+		        UsuariDto usuariActual = aplicacioService.getUsuariActual();
+		        EntitatDto entitatActual = new EntitatDto();
+		        entitatActual.setCodi(entitatEntity.getCodi());
+		        entitatActual.setId(entitatEntity.getId());
+		        
+		        Path tempZip = Files.createTempFile("import-", ".zip");
+		        Files.write(tempZip, zipFile.getContent());
+				zipImportacioHelper.processarZip(
+						usuariActual, 
+						entitatActual, 
+						tempZip, 
+						configHelper.getRolActual(),
+						pare.getId(), 
+						null// tascaId
+				);
 
 		        return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
 		    } catch (Exception ex) {

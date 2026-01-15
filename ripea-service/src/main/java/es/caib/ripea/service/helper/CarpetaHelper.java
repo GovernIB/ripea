@@ -2,6 +2,7 @@ package es.caib.ripea.service.helper;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -331,6 +332,39 @@ public class CarpetaHelper {
 		
 		return resultat;
 	}
+	
+    public Long crearCarpetaRecursiu(
+    		Long entitatId, 
+    		ContingutEntity pare,
+    		Long pareId, 
+    		String nomFitxer,
+    		Iterator<String> ubicacio) {
+        if (!ubicacio.hasNext()) return pareId;
+
+        var nomCarpeta = ubicacio.next();
+        var carpeta = comprovarCarpetaExpedient(nomCarpeta, pare);
+        var carpetaId = carpeta != null
+                ? carpeta.getId()
+                : crearCarpeta(entitatId, pareId, nomFitxer, nomCarpeta);
+
+        return crearCarpetaRecursiu(entitatId, carpeta, carpetaId, nomFitxer, ubicacio);
+    }
+    
+    private Long crearCarpeta(Long entitatId, Long pareId, String nomFitxer, String nomCarpeta) {
+        logger.info("Creant la carpeta {} pel document {}", nomCarpeta, nomFitxer);
+        var carpeta = create(
+				entitatId,
+				pareId,
+				nomCarpeta,
+				false,
+				null,
+				false,
+				null, 
+				false, 
+				null, 
+				true);
+        return carpeta != null ? carpeta.getId() : null;
+    }
 	
 	private List<ExpedientCarpetaArbreDto> findCarpetesExpedient(Long entitatId, ExpedientEntity expedient) {
 		List<ExpedientCarpetaArbreEntity> expedientCarpetes = expedientCarpetaArbreRepository.findByPare(entitatId, expedient.getId());

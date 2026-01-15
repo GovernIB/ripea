@@ -2,6 +2,8 @@ package es.caib.ripea.service.service;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -15,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -1568,14 +1571,61 @@ public class DocumentServiceImpl implements DocumentService {
 	}
 
 	@Override
+	@Async
 	@Transactional
-	public int extreureDocumentsZip(InputStream zip, String rolActual, Long pareId, Long tascaId, EntitatDto entitatActual) throws IOException {
-		return zipImportacioHelper.descomprimirZip(zip, rolActual, pareId, tascaId, entitatActual.getId());
+	public void processarZipAsync(
+			UsuariDto usuariActual, 
+			Path tempZip, 
+			String rolActual, 
+			Long pareId, 
+			Long tascaId, 
+			EntitatDto entitatActual) {
+//		try (InputStream zip = new BufferedInputStream(Files.newInputStream(tempZip))) {
+//			InputStream zipStream = new BufferedInputStream(zip);
+//            zipImportacioHelper.processarZip(
+//                    usuariActual,
+//                    entitatActual, 
+//                    zipStream, 
+//                    rolActual, 
+//                    pareId, 
+//                    tascaId
+//            );
+//        } catch (Exception e) {
+//            logger.error("Error async ZIP", e);
+//        } finally {
+//            try { Files.deleteIfExists(tempZip); } catch (Exception ignore) {}
+//        }
+	    try {
+	        zipImportacioHelper.processarZip(
+	                usuariActual,
+	                entitatActual,
+	                tempZip,
+	                rolActual,
+	                pareId,
+	                tascaId
+	        );
+	    } catch (Exception e) {
+	        logger.error("Error async ZIP", e);
+	    } finally {
+	        try {
+	            Files.deleteIfExists(tempZip);
+	        } catch (Exception ignore) {}
+	    }
 	}
 
 	@Override
+	public ProgresProcessamentZipDto inicialitzarProgresProcessamentZip(Long pareId) {
+		return zipImportacioHelper.inicialitzarProgres(pareId);
+	}
+	
+	@Override
 	public ProgresProcessamentZipDto obtenirProgresProcessamentZip(Long pareId) {
 		return zipImportacioHelper.obtenirProgresActual(pareId);
+	}
+
+	@Override
+	public void cancelarProcessamentZip(Long pareId) {
+		zipImportacioHelper.cancelarProcessamentZip(pareId);
 	}
 	
 }

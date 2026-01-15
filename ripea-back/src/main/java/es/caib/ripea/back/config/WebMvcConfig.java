@@ -65,7 +65,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 	@Autowired private AccesFluxosFirmaUsuariInterceptor accesFluxosFirmaUsuariInterceptor;
 	@Autowired private AccesSuperInterceptor accesSuperInterceptor;
 
-	public static final int MAX_UPLOAD_SIZE = 52428800;
+	public static final int MAX_UPLOAD_SIZE = 1000000000;
 	
 	@Bean
 	public FilterRegistrationBean<SiteMeshFilter> sitemeshFilter() {

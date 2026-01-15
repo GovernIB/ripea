@@ -4,7 +4,7 @@
 package es.caib.ripea.service.intf.service;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -789,12 +789,19 @@ public interface DocumentService {
     public byte[] getPlantillaImportacioZip();
     
     @PreAuthorize("isAuthenticated()")
-	public int extreureDocumentsZip(
-			InputStream zip, 
+	public void processarZipAsync(
+			UsuariDto usuariActual,
+			Path tempZip, 
 			String rolActual, 
 			Long pareId, 
 			Long tascaId, 
 			EntitatDto entitatActual) throws IOException;
+    
+    @PreAuthorize("isAuthenticated()")
+	public void cancelarProcessamentZip(Long pareId);
+    
+    @PreAuthorize("isAuthenticated()")
+	public ProgresProcessamentZipDto inicialitzarProgresProcessamentZip(Long pareId);
     
     @PreAuthorize("isAuthenticated()")
 	public ProgresProcessamentZipDto obtenirProgresProcessamentZip(Long pareId);

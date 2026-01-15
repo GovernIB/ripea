@@ -10,162 +10,207 @@
 <html>
 <head>
 	<title>${titol}</title>
-	<link href="<c:url value="/webjars/select2/4.0.6-rc.1/dist/css/select2.min.css"/>" rel="stylesheet"/>
-	<link href="<c:url value="/webjars/select2-bootstrap-theme/0.1.0-beta.4/dist/select2-bootstrap.min.css"/>" rel="stylesheet"/>
-	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/select2.min.js"/>"></script>
-	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/i18n/${requestLocale}.js"/>"></script>
-	<link href="<c:url value="/css/jasny-bootstrap.min.css"/>" rel="stylesheet">
-	<script src="<c:url value="/js/jasny-bootstrap.min.js"/>"></script>
-	<%--
-	<link href="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/css/bootstrap-datepicker.min.css"/>" rel="stylesheet"/>
-	<script src="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/js/bootstrap-datepicker.min.js"/>"></script>
-	--%>
-	<script src="<c:url value="/webjars/moment/2.15.1/min/moment.min.js"/>"></script>
-	<script src="<c:url value="/webjars/moment/2.15.1/min/locales.min.js"/>"></script>
-	<script src="<c:url value="/webjars/moment/2.15.1/locale/${requestLocale}.js"/>"></script>
-	<link href="<c:url value="/webjars/eonasdan-bootstrap-datetimepicker/4.7.14/build/css/bootstrap-datetimepicker.min.css"/>" rel="stylesheet"/>
-	<script src="<c:url value="/webjars/eonasdan-bootstrap-datetimepicker/4.7.14/build//js/bootstrap-datetimepicker.min.js"/>"></script>
-	<script src="<c:url value="/js/webutil.common.js"/>"></script>
-	<script src="<c:url value="/webjars/autoNumeric/1.9.30/autoNumeric.js"/>"></script>
-	<script src="<c:url value="/js/jquery.maskedinput.min.js"/>"></script>
+	<link href="<c:url value='/webjars/select2/4.0.6-rc.1/dist/css/select2.min.css'/>" rel="stylesheet"/>
+	<link href="<c:url value='/webjars/select2-bootstrap-theme/0.1.0-beta.4/dist/select2-bootstrap.min.css'/>" rel="stylesheet"/>
+	<script src="<c:url value='/webjars/select2/4.0.6-rc.1/dist/js/select2.min.js'/>"></script>
+	<script src="<c:url value='/webjars/select2/4.0.6-rc.1/dist/js/i18n/${requestLocale}.js'/>"></script>
+	<link href="<c:url value='/css/jasny-bootstrap.min.css'/>" rel="stylesheet">
+	<script src="<c:url value='/js/jasny-bootstrap.min.js'/>"></script>
+	<script src="<c:url value='/webjars/moment/2.15.1/min/moment.min.js'/>"></script>
+	<script src="<c:url value='/webjars/moment/2.15.1/min/locales.min.js'/>"></script>
+	<script src="<c:url value='/webjars/moment/2.15.1/locale/${requestLocale}.js'/>"></script>
+	<link href="<c:url value='/webjars/eonasdan-bootstrap-datetimepicker/4.7.14/build/css/bootstrap-datetimepicker.min.css'/>" rel="stylesheet"/>
+	<script src="<c:url value='/webjars/eonasdan-bootstrap-datetimepicker/4.7.14/build/js/bootstrap-datetimepicker.min.js'/>"></script>
+	<script src="<c:url value='/js/webutil.common.js'/>"></script>
+	<script src="<c:url value='/webjars/autoNumeric/1.9.30/autoNumeric.js'/>"></script>
+	<script src="<c:url value='/js/jquery.maskedinput.min.js'/>"></script>
 	<rip:modalHead/>
-<style type="text/css">
 
-#command {
-	padding-bottom: 10px;
-}
+	<style>
+	#command { padding-bottom: 10px; }
+	.title-container {
+		margin-bottom: 20px;
+		text-align: left;
+		background-color: #696666;
+		padding-left: 5px;
+		line-height: 25px;
+		height: 25px;
+		color: #fff;
+	}
+	.progressContainer {
+		margin-top: 15px;
+		text-align: center;
+		width: 95%;
+		margin-left:auto;
+		margin-right:auto;
+	}
+	.progressText {
+		margin-top: 10px; 
+	}
+	.help-block {
+		color: #a94442;
+	}
+	</style>
 
-.title-container {
-	margin-bottom: 20px;
-	text-align: left;
-  	background-color: #696666;
-  	padding-left: 5px;
-  	line-height: 25px;
-  	height: 25px;
-  	color: #fff;
-}
+	<script>
+	var intervalProgres;
+	var preparantZipMsg = "<spring:message code='contingut.boto.crear.document.multiple.preparant'/>";
+	var tancarModalMsg = "<spring:message code='contingut.boto.crear.document.multiple.tancar'/>";
+	var cancelarModalMsg = "<spring:message code='contingut.boto.crear.document.multiple.cancelar'/>";
 
-</style>
+	$(document).ready(function() {
 
-<script>
-var intervalProgres;
-var content="<spring:message code="contingut.boto.crear.document.multiple.cancelar"/>";
+		$('#cancelarProcessarDocumentsBtn').hide();
+		
+		clearInterval(intervalProgres);
 
-$(document).ready(function() {
+		mostrarBarraProgresExistent();
 
-	clearInterval(intervalProgres);
+		processarZip();
+		
+		$('button[name=cancelarBtn]').click(tancarModalImportacio);
+
+		$('button.close').click(function(e){
+			e.preventDefault();
+			tancarModalImportacio();
+		});
+
+	});
 	
-	let currentIframe = window.frameElement;
-	if (currentIframe) {
-		var target = $(currentIframe.parentElement).find(".progressContainer");
-        if (target) {
-            target.remove();
-        }
+	function processarZip() {
+		$(".progressContainer").remove();
+
+		$('#processarDocumentsBtn').on('click', function () {
+			
+		    $('#processarDocumentsBtn', parent.document).attr('disabled', true);
+		    
+		    var form = $('form')[0];
+		    var data = new FormData(form);
+
+		    $('form, .esborranys').hide();
+			$('#cancelarProcessarDocumentsBtn', parent.document).show();
+			mostrarBarraProgres();
+        	
+		    $.ajax({
+		        url: form.action,
+		        type: 'POST',
+		        data: data,
+		        processData: false,
+		        contentType: false,
+		        error: function(jqXHR, textStatus, errorThrown) {
+		        	$('form, .esborranys').show();
+		        	$('#cancelarProcessarDocumentsBtn', parent.document).hide();
+				    $('#processarDocumentsBtn', parent.document).attr('disabled', false);
+				    $('#progressZip .progressContainer').remove();
+				    $('form').find('.help-block').remove();
+		        	$('form .fileinput').after('<p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<span>' + jqXHR.responseText + '</span></p>')
+		            clearInterval(intervalProgres);
+		        }
+		    });
+		});
 	}
 	
-	$('button[name=processarDocumentsBtn]').click( function(e) {
-        $('.datatable-dades-carregant', parent.document).css("display", "none");
-        
-        mostrarBarraProgres();
-    });
-	
-	setTimeout(function () {
-        $('[id^="ntiEstadoElaboracion_"]').each(function() {
-            $(this).trigger('change');
-        });
-    }, 50);
-	
-	$('[id^="ntiEstadoElaboracion_"]').change(function() {
-        var index = $(this).attr('id').split('_')[1];  // Obtenir índex del camp seleccionat
-        var estatElaboracioSeleccionat = $(this).val();
-        
-       	var estatsElaboracioIdentificadorEniObligat = "${estatsElaboracioIdentificadorEniObligat}".replace(/\s/g, '').split(',');
-		if (estatElaboracioSeleccionat && (estatsElaboracioIdentificadorEniObligat.includes(estatElaboracioSeleccionat))) {
-			$('#ntiIdDocumentoOrigenDiv_' + index).show();
-		} else {
-			$('#ntiIdDocumentoOrigenDiv_' + index).hide();
+	function cancelarProcessamentZip(){
+		if(confirm(cancelarModalMsg)){
+			$.ajax({
+				url: "<c:url value='/contingut/${command.pareId}/zip/importacio/cancelar/'/>",
+		        type: 'POST',
+				success: function () {
+					window.top.location.reload();
+		        }
+		    });
 		}
-	});
-
-	// En tancar modal
-	$('button[name=cancelarBtn]').click( function(e) {
-		tancarModalImportacio();
-    });
-	
-	$('button.close', currentIframe.parentElement.parentElement).click(function (e) {
-		e.stopPropagation();
-		e.preventDefault();
+	}
 		
-		tancarModalImportacio();
-	});
-	
-	function mostrarBarraProgres() {
-		let rootIframe = window.frameElement;
+	function tancarModalImportacio(){
+		if(confirm(tancarModalMsg)){
+			window.top.location.reload();
+		}
+	}
 		
-		var progressContainer = '<div class="progressContainer"> \
-									<div class="progress"> \
-										<div id="bar" class="progress-bar" role="progressbar progress-bar-striped active" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;">0%</div> \
-									</div> \
-									<div class="progressText"> \
-										<p >...</p> \
-									</div> \
-								</div>';
-							
-		$(progressContainer).insertAfter(parent.$('.datatable-dades-carregant'));
-		
-		$(rootIframe.parentElement).find(".progressContainer").css({
-			"width": "95%",
-			"margin": "auto",
-			"margin-top": "15px",
-			"text-align": "center"
-		});
-		
-		$(rootIframe.parentElement).find(".progressText").css({
-			"margin-top": "10px"
-		});
-		
+	function mostrarBarraProgres(){
+		var html = '<div class="progressContainer"> \
+		           		<div class="progress"> \
+		           			<div class="progress-bar progress-bar-striped active" style="width:0%">0%</div> \
+		            	</div> \
+		            <div class="progressText">' + preparantZipMsg + '</div> \
+		            </div>';
+		$('#progressZip').html(html);
 		refreshProgres();
 	}
-	
-	function refreshProgres() {
-		intervalProgres =  setInterval(function(){ consultarProgreso(); }, 50);
+
+	function refreshProgres(){
+		intervalProgres = setInterval(consultarProgreso, 100); // Cada 0.5 segons refrescar
 	}
 
-    function consultarProgreso() {
-    	$.ajax({
-            url: "<c:url value="/contingut/${command.pareId}/zip/importacio/progres/"/>",
-            type: "GET",
-            success: function(response) {
-            	let rootIframe = window.frameElement;
-            	
-            	if (! response.finished) {
-            		$(rootIframe.parentElement).find(".progress-bar").css("width", response.progres + "%").text(Math.round(response.progres) + "%");
-            		
-            		$(response.info).each(function(index, info) {
-                		$(rootIframe.parentElement).find(".progressText").html(info.text || "Procesando...");
-            		});
-                }
-            	
-            }
-        });
-    }
-    
-    function tancarModalImportacio() {
-    	if (confirm(content)) {
-    		window.top.location.reload();
-    	}
-    }
-	  
-});
-</script>
+	function consultarProgreso(){
+		$.ajax({
+			url: "<c:url value='/contingut/${command.pareId}/zip/importacio/progres/'/>",
+			type: "GET",
+			success: function(res){
+				if(res){
+					var prog = Math.round(res.progres || 0);
+					$('#progressZip .progress-bar')
+						.css('width', prog + '%')
+						.text(prog + '%');
 
+					if(res.error){
+						$('#progressZip .progress-bar').addClass('progress-bar-danger');
+						$('#progressZip .progressText').text(res.errorMsg || 'Error processant zip...');
+					} else if (res.info && res.info.length > 0){
+						$('#progressZip .progressText').text(res.info[res.info.length-1].text || 'Procesando...');
+					}
+
+					if(res.finished){
+						clearInterval(intervalProgres);
+						window.top.location.reload();
+					}
+				}
+			},
+			error: function(){
+				clearInterval(intervalProgres);
+				$('#progressZip .progress-bar').addClass('progress-bar-danger');
+				$('#progressZip .progressText').text('Error consultant progress...');
+			}
+		});
+	}
+		
+	function mostrarBarraProgresExistent() {
+	    $.ajax({
+	        url: "<c:url value='/contingut/${command.pareId}/zip/importacio/progres/'/>",
+	        type: "GET",
+	        success: function(res) {
+	            if (res && !res.finished) {
+	            	$('form, .esborranys').hide();
+	            	$('#cancelarProcessarDocumentsBtn', parent.document).show();
+	            	$('#processarDocumentsBtn', parent.document).attr('disabled', true);
+	            	
+	                if ($("#progressZip .progressContainer").length === 0) {
+	                    var progressContainer = 
+	                        '<div class="progressContainer"> \
+	                         	<div class="progress"> \
+	                         		<div class="progress-bar progress-bar-striped active" style="width:' + res.progres + '%">' + Math.round(res.progres) + '%</div> \
+	                         	</div> \
+	                        	<div class="progressText">' + (res.info[0]?.text || preparantZipMsg) + '</div> \
+	                        </div>';
+	                    $("#progressZip").html(progressContainer);
+	                }
+
+	                refreshProgres();
+	            }
+	        }
+	    });
+	}
+	</script>
 </head>
 
 <body>
-
 	<c:set var="formAction"><rip:modalUrl value="${action}"/></c:set>
 
-    <div class="esborranys alert well-sm alert-info alert-dismissable"><spring:message code="contingut.boto.crear.document.multiple.info"/></div>
+	<div class="esborranys alert well-sm alert-info alert-dismissable">
+		<spring:message code="contingut.boto.crear.document.multiple.info"/>
+	</div>
+	<div id="progressZip"></div>
 
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="command" enctype="multipart/form-data">
 		<form:hidden path="tascaId"/>
@@ -176,8 +221,12 @@ $(document).ready(function() {
 		</c:if>
 
 		<div id="modal-botons" class="well">
-			<button type="submit" name="processarDocumentsBtn" class="btn btn-success"><span class="fa fa-save"></span>
-				<spring:message code="comu.boto.processar"/>		
+			<button type="button" onclick="cancelarProcessamentZip();" id="cancelarProcessarDocumentsBtn"  class="btn btn-danger">
+				<span class="fa fa-save"></span> <spring:message code="comu.boto.cancelar"/>
+			</button>
+			
+			<button type="button" id="processarDocumentsBtn" class="btn btn-success">
+				<span class="fa fa-save"></span> <spring:message code="comu.boto.processar"/>
 			</button>
 			
 			<button type="button" name="cancelarBtn" class="btn btn-default">
