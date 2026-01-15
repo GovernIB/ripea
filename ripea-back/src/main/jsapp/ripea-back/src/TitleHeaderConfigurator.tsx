@@ -41,6 +41,7 @@ const TITLES: any = {
     '/permis': "page.user.menu.permisos",
     '/domini': "page.user.menu.dominis",
     '/metaDocument': "page.user.menu.documents",
+    '/urlInstruccio': "page.user.menu.url",
 };
 
 export const setTitlePage = (title:string) => {

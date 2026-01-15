@@ -1,19 +1,24 @@
 package es.caib.ripea.service.resourceservice;
 
+import es.caib.ripea.persistence.entity.resourceentity.EntitatResourceEntity;
+import es.caib.ripea.persistence.entity.resourceentity.URLInstruccioResourceEntity;
+import es.caib.ripea.persistence.entity.resourcerepository.EntitatResourceRepository;
+import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
+import es.caib.ripea.service.intf.model.URLInstruccioResource;
 import org.springframework.stereotype.Service;
 
 import com.turkraft.springfilter.FilterBuilder;
 import com.turkraft.springfilter.parser.Filter;
 
-import es.caib.ripea.persistence.entity.resourceentity.URLInstruccioResourceEntity;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.intf.model.ContingutResource;
 import es.caib.ripea.service.intf.model.EntitatResource;
-import es.caib.ripea.service.intf.model.URLInstruccioResource;
 import es.caib.ripea.service.intf.resourceservice.URLInstruccioResourceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -21,7 +26,8 @@ import lombok.extern.slf4j.Slf4j;
 public class URLInstruccioResourceServiceImpl extends BaseMutableResourceService<URLInstruccioResource, Long, URLInstruccioResourceEntity> implements URLInstruccioResourceService {
 
 	private final ConfigHelper configHelper;
-	
+	private final EntitatResourceRepository entitatResourceRepository;
+
 	protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
 		
         String entitatActualCodi = configHelper.getEntitatActualCodi();
@@ -35,4 +41,11 @@ public class URLInstruccioResourceServiceImpl extends BaseMutableResourceService
         
         return filtreBase.generate();
 	}
+
+    @Override
+    protected void beforeCreateSave(URLInstruccioResourceEntity entity, URLInstruccioResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
+        String entitatActualCodi = configHelper.getEntitatActualCodi();
+        EntitatResourceEntity entitat = entitatResourceRepository.findByCodi(entitatActualCodi);
+        entity.setEntitat(entitat);
+    }
 }

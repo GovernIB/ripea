@@ -358,7 +358,7 @@ const useMenuAdmin = () => {
                     id: 'url',
                     title: t('page.user.menu.url'),
                     // icon: '',
-                    onClick: () => toProgramaAntic('urlInstruccio'),
+                    to: '/urlInstruccio',
                     hidden: !user?.sessionScope?.isUrlInstruccioEnabled,
                 },
                 {

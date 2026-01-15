@@ -36,9 +36,9 @@ const DominiForm = () => {
         <GridFormField xs={12} name="nom"/>
         <GridFormField xs={12} name="descripcio" type={"textarea"}/>
         <GridFormField xs={12} name="consulta" type={"textarea"}
-                       componentProps={{ placeholder: "SELECT field_id AS ID, field_valor AS VALOR FROM tables" }}/>
+                       componentProps={{ InputLabelProps: { shrink: true }, placeholder: "SELECT field_id AS ID, field_valor AS VALOR FROM tables" }}/>
         <GridFormField xs={12} name="cadena" type={"textarea"}
-                       componentProps={{ placeholder: "" +
+                       componentProps={{ InputLabelProps: { shrink: true }, placeholder: "" +
                                "<local-tx-datasource>\n" +
                                "  <connection-url>jdbc:oracle:thin:@localhost:1521/orcl</connection-url>\n" +
                                "  <driver-class>oracle.jdbc.driver.OracleDriver</driver-class>\n" +
