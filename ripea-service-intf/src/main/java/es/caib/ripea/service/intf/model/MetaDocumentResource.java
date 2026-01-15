@@ -37,20 +37,10 @@ import lombok.experimental.FieldNameConstants;
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = MetaDocumentResource.PERSPECTIVE_COUNT_METADADES),
-                @ResourceConfigArtifact(
-                        type = ResourceArtifactType.ACTION,
-                        code = MetaDocumentResource.ACTION_CREACIO_FLUXE_CODE,
-                        formClass = MetaDocumentResource.class),
-                @ResourceConfigArtifact(
-                        type = ResourceArtifactType.ACTION,
-                        code = MetaDocumentResource.ACTION_EDITAR_FLUXE_CODE,
-                        formClass = MetaDocumentResource.class),
         })
 public class MetaDocumentResource extends MetaNodeResource {
 
 	public static final String PERSPECTIVE_COUNT_METADADES = "COUNT_METADADES";
-	public static final String ACTION_CREACIO_FLUXE_CODE = "CREACIO_FLUXE";
-	public static final String ACTION_EDITAR_FLUXE_CODE = "EDITAR_FLUXE";
 
     @NotNull 
     private MultiplicitatEnumDto multiplicitat = MultiplicitatEnumDto.M_1;

@@ -5,15 +5,11 @@ import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
-import es.caib.ripea.service.intf.config.BaseConfig;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
-import org.springframework.data.annotation.Transient;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 @Getter
@@ -22,11 +18,31 @@ import java.io.Serializable;
 @FieldNameConstants
 @ResourceConfig(
         quickFilterFields = { "codi", "portafirmesFluxDesc" },
-        descriptionField = "portafirmesFluxDesc"
-)
+        descriptionField = "portafirmesFluxDesc",
+        artifacts = {
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = MetaDocumentFluxPortafibResource.ACTION_CREACIO_FLUXE_CODE,
+                        formClass = MetaDocumentFluxPortafibResource.UrlFluxForm.class),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = MetaDocumentFluxPortafibResource.ACTION_EDITAR_FLUXE_CODE,
+                        requiresId = true),
+        })
 public class MetaDocumentFluxPortafibResource extends BaseAuditableResource<Long> {
+
+    public static final String ACTION_CREACIO_FLUXE_CODE = "CREACIO_FLUXE";
+    public static final String ACTION_EDITAR_FLUXE_CODE = "EDITAR_FLUXE";
 
     private ResourceReference<MetaDocumentResource, Long> metaDocument;
     private String portafirmesFluxId;
     private String portafirmesFluxDesc;
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @FieldNameConstants
+    public static class UrlFluxForm implements Serializable {
+        private String metaDocumentId;
+    }
 }
