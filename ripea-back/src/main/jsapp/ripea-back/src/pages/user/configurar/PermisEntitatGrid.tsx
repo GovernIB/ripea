@@ -71,12 +71,15 @@ const PermisEntitatGrid = ()=> {
                 sortModel={sortModel}
                 namedQueries={['ENTITY']}
                 perspectives={['PERMISION#ENTITY']}
-
                 rowAdditionalActions={actions}
                 toolbarElementsWithPositions={[
                     {
                         position: 3,
-                        element: <ToolbarButton title={t('common.create')} icon={'add'} onClick={()=>handelCreate()} color={'primary'}/>,
+                        element: <ToolbarButton 
+                            title={t('common.create')} 
+                            icon={'add'} 
+                            onClick={()=>handelCreate()} 
+                            color={'primary'}>{t('common.create')}</ToolbarButton>,
                     },
                 ]}
                 toolbarHideCreate

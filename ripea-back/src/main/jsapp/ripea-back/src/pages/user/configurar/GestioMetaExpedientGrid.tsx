@@ -1,10 +1,10 @@
 import {useTranslation} from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import {useState} from "react";
 import {GridPage, useFormContext} from "reactlib";
 import {CardPage} from "../../../components/CardData.tsx";
 import StyledMuiGrid, {ToolbarButton} from "../../../components/StyledMuiGrid.tsx";
-import {Button, Grid, Icon} from "@mui/material";
-import { Link } from "react-router-dom";
+import {Badge, IconButton, Grid, Icon} from "@mui/material";
 import GridFormField, {GridButtonField} from "../../../components/GridFormField.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
@@ -12,12 +12,13 @@ import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
 const GestioMetaExpedientFilterForm = () => {
     const { data } = useFormContext();
     return <>
-        <GridFormField xs={3} name="codi"/>
+        <GridFormField xs={2} name="codi"/>
         <GridFormField xs={3} name="nom"/>
         <GridFormField xs={3} name="classificacio"/>
-        <GridFormField xs={3} name="actiu"/>
+        <GridFormField xs={2} name="actiu"/>
+        <GridFormField xs={2} name="revisioEstat"/>
         <GridFormField xs={4} name="organGestor" disabled={data?.ambit == 'COMUNS'} readOnly={data?.ambit == 'COMUNS'}/>
-        <GridFormField xs={4} name="ambit"/>
+        <GridFormField xs={3} name="ambit"/>
         <Grid item xs={1}/>
         <GridButtonField xs={0.6} name="permisDirecte" icon={"pan_tool_alt"}/>
     </>
@@ -48,63 +49,90 @@ const GestioMetaExpedientFilter = (props: any) => {
     </StyledMuiFilter>
 }
 
-// Grid
-const sortModel: any = [{field: 'nom', sort: 'asc'}]
-const columns = [
-    {
-        field: 'codi',
-        flex: 1,
-    },
-    {
-        field: 'classificacio',
-        flex: 1,
-    },
-    {
-        field: 'nom',
-        flex: 1,
-    },
-    {
-        field: 'serieDocumental',
-        flex: 1,
-    },
-    {
-        field: 'organGestor',
-        flex: 1,
-    },
-    {
-        field: 'comu',
-        flex: 1,
-        renderCell: (params:any) => (params?.row?.comu && <Icon>check</Icon>),
-    },
-    {
-        field: 'permisDirecte',
-        flex: 1,
-        renderCell: (params:any) => (params?.row?.permisDirecte && <Icon>check</Icon>),
-    },
-    {
-        field: 'gestioAmbGrupsActiva',
-        flex: 0.5,
-        renderCell: (params:any) => (params?.row?.gestioAmbGrupsActiva && <Icon>check</Icon>),
-    },
-    {
-        field: 'actiu',
-        flex: 0.5,
-        renderCell: (params:any) => (params?.row?.actiu && <Icon>check</Icon>),
-    },
-    {
-        filed: 'permis',
-        headerName: '',
-        sortable: false,
-        flex: 0.5,
-        renderCell: (params:any) => <Button component={Link} to={`/metaExpedient/${params?.row?.id}/permis`} variant={'contained'}>
-            <Icon>key</Icon>
-        </Button>
-    }
-]
-
 const GestioMetaExpedientGrid = () => {
+
     const {t} = useTranslation();
+    const navigate = useNavigate();
     const [springFilter, setSpringFilter] = useState<string>();
+    const sortModel: any = [{field: 'nom', sort: 'asc'}]
+
+    const columns = [
+        {
+            field: 'codi',
+            flex: 1,
+        },
+        {
+            field: 'classificacio',
+            flex: 1,
+        },
+        {
+            field: 'nom',
+            flex: 2,
+        },
+        {
+            field: 'serieDocumental',
+            flex: 1,
+        },
+        {
+            field: 'organGestor',
+            flex: 1,
+        },
+        {
+            field: 'procedimentComu',
+            flex: 1,
+            renderCell: (params:any) => (params?.row?.procedimentComu && <Icon>check</Icon>),
+        },
+        {
+            field: 'permisDirecte',
+            flex: 1,
+            renderCell: (params:any) => (params?.row?.permisDirecte && <Icon>check</Icon>),
+        },
+        {
+            field: 'gestioAmbGrupsActiva',
+            flex: 0.5,
+            renderCell: (params:any) => (params?.row?.gestioAmbGrupsActiva && <Icon>check</Icon>),
+        },
+        {
+            field: 'actiu',
+            flex: 0.5,
+            renderCell: (params:any) => (params?.row?.actiu && <Icon>check</Icon>),
+        },
+        {
+            filed: 'comentaris',
+            headerName: '',
+            sortable: false,
+            flex: 0.5,
+            renderCell: (params:any) => <IconButton
+                aria-label="forum"
+                color="inherit"
+                title="Comentaris"
+                onClick={(e:any) => { 
+                    e.stopPropagation();
+                    //TODO implementar los comentarios
+                }}
+            >
+                <Badge badgeContent={params?.row?.numComentaris} color="primary" showZero>
+                    <Icon>forum</Icon>
+                </Badge>
+            </IconButton>
+        },        
+        {
+            filed: 'permis',
+            headerName: '',
+            sortable: false,
+            flex: 0.5,
+            renderCell: (params:any) => <IconButton
+                aria-label="key"
+                color="inherit"
+                title="Permisos"
+                onClick={(e:any) => { e.stopPropagation(); navigate(`/metaExpedient/${params?.row?.id}/permis`); }}
+            >
+                <Badge badgeContent={params?.row?.numPermisos} color="primary" showZero>
+                    <Icon>key</Icon>
+                </Badge>
+            </IconButton>
+        }
+    ]
 
     const actions = [
         {
@@ -122,18 +150,15 @@ const GestioMetaExpedientGrid = () => {
     ]
 
     return <GridPage disableMargins>
-        <CardPage title={t('page.user.menu.procediments')}>
+        <CardPage title={t('page.user.menu.procedimentsTitle')}>
             <GestioMetaExpedientFilter onSpringFilterChange={setSpringFilter}/>
 
             <StyledMuiGrid
                 resourceName={"metaExpedientResource"}
                 columns={columns}
-                // TODO: revisar filtre
                 filter={springFilter}
                 sortModel={sortModel}
-
                 rowAdditionalActions={actions}
-
                 toolbarElementsWithPositions={[
                     {
                         position: 2,
@@ -153,7 +178,6 @@ const GestioMetaExpedientGrid = () => {
                             color={'primary'}/>,
                     },
                 ]}
-
                 toolbarHideRefresh
             />
         </CardPage>

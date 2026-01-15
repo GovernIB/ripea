@@ -1419,9 +1419,9 @@ const translationCa = {
                 backVersio: "Interfície clàssica",
 
                 anotacions: "Anotacions",
-                procediments: "Gestió de procediments",
+                procediments: "Procediments",
+                procedimentsTitle: "Gestió de procediments",
                 procedimentPermis: "Permisos del procediment: {{nom}}",
-                procedimentsTitle: "L'entitat té procediments amb òrgans gestors no actualitzats",
                 grups: "Grups",
                 grupPermis: "Permisos del grup",
                 revisar: "Revisió de procediments",

@@ -86,7 +86,6 @@ import es.caib.ripea.service.intf.dto.GrupDto;
 import es.caib.ripea.service.intf.dto.MetaDadaDto;
 import es.caib.ripea.service.intf.dto.MetaDadaTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentDto;
-import es.caib.ripea.service.intf.dto.MetaExpedientAmbitEnumDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientCarpetaDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientComentariDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientDto;
@@ -277,7 +276,10 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 			else 
 				metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientEntity.getId(), organId);
 		} else if ("IPA_ADMIN".equals(rolActual)){
-			metaExpedientHelper.canviarEstatRevisioASellecionat(entitatId, metaExpedient);
+			metaExpedientHelper.canviarEstatRevisioASellecionat(
+					entitatId,
+					metaExpedient.getId(),
+					metaExpedient.getRevisioEstat());
 		}
 		return conversioTipusHelper.convertir(metaExpedientEntity, MetaExpedientDto.class);
 	}
@@ -298,7 +300,10 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 					rolActual);
 		}
 		
-		return metaExpedientHelper.canviarEstatRevisioASellecionat(entitatId, metaExpedient);
+		return metaExpedientHelper.canviarEstatRevisioASellecionat(
+				entitatId,
+				metaExpedient.getId(),
+				metaExpedient.getRevisioEstat());
 	}
 
 	@Transactional

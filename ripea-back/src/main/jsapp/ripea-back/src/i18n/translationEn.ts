@@ -1419,9 +1419,9 @@ const translationEn = {
                 backVersio: "Classic interface",
 
                 anotacions: "Annotations",
-                procediments: "Procedure management",
+                procediments: "Procedures",
+                procedimentsTitle: "Procedure management",
                 procedimentPermis: "Procedure permissions: {{nom}}",
-                procedimentsTitle: "The entity has procedures with outdated managing bodies",
                 grups: "Groups",
                 grupPermis: "Group permissions",
                 revisar: "Procedure review",

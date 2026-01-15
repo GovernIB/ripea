@@ -22,17 +22,22 @@ import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
+import es.caib.ripea.service.helper.ExcepcioLogHelper;
 import es.caib.ripea.service.helper.MessageHelper;
 import es.caib.ripea.service.helper.MetaExpedientHelper;
+import es.caib.ripea.service.helper.PermisosHelper;
 import es.caib.ripea.service.helper.PluginHelper;
+import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.MetaExpedientRevisioEstatEnumDto;
+import es.caib.ripea.service.intf.dto.PermisDto;
 import es.caib.ripea.service.intf.dto.ProcedimentDto;
 import es.caib.ripea.service.intf.dto.TipusClassificacioEnumDto;
 import es.caib.ripea.service.intf.model.EntitatResource;
 import es.caib.ripea.service.intf.model.MetaExpedientResource;
+import es.caib.ripea.service.intf.model.MetaExpedientResource.RevisioChangeFormAction;
 import es.caib.ripea.service.intf.model.MetaNodeResource;
 import es.caib.ripea.service.intf.model.OrganGestorResource;
 import es.caib.ripea.service.intf.resourceservice.MetaExpedientResourceService;
@@ -53,10 +58,18 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 	private final OrganGestorRepository organGestorRepository;
 	private final PluginHelper pluginHelper;
 	private final MessageHelper messageHelper;
+	private final PermisosHelper permisosHelper;
+	private final ExcepcioLogHelper excepcioLogHelper;
 
     @PostConstruct
     public void init() {
+    	
     	register(MetaExpedientResource.PERSPECTIVE_AUDIT_CODE, new AuditoriaPerspectiveApplicator());
+    	register(MetaExpedientResource.PERSPECTIVE_COMMENTS_CODE, new ComentarisPerspectiveApplicator());
+    	register(MetaExpedientResource.PERSPECTIVE_PERMISOS_CODE, new PermisosPerspectiveApplicator());
+    	
+    	register(MetaExpedientResource.ACTION_CHANGE_REVISIO_CODE, new RevisioChangeActionExecutor());
+    	
     	register(MetaExpedientResource.Fields.classificacio, new OnchangeLogicProcessor());
     	register(MetaExpedientResource.Fields.tipusClassificacio, new OnchangeLogicProcessor());
     	register(MetaExpedientResource.Fields.organGestor, new OnchangeLogicProcessor());
@@ -251,6 +264,21 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 		}
     }
     
+    private class ComentarisPerspectiveApplicator implements PerspectiveApplicator<MetaExpedientResourceEntity, MetaExpedientResource> {
+		@Override
+		public void applySingle(String code, MetaExpedientResourceEntity entity, MetaExpedientResource resource) throws PerspectiveApplicationException {
+			resource.setNumComentaris(entity.getComentaris()!=null?entity.getComentaris().size():0);
+		}
+    }
+    
+    private class PermisosPerspectiveApplicator implements PerspectiveApplicator<MetaExpedientResourceEntity, MetaExpedientResource> {
+		@Override
+		public void applySingle(String code, MetaExpedientResourceEntity entity, MetaExpedientResource resource) throws PerspectiveApplicationException {
+			List<PermisDto> permisosGrup = permisosHelper.findPermisos(entity.getId(), OrganGestorEntity.class); 
+			resource.setNumPermisos(permisosGrup!=null?permisosGrup.size():0);
+		}
+    }
+    
     private class AuditoriaPerspectiveApplicator implements PerspectiveApplicator<MetaExpedientResourceEntity, MetaExpedientResource> {
         @Override
         public void applySingle(String code, MetaExpedientResourceEntity entity, MetaExpedientResource resource) throws PerspectiveApplicationException {
@@ -265,5 +293,38 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
         		resource.setLastModifiedByFullName(usuariResourceEntity.getNom() + " (" + usuariResourceEntity.getCodi() + ")");
         	}
         }
+    }
+    
+    private class RevisioChangeActionExecutor implements ActionExecutor<MetaExpedientResourceEntity, MetaExpedientResource.RevisioChangeFormAction, Serializable> {
+
+		@Override
+		public void onChange(Serializable id, RevisioChangeFormAction previous, String fieldName, Object fieldValue,
+				Map<String, AnswerValue> answers, String[] previousFieldNames, RevisioChangeFormAction target) {
+		}
+
+		@Override
+		public Serializable exec(String code, MetaExpedientResourceEntity entity, RevisioChangeFormAction params) throws ActionExecutionException {
+			try {
+				
+				EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+				
+				if (params.getRevisioComentari() != null && !params.getRevisioComentari().isEmpty()) {
+					metaExpedientHelper.publicarComentariPerMetaExpedient(
+							entitatEntity.getId(),
+							entity.getId(),
+							params.getRevisioComentari(),
+							configHelper.getRolActual());
+				}
+				
+				return metaExpedientHelper.canviarEstatRevisioASellecionat(
+						entitatEntity.getId(),
+						entity.getId(),
+						params.getRevisioEstat());
+				
+			} catch (Exception e) {
+				excepcioLogHelper.addExcepcio("/metaExpedient/"+entity.getId()+"/RevisioChangeActionExecutor", e);
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, messageHelper.getMessage("message.common.action.error")+": "+e.getMessage());
+			}
+		}    	
     }
 }

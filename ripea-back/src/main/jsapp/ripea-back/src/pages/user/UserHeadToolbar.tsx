@@ -314,7 +314,6 @@ const useMenuAdmin = () => {
                     id: 'procediments',
                     title: t('page.user.menu.procediments'),
                     barge: user?.sessionScope?.organsNoSincronitzats,
-                    hover: t('page.user.menu.procedimentsTitle'),
                     // icon: '',
                     to: '/metaExpedient',
                 },

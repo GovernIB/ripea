@@ -1419,9 +1419,9 @@ const translationEs = {
                 backVersio: "Interfaz clásica",
 
                 anotacions: "Anotaciones",
-                procediments: "Gestión de procedimientos",
+                procediments: "Procedimientos",
                 procedimentPermis: "Permisos del procedimiento: {{nom}}",
-                procedimentsTitle: "La entidad tiene procedimientos con órganos gestores no actualizados",
+                procedimentsTitle: "Gestión de procedimientos",
                 grups: "Grupos",
                 grupPermis: "Permisos del grupo",
                 revisar: "Revisión de procedimientos",

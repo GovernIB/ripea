@@ -766,36 +766,27 @@ public class MetaExpedientHelper {
 		}
 		return ids;
 	}
-	
-	
 
-	public MetaExpedientDto canviarEstatRevisioASellecionat(Long entitatId, MetaExpedientDto metaExpedient) {
+	public MetaExpedientDto canviarEstatRevisioASellecionat(
+			Long entitatId,
+			Long metaExpedientId, 
+			MetaExpedientRevisioEstatEnumDto revisio) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-		MetaExpedientEntity metaExpedientEntity = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedient.getId());
-
+		MetaExpedientEntity metaExpedientEntity = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
 		MetaExpedientRevisioEstatEnumDto estatAnterior = metaExpedientEntity.getRevisioEstat();
+		metaExpedientEntity.updateRevisioEstat(revisio);
 		
-		metaExpedientEntity.updateRevisioEstat(
-				metaExpedient.getRevisioEstat());
-
-		
-		if (estatAnterior == MetaExpedientRevisioEstatEnumDto.PENDENT && metaExpedient.getRevisioEstat() != MetaExpedientRevisioEstatEnumDto.PENDENT 
-				&& metaExpedient.getRevisioEstat() != MetaExpedientRevisioEstatEnumDto.DISSENY) {
-
+		if (estatAnterior == MetaExpedientRevisioEstatEnumDto.PENDENT && revisio != MetaExpedientRevisioEstatEnumDto.PENDENT 
+				&& revisio != MetaExpedientRevisioEstatEnumDto.DISSENY) {
 			emailHelper.canviEstatRevisioMetaExpedient(metaExpedientEntity, entitatId);
-
 		}
 		
-		if (estatAnterior == MetaExpedientRevisioEstatEnumDto.PENDENT && metaExpedient.getRevisioEstat() == MetaExpedientRevisioEstatEnumDto.DISSENY) {
-
+		if (estatAnterior == MetaExpedientRevisioEstatEnumDto.PENDENT && revisio == MetaExpedientRevisioEstatEnumDto.DISSENY) {
 			emailHelper.canviEstatRevisioMetaExpedientEnviarAAdminOrganCreador(metaExpedientEntity, entitatId);
-
 		}
 
 		return conversioTipusHelper.convertir(metaExpedientEntity, MetaExpedientDto.class);
 	}
-	
-	
 	
 	public CrearReglaResponseDto crearReglaDistribucio(Long metaExpedientId) {
 		MetaExpedientEntity metaExpedient = metaExpedientRepository.getOne(metaExpedientId);

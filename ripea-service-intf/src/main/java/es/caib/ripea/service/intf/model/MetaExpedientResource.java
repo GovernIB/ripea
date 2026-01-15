@@ -6,16 +6,16 @@ import java.util.List;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
-import es.caib.ripea.service.intf.base.annotation.ResourceField;
-import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
-import es.caib.ripea.service.intf.dto.MetaExpedientAmbitEnumDto;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Sort;
 
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
+import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
+import es.caib.ripea.service.intf.base.annotation.ResourceField;
+import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.CrearReglaDistribucioEstatEnumDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientAmbitEnumDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.TipusClassificacioEnumDto;
 import lombok.Getter;
@@ -33,7 +33,13 @@ import lombok.experimental.FieldNameConstants;
         artifacts = {
 				@ResourceConfigArtifact(
 						type = ResourceArtifactType.PERSPECTIVE,
-						code = MetaExpedientResource.PERSPECTIVE_AUDIT_CODE),        		
+						code = MetaExpedientResource.PERSPECTIVE_AUDIT_CODE),
+				@ResourceConfigArtifact(
+						type = ResourceArtifactType.PERSPECTIVE,
+						code = MetaExpedientResource.PERSPECTIVE_COMMENTS_CODE),
+				@ResourceConfigArtifact(
+						type = ResourceArtifactType.PERSPECTIVE,
+						code = MetaExpedientResource.PERSPECTIVE_PERMISOS_CODE),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.FILTER,
                         code = MetaExpedientResource.FILTER_REVISIO_CODE,
@@ -42,19 +48,25 @@ import lombok.experimental.FieldNameConstants;
                         type = ResourceArtifactType.FILTER,
                         code = MetaExpedientResource.FILTER_GESTIO_CODE,
                         formClass = MetaExpedientResource.GestioRevisioFormFilter.class),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = MetaExpedientResource.ACTION_CHANGE_REVISIO_CODE,
+                        formClass = MetaExpedientResource.RevisioChangeFormAction.class),                
         },
 		defaultSortFields = { @ResourceConfig.ResourceSort(field = "nom", direction = Sort.Direction.ASC) }
 )
 public class MetaExpedientResource extends MetaNodeResource {
 
-    public static final String FILTER_REVISIO_CODE = "FILTER_REVISIO";
-    public static final String FILTER_GESTIO_CODE = "FILTER_GESTIO";
-    public static final String PERSPECTIVE_AUDIT_CODE = "AUDITORIA";
+    public static final String FILTER_REVISIO_CODE 			= "FILTER_REVISIO";
+    public static final String FILTER_GESTIO_CODE 			= "FILTER_GESTIO";
+    public static final String PERSPECTIVE_AUDIT_CODE 		= "AUDITORIA";
+    public static final String PERSPECTIVE_COMMENTS_CODE	= "COMENTARIS";
+    public static final String PERSPECTIVE_PERMISOS_CODE	= "PERMISOS";
+    public static final String ACTION_CHANGE_REVISIO_CODE	= "CHANGE_REVISIO";
 
 	@NotNull
 	@Size(max = 64)
-	private String codiPropi;
-	
+	private String codiPropi;	
 	@NotNull
 	@ResourceField(onChangeActive = true)
 	private TipusClassificacioEnumDto tipusClassificacio;
@@ -87,12 +99,14 @@ public class MetaExpedientResource extends MetaNodeResource {
 	private ResourceReference<OrganGestorResource, Long> organGestor;
 	private ResourceReference<GrupResource, Long> grupPerDefecte;
 
-    @Transient int numComentaris;
     @ResourceField(onChangeActive = true)
-    @Transient boolean procedimentComu;
+    @Transient private boolean procedimentComu;
 	@Transient private List<ResourceReference<ExpedientEstatResource, Long>> estats;
 	@Transient private List<ResourceReference<MetaExpedientOrganGestorResource, Long>> metaExpedientOrganGestors;
 
+    @Transient private int numComentaris;
+    @Transient private int numPermisos;
+	
     public String getNomClassificacio() {
         return nom + " (" + classificacio +")";
     }
@@ -100,15 +114,23 @@ public class MetaExpedientResource extends MetaNodeResource {
     @Getter
     @Setter
     public static class GestioRevisioFormFilter implements Serializable {
-        private String codi;
+		private static final long serialVersionUID = -4055886032912956357L;
+		private String codi;
         private String classificacio;
         private String nom;
         private MetaExpedientRevisioEstatEnumDto revisioEstat;
         private ResourceReference<OrganGestorResource, Long> organGestor;
-
-        private Boolean actiu;
+        private Boolean actiu = true;
         private MetaExpedientAmbitEnumDto ambit;
         private boolean permisDirecte;
+    }
+    
+    @Getter
+    @Setter
+    public static class RevisioChangeFormAction implements Serializable {
+		private static final long serialVersionUID = -973615025357818666L;
+		private MetaExpedientRevisioEstatEnumDto revisioEstat;
+        private String revisioComentari;
     }
     
     private static final long serialVersionUID = -7526532893601431955L;
