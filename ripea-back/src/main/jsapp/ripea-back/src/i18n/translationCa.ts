@@ -1270,7 +1270,7 @@ const translationCa = {
                     title: "Predicció de sincronització",
                     label: "Actualitzar òrgans gestors de DIR3",
                     ok: "Els òrgans estan actualitzats",
-                    button: "Syncronitzar",
+                    button: "Sincronitza",
                     tabs: {
                         firstSync: "Primera sincronització",
                         split: "Divisions",
@@ -1282,6 +1282,7 @@ const translationCa = {
                     },
                 },
                 vista: "Canvi vista",
+                pdf: "Descarregar PDF",
             },
         },
         tipusDocumental: {

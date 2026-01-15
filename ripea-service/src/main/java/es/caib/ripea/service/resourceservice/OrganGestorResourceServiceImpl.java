@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.turkraft.springfilter.FilterBuilder;
@@ -63,6 +64,7 @@ public class OrganGestorResourceServiceImpl extends BaseMutableResourceService<O
     public void init() {
         register(OrganGestorResource.PERSPECTIVE_PATH_CODE, new PathPerspectiveApplicator());
         register(OrganGestorResource.PERSPECTIVE_COUNT_PERMISOS, new CountPermisosPerspectiveApplicator());
+        register(OrganGestorResource.DIR3_PREDICT_CODE, new PredictDir3ActionExecutor());
         register(OrganGestorResource.DIR3_UPDATE_CODE, new UpdateDir3ActionExecutor());
     }
 	
@@ -247,7 +249,7 @@ public class OrganGestorResourceServiceImpl extends BaseMutableResourceService<O
 		}
     }
     
-    private class UpdateDir3ActionExecutor implements ActionExecutor<OrganGestorResourceEntity, Serializable, Serializable> {
+    private class PredictDir3ActionExecutor implements ActionExecutor<OrganGestorResourceEntity, Serializable, Serializable> {
 		@Override
 		public void onChange(Serializable id, Serializable previous, String fieldName, Object fieldValue,
 				Map<String, AnswerValue> answers, String[] previousFieldNames, Serializable target) {
@@ -258,10 +260,26 @@ public class OrganGestorResourceServiceImpl extends BaseMutableResourceService<O
 				EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, true, false, false, false);
 				return organGestorHelper.predictSyncDir3OrgansGestors(entitat);
 			} catch (Exception e) {
-				excepcioLogHelper.addExcepcio("/organGestor/UpdateDir3ActionExecutor", e);
+				excepcioLogHelper.addExcepcio("/organGestor/PredictDir3ActionExecutor", e);
 				throw new ActionExecutionException(getResourceClass(), null, code, messageHelper.getMessage("message.common.action.error")+": "+e.getMessage());
 			}				
 		}
     }
 
+    private class UpdateDir3ActionExecutor implements ActionExecutor<OrganGestorResourceEntity, Serializable, Serializable> {
+		@Override
+		public void onChange(Serializable id, Serializable previous, String fieldName, Object fieldValue,
+				Map<String, AnswerValue> answers, String[] previousFieldNames, Serializable target) {
+		}
+		@Override
+		public Serializable exec(String code, OrganGestorResourceEntity entity, Serializable params) throws ActionExecutionException {
+			try {
+				EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, true, false, false, false);
+				return organGestorHelper.syncDir3OrgansGestors(entitat.getId(), LocaleContextHolder.getLocale());
+			} catch (Exception e) {
+				excepcioLogHelper.addExcepcio("/organGestor/UpdateDir3ActionExecutor", e);
+				throw new ActionExecutionException(getResourceClass(), null, code, messageHelper.getMessage("message.common.action.error")+": "+e.getMessage());
+			}
+		}
+    }
 }

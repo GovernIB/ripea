@@ -6,9 +6,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.multimap.ArrayListValuedHashMap;
 import org.apache.commons.lang3.StringUtils;
@@ -73,15 +75,125 @@ public class OrganGestorHelper {
 	@Autowired private PermisosHelper permisosHelper;
 	@Autowired private PluginHelper pluginHelper;
 	@Autowired private MessageHelper messageHelper;
+	@Autowired private CacheHelper cacheHelper;
 	@Autowired private ContingutRepository contingutRepository;
 	@Autowired private RegistreAnnexRepository registreAnnexRepository;
 	@Autowired private MetaDocumentRepository metaDocumentRepository;
     @Autowired private ConversioTipusHelper conversioTipusHelper;
+    @Autowired private OrganGestorCacheHelper organGestorCacheHelper;
+    @Autowired private MetaExpedientHelper metaExpedientHelper;
     @Autowired private EntityComprovarHelper entityComprovarHelper;
     
-	public static final String ORGAN_NO_SYNC = "Hi ha canvis pendents de sincronitzar a l'organigrama";
-    @Autowired private OrganGestorCacheHelper organGestorCacheHelper;
+    public static final String ORGAN_NO_SYNC = "Hi ha canvis pendents de sincronitzar a l'organigrama";
+    public static Map<String, ProgresActualitzacioDto> progresActualitzacio = new HashMap<>();
 
+    public ProgresActualitzacioDto getProgresActualitzacio(String entitatCodi) {
+		ProgresActualitzacioDto progres = progresActualitzacio.get(entitatCodi);
+		if (progres != null && progres.isFinished()) {
+			progresActualitzacio.remove(entitatCodi);
+		}
+		return progres;
+    }
+    
+    public Object[] syncDir3OrgansGestors(Long entitatId, Locale locale) throws Exception {
+	    EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false, false, false);
+	    boolean primeraSync = entitat.getDataSincronitzacio() == null;
+	    EntitatDto entitatDto = conversioTipusHelper.convertir(entitat, EntitatDto.class);
+		ConfigHelper.setEntitat(entitatDto);
+		MessageHelper.setCurrentLocale(locale);
+		if (entitat.getUnitatArrel() == null || entitat.getUnitatArrel().isEmpty()) {
+			throw new Exception(msg("unitat.synchronize.error.dir3"));
+		}
+
+		// Comprova si hi ha una altra instància del procés en execució
+		ProgresActualitzacioDto progres = progresActualitzacio.get(entitat.getCodi());
+		if (progres != null && (progres.getProgres() > 0 && progres.getProgres() < 100) && !progres.isError()) {
+			logger.debug("[ORGANS GESTORS] Ja existeix un altre procés que està executant l'actualització");
+			return null;	// Ja existeix un altre procés que està executant l'actualització.
+		}
+
+		// inicialitza el seguiment del progrés d'actualització
+		progres = new ProgresActualitzacioDto();
+		progresActualitzacio.put(entitat.getCodi(), progres);
+
+		progres.setNumOperacions(100);
+		progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoTitol(msg("unitat.synchronize.titol.actualitzar")).infoText(msg("unitat.synchronize.info.actualitzar.inici")).build());
+		progres.setProgres(1);
+
+		List<OrganGestorEntity> obsoleteUnitats = new ArrayList<>();
+		List<OrganGestorEntity> organsDividits = new ArrayList<>();
+		List<OrganGestorEntity> organsFusionats = new ArrayList<>();
+		List<OrganGestorEntity> organsSubstituits = new ArrayList<>();
+
+		try {
+			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.organigrama")).infoText(msg("unitat.synchronize.info.organigrama.inici")).build());
+			List<UnitatOrganitzativa> unitatsWs = pluginHelper.unitatsOrganitzativesFindByPare(
+					entitat.getUnitatArrel(),
+					entitat.getDataActualitzacio(),
+					entitat.getDataSincronitzacio());
+			progres.setProgres(2);
+			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.organigrama")).infoText(unitatsWs.isEmpty() ? msg("unitat.synchronize.info.organigrama.fi.buid") : msg("unitat.synchronize.info.organigrama.fi", unitatsWs.size())).build());
+
+			// Sincronitzar òrgans
+			progres.setFase(1); 
+			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.organs")).infoText(msg("unitat.synchronize.info.organs.inici")).build());
+			sincronitzarOrgans(entitatDto.getId(), unitatsWs, obsoleteUnitats, organsDividits, organsFusionats, organsSubstituits, progres);
+			progres.setProgres(27);
+			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.organs")).infoText(msg("unitat.synchronize.info.organs.fi")).build());
+
+			// Actualitzar procediments
+			progres.setFase(2);
+			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.procediments")).infoText(msg("unitat.synchronize.info.procediments.inici")).build());
+			metaExpedientHelper.actualitzarProcediments(
+					entitat,
+					metaExpedientRepository.findByEntitatOrderByNomAsc(entitat),
+					locale,
+					progres);
+			progres.setProgres(51);
+			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.procediments")).infoText(msg("unitat.synchronize.info.procediments.fi")).build());
+
+			if (!primeraSync) {
+				// Actualitzar permisos
+				progres.setFase(3);
+				progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.permisos")).infoText(msg("unitat.synchronize.info.permisos.inici")).build());
+				permisosHelper.actualitzarPermisosOrgansObsolets(obsoleteUnitats, organsDividits, organsFusionats, organsSubstituits, progres);
+				progres.setProgres(75);
+				progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.permisos")).infoText(msg("unitat.synchronize.info.permisos.fi")).build());
+				
+				// Actualitzar expedients oberts
+				progres.setFase(4);
+				progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.expedients")).infoText(msg("unitat.synchronize.info.expedients.inici")).build());
+				actualitzarExpedientsObertsAmbOrgansObsolets(
+						ListUtils.union(organsSubstituits, organsFusionats),
+						progres);
+				progres.setProgres(99);
+				progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.expedients")).infoText(msg("unitat.synchronize.info.expedients.fi")).build());
+
+			}
+
+//			// Eliminar organs no vigents no utilitzats??
+//			progres.setFase(4);
+//			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.obsolets")).infoText(msg("unitat.synchronize.info.obsolets.inici")).build());
+//			organGestorHelper.deleteExtingitsNoUtilitzats(obsoleteUnitats, progres);
+//			progres.setProgres(99);
+//			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.obsolets")).infoText(msg("unitat.synchronize.info.obsolets.fi")).build());
+
+			cacheHelper.evictUnitatsOrganitzativesPerEntitat(entitat.getCodi());
+			cacheHelper.evictAllOrganismesEntitatAmbPermis();
+
+			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-success").infoTitol(msg("unitat.synchronize.titol.actualitzar")).infoText(msg("unitat.synchronize.info.actualitzar.fi")).build());
+		} catch (Exception ex) {
+			progres.addInfo(ActualitzacioInfo.builder().hasError(true).infoTitol(msg("unitat.synchronize.titol.error")).errorText("S'ha produit un error al realitzar la sincronització dels òrgans gestors: " + ex.getMessage()).build());
+			throw ex;
+		} finally {
+			progres.setProgres(100);
+			progres.setFinished(true);
+			MessageHelper.setCurrentLocale(null); //Ara el massages helper tornrà a afagar el locale del contexte
+		}
+
+		return new ArrayList[]{(ArrayList) obsoleteUnitats, (ArrayList) organsDividits, (ArrayList) organsFusionats, (ArrayList) organsSubstituits};
+	}
+    
     @SuppressWarnings("unchecked")
     public PrediccioSincronitzacio predictSyncDir3OrgansGestors(EntitatEntity entitat) throws Exception {
 

@@ -4,7 +4,7 @@ import {useMemo, useRef, useState} from "react";
 import {GridPage, MuiDialog, useResourceApiService} from "reactlib";
 import {CardData, CardPage} from "../../../components/CardData.tsx";
 import StyledMuiGrid, {ToolbarButton} from "../../../components/StyledMuiGrid.tsx";
-import {Grid, Icon, Badge, IconButton, Divider} from "@mui/material";
+import {Grid, Icon, Badge, IconButton, Divider, Typography} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
@@ -12,13 +12,19 @@ import Load from "../../../components/Load.tsx";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
+/*
+He aplicado un parche en OrganGestorGrid.tsx para que Node no haga spread de todas las props dentro de sx 
+(ahí suele estar la causa: props no-CSS terminan en sx y MUI falla al procesarlas, 
+lo que puede producir errores extraños como lectura de align).
+*/
 const Node = (props: any) => {
+    const { children, backgroundColor, color, sx: sxProp } = props;
     return (
         <Grid
             item
             sx={{
-                backgroundColor: "white",
-                color: "black",
+                backgroundColor: backgroundColor ?? "white",
+                color: color ?? "black",
                 textAlign: "center",
                 borderRadius: 2,
                 fontWeight: "bold",
@@ -27,10 +33,10 @@ const Node = (props: any) => {
                 flexGrow: 0,
                 paddingLeft: '0 !important',
                 paddingTop: '0 !important',
-                ...props,
+                ...(sxProp || {}),
             }}
         >
-            {props.children}
+            {children}
         </Grid>
     );
 };
@@ -39,26 +45,34 @@ const NodeGrup = (props: any) => {
     const { nodeKey, values, divider } = props;
     return (
         <Grid container item xs={12} direction="row" wrap="nowrap" justifyContent={"space-around"} alignItems="center" columnSpacing={1} rowSpacing={1}>
-            {nodeKey && <Node backgroundColor="green" color="white">{`${nodeKey?.codi} - ${nodeKey.denominacioCooficial}`}</Node>}
+            {nodeKey && <Node backgroundColor="#d6e9c6" color="black" minWidth="40% !important">
+                    <Typography sx={{fontSize: '1rem', padding: '5px'}}>{`${nodeKey?.codi} - ${nodeKey.denominacioCooficial}`}</Typography>
+                </Node>
+            }
             {(divider || (nodeKey && values)) && (
                 <Grid item sx={{display: "flex", alignItems: "center", justifyContent: "center" }}>
                     <Divider orientation="horizontal" flexItem sx={{ borderColor: "black", borderWidth: 2, width: 40 }}/>
                 </Grid>
             )}
-            {values?.map((value:any) => <Node backgroundColor="orange" color="white">{`${value?.codi} - ${value.denominacioCooficial}`}</Node>)}
+            {values?.map((value:any) => <Node backgroundColor="#faebcc" color="black" minWidth="40% !important">
+                    <Typography sx={{fontSize: '1rem', padding: '5px'}}>{`${value?.codi} - ${value.denominacioCooficial}`}</Typography>
+                </Node>)
+            }
         </Grid>
     );
 };
 
 const useActions = (refresh?: () => void) => {
+
     const [prediccio, setPrediccio] = useState<any>();
+
     const {
         artifactAction: apiAction,
     } = useResourceApiService('organGestorResource');
 
     const getPrediccio = () => {
         setPrediccio(undefined)
-        apiAction(undefined, {code: "DIR3_UPDATE"})
+        apiAction(undefined, {code: "DIR3_PREDICT"})
             .then((res) => {
                 setPrediccio(res)
             })
@@ -106,9 +120,14 @@ const useActions = (refresh?: () => void) => {
 }
 
 const useOrganGestorSyncDialog = () => {
+
     const { t } = useTranslation();
     const [open, setOpen] = useState(false);
     const ref = useRef();
+    
+    const {
+        artifactAction: apiAction,
+    } = useResourceApiService('organGestorResource');
 
     const handleOpen = () => {
         getPrediccio();
@@ -128,19 +147,10 @@ const useOrganGestorSyncDialog = () => {
     const buttons :any[] = useMemo(() => [
         {
             value: 'download',
-            text: t('common.download'),
+            text: t('page.organGestor.action.pdf'),
             icon: 'download',
             componentProps: {
                 variant: "outlined",
-            }
-        },
-        {
-            value: 'sync',
-            text: t('page.organGestor.action.actualitzar.button'),
-            icon: 'save',
-            componentProps: {
-                variant: "contained",
-                color: "success",
             }
         },
         {
@@ -151,6 +161,15 @@ const useOrganGestorSyncDialog = () => {
                 variant: "outlined",
             }
         },
+        {
+            value: 'sync',
+            text: t('page.organGestor.action.actualitzar.button'),
+            icon: 'save',
+            componentProps: {
+                variant: "contained",
+                color: "primary",
+            }
+        },        
     ], [t])
 
     const dialog =
@@ -166,6 +185,10 @@ const useOrganGestorSyncDialog = () => {
                         descargarPDF(ref?.current)
                         break;
                     case 'sync':
+                        apiAction(undefined, {code: "DIR3_PREDICT"})
+                            .then((res) => {
+                                handleClose();
+                            });  
                         break;
                     case 'close':
                         handleClose();
@@ -193,11 +216,15 @@ const useOrganGestorSyncDialog = () => {
                 <CardData title={t('page.organGestor.action.actualitzar.tabs.change')} rowSpacing={2} hidden={prediccio?.unitatsVigents?.length == 0}>
                     {prediccio?.unitatsVigents?.map?.((unitat:any) => <>
                         <Grid container item xs={12} direction="row" wrap="nowrap" justifyContent={"space-around"} alignItems="center" columnSpacing={1} rowSpacing={1}>
-                            <Node backgroundColor="green" color="white">{`${unitat?.codi} - ${unitat.oldDenominacio}`}</Node>
+                            <Node backgroundColor="#d6e9c6" color="black" minWidth="40% !important">
+                                <Typography sx={{fontSize: '1rem', padding: '5px'}}>{`${unitat?.codi} - ${unitat.oldDenominacio}`}</Typography>
+                            </Node>
                             <Grid item sx={{display: "flex", alignItems: "center", justifyContent: "center" }}>
                                 <Divider orientation="horizontal" flexItem sx={{ borderColor: "black", borderWidth: 2, width: 40 }}/>
                             </Grid>
-                            <Node backgroundColor="orange" color="white">{`${unitat?.codi} - ${unitat.denominacioCooficial}`}</Node>
+                            <Node backgroundColor="#faebcc" color="black" minWidth="40% !important">
+                                <Typography sx={{fontSize: '1rem', padding: '5px'}}>{`${unitat?.codi} - ${unitat.denominacioCooficial}`}</Typography>
+                            </Node>
                         </Grid>
                     </>)}
                 </CardData>
@@ -207,7 +234,9 @@ const useOrganGestorSyncDialog = () => {
                 <CardData title={t('page.organGestor.action.actualitzar.tabs.del')} rowSpacing={2} hidden={prediccio?.unitatsExtingides?.length == 0}>
                     {prediccio?.unitatsExtingides?.map?.((unitat:any) =>
                         <Grid container item xs={12} direction="row" wrap="nowrap" justifyContent={"space-around"} alignItems="center" columnSpacing={1} rowSpacing={1}>
-                            <Node backgroundColor="red" color="white">{`${unitat?.codi} - ${unitat.denominacioCooficial}`}</Node>
+                            <Node backgroundColor="#f8d7da" color="black" minWidth="40% !important">
+                                <Typography sx={{fontSize: '1rem', padding: '5px'}}>{`${unitat?.codi} - ${unitat.denominacioCooficial}`}</Typography>
+                            </Node>
                         </Grid>
                     )}
                 </CardData>

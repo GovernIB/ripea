@@ -9,7 +9,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.collections4.ListUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,24 +24,19 @@ import org.springframework.transaction.annotation.Transactional;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
-import es.caib.ripea.persistence.repository.MetaExpedientRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.plugin.unitat.NodeDir3;
-import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
 import es.caib.ripea.service.helper.CacheHelper;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.ConversioTipusHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
-import es.caib.ripea.service.helper.IntegracioHelper;
 import es.caib.ripea.service.helper.MessageHelper;
-import es.caib.ripea.service.helper.MetaExpedientHelper;
 import es.caib.ripea.service.helper.OrganGestorHelper;
 import es.caib.ripea.service.helper.OrganismeHelper;
 import es.caib.ripea.service.helper.PaginacioHelper;
 import es.caib.ripea.service.helper.PermisosHelper;
 import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.helper.UsuariHelper;
-import es.caib.ripea.service.intf.dto.ActualitzacioInfo;
 import es.caib.ripea.service.intf.dto.ArbreDto;
 import es.caib.ripea.service.intf.dto.ArbreNodeDto;
 import es.caib.ripea.service.intf.dto.EntitatDto;
@@ -59,15 +53,13 @@ import es.caib.ripea.service.intf.dto.PrincipalTipusEnumDto;
 import es.caib.ripea.service.intf.dto.ProgresActualitzacioDto;
 import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
-import es.caib.ripea.service.intf.exception.SistemaExternException;
 import es.caib.ripea.service.intf.service.OrganGestorService;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.permission.ExtendedPermission;
 
 @Service
 public class OrganGestorServiceImpl implements OrganGestorService {
-
-	@Autowired private MetaExpedientRepository metaExpedientRepository;
+	
 	@Autowired private EntityComprovarHelper entityComprovarHelper;
 	@Autowired private ConversioTipusHelper conversioTipusHelper;
 	@Autowired private OrganGestorRepository organGestorRepository;
@@ -78,11 +70,8 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	@Autowired private OrganGestorHelper organGestorHelper;
 	@Autowired private OrganismeHelper organismeHelper;
 	@Autowired private UsuariHelper usuariHelper;
-	@Autowired private MetaExpedientHelper metaExpedientHelper;
 	@Autowired private MessageHelper messageHelper;
 	@Autowired private ConfigHelper configHelper;
-	
-	public static Map<String, ProgresActualitzacioDto> progresActualitzacio = new HashMap<>();
 
 	@Override
 	public void actualitzarOrganCodi(String organCodi) {
@@ -231,106 +220,10 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 				OrganGestorDto.class);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public Object[] syncDir3OrgansGestors(EntitatDto entitatDto, Locale locale) throws Exception {
-	    EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatDto.getId(), false, true, false, false, false);
-	    boolean primeraSync = entitat.getDataSincronitzacio() == null;
-	    
-		ConfigHelper.setEntitat(entitatDto);
-		MessageHelper.setCurrentLocale(locale);
-		if (entitat.getUnitatArrel() == null || entitat.getUnitatArrel().isEmpty()) {
-			throw new Exception(msg("unitat.synchronize.error.dir3"));
-		}
-
-		// Comprova si hi ha una altra instància del procés en execució
-		ProgresActualitzacioDto progres = progresActualitzacio.get(entitat.getCodi());
-		if (progres != null && (progres.getProgres() > 0 && progres.getProgres() < 100) && !progres.isError()) {
-			logger.debug("[ORGANS GESTORS] Ja existeix un altre procés que està executant l'actualització");
-			return null;	// Ja existeix un altre procés que està executant l'actualització.
-		}
-
-		// inicialitza el seguiment del progrés d'actualització
-		progres = new ProgresActualitzacioDto();
-		progresActualitzacio.put(entitat.getCodi(), progres);
-
-		progres.setNumOperacions(100);
-		progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoTitol(msg("unitat.synchronize.titol.actualitzar")).infoText(msg("unitat.synchronize.info.actualitzar.inici")).build());
-		progres.setProgres(1);
-
-		List<OrganGestorEntity> obsoleteUnitats = new ArrayList<>();
-		List<OrganGestorEntity> organsDividits = new ArrayList<>();
-		List<OrganGestorEntity> organsFusionats = new ArrayList<>();
-		List<OrganGestorEntity> organsSubstituits = new ArrayList<>();
-
-		try {
-			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.organigrama")).infoText(msg("unitat.synchronize.info.organigrama.inici")).build());
-			List<UnitatOrganitzativa> unitatsWs = pluginHelper.unitatsOrganitzativesFindByPare(
-					entitat.getUnitatArrel(),
-					entitat.getDataActualitzacio(),
-					entitat.getDataSincronitzacio());
-			progres.setProgres(2);
-			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.organigrama")).infoText(unitatsWs.isEmpty() ? msg("unitat.synchronize.info.organigrama.fi.buid") : msg("unitat.synchronize.info.organigrama.fi", unitatsWs.size())).build());
-
-			// Sincronitzar òrgans
-			progres.setFase(1); 
-			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.organs")).infoText(msg("unitat.synchronize.info.organs.inici")).build());
-			organGestorHelper.sincronitzarOrgans(entitatDto.getId(), unitatsWs, obsoleteUnitats, organsDividits, organsFusionats, organsSubstituits, progres);
-			progres.setProgres(27);
-			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.organs")).infoText(msg("unitat.synchronize.info.organs.fi")).build());
-
-			// Actualitzar procediments
-			progres.setFase(2);
-			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.procediments")).infoText(msg("unitat.synchronize.info.procediments.inici")).build());
-			metaExpedientHelper.actualitzarProcediments(
-					entitat,
-					metaExpedientRepository.findByEntitatOrderByNomAsc(entitat),
-					locale,
-					progres);
-			progres.setProgres(51);
-			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.procediments")).infoText(msg("unitat.synchronize.info.procediments.fi")).build());
-
-			if (!primeraSync) {
-				// Actualitzar permisos
-				progres.setFase(3);
-				progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.permisos")).infoText(msg("unitat.synchronize.info.permisos.inici")).build());
-				permisosHelper.actualitzarPermisosOrgansObsolets(obsoleteUnitats, organsDividits, organsFusionats, organsSubstituits, progres);
-				progres.setProgres(75);
-				progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.permisos")).infoText(msg("unitat.synchronize.info.permisos.fi")).build());
-				
-				// Actualitzar expedients oberts
-				progres.setFase(4);
-				progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.expedients")).infoText(msg("unitat.synchronize.info.expedients.inici")).build());
-				organGestorHelper.actualitzarExpedientsObertsAmbOrgansObsolets(
-						ListUtils.union(organsSubstituits, organsFusionats),
-						progres);
-				progres.setProgres(99);
-				progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.expedients")).infoText(msg("unitat.synchronize.info.expedients.fi")).build());
-
-			}
-
-//			// Eliminar organs no vigents no utilitzats??
-//			progres.setFase(4);
-//			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.obsolets")).infoText(msg("unitat.synchronize.info.obsolets.inici")).build());
-//			organGestorHelper.deleteExtingitsNoUtilitzats(obsoleteUnitats, progres);
-//			progres.setProgres(99);
-//			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.obsolets")).infoText(msg("unitat.synchronize.info.obsolets.fi")).build());
-
-			cacheHelper.evictUnitatsOrganitzativesPerEntitat(entitat.getCodi());
-			cacheHelper.evictAllOrganismesEntitatAmbPermis();
-
-			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-success").infoTitol(msg("unitat.synchronize.titol.actualitzar")).infoText(msg("unitat.synchronize.info.actualitzar.fi")).build());
-		} catch (Exception ex) {
-			progres.addInfo(ActualitzacioInfo.builder().hasError(true).infoTitol(msg("unitat.synchronize.titol.error")).errorText("S'ha produit un error al realitzar la sincronització dels òrgans gestors: " + ex.getMessage()).build());
-			throw ex;
-		} finally {
-			progres.setProgres(100);
-			progres.setFinished(true);
-			MessageHelper.setCurrentLocale(null); //Ara el massages helper tornrà a afagar el locale del contexte
-		}
-
-		return new ArrayList[]{(ArrayList) obsoleteUnitats, (ArrayList) organsDividits, (ArrayList) organsFusionats, (ArrayList) organsSubstituits};
+		return organGestorHelper.syncDir3OrgansGestors(entitatDto.getId(), locale);
 	}
 
 	@Override
@@ -342,11 +235,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 
 	@Override
 	public ProgresActualitzacioDto getProgresActualitzacio(String entitatCodi) {
-		ProgresActualitzacioDto progres = progresActualitzacio.get(entitatCodi);
-		if (progres != null && progres.isFinished()) {
-			progresActualitzacio.remove(entitatCodi);
-		}
-		return progres;
+		return organGestorHelper.getProgresActualitzacio(entitatCodi);
 	}
 
 	@Override

@@ -1282,6 +1282,7 @@ const translationEn = {
                     },
                 },
                 vista: "Change view",
+                pdf: "Download PDF",
             },
         },
         tipusDocumental: {

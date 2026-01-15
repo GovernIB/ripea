@@ -269,7 +269,7 @@ public class MetaDocumentController extends BaseAdminController {
 		PortafirmesFluxRespostaDto resposta = portafirmesFluxService.recuperarFluxFirma(transactionId);
 		CreacioFluxFinalitzatEvent fluxEvent = new CreacioFluxFinalitzatEvent(
 				null,
-				Long.parseLong(dataSplri[1].toString()), //metaDocumentId
+				dataSplri[1]!=null?Long.parseLong(dataSplri[1].toString()):null, //metaDocumentId
 				dataSplri[0], //entitatCodi
 				dataSplri[2], //usuariCodi
 				resposta);

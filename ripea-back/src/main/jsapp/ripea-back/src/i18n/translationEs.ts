@@ -1282,6 +1282,7 @@ const translationEs = {
                     },
                 },
                 vista: "Cambiar vista",
+                pdf: "Descargar PDF",
             },
         },
         tipusDocumental: {
