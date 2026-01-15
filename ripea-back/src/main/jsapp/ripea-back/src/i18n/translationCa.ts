@@ -1362,6 +1362,21 @@ const translationCa = {
                 },
             },
         },
+        urlInstruccio: {
+            title: "URL Instrucció",
+            action: {
+                new: {
+                    label: "Nova url instrucció",
+                    ok: "Url creat correctament",
+                },
+                update: {
+                    ok: "Url modificat correctament",
+                },
+                delete: {
+                    ok: "Url eliminat correctament",
+                },
+            },
+        },
         permision: {
             title: "Permisos",
             grid: {

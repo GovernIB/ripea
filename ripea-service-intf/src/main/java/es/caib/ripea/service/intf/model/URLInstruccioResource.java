@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 
+import javax.validation.constraints.NotNull;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -17,8 +19,8 @@ public class URLInstruccioResource extends BaseAuditableResource<Long> {
 
 	private static final long serialVersionUID = 1301398896789809114L;
 	
-	private String codi;
-	private String nom;
+	@NotNull private String codi;
+	@NotNull private String nom;
 	private String descripcio;
 	private String url;
 	

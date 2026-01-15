@@ -35,13 +35,16 @@ import DominiGrid from "./pages/user/configurar/DominiGrid.tsx";
 import MetaDocumentGrid from "./pages/user/configurar/MetaDocumentGrid.tsx";
 import MetaDocumentDadaGrid from "./pages/user/configurar/MetaDocumentDadaGrid.tsx";
 import {useUserSession} from "./components/Session.tsx";
+import {UrlInstruccioGrid} from "./pages/user/configurar/UrlInstruccioGrid.tsx";
 
-const ProtectedRoute = ({ allowedRoles = [] }: any) => {
+const ProtectedRoute = ({ allowedRoles = [], params = [] }: any) => {
     const {value: user} = useUserSession();
 
-    // console.log("rol:", user.rolActual, allowedRoles)
-    if (!allowedRoles.includes(user.rolActual)) {
-        return <NotFoundPage />;
+    if (allowedRoles?.length > 0 && !allowedRoles.includes(user.rolActual)) {
+        // return <NotFoundPage />;
+    }
+    if (params?.length > 0 && params?.some?.((param:any) => !user?.sessionScope?.[param])) {
+        // return <NotFoundPage />;
     }
 
     return <Outlet />;
@@ -103,6 +106,9 @@ const AppRoutes: React.FC = () => {
             <Route path="domini" element={<DominiGrid/>} />
             <Route path="metaDocument" element={<MetaDocumentGrid/>} />
             <Route path="metaDocument/:id/metaDada" element={<MetaDocumentDadaGrid/>} />
+            <Route element={<ProtectedRoute params={['isUrlInstruccioEnabled']}/>}>
+                <Route path="urlInstruccio" element={<UrlInstruccioGrid/>} />
+            </Route>
         </Route>
 
         <Route path="*" element={<NotFoundPage />} />

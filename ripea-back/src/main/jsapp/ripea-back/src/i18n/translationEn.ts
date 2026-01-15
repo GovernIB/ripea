@@ -1362,6 +1362,21 @@ const translationEn = {
                 },
             },
         },
+        urlInstruccio: {
+            title: "URL de instrucción",
+            action: {
+                new: {
+                    label: "Nueva URL de instrucción",
+                    ok: "URL creada correctamente",
+                },
+                update: {
+                    ok: "URL modificada correctamente",
+                },
+                delete: {
+                    ok: "URL eliminada correctamente",
+                },
+            },
+        },
         permision: {
             title: "Permissions",
             grid: {
