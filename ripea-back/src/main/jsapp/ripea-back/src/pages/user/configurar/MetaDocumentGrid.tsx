@@ -1,18 +1,29 @@
 import {useTranslation} from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import {GridPage, useBaseAppContext, useFormContext, useMuiDataGridApiRef, useResourceApiService} from "reactlib";
+import {
+    GridPage,
+    MuiDialog,
+    useBaseAppContext,
+    useFormContext,
+    useMuiDataGridApiRef,
+    useResourceApiService
+} from "reactlib";
 import {CardPage} from "../../../components/CardData.tsx";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import {Alert, Typography, Grid, Icon, Badge, IconButton} from "@mui/material";
-import GridFormField, {FileFormField} from "../../../components/GridFormField.tsx";
+import GridFormField, {FileFormField, GridButton} from "../../../components/GridFormField.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import TabComponent from "../../../components/TabComponent.tsx";
-import {useMemo} from "react";
+import {useMemo, useState} from "react";
+import Load from "../../../components/Load.tsx";
+import Iframe from "../../../components/Iframe.tsx";
+import {useFluxFinalitzatSession} from "../../../components/SseClient.tsx";
+import {useUserSession} from "../../../components/Session.tsx";
 
 const useActions = (refresh?: () => void) => {
     const {t} = useTranslation();
     const {
-        patch: apiPatch
+        patch: apiPatch,
     } = useResourceApiService('metaDocumentResource');
     const {temporalMessageShow} = useBaseAppContext();
 
@@ -40,6 +51,54 @@ const useActions = (refresh?: () => void) => {
 
     return {active, desactive}
 }
+const useFluxActions = () => {
+    const {
+        isReady: apiIsReady,
+        artifactAction: apiAction,
+    } = useResourceApiService('metaDocumentFluxPortafibResource');
+
+    const [open, setOpen] = useState(false);
+    const [url, setUrl] = useState<any>();
+
+    const handleOpen = (id:any, row:any) => {
+        if(apiIsReady){
+            if (!id) {
+                apiAction(undefined, {code: 'CREACIO_FLUXE', data: {metaDocumentId: row?.metaDocument?.id}})
+                    .then((app) => setUrl(app?.url))
+            } else {
+                apiAction(id, {code: 'EDITAR_FLUXE'})
+                    .then((app) => setUrl(app?.url))
+            }
+        }
+        setOpen(true);
+    }
+
+    const handleClose = (reason?: string) => {
+        if(reason !== 'backdropClick') {
+            setUrl(undefined);
+            setOpen(false);
+        }
+    };
+
+    const dialog =
+        <MuiDialog
+            open={open}
+            closeCallback={handleClose}
+            title={''}
+            componentProps={{ fullWidth: true, maxWidth: 'md' }}
+        >
+            <Load value={url}>
+                <Iframe src={url}/>
+            </Load>
+        </MuiDialog>
+
+    return {
+        apiIsReady,
+        handleOpen,
+        handleClose,
+        dialog
+    }
+}
 
 // Form
 const portafibColumns = [
@@ -53,15 +112,45 @@ const portafibColumns = [
     },
 ]
 const PortafirmesMetaDocumentForm = () => {
-    const {data} = useFormContext()
+    const {t} = useTranslation()
+    const apiRef = useMuiDataGridApiRef();
+    const { value: user } = useUserSession()
+    const {data, apiRef: formApiRef} = useFormContext()
+
     const filterResponsables = builder.neq('nif', null)
 
     const filter = useMemo(() => {
         return builder.inside("id",
             data?.fluxosFirma?.length > 0
-                ? data?.fluxosFirma?.map(flux => (flux?.id))
+                ? data?.fluxosFirma?.map((flux:any) => (flux?.id))
                 : [0])
-    }, [data?.fluxosFirma])
+    }, [data?.fluxosFirma?.length])
+
+    const refresh = () => {
+        apiRef?.current?.refresh?.();
+    }
+
+    const {handleOpen, handleClose, dialog} = useFluxActions();
+    const actions = [
+        {
+            label: t('common.update'),
+            icon: "edit",
+            showInMenu: false,
+            onClick: handleOpen,
+        },
+    ]
+
+    const { onChange, remove } = useFluxFinalitzatSession();
+    onChange((flux) => {
+        if(!flux?.error) {
+            const fluxos: any[] = data?.fluxosFirma ?? [];
+            fluxos.push({ id: flux?.fluxCreat?.fluxId, description: flux?.fluxCreat?.nom })
+            formApiRef?.current?.setFieldValue("fluxosFirma", fluxos);
+            remove()
+            handleClose()
+            refresh?.()
+        }
+    })
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField xs={12} name="firmaPortafirmesActiva"/>
@@ -72,15 +161,23 @@ const PortafirmesMetaDocumentForm = () => {
             <GridFormField xs={12} name="portafirmesSequenciaTipus" required/>
         </>}
         {data?.portafirmesFluxTipus == "PORTAFIB" && <>
-            <GridFormField xs={12} name="fluxosFirma" multiple required/>
+            <GridFormField xs={11} name="fluxosFirma" multiple required/>
+            <GridButton xs={1}
+                        onClick={() => handleOpen(undefined, { metaDocument: { id: data?.id } })}
+            >
+                <Icon>add</Icon>
+            </GridButton>
             <StyledMuiGrid
+                apiRef={apiRef}
                 resourceName={'metaDocumentFluxPortafibResource'}
                 columns={portafibColumns}
                 filter={filter}
+                rowAdditionalActions={actions}
                 toolbarHide
                 sx={{ ml: 1, mt: 1 }}
             />
         </>}
+        {dialog}
     </Grid>
 }
 

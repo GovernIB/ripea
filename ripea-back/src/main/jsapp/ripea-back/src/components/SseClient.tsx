@@ -9,6 +9,7 @@ const avisosKey = 'avisos';
 const notificacionsKey = 'notificacions';
 const tasquesKey = 'tasques';
 const firmaFinalitzadaKey = 'firma_finalitzada';
+const flux_finalitzatKey = 'flux_finalitzat';
 const sseConnectedKey = 'user_connect';
 
 const useSseClientSession = () => useSessionList(sseClientKey)
@@ -53,6 +54,7 @@ export const useTasquesSession = () => {
     return { value: get(tasquesKey) };
 }
 export const useFirmaFinalitzadaSession = () => useTempSession(firmaFinalitzadaKey);
+export const useFluxFinalitzatSession = () => useTempSession(flux_finalitzatKey);
 
 /**
  * Component que gestiona la connexió SSE amb el servidor
@@ -111,6 +113,9 @@ export const SseClient: React.FC = () => {
             
             // Gestionar l'esdeveniment de firma finalitzada
             addEventListener(eventSource, firmaFinalitzadaKey)
+
+            // Gestionar l'esdeveniment de flux finalitzat
+            addEventListener(eventSource, flux_finalitzatKey)
 
             // Gestionar errors
             eventSource.onerror = (error) => {
