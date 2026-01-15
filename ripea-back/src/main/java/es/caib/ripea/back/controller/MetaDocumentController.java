@@ -258,7 +258,7 @@ public class MetaDocumentController extends BaseAdminController {
 		return "portafirmesModalTancar";
 	}
 	
-	@RequestMapping(value = "/flux/{paramSecure}/returnurl/{transactionId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/flux/event/{paramSecure}/returnurl/{transactionId}", method = RequestMethod.GET)
 	public void transaccioEstat(
 			HttpServletRequest request,
 			@PathVariable String paramSecure,

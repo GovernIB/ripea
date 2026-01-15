@@ -6,17 +6,19 @@ import es.caib.ripea.service.intf.dto.PortafirmesFluxRespostaDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 @Builder
 @Getter
+@Setter
 @AllArgsConstructor
 public class CreacioFluxFinalitzatEvent implements Serializable {
 	private static final long serialVersionUID = -7159538246036007850L;
-	private final Long expedientId;
-	private final Long metaDocumentId;
-	private final String entitatCodi;
-	private final String usuariCodi;
-	private final PortafirmesFluxRespostaDto fluxCreat;
+	private Long expedientId;
+	private Long metaDocumentId;
+	private String entitatCodi;
+	private String usuariCodi;
+	private PortafirmesFluxRespostaDto fluxCreat;
 	
 	public CreacioFluxFinalitzatEvent(Long expedientId, PortafirmesFluxRespostaDto fluxCreat) {
 		super();

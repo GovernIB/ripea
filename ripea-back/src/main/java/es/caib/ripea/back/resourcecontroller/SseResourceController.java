@@ -77,9 +77,27 @@ public class SseResourceController {
     /**
      * T E S T I N G
      */
+    
+    @GetMapping("/testFlux/{fluxId}/{idMetaDoc}/{userCode}/send")
+    @ResponseBody
+    public ResponseEntity<String> testFlux(
+    		@PathVariable String fluxId,
+    		@PathVariable Long idMetaDoc,
+    		@PathVariable String userCode) {
+		PortafirmesFluxRespostaDto pfr = new PortafirmesFluxRespostaDto();
+		pfr.setFluxId(fluxId!=null?fluxId:"fluxIdTest_SSE_"+System.currentTimeMillis());
+		pfr.setNom("Flux test SSE");
+		CreacioFluxFinalitzatEvent cffe = new CreacioFluxFinalitzatEvent(null, pfr);
+		cffe.setEntitatCodi(aplicacioService.getEntitatActualCodi());
+		cffe.setUsuariCodi(userCode);
+		cffe.setMetaDocumentId(idMetaDoc);
+		handleEventFluxCreatEditat(cffe);
+		return ResponseEntity.ok().header("Content-Type", "text/plain; charset=UTF-8").body("OK");
+    }
+    
     @GetMapping("/test/{eventType}/{idExpedient}/{userCode}/send")
     @ResponseBody
-    public ResponseEntity<String> stream(
+    public ResponseEntity<String> test(
     		@PathVariable String eventType,
     		@PathVariable Long idExpedient,
     		@PathVariable String userCode) {
