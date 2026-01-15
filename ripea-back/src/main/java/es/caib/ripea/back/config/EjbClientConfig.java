@@ -494,6 +494,11 @@ public class EjbClientConfig {
 		return getLocalEjbFactoyBean(MetaDocumentFluxPortafibResourceService.class);
 	}
 	
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean uRLInstruccioResourceServiceEjb() {
+		return getLocalEjbFactoyBean(URLInstruccioResourceService.class);
+	}
+	
 	/*
 	@Bean
 	public static BeanFactoryPostProcessor configurarEJBsDinamicament() {
