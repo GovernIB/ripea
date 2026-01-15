@@ -101,6 +101,7 @@ public class PermissionHelper {
 			if (targetType.endsWith(".MetaExpedientOrganGestorResource")) { return userPermissions.isAdmin(); }
 			if (targetType.endsWith(".MetaExpedientTascaResource")) { return userPermissions.isAdmin(); }
 			if (targetType.endsWith(".MetaExpedientTascaValidacioResource")) { return userPermissions.isAdmin(); }
+			if (targetType.endsWith(".MetaDocumentFluxPortafibResource")) { return userPermissions.isAdmin() || userPermissions.isOrgan(); }
 			if (targetType.endsWith(".DominiResource")) { return userPermissions.isAdmin(); }
 			if (targetType.endsWith(".TipusDocumentalResource")) { return userPermissions.isAdmin(); }
 			if (targetType.endsWith(".ConsultaPinbalResource")) { return userPermissions.isAdmin(); }
@@ -113,6 +114,7 @@ public class PermissionHelper {
 			if (targetType.endsWith(".MetaDocumentResource")) { return userPermissions.isAdmin() || userPermissions.isDisseny() || userPermissions.isRevisio(); }
 			if (targetType.endsWith(".MetaExpedientResource")) { return userPermissions.isAdmin() || userPermissions.isDisseny() || userPermissions.isRevisio(); }
 			if (targetType.endsWith(".MetaExpedientTascaResource")) { return userPermissions.isAdmin() || userPermissions.isDisseny() || userPermissions.isRevisio(); }
+			
 			//Usuari
 			if (targetType.endsWith(".UsuariResource")) { return userPermissions.isConsulta(); }
 			if (targetType.endsWith(".AlertaResource")) { return userPermissions.isConsulta(); }
