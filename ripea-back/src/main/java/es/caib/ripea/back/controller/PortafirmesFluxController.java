@@ -202,16 +202,14 @@ public class PortafirmesFluxController extends BaseUserOAdminOOrganController {
 						entitatActual.getId(), 
 						flux,
 						null);
+				model.addAttribute("fluxId", resposta.getFluxId()); //No es plantilla, es un flux creat
+			} else {
+				model.addAttribute("fluxId", transactionId); //Plantilla=true, es un flux temporal que no s'ha creat com a tal a PF
 			}
-			model.addAttribute(
-					"FluxCreat",
-					getMessage(
-					request,
-					"metadocument.form.camp.portafirmes.flux.enum." + resposta.getEstat()));
-			model.addAttribute(
-					"FluxNom", resposta.getNom());
-			model.addAttribute(
-					"FluxDescripcio", resposta.getDescripcio());
+			
+			model.addAttribute("FluxCreat", getMessage(request, "metadocument.form.camp.portafirmes.flux.enum." + resposta.getEstat()));
+			model.addAttribute("FluxNom", resposta.getNom());
+			model.addAttribute("FluxDescripcio", resposta.getDescripcio());
 			RequestSessionHelper.actualitzarObjecteSessio(
 					request,
 					SESSION_ATTRIBUTE_TRANSACCIOID,

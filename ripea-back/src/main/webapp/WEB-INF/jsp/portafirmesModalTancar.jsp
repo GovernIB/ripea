@@ -28,20 +28,28 @@ if (fluxIframe) {
 	const fluxCreatedDescripcio = "${fn:escapeXml(FluxDescripcio)}";
 	const $modalFlux = $(fluxIframe.parentElement.parentElement).prev();
 	var alertDiv;
+	var fromMetaDocument = false;
+	var selectorfluxos = $modalFlux.find('#portafirmesFluxosId'); //desde "metaExpedientMetaDocumentForm"
+	if (selectorfluxos.length === 0) {
+		selectorfluxos = $modalFlux.find('#portafirmesEnviarFluxId'); //desde "portafirmesForm"
+	} else {
+		fromMetaDocument = true;
+	}
 	
+	//Aques codi serveix tant si es crida desde "portafirmesForm" (expedient), com desde "metaExpedientMetaDocumentForm" (procediment)
     if (idTransaccioFlux != null && idTransaccioFlux != '') {
-
-    	//Afegir la opció al selector de fluxos, i que estigui ja seleccionada.
-        let selectorfluxos = $modalFlux.find('#portafirmesFluxosId');
+    	
         $(selectorfluxos).append(new Option(fluxCreatedNom, idTransaccioFlux));
         let valoresActuales = $(selectorfluxos).val() || [];
         valoresActuales.push(idTransaccioFlux);
         $(selectorfluxos).val(valoresActuales).trigger('change');
         
         //Afegir la fila a la taula de fluxos seleccionats
-        window.parent.addFluxRow(idTransaccioFlux, fluxCreatedNom);
+        if (fromMetaDocument) {
+        	window.parent.addFluxRow(idTransaccioFlux, fluxCreatedNom); //desde "metaExpedientMetaDocumentForm"
+        }
 
-    } else if (fluxErrorDesc != null && fluxErrorDesc != '') {
+    } else if (fluxErrorDesc != null && fluxErrorDesc != '' && !fromMetaDocument) {
         alertDiv = '<div class="alert alert-danger" role="alert"> \
                         <a class="close" data-dismiss="alert">×</a> \
                         <span>' + fluxErrorDesc + '</span> \
@@ -53,9 +61,12 @@ if (fluxIframe) {
 
         $modalFlux.find(".portafirmesEnviarFluxId_btn_addicional").find('i').addClass('fa-eye').removeClass('fa-eye-slash');
     }
-	if (fluxSuccesDesc != null && fluxSuccesDesc != '') {
-		$modalFlux.find('#portafirmesEnviarFluxId').empty();
-		$modalFlux.find('#portafirmesEnviarFluxId').attr('disabled', true);
+	
+  	//Nomes desde "portafirmesForm"
+	//Afegir missatge de flux seleccionat i deshabilitar el selector de flux a enviar per la firma.
+	if (fluxSuccesDesc != null && fluxSuccesDesc != '' && !fromMetaDocument) {
+		$(selectorfluxos).empty();
+		$(selectorfluxos).attr('disabled', true);
 		//desactivar botó de visualitzar
 		$modalFlux.find('.portafirmesEnviarFluxId_btn_addicional').attr('disabled', true);
 		alertDiv = '<div class="alert alert-success" role="alert"> \
@@ -67,9 +78,9 @@ if (fluxIframe) {
 			$comentari = $modalFlux.find('.comentari');
 			$comentari.text('');
 			//if flux success text exists
-			$modalFlux.find('#portafirmesEnviarFluxId').closest('.form-group').prev('p').remove();
-			$modalFlux.find('#portafirmesEnviarFluxId').closest('form').find('.success-label').removeClass('hidden');
-			$modalFlux.find('#portafirmesEnviarFluxId').closest('.form-group').before('<p class="success col-xs-8"></p>');
+			$(selectorfluxos).closest('.form-group').prev('p').remove();
+			$(selectorfluxos).closest('form').find('.success-label').removeClass('hidden');
+			$(selectorfluxos).closest('.form-group').before('<p class="success col-xs-8"></p>');
 			var $success =  $modalFlux.find('.success');
 			var text = '<spring:message code='contingut.document.form.camp.portafirmes.flux.seleccionat'/>';
 			$success.html(text + " <span>" + fluxCreatedNom + "</span>");
