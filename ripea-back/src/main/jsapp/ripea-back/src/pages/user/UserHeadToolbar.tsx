@@ -266,7 +266,6 @@ const useMenuAdmin = () => {
     const { value: user } = useUserSession();
     const { value: numNotif } = useNotificacionsSession()
     const { t } = useTranslation();
-    const { toProgramaAntic } = useToProgramaAntic();
 
     const appEntries:any[] = [
         {

@@ -22,7 +22,7 @@ import ExpedientsPendentsGrid from "./pages/user/consultes/ExpedientsPendentsGri
 import AnotacionsComunicadesGrid from "./pages/user/consultes/AnotacionsComunicadesGrid.tsx";
 import RevisioMetaExpedientGrid from "./pages/user/consultes/RevisioMetaExpedientGrid.tsx";
 import ContingutGrid from "./pages/user/consultes/ContingutGrid.tsx";
-import GestioMetaExpedientGrid from "./pages/user/configurar/GestioMetaExpedientGrid.tsx";
+import MetaExpedientGrid from "./pages/metaExpedient/MetaExpedientGrid.tsx";
 import GrupGrid from "./pages/user/configurar/GrupGrid.tsx";
 import OrganGestorGrid from "./pages/user/configurar/OrganGestorGrid.tsx";
 import TipusDocumentalGrid from "./pages/user/configurar/TipusDocumentalGrid.tsx";
@@ -91,7 +91,7 @@ const AppRoutes: React.FC = () => {
 
         {/* Configurar */}
         <Route element={<ProtectedRoute allowedRoles={['IPA_ADMIN', 'IPA_ADMIN_LECTURA', 'IPA_ORGAN_ADMIN', 'IPA_DISSENY']} />}>
-            <Route path="metaExpedient" element={<GestioMetaExpedientGrid/>} />
+            <Route path="metaExpedient" element={<MetaExpedientGrid/>} />
             <Route path="metaExpedient/:id/permis" element={<PermisMetaExpedientGrid/>} />
         </Route>
         <Route element={<ProtectedRoute allowedRoles={['IPA_ADMIN', 'IPA_ORGAN_ADMIN', 'IPA_DISSENY']} />}>
