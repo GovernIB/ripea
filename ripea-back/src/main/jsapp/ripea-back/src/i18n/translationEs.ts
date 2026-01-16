@@ -1307,8 +1307,41 @@ const translationEs = {
                 estat: "Estado de revisión",
             },
             action: {
+                new: {
+                    label: "Nuevo procedimiento",
+                    ok: "Procedimiento creado correctamente",
+                },
                 update: {
                     ok: "Procedimiento modificado correctamente",
+                },
+                delete: {
+                    ok: "Procedimiento eliminado correctamente",
+                },
+                consultar: {
+                    title: "Detalle del procedimiento",
+                    label: "Consultar",
+                },
+                canviEstat: {
+                    title: "Cambiar estado de revisión",
+                    label: "Cambiar el estado de revisión",
+                    ok: "",
+                },
+                expedient: {
+                    label: "Expedientes",
+                },
+                regla: {
+                    label: "Regla de distribución",
+                },
+                activar: {
+                    label: "Activar",
+                    ok: "Procedimiento activado correctamente",
+                },
+                desactivar: {
+                    label: "Desactivar",
+                    ok: "Procedimiento desactivado correctamente",
+                },
+                comment: {
+                    ok: "Comentario añadido al procedimiento '{{data.metaExpedient.description}}'",
                 },
             },
         },

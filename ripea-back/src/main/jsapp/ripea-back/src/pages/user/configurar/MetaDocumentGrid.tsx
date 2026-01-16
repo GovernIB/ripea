@@ -18,7 +18,6 @@ import {useMemo, useState} from "react";
 import Load from "../../../components/Load.tsx";
 import Iframe from "../../../components/Iframe.tsx";
 import {useFluxFinalitzatSession} from "../../../components/SseClient.tsx";
-import {useUserSession} from "../../../components/Session.tsx";
 
 const useActions = (refresh?: () => void) => {
     const {t} = useTranslation();
@@ -114,7 +113,6 @@ const portafibColumns = [
 const PortafirmesMetaDocumentForm = () => {
     const {t} = useTranslation()
     const apiRef = useMuiDataGridApiRef();
-    const { value: user } = useUserSession()
     const {data, apiRef: formApiRef} = useFormContext()
 
     const filterResponsables = builder.neq('nif', null)
@@ -253,7 +251,6 @@ const sortModel: any = [{field: 'nom', sort: 'asc'}]
 const perspectives = ["COUNT_METADADES"];
 
 const MetaDocumentGrid = () => {
-
     const {t} = useTranslation();
     const navigate = useNavigate();
     const apiRef = useMuiDataGridApiRef();

@@ -167,3 +167,17 @@ export const TascaComment = (props: any) => {
         }}
     />
 }
+
+export const MetaExpedientComment = (props: any) => {
+    const { entity } = props;
+    const { t } = useTranslation();
+    return <CommentDialog
+        {...props}
+        title={`${t('page.comment.metaExpedient')}: ${entity?.nom}`}
+        resourceName={'metaExpedientComentariResource'}
+        resourceReference={'metaExpedient'}
+        i18nKeys={{
+            createSuccess: 'page.metaExpedient.action.comment.ok',
+        }}
+    />
+}

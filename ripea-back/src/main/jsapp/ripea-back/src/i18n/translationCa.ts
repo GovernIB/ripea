@@ -1307,8 +1307,41 @@ const translationCa = {
                 estat: "Estat revisió",
             },
             action: {
+                new: {
+                    label: "Nou procediment",
+                    ok: "Procediment creat correctament",
+                },
                 update: {
                     ok: "Procediment modificat correctament",
+                },
+                delete: {
+                    ok: "Procediment eliminat correctament",
+                },
+                consultar: {
+                    title: "Detall del procediment",
+                    label: "Consultar",
+                },
+                canviEstat: {
+                    title: "Canviar estat de revisó",
+                    label: "Canviar l'estat de revisó",
+                    ok: "",
+                },
+                expedient: {
+                    label: "Expedients",
+                },
+                regla: {
+                    label: "Regla distribució",
+                },
+                activar: {
+                    label: "Activar",
+                    ok: "Procediment activat correctament",
+                },
+                desactivar: {
+                    label: "Desactivar",
+                    ok: "Procediment desactivat correctament",
+                },
+                comment: {
+                    ok: "Comentari afegit al procediment '{{data.metaExpedient.description}}'",
                 },
             },
         },

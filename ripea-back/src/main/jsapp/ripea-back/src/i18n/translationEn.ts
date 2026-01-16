@@ -1307,8 +1307,41 @@ const translationEn = {
                 estat: "Review status",
             },
             action: {
+                new: {
+                    label: "New procedure",
+                    ok: "Procedure created successfully",
+                },
                 update: {
                     ok: "Procedure updated successfully",
+                },
+                delete: {
+                    ok: "Procedure deleted successfully",
+                },
+                consultar: {
+                    title: "Procedure details",
+                    label: "View",
+                },
+                canviEstat: {
+                    title: "Change review status",
+                    label: "Change review status",
+                    ok: "",
+                },
+                expedient: {
+                    label: "Cases",
+                },
+                regla: {
+                    label: "Distribution rule",
+                },
+                activar: {
+                    label: "Activate",
+                    ok: "Procedure activated successfully",
+                },
+                desactivar: {
+                    label: "Deactivate",
+                    ok: "Procedure deactivated successfully",
+                },
+                comment: {
+                    ok: "Comment added to procedure '{{data.metaExpedient.description}}'",
                 },
             },
         },
