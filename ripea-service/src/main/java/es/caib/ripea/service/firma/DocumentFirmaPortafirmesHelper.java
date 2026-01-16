@@ -94,6 +94,11 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 			String transaccioId,
 			boolean avisFirmaParcial,
 			boolean firmaParcial) {
+		
+		if (!Utils.hasValue(portafirmesFluxId)) {
+			portafirmesFluxId = transaccioId;
+		}
+		
 		logger.debug("Enviant document a portafirmes (" +
 				"entitatId=" + entitatId + ", " +
 				"id=" + document.getId() + ", " +
