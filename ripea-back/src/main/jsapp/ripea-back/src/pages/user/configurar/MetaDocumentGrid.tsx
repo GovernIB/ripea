@@ -144,7 +144,7 @@ const PortafirmesMetaDocumentForm = () => {
     onChange((flux) => {
         if(!flux?.error) {
             const fluxos: any[] = data?.fluxosFirma ?? [];
-            fluxos.push({ id: flux?.fluxCreat?.fluxId, description: flux?.fluxCreat?.nom })
+            fluxos.push({ id: flux?.fluxCreat?.id, description: flux?.fluxCreat?.nom })
             formApiRef?.current?.setFieldValue("fluxosFirma", fluxos);
             remove()
             handleClose()

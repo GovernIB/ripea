@@ -266,10 +266,13 @@ public class MetaDocumentController extends BaseAdminController {
 			Model model) {
 		String data = Utils.desencripta(paramSecure, aplicacioService.propertyFindByNom("es.caib.ripea.encription.key"));
 		String[] dataSplri = data.split("#");
-		Long metaDocumentId = dataSplri[1]!=null?Long.parseLong(dataSplri[1].toString()):null;
+		Long metaDocumentId = null;
+		if (dataSplri[1]!=null && !"null".equals(dataSplri[1].toString()) && Utils.hasValue(dataSplri[1].toString())) {
+			metaDocumentId = Long.parseLong(dataSplri[1].toString());
+		}
 		PortafirmesFluxRespostaDto resposta = portafirmesFluxService.recuperarFluxFirma(transactionId);
-//		Long fluxId = portafirmesFluxService.guardarFluxFirmaMetaDocumentRipea(metaDocumentId, resposta);
-//		resposta.setId(fluxId);
+		Long fluxId = portafirmesFluxService.guardarFluxFirmaMetaDocumentRipea(metaDocumentId, resposta);
+		resposta.setId(fluxId);
 		CreacioFluxFinalitzatEvent fluxEvent = new CreacioFluxFinalitzatEvent(
 				null,
 				metaDocumentId,

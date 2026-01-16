@@ -171,7 +171,12 @@ public class MetaDocumentHelper {
 			for (String fluxId : newFluxos) {
 				//Insertar els fluxos que no existeixen actualment a la entitat
 				if (!metaDocumentEntity.fluxeExistById(fluxId))	{
+					//Revisam si hi ha algun flux amb aquest ID pero sense meta-doc associat.
+					MetaDocumentFluxPortafibEntity fluxOrfe = metaDocumentFluxPortafibRepository.findByMetaDocumentIsNullAndPortafirmesFluxId(fluxId);
 					MetaDocumentFluxPortafibEntity metaDocumentFluxPortafibEntity = new MetaDocumentFluxPortafibEntity();
+					if (fluxOrfe!=null) {
+						metaDocumentFluxPortafibEntity = fluxOrfe;
+					}
 					metaDocumentFluxPortafibEntity.setMetaDocument(metaDocumentEntity);
 					metaDocumentFluxPortafibEntity.setPortafirmesFluxId(fluxId);
 					try {

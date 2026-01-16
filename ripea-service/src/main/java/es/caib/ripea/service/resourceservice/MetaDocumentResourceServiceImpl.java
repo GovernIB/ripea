@@ -20,12 +20,15 @@ import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.entity.MetaDadaEntity;
 import es.caib.ripea.persistence.entity.MetaDocumentEntity;
+import es.caib.ripea.persistence.entity.MetaDocumentFluxPortafibEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.entity.TipusDocumentalEntity;
+import es.caib.ripea.persistence.entity.resourceentity.MetaDocumentFluxPortafibResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaDocumentResourceEntity;
 import es.caib.ripea.persistence.repository.DocumentRepository;
 import es.caib.ripea.persistence.repository.ExpedientRepository;
 import es.caib.ripea.persistence.repository.MetaDadaRepository;
+import es.caib.ripea.persistence.repository.MetaDocumentFluxPortafibRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.persistence.repository.TipusDocumentalRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
@@ -45,6 +48,7 @@ import es.caib.ripea.service.intf.dto.PinbalServeiDto;
 import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.model.ContingutResource;
 import es.caib.ripea.service.intf.model.EntitatResource;
+import es.caib.ripea.service.intf.model.MetaDocumentFluxPortafibResource;
 import es.caib.ripea.service.intf.model.MetaDocumentResource;
 import es.caib.ripea.service.intf.model.UsuariResource;
 import es.caib.ripea.service.intf.resourceservice.MetaDocumentResourceService;
@@ -61,6 +65,7 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
 	private final MetaDadaRepository metaDadaRepository;
 	private final DocumentRepository documentRepository;
 	private final OrganGestorRepository organGestorRepository;
+	private final MetaDocumentFluxPortafibRepository metaDocumentFluxPortafibRepository;
 	private final TipusDocumentalRepository tipusDocumentalRepository;
 	private final MetaDocumentHelper metaDocumentHelper;
 	private final UsuariHelper usuariHelper;
@@ -246,6 +251,13 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
 					entity.getPinbalServei().getId(),
 					entity.getPinbalServei().getNom()));
 		}
+		if (entity.getFluxosFirma()!=null && entity.getFluxosFirma().size()>0) {
+			List<ResourceReference<MetaDocumentFluxPortafibResource, Long>> fluxosFirma = new ArrayList<>();
+			for (MetaDocumentFluxPortafibResourceEntity mdfpre: entity.getFluxosFirma()) {
+				fluxosFirma.add(ResourceReference.toResourceReference(mdfpre.getId(), mdfpre.getPortafirmesFluxDesc()));
+			}
+			metaDocumentResource.setFluxosFirma(fluxosFirma);
+		}
 		return metaDocumentResource;
 	}
 	
@@ -266,6 +278,15 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
 			PinbalServeiDto pinbalServeiDto = new PinbalServeiDto();
 			pinbalServeiDto.setId(resource.getPinbalServei().getId());
 			metaDocumentDto.setPinbalServei(pinbalServeiDto);
+		}
+		if (resource.getFluxosFirma()!=null) {
+			String[] fluxosFirma = new String[resource.getFluxosFirma().size()];
+			for (int f=0; f<resource.getFluxosFirma().size(); f++) {
+				MetaDocumentFluxPortafibEntity mdfpre = metaDocumentFluxPortafibRepository.findById(
+						resource.getFluxosFirma().get(f).getId()).get();
+				fluxosFirma[f] = mdfpre.getPortafirmesFluxId();
+			}
+			metaDocumentDto.setPortafirmesFluxosId(fluxosFirma);
 		}
 		return metaDocumentDto;
 	}
