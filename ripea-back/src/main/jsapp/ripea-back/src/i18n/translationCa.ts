@@ -1282,7 +1282,7 @@ const translationCa = {
                     },
                 },
                 vista: "Canvi vista",
-                pdf: "Descarregar PDF",
+                pdf: "Descarrega PDF",
             },
         },
         tipusDocumental: {

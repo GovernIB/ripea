@@ -6,6 +6,7 @@ import java.util.stream.Stream;
 
 import es.caib.ripea.back.interceptor.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -65,7 +66,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
 	@Autowired private AccesFluxosFirmaUsuariInterceptor accesFluxosFirmaUsuariInterceptor;
 	@Autowired private AccesSuperInterceptor accesSuperInterceptor;
 
-	public static final int MAX_UPLOAD_SIZE = 1000000000;
+	@Value("${es.caib.ripea.maxUploadSize:1000000000}")
+	public long MAX_UPLOAD_SIZE;
 	
 	@Bean
 	public FilterRegistrationBean<SiteMeshFilter> sitemeshFilter() {

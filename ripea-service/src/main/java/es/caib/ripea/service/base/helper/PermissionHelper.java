@@ -100,7 +100,6 @@ public class PermissionHelper {
 			if (targetType.endsWith(".MetaExpedientComentariResource")) { return userPermissions.isAdmin(); }
 			if (targetType.endsWith(".MetaExpedientOrganGestorResource")) { return userPermissions.isAdmin(); }
 			if (targetType.endsWith(".MetaExpedientTascaResource")) { return userPermissions.isAdmin(); }
-			if (targetType.endsWith(".MetaExpedientTascaValidacioResource")) { return userPermissions.isAdmin(); }
 			if (targetType.endsWith(".MetaDocumentFluxPortafibResource")) { return userPermissions.isAdmin() || userPermissions.isOrgan(); }
 			if (targetType.endsWith(".DominiResource")) { return userPermissions.isAdmin(); }
 			if (targetType.endsWith(".TipusDocumentalResource")) { return userPermissions.isAdmin(); }
@@ -119,6 +118,7 @@ public class PermissionHelper {
 			if (targetType.endsWith(".UsuariResource")) { return userPermissions.isConsulta(); }
 			if (targetType.endsWith(".AlertaResource")) { return userPermissions.isConsulta(); }
 			if (targetType.endsWith(".CarpetaResource")) { return userPermissions.isConsulta(); }
+			if (targetType.endsWith(".CarpetaResource")) { return userPermissions.isConsulta(); }
 			if (targetType.endsWith(".ContingutLogResource")) { return userPermissions.isConsulta(); }
 			if (targetType.endsWith(".ContingutMovimentResource")) { return userPermissions.isConsulta(); }
 			if (targetType.endsWith(".ContingutResource")) { return userPermissions.isConsulta(); }
@@ -135,6 +135,7 @@ public class PermissionHelper {
 			if (targetType.endsWith(".ExecucioMassivaResource")) { return userPermissions.isConsulta(); }
 			if (targetType.endsWith(".ExpedientComentariResource")) { return userPermissions.isConsulta(); }
 			if (targetType.endsWith(".ExpedientEstatResource")) { return userPermissions.isConsulta(); }
+			if (targetType.endsWith(".ExpedientOrganPareResource")) { return userPermissions.isConsulta(); }
 			if (targetType.endsWith(".ExpedientPeticioResource")) { return userPermissions.isConsulta(); }
 			if (targetType.endsWith(".ExpedientResource")) { return userPermissions.isConsulta(); }
 			if (targetType.endsWith(".ExpedientTascaComentariResource")) { return userPermissions.isConsulta(); }
@@ -148,7 +149,8 @@ public class PermissionHelper {
 			if (targetType.endsWith(".RegistreInteressatResource")) { return userPermissions.isConsulta(); }
 			if (targetType.endsWith(".RegistreResource")) { return userPermissions.isConsulta(); }
 			if (targetType.endsWith(".ValidacioErrorResource")) { return userPermissions.isConsulta(); }
-			if (targetType.endsWith(".InteressatGrupResource")) { return userPermissions.isConsulta(); }			
+			if (targetType.endsWith(".InteressatGrupResource")) { return userPermissions.isConsulta(); }
+			if (targetType.endsWith(".URLInstruccioResource")) { return userPermissions.isConsulta(); }
 		}
 		//Es retorna false per defecte, quant es crei un nou recurs, s'ha de venir aqui a colocar-lo en el nivell adequat.
 		return false;
