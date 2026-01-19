@@ -151,7 +151,7 @@ public class DocumentResourceEntity extends NodeResourceEntity<DocumentResource>
 	@JoinColumn(
 			name = "expedient_estat_id",
 			foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "expestat_document_fk"))	
-	private ExpedientEstatResourceEntity expedientEstatAdditional;
+	private MetaExpedientEstatResourceEntity expedientEstatAdditional;
 
     @OneToMany(mappedBy = "document", fetch = FetchType.LAZY)
     @Where(clause = "dtype = 'DocumentNotificacioEntity'")

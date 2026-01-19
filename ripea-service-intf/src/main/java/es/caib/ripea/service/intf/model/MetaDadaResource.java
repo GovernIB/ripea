@@ -16,9 +16,11 @@ import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.FieldNameConstants;
 
 @Getter
 @Setter
+@FieldNameConstants
 @NoArgsConstructor
 @ResourceConfig(
         quickFilterFields = { "codi", "nom", "tipus" },

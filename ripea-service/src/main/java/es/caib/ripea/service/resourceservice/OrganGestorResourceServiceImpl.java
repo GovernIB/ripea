@@ -275,7 +275,8 @@ public class OrganGestorResourceServiceImpl extends BaseMutableResourceService<O
 		public Serializable exec(String code, OrganGestorResourceEntity entity, Serializable params) throws ActionExecutionException {
 			try {
 				EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, true, false, false, false);
-				return organGestorHelper.syncDir3OrgansGestors(entitat.getId(), LocaleContextHolder.getLocale());
+				Object[] resultat = organGestorHelper.syncDir3OrgansGestors(entitat.getId(), LocaleContextHolder.getLocale());
+				return "{\"obsoleteUnitats\": \""+((ArrayList)resultat[0]).size()+"\"}";
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/organGestor/UpdateDir3ActionExecutor", e);
 				throw new ActionExecutionException(getResourceClass(), null, code, messageHelper.getMessage("message.common.action.error")+": "+e.getMessage());

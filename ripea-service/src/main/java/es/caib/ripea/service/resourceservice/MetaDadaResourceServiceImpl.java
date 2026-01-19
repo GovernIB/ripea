@@ -10,6 +10,9 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.stereotype.Service;
 
+import com.turkraft.springfilter.FilterBuilder;
+import com.turkraft.springfilter.parser.Filter;
+
 import es.caib.ripea.persistence.entity.DominiEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaDadaResourceEntity;
@@ -26,17 +29,14 @@ import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.DominiDto;
 import es.caib.ripea.service.intf.dto.MetaDadaDto;
 import es.caib.ripea.service.intf.dto.MetaDadaTipusEnumDto;
+import es.caib.ripea.service.intf.model.EntitatResource;
 import es.caib.ripea.service.intf.model.MetaDadaResource;
+import es.caib.ripea.service.intf.model.MetaNodeResource;
 import es.caib.ripea.service.intf.resourceservice.MetaDadaResourceService;
 import es.caib.ripea.service.intf.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * Implementació del servei de gestió de tasques.
- *
- * @author Límit Tecnologies
- */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -53,6 +53,19 @@ public class MetaDadaResourceServiceImpl extends BaseMutableResourceService<Meta
     @PostConstruct
     public void init() {}
 	
+    protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
+    	
+        String entitatActualCodi = configHelper.getEntitatActualCodi();
+    	
+        Filter filtreBase = FilterBuilder.and(
+                (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null,
+                FilterBuilder.equal(MetaDadaResource.Fields.metaNode + "." + MetaNodeResource.Fields.entitat + "." + EntitatResource.Fields.codi, 
+                		entitatActualCodi != null?entitatActualCodi:"................................................................................")
+        );
+        
+        return filtreBase.generate();
+    }
+    
 	@Override
 	public MetaDadaResource create(MetaDadaResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
 		

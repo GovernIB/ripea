@@ -15,16 +15,16 @@ import es.caib.ripea.service.intf.base.exception.ArtifactNotFoundException;
 import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
 import es.caib.ripea.service.intf.base.exception.ResourceFieldNotFoundException;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
-import es.caib.ripea.service.intf.resourceservice.ExpedientEstatResourceService;
+import es.caib.ripea.service.intf.resourceservice.MetaExpedientEstatResourceService;
 import lombok.experimental.Delegate;
 
 @Stateless
 @RolesAllowed("**")
-public class ExpedientEstatResourceServiceEjb extends AbstractServiceEjb<ExpedientEstatResourceService> implements ExpedientEstatResourceService {
+public class MetaExpedientEstatResourceServiceEjb extends AbstractServiceEjb<MetaExpedientEstatResourceService> implements MetaExpedientEstatResourceService {
 
-	@Delegate private ExpedientEstatResourceService delegateService;
+	@Delegate private MetaExpedientEstatResourceService delegateService;
 
-	protected void setDelegateService(ExpedientEstatResourceService delegateService) {
+	protected void setDelegateService(MetaExpedientEstatResourceService delegateService) {
 		this.delegateService = delegateService;
 	}
 	

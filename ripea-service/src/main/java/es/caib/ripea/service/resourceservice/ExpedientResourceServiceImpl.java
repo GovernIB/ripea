@@ -25,7 +25,6 @@ import java.util.zip.ZipOutputStream;
 
 import javax.annotation.PostConstruct;
 
-import es.caib.ripea.service.intf.model.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.hibernate.Hibernate;
 import org.springframework.data.jpa.domain.Specification;
@@ -117,6 +116,10 @@ import es.caib.ripea.service.intf.dto.ResultatConsultaDto;
 import es.caib.ripea.service.intf.dto.SiNoEnumDto;
 import es.caib.ripea.service.intf.dto.TipusRegistreEnumDto;
 import es.caib.ripea.service.intf.dto.UsuariDto;
+import es.caib.ripea.service.intf.model.ContingutResource;
+import es.caib.ripea.service.intf.model.DocumentResource;
+import es.caib.ripea.service.intf.model.EntitatResource;
+import es.caib.ripea.service.intf.model.ExpedientResource;
 import es.caib.ripea.service.intf.model.ExpedientResource.CanviEstatExpedientFormAction;
 import es.caib.ripea.service.intf.model.ExpedientResource.CanviPrioritatExpedientFormAction;
 import es.caib.ripea.service.intf.model.ExpedientResource.ExpedientFilterForm;
@@ -127,7 +130,12 @@ import es.caib.ripea.service.intf.model.ExpedientResource.ImportarExpedientFormA
 import es.caib.ripea.service.intf.model.ExpedientResource.MassiveImportDocsAction;
 import es.caib.ripea.service.intf.model.ExpedientResource.MoureTotFormAction;
 import es.caib.ripea.service.intf.model.ExpedientResource.TancarExpedientFormAction;
+import es.caib.ripea.service.intf.model.InteressatResource;
+import es.caib.ripea.service.intf.model.MetaExpedientEstatResource;
+import es.caib.ripea.service.intf.model.MetaExpedientOrganGestorResource;
+import es.caib.ripea.service.intf.model.MetaExpedientResource;
 import es.caib.ripea.service.intf.model.NodeResource.MassiveAction;
+import es.caib.ripea.service.intf.model.UsuariResource;
 import es.caib.ripea.service.intf.resourceservice.ExpedientResourceService;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.utils.Utils;
@@ -754,7 +762,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         @Override
         public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
             if (entity.getEstatAdditional()!=null) {
-                resource.setEstatAdditionalInfo(objectMappingHelper.newInstanceMap(Hibernate.unproxy(entity.getEstatAdditional()), ExpedientEstatResource.class));
+                resource.setEstatAdditionalInfo(objectMappingHelper.newInstanceMap(Hibernate.unproxy(entity.getEstatAdditional()), MetaExpedientEstatResource.class));
             }
         }
     }

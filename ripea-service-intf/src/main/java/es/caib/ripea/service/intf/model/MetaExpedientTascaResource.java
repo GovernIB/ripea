@@ -8,6 +8,7 @@ import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.FieldNameConstants;
 
 import java.util.Date;
 
@@ -19,6 +20,7 @@ import java.util.Date;
 @Getter
 @Setter
 @NoArgsConstructor
+@FieldNameConstants
 @ResourceConfig(quickFilterFields = { "codi", "nom" }, descriptionField = "nom")
 public class MetaExpedientTascaResource extends BaseAuditableResource<Long> {
 
@@ -41,8 +43,8 @@ public class MetaExpedientTascaResource extends BaseAuditableResource<Long> {
     private String estatNomFinalitzarTasca;
     private String estatColorFinalitzarTasca;
 
-    private ResourceReference<ExpedientEstatResource, Long> estatCrearTasca;
-    private ResourceReference<ExpedientEstatResource, Long> estatFinalitzarTasca;
+    private ResourceReference<MetaExpedientEstatResource, Long> estatCrearTasca;
+    private ResourceReference<MetaExpedientEstatResource, Long> estatFinalitzarTasca;
     private ResourceReference<MetaExpedientResource, Long> metaExpedient;
 
 }

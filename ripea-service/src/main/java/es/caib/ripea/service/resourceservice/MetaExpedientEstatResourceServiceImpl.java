@@ -7,20 +7,20 @@ import org.springframework.stereotype.Service;
 import com.turkraft.springfilter.FilterBuilder;
 import com.turkraft.springfilter.parser.Filter;
 
-import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientTascaResourceEntity;
+import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientEstatResourceEntity;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.intf.model.EntitatResource;
-import es.caib.ripea.service.intf.model.MetaExpedientTascaResource;
+import es.caib.ripea.service.intf.model.MetaExpedientEstatResource;
 import es.caib.ripea.service.intf.model.MetaNodeResource;
-import es.caib.ripea.service.intf.resourceservice.MetaExpedientTascaResourceService;
+import es.caib.ripea.service.intf.resourceservice.MetaExpedientEstatResourceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class MetaExpedientTascaResourceServiceImpl extends BaseMutableResourceService<MetaExpedientTascaResource, Long, MetaExpedientTascaResourceEntity> implements MetaExpedientTascaResourceService {
+public class MetaExpedientEstatResourceServiceImpl extends BaseMutableResourceService<MetaExpedientEstatResource, Long, MetaExpedientEstatResourceEntity> implements MetaExpedientEstatResourceService {
 
 	private final ConfigHelper configHelper;
 	
@@ -33,7 +33,7 @@ public class MetaExpedientTascaResourceServiceImpl extends BaseMutableResourceSe
     	
         Filter filtreBase = FilterBuilder.and(
                 (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null,
-                FilterBuilder.equal(MetaExpedientTascaResource.Fields.metaExpedient + "." + MetaNodeResource.Fields.entitat + "." + EntitatResource.Fields.codi, 
+                FilterBuilder.equal(MetaExpedientEstatResource.Fields.metaExpedient + "." + MetaNodeResource.Fields.entitat + "." + EntitatResource.Fields.codi, 
                 		entitatActualCodi != null?entitatActualCodi:"................................................................................")
         );
         

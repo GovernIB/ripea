@@ -9,12 +9,14 @@ import es.caib.ripea.service.intf.base.model.ResourceReference;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.FieldNameConstants;
 
 @Getter
 @Setter
 @NoArgsConstructor
+@FieldNameConstants
 @ResourceConfig(quickFilterFields = { "codi", "nom" }, descriptionField = "nom")
-public class ExpedientEstatResource extends BaseAuditableResource<Long> {
+public class MetaExpedientEstatResource extends BaseAuditableResource<Long> {
 
 	@NotNull
 	@Size(max = 256)

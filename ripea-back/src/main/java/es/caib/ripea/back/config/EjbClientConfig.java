@@ -25,7 +25,7 @@ import es.caib.ripea.service.intf.resourceservice.EntitatResourceService;
 import es.caib.ripea.service.intf.resourceservice.ExecucioMassivaContingutResourceService;
 import es.caib.ripea.service.intf.resourceservice.ExecucioMassivaResourceService;
 import es.caib.ripea.service.intf.resourceservice.ExpedientComentariResourceService;
-import es.caib.ripea.service.intf.resourceservice.ExpedientEstatResourceService;
+import es.caib.ripea.service.intf.resourceservice.MetaExpedientEstatResourceService;
 import es.caib.ripea.service.intf.resourceservice.ExpedientPeticioResourceService;
 import es.caib.ripea.service.intf.resourceservice.ExpedientResourceService;
 import es.caib.ripea.service.intf.resourceservice.ExpedientTascaComentariResourceService;
@@ -390,8 +390,8 @@ public class EjbClientConfig {
 	}
 
 	@Bean
-	public LocalStatelessSessionProxyFactoryBean expedientEstatResourceServiceEjb() {
-		return getLocalEjbFactoyBean(ExpedientEstatResourceService.class);
+	public LocalStatelessSessionProxyFactoryBean metaExpedientEstatResourceServiceEjb() {
+		return getLocalEjbFactoyBean(MetaExpedientEstatResourceService.class);
 	}
 
 	@Bean
@@ -497,6 +497,11 @@ public class EjbClientConfig {
 	@Bean
 	public LocalStatelessSessionProxyFactoryBean uRLInstruccioResourceServiceEjb() {
 		return getLocalEjbFactoyBean(URLInstruccioResourceService.class);
+	}
+	
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean metaExpedientTascaValidacioResourceServiceEjb() {
+		return getLocalEjbFactoyBean(MetaExpedientTascaValidacioResourceService.class);
 	}
 	
 	/*

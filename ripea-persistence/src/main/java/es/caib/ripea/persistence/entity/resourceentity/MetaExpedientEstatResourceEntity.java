@@ -1,11 +1,6 @@
 package es.caib.ripea.persistence.entity.resourceentity;
 
-import es.caib.ripea.persistence.base.entity.BaseAuditableEntity;
-import es.caib.ripea.service.intf.config.BaseConfig;
-import es.caib.ripea.service.intf.model.ExpedientEstatResource;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -18,7 +13,13 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import java.util.List;
+
+import es.caib.ripea.persistence.base.entity.BaseAuditableEntity;
+import es.caib.ripea.service.intf.config.BaseConfig;
+import es.caib.ripea.service.intf.model.MetaExpedientEstatResource;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * Entitat de base de dades que representa un node.
@@ -31,7 +32,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @Inheritance(strategy = InheritanceType.JOINED)
-public class ExpedientEstatResourceEntity extends BaseAuditableEntity<ExpedientEstatResource> {
+public class MetaExpedientEstatResourceEntity extends BaseAuditableEntity<MetaExpedientEstatResource> {
 
 	@Column(name = "codi", length = 256, nullable = false)
 	private String codi;

@@ -296,7 +296,7 @@ public class DocumentResource extends NodeResource {
     @NotNull
 	private DocumentFirmaTipusEnumDto documentFirmaTipus;
     
-	private ResourceReference<ExpedientEstatResource, Long> expedientEstatAdditional;
+	private ResourceReference<MetaExpedientEstatResource, Long> expedientEstatAdditional;
     @NotNull
     private ResourceReference<ExpedientResource, Long> expedient;
     

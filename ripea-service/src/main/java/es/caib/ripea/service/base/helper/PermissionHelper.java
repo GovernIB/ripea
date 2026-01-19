@@ -134,7 +134,8 @@ public class PermissionHelper {
 			if (targetType.endsWith(".ExecucioMassivaContingutResource")) { return userPermissions.isConsulta(); }
 			if (targetType.endsWith(".ExecucioMassivaResource")) { return userPermissions.isConsulta(); }
 			if (targetType.endsWith(".ExpedientComentariResource")) { return userPermissions.isConsulta(); }
-			if (targetType.endsWith(".ExpedientEstatResource")) { return userPermissions.isConsulta(); }
+			if (targetType.endsWith(".MetaExpedientEstatResource")) { return userPermissions.isConsulta(); }
+			if (targetType.endsWith(".MetaExpedientTascaResource")) { return userPermissions.isConsulta(); }			
 			if (targetType.endsWith(".ExpedientOrganPareResource")) { return userPermissions.isConsulta(); }
 			if (targetType.endsWith(".ExpedientPeticioResource")) { return userPermissions.isConsulta(); }
 			if (targetType.endsWith(".ExpedientResource")) { return userPermissions.isConsulta(); }

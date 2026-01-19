@@ -1,6 +1,8 @@
 package es.caib.ripea.persistence.entity.resourceentity;
 
 import es.caib.ripea.persistence.base.entity.BaseAuditableEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientTascaValidacioEntity;
+import es.caib.ripea.persistence.repository.MetaExpedientTascaValidacioRepository;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
 import es.caib.ripea.service.intf.model.MetaExpedientTascaResource;
@@ -43,21 +45,21 @@ public class MetaExpedientTascaResourceEntity extends BaseAuditableEntity<MetaEx
 
     @ManyToOne
     @JoinColumn(name = "estat_crear_tasca_id")
-    private ExpedientEstatResourceEntity estatCrearTasca;
+    private MetaExpedientEstatResourceEntity estatCrearTasca;
 
     @ManyToOne
     @JoinColumn(name = "estat_finalitzar_tasca_id")
-    private ExpedientEstatResourceEntity estatFinalitzarTasca;
+    private MetaExpedientEstatResourceEntity estatFinalitzarTasca;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "meta_expedient_id")
     @org.hibernate.annotations.ForeignKey(name = BaseConfig.DB_PREFIX + "metaexp_metaexptas_fk")
     private MetaExpedientResourceEntity metaExpedient;
 
-//    @OneToMany(
-//            mappedBy = "metaExpedientTasca",
-//            cascade = CascadeType.ALL,
-//            fetch = FetchType.LAZY,
-//            orphanRemoval = true)
-//    private List<MetaExpedientTascaValidacioEntity> validacions = new ArrayList<MetaExpedientTascaValidacioEntity>();
+    @OneToMany(
+            mappedBy = "metaExpedientTasca",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY,
+            orphanRemoval = true)
+    private List<MetaExpedientTascaValidacioResourceEntity> validacions = new ArrayList<MetaExpedientTascaValidacioResourceEntity>();
 }

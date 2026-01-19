@@ -55,7 +55,7 @@ public class MetaExpedientResourceEntity extends MetaNodeResourceEntity<MetaExpe
     private boolean permisDirecte = false;
 
 	@OneToMany(mappedBy = "metaExpedient", cascade = { CascadeType.ALL })
-	protected Set<ExpedientEstatResourceEntity> estats;
+	protected Set<MetaExpedientEstatResourceEntity> estats;
 
 	@Column(name = "codi", length = 64, nullable = false)
 	private String codiPropi;

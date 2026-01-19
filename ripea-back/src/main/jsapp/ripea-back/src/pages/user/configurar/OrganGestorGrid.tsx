@@ -185,7 +185,7 @@ const useOrganGestorSyncDialog = () => {
                         descargarPDF(ref?.current)
                         break;
                     case 'sync':
-                        apiAction(undefined, {code: "DIR3_UPDATE_CODE"})
+                        apiAction(undefined, {code: "DIR3_UPDATE"})
                             .then((res) => {
                                 handleClose();
                             });  

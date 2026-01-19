@@ -308,7 +308,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
 	private ResourceReference<MetaExpedientResource, Long> metaExpedient;
     @Transient private MetaExpedientResource metaExpedientInfo;
 	private ResourceReference<UsuariResource, String> agafatPer;
-	private ResourceReference<ExpedientEstatResource, Long> estatAdditional;
+	private ResourceReference<MetaExpedientEstatResource, Long> estatAdditional;
     @Transient boolean gestioAmbGrupsActiva;
 	private ResourceReference<GrupResource, Long> grup;
 	private ResourceReference<MetaExpedientOrganGestorResource, Long> metaexpedientOrganGestorPares;
@@ -378,7 +378,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
 	@Size(max = 1024)
 	private String prioritatMotiu;
 
-    @Transient private ExpedientEstatResource estatAdditionalInfo;
+    @Transient private MetaExpedientEstatResource estatAdditionalInfo;
     @Transient private List<InteressatResource> interessats;
     @Transient private List<ResourceReference<UsuariResource, String>> seguidors;
     @Transient private boolean seguidor = false;
@@ -503,7 +503,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
     public static class CanviEstatExpedientFormAction extends MassiveAction {
         @Transient private String nom;
         @NotNull
-        private ResourceReference<ExpedientEstatResource, Long> estatAdditional;
+        private ResourceReference<MetaExpedientEstatResource, Long> estatAdditional;
     }
     
     @Getter

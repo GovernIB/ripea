@@ -1,13 +1,13 @@
 package es.caib.ripea.persistence.entity.resourcerepository;
 
 import es.caib.ripea.persistence.base.repository.BaseRepository;
-import es.caib.ripea.persistence.entity.resourceentity.ExpedientEstatResourceEntity;
+import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientEstatResourceEntity;
 
 /**
  * Repositori per a la gestió d'expedients.
  * 
  * @author Límit Tecnologies
  */
-public interface ExpedientEstatResourceRepository extends BaseRepository<ExpedientEstatResourceEntity, Long> {
+public interface MetaExpedientEstatResourceRepository extends BaseRepository<MetaExpedientEstatResourceEntity, Long> {
 
 }

@@ -101,7 +101,7 @@ public class MetaExpedientResource extends MetaNodeResource {
 
     @ResourceField(onChangeActive = true)
     @Transient private boolean procedimentComu;
-	@Transient private List<ResourceReference<ExpedientEstatResource, Long>> estats;
+	@Transient private List<ResourceReference<MetaExpedientEstatResource, Long>> estats;
 	@Transient private List<ResourceReference<MetaExpedientOrganGestorResource, Long>> metaExpedientOrganGestors;
 
     @Transient private int numComentaris;
