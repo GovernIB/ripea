@@ -41,7 +41,7 @@ import es.caib.ripea.service.intf.base.model.UnpagedButSorted;
  * 
  * @author Limit Tecnologies
  */
-@Configuration
+@Configuration("webMvcConfig")
 public class WebMvcConfig implements WebMvcConfigurer {
 
 	@Autowired private MetaExpedientInterceptor metaExpedientInterceptor;
@@ -69,6 +69,10 @@ public class WebMvcConfig implements WebMvcConfigurer {
 	@Value("${es.caib.ripea.maxUploadSize:1000000000}")
 	public long MAX_UPLOAD_SIZE;
 	
+	public long getMAX_UPLOAD_SIZE() {
+		return MAX_UPLOAD_SIZE;
+	}
+
 	@Bean
 	public FilterRegistrationBean<SiteMeshFilter> sitemeshFilter() {
 		FilterRegistrationBean<SiteMeshFilter> registrationBean = new FilterRegistrationBean<>();

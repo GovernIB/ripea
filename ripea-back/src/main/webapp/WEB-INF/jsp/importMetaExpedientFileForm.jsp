@@ -5,7 +5,7 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 
-<c:set var="maxFileSize"><%=es.caib.ripea.back.config.WebMvcConfig.MAX_UPLOAD_SIZE%></c:set>
+<spring:eval var="maxFileSize" expression="@webMvcConfig.MAX_UPLOAD_SIZE" />
 
 <html>
 <head>

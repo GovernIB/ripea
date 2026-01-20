@@ -7,7 +7,7 @@
 
 <c:set var="charSearch" value='"' />
 <c:set var="charReplace" value='\\"' />
-<c:set var="maxFileSize"><%=es.caib.ripea.back.config.WebMvcConfig.MAX_UPLOAD_SIZE%></c:set>
+<spring:eval var="maxFileSize" expression="@webMvcConfig.MAX_UPLOAD_SIZE" />
 
 <%
 pageContext.setAttribute("idioma", org.springframework.web.servlet.support.RequestContextUtils.getLocale(request).getLanguage());

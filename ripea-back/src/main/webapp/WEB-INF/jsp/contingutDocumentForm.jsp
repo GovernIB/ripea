@@ -9,7 +9,7 @@
 	<c:when test="${empty documentCommand.id}"><c:set var="titol"><spring:message code="contingut.document.form.titol.crear"/></c:set></c:when>
 	<c:otherwise><c:set var="titol"><spring:message code="contingut.document.form.titol.modificar"/></c:set></c:otherwise>
 </c:choose>
-<c:set var="maxFileSize"><%=es.caib.ripea.back.config.WebMvcConfig.MAX_UPLOAD_SIZE%></c:set>
+<spring:eval var="maxFileSize" expression="@webMvcConfig.MAX_UPLOAD_SIZE" />
 <c:set var="idioma"><%=org.springframework.web.servlet.support.RequestContextUtils.getLocale(request).getLanguage()%></c:set>
 <c:set var="isTasca" value="${not empty tascaId}"/>
 <c:set var="isCreate" value="${empty documentCommand.id}"/>
