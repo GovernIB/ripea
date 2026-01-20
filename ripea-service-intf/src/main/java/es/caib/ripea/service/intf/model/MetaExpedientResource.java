@@ -64,9 +64,8 @@ public class MetaExpedientResource extends MetaNodeResource {
     public static final String PERSPECTIVE_PERMISOS_CODE	= "PERMISOS";
     public static final String ACTION_CHANGE_REVISIO_CODE	= "CHANGE_REVISIO";
 
-	@NotNull
 	@Size(max = 64)
-	private String codiPropi;	
+	private String codiPropi;
 	@NotNull
 	@ResourceField(onChangeActive = true)
 	private TipusClassificacioEnumDto tipusClassificacio;
@@ -86,11 +85,15 @@ public class MetaExpedientResource extends MetaNodeResource {
 	private boolean gestioAmbGrupsActiva;
 	private boolean permisDirecte = false;
 	private MetaExpedientRevisioEstatEnumDto revisioEstat;
+	@Transient private MetaExpedientRevisioEstatEnumDto estatAnterior;
 	@Size(max = 1024)
 	private String revisioComentari;
+	
+	@Transient private boolean crearReglaDistribucio = true;
 	private CrearReglaDistribucioEstatEnumDto crearReglaDistribucioEstat;
 	@Size(max = 1024)
 	private String crearReglaDistribucioError;
+	
 	private boolean organNoSincronitzat;
 	private boolean interessatObligatori;
 

@@ -13,13 +13,16 @@ import com.turkraft.springfilter.FilterBuilder;
 import com.turkraft.springfilter.parser.Filter;
 
 import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.UsuariResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.UsuariResourceRepository;
+import es.caib.ripea.persistence.repository.ExpedientRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
+import es.caib.ripea.service.helper.CacheHelper;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
@@ -28,12 +31,15 @@ import es.caib.ripea.service.helper.MetaExpedientHelper;
 import es.caib.ripea.service.helper.PermisosHelper;
 import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
+import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
+import es.caib.ripea.service.intf.dto.CrearReglaResponseDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.PermisDto;
 import es.caib.ripea.service.intf.dto.ProcedimentDto;
+import es.caib.ripea.service.intf.dto.StatusEnumDto;
 import es.caib.ripea.service.intf.dto.TipusClassificacioEnumDto;
 import es.caib.ripea.service.intf.model.EntitatResource;
 import es.caib.ripea.service.intf.model.MetaExpedientResource;
@@ -52,10 +58,12 @@ import lombok.extern.slf4j.Slf4j;
 public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService<MetaExpedientResource, Long, MetaExpedientResourceEntity> implements MetaExpedientResourceService {
 
 	private final ConfigHelper configHelper;
+	private final CacheHelper cacheHelper;
 	private final MetaExpedientHelper metaExpedientHelper;
 	private final EntityComprovarHelper entityComprovarHelper;
 	private final UsuariResourceRepository usuariResourceRepository;
 	private final OrganGestorRepository organGestorRepository;
+	private final ExpedientRepository expedientRepository;
 	private final PluginHelper pluginHelper;
 	private final MessageHelper messageHelper;
 	private final PermisosHelper permisosHelper;
@@ -174,6 +182,58 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
     protected void afterConversion(MetaExpedientResourceEntity entity, MetaExpedientResource resource) {
         resource.setNumComentaris(entity.getComentaris().size());
         resource.setProcedimentComu(entity.getOrganGestor()==null);
+    }
+    
+    @Override
+    protected void afterCreateSave(MetaExpedientResourceEntity entity, MetaExpedientResource resource, Map<String, AnswerRequiredException.AnswerValue> answers, boolean anyOrderChanged) {
+		if ("IPA_ORGAN_ADMIN".equals(configHelper.getRolActual())) {
+			String entitatActualCodi = configHelper.getEntitatActualCodi();
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true,false);
+			String organActualCodi	 = configHelper.getOrganActualCodi();
+			OrganGestorEntity ogEntity	= organGestorRepository.findByEntitatIdAndCodi(entitat.getId(), organActualCodi);
+			metaExpedientHelper.canviarRevisioADisseny(entitat.getId(), entity.getId(), ogEntity!=null?ogEntity.getId():null);
+		} else {
+			entity.setRevisioEstat(MetaExpedientRevisioEstatEnumDto.REVISAT);
+			if (resource.isCrearReglaDistribucio()) {
+				CrearReglaResponseDto crearReglaResponse = metaExpedientHelper.crearReglaDistribucio(entity.getId());
+				if (StatusEnumDto.ERROR.equals(crearReglaResponse.getStatus())) {
+					resource.setCrearReglaDistribucioError(crearReglaResponse.getMsg());
+				}
+			}
+		}
+    }
+    
+    @Override
+    protected void beforeUpdateSave(MetaExpedientResourceEntity entity, MetaExpedientResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
+    	resource.setEstatAnterior(entity.getRevisioEstat());
+    }
+    
+    @Override
+    protected void afterUpdateSave(MetaExpedientResourceEntity entity, MetaExpedientResource resource, Map<String, AnswerRequiredException.AnswerValue> answers, boolean anyOrderChanged) {
+    	
+		List<ExpedientEntity> expedients = expedientRepository.findByMetaExpedientIdAndEsborrat(entity.getId(), 0);
+		
+		for (ExpedientEntity expedient: expedients) {
+			cacheHelper.evictErrorsValidacioPerNode(expedient.getId());
+		}
+		
+		String entitatActualCodi = configHelper.getEntitatActualCodi();
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true,false);
+		
+		if ("IPA_ORGAN_ADMIN".equals(configHelper.getRolActual())) {			
+			String organActualCodi	 = configHelper.getOrganActualCodi();
+			OrganGestorEntity ogEntity	= organGestorRepository.findByEntitatIdAndCodi(entitat.getId(), organActualCodi);
+			if (MetaExpedientRevisioEstatEnumDto.DISSENY.equals(resource.getEstatAnterior()) && MetaExpedientRevisioEstatEnumDto.PENDENT.equals(entity.getRevisioEstat())) {
+				metaExpedientHelper.canviarRevisioAPendentEnviarEmail(entitat.getId(), entity.getId(), ogEntity!=null?ogEntity.getId():null);
+			} else {
+				metaExpedientHelper.canviarRevisioADisseny(entitat.getId(), entity.getId(), ogEntity!=null?ogEntity.getId():null);
+			}
+		} else {
+			metaExpedientHelper.canviarEstatRevisioASellecionat(
+					entitat.getId(),
+					entity.getId(),
+					entity.getRevisioEstat());
+		}
     }
 
     private class OnchangeLogicProcessor implements OnChangeLogicProcessor<MetaExpedientResource> {

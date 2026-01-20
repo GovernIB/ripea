@@ -258,7 +258,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 					metaExpedientEntity);
 		}
 		
-		List<ExpedientEntity> expedients = expedientRepository.findByMetaExpedientAndEsborrat(metaExpedientEntity, 0);
+		List<ExpedientEntity> expedients = expedientRepository.findByMetaExpedientIdAndEsborrat(metaExpedientEntity.getId(), 0);
 		
 		long t0 = System.currentTimeMillis();
 		logger.info("MetaExpedientServiceImpl.update evictErrorsValidacioPerNode start (total expedients:" + (expedients.size()) + "");
