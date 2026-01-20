@@ -463,7 +463,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 		}    	
     }
     
-    private class ExportJsonGenerator implements ReportGenerator<ExpedientResourceEntity, MassiveAction, Serializable> {
+    private class ExportJsonGenerator implements ReportGenerator<MetaExpedientResourceEntity, Serializable, Serializable> {
 
     	@Override
 		public DownloadableFile generateFile(String code, List<?> data, ReportFileType fileType, OutputStream out) {
@@ -499,14 +499,13 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
     	}
     	
 		@Override
-		public void onChange(Serializable id, MassiveAction previous, String fieldName, Object fieldValue,
-				Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {
+		public void onChange(Serializable id, Serializable previous, String fieldName, Object fieldValue,
+				Map<String, AnswerValue> answers, String[] previousFieldNames, Serializable target) {
 		}
 
 		@Override
-		public List<Serializable> generateData(String code, ExpedientResourceEntity entity, MassiveAction params) throws ReportGenerationException {
-			return null;
+		public List<Serializable> generateData(String code, MetaExpedientResourceEntity entity, Serializable params) throws ReportGenerationException {
+			return List.of(entity.getId());
 		}
-    	
     }
 }
