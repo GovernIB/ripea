@@ -2,7 +2,6 @@ package es.caib.ripea.service.resourceservice;
 
 import javax.annotation.PostConstruct;
 
-import org.springframework.data.annotation.Transient;
 import org.springframework.stereotype.Service;
 
 import com.turkraft.springfilter.FilterBuilder;
@@ -50,4 +49,5 @@ public class MetaExpedientTascaResourceServiceImpl extends BaseMutableResourceSe
             resource.setEstatColorFinalitzarTasca(entity.getEstatFinalitzarTasca().getColor());
         }
     }
+
 }

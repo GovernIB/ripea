@@ -22,6 +22,7 @@ import es.caib.ripea.persistence.entity.resourceentity.ExpedientResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.GrupResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.UsuariResourceEntity;
+import es.caib.ripea.persistence.entity.resourcerepository.GrupResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaDadaResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaDocumentResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientCarpetaResourceRepository;
@@ -36,6 +37,7 @@ import es.caib.ripea.service.helper.CacheHelper;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
+import es.caib.ripea.service.helper.GrupHelper;
 import es.caib.ripea.service.helper.MessageHelper;
 import es.caib.ripea.service.helper.MetaExpedientHelper;
 import es.caib.ripea.service.helper.PermisosHelper;
@@ -57,6 +59,7 @@ import es.caib.ripea.service.intf.dto.TipusClassificacioEnumDto;
 import es.caib.ripea.service.intf.model.EntitatResource;
 import es.caib.ripea.service.intf.model.MetaExpedientResource;
 import es.caib.ripea.service.intf.model.MetaExpedientResource.RevisioChangeFormAction;
+import es.caib.ripea.service.intf.model.MetaExpedientResource.VincularGrupFormAction;
 import es.caib.ripea.service.intf.model.MetaNodeResource;
 import es.caib.ripea.service.intf.model.NodeResource.MassiveAction;
 import es.caib.ripea.service.intf.model.OrganGestorResource;
@@ -73,6 +76,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 
 	private final ConfigHelper configHelper;
 	private final CacheHelper cacheHelper;
+	private final GrupHelper grupHelper;
 	private final MetaExpedientHelper metaExpedientHelper;
 	private final MetaExpedientResourceRepository metaExpedientResourceRepository;
 	private final MetaDocumentResourceRepository metaDocumentResourceRepository;
@@ -84,6 +88,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 	private final UsuariResourceRepository usuariResourceRepository;
 	private final OrganGestorRepository organGestorRepository;
 	private final ExpedientRepository expedientRepository;
+	private final GrupResourceRepository grupResourceRepository;
 	private final PluginHelper pluginHelper;
 	private final MessageHelper messageHelper;
 	private final PermisosHelper permisosHelper;
@@ -98,6 +103,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
     	register(MetaExpedientResource.PERSPECTIVE_ELEMENTS_CODE, new ElementsCountPerspectiveApplicator());
     	
     	register(MetaExpedientResource.ACTION_CHANGE_REVISIO_CODE, new RevisioChangeActionExecutor());
+    	register(MetaExpedientResource.ACTION_VINCULAR_GRUP_CODE, new VincularGrupActionExecutor());
     	
     	register(MetaExpedientResource.REPORT_EXPORT_JSON, new ExportJsonGenerator());
     	
@@ -389,6 +395,39 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
         		resource.setLastModifiedByFullName(usuariResourceEntity.getNom() + " (" + usuariResourceEntity.getCodi() + ")");
         	}
         }
+    }
+    
+    private class VincularGrupActionExecutor implements ActionExecutor<MetaExpedientResourceEntity, MetaExpedientResource.VincularGrupFormAction, Serializable> {
+
+		@Override
+		public void onChange(Serializable id, VincularGrupFormAction previous, String fieldName, Object fieldValue,
+				Map<String, AnswerValue> answers, String[] previousFieldNames, VincularGrupFormAction target) {
+			if (fieldName != null) {
+				if (fieldName.equals("grup") && previous.getGrup()!=null) {
+					GrupResourceEntity gre = grupResourceRepository.findById(previous.getGrup().getId()).get();
+					if (gre!=null && gre.getOrganGestor()!=null) {
+						target.setOrganGestor(ResourceReference.toResourceReference(
+								gre.getOrganGestor().getId(),
+								gre.getOrganGestor().getCodiINom()));
+					}
+				} else {
+					target.setOrganGestor(null);
+				}
+			}
+		}
+
+		@Override
+		public Serializable exec(String code, MetaExpedientResourceEntity entity, VincularGrupFormAction params) throws ActionExecutionException {
+			grupHelper.relacionarAmbMetaExpedient(entity.getId(), params.getGrup().getId(), params.isPerDefecte());
+			if ("IPA_ORGAN_ADMIN".equals(configHelper.getRolActual())) {
+				String entitatActualCodi = configHelper.getEntitatActualCodi();
+				EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true,false);
+				String organActualCodi	 = configHelper.getOrganActualCodi();
+				OrganGestorEntity ogEntity	= organGestorRepository.findByEntitatIdAndCodi(entitat.getId(), organActualCodi);
+				metaExpedientHelper.canviarRevisioADisseny(entitat.getId(), entity.getId(), ogEntity!=null?ogEntity.getId():null);
+			}
+			return objectMappingHelper.newInstanceMap(entity, MetaExpedientResource.class);
+		}    	
     }
     
     private class RevisioChangeActionExecutor implements ActionExecutor<MetaExpedientResourceEntity, MetaExpedientResource.RevisioChangeFormAction, Serializable> {

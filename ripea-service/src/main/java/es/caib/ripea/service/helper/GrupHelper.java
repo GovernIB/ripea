@@ -1,5 +1,8 @@
 package es.caib.ripea.service.helper;
 
+import java.util.Iterator;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,7 +11,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.GrupEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.repository.GrupRepository;
+import es.caib.ripea.persistence.repository.MetaExpedientRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.service.intf.dto.GrupDto;
 import es.caib.ripea.service.intf.dto.PermisDto;
@@ -23,12 +28,22 @@ public class GrupHelper {
 	@Autowired private GrupRepository grupRepository;
 	@Autowired private PermisosHelper permisosHelper;
 	@Autowired private OrganGestorRepository organGestorRepository;
+	@Autowired private MetaExpedientRepository metaExpedientRepository;
+	@Autowired private OrganGestorHelper organGestorHelper;
 
-	public GrupDto create(
-			Long entitatId,
-			GrupDto grupDto) throws NotFoundException {
-		logger.debug("Creant un nou grup per l'entitat (" +
-				"entitatId=" + entitatId + ")");
+	public void relacionarAmbMetaExpedient(Long metaExpedientId, Long grupId, boolean marcarPerDefecte) {
+		MetaExpedientEntity metaExpedientEntity = metaExpedientRepository.getOne(metaExpedientId);
+		GrupEntity grupEntity = grupRepository.getOne(grupId);
+		metaExpedientEntity.addGrup(grupEntity);
+		if (marcarPerDefecte) {
+			metaExpedientEntity.setGrupPerDefecte(grupEntity);
+		}
+	}
+	
+	public GrupDto create(Long entitatId, GrupDto grupDto) throws NotFoundException {
+		
+		logger.debug("Creant un nou grup per l'entitat (entitatId=" + entitatId + ")");
+		
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
@@ -49,7 +64,6 @@ public class GrupHelper {
 		return dto;
 	}
 	
-	
 	@Transactional
 	public void crearPermisosDeGrup(
 			Long grupId, 
@@ -60,9 +74,54 @@ public class GrupHelper {
 		dto.setPrincipalTipus(PrincipalTipusEnumDto.ROL);
 		dto.setPrincipalNom(grup.getCodi());
 		permisosHelper.updatePermis(grup.getId(), GrupEntity.class, dto);
-		
 	}
 	
+	public List<GrupEntity> findGrupsNoRelacionatAmbMetaExpedient(Long entitatId, Long metaExpedientId, Long adminOrganId) {
+		
+		List<GrupEntity> grups = grupRepository.findByEntitatId(entitatId);
+		
+		MetaExpedientEntity metaExpedient = metaExpedientRepository.getOne(metaExpedientId);
+		Long procedimentOrganId = metaExpedient.getOrganGestor() != null ? metaExpedient.getOrganGestor().getId() : null;
+		List<GrupEntity> grupsProcedimentExisting = metaExpedient.getGrups();
+		
+		// remove grups already related to procediment
+		for (Iterator<GrupEntity> iter = grups.iterator(); iter.hasNext();) {
+			GrupEntity grup = iter.next();
+			
+			boolean contains = false;
+			for (GrupEntity gr : grupsProcedimentExisting) {
+				if (gr.getId().equals(grup.getId())) {
+					contains = true;
+					break;
+				}
+			}
+			if (contains) {
+				iter.remove();
+			}
+		}
+		
+		// if is called by administador d'organ only leave grups assigned to organ or descendents
+		if (adminOrganId != null) {
+			for (Iterator<GrupEntity> iter = grups.iterator(); iter.hasNext();) {
+				GrupEntity grup = iter.next();
+				if (grup.getOrganGestor() == null || !organGestorHelper.findParesIds(grup.getOrganGestor().getId(), true).contains(adminOrganId)) {
+					iter.remove();
+				}
+			}
+		} 
+		
+		// if procediment belongs to organ remove grups that belong to other organ
+		if (procedimentOrganId != null) {
+			for (Iterator<GrupEntity> iter = grups.iterator(); iter.hasNext();) {
+				GrupEntity grup = iter.next();
+				if (grup.getOrganGestor() != null && !organGestorHelper.findParesIds(grup.getOrganGestor().getId(), true).contains(procedimentOrganId)) {
+					iter.remove();
+				}
+			}
+		}
+		
+		return grups;
+	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(GrupHelper.class);
 	

@@ -684,6 +684,15 @@ public class Utils {
         return mapaNamedQueries;
 	}
 	
+	public static String findKeyStartingWith(Map<String, String> mapaNamedQueries, String prefix) {
+	    for (String key : mapaNamedQueries.keySet()) {
+	        if (key.startsWith(prefix)) {
+	            return key;
+	        }
+	    }
+	    return null;
+	}
+	
 	public static void addSortDefault(PaginacioParamsDto paginacioParams, String camp) {
 		boolean isOrderedByNom = false;
 		if (paginacioParams.getOrdres() != null && !paginacioParams.getOrdres().isEmpty()) {

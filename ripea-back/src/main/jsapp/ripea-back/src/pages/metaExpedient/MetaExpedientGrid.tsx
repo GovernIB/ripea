@@ -28,6 +28,7 @@ export const MetaExpedientForm = ({ isAdmin }:any) => {
         <Grid item xs={12} hidden={data?.msgSiaRolsac == null}>
             <Alert severity={'warning'} sx={{ mt: 0.5 }}>{data.msgSiaRolsac}</Alert>
         </Grid>
+        <GridFormField xs={4} name="crearReglaDistribucio" disabled={!isAdmin || data?.id}/>
         <GridFormField xs={12} name="nom"/>
         <GridFormField xs={12} name="descripcio"/>
         <GridFormField xs={12} name="serieDocumental"/>
@@ -36,9 +37,8 @@ export const MetaExpedientForm = ({ isAdmin }:any) => {
         <GridFormField xs={12} name="expressioNumero"
                        componentProps={{ helperText: t('page.metaExpedient.detall.expressioNumero') }}/>
 
-        <GridFormField xs={4} name="permetMetadocsGenerals"/>
-        <GridFormField xs={4} name="gestioAmbGrupsActiva"/>
-        <GridFormField xs={4} name="crearReglaDistribucio" disabled={!isAdmin || data?.id}/>
+        <GridFormField xs={6} name="permetMetadocsGenerals"/>
+        <GridFormField xs={6} name="gestioAmbGrupsActiva"/>
         <GridFormField xs={6} name="interessatObligatori"/>
         <GridFormField xs={6} name="permisDirecte" disabled={!isAdmin}
                        componentProps={{ helperText: t('page.metaExpedient.detall.permisDirecte') }}/>

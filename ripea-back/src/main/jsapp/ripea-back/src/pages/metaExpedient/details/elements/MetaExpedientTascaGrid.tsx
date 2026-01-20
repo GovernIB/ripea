@@ -53,6 +53,7 @@ const MetaExpedientTascaForm = () => {
         <GridFormField xs={12} name="prioritat" required/>
         <GridFormField xs={12} name="estatCrearTasca" filter={builder.eq("metaExpedient.id", data?.metaExpedient?.id)}/>
         <GridFormField xs={12} name="estatFinalitzarTasca" filter={builder.eq("metaExpedient.id", data?.metaExpedient?.id)}/>
+        <GridFormField xs={12} name="activa"/>
     </Grid>
 }
 

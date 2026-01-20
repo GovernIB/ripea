@@ -54,7 +54,12 @@ import lombok.experimental.FieldNameConstants;
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = MetaExpedientResource.ACTION_CHANGE_REVISIO_CODE,
-                        formClass = MetaExpedientResource.RevisioChangeFormAction.class),  
+                        formClass = MetaExpedientResource.RevisioChangeFormAction.class),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = MetaExpedientResource.ACTION_VINCULAR_GRUP_CODE,
+                        formClass = MetaExpedientResource.VincularGrupFormAction.class,
+                        requiresId = true),                 
 				@ResourceConfigArtifact(
 						type = ResourceArtifactType.REPORT,
 						code = MetaExpedientResource.REPORT_EXPORT_JSON,
@@ -71,6 +76,7 @@ public class MetaExpedientResource extends MetaNodeResource {
     public static final String PERSPECTIVE_PERMISOS_CODE	= "PERMISOS";
     public static final String PERSPECTIVE_ELEMENTS_CODE	= "ELEMENTS_COUNT";
     public static final String ACTION_CHANGE_REVISIO_CODE	= "CHANGE_REVISIO";
+    public static final String ACTION_VINCULAR_GRUP_CODE	= "VINCULAR_GRUP";
     public static final String REPORT_EXPORT_JSON 			= "REPORT_EXPORT_JSON";
 
 	@Size(max = 64)
@@ -149,6 +155,14 @@ public class MetaExpedientResource extends MetaNodeResource {
 		private static final long serialVersionUID = -973615025357818666L;
 		private MetaExpedientRevisioEstatEnumDto revisioEstat;
         private String revisioComentari;
+    }
+    
+    @Getter
+    @Setter
+    public static class VincularGrupFormAction implements Serializable {
+    	private ResourceReference<GrupResource, Long> grup;
+    	private ResourceReference<OrganGestorResource, Long> organGestor;
+    	private boolean perDefecte;
     }
     
     private static final long serialVersionUID = -7526532893601431955L;

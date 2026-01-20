@@ -22,6 +22,7 @@ import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
+import es.caib.ripea.service.helper.GrupHelper;
 import es.caib.ripea.service.helper.PermisosHelper;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
@@ -39,6 +40,7 @@ import lombok.extern.slf4j.Slf4j;
 public class GrupResourceServiceImpl extends BaseMutableResourceService<GrupResource, Long, GrupResourceEntity> implements GrupResourceService {
 
 	private final ConfigHelper configHelper;
+	private final GrupHelper grupHelper;
 	private final PermisosHelper permisosHelper;
 	private final EntityComprovarHelper entityComprovarHelper;
 	private final MetaExpedientRepository metaExpedientRepository;
@@ -64,7 +66,7 @@ public class GrupResourceServiceImpl extends BaseMutableResourceService<GrupReso
     	
     	Filter filtreGrupsPermesos = getFiltreGrupsPermesos(entitat.getId(), rolActual, ogEntity != null ?ogEntity.getId() :null);
     	
-        Map<String, String> mapaNamedQueries =  Utils.namedQueriesToMap(namedQueries);
+        Map<String, String> mapaNamedQueries = Utils.namedQueriesToMap(namedQueries);
     	if (mapaNamedQueries.size()>0) {
     		/**
     		 * S'utilitza en el formulari de acceptar anotació, per obtenir els grups de un procediment
@@ -102,6 +104,41 @@ public class GrupResourceServiceImpl extends BaseMutableResourceService<GrupReso
     			Filter filtreResultat = FilterBuilder.and(filtreGrupsProcediment, filtreGrupsPermesos);
 				return filtreResultat.generate();
 				// ----------------> return amb resultats: grups permesos del procediment
+    		} else {
+    			String vincularGrupProcediment = Utils.findKeyStartingWith(mapaNamedQueries, "VINCULAR_PROCEDIMENT");
+    			if (vincularGrupProcediment!=null) {
+    				String[] split = vincularGrupProcediment.split("#");
+    				List<GrupEntity> grups = grupHelper.findGrupsNoRelacionatAmbMetaExpedient(
+    					entitat.getId(),
+    					Long.parseLong(split[1]),
+    					ogEntity != null ?ogEntity.getId() :null);
+    				
+    				if (grups!=null && grups.size()>0) {
+    					
+    	    			List<Long> grupsIds = new ArrayList<Long>();
+    	    			if (grups!=null) {
+    						for (GrupEntity ge: grups) {
+    							grupsIds.add(ge.getId());
+    						}
+    	    			}
+    	    			
+	    				List<String> grupsOrgansProcedimentIn = Utils.getIdsEnGruposMil(grupsIds);
+	    				Filter filtreGrupsProcediment = null;
+	    		        if (grupsOrgansProcedimentIn!=null) {
+	    			        for (String aux: grupsOrgansProcedimentIn) {
+	    				        if (aux != null && !aux.isEmpty()) {
+	    				        	filtreGrupsProcediment = FilterBuilder.or(filtreGrupsProcediment, Filter.parse("id IN (" + aux + ")"));
+	    				        }
+	    			        }
+	    		        }
+    	    			
+	    		        return filtreGrupsProcediment.generate();
+	    		        
+    				} else {
+        				return FilterBuilder.equal("id", 0).generate();
+        				// ----------------> return sense resultats
+    				}
+    			}
     		}
     		
     		/**
