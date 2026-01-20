@@ -100,10 +100,6 @@ const MetaDadaGrid = (props: any) => {
                     builder.eq('metaNode.id', entity?.metaNode?.id)
                 )
             }
-            popupEditFormDialogButtons={[
-                {icon: 'save', text: t('common.save'), componentProps: { variant: 'contained' }, value: true },
-                {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false }, 
-            ]}
             staticSortModel={sortModel}
             apiRef={apiRef}
             rowAdditionalActions={actions}

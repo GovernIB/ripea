@@ -253,7 +253,6 @@ const ContingutGrid = () => {
             headerName: t('page.contingut.grid.path'),
             flex: 1.5,
             renderCell: (params:any) => <>
-                {/** TODO: revisar columna ubicación */}
                 {!!params?.row?.expedient?.id && <>/<Link component={RouterLink} to={`/contingut/${params?.row?.expedient?.id}`} style={{ display: 'flex', alignItems: 'center' }}><Icon>folder_open</Icon>{params?.formattedValue}</Link></>}
                 {params?.row?.pare?.id != params?.row?.expedient?.id ?<>/.../<Icon>folder</Icon>{params?.row?.pare?.description}</> :"" }
                 {/*{!!params?.row?.fitxerNom && <>/<Icon>description</Icon>{params?.row?.fitxerNom}</>}*/}

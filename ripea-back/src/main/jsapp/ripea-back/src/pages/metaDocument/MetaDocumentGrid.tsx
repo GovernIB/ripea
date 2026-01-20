@@ -3,53 +3,22 @@ import { useNavigate } from "react-router-dom";
 import {
     GridPage,
     MuiDialog,
-    useBaseAppContext,
     useFormContext,
     useMuiDataGridApiRef,
     useResourceApiService
 } from "reactlib";
-import {CardPage} from "../../../components/CardData.tsx";
-import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
+import {CardPage} from "../../components/CardData.tsx";
+import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
 import {Alert, Typography, Grid, Icon, Badge, IconButton} from "@mui/material";
-import GridFormField, {FileFormField, GridButton} from "../../../components/GridFormField.tsx";
-import * as builder from "../../../util/springFilterUtils.ts";
-import TabComponent from "../../../components/TabComponent.tsx";
+import GridFormField, {FileFormField, GridButton} from "../../components/GridFormField.tsx";
+import * as builder from "../../util/springFilterUtils.ts";
+import TabComponent from "../../components/TabComponent.tsx";
 import {useMemo, useState} from "react";
-import Load from "../../../components/Load.tsx";
-import Iframe from "../../../components/Iframe.tsx";
-import {useFluxFinalitzatSession} from "../../../components/SseClient.tsx";
+import Load from "../../components/Load.tsx";
+import Iframe from "../../components/Iframe.tsx";
+import {useFluxFinalitzatSession} from "../../components/SseClient.tsx";
+import {useMetaDocumentActions} from "./details/MetaDocumentActions.tsx";
 
-const useActions = (refresh?: () => void) => {
-    const {t} = useTranslation();
-    const {
-        patch: apiPatch,
-    } = useResourceApiService('metaDocumentResource');
-    const {temporalMessageShow} = useBaseAppContext();
-
-    const active = (id:any) => {
-        apiPatch(id, {data: { actiu: true }})
-            .then(() => {
-                refresh?.()
-                temporalMessageShow(null, t('page.metaDocument.action.activar.ok'), 'success');
-            })
-            .catch((error) => {
-                temporalMessageShow(null, error?.message, 'error');
-            });
-    }
-
-    const desactive = (id:any) => {
-        apiPatch(id, {data: { actiu: false }})
-            .then(() => {
-                refresh?.()
-                temporalMessageShow(null, t('page.metaDocument.action.desactivar.ok'), 'success');
-            })
-            .catch((error) => {
-                temporalMessageShow(null, error?.message, 'error');
-            });
-    }
-
-    return {active, desactive}
-}
 const useFluxActions = () => {
     const {
         isReady: apiIsReady,
@@ -179,7 +148,7 @@ const PortafirmesMetaDocumentForm = () => {
     </Grid>
 }
 
-const MetaDocumentForm = () => {
+export const MetaDocumentForm = () => {
     const {t} = useTranslation();
     const {fieldErrors} = useFormContext()
 
@@ -259,36 +228,7 @@ const MetaDocumentGrid = () => {
         apiRef?.current?.refresh?.();
     }
 
-    const {active, desactive} = useActions(refresh)
-    const actions = [
-        {
-            label: t('common.update'),
-            icon: "edit",
-            showInMenu: true,
-            clickShowUpdateDialog: true,
-        },
-        {
-            label: t('page.metaDocument.action.activar.label'),
-            icon: "check",
-            showInMenu: true,
-            onClick: active,
-            hidden: (row:any) => row?.actiu,
-        },
-        {
-            label: t('page.metaDocument.action.desactivar.label'),
-            icon: "close",
-            showInMenu: true,
-            onClick: desactive,
-            hidden: (row:any) => !row?.actiu,
-        },
-        {
-            label: t('common.delete'),
-            icon: "delete",
-            showInMenu: true,
-            clickTriggerDelete: true,
-        },
-    ]
-
+    const {actions} = useMetaDocumentActions(refresh);
     const columns = [
         {
             field: 'codi',

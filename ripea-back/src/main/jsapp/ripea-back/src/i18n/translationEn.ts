@@ -1258,6 +1258,18 @@ const translationEn = {
                 delete: {
                     ok: "Group '{{data.codi}}' deleted successfully",
                 },
+                link: {
+                    label: "Link group",
+                    ok: "Group linked",
+                },
+                unlink: {
+                    label: "Unlink",
+                    ok: "Group unlinked",
+                },
+                default: {
+                    label: "Set as default",
+                    ok: "Group set as default",
+                },
             },
         },
         organGestor: {
@@ -1272,6 +1284,7 @@ const translationEn = {
                     ok: "The bodies are up to date",
                     button: "Synchronize",
                     tabs: {
+                        empty: "The bodies are up to date",
                         firstSync: "First synchronization",
                         split: "Splits",
                         merge: "Mergers",
@@ -1302,9 +1315,18 @@ const translationEn = {
         },
         metaExpedient: {
             title: "Procedure",
+            detall: {
+                elements: "Procedure elements: {{nom}}",
+            },
             tabs: {
                 dades: "Data",
                 estat: "Review status",
+
+                metaDocument: "Document types",
+                metaDada: "Metadata",
+                expedientEstat: "Statuses",
+                tasca: "Tasks",
+                grup: "Groups",
             },
             action: {
                 new: {
@@ -1356,6 +1378,10 @@ const translationEn = {
                 pinbal: "PINBAL",
             },
             action: {
+                default: {
+                    label: "Set as default",
+                    ok: "Document type set as default",
+                },
                 activar: {
                     label: "Activate",
                     ok: "Document type activated",
@@ -1373,6 +1399,47 @@ const translationEn = {
                 },
                 delete: {
                     ok: "Document type deleted successfully",
+                },
+            },
+        },
+        expedientEstat: {
+            title: "Procedure status",
+            action: {
+                new: {
+                    label: "New status",
+                    ok: "Status created successfully",
+                },
+                update: {
+                    ok: "Status updated successfully",
+                },
+                delete: {
+                    ok: "Status deleted successfully",
+                },
+            },
+        },
+        metaExpedientTasca: {
+            title: "Task",
+            detall: {
+                duracio: "Task duration in calendar days.",
+            },
+            action: {
+                activar: {
+                    label: "Activate",
+                    ok: "Task activated",
+                },
+                desactivar: {
+                    label: "Deactivate",
+                    ok: "Task deactivated",
+                },
+                new: {
+                    label: "New task",
+                    ok: "Task created successfully",
+                },
+                update: {
+                    ok: "Task updated successfully",
+                },
+                delete: {
+                    ok: "Task deleted successfully",
                 },
             },
         },
@@ -1397,6 +1464,9 @@ const translationEn = {
         },
         urlInstruccio: {
             title: "URL de instrucción",
+            detall: {
+                url: "Available formats:\n - http://URL.es/alegar/[ENI]",
+            },
             action: {
                 new: {
                     label: "Nueva URL de instrucción",

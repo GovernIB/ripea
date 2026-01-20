@@ -1258,6 +1258,18 @@ const translationCa = {
                 delete: {
                     ok: "Grup '{{data.codi}}' esborrat correctament",
                 },
+                link: {
+                    label: "Víncular grup",
+                    ok: "Grup vinculat",
+                },
+                unlink: {
+                    label: "Desvincular",
+                    ok: "Grup desvinculat",
+                },
+                default: {
+                    label: "Marcar per defecte",
+                    ok: "Grup marcat com defecte",
+                },
             },
         },
         organGestor: {
@@ -1272,6 +1284,7 @@ const translationCa = {
                     ok: "Els òrgans estan actualitzats",
                     button: "Sincronitza",
                     tabs: {
+                        empty: "Els òrgans estan actualitzats",
                         firstSync: "Primera sincronització",
                         split: "Divisions",
                         merge: "Fusions",
@@ -1302,9 +1315,18 @@ const translationCa = {
         },
         metaExpedient: {
             title: "Procediment",
+            detall: {
+              elements: "Elements del procediment: {{nom}}",
+            },
             tabs: {
                 dades: "Dades",
                 estat: "Estat revisió",
+
+                metaDocument: "Tipus de doc.",
+                metaDada: "Meta-Dades",
+                expedientEstat: "Estats",
+                tasca: "Tasques",
+                grup: "Grups",
             },
             action: {
                 new: {
@@ -1356,6 +1378,10 @@ const translationCa = {
                 pinbal: "PINBAL",
             },
             action: {
+                default: {
+                    label: "Marcar per defecte",
+                    ok: "Tipus de document marcat com defecte",
+                },
                 activar: {
                     label: "Activar",
                     ok: "Tipus de document activat",
@@ -1373,6 +1399,47 @@ const translationCa = {
                 },
                 delete: {
                     ok: "Tipus de document eliminat correctament",
+                },
+            },
+        },
+        expedientEstat: {
+            title: "Estat del procediment",
+            action: {
+                new: {
+                    label: "Nou estat",
+                    ok: "Estat creat correctament",
+                },
+                update: {
+                    ok: "Estat modificat correctament",
+                },
+                delete: {
+                    ok: "Estat eliminat correctament",
+                },
+            },
+        },
+        metaExpedientTasca: {
+            title: "Tasca",
+            detall: {
+                duracio: "Duració de la tasca en dies naturals.",
+            },
+            action: {
+                activar: {
+                    label: "Activar",
+                    ok: "Tasca activat",
+                },
+                desactivar: {
+                    label: "Desactivar",
+                    ok: "Tasca desactivat",
+                },
+                new: {
+                    label: "Nova tasca",
+                    ok: "Tasca creat correctament",
+                },
+                update: {
+                    ok: "Tasca modificat correctament",
+                },
+                delete: {
+                    ok: "Tasca eliminat correctament",
                 },
             },
         },
@@ -1397,6 +1464,9 @@ const translationCa = {
         },
         urlInstruccio: {
             title: "URL Instrucció",
+            detall: {
+                url: "Formats disponibles:\n - http://URL.es/alegar/[ENI]",
+            },
             action: {
                 new: {
                     label: "Nova url instrucció",

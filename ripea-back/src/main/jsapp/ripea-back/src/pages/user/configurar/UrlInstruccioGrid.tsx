@@ -6,14 +6,15 @@ import {Grid} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
 
 const UrlInstruccioGridForm = () => {
+    const {t} = useTranslation()
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField xs={12} name="codi"/>
         <GridFormField xs={12} name="nom"/>
         <GridFormField xs={12} name="descripcio"/>
         <GridFormField xs={12} name="url" type={"textarea"}
-                       componentProps={{ InputLabelProps: { shrink: true }, placeholder: "" +
-                               "Formats disponiobles:\n" +
-                               " - http://URL.es/alegar/[ENI]"
+                       componentProps={{
+                           InputLabelProps: { shrink: true },
+                           placeholder: t('page.urlInstruccio.detall.url')
                        }}/>
     </Grid>
 }
@@ -27,6 +28,14 @@ const columns = [
     },
     {
         field: 'nom',
+        flex: 1,
+    },
+    {
+        field: 'descripcio',
+        flex: 1,
+    },
+    {
+        field: 'url',
         flex: 1,
     },
 ]

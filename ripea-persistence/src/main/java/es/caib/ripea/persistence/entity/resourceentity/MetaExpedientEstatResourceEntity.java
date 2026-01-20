@@ -44,8 +44,9 @@ public class MetaExpedientEstatResourceEntity extends BaseAuditableEntity<MetaEx
 	private String color;
 	@Column(name = "inicial")
 	private boolean inicial;
-	@Column(name = "responsable_codi")
-	private String responsableCodi;
+    @ManyToOne
+    @JoinColumn(name = "responsable_codi")
+    private UsuariResourceEntity responsable;
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(
 			name = "metaexpedient_id",

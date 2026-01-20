@@ -3,13 +3,13 @@ package es.caib.ripea.service.intf.model;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
-import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 /**
@@ -24,9 +24,9 @@ import java.util.Date;
 @ResourceConfig(quickFilterFields = { "codi", "nom" }, descriptionField = "nom")
 public class MetaExpedientTascaResource extends BaseAuditableResource<Long> {
 
-    private String codi;
-    private String nom;
-    private String descripcio;
+    @NotNull private String codi;
+    @NotNull private String nom;
+    @NotNull private String descripcio;
     private ResourceReference<UsuariResource, String> responsable;
     private boolean activa;
     private Date dataLimit;
@@ -36,12 +36,6 @@ public class MetaExpedientTascaResource extends BaseAuditableResource<Long> {
     @SuppressWarnings("unused")
     private String duracioFormat;
     private PrioritatEnumDto prioritat = PrioritatEnumDto.B_NORMAL;
-    private Long estatIdCrearTasca;
-    private String estatNomCrearTasca;
-    private String estatColorCrearTasca;
-    private Long estatIdFinalitzarTasca;
-    private String estatNomFinalitzarTasca;
-    private String estatColorFinalitzarTasca;
 
     private ResourceReference<MetaExpedientEstatResource, Long> estatCrearTasca;
     private ResourceReference<MetaExpedientEstatResource, Long> estatFinalitzarTasca;

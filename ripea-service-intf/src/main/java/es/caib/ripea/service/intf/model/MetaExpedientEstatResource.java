@@ -29,7 +29,7 @@ public class MetaExpedientEstatResource extends BaseAuditableResource<Long> {
 	@Size(max = 256)
 	private String color;
 	private boolean inicial;
-	private String responsableCodi;
+    private ResourceReference<UsuariResource, String> responsable;
 	
 	private ResourceReference<MetaExpedientResource, Long> metaExpedient;
 }

@@ -294,10 +294,6 @@ const ExpedientGrid = () => {
                     createSuccess: 'page.expedient.action.new.ok',
                     updateSuccess: 'page.expedient.action.update.ok',
                 }}
-                popupEditFormDialogButtons={[
-                    {icon: 'save', text: t('common.create'), componentProps: { variant: 'contained' }, value: true },
-                    {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false }, 
-                ]}
             />
             </Load>
 

@@ -3,7 +3,7 @@ import {useMemo, useState} from "react";
 import {GridPage, useFormContext, useMuiDataGridApiRef} from "reactlib";
 import {CardPage} from "../../components/CardData.tsx";
 import StyledMuiGrid, {ToolbarButton} from "../../components/StyledMuiGrid.tsx";
-import {Alert, Badge, Grid, Icon} from "@mui/material";
+import {Alert, Badge, Grid, Icon, MenuItem} from "@mui/material";
 import GridFormField from "../../components/GridFormField.tsx";
 import {MetaExpedientComment} from "../CommentDialog.tsx";
 import LinkButton from "../../components/LinkButton.tsx";
@@ -12,6 +12,9 @@ import {useMetaExpedientActions} from "./details/MetaExpedientActions.tsx";
 import {MetaExpedientFilter} from "./MetaExpedientFilter.tsx";
 import {useUserSession} from "../../components/Session.tsx";
 import {StyledEstat} from "../user/consultes/RevisioMetaExpedientGrid.tsx";
+import MenuButton from "../../components/MenuButton.tsx";
+import {useNavigate} from "react-router-dom";
+import {StyledBadge} from "../../components/StyledBadge.tsx";
 
 // Form
 export const MetaExpedientForm = () => {
@@ -95,6 +98,7 @@ const columns = [
 const sortModel: any = [{field: 'nom', sort: 'asc'}]
 const MetaExpedientGrid = () => {
     const {t} = useTranslation();
+    const navigate = useNavigate();
     const {value: user} = useUserSession();
     const [springFilter, setSpringFilter] = useState<string>();
     const apiRef = useMuiDataGridApiRef();
@@ -137,7 +141,44 @@ const MetaExpedientGrid = () => {
                     <Icon>key</Icon>
                 </Badge>
             </LinkButton>
-        }
+        },
+        {
+            field: 'id',
+            headerName: '',
+            sortable: false,
+            flex: 0.75,
+            renderCell: (params: any) => <MenuButton
+                id={`elements-${params?.id}`}
+                buttonLabel={"Elements"}
+                buttonProps={{color: 'black'}}
+            >
+                <MenuItem onClick={() => navigate(`/metaExpedient/${params?.id}/metaDocument`)}>
+                    <StyledBadge badgeContent={params?.row?.numMetaDocument} showZero sx={{ '& .MuiBadge-badge': {right: -3, top: 10 } }}>
+                        {t('page.metaExpedient.tabs.metaDocument')}
+                    </StyledBadge>
+                </MenuItem>
+                <MenuItem onClick={() => navigate(`/metaExpedient/${params?.id}/metaDada`)}>
+                    <StyledBadge badgeContent={params?.row?.numMetaDada} showZero sx={{ '& .MuiBadge-badge': {right: -3, top: 10 } }}>
+                        {t('page.metaExpedient.tabs.metaDada')}
+                    </StyledBadge>
+                </MenuItem>
+                <MenuItem onClick={() => navigate(`/metaExpedient/${params?.id}/estat`)}>
+                    <StyledBadge badgeContent={params?.row?.numEstat} showZero sx={{ '& .MuiBadge-badge': {right: -3, top: 10 } }}>
+                        {t('page.metaExpedient.tabs.expedientEstat')}
+                    </StyledBadge>
+                </MenuItem>
+                <MenuItem onClick={() => navigate(`/metaExpedient/${params?.id}/tasca`)}>
+                    <StyledBadge badgeContent={params?.row?.numTasca} showZero sx={{ '& .MuiBadge-badge': {right: -3, top: 10 } }}>
+                        {t('page.metaExpedient.tabs.tasca')}
+                    </StyledBadge>
+                </MenuItem>
+                {params?.row?.gestioAmbGrupsActiva && <MenuItem onClick={() => navigate(`/metaExpedient/${params?.id}/grup`)}>
+                    <StyledBadge badgeContent={params?.row?.numGrup} showZero sx={{ '& .MuiBadge-badge': {right: -3, top: 10 } }}>
+                        {t('page.metaExpedient.tabs.grup')}
+                    </StyledBadge>
+                </MenuItem>}
+            </MenuButton>
+        },
     ].filter((col:any)=>!col?.hidden), [user?.sessionScope?.isRevisioActiva])
 
     const {actions, content} = useMetaExpedientActions(refresh);

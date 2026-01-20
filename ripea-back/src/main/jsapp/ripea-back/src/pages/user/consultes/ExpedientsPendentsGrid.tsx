@@ -89,7 +89,6 @@ const ExpedientsPendentsGrid = () => {
             <StyledMuiGrid
                 resourceName={"expedientPeticioResource"}
                 columns={columns}
-                // TODO: Revisar filtre
                 filter={springFilter}
                 perspectives={perspectives}
                 namedQueries={namedQueries}

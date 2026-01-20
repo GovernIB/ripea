@@ -86,28 +86,9 @@ const columns = [
     },
 ]
 
-const MetaDocumentDadaGrid = () => {
+export const MetDadaGrid = ({ id, onRowCountChange }: any) => {
     const {t} = useTranslation();
-    const { id } = useParams();
     const apiRef = useMuiDataGridApiRef();
-
-    const {
-        isReady: apiIsReady,
-        getOne: appGetOne,
-    } = useResourceApiService('metaDocumentResource');
-    const [metaDocument, setMetaDocument] = useState<any>();
-
-    useEffect(()=>{
-        if (apiIsReady) {
-            appGetOne(id).then((app) => setMetaDocument(app))
-        }
-    },[apiIsReady, id])
-
-    useEffect(() => {
-        if (metaDocument) {
-            setTitlePage(t('page.user.menu.documentDada', {nom: metaDocument?.nom}))
-        }
-    }, [metaDocument]);
 
     const refresh = () => {
         apiRef?.current?.refresh?.();
@@ -143,32 +124,58 @@ const MetaDocumentDadaGrid = () => {
         },
     ]
 
+    return <StyledMuiGrid
+        apiRef={apiRef}
+        resourceName={"metaDadaResource"}
+        popupEditUpdateActive
+        popupEditFormDialogResourceTitle={t('page.metaDada.title')}
+        popupEditFormContent={<MetaDocumentDadaForm/>}
+        columns={columns}
+        toolbarHideQuickFilter={false}
+        filter={builder.eq("metaNode.id", id)}
+        formAdditionalData={{
+            metaNode: {id}
+        }}
+        sortModel={sortModel}
+        // perspectives={perspectives}
+        rowAdditionalActions={actions}
+        onRowCountChange={onRowCountChange}
+
+        toolbarCreateTitle={t('page.metaDada.action.new.label')}
+        popupEditFormI18nKeys={{
+            createSuccess: 'page.metaDada.action.new.ok',
+            updateSuccess: 'page.metaDada.action.update.ok',
+            deleteSuccess: 'page.metaDada.action.delete.ok',
+        }}
+    />
+}
+
+const MetaDadaGrid = () => {
+    const {t} = useTranslation();
+    const { id } = useParams();
+
+    const {
+        isReady: apiIsReady,
+        getOne: appGetOne,
+    } = useResourceApiService('metaDocumentResource');
+    const [metaDocument, setMetaDocument] = useState<any>();
+
+    useEffect(()=>{
+        if (apiIsReady) {
+            appGetOne(id).then((app) => setMetaDocument(app))
+        }
+    },[apiIsReady, id])
+
+    useEffect(() => {
+        if (metaDocument) {
+            setTitlePage(t('page.user.menu.documentDada', {nom: metaDocument?.nom}))
+        }
+    }, [metaDocument]);
+
     return <GridPage disableMargins>
         <CardPage title={t('page.user.menu.documentDada', {nom: metaDocument?.nom})}>
-            <StyledMuiGrid
-                apiRef={apiRef}
-                resourceName={"metaDadaResource"}
-                popupEditUpdateActive
-                popupEditFormDialogResourceTitle={t('page.metaDada.title')}
-                popupEditFormContent={<MetaDocumentDadaForm/>}
-                columns={columns}
-                toolbarHideQuickFilter={false}
-                filter={builder.eq("metaNode.id", id)}
-                formAdditionalData={{
-                    metaNode: {id}
-                }}
-                sortModel={sortModel}
-                // perspectives={perspectives}
-                rowAdditionalActions={actions}
-
-                toolbarCreateTitle={t('page.metaDada.action.new.label')}
-                popupEditFormI18nKeys={{
-                    createSuccess: 'page.metaDada.action.new.ok',
-                    updateSuccess: 'page.metaDada.action.update.ok',
-                    deleteSuccess: 'page.metaDada.action.delete.ok',
-                }}
-            />
+            <MetDadaGrid id={id}/>
         </CardPage>
     </GridPage>
 }
-export default MetaDocumentDadaGrid;
+export default MetaDadaGrid;

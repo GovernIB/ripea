@@ -24,7 +24,7 @@ import RevisioMetaExpedientGrid from "./pages/user/consultes/RevisioMetaExpedien
 import ContingutGrid from "./pages/user/consultes/ContingutGrid.tsx";
 import MetaExpedientGrid from "./pages/metaExpedient/MetaExpedientGrid.tsx";
 import GrupGrid from "./pages/user/configurar/GrupGrid.tsx";
-import OrganGestorGrid from "./pages/user/configurar/OrganGestorGrid.tsx";
+import OrganGestorGrid from "./pages/organGestor/OrganGestorGrid.tsx";
 import TipusDocumentalGrid from "./pages/user/configurar/TipusDocumentalGrid.tsx";
 import PermisEntitatGrid from "./pages/user/configurar/PermisEntitatGrid.tsx";
 import PermisGrupGrid from "./pages/user/configurar/PermisGrupGrid.tsx";
@@ -32,10 +32,11 @@ import PermisOrganGestorGrid from "./pages/user/configurar/PermisOrganGestorGrid
 import PermisMetaExpedientGrid from "./pages/user/configurar/PermisMetaExpedientGrid.tsx";
 import AdjuntarAnnexosPendentsGrid from "./pages/user/accionsMassives/AdjuntarAnnexosPendentsGrid.tsx";
 import DominiGrid from "./pages/user/configurar/DominiGrid.tsx";
-import MetaDocumentGrid from "./pages/user/configurar/MetaDocumentGrid.tsx";
-import MetaDocumentDadaGrid from "./pages/user/configurar/MetaDocumentDadaGrid.tsx";
+import MetaDocumentGrid from "./pages/metaDocument/MetaDocumentGrid.tsx";
+import MetaDadaGrid from "./pages/metaDocument/details/MetaDadaGrid.tsx";
 import {useUserSession} from "./components/Session.tsx";
 import {UrlInstruccioGrid} from "./pages/user/configurar/UrlInstruccioGrid.tsx";
+import {MetaExpedientElements} from "./pages/metaExpedient/details/MetaExpedientElements.tsx";
 
 const ProtectedRoute = ({ allowedRoles = [], params = [] }: any) => {
     const {value: user} = useUserSession();
@@ -93,6 +94,8 @@ const AppRoutes: React.FC = () => {
         <Route element={<ProtectedRoute allowedRoles={['IPA_ADMIN', 'IPA_ADMIN_LECTURA', 'IPA_ORGAN_ADMIN', 'IPA_DISSENY']} />}>
             <Route path="metaExpedient" element={<MetaExpedientGrid/>} />
             <Route path="metaExpedient/:id/permis" element={<PermisMetaExpedientGrid/>} />
+            <Route path="metaExpedient/:id/:element" element={<MetaExpedientElements/>} />
+            <Route path="expedientEstat/:id" element={<MetaExpedientElements/>} />
         </Route>
         <Route element={<ProtectedRoute allowedRoles={['IPA_ADMIN', 'IPA_ORGAN_ADMIN', 'IPA_DISSENY']} />}>
             <Route path="grup" element={<GrupGrid/>} />
@@ -105,7 +108,7 @@ const AppRoutes: React.FC = () => {
             <Route path="permis" element={<PermisEntitatGrid/>} />
             <Route path="domini" element={<DominiGrid/>} />
             <Route path="metaDocument" element={<MetaDocumentGrid/>} />
-            <Route path="metaDocument/:id/metaDada" element={<MetaDocumentDadaGrid/>} />
+            <Route path="metaDocument/:id/metaDada" element={<MetaDadaGrid/>} />
             <Route element={<ProtectedRoute params={['isUrlInstruccioEnabled']}/>}>
                 <Route path="urlInstruccio" element={<UrlInstruccioGrid/>} />
             </Route>

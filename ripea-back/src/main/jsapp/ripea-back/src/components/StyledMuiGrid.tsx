@@ -217,7 +217,7 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
                 setGridRows([...rows]);
                 setGridSelectedRows(others?.rowSelectionModel ?? [])
                 onRowsChange?.(rows, info);
-                onRowCountChange?.(info?.totalElements)
+                onRowCountChange?.(info?.totalElements ?? 0)
             }}
             onRowSelectionModelChange={(newSelection, details) => {
                 setSelectedRows([...newSelection]);
@@ -231,6 +231,10 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
             popupEditFormDialogComponentProps={{ fullWidth: true, maxWidth: 'md', initOnChangeRequest: formInitOnChange, ...popupEditFormDialogComponentProps }}
             popupEditFormComponentProps={{ ...(popupEditFormComponentProps ?? []), avoidSubmitIfAnyValidatorErrors: true }}
             popupEditFormDialogOnClose={(reason?: string) => reason !== 'backdropClick' }
+            popupEditFormDialogButtons={[
+                {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
+                {icon: 'save', text: t('common.create'), componentProps: { variant: 'contained' }, value: true },
+            ]}
 
             toolbarHideRefresh
             toolbarHideCreate

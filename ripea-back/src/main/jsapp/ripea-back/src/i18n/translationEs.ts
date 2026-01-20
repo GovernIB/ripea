@@ -1258,6 +1258,18 @@ const translationEs = {
                 delete: {
                     ok: "Grupo '{{data.codi}}' eliminado correctamente",
                 },
+                link: {
+                    label: "Vincular grupo",
+                    ok: "Grupo vinculado",
+                },
+                unlink: {
+                    label: "Desvincular",
+                    ok: "Grupo desvinculado",
+                },
+                default: {
+                    label: "Marcar por defecto",
+                    ok: "Grupo marcado como defecto",
+                },
             },
         },
         organGestor: {
@@ -1272,6 +1284,7 @@ const translationEs = {
                     ok: "Los órganos están actualizados",
                     button: "Sincronizar",
                     tabs: {
+                        empty: "Los órganos están actualizados",
                         firstSync: "Primera sincronización",
                         split: "Divisiones",
                         merge: "Fusiones",
@@ -1302,9 +1315,18 @@ const translationEs = {
         },
         metaExpedient: {
             title: "Procedimiento",
+            detall: {
+                elements: "Elementos del procedimiento: {{nom}}",
+            },
             tabs: {
                 dades: "Datos",
                 estat: "Estado de revisión",
+
+                metaDocument: "Tipos de documento",
+                metaDada: "Metadatos",
+                expedientEstat: "Estados",
+                tasca: "Tareas",
+                grup: "Grupos",
             },
             action: {
                 new: {
@@ -1356,6 +1378,10 @@ const translationEs = {
                 pinbal: "PINBAL",
             },
             action: {
+                default: {
+                    label: "Marcar por defecto",
+                    ok: "Tipo de documento marcado como defecto",
+                },
                 activar: {
                     label: "Activar",
                     ok: "Tipo de documento activado",
@@ -1373,6 +1399,47 @@ const translationEs = {
                 },
                 delete: {
                     ok: "Tipo de documento eliminado correctamente",
+                },
+            },
+        },
+        expedientEstat: {
+            title: "Estado del procedimiento",
+            action: {
+                new: {
+                    label: "Nuevo estado",
+                    ok: "Estado creado correctamente",
+                },
+                update: {
+                    ok: "Estado modificado correctamente",
+                },
+                delete: {
+                    ok: "Estado eliminado correctamente",
+                },
+            },
+        },
+        metaExpedientTasca: {
+            title: "Tarea",
+            detall: {
+                duracio: "Duración de la tarea en días naturales.",
+            },
+            action: {
+                activar: {
+                    label: "Activar",
+                    ok: "Tarea activada",
+                },
+                desactivar: {
+                    label: "Desactivar",
+                    ok: "Tarea desactivada",
+                },
+                new: {
+                    label: "Nueva tarea",
+                    ok: "Tarea creada correctamente",
+                },
+                update: {
+                    ok: "Tarea modificada correctamente",
+                },
+                delete: {
+                    ok: "Tarea eliminada correctamente",
                 },
             },
         },
@@ -1397,6 +1464,9 @@ const translationEs = {
         },
         urlInstruccio: {
             title: "URL de instrucción",
+            detall: {
+                url: "Formatos disponibles:\n - http://URL.es/alegar/[ENI]",
+            },
             action: {
                 new: {
                     label: "Nueva URL de instrucción",

@@ -257,10 +257,6 @@ const DocumentsGrid = (props: any) => {
                         rowAdditionalActions={actions}
                         onRowCountChange={onRowCountChange}
                         onRefresh={refresh}
-                        popupEditFormDialogButtons={[
-                            {icon: 'save', text: t('common.create'), componentProps: { variant: 'contained' }, value: true },
-                            {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false }, 
-                        ]}
                         groupingColDef={{
                             headerName: t('page.contingut.grid.nom'),
                             flex: 1.5,

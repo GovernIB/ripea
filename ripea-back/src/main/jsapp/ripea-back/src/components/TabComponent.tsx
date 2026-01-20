@@ -37,12 +37,12 @@ const TabPanel = (props:any) => {
 }
 
 const TabComponent = (props :any) => {
-    const { tabs, headerAdditionalData, ...other}=props;
+    const { tabs, headerAdditionalData, defaultValue, ...other}=props;
     if (!tabs || tabs?.length==0){
         return <></>
     }
 
-    const [value, setValue] = useState<any>(tabs[0].value);
+    const [value, setValue] = useState<any>(defaultValue ?? tabs[0].value);
 
     const handleChange = (event :any, newValue :string) : void => {
         if (tabs.some((tab:TabProps)=>tab?.value==newValue)) {
@@ -80,7 +80,7 @@ const TabComponent = (props :any) => {
         </Box>
         {tabs.map((tab:TabProps) =>
             <TabPanel value={value} index={tab.value} key={"tab-panel-"+tab.value}>
-                {tab.content}
+                {!tab.hidden && tab.content}
             </TabPanel>
         )}
     </Box>
