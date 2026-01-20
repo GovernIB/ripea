@@ -40,6 +40,9 @@ import lombok.experimental.FieldNameConstants;
 				@ResourceConfigArtifact(
 						type = ResourceArtifactType.PERSPECTIVE,
 						code = MetaExpedientResource.PERSPECTIVE_PERMISOS_CODE),
+				@ResourceConfigArtifact(
+						type = ResourceArtifactType.PERSPECTIVE,
+						code = MetaExpedientResource.PERSPECTIVE_ELEMENTS_CODE),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.FILTER,
                         code = MetaExpedientResource.FILTER_REVISIO_CODE,
@@ -62,6 +65,7 @@ public class MetaExpedientResource extends MetaNodeResource {
     public static final String PERSPECTIVE_AUDIT_CODE 		= "AUDITORIA";
     public static final String PERSPECTIVE_COMMENTS_CODE	= "COMENTARIS";
     public static final String PERSPECTIVE_PERMISOS_CODE	= "PERMISOS";
+    public static final String PERSPECTIVE_ELEMENTS_CODE	= "ELEMENTS_COUNT";
     public static final String ACTION_CHANGE_REVISIO_CODE	= "CHANGE_REVISIO";
 
 	@Size(max = 64)
@@ -114,6 +118,7 @@ public class MetaExpedientResource extends MetaNodeResource {
     @Transient private int numEstat;
     @Transient private int numTasca;
     @Transient private int numGrup;
+    @Transient private int numCarpetes;
 
     public String getNomClassificacio() {
         return nom + " (" + classificacio +")";

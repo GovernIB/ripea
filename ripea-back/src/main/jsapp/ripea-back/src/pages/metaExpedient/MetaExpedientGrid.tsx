@@ -95,8 +95,12 @@ const columns = [
         renderCell: (params:any) => (params?.row?.actiu && <Icon>check</Icon>),
     },
 ]
+
 const sortModel: any = [{field: 'nom', sort: 'asc'}]
+const perspectives = ["PERMISOS", "ELEMENTS_COUNT"];
+
 const MetaExpedientGrid = () => {
+
     const {t} = useTranslation();
     const navigate = useNavigate();
     const {value: user} = useUserSession();
@@ -195,6 +199,7 @@ const MetaExpedientGrid = () => {
                 popupEditFormContent={<MetaExpedientForm/>}
                 columns={additionalColumns}
                 filter={springFilter}
+                perspectives={perspectives}
                 sortModel={sortModel}
                 rowAdditionalActions={actions}
                 toolbarElementsWithPositions={[

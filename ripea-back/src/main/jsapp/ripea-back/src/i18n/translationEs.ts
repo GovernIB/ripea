@@ -1316,7 +1316,7 @@ const translationEs = {
         metaExpedient: {
             title: "Procedimiento",
             detall: {
-                elements: "Elementos del procedimiento: {{nom}}",
+                elements: "Gestión del procedimiento: {{nom}}",
             },
             tabs: {
                 dades: "Datos",

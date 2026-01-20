@@ -1316,7 +1316,7 @@ const translationEn = {
         metaExpedient: {
             title: "Procedure",
             detall: {
-                elements: "Procedure elements: {{nom}}",
+                elements: "Procedure management: {{nom}}",
             },
             tabs: {
                 dades: "Data",

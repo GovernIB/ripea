@@ -16,8 +16,14 @@ import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
+import es.caib.ripea.persistence.entity.resourceentity.GrupResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.UsuariResourceEntity;
+import es.caib.ripea.persistence.entity.resourcerepository.MetaDadaResourceRepository;
+import es.caib.ripea.persistence.entity.resourcerepository.MetaDocumentResourceRepository;
+import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientCarpetaResourceRepository;
+import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientEstatResourceRepository;
+import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientTascaResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.UsuariResourceRepository;
 import es.caib.ripea.persistence.repository.ExpedientRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
@@ -60,6 +66,11 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 	private final ConfigHelper configHelper;
 	private final CacheHelper cacheHelper;
 	private final MetaExpedientHelper metaExpedientHelper;
+	private final MetaDocumentResourceRepository metaDocumentResourceRepository;
+	private final MetaDadaResourceRepository metaDadaResourceRepository;
+	private final MetaExpedientEstatResourceRepository metaExpedientEstatResourceRepository;
+	private final MetaExpedientTascaResourceRepository metaExpedientTascaResourceRepository;
+	private final MetaExpedientCarpetaResourceRepository metaExpedientCarpetaResourceRepository;
 	private final EntityComprovarHelper entityComprovarHelper;
 	private final UsuariResourceRepository usuariResourceRepository;
 	private final OrganGestorRepository organGestorRepository;
@@ -75,6 +86,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
     	register(MetaExpedientResource.PERSPECTIVE_AUDIT_CODE, new AuditoriaPerspectiveApplicator());
     	register(MetaExpedientResource.PERSPECTIVE_COMMENTS_CODE, new ComentarisPerspectiveApplicator());
     	register(MetaExpedientResource.PERSPECTIVE_PERMISOS_CODE, new PermisosPerspectiveApplicator());
+    	register(MetaExpedientResource.PERSPECTIVE_ELEMENTS_CODE, new ElementsCountPerspectiveApplicator());
     	
     	register(MetaExpedientResource.ACTION_CHANGE_REVISIO_CODE, new RevisioChangeActionExecutor());
     	
@@ -324,6 +336,19 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 		}
     }
     
+    private class ElementsCountPerspectiveApplicator implements PerspectiveApplicator<MetaExpedientResourceEntity, MetaExpedientResource> {
+		@Override
+		public void applySingle(String code, MetaExpedientResourceEntity entity, MetaExpedientResource resource) throws PerspectiveApplicationException {
+			resource.setNumMetaDocument(metaDocumentResourceRepository.countByMetaExpedientId(entity.getId()));
+			resource.setNumMetaDada(metaDadaResourceRepository.countByMetaNodeId(entity.getId()));
+			resource.setNumEstat(metaExpedientEstatResourceRepository.countByMetaExpedientId(entity.getId()));
+			resource.setNumTasca(metaExpedientTascaResourceRepository.countByMetaExpedientId(entity.getId()));
+			List<GrupResourceEntity> grupsProcediment = entity.getGrups();
+			resource.setNumGrup(grupsProcediment!=null?grupsProcediment.size():0);
+			resource.setNumCarpetes(metaExpedientCarpetaResourceRepository.countByMetaExpedientId(entity.getId()));
+		}
+    }
+    
     private class ComentarisPerspectiveApplicator implements PerspectiveApplicator<MetaExpedientResourceEntity, MetaExpedientResource> {
 		@Override
 		public void applySingle(String code, MetaExpedientResourceEntity entity, MetaExpedientResource resource) throws PerspectiveApplicationException {
@@ -334,7 +359,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
     private class PermisosPerspectiveApplicator implements PerspectiveApplicator<MetaExpedientResourceEntity, MetaExpedientResource> {
 		@Override
 		public void applySingle(String code, MetaExpedientResourceEntity entity, MetaExpedientResource resource) throws PerspectiveApplicationException {
-			List<PermisDto> permisosGrup = permisosHelper.findPermisos(entity.getId(), OrganGestorEntity.class); 
+			List<PermisDto> permisosGrup = permisosHelper.findPermisos(entity.getId(), MetaExpedientEntity.class); 
 			resource.setNumPermisos(permisosGrup!=null?permisosGrup.size():0);
 		}
     }
