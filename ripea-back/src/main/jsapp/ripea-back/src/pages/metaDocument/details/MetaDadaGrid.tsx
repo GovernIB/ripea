@@ -8,6 +8,7 @@ import {useParams} from "react-router-dom";
 import GridFormField from "../../../components/GridFormField.tsx";
 import {useEffect, useState} from "react";
 import {setTitlePage} from "../../../TitleHeaderConfigurator.tsx";
+import {useUserSession} from "../../../components/Session.tsx";
 
 const useActions = (refresh?: () => void) => {
     const {t} = useTranslation();
@@ -42,7 +43,7 @@ const useActions = (refresh?: () => void) => {
 }
 
 // Form
-const MetaDocumentDadaForm = () => {
+const MetaDocumentDadaForm = ({ enviable }:any) => {
     const {data} = useFormContext()
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField xs={12} name="codi"/>
@@ -60,6 +61,9 @@ const MetaDocumentDadaForm = () => {
         <GridFormField xs={12} name="noAplica" hidden={data?.tipus!="DOMINI"}/>
 
         <GridFormField xs={12} name="descripcio" type={"textarea"}/>
+
+        <GridFormField xs={12} name="enviable" hidden={!enviable}/>
+        <GridFormField xs={12} name="metadadaArxiu" hidden={!enviable || !data?.enviable} required/>
     </Grid>
 }
 
@@ -86,9 +90,10 @@ const columns = [
     },
 ]
 
-export const MetDadaGrid = ({ id, onRowCountChange }: any) => {
+export const MetDadaGrid = ({ id, onRowCountChange, enviable = false }: any) => {
     const {t} = useTranslation();
     const apiRef = useMuiDataGridApiRef();
+    const {value: user} = useUserSession()
 
     const refresh = () => {
         apiRef?.current?.refresh?.();
@@ -129,7 +134,7 @@ export const MetDadaGrid = ({ id, onRowCountChange }: any) => {
         resourceName={"metaDadaResource"}
         popupEditUpdateActive
         popupEditFormDialogResourceTitle={t('page.metaDada.title')}
-        popupEditFormContent={<MetaDocumentDadaForm/>}
+        popupEditFormContent={<MetaDocumentDadaForm enviable={enviable && user?.sessionScope?.isPropagarMetadades}/>}
         columns={columns}
         toolbarHideQuickFilter={false}
         filter={builder.eq("metaNode.id", id)}

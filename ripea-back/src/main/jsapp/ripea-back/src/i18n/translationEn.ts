@@ -1317,6 +1317,8 @@ const translationEn = {
             title: "Procedure",
             detall: {
                 elements: "Procedure management: {{nom}}",
+                expressioNumero: "If no expression is specified, the following default will be used: {{codi}}/{{seq}}/{{any}}",
+                permisDirecte: "An entity administrator user can modify this value.",
             },
             tabs: {
                 dades: "Data",
@@ -1327,6 +1329,7 @@ const translationEn = {
                 expedientEstat: "Statuses",
                 tasca: "Tasks",
                 grup: "Groups",
+                carpeta: "Folders",
             },
             action: {
                 new: {
@@ -1421,6 +1424,7 @@ const translationEn = {
             title: "Task",
             detall: {
                 duracio: "Task duration in calendar days.",
+                validacio: "Task validations: {{nom}}",
             },
             action: {
                 activar: {
@@ -1440,6 +1444,29 @@ const translationEn = {
                 },
                 delete: {
                     ok: "Task deleted successfully",
+                },
+            },
+        },
+        metaExpedientTascaValidacio: {
+            title: "Validation",
+            action: {
+                activate: {
+                    label: "Activate",
+                    ok: "Validation activated",
+                },
+                deactivate: {
+                    label: "Deactivate",
+                    ok: "Validation deactivated",
+                },
+                new: {
+                    label: "New validation",
+                    ok: "Validation created successfully",
+                },
+                update: {
+                    ok: "Validation updated successfully",
+                },
+                delete: {
+                    ok: "Validation deleted successfully",
                 },
             },
         },

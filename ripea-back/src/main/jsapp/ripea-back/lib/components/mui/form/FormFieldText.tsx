@@ -15,7 +15,7 @@ export const useFormFieldCommon = (
     inline: boolean | undefined,
     componentProps: any,
     startAdornmentIcons?: React.ReactElement[]) => {
-    const helperText = inline ? field?.helperText : fieldError?.message ?? field?.helperText;
+    const helperText = componentProps?.helperText ?? (inline ? field?.helperText : fieldError?.message ?? field?.helperText);
     const title = field?.title ?? (inline ? helperText : undefined);
     const inlineErrorIconElement = fieldError && inline ? <Icon
         fontSize="small"

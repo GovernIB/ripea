@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
+import org.springframework.data.annotation.Transient;
 
 import javax.validation.constraints.NotNull;
 import java.util.Date;
@@ -41,4 +42,7 @@ public class MetaExpedientTascaResource extends BaseAuditableResource<Long> {
     private ResourceReference<MetaExpedientEstatResource, Long> estatFinalitzarTasca;
     private ResourceReference<MetaExpedientResource, Long> metaExpedient;
 
+    @Transient private int numValidacio;
+    @Transient private String estatColorCrearTasca;
+    @Transient private String estatColorFinalitzarTasca;
 }

@@ -111,13 +111,13 @@ export const useMetaExpedientActions = (refresh?: () => void) => {
         },
     ]
 
-    const content = <>
+    const components = <>
         {contentCanviEstat}
         {dialogDetail}
     </>
 
     return {
         actions,
-        content
+        components
     }
 }

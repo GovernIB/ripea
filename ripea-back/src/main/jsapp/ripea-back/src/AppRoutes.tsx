@@ -37,6 +37,8 @@ import MetaDadaGrid from "./pages/metaDocument/details/MetaDadaGrid.tsx";
 import {useUserSession} from "./components/Session.tsx";
 import {UrlInstruccioGrid} from "./pages/user/configurar/UrlInstruccioGrid.tsx";
 import {MetaExpedientElements} from "./pages/metaExpedient/details/MetaExpedientElements.tsx";
+import MetaExpedientTascaValidacioGrid
+    from "./pages/metaExpedient/details/elements/MetaExpedientTascaValidacioGrid.tsx";
 
 const ProtectedRoute = ({ allowedRoles = [], params = [] }: any) => {
     const {value: user} = useUserSession();
@@ -96,6 +98,7 @@ const AppRoutes: React.FC = () => {
             <Route path="metaExpedient/:id/permis" element={<PermisMetaExpedientGrid/>} />
             <Route path="metaExpedient/:id/:element" element={<MetaExpedientElements/>} />
             <Route path="expedientEstat/:id" element={<MetaExpedientElements/>} />
+            <Route path="metaExpedient/:id/tasca/:tascaId/validacio" element={<MetaExpedientTascaValidacioGrid/>} />
         </Route>
         <Route element={<ProtectedRoute allowedRoles={['IPA_ADMIN', 'IPA_ORGAN_ADMIN', 'IPA_DISSENY']} />}>
             <Route path="grup" element={<GrupGrid/>} />

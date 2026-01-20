@@ -1316,7 +1316,9 @@ const translationCa = {
         metaExpedient: {
             title: "Procediment",
             detall: {
-              elements: "Gestió del procediment: {{nom}}",
+                elements: "Gestió del procediment: {{nom}}",
+                expressioNumero: "Si no s'especifica cap expressió s'utilitzarà aquesta per defecte: {{codi}}/{{seq}}/{{any}}",
+                permisDirecte: "Un usuari administrador de l'entitat pot modificar aquest valor.",
             },
             tabs: {
                 dades: "Dades",
@@ -1327,6 +1329,7 @@ const translationCa = {
                 expedientEstat: "Estats",
                 tasca: "Tasques",
                 grup: "Grups",
+                carpeta: "Carpetes",
             },
             action: {
                 new: {
@@ -1421,6 +1424,7 @@ const translationCa = {
             title: "Tasca",
             detall: {
                 duracio: "Duració de la tasca en dies naturals.",
+                validacio: "Validacions de la tasca: {{nom}}",
             },
             action: {
                 activar: {
@@ -1440,6 +1444,29 @@ const translationCa = {
                 },
                 delete: {
                     ok: "Tasca eliminat correctament",
+                },
+            },
+        },
+        metaExpedientTascaValidacio: {
+            title: "Validació",
+            action: {
+                activar: {
+                    label: "Activar",
+                    ok: "Validació activat",
+                },
+                desactivar: {
+                    label: "Desactivar",
+                    ok: "Validació desactivat",
+                },
+                new: {
+                    label: "Nova validació",
+                    ok: "Validació creat correctament",
+                },
+                update: {
+                    ok: "Validació modificat correctament",
+                },
+                delete: {
+                    ok: "Validació eliminat correctament",
                 },
             },
         },

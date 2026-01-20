@@ -12,12 +12,12 @@ import {useMetaExpedientActions} from "./details/MetaExpedientActions.tsx";
 import {MetaExpedientFilter} from "./MetaExpedientFilter.tsx";
 import {useUserSession} from "../../components/Session.tsx";
 import {StyledEstat} from "../user/consultes/RevisioMetaExpedientGrid.tsx";
-import MenuButton from "../../components/MenuButton.tsx";
+import MenuButton, {MenuActionButton} from "../../components/MenuButton.tsx";
 import {useNavigate} from "react-router-dom";
 import {StyledBadge} from "../../components/StyledBadge.tsx";
 
 // Form
-export const MetaExpedientForm = () => {
+export const MetaExpedientForm = ({ isAdmin }:any) => {
     const {t} = useTranslation();
     const {data} = useFormContext()
 
@@ -33,12 +33,15 @@ export const MetaExpedientForm = () => {
         <GridFormField xs={12} name="serieDocumental"/>
         <GridFormField xs={4} name="procedimentComu"/>
         <GridFormField xs={8} name="organGestor" required hidden={data?.procedimentComu}/>
-        <GridFormField xs={12} name="expressioNumero"/>
+        <GridFormField xs={12} name="expressioNumero"
+                       componentProps={{ helperText: t('page.metaExpedient.detall.expressioNumero') }}/>
 
-        <GridFormField xs={6} name="permetMetadocsGenerals"/>
-        <GridFormField xs={6} name="gestioAmbGrupsActiva"/>
+        <GridFormField xs={4} name="permetMetadocsGenerals"/>
+        <GridFormField xs={4} name="gestioAmbGrupsActiva"/>
+        <GridFormField xs={4} name="crearReglaDistribucio" disabled={!isAdmin || data?.id}/>
         <GridFormField xs={6} name="interessatObligatori"/>
-        <GridFormField xs={6} name="permisDirecte"/>
+        <GridFormField xs={6} name="permisDirecte" disabled={!isAdmin}
+                       componentProps={{ helperText: t('page.metaExpedient.detall.permisDirecte') }}/>
 
         {data?.id &&
             <Grid xs={12} sx={{ pl: '8px', pt: '8px' }}>
@@ -117,7 +120,7 @@ const MetaExpedientGrid = () => {
             field: 'revisioEstat',
             flex: 0.5,
             renderCell: (params:any) => <StyledEstat entity={params?.row}>{params.formattedValue}</StyledEstat>,
-            hidden: user?.sessionScope?.isRevisioActiva
+            hidden: !user?.sessionScope?.isRevisioActiva
         },
         {
             field: 'numComentaris',
@@ -181,11 +184,16 @@ const MetaExpedientGrid = () => {
                         {t('page.metaExpedient.tabs.grup')}
                     </StyledBadge>
                 </MenuItem>}
+                {user?.sessionScope?.isCarpetesDefecte && <MenuItem onClick={() => navigate(`/metaExpedient/${params?.id}/carpeta`)}>
+                    <StyledBadge badgeContent={params?.row?.numCarpetes} showZero sx={{ '& .MuiBadge-badge': {right: -3, top: 10 } }}>
+                        {t('page.metaExpedient.tabs.carpeta')}
+                    </StyledBadge>
+                </MenuItem>}
             </MenuButton>
         },
     ].filter((col:any)=>!col?.hidden), [user?.sessionScope?.isRevisioActiva])
 
-    const {actions, content} = useMetaExpedientActions(refresh);
+    const {actions, components} = useMetaExpedientActions(refresh);
 
     return <GridPage disableMargins>
         <CardPage title={t('page.user.menu.procedimentsTitle')}>
@@ -196,7 +204,7 @@ const MetaExpedientGrid = () => {
                 resourceName={"metaExpedientResource"}
                 popupEditFormDialogResourceTitle={t('page.metaExpedient.title')}
                 popupEditCreateActive
-                popupEditFormContent={<MetaExpedientForm/>}
+                popupEditFormContent={<MetaExpedientForm isAdmin={user?.rolActual === 'IPA_ADMIN'}/>}
                 columns={additionalColumns}
                 filter={springFilter}
                 perspectives={perspectives}
@@ -205,20 +213,33 @@ const MetaExpedientGrid = () => {
                 toolbarElementsWithPositions={[
                     {
                         position: 2,
-                        element: <ToolbarButton
-                            title={t('common.import')}
-                            icon={'download'}
-                            onClick={()=>{}}
-                            variant={"contained"}
-                            color={'success'}/>,
+                        element: <MenuActionButton
+                            id={'metaExpedient-import'}
+                            buttonLabel={t('common.import')}
+                            buttonProps={{
+                                // icon: 'download',
+                                variant: "contained",
+                                color: 'success',
+                                size: "small",
+                                startIcon: <Icon>download</Icon>,
+                                sx: { borderRadius: '4px',  minWidth: '20px', minHeight: '32px' }
+                            }}
+                            actions={[
+                                {
+                                    label: "Importar des de ROLSAC",
+                                },
+                                {
+                                    label: "Importar des de fitxer",
+                                },
+                            ]}
+                        />,
                     },
                     {
                         position: 2,
                         element: <ToolbarButton
-                            title={t('common.actualize')}
                             icon={'cached'}
                             onClick={()=>{}}
-                            color={'primary'}/>,
+                            color={'primary'}>{t('common.actualize')}</ToolbarButton>,
                     },
                 ]}
 
@@ -230,6 +251,7 @@ const MetaExpedientGrid = () => {
                 }}
                 toolbarHideRefresh
             />
+            {components}
             {content}
         </CardPage>
     </GridPage>

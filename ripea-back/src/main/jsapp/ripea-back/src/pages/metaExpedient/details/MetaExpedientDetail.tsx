@@ -27,7 +27,7 @@ const MetaExpedientDetail = (props:any) => {
     </MuiDetail>
 }
 
-const perspectives = ["ELEMENTS_COUNT"]
+const perspectives = []
 const useMetaExpedientDetail = () => {
     const { t } = useTranslation();
 

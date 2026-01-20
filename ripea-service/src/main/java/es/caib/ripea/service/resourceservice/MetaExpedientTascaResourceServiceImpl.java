@@ -2,6 +2,7 @@ package es.caib.ripea.service.resourceservice;
 
 import javax.annotation.PostConstruct;
 
+import org.springframework.data.annotation.Transient;
 import org.springframework.stereotype.Service;
 
 import com.turkraft.springfilter.FilterBuilder;
@@ -38,5 +39,15 @@ public class MetaExpedientTascaResourceServiceImpl extends BaseMutableResourceSe
         );
         
         return filtreBase.generate();
+    }
+
+    @Override
+    protected void afterConversion(MetaExpedientTascaResourceEntity entity, MetaExpedientTascaResource resource) {
+        if (entity.getEstatCrearTasca()!=null) {
+            resource.setEstatColorCrearTasca(entity.getEstatCrearTasca().getColor());
+        }
+        if (entity.getEstatFinalitzarTasca()!=null) {
+            resource.setEstatColorFinalitzarTasca(entity.getEstatFinalitzarTasca().getColor());
+        }
     }
 }

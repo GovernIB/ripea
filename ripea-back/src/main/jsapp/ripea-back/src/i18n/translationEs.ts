@@ -1317,6 +1317,8 @@ const translationEs = {
             title: "Procedimiento",
             detall: {
                 elements: "Gestión del procedimiento: {{nom}}",
+                expressioNumero: "Si no se especifica ninguna expresión se utilizará la siguiente por defecto: {{codi}}/{{seq}}/{{any}}",
+                permisDirecte: "Un usuario administrador de la entidad puede modificar este valor.",
             },
             tabs: {
                 dades: "Datos",
@@ -1327,6 +1329,7 @@ const translationEs = {
                 expedientEstat: "Estados",
                 tasca: "Tareas",
                 grup: "Grupos",
+                carpeta: "Carpetas",
             },
             action: {
                 new: {
@@ -1421,6 +1424,7 @@ const translationEs = {
             title: "Tarea",
             detall: {
                 duracio: "Duración de la tarea en días naturales.",
+                validacio: "Validaciones de la tarea: {{nom}}",
             },
             action: {
                 activar: {
@@ -1440,6 +1444,29 @@ const translationEs = {
                 },
                 delete: {
                     ok: "Tarea eliminada correctamente",
+                },
+            },
+        },
+        metaExpedientTascaValidacio: {
+            title: "Validación",
+            action: {
+                activar: {
+                    label: "Activar",
+                    ok: "Validación activada",
+                },
+                desactivar: {
+                    label: "Desactivar",
+                    ok: "Validación desactivada",
+                },
+                new: {
+                    label: "Nueva validación",
+                    ok: "Validación creada correctamente",
+                },
+                update: {
+                    ok: "Validación modificada correctamente",
+                },
+                delete: {
+                    ok: "Validación eliminada correctamente",
                 },
             },
         },
