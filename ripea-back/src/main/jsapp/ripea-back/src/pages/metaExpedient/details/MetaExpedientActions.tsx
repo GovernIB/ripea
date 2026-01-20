@@ -3,7 +3,7 @@ import {useUserSession} from "../../../components/Session.tsx";
 import useCanviEstatRevisio from "../actions/CanviEstatRevisio.tsx";
 import useMetaExpedientDetail from "./MetaExpedientDetail.tsx";
 import {useBaseAppContext, useResourceApiService} from "reactlib";
-import {iniciaDescargaBlob} from "../../expedient/details/CommonActions.tsx";
+import {iniciaDescargaBlob, iniciaDescargaJSON} from "../../expedient/details/CommonActions.tsx";
 
 const useActions = (refresh?: () => void) => {
     const {t} = useTranslation()
@@ -36,9 +36,9 @@ const useActions = (refresh?: () => void) => {
     }
 
     const exportar = (id:any) => {
-        apiReport(id, { code: 'REPORT_EXPORT_JSON' })
+        apiReport(id, { code: 'REPORT_EXPORT_JSON', fileType: "JSON" })
             .then((result) => {
-                iniciaDescargaBlob(result);
+                iniciaDescargaJSON(result);
                 temporalMessageShow(null, t(''), 'success');
             })
             .catch((error) => {

@@ -233,7 +233,7 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
             popupEditFormDialogOnClose={(reason?: string) => reason !== 'backdropClick' }
             popupEditFormDialogButtons={[
                 {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
-                {icon: 'save', text: t('common.create'), componentProps: { variant: 'contained' }, value: true },
+                {icon: 'save', text: t('common.save'), componentProps: { variant: 'contained' }, value: true },
             ]}
 
             toolbarHideRefresh
