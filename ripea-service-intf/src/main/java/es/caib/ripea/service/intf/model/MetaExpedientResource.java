@@ -54,7 +54,11 @@ import lombok.experimental.FieldNameConstants;
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = MetaExpedientResource.ACTION_CHANGE_REVISIO_CODE,
-                        formClass = MetaExpedientResource.RevisioChangeFormAction.class),                
+                        formClass = MetaExpedientResource.RevisioChangeFormAction.class),  
+				@ResourceConfigArtifact(
+						type = ResourceArtifactType.REPORT,
+						code = MetaExpedientResource.REPORT_EXPORT_JSON,
+                        requiresId = true),
         },
 		defaultSortFields = { @ResourceConfig.ResourceSort(field = "nom", direction = Sort.Direction.ASC) }
 )
@@ -67,6 +71,7 @@ public class MetaExpedientResource extends MetaNodeResource {
     public static final String PERSPECTIVE_PERMISOS_CODE	= "PERMISOS";
     public static final String PERSPECTIVE_ELEMENTS_CODE	= "ELEMENTS_COUNT";
     public static final String ACTION_CHANGE_REVISIO_CODE	= "CHANGE_REVISIO";
+    public static final String REPORT_EXPORT_JSON 			= "REPORT_EXPORT_JSON";
 
 	@Size(max = 64)
 	private String codiPropi;

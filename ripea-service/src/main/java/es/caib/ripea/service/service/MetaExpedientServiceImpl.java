@@ -17,8 +17,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import es.caib.ripea.persistence.entity.DominiEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.ExpedientEntity;
@@ -41,7 +39,6 @@ import es.caib.ripea.persistence.repository.DominiRepository;
 import es.caib.ripea.persistence.repository.ExpedientEstatRepository;
 import es.caib.ripea.persistence.repository.ExpedientRepository;
 import es.caib.ripea.persistence.repository.GrupRepository;
-import es.caib.ripea.persistence.repository.MetaDocumentRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientComentariRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientOrganGestorRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientRepository;
@@ -79,7 +76,6 @@ import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.ArbreDto;
 import es.caib.ripea.service.intf.dto.CrearReglaDistribucioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.CrearReglaResponseDto;
-import es.caib.ripea.service.intf.dto.DominiDto;
 import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.ExpedientEstatDto;
 import es.caib.ripea.service.intf.dto.GrupDto;
@@ -143,7 +139,6 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	@Autowired private HistoricExpedientRepository historicExpedientRepository;
 	@Autowired private HistoricInteressatRepository historicInteressatRepository;
 	@Autowired private HistoricUsuariRepository historicUsuariRepository;
-	@Autowired private MetaDocumentRepository metaDocumentRepository;
 	@Autowired private MetaExpedientTascaValidacioRepository metaExpedientTascaValidacioRepository;
 	@Autowired private DistribucioReglaHelper distribucioReglaHelper;
 	@Autowired private CacheHelper cacheHelper;
@@ -644,52 +639,10 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	
 	@Transactional
 	@Override
-	public String export(Long entitatId, Long id, Long organId) {
-		logger.debug("Exportant un meta-expedient (" + "id=" + id + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarAccesMetaExpedient(entitat, id, organId, true);
-		
-		ObjectMapper objectMapper = new ObjectMapper();
-		try {
-			MetaExpedientExportDto metaExpedientDto = conversioTipusHelper.convertir(metaExpedient, MetaExpedientExportDto.class);
-			
-			if (metaExpedientDto.getMetaDades() != null) {
-				for (MetaDadaDto metaDadaDto : metaExpedientDto.getMetaDades()) {
-					if (metaDadaDto.getTipus().equals(MetaDadaTipusEnumDto.DOMINI)) {
-						List<DominiEntity> dominis = dominiRepository.findByEntitatAndCodi(entitat, metaDadaDto.getCodi());
-						if (dominis != null && !dominis.isEmpty()) {
-							DominiEntity domini = dominis.get(0);
-							metaDadaDto.setDomini(conversioTipusHelper.convertir(domini, DominiDto.class));
-						}
-					}
-				}
-			}
-
-			if (metaExpedientDto.getMetaDocuments() != null) {
-				for (MetaDocumentDto metaDocumentDto : metaExpedientDto.getMetaDocuments()) {
-					if (metaDocumentDto.getMetaDades() != null) {
-						for (MetaDadaDto metaDadaDto : metaDocumentDto.getMetaDades()) {
-							if (metaDadaDto.getTipus().equals(MetaDadaTipusEnumDto.DOMINI)) {
-								List<DominiEntity> dominis = dominiRepository.findByEntitatAndCodi(entitat, metaDadaDto.getCodi());
-								if (dominis != null && !dominis.isEmpty()) {
-									DominiEntity domini = dominis.get(0);
-									metaDadaDto.setDomini(conversioTipusHelper.convertir(domini, DominiDto.class));
-								}
-							}
-						}
-					}
-				}
-			}
-			
-			String carAsString = objectMapper.writeValueAsString(metaExpedientDto);
-			logger.info(carAsString);
-			return carAsString;
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-		
+	public String export(Long entitatId, Long metaExpedientId, Long organId) {
+		logger.debug("Exportant un meta-expedient (" + "id=" + metaExpedientId + ")");
+		return metaExpedientHelper.export(entitatId, metaExpedientId, organId);
 	}
-	
 
 	@Transactional
 	@Override

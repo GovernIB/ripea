@@ -1,6 +1,8 @@
 package es.caib.ripea.service.resourceservice;
 
+import java.io.OutputStream;
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +18,7 @@ import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
+import es.caib.ripea.persistence.entity.resourceentity.ExpedientResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.GrupResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.UsuariResourceEntity;
@@ -23,6 +26,7 @@ import es.caib.ripea.persistence.entity.resourcerepository.MetaDadaResourceRepos
 import es.caib.ripea.persistence.entity.resourcerepository.MetaDocumentResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientCarpetaResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientEstatResourceRepository;
+import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientTascaResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.UsuariResourceRepository;
 import es.caib.ripea.persistence.repository.ExpedientRepository;
@@ -40,6 +44,9 @@ import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
+import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
+import es.caib.ripea.service.intf.base.model.DownloadableFile;
+import es.caib.ripea.service.intf.base.model.ReportFileType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.CrearReglaResponseDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientRevisioEstatEnumDto;
@@ -51,6 +58,7 @@ import es.caib.ripea.service.intf.model.EntitatResource;
 import es.caib.ripea.service.intf.model.MetaExpedientResource;
 import es.caib.ripea.service.intf.model.MetaExpedientResource.RevisioChangeFormAction;
 import es.caib.ripea.service.intf.model.MetaNodeResource;
+import es.caib.ripea.service.intf.model.NodeResource.MassiveAction;
 import es.caib.ripea.service.intf.model.OrganGestorResource;
 import es.caib.ripea.service.intf.resourceservice.MetaExpedientResourceService;
 import es.caib.ripea.service.intf.utils.Utils;
@@ -66,6 +74,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 	private final ConfigHelper configHelper;
 	private final CacheHelper cacheHelper;
 	private final MetaExpedientHelper metaExpedientHelper;
+	private final MetaExpedientResourceRepository metaExpedientResourceRepository;
 	private final MetaDocumentResourceRepository metaDocumentResourceRepository;
 	private final MetaDadaResourceRepository metaDadaResourceRepository;
 	private final MetaExpedientEstatResourceRepository metaExpedientEstatResourceRepository;
@@ -89,6 +98,8 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
     	register(MetaExpedientResource.PERSPECTIVE_ELEMENTS_CODE, new ElementsCountPerspectiveApplicator());
     	
     	register(MetaExpedientResource.ACTION_CHANGE_REVISIO_CODE, new RevisioChangeActionExecutor());
+    	
+    	register(MetaExpedientResource.REPORT_EXPORT_JSON, new ExportJsonGenerator());
     	
     	register(MetaExpedientResource.Fields.classificacio, new OnchangeLogicProcessor());
     	register(MetaExpedientResource.Fields.tipusClassificacio, new OnchangeLogicProcessor());
@@ -411,5 +422,52 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, messageHelper.getMessage("message.common.action.error")+": "+e.getMessage());
 			}
 		}    	
+    }
+    
+    private class ExportJsonGenerator implements ReportGenerator<ExpedientResourceEntity, MassiveAction, Serializable> {
+
+    	@Override
+		public DownloadableFile generateFile(String code, List<?> data, ReportFileType fileType, OutputStream out) {
+    		DownloadableFile resultat = null;
+    		Long procedimentId = data.get(0)!=null?(Long)data.get(0):null;
+    		
+    		try {
+    			String entitatActualCodi = configHelper.getEntitatActualCodi();
+    			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true,false);
+    			String organActualCodi	 = configHelper.getOrganActualCodi();
+    			OrganGestorEntity ogEntity	= organGestorRepository.findByEntitatIdAndCodi(entitat.getId(), organActualCodi);
+    			
+    			String json = metaExpedientHelper.export(entitat.getId(), procedimentId, ogEntity!=null?ogEntity.getId():null);
+    			
+    			MetaExpedientResourceEntity mere = metaExpedientResourceRepository.findById(procedimentId).get();
+    			
+    			String fileNom = mere.getCodi().replaceAll("[^a-zA-Z0-9-]", "_");
+    			if (fileNom.length() > 60) {
+    				fileNom = fileNom.substring(0, 60);
+    			}
+    			
+            	resultat = new DownloadableFile(
+            			fileNom,
+            			"application/json; charset=UTF-8",
+            			json.getBytes(StandardCharsets.UTF_8));
+    			
+			} catch (Exception e) {
+				excepcioLogHelper.addExcepcio("/metaExpedient/"+procedimentId+"/ExportJsonGenerator", e);
+				throw new ReportGenerationException(getResourceClass(), procedimentId, code, "expedient.export.eni.reject");
+			}
+
+            return resultat;
+    	}
+    	
+		@Override
+		public void onChange(Serializable id, MassiveAction previous, String fieldName, Object fieldValue,
+				Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {
+		}
+
+		@Override
+		public List<Serializable> generateData(String code, ExpedientResourceEntity entity, MassiveAction params) throws ReportGenerationException {
+			return null;
+		}
+    	
     }
 }

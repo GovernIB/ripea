@@ -29,7 +29,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import es.caib.ripea.persistence.entity.AvisEntity;
+import es.caib.ripea.persistence.entity.DominiEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.ExpedientEstatEntity;
 import es.caib.ripea.persistence.entity.GrupEntity;
@@ -43,6 +46,7 @@ import es.caib.ripea.persistence.entity.MetaExpedientTascaEntity;
 import es.caib.ripea.persistence.entity.MetaNodeEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.repository.AvisRepository;
+import es.caib.ripea.persistence.repository.DominiRepository;
 import es.caib.ripea.persistence.repository.ExpedientEstatRepository;
 import es.caib.ripea.persistence.repository.ExpedientRepository;
 import es.caib.ripea.persistence.repository.MetaDocumentRepository;
@@ -62,10 +66,14 @@ import es.caib.ripea.service.intf.dto.ArbreNodeDto;
 import es.caib.ripea.service.intf.dto.AvisNivellEnumDto;
 import es.caib.ripea.service.intf.dto.CrearReglaDistribucioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.CrearReglaResponseDto;
+import es.caib.ripea.service.intf.dto.DominiDto;
+import es.caib.ripea.service.intf.dto.MetaDadaDto;
+import es.caib.ripea.service.intf.dto.MetaDadaTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientAmbitEnumDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientCarpetaDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientExportDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientFiltreDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientTascaDto;
@@ -108,13 +116,59 @@ public class MetaExpedientHelper {
 	@Autowired private MetaDocumentRepository metaDocumentRepository;
 	@Autowired private ApplicationHelper applicationHelper;
 	@Autowired private PaginacioHelper paginacioHelper;
-
-	public static final String PROCEDIMENT_ORGAN_NO_SYNC = "Hi ha procediments que pertanyen a òrgans no existents en l'organigrama actual";
-
-
 	@Autowired private ExpedientRepository expedientRepository;
+	@Autowired private DominiRepository dominiRepository;
     @Autowired private OrganGestorCacheHelper organGestorCacheHelper;
 
+    public static final String PROCEDIMENT_ORGAN_NO_SYNC = "Hi ha procediments que pertanyen a òrgans no existents en l'organigrama actual";
+    
+    public String export(Long entitatId, Long metaExpedientId, Long organId) {
+
+    	try {
+
+	    	EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
+	    	MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarAccesMetaExpedient(entitat, metaExpedientId, organId, true);
+			MetaExpedientExportDto metaExpedientDto = conversioTipusHelper.convertir(metaExpedient, MetaExpedientExportDto.class);
+			
+			ObjectMapper objectMapper = new ObjectMapper();
+			
+			if (metaExpedientDto.getMetaDades() != null) {
+				for (MetaDadaDto metaDadaDto : metaExpedientDto.getMetaDades()) {
+					if (metaDadaDto.getTipus().equals(MetaDadaTipusEnumDto.DOMINI)) {
+						List<DominiEntity> dominis = dominiRepository.findByEntitatAndCodi(entitat, metaDadaDto.getCodi());
+						if (dominis != null && !dominis.isEmpty()) {
+							DominiEntity domini = dominis.get(0);
+							metaDadaDto.setDomini(conversioTipusHelper.convertir(domini, DominiDto.class));
+						}
+					}
+				}
+			}
+	
+			if (metaExpedientDto.getMetaDocuments() != null) {
+				for (MetaDocumentDto metaDocumentDto : metaExpedientDto.getMetaDocuments()) {
+					if (metaDocumentDto.getMetaDades() != null) {
+						for (MetaDadaDto metaDadaDto : metaDocumentDto.getMetaDades()) {
+							if (metaDadaDto.getTipus().equals(MetaDadaTipusEnumDto.DOMINI)) {
+								List<DominiEntity> dominis = dominiRepository.findByEntitatAndCodi(entitat, metaDadaDto.getCodi());
+								if (dominis != null && !dominis.isEmpty()) {
+									DominiEntity domini = dominis.get(0);
+									metaDadaDto.setDomini(conversioTipusHelper.convertir(domini, DominiDto.class));
+								}
+							}
+						}
+					}
+				}
+			}
+			
+			String carAsString = objectMapper.writeValueAsString(metaExpedientDto);
+			logger.info(carAsString);
+			return carAsString;
+		
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+    }
+    
 	public long obtenirProximaSequenciaExpedient(
 			MetaExpedientEntity metaExpedient,
 			Integer any,
