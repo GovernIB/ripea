@@ -252,7 +252,6 @@ const MetaExpedientGrid = () => {
                 toolbarHideRefresh
             />
             {components}
-            {content}
         </CardPage>
     </GridPage>
 }
