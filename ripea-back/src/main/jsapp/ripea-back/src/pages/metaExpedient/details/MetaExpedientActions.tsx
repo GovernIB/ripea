@@ -3,11 +3,13 @@ import {useUserSession} from "../../../components/Session.tsx";
 import useCanviEstatRevisio from "../actions/CanviEstatRevisio.tsx";
 import useMetaExpedientDetail from "./MetaExpedientDetail.tsx";
 import {useBaseAppContext, useResourceApiService} from "reactlib";
+import {iniciaDescargaBlob} from "../../expedient/details/CommonActions.tsx";
 
 const useActions = (refresh?: () => void) => {
     const {t} = useTranslation()
     const {
-        patch: apiPatch
+        patch: apiPatch,
+        artifactReport: apiReport,
     } = useResourceApiService('metaExpedientResource');
     const {temporalMessageShow} = useBaseAppContext();
 
@@ -33,7 +35,18 @@ const useActions = (refresh?: () => void) => {
             });
     }
 
-    return {active, desactive}
+    const exportar = (id:any) => {
+        apiReport(id, { code: 'REPORT_EXPORT_JSON' })
+            .then((result) => {
+                iniciaDescargaBlob(result);
+                temporalMessageShow(null, t(''), 'success');
+            })
+            .catch((error) => {
+                temporalMessageShow(null, error.message, 'error');
+            });
+    }
+
+    return {active, desactive, exportar}
 }
 
 export const useMetaExpedientActions = (refresh?: () => void) => {
@@ -47,7 +60,7 @@ export const useMetaExpedientActions = (refresh?: () => void) => {
 
     const {handleOpen: handleDetail, dialog: dialogDetail} = useMetaExpedientDetail();
     const {handleShow: handleCanviEstat, content: contentCanviEstat} = useCanviEstatRevisio(refresh);
-    const {active, desactive} = useActions(refresh)
+    const {active, desactive, exportar} = useActions(refresh)
 
     const actions = [
         {
@@ -81,6 +94,7 @@ export const useMetaExpedientActions = (refresh?: () => void) => {
             label: t('common.export'),
             icon: "upload",
             showInMenu: true,
+            onClick: exportar,
             hidden: !(isRolActualAdmin || isRolActualOrganAdmin),
         },
         {
