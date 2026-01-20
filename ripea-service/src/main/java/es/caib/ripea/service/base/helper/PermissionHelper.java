@@ -113,6 +113,7 @@ public class PermissionHelper {
 			if (targetType.endsWith(".MetaDocumentResource")) { return userPermissions.isAdmin() || userPermissions.isDisseny() || userPermissions.isRevisio(); }
 			if (targetType.endsWith(".MetaExpedientResource")) { return userPermissions.isAdmin() || userPermissions.isDisseny() || userPermissions.isRevisio(); }
 			if (targetType.endsWith(".MetaExpedientTascaResource")) { return userPermissions.isAdmin() || userPermissions.isDisseny() || userPermissions.isRevisio(); }
+			if (targetType.endsWith(".MetaExpedientCarpetaResource")) { return userPermissions.isAdmin() || userPermissions.isDisseny() || userPermissions.isRevisio(); }
 			
 			//Usuari
 			if (targetType.endsWith(".UsuariResource")) { return userPermissions.isConsulta(); }
