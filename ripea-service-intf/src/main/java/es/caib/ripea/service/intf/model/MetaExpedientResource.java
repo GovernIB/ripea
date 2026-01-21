@@ -198,6 +198,9 @@ public class MetaExpedientResource extends MetaNodeResource {
 		@NotEmpty
 		@ResourceField(onChangeActive = true)
     	private FileReference importJson;
+		
+		@ResourceField(onChangeActive = true)
+		private ResourceReference<MetaExpedientResource, Long> procediment;
 
         private List<ResourceReference<MetaDocumentResource, Long>> metaDocuments = new ArrayList<>();
         private List<ResourceReference<MetaDadaResource, Long>> metaDades = new ArrayList<>();
