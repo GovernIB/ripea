@@ -16,6 +16,7 @@ const MetaExpedientCarpetaForm = () => {
                            builder.eq("metaExpedient.id", data?.metaExpedient?.id),
                            builder.eq("pare", null),
                        )}
+                       componentProps={{ helperText: data?.id ?"":"Si es deixa en blanc, es creará com a carpeta principal." }}
                        disabled={data?.id}/>
     </Grid>
 }
@@ -68,11 +69,7 @@ export const MetaExpedientCarpetaGrid = ({ entity, onRowCountChange } :any) => {
         groupingColDef={{
             headerName: t('page.contingut.grid.nom'),
             flex: 1.5,
-            valueFormatter: (value: any, row: any) => (
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <ContingutIcon entity={row} />
-                </Box>
-            ),
+            valueFormatter: (value: any, row: any) => row?.nom,
             renderCell: (params: any) => <GridTreeDataGroupingCell {...params} />,
         }}
         getTreeDataPath={(row: any): string[] => {
