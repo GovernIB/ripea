@@ -59,4 +59,20 @@ public class MetaExpedientCarpetaHelper {
 		List<MetaExpedientCarpetaEntity> metaExpedientCarpetes = metaExpedientCarpetaRepository.findByMetaExpedientAndPare(metaExpedient, null);
 		metaExpedientCarpetaRepository.deleteAll(metaExpedientCarpetes);
 	}
+	
+	public List<MetaExpedientCarpetaEntity> existeixCarpetaMetaExpedient(
+			MetaExpedientEntity metaExpedient,
+			String nomCarpeta,
+			MetaExpedientCarpetaEntity pare) {
+		if (pare==null) {
+			return metaExpedientCarpetaRepository.findByMetaExpedientAndNom(
+					metaExpedient,
+					nomCarpeta);
+		} else {
+			return metaExpedientCarpetaRepository.findByMetaExpedientAndNomAndPare(
+					metaExpedient,
+					nomCarpeta,
+					pare);
+		}
+	}
 }

@@ -337,10 +337,10 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				tipusClassificacio(procedimentImportat.getTipusClassificacio()).build();
 		
 		MetaExpedientEntity metaExpedientEntity = metaExpedientRepository.save(entity);
-		if (procedimentImportat.getEstructuraCarpetes() != null) {
+		if (procedimentImportat.getCarpetes() != null && procedimentImportat.getCarpetes().size()>0) {
 			//crear estructura carpetes per defecte
-			metaExpedientHelper.crearEstructuraCarpetes(
-					procedimentImportat.getEstructuraCarpetes(), 
+			metaExpedientHelper.crearEstructuraCarpetesDto(
+					procedimentImportat.getCarpetes(), 
 					metaExpedientEntity);
 		}
 		
@@ -464,8 +464,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		Long metaExpedientEntityId = metaExpedientEntity.getId();
 
 		//Actualitzar estructura carpetes
-		if (procedimentImportat.getEstructuraCarpetes() != null) {
-			metaExpedientHelper.crearEstructuraCarpetes(procedimentImportat.getEstructuraCarpetes(), metaExpedientEntity);
+		if (procedimentImportat.getCarpetes() != null && procedimentImportat.getCarpetes().size()>0) {
+			metaExpedientHelper.crearEstructuraCarpetesDto(procedimentImportat.getCarpetes(), metaExpedientEntity);
 		}
 		
 		/**

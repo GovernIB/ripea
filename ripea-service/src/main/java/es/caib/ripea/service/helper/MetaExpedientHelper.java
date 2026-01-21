@@ -72,6 +72,7 @@ import es.caib.ripea.service.intf.dto.MetaDadaTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientAmbitEnumDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientCarpetaDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientCarpetaMinDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientExportDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientFiltreDto;
@@ -148,6 +149,11 @@ public class MetaExpedientHelper {
 				}
 			}
 			
+			//Carpetes per defecte (segons property)
+			List<MetaExpedientCarpetaDto> carpetesProcediment = metaExpedientCarpetaHelper.findCarpetesMetaExpedient(metaExpedient);
+			metaExpedientDto.setCarpetes(conversioTipusHelper.convertirList(carpetesProcediment, MetaExpedientCarpetaMinDto.class));
+			
+			//Meta-dades amb dominis
 			if (metaExpedientDto.getMetaDades() != null) {
 				for (MetaDadaDto metaDadaDto : metaExpedientDto.getMetaDades()) {
 					if (metaDadaDto.getTipus().equals(MetaDadaTipusEnumDto.DOMINI)) {
@@ -160,6 +166,7 @@ public class MetaExpedientHelper {
 				}
 			}
 	
+			//Meta-documents amb meta-dades amb dominis
 			if (metaExpedientDto.getMetaDocuments() != null) {
 				for (MetaDocumentDto metaDocumentDto : metaExpedientDto.getMetaDocuments()) {
 					if (metaDocumentDto.getMetaDades() != null) {
@@ -673,6 +680,55 @@ public class MetaExpedientHelper {
 		return currentArbreNode;
 	}
 
+	public void crearEstructuraCarpetesDto(
+			List<MetaExpedientCarpetaMinDto> carpetes,
+			MetaExpedientEntity metaExpedient) {
+		if (carpetes!=null && carpetes.size()>0) {
+			for (MetaExpedientCarpetaMinDto aux: carpetes) {
+				//Si la carpeta té pare, miram si existeix en el procediment una carpeta amb el mateix nom del pare
+				MetaExpedientCarpetaEntity pare = null;
+				if (aux.getPare()!=null) {
+					List<MetaExpedientCarpetaEntity> carpetesPare = metaExpedientCarpetaHelper.existeixCarpetaMetaExpedient(
+							metaExpedient,
+							aux.getPare().getNom(),
+							null);
+					if (carpetesPare!=null && carpetesPare.size()>0) {
+						pare = carpetesPare.get(0);
+					} else {
+						pare = metaExpedientCarpetaHelper.crearNovaCarpeta(
+								aux.getPare().getNom(),
+								null,
+								metaExpedient);
+					}
+					
+					List<MetaExpedientCarpetaEntity> carpetesExistents = metaExpedientCarpetaHelper.existeixCarpetaMetaExpedient(
+							metaExpedient,
+							aux.getNom(),
+							pare);
+					
+					if (carpetesExistents==null || carpetesExistents.size()==0) {
+						metaExpedientCarpetaHelper.crearNovaCarpeta(
+								aux.getNom(),
+								pare,
+								metaExpedient);
+					}
+				} else {
+					//La carpeta no té pare
+					List<MetaExpedientCarpetaEntity> carpetesExistents = metaExpedientCarpetaHelper.existeixCarpetaMetaExpedient(
+							metaExpedient,
+							aux.getNom(),
+							null);
+					if (carpetesExistents==null || carpetesExistents.size()==0) {
+						metaExpedientCarpetaHelper.crearNovaCarpeta(
+								aux.getNom(),
+								null,
+								metaExpedient);
+					}
+				}
+			}
+		}
+	}			
+	
 	public void crearEstructuraCarpetes(
 			List<ArbreJsonDto> estructuraCarpetes,
 			MetaExpedientEntity metaExpedient) {

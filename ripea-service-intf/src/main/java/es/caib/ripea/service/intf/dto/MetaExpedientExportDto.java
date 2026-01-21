@@ -39,7 +39,7 @@ public class MetaExpedientExportDto extends MetaNodeAmbMetaDadesDto implements S
 	private Set<ExpedientEstatDto> estats;
     private Set<MetaExpedientTascaDto> tasques;
     private List<GrupDto> grups; //Opcional
-    List<ArbreJsonDto> estructuraCarpetes; //Opcional
+    private List<MetaExpedientCarpetaMinDto> carpetes; //Opcional
 
     private boolean interessatObligatori;
 	

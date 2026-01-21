@@ -16,6 +16,8 @@ public interface MetaExpedientCarpetaRepository extends JpaRepository<MetaExpedi
 
 	List<MetaExpedientCarpetaEntity> findByMetaExpedientAndPare(MetaExpedientEntity metaExpedient, MetaExpedientCarpetaEntity pare);
 	List<MetaExpedientCarpetaEntity> findByMetaExpedient(MetaExpedientEntity metaExpedient);
+	List<MetaExpedientCarpetaEntity> findByMetaExpedientAndNom(MetaExpedientEntity metaExpedient, String nom);
+	List<MetaExpedientCarpetaEntity> findByMetaExpedientAndNomAndPare(MetaExpedientEntity metaExpedient, String nom, MetaExpedientCarpetaEntity pare);
 	
 	@Modifying
  	@Query(value = "UPDATE IPA_METAEXPEDIENT_CARPETA " +

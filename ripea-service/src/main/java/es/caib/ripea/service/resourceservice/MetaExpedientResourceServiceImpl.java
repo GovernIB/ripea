@@ -11,6 +11,10 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.introspect.VisibilityChecker;
 import com.turkraft.springfilter.FilterBuilder;
 import com.turkraft.springfilter.parser.Filter;
 
@@ -47,9 +51,11 @@ import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerV
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
 import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
 import es.caib.ripea.service.intf.base.model.DownloadableFile;
+import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ReportFileType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.CrearReglaResponseDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientExportDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.PermisDto;
 import es.caib.ripea.service.intf.dto.ProcedimentDto;
@@ -446,7 +452,28 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 				Map<String, AnswerValue> answers, String[] previousFieldNames, ImportarFitxerFormAction target) {
 			if (fieldName != null) {
 				if (ImportarFitxerFormAction.Fields.importJson.equals(fieldName) && fieldValue != null) {
-					target.setDescripcio("TODO");
+
+					try {
+					
+						ObjectMapper objectMapper = new ObjectMapper();
+						objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+						objectMapper.setVisibility(VisibilityChecker.Std.defaultInstance().withFieldVisibility(JsonAutoDetect.Visibility.ANY));
+						
+						String jsonString = new String(((FileReference)fieldValue).getContent(), StandardCharsets.UTF_8);
+						
+						MetaExpedientExportDto metaExpedientExport = objectMapper.readValue(jsonString, MetaExpedientExportDto.class);
+						
+						//Convertir MetaExpedientExportDto a MetaExpedientResource
+						target.setTipusClassificacio(metaExpedientExport.getTipusClassificacio());
+						target.setClassificacio(metaExpedientExport.getClassificacio());
+						target.setSerieDocumental(metaExpedientExport.getSerieDocumental());
+						target.setExpressioNumero(metaExpedientExport.getExpressioNumero());
+//						target.setNo
+						
+					} catch (Exception e) {
+						excepcioLogHelper.addExcepcio("/metaExpedient/ImportarFitxerActionExecutor.onChange", e);
+						throw new ActionExecutionException(getResourceClass(), null, fieldName, messageHelper.getMessage("message.common.action.error")+": "+e.getMessage());
+					}
 				}
 			}
 		}
