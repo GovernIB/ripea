@@ -1,26 +1,36 @@
 import {MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
-import {Grid} from "@mui/material";
+import {Alert, Grid} from "@mui/material";
 import GridFormField, {FileFormField} from "../../../components/GridFormField.tsx";
 import {useRef} from "react";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
-import {MetaExpedientForm} from "../MetaExpedientGrid.tsx";
-import {useUserSession} from "../../../components/Session.tsx";
 
-const ImportFitxerForm = ({ isAdmin }: any) => {
+const ImportFitxerForm = () => {
     const {data} = useFormContext()
+    const {t} = useTranslation()
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <FileFormField xs={12} name={'importJson'} hidden={data?.importJson}/>
         {data?.importJson && <>
             <GridFormField xs={12} name={'procediment'}/>
-            <Grid item xs={12}><MetaExpedientForm isAdmin={isAdmin}/></Grid>
+            <GridFormField xs={12} name="codi"/>
+            <GridFormField xs={2} name="tipusClassificacio" required/>
+            <GridFormField xs={10} name="classificacio" debounce disabled={data?.tipusClassificacio == 'ID'}/>
+            <Grid item xs={12} hidden={data?.msgSiaRolsac == null}>
+                <Alert severity={'warning'} sx={{ mt: 0.5 }}>{data.msgSiaRolsac}</Alert>
+            </Grid>
+            <GridFormField xs={12} name="nom"/>
+            <GridFormField xs={12} name="descripcio"/>
+            <GridFormField xs={12} name="serieDocumental"/>
+            <GridFormField xs={4} name="procedimentComu"/>
+            <GridFormField xs={8} name="organGestor" required hidden={data?.procedimentComu}/>
+            <GridFormField xs={12} name="expressioNumero"
+                           componentProps={{ helperText: t('page.metaExpedient.detall.expressioNumero') }}/>
         </>}
     </Grid>
 }
 
 const ImportFitxer = (props: any) => {
     const { t } = useTranslation();
-    const {value: user} = useUserSession();
 
     return <FormActionDialog
         resourceName={"metaExpedientResource"}
@@ -32,7 +42,7 @@ const ImportFitxer = (props: any) => {
         // ]}
         {...props}
     >
-        <ImportFitxerForm isAdmin={user?.rolActual === 'IPA_ADMIN'}/>
+        <ImportFitxerForm/>
     </FormActionDialog>
 }
 
