@@ -425,7 +425,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 					aux.setNom(procedimentDto.getNom());
 					aux.setDescripcio(procedimentDto.getResum());
 					aux.setProcedimentComu(procedimentDto.isComu());
-					if (!procedimentDto.isComu()) {
+					if (!procedimentDto.isComu() && procedimentDto.getOrganId() != null) {
 						aux.setOrganGestor(ResourceReference.toResourceReference(
 								procedimentDto.getOrganId(),
 								procedimentDto.getOrganNom()));
