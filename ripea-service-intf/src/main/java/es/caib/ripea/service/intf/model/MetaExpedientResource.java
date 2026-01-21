@@ -185,17 +185,18 @@ public class MetaExpedientResource extends MetaNodeResource {
     @Setter
     public static class ImportarRolsacFormAction implements Serializable {
 		private static final long serialVersionUID = 2247344473674559400L;
-		@NotEmpty
+		@NotNull @NotEmpty
     	private String codiSia;
     }
     
     @Getter
     @Setter
+    @FieldNameConstants
     public static class ImportarFitxerFormAction extends MetaExpedientResource {
 
 		private static final long serialVersionUID = -7203619944391181991L;
 
-		@NotEmpty
+        @NotNull @NotEmpty
 		@ResourceField(onChangeActive = true)
     	private FileReference importJson;
 		

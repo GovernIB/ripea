@@ -15,6 +15,8 @@ import {StyledEstat} from "../user/consultes/RevisioMetaExpedientGrid.tsx";
 import MenuButton, {MenuActionButton} from "../../components/MenuButton.tsx";
 import {useNavigate} from "react-router-dom";
 import {StyledBadge} from "../../components/StyledBadge.tsx";
+import {useImportRolsac} from "./actions/ImportRolsac.tsx";
+import {useImportFitxer} from "./actions/ImportFitxer.tsx";
 
 // Form
 export const MetaExpedientForm = ({ isAdmin }:any) => {
@@ -193,6 +195,8 @@ const MetaExpedientGrid = () => {
         },
     ].filter((col:any)=>!col?.hidden), [user?.sessionScope?.isRevisioActiva])
 
+    const {handleShow: handleImportRolsac, content: contentImportRolsac} = useImportRolsac(apiRef)
+    const {handleShow: handleImportFitxer, content: contentImportFitxer} = useImportFitxer(refresh)
     const {actions, components} = useMetaExpedientActions(refresh);
 
     return <GridPage disableMargins>
@@ -226,10 +230,12 @@ const MetaExpedientGrid = () => {
                             }}
                             actions={[
                                 {
-                                    label: "Importar des de ROLSAC",
+                                    label: t('page.metaExpedient.action.importRolsac.label'),
+                                    onClick: () => handleImportRolsac(),
                                 },
                                 {
-                                    label: "Importar des de fitxer",
+                                    label: t('page.metaExpedient.action.importFitxer.label'),
+                                    onClick: () => handleImportFitxer(),
                                 },
                             ]}
                         />,
@@ -251,6 +257,8 @@ const MetaExpedientGrid = () => {
                 }}
                 toolbarHideRefresh
             />
+            {contentImportRolsac}
+            {contentImportFitxer}
             {components}
         </CardPage>
     </GridPage>
