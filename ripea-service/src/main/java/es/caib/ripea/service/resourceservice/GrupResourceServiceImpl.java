@@ -104,41 +104,37 @@ public class GrupResourceServiceImpl extends BaseMutableResourceService<GrupReso
     			Filter filtreResultat = FilterBuilder.and(filtreGrupsProcediment, filtreGrupsPermesos);
 				return filtreResultat.generate();
 				// ----------------> return amb resultats: grups permesos del procediment
-    		} else {
-    			String vincularGrupProcediment = Utils.findKeyStartingWith(mapaNamedQueries, "VINCULAR_PROCEDIMENT");
-    			if (vincularGrupProcediment!=null) {
-    				String[] split = vincularGrupProcediment.split("#");
-    				List<GrupEntity> grups = grupHelper.findGrupsNoRelacionatAmbMetaExpedient(
-    					entitat.getId(),
-    					Long.parseLong(split[1]),
-    					ogEntity != null ?ogEntity.getId() :null);
-    				
-    				if (grups!=null && grups.size()>0) {
-    					
-    	    			List<Long> grupsIds = new ArrayList<Long>();
-    	    			if (grups!=null) {
-    						for (GrupEntity ge: grups) {
-    							grupsIds.add(ge.getId());
-    						}
-    	    			}
-    	    			
-	    				List<String> grupsOrgansProcedimentIn = Utils.getIdsEnGruposMil(grupsIds);
-	    				Filter filtreGrupsProcediment = null;
-	    		        if (grupsOrgansProcedimentIn!=null) {
-	    			        for (String aux: grupsOrgansProcedimentIn) {
-	    				        if (aux != null && !aux.isEmpty()) {
-	    				        	filtreGrupsProcediment = FilterBuilder.or(filtreGrupsProcediment, Filter.parse("id IN (" + aux + ")"));
-	    				        }
-	    			        }
-	    		        }
-    	    			
-	    		        return filtreGrupsProcediment.generate();
-	    		        
-    				} else {
-        				return FilterBuilder.equal("id", 0).generate();
-        				// ----------------> return sense resultats
-    				}
-    			}
+    		} else if (mapaNamedQueries.containsKey("VINCULAR_PROCEDIMENT")) {
+                Long procedimentId = Long.parseLong(mapaNamedQueries.get("VINCULAR_PROCEDIMENT"));
+                List<GrupEntity> grups = grupHelper.findGrupsNoRelacionatAmbMetaExpedient(
+                        entitat.getId(),
+                        procedimentId,
+                        ogEntity != null ?ogEntity.getId() :null);
+
+                if (grups!=null && grups.size()>0) {
+                    List<Long> grupsIds = new ArrayList<Long>();
+                    if (grups!=null) {
+                        for (GrupEntity ge: grups) {
+                            grupsIds.add(ge.getId());
+                        }
+                    }
+
+                    List<String> grupsOrgansProcedimentIn = Utils.getIdsEnGruposMil(grupsIds);
+                    Filter filtreGrupsProcediment = null;
+                    if (grupsOrgansProcedimentIn!=null) {
+                        for (String aux: grupsOrgansProcedimentIn) {
+                            if (aux != null && !aux.isEmpty()) {
+                                filtreGrupsProcediment = FilterBuilder.or(filtreGrupsProcediment, Filter.parse("id IN (" + aux + ")"));
+                            }
+                        }
+                    }
+
+                    return filtreGrupsProcediment.generate();
+
+                } else {
+                    return FilterBuilder.equal("id", 0).generate();
+                    // ----------------> return sense resultats
+                }
     		}
     		
     		/**

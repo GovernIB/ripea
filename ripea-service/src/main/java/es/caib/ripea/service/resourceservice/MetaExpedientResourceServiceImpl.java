@@ -403,16 +403,19 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 		public void onChange(Serializable id, VincularGrupFormAction previous, String fieldName, Object fieldValue,
 				Map<String, AnswerValue> answers, String[] previousFieldNames, VincularGrupFormAction target) {
 			if (fieldName != null) {
-				if (fieldName.equals("grup") && previous.getGrup()!=null) {
-					GrupResourceEntity gre = grupResourceRepository.findById(previous.getGrup().getId()).get();
-					if (gre!=null && gre.getOrganGestor()!=null) {
-						target.setOrganGestor(ResourceReference.toResourceReference(
-								gre.getOrganGestor().getId(),
-								gre.getOrganGestor().getCodiINom()));
-					}
-				} else {
-					target.setOrganGestor(null);
-				}
+				if (VincularGrupFormAction.Fields.grup.equals(fieldName)) {
+                    if (previous.getGrup() != null) {
+                        grupResourceRepository.findById(previous.getGrup().getId()).ifPresent((gre) -> {
+                            if (gre.getOrganGestor() != null) {
+                                target.setOrganGestor(ResourceReference.toResourceReference(
+                                        gre.getOrganGestor().getId(),
+                                        gre.getOrganGestor().getCodiINom()));
+                            }
+                        });
+                    } else {
+                        target.setOrganGestor(null);
+                    }
+                }
 			}
 		}
 
