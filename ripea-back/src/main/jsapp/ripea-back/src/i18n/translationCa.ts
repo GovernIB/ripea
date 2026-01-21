@@ -1260,6 +1260,7 @@ const translationCa = {
                 },
                 link: {
                     label: "Víncular grup",
+                    title: "Víncular grup",
                     ok: "Grup vinculat",
                 },
                 unlink: {
@@ -1269,6 +1270,10 @@ const translationCa = {
                 default: {
                     label: "Marcar per defecte",
                     ok: "Grup marcat com defecte",
+                },
+                undefault: {
+                    label: "Llevar per defecte",
+                    ok: "Grup desmarcat com defecte",
                 },
             },
         },

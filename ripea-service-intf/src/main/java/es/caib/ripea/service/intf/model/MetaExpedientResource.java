@@ -172,9 +172,11 @@ public class MetaExpedientResource extends MetaNodeResource {
     
     @Getter
     @Setter
+    @FieldNameConstants
     public static class VincularGrupFormAction implements Serializable {
 		private static final long serialVersionUID = 3621908428141475760L;
-		private ResourceReference<GrupResource, Long> grup;
+		@NotNull @ResourceField(onChangeActive = true)
+        private ResourceReference<GrupResource, Long> grup;
     	private ResourceReference<OrganGestorResource, Long> organGestor;
     	private boolean perDefecte;
     }

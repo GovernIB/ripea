@@ -1260,6 +1260,7 @@ const translationEn = {
                 },
                 link: {
                     label: "Link group",
+                    title: "Link group",
                     ok: "Group linked",
                 },
                 unlink: {
@@ -1269,6 +1270,10 @@ const translationEn = {
                 default: {
                     label: "Set as default",
                     ok: "Group set as default",
+                },
+                undefault: {
+                    label: "Remove default",
+                    ok: "Group unmarked as default",
                 },
             },
         },

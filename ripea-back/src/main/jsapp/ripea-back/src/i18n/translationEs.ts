@@ -1260,6 +1260,7 @@ const translationEs = {
                 },
                 link: {
                     label: "Vincular grupo",
+                    title: "Vincular grupo",
                     ok: "Grupo vinculado",
                 },
                 unlink: {
@@ -1269,6 +1270,10 @@ const translationEs = {
                 default: {
                     label: "Marcar por defecto",
                     ok: "Grupo marcado como defecto",
+                },
+                undefault: {
+                    label: "Quitar por defecto",
+                    ok: "Grupo desmarcado como predeterminado",
                 },
             },
         },

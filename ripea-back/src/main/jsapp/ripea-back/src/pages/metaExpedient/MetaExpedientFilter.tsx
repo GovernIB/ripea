@@ -26,7 +26,7 @@ const springFilterBuilder = (data:any) => {
         builder.like('classificacio', data?.classificacio),
         builder.eq('organGestor.id', data?.organGestor?.id),
         data?.actiu && builder.eq('actiu', data?.actiu),
-        builder.eq('permisDirecte', data?.permisDirecte),
+        data?.permisDirecte && builder.eq('permisDirecte', data?.permisDirecte),
         data?.ambit && builder.equals('organGestor.id', null, data?.ambit == 'COMUNS'),
     );
 }

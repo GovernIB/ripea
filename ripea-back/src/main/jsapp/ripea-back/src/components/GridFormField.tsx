@@ -67,10 +67,10 @@ export const FileFormField = (props:GridFormField) => {
 }
 
 const GridFormField = (props:GridFormField) => {
-    const { xs, hidden, componentProps = {}, ...other} = props;
+    const { xs, hidden, componentProps = {}, disabled, ...other} = props;
 
     return <Grid item xs={xs} hidden={!!hidden}>
-        <FormField {...other} componentProps={{
+        <FormField disabled={disabled} readOnly={disabled} {...other} componentProps={{
             sx: {color: 'black', backgroundColor: 'white'},
             ...componentProps
         }}/>

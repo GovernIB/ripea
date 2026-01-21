@@ -3,9 +3,9 @@ import {useUserSession} from "../../../components/Session.tsx";
 import useCanviEstatRevisio from "../actions/CanviEstatRevisio.tsx";
 import useMetaExpedientDetail from "./MetaExpedientDetail.tsx";
 import {useBaseAppContext, useResourceApiService} from "reactlib";
-import {iniciaDescargaBlob, iniciaDescargaJSON} from "../../expedient/details/CommonActions.tsx";
+import {iniciaDescargaJSON} from "../../expedient/details/CommonActions.tsx";
 
-const useActions = (refresh?: () => void) => {
+export const useActions = (refresh?: () => void) => {
     const {t} = useTranslation()
     const {
         patch: apiPatch,
@@ -35,6 +35,28 @@ const useActions = (refresh?: () => void) => {
             });
     }
 
+    const defecte = (id:any, idGrup:any) => {
+        apiPatch(id, {data: { grupPerDefecte: {id: idGrup} }})
+            .then(() => {
+                refresh?.()
+                temporalMessageShow(null, t('page.grup.action.default.ok'), 'success');
+            })
+            .catch((error) => {
+                temporalMessageShow(null, error?.message, 'error');
+            });
+    }
+
+    const llevarDefecte = (id:any) => {
+        apiPatch(id, {data: { grupPerDefecte: null }})
+            .then(() => {
+                refresh?.()
+                temporalMessageShow(null, t('page.grup.action.default.ok'), 'success');
+            })
+            .catch((error) => {
+                temporalMessageShow(null, error?.message, 'error');
+            });
+    }
+
     const exportar = (id:any) => {
         apiReport(id, { code: 'REPORT_EXPORT_JSON', fileType: "JSON" })
             .then((result) => {
@@ -46,7 +68,7 @@ const useActions = (refresh?: () => void) => {
             });
     }
 
-    return {active, desactive, exportar}
+    return {active, desactive, exportar, defecte, llevarDefecte}
 }
 
 export const useMetaExpedientActions = (refresh?: () => void) => {

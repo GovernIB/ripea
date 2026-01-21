@@ -25,11 +25,14 @@ export const MetaExpedientElements = () => {
         getOne: appGetOne,
     } = useResourceApiService('metaExpedientResource');
     const [metaExpedient, setMetaExpedient] = useState<any>();
+    const refreshMetaExpedient = () => {
+        appGetOne(id, {perspectives})
+            .then((app) => setMetaExpedient(app))
+    }
 
-    useEffect(()=>{
+    useEffect(() => {
         if (apiIsReady) {
-            appGetOne(id, {perspectives})
-                .then((app) => setMetaExpedient(app))
+            refreshMetaExpedient()
         }
     },[apiIsReady, id])
 
@@ -72,7 +75,7 @@ export const MetaExpedientElements = () => {
         {
             value: "grup",
             label: t('page.metaExpedient.tabs.grup'),
-            content: <GrupGrid entity={metaExpedient} onRowCountChange={setNumGrup}/>,
+            content: <GrupGrid entity={metaExpedient} refresh={refreshMetaExpedient} onRowCountChange={setNumGrup}/>,
             badge: numGrup ?? metaExpedient?.numGrup,
             showZero: true,
             hidden: !metaExpedient?.gestioAmbGrupsActiva,
