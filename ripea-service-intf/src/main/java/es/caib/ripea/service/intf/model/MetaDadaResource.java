@@ -28,7 +28,7 @@ import lombok.experimental.FieldNameConstants;
 )
 public class MetaDadaResource extends BaseAuditableResource<Long> {
 
-    @NotNull private String codi;
+	@NotNull private String codi;
     @NotNull private String nom;
     @NotNull private MetaDadaTipusEnumDto tipus = MetaDadaTipusEnumDto.TEXT;
     private String descripcio;
@@ -56,6 +56,9 @@ public class MetaDadaResource extends BaseAuditableResource<Long> {
         return this.codi + " - " + this.nom;
     }
 
-    @Transient
-    private List<DadaResource> dades;
+    @Transient private List<DadaResource> dades;
+    
+    @Transient private boolean importar;
+    
+    private static final long serialVersionUID = 752278996924931848L;
 }

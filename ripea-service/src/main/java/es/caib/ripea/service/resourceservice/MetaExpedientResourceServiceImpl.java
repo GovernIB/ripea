@@ -55,6 +55,7 @@ import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ReportFileType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.CrearReglaResponseDto;
+import es.caib.ripea.service.intf.dto.MetaDocumentDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientExportDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.PermisDto;
@@ -62,6 +63,7 @@ import es.caib.ripea.service.intf.dto.ProcedimentDto;
 import es.caib.ripea.service.intf.dto.StatusEnumDto;
 import es.caib.ripea.service.intf.dto.TipusClassificacioEnumDto;
 import es.caib.ripea.service.intf.model.EntitatResource;
+import es.caib.ripea.service.intf.model.MetaDocumentResource;
 import es.caib.ripea.service.intf.model.MetaExpedientResource;
 import es.caib.ripea.service.intf.model.MetaExpedientResource.ImportarFitxerFormAction;
 import es.caib.ripea.service.intf.model.MetaExpedientResource.ImportarRolsacFormAction;
@@ -69,6 +71,7 @@ import es.caib.ripea.service.intf.model.MetaExpedientResource.RevisioChangeFormA
 import es.caib.ripea.service.intf.model.MetaExpedientResource.VincularGrupFormAction;
 import es.caib.ripea.service.intf.model.MetaNodeResource;
 import es.caib.ripea.service.intf.model.OrganGestorResource;
+import es.caib.ripea.service.intf.model.UsuariResource;
 import es.caib.ripea.service.intf.resourceservice.MetaExpedientResourceService;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.permission.ExtendedPermission;
@@ -425,10 +428,15 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 					aux.setNom(procedimentDto.getNom());
 					aux.setDescripcio(procedimentDto.getResum());
 					aux.setProcedimentComu(procedimentDto.isComu());
-					if (!procedimentDto.isComu() && procedimentDto.getOrganId() != null) {
-						aux.setOrganGestor(ResourceReference.toResourceReference(
-								procedimentDto.getOrganId(),
-								procedimentDto.getOrganNom()));
+					if (procedimentDto != null && procedimentDto.getUnitatOrganitzativaCodi() != null && !procedimentDto.getUnitatOrganitzativaCodi().isEmpty()) {
+						OrganGestorEntity organEntity = organGestorRepository.findByEntitatCodiAndCodi(
+								configHelper.getEntitatActualCodi(),
+								procedimentDto.getUnitatOrganitzativaCodi());
+						if (organEntity != null) {
+							aux.setOrganGestor(ResourceReference.toResourceReference(
+									organEntity.getId(),
+									organEntity.getCodiINom()));
+						}
 					}
 					return aux;
 				} else {
@@ -466,9 +474,46 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 						//Convertir MetaExpedientExportDto a MetaExpedientResource
 						target.setTipusClassificacio(metaExpedientExport.getTipusClassificacio());
 						target.setClassificacio(metaExpedientExport.getClassificacio());
+						target.setNom(metaExpedientExport.getNom());
+						target.setDescripcio(metaExpedientExport.getDescripcio());
 						target.setSerieDocumental(metaExpedientExport.getSerieDocumental());
+						if (metaExpedientExport.getOrganGestor()==null) {
+							target.setProcedimentComu(true);
+						} else {
+							target.setProcedimentComu(false);
+							target.setOrganGestor(ResourceReference.toResourceReference(
+									metaExpedientExport.getOrganGestor().getId(),
+									metaExpedientExport.getOrganGestor().getCodiINom()));
+						}
 						target.setExpressioNumero(metaExpedientExport.getExpressioNumero());
-//						target.setNo
+
+						List<MetaDocumentResource> metaDocumentsImportats = new ArrayList<MetaDocumentResource>();
+						if (metaExpedientExport.getMetaDocuments()!=null) {
+							for (MetaDocumentDto metaDocumentDto: metaExpedientExport.getMetaDocuments()) {
+								MetaDocumentResource mdRes = new MetaDocumentResource();
+								mdRes.setCodi(metaDocumentDto.getCodi());
+								mdRes.setNom(metaDocumentDto.getNom());
+								mdRes.setDescripcio(metaDocumentDto.getDescripcio());
+								mdRes.setMultiplicitat(metaDocumentDto.getMultiplicitat());
+								mdRes.setNtiOrigen(metaDocumentDto.getNtiOrigen());
+								mdRes.setNtiTipoDocumental(metaDocumentDto.getNtiTipoDocumental());
+								mdRes.setNtiEstadoElaboracion(metaDocumentDto.getNtiEstadoElaboracion());
+								mdRes.setPortafirmesFluxTipus(metaDocumentDto.getPortafirmesFluxTipus());
+								if (metaDocumentDto.getPortafirmesResponsables()!=null) {
+									List<ResourceReference<UsuariResource, String>> portafirmesResponsables = new ArrayList<ResourceReference<UsuariResource, String>>();
+									for (String pfResp: metaDocumentDto.getPortafirmesResponsables()) {
+										UsuariResourceEntity usu = usuariResourceRepository.findById(pfResp).orElse(null);
+										if (usu!=null) {
+											portafirmesResponsables.add(ResourceReference.toResourceReference(
+													usu.getCodi(), 
+													usu.getNom()));
+										}
+									}
+									mdRes.setPortafirmesResponsables(portafirmesResponsables);
+								}
+							}
+						}
+						target.setMetaDocumentsImportats(metaDocumentsImportats);
 						
 					} catch (Exception e) {
 						excepcioLogHelper.addExcepcio("/metaExpedient/ImportarFitxerActionExecutor.onChange", e);

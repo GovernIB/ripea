@@ -203,12 +203,12 @@ public class MetaExpedientResource extends MetaNodeResource {
 		@ResourceField(onChangeActive = true)
 		private ResourceReference<MetaExpedientResource, Long> procediment;
 
-        private List<ResourceReference<MetaDocumentResource, Long>> metaDocuments = new ArrayList<>();
-        private List<ResourceReference<MetaDadaResource, Long>> metaDades = new ArrayList<>();
-//        private List<ResourceReference<MetaExpedientEstatResource, Long>> estats = new ArrayList<>(); //Ya esta en el padre
-        private List<ResourceReference<MetaExpedientTascaResource, Long>> tasques = new ArrayList<>();
-//        private List<ResourceReference<GrupResource, Long>> grups = new ArrayList<>(); //No se importan grupos
-        private List<ResourceReference<MetaExpedientCarpetaResource, Long>> carpetes = new ArrayList<>();
+        private List<MetaDocumentResource> metaDocumentsImportats = new ArrayList<>();
+        private List<MetaDadaResource> metaDadesImportats = new ArrayList<>();
+        private List<MetaExpedientEstatResource> estatsImportats = new ArrayList<>();
+        private List<MetaExpedientTascaResource> tasquesImportats = new ArrayList<>();
+        private List<GrupResource> grupsImportats = new ArrayList<>();
+        private List<MetaExpedientCarpetaResource> carpetesImportats = new ArrayList<>();
     }
     
     private static final long serialVersionUID = -7526532893601431955L;
