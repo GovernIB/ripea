@@ -445,7 +445,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 		public void onChange(Serializable id, ImportarFitxerFormAction previous, String fieldName, Object fieldValue,
 				Map<String, AnswerValue> answers, String[] previousFieldNames, ImportarFitxerFormAction target) {
 			if (fieldName != null) {
-				if (fieldName.equals("importJson") && previous.getImportJson()!=null) {
+				if (ImportarFitxerFormAction.Fields.importJson.equals(fieldName) && fieldValue != null) {
 					target.setDescripcio("TODO");
 				}
 			}
@@ -469,7 +469,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 				Map<String, AnswerValue> answers, String[] previousFieldNames, VincularGrupFormAction target) {
 			if (fieldName != null) {
 				if (VincularGrupFormAction.Fields.grup.equals(fieldName)) {
-                    if (previous.getGrup() != null) {
+                    if (fieldValue != null) {
                         grupResourceRepository.findById(previous.getGrup().getId()).ifPresent((gre) -> {
                             if (gre.getOrganGestor() != null) {
                                 target.setOrganGestor(ResourceReference.toResourceReference(

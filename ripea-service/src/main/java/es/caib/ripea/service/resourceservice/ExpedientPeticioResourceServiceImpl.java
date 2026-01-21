@@ -2,12 +2,7 @@ package es.caib.ripea.service.resourceservice;
 
 import java.io.OutputStream;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -121,15 +116,12 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 
     @Override
     protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
+        List<Filter> filters = new ArrayList<>();
+        filters.add((currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null);
     	
         String entitatActualCodi = configHelper.getEntitatActualCodi();
         EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true,false);
 
-        Filter filtrePermesos = null;
-        Filter filtreEstat = null;
-		Filter filtreBase = (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null;
-        Filter filtreEntitat = null;
-        
         Map<String, String> mapaNamedQueries =  Utils.namedQueriesToMap(namedQueries);
         
         //El llistat del menú "Consulta > Anotacions comunicades" no filtra per entitat
@@ -171,8 +163,8 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 						        }
 					        }
 				        }
-				        
-				        filtrePermesos = filtreOrgansPermesos;
+
+                        filters.add(filtreOrgansPermesos);
 						
 					} else { //Aplica filtres de permisos per procediment
 						
@@ -201,20 +193,19 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 				        String grAct = ExpedientPeticioResource.Fields.metaExpedient +"."+ MetaExpedientResource.Fields.gestioAmbGrupsActiva;
 				        Filter notGestioGrupsActiva = FilterBuilder.equal(grAct, false);
 				        Filter filterGEstioGrupsActius = FilterBuilder.or(notGestioGrupsActiva, filtregrupsPermesos);
-				        
-				        filtrePermesos = FilterBuilder.and(filtreProcedimentsPermesos, filterGEstioGrupsActius);
+
+                        filters.add(FilterBuilder.and(filtreProcedimentsPermesos, filterGEstioGrupsActius));
 					}
     			}
     		} else if (mapaNamedQueries.containsKey("MASSIU_ANOTACIONS_ESTAT")) {
-        		filtreEstat = FilterBuilder.notEqual(ExpedientPeticioResource.Fields.estat, ExpedientPeticioEstatEnumDto.CREAT);
+                filters.add(FilterBuilder.notEqual(ExpedientPeticioResource.Fields.estat, ExpedientPeticioEstatEnumDto.CREAT));
     		}
     	}
-        
-        return FilterBuilder.and(
-        		filtreBase,
-        		filtreEntitat,
-        		filtrePermesos,
-        		filtreEstat).generate();
+
+        List<Filter> result = filters.stream()
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+        return result.isEmpty() ? null : FilterBuilder.and(result).generate();
     }
     
     @Override

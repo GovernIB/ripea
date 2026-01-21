@@ -1373,6 +1373,15 @@ const translationEn = {
                 comment: {
                     ok: "Comment added to procedure '{{data.metaExpedient.description}}'",
                 },
+                importRolsac: {
+                    title: "Import procedure from ROLSAC",
+                    label: "Import from ROLSAC",
+                },
+                importFitxer: {
+                    title: "Import procedure",
+                    label: "Import from file",
+                    ok: "Procedure imported successfully",
+                },
             },
         },
         metaDocument: {

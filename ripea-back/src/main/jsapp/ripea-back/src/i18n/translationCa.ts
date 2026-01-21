@@ -1373,6 +1373,15 @@ const translationCa = {
                 comment: {
                     ok: "Comentari afegit al procediment '{{data.metaExpedient.description}}'",
                 },
+                importRolsac: {
+                    title: "Importar procediment des de ROLSAC",
+                    label: "Importar des de ROLSAC",
+                },
+                importFitxer: {
+                    title: "Importar procediment",
+                    label: "Importar des de fitxer",
+                    ok: "Procediment importat correctament",
+                },
             },
         },
         metaDocument: {
