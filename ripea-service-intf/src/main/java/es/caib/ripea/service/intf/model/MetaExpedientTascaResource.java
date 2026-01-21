@@ -13,11 +13,6 @@ import org.springframework.data.annotation.Transient;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 
-/**
- * Informació d'una aplicació a monitoritzar.
- *
- * @author Límit Tecnologies
- */
 @Getter
 @Setter
 @NoArgsConstructor

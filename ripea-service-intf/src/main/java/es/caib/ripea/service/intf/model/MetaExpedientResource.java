@@ -1,8 +1,10 @@
 package es.caib.ripea.service.intf.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -12,6 +14,7 @@ import org.springframework.data.domain.Sort;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceField;
+import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.CrearReglaDistribucioEstatEnumDto;
@@ -59,7 +62,15 @@ import lombok.experimental.FieldNameConstants;
                         type = ResourceArtifactType.ACTION,
                         code = MetaExpedientResource.ACTION_VINCULAR_GRUP_CODE,
                         formClass = MetaExpedientResource.VincularGrupFormAction.class,
-                        requiresId = true),                 
+                        requiresId = true),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = MetaExpedientResource.ACTION_IMPORT_ROLSAC_CODE,
+                        formClass = MetaExpedientResource.ImportarRolsacFormAction.class),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = MetaExpedientResource.ACTION_IMPORT_FITXER_CODE,
+                        formClass = MetaExpedientResource.ImportarFitxerFormAction.class),                
 				@ResourceConfigArtifact(
 						type = ResourceArtifactType.REPORT,
 						code = MetaExpedientResource.REPORT_EXPORT_JSON,
@@ -77,6 +88,8 @@ public class MetaExpedientResource extends MetaNodeResource {
     public static final String PERSPECTIVE_ELEMENTS_CODE	= "ELEMENTS_COUNT";
     public static final String ACTION_CHANGE_REVISIO_CODE	= "CHANGE_REVISIO";
     public static final String ACTION_VINCULAR_GRUP_CODE	= "VINCULAR_GRUP";
+    public static final String ACTION_IMPORT_ROLSAC_CODE	= "IMPORT_ROLSAC";
+    public static final String ACTION_IMPORT_FITXER_CODE	= "IMPORT_FITXER";
     public static final String REPORT_EXPORT_JSON 			= "REPORT_EXPORT_JSON";
 
 	@Size(max = 64)
@@ -160,9 +173,36 @@ public class MetaExpedientResource extends MetaNodeResource {
     @Getter
     @Setter
     public static class VincularGrupFormAction implements Serializable {
-    	private ResourceReference<GrupResource, Long> grup;
+		private static final long serialVersionUID = 3621908428141475760L;
+		private ResourceReference<GrupResource, Long> grup;
     	private ResourceReference<OrganGestorResource, Long> organGestor;
     	private boolean perDefecte;
+    }
+    
+    @Getter
+    @Setter
+    public static class ImportarRolsacFormAction implements Serializable {
+		private static final long serialVersionUID = 2247344473674559400L;
+		@NotEmpty
+    	private String codiSia;
+    }
+    
+    @Getter
+    @Setter
+    public static class ImportarFitxerFormAction extends MetaExpedientResource {
+
+		private static final long serialVersionUID = -7203619944391181991L;
+
+		@NotEmpty
+		@ResourceField(onChangeActive = true)
+    	private FileReference importJson;
+
+        private List<ResourceReference<MetaDocumentResource, Long>> metaDocuments = new ArrayList<>();
+        private List<ResourceReference<MetaDadaResource, Long>> metaDades = new ArrayList<>();
+//        private List<ResourceReference<MetaExpedientEstatResource, Long>> estats = new ArrayList<>(); //Ya esta en el padre
+        private List<ResourceReference<MetaExpedientTascaResource, Long>> tasques = new ArrayList<>();
+//        private List<ResourceReference<GrupResource, Long>> grups = new ArrayList<>(); //No se importan grupos
+        private List<ResourceReference<MetaExpedientCarpetaResource, Long>> carpetes = new ArrayList<>();
     }
     
     private static final long serialVersionUID = -7526532893601431955L;

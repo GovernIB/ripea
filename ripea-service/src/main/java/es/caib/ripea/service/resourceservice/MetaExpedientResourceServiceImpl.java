@@ -18,7 +18,6 @@ import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
-import es.caib.ripea.persistence.entity.resourceentity.ExpedientResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.GrupResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.UsuariResourceEntity;
@@ -58,10 +57,11 @@ import es.caib.ripea.service.intf.dto.StatusEnumDto;
 import es.caib.ripea.service.intf.dto.TipusClassificacioEnumDto;
 import es.caib.ripea.service.intf.model.EntitatResource;
 import es.caib.ripea.service.intf.model.MetaExpedientResource;
+import es.caib.ripea.service.intf.model.MetaExpedientResource.ImportarFitxerFormAction;
+import es.caib.ripea.service.intf.model.MetaExpedientResource.ImportarRolsacFormAction;
 import es.caib.ripea.service.intf.model.MetaExpedientResource.RevisioChangeFormAction;
 import es.caib.ripea.service.intf.model.MetaExpedientResource.VincularGrupFormAction;
 import es.caib.ripea.service.intf.model.MetaNodeResource;
-import es.caib.ripea.service.intf.model.NodeResource.MassiveAction;
 import es.caib.ripea.service.intf.model.OrganGestorResource;
 import es.caib.ripea.service.intf.resourceservice.MetaExpedientResourceService;
 import es.caib.ripea.service.intf.utils.Utils;
@@ -97,20 +97,23 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
     @PostConstruct
     public void init() {
     	
-    	register(MetaExpedientResource.PERSPECTIVE_AUDIT_CODE, new AuditoriaPerspectiveApplicator());
-    	register(MetaExpedientResource.PERSPECTIVE_COMMENTS_CODE, new ComentarisPerspectiveApplicator());
-    	register(MetaExpedientResource.PERSPECTIVE_PERMISOS_CODE, new PermisosPerspectiveApplicator());
-    	register(MetaExpedientResource.PERSPECTIVE_ELEMENTS_CODE, new ElementsCountPerspectiveApplicator());
+    	register(MetaExpedientResource.PERSPECTIVE_AUDIT_CODE,		new AuditoriaPerspectiveApplicator());
+    	register(MetaExpedientResource.PERSPECTIVE_COMMENTS_CODE,	new ComentarisPerspectiveApplicator());
+    	register(MetaExpedientResource.PERSPECTIVE_PERMISOS_CODE,	new PermisosPerspectiveApplicator());
+    	register(MetaExpedientResource.PERSPECTIVE_ELEMENTS_CODE,	new ElementsCountPerspectiveApplicator());
     	
-    	register(MetaExpedientResource.ACTION_CHANGE_REVISIO_CODE, new RevisioChangeActionExecutor());
-    	register(MetaExpedientResource.ACTION_VINCULAR_GRUP_CODE, new VincularGrupActionExecutor());
+    	register(MetaExpedientResource.ACTION_CHANGE_REVISIO_CODE,	new RevisioChangeActionExecutor());
+    	register(MetaExpedientResource.ACTION_VINCULAR_GRUP_CODE,	new VincularGrupActionExecutor());
     	
-    	register(MetaExpedientResource.REPORT_EXPORT_JSON, new ExportJsonGenerator());
+    	register(MetaExpedientResource.ACTION_IMPORT_ROLSAC_CODE, 	new ImportarRolsacActionExecutor());
+    	register(MetaExpedientResource.ACTION_IMPORT_FITXER_CODE,	new ImportarFitxerActionExecutor());
     	
-    	register(MetaExpedientResource.Fields.classificacio, new OnchangeLogicProcessor());
-    	register(MetaExpedientResource.Fields.tipusClassificacio, new OnchangeLogicProcessor());
-    	register(MetaExpedientResource.Fields.organGestor, new OnchangeLogicProcessor());
-    	register(MetaExpedientResource.Fields.procedimentComu, new OnchangeLogicProcessor());
+    	register(MetaExpedientResource.REPORT_EXPORT_JSON,			new ExportJsonGenerator());
+    	
+    	register(MetaExpedientResource.Fields.classificacio,		new OnchangeLogicProcessor());
+    	register(MetaExpedientResource.Fields.tipusClassificacio,	new OnchangeLogicProcessor());
+    	register(MetaExpedientResource.Fields.organGestor,			new OnchangeLogicProcessor());
+    	register(MetaExpedientResource.Fields.procedimentComu,		new OnchangeLogicProcessor());
     }
 	
 	@Override
@@ -395,6 +398,46 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
         		resource.setLastModifiedByFullName(usuariResourceEntity.getNom() + " (" + usuariResourceEntity.getCodi() + ")");
         	}
         }
+    }
+    
+    private class ImportarRolsacActionExecutor implements ActionExecutor<MetaExpedientResourceEntity, MetaExpedientResource.ImportarRolsacFormAction, MetaExpedientResource> {
+		@Override
+		public void onChange(Serializable id, ImportarRolsacFormAction previous, String fieldName, Object fieldValue,
+				Map<String, AnswerValue> answers, String[] previousFieldNames, ImportarRolsacFormAction target) {
+		}
+		@Override
+		public MetaExpedientResource exec(String code, MetaExpedientResourceEntity entity, ImportarRolsacFormAction params) throws ActionExecutionException {
+			try {
+				MetaExpedientResource aux = new MetaExpedientResource();
+				aux.setNom("Procediment auxiliar");
+				return aux;
+			} catch (Exception e) {
+				excepcioLogHelper.addExcepcio("/metaExpedient/ImportarRolsacActionExecutor", e);
+				throw new ActionExecutionException(getResourceClass(), null, code, messageHelper.getMessage("message.common.action.error")+": "+e.getMessage());
+			}
+		}
+    }
+    
+    private class ImportarFitxerActionExecutor implements ActionExecutor<MetaExpedientResourceEntity, MetaExpedientResource.ImportarFitxerFormAction, Serializable> {
+		@Override
+		public void onChange(Serializable id, ImportarFitxerFormAction previous, String fieldName, Object fieldValue,
+				Map<String, AnswerValue> answers, String[] previousFieldNames, ImportarFitxerFormAction target) {
+			if (fieldName != null) {
+				if (fieldName.equals("importJson") && previous.getImportJson()!=null) {
+					target.setDescripcio("TODO");
+				}
+			}
+		}
+
+		@Override
+		public Serializable exec(String code, MetaExpedientResourceEntity entity, ImportarFitxerFormAction params) throws ActionExecutionException {
+			try {
+				return "{\"resultado\": \"OK\"}";
+			} catch (Exception e) {
+				excepcioLogHelper.addExcepcio("/metaExpedient/ImportarFitxerActionExecutor", e);
+				throw new ActionExecutionException(getResourceClass(), null, code, messageHelper.getMessage("message.common.action.error")+": "+e.getMessage());
+			}
+		}
     }
     
     private class VincularGrupActionExecutor implements ActionExecutor<MetaExpedientResourceEntity, MetaExpedientResource.VincularGrupFormAction, Serializable> {
