@@ -35,6 +35,7 @@ import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientTascaRes
 import es.caib.ripea.persistence.entity.resourcerepository.UsuariResourceRepository;
 import es.caib.ripea.persistence.repository.ExpedientRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
+import es.caib.ripea.plugin.usuari.DadesUsuari;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.CacheHelper;
 import es.caib.ripea.service.helper.ConfigHelper;
@@ -507,10 +508,18 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 											portafirmesResponsables.add(ResourceReference.toResourceReference(
 													usu.getCodi(), 
 													usu.getNom()));
+										} else {
+											List<DadesUsuari> usuarisPlugin = pluginHelper.findAmbFiltre(pfResp);
+											if (usuarisPlugin!=null && usuarisPlugin.size()==1) {
+												portafirmesResponsables.add(ResourceReference.toResourceReference(
+														usuarisPlugin.get(0).getCodi(), 
+														usuarisPlugin.get(0).getNomSencer()));
+											}
 										}
 									}
 									mdRes.setPortafirmesResponsables(portafirmesResponsables);
 								}
+								metaDocumentsImportats.add(mdRes);
 							}
 						}
 						target.setMetaDocumentsImportats(metaDocumentsImportats);
