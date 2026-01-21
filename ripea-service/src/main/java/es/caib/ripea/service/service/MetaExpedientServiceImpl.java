@@ -1433,6 +1433,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 			OrganGestorEntity organEntity = organGestorRepository.findByEntitatAndCodi(entitat, procedimentDto.getUnitatOrganitzativaCodi());
 			if (organEntity != null) {
 				procedimentDto.setOrganId(organEntity.getId());
+				procedimentDto.setOrganNom(organEntity.getCodiINom());
 			}
 		}
 		return procedimentDto;

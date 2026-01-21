@@ -77,6 +77,7 @@ import es.caib.ripea.service.intf.dto.MetaExpedientExportDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientFiltreDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientTascaDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientTascaValidacioDto;
 import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
 import es.caib.ripea.service.intf.dto.PermisDto;
 import es.caib.ripea.service.intf.dto.ProcedimentDto;
@@ -132,6 +133,21 @@ public class MetaExpedientHelper {
 			
 			ObjectMapper objectMapper = new ObjectMapper();
 			
+			//En el conversor tipus helper no inclou les validacions de les tasques
+			if (metaExpedient.getTasques() != null) {
+				for (MetaExpedientTascaEntity tascaEntity : metaExpedient.getTasques()) {
+					if (tascaEntity.getValidacions()!=null && tascaEntity.getValidacions().size()>0) {
+						for (MetaExpedientTascaDto tascaDto : metaExpedientDto.getTasques()) {
+							if (tascaEntity.getId().equals(tascaDto.getId())) {
+								tascaDto.setValidacions(conversioTipusHelper.convertirList(
+										tascaEntity.getValidacions(),
+										MetaExpedientTascaValidacioDto.class));
+							}
+						}
+					}
+				}
+			}
+			
 			if (metaExpedientDto.getMetaDades() != null) {
 				for (MetaDadaDto metaDadaDto : metaExpedientDto.getMetaDades()) {
 					if (metaDadaDto.getTipus().equals(MetaDadaTipusEnumDto.DOMINI)) {
@@ -160,9 +176,9 @@ public class MetaExpedientHelper {
 				}
 			}
 			
-			String carAsString = objectMapper.writeValueAsString(metaExpedientDto);
-			logger.info(carAsString);
-			return carAsString;
+			String procedimentAsString = objectMapper.writeValueAsString(metaExpedientDto);
+			logger.info(procedimentAsString);
+			return procedimentAsString;
 		
 		} catch (Exception e) {
 			throw new RuntimeException(e);

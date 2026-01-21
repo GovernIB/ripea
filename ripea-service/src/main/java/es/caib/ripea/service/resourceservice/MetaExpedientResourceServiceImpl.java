@@ -288,22 +288,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 					if (fieldValue==null) {
 						target.setMsgSiaRolsac(null);
 					} else {
-						
-						String rolActual = configHelper.getRolActual();
-						boolean rolOrgan = rolActual.equals("IPA_DISSENY") || rolActual.equals("IPA_ORGAN_ADMIN");
-						String entitatActualCodi = configHelper.getEntitatActualCodi();
-						EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true, false);
-						
-						String codiDir3 = null;
-						if (rolOrgan) {
-							String organActualCodi	 = configHelper.getOrganActualCodi();
-							OrganGestorEntity ogEntity	= organGestorRepository.findByEntitatIdAndCodi(entitatEntity.getId(), organActualCodi);
-							if (ogEntity!=null) {
-								codiDir3 = ogEntity.getCodi();
-							}
-						} else {
-							codiDir3 = entitatEntity.getUnitatArrel();
-						}
+						String codiDir3 = getCodiDir3();
 						ProcedimentDto procedimentDto = null;
 						String msgSiaRolsac = null;
 						try {
@@ -345,6 +330,23 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 				}
 			}
 		}
+    }
+    
+    private String getCodiDir3() {
+		String rolActual = configHelper.getRolActual();
+		boolean rolOrgan = rolActual.equals("IPA_DISSENY") || rolActual.equals("IPA_ORGAN_ADMIN");
+		String entitatActualCodi = configHelper.getEntitatActualCodi();
+		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true, false);
+		if (rolOrgan) {
+			String organActualCodi	 = configHelper.getOrganActualCodi();
+			OrganGestorEntity ogEntity	= organGestorRepository.findByEntitatIdAndCodi(entitatEntity.getId(), organActualCodi);
+			if (ogEntity!=null) {
+				return ogEntity.getCodi();
+			}
+		} else {
+			return entitatEntity.getUnitatArrel();
+		}
+		return null;
     }
     
     private String getIdCalculadoOrganoGestor(Long organActualId) {
@@ -408,9 +410,29 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 		@Override
 		public MetaExpedientResource exec(String code, MetaExpedientResourceEntity entity, ImportarRolsacFormAction params) throws ActionExecutionException {
 			try {
-				MetaExpedientResource aux = new MetaExpedientResource();
-				aux.setNom("Procediment auxiliar");
-				return aux;
+				String codiDir3 = getCodiDir3();
+				ProcedimentDto procedimentDto = pluginHelper.procedimentFindByCodiSia(codiDir3, params.getCodiSia());
+				if (procedimentDto!=null) {
+					MetaExpedientResource aux = new MetaExpedientResource();
+					aux.setTipusClassificacio(TipusClassificacioEnumDto.SIA);
+					aux.setClassificacio(params.getCodiSia());
+					aux.setNom(procedimentDto.getNom());
+					aux.setDescripcio(procedimentDto.getResum());
+					aux.setProcedimentComu(procedimentDto.isComu());
+					if (!procedimentDto.isComu()) {
+						aux.setOrganGestor(ResourceReference.toResourceReference(
+								procedimentDto.getOrganId(),
+								procedimentDto.getOrganNom()));
+					}
+					return aux;
+				} else {
+					throw new ActionExecutionException(
+							getResourceClass(),
+							null,
+							code,
+							messageHelper.getMessage("MetaExpedientResourceServiceImpl.ImportarRolsacActionExecutor.notFound")
+							+" "+params.getCodiSia()+" Dir3: "+codiDir3);
+				}
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/metaExpedient/ImportarRolsacActionExecutor", e);
 				throw new ActionExecutionException(getResourceClass(), null, code, messageHelper.getMessage("message.common.action.error")+": "+e.getMessage());
