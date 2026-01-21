@@ -150,7 +150,7 @@ public class MetaDadaResourceServiceImpl extends BaseMutableResourceService<Meta
 	}
 	
 	private MetaDadaDto recursToMetaDadaDto(MetaDadaResource resource) {
-		MetaDadaDto metaDadaDto = objectMappingHelper.newInstanceMap(resource, MetaDadaDto.class, "valorData", "domini");
+		MetaDadaDto metaDadaDto = objectMappingHelper.newInstanceMap(resource, MetaDadaDto.class, "valorData", "domini", "serialVersionUID");
 		metaDadaDto.setValorData(Utils.localDateTimeToDateJava(resource.getValorData()));
 		if (resource.getTipus().equals(MetaDadaTipusEnumDto.DOMINI) && resource.getDomini()!=null) {
 			DominiDto dominiDto = new DominiDto();

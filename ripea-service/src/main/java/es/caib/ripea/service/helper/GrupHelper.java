@@ -30,6 +30,7 @@ public class GrupHelper {
 	@Autowired private OrganGestorRepository organGestorRepository;
 	@Autowired private MetaExpedientRepository metaExpedientRepository;
 	@Autowired private OrganGestorHelper organGestorHelper;
+	@Autowired private MetaExpedientHelper metaExpedientHelper;
 
 	public void relacionarAmbMetaExpedient(Long metaExpedientId, Long grupId, boolean marcarPerDefecte) {
 		MetaExpedientEntity metaExpedientEntity = metaExpedientRepository.getOne(metaExpedientId);
@@ -37,6 +38,18 @@ public class GrupHelper {
 		metaExpedientEntity.addGrup(grupEntity);
 		if (marcarPerDefecte) {
 			metaExpedientEntity.setGrupPerDefecte(grupEntity);
+		}
+	}
+	
+	public void desvincularAmbMetaExpedient(Long entitatId, Long metaExpedientId, Long idGrup, String rolActual, Long organId) {
+		MetaExpedientEntity metaExpedientEntity = metaExpedientRepository.getOne(metaExpedientId);
+		GrupEntity grupEntity = HibernateHelper.deproxy(grupRepository.getOne(idGrup));
+		metaExpedientEntity.removeGrup(grupEntity);
+		if (metaExpedientEntity.getGrupPerDefecte() != null && grupEntity.getId().equals(metaExpedientEntity.getGrupPerDefecte().getId())) {
+			metaExpedientEntity.setGrupPerDefecte(null);
+		}
+		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientEntity.getId(), organId);
 		}
 	}
 	

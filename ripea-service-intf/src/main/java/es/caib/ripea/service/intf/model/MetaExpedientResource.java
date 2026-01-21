@@ -20,6 +20,7 @@ import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.CrearReglaDistribucioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientAmbitEnumDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientRevisioEstatEnumDto;
+import es.caib.ripea.service.intf.dto.ReglaDistribucioDto;
 import es.caib.ripea.service.intf.dto.TipusClassificacioEnumDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -46,6 +47,9 @@ import lombok.experimental.FieldNameConstants;
 				@ResourceConfigArtifact(
 						type = ResourceArtifactType.PERSPECTIVE,
 						code = MetaExpedientResource.PERSPECTIVE_ELEMENTS_CODE),
+				@ResourceConfigArtifact(
+						type = ResourceArtifactType.PERSPECTIVE,
+						code = MetaExpedientResource.PERSPECTIVE_ROLSAC_CODE),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.FILTER,
                         code = MetaExpedientResource.FILTER_REVISIO_CODE,
@@ -62,6 +66,16 @@ import lombok.experimental.FieldNameConstants;
                         type = ResourceArtifactType.ACTION,
                         code = MetaExpedientResource.ACTION_VINCULAR_GRUP_CODE,
                         formClass = MetaExpedientResource.VincularGrupFormAction.class,
+                        requiresId = true),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = MetaExpedientResource.ACTION_DESVINCULAR_GRUP_CODE,
+                        formClass = MetaExpedientResource.DesVincularGrupFormAction.class,
+                        requiresId = true),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = MetaExpedientResource.ACTION_TOGGLE_REGLA_CODE,
+                        formClass = MetaExpedientResource.ToggleReglaRolsacFormAction.class,
                         requiresId = true),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
@@ -86,8 +100,11 @@ public class MetaExpedientResource extends MetaNodeResource {
     public static final String PERSPECTIVE_COMMENTS_CODE	= "COMENTARIS";
     public static final String PERSPECTIVE_PERMISOS_CODE	= "PERMISOS";
     public static final String PERSPECTIVE_ELEMENTS_CODE	= "ELEMENTS_COUNT";
+    public static final String PERSPECTIVE_ROLSAC_CODE		= "ELEMENTS_COUNT";
     public static final String ACTION_CHANGE_REVISIO_CODE	= "CHANGE_REVISIO";
     public static final String ACTION_VINCULAR_GRUP_CODE	= "VINCULAR_GRUP";
+    public static final String ACTION_DESVINCULAR_GRUP_CODE	= "DESVINCULAR_GRUP";
+    public static final String ACTION_TOGGLE_REGLA_CODE		= "TOGGLE_REGLA_ROLSAC";
     public static final String ACTION_IMPORT_ROLSAC_CODE	= "IMPORT_ROLSAC";
     public static final String ACTION_IMPORT_FITXER_CODE	= "IMPORT_FITXER";
     public static final String REPORT_EXPORT_JSON 			= "REPORT_EXPORT_JSON";
@@ -143,6 +160,8 @@ public class MetaExpedientResource extends MetaNodeResource {
     @Transient private int numTasca;
     @Transient private int numGrup;
     @Transient private int numCarpetes;
+    
+    @Transient private ReglaDistribucioDto regla;
 
     public String getNomClassificacio() {
         return nom + " (" + classificacio +")";
@@ -179,6 +198,19 @@ public class MetaExpedientResource extends MetaNodeResource {
         private ResourceReference<GrupResource, Long> grup;
     	private ResourceReference<OrganGestorResource, Long> organGestor;
     	private boolean perDefecte;
+    }
+    
+    @Getter
+    @Setter
+    @FieldNameConstants
+    public static class DesVincularGrupFormAction implements Serializable {
+        private ResourceReference<GrupResource, Long> grup;
+    }
+    
+    @Getter
+    @Setter
+    public static class ToggleReglaRolsacFormAction implements Serializable {
+        private boolean activa;
     }
     
     @Getter

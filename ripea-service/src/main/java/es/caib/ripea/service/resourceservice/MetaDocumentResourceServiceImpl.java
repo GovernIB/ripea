@@ -233,7 +233,7 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
 		MetaDocumentResource metaDocumentResource = objectMappingHelper.newInstanceMap(
 				entity,
 				getResourceClass(),
-				"portafirmesResponsables");
+				"portafirmesResponsables", "serialVersionUID");
 		if (Utils.hasValue(entity.getPortafirmesResponsables())) {
 			List<ResourceReference<UsuariResource, String>> responsables = new ArrayList<>();
 			String[] pfResponsables = entity.getPortafirmesResponsables().split(",");

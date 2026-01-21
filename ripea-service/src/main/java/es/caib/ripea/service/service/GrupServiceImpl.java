@@ -28,7 +28,6 @@ import es.caib.ripea.service.helper.CacheHelper;
 import es.caib.ripea.service.helper.ConversioTipusHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.GrupHelper;
-import es.caib.ripea.service.helper.HibernateHelper;
 import es.caib.ripea.service.helper.MetaExpedientHelper;
 import es.caib.ripea.service.helper.OrganGestorCacheHelper;
 import es.caib.ripea.service.helper.PaginacioHelper;
@@ -329,7 +328,6 @@ public class GrupServiceImpl implements GrupService {
 		}
 	}
 	
-	
 	@Override
 	@Transactional
 	public void desvincularAmbMetaExpedient(
@@ -341,29 +339,9 @@ public class GrupServiceImpl implements GrupService {
 		logger.debug("Desvinculant un grup amb metaxpedient (" +
 				"metaExpedientId=" + metaExpedientId + ", " +
 				"id=" + id + ")");
-		
-		entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				false,
-				false, false, false);
-		
-		MetaExpedientEntity metaExpedientEntity = metaExpedientRepository.getOne(metaExpedientId);
-		
-		GrupEntity grupEntity = HibernateHelper.deproxy(grupRepository.getOne(id));
-
-		metaExpedientEntity.removeGrup(grupEntity);
-		
-		if (metaExpedientEntity.getGrupPerDefecte() != null && grupEntity.getId().equals(metaExpedientEntity.getGrupPerDefecte().getId())) {
-			metaExpedientEntity.setGrupPerDefecte(null);
-		}
-		
-		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientEntity.getId(), organId);
-		}
+		entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false, false);
+		grupHelper.desvincularAmbMetaExpedient(entitatId, metaExpedientId, id, rolActual, organId);
 	}
-	
-	
 	
 	@Transactional
 	@Override

@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +54,6 @@ import es.caib.ripea.service.helper.ConversioTipusHelper;
 import es.caib.ripea.service.helper.DistribucioReglaHelper;
 import es.caib.ripea.service.helper.DominiHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
-import es.caib.ripea.service.helper.ExceptionHelper;
 import es.caib.ripea.service.helper.ExpedientEstatHelper;
 import es.caib.ripea.service.helper.GrupHelper;
 import es.caib.ripea.service.helper.MessageHelper;
@@ -74,7 +71,6 @@ import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.helper.UsuariHelper;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.ArbreDto;
-import es.caib.ripea.service.intf.dto.CrearReglaDistribucioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.CrearReglaResponseDto;
 import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.ExpedientEstatDto;
@@ -99,7 +95,6 @@ import es.caib.ripea.service.intf.dto.PrincipalTipusEnumDto;
 import es.caib.ripea.service.intf.dto.ProcedimentDto;
 import es.caib.ripea.service.intf.dto.ProgresActualitzacioDto;
 import es.caib.ripea.service.intf.dto.ReglaDistribucioDto;
-import es.caib.ripea.service.intf.dto.StatusEnumDto;
 import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.exception.ExisteixenExpedientsEsborratsException;
 import es.caib.ripea.service.intf.exception.ExisteixenExpedientsException;
@@ -1566,39 +1561,13 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		return metaExpedientHelper.crearReglaDistribucio(metaExpedientId);
 	}
 	
-	
 	@Transactional
 	@Override
 	public CrearReglaResponseDto canviarEstatReglaDistribucio(
 			Long metaExpedientId, 
 			boolean activa) {
-		MetaExpedientEntity metaExpedient = metaExpedientRepository.getOne(metaExpedientId);
-		metaExpedient.updateCrearReglaDistribucio(CrearReglaDistribucioEstatEnumDto.PENDENT);
-
-		try {
-
-			CrearReglaResponseDto rearReglaResponseDto = distribucioReglaHelper.canviEstat(
-					metaExpedient.getClassificacio(), 
-					activa);
-
-			if (rearReglaResponseDto.getStatus() == StatusEnumDto.OK) {
-				metaExpedient.updateCrearReglaDistribucio(CrearReglaDistribucioEstatEnumDto.PROCESSAT);
-			} else {
-				metaExpedient.updateCrearReglaDistribucioError(StringUtils.abbreviate(rearReglaResponseDto.getMsg(), 1024));
-			}
-
-			return rearReglaResponseDto;
-
-		} catch (Exception e) {
-			logger.error("Error al crear regla en distribucio ", e);
-			metaExpedient.updateCrearReglaDistribucioError(StringUtils.abbreviate(e.getMessage() + ": " + ExceptionUtils.getStackTrace(e), 1024));
-
-			return new CrearReglaResponseDto(StatusEnumDto.ERROR,
-					ExceptionHelper.getRootCauseOrItself(e).getMessage());
-		}
+		return metaExpedientHelper.canviarEstatReglaDistribucio(metaExpedientId, activa);
 	}
-	
-	
 
     @Override
     public boolean isUpdatingProcediments(EntitatDto entitatDto) {

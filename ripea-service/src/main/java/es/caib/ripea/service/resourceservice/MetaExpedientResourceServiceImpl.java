@@ -39,6 +39,7 @@ import es.caib.ripea.plugin.usuari.DadesUsuari;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.CacheHelper;
 import es.caib.ripea.service.helper.ConfigHelper;
+import es.caib.ripea.service.helper.DistribucioReglaHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
 import es.caib.ripea.service.helper.GrupHelper;
@@ -66,9 +67,11 @@ import es.caib.ripea.service.intf.dto.TipusClassificacioEnumDto;
 import es.caib.ripea.service.intf.model.EntitatResource;
 import es.caib.ripea.service.intf.model.MetaDocumentResource;
 import es.caib.ripea.service.intf.model.MetaExpedientResource;
+import es.caib.ripea.service.intf.model.MetaExpedientResource.DesVincularGrupFormAction;
 import es.caib.ripea.service.intf.model.MetaExpedientResource.ImportarFitxerFormAction;
 import es.caib.ripea.service.intf.model.MetaExpedientResource.ImportarRolsacFormAction;
 import es.caib.ripea.service.intf.model.MetaExpedientResource.RevisioChangeFormAction;
+import es.caib.ripea.service.intf.model.MetaExpedientResource.ToggleReglaRolsacFormAction;
 import es.caib.ripea.service.intf.model.MetaExpedientResource.VincularGrupFormAction;
 import es.caib.ripea.service.intf.model.MetaNodeResource;
 import es.caib.ripea.service.intf.model.OrganGestorResource;
@@ -88,6 +91,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 	private final CacheHelper cacheHelper;
 	private final GrupHelper grupHelper;
 	private final MetaExpedientHelper metaExpedientHelper;
+	private final DistribucioReglaHelper distribucioReglaHelper;
 	private final MetaExpedientResourceRepository metaExpedientResourceRepository;
 	private final MetaDocumentResourceRepository metaDocumentResourceRepository;
 	private final MetaDadaResourceRepository metaDadaResourceRepository;
@@ -111,9 +115,12 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
     	register(MetaExpedientResource.PERSPECTIVE_COMMENTS_CODE,	new ComentarisPerspectiveApplicator());
     	register(MetaExpedientResource.PERSPECTIVE_PERMISOS_CODE,	new PermisosPerspectiveApplicator());
     	register(MetaExpedientResource.PERSPECTIVE_ELEMENTS_CODE,	new ElementsCountPerspectiveApplicator());
+    	register(MetaExpedientResource.PERSPECTIVE_ROLSAC_CODE,		new ReglaRolsacPerspectiveApplicator());
     	
     	register(MetaExpedientResource.ACTION_CHANGE_REVISIO_CODE,	new RevisioChangeActionExecutor());
     	register(MetaExpedientResource.ACTION_VINCULAR_GRUP_CODE,	new VincularGrupActionExecutor());
+    	register(MetaExpedientResource.ACTION_DESVINCULAR_GRUP_CODE,new DesVincularGrupActionExecutor());
+    	register(MetaExpedientResource.ACTION_TOGGLE_REGLA_CODE,	new ToggleReglaActionExecutor());
     	
     	register(MetaExpedientResource.ACTION_IMPORT_ROLSAC_CODE, 	new ImportarRolsacActionExecutor());
     	register(MetaExpedientResource.ACTION_IMPORT_FITXER_CODE,	new ImportarFitxerActionExecutor());
@@ -381,6 +388,13 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 		}
     }
     
+    private class ReglaRolsacPerspectiveApplicator implements PerspectiveApplicator<MetaExpedientResourceEntity, MetaExpedientResource> {
+		@Override
+		public void applySingle(String code, MetaExpedientResourceEntity entity, MetaExpedientResource resource) throws PerspectiveApplicationException {
+			resource.setRegla(distribucioReglaHelper.consultarRegla(entity.getClassificacio()));
+		}
+    }    
+    
     private class ComentarisPerspectiveApplicator implements PerspectiveApplicator<MetaExpedientResourceEntity, MetaExpedientResource> {
 		@Override
 		public void applySingle(String code, MetaExpedientResourceEntity entity, MetaExpedientResource resource) throws PerspectiveApplicationException {
@@ -543,6 +557,52 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 		}
     }
     
+    private class ToggleReglaActionExecutor implements ActionExecutor<MetaExpedientResourceEntity, MetaExpedientResource.ToggleReglaRolsacFormAction, Serializable> {
+
+		@Override
+		public void onChange(Serializable id, ToggleReglaRolsacFormAction previous, String fieldName, Object fieldValue,
+				Map<String, AnswerValue> answers, String[] previousFieldNames, ToggleReglaRolsacFormAction target) {
+		}
+
+		@Override
+		public Serializable exec(String code, MetaExpedientResourceEntity entity, ToggleReglaRolsacFormAction params) throws ActionExecutionException {
+			try {
+				return metaExpedientHelper.canviarEstatReglaDistribucio(entity.getId(), params.isActiva());
+			} catch (Exception e) {
+				excepcioLogHelper.addExcepcio("/metaExpedient/"+entity.getId()+"/ToggleReglaActionExecutor", e);
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, messageHelper.getMessage("message.common.action.error")+": "+e.getMessage());
+			}
+		}
+    }
+    
+    private class DesVincularGrupActionExecutor implements ActionExecutor<MetaExpedientResourceEntity, MetaExpedientResource.DesVincularGrupFormAction, Serializable> {
+
+		@Override
+		public void onChange(Serializable id, DesVincularGrupFormAction previous, String fieldName, Object fieldValue,
+				Map<String, AnswerValue> answers, String[] previousFieldNames, DesVincularGrupFormAction target) {
+		}
+
+		@Override
+		public Serializable exec(String code, MetaExpedientResourceEntity entity, DesVincularGrupFormAction params) throws ActionExecutionException {
+			try {
+				String entitatActualCodi = configHelper.getEntitatActualCodi();
+				EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true,false);
+				String organActualCodi	 = configHelper.getOrganActualCodi();
+				OrganGestorEntity ogEntity	= organGestorRepository.findByEntitatIdAndCodi(entitat.getId(), organActualCodi);
+				grupHelper.desvincularAmbMetaExpedient(
+						entitat.getId(),
+						entity.getId(),
+						params.getGrup().getId(),
+						configHelper.getRolActual(),
+						ogEntity!=null?ogEntity.getId():null);
+				return "{\"resultado\": \"OK\"}";
+			} catch (Exception e) {
+				excepcioLogHelper.addExcepcio("/metaExpedient/"+entity.getId()+"/DesVincularGrupActionExecutor", e);
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, messageHelper.getMessage("message.common.action.error")+": "+e.getMessage());
+			}
+		}
+    }
+    
     private class VincularGrupActionExecutor implements ActionExecutor<MetaExpedientResourceEntity, MetaExpedientResource.VincularGrupFormAction, Serializable> {
 
 		@Override
@@ -567,15 +627,20 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 
 		@Override
 		public Serializable exec(String code, MetaExpedientResourceEntity entity, VincularGrupFormAction params) throws ActionExecutionException {
-			grupHelper.relacionarAmbMetaExpedient(entity.getId(), params.getGrup().getId(), params.isPerDefecte());
-			if ("IPA_ORGAN_ADMIN".equals(configHelper.getRolActual())) {
-				String entitatActualCodi = configHelper.getEntitatActualCodi();
-				EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true,false);
-				String organActualCodi	 = configHelper.getOrganActualCodi();
-				OrganGestorEntity ogEntity	= organGestorRepository.findByEntitatIdAndCodi(entitat.getId(), organActualCodi);
-				metaExpedientHelper.canviarRevisioADisseny(entitat.getId(), entity.getId(), ogEntity!=null?ogEntity.getId():null);
-			}
-			return objectMappingHelper.newInstanceMap(entity, MetaExpedientResource.class);
+			try {
+				grupHelper.relacionarAmbMetaExpedient(entity.getId(), params.getGrup().getId(), params.isPerDefecte());
+				if ("IPA_ORGAN_ADMIN".equals(configHelper.getRolActual())) {
+					String entitatActualCodi = configHelper.getEntitatActualCodi();
+					EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true,false);
+					String organActualCodi	 = configHelper.getOrganActualCodi();
+					OrganGestorEntity ogEntity	= organGestorRepository.findByEntitatIdAndCodi(entitat.getId(), organActualCodi);
+					metaExpedientHelper.canviarRevisioADisseny(entitat.getId(), entity.getId(), ogEntity!=null?ogEntity.getId():null);
+				}
+				return objectMappingHelper.newInstanceMap(entity, MetaExpedientResource.class);
+			} catch (Exception e) {
+				excepcioLogHelper.addExcepcio("/metaExpedient/"+entity.getId()+"/VincularGrupActionExecutor", e);
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, messageHelper.getMessage("message.common.action.error")+": "+e.getMessage());
+			}				
 		}    	
     }
     

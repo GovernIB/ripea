@@ -124,6 +124,35 @@ public class MetaExpedientHelper {
 
     public static final String PROCEDIMENT_ORGAN_NO_SYNC = "Hi ha procediments que pertanyen a òrgans no existents en l'organigrama actual";
     
+    public CrearReglaResponseDto canviarEstatReglaDistribucio(
+			Long metaExpedientId, 
+			boolean activa) {
+		MetaExpedientEntity metaExpedient = metaExpedientRepository.getOne(metaExpedientId);
+		metaExpedient.updateCrearReglaDistribucio(CrearReglaDistribucioEstatEnumDto.PENDENT);
+
+		try {
+
+			CrearReglaResponseDto rearReglaResponseDto = distribucioReglaHelper.canviEstat(
+					metaExpedient.getClassificacio(), 
+					activa);
+
+			if (rearReglaResponseDto.getStatus() == StatusEnumDto.OK) {
+				metaExpedient.updateCrearReglaDistribucio(CrearReglaDistribucioEstatEnumDto.PROCESSAT);
+			} else {
+				metaExpedient.updateCrearReglaDistribucioError(StringUtils.abbreviate(rearReglaResponseDto.getMsg(), 1024));
+			}
+
+			return rearReglaResponseDto;
+
+		} catch (Exception e) {
+			logger.error("Error al crear regla en distribucio ", e);
+			metaExpedient.updateCrearReglaDistribucioError(StringUtils.abbreviate(e.getMessage() + ": " + ExceptionUtils.getStackTrace(e), 1024));
+
+			return new CrearReglaResponseDto(StatusEnumDto.ERROR,
+					ExceptionHelper.getRootCauseOrItself(e).getMessage());
+		}
+    }
+    
     public String export(Long entitatId, Long metaExpedientId, Long organId) {
 
     	try {
