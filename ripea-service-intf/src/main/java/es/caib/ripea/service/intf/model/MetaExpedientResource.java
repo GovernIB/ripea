@@ -228,7 +228,7 @@ public class MetaExpedientResource extends MetaNodeResource {
 
 		private static final long serialVersionUID = -7203619944391181991L;
 
-        @NotNull @NotEmpty
+        @NotNull
 		@ResourceField(onChangeActive = true)
     	private FileReference importJson;
 		
@@ -241,6 +241,9 @@ public class MetaExpedientResource extends MetaNodeResource {
         private List<MetaExpedientTascaResource> tasquesImportats = new ArrayList<>();
         private List<GrupResource> grupsImportats = new ArrayList<>();
         private List<MetaExpedientCarpetaResource> carpetesImportats = new ArrayList<>();
+
+        @Transient private boolean importar;
+        @Transient private List<ResourceReference<UsuariResource, String>> portafirmesResponsables;
     }
     
     private static final long serialVersionUID = -7526532893601431955L;
