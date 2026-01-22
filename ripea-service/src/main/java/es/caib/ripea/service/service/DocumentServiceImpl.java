@@ -1580,21 +1580,6 @@ public class DocumentServiceImpl implements DocumentService {
 			Long pareId, 
 			Long tascaId, 
 			EntitatDto entitatActual) {
-//		try (InputStream zip = new BufferedInputStream(Files.newInputStream(tempZip))) {
-//			InputStream zipStream = new BufferedInputStream(zip);
-//            zipImportacioHelper.processarZip(
-//                    usuariActual,
-//                    entitatActual, 
-//                    zipStream, 
-//                    rolActual, 
-//                    pareId, 
-//                    tascaId
-//            );
-//        } catch (Exception e) {
-//            logger.error("Error async ZIP", e);
-//        } finally {
-//            try { Files.deleteIfExists(tempZip); } catch (Exception ignore) {}
-//        }
 	    try {
 	        zipImportacioHelper.processarZip(
 	                usuariActual,

@@ -1,7 +1,9 @@
 package es.caib.ripea.service.intf.dto;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,15 +25,44 @@ public class ProgresProcessamentZipDto {
 	private Integer numOperacionsRealitzades = 0;
 	private boolean error = false;
 	private String errorMsg;
-	
+
+	// Informe
+    private int documentsCorrectes = 0;
+    private int documentsError = 0;
+    private int documentsFirmaError = 0;
+    private int carpetesCreades = 0;
+    private long tamanyTotal = 0L; // bytes
+    private Set<String> carpetesCreadesSet = new HashSet<String>();
+    
+	private List<String> errorsDetall = new ArrayList<>();
 	List<ProgresProcessamentZipInfo> info = new ArrayList<ProgresProcessamentZipInfo>();
 	
 	public void addInfo(String text) {
-
 		log.info("[Progres Actualitzacio] " + text);
-		info.add(new ProgresProcessamentZipInfo(text));
+		this.info.add(new ProgresProcessamentZipInfo(text));
 	}
-
+	
+    public void addErrorFirma(String errorText) {
+        log.error(errorText);
+        this.errorsDetall.add(errorText);
+        this.documentsFirmaError++;
+        this.error = true;
+        this.errorMsg = errorText;
+    }
+    
+    public void addError(String errorText) {
+        log.error(errorText);
+        this.errorsDetall.add(errorText);
+        this.documentsError++;
+        this.error = true;
+        this.errorMsg = errorText;
+    }
+    
+    public void addDocumentCorrecte(long tamany) {
+    	this.documentsCorrectes++;
+    	this.tamanyTotal += tamany;
+    }
+    
 	public void incrementOperacionsRealitzades() {
 		incrementOperacionsRealitzades(1);
 	}
@@ -45,9 +76,9 @@ public class ProgresProcessamentZipDto {
 		this.progres = (int) auxprogres;
 	}
 	
-	public boolean isFinished() {
-		return progres == 100;
-	}
+    public boolean isFinished() {
+        return this.progres >= 100;
+    }
 	
 	@Getter @Setter @AllArgsConstructor @NoArgsConstructor
 	public class ProgresProcessamentZipInfo {	

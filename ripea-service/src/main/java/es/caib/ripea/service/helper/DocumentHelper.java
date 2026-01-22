@@ -96,6 +96,7 @@ public class DocumentHelper {
 	@Autowired private ConversioTipusHelper conversioTipusHelper;
 	@Autowired private CarpetaHelper carpetaHelper;
 	@Autowired private DocumentPublicacioRepository documentPublicacioRepository;
+	@Autowired private MessageHelper messageHelper;
 	
 	public DocumentDto crearDocument(
 			Long entitatId,
@@ -340,9 +341,12 @@ public class DocumentHelper {
 			DocumentDto documentDto,
 			Long pareId,
 			String rolActual) {
-		
+
+        var ubicacio = ubicacioDocuments.get(documentDto.getRutaZip());
+        
         assignarCarpeta(
-        		ubicacioDocuments,
+        		ubicacio,
+        		progres,
         		documentDto, 
         		entitatId, 
         		pareId);
@@ -370,9 +374,8 @@ public class DocumentHelper {
 				false);
 	}
 	
-    private void assignarCarpeta(Map<String, List<String>> ubicacioDocuments, DocumentDto documentDto, Long entitatId, Long pareId) {
+    private void assignarCarpeta(List<String> ubicacio, ProgresProcessamentZipDto progres, DocumentDto documentDto, Long entitatId, Long pareId) {
         var nomFitxer = documentDto.getFitxerNom();
-        var ubicacio = ubicacioDocuments.get(documentDto.getRutaZip());
 
         if (ubicacio != null) {
             var pare = entityComprovarHelper.comprovarContingut(pareId);
@@ -382,6 +385,13 @@ public class DocumentHelper {
             		pareId, 
             		nomFitxer, 
             		ubicacio.iterator());
+            
+            String rutaCarpeta = String.join("/", ubicacio);
+            if (!progres.getCarpetesCreadesSet().contains(rutaCarpeta)) {
+                progres.getCarpetesCreadesSet().add(rutaCarpeta);
+                progres.setCarpetesCreades(progres.getCarpetesCreades() + 1);
+            }
+            
             documentDto.setPareId(carpetaId);
         } else {
             documentDto.setPareId(pareId);
@@ -390,12 +400,13 @@ public class DocumentHelper {
     
     private void validarFirmesAmbProgres(DocumentDto documentDto, ProgresProcessamentZipDto progres) {
         try {
-            progres.addInfo("Validant les firmes del document: " + documentDto.getFitxerNom());
+            progres.addInfo(messageHelper.getMessage("contingut.boto.crear.document.multiple.verificar.firma", new Object[] {documentDto.getFitxerNom()}));
 
             SignatureInfoDto signatureInfo =
-                    pluginHelper.detectaFirmaDocument(documentDto.getFitxerContingut(), documentDto.getFitxerContentType());
+                    pluginHelper.detectSignedAttachedUsingPdfReader(documentDto.getFitxerContingut(), documentDto.getFitxerContentType());
 
             if (signatureInfo.isSigned()) {
+            	signatureInfo = pluginHelper.detectSignedAttachedUsingValidateSignaturePlugin(documentDto.getFitxerContingut(), documentDto.getFitxerContentType());
                 documentDto.setAmbFirma(!signatureInfo.isError());
                 documentDto.setDocumentFirmaTipus(DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA);
                 documentDto.setTipusFirma(DocumentTipusFirmaEnumDto.ADJUNT);
@@ -406,9 +417,11 @@ public class DocumentHelper {
                 documentDto.setDocumentFirmaTipus(DocumentFirmaTipusEnumDto.SENSE_FIRMA);
             }
         } catch (Exception e) {
+            logger.error("Error verificant firma del document: " + documentDto.getFitxerNom(), e);
             progres.setError(true);
-            progres.setErrorMsg("Error validant firma del document: " + documentDto.getFitxerNom() + " [Excepció: " + e.getMessage() + "]");
-            logger.error("Error validant firma del document: " + documentDto.getFitxerNom(), e);
+            progres.addErrorFirma(
+            		messageHelper.getMessage("contingut.boto.crear.document.multiple.verificar.firma.error", 
+            				new Object[] {documentDto.getRutaZip(), e.getMessage()}));
         }
     }
 
