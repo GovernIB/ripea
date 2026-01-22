@@ -819,7 +819,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 			if (fieldName != null) {
 				if (VincularGrupFormAction.Fields.grup.equals(fieldName)) {
                     if (fieldValue != null) {
-                        grupResourceRepository.findById(previous.getGrup().getId()).ifPresent((gre) -> {
+                        grupResourceRepository.findById(((ResourceReference<GrupResource, Long>)fieldValue).getId()).ifPresent((gre) -> {
                             if (gre.getOrganGestor() != null) {
                                 target.setOrganGestor(ResourceReference.toResourceReference(
                                         gre.getOrganGestor().getId(),

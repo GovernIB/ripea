@@ -86,7 +86,7 @@ export const MetaExpedientElements = () => {
             content: <MetaExpedientCarpetaGrid entity={metaExpedient} onRowCountChange={setNumCarpeta}/>,
             badge: numCarpeta ?? metaExpedient?.numCarpetes,
             showZero: true,
-            // hidden: !user?.sessionScope?.isCarpetesDefecte,
+            hidden: !user?.sessionScope?.isCarpetesDefecte,
         },
     ]
 

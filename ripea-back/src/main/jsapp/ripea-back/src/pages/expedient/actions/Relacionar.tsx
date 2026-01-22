@@ -13,7 +13,6 @@ import Load from "../../../components/Load.tsx";
 import {springFilterBuilder as expedientFilterBuilder} from "../ExpedientFilter.tsx";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 import {GridSortDirection} from "@mui/x-data-grid-pro";
-import {Grid} from "@mui/material";
 
 const sortModel:any = [{ field: 'createdDate', sort: 'desc' }];
 const perspectives = ["ESTAT"];

@@ -36,13 +36,13 @@ export const GrupGrid = ({ entity, refresh: refreshEntity, onRowCountChange } :a
     ]
 
     const {handleShow: handleVincular, content: contentVincular} = useVincularGrup(refresh);
-    const {defecte, llevarDefecte} = useActions(refresh)
+    const {defecte, llevarDefecte, desvincularGrup} = useActions(refresh)
     const actions = [
         {
             label: t('page.grup.action.unlink.label'),
             icon: "link_off",
             showInMenu: true,
-            onClick: () => {},
+            onClick: (id:any) => desvincularGrup(entity?.id, id),
         },
         {
             label: t('page.grup.action.default.label'),

@@ -1324,6 +1324,12 @@ const translationEn = {
                 elements: "Procedure management: {{nom}}",
                 expressioNumero: "If no expression is specified, the following default will be used: {{codi}}/{{seq}}/{{any}}",
                 permisDirecte: "An entity administrator user can modify this value.",
+                regla: {
+                    create: "Created",
+                    data: "Creation date",
+                    activa: "Active",
+                    nom: "Name",
+                },
             },
             tabs: {
                 dades: "Data",
@@ -1357,10 +1363,24 @@ const translationEn = {
                     ok: "",
                 },
                 expedient: {
-                    label: "Cases",
+                    title: "Procedure records: {{nom}}",
+                    label: "Records",
                 },
                 regla: {
+                    title: "Distribution rule status",
                     label: "Distribution rule",
+                    create: {
+                        label: "Create distribution rule",
+                        ok: "The rule with code '{{data.codi}}' has been created successfully.",
+                    },
+                    active: {
+                        label: "Activate distribution rule",
+                        ok: "The rule with code '{{data.codi}}' has been activated successfully.",
+                    },
+                    desactive: {
+                        label: "Deactivate distribution rule",
+                        ok: "The rule with code '{{data.codi}}' has been deactivated successfully",
+                    },
                 },
                 activar: {
                     label: "Activate",
