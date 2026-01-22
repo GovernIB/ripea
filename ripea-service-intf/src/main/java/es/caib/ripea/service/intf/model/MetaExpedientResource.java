@@ -100,7 +100,7 @@ public class MetaExpedientResource extends MetaNodeResource {
     public static final String PERSPECTIVE_COMMENTS_CODE	= "COMENTARIS";
     public static final String PERSPECTIVE_PERMISOS_CODE	= "PERMISOS";
     public static final String PERSPECTIVE_ELEMENTS_CODE	= "ELEMENTS_COUNT";
-    public static final String PERSPECTIVE_ROLSAC_CODE		= "ELEMENTS_COUNT";
+    public static final String PERSPECTIVE_ROLSAC_CODE		= "REGLA_ROLSAC";
     public static final String ACTION_CHANGE_REVISIO_CODE	= "CHANGE_REVISIO";
     public static final String ACTION_VINCULAR_GRUP_CODE	= "VINCULAR_GRUP";
     public static final String ACTION_DESVINCULAR_GRUP_CODE	= "DESVINCULAR_GRUP";

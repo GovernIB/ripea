@@ -81,7 +81,7 @@ public class MetaDocumentResource extends MetaNodeResource {
     @Transient private int numMetadades;
     @Transient private FileReference plantilla;
     
-    @Transient private boolean importar;
+    @Transient private boolean importar = true;
     
     private static final long serialVersionUID = -4446427656169703518L;
 }

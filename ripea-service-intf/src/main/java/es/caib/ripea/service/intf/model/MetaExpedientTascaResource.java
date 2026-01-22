@@ -40,4 +40,6 @@ public class MetaExpedientTascaResource extends BaseAuditableResource<Long> {
     @Transient private int numValidacio;
     @Transient private String estatColorCrearTasca;
     @Transient private String estatColorFinalitzarTasca;
+    
+    @Transient private boolean importar = true;
 }

@@ -51,6 +51,8 @@ public class GrupResource extends BaseAuditableResource<Long> {
 
 	@Transient private int numPermisos;
 	
+	@Transient private boolean importar = true;
+	
     @Getter
     @Setter
     public static class FormFilter implements Serializable {

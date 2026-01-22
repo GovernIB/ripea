@@ -3,6 +3,8 @@ package es.caib.ripea.service.intf.model;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.springframework.data.annotation.Transient;
+
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
@@ -32,4 +34,6 @@ public class MetaExpedientEstatResource extends BaseAuditableResource<Long> {
     private ResourceReference<UsuariResource, String> responsable;
 	
 	private ResourceReference<MetaExpedientResource, Long> metaExpedient;
+	
+	@Transient private boolean importar = true;
 }

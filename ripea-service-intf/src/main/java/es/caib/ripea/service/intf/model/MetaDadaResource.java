@@ -58,7 +58,7 @@ public class MetaDadaResource extends BaseAuditableResource<Long> {
 
     @Transient private List<DadaResource> dades;
     
-    @Transient private boolean importar;
+    @Transient private boolean importar = true;
     
     private static final long serialVersionUID = 752278996924931848L;
 }
