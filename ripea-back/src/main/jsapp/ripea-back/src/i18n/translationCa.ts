@@ -1326,8 +1326,8 @@ const translationCa = {
                 permisDirecte: "Un usuari administrador de l'entitat pot modificar aquest valor.",
                 regla: {
                     create: "Creada",
-                    data: "Activa",
-                    activa: "Data creació",
+                    data: "Data creació",
+                    activa: "Activa",
                     nom: "Nom",
                 },
             },
