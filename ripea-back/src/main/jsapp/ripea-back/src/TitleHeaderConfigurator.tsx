@@ -31,7 +31,7 @@ const TITLES: any = {
     '/expedientPeticioComunicades': "page.user.menu.comunicades",
 
     // Configurar
-    '/metaExpedient': "page.user.menu.procediments",
+    '/metaExpedient': "page.user.menu.procedimentsTitle",
     // '/metaExpedient/:id/permis': "page.user.menu.procedimentPermis",
     '/tipusDocumental': "page.user.menu.nti",
     '/grup': "page.user.menu.grups",

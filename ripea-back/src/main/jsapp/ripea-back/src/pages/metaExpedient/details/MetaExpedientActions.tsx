@@ -4,11 +4,14 @@ import useCanviEstatRevisio from "../actions/CanviEstatRevisio.tsx";
 import useMetaExpedientDetail from "./MetaExpedientDetail.tsx";
 import {useBaseAppContext, useResourceApiService} from "reactlib";
 import {iniciaDescargaJSON} from "../../expedient/details/CommonActions.tsx";
+import useReglaDistribucio from "../actions/ReglaDistribucio.tsx";
+import useExpedientDialog from "./ExpedientDialog.tsx";
 
 export const useActions = (refresh?: () => void) => {
     const {t} = useTranslation()
     const {
         patch: apiPatch,
+        artifactAction: apiAction,
         artifactReport: apiReport,
     } = useResourceApiService('metaExpedientResource');
     const {temporalMessageShow} = useBaseAppContext();
@@ -57,6 +60,30 @@ export const useActions = (refresh?: () => void) => {
             });
     }
 
+    const desvincularGrup = (id:any, idGrup:any) => {
+        apiAction(id, { code: 'DESVINCULAR_GRUP', data: {grup:{id:idGrup}} })
+            .then(() => {
+                refresh?.()
+                temporalMessageShow(null, t('page.grup.action.unlink.ok'), 'success');
+            })
+            .catch((error) => {
+                temporalMessageShow(null, error.message, 'error');
+            });
+    }
+
+    const toogleRegla = (id:any, activa:boolean) => {
+        apiAction(id, { code: 'TOGGLE_REGLA_ROLSAC', data: {activa} })
+            .then(() => {
+                refresh?.();
+                activa
+                    ? temporalMessageShow(null, t('page.metaExpedient.action.regla.active.ok'), 'success')
+                    : temporalMessageShow(null, t('page.metaExpedient.action.regla.desactive.ok'), 'success')
+            })
+            .catch((error) => {
+                temporalMessageShow(null, error.message, 'error');
+            });
+    }
+
     const exportar = (id:any) => {
         apiReport(id, { code: 'REPORT_EXPORT_JSON', fileType: "JSON" })
             .then((result) => {
@@ -68,7 +95,7 @@ export const useActions = (refresh?: () => void) => {
             });
     }
 
-    return {active, desactive, exportar, defecte, llevarDefecte}
+    return {active, desactive, exportar, defecte, llevarDefecte, toogleRegla, desvincularGrup}
 }
 
 export const useMetaExpedientActions = (refresh?: () => void) => {
@@ -80,8 +107,10 @@ export const useMetaExpedientActions = (refresh?: () => void) => {
     const isRolActualOrganAdmin = user?.rolActual == 'IPA_ORGAN_ADMIN';
     const isRolActualRevisor = user?.rolActual == 'IPA_REVISIO';
 
+    const {handleOpen: handleExpedient, dialog: dialogExpedient} = useExpedientDialog();
     const {handleOpen: handleDetail, dialog: dialogDetail} = useMetaExpedientDetail();
     const {handleShow: handleCanviEstat, content: contentCanviEstat} = useCanviEstatRevisio(refresh);
+    const {handleOpen: handleRegla, dialog: dialogRegla} = useReglaDistribucio(refresh);
     const {active, desactive, exportar} = useActions(refresh)
 
     const actions = [
@@ -110,7 +139,8 @@ export const useMetaExpedientActions = (refresh?: () => void) => {
             label: t('page.metaExpedient.action.expedient.label'),
             icon: "business_center",
             showInMenu: true,
-            hidden: !(isRolActualAdmin || isRolActualOrganAdmin),
+            onClick: handleExpedient,
+            hidden: isRolActualRevisor,
         },
         {
             label: t('common.export'),
@@ -123,6 +153,7 @@ export const useMetaExpedientActions = (refresh?: () => void) => {
             label: t('page.metaExpedient.action.regla.label'),
             icon: "search",
             showInMenu: true,
+            onClick: handleRegla,
             hidden: !(isRolActualAdmin || isRolActualOrganAdmin),
         },
         {
@@ -148,8 +179,10 @@ export const useMetaExpedientActions = (refresh?: () => void) => {
     ]
 
     const components = <>
+        {dialogExpedient}
         {contentCanviEstat}
         {dialogDetail}
+        {dialogRegla}
     </>
 
     return {

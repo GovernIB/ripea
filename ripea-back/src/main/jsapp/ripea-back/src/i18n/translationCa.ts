@@ -1324,6 +1324,12 @@ const translationCa = {
                 elements: "Gestió del procediment: {{nom}}",
                 expressioNumero: "Si no s'especifica cap expressió s'utilitzarà aquesta per defecte: {{codi}}/{{seq}}/{{any}}",
                 permisDirecte: "Un usuari administrador de l'entitat pot modificar aquest valor.",
+                regla: {
+                    create: "Creada",
+                    data: "Activa",
+                    activa: "Data creació",
+                    nom: "Nom",
+                },
             },
             tabs: {
                 dades: "Dades",
@@ -1357,10 +1363,24 @@ const translationCa = {
                     ok: "",
                 },
                 expedient: {
+                    title: "Expedients del procediment: {{nom}}",
                     label: "Expedients",
                 },
                 regla: {
+                    title: "Estat de la regla en Distribució",
                     label: "Regla distribució",
+                    create: {
+                        label: "Crear regla en Distribució",
+                        ok: "La regla amb codi '{{data.codi}}' s'ha creat correctament.",
+                    },
+                    active: {
+                        label: "Activar regla en Distribució",
+                        ok: "La regla amb codi '{{data.codi}}' s'ha activat correctament.",
+                    },
+                    desactive: {
+                        label: "Desactivar regla en Distribució",
+                        ok: "La regla amb codi '{{data.codi}}' s'ha desactivat correctament",
+                    },
                 },
                 activar: {
                     label: "Activar",

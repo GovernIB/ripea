@@ -9,6 +9,8 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
+import es.caib.ripea.service.intf.dto.*;
+import es.caib.ripea.service.intf.model.*;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
@@ -56,26 +58,12 @@ import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ReportFileType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
-import es.caib.ripea.service.intf.dto.CrearReglaResponseDto;
-import es.caib.ripea.service.intf.dto.MetaDocumentDto;
-import es.caib.ripea.service.intf.dto.MetaExpedientExportDto;
-import es.caib.ripea.service.intf.dto.MetaExpedientRevisioEstatEnumDto;
-import es.caib.ripea.service.intf.dto.PermisDto;
-import es.caib.ripea.service.intf.dto.ProcedimentDto;
-import es.caib.ripea.service.intf.dto.StatusEnumDto;
-import es.caib.ripea.service.intf.dto.TipusClassificacioEnumDto;
-import es.caib.ripea.service.intf.model.EntitatResource;
-import es.caib.ripea.service.intf.model.MetaDocumentResource;
-import es.caib.ripea.service.intf.model.MetaExpedientResource;
 import es.caib.ripea.service.intf.model.MetaExpedientResource.DesVincularGrupFormAction;
 import es.caib.ripea.service.intf.model.MetaExpedientResource.ImportarFitxerFormAction;
 import es.caib.ripea.service.intf.model.MetaExpedientResource.ImportarRolsacFormAction;
 import es.caib.ripea.service.intf.model.MetaExpedientResource.RevisioChangeFormAction;
 import es.caib.ripea.service.intf.model.MetaExpedientResource.ToggleReglaRolsacFormAction;
 import es.caib.ripea.service.intf.model.MetaExpedientResource.VincularGrupFormAction;
-import es.caib.ripea.service.intf.model.MetaNodeResource;
-import es.caib.ripea.service.intf.model.OrganGestorResource;
-import es.caib.ripea.service.intf.model.UsuariResource;
 import es.caib.ripea.service.intf.resourceservice.MetaExpedientResourceService;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.permission.ExtendedPermission;
@@ -611,7 +599,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 			if (fieldName != null) {
 				if (VincularGrupFormAction.Fields.grup.equals(fieldName)) {
                     if (fieldValue != null) {
-                        grupResourceRepository.findById(previous.getGrup().getId()).ifPresent((gre) -> {
+                        grupResourceRepository.findById(((ResourceReference<GrupResource, Long>)fieldValue).getId()).ifPresent((gre) -> {
                             if (gre.getOrganGestor() != null) {
                                 target.setOrganGestor(ResourceReference.toResourceReference(
                                         gre.getOrganGestor().getId(),
