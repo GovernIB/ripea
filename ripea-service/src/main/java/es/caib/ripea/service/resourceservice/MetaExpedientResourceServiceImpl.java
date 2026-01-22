@@ -4,8 +4,10 @@ import java.io.OutputStream;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
@@ -34,6 +36,7 @@ import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientResource
 import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientTascaResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.UsuariResourceRepository;
 import es.caib.ripea.persistence.repository.ExpedientRepository;
+import es.caib.ripea.persistence.repository.MetaExpedientRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
@@ -57,8 +60,10 @@ import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ReportFileType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.CrearReglaResponseDto;
+import es.caib.ripea.service.intf.dto.DominiDto;
 import es.caib.ripea.service.intf.dto.ExpedientEstatDto;
 import es.caib.ripea.service.intf.dto.GrupDto;
+import es.caib.ripea.service.intf.dto.ItemValidacioTascaEnum;
 import es.caib.ripea.service.intf.dto.MetaDadaDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentFirmaFluxTipusEnumDto;
@@ -119,6 +124,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 	private final OrganGestorRepository organGestorRepository;
 	private final ExpedientRepository expedientRepository;
 	private final GrupResourceRepository grupResourceRepository;
+	private final MetaExpedientRepository metaExpedientRepository;
 	private final PluginHelper pluginHelper;
 	private final MessageHelper messageHelper;
 	private final PermisosHelper permisosHelper;
@@ -491,6 +497,37 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 		}
     }
     
+    private MetaDadaResource toMetaDadaResource(MetaDadaDto metaDadaDto) {
+		
+    	MetaDadaResource mdadaRes = new MetaDadaResource();
+		
+		mdadaRes.setCodi(metaDadaDto.getCodi());
+		mdadaRes.setNom(metaDadaDto.getNom());
+		mdadaRes.setTipus(metaDadaDto.getTipus());
+		mdadaRes.setMultiplicitat(metaDadaDto.getMultiplicitat());
+		
+		mdadaRes.setValorString(metaDadaDto.getValorString());
+		mdadaRes.setValorSencer(metaDadaDto.getValorSencer());
+		mdadaRes.setValorImport(metaDadaDto.getValorImport());
+		mdadaRes.setValorFlotant(metaDadaDto.getValorFlotant());
+		if (metaDadaDto.getValorData()!=null) {
+			mdadaRes.setValorData(Utils.dateJavaToLocalDateTime(metaDadaDto.getValorData()));
+		}
+		mdadaRes.setValorBoolea(metaDadaDto.getValorBoolea());
+		
+		mdadaRes.setEnviable(metaDadaDto.isEnviable());
+		mdadaRes.setMetadadaArxiu(metaDadaDto.getMetadadaArxiu());
+		mdadaRes.setDescripcio(metaDadaDto.getDescripcio());
+		mdadaRes.setActiva(metaDadaDto.isActiva());
+		
+		if (metaDadaDto.getDomini()!=null) {
+			mdadaRes.setDomini(ResourceReference.toResourceReference(
+					metaDadaDto.getDomini().getId(),
+					metaDadaDto.getDomini().getCodi()));
+		}
+		return mdadaRes;
+    }
+    
     private class ImportarFitxerActionExecutor implements ActionExecutor<MetaExpedientResourceEntity, MetaExpedientResource.ImportarFitxerFormAction, Serializable> {
 		@Override
 		public void onChange(Serializable id, ImportarFitxerFormAction previous, String fieldName, Object fieldValue,
@@ -595,6 +632,15 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 								mdRes.setPinbalFinalitat(metaDocumentDto.getPinbalFinalitat());
 								mdRes.setPinbalUtilitzarCifOrgan(metaDocumentDto.isPinbalUtilitzarCifOrgan());
 								
+								//Meta-dades del meta-document
+								List<MetaDadaResource> metaDadesDocumentResource = new ArrayList<MetaDadaResource>();
+								if (metaDocumentDto.getMetaDades()!=null) {
+									for (MetaDadaDto metaDadaDto: metaDocumentDto.getMetaDades()) {
+										metaDadesDocumentResource.add(toMetaDadaResource(metaDadaDto));
+									}
+								}
+								mdRes.setMetaDadesImportacio(metaDadesDocumentResource);
+								
 								metaDocumentsImportats.add(mdRes);
 							}
 						}
@@ -606,34 +652,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 						List<MetaDadaResource> metaDadesImportats = new ArrayList<MetaDadaResource>();
 						if (metaExpedientExport.getMetaDades()!=null) {
 							for (MetaDadaDto metaDadaDto: metaExpedientExport.getMetaDades()) {
-								MetaDadaResource mdadaRes = new MetaDadaResource();
-								
-								mdadaRes.setCodi(metaDadaDto.getCodi());
-								mdadaRes.setNom(metaDadaDto.getNom());
-								mdadaRes.setTipus(metaDadaDto.getTipus());
-								mdadaRes.setMultiplicitat(metaDadaDto.getMultiplicitat());
-								
-								mdadaRes.setValorString(metaDadaDto.getValorString());
-								mdadaRes.setValorSencer(metaDadaDto.getValorSencer());
-								mdadaRes.setValorImport(metaDadaDto.getValorImport());
-								mdadaRes.setValorFlotant(metaDadaDto.getValorFlotant());
-								if (metaDadaDto.getValorData()!=null) {
-									mdadaRes.setValorData(Utils.dateJavaToLocalDateTime(metaDadaDto.getValorData()));
-								}
-								mdadaRes.setValorBoolea(metaDadaDto.getValorBoolea());
-								
-								mdadaRes.setEnviable(metaDadaDto.isEnviable());
-								mdadaRes.setMetadadaArxiu(metaDadaDto.getMetadadaArxiu());
-								mdadaRes.setDescripcio(metaDadaDto.getDescripcio());
-								mdadaRes.setActiva(metaDadaDto.isActiva());
-								
-								if (metaDadaDto.getDomini()!=null) {
-									mdadaRes.setDomini(ResourceReference.toResourceReference(
-											metaDadaDto.getDomini().getId(),
-											metaDadaDto.getDomini().getCodi()));
-								}
-								
-								metaDadesImportats.add(mdadaRes);
+								metaDadesImportats.add(toMetaDadaResource(metaDadaDto));
 							}
 						}
 						target.setMetaDadesImportats(metaDadesImportats);
@@ -771,6 +790,20 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 				OrganGestorEntity ogEntity	= organGestorRepository.findByEntitatIdAndCodi(entitat.getId(), organActualCodi);
 				
 				if (params.getProcediment()==null) {
+					
+					//Comprovar que no existeix un altre expedient amb el mateix codi SIA
+					List<MetaExpedientEntity> altresSIA = metaExpedientRepository.findByEntitatAndClassificacioOrderByNomAsc(
+							entitat,
+							params.getClassificacio());
+
+					if (altresSIA!=null && altresSIA.size()>0) {
+						throw new ActionExecutionException(
+								getResourceClass(),
+								null,
+								code,
+								messageHelper.getMessage("metaexpedient.import.form.validation.codisia.repetit"));
+					}
+
 					metaExpedientHelper.createFromImport(
 							entitat.getId(),
 							resourceToExportDto(params),
@@ -792,8 +825,53 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 		}
     }
     
+    private MetaDadaDto toMetaDadaDto(MetaDadaResource metaDadaResource) {
+		MetaDadaDto mdadaDto = new MetaDadaDto();
+		
+		mdadaDto.setCodi(metaDadaResource.getCodi());
+		mdadaDto.setNom(metaDadaResource.getNom());
+		mdadaDto.setTipus(metaDadaResource.getTipus());
+		mdadaDto.setMultiplicitat(metaDadaResource.getMultiplicitat());
+		
+		mdadaDto.setValorString(metaDadaResource.getValorString());
+		mdadaDto.setValorSencer(metaDadaResource.getValorSencer());
+		mdadaDto.setValorImport(metaDadaResource.getValorImport());
+		mdadaDto.setValorFlotant(metaDadaResource.getValorFlotant());
+		if (metaDadaResource.getValorData()!=null) {
+			mdadaDto.setValorData(Utils.localDateTimeToDateJava(metaDadaResource.getValorData()));
+		}
+		mdadaDto.setValorBoolea(metaDadaResource.getValorBoolea());
+		
+		mdadaDto.setEnviable(metaDadaResource.isEnviable());
+		mdadaDto.setMetadadaArxiu(metaDadaResource.getMetadadaArxiu());
+		mdadaDto.setDescripcio(metaDadaResource.getDescripcio());
+		mdadaDto.setActiva(metaDadaResource.isActiva());
+		
+		if (metaDadaResource.getDomini()!=null) {
+			DominiDto dominiDto = new DominiDto();
+			dominiDto.setId(metaDadaResource.getDomini().getId());
+			dominiDto.setCodi(metaDadaResource.getDomini().getDescription());
+			mdadaDto.setDomini(dominiDto);
+		}
+		
+		return mdadaDto;
+    }
+    
+    private boolean isMetadadaDescartada(List<MetaDadaResource> metaDadesImportacioList, Long idMetadada) {
+    	if (metaDadesImportacioList!=null) {
+    		for (MetaDadaResource metaDadaResource: metaDadesImportacioList) {
+    			if (metaDadaResource.getId().equals(idMetadada) && !metaDadaResource.isImportar()) {
+    				return true;
+    			}
+    		}
+    	}
+    	return false;
+    }
+    
     private MetaExpedientExportDto resourceToExportDto(ImportarFitxerFormAction metaExpedientExport) {
     	MetaExpedientExportDto target = new MetaExpedientExportDto();
+    	
+    	target.setCodi(metaExpedientExport.getCodi());
     	
 		target.setTipusClassificacio(metaExpedientExport.getTipusClassificacio());
 		target.setClassificacio(metaExpedientExport.getClassificacio());
@@ -815,66 +893,248 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 		List<MetaDocumentDto> metaDocuments = new ArrayList<MetaDocumentDto>();
 		if (metaExpedientExport.getMetaDocumentsImportats()!=null) {
 			
-			for (MetaDocumentResource metaDocumentDto: metaExpedientExport.getMetaDocumentsImportats()) {
+			for (MetaDocumentResource metaDocumentResource: metaExpedientExport.getMetaDocumentsImportats()) {
 				
-				if (metaDocumentDto.isImportar()) {
+				if (metaDocumentResource.isImportar()) {
 					
-					MetaDocumentDto mdRes = new MetaDocumentDto();
+					MetaDocumentDto metaDocumentDto = new MetaDocumentDto();
 					//Dades generals
-					mdRes.setCodi(metaDocumentDto.getCodi());
-					mdRes.setNom(metaDocumentDto.getNom());
-					mdRes.setDescripcio(metaDocumentDto.getDescripcio());
-					mdRes.setMultiplicitat(metaDocumentDto.getMultiplicitat());
-					mdRes.setActiu(metaDocumentDto.isActiu());
+					metaDocumentDto.setCodi(metaDocumentResource.getCodi());
+					metaDocumentDto.setNom(metaDocumentResource.getNom());
+					metaDocumentDto.setDescripcio(metaDocumentResource.getDescripcio());
+					metaDocumentDto.setMultiplicitat(metaDocumentResource.getMultiplicitat());
+					metaDocumentDto.setActiu(metaDocumentResource.isActiu());
 					//Dades NTI
-					mdRes.setNtiOrigen(metaDocumentDto.getNtiOrigen());
-					mdRes.setNtiTipoDocumental(metaDocumentDto.getNtiTipoDocumental());
-					mdRes.setNtiEstadoElaboracion(metaDocumentDto.getNtiEstadoElaboracion());
+					metaDocumentDto.setNtiOrigen(metaDocumentResource.getNtiOrigen());
+					metaDocumentDto.setNtiTipoDocumental(metaDocumentResource.getNtiTipoDocumental());
+					metaDocumentDto.setNtiEstadoElaboracion(metaDocumentResource.getNtiEstadoElaboracion());
 					//Dades firma
-					mdRes.setFirmaPortafirmesActiva(metaDocumentDto.isFirmaPortafirmesActiva());
-					mdRes.setPortafirmesFluxTipus(metaDocumentDto.getPortafirmesFluxTipus());
+					metaDocumentDto.setFirmaPortafirmesActiva(metaDocumentResource.isFirmaPortafirmesActiva());
+					metaDocumentDto.setPortafirmesFluxTipus(metaDocumentResource.getPortafirmesFluxTipus());
 					//Usuaris resposables de firma SIMPLE
-					if (MetaDocumentFirmaFluxTipusEnumDto.SIMPLE.equals(mdRes.getPortafirmesFluxTipus())) {
-						mdRes.setPortafirmesSequenciaTipus(metaDocumentDto.getPortafirmesSequenciaTipus());
-						if (metaDocumentDto.getPortafirmesResponsables()!=null && metaDocumentDto.getPortafirmesResponsables().size()>0) {
-							String[] portafirmesResponsables = metaDocumentDto.getPortafirmesResponsables().stream()
+					if (MetaDocumentFirmaFluxTipusEnumDto.SIMPLE.equals(metaDocumentDto.getPortafirmesFluxTipus())) {
+						metaDocumentDto.setPortafirmesSequenciaTipus(metaDocumentResource.getPortafirmesSequenciaTipus());
+						if (metaDocumentResource.getPortafirmesResponsables()!=null && metaDocumentResource.getPortafirmesResponsables().size()>0) {
+							String[] portafirmesResponsables = metaDocumentResource.getPortafirmesResponsables().stream()
 							        .map(ResourceReference::getId)
 							        .toArray(String[]::new);
-							mdRes.setPortafirmesResponsables(portafirmesResponsables);
+							metaDocumentDto.setPortafirmesResponsables(portafirmesResponsables);
 						}
 					}
-					if (MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB.equals(mdRes.getPortafirmesFluxTipus())) {
-						if (metaDocumentDto.getFluxosFirma()!=null && metaDocumentDto.getFluxosFirma().size()>0) {
-							String[] fluxosFirma = metaDocumentDto.getFluxosFirma().stream()
+					if (MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB.equals(metaDocumentDto.getPortafirmesFluxTipus())) {
+						if (metaDocumentResource.getFluxosFirma()!=null && metaDocumentResource.getFluxosFirma().size()>0) {
+							String[] fluxosFirma = metaDocumentResource.getFluxosFirma().stream()
 							        .map(ResourceReference::getDescription)
 							        .toArray(String[]::new);
-							mdRes.setPortafirmesFluxosId(fluxosFirma);
+							metaDocumentDto.setPortafirmesFluxosId(fluxosFirma);
 						}
 					}
 					//Firma Navegador
-					mdRes.setFirmaPassarelaActiva(metaDocumentDto.isFirmaPassarelaActiva());
+					metaDocumentDto.setFirmaPassarelaActiva(metaDocumentResource.isFirmaPassarelaActiva());
 					//ViaFirma
-					mdRes.setFirmaBiometricaActiva(metaDocumentDto.isFirmaBiometricaActiva());
-					mdRes.setBiometricaLectura(metaDocumentDto.isBiometricaLectura());
+					metaDocumentDto.setFirmaBiometricaActiva(metaDocumentResource.isFirmaBiometricaActiva());
+					metaDocumentDto.setBiometricaLectura(metaDocumentResource.isBiometricaLectura());
 					//PINBAL
-					mdRes.setPinbalActiu(metaDocumentDto.isPinbalActiu());
-					if (metaDocumentDto.isPinbalActiu() && metaDocumentDto.getPinbalServei()!=null) {
+					metaDocumentDto.setPinbalActiu(metaDocumentResource.isPinbalActiu());
+					if (metaDocumentResource.isPinbalActiu() && metaDocumentResource.getPinbalServei()!=null) {
 						PinbalServeiDto pinbalServeiDto = new PinbalServeiDto();
-						pinbalServeiDto.setId(metaDocumentDto.getPinbalServei().getId());
-						pinbalServeiDto.setCodi(metaDocumentDto.getPinbalServei().getDescription());
-						mdRes.setPinbalServei(pinbalServeiDto);
+						pinbalServeiDto.setId(metaDocumentResource.getPinbalServei().getId());
+						pinbalServeiDto.setCodi(metaDocumentResource.getPinbalServei().getDescription());
+						metaDocumentDto.setPinbalServei(pinbalServeiDto);
 					}
-					mdRes.setPinbalFinalitat(metaDocumentDto.getPinbalFinalitat());
-					mdRes.setPinbalUtilitzarCifOrgan(metaDocumentDto.isPinbalUtilitzarCifOrgan());
+					metaDocumentDto.setPinbalFinalitat(metaDocumentResource.getPinbalFinalitat());
+					metaDocumentDto.setPinbalUtilitzarCifOrgan(metaDocumentResource.isPinbalUtilitzarCifOrgan());
 					
-					metaDocuments.add(mdRes);
+					//Meta-dades del meta-document
+					List<MetaDadaDto> metaDadesDocument = new ArrayList<MetaDadaDto>();
+					if (metaDocumentResource.getMetaDadesImportacio()!=null) {
+						for (MetaDadaResource metaDadaDocumentResource: metaDocumentResource.getMetaDadesImportacio()) {
+							//La metadada del document, no ha de haver estat descartada de la importació
+							if (!isMetadadaDescartada(metaExpedientExport.getMetaDadesImportats(), metaDadaDocumentResource.getId())) {
+								metaDadesDocument.add(toMetaDadaDto(metaDadaDocumentResource));
+							}
+						}
+					}
+					metaDocumentDto.setMetaDades(metaDadesDocument);
+					
+					metaDocuments.add(metaDocumentDto);
 				} //Fi IF importar...
 			} //Fi bucle documents
 		} //Fi IF documents...
 		
 		target.setMetaDocuments(metaDocuments);
 		
+		/**
+		 * META-DADES
+		 */
+		List<MetaDadaDto> metaDadesImportats = new ArrayList<MetaDadaDto>();
+		if (metaExpedientExport.getMetaDadesImportats()!=null) {
+			
+			for (MetaDadaResource metaDadaResource: metaExpedientExport.getMetaDadesImportats()) {
+			
+				if (metaDadaResource.isImportar()) {
+					metaDadesImportats.add(toMetaDadaDto(metaDadaResource));
+				}
+			}
+		}
+		target.setMetaDades(metaDadesImportats);
+		
+		/**
+		 * ESTATS
+		 */
+		Set<ExpedientEstatDto> estatsImportats = new HashSet<ExpedientEstatDto>();
+		if (metaExpedientExport.getEstats()!=null) {
+			
+			for (MetaExpedientEstatResource estatResource: metaExpedientExport.getEstatsImportats()) {
+				
+				if (estatResource.isImportar()) {
+				
+					ExpedientEstatDto estatDto = new ExpedientEstatDto();
+					
+					estatDto.setCodi(estatResource.getCodi());
+					estatDto.setNom(estatResource.getNom());
+					estatDto.setOrdre(estatResource.getOrdre());
+					estatDto.setColor(estatResource.getColor());
+					estatDto.setInicial(estatResource.isInicial());
+					
+					if (estatResource.getResponsable()!=null) {
+						estatDto.setResponsableCodi(estatResource.getResponsable().getId());
+					}
+					
+					estatsImportats.add(estatDto);
+				}
+			}
+		}
+		target.setEstats(estatsImportats);
+		
+		/**
+		 * TASQUES
+		 */
+		Set<MetaExpedientTascaDto> tasquesImportats = new HashSet<MetaExpedientTascaDto>();
+		if (metaExpedientExport.getTasquesImportats()!=null) {
+			
+			for (MetaExpedientTascaResource tascaResource: metaExpedientExport.getTasquesImportats()) {
+				
+				if (tascaResource.isImportar()) {
+				
+					MetaExpedientTascaDto tascaDto = new MetaExpedientTascaDto();
+					
+					tascaDto.setCodi(tascaResource.getCodi());
+					tascaDto.setNom(tascaResource.getNom());
+					if (tascaResource.getResponsable()!=null) {
+						tascaDto.setResponsable(tascaResource.getResponsable().getId());
+					}
+					tascaDto.setDuracio(tascaResource.getDuracio());
+					tascaDto.setDescripcio(tascaResource.getDescripcio());
+					tascaDto.setPrioritat(tascaResource.getPrioritat());
+					if (tascaResource.getEstatCrearTasca()!=null) {
+						tascaDto.setEstatIdCrearTasca(tascaResource.getEstatCrearTasca().getId());
+						tascaDto.setEstatNomCrearTasca(tascaResource.getEstatCrearTasca().getDescription());
+					}
+					if (tascaResource.getEstatFinalitzarTasca()!=null) {
+						tascaDto.setEstatIdFinalitzarTasca(tascaResource.getEstatFinalitzarTasca().getId());
+						tascaDto.setEstatNomFinalitzarTasca(tascaResource.getEstatFinalitzarTasca().getDescription());
+					}
+					
+					if (tascaResource.getValidacionsImportacio()!=null) {
+						List<MetaExpedientTascaValidacioDto> validacionsImportacio = new ArrayList<MetaExpedientTascaValidacioDto>();
+						for (MetaExpedientTascaValidacioResource tascaValidacioResource: tascaResource.getValidacionsImportacio()) {
+							
+							//El item de la validació (document o metadada) no ha de haver estat exclòs de la importació
+							if (!elementValidacioExclos(
+									tascaValidacioResource.getItemValidacio(),
+									tascaValidacioResource.getItemId(),
+									metaExpedientExport.getMetaDocumentsImportats(),
+									metaExpedientExport.getMetaDadesImportats())) {
+
+								MetaExpedientTascaValidacioDto tascaValidacioDto = new MetaExpedientTascaValidacioDto();
+								
+								tascaValidacioDto.setItemValidacio(tascaValidacioResource.getItemValidacio());
+								tascaValidacioDto.setTipusValidacio(tascaValidacioResource.getTipusValidacio());
+								tascaValidacioDto.setItemId(tascaValidacioResource.getItemId());
+								tascaValidacioDto.setActiva(tascaValidacioResource.isActiva());
+								
+								validacionsImportacio.add(tascaValidacioDto);
+							}
+						}
+						tascaDto.setValidacions(validacionsImportacio);
+					}
+					
+					tasquesImportats.add(tascaDto);
+				}
+			}
+		}
+		target.setTasques(tasquesImportats);
+		
+		/**
+		 * GRUPS
+		 */
+		List<GrupDto> grupsImportats = new ArrayList<GrupDto>();
+		if (metaExpedientExport.getGrupsImportats()!=null) {
+			for (GrupResource grupResource: metaExpedientExport.getGrupsImportats()) {
+				
+				GrupDto grupDto = new GrupDto();
+				
+				grupDto.setCodi(grupResource.getCodi());
+				grupDto.setDescripcio(grupResource.getDescripcio());
+				
+				grupsImportats.add(grupDto);
+			}
+		}
+		target.setGrups(grupsImportats);
+		target.setGrupsCount(grupsImportats.size());
+		
+		/**
+		 * CARPETES PER DEFECTE
+		 */
+		List<MetaExpedientCarpetaMinDto> carpetesImportats = new ArrayList<MetaExpedientCarpetaMinDto>();
+		if (metaExpedientExport.getCarpetesImportats()!=null) {
+			for (MetaExpedientCarpetaResource carpetaMetaExpResource: metaExpedientExport.getCarpetesImportats()) {
+				MetaExpedientCarpetaMinDto carpetaDto = new MetaExpedientCarpetaMinDto();
+				carpetaDto.setId(carpetaMetaExpResource.getId());
+				carpetaDto.setNom(carpetaMetaExpResource.getNom());
+				if (carpetaMetaExpResource.getPare()!=null) {
+					MetaExpedientCarpetaMinDto pare = new MetaExpedientCarpetaMinDto();
+					pare.setId(carpetaMetaExpResource.getPare().getId());
+					pare.setNom(carpetaMetaExpResource.getPare().getDescription());
+					carpetaDto.setPare(pare);
+				}
+				
+				carpetesImportats.add(carpetaDto);
+			}
+		}
+		target.setCarpetes(carpetesImportats);
+		
     	return target;
+    }
+    
+    private boolean elementValidacioExclos(
+    		ItemValidacioTascaEnum itemValidacio,
+    		Long itemId,
+    		List<MetaDocumentResource> metaDocumentsImportats,
+    		List<MetaDadaResource> metaDadesImportats) {
+    	switch (itemValidacio) {
+		case DADA:
+			if (metaDadesImportats!=null) {
+				for (MetaDadaResource metaDada: metaDadesImportats) {
+					if (metaDada.getId().equals(itemId) && !metaDada.isImportar()) {
+						return true;
+					}
+				}
+			}
+			break;
+
+		case DOCUMENT:
+			if (metaDocumentsImportats!=null) {
+				for (MetaDocumentResource metaDoc: metaDocumentsImportats) {
+					if (metaDoc.getId().equals(itemId) && !metaDoc.isImportar()) {
+						return true;
+					}
+				}
+			}			
+			break;
+		}
+    	return false;
     }
     
     private class CrearReglaActionExecutor implements ActionExecutor<MetaExpedientResourceEntity, Serializable, Serializable> {
