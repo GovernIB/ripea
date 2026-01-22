@@ -57,15 +57,27 @@ import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ReportFileType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.CrearReglaResponseDto;
+import es.caib.ripea.service.intf.dto.ExpedientEstatDto;
+import es.caib.ripea.service.intf.dto.GrupDto;
+import es.caib.ripea.service.intf.dto.MetaDadaDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentDto;
+import es.caib.ripea.service.intf.dto.MetaDocumentFirmaFluxTipusEnumDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientCarpetaMinDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientExportDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientRevisioEstatEnumDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientTascaDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientTascaValidacioDto;
 import es.caib.ripea.service.intf.dto.PermisDto;
 import es.caib.ripea.service.intf.dto.ProcedimentDto;
 import es.caib.ripea.service.intf.dto.StatusEnumDto;
 import es.caib.ripea.service.intf.dto.TipusClassificacioEnumDto;
 import es.caib.ripea.service.intf.model.EntitatResource;
+import es.caib.ripea.service.intf.model.GrupResource;
+import es.caib.ripea.service.intf.model.MetaDadaResource;
+import es.caib.ripea.service.intf.model.MetaDocumentFluxPortafibResource;
 import es.caib.ripea.service.intf.model.MetaDocumentResource;
+import es.caib.ripea.service.intf.model.MetaExpedientCarpetaResource;
+import es.caib.ripea.service.intf.model.MetaExpedientEstatResource;
 import es.caib.ripea.service.intf.model.MetaExpedientResource;
 import es.caib.ripea.service.intf.model.MetaExpedientResource.DesVincularGrupFormAction;
 import es.caib.ripea.service.intf.model.MetaExpedientResource.ImportarFitxerFormAction;
@@ -73,6 +85,8 @@ import es.caib.ripea.service.intf.model.MetaExpedientResource.ImportarRolsacForm
 import es.caib.ripea.service.intf.model.MetaExpedientResource.RevisioChangeFormAction;
 import es.caib.ripea.service.intf.model.MetaExpedientResource.ToggleReglaRolsacFormAction;
 import es.caib.ripea.service.intf.model.MetaExpedientResource.VincularGrupFormAction;
+import es.caib.ripea.service.intf.model.MetaExpedientTascaResource;
+import es.caib.ripea.service.intf.model.MetaExpedientTascaValidacioResource;
 import es.caib.ripea.service.intf.model.MetaNodeResource;
 import es.caib.ripea.service.intf.model.OrganGestorResource;
 import es.caib.ripea.service.intf.model.UsuariResource;
@@ -486,7 +500,9 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 						
 						MetaExpedientExportDto metaExpedientExport = objectMapper.readValue(jsonString, MetaExpedientExportDto.class);
 						
-						//Convertir MetaExpedientExportDto a MetaExpedientResource
+						/**
+						 * DADES GENERALS
+						 */
 						target.setTipusClassificacio(metaExpedientExport.getTipusClassificacio());
 						target.setClassificacio(metaExpedientExport.getClassificacio());
 						target.setNom(metaExpedientExport.getNom());
@@ -502,41 +518,233 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 						}
 						target.setExpressioNumero(metaExpedientExport.getExpressioNumero());
 
+						/**
+						 * META-DOCUMENTS
+						 */
 						List<MetaDocumentResource> metaDocumentsImportats = new ArrayList<MetaDocumentResource>();
 						if (metaExpedientExport.getMetaDocuments()!=null) {
 							for (MetaDocumentDto metaDocumentDto: metaExpedientExport.getMetaDocuments()) {
 								MetaDocumentResource mdRes = new MetaDocumentResource();
+								//Dades generals
 								mdRes.setCodi(metaDocumentDto.getCodi());
 								mdRes.setNom(metaDocumentDto.getNom());
 								mdRes.setDescripcio(metaDocumentDto.getDescripcio());
 								mdRes.setMultiplicitat(metaDocumentDto.getMultiplicitat());
+								mdRes.setActiu(metaDocumentDto.isActiu());
+								//Dades NTI
 								mdRes.setNtiOrigen(metaDocumentDto.getNtiOrigen());
 								mdRes.setNtiTipoDocumental(metaDocumentDto.getNtiTipoDocumental());
 								mdRes.setNtiEstadoElaboracion(metaDocumentDto.getNtiEstadoElaboracion());
+								//Dades firma
+								mdRes.setFirmaPortafirmesActiva(metaDocumentDto.isFirmaPortafirmesActiva());
 								mdRes.setPortafirmesFluxTipus(metaDocumentDto.getPortafirmesFluxTipus());
-								if (metaDocumentDto.getPortafirmesResponsables()!=null) {
-									List<ResourceReference<UsuariResource, String>> portafirmesResponsables = new ArrayList<ResourceReference<UsuariResource, String>>();
-									for (String pfResp: metaDocumentDto.getPortafirmesResponsables()) {
-										UsuariResourceEntity usu = usuariResourceRepository.findById(pfResp).orElse(null);
-										if (usu!=null) {
-											portafirmesResponsables.add(ResourceReference.toResourceReference(
-													usu.getCodi(), 
-													usu.getNom()));
-										} else {
-											List<DadesUsuari> usuarisPlugin = pluginHelper.findAmbFiltre(pfResp);
-											if (usuarisPlugin!=null && usuarisPlugin.size()==1) {
+								if (MetaDocumentFirmaFluxTipusEnumDto.SIMPLE.equals(mdRes.getPortafirmesFluxTipus())) {
+									mdRes.setPortafirmesSequenciaTipus(metaDocumentDto.getPortafirmesSequenciaTipus());
+									if (metaDocumentDto.getPortafirmesResponsables()!=null) {
+										List<ResourceReference<UsuariResource, String>> portafirmesResponsables = new ArrayList<ResourceReference<UsuariResource, String>>();
+										for (String pfResp: metaDocumentDto.getPortafirmesResponsables()) {
+											UsuariResourceEntity usu = usuariResourceRepository.findById(pfResp).orElse(null);
+											if (usu!=null) {
 												portafirmesResponsables.add(ResourceReference.toResourceReference(
-														usuarisPlugin.get(0).getCodi(), 
-														usuarisPlugin.get(0).getNomSencer()));
+														usu.getCodi(), 
+														usu.getNom()));
+											} else {
+												List<DadesUsuari> usuarisPlugin = pluginHelper.findAmbFiltre(pfResp);
+												if (usuarisPlugin!=null && usuarisPlugin.size()==1) {
+													portafirmesResponsables.add(ResourceReference.toResourceReference(
+															usuarisPlugin.get(0).getCodi(), 
+															usuarisPlugin.get(0).getNomSencer()));
+												}
 											}
 										}
+										mdRes.setPortafirmesResponsables(portafirmesResponsables);
 									}
-									mdRes.setPortafirmesResponsables(portafirmesResponsables);
 								}
+								if (MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB.equals(mdRes.getPortafirmesFluxTipus())) {
+									if (metaDocumentDto.getPortafirmesFluxosId()!=null) {
+										List<ResourceReference<MetaDocumentFluxPortafibResource, Long>> fluxosFirma = new ArrayList<ResourceReference<MetaDocumentFluxPortafibResource, Long>>();
+										for (String pfFluxId: metaDocumentDto.getPortafirmesFluxosId()) {
+											fluxosFirma.add(ResourceReference.toResourceReference(
+													0l, 
+													pfFluxId));
+										}
+										mdRes.setFluxosFirma(fluxosFirma);
+									}
+								}
+								
+								//Firma Navegador
+								mdRes.setFirmaPassarelaActiva(metaDocumentDto.isFirmaPassarelaActiva());
+								//ViaFirma
+								mdRes.setFirmaBiometricaActiva(metaDocumentDto.isFirmaBiometricaActiva());
+								mdRes.setBiometricaLectura(metaDocumentDto.isBiometricaLectura());
+								//PINBAL
+								mdRes.setPinbalActiu(metaDocumentDto.isPinbalActiu());
+								if (metaDocumentDto.isPinbalActiu() && metaDocumentDto.getPinbalServei()!=null) {
+									mdRes.setPinbalServei(ResourceReference.toResourceReference(
+											metaDocumentDto.getPinbalServei().getId(), 
+											metaDocumentDto.getPinbalServei().getCodi()));
+								}
+								mdRes.setPinbalFinalitat(metaDocumentDto.getPinbalFinalitat());
+								mdRes.setPinbalUtilitzarCifOrgan(metaDocumentDto.isPinbalUtilitzarCifOrgan());
+								
 								metaDocumentsImportats.add(mdRes);
 							}
 						}
 						target.setMetaDocumentsImportats(metaDocumentsImportats);
+						
+						/**
+						 * META-DADES
+						 */
+						List<MetaDadaResource> metaDadesImportats = new ArrayList<MetaDadaResource>();
+						if (metaExpedientExport.getMetaDades()!=null) {
+							for (MetaDadaDto metaDadaDto: metaExpedientExport.getMetaDades()) {
+								MetaDadaResource mdadaRes = new MetaDadaResource();
+								
+								mdadaRes.setCodi(metaDadaDto.getCodi());
+								mdadaRes.setNom(metaDadaDto.getNom());
+								mdadaRes.setTipus(metaDadaDto.getTipus());
+								mdadaRes.setMultiplicitat(metaDadaDto.getMultiplicitat());
+								
+								mdadaRes.setValorString(metaDadaDto.getValorString());
+								mdadaRes.setValorSencer(metaDadaDto.getValorSencer());
+								mdadaRes.setValorImport(metaDadaDto.getValorImport());
+								mdadaRes.setValorFlotant(metaDadaDto.getValorFlotant());
+								if (metaDadaDto.getValorData()!=null) {
+									mdadaRes.setValorData(Utils.dateJavaToLocalDateTime(metaDadaDto.getValorData()));
+								}
+								mdadaRes.setValorBoolea(metaDadaDto.getValorBoolea());
+								
+								mdadaRes.setEnviable(metaDadaDto.isEnviable());
+								mdadaRes.setMetadadaArxiu(metaDadaDto.getMetadadaArxiu());
+								mdadaRes.setDescripcio(metaDadaDto.getDescripcio());
+								mdadaRes.setActiva(metaDadaDto.isActiva());
+								
+								if (metaDadaDto.getDomini()!=null) {
+									mdadaRes.setDomini(ResourceReference.toResourceReference(
+											metaDadaDto.getDomini().getId(),
+											metaDadaDto.getDomini().getCodi()));
+								}
+								
+								metaDadesImportats.add(mdadaRes);
+							}
+						}
+						target.setMetaDadesImportats(metaDadesImportats);
+						
+						/**
+						 * ESTATS
+						 */
+						List<MetaExpedientEstatResource> estatsImportats = new ArrayList<MetaExpedientEstatResource>();
+						if (metaExpedientExport.getEstats()!=null) {
+							for (ExpedientEstatDto estatDto: metaExpedientExport.getEstats()) {
+								MetaExpedientEstatResource estatResource = new MetaExpedientEstatResource();
+								
+								estatResource.setCodi(estatDto.getCodi());
+								estatResource.setNom(estatDto.getNom());
+								estatResource.setOrdre(estatDto.getOrdre());
+								estatResource.setColor(estatDto.getColor());
+								estatResource.setInicial(estatDto.isInicial());
+								
+								if (estatDto.getResponsableCodi()!=null) {
+									UsuariResourceEntity usu = usuariResourceRepository.findById(estatDto.getResponsableCodi()).orElse(null);
+									if (usu!=null) {
+										estatResource.setResponsable(ResourceReference.toResourceReference(
+												usu.getCodi(), 
+												usu.getNom()));
+									}
+								}
+								
+								estatsImportats.add(estatResource);
+							}
+						}
+						target.setEstatsImportats(estatsImportats);
+						
+						/**
+						 * TASQUES
+						 */
+						List<MetaExpedientTascaResource> tasquesImportats = new ArrayList<MetaExpedientTascaResource>();
+						if (metaExpedientExport.getTasques()!=null) {
+							for (MetaExpedientTascaDto tascaDto: metaExpedientExport.getTasques()) {
+								MetaExpedientTascaResource tascaResource = new MetaExpedientTascaResource();
+								
+								tascaResource.setCodi(tascaDto.getCodi());
+								tascaResource.setNom(tascaDto.getNom());
+								if (tascaDto.getResponsable()!=null) {
+									UsuariResourceEntity usu = usuariResourceRepository.findById(tascaDto.getResponsable()).orElse(null);
+									if (usu!=null) {
+										tascaResource.setResponsable(ResourceReference.toResourceReference(
+												usu.getCodi(), 
+												usu.getNom()));
+									}
+								}
+								tascaResource.setDuracio(tascaDto.getDuracio());
+								tascaResource.setDescripcio(tascaDto.getDescripcio());
+								tascaResource.setPrioritat(tascaDto.getPrioritat());
+								if (tascaDto.getEstatIdCrearTasca()!=null) {
+									tascaResource.setEstatCrearTasca(ResourceReference.toResourceReference(
+											tascaDto.getEstatIdCrearTasca(), 
+											"Tasca inicial id "+tascaDto.getEstatIdCrearTasca()));
+								}
+								if (tascaDto.getEstatIdFinalitzarTasca()!=null) {
+									tascaResource.setEstatFinalitzarTasca(ResourceReference.toResourceReference(
+											tascaDto.getEstatIdFinalitzarTasca(), 
+											"Tasca final id "+tascaDto.getEstatIdFinalitzarTasca()));
+								}
+								
+								if (tascaDto.getValidacions()!=null) {
+									List<MetaExpedientTascaValidacioResource> validacionsImportacio = new ArrayList<MetaExpedientTascaValidacioResource>();
+									for (MetaExpedientTascaValidacioDto tascaValidacioDto: tascaDto.getValidacions()) {
+										MetaExpedientTascaValidacioResource validacioResource = new MetaExpedientTascaValidacioResource();
+										
+										validacioResource.setItemValidacio(tascaValidacioDto.getItemValidacio());
+										validacioResource.setTipusValidacio(tascaValidacioDto.getTipusValidacio());
+										validacioResource.setItemId(tascaValidacioDto.getItemId());
+										validacioResource.setActiva(tascaValidacioDto.isActiva());
+										
+										validacionsImportacio.add(validacioResource);
+									}
+									tascaResource.setValidacionsImportacio(validacionsImportacio);
+								}
+								
+								tasquesImportats.add(tascaResource);
+							}
+						}
+						target.setTasquesImportats(tasquesImportats);
+						
+						/**
+						 * GRUPS
+						 */
+						List<GrupResource> grupsImportats = new ArrayList<GrupResource>();
+						if (metaExpedientExport.getGrups()!=null) {
+							for (GrupDto grupDto: metaExpedientExport.getGrups()) {
+								GrupResource grupResource = new GrupResource();
+								
+								grupResource.setCodi(grupDto.getCodi());
+								grupResource.setDescripcio(grupDto.getDescripcio());
+								
+								grupsImportats.add(grupResource);
+							}
+						}
+						target.setGrupsImportats(grupsImportats);
+						
+						/**
+						 * CARPETES PER DEFECTE
+						 */
+						List<MetaExpedientCarpetaResource> carpetesImportats = new ArrayList<MetaExpedientCarpetaResource>();
+						if (metaExpedientExport.getCarpetes()!=null) {
+							for (MetaExpedientCarpetaMinDto carpetaDto: metaExpedientExport.getCarpetes()) {
+								MetaExpedientCarpetaResource carpetaResource = new MetaExpedientCarpetaResource();
+								
+								carpetaResource.setNom(carpetaDto.getNom());
+								if (carpetaDto.getPare()!=null) {
+									carpetaResource.setPare(ResourceReference.toResourceReference(
+											carpetaDto.getPare().getId(),
+											carpetaDto.getPare().getNom()));
+								}
+								
+								carpetesImportats.add(carpetaResource);
+							}
+						}
+						target.setCarpetesImportats(carpetesImportats);
 						
 					} catch (Exception e) {
 						excepcioLogHelper.addExcepcio("/metaExpedient/ImportarFitxerActionExecutor.onChange", e);

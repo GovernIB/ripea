@@ -11,7 +11,10 @@ import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.Transient;
 
 import javax.validation.constraints.NotNull;
+
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -40,6 +43,9 @@ public class MetaExpedientTascaResource extends BaseAuditableResource<Long> {
     @Transient private int numValidacio;
     @Transient private String estatColorCrearTasca;
     @Transient private String estatColorFinalitzarTasca;
+    
+    //Nomes per importacio de procediments
+    private List<MetaExpedientTascaValidacioResource> validacionsImportacio = new ArrayList<>();
     
     @Transient private boolean importar = true;
 }

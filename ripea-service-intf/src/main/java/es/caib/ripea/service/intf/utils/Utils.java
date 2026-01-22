@@ -340,6 +340,10 @@ public class Utils {
 		ZoneId zone = ZoneId.systemDefault();
 		return Date.from(localDateTime.atZone(zone).toInstant());
 	}
+	
+	public static LocalDateTime dateJavaToLocalDateTime(Date javaIUtilDate) {
+		return javaIUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+	}
 
 	public static String convertDateToString(
 			Date date,
