@@ -1324,6 +1324,7 @@ const translationEn = {
                 elements: "Procedure management: {{nom}}",
                 expressioNumero: "If no expression is specified, the following default will be used: {{codi}}/{{seq}}/{{any}}",
                 permisDirecte: "An entity administrator user can modify this value.",
+                responsable: "You can change the signature responsible",
                 portafirmesResponsables: "You can change the signature responsibles",
                 regla: {
                     create: "Created",

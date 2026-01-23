@@ -248,6 +248,7 @@ public class MetaExpedientResource extends MetaNodeResource {
         private List<MetaExpedientCarpetaResource> carpetesImportats = new ArrayList<>();
 
         @Transient private boolean importar;
+        @Transient private ResourceReference<UsuariResource, String> responsable;
         @Transient private List<ResourceReference<UsuariResource, String>> portafirmesResponsables;
     }
     

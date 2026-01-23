@@ -1324,6 +1324,7 @@ const translationEs = {
                 elements: "Gestión del procedimiento: {{nom}}",
                 expressioNumero: "Si no se especifica ninguna expresión se utilizará la siguiente por defecto: {{codi}}/{{seq}}/{{any}}",
                 permisDirecte: "Un usuario administrador de la entidad puede modificar este valor.",
+                responsable: "Puede cambiar el responsable de la firma",
                 portafirmesResponsables: "Puede cambiar los responsables de la firma",
                 regla: {
                     create: "Creada",

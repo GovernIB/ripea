@@ -1,7 +1,7 @@
 import {FormField, MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
 import {Alert, Grid} from "@mui/material";
 import GridFormField, {FileFormField} from "../../../components/GridFormField.tsx";
-import {useMemo, useRef} from "react";
+import {useEffect, useMemo, useRef, useState} from "react";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 import {CardData} from "../../../components/CardData.tsx";
@@ -62,7 +62,7 @@ const Item = ({ identifiator = 'codi', fieldList, element, children, label }: an
 const FieldResponsable = ({ fieldList, element, field, ...other }: any) => {
     const {t} = useTranslation()
     const {data, fields, apiRef} = useFormContext()
-    const fieldResponsables = useMemo(() => (fields?.filter(i=>i.name=="portafirmesResponsables")[0]), [fields]);
+    const fieldResponsables = useMemo(() => (fields?.filter(i=>i.name==field)[0]), [fields]);
     return <GridFormField
         xs={12}
         name={field + (element.codi ?`#${element.codi}`:'')}
@@ -75,7 +75,7 @@ const FieldResponsable = ({ fieldList, element, field, ...other }: any) => {
         }}
         disabled={!element?.importar}
         componentProps={{
-            helperText: t('page.metaExpedient.detall.portafirmesResponsables'),
+            helperText: t(`page.metaExpedient.detall.${field}`),
         }}
         {...other}
     />
@@ -187,9 +187,13 @@ function editarElemento(array, codi, cambios, identifiator = 'codi') {
             : item
     );
 }
-const ImportFitxerForm = () => {
+const ImportFitxerForm = ({ onFileChange }: any) => {
     const {t} = useTranslation()
     const {data, fieldErrors} = useFormContext()
+
+    useEffect(() => {
+        onFileChange?.(!!data?.importJson)
+    }, [onFileChange, data?.importJson]);
 
     const dataError = useMemo(() => (
         fieldErrors?.some?.(e => ![
@@ -265,19 +269,21 @@ const ImportFitxerForm = () => {
 
 const ImportFitxer = (props: any) => {
     const { t } = useTranslation();
+    const [file, setFile] = useState<boolean>(false);
 
-    return <FormActionDialog
+    return <>
+        <FormActionDialog
         resourceName={"metaExpedientResource"}
         title={t('page.metaExpedient.action.importFitxer.title')}
         action={"IMPORT_FITXER"}
-        // formDialogButtons={[
-        //     {icon: 'save', text: t('common.save'), componentProps: { variant: 'contained' }, value: true },
-        //     {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
-        // ]}
+        formDialogButtons={[
+            {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
+            {icon: 'save', text: t('common.import'), componentProps: { variant: 'contained', disabled: !file }, value: true },
+        ]}
         {...props}
     >
-        <ImportFitxerForm/>
-    </FormActionDialog>
+        <ImportFitxerForm onFileChange={setFile}/>
+    </FormActionDialog></>
 }
 
 export const useImportFitxer = (refresh?: () => void) => {
