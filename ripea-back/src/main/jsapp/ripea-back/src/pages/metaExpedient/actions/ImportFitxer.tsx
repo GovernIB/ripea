@@ -6,6 +6,7 @@ import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 import {CardData} from "../../../components/CardData.tsx";
 import TabComponent from "../../../components/TabComponent.tsx";
+import * as builder from "../../../util/springFilterUtils.ts";
 
 const Item = ({ identifiator = 'codi', fieldList, element, children, label }: any) => {
     const {data, fields, apiRef} = useFormContext()
@@ -112,6 +113,8 @@ const ImportFitxerFormMetaDocument = () => {
                         fieldList={"metaDocumentsImportats"}
                         field={"portafirmesResponsables"}
                         element={element}
+                        filter={builder.neq('nif', null)}
+                        namedQueries={[`ADD_PLUGIN_USERS`]}
                         multiple
                     />
                 }
@@ -124,14 +127,7 @@ const ImportFitxerFormMetaDades = () => {
 
     return <Grid container sx={{display: "flex", flexDirection: "row", wordWrap: "break-word"}} columnSpacing={1} rowSpacing={1}>
         {data?.metaDadesImportats?.map((element:any) =>
-            <Item fieldList={"metaDadesImportats"} element={element}>
-                <FieldResponsable
-                    fieldList={"metaDadesImportats"}
-                    field={"portafirmesResponsables"}
-                    element={element}
-                    multiple
-                />
-            </Item>
+            <Item fieldList={"metaDadesImportats"} element={element}/>
         )}
     </Grid>
 }

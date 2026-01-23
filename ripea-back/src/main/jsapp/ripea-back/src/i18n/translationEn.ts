@@ -1403,6 +1403,9 @@ const translationEn = {
                     label: "Import from file",
                     ok: "Procedure imported successfully",
                 },
+                export: {
+                    ok: "Procedure exported successfully",
+                },
             },
         },
         metaDocument: {

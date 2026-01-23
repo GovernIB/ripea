@@ -1403,6 +1403,9 @@ const translationCa = {
                     label: "Importar des de fitxer",
                     ok: "Procediment importat correctament",
                 },
+                export: {
+                    ok: "Procediment exportat correctament",
+                },
             },
         },
         metaDocument: {

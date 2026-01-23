@@ -67,7 +67,7 @@ const useReglaDistribucio = (refresh?: () => void) => {
         }
     };
 
-    const {toogleRegla} = useActions(() => refreshEntity(entity?.id))
+    const {crearRegla, toogleRegla} = useActions(() => refreshEntity(entity?.id))
     const buttons :any[] = useMemo(() => [
         {
             value: 'create',
@@ -112,7 +112,7 @@ const useReglaDistribucio = (refresh?: () => void) => {
             buttons={buttons}
             buttonCallback={(value) :void => {
                 switch (value) {
-                    case 'create':break;
+                    case 'create':crearRegla(entity?.id);break;
                     case 'active':toogleRegla(entity?.id, true);break;
                     case 'desactive':toogleRegla(entity?.id, false);break;
                     case 'close':refresh?.();handleClose();break;

@@ -84,18 +84,29 @@ export const useActions = (refresh?: () => void) => {
             });
     }
 
-    const exportar = (id:any) => {
-        apiReport(id, { code: 'REPORT_EXPORT_JSON', fileType: "JSON" })
-            .then((result) => {
-                iniciaDescargaJSON(result);
-                temporalMessageShow(null, t(''), 'success');
+    const crearRegla = (id:any) => {
+        apiAction(id, { code: 'CREAR_REGLA_ROLSAC' })
+            .then(() => {
+                refresh?.();
+                temporalMessageShow(null, t('page.metaExpedient.action.regla.create.ok'), 'success')
             })
             .catch((error) => {
                 temporalMessageShow(null, error.message, 'error');
             });
     }
 
-    return {active, desactive, exportar, defecte, llevarDefecte, toogleRegla, desvincularGrup}
+    const exportar = (id:any) => {
+        apiReport(id, { code: 'REPORT_EXPORT_JSON', fileType: "JSON" })
+            .then((result) => {
+                iniciaDescargaJSON(result);
+                temporalMessageShow(null, t('page.metaExpedient.action.export.ok'), 'success');
+            })
+            .catch((error) => {
+                temporalMessageShow(null, error.message, 'error');
+            });
+    }
+
+    return {active, desactive, exportar, defecte, llevarDefecte, crearRegla, toogleRegla, desvincularGrup}
 }
 
 export const useMetaExpedientActions = (refresh?: () => void) => {

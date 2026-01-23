@@ -1403,6 +1403,9 @@ const translationEs = {
                     label: "Importar desde fichero",
                     ok: "Procedimiento importado correctamente",
                 },
+                export: {
+                    ok: "Procedimiento exportado correctamente",
+                },
             },
         },
         metaDocument: {
