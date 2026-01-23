@@ -8,8 +8,10 @@ import com.turkraft.springfilter.FilterBuilder;
 import com.turkraft.springfilter.parser.Filter;
 
 import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientTascaResourceEntity;
+import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientTascaValidacioResourceRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.ConfigHelper;
+import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
 import es.caib.ripea.service.intf.model.EntitatResource;
 import es.caib.ripea.service.intf.model.MetaExpedientTascaResource;
 import es.caib.ripea.service.intf.model.MetaNodeResource;
@@ -23,9 +25,12 @@ import lombok.extern.slf4j.Slf4j;
 public class MetaExpedientTascaResourceServiceImpl extends BaseMutableResourceService<MetaExpedientTascaResource, Long, MetaExpedientTascaResourceEntity> implements MetaExpedientTascaResourceService {
 
 	private final ConfigHelper configHelper;
+	private final MetaExpedientTascaValidacioResourceRepository metaExpedientTascaValidacioResourceRepository;
 	
     @PostConstruct
-    public void init() {}
+    public void init() {
+    	register(MetaExpedientTascaResource.PERSPECTIVE_COUNT_VALIDACIONS,	new CountValidacionsTascaPerspectiveApplicator());
+    }
 	
     protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
     	
@@ -38,6 +43,13 @@ public class MetaExpedientTascaResourceServiceImpl extends BaseMutableResourceSe
         );
         
         return filtreBase.generate();
+    }
+    
+    private class CountValidacionsTascaPerspectiveApplicator implements PerspectiveApplicator<MetaExpedientTascaResourceEntity, MetaExpedientTascaResource> {
+		@Override
+		public void applySingle(String code, MetaExpedientTascaResourceEntity entity, MetaExpedientTascaResource resource) throws PerspectiveApplicationException {
+			resource.setNumValidacio(metaExpedientTascaValidacioResourceRepository.countByMetaExpedientTascaId(entity.getId()));
+		}
     }
 
     @Override

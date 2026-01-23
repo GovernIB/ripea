@@ -34,8 +34,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import es.caib.ripea.persistence.entity.AvisEntity;
 import es.caib.ripea.persistence.entity.DominiEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.entity.ExpedientEstatEntity;
 import es.caib.ripea.persistence.entity.GrupEntity;
+import es.caib.ripea.persistence.entity.HistoricExpedientEntity;
+import es.caib.ripea.persistence.entity.HistoricInteressatEntity;
+import es.caib.ripea.persistence.entity.HistoricUsuariEntity;
 import es.caib.ripea.persistence.entity.MetaDadaEntity;
 import es.caib.ripea.persistence.entity.MetaDocumentEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientCarpetaEntity;
@@ -46,6 +50,7 @@ import es.caib.ripea.persistence.entity.MetaExpedientSequenciaEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientTascaEntity;
 import es.caib.ripea.persistence.entity.MetaNodeEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
+import es.caib.ripea.persistence.entity.UsuariEntity;
 import es.caib.ripea.persistence.repository.AvisRepository;
 import es.caib.ripea.persistence.repository.DominiRepository;
 import es.caib.ripea.persistence.repository.ExpedientEstatRepository;
@@ -59,6 +64,10 @@ import es.caib.ripea.persistence.repository.MetaExpedientSequenciaRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientTascaRepository;
 import es.caib.ripea.persistence.repository.MetaNodeRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
+import es.caib.ripea.persistence.repository.UsuariRepository;
+import es.caib.ripea.persistence.repository.historic.HistoricExpedientRepository;
+import es.caib.ripea.persistence.repository.historic.HistoricInteressatRepository;
+import es.caib.ripea.persistence.repository.historic.HistoricUsuariRepository;
 import es.caib.ripea.service.helper.PermisosHelper.ObjectIdentifierExtractor;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.ActualitzacioInfo;
@@ -89,6 +98,8 @@ import es.caib.ripea.service.intf.dto.ProcedimentDto;
 import es.caib.ripea.service.intf.dto.ProgresActualitzacioDto;
 import es.caib.ripea.service.intf.dto.StatusEnumDto;
 import es.caib.ripea.service.intf.dto.TipusClassificacioEnumDto;
+import es.caib.ripea.service.intf.exception.ExisteixenExpedientsEsborratsException;
+import es.caib.ripea.service.intf.exception.ExisteixenExpedientsException;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.exception.SistemaExternException;
 import es.caib.ripea.service.intf.utils.Utils;
@@ -131,6 +142,10 @@ public class MetaExpedientHelper {
     @Autowired private ExpedientEstatHelper expedientEstatHelper;
 	@Autowired private GrupHelper grupHelper;
 	@Autowired private GrupRepository grupRepository;
+	@Autowired private HistoricExpedientRepository historicExpedientRepository;
+	@Autowired private HistoricInteressatRepository historicInteressatRepository;
+	@Autowired private HistoricUsuariRepository historicUsuariRepository;
+	@Autowired private UsuariRepository usuariRepository;
 
     public static final String PROCEDIMENT_ORGAN_NO_SYNC = "Hi ha procediments que pertanyen a òrgans no existents en l'organigrama actual";
     
@@ -1516,6 +1531,56 @@ public class MetaExpedientHelper {
 				metaExpedientEntity.addGrup(grup);
 			}
 		}
+	}
+	
+	public MetaExpedientEntity delete(Long entitatId, Long id, Long organId) {
+		
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
+		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarAccesMetaExpedient(entitat, id, organId, true);
+		
+		metaExpedientTascaRepository.deleteMetaExpedientTascaByMetaExpedient(metaExpedient);
+		
+		List<ExpedientEntity> expedients = expedientRepository.findByMetaExpedient(metaExpedient);
+		boolean allEsborats = true;
+		for (ExpedientEntity expedientEntity : expedients) {
+			if (expedientEntity.getEsborrat() == 0) {
+				allEsborats = false;
+			}
+		}
+		if (expedients.size() > 0) {
+			if (allEsborats) {
+				throw new ExisteixenExpedientsEsborratsException();
+			} else {
+				throw new ExisteixenExpedientsException();
+			}
+			
+		}
+			
+		//esborrar les carpetes per defecte
+		metaExpedientCarpetaHelper.removeAllCarpetes(metaExpedient);
+		
+		List<HistoricExpedientEntity> historicsExpedient = historicExpedientRepository.findByMetaExpedient(metaExpedient);
+		for (HistoricExpedientEntity historicEntity : historicsExpedient) {
+			historicExpedientRepository.delete(historicEntity);
+		}
+		List<HistoricInteressatEntity> historicsInteressats = historicInteressatRepository.findByMetaExpedient(metaExpedient);
+		for (HistoricInteressatEntity historicEntity : historicsInteressats) {
+			historicInteressatRepository.delete(historicEntity);
+		}
+		List<HistoricUsuariEntity> historicsUsuari = historicUsuariRepository.findByMetaExpedient(metaExpedient);
+		for (HistoricUsuariEntity historicEntity : historicsUsuari) {
+			historicUsuariRepository.delete(historicEntity);
+		}
+
+		// Esborra l'expedient de les preferències d'usuari per a evitar errors de FK
+		List<UsuariEntity> usuarisAmbAquestProcedient = usuariRepository.findByProcediment(metaExpedient);
+		for (UsuariEntity usuari: usuarisAmbAquestProcedient) {
+			usuari.updateProcediment(null);
+		}
+
+		metaExpedientRepository.delete(metaExpedient);
+		
+		return metaExpedient;
 	}
 	
 	private void actualitzaAvisosSyncProcediments(Map<String, String[]> avisosProcedimentsOrgans, Long entitatId) {

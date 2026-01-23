@@ -34,7 +34,7 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 	@Column(name = "tipus_classificacio", length = 3, nullable = false)
 	@Enumerated(EnumType.STRING)
     private TipusClassificacioEnumDto tipusClassificacio;
-    @Column(name = "clasif_sia", length = 30, nullable = false)
+    @Column(name = "clasif_sia", length = 46, nullable = false)
     private String classificacio;
     @Column(name = "serie_doc", length = 30, nullable = false)
     private String serieDocumental;

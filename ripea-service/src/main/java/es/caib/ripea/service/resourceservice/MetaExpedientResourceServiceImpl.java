@@ -4,6 +4,7 @@ import java.io.OutputStream;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,7 @@ import com.turkraft.springfilter.parser.Filter;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
+import es.caib.ripea.persistence.entity.MetaNodeEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.entity.resourceentity.GrupResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientResourceEntity;
@@ -55,6 +57,8 @@ import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
 import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
+import es.caib.ripea.service.intf.base.exception.ResourceNotCreatedException;
+import es.caib.ripea.service.intf.base.exception.ResourceNotFoundException;
 import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ReportFileType;
@@ -72,6 +76,7 @@ import es.caib.ripea.service.intf.dto.MetaExpedientExportDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientTascaDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientTascaValidacioDto;
+import es.caib.ripea.service.intf.dto.MetaNodeTipusEnum;
 import es.caib.ripea.service.intf.dto.OrganGestorDto;
 import es.caib.ripea.service.intf.dto.PermisDto;
 import es.caib.ripea.service.intf.dto.PinbalServeiDto;
@@ -257,13 +262,21 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
     }
     
     @Override
+    protected void beforeCreateEntity(MetaExpedientResourceEntity entity, MetaExpedientResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotCreatedException {
+    	//ORA-01400: no se puede realizar una inserción NULL en ("RIPEA10"."IPA_METANODE"."TIPUS")
+    	resource.setTipus(MetaNodeTipusEnum.EXPEDIENT);
+    	//ORA-01400: no se puede realizar una inserción NULL en ("RIPEA10"."IPA_METANODE"."ENTITAT_ID")
+		String entitatActualCodi = configHelper.getEntitatActualCodi();
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true, false);
+    	resource.setEntitat(ResourceReference.toResourceReference(entitat.getId(), entitat.getNom()));
+    }
+    
+    @Override
     protected void afterCreateSave(MetaExpedientResourceEntity entity, MetaExpedientResource resource, Map<String, AnswerRequiredException.AnswerValue> answers, boolean anyOrderChanged) {
 		if ("IPA_ORGAN_ADMIN".equals(configHelper.getRolActual())) {
-			String entitatActualCodi = configHelper.getEntitatActualCodi();
-			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true,false);
 			String organActualCodi	 = configHelper.getOrganActualCodi();
-			OrganGestorEntity ogEntity	= organGestorRepository.findByEntitatIdAndCodi(entitat.getId(), organActualCodi);
-			metaExpedientHelper.canviarRevisioADisseny(entitat.getId(), entity.getId(), ogEntity!=null?ogEntity.getId():null);
+			OrganGestorEntity ogEntity	= organGestorRepository.findByEntitatIdAndCodi(entity.getEntitat().getId(), organActualCodi);
+			metaExpedientHelper.canviarRevisioADisseny(entity.getEntitat().getId(), entity.getId(), ogEntity!=null?ogEntity.getId():null);
 		} else {
 			entity.setRevisioEstat(MetaExpedientRevisioEstatEnumDto.REVISAT);
 			if (resource.isCrearReglaDistribucio()) {
@@ -281,6 +294,18 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
     }
     
     @Override
+	public void delete(Long id, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotFoundException {
+    	
+		String entitatActualCodi = configHelper.getEntitatActualCodi();
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true, false);
+    	
+		String organActualCodi	 = configHelper.getOrganActualCodi();
+		OrganGestorEntity ogEntity	= organGestorRepository.findByEntitatIdAndCodi(entitat.getId(), organActualCodi);
+		
+		metaExpedientHelper.delete(entitat.getId(), id, ogEntity!=null?ogEntity.getId():null);
+	}
+    
+    @Override
     protected void afterUpdateSave(MetaExpedientResourceEntity entity, MetaExpedientResource resource, Map<String, AnswerRequiredException.AnswerValue> answers, boolean anyOrderChanged) {
     	
 		List<ExpedientEntity> expedients = expedientRepository.findByMetaExpedientIdAndEsborrat(entity.getId(), 0);
@@ -290,7 +315,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 		}
 		
 		String entitatActualCodi = configHelper.getEntitatActualCodi();
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true,false);
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true, false);
 		
 		if ("IPA_ORGAN_ADMIN".equals(configHelper.getRolActual())) {			
 			String organActualCodi	 = configHelper.getOrganActualCodi();
@@ -433,7 +458,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
     private class PermisosPerspectiveApplicator implements PerspectiveApplicator<MetaExpedientResourceEntity, MetaExpedientResource> {
 		@Override
 		public void applySingle(String code, MetaExpedientResourceEntity entity, MetaExpedientResource resource) throws PerspectiveApplicationException {
-			List<PermisDto> permisosGrup = permisosHelper.findPermisos(entity.getId(), MetaExpedientEntity.class); 
+			List<PermisDto> permisosGrup = permisosHelper.findPermisos(entity.getId(), MetaNodeEntity.class); 
 			resource.setNumPermisos(permisosGrup!=null?permisosGrup.size():0);
 		}
     }
@@ -501,6 +526,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 		
     	MetaDadaResource mdadaRes = new MetaDadaResource();
 		
+    	mdadaRes.setImportacioId(metaDadaDto.getId());
 		mdadaRes.setCodi(metaDadaDto.getCodi());
 		mdadaRes.setNom(metaDadaDto.getNom());
 		mdadaRes.setTipus(metaDadaDto.getTipus());
@@ -571,6 +597,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 							for (MetaDocumentDto metaDocumentDto: metaExpedientExport.getMetaDocuments()) {
 								MetaDocumentResource mdRes = new MetaDocumentResource();
 								//Dades generals
+								mdRes.setImportacioId(metaDocumentDto.getId());
 								mdRes.setCodi(metaDocumentDto.getCodi());
 								mdRes.setNom(metaDocumentDto.getNom());
 								mdRes.setDescripcio(metaDocumentDto.getDescripcio());
@@ -644,6 +671,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 								metaDocumentsImportats.add(mdRes);
 							}
 						}
+						metaDocumentsImportats.sort(Comparator.comparing(MetaDocumentResource::getNom));
 						target.setMetaDocumentsImportats(metaDocumentsImportats);
 						
 						/**
@@ -655,6 +683,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 								metaDadesImportats.add(toMetaDadaResource(metaDadaDto));
 							}
 						}
+						metaDadesImportats.sort(Comparator.comparing(MetaDadaResource::getNom));
 						target.setMetaDadesImportats(metaDadesImportats);
 						
 						/**
@@ -665,6 +694,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 							for (ExpedientEstatDto estatDto: metaExpedientExport.getEstats()) {
 								MetaExpedientEstatResource estatResource = new MetaExpedientEstatResource();
 								
+								estatResource.setImportacioId(estatDto.getId());
 								estatResource.setCodi(estatDto.getCodi());
 								estatResource.setNom(estatDto.getNom());
 								estatResource.setOrdre(estatDto.getOrdre());
@@ -683,6 +713,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 								estatsImportats.add(estatResource);
 							}
 						}
+						estatsImportats.sort(Comparator.comparing(MetaExpedientEstatResource::getNom));
 						target.setEstatsImportats(estatsImportats);
 						
 						/**
@@ -735,6 +766,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 								tasquesImportats.add(tascaResource);
 							}
 						}
+						tasquesImportats.sort(Comparator.comparing(MetaExpedientTascaResource::getNom));
 						target.setTasquesImportats(tasquesImportats);
 						
 						/**
@@ -751,6 +783,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 								grupsImportats.add(grupResource);
 							}
 						}
+						grupsImportats.sort(Comparator.comparing(GrupResource::getDescripcio));
 						target.setGrupsImportats(grupsImportats);
 						
 						/**
@@ -770,6 +803,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 								carpetesImportats.add(carpetaResource);
 							}
 						}
+						carpetesImportats.sort(Comparator.comparing(MetaExpedientCarpetaResource::getNom));
 						target.setCarpetesImportats(carpetesImportats);
 						
 					} catch (Exception e) {
@@ -857,7 +891,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 		return mdadaDto;
     }
     
-    private boolean isMetadadaDescartada(List<MetaDadaResource> metaDadesImportacioList, Long idMetadada) {
+    /*private boolean isMetadadaDescartada(List<MetaDadaResource> metaDadesImportacioList, Long idMetadada) {
     	if (metaDadesImportacioList!=null) {
     		for (MetaDadaResource metaDadaResource: metaDadesImportacioList) {
     			if (metaDadaResource.getId().equals(idMetadada) && !metaDadaResource.isImportar()) {
@@ -866,7 +900,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
     		}
     	}
     	return false;
-    }
+    }*/
     
     private MetaExpedientExportDto resourceToExportDto(ImportarFitxerFormAction metaExpedientExport) {
     	MetaExpedientExportDto target = new MetaExpedientExportDto();
@@ -950,9 +984,10 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 					if (metaDocumentResource.getMetaDadesImportacio()!=null) {
 						for (MetaDadaResource metaDadaDocumentResource: metaDocumentResource.getMetaDadesImportacio()) {
 							//La metadada del document, no ha de haver estat descartada de la importació
-							if (!isMetadadaDescartada(metaExpedientExport.getMetaDadesImportats(), metaDadaDocumentResource.getId())) {
+							//NO es necessari, les metadades dels documents van a part de les del procediment
+//							if (!isMetadadaDescartada(metaExpedientExport.getMetaDadesImportats(), metaDadaDocumentResource.getId())) {
 								metaDadesDocument.add(toMetaDadaDto(metaDadaDocumentResource));
-							}
+//							}
 						}
 					}
 					metaDocumentDto.setMetaDades(metaDadesDocument);
@@ -983,6 +1018,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 		 * ESTATS
 		 */
 		Set<ExpedientEstatDto> estatsImportats = new HashSet<ExpedientEstatDto>();
+		List<Long> estatsExclosos = new ArrayList<Long>();
 		if (metaExpedientExport.getEstats()!=null) {
 			
 			for (MetaExpedientEstatResource estatResource: metaExpedientExport.getEstatsImportats()) {
@@ -1002,6 +1038,8 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 					}
 					
 					estatsImportats.add(estatDto);
+				} else {
+					estatsExclosos.add(estatResource.getImportacioId());
 				}
 			}
 		}
@@ -1027,13 +1065,19 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 					tascaDto.setDuracio(tascaResource.getDuracio());
 					tascaDto.setDescripcio(tascaResource.getDescripcio());
 					tascaDto.setPrioritat(tascaResource.getPrioritat());
+					
+					//Al assginar estats a tasques, revisar que el estat no ha estat exclos de la importació
 					if (tascaResource.getEstatCrearTasca()!=null) {
-						tascaDto.setEstatIdCrearTasca(tascaResource.getEstatCrearTasca().getId());
-						tascaDto.setEstatNomCrearTasca(tascaResource.getEstatCrearTasca().getDescription());
+						if (!estatsExclosos.contains(tascaResource.getEstatCrearTasca().getId())) {
+								tascaDto.setEstatIdCrearTasca(tascaResource.getEstatCrearTasca().getId());
+								tascaDto.setEstatNomCrearTasca(tascaResource.getEstatCrearTasca().getDescription());
+						}
 					}
 					if (tascaResource.getEstatFinalitzarTasca()!=null) {
-						tascaDto.setEstatIdFinalitzarTasca(tascaResource.getEstatFinalitzarTasca().getId());
-						tascaDto.setEstatNomFinalitzarTasca(tascaResource.getEstatFinalitzarTasca().getDescription());
+						if (!estatsExclosos.contains(tascaResource.getEstatFinalitzarTasca().getId())) {
+							tascaDto.setEstatIdFinalitzarTasca(tascaResource.getEstatFinalitzarTasca().getId());
+							tascaDto.setEstatNomFinalitzarTasca(tascaResource.getEstatFinalitzarTasca().getDescription());
+						}
 					}
 					
 					if (tascaResource.getValidacionsImportacio()!=null) {
@@ -1117,7 +1161,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 		case DADA:
 			if (metaDadesImportats!=null) {
 				for (MetaDadaResource metaDada: metaDadesImportats) {
-					if (metaDada.getId().equals(itemId) && !metaDada.isImportar()) {
+					if (metaDada.getImportacioId().equals(itemId) && !metaDada.isImportar()) {
 						return true;
 					}
 				}
@@ -1127,7 +1171,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 		case DOCUMENT:
 			if (metaDocumentsImportats!=null) {
 				for (MetaDocumentResource metaDoc: metaDocumentsImportats) {
-					if (metaDoc.getId().equals(itemId) && !metaDoc.isImportar()) {
+					if (metaDoc.getImportacioId().equals(itemId) && !metaDoc.isImportar()) {
 						return true;
 					}
 				}

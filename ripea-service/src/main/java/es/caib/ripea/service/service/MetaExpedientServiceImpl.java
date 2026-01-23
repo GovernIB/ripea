@@ -15,16 +15,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import es.caib.ripea.persistence.entity.DominiEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.entity.ExpedientEstatEntity;
 import es.caib.ripea.persistence.entity.GrupEntity;
-import es.caib.ripea.persistence.entity.HistoricExpedientEntity;
-import es.caib.ripea.persistence.entity.HistoricInteressatEntity;
-import es.caib.ripea.persistence.entity.HistoricUsuariEntity;
-import es.caib.ripea.persistence.entity.MetaDadaEntity;
-import es.caib.ripea.persistence.entity.MetaDocumentEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientComentariEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientOrganGestorEntity;
@@ -32,32 +26,21 @@ import es.caib.ripea.persistence.entity.MetaExpedientTascaEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientTascaValidacioEntity;
 import es.caib.ripea.persistence.entity.MetaNodeEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
-import es.caib.ripea.persistence.entity.UsuariEntity;
 import es.caib.ripea.persistence.repository.ExpedientEstatRepository;
 import es.caib.ripea.persistence.repository.ExpedientRepository;
-import es.caib.ripea.persistence.repository.GrupRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientComentariRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientOrganGestorRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientTascaRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientTascaValidacioRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
-import es.caib.ripea.persistence.repository.UsuariRepository;
-import es.caib.ripea.persistence.repository.historic.HistoricExpedientRepository;
-import es.caib.ripea.persistence.repository.historic.HistoricInteressatRepository;
-import es.caib.ripea.persistence.repository.historic.HistoricUsuariRepository;
 import es.caib.ripea.service.helper.ApplicationHelper;
 import es.caib.ripea.service.helper.CacheHelper;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.ConversioTipusHelper;
 import es.caib.ripea.service.helper.DistribucioReglaHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
-import es.caib.ripea.service.helper.ExpedientEstatHelper;
-import es.caib.ripea.service.helper.GrupHelper;
 import es.caib.ripea.service.helper.MessageHelper;
-import es.caib.ripea.service.helper.MetaDadaHelper;
-import es.caib.ripea.service.helper.MetaDocumentHelper;
-import es.caib.ripea.service.helper.MetaExpedientCarpetaHelper;
 import es.caib.ripea.service.helper.MetaExpedientHelper;
 import es.caib.ripea.service.helper.MetaNodeHelper;
 import es.caib.ripea.service.helper.PaginacioHelper;
@@ -71,11 +54,7 @@ import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.ArbreDto;
 import es.caib.ripea.service.intf.dto.CrearReglaResponseDto;
 import es.caib.ripea.service.intf.dto.EntitatDto;
-import es.caib.ripea.service.intf.dto.ExpedientEstatDto;
 import es.caib.ripea.service.intf.dto.GrupDto;
-import es.caib.ripea.service.intf.dto.MetaDadaDto;
-import es.caib.ripea.service.intf.dto.MetaDadaTipusEnumDto;
-import es.caib.ripea.service.intf.dto.MetaDocumentDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientCarpetaDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientComentariDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientDto;
@@ -94,8 +73,6 @@ import es.caib.ripea.service.intf.dto.ProcedimentDto;
 import es.caib.ripea.service.intf.dto.ProgresActualitzacioDto;
 import es.caib.ripea.service.intf.dto.ReglaDistribucioDto;
 import es.caib.ripea.service.intf.dto.UsuariDto;
-import es.caib.ripea.service.intf.exception.ExisteixenExpedientsEsborratsException;
-import es.caib.ripea.service.intf.exception.ExisteixenExpedientsException;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.exception.PermissionDeniedException;
 import es.caib.ripea.service.intf.service.MetaExpedientService;
@@ -117,24 +94,14 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	@Autowired private MetaExpedientHelper metaExpedientHelper;
 	@Autowired private OrganGestorRepository organGestorRepository;
 	@Autowired private ExpedientRepository expedientRepository;
-	@Autowired private UsuariRepository usuariRepository;
-	@Autowired private MetaExpedientCarpetaHelper metaExpedientCarpetaHelper;
 	@Autowired private PluginHelper pluginHelper;
 	@Autowired private MetaExpedientOrganGestorRepository metaExpedientOrganGestorRepository;
 	@Autowired private UsuariHelper usuariHelper;
 	@Autowired private ConfigHelper configHelper;
 	@Autowired private MetaExpedientComentariRepository metaExpedientComentariRepository;
-	@Autowired private ExpedientEstatHelper expedientEstatHelper;
-	@Autowired private GrupHelper grupHelper;
-	@Autowired private GrupRepository grupRepository;
-	@Autowired private HistoricExpedientRepository historicExpedientRepository;
-	@Autowired private HistoricInteressatRepository historicInteressatRepository;
-	@Autowired private HistoricUsuariRepository historicUsuariRepository;
 	@Autowired private MetaExpedientTascaValidacioRepository metaExpedientTascaValidacioRepository;
 	@Autowired private DistribucioReglaHelper distribucioReglaHelper;
 	@Autowired private CacheHelper cacheHelper;
-	@Autowired private MetaDocumentHelper metaDocumentHelper;
-	@Autowired private MetaDadaHelper metaDadaHelper;
 	@Autowired private ApplicationHelper applicationHelper;
 
 	public static Map<String, ProgresActualitzacioDto> progresActualitzacio = new HashMap<>();
@@ -333,51 +300,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	@Override
 	public MetaExpedientDto delete(Long entitatId, Long id, Long organId) {
 		logger.debug("Esborrant meta-expedient (id=" + id + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-		MetaExpedientEntity metaExpedient;
-		metaExpedient = entityComprovarHelper.comprovarAccesMetaExpedient(entitat, id, organId, true);
-		metaExpedientTascaRepository.deleteMetaExpedientTascaByMetaExpedient(metaExpedient);
-		List<ExpedientEntity> expedients = expedientRepository.findByMetaExpedient(metaExpedient);
-		boolean allEsborats = true;
-		for (ExpedientEntity expedientEntity : expedients) {
-			if (expedientEntity.getEsborrat() == 0) {
-				allEsborats = false;
-			}
-		}
-		if (expedients.size() > 0) {
-			if (allEsborats) {
-				throw new ExisteixenExpedientsEsborratsException();
-			} else {
-				throw new ExisteixenExpedientsException();
-			}
-			
-		}
-			
-		//esborrar les carpetes per defecte
-		metaExpedientCarpetaHelper.removeAllCarpetes(metaExpedient);
-		
-		List<HistoricExpedientEntity> historicsExpedient = historicExpedientRepository.findByMetaExpedient(metaExpedient);
-		for (HistoricExpedientEntity historicEntity : historicsExpedient) {
-			historicExpedientRepository.delete(historicEntity);
-		}
-		List<HistoricInteressatEntity> historicsInteressats = historicInteressatRepository.findByMetaExpedient(metaExpedient);
-		for (HistoricInteressatEntity historicEntity : historicsInteressats) {
-			historicInteressatRepository.delete(historicEntity);
-		}
-		List<HistoricUsuariEntity> historicsUsuari = historicUsuariRepository.findByMetaExpedient(metaExpedient);
-		for (HistoricUsuariEntity historicEntity : historicsUsuari) {
-			historicUsuariRepository.delete(historicEntity);
-		}
-
-		// Esborra l'expedient de les preferències d'usuari per a evitar errors de FK
-		List<UsuariEntity> usuarisAmbAquestProcedient = usuariRepository.findByProcediment(metaExpedient);
-		for (UsuariEntity usuari: usuarisAmbAquestProcedient) {
-			usuari.updateProcediment(null);
-		}
-
-		metaExpedientRepository.delete(metaExpedient);
 		return conversioTipusHelper.convertir(
-				metaExpedient,
+				metaExpedientHelper.delete(entitatId, id, organId),
 				MetaExpedientDto.class);
 	}
 

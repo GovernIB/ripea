@@ -36,4 +36,5 @@ public class MetaExpedientEstatResource extends BaseAuditableResource<Long> {
 	private ResourceReference<MetaExpedientResource, Long> metaExpedient;
 	
 	@Transient private boolean importar = true;
+	@Transient private Long importacioId;
 }

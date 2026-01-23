@@ -58,7 +58,7 @@ const MetaExpedientTascaForm = () => {
 }
 
 const sortModel: any = [{field: 'codi', sort: 'asc'}]
-const perspectives: string[] = [];
+const perspectives: string[] = ['COUNT_VALIDACIONS'];
 const columns = [
     {
         field: 'codi',

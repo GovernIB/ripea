@@ -1,7 +1,9 @@
 package es.caib.ripea.service.intf.model;
 
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
+import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
+import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
 import lombok.Getter;
@@ -20,9 +22,18 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @FieldNameConstants
-@ResourceConfig(quickFilterFields = { "codi", "nom" }, descriptionField = "nom")
+@ResourceConfig(
+		quickFilterFields = { "codi", "nom" },
+		descriptionField = "nom",
+		artifacts = {
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.PERSPECTIVE,
+                        code = MetaExpedientTascaResource.PERSPECTIVE_COUNT_VALIDACIONS),
+        })
 public class MetaExpedientTascaResource extends BaseAuditableResource<Long> {
 
+	public static final String PERSPECTIVE_COUNT_VALIDACIONS = "COUNT_VALIDACIONS";
+	
     @NotNull private String codi;
     @NotNull private String nom;
     @NotNull private String descripcio;

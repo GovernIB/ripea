@@ -120,7 +120,7 @@ public class MetaExpedientResource extends MetaNodeResource {
 	@ResourceField(onChangeActive = true)
 	private TipusClassificacioEnumDto tipusClassificacio;
 	@NotNull
-	@Size(max = 30)
+	@Size(max = 46)
 	@ResourceField(onChangeActive = true)
 	private String classificacio;
 	@Transient private String msgSiaRolsac;

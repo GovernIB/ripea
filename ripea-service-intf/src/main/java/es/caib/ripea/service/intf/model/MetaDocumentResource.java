@@ -83,6 +83,7 @@ public class MetaDocumentResource extends MetaNodeResource {
     
     @Transient private boolean importar = true;
     @Transient private List<MetaDadaResource> metaDadesImportacio;
+    @Transient private Long importacioId;
     
     private static final long serialVersionUID = -4446427656169703518L;
 }
