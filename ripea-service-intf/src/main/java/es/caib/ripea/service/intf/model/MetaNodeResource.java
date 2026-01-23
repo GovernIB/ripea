@@ -1,6 +1,7 @@
 package es.caib.ripea.service.intf.model;
 
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
@@ -19,9 +20,9 @@ import lombok.experimental.FieldNameConstants;
 @ResourceConfig(quickFilterFields = { "codi", "nom" }, descriptionField = "nom")
 public class MetaNodeResource extends BaseAuditableResource<Long> {
 	private static final long serialVersionUID = 5537648887756445019L;
-	@NotEmpty @Size(max=64)
+	@NotNull @NotEmpty @Size(max=64)
 	protected String codi;
-	@NotEmpty @Size(max=256)
+    @NotNull @NotEmpty @Size(max=256)
 	protected String nom;
 	@Size(max=1024)
 	protected String descripcio;

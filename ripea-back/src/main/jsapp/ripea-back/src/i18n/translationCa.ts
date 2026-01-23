@@ -1324,6 +1324,7 @@ const translationCa = {
                 elements: "Gestió del procediment: {{nom}}",
                 expressioNumero: "Si no s'especifica cap expressió s'utilitzarà aquesta per defecte: {{codi}}/{{seq}}/{{any}}",
                 permisDirecte: "Un usuari administrador de l'entitat pot modificar aquest valor.",
+                portafirmesResponsables: "Podeu canviar els responsables de firma",
                 regla: {
                     create: "Creada",
                     data: "Data creació",

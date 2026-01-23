@@ -1,11 +1,84 @@
-import {MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
+import {FormField, MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
 import {Alert, Grid} from "@mui/material";
 import GridFormField, {FileFormField} from "../../../components/GridFormField.tsx";
-import {useRef} from "react";
+import {useMemo, useRef} from "react";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 import {CardData} from "../../../components/CardData.tsx";
 import TabComponent from "../../../components/TabComponent.tsx";
+
+const Item = ({ identifiator = 'codi', fieldList, element, children, label }: any) => {
+    const {data, fields, apiRef} = useFormContext()
+    const fieldImportar = useMemo(() => (fields?.filter(i=>i.name=='importar')[0]), [fields]);
+
+    const suffix = element?.[identifiator] ? `#${element?.[identifiator]}` : ''
+
+    return (
+        <CardData
+            cardProps={element?.importar?{}:{backgroundColor: 'rgba(231,229,229,0.6)'}}
+            headerProps={{ py: 0 }}
+            header={
+                <Grid
+                    container
+                    sx={{ display: "flex", flexDirection: "row", alignItems: 'center' }}
+                    columnSpacing={1}
+                    rowSpacing={1}
+                >
+                    <Grid xs={11.5} sx={{ pl: 1, pt: 1 }}>
+                        {label ?? element?.nom}
+                    </Grid>
+
+                    <Grid xs={0.5}>
+                        <FormField
+                            componentProps={{ title: fieldImportar?.label }}
+                            label=""
+                            name={`importar${suffix}`}
+                            value={element?.importar}
+                            field={fieldImportar}
+                            onChange={(value) => {
+                                apiRef?.current?.setFieldValue(
+                                    fieldList,
+                                    editarElemento(
+                                        data?.[fieldList],
+                                        element?.[identifiator],
+                                        { importar: value },
+                                        identifiator
+                                    )
+                                )
+                            }}
+                        />
+                    </Grid>
+                </Grid>
+            }
+            disabled
+            readOnly
+        >
+            {children}
+        </CardData>
+    )
+}
+
+const FieldResponsable = ({ fieldList, element, field, ...other }: any) => {
+    const {t} = useTranslation()
+    const {data, fields, apiRef} = useFormContext()
+    const fieldResponsables = useMemo(() => (fields?.filter(i=>i.name=="portafirmesResponsables")[0]), [fields]);
+    return <GridFormField
+        xs={12}
+        name={field + (element.codi ?`#${element.codi}`:'')}
+        value={element?.[field]}
+        field={fieldResponsables}
+        onChange={(value) => {
+            apiRef?.current?.setFieldValue(fieldList,
+                editarElemento(data?.[fieldList], element.codi, {[field]: value})
+            )
+        }}
+        disabled={!element?.importar}
+        componentProps={{
+            helperText: t('page.metaExpedient.detall.portafirmesResponsables'),
+        }}
+        {...other}
+    />
+}
 
 const ImportFitxerFormBase = () => {
     const {t} = useTranslation()
@@ -27,133 +100,170 @@ const ImportFitxerFormBase = () => {
                        componentProps={{ helperText: t('page.metaExpedient.detall.expressioNumero') }}/>
     </Grid>
 }
+
 const ImportFitxerFormMetaDocument = () => {
-    const {t} = useTranslation()
-    const {data, fields, apiRef} = useFormContext()
+    const {data} = useFormContext()
 
-    const fieldResponsables = fields?.filter(i=>i.name=='portafirmesResponsables')[0];
-    const fieldImportar = fields?.filter(i=>i.name=='importar')[0];
-
-    return <CardData title={"Tipus de document"}>
-        {data?.metaDocumentsImportats?.map((metaDocument:any) => <>
-            <CardData>
-                <GridFormField
-                    xs={12}
-                    name={"codi" + (metaDocument.codi ?`#${metaDocument.codi}`:'')}
-                    value={metaDocument?.codi}
-                    required
-                    disabled
-                />
-                <GridFormField
-                    xs={12}
-                    name={"portafirmesResponsables" + (metaDocument.codi ?`#${metaDocument.codi}`:'')}
-                    value={metaDocument?.portafirmesResponsables}
-                    field={fieldResponsables}
-                    onChange={(value) => {
-                        apiRef?.current?.setFieldValue('metaDocumentsImportats',
-                            editarElemento(data?.metaDocumentsImportats, metaDocument.codi, {portafirmesResponsables: value})
-                        )
-                    }}
-                    multiple
-                />
-                <GridFormField
-                    xs={12}
-                    name={"importar" + (metaDocument.codi ?`#${metaDocument.codi}`:'')}
-                    value={metaDocument?.importar}
-                    field={fieldImportar}
-                    onChange={(value) => {
-                        apiRef?.current?.setFieldValue('metaDocumentsImportats',
-                            editarElemento(data?.metaDocumentsImportats, metaDocument.codi, {importar: value})
-                        )
-                    }}
-                />
-            </CardData>
-        </>)}
-    </CardData>
+    return <Grid container sx={{display: "flex", flexDirection: "row", wordWrap: "break-word"}} columnSpacing={1} rowSpacing={1}>
+        {data?.metaDocumentsImportats?.map((element:any) =>
+            <Item fieldList={"metaDocumentsImportats"} element={element}>
+                {element?.portafirmesFluxTipus == "SIMPLE" && !!element?.firmaPortafirmesActiva &&
+                    <FieldResponsable
+                        fieldList={"metaDocumentsImportats"}
+                        field={"portafirmesResponsables"}
+                        element={element}
+                        multiple
+                    />
+                }
+            </Item>
+        )}
+    </Grid>
 }
 const ImportFitxerFormMetaDades = () => {
-    const {t} = useTranslation()
-    const {data, fields, apiRef} = useFormContext()
+    const {data} = useFormContext()
 
-    // const fieldResponsables = fields?.filter(i=>i.name=='portafirmesResponsables')[0];
-    const fieldImportar = fields?.filter(i=>i.name=='importar')[0];
+    return <Grid container sx={{display: "flex", flexDirection: "row", wordWrap: "break-word"}} columnSpacing={1} rowSpacing={1}>
+        {data?.metaDadesImportats?.map((element:any) =>
+            <Item fieldList={"metaDadesImportats"} element={element}>
+                <FieldResponsable
+                    fieldList={"metaDadesImportats"}
+                    field={"portafirmesResponsables"}
+                    element={element}
+                    multiple
+                />
+            </Item>
+        )}
+    </Grid>
+}
+const ImportFitxerFormEstat = () => {
+    const {data} = useFormContext()
 
-    return <CardData title={"Meta-dada"}>
-        {data?.metaDadesImportats?.map((metaDada:any) => <>
-            <CardData>
-                <GridFormField
-                    xs={12}
-                    name={"codi" + (metaDada.codi ?`#${metaDada.codi}`:'')}
-                    value={metaDada?.codi}
-                    required
-                    disabled
+    return <Grid container sx={{display: "flex", flexDirection: "row", wordWrap: "break-word"}} columnSpacing={1} rowSpacing={1}>
+        {data?.estatsImportats?.map((element:any) =>
+            <Item fieldList={"estatsImportats"} element={element}>
+                <FieldResponsable
+                    fieldList={"estatsImportats"}
+                    field={"responsable"}
+                    element={element}
                 />
-                {/*<GridFormField*/}
-                {/*    xs={12}*/}
-                {/*    name={"portafirmesResponsables" + (metaDada.codi ?`#${metaDada.codi}`:'')}*/}
-                {/*    value={metaDada?.portafirmesResponsables}*/}
-                {/*    field={fieldResponsables}*/}
-                {/*    onChange={(value) => {*/}
-                {/*        apiRef?.current?.setFieldValue('metaDadesImportats',*/}
-                {/*            editarElemento(data?.metaDadesImportats, metaDada.codi, {portafirmesResponsables: value})*/}
-                {/*        )*/}
-                {/*    }}*/}
-                {/*    multiple*/}
-                {/*/>*/}
-                <GridFormField
-                    xs={12}
-                    name={"importar" + (metaDada.codi ?`#${metaDada.codi}`:'')}
-                    value={metaDada?.importar}
-                    field={fieldImportar}
-                    onChange={(value) => {
-                        apiRef?.current?.setFieldValue('metaDadesImportats',
-                            editarElemento(data?.metaDadesImportats, metaDada.codi, {importar: value})
-                        )
-                    }}
+            </Item>
+        )}
+    </Grid>
+}
+const ImportFitxerFormTasca = () => {
+    const {data} = useFormContext()
+
+    return <Grid container sx={{display: "flex", flexDirection: "row", wordWrap: "break-word"}} columnSpacing={1} rowSpacing={1}>
+        {data?.tasquesImportats?.map((element:any) =>
+            <Item fieldList={"tasquesImportats"} element={element}>
+                <FieldResponsable
+                    fieldList={"tasquesImportats"}
+                    field={"responsable"}
+                    element={element}
                 />
-            </CardData>
-        </>)}
-    </CardData>
+            </Item>
+        )}
+    </Grid>
+}
+const ImportFitxerFormGrup = () => {
+    const {data} = useFormContext()
+
+    return <Grid container sx={{display: "flex", flexDirection: "row", wordWrap: "break-word"}} columnSpacing={1} rowSpacing={1}>
+        {data?.grupsImportats?.map((element:any) =>
+            <Item fieldList={"grupsImportats"} element={element} label={element?.descripcio}/>
+        )}
+    </Grid>
+}
+const ImportFitxerFormCarpeta = () => {
+    const {data} = useFormContext()
+
+    return <Grid container sx={{display: "flex", flexDirection: "row", wordWrap: "break-word"}} columnSpacing={1} rowSpacing={1}>
+        {data?.carpetesImportats?.map((element:any) =>
+            <Item fieldList={"carpetesImportats"} identifiator={'id'} element={element}/>
+        )}
+    </Grid>
 }
 
-function editarElemento(array, codi, cambios) {
+function editarElemento(array, codi, cambios, identifiator = 'codi') {
     return array.map(item =>
-        item.codi === codi
+        item?.[identifiator] === codi
             ? { ...item, ...cambios }
             : item
     );
 }
 const ImportFitxerForm = () => {
     const {t} = useTranslation()
-    const {data} = useFormContext()
+    const {data, fieldErrors} = useFormContext()
+
+    const dataError = useMemo(() => (
+        fieldErrors?.some?.(e => ![
+            "metaDocumentsImportats",
+            "metaDadesImportats",
+            "estatsImportats",
+            "tasquesImportats",
+            "grupsImportats",
+            "carpetesImportats",
+            "importar",
+            "portafirmesResponsables",
+        ].includes(e.field))
+    ), [fieldErrors])
 
     const tabs = [
         {
             value: "data",
-            label: "data",
+            label: t('page.metaExpedient.tabs.dades'),
             content: <ImportFitxerFormBase/>,
+            error: dataError,
         },
         {
             value: "metaDocument",
-            label: "metaDocument",
+            label: t('page.metaExpedient.tabs.metaDocument'),
             content: <ImportFitxerFormMetaDocument/>,
             badge: data?.metaDocumentsImportats?.length,
             hidden: data?.metaDocumentsImportats?.length == 0,
         },
         {
-            value: "metaDades",
-            label: "metaDades",
+            value: "metaDada",
+            label: t('page.metaExpedient.tabs.metaDada'),
             content: <ImportFitxerFormMetaDades/>,
             badge: data?.metaDadesImportats?.length,
             hidden: data?.metaDadesImportats?.length == 0,
+        },
+        {
+            value: "estat",
+            label: t('page.metaExpedient.tabs.expedientEstat'),
+            content: <ImportFitxerFormEstat/>,
+            badge: data?.estatsImportats?.length,
+            hidden: data?.estatsImportats?.length == 0,
+        },
+        {
+            value: "tasca",
+            label: t('page.metaExpedient.tabs.tasca'),
+            content: <ImportFitxerFormTasca/>,
+            badge: data?.tasquesImportats?.length,
+            hidden: data?.tasquesImportats?.length == 0,
+        },
+        {
+            value: "grup",
+            label: t('page.metaExpedient.tabs.grup'),
+            content: <ImportFitxerFormGrup/>,
+            badge: data?.grupsImportats?.length,
+            hidden: data?.grupsImportats?.length == 0,
+        },
+        {
+            value: "carpeta",
+            label: t('page.metaExpedient.tabs.carpeta'),
+            content: <ImportFitxerFormCarpeta/>,
+            badge: data?.carpetesImportats?.length,
+            hidden: data?.carpetesImportats?.length == 0,
         },
     ]
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <FileFormField xs={12} name={'importJson'} hidden={data?.importJson}/>
-        {data?.importJson && <>
+        {data?.importJson && <Grid xs={12}>
             <TabComponent tabs={tabs}/>
-        </>}
+        </Grid>}
     </Grid>
 }
 
