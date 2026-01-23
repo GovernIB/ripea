@@ -197,7 +197,7 @@ const UserMenuButton = () => {
            buttonProps={{ endIcon: undefined, sx: {m: '0 !important'} }}
            buttonLabel={<UserAvatar/>}
         >
-        <div style={{ borderColor: '#707070', borderStyle: 'solid', borderWidth: 1 }}>
+        {/*<div style={{ borderColor: '#707070', borderStyle: 'solid', borderWidth: 1 }}>*/}
             <MenuItem disableRipple
                       sx={{
                           "&.MuiButtonBase-root:hover": {
@@ -226,7 +226,7 @@ const UserMenuButton = () => {
                 </ListItemIcon>
                 <ListItemText>{t('page.user.options.logout')}</ListItemText>
             </MenuItem>
-        </div>
+        {/*</div>*/}
         </MenuButton>
     </Load>
 }

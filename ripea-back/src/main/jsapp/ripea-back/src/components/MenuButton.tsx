@@ -58,7 +58,7 @@ const MenuButton = (props:MenuButtonProps) => {
             open={open}
             onClose={handleClose}
 
-            elevation={0}
+            elevation={3}
             anchorOrigin={{
                 vertical: 'bottom',
                 horizontal: 'right',

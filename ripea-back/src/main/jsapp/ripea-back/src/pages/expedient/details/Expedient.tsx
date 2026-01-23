@@ -261,12 +261,12 @@ const Expedient = () => {
     ]
 
     const headerMain = <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-        <Box sx={{ display: 'flex', alignItems: 'center'}}>
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Icon sx={{ fontSize: '2rem' }}>{icons.expedient}</Icon>
             <Typography variant="h4" sx={{ display: 'flex' }}>{expedient?.nom}</Typography>
         </Box>
         <Box>
-            <Typography variant={"subtitle1"} sx={{border}} px={1} hidden={!expedient?.agafatPer}>
+            <Typography variant={"subtitle1"} sx={{border}} px={2} hidden={!expedient?.agafatPer}>
                 {t('page.expedient.title')} {t('page.expedient.detall.agafatPer')}: {expedient?.agafatPer?.description}
                 {expedient?.agafatPer?.id == user?.codi &&
                     <IconButton aria-label="lock_open" color={"inherit"} onClick={() => alliberar(id, expedient)} title={t('page.expedient.action.lliberar.label')}>

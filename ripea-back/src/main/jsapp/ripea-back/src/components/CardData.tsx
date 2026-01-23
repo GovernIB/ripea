@@ -3,7 +3,7 @@ import IconButton from "@mui/material/IconButton";
 import Icon from "@mui/material/Icon";
 
 const cardBorder= { border: '1px solid #e3e3e3', borderRadius: '4px' };
-const cardHeader= { color: 'black', backgroundColor: '#f5f5f5', borderBottom: '1px solid #e3e3e3' };
+const cardHeader= { py: 1, px: 2, color: 'black', backgroundColor: '#f5f5f5', borderBottom: '1px solid #e3e3e3' };
 const iconButton = { p: 0.5, borderRadius: '5px', maxWidth: 'max-content', border: '1px solid grey' }
 
 const CardButton = (props:any) => {

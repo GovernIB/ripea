@@ -147,18 +147,18 @@ const base: ThemeOptions = {
                     fontSize: '14px',
                     fontWeight: 200,
                     color: 'black',
-                    backgroundColor: 'white',
+                    // backgroundColor: 'white',
                     '&.Mui-disabled': {
                         fontStyle: 'italic',
                         paddingRight: '2px',
                         color: 'black',
                         opacity: 1,
-                        backgroundColor: 'white',
+                        // backgroundColor: 'white',
                     },
                     '&.Mui-focused': {
                         fontStyle: 'italic',
                         paddingRight: '2px',
-                        backgroundColor: 'white',
+                        // backgroundColor: 'white',
                     }
                 }
             }
