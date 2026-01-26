@@ -8,7 +8,7 @@ import GridFormField from "../../components/GridFormField.tsx";
 import {MetaExpedientComment} from "../CommentDialog.tsx";
 import LinkButton from "../../components/LinkButton.tsx";
 import {formatDate} from "../../util/dateUtils.ts";
-import {useMetaExpedientActions} from "./details/MetaExpedientActions.tsx";
+import {useActions, useMetaExpedientActions} from "./details/MetaExpedientActions.tsx";
 import {MetaExpedientFilter} from "./MetaExpedientFilter.tsx";
 import {useUserSession} from "../../components/Session.tsx";
 import {StyledEstat} from "../user/consultes/RevisioMetaExpedientGrid.tsx";
@@ -17,6 +17,7 @@ import {useNavigate} from "react-router-dom";
 import {StyledBadge} from "../../components/StyledBadge.tsx";
 import {useImportRolsac} from "./actions/ImportRolsac.tsx";
 import {useImportFitxer} from "./actions/ImportFitxer.tsx";
+import useActualitzar from "./actions/Actualitzar.tsx";
 
 // Form
 export const MetaExpedientForm = ({ isAdmin }:any) => {
@@ -197,7 +198,17 @@ const MetaExpedientGrid = () => {
 
     const {handleShow: handleImportRolsac, content: contentImportRolsac} = useImportRolsac(apiRef)
     const {handleShow: handleImportFitxer, content: contentImportFitxer} = useImportFitxer(refresh)
+    const {handleShow: handleActualitzar, content: contentActualitzar } = useActualitzar(refresh);
     const {actions, components} = useMetaExpedientActions(refresh);
+
+    const massiveActions :any[] = [
+        {
+            label: t('common.actualize'),
+            icon: "cached",
+            showInMenu: false,
+            onClick: handleActualitzar,
+        },
+    ]
 
     return <GridPage disableMargins>
         <CardPage title={t('page.user.menu.procedimentsTitle')}>
@@ -214,6 +225,7 @@ const MetaExpedientGrid = () => {
                 perspectives={perspectives}
                 sortModel={sortModel}
                 rowAdditionalActions={actions}
+                toolbarMassiveActions={massiveActions}
                 toolbarElementsWithPositions={[
                     {
                         position: 2,
@@ -240,13 +252,6 @@ const MetaExpedientGrid = () => {
                             ]}
                         />,
                     },
-                    {
-                        position: 2,
-                        element: <ToolbarButton
-                            icon={'cached'}
-                            onClick={()=>{}}
-                            color={'primary'}>{t('common.actualize')}</ToolbarButton>,
-                    },
                 ]}
 
                 toolbarCreateTitle={t('page.metaExpedient.action.new.label')}
@@ -255,10 +260,11 @@ const MetaExpedientGrid = () => {
                     updateSuccess: 'page.metaExpedient.action.update.ok',
                     deleteSuccess: 'page.metaExpedient.action.delete.ok',
                 }}
-                toolbarHideRefresh
+                // toolbarHideRefresh
             />
             {contentImportRolsac}
             {contentImportFitxer}
+            {contentActualitzar}
             {components}
         </CardPage>
     </GridPage>
