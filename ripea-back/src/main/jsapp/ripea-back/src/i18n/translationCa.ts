@@ -1407,6 +1407,16 @@ const translationCa = {
                 export: {
                     ok: "Procediment exportat correctament",
                 },
+                actualize: {
+                    title: "Actualització de procediments",
+                    description: "Vols actualitzar els procediments amb la informació de ROLSAC?",
+                    ok: "Procediments actualitzats",
+                    result: {
+                        title: "Inici de procés d'actualització dels procediments",
+                        description: "S'han realitzat '{{numOperacions}}' peticions, s'han modificat '{{numActualitzats}}' procediments, i '{{numErrord}}' han donat error",
+                        senseCanvi: "Sense canvis",
+                    }
+                }
             },
         },
         metaDocument: {

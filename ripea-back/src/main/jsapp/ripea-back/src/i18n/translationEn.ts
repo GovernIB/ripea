@@ -1407,6 +1407,16 @@ const translationEn = {
                 export: {
                     ok: "Procedure exported successfully",
                 },
+                actualize: {
+                    title: "Procedure update",
+                    description: "Do you want to update the procedures with information from ROLSAC?",
+                    ok: "Procedures updated",
+                    result: {
+                        title: "Start of the procedure update process",
+                        description: "'{{numOperacions}}' requests have been made, '{{numActualitzats}}' procedures have been updated, and '{{numErrord}}' resulted in errors",
+                        senseCanvi: "No changes",
+                    }
+                }
             },
         },
         metaDocument: {

@@ -1407,6 +1407,16 @@ const translationEs = {
                 export: {
                     ok: "Procedimiento exportado correctamente",
                 },
+                actualize: {
+                    title: "Actualización de procedimientos",
+                    description: "¿Desea actualizar los procedimientos con la información de ROLSAC?",
+                    ok: "Procedimientos actualizados",
+                    result: {
+                        title: "Inicio del proceso de actualización de los procedimientos",
+                        description: "Se han realizado '{{numOperacions}}' peticiones, se han modificado '{{numActualitzats}}' procedimientos y '{{numErrord}}' han dado error",
+                        senseCanvi: "Sin cambios",
+                    }
+                }
             },
         },
         metaDocument: {
