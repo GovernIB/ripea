@@ -151,6 +151,7 @@ public class MetaExpedientResource extends MetaNodeResource {
 	@ResourceField(onChangeActive = true)
 	private ResourceReference<OrganGestorResource, Long> organGestor;
 	private ResourceReference<GrupResource, Long> grupPerDefecte;
+	private ResourceReference<EntitatResource, Long> entitatPropia;
 
     @ResourceField(onChangeActive = true)
     @Transient private boolean procedimentComu;

@@ -51,9 +51,6 @@ public abstract class MetaNodeResourceEntity<R> extends BaseAuditableEntity<R> {
 			orphanRemoval = true)
 	@OrderBy("ordre asc")
 	private List<MetaDadaResourceEntity> metaDades = new ArrayList<>();
-//	@OneToMany(
-//			mappedBy = "metaNode",
-//			fetch = FetchType.LAZY)
-//	protected Set<NodeResourceEntity> nodes = new HashSet<>();
-
+	@Version
+	private long version = 0;
 }

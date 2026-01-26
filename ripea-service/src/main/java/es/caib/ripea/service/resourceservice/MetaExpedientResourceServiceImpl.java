@@ -22,7 +22,6 @@ import com.turkraft.springfilter.FilterBuilder;
 import com.turkraft.springfilter.parser.Filter;
 
 import es.caib.ripea.persistence.entity.EntitatEntity;
-import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.MetaNodeEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
@@ -37,12 +36,10 @@ import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientEstatRes
 import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientTascaResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.UsuariResourceRepository;
-import es.caib.ripea.persistence.repository.ExpedientRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
-import es.caib.ripea.service.helper.CacheHelper;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.DistribucioReglaHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
@@ -57,13 +54,11 @@ import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
 import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
-import es.caib.ripea.service.intf.base.exception.ResourceNotCreatedException;
 import es.caib.ripea.service.intf.base.exception.ResourceNotFoundException;
 import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ReportFileType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
-import es.caib.ripea.service.intf.dto.CrearReglaResponseDto;
 import es.caib.ripea.service.intf.dto.DominiDto;
 import es.caib.ripea.service.intf.dto.ExpedientEstatDto;
 import es.caib.ripea.service.intf.dto.GrupDto;
@@ -72,6 +67,7 @@ import es.caib.ripea.service.intf.dto.MetaDadaDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientCarpetaMinDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientExportDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientTascaDto;
@@ -81,7 +77,6 @@ import es.caib.ripea.service.intf.dto.OrganGestorDto;
 import es.caib.ripea.service.intf.dto.PermisDto;
 import es.caib.ripea.service.intf.dto.PinbalServeiDto;
 import es.caib.ripea.service.intf.dto.ProcedimentDto;
-import es.caib.ripea.service.intf.dto.StatusEnumDto;
 import es.caib.ripea.service.intf.dto.TipusClassificacioEnumDto;
 import es.caib.ripea.service.intf.model.EntitatResource;
 import es.caib.ripea.service.intf.model.GrupResource;
@@ -114,7 +109,6 @@ import lombok.extern.slf4j.Slf4j;
 public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService<MetaExpedientResource, Long, MetaExpedientResourceEntity> implements MetaExpedientResourceService {
 
 	private final ConfigHelper configHelper;
-	private final CacheHelper cacheHelper;
 	private final GrupHelper grupHelper;
 	private final MetaExpedientHelper metaExpedientHelper;
 	private final DistribucioReglaHelper distribucioReglaHelper;
@@ -127,7 +121,6 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 	private final EntityComprovarHelper entityComprovarHelper;
 	private final UsuariResourceRepository usuariResourceRepository;
 	private final OrganGestorRepository organGestorRepository;
-	private final ExpedientRepository expedientRepository;
 	private final GrupResourceRepository grupResourceRepository;
 	private final MetaExpedientRepository metaExpedientRepository;
 	private final PluginHelper pluginHelper;
@@ -259,39 +252,52 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
     protected void afterConversion(MetaExpedientResourceEntity entity, MetaExpedientResource resource) {
         resource.setNumComentaris(entity.getComentaris().size());
         resource.setProcedimentComu(entity.getOrganGestor()==null);
+        resource.setTipus(MetaNodeTipusEnum.EXPEDIENT);
     }
     
-    @Override
-    protected void beforeCreateEntity(MetaExpedientResourceEntity entity, MetaExpedientResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotCreatedException {
-    	//ORA-01400: no se puede realizar una inserción NULL en ("RIPEA10"."IPA_METANODE"."TIPUS")
-    	resource.setTipus(MetaNodeTipusEnum.EXPEDIENT);
-    	//ORA-01400: no se puede realizar una inserción NULL en ("RIPEA10"."IPA_METANODE"."ENTITAT_ID")
-		String entitatActualCodi = configHelper.getEntitatActualCodi();
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true, false);
-    	resource.setEntitat(ResourceReference.toResourceReference(entitat.getId(), entitat.getNom()));
-    }
-    
-    @Override
-    protected void afterCreateSave(MetaExpedientResourceEntity entity, MetaExpedientResource resource, Map<String, AnswerRequiredException.AnswerValue> answers, boolean anyOrderChanged) {
-		if ("IPA_ORGAN_ADMIN".equals(configHelper.getRolActual())) {
-			String organActualCodi	 = configHelper.getOrganActualCodi();
-			OrganGestorEntity ogEntity	= organGestorRepository.findByEntitatIdAndCodi(entity.getEntitat().getId(), organActualCodi);
-			metaExpedientHelper.canviarRevisioADisseny(entity.getEntitat().getId(), entity.getId(), ogEntity!=null?ogEntity.getId():null);
-		} else {
-			entity.setRevisioEstat(MetaExpedientRevisioEstatEnumDto.REVISAT);
-			if (resource.isCrearReglaDistribucio()) {
-				CrearReglaResponseDto crearReglaResponse = metaExpedientHelper.crearReglaDistribucio(entity.getId());
-				if (StatusEnumDto.ERROR.equals(crearReglaResponse.getStatus())) {
-					resource.setCrearReglaDistribucioError(crearReglaResponse.getMsg());
-				}
-			}
-		}
-    }
-    
-    @Override
-    protected void beforeUpdateSave(MetaExpedientResourceEntity entity, MetaExpedientResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
-    	resource.setEstatAnterior(entity.getRevisioEstat());
-    }
+	@Override
+	public MetaExpedientResource create(MetaExpedientResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
+		
+		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+		OrganGestorEntity ogEntity	= organGestorRepository.findByEntitatIdAndCodi(entitatEntity.getId(), configHelper.getOrganActualCodi());
+		
+		MetaExpedientEntity metaExpedientEntity = metaExpedientHelper.create(
+				entitatEntity.getId(),
+				objectMappingHelper.newInstanceMap(
+						resource
+						, MetaExpedientDto.class
+						, "serialVersionUID", "createdBy", "createdDate", "lastModifiedBy", "lastModifiedDate"),
+				configHelper.getRolActual(),
+				ogEntity!=null?ogEntity.getId():null);
+		
+		resource.setId(metaExpedientEntity.getId());
+		resource.setCrearReglaDistribucioError(metaExpedientEntity.getCrearReglaDistribucioError());
+		resource.setCrearReglaDistribucioEstat(metaExpedientEntity.getCrearReglaDistribucioEstat());
+		
+		return resource;
+	}
+	
+	@Override
+	public MetaExpedientResource update(
+			Long id,
+			MetaExpedientResource resource,
+			Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotFoundException {
+		
+		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+		OrganGestorEntity ogEntity	= organGestorRepository.findByEntitatIdAndCodi(entitatEntity.getId(), configHelper.getOrganActualCodi());
+		
+		metaExpedientHelper.update(
+				entitatEntity.getId(),
+				objectMappingHelper.newInstanceMap(
+						resource,
+						MetaExpedientDto.class,
+						"serialVersionUID", "createdBy", "createdDate", "lastModifiedBy", "lastModifiedDate"),
+				configHelper.getRolActual(),
+				resource.getRevisioEstat(),
+				ogEntity!=null?ogEntity.getId():null);
+		
+		return resource;
+	}
     
     @Override
 	public void delete(Long id, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotFoundException {
@@ -304,34 +310,6 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 		
 		metaExpedientHelper.delete(entitat.getId(), id, ogEntity!=null?ogEntity.getId():null);
 	}
-    
-    @Override
-    protected void afterUpdateSave(MetaExpedientResourceEntity entity, MetaExpedientResource resource, Map<String, AnswerRequiredException.AnswerValue> answers, boolean anyOrderChanged) {
-    	
-		List<ExpedientEntity> expedients = expedientRepository.findByMetaExpedientIdAndEsborrat(entity.getId(), 0);
-		
-		for (ExpedientEntity expedient: expedients) {
-			cacheHelper.evictErrorsValidacioPerNode(expedient.getId());
-		}
-		
-		String entitatActualCodi = configHelper.getEntitatActualCodi();
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true, false);
-		
-		if ("IPA_ORGAN_ADMIN".equals(configHelper.getRolActual())) {			
-			String organActualCodi	 = configHelper.getOrganActualCodi();
-			OrganGestorEntity ogEntity	= organGestorRepository.findByEntitatIdAndCodi(entitat.getId(), organActualCodi);
-			if (MetaExpedientRevisioEstatEnumDto.DISSENY.equals(resource.getEstatAnterior()) && MetaExpedientRevisioEstatEnumDto.PENDENT.equals(entity.getRevisioEstat())) {
-				metaExpedientHelper.canviarRevisioAPendentEnviarEmail(entitat.getId(), entity.getId(), ogEntity!=null?ogEntity.getId():null);
-			} else {
-				metaExpedientHelper.canviarRevisioADisseny(entitat.getId(), entity.getId(), ogEntity!=null?ogEntity.getId():null);
-			}
-		} else {
-			metaExpedientHelper.canviarEstatRevisioASellecionat(
-					entitat.getId(),
-					entity.getId(),
-					entity.getRevisioEstat());
-		}
-    }
 
     private class OnchangeLogicProcessor implements OnChangeLogicProcessor<MetaExpedientResource> {
 		@Override

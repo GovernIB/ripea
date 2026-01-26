@@ -5,6 +5,7 @@ package es.caib.ripea.persistence.entity;
 
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.dto.CrearReglaDistribucioEstatEnumDto;
+import es.caib.ripea.service.intf.dto.CrearReglaResponseDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.MetaNodeTipusEnum;
 import es.caib.ripea.service.intf.dto.TipusClassificacioEnumDto;
@@ -66,7 +67,6 @@ public class MetaExpedientEntity extends MetaNodeEntity {
     
     @OneToMany(mappedBy = "metaExpedient", cascade = { CascadeType.ALL })
     private Set<HistoricEntity> historics;
-    
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "entitat_id")
@@ -96,12 +96,10 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 			inverseName = BaseConfig.DB_PREFIX + "grup_metaexpgrup_fk")
 	private List<GrupEntity> grups = new ArrayList<GrupEntity>();
 	
-	
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "grup_per_defecte")
     @ForeignKey(name = BaseConfig.DB_PREFIX + "grup_metaexp_fk")
     private GrupEntity grupPerDefecte;
-
 	
 	@Column(name = "revisio_estat", length = 8)
 	@Enumerated(EnumType.STRING)
@@ -115,7 +113,6 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 			orphanRemoval = true)
 	private List<MetaExpedientComentariEntity> comentaris = new ArrayList<MetaExpedientComentariEntity>();
 	
-	
 	@Column(name = "crear_regla_dist_estat", length = 10)
 	@Enumerated(EnumType.STRING)
 	private CrearReglaDistribucioEstatEnumDto crearReglaDistribucioEstat;
@@ -127,6 +124,12 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 
 	@Column(name = "interessat_obligatori", nullable = false)
     private boolean interessatObligatori;
+	
+	@Transient private CrearReglaResponseDto crearReglaResponse;
+	
+	public void setCrearReglaResponse(CrearReglaResponseDto crearReglaResponse) {
+		this.crearReglaResponse = crearReglaResponse;
+	}
 	
 	public void updateCrearReglaDistribucio(CrearReglaDistribucioEstatEnumDto crearReglaDistribucioEstat) {
 		this.crearReglaDistribucioEstat = crearReglaDistribucioEstat;

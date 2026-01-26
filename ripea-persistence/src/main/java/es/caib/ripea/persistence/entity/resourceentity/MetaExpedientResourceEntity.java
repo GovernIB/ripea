@@ -60,6 +60,12 @@ public class MetaExpedientResourceEntity extends MetaNodeResourceEntity<MetaExpe
 	@Column(name = "codi", length = 64, nullable = false)
 	private String codiPropi;
 
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@JoinColumn(
+			name = "entitat_id",
+			foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "ENTITAT_METAEXP_FK"))
+	protected EntitatResourceEntity entitatPropia;
+	
 	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(
 			name = "organ_gestor_id",

@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.persistence.entity.EntitatEntity;
-import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.entity.ExpedientEstatEntity;
 import es.caib.ripea.persistence.entity.GrupEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientComentariEntity;
@@ -27,7 +26,6 @@ import es.caib.ripea.persistence.entity.MetaExpedientTascaValidacioEntity;
 import es.caib.ripea.persistence.entity.MetaNodeEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.repository.ExpedientEstatRepository;
-import es.caib.ripea.persistence.repository.ExpedientRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientComentariRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientOrganGestorRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientRepository;
@@ -93,7 +91,6 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	@Autowired private EntityComprovarHelper entityComprovarHelper;
 	@Autowired private MetaExpedientHelper metaExpedientHelper;
 	@Autowired private OrganGestorRepository organGestorRepository;
-	@Autowired private ExpedientRepository expedientRepository;
 	@Autowired private PluginHelper pluginHelper;
 	@Autowired private MetaExpedientOrganGestorRepository metaExpedientOrganGestorRepository;
 	@Autowired private UsuariHelper usuariHelper;
@@ -109,131 +106,24 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	@Transactional
 	@Override
 	public MetaExpedientDto create(Long entitatId, MetaExpedientDto metaExpedient, String rolActual, Long organId) {
-		
 		Timer.Sample sample = Timer.start(applicationHelper.getMeterRegistry());
-		
 		try {
-		
 			logger.debug("Creant un nou meta-expedient (" + "entitatId=" + entitatId + ", " + "metaExpedient=" + metaExpedient + ")");
-			EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-			if (metaExpedient.getOrganGestor() != null) {
-				entityComprovarHelper.comprovarPermisOrganGestor(
-						entitatId,
-						metaExpedient.getOrganGestor().getId(),
-						true);
-			}
-			MetaExpedientEntity metaExpedientPare = null;
-			if (metaExpedient.getPareId() != null) {
-	
-			metaExpedientPare = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedient.getPareId());
-			}
-			Long organGestorId = metaExpedient.getOrganGestor() != null ? metaExpedient.getOrganGestor().getId() : null;
-			MetaExpedientEntity entity = MetaExpedientEntity.getBuilder(
-					metaExpedient.getCodi(),
-					metaExpedient.getNom(),
-					metaExpedient.getDescripcio(),
-					metaExpedient.getSerieDocumental(),
-					metaExpedient.getClassificacio(),
-					metaExpedient.isNotificacioActiva(),
-					metaExpedient.isPermetMetadocsGenerals(),
-					entitat,
-					metaExpedientPare,
-					organGestorId == null ? null : organGestorRepository.getOne(organGestorId),
-					metaExpedient.isGestioAmbGrupsActiva(),
-					metaExpedient.isInteressatObligatori(),
-					rolActual.equals("IPA_ADMIN")?metaExpedient.isPermisDirecte():false).
-					expressioNumero(metaExpedient.getExpressioNumero()).
-					tipusClassificacio(metaExpedient.getTipusClassificacio()).build();
-			MetaExpedientEntity metaExpedientEntity = metaExpedientRepository.save(entity);
-			if (metaExpedient.getEstructuraCarpetes() != null) {
-				//crear estructura carpetes per defecte
-				metaExpedientHelper.crearEstructuraCarpetes(
-						metaExpedient.getEstructuraCarpetes(), 
-						metaExpedientEntity);
-			}
-			
+			MetaExpedientEntity metaExpedientEntity = metaExpedientHelper.create(entitatId, metaExpedient, rolActual, organId);
 			MetaExpedientDto metaExpedientDto = conversioTipusHelper.convertir(metaExpedientEntity, MetaExpedientDto.class);
-			if ("IPA_ORGAN_ADMIN".equals(rolActual)) {
-				metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientEntity.getId(), organId);
-			} else {
-				metaExpedientEntity.updateRevisioEstat(MetaExpedientRevisioEstatEnumDto.REVISAT);
-				if (metaExpedient.isCrearReglaDistribucio()) {
-					metaExpedientDto.setCrearReglaResponse(metaExpedientHelper.crearReglaDistribucio(metaExpedientEntity.getId()));
-				}
-			}
-			
 			applicationHelper.stopTimer(sample, "METRICS@Subsystem_Procediment.create", "resultado", "exito");
-		
 			return metaExpedientDto;
-			
 		} catch (Exception e) {
 			applicationHelper.stopTimer(sample, "METRICS@Subsystem_Procediment.create", "resultado", "error");
 			throw e;
-		}			
+		}
 	}
 
 	@Transactional
 	@Override
 	public MetaExpedientDto update(Long entitatId, MetaExpedientDto metaExpedient, String rolActual, MetaExpedientRevisioEstatEnumDto estatAnterior, Long organId) {
-		logger.debug(
-				"Actualitzant meta-expedient existent (" + "entitatId=" + entitatId + ", " + "metaExpedient=" +
-						metaExpedient + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-		MetaExpedientEntity metaExpedientEntity;
-		MetaExpedientEntity metaExpedientPare = null;
-		metaExpedientEntity = entityComprovarHelper.comprovarAccesMetaExpedient(entitat, metaExpedient.getId(), organId, true);
-
-		if (metaExpedient.getPareId() != null) {
-			metaExpedientPare = entityComprovarHelper.comprovarAccesMetaExpedient(entitat, metaExpedient.getPareId(), null, true);
-		}
-
-		Long organGestorId = metaExpedient.getOrganGestor() != null ? metaExpedient.getOrganGestor().getId() : null;
-		metaExpedientEntity.update(
-				metaExpedient.getCodi(),
-				metaExpedient.getNom(),
-				metaExpedient.getDescripcio(),
-				metaExpedient.getClassificacio(),
-				metaExpedient.getSerieDocumental(),
-				metaExpedient.getExpressioNumero(),
-				metaExpedient.isNotificacioActiva(),
-				metaExpedient.isPermetMetadocsGenerals(),
-				metaExpedientPare,
-				organGestorId == null ? null : organGestorRepository.getOne(organGestorId),
-				metaExpedient.isGestioAmbGrupsActiva(), 
-				metaExpedient.getTipusClassificacio(),
-				metaExpedient.isInteressatObligatori(),
-				rolActual.equals("IPA_ADMIN")?metaExpedient.isPermisDirecte():metaExpedientEntity.isPermisDirecte());
-		
-		if (metaExpedient.getEstructuraCarpetes() != null) {
-			//crear estructura carpetes per defecte
-			metaExpedientHelper.crearEstructuraCarpetes(
-					metaExpedient.getEstructuraCarpetes(), 
-					metaExpedientEntity);
-		}
-		
-		List<ExpedientEntity> expedients = expedientRepository.findByMetaExpedientIdAndEsborrat(metaExpedientEntity.getId(), 0);
-		
-		long t0 = System.currentTimeMillis();
-		logger.info("MetaExpedientServiceImpl.update evictErrorsValidacioPerNode start (total expedients:" + (expedients.size()) + "");
-		
-		for (ExpedientEntity expedient: expedients) {
-			cacheHelper.evictErrorsValidacioPerNode(expedient.getId());
-		}
-		
-		if (cacheHelper.mostrarLogsRendiment())
-			logger.info("MetaExpedientServiceImpl.update evictErrorsValidacioPerNode end:  " + (System.currentTimeMillis() - t0) + " ms");
-		
-		if ("IPA_ORGAN_ADMIN".equals(rolActual)) {
-			if (estatAnterior == MetaExpedientRevisioEstatEnumDto.DISSENY && metaExpedient.getRevisioEstat() == MetaExpedientRevisioEstatEnumDto.PENDENT)
-				marcarPendentRevisio(entitatId,  metaExpedientEntity.getId(), organId);
-			else 
-				metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientEntity.getId(), organId);
-		} else if ("IPA_ADMIN".equals(rolActual)){
-			metaExpedientHelper.canviarEstatRevisioASellecionat(
-					entitatId,
-					metaExpedient.getId(),
-					metaExpedient.getRevisioEstat());
-		}
+		logger.debug("Actualitzant meta-expedient existent (" + "entitatId=" + entitatId + ", " + "metaExpedient=" + metaExpedient + ")");
+		MetaExpedientEntity metaExpedientEntity = metaExpedientHelper.update(entitatId, metaExpedient, rolActual, estatAnterior, organId);
 		return conversioTipusHelper.convertir(metaExpedientEntity, MetaExpedientDto.class);
 	}
 	
