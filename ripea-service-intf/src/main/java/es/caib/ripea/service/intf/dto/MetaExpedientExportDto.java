@@ -31,7 +31,8 @@ public class MetaExpedientExportDto extends MetaNodeAmbMetaDadesDto implements S
     private int grupsCount;
     private boolean permetMetadocsGenerals;
     private OrganGestorDto organGestor;    
-    private boolean gestioAmbGrupsActiva;    
+    private boolean gestioAmbGrupsActiva;
+    private boolean permisDirecte;
 	private MetaExpedientRevisioEstatEnumDto revisioEstat;
 	
 	private List<MetaDocumentDto> metaDocuments;

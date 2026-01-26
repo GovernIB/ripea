@@ -48,6 +48,7 @@ import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientOrganGestorEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientSequenciaEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientTascaEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientTascaValidacioEntity;
 import es.caib.ripea.persistence.entity.MetaNodeEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.entity.UsuariEntity;
@@ -62,6 +63,7 @@ import es.caib.ripea.persistence.repository.MetaExpedientOrganGestorRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientSequenciaRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientTascaRepository;
+import es.caib.ripea.persistence.repository.MetaExpedientTascaValidacioRepository;
 import es.caib.ripea.persistence.repository.MetaNodeRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.persistence.repository.UsuariRepository;
@@ -120,6 +122,7 @@ public class MetaExpedientHelper {
     @Autowired private MetaExpedientOrganGestorRepository metaExpedientOrganGestorRepository;
 	@Autowired private ExpedientEstatRepository expedientEstatRepository;
 	@Autowired private MetaExpedientTascaRepository metaExpedientTascaRepository;
+	@Autowired private MetaExpedientTascaValidacioRepository metaExpedientTascaValidacioRepository;
 	@Autowired private AvisRepository avisRepository;
     @Autowired private EmailHelper emailHelper;
 	@Autowired private ConfigHelper configHelper;
@@ -210,8 +213,8 @@ public class MetaExpedientHelper {
 			//Meta-dades amb dominis
 			if (metaExpedientDto.getMetaDades() != null) {
 				for (MetaDadaDto metaDadaDto : metaExpedientDto.getMetaDades()) {
-					if (metaDadaDto.getTipus().equals(MetaDadaTipusEnumDto.DOMINI)) {
-						List<DominiEntity> dominis = dominiRepository.findByEntitatAndCodi(entitat, metaDadaDto.getCodi());
+					if (metaDadaDto.getTipus().equals(MetaDadaTipusEnumDto.DOMINI) && Utils.hasValue(metaDadaDto.getValorString())) {
+						List<DominiEntity> dominis = dominiRepository.findByEntitatAndCodi(entitat, metaDadaDto.getValorString());
 						if (dominis != null && !dominis.isEmpty()) {
 							DominiEntity domini = dominis.get(0);
 							metaDadaDto.setDomini(conversioTipusHelper.convertir(domini, DominiDto.class));
@@ -226,7 +229,7 @@ public class MetaExpedientHelper {
 					if (metaDocumentDto.getMetaDades() != null) {
 						for (MetaDadaDto metaDadaDto : metaDocumentDto.getMetaDades()) {
 							if (metaDadaDto.getTipus().equals(MetaDadaTipusEnumDto.DOMINI)) {
-								List<DominiEntity> dominis = dominiRepository.findByEntitatAndCodi(entitat, metaDadaDto.getCodi());
+								List<DominiEntity> dominis = dominiRepository.findByEntitatAndCodi(entitat, metaDadaDto.getValorString());
 								if (dominis != null && !dominis.isEmpty()) {
 									DominiEntity domini = dominis.get(0);
 									metaDadaDto.setDomini(conversioTipusHelper.convertir(domini, DominiDto.class));
@@ -634,7 +637,7 @@ public class MetaExpedientHelper {
 			if (metaExpedientTasca.getEstatIdFinalitzarTasca()!=null) 
 				estatFinalitzarTasca = expedientEstatRepository.findById(metaExpedientTasca.getEstatIdFinalitzarTasca()).orElse(null);
 			
-			MetaExpedientTascaEntity entity = MetaExpedientTascaEntity.getBuilder(
+			MetaExpedientTascaEntity metaExpedientTascaEntity = MetaExpedientTascaEntity.getBuilder(
 					metaExpedientTasca.getCodi(),
 					metaExpedientTasca.getNom(),
 					metaExpedientTasca.getDescripcio(),
@@ -649,9 +652,23 @@ public class MetaExpedientHelper {
 				canviarRevisioADisseny(entitatId, metaExpedient.getId(), organId);
 			}
 			
+			metaExpedientTascaEntity = metaExpedientTascaRepository.save(metaExpedientTascaEntity);
+			
+			if (metaExpedientTasca.getValidacions()!=null && metaExpedientTasca.getValidacions().size()>0) {
+				for (MetaExpedientTascaValidacioDto validacioTascaDto: metaExpedientTasca.getValidacions()) {
+					MetaExpedientTascaValidacioEntity validacion = MetaExpedientTascaValidacioEntity.getBuilder(
+							validacioTascaDto.getItemValidacio(),
+							validacioTascaDto.getTipusValidacio(),
+							validacioTascaDto.getItemId(),
+							validacioTascaDto.isActiva()).build();
+					validacion.setMetaExpedientTasca(metaExpedientTascaEntity);
+					metaExpedientTascaValidacioRepository.save(validacion);
+				}
+			}
+			
 			applicationHelper.stopTimer(sample, "METRICS@Subsystem_Procediment.metaTasca", "resultado", "exito");
 		
-			return conversioTipusHelper.convertir(metaExpedientTascaRepository.save(entity), MetaExpedientTascaDto.class);
+			return conversioTipusHelper.convertir(metaExpedientTascaEntity, MetaExpedientTascaDto.class);
 			
 		} catch (Exception e) {
 			applicationHelper.stopTimer(sample, "METRICS@Subsystem_Procediment.metaTasca", "resultado", "error");
@@ -1340,7 +1357,7 @@ public class MetaExpedientHelper {
 				organGestorId == null ? null : organGestorRepository.getOne(organGestorId),
 				procedimentImportat.isGestioAmbGrupsActiva(),
 				procedimentImportat.isInteressatObligatori(),
-				false).
+				procedimentImportat.isPermisDirecte()).
 				expressioNumero(procedimentImportat.getExpressioNumero()).
 				tipusClassificacio(procedimentImportat.getTipusClassificacio()).build();
 		
@@ -1365,7 +1382,7 @@ public class MetaExpedientHelper {
 				if (metaDocumentDto.getMetaDades() != null) {
 					for (MetaDadaDto metaDadaDto : metaDocumentDto.getMetaDades()) {
 						if (metaDadaDto.getTipus() == MetaDadaTipusEnumDto.DOMINI) {
-							List<DominiEntity> dominis = dominiRepository.findByEntitatAndCodi(entitat, metaDadaDto.getCodi());
+							List<DominiEntity> dominis = dominiRepository.findByEntitatAndCodi(entitat, metaDadaDto.getValorString());
 							if (dominis == null || dominis.isEmpty() && metaDadaDto.getDomini() != null) {
 								dominiHelper.create(entitatId, metaDadaDto.getDomini(), false);
 							}
@@ -1379,7 +1396,7 @@ public class MetaExpedientHelper {
 		if (procedimentImportat.getMetaDades() != null) {
 			for (MetaDadaDto metaDadaDto : procedimentImportat.getMetaDades()) {
 				if (metaDadaDto.getTipus() == MetaDadaTipusEnumDto.DOMINI) {
-					List<DominiEntity> dominis = dominiRepository.findByEntitatAndCodi(entitat, metaDadaDto.getCodi());
+					List<DominiEntity> dominis = dominiRepository.findByEntitatAndCodi(entitat, metaDadaDto.getValorString());
 					if (dominis == null || dominis.isEmpty() && metaDadaDto.getDomini() != null) {
 						dominiHelper.create(entitatId, metaDadaDto.getDomini(), false);
 					}

@@ -435,7 +435,7 @@ public class ConversioTipusHelper {
 							target.setValorImport((BigDecimal)DadaEntity.getDadaValorPerRetornar(source, source.getValor()));
 						} else if (source.getTipus()==MetaDadaTipusEnumDto.SENCER) {
 							target.setValorSencer((Long) DadaEntity.getDadaValorPerRetornar(source, source.getValor()));
-						}  else if (source.getTipus()==MetaDadaTipusEnumDto.TEXT) {
+						}  else if (source.getTipus()==MetaDadaTipusEnumDto.TEXT || source.getTipus()==MetaDadaTipusEnumDto.DOMINI) {
 							target.setValorString((String) DadaEntity.getDadaValorPerRetornar(source, source.getValor()));
 						}						
 						

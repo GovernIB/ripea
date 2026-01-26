@@ -527,6 +527,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 		mdadaRes.setMetadadaArxiu(metaDadaDto.getMetadadaArxiu());
 		mdadaRes.setDescripcio(metaDadaDto.getDescripcio());
 		mdadaRes.setActiva(metaDadaDto.isActiva());
+		mdadaRes.setNoAplica(metaDadaDto.isNoAplica());
 		
 		if (metaDadaDto.getDomini()!=null) {
 			mdadaRes.setDomini(ResourceReference.toResourceReference(
@@ -862,12 +863,15 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 		mdadaDto.setMetadadaArxiu(metaDadaResource.getMetadadaArxiu());
 		mdadaDto.setDescripcio(metaDadaResource.getDescripcio());
 		mdadaDto.setActiva(metaDadaResource.isActiva());
+		mdadaDto.setNoAplica(metaDadaResource.isNoAplica());
 		
 		if (metaDadaResource.getDomini()!=null) {
 			DominiDto dominiDto = new DominiDto();
 			dominiDto.setId(metaDadaResource.getDomini().getId());
 			dominiDto.setCodi(metaDadaResource.getDomini().getDescription());
 			mdadaDto.setDomini(dominiDto);
+			//El valor de una meta-dada de tipus DOMINI, es el codi del domini
+			mdadaDto.setValorString(metaDadaResource.getDomini().getDescription());
 		}
 		
 		return mdadaDto;
@@ -894,12 +898,19 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 		target.setNom(metaExpedientExport.getNom());
 		target.setDescripcio(metaExpedientExport.getDescripcio());
 		target.setSerieDocumental(metaExpedientExport.getSerieDocumental());
+		
+		target.setPermetMetadocsGenerals(metaExpedientExport.isPermetMetadocsGenerals());
+		target.setGestioAmbGrupsActiva(metaExpedientExport.isGestioAmbGrupsActiva());
+		target.setInteressatObligatori(metaExpedientExport.isInteressatObligatori());
+		target.setPermisDirecte(metaExpedientExport.isPermisDirecte());
     	
-		if (metaExpedientExport.getOrganGestor()!=null) {
+		if (!metaExpedientExport.isProcedimentComu()) {
 			OrganGestorDto organGestor = new OrganGestorDto();
 			organGestor.setId(metaExpedientExport.getOrganGestor().getId());
 			organGestor.setNom(metaExpedientExport.getOrganGestor().getDescription());
 			target.setOrganGestor(organGestor);
+		} else {
+			target.setOrganGestor(null);
 		}
 		target.setExpressioNumero(metaExpedientExport.getExpressioNumero());
 		
@@ -1001,7 +1012,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 		 */
 		Set<ExpedientEstatDto> estatsImportats = new HashSet<ExpedientEstatDto>();
 		List<Long> estatsExclosos = new ArrayList<Long>();
-		if (metaExpedientExport.getEstats()!=null) {
+		if (metaExpedientExport.getEstatsImportats()!=null) {
 			
 			for (MetaExpedientEstatResource estatResource: metaExpedientExport.getEstatsImportats()) {
 				
