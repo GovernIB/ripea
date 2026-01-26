@@ -12,6 +12,7 @@ import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
@@ -77,6 +78,7 @@ import es.caib.ripea.service.intf.dto.OrganGestorDto;
 import es.caib.ripea.service.intf.dto.PermisDto;
 import es.caib.ripea.service.intf.dto.PinbalServeiDto;
 import es.caib.ripea.service.intf.dto.ProcedimentDto;
+import es.caib.ripea.service.intf.dto.ProgresActualitzacioDto;
 import es.caib.ripea.service.intf.dto.TipusClassificacioEnumDto;
 import es.caib.ripea.service.intf.model.EntitatResource;
 import es.caib.ripea.service.intf.model.GrupResource;
@@ -95,6 +97,7 @@ import es.caib.ripea.service.intf.model.MetaExpedientResource.VincularGrupFormAc
 import es.caib.ripea.service.intf.model.MetaExpedientTascaResource;
 import es.caib.ripea.service.intf.model.MetaExpedientTascaValidacioResource;
 import es.caib.ripea.service.intf.model.MetaNodeResource;
+import es.caib.ripea.service.intf.model.NodeResource.MassiveAction;
 import es.caib.ripea.service.intf.model.OrganGestorResource;
 import es.caib.ripea.service.intf.model.UsuariResource;
 import es.caib.ripea.service.intf.resourceservice.MetaExpedientResourceService;
@@ -142,6 +145,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
     	register(MetaExpedientResource.ACTION_DESVINCULAR_GRUP_CODE,new DesVincularGrupActionExecutor());
     	register(MetaExpedientResource.ACTION_TOGGLE_REGLA_CODE,	new ToggleReglaActionExecutor());
     	register(MetaExpedientResource.ACTION_CREAR_REGLA_CODE,		new CrearReglaActionExecutor());
+    	register(MetaExpedientResource.ACTION_UPDATE_ROLSAC_CODE,	new ActualitzarProcedimentsRolsacActionExecutor());
     	
     	register(MetaExpedientResource.ACTION_IMPORT_ROLSAC_CODE, 	new ImportarRolsacActionExecutor());
     	register(MetaExpedientResource.ACTION_IMPORT_FITXER_CODE,	new ImportarFitxerActionExecutor());
@@ -1174,6 +1178,35 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 				excepcioLogHelper.addExcepcio("/metaExpedient/"+entity.getId()+"/CrearReglaActionExecutor", e);
 				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, messageHelper.getMessage("message.common.action.error")+": "+e.getMessage());
 			}
+		}
+    }
+    
+    private class ActualitzarProcedimentsRolsacActionExecutor implements ActionExecutor<MetaExpedientResourceEntity, MassiveAction, Serializable> {
+
+		@Override
+		public void onChange(Serializable id, MassiveAction previous, String fieldName, Object fieldValue,
+				Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {
+		}
+
+		@Override
+		public Serializable exec(String code, MetaExpedientResourceEntity entity, MassiveAction params) throws ActionExecutionException {
+			String entitatActualCodi = configHelper.getEntitatActualCodi();
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true,false);
+			ProgresActualitzacioDto progresActualitzacioDto = new ProgresActualitzacioDto();
+			List<MetaExpedientEntity> metaExpedients = new ArrayList<MetaExpedientEntity>();
+			if (params.getIds()!=null) {
+				
+				for (Long idProc: params.getIds()) {
+					metaExpedients.add(metaExpedientRepository.findById(idProc).get());
+				}
+				
+				metaExpedientHelper.actualitzarProcediments(
+						entitat,
+						metaExpedients,
+						LocaleContextHolder.getLocale(),
+						progresActualitzacioDto);
+			}
+			return progresActualitzacioDto;
 		}
     }
     

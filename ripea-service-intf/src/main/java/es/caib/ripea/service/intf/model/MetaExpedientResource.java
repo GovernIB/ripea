@@ -83,6 +83,10 @@ import lombok.experimental.FieldNameConstants;
                         requiresId = true),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
+                        code = MetaExpedientResource.ACTION_UPDATE_ROLSAC_CODE,
+                        formClass = NodeResource.MassiveAction.class),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
                         code = MetaExpedientResource.ACTION_IMPORT_ROLSAC_CODE,
                         formClass = MetaExpedientResource.ImportarRolsacFormAction.class),
                 @ResourceConfigArtifact(
@@ -110,6 +114,7 @@ public class MetaExpedientResource extends MetaNodeResource {
     public static final String ACTION_DESVINCULAR_GRUP_CODE	= "DESVINCULAR_GRUP";
     public static final String ACTION_TOGGLE_REGLA_CODE		= "TOGGLE_REGLA_ROLSAC";
     public static final String ACTION_CREAR_REGLA_CODE		= "CREAR_REGLA_ROLSAC";
+    public static final String ACTION_UPDATE_ROLSAC_CODE	= "UPDATE_ROLSAC";
     public static final String ACTION_IMPORT_ROLSAC_CODE	= "IMPORT_ROLSAC";
     public static final String ACTION_IMPORT_FITXER_CODE	= "IMPORT_FITXER";
     public static final String REPORT_EXPORT_JSON 			= "REPORT_EXPORT_JSON";
