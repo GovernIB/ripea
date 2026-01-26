@@ -25,214 +25,292 @@
 	<script src="<c:url value='/webjars/autoNumeric/1.9.30/autoNumeric.js'/>"></script>
 	<script src="<c:url value='/js/jquery.maskedinput.min.js'/>"></script>
 	<rip:modalHead/>
-
-	<style>
-	#command { padding-bottom: 10px; }
-	.title-container {
-		margin-bottom: 20px;
-		text-align: left;
-		background-color: #696666;
-		padding-left: 5px;
-		line-height: 25px;
-		height: 25px;
-		color: #fff;
-	}
+	
+<style>
 	.progressContainer {
-		margin-top: 15px;
-		text-align: center;
-		width: 95%;
-		margin-left:auto;
-		margin-right:auto;
+	    margin-top: 15px;
+	    text-align: center;
+	    width: 95%;
+	    margin: auto;
 	}
 	.progressText {
-		margin-top: 10px; 
+	    margin-top: 10px;
 	}
 	.help-block {
-		color: #a94442;
+	    color: #a94442;
 	}
-	</style>
+</style>
 
-	<script>
+<script>
+	'use strict';
+
 	var intervalProgres;
+	var mostrarConfirmacio = true;
+	
 	var preparantZipMsg = "<spring:message code='contingut.boto.crear.document.multiple.preparant'/>";
 	var tancarModalMsg = "<spring:message code='contingut.boto.crear.document.multiple.tancar'/>";
 	var cancelarModalMsg = "<spring:message code='contingut.boto.crear.document.multiple.cancelar'/>";
 
-	$(document).ready(function() {
+	var resultatProcesTitol = "<spring:message code='contingut.boto.crear.document.multiple.resultat.proces.titol'/>";
+	var resultatProcesErrorTitol = "<spring:message code='contingut.boto.crear.document.multiple.resultat.proces.error.titol'/>";
+	var resultatProcesTotal = "<spring:message code='contingut.boto.crear.document.multiple.resultat.proces.total'/>";
+	var resultatProcesTotalOk = "<spring:message code='contingut.boto.crear.document.multiple.resultat.proces.total.ok'/>";
+	var resultatProcesTotalError = "<spring:message code='contingut.boto.crear.document.multiple.resultat.proces.total.error'/>";
+	var resultatProcesFirmaError = "<spring:message code='contingut.boto.crear.document.multiple.resultat.proces.total.firma.error'/>";
+	var resultatProcesTotalCarpetes = "<spring:message code='contingut.boto.crear.document.multiple.resultat.proces.total.carpetes'/>";
+	var resultatProcesTamany = "<spring:message code='contingut.boto.crear.document.multiple.resultat.proces.tamany'/>";
 
-		$('#cancelarProcessarDocumentsBtn').hide();
-		
-		clearInterval(intervalProgres);
+	var selectors = {
+		form: 'form',
+		formContent: '.form-content',
+		esborranys: '.esborranys',
+		progressZip: '.progressZip',
+		btnProcessar: '#processarDocumentsBtn',
+		btnCancelar: '#cancelarBtn',
+		btnCancelarProces: '#cancelarProcessarDocumentsBtn'
+	};
 
+	var $form;
+	var $formContent;
+	var $esborranys;
+	var $progressZip;
+	var $btnProcessar;
+	var $btnCancelar;
+	var $btnCancelarProces;
+
+	$(document).ready(function () {
+		inicialitzarSelectors();
+		inicialitzarFormulari();
+		inicialitzarProcesZip();
 		mostrarBarraProgresExistent();
-
-		processarZip();
-		
-		$('button[name=cancelarBtn]').click(tancarModalImportacio);
-
-		$('button.close').click(function(e){
-			e.preventDefault();
-			tancarModalImportacio();
-		});
-
 	});
+
+	function inicialitzarSelectors() {
+		$form = $(selectors.form);
+		$formContent = $(selectors.formContent);
+		$esborranys = $(selectors.esborranys);
+		$progressZip = $(selectors.progressZip);
+		$btnProcessar = $(selectors.btnProcessar);
+		$btnCancelar = $(selectors.btnCancelar);
+		$btnCancelarProces = $(selectors.btnCancelarProces);
+	}
+
+	function inicialitzarFormulari() {
+		$btnCancelar.hide();
+		$btnCancelarProces.hide();
+		$btnProcessar.prop('disabled', false);
+	    clearInterval(intervalProgres);
+	}
 	
-	function processarZip() {
-		$(".progressContainer").remove();
+	function processarFormulari() {
+		$btnProcessar = $(parent.document).find(selectors.btnProcessar);
+		$btnCancelar = $(parent.document).find(selectors.btnCancelar);
+		$btnCancelarProces = $(parent.document).find(selectors.btnCancelarProces);
 
-		$('#processarDocumentsBtn').on('click', function () {
+		$btnProcessar.prop('disabled', true);
+        $btnCancelar.show();
+		$btnCancelarProces.show();
+	}
+	
+	function ocultarFormulari() {
+		$formContent.hide();
+		$esborranys.hide();
+	}
+
+	function mostrarFormulari() {
+		$formContent.show();
+		$esborranys.show();
+	}
+
+	function resetErrors() {
+		$form.find('.help-block').remove();
+		$progressZip.empty();
+	}
+
+	function inicialitzarProcesZip() {
+		$btnProcessar.on('click', function () {
 			
-		    $('#processarDocumentsBtn', parent.document).attr('disabled', true);
-		    
-		    var form = $('form')[0];
-		    var data = new FormData(form);
-
-		    $('form, .esborranys').hide();
-			$('#cancelarProcessarDocumentsBtn', parent.document).show();
+			processarFormulari();
+			ocultarFormulari();
 			mostrarBarraProgres();
-        	
-		    $.ajax({
-		        url: form.action,
-		        type: 'POST',
-		        data: data,
-		        processData: false,
-		        contentType: false,
-		        error: function(jqXHR, textStatus, errorThrown) {
-		        	$('form, .esborranys').show();
-		        	$('#cancelarProcessarDocumentsBtn', parent.document).hide();
-				    $('#processarDocumentsBtn', parent.document).attr('disabled', false);
-				    $('#progressZip .progressContainer').remove();
-				    $('form').find('.help-block').remove();
-		        	$('form .fileinput').after('<p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<span>' + jqXHR.responseText + '</span></p>')
-		            clearInterval(intervalProgres);
-		        }
-		    });
+
+			var data = new FormData($form[0]);
+
+	        
+			$.ajax({
+				url: $form[0].action,
+				type: 'POST',
+				data: data,
+				processData: false,
+				contentType: false,
+				error: function (jqXHR) {
+					restaurarFormulariError(jqXHR.responseText);
+				}
+			});
 		});
 	}
-	
-	function cancelarProcessamentZip(){
-		if(confirm(cancelarModalMsg)){
-			$.ajax({
-				url: "<c:url value='/contingut/${command.pareId}/zip/importacio/cancelar/'/>",
-		        type: 'POST',
-				success: function () {
-					window.top.location.reload();
-		        }
-		    });
-		}
+
+	function restaurarFormulariError(errorText) {
+		mostrarFormulari();
+
+		inicialitzarFormulari();
+
+		resetErrors();
+
+		$form.find('.fileinput').after(
+			'<p class="help-block"><span class="fa fa-exclamation-triangle"></span> ' +
+			errorText +
+			'</p>'
+		);
 	}
-		
-	function tancarModalImportacio(){
-		if(confirm(tancarModalMsg)){
+
+	 function cancelarProcessamentZip() {
+		if (confirm(cancelarModalMsg)) {
+			$.post("<c:url value='/contingut/${command.pareId}/zip/importacio/cancelar/'/>", function () {
+				window.top.location.reload();
+			});
+		}
+	};
+
+	function tancarModalImportacio() {
+		if (mostrarConfirmacio ? confirm(tancarModalMsg) : true) {
 			window.top.location.reload();
 		}
-	}
-		
-	function mostrarBarraProgres(){
-		var html = '<div class="progressContainer"> \
-		           		<div class="progress"> \
-		           			<div class="progress-bar progress-bar-striped active" style="width:0%">0%</div> \
-		            	</div> \
-		            <div class="progressText">' + preparantZipMsg + '</div> \
-		            </div>';
-		$('#progressZip').html(html);
-		refreshProgres();
-	}
+	};
 
-	function refreshProgres(){
-		intervalProgres = setInterval(consultarProgreso, 100); // Cada 0.5 segons refrescar
+	function mostrarBarraProgres() {
+		$progressZip.html(
+			'<div class="progressContainer">' +
+				'<div class="progress">' +
+					'<div class="progress-bar progress-bar-striped active" style="width:0%">0%</div>' +
+				'</div>' +
+				'<div class="progressText">' + preparantZipMsg + '</div>' +
+			'</div>'
+		);
+
+		intervalProgres = setInterval(consultarProgreso, 250);
 	}
 
-	function consultarProgreso(){
-		$.ajax({
-			url: "<c:url value='/contingut/${command.pareId}/zip/importacio/progres/'/>",
-			type: "GET",
-			success: function(res){
-				if(res){
-					var prog = Math.round(res.progres || 0);
-					$('#progressZip .progress-bar')
-						.css('width', prog + '%')
-						.text(prog + '%');
+	function consultarProgreso() {
+		$.get("<c:url value='/contingut/${command.pareId}/zip/importacio/progres/'/>", function (res) {
+			if (!res) return;
 
-					if(res.error){
-						$('#progressZip .progress-bar').addClass('progress-bar-danger');
-						$('#progressZip .progressText').text(res.errorMsg || 'Error processant zip...');
-					} else if (res.info && res.info.length > 0){
-						$('#progressZip .progressText').text(res.info[res.info.length-1].text || 'Procesando...');
-					}
+			var prog = Math.round(res.progres || 0);
+			$('.progress-bar').css('width', prog + '%').html(prog + '%');
 
-					if(res.finished){
-						clearInterval(intervalProgres);
-						window.top.location.reload();
-					}
-				}
-			},
-			error: function(){
+			if (res.error) {
+				$('.progress-bar').addClass('progress-bar-danger');
+				$('.progressText').html(res.errorMsg);
+			} else if (res.info && res.info.length) {
+				$('.progressText').html(res.info[res.info.length - 1].text);
+			}
+
+			if (res.finished) {
 				clearInterval(intervalProgres);
-				$('#progressZip .progress-bar').addClass('progress-bar-danger');
-				$('#progressZip .progressText').text('Error consultant progress...');
+				mostrarResultatFinal(res);
+				mostrarConfirmacio = false;
+				webutilModalAdjustHeight();
 			}
 		});
 	}
-		
-	function mostrarBarraProgresExistent() {
-	    $.ajax({
-	        url: "<c:url value='/contingut/${command.pareId}/zip/importacio/progres/'/>",
-	        type: "GET",
-	        success: function(res) {
-	            if (res && !res.finished) {
-	            	$('form, .esborranys').hide();
-	            	$('#cancelarProcessarDocumentsBtn', parent.document).show();
-	            	$('#processarDocumentsBtn', parent.document).attr('disabled', true);
-	            	
-	                if ($("#progressZip .progressContainer").length === 0) {
-	                    var progressContainer = 
-	                        '<div class="progressContainer"> \
-	                         	<div class="progress"> \
-	                         		<div class="progress-bar progress-bar-striped active" style="width:' + res.progres + '%">' + Math.round(res.progres) + '%</div> \
-	                         	</div> \
-	                        	<div class="progressText">' + (res.info[0]?.text || preparantZipMsg) + '</div> \
-	                        </div>';
-	                    $("#progressZip").html(progressContainer);
-	                }
 
-	                refreshProgres();
-	            }
-	        }
-	    });
+	function mostrarResultatFinal(res) {
+		$btnCancelarProces.hide();
+
+		var html =
+			'<h5><strong>' + resultatProcesTitol + '</strong></h5>' +
+			'<div class="alert alert-success"><ul>' +
+				'<li>' + resultatProcesTotal + ' <strong>' + res.numOperacions + '</strong></li>' +
+				'<li>' + resultatProcesTotalOk + ' <strong>' + res.documentsCorrectes + '</strong></li>' +
+				'<li>' + resultatProcesTotalError + ' <strong>' + res.documentsError + '</strong></li>' +
+				'<li>' + resultatProcesFirmaError + ' <strong>' + res.documentsFirmaError + '</strong></li>' +
+				'<li>' + resultatProcesTotalCarpetes + ' <strong>' + res.carpetesCreades + '</strong></li>' +
+				'<li>' + resultatProcesTamany + ' <strong>' + formatBytes(res.tamanyTotal) + '</strong></li>' +
+			'</ul></div>';
+
+		if (res.errorsDetall && res.errorsDetall.length) {
+			html +=
+				'<h5><strong>' + resultatProcesErrorTitol + '</strong></h5>' +
+				'<div class="alert alert-danger"><ul>' +
+				$.map(res.errorsDetall, function (err) {
+					return '<li>' + err + '</li>';
+				}).join('') +
+				'</ul></div>';
+		}
+
+		$progressZip.html(html);
 	}
-	</script>
+
+	function mostrarBarraProgresExistent() {
+		$.get("<c:url value='/contingut/${command.pareId}/zip/importacio/progres/'/>", function (res) {
+			if (res && !res.finished) {
+				processarFormulari();
+				ocultarFormulari();
+				mostrarBarraProgres();
+			}
+		});
+	}
+
+	function formatBytes(bytes) {
+		if (!bytes) return '0 B';
+		var sizes = ['B', 'KB', 'MB', 'GB'];
+		var i = Math.floor(Math.log(bytes) / Math.log(1024));
+		return (bytes / Math.pow(1024, i)).toFixed(2) + ' ' + sizes[i];
+	}
+</script>
+
 </head>
 
 <body>
-	<c:set var="formAction"><rip:modalUrl value="${action}"/></c:set>
 
-	<div class="esborranys alert well-sm alert-info alert-dismissable">
-		<spring:message code="contingut.boto.crear.document.multiple.info"/>
+	<c:set var="formAction">
+	    <rip:modalUrl value="${action}"/>
+	</c:set>
+	
+	<div class="esborranys alert alert-info">
+	    <spring:message code="contingut.boto.crear.document.multiple.info"/>
 	</div>
-	<div id="progressZip"></div>
-
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="command" enctype="multipart/form-data">
-		<form:hidden path="tascaId"/>
-		<form:hidden path="metaExpedientId"/>
-		
-		<c:if test="${empty command.documents}">
-			<rip:inputFile name="arxiuZip" textKey="contingut.document.zip.form.camp.arxiu" required="true"/>
-		</c:if>
-
-		<div id="modal-botons" class="well">
-			<button type="button" onclick="cancelarProcessamentZip();" id="cancelarProcessarDocumentsBtn"  class="btn btn-danger">
-				<span class="fa fa-save"></span> <spring:message code="comu.boto.cancelar"/>
-			</button>
-			
-			<button type="button" id="processarDocumentsBtn" class="btn btn-success">
-				<span class="fa fa-save"></span> <spring:message code="comu.boto.processar"/>
-			</button>
-			
-			<button type="button" name="cancelarBtn" class="btn btn-default">
-				<spring:message code="comu.boto.tanca"/>
-			</button>
+	
+	<div class="progressZip"></div>
+	
+	<form:form action="${formAction}"
+	           method="post"
+	           cssClass="form-horizontal"
+	           commandName="command"
+	           enctype="multipart/form-data">
+	
+	    <form:hidden path="tascaId"/>
+	    <form:hidden path="metaExpedientId"/>
+	
+		<div class="form-content">
+		    <rip:inputFile name="arxiuZip"
+		                   textKey="contingut.document.zip.form.camp.arxiu"
+		                   required="true"/>
 		</div>
+	    <div id="modal-botons" class="well">
+	
+	        <button type="button"
+	                id="cancelarProcessarDocumentsBtn"
+	                onclick="cancelarProcessamentZip();"
+	                class="btn btn-danger">
+	            <spring:message code="comu.boto.cancelar"/>
+	        </button>
+	
+	        <button type="button"
+	                id="processarDocumentsBtn"
+	                class="btn btn-success">
+	            <spring:message code="comu.boto.processar"/>
+	        </button>
+	
+	        <button type="button"
+	        		id="cancelarBtn"
+	                onclick="tancarModalImportacio();"
+	                class="btn btn-default">
+	            <spring:message code="comu.boto.tanca"/>
+	        </button>
+	
+	    </div>
 	</form:form>
+
 </body>
 </html>

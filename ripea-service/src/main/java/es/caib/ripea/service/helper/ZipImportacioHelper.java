@@ -1,6 +1,5 @@
 package es.caib.ripea.service.helper;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -13,13 +12,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.io.FilenameUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -47,11 +46,8 @@ public class ZipImportacioHelper {
     private final Map<Long, ProgresProcessamentZipDto> mapProgres = new HashMap<>();
     private final AtomicBoolean cancelat = new AtomicBoolean(false);
 
-    private final DocumentHelper documentHelper;
-    
-    public ZipImportacioHelper(DocumentHelper documentHelper) {
-        this.documentHelper = documentHelper;
-    }
+    @Autowired private DocumentHelper documentHelper;
+    @Autowired private MessageHelper messageHelper;
 
     public void processarZip(
     		UsuariDto usuari, 
@@ -63,39 +59,23 @@ public class ZipImportacioHelper {
         try {
             inicialitzarContext(usuari, entitat);
 
-//            byte[] zipBytes = zipInputStream.readAllBytes();
-//            int totalEntradas = comptarEntradasZip(new ByteArrayInputStream(zipBytes));
-//
-            ProgresProcessamentZipDto progres = inicialitzarProgres(pareId);
-//            progres.setNumOperacions(totalEntradas);
-			try (InputStream in = Files.newInputStream(tempZip);
-					ZipArchiveInputStream zis = new ZipArchiveInputStream(in, StandardCharsets.UTF_8.name(), true)) {
+            inicialitzarProgres(pareId);
+            
+            comptarEntradesZip(
+            		tempZip, 
+            		pareId);
 
-				int total = 0;
-				ZipEntry entry;
-				while ((entry = zis.getNextEntry()) != null) {
-					if (!entry.isDirectory())
-						total++;
-				}
-				progres.setNumOperacions(total);
-			}
-
-			try (InputStream in = Files.newInputStream(tempZip);
-					ZipArchiveInputStream zis = new ZipArchiveInputStream(in, StandardCharsets.UTF_8.name(), true)) {
-
-				processarEntradesZip(
-						zis, 
-						entitat.getId(), 
-						pareId, 
-						rolActual);
-			}
-
-        } catch (Exception e) {
-            log.error("Error general processant el fitxer ZIP", e);
+			processarEntradesZip(
+					tempZip, 
+					entitat.getId(), 
+					pareId, 
+					rolActual);
+        } catch (Exception ex) {
+            log.error("Error general processant el fitxer ZIP", ex);
             ProgresProcessamentZipDto progres = mapProgres.get(pareId);
             if (progres != null) {
                 progres.setError(true);
-                progres.setErrorMsg("Error general processant el fitxer ZIP: " + e.getMessage());
+                progres.setErrorMsg(messageHelper.getMessage("contingut.boto.crear.document.multiple.error", new Object[] {ex.getMessage()}));
             }
         }
     }
@@ -116,98 +96,70 @@ public class ZipImportacioHelper {
         return mapProgres.get(pareId);
     }
     
-    private void inicialitzarContext(UsuariDto usuari, EntitatDto entitat) {
-        createAuthenticationContext(usuari);
-        ConfigHelper.setEntitat(entitat);
-    }
-
-    
-    /** Mètodes privats **/
-    
-    private int comptarEntradasZip(InputStream zipInputStream) throws IOException {
-        int total = 0;
-        try (ZipArchiveInputStream zis = new ZipArchiveInputStream(zipInputStream, StandardCharsets.UTF_8.name(), true)) {
-            ZipEntry entry;
-            while ((entry = zis.getNextEntry()) != null) {
-                if (!entry.isDirectory()) total++;
-            }
-        }
-        return total;
-    }
-
-    // Processa cada entrada del ZIP en streaming
-    private void processarEntradesZip(
-            ZipArchiveInputStream zis,
-            Long entitatId,
-            Long pareId,
-            String rolActual) throws IOException {
-
-        Map<String, List<String>> ubicacioDocuments = new HashMap<>();
-        ProgresProcessamentZipDto progres = mapProgres.get(pareId);
-
-        ZipEntry entry;
-        while ((entry = zis.getNextEntry()) != null && !cancelat.get()) {
-
-            if (entry.isDirectory()) continue;
-
-            String rutaCompleta = entry.getName();
-            registrarUbicacio(rutaCompleta, ubicacioDocuments);
-
-            try {
-                progres.addInfo("Processant: " + rutaCompleta);
-
-                byte[] contingut = zis.readAllBytes();
-                DocumentDto document = crearDocumentDto(rutaCompleta, contingut);
-
-                documentHelper.processarDocumentNewTransaction(
-                        ubicacioDocuments,
-                        progres,
-                        entitatId,
-                        document,
-                        pareId,
-                        rolActual
-                );
-            } catch (Exception ex) {
-                progres.setError(true);
-                progres.setErrorMsg("Error processant: " + rutaCompleta);
-                log.error("Error procesant {}", rutaCompleta, ex);
-            } finally {
-                progres.incrementOperacionsRealitzades();
-            }
-        }
-    }
-
-
-    private void procesarEntradaZip(
-    		InputStream zis, 
-    		String rutaCompleta, 
-    		Map<String, List<String>> ubicacioDocuments,
-    		Long entitatId, 
-    		Long pareId, 
-    		String rolActual) {
+    private void comptarEntradesZip(Path tempZip, Long pareId) throws IOException {
     	ProgresProcessamentZipDto progres = mapProgres.get(pareId);
     	
-        try {
-            progres.addInfo("Processant: " + rutaCompleta);
+    	try (InputStream in = Files.newInputStream(tempZip);
+				ZipArchiveInputStream zis = new ZipArchiveInputStream(in, StandardCharsets.UTF_8.name(), true)) {
 
-            byte[] contingut = zis.readAllBytes();
-            DocumentDto document = crearDocumentDto(rutaCompleta, contingut);
+			int total = 0;
+			ZipEntry entry;
+			while ((entry = zis.getNextEntry()) != null) {
+				if (!entry.isDirectory())
+					total++;
+			}
+			progres.setNumOperacions(total);
+		}
+    }
 
-            documentHelper.processarDocumentNewTransaction(
-            		ubicacioDocuments, 
-            		progres, 
-            		entitatId, 
-            		document, 
-            		pareId, 
-            		rolActual);
+    private void processarEntradesZip(
+    		Path tempZip,
+    		Long entitatId, 
+    		Long pareId, 
+    		String rolActual) throws IOException {
+    	try (InputStream in = Files.newInputStream(tempZip);
+				ZipArchiveInputStream zis = new ZipArchiveInputStream(in, StandardCharsets.UTF_8.name(), true)) {
 
-        } catch (Exception ex) {
-            progres.setError(true);
-            progres.setErrorMsg("Error procesando: " + rutaCompleta);
-            log.error("Error procesando {}", rutaCompleta, ex);
-        } finally {
-            progres.incrementOperacionsRealitzades();
-        }
+    		Map<String, List<String>> ubicacioDocuments = new HashMap<>();
+            ProgresProcessamentZipDto progres = mapProgres.get(pareId);
+
+            ZipEntry entry;
+            while ((entry = zis.getNextEntry()) != null && !cancelat.get()) {
+
+                if (entry.isDirectory()) continue;
+
+                String rutaCompleta = entry.getName();
+                registrarUbicacio(rutaCompleta, ubicacioDocuments);
+
+                try {
+                    progres.addInfo(
+                    		messageHelper.getMessage("contingut.boto.crear.document.multiple.processant",
+                    				new Object[] {rutaCompleta}));
+
+                    byte[] contingut = zis.readAllBytes();
+                    DocumentDto document = crearDocumentDto(rutaCompleta, contingut);
+
+                    documentHelper.processarDocumentNewTransaction(
+                            ubicacioDocuments,
+                            progres,
+                            entitatId,
+                            document,
+                            pareId,
+                            rolActual
+                    );
+            		
+            		progres.addDocumentCorrecte(document.getFitxerTamany());
+                    
+                } catch (Exception ex) {
+                    log.error("Error procesant la següent entrada del fitxer ZIP {}", rutaCompleta, ex);
+					progres.addError(
+							messageHelper.getMessage("contingut.boto.crear.document.multiple.entrada.error",
+							new Object[] { rutaCompleta, ex.getMessage() }));
+                } finally {
+                    progres.incrementOperacionsRealitzades();
+                }
+            }
+		}
     }
 
     private DocumentDto crearDocumentDto(String rutaCompleta, byte[] contingut) {
@@ -239,6 +191,11 @@ public class ZipImportacioHelper {
         List<String> ubicacio = new ArrayList<>();
         path.forEach(p -> ubicacio.add(p.toString()));
         ubicacioDocuments.put(rutaCompleta, ubicacio);
+    }
+    
+    private void inicialitzarContext(UsuariDto usuari, EntitatDto entitat) {
+        createAuthenticationContext(usuari);
+        ConfigHelper.setEntitat(entitat);
     }
 
     private void createAuthenticationContext(UsuariDto usuariActual) {
