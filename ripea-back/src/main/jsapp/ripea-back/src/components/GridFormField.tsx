@@ -3,7 +3,8 @@ import {FormField, FormFieldProps, useFormContext} from "reactlib";
 import Load from "./Load.tsx";
 import {useTranslation} from "react-i18next";
 import {useUserSession} from "./Session.tsx";
-import {useMemo} from "react";
+import {useCallback, useEffect, useMemo, useState} from "react";
+import {FormFieldDataActionType} from "../../lib/components/form/FormContext.tsx";
 
 export const GridButton = (props:any) => {
     const { title, xs, children, hidden, ...other} = props;
@@ -52,7 +53,7 @@ function formatByteCount(bytes:number) {
 export const FileFormField = (props:GridFormField) => {
     const { t } = useTranslation();
     const { value: user } = useUserSession()
-    const maxSize = useMemo(()=>user?.sessionScope?.maxUploadFileSize || 0,[]);
+    const maxSize = useMemo(()=>user?.sessionScope?.maxUploadFileSize || 0,[user?.sessionScope?.maxUploadFileSize]);
     const mssg = useMemo(()=>t('page.contingut.alert.fileSize', {maxSize: formatByteCount(maxSize)}),[t, maxSize]);
 
     const adjuntValidator = (value: any) => {
@@ -63,17 +64,53 @@ export const FileFormField = (props:GridFormField) => {
             }];
         }
     }
-    return <GridFormField {...props} componentProps={{title :mssg}} type={"file"} validator={adjuntValidator}/>
+    return <GridFormField {...props} componentProps={{...(props?.componentProps ?? {}), title: mssg}} type={"file"} validator={adjuntValidator}/>
 }
 
 const GridFormField = (props:GridFormField) => {
-    const { xs, hidden, componentProps = {}, disabled, ...other} = props;
+    const {
+        name,
+        xs,
+        hidden,
+        componentProps = {},
+        disabled,
+        onChange,
+        validator,
+        ...other
+    } = props;
+    const {fields, dataDispatchAction, validationSetFieldErrors} = useFormContext()
+
+    const [field, setField] = useState<any>();
+    useEffect(() => {
+        if (fields) {
+            const field = fields.find(f => f.name === name);
+            setField(field ?? null);
+        }
+    }, [fields, name]);
+    const handleFieldValueChange = useCallback((value: any) => {
+        const errors = validator?.(value) ?? undefined;
+        validationSetFieldErrors(name, errors);
+        if (errors === undefined) {
+            onChange?.(value)
+            dataDispatchAction({
+                type: FormFieldDataActionType.FIELD_CHANGE,
+                payload: { fieldName: name, field, value }
+            });
+        }
+    }, [dataDispatchAction, field, name]);
 
     return <Grid item xs={xs} hidden={!!hidden}>
-        <FormField disabled={disabled} readOnly={disabled} {...other} componentProps={{
-            sx: {color: 'black', backgroundColor: 'white'},
-            ...componentProps
-        }}/>
+        <FormField
+            name={name}
+            disabled={disabled}
+            readOnly={disabled}
+            {...other}
+            componentProps={{
+                sx: {color: 'black', backgroundColor: 'white'},
+                ...componentProps
+            }}
+            onFieldValueChange={handleFieldValueChange}
+        />
     </Grid>
 }
 export default GridFormField;

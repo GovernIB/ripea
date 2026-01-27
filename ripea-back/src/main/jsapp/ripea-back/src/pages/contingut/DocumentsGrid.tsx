@@ -171,6 +171,7 @@ const DocumentsGrid = (props: any) => {
     const [treeView, setTreeView] = useState<boolean>(true);
     const [expand, setExpand] = useState<boolean>(user?.conf?.expedientExpandit);
     const [vista, setVista] = useState<string>(getFolderExpand("vista") ?? user?.conf?.vistaActual);
+    const [disabled, setDisabled] = useState<boolean>(false);
     const {
         isReady,
         carpetes,
@@ -248,7 +249,7 @@ const DocumentsGrid = (props: any) => {
                         staticSortModel={sortModel}
                         //rowReordering
                         popupEditCreateActive
-                        popupEditFormContent={<DocumentsGridForm />}
+                        popupEditFormContent={<DocumentsGridForm setDisabled={setDisabled} />}
                         formAdditionalData={{
                             expedient: { id: entity?.id },
                             metaExpedient: entity?.metaExpedient,
@@ -389,6 +390,10 @@ const DocumentsGrid = (props: any) => {
 
                         toolbarHideCreate
                         popupEditFormComponentProps={{ initOnChangeRequest: true }}
+                        popupEditFormDialogButtons={[
+                            {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
+                            {icon: 'save', text: t('common.save'), componentProps: { variant: 'contained', disabled: disabled }, value: true },
+                        ]}
                         popupEditFormI18nKeys={{
                             createSuccess: 'page.document.action.new.ok',
                             updateSuccess: 'page.document.action.update.ok',

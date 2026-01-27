@@ -67,9 +67,6 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
         formInitOnChange,
         popupEditFormDialogComponentProps,
         popupEditFormComponentProps,
-        rowHideUpdateButton = true,
-        rowHideDeleteButton = true,
-        toolbarHideQuickFilter = true,
         rowExpansionChange,
         onRefresh,
         disabledMassiveDefSelector = false,
@@ -208,7 +205,7 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
             disableColumnMenu
             disableColumnSorting={!!staticSortModel}
             staticSortModel={staticSortModel}
-            {...others}
+
             apiRef={apiRef}
             datagridApiRef={datagridApiRef}
             columns={columnsWithWordWrap}
@@ -239,13 +236,14 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
             toolbarHideRefresh
             toolbarHideCreate
             toolbarHideExport
-            toolbarHideQuickFilter={toolbarHideQuickFilter}
+            toolbarHideQuickFilter
             toolbarElementsWithPositions={toolbarElements}
-            rowHideUpdateButton={rowHideUpdateButton}
-            rowHideDeleteButton={rowHideDeleteButton}
+            rowHideUpdateButton
+            rowHideDeleteButton
             readOnly={readOnly}
 
             {...paginationProps}
+            {...others}
         />
     </div>
 }
