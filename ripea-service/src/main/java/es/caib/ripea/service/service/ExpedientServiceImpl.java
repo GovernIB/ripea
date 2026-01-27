@@ -72,6 +72,7 @@ import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.CodiValorDto;
 import es.caib.ripea.service.intf.dto.ContingutMassiuFiltreDto;
 import es.caib.ripea.service.intf.dto.ContingutVistaEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentAmbTipusDto;
 import es.caib.ripea.service.intf.dto.DocumentDto;
 import es.caib.ripea.service.intf.dto.ExpedientComentariDto;
 import es.caib.ripea.service.intf.dto.ExpedientDto;
@@ -1765,6 +1766,28 @@ public class ExpedientServiceImpl implements ExpedientService {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		UsuariEntity usuari = usuariRepository.getOne(auth.getName());
 		return usuari.getVistaMoureActual();
+	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public Long checkAllExpedientsSameProcediment(Set<Long> expedientIds) {
+	    if (expedientIds == null || expedientIds.isEmpty()) {
+	        return 0l;
+	    }
+		List<Long> procsIds = expedientRepository.findDistinctProcedimentIds(expedientIds);
+		if (procsIds!=null) {
+			if (procsIds.size()==1) {
+				return procsIds.get(0);
+			} else {
+				return 0l;		
+			}
+		}
+		return 0l;
+	}
+	
+	@Override
+	public String saveImportacioMassivaDocsTemporal(List<DocumentAmbTipusDto> documents) throws IOException {
+		return expedientHelper.saveImportacioMassivaDocsTemporal(documents);
 	}
 
 	private boolean isIncorporacioDuplicadaPermesa() {

@@ -1,5 +1,6 @@
 package es.caib.ripea.service.helper;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
@@ -17,6 +18,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import javax.swing.table.DefaultTableModel;
@@ -42,6 +44,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;
 import com.github.mustachejava.MustacheFactory;
@@ -107,6 +110,7 @@ import es.caib.ripea.service.auxiliary.ExpedientFiltreCalculat;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.ArxiuEstatEnumDto;
 import es.caib.ripea.service.intf.dto.CarpetaDto;
+import es.caib.ripea.service.intf.dto.DocumentAmbTipusDto;
 import es.caib.ripea.service.intf.dto.DocumentDto;
 import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentNtiEstadoElaboracionEnumDto;
@@ -217,6 +221,30 @@ public class ExpedientHelper {
 	        }
         }
         return false;
+	}
+	
+	public String saveImportacioMassivaDocsTemporal(List<DocumentAmbTipusDto> documents) throws IOException {
+		//1.- Guardar fitxers temporalment a disc: en un sol fitxer ZIP amb els objectes passats a fitxers JSON
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ZipOutputStream zipOut = new ZipOutputStream(baos);
+		for (int i = 0; i < documents.size(); i++) {
+			DocumentAmbTipusDto doc = documents.get(i);
+			// Convertir el objeto a JSON
+			ObjectMapper objectMapper = new ObjectMapper();
+			String docAsString = objectMapper.writeValueAsString(doc);
+			// Crear una entrada en el ZIP
+			String entryName = "document_" + (i + 1) + ".json";
+			ZipEntry zipEntry = new ZipEntry(entryName);
+			zipOut.putNextEntry(zipEntry);
+            // Escribir el JSON en la entrada
+            byte[] jsonBytes = docAsString.getBytes("UTF-8");
+            zipOut.write(jsonBytes, 0, jsonBytes.length);
+            zipOut.closeEntry();
+		}
+		
+		return pluginHelper.gestioDocumentalCreate(
+					PluginHelper.GESDOC_AGRUPACIO_DOCS_ESBORRANYS,
+					new ByteArrayInputStream(baos.toByteArray()));
 	}
 	
 	@Transactional(propagation = Propagation.REQUIRES_NEW)

@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.service.intf.service;
 
 import es.caib.ripea.service.intf.dto.*;
@@ -473,8 +470,12 @@ public interface ExpedientService {
 			String rolActual,
 			Long entitatId);
 
+	@PreAuthorize("isAuthenticated()")
+	public Long checkAllExpedientsSameProcediment(Set<Long> expedientsIds);
 
-
+	@PreAuthorize("isAuthenticated()")
+	public String saveImportacioMassivaDocsTemporal(List<DocumentAmbTipusDto> documents) throws IOException;
+	
 	/**
 	 * Retorna una pàgina d'expedients relacionats amb l'expedient especificat.
 	 * @param filtre 

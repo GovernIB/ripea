@@ -6207,7 +6207,7 @@ public class PluginHelper {
 		String redireccio = configHelper.getConfig(PropertyConfig.BASE_URL) + "/contingut/"+tascaEntity.getExpedient().getId()+"?tascaId="+tascaEntity.getId()+"&origenTasques=true";
 		
 		Tasca resultat = Tasca.builder()
-                .appCodi("RIP")
+                .appCodi(configHelper.getConfig(PropertyConfig.COMANDA_APP_CODI))
                 .entornCodi(configHelper.getConfig(PropertyConfig.COMANDA_PLUGIN_ENTORN))
                 .identificador(tascaEntity.getId() + "")
                 .tipus(tascaEntity.getMetaTasca().getNom())
@@ -6231,7 +6231,7 @@ public class PluginHelper {
 	private Avis anotacioRipeaToAvisComanda(ExpedientPeticioEntity expedientPeticioEntity) throws Exception {
 		String redireccio = configHelper.getConfig(PropertyConfig.BASE_URL) + "/expedientPeticio/"+expedientPeticioEntity.getId();
 		Avis avisComanda = Avis.builder()
-                .appCodi("RIP")
+                .appCodi(configHelper.getConfig(PropertyConfig.COMANDA_APP_CODI))
                 .dataFi(DateUtil.addToDate(expedientPeticioEntity.getDataAlta(), Calendar.MONTH, 3))
                 .dataInici(expedientPeticioEntity.getDataAlta())
                 .entornCodi(configHelper.getConfig(PropertyConfig.COMANDA_PLUGIN_ENTORN))
@@ -6300,7 +6300,7 @@ public class PluginHelper {
 		
 		String redireccio = configHelper.getConfig(PropertyConfig.BASE_URL) + "/contingut/"+expedient.getId();
 		Avis avisComanda = Avis.builder()
-                .appCodi("RIP")
+                .appCodi(configHelper.getConfig(PropertyConfig.COMANDA_APP_CODI))
                 .dataFi(dataFi)
                 .dataInici(Calendar.getInstance().getTime())
                 .entornCodi(configHelper.getConfig(PropertyConfig.COMANDA_PLUGIN_ENTORN))

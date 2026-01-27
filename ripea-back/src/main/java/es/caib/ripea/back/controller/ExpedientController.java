@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,6 +37,8 @@ import es.caib.ripea.back.command.ExpedientAssignarCommand;
 import es.caib.ripea.back.command.ExpedientCommand;
 import es.caib.ripea.back.command.ExpedientFiltreCommand;
 import es.caib.ripea.back.command.ExpedientTancarCommand;
+import es.caib.ripea.back.command.ImportarDocsMassiuCommand;
+import es.caib.ripea.back.command.ImportarDocsMassiuCommand.DocumentMassiuItem;
 import es.caib.ripea.back.helper.DatatablesHelper;
 import es.caib.ripea.back.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.back.helper.EntitatHelper;
@@ -45,8 +48,10 @@ import es.caib.ripea.back.helper.JsonResponse;
 import es.caib.ripea.back.helper.MissatgesHelper;
 import es.caib.ripea.back.helper.RequestSessionHelper;
 import es.caib.ripea.back.helper.RolHelper;
+import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.CodiValorDto;
+import es.caib.ripea.service.intf.dto.DocumentAmbTipusDto;
 import es.caib.ripea.service.intf.dto.DocumentDto;
 import es.caib.ripea.service.intf.dto.DocumentEnviamentInteressatDto;
 import es.caib.ripea.service.intf.dto.DocumentEnviamentTipusEnumDto;
@@ -86,6 +91,7 @@ import es.caib.ripea.service.intf.service.ExecucioMassivaService;
 import es.caib.ripea.service.intf.service.ExpedientEstatService;
 import es.caib.ripea.service.intf.service.ExpedientService;
 import es.caib.ripea.service.intf.service.GrupService;
+import es.caib.ripea.service.intf.service.MetaDocumentService;
 import es.caib.ripea.service.intf.service.MetaExpedientService;
 import es.caib.ripea.service.intf.service.OrganGestorService;
 import es.caib.ripea.service.intf.utils.Utils;
@@ -113,6 +119,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 	@Autowired private ExpedientService expedientService;
 	@Autowired private DocumentService documentService;
 	@Autowired private MetaExpedientService metaExpedientService;
+	@Autowired private MetaDocumentService metaDocumentService;
 	@Autowired private DocumentEnviamentService documentEnviamentService;
 	@Autowired private AplicacioService aplicacioService;
 	@Autowired private ExpedientEstatService expedientEstatService;
@@ -438,6 +445,134 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		}
 		model.addAttribute(expedientExportarZipOptions);
 		return "exportarZipMassiu";
+	}
+	
+	@RequestMapping(value = "/importarDocsMassiu", method = RequestMethod.GET)
+	public String importarDocsMassiu(
+			HttpServletRequest request,
+			HttpServletResponse response,
+			Model model) throws IOException {
+		@SuppressWarnings("unchecked")
+		Set<Long> seleccio = (Set<Long>) RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_SELECCIO);
+		ImportarDocsMassiuCommand importarDocsMassiuCommand = new ImportarDocsMassiuCommand();
+		if (seleccio!=null) {
+			importarDocsMassiuCommand.setNumExps(seleccio.size());
+		} else {
+			importarDocsMassiuCommand.setNumExps(0);
+		}
+		
+		if (seleccio==null || seleccio.size()==0) {
+			importarDocsMassiuCommand.setAllSameProcediment(false);
+		} else {
+		
+			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+			Long procedimentId = expedientService.checkAllExpedientsSameProcediment(seleccio);
+			
+			if (procedimentId>0) {
+			
+				importarDocsMassiuCommand.setAllSameProcediment(true);
+				
+			    // Inicializar con un documento vacío
+			    importarDocsMassiuCommand.getDocuments().add(new ImportarDocsMassiuCommand.DocumentMassiuItem());
+			    
+			    // Cargar tipos de documento
+				model.addAttribute(
+						"tipusDocuments",
+						metaDocumentService.findByMetaExpedient(
+								entitatActual.getId(),
+								procedimentId));
+			} else {
+				importarDocsMassiuCommand.setAllSameProcediment(false);
+			}
+		}
+		
+		model.addAttribute("importarDocsMassiuCommand", importarDocsMassiuCommand);
+		return "importarDocsMassiu";
+	}
+	
+	@RequestMapping(value = "/importarDocsMassiu", method = RequestMethod.POST)
+	public String importarDocsMassiu(HttpServletRequest request,
+			ImportarDocsMassiuCommand command,
+			BindingResult bindingResult,
+			Model model) throws IOException {		
+		
+		@SuppressWarnings("unchecked")
+		Set<Long> seleccio = (Set<Long>) RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_SELECCIO);
+		
+		if (seleccio!=null && seleccio.size()>0) {
+
+			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+			List<ExecucioMassivaContingutDto> execucioMassivaElements = new ArrayList<>();
+			
+			//Preparam els expedients per els quals es programa la acció massiva
+			for (Long expedientId : seleccio) {
+				ExecucioMassivaContingutDto execMass = new ExecucioMassivaContingutDto(
+						new Date(),
+						null,
+						expedientId,
+						ExecucioMassivaEstatDto.ESTAT_PENDENT);
+				execucioMassivaElements.add(execMass);
+			}
+
+			//Preparam el document temporal que s'utilitzará durant l'execució del proces, i que es passa a la accio massiva
+			List<DocumentAmbTipusDto> documentsTemporal = new ArrayList<DocumentAmbTipusDto>();
+			if (command.getDocuments()!=null) {
+				for (DocumentMassiuItem dmItem: command.getDocuments()) {
+					if (	dmItem!=null && 
+							dmItem.getFile()!=null && 
+							dmItem.getFile().getBytes()!=null && 
+							dmItem.getFile().getBytes().length>0) {
+						DocumentAmbTipusDto aux = new DocumentAmbTipusDto();
+						aux.setTipusDocument(dmItem.getTipusDocumentId());
+						FileReference fr = new FileReference(
+								dmItem.getFile().getOriginalFilename(),
+								dmItem.getFile().getBytes(),
+								dmItem.getFile().getContentType(),
+								dmItem.getFile().getSize());
+						aux.setFitxer(fr);
+						documentsTemporal.add(aux);
+					}
+				}
+			}
+			
+			if (documentsTemporal.size()>0) {
+			
+				ExecucioMassivaDto execMassDto = new ExecucioMassivaDto(
+						ExecucioMassivaTipusDto.IMPORTAR_DOCS,
+						new Date(),
+						null,
+						RolHelper.getRolActual(request));
+				
+				String gestioDocumentalAdjuntId = expedientService.saveImportacioMassivaDocsTemporal(documentsTemporal);
+				execMassDto.setDocumentNom(gestioDocumentalAdjuntId);
+				
+				execucioMassivaService.saveExecucioMassiva(
+						entitatActual.getId(),
+						execMassDto,
+						execucioMassivaElements,
+						ElementTipusEnumDto.EXPEDIENT);
+	
+				MissatgesHelper.info(request, getMessage(
+						request,
+						"expedient.importar.docs.mass.documents.ok",
+						new Object[]{seleccio.size()}));
+			} else {
+				MissatgesHelper.info(request, getMessage(
+						request,
+						"expedient.importar.docs.mass.documents.buid",
+						new Object[]{seleccio.size()}));
+			}
+		} else {
+			MissatgesHelper.error(
+					request,
+					getMessage(request,"expedient.controller.exportacio.seleccio.buida"));
+		}
+
+		return modalUrlTancar();
 	}
 
 	@RequestMapping(value = "/exportarZipMassiu", method = RequestMethod.POST)

@@ -977,31 +977,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 				if (params!=null && params.getDocuments()!=null && params.getDocuments().size()>0) {
 				
 					//1.- Guardar fitxers temporalment a disc: en un sol fitxer ZIP amb els objectes passats a fitxers JSON
-					ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		            ZipOutputStream zipOut = new ZipOutputStream(baos);
-					for (int i = 0; i < params.getDocuments().size(); i++) {
-						DocumentAmbTipusDto doc = params.getDocuments().get(i);
-						// Convertir el objeto a JSON
-						ObjectMapper objectMapper = new ObjectMapper();
-						String docAsString = objectMapper.writeValueAsString(doc);
-						// Crear una entrada en el ZIP
-						String entryName = "document_" + (i + 1) + ".json";
-						ZipEntry zipEntry = new ZipEntry(entryName);
-						zipOut.putNextEntry(zipEntry);
-		                // Escribir el JSON en la entrada
-		                byte[] jsonBytes = docAsString.getBytes("UTF-8");
-		                zipOut.write(jsonBytes, 0, jsonBytes.length);
-		                zipOut.closeEntry();
-					}
-					
-//					FitxerDto resultat = new FitxerDto();
-//					resultat.setNom(expedient.getNom().replaceAll(" ", "_") + ".zip");
-//					resultat.setContentType("application/zip");
-//					resultat.setContingut(baos.toByteArray());
-					
-					String gestioDocumentalAdjuntId = pluginHelper.gestioDocumentalCreate(
-								PluginHelper.GESDOC_AGRUPACIO_DOCS_ESBORRANYS,
-								new ByteArrayInputStream(baos.toByteArray()));
+					String gestioDocumentalAdjuntId = expedientHelper.saveImportacioMassivaDocsTemporal(params.getDocuments());
 					
 					//2.- Programar la acció massiva per els expedient seleccionats.
 					List<ExecucioMassivaContingutDto> elementsMassiva = execucioMassivaHelper.getMassivaContingutFromIds(params.getIds());
