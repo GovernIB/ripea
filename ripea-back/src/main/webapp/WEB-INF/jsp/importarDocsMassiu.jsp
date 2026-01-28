@@ -46,7 +46,7 @@
 <body>
     <c:set var="formAction"><rip:modalUrl value="/expedient/importarDocsMassiu"/></c:set>
     
-    <form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="importarDocsMassiuCommand" enctype="multipart/form-data">
+    <form:form action="${formAction}" style="min-height: 500px;" method="post" cssClass="form-horizontal" modelAttribute="importarDocsMassiuCommand" enctype="multipart/form-data">
         
         <c:if test="${importarDocsMassiuCommand.allSameProcediment}">
         
