@@ -111,9 +111,9 @@ const PermisMetaExpedientOrganGrid = (props:any) => {
             toolbarElementsWithPositions={[
                 {
                     position: 3,
-                    element: <ToolbarButton title={t('common.create')} icon={'add'}
+                    element: <ToolbarButton title={t('page.permision.action.new.label')} icon={'add'}
                                             onClick={()=>handelCreate(undefined, {}, {procedimentId: id})}
-                                            color={'primary'}/>,
+                                            color={'primary'}>{t('page.permision.action.new.label')}</ToolbarButton>,
                 },
             ]}
 
@@ -238,7 +238,11 @@ const PermisMetaExpedientNodeGrid = (props:any) => {
             toolbarElementsWithPositions={[
                 {
                     position: 3,
-                    element: <ToolbarButton title={t('common.create')} icon={'add'} onClick={()=>handelCreate(id)} color={'primary'}/>,
+                    element: <ToolbarButton
+                        title={t('page.permision.action.new.label')}
+                        icon={'add'}
+                        onClick={()=>handelCreate(id)}
+                        color={'primary'}>{t('page.permision.action.new.label')}</ToolbarButton>,
                 },
             ]}
             toolbarHideCreate
@@ -278,7 +282,7 @@ const PermisMetaExpedientGrid = ()=> {
     return <GridPage disableMargins>
         <Load value={entity}>
             <CardPage title={t('page.user.menu.procedimentPermis', {nom: entity?.nom})}>
-                {entity?.comu
+                {entity?.procedimentComu
                     ?<PermisMetaExpedientOrganGrid id={id}/>
                     :<PermisMetaExpedientNodeGrid id={id}/>
                 }

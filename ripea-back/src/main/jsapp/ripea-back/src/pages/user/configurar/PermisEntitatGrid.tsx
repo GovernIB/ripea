@@ -76,10 +76,10 @@ const PermisEntitatGrid = ()=> {
                     {
                         position: 3,
                         element: <ToolbarButton 
-                            title={t('common.create')} 
+                            title={t('page.permision.action.new.label')}
                             icon={'add'} 
                             onClick={()=>handelCreate()} 
-                            color={'primary'}>{t('common.create')}</ToolbarButton>,
+                            color={'primary'}>{t('page.permision.action.new.label')}</ToolbarButton>,
                     },
                 ]}
                 toolbarHideCreate

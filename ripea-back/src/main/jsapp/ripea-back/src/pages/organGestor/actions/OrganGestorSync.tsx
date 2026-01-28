@@ -72,6 +72,11 @@ const useActions = (refresh?: () => void) => {
             .then((res) => {
                 setPrediccio(res)
             })
+            .catch((error) => {
+                if (error?.message) {
+                    temporalMessageShow(null, error?.message, 'error');
+                }
+            });
     };
     const update = () => {
         setPrediccio(undefined)
@@ -204,7 +209,9 @@ export const useOrganGestorSyncDialog = () => {
             <Load value={prediccio}>
                 <Grid ref={ref} container item xs={12} direction="row" columnSpacing={1} rowSpacing={1}>
                     {prediccio?.noCanvis ?<>
-                        <Alert severity={"info"}>{t('page.organGestor.action.actualitzar.tabs.empty')}</Alert>
+                        <Grid item xs={12}>
+                            <Alert severity={"info"}>{t('page.organGestor.action.actualitzar.tabs.empty')}</Alert>
+                        </Grid>
                     </> :<>
                     {prediccio?.firstSincronization && <>
                         <CardData title={t('page.organGestor.action.actualitzar.tabs.firstSync')} rowSpacing={2}>

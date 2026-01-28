@@ -102,7 +102,7 @@ const OrganGestorGrid = () => {
                         element: <ToolbarButton
                             onClick={handleOpen}
                             icon={'cached'}
-                            color={'primary'}>&nbsp;{t('page.organGestor.action.actualitzar.label')}</ToolbarButton>,
+                            color={'primary'}>{t('page.organGestor.action.actualitzar.label')}</ToolbarButton>,
                     },
                     {
                         position: 3,
@@ -110,12 +110,12 @@ const OrganGestorGrid = () => {
                             icon={'visibility'}
                             variant={treeView ?"contained" :"outlined"}
                             onClick={()=>setTreeView(prev=>!prev)}
-                            color={'primary'}>&nbsp;{t('page.organGestor.action.vista')}</ToolbarButton>,
+                            color={'primary'}>{t('page.organGestor.action.vista')}</ToolbarButton>,
                     },
                 ]}
 
                 paginationActive={!treeView}
-                autoHeight={treeView}
+                // autoHeight={treeView}
                 treeData={treeView}
                 groupingColDef={{
                     headerName: t('page.contingut.grid.nom'),

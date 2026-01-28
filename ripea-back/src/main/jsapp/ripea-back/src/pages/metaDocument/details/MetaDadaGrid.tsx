@@ -68,7 +68,7 @@ const MetaDocumentDadaForm = ({ enviable }:any) => {
 }
 
 // Grid
-const sortModel: any = [{field: 'codi', sort: 'asc'}]
+const sortModel: any = [{field: 'ordre', sort: 'asc'}]
 // const perspectives = [""];
 const columns = [
     {
@@ -141,7 +141,7 @@ export const MetDadaGrid = ({ id, onRowCountChange, enviable = false }: any) => 
         formAdditionalData={{
             metaNode: {id}
         }}
-        sortModel={sortModel}
+        staticSortModel={sortModel}
         // perspectives={perspectives}
         rowAdditionalActions={actions}
         onRowCountChange={onRowCountChange}

@@ -152,10 +152,10 @@ const UserHeadToolbar = () => {
 
     return <Grid container rowSpacing={1} columnSpacing={1} item xs={8} flexDirection={"row"} alignContent={'center'} justifyContent={'end'}>
         <Grid item xs={10} display={"flex"} justifyContent={"end"}>{...generateMenuItems(appMenuEntries)} {/* Menu */}</Grid>
-        <Grid item xs={1} display={"flex"} justifyContent={"center"}>
-            {menuEntries?.length && <AppMenu key="app_menu" menuEntries={menuEntries} logo={menuLogo}/>} {/* Side Menu */}
+        {menuEntries?.length > 0 && <Grid item xs={1} display={"flex"} justifyContent={"center"}>
+            <AppMenu key="app_menu" menuEntries={menuEntries} logo={menuLogo}/> {/* Side Menu */}
             {...contents} {/* Additional content */}
-        </Grid>
+        </Grid>}
     </Grid>
 }
 
@@ -563,8 +563,7 @@ const useMenuAdminOrgan = () => {
 const useMenuDissenyOrgan = () => {
     const { t } = useTranslation();
 
-    const appEntries:any[] = [];
-    const entries = [
+    const appEntries:any[] = [
         {
             id: 'procediments',
             title: t('page.user.menu.procediments'),
@@ -577,7 +576,8 @@ const useMenuDissenyOrgan = () => {
             // icon: '',
             to: '/grup',
         },
-    ]
+    ];
+    const entries = []
     const content = <>
     </>
 

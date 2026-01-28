@@ -1575,6 +1575,7 @@ const translationEs = {
             action: {
                 new: {
                     title: "Crear nuevo permiso",
+                    label: "Nuevo permiso",
                     ok: "El permiso para '{{data.principal}} {{data.sid}}' se ha creado correctamente",
                 },
                 update: {

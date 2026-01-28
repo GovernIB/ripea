@@ -18,7 +18,7 @@ export const ToolbarButton = (props:any) => {
             <Button
                 variant="outlined"
                 size="small"
-                startIcon={<Icon sx={{m: 0}}>{icon}</Icon>}
+                startIcon={<Icon sx={children ?{} :{m: 0}}>{icon}</Icon>}
                 {...other}
                 sx={{ borderRadius: '4px',  minWidth: '20px', minHeight: '32px' }}
             >

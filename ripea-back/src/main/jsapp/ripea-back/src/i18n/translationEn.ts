@@ -1575,6 +1575,7 @@ const translationEn = {
             action: {
                 new: {
                     title: "Create new permission",
+                    label: "New permission",
                     ok: "Permission for '{{data.principal}} {{data.sid}}' has been created successfully",
                 },
                 update: {

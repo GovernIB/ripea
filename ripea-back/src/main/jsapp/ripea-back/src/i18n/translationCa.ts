@@ -1575,6 +1575,7 @@ const translationCa = {
             action: {
                 new: {
                     title: "Crear nou permís",
+                    label: "Nou permís",
                     ok: "El permís per '{{data.principal}} {{data.sid}}' s'ha creat correctament",
                 },
                 update: {
