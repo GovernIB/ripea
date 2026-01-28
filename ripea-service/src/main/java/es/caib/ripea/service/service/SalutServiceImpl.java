@@ -29,6 +29,7 @@ import es.caib.comanda.ms.salut.helper.EstatHelper;
 import es.caib.comanda.ms.salut.helper.MonitorHelper;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.repository.EntitatRepository;
+import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.AvisDto;
 import es.caib.ripea.service.intf.dto.IntegracioAccioDto;
@@ -55,6 +56,7 @@ public class SalutServiceImpl implements SalutService{
 	private final EntitatRepository entitatRepository;
 	private final MeterRegistry meterRegistry;
 	private final JdbcTemplate jdbcTemplate;
+	private final ConfigHelper configHelper;
 	
 	//Guardam les dades del enviament anterior, d'aquesta manera podrem calcular la diferencia
 	private static List<MetriquesRipeaInfoDto> dadesSalutRipea = new ArrayList<MetriquesRipeaInfoDto>();
@@ -244,7 +246,7 @@ public class SalutServiceImpl implements SalutService{
 		EstatSalut estatSalut = EstatSalut.builder().estat(estat).latencia(latenciaGlobal).build();
 		InformacioSistema systemInfo = MonitorHelper.getInfoSistema();
         return SalutInfo.builder()
-                .codi("RIP")
+                .codi(configHelper.getConfig(PropertyConfig.COMANDA_APP_CODI))
                 .versio(versio)
                 .data(new Date())
                 .estatGlobal(estatSalut)

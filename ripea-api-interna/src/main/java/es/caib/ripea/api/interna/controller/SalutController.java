@@ -18,6 +18,8 @@ import es.caib.comanda.model.v1.salut.AppInfo;
 import es.caib.comanda.model.v1.salut.SalutInfo;
 import es.caib.comanda.ms.salut.helper.MonitorHelper;
 import es.caib.ripea.api.interna.config.BaseApiInternaSecurityConfig;
+import es.caib.ripea.service.intf.config.PropertyConfig;
+import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.SalutService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +31,7 @@ import lombok.RequiredArgsConstructor;
 public class SalutController extends BaseApiInternaController {
 
 	private final SalutService salutService;
+	private final AplicacioService aplicacioService;
 	private ManifestInfo manifestInfo;
 	
 	protected ManifestInfo getManifestInfo() throws IOException {
@@ -43,7 +46,7 @@ public class SalutController extends BaseApiInternaController {
     	autenticaAmbRolTothom();
         var manifestInfo = getManifestInfo();
         return AppInfo.builder()
-                .codi("RIP")
+                .codi(aplicacioService.propertyFindByNom(PropertyConfig.COMANDA_APP_CODI))
                 .nom("RIPEA")
                 .data(manifestInfo.getBuildDate())
                 .versio(manifestInfo.getVersion())

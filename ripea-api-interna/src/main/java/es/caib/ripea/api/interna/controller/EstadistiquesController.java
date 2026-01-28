@@ -26,6 +26,8 @@ import es.caib.comanda.model.v1.estadistica.EstadistiquesInfo;
 import es.caib.comanda.model.v1.estadistica.IndicadorDesc;
 import es.caib.comanda.model.v1.estadistica.RegistresEstadistics;
 import es.caib.ripea.api.interna.config.BaseApiInternaSecurityConfig;
+import es.caib.ripea.service.intf.config.PropertyConfig;
+import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.SegonPlaService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +39,7 @@ import lombok.RequiredArgsConstructor;
 public class EstadistiquesController extends BaseApiInternaController {
 
 	private final SegonPlaService segonPlaService;
+	private final AplicacioService aplicacioService;
 	private ManifestInfo manifestInfo;
 	
 	protected ManifestInfo getManifestInfo() throws IOException {
@@ -52,7 +55,7 @@ public class EstadistiquesController extends BaseApiInternaController {
         List<DimensioDesc> dimensions  = segonPlaService.getDimensionsInfo();
         List<IndicadorDesc> indicadors = segonPlaService.getIndicadorsInfo();
         return EstadistiquesInfo.builder()
-        		.codi("RIP")
+        		.codi(aplicacioService.propertyFindByNom(PropertyConfig.COMANDA_APP_CODI))
         		.data(Calendar.getInstance().getTime())
         		.versio(getManifestInfo().getVersion())
         		.dimensions(dimensions)
