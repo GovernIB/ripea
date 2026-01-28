@@ -105,9 +105,12 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
         }
 
         EntitatDto entitatActual = EntitatHelper.getEntitatActual(request, entitatService);
+        entitatActual.setOrgansGestors(EntitatHelper.findOrganismesEntitatAmbPermisCacheByRol(request, organGestorService, entitatActual));
+        String rolActual = RolHelper.getRolActual(request);
+        aplicacioService.actualitzarRolThreadLocal(rolActual);
         entitatService.setConfigEntitat(entitatActual);
         OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
-        String rolActual = RolHelper.getRolActual(request);
+        
         List<String> roles = RolHelper.getRolsUsuariActual(request);
         List<String> rolesAuth = SecurityContextHolder.getContext().getAuthentication().getAuthorities()
                 .stream()
@@ -122,8 +125,6 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
         userPermissionInfo.setRols(roles);
         userPermissionInfo.setAuth(rolesAuth);
         userPermissionInfo.setSessionScope(getUsuariActualAdditionalInfo(request, userPermissionInfo, organActual));
-        
-        aplicacioService.actualitzarRolThreadLocal(rolActual);
         
         return ResponseEntity.ok(userPermissionInfo);
     }

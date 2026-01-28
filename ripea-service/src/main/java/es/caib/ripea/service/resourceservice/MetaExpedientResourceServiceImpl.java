@@ -13,6 +13,8 @@ import java.util.Set;
 import javax.annotation.PostConstruct;
 
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.security.acls.model.Permission;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
@@ -24,6 +26,7 @@ import com.turkraft.springfilter.parser.Filter;
 
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientOrganGestorEntity;
 import es.caib.ripea.persistence.entity.MetaNodeEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.entity.resourceentity.GrupResourceEntity;
@@ -168,7 +171,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
         
 		boolean isAdmin = "IPA_ADMIN".equals(rolActual);
 		boolean isAdminOrgan = "IPA_ORGAN_ADMIN".equals(rolActual);
-//		boolean isDissenyador = "IPA_DISSENY".equals(rolActual);
+		boolean isDissenyador = "IPA_DISSENY".equals(rolActual);
 //		boolean usuariFiltreOrgan = isAdminOrgan || isDissenyador;
         
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true,false);
@@ -197,7 +200,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
             		isAdminOrgan,
             		null, //organId
             		false); //comú
-            
+            procsPermesosIds = metaExpedientEntityToListLong(metaExpPermesos);
             if (metaExpedientHelper.isRevisioActiva()) {
             	revisioActiva = Filter.parse(MetaExpedientResource.Fields.revisioEstat+":'"+MetaExpedientRevisioEstatEnumDto.REVISAT.toString()+"'");
             }
@@ -212,29 +215,46 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
             		isAdminOrgan,
             		null, //organId
             		false); //comú
+            procsPermesosIds = metaExpedientEntityToListLong(metaExpPermesos);
         } else if (mapaNamedQueries.size()>0 && mapaNamedQueries.containsKey("CONSULTA_REVISIO_ESTAT")) {
         	//Volem replicar metaExpedientServiceImpl.findByEntitat
         	//Nom comprova cap permis, ja que es un manteniment per admins
         	//Nomes filtra per entitat o els filtres del formulari de cerca.
         	return filtreBase.generate();
-        } else { //Llistat de procediments
-            metaExpPermesos = metaExpedientHelper.findAmbPermis(
-            		entitat.getId(),
-            		ExtendedPermission.READ,
-            		false, //nomesActius
-            		null, //filtreNomOrCodiSia
-            		isAdmin,
-            		isAdminOrgan,
-            		null, //organId
-            		false); //comú
+        } else { 
+        	/**
+        	 * LLISTAT DE PROCEDIMENTS
+        	 */
+        	
+        	if (isAdminOrgan || isDissenyador) {
+        		OrganGestorEntity ogEntity	= organGestorRepository.findByEntitatIdAndCodi(
+        				entitat.getId(),
+        				configHelper.getOrganActualCodi());
+        		boolean hasPermisAdminComu = permisosHelper.isGrantedAll(
+        				ogEntity.getId(),
+        				OrganGestorEntity.class,
+        				new Permission[] { ExtendedPermission.ADMINISTRATION, ExtendedPermission.ADM_COMU },
+        				SecurityContextHolder.getContext().getAuthentication());
+        		procsPermesosIds = metaExpedientHelper.findMetaExpedientIdsFiltratsAmbPermisosOrganGestor(
+        				entitat.getId(),
+        				ogEntity.getId(),
+        				hasPermisAdminComu);
+        	} else {
+	            metaExpPermesos = metaExpedientHelper.findAmbPermis(
+	            		entitat.getId(),
+	            		ExtendedPermission.READ,
+	            		false, //nomesActius
+	            		null, //filtreNomOrCodiSia
+	            		isAdmin,
+	            		isAdminOrgan,
+	            		null, //organId
+	            		false); //comú
+	            procsPermesosIds = metaExpedientEntityToListLong(metaExpPermesos);
+        	}
         }
         
-		if (metaExpPermesos==null || metaExpPermesos.size()==0) {
+		if (procsPermesosIds==null || procsPermesosIds.size()==0) {
 			return FilterBuilder.equal("id", 0).generate();
-		} else {
-			for (MetaExpedientEntity mee: metaExpPermesos) {
-				procsPermesosIds.add(mee.getId());
-			}
 		}
 		
 		Filter filtrePermisos = null;
@@ -252,6 +272,17 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
         return filtreResultat.generate();
     }
 
+	private List<Long> metaExpedientEntityToListLong(List<MetaExpedientEntity> metaExpPermesos) {
+		List<Long> resultat = null;
+		if (metaExpPermesos!=null && metaExpPermesos.size()>0) {
+			resultat = new ArrayList<Long>();
+			for (MetaExpedientEntity mee: metaExpPermesos) {
+				resultat.add(mee.getId());
+			}
+		}
+		return resultat;
+	}
+	
     @Override
     protected void afterConversion(MetaExpedientResourceEntity entity, MetaExpedientResource resource) {
         resource.setNumComentaris(entity.getComentaris().size());
@@ -440,7 +471,12 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
     private class PermisosPerspectiveApplicator implements PerspectiveApplicator<MetaExpedientResourceEntity, MetaExpedientResource> {
 		@Override
 		public void applySingle(String code, MetaExpedientResourceEntity entity, MetaExpedientResource resource) throws PerspectiveApplicationException {
-			List<PermisDto> permisosGrup = permisosHelper.findPermisos(entity.getId(), MetaNodeEntity.class); 
+			List<PermisDto> permisosGrup = null;
+			if (entity.isComu()) {
+				permisosGrup = permisosHelper.findPermisos(entity.getId(), MetaExpedientOrganGestorEntity.class);
+			} else {
+				permisosGrup = permisosHelper.findPermisos(entity.getId(), MetaNodeEntity.class);
+			}
 			resource.setNumPermisos(permisosGrup!=null?permisosGrup.size():0);
 		}
     }
