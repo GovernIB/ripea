@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -44,6 +45,9 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 	@Query(	"select e.relacionatsAmb from ExpedientEntity e where e.id = :expedientId")
 	List<ExpedientEntity> findRelacionatsAmb(@Param("expedientId") Long expedientId);
 
+	@Query("SELECT DISTINCT e.metaNode.id FROM ExpedientEntity e WHERE e.id IN :expedientIds")
+    List<Long> findDistinctProcedimentIds(@Param("expedientIds") Set<Long> expedientIds);
+	
 	@Query(	"select " +
 			"    e.id " +
 			"from " +

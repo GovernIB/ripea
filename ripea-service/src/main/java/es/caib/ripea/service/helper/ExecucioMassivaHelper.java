@@ -401,7 +401,13 @@ public class ExecucioMassivaHelper {
 		        	        metaNode.setId(docExp.getTipusDocument());
 		        	        documentDto.setMetaNode(metaNode);
 		        	        documentDto.setPareId(emc.getElementId());
-		        	        MetaDocumentEntity metaDocumentEntity = metaDocumentRepository.findById(docExp.getTipusDocument()).get();
+		        	        if (docExp.getTipusDocument()==null) {
+		        	        	throw new NotFoundException(docExp.getTipusDocument(), Long.class);
+		        	        }
+		        	        MetaDocumentEntity metaDocumentEntity = metaDocumentRepository.findById(docExp.getTipusDocument()).orElse(null);
+		        	        if (metaDocumentEntity==null) {
+		        	        	throw new NotFoundException(metaDocumentEntity, MetaDocumentEntity.class);
+		        	        }
 		        	        documentDto.setDocumentTipus(DocumentTipusEnumDto.DIGITAL);
 		        	        //El nom no es pot repetir dins l'expedient
 		        	        String nomDocument = metaDocumentEntity.getNom()+" "+emc.getElementId()+ " "+emc.getExecucioMassiva().getId(); 

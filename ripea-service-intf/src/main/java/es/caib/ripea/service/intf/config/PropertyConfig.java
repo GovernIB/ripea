@@ -221,6 +221,7 @@ public class PropertyConfig {
 	public static final String DIGITALITZACIO_PLUGIN_SCANNER_MOCK	= "es.caib.ripea.plugin.digitalitzacio.scanner.mock";
 
 	public static final String COMANDA_PLUGIN_ACTIU					= "es.caib.ripea.plugin.comanda.actiu";
+	public static final String COMANDA_APP_CODI						= "es.caib.ripea.plugin.comanda.aplicacio";
 	public static final String COMANDA_PLUGIN_ENTORN				= "es.caib.ripea.plugin.comanda.entorn";
 	public static final String COMANDA_PLUGIN_CLASS					= "es.caib.ripea.plugin.comanda.class";
 	public static final String COMANDA_PLUGIN_URL					= "es.caib.ripea.plugin.comanda.baseurl";

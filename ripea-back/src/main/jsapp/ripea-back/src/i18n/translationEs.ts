@@ -677,7 +677,7 @@ const translationEs = {
                 impDocMass: {
                     label: "Importar documentos a los expedientes seleccionados",
                     title: "Importar documentos a expedientes",
-                    warning: "Los expedientes deben pertenecer al mismo procedimiento",
+                    warning: "Los expedientes deben pertenecer al mismo procedimiento.",
                 },
                 comment: {
                     ok: "Comentario añadido al expediente '{{data.expedient.description}}'",

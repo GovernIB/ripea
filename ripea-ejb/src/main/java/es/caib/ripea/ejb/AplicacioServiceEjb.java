@@ -138,7 +138,7 @@ public class AplicacioServiceEjb extends AbstractServiceEjb<AplicacioService> im
 	}
 
 	@Override
-	@RolesAllowed("**")
+	@PermitAll
 	public String propertyFindByNom(String nom) {
 		return delegateService.propertyFindByNom(nom);
 	}

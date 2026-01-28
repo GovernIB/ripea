@@ -576,8 +576,9 @@ function removeCookie(cname) {
 						<li><a class="fileDownload" href="expedient/generarIndex/PDF"><span class="fa fa-download"></span>&nbsp;&nbsp;<spring:message code="expedient.list.user.recuperar.index.pdf"/></a></li>
 						<li><a class="fileDownload" href="expedient/exportarEni"><span class="fa fa-download"></span>&nbsp;&nbsp;<spring:message code="expedient.list.user.recuperar.exportacio.eni"/></a></li>
 						<li><a class="fileDownload" href="expedient/exportarZipMassiu" data-toggle="modal"><span class="fa fa-file-archive-o"></span>&nbsp;&nbsp;<spring:message code="expedient.list.user.recuperar.exportacio.mass"/></a></li>
-                        <%--
                         <li role="separator" class="divider"></li>
+						<li><a href="expedient/importarDocsMassiu" data-toggle="modal" data-width="65%"><span class="fa fa-plus"></span>&nbsp;&nbsp;<spring:message code="expedient.list.user.importar.docs.mass"/></a></li>
+						<%--
                         <li><a href="expedient/importarZipMassiu" data-toggle="modal"><span class="fa fa-files-o"></span>&nbsp;&nbsp;<spring:message code="expedient.list.user.recuperar.importar.mass"/></a></li>
                         --%>
 					</ul>

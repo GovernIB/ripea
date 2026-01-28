@@ -677,7 +677,7 @@ const translationEn = {
                 impDocMass: {
                     label: "Import documents into the selected cases",
                     title: "Import documents into cases",
-                    warning: "The cases must belong to the same procedure",
+                    warning: "The cases must belong to the same procedure.",
                 },
                 comment: {
                     ok: "Comment added to the case '{{data.expedient.description}}'",
