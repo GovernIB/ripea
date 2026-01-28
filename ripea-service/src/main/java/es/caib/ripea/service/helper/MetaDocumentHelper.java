@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 
 import javax.transaction.Transactional;
 
@@ -57,6 +58,35 @@ public class MetaDocumentHelper {
 	@Autowired private MetaDocumentFluxPortafibRepository metaDocumentFluxPortafibRepository;
 	@Autowired private DocumentRepository documentRepository;
 	@Autowired private UsuariRepository usuariRepository;
+	
+	public void marcarPerDefecte(
+			Long entitatId, 
+			Long metaExpedientId,
+			Long metaDocumentId,
+			boolean remove) {
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				false,
+				false,
+				false, 
+				false, 
+				true);
+		MetaDocumentEntity currentMetaDocument = entityComprovarHelper.comprovarMetaDocument(
+				metaDocumentId);
+		MetaExpedientEntity metaExpedientEntity = entityComprovarHelper.comprovarMetaExpedient(
+				entitat, 
+				metaExpedientId);
+//		Recupera els metadocuments del mateix procediment
+		Set<MetaDocumentEntity> metaDocuments = metaExpedientEntity.getMetaDocuments();
+		
+		for (MetaDocumentEntity metaDocumentEntity : metaDocuments) {
+			if (metaDocumentEntity.isPerDefecte()) {
+				metaDocumentEntity.updatePerDefecte(false);
+			}
+		}
+		if (!remove)
+			currentMetaDocument.updatePerDefecte(true);
+	}
 	
 	public MetaDocumentEntity delete(Long entitatId, Long metaExpedientId, Long id, String rolActual, Long organId) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(

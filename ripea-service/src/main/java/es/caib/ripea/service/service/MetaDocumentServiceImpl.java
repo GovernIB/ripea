@@ -563,28 +563,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		logger.debug("Marcant/desmarcant el tipus de document per defecte (" +
 				"entitatId=" + entitatId + ", " +
 				"metaDocumentId=" + metaDocumentId + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				false,
-				false, 
-				false, 
-				true);
-		MetaDocumentEntity currentMetaDocument = entityComprovarHelper.comprovarMetaDocument(
-				metaDocumentId);
-		MetaExpedientEntity metaExpedientEntity = entityComprovarHelper.comprovarMetaExpedient(
-				entitat, 
-				metaExpedientId);
-//		Recupera els metadocuments del mateix procediment
-		Set<MetaDocumentEntity> metaDocuments = metaExpedientEntity.getMetaDocuments();
-		
-		for (MetaDocumentEntity metaDocumentEntity : metaDocuments) {
-			if (metaDocumentEntity.isPerDefecte()) {
-				metaDocumentEntity.updatePerDefecte(false);
-			}
-		}
-		if (!remove)
-			currentMetaDocument.updatePerDefecte(true);
+		metaDocumentHelper.marcarPerDefecte(entitatId, metaExpedientId, metaDocumentId, remove);
 	}
 	
 	@Transactional

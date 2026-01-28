@@ -37,10 +37,20 @@ import lombok.experimental.FieldNameConstants;
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = MetaDocumentResource.PERSPECTIVE_COUNT_METADADES),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = MetaDocumentResource.ACTION_MARCAR_DEFECTE_CODE,
+                        requiresId = true),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = MetaDocumentResource.ACTION_DESMARCAR_DEFECTE_CODE,
+                        requiresId = true),           
         })
 public class MetaDocumentResource extends MetaNodeResource {
 
-	public static final String PERSPECTIVE_COUNT_METADADES = "COUNT_METADADES";
+	public static final String PERSPECTIVE_COUNT_METADADES		= "COUNT_METADADES";
+	public static final String ACTION_MARCAR_DEFECTE_CODE		= "MARCAR_DEFECTE";
+	public static final String ACTION_DESMARCAR_DEFECTE_CODE	= "DESMARCAR_DEFECTE";
 
     @NotNull 
     private MultiplicitatEnumDto multiplicitat = MultiplicitatEnumDto.M_1;

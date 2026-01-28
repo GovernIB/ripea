@@ -1,5 +1,6 @@
 package es.caib.ripea.service.resourceservice;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -37,7 +38,9 @@ import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
 import es.caib.ripea.service.helper.MetaDocumentHelper;
 import es.caib.ripea.service.helper.UsuariHelper;
+import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
+import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
 import es.caib.ripea.service.intf.base.exception.ResourceNotFoundException;
 import es.caib.ripea.service.intf.base.model.FieldOption;
@@ -76,6 +79,8 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
     @PostConstruct
     public void init() {
     	register(MetaDocumentResource.PERSPECTIVE_COUNT_METADADES,	new CountMetaDadesPerspectiveApplicator());
+    	register(MetaDocumentResource.ACTION_MARCAR_DEFECTE_CODE,	new MarcarPerDefecteActionExecutor());
+    	register(MetaDocumentResource.ACTION_DESMARCAR_DEFECTE_CODE,new DesMarcarPerDefecteActionExecutor());
     	register(MetaDocumentResource.Fields.ntiTipoDocumental, 	new TipusDocFieldOptionsProvider());
     }
     
@@ -192,6 +197,40 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
 			resource.setNumMetadades(mtdds!=null?mtdds.size():0);
 		}
     }
+    
+    private class MarcarPerDefecteActionExecutor implements ActionExecutor<MetaDocumentResourceEntity, Serializable, Serializable> {
+		@Override
+		public void onChange(Serializable id, Serializable previous, String fieldName, Object fieldValue,
+				Map<String, AnswerValue> answers, String[] previousFieldNames, Serializable target) {
+		}
+		@Override
+		public Serializable exec(String code, MetaDocumentResourceEntity entity, Serializable params) throws ActionExecutionException {
+			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+			metaDocumentHelper.marcarPerDefecte(
+					entitatEntity.getId(),
+					entity.getMetaExpedient()!=null?entity.getMetaExpedient().getId():null,
+					entity.getId(),
+					false);
+			return "{\"resultado\": \"OK\"}";
+		}
+    }
+    
+    private class DesMarcarPerDefecteActionExecutor implements ActionExecutor<MetaDocumentResourceEntity, Serializable, Serializable> {
+		@Override
+		public void onChange(Serializable id, Serializable previous, String fieldName, Object fieldValue,
+				Map<String, AnswerValue> answers, String[] previousFieldNames, Serializable target) {
+		}
+		@Override
+		public Serializable exec(String code, MetaDocumentResourceEntity entity, Serializable params) throws ActionExecutionException {
+			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+			metaDocumentHelper.marcarPerDefecte(
+					entitatEntity.getId(),
+					entity.getMetaExpedient()!=null?entity.getMetaExpedient().getId():null,
+					entity.getId(),
+					true);
+			return "{\"resultado\": \"OK\"}";
+		}
+    }    
     
 	@Override
 	public MetaDocumentResource create(MetaDocumentResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
