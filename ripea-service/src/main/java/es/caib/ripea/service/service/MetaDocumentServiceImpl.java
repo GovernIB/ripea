@@ -156,35 +156,8 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 			Long entitatId,
 			Long metaDocumentId,
 			int posicio) throws NotFoundException {
-
 		entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-		MetaDocumentEntity metaDocument = metaDocumentRepository.getOne(metaDocumentId);
-		
-		List<MetaDocumentEntity> metaDocuments = metaDocumentRepository.findByMetaExpedientOrderByOrdreAsc(metaDocument.getMetaExpedient());
-		moveTo(
-				metaDocument,
-				metaDocuments,
-				posicio);
-	}
-	
-	public void moveTo(
-			MetaDocumentEntity elementToMove,
-			List<MetaDocumentEntity> elements,
-			int posicio) {
-		
-		int anteriorIndex = -1; 
-		for (int i = 0; i < elements.size(); i++) {
-			if (elements.get(i).getId().equals(elementToMove.getId())) {
-				anteriorIndex = i;
-				break;
-			}
-		}
-		elements.add(
-				posicio,
-				elements.remove(anteriorIndex));
-		for (int i = 0; i < elements.size(); i++) {
-			elements.get(i).updateOrdre(i);
-		}
+		metaDocumentHelper.moveTo(metaDocumentId, posicio);
 	}
 
 	@Transactional(readOnly = true)

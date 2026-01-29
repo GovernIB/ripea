@@ -81,6 +81,7 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
     	register(MetaDocumentResource.PERSPECTIVE_COUNT_METADADES,	new CountMetaDadesPerspectiveApplicator());
     	register(MetaDocumentResource.ACTION_MARCAR_DEFECTE_CODE,	new MarcarPerDefecteActionExecutor());
     	register(MetaDocumentResource.ACTION_DESMARCAR_DEFECTE_CODE,new DesMarcarPerDefecteActionExecutor());
+    	register(MetaDocumentResource.ACTION_REORDENAR_CODE,		new ReordenarActionExecutor());
     	register(MetaDocumentResource.Fields.ntiTipoDocumental, 	new TipusDocFieldOptionsProvider());
     }
     
@@ -231,6 +232,18 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
 			return "{\"resultado\": \"OK\"}";
 		}
     }    
+    
+    private class ReordenarActionExecutor implements ActionExecutor<MetaDocumentResourceEntity, Integer, Serializable> {
+		@Override
+		public void onChange(Serializable id, Integer previous, String fieldName, Object fieldValue,
+				Map<String, AnswerValue> answers, String[] previousFieldNames, Integer target) {
+		}
+		@Override
+		public Serializable exec(String code, MetaDocumentResourceEntity entity, Integer params) throws ActionExecutionException {
+			metaDocumentHelper.moveTo(entity.getId(), params);
+			return "{\"resultado\": \"OK\"}";
+		}
+    }
     
 	@Override
 	public MetaDocumentResource create(MetaDocumentResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {

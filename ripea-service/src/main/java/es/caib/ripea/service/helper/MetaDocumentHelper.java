@@ -38,6 +38,7 @@ import es.caib.ripea.service.intf.dto.ItemValidacioTascaEnum;
 import es.caib.ripea.service.intf.dto.MetaDocumentDto;
 import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
 import es.caib.ripea.service.intf.exception.ExisteixenDocumentsException;
+import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.exception.SistemaExternException;
 import io.micrometer.core.instrument.Timer;
 
@@ -58,6 +59,28 @@ public class MetaDocumentHelper {
 	@Autowired private MetaDocumentFluxPortafibRepository metaDocumentFluxPortafibRepository;
 	@Autowired private DocumentRepository documentRepository;
 	@Autowired private UsuariRepository usuariRepository;
+	
+	public void moveTo(
+			Long metaDocumentId,
+			int posicio) throws NotFoundException {
+		MetaDocumentEntity metaDocument = metaDocumentRepository.getOne(metaDocumentId);
+		
+		List<MetaDocumentEntity> metaDocuments = metaDocumentRepository.findByMetaExpedientOrderByOrdreAsc(metaDocument.getMetaExpedient());
+
+		int anteriorIndex = -1; 
+		for (int i = 0; i < metaDocuments.size(); i++) {
+			if (metaDocuments.get(i).getId().equals(metaDocument.getId())) {
+				anteriorIndex = i;
+				break;
+			}
+		}
+		metaDocuments.add(
+				posicio,
+				metaDocuments.remove(anteriorIndex));
+		for (int i = 0; i < metaDocuments.size(); i++) {
+			metaDocuments.get(i).updateOrdre(i);
+		}
+	}
 	
 	public void marcarPerDefecte(
 			Long entitatId, 
