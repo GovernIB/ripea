@@ -1,5 +1,6 @@
 package es.caib.ripea.service.intf.dto;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -18,8 +19,10 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Getter @Setter
-public class ProgresProcessamentZipDto {
+public class ProgresProcessamentZipDto implements Serializable {
 
+	private static final long serialVersionUID = 1333490873786597486L;
+	
 	private Integer progres = 0;
 	private Integer numOperacions = 0;
 	private Integer numOperacionsRealitzades = 0;

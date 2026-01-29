@@ -112,6 +112,7 @@ import es.caib.ripea.service.intf.dto.ImportacioDto;
 import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
 import es.caib.ripea.service.intf.dto.PermisosPerExpedientsDto;
 import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
+import es.caib.ripea.service.intf.dto.ProgresProcessamentZipDto;
 import es.caib.ripea.service.intf.dto.ResultatConsultaDto;
 import es.caib.ripea.service.intf.dto.SiNoEnumDto;
 import es.caib.ripea.service.intf.dto.TipusRegistreEnumDto;
@@ -231,6 +232,8 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         register(ExpedientResource.ACTION_GUARDAR_ARXIU, new GuardarArxiuActionExecutor());
         register(ExpedientResource.ACTION_IMPORT_DOCS, new ImportarDocumentsArxiuActionExecutor());
         register(ExpedientResource.ACTION_IMPORT_DOCS_ZIP, new ImportarDocumentsZipArxiuActionExecutor());
+        register(ExpedientResource.ACTION_GET_PROGRES_ZIP, new GetProgresZipActionExecutor());
+        register(ExpedientResource.ACTION_CANCEL_IMPORT_ZIP, new CancelarImportZipActionExecutor());
         register(ExpedientResource.ACTION_IMPORT_INTE, new ImportarInteressatsArxiuActionExecutor());
         register(ExpedientResource.ACTION_MOURE_TOT_CODE, new MoureTotActionExecutor());
         
@@ -1503,8 +1506,11 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		        entitatActual.setCodi(entitatEntity.getCodi());
 		        entitatActual.setId(entitatEntity.getId());
 		        
+		        zipImportacioHelper.inicialitzarProgres(pare.getId());
+			    
 		        Path tempZip = Files.createTempFile("import-", ".zip");
 		        Files.write(tempZip, zipFile.getContent());
+			    
 				zipImportacioHelper.processarZip(
 						usuariActual, 
 						entitatActual, 
@@ -1521,6 +1527,38 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		        throw new ActionExecutionException(getResourceClass(), entity.getId(), code, message);
 		    }			
 		}
+    }
+    
+    private class GetProgresZipActionExecutor implements ActionExecutor<ExpedientResourceEntity, Long, ProgresProcessamentZipDto> {
+
+        @Override
+        public ProgresProcessamentZipDto exec(String code, ExpedientResourceEntity entity, Long id)
+                throws ActionExecutionException {
+        	ProgresProcessamentZipDto progres = zipImportacioHelper.obtenirProgresActual(entity.getId());
+        
+        	return progres;
+        }
+
+		@Override
+		public void onChange(Serializable id, Long previous, String fieldName, Object fieldValue,
+				Map<String, AnswerValue> answers, String[] previousFieldNames, Long target) {}
+		
+    }
+    
+    private class CancelarImportZipActionExecutor implements ActionExecutor<ExpedientResourceEntity, Long, Serializable> {
+
+        @Override
+        public Serializable exec(String code, ExpedientResourceEntity entity, Long id)
+                throws ActionExecutionException {
+        	zipImportacioHelper.cancelarProcessamentZip(entity.getId());  
+  
+        	return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
+        }
+
+		@Override
+		public void onChange(Serializable id, Long previous, String fieldName, Object fieldValue,
+				Map<String, AnswerValue> answers, String[] previousFieldNames, Long target) {}
+		
     }
     
     private class ImportarDocumentsArxiuActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.ImportarDocumentsForm, Serializable> {

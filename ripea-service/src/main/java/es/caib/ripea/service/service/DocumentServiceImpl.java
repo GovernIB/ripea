@@ -1571,7 +1571,7 @@ public class DocumentServiceImpl implements DocumentService {
 	}
 
 	@Override
-	@Async
+//	@Async
 	@Transactional
 	public void processarZipAsync(
 			UsuariDto usuariActual, 
@@ -1580,22 +1580,14 @@ public class DocumentServiceImpl implements DocumentService {
 			Long pareId, 
 			Long tascaId, 
 			EntitatDto entitatActual) {
-	    try {
-	        zipImportacioHelper.processarZip(
-	                usuariActual,
-	                entitatActual,
-	                tempZip,
-	                rolActual,
-	                pareId,
-	                tascaId
-	        );
-	    } catch (Exception e) {
-	        logger.error("Error async ZIP", e);
-	    } finally {
-	        try {
-	            Files.deleteIfExists(tempZip);
-	        } catch (Exception ignore) {}
-	    }
+		zipImportacioHelper.processarZip(
+                usuariActual,
+                entitatActual,
+                tempZip,
+                rolActual,
+                pareId,
+                tascaId
+        );
 	}
 
 	@Override

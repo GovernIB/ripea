@@ -836,6 +836,28 @@ const translationEs = {
                     label: "Importar desde ZIP...",
                     title: "Importación de documentos desde un ZIP",
                     ok: "Documentos importados correctamente",
+					close: {
+					    check: "¿Está seguro de que desea cerrar esta ventana?",
+					    description: "La importación del ZIP continuará en segundo plano y podrá consultar el resultado en el expediente más tarde.",
+					},
+					cancel: {
+					    check: "¿Está seguro de que desea cancelar la importación del ZIP?",
+					    description: "Los documentos importados hasta este momento se conservarán en el expediente.",
+					},
+					resultat: {
+						title: "Resultado:",
+						ok: "Proceso importación completado",
+						documents: {
+							ok: "Documentos procesados correctamente: ",
+							ko: "Documentos con error: ",
+							firma: "Documentos con error de firma: ",
+						},
+						carpetes: {
+							ok: "Carpetas creadas correctamente: ",
+						},
+						tamany: "Tamaño total procesado: ",
+						errors: "Errores detallados: ",
+					},
                 },
                 detall: {
                     label: "Detalles",

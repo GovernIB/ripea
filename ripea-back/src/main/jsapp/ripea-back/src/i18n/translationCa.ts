@@ -836,6 +836,28 @@ const translationCa = {
                     label: "Importar des de ZIP...",
                     title: "Importació de documents des d'un ZIP",
                     ok: "Documents importats correctament",
+					close: {
+						check: "Estau segur que voleu tancar aquesta finestra?",
+						description: "L'importació del ZIP continuarà en segon pla i podreu consultar el resultat a l'expedient més tard.",
+					},
+					cancel: {
+						check: "Esteu segur que voleu cancel·lar la importació del ZIP?",
+						description: "Els documents importats fins a aquest moment es conservaran a l’expedient.",
+					},
+					resultat: {
+						title: "Resultat:",
+						ok: "Procés importació completat",
+						documents: {
+							ok: "Documents processats correctament: ",
+							ko: "Documents amb error: ",
+							firma: "Documents amb error de firma: ",
+						},
+						carpetes: {
+							ok: "Carpetes creades correctament: ",
+						},
+						tamany: "Tamany total processat: ",
+						errors: "Errors detallats: ",
+					}
                 },
                 detall: {
                     label: "Detalls",

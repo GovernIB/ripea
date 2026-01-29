@@ -836,6 +836,28 @@ const translationEn = {
                     label: "Import documents from ZIP...",
                     title: "Import documentos from ZIP",
                     ok: "Documents imported successfully",
+					close: {
+					    check: "Are you sure you want to close this window?",
+					    description: "The ZIP import will continue in the background and you can check the result in the file later.",
+					},
+					cancel: {
+					    check: "Are you sure you want to cancel the ZIP import?",
+					    description: "The documents imported up to this point will be kept in the file.",
+					},
+					resultat: {
+						title: "Result:",
+						ok: "Import process completed",
+						documents: {
+							ok: "Documents processed correctly: ",
+							ko: "Documents with errors: ",
+							firma: "Documents with signature errors: ",
+						},
+						carpetes: {
+							ok: "Folders created successfully: ",
+						},
+						tamany: "Total size processed: ",
+						errors: "Detailed errors: ",
+					},
                 },
                 detall: {
                     label: "Details",

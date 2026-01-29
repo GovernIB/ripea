@@ -400,7 +400,7 @@ public class DocumentHelper {
     
     private void validarFirmesAmbProgres(DocumentDto documentDto, ProgresProcessamentZipDto progres) {
         try {
-            progres.addInfo(messageHelper.getMessage("contingut.boto.crear.document.multiple.verificar.firma", new Object[] {documentDto.getFitxerNom()}));
+            //progres.addInfo(messageHelper.getMessage("contingut.boto.crear.document.multiple.verificar.firma", new Object[] {documentDto.getFitxerNom()}));
 
             SignatureInfoDto signatureInfo =
                     pluginHelper.detectSignedAttachedUsingPdfReader(documentDto.getFitxerContingut(), documentDto.getFitxerContentType());
