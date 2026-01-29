@@ -17,6 +17,7 @@ import es.caib.ripea.persistence.repository.ExpedientRepository;
 import es.caib.ripea.service.intf.dto.ExpedientEstatDto;
 import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
+import es.caib.ripea.service.intf.exception.NotFoundException;
 
 @Component
 public class ExpedientEstatHelper {
@@ -33,6 +34,33 @@ public class ExpedientEstatHelper {
 
 	public ExpedientEstatEntity findByMetaExpedientAndCodi(MetaExpedientEntity metaExpedientEntity, String codi) {
 		return expedientEstatRepository.findByMetaExpedientAndCodi(metaExpedientEntity, codi);
+	}
+	
+	public ExpedientEstatEntity moveTo(
+			Long entitatId,
+			Long metaExpedientId,
+			Long expedientEstatId,
+			int posicio, String rolActual) throws NotFoundException {
+		ExpedientEstatEntity estat = expedientEstatRepository.getOne(expedientEstatId);
+
+		List<ExpedientEstatEntity> estats = expedientEstatRepository.findByMetaExpedientOrderByOrdreAsc(
+				estat.getMetaExpedient());
+		
+		int anteriorIndex = -1; 
+		for (int i = 0; i < estats.size(); i++) {
+			if (estats.get(i).getId().equals(estat.getId())) {
+				anteriorIndex = i;
+				break;
+			}
+		}
+		estats.add(
+				posicio,
+				estats.remove(anteriorIndex));
+		for (int i = 0; i < estats.size(); i++) {
+			estats.get(i).updateOrdre(i);
+		}
+		
+		return estat;
 	}
 	
 	public ExpedientEntity updateEstatAdditional(Long entitatId, Long expedientId, Long estatId) {

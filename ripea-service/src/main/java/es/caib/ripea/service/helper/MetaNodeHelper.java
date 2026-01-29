@@ -9,6 +9,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.MetaDadaEntity;
 import es.caib.ripea.persistence.entity.MetaNodeEntity;
 import es.caib.ripea.persistence.repository.MetaDadaRepository;
@@ -25,6 +26,7 @@ public class MetaNodeHelper {
 	@Autowired private ConversioTipusHelper conversioTipusHelper;
 	@Autowired private PermisosHelper permisosHelper;
 	@Autowired private MetaExpedientHelper metaExpedientHelper;
+	@Autowired private EntityComprovarHelper entityComprovarHelper;
 
 	public void omplirMetaDadesPerMetaNodes(
 			List<? extends MetaNodeAmbMetaDadesDto> metaNodes) {
@@ -66,37 +68,30 @@ public class MetaNodeHelper {
 	}
 
 	public void moureMetaNodeMetaDada(
-			MetaNodeEntity metaNode,
-			MetaDadaEntity metaDada,
-			int posicio) {
-		List<MetaDadaEntity> metaNodeMetaDades = metaDadaRepository.findByMetaNodeOrderByOrdreAsc(metaNode);
-		moveTo(
-				metaDada,
-				metaNodeMetaDades,
-				posicio);
-	}
-	
-	public void moveTo(
-			MetaDadaEntity elementToMove,
-			List<MetaDadaEntity> elements,
+			Long entitatId,
+			Long metaNodeId,
+			Long metaDadaId,
 			int posicio) {
 		
+		EntitatEntity entitat 	= entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
+		MetaNodeEntity metaNode = entityComprovarHelper.comprovarMetaNode(entitat, metaNodeId);
+		MetaDadaEntity metaDada = entityComprovarHelper.comprovarMetaDada(entitat, metaNode, metaDadaId);		
+		List<MetaDadaEntity> metaNodeMetaDades = metaDadaRepository.findByMetaNodeOrderByOrdreAsc(metaNode);
+		
 		int anteriorIndex = -1; 
-		for (int i = 0; i < elements.size(); i++) {
-			if (elements.get(i).getId().equals(elementToMove.getId())) {
+		for (int i = 0; i < metaNodeMetaDades.size(); i++) {
+			if (metaNodeMetaDades.get(i).getId().equals(metaDada.getId())) {
 				anteriorIndex = i;
 				break;
 			}
 		}
-		elements.add(
-				posicio,
-				elements.remove(anteriorIndex));
-		for (int i = 0; i < elements.size(); i++) {
-			elements.get(i).updateOrdre(i);
+		
+		metaNodeMetaDades.add(posicio, metaNodeMetaDades.remove(anteriorIndex));
+		
+		for (int i = 0; i < metaNodeMetaDades.size(); i++) {
+			metaNodeMetaDades.get(i).updateOrdre(i);
 		}
-	}
-	
-	
+	}	
 
 	public void reordenarMetaDades(
 			MetaNodeEntity metaNode) {

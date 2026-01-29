@@ -1,5 +1,6 @@
 package es.caib.ripea.service.resourceservice;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -23,7 +24,10 @@ import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.MetaDadaHelper;
+import es.caib.ripea.service.helper.MetaNodeHelper;
+import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
+import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
 import es.caib.ripea.service.intf.base.exception.ResourceNotFoundException;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.DominiDto;
@@ -44,6 +48,7 @@ public class MetaDadaResourceServiceImpl extends BaseMutableResourceService<Meta
     
 	private final ConfigHelper configHelper;
 	private final MetaDadaHelper metaDadaHelper;
+	private final MetaNodeHelper metaNodeHelper;
 	private final EntityComprovarHelper entityComprovarHelper;
 	
 	private final OrganGestorRepository organGestorRepository;
@@ -51,7 +56,9 @@ public class MetaDadaResourceServiceImpl extends BaseMutableResourceService<Meta
 	private final DominiRepository dominiRepository;
 	
     @PostConstruct
-    public void init() {}
+    public void init() {
+    	register(MetaDadaResource.ACTION_REORDENAR_CODE,		new ReordenarActionExecutor());
+    }
 	
     protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
     	
@@ -192,5 +199,18 @@ public class MetaDadaResourceServiceImpl extends BaseMutableResourceService<Meta
 				resource.setDomini(ResourceReference.toResourceReference(domini.getId(), domini.getNom()));
 			}
     	}
-    }	
+    }
+    
+    private class ReordenarActionExecutor implements ActionExecutor<MetaDadaResourceEntity, Integer, Serializable> {
+		@Override
+		public void onChange(Serializable id, Integer previous, String fieldName, Object fieldValue,
+				Map<String, AnswerValue> answers, String[] previousFieldNames, Integer target) {
+		}
+		@Override
+		public Serializable exec(String code, MetaDadaResourceEntity entity, Integer params) throws ActionExecutionException {
+			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+			metaNodeHelper.moureMetaNodeMetaDada(entitatEntity.getId(), entity.getMetaNode().getId(), entity.getId(), params);
+			return "{\"resultado\": \"OK\"}";
+		}
+    }
 }

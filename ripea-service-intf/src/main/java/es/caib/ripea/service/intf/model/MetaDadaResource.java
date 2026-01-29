@@ -9,7 +9,9 @@ import javax.validation.constraints.NotNull;
 import org.springframework.data.annotation.Transient;
 
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
+import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
+import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.MetaDadaTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
@@ -24,10 +26,19 @@ import lombok.experimental.FieldNameConstants;
 @NoArgsConstructor
 @ResourceConfig(
         quickFilterFields = { "codi", "nom", "tipus" },
-        descriptionField = "nom"
+        descriptionField = "nom",
+		artifacts = {
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = MetaDadaResource.ACTION_REORDENAR_CODE,
+                        formClass = Integer.class,
+                        requiresId = true),
+		}
 )
 public class MetaDadaResource extends BaseAuditableResource<Long> {
 
+	public static final String ACTION_REORDENAR_CODE			= "REORDENAR";
+	
 	@NotNull private String codi;
     @NotNull private String nom;
     @NotNull private MetaDadaTipusEnumDto tipus = MetaDadaTipusEnumDto.TEXT;
