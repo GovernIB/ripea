@@ -1,19 +1,23 @@
 import {useTranslation} from "react-i18next";
 import {GridPage, useBaseAppContext, useFormContext, useMuiDataGridApiRef, useResourceApiService} from "reactlib";
-import {CardPage} from "../../../components/CardData.tsx";
-import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
+import {CardPage} from "../../../../components/CardData.tsx";
+import StyledMuiGrid from "../../../../components/StyledMuiGrid.tsx";
 import {Grid, Icon} from "@mui/material";
-import * as builder from "../../../util/springFilterUtils.ts";
+import * as builder from "../../../../util/springFilterUtils.ts";
 import {useParams} from "react-router-dom";
-import GridFormField from "../../../components/GridFormField.tsx";
+import GridFormField from "../../../../components/GridFormField.tsx";
 import {useEffect, useState} from "react";
-import {setTitlePage} from "../../../TitleHeaderConfigurator.tsx";
-import {useUserSession} from "../../../components/Session.tsx";
+import {setTitlePage} from "../../../../TitleHeaderConfigurator.tsx";
+import {useUserSession} from "../../../../components/Session.tsx";
+import {DraggableGridRow, DraggableGridRowHandler} from "../../../../components/DraggableContext.tsx";
+import {DndContext} from "@dnd-kit/core";
+import {GridSlots} from "@mui/x-data-grid-pro";
 
 const useActions = (refresh?: () => void) => {
     const {t} = useTranslation();
     const {
-        patch: apiPatch
+        patch: apiPatch,
+        artifactAction: apiAction,
     } = useResourceApiService('metaDadaResource');
     const {temporalMessageShow} = useBaseAppContext();
 
@@ -39,7 +43,15 @@ const useActions = (refresh?: () => void) => {
             });
     }
 
-    return {active, desactive}
+    const reordering = (id:any, ordre:number) => {
+        apiAction(id, { code: 'REORDENAR', data: ordre })
+            .then(() => refresh?.())
+            .catch((error) => {
+                temporalMessageShow(null, error?.message, 'error');
+            });
+    }
+
+    return {active, desactive, reordering}
 }
 
 // Form
@@ -88,9 +100,13 @@ const columns = [
         flex: 0.5,
         renderCell: (params:any) => (params?.row?.activa && <Icon>check</Icon>),
     },
+    {
+        renderCell: () => <DraggableGridRowHandler />,
+        flex: 0.1
+    }
 ]
 
-export const MetDadaGrid = ({ id, onRowCountChange, enviable = false }: any) => {
+export const MetDadaGrid = ({ id, enviable = false, ...other }: any) => {
     const {t} = useTranslation();
     const apiRef = useMuiDataGridApiRef();
     const {value: user} = useUserSession()
@@ -99,7 +115,7 @@ export const MetDadaGrid = ({ id, onRowCountChange, enviable = false }: any) => 
         apiRef?.current?.refresh?.();
     }
 
-    const {active, desactive} = useActions(refresh)
+    const {active, desactive, reordering} = useActions(refresh)
     const actions = [
         {
             label: t('common.update'),
@@ -129,13 +145,23 @@ export const MetDadaGrid = ({ id, onRowCountChange, enviable = false }: any) => 
         },
     ]
 
-    return <StyledMuiGrid
+    const handleDragEnd = (event: any) => {
+        const sourceData = event.active.data.current;
+        const targetData = event.over.data.current;
+        // console.log('>>> ', sourceData.codi, '(', sourceData.ordre, ') ->', targetData.codi, '(', targetData.ordre, ')')
+        if (sourceData.id != targetData.id) {
+            reordering(sourceData.id, targetData.ordre)
+        }
+    }
+
+    return <DndContext onDragEnd={handleDragEnd}><StyledMuiGrid
         apiRef={apiRef}
         resourceName={"metaDadaResource"}
         popupEditUpdateActive
         popupEditFormDialogResourceTitle={t('page.metaDada.title')}
         popupEditFormContent={<MetaDocumentDadaForm enviable={enviable && user?.sessionScope?.isPropagarMetadades}/>}
         columns={columns}
+        rowActionsColumnIndex={-1}
         toolbarHideQuickFilter={false}
         filter={builder.eq("metaNode.id", id)}
         formAdditionalData={{
@@ -144,7 +170,11 @@ export const MetDadaGrid = ({ id, onRowCountChange, enviable = false }: any) => 
         staticSortModel={sortModel}
         // perspectives={perspectives}
         rowAdditionalActions={actions}
-        onRowCountChange={onRowCountChange}
+        {...other}
+
+        slots={{
+            row: DraggableGridRow as GridSlots['row'],
+        }}
 
         toolbarCreateTitle={t('page.metaDada.action.new.label')}
         popupEditFormI18nKeys={{
@@ -152,7 +182,7 @@ export const MetDadaGrid = ({ id, onRowCountChange, enviable = false }: any) => 
             updateSuccess: 'page.metaDada.action.update.ok',
             deleteSuccess: 'page.metaDada.action.delete.ok',
         }}
-    />
+    /></DndContext>
 }
 
 const MetaDadaGrid = () => {

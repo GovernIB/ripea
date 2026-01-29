@@ -1434,6 +1434,10 @@ const translationEs = {
                     label: "Marcar por defecto",
                     ok: "Tipo de documento marcado como defecto",
                 },
+                undefault: {
+                    label: "Quitar por defecto",
+                    ok: "Tipo de documento desmarcado como predeterminado",
+                },
                 activar: {
                     label: "Activar",
                     ok: "Tipo de documento activado",

@@ -1,10 +1,11 @@
 import {useTranslation} from "react-i18next";
 import {useBaseAppContext, useResourceApiService} from "reactlib";
 
-const useActions = (refresh?: () => void) => {
+export const useActions = (refresh?: () => void) => {
     const {t} = useTranslation();
     const {
         patch: apiPatch,
+        artifactAction: apiAction,
     } = useResourceApiService('metaDocumentResource');
     const {temporalMessageShow} = useBaseAppContext();
 
@@ -30,7 +31,37 @@ const useActions = (refresh?: () => void) => {
             });
     }
 
-    return {active, desactive}
+    const marcarDefecte = (id:any) => {
+        apiAction(id, { code: 'MARCAR_DEFECTE' })
+            .then(() => {
+                refresh?.()
+                temporalMessageShow(null, t('page.metaDocument.action.default.ok'), 'success');
+            })
+            .catch((error) => {
+                temporalMessageShow(null, error?.message, 'error');
+            });
+    }
+
+    const desmarcarDefecte = (id:any) => {
+        apiAction(id, { code: 'DESMARCAR_DEFECTE' })
+            .then(() => {
+                refresh?.()
+                temporalMessageShow(null, t('page.metaDocument.action.undefault.ok'), 'success');
+            })
+            .catch((error) => {
+                temporalMessageShow(null, error?.message, 'error');
+            });
+    }
+
+    const reordering = (id:any, ordre:number) => {
+        apiAction(id, { code: 'REORDENAR', data: ordre })
+            .then(() => refresh?.())
+            .catch((error) => {
+                temporalMessageShow(null, error?.message, 'error');
+            });
+    }
+
+    return {active, desactive, marcarDefecte, desmarcarDefecte, reordering}
 }
 
 export const useMetaDocumentActions = (refresh?: () => void) => {

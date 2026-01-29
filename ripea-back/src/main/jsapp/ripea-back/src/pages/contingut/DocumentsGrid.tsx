@@ -241,7 +241,7 @@ const DocumentsGrid = (props: any) => {
                         resourceName={"documentResource"}
                         popupEditFormDialogResourceTitle={t('page.document.title')}
                         columns={additionalColumns}
-                        rowActionsColumnIndex={4}
+                        rowActionsColumnIndex={-1}
                         paginationActive={false}
                         autoHeight
                         filter={commonFilter}

@@ -1434,6 +1434,10 @@ const translationCa = {
                     label: "Marcar per defecte",
                     ok: "Tipus de document marcat com defecte",
                 },
+                undefault: {
+                    label: "Borrar per defecte",
+                    ok: "Tipus de document desmarcat com defecte",
+                },
                 activar: {
                     label: "Activar",
                     ok: "Tipus de document activat",

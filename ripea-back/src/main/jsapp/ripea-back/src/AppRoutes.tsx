@@ -33,7 +33,7 @@ import PermisMetaExpedientGrid from "./pages/user/configurar/PermisMetaExpedient
 import AdjuntarAnnexosPendentsGrid from "./pages/user/accionsMassives/AdjuntarAnnexosPendentsGrid.tsx";
 import DominiGrid from "./pages/user/configurar/DominiGrid.tsx";
 import MetaDocumentGrid from "./pages/metaDocument/MetaDocumentGrid.tsx";
-import MetaDadaGrid from "./pages/metaDocument/details/MetaDadaGrid.tsx";
+import MetaDadaGrid from "./pages/metaExpedient/details/elements/MetaDadaGrid.tsx";
 import {useUserSession} from "./components/Session.tsx";
 import {UrlInstruccioGrid} from "./pages/user/configurar/UrlInstruccioGrid.tsx";
 import {MetaExpedientElements} from "./pages/metaExpedient/details/MetaExpedientElements.tsx";
@@ -46,7 +46,7 @@ const ProtectedRoute = ({ allowedRoles = [], params = [] }: any) => {
     if (allowedRoles?.length > 0 && !allowedRoles.includes(user.rolActual)) {
         // return <NotFoundPage />;
     }
-    if (params?.length > 0 && params?.some?.((param:any) => !user?.sessionScope?.[param])) {
+    if (params?.length > 0 && params?.some?.((param:string) => !user?.sessionScope?.[param])) {
         // return <NotFoundPage />;
     }
 

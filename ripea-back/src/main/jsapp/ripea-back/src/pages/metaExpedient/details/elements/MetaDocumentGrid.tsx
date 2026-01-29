@@ -3,10 +3,13 @@ import {useTranslation} from "react-i18next";
 import {useMuiDataGridApiRef} from "reactlib";
 import {useMemo} from "react";
 import LinkButton from "../../../../components/LinkButton.tsx";
-import {useMetaDocumentActions} from "../../../metaDocument/details/MetaDocumentActions.tsx";
+import {useActions, useMetaDocumentActions} from "../../../metaDocument/details/MetaDocumentActions.tsx";
 import StyledMuiGrid from "../../../../components/StyledMuiGrid.tsx";
 import {MetaDocumentForm} from "../../../metaDocument/MetaDocumentGrid.tsx";
 import * as builder from "../../../../util/springFilterUtils.ts";
+import {DndContext} from "@dnd-kit/core";
+import {DraggableGridRow, DraggableGridRowHandler} from "../../../../components/DraggableContext.tsx";
+import {GridSlots} from "@mui/x-data-grid-pro";
 
 const sortModel: any = [{field: 'ordre', sort: 'asc'}]
 const perspectives = ["COUNT_METADADES"];
@@ -83,8 +86,13 @@ export const MetaDocumentGrid = ({ entity, onRowCountChange } :any) => {
                 </Badge>
             </LinkButton>
         },
+        {
+            renderCell: () => <DraggableGridRowHandler />,
+            flex: 0.1
+        }
     ], [t])
 
+    const {marcarDefecte, desmarcarDefecte, reordering} = useActions(refresh)
     const {actions} = useMetaDocumentActions(refresh);
     const additionalActions = useMemo(() => [
         ...actions,
@@ -92,17 +100,35 @@ export const MetaDocumentGrid = ({ entity, onRowCountChange } :any) => {
             label: t('page.metaDocument.action.default.label'),
             icon: "check_box",
             showInMenu: true,
-            onClick: ()=>{},
+            onClick: marcarDefecte,
+            hidden: (row:any) => row?.perDefecte,
         },
-    ], [actions])
+        {
+            label: t('page.metaDocument.action.undefault.label'),
+            icon: "close",
+            showInMenu: true,
+            onClick: desmarcarDefecte,
+            hidden: (row:any) => !row?.perDefecte,
+        },
+    ], [t, actions])
 
-    return <StyledMuiGrid
+    const handleDragEnd = (event: any) => {
+        const sourceData = event.active.data.current;
+        const targetData = event.over.data.current;
+        // console.log('>>> ', sourceData.codi, '(', sourceData.ordre, ') ->', targetData.codi, '(', targetData.ordre, ')')
+        if (sourceData.id != targetData.id) {
+            reordering(sourceData.id, targetData.ordre)
+        }
+    }
+
+    return <DndContext onDragEnd={handleDragEnd}><StyledMuiGrid
         apiRef={apiRef}
         resourceName={"metaDocumentResource"}
         popupEditUpdateActive
         popupEditFormDialogResourceTitle={t('page.metaDocument.title')}
         popupEditFormContent={<MetaDocumentForm/>}
         columns={additionalColumns}
+        rowActionsColumnIndex={-1}
         toolbarHideQuickFilter={false}
         filter={builder.eq("metaExpedient.id", entity?.id)}
         formAdditionalData={{ metaExpedient: {id: entity?.id} }}
@@ -111,6 +137,10 @@ export const MetaDocumentGrid = ({ entity, onRowCountChange } :any) => {
         rowAdditionalActions={additionalActions}
         onRowCountChange={onRowCountChange}
 
+        slots={{
+            row: DraggableGridRow as GridSlots['row'],
+        }}
+
         popupEditFormDialogComponentProps={{ fullWidth: true, maxWidth: 'lg' }}
         toolbarCreateTitle={t('page.metaDocument.action.new.label')}
         popupEditFormI18nKeys={{
@@ -118,5 +148,5 @@ export const MetaDocumentGrid = ({ entity, onRowCountChange } :any) => {
             updateSuccess: 'page.metaDocument.action.update.ok',
             deleteSuccess: 'page.metaDocument.action.delete.ok',
         }}
-    />
+    /></DndContext>
 }

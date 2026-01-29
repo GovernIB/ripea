@@ -1434,6 +1434,10 @@ const translationEn = {
                     label: "Set as default",
                     ok: "Document type set as default",
                 },
+                undefault: {
+                    label: "Unset as default",
+                    ok: "Document type unset as default",
+                },
                 activar: {
                     label: "Activate",
                     ok: "Document type activated",

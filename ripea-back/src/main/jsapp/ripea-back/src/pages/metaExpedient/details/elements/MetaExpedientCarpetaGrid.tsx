@@ -21,7 +21,7 @@ const MetaExpedientCarpetaForm = () => {
     </Grid>
 }
 
-const sortModel: any = [{field: 'ordre', sort: 'asc'}]
+const sortModel: any = [{field: 'nom', sort: 'asc'}]
 const perspectives: string[] = [];
 const columns = [
     // {

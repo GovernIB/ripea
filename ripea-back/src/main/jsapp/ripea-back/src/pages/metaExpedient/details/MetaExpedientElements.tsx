@@ -5,7 +5,7 @@ import {useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
 import Load from "../../../components/Load.tsx";
 import TabComponent from "../../../components/TabComponent.tsx";
-import {MetDadaGrid} from "../../metaDocument/details/MetaDadaGrid.tsx";
+import {MetDadaGrid} from "./elements/MetaDadaGrid.tsx";
 import {MetaExpedientTascaGrid} from "./elements/MetaExpedientTascaGrid.tsx";
 import {GrupGrid} from "./elements/GrupGrid.tsx";
 import {MetaDocumentGrid} from "./elements/MetaDocumentGrid.tsx";
