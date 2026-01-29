@@ -1,5 +1,6 @@
 package es.caib.ripea.service.helper;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -20,6 +21,7 @@ import es.caib.ripea.persistence.repository.ExpedientPeticioRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientRepository;
 import es.caib.ripea.service.intf.dto.ExpedientPeticioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.ExpedientPeticioInfoDto;
+import es.caib.ripea.service.intf.dto.TipusProcedimentServeiEnum;
 
 @Component
 public class AnotacioDistribucioHelper {
@@ -80,9 +82,18 @@ public class AnotacioDistribucioHelper {
 					return;
 				}
 
-				List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findByEntitatAndClassificacioOrderByNomAsc(
-						entitat,
-						registre.getProcedimentCodi());
+				List<MetaExpedientEntity> metaExpedients = new ArrayList<MetaExpedientEntity>();
+				if (registre.getProcedimentCodi()!=null) {
+					metaExpedients = metaExpedientRepository.findByEntitatAndClassificacioAndTipusProcedimentServeiOrderByNomAsc(
+							entitat,
+							registre.getProcedimentCodi(),
+							TipusProcedimentServeiEnum.PROCEDIMENT);
+				} else {
+					metaExpedients = metaExpedientRepository.findByEntitatAndClassificacioAndTipusProcedimentServeiOrderByNomAsc(
+							entitat,
+							registre.getAplicacioCodi(), //TODO: canviar per getServeiCodi quant disponible
+							TipusProcedimentServeiEnum.SERVEI);
+				}
 				MetaExpedientEntity metaExpedientEntity = null;
 				if (!metaExpedients.isEmpty()) {
 					metaExpedientEntity = metaExpedients.get(0);

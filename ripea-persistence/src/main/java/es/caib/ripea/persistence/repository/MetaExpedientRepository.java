@@ -256,6 +256,11 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 
 	List<MetaExpedientEntity> findByEntitatAndClassificacioOrderByNomAsc(EntitatEntity entitat, String classificacio);
 	
+	List<MetaExpedientEntity> findByEntitatAndClassificacioAndTipusProcedimentServeiOrderByNomAsc(
+			EntitatEntity entitat,
+			String classificacio,
+			TipusProcedimentServeiEnum tipusProcedimentServei);
+	
 	@Query( "select " +
 			"   me.id " +
 			"from " +

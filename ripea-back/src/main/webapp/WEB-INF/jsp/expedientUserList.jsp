@@ -73,310 +73,320 @@ table.dataTable tr > td:nth-child(6) {
 	max-width: 1px;
 }
 </style>
-<script>
 
-var mostrarMeusExpedients = '${meusExpedients}' === 'true';
-var mostrarExpedientsFirmaPendent = '${firmaPendent}' === 'true';
-var columnaAgafatPer = 23;
+<script type="text/javascript">
 
-$(document).ready(function() {
-
-	$('#taulaDades').on('selectionchange.dataTable', function (e, accio, ids) {
-		$.get(
-				"expedient/" + accio,
-				{ids: ids},
-				function(data) {
-					$("#seleccioCount").html(data);
+	var mostrarMeusExpedients = '${meusExpedients}' === 'true';
+	var mostrarExpedientsFirmaPendent = '${firmaPendent}' === 'true';
+	var columnaAgafatPer = 23;
+	
+	$(document).ready(function() {
+	
+		$('#taulaDades').on('selectionchange.dataTable', function (e, accio, ids) {
+			$.get(
+					"expedient/" + accio,
+					{ids: ids},
+					function(data) {
+						$("#seleccioCount").html(data);
+					}
+			);
+		});
+	
+		$('#taulaDades').on('draw.dt', function () {
+			$('#seleccioAll').on('click', function() {
+				$.get(
+						"expedient/select",
+						function(data) {
+							$("#seleccioCount").html(data);
+							$('#taulaDades').webutilDatatable('refresh');
+						}
+				);
+				return false;
+			});
+			$('#seleccioNone').on('click', function() {
+				$.get(
+						"expedient/deselect",
+						function(data) {
+							$("#seleccioCount").html(data);
+							$('#taulaDades').webutilDatatable('select-none');
+							$('#taulaDades').webutilDatatable('refresh');
+						}
+				);
+				return false;
+			});
+	
+	 		$('#taulaDades').DataTable().column(columnaAgafatPer).visible(!mostrarMeusExpedients);
+	
+			$("span[class^='stateColor-']").each(function( index ) {
+				var fullClassNameString = this.className;
+				var colorString = fullClassNameString.substring(11);
+				if (colorString == "" || colorString == 'OBERT' || colorString == 'ESTAT') {
+					$(this).parent().css( "border", "dashed 1px #AAA" );
+					$(this).parent().css( "color", '#666666' );
+				} else if (colorString == 'TANCAT') {
+					$(this).parent().css( "background-color", "#777" );
+				} else {
+				    $(this).parent().css( "background-color", colorString );
+					const textColor = getTextColorOnBackground('#666666', '#ffffff', colorString);
+					$(this).parent().css( "color", textColor );
+					// $(this).parent().css( "fontSize", 'small' );
+					$(this).parent().parent().parent().css( "box-shadow", "-6px 0 0 " + colorString );
 				}
-		);
-	});
-
-	$('#taulaDades').on('draw.dt', function () {
-		$('#seleccioAll').on('click', function() {
-			$.get(
-					"expedient/select",
-					function(data) {
-						$("#seleccioCount").html(data);
-						$('#taulaDades').webutilDatatable('refresh');
-					}
-			);
-			return false;
+			});
+			
+	
+			$("a.fileDownload").on("click", function() {
+				$("body").addClass("loading");
+				checkLoadingFinished();
+		    });
+	
+	
+			$('#agafar_lnk').on('click', function() {
+				$("body").addClass("loading");
+			});
+			    
 		});
-		$('#seleccioNone').on('click', function() {
-			$.get(
-					"expedient/deselect",
-					function(data) {
-						$("#seleccioCount").html(data);
-						$('#taulaDades').webutilDatatable('select-none');
-						$('#taulaDades').webutilDatatable('refresh');
-					}
-			);
-			return false;
+	
+		if (mostrarMeusExpedients) {
+	 		$('#taulaDades').DataTable().column(columnaAgafatPer).visible(false);
+		}
+		$('#meusExpedientsBtn').click(function() {
+			mostrarMeusExpedients = !$(this).hasClass('active');
+			// Modifica el formulari
+			$('#meusExpedients').val(mostrarMeusExpedients);
+			$(this).blur();
+			// Estableix el valor de la cookie
+			setCookie("${nomCookieMeusExpedients}", mostrarMeusExpedients);
+			// Amaga la columna i refresca la taula
+			$('#taulaDades').webutilDatatable('refresh');
 		});
-
- 		$('#taulaDades').DataTable().column(columnaAgafatPer).visible(!mostrarMeusExpedients);
-
-		$("span[class^='stateColor-']").each(function( index ) {
-			var fullClassNameString = this.className;
-			var colorString = fullClassNameString.substring(11);
-			if (colorString == "" || colorString == 'OBERT' || colorString == 'ESTAT') {
-				$(this).parent().css( "border", "dashed 1px #AAA" );
-				$(this).parent().css( "color", '#666666' );
-			} else if (colorString == 'TANCAT') {
-				$(this).parent().css( "background-color", "#777" );
-			} else {
-			    $(this).parent().css( "background-color", colorString );
-				const textColor = getTextColorOnBackground('#666666', '#ffffff', colorString);
-				$(this).parent().css( "color", textColor );
-				// $(this).parent().css( "fontSize", 'small' );
-				$(this).parent().parent().parent().css( "box-shadow", "-6px 0 0 " + colorString );
-			}
+		$('#ambFirmaPendentBtn').click(function() {
+			mostrarExpedientsFirmaPendent = !$(this).hasClass('active');
+			// Modifica el formulari
+			$('#ambFirmaPendent').val(mostrarExpedientsFirmaPendent);
+			$(this).blur();
+			// Estableix el valor de la cookie
+			setCookie("${nomCookieFirmaPendent}", mostrarExpedientsFirmaPendent);
+			// Amaga la columna i refresca la taula
+			$('#taulaDades').webutilDatatable('refresh');
+		});
+		$('#expSeguitsBtn').click(function() {
+			let mostrarExpedientsSeguits = !$(this).hasClass('active');
+			// Modifica el formulari
+			$('#expedientsSeguits').val(mostrarExpedientsSeguits);
+			$(this).blur();
+			// Estableix el valor de la cookie
+			setCookie("${nomCookieExpsSeguits}", mostrarExpedientsSeguits);
+			// Amaga la columna i refresca la taula
+			$('#taulaDades').webutilDatatable('refresh');
+		});
+		$(".email-user").click(function(e) {
+			e.preventDefault();
+			e.stopPropagation();
+			alert("Button Clicked");
 		});
 		
-
-		$("a.fileDownload").on("click", function() {
-			$("body").addClass("loading");
-			checkLoadingFinished();
-	    });
-
-
-		$('#agafar_lnk').on('click', function() {
-			$("body").addClass("loading");
+		// Mostrar els procediments al filtre
+		var organGestorId = $("#organGestorId").val();
+		if (organGestorId) {
+			findActiusPerLectura(organGestorId);
+		} else {
+			findActiusPerLectura();
+		}
+		
+		var metaExpedientId = "";
+		var counter = 0;
+		$('#metaExpedientId').on('change', function() {
+			metaExpedientId = $(this).val();
+			if (counter != 0) {
+				if (metaExpedientId) {
+					var baseUrl = "<c:url value="/expedient/estatValues/"/>";
+					if (/;jsessionid/.test(baseUrl))
+						baseUrl = baseUrl.substring(0, baseUrl.indexOf(";jsessionid"));
+					$.get(baseUrl + metaExpedientId)
+					.done(function(data) {
+						
+						$('#expedientEstatId').select2('val', '', true);
+						$('#expedientEstatId option[value!=""]').remove();
+						for (var i = 0; i < data.length; i++) {
+							$('#expedientEstatId').append('<option value="' + data[i].id + '">' + data[i].nom + '</option>');
+						}
+					})
+					.fail(function() {
+						alert("<spring:message code="error.jquery.ajax"/>");
+					});
+				} else {
+					setObertTancat();
+				}
+			}
+			counter++;
 		});
-		    
-	});
-
-	if (mostrarMeusExpedients) {
- 		$('#taulaDades').DataTable().column(columnaAgafatPer).visible(false);
-	}
-	$('#meusExpedientsBtn').click(function() {
-		mostrarMeusExpedients = !$(this).hasClass('active');
-		// Modifica el formulari
-		$('#meusExpedients').val(mostrarMeusExpedients);
-		$(this).blur();
-		// Estableix el valor de la cookie
-		setCookie("${nomCookieMeusExpedients}", mostrarMeusExpedients);
-		// Amaga la columna i refresca la taula
-		$('#taulaDades').webutilDatatable('refresh');
-	});
-	$('#ambFirmaPendentBtn').click(function() {
-		mostrarExpedientsFirmaPendent = !$(this).hasClass('active');
-		// Modifica el formulari
-		$('#ambFirmaPendent').val(mostrarExpedientsFirmaPendent);
-		$(this).blur();
-		// Estableix el valor de la cookie
-		setCookie("${nomCookieFirmaPendent}", mostrarExpedientsFirmaPendent);
-		// Amaga la columna i refresca la taula
-		$('#taulaDades').webutilDatatable('refresh');
-	});
-	$('#expSeguitsBtn').click(function() {
-		let mostrarExpedientsSeguits = !$(this).hasClass('active');
-		// Modifica el formulari
-		$('#expedientsSeguits').val(mostrarExpedientsSeguits);
-		$(this).blur();
-		// Estableix el valor de la cookie
-		setCookie("${nomCookieExpsSeguits}", mostrarExpedientsSeguits);
-		// Amaga la columna i refresca la taula
-		$('#taulaDades').webutilDatatable('refresh');
-	});
-	$(".email-user").click(function(e) {
-		e.preventDefault();
-		e.stopPropagation();
-		alert("Button Clicked");
-	});
 	
-	// Mostrar els procediments al filtre
-	var organGestorId = $("#organGestorId").val();
-	if (organGestorId) {
-		findActiusPerLectura(organGestorId);
-	} else {
-		findActiusPerLectura();
-	}
-	
-	var metaExpedientId = "";
-	var counter = 0;
-	$('#metaExpedientId').on('change', function() {
-		metaExpedientId = $(this).val();
-		if (counter != 0) {
-			if (metaExpedientId) {
-				var baseUrl = "<c:url value="/expedient/estatValues/"/>";
-				if (/;jsessionid/.test(baseUrl))
-					baseUrl = baseUrl.substring(0, baseUrl.indexOf(";jsessionid"));
-				$.get(baseUrl + metaExpedientId)
-				.done(function(data) {
-					
-					$('#expedientEstatId').select2('val', '', true);
-					$('#expedientEstatId option[value!=""]').remove();
-					for (var i = 0; i < data.length; i++) {
-						$('#expedientEstatId').append('<option value="' + data[i].id + '">' + data[i].nom + '</option>');
+		var multipleUrl = '<c:url value="/metaExpedient/metaDadaPermisLectura/domini"/>';
+		$.get(multipleUrl)
+			.done(function(data) {
+				var campDomini = $('#metaExpedientDominiCodi');
+				campDomini.empty();
+				campDomini.append("<option value=\"\"></option>");
+				data.forEach(function(domini) {
+					if(domini.codi == '${expedientFiltreCommand.metaExpedientDominiCodi}') {
+						campDomini.append('<option value="' + domini.codi + '" selected>' + domini.nom + '</option>');
+						$('#metaExpedientDominiCodi').trigger('change');
+					} else {
+						campDomini.append('<option value="' + domini.codi + '">' + domini.nom + '</option>');
 					}
+				});
+			})
+			.fail(function(e) {
+				alert("<spring:message code="error.jquery.ajax"/>");
+			});
+							
+		$('#metaExpedientId').trigger('change');
+		
+		let pageSizeDominis = 20;		
+		$('#metaExpedientDominiCodi').on('change', function() {
+			var selDomini = $("#metaExpedientDominiValor");
+			var dominiCodi= $(this).val();
+			var multipleUrl = '<c:url value="/metaExpedient/metaDada/domini/' + dominiCodi + '"/>';
+			selDomini.empty();
+			selDomini.append("<option value=\"\"></option>");
+			var select2Options = {
+					language: "${requestLocale}",
+			        theme: 'bootstrap',
+					allowClear: true,
+			        ajax: {
+			            url: multipleUrl,
+			            dataType: 'json',
+			            delay: 250,
+		                global: false,
+			            data: function (params) {
+			                params.page = params.page || 1;
+			                return {
+			                	filter: params.term ? params.term : '',
+			                    pageSize: pageSizeDominis,
+			                    page: params.page
+			                };
+			            },
+			            processResults: function (data, params) {
+			                params.page = params.page || 1;
+			                var dominis = [];
+			                for (let i = 0; i < data.resultat.length; i++) {
+			                	dominis.push({
+			                        id: data.resultat[i].id, 
+			                        text: data.resultat[i].text
+			                    })
+			                }
+			                return {
+			                    results: dominis,
+			                    pagination: {
+			                        more: params.term ? (params.page * data.totalElements < data.totalElements) : ((params.page * pageSizeDominis < data.totalElements) || (data.resultat.length > 0))
+			                    }
+			                };
+			            },
+			            cache: true
+			        },
+			        width: '100%',
+			        minimumInputLength: 0
+		    };
+			selDomini.select2(select2Options);
+			
+			if ('${expedientFiltreCommand.metaExpedientDominiValor}') {
+				$.get("<c:url value="/metaExpedient/metaDada/domini/${expedientFiltreCommand.metaExpedientDominiCodi}/valor?dadaValor=${expedientFiltreCommand.metaExpedientDominiValor}"/>")
+				.done(function(data) {
+					var $option = $('<option selected>' + data.text + '</option>').val(data.id);
+					selDomini.append($option).trigger('change');
 				})
 				.fail(function() {
 					alert("<spring:message code="error.jquery.ajax"/>");
 				});
-			} else {
-				setObertTancat();
 			}
-		}
-		counter++;
-	});
-
-	var multipleUrl = '<c:url value="/metaExpedient/metaDadaPermisLectura/domini"/>';
-	$.get(multipleUrl)
-		.done(function(data) {
-			var campDomini = $('#metaExpedientDominiCodi');
-			campDomini.empty();
-			campDomini.append("<option value=\"\"></option>");
-			data.forEach(function(domini) {
-				if(domini.codi == '${expedientFiltreCommand.metaExpedientDominiCodi}') {
-					campDomini.append('<option value="' + domini.codi + '" selected>' + domini.nom + '</option>');
-					$('#metaExpedientDominiCodi').trigger('change');
-				} else {
-					campDomini.append('<option value="' + domini.codi + '">' + domini.nom + '</option>');
-				}
-			});
-		})
-		.fail(function(e) {
-			alert("<spring:message code="error.jquery.ajax"/>");
+			
 		});
-						
-	$('#metaExpedientId').trigger('change');
-	
-	let pageSizeDominis = 20;		
-	$('#metaExpedientDominiCodi').on('change', function() {
-		var selDomini = $("#metaExpedientDominiValor");
-		var dominiCodi= $(this).val();
-		var multipleUrl = '<c:url value="/metaExpedient/metaDada/domini/' + dominiCodi + '"/>';
-		selDomini.empty();
-		selDomini.append("<option value=\"\"></option>");
-		var select2Options = {
-				language: "${requestLocale}",
-		        theme: 'bootstrap',
-				allowClear: true,
-		        ajax: {
-		            url: multipleUrl,
-		            dataType: 'json',
-		            delay: 250,
-	                global: false,
-		            data: function (params) {
-		                params.page = params.page || 1;
-		                return {
-		                	filter: params.term ? params.term : '',
-		                    pageSize: pageSizeDominis,
-		                    page: params.page
-		                };
-		            },
-		            processResults: function (data, params) {
-		                params.page = params.page || 1;
-		                var dominis = [];
-		                for (let i = 0; i < data.resultat.length; i++) {
-		                	dominis.push({
-		                        id: data.resultat[i].id, 
-		                        text: data.resultat[i].text
-		                    })
-		                }
-		                return {
-		                    results: dominis,
-		                    pagination: {
-		                        more: params.term ? (params.page * data.totalElements < data.totalElements) : ((params.page * pageSizeDominis < data.totalElements) || (data.resultat.length > 0))
-		                    }
-		                };
-		            },
-		            cache: true
-		        },
-		        width: '100%',
-		        minimumInputLength: 0
-	    };
-		selDomini.select2(select2Options);
 		
-		if ('${expedientFiltreCommand.metaExpedientDominiValor}') {
-			$.get("<c:url value="/metaExpedient/metaDada/domini/${expedientFiltreCommand.metaExpedientDominiCodi}/valor?dadaValor=${expedientFiltreCommand.metaExpedientDominiValor}"/>")
-			.done(function(data) {
-				var $option = $('<option selected>' + data.text + '</option>').val(data.id);
-				selDomini.append($option).trigger('change');
-			})
-			.fail(function() {
-				alert("<spring:message code="error.jquery.ajax"/>");
-			});
+		$('#organGestorId').on('change', function() {
+			var organGestorId = $(this).val();
+			findActiusPerLectura(organGestorId);
+		});
+	});
+	
+	function findActiusPerLectura(organId) {
+		var findUrl;
+		if (organId != undefined) {
+			findUrl = '<c:url value="/metaExpedient/findPerLectura?organId="/>' + organId;
+		} else {
+			findUrl = '<c:url value="/metaExpedient/findPerLectura/"/>';
+		}
+		var selProcediments = $("#metaExpedientId");
+		var previousValue = selProcediments.val();
+		$.ajax({
+	        type: "GET",
+	        url: findUrl,
+	        success: function (data) {
+	        	selProcediments.empty();
+	    		selProcediments.append("<option value=\"\"></option>");
+	    		if (data) {
+	
+	    		    var procedimentsComuns = [];
+	    		    var procedimentsOrgan = [];
+	    		    $.each(data, function(i, val) {
+	    		        if(val.procedimentComu) {
+	    		            procedimentsComuns.push(val);
+	    		        } else {
+	    		            procedimentsOrgan.push(val);
+	    		        }
+	    		    });
+	
+	                console.info(procedimentsComuns);
+	                console.info(procedimentsOrgan);
+	
+					var previousProcedimentStillSelected = false;
+	                if (procedimentsComuns.length > 0) {
+	                    selProcediments.append("<optgroup label='<spring:message code='expedient.list.user.procediment.comuns'/>'>");
+	                    $.each(procedimentsComuns, function(index, val) {
+							var tipusProcServ = "[P] ";
+							if (val.tipusProcedimentServei=='SERVEI') {tipusProcServ = "[S] ";}
+	        				if(val.id == previousValue || val.id == '${expedientFiltreCommand.metaExpedientId}') {      					
+	        					selProcediments.append("<option value='" + val.id + "' selected>" + tipusProcServ + val.nom + " (" + val.classificacio + ")</option>");
+	        					previousProcedimentStillSelected = true;
+	        				} else {
+	        					selProcediments.append("<option value='" + val.id + "'>" + tipusProcServ + val.nom + " (" + val.classificacio + ")</option>");
+	        				}
+	                    });
+	                    selProcediments.append("</optgroup>");
+	                }
+	                if (procedimentsOrgan.length > 0) {
+	                	 selProcediments.append("<optgroup label='<spring:message code='expedient.list.user.procediment.organs'/>'>");
+	                    $.each(procedimentsOrgan, function(index, val) {
+							var tipusProcServ = "[P] ";
+							if (val.tipusProcedimentServei=='SERVEI') {tipusProcServ = "[S] ";}
+	        				if(val.id == previousValue || val.id == '${expedientFiltreCommand.metaExpedientId}') {
+	        					selProcediments.append("<option value='" + val.id + "' selected>" + tipusProcServ + val.nom + " (" + val.classificacio + ")</option>");
+	        					previousProcedimentStillSelected = true;
+	        				} else {
+	        					selProcediments.append("<option value='" + val.id + "'>" + tipusProcServ + val.nom + " (" + val.classificacio + ")</option>");
+	        				}
+	                    });
+	                    selProcediments.append("</optgroup>");
+	                }
+	
+	                if (previousValue && !previousProcedimentStillSelected) {
+	                	setObertTancat();
+					}
+	    		} else {
+	    			setObertTancat();
+	        	}
+	        }
+		});
+		var select2Options = {
+			theme: 'bootstrap', 
+			idth: '100%',
+			minimumInputLength: 0,
+			allowClear: true,
+			language: "${requestLocale}"
 		}
 		
-	});
-	
-	$('#organGestorId').on('change', function() {
-		var organGestorId = $(this).val();
-		findActiusPerLectura(organGestorId);
-	});
-});
-
-function findActiusPerLectura(organId) {
-	var findUrl;
-	if (organId != undefined) {
-		findUrl = '<c:url value="/metaExpedient/findPerLectura?organId="/>' + organId;
-	} else {
-		findUrl = '<c:url value="/metaExpedient/findPerLectura/"/>';
+		selProcediments.select2(select2Options);
 	}
-	var selProcediments = $("#metaExpedientId");
-	var previousValue = selProcediments.val();
-	$.ajax({
-        type: "GET",
-        url: findUrl,
-        success: function (data) {
-        	selProcediments.empty();
-    		selProcediments.append("<option value=\"\"></option>");
-    		if (data) {
-
-    		    var procedimentsComuns = [];
-    		    var procedimentsOrgan = [];
-    		    $.each(data, function(i, val) {
-    		        if(val.procedimentComu) {
-    		            procedimentsComuns.push(val);
-    		        } else {
-    		            procedimentsOrgan.push(val);
-    		        }
-    		    });
-
-                console.info(procedimentsComuns);
-                console.info(procedimentsOrgan);
-
-				var previousProcedimentStillSelected = false;
-                if (procedimentsComuns.length > 0) {
-                    selProcediments.append("<optgroup label='<spring:message code='expedient.list.user.procediment.comuns'/>'>");
-                    $.each(procedimentsComuns, function(index, val) {
-        				if(val.id == previousValue || val.id == '${expedientFiltreCommand.metaExpedientId}') {
-        					selProcediments.append("<option value='" + val.id + "' selected>" + val.nom + " (" + val.classificacio + ")</option>");
-        					previousProcedimentStillSelected = true;
-        				} else {
-        					selProcediments.append("<option value='" + val.id + "'>" + val.nom + " (" + val.classificacio + ")</option>");
-        				}
-                    });
-                    selProcediments.append("</optgroup>");
-                }
-                if (procedimentsOrgan.length > 0) {
-                	 selProcediments.append("<optgroup label='<spring:message code='expedient.list.user.procediment.organs'/>'>");
-                    $.each(procedimentsOrgan, function(index, val) {
-        				if(val.id == previousValue || val.id == '${expedientFiltreCommand.metaExpedientId}') {
-        					selProcediments.append("<option value='" + val.id + "' selected>" + val.nom + " (" + val.classificacio + ")</option>");
-        					previousProcedimentStillSelected = true;
-        				} else {
-        					selProcediments.append("<option value='" + val.id + "'>" + val.nom + " (" + val.classificacio + ")</option>");
-        				}
-                    });
-                    selProcediments.append("</optgroup>");
-                }
-
-
-                if (previousValue && !previousProcedimentStillSelected) {
-                	setObertTancat();
-				}
-    		} else {
-    			setObertTancat();
-        	}
-        }
-	});
-	var select2Options = {theme: 'bootstrap', width: '100%', minimumInputLength: 0, allowClear: true, language: "${requestLocale}"}
-	selProcediments.select2(select2Options);
-}
-
 
 	function setObertTancat() {
 		$.get("<c:url value="/expedient/estatValues/"/>"+0)
@@ -461,7 +471,12 @@ function removeCookie(cname) {
  					inline="true"/>	
 			</div>				
 			<div class="col-md-3">
-				<rip:inputSelect name="metaExpedientId" inline="true" emptyOption="true" optionMinimumResultsForSearch="6" placeholderKey="expedient.list.user.placeholder.procediment"/>
+				<rip:inputSelect
+					name="metaExpedientId"
+					inline="true"
+					emptyOption="true"
+					optionMinimumResultsForSearch="6"
+					placeholderKey="expedient.list.user.placeholder.procediment"/>
 			</div>		
 	
 			<div class="col-md-3">
