@@ -440,6 +440,8 @@ public class MetaExpedientHelper {
 			Map<String, String[]> ordenacioMap) {
 		return metaExpedientRepository.findByEntitat(
 				entitat,
+				filtre.getTipusProcedimentServei()==null,
+				filtre.getTipusProcedimentServei(),
 				filtre.getCodi() == null || filtre.getCodi().isEmpty(),
 				filtre.getCodi() != null ? filtre.getCodi().trim() : "",
 				filtre.getNom() == null || filtre.getNom().isEmpty(),
@@ -897,7 +899,8 @@ public class MetaExpedientHelper {
 				metaExpedient.isInteressatObligatori(),
 				rolActual.equals("IPA_ADMIN")?metaExpedient.isPermisDirecte():false).
 				expressioNumero(metaExpedient.getExpressioNumero()).
-				tipusClassificacio(metaExpedient.getTipusClassificacio()).build();
+				tipusClassificacio(metaExpedient.getTipusClassificacio()).
+				tipusProcedimentServei(metaExpedient.getTipusProcedimentServei()).build();
 		
 		MetaExpedientEntity metaExpedientEntity = metaExpedientRepository.save(entity);
 		
@@ -945,6 +948,8 @@ public class MetaExpedientHelper {
 				metaExpedient.getTipusClassificacio(),
 				metaExpedient.isInteressatObligatori(),
 				rolActual.equals("IPA_ADMIN")?metaExpedient.isPermisDirecte():metaExpedientEntity.isPermisDirecte());
+		
+		metaExpedientEntity.setTipusProcedimentServei(metaExpedient.getTipusProcedimentServei());
 		
 		if (metaExpedient.getEstructuraCarpetes() != null) {
 			//crear estructura carpetes per defecte

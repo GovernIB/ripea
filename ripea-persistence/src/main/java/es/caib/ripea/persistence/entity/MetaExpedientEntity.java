@@ -3,22 +3,39 @@
  */
 package es.caib.ripea.persistence.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+import javax.persistence.UniqueConstraint;
+
+import org.apache.commons.lang3.StringUtils;
+import org.hibernate.annotations.ForeignKey;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.dto.CrearReglaDistribucioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.CrearReglaResponseDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.MetaNodeTipusEnum;
 import es.caib.ripea.service.intf.dto.TipusClassificacioEnumDto;
+import es.caib.ripea.service.intf.dto.TipusProcedimentServeiEnum;
 import lombok.Getter;
-import org.apache.commons.lang3.StringUtils;
-import org.hibernate.annotations.ForeignKey;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
 
 /**
  * Classe del model de dades que representa un meta-expedient.
@@ -32,6 +49,9 @@ import java.util.Set;
 @Getter
 public class MetaExpedientEntity extends MetaNodeEntity {
 
+    @Column(name = "TIPUS_PROC_SERVEI")
+    @Enumerated(EnumType.STRING)
+    private TipusProcedimentServeiEnum tipusProcedimentServei;
 	@Column(name = "tipus_classificacio", length = 3, nullable = false)
 	@Enumerated(EnumType.STRING)
     private TipusClassificacioEnumDto tipusClassificacio;
@@ -273,6 +293,11 @@ public class MetaExpedientEntity extends MetaNodeEntity {
             built.tipusClassificacio = tipusClassificacio;
             return this;
         }
+        
+        public Builder tipusProcedimentServei(TipusProcedimentServeiEnum tipusProcedimentServei) {
+            built.tipusProcedimentServei = tipusProcedimentServei;
+            return this;
+        }
 
         public MetaExpedientEntity build() {
             return built;
@@ -339,6 +364,10 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 	public void setPermisDirecte(
 			boolean permisDirecte) {
 		this.permisDirecte = permisDirecte;
+	}
+
+	public void setTipusProcedimentServei(TipusProcedimentServeiEnum tipusProcedimentServei) {
+		this.tipusProcedimentServei = tipusProcedimentServei;
 	}
 
 	@SuppressWarnings("unused")

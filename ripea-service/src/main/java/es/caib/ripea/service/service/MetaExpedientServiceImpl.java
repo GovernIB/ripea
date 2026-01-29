@@ -571,6 +571,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		
 		return metaExpedientRepository.findByOrganGestor(
 			entitat,
+			filtre.getTipusProcedimentServei()==null,
+			filtre.getTipusProcedimentServei(),
 			filtre.getCodi() == null || filtre.getCodi().isEmpty(),
 			filtre.getCodi() != null ? filtre.getCodi().trim() : "",
 			filtre.getNom() == null || filtre.getNom().isEmpty(),

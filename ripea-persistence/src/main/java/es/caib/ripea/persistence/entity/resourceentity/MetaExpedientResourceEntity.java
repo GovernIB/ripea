@@ -24,6 +24,7 @@ import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.dto.CrearReglaDistribucioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.TipusClassificacioEnumDto;
+import es.caib.ripea.service.intf.dto.TipusProcedimentServeiEnum;
 import es.caib.ripea.service.intf.model.MetaExpedientResource;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -37,6 +38,9 @@ import lombok.Setter;
 @Inheritance(strategy=InheritanceType.JOINED)
 public class MetaExpedientResourceEntity extends MetaNodeResourceEntity<MetaExpedientResource> {
 
+    @Column(name = "TIPUS_PROC_SERVEI")
+    @Enumerated(EnumType.STRING)
+    private TipusProcedimentServeiEnum tipusProcedimentServei;
 	@Column(name = "tipus_classificacio", length = 3, nullable = false)
 	@Enumerated(EnumType.STRING)
 	private TipusClassificacioEnumDto tipusClassificacio;

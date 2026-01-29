@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.back.command;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -30,8 +27,8 @@ import java.util.List;
 @OrganGestorMetaExpedientNotNull
 public class MetaExpedientCommand {
 
+	private TipusProcedimentServeiEnum tipusProcedimentServei = TipusProcedimentServeiEnum.PROCEDIMENT;
 	private Long id;
-
 	@NotEmpty
 	@Size(max = 64)
 	private String codi;
@@ -215,6 +212,9 @@ public class MetaExpedientCommand {
 	public void setPermisDirecte(
 			boolean permisDirecte) {
 		this.permisDirecte = permisDirecte;
+	}
+	public void setTipusProcedimentServei(TipusProcedimentServeiEnum tipusProcedimentServei) {
+		this.tipusProcedimentServei = tipusProcedimentServei;
 	}
 	
 }

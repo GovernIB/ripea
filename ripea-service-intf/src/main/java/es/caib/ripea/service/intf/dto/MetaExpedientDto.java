@@ -11,6 +11,7 @@ import java.util.List;
 @SuppressWarnings("serial")
 public class MetaExpedientDto extends MetaNodeAmbMetaDadesDto implements Serializable {
 
+	private TipusProcedimentServeiEnum tipusProcedimentServei;
     private TipusClassificacioEnumDto tipusClassificacio;
     private String classificacio;
     private String serieDocumental;
