@@ -174,6 +174,14 @@ import lombok.experimental.FieldNameConstants;
                         requiresId = true),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
+                        code = ExpedientResource.ACTION_GET_PROGRES_ZIP,
+                        requiresId = true),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = ExpedientResource.ACTION_CANCEL_IMPORT_ZIP,
+                        requiresId = true),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
                         code = ExpedientResource.ACTION_MASSIVE_REOBRIR_CODE,
                         formClass = ExpedientResource.MassiveAction.class),
                 @ResourceConfigArtifact(
@@ -260,6 +268,8 @@ public class ExpedientResource extends NodeResource implements Serializable {
 	public static final String ACTION_GUARDAR_ARXIU = "GUARDAR_ARXIU";	
 	public static final String ACTION_IMPORT_DOCS = "IMPORT_DOCS";
 	public static final String ACTION_IMPORT_DOCS_ZIP = "IMPORT_DOCS_ZIP";
+	public static final String ACTION_GET_PROGRES_ZIP = "GET_PROGRES_ZIP";
+	public static final String ACTION_CANCEL_IMPORT_ZIP = "CANCEL_IMPORT_ZIP";
 	public static final String ACTION_IMPORT_INTE = "IMPORT_INTE";
 	public static final String ACTION_MOURE_TOT_CODE = "MOURE_TOT";
 	public static final String REPORT_PLANTILLA_EXCEL_INTERESSATS = "PLANTILLA_EXCEL_INTERESSATS";

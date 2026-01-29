@@ -19,6 +19,7 @@ import java.util.zip.ZipEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -49,6 +50,7 @@ public class ZipImportacioHelper {
     @Autowired private DocumentHelper documentHelper;
     @Autowired private MessageHelper messageHelper;
 
+    @Async
     public void processarZip(
     		UsuariDto usuari, 
     		EntitatDto entitat, 
@@ -76,6 +78,13 @@ public class ZipImportacioHelper {
             if (progres != null) {
                 progres.setError(true);
                 progres.setErrorMsg(messageHelper.getMessage("contingut.boto.crear.document.multiple.error", new Object[] {ex.getMessage()}));
+            }
+        } finally {
+            try {
+                Files.deleteIfExists(tempZip);
+                log.debug("ZIP temporal eliminat: {}", tempZip);
+            } catch (IOException e) {
+                log.warn("No s'ha pogut eliminar el ZIP temporal {}", tempZip, e);
             }
         }
     }
@@ -161,7 +170,7 @@ public class ZipImportacioHelper {
             }
 		}
     }
-
+    
     private DocumentDto crearDocumentDto(String rutaCompleta, byte[] contingut) {
         String fitxerNom = Paths.get(rutaCompleta).getFileName().toString();
         String nom = FilenameUtils.removeExtension(fitxerNom);
