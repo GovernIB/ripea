@@ -2986,6 +2986,16 @@ public class ContingutHelper {
 			};
 			return setResultatSync(OK, messageHelper.getMessage("contingutHelper.sincronitzaExpedient.expOk"));
 		} else {
+			
+			//Si té interessats pendents de sincronitzar, feim un update
+			if (expedient.getInteressatsORepresentants()!=null) {
+				for (InteressatEntity interessat: expedient.getInteressatsORepresentants()) {
+					if (!interessat.isArxiuPropagat()) {
+						expedientInteressatHelper.arxiuPropagarInteressats(expedient, interessat);
+					}
+				}
+			}
+			
 			// Si ja està guardat, sincronitzam l'estat
 			es.caib.plugins.arxiu.api.Expedient arxiuExpedient = pluginHelper.arxiuExpedientConsultar(expedient);
 			if (arxiuExpedient == null)
@@ -3115,12 +3125,19 @@ public class ContingutHelper {
 					.codi("ERROR")
 					.valor(messageHelper.getMessage("contingutHelper.sincronitzaExpedient.docKo", new Object[] {document.getNom()}) + " " + exception.getMessage()).build();
 		} else {
-		// Actualitzar estat
+
 			Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(document.getArxiuUuid());
 			ArxiuEstatEnumDto estat = getDocumentArxiuEstat(arxiuDocument);
+			//Actualitzar les metadades del DocumentEntity amb la informació de Arxiu (no inclou estat)
+			pluginHelper.propagarMetadadesDocument(arxiuDocument, document);
+			document.setArxiuPropagat(true);
+			
+			// Actualitzar estat
 			if (estat != null && !estat.equals(document.getArxiuEstat())) {
 				document.updateArxiuEstat(estat);
-				if (ArxiuEstatEnumDto.DEFINITIU.equals(estat) && arxiuDocument.getFirmes() != null && !arxiuDocument.getFirmes().isEmpty()
+				if (ArxiuEstatEnumDto.DEFINITIU.equals(estat) 
+						&& arxiuDocument.getFirmes() != null 
+						&& !arxiuDocument.getFirmes().isEmpty()
 						&& !DocumentEstatEnumDto.DEFINITIU.equals(document.getEstat())) {
 					document.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
 				}
