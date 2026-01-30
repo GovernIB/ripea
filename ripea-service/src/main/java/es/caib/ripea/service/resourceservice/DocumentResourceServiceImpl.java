@@ -524,7 +524,10 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         
         if (entity.getMetaDocument()!=null) {
         	MetaDocumentResourceEntity metaDocumentResourceEntity = (MetaDocumentResourceEntity) Hibernate.unproxy(entity.getMetaDocument());
-        	resource.setMetaDocumentInfo(objectMappingHelper.newInstanceMap(metaDocumentResourceEntity, MetaDocumentResource.class));
+        	resource.setMetaDocumentInfo(objectMappingHelper.newInstanceMap(
+        			metaDocumentResourceEntity,
+        			MetaDocumentResource.class,
+        			"portafirmesResponsables", "serialVersionUID"));
         }
         
         if (entity.getCreatedBy()!=null) {

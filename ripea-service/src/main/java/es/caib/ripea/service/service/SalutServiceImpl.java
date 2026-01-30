@@ -175,6 +175,7 @@ public class SalutServiceImpl implements SalutService{
 		List<IntegracioInfo> integracions = new ArrayList<IntegracioInfo>();
 		integracions.add(new IntegracioInfo(IntegracioApp.PFI.toString(), IntegracioApp.PFI.getNom())); //portafirmes
 		integracions.add(new IntegracioInfo(IntegracioApp.ARX.toString(), IntegracioApp.ARX.getNom())); //Arxiu
+//TODO:	integracions.add(new IntegracioInfo(IntegracioApp.CSV.toString(), IntegracioApp.CSV.getNom())); //ConCSV
 		integracions.add(new IntegracioInfo(IntegracioApp.GDC.toString(), IntegracioApp.GDC.getNom())); //Gestor documental
 		integracions.add(new IntegracioInfo(IntegracioApp.PBL.toString(), IntegracioApp.PBL.getNom())); //PINBAL
 		integracions.add(new IntegracioInfo(IntegracioApp.DIS.toString(), IntegracioApp.DIS.getNom())); //DISTRIBUCIO
@@ -540,6 +541,12 @@ public class SalutServiceImpl implements SalutService{
 		IntegracioPeticions ipARX = new IntegracioPeticions();
 		ipARX.setPeticionsPerEntorn(getPeticionsPerEntorn(IntegracioApp.ARX.toString(), codesFSARX)); 
 		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.ARX, ipARX));
+		
+		//TODO: conCSV
+//		String[] codesFSCSV = {"METRICS@Integracions.concsv"};
+//		IntegracioPeticions ipCSV = new IntegracioPeticions();
+//		ipCSV.setPeticionsPerEntorn(getPeticionsPerEntorn(IntegracioApp.CSV.toString(), codesFSCSV)); 
+//		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.CSV, ipCSV));
 		
 		String[] codesFSPBL = {"METRICS@Integracions.pinbal"};
 		IntegracioPeticions ipPBL = new IntegracioPeticions();

@@ -38,6 +38,7 @@ public class IntegracioHelper {
 	public static final String INTCODI_PFIRMA = "PORTAFIRMES";
 	public static final String INTCODI_FIRMASIMPLE = "FIRMA_SIMPLE_WEB";
 	public static final String INTCODI_ARXIU = "ARXIU";
+	public static final String INTCODI_CONCSV = "CONCSV";
 	public static final String INTCODI_PINBAL = "PINBAL";
 	public static final String INTCODI_CONVERT = "CONVERSIO";
 	public static final String INTCODI_CALLBACK = "CALLBACK";
@@ -66,6 +67,7 @@ public class IntegracioHelper {
 		integracions.add(novaIntegracio(INTCODI_FIRMASERV));
 		integracions.add(novaIntegracio(INTCODI_CALLBACK));
 		integracions.add(novaIntegracio(INTCODI_ARXIU));
+		integracions.add(novaIntegracio(INTCODI_CONCSV));
 		integracions.add(novaIntegracio(INTCODI_GESDOC));
 		integracions.add(novaIntegracio(INTCODI_PINBAL));
 		integracions.add(novaIntegracio(INTCODI_DISTRIBUCIO));
@@ -234,6 +236,8 @@ public class IntegracioHelper {
 			integracio.setNom("Portafirmes");			
 		} else if (INTCODI_ARXIU.equals(codi)) {
 			integracio.setNom("Arxiu digital");
+		} else if (INTCODI_CONCSV.equals(codi)) {
+			integracio.setNom("ConvCSV");
 		} else if (INTCODI_PINBAL.equals(codi)) {
 			integracio.setNom("PINBAL");
 		} else if (INTCODI_CONVERT.equals(codi)) {

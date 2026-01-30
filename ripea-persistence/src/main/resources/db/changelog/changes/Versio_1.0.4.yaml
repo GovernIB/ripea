@@ -5,6 +5,12 @@ databaseChangeLog:
     changes:
       - sqlFile:
           dbms: oracle
+          path: ../scripts/oracle/1.0.4/Versio_1.0.4_DDL.sql
+          splitStatements: true
+          stripComments: true
+          relativeToChangelogFile: true
+      - sqlFile:
+          dbms: oracle
           path: ../scripts/oracle/1.0.4/Versio_1.0.4_DDL1.sql
           splitStatements: true
           stripComments: true
@@ -17,6 +23,18 @@ databaseChangeLog:
           relativeToChangelogFile: true
       - sqlFile:
           dbms: oracle
+          path: ../scripts/oracle/1.0.4/Versio_1.0.4_DDL3.sql
+          splitStatements: true
+          stripComments: true
+          relativeToChangelogFile: true
+      - sqlFile:
+          dbms: oracle
+          path: ../scripts/oracle/1.0.4/Versio_1.0.4_DDL4.sql
+          splitStatements: true
+          stripComments: true
+          relativeToChangelogFile: true
+      - sqlFile:
+          dbms: oracle
           path: ../scripts/oracle/1.0.4/Versio_1.0.4_DDL5.sql
           splitStatements: true
           stripComments: true
@@ -24,6 +42,24 @@ databaseChangeLog:
       - sqlFile:
           dbms: oracle
           path: ../scripts/oracle/1.0.4/Versio_1.0.4_DML1.sql
+          splitStatements: true
+          stripComments: true
+          relativeToChangelogFile: true
+      - sqlFile:
+          dbms: oracle
+          path: ../scripts/oracle/1.0.4/Versio_1.0.4_DML2.sql
+          splitStatements: true
+          stripComments: true
+          relativeToChangelogFile: true
+      - sqlFile:
+          dbms: oracle
+          path: ../scripts/oracle/1.0.4/Versio_1.0.4_DML3.sql
+          splitStatements: true
+          stripComments: true
+          relativeToChangelogFile: true
+      - sqlFile:
+          dbms: postgresql
+          path: ../scripts/postgres/1.0.4/Versio_1.0.4_DDL.sql
           splitStatements: true
           stripComments: true
           relativeToChangelogFile: true
@@ -41,6 +77,18 @@ databaseChangeLog:
           relativeToChangelogFile: true
       - sqlFile:
           dbms: postgresql
+          path: ../scripts/postgres/1.0.4/Versio_1.0.4_DDL3.sql
+          splitStatements: true
+          stripComments: true
+          relativeToChangelogFile: true
+      - sqlFile:
+          dbms: postgresql
+          path: ../scripts/postgres/1.0.4/Versio_1.0.4_DDL4.sql
+          splitStatements: true
+          stripComments: true
+          relativeToChangelogFile: true
+      - sqlFile:
+          dbms: postgresql
           path: ../scripts/postgres/1.0.4/Versio_1.0.4_DDL5.sql
           splitStatements: true
           stripComments: true
@@ -48,6 +96,18 @@ databaseChangeLog:
       - sqlFile:
           dbms: postgresql
           path: ../scripts/postgres/1.0.4/Versio_1.0.4_DML1.sql
+          splitStatements: true
+          stripComments: true
+          relativeToChangelogFile: true
+      - sqlFile:
+          dbms: postgresql
+          path: ../scripts/postgres/1.0.4/Versio_1.0.4_DML2.sql
+          splitStatements: true
+          stripComments: true
+          relativeToChangelogFile: true
+      - sqlFile:
+          dbms: postgresql
+          path: ../scripts/postgres/1.0.4/Versio_1.0.4_DML3.sql
           splitStatements: true
           stripComments: true
           relativeToChangelogFile: true

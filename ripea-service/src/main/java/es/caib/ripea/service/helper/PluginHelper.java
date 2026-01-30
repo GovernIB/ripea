@@ -255,6 +255,7 @@ public class PluginHelper {
 	private Map<String, DadesExternesPlugin> dadesExternesPlugins = new HashMap<>();
 	private Map<String, DadesExternesPlugin> dadesExternesPinbalPlugins = new HashMap<>();
 	private Map<String, IArxiuPluginWrapper> arxiuPlugins = new HashMap<>();
+	private Map<String, IArxiuPluginWrapper> conCSVPlugins = new HashMap<>();
 	private Map<String, IValidateSignaturePluginWrapper> validaSignaturaPlugins = new HashMap<>();
 	private Map<String, ValidacioSignaturaPlugin> validaSignaturaAgilPlugins = new HashMap<>();
 	private Map<String, NotificacioPlugin> notificacioPlugins = new HashMap<>();
@@ -1362,7 +1363,7 @@ public class PluginHelper {
 		IntegracioAccioDto integracioAccio = getIntegracioAccioArxiu(
 				document,
 				arxiuPluginWrapper.getEndpoint(),
-				"Actualització de les dades d'un document");
+				document.getArxiuUuid() == null?"Creació d'un document":"Actualització d'un document");
 
 		ContingutEntity contingutPare = getContingutPare(document);
 
@@ -2655,8 +2656,9 @@ public class PluginHelper {
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("id", document.getId().toString());
 		accioParams.put("títol", document.getNom());
+		accioParams.put("uuid", document.getArxiuUuid());
 		long t0 = System.currentTimeMillis();
-		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
+		IArxiuPluginWrapper arxiuPluginWrapper = getConcsvPlugin();
 		String endpoint = arxiuPluginWrapper.getEndpoint();
 		
 		try {
@@ -2668,18 +2670,18 @@ public class PluginHelper {
 			fitxer.setTamany(documentContingut.getTamany());
 			fitxer.setContingut(documentContingut.getContingut());
 			integracioHelper.addAccioOk(
-					IntegracioHelper.INTCODI_ARXIU,
+					IntegracioHelper.INTCODI_CONCSV,
 					accioDescripcio,
 					arxiuPluginWrapper.getEndpoint(),
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.concsv", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			return fitxer;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
 			integracioHelper.addAccioError(
-					IntegracioHelper.INTCODI_ARXIU,
+					IntegracioHelper.INTCODI_CONCSV,
 					accioDescripcio,
 					arxiuPluginWrapper.getEndpoint(),
 					accioParams,
@@ -2687,8 +2689,8 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
-			throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, errorDescripcio, ex);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.concsv", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
+			throw new SistemaExternException(IntegracioHelper.INTCODI_CONCSV, errorDescripcio, ex);
 		}
 	}
 
@@ -7413,6 +7415,85 @@ public class PluginHelper {
 		}
 	}
 
+	public IArxiuPluginWrapper getConcsvPlugin() {
+        return getConcsvPlugin(configHelper.getEntitatActualCodi());
+    }
+	
+	public IArxiuPluginWrapper getConcsvPlugin(String entitatCodi) {
+		if (entitatCodi == null) {
+			throw new RuntimeException("El codi d'entitat actual no pot ser nul");
+		}
+        String organCodi = configHelper.getOrganActualCodi();
+        return getConcsvPlugin(entitatCodi, organCodi);
+	}
+	
+    public IArxiuPluginWrapper getConcsvPlugin(String entitatCodi, String organCodi) {
+
+		IArxiuPluginWrapper plugin = null;
+		if (organCodi != null) {
+			
+			plugin = conCSVPlugins.get(entitatCodi + "." + organCodi);
+			if (plugin != null) { return plugin; }
+			
+			String pluginClassOrgan = configHelper.getValueForOrgan(entitatCodi, organCodi, PropertyConfig.ARXIU_CSV_PLUGIN_CLASS);
+			
+			if (StringUtils.isNotEmpty(pluginClassOrgan)) {
+				try {
+					Class<?> clazz = Class.forName(
+							pluginClassOrgan);
+					Properties propiedades = configHelper.getGroupPropertiesOrganOrEntitatOrGeneral(
+							IntegracioHelper.INTCODI_CONCSV,
+							entitatCodi,
+							organCodi);
+					IArxiuPlugin pluginInstance = (IArxiuPlugin) clazz.getDeclaredConstructor(
+							String.class,
+							Properties.class).newInstance(
+									ConfigDto.prefix + ".",
+									propiedades);
+					plugin = new IArxiuPluginWrapper(
+							pluginInstance, 
+							Utils.getEndpointNameFromProperties(propiedades));
+					conCSVPlugins.put(entitatCodi + "." + organCodi, plugin);
+					return plugin;
+				} catch (Exception ex) {
+					throw new SistemaExternException(IntegracioHelper.INTCODI_CONCSV,
+							"Error al crear la instància del plugin d'arxiu digital CONCSV (" + organCodi + ")", ex);
+				}
+			}
+		}
+
+		// ENTITAT/GENERAL PLUGIN
+		plugin = conCSVPlugins.get(entitatCodi);
+		if (plugin != null) {
+			return plugin;
+		}
+		String pluginClass = getPropertyPluginArxiu();
+		if (StringUtils.isEmpty(pluginClass)) {
+			throw new SistemaExternException(IntegracioHelper.INTCODI_CONCSV,
+					"No està configurada la classe per al plugin d'arxiu digital CONCSV");
+		}
+		try {
+			Class<?> clazz = Class.forName(
+					pluginClass);
+			Properties propiedades = configHelper.getGroupPropertiesEntitatOrGeneral(
+					IntegracioHelper.INTCODI_CONCSV,
+					entitatCodi);
+			IArxiuPlugin pluginInstance = (IArxiuPlugin) clazz.getDeclaredConstructor(
+					String.class,
+					Properties.class).newInstance(
+							ConfigDto.prefix + ".",
+							propiedades);
+			plugin = new IArxiuPluginWrapper(
+					pluginInstance,
+					Utils.getEndpointNameFromProperties(propiedades));
+			conCSVPlugins.put(entitatCodi + "." + organCodi, plugin);
+			return plugin;
+		} catch (Exception ex) {
+			throw new SistemaExternException(IntegracioHelper.INTCODI_CONCSV,
+					"Error al crear la instància del plugin d'arxiu digital (conCSV)", ex);
+		}
+	}    
+    
     private PortafirmesPlugin getPortafirmesPlugin(String entitatCodi, String organCodi) {
     	
 		PortafirmesPlugin plugin = null;		

@@ -132,13 +132,17 @@ public class PropertyConfig {
 	public static final String ARXIU_PLUGIN_PASS					= "es.caib.ripea.plugin.arxiu.caib.contrasenya";
 	public static final String ARXIU_PLUGIN_APLICACIO_CODI			= "es.caib.ripea.plugin.arxiu.caib.aplicacio.codi";
 	public static final String ARXIU_PLUGIN_ENDPOINT_NAME			= "es.caib.ripea.arxiu.endpointName";
+	public static final String ARXIU_PLUGIN_METADADES_ADICIONALS	= "es.caib.ripea.arxiu.metadades.addicionals.actiu";
+	public static final String ARXIU_PLUGIN_FIRMA_DETALLS			= "es.caib.ripea.arxiu.firma.detalls.actiu";
+	
+	public static final String ARXIU_CSV_PLUGIN_CLASS				= "es.caib.ripea.concsv.class";
 	public static final String ARXIU_PLUGIN_VERSIO_IMPR_URL			= "es.caib.ripea.plugin.arxiu.caib.conversio.imprimible.url";
 	public static final String ARXIU_PLUGIN_VERSIO_IMPR_USR			= "es.caib.ripea.plugin.arxiu.caib.conversio.imprimible.usuari";
 	public static final String ARXIU_PLUGIN_VERSIO_IMPR_PAS			= "es.caib.ripea.plugin.arxiu.caib.conversio.imprimible.contrasenya";
 	public static final String ARXIU_PLUGIN_TIMEOUT_CONNECT			= "es.caib.ripea.plugin.arxiu.caib.timeout.connect";
 	public static final String ARXIU_PLUGIN_TIMEOUT_READ			= "es.caib.ripea.plugin.arxiu.caib.timeout.read";
-	public static final String ARXIU_PLUGIN_METADADES_ADICIONALS	= "es.caib.ripea.arxiu.metadades.addicionals.actiu";
-	public static final String ARXIU_PLUGIN_FIRMA_DETALLS			= "es.caib.ripea.arxiu.firma.detalls.actiu";
+	public static final String ARXIU_PLUGIN_CSV_ENDPOINT_NAME		= "es.caib.ripea.concsv.endpointName";
+
 
 	public static final String CONVERSIO_PLUGIN_CLASS			= "es.caib.ripea.plugin.conversio.class";
 	public static final String CONVERSIO_PLUGIN_OOFICE_HOST		= "es.caib.ripea.plugin.conversio.ooffice.host";
