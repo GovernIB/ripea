@@ -1640,12 +1640,12 @@ const translationCa = {
                 backVersio: "Interfície clàssica",
 
                 anotacions: "Anotacions",
-                procediments: "Procediments",
-                procedimentsTitle: "Gestió de procediments",
+                procediments: "Procediments i serveis",
+                procedimentsTitle: "Gestió de procediments i serveis",
                 procedimentPermis: "Permisos del procediment: {{nom}}",
                 grups: "Grups",
                 grupPermis: "Permisos del grup",
-                revisar: "Revisió de procediments",
+                revisar: "Revisió de procediments i serveis",
                 tasca: "Tasques",
                 flux: "Fluxos de firma",
 

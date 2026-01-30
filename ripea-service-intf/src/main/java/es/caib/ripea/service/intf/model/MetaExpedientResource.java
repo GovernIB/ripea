@@ -8,6 +8,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import es.caib.ripea.service.intf.dto.*;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Sort;
 
@@ -17,11 +18,6 @@ import es.caib.ripea.service.intf.base.annotation.ResourceField;
 import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
-import es.caib.ripea.service.intf.dto.CrearReglaDistribucioEstatEnumDto;
-import es.caib.ripea.service.intf.dto.MetaExpedientAmbitEnumDto;
-import es.caib.ripea.service.intf.dto.MetaExpedientRevisioEstatEnumDto;
-import es.caib.ripea.service.intf.dto.ReglaDistribucioDto;
-import es.caib.ripea.service.intf.dto.TipusClassificacioEnumDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -152,6 +148,8 @@ public class MetaExpedientResource extends MetaNodeResource {
 	private boolean organNoSincronitzat;
 	private boolean interessatObligatori;
 
+    private TipusProcedimentServeiEnum tipusProcedimentServei = TipusProcedimentServeiEnum.PROCEDIMENT;
+
 	private ResourceReference<MetaExpedientResource, Long> pare;
 	@ResourceField(onChangeActive = true)
 	private ResourceReference<OrganGestorResource, Long> organGestor;
@@ -190,6 +188,7 @@ public class MetaExpedientResource extends MetaNodeResource {
         private Boolean actiu = true;
         private MetaExpedientAmbitEnumDto ambit;
         private boolean permisDirecte;
+        private TipusProcedimentServeiEnum tipus;
     }
     
     @Getter

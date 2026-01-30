@@ -1640,12 +1640,12 @@ const translationEn = {
                 backVersio: "Classic interface",
 
                 anotacions: "Annotations",
-                procediments: "Procedures",
-                procedimentsTitle: "Procedure management",
+                procediments: "Procedures and services",
+                procedimentsTitle: "Procedure and service management",
                 procedimentPermis: "Procedure permissions: {{nom}}",
                 grups: "Groups",
                 grupPermis: "Group permissions",
-                revisar: "Procedure review",
+                revisar: "Procedure and service review",
                 tasca: "Tasks",
                 flux: "Signature workflows",
 

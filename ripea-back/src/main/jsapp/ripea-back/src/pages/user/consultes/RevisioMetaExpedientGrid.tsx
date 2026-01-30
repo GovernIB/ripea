@@ -1,9 +1,9 @@
 import {useTranslation} from "react-i18next";
-import {useState} from "react";
+import {useMemo, useState} from "react";
 import {GridPage, useMuiDataGridApiRef} from "reactlib";
 import {CardPage} from "../../../components/CardData.tsx";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
-import {Grid, Icon, Typography} from "@mui/material";
+import {Chip, Grid, Icon, Typography} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
@@ -41,9 +41,10 @@ const RevisioMetaExpedientFilterForm = () => {
         <GridFormField xs={4} name="codi"/>
         <GridFormField xs={4} name="classificacio"/>
         <GridFormField xs={4} name="nom"/>
-        <GridFormField xs={4} name="revisioEstat"/>
-        <GridFormField xs={4} name="organGestor"/>
-        <Grid item xs={1.6}/>
+        <GridFormField xs={3} name="revisioEstat"/>
+        <GridFormField xs={3} name="organGestor"/>
+        <GridFormField xs={3} name="tipus"/>
+        <Grid item xs={0.6}/>
     </>
 }
 
@@ -54,6 +55,7 @@ const springFilterBuilder = (data:any) => {
         builder.like('nom', data?.nom),
         builder.eq('revisioEstat', `'${data?.revisioEstat}'`),
         builder.eq('organGestor.id', data?.organGestor?.id),
+        data?.tipus && builder.eq('tipusProcedimentServei', `'${data?.tipus}'`),
     );
 }
 
@@ -107,6 +109,16 @@ const columns = [
     {
         field: 'classificacio',
         flex: 0.75,
+        renderCell: (params:any) => {
+            const isProcediment = params?.row?.tipusProcedimentServei === 'PROCEDIMENT'
+            return <>
+                {params?.row?.tipusProcedimentServei &&
+                    <Chip label={isProcediment ?'P' :'S'}
+                          color={isProcediment ?"primary" :"success"}
+                          sx={{mr: 1}}/>}
+                {params?.formattedValue}
+            </>
+        }
     },
     {
         field: 'nom',
@@ -163,7 +175,7 @@ const RevisioMetaExpedientGrid = () => {
         apiRef?.current?.refresh?.();
     }
 
-    const columnsAddition :any[] = [
+    const columnsAddition :any[] = useMemo(() => [
         ...columns,
         {
             field: 'numComentaris',
@@ -178,7 +190,7 @@ const RevisioMetaExpedientGrid = () => {
                 onClose={refresh}
             />,
         },
-    ]
+    ], [t])
 
     return <GridPage disableMargins>
         <CardPage title={t('page.user.menu.revisar')}>

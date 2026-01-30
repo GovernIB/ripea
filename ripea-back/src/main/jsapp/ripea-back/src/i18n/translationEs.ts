@@ -1640,12 +1640,12 @@ const translationEs = {
                 backVersio: "Interfaz clásica",
 
                 anotacions: "Anotaciones",
-                procediments: "Procedimientos",
+                procediments: "Procedimientos y servicios",
+                procedimentsTitle: "Gestión de procedimientos y servicios",
                 procedimentPermis: "Permisos del procedimiento: {{nom}}",
-                procedimentsTitle: "Gestión de procedimientos",
                 grups: "Grupos",
                 grupPermis: "Permisos del grupo",
-                revisar: "Revisión de procedimientos",
+                revisar: "Revisión de procedimientos y servicios",
                 tasca: "Tareas",
                 flux: "Flujos de firma",
 

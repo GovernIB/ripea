@@ -16,6 +16,7 @@ const MetaExpedientDetail = (props:any) => {
         <FieldData field={'descripcio'}/>
         <FieldData field={'tipus'}/>
         <FieldData field={'revisioEstat'}/>
+        <FieldData field={'tipusProcedimentServei'}/>
 
         <Grid xs={12} sx={{ pl: '8px', pt: '8px' }}>
             <Alert severity={'info'}>

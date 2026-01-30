@@ -2,13 +2,13 @@ import {useTranslation} from "react-i18next";
 import {useMemo, useState} from "react";
 import {GridPage, useFormContext, useMuiDataGridApiRef} from "reactlib";
 import {CardPage} from "../../components/CardData.tsx";
-import StyledMuiGrid, {ToolbarButton} from "../../components/StyledMuiGrid.tsx";
-import {Alert, Badge, Grid, Icon, MenuItem} from "@mui/material";
+import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
+import {Alert, Badge, Chip, Grid, Icon, MenuItem} from "@mui/material";
 import GridFormField from "../../components/GridFormField.tsx";
 import {MetaExpedientComment} from "../CommentDialog.tsx";
 import LinkButton from "../../components/LinkButton.tsx";
 import {formatDate} from "../../util/dateUtils.ts";
-import {useActions, useMetaExpedientActions} from "./details/MetaExpedientActions.tsx";
+import {useMetaExpedientActions} from "./details/MetaExpedientActions.tsx";
 import {MetaExpedientFilter} from "./MetaExpedientFilter.tsx";
 import {useUserSession} from "../../components/Session.tsx";
 import {StyledEstat} from "../user/consultes/RevisioMetaExpedientGrid.tsx";
@@ -35,6 +35,7 @@ export const MetaExpedientForm = ({ isAdmin }:any) => {
         <GridFormField xs={12} name="nom"/>
         <GridFormField xs={12} name="descripcio"/>
         <GridFormField xs={12} name="serieDocumental"/>
+        <GridFormField xs={12} name="tipusProcedimentServei"/>
         <GridFormField xs={4} name="procedimentComu"/>
         <GridFormField xs={8} name="organGestor" required hidden={data?.procedimentComu}/>
         <GridFormField xs={12} name="expressioNumero"
@@ -67,6 +68,16 @@ const columns = [
     {
         field: 'classificacio',
         flex: 1,
+        renderCell: (params:any) => {
+            const isProcediment = params?.row?.tipusProcedimentServei === 'PROCEDIMENT'
+            return <>
+                {params?.row?.tipusProcedimentServei &&
+                    <Chip label={isProcediment ?'P' :'S'}
+                          color={isProcediment ?"primary" :"success"}
+                          sx={{mr: 1}}/>}
+                {params?.formattedValue}
+            </>
+        }
     },
     {
         field: 'nom',
