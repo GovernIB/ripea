@@ -577,8 +577,7 @@ public class CacheHelper {
 	}
 	
 	@CacheEvict(value = "resultatConsultaDominis", allEntries=true)
-	public void evictFindDominisByConsutla() {
-	}
+	public void evictFindDominisByConsutla() {}
 
 	@Cacheable(value = "enviamentsPortafirmesAmbErrorPerExpedient", key="#expedient")
 	public boolean hasEnviamentsPortafirmesAmbErrorPerExpedient(ExpedientEntity expedient) {
@@ -604,10 +603,10 @@ public class CacheHelper {
 	}
 
 	@Cacheable(value = "notificacionsAmbErrorPerExpedient", key="#expedient")
-	public boolean hasNotificacionsAmbErrorPerExpedient(
-			ExpedientEntity expedient) {
+	public boolean hasNotificacionsAmbErrorPerExpedient(ExpedientEntity expedient) {
+		List<DocumentEntity> documents = documentRepository.findByExpedientAndEsborrat(expedient, 0);
 		boolean errorLastNotificacio = false; //enviaments Portafirmes amb error
-		for (ContingutEntity contingut : expedient.getFills()) {
+		for (ContingutEntity contingut : documents) {
 			if (contingut instanceof DocumentEntity) {
 				List<DocumentNotificacioEntity> notificacions = documentNotificacioRepository.findByDocumentOrderByCreatedDateDesc(
 						(DocumentEntity) contingut);
@@ -627,8 +626,9 @@ public class CacheHelper {
 	@Cacheable(value = "enviamentsPortafirmesPendentsPerExpedient", key="#expedientId")
 	public boolean hasEnviamentsPortafirmesPendentsPerExpedient(Long expedientId) {
 		ExpedientEntity expedient = expedientRepository.findById(expedientId).get();
+		List<DocumentEntity> documents = documentRepository.findByExpedientAndEsborrat(expedient, 0);
 		boolean hasEnviamentsPortafirmesPendents = false; //enviaments Portafirmes amb error
-		for (ContingutEntity contingut : expedient.getFills()) {
+		for (ContingutEntity contingut : documents) {
 			if (contingut instanceof DocumentEntity) {
 				List<DocumentPortafirmesEntity> enviamentsPortafirmesPendents = documentPortafirmesRepository.findByDocumentAndEstatInAndErrorOrderByCreatedDateAsc(
 						(DocumentEntity) contingut,
@@ -652,9 +652,7 @@ public class CacheHelper {
 
 	@Cacheable(value = "notificacionsPendentsPerExpedient", key="#expedient")
 	public boolean hasNotificacionsPendentsPerExpedient(ExpedientEntity expedient) {
-		List<DocumentEntity> documents = documentRepository.findByExpedientAndEsborrat(
-				expedient,
-				0);
+		List<DocumentEntity> documents = documentRepository.findByExpedientAndEsborrat(expedient, 0);
 		boolean hasNotificacionsPendents = false;
 		for (ContingutEntity contingut : documents) {
 			if (contingut instanceof DocumentEntity) {
