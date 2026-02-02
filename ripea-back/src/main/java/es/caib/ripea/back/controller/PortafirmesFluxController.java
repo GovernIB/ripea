@@ -224,12 +224,13 @@ public class PortafirmesFluxController extends BaseUserOAdminOOrganController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		organGestorService.actualitzarOrganCodi(organGestorService.getOrganCodiFromContingutId(documentId));
 		Boolean filtrarPerUsuariActual = aplicacioService.propertyBooleanFindByKey(PropertyConfig.FILTRAR_USUARI_DESCRIPCIO);
+		Boolean fluxosUsuari = aplicacioService.propertyBooleanFindByKey(PropertyConfig.PERMETRE_USUARIS_CREAR_FLUX_PORTAFIB);
 		Long metaDocumentId = documentService.findById(entitatActual.getId(), documentId, null).getMetaDocument().getId();
 		boolean filtrarUsuari = filtrarPerUsuariActual == null || filtrarPerUsuariActual.equals(true);
 		List<PortafirmesFluxRespostaDto> resposta = portafirmesFluxService.recuperarPlantillesDisponibles(
 				entitatActual.getId(),
 				metaDocumentId,
-				true,
+				fluxosUsuari,
 				filtrarUsuari);
 		return resposta;
 	}
