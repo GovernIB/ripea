@@ -99,13 +99,25 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 	public void updateNotificacioEstat(
 			NotificacioEstat estat,
 			Date estatData,
-			boolean error,
+			Date dataEnviada, 
+			Date dataFinalitzada) {
+		this.error = false;
+		this.errorDescripcio = null;
+		this.notificacioEstat = estat != null ? DocumentNotificacioEstatEnumDto.valueOf(estat.toString()) : null;
+		this.processatData = estatData;
+		this.dataEnviada = dataEnviada;
+		this.dataFinalitzada = dataFinalitzada;
+	}
+	
+	public void updateNotificacioError(
+			NotificacioEstat estat,
+			Date estatData,
 			String errorDescripcio,
 			Date dataEnviada, 
 			Date dataFinalitzada) {
-		this.error = error;
+		this.error = true;
 		this.errorDescripcio = errorDescripcio;
-		this.notificacioEstat = estat != null ? DocumentNotificacioEstatEnumDto.valueOf(estat.toString()) : null;
+		this.notificacioEstat = estat != null ? DocumentNotificacioEstatEnumDto.valueOf(estat.toString()) : DocumentNotificacioEstatEnumDto.ENVIADA_AMB_ERRORS;
 		this.processatData = estatData;
 		this.dataEnviada = dataEnviada;
 		this.dataFinalitzada = dataFinalitzada;

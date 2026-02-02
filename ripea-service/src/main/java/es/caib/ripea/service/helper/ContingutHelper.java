@@ -1151,22 +1151,22 @@ public class ContingutHelper {
 				dto.setAmbFirma(true);
 			}
 		}
+
 		dto.setVersioCount(0);
 		dto.setDataCaptura(new Date());
 		dto.setNtiVersion("1.0");
 		dto.setNtiIdentificador(resposta.getCertificacioHash());
 		dto.setNtiOrgano(resposta.getReceptorNif());
 		dto.setNtiOrganoDescripcio(resposta.getReceptorNom());
-		dto.setNtiOrigen(metaDocument.getNtiOrigen());
-		dto.setNtiEstadoElaboracion(metaDocument.getNtiEstadoElaboracion());
-		dto.setNtiTipoDocumental(metaDocument.getNtiTipoDocumental());
-
 		dto.setNtiCsv(resposta.getCertificacioCsv());
 
-		metaNode = conversioTipusHelper.convertir(
-				metaDocument,
-				MetaDocumentDto.class);
-		dto.setMetaNode(metaNode);
+		if (metaDocument!=null) {
+			dto.setNtiOrigen(metaDocument.getNtiOrigen());
+			dto.setNtiEstadoElaboracion(metaDocument.getNtiEstadoElaboracion());
+			dto.setNtiTipoDocumental(metaDocument.getNtiTipoDocumental());
+			metaNode = conversioTipusHelper.convertir(metaDocument, MetaDocumentDto.class);
+			dto.setMetaNode(metaNode);
+		}
 		return dto;
 	}
 

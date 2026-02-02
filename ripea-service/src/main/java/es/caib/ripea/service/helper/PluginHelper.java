@@ -5310,42 +5310,25 @@ public class PluginHelper {
 		ExpedientEntity expedient = notificacio.getExpedient();
 		DocumentEntity document = notificacio.getDocument();
 		DocumentNotificacioEstatEnumDto estatAnterior = notificacio.getNotificacioEstat();
-		ConfigHelper.setEntitat(
-				conversioTipusHelper.convertir(
-						expedient.getEntitat(),
-						EntitatDto.class));
-		organGestorHelper.actualitzarOrganCodi(
-				organGestorHelper.getOrganCodiFromContingutId(
-						expedient.getId()));
+		ConfigHelper.setEntitat(conversioTipusHelper.convertir(expedient.getEntitat(), EntitatDto.class));
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(expedient.getId()));
 
 		Map<String, String> accioParams = new HashMap<String, String>();
-		accioParams.put(
-				"setEmisorDir3Codi",
-				expedient.getEntitat().getUnitatArrel());
-		accioParams.put(
-				"expedientId",
-				expedient.getId().toString());
-		accioParams.put(
-				"expedientTitol",
-				expedient.getNom());
-		accioParams.put(
-				"expedientTipusId",
-				expedient.getMetaNode().getId().toString());
-		accioParams.put(
-				"expedientTipusNom",
-				expedient.getMetaNode().getNom());
-		accioParams.put(
-				"documentNom",
-				document.getNom());
+		accioParams.put("setEmisorDir3Codi", expedient.getEntitat().getUnitatArrel());
+		accioParams.put("expedientId", expedient.getId().toString());
+		accioParams.put("expedientTitol", expedient.getNom());
+		accioParams.put("expedientTipusId", expedient.getMetaNode().getId().toString());
+		accioParams.put("expedientTipusNom", expedient.getMetaNode().getNom());
+		accioParams.put("documentNom", document.getNom());
 		if (notificacio.getTipus() != null) {
-			accioParams.put(
-					"enviamentTipus",
-					notificacio.getTipus().name());
+			accioParams.put("enviamentTipus", notificacio.getTipus().name());
 		}
 		accioParams.put("concepte", notificacio.getAssumpte());
 		accioParams.put("referencia", documentEnviamentInteressatEntity.getEnviamentReferencia());
+		
 		NotificacioPlugin notificacioPlugin = getNotificacioPlugin();
 		String endpoint = notificacioPlugin.getEndpointURL();
+
 		try {
 
 			RespostaConsultaEstatEnviament resposta = null;
@@ -5354,6 +5337,9 @@ public class PluginHelper {
 			
 				resposta = notificacioPlugin.consultarEnviament(documentEnviamentInteressatEntity.getEnviamentReferencia());
 	
+				accioParams.put("isError", String.valueOf(resposta.isError()));
+				accioParams.put("estatResposta", resposta.getEstat()!=null?resposta.getEstat().toString():"null");
+				
 				if (!resposta.isError()) {
 				
 					documentEnviamentInteressatEntity.updateEnviamentEstat(
@@ -5361,9 +5347,7 @@ public class PluginHelper {
 							resposta.getEstatData(),
 							resposta.getEstatOrigen(),
 							documentEnviamentInteressatEntity.getEnviamentCertificacioData(),
-							resposta.getCertificacioOrigen(),
-							resposta.isError(),
-							resposta.getErrorDescripcio());
+							resposta.getCertificacioOrigen());
 		
 					documentEnviamentInteressatEntity.updateEnviamentInfoRegistre(
 							resposta.getRegistreData(),
@@ -5371,6 +5355,12 @@ public class PluginHelper {
 							resposta.getRegistreNumeroFormatat());
 					
 					guardarCertificacio(documentEnviamentInteressatEntity, resposta);
+				} else {
+					documentEnviamentInteressatEntity.updateEnviamentError(
+							resposta.getEstat(),
+							resposta.getEstatData(),
+							resposta.getEstatOrigen(),
+							resposta.getErrorDescripcio());
 				}
 			}
 
@@ -5382,8 +5372,6 @@ public class PluginHelper {
 				notificacio.updateNotificacioEstat(
 						respostaNotificioEstat.getEstat(),
 						resposta!=null?resposta.getEstatData():Calendar.getInstance().getTime(),
-						respostaNotificioEstat.isError(),
-						respostaNotificioEstat.getErrorDescripcio(),
 						respostaNotificioEstat.getDataEnviada(),
 						respostaNotificioEstat.getDataFinalitzada());
 	
@@ -5394,19 +5382,27 @@ public class PluginHelper {
 					estatDespres  != DocumentNotificacioEstatEnumDto.PROCESSADA) {
 						emailHelper.canviEstatNotificacio(notificacio, estatAnterior);
 				}
-				
-				cacheHelper.evictErrorsValidacioPerNode(expedient.getId());
-				cacheHelper.evictNotificacionsPendentsPerExpedient(expedient);
-	
-				integracioHelper.addAccioOk(
-						IntegracioHelper.INTCODI_NOTIFICACIO,
-						"Consulta d'estat d'una notificació electrònica",
-						notificacioPlugin.getEndpointURL(),
-						accioParams,
-						IntegracioAccioTipusEnumDto.RECEPCIO,
-						System.currentTimeMillis() - t0);
-				applicationHelper.stopTimer(sample, "METRICS@Integracions.notib", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
+
+			} else {
+				notificacio.updateNotificacioError(
+						respostaNotificioEstat.getEstat(),
+						resposta!=null?resposta.getEstatData():Calendar.getInstance().getTime(),
+						respostaNotificioEstat.getErrorDescripcio(),
+						respostaNotificioEstat.getDataEnviada(),
+						respostaNotificioEstat.getDataFinalitzada());
 			}
+
+			cacheHelper.evictErrorsValidacioPerNode(expedient.getId());
+			cacheHelper.evictNotificacionsPendentsPerExpedient(expedient);
+			
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_NOTIFICACIO,
+					"Consulta d'estat d'una notificació electrònica",
+					notificacioPlugin.getEndpointURL(),
+					accioParams,
+					IntegracioAccioTipusEnumDto.RECEPCIO,
+					System.currentTimeMillis() - t0);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.notib", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 
 			return resposta;
 
