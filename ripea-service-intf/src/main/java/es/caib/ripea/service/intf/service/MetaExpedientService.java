@@ -463,13 +463,13 @@ public interface MetaExpedientService {
 			Long organGestorId, 
 			String filtre);
 
-	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_DISSENY') or hasRole('IPA_ORGAN_ADMIN')")
+	@PreAuthorize("isAuthenticated()")
 	public List<ArbreDto<MetaExpedientCarpetaDto>> findArbreCarpetesMetaExpedient(Long entitatId, Long metaExpedientId);
 
-	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_DISSENY') or hasRole('IPA_ORGAN_ADMIN')")
+	@PreAuthorize("isAuthenticated()")
 	public MetaExpedientCarpetaDto deleteCarpetaMetaExpedient(Long entitatId, Long metaExpedientCarpetaId);
 
-	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_DISSENY') or hasRole('IPA_ORGAN_ADMIN')")
+	@PreAuthorize("isAuthenticated()")
 	public ProcedimentDto findProcedimentByCodiSia(
 			Long entitatId,
 			String codiDir3, String codiSia);

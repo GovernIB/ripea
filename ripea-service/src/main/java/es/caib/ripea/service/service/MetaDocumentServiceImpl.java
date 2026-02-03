@@ -92,7 +92,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 			String plantillaContentType,
 			byte[] plantillaContingut) {
 		logger.debug("Actualitzant meta-document existent ( entitatId=" + entitatId + ", metaDocument=" + metaDocument + ")");
-		entityComprovarHelper.comprovarEntitat(entitatId, false, true, false, false, false);
+		entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
 		MetaDocumentEntity entity = entityComprovarHelper.comprovarMetaDocument(metaDocument.getId());
 		entity = metaDocumentHelper.update(
 				entity.getMetaExpedient()==null?null:entity.getMetaExpedient().getId(),

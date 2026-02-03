@@ -11,6 +11,7 @@ import es.caib.ripea.back.validation.CodiMetaExpedientNoRepetit;
 import es.caib.ripea.back.validation.MetaExpedientCodiSiaNoRepetit;
 import es.caib.ripea.back.validation.OrganGestorMetaExpedientNotNull;
 import es.caib.ripea.service.intf.dto.*;
+import es.caib.ripea.service.intf.utils.Utils;
 import lombok.Getter;
 import javax.validation.constraints.NotEmpty;
 
@@ -165,7 +166,8 @@ public class MetaExpedientCommand {
 	public MetaExpedientDto asDto() throws JsonMappingException {
 		MetaExpedientDto dto = ConversioTipusHelper.convertir(this, MetaExpedientDto.class);
 		try {
-			if (getEstructuraCarpetesJson() != null) {
+			String carpetesStructure = getEstructuraCarpetesJson();
+			if (Utils.hasValue(carpetesStructure) && !"[]".equals(carpetesStructure)) {
 				ObjectMapper objectMapper = new ObjectMapper();
 				List<ArbreJsonDto> listCarpetes = objectMapper.readValue(getEstructuraCarpetesJson(), new TypeReference<List<ArbreJsonDto>>(){});
 				dto.setEstructuraCarpetes(listCarpetes);
