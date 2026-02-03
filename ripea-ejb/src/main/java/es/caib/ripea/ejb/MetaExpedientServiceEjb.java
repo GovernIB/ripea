@@ -293,20 +293,20 @@ public class MetaExpedientServiceEjb extends AbstractServiceEjb<MetaExpedientSer
 	}
 
 	@Override
-	@RolesAllowed({"IPA_ADMIN", "IPA_DISSENY", "IPA_ORGAN_ADMIN"})
+	@RolesAllowed({"IPA_ADMIN", "IPA_DISSENY", "IPA_ORGAN_ADMIN", "IPA_REVISIO"})
 	public List<ArbreDto<MetaExpedientCarpetaDto>> findArbreCarpetesMetaExpedient(Long entitatId,
 			Long metaExpedientId) {
 		return delegateService.findArbreCarpetesMetaExpedient(entitatId, metaExpedientId);
 	}
 
 	@Override
-	@RolesAllowed({"IPA_ADMIN", "IPA_DISSENY", "IPA_ORGAN_ADMIN"})
+	@RolesAllowed({"IPA_ADMIN", "IPA_DISSENY", "IPA_ORGAN_ADMIN", "IPA_REVISIO"})
 	public MetaExpedientCarpetaDto deleteCarpetaMetaExpedient(Long entitatId, Long metaExpedientCarpetaId) {
 		return delegateService.deleteCarpetaMetaExpedient(entitatId, metaExpedientCarpetaId);
 	}
 
 	@Override
-	@RolesAllowed({"IPA_ADMIN", "IPA_DISSENY", "IPA_ORGAN_ADMIN"})
+	@RolesAllowed({"IPA_ADMIN", "IPA_DISSENY", "IPA_ORGAN_ADMIN", "IPA_REVISIO"})
 	public ProcedimentDto findProcedimentByCodiSia(
 			Long entitatId,
 			String codiDir3, String codiSia) {

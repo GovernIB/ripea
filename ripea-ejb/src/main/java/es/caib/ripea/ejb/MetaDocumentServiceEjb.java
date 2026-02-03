@@ -28,7 +28,7 @@ public class MetaDocumentServiceEjb extends AbstractServiceEjb<MetaDocumentServi
 	}
 
 	@Override
-	@RolesAllowed("**")
+	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN", "IPA_DISSENY", "IPA_REVISIO"})
 	public MetaDocumentDto create(
 			Long entitatId,
 			Long metaExpedientId,
@@ -46,7 +46,7 @@ public class MetaDocumentServiceEjb extends AbstractServiceEjb<MetaDocumentServi
 	}
 	
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN", "IPA_DISSENY", "IPA_REVISIO"})
 	public MetaDocumentDto update(Long entitatId, MetaDocumentDto metaDocument, String plantillaNom,
 			String plantillaContentType, byte[] plantillaContingut) throws NotFoundException {
 		return delegateService.update(
@@ -58,7 +58,7 @@ public class MetaDocumentServiceEjb extends AbstractServiceEjb<MetaDocumentServi
 	}
 	
 	@Override
-	@RolesAllowed("**")
+	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN", "IPA_DISSENY", "IPA_REVISIO"})
 	public MetaDocumentDto updateActiu(
 			Long entitatId,
 			Long metaExpedientId,
@@ -72,7 +72,7 @@ public class MetaDocumentServiceEjb extends AbstractServiceEjb<MetaDocumentServi
 	}
 
 	@Override
-	@RolesAllowed("**")
+	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN", "IPA_DISSENY", "IPA_REVISIO"})
 	public MetaDocumentDto delete(
 			Long entitatId,
 			Long metaExpedientId,
@@ -120,7 +120,7 @@ public class MetaDocumentServiceEjb extends AbstractServiceEjb<MetaDocumentServi
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("**")
 	public PaginaDto<MetaDocumentDto> findWithoutMetaExpedient(
 			Long entitatId,
 			PaginacioParamsDto paginacioParams) {
@@ -130,7 +130,7 @@ public class MetaDocumentServiceEjb extends AbstractServiceEjb<MetaDocumentServi
 	}
 	
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("**")
 	public List<MetaDocumentDto> findByEntitat(
 			Long entitatId) throws NotFoundException {
 		return delegateService.findByEntitat(entitatId);
