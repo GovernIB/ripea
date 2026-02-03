@@ -100,6 +100,7 @@ import es.caib.ripea.service.intf.dto.ProcedimentDto;
 import es.caib.ripea.service.intf.dto.ProgresActualitzacioDto;
 import es.caib.ripea.service.intf.dto.StatusEnumDto;
 import es.caib.ripea.service.intf.dto.TipusClassificacioEnumDto;
+import es.caib.ripea.service.intf.dto.TipusProcedimentServeiEnum;
 import es.caib.ripea.service.intf.exception.ExisteixenExpedientsEsborratsException;
 import es.caib.ripea.service.intf.exception.ExisteixenExpedientsException;
 import es.caib.ripea.service.intf.exception.NotFoundException;
@@ -1365,6 +1366,12 @@ public class MetaExpedientHelper {
 				procedimentImportat.isPermisDirecte()).
 				expressioNumero(procedimentImportat.getExpressioNumero()).
 				tipusClassificacio(procedimentImportat.getTipusClassificacio()).build();
+		
+		if (procedimentImportat.getTipusProcedimentServei()!=null) {
+			entity.setTipusProcedimentServei(procedimentImportat.getTipusProcedimentServei());
+		} else {
+			entity.setTipusProcedimentServei(TipusProcedimentServeiEnum.PROCEDIMENT);
+		}
 		
 		MetaExpedientEntity metaExpedientEntity = metaExpedientRepository.save(entity);
 		if (procedimentImportat.getCarpetes() != null && procedimentImportat.getCarpetes().size()>0) {

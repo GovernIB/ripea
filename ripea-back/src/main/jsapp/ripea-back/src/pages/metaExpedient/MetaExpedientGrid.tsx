@@ -25,6 +25,7 @@ export const MetaExpedientForm = ({ isAdmin }:any) => {
     const {data} = useFormContext()
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
+        <GridFormField xs={12} name="tipus" required/>
         <GridFormField xs={12} name="codi"/>
         <GridFormField xs={2} name="tipusClassificacio" required/>
         <GridFormField xs={10} name="classificacio" debounce disabled={data?.tipusClassificacio == 'ID'}/>

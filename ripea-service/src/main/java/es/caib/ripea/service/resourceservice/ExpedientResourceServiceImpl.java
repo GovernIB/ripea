@@ -1694,7 +1694,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 				EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatActual, false, false, false, true, false);
 	        	
 				if (params.isMassivo()) {
-					//TODO: No hi ha accio massiva per sincronitzar un expedient a arxi. Veurer GuardarArxiuActionExecutor       		
+					//TODO: No hi ha accio massiva per sincronitzar un expedient a arxiu. Veurer GuardarArxiuActionExecutor       		
 	        	} else {
 	        		resultat = contingutHelper.sincronitzarEstatArxiu(entitatEntity.getId(), params.getIds().get(0));
 	        	}

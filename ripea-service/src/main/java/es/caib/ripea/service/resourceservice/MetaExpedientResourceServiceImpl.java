@@ -593,6 +593,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 						/**
 						 * DADES GENERALS
 						 */
+						target.setTipusProcedimentServei(metaExpedientExport.getTipusProcedimentServei());
 						target.setTipusClassificacio(metaExpedientExport.getTipusClassificacio());
 						target.setClassificacio(metaExpedientExport.getClassificacio());
 						target.setNom(metaExpedientExport.getNom());
@@ -929,6 +930,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
     	
     	target.setCodi(metaExpedientExport.getCodi());
     	
+    	target.setTipusProcedimentServei(metaExpedientExport.getTipusProcedimentServei());
 		target.setTipusClassificacio(metaExpedientExport.getTipusClassificacio());
 		target.setClassificacio(metaExpedientExport.getClassificacio());
 		target.setNom(metaExpedientExport.getNom());
@@ -1394,7 +1396,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
     			
     			MetaExpedientResourceEntity mere = metaExpedientResourceRepository.findById(procedimentId).get();
     			
-    			String fileNom = mere.getCodi().replaceAll("[^a-zA-Z0-9-]", "_");
+    			String fileNom = mere.getCodi().replaceAll("[^a-zA-Z0-9-]", "_")+"_export";
     			if (fileNom.length() > 60) {
     				fileNom = fileNom.substring(0, 60);
     			}

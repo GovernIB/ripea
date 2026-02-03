@@ -1163,6 +1163,7 @@ public class ContingutServiceImpl implements ContingutService {
 	@Transactional
 	@Override
 	public List<CodiValorDto> sincronitzarEstatArxiu(Long entitatId, Long contingutId) {
+		entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
 		return contingutHelper.sincronitzarEstatArxiu(entitatId, contingutId);
 	}
 

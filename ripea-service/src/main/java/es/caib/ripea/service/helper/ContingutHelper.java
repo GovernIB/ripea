@@ -2938,13 +2938,6 @@ public class ContingutHelper {
 			throw new ValidationException(contingutId, ContingutEntity.class,
 					"El contingut amb id=" + contingutId + "a sincronitzar no és de tipus expedient");
 		}
-
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				false,
-				false,
-				true, false);
 		
 		List<CodiValorDto> resultat = new ArrayList<>();
 
@@ -3142,7 +3135,7 @@ public class ContingutHelper {
 					document.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
 				}
 				
-				return setResultatSync(OK, messageHelper.getMessage("contingutHelper.sincronitzaExpedient.docKo", new Object[] {document.getNom(), estat}));
+				return setResultatSync(OK, messageHelper.getMessage("contingutHelper.sincronitzaExpedient.docOk", new Object[] {document.getNom(), estat}));
 			}
 			return setResultatSync(INFO, messageHelper.getMessage("contingutHelper.sincronitzaExpedient.docNoNeed"));
 		}
