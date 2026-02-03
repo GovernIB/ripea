@@ -273,7 +273,7 @@ public class DocumentEnviamentController extends BaseUserController {
 			String msg = getMessage(request, "contingut.enviament.actualitzar.estat.error") + ": ";
 			Throwable root = ExceptionHelper.getRootCauseOrItself(e);
 
-			if (root instanceof ConnectException || root.getMessage().contains("timed out")){
+			if (root instanceof ConnectException || (root.getMessage()!=null && root.getMessage().contains("timed out"))) {
 				msg += getMessage(request, "error.notib.connectTimedOut");
 			} else {
 				root.getMessage();
