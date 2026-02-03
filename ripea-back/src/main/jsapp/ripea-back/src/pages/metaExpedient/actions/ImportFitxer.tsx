@@ -86,9 +86,12 @@ const ImportFitxerFormBase = () => {
     const {data} = useFormContext()
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField xs={12} name={'procediment'}/>
-        <GridFormField xs={12} name="codi"/>
-        <GridFormField xs={2} name="tipusClassificacio" required/>
-        <GridFormField xs={10} name="classificacio" debounce disabled={data?.tipusClassificacio == 'ID'}/>
+        <GridFormField xs={12} name="codi" disabled={data?.procediment != null}/>
+        <GridFormField xs={2} name="tipusClassificacio" required disabled={data?.procediment != null}/>
+        <GridFormField xs={10} 
+            name="classificacio"
+            debounce
+            disabled={data?.tipusClassificacio == 'ID' || data?.procediment != null}/>
         <Grid item xs={12} hidden={data?.msgSiaRolsac == null}>
             <Alert severity={'warning'} sx={{ mt: 0.5 }}>{data.msgSiaRolsac}</Alert>
         </Grid>
@@ -96,7 +99,11 @@ const ImportFitxerFormBase = () => {
         <GridFormField xs={12} name="descripcio"/>
         <GridFormField xs={12} name="serieDocumental"/>
         <GridFormField xs={4} name="procedimentComu"/>
-        <GridFormField xs={8} name="organGestor" required hidden={data?.procedimentComu}/>
+        <GridFormField xs={8} 
+            name="organGestor"
+            required
+            hidden={data?.procedimentComu}
+            disabled={data?.procediment != null}/>
         <GridFormField xs={12} name="expressioNumero"
                        componentProps={{ helperText: t('page.metaExpedient.detall.expressioNumero') }}/>
     </Grid>

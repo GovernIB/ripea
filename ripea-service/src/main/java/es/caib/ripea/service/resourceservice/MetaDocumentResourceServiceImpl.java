@@ -26,6 +26,7 @@ import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.entity.TipusDocumentalEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaDocumentFluxPortafibResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaDocumentResourceEntity;
+import es.caib.ripea.persistence.entity.resourcerepository.MetaDocumentResourceRepository;
 import es.caib.ripea.persistence.repository.DocumentRepository;
 import es.caib.ripea.persistence.repository.ExpedientRepository;
 import es.caib.ripea.persistence.repository.MetaDadaRepository;
@@ -68,6 +69,7 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
 	private final MetaDadaRepository metaDadaRepository;
 	private final DocumentRepository documentRepository;
 	private final OrganGestorRepository organGestorRepository;
+	private final MetaDocumentResourceRepository metaDocumentResourceRepository;
 	private final MetaDocumentFluxPortafibRepository metaDocumentFluxPortafibRepository;
 	private final TipusDocumentalRepository tipusDocumentalRepository;
 	private final MetaDocumentHelper metaDocumentHelper;
@@ -270,12 +272,19 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
 			MetaDocumentResource resource,
 			Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotFoundException {
 		
-		metaDocumentHelper.update(
-				resource.getMetaExpedient()!=null?resource.getMetaExpedient().getId():null,
-				resourceToMetaDocumentDto(resource),
-				resource.getPlantilla()!=null?resource.getPlantilla().getName():null,
-				resource.getPlantilla()!=null?resource.getPlantilla().getContentType():null,
-				resource.getPlantilla()!=null?resource.getPlantilla().getContent():null);
+		MetaDocumentResourceEntity mdre = metaDocumentResourceRepository.findById(id).get();
+		
+		if (mdre.isActiu()!=resource.isActiu()) {
+//			metaDocumentHelper.updateActiu();
+		} else {
+		
+			metaDocumentHelper.update(
+					resource.getMetaExpedient()!=null?resource.getMetaExpedient().getId():null,
+					resourceToMetaDocumentDto(resource),
+					resource.getPlantilla()!=null?resource.getPlantilla().getName():null,
+					resource.getPlantilla()!=null?resource.getPlantilla().getContentType():null,
+					resource.getPlantilla()!=null?resource.getPlantilla().getContent():null);
+		}
 		
 		return resource;
 	}

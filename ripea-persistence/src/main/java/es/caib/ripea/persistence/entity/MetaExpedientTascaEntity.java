@@ -3,18 +3,34 @@
  */
 package es.caib.ripea.persistence.entity;
 
-import es.caib.ripea.service.intf.config.BaseConfig;
-import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
-import lombok.Getter;
-import lombok.Setter;
-import org.hibernate.annotations.ForeignKey;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.UniqueConstraint;
+
+import org.hibernate.annotations.ForeignKey;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import es.caib.ripea.service.intf.config.BaseConfig;
+import es.caib.ripea.service.intf.dto.MetaExpedientTascaValidacioDto;
+import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Classe del model de dades que representa una tasca d'un meta-expedient.
@@ -158,6 +174,19 @@ public class MetaExpedientTascaEntity extends RipeaAuditable<Long> {
 		}
 	}
 
+	public boolean hasValidacio(MetaExpedientTascaValidacioDto validacioTascaDto) {
+		if (this.validacions!=null) {
+			for (MetaExpedientTascaValidacioEntity val: this.validacions) {
+				if (val.getTipusValidacio().equals(validacioTascaDto.getTipusValidacio()) &&
+					val.getItemValidacio().equals(validacioTascaDto.getItemValidacio()) &&
+					val.getItemId().equals(validacioTascaDto.getItemId())) {
+						return true;
+				}
+			}
+		}
+		return false;
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

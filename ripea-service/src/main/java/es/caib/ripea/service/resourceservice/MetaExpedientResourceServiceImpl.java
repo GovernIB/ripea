@@ -73,6 +73,7 @@ import es.caib.ripea.service.intf.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientCarpetaMinDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientExportDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientFiltreDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientTascaDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientTascaValidacioDto;
@@ -239,6 +240,10 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
         				entitat.getId(),
         				ogEntity.getId(),
         				hasPermisAdminComu);
+        	} else if (isAdmin) {
+        		MetaExpedientFiltreDto filtre = new MetaExpedientFiltreDto();
+        		metaExpPermesos = metaExpedientHelper.findByEntitat(entitat, filtre, Utils.sensePaginacio(), null).getContent();
+        		procsPermesosIds = metaExpedientEntityToListLong(metaExpPermesos);
         	} else {
 	            metaExpPermesos = metaExpedientHelper.findAmbPermis(
 	            		entitat.getId(),
@@ -298,10 +303,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 		
 		MetaExpedientEntity metaExpedientEntity = metaExpedientHelper.create(
 				entitatEntity.getId(),
-				objectMappingHelper.newInstanceMap(
-						resource
-						, MetaExpedientDto.class
-						, "serialVersionUID", "createdBy", "createdDate", "lastModifiedBy", "lastModifiedDate"),
+				metaExpedientresourceToDto(resource),
 				configHelper.getRolActual(),
 				ogEntity!=null?ogEntity.getId():null);
 		
@@ -320,18 +322,39 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 		
 		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
 		OrganGestorEntity ogEntity	= organGestorRepository.findByEntitatIdAndCodi(entitatEntity.getId(), configHelper.getOrganActualCodi());
+		MetaExpedientResourceEntity mere = metaExpedientResourceRepository.findById(id).get();
 		
-		metaExpedientHelper.update(
-				entitatEntity.getId(),
-				objectMappingHelper.newInstanceMap(
-						resource,
-						MetaExpedientDto.class,
-						"serialVersionUID", "createdBy", "createdDate", "lastModifiedBy", "lastModifiedDate"),
-				configHelper.getRolActual(),
-				resource.getRevisioEstat(),
-				ogEntity!=null?ogEntity.getId():null);
+		if (mere.isActiu()!=resource.isActiu()) {
+			metaExpedientHelper.updateActiu(
+					entitatEntity.getId(),
+					id,
+					resource.isActiu(),
+					configHelper.getRolActual(),
+					ogEntity!=null?ogEntity.getId():null);
+		} else {
+			metaExpedientHelper.update(
+					entitatEntity.getId(),
+					metaExpedientresourceToDto(resource),
+					configHelper.getRolActual(),
+					resource.getRevisioEstat(),
+					ogEntity!=null?ogEntity.getId():null);
+		}
 		
 		return resource;
+	}
+	
+	private MetaExpedientDto metaExpedientresourceToDto(MetaExpedientResource resource) {
+		MetaExpedientDto metaExpedientDto = objectMappingHelper.newInstanceMap(
+				resource
+				, MetaExpedientDto.class
+				, "serialVersionUID", "createdBy", "createdDate", "lastModifiedBy", "lastModifiedDate");
+		if (resource.getOrganGestor()!=null) {
+			OrganGestorDto og = new OrganGestorDto();
+			og.setId(resource.getOrganGestor().getId());
+			og.setNom(resource.getOrganGestor().getDescription());
+			metaExpedientDto.setOrganGestor(og);
+		}
+		return metaExpedientDto;
 	}
     
     @Override
@@ -345,7 +368,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 		
 		metaExpedientHelper.delete(entitat.getId(), id, ogEntity!=null?ogEntity.getId():null);
 	}
-
+    
     private class OnchangeLogicProcessor implements OnChangeLogicProcessor<MetaExpedientResource> {
 		@Override
 		public void onChange(Serializable id, MetaExpedientResource previous, String fieldName, Object fieldValue,
@@ -593,6 +616,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 						/**
 						 * DADES GENERALS
 						 */
+						target.setCodi(metaExpedientExport.getCodi());
 						target.setTipusProcedimentServei(metaExpedientExport.getTipusProcedimentServei());
 						target.setTipusClassificacio(metaExpedientExport.getTipusClassificacio());
 						target.setClassificacio(metaExpedientExport.getClassificacio());
@@ -830,6 +854,17 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 						excepcioLogHelper.addExcepcio("/metaExpedient/ImportarFitxerActionExecutor.onChange", e);
 						throw new ActionExecutionException(getResourceClass(), null, fieldName, messageHelper.getMessage("message.common.action.error")+": "+e.getMessage());
 					}
+				} else if (MetaExpedientResource.ImportarFitxerFormAction.Fields.procediment.equals(fieldName)) {
+					if (fieldValue!=null) {
+						ResourceReference<OrganGestorResource, Long> resourceReference = (ResourceReference<OrganGestorResource, Long>) fieldValue;
+						MetaExpedientEntity prc = metaExpedientRepository.findById(resourceReference.getId()).get();
+						target.setCodi(prc.getCodi());
+						target.setTipusClassificacio(prc.getTipusClassificacio());
+						target.setClassificacio(prc.getClassificacio());
+						if (prc.getOrganGestor()!=null) {
+							target.setOrganGestor(ResourceReference.toResourceReference(prc.getOrganGestor().getId(), prc.getOrganGestor().getNom()));
+						}
+					}
 				}
 			}
 		}
@@ -913,21 +948,12 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 		
 		return mdadaDto;
     }
-    
-    /*private boolean isMetadadaDescartada(List<MetaDadaResource> metaDadesImportacioList, Long idMetadada) {
-    	if (metaDadesImportacioList!=null) {
-    		for (MetaDadaResource metaDadaResource: metaDadesImportacioList) {
-    			if (metaDadaResource.getId().equals(idMetadada) && !metaDadaResource.isImportar()) {
-    				return true;
-    			}
-    		}
-    	}
-    	return false;
-    }*/
-    
+
     private MetaExpedientExportDto resourceToExportDto(ImportarFitxerFormAction metaExpedientExport) {
+    	
     	MetaExpedientExportDto target = new MetaExpedientExportDto();
     	
+    	target.setId(metaExpedientExport.getProcediment()!=null?metaExpedientExport.getProcediment().getId():null);
     	target.setCodi(metaExpedientExport.getCodi());
     	
     	target.setTipusProcedimentServei(metaExpedientExport.getTipusProcedimentServei());

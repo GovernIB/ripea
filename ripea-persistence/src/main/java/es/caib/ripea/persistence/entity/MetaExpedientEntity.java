@@ -170,7 +170,17 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 		grups.remove(grup);
 	}
 
-
+	public boolean hasGrup(Long grupId) {
+		if (this.grups!=null && grups.size()>0) {
+			for (GrupEntity grp: this.grups) {
+				if (grp.getId().equals(grupId)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
 	public void update(
 			String codi,
 			String nom,

@@ -174,16 +174,13 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	@Override
 	public MetaExpedientDto updateActiu(Long entitatId, Long id, boolean actiu, String rolActual, Long organId) {
 		logger.debug(
-				"Actualitzant propietat activa d'un meta-expedient existent (" + "entitatId=" + entitatId + ", " +
-						"id=" + id + ", " + "actiu=" + actiu + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarAccesMetaExpedient(entitat, id, organId, true);
-		metaExpedient.updateActiu(actiu);
-		
-		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId(), organId);
-		}
-		return conversioTipusHelper.convertir(metaExpedient, MetaExpedientDto.class);
+				"Actualitzant propietat activa d'un meta-expedient existent (" 
+						+ "entitatId=" + entitatId + ", " 
+						+ "id=" + id + ", " 
+						+ "actiu=" + actiu + ")");
+		return conversioTipusHelper.convertir(
+				metaExpedientHelper.updateActiu(entitatId, id, actiu, rolActual, organId),
+				MetaExpedientDto.class);
 	}
 
 	@Transactional

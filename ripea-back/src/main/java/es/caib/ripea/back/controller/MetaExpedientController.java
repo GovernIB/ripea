@@ -716,16 +716,12 @@ public class MetaExpedientController extends BaseAdminController {
 		
 		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
 		
-		PaginacioParamsDto sensePaginacio = new PaginacioParamsDto();
-		sensePaginacio.setPaginaNum(0);
-		sensePaginacio.setPaginaTamany(Integer.MAX_VALUE);
-		
 		PaginaDto<MetaExpedientDto> metaExps = metaExpedientService.findByEntitatOrOrganGestor(
 				entitatActual.getId(),
 				organActual == null ? null : organActual.getId(),
 				new MetaExpedientFiltreDto(),
 				organActual == null ? false : RolHelper.isRolAmbFiltreOrgan(request),
-				sensePaginacio,
+				Utils.sensePaginacio(),
 				RolHelper.getRolActual(request),
 				hasPermisAdmComu(request));
 		

@@ -697,6 +697,14 @@ public class Utils {
 	    return null;
 	}
 	
+	public static PaginacioParamsDto sensePaginacio() {
+		PaginacioParamsDto sensePaginacio = new PaginacioParamsDto();
+		sensePaginacio.setPaginaNum(0);
+		sensePaginacio.setPaginaTamany(Integer.MAX_VALUE);
+		addSortDefault(sensePaginacio, "id");
+		return sensePaginacio;
+	}
+	
 	public static void addSortDefault(PaginacioParamsDto paginacioParams, String camp) {
 		boolean isOrderedByNom = false;
 		if (paginacioParams.getOrdres() != null && !paginacioParams.getOrdres().isEmpty()) {
