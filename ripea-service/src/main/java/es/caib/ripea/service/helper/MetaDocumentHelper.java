@@ -34,6 +34,7 @@ import es.caib.ripea.persistence.repository.MetaExpedientRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientTascaValidacioRepository;
 import es.caib.ripea.persistence.repository.PinbalServeiRepository;
 import es.caib.ripea.persistence.repository.UsuariRepository;
+import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.dto.ItemValidacioTascaEnum;
 import es.caib.ripea.service.intf.dto.MetaDocumentDto;
 import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
@@ -147,6 +148,49 @@ public class MetaDocumentHelper {
 		metaDocumentRepository.delete(metaDocumentEntity);
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
 			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId(), organId);
+		}
+		
+		return metaDocumentEntity;
+	}
+	
+	public MetaDocumentEntity updateActiu(
+			Long entitatId,
+			Long metaExpedientId,
+			Long metaDocumentId,
+			boolean actiu, String rolActual) {
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				false,
+				false,
+				false, 
+				false, 
+				true);
+		
+		MetaExpedientEntity metaExpedient = null;
+		MetaDocumentEntity metaDocumentEntity = null;
+		
+		if (metaExpedientId!=null) {
+			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
+			metaDocumentEntity = entityComprovarHelper.comprovarMetaDocument(entitat, metaExpedient, metaDocumentId);
+		} else {
+			metaDocumentEntity = metaDocumentRepository.findById(metaDocumentId).get();
+		}
+
+		metaDocumentEntity.updateActiu(actiu);
+		
+		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId(), null);
+		}
+		
+		if (metaExpedient != null) {
+			List<ExpedientEntity> expedients = expedientRepository.findByEntitatAndMetaExpedientAndEstatAndEsborrat(
+					entitat, 
+					metaExpedient, 
+					ExpedientEstatEnumDto.OBERT, 
+					0);
+			for (ExpedientEntity expedient: expedients) {
+				cacheHelper.evictErrorsValidacioPerNode(expedient.getId());
+			}
 		}
 		
 		return metaDocumentEntity;

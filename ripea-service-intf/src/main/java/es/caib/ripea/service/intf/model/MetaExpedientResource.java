@@ -75,6 +75,11 @@ import lombok.experimental.FieldNameConstants;
                         requiresId = true),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
+                        code = MetaExpedientResource.ACTION_TOGGLE_GRUP_DEF_CODE,
+                        formClass = MetaExpedientResource.ToggleGrupDefecteFormAction.class,
+                        requiresId = true),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
                         code = MetaExpedientResource.ACTION_CREAR_REGLA_CODE,
                         requiresId = true),
                 @ResourceConfigArtifact(
@@ -108,6 +113,7 @@ public class MetaExpedientResource extends MetaNodeResource {
     public static final String ACTION_CHANGE_REVISIO_CODE	= "CHANGE_REVISIO";
     public static final String ACTION_VINCULAR_GRUP_CODE	= "VINCULAR_GRUP";
     public static final String ACTION_DESVINCULAR_GRUP_CODE	= "DESVINCULAR_GRUP";
+    public static final String ACTION_TOGGLE_GRUP_DEF_CODE	= "TOGGLE_GRUP_DEF";
     public static final String ACTION_TOGGLE_REGLA_CODE		= "TOGGLE_REGLA_ROLSAC";
     public static final String ACTION_CREAR_REGLA_CODE		= "CREAR_REGLA_ROLSAC";
     public static final String ACTION_UPDATE_ROLSAC_CODE	= "UPDATE_ROLSAC";
@@ -221,6 +227,13 @@ public class MetaExpedientResource extends MetaNodeResource {
     @Setter
     public static class ToggleReglaRolsacFormAction implements Serializable {
         private boolean activa;
+    }
+    
+    @Getter
+    @Setter
+    public static class ToggleGrupDefecteFormAction implements Serializable {
+        private Long grupId;
+    	private boolean defecte;
     }
     
     @Getter

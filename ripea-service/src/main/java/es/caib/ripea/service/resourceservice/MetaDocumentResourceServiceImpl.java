@@ -275,7 +275,10 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
 		MetaDocumentResourceEntity mdre = metaDocumentResourceRepository.findById(id).get();
 		
 		if (mdre.isActiu()!=resource.isActiu()) {
-//			metaDocumentHelper.updateActiu();
+			
+			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+			metaDocumentHelper.updateActiu(entitatEntity.getId(), mdre.getMetaExpedient().getId(), id, resource.isActiu(), configHelper.getRolActual());
+			
 		} else {
 		
 			metaDocumentHelper.update(

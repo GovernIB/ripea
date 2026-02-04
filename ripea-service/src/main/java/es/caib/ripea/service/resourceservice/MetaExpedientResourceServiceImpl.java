@@ -96,6 +96,7 @@ import es.caib.ripea.service.intf.model.MetaExpedientResource.DesVincularGrupFor
 import es.caib.ripea.service.intf.model.MetaExpedientResource.ImportarFitxerFormAction;
 import es.caib.ripea.service.intf.model.MetaExpedientResource.ImportarRolsacFormAction;
 import es.caib.ripea.service.intf.model.MetaExpedientResource.RevisioChangeFormAction;
+import es.caib.ripea.service.intf.model.MetaExpedientResource.ToggleGrupDefecteFormAction;
 import es.caib.ripea.service.intf.model.MetaExpedientResource.ToggleReglaRolsacFormAction;
 import es.caib.ripea.service.intf.model.MetaExpedientResource.VincularGrupFormAction;
 import es.caib.ripea.service.intf.model.MetaExpedientTascaResource;
@@ -147,6 +148,8 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
     	register(MetaExpedientResource.ACTION_CHANGE_REVISIO_CODE,	new RevisioChangeActionExecutor());
     	register(MetaExpedientResource.ACTION_VINCULAR_GRUP_CODE,	new VincularGrupActionExecutor());
     	register(MetaExpedientResource.ACTION_DESVINCULAR_GRUP_CODE,new DesVincularGrupActionExecutor());
+    	register(MetaExpedientResource.ACTION_TOGGLE_GRUP_DEF_CODE,	new ToggleGrupDefecteActionExecutor());
+    	
     	register(MetaExpedientResource.ACTION_TOGGLE_REGLA_CODE,	new ToggleReglaActionExecutor());
     	register(MetaExpedientResource.ACTION_CREAR_REGLA_CODE,		new CrearReglaActionExecutor());
     	register(MetaExpedientResource.ACTION_UPDATE_ROLSAC_CODE,	new ActualitzarProcedimentsRolsacActionExecutor());
@@ -1303,12 +1306,28 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 		}
     }
     
+    private class ToggleGrupDefecteActionExecutor implements ActionExecutor<MetaExpedientResourceEntity, MetaExpedientResource.ToggleGrupDefecteFormAction, Serializable> {
+
+		@Override
+		public void onChange(Serializable id, ToggleGrupDefecteFormAction previous, String fieldName, Object fieldValue,
+				Map<String, AnswerValue> answers, String[] previousFieldNames, ToggleGrupDefecteFormAction target) {}
+
+		@Override
+		public Serializable exec(String code, MetaExpedientResourceEntity entity, ToggleGrupDefecteFormAction params) throws ActionExecutionException {
+			if (params.isDefecte()) {
+				entity.setGrupPerDefecte(grupResourceRepository.findById(params.getGrupId()).get());
+			} else {
+				entity.setGrupPerDefecte(null);
+			}
+			return "{\"resultado\": \"OK\"}";
+		}
+    }
+    
     private class DesVincularGrupActionExecutor implements ActionExecutor<MetaExpedientResourceEntity, MetaExpedientResource.DesVincularGrupFormAction, Serializable> {
 
 		@Override
 		public void onChange(Serializable id, DesVincularGrupFormAction previous, String fieldName, Object fieldValue,
-				Map<String, AnswerValue> answers, String[] previousFieldNames, DesVincularGrupFormAction target) {
-		}
+				Map<String, AnswerValue> answers, String[] previousFieldNames, DesVincularGrupFormAction target) {}
 
 		@Override
 		public Serializable exec(String code, MetaExpedientResourceEntity entity, DesVincularGrupFormAction params) throws ActionExecutionException {

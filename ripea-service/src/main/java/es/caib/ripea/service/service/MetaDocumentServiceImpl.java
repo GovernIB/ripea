@@ -100,46 +100,13 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 	public MetaDocumentDto updateActiu(
 			Long entitatId,
 			Long metaExpedientId,
-			Long id,
-			boolean actiu, String rolActual) {
-		logger.debug("Actualitzant propietat activa d'un meta-document existent (entitatId=" + entitatId + ", metaExpedientId=" + metaExpedientId + ", id=" + id + ")");
-		
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				false,
-				false, 
-				false, 
-				true);
-		
-		MetaExpedientEntity metaExpedient = null;
-		MetaDocumentEntity metaDocumentEntity = null;
-		
-		if (metaExpedientId!=null) {
-			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
-			metaDocumentEntity = entityComprovarHelper.comprovarMetaDocument(entitat, metaExpedient, id);
-		} else {
-			metaDocumentEntity = metaDocumentRepository.findById(id).get();
-		}
-
-		metaDocumentEntity.updateActiu(actiu);
-		
-		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId(), null);
-		}
-		
-		if (metaExpedient != null) {
-			List<ExpedientEntity> expedients = expedientRepository.findByEntitatAndMetaExpedientAndEstatAndEsborrat(
-					entitat, 
-					metaExpedient, 
-					ExpedientEstatEnumDto.OBERT, 
-					0);
-			for (ExpedientEntity expedient: expedients) {
-				cacheHelper.evictErrorsValidacioPerNode(expedient.getId());
-			}
-		}
-		
-		return conversioTipusHelper.convertir(metaDocumentEntity, MetaDocumentDto.class);
+			Long metaDocumentId,
+			boolean actiu,
+			String rolActual) {
+		logger.debug("Actualitzant propietat actiu d'un meta-document existent (entitatId=" + entitatId + ", metaExpedientId=" + metaExpedientId + ", metaDocumentId=" + metaDocumentId + ")");
+		return conversioTipusHelper.convertir(
+				metaDocumentHelper.updateActiu(entitatId, metaExpedientId, metaDocumentId, actiu, rolActual),
+				MetaDocumentDto.class);
 	}
 
 	@Transactional
