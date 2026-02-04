@@ -50,7 +50,15 @@ const Link = React.forwardRef<HTMLAnchorElement, RouterLinkProps>((itemProps, re
 
 const generateMenuItems = (appMenuEntries: any[]) => {
     const { value: entitat } = useEntitatSession();
-
+	/*
+	 iconVariant — valores posibles (Material Icons):
+	  - 'material-icons'          : filled (por defecto)
+	  - 'material-icons-outlined' : outlined
+	  - 'material-icons-round'    : round
+	  - 'material-icons-sharp'    : sharp
+	  - 'material-icons-two-tone' : two-tone
+	 Uso: si entry.iconVariant tiene valor, se pasa como Icon.baseClassName; si no, usar 'material-icons'.
+	*/
     return appMenuEntries?.length
         ? appMenuEntries.map((entry) => (
             <Button
@@ -59,13 +67,11 @@ const generateMenuItems = (appMenuEntries: any[]) => {
                 style={{ color: entitat?.conf?.colorLletra, marginLeft: 0, ...entry?.componentProps }}
                 component={Link}
                 to={entry.to} // Navegació amb React Router
-                onClick={entry?.onClick}
-            >
-                {entry?.icon && <Icon>{entry?.icon}</Icon>}
+                onClick={entry?.onClick}>
+                {entry?.icon && <Icon baseClassName={entry?.iconVariant ?? 'material-icons'}>{entry?.icon}</Icon>}
                 {entry.title}
             </Button>
-        ))
-        : [];
+        )) : [];
 }
 
 const AppMenuBadge = (props:any) => {
@@ -286,7 +292,8 @@ const useMenuAdmin = () => {
             title: t('page.user.menu.procediments'),
             badge: user?.sessionScope?.organsNoSincronitzats,
             hover: t('page.user.menu.procedimentsTitle'),
-            icon: 'developer_board',
+            icon: 'integration_instructions',
+            iconVariant: 'material-icons-outlined',
             to: '/metaExpedient',
         },
     ];
@@ -458,7 +465,8 @@ const useMenuAdminLectura = () => {
             title: t('page.user.menu.procediments'),
             badge: user?.sessionScope?.organsNoSincronitzats,
             hover: t('page.user.menu.procedimentsTitle'),
-            // icon: '',
+			icon: 'integration_instructions',
+			iconVariant: 'material-icons-outlined',
             to: '/metaExpedient',
         },
     ];
@@ -474,7 +482,8 @@ const useMenuAdminLectura = () => {
             title: t('page.user.menu.procediments'),
             barge: user?.sessionScope?.organsNoSincronitzats,
             hover: t('page.user.menu.procedimentsTitle'),
-            // icon: '',
+			icon: 'integration_instructions',
+			iconVariant: 'material-icons-outlined',
             to: '/metaExpedient',
         },
     ]
@@ -511,7 +520,8 @@ const useMenuAdminOrgan = () => {
             title: t('page.user.menu.procediments'),
             badge: user?.sessionScope?.organsNoSincronitzats,
             hover: t('page.user.menu.procedimentsTitle'),
-            // icon: '',
+			icon: 'integration_instructions',
+			iconVariant: 'material-icons-outlined',
             to: '/metaExpedient',
         },
     ];
@@ -567,13 +577,14 @@ const useMenuDissenyOrgan = () => {
         {
             id: 'procediments',
             title: t('page.user.menu.procediments'),
-            // icon: '',
+			icon: 'integration_instructions',
+			iconVariant: 'material-icons-outlined',
             to: '/metaExpedient',
         },
         {
             id: 'grups',
             title: t('page.user.menu.grups'),
-            // icon: '',
+			icon: 'groups',
             to: '/grup',
         },
     ];

@@ -386,6 +386,7 @@ function calculateClassificacioId() {
 						name="tipusProcedimentServei" 
 						optionEnum="TipusProcedimentServeiEnum" 
 						emptyOption="false" 
+						disabled="${bloquejarCamps}"
 						textKey="metaexpedient.list.filtre.camp.tipus"/>
 			
 				<rip:inputText name="codi" textKey="metaexpedient.form.camp.codi" required="true" readonly="${bloquejarCamps}"/>

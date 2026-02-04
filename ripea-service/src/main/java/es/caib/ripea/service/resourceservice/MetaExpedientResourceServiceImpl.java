@@ -153,6 +153,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
     	register(MetaExpedientResource.ACTION_TOGGLE_REGLA_CODE,	new ToggleReglaActionExecutor());
     	register(MetaExpedientResource.ACTION_CREAR_REGLA_CODE,		new CrearReglaActionExecutor());
     	register(MetaExpedientResource.ACTION_UPDATE_ROLSAC_CODE,	new ActualitzarProcedimentsRolsacActionExecutor());
+    	register(MetaExpedientResource.ACTION_CANVIAR_DISSENY_CODE,	new CanviarEstatDissenyActionExecutor());
     	
     	register(MetaExpedientResource.ACTION_IMPORT_ROLSAC_CODE, 	new ImportarRolsacActionExecutor());
     	register(MetaExpedientResource.ACTION_IMPORT_FITXER_CODE,	new ImportarFitxerActionExecutor());
@@ -1345,6 +1346,28 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 				return "{\"resultado\": \"OK\"}";
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/metaExpedient/"+entity.getId()+"/DesVincularGrupActionExecutor", e);
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, messageHelper.getMessage("message.common.action.error")+": "+e.getMessage());
+			}
+		}
+    }
+    
+    private class CanviarEstatDissenyActionExecutor implements ActionExecutor<MetaExpedientResourceEntity, Serializable, Serializable> {
+
+		@Override
+		public void onChange(Serializable id, Serializable previous, String fieldName, Object fieldValue,
+				Map<String, AnswerValue> answers, String[] previousFieldNames, Serializable target) {}
+
+		@Override
+		public Serializable exec(String code, MetaExpedientResourceEntity entity, Serializable params) throws ActionExecutionException {
+			try {
+				String entitatActualCodi = configHelper.getEntitatActualCodi();
+				EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true,false);
+				String organActualCodi	 = configHelper.getOrganActualCodi();
+				OrganGestorEntity ogEntity	= organGestorRepository.findByEntitatIdAndCodi(entitat.getId(), organActualCodi);
+				metaExpedientHelper.canviarRevisioADisseny(entitat.getId(), entity.getId(), ogEntity!=null?ogEntity.getId():null);
+				return "{\"resultado\": \"OK\"}";
+			} catch (Exception e) {
+				excepcioLogHelper.addExcepcio("/metaExpedient/"+entity.getId()+"/CanviarEstatDissenyActionExecutor", e);
 				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, messageHelper.getMessage("message.common.action.error")+": "+e.getMessage());
 			}
 		}

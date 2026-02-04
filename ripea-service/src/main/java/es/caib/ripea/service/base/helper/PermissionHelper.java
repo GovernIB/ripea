@@ -94,7 +94,7 @@ public class PermissionHelper {
 			if (targetType.endsWith(".AvisResource")) { return userPermissions.isSuperAdmin(); }
 			//Exclusius administradors
 			if (targetType.endsWith(".OrganGestorResource")) { return userPermissions.isAdmin(); }
-			if (targetType.endsWith(".GrupResource")) { return userPermissions.isAdmin(); }
+			if (targetType.endsWith(".GrupResource")) { return userPermissions.isAdmin() || userPermissions.isOrgan(); }
 			if (targetType.endsWith(".HistoricResource")) { return userPermissions.isAdmin(); }
 			if (targetType.endsWith(".MetaExpedientResource")) { return userPermissions.isAdmin(); }
 			if (targetType.endsWith(".MetaExpedientComentariResource")) { return userPermissions.isAdmin(); }

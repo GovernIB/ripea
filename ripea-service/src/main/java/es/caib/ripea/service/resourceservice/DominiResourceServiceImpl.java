@@ -6,17 +6,18 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
-import es.caib.ripea.persistence.entity.resourceentity.EntitatResourceEntity;
-import es.caib.ripea.persistence.entity.resourcerepository.EntitatResourceRepository;
 import org.springframework.stereotype.Service;
 
 import com.turkraft.springfilter.FilterBuilder;
 import com.turkraft.springfilter.parser.Filter;
 
 import es.caib.ripea.persistence.entity.resourceentity.DominiResourceEntity;
+import es.caib.ripea.persistence.entity.resourceentity.EntitatResourceEntity;
+import es.caib.ripea.persistence.entity.resourcerepository.EntitatResourceRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.CacheHelper;
 import es.caib.ripea.service.helper.ConfigHelper;
+import es.caib.ripea.service.helper.DominiHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
 import es.caib.ripea.service.intf.model.DominiResource;
@@ -32,6 +33,7 @@ public class DominiResourceServiceImpl extends BaseMutableResourceService<Domini
 
 	private final ConfigHelper	configHelper;
 	private final CacheHelper	cacheHelper;
+	private final DominiHelper	dominiHelper;
 	private final EntitatResourceRepository entitatResourceRepository;
 
     @PostConstruct
@@ -54,10 +56,25 @@ public class DominiResourceServiceImpl extends BaseMutableResourceService<Domini
     }
 
     @Override
+    protected void afterConversion(DominiResourceEntity entity, DominiResource resource) {
+    	resource.setContrasenya(dominiHelper.desxifrarContrasenya(entity.getContrasenya()));
+    }
+    
+    @Override
     protected void beforeCreateSave(DominiResourceEntity entity, DominiResource resource, Map<String, AnswerValue> answers) {
+    	xifraPassord(entity, resource);
+    }
+    
+    @Override
+    protected void beforeUpdateSave(DominiResourceEntity entity, DominiResource resource, Map<String, AnswerValue> answers) {
+    	xifraPassord(entity, resource);
+    }
+    
+    private void xifraPassord(DominiResourceEntity entity, DominiResource resource) {
         String entitatActualCodi = configHelper.getEntitatActualCodi();
         EntitatResourceEntity entitat = entitatResourceRepository.findByCodi(entitatActualCodi);
         entity.setEntitat(entitat);
+        entity.setContrasenya(dominiHelper.xifrarContrasenya(resource.getContrasenya()));
     }
     
     private class BuidarCacheDominisActionExecutor implements ActionExecutor<DominiResourceEntity, Serializable, Serializable> {
