@@ -281,14 +281,14 @@ const useMenuAdmin = () => {
             icon: icons.anotacio,
             to: '/expedientPeticio',
         },
-        // {
-        //     id: 'procediments',
-        //     title: t('page.user.menu.procediments'),
-        //     badge: user?.sessionScope?.organsNoSincronitzats,
-        //     hover: t('page.user.menu.procedimentsTitle'),
-        //     // icon: '',
-        //     to: '/metaExpedient',
-        // },
+        {
+            id: 'procediments',
+            title: t('page.user.menu.procediments'),
+            badge: user?.sessionScope?.organsNoSincronitzats,
+            hover: t('page.user.menu.procedimentsTitle'),
+            icon: 'developer_board',
+            to: '/metaExpedient',
+        },
     ];
     const entries = [
         {
@@ -577,7 +577,7 @@ const useMenuDissenyOrgan = () => {
             to: '/grup',
         },
     ];
-    const entries = []
+    const entries:any[] = []
     const content = <>
     </>
 

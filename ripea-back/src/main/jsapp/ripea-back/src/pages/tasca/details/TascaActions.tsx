@@ -81,7 +81,7 @@ const useTascaActions = (entity:any, refresh?: () => void) => {
     }
     const hiddenTramitable = (row:any) => isOnlyObservador(row) || hiddenByEstat(row)
 
-    const actions = [
+    const actions:any[] = [
         {
             label: t('common.detail'),
             icon: "info",

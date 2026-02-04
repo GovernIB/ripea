@@ -3,11 +3,11 @@ import {useState} from "react";
 import {GridPage} from "reactlib";
 import {CardPage} from "../../../components/CardData.tsx";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
-import {Grid, Icon, Badge, IconButton} from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import {Grid, Icon, Badge} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
+import LinkButton from "../../../components/LinkButton.tsx";
 
 const GrupFilterForm = () => {
     return <>
@@ -48,46 +48,43 @@ const GrupForm = () => {
     </Grid>
 }
 
-const sortModel: any = [{field: 'codi', sort: 'asc'}]
+const columns:any[] = [
+    {
+        field: 'codi',
+        flex: 0.5,
+    },
+    {
+        field: 'descripcio',
+        flex: 1,
+    },
+    {
+        field: 'organGestor',
+        flex: 1,
+    },
+    {
+        field: 'permis',
+        headerName: '',
+        sortable: false,
+        flex: 0.25,
+        renderCell: (params:any) => <LinkButton
+            aria-label="key"
+            color="inherit"
+            title="Permisos"
+            to={`/grupPermis/${params?.row?.id}/permis`}
+        >
+            <Badge badgeContent={params?.row?.numPermisos} color="primary" showZero>
+                <Icon>key</Icon>
+            </Badge>
+        </LinkButton>
+    }
+]
 
+const sortModel: any = [{field: 'codi', sort: 'asc'}]
 const perspectives = ["COUNT_PERMISOS"];
 
 const GrupGrid = () => {
-
     const {t} = useTranslation();
-    const navigate = useNavigate();
     const [springFilter, setSpringFilter] = useState<string>();
-
-    const columns = [
-        {
-            field: 'codi',
-            flex: 0.5,
-        },
-        {
-            field: 'descripcio',
-            flex: 1,
-        },
-        {
-            field: 'organGestor',
-            flex: 1,
-        },
-        {
-            field: 'permis',
-            headerName: '',
-            sortable: false,
-            flex: 0.25,
-            renderCell: (params:any) => <IconButton 
-                aria-label="key" 
-                color="inherit"
-                title="Permisos"
-                onClick={(e:any) => { e.stopPropagation(); navigate(`/grupPermis/${params?.row?.id}/permis`); }}
-            >
-                <Badge badgeContent={params?.row?.numPermisos} color="primary" showZero>
-                    <Icon>key</Icon>
-                </Badge>
-            </IconButton>
-        }
-    ]
 
     const actions = [
         {

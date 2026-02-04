@@ -1343,7 +1343,8 @@ const translationCa = {
         metaExpedient: {
             title: "Procediment",
             detall: {
-                elements: "Gestió del procediment: {{nom}}",
+                elementsProc: "Gestió del procediment: {{nom}}",
+                elementsServ: "Gestió del servei: {{nom}}",
                 expressioNumero: "Si no s'especifica cap expressió s'utilitzarà aquesta per defecte: {{codi}}/{{seq}}/{{any}}",
                 permisDirecte: "Un usuari administrador de l'entitat pot modificar aquest valor.",
                 responsable: "Podeu canviar el responsable de firma",

@@ -265,7 +265,7 @@ export const useCommonActions = (refresh?: () => void) => {
         return (isRolActualAdmin && permisos?.permisAdministrador) || ( isRolActualOrganAdmin && permisos?.organs?.some((e:any)=>e.id == row?.organGestor?.id) )
     }
 
-    const actions = [
+    const actions:any[] = [
         {
             label: user?.rolActual == 'IPA_ADMIN_LECTURA' ?t('common.detail') :t('page.expedient.action.detall.label'),
             icon: "folder",

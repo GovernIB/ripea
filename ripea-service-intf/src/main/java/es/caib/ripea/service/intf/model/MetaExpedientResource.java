@@ -233,7 +233,6 @@ public class MetaExpedientResource extends MetaNodeResource {
     @Setter
     public static class ToggleGrupDefecteFormAction implements Serializable {
         private Long grupId;
-    	private boolean defecte;
     }
     
     @Getter

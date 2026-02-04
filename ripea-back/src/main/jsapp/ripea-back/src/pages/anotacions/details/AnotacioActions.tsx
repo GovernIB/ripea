@@ -183,7 +183,7 @@ const useAnotacioActions = (refresh?: () => void) => {
             label: t('page.expedient.title'),
             icon: icons.expedient,
             showInMenu: true,
-            onClick: (id:any, row:any) => navigate(`/contingut/${row?.expedient?.id}`),
+            onClick: (_id:any, row:any) => navigate(`/contingut/${row?.expedient?.id}`),
             hidden: (row:any) => row?.estatView != 'ACCEPTAT' || !row?.expedient,
         },
         {

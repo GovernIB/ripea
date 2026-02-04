@@ -21,16 +21,19 @@ const columns = [
     {
         field: 'admin',
         flex: 0.5,
+        sortable: false,
         renderCell: (params:any) => (params?.row?.admin && <Icon>check</Icon>),
     },
     {
         field: 'adminLectura',
         flex: 0.5,
+        sortable: false,
         renderCell: (params:any) => (params?.row?.adminLectura && <Icon>check</Icon>),
     },
     {
         field: 'user',
         flex: 0.5,
+        sortable: false,
         renderCell: (params:any) => (params?.row?.user && <Icon>check</Icon>),
     },
 ]
@@ -51,7 +54,7 @@ const PermisEntitatGrid = ()=> {
             label: t('common.update'),
             icon: "edit",
             showInMenu: true,
-            onClick: (id:any, row:any) => handelModify(undefined, row),
+            onClick: (_id:any, row:any) => handelModify(undefined, row),
         },
         {
             label: t('common.delete'),

@@ -138,7 +138,7 @@ const RemesaGrid = (props:any) => {
             onRowCountChange={onRowCountChange}
             disableColumnSorting
             toolbarHideCreate
-            onRowClick={(params: any) => handleOpen(params?.row?.id, params?.row) }
+            onRowClick={(params: any) => handleOpen(params?.row?.id) }
             popupEditFormI18nKeys={{
                 updateSuccess: 'page.notificacio.action.update.ok',
             }}

@@ -60,7 +60,7 @@ const columns = [
     {
         field: 'itemId',
         flex: 1,
-        valueGetter: (id:any, row:any) => row?.itemValidacio == "DOCUMENT" ?row?.metaDocument :row?.metaDada,
+        valueGetter: (_id:any, row:any) => row?.itemValidacio == "DOCUMENT" ?row?.metaDocument :row?.metaDada,
         valueFormatter: (value:any) => value?.description,
     },
     {

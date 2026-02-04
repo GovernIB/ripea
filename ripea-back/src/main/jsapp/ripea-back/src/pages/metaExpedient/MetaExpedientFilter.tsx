@@ -2,6 +2,7 @@ import {useFormContext} from "reactlib";
 import GridFormField, {GridButtonField} from "../../components/GridFormField.tsx";
 import StyledMuiFilter from "../../components/StyledMuiFilter.tsx";
 import * as builder from "../../util/springFilterUtils.ts";
+import {Grid} from "@mui/material";
 
 const MetaExpedientFilterForm = () => {
     const { data } = useFormContext();
@@ -14,6 +15,7 @@ const MetaExpedientFilterForm = () => {
         <GridFormField xs={2} name="revisioEstat"/>
         <GridFormField xs={2} name="ambit"/>
         <GridFormField xs={3} name="organGestor" disabled={data?.ambit == 'COMUNS'}/>
+        <Grid xs={2}/>
         <GridButtonField xs={0.6} name="permisDirecte" icon={"pan_tool_alt"}/>
     </>
 }

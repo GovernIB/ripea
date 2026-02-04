@@ -91,7 +91,7 @@ const useCerrarTransaccioOnUnload = (getUrl: (path: string) => string, idTransac
     }, [idTransaccio, openNewFlux]);
 };
 
-const EnviarPortafirmesForm = forwardRef((props, ref) => {
+const EnviarPortafirmesForm = forwardRef((_props, ref) => {
     const { t } = useTranslation();
     const {data, apiRef} = useFormContext();
     const { onChange } = useFluxCreateSession();

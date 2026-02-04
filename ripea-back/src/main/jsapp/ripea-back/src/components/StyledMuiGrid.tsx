@@ -103,7 +103,7 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
             hidden: !toolbarMassiveActions || readOnly,
         },
         {
-            position: 2,
+            position: 3,
             element: <ToolbarButton title={t('common.refresh')} icon={'refresh'} onClick={refresh} color={'primary'}/>,
             hidden: toolbarHideRefresh,
         },

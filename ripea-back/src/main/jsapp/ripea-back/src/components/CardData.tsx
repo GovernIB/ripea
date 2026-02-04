@@ -28,7 +28,7 @@ const isEmpty = (value:any[]) => {
 }
 
 export const CardData = (props:any) => {
-    const {title, header, children, xs, hidden, hiddenIfEmpty, buttons, cardProps, headerProps = {}, ...other} = props;
+    const {title, header, children, xs, hidden, hiddenIfEmpty, buttons, cardProps, headerProps = {}, variant, ...other} = props;
 
     if (hidden || (hiddenIfEmpty && isEmpty(children))){
         return <></>
@@ -36,7 +36,7 @@ export const CardData = (props:any) => {
 
     return <Grid item xs={xs ?? 12}>
         <Card sx={{...cardBorder, ...cardProps}}>
-            {title && <CardHeader title={<Typography variant="h4">{title}</Typography>} sx={{...cardHeader, ...headerProps}}/>}
+            {title && <CardHeader title={<Typography variant={variant ?? "h4"}>{title}</Typography>} sx={{...cardHeader, ...headerProps}}/>}
             {header && <CardContent sx={{...cardHeader, ...headerProps}}>{header}</CardContent>}
 
             <CardContent hidden={!children}>

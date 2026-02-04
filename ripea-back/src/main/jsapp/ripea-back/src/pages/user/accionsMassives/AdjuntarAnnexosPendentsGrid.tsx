@@ -11,7 +11,6 @@ import {Alert, Grid, Link} from "@mui/material";
 import {useSession} from "../../../components/SessionStorageContext.tsx";
 import {GridSortDirection} from "@mui/x-data-grid-pro";
 import {useAnexxActions} from "../../anotacions/details/AnotacioActions.tsx";
-import {useGridApiRef as useMuiDatagridApiRef} from "@mui/x-data-grid-pro/hooks/utils/useGridApiRef";
 
 const AdjuntarAnnexosPendentsFilterFrom = () => {
     return <>
@@ -56,7 +55,7 @@ const AdjuntarAnnexosPendentsFilter = (props: any) => {
 
 const namedQuery: string[] = ['MASSIU_PENDENT_PROCESSAR']
 const perspectives: string[] = ['REGISTRE']
-const sortModel: any = [{field: 'expedientInfo.createdDate', sort: 'desc'}]
+// const sortModel: any = [{field: 'expedientInfo.createdDate', sort: 'desc'}]
 const AdjuntarAnnexosPendentsGrid = () => {
     const {t} = useTranslation();
     const apiRef = useMuiDataGridApiRef();
@@ -72,7 +71,7 @@ const AdjuntarAnnexosPendentsGrid = () => {
             headerName: t('page.registre.grid.origenRegistreNumero'),
             field: 'registreInfo.identificador',
             flex: 1,
-            sortProcessor: (field: string, sort: GridSortDirection) => [{field: 'registre.identificador', sort}],
+            sortProcessor: (_field: string, sort: GridSortDirection) => [{field: 'registre.identificador', sort}],
         },
         {
             headerName: t('page.expedient.title'),

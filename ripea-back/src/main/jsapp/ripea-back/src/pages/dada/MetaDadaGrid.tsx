@@ -5,7 +5,6 @@ import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
 import {useEffect, useState} from "react";
 import {MultiplicitatStyled} from "../contingut/details/MetaExpedient.tsx";
 import {Typography} from "@mui/material";
-import {useTranslation} from "react-i18next";
 import useDataGrid from "./details/DataGrid.tsx";
 
 const dadesFilter = (metaDada:any, dades:any[]) :any[] => {
@@ -29,7 +28,6 @@ export const StyledDadaValor = (props: any) => {
 const MetaDadaGrid = (props: any) => {
     const apiRef = useMuiDataGridApiRef()
     const { entity, onRowCountChange, onRefresh } = props
-    const { t } = useTranslation();
     const {
         isReady,
         find: apiFindAll
@@ -72,7 +70,7 @@ const MetaDadaGrid = (props: any) => {
         {
             field: 'dades',
             flex: 0.8,
-            valueGetter: (value: any, row:any) => dadesFilter(row, dades),
+            valueGetter: (_value: any, row:any) => dadesFilter(row, dades),
             renderCell: (params: any) => {
                 const value = params.value;
                 const row = params.row;

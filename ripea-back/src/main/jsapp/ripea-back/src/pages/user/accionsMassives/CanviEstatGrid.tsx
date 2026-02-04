@@ -12,7 +12,6 @@ import {GridSortDirection} from "@mui/x-data-grid-pro";
 import {StyledEstat, StyledPrioritat} from "../../expedient/ExpedientGrid.tsx";
 import {useSession} from "../../../components/SessionStorageContext.tsx";
 import useCambiarEstat, {useCambiarEstatMassive} from "../../expedient/actions/CambiarEstat.tsx";
-import {useGridApiRef as useMuiDatagridApiRef} from "@mui/x-data-grid-pro/hooks/utils/useGridApiRef";
 
 const CanviEstatFilterFrom = (props:any) => {
     const { findExpedientByName = false } = props;

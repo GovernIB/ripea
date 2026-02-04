@@ -14,7 +14,7 @@ import {
     useResourceApiService,
     useBaseAppContext,
     useMuiContentDialog,
-    useFormApiRef
+    FormApi
 } from 'reactlib';
 import { formatDate } from '../util/dateUtils';
 import { useUserSession } from '../components/Session';
@@ -33,7 +33,7 @@ const Comments = (props: any) => {
     } = useResourceApiService(resourceName);
     const [comments, setComments] = React.useState<any[]>();
     const {temporalMessageShow} = useBaseAppContext();
-    const formApiRef = useFormApiRef();
+    const formApiRef = React.useRef<FormApi | any>({});
     const gridRef = React.useRef<HTMLDivElement | undefined>();
     const refresh = () => {
         apiFind({
@@ -52,7 +52,8 @@ const Comments = (props: any) => {
             }, 100);
         }).
         catch((error) => {
-            error?.message && temporalMessageShow(null, error?.message, 'error');
+            if (error?.message)
+                temporalMessageShow(null, error?.message, 'error');
         });
     }
     React.useEffect(() => {

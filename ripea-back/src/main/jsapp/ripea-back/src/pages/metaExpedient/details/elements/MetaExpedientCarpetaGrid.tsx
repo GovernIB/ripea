@@ -1,10 +1,9 @@
-import {Box, Grid} from "@mui/material";
+import {Grid} from "@mui/material";
 import GridFormField from "../../../../components/GridFormField.tsx";
 import {useTranslation} from "react-i18next";
 import StyledMuiGrid from "../../../../components/StyledMuiGrid.tsx";
 import * as builder from "../../../../util/springFilterUtils.ts";
 import {useFormContext} from "reactlib";
-import ContingutIcon from "../../../contingut/details/ContingutIcon.tsx";
 import {GridTreeDataGroupingCell} from "@mui/x-data-grid-pro";
 
 const MetaExpedientCarpetaForm = () => {
@@ -23,7 +22,7 @@ const MetaExpedientCarpetaForm = () => {
 
 const sortModel: any = [{field: 'nom', sort: 'asc'}]
 const perspectives: string[] = [];
-const columns = [
+const columns:any = [
     // {
     //     field: 'codi',
     //     flex: 1,
@@ -69,7 +68,7 @@ export const MetaExpedientCarpetaGrid = ({ entity, onRowCountChange } :any) => {
         groupingColDef={{
             headerName: t('page.contingut.grid.nom'),
             flex: 1.5,
-            valueFormatter: (value: any, row: any) => row?.nom,
+            valueFormatter: (_value: any, row: any) => row?.nom,
             renderCell: (params: any) => <GridTreeDataGroupingCell {...params} />,
         }}
         getTreeDataPath={(row: any): string[] => {

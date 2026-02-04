@@ -166,7 +166,7 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
             ]}
 
             onRowClick={(params: any) => {
-					handleOpen(params?.row?.id, params?.row);
+                handleOpen(params?.row?.id);
 			}}
             popupEditFormI18nKeys={{
                 createSuccess: 'page.interessat.action.new.ok',

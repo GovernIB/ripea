@@ -8,7 +8,7 @@ import {useEntitatSession} from "./components/Session.tsx";
 import TitleHeaderConfigurator from "./TitleHeaderConfigurator.tsx";
 
 const changeFavicon = (faviconUrl:any) => {
-    const link =
+    const link:any =
         document.querySelector("link[rel~='icon']") ||
         document.createElement('link');
 

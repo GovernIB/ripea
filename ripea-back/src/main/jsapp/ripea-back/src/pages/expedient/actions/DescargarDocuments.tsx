@@ -118,15 +118,6 @@ const DescargarDocuments = (props:any) => {
     </FormReportDialog>
 }
 
-const handleClose = (action:any) => {
-    const apiRef = useRef<MuiFormDialogApi>();
-    if (action === 'close') {
-        apiRef.current?.close?.();
-    } else if (action === 'save') {
-
-    }
-}
-
 const useDescargarDocuments = () => {
     const { t } = useTranslation();
     const apiRef = useRef<MuiFormDialogApi>();

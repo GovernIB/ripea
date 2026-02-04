@@ -44,7 +44,7 @@ const TabComponent = (props :any) => {
 
     const [value, setValue] = useState<any>(defaultValue ?? tabs[0].value);
 
-    const handleChange = (event :any, newValue :string) : void => {
+    const handleChange = (_event :any, newValue :string) : void => {
         if (tabs.some((tab:TabProps)=>tab?.value==newValue)) {
             setValue(newValue);
         }

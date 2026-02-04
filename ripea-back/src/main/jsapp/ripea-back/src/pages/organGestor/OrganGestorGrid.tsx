@@ -1,15 +1,16 @@
 import {useTranslation} from "react-i18next";
-import { useNavigate } from "react-router-dom";
 import {useMemo, useState} from "react";
-import {GridPage} from "reactlib";
+import {GridPage, useFormContext} from "reactlib";
 import {CardPage} from "../../components/CardData.tsx";
 import StyledMuiGrid, {ToolbarButton} from "../../components/StyledMuiGrid.tsx";
-import {Grid, Icon, Badge, IconButton} from "@mui/material";
+import {Grid, Icon, Badge} from "@mui/material";
 import GridFormField from "../../components/GridFormField.tsx";
 import {OrganGestorFilter} from "./OrganGestorFilter.tsx";
 import {useOrganGestorSyncDialog} from "./actions/OrganGestorSync.tsx";
+import LinkButton from "../../components/LinkButton.tsx";
 
 const OrganGestorForm = () => {
+    const {data} = useFormContext()
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField xs={12} name="codi" disabled readOnly/>
         <GridFormField xs={12} name="nom" disabled readOnly/>
@@ -17,6 +18,7 @@ const OrganGestorForm = () => {
         <GridFormField xs={12} name="cif" disabled readOnly/>
         <GridFormField xs={12} name="utilitzarCifPinbal"/>
         <GridFormField xs={12} name="permetreEnviamentPostal"/>
+        <GridFormField xs={12} name="permetreEnviamentPostalDescendents" hidden={!data?.permetreEnviamentPostal}/>
     </Grid>
 }
 
@@ -24,7 +26,6 @@ const sortModel: any = [{field: 'nom', sort: 'asc'}]
 
 const OrganGestorGrid = () => {
     const {t} = useTranslation();
-    const navigate = useNavigate();
     const [springFilter, setSpringFilter] = useState<string>();
     const [treeView, setTreeView] = useState<boolean>(false);
 
@@ -39,22 +40,21 @@ const OrganGestorGrid = () => {
     ]
 
     const perspectives = useMemo(() => treeView?['PATH','COUNT_PERMISOS']:['COUNT_PERMISOS'], [treeView])
-    const columns = useMemo(()=>[
-        {
-            field: 'codi',
-            flex: 0.5,
-            hidden: treeView
-        },
-        {
-            field: 'nom',
-            flex: 1,
-            hidden: treeView
-        },
-        {
-            field: 'pare',
-            flex: 1,
-            hidden: treeView
-        },
+    const columns:any[] = useMemo(()=>[
+        ...(treeView ?[
+            {
+                field: 'codi',
+                flex: 0.5,
+            },
+            {
+                field: 'nom',
+                flex: 1,
+            },
+            {
+                field: 'pare',
+                flex: 1,
+            }
+        ] :[]),
         {
             field: 'cif',
             flex: 0.5,
@@ -68,19 +68,18 @@ const OrganGestorGrid = () => {
             headerName: '',
             sortable: false,
             flex: 0.25,
-            renderCell: (params:any) => <IconButton
+            renderCell: (params:any) => <LinkButton
                 aria-label="key"
                 color="inherit"
                 title="Permisos"
-                onClick={(e:any) => { e.stopPropagation(); navigate(`/organgestor/${params?.row?.id}/permis`); }}
+                to={`/organgestor/${params?.row?.id}/permis`}
             >
                 <Badge badgeContent={params?.row?.numPermisos} color="primary" showZero>
                     <Icon>key</Icon>
                 </Badge>
-            </IconButton>
+            </LinkButton>
         }
-    ]
-        .filter((col:any)=>!col?.hidden), [treeView])
+    ], [treeView])
 
     return <GridPage disableMargins>
         <CardPage title={t('page.user.menu.organs')}>
@@ -120,15 +119,15 @@ const OrganGestorGrid = () => {
                 groupingColDef={{
                     headerName: t('page.contingut.grid.nom'),
                     flex: 1,
-                    valueFormatter: (value: any, row: any) => row?.codi +" - "+ row?.nom,
+                    valueFormatter: (_value: any, row: any) => row?.codi +" - "+ row?.nom,
                 }}
-                treeDataAdditionalRows={(_rows: any) => {
+                treeDataAdditionalRows={(rows: any) => {
                     const additionalRows: any[] = [];
-                        if (_rows!=null && treeView){
-                            for (const row of _rows) {
+                        if (rows!=null && treeView){
+                            for (const row of rows) {
                                 for (const r of row?.path) {
                                     if (!additionalRows.map((b:any) => b.id).includes(r?.id)
-                                        && !_rows.map((b:any) => b.id).includes(r?.id))
+                                        && !rows.map((b:any) => b.id).includes(r?.id))
                                     {
                                         additionalRows.push(r)
                                     }

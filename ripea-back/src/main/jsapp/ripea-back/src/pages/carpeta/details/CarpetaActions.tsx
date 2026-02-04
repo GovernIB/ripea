@@ -5,7 +5,7 @@ import useHistoric from "../../Historic.tsx";
 import useModificar from "../actions/Modificar.tsx";
 import {useBaseAppContext, useResourceApiService} from "reactlib";
 import {iniciaDescargaBlob} from "../../expedient/details/CommonActions.tsx";
-import {useCopiar, useMoure} from "../actions/Moure.tsx";
+import {useMoure} from "../actions/Moure.tsx";
 
 const useActions = (refresh?:()=>void) => {
 
@@ -85,7 +85,7 @@ const useCarpetaActions = (entity:any, refresh?: () => void) => {
     const {handleOpen: handleHistoricOpen, dialog: dialogHistoric} = useHistoric();
     const {handleShow: handleModifyCarpeta, content: contentModifyCarpeta} = useModificar(entity, refresh)
     const {handleShow: handleMoure, content: contentMoure} = useMoure(refresh)
-    const {handleShow: handleCopiar, content: contentCopiar} = useCopiar(refresh)
+    // const {handleShow: handleCopiar, content: contentCopiar} = useCopiar(refresh)
 
 	const isUsuariAmbPermis = (row: any) =>
 	    row?.restriccions?.some(
@@ -173,7 +173,6 @@ const useCarpetaActions = (entity:any, refresh?: () => void) => {
         {dialogHistoric}
         {contentModifyCarpeta}
         {contentMoure}
-        {contentCopiar}
     </>
 
     return {

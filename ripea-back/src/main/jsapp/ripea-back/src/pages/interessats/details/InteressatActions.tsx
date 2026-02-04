@@ -145,7 +145,7 @@ const useInteressatActions = (entity:any, refresh?: () => void) => {
         }
     ]
 
-    const actions = [
+    const actions:any[] = [
         {
             label: t('page.contingut.action.guardarArxiu.label'),
             icon: 'autorenew',

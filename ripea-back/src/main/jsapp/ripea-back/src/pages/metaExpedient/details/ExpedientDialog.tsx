@@ -91,7 +91,7 @@ const useExpedientDialog = () => {
     const [open, setOpen] = useState(false);
     const [entity, setEntity] = useState<any>();
 
-    const handleOpen = (id:any, row:any) => {
+    const handleOpen = (_id:any, row:any) => {
         setEntity(row)
         setOpen(true);
     }

@@ -45,7 +45,7 @@ const AnotacionsGrid = () => {
             headerName: t('page.registre.grid.dataRecepcio'),
             flex: 0.75,
             valueFormatter: (value: any) => formatDate(value),
-            sortProcessor: (field: string, sort: GridSortDirection) => {
+            sortProcessor: (_field: string, sort: GridSortDirection) => {
                 return [{field: 'registre.data', sort}];
             },
         },
@@ -53,7 +53,7 @@ const AnotacionsGrid = () => {
             field: 'registreInfo.extracte',
             headerName: t('page.registre.grid.extracte'),
             flex: 1,
-            sortProcessor: (field: string, sort: GridSortDirection) => {
+            sortProcessor: (_field: string, sort: GridSortDirection) => {
                 return [{field: 'registre.extracte', sort}];
             },
         },
@@ -61,7 +61,7 @@ const AnotacionsGrid = () => {
             field: 'registreInfo.destiDescripcio',
             headerName: t('page.registre.grid.destiDescripcio'),
             flex: 0.5,
-            sortProcessor: (field: string, sort: GridSortDirection) => {
+            sortProcessor: (_field: string, sort: GridSortDirection) => {
                 return [{field: 'registre.destiDescripcio', sort}];
             },
         },

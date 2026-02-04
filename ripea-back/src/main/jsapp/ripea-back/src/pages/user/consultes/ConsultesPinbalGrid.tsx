@@ -35,14 +35,14 @@ const useConsultaPinbalActions = (refresh?: () => void) => {
             label: t('page.document.action.detall.label'),
             icon: "folder",
             showInMenu: true,
-            onClick: (id:any, row:any) => handleDetallOpen(row?.documentInfo?.id),
+            onClick: (_id:any, row:any) => handleDetallOpen(row?.documentInfo?.id),
             hidden: (row:any) => row?.documentInfo == null
         },
         {
             label: t('page.document.action.descarregarOriginal.label'),
             icon: "download",
             showInMenu: true,
-            onClick: (id:any, row:any) => apiDownload(row?.documentInfo?.id, 'adjunt', t('page.document.action.descarregarOriginal.ok')),
+            onClick: (_id:any, row:any) => apiDownload(row?.documentInfo?.id, 'adjunt', t('page.document.action.descarregarOriginal.ok')),
             hidden: (row:any) => row?.documentInfo == null || !isDigitalOrImportat(row?.documentInfo)
         },
         {
@@ -50,7 +50,7 @@ const useConsultaPinbalActions = (refresh?: () => void) => {
             title: t('page.document.alert.view'),
             icon: "search",
             showInMenu: true,
-            onClick: (id:any, row:any) => handleVisualitzarOpen(row?.documentInfo?.id),
+            onClick: (_id:any, row:any) => handleVisualitzarOpen(row?.documentInfo?.id),
             disabled: (row:any) => !isValid(row?.documentInfo),
             hidden: (row:any) => row?.documentInfo == null || !isDigitalOrImportat(row?.documentInfo)
         },

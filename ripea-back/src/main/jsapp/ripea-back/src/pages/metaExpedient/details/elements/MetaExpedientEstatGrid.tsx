@@ -7,12 +7,13 @@ import * as builder from "../../../../util/springFilterUtils.ts";
 import {DraggableGridRow, DraggableGridRowHandler} from "../../../../components/DraggableContext.tsx";
 import {GridSlots} from "@mui/x-data-grid-pro";
 import {DndContext} from "@dnd-kit/core";
-import {useMuiDataGridApiRef, useResourceApiService} from "reactlib";
+import {useBaseAppContext, useMuiDataGridApiRef, useResourceApiService} from "reactlib";
 
 const useActions = (refresh?: () => void) => {
     const {
         artifactAction: apiAction,
     } = useResourceApiService('metaExpedientEstatResource');
+    const {temporalMessageShow} = useBaseAppContext();
 
     const reordering = (id:any, ordre:number) => {
         apiAction(id, { code: 'REORDENAR', data: ordre })
@@ -37,7 +38,7 @@ const MetaExpedientEstatForm = () => {
 
 const sortModel: any = [{field: 'ordre', sort: 'asc'}]
 const perspectives: string[] = [];
-const columns = [
+const columns:any = [
     {
         field: 'codi',
         flex: 1,

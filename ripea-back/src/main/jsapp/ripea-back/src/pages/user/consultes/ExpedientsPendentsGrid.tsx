@@ -74,7 +74,7 @@ const ExpedientsPendentsGrid = () => {
             headerName: t('page.registre.grid.dataRecepcio'),
             flex: 0.75,
             valueFormatter: (value: any) => formatDate(value),
-            sortProcessor: (field: string, sort: GridSortDirection) => {
+            sortProcessor: (_field: string, sort: GridSortDirection) => {
                 return [{field: 'registre.data', sort}];
             },
         },

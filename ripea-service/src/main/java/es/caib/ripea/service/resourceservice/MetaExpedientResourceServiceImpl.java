@@ -1314,7 +1314,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 
 		@Override
 		public Serializable exec(String code, MetaExpedientResourceEntity entity, ToggleGrupDefecteFormAction params) throws ActionExecutionException {
-			if (params.isDefecte()) {
+			if (params.getGrupId()!=null) {
 				entity.setGrupPerDefecte(grupResourceRepository.findById(params.getGrupId()).get());
 			} else {
 				entity.setGrupPerDefecte(null);

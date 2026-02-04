@@ -8,7 +8,6 @@ import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
 import GridFormField from "../../../components/GridFormField.tsx";
 import {StyledEstat} from "../ExpedientGrid.tsx";
 import {useActions} from "../details/CommonActions.tsx";
-import {Grid} from "@mui/material";
 import {springFilterBuilder as expedientFilterBuilder} from "../ExpedientFilter.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 

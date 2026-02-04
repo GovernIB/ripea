@@ -141,7 +141,7 @@ const DocumentsGrid = (props: any) => {
     const { t } = useTranslation();
     const { value: user } = useUserSession();
 
-    const sortModel = useMemo(() => {
+    const sortModel:any[] = useMemo(() => {
         if (user?.sessionScope?.ordenacioContingutPermesa) {
             return [{ field: 'ordre', sort: 'asc' }];
         }
@@ -189,7 +189,7 @@ const DocumentsGrid = (props: any) => {
     const { createActions, actions, components } = useContingutActions(entity, gridApiRef, refresh);
     const { actions: massiveActions, components: massiveComponents } = useContingutMassiveActions(entity, refresh);
 
-    const additionalColumns = useMemo(()=>[
+    const additionalColumns:any[] = useMemo(()=>[
         ...columns,
         ...(vista == View.carpeta && (entity?.potModificarContingut || entity?.potModificar) && user?.sessionScope?.ordenacioContingutPermesa ? [{
             renderCell: () => <DraggableGridRowHandler />,

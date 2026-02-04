@@ -6,7 +6,7 @@ import {
 import {CardPage} from "../../../components/CardData.tsx";
 import StyledMuiGrid, {ToolbarButton} from "../../../components/StyledMuiGrid.tsx";
 import {Icon} from "@mui/material";
-import {useEffect, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import {useParams} from "react-router-dom";
 import {setTitlePage} from "../../../TitleHeaderConfigurator.tsx";
 import {
@@ -27,7 +27,7 @@ const PermisMetaExpedientOrganGrid = (props:any) => {
         gridApiRef?.current?.refresh?.();
     }
 
-    const columnsOrgan = [
+    const columnsOrgan = useMemo(() => [
         {
             field: 'principal',
             headerName: t('page.permision.grid.principal'),
@@ -42,33 +42,38 @@ const PermisMetaExpedientOrganGrid = (props:any) => {
             field: 'create',
             headerName: t('page.permision.grid.create'),
             flex: 0.5,
+            sortable: false,
             renderCell: (params:any) => (params?.row?.create && <Icon>check</Icon>),
         },
         {
             field: 'read',
             headerName: t('page.permision.grid.read'),
             flex: 0.5,
+            sortable: false,
             renderCell: (params:any) => (params?.row?.read && <Icon>check</Icon>),
         },
         {
             field: 'write',
             headerName: t('page.permision.grid.write'),
             flex: 0.5,
+            sortable: false,
             renderCell: (params:any) => (params?.row?.write && <Icon>check</Icon>),
         },
         {
             field: 'delete',
             headerName: t('page.permision.grid.delete'),
             flex: 0.5,
+            sortable: false,
             renderCell: (params:any) => (params?.row?.delete && <Icon>check</Icon>),
         },
         {
             field: 'estadistic',
             headerName: t('page.permision.grid.estadistic'),
             flex: 0.5,
+            sortable: false,
             renderCell: (params:any) => (params?.row?.estadistic && <Icon>check</Icon>),
         },
-    ]
+    ], [t]);
 
     const { apiIsReady, eliminar } = usePermisActions(refresh)
     const { handleShow: handelCreate, content: contentCreate } = usePermisMetaExpedientOrganCreate(refresh);
@@ -78,7 +83,7 @@ const PermisMetaExpedientOrganGrid = (props:any) => {
             label: t('common.update'),
             icon: "edit",
             showInMenu: true,
-            onClick: (rowId:any, row:any) => handelModify(undefined, row, {
+            onClick: (_rowId:any, row:any) => handelModify(undefined, row, {
                 procedimentId: id,
                 organGestor: row?.organGestor
             }),
@@ -88,7 +93,7 @@ const PermisMetaExpedientOrganGrid = (props:any) => {
             label: t('common.delete'),
             icon: "delete",
             showInMenu: true,
-            onClick: (rowId:any, row:any) => eliminar(row?.originalId, {
+            onClick: (_rowId:any, row:any) => eliminar(row?.originalId, {
                 classType: 'MET_EXP_ORG',
                 procedimentId: id,
                 organGestor: row?.organGestor
@@ -121,7 +126,7 @@ const PermisMetaExpedientOrganGrid = (props:any) => {
             groupingColDef={{
                 headerName: t('page.permision.grid.organGestor'),
                 flex: 1.5,
-                valueFormatter: (value: any, row: any) => {
+                valueFormatter: (_value: any, row: any) => {
                     return (row?.pareId)
                         ?'' // ?row?.principal + " - " + row?.sid
                         :row?.organGestor?.description;
@@ -171,26 +176,31 @@ const columnsNode = [
     {
         field: 'create',
         flex: 0.5,
+        sortable: false,
         renderCell: (params:any) => (params?.row?.create && <Icon>check</Icon>),
     },
     {
         field: 'read',
         flex: 0.5,
+        sortable: false,
         renderCell: (params:any) => (params?.row?.read && <Icon>check</Icon>),
     },
     {
         field: 'write',
         flex: 0.5,
+        sortable: false,
         renderCell: (params:any) => (params?.row?.write && <Icon>check</Icon>),
     },
     {
         field: 'delete',
         flex: 0.5,
+        sortable: false,
         renderCell: (params:any) => (params?.row?.delete && <Icon>check</Icon>),
     },
     {
         field: 'estadistic',
         flex: 0.5,
+        sortable: false,
         renderCell: (params:any) => (params?.row?.estadistic && <Icon>check</Icon>),
     },
 ]
@@ -211,7 +221,7 @@ const PermisMetaExpedientNodeGrid = (props:any) => {
             label: t('common.update'),
             icon: "edit",
             showInMenu: true,
-            onClick: (rowId:any, row:any) => handelModify(id, row),
+            onClick: (_rowId:any, row:any) => handelModify(id, row),
         },
         {
             label: t('common.delete'),

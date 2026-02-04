@@ -10,22 +10,23 @@ const ActualitzarResultProcessor = (props:any) => {
     const { t } = useTranslation();
 
     return <Grid container sx={{display: "flex", flexDirection: "row", wordWrap: "break-word"}} columnSpacing={1} rowSpacing={1}>
-        <CardData title={t('page.metaExpedient.action.actualize.result.title')}>
+        <CardData title={t('page.metaExpedient.action.actualize.result.title')} variant={"h6"}>
             <Grid item xs={12}>
                 {t('page.metaExpedient.action.actualize.result.description', {
                     numOperacions: entity?.numOperacions,
                     numActualitzats: entity?.numElementsActualitzats,
-                    numErrord: entity?.info?.filter(i=>i?.hasError)?.length
+                    numErrord: entity?.info?.filter((i:any)=>i?.hasError)?.length
                 })}
             </Grid>
         </CardData>
 
-        {entity?.info?.map(i => <>
+        {entity?.info?.map((i:any) => <>
             <CardData
                 title={`${t('page.metaExpedient.title')}: ${i?.codiSia} - ${i?.nomAntic}`}
                 cardProps={{border: '1px solid #ffcdd2'}}
                 headerProps={{ backgroundColor: '#ffcdd2', color: 'error.main' }}
                 hidden={!i?.codiSia || !i?.hasError}
+                variant={"h6"}
             >
                 <Grid item xs={12}>{i?.errorText}</Grid>
             </CardData>
@@ -34,12 +35,14 @@ const ActualitzarResultProcessor = (props:any) => {
                 cardProps={{border: '1px solid #e3f2fd'}}
                 headerProps={{ backgroundColor: '#e3f2fd', color: 'info.main' }}
                 hidden={!i?.codiSia || !i?.hasCanvis}
+                variant={"h6"}
             >
                 <Grid item xs={12}>{i?.descripcioNova}</Grid>
             </CardData>
             <CardData
                 title={`Procediment: ${i?.codiSia} - ${i?.nomAntic}`}
                 hidden={!i?.codiSia || i?.hasCanvis || i?.hasError}
+                variant={"h6"}
             >
                 <Grid item xs={12}>{t('page.metaExpedient.action.actualize.result.senseCanvi')}</Grid>
             </CardData>
@@ -85,7 +88,7 @@ export const useActualitzar = (refresh?: () => void) => {
             apiRef={apiRef}
             onSuccess={onSuccess}
             disabled={disabled}
-            formDialogResultProcessor={(response => {
+            formDialogResultProcessor={((response:any) => {
                 setDisabled(true)
                 return <ActualitzarResultProcessor entity={response}/>
             })}

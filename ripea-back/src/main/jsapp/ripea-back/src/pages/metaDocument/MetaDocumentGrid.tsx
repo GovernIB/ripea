@@ -1,5 +1,4 @@
 import {useTranslation} from "react-i18next";
-import { useNavigate } from "react-router-dom";
 import {
     GridPage,
     MuiDialog,
@@ -9,7 +8,7 @@ import {
 } from "reactlib";
 import {CardPage} from "../../components/CardData.tsx";
 import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
-import {Alert, Typography, Grid, Icon, Badge, IconButton} from "@mui/material";
+import {Alert, Typography, Grid, Icon, Badge} from "@mui/material";
 import GridFormField, {FileFormField, GridButton} from "../../components/GridFormField.tsx";
 import * as builder from "../../util/springFilterUtils.ts";
 import TabComponent from "../../components/TabComponent.tsx";
@@ -18,6 +17,7 @@ import Load from "../../components/Load.tsx";
 import Iframe from "../../components/Iframe.tsx";
 import {useFluxFinalitzatSession} from "../../components/SseClient.tsx";
 import {useMetaDocumentActions} from "./details/MetaDocumentActions.tsx";
+import LinkButton from "../../components/LinkButton.tsx";
 
 const useFluxActions = () => {
     const {
@@ -26,7 +26,7 @@ const useFluxActions = () => {
     } = useResourceApiService('metaDocumentFluxPortafibResource');
 
     const [open, setOpen] = useState(false);
-    const [url, setUrl] = useState<any>();
+    const [url, setUrl] = useState<string>();
 
     const handleOpen = (id:any, row:any) => {
         if(apiIsReady){
@@ -221,7 +221,6 @@ const perspectives = ["COUNT_METADADES"];
 
 const MetaDocumentGrid = () => {
     const {t} = useTranslation();
-    const navigate = useNavigate();
     const apiRef = useMuiDataGridApiRef();
     
     const refresh = () => {
@@ -248,17 +247,16 @@ const MetaDocumentGrid = () => {
             headerName: '',
             flex: 0.5,
             sortable: false,
-            //renderCell: (props:any) => <Button component={Link} variant={"outlined"} href={`/metaDocument/${props?.id}/metaDada`}>Meta-dades <Chip label={props?.row?.numMetadades ?? 0}/></Button>
-            renderCell: (params:any) => <IconButton 
+            renderCell: (params:any) => <LinkButton
                 aria-label="key" 
                 color="inherit"
                 title={t('page.metaDada.plural')}
-                onClick={(e:any) => { e.stopPropagation(); navigate(`/metaDocument/${params?.row?.id}/metaDada`); }}
+                onClick={`/metaDocument/${params?.row?.id}/metaDada`}
             >
                 <Badge badgeContent={params?.row?.numMetadades} color="primary" showZero>
                     <Typography sx={{fontSize: '1rem', paddingRight: '10px'}}>{t('page.metaDada.plural')}</Typography>
                 </Badge>
-            </IconButton>
+            </LinkButton>
         },
     ]
 

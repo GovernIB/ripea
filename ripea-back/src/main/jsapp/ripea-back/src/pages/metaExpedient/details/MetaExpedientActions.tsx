@@ -38,8 +38,8 @@ export const useActions = (refresh?: () => void) => {
             });
     }
 
-    const defecte = (id:any, idGrup:any) => {
-        apiPatch(id, {data: { grupPerDefecte: {id: idGrup} }})
+    const defecte = (id:any, grupId:any) => {
+        apiAction(id, {code: 'TOGGLE_GRUP_DEF', data: { grupId }})
             .then(() => {
                 refresh?.()
                 temporalMessageShow(null, t('page.grup.action.default.ok'), 'success');
@@ -50,10 +50,10 @@ export const useActions = (refresh?: () => void) => {
     }
 
     const llevarDefecte = (id:any) => {
-        apiPatch(id, {data: { grupPerDefecte: null }})
+        apiAction(id, {code: 'TOGGLE_GRUP_DEF', data: { grupId: null }})
             .then(() => {
                 refresh?.()
-                temporalMessageShow(null, t('page.grup.action.default.ok'), 'success');
+                temporalMessageShow(null, t('page.grup.action.undefault.ok'), 'success');
             })
             .catch((error) => {
                 temporalMessageShow(null, error?.message, 'error');

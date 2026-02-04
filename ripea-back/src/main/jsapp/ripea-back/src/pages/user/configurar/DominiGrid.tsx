@@ -121,7 +121,6 @@ const DominiGrid = () => {
                     updateSuccess: 'page.domini.action.update.ok',
                     deleteSuccess: 'page.domini.action.delete.ok',
                 }}
-                toolbarHideRefresh
             />
         </CardPage>
     </GridPage>

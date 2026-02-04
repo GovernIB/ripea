@@ -1343,7 +1343,8 @@ const translationEn = {
         metaExpedient: {
             title: "Procedure",
             detall: {
-                elements: "Procedure management: {{nom}}",
+                elementsProc: "Procedure management: {{nom}}",
+                elementsServ: "Service management: {{nom}}",
                 expressioNumero: "If no expression is specified, the following default will be used: {{codi}}/{{seq}}/{{any}}",
                 permisDirecte: "An entity administrator user can modify this value.",
                 responsable: "You can change the signature responsible",

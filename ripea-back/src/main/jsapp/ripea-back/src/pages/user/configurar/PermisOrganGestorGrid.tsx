@@ -29,41 +29,49 @@ const columns = [
     {
         field: 'create',
         flex: 0.5,
+        sortable: false,
         renderCell: (params:any) => (params?.row?.create && <Icon>check</Icon>),
     },
     {
         field: 'read',
         flex: 0.5,
+        sortable: false,
         renderCell: (params:any) => (params?.row?.user && <Icon>check</Icon>),
     },
     {
         field: 'write',
         flex: 0.5,
+        sortable: false,
         renderCell: (params:any) => (params?.row?.write && <Icon>check</Icon>),
     },
     {
         field: 'delete',
         flex: 0.5,
+        sortable: false,
         renderCell: (params:any) => (params?.row?.delete && <Icon>check</Icon>),
     },
     {
         field: 'procedimentsComuns',
         flex: 0.5,
+        sortable: false,
         renderCell: (params:any) => (params?.row?.procedimentsComuns && <Icon>check</Icon>),
     },
     {
         field: 'admin',
         flex: 0.5,
+        sortable: false,
         renderCell: (params:any) => (params?.row?.admin && <Icon>check</Icon>),
     },
     {
         field: 'adminComuns',
         flex: 0.5,
+        sortable: false,
         renderCell: (params:any) => (params?.row?.adminComuns && <Icon>check</Icon>),
     },
     {
         field: 'disseny',
         flex: 0.5,
+        sortable: false,
         renderCell: (params:any) => (params?.row?.disseny && <Icon>check</Icon>),
     },
 ]
@@ -104,7 +112,7 @@ const PermisOrganGestorGrid = ()=> {
             label: t('common.update'),
             icon: "edit",
             showInMenu: true,
-            onClick: (rowId:any, row:any) => handelModify(id, row),
+            onClick: (_rowId:any, row:any) => handelModify(id, row),
         },
         {
             label: t('common.delete'),

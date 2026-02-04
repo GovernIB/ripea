@@ -3,13 +3,7 @@ import React, { ReactNode } from "react";
 import {Grid} from "@mui/material";
 import Load from "./Load.tsx";
 
-type FieldDataProps = {
-    field: string;
-    label?: string;
-    children?: ReactNode;
-};
-
-export const FieldData = ({ label, field, children, ...other }: FieldDataProps) => {
+export const FieldData = ({ label, field, children, ...other }: any) => {
     const { entity, getField } = useMuiDetailContext()
     const f = getField(field);
     const value = f?.options?.[entity?.[field]] ?? entity?.[field];

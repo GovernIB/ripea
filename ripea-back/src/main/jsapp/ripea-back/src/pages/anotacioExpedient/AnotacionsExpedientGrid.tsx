@@ -31,7 +31,7 @@ const AnotacionsExpedientGrid = (props:any) => {
             headerName: t('page.registre.grid.data'),
             flex: 0.5,
             valueFormatter: (value: any) => formatDate(value),
-            sortProcessor: (field: string, sort: GridSortDirection) => {
+            sortProcessor: (_field: string, sort: GridSortDirection) => {
                 return [{field: 'registre.data', sort}];
             },
         },

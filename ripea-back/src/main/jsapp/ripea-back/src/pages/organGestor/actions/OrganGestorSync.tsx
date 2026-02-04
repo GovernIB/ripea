@@ -74,6 +74,7 @@ const useActions = (refresh?: () => void) => {
             })
             .catch((error) => {
                 if (error?.message) {
+                    refresh?.()
                     temporalMessageShow(null, error?.message, 'error');
                 }
             });
@@ -135,7 +136,6 @@ const useActions = (refresh?: () => void) => {
 }
 
 export const useOrganGestorSyncDialog = () => {
-
     const { t } = useTranslation();
     const [open, setOpen] = useState(false);
     const ref = useRef();
@@ -163,15 +163,16 @@ export const useOrganGestorSyncDialog = () => {
             componentProps: {
                 variant: "outlined",
             },
-            hidden: prediccio?.noCanvis,
+            hidden: !prediccio || prediccio?.noCanvis,
         },
         {
             value: 'close',
-            text: t('common.cancel'),
+            text: t('common.close'),
             icon: 'close',
             componentProps: {
                 variant: "outlined",
-            }
+            },
+            hidden: !prediccio,
         },
         {
             value: 'sync',
@@ -181,7 +182,7 @@ export const useOrganGestorSyncDialog = () => {
                 variant: "contained",
                 color: "primary",
             },
-            hidden: prediccio?.noCanvis,
+            hidden: !prediccio || prediccio?.noCanvis,
         },
     ].filter((button:any)=>!button?.hidden), [t, prediccio])
 
@@ -195,7 +196,8 @@ export const useOrganGestorSyncDialog = () => {
             buttonCallback={(value :any) :void => {
                 switch (value){
                     case 'download':
-                        descargarPDF(ref?.current)
+                        if (ref?.current)
+                            descargarPDF(ref?.current)
                         break;
                     case 'sync':
                         update()

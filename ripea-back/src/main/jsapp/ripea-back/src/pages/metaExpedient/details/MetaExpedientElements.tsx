@@ -2,7 +2,7 @@ import {GridPage, useResourceApiService} from "reactlib";
 import {CardPage} from "../../../components/CardData.tsx";
 import {useTranslation} from "react-i18next";
 import {useParams} from "react-router-dom";
-import {useEffect, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import Load from "../../../components/Load.tsx";
 import TabComponent from "../../../components/TabComponent.tsx";
 import {MetDadaGrid} from "./elements/MetaDadaGrid.tsx";
@@ -90,15 +90,21 @@ export const MetaExpedientElements = () => {
         },
     ]
 
+    const title = useMemo(() => {
+        return metaExpedient?.tipusProcedimentServei === 'PROCEDIMENT'
+            ? t('page.metaExpedient.detall.elementsProc', {nom: metaExpedient?.nom})
+            : t('page.metaExpedient.detall.elementsServ', {nom: metaExpedient?.nom})
+    }, [t, metaExpedient])
+
     useEffect(() => {
         if (metaExpedient) {
-            setTitlePage(t('page.metaExpedient.detall.elements', {nom: metaExpedient?.nom}))
+            setTitlePage(title)
         }
     }, [metaExpedient]);
 
     return <GridPage disableMargins>
         <Load value={metaExpedient}>
-            <CardPage title={t('page.metaExpedient.detall.elements', {nom: metaExpedient?.nom})}>
+            <CardPage title={title}>
                 <TabComponent defaultValue={element} tabs={tabs}/>
             </CardPage>
         </Load>

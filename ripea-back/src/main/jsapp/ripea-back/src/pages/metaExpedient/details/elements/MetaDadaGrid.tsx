@@ -12,6 +12,7 @@ import {useUserSession} from "../../../../components/Session.tsx";
 import {DraggableGridRow, DraggableGridRowHandler} from "../../../../components/DraggableContext.tsx";
 import {DndContext} from "@dnd-kit/core";
 import {GridSlots} from "@mui/x-data-grid-pro";
+import {MultiplicitatStyled} from "../../../contingut/details/MetaExpedient.tsx";
 
 const useActions = (refresh?: () => void) => {
     const {t} = useTranslation();
@@ -90,6 +91,11 @@ const columns = [
     {
         field: 'nom',
         flex: 1,
+    },
+    {
+        field: 'multiplicitat',
+        flex: 0.2,
+        renderCell: (params:any) => <MultiplicitatStyled multiplicitat={params?.formattedValue}/>
     },
     {
         field: 'tipus',

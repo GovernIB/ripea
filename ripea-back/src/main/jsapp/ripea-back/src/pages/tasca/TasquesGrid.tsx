@@ -42,7 +42,7 @@ const TasquesGrid = () => {
         {
             field: 'metaExpedientTascaDescription',
             flex: 0.6,
-            sortProcessor: (field: string, sort: GridSortDirection) => {
+            sortProcessor: (_field: string, sort: GridSortDirection) => {
                 return [
                     { field: "metaExpedientTasca.descripcio", sort },
                 ]

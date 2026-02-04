@@ -11,7 +11,6 @@ import GridFormField from "../../../components/GridFormField.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import {useSession} from "../../../components/SessionStorageContext.tsx";
 import {GridSortDirection} from "@mui/x-data-grid-pro";
-import {useGridApiRef as useMuiDatagridApiRef} from "@mui/x-data-grid-pro/hooks/utils/useGridApiRef";
 
 const EnviarPortafirmesFilterForm = () => {
     const {data} = useFormContext();
@@ -77,7 +76,7 @@ const columns = [
     {
         field: 'createdByFullName',
         flex: 0.6,
-        sortProcessor: (field: string, sort: GridSortDirection) => [ { field: "createdBy", sort } ]
+        sortProcessor: (_field: string, sort: GridSortDirection) => [ { field: "createdBy", sort } ]
     },
 ]
 

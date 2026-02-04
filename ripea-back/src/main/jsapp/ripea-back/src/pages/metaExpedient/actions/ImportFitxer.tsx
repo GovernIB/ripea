@@ -187,8 +187,8 @@ const ImportFitxerFormCarpeta = () => {
     </Grid>
 }
 
-function editarElemento(array, codi, cambios, identifiator = 'codi') {
-    return array.map(item =>
+function editarElemento(array:any[], codi:string, cambios:any, identifiator:string = 'codi') {
+    return array.map((item:any) =>
         item?.[identifiator] === codi
             ? { ...item, ...cambios }
             : item
