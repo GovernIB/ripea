@@ -3,7 +3,7 @@ import {GridPage, useBaseAppContext, useMuiDataGridApiRef, useResourceApiService
 import {CardPage} from "../../../components/CardData.tsx";
 import StyledMuiGrid, {ToolbarButton} from "../../../components/StyledMuiGrid.tsx";
 import { Grid } from "@mui/material";
-import GridFormField from "../../../components/GridFormField.tsx";
+import GridFormField, {PasswordFormField} from "../../../components/GridFormField.tsx";
 
 const useActions = (refresh?: () => void) => {
     const { t } = useTranslation();
@@ -45,11 +45,11 @@ const DominiForm = () => {
                                "  <user-name>usuari</user-name>\n" +
                                "</local-tx-datasource>"
                        }}/>
-        <GridFormField xs={12} name="contrasenya"/>
+        <PasswordFormField xs={12} name="contrasenya" />
     </Grid>
 }
 
-const sortModel: any = [{field: 'codi', sort: 'asc'}]
+const sortModel: any[] = [{field: 'codi', sort: 'asc'}]
 // const perspectives = [""];
 const columns = [
     {

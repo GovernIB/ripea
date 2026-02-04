@@ -1432,6 +1432,7 @@ const translationCa = {
                 },
                 actualize: {
                     title: "Actualització de procediments",
+                    label: "Actualitzar desde ROLSAC",
                     description: "Vols actualitzar els procediments amb la informació de ROLSAC?",
                     ok: "Procediments actualitzats",
                     result: {

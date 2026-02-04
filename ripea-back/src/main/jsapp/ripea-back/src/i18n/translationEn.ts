@@ -1432,6 +1432,7 @@ const translationEn = {
                 },
                 actualize: {
                     title: "Procedure update",
+                    label: "Update from ROLSAC",
                     description: "Do you want to update the procedures with information from ROLSAC?",
                     ok: "Procedures updated",
                     result: {

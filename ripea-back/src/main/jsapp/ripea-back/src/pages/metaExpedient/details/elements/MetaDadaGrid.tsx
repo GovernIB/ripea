@@ -94,7 +94,7 @@ const columns = [
     },
     {
         field: 'multiplicitat',
-        flex: 0.2,
+        flex: 0.5,
         renderCell: (params:any) => <MultiplicitatStyled multiplicitat={params?.formattedValue}/>
     },
     {

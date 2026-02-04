@@ -1,10 +1,11 @@
-import {Button, Grid, Icon} from "@mui/material";
+import {Button, Grid, Icon, IconButton} from "@mui/material";
 import {FormField, FormFieldProps, useFormContext} from "reactlib";
 import Load from "./Load.tsx";
 import {useTranslation} from "react-i18next";
 import {useUserSession} from "./Session.tsx";
 import {useCallback, useEffect, useMemo, useState} from "react";
 import {FormFieldDataActionType} from "../../lib/components/form/FormContext.tsx";
+import InputAdornment from "@mui/material/InputAdornment";
 
 export const GridButton = (props:any) => {
     const { title, xs, children, hidden, ...other} = props;
@@ -65,6 +66,29 @@ export const FileFormField = (props:GridFormField) => {
         }
     }
     return <GridFormField {...props} componentProps={{...(props?.componentProps ?? {}), title: mssg}} type={"file"} validator={adjuntValidator}/>
+}
+
+export const PasswordFormField = (props:GridFormField) => {
+    const [showPassword, setShowPassword] = useState<boolean>(false);
+
+    return <GridFormField
+        {...props}
+        componentProps={{
+            ...(props?.componentProps),
+            type: showPassword ?'text' :'password',
+            slotProps: { input: {
+                endAdornment: (
+                    <InputAdornment position="end">
+                        <IconButton
+                            onClick={() => setShowPassword((prev:boolean) => !prev)}
+                            edge="end"
+                        >
+                            {showPassword ? <Icon>visibility_off</Icon> : <Icon>visibility</Icon>}
+                        </IconButton>
+                    </InputAdornment>)
+            } },
+        }}
+    />
 }
 
 const GridFormField = (props:GridFormField) => {

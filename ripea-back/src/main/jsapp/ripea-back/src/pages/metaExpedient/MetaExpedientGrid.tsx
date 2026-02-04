@@ -215,7 +215,7 @@ const MetaExpedientGrid = () => {
 
     const massiveActions :any[] = [
         {
-            title: t('common.actualize'),
+            title: t('page.metaExpedient.action.actualize.label'),
             label: t('common.actualize'),
             icon: "cached",
             showInMenu: false,

@@ -1432,6 +1432,7 @@ const translationEs = {
                 },
                 actualize: {
                     title: "Actualización de procedimientos",
+                    label: "Actualizar desde ROLSAC",
                     description: "¿Desea actualizar los procedimientos con la información de ROLSAC?",
                     ok: "Procedimientos actualizados",
                     result: {
