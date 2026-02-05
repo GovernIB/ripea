@@ -165,11 +165,9 @@ const columns = [
 
 const RevisioMetaExpedientGrid = () => {
     const {t} = useTranslation();
-    const {value: user} = useUserSession();
+    const {rol} = useUserSession();
     const apiRef = useMuiDataGridApiRef();
     const [springFilter, setSpringFilter] = useState<string>();
-
-    const isRolActualRevisio = user?.rolActual == 'IPA_REVISIO';
 
     const refresh = () => {
         apiRef?.current?.refresh?.();
@@ -207,7 +205,7 @@ const RevisioMetaExpedientGrid = () => {
                 toolbarHideCreate
                 rowHideUpdateButton={false}
                 popupEditCreateActive
-                popupEditFormContent={<RevisioMetaExpedientForm revisor={isRolActualRevisio}/>}
+                popupEditFormContent={<RevisioMetaExpedientForm revisor={rol?.isRevisio}/>}
                 popupEditFormDialogResourceTitle={t('page.metaExpedient.title')}
                 popupEditFormI18nKeys={{
                     updateSuccess: 'page.metaExpedient.action.update.ok',

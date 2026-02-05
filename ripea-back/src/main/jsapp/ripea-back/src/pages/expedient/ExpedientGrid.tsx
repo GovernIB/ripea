@@ -171,8 +171,7 @@ const ExpedientGrid = () => {
     const [load, setLoad] = useState<boolean>(false);
     const apiRef = useMuiDataGridApiRef();
 
-    const {value: user} = useUserSession();
-    const isRolActualAdminLectura = user?.rolActual == 'IPA_ADMIN_LECTURA';
+    const {value: user, rol} = useUserSession();
 
     const refresh = () => {
         apiRef?.current?.refresh?.();
@@ -280,7 +279,7 @@ const ExpedientGrid = () => {
                 popupEditCreateActive
                 popupEditFormContent={<ExpedientGridForm/>}
                 popupEditFormDialogTitle={t('page.expedient.action.new.title')}
-                readOnly={isRolActualAdminLectura}
+                readOnly={rol?.isAdminLectura}
                 onRowClick={(params: any) => navigate(`/contingut/${params?.id}`)}
                 rowAdditionalActions={actions}
                 toolbarCreateTitle={t('page.expedient.action.new.label')}

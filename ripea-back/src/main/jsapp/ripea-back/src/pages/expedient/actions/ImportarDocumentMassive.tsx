@@ -1,6 +1,6 @@
 import {FormField, MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
 import {Grid, Box, Alert} from "@mui/material";
-import {useEffect, useRef, useState} from "react";
+import {useEffect, useMemo, useRef, useState} from "react";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 import {DataGridPro, GridToolbarContainer} from "@mui/x-data-grid-pro";
@@ -31,7 +31,7 @@ const ImportarDocumentMassiveForm = (props:any) => {
         apiRef?.current?.setFieldValue('documents', newDocs)
     }
 
-    const columns = [
+    const columns = useMemo(() => [
         {
             field: 'file',
             headerName: fieldFitxer.label,
@@ -81,7 +81,7 @@ const ImportarDocumentMassiveForm = (props:any) => {
                 }}
             />,
         }
-    ]
+    ], [apiRef, data.documents, data?.metaExpedientId, fieldFitxer, fieldTipusDocument, updateDocument]);
 
     const CustomToolbar = () => {
         return <GridToolbarContainer sx={{ height: '52px', display: 'flex', justifyContent: 'end', mr: 1 }}>

@@ -1006,6 +1006,9 @@ const translationEs = {
         },
         carpeta: {
             title: 'Carpeta',
+            detail: {
+                tite: "Detalle de la carpeta",
+            },
             action: {
                 new: {
                     label: "Carpeta...",
@@ -1056,7 +1059,10 @@ const translationEs = {
         metaDada: {
             title: "Meta-dato",
             plural: "Meta-datos",
-            detail: "Valores del Meta-dato '{{metaDada}}'",
+            detail: {
+                title: "Detalle del metadato",
+                value: "Valores del metadato '{{metaDada}}'",
+            },
             action: {
                 activar: {
                     label: "Activar",
@@ -1269,6 +1275,12 @@ const translationEs = {
         },
         grup: {
             title: "Grupo",
+            detail: {
+                title: "Detalle del grupo",
+            },
+            grid: {
+                default: "Por defecto",
+            },
             action: {
                 new: {
                     label: "Nuevo Grupo",
@@ -1381,6 +1393,7 @@ const translationEs = {
                 consultar: {
                     title: "Detalle del procedimiento",
                     label: "Consultar",
+                    revisat: "Este procedimiento no se puede modificar ya que se encuentra en estado revisado",
                 },
                 canviEstat: {
                     title: "Cambiar estado de revisión",
@@ -1430,6 +1443,10 @@ const translationEs = {
                 export: {
                     ok: "Procedimiento exportado correctamente",
                 },
+                canviDisseny: {
+                    label: "Marcar como proceso de diseño",
+                    ok: "Procedimiento marcado como proceso de diseño",
+                },
                 actualize: {
                     title: "Actualización de procedimientos",
                     label: "Actualizar desde ROLSAC",
@@ -1445,6 +1462,9 @@ const translationEs = {
         },
         metaDocument: {
             title: "Tipo de documento",
+            detail: {
+                title: "Detalle del tipo de documento",
+            },
             tabs: {
                 dades: "Datos",
                 nti: "Datos NTI",
@@ -1484,6 +1504,9 @@ const translationEs = {
         },
         expedientEstat: {
             title: "Estado del procedimiento",
+            detail: {
+                title: "Detalle del estado del procedimiento",
+            },
             action: {
                 new: {
                     label: "Nuevo estado",
@@ -1500,6 +1523,7 @@ const translationEs = {
         metaExpedientTasca: {
             title: "Tarea",
             detall: {
+                title: "Detalle de la tarea",
                 duracio: "Duración de la tarea en días naturales.",
                 validacio: "Validaciones de la tarea: {{nom}}",
             },
@@ -1526,6 +1550,9 @@ const translationEs = {
         },
         metaExpedientTascaValidacio: {
             title: "Validación",
+            detail: {
+                title: "Detalle de la validación",
+            },
             action: {
                 activar: {
                     label: "Activar",

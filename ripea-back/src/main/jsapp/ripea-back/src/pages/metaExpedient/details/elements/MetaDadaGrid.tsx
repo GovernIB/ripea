@@ -1,18 +1,16 @@
 import {useTranslation} from "react-i18next";
 import {GridPage, useBaseAppContext, useFormContext, useMuiDataGridApiRef, useResourceApiService} from "reactlib";
 import {CardPage} from "../../../../components/CardData.tsx";
-import StyledMuiGrid from "../../../../components/StyledMuiGrid.tsx";
+import {DndMuiGrid} from "../../../../components/StyledMuiGrid.tsx";
 import {Grid, Icon} from "@mui/material";
 import * as builder from "../../../../util/springFilterUtils.ts";
 import {useParams} from "react-router-dom";
 import GridFormField from "../../../../components/GridFormField.tsx";
-import {useEffect, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import {setTitlePage} from "../../../../TitleHeaderConfigurator.tsx";
 import {useUserSession} from "../../../../components/Session.tsx";
-import {DraggableGridRow, DraggableGridRowHandler} from "../../../../components/DraggableContext.tsx";
-import {DndContext} from "@dnd-kit/core";
-import {GridSlots} from "@mui/x-data-grid-pro";
 import {MultiplicitatStyled} from "../../../contingut/details/MetaExpedient.tsx";
+import useMetaDadaDetail from "./details/MetaDadaDetail.tsx";
 
 const useActions = (refresh?: () => void) => {
     const {t} = useTranslation();
@@ -82,7 +80,7 @@ const MetaDocumentDadaForm = ({ enviable }:any) => {
 
 // Grid
 const sortModel: any = [{field: 'ordre', sort: 'asc'}]
-// const perspectives = [""];
+// const perspectives = [];
 const columns = [
     {
         field: 'codi',
@@ -106,13 +104,9 @@ const columns = [
         flex: 0.5,
         renderCell: (params:any) => (params?.row?.activa && <Icon>check</Icon>),
     },
-    {
-        renderCell: () => <DraggableGridRowHandler />,
-        flex: 0.1
-    }
 ]
 
-export const MetDadaGrid = ({ id, enviable = false, ...other }: any) => {
+export const MetDadaGrid = ({ id, enviable = false, readOnly, ...other }: any) => {
     const {t} = useTranslation();
     const apiRef = useMuiDataGridApiRef();
     const {value: user} = useUserSession()
@@ -122,7 +116,15 @@ export const MetDadaGrid = ({ id, enviable = false, ...other }: any) => {
     }
 
     const {active, desactive, reordering} = useActions(refresh)
-    const actions = [
+    const {apiIsReady, handleOpen, dialog} = useMetaDadaDetail()
+    const actions = useMemo(() => readOnly ?[
+        {
+            label: t('page.metaExpedient.action.consultar.label'),
+            icon: "search",
+            showInMenu: false,
+            onClick: handleOpen,
+        },
+    ]:[
         {
             label: t('common.update'),
             icon: "edit",
@@ -149,7 +151,7 @@ export const MetDadaGrid = ({ id, enviable = false, ...other }: any) => {
             showInMenu: true,
             clickTriggerDelete: true,
         },
-    ]
+    ], [t, readOnly, apiIsReady])
 
     const handleDragEnd = (event: any) => {
         const sourceData = event.active.data.current;
@@ -160,27 +162,22 @@ export const MetDadaGrid = ({ id, enviable = false, ...other }: any) => {
         }
     }
 
-    return <DndContext onDragEnd={handleDragEnd}><StyledMuiGrid
+    return <><DndMuiGrid
         apiRef={apiRef}
         resourceName={"metaDadaResource"}
         popupEditUpdateActive
         popupEditFormDialogResourceTitle={t('page.metaDada.title')}
         popupEditFormContent={<MetaDocumentDadaForm enviable={enviable && user?.sessionScope?.isPropagarMetadades}/>}
         columns={columns}
-        rowActionsColumnIndex={-1}
         toolbarHideQuickFilter={false}
         filter={builder.eq("metaNode.id", id)}
-        formAdditionalData={{
-            metaNode: {id}
-        }}
+        formAdditionalData={{ metaNode: {id} }}
         staticSortModel={sortModel}
         // perspectives={perspectives}
         rowAdditionalActions={actions}
         {...other}
 
-        slots={{
-            row: DraggableGridRow as GridSlots['row'],
-        }}
+        onDragEnd={handleDragEnd}
 
         toolbarCreateTitle={t('page.metaDada.action.new.label')}
         popupEditFormI18nKeys={{
@@ -188,12 +185,16 @@ export const MetDadaGrid = ({ id, enviable = false, ...other }: any) => {
             updateSuccess: 'page.metaDada.action.update.ok',
             deleteSuccess: 'page.metaDada.action.delete.ok',
         }}
-    /></DndContext>
+        readOnly={readOnly}
+    />
+        {dialog}
+    </>
 }
 
 const MetaDadaGrid = () => {
     const {t} = useTranslation();
     const { id } = useParams();
+    const {rol} = useUserSession();
 
     const {
         isReady: apiIsReady,
@@ -213,9 +214,13 @@ const MetaDadaGrid = () => {
         }
     }, [metaDocument]);
 
+    const readOnly = useMemo(() => {
+        return !(rol.isAdmin || (rol.isOrganAdmin && metaDocument?.metaExpedientRevisioEstat == 'REVISAT') || rol.isDissenyOrgan)
+    }, [metaDocument, rol])
+
     return <GridPage disableMargins>
         <CardPage title={t('page.user.menu.documentDada', {nom: metaDocument?.nom})}>
-            <MetDadaGrid id={id}/>
+            <MetDadaGrid id={id} readOnly={readOnly}/>
         </CardPage>
     </GridPage>
 }

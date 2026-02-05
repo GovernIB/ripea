@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState} from "react";
+import {useEffect, useMemo, useRef, useState} from "react";
 import {Grid, Icon} from "@mui/material";
 import {DataGridPro} from "@mui/x-data-grid-pro";
 import {MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
@@ -12,7 +12,7 @@ const ImportForm = () => {
     const {data, apiRef} = useFormContext();
     const [selectedRows, setSelectedRows] = useState<any[]>([]);
 
-    const columns = [
+    const columns = useMemo(() => [
         {
             field: 'tipus',
             headerName: t('page.interessat.grid.title'),
@@ -43,7 +43,7 @@ const ImportForm = () => {
             flex: 0.75,
             valueFormatter: (value: any) => value?.description,
         },
-    ];
+    ], [t]);
 
     useEffect(() => {
         apiRef?.current?.setFieldValue("interessatsPerImportar", data?.interessatsFitxer?.filter((i:any)=>selectedRows.includes(i.id)))

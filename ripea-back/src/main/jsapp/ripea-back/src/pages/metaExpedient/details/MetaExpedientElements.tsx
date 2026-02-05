@@ -18,7 +18,7 @@ const perspectives :string[] = ["ELEMENTS_COUNT"]
 export const MetaExpedientElements = () => {
     const {t} = useTranslation()
     const { id, element } = useParams();
-    const {value: user} = useUserSession();
+    const {value: user, rol} = useUserSession();
 
     const {
         isReady: apiIsReady,
@@ -36,6 +36,10 @@ export const MetaExpedientElements = () => {
         }
     },[apiIsReady, id])
 
+    const readOnly = useMemo(() => {
+        return !(rol.isAdmin || (rol.isOrganAdmin && metaExpedient?.revisioEstat == 'REVISAT') || rol.isDissenyOrgan)
+    }, [metaExpedient, rol])
+
     const [numMetaDocument, setNumMetaDocument] = useState<number>();
     const [numMetaDada, setNumMetaDada] = useState<number>();
     const [numEstat, setNumEstat] = useState<number>();
@@ -47,35 +51,35 @@ export const MetaExpedientElements = () => {
         {
             value: "metaDocument",
             label: t('page.metaExpedient.tabs.metaDocument'),
-            content: <MetaDocumentGrid entity={metaExpedient} onRowCountChange={setNumMetaDocument}/>,
+            content: <MetaDocumentGrid entity={metaExpedient} onRowCountChange={setNumMetaDocument} readOnly={readOnly}/>,
             badge: numMetaDocument ?? metaExpedient?.numMetaDocument,
             showZero: true,
         },
         {
             value: "metaDada",
             label: t('page.metaExpedient.tabs.metaDada'),
-            content: <MetDadaGrid id={id} enviable onRowCountChange={setNumMetaDada}/>,
+            content: <MetDadaGrid id={id} enviable onRowCountChange={setNumMetaDada} readOnly={readOnly}/>,
             badge: numMetaDada ?? metaExpedient?.numMetaDada,
             showZero: true,
         },
         {
             value: "estat",
             label: t('page.metaExpedient.tabs.expedientEstat'),
-            content: <MetaExpedientEstatGrid entity={metaExpedient} onRowCountChange={setNumEstat}/>,
+            content: <MetaExpedientEstatGrid entity={metaExpedient} onRowCountChange={setNumEstat} readOnly={readOnly}/>,
             badge: numEstat ?? metaExpedient?.numEstat,
             showZero: true,
         },
         {
             value: "tasca",
             label: t('page.metaExpedient.tabs.tasca'),
-            content: <MetaExpedientTascaGrid entity={metaExpedient} onRowCountChange={setNumTasca}/>,
+            content: <MetaExpedientTascaGrid entity={metaExpedient} onRowCountChange={setNumTasca} readOnly={readOnly}/>,
             badge: numTasca ?? metaExpedient?.numTasca,
             showZero: true,
         },
         {
             value: "grup",
             label: t('page.metaExpedient.tabs.grup'),
-            content: <GrupGrid entity={metaExpedient} refresh={refreshMetaExpedient} onRowCountChange={setNumGrup}/>,
+            content: <GrupGrid entity={metaExpedient} refresh={refreshMetaExpedient} onRowCountChange={setNumGrup} readOnly={readOnly}/>,
             badge: numGrup ?? metaExpedient?.numGrup,
             showZero: true,
             hidden: !metaExpedient?.gestioAmbGrupsActiva,
@@ -83,7 +87,7 @@ export const MetaExpedientElements = () => {
         {
             value: "carpeta",
             label: t('page.metaExpedient.tabs.carpeta'),
-            content: <MetaExpedientCarpetaGrid entity={metaExpedient} onRowCountChange={setNumCarpeta}/>,
+            content: <MetaExpedientCarpetaGrid entity={metaExpedient} onRowCountChange={setNumCarpeta} readOnly={readOnly}/>,
             badge: numCarpeta ?? metaExpedient?.numCarpetes,
             showZero: true,
             hidden: !user?.sessionScope?.isCarpetesDefecte,

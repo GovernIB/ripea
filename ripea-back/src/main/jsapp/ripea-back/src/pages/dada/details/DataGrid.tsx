@@ -128,7 +128,7 @@ const useDataGrid = (contingut:any, refresh?:() => void) => {
     const content =
         <MuiDialog
             open={open}
-            title={t('page.metaDada.detail', {metaDada: entity?.nom})}
+            title={t('page.metaDada.detail.value', {metaDada: entity?.nom})}
             closeCallback={handleClose}
             componentProps={{ fullWidth: true, maxWidth: 'sm' }}
             buttons={[

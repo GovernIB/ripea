@@ -16,9 +16,7 @@ export const CanviEstatRevisioForm = ({ revisor = false }:any) => {
 export const CanviEstatRevisio = (props: { apiRef:any }) => {
     const { t } = useTranslation();
     const { apiRef } = props;
-    const {value: user} = useUserSession()
-
-    const isRolActualRevisor = user?.rolActual == 'IPA_REVISIO';
+    const {rol} = useUserSession()
 
     return <MuiFormDialog
         resourceName={"metaExpedientResource"}
@@ -30,7 +28,7 @@ export const CanviEstatRevisio = (props: { apiRef:any }) => {
         ]}
         apiRef={apiRef}
     >
-        <CanviEstatRevisioForm revisor={isRolActualRevisor}/>
+        <CanviEstatRevisioForm revisor={rol?.isRevisor}/>
     </MuiFormDialog>
 }
 

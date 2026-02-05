@@ -6,8 +6,10 @@ import GridFormField from "../../../../components/GridFormField.tsx";
 import * as builder from "../../../../util/springFilterUtils.ts";
 import {useParams} from "react-router-dom";
 import {CardPage} from "../../../../components/CardData.tsx";
-import {useEffect, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import Load from "../../../../components/Load.tsx";
+import {useUserSession} from "../../../../components/Session.tsx";
+import useMetaExpTasaValidacioDetail from "./details/MetaExpTasaValidacioDetail.tsx";
 
 const useActions = (refresh?: () => void) => {
     const {t} = useTranslation();
@@ -77,6 +79,7 @@ const columns = [
 const MetaExpedientTascaValidacioGrid = () => {
     const {t} = useTranslation()
     const { id, tascaId } = useParams();
+    const {rol} = useUserSession();
     const apiRef = useMuiDataGridApiRef();
 
     const refresh = () => {
@@ -88,16 +91,27 @@ const MetaExpedientTascaValidacioGrid = () => {
         getOne: appGetOne,
     } = useResourceApiService('metaExpedientTascaResource');
     const [metaExpedientTasca, setMetaExpedientTasca] = useState<any>();
-
     useEffect(()=>{
         if (apiIsReady) {
-            appGetOne(tascaId)
+            appGetOne(tascaId, {perspectives: ['REVISIO_ESTAT']})
                 .then((app) => setMetaExpedientTasca(app))
         }
     },[apiIsReady, tascaId])
 
+    const readOnly = useMemo(() => {
+        return !(rol.isAdmin || (rol.isOrganAdmin && metaExpedientTasca?.metaExpedientRevisioEstat == 'REVISAT') || rol.isDissenyOrgan)
+    }, [metaExpedientTasca, rol])
+
     const {active, desactive} = useActions(refresh)
-    const actions = [
+    const {apiIsReady: apiValidIsReady, handleOpen, dialog} = useMetaExpTasaValidacioDetail()
+    const actions = useMemo(() => readOnly ?[
+        {
+            label: t('page.metaExpedient.action.consultar.label'),
+            icon: "search",
+            showInMenu: false,
+            onClick: handleOpen
+        },
+    ]:[
         {
             label: t('common.update'),
             icon: "edit",
@@ -124,7 +138,7 @@ const MetaExpedientTascaValidacioGrid = () => {
             showInMenu: true,
             clickTriggerDelete: true,
         },
-    ]
+    ], [t, readOnly, apiValidIsReady]);
 
     return <GridPage disableMargins>
         <Load value={metaExpedientTasca}>
@@ -150,8 +164,10 @@ const MetaExpedientTascaValidacioGrid = () => {
                         updateSuccess: 'page.metaExpedientTascaValidacio.action.update.ok',
                         deleteSuccess: 'page.metaExpedientTascaValidacio.action.delete.ok',
                     }}
+                    readOnly={readOnly}
                 />
             </CardPage>
+            {dialog}
         </Load>
     </GridPage>
 }

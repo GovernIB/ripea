@@ -34,7 +34,7 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
         builder.eq('esRepresentant', false)
     ),[entity])
 	
-    const columns = [
+    const columns = useMemo(() => [
         {
             field: 'tipus',
             flex: 0.5,
@@ -69,7 +69,7 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
             renderCell: (params:any) => params?.row?.grups
                 ?.map?.((g:any) => <Chip label={g?.description} size={"small"}/>),
         },
-    ];
+    ], [t]);
 
     const apiRef = useMuiDataGridApiRef()
 

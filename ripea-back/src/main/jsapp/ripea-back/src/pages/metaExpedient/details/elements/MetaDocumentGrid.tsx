@@ -2,14 +2,13 @@ import {Badge, Icon, Typography} from "@mui/material";
 import {useTranslation} from "react-i18next";
 import {useMuiDataGridApiRef} from "reactlib";
 import {useMemo} from "react";
-import LinkButton from "../../../../components/LinkButton.tsx";
+import LinkIcon from "../../../../components/LinkIcon.tsx";
 import {useActions, useMetaDocumentActions} from "../../../metaDocument/details/MetaDocumentActions.tsx";
-import StyledMuiGrid from "../../../../components/StyledMuiGrid.tsx";
 import {MetaDocumentForm} from "../../../metaDocument/MetaDocumentGrid.tsx";
 import * as builder from "../../../../util/springFilterUtils.ts";
-import {DndContext} from "@dnd-kit/core";
-import {DraggableGridRow, DraggableGridRowHandler} from "../../../../components/DraggableContext.tsx";
-import {GridSlots} from "@mui/x-data-grid-pro";
+import {DndMuiGrid} from "../../../../components/StyledMuiGrid.tsx";
+import useMetaDocumentDetail from "./details/MetaDocumentDetail.tsx";
+import {MultiplicitatStyled} from "../../../contingut/details/MetaExpedient.tsx";
 
 const sortModel: any = [{field: 'ordre', sort: 'asc'}]
 const perspectives = ["COUNT_METADADES"];
@@ -35,6 +34,7 @@ const columns: any[] = [
     {
         field: 'multiplicitat',
         flex: 0.5,
+        renderCell: (params:any) => <MultiplicitatStyled multiplicitat={params?.formattedValue}/>
     },
     {
         field: 'ntiOrigen',
@@ -60,7 +60,8 @@ const columns: any[] = [
         renderCell: (params:any) => (params?.row?.pinbalActiu && <Icon>check</Icon>),
     },
 ]
-export const MetaDocumentGrid = ({ entity, onRowCountChange } :any) => {
+
+export const MetaDocumentGrid = ({ entity, onRowCountChange, readOnly } :any) => {
     const {t} = useTranslation();
     const apiRef = useMuiDataGridApiRef();
 
@@ -75,7 +76,7 @@ export const MetaDocumentGrid = ({ entity, onRowCountChange } :any) => {
             headerName: '',
             flex: 0.5,
             sortable: false,
-            renderCell: (params:any) => <LinkButton
+            renderCell: (params:any) => <LinkIcon
                 aria-label="key"
                 color="inherit"
                 title={t('page.metaDada.plural')}
@@ -84,17 +85,21 @@ export const MetaDocumentGrid = ({ entity, onRowCountChange } :any) => {
                 <Badge badgeContent={params?.row?.numMetadades} color="primary" showZero>
                     <Typography sx={{fontSize: '1rem', paddingRight: '10px'}}>{t('page.metaDada.plural')}</Typography>
                 </Badge>
-            </LinkButton>
+            </LinkIcon>
         },
-        {
-            renderCell: () => <DraggableGridRowHandler />,
-            flex: 0.1
-        }
     ], [t])
 
+    const {apiIsReady, handleOpen, dialog} = useMetaDocumentDetail()
     const {marcarDefecte, desmarcarDefecte, reordering} = useActions(refresh)
     const {actions} = useMetaDocumentActions(refresh);
-    const additionalActions = useMemo(() => [
+    const additionalActions = useMemo(() => readOnly ?[
+        {
+            label: t('page.metaExpedient.action.consultar.label'),
+            icon: "search",
+            showInMenu: false,
+            onClick: handleOpen,
+        },
+    ]:[
         ...actions,
         {
             label: t('page.metaDocument.action.default.label'),
@@ -110,7 +115,7 @@ export const MetaDocumentGrid = ({ entity, onRowCountChange } :any) => {
             onClick: desmarcarDefecte,
             hidden: (row:any) => !row?.perDefecte,
         },
-    ], [t, actions])
+    ], [t, actions, readOnly, apiIsReady])
 
     const handleDragEnd = (event: any) => {
         const sourceData = event.active.data.current;
@@ -121,14 +126,13 @@ export const MetaDocumentGrid = ({ entity, onRowCountChange } :any) => {
         }
     }
 
-    return <DndContext onDragEnd={handleDragEnd}><StyledMuiGrid
+    return <><DndMuiGrid
         apiRef={apiRef}
         resourceName={"metaDocumentResource"}
         popupEditUpdateActive
         popupEditFormDialogResourceTitle={t('page.metaDocument.title')}
         popupEditFormContent={<MetaDocumentForm/>}
         columns={additionalColumns}
-        rowActionsColumnIndex={-1}
         toolbarHideQuickFilter={false}
         filter={builder.eq("metaExpedient.id", entity?.id)}
         formAdditionalData={{ metaExpedient: {id: entity?.id} }}
@@ -137,9 +141,7 @@ export const MetaDocumentGrid = ({ entity, onRowCountChange } :any) => {
         rowAdditionalActions={additionalActions}
         onRowCountChange={onRowCountChange}
 
-        slots={{
-            row: DraggableGridRow as GridSlots['row'],
-        }}
+        onDragEnd={handleDragEnd}
 
         popupEditFormDialogComponentProps={{ fullWidth: true, maxWidth: 'lg' }}
         toolbarCreateTitle={t('page.metaDocument.action.new.label')}
@@ -148,5 +150,8 @@ export const MetaDocumentGrid = ({ entity, onRowCountChange } :any) => {
             updateSuccess: 'page.metaDocument.action.update.ok',
             deleteSuccess: 'page.metaDocument.action.delete.ok',
         }}
-    /></DndContext>
+        readOnly={readOnly}
+    />
+        {dialog}
+    </>
 }

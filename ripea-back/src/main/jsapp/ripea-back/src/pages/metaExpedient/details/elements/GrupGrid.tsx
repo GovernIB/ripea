@@ -4,17 +4,19 @@ import * as builder from "../../../../util/springFilterUtils.ts";
 import {Icon} from "@mui/material";
 import {useVincularGrup} from "../../actions/VincularGrup.tsx";
 import {useActions} from "../MetaExpedientActions.tsx";
+import {useMemo} from "react";
+import useGrupDetail from "./details/GrupDetail.tsx";
 
 const sortModel: any = [{field: 'codi', sort: 'asc'}]
 const perspectives: string[] = [];
-export const GrupGrid = ({ entity, refresh: refreshEntity, onRowCountChange } :any) => {
+export const GrupGrid = ({ entity, refresh: refreshEntity, onRowCountChange, readOnly } :any) => {
     const {t} = useTranslation()
 
     const refresh = () => {
         refreshEntity?.();
     }
 
-    const columns = [
+    const columns = useMemo(() => [
         {
             field: 'codi',
             flex: 0.5,
@@ -29,15 +31,23 @@ export const GrupGrid = ({ entity, refresh: refreshEntity, onRowCountChange } :a
         },
         {
             field: 'id',
-            headerName: 'Per defecte',
+            headerName: t('page.grup.grid.default'),
             flex: 0.5,
             renderCell: (params:any) => (params?.id == entity?.grupPerDefecte?.id && <Icon>check</Icon>),
         },
-    ]
+    ], [t, entity]);
 
     const {handleShow: handleVincular, content: contentVincular} = useVincularGrup(refresh);
     const {defecte, llevarDefecte, desvincularGrup} = useActions(refresh)
-    const actions = [
+    const {apiIsReady, handleOpen, dialog} = useGrupDetail()
+    const actions = useMemo(() => readOnly ?[
+        {
+            label: t('page.metaExpedient.action.consultar.label'),
+            icon: "search",
+            showInMenu: false,
+            onClick: handleOpen
+        },
+    ]:[
         {
             label: t('page.grup.action.unlink.label'),
             icon: "link_off",
@@ -58,7 +68,17 @@ export const GrupGrid = ({ entity, refresh: refreshEntity, onRowCountChange } :a
             onClick: () => llevarDefecte(entity?.id),
             hidden: (row:any) => row?.id != entity?.grupPerDefecte?.id
         },
-    ]
+    ], [t, readOnly, apiIsReady]);
+
+    const elementsWithPositions:any[] = useMemo(() => [
+        {
+            position: 3,
+            element: <ToolbarButton icon={'add'} onClick={() => handleVincular(entity?.id)}>
+                {t('page.grup.action.link.label')}
+            </ToolbarButton>,
+            hidden: readOnly,
+        },
+    ], [t, readOnly]);
 
     return <>
         <StyledMuiGrid
@@ -72,15 +92,10 @@ export const GrupGrid = ({ entity, refresh: refreshEntity, onRowCountChange } :a
             toolbarHideCreate
             onRowCountChange={onRowCountChange}
 
-            toolbarElementsWithPositions={[
-                {
-                    position: 3,
-                    element: <ToolbarButton icon={'add'} onClick={() => handleVincular(entity?.id)}>
-                        {t('page.grup.action.link.label')}
-                    </ToolbarButton>,
-                },
-            ]}
+            toolbarElementsWithPositions={elementsWithPositions}
+            readOnly={readOnly}
         />
         {contentVincular}
+        {dialog}
     </>
 }

@@ -61,7 +61,7 @@ const AdjuntarAnnexosPendentsGrid = () => {
     const apiRef = useMuiDataGridApiRef();
     const [springFilter, setSpringFilter] = useState<string>();
 
-    const columns = [
+    const columns = useMemo(() => [
         {
             headerName: t('page.registre.grid.nomAnnex'),
             field: 'titol',
@@ -89,7 +89,7 @@ const AdjuntarAnnexosPendentsGrid = () => {
             // sortProcessor: (field: string, sort: GridSortDirection) => [{field: 'registre.expedientPeticions.expedient.createdDate', sort}],
             sortable: false,
         },
-    ]
+    ], [t]);
 
     const sessionKey = "ADJUNTAR_ANNEX_FILTER";
     const { value: filterData } = useSession(sessionKey);

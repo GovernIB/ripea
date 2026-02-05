@@ -61,8 +61,19 @@ export const useUserSession = () => {
         }
     }, []);
 
+    const rol = useMemo(() => ({
+        isSupAdmin: value?.rolActual == 'IPA_SUPER',
+        isAdmin: value?.rolActual == 'IPA_ADMIN',
+        isAdminLectura: value?.rolActual == 'IPA_ADMIN_LECTURA',
+        isOrganAdmin: value?.rolActual == 'IPA_ORGAN_ADMIN',
+        isDissenyOrgan: value?.rolActual == 'IPA_DISSENY',
+        isRevisor: value?.rolActual == 'IPA_REVISIO',
+        isUser: value?.rolActual == 'tothom',
+    }), [value])
+
     return {
         value,
+        rol,
         permisos,
 
         refresh,

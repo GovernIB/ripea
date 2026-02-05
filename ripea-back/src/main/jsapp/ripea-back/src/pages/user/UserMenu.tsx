@@ -68,11 +68,7 @@ export const UserMenu = () => {
     // const { value: entitat } = useEntitatSession()
     // const textColor = entitat?.capsaleraColorLletra ?? '#000';
 
-    const { value: user, permisos, save: apiSave } = useUserSession();
-    const isRolActualSupAdmin = user?.rolActual == 'IPA_SUPER';
-    const isRolActualAdmin = user?.rolActual == 'IPA_ADMIN';
-    const isRolActualOrganAdmin = user?.rolActual == 'IPA_ORGAN_ADMIN';
-    const isRolActualDissenyOrgan = user?.rolActual == 'IPA_DISSENY';
+    const { value: user, rol: rolActual, permisos, save: apiSave } = useUserSession();
 
     const {handleOpen, dialog} = usePerfil();
 
@@ -118,7 +114,7 @@ export const UserMenu = () => {
             <ListItemText>{t('page.user.options.perfil')}</ListItemText>
         </MenuItem>{dialog}
 
-        {(isRolActualSupAdmin || isRolActualAdmin || isRolActualOrganAdmin) &&
+        {(rolActual?.isSupAdmin || rolActual?.isAdmin || rolActual?.isOrganAdmin) &&
             <MenuItem onClick={()=>{
                 const url = 'https://github.com/GovernIB/ripea/raw/ripea-1.0-dev/doc/pdf/02_ripea_manual_administradors.pdf';
                 iniciaDescarga(url, '02_ripea_manual_administradors.pdf')
@@ -137,7 +133,7 @@ export const UserMenu = () => {
 
         <Divider/>
 
-        { !isRolActualSupAdmin &&
+        { !rolActual?.isSupAdmin &&
             <MenuSelect
                 value={entitatId}
                 onChange={setEntitatId}
@@ -163,7 +159,7 @@ export const UserMenu = () => {
             }
         </MenuSelect>
 
-        { (isRolActualOrganAdmin || isRolActualDissenyOrgan) && (
+        { (rolActual?.isOrganAdmin || rolActual?.isDissenyOrgan) && (
             (permisos?.organs && permisos.organs.length > 0) ? (
                 <MenuSelect
                     value={organId}

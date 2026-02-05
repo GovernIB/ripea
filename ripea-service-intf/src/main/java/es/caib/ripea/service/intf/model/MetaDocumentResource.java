@@ -5,6 +5,7 @@ import java.util.List;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import es.caib.ripea.service.intf.dto.*;
 import org.springframework.data.annotation.Transient;
 
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
@@ -13,12 +14,6 @@ import es.caib.ripea.service.intf.base.annotation.ResourceField;
 import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
-import es.caib.ripea.service.intf.dto.DocumentNtiEstadoElaboracionEnumDto;
-import es.caib.ripea.service.intf.dto.MetaDocumentFirmaFluxTipusEnumDto;
-import es.caib.ripea.service.intf.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
-import es.caib.ripea.service.intf.dto.MetaDocumentTipusGenericEnumDto;
-import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
-import es.caib.ripea.service.intf.dto.NtiOrigenEnumDto;
 import es.caib.ripea.service.intf.resourcevalidation.MetaDocumentValid;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -38,6 +33,9 @@ import lombok.experimental.FieldNameConstants;
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = MetaDocumentResource.PERSPECTIVE_COUNT_METADADES),
                 @ResourceConfigArtifact(
+                        type = ResourceArtifactType.PERSPECTIVE,
+                        code = MetaDocumentResource.PERSPECTIVE_REVISIO_ESTAT),
+                @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = MetaDocumentResource.ACTION_MARCAR_DEFECTE_CODE,
                         requiresId = true),
@@ -54,6 +52,7 @@ import lombok.experimental.FieldNameConstants;
 public class MetaDocumentResource extends MetaNodeResource {
 
 	public static final String PERSPECTIVE_COUNT_METADADES		= "COUNT_METADADES";
+    public static final String PERSPECTIVE_REVISIO_ESTAT        = "REVISIO_ESTAT";
 	public static final String ACTION_MARCAR_DEFECTE_CODE		= "MARCAR_DEFECTE";
 	public static final String ACTION_DESMARCAR_DEFECTE_CODE	= "DESMARCAR_DEFECTE";
 	public static final String ACTION_REORDENAR_CODE			= "REORDENAR";
@@ -100,6 +99,7 @@ public class MetaDocumentResource extends MetaNodeResource {
     @Transient private boolean importar = true;
     @Transient private List<MetaDadaResource> metaDadesImportacio;
     @Transient private Long importacioId;
+    @Transient private MetaExpedientRevisioEstatEnumDto metaExpedientRevisioEstat;
     
     private static final long serialVersionUID = -4446427656169703518L;
 }

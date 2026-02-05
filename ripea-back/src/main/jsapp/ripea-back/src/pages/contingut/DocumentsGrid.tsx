@@ -139,7 +139,7 @@ const columns = [
 const DocumentsGrid = (props: any) => {
     const { entity, onRowCountChange } = props;
     const { t } = useTranslation();
-    const { value: user } = useUserSession();
+    const { value: user, rol } = useUserSession();
 
     const sortModel:any[] = useMemo(() => {
         if (user?.sessionScope?.ordenacioContingutPermesa) {
@@ -335,9 +335,7 @@ const DocumentsGrid = (props: any) => {
 									(restriccio: any) => restriccio?.id === user?.codi
 								) ?? false;
 
-								const isAdmin = user?.rolActual === 'IPA_ADMIN';
-
-								if (!isResponsableRestriccio && !isUsuariAmbPermis && !isAdmin) {
+								if (!isResponsableRestriccio && !isUsuariAmbPermis && !rol?.isAdmin) {
 									return false;
 								}
 							}

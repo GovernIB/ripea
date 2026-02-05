@@ -48,8 +48,7 @@ const Link = React.forwardRef<HTMLAnchorElement, RouterLinkProps>((itemProps, re
     return <RouterLink ref={ref} {...itemProps} role={undefined} />;
 });
 
-const generateMenuItems = (appMenuEntries: any[]) => {
-    const { value: entitat } = useEntitatSession();
+const generateMenuItems = (appMenuEntries: any[], entitat:any) => {
 	/*
 	 iconVariant — valores posibles (Material Icons):
 	  - 'material-icons'          : filled (por defecto)
@@ -83,7 +82,7 @@ const MenuBadge = (props:any) => {
 
 const UserHeadToolbar = () => {
     const { t } = useTranslation();
-    const { value: user } = useUserSession();
+    const { rol } = useUserSession();
     const { value: entitat } = useEntitatSession()
     const { toProgramaAntic } = useToProgramaAntic()
     const location = useLocation();
@@ -91,14 +90,6 @@ const UserHeadToolbar = () => {
     const menuLogo = useMemo(() => {
         return getImgFromBytes(entitat?.conf?.menuicon) || goib_escut_logo
     }, [entitat?.conf?.menuicon]);
-
-    const isRolActualSupAdmin = user?.rolActual == 'IPA_SUPER';
-    const isRolActualAdmin = user?.rolActual == 'IPA_ADMIN';
-    const isRolActualAdminLectura = user?.rolActual == 'IPA_ADMIN_LECTURA';
-    const isRolActualOrganAdmin = user?.rolActual == 'IPA_ORGAN_ADMIN';
-    const isRolActualDissenyOrgan = user?.rolActual == 'IPA_DISSENY';
-    const isRolActualRevisor = user?.rolActual == 'IPA_REVISIO';
-    const isRolActualUser = user?.rolActual == 'tothom';
 
     const appMenuEntries:any[] =[
         {
@@ -129,14 +120,14 @@ const UserHeadToolbar = () => {
     const contents:any[] = []
 
     const menus = [
-        { condition: isRolActualSupAdmin, hook: useMenuSupAdmin },
-        { condition: isRolActualAdmin, hook: useMenuAdmin },
-        { condition: isRolActualAdminLectura, hook: useMenuAdminLectura },
-        { condition: isRolActualOrganAdmin, hook: useMenuAdminOrgan },
-        { condition: isRolActualDissenyOrgan, hook: useMenuDissenyOrgan },
-        { condition: isRolActualUser, hook: useMenuUsuari },
-        { condition: (isRolActualAdmin || isRolActualOrganAdmin || isRolActualUser), hook: useAccionesMassivas },
-        { condition: isRolActualRevisor, hook: useMenuRevisor },
+        { condition: rol?.isSupAdmin, hook: useMenuSupAdmin },
+        { condition: rol?.isAdmin, hook: useMenuAdmin },
+        { condition: rol?.isAdminLectura, hook: useMenuAdminLectura },
+        { condition: rol?.isOrganAdmin, hook: useMenuAdminOrgan },
+        { condition: rol?.isDissenyOrgan, hook: useMenuDissenyOrgan },
+        { condition: rol?.isUser, hook: useMenuUsuari },
+        { condition: (rol?.isAdmin || rol?.isOrganAdmin || rol?.isUser), hook: useAccionesMassivas },
+        { condition: rol?.isRevisor, hook: useMenuRevisor },
     ];
 
     menus.forEach(({ condition, hook }) => {
@@ -157,7 +148,7 @@ const UserHeadToolbar = () => {
     })
 
     return <Grid container rowSpacing={1} columnSpacing={1} item xs={8} flexDirection={"row"} alignContent={'center'} justifyContent={'end'}>
-        <Grid item xs={10} display={"flex"} justifyContent={"end"}>{...generateMenuItems(appMenuEntries)} {/* Menu */}</Grid>
+        <Grid item xs={10} display={"flex"} justifyContent={"end"}>{...generateMenuItems(appMenuEntries, entitat)} {/* Menu */}</Grid>
         {menuEntries?.length > 0 && <Grid item xs={1} display={"flex"} justifyContent={"center"}>
             <AppMenu key="app_menu" menuEntries={menuEntries} logo={menuLogo}/> {/* Side Menu */}
             {...contents} {/* Additional content */}
@@ -696,8 +687,7 @@ const useMenuUsuari = () => {
 }
 
 const useAccionesMassivas = () => {
-    const { value: user } = useUserSession();
-    const isRolActualAdmin = user?.rolActual == 'IPA_ADMIN';
+    const { value: user, rol } = useUserSession();
     const { t } = useTranslation();
 
     const {handleOpen, dialog} = useExecucioMassiva();
@@ -764,7 +754,7 @@ const useAccionesMassivas = () => {
                     title: t('page.user.massive.anotacio'),
                     // icon: '',
                     to: '/massiu/expedientPeticioCanviEstatDistribucio',
-                    hidden: !isRolActualAdmin,
+                    hidden: !rol?.isAdmin,
                 },
                 {
                     id: 'prioritat',
