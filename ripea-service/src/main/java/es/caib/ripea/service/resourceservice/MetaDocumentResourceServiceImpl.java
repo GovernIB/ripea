@@ -11,6 +11,8 @@ import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 
+import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientTascaResourceEntity;
+import es.caib.ripea.service.intf.model.*;
 import org.springframework.stereotype.Service;
 
 import com.turkraft.springfilter.FilterBuilder;
@@ -50,11 +52,6 @@ import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.MetaDocumentDto;
 import es.caib.ripea.service.intf.dto.PinbalServeiDto;
 import es.caib.ripea.service.intf.dto.UsuariDto;
-import es.caib.ripea.service.intf.model.ContingutResource;
-import es.caib.ripea.service.intf.model.EntitatResource;
-import es.caib.ripea.service.intf.model.MetaDocumentFluxPortafibResource;
-import es.caib.ripea.service.intf.model.MetaDocumentResource;
-import es.caib.ripea.service.intf.model.UsuariResource;
 import es.caib.ripea.service.intf.resourceservice.MetaDocumentResourceService;
 import es.caib.ripea.service.intf.utils.Utils;
 import lombok.RequiredArgsConstructor;
@@ -81,6 +78,7 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
     @PostConstruct
     public void init() {
     	register(MetaDocumentResource.PERSPECTIVE_COUNT_METADADES,	new CountMetaDadesPerspectiveApplicator());
+    	register(MetaDocumentResource.PERSPECTIVE_REVISIO_ESTAT,	new RevisioEstatPerspectiveApplicator());
     	register(MetaDocumentResource.ACTION_MARCAR_DEFECTE_CODE,	new MarcarPerDefecteActionExecutor());
     	register(MetaDocumentResource.ACTION_DESMARCAR_DEFECTE_CODE,new DesMarcarPerDefecteActionExecutor());
     	register(MetaDocumentResource.ACTION_REORDENAR_CODE,		new ReordenarActionExecutor());
@@ -198,6 +196,15 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
 			//Es reaprofita un metode existent, tot i que no faria falta la ordenació
 			List<MetaDadaEntity> mtdds = metaDadaRepository.findByMetaNodeIdOrderByOrdreAsc(entity.getId()); 
 			resource.setNumMetadades(mtdds!=null?mtdds.size():0);
+		}
+    }
+
+    private class RevisioEstatPerspectiveApplicator implements PerspectiveApplicator<MetaDocumentResourceEntity, MetaDocumentResource> {
+		@Override
+		public void applySingle(String code, MetaDocumentResourceEntity entity, MetaDocumentResource resource) throws PerspectiveApplicationException {
+            if (entity.getMetaExpedient() != null) {
+                resource.setMetaExpedientRevisioEstat(entity.getMetaExpedient().getRevisioEstat());
+            }
 		}
     }
     

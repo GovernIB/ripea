@@ -1006,6 +1006,9 @@ const translationEn = {
         },
         carpeta: {
             title: "Folder",
+            detail: {
+                tite: "Folder details",
+            },
             action: {
                 new: {
                     label: "Folder...",
@@ -1056,7 +1059,10 @@ const translationEn = {
         metaDada: {
             title: "Meta-data",
             plural: "Meta-datas",
-            detail: "Values of the Meta-data '{{metaDada}}'",
+            detail: {
+                title: "Metadata details",
+                value: "Values of the metadata '{{metaDada}}'",
+            },
             action: {
                 activar: {
                     label: "Activate",
@@ -1269,6 +1275,12 @@ const translationEn = {
         },
         grup: {
             title: "Group",
+            detail: {
+                title: "Group details",
+            },
+            grid: {
+                default: "Default",
+            },
             action: {
                 new: {
                     label: "New Group",
@@ -1381,6 +1393,7 @@ const translationEn = {
                 consultar: {
                     title: "Procedure details",
                     label: "View",
+                    revisat: "This procedure cannot be modified because it is in a reviewed state",
                 },
                 canviEstat: {
                     title: "Change review status",
@@ -1430,6 +1443,10 @@ const translationEn = {
                 export: {
                     ok: "Procedure exported successfully",
                 },
+                canviDisseny: {
+                    label: "Mark as design process",
+                    ok: "Procedure marked as a design process",
+                },
                 actualize: {
                     title: "Procedure update",
                     label: "Update from ROLSAC",
@@ -1445,6 +1462,9 @@ const translationEn = {
         },
         metaDocument: {
             title: "Document type",
+            detail: {
+                title: "Document type details",
+            },
             tabs: {
                 dades: "Data",
                 nti: "NTI data",
@@ -1484,6 +1504,9 @@ const translationEn = {
         },
         expedientEstat: {
             title: "Procedure status",
+            detail: {
+                title: "Procedure status details",
+            },
             action: {
                 new: {
                     label: "New status",
@@ -1500,6 +1523,7 @@ const translationEn = {
         metaExpedientTasca: {
             title: "Task",
             detall: {
+                title: "Task details",
                 duracio: "Task duration in calendar days.",
                 validacio: "Task validations: {{nom}}",
             },
@@ -1526,6 +1550,9 @@ const translationEn = {
         },
         metaExpedientTascaValidacio: {
             title: "Validation",
+            detail: {
+                title: "Validation details",
+            },
             action: {
                 activate: {
                     label: "Activate",

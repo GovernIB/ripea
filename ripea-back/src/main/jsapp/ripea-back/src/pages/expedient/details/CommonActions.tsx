@@ -220,9 +220,7 @@ export const useActions = (refresh?: () => void) => {
 
 export const useCommonActions = (refresh?: () => void) => {
     const { t } = useTranslation();
-    const { value: user, permisos } = useUserSession();
-    const isRolActualAdmin = user?.rolActual == 'IPA_ADMIN';
-    const isRolActualOrganAdmin = user?.rolActual == 'IPA_ORGAN_ADMIN';
+    const { value: user, rol, permisos } = useUserSession();
 
     const {
         reobrir,
@@ -259,15 +257,15 @@ export const useCommonActions = (refresh?: () => void) => {
         return row?.agafatPer?.id == user?.codi
     }
     const isUsuariActualWrite = (row:any) :boolean => {
-        return row?.usuariActualWrite || user?.rolActual == "IPA_ADMIN_LECTURA"
+        return row?.usuariActualWrite || rol?.isAdminLectura
     }
     const isAdminOAdminOrgan = (row:any) :boolean => {
-        return (isRolActualAdmin && permisos?.permisAdministrador) || ( isRolActualOrganAdmin && permisos?.organs?.some((e:any)=>e.id == row?.organGestor?.id) )
+        return (rol?.isAdmin && permisos?.permisAdministrador) || ( rol?.isOrganAdmin && permisos?.organs?.some((e:any)=>e.id == row?.organGestor?.id) )
     }
 
     const actions:any[] = [
         {
-            label: user?.rolActual == 'IPA_ADMIN_LECTURA' ?t('common.detail') :t('page.expedient.action.detall.label'),
+            label: rol?.isAdminLectura ?t('common.detail') :t('page.expedient.action.detall.label'),
             icon: "folder",
             linkTo: "/contingut/{{id}}",
             showInMenu: true,

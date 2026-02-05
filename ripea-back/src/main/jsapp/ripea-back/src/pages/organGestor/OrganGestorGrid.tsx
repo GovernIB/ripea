@@ -7,7 +7,7 @@ import {Grid, Icon, Badge} from "@mui/material";
 import GridFormField from "../../components/GridFormField.tsx";
 import {OrganGestorFilter} from "./OrganGestorFilter.tsx";
 import {useOrganGestorSyncDialog} from "./actions/OrganGestorSync.tsx";
-import LinkButton from "../../components/LinkButton.tsx";
+import LinkIcon from "../../components/LinkIcon.tsx";
 
 const OrganGestorForm = () => {
     const {data} = useFormContext()
@@ -68,7 +68,7 @@ const OrganGestorGrid = () => {
             headerName: '',
             sortable: false,
             flex: 0.25,
-            renderCell: (params:any) => <LinkButton
+            renderCell: (params:any) => <LinkIcon
                 aria-label="key"
                 color="inherit"
                 title="Permisos"
@@ -77,7 +77,7 @@ const OrganGestorGrid = () => {
                 <Badge badgeContent={params?.row?.numPermisos} color="primary" showZero>
                     <Icon>key</Icon>
                 </Badge>
-            </LinkButton>
+            </LinkIcon>
         }
     ], [treeView])
 

@@ -5,6 +5,7 @@ import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
+import es.caib.ripea.service.intf.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,11 +30,15 @@ import java.util.List;
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = MetaExpedientTascaResource.PERSPECTIVE_COUNT_VALIDACIONS),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.PERSPECTIVE,
+                        code = MetaExpedientTascaResource.PERSPECTIVE_REVISIO_ESTAT),
         })
 public class MetaExpedientTascaResource extends BaseAuditableResource<Long> {
 
 	public static final String PERSPECTIVE_COUNT_VALIDACIONS = "COUNT_VALIDACIONS";
-	
+	public static final String PERSPECTIVE_REVISIO_ESTAT = "REVISIO_ESTAT";
+
     @NotNull private String codi;
     @NotNull private String nom;
     @NotNull private String descripcio;
@@ -54,6 +59,7 @@ public class MetaExpedientTascaResource extends BaseAuditableResource<Long> {
     @Transient private int numValidacio;
     @Transient private String estatColorCrearTasca;
     @Transient private String estatColorFinalitzarTasca;
+    @Transient private MetaExpedientRevisioEstatEnumDto metaExpedientRevisioEstat;
     
     //Nomes per importacio de procediments
     private List<MetaExpedientTascaValidacioResource> validacionsImportacio = new ArrayList<>();

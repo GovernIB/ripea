@@ -2,12 +2,11 @@ import {Grid, Icon} from "@mui/material";
 import GridFormField from "../../../../components/GridFormField.tsx";
 import {StyledBadge} from "../../../../components/StyledBadge.tsx";
 import {useTranslation} from "react-i18next";
-import StyledMuiGrid from "../../../../components/StyledMuiGrid.tsx";
+import {DndMuiGrid} from "../../../../components/StyledMuiGrid.tsx";
 import * as builder from "../../../../util/springFilterUtils.ts";
-import {DraggableGridRow, DraggableGridRowHandler} from "../../../../components/DraggableContext.tsx";
-import {GridSlots} from "@mui/x-data-grid-pro";
-import {DndContext} from "@dnd-kit/core";
 import {useBaseAppContext, useMuiDataGridApiRef, useResourceApiService} from "reactlib";
+import {useMemo} from "react";
+import useMetaExpEstatDetail from "./details/MetaExpEstatDetail.tsx";
 
 const useActions = (refresh?: () => void) => {
     const {
@@ -61,12 +60,8 @@ const columns:any = [
         flex: 0.5,
         renderCell: (params:any) => (params?.row?.color && <StyledBadge badgecolor={params?.formattedValue} overlap="circular" badgeContent=" "/>)
     },
-    {
-        renderCell: () => <DraggableGridRowHandler />,
-        flex: 0.1
-    }
 ]
-export const MetaExpedientEstatGrid = ({ entity, onRowCountChange } :any) => {
+export const MetaExpedientEstatGrid = ({ entity, onRowCountChange, readOnly } :any) => {
     const {t} = useTranslation()
     const apiRef = useMuiDataGridApiRef();
 
@@ -75,7 +70,15 @@ export const MetaExpedientEstatGrid = ({ entity, onRowCountChange } :any) => {
     }
 
     const {reordering} = useActions(refresh)
-    const actions = [
+    const {apiIsReady, handleOpen, dialog} = useMetaExpEstatDetail()
+    const actions = useMemo(() => readOnly ?[
+        {
+            label: t('page.metaExpedient.action.consultar.label'),
+            icon: "search",
+            showInMenu: false,
+            onClick: handleOpen,
+        },
+    ]:[
         {
             label: t('common.update'),
             icon: "edit",
@@ -88,7 +91,7 @@ export const MetaExpedientEstatGrid = ({ entity, onRowCountChange } :any) => {
             showInMenu: true,
             clickTriggerDelete: true,
         },
-    ]
+    ], [t, readOnly, apiIsReady]);
 
     const handleDragEnd = (event: any) => {
         const sourceData = event.active.data.current;
@@ -99,14 +102,13 @@ export const MetaExpedientEstatGrid = ({ entity, onRowCountChange } :any) => {
         }
     }
 
-    return <DndContext onDragEnd={handleDragEnd}><StyledMuiGrid
+    return <><DndMuiGrid
         apiRef={apiRef}
         resourceName={'metaExpedientEstatResource'}
         popupEditUpdateActive
         popupEditFormDialogResourceTitle={t('page.expedientEstat.title')}
         popupEditFormContent={<MetaExpedientEstatForm/>}
         columns={columns}
-        rowActionsColumnIndex={-1}
         filter={builder.eq("metaExpedient.id", entity?.id)}
         formAdditionalData={{ metaExpedient: {id: entity?.id} }}
         staticSortModel={sortModel}
@@ -114,9 +116,7 @@ export const MetaExpedientEstatGrid = ({ entity, onRowCountChange } :any) => {
         rowAdditionalActions={actions}
         onRowCountChange={onRowCountChange}
 
-        slots={{
-            row: DraggableGridRow as GridSlots['row'],
-        }}
+        onDragEnd={handleDragEnd}
 
         popupEditFormDialogComponentProps={{ fullWidth: true, maxWidth: 'lg' }}
         toolbarCreateTitle={t('page.expedientEstat.action.new.label')}
@@ -125,5 +125,6 @@ export const MetaExpedientEstatGrid = ({ entity, onRowCountChange } :any) => {
             updateSuccess: 'page.expedientEstat.action.update.ok',
             deleteSuccess: 'page.expedientEstat.action.delete.ok',
         }}
-    /></DndContext>
+        readOnly={readOnly}
+    />{dialog}</>
 }

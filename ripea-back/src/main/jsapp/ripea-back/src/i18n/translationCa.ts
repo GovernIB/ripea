@@ -1006,6 +1006,9 @@ const translationCa = {
         },
         carpeta: {
             title: "Carpeta",
+            detail: {
+                tite: "Detall de la carpeta",
+            },
             action: {
                 new: {
                     label: "Carpeta...",
@@ -1056,7 +1059,10 @@ const translationCa = {
         metaDada: {
             title: "Meta-dada",
             plural: "Meta-dades",
-            detail: "Valors de la meta-dada '{{metaDada}}'",
+            detail: {
+                title: "Detall de la meta-dada",
+                value: "Valors de la meta-dada '{{metaDada}}'",
+            },
             action: {
                 activar: {
                     label: "Activar",
@@ -1269,6 +1275,12 @@ const translationCa = {
         },
         grup: {
             title: "Grup",
+            detail: {
+                title: "Detall del grup",
+            },
+            grid: {
+                default: "Per defecte",
+            },
             action: {
                 new: {
                     label: "Nou Grup",
@@ -1381,6 +1393,7 @@ const translationCa = {
                 consultar: {
                     title: "Detall del procediment",
                     label: "Consultar",
+                    revisat: "Aquest procediment no es pot modificar ja que es troba en estat revisat",
                 },
                 canviEstat: {
                     title: "Canviar estat de revisó",
@@ -1430,6 +1443,10 @@ const translationCa = {
                 export: {
                     ok: "Procediment exportat correctament",
                 },
+                canviDisseny: {
+                    label: "Marcar com a procés de disseny",
+                    ok: "Procediment marcat com a procés de disseny",
+                },
                 actualize: {
                     title: "Actualització de procediments",
                     label: "Actualitzar desde ROLSAC",
@@ -1445,6 +1462,9 @@ const translationCa = {
         },
         metaDocument: {
             title: "Tipus de document",
+            detail: {
+                title: "Detall de tipus de document",
+            },
             tabs: {
                 dades: "Dades",
                 nti: "Dades NTI",
@@ -1484,6 +1504,9 @@ const translationCa = {
         },
         expedientEstat: {
             title: "Estat del procediment",
+            detail: {
+                title: "Detall de l'estat del procediment"
+            },
             action: {
                 new: {
                     label: "Nou estat",
@@ -1500,6 +1523,7 @@ const translationCa = {
         metaExpedientTasca: {
             title: "Tasca",
             detall: {
+                title: "Detall de la tasca",
                 duracio: "Duració de la tasca en dies naturals.",
                 validacio: "Validacions de la tasca: {{nom}}",
             },
@@ -1526,6 +1550,9 @@ const translationCa = {
         },
         metaExpedientTascaValidacio: {
             title: "Validació",
+            detail: {
+                title: "Detall de la validació",
+            },
             action: {
                 activar: {
                     label: "Activar",

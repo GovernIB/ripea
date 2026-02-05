@@ -5,7 +5,7 @@ import {StyledPrioritat} from "../expedient/ExpedientGrid.tsx";
 import {TascaComment} from "../CommentDialog.tsx";
 import StyledMuiGrid from '../../components/StyledMuiGrid.tsx';
 import TasquesGridFilter from "./TasquesGridFilter.tsx";
-import {useMemo, useState} from "react";
+import {useCallback, useMemo, useState} from "react";
 import Load from "../../components/Load.tsx";
 import { CardPage } from "../../components/CardData.tsx";
 import {useUserSession} from "../../components/Session.tsx";
@@ -26,9 +26,9 @@ const TasquesGrid = () => {
     const [springFilter, setSpringFilter] = useState<string>();
     const [load, setLoad] = useState<boolean>(false);
 
-    const refresh = () => {
+    const refresh = useCallback(() => {
         apiRef?.current?.refresh?.();
-    }
+    }, [apiRef])
 
     const columns = useMemo(() => [
         {
@@ -100,7 +100,7 @@ const TasquesGrid = () => {
                 onClose={refresh}
             />
         },
-    ], []);
+    ], [refresh, t]);
 
     const { actions, components, isTramitable } = useTascaActions({potModificar: true}, refresh)
     const { handleOpen, dialog } = useTascaDetail();

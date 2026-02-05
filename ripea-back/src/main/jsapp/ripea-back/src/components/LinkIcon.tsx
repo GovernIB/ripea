@@ -1,7 +1,7 @@
 import {IconButton} from "@mui/material";
 import {useNavigate} from "react-router-dom";
 
-const LinkButton = (props:any) => {
+const LinkIcon = (props:any) => {
     const navigate = useNavigate();
     return <IconButton
         {...props}
@@ -13,4 +13,4 @@ const LinkButton = (props:any) => {
         }}
     />
 }
-export default LinkButton;
+export default LinkIcon;

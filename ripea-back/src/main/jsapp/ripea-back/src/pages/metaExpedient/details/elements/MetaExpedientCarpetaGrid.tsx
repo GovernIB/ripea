@@ -5,6 +5,8 @@ import StyledMuiGrid from "../../../../components/StyledMuiGrid.tsx";
 import * as builder from "../../../../util/springFilterUtils.ts";
 import {useFormContext} from "reactlib";
 import {GridTreeDataGroupingCell} from "@mui/x-data-grid-pro";
+import {useMemo} from "react";
+import useMetaExpCarpetaDetail from "./details/MetaExpCarpetaDetail.tsx";
 
 const MetaExpedientCarpetaForm = () => {
     const {data} = useFormContext()
@@ -32,10 +34,18 @@ const columns:any = [
     //     flex: 1,
     // },
 ]
-export const MetaExpedientCarpetaGrid = ({ entity, onRowCountChange } :any) => {
+export const MetaExpedientCarpetaGrid = ({ entity, onRowCountChange, readOnly } :any) => {
     const {t} = useTranslation()
 
-    const actions = [
+    const {apiIsReady, handleOpen, dialog} = useMetaExpCarpetaDetail()
+    const actions = useMemo(() => readOnly ?[
+        {
+            label: t('page.metaExpedient.action.consultar.label'),
+            icon: "search",
+            showInMenu: false,
+            onClick: handleOpen
+        },
+    ]:[
         {
             label: t('common.update'),
             icon: "edit",
@@ -48,9 +58,9 @@ export const MetaExpedientCarpetaGrid = ({ entity, onRowCountChange } :any) => {
             showInMenu: true,
             clickTriggerDelete: true,
         },
-    ]
+    ], [t, readOnly, apiIsReady]);
 
-    return <StyledMuiGrid
+    return <><StyledMuiGrid
         resourceName={'metaExpedientCarpetaResource'}
         popupEditUpdateActive
         popupEditFormDialogResourceTitle={t('page.carpeta.title')}
@@ -82,5 +92,6 @@ export const MetaExpedientCarpetaGrid = ({ entity, onRowCountChange } :any) => {
             updateSuccess: 'page.carpeta.action.update.ok',
             deleteSuccess: 'page.carpeta.action.delete.ok',
         }}
-    />
+        readOnly={readOnly}
+    />{dialog}</>
 }

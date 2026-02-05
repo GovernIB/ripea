@@ -79,7 +79,7 @@ const useActions = (refresh?:()=>void) => {
 
 const useCarpetaActions = (entity:any, refresh?: () => void) => {
     const { t } = useTranslation();
-    const { value: user } = useUserSession()
+    const { value: user, rol } = useUserSession()
 
     const { eliminar, exportarPDF, exportarEXCEL, guardarArxiu } = useActions(refresh)
     const {handleOpen: handleHistoricOpen, dialog: dialogHistoric} = useHistoric();
@@ -92,13 +92,12 @@ const useCarpetaActions = (entity:any, refresh?: () => void) => {
 	        (restriccio: any) => restriccio?.id === user?.codi
 	    ) ?? false;
 	const isResponsableRestriccio = (row: any) => row?.responsableRestriccio?.id === user?.codi;
-	const isRolActualAdmin = user?.rolActual === 'IPA_ADMIN';
 	
 	const potGestionarCarpeta = (row: any) =>
 	    !row?.restringida || 
 		(row?.restringida && (
 	    	isResponsableRestriccio(row) ||
-	    	isRolActualAdmin ||
+	    	rol?.isAdmin ||
 	    	isUsuariAmbPermis(row)));
 			
     const actions = [

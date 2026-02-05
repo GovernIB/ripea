@@ -106,23 +106,29 @@ export const useActions = (refresh?: () => void) => {
             });
     }
 
-    return {active, desactive, exportar, defecte, llevarDefecte, crearRegla, toogleRegla, desvincularGrup}
+    const canviDisseny = (id:any) => {
+        apiAction(id, { code: 'CANVIAR_DISSENY' })
+            .then((result) => {
+                iniciaDescargaJSON(result);
+                temporalMessageShow(null, t('page.metaExpedient.action.canviDisseny.ok'), 'success');
+            })
+            .catch((error) => {
+                temporalMessageShow(null, error.message, 'error');
+            });
+    }
+
+    return {active, desactive, exportar, defecte, llevarDefecte, crearRegla, toogleRegla, desvincularGrup, canviDisseny}
 }
 
 export const useMetaExpedientActions = (refresh?: () => void) => {
     const {t} = useTranslation();
-    const {value: user} = useUserSession()
-
-    const isRolActualAdmin = user?.rolActual == 'IPA_ADMIN';
-    const isRolActualAdminLectura = user?.rolActual == 'IPA_ADMIN_LECTURA';
-    const isRolActualOrganAdmin = user?.rolActual == 'IPA_ORGAN_ADMIN';
-    const isRolActualRevisor = user?.rolActual == 'IPA_REVISIO';
+    const {rol} = useUserSession()
 
     const {handleOpen: handleExpedient, dialog: dialogExpedient} = useExpedientDialog();
     const {handleOpen: handleDetail, dialog: dialogDetail} = useMetaExpedientDetail();
     const {handleShow: handleCanviEstat, content: contentCanviEstat} = useCanviEstatRevisio(refresh);
     const {handleOpen: handleRegla, dialog: dialogRegla} = useReglaDistribucio(refresh);
-    const {active, desactive, exportar} = useActions(refresh)
+    const {active, desactive, exportar, canviDisseny} = useActions(refresh)
 
     const actions = [
         {
@@ -130,63 +136,77 @@ export const useMetaExpedientActions = (refresh?: () => void) => {
             icon: "search",
             showInMenu: true,
             onClick: handleDetail,
-            hidden: !(isRolActualRevisor || isRolActualAdminLectura),
+            hidden: !(rol?.isRevisor || rol?.isAdminLectura),
+        },
+        {
+            label: t('common.update'),
+            icon: "edit",
+            showInMenu: true,
+            onClick: handleDetail,
+            hidden: (row:any) => !(row?.revisioEstat == 'REVISAT' && rol?.isOrganAdmin),
         },
         {
             label: t('common.update'),
             icon: "edit",
             showInMenu: true,
             clickShowUpdateDialog: true,
-            hidden: isRolActualRevisor || isRolActualAdminLectura,
+            hidden: (row:any) => rol?.isRevisor || rol?.isAdminLectura || (row?.revisioEstat == 'REVISAT' && rol?.isOrganAdmin),
         },
         {
             label: t('page.metaExpedient.action.canviEstat.label'),
             icon: "edit",
             showInMenu: true,
             onClick: handleCanviEstat,
-            hidden: !isRolActualRevisor,
+            hidden: !rol?.isRevisor,
         },
         {
             label: t('page.metaExpedient.action.expedient.label'),
             icon: "business_center",
             showInMenu: true,
             onClick: handleExpedient,
-            hidden: isRolActualRevisor,
+            hidden: rol?.isRevisor,
         },
         {
             label: t('common.export'),
             icon: "upload",
             showInMenu: true,
             onClick: exportar,
-            hidden: !(isRolActualAdmin || isRolActualOrganAdmin),
+            hidden: !(rol?.isAdmin || rol?.isOrganAdmin),
         },
         {
             label: t('page.metaExpedient.action.regla.label'),
             icon: "search",
             showInMenu: true,
             onClick: handleRegla,
-            hidden: !(isRolActualAdmin || isRolActualOrganAdmin),
+            hidden: !(rol?.isAdmin || rol?.isOrganAdmin),
         },
         {
             label: t('page.metaExpedient.action.activar.label'),
             icon: "check",
             showInMenu: true,
             onClick: active,
-            hidden: (row:any) => row?.actiu || !(isRolActualAdmin),
+            hidden: (row:any) => row?.actiu || !(rol?.isAdmin || rol?.isOrganAdmin),
         },
         {
             label: t('page.metaExpedient.action.desactivar.label'),
             icon: "cancel",
             showInMenu: true,
             onClick: desactive,
-            hidden: (row:any) => !row?.actiu || !(isRolActualAdmin),
+            hidden: (row:any) => !row?.actiu || !(rol?.isAdmin || rol?.isOrganAdmin),
+        },
+        {
+            label: t('page.metaExpedient.action.canviDisseny.label'),
+            icon: "check",
+            showInMenu: true,
+            onClick: canviDisseny,
+            hidden: !rol?.isOrganAdmin,
         },
         {
             label: t('common.delete'),
             icon: "delete",
             showInMenu: true,
             clickTriggerDelete: true,
-            hidden: !isRolActualAdmin,
+            hidden: !rol?.isAdmin,
         },
     ]
 

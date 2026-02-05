@@ -2,28 +2,18 @@ import {useState} from "react";
 import {Alert, Grid} from "@mui/material";
 import {useResourceApiService, MuiDialog, useBaseAppContext} from "reactlib";
 import {useTranslation} from "react-i18next";
-import Load from "../../../components/Load.tsx";
-import {formatDate} from "../../../util/dateUtils.ts";
-import {FieldData, MuiDetail} from "../../../components/MuiDetail.tsx";
-import {useUserSession} from "../../../components/Session.tsx";
+import Load from "../../../../../components/Load.tsx";
+import {FieldData, MuiDetail} from "../../../../../components/MuiDetail.tsx";
+import {formatDate} from "../../../../../util/dateUtils.ts";
 
-const MetaExpedientDetail = (props:any) => {
-    const {entity, fields, isOrganAdmin} = props;
+const GrupDetail = (props:any) => {
+    const {entity, fields} = props;
     const { t } = useTranslation();
 
     return <MuiDetail entity={entity} fields={fields}>
-        {(entity?.revisioEstat == 'REVISAT' && isOrganAdmin) &&
-            <Grid xs={12}>
-                <Alert severity={'info'}>{t('page.metaExpedient.action.consultar.revisat')}</Alert>
-            </Grid>
-        }
-
         <FieldData field={'codi'}/>
-        <FieldData field={'nom'}/>
         <FieldData field={'descripcio'}/>
-        <FieldData field={'tipus'}/>
-        <FieldData field={'revisioEstat'}/>
-        <FieldData field={'tipusProcedimentServei'}/>
+        <FieldData field={'organGestor'}/>
 
         <Grid xs={12} sx={{ pl: '8px', pt: '8px' }}>
             <Alert severity={'info'}>
@@ -36,15 +26,14 @@ const MetaExpedientDetail = (props:any) => {
 }
 
 const perspectives:any = []
-const useMetaExpedientDetail = () => {
+const useGrupDetail = () => {
     const { t } = useTranslation();
-    const {rol} = useUserSession()
 
     const {
         isReady: apiIsReady,
         getOne: apiGetOne,
         currentFields
-    } = useResourceApiService('metaExpedientResource');
+    } = useResourceApiService('metaDadaResource');
     const {temporalMessageShow} = useBaseAppContext();
 
     const [open, setOpen] = useState(false);
@@ -81,15 +70,15 @@ const useMetaExpedientDetail = () => {
         <MuiDialog
             open={open}
             closeCallback={handleClose}
-            title={t('page.metaExpedient.action.consultar.title')}
-            componentProps={{ fullWidth: true, maxWidth: 'md' }}
+            title={t('page.grup.detail.title')}
+            componentProps={{ fullWidth: true, maxWidth: 'sm' }}
             buttons={buttons}
             buttonCallback={() :void => {
                 handleClose();
             }}
         >
             <Load value={entity}>
-                <MetaExpedientDetail fields={currentFields} entity={entity} isOrganAdmin={rol?.isOrganAdmin}/>
+                <GrupDetail fields={currentFields} entity={entity}/>
             </Load>
         </MuiDialog>
 
@@ -100,4 +89,4 @@ const useMetaExpedientDetail = () => {
         dialog
     }
 }
-export default useMetaExpedientDetail;
+export default useGrupDetail;

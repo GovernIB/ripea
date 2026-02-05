@@ -1,10 +1,12 @@
 import React, {useEffect, useMemo, useState} from "react";
 import {Button, Icon, Tooltip} from "@mui/material";
-import {useGridApiRef as useMuiDatagridApiRef} from "@mui/x-data-grid-pro";
-import {MuiDataGridProps, MuiGrid, useMuiDataGridApiRef} from "reactlib";
+import {GridSlots, useGridApiRef as useMuiDatagridApiRef} from "@mui/x-data-grid-pro";
+import {MuiDataGridColDef, MuiDataGridProps, MuiGrid, useMuiDataGridApiRef} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {useUserSession} from "./Session.tsx";
 import MassiveActionSelector, {MassiveActionProps} from "./MassiveActionSelector.tsx";
+import {DraggableGridRow, DraggableGridRowHandler} from "./DraggableContext.tsx";
+import {DndContext} from "@dnd-kit/core";
 
 export const ToolbarButton = (props:any) => {
     const { title, icon, hidden, children, ...other } = props;
@@ -37,6 +39,31 @@ type StyledMuiGridProps = MuiDataGridProps & {
     onRefresh?: () => any,
     disabledMassiveDefSelector?: boolean,
     hiddenMassiveDefSelector?: boolean,
+    onDragEnd?: boolean,
+}
+
+export const DndMuiGrid = (props) => {
+    const {onDragEnd, ...other} = props
+    const dndEnabled = onDragEnd != null && !other?.readOnly
+
+    const additionalColumns:any[] = useMemo(()=> [
+        ...props.columns,
+        {
+            renderCell: () => <DraggableGridRowHandler />,
+            flex: 0.1
+        }
+    ], [props.columns])
+
+    if (!dndEnabled) return <StyledMuiGrid {...other}/>;
+
+    return <DndContext onDragEnd={onDragEnd}><StyledMuiGrid
+        {...other}
+        rowActionsColumnIndex={-1}
+        columns={additionalColumns}
+        slots={{
+            row: DraggableGridRow as GridSlots['row'],
+        }}
+    /></DndContext>;
 }
 
 const StyledMuiGrid = (props:StyledMuiGridProps) => {
@@ -143,7 +170,7 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
 
     // Applica word wrap a totes les columnes
     const columnsWithWordWrap = useMemo(()=>{
-        return columns.map((col:any) => ({
+        return columns.filter((col:any) => !col?.hidden).map((col:any) => ({
             ...col,
             flex: col.flex ?? 1,
             cellClassName: 'cell-with-wrap',

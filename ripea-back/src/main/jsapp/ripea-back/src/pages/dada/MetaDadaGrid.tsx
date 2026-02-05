@@ -2,7 +2,7 @@ import {useMuiDataGridApiRef, useResourceApiService} from "reactlib";
 import * as builder from '../../util/springFilterUtils';
 import {useDadaActions} from "./details/DadaActions.tsx";
 import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
-import {useEffect, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import {MultiplicitatStyled} from "../contingut/details/MetaExpedient.tsx";
 import {Typography} from "@mui/material";
 import useDataGrid from "./details/DataGrid.tsx";
@@ -57,7 +57,7 @@ const MetaDadaGrid = (props: any) => {
         }
     }, [isReady]);
 
-    const columns = [
+    const columns = useMemo(() => [
         {
             field: 'nom',
             flex: 0.7,
@@ -84,7 +84,7 @@ const MetaDadaGrid = (props: any) => {
                 ));
             },
         }
-    ]
+    ], [dades]);
 
     const {actions, components} = useDadaActions(entity, refresh);
     const {handleOpen, content} = useDataGrid(entity, refresh)

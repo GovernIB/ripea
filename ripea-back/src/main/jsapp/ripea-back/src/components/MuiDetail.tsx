@@ -3,14 +3,14 @@ import React, { ReactNode } from "react";
 import {Grid} from "@mui/material";
 import Load from "./Load.tsx";
 
-export const FieldData = ({ label, field, children, ...other }: any) => {
+export const FieldData = ({ label, field, renderCell = (formattedValue:any) => formattedValue,  children, ...other }: any) => {
     const { entity, getField } = useMuiDetailContext()
     const f = getField(field);
     const value = f?.options?.[entity?.[field]] ?? entity?.[field];
 
     return (
         <ContenidoData title={label ?? (f?.label ?? field)} {...other}>
-            {children ?? (value?.description ?? value)}
+            {children ?? (renderCell(value?.description ?? value))}
         </ContenidoData>
     );
 };

@@ -17,7 +17,7 @@ import Load from "../../components/Load.tsx";
 import Iframe from "../../components/Iframe.tsx";
 import {useFluxFinalitzatSession} from "../../components/SseClient.tsx";
 import {useMetaDocumentActions} from "./details/MetaDocumentActions.tsx";
-import LinkButton from "../../components/LinkButton.tsx";
+import LinkIcon from "../../components/LinkIcon.tsx";
 
 const useFluxActions = () => {
     const {
@@ -228,7 +228,7 @@ const MetaDocumentGrid = () => {
     }
 
     const {actions} = useMetaDocumentActions(refresh);
-    const columns = [
+    const columns = useMemo(() => [
         {
             field: 'codi',
             flex: 1,
@@ -247,7 +247,7 @@ const MetaDocumentGrid = () => {
             headerName: '',
             flex: 0.5,
             sortable: false,
-            renderCell: (params:any) => <LinkButton
+            renderCell: (params:any) => <LinkIcon
                 aria-label="key" 
                 color="inherit"
                 title={t('page.metaDada.plural')}
@@ -256,9 +256,9 @@ const MetaDocumentGrid = () => {
                 <Badge badgeContent={params?.row?.numMetadades} color="primary" showZero>
                     <Typography sx={{fontSize: '1rem', paddingRight: '10px'}}>{t('page.metaDada.plural')}</Typography>
                 </Badge>
-            </LinkButton>
+            </LinkIcon>
         },
-    ]
+    ], [t]);
 
     return <GridPage disableMargins>
         <CardPage title={t('page.user.menu.documents')}>

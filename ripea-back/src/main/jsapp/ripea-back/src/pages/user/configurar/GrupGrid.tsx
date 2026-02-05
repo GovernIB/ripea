@@ -7,7 +7,7 @@ import {Grid, Icon, Badge} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
-import LinkButton from "../../../components/LinkButton.tsx";
+import LinkIcon from "../../../components/LinkIcon.tsx";
 
 const GrupFilterForm = () => {
     return <>
@@ -66,7 +66,7 @@ const columns:any[] = [
         headerName: '',
         sortable: false,
         flex: 0.25,
-        renderCell: (params:any) => <LinkButton
+        renderCell: (params:any) => <LinkIcon
             aria-label="key"
             color="inherit"
             title="Permisos"
@@ -75,7 +75,7 @@ const columns:any[] = [
             <Badge badgeContent={params?.row?.numPermisos} color="primary" showZero>
                 <Icon>key</Icon>
             </Badge>
-        </LinkButton>
+        </LinkIcon>
     }
 ]
 

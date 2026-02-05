@@ -30,6 +30,7 @@ public class MetaExpedientTascaResourceServiceImpl extends BaseMutableResourceSe
     @PostConstruct
     public void init() {
     	register(MetaExpedientTascaResource.PERSPECTIVE_COUNT_VALIDACIONS,	new CountValidacionsTascaPerspectiveApplicator());
+    	register(MetaExpedientTascaResource.PERSPECTIVE_REVISIO_ESTAT,	new RevisioEstatPerspectiveApplicator());
     }
 	
     protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
@@ -49,6 +50,15 @@ public class MetaExpedientTascaResourceServiceImpl extends BaseMutableResourceSe
 		@Override
 		public void applySingle(String code, MetaExpedientTascaResourceEntity entity, MetaExpedientTascaResource resource) throws PerspectiveApplicationException {
 			resource.setNumValidacio(metaExpedientTascaValidacioResourceRepository.countByMetaExpedientTascaId(entity.getId()));
+		}
+    }
+
+    private class RevisioEstatPerspectiveApplicator implements PerspectiveApplicator<MetaExpedientTascaResourceEntity, MetaExpedientTascaResource> {
+		@Override
+		public void applySingle(String code, MetaExpedientTascaResourceEntity entity, MetaExpedientTascaResource resource) throws PerspectiveApplicationException {
+            if (entity.getMetaExpedient() != null) {
+                resource.setMetaExpedientRevisioEstat(entity.getMetaExpedient().getRevisioEstat());
+            }
 		}
     }
 

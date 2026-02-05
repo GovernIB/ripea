@@ -5,8 +5,10 @@ import * as builder from "../../../../util/springFilterUtils.ts";
 import {useBaseAppContext, useFormContext, useMuiDataGridApiRef, useResourceApiService} from "reactlib";
 import GridFormField from "../../../../components/GridFormField.tsx";
 import {StyledPrioritat} from "../../../expedient/ExpedientGrid.tsx";
-import LinkButton from "../../../../components/LinkButton.tsx";
+import LinkIcon from "../../../../components/LinkIcon.tsx";
 import { StyledBadge } from "../../../../components/StyledBadge.tsx";
+import {useMemo} from "react";
+import useMetaExpTascaDetail from "./details/MetaExpTascaDetail.tsx";
 
 const useActions = (refresh?: () => void) => {
     const {t} = useTranslation();
@@ -101,7 +103,7 @@ const columns = [
         headerName: '',
         sortable: false,
         flex: 0.25,
-        renderCell: (params:any) => <LinkButton
+        renderCell: (params:any) => <LinkIcon
             aria-label="key"
             color="inherit"
             title="Validacions"
@@ -110,10 +112,10 @@ const columns = [
             <Badge badgeContent={params?.row?.numValidacio} color="primary" showZero>
                 <Icon>checklist</Icon>
             </Badge>
-        </LinkButton>
+        </LinkIcon>
     },
 ]
-export const MetaExpedientTascaGrid = ({ entity, onRowCountChange } :any) => {
+export const MetaExpedientTascaGrid = ({ entity, onRowCountChange, readOnly } :any) => {
     const {t} = useTranslation()
     const apiRef = useMuiDataGridApiRef();
 
@@ -122,7 +124,15 @@ export const MetaExpedientTascaGrid = ({ entity, onRowCountChange } :any) => {
     }
 
     const {active, desactive} = useActions(refresh)
-    const actions = [
+    const {apiIsReady, handleOpen, dialog} = useMetaExpTascaDetail()
+    const actions = useMemo(() => readOnly ?[
+        {
+            label: t('page.metaExpedient.action.consultar.label'),
+            icon: "search",
+            showInMenu: false,
+            onClick: handleOpen,
+        },
+    ]:[
         {
             label: t('common.update'),
             icon: "edit",
@@ -149,9 +159,9 @@ export const MetaExpedientTascaGrid = ({ entity, onRowCountChange } :any) => {
             showInMenu: true,
             clickTriggerDelete: true,
         },
-    ]
+    ], [t, readOnly, apiIsReady]);
 
-    return <StyledMuiGrid
+    return <><StyledMuiGrid
         apiRef={apiRef}
         resourceName={'metaExpedientTascaResource'}
         popupEditUpdateActive
@@ -173,5 +183,6 @@ export const MetaExpedientTascaGrid = ({ entity, onRowCountChange } :any) => {
             updateSuccess: 'page.metaExpedientTasca.action.update.ok',
             deleteSuccess: 'page.metaExpedientTasca.action.delete.ok',
         }}
-    />
+        readOnly={readOnly}
+    />{dialog}</>
 }

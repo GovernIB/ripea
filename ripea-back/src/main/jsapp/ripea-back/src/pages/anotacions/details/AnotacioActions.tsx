@@ -143,8 +143,7 @@ const useAnotacioActions = (refresh?: () => void) => {
     const { t } = useTranslation();
     const navigate = useNavigate();
 
-    const { value: user } = useUserSession();
-    const isRolActualAdmin = user?.rolActual == 'IPA_ADMIN';
+    const { rol } = useUserSession();
 
     const { canviEstatDistribucio } = useActions(refresh)
     const {handleShow: handleRebutjar, content: contentRebutjar} = useRebutjar(refresh)
@@ -177,7 +176,7 @@ const useAnotacioActions = (refresh?: () => void) => {
             icon: "edit",
             showInMenu: true,
             clickShowUpdateDialog: true,
-            hidden: (row:any) => row?.estat != 'PENDENT' || row?.pendentCanviEstatDistribucio || !isRolActualAdmin,
+            hidden: (row:any) => row?.estat != 'PENDENT' || row?.pendentCanviEstatDistribucio || !rol?.isAdmin,
         },
         {
             label: t('page.expedient.title'),
@@ -191,7 +190,7 @@ const useAnotacioActions = (refresh?: () => void) => {
             icon: "turn_right",
             showInMenu: true,
             onClick: canviEstatDistribucio,
-            hidden: (row:any) => !row?.pendentCanviEstatDistribucio || !isRolActualAdmin,
+            hidden: (row:any) => !row?.pendentCanviEstatDistribucio || !rol?.isAdmin,
         },
     ];
 

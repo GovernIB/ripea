@@ -37,7 +37,7 @@ const Accions = (props:any) => {
         {
             label: t('common.detail'),
             icon: 'info',
-            showInMenu: false, // <-- Esto lo muestra como botón directo en la fila
+            showInMenu: false,
             onClick: handleOpen,
         }
     ]

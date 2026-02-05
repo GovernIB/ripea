@@ -6,7 +6,7 @@ import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
 import {Alert, Badge, Chip, Grid, Icon, MenuItem} from "@mui/material";
 import GridFormField from "../../components/GridFormField.tsx";
 import {MetaExpedientComment} from "../CommentDialog.tsx";
-import LinkButton from "../../components/LinkButton.tsx";
+import LinkIcon from "../../components/LinkIcon.tsx";
 import {formatDate} from "../../util/dateUtils.ts";
 import {useMetaExpedientActions} from "./details/MetaExpedientActions.tsx";
 import {MetaExpedientFilter} from "./MetaExpedientFilter.tsx";
@@ -121,7 +121,7 @@ const MetaExpedientGrid = () => {
 
     const {t} = useTranslation();
     const navigate = useNavigate();
-    const {value: user} = useUserSession();
+    const {value: user, rol} = useUserSession();
     const [springFilter, setSpringFilter] = useState<string>();
     const apiRef = useMuiDataGridApiRef();
 
@@ -153,7 +153,7 @@ const MetaExpedientGrid = () => {
             headerName: '',
             sortable: false,
             flex: 0.25,
-            renderCell: (params:any) => <LinkButton
+            renderCell: (params:any) => <LinkIcon
                 aria-label="key"
                 color="inherit"
                 title="Permisos"
@@ -162,7 +162,7 @@ const MetaExpedientGrid = () => {
                 <Badge badgeContent={params?.row?.numPermisos} color="primary" showZero>
                     <Icon>key</Icon>
                 </Badge>
-            </LinkButton>
+            </LinkIcon>
         },
         {
             field: 'id',
@@ -206,7 +206,7 @@ const MetaExpedientGrid = () => {
                 </MenuItem>}
             </MenuButton>
         },
-    ].filter((col:any)=>!col?.hidden), [user?.sessionScope?.isRevisioActiva])
+    ].filter((col:any)=>!col?.hidden), [t, user?.sessionScope?.isRevisioActiva])
 
     const {handleShow: handleImportRolsac, content: contentImportRolsac} = useImportRolsac(apiRef)
     const {handleShow: handleImportFitxer, content: contentImportFitxer} = useImportFitxer(refresh)
@@ -232,7 +232,7 @@ const MetaExpedientGrid = () => {
                 resourceName={"metaExpedientResource"}
                 popupEditFormDialogResourceTitle={t('page.metaExpedient.title')}
                 popupEditCreateActive
-                popupEditFormContent={<MetaExpedientForm isAdmin={user?.rolActual === 'IPA_ADMIN'}/>}
+                popupEditFormContent={<MetaExpedientForm isAdmin={rol?.isAdmin}/>}
                 columns={additionalColumns}
                 filter={springFilter}
                 perspectives={perspectives}
