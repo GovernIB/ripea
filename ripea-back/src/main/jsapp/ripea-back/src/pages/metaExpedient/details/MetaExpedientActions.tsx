@@ -108,8 +108,8 @@ export const useActions = (refresh?: () => void) => {
 
     const canviDisseny = (id:any) => {
         apiAction(id, { code: 'CANVIAR_DISSENY' })
-            .then((result) => {
-                iniciaDescargaJSON(result);
+            .then(() => {
+                refresh?.();
                 temporalMessageShow(null, t('page.metaExpedient.action.canviDisseny.ok'), 'success');
             })
             .catch((error) => {
@@ -117,7 +117,18 @@ export const useActions = (refresh?: () => void) => {
             });
     }
 
-    return {active, desactive, exportar, defecte, llevarDefecte, crearRegla, toogleRegla, desvincularGrup, canviDisseny}
+    const canviPendent = (id:any) => {
+        apiAction(id, { code: 'CANVIAR_PENDENT' })
+            .then(() => {
+                refresh?.();
+                temporalMessageShow(null, t('page.metaExpedient.action.canviPendent.ok'), 'success');
+            })
+            .catch((error) => {
+                temporalMessageShow(null, error.message, 'error');
+            });
+    }
+
+    return {active, desactive, exportar, defecte, llevarDefecte, crearRegla, toogleRegla, desvincularGrup, canviDisseny, canviPendent}
 }
 
 export const useMetaExpedientActions = (refresh?: () => void) => {
@@ -128,7 +139,7 @@ export const useMetaExpedientActions = (refresh?: () => void) => {
     const {handleOpen: handleDetail, dialog: dialogDetail} = useMetaExpedientDetail();
     const {handleShow: handleCanviEstat, content: contentCanviEstat} = useCanviEstatRevisio(refresh);
     const {handleOpen: handleRegla, dialog: dialogRegla} = useReglaDistribucio(refresh);
-    const {active, desactive, exportar, canviDisseny} = useActions(refresh)
+    const {active, desactive, exportar, canviDisseny, canviPendent} = useActions(refresh)
 
     const actions = [
         {
@@ -199,14 +210,21 @@ export const useMetaExpedientActions = (refresh?: () => void) => {
             icon: "check",
             showInMenu: true,
             onClick: canviDisseny,
-            hidden: !rol?.isOrganAdmin,
+            hidden: (row:any) => !(rol?.isOrganAdmin && row?.revisioEstat == 'REVISAT'),
         },
+        {
+            label: t('page.metaExpedient.action.canviPendent.label'),
+            icon: "check",
+            showInMenu: true,
+            onClick: canviPendent,
+            hidden: (row:any) => !(rol?.isOrganAdmin && row?.revisioEstat == 'DISSENY'),
+        },        
         {
             label: t('common.delete'),
             icon: "delete",
             showInMenu: true,
             clickTriggerDelete: true,
-            hidden: !rol?.isAdmin,
+            hidden: (row:any) => !(rol?.isAdmin || (row?.revisioEstat != 'REVISAT' && rol?.isOrganAdmin)),
         },
     ]
 

@@ -37,7 +37,7 @@ export const MetaExpedientElements = () => {
     },[apiIsReady, id])
 
     const readOnly = useMemo(() => {
-        return !(rol.isAdmin || (rol.isOrganAdmin && metaExpedient?.revisioEstat == 'REVISAT') || rol.isDissenyOrgan)
+        return !(rol.isAdmin || (rol.isOrganAdmin && metaExpedient?.revisioEstat != 'REVISAT') || rol.isDissenyOrgan)
     }, [metaExpedient, rol])
 
     const [numMetaDocument, setNumMetaDocument] = useState<number>();

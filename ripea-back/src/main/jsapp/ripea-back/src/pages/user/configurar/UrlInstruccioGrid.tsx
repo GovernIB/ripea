@@ -24,11 +24,11 @@ const perspectives = [""];
 const columns = [
     {
         field: 'codi',
-        flex: 1,
+        flex: 0.5,
     },
     {
         field: 'nom',
-        flex: 1,
+        flex: 0.5,
     },
     {
         field: 'descripcio',

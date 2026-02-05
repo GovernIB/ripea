@@ -44,6 +44,7 @@ import es.caib.ripea.persistence.repository.MetaExpedientRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
+import es.caib.ripea.service.helper.ApplicationHelper;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.DistribucioReglaHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
@@ -108,6 +109,7 @@ import es.caib.ripea.service.intf.model.UsuariResource;
 import es.caib.ripea.service.intf.resourceservice.MetaExpedientResourceService;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.permission.ExtendedPermission;
+import io.micrometer.core.instrument.Timer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -135,6 +137,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 	private final MessageHelper messageHelper;
 	private final PermisosHelper permisosHelper;
 	private final ExcepcioLogHelper excepcioLogHelper;
+	private final ApplicationHelper applicationHelper;
 
     @PostConstruct
     public void init() {
@@ -154,6 +157,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
     	register(MetaExpedientResource.ACTION_CREAR_REGLA_CODE,		new CrearReglaActionExecutor());
     	register(MetaExpedientResource.ACTION_UPDATE_ROLSAC_CODE,	new ActualitzarProcedimentsRolsacActionExecutor());
     	register(MetaExpedientResource.ACTION_CANVIAR_DISSENY_CODE,	new CanviarEstatDissenyActionExecutor());
+    	register(MetaExpedientResource.ACTION_CANVIAR_PENDENT_CODE,	new CanviarEstatPendentActionExecutor());
     	
     	register(MetaExpedientResource.ACTION_IMPORT_ROLSAC_CODE, 	new ImportarRolsacActionExecutor());
     	register(MetaExpedientResource.ACTION_IMPORT_FITXER_CODE,	new ImportarFitxerActionExecutor());
@@ -301,21 +305,29 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
     
 	@Override
 	public MetaExpedientResource create(MetaExpedientResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
+		Timer.Sample sample = Timer.start(applicationHelper.getMeterRegistry());
+		try {
 		
-		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
-		OrganGestorEntity ogEntity	= organGestorRepository.findByEntitatIdAndCodi(entitatEntity.getId(), configHelper.getOrganActualCodi());
-		
-		MetaExpedientEntity metaExpedientEntity = metaExpedientHelper.create(
-				entitatEntity.getId(),
-				metaExpedientresourceToDto(resource),
-				configHelper.getRolActual(),
-				ogEntity!=null?ogEntity.getId():null);
-		
-		resource.setId(metaExpedientEntity.getId());
-		resource.setCrearReglaDistribucioError(metaExpedientEntity.getCrearReglaDistribucioError());
-		resource.setCrearReglaDistribucioEstat(metaExpedientEntity.getCrearReglaDistribucioEstat());
-		
-		return resource;
+			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+			OrganGestorEntity ogEntity	= organGestorRepository.findByEntitatIdAndCodi(entitatEntity.getId(), configHelper.getOrganActualCodi());
+			
+			MetaExpedientEntity metaExpedientEntity = metaExpedientHelper.create(
+					entitatEntity.getId(),
+					metaExpedientresourceToDto(resource),
+					configHelper.getRolActual(),
+					ogEntity!=null?ogEntity.getId():null);
+			
+			resource.setId(metaExpedientEntity.getId());
+			resource.setCrearReglaDistribucioError(metaExpedientEntity.getCrearReglaDistribucioError());
+			resource.setCrearReglaDistribucioEstat(metaExpedientEntity.getCrearReglaDistribucioEstat());
+			
+			applicationHelper.stopTimer(sample, "METRICS@Subsystem_Procediment.create", "resultado", "exito");
+			
+			return resource;
+		} catch (Exception ex) {
+			applicationHelper.stopTimer(sample, "METRICS@Subsystem_Procediment.create", "resultado", "error");
+			throw new ActionExecutionException(getResourceClass(), null, "MetaExpedientResource.create", ex.getMessage(), ex);
+		}
 	}
 	
 	@Override
@@ -1346,6 +1358,28 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 				return "{\"resultado\": \"OK\"}";
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/metaExpedient/"+entity.getId()+"/DesVincularGrupActionExecutor", e);
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, messageHelper.getMessage("message.common.action.error")+": "+e.getMessage());
+			}
+		}
+    }
+    
+    private class CanviarEstatPendentActionExecutor implements ActionExecutor<MetaExpedientResourceEntity, Serializable, Serializable> {
+
+		@Override
+		public void onChange(Serializable id, Serializable previous, String fieldName, Object fieldValue,
+				Map<String, AnswerValue> answers, String[] previousFieldNames, Serializable target) {}
+
+		@Override
+		public Serializable exec(String code, MetaExpedientResourceEntity entity, Serializable params) throws ActionExecutionException {
+			try {
+				String entitatActualCodi = configHelper.getEntitatActualCodi();
+				EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true,false);
+				String organActualCodi	 = configHelper.getOrganActualCodi();
+				OrganGestorEntity ogEntity	= organGestorRepository.findByEntitatIdAndCodi(entitat.getId(), organActualCodi);
+				metaExpedientHelper.canviarRevisioAPendentEnviarEmail(entitat.getId(), entity.getId(), ogEntity!=null?ogEntity.getId():null);
+				return "{\"resultado\": \"OK\"}";
+			} catch (Exception e) {
+				excepcioLogHelper.addExcepcio("/metaExpedient/"+entity.getId()+"/CanviarEstatPendentActionExecutor", e);
 				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, messageHelper.getMessage("message.common.action.error")+": "+e.getMessage());
 			}
 		}

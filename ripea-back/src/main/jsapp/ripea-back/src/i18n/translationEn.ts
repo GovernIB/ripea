@@ -1443,6 +1443,10 @@ const translationEn = {
                 export: {
                     ok: "Procedure exported successfully",
                 },
+                canviPendent: {
+                    label: "Mark as pending of review",
+                    ok: "Procedure marked as pending of review",
+                },                
                 canviDisseny: {
                     label: "Mark as design process",
                     ok: "Procedure marked as a design process",

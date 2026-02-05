@@ -1443,10 +1443,14 @@ const translationCa = {
                 export: {
                     ok: "Procediment exportat correctament",
                 },
+                canviPendent: {
+                    label: "Marcar com a pendent de revisió",
+                    ok: "Procediment marcat com a pendent de revisió",
+                },
                 canviDisseny: {
                     label: "Marcar com a procés de disseny",
                     ok: "Procediment marcat com a procés de disseny",
-                },
+                },                
                 actualize: {
                     title: "Actualització de procediments",
                     label: "Actualitzar desde ROLSAC",

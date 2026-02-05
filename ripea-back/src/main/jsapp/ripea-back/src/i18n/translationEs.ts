@@ -1443,6 +1443,10 @@ const translationEs = {
                 export: {
                     ok: "Procedimiento exportado correctamente",
                 },
+                canviPendent: {
+                    label: "Marcar como pendiente de revisión",
+                    ok: "Procedimiento marcado como pendiente de revisión",
+                },                
                 canviDisseny: {
                     label: "Marcar como proceso de diseño",
                     ok: "Procedimiento marcado como proceso de diseño",
