@@ -446,7 +446,7 @@ body {
                     </c:when>
                     <c:when test="${isRolActualDissenyadorOrgan}">
                 		<c:if test="${sessionScope['SessionHelper.isReactActiu']!=null  && sessionScope['SessionHelper.isReactActiu']}">
-							<a href="<c:url value="/reactapp/expedient"/>"	class="btn btn-default"><span class="fa fa-folder" style="color: #004b99;"></span> <spring:message code="decorator.menu.expedients.new"/></a>
+							<a href="<c:url value="/reactapp/metaExpedient"/>"	class="btn btn-default"><span class="fa fa-folder" style="color: #004b99;"></span> <spring:message code="decorator.menu.expedients.new"/></a>
 						</c:if>                    
                         <a href="<c:url value="/metaExpedient"></c:url>"class="btn btn-primary"><spring:message code="decorator.menu.metaexpedients"/></a>
                         <a href="<c:url value="/grup"></c:url>"class="btn btn-primary"><spring:message code="decorator.menu.grups"/></a>

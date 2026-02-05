@@ -1,6 +1,6 @@
 import {GridPage, useBaseAppContext, useFormContext, useMuiDataGridApiRef, useResourceApiService} from "reactlib";
 import StyledMuiGrid from "../../../../components/StyledMuiGrid.tsx";
-import {Grid, Icon} from "@mui/material";
+import {Grid, Icon, Divider} from "@mui/material";
 import {useTranslation} from "react-i18next";
 import GridFormField from "../../../../components/GridFormField.tsx";
 import * as builder from "../../../../util/springFilterUtils.ts";
@@ -132,6 +132,11 @@ const MetaExpedientTascaValidacioGrid = () => {
             onClick: desactive,
             hidden: (row:any) => !row?.activa,
         },
+        {
+            label: <Divider sx={{px: 1, width: '100%'}} color={"none"}/>,
+            showInMenu: true,
+            disabled: true,
+        },        
         {
             label: t('common.delete'),
             icon: "delete",

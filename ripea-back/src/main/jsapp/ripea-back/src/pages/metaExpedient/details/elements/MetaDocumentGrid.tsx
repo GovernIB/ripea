@@ -90,7 +90,7 @@ export const MetaDocumentGrid = ({ entity, onRowCountChange, readOnly } :any) =>
     ], [t])
 
     const {apiIsReady, handleOpen, dialog} = useMetaDocumentDetail()
-    const {marcarDefecte, desmarcarDefecte, reordering} = useActions(refresh)
+    const {reordering} = useActions(refresh)
     const {actions} = useMetaDocumentActions(refresh);
     const additionalActions = useMemo(() => readOnly ?[
         {
@@ -100,21 +100,7 @@ export const MetaDocumentGrid = ({ entity, onRowCountChange, readOnly } :any) =>
             onClick: handleOpen,
         },
     ]:[
-        ...actions,
-        {
-            label: t('page.metaDocument.action.default.label'),
-            icon: "check_box",
-            showInMenu: true,
-            onClick: marcarDefecte,
-            hidden: (row:any) => row?.perDefecte,
-        },
-        {
-            label: t('page.metaDocument.action.undefault.label'),
-            icon: "close",
-            showInMenu: true,
-            onClick: desmarcarDefecte,
-            hidden: (row:any) => !row?.perDefecte,
-        },
+        ...actions
     ], [t, actions, readOnly, apiIsReady])
 
     const handleDragEnd = (event: any) => {

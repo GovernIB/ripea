@@ -153,6 +153,7 @@ const MetaExpedientGrid = () => {
             headerName: '',
             sortable: false,
             flex: 0.25,
+            hidden: !rol?.isAdmin,
             renderCell: (params:any) => <LinkIcon
                 aria-label="key"
                 color="inherit"

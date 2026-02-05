@@ -1,5 +1,6 @@
 import {useTranslation} from "react-i18next";
 import {useBaseAppContext, useResourceApiService} from "reactlib";
+import {Divider} from "@mui/material";
 
 export const useActions = (refresh?: () => void) => {
     const {t} = useTranslation();
@@ -66,7 +67,7 @@ export const useActions = (refresh?: () => void) => {
 
 export const useMetaDocumentActions = (refresh?: () => void) => {
     const {t} = useTranslation()
-    const {active, desactive} = useActions(refresh)
+    const {marcarDefecte, desmarcarDefecte, active, desactive} = useActions(refresh)
     const actions = [
         {
             label: t('common.update'),
@@ -87,6 +88,25 @@ export const useMetaDocumentActions = (refresh?: () => void) => {
             showInMenu: true,
             onClick: desactive,
             hidden: (row:any) => !row?.actiu,
+        },
+        {
+            label: t('page.metaDocument.action.default.label'),
+            icon: "check_box",
+            showInMenu: true,
+            onClick: marcarDefecte,
+            hidden: (row:any) => row?.perDefecte || !row?.metaExpedient,
+        },
+        {
+            label: t('page.metaDocument.action.undefault.label'),
+            icon: "close",
+            showInMenu: true,
+            onClick: desmarcarDefecte,
+            hidden: (row:any) => !row?.perDefecte || !row?.metaExpedient,
+        },        
+        {
+            label: <Divider sx={{px: 1, width: '100%'}} color={"none"}/>,
+            showInMenu: true,
+            disabled: true,
         },
         {
             label: t('common.delete'),

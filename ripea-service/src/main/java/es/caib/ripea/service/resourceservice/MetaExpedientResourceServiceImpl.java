@@ -174,14 +174,12 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
     protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
 
         String entitatActualCodi = configHelper.getEntitatActualCodi();
-//        String organActualCodi	 = configHelper.getOrganActualCodi();
         String rolActual		 = configHelper.getRolActual();
-//        String organGestorFiltre = Utils.getValorCampFiltre("organGestor.id", currentSpringFilter);
         
 		boolean isAdmin = "IPA_ADMIN".equals(rolActual);
 		boolean isAdminOrgan = "IPA_ORGAN_ADMIN".equals(rolActual);
 		boolean isDissenyador = "IPA_DISSENY".equals(rolActual);
-//		boolean usuariFiltreOrgan = isAdminOrgan || isDissenyador;
+		boolean isRevisor = "IPA_REVISIO".equals(rolActual);
         
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true,false);
     	Map<String, String> mapaNamedQueries =  Utils.namedQueriesToMap(namedQueries);
@@ -248,7 +246,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
         				entitat.getId(),
         				ogEntity.getId(),
         				hasPermisAdminComu);
-        	} else if (isAdmin) {
+        	} else if (isAdmin || isRevisor) {
         		MetaExpedientFiltreDto filtre = new MetaExpedientFiltreDto();
         		metaExpPermesos = metaExpedientHelper.findByEntitat(entitat, filtre, Utils.sensePaginacio(), null).getContent();
         		procsPermesosIds = metaExpedientEntityToListLong(metaExpPermesos);

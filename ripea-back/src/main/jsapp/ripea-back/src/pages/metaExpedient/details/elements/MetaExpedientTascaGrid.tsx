@@ -1,5 +1,5 @@
 import {useTranslation} from "react-i18next";
-import {Badge, Grid, Icon} from "@mui/material";
+import {Badge, Grid, Icon, Divider} from "@mui/material";
 import StyledMuiGrid from "../../../../components/StyledMuiGrid.tsx";
 import * as builder from "../../../../util/springFilterUtils.ts";
 import {useBaseAppContext, useFormContext, useMuiDataGridApiRef, useResourceApiService} from "reactlib";
@@ -153,6 +153,11 @@ export const MetaExpedientTascaGrid = ({ entity, onRowCountChange, readOnly } :a
             onClick: desactive,
             hidden: (row:any) => !row?.activa,
         },
+        {
+            label: <Divider sx={{px: 1, width: '100%'}} color={"none"}/>,
+            showInMenu: true,
+            disabled: true,
+        },        
         {
             label: t('common.delete'),
             icon: "delete",

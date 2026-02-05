@@ -2,7 +2,7 @@ import {useTranslation} from "react-i18next";
 import {GridPage, useBaseAppContext, useFormContext, useMuiDataGridApiRef, useResourceApiService} from "reactlib";
 import {CardPage} from "../../../../components/CardData.tsx";
 import {DndMuiGrid} from "../../../../components/StyledMuiGrid.tsx";
-import {Grid, Icon} from "@mui/material";
+import {Grid, Icon, Divider} from "@mui/material";
 import * as builder from "../../../../util/springFilterUtils.ts";
 import {useParams} from "react-router-dom";
 import GridFormField from "../../../../components/GridFormField.tsx";
@@ -145,6 +145,11 @@ export const MetDadaGrid = ({ id, enviable = false, readOnly, ...other }: any) =
             onClick: desactive,
             hidden: (row:any) => !row?.activa,
         },
+        {
+            label: <Divider sx={{px: 1, width: '100%'}} color={"none"}/>,
+            showInMenu: true,
+            disabled: true,
+        },        
         {
             label: t('common.delete'),
             icon: "delete",

@@ -1,4 +1,4 @@
-import {Grid, Icon} from "@mui/material";
+import {Grid, Icon, Divider} from "@mui/material";
 import GridFormField from "../../../../components/GridFormField.tsx";
 import {StyledBadge} from "../../../../components/StyledBadge.tsx";
 import {useTranslation} from "react-i18next";
@@ -84,6 +84,11 @@ export const MetaExpedientEstatGrid = ({ entity, onRowCountChange, readOnly } :a
             icon: "edit",
             showInMenu: true,
             clickShowUpdateDialog: true,
+        },
+        {
+            label: <Divider sx={{px: 1, width: '100%'}} color={"none"}/>,
+            showInMenu: true,
+            disabled: true,
         },
         {
             label: t('common.delete'),

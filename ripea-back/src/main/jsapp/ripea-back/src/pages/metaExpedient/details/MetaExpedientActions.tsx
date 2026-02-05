@@ -6,6 +6,7 @@ import {useBaseAppContext, useResourceApiService} from "reactlib";
 import {iniciaDescargaJSON} from "../../expedient/details/CommonActions.tsx";
 import useReglaDistribucio from "../actions/ReglaDistribucio.tsx";
 import useExpedientDialog from "./ExpedientDialog.tsx";
+import {Divider} from "@mui/material";
 
 export const useActions = (refresh?: () => void) => {
     const {t} = useTranslation()
@@ -175,14 +176,14 @@ export const useMetaExpedientActions = (refresh?: () => void) => {
             icon: "business_center",
             showInMenu: true,
             onClick: handleExpedient,
-            hidden: rol?.isRevisor,
+            hidden: rol?.isRevisor || rol?.isDissenyOrgan,
         },
         {
             label: t('common.export'),
             icon: "upload",
             showInMenu: true,
             onClick: exportar,
-            hidden: !(rol?.isAdmin || rol?.isOrganAdmin),
+            hidden: !(rol?.isAdmin || rol?.isOrganAdmin || rol?.isDissenyOrgan),
         },
         {
             label: t('page.metaExpedient.action.regla.label'),
@@ -196,14 +197,14 @@ export const useMetaExpedientActions = (refresh?: () => void) => {
             icon: "check",
             showInMenu: true,
             onClick: active,
-            hidden: (row:any) => row?.actiu || !(rol?.isAdmin || rol?.isOrganAdmin),
+            hidden: (row:any) => row?.actiu || !(rol?.isAdmin || rol?.isOrganAdmin || rol?.isDissenyOrgan),
         },
         {
             label: t('page.metaExpedient.action.desactivar.label'),
             icon: "cancel",
             showInMenu: true,
             onClick: desactive,
-            hidden: (row:any) => !row?.actiu || !(rol?.isAdmin || rol?.isOrganAdmin),
+            hidden: (row:any) => !row?.actiu || !(rol?.isAdmin || rol?.isOrganAdmin || rol?.isDissenyOrgan),
         },
         {
             label: t('page.metaExpedient.action.canviDisseny.label'),
@@ -218,13 +219,19 @@ export const useMetaExpedientActions = (refresh?: () => void) => {
             showInMenu: true,
             onClick: canviPendent,
             hidden: (row:any) => !(rol?.isOrganAdmin && row?.revisioEstat == 'DISSENY'),
-        },        
+        },
+        {
+            label: <Divider sx={{px: 1, width: '100%'}} color={"none"}/>,
+            showInMenu: true,
+            disabled: true,
+            hidden: (row:any) => !(rol?.isAdmin || rol?.isDissenyOrgan || (row?.revisioEstat != 'REVISAT' && rol?.isOrganAdmin)),
+        },
         {
             label: t('common.delete'),
             icon: "delete",
             showInMenu: true,
             clickTriggerDelete: true,
-            hidden: (row:any) => !(rol?.isAdmin || (row?.revisioEstat != 'REVISAT' && rol?.isOrganAdmin)),
+            hidden: (row:any) => !(rol?.isAdmin || rol?.isDissenyOrgan || (row?.revisioEstat != 'REVISAT' && rol?.isOrganAdmin)),
         },
     ]
 
