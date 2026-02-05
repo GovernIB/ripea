@@ -21,14 +21,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import es.caib.comanda.model.v1.estadistica.DimensioDesc;
-import es.caib.comanda.model.v1.estadistica.EstadistiquesInfo;
-import es.caib.comanda.model.v1.estadistica.IndicadorDesc;
-import es.caib.comanda.model.v1.estadistica.RegistresEstadistics;
+import es.caib.comanda.model.server.monitoring.DimensioDesc;
+import es.caib.comanda.model.server.monitoring.EstadistiquesInfo;
+import es.caib.comanda.model.server.monitoring.IndicadorDesc;
+import es.caib.comanda.model.server.monitoring.RegistresEstadistics;
 import es.caib.ripea.api.interna.config.BaseApiInternaSecurityConfig;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.SegonPlaService;
+import es.caib.ripea.service.intf.utils.DateUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
@@ -54,12 +55,12 @@ public class EstadistiquesController extends BaseApiInternaController {
     	autenticaAmbRolTothom();
         List<DimensioDesc> dimensions  = segonPlaService.getDimensionsInfo();
         List<IndicadorDesc> indicadors = segonPlaService.getIndicadorsInfo();
-        return EstadistiquesInfo.builder()
+        return new EstadistiquesInfo()
         		.codi(aplicacioService.propertyFindByNom(PropertyConfig.COMANDA_APP_CODI))
-        		.data(Calendar.getInstance().getTime())
+        		.data(DateUtil.toOffsetDateTime(Calendar.getInstance().getTime()))
         		.versio(getManifestInfo().getVersion())
         		.dimensions(dimensions)
-        		.indicadors(indicadors).build();
+        		.indicadors(indicadors);
     }
 	
     @GetMapping("/estadistiques")

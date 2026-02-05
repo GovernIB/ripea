@@ -24,8 +24,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import es.caib.comanda.model.v1.log.FitxerContingut;
-import es.caib.comanda.model.v1.log.FitxerInfo;
+import es.caib.comanda.model.server.monitoring.FitxerContingut;
+import es.caib.comanda.model.server.monitoring.FitxerInfo;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.ContingutHelper;
 import es.caib.ripea.service.intf.dto.FitxerDto;
@@ -61,10 +61,10 @@ public class LogServiceImpl implements LogService {
                     var dataCreacio = sdf.format(new Date(attr.creationTime().toMillis()));
                     var dataModificacio = sdf.format(new Date(attr.lastModifiedTime().toMillis()));
                     var mida = file.length();
-                    var fitxer = FitxerInfo.builder().nom(file.getName())
+                    var fitxer = new FitxerInfo().nom(file.getName())
                                                      .mida(mida)
                                                      .dataCreacio(dataCreacio)
-                                                     .dataModificacio(dataModificacio).build();
+                                                     .dataModificacio(dataModificacio);
                     fitxers.add(fitxer);
                 } catch (Exception ex) {
                 	logger.error("Errror obtenint la info del fitxer " + f.getFileName(), ex);
@@ -82,12 +82,12 @@ public class LogServiceImpl implements LogService {
         	
             var directoriPath = configHelper.getConfig("es.caib.ripea.plugin.fitxer.logs.path");
             if (!Utils.hasValue(directoriPath)) {
-                return FitxerContingut.builder().build();
+                return new FitxerContingut();
             }
             
             var filePath = Paths.get(directoriPath, nom);
             if (!Files.exists(filePath) || !Files.isRegularFile(filePath)) {
-                return FitxerContingut.builder().build();
+                return new FitxerContingut();
             }
             
             var file = filePath.toFile();
@@ -105,15 +105,15 @@ public class LogServiceImpl implements LogService {
 			
 			byte[] contingut = baos.toByteArray();
 			
-            return FitxerContingut.builder().contingut(contingut)
+            return new FitxerContingut().contingut(contingut)
                                             .mimeType("application/zip")
                                             .nom(file.getName())
                                             .dataCreacio(dataCreacio)
                                             .dataModificacio(dataModificacio)
-                                            .mida(contingut.length).build();
+                                            .mida((long)contingut.length);
         } catch (IOException ex) {
         	logger.error("Error reading file content for " + nom, ex);
-            return FitxerContingut.builder().build();
+            return new FitxerContingut();
         }
 	}
 

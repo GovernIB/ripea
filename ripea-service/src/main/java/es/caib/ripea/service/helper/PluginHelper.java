@@ -51,10 +51,10 @@ import com.itextpdf.text.pdf.AcroFields;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.tool.xml.Experimental;
 
-import es.caib.comanda.model.v1.avis.Avis;
-import es.caib.comanda.model.v1.avis.AvisTipus;
-import es.caib.comanda.model.v1.tasca.Tasca;
-import es.caib.comanda.model.v1.tasca.TascaEstat;
+import es.caib.comanda.model.management.Avis;
+import es.caib.comanda.model.management.AvisTipus;
+import es.caib.comanda.model.management.Tasca;
+import es.caib.comanda.model.management.TascaEstat;
 import es.caib.distribucio.rest.client.integracio.domini.Annex;
 import es.caib.distribucio.rest.client.integracio.domini.AnotacioRegistreEntrada;
 import es.caib.distribucio.rest.client.integracio.domini.AnotacioRegistreId;
@@ -6273,16 +6273,16 @@ public class PluginHelper {
 		
 		String redireccio = configHelper.getConfig(PropertyConfig.BASE_URL) + "/contingut/"+tascaEntity.getExpedient().getId()+"?tascaId="+tascaEntity.getId()+"&origenTasques=true";
 		
-		Tasca resultat = Tasca.builder()
+		Tasca resultat = new Tasca()
                 .appCodi(configHelper.getConfig(PropertyConfig.COMANDA_APP_CODI))
                 .entornCodi(configHelper.getConfig(PropertyConfig.COMANDA_PLUGIN_ENTORN))
                 .identificador(tascaEntity.getId() + "")
                 .tipus(tascaEntity.getMetaTasca().getNom())
                 .nom(tascaEntity.getTitol())
                 .descripcio(tascaEntity.getObservacions())
-                .dataInici(tascaEntity.getDataInici())
-                .dataFi(tascaEntity.getDataFi())
-                .dataCaducitat(tascaEntity.getDataLimit())
+                .dataInici(DateUtil.toOffsetDateTime(tascaEntity.getDataInici()))
+                .dataFi(DateUtil.toOffsetDateTime(tascaEntity.getDataFi()))
+                .dataCaducitat(DateUtil.toOffsetDateTime(tascaEntity.getDataLimit()))
                 .estat(estatTascaComanda)
                 .estatDescripcio(tascaEntity.getMotiuRebuig())
                 .numeroExpedient(tascaEntity.getExpedient().getCodi()+"/"+tascaEntity.getExpedient().getNumero()+"/"+tascaEntity.getExpedient().getAny())
@@ -6290,25 +6290,24 @@ public class PluginHelper {
                 .usuarisAmbPermis(usuarisAmbPermis)
                 .grupsAmbPermis(null)
                 .redireccio(new URL(redireccio))
-                .grup(tascaEntity.getExpedient().getGrup()!=null?tascaEntity.getExpedient().getGrup().getCodi():null)
-                .build();
+                .grup(tascaEntity.getExpedient().getGrup()!=null?tascaEntity.getExpedient().getGrup().getCodi():null);
 		return resultat;
 	}
 	
 	private Avis anotacioRipeaToAvisComanda(ExpedientPeticioEntity expedientPeticioEntity) throws Exception {
 		String redireccio = configHelper.getConfig(PropertyConfig.BASE_URL) + "/expedientPeticio/"+expedientPeticioEntity.getId();
-		Avis avisComanda = Avis.builder()
+		
+		Avis avisComanda = new Avis()
                 .appCodi(configHelper.getConfig(PropertyConfig.COMANDA_APP_CODI))
-                .dataFi(DateUtil.addToDate(expedientPeticioEntity.getDataAlta(), Calendar.MONTH, 3))
-                .dataInici(expedientPeticioEntity.getDataAlta())
+                .dataFi(DateUtil.toOffsetDateTime(DateUtil.addToDate(expedientPeticioEntity.getDataAlta(), Calendar.MONTH, 3)))
+                .dataInici(DateUtil.toOffsetDateTime(expedientPeticioEntity.getDataAlta()))
                 .entornCodi(configHelper.getConfig(PropertyConfig.COMANDA_PLUGIN_ENTORN))
                 .identificador("ANOTACIO#"+expedientPeticioEntity.getId())
                 .nom(expedientPeticioEntity.getRegistre().getExtracte())
                 .descripcio(expedientPeticioEntity.getObservacions())
                 .tipus(AvisTipus.INFO)
                 .redireccio(new URL(redireccio))
-                .grup(expedientPeticioEntity.getGrup()!=null?expedientPeticioEntity.getGrup().getCodi():null)
-                .build();
+                .grup(expedientPeticioEntity.getGrup()!=null?expedientPeticioEntity.getGrup().getCodi():null);
 		return avisComanda;
 	}
 	
@@ -6366,18 +6365,17 @@ public class PluginHelper {
 		}		
 		
 		String redireccio = configHelper.getConfig(PropertyConfig.BASE_URL) + "/contingut/"+expedient.getId();
-		Avis avisComanda = Avis.builder()
+		Avis avisComanda = new Avis()
                 .appCodi(configHelper.getConfig(PropertyConfig.COMANDA_APP_CODI))
-                .dataFi(dataFi)
-                .dataInici(Calendar.getInstance().getTime())
+                .dataFi(DateUtil.toOffsetDateTime(dataFi))
+                .dataInici(DateUtil.toOffsetDateTime(Calendar.getInstance().getTime()))
                 .entornCodi(configHelper.getConfig(PropertyConfig.COMANDA_PLUGIN_ENTORN))
                 .identificador(expedient.getId()+"")
                 .nom(expedient.getCodi()+"/"+expedient.getNumero()+"/"+expedient.getAny())
                 .descripcio(descripcio)
                 .tipus(AvisTipus.ALERTA)
                 .redireccio(new URL(redireccio))
-                .grup(expedient.getGrup()!=null?expedient.getGrup().getCodi():null)
-                .build();
+                .grup(expedient.getGrup()!=null?expedient.getGrup().getCodi():null);
 		return avisComanda;
 	}
 	

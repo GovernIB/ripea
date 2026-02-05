@@ -26,16 +26,14 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import es.caib.comanda.model.v1.estadistica.Dimensio;
-import es.caib.comanda.model.v1.estadistica.DimensioDesc;
-import es.caib.comanda.model.v1.estadistica.Fet;
-import es.caib.comanda.model.v1.estadistica.Format;
-import es.caib.comanda.model.v1.estadistica.GenericDimensio;
-import es.caib.comanda.model.v1.estadistica.GenericFet;
-import es.caib.comanda.model.v1.estadistica.IndicadorDesc;
-import es.caib.comanda.model.v1.estadistica.RegistreEstadistic;
-import es.caib.comanda.model.v1.estadistica.RegistresEstadistics;
-import es.caib.comanda.model.v1.estadistica.Temps;
+import es.caib.comanda.model.server.monitoring.Dimensio;
+import es.caib.comanda.model.server.monitoring.DimensioDesc;
+import es.caib.comanda.model.server.monitoring.Fet;
+import es.caib.comanda.model.server.monitoring.Format;
+import es.caib.comanda.model.server.monitoring.IndicadorDesc;
+import es.caib.comanda.model.server.monitoring.RegistreEstadistic;
+import es.caib.comanda.model.server.monitoring.RegistresEstadistics;
+import es.caib.comanda.model.server.monitoring.Temps;
 import es.caib.ripea.persistence.entity.ContingutEntity;
 import es.caib.ripea.persistence.entity.DocumentEntity;
 import es.caib.ripea.persistence.entity.EmailPendentEnviarEntity;
@@ -574,19 +572,19 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 		List<DimensioDesc> resultat = new ArrayList<DimensioDesc>();
 		
 		List<String> valorsEntitats = entitatRepository.findCodisOrdenats();
-		DimensioDesc dimEntitat = new DimensioDesc("ENT", "Entitats", "Entitats de RIPEA", valorsEntitats);
+		DimensioDesc dimEntitat = new DimensioDesc("ENT", "Entitats").descripcio("Entitats de RIPEA").valors(valorsEntitats);
 		resultat.add(dimEntitat);
 		
 		List<String> valorsProcediments = metaExpedientRepository.findCodisOrdenats();
-		DimensioDesc dimProcediment = new DimensioDesc("PRO", "Procediment", "Procediments de RIPEA", valorsProcediments);
+		DimensioDesc dimProcediment = new DimensioDesc("PRO", "Procediment").descripcio("Procediments de RIPEA").valors(valorsProcediments);
 		resultat.add(dimProcediment);
 		
 		List<String> valorsOGs = organGestorRepository.findCodisOrdenats();
-		DimensioDesc dimOrgansGestors = new DimensioDesc("ORG", "Òrgan gestor", "Òrgans gestors de RIPEA", valorsOGs);
+		DimensioDesc dimOrgansGestors = new DimensioDesc("ORG", "Òrgan gestor").descripcio("Òrgans gestors de RIPEA").valors(valorsOGs);
 		resultat.add(dimOrgansGestors);
 		
 		List<String> valorsUsuaris = usuariRepository.findCodisOrdenats();
-		DimensioDesc dimUsuari = new DimensioDesc("USU", "Usuaris", "Usuaris de RIPEA", valorsUsuaris);
+		DimensioDesc dimUsuari = new DimensioDesc("USU", "Usuaris").descripcio("Usuaris de RIPEA").valors(valorsUsuaris);
 		resultat.add(dimUsuari);
 		
 		return resultat;
@@ -598,59 +596,59 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 		
 		List<IndicadorDesc> resultat = new ArrayList<IndicadorDesc>();
 		
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.ANO_NOVES.toString(),				"Anotacions noves", "Noves anotacions rebudes a RIPEA", Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.ANO_NOVES_TOTAL.toString(),		"Anotacions noves totals", "Total noves anotacions rebudes a RIPEA", Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.ANO_PROCESSADES.toString(),		"Anotacions processades", "Anotacions processades a RIPEA", Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.ANO_PROCESSADES_TOTAL.toString(),	"Anotacions processades totals", "Anotacions processades totals a RIPEA", Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.ANO_REBUTJADES.toString(), 		"Anotacions rebutjades", "Anotacions rebutjades a RIPEA", Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.ANO_REBUTJADES_TOTAL.toString(),	"Anotacions rebutjades totals", "Anotacions rebutjades totals a RIPEA", Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.ANO_NOVES.toString(), "Anotacions noves").descripcio("Noves anotacions rebudes a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.ANO_NOVES_TOTAL.toString(), "Anotacions noves totals").descripcio("Total noves anotacions rebudes a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.ANO_PROCESSADES.toString(), "Anotacions processades").descripcio("Anotacions processades a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.ANO_PROCESSADES_TOTAL.toString(), "Anotacions processades totals").descripcio("Anotacions processades totals a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.ANO_REBUTJADES.toString(), "Anotacions rebutjades").descripcio("Anotacions rebutjades a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.ANO_REBUTJADES_TOTAL.toString(), "Anotacions rebutjades totals").descripcio("Anotacions rebutjades totals a RIPEA").format(Format.LONG));
 		
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.EXP_OBERTS.toString(), 		"Expedients oberts", "Expedients oberts a RIPEA", Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.EXP_OBERTS_TOTAL.toString(),	"Expedients oberts totals", "Expedients oberts totals a RIPEA", Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.EXP_TANCATS.toString(), 		"Expedients tancats", "Expedients tancats a RIPEA", Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.EXP_TANCATS_TOTAL.toString(),	"Expedients tancats totals", "Expedients tancats totals a RIPEA", Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.EXP_OBERTS.toString(), "Expedients oberts").descripcio("Expedients oberts a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.EXP_OBERTS_TOTAL.toString(), "Expedients oberts totals").descripcio("Expedients oberts totals a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.EXP_TANCATS.toString(), "Expedients tancats").descripcio("Expedients tancats a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.EXP_TANCATS_TOTAL.toString(), "Expedients tancats totals").descripcio("Expedients tancats totals a RIPEA").format(Format.LONG));
 		
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.FIR_FIRMADES.toString(), 			"Env. portafib firmats", "Env. portafib firmats a RIPEA", Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.FIR_FIRMADES_TOTAL.toString(), 	"Env. portafib firmats totals", "Env. portafib firmats totals a RIPEA", Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.FIR_INICIADES.toString(), 			"Env. portafib iniciats", "Env. portafib iniciats a RIPEA", Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.FIR_INICIADES_TOTAL.toString(), 	"Env. portafib iniciats totals", "Env. portafib iniciats totals a RIPEA", Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.FIR_PARCIALS.toString(), 			"Env. portafib parcials", "Env. portafib parcials a RIPEA", Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.FIR_PARCIALS_TOTAL.toString(), 	"Env. portafib parcials totals", "Env. portafib parcials totals a RIPEA", Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.FIR_PAUSADES.toString(), 			"Env. portafib pausats", "Env. portafib pausats a RIPEA", Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.FIR_PAUSADES_TOTAL.toString(), 	"Env. portafib pausats totals", "Env. portafib pausats totals a RIPEA", Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.FIR_REBUTJADES.toString(), 		"Env. portafib rebutjats", "Env. portafib rebutjats a RIPEA", Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.FIR_REBUTJADES_TOTAL.toString(),	"Env. portafib rebutjats totals", "Env. portafib rebutjats totals a RIPEA", Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.FIR_FIRMADES.toString(), "Env. portafib firmats").descripcio("Env. portafib firmats a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.FIR_FIRMADES_TOTAL.toString(), "Env. portafib firmats totals").descripcio("Env. portafib firmats totals a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.FIR_INICIADES.toString(), "Env. portafib iniciats").descripcio("Env. portafib iniciats a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.FIR_INICIADES_TOTAL.toString(), "Env. portafib iniciats totals").descripcio("Env. portafib iniciats totals a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.FIR_PARCIALS.toString(), "Env. portafib parcials").descripcio("Env. portafib parcials a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.FIR_PARCIALS_TOTAL.toString(), "Env. portafib parcials totals").descripcio("Env. portafib parcials totals a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.FIR_PAUSADES.toString(), "Env. portafib pausats").descripcio("Env. portafib pausats a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.FIR_PAUSADES_TOTAL.toString(), "Env. portafib pausats totals").descripcio("Env. portafib pausats totals a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.FIR_REBUTJADES.toString(), "Env. portafib rebutjats").descripcio("Env. portafib rebutjats a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.FIR_REBUTJADES_TOTAL.toString(), "Env. portafib rebutjats totals").descripcio("Env. portafib rebutjats totals a RIPEA").format(Format.LONG));
+
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.NOT_ENVIADES.toString(), "Notificacions enviades").descripcio("Notificacions enviades a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.NOT_ENVIADES_TOTAL.toString(), "Notificacions enviades totals").descripcio("Notificacions enviades totals a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.NOT_PENDENTS.toString(), "Notificacions pendents").descripcio("Notificacions pendents a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.NOT_PENDENTS_TOTAL.toString(), "Notificacions pendents totals").descripcio("Notificacions pendents totals a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.NOT_REGISTRADES.toString(), "Notificacions registrades").descripcio("Notificacions pendents totals a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.NOT_REGISTRADES_TOTAL.toString(), "Notificacions registrades totals").descripcio("Notificacions registrades a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.NOT_FINALITZADES.toString(), "Notificacions finalitzades").descripcio("Notificacions finalitzades a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.NOT_FINALITZADES_TOTAL.toString(), "Notificacions finalitzades totals").descripcio("Notificacions finalitzades totals a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.NOT_PROCESSADES.toString(), "Notificacions processades").descripcio("Notificacions processades a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.NOT_PROCESSADES_TOTAL.toString(), "Notificacions processades totals").descripcio("Notificacions processades totals a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.NOT_ENVIADES_ERROR.toString(), "Notificacions enviades amb error").descripcio("Notificacions enviades amb error a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.NOT_ENVIADES_ERROR_TOTAL.toString(), "Notificacions enviades amb error totals").descripcio("Notificacions enviades amb error totals a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.NOT_FINALITZADES_ERROR.toString(), "Notificacions finalitzades amb error").descripcio("Notificacions finalitzades amb error a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.NOT_FINALITZADES_ERROR_TOTAL.toString(), "Notificacions finalitzades amb error totals").descripcio("Notificacions finalitzades amb error totals a RIPEA").format(Format.LONG));
+
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.PIN_ENVIAMENTS.toString(), "Enviaments PINBAL").descripcio("Enviaments PINBAL a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.PIN_ENVIAMENTS_TOTAL.toString(), "Enviaments PINBAL totals").descripcio("Enviaments PINBAL totals a RIPEA").format(Format.LONG));
 		
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.NOT_ENVIADES.toString(), 					"Notificacions enviades", "Notificacions enviades a RIPEA", Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.NOT_ENVIADES_TOTAL.toString(), 			"Notificacions enviades totals", "Notificacions enviades totals a RIPEA", Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.NOT_PENDENTS.toString(), 					"Notificacions pendents", "Notificacions pendents a RIPEA", Format.LONG));		
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.NOT_PENDENTS_TOTAL.toString(), 			"Notificacions pendents totals", "Notificacions pendents totals a RIPEA", Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.NOT_REGISTRADES.toString(), 				"Notificacions registrades", "Notificacions registrades a RIPEA", Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.NOT_REGISTRADES_TOTAL.toString(), 			"Notificacions registrades totals", "Notificacions registrades totals a RIPEA", Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.NOT_FINALITZADES.toString(), 				"Notificacions finalitzades", "Notificacions finalitzades a RIPEA", Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.NOT_FINALITZADES_TOTAL.toString(), 		"Notificacions finalitzades totals", "Notificacions finalitzades totals a RIPEA", Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.NOT_PROCESSADES.toString(), 				"Notificacions processades", "Notificacions processades a RIPEA", Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.NOT_PROCESSADES_TOTAL.toString(), 			"Notificacions processades totals", "Notificacions processades totals a RIPEA", Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.NOT_ENVIADES_ERROR.toString(), 			"Notificacions enviades amb error", "Notificacions enviades amb error a RIPEA", Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.NOT_ENVIADES_ERROR_TOTAL.toString(), 		"Notificacions enviades amb error totals", "Notificacions enviades amb error totals a RIPEA", Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.NOT_FINALITZADES_ERROR.toString(), 		"Notificacions finalitzades amb error", "Notificacions finalitzades amb error a RIPEA", Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.NOT_FINALITZADES_ERROR_TOTAL.toString(),	"Notificacions finalitzades amb error totals", "Notificacions finalitzades amb error totals a RIPEA", Format.LONG));
-		
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.PIN_ENVIAMENTS.toString(), 		"Enviaments PINBAL", "Enviaments PINBAL a RIPEA", Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.PIN_ENVIAMENTS_TOTAL.toString(),	"Enviaments PINBAL totals", "Enviaments PINBAL totals a RIPEA", Format.LONG));
-		
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_AGAFADES.toString(),			"Tasques afagades", "Tasques afagades a RIPEA", Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_AGAFADES_TOTAL.toString(), 	"Tasques afagades totals", "Tasques afagades totals a RIPEA", Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_CANCELADES.toString(),			"Tasques cancelades", "Tasques cancelades a RIPEA", Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_CANCELADES_TOTAL.toString(),	"Tasques cancelades totals", "Tasques cancelades totals a RIPEA", Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_FINALITZADES.toString(), 		"Tasques finalitzades", "Tasques finalitzades a RIPEA", Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_FINALITZADES_TOTAL.toString(),	"Tasques finalitzades totals", "Tasques finalitzades totals a RIPEA", Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_INICIADES.toString(), 			"Tasques iniciades", "Tasques iniciades a RIPEA", Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_INICIADES_TOTAL.toString(), 	"Tasques iniciades totals", "Tasques iniciades totals a RIPEA", Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_PENDENTS.toString(), 			"Tasques pendents", "Tasques pendents a RIPEA", Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_PENDENTS_TOTAL.toString(),		"Tasques pendents totals", "Tasques pendents totals a RIPEA", Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_REBUTJADES.toString(), 		"Tasques rebutjades", "Tasques rebutjades a RIPEA", Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_REBUTJADES_TOTAL.toString(),	"Tasques rebutjades totals", "Tasques rebutjades totals a RIPEA", Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_AGAFADES.toString(), "Tasques afagades").descripcio("Tasques afagades a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_AGAFADES_TOTAL.toString(), "Tasques afagades totals").descripcio("Tasques afagades totals a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_CANCELADES.toString(), "Tasques cancelades").descripcio("Tasques cancelades a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_CANCELADES_TOTAL.toString(), "Tasques cancelades totals").descripcio("Tasques cancelades totals a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_FINALITZADES.toString(), "Tasques finalitzades").descripcio("Tasques finalitzades a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_FINALITZADES_TOTAL.toString(), "Tasques finalitzades totals").descripcio("Tasques finalitzades totals a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_INICIADES.toString(), "Tasques iniciades").descripcio("Tasques iniciades a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_INICIADES_TOTAL.toString(), "Tasques iniciades totals").descripcio("Tasques iniciades totals a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_PENDENTS.toString(), "Tasques pendents").descripcio("Tasques pendents a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_PENDENTS_TOTAL.toString(), "Tasques pendents totals").descripcio("Tasques pendents totals a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_REBUTJADES.toString(), "Tasques rebutjades").descripcio("Tasques rebutjades a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_REBUTJADES_TOTAL.toString(), "Tasques rebutjades totals").descripcio("Tasques rebutjades totals a RIPEA").format(Format.LONG));
 		
 		return resultat;
 	}
@@ -672,88 +670,88 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 //		ZonedDateTime zonedDateTime = date.atTime(LocalTime.NOON).atZone(ZoneId.systemDefault());
 //		Date dateJava = Date.from(zonedDateTime.toInstant());
 		
-		Temps temps = new Temps(dateJava);
+		Temps temps = new Temps(DateUtil.toOffsetDateTime(dateJava));
 
 		List<RegistreEstadistic> fets = new ArrayList<RegistreEstadistic>();
 		List<ExplotacioFetsEntity> dadesByTemps = explotacioFetsRepository.findByTemps(tempsDia);
 		
 		if (dadesByTemps!=null) {
 			for (ExplotacioFetsEntity efe: dadesByTemps) {
-				RegistreEstadistic reComanda = new RegistreEstadistic(
-						toDimensioComanda(efe.getDimensio()),
-						toFetComanda(efe));
+				RegistreEstadistic reComanda = new RegistreEstadistic()
+						.dimensions(toDimensioComanda(efe.getDimensio()))
+						.fets(toFetComanda(efe));
 				fets.add(reComanda);
 			}
 		}
 		
-		RegistresEstadistics resultat = new RegistresEstadistics(temps, fets);
+		RegistresEstadistics resultat = new RegistresEstadistics(temps).fets(fets);
 		return resultat;
 	}
 
 	private List<Dimensio> toDimensioComanda(ExplotacioDimensioEntity ede) {
 		List<Dimensio> resultat = new ArrayList<Dimensio>();
-		resultat.add(new GenericDimensio("ENT", ede.getEntitatCodi()));
-		resultat.add(new GenericDimensio("PRO", ede.getProcedimentCodi()));
-		resultat.add(new GenericDimensio("ORG", ede.getOrganCodi()));
-		resultat.add(new GenericDimensio("USU", ede.getUsuari()!=null?ede.getUsuari().getCodi():null));
+		resultat.add(new Dimensio().codi("ENT").valor(ede.getEntitatCodi()));
+		resultat.add(new Dimensio().codi("PRO").valor(ede.getProcedimentCodi()));
+		resultat.add(new Dimensio().codi("ORG").valor(ede.getOrganCodi()));
+		resultat.add(new Dimensio().codi("USU").valor(ede.getUsuari()!=null?ede.getUsuari().getCodi():null));
 		return resultat;		
 	}
 	
 	private List<Fet> toFetComanda(ExplotacioFetsEntity efe) {
 		List<Fet> resultat = new ArrayList<Fet>();
-		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.ANO_NOVES.toString(), efe.getAnotacionsNoves()!=null?efe.getAnotacionsNoves().doubleValue():null));
-		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.ANO_NOVES_TOTAL.toString(), efe.getAnotacionsNovesTotal()!=null?efe.getAnotacionsNovesTotal().doubleValue():null));
-		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.ANO_PROCESSADES.toString(), efe.getAnotacionsProcessades()!=null?efe.getAnotacionsProcessades().doubleValue():null));
-		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.ANO_PROCESSADES_TOTAL.toString(), efe.getAnotacionsProcessadesTotal()!=null?efe.getAnotacionsProcessadesTotal().doubleValue():null));
-		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.ANO_REBUTJADES.toString(), efe.getAnotacionsRebutjades()!=null?efe.getAnotacionsRebutjades().doubleValue():null));
-		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.ANO_REBUTJADES_TOTAL.toString(), efe.getAnotacionsRebutjadesTotal()!=null?efe.getAnotacionsRebutjadesTotal().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.ANO_NOVES.toString()).valor(efe.getAnotacionsNoves()!=null?efe.getAnotacionsNoves().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.ANO_NOVES_TOTAL.toString()).valor(efe.getAnotacionsNovesTotal()!=null?efe.getAnotacionsNovesTotal().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.ANO_PROCESSADES.toString()).valor(efe.getAnotacionsProcessades()!=null?efe.getAnotacionsProcessades().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.ANO_PROCESSADES_TOTAL.toString()).valor(efe.getAnotacionsProcessadesTotal()!=null?efe.getAnotacionsProcessadesTotal().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.ANO_REBUTJADES.toString()).valor(efe.getAnotacionsRebutjades()!=null?efe.getAnotacionsRebutjades().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.ANO_REBUTJADES_TOTAL.toString()).valor(efe.getAnotacionsRebutjadesTotal()!=null?efe.getAnotacionsRebutjadesTotal().doubleValue():null));
 		
-		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.EXP_OBERTS.toString(), efe.getExpedientsOberts()!=null?efe.getExpedientsOberts().doubleValue():null));
-		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.EXP_OBERTS_TOTAL.toString(), efe.getExpedientsObertsTotal()!=null?efe.getExpedientsObertsTotal().doubleValue():null));
-		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.EXP_TANCATS.toString(), efe.getExpedientsTancats()!=null?efe.getExpedientsTancats().doubleValue():null));
-		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.EXP_TANCATS_TOTAL.toString(), efe.getExpedientsTancatsTotal()!=null?efe.getExpedientsTancatsTotal().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.EXP_OBERTS.toString()).valor(efe.getExpedientsOberts()!=null?efe.getExpedientsOberts().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.EXP_OBERTS_TOTAL.toString()).valor(efe.getExpedientsObertsTotal()!=null?efe.getExpedientsObertsTotal().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.EXP_TANCATS.toString()).valor(efe.getExpedientsTancats()!=null?efe.getExpedientsTancats().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.EXP_TANCATS_TOTAL.toString()).valor(efe.getExpedientsTancatsTotal()!=null?efe.getExpedientsTancatsTotal().doubleValue():null));
 		
-		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.FIR_FIRMADES.toString(), efe.getFirmesFirmades()!=null?efe.getFirmesFirmades().doubleValue():null));
-		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.FIR_FIRMADES_TOTAL.toString(), efe.getFirmesFirmadesTotal()!=null?efe.getFirmesFirmadesTotal().doubleValue():null));
-		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.FIR_INICIADES.toString(), efe.getFirmesIniciades()!=null?efe.getFirmesIniciades().doubleValue():null));
-		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.FIR_INICIADES_TOTAL.toString(), efe.getFirmesIniciadesTotal()!=null?efe.getFirmesIniciadesTotal().doubleValue():null));
-		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.FIR_PARCIALS.toString(), efe.getFirmesParcials()!=null?efe.getFirmesParcials().doubleValue():null));
-		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.FIR_PARCIALS_TOTAL.toString(), efe.getFirmesParcialsTotal()!=null?efe.getFirmesParcialsTotal().doubleValue():null));
-		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.FIR_PAUSADES.toString(), efe.getFirmesPausades()!=null?efe.getFirmesPausades().doubleValue():null));
-		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.FIR_PAUSADES_TOTAL.toString(), efe.getFirmesPausadesTotal()!=null?efe.getFirmesPausadesTotal().doubleValue():null));
-		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.FIR_REBUTJADES.toString(), efe.getFirmesRebutjades()!=null?efe.getFirmesRebutjades().doubleValue():null));
-		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.FIR_REBUTJADES_TOTAL.toString(), efe.getFirmesRebutjadesTotal()!=null?efe.getFirmesRebutjadesTotal().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.FIR_FIRMADES.toString()).valor(efe.getFirmesFirmades()!=null?efe.getFirmesFirmades().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.FIR_FIRMADES_TOTAL.toString()).valor(efe.getFirmesFirmadesTotal()!=null?efe.getFirmesFirmadesTotal().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.FIR_INICIADES.toString()).valor(efe.getFirmesIniciades()!=null?efe.getFirmesIniciades().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.FIR_INICIADES_TOTAL.toString()).valor(efe.getFirmesIniciadesTotal()!=null?efe.getFirmesIniciadesTotal().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.FIR_PARCIALS.toString()).valor(efe.getFirmesParcials()!=null?efe.getFirmesParcials().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.FIR_PARCIALS_TOTAL.toString()).valor(efe.getFirmesParcialsTotal()!=null?efe.getFirmesParcialsTotal().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.FIR_PAUSADES.toString()).valor(efe.getFirmesPausades()!=null?efe.getFirmesPausades().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.FIR_PAUSADES_TOTAL.toString()).valor(efe.getFirmesPausadesTotal()!=null?efe.getFirmesPausadesTotal().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.FIR_REBUTJADES.toString()).valor(efe.getFirmesRebutjades()!=null?efe.getFirmesRebutjades().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.FIR_REBUTJADES_TOTAL.toString()).valor(efe.getFirmesRebutjadesTotal()!=null?efe.getFirmesRebutjadesTotal().doubleValue():null));
 		
-		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.NOT_ENVIADES.toString(), efe.getNotificacionsEnviades()!=null?efe.getNotificacionsEnviades().doubleValue():null));
-		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.NOT_ENVIADES_TOTAL.toString(), efe.getNotificacionsEnviadesTotal()!=null?efe.getNotificacionsEnviadesTotal().doubleValue():null));
-		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.NOT_PENDENTS.toString(), efe.getNotificacionsPendents()!=null?efe.getNotificacionsPendents().doubleValue():null));
-		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.NOT_PENDENTS_TOTAL.toString(), efe.getNotificacionsPendentsTotal()!=null?efe.getNotificacionsPendentsTotal().doubleValue():null));
-		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.NOT_REGISTRADES.toString(), efe.getNotificacionsRegistrades()!=null?efe.getNotificacionsRegistrades().doubleValue():null));
-		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.NOT_REGISTRADES_TOTAL.toString(), efe.getNotificacionsRegistradesTotal()!=null?efe.getNotificacionsRegistradesTotal().doubleValue():null));
-		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.NOT_FINALITZADES.toString(), efe.getNotificacionsFinalitzades()!=null?efe.getNotificacionsFinalitzades().doubleValue():null));
-		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.NOT_FINALITZADES_TOTAL.toString(), efe.getNotificacionsFinalitzadesTotal()!=null?efe.getNotificacionsFinalitzadesTotal().doubleValue():null));
-		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.NOT_PROCESSADES.toString(), efe.getNotificacionsProcessades()!=null?efe.getNotificacionsProcessades().doubleValue():null));
-		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.NOT_PROCESSADES_TOTAL.toString(), efe.getNotificacionsProcessadesTotal()!=null?efe.getNotificacionsProcessadesTotal().doubleValue():null));
-		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.NOT_ENVIADES_ERROR.toString(), efe.getNotificacionsEnvError()!=null?efe.getNotificacionsEnvError().doubleValue():null));
-		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.NOT_ENVIADES_ERROR_TOTAL.toString(), efe.getNotificacionsEnvErrorTotal()!=null?efe.getNotificacionsEnvErrorTotal().doubleValue():null));
-		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.NOT_FINALITZADES_ERROR.toString(), efe.getNotificacionsFinError()!=null?efe.getNotificacionsFinError().doubleValue():null));
-		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.NOT_FINALITZADES_ERROR_TOTAL.toString(), efe.getNotificacionsFinErrorTotal()!=null?efe.getNotificacionsFinErrorTotal().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.NOT_ENVIADES.toString()).valor(efe.getNotificacionsEnviades()!=null?efe.getNotificacionsEnviades().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.NOT_ENVIADES_TOTAL.toString()).valor(efe.getNotificacionsEnviadesTotal()!=null?efe.getNotificacionsEnviadesTotal().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.NOT_PENDENTS.toString()).valor(efe.getNotificacionsPendents()!=null?efe.getNotificacionsPendents().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.NOT_PENDENTS_TOTAL.toString()).valor(efe.getNotificacionsPendentsTotal()!=null?efe.getNotificacionsPendentsTotal().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.NOT_REGISTRADES.toString()).valor(efe.getNotificacionsRegistrades()!=null?efe.getNotificacionsRegistrades().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.NOT_REGISTRADES_TOTAL.toString()).valor(efe.getNotificacionsRegistradesTotal()!=null?efe.getNotificacionsRegistradesTotal().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.NOT_FINALITZADES.toString()).valor(efe.getNotificacionsFinalitzades()!=null?efe.getNotificacionsFinalitzades().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.NOT_FINALITZADES_TOTAL.toString()).valor(efe.getNotificacionsFinalitzadesTotal()!=null?efe.getNotificacionsFinalitzadesTotal().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.NOT_PROCESSADES.toString()).valor(efe.getNotificacionsProcessades()!=null?efe.getNotificacionsProcessades().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.NOT_PROCESSADES_TOTAL.toString()).valor(efe.getNotificacionsProcessadesTotal()!=null?efe.getNotificacionsProcessadesTotal().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.NOT_ENVIADES_ERROR.toString()).valor(efe.getNotificacionsEnvError()!=null?efe.getNotificacionsEnvError().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.NOT_ENVIADES_ERROR_TOTAL.toString()).valor(efe.getNotificacionsEnvErrorTotal()!=null?efe.getNotificacionsEnvErrorTotal().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.NOT_FINALITZADES_ERROR.toString()).valor(efe.getNotificacionsFinError()!=null?efe.getNotificacionsFinError().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.NOT_FINALITZADES_ERROR_TOTAL.toString()).valor(efe.getNotificacionsFinErrorTotal()!=null?efe.getNotificacionsFinErrorTotal().doubleValue():null));
 		
-		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.PIN_ENVIAMENTS.toString(), efe.getPinbalEnviaments()!=null?efe.getPinbalEnviaments().doubleValue():null));
-		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.PIN_ENVIAMENTS_TOTAL.toString(), efe.getPinbalEnviamentsTotal()!=null?efe.getPinbalEnviamentsTotal().doubleValue():null));		
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.PIN_ENVIAMENTS.toString()).valor(efe.getPinbalEnviaments()!=null?efe.getPinbalEnviaments().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.PIN_ENVIAMENTS_TOTAL.toString()).valor(efe.getPinbalEnviamentsTotal()!=null?efe.getPinbalEnviamentsTotal().doubleValue():null));		
 		
-		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.TAS_AGAFADES.toString(), efe.getTasquesAgafades()!=null?efe.getTasquesAgafades().doubleValue():null));
-		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.TAS_AGAFADES_TOTAL.toString(), efe.getTasquesAgafadesTotal()!=null?efe.getTasquesAgafadesTotal().doubleValue():null));
-		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.TAS_CANCELADES.toString(), efe.getTasquesCancelades()!=null?efe.getTasquesCancelades().doubleValue():null));
-		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.TAS_CANCELADES_TOTAL.toString(), efe.getTasquesCanceladesTotal()!=null?efe.getTasquesCanceladesTotal().doubleValue():null));
-		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.TAS_FINALITZADES.toString(), efe.getTasquesFinalitzades()!=null?efe.getTasquesFinalitzades().doubleValue():null));
-		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.TAS_FINALITZADES_TOTAL.toString(), efe.getTasquesFinalitzadesTotal()!=null?efe.getTasquesFinalitzadesTotal().doubleValue():null));
-		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.TAS_INICIADES.toString(), efe.getTasquesIniciades()!=null?efe.getTasquesIniciades().doubleValue():null));
-		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.TAS_INICIADES_TOTAL.toString(), efe.getTasquesIniciadesTotal()!=null?efe.getTasquesIniciadesTotal().doubleValue():null));
-		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.TAS_PENDENTS.toString(), efe.getTasquesPendents()!=null?efe.getTasquesPendents().doubleValue():null));
-		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.TAS_PENDENTS_TOTAL.toString(), efe.getTasquesPendentsTotal()!=null?efe.getTasquesPendentsTotal().doubleValue():null));
-		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.TAS_REBUTJADES.toString(), efe.getTasquesRebutjades()!=null?efe.getTasquesRebutjades().doubleValue():null));
-		resultat.add(new GenericFet(ExplotFetsAmbDimensioDto.FetsEnum.TAS_REBUTJADES_TOTAL.toString(), efe.getTasquesRebutjadesTotal()!=null?efe.getTasquesRebutjadesTotal().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.TAS_AGAFADES.toString()).valor(efe.getTasquesAgafades()!=null?efe.getTasquesAgafades().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.TAS_AGAFADES_TOTAL.toString()).valor(efe.getTasquesAgafadesTotal()!=null?efe.getTasquesAgafadesTotal().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.TAS_CANCELADES.toString()).valor(efe.getTasquesCancelades()!=null?efe.getTasquesCancelades().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.TAS_CANCELADES_TOTAL.toString()).valor(efe.getTasquesCanceladesTotal()!=null?efe.getTasquesCanceladesTotal().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.TAS_FINALITZADES.toString()).valor(efe.getTasquesFinalitzades()!=null?efe.getTasquesFinalitzades().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.TAS_FINALITZADES_TOTAL.toString()).valor(efe.getTasquesFinalitzadesTotal()!=null?efe.getTasquesFinalitzadesTotal().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.TAS_INICIADES.toString()).valor(efe.getTasquesIniciades()!=null?efe.getTasquesIniciades().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.TAS_INICIADES_TOTAL.toString()).valor(efe.getTasquesIniciadesTotal()!=null?efe.getTasquesIniciadesTotal().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.TAS_PENDENTS.toString()).valor(efe.getTasquesPendents()!=null?efe.getTasquesPendents().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.TAS_PENDENTS_TOTAL.toString()).valor(efe.getTasquesPendentsTotal()!=null?efe.getTasquesPendentsTotal().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.TAS_REBUTJADES.toString()).valor(efe.getTasquesRebutjades()!=null?efe.getTasquesRebutjades().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.TAS_REBUTJADES_TOTAL.toString()).valor(efe.getTasquesRebutjadesTotal()!=null?efe.getTasquesRebutjadesTotal().doubleValue():null));
 		
 		return resultat;
 	}

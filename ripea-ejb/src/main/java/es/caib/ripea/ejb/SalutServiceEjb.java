@@ -6,10 +6,10 @@ import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 
-import es.caib.comanda.model.v1.salut.ContextInfo;
-import es.caib.comanda.model.v1.salut.IntegracioInfo;
-import es.caib.comanda.model.v1.salut.SalutInfo;
-import es.caib.comanda.model.v1.salut.SubsistemaInfo;
+import es.caib.comanda.model.server.monitoring.ContextInfo;
+import es.caib.comanda.model.server.monitoring.IntegracioInfo;
+import es.caib.comanda.model.server.monitoring.SalutInfo;
+import es.caib.comanda.model.server.monitoring.SubsistemaInfo;
 import es.caib.ripea.ejb.base.AbstractServiceEjb;
 import es.caib.ripea.service.intf.service.SalutService;
 import lombok.experimental.Delegate;

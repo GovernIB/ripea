@@ -12,20 +12,20 @@ import java.util.concurrent.TimeUnit;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
-import es.caib.comanda.model.v1.salut.ContextInfo;
-import es.caib.comanda.model.v1.salut.EstatSalut;
-import es.caib.comanda.model.v1.salut.EstatSalutEnum;
-import es.caib.comanda.model.v1.salut.InformacioSistema;
-import es.caib.comanda.model.v1.salut.IntegracioApp;
-import es.caib.comanda.model.v1.salut.IntegracioInfo;
-import es.caib.comanda.model.v1.salut.IntegracioPeticions;
-import es.caib.comanda.model.v1.salut.IntegracioSalut;
-import es.caib.comanda.model.v1.salut.Manual;
-import es.caib.comanda.model.v1.salut.MissatgeSalut;
-import es.caib.comanda.model.v1.salut.SalutInfo;
-import es.caib.comanda.model.v1.salut.SubsistemaInfo;
-import es.caib.comanda.model.v1.salut.SubsistemaSalut;
+import es.caib.comanda.model.server.monitoring.ContextInfo;
+import es.caib.comanda.model.server.monitoring.EstatSalut;
+import es.caib.comanda.model.server.monitoring.EstatSalutEnum;
+import es.caib.comanda.model.server.monitoring.InformacioSistema;
+import es.caib.comanda.model.server.monitoring.IntegracioInfo;
+import es.caib.comanda.model.server.monitoring.IntegracioPeticions;
+import es.caib.comanda.model.server.monitoring.IntegracioSalut;
+import es.caib.comanda.model.server.monitoring.Manual;
+import es.caib.comanda.model.server.monitoring.MissatgeSalut;
+import es.caib.comanda.model.server.monitoring.SalutInfo;
+import es.caib.comanda.model.server.monitoring.SubsistemaInfo;
+import es.caib.comanda.model.server.monitoring.SubsistemaSalut;
 import es.caib.comanda.ms.salut.helper.EstatHelper;
+import es.caib.comanda.ms.salut.helper.IntegracioApp;
 import es.caib.comanda.ms.salut.helper.MonitorHelper;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.repository.EntitatRepository;
@@ -39,6 +39,7 @@ import es.caib.ripea.service.intf.dto.MetriquesRipeaInfoDto;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.AvisService;
 import es.caib.ripea.service.intf.service.SalutService;
+import es.caib.ripea.service.intf.utils.DateUtil;
 import io.micrometer.core.instrument.Meter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
@@ -175,7 +176,7 @@ public class SalutServiceImpl implements SalutService{
 		List<IntegracioInfo> integracions = new ArrayList<IntegracioInfo>();
 		integracions.add(new IntegracioInfo(IntegracioApp.PFI.toString(), IntegracioApp.PFI.getNom())); //portafirmes
 		integracions.add(new IntegracioInfo(IntegracioApp.ARX.toString(), IntegracioApp.ARX.getNom())); //Arxiu
-//TODO:	integracions.add(new IntegracioInfo(IntegracioApp.CSV.toString(), IntegracioApp.CSV.getNom())); //ConCSV
+		integracions.add(new IntegracioInfo(IntegracioApp.CSV.toString(), IntegracioApp.CSV.getNom())); //ConCSV
 		integracions.add(new IntegracioInfo(IntegracioApp.GDC.toString(), IntegracioApp.GDC.getNom())); //Gestor documental
 		integracions.add(new IntegracioInfo(IntegracioApp.PBL.toString(), IntegracioApp.PBL.getNom())); //PINBAL
 		integracions.add(new IntegracioInfo(IntegracioApp.DIS.toString(), IntegracioApp.DIS.getNom())); //DISTRIBUCIO
@@ -195,39 +196,29 @@ public class SalutServiceImpl implements SalutService{
 	@Override
 	public List<SubsistemaInfo> getSubsistemes() {
 		List<SubsistemaInfo> subsistemes = new ArrayList<SubsistemaInfo>();
-		subsistemes.add(SubsistemaInfo.builder().codi("SUB_EXP").nom("Tramitació d'expedients").build());
-		subsistemes.add(SubsistemaInfo.builder().codi("SUB_PRC").nom("Gestió de procediments").build());
-		subsistemes.add(SubsistemaInfo.builder().codi("SUB_MAS").nom("Accions massives").build());
-		subsistemes.add(SubsistemaInfo.builder().codi("SUB_CPF").nom("Callback PORTAFIB").build());
-		subsistemes.add(SubsistemaInfo.builder().codi("SUB_CNB").nom("Callback NOTIB").build());
-		subsistemes.add(SubsistemaInfo.builder().codi("SUB_CDI").nom("Callback DISTRIBUCIO").build());
-		subsistemes.add(SubsistemaInfo.builder().codi("SUB_GDO").nom("Gestió documental FileSystem").build());
+		subsistemes.add(new SubsistemaInfo().codi("SUB_EXP").nom("Tramitació d'expedients"));
+		subsistemes.add(new SubsistemaInfo().codi("SUB_PRC").nom("Gestió de procediments"));
+		subsistemes.add(new SubsistemaInfo().codi("SUB_MAS").nom("Accions massives"));
+		subsistemes.add(new SubsistemaInfo().codi("SUB_CPF").nom("Callback PORTAFIB"));
+		subsistemes.add(new SubsistemaInfo().codi("SUB_CNB").nom("Callback NOTIB"));
+		subsistemes.add(new SubsistemaInfo().codi("SUB_CDI").nom("Callback DISTRIBUCIO"));
+		subsistemes.add(new SubsistemaInfo().codi("SUB_GDO").nom("Gestió documental FileSystem"));
 		return subsistemes;
 	}
 
 	@Override
 	public List<ContextInfo> getContexts(String baseUrl) {
         return List.of(
-                ContextInfo.builder()
-                        .codi("BACK")
-                        .nom("Backoffice")
-                        .path(baseUrl + "/ripeaback")
-                        .manuals(List.of(
-                                Manual.builder().nom("Manual d'usuari").path("https://github.com/GovernIB/ripea/raw/ripea-1.0-dev/doc/pdf/01_ripea_manual_usuari.pdf").build(),
-                                Manual.builder().nom("Manual d'administració").path("https://github.com/GovernIB/ripea/raw/ripea-1.0-dev/doc/pdf/02_ripea_manual_administradors.pdf").build()))
-                        .build(),
-                ContextInfo.builder()
-                        .codi("INT")
-                        .nom("API interna")
-                        .path(baseUrl + "/ripeaapi/interna")
-                        .api(baseUrl + "/ripeaapi/interna/swagger-ui/index.html")
-                        .build(),
-                ContextInfo.builder()
-                        .codi("EXT")
-                        .nom("API externa")
-                        .path(baseUrl + "/ripeaapi/externa")
-                        .api(null)
-                        .build()
+            new ContextInfo()
+                    .codi("BACK")
+                    .nom("Backoffice")
+                    .path(baseUrl + "/ripeaback")
+                    .manuals(List.of(
+                            new Manual().nom("Manual d'usuari").path("https://github.com/GovernIB/ripea/raw/ripea-1.0-dev/doc/pdf/01_ripea_manual_usuari.pdf"),
+                            new Manual().nom("Manual d'administració").path("https://github.com/GovernIB/ripea/raw/ripea-1.0-dev/doc/pdf/02_ripea_manual_administradors.pdf")))
+                    ,
+                    new ContextInfo().codi("INT").nom("API interna").path(baseUrl + "/ripeaapi/interna").api(baseUrl + "/ripeaapi/interna/swagger-ui/index.html"),
+                    new ContextInfo().codi("EXT").nom("API externa").path(baseUrl + "/ripeaapi/externa").api(null)
         );
 	}
 
@@ -244,19 +235,18 @@ public class SalutServiceImpl implements SalutService{
 		EstatSalutEnum estat	= calculaEstatGlobal(salutIntegracions, subsistemesSalut);
 		int latenciaGlobal 		= calculaLatenciaGlobal(salutDb, salutIntegracions, subsistemesSalut);
 		
-		EstatSalut estatSalut = EstatSalut.builder().estat(estat).latencia(latenciaGlobal).build();
+		EstatSalut estatSalut = new EstatSalut().estat(estat).latencia(latenciaGlobal);
 		InformacioSistema systemInfo = MonitorHelper.getInfoSistema();
-        return SalutInfo.builder()
+        return new SalutInfo()
                 .codi(configHelper.getConfig(PropertyConfig.COMANDA_APP_CODI))
                 .versio(versio)
-                .data(new Date())
+                .data(DateUtil.toOffsetDateTime(new Date()))
                 .estatGlobal(estatSalut)
                 .estatBaseDeDades(salutDb)
                 .integracions(salutIntegracions)
                 .subsistemes(subsistemesSalut)
                 .missatges(missatgesSalut)
-                .informacioSistema(systemInfo)
-                .build();
+                .informacioSistema(systemInfo);
 	}
 	
 	private EstatSalutEnum calculaEstatGlobal(List<IntegracioSalut> salutIntegracions, List<SubsistemaSalut> subsistemesSalut) {
@@ -329,9 +319,9 @@ public class SalutServiceImpl implements SalutService{
             Instant start = Instant.now();
             jdbcTemplate.execute("SELECT COUNT(ID) FROM IPA_EXPEDIENT");
             Instant end = Instant.now();
-            return EstatSalut.builder().estat(EstatSalutEnum.UP).latencia((int) Duration.between(start, end).toMillis()).build();
+            return new EstatSalut().estat(EstatSalutEnum.UP).latencia((int) Duration.between(start, end).toMillis());
         } catch (Exception e) {
-            return EstatSalut.builder().estat(EstatSalutEnum.DOWN).build();
+            return new EstatSalut().estat(EstatSalutEnum.DOWN);
         }
     }
 
@@ -468,12 +458,11 @@ public class SalutServiceImpl implements SalutService{
 	    		}
 	    	}
 	    	
-	    	return IntegracioSalut.builder()
+	    	return new IntegracioSalut()
 	                .codi(codiIntegracio.toString())
 	                .latencia(ip.getTotalTempsMig()/ip.getPeticionsPerEntorn().size())
 	                .estat(calculaEstat(darreresOk, darreresKo))
-	                .peticions(ip)
-	                .build();
+	                .peticions(ip);
     	} else {
     		
     		ip.setTotalOk(0l);
@@ -484,12 +473,11 @@ public class SalutServiceImpl implements SalutService{
     		ip.setTempsMigUltimPeriode(0);
 	    	ip.setEndpoint(endpointBase);
 	    	
-	    	return IntegracioSalut.builder()
+	    	return new IntegracioSalut()
 	                .codi(codiIntegracio.toString())
 	                .latencia(null)
 	                .estat(EstatSalutEnum.UNKNOWN)
-	                .peticions(ip)
-	                .build();
+	                .peticions(ip);
     	}
     }
     
@@ -497,6 +485,7 @@ public class SalutServiceImpl implements SalutService{
     	switch (integracioComanda) {
     		case PFI: return IntegracioEnumDto.PFIRMA;
     		case ARX: return IntegracioEnumDto.ARXIU;
+    		case CSV: return IntegracioEnumDto.CONCSV;
     		case GDC: return IntegracioEnumDto.GESDOC;
     		case PBL: return IntegracioEnumDto.DADESEXT;
     		case DIS: return IntegracioEnumDto.DISTRIBUCIO;
@@ -542,11 +531,10 @@ public class SalutServiceImpl implements SalutService{
 		ipARX.setPeticionsPerEntorn(getPeticionsPerEntorn(IntegracioApp.ARX.toString(), codesFSARX)); 
 		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.ARX, ipARX));
 		
-		//TODO: conCSV
-//		String[] codesFSCSV = {"METRICS@Integracions.concsv"};
-//		IntegracioPeticions ipCSV = new IntegracioPeticions();
-//		ipCSV.setPeticionsPerEntorn(getPeticionsPerEntorn(IntegracioApp.CSV.toString(), codesFSCSV)); 
-//		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.CSV, ipCSV));
+		String[] codesFSCSV = {"METRICS@Integracions.concsv"};
+		IntegracioPeticions ipCSV = new IntegracioPeticions();
+		ipCSV.setPeticionsPerEntorn(getPeticionsPerEntorn(IntegracioApp.CSV.toString(), codesFSCSV)); 
+		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.CSV, ipCSV));
 		
 		String[] codesFSPBL = {"METRICS@Integracions.pinbal"};
 		IntegracioPeticions ipPBL = new IntegracioPeticions();
@@ -634,7 +622,7 @@ public class SalutServiceImpl implements SalutService{
     	
     	int		tempsPromitgActual = subsistema_total_exito==0?0:(int)(tempsPromitgSubsistema/subsistema_total_exito);
     	long	peticionsOkDarrerPeriode = getDadesOkPeriodeByCodi(codi, subsistema_total_exito); 
-    	SubsistemaSalut resultat = SubsistemaSalut.builder()
+    	SubsistemaSalut resultat = new SubsistemaSalut()
                 .codi(codi)
                 .totalTempsMig(tempsPromitgActual)
                 .estat(calculaEstat(subsistema_total_exito, subsistema_total_error))
@@ -642,8 +630,7 @@ public class SalutServiceImpl implements SalutService{
                 .totalError(subsistema_total_error)
                 .peticionsOkUltimPeriode(peticionsOkDarrerPeriode)
                 .peticionsErrorUltimPeriode(getDadesErrorPeriodeByCodi(codi, subsistema_total_error))
-                .tempsMigUltimPeriode(getDadesTempsPromitgPeriodeByCodi(codi, tempsPromitgActual, subsistema_total_exito))
-                .build();
+                .tempsMigUltimPeriode(getDadesTempsPromitgPeriodeByCodi(codi, tempsPromitgActual, subsistema_total_exito));
 		
 		actualizarDadesSalutRipeaByCodi(codi, subsistema_total_exito, subsistema_total_error, tempsPromitgActual);
 		
@@ -748,11 +735,10 @@ public class SalutServiceImpl implements SalutService{
 	    	}
 
 	    	for (AvisDto avis: avisos) {
-	    		MissatgeSalut ms = MissatgeSalut.builder()
-	    				.data(avis.getDataInici())
+	    		MissatgeSalut ms = new MissatgeSalut()
+	    				.data(DateUtil.toOffsetDateTime(avis.getDataInici()))
 	    				.missatge(avis.getAssumpte()+": "+avis.getMissatge())
-	    				.nivell(avis.getSalutNivellComanda())
-	    				.build();
+	    				.nivell(avis.getSalutNivellComanda());
 	    		missatges.add(ms);
 	    	}
     	} catch (Exception ex) {}

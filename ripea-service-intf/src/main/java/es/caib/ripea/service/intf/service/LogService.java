@@ -5,8 +5,8 @@ import java.util.concurrent.BlockingQueue;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 
-import es.caib.comanda.model.v1.log.FitxerContingut;
-import es.caib.comanda.model.v1.log.FitxerInfo;
+import es.caib.comanda.model.server.monitoring.FitxerContingut;
+import es.caib.comanda.model.server.monitoring.FitxerInfo;
 
 public interface LogService {
 

@@ -7,8 +7,8 @@ import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 
-import es.caib.comanda.model.v1.log.FitxerContingut;
-import es.caib.comanda.model.v1.log.FitxerInfo;
+import es.caib.comanda.model.server.monitoring.FitxerContingut;
+import es.caib.comanda.model.server.monitoring.FitxerInfo;
 import es.caib.ripea.ejb.base.AbstractServiceEjb;
 import es.caib.ripea.service.intf.service.LogService;
 import lombok.experimental.Delegate;

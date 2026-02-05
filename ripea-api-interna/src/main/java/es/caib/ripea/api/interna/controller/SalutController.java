@@ -14,13 +14,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import es.caib.comanda.model.v1.salut.AppInfo;
-import es.caib.comanda.model.v1.salut.SalutInfo;
+import es.caib.comanda.model.server.monitoring.AppInfo;
+import es.caib.comanda.model.server.monitoring.SalutInfo;
 import es.caib.comanda.ms.salut.helper.MonitorHelper;
 import es.caib.ripea.api.interna.config.BaseApiInternaSecurityConfig;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.SalutService;
+import es.caib.ripea.service.intf.utils.DateUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
@@ -45,18 +46,17 @@ public class SalutController extends BaseApiInternaController {
     public AppInfo appInfo(HttpServletRequest request) throws IOException {
     	autenticaAmbRolTothom();
         var manifestInfo = getManifestInfo();
-        return AppInfo.builder()
+        return new AppInfo()
                 .codi(aplicacioService.propertyFindByNom(PropertyConfig.COMANDA_APP_CODI))
                 .nom("RIPEA")
-                .data(manifestInfo.getBuildDate())
+                .data(DateUtil.toOffsetDateTime(manifestInfo.getBuildDate()))
                 .versio(manifestInfo.getVersion())
                 .revisio(manifestInfo.getBuildScmRevision())
                 .jdkVersion(manifestInfo.getBuildJDK())
                 .integracions(salutService.getIntegracions())
                 .subsistemes(salutService.getSubsistemes())
                 .contexts(salutService.getContexts(getBaseUrl(request)))
-                .versioJboss(MonitorHelper.getApplicationServerInfo())
-                .build();
+                .versioJboss(MonitorHelper.getApplicationServerInfo());
     }
     
     @GetMapping("/salut")

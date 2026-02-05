@@ -6,9 +6,9 @@ import java.util.List;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 
-import es.caib.comanda.model.v1.estadistica.DimensioDesc;
-import es.caib.comanda.model.v1.estadistica.IndicadorDesc;
-import es.caib.comanda.model.v1.estadistica.RegistresEstadistics;
+import es.caib.comanda.model.server.monitoring.DimensioDesc;
+import es.caib.comanda.model.server.monitoring.IndicadorDesc;
+import es.caib.comanda.model.server.monitoring.RegistresEstadistics;
 import es.caib.ripea.service.intf.dto.ExplotFetsAmbDimensioDto;
 
 @PreAuthorize("isAuthenticated()")

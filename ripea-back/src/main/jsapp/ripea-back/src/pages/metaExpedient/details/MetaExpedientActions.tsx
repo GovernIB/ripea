@@ -172,20 +172,21 @@ export const useMetaExpedientActions = (refresh?: () => void) => {
             icon: "check",
             showInMenu: true,
             onClick: active,
-            hidden: (row:any) => row?.actiu || !(isRolActualAdmin || isRolActualOrganAdmin),
+            hidden: (row:any) => row?.actiu || !(isRolActualAdmin),
         },
         {
             label: t('page.metaExpedient.action.desactivar.label'),
             icon: "cancel",
             showInMenu: true,
             onClick: desactive,
-            hidden: (row:any) => !row?.actiu || !(isRolActualAdmin || isRolActualOrganAdmin),
+            hidden: (row:any) => !row?.actiu || !(isRolActualAdmin),
         },
         {
             label: t('common.delete'),
             icon: "delete",
             showInMenu: true,
             clickTriggerDelete: true,
+            hidden: !isRolActualAdmin,
         },
     ]
 
