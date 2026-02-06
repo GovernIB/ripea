@@ -104,7 +104,7 @@ const columns = [
     },
     {
         field: 'notificacioEstat',
-        flex: 0.5,
+        flex: 0.75,
         renderCell: (params:any) => <StyledEstat entity={params?.row}>{params.formattedValue}</StyledEstat>
     },
     {

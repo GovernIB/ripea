@@ -22,15 +22,16 @@ export const EstatMessage = (props:any) => {
 }
 export const StyledEstat = (props:any) => {
     const { entity, children } = props;
-    const { t } = useTranslation()
 
     switch (entity?.notificacioEstat) {
         case 'PENDENT':
             return <>
-                <EstatMessage icon={"schedule"} color='warning'>{children}</EstatMessage>
                 { entity?.error &&
-                    <EstatMessage icon={"warning"} color={'error'}>{t('page.notificacio.detall.estatError')}</EstatMessage>
-                }
+                    <Icon fontSize={"inherit"} 
+                        title={entity.errorDescripcio} 
+                        sx={{ mr: children!=null  ?1 :0, color: 'error.light' }}>warning</Icon>
+                }            
+                <EstatMessage icon={"schedule"} color='warning'>{children}</EstatMessage>
             </>
         case 'REGISTRADA':
             if (entity?.error) {

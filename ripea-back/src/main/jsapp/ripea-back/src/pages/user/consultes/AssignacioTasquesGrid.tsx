@@ -17,8 +17,8 @@ const AssignacioTasquesFilterForm = () => {
         <GridFormField xs={3} name="metaExpedientTasca"/>
         <GridFormField xs={3} name="estat"/>
         <GridFormField xs={3} name="responsable"/>
-        <GridFormField xs={4} name="dataInici" type={"date"}/>
-        <GridFormField xs={4} name="dataFi" type={"date"}/>
+        <GridFormField xs={3} name="dataInici" type={"date"}/>
+        <GridFormField xs={3} name="dataFi" type={"date"}/>
         <Grid item xs={1.6}/>
     </>
 }

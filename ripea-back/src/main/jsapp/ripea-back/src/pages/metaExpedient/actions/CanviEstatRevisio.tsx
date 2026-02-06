@@ -5,11 +5,11 @@ import {useRef} from "react";
 import {useTranslation} from "react-i18next";
 import {useUserSession} from "../../../components/Session.tsx";
 
-export const CanviEstatRevisioForm = ({ revisor = false }:any) => {
+export const CanviEstatRevisioForm = ({ editable = false }:any) => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         {/*rol actual “IPA_REVISIO”*/}
-        <GridFormField xs={12} name="revisioEstat" disabled={!revisor}/>
-        <GridFormField xs={12} name="revisioComentari" type={'textarea'} disabled={!revisor}/>
+        <GridFormField xs={12} name="revisioEstat" disabled={!editable}/>
+        <GridFormField xs={12} name="revisioComentari" type={'textarea'} disabled={!editable}/>
     </Grid>
 }
 
@@ -28,7 +28,7 @@ export const CanviEstatRevisio = (props: { apiRef:any }) => {
         ]}
         apiRef={apiRef}
     >
-        <CanviEstatRevisioForm revisor={rol?.isRevisor}/>
+        <CanviEstatRevisioForm editable={rol?.isRevisor || rol?.isAdmin}/>
     </MuiFormDialog>
 }
 

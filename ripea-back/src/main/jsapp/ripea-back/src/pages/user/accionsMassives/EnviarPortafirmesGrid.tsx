@@ -20,8 +20,8 @@ const EnviarPortafirmesFilterForm = () => {
 
     return <>
         <GridFormField xs={3} name="procediment"/>
-        <GridFormField xs={3} name="expedient" filter={expedientFilter}/>
-        <GridFormField xs={3} name="metaDocument" filter={metaDocumentFilter}/>
+        <GridFormField xs={3} name="expedient" filter={expedientFilter} disabled={!data.procediment}/>
+        <GridFormField xs={3} name="metaDocument" filter={metaDocumentFilter} disabled={!data.procediment}/>
         <GridFormField xs={3} name="nom"/>
         <GridFormField xs={3} name="dataCreacioInici" type={"date"}/>
         <GridFormField xs={3} name="dataCreacioFi" type={"date"}/>
