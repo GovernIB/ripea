@@ -94,15 +94,20 @@ public class PermissionHelper {
 			if (targetType.endsWith(".AvisResource")) { return userPermissions.isSuperAdmin(); }
 			//Exclusius administradors
 			if (targetType.endsWith(".OrganGestorResource")) { return userPermissions.isAdmin(); }
-			if (targetType.endsWith(".GrupResource")) { return userPermissions.isAdmin() || userPermissions.isOrgan(); }
+			if (targetType.endsWith(".GrupResource")) { 
+				return userPermissions.isAdmin() || userPermissions.isOrgan() || userPermissions.isDisseny();
+			}
 			if (targetType.endsWith(".HistoricResource")) { return userPermissions.isAdmin(); }
 			if (targetType.endsWith(".DominiResource")) { return userPermissions.isAdmin(); }
 			if (targetType.endsWith(".TipusDocumentalResource")) { return userPermissions.isAdmin(); }
 			if (targetType.endsWith(".ConsultaPinbalResource")) { return userPermissions.isAdmin(); }
-			if (targetType.endsWith(".AclClassResource")) { return userPermissions.isAdmin(); }
-			if (targetType.endsWith(".AclEntryResource")) { return userPermissions.isAdmin(); }
-			if (targetType.endsWith(".AclSidResource")) { return userPermissions.isAdmin(); }
-			if (targetType.endsWith(".AclObjIdentityResource")) { return userPermissions.isAdmin(); }
+			//Modificació de permisos
+			if (targetType.endsWith(".AclClassResource") ||
+				targetType.endsWith(".AclEntryResource") ||
+				targetType.endsWith(".AclSidResource") ||
+				targetType.endsWith(".AclObjIdentityResource")) { 
+					return	userPermissions.isAdmin() || userPermissions.isOrgan() || userPermissions.isDisseny();
+			}
 			//Modificació de procediments
 			if (targetType.endsWith(".MetaExpedientResource") ||
 				targetType.endsWith(".MetaExpedientComentariResource") ||

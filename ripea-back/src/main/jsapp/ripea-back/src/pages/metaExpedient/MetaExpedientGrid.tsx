@@ -157,7 +157,7 @@ const MetaExpedientGrid = () => {
             headerName: '',
             sortable: false,
             flex: 0.25,
-            hidden: !rol?.isAdmin,
+            hidden: !(rol?.isAdmin || rol?.isOrganAdmin),
             renderCell: (params:any) => <LinkIcon
                 aria-label="key"
                 color="inherit"
@@ -258,7 +258,8 @@ const MetaExpedientGrid = () => {
     ],[t])
 
     return <GridPage disableMargins>
-        <CardPage title={t('page.user.menu.procedimentsTitle')}>
+        <CardPage title={ rol?.isRevisor ? t('page.user.menu.procedimentsRevisorTitle') : t('page.user.menu.procedimentsTitle')}>
+            
             <MetaExpedientFilter onSpringFilterChange={setSpringFilter}/>
 
             <StyledMuiGrid

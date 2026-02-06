@@ -44,6 +44,7 @@ import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.EntitatService;
 import es.caib.ripea.service.intf.service.EventService;
 import es.caib.ripea.service.intf.service.GrupService;
+import es.caib.ripea.service.intf.service.MetaExpedientService;
 import es.caib.ripea.service.intf.service.OrganGestorService;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -67,6 +68,7 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
     @Value("${es.caib.ripea.develope.roles:IPA_SUPER,IPA_ADMIN,IPA_ORGAN_ADMIN,tothom}")
     private String developmentRoles;
 
+    private final MetaExpedientService metaExpedientService;
     private final EntitatService entitatService;
     private final OrganGestorService organGestorService;
     private final AplicacioService aplicacioService;
@@ -188,6 +190,12 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
         response.put("isPropagarMetadades", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.PROPAGAR_METADADES)));
         response.put("isCarpetesDefecte", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.CARPETES_PER_DEFECTE)));
 
+        if ("IPA_ADMIN".equals(userPermissionInfo.getRolActual()) && userPermissionInfo.getEntitatActualId()!=null) {
+        	try {
+        		response.put("numProcsPendentsRevisio", metaExpedientService.countMetaExpedientsPendentRevisar(userPermissionInfo.getEntitatActualId()));
+        	} catch (Exception ex) {}
+        }
+        		
         List<GrupDto> grupsPermesos = null;
         if (organActual!=null) {
         	grupsPermesos = grupService.findGrupsPermesosProcedimentsGestioActiva(

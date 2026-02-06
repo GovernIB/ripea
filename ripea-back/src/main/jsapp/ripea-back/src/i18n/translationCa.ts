@@ -1675,6 +1675,7 @@ const translationCa = {
                 anotacions: "Anotacions",
                 procediments: "Procediments i serveis",
                 procedimentsTitle: "Gestió de procediments i serveis",
+                procedimentsRevisorTitle: "Revisió de procediments i serveis",
                 procedimentPermis: "Permisos del procediment: {{nom}}",
                 grups: "Grups",
                 grupPermis: "Permisos del grup",

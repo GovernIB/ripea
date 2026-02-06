@@ -1675,6 +1675,7 @@ const translationEn = {
                 anotacions: "Annotations",
                 procediments: "Procedures and services",
                 procedimentsTitle: "Procedure and service management",
+                procedimentsRevisorTitle: "Procedure and service review",
                 procedimentPermis: "Procedure permissions: {{nom}}",
                 grups: "Groups",
                 grupPermis: "Group permissions",

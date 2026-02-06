@@ -169,7 +169,7 @@ export const useMetaExpedientActions = (refresh?: () => void) => {
             icon: "edit",
             showInMenu: true,
             onClick: handleCanviEstat,
-            hidden: !rol?.isRevisor,
+            hidden: !(rol?.isRevisor || rol?.isAdmin),
         },
         {
             label: t('page.metaExpedient.action.expedient.label'),
@@ -197,14 +197,14 @@ export const useMetaExpedientActions = (refresh?: () => void) => {
             icon: "check",
             showInMenu: true,
             onClick: active,
-            hidden: (row:any) => row?.actiu || !(rol?.isAdmin || rol?.isOrganAdmin || rol?.isDissenyOrgan),
+            hidden: (row:any) => row?.actiu || !(rol?.isAdmin || (rol?.isOrganAdmin && row?.revisioEstat != 'DISSENY') || rol?.isDissenyOrgan),
         },
         {
             label: t('page.metaExpedient.action.desactivar.label'),
             icon: "cancel",
             showInMenu: true,
             onClick: desactive,
-            hidden: (row:any) => !row?.actiu || !(rol?.isAdmin || rol?.isOrganAdmin || rol?.isDissenyOrgan),
+            hidden: (row:any) => !row?.actiu || !(rol?.isAdmin || (rol?.isOrganAdmin && row?.revisioEstat != 'DISSENY') || rol?.isDissenyOrgan),
         },
         {
             label: t('page.metaExpedient.action.canviDisseny.label'),

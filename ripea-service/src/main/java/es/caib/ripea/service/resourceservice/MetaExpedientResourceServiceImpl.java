@@ -13,6 +13,7 @@ import java.util.Set;
 import javax.annotation.PostConstruct;
 
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -169,7 +170,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
     	register(MetaExpedientResource.Fields.organGestor,			new OnchangeLogicProcessor());
     	register(MetaExpedientResource.Fields.procedimentComu,		new OnchangeLogicProcessor());
     }
-	
+    
 	@Override
     protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
 
@@ -345,6 +346,15 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 					resource.isActiu(),
 					configHelper.getRolActual(),
 					ogEntity!=null?ogEntity.getId():null);
+		} else if ("IPA_REVISIO".equals(configHelper.getRolActual()) && !resource.getRevisioEstat().equals(mere.getRevisioEstat())) {
+			if (Utils.hasValue(resource.getRevisioComentari())) {
+				metaExpedientHelper.publicarComentariPerMetaExpedient(
+						entitatEntity.getId(),
+						id,
+						resource.getRevisioComentari(),
+						configHelper.getRolActual());
+			}
+			metaExpedientHelper.canviarEstatRevisioASellecionat(entitatEntity.getId(), id, resource.getRevisioEstat());
 		} else {
 			metaExpedientHelper.update(
 					entitatEntity.getId(),
