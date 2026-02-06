@@ -125,7 +125,7 @@ export const MetaExpedientTascaGrid = ({ entity, onRowCountChange, readOnly } :a
 
     const {active, desactive} = useActions(refresh)
     const {apiIsReady, handleOpen, dialog} = useMetaExpTascaDetail()
-    const actions = useMemo(() => readOnly ?[
+    const actions:any[] = useMemo(() => readOnly ?[
         {
             label: t('page.metaExpedient.action.consultar.label'),
             icon: "search",

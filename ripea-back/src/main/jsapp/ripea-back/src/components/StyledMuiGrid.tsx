@@ -1,7 +1,7 @@
 import React, {useEffect, useMemo, useState} from "react";
 import {Button, Icon, Tooltip} from "@mui/material";
 import {GridSlots, useGridApiRef as useMuiDatagridApiRef} from "@mui/x-data-grid-pro";
-import {MuiDataGridColDef, MuiDataGridProps, MuiGrid, useMuiDataGridApiRef} from "reactlib";
+import {MuiDataGridProps, MuiGrid, useMuiDataGridApiRef} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {useUserSession} from "./Session.tsx";
 import MassiveActionSelector, {MassiveActionProps} from "./MassiveActionSelector.tsx";
@@ -39,10 +39,10 @@ type StyledMuiGridProps = MuiDataGridProps & {
     onRefresh?: () => any,
     disabledMassiveDefSelector?: boolean,
     hiddenMassiveDefSelector?: boolean,
-    onDragEnd?: boolean,
+    onDragEnd?: ( event:any ) => void,
 }
 
-export const DndMuiGrid = (props) => {
+export const DndMuiGrid = (props:StyledMuiGridProps) => {
     const {onDragEnd, ...other} = props
     const dndEnabled = onDragEnd != null && !other?.readOnly
 

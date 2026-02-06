@@ -99,12 +99,12 @@ const MetaExpedientTascaValidacioGrid = () => {
     },[apiIsReady, tascaId])
 
     const readOnly = useMemo(() => {
-        return !(rol.isAdmin || (rol.isOrganAdmin && metaExpedientTasca?.metaExpedientRevisioEstat == 'REVISAT') || rol.isDissenyOrgan)
+        return !(rol.isAdmin || (rol.isOrganAdmin && metaExpedientTasca?.metaExpedientRevisioEstat != 'REVISAT') || rol.isDissenyOrgan)
     }, [metaExpedientTasca, rol])
 
     const {active, desactive} = useActions(refresh)
     const {apiIsReady: apiValidIsReady, handleOpen, dialog} = useMetaExpTasaValidacioDetail()
-    const actions = useMemo(() => readOnly ?[
+    const actions:any[] = useMemo(() => readOnly ?[
         {
             label: t('page.metaExpedient.action.consultar.label'),
             icon: "search",

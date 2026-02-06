@@ -92,7 +92,7 @@ export const MetaDocumentGrid = ({ entity, onRowCountChange, readOnly } :any) =>
     const {apiIsReady, handleOpen, dialog} = useMetaDocumentDetail()
     const {reordering} = useActions(refresh)
     const {actions} = useMetaDocumentActions(refresh);
-    const additionalActions = useMemo(() => readOnly ?[
+    const additionalActions:any[] = useMemo(() => readOnly ?[
         {
             label: t('page.metaExpedient.action.consultar.label'),
             icon: "search",

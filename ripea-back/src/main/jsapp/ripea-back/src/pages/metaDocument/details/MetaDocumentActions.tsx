@@ -68,7 +68,7 @@ export const useActions = (refresh?: () => void) => {
 export const useMetaDocumentActions = (refresh?: () => void) => {
     const {t} = useTranslation()
     const {marcarDefecte, desmarcarDefecte, active, desactive} = useActions(refresh)
-    const actions = [
+    const actions:any[] = [
         {
             label: t('common.update'),
             icon: "edit",

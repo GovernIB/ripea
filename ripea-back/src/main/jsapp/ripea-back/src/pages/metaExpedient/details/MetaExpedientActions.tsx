@@ -142,7 +142,7 @@ export const useMetaExpedientActions = (refresh?: () => void) => {
     const {handleOpen: handleRegla, dialog: dialogRegla} = useReglaDistribucio(refresh);
     const {active, desactive, exportar, canviDisseny, canviPendent} = useActions(refresh)
 
-    const actions = [
+    const actions:any[] = [
         {
             label: t('page.metaExpedient.action.consultar.label'),
             icon: "search",

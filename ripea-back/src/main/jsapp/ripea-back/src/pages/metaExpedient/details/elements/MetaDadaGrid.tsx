@@ -117,7 +117,7 @@ export const MetDadaGrid = ({ id, enviable = false, readOnly, ...other }: any) =
 
     const {active, desactive, reordering} = useActions(refresh)
     const {apiIsReady, handleOpen, dialog} = useMetaDadaDetail()
-    const actions = useMemo(() => readOnly ?[
+    const actions:any[] = useMemo(() => readOnly ?[
         {
             label: t('page.metaExpedient.action.consultar.label'),
             icon: "search",
@@ -220,7 +220,7 @@ const MetaDadaGrid = () => {
     }, [metaDocument]);
 
     const readOnly = useMemo(() => {
-        return !(rol.isAdmin || (rol.isOrganAdmin && metaDocument?.metaExpedientRevisioEstat == 'REVISAT') || rol.isDissenyOrgan)
+        return !(rol.isAdmin || (rol.isOrganAdmin && metaDocument?.metaExpedientRevisioEstat != 'REVISAT') || rol.isDissenyOrgan)
     }, [metaDocument, rol])
 
     return <GridPage disableMargins>

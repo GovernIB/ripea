@@ -71,7 +71,7 @@ export const MetaExpedientEstatGrid = ({ entity, onRowCountChange, readOnly } :a
 
     const {reordering} = useActions(refresh)
     const {apiIsReady, handleOpen, dialog} = useMetaExpEstatDetail()
-    const actions = useMemo(() => readOnly ?[
+    const actions:any[] = useMemo(() => readOnly ?[
         {
             label: t('page.metaExpedient.action.consultar.label'),
             icon: "search",

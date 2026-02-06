@@ -141,6 +141,8 @@ const PortafirmesMetaDocumentForm = () => {
                 filter={filter}
                 rowAdditionalActions={actions}
                 toolbarHide
+                autoHeight
+                paginationModel={{page: 0, pageSize: 5}}
                 sx={{ ml: 1, mt: 1 }}
             />
         </>}

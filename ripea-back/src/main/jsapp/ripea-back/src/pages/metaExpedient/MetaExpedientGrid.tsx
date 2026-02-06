@@ -129,6 +129,10 @@ const MetaExpedientGrid = () => {
         apiRef?.current?.refresh?.();
     }
 
+    const readOnly = useMemo(() => {
+        return rol.isRevisor
+    }, [rol])
+
     const additionalColumns = useMemo(() => [
         ...columns,
         {
@@ -224,6 +228,35 @@ const MetaExpedientGrid = () => {
         },
     ]
 
+    const elementsWithPositions = useMemo(() => [
+        {
+            position: 2,
+            hidden: readOnly,
+            element: <MenuActionButton
+                id={'metaExpedient-import'}
+                buttonLabel={t('common.import')}
+                buttonProps={{
+                    // icon: 'download',
+                    variant: "contained",
+                    color: 'success',
+                    size: "small",
+                    startIcon: <Icon>download</Icon>,
+                    sx: { borderRadius: '4px',  minWidth: '20px', minHeight: '32px' }
+                }}
+                actions={[
+                    {
+                        label: t('page.metaExpedient.action.importRolsac.label'),
+                        onClick: () => handleImportRolsac(),
+                    },
+                    {
+                        label: t('page.metaExpedient.action.importFitxer.label'),
+                        onClick: () => handleImportFitxer(),
+                    },
+                ]}
+            />,
+        },
+    ],[t])
+
     return <GridPage disableMargins>
         <CardPage title={t('page.user.menu.procedimentsTitle')}>
             <MetaExpedientFilter onSpringFilterChange={setSpringFilter}/>
@@ -240,33 +273,7 @@ const MetaExpedientGrid = () => {
                 sortModel={sortModel}
                 rowAdditionalActions={actions}
                 toolbarMassiveActions={massiveActions}
-                toolbarElementsWithPositions={[
-                    {
-                        position: 2,
-                        element: <MenuActionButton
-                            id={'metaExpedient-import'}
-                            buttonLabel={t('common.import')}
-                            buttonProps={{
-                                // icon: 'download',
-                                variant: "contained",
-                                color: 'success',
-                                size: "small",
-                                startIcon: <Icon>download</Icon>,
-                                sx: { borderRadius: '4px',  minWidth: '20px', minHeight: '32px' }
-                            }}
-                            actions={[
-                                {
-                                    label: t('page.metaExpedient.action.importRolsac.label'),
-                                    onClick: () => handleImportRolsac(),
-                                },
-                                {
-                                    label: t('page.metaExpedient.action.importFitxer.label'),
-                                    onClick: () => handleImportFitxer(),
-                                },
-                            ]}
-                        />,
-                    },
-                ]}
+                toolbarElementsWithPositions={elementsWithPositions}
 
                 toolbarCreateTitle={t('page.metaExpedient.action.new.label')}
                 popupEditFormI18nKeys={{
@@ -274,7 +281,7 @@ const MetaExpedientGrid = () => {
                     updateSuccess: 'page.metaExpedient.action.update.ok',
                     deleteSuccess: 'page.metaExpedient.action.delete.ok',
                 }}
-                // toolbarHideRefresh
+                readOnly={readOnly}
             />
             {contentImportRolsac}
             {contentImportFitxer}

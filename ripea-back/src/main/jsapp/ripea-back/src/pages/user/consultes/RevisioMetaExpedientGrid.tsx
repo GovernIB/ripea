@@ -205,7 +205,7 @@ const RevisioMetaExpedientGrid = () => {
                 toolbarHideCreate
                 rowHideUpdateButton={false}
                 popupEditCreateActive
-                popupEditFormContent={<RevisioMetaExpedientForm revisor={rol?.isRevisio}/>}
+                popupEditFormContent={<RevisioMetaExpedientForm revisor={rol?.isRevisor}/>}
                 popupEditFormDialogResourceTitle={t('page.metaExpedient.title')}
                 popupEditFormI18nKeys={{
                     updateSuccess: 'page.metaExpedient.action.update.ok',
