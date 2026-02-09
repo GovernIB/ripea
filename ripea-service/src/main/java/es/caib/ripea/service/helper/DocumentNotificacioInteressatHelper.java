@@ -74,7 +74,7 @@ public class DocumentNotificacioInteressatHelper {
 
 			notificacionsWithError.put(interessat.getDocumentNum(), respostaEnviar.getErrorDescripcio());
 		} else {
-			cacheHelper.evictErrorsValidacioPerNode(expedientEntity.getId());
+			cacheHelper.evictErrorsValidacioAndNotify(expedientEntity.getId());
 			cacheHelper.evictNotificacionsPendentsPerExpedient(expedientEntity);
 			notificacioEntity.updateEnviat(null, respostaEnviar.getEstat(), respostaEnviar.getIdentificador());
 		}

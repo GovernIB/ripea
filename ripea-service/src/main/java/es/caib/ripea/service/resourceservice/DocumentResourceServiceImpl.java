@@ -505,9 +505,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                 null
         ));
         
-        resource.setErrors(cacheHelper.findErrorsValidacioPerNode(entity.getId(), false));
+        resource.setErrors(cacheHelper.findErrorsValidacioPerNode(entity.getId()));
         resource.setValid(resource.getErrors().isEmpty());
-        
         resource.setAmbNotificacions(!entity.getNotificacions().isEmpty());
         
 		DocumentNotificacioEstatEnumDto estatDarreraNotificacio = documentNotificacioRepository.findLastEstatNotificacioByDocumentId(entity.getId());

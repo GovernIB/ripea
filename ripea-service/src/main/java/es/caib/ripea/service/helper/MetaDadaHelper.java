@@ -8,13 +8,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.entity.MetaDadaEntity;
 import es.caib.ripea.persistence.entity.MetaDocumentEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientTascaValidacioEntity;
 import es.caib.ripea.persistence.entity.MetaNodeEntity;
+import es.caib.ripea.persistence.repository.ExpedientRepository;
 import es.caib.ripea.persistence.repository.MetaDadaRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientTascaValidacioRepository;
+import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.dto.ItemValidacioTascaEnum;
 import es.caib.ripea.service.intf.dto.MetaDadaDto;
 import es.caib.ripea.service.intf.dto.MetaDadaTipusEnumDto;
@@ -23,11 +26,13 @@ import io.micrometer.core.instrument.Timer;
 @Component
 public class MetaDadaHelper {
 	
+	@Autowired private ExpedientRepository expedientRepository;
 	@Autowired private MetaDadaRepository metaDadaRepository;
 	@Autowired private MetaExpedientTascaValidacioRepository metaExpedientTascaValidacioRepository;
 	@Autowired private EntityComprovarHelper entityComprovarHelper;
 	@Autowired private MetaExpedientHelper metaExpedientHelper;
 	@Autowired private ApplicationHelper applicationHelper;
+	@Autowired private CacheHelper cacheHelper;
 
 	public MetaDadaEntity findByMetaNodeAndCodi(MetaNodeEntity metaNode, String codi) {
 		return metaDadaRepository.findByMetaNodeAndCodi(metaNode, codi);
@@ -85,13 +90,29 @@ public class MetaDadaHelper {
 			}
 
 			applicationHelper.stopTimer(sample, "METRICS@Subsystem_Procediment.metaDada", "resultado", "exito");
-		
+			
+			evictValidacionsExpedients(entitat, metaNode);
+			
 			return metaDadaRepository.save(entity);
 			
 		} catch (Exception e) {
 			applicationHelper.stopTimer(sample, "METRICS@Subsystem_Procediment.metaDada", "resultado", "error");
 			throw e;
 		}			
+	}
+	
+	private void evictValidacionsExpedients(EntitatEntity entitat, MetaNodeEntity metaNode) {
+		//Una metaDada pot ser de un meta-document
+		if (metaNode != null && metaNode instanceof MetaExpedientEntity) {
+			List<ExpedientEntity> expedients = expedientRepository.findByEntitatAndMetaExpedientAndEstatAndEsborrat(
+					entitat, 
+					(MetaExpedientEntity)metaNode,
+					ExpedientEstatEnumDto.OBERT, 
+					0);
+			for (ExpedientEntity expedient: expedients) {
+				cacheHelper.evictErrorsValidacioAndNotify(expedient.getId());
+			}
+		}
 	}
 	
 	public MetaDadaEntity update(
@@ -107,6 +128,10 @@ public class MetaDadaHelper {
 				metaNode,
 				metaDada.getId());
 
+		if (!metaDada.getMultiplicitat().equals(entity.getMultiplicitat())) {
+			evictValidacionsExpedients(entitat, metaNode);
+		}
+		
 		entity.update(metaDada);
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
@@ -151,6 +176,8 @@ public class MetaDadaHelper {
 			}
 			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientId, organId);
 		}
+		
+		evictValidacionsExpedients(entitat, metaNode);
 		
 		return metaDada;
 	}

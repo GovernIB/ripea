@@ -82,7 +82,7 @@ public class DocumentFirmaViaFirmaHelper extends DocumentFirmaHelper{
 					DocumentEntity.class,
 					"El document a enviar a viaFirma no és del tipus " + DocumentTipusEnumDto.DIGITAL);
 		}
-		if (!cacheHelper.findErrorsValidacioPerNode(document.getId(), true).isEmpty()) {
+		if (!cacheHelper.findErrorsValidacioPerNode(document.getId()).isEmpty()) {
 			throw new ValidationException(
 					document.getId(),
 					DocumentEntity.class,

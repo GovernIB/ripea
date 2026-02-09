@@ -32,6 +32,7 @@ import es.caib.ripea.service.intf.dto.UsuariAnotacioDto;
 import es.caib.ripea.service.intf.model.sse.AnotacionsPendentsEvent;
 import es.caib.ripea.service.intf.model.sse.AvisosActiusEvent;
 import es.caib.ripea.service.intf.model.sse.CreacioFluxFinalitzatEvent;
+import es.caib.ripea.service.intf.model.sse.ErrorsValidacioChangedEvent;
 import es.caib.ripea.service.intf.model.sse.FirmaFinalitzadaEvent;
 import es.caib.ripea.service.intf.model.sse.ScanFinalitzatEvent;
 import es.caib.ripea.service.intf.model.sse.TasquesPendentsEvent;
@@ -69,7 +70,7 @@ public class SseResourceController {
     }
     
     private enum ExpedientEventType {
-        EXP_CONNECT, FLUX_CREAT, SCAN_FINALITZAT;
+        EXP_CONNECT, FLUX_CREAT, SCAN_FINALITZAT, VALIDACIO_CHANGE;
         public String getEventName() { return name().toLowerCase(); }
         public static ExpedientEventType fromEventName(String name) { return ExpedientEventType.valueOf(name.toUpperCase()); }
     }
@@ -345,6 +346,39 @@ public class SseResourceController {
     	            }
             	}
 			}
+    	}
+    }
+    
+    @Async
+    @JmsListener(destination = "errorsValidacioExp")
+    public void handleEventErrorsValidacio(ErrorsValidacioChangedEvent errorsValidacioEvent) {
+    	if (errorsValidacioEvent!=null && errorsValidacioEvent.getExpedientId()!=null) {
+    		logger.debug("Actualització de CreacioFluxFinalitzatEvent a expedients...");
+			Iterator<Map.Entry<Long, List<SseEmitter>>> iterator = clientsExpedient.entrySet().iterator();
+			while (iterator.hasNext()) {
+				Map.Entry<Long, List<SseEmitter>> expedientClient = iterator.next();
+            	if (errorsValidacioEvent.getExpedientId().equals(expedientClient.getKey())) {
+            		List<SseEmitter> emisorsExpedient  = expedientClient.getValue();
+            		List<SseEmitter> emisoresAEliminar = new ArrayList<>();
+            		for (SseEmitter emisor : emisorsExpedient) {
+            			try {
+            				emisor.send(SseEmitter.event().name(ExpedientEventType.VALIDACIO_CHANGE.getEventName()).data(errorsValidacioEvent.getErrorsValidacio()));
+            				logger.debug("... comunicats ErrorsValidacioChangedEvent al expedient "+expedientClient.getKey()+" a travers del emissor "+emisor.hashCode()+".");
+        	            } catch (Exception e) {
+        	            	emisoresAEliminar.add(emisor); //Eliminam el emisor de la llista de emisors del expedient
+        	            	logger.debug("... eliminat emisor de ErrorsValidacioChangedEvent "+emisor.hashCode()+" per error "+e.getMessage()+".");
+        	            }
+            		}
+            		emisorsExpedient.removeAll(emisoresAEliminar);
+            		//Si ja no queden emisors per l'expedient, eliminam l'entrada del mapa
+            		if (emisorsExpedient==null || emisorsExpedient.size()==0) {
+            			clientsExpedient.remove(expedientClient.getKey());
+            			logger.debug("... eliminat expedient "+expedientClient.getKey()+" de la llista de events per no tenir cap emisor actiu.");
+            		} else {
+            			clientsExpedient.put(expedientClient.getKey(), emisorsExpedient);
+            		}
+            	}
+	        }
     	}
     }
     

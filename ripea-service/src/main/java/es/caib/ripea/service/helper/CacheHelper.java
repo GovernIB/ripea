@@ -78,6 +78,7 @@ import es.caib.ripea.service.intf.dto.TipusViaDto;
 import es.caib.ripea.service.intf.dto.UnitatOrganitzativaDto;
 import es.caib.ripea.service.intf.dto.ValidacioErrorDto;
 import es.caib.ripea.service.intf.exception.DominiException;
+import es.caib.ripea.service.intf.model.sse.ErrorsValidacioChangedEvent;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.permission.ExtendedPermission;
 
@@ -106,6 +107,7 @@ public class CacheHelper {
 	@Autowired private ExpedientPeticioHelper expedientPeticioHelper;
 	@Autowired private ConfigHelper configHelper;
 	@Autowired private MutableAclService aclService;
+	@Autowired private EventHelper eventHelper;
 	
 	private PluginHelper pluginHelper;
 	@Autowired
@@ -199,9 +201,20 @@ public class CacheHelper {
 	public void evictAllOrganismesEntitatAmbPermis() {}
 	@CacheEvict(value = "findOrganismesEntitatAmbPermisDisseny", key="{#entitatId, #usuariCodi}")
 	public void evictOrganismesEntitatAmbPermisDisseny(Long entitatId, String usuariCodi) {}
-
+	
+	//Metode de encapsulament, ja que el metode send comanda podria donar errors de connexio
+	//i en tal cas el metode no quedaria cacheat si incloem la crida a comanda dins el metode anotat amb "Cacheable"
+	public List<ValidacioErrorDto> findErrorsValidacioPerNodeAndSendComanda(Long nodeId) {
+		List<ValidacioErrorDto> errors = findErrorsValidacioPerNode(nodeId);
+		NodeEntity node = nodeRepository.findById(nodeId).get();
+		if (node instanceof ExpedientEntity) {
+			pluginHelper.comandaAvisSend((ExpedientEntity)node, errors);
+		}
+		return errors;
+	}
+	
 	@Cacheable(value = "errorsValidacioNode", key = "#nodeId")
-	public List<ValidacioErrorDto> findErrorsValidacioPerNode(Long nodeId, boolean sendComanda) {
+	public List<ValidacioErrorDto> findErrorsValidacioPerNode(Long nodeId) {
 
 		logger.debug("Consulta dels errors de validació pel node (nodeId=" + nodeId + ")");
 		
@@ -294,9 +307,6 @@ public class CacheHelper {
 				errors.add(crearValidacioError(null, null, ErrorsValidacioTipusEnumDto.INTERESSATS));
 			}
 			
-			if (sendComanda)
-				pluginHelper.comandaAvisSend(expedient, errors);
-			
 			//Validar les tasques del expedient
 			/*List<ExpedientTascaEntity> tasquesExpedient = expedientTascaRepository.findByExpedient(expedient, null);
 			if (tasquesExpedient!=null) {
@@ -324,6 +334,12 @@ public class CacheHelper {
 	
 	@CacheEvict(value = "errorsValidacioNode", key = "#nodeId")
 	public void evictErrorsValidacioPerNode(Long nodeId) {}
+	
+	public void evictErrorsValidacioAndNotify(Long nodeId) {
+		evictErrorsValidacioPerNode(nodeId); // Primero hace evict
+		ErrorsValidacioChangedEvent evce = new ErrorsValidacioChangedEvent(nodeId, findErrorsValidacioPerNode(nodeId));
+		eventHelper.notifyErrorsValidacio(evce); // Luego notifica con datos frescos
+	}
 	
 	@Cacheable(value = "usuariAmbCodi", key="#usuariCodi")
 	public DadesUsuari findUsuariAmbCodi(String usuariCodi) {

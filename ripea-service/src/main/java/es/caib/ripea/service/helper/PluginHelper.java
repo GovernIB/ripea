@@ -5394,7 +5394,7 @@ public class PluginHelper {
 						respostaNotificioEstat.getDataFinalitzada());
 			}
 
-			cacheHelper.evictErrorsValidacioPerNode(expedient.getId());
+			cacheHelper.evictErrorsValidacioAndNotify(expedient.getId());
 			cacheHelper.evictNotificacionsPendentsPerExpedient(expedient);
 			
 			integracioHelper.addAccioOk(

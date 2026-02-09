@@ -963,7 +963,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 		String resultat = "";
 		if (configHelper.getAsBoolean(PropertyConfig.COMANDA_PLUGIN_ACTIU)) {
 			try {
-				List<ValidacioErrorDto> errors = cacheHelper.findErrorsValidacioPerNode(expedientId, false);
+				List<ValidacioErrorDto> errors = cacheHelper.findErrorsValidacioPerNode(expedientId);
 				if (errors!=null && errors.size()>0) {
 					pluginHelper.comandaAvisSendNoLog(expedientRepository.findById(expedientId).get(), errors);
 					resultat+=""+errors.size()+" avisos del expedient "+expedientId+" actualitzats a Comanda.";

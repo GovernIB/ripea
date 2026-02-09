@@ -580,7 +580,7 @@ public class ContingutServiceImpl implements ContingutService {
 	public List<ValidacioErrorDto> findErrorsValidacio(Long entitatId, Long contingutId) {
 		logger.debug("Obtenint errors de validació del contingut (entitatId=" + entitatId + ", contingutId=" + contingutId + ")");
 		NodeEntity node = contingutHelper.comprovarNodeDinsExpedientAccessible(entitatId, contingutId, true,false);
-		return cacheHelper.findErrorsValidacioPerNode(node.getId(), true);
+		return cacheHelper.findErrorsValidacioPerNode(node.getId());
 	}
 
 	@Transactional(readOnly = true)

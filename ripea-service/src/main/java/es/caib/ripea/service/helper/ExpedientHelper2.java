@@ -74,7 +74,7 @@ public class ExpedientHelper2 {
 		if (anyExecucioMassiva(expedient)) {
 			throw new ValidationException("No es pot tancar un expedient amb execucions massives pendents de finalitzar");
 		}
-		List<ValidacioErrorDto> errorsExp = cacheHelper.findErrorsValidacioPerNode(expedient.getId(), false);
+		List<ValidacioErrorDto> errorsExp = cacheHelper.findErrorsValidacioPerNode(expedient.getId());
 		if (!errorsExp.isEmpty()) {
 			throw new ValidationException("No es pot tancar un expedient amb errors de validació");
 		}

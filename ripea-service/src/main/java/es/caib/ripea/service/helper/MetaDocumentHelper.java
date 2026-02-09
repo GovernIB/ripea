@@ -60,6 +60,7 @@ public class MetaDocumentHelper {
 	@Autowired private MetaDocumentFluxPortafibRepository metaDocumentFluxPortafibRepository;
 	@Autowired private DocumentRepository documentRepository;
 	@Autowired private UsuariRepository usuariRepository;
+	@Autowired private ConfigHelper configHelper;
 	
 	public void moveTo(
 			Long metaDocumentId,
@@ -127,6 +128,7 @@ public class MetaDocumentHelper {
 		if (metaExpedientId!=null) {
 			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
 			metaDocumentEntity = entityComprovarHelper.comprovarMetaDocument(entitat, metaExpedient, id);
+			evictValidacionsExpedients(entitat, metaExpedient);
 		} else {
 			metaDocumentEntity = metaDocumentRepository.findById(id).get();
 		}
@@ -158,6 +160,7 @@ public class MetaDocumentHelper {
 			Long metaExpedientId,
 			Long metaDocumentId,
 			boolean actiu, String rolActual) {
+		
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
@@ -181,7 +184,31 @@ public class MetaDocumentHelper {
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
 			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId(), null);
 		}
+
+		evictValidacionsExpedients(entitat, metaExpedient);
 		
+		return metaDocumentEntity;
+	}
+	
+	private void evictValidacionsExpedients(Long metaExpedientId) {
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi());
+		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
+		evictValidacionsExpedients(entitat, metaExpedient);
+	}
+	
+	private void evictValidacionsExpedients(Long entitatId, Long metaExpedientId) {
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				false,
+				false,
+				false, 
+				false, 
+				true);
+		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
+		evictValidacionsExpedients(entitat, metaExpedient);
+	}
+	
+	private void evictValidacionsExpedients(EntitatEntity entitat, MetaExpedientEntity metaExpedient) {
 		if (metaExpedient != null) {
 			List<ExpedientEntity> expedients = expedientRepository.findByEntitatAndMetaExpedientAndEstatAndEsborrat(
 					entitat, 
@@ -189,11 +216,9 @@ public class MetaDocumentHelper {
 					ExpedientEstatEnumDto.OBERT, 
 					0);
 			for (ExpedientEntity expedient: expedients) {
-				cacheHelper.evictErrorsValidacioPerNode(expedient.getId());
+				cacheHelper.evictErrorsValidacioAndNotify(expedient.getId());
 			}
 		}
-		
-		return metaDocumentEntity;
 	}
 	
 	public MetaDocumentEntity update(
@@ -208,6 +233,10 @@ public class MetaDocumentHelper {
 		//El Metadocument pot ser generic (sense associar a un procediment)
 		if (metaExpedientId!=null) {
 			metaDocumentEntity = metaDocumentRepository.findByMetaExpedientIdAndCodi(metaExpedientId, metaDocument.getCodi());
+			//Si ha canviat la cardinalitat, refrescar cache de validacions de expedients
+			if (!metaDocument.getMultiplicitat().equals(metaDocumentEntity.getMultiplicitat())) {
+				evictValidacionsExpedients(metaExpedientId);
+			}
 		} else {
 			metaDocumentEntity = metaDocumentRepository.findById(metaDocument.getId()).get();
 		}
@@ -216,7 +245,7 @@ public class MetaDocumentHelper {
 		if (metaDocument.getPinbalServei()!=null && metaDocument.getPinbalServei().getId()!=null) {
 			pinbalServeiEntity = pinbalServeiRepository.findById(metaDocument.getPinbalServei().getId()).orElse(null);
 		}
-
+		
 		metaDocumentEntity.update(
 				metaDocumentEntity.getCodi(),
 				metaDocument.getNom(),
@@ -327,6 +356,7 @@ public class MetaDocumentHelper {
 			if (metaExpedientId!=null) {
 				metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
 				ordre = metaDocumentRepository.countByMetaExpedient(metaExpedient);
+				evictValidacionsExpedients(entitat, metaExpedient);
 			}
 			
 			PinbalServeiEntity pinbalServeiEntity = null;

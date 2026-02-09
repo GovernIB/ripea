@@ -24,6 +24,7 @@ import es.caib.ripea.service.intf.dto.UsuariAnotacioDto;
 import es.caib.ripea.service.intf.model.sse.AnotacionsPendentsEvent;
 import es.caib.ripea.service.intf.model.sse.AvisosActiusEvent;
 import es.caib.ripea.service.intf.model.sse.CreacioFluxFinalitzatEvent;
+import es.caib.ripea.service.intf.model.sse.ErrorsValidacioChangedEvent;
 import es.caib.ripea.service.intf.model.sse.FirmaFinalitzadaEvent;
 import es.caib.ripea.service.intf.model.sse.ScanFinalitzatEvent;
 import es.caib.ripea.service.intf.model.sse.TasquesPendentsEvent;
@@ -72,6 +73,15 @@ public class EventHelper {
     		jmsTemplate.convertAndSend("anotacions", resultat);
     	} catch (Exception ex) {
     		log.error("Error al notifyAnotacionsPendents a clients", ex);
+    	}
+    }
+    
+    public void notifyErrorsValidacio(ErrorsValidacioChangedEvent errors) {
+    	try {
+    		log.debug("notifyErrorsValidacio a expedient");
+    		jmsTemplate.convertAndSend("errorsValidacioExp", errors);
+    	} catch (Exception ex) {
+    		log.error("Error al notifyErrorsValidacio a expedient", ex);
     	}
     }
     

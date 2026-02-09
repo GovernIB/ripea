@@ -601,7 +601,7 @@ public class ContingutHelper {
 		}
 		dto.setAgafatPer(conversioTipusHelper.convertir(expedient.getAgafatPer(), UsuariDto.class));
 
-        List<ValidacioErrorDto> errorsValidacio = cacheHelper.findErrorsValidacioPerNode(expedient.getId(), true);
+        List<ValidacioErrorDto> errorsValidacio = cacheHelper.findErrorsValidacioPerNode(expedient.getId());
         dto.setValid(errorsValidacio.isEmpty());
         dto.setNotificacionsCaducades(expedientHelper.expedientTeNotificacionsCaducades(expedient));
 		dto.setNumSeguidors(expedient.getSeguidors().size());
@@ -937,7 +937,7 @@ public class ContingutHelper {
 	}
 
 	private void setValidationProperties(DocumentDto dto, DocumentEntity document) {
-		dto.setValid(cacheHelper.findErrorsValidacioPerNode(document.getId(), true).isEmpty());
+		dto.setValid(cacheHelper.findErrorsValidacioPerNode(document.getId()).isEmpty());
 		dto.setValidacioFirmaCorrecte(document.isValidacioFirmaCorrecte());
 		dto.setValidacioFirmaErrorMsg(document.getValidacioFirmaErrorMsg());
 	}
@@ -1502,7 +1502,7 @@ public class ContingutHelper {
 		// Cancel·lar enviament si el document conté enviaments pendents
 		if (contingut instanceof DocumentEntity) {
 			if (expedientPare != null) {
-				cacheHelper.evictErrorsValidacioPerNode(expedientPare.getId());
+				cacheHelper.evictErrorsValidacioAndNotify(expedientPare.getId());
 			}
 			DocumentEntity document = (DocumentEntity)contingut;
 			if (document.getEstat().equals(DocumentEstatEnumDto.FIRMA_PENDENT)) {

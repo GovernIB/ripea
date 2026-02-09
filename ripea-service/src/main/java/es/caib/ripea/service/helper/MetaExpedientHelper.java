@@ -979,7 +979,7 @@ public class MetaExpedientHelper {
 		logger.info("MetaExpedientServiceImpl.update evictErrorsValidacioPerNode start (total expedients:" + (expedients.size()) + "");
 		
 		for (ExpedientEntity expedient: expedients) {
-			cacheHelper.evictErrorsValidacioPerNode(expedient.getId());
+			cacheHelper.evictErrorsValidacioAndNotify(expedient.getId());
 		}
 		
 		if (cacheHelper.mostrarLogsRendiment())

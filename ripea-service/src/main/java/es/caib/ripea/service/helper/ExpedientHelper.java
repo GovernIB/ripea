@@ -1628,7 +1628,7 @@ public class ExpedientHelper {
 		dto.setNumero(entity.getNumero());
 		dto.setNom(entity.getNom());
 		dto.setAlerta(alertaRepository.countByLlegidaAndContingutId(false, entity.getId()) > 0);
-		dto.setValid(cacheHelper.findErrorsValidacioPerNode(entity.getId(), true).isEmpty());
+		dto.setValid(cacheHelper.findErrorsValidacioPerNode(entity.getId()).isEmpty());
 		dto.setErrorLastEnviament(cacheHelper.hasEnviamentsPortafirmesAmbErrorPerExpedient(entity));
 		dto.setErrorLastNotificacio(cacheHelper.hasNotificacionsAmbErrorPerExpedient(entity));
 		dto.setAmbEnviamentsPendents(cacheHelper.hasEnviamentsPortafirmesPendentsPerExpedient(entity.getId()));
