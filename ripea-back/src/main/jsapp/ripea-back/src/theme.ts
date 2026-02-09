@@ -192,18 +192,6 @@ const base: ThemeOptions = {
                 }
             }
         },
-        MuiDataGrid: {
-            styleOverrides: {
-                row: {
-                    '&.even': {
-                        backgroundColor: '#f9f9f9 !important',
-                        '&:hover': {
-                            backgroundColor: '#f5f5f5 !important',
-                        }
-                    }
-                }
-            }
-        },
 		MuiDialogTitle: {
             styleOverrides: {
                 root: {
@@ -277,33 +265,40 @@ export const darkTheme = createTheme(base, {
   },
   components: {
 	MuiCssBaseline: {
-	      styleOverrides: {
-	        'div[class*="MuiBox-root"]': {
-	          backgroundColor: '#2d2d2d',
-	          color: 'white',
-	        },
-			// Excluye los Box dentro de header
-		    'header div[class*="MuiBox-root"]': {
-		      backgroundColor: 'inherit',
-		      color: 'inherit',
-		    },
-			// Excluye los Box dentro de footer
-			'footer div[class*="MuiBox-root"]': {
-			  backgroundColor: 'inherit',
-			  color: 'inherit',
-			},
-			// Excluir los Box dentro de celdas de DataGrid
-			'.MuiDataGrid-cell div[class*="MuiBox-root"]': {
-			  backgroundColor: 'inherit',
-			  color: 'inherit',
-			},
-			// Excluir los Box dentro de avisos
-			'.MuiCollapse-wrapperInner div[class*="MuiBox-root"]': {
-			  backgroundColor: 'inherit',
-			  color: 'inherit',
-			},
-	      },
-	    },
+      styleOverrides: {
+        'div[class*="MuiBox-root"]': {
+          backgroundColor: '#2d2d2d',
+          color: 'white',
+        },
+        // Excluye los Box dentro de header
+        'header div[class*="MuiBox-root"]': {
+          backgroundColor: 'inherit',
+          color: 'inherit',
+        },
+        // Excluye los Box dentro de footer
+        'footer div[class*="MuiBox-root"]': {
+          backgroundColor: 'inherit',
+          color: 'inherit',
+        },
+        // Excluir los Box dentro de celdas de DataGrid
+        '.MuiDataGrid-cell div[class*="MuiBox-root"]': {
+          backgroundColor: 'inherit',
+          color: 'inherit',
+        },
+        // Excluir los Box dentro de avisos
+        '.MuiCollapse-wrapperInner div[class*="MuiBox-root"]': {
+          backgroundColor: 'inherit',
+          color: 'inherit',
+        },
+      },
+    },
+    MuiDialogContent: {
+        styleOverrides: {
+            root: {
+                backgroundColor: "#2d2d2d",
+            }
+        }
+    },
 	MuiDialogTitle: {
 	    styleOverrides: {
 	        root: {
@@ -388,19 +383,55 @@ export const darkTheme = createTheme(base, {
 		styleOverrides: {
 			root: {
 				fontSize: '14px',
-				color: 'white !important',
-				backgroundColor: '#1e1e1e !important',
+				backgroundColor: '#1e1e1e',
 			},
 		},
 	},
-	MuiCheckbox	: {
-		styleOverrides: {
-			root: {
-				color: 'white !important',
-				backgroundColor: '#1e1e1e !important',
-			},
-		},
-	},
+    MuiAutocomplete: {
+        styleOverrides: {
+            root: {
+                backgroundColor: '#2d2d2d !important',
+            },
+        },
+    },
+    MuiTextField: {
+        styleOverrides: {
+            root: {
+                backgroundColor: '#2d2d2d !important',
+                borderRadius: 4,
+            },
+        },
+    },
+    MuiInputLabel: {
+        styleOverrides: {
+            root: {
+                color: '#fff',
+                '&.Mui-focused': {
+                    color: '#fff',
+                    backgroundColor: 'transparent !important',
+                },
+            },
+        },
+    },
+    MuiFormHelperText: {
+        styleOverrides: {
+            root: {
+                color: '#fff',
+                opacity: 0.8,
+            },
+        },
+    },
+    MuiCheckbox: {
+        styleOverrides: {
+            root: {
+                color: 'white !important',
+                backgroundColor: 'transparent !important',
+                '&.Mui-disabled': {
+                    color: '#1e1e1e !important',
+                },
+            },
+        },
+    },
 	MuiTypography: {
 	    styleOverrides: {
 	        h5: {

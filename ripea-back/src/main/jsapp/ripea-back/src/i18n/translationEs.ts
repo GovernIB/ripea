@@ -1463,6 +1463,9 @@ const translationEs = {
                     }
                 }
             },
+            alert: {
+                pendentsRevisio: "Hay {{num}} procedimientos o servicios pendientes de revisar",
+            },
         },
         metaDocument: {
             title: "Tipo de documento",
