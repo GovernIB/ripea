@@ -1,9 +1,9 @@
 import {useTranslation} from "react-i18next";
 import {useMemo, useState} from "react";
-import {GridPage, useFormContext, useMuiDataGridApiRef} from "reactlib";
+import {GridPage, useFilterApiRef, useFormApiRef, useFormContext, useMuiDataGridApiRef} from "reactlib";
 import {CardPage} from "../../components/CardData.tsx";
 import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
-import {Alert, Badge, Chip, Grid, Icon, MenuItem} from "@mui/material";
+import {Alert, Badge, Chip, Grid, Icon, IconButton, MenuItem} from "@mui/material";
 import GridFormField from "../../components/GridFormField.tsx";
 import {MetaExpedientComment} from "../CommentDialog.tsx";
 import LinkIcon from "../../components/LinkIcon.tsx";
@@ -18,6 +18,7 @@ import {StyledBadge} from "../../components/StyledBadge.tsx";
 import {useImportRolsac} from "./actions/ImportRolsac.tsx";
 import {useImportFitxer} from "./actions/ImportFitxer.tsx";
 import useActualitzar from "./actions/Actualitzar.tsx";
+import {useSessionContext} from "../../components/SessionStorageContext.tsx";
 
 // Form
 export const MetaExpedientForm = ({ isAdmin }:any) => {
@@ -257,10 +258,28 @@ const MetaExpedientGrid = () => {
         },
     ],[t])
 
+
+    const filterRef = useFilterApiRef();
+    const formRef = useFormApiRef();
+    const {value: revisioEstatMssg, save: setRevisioEstatMssg} = useSessionContext('revisioEstatMssg')
+
     return <GridPage disableMargins>
-        <CardPage title={ rol?.isRevisor ? t('page.user.menu.procedimentsRevisorTitle') : t('page.user.menu.procedimentsTitle')}>
-            
-            <MetaExpedientFilter onSpringFilterChange={setSpringFilter}/>
+        <CardPage title={ rol?.isRevisor ? t('page.user.menu.revisar') : t('page.user.menu.procedimentsTitle')}>
+
+            { rol?.isAdmin && user?.sessionScope?.numProcsPendentsRevisio > 0 && !revisioEstatMssg &&
+                <Alert severity={'info'} sx={{mb:1}}>
+                    {t('page.metaExpedient.alert.pendentsRevisio', {num: user?.sessionScope?.numProcsPendentsRevisio})}
+                    <IconButton sx={{ml: 1, p: 0}} onClick={() => {
+                        formRef.current?.setFieldValue('revisioEstat', 'PENDENT')
+                        filterRef.current?.filter()
+                        setRevisioEstatMssg(true)
+                    }}>
+                        <Icon>open_in_new</Icon>
+                    </IconButton>
+                </Alert>
+            }
+
+            <MetaExpedientFilter apiRef={filterRef} formApiRef={formRef} onSpringFilterChange={setSpringFilter}/>
 
             <StyledMuiGrid
                 apiRef={apiRef}

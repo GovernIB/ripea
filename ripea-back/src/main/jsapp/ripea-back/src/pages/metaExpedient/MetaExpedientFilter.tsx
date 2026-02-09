@@ -35,13 +35,13 @@ const springFilterBuilder = (data:any) => {
 }
 
 export const MetaExpedientFilter = (props: any) => {
-    const {onSpringFilterChange} = props;
+    // const {onSpringFilterChange} = props;
 
     return <StyledMuiFilter
         resourceName={"metaExpedientResource"}
         code={"FILTER_GESTIO"}
         springFilterBuilder={springFilterBuilder}
-        onSpringFilterChange={onSpringFilterChange}
+        {...props}
     >
         <MetaExpedientFilterForm/>
     </StyledMuiFilter>

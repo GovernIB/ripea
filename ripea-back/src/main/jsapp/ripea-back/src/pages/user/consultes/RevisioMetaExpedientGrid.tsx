@@ -115,6 +115,7 @@ const columns = [
                 {params?.row?.tipusProcedimentServei &&
                     <Chip label={isProcediment ?'P' :'S'}
                           color={isProcediment ?"primary" :"success"}
+                          size={'small'}
                           sx={{mr: 1}}/>}
                 {params?.formattedValue}
             </>

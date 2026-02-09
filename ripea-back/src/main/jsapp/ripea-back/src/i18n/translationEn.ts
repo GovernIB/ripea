@@ -1463,6 +1463,9 @@ const translationEn = {
                     }
                 }
             },
+            alert: {
+                pendentsRevisio: "There are {{num}} procedures or services pending review",
+            },
         },
         metaDocument: {
             title: "Document type",
