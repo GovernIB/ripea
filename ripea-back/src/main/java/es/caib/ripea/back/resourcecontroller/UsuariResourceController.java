@@ -196,13 +196,11 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
         	} catch (Exception ex) {}
         }
         		
-        List<GrupDto> grupsPermesos = null;
-        if (organActual!=null) {
-        	grupsPermesos = grupService.findGrupsPermesosProcedimentsGestioActiva(
+        List<GrupDto> grupsPermesos = grupService.findGrupsPermesosProcedimentsGestioActiva(
 	        		userPermissionInfo.getEntitatActualId(),
 	        		userPermissionInfo.getRolActual(),
-	        		RolHelper.isRolActualAdministradorOrgan(request) ? organActual.getId() : null);
-        }
+	        		organActual!=null ? organActual.getId() : null);
+        
         response.put("isFiltreGrupsVisible", (grupsPermesos!=null && !grupsPermesos.isEmpty()));
         
         return response;

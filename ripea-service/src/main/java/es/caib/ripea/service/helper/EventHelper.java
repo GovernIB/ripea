@@ -21,6 +21,7 @@ import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.persistence.repository.UsuariRepository;
 import es.caib.ripea.service.intf.dto.AvisDto;
 import es.caib.ripea.service.intf.dto.UsuariAnotacioDto;
+import es.caib.ripea.service.intf.dto.ValidacioErrorDto;
 import es.caib.ripea.service.intf.model.sse.AnotacionsPendentsEvent;
 import es.caib.ripea.service.intf.model.sse.AvisosActiusEvent;
 import es.caib.ripea.service.intf.model.sse.CreacioFluxFinalitzatEvent;
@@ -83,6 +84,10 @@ public class EventHelper {
     	} catch (Exception ex) {
     		log.error("Error al notifyErrorsValidacio a expedient", ex);
     	}
+    }
+    
+    public List<ValidacioErrorDto> getValidacionsInicialsExpedient(Long expedientId) {
+    	return cacheHelper.findErrorsValidacioPerNode(expedientId);
     }
     
     public void notifyTasquesPendents(List<String> usuarisAfectats) {

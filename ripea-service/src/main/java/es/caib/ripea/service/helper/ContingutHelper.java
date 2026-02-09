@@ -2365,9 +2365,7 @@ public class ContingutHelper {
 		}
 	}
 
-	public void arxiuPropagarModificacio(
-			ExpedientEntity expedient) {
-
+	public void arxiuPropagarModificacio(ExpedientEntity expedient) { 
 		pluginHelper.arxiuExpedientActualitzar(expedient);
 	}
 

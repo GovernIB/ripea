@@ -5,6 +5,7 @@ import java.util.List;
 import javax.annotation.security.PermitAll;
 
 import es.caib.ripea.service.intf.dto.UsuariAnotacioDto;
+import es.caib.ripea.service.intf.dto.ValidacioErrorDto;
 import es.caib.ripea.service.intf.model.sse.AvisosActiusEvent;
 import es.caib.ripea.service.intf.model.sse.CreacioFluxFinalitzatEvent;
 import es.caib.ripea.service.intf.model.sse.ErrorsValidacioChangedEvent;
@@ -30,4 +31,5 @@ public interface EventService {
     public AvisosActiusEvent getAvisosActiusEvent();
     public long getAnotacionsPendents(UsuariAnotacioDto usuariCodi);
     public long getTasquesPendents(String usuariCodi);
+    public List<ValidacioErrorDto> getValidacionsInicialsExpedient(Long expedientId);
 }

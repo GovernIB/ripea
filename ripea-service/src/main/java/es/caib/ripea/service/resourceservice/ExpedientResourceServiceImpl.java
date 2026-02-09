@@ -595,8 +595,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         resource.setConteDocumentsEnProcessDeFirma(CollectionUtils.isNotEmpty(documentResourceRepository.findEnProccessDeFirma(entity)));
         resource.setConteDocumentsDePortafirmesNoCustodiats(CollectionUtils.isNotEmpty(documentResourceRepository.findDocumentsDePortafirmesNoCustodiats(entity)));
         resource.setConteDocumentsPendentsReintentsArxiu(CollectionUtils.isNotEmpty(documentResourceRepository.findDocumentsPendentsReintentsArxiu(entity, contingutHelper.getArxiuMaxReintentsDocuments())));
-//        resource.setConteDocumentsDeAnotacionesNoMogutsASerieFinal(CollectionUtils.isNotEmpty(registreAnnexRepository.findDocumentsDeAnotacionesNoMogutsASerieFinalByExpedientId(entity.getId())));
-        
+//      resource.setConteDocumentsDeAnotacionesNoMogutsASerieFinal(CollectionUtils.isNotEmpty(registreAnnexRepository.findDocumentsDeAnotacionesNoMogutsASerieFinalByExpedientId(entity.getId())));
         resource.setErrors(cacheHelper.findErrorsValidacioPerNode(entity.getId()));
         resource.setValid(resource.getErrors().isEmpty());
 
