@@ -151,7 +151,7 @@ public class ExpedientPeticioResource extends BaseAuditableResource<Long> {
         private Date dataAltaInici;
         private Date dataAltaFi;
         private ExpedientPeticioEstatEnumDto estat;
-        private boolean nomesPendents;
+        private boolean nomesPendents = true;
     }
     
     @Getter

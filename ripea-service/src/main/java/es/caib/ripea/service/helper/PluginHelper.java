@@ -8936,6 +8936,27 @@ public class PluginHelper {
 		}	
 	}
 	
+	public String comandaIntegracioDiagnostic(DiagnosticFiltreDto filtre) {
+		try {
+			ComandaCaibPlugin comandaCaibPlugin = getComandaPlugin(filtre.getEntitatCodi(), filtre.getOrganCodi());
+			comandaCaibPlugin.getLlistatTasques("prova");
+			return null;
+		} catch (Exception ex) {
+			return ex.getMessage();
+		}				
+	}
+	
+	public String concsvIntegracioDiagnostic(DiagnosticFiltreDto filtre) {
+		try {
+			IArxiuPluginWrapper iArxiuPluginWrapper = getConcsvPlugin(filtre.getEntitatCodi(), filtre.getOrganCodi());
+			DocumentEntity doc = documentHelper.findLastDocumentPujatArxiuByExtensio(null);
+			iArxiuPluginWrapper.getPlugin().documentImprimible(doc.getArxiuUuid());
+			return null;
+		} catch (Exception ex) {
+			return ex.getMessage();
+		}	
+	}
+	
 	//Els fitxers han de estar a la ruta src/main/resources/es/caib/ripea/core
 	private InputStream llegirResourceCore(String finalPath) {
 		ClassLoader classLoader = PluginHelper.class.getClassLoader();

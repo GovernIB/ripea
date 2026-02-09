@@ -1,19 +1,14 @@
 package es.caib.ripea.plugin.caib.comanda;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.Properties;
 
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import es.caib.comanda.model.management.Avis;
 import es.caib.comanda.model.management.Tasca;
+import es.caib.comanda.model.management.TascaPage;
 import es.caib.comanda.service.management.AppComandaClient;
 import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.comanda.ComandaCaibPlugin;
@@ -95,10 +90,19 @@ public class ComandaCaibPluginImpl extends RipeaAbstractPluginProperties impleme
 //        return getRestTemplate().postForEntity(url, requestEntity, String.class);
 	}
 	
-	private RestTemplate getRestTemplate() {
-        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
-        factory.setConnectTimeout(5000);
-        factory.setReadTimeout(5000);
-        return new RestTemplate(factory);
+//	private RestTemplate getRestTemplate() {
+//        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+//        factory.setConnectTimeout(5000);
+//        factory.setReadTimeout(5000);
+//        return new RestTemplate(factory);
+//	}
+
+	@Override
+	public TascaPage getLlistatTasques(String quickFilter) throws Exception {
+		String url 		= getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.COMANDA_PLUGIN_URL));
+		String username = getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.COMANDA_PLUGIN_USR));
+		String password = getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.COMANDA_PLUGIN_PWR));
+		AppComandaClient clientcomanda = new AppComandaClient(url, username, password);
+		return clientcomanda.obtenirLlistatTasques(quickFilter, "", "0", 1);
 	}
 }

@@ -757,6 +757,20 @@ public class AplicacioServiceImpl implements AplicacioService {
 				} else {
 					return new GenericDto("integracio.diag.fa.ko", "fa fa-times vermell", new Object[] {resultatDiagnostic});
 				}
+			}  else if (codi.equals(IntegracioHelper.INTCODI_CONCSV)) {
+				String resultatDiagnostic = pluginHelper.concsvIntegracioDiagnostic(filtre);
+				if (resultatDiagnostic==null) {
+					return new GenericDto("integracio.diag.fa.ok", "fa fa-check verd", new Object[] {codi});
+				} else {
+					return new GenericDto("integracio.diag.fa.ko", "fa fa-times vermell", new Object[] {resultatDiagnostic});
+				}
+			}  else if (codi.equals(IntegracioHelper.INTCODI_COMANDA)) {
+				String resultatDiagnostic = pluginHelper.comandaIntegracioDiagnostic(filtre);
+				if (resultatDiagnostic==null) {
+					return new GenericDto("integracio.diag.fa.ok", "fa fa-check verd", new Object[] {codi});
+				} else {
+					return new GenericDto("integracio.diag.fa.ko", "fa fa-times vermell", new Object[] {resultatDiagnostic});
+				}
 			} else {
 				return new GenericDto("integracio.diag.no", "fa fa-question-circle taronja", new Object[] {codi});
 			}
