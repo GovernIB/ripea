@@ -1745,7 +1745,7 @@ const translationEs = {
                 read: {
                     label: "Marcar como leído",
                     ok: "La alerta se ha marcado como leida",
-                    massiveOk: "Las alertas se ha marcado como leídas",
+                    massiveOk: "Las alertas se han marcado como leídas",
                 },
             },
             errors: {

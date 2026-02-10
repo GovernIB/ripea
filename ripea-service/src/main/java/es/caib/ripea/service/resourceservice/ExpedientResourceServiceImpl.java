@@ -624,7 +624,22 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		resource.setPotModificar(entityComprovarHelper.comprovarSiEsPotModificarExpedient(expedientEntity));
 		UsuariEntity usuariEntity = usuariRepository.findById(SecurityContextHolder.getContext().getAuthentication().getName()).orElse(null);
 		if (usuariEntity!=null && entity.getId()!=null) {
-			resource.setPotModificarContingut(expedientTascaRepository.countTasquesResponsableExpedient(usuariEntity, entity.getId())>0);
+			try {
+				ContingutEntity contingutEntity = contingutHelper.comprovarContingutDinsExpedientModificable(
+						entity.getEntitat().getId(),
+						entity.getId(),
+						false, //comprovarPermisRead
+						true, //comprovarPermisWrite
+						false, //comprovarPermisCreate
+						false, //comprovarPermisDelete
+						false, //checkPerMassiuAdmin
+						false, //comprovarAgafatPerUsuariActual
+						configHelper.getRolActual());
+				resource.setPotModificarContingut(contingutEntity!=null);
+			}catch (Exception ex) {
+				resource.setPotModificarContingut(false);
+			}
+//			resource.setPotModificarContingut(expedientTascaRepository.countTasquesResponsableExpedient(usuariEntity, entity.getId())>0);
     	}
 		resource.setHasEsborranys(documentResourceRepository.hasFillsEsborranys(expedientEntity.getId()));
 		resource.setPendentExecucioMassiva(expedientHelper.isExpedientPendentExecucioMassiva(expedientEntity.getId()));

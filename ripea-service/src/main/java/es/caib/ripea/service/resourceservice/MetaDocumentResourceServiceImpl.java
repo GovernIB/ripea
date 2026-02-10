@@ -26,6 +26,7 @@ import es.caib.ripea.persistence.entity.MetaDocumentEntity;
 import es.caib.ripea.persistence.entity.MetaDocumentFluxPortafibEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.entity.TipusDocumentalEntity;
+import es.caib.ripea.persistence.entity.resourceentity.MetaDadaResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaDocumentFluxPortafibResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaDocumentResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaDocumentResourceRepository;
@@ -372,5 +373,27 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
     		excepcioLogHelper.addExcepcio("/metaDocumentResource/"+id+"/delete", ex);
     		throw new ResourceNotFoundException(getResourceClass(), ex.getMessage());
     	}
+    }
+    
+    @Override
+    protected void afterCreateSave(MetaDocumentResourceEntity entity, MetaDocumentResource resource, Map<String, AnswerRequiredException.AnswerValue> answers, boolean anyOrderChanged) {
+    	afterDbChange(entity);
+    }
+    
+    @Override
+    protected void afterUpdateSave(MetaDocumentResourceEntity entity, MetaDocumentResource resource, Map<String, AnswerRequiredException.AnswerValue> answers, boolean anyOrderChanged) {
+    	if (!entity.getMultiplicitat().equals(resource.getMultiplicitat())) {
+    		afterDbChange(entity);
+    	}
+    }
+    
+    @Override
+    protected void afterDelete(MetaDocumentResourceEntity entity, Map<String, AnswerRequiredException.AnswerValue> answers) {
+        afterDbChange(entity);
+    }
+    
+    private void afterDbChange(MetaDocumentResourceEntity entity) {
+    	//Esborram cache de validacions del expedient
+    	metaDocumentHelper.evictValidacionsExpedients(entity.getEntitat().getId(), entity.getMetaExpedient().getId());
     }
 }

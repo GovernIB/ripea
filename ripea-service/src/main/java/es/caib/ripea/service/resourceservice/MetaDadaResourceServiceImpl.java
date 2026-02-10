@@ -16,6 +16,7 @@ import com.turkraft.springfilter.parser.Filter;
 
 import es.caib.ripea.persistence.entity.DominiEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.resourceentity.DadaResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaDadaResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaDadaResourceRepository;
 import es.caib.ripea.persistence.repository.DominiRepository;
@@ -33,6 +34,7 @@ import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.DominiDto;
 import es.caib.ripea.service.intf.dto.MetaDadaDto;
 import es.caib.ripea.service.intf.dto.MetaDadaTipusEnumDto;
+import es.caib.ripea.service.intf.model.DadaResource;
 import es.caib.ripea.service.intf.model.EntitatResource;
 import es.caib.ripea.service.intf.model.MetaDadaResource;
 import es.caib.ripea.service.intf.model.MetaNodeResource;
@@ -155,6 +157,25 @@ public class MetaDadaResourceServiceImpl extends BaseMutableResourceService<Meta
 				configHelper.getRolActual(),
 				organId);
 	}
+	
+    @Override
+    protected void afterCreateSave(MetaDadaResourceEntity entity, MetaDadaResource resource, Map<String, AnswerRequiredException.AnswerValue> answers, boolean anyOrderChanged) {
+    	afterDbChange(entity);
+    }    
+    @Override
+    protected void afterUpdateSave(MetaDadaResourceEntity entity, MetaDadaResource resource, Map<String, AnswerRequiredException.AnswerValue> answers, boolean anyOrderChanged) {
+    	if (!entity.getMultiplicitat().equals(resource.getMultiplicitat())) {
+    		afterDbChange(entity);
+    	}
+    }    
+    @Override
+    protected void afterDelete(MetaDadaResourceEntity entity, Map<String, AnswerRequiredException.AnswerValue> answers) {
+        afterDbChange(entity);
+    }    
+    private void afterDbChange(MetaDadaResourceEntity entity) {
+    	//Esborram cache de validacions del expedient
+    	metaDadaHelper.evictValidacionsExpedients(entity.getMetaNode().getEntitat().getId(), entity.getMetaNode().getId());
+    }
 	
 	private MetaDadaDto recursToMetaDadaDto(MetaDadaResource resource) {
 		MetaDadaDto metaDadaDto = objectMappingHelper.newInstanceMap(resource, MetaDadaDto.class, "valorData", "domini", "serialVersionUID");

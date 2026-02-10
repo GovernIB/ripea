@@ -101,8 +101,15 @@ public class MetaDadaHelper {
 		}			
 	}
 	
-	private void evictValidacionsExpedients(EntitatEntity entitat, MetaNodeEntity metaNode) {
-		//Una metaDada pot ser de un meta-document
+	public void evictValidacionsExpedients(Long entitatId, Long metaNodeId) {
+		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatId);
+		evictValidacionsExpedients(
+				entitatEntity,
+				entityComprovarHelper.comprovarMetaNode(entitatEntity, metaNodeId));
+	}
+	
+	public void evictValidacionsExpedients(EntitatEntity entitat, MetaNodeEntity metaNode) {
+		//Una metaDada pot ser de un meta-document, i el evict i les notificacions son per expedients
 		if (metaNode != null && metaNode instanceof MetaExpedientEntity) {
 			List<ExpedientEntity> expedients = expedientRepository.findByEntitatAndMetaExpedientAndEstatAndEsborrat(
 					entitat, 
@@ -177,7 +184,7 @@ public class MetaDadaHelper {
 			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientId, organId);
 		}
 		
-		evictValidacionsExpedients(entitat, metaNode);
+		evictValidacionsExpedients(entitat, metaNode);		
 		
 		return metaDada;
 	}

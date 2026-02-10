@@ -196,7 +196,7 @@ public class MetaDocumentHelper {
 		evictValidacionsExpedients(entitat, metaExpedient);
 	}
 	
-	private void evictValidacionsExpedients(Long entitatId, Long metaExpedientId) {
+	public void evictValidacionsExpedients(Long entitatId, Long metaExpedientId) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,

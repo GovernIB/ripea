@@ -186,10 +186,13 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
         }
        	resource.setUsuariActualResponsable(usuariActualResponsable);
         resource.setUsuariActualDelegat(resource.getDelegat()!=null && usuariActualCodi.equals(resource.getDelegat().getId()));
-        if (entity.getDataLimit()!=null && entity.getDataLimit().before(Calendar.getInstance().getTime())) {
-        	resource.setDataLimitExpirada(true);
+        if (entity.getDataLimit()!=null) {
+	        if (entity.getDataLimit().before(Calendar.getInstance().getTime())) {
+	        	resource.setDataLimitExpirada(true);
+	        } else {
+	        	resource.setShouldNotifyAboutDeadline(tascaHelper.shouldNotifyAboutDeadline(entity.getDataLimit()));
+	        }
         }
-        resource.setShouldNotifyAboutDeadline(tascaHelper.shouldNotifyAboutDeadline(entity.getDataLimit()));
         resource.setUsuariActualOnlyObservador(entity.isUsuariActualOnlyObservador(usuariActualCodi));
         resource.setAgafadaUsuariActual(entity.getResponsableActual()!=null && entity.getResponsableActual().getId().equals(usuariActualCodi));
         resource.setResponsablesStr(entity.getResponsablesStr());

@@ -1773,6 +1773,9 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 				String docIdStr = Utils.getIdsSeparatsComa(params.getIds());
 				excepcioLogHelper.addExcepcio("/document/EnviarPortafirmesActionExecutor", e, docIdStr, "massiu="+params.isMassivo());
 				String message = messageHelper.getMessage("message.common.action.error")+": "+e.getMessage();
+				if (e.getCause()!=null && e.getCause().getMessage()!=null) {
+					message = e.getCause().getMessage();
+				}
 				throw new ActionExecutionException(getResourceClass(), docIdStr, code, message);
 			}
         }
