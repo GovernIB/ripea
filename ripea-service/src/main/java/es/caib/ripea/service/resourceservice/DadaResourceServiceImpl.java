@@ -70,7 +70,10 @@ public class DadaResourceServiceImpl extends BaseMutableResourceService<DadaReso
         afterDbChange(entity);
     }    
     private void afterDbChange(DadaResourceEntity entity) {
-    	cacheHelper.evictErrorsValidacioPerNode(entity.getNode().getId());
+    	//Esborram cache de validacions del expedient
+    	if (entity.getMetaDada().getMultiplicitat().esObligatoria()) {
+    		cacheHelper.evictErrorsValidacioAndNotify(entity.getNode().getId());
+    	}
     }
     //Fi Metodes AFTER
     

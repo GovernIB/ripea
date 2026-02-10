@@ -1,15 +1,10 @@
 package es.caib.ripea.back.controller;
 
 import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -24,12 +19,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -220,7 +212,11 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 	}
 	
 	@RequestMapping(value = "/{registreAnnexId}/{expedientPeticioId}/reintentar", method = RequestMethod.GET)
-	public String retryCreateDocFromAnnex(HttpServletRequest request, @PathVariable Long registreAnnexId, @PathVariable Long expedientPeticioId, Model model) {
+	public String retryCreateDocFromAnnex(
+			HttpServletRequest request,
+			@PathVariable Long registreAnnexId,
+			@PathVariable Long expedientPeticioId,
+			Model model) {
 
 		RegistreAnnexDto registreAnnex = expedientPeticioService.findAnnexById(registreAnnexId);
 		if (registreAnnex.getDocumentId() != null) {

@@ -384,14 +384,14 @@ const useMenuAdmin = () => {
                     title: t('page.user.menu.dadesEstadistiques'),
                     // icon: '',
                     onClick: () => toProgramaAntic('historic'),
-                },*/
+                },
                 {
                     id: 'revisar',
                     title: t('page.user.menu.revisar'),
                     // icon: '',
                     to: '/metaExpedientRevisio',
                     hidden: !user?.sessionScope?.revisioActiva,
-                },
+                },*/
                 {
                     id: 'portafib',
                     title: t('page.user.menu.portafib'),

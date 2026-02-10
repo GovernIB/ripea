@@ -510,7 +510,7 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 									expedientPeticioId,
 									Long.parseLong(entry.getValue()),
 									rolActual);
-
+							
 						} catch (Exception e) {
 							expedientHelper.updateRegistreAnnexError(
 									entry.getKey(),

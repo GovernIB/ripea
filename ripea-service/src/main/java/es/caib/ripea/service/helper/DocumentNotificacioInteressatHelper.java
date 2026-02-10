@@ -92,7 +92,7 @@ public class DocumentNotificacioInteressatHelper {
 			destinitariAmbDocument += interessatDto.getNomCompletAmbDocument();
 		}
 
-		cacheHelper.evictErrorsValidacioPerNode(expedientEntity.getId());
+		cacheHelper.evictErrorsValidacioAndNotify(expedientEntity.getId());
 		cacheHelper.evictNotificacionsPendentsPerExpedient(expedientEntity);
 		logAll(notificacioEntity, LogTipusEnumDto.NOTIFICACIO_ENVIADA, destinitariAmbDocument);
 	}
