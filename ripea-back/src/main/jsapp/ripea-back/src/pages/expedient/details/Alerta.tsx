@@ -124,7 +124,7 @@ const useAlerta = () => {
     };
 
     useEffect(() => {
-        if (count == 0){
+        if (count === 0){
             handleClose()
         }
     }, [count]);

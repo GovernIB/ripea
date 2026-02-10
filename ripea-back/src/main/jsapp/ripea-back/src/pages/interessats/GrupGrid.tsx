@@ -122,7 +122,7 @@ export const GrupGrid = (props:any) => {
         />
     </BasePage>
 }
-export const useGrupGridDialog = (entity:any) => {
+export const useGrupGridDialog = (entity:any, refresh?: () => void) => {
     const { t } = useTranslation();
 
     const [open, setOpen] = useState(false);
@@ -134,6 +134,7 @@ export const useGrupGridDialog = (entity:any) => {
     const handleClose = (reason?: string) => {
         if(reason !== 'backdropClick') {
             setOpen(false);
+            refresh?.()
         }
     };
 

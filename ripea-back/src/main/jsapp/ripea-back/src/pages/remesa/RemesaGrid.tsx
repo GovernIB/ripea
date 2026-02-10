@@ -17,7 +17,7 @@ export const EstatMessage = (props:any) => {
         title={title || (typeof children === 'string' ?children :'')} 
         sx={{ ...commonStyle, backgroundColor: `${color}.light`, color: 'white' }}>
             <Icon fontSize={"inherit"} sx={{ mr: children!=null  ?1 :0 }}>{icon}</Icon>
-            <Typography sx={{fontSize: '0.8rem', paddingRight: '5px'}}>{children}</Typography>
+            {children && <Typography sx={{fontSize: '0.8rem', paddingRight: '5px'}}>{children}</Typography>}
     </Typography>
 }
 export const StyledEstat = (props:any) => {
