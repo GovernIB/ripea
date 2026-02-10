@@ -29,6 +29,7 @@ import es.caib.ripea.api.interna.config.BaseApiInternaSecurityConfig;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.SegonPlaService;
+import es.caib.ripea.service.intf.utils.DateUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
@@ -56,7 +57,7 @@ public class EstadistiquesController extends BaseApiInternaController {
         List<IndicadorDesc> indicadors = segonPlaService.getIndicadorsInfo();
         return EstadistiquesInfo.builder()
         		.codi(aplicacioService.propertyFindByNom(PropertyConfig.COMANDA_APP_CODI))
-        		.data(Calendar.getInstance().getTime())
+        		.data(DateUtil.toOffsetDateTime(Calendar.getInstance().getTime()))
         		.versio(getManifestInfo().getVersion())
         		.dimensions(dimensions)
         		.indicadors(indicadors).build();

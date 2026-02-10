@@ -39,6 +39,7 @@ import es.caib.ripea.service.intf.dto.MetriquesRipeaInfoDto;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.AvisService;
 import es.caib.ripea.service.intf.service.SalutService;
+import es.caib.ripea.service.intf.utils.DateUtil;
 import io.micrometer.core.instrument.Meter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
@@ -248,7 +249,7 @@ public class SalutServiceImpl implements SalutService{
         return SalutInfo.builder()
                 .codi(configHelper.getConfig(PropertyConfig.COMANDA_APP_CODI))
                 .versio(versio)
-                .data(new Date())
+                .data(DateUtil.toOffsetDateTime(new Date()))
                 .estatGlobal(estatSalut)
                 .estatBaseDeDades(salutDb)
                 .integracions(salutIntegracions)
@@ -742,7 +743,7 @@ public class SalutServiceImpl implements SalutService{
 
 	    	for (AvisDto avis: avisos) {
 	    		MissatgeSalut ms = MissatgeSalut.builder()
-	    				.data(avis.getDataInici())
+	    				.data(DateUtil.toOffsetDateTime(avis.getDataInici()))
 	    				.missatge(avis.getAssumpte()+": "+avis.getMissatge())
 	    				.nivell(avis.getSalutNivellComanda())
 	    				.build();

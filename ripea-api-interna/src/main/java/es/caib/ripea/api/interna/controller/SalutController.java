@@ -21,6 +21,7 @@ import es.caib.ripea.api.interna.config.BaseApiInternaSecurityConfig;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.SalutService;
+import es.caib.ripea.service.intf.utils.DateUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
@@ -48,7 +49,7 @@ public class SalutController extends BaseApiInternaController {
         return AppInfo.builder()
                 .codi(aplicacioService.propertyFindByNom(PropertyConfig.COMANDA_APP_CODI))
                 .nom("RIPEA")
-                .data(manifestInfo.getBuildDate())
+                .data(DateUtil.toOffsetDateTime(manifestInfo.getBuildDate()))
                 .versio(manifestInfo.getVersion())
                 .revisio(manifestInfo.getBuildScmRevision())
                 .jdkVersion(manifestInfo.getBuildJDK())
