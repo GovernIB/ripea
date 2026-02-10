@@ -299,7 +299,7 @@ const DocumentsGrid = (props: any) => {
                                 case View.tipus:
                                     if (_rows!=null){
                                         for (const row of _rows) {
-                                            if (!additionalRows.map((b) => b.id).includes(row?.metaNode?.id)) {
+                                            if (!additionalRows.map((b) => b.id).includes(row?.metaDocumentInfo?.id)) {
                                                 additionalRows.push({
                                                     ...row?.metaDocumentInfo,
                                                     tipus: "META_" + row?.metaDocumentInfo?.tipus,

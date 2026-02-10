@@ -3,8 +3,6 @@ package es.caib.ripea.plugin.caib.comanda;
 import java.util.Properties;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
-import org.springframework.web.client.RestTemplate;
 
 import es.caib.comanda.model.management.Avis;
 import es.caib.comanda.model.management.Tasca;
@@ -103,6 +101,6 @@ public class ComandaCaibPluginImpl extends RipeaAbstractPluginProperties impleme
 		String username = getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.COMANDA_PLUGIN_USR));
 		String password = getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.COMANDA_PLUGIN_PWR));
 		AppComandaClient clientcomanda = new AppComandaClient(url, username, password);
-		return clientcomanda.obtenirLlistatTasques(quickFilter, "", "0", 1);
+		return clientcomanda.obtenirLlistatTasques(quickFilter, null, "0", 1);
 	}
 }

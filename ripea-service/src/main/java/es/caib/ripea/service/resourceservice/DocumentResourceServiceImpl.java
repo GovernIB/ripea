@@ -522,9 +522,9 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         resource.setFirmaParcial(DocumentEstatEnumDto.FIRMA_PARCIAL.equals(entity.getEstat()));
         
         if (entity.getMetaDocument()!=null) {
-        	MetaDocumentResourceEntity metaDocumentResourceEntity = (MetaDocumentResourceEntity) Hibernate.unproxy(entity.getMetaDocument());
+//        	MetaDocumentResourceEntity metaDocumentResourceEntity = (MetaDocumentResourceEntity) Hibernate.unproxy(entity.getMetaDocument());
         	resource.setMetaDocumentInfo(objectMappingHelper.newInstanceMap(
-        			metaDocumentResourceEntity,
+        			entity.getMetaDocument(),
         			MetaDocumentResource.class,
         			"portafirmesResponsables", "serialVersionUID"));
         }
