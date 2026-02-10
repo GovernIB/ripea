@@ -1,4 +1,4 @@
-import { Grid } from "@mui/material";
+import {Grid, Icon, Typography} from "@mui/material";
 import {
     useFormContext,
     useMuiDataGridApiRef,
@@ -48,7 +48,15 @@ const columns = [
     {
         field: 'dataLimit',
         flex: 0.45,
-        valueFormatter: (value: any) => formatDate(value, "DD/MM/Y")
+        valueFormatter: (value: any) => formatDate(value, "DD/MM/Y"),
+        renderCell: (params: any) => {
+            const color = params?.row?.dataLimitExpirada
+                ?'error'
+                :params?.row?.shouldNotifyAboutDeadline
+                    ?'warning'
+                    :'default'
+            return <Typography variant={"inherit"} color={color}>{params?.formattedValue}<Icon>alarm</Icon></Typography>
+        }
     },
     {
         field: 'titol',
@@ -100,7 +108,11 @@ const TasquesExpedientGrid = (props: any) => {
         },
     ]
 
-    const { actions, components } = useTascaActions(entity, apiRef?.current?.refresh);
+    const refresh = () => {
+        apiRef?.current?.refresh?.();
+    }
+
+    const { actions, components } = useTascaActions(entity, refresh);
     const { handleOpen, dialog } = useTascaDetail();
 
     return <>

@@ -142,8 +142,8 @@ const ExpedientAlert = (props:any) => {
         { expedient?.numAlert!=0 && (count === null || count !== 0) &&
             <Alert severity="warning"
                    action={
-                       <Button  sx={{py: 0}} variant="outlined"
-                                onClick={() => handelAlert(expedient?.id, expedient)}>
+                       <Button sx={{py: 0}} variant="outlined"
+                               onClick={() => handelAlert(expedient?.id, expedient)}>
                             <Icon>search</Icon>
                            <Typography variant={"subtitle2"}>{t('common.consult')}</Typography>
                        </Button>

@@ -8,17 +8,17 @@ import {EstatMessage} from "../remesa/RemesaGrid.tsx";
 import {useTranslation} from "react-i18next";
 
 const StyledEstat = (props:any) => {
-    const { entity: publicacio } = props;
+    const { estat, children } = props;
 
-    switch (publicacio?.estat) {
+    switch (estat) {
         case 'PENDENT':
-            return <EstatMessage icon={'schedule'} color={'warning'} title={publicacio?.estat}/>;
+            return <EstatMessage icon={'schedule'} color={'warning'} title={children}/>;
         case 'ENVIAT':
-            return <EstatMessage icon={'mail'} color={'info'} title={publicacio?.estat}/>;
+            return <EstatMessage icon={'mail'} color={'info'} title={children}/>;
         case 'REBUTJAT':
-            return <EstatMessage icon={'close'} color={'disabled'} title={publicacio?.estat}/>;
+            return <EstatMessage icon={'close'} color={'disabled'} title={children}/>;
         case 'PROCESSAT':
-            return <EstatMessage icon={'check'} color={'error'} title={publicacio?.estat}/>;
+            return <EstatMessage icon={'check'} color={'error'} title={children}/>;
     }
 
     return <></>;
@@ -62,7 +62,7 @@ const columns = [
     {
         field: 'estat',
         flex: 0.25,
-        renderCell: (params: any) => <StyledEstat entity={params?.row}/>
+        renderCell: (params: any) => <StyledEstat estat={params?.row?.estat}>{params?.formattedValue}</StyledEstat>
     },
 ]
 

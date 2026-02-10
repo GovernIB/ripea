@@ -241,7 +241,7 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
                 setGridRows([...rows]);
                 setGridSelectedRows(others?.rowSelectionModel ?? [])
                 onRowsChange?.(rows, info);
-                onRowCountChange?.(info?.totalElements ?? 0)
+                onRowCountChange?.(info?.totalElements)
             }}
             onRowSelectionModelChange={(newSelection, details) => {
                 setSelectedRows([...newSelection]);
