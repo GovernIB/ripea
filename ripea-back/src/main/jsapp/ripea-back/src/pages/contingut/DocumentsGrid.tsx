@@ -327,7 +327,6 @@ const DocumentsGrid = (props: any) => {
                             }
                         }}
                         rowExpansionChange={(params: any) => {
-                            console.log('1', params.groupingKey, params.childrenExpanded)
                             addFolderExpand(params.groupingKey, params.childrenExpanded)
                         }}
                         isGroupExpandedByDefault={(params) => {

@@ -21,7 +21,7 @@ import {useUserSession} from "../../../components/Session.tsx";
 import {useActions} from "./CommonActions.tsx";
 import useAlerta from "./Alerta.tsx";
 import useErrorValidacio from "./ErrorValidacio.tsx";
-import SseExpedient from "../../../components/SseExpedient.tsx";
+import SseExpedient, {useValidacioSession} from "../../../components/SseExpedient.tsx";
 import {icons} from "../../user/UserHeadToolbar.tsx";
 import {setTitlePage} from "../../../TitleHeaderConfigurator.tsx";
 
@@ -116,6 +116,7 @@ const ExpedientAlert = (props:any) => {
     }
 
     const {value: user} = useUserSession();
+    const {value: validacions} = useValidacioSession()
     const {agafar} = useActions(refresh);
 
     const {handleOpen: handelAlert, dialog: dialogAlert, count} = useAlerta();
@@ -150,7 +151,7 @@ const ExpedientAlert = (props:any) => {
                    }
             >{t('page.expedient.alert.alert')}</Alert>
         }
-        { !expedient?.valid &&
+        { validacions &&
             <Alert severity="warning"
                    action={
                        <Button  sx={{py: 0}} variant="outlined"
