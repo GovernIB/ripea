@@ -96,8 +96,6 @@ const Alerta = (props:any) => {
         apiRef={apiRef}
         rowAdditionalActions={actions}
         toolbarMassiveActions={massiveActions}
-        // height={162 + 52 * 4}
-        // paginationActive
         autoHeight
 
         onRowCountChange={onRowCountChange}

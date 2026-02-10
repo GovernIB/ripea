@@ -197,6 +197,7 @@ const useDocumentDetail = (expedient:any, refresh?: () => void) => {
                 handleClose();
             }}
         >
+            <Load value={entity}>
             {!entity?.valid &&
                 <Alert severity="warning"
                        action={
@@ -215,6 +216,7 @@ const useDocumentDetail = (expedient:any, refresh?: () => void) => {
                 tabs={tabs}
                 variant="scrollable"
             />
+            </Load>
         </MuiDialog>
 
     return {

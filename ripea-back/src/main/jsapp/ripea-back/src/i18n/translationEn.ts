@@ -808,6 +808,7 @@ const translationEn = {
                 naixement: "Birth",
                 dadesAdicionals: "Additional data",
                 dataOther: "Other data",
+                senseTipus: "No type assigned",
             },
             action: {
                 new: {
@@ -1739,7 +1740,7 @@ const translationEn = {
             }
         },
         alert: {
-            title: "Case Alerts",
+            title: "Case validation errors",
             action: {
                 read: {
                     label: "Mark as read",

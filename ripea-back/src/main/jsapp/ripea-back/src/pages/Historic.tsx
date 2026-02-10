@@ -50,9 +50,8 @@ const Accions = (props:any) => {
             columns={columnsAccions}
             rowAdditionalActions={actions}
             onRowCountChange={onRowCountChange}
-            // paginationActive
-            height={58 + 52 * 4}
-            // autoHeight
+            autoHeight
+            paginationModel={{page: 0, pageSize: 5}}
             toolbarHide
             readOnly
         />
@@ -159,8 +158,8 @@ const Moviment = (props:any) => {
             staticSortModel={sortModel}
             columns={columnsMoviment}
             onRowCountChange={onRowCountChange}
-            // paginationActive
-            height={58 + 52 * 4}
+            autoHeight
+            paginationModel={{page: 0, pageSize: 5}}
             toolbarHide
             readOnly
         />

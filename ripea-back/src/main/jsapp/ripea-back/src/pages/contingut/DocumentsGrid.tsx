@@ -189,13 +189,16 @@ const DocumentsGrid = (props: any) => {
     const { createActions, actions, components } = useContingutActions(entity, gridApiRef, refresh);
     const { actions: massiveActions, components: massiveComponents } = useContingutMassiveActions(entity, refresh);
 
+    const draggable = useMemo(()=> (
+        vista == View.carpeta && (entity?.potModificarContingut || entity?.potModificar) && user?.sessionScope?.ordenacioContingutPermesa
+    ),[vista, entity?.potModificarContingut, entity?.potModificar, user?.sessionScope?.ordenacioContingutPermesa])
     const additionalColumns:any[] = useMemo(()=>[
         ...columns,
-        ...(vista == View.carpeta && (entity?.potModificarContingut || entity?.potModificar) && user?.sessionScope?.ordenacioContingutPermesa ? [{
+        ...( draggable? [{
             renderCell: () => <DraggableGridRowHandler />,
             flex: 0.1
         }] : [])
-    ], [columns, vista, user?.sessionScope?.ordenacioContingutPermesa])
+    ], [draggable])
 
     const onDrop = React.useCallback((adjunt: any) => {
         gridApiRef?.current?.showCreateDialog?.(null, { adjunt })
@@ -241,7 +244,7 @@ const DocumentsGrid = (props: any) => {
                         resourceName={"documentResource"}
                         popupEditFormDialogResourceTitle={t('page.document.title')}
                         columns={additionalColumns}
-                        rowActionsColumnIndex={-1}
+                        rowActionsColumnIndex={draggable?-1:undefined}
                         paginationActive={false}
                         autoHeight
                         filter={commonFilter}
@@ -318,7 +321,7 @@ const DocumentsGrid = (props: any) => {
                         getTreeDataPath={(row: any): string[] => {
                             switch (vista) {
                                 case View.estat: return [`${row?.expedientEstatAdditional?.description}`, `${row.id}`];
-                                case View.tipus: return row?.metaNode ?[`${row?.metaNode?.id}`, `${row.id}`] :[`${row.id}`];
+                                case View.tipus: return row?.metaNode ?[`${row?.metaNode?.id}`, `${row.id}`] :[t('page.document.detall.senseTipus'),`${row.id}`];
                                 default: return row?.treePath?.filter((id:any)=>id!=entity?.id) ?? [`${row.id}`];
                             }
                         }}

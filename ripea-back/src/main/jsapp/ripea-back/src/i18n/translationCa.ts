@@ -808,6 +808,7 @@ const translationCa = {
                 naixement: "Naixement",
                 dadesAdicionals: "Dades addicionals",
                 dataOther: "Altres dades",
+                senseTipus: 'Sense tipus assignat',
             },
             action: {
                 new: {
@@ -1739,7 +1740,7 @@ const translationCa = {
             }
         },
         alert: {
-            title: "Alertes d'expedient",
+            title: "Errors de validació del expedient",
             action: {
                 read: {
                     label: "Marcar com a llegida",

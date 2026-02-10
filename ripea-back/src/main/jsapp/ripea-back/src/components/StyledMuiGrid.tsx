@@ -269,8 +269,8 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
             rowHideDeleteButton
             readOnly={readOnly}
 
-            {...paginationProps}
             {...others}
+            {...paginationProps}
         />
     </div>
 }

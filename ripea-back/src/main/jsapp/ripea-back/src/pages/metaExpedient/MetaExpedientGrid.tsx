@@ -19,6 +19,7 @@ import {useImportRolsac} from "./actions/ImportRolsac.tsx";
 import {useImportFitxer} from "./actions/ImportFitxer.tsx";
 import useActualitzar from "./actions/Actualitzar.tsx";
 import {useSessionContext} from "../../components/SessionStorageContext.tsx";
+import Load from "../../components/Load.tsx";
 
 // Form
 export const MetaExpedientForm = ({ isAdmin }:any) => {
@@ -258,9 +259,9 @@ const MetaExpedientGrid = () => {
         },
     ],[t])
 
-
     const filterRef = useFilterApiRef();
     const formRef = useFormApiRef();
+    const [load, setLoad] = useState<boolean>(true);
     const {value: revisioEstatMssg, save: setRevisioEstatMssg} = useSessionContext('revisioEstatMssg')
 
     return <GridPage disableMargins>
@@ -272,6 +273,7 @@ const MetaExpedientGrid = () => {
                     <IconButton sx={{ml: 1, p: 0}} onClick={() => {
                         formRef.current?.setFieldValue('revisioEstat', 'PENDENT')
                         filterRef.current?.filter()
+                        setLoad(true)
                         setRevisioEstatMssg(true)
                     }}>
                         <Icon>open_in_new</Icon>
@@ -279,8 +281,12 @@ const MetaExpedientGrid = () => {
                 </Alert>
             }
 
-            <MetaExpedientFilter apiRef={filterRef} formApiRef={formRef} onSpringFilterChange={setSpringFilter}/>
+            <MetaExpedientFilter apiRef={filterRef} formApiRef={formRef} onSpringFilterChange={(filter:string) => {
+                setSpringFilter(filter)
+                setLoad(false)
+            }}/>
 
+            <Load value={!load}>
             <StyledMuiGrid
                 apiRef={apiRef}
                 resourceName={"metaExpedientResource"}
@@ -302,7 +308,7 @@ const MetaExpedientGrid = () => {
                     deleteSuccess: 'page.metaExpedient.action.delete.ok',
                 }}
                 readOnly={readOnly}
-            />
+            /></Load>
             {contentImportRolsac}
             {contentImportFitxer}
             {contentActualitzar}

@@ -3,36 +3,34 @@ import {Grid, Alert, Icon} from "@mui/material";
 import {MuiDialog} from "reactlib";
 import {useTranslation} from "react-i18next";
 import Load from "../../../components/Load.tsx";
+import {useValidacioSession} from "../../../components/SseExpedient.tsx";
 
 const ErrorValidacio = (props:any) => {
-    const {entity} = props;
+    const {errors} = props;
     const { t } = useTranslation();
-    const errors = entity?.errors;
-
-    const hiHaDocumentsSenseMetaNode = errors?.some((error:any)=>error?.documentsWithoutMetaDocument);
-    const hiHaNotificacionsNoFinalitzades = errors?.some((error:any)=>error?.withNotificacionsNoFinalitzades);
-    const expedientAmbInteressatObligatori = errors?.some((error:any)=>error?.expedientWithoutInteressats);
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         {
-            errors.map((error:any)=> <>
-                {error?.metaDada && <Grid item xs={12} key={`metaDada-${error?.id}`}><Alert severity="warning" icon={<Icon>create</Icon>}>{t('page.alert.errors.metaDada')} {error?.metaDada?.nom} ({error?.metaDada?.tipus})</Alert></Grid>}
-                {error?.metaDocument && <Grid item xs={12} key={`metaDocument-${error?.id}`}><Alert severity="warning" icon={<Icon>insert_drive_file</Icon>}>{t('page.alert.errors.metaDocument')} {error?.metaDocument?.nom}</Alert></Grid>}
-            </>)
+            errors?.map((validacio:any, index:number)=> <Grid item xs={12} key={`validacio-${index}`} container direction={"row"} columnSpacing={1} rowSpacing={1}>
+                <Grid item xs={12} hidden={!validacio?.metaDada}><Alert severity="warning" icon={<Icon>create</Icon>}>{t('page.alert.errors.metaDada')} {validacio?.metaDada?.nom} ({validacio?.metaDada?.tipus})</Alert></Grid>
+                <Grid item xs={12} hidden={!validacio?.metaDocument}><Alert severity="warning" icon={<Icon>insert_drive_file</Icon>}>{t('page.alert.errors.metaDocument')} {validacio?.metaDocument?.nom}</Alert></Grid>
+
+                <Grid item xs={12} hidden={!validacio?.documentsWithoutMetaDocument}><Alert severity="warning">{t('page.alert.errors.metaNode')}</Alert></Grid>
+                <Grid item xs={12} hidden={!validacio?.withNotificacionsNoFinalitzades}><Alert severity="warning">{t('page.alert.errors.noFinalitzades')}</Alert></Grid>
+                <Grid item xs={12} hidden={!validacio?.expedientWithoutInteressats}><Alert severity="warning">{t('page.alert.errors.interessatObligatori')}</Alert></Grid>
+            </Grid>)
         }
-        <Grid item xs={12} hidden={!hiHaDocumentsSenseMetaNode}><Alert severity="warning">{t('page.alert.errors.metaNode')}</Alert></Grid>
-        <Grid item xs={12} hidden={!hiHaNotificacionsNoFinalitzades}><Alert severity="warning">{t('page.alert.errors.noFinalitzades')}</Alert></Grid>
-        <Grid item xs={12} hidden={!expedientAmbInteressatObligatori}><Alert severity="warning">{t('page.alert.errors.interessatObligatori')}</Alert></Grid>
     </Grid>
 }
 const useErrorValidacio = () => {
     const { t } = useTranslation();
+    const {value: validacions} = useValidacioSession()
 
     const [open, setOpen] = useState(false);
     const [entity, setEntity] = useState<any>();
 
-    const handleOpen = (id:any, row:any) => {
-        console.log(id, row)
+    const handleOpen = (_id:any, row:any) => {
+        // console.log(id, row)
         setEntity(row);
         setOpen(true);
     }
@@ -63,7 +61,9 @@ const useErrorValidacio = () => {
         }}
     >
         <Load value={entity} noEffect>
-            <ErrorValidacio entity={entity}/>
+            <ErrorValidacio errors={validacions?.expedientId == entity?.id
+                ?validacions?.errorsValidacio
+                :entity?.errors}/>
         </Load>
     </MuiDialog>
 

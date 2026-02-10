@@ -808,6 +808,7 @@ const translationEs = {
                 naixement: "Nacimiento",
                 dadesAdicionals: "Datos adicionales",
                 dataOther: "Otros datos",
+                senseTipus: "Sin tipo asignado",
             },
             action: {
                 new: {
@@ -1739,7 +1740,7 @@ const translationEs = {
             }
         },
         alert: {
-            title: "Alertas de expediente",
+            title: "Errores de validación del expediente",
             action: {
                 read: {
                     label: "Marcar como leído",

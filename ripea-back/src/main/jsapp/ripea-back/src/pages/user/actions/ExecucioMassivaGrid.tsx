@@ -103,27 +103,13 @@ const columns = [
     },
 ]
 const sortModel: any = [{field: 'createdDate', sort: 'desc'}];
-const useExecucioMassiva = () => {
+const ExecucioMassivaGrid = () => {
     const {t} = useTranslation();
-    const [open, setOpen] = useState(false);
     const [isRefresh, setRefresh] = useState(false);
-    const {value: user} = useUserSession();
-
     const gridApiRef = useMuiDataGridApiRef();
 
     const {download} = useActions();
     const {handleOpen: handleContingutOpen, dialog: dialogContingut, refresh} = useExecucioMassivaContingut();
-
-    const handleOpen = () => {
-        setOpen(true);
-    }
-
-    const handleClose = (reason?: string) => {
-        if(reason !== 'backdropClick') {
-            setOpen(false);
-        }
-    };
-
     const actions: any = [
         {
             label: t('common.detail'),
@@ -142,12 +128,13 @@ const useExecucioMassiva = () => {
 
     const intervalRef = useRef<any>();
     useEffect(() => {
-        intervalRef.current = {open, isRefresh}
+        intervalRef.current = {isRefresh}
 
-        if (open && isRefresh) {
+        if (isRefresh) {
             const interval = setInterval(() => {
-                const {open: openRef, isRefresh: isRefreshRef} = intervalRef.current;
-                if (openRef && isRefreshRef) {
+                console.log("A")
+                const {isRefresh: isRefreshRef} = intervalRef.current;
+                if (isRefreshRef) {
                     gridApiRef?.current?.refresh?.();
                     refresh?.()
                 } else {
@@ -156,7 +143,57 @@ const useExecucioMassiva = () => {
             }, 10000); // 10000 milisegundos = 10 segundos
             return () => clearInterval(interval)
         }
-    }, [open, isRefresh]);
+    }, [isRefresh]);
+
+    return <>
+        <StyledMuiGrid
+            resourceName={'execucioMassivaResource'}
+            apiRef={gridApiRef}
+            staticSortModel={sortModel}
+            columns={columns}
+            rowAdditionalActions={actions}
+            autoHeight
+            paginationModel={{page: 0, pageSize: 5}}
+            readOnly
+
+            toolbarElementsWithPositions={[
+                {
+                    position: 0,
+                    element: <FormControlLabel
+                        control={<Checkbox checked={isRefresh} onClick={() => setRefresh(!isRefresh)}/>}
+                        label={t('page.user.massive.refresh')}/>,
+                }
+            ]}
+            rowProps={(row: any) => {
+                const color =
+                    row?.errors ? 'red'
+                        : row?.pendents ? 'orange'
+                            : row?.finalitzades ? 'green'
+                                : row?.cancelats ? 'grey'
+                                    : ''
+                return {
+                    'box-shadow': `${color} -6px 0px 0px`,
+                    'border-left': `6px solid ${color}`
+                }
+            }}
+        />
+        {dialogContingut}
+    </>
+}
+const useExecucioMassiva = () => {
+    const {t} = useTranslation();
+    const [open, setOpen] = useState(false);
+    const {value: user} = useUserSession();
+
+    const handleOpen = () => {
+        setOpen(true);
+    }
+
+    const handleClose = (reason?: string) => {
+        if(reason !== 'backdropClick') {
+            setOpen(false);
+        }
+    };
 
     const dialog =
         <MuiDialog
@@ -178,38 +215,7 @@ const useExecucioMassiva = () => {
             }}
         >
             <Load value={user} noEffect>
-                <StyledMuiGrid
-                    resourceName={'execucioMassivaResource'}
-                    apiRef={gridApiRef}
-                    staticSortModel={sortModel}
-                    columns={columns}
-                    rowAdditionalActions={actions}
-                    paginationActive
-                    height={162 + 52 * 4}
-                    readOnly
-
-                    toolbarElementsWithPositions={[
-                        {
-                            position: 0,
-                            element: <FormControlLabel
-                                control={<Checkbox checked={isRefresh} onClick={() => setRefresh(!isRefresh)}/>}
-                                label={t('page.user.massive.refresh')}/>,
-                        }
-                    ]}
-                    rowProps={(row: any) => {
-                        const color =
-                            row?.errors ? 'red'
-                                : row?.pendents ? 'orange'
-                                    : row?.finalitzades ? 'green'
-                                        : row?.cancelats ? 'grey'
-                                            : ''
-                        return {
-                            'box-shadow': `${color} -6px 0px 0px`,
-                            'border-left': `6px solid ${color}`
-                        }
-                    }}
-                />
-                {dialogContingut}
+                <ExecucioMassivaGrid/>
             </Load>
         </MuiDialog>
 
@@ -336,8 +342,8 @@ const useExecucioMassivaContingut = () => {
                 sortModel={sortModelContingut}
                 columns={columnsContingut}
                 paginationActive
-                height={110 + 52 * 4}
-                //autoHeight
+                autoHeight
+                paginationModel={{page: 0, pageSize: 5}}
                 readOnly
 
                 rowProps={(row: any) => {

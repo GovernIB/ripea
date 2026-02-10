@@ -148,18 +148,15 @@ const base: ThemeOptions = {
                     fontSize: '14px',
                     fontWeight: 200,
                     color: 'black',
-                    // backgroundColor: 'white',
                     '&.Mui-disabled': {
                         fontStyle: 'italic',
                         paddingRight: '2px',
                         color: 'black',
                         opacity: 1,
-                        // backgroundColor: 'white',
                     },
                     '&.Mui-focused': {
                         fontStyle: 'italic',
                         paddingRight: '2px',
-                        // backgroundColor: 'white',
                     }
                 }
             }
@@ -252,7 +249,7 @@ export const darkTheme = createTheme(base, {
     text: {
       primary: '#ffffff',
       secondary: '#bbbbbb',
-      disabled: '#777777',
+      disabled: '#777777 !important',
     },
     divider: '#333333',
     action: {
@@ -427,7 +424,7 @@ export const darkTheme = createTheme(base, {
                 color: 'white !important',
                 backgroundColor: 'transparent !important',
                 '&.Mui-disabled': {
-                    color: '#1e1e1e !important',
+                    color: '#7777 !important',
                 },
             },
         },
