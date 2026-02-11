@@ -4,7 +4,7 @@ import { formatDate } from "../../util/dateUtils.ts";
 import {StyledPrioritat} from "../expedient/ExpedientGrid.tsx";
 import {TascaComment} from "../CommentDialog.tsx";
 import StyledMuiGrid from '../../components/StyledMuiGrid.tsx';
-import TasquesGridFilter from "./TasquesGridFilter.tsx";
+import TasquesFilter from "./TasquesFilter.tsx";
 import {useCallback, useMemo, useState} from "react";
 import Load from "../../components/Load.tsx";
 import { CardPage } from "../../components/CardData.tsx";
@@ -14,6 +14,19 @@ import useTascaActions from "./details/TascaActions.tsx";
 import {useNavigate} from "react-router-dom";
 import useTascaDetail from "./details/TascaDetail.tsx";
 import {GridSortDirection} from "@mui/x-data-grid-pro";
+
+export const StyledDate = (props: any) => {
+    const {entity, children} = props;
+    const color = entity?.dataLimitExpirada
+        ?'error'
+        :entity?.shouldNotifyAboutDeadline
+            ?'warning'
+            :'default'
+    return <Typography variant={"inherit"} color={color}>
+        {children}
+        {(entity?.dataLimitExpirada || entity?.shouldNotifyAboutDeadline) && <Icon>alarm</Icon>}
+    </Typography>
+}
 
 const sortModel:any = [{field: 'dataInici', sort: 'desc'}];
 const namedQueries:any = ['USUARI_RELACIONAT'];
@@ -76,14 +89,7 @@ const TasquesGrid = () => {
             field: 'dataLimit',
             flex: 0.4,
             valueFormatter: (value: any) => formatDate(value, "DD/MM/Y"),
-            renderCell: (params: any) => {
-                const color = params?.row?.dataLimitExpirada
-                    ?'error'
-                    :params?.row?.shouldNotifyAboutDeadline
-                        ?'warning'
-                        :'default'
-                return <Typography variant={"inherit"} color={color}>{params?.formattedValue}<Icon>alarm</Icon></Typography>
-            }
+            renderCell: (params: any) => <StyledDate entity={params?.row}>{params?.formattedValue}</StyledDate>
         },
         {
             field: 'estat',
@@ -107,8 +113,8 @@ const TasquesGrid = () => {
 
     return <GridPage disableMargins>
         <CardPage title={t('page.user.menu.tasca')}>
-            <TasquesGridFilter
-                onSpringFilterChange={(value:any)=>{
+            <TasquesFilter
+                onSpringFilterChange={(value:any) => {
                     setSpringFilter(value)
                     setLoad(true)
                 }}

@@ -1,4 +1,4 @@
-import {Grid, Icon, Typography} from "@mui/material";
+import {Grid} from "@mui/material";
 import {
     useFormContext,
     useMuiDataGridApiRef,
@@ -12,6 +12,7 @@ import {StyledPrioritat} from "../expedient/ExpedientGrid.tsx";
 import {TascaComment} from "../CommentDialog.tsx";
 import StyledMuiGrid from '../../components/StyledMuiGrid.tsx';
 import useTascaDetail from "./details/TascaDetail.tsx";
+import {StyledDate} from "./TasquesGrid.tsx";
 
 const TasquesGridForm = () => {
     const { data } = useFormContext();
@@ -26,7 +27,7 @@ const TasquesGridForm = () => {
         <GridFormField xs={12} name="metaExpedientTascaDescription" type={"textarea"} readOnly disabled/>
         <GridFormField xs={12} name="responsables" multiple required/>
         <GridFormField xs={12} name="observadors" multiple/>
-        <GridFormField xs={6} name="duracio"/>
+        <GridFormField xs={6} name="duracio" debounce/>
         <GridFormField xs={6} name="dataLimit" type={"date"}/>
         <GridFormField xs={12} name="titol"/>
         <GridFormField xs={12} name="observacions" type={"textarea"}/>
@@ -49,14 +50,7 @@ const columns = [
         field: 'dataLimit',
         flex: 0.45,
         valueFormatter: (value: any) => formatDate(value, "DD/MM/Y"),
-        renderCell: (params: any) => {
-            const color = params?.row?.dataLimitExpirada
-                ?'error'
-                :params?.row?.shouldNotifyAboutDeadline
-                    ?'warning'
-                    :'default'
-            return <Typography variant={"inherit"} color={color}>{params?.formattedValue}<Icon>alarm</Icon></Typography>
-        }
+        renderCell: (params: any) => <StyledDate entity={params?.row}>{params?.formattedValue}</StyledDate>
     },
     {
         field: 'titol',

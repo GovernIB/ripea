@@ -110,18 +110,9 @@ const ExpedientFilter = (props: any) => {
     return <StyledMuiFilter
         resourceName={"expedientResource"}
         code={"EXPEDIENT_FILTER"}
-        springFilterBuilder={(data: any)=> {
-            if (!data?.advanced) {
-                return springFilterBuilder({
-                    numero: data.numero,
-                    estat: data.estat,
-                    dataCreacioInici: data.dataCreacioInici,
-                    dataCreacioFinal: data.dataCreacioFinal,
-                    advanced: true,
-                }, user, rol)
-            }
-            return springFilterBuilder(data, user, rol)
-        }}
+        springFilterBuilder={(data: any)=> (
+            springFilterBuilder(data, user, rol)
+        )}
         onSpringFilterChange={onSpringFilterChange}
         advancedSearch
         filterOnFieldEnterKeyPressed

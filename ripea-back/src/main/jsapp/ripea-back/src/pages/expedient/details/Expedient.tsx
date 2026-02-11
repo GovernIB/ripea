@@ -110,15 +110,14 @@ export const ExpedientInfo = (props:any) => {
 const ExpedientAlert = (props:any) => {
     const {entity: expedient} = props;
     const { t } = useTranslation();
+    const {value: user} = useUserSession();
+    const {value: validacio} = useValidacioSession()
 
     const refresh = () => {
         window.location.reload();
     }
 
-    const {value: user} = useUserSession();
-    const {value: validacions} = useValidacioSession()
     const {agafar} = useActions(refresh);
-
     const {handleOpen: handelAlert, dialog: dialogAlert, count} = useAlerta();
     const {handleOpen: hanldeErrorValidacio, dialog: dialogErrorValidacio} = useErrorValidacio();
 
@@ -151,7 +150,7 @@ const ExpedientAlert = (props:any) => {
                    }
             >{t('page.expedient.alert.alert')}</Alert>
         }
-        { validacions &&
+        { validacio?.errorsValidacio?.length > 0 &&
             <Alert severity="warning"
                    action={
                        <Button  sx={{py: 0}} variant="outlined"

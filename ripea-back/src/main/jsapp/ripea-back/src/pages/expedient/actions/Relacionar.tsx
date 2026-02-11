@@ -143,7 +143,8 @@ const RelacionarForm= () => {
                     }
             }}
 
-            style={{ minHeight: 110 + 52 * 10 }}
+            autoHeight
+            paginationModel={{page: 0, pageSize: 10}}
             readOnly
         />
         </Load>

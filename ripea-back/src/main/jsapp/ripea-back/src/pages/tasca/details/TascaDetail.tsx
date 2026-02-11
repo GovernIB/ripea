@@ -5,6 +5,7 @@ import {useTranslation} from "react-i18next";
 import {formatDate} from "../../../util/dateUtils.ts";
 import {StyledPrioritat} from "../../expedient/ExpedientGrid.tsx";
 import {ContenidoData} from "../../../components/CardData.tsx";
+import {StyledDate} from "../TasquesGrid.tsx";
 
 const useTascaDetail = () => {
     const [open, setOpen] = useState(false);
@@ -53,7 +54,7 @@ const useTascaDetail = () => {
                 <ContenidoData title={t('page.tasca.detall.observadors')}>{entity?.observadorsStr}</ContenidoData>
                 <ContenidoData title={t('page.tasca.detall.dataInici')}>{formatDate(entity?.dataInici)}</ContenidoData>
                 <ContenidoData title={t('page.tasca.detall.duracio')}>{entity?.duracio}</ContenidoData>
-                <ContenidoData title={t('page.tasca.detall.dataLimit')}>{formatDate(entity?.dataLimit, "DD/MM/Y")}</ContenidoData>
+                <ContenidoData title={t('page.tasca.detall.dataLimit')}><StyledDate entity={entity}>{formatDate(entity?.dataLimit, "DD/MM/Y")}</StyledDate></ContenidoData>
                 <ContenidoData title={t('page.tasca.detall.estat')}>{entity?.estat}</ContenidoData>
                 <ContenidoData title={t('page.tasca.detall.prioritat')}><StyledPrioritat entity={entity}>{t(`enum.prioritat.${entity?.prioritat}`)}</StyledPrioritat></ContenidoData>
             </Grid>
