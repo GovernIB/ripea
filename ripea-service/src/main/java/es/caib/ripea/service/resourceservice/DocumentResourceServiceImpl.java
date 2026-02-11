@@ -25,7 +25,6 @@ import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.fundaciobit.apisib.apifirmasimple.v1.beans.FirmaSimpleStartTransactionRequest;
-import org.hibernate.Hibernate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -163,7 +162,6 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     private final ExcepcioLogHelper excepcioLogHelper;
     private final DocumentNotificacioHelper documentNotificacioHelper;
     private final EntityComprovarHelper entityComprovarHelper;
-    private final RolHelper rolHelper;
 	private final DocumentFirmaPortafirmesHelper firmaPortafirmesHelper;
 	private final DocumentFirmaViaFirmaHelper firmaViaFirmaHelper;
 	private final UsuariHelper usuariHelper;
@@ -366,7 +364,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 		public void onChange(Serializable id, DocumentResource previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, DocumentResource target) {
 			//Camps transient per inicialitzar al carregar el formulari
 	        target.setPluginSummarizeActiu(Utils.hasValue(configHelper.getConfig(PropertyConfig.SUMMARIZE_PLUGIN_CLASS)));
-	        target.setFuncionariHabilitatDigitalib(rolHelper.doesCurrentUserHasRol("DIB_USER"));
+	        target.setFuncionariHabilitatDigitalib(RolHelper.doesCurrentUserHasRol("DIB_USER"));
 	        target.setDeteccioFirmaAutomaticaActiva(configHelper.getAsBoolean(PropertyConfig.DETECCIO_FIRMA_AUTOMATICA));
 	        target.setDocumentFirmaTipus(DocumentFirmaTipusEnumDto.SENSE_FIRMA);
 	        
