@@ -54,6 +54,7 @@ public class IntegracioHelper {
 	public static final String INTCODI_SUMMARIZE = "SUMMARIZE";
 	public static final String INTCODI_DISTRIBUCIO = "DISTRIBUCIO";
 	public static final String INTCODI_COMANDA = "COMANDA";
+	public static final String INTCODI_REGISTRE = "REGISTRE";
 	
 	private Map<String, LinkedList<IntegracioAccioDto>> accionsIntegracio = Collections.synchronizedMap(new HashMap<String, LinkedList<IntegracioAccioDto>>());
 	private Map<String, Integer> maxAccionsIntegracio = new HashMap<String, Integer>();
@@ -81,6 +82,7 @@ public class IntegracioHelper {
 		integracions.add(novaIntegracio(INTCODI_PROCEDIMENT));
 		integracions.add(novaIntegracio(INTCODI_COMANDA));
 		integracions.add(novaIntegracio(INTCODI_FIRMAAGIL));
+		integracions.add(novaIntegracio(INTCODI_REGISTRE));
 		return integracions;
 	}
 
@@ -256,6 +258,8 @@ public class IntegracioHelper {
 			integracio.setNom("ViaFirma");
 		} else if (INTCODI_DIGITALITZACIO.equals(codi)) {
 			integracio.setNom("Digitalització");
+		} else if (INTCODI_REGISTRE.equals(codi)) {
+			integracio.setNom("Registre");
 		}
 		return integracio;
 	}

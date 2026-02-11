@@ -436,6 +436,7 @@ const translationEn = {
             title: "Interested Party",
             rep: "Representative",
             detall: {
+				tipus: "Type",
                 nif: "NIF/CIF/NIE",
                 nom: "Name",
                 raoSocial: "Company name",
@@ -828,23 +829,41 @@ const translationEn = {
                     title: "New PINBAL query",
                     ok: "Document created from PINBAL query '{{codiServeiPinbal}}'",
                 },
-                import: {
-                    label: "Import documents from SGD...",
-                    title: "Import documents from SGD",
-                    ok: "Documents imported successfully",
-                },
+				import: {
+					close: {
+					    check: "Are you sure you want to close this window?",
+					    description: "The import will continue in the background and you can check the result in the file later.",
+					},
+					cancel: {
+					    check: "Are you sure you want to cancel the import?",
+					    description: "The documents imported up to this point will be kept in the file.",
+					},
+				},
+				importSgd: {
+				    label: "Import documents from SGD...",
+				    title: "Import documents from SGD",
+				    ok: "Documents and Interested imported successfully",
+					interessats: "Select the interested parties you wish to associate with the file",
+					interessat: {
+					    tipus: {
+					        1: "Administration",
+					        2: "Natural person",
+					        3: "Legal entity",
+					    },
+					},
+					resultat: {
+						title: "Result:",
+						ok: "Import process completed",
+						documents: "Documents processed correctly: ",
+						interessats: "Interested processed correctly: ",
+						carpetes: "Folders created successfully: ",
+						errors: "Detailed errors: ",
+					}
+				},
                 importZip: {
                     label: "Import documents from ZIP...",
                     title: "Import documentos from ZIP",
                     ok: "Documents imported successfully",
-					close: {
-					    check: "Are you sure you want to close this window?",
-					    description: "The ZIP import will continue in the background and you can check the result in the file later.",
-					},
-					cancel: {
-					    check: "Are you sure you want to cancel the ZIP import?",
-					    description: "The documents imported up to this point will be kept in the file.",
-					},
 					resultat: {
 						title: "Result:",
 						ok: "Import process completed",

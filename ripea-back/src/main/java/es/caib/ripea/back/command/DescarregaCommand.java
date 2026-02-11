@@ -10,7 +10,7 @@ import es.caib.ripea.back.helper.ConversioTipusHelper;
 import es.caib.ripea.back.validation.DescarregaEstructura;
 import es.caib.ripea.service.intf.dto.ArbreJsonDto;
 import es.caib.ripea.service.intf.dto.DescarregaDto;
-import es.caib.ripea.service.intf.dto.ImportacioDto;
+import es.caib.ripea.service.intf.dto.ImportacioRegistreParamsDto;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -32,7 +32,7 @@ public class DescarregaCommand {
 	
 	private String estructuraCarpetesJson;
 	
-	public static DescarregaCommand asCommand(ImportacioDto dto) {
+	public static DescarregaCommand asCommand(ImportacioRegistreParamsDto dto) {
 		DescarregaCommand command = ConversioTipusHelper.convertir(
 				dto,
 				DescarregaCommand.class);

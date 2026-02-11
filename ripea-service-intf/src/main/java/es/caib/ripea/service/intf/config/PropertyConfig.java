@@ -233,6 +233,13 @@ public class PropertyConfig {
 	public static final String COMANDA_PLUGIN_PWR					= "es.caib.ripea.plugin.comanda.password";
 	public static final String COMANDA_PLUGIN_ENDPOINT				= "es.caib.ripea.plugin.comanda.endpointName";
 	
+	public static final String REGISTRE_PLUGIN_CLASS 				= "es.caib.ripea.plugin.registre.class";
+	public static final String REGISTRE_PLUGIN_URL 					= "es.caib.ripea.plugin.registre.baseurl";
+	public static final String REGISTRE_PLUGIN_USER 				= "es.caib.ripea.plugin.registre.username";
+	public static final String REGISTRE_PLUGIN_PASS 				= "es.caib.ripea.plugin.registre.password";
+	public static final String REGISTRE_PLUGIN_DEBUG 				= "es.caib.ripea.plugin.registre.log.actiu";
+	public static final String REGISTRE_PLUGIN_TIMEOUT 				= "es.caib.ripea.plugin.registre.timeout";
+	
 	public static final String REINTENTAR_CANVI_ESTAT_DISTRIBUCIO 					= "es.caib.ripea.segonpla.reintentar.anotacions.pendents.enviar.distribucio";	
 	public static final String ENVIAR_EMAILS_PENDENTS_PROCEDIMENT_COMENTARI_CRON 	= "es.caib.ripea.segonpla.email.enviament.procediment.comentari.cron";	
 	public static final String GUARDAR_ARXIU_CONTINGUTS_PENDENTS 					= "es.caib.ripea.segonpla.guardar.arxiu.continguts.pendents";

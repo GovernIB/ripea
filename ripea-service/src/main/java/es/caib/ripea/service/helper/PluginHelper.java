@@ -149,6 +149,8 @@ import es.caib.ripea.plugin.portafirmes.PortafirmesIniciFluxResposta;
 import es.caib.ripea.plugin.portafirmes.PortafirmesPlugin;
 import es.caib.ripea.plugin.portafirmes.PortafirmesPrioritatEnum;
 import es.caib.ripea.plugin.procediment.ProcedimentPlugin;
+import es.caib.ripea.plugin.registre.RegistrePlugin;
+import es.caib.ripea.plugin.registre.RespostaConsultaRegistre;
 import es.caib.ripea.plugin.summarize.SummarizePlugin;
 import es.caib.ripea.plugin.unitat.NodeDir3;
 import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
@@ -193,7 +195,7 @@ import es.caib.ripea.service.intf.dto.EntregaPostalTipusEnum;
 import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.dto.FirmaResultatDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
-import es.caib.ripea.service.intf.dto.ImportacioDto;
+import es.caib.ripea.service.intf.dto.ImportacioRegistreParamsDto;
 import es.caib.ripea.service.intf.dto.IntegracioAccioDto;
 import es.caib.ripea.service.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.ripea.service.intf.dto.InteressatTipusEnumDto;
@@ -267,7 +269,8 @@ public class PluginHelper {
 	private Map<String, SummarizePlugin> summarizePlugins = new HashMap<>();
 	private Map<String, DistribucioPlugin> distribucioPlugins = new HashMap<>();
 	private Map<String, ComandaCaibPlugin> comandaPlugins = new HashMap<>();
-
+	private Map<String, RegistrePlugin> registrePlugins = new HashMap<>();
+	
 	@Autowired private ConversioTipusHelper conversioTipusHelper;
 	@Autowired private IntegracioHelper integracioHelper;
 	@Autowired private DocumentHelper documentHelper;
@@ -2988,7 +2991,7 @@ public class PluginHelper {
 		}
 	}
 
-	public List<ContingutArxiu> importarDocumentsArxiu(ImportacioDto params) {
+	public List<ContingutArxiu> importarDocumentsArxiu(ImportacioRegistreParamsDto params) {
 
 		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		String accioDescripcio = "Importar documents";
@@ -4671,6 +4674,54 @@ public class PluginHelper {
 		}
 	}
 
+	public RespostaConsultaRegistre obtenerAsientoRegistral(
+			String codiDir3Entitat, 
+			String numeroRegistreFormatat, 
+			Long tipusRegistre, 
+			boolean ambAnnexos) {
+		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
+		long t0 = System.currentTimeMillis();
+		String accioDescripcio = "Consulta del l'assentament registral";
+		Map<String, String> accioParams = new HashMap<String, String>();
+		accioParams.put("codiDir3Entitat", codiDir3Entitat);
+		accioParams.put("numeroRegistreFormatat", numeroRegistreFormatat);
+		accioParams.put("tipusRegistre", String.valueOf(tipusRegistre));
+		accioParams.put("ambAnnexos", String.valueOf(ambAnnexos));
+
+		RegistrePlugin registrePlugin = getRegistrePlugin();
+		String endpoint = registrePlugin.getEndpointURL();
+		try {
+			RespostaConsultaRegistre resposta = registrePlugin.obtenerAsientoRegistral(
+					codiDir3Entitat, 
+					numeroRegistreFormatat, 
+					tipusRegistre, 
+					ambAnnexos);
+			
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_REGISTRE,
+					accioDescripcio,
+					endpoint,
+					null,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
+			return resposta;
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al accedir al plugin de dades externes PINBAL";
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_REGISTRE,
+					accioDescripcio,
+					endpoint,
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
+			throw new SistemaExternException(IntegracioHelper.INTCODI_REGISTRE, errorDescripcio, ex);
+		}
+	}
+	
 	public SignatureInfoDto detectSignedAttachedUsingPdfReader(
 			byte[] documentContingut,
 			String contentType) {
@@ -7890,6 +7941,38 @@ public class PluginHelper {
 		}
 	}
 
+	private RegistrePlugin getRegistrePlugin() {
+
+		String entitatCodi = configHelper.getEntitatActualCodi();
+		if (entitatCodi == null) {
+			throw new RuntimeException("El codi d'entitat actual no pot ser nul");
+		}
+		
+		RegistrePlugin plugin = registrePlugins.get(entitatCodi);
+		if (plugin != null) { return plugin; }
+		
+		String pluginClass = getPropertyPluginRegistre();
+		
+		if (StringUtils.isEmpty(pluginClass)) {
+			throw new SistemaExternException(IntegracioHelper.INTCODI_REGISTRE, "No està configurada la classe per al plugin de registre");
+		}
+		
+		try {
+			Class<?> clazz = Class.forName(pluginClass);
+			plugin = (RegistrePlugin) clazz.getDeclaredConstructor(
+					String.class,
+					Properties.class).newInstance(
+							ConfigDto.prefix + ".",
+							configHelper.getGroupPropertiesEntitatOrGeneral(Arrays.asList(IntegracioHelper.INTCODI_REGISTRE), entitatCodi));
+			registrePlugins.put(entitatCodi,plugin);
+			return plugin;
+
+		} catch (Exception ex) {
+			throw new SistemaExternException(IntegracioHelper.INTCODI_REGISTRE,
+					"Error al crear la instància del plugin de registre", ex);
+		}
+	}
+	
 	private IValidateSignaturePluginWrapper getValidaSignaturaPlugin() {
 		String entitatCodi = configHelper.getEntitatActualCodi();
 		if (entitatCodi == null) {
@@ -8596,6 +8679,10 @@ public class PluginHelper {
 
 	private String getPropertyPluginProcediment() {
 		return configHelper.getConfig(PropertyConfig.ROLSAC_PLUGIN_CLASS);
+	}
+	
+	private String getPropertyPluginRegistre() {
+		return configHelper.getConfig(PropertyConfig.REGISTRE_PLUGIN_CLASS);
 	}
 
 	private String getPropertyPluginValidaSignatura() {

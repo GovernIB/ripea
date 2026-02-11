@@ -18,7 +18,7 @@ import useFirmaNavegador from "../actions/FirmaNavegador.tsx";
 import useDocPinbal from "../actions/DocPinbal.tsx";
 import useEnviarViaFirma from "../actions/EnviarViaFirma.tsx";
 import useCrearCarpeta from "../../carpeta/actions/Crear.tsx";
-import useImportar from "../actions/Importar.tsx";
+import useImportar from "../actions/ImportarSgd.tsx";
 import useCarpetaActions from "../../carpeta/details/CarpetaActions.tsx";
 import useImportarExpedient from "../../expedient/actions/ImportarExpedient.tsx";
 import useImportarZip from "../actions/ImportarZip.tsx";
@@ -209,7 +209,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
 			hidden: !entity?.potModificar,
         },
         {
-            label: t('page.document.action.import.label'),
+            label: t('page.document.action.importSgd.label'),
             icon: "upload_file",
             onClick: handleImportar,
             hidden: !(user?.sessionScope?.isMostrarImportacio && entity?.potModificar),

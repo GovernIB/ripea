@@ -436,6 +436,7 @@ const translationEs = {
             title: "Interesado",
             rep: "Representante",
             detall: {
+				tipus: "Tipo",
                 nif: "NIF/CIF/NIE",
                 nom: "Nombre",
                 raoSocial: "Razón social",
@@ -828,23 +829,41 @@ const translationEs = {
                     title: "Nueva consulta PINBAL",
                     ok: "Se ha creado el documento a partir de la consulta pinbal '{{codiServeiPinbal}}'",
                 },
-                import: {
-                    label: "Importar documentos desde SGD...",
-                    title: "Importación de documentos desde el SGD",
-                    ok: "Documentos importados correctamente",
-                },
+				import: {
+					close: {
+					    check: "¿Está seguro de que desea cerrar esta ventana?",
+					    description: "La importación continuará en segundo plano y podrá consultar el resultado en el expediente más tarde.",
+					},
+					cancel: {
+					    check: "¿Está seguro de que desea cancelar la importación?",
+					    description: "Los documentos importados hasta este momento se conservarán en el expediente.",
+					},
+				},
+				importSgd: {
+				    label: "Importar documentos SGD...",
+				    title: "Importación de documentos desde el SGD",
+				    ok: "Documentos importados correctamente",
+					interessats: "Selecciona los interesados que desea asociar al expediente",
+					interessat: {
+						tipus: {
+							1: "Administración",
+							2: "Persona física",
+							3: "Persona jurídica",
+						},
+					},
+					resultat: {
+						title: "Resultado:",
+						ok: "Proceso importación completado",
+						documents: "Documentos procesados correctamente: ",
+						interessats: "Interesados procesados correctamente: ",
+						carpetes: "Carpetas creadas correctamente: ",
+						errors: "Errores detallados: ",
+					}
+				},
                 importZip: {
                     label: "Importar desde ZIP...",
                     title: "Importación de documentos desde un ZIP",
                     ok: "Documentos importados correctamente",
-					close: {
-					    check: "¿Está seguro de que desea cerrar esta ventana?",
-					    description: "La importación del ZIP continuará en segundo plano y podrá consultar el resultado en el expediente más tarde.",
-					},
-					cancel: {
-					    check: "¿Está seguro de que desea cancelar la importación del ZIP?",
-					    description: "Los documentos importados hasta este momento se conservarán en el expediente.",
-					},
 					resultat: {
 						title: "Resultado:",
 						ok: "Proceso importación completado",

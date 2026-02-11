@@ -5,7 +5,10 @@ import java.time.LocalDateTime;
 import java.time.Year;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -27,6 +30,7 @@ import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.dto.FileNameOption;
 import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
 import es.caib.ripea.service.intf.dto.TipusImportEnumDto;
+import es.caib.ripea.service.intf.registre.RegistreInteressat;
 import es.caib.ripea.service.intf.resourcevalidation.ExpedientValid;
 import es.caib.ripea.service.intf.resourcevalidation.ImportarDocumentValid;
 import es.caib.ripea.service.intf.resourcevalidation.MassiveImportDocValid;
@@ -177,6 +181,14 @@ import lombok.experimental.FieldNameConstants;
                         requiresId = true),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
+                        code = ExpedientResource.ACTION_GET_PROGRES_SGD,
+                        requiresId = true),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = ExpedientResource.ACTION_CANCEL_IMPORT_SGD,
+                        requiresId = true),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
                         code = ExpedientResource.ACTION_GET_PROGRES_ZIP,
                         requiresId = true),
                 @ResourceConfigArtifact(
@@ -270,10 +282,12 @@ public class ExpedientResource extends NodeResource implements Serializable {
 	public static final String ACTION_SYNC_ARXIU = "SYNC_ARXIU";
 	public static final String ACTION_GUARDAR_ARXIU = "GUARDAR_ARXIU";	
 	public static final String ACTION_IMPORT_DOCS = "IMPORT_DOCS";
+	public static final String ACTION_IMPORT_INTE = "IMPORT_INTE";
+	public static final String ACTION_GET_PROGRES_SGD = "GET_PROGRES_SGD";
+	public static final String ACTION_CANCEL_IMPORT_SGD = "CANCEL_IMPORT_SGD";
 	public static final String ACTION_IMPORT_DOCS_ZIP = "IMPORT_DOCS_ZIP";
 	public static final String ACTION_GET_PROGRES_ZIP = "GET_PROGRES_ZIP";
 	public static final String ACTION_CANCEL_IMPORT_ZIP = "CANCEL_IMPORT_ZIP";
-	public static final String ACTION_IMPORT_INTE = "IMPORT_INTE";
 	public static final String ACTION_MOURE_TOT_CODE = "MOURE_TOT";
 	public static final String REPORT_PLANTILLA_EXCEL_INTERESSATS = "PLANTILLA_EXCEL_INTERESSATS";
 	public static final String REPORT_PLANTILLA_DADES_CSV = "PLANTILLA_DADES_CSV";
@@ -554,10 +568,12 @@ public class ExpedientResource extends NodeResource implements Serializable {
     	private TipusImportEnumDto tipusImportacio = TipusImportEnumDto.NUMERO_REGISTRE;
     	private String codiEni;
     	private String numeroRegistre;
+    	private boolean importarInteressats;
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone="Europe/Madrid")
         private Date dataPresentacio;
     	private ResourceReference<CarpetaResource, Long> carpeta;
         private String novaCarpetaNom;
+        private List<RegistreInteressat> interessats;
     }
 
     @Getter
@@ -566,8 +582,6 @@ public class ExpedientResource extends NodeResource implements Serializable {
     @FieldNameConstants
     public static class ImportarInteressatsForm implements Serializable {
     	@NotNull private String numeroRegistre;
-        @NotNull @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy", timezone="Europe/Madrid")
-        private Date dataPresentacio;
     }
     
     @Getter

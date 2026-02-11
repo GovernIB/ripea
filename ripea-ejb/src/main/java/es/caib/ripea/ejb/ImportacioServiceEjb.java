@@ -8,7 +8,7 @@ import javax.ejb.Stateless;
 
 import es.caib.ripea.ejb.base.AbstractServiceEjb;
 import es.caib.ripea.service.intf.dto.DocumentDto;
-import es.caib.ripea.service.intf.dto.ImportacioDto;
+import es.caib.ripea.service.intf.dto.ImportacioRegistreParamsDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.service.ImportacioService;
 import lombok.experimental.Delegate;
@@ -25,7 +25,7 @@ public class ImportacioServiceEjb extends AbstractServiceEjb<ImportacioService> 
 
 	@Override
 	@RolesAllowed("**")
-	public int importarDocuments(Long entitatId, Long contingutId, ImportacioDto dades) throws NotFoundException {
+	public int importarDocuments(Long entitatId, Long contingutId, ImportacioRegistreParamsDto dades) throws NotFoundException {
 		return delegateService.importarDocuments(
 				entitatId, 
 				contingutId,

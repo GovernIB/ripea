@@ -3,7 +3,7 @@ import { Typography, Box, Backdrop, LinearProgress, Button } from '@mui/material
 import { useBaseAppContext, useConfirmDialogButtons } from 'reactlib'; // ← Importar el contexto
 import { useTranslation } from 'react-i18next';
 
-interface ImportarZipBackdropProps {
+interface BackdropLoadingProps {
 	open: boolean;
 	progress: number;
 	progressMessage: string;
@@ -11,7 +11,7 @@ interface ImportarZipBackdropProps {
 	onClose: () => void;
 }
 
-const ImportarZipBackdrop: React.FC<ImportarZipBackdropProps> = ({
+const BackdropLoading: React.FC<BackdropLoadingProps> = ({
 	open,
 	progress,
 	progressMessage,
@@ -24,8 +24,8 @@ const ImportarZipBackdrop: React.FC<ImportarZipBackdropProps> = ({
 
 	const handleCancelClick = () => {
 		messageDialogShow(
-			t('page.document.action.importZip.cancel.check'),
-			t('page.document.action.importZip.cancel.description'),
+			t('page.document.action.import.cancel.check'),
+			t('page.document.action.import.cancel.description'),
 			confirmDialogButtons,
 			{
 				maxWidth: 'sm',
@@ -41,8 +41,8 @@ const ImportarZipBackdrop: React.FC<ImportarZipBackdropProps> = ({
 
 	const handleCloseClick = () => {
 		messageDialogShow(
-			t('page.document.action.importZip.close.check'),
-			t('page.document.action.importZip.close.description'),
+			t('page.document.action.import.close.check'),
+			t('page.document.action.import.close.description'),
 			confirmDialogButtons,
 			{
 				maxWidth: 'sm',
@@ -132,4 +132,4 @@ const ImportarZipBackdrop: React.FC<ImportarZipBackdropProps> = ({
 	);
 };
 
-export default ImportarZipBackdrop;
+export default BackdropLoading;

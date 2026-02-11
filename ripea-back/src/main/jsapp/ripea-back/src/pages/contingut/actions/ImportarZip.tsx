@@ -6,7 +6,7 @@ import { FileFormField } from "../../../components/GridFormField.tsx";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 import { usePollingArtifactAction } from "../../../components/ActionPollingOptions.tsx";
 import ImportarZipResults from "./ImportarZipResults.tsx";
-import ImportarZipBackdrop from "./ImportarZipBackdrop.tsx";
+import BackdropLoading from "../../../components/BackdropLoading.tsx";
 
 const usePolling = () => {
 	const [progress, setProgress] = useState(0);
@@ -15,7 +15,7 @@ const usePolling = () => {
 
 	const { startPolling, cancelPolling } = usePollingArtifactAction("expedientResource",
 		{
-			intervalMs: 500,
+			intervalMs: 250,
 			stopCondition: (data) => data?.finished,
 			onProgress: (data) => {
 				setProgress(data?.progres ?? 0);
@@ -61,13 +61,13 @@ const ImportarZip = ({ ...props }: any) => {
 		setShowBackdrop(!finished);
 	}, [finished]);
 
-	const handleTancarImportar = () => {
+	const handleClose = () => {
 		setShowBackdrop(false);
-		refresh?.();
 		apiRef.current?.close();
+		refresh?.();
 	}
 
-	const handleCancelProcessing = async () => {
+	const handleCancel = async () => {
 		try {
 			setShowBackdrop(false);
 			cancelPolling(
@@ -101,12 +101,12 @@ const ImportarZip = ({ ...props }: any) => {
 					progressMessage={progressMessage} />
 			</FormActionDialog>
 
-			<ImportarZipBackdrop
+			<BackdropLoading
 				open={showBackdrop}
 				progress={progress}
 				progressMessage={progressMessage}
-				onCancel={handleCancelProcessing}
-				onClose={handleTancarImportar}
+				onCancel={handleCancel}
+				onClose={handleClose}
 			/>
 
 		</>

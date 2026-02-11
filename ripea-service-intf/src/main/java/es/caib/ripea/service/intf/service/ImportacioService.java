@@ -4,7 +4,7 @@
 package es.caib.ripea.service.intf.service;
 
 import es.caib.ripea.service.intf.dto.DocumentDto;
-import es.caib.ripea.service.intf.dto.ImportacioDto;
+import es.caib.ripea.service.intf.dto.ImportacioRegistreParamsDto;
 import es.caib.ripea.service.intf.exception.ValidationException;
 import org.springframework.security.access.prepost.PreAuthorize;
 
@@ -37,7 +37,7 @@ public interface ImportacioService {
 	public int importarDocuments(
 			Long entitatId,
 			Long contingutId,
-			ImportacioDto params) throws ValidationException;
+			ImportacioRegistreParamsDto params) throws ValidationException;
 	/**
 	 * Retorna la llista dels expedients on s'ha importat el document que s'intetna importar actualment
 	 * 

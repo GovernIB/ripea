@@ -436,6 +436,7 @@ const translationCa = {
             title: "Interessat",
             rep: "Representant",
             detall: {
+				tipus: "Tipus",
                 nif: "NIF/CIF/NIE",
                 nom: "Nom",
                 raoSocial: "Raó social",
@@ -828,23 +829,41 @@ const translationCa = {
                     title: "Nova consulta PINBAL",
                     ok: "S'ha creat el document a partir de la consulta pinbal '{{codiServeiPinbal}}'",
                 },
-                import: {
+				import: {
+					close: {
+						check: "Estau segur que voleu tancar aquesta finestra?",
+						description: "L'importació continuarà en segon pla i podreu consultar el resultat a l'expedient més tard.",
+					},
+					cancel: {
+						check: "Esteu segur que voleu cancel·lar la importació?",
+						description: "Els documents importats fins a aquest moment es conservaran a l’expedient.",
+					},
+				},
+                importSgd: {
                     label: "Importar documents SGD...",
                     title: "Importació de documents des del SGD",
                     ok: "Documents importats correctament",
+					interessats: "Selecciona els interessats que desitgi associar a l'expedient",
+					interessat: {
+						tipus: {
+							1: "Administrador",
+							2: "Persona física",
+							3: "Persona jurídica",
+						},
+					},
+					resultat: {
+						title: "Resultat:",
+						ok: "Procés importació completat",
+						documents: "Documents processats correctament: ",
+						interessats: "Interessats processats correctament: ",
+						carpetes: "Carpetes creades correctament: ",
+						errors: "Errors detallats: ",
+					}
                 },
                 importZip: {
                     label: "Importar des de ZIP...",
                     title: "Importació de documents des d'un ZIP",
                     ok: "Documents importats correctament",
-					close: {
-						check: "Estau segur que voleu tancar aquesta finestra?",
-						description: "L'importació del ZIP continuarà en segon pla i podreu consultar el resultat a l'expedient més tard.",
-					},
-					cancel: {
-						check: "Esteu segur que voleu cancel·lar la importació del ZIP?",
-						description: "Els documents importats fins a aquest moment es conservaran a l’expedient.",
-					},
 					resultat: {
 						title: "Resultat:",
 						ok: "Procés importació completat",

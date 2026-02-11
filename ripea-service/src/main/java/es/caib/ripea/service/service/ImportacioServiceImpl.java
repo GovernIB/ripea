@@ -11,16 +11,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import es.caib.ripea.service.helper.ContingutHelper;
+import es.caib.ripea.service.helper.ContingutImportacioHelper;
 import es.caib.ripea.service.helper.OrganGestorHelper;
 import es.caib.ripea.service.intf.dto.DocumentDto;
-import es.caib.ripea.service.intf.dto.ImportacioDto;
+import es.caib.ripea.service.intf.dto.ImportacioRegistreParamsDto;
 import es.caib.ripea.service.intf.service.ImportacioService;
 
 @Service
 public class ImportacioServiceImpl implements ImportacioService {
 
-	@Autowired private ContingutHelper contingutHelper;
+	@Autowired private ContingutImportacioHelper contingutImportacioHelper;
 	@Autowired private OrganGestorHelper organGestorHelper;
 	
 	public static List<DocumentDto> expedientsWithImportacio = new ArrayList<DocumentDto>();
@@ -31,10 +31,10 @@ public class ImportacioServiceImpl implements ImportacioService {
 	public int importarDocuments(
 			Long entitatId,
 			Long contingutId,
-			ImportacioDto params) {
+			ImportacioRegistreParamsDto params) {
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(contingutId));
 		logger.debug("Important documents de l'arxiu digital (numeroRegistre=" + params.getNumeroRegistre() + ")");
-		return contingutHelper.importarDocuments(entitatId, contingutId, params, documentAlreadyHasExpedient, expedientsWithImportacio);
+		return contingutImportacioHelper.importarDocuments(entitatId, contingutId, params, documentAlreadyHasExpedient, expedientsWithImportacio);
 	}
 
 	@Override

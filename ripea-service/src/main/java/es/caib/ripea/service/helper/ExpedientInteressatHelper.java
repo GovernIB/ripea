@@ -707,6 +707,21 @@ public class ExpedientInteressatHelper {
 		expedient.updateArxiuIntent(true);
 		return arxiuPropagarInteressats(expedient, null);
 	}
+	
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public String importarInteressatsNewTransaction(
+			Long entitatId,
+			Long expedientId,
+			String rolActual,
+			List<InteressatDto> interessats) {
+		List<Long> seleccionats = new ArrayList<Long>();
+		if (interessats!=null) {
+			for (InteressatDto iDto: interessats) {
+				seleccionats.add(iDto.getId());			
+			}			
+		}
+		return importarInteressats(entitatId, expedientId, rolActual, interessats, seleccionats);
+	}
 
 	public String importarInteressats(
 			Long entitatId,

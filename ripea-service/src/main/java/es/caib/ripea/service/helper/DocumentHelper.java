@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -47,6 +48,7 @@ import es.caib.ripea.persistence.entity.MetaDocumentEntity;
 import es.caib.ripea.persistence.entity.NodeEntity;
 import es.caib.ripea.persistence.repository.DocumentPublicacioRepository;
 import es.caib.ripea.persistence.repository.DocumentRepository;
+import es.caib.ripea.persistence.repository.MetaDocumentRepository;
 import es.caib.ripea.service.firma.DocumentFirmaAppletHelper;
 import es.caib.ripea.service.firma.DocumentFirmaAppletHelper.ObjecteFirmaApplet;
 import es.caib.ripea.service.intf.config.PropertyConfig;
@@ -67,18 +69,25 @@ import es.caib.ripea.service.intf.dto.DocumentPublicacioDto;
 import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentTipusFirmaEnumDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
+import es.caib.ripea.service.intf.dto.ImportacioRegistreParamsDto;
 import es.caib.ripea.service.intf.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
 import es.caib.ripea.service.intf.dto.NtiOrigenEnumDto;
 import es.caib.ripea.service.intf.dto.PermissionEnumDto;
+import es.caib.ripea.service.intf.dto.ProgresImportacioSgdDto;
 import es.caib.ripea.service.intf.dto.ProgresProcessamentZipDto;
 import es.caib.ripea.service.intf.dto.SignatureInfoDto;
+import es.caib.ripea.service.intf.dto.TipusImportEnumDto;
 import es.caib.ripea.service.intf.exception.ArxiuJaGuardatException;
 import es.caib.ripea.service.intf.exception.ContingutNotUniqueException;
+import es.caib.ripea.service.intf.exception.DocumentAlreadyImportedException;
 import es.caib.ripea.service.intf.exception.ValidacioFirmaException;
 import es.caib.ripea.service.intf.exception.ValidationException;
 import es.caib.ripea.service.intf.utils.Utils;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
 @Component
 public class DocumentHelper {
@@ -97,6 +106,7 @@ public class DocumentHelper {
 	@Autowired private CarpetaHelper carpetaHelper;
 	@Autowired private DocumentPublicacioRepository documentPublicacioRepository;
 	@Autowired private MessageHelper messageHelper;
+	@Autowired private MetaDocumentRepository metaDocumentRepository;
 	
 	public DocumentDto crearDocument(
 			Long entitatId,
@@ -2040,12 +2050,187 @@ public class DocumentHelper {
 		return resultat;
 	}
 	
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public void procesarDocumentImportacioNewTransaction(
+			Long entitatId,
+    		Long expedientId,
+            Document documentArxiu,
+            FitxerDto fitxer,
+            ProgresImportacioSgdDto progress,
+            ImportacioRegistreParamsDto params) {
+		
+        ContingutEntity pareActual = contingutHelper.comprovarContingutDinsExpedientModificable(
+        		entitatId,
+                expedientId,
+                false,
+                false, 
+                false, 
+                false, 
+                false, 
+                true, 
+                null);
+        
+		boolean usingNumeroRegistre = TipusImportEnumDto.NUMERO_REGISTRE.equals(params.getTipusImportacio());
+		String numeroRegistre = params.getNumeroRegistre();
+		
+		DestinacioImportacio desti = resoldreDestinacio(
+        		entitatId, 
+        		params, 
+        		pareActual, 
+        		progress);
+		
+		ContingutEntity contenidor = desti.getContenidor();
+		ExpedientEntity expedient = desti.getExpedient();
+		String tituloDoc = (String) documentArxiu.getMetadades().getMetadadaAddicional("tituloDoc");
+        String nomDocument = (tituloDoc != null && TipusImportEnumDto.NUMERO_REGISTRE.equals(params.getTipusImportacio()))
+                ? formatTitulo(tituloDoc, params.getNumeroRegistre())
+                : documentArxiu.getNom();
+        nomDocument = nomDocument.trim();
+        
+        contingutHelper.comprovarNomValid(desti.getContenidor(), nomDocument, null, DocumentEntity.class);
+
+        if (checkDocumentUniqueContraint(nomDocument, desti.getContenidor(), entitatId) > 0) {
+            throw new DocumentAlreadyImportedException();
+        }
+		
+        organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(expedient.getId()));
+        MetaDocumentEntity metaDocument = metaDocumentRepository.findByMetaExpedientAndPerDefecteTrue(expedient.getMetaExpedient());
+        DocumentNtiTipoFirmaEnumDto documentNtiTipoFirmaEnum = ArxiuConversions.getNtiTipoFirma(documentArxiu);
+        
+        DocumentEntity entity = crearDocumentDB(
+                DocumentTipusEnumDto.IMPORTAT,
+                documentArxiu.getNom(),
+                null,
+                documentArxiu.getMetadades().getDataCaptura(),
+                documentArxiu.getMetadades().getDataCaptura(),
+                getOrgans(documentArxiu),
+                ArxiuConversions.getOrigen(documentArxiu),
+                ArxiuConversions.getEstatElaboracio(documentArxiu),
+                ArxiuConversions.getTipusDocumental(documentArxiu),
+                metaDocument,
+                contenidor,
+                pareActual.getEntitat(),
+                expedient,
+                null,
+                expedient.getArxiuUuid(),
+                null,
+                getDocumentFirmaTipus(documentNtiTipoFirmaEnum),
+                expedient.getEstatAdditional());
+
+        actualitzarFitxerDB(entity, fitxer);
+        entity.updateNumeroRegistre(numeroRegistre);
+
+        if (documentArxiu.getFirmes() != null && !documentArxiu.getFirmes().isEmpty()) {
+            entity.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
+        } else {
+            entity.updateEstat(DocumentEstatEnumDto.DEFINITIU);
+        }
+        entity.updateArxiuEstat(ArxiuEstatEnumDto.DEFINITIU);
+
+        Document documentImportat = pluginHelper.importarDocument(expedient.getArxiuUuid(),
+                documentArxiu.getIdentificador(), usingNumeroRegistre);
+
+        entity.updateArxiu(documentImportat.getIdentificador());
+        entity.updateNtiIdentificador(documentImportat.getMetadades().getIdentificador());
+        entity.updateNti(
+                obtenirNumeroVersioEniDocument(documentImportat.getMetadades().getVersioNti()),
+                documentImportat.getMetadades().getIdentificador(),
+                getOrgans(documentImportat),
+                ArxiuConversions.getOrigen(documentImportat),
+                ArxiuConversions.getEstatElaboracio(documentImportat),
+                ArxiuConversions.getTipusDocumental(documentImportat),
+                documentImportat.getMetadades().getIdentificadorOrigen(),
+                documentNtiTipoFirmaEnum,
+                ArxiuConversions.getNtiCsv(documentImportat)[0],
+                ArxiuConversions.getNtiCsv(documentImportat)[1]);
+
+        contingutLogHelper.logCreacio(entity, true, true);
+    }
+	
+    private DestinacioImportacio resoldreDestinacio(
+            Long entitatId,
+            ImportacioRegistreParamsDto params,
+            ContingutEntity pareActual,
+            ProgresImportacioSgdDto progress) {
+
+        ExpedientEntity expedientSuperior = ContingutTipusEnumDto.EXPEDIENT.equals(pareActual.getTipus())
+                ? (ExpedientEntity) pareActual
+                : pareActual.getExpedient();
+
+        Map<String, Long> destiMap = new HashMap<>();
+        if (params.getEstructuraCarpetes() != null) {
+            destiMap = carpetaHelper.crearEstructuraCarpetes(entitatId,
+                    params.getEstructuraCarpetes(),
+                    expedientSuperior.getId(),
+                    params.getDestiId());
+        }
+
+        Long destiId;
+        try {
+            destiId = Long.valueOf(params.getDestiId());
+        } catch (NumberFormatException nfe) {
+            if (!destiMap.isEmpty()) {
+                destiId = Long.valueOf(destiMap.get(params.getDestiId()));
+                if (progress != null) progress.addCarpetaCreada();
+            } else destiId = null;
+        }
+
+        ContingutEntity destiEntity = entityComprovarHelper.comprovarContingut(destiId);
+
+        if (destiEntity instanceof CarpetaEntity) {
+            CarpetaEntity carpeta = (CarpetaEntity) destiEntity;
+            carpeta.updateNumeroRegistre(params.getNumeroRegistre());
+            return new DestinacioImportacio(carpeta, expedientSuperior, true);
+        }
+
+        ExpedientEntity expedient = (ExpedientEntity) destiEntity;
+        expedient.updateNumeroRegistre(params.getNumeroRegistre());
+        return new DestinacioImportacio(expedient, expedient, false);
+    }
+	
+	private static final String ENI_DOCUMENT_PREFIX = "http://administracionelectronica.gob.es/ENI/XSD/v";
+    private String obtenirNumeroVersioEniDocument(String versio) {
+        if (versio != null && versio.startsWith(ENI_DOCUMENT_PREFIX)) {
+            int indexBarra = versio.indexOf("/", ENI_DOCUMENT_PREFIX.length());
+            return versio.substring(ENI_DOCUMENT_PREFIX.length(), indexBarra);
+        }
+        return null;
+    }
+
+    private String getOrgans(Document documentArxiu) {
+        if (documentArxiu.getMetadades().getOrgans() == null) return null;
+        return String.join(",", documentArxiu.getMetadades().getOrgans());
+    }
+    
 	private static String revisarContingutNom(String nom) {
 		if (nom == null) {
 			return null;
 		}
 		return nom.replace("&", "&amp;").replaceAll("[\\\\/:*?\"<>|]", "_");
 	}
+	
+    private String formatTitulo(String tituloDoc, String numeroRegistre) {
+        String extension = FilenameUtils.getExtension(tituloDoc);
+        if (extension != null && !extension.isEmpty()) {
+            return FilenameUtils.removeExtension(tituloDoc) + " - " + numeroRegistre.replace('/', '_') + "." + extension;
+        } else {
+            return tituloDoc + " - " + numeroRegistre.replace('/', '_');
+        }
+    }
+    
+	private int checkDocumentUniqueContraint (String nom, ContingutEntity pare, Long entitatId) {
+		EntitatEntity entitat = entitatId != null ? entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false, false) : null;
+		return  contingutHelper.checkUniqueContraint(nom, pare, entitat, ContingutTipusEnumDto.DOCUMENT);
+	}
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    private class DestinacioImportacio {
+        private ContingutEntity contenidor;
+        private ExpedientEntity expedient;
+        private boolean carpeta;
+    }
 	
 	public boolean isModificacioCustodiatsActiva() {
 		return configHelper.getAsBoolean(PropertyConfig.MODIFICAR_DOCUMENTS_CUSTODIATS);
