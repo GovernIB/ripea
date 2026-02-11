@@ -11,6 +11,7 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import es.caib.comanda.model.v1.avis.Avis;
 import es.caib.comanda.model.v1.tasca.Tasca;
@@ -50,13 +51,14 @@ public class ComandaCaibPluginImpl extends RipeaAbstractPluginProperties impleme
         String authHeader = "Basic " + new String(encodedAuth);
         httpHeaders.set("Authorization", authHeader);
         var mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
         var requestBody = mapper.writeValueAsString(tasca);
         HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, httpHeaders);
         String url = getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.COMANDA_PLUGIN_URL));
         if (url == null) {
             throw new Exception("La propietat es.caib.ripea.plugin.comanda.url.base no pot ser null");
         }
-        url += (url.charAt(url.length()-1) != '/' ? "/" : "") + "tasques";
+        url += (url.charAt(url.length()-1) != '/' ? "/" : "") + "tasques/v1";
         return getRestTemplate().postForEntity(url, requestEntity, String.class);
 	}
 
@@ -71,13 +73,14 @@ public class ComandaCaibPluginImpl extends RipeaAbstractPluginProperties impleme
         String authHeader = "Basic " + new String(encodedAuth);
         httpHeaders.set("Authorization", authHeader);
         var mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
         var requestBody = mapper.writeValueAsString(avis);
         HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, httpHeaders);
         String url = getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.COMANDA_PLUGIN_URL));
         if (url == null) {
             throw new Exception("La propietat es.caib.ripea.plugin.comanda.url.base no pot ser null");
         }
-        url += (url.charAt(url.length()-1) != '/' ? "/" : "") + "avisos";
+        url += (url.charAt(url.length()-1) != '/' ? "/" : "") + "avisos/v1";
         return getRestTemplate().postForEntity(url, requestEntity, String.class);
 	}
 	
