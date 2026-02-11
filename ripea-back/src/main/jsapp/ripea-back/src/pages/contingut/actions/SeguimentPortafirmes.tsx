@@ -127,6 +127,7 @@ const useSeguimentPortafirmes = (potModificar:boolean, refresh?: () => void) => 
             buttonCallback={(value :any) :void=>{
                 if (value=='cancel' && entity?.estat == 'ENVIAT' && potModificar && user?.rolActual != "IPA_ADMIN_LECTURA") {
                     cancelarFirma(entity?.id)
+                    handleClose();
                 }
                 if (value=='close') {
                     handleClose();

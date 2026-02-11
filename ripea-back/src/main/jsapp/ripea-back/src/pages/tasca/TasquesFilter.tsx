@@ -3,7 +3,7 @@ import * as builder from '../../util/springFilterUtils';
 import GridFormField from "../../components/GridFormField.tsx";
 import {useFormContext} from "reactlib";
 
-const TasquesGridFilterForm = () => {
+const TasquesFilterForm = () => {
     const {data} = useFormContext()
 
     if (!data?.advanced) {
@@ -45,28 +45,17 @@ const springFilterBuilder = (data:any) => {
     );
 }
 
-const TasquesGridFilter = (props:any) => {
+const TasquesFilter = (props:any) => {
     const {onSpringFilterChange} = props;
     return <StyledMuiFilter
         resourceName={"expedientTascaResource"}
         code={"TASCA_FILTER"}
-        springFilterBuilder={(data: any) => {
-            if (!data?.advanced) {
-                return springFilterBuilder({
-                    metaExpedient: data.metaExpedient,
-                    titol: data.titol,
-                    prioritat: data.prioritat,
-                    estat: data.estat,
-                    advanced: true,
-                })
-            }
-            return springFilterBuilder(data)
-        }}
+        springFilterBuilder={springFilterBuilder}
         onSpringFilterChange={onSpringFilterChange}
         filterOnFieldEnterKeyPressed
         advancedSearch
     >
-        <TasquesGridFilterForm/>
+        <TasquesFilterForm/>
     </StyledMuiFilter>
 }
-export default TasquesGridFilter;
+export default TasquesFilter;

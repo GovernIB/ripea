@@ -369,7 +369,7 @@ public class SseResourceController {
             		List<SseEmitter> emisoresAEliminar = new ArrayList<>();
             		for (SseEmitter emisor : emisorsExpedient) {
             			try {
-            				emisor.send(SseEmitter.event().name(ExpedientEventType.VALIDACIO_CHANGE.getEventName()).data(errorsValidacioEvent.getErrorsValidacio()));
+            				emisor.send(SseEmitter.event().name(ExpedientEventType.VALIDACIO_CHANGE.getEventName()).data(errorsValidacioEvent));
             				logger.debug("... comunicats ErrorsValidacioChangedEvent al expedient "+expedientClient.getKey()+" a travers del emissor "+emisor.hashCode()+".");
         	            } catch (Exception e) {
         	            	emisoresAEliminar.add(emisor); //Eliminam el emisor de la llista de emisors del expedient

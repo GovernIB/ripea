@@ -29,7 +29,7 @@ const AnotacioFilterForm = () => {
 }
 
 const springFilterBuilder = (data: any): string => {
-    let filterStr: string = builder.and(
+    return builder.and(
         builder.like("identificador", data.numRegistre),
         builder.like("registre.extracte", data.extracte),
         builder.like("registre.destiCodiINom", data.destinacio),
@@ -48,8 +48,6 @@ const springFilterBuilder = (data: any): string => {
             )
         ),
     )
-    // console.log('>>> springFilterBuilder:', filterStr)
-    return filterStr;
 }
 
 const AnotacioFilter = (props: any) => {
@@ -58,18 +56,7 @@ const AnotacioFilter = (props: any) => {
     return <StyledMuiFilter
         resourceName={"expedientPeticioResource"}
         code={"ANOTACIO_FILTER"}
-        springFilterBuilder={(data: any)=> {
-                    if (!data?.advanced) {
-                        return springFilterBuilder({
-                            metaExpedient: data.metaExpedient,
-                            estat: data.estat,
-                            dataRecepcioInicial: data.dataRecepcioInicial,
-                            dataRecepcioFinal: data.dataRecepcioFinal,
-                            advanced: true,
-                        })
-                    }
-                    return springFilterBuilder(data)
-                }}
+        springFilterBuilder={springFilterBuilder}
         onSpringFilterChange={onSpringFilterChange}
 		filterOnFieldEnterKeyPressed
         advancedSearch

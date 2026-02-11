@@ -299,6 +299,7 @@ export const darkTheme = createTheme(base, {
 	MuiDialogTitle: {
 	    styleOverrides: {
 	        root: {
+                color: '#1e1e1e',
 				padding: "5px 24px",
 				display: "flex",
 				justifyContent: "space-between",
@@ -444,9 +445,6 @@ export const darkTheme = createTheme(base, {
 			body1: {
 				color: 'white !important',
 			},
-			root: {
-				color: 'darkgrey !important',
-			}
 	    },
 	},
 	MuiButtonGroup: {
@@ -477,6 +475,13 @@ export const darkTheme = createTheme(base, {
 				color: '#fff'
 		    },
 		},
+	},
+    MuiDivider: {
+	    styleOverrides: {
+	        root: {
+                borderColor: 'white'
+	        },
+	    }
 	},
 	MuiIcon: {
 	    styleOverrides: {
