@@ -57,7 +57,6 @@ import es.caib.ripea.persistence.repository.DadaRepository;
 import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.persistence.repository.ExpedientEstatRepository;
 import es.caib.ripea.persistence.repository.ExpedientRepository;
-import es.caib.ripea.persistence.repository.ExpedientTascaRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.persistence.repository.UsuariRepository;
@@ -149,7 +148,6 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
 	private final EntitatRepository entitatRepository;
 	private final ExpedientRepository expedientRepository;
-	private final ExpedientTascaRepository expedientTascaRepository;
 	private final OrganGestorRepository organGestorRepository;
 	private final ExpedientEstatRepository expedientEstatRepository;
     private final DocumentResourceRepository documentResourceRepository;
@@ -232,6 +230,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         register(ExpedientResource.ACTION_IMPORT_INTE, new ImportarInteressatsArxiuActionExecutor());
         register(ExpedientResource.ACTION_MOURE_TOT_CODE, new MoureTotActionExecutor());
         
+        register(ExpedientResource.PERSPECTIVE_PERMIS_CONTINGUT, new PermisContingutPerspectiveApplicator());
         register(ExpedientResource.PERSPECTIVE_AMB_PINBAL_CODE, new AmbDocumentsPinbalPerspectiveApplicator());
         register(ExpedientResource.PERSPECTIVE_FOLLOWERS, new FollowersPerspectiveApplicator());
         register(ExpedientResource.PERSPECTIVE_COUNT, new CountPerspectiveApplicator());
@@ -622,28 +621,8 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		resource.setAmbNotificacionsPendents(cacheHelper.hasNotificacionsPendentsPerExpedient(expedientEntity));
 		resource.setDataDarrerEnviament(cacheHelper.getDataDarrerEnviament(expedientEntity));
 		resource.setPotModificar(entityComprovarHelper.comprovarSiEsPotModificarExpedient(expedientEntity));
-		UsuariEntity usuariEntity = usuariRepository.findById(SecurityContextHolder.getContext().getAuthentication().getName()).orElse(null);
-		if (usuariEntity!=null && entity.getId()!=null) {
-			try {
-				ContingutEntity contingutEntity = contingutHelper.comprovarContingutDinsExpedientModificable(
-						entity.getEntitat().getId(),
-						entity.getId(),
-						false, //comprovarPermisRead
-						true, //comprovarPermisWrite
-						false, //comprovarPermisCreate
-						false, //comprovarPermisDelete
-						false, //checkPerMassiuAdmin
-						false, //comprovarAgafatPerUsuariActual
-						configHelper.getRolActual());
-				resource.setPotModificarContingut(contingutEntity!=null);
-			}catch (Exception ex) {
-				resource.setPotModificarContingut(false);
-			}
-//			resource.setPotModificarContingut(expedientTascaRepository.countTasquesResponsableExpedient(usuariEntity, entity.getId())>0);
-    	}
 		resource.setHasEsborranys(documentResourceRepository.hasFillsEsborranys(expedientEntity.getId()));
-		resource.setPendentExecucioMassiva(expedientHelper.isExpedientPendentExecucioMassiva(expedientEntity.getId()));
-		
+		resource.setPendentExecucioMassiva(expedientHelper.isExpedientPendentExecucioMassiva(expedientEntity.getId()));		
 	}
 
     @Override
@@ -709,6 +688,30 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
             List<MetaDocumentEntity> metaDocuments = metaDocumentHelper.findMetaDocumentsPinbalDisponiblesPerCreacio(entity.getId());
             resource.setAmbDocumentsPinbal(metaDocuments!=null && !metaDocuments.isEmpty());
+        }
+    }
+
+    private class PermisContingutPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
+        @Override
+        public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
+    		UsuariEntity usuariEntity = usuariRepository.findById(SecurityContextHolder.getContext().getAuthentication().getName()).orElse(null);
+    		if (usuariEntity!=null && entity.getId()!=null) {
+    			try {
+    				ContingutEntity contingutEntity = contingutHelper.comprovarContingutDinsExpedientModificable(
+    						entity.getEntitat().getId(),
+    						entity.getId(),
+    						false, //comprovarPermisRead
+    						false, //comprovarPermisWrite
+    						false, //comprovarPermisCreate
+    						false, //comprovarPermisDelete
+    						false, //checkPerMassiuAdmin
+    						true, //comprovarAgafatPerUsuariActual
+    						configHelper.getRolActual());
+    				resource.setPotModificarContingut(contingutEntity!=null);
+    			}catch (Exception ex) {
+    				resource.setPotModificarContingut(false);
+    			}
+        	}
         }
     }
 

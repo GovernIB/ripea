@@ -64,6 +64,9 @@ import lombok.experimental.FieldNameConstants;
 						code = ExpedientResource.PERSPECTIVE_AMB_PINBAL_CODE),
 				@ResourceConfigArtifact(
 						type = ResourceArtifactType.PERSPECTIVE,
+						code = ExpedientResource.PERSPECTIVE_PERMIS_CONTINGUT),
+				@ResourceConfigArtifact(
+						type = ResourceArtifactType.PERSPECTIVE,
 						code = ExpedientResource.PERSPECTIVE_AUDIT_CODE),
 				@ResourceConfigArtifact(
 						type = ResourceArtifactType.PERSPECTIVE,
@@ -286,6 +289,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
 	public static final String PERSPECTIVE_DOCUMENTS_NO_MOGUTS = "DOCUMENTS_NO_MOGUTS";
 	public static final String PERSPECTIVE_DOCUMENTS_OBLIGATORIS_TANCAR = "DOCUMENTS_OBLIGATORIS_TANCAR";
 	public static final String PERSPECTIVE_AMB_PINBAL_CODE = "AMB_PINBAL";
+	public static final String PERSPECTIVE_PERMIS_CONTINGUT = "PERMIS_CONTINGUT";	
 	public static final String PERSPECTIVE_AUDIT_CODE = "AUDITORIA";
 	
 
