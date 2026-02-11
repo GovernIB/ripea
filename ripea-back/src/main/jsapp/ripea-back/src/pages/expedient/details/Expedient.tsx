@@ -166,7 +166,7 @@ const ExpedientAlert = (props:any) => {
     </>
 }
 
-const perspectives = ['COUNT', 'ESTAT', 'RELACIONAT', 'AMB_PINBAL', "META_EXPEDIENT"]
+const perspectives = ['COUNT', 'ESTAT', 'RELACIONAT', 'AMB_PINBAL', "META_EXPEDIENT", "PERMIS_CONTINGUT"]
 const Expedient = () => {
     const { t } = useTranslation();
     const { id } = useParams();

@@ -2,8 +2,8 @@ import {Card, CardContent, CardHeader, Grid, Typography} from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import Icon from "@mui/material/Icon";
 
-const cardBorder= { border: '1px solid #e3e3e3', borderRadius: '4px' };
-const cardHeader= { py: 1, px: 2, color: 'black', backgroundColor: '#f5f5f5', borderBottom: '1px solid #e3e3e3' };
+const cardBorder= { borderRadius: '4px' };
+const cardHeader= { py: 1, px: 2 };
 const iconButton = { p: 0.5, borderRadius: '5px', maxWidth: 'max-content', border: '1px solid grey' }
 
 const CardButton = (props:any) => {
@@ -58,7 +58,7 @@ export const CardPage = (props:any) => {
         flexDirection: 'column'
     }}>
         {title && <CardHeader title={title} sx={headerProps}/>}
-        {header && <CardContent sx={headerProps}>{header}</CardContent>}
+        {header && <CardContent sx={headerProps} className={'cardHeader'}>{header}</CardContent>}
 
         <CardContent sx={{height: '100%', display: 'flex', flexDirection: 'column'}}>
             {children}

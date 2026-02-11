@@ -188,38 +188,7 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
     }, [user?.conf?.numElementsPagina])
 
     return <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
-        <style>
-            {`
-                    .cell-with-wrap {
-                        // white-space: normal !important;
-                        // line-height: 1.2em;
-                        // word-break: break-word;
-                        // padding: 5px 10px !important;
-                        // overflow: auto;
-                        // display: flex;
-                        // align-items: start !important;
-                        text-overflow: ellipsis !important;
-                    }
-                    
-                    .MuiDataGrid-checkboxInput {
-                        transform: scale(0.8);
-                    }
-                    .MuiDataGrid-cell--withRenderer {
-                        align-items: flex-start !important;
-                    }
-                    .MuiDataGrid-columnHeaderCheckbox {
-                        align-items: flex-start !important;
-                        padding-top: 4px !important;
-                    }
-                    [class^="row-with-color-"] .MuiDataGrid-cellCheckbox {
-                        width: 48px !important;
-                        max-width: 48px !important;
-                        min-width: 48px !important;
-                        margin-left: -4px !important;
-                    }
-            `}
-            {rowStyles}
-        </style>
+        <style>{rowStyles}</style>
 
         <MuiGrid
             resourceName={resourceName}

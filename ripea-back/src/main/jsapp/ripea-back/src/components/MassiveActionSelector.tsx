@@ -103,7 +103,7 @@ const MassiveActionSelector: React.FC<MassiveActionSelectorProps> = (props:Massi
                         <Button
                             onClick={()=> action?.onClick?.(selectedRows)}
                             disabled={typeof action?.disabled === 'function' ? action?.disabled(selectedRows) : action?.disabled}
-                            sx={{ minWidth: '40px', maxHeight: '32.5px', display: 'flex', justifyContent: 'center', alignItems: 'center', paddingTop: 0.75 }}
+                            sx={{ minWidth: '40px', maxHeight: '32.5px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
                         >
                             <Icon color="action" sx={{m: 0, mr: action?.title ?1 :0}}>{action?.icon}</Icon>{action?.title}
                         </Button>
