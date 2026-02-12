@@ -10,6 +10,7 @@ import lombok.Data;
 @Data
 public class ImportacioZipDocument implements Serializable {
 	private static final long serialVersionUID = 6560559906432257920L;
+	private long id; //ID para el front, no es ningun ID de BBDD
 	private boolean importar;
 	private String ruta;
 	@NotNull

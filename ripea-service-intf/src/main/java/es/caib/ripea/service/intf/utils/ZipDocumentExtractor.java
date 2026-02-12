@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -82,6 +83,9 @@ public class ZipDocumentExtractor {
      */
     private ImportacioZipDocument createDocumentFromEntry(ZipEntry entry, byte[] fileContent) {
         ImportacioZipDocument document = new ImportacioZipDocument();
+        
+        //ID para el front, no es ningun ID de BBDD
+        document.setId(Calendar.getInstance().getTimeInMillis());
         
         // Nombre completo del archivo con su ruta
         String fullPath = entry.getName();
