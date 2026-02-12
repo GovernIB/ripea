@@ -91,7 +91,7 @@ public class MetaDadaHelper {
 
 			applicationHelper.stopTimer(sample, "METRICS@Subsystem_Procediment.metaDada", "resultado", "exito");
 			
-			evictValidacionsExpedients(entitat, metaNode);
+			evictValidacionsExpedients(entitat, metaNode, false);
 			
 			return metaDadaRepository.save(entity);
 			
@@ -101,14 +101,15 @@ public class MetaDadaHelper {
 		}			
 	}
 	
+	//Nmoes es crida desde els métodes dels ResourceService
 	public void evictValidacionsExpedients(Long entitatId, Long metaNodeId) {
 		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatId);
 		evictValidacionsExpedients(
 				entitatEntity,
-				entityComprovarHelper.comprovarMetaNode(entitatEntity, metaNodeId));
+				entityComprovarHelper.comprovarMetaNode(entitatEntity, metaNodeId), true);
 	}
 	
-	public void evictValidacionsExpedients(EntitatEntity entitat, MetaNodeEntity metaNode) {
+	public void evictValidacionsExpedients(EntitatEntity entitat, MetaNodeEntity metaNode, boolean notificaSse) {
 		//Una metaDada pot ser de un meta-document, i el evict i les notificacions son per expedients
 		if (metaNode != null && metaNode instanceof MetaExpedientEntity) {
 			List<ExpedientEntity> expedients = expedientRepository.findByEntitatAndMetaExpedientAndEstatAndEsborrat(
@@ -117,7 +118,11 @@ public class MetaDadaHelper {
 					ExpedientEstatEnumDto.OBERT, 
 					0);
 			for (ExpedientEntity expedient: expedients) {
-				cacheHelper.evictErrorsValidacioAndNotify(expedient.getId());
+				if (notificaSse) {
+					cacheHelper.evictErrorsValidacioAndNotify(expedient.getId());
+				} else {
+					cacheHelper.evictErrorsValidacioPerNode(expedient.getId());
+				}
 			}
 		}
 	}
@@ -136,7 +141,7 @@ public class MetaDadaHelper {
 				metaDada.getId());
 
 		if (!metaDada.getMultiplicitat().equals(entity.getMultiplicitat())) {
-			evictValidacionsExpedients(entitat, metaNode);
+			evictValidacionsExpedients(entitat, metaNode, false);
 		}
 		
 		entity.update(metaDada);
@@ -184,7 +189,7 @@ public class MetaDadaHelper {
 			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientId, organId);
 		}
 		
-		evictValidacionsExpedients(entitat, metaNode);		
+		evictValidacionsExpedients(entitat, metaNode, false);		
 		
 		return metaDada;
 	}

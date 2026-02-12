@@ -11,8 +11,6 @@ import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 
-import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientTascaResourceEntity;
-import es.caib.ripea.service.intf.model.*;
 import org.springframework.stereotype.Service;
 
 import com.turkraft.springfilter.FilterBuilder;
@@ -26,9 +24,9 @@ import es.caib.ripea.persistence.entity.MetaDocumentEntity;
 import es.caib.ripea.persistence.entity.MetaDocumentFluxPortafibEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.entity.TipusDocumentalEntity;
-import es.caib.ripea.persistence.entity.resourceentity.MetaDadaResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaDocumentFluxPortafibResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaDocumentResourceEntity;
+import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaDocumentResourceRepository;
 import es.caib.ripea.persistence.repository.DocumentRepository;
 import es.caib.ripea.persistence.repository.ExpedientRepository;
@@ -53,6 +51,11 @@ import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.MetaDocumentDto;
 import es.caib.ripea.service.intf.dto.PinbalServeiDto;
 import es.caib.ripea.service.intf.dto.UsuariDto;
+import es.caib.ripea.service.intf.model.ContingutResource;
+import es.caib.ripea.service.intf.model.EntitatResource;
+import es.caib.ripea.service.intf.model.MetaDocumentFluxPortafibResource;
+import es.caib.ripea.service.intf.model.MetaDocumentResource;
+import es.caib.ripea.service.intf.model.UsuariResource;
 import es.caib.ripea.service.intf.resourceservice.MetaDocumentResourceService;
 import es.caib.ripea.service.intf.utils.Utils;
 import lombok.RequiredArgsConstructor;
@@ -271,6 +274,8 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
 				configHelper.getRolActual(),
 				ogEntity!=null?ogEntity.getId():null);
 		
+		afterDbChange(entitatEntity.getId(), resource.getMetaExpedient()!=null?resource.getMetaExpedient().getId():null);
+		
 		return resource;
 	}
     
@@ -296,6 +301,8 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
 					resource.getPlantilla()!=null?resource.getPlantilla().getContentType():null,
 					resource.getPlantilla()!=null?resource.getPlantilla().getContent():null);
 		}
+		
+		afterDbChange(resource.getEntitat().getId(), resource.getMetaExpedient()!=null?resource.getMetaExpedient().getId():null);
 		
 		return resource;
 	}
@@ -368,32 +375,16 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
     	try {
     		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
     		OrganGestorEntity ogEntity	= organGestorRepository.findByEntitatIdAndCodi(entitatEntity.getId(), configHelper.getOrganActualCodi());
+    		MetaExpedientResourceEntity metaExpedient = metaDocumentResourceRepository.findById(id).get().getMetaExpedient();
     		metaDocumentHelper.delete(entitatEntity.getId(), null, id, configHelper.getRolActual(), ogEntity!=null?ogEntity.getId():null);
+    		afterDbChange(entitatEntity.getId(), metaExpedient!=null?metaExpedient.getId():null);
     	} catch (Exception ex) {
     		excepcioLogHelper.addExcepcio("/metaDocumentResource/"+id+"/delete", ex);
     		throw new ResourceNotFoundException(getResourceClass(), ex.getMessage());
     	}
     }
     
-    @Override
-    protected void afterCreateSave(MetaDocumentResourceEntity entity, MetaDocumentResource resource, Map<String, AnswerRequiredException.AnswerValue> answers, boolean anyOrderChanged) {
-    	afterDbChange(entity);
-    }
-    
-    @Override
-    protected void afterUpdateSave(MetaDocumentResourceEntity entity, MetaDocumentResource resource, Map<String, AnswerRequiredException.AnswerValue> answers, boolean anyOrderChanged) {
-    	if (!entity.getMultiplicitat().equals(resource.getMultiplicitat())) {
-    		afterDbChange(entity);
-    	}
-    }
-    
-    @Override
-    protected void afterDelete(MetaDocumentResourceEntity entity, Map<String, AnswerRequiredException.AnswerValue> answers) {
-        afterDbChange(entity);
-    }
-    
-    private void afterDbChange(MetaDocumentResourceEntity entity) {
-    	//Esborram cache de validacions del expedient
-    	metaDocumentHelper.evictValidacionsExpedients(entity.getEntitat().getId(), entity.getMetaExpedient().getId());
+    private void afterDbChange(Long entitatId, Long metaNodeId) {
+    	metaDocumentHelper.evictErrorsValidacioAndNotify(entitatId, metaNodeId, true);
     }
 }
