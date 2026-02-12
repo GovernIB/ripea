@@ -93,7 +93,7 @@ const DocumentEnviatsPortafirmesFilter = (props: any) => {
 }
 
 // Grid
-const sortModel: any = [{field: 'estat', sort: 'desc'}]
+const sortModel: any = [{field: 'dataEnviamentInici', sort: 'desc'}]
 const columns = [
     {
         field: 'expedient',

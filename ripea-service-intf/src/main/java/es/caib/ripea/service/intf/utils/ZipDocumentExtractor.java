@@ -196,4 +196,20 @@ public class ZipDocumentExtractor {
         }
         return false;
     }
+    
+    //Extraer un ZipEntry del zip por nombre completo de la ruta
+    public byte[] extractSpecificFile(byte[] zipBytes, String rutaCompleta) throws IOException {
+        try (ByteArrayInputStream bais = new ByteArrayInputStream(zipBytes);
+             ZipInputStream zipInputStream = new ZipInputStream(bais)) {
+            
+            ZipEntry entry;
+            while ((entry = zipInputStream.getNextEntry()) != null) {
+                if (entry.getName().equals(rutaCompleta)) {
+                    return readFileContent(zipInputStream);
+                }
+                zipInputStream.closeEntry();
+            }
+        }
+        throw new IOException("Archivo no encontrado: " + rutaCompleta);
+    }
 }
