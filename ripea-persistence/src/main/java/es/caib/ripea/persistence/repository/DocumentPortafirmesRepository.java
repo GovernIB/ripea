@@ -65,7 +65,8 @@ public interface DocumentPortafirmesRepository extends JpaRepository<DocumentPor
 			"and (:esNullDocumentNom = true or lower(dp.document.nom) like lower('%'||:documentNom||'%'))" +
 			"and (:esNullDataEnviamentInici = true or dp.enviatData >= :dataEnviamentInici) " +
 			"and (:esNullDataEnviamentFinal = true or dp.enviatData <= :dataEnviamentFinal) " +
-			"and (:esNullEstatEnviament = true or dp.estat = :estatEnviament) ")
+			"and (:esNullEstatEnviament = true or dp.estat = :estatEnviament) " +
+			"and (dp.document.esborrat=0)")
 	public Page<DocumentPortafirmesEntity> findAmbFiltrePaginat(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("rolActual") String rolActual,

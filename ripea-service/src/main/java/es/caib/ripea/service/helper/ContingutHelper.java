@@ -1473,7 +1473,7 @@ public class ContingutHelper {
 		if ((conteDocumentsDefinitius(contingut) && isPermesEsborrarFinals()) || !conteDocumentsDefinitius(contingut)) {
 			if (!conteDocumentsAnotacions(contingut)) {
 				//Marca el contingut i tots els seus fills com a esborrats de forma recursiva
-				marcarEsborrat(contingut);
+				marcarEsborrat(entitatId, contingut, rolActual);
 			} else {
 				logger.error("Aquest contingut prové d'una anotació o conté documents que provenen de una anotació (contingutId=" + contingut.getId() + ")");
 				throw new ValidationException(
@@ -2769,14 +2769,22 @@ public class ContingutHelper {
 		}
 	}
 
-	public void marcarEsborrat(ContingutEntity contingut) {
+	public void marcarEsborrat(Long entitatId, ContingutEntity contingut, String rolActual) {
 
 		if (contingut.getEsborrat() == 0) {
 
 			for (ContingutEntity contingutFill: contingut.getFills()) {
-				marcarEsborrat(contingutFill);
+				marcarEsborrat(entitatId, contingutFill, rolActual);
 			}
 
+			//Si es un document, amb enviament a PF en curs, es cancela
+			if (contingut instanceof DocumentEntity) {
+				DocumentEntity documentEntity = (DocumentEntity)contingut;
+				if (documentEntity.getEstat().equals(DocumentEstatEnumDto.FIRMA_PENDENT)) {
+					firmaPortafirmesHelper.portafirmesCancelar(entitatId, documentEntity, rolActual);
+				}
+			}
+			
 			List<ContingutEntity> continguts = contingutRepository.findByPareAndNomOrderByEsborratAsc(
 					contingut.getPare(),
 					contingut.getNom());

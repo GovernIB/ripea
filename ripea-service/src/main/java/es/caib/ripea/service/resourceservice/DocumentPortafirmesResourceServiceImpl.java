@@ -68,7 +68,8 @@ public class DocumentPortafirmesResourceServiceImpl extends BaseMutableResourceS
         Filter filtreBase = FilterBuilder.and(
                 (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null,
                 FilterBuilder.equal(DocumentEnviamentResource.Fields.document + "." + ContingutResource.Fields.entitat + "." + EntitatResource.Fields.codi, 
-                		entitatActualCodi != null?entitatActualCodi:"................................................................................")
+                		entitatActualCodi != null?entitatActualCodi:"................................................................................"),
+                FilterBuilder.equal(DocumentEnviamentResource.Fields.document + "." + ContingutResource.Fields.esborrat, 0)
         );
         
         Filter filtrePermisos = null;
