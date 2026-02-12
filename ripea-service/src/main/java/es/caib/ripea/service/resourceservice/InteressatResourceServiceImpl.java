@@ -52,6 +52,7 @@ import es.caib.ripea.service.base.springfilter.FilterSpecification;
 import es.caib.ripea.service.helper.CacheHelper;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
+import es.caib.ripea.service.helper.EventHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
 import es.caib.ripea.service.helper.ExecucioMassivaHelper;
 import es.caib.ripea.service.helper.ExpedientInteressatHelper;
@@ -92,6 +93,7 @@ import es.caib.ripea.service.intf.model.InteressatGrupResource;
 import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.model.InteressatResource.UnitatOrganitzativaFormFilter;
 import es.caib.ripea.service.intf.model.NodeResource.MassiveAction;
+import es.caib.ripea.service.intf.model.sse.ErrorsValidacioChangedEvent;
 import es.caib.ripea.service.intf.resourceservice.InteressatResourceService;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.resourcehelper.InteressatResourceHelper;
@@ -110,6 +112,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
     private final ConfigHelper configHelper;
     private final PluginHelper pluginHelper;
     private final CacheHelper cacheHelper;
+    private final EventHelper eventHelper;
     private final EntityComprovarHelper entityComprovarHelper;
     private final ExecucioMassivaHelper execucioMassivaHelper;
     private final MessageHelper messageHelper;
@@ -423,17 +426,30 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
 
     @Override
     public InteressatResource create(InteressatResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
-        return interessatResourceHelper.create(resource);
+    	InteressatResource ir = interessatResourceHelper.create(resource);
+		afterDbChange(resource.getExpedient().getId());
+		return ir;
     }
-
+    
     @Override
     public InteressatResource update(Long id, InteressatResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotFoundException {
     	try {
-    		return interessatResourceHelper.update(resource);
+    		InteressatResource ir = interessatResourceHelper.update(resource);
+    		afterDbChange(resource.getExpedient().getId());
+    		return ir;
     	} catch (Exception ex) {
     		log.error("Error update InteressatResource", ex);
     		return resource;
     	}
+    }
+
+    private void afterDbChange(Long expedientId) {
+    	//Esborram cache de validacions del expedient
+		cacheHelper.evictErrorsValidacioPerNode(expedientId); // Primero hace evict
+		ErrorsValidacioChangedEvent evce = new ErrorsValidacioChangedEvent(
+				expedientId,
+				cacheHelper.findErrorsValidacioPerNode(expedientId));
+		eventHelper.notifyErrorsValidacio(evce); // Luego notifica con datos frescos	
     }
 
     private class RespresentantPerspectiveApplicator implements PerspectiveApplicator<InteressatResourceEntity, InteressatResource> {
@@ -729,6 +745,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
                         entity.getExpedient().getId(),
                         entity.getId(),
                         configHelper.getRolActual());
+                afterDbChange(entity.getExpedient().getId());
             } catch (Exception e) {
                 excepcioLogHelper.addExcepcio("/expedient/interessats/" + entity.getId() + "/DeleteInteressatActionExecutor", e);
                 String message = messageHelper.getMessage("message.common.action.error") + ": " + e.getMessage();

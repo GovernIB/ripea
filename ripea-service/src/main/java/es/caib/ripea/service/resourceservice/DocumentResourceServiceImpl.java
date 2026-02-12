@@ -37,6 +37,7 @@ import es.caib.ripea.persistence.entity.DocumentEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.ViaFirmaUsuariEntity;
+import es.caib.ripea.persistence.entity.resourceentity.DadaResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.DocumentResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.ExpedientResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.InteressatGrupResourceEntity;
@@ -67,6 +68,7 @@ import es.caib.ripea.service.helper.DocumentHelper;
 import es.caib.ripea.service.helper.DocumentNotificacioHelper;
 import es.caib.ripea.service.helper.EmailHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
+import es.caib.ripea.service.helper.EventHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
 import es.caib.ripea.service.helper.ExecucioMassivaHelper;
 import es.caib.ripea.service.helper.ExpedientHelper;
@@ -124,6 +126,7 @@ import es.caib.ripea.service.intf.dto.ViaFirmaDispositiuDto;
 import es.caib.ripea.service.intf.dto.ViaFirmaEnviarDto;
 import es.caib.ripea.service.intf.exception.ValidationException;
 import es.caib.ripea.service.intf.model.ContingutResource;
+import es.caib.ripea.service.intf.model.DadaResource;
 import es.caib.ripea.service.intf.model.DocumentResource;
 import es.caib.ripea.service.intf.model.DocumentResource.IniciarFirmaNavegador;
 import es.caib.ripea.service.intf.model.DocumentResource.NewDocPinbalForm;
@@ -137,6 +140,7 @@ import es.caib.ripea.service.intf.model.InteressatGrupResource;
 import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.model.MetaDocumentResource;
 import es.caib.ripea.service.intf.model.NodeResource.MassiveAction;
+import es.caib.ripea.service.intf.model.sse.ErrorsValidacioChangedEvent;
 import es.caib.ripea.service.intf.model.UsuariResource;
 import es.caib.ripea.service.intf.resourceservice.DocumentResourceService;
 import es.caib.ripea.service.intf.service.AplicacioService;
@@ -157,6 +161,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     private final EmailHelper emailHelper;
     private final ExpedientHelper expedientHelper;
     private final CacheHelper cacheHelper;
+    private final EventHelper eventHelper;
     private final DocumentHelper documentHelper;
     private final ContingutHelper contingutHelper;
     private final ExcepcioLogHelper excepcioLogHelper;
@@ -423,6 +428,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     				false,
     				true);
     		resource.setId(documentCreat.getId());
+    		afterDbChange(documentCreat.getExpedientId());
     	} catch (ValidationException ex) {
     		throw ex;
     	} catch (Exception ex) {
@@ -435,8 +441,10 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     @Override
     public void delete(Long id, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotFoundException {
     	try {
+    		Long expedientId = documentRepository.findById(id).get().getExpedient().getId();
     		EntitatEntity entitatEntity = entitatRepository.findByCodi(configHelper.getEntitatActualCodi());
     		contingutHelper.deleteReversible(entitatEntity.getId(), id, null, configHelper.getRolActual());
+    		afterDbChange(expedientId);
     	} catch (Exception ex) {
     		excepcioLogHelper.addExcepcio("/document/"+id+"/delete", ex);
     		throw new ResourceNotFoundException(getResourceClass(), ex.getMessage());
@@ -472,17 +480,27 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 				}
     		} else {
     			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
-        		DocumentDto documentCreat = documentHelper.updateDocument(
+        		DocumentDto documentActualitzat = documentHelper.updateDocument(
         				entitatEntity.getId(),
         				documentActual,
     					resource.toDocumentDto(),
         				true);
-        		resource.setId(documentCreat.getId());
+        		resource.setId(documentActualitzat.getId());
+        		afterDbChange(documentActual.getExpedient().getId());
     		}
     	} catch (Exception ex) {
     		excepcioLogHelper.addExcepcio("/document/"+resource.getId()+"/update", ex);
     	}
     	return resource;
+    }
+    
+    private void afterDbChange(Long expedientId) {
+    	//Esborram cache de validacions del expedient
+		cacheHelper.evictErrorsValidacioPerNode(expedientId); // Primero hace evict
+		ErrorsValidacioChangedEvent evce = new ErrorsValidacioChangedEvent(
+				expedientId,
+				cacheHelper.findErrorsValidacioPerNode(expedientId));
+		eventHelper.notifyErrorsValidacio(evce); // Luego notifica con datos frescos	
     }
 
     @Override

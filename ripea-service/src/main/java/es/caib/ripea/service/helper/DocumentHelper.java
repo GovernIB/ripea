@@ -68,6 +68,7 @@ import es.caib.ripea.service.intf.dto.DocumentOrigenEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentPublicacioDto;
 import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentTipusFirmaEnumDto;
+import es.caib.ripea.service.intf.dto.ExpedientDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.ImportacioRegistreParamsDto;
 import es.caib.ripea.service.intf.dto.LogObjecteTipusEnumDto;
@@ -333,10 +334,14 @@ public class DocumentHelper {
 
 		contingutHelper.reOrdenaContingut(entity, null);
 		
-		if (returnDetail)		
+		if (returnDetail) {
 			dto = toDocumentDto(entity);
-		else
+		} else {
 			dto.setId(entity.getId());
+			ExpedientDto expDto = new ExpedientDto();
+			expDto.setId(expedient.getId());
+			dto.setExpedientPare(expDto);
+		}
 
 		return dto;
 	}
@@ -520,9 +525,9 @@ public class DocumentHelper {
 				document.getNom(),
 				documentEntity.getId(),
 				DocumentEntity.class);
+
 		cacheHelper.evictErrorsValidacioPerNode(documentEntity.getId());
-		cacheHelper.evictErrorsValidacioAndNotify(documentEntity.getExpedient().getId());
-		
+		cacheHelper.evictErrorsValidacioPerNode(documentEntity.getExpedient().getId());
 		
 		String nomOriginal = documentEntity.getNom();
 		
@@ -768,7 +773,8 @@ public class DocumentHelper {
 		} 
 
 		cacheHelper.evictErrorsValidacioPerNode(documentEntity.getId());
-		cacheHelper.evictErrorsValidacioAndNotify(documentEntity.getExpedient().getId());
+		cacheHelper.evictErrorsValidacioPerNode(documentEntity.getExpedient().getId());
+		
 		// Registra al log la modificació del document
 		contingutLogHelper.log(
 				documentEntity,
@@ -844,7 +850,8 @@ public class DocumentHelper {
 		}
 
 		cacheHelper.evictErrorsValidacioPerNode(documentEntity.getId());
-		cacheHelper.evictErrorsValidacioAndNotify(documentEntity.getExpedient().getId());
+		cacheHelper.evictErrorsValidacioPerNode(documentEntity.getExpedient().getId());
+		
 		// Registra al log la modificació del document
 		contingutLogHelper.log(
 				documentEntity,
@@ -853,7 +860,6 @@ public class DocumentHelper {
 				null,
 				true,
 				true);
-
 	}
 
 	public DocumentEntity crearDocumentDB(
@@ -951,7 +957,7 @@ public class DocumentHelper {
 				documentCreat,
 				entitat.getUnitatArrel());
 		if (expedient != null) {
-			cacheHelper.evictErrorsValidacioAndNotify(expedient.getId());
+			cacheHelper.evictErrorsValidacioPerNode(expedient.getId());
 		}
 		return documentCreat;
 	}
