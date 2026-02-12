@@ -105,10 +105,10 @@ import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.dto.FileNameOption;
 import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.ImportacioRegistreParamsDto;
-import es.caib.ripea.service.intf.dto.ProgresImportacioSgdDto;
 import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
 import es.caib.ripea.service.intf.dto.PermisosPerExpedientsDto;
 import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
+import es.caib.ripea.service.intf.dto.ProgresImportacioSgdDto;
 import es.caib.ripea.service.intf.dto.ProgresProcessamentZipDto;
 import es.caib.ripea.service.intf.dto.ResultatConsultaDto;
 import es.caib.ripea.service.intf.dto.SiNoEnumDto;
@@ -137,6 +137,7 @@ import es.caib.ripea.service.intf.model.UsuariResource;
 import es.caib.ripea.service.intf.resourceservice.ExpedientResourceService;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.utils.Utils;
+import es.caib.ripea.service.intf.utils.ZipDocumentExtractor;
 import es.caib.ripea.service.permission.ExtendedPermission;
 import es.caib.ripea.service.resourcehelper.ContingutLogResourceHelper;
 import es.caib.ripea.service.resourcehelper.ContingutResourceHelper;
@@ -1511,7 +1512,22 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     private class ImportarDocumentsZipArxiuActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.ImportarDocumentsZipForm, Serializable> {
 
 		@Override
-		public void onChange(Serializable id, ImportarDocumentsZipForm previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, ImportarDocumentsZipForm target) {}
+		public void onChange(Serializable id, ImportarDocumentsZipForm previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, ImportarDocumentsZipForm target) {
+			if ("documentZip".equals(fieldName)) {
+				if (fieldValue!=null) {
+					ZipDocumentExtractor extractor = new ZipDocumentExtractor();
+					try {
+						target.setDocumentsZip(extractor.extractDocuments(((FileReference)fieldValue).getContent()));
+					} catch (Exception ex) {
+				        excepcioLogHelper.addExcepcio("/expedient/" + id + "ImportarDocumentsZipArxiuActionExecutor.onChange", ex);
+				        String message = messageHelper.getMessage("message.common.action.error") + ": " + ex.getMessage();
+				        throw new ActionExecutionException(getResourceClass(), id, fieldName, message);
+					}
+				} else {
+					target.setDocumentsZip(null);
+				}
+			}
+		}
 
 		@Override
 		public Serializable exec(String code, ExpedientResourceEntity entity, ImportarDocumentsZipForm params) throws ActionExecutionException {
@@ -1536,8 +1552,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 						tempZip, 
 						configHelper.getRolActual(),
 						pare.getId(), 
-						null// tascaId
-				);
+						null);
 
 		        return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
 		    } catch (Exception ex) {
