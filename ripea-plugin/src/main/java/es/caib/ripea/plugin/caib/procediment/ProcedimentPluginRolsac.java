@@ -8,8 +8,6 @@ import java.util.Properties;
 import org.fundaciobit.genapp.common.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
-import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -86,17 +84,15 @@ public class ProcedimentPluginRolsac extends RipeaAbstractPluginProperties imple
 
 				String unitatCodi = null;
 				
-				Rolsac2UAResponse resposta = getJerseyClient().
-						resource(url).
-						post(Rolsac2UAResponse.class);
+				Rolsac2UAResponse resposta = getJerseyClient().resource(url).post(Rolsac2UAResponse.class);
 				
 				logger.debug("Response get unitat administrativa del ROLSAC2 (codi=" + codi + "): " + resposta.toString());
 				
-				if (resposta.getResultado() != null && !resposta.getResultado().isEmpty()) {
-					Rolsac2UnitatAdministrativa unitat = resposta.getResultado().get(0);
+				if (resposta.getItems() != null && !resposta.getItems().isEmpty()) {
+					Rolsac2UnitatAdministrativa unitat = resposta.getItems().get(0);
 					if (unitat.getCodigoDIR3() != null && !unitat.getCodigoDIR3().isEmpty()) {
 						unitatCodi = unitat.getCodigoDIR3();
-					} else if (unitat.getPadre()!=null && unitat.getPadre()>0 && unitat.getLink_padre()!=null) {
+					} else if (unitat.getLink_padre()!=null) {
 						unitatCodi = getUnitatAdministrativa(unitat.getLink_padre().getCodigo());
 					}
 				}
@@ -218,25 +214,7 @@ public class ProcedimentPluginRolsac extends RipeaAbstractPluginProperties imple
 		
 		String url = getServiceUrl();
 		url += (url.charAt(url.length()-1) != '/' ? "/" : "") + "procedimientos";
-		 
-		//        var httpHeaders = new HttpHeaders();
-		//        httpHeaders.set("Content-Type", "application/json");
-		//        var username = getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.COMANDA_PLUGIN_USR));
-		//        var password = getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.COMANDA_PLUGIN_PWR));
-		//        String auth = username + ":" + password;
-		//        byte[] encodedAuth = Base64.getEncoder().encode(auth.getBytes(StandardCharsets.UTF_8));
-		//        String authHeader = "Basic " + new String(encodedAuth);
-		//        httpHeaders.set("Authorization", authHeader);
-		//        var mapper = new ObjectMapper();
-		//        var requestBody = mapper.writeValueAsString(tasca);
-		//        HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, httpHeaders);
-		//        String url = getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.COMANDA_PLUGIN_URL));
-		//        if (url == null) {
-		//            throw new Exception("La propietat es.caib.ripea.plugin.comanda.url.base no pot ser null");
-		//        }
-		//        url += (url.charAt(url.length()-1) != '/' ? "/" : "") + "tasques";
-		//        return getRestTemplate().postForEntity(url, requestEntity, String.class);
-		
+
 		Rolsac2ProcedimentFilterRequest body = Rolsac2ProcedimentFilterRequest.builder()
 				.codigoSia(codiSia)
 				.codigoUADir3(codiDir3)
@@ -258,24 +236,17 @@ public class ProcedimentPluginRolsac extends RipeaAbstractPluginProperties imple
 		Rolsac2ProcedimientosResponse response = clientResponse.getEntity(Rolsac2ProcedimientosResponse.class);
 		
 		if (response != null && response.getStatus().equals("200")) {
-			if (response.getResultado() != null && !response.getResultado().isEmpty()) {
-				return toProcedimentDto2(response.getResultado().get(0));
+			if (response.getItems() != null && !response.getItems().isEmpty()) {
+				return toProcedimentDto2(response.getItems().get(0));
 			} else { 
 				return null;
 			}
-		} else if (response != null && response.getStatus().equals("400") && Utils.isEmpty(response.getResultado()) && es.caib.ripea.service.intf.utils.Utils.equals(response.getMensaje(), "La petición recibida es incorrecta(parametro: filtro // Tipo esperado: filtro)")) {
+		} else if (response != null && response.getStatus().equals("400") && Utils.isEmpty(response.getItems()) && es.caib.ripea.service.intf.utils.Utils.equals(response.getMensaje(), "La petición recibida es incorrecta(parametro: filtro // Tipo esperado: filtro)")) {
 			return null;
 		} else {
 			throw new SistemaExternException(
 					"No s'han pogut consultar el procediment de ROLSAC2 (codiSia=" + body.getCodigoSia() + "). Resposta rebuda amb el codi " + response.getStatus());
 		}
-	}
-	
-	private RestTemplate getRestTemplate() {
-	  SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
-	  factory.setConnectTimeout(5000);
-	  factory.setReadTimeout(5000);
-	  return new RestTemplate(factory);
 	}
 	
 	private ProcedimentDto toProcedimentDto2(Rolsac2Procediment procediment) throws  SistemaExternException {

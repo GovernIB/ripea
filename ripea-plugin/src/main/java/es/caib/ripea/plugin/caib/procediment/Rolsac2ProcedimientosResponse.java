@@ -11,10 +11,9 @@ import lombok.Setter;
 @Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Rolsac2ProcedimientosResponse {
-	private String numeroElementos;
-	private Integer tiempo;
+	private String itemsReturned;
 	private String mensaje;
 	private String status;
-	private String url;
-	private List<Rolsac2Procediment> resultado;
+	private String resultadoURL;
+	private List<Rolsac2Procediment> items;
 }
