@@ -78,6 +78,23 @@ public class ZipDocumentExtractor {
         return extractDocuments(new java.io.File(zipFilePath));
     }
     
+    private long lastTimestamp = -1L;
+    private long counter = 0L;
+    
+    public synchronized long generateUniqueId() {
+        long timestamp = Calendar.getInstance().getTimeInMillis();
+        
+        if (timestamp == lastTimestamp) {
+            counter++;
+        } else {
+            counter = 0;
+            lastTimestamp = timestamp;
+        }
+        
+        // Combinar timestamp con contador (desplazar timestamp y añadir contador)
+        return (timestamp << 20) | (counter & 0xFFFFF);
+    }
+    
     /**
      * Crea un ImportacioZipDocument desde un ZipEntry y su contenido
      */
@@ -85,7 +102,7 @@ public class ZipDocumentExtractor {
         ImportacioZipDocument document = new ImportacioZipDocument();
         
         //ID para el front, no es ningun ID de BBDD
-        document.setId(Calendar.getInstance().getTimeInMillis());
+        document.setId(generateUniqueId());
         
         // Nombre completo del archivo con su ruta
         String fullPath = entry.getName();
