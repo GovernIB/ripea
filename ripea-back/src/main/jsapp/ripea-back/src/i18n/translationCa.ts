@@ -719,8 +719,8 @@ const translationCa = {
                 seguidors: "Seguidors de l’expedient",
             },
             results: {
-                checkDelete: "Esteu segur que voleu eliminar aquest element?",
-                checkRelacio: "Esteu segur que voleu eliminar aquesta relació?",
+                checkDelete: "Estau segur que voleu eliminar aquest contingut? Si contenia firmes en curs, seràn cancelades.",
+                checkRelacio: "Estau segur que voleu eliminar aquesta relació?",
                 actionOk: "L’acció s’ha executat correctament.",
                 actionBackgroundOk: "L’acció s’ha preparat per executar-se en segon pla. Podeu consultar-ne l’estat al llistat d’accions massives.",
             }
@@ -820,7 +820,7 @@ const translationCa = {
                 },
                 delete: {
                     label: "Esborrar",
-                    check: "Està segur que vol continuar amb aquesta acció?",
+                    check: "Estau segur que voleu eliminar aquest contingut? Si contenia firma en curs, serà cancelada.",
                     description: "Un cop esborrat no es podrà recuperar",
                     ok: "El document {{data.nom}} s'ha eliminat correctament"
                 },

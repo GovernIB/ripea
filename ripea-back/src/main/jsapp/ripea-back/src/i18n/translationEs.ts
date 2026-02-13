@@ -719,7 +719,7 @@ const translationEs = {
                 seguidors: "Seguidores del expediente",
             },
             results: {
-                checkDelete: "¿Está seguro de que quiere borrar este elemento?",
+                checkDelete: "¿Está seguro de que quiere borrar este contenido? Si contenia firmas en curso, seran canceladas.",
                 checkRelacio: "¿Está seguro de que quiere borrar esta relación?",
                 actionOk: "La acción se ha ejecutado correctamente.",
                 actionBackgroundOk: "La acción se ha preparado para su ejecución en segundo plano. Puede consultar el estado del proceso desde el listado de acciones masivas.",
@@ -820,7 +820,7 @@ const translationEs = {
                 },
                 delete: {
                     label: "Borrar",
-                    check: "¿Está seguro de que quiere seguir con esta acción?",
+                    check: "¿Está seguro de que quiere borrar este contenido? Si contenia firmas en curso, seran canceladas.",
                     description: "Una vez borrado no se podrá recuperar.",
                     ok: "El documento {{data.nom}} se ha eliminado correctamente"
                 },

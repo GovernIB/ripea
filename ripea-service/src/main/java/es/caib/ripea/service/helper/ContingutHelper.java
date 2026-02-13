@@ -163,7 +163,6 @@ public class ContingutHelper {
 	@Autowired private TipusDocumentalRepository tipusDocumentalRepository;
 	@Autowired private IndexHelper indexHelper;
 	@Autowired private MessageHelper messageHelper;
-	@Autowired private DocumentFirmaPortafirmesHelper firmaPortafirmesHelper;
 	@Autowired private ConfigHelper configHelper;
 	@Autowired private OrganGestorHelper organGestorHelper;
 	@Autowired private MetaDocumentRepository metaDocumentRepository;
@@ -1496,7 +1495,7 @@ public class ContingutHelper {
 			}
 			DocumentEntity document = (DocumentEntity)contingut;
 			if (document.getEstat().equals(DocumentEstatEnumDto.FIRMA_PENDENT)) {
-				firmaPortafirmesHelper.portafirmesCancelar(
+				documentFirmaPortafirmesHelper.portafirmesCancelar(
 						entitatId,
 						document, rolActual);
 			}
@@ -2781,7 +2780,7 @@ public class ContingutHelper {
 			if (contingut instanceof DocumentEntity) {
 				DocumentEntity documentEntity = (DocumentEntity)contingut;
 				if (documentEntity.getEstat().equals(DocumentEstatEnumDto.FIRMA_PENDENT)) {
-					firmaPortafirmesHelper.portafirmesCancelar(entitatId, documentEntity, rolActual);
+					documentFirmaPortafirmesHelper.portafirmesCancelar(entitatId, documentEntity, rolActual);
 				}
 			}
 			

@@ -266,6 +266,12 @@ public interface AplicacioService {
 	public String getMetriquesJSON() throws Exception;
 	
 	@PreAuthorize("hasRole('IPA_ADMIN')")
+	public List<Long> getPortafirmesEliminats();
+	
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	public String executePortafirmesEliminat(Long tascaId) throws Exception;
+	
+	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public List<Long> getTasquesComanda();
 	
 	@PreAuthorize("hasRole('IPA_ADMIN')")

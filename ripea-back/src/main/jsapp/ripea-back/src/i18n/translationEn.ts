@@ -719,8 +719,8 @@ const translationEn = {
                 seguidors: "Case file followers",
             },
             results: {
-                checkDelete: "Are you sure you want to delete this item?",
-                checkRelacio: "Are you sure you want to delete this relation?",
+                checkDelete: "Are you sure you want to delete this content? If it contained ongoing signatures, they will be canceled.",
+				checkRelacio: "Are you sure you want to delete this relation?",
                 actionOk: "Action executed successfully.",
                 actionBackgroundOk: "Action has been scheduled for background execution. You can track it in the mass actions list.",
             }
@@ -820,7 +820,7 @@ const translationEn = {
                 },
                 delete: {
                     label: "Delete",
-                    check: "Are you sure you want to continue with this action?",
+                    check: "Are you sure you want to delete this content? If it contained ongoing signatures, they will be canceled.",
                     description: "Once deleted it cannot be recovered",
                     ok: "The document {{data.nom}} has been deleted successfully"
                 },

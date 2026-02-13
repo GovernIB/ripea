@@ -56,6 +56,9 @@ public interface DocumentPortafirmesRepository extends JpaRepository<DocumentPor
 			DocumentEnviamentEstatEnumDto[] estat,
 			boolean error);
 	
+	@Query(	"select dp.id from DocumentPortafirmesEntity dp where dp.document.esborrat=1 and dp.document.estat IN (1, 4)")
+	List<Long> findFirmaPendentDocumentEliminat();
+	
 	@Query(	"from " +
 			"    DocumentPortafirmesEntity dp " +
 			"where " +

@@ -16,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import es.caib.ripea.persistence.entity.DocumentPortafirmesEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.GrupEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
@@ -31,6 +32,7 @@ import es.caib.ripea.persistence.repository.ContingutRepository;
 import es.caib.ripea.persistence.repository.DadaRepository;
 import es.caib.ripea.persistence.repository.DispositiuEnviamentRepository;
 import es.caib.ripea.persistence.repository.DocumentEnviamentInteressatRepository;
+import es.caib.ripea.persistence.repository.DocumentPortafirmesRepository;
 import es.caib.ripea.persistence.repository.DominiRepository;
 import es.caib.ripea.persistence.repository.EmailPendentEnviarRepository;
 import es.caib.ripea.persistence.repository.EntitatRepository;
@@ -68,6 +70,7 @@ import es.caib.ripea.persistence.repository.ViaFirmaUsuariRepository;
 import es.caib.ripea.persistence.repository.config.ConfigRepository;
 import es.caib.ripea.persistence.repository.historic.HistoricUsuariRepository;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
+import es.caib.ripea.service.firma.DocumentFirmaPortafirmesHelper;
 import es.caib.ripea.service.helper.ApplicationHelper;
 import es.caib.ripea.service.helper.CacheHelper;
 import es.caib.ripea.service.helper.ConfigHelper;
@@ -162,6 +165,8 @@ public class AplicacioServiceImpl implements AplicacioService {
     @Autowired private RegistreInteressatRepository registreInteressatRepository;
     @Autowired private TipusDocumentalRepository tipusDocumentalRepository;
     @Autowired private ViaFirmaUsuariRepository viaFirmaUsuariRepository;
+    @Autowired private DocumentPortafirmesRepository documentPortafirmesRepository;
+    @Autowired private DocumentFirmaPortafirmesHelper firmaPortafirmesHelper;
     @Autowired private AclSidRepository aclSidRepository;
     @Autowired private AclCache aclCache;
 
@@ -935,6 +940,33 @@ public class AplicacioServiceImpl implements AplicacioService {
 		applicationHelper.stopTimer(sample, metricCode, tags);
 	}
 
+	@Override
+	@Transactional(readOnly = true)
+	public List<Long> getPortafirmesEliminats() {
+		return documentPortafirmesRepository.findFirmaPendentDocumentEliminat();
+	}
+	
+	@Override
+	@Transactional
+	public String executePortafirmesEliminat(Long portafirmesDocIs) throws Exception {
+		
+		String resultat = "";
+		
+		try {
+			DocumentPortafirmesEntity dpe = documentPortafirmesRepository.findById(portafirmesDocIs).get();
+			String rolActual = configHelper.getRolActual();
+			firmaPortafirmesHelper.portafirmesCancelar(
+					dpe.getDocument().getEntitat().getId(),
+					dpe.getDocument(),
+					rolActual!=null?rolActual:"IPA_ADMIN");
+			resultat+="Cancelada la firma pendent del document "+dpe.getDocument().getNom()+"</br>";
+		} catch (Exception ex) {
+			throw new Exception("Error al cancelar la firma pendent del document esborrat="+portafirmesDocIs+": "+ex.getMessage());
+		}
+		
+		return resultat;
+	}
+	
 	@Override
 	@Transactional(readOnly = true)
 	public List<Long> getTasquesComanda() {
