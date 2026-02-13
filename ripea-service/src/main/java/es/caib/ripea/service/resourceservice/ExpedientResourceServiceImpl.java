@@ -1523,8 +1523,6 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 				        String message = messageHelper.getMessage("message.common.action.error") + ": " + ex.getMessage();
 				        throw new ActionExecutionException(getResourceClass(), id, fieldName, message);
 					}
-				} else {
-					target.setDocumentsZip(null);
 				}
 			}
 		}
