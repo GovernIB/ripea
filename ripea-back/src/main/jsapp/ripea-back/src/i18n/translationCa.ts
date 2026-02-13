@@ -810,6 +810,8 @@ const translationCa = {
                 dadesAdicionals: "Dades addicionals",
                 dataOther: "Altres dades",
                 senseTipus: 'Sense tipus assignat',
+                extensio: "Extensio",
+                mida: "Mida",
             },
             action: {
                 new: {
@@ -1017,6 +1019,7 @@ const translationCa = {
                 scaned: "El procés d'escaneig s'ha realitzat amb èxit.",
                 view: "Nomes per PDF, ODT i DOCX",
                 portafirmes: "És necessari seleccionar un procediment i un tipus de document per poder realitzar l'acció massiva",
+                documentsZip: "S'ha de seleccionar com a mínim un document per fer l'importació",
             },
             versio: {
                 title: "Versió",

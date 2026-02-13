@@ -810,6 +810,8 @@ const translationEn = {
                 dadesAdicionals: "Additional data",
                 dataOther: "Other data",
                 senseTipus: "No type assigned",
+                extensio: "Extension",
+                mida: "Size",
             },
             action: {
                 new: {
@@ -1017,6 +1019,7 @@ const translationEn = {
                 scaned: "The scanning process was successful.",
                 view: "Only for PDF, ODT and DOCX",
                 portafirmes: "Es necesario seleccionar un procedimiento y un tipo de documento para poder realizar la acción masiva",
+                documentsZip: "At least one document must be selected to perform the import",
             },
             versio: {
                 title: "Version",

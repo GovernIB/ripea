@@ -1513,7 +1513,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
 		@Override
 		public void onChange(Serializable id, ImportarDocumentsZipForm previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, ImportarDocumentsZipForm target) {
-			if ("documentZip".equals(fieldName)) {
+			if (ImportarDocumentsZipForm.Fields.documentZip.equals(fieldName)) {
 				if (fieldValue!=null) {
 					ZipDocumentExtractor extractor = new ZipDocumentExtractor();
 					try {

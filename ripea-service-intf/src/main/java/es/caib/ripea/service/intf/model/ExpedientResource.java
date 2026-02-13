@@ -14,6 +14,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import es.caib.ripea.service.intf.resourcevalidation.ImportarDocumentsZipValid;
 import org.springframework.data.annotation.Transient;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -588,12 +589,18 @@ public class ExpedientResource extends NodeResource implements Serializable {
     @Setter
     @NoArgsConstructor
     @FieldNameConstants
+    @ImportarDocumentsZipValid
     public static class ImportarDocumentsZipForm implements Serializable {
     	@NotNull
     	@ResourceField(onChangeActive = true)
     	private FileReference documentZip;
+        @NotNull @NotEmpty
     	private List<ImportacioZipDocument> documentsZip;
-    	private List<DocumentResource> documentsUsuari;
+
+        @Transient
+        private String nom;
+        @Transient
+        private ResourceReference<MetaDocumentResource, Long> tipusDocument;
     }
 
     @Getter

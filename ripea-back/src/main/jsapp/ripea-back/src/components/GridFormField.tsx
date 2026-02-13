@@ -43,7 +43,7 @@ type GridFormField = FormFieldProps & {
     hidden?: boolean,
 }
 
-function formatByteCount(bytes:number) {
+export function formatByteCount(bytes:number) {
     if (bytes < 1024) return bytes + ' B';
     const exp = Math.floor(Math.log(bytes) / Math.log(1024));
     const pre = 'KMGTPE'.charAt(exp - 1) + 'B';
