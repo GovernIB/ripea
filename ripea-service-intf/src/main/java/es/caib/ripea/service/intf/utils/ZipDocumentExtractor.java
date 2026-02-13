@@ -24,7 +24,7 @@ public class ZipDocumentExtractor {
      */
     public List<ImportacioZipDocument> extractDocuments(byte[] zipBytes) throws IOException {
         List<ImportacioZipDocument> documents = new ArrayList<>();
-        
+        int contador = 0;
         try (ByteArrayInputStream bais = new ByteArrayInputStream(zipBytes);
              ZipInputStream zipInputStream = new ZipInputStream(bais)) {
             
@@ -39,7 +39,7 @@ public class ZipDocumentExtractor {
                 // Leer el contenido del archivo
                 byte[] fileContent = readFileContent(zipInputStream);
                 
-                ImportacioZipDocument document = createDocumentFromEntry(entry, fileContent);
+                ImportacioZipDocument document = createDocumentFromEntry(entry, fileContent, contador++);
                 documents.add(document);
                 
                 zipInputStream.closeEntry();
@@ -81,11 +81,11 @@ public class ZipDocumentExtractor {
     /**
      * Crea un ImportacioZipDocument desde un ZipEntry y su contenido
      */
-    private ImportacioZipDocument createDocumentFromEntry(ZipEntry entry, byte[] fileContent) {
+    private ImportacioZipDocument createDocumentFromEntry(ZipEntry entry, byte[] fileContent, int counter) {
         ImportacioZipDocument document = new ImportacioZipDocument();
         
         //ID para el front, no es ningun ID de BBDD
-        document.setId(Calendar.getInstance().getTimeInMillis());
+        document.setId(Calendar.getInstance().getTimeInMillis()+"_"+counter);
         
         // Nombre completo del archivo con su ruta
         String fullPath = entry.getName();
