@@ -4,12 +4,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.chrono.ChronoLocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -128,6 +127,7 @@ import es.caib.ripea.service.intf.model.ExpedientResource.ImportarExpedientFormA
 import es.caib.ripea.service.intf.model.ExpedientResource.MassiveImportDocsAction;
 import es.caib.ripea.service.intf.model.ExpedientResource.MoureTotFormAction;
 import es.caib.ripea.service.intf.model.ExpedientResource.TancarExpedientFormAction;
+import es.caib.ripea.service.intf.model.ImportacioZipDocument;
 import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.model.MetaExpedientEstatResource;
 import es.caib.ripea.service.intf.model.MetaExpedientOrganGestorResource;
@@ -1517,14 +1517,16 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 				if (fieldValue!=null) {
 					ZipDocumentExtractor extractor = new ZipDocumentExtractor();
 					try {
-						target.setDocumentsZip(extractor.extractDocuments(((FileReference)fieldValue).getContent()));
+						List<ImportacioZipDocument> documents = extractor.extractDocuments(((FileReference)fieldValue).getContent());
+						Collections.sort(documents);
+						target.setDocumentsZip(documents);
+//						previous.setDocumentZip(null);
+//						target.setDocumentZip(null);
 					} catch (Exception ex) {
 				        excepcioLogHelper.addExcepcio("/expedient/" + id + "ImportarDocumentsZipArxiuActionExecutor.onChange", ex);
 				        String message = messageHelper.getMessage("message.common.action.error") + ": " + ex.getMessage();
 				        throw new ActionExecutionException(getResourceClass(), id, fieldName, message);
 					}
-				} else {
-					target.setDocumentsZip(null);
 				}
 			}
 		}
@@ -1542,6 +1544,11 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		        entitatActual.setId(entitatEntity.getId());
 		        
 		        zipImportacioHelper.inicialitzarProgres(pare.getId());
+		        
+		        
+		        
+		        /*
+		        zipImportacioHelper.inicialitzarProgres(pare.getId());
 			    
 		        Path tempZip = Files.createTempFile("import-", ".zip");
 		        Files.write(tempZip, zipFile.getContent());
@@ -1553,7 +1560,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 						configHelper.getRolActual(),
 						pare.getId(), 
 						null);
-
+		         */
 		        return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
 		    } catch (Exception ex) {
 		        excepcioLogHelper.addExcepcio("/expedient/" + entity.getId() + "ImportarDocumentsZipArxiuActionExecutor", ex);

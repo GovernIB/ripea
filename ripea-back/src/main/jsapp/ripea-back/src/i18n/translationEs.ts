@@ -811,6 +811,7 @@ const translationEs = {
                 dataOther: "Otros datos",
                 senseTipus: "Sin tipo asignado",
                 extensio: "Extensión",
+                ruta: "Ruta",
                 mida: "Tamaño",
             },
             action: {

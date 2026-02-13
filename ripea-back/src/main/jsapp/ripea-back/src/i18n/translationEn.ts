@@ -811,6 +811,7 @@ const translationEn = {
                 dataOther: "Other data",
                 senseTipus: "No type assigned",
                 extensio: "Extension",
+                ruta: "Path",
                 mida: "Size",
             },
             action: {

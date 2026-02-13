@@ -27,7 +27,7 @@ public class ImportarDocumentsZipValidator implements ConstraintValidator<Import
                 valid = false;
             }
 
-            if (resource.getDocumentsZip().stream().anyMatch(d -> d.getNom() == null || d.getNom().isBlank())) {
+            if (resource.getDocumentsZip().stream().anyMatch(d -> d.isImportar() && (d.getNom() == null || d.getNom().isBlank()))) {
                 context
                         .buildConstraintViolationWithTemplate("{javax.validation.constraints.NotNull.message}")
                         .addPropertyNode(ImportarDocumentsZipForm.Fields.nom)
@@ -36,7 +36,7 @@ public class ImportarDocumentsZipValidator implements ConstraintValidator<Import
                 valid = false;
             }
 
-            if (resource.getDocumentsZip().stream().anyMatch(d -> d.getTipusDocument() == null)) {
+            if (resource.getDocumentsZip().stream().anyMatch(d -> d.isImportar() && d.getTipusDocument() == null)) {
                 context
                         .buildConstraintViolationWithTemplate("{javax.validation.constraints.NotNull.message}")
                         .addPropertyNode(ImportarDocumentsZipForm.Fields.tipusDocument)

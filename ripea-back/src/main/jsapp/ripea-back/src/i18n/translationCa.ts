@@ -811,6 +811,7 @@ const translationCa = {
                 dataOther: "Altres dades",
                 senseTipus: 'Sense tipus assignat',
                 extensio: "Extensio",
+                ruta: "Ruta",
                 mida: "Mida",
             },
             action: {
