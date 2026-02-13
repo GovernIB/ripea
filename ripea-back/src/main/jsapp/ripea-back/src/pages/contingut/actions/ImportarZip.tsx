@@ -68,6 +68,11 @@ const ImportarZipForm = () => {
     }
     const columns:any[] = [
         {
+            field: 'ruta',
+            headerName: t('page.document.detall.ruta'),
+            flex: 1,
+        },		
+        {
             headerName: fieldNom?.label,
             flex: 1,
             renderCell: (params:any) => {
@@ -87,12 +92,12 @@ const ImportarZipForm = () => {
         {
             field: 'extensio',
             headerName: t('page.document.detall.extensio'),
-            flex: 0.5,
+            flex: 0.4,
         },
         {
             field: 'mida',
             headerName: t('page.document.detall.mida'),
-            flex: 0.5,
+            flex: 0.4,
             valueFormatter: (value:number) => formatByteCount(value),
         },
         {
@@ -151,7 +156,7 @@ const ImportarZipForm = () => {
 
             {!data?.documentsZip?.some?.((doc:any) => doc.importar) &&
                 <Grid item xs={12}>
-                    <Alert severity={'error'}>{t('page.doccument.alert.documentsZip')}</Alert>
+                    <Alert severity={'error'}>{t('page.document.alert.documentsZip')}</Alert>
                 </Grid>
             }
         </Load>

@@ -105,6 +105,10 @@ public class ZipImportacioHelper {
         return mapProgres.get(pareId);
     }
     
+    public void setNumOperacionsProgres(Long pareId, int totalOperacions) {
+    	mapProgres.get(pareId).setNumOperacions(totalOperacions);
+    }
+    
     private void comptarEntradesZip(Path tempZip, Long pareId) throws IOException {
     	ProgresProcessamentZipDto progres = mapProgres.get(pareId);
     	
@@ -121,6 +125,32 @@ public class ZipImportacioHelper {
 		}
     }
 
+    public void processarEntradaZip(
+    		Long entitatId,
+    		Long pareId,
+    		Map<String, List<String>> ubicacioDocuments,
+    		ProgresProcessamentZipDto progres,
+    		String rutaCompleta,
+    		byte[] contingut,
+    		String rolActual) {
+    	
+        progres.addInfo(
+        		messageHelper.getMessage("contingut.boto.crear.document.multiple.processant",
+        		new Object[] {rutaCompleta}));
+
+        DocumentDto document = crearDocumentDto(rutaCompleta, contingut);
+
+//        documentHelper.processarDocumentNewTransaction(
+//                ubicacioDocuments,
+//                progres,
+//                entitatId,
+//                document,
+//                pareId,
+//                rolActual);
+		
+		progres.addDocumentCorrecte(document.getFitxerTamany());
+    }
+    
     private void processarEntradesZip(
     		Path tempZip,
     		Long entitatId, 
@@ -141,24 +171,7 @@ public class ZipImportacioHelper {
                 registrarUbicacio(rutaCompleta, ubicacioDocuments);
 
                 try {
-                    progres.addInfo(
-                    		messageHelper.getMessage("contingut.boto.crear.document.multiple.processant",
-                    				new Object[] {rutaCompleta}));
-
-                    byte[] contingut = zis.readAllBytes();
-                    DocumentDto document = crearDocumentDto(rutaCompleta, contingut);
-
-                    documentHelper.processarDocumentNewTransaction(
-                            ubicacioDocuments,
-                            progres,
-                            entitatId,
-                            document,
-                            pareId,
-                            rolActual
-                    );
-            		
-            		progres.addDocumentCorrecte(document.getFitxerTamany());
-                    
+                	processarEntradaZip(entitatId, pareId, ubicacioDocuments, progres, rutaCompleta, zis.readAllBytes(), rolActual);                    
                 } catch (Exception ex) {
                     log.error("Error procesant la següent entrada del fitxer ZIP {}", rutaCompleta, ex);
 					progres.addError(

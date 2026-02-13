@@ -21,6 +21,10 @@ public class ImportacioZipDocument implements Serializable, Comparable<Importaci
 	@NotNull
 	private ResourceReference<MetaDocumentResource, Long> tipusDocument;
 	
+	public String getRutaCompleta() {
+		return this.ruta+"/"+this.nom+"."+this.extensio;
+	}
+	
 	@Override
 	public int compareTo(ImportacioZipDocument other) {
 	    // Manejar nulls y blancos en ruta - ponerlos al final

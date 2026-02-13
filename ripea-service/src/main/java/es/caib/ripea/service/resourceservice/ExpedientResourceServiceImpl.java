@@ -1543,25 +1543,48 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		        entitatActual.setCodi(entitatEntity.getCodi());
 		        entitatActual.setId(entitatEntity.getId());
 		        
-		        zipImportacioHelper.inicialitzarProgres(pare.getId());
+		        if (params.getDocumentsZip()!=null && params.getDocumentsZip().size()>0) {
 		        
-		        
-		        
-		        /*
-		        zipImportacioHelper.inicialitzarProgres(pare.getId());
-			    
-		        Path tempZip = Files.createTempFile("import-", ".zip");
-		        Files.write(tempZip, zipFile.getContent());
-			    
-				zipImportacioHelper.processarZip(
-						usuariActual, 
-						entitatActual, 
-						tempZip, 
-						configHelper.getRolActual(),
-						pare.getId(), 
-						null);
-		         */
-		        return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
+		        	Map<String, List<String>> ubicacioDocuments = new HashMap<>();
+		        	
+		        	int numTotalDocs = 0;
+		        	for (ImportacioZipDocument izd: params.getDocumentsZip()) {
+		        		if (izd.isImportar()) {
+		        			numTotalDocs++;
+		        		}
+		        	}
+		        	
+		        	ProgresProcessamentZipDto pogres = zipImportacioHelper.inicialitzarProgres(pare.getId());
+			        zipImportacioHelper.setNumOperacionsProgres(pare.getId(), numTotalDocs);
+			        
+			        for (ImportacioZipDocument izd: params.getDocumentsZip()) {
+			        	zipImportacioHelper.processarEntradaZip(
+			        			entitatEntity.getId(),
+			        			pare.getId(),
+			        			ubicacioDocuments,
+			        			pogres,
+			        			izd.getRutaCompleta(),
+			        			izd.getContingut(),
+			        			configHelper.getRolActual());
+			        }
+			        /*
+			        zipImportacioHelper.inicialitzarProgres(pare.getId());
+				    
+			        Path tempZip = Files.createTempFile("import-", ".zip");
+			        Files.write(tempZip, zipFile.getContent());
+				    
+					zipImportacioHelper.processarZip(
+							usuariActual, 
+							entitatActual, 
+							tempZip, 
+							configHelper.getRolActual(),
+							pare.getId(), 
+							null);
+			         */
+			        return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
+		        } else {
+		        	throw new ActionExecutionException(getResourceClass(), entity.getId(), code, "No s'han seleccionat documents per importar.");
+		        }
 		    } catch (Exception ex) {
 		        excepcioLogHelper.addExcepcio("/expedient/" + entity.getId() + "ImportarDocumentsZipArxiuActionExecutor", ex);
 		        String message = messageHelper.getMessage("message.common.action.error") + ": " + ex.getMessage();
