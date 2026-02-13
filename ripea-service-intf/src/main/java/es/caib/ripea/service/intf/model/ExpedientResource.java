@@ -591,7 +591,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
     @FieldNameConstants
     @ImportarDocumentsZipValid
     public static class ImportarDocumentsZipForm implements Serializable {
-    	@NotNull
+//    	@NotNull
     	@ResourceField(onChangeActive = true)
     	private FileReference documentZip;
         @NotNull @NotEmpty
