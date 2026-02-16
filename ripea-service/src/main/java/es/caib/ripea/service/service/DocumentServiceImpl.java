@@ -1571,7 +1571,6 @@ public class DocumentServiceImpl implements DocumentService {
 	}
 
 	@Override
-//	@Async
 	@Transactional
 	public void processarZipAsync(
 			UsuariDto usuariActual, 

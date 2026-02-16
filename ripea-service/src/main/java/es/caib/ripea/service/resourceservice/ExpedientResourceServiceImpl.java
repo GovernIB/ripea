@@ -1,6 +1,8 @@
 package es.caib.ripea.service.resourceservice;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
@@ -1516,17 +1518,32 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 			if (ImportarDocumentsZipForm.Fields.documentZip.equals(fieldName)) {
 				if (fieldValue!=null) {
 					ZipDocumentExtractor extractor = new ZipDocumentExtractor();
+					File tempFile = null;
 					try {
-						List<ImportacioZipDocument> documents = extractor.extractDocuments(((FileReference)fieldValue).getContent());
+						
+		                FileReference fileRef = (FileReference) fieldValue;
+
+		                // Crear archivo temporal
+		                tempFile = File.createTempFile("upload_", ".zip");
+		                
+		                // Escribir el contenido al archivo temporal
+		                try (FileOutputStream fos = new FileOutputStream(tempFile)) {
+		                    fos.write(fileRef.getContent());
+		                }
+						
+						List<ImportacioZipDocument> documents = extractor.extractDocuments(tempFile);
 						Collections.sort(documents);
 						target.setDocumentsZip(documents);
-//						previous.setDocumentZip(null);
-//						target.setDocumentZip(null);
 					} catch (Exception ex) {
 				        excepcioLogHelper.addExcepcio("/expedient/" + id + "ImportarDocumentsZipArxiuActionExecutor.onChange", ex);
 				        String message = messageHelper.getMessage("message.common.action.error") + ": " + ex.getMessage();
 				        throw new ActionExecutionException(getResourceClass(), id, fieldName, message);
-					}
+		            } finally {
+		                // Limpiar archivo temporal
+		                if (tempFile != null && tempFile.exists()) {
+		                    tempFile.delete();
+		                }
+		            }
 				}
 			}
 		}
@@ -1534,53 +1551,24 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		@Override
 		public Serializable exec(String code, ExpedientResourceEntity entity, ImportarDocumentsZipForm params) throws ActionExecutionException {
 		    try {
-		        EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
-		        ContingutEntity pare = contingutRepository.findById(entity.getId()).orElseThrow();
-
-		        FileReference zipFile = params.getDocumentZip();
-		        UsuariDto usuariActual = aplicacioService.getUsuariActual();
-		        EntitatDto entitatActual = new EntitatDto();
-		        entitatActual.setCodi(entitatEntity.getCodi());
-		        entitatActual.setId(entitatEntity.getId());
 		        
 		        if (params.getDocumentsZip()!=null && params.getDocumentsZip().size()>0) {
-		        
-		        	Map<String, List<String>> ubicacioDocuments = new HashMap<>();
-		        	
-		        	int numTotalDocs = 0;
-		        	for (ImportacioZipDocument izd: params.getDocumentsZip()) {
-		        		if (izd.isImportar()) {
-		        			numTotalDocs++;
-		        		}
-		        	}
-		        	
-		        	ProgresProcessamentZipDto pogres = zipImportacioHelper.inicialitzarProgres(pare.getId());
-			        zipImportacioHelper.setNumOperacionsProgres(pare.getId(), numTotalDocs);
+
+			        EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+			        ContingutEntity pare = contingutRepository.findById(entity.getId()).orElseThrow();
+
+			        EntitatDto entitatActual = new EntitatDto();
+			        entitatActual.setCodi(entitatEntity.getCodi());
+			        entitatActual.setId(entitatEntity.getId());
+			        entitatActual.setNom(entitatEntity.getNom());
 			        
-			        for (ImportacioZipDocument izd: params.getDocumentsZip()) {
-			        	zipImportacioHelper.processarEntradaZip(
-			        			entitatEntity.getId(),
-			        			pare.getId(),
-			        			ubicacioDocuments,
-			        			pogres,
-			        			izd.getRutaCompleta(),
-			        			izd.getContingut(),
-			        			configHelper.getRolActual());
-			        }
-			        /*
-			        zipImportacioHelper.inicialitzarProgres(pare.getId());
-				    
-			        Path tempZip = Files.createTempFile("import-", ".zip");
-			        Files.write(tempZip, zipFile.getContent());
-				    
-					zipImportacioHelper.processarZip(
-							usuariActual, 
-							entitatActual, 
-							tempZip, 
-							configHelper.getRolActual(),
-							pare.getId(), 
-							null);
-			         */
+		        	zipImportacioHelper.processarZipReact(
+		        			entitatActual,
+		        			params.getDocumentsZip(),
+		        			pare.getId(),
+		        			aplicacioService.getUsuariActual(),
+		        			configHelper.getRolActual());
+		        	
 			        return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
 		        } else {
 		        	throw new ActionExecutionException(getResourceClass(), entity.getId(), code, "No s'han seleccionat documents per importar.");

@@ -1,8 +1,10 @@
 package es.caib.ripea.service.intf.utils;
-
-import java.io.ByteArrayInputStream;
+									
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -16,18 +18,33 @@ import es.caib.ripea.service.intf.model.ImportacioZipDocument;
 public class ZipDocumentExtractor {
 
     /**
-     * Procesa un archivo ZIP desde un array de bytes y extrae todos los documentos recursivamente
+     * Procesa un archivo ZIP desde un File en disco y extrae todos los documentos
+     * Esta es ahora la versión principal recomendada para archivos grandes
      * 
-     * @param zipBytes Array de bytes del archivo ZIP
+     * @param zipFile Archivo ZIP en disco
      * @return Lista de ImportacioZipDocument
      * @throws IOException Si hay error al leer el ZIP
      */
-    public List<ImportacioZipDocument> extractDocuments(byte[] zipBytes) throws IOException {
+    public List<ImportacioZipDocument> extractDocuments(File zipFile) throws IOException {
+        try (FileInputStream fis = new FileInputStream(zipFile)) {
+            return extractDocuments(fis);
+        }
+    }
+    
+    /**
+     * Procesa un archivo ZIP desde un InputStream y extrae todos los documentos
+     * 
+     * @param inputStream InputStream del archivo ZIP
+     * @return Lista de ImportacioZipDocument
+     * @throws IOException Si hay error al leer el ZIP
+     */
+    public List<ImportacioZipDocument> extractDocuments(InputStream inputStream) throws IOException {
         List<ImportacioZipDocument> documents = new ArrayList<>();
         int contador = 0;
-        try (ByteArrayInputStream bais = new ByteArrayInputStream(zipBytes);
-             ZipInputStream zipInputStream = new ZipInputStream(bais)) {
-            
+																			
+																		
+        
+        try (ZipInputStream zipInputStream = new ZipInputStream(inputStream)) {
             ZipEntry entry;
             while ((entry = zipInputStream.getNextEntry()) != null) {
                 // Ignorar directorios vacíos
@@ -36,7 +53,7 @@ public class ZipDocumentExtractor {
                     continue;
                 }
                 
-                // Leer el contenido del archivo
+                // Leer el contenido del archivo en chunks
                 byte[] fileContent = readFileContent(zipInputStream);
                 
                 ImportacioZipDocument document = createDocumentFromEntry(entry, fileContent, contador++);
@@ -50,11 +67,39 @@ public class ZipDocumentExtractor {
     }
     
     /**
-     * Lee el contenido completo de un archivo del ZIP
+     * Versión que acepta ruta como String
+     * 
+     * @param zipFilePath Ruta del archivo ZIP
+     * @return Lista de ImportacioZipDocument
+     * @throws IOException Si hay error al leer el ZIP
+     */
+    public List<ImportacioZipDocument> extractDocuments(String zipFilePath) throws IOException {
+        return extractDocuments(new File(zipFilePath));
+    }
+    
+    /**
+     * Versión legacy que acepta byte[] para mantener compatibilidad con código existente
+     * NOTA: No recomendado para archivos grandes
+     * 
+     * @deprecated Usar {@link #extractDocuments(File)} o {@link #extractDocuments(InputStream)} en su lugar
+     * @param zipBytes Array de bytes del archivo ZIP
+     * @return Lista de ImportacioZipDocument
+     * @throws IOException Si hay error al leer el ZIP
+     */
+    @Deprecated
+    public List<ImportacioZipDocument> extractDocumentsFromBytes(byte[] zipBytes) throws IOException {
+        try (InputStream is = new java.io.ByteArrayInputStream(zipBytes)) {
+            return extractDocuments(is);
+        }
+    }
+    
+    /**
+     * Lee el contenido completo de un archivo del ZIP en chunks
+     * Optimizado para no consumir demasiada memoria de golpe
      */
     private byte[] readFileContent(ZipInputStream zipInputStream) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        byte[] buffer = new byte[4096];
+        byte[] buffer = new byte[8192]; // Buffer de 8KB
         int bytesRead;
         
         while ((bytesRead = zipInputStream.read(buffer)) != -1) {
@@ -65,20 +110,20 @@ public class ZipDocumentExtractor {
     }
     
     /**
-     * Versión alternativa que acepta un File (mantiene compatibilidad)
-     */
-    public List<ImportacioZipDocument> extractDocuments(java.io.File zipFile) throws IOException {
-        return extractDocuments(java.nio.file.Files.readAllBytes(zipFile.toPath()));
-    }
-    
-    /**
-     * Versión alternativa que acepta una ruta como String (mantiene compatibilidad)
-     */
-    public List<ImportacioZipDocument> extractDocuments(String zipFilePath) throws IOException {
-        return extractDocuments(new java.io.File(zipFilePath));
-    }
-    
-    /**
+																		
+	   
+																								  
+																					
+	 
+	
+	   
+																					 
+	   
+																								
+															   
+	 
+	
+	   
      * Crea un ImportacioZipDocument desde un ZipEntry y su contenido
      */
     private ImportacioZipDocument createDocumentFromEntry(ZipEntry entry, byte[] fileContent, int counter) {
@@ -160,17 +205,31 @@ public class ZipDocumentExtractor {
     }
     
     /**
-     * Versión que filtra por extensiones permitidas
+     * Versión que filtra por extensiones permitidas - ahora acepta File
      */
-    public List<ImportacioZipDocument> extractDocuments(byte[] zipBytes, List<String> allowedExtensions) throws IOException {
-        List<ImportacioZipDocument> allDocuments = extractDocuments(zipBytes);
-        
+    public List<ImportacioZipDocument> extractDocuments(File zipFile, List<String> allowedExtensions) throws IOException {
+        List<ImportacioZipDocument> allDocuments = extractDocuments(zipFile);
+        return filterByExtensions(allDocuments, allowedExtensions);
+    }
+    
+    /**
+     * Versión que filtra por extensiones permitidas - ahora acepta InputStream
+     */
+    public List<ImportacioZipDocument> extractDocuments(InputStream inputStream, List<String> allowedExtensions) throws IOException {
+        List<ImportacioZipDocument> allDocuments = extractDocuments(inputStream);
+        return filterByExtensions(allDocuments, allowedExtensions);
+    }
+    
+    /**
+     * Filtra documentos por extensiones permitidas
+     */
+    private List<ImportacioZipDocument> filterByExtensions(List<ImportacioZipDocument> documents, List<String> allowedExtensions) {
         if (allowedExtensions == null || allowedExtensions.isEmpty()) {
-            return allDocuments;
+            return documents;
         }
         
         List<ImportacioZipDocument> filteredDocuments = new ArrayList<>();
-        for (ImportacioZipDocument doc : allDocuments) {
+        for (ImportacioZipDocument doc : documents) {
             if (hasAllowedExtension(doc.getExtensio(), allowedExtensions)) {
                 filteredDocuments.add(doc);
             }
@@ -197,11 +256,22 @@ public class ZipDocumentExtractor {
         return false;
     }
     
-    //Extraer un ZipEntry del zip por nombre completo de la ruta
-    public byte[] extractSpecificFile(byte[] zipBytes, String rutaCompleta) throws IOException {
-        try (ByteArrayInputStream bais = new ByteArrayInputStream(zipBytes);
-             ZipInputStream zipInputStream = new ZipInputStream(bais)) {
-            
+    /**
+     * Extraer un archivo específico del ZIP por nombre completo de ruta
+     * Ahora acepta File en lugar de byte[]
+     */
+    public byte[] extractSpecificFile(File zipFile, String rutaCompleta) throws IOException {
+        try (FileInputStream fis = new FileInputStream(zipFile)) {
+            return extractSpecificFile(fis, rutaCompleta);
+        }
+    }
+    
+    /**
+     * Extraer un archivo específico del ZIP por nombre completo de ruta
+     * Versión con InputStream
+     */
+    public byte[] extractSpecificFile(InputStream inputStream, String rutaCompleta) throws IOException {
+        try (ZipInputStream zipInputStream = new ZipInputStream(inputStream)) {
             ZipEntry entry;
             while ((entry = zipInputStream.getNextEntry()) != null) {
                 if (entry.getName().equals(rutaCompleta)) {

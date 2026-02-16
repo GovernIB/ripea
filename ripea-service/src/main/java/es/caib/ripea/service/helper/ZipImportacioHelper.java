@@ -26,13 +26,17 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 
+import es.caib.ripea.persistence.entity.MetaDocumentEntity;
+import es.caib.ripea.persistence.repository.MetaDocumentRepository;
 import es.caib.ripea.service.intf.dto.DocumentDto;
 import es.caib.ripea.service.intf.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
 import es.caib.ripea.service.intf.dto.EntitatDto;
+import es.caib.ripea.service.intf.dto.MetaNodeDto;
 import es.caib.ripea.service.intf.dto.NtiOrigenEnumDto;
 import es.caib.ripea.service.intf.dto.ProgresProcessamentZipDto;
 import es.caib.ripea.service.intf.dto.UsuariDto;
+import es.caib.ripea.service.intf.model.ImportacioZipDocument;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -47,8 +51,9 @@ public class ZipImportacioHelper {
     private final Map<Long, ProgresProcessamentZipDto> mapProgres = new HashMap<>();
     private final AtomicBoolean cancelat = new AtomicBoolean(false);
 
-    @Autowired private DocumentHelper documentHelper;
     @Autowired private MessageHelper messageHelper;
+    @Autowired private DocumentHelper documentHelper;
+    @Autowired private MetaDocumentRepository metaDocumentRepository;
 
     @Async
     public void processarZip(
@@ -88,6 +93,56 @@ public class ZipImportacioHelper {
             }
         }
     }
+    
+    @Async
+    public void processarZipReact(
+    		EntitatDto entitat,
+    		List<ImportacioZipDocument> documentsZip,
+    		Long pareId,
+    		UsuariDto usuariActual,
+    		String rolActual) {
+    	
+    	Map<String, List<String>> ubicacioDocuments = new HashMap<>();
+    	
+    	int numTotalDocs = 0;
+    	for (ImportacioZipDocument izd: documentsZip) {
+    		if (izd.isImportar()) {
+    			numTotalDocs++;
+    		}
+    	}
+    	
+    	inicialitzarContext(usuariActual, entitat);
+    	
+    	ProgresProcessamentZipDto progres = inicialitzarProgres(pareId);
+        setNumOperacionsProgres(pareId, numTotalDocs);
+        
+        for (ImportacioZipDocument izd: documentsZip) {
+        	if (izd.isImportar()) {
+        		
+                try {
+                	
+                	registrarUbicacio(izd.getRutaCompleta(), ubicacioDocuments);
+                	
+    	        	processarEntradaZip(
+    	        			entitat.getId(),
+    	        			pareId,
+    	        			izd.getTipusDocument()!=null?izd.getTipusDocument().getId():null,
+    	        			ubicacioDocuments,
+    	        			progres,
+    	        			izd.getRutaCompleta(),
+    	        			izd.getContingut(),
+    	        			rolActual);
+                } catch (Exception ex) {
+                    log.error("Error procesant la següent entrada del fitxer ZIP {}", izd.getRutaCompleta(), ex);
+					progres.addError(
+							messageHelper.getMessage("contingut.boto.crear.document.multiple.entrada.error",
+							new Object[] { izd.getRutaCompleta(), ex.getMessage() }));
+                } finally {
+                    progres.incrementOperacionsRealitzades();
+                }        		
+        	}
+        }
+    }
 
     public void cancelarProcessamentZip(Long pareId) {
         cancelat.set(true);
@@ -125,9 +180,10 @@ public class ZipImportacioHelper {
 		}
     }
 
-    public void processarEntradaZip(
+    private void processarEntradaZip(
     		Long entitatId,
     		Long pareId,
+    		Long metaDocumentId,
     		Map<String, List<String>> ubicacioDocuments,
     		ProgresProcessamentZipDto progres,
     		String rutaCompleta,
@@ -138,15 +194,15 @@ public class ZipImportacioHelper {
         		messageHelper.getMessage("contingut.boto.crear.document.multiple.processant",
         		new Object[] {rutaCompleta}));
 
-        DocumentDto document = crearDocumentDto(rutaCompleta, contingut);
+        DocumentDto document = crearDocumentDto(rutaCompleta, contingut, metaDocumentId);
 
-//        documentHelper.processarDocumentNewTransaction(
-//                ubicacioDocuments,
-//                progres,
-//                entitatId,
-//                document,
-//                pareId,
-//                rolActual);
+        documentHelper.processarDocumentNewTransaction(
+                ubicacioDocuments,
+                progres,
+                entitatId,
+                document,
+                pareId,
+                rolActual);
 		
 		progres.addDocumentCorrecte(document.getFitxerTamany());
     }
@@ -171,7 +227,7 @@ public class ZipImportacioHelper {
                 registrarUbicacio(rutaCompleta, ubicacioDocuments);
 
                 try {
-                	processarEntradaZip(entitatId, pareId, ubicacioDocuments, progres, rutaCompleta, zis.readAllBytes(), rolActual);                    
+                	processarEntradaZip(entitatId, pareId, null, ubicacioDocuments, progres, rutaCompleta, zis.readAllBytes(), rolActual);                    
                 } catch (Exception ex) {
                     log.error("Error procesant la següent entrada del fitxer ZIP {}", rutaCompleta, ex);
 					progres.addError(
@@ -184,7 +240,7 @@ public class ZipImportacioHelper {
 		}
     }
     
-    private DocumentDto crearDocumentDto(String rutaCompleta, byte[] contingut) {
+    private DocumentDto crearDocumentDto(String rutaCompleta, byte[] contingut, Long metaNodeId) {
         String fitxerNom = Paths.get(rutaCompleta).getFileName().toString();
         String nom = FilenameUtils.removeExtension(fitxerNom);
 
@@ -199,9 +255,21 @@ public class ZipImportacioHelper {
         documentDto.setNtiVersion(NTI_VERSION);
         documentDto.setDataCaptura(new Date());
         documentDto.setData(new Date());
-        documentDto.setNtiOrigen(NTI_ORIGEN);
-        documentDto.setNtiEstadoElaboracion(NTI_ESTADO_ELABORACION);
-        documentDto.setNtiTipoDocumental(NTI_TIPO_DOCUMENTAL);
+
+        
+        if (metaNodeId==null) {
+            documentDto.setNtiOrigen(NTI_ORIGEN);
+            documentDto.setNtiEstadoElaboracion(NTI_ESTADO_ELABORACION);
+            documentDto.setNtiTipoDocumental(NTI_TIPO_DOCUMENTAL);        	
+        } else {
+        	MetaDocumentEntity mdE = metaDocumentRepository.findById(metaNodeId).get();
+        	documentDto.setNtiOrigen(mdE.getNtiOrigen());
+            documentDto.setNtiEstadoElaboracion(mdE.getNtiEstadoElaboracion());
+            documentDto.setNtiTipoDocumental(mdE.getNtiTipoDocumental());
+            MetaNodeDto metaNodeDto = new MetaNodeDto();
+            metaNodeDto.setId(mdE.getId());
+            documentDto.setMetaNode(metaNodeDto);    
+        }
 
         return documentDto;
     }

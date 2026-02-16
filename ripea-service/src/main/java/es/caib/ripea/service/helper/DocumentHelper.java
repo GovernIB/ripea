@@ -384,7 +384,7 @@ public class DocumentHelper {
 				pare,
 				false,
 				true,
-				false);
+				documentDto.getMetaNode()!=null);
 	}
 	
     private void assignarCarpeta(List<String> ubicacio, ProgresProcessamentZipDto progres, DocumentDto documentDto, Long entitatId, Long pareId) {
