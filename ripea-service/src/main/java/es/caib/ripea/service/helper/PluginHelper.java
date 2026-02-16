@@ -220,6 +220,7 @@ import es.caib.ripea.service.intf.dto.ProvinciaDto;
 import es.caib.ripea.service.intf.dto.RespostaAmpliarPlazo;
 import es.caib.ripea.service.intf.dto.Resum;
 import es.caib.ripea.service.intf.dto.SignatureInfoDto;
+import es.caib.ripea.service.intf.dto.TascaEstatEnumDto;
 import es.caib.ripea.service.intf.dto.TipusClassificacioEnumDto;
 import es.caib.ripea.service.intf.dto.TipusDocumentalDto;
 import es.caib.ripea.service.intf.dto.TipusImportEnumDto;
@@ -6248,7 +6249,14 @@ public class PluginHelper {
 			
 			try {
 				
-				ResponseEntity<String> resultat = comandaCaibPlugin.sendTasca(tascaRipeaToComanda(tascaEntity));
+				ResponseEntity<String> resultat = null;
+				
+				if (TascaEstatEnumDto.FINALITZADA.equals(tascaEntity.getEstat()) ||
+					TascaEstatEnumDto.CANCELLADA.equals(tascaEntity.getEstat())) {
+					resultat = comandaCaibPlugin.sendTasca(tascaRipeaToComanda(tascaEntity));
+				} else {
+					resultat = comandaCaibPlugin.deleteTasca(tascaEntity.getId() + "");
+				}
 				
 				if (resultat.getStatusCode().equals(HttpStatus.OK)) {
 					integracioHelper.addAccioOk(
@@ -6362,7 +6370,7 @@ public class PluginHelper {
 		return avisComanda;
 	}
 	
-	private Avis anotacioRipeaToAvisComanda(ExpedientEntity expedient, List<ValidacioErrorDto> errors) throws Exception {
+	private Avis validacionsRipeaToAvisComanda(ExpedientEntity expedient, List<ValidacioErrorDto> errors) throws Exception {
 		//Els avisos tendran una duració de 10 dies a comanda
 		Date dataFi = DateUtil.addToDate(Calendar.getInstance().getTime(), Calendar.DATE, 10);
 		String descripcio = "L'expedient no té avisos en aquests moments.";
@@ -6430,6 +6438,60 @@ public class PluginHelper {
 		return avisComanda;
 	}
 	
+	public void comandaAvisDelete(ExpedientPeticioEntity expedientPeticioEntity) {
+		
+		if (configHelper.getAsBoolean(PropertyConfig.COMANDA_PLUGIN_ACTIU)) {
+		
+			Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
+			long t0 = System.currentTimeMillis();
+			String accioDescripcio = "Eliminar un avís";
+			Map<String, String> accioParams = new HashMap<String, String>();
+			ComandaCaibPlugin comandaCaibPlugin = getComandaPlugin();
+			String endpoint = comandaCaibPlugin.getEndpointURL();
+			
+			try {
+				
+				ResponseEntity<String> resultat = comandaCaibPlugin.deleteAvis("ANOTACIO#"+expedientPeticioEntity.getId());
+				
+				if (resultat.getStatusCode().equals(HttpStatus.OK)) {
+					integracioHelper.addAccioOk(
+							IntegracioHelper.INTCODI_COMANDA,
+							accioDescripcio,
+							endpoint,
+							accioParams,
+							IntegracioAccioTipusEnumDto.ENVIAMENT,
+							System.currentTimeMillis() - t0);
+					applicationHelper.stopTimer(sample, "METRICS@Integracions.comanda", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
+				} else {
+					String errorDescripcio = "Error en la resposta al enviar un avís a comanda.";
+					integracioHelper.addAccioError(
+							IntegracioHelper.INTCODI_COMANDA,
+							accioDescripcio,
+							endpoint,
+							accioParams,
+							IntegracioAccioTipusEnumDto.ENVIAMENT,
+							System.currentTimeMillis() - t0,
+							errorDescripcio,
+							null);
+					applicationHelper.stopTimer(sample, "METRICS@Integracions.comanda", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");				
+				}
+				
+			} catch (Exception ex) {
+				String errorDescripcio = "Error al enviar un avís a comanda.";
+				integracioHelper.addAccioError(
+						IntegracioHelper.INTCODI_COMANDA,
+						accioDescripcio,
+						endpoint,
+						accioParams,
+						IntegracioAccioTipusEnumDto.ENVIAMENT,
+						System.currentTimeMillis() - t0,
+						errorDescripcio,
+						ex);
+				applicationHelper.stopTimer(sample, "METRICS@Integracions.comanda", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
+			}
+		}
+	}
+	
 	public void comandaAvisSend(ExpedientPeticioEntity expedientPeticioEntity) {
 		
 		if (configHelper.getAsBoolean(PropertyConfig.COMANDA_PLUGIN_ACTIU)) {
@@ -6442,9 +6504,11 @@ public class PluginHelper {
 			String endpoint = comandaCaibPlugin.getEndpointURL();
 			
 			try {
+				
 				Avis avisComanda = anotacioRipeaToAvisComanda(expedientPeticioEntity);
 				ResponseEntity<String> resultat = comandaCaibPlugin.sendAvis(avisComanda);
 				accioParams.put("nom", avisComanda.getNom());
+				
 				if (resultat.getStatusCode().equals(HttpStatus.OK)) {
 					integracioHelper.addAccioOk(
 							IntegracioHelper.INTCODI_COMANDA,
@@ -6486,7 +6550,7 @@ public class PluginHelper {
 	
 	public void comandaAvisSendNoLog(ExpedientEntity expedient, List<ValidacioErrorDto> errors) throws Exception {
 		ComandaCaibPlugin comandaCaibPlugin = getComandaPlugin();
-		Avis avisComanda = anotacioRipeaToAvisComanda(expedient, errors);
+		Avis avisComanda = validacionsRipeaToAvisComanda(expedient, errors);
 		comandaCaibPlugin.sendAvis(avisComanda);
 	}
 	
@@ -6500,11 +6564,18 @@ public class PluginHelper {
 			Map<String, String> accioParams = new HashMap<String, String>();
 			ComandaCaibPlugin comandaCaibPlugin = getComandaPlugin();
 			String endpoint = comandaCaibPlugin.getEndpointURL();
-			
+			ResponseEntity<String> resultat = null;
+					
 			try {
-				Avis avisComanda = anotacioRipeaToAvisComanda(expedient, errors);
-				ResponseEntity<String> resultat = comandaCaibPlugin.sendAvis(avisComanda);
-				accioParams.put("nom", avisComanda.getNom());
+				
+				if (errors==null || errors.size()==0) {
+					resultat = comandaCaibPlugin.deleteAvis(expedient.getId()+"");
+				} else {
+					Avis avisComanda = validacionsRipeaToAvisComanda(expedient, errors);
+					resultat = comandaCaibPlugin.sendAvis(avisComanda);
+				}
+
+				accioParams.put("expedient", expedient.getCodi());
 				if (resultat.getStatusCode().equals(HttpStatus.OK)) {
 					integracioHelper.addAccioOk(
 							IntegracioHelper.INTCODI_COMANDA,

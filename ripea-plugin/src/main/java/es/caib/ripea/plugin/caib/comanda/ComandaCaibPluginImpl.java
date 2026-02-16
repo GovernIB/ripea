@@ -42,6 +42,18 @@ public class ComandaCaibPluginImpl extends RipeaAbstractPluginProperties impleme
 		String resultat = clientcomanda.crearTasca(tasca);
 		return ResponseEntity.ok(resultat);
 	}
+	
+	@Override
+	public ResponseEntity<String> deleteTasca(String idTasca) throws Exception {
+		String url 		= getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.COMANDA_PLUGIN_URL));
+		String username = getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.COMANDA_PLUGIN_USR));
+		String password = getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.COMANDA_PLUGIN_PWR));
+		AppComandaClient clientcomanda = new AppComandaClient(url, username, password);
+		String appCodi 	= getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.COMANDA_APP_CODI));
+		String entorn 	= getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.COMANDA_PLUGIN_ENTORN));
+		String resultat = clientcomanda.eliminarTasca(idTasca, appCodi, entorn);
+		return ResponseEntity.ok(resultat);
+	}
 
 	@Override
 	public ResponseEntity<String> sendAvis(Avis avis) throws Exception {
@@ -50,6 +62,18 @@ public class ComandaCaibPluginImpl extends RipeaAbstractPluginProperties impleme
 		String password = getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.COMANDA_PLUGIN_PWR));
 		AppComandaClient clientcomanda = new AppComandaClient(url, username, password);
 		String resultat = clientcomanda.crearAvis(avis);
+		return ResponseEntity.ok(resultat);
+	}
+	
+	@Override
+	public ResponseEntity<String> deleteAvis(String idAvis) throws Exception {
+		String url 		= getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.COMANDA_PLUGIN_URL));
+		String username = getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.COMANDA_PLUGIN_USR));
+		String password = getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.COMANDA_PLUGIN_PWR));
+		AppComandaClient clientcomanda = new AppComandaClient(url, username, password);
+		String appCodi 	= getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.COMANDA_APP_CODI));
+		String entorn 	= getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.COMANDA_PLUGIN_ENTORN));
+		String resultat = clientcomanda.eliminarAvis(idAvis, appCodi, entorn);
 		return ResponseEntity.ok(resultat);
 	}
 

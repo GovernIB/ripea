@@ -389,6 +389,7 @@ public class ExpedientHelper {
 				}
 				ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.getOne(expedientPeticioId);
 				expedientPeticioHelper.canviEstatExpedientPeticio(expedientPeticioEntity, ExpedientPeticioEstatEnumDto.PROCESSAT_PENDENT);
+				pluginHelper.comandaAvisDelete(expedientPeticioEntity);
 			}
 			
 			// crear carpetes per defecte del procediment

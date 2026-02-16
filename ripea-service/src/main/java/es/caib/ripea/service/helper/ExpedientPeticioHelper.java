@@ -436,6 +436,7 @@ public class ExpedientPeticioHelper {
 		if (entitatAnotacio != null) {
 			cacheHelper.evictAllCountAnotacionsPendents();
 		}
+		pluginHelper.comandaAvisDelete(expedientPeticioEntity);
 	}
 	
 	public void canviarProcediment(Long expedientPeticioId, Long procedimentId, Long grupId) {
