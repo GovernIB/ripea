@@ -134,6 +134,7 @@ const GridFormField = (props:GridFormField) => {
                 ...componentProps
             }}
             onFieldValueChange={handleFieldValueChange}
+            debounce
         />
     </Grid>
 }

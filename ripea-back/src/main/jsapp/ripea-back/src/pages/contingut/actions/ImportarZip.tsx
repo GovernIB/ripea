@@ -61,11 +61,15 @@ const ImportarZipForm = () => {
             doc?.id === rowId ? {...doc, [field]: value} : doc
         )
         apiRef?.current?.setFieldValue('documentsZip', localVariableDocs.current)
+    }
 
-        if (localVariableDocs.current && data?.documentZip) {
+    useEffect(() => {
+        if (data?.documentZip) {
             apiRef?.current?.setFieldValue('documentZip', null)
         }
-    }
+        localVariableDocs.current = undefined
+    }, [data?.documentZip]);
+
     const columns:any[] = [
         {
             field: 'ruta',
@@ -85,6 +89,7 @@ const ImportarZipForm = () => {
                         updateDocument(params.id, "nom", value)
                     }
                     componentProps={{size: "small"}}
+                    debounce
                     required
                 /></Box>
             }
@@ -116,6 +121,7 @@ const ImportarZipForm = () => {
                     componentProps={{size: "small"}}
                     namedQueries={[`CREATE_NEW_DOC#${apiRef?.current?.getId()}`]}
                     filter={metaDocumentFilter}
+                    debounce
                     required
                 /></Box>
             }
@@ -123,7 +129,7 @@ const ImportarZipForm = () => {
     ]
 
 	return <Grid container direction="row" columnSpacing={1} rowSpacing={1}>
-        <FileFormField xs={12} name="documentZip" onChange={() => localVariableDocs.current = undefined} required />
+        <FileFormField xs={12} name="documentZip" required />
 
         <Load value={data?.documentsZip} noEffect>
             <GridFormField xs={12}
