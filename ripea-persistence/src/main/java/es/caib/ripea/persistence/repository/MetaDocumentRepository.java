@@ -36,14 +36,7 @@ public interface MetaDocumentRepository extends JpaRepository<MetaDocumentEntity
 			"    md.metaExpedient is null " +
 			"and lower(:codi) = lower(md.codi)")
 	MetaDocumentEntity findByMetaExpedientNullAndCodi(@Param("codi") String codi);
-	
-	@Query(	"from " +
-			"    MetaDocumentEntity md " +
-			"where " +
-			"    md.metaExpedient.id = :metaExpedientId " +
-			"and lower(:codi) = lower(md.codi)")
-	MetaDocumentEntity findByMetaExpedientIdAndCodi(@Param("metaExpedientId") Long metaExpedientId, @Param("codi") String codi);
-	
+
 	List<MetaDocumentEntity> findByMetaExpedient(
 			MetaExpedientEntity metaExpedient);
 	

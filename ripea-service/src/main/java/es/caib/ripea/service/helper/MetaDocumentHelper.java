@@ -227,11 +227,10 @@ public class MetaDocumentHelper {
 			String plantillaContentType,
 			byte[] plantillaContingut) {
 
-		MetaDocumentEntity metaDocumentEntity = null;
+		MetaDocumentEntity metaDocumentEntity = metaDocumentRepository.findById(metaDocument.getId()).get();
 
 		//El Metadocument pot ser generic (sense associar a un procediment)
 		if (metaExpedientId!=null) {
-			metaDocumentEntity = metaDocumentRepository.findByMetaExpedientIdAndCodi(metaExpedientId, metaDocument.getCodi());
 			//Si ha canviat la cardinalitat, refrescar cache de validacions de expedients
 			if (!metaDocument.getMultiplicitat().equals(metaDocumentEntity.getMultiplicitat())) {
 				evictErrorsValidacioAndNotify(
@@ -239,8 +238,6 @@ public class MetaDocumentHelper {
 						metaDocumentEntity.getMetaExpedient()!=null?metaDocumentEntity.getMetaExpedient().getId():null,
 						false);
 			}
-		} else {
-			metaDocumentEntity = metaDocumentRepository.findById(metaDocument.getId()).get();
 		}
 
 		PinbalServeiEntity pinbalServeiEntity = null;
@@ -249,7 +246,7 @@ public class MetaDocumentHelper {
 		}
 
 		metaDocumentEntity.update(
-				metaDocumentEntity.getCodi(),
+				metaDocument.getCodi(),
 				metaDocument.getNom(),
 				metaDocument.getDescripcio(),
 				metaDocument.getMultiplicitat(),

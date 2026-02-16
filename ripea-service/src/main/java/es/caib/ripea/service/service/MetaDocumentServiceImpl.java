@@ -1,7 +1,6 @@
 package es.caib.ripea.service.service;
 
 import java.util.List;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,19 +13,15 @@ import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.entity.MetaDocumentEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
-import es.caib.ripea.persistence.repository.ExpedientRepository;
 import es.caib.ripea.persistence.repository.MetaDocumentRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientRepository;
-import es.caib.ripea.service.helper.CacheHelper;
 import es.caib.ripea.service.helper.ConversioTipusHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.MetaDocumentHelper;
-import es.caib.ripea.service.helper.MetaExpedientHelper;
 import es.caib.ripea.service.helper.MetaNodeHelper;
 import es.caib.ripea.service.helper.PaginacioHelper;
 import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
-import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentTipusGenericEnumDto;
@@ -46,11 +41,8 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 	@Autowired private PaginacioHelper paginacioHelper;
 	@Autowired private PluginHelper pluginHelper;
 	@Autowired private EntityComprovarHelper entityComprovarHelper;
-	@Autowired private MetaExpedientHelper metaExpedientHelper;
 	@Autowired private MetaDocumentHelper metaDocumentHelper;
 	@Autowired private MetaExpedientRepository metaExpedientRepository;
-	@Autowired private ExpedientRepository expedientRepository;
-	@Autowired private CacheHelper cacheHelper;
 	
 	@Transactional
 	@Override
