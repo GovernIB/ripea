@@ -33,7 +33,6 @@ import es.caib.comanda.model.server.monitoring.Format;
 import es.caib.comanda.model.server.monitoring.IndicadorDesc;
 import es.caib.comanda.model.server.monitoring.RegistreEstadistic;
 import es.caib.comanda.model.server.monitoring.RegistresEstadistics;
-import es.caib.comanda.model.server.monitoring.Temps;
 import es.caib.ripea.persistence.entity.ContingutEntity;
 import es.caib.ripea.persistence.entity.DocumentEntity;
 import es.caib.ripea.persistence.entity.EmailPendentEnviarEntity;
@@ -667,10 +666,6 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 		ExplotacioTempsEntity tempsDia = explotacioTempsRepository.findFirstByData(date);
 
 		Date dateJava = Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
-//		ZonedDateTime zonedDateTime = date.atTime(LocalTime.NOON).atZone(ZoneId.systemDefault());
-//		Date dateJava = Date.from(zonedDateTime.toInstant());
-		
-		Temps temps = new Temps(DateUtil.toOffsetDateTime(dateJava));
 
 		List<RegistreEstadistic> fets = new ArrayList<RegistreEstadistic>();
 		List<ExplotacioFetsEntity> dadesByTemps = explotacioFetsRepository.findByTemps(tempsDia);
@@ -684,7 +679,9 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 			}
 		}
 		
-		RegistresEstadistics resultat = new RegistresEstadistics(temps).fets(fets);
+		RegistresEstadistics resultat = new RegistresEstadistics();
+		resultat.setFets(fets);
+		resultat.setTemps(DateUtil.toOffsetDateTime(dateJava));
 		return resultat;
 	}
 

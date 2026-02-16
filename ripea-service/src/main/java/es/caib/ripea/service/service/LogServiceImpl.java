@@ -8,7 +8,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
@@ -30,6 +29,7 @@ import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.ContingutHelper;
 import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.service.LogService;
+import es.caib.ripea.service.intf.utils.DateUtil;
 import es.caib.ripea.service.intf.utils.Utils;
 
 @Service
@@ -52,19 +52,18 @@ public class LogServiceImpl implements LogService {
         }
         
         List<FitxerInfo> fitxers = new ArrayList<>();
-        var sdf = new SimpleDateFormat("dd/MM/yyyy");
         try (Stream<Path> paths = Files.list(Paths.get(directoriPath))) {
             paths.filter(Files::isRegularFile).forEach(f -> {
                 var file = f.toFile();
                 try {
                     var attr = Files.readAttributes(f, BasicFileAttributes.class);
-                    var dataCreacio = sdf.format(new Date(attr.creationTime().toMillis()));
-                    var dataModificacio = sdf.format(new Date(attr.lastModifiedTime().toMillis()));
+                    Date dataCreacio = new Date(attr.creationTime().toMillis());
+                    Date dataModificacio = new Date(attr.lastModifiedTime().toMillis());
                     var mida = file.length();
                     var fitxer = new FitxerInfo().nom(file.getName())
                                                      .mida(mida)
-                                                     .dataCreacio(dataCreacio)
-                                                     .dataModificacio(dataModificacio);
+                                                     .dataCreacio(DateUtil.toOffsetDateTime(dataCreacio))
+                                                     .dataModificacio(DateUtil.toOffsetDateTime(dataModificacio));
                     fitxers.add(fitxer);
                 } catch (Exception ex) {
                 	logger.error("Errror obtenint la info del fitxer " + f.getFileName(), ex);
@@ -92,9 +91,9 @@ public class LogServiceImpl implements LogService {
             
             var file = filePath.toFile();
             var attr = Files.readAttributes(filePath, BasicFileAttributes.class);
-            var sdf = new SimpleDateFormat("dd/MM/yyyy");
-            var dataCreacio = sdf.format(new Date(attr.creationTime().toMillis()));
-            var dataModificacio = sdf.format(new Date(attr.lastModifiedTime().toMillis()));
+            
+            Date dataCreacio = new Date(attr.creationTime().toMillis());
+            Date dataModificacio = new Date(attr.lastModifiedTime().toMillis());
             
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			ZipOutputStream zos = new ZipOutputStream(baos);
@@ -108,8 +107,8 @@ public class LogServiceImpl implements LogService {
             return new FitxerContingut().contingut(contingut)
                                             .mimeType("application/zip")
                                             .nom(file.getName())
-                                            .dataCreacio(dataCreacio)
-                                            .dataModificacio(dataModificacio)
+                                            .dataCreacio(DateUtil.toOffsetDateTime(dataCreacio))
+                                            .dataModificacio(DateUtil.toOffsetDateTime(dataModificacio))
                                             .mida((long)contingut.length);
         } catch (IOException ex) {
         	logger.error("Error reading file content for " + nom, ex);
