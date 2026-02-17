@@ -13,7 +13,6 @@ import java.util.Set;
 import javax.annotation.PostConstruct;
 
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -518,13 +517,13 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
     private class PermisosPerspectiveApplicator implements PerspectiveApplicator<MetaExpedientResourceEntity, MetaExpedientResource> {
 		@Override
 		public void applySingle(String code, MetaExpedientResourceEntity entity, MetaExpedientResource resource) throws PerspectiveApplicationException {
-			List<PermisDto> permisosGrup = null;
+			List<PermisDto> permisosProcediment = null;
 			if (entity.isComu()) {
-				permisosGrup = permisosHelper.findPermisos(entity.getId(), MetaExpedientOrganGestorEntity.class);
+				permisosProcediment = permisosHelper.findPermisos(entity.getId(), MetaExpedientOrganGestorEntity.class);
 			} else {
-				permisosGrup = permisosHelper.findPermisos(entity.getId(), MetaNodeEntity.class);
+				permisosProcediment = permisosHelper.findPermisos(entity.getId(), MetaNodeEntity.class);
 			}
-			resource.setNumPermisos(permisosGrup!=null?permisosGrup.size():0);
+			resource.setNumPermisos(permisosProcediment!=null?permisosProcediment.size():0);
 		}
     }
     

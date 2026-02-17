@@ -5,8 +5,12 @@ import java.util.Date;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.springframework.data.annotation.Transient;
+
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
+import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
+import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,10 +22,17 @@ import lombok.experimental.FieldNameConstants;
 @FieldNameConstants
 @ResourceConfig(
         quickFilterFields = { "codi", "nom" },
-        descriptionField = "nom"
+        descriptionField = "nom",
+        		artifacts = {
+        				@ResourceConfigArtifact(
+        						type = ResourceArtifactType.PERSPECTIVE,
+        						code = EntitatResource.PERSPECTIVE_PERMISOS_CODE),
+        }
 )
 public class EntitatResource extends BaseAuditableResource<Long> {
 
+	public static final String PERSPECTIVE_PERMISOS_CODE	= "PERMISOS";
+	
 	@NotNull
 	@Size(max = 64)
 	private String codi;
@@ -54,4 +65,8 @@ public class EntitatResource extends BaseAuditableResource<Long> {
     private byte[] blackMenuImgBytes;
     private String blackCapsaleraColorFons;
     private String blackCapsaleraColorLletra;
+    
+    @Transient private int numPermisos;
+    
+    private static final long serialVersionUID = 5467286889478459953L;
 }
