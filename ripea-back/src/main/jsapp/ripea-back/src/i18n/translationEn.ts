@@ -1433,15 +1433,15 @@ const translationEn = {
                     label: "Distribution rule",
                     create: {
                         label: "Create distribution rule",
-                        ok: "The rule with code '{{data.codi}}' has been created successfully.",
+                        ok: "The rule with code '{{nom}}' has been created successfully.",
                     },
                     active: {
                         label: "Activate distribution rule",
-                        ok: "The rule with code '{{data.codi}}' has been activated successfully.",
+                        ok: "The rule with code '{{nom}}' has been activated successfully.",
                     },
                     desactive: {
                         label: "Deactivate distribution rule",
-                        ok: "The rule with code '{{data.codi}}' has been deactivated successfully",
+                        ok: "The rule with code '{{nom}}' has been deactivated successfully",
                     },
                 },
                 activar: {

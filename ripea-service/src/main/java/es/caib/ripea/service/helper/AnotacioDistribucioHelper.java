@@ -91,7 +91,7 @@ public class AnotacioDistribucioHelper {
 				} else {
 					metaExpedients = metaExpedientRepository.findByEntitatAndClassificacioAndTipusProcedimentServeiOrderByNomAsc(
 							entitat,
-							registre.getAplicacioCodi(), //TODO: canviar per getServeiCodi quant disponible
+							registre.getServeiCodi(),
 							TipusProcedimentServeiEnum.SERVEI);
 				}
 				MetaExpedientEntity metaExpedientEntity = null;

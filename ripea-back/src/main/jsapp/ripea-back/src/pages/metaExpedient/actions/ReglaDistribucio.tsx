@@ -4,7 +4,6 @@ import {useResourceApiService, MuiDialog, useBaseAppContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import Load from "../../../components/Load.tsx";
 import {ContenidoData} from "../../../components/CardData.tsx";
-import {formatDate} from "../../../util/dateUtils.ts";
 import {useActions} from "../details/MetaExpedientActions.tsx";
 
 const ReglaDistribucio = (props:any) => {
@@ -19,7 +18,7 @@ const ReglaDistribucio = (props:any) => {
             }
         </ContenidoData>
         {entity!=null && <>
-            <ContenidoData title={t('page.metaExpedient.detall.regla.data')}>{formatDate(entity?.data)}</ContenidoData>
+            <ContenidoData title={t('page.metaExpedient.detall.regla.data')}>{entity?.data}</ContenidoData>
             <ContenidoData title={t('page.metaExpedient.detall.regla.activa')}>
                 {entity?.activa
                     ? <Icon color={'success'}>check</Icon>

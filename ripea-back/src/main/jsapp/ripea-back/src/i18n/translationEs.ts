@@ -1433,15 +1433,15 @@ const translationEs = {
                     label: "Regla de distribución",
                     create: {
                         label: "Crear regla en Distribución",
-                        ok: "La regla con código '{{data.codi}}' se ha creado correctamente.",
+                        ok: "La regla con código '{{nom}}' se ha creado correctamente.",
                     },
                     active: {
                         label: "Activar regla en Distribución",
-                        ok: "La regla con código '{{data.codi}}' se ha activado correctamente.",
+                        ok: "La regla con código '{{nom}}' se ha activado correctamente.",
                     },
                     desactive: {
                         label: "Desactivar regla en Distribución",
-                        ok: "La regla con código '{{data.codi}}' se ha desactivado correctamente",
+                        ok: "La regla con código '{{nom}}' se ha desactivado correctamente",
                     },
                 },
                 activar: {

@@ -77,8 +77,8 @@ export const useActions = (refresh?: () => void) => {
             .then(() => {
                 refresh?.();
                 activa
-                    ? temporalMessageShow(null, t('page.metaExpedient.action.regla.active.ok'), 'success')
-                    : temporalMessageShow(null, t('page.metaExpedient.action.regla.desactive.ok'), 'success')
+                    ? temporalMessageShow(null, t('page.metaExpedient.action.regla.active.ok', {nom: id}), 'success')
+                    : temporalMessageShow(null, t('page.metaExpedient.action.regla.desactive.ok', {nom: id}), 'success')
             })
             .catch((error) => {
                 temporalMessageShow(null, error.message, 'error');
@@ -89,7 +89,7 @@ export const useActions = (refresh?: () => void) => {
         apiAction(id, { code: 'CREAR_REGLA_ROLSAC' })
             .then(() => {
                 refresh?.();
-                temporalMessageShow(null, t('page.metaExpedient.action.regla.create.ok'), 'success')
+                temporalMessageShow(null, t('page.metaExpedient.action.regla.create.ok', {nom: id}), 'success')
             })
             .catch((error) => {
                 temporalMessageShow(null, error.message, 'error');

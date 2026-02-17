@@ -1121,6 +1121,7 @@ public class MetaExpedientHelper {
 		try {
 
 			CrearReglaResponseDto rearReglaResponseDto = distribucioReglaHelper.crearRegla(
+					metaExpedient.getTipusProcedimentServei(),
 					metaExpedient.getEntitat().getUnitatArrel(),
 					metaExpedient.getClassificacio());
 
