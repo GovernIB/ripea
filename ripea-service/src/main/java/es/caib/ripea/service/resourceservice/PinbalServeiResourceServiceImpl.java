@@ -8,14 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-/**
- * Implementació del servei de gestió d'expedients.
- *
- * @author Límit Tecnologies
- */
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class PinbalServeiResourceServiceImpl extends BaseMutableResourceService<PinbalServeiResource, Long, PinbalServeiResourceEntity> implements PinbalServeiResourceService {
-
-}
+public class PinbalServeiResourceServiceImpl extends BaseMutableResourceService<PinbalServeiResource, Long, PinbalServeiResourceEntity> implements PinbalServeiResourceService {}

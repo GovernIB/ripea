@@ -14,7 +14,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @ResourceConfig(quickFilterFields = { "codi", "nom" }, descriptionField = "nom")
 public class PinbalServeiResource extends BaseAuditableResource<Long> {
-	
+
 	@NotNull
 	@Size(max = 64)
 	private String codi;
@@ -31,4 +31,6 @@ public class PinbalServeiResource extends BaseAuditableResource<Long> {
 	@NotNull
 	private boolean pinbalServeiDocPermesPas;
 	private boolean actiu;
+	
+	private static final long serialVersionUID = 6916266264935291305L;
 }

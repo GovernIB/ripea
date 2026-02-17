@@ -411,6 +411,11 @@ public class EjbClientConfig {
 	public LocalStatelessSessionProxyFactoryBean pinbalServeiResourceServiceEjb() {
 		return getLocalEjbFactoyBean(PinbalServeiResourceService.class);
 	}
+	
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean avisServeiResourceServiceEjb() {
+		return getLocalEjbFactoyBean(AvisResourceService.class);
+	}
 
 	@Bean
 	public LocalStatelessSessionProxyFactoryBean contingutResourceServiceEjb() {
