@@ -1,8 +1,8 @@
 import {useState} from "react";
-import {Grid, Icon} from "@mui/material";
+import {Box, Grid2} from "@mui/material";
 import {BasePage, MuiDialog} from "reactlib";
 import {useTranslation} from "react-i18next";
-import {CardData, ContenidoData} from "../../../components/CardData.tsx";
+import {CardButton, DetailCard, DetailCardContent} from "../../../components/CardData.tsx";
 import TabComponent from "../../../components/TabComponent.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
@@ -20,32 +20,37 @@ const Resum = (props:any) => {
     const { t } = useTranslation();
 
     return <BasePage>
-        <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-            <ContenidoData title={t('page.registre.detall.identificador')}      xs={6} titleXs={4} textXs={8}>{registre?.identificador}</ContenidoData>
-            <ContenidoData title={t('page.registre.detall.data')}               xs={6} titleXs={4} textXs={8}>{formatDate(registre?.data)}</ContenidoData>
-            <ContenidoData title={t('page.registre.detall.oficina')}            xs={6} titleXs={4} textXs={8}>{registre?.oficinaDescripcio} ({registre?.oficinaCodi})</ContenidoData>
-            <ContenidoData title={t('page.registre.detall.extracte')}           xs={6} titleXs={4} textXs={8}>{registre?.extracte}</ContenidoData>
-            <ContenidoData title={t('page.registre.detall.observacions')}       xs={6} titleXs={4} textXs={8}>{registre?.observacions}</ContenidoData>
-            <ContenidoData title={t('page.registre.detall.identificador')}      xs={6} titleXs={4} textXs={8}>{registre?.identificador}</ContenidoData>
-            <ContenidoData title={t('page.registre.detall.data')}               xs={6} titleXs={4} textXs={8}>{formatDate(registre?.data)}</ContenidoData>
-            <ContenidoData title={t('page.registre.detall.oficinaDescripcio')}  xs={6} titleXs={4} textXs={8}>{registre?.oficinaDescripcio}</ContenidoData>
+        <Grid2 container direction={"row"} columnSpacing={1} rowSpacing={1}>
+            <DetailCard title={'Identificació'}>
+                <DetailCardContent title={t('page.registre.detall.identificador')} size={6}>{registre?.identificador}</DetailCardContent>
+                <DetailCardContent title={t('page.registre.detall.data')}          size={6}>{formatDate(registre?.data)}</DetailCardContent>
+                <DetailCardContent title={t('page.registre.detall.oficina')}       size={6}>{registre?.oficinaDescripcio} ({registre?.oficinaCodi})</DetailCardContent>
+                <DetailCardContent title={t('page.registre.detall.extracte')}      size={6}>{registre?.extracte}</DetailCardContent>
+            </DetailCard>
 
-            <CardData xs={12}  title={t('page.registre.detall.infoResumida')}>
-                <ContenidoData title={t('page.registre.detall.docFisica')}          xs={6} titleXs={4} textXs={8}>{registre?.docFisicaCodi} - {registre?.docFisicaDescripcio}</ContenidoData>
-                <ContenidoData title={t('page.registre.detall.desti')}              xs={6} titleXs={4} textXs={8}>{registre?.destiDescripcio} ({registre?.destiCodi})</ContenidoData>
-                <ContenidoData title={t('page.registre.detall.refExterna')}         xs={6} titleXs={4} textXs={8}>{registre?.refExterna}</ContenidoData>
-                <ContenidoData title={t('page.registre.detall.expedientNumero')}    xs={6} titleXs={4} textXs={8}>{registre?.expedientNumero}</ContenidoData>
-                <ContenidoData title={t('page.registre.detall.procediment')}        xs={12} titleXs={2} textXs={10}>{registre?.procedimentCodi} - {entity?.metaExpedient?.description}</ContenidoData>
-            </CardData>
+            <DetailCard title={'Informació de registre'}>
+                <DetailCardContent title={t('page.registre.detall.observacions')}      size={6}>{registre?.observacions}</DetailCardContent>
+                <DetailCardContent title={t('page.registre.detall.identificador')}     size={6}>{registre?.identificador}</DetailCardContent>
+                <DetailCardContent title={t('page.registre.detall.data')}              size={6}>{formatDate(registre?.data)}</DetailCardContent>
+                <DetailCardContent title={t('page.registre.detall.oficinaDescripcio')} size={6}>{registre?.oficinaDescripcio}</DetailCardContent>
+            </DetailCard>
 
-            <CardData xs={12} title={t('page.registre.detall.interessats')}>
+            <DetailCard title={t('page.registre.detall.infoResumida')}>
+                <DetailCardContent title={t('page.registre.detall.docFisica')}         size={6}>{registre?.docFisicaCodi} - {registre?.docFisicaDescripcio}</DetailCardContent>
+                <DetailCardContent title={t('page.registre.detall.desti')}             size={6}>{registre?.destiDescripcio} ({registre?.destiCodi})</DetailCardContent>
+                <DetailCardContent title={t('page.registre.detall.refExterna')}        size={6}>{registre?.refExterna}</DetailCardContent>
+                <DetailCardContent title={t('page.registre.detall.expedientNumero')}   size={6}>{registre?.expedientNumero}</DetailCardContent>
+                <DetailCardContent title={t('page.registre.detall.procediment')}       size={12}>{registre?.procedimentCodi} - {entity?.metaExpedient?.description}</DetailCardContent>
+            </DetailCard>
+
+            <DetailCard title={t('page.registre.detall.interessats')}>
                 <Interessats entity={registre} onRowCountChange={setNumInteressats}/>
-            </CardData>
+            </DetailCard>
 
-            <CardData xs={12} title={t('page.registre.detall.annexos')}>
+            <DetailCard title={t('page.registre.detall.annexos')}>
                 <Annexos entity={registre} onRowCountChange={setNumAnnexos}/>
-            </CardData>
-        </Grid>
+            </DetailCard>
+        </Grid2>
     </BasePage>
 }
 
@@ -54,26 +59,26 @@ const Estat = (props:any) => {
     const { t } = useTranslation();
 
     return <BasePage>
-        <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-            <ContenidoData title={t('page.anotacio.detall.estatView')} xs={6} titleXs={4} textXs={8}>{entity?.estatView}</ContenidoData>
-            <ContenidoData title={t('page.anotacio.detall.dataAlta')} xs={6} titleXs={4} textXs={8}>{formatDate(entity?.dataAlta)}</ContenidoData>
+        <DetailCard>
+            <DetailCardContent title={t('page.anotacio.detall.estatView')} size={6}>{entity?.estatView}</DetailCardContent>
+            <DetailCardContent title={t('page.anotacio.detall.dataAlta')} size={6}>{formatDate(entity?.dataAlta)}</DetailCardContent>
             {entity?.estat == 'REBUTJAT' &&
-                <ContenidoData title={t('page.anotacio.detall.observacions')} xs={6} titleXs={4} textXs={8}>{entity?.observacions}</ContenidoData>
+                <DetailCardContent title={t('page.anotacio.detall.observacions')} size={6}>{entity?.observacions}</DetailCardContent>
             }
             {entity?.estat != 'PENDENT' &&
                 <>
-                    <ContenidoData title={entity?.estat == 'REBUTJAT'
+                    <DetailCardContent title={entity?.estat == 'REBUTJAT'
                         ?t('page.anotacio.detall.rejectedDate')
                         :t('page.anotacio.detall.acceptedDate')}
-                        xs={6} titleXs={4} textXs={8}
+                        size={6}
                     >
                         {formatDate(entity?.dataActualitzacio)}
-                    </ContenidoData>
+                    </DetailCardContent>
 
-                    <ContenidoData title={t('page.anotacio.detall.usuariActualitzacio')} xs={6} titleXs={4} textXs={8}>{entity?.usuariActualitzacio?.description}</ContenidoData>
+                    <DetailCardContent title={t('page.anotacio.detall.usuariActualitzacio')} size={6}>{entity?.usuariActualitzacio?.description}</DetailCardContent>
                 </>
             }
-        </Grid>
+        </DetailCard>
     </BasePage>
 }
 
@@ -82,32 +87,34 @@ const InformeRegistre = (props:any) => {
     const { t } = useTranslation();
 
     return <BasePage>
-        <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-            <ContenidoData title={t('page.registre.detall.tipus')}          xs={6} titleXs={4} textXs={8}>{t('page.registre.detall.entrada')}</ContenidoData>
-            <ContenidoData title={t('page.registre.detall.identificador')}  xs={6} titleXs={4} textXs={8}>{entity?.identificador}</ContenidoData>
-            <ContenidoData title={t('page.registre.detall.data')}           xs={6} titleXs={4} textXs={8}>{formatDate(entity?.data)}</ContenidoData>
-            <ContenidoData title={t('page.registre.detall.oficina')}        xs={6} titleXs={4} textXs={8}>{entity?.oficinaDescripcio} ({entity?.oficinaCodi})</ContenidoData>
+        <Grid2 container direction={"row"} columnSpacing={1} rowSpacing={1}>
+            <DetailCard>
+                <DetailCardContent title={t('page.registre.detall.tipus')}          size={6}>{t('page.registre.detall.entrada')}</DetailCardContent>
+                <DetailCardContent title={t('page.registre.detall.identificador')}  size={6}>{entity?.identificador}</DetailCardContent>
+                <DetailCardContent title={t('page.registre.detall.data')}           size={6}>{formatDate(entity?.data)}</DetailCardContent>
+                <DetailCardContent title={t('page.registre.detall.oficina')}        size={6}>{entity?.oficinaDescripcio} ({entity?.oficinaCodi})</DetailCardContent>
+            </DetailCard>
 
-            <CardData xs={6} title={t('page.registre.detall.required')}>
-                <ContenidoData title={t('page.registre.detall.llibre')}     xs={12} titleXs={4} textXs={8}>{entity?.llibreDescripcio} ({entity?.llibreCodi})</ContenidoData>
-                <ContenidoData title={t('page.registre.detall.extracte')}   xs={12} titleXs={4} textXs={8}>{entity?.extracte}</ContenidoData>
-                <ContenidoData title={t('page.registre.detall.docFisica')}  xs={12} titleXs={4} textXs={8}>{entity?.docFisicaCodi} - {entity?.docFisicaDescripcio}</ContenidoData>
-                <ContenidoData title={t('page.registre.detall.desti')}      xs={12} titleXs={4} textXs={8}>{entity?.destiDescripcio} ({entity?.destiCodi})</ContenidoData>
-                <ContenidoData title={t('page.registre.detall.assumpte')}   xs={12} titleXs={4} textXs={8}>{entity?.assumpteTipusDescripcio} ({entity?.assumpteTipusCodi})</ContenidoData>
-                <ContenidoData title={t('page.registre.detall.idioma')}     xs={12} titleXs={4} textXs={8}>{entity?.idiomaDescripcio} ({entity?.idiomaCodi})</ContenidoData>
-            </CardData>
+            <DetailCard size={6} title={t('page.registre.detall.required')}>
+                <DetailCardContent title={t('page.registre.detall.llibre')}     >{entity?.llibreDescripcio} ({entity?.llibreCodi})</DetailCardContent>
+                <DetailCardContent title={t('page.registre.detall.extracte')}   >{entity?.extracte}</DetailCardContent>
+                <DetailCardContent title={t('page.registre.detall.docFisica')}  >{entity?.docFisicaCodi} - {entity?.docFisicaDescripcio}</DetailCardContent>
+                <DetailCardContent title={t('page.registre.detall.desti')}      >{entity?.destiDescripcio} ({entity?.destiCodi})</DetailCardContent>
+                <DetailCardContent title={t('page.registre.detall.assumpte')}   >{entity?.assumpteTipusDescripcio} ({entity?.assumpteTipusCodi})</DetailCardContent>
+                <DetailCardContent title={t('page.registre.detall.idioma')}     >{entity?.idiomaDescripcio} ({entity?.idiomaCodi})</DetailCardContent>
+            </DetailCard>
 
-            <CardData xs={6} title={t('page.registre.detall.optional')}>
-                <ContenidoData title={t('page.registre.detall.assumpteCodi')}       xs={12} titleXs={4} textXs={8}>{entity?.assumpteCodiCodi}</ContenidoData>
-                <ContenidoData title={t('page.registre.detall.refExterna')}         xs={12} titleXs={4} textXs={8}>{entity?.refExterna}</ContenidoData>
-                <ContenidoData title={t('page.registre.detall.expedientNumero')}    xs={12} titleXs={4} textXs={8}>{entity?.expedientNumero}</ContenidoData>
-                <ContenidoData title={t('page.registre.detall.transport')}          xs={12} titleXs={4} textXs={8}>{entity?.transportTipusDescripcio}</ContenidoData>
-                <ContenidoData title={t('page.registre.detall.transportNumero')}    xs={12} titleXs={4} textXs={8}>{entity?.transportNumero}</ContenidoData>
-                <ContenidoData title={t('page.registre.detall.origenRegistreNumero')} xs={12} titleXs={4} textXs={8}>{entity?.origenRegistreNumero}</ContenidoData>
-                <ContenidoData title={t('page.registre.detall.origenData')}         xs={12} titleXs={4} textXs={8}>{formatDate(entity?.origenData)}</ContenidoData>
-                <ContenidoData title={t('page.registre.detall.observacions')}       xs={12} titleXs={4} textXs={8}>{entity?.observacions}</ContenidoData>
-            </CardData>
-        </Grid>
+            <DetailCard size={6} title={t('page.registre.detall.optional')}>
+                <DetailCardContent title={t('page.registre.detall.assumpteCodi')}         >{entity?.assumpteCodiCodi}</DetailCardContent>
+                <DetailCardContent title={t('page.registre.detall.refExterna')}           >{entity?.refExterna}</DetailCardContent>
+                <DetailCardContent title={t('page.registre.detall.expedientNumero')}      >{entity?.expedientNumero}</DetailCardContent>
+                <DetailCardContent title={t('page.registre.detall.transport')}            >{entity?.transportTipusDescripcio}</DetailCardContent>
+                <DetailCardContent title={t('page.registre.detall.transportNumero')}      >{entity?.transportNumero}</DetailCardContent>
+                <DetailCardContent title={t('page.registre.detall.origenRegistreNumero')} >{entity?.origenRegistreNumero}</DetailCardContent>
+                <DetailCardContent title={t('page.registre.detall.origenData')}           >{formatDate(entity?.origenData)}</DetailCardContent>
+                <DetailCardContent title={t('page.registre.detall.observacions')}         >{entity?.observacions}</DetailCardContent>
+            </DetailCard>
+        </Grid2>
     </BasePage>
 }
 
@@ -271,26 +278,26 @@ const Justificant = (props:any) => {
 
     const {downloadJustificant} = useActions()
 
-    return <CardData title={<><Icon hidden sx={{ fontSize: '1em', paddingTop: '2px', }}>description</Icon>{entity?.titol}</>}
-         buttons={[
-             {
-                 text: t('page.anotacio.action.justificant.label'),
-                 icon: 'download',
-                 onClick: ()=>downloadJustificant(id),
-             }
-         ]}
-    >
-        <ContenidoData title={t('page.registre.justificant.ntiFechaCaptura')}   xs={6} titleXs={4} textXs={8}>{formatDate(entity?.ntiFechaCaptura)}</ContenidoData>
-        <ContenidoData title={t('page.registre.justificant.ntiOrigen')}         xs={6} titleXs={4} textXs={8}>{entity?.ntiOrigen}</ContenidoData>
-        <ContenidoData title={t('page.registre.justificant.ntiTipoDocumental')} xs={6} titleXs={4} textXs={8}>{entity?.ntiTipoDocumental}</ContenidoData>
-        <ContenidoData title={t('page.registre.justificant.uuid')}              xs={6} titleXs={4} textXs={8}>{entity?.uuid}</ContenidoData>
-        <ContenidoData title={t('page.registre.justificant.titol')}             xs={6} titleXs={4} textXs={8}>{entity?.titol}</ContenidoData>
+    return <Grid2 container direction={"row"} columnSpacing={1} rowSpacing={1}>
+        <DetailCard icon={'description'} title={entity?.titol}
+                    header={<Box ml="auto">
+                        <CardButton icon={'download'}
+                                    text={t('page.anotacio.action.justificant.label')}
+                                    onClick={()=>downloadJustificant(id)}/>
+                    </Box>}
+        >
+            <DetailCardContent title={t('page.registre.justificant.ntiFechaCaptura')}   size={6}>{formatDate(entity?.ntiFechaCaptura)}</DetailCardContent>
+            <DetailCardContent title={t('page.registre.justificant.ntiOrigen')}         size={6}>{entity?.ntiOrigen}</DetailCardContent>
+            <DetailCardContent title={t('page.registre.justificant.ntiTipoDocumental')} size={6}>{entity?.ntiTipoDocumental}</DetailCardContent>
+            <DetailCardContent title={t('page.registre.justificant.uuid')}              size={6}>{entity?.uuid}</DetailCardContent>
+            <DetailCardContent title={t('page.registre.justificant.titol')}             size={12}>{entity?.titol}</DetailCardContent>
+        </DetailCard>
 
-        <CardData title={<><Icon hidden sx={{ fontSize: '1em', paddingTop: '2px', }}>{icons.firma}</Icon>{t('page.arxiu.firma.title')}</>}>
-            <ContenidoData title={t('page.registre.justificant.firmaTipus')}    xs={6} titleXs={4} textXs={8}>{entity?.firmaTipus}</ContenidoData>
-            <ContenidoData title={t('page.registre.justificant.firmaPerfil')}   xs={6} titleXs={4} textXs={8}>{entity?.firmaPerfil}</ContenidoData>
-        </CardData>
-    </CardData>
+        <DetailCard icon={icons.firma} title={t('page.arxiu.firma.title')}>
+            <DetailCardContent title={t('page.registre.justificant.firmaTipus')}    size={6}>{entity?.firmaTipus}</DetailCardContent>
+            <DetailCardContent title={t('page.registre.justificant.firmaPerfil')}   size={6}>{entity?.firmaPerfil}</DetailCardContent>
+        </DetailCard>
+    </Grid2>
 }
 
 const useAnotacioDetail = () => {

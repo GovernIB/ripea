@@ -6,32 +6,33 @@ import Load from "../../../components/Load.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import {FieldData, MuiDetail} from "../../../components/MuiDetail.tsx";
 import {useUserSession} from "../../../components/Session.tsx";
+import {DetailCard} from "../../../components/CardData.tsx";
 
 const MetaExpedientDetail = (props:any) => {
     const {entity, fields, isOrganAdmin} = props;
     const { t } = useTranslation();
 
     return <MuiDetail entity={entity} fields={fields}>
-        {(entity?.revisioEstat == 'REVISAT' && isOrganAdmin) &&
-            <Grid xs={12}>
-                <Alert severity={'info'}>{t('page.metaExpedient.action.consultar.revisat')}</Alert>
-            </Grid>
-        }
+        <DetailCard>
+            {(entity?.revisioEstat == 'REVISAT' && isOrganAdmin) &&
+                <Grid xs={12}>
+                    <Alert severity={'info'}>{t('page.metaExpedient.action.consultar.revisat')}</Alert>
+                </Grid>
+            }
 
-        <FieldData field={'codi'}/>
-        <FieldData field={'nom'}/>
-        <FieldData field={'descripcio'}/>
-        <FieldData field={'tipus'}/>
-        <FieldData field={'revisioEstat'}/>
-        <FieldData field={'tipusProcedimentServei'}/>
+            <FieldData field={'codi'}/>
+            <FieldData field={'nom'}/>
+            <FieldData field={'descripcio'}/>
+            <FieldData field={'tipus'}/>
+            <FieldData field={'revisioEstat'}/>
+            <FieldData field={'tipusProcedimentServei'}/>
+        </DetailCard>
 
-        <Grid xs={12} sx={{ pl: '8px', pt: '8px' }}>
-            <Alert severity={'info'}>
-                {t('common.auditoria.create', {createdDate: formatDate(entity.createdDate), createdBy: entity.createdByFullName})}
-                {entity.lastModifiedDate != null &&
-                    t('common.auditoria.update', {lastModifiedDate: formatDate(entity.lastModifiedDate), lastModifiedBy: entity.lastModifiedByFullName})}
-            </Alert>
-        </Grid>
+        <Alert severity={'info'}>
+            {t('common.auditoria.create', {createdDate: formatDate(entity.createdDate), createdBy: entity.createdByFullName})}
+            {entity.lastModifiedDate != null &&
+                t('common.auditoria.update', {lastModifiedDate: formatDate(entity.lastModifiedDate), lastModifiedBy: entity.lastModifiedByFullName})}
+        </Alert>
     </MuiDetail>
 }
 

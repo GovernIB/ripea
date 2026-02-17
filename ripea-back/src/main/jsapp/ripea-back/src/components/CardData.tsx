@@ -1,4 +1,4 @@
-import {Card, CardContent, CardHeader, Grid, Typography} from "@mui/material";
+import {Box, Card, CardContent, CardHeader, Grid, Grid2, Typography} from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import Icon from "@mui/material/Icon";
 
@@ -6,7 +6,7 @@ const cardBorder= { borderRadius: '4px' };
 const cardHeader= { py: 1, px: 2 };
 const iconButton = { p: 0.5, borderRadius: '5px', maxWidth: 'max-content', border: '1px solid grey' }
 
-const CardButton = (props:any) => {
+export const CardButton = (props:any) => {
     const {text, icon, onClick, flex, buttonProps, hidden} = props;
 
     if (hidden){
@@ -23,8 +23,56 @@ const CardButton = (props:any) => {
     </Grid>
 }
 
-const isEmpty = (value:any[]) => {
-    return !value || value?.length === 0 || value?.every?.((item:any) => !item)
+const isEmpty = (value:any) => {
+    return !value || value?.length === 0 || value?.trim?.() === '' || value?.every?.((item:any) => isEmpty(item))
+}
+
+export const DetailCard = (props:any) => {
+    const {icon, title, header, children, size = 12, hidden, cardProps = {}, headerProps = {}, variant = "overline", ...other} = props;
+
+    if (hidden){
+        return <></>
+    }
+
+    return <Grid2 size={size}>
+        <Card sx={{...cardBorder, ...cardProps}}>
+            {(title || header) &&
+                <CardHeader title={<Box display={'flex'} alignItems={'center'}>
+                    {icon && <Icon>{icon}</Icon>}
+                    {title && <Typography mt={0.5} variant={variant}>{title}</Typography>}
+                    {header}
+                </Box>} className={'detail'} sx={{ py: 0, px: 2, ...headerProps }}/>
+            }
+
+            <CardContent sx={{ p: '0 !important' }}>
+                <Grid2 container {...other}>
+                    {children}
+                </Grid2>
+            </CardContent>
+        </Card>
+    </Grid2>
+}
+export const DetailCardContent = (props:any) => {
+    const {title, children, size = 12, titleSize = 12, textSize = 12, componentTitleProps, componentTextProps, hidden, ...other} = props;
+
+    if (hidden){
+        return <></>
+    }
+
+    return <Grid2 item size={size} container direction={"row"}
+                  {...other}
+                  sx={{
+                      p: 1,
+                      borderLeft: "0.5px solid",
+                      borderTop: "0.5px solid",
+                      borderColor: "divider",
+                      ...(other?.sx ?? {})
+                  }}>
+        <Grid2 size={titleSize}><Typography variant={"body1"} color={'black'} sx={componentTitleProps}>{title}</Typography></Grid2>
+        <Grid2 size={textSize}><Typography variant={"inherit"} color={'textSecondary'} sx={componentTextProps}>
+            {isEmpty(children) ?" - " :children}
+        </Typography></Grid2>
+    </Grid2>
 }
 
 export const CardData = (props:any) => {

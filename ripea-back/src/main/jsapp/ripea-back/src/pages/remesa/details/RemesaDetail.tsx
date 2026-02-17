@@ -1,12 +1,13 @@
 import {useState} from "react";
 import {MuiDialog, useBaseAppContext, useResourceApiService} from "reactlib";
 import {useTranslation} from "react-i18next";
-import {CardData} from "../../../components/CardData.tsx";
+import {CardButton, DetailCard} from "../../../components/CardData.tsx";
 import AlertExpand from "../../../components/AlertExpand.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import {useActions} from "./RemesaActions.tsx";
 import Load from "../../../components/Load.tsx";
 import {FieldData, MuiDetail} from "../../../components/MuiDetail.tsx";
+import {Box} from "@mui/material";
 
 const RemesaDetail = (props:any) => {
     const {entity, fields} = props;
@@ -15,15 +16,12 @@ const RemesaDetail = (props:any) => {
     const {justificant, descarregarDocumentEnviat} = useActions()
 
     return <MuiDetail entity={entity} fields={fields}>
-        <CardData title={t('page.notificacio.detall.notificacioDades')}
-              buttons={[
-                  {
-                      text: t('page.notificacio.action.justificant.label'),
-                      icon: 'download',
-                      onClick: ()=>{justificant(entity?.id)},
-                      hidden: entity?.notificacioEstat == 'PENDENT',
-                  },
-              ]}
+        <DetailCard title={t('page.notificacio.detall.notificacioDades')}
+                    header={entity?.notificacioEstat != 'PENDENT' && <Box ml="auto">
+                        <CardButton icon={'download'}
+                                    text={t('page.notificacio.action.justificant.label')}
+                                    onClick={()=>justificant(entity?.id)}/>
+                    </Box>}
         >
             <FieldData field={'emisor'}/>
             <FieldData field={'assumpte'}/>
@@ -34,8 +32,8 @@ const RemesaDetail = (props:any) => {
                 {formatDate(entity?.processatData)}</FieldData>
             <FieldData field={'tipus'}/>
             <FieldData field={'entregaPostal'} title={t('page.notificacio.detall.entregaPostal')}>{t(`enum.siNO.${entity?.entregaPostal}`)}</FieldData>
-        </CardData>
-        <CardData title={t('page.notificacio.detall.notificacioDocument')}
+        </DetailCard>
+        <DetailCard title={t('page.notificacio.detall.notificacioDocument')}
                   buttons={[
                       {
                           text: t('page.notificacio.action.documentEnviat.label'),
@@ -46,7 +44,7 @@ const RemesaDetail = (props:any) => {
                   ]}
         >
             <FieldData field={'fitxerNom'} title={t('page.notificacio.detall.fitxerNom')} xs={10}/>
-        </CardData>
+        </DetailCard>
     </MuiDetail>
 }
 

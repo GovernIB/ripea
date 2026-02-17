@@ -1,12 +1,12 @@
 import {useState} from "react";
-import {Grid} from "@mui/material";
+import {Grid2} from "@mui/material";
 import {BasePage, MuiDialog} from "reactlib";
 import {useTranslation} from "react-i18next";
 import TabComponent from "../components/TabComponent.tsx";
 import {formatDate} from "../util/dateUtils.ts";
 import StyledMuiGrid from "../components/StyledMuiGrid.tsx";
 import * as builder from "../util/springFilterUtils.ts";
-import {CardData, ContenidoData} from "../components/CardData.tsx";
+import {DetailCard, DetailCardContent} from "../components/CardData.tsx";
 import Load from "../components/Load.tsx";
 
 const columnsAccions = [
@@ -95,26 +95,28 @@ const useAccioDialog = () => {
             }
         }}
     >
-        <Grid container columnSpacing={1} rowSpacing={1}>
-            <CardData title={t('page.contingut.log.param')}>
-                <ContenidoData title={t('page.contingut.log.param1')} xs={6}>{entity?.param1}</ContenidoData>
-                <ContenidoData title={t('page.contingut.log.param2')} xs={6}>{entity?.param2}</ContenidoData>
-            </CardData>
+        <Grid2 container columnSpacing={1} rowSpacing={1}>
+            <DetailCard title={t('page.contingut.log.param')}>
+                <DetailCardContent title={t('page.contingut.log.param1')} size={6}>{entity?.param1}</DetailCardContent>
+                <DetailCardContent title={t('page.contingut.log.param2')} size={6}>{entity?.param2}</DetailCardContent>
+            </DetailCard>
 
-            <CardData title={t('page.contingut.log.causa')} hidden={!entity?.pare}>
-                <ContenidoData title={t('common.action')}>
+            <DetailCard title={t('page.contingut.log.causa')} hidden={!entity?.pare}>
+                <DetailCardContent title={t('common.action')}>
                     {formatDate(entity?.pare?.createdDate)} | {entity?.pare?.createdByFullName} | {entity?.pare?.tipusString}
-                </ContenidoData>
-                <ContenidoData title={t('page.contingut.log.objecte')}>{entity?.pare?.mssg} {entity?.pare?.objecteNom ?' - '+entity?.pare?.objecteNom :''}</ContenidoData>
-                <ContenidoData title={t('page.contingut.log.param1')} xs={6}>{entity?.pare?.param1}</ContenidoData>
-                <ContenidoData title={t('page.contingut.log.param2')} xs={6}>{entity?.pare?.param2}</ContenidoData>
-            </CardData>
+                </DetailCardContent>
+                <DetailCardContent title={t('page.contingut.log.objecte')}>
+                    {entity?.pare?.mssg} {entity?.pare?.objecteNom ?' - '+entity?.pare?.objecteNom :''}
+                </DetailCardContent>
+                <DetailCardContent title={t('page.contingut.log.param1')} size={6}>{entity?.pare?.param1}</DetailCardContent>
+                <DetailCardContent title={t('page.contingut.log.param2')} size={6}>{entity?.pare?.param2}</DetailCardContent>
+            </DetailCard>
 
-            <CardData title={t('page.contingut.moviment.causa')} hidden={!entity?.moviment}>
-                <ContenidoData title={t('page.contingut.moviment.origen')} xs={6}>#{entity?.moviment?.origen?.id}</ContenidoData>
-                <ContenidoData title={t('page.contingut.moviment.desti')} xs={6}>#{entity?.moviment?.desti?.id}</ContenidoData>
-            </CardData>
-        </Grid>
+            <DetailCard title={t('page.contingut.moviment.causa')} hidden={!entity?.moviment}>
+                <DetailCardContent title={t('page.contingut.moviment.origen')} size={6}>#{entity?.moviment?.origen?.id}</DetailCardContent>
+                <DetailCardContent title={t('page.contingut.moviment.desti')} size={6}>#{entity?.moviment?.desti?.id}</DetailCardContent>
+            </DetailCard>
+        </Grid2>
     </MuiDialog>
 
     return {
@@ -170,16 +172,16 @@ const Auditoria = (props:any) => {
     const { t } = useTranslation();
 
     return <BasePage>
-        <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-            <CardData title={t('page.contingut.history.create')} xs={6}>
-                <ContenidoData title={t('page.contingut.history.user')}>{entity?.createdByFullName}</ContenidoData>
-                <ContenidoData title={t('page.contingut.history.date')} >{formatDate(entity?.createdDate)}</ContenidoData>
-            </CardData>
-            <CardData title={t('page.contingut.history.update')} xs={6}>
-                <ContenidoData title={t('page.contingut.history.user')} >{entity?.lastModifiedByFullName}</ContenidoData>
-                <ContenidoData title={t('page.contingut.history.date')} >{formatDate(entity?.lastModifiedDate)}</ContenidoData>
-            </CardData>
-        </Grid>
+        <Grid2 container direction={"row"} columnSpacing={1} rowSpacing={1}>
+            <DetailCard title={t('page.contingut.history.create')} size={6}>
+                <DetailCardContent title={t('page.contingut.history.user')}>{entity?.createdByFullName}</DetailCardContent>
+                <DetailCardContent title={t('page.contingut.history.date')} >{formatDate(entity?.createdDate)}</DetailCardContent>
+            </DetailCard>
+            <DetailCard title={t('page.contingut.history.update')} size={6}>
+                <DetailCardContent title={t('page.contingut.history.user')} >{entity?.lastModifiedByFullName}</DetailCardContent>
+                <DetailCardContent title={t('page.contingut.history.date')} >{formatDate(entity?.lastModifiedDate)}</DetailCardContent>
+            </DetailCard>
+        </Grid2>
     </BasePage>;
 }
 

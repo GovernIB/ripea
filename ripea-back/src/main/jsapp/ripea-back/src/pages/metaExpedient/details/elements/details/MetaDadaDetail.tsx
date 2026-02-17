@@ -1,28 +1,29 @@
 import {useState} from "react";
-import {Alert, Grid} from "@mui/material";
+import {Alert} from "@mui/material";
 import {useResourceApiService, MuiDialog, useBaseAppContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import Load from "../../../../../components/Load.tsx";
 import {FieldData, MuiDetail} from "../../../../../components/MuiDetail.tsx";
 import {formatDate} from "../../../../../util/dateUtils.ts";
+import {DetailCard} from "../../../../../components/CardData.tsx";
 
 const MetaDadaDetail = (props:any) => {
     const {entity, fields} = props;
     const { t } = useTranslation();
 
     return <MuiDetail entity={entity} fields={fields}>
-        <FieldData field={'codi'}/>
-        <FieldData field={'nom'}/>
-        <FieldData field={'descripcio'}/>
-        <FieldData field={'multiplicitat'}/>
+        <DetailCard>
+            <FieldData field={'codi'}/>
+            <FieldData field={'nom'}/>
+            <FieldData field={'descripcio'}/>
+            <FieldData field={'multiplicitat'}/>
+        </DetailCard>
 
-        <Grid xs={12} sx={{ pl: '8px', pt: '8px' }}>
-            <Alert severity={'info'}>
-                {t('common.auditoria.create', {createdDate: formatDate(entity.createdDate), createdBy: entity.createdByFullName})}
-                {entity.lastModifiedDate != null &&
-                    t('common.auditoria.update', {lastModifiedDate: formatDate(entity.lastModifiedDate), lastModifiedBy: entity.lastModifiedByFullName})}
-            </Alert>
-        </Grid>
+        <Alert severity={'info'}>
+            {t('common.auditoria.create', {createdDate: formatDate(entity.createdDate), createdBy: entity.createdByFullName})}
+            {entity.lastModifiedDate != null &&
+                t('common.auditoria.update', {lastModifiedDate: formatDate(entity.lastModifiedDate), lastModifiedBy: entity.lastModifiedByFullName})}
+        </Alert>
     </MuiDetail>
 }
 

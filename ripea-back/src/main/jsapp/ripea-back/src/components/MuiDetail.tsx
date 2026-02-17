@@ -1,6 +1,6 @@
-import {ContenidoData} from "./CardData.tsx";
+import {DetailCardContent} from "./CardData.tsx";
 import React, { ReactNode } from "react";
-import {Grid} from "@mui/material";
+import {Grid2} from "@mui/material";
 import Load from "./Load.tsx";
 
 export const FieldData = ({ label, field, renderCell = (formattedValue:any) => formattedValue,  children, ...other }: any) => {
@@ -9,9 +9,9 @@ export const FieldData = ({ label, field, renderCell = (formattedValue:any) => f
     const value = f?.options?.[entity?.[field]] ?? entity?.[field];
 
     return (
-        <ContenidoData title={label ?? (f?.label ?? field)} {...other}>
+        <DetailCardContent title={label ?? (f?.label ?? field)} {...other}>
             {children ?? (renderCell(value?.description ?? value))}
-        </ContenidoData>
+        </DetailCardContent>
     );
 };
 
@@ -34,9 +34,9 @@ export const MuiDetail = ({ entity, fields, children }: MuiDetailProps) => {
 
     return (<MuiDetailContext.Provider value={{ entity, getField }}>
         <Load value={entity}>
-            <Grid container sx={{display: "flex", flexDirection: "row", wordWrap: "break-word"}} columnSpacing={1} rowSpacing={1}>
+            <Grid2 container sx={{display: "flex", flexDirection: "row", wordWrap: "break-word"}} columnSpacing={1} rowSpacing={1}>
                 {children}
-            </Grid>
+            </Grid2>
         </Load>
     </MuiDetailContext.Provider>);
 };

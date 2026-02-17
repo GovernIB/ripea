@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {Alert, Grid} from "@mui/material";
+import {Alert} from "@mui/material";
 import {useResourceApiService, MuiDialog, useBaseAppContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import Load from "../../../../../components/Load.tsx";
@@ -7,28 +7,29 @@ import {FieldData, MuiDetail} from "../../../../../components/MuiDetail.tsx";
 import {formatDate} from "../../../../../util/dateUtils.ts";
 import {StyledBadge} from "../../../../../components/StyledBadge.tsx";
 import {StyledPrioritat} from "../../../../expedient/ExpedientGrid.tsx";
+import {DetailCard} from "../../../../../components/CardData.tsx";
 
 const MetaExpTascaDetail = (props:any) => {
     const {entity, fields} = props;
     const { t } = useTranslation();
 
     return <MuiDetail entity={entity} fields={fields}>
-        <FieldData field={'codi'}/>
-        <FieldData field={'nom'}/>
-        <FieldData field={'prioritat'} renderCell={(formattedValue:any) =>
-            <StyledPrioritat entity={entity}>{formattedValue}</StyledPrioritat>}/>
-        <FieldData xs={6} field={'estatCrearTasca'} renderCell={(formattedValue:any) =>
-            <StyledBadge textcolor={'black'} badgecolor={entity?.estatColorCrearTasca} overlap="circular" badgeContent={formattedValue}/>}/>
-        <FieldData xs={6} field={'estatFinalitzarTasca'} renderCell={(formattedValue:any) =>
-            <StyledBadge textcolor={'black'} badgecolor={entity?.estatColorFinalitzarTasca} overlap="circular" badgeContent={formattedValue}/>}/>
+        <DetailCard>
+            <FieldData field={'codi'}/>
+            <FieldData field={'nom'}/>
+            <FieldData field={'prioritat'} renderCell={(formattedValue:any) =>
+                <StyledPrioritat entity={entity}>{formattedValue}</StyledPrioritat>}/>
+            <FieldData size={6} titleSize={8} textSize={4} field={'estatCrearTasca'} renderCell={(formattedValue:any) =>
+                <StyledBadge textcolor={'black'} badgecolor={entity?.estatColorCrearTasca} overlap="circular" badgeContent={formattedValue}/>}/>
+            <FieldData size={6} titleSize={8} textSize={4} field={'estatFinalitzarTasca'} renderCell={(formattedValue:any) =>
+                <StyledBadge textcolor={'black'} badgecolor={entity?.estatColorFinalitzarTasca} overlap="circular" badgeContent={formattedValue}/>}/>
+        </DetailCard>
 
-        <Grid xs={12} sx={{ pl: '8px', pt: '8px' }}>
-            <Alert severity={'info'}>
-                {t('common.auditoria.create', {createdDate: formatDate(entity.createdDate), createdBy: entity.createdByFullName})}
-                {entity.lastModifiedDate != null &&
-                    t('common.auditoria.update', {lastModifiedDate: formatDate(entity.lastModifiedDate), lastModifiedBy: entity.lastModifiedByFullName})}
-            </Alert>
-        </Grid>
+        <Alert severity={'info'}>
+            {t('common.auditoria.create', {createdDate: formatDate(entity.createdDate), createdBy: entity.createdByFullName})}
+            {entity.lastModifiedDate != null &&
+                t('common.auditoria.update', {lastModifiedDate: formatDate(entity.lastModifiedDate), lastModifiedBy: entity.lastModifiedByFullName})}
+        </Alert>
     </MuiDetail>
 }
 

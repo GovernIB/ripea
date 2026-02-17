@@ -197,6 +197,10 @@ export const lightTheme = createTheme(base, {
                 root: {
                     backgroundColor: 'rgba(231,229,229,0.6)',
                     borderBottom: '1px solid #e3e3e3',
+
+                    '&.detail': {
+                        backgroundColor: 'rgba(234,234,234,0.31)',
+                    }
                 }
             },
         },
@@ -276,8 +280,8 @@ export const darkTheme = createTheme(base, {
         MuiCardHeader: {
             styleOverrides: {
                 root: {
-                    backgroundColor: 'inherit !important',
-                    color: 'inherit !important',
+                    backgroundColor: 'inherit',
+                    color: 'inherit',
                     borderBottom: '1px solid white',
                 }
             },

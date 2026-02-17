@@ -1,8 +1,8 @@
 import {useState} from "react";
-import {Alert, Grid, Icon} from "@mui/material";
+import {Alert, Grid2, Icon} from "@mui/material";
 import {MuiDialog, useBaseAppContext, useResourceApiService} from "reactlib";
 import {useTranslation} from "react-i18next";
-import {CardData, ContenidoData} from "../../../components/CardData.tsx";
+import {DetailCard, DetailCardContent} from "../../../components/CardData.tsx";
 import Load from "../../../components/Load.tsx";
 
 export const InteressatDetail = (props: any) => {
@@ -25,42 +25,42 @@ export const InteressatDetail = (props: any) => {
         return tipusVia ?t(`enum.tipusVia.${tipusVia}`) :'';
     }
 
-    return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
+    return <Grid2 container direction={"row"} columnSpacing={1} rowSpacing={1}>
 
         { entity?.incapacitat == true && (!entity?.representant || entity?.representant?.incapacitat) &&
             <Alert severity="warning">{t('page.interessat.alert.incapacitat')}</Alert>
         }
 
-        <CardData title={t('page.interessat.title')}>
-            <ContenidoData title={t('page.interessat.detall.nif')}>{entity?.documentNum}</ContenidoData>
-            <ContenidoData title={`${t('page.interessat.detall.nom')} / ${t('page.interessat.detall.raoSocial')}`}>{entity?.nomComplet} {entity?.raoSocial}</ContenidoData>
-            <ContenidoData title={t('page.interessat.detall.llinatges')}>{entity?.llinatge1} {entity?.llinatge2}</ContenidoData>
-            <ContenidoData title={t('page.interessat.detall.email')}>{entity?.email}</ContenidoData>
-            <ContenidoData title={t('page.interessat.detall.telefon')}>{entity?.telefon}</ContenidoData>
-            <ContenidoData title={t('page.interessat.detall.incapacitat')} hiddenIfEmpty>{entity?.incapacitat}</ContenidoData>
-            <ContenidoData hidden={!!representant || !isShowDireccio} title={<><Icon sx={{mr:1}}>place</Icon>{t('page.interessat.detall.direccioPostal')}</>}>
+        <DetailCard title={t('page.interessat.title')}>
+            <DetailCardContent title={t('page.interessat.detall.nif')} size={4}>{entity?.documentNum}</DetailCardContent>
+            <DetailCardContent title={`${t('page.interessat.detall.nom')} / ${t('page.interessat.detall.raoSocial')}`} size={4}>{entity?.nomComplet} {entity?.raoSocial}</DetailCardContent>
+            <DetailCardContent title={t('page.interessat.detall.llinatges')} size={4}>{entity?.llinatge1} {entity?.llinatge2}</DetailCardContent>
+            <DetailCardContent title={t('page.interessat.detall.email')} size={4}>{entity?.email}</DetailCardContent>
+            <DetailCardContent title={t('page.interessat.detall.telefon')} size={4}>{entity?.telefon}</DetailCardContent>
+            <DetailCardContent title={t('page.interessat.detall.incapacitat')} size={4}>{entity?.incapacitat}</DetailCardContent>
+            <DetailCardContent hidden={!!representant || !isShowDireccio} title={<><Icon sx={{mr:1}}>place</Icon>{t('page.interessat.detall.direccioPostal')}</>} size={6}>
                 {(entity?.adressaTipus == "NACIONAL" || entity?.adressaTipus == "ESTRANGER") && <>{getTipusVia(entity?.adressaTipusVia)} {entity?.adresa} {entity?.adressaNumCasa}</>}
                 {entity?.adressaTipus == "APARTAT_CORREUS" && <>{getTipusVia(entity?.adressaTipusVia)} {entity?.adresa} {entity?.adressaNumCasa} {entity?.adresaApartatCorreus}</>}
                 {entity?.adressaTipus == "SENSE_NORMALITZAR" && <>{entity?.adresa}</>}
-            </ContenidoData>
-            <ContenidoData hidden={!!representant || !isShowDireccio}>{direccion}</ContenidoData>
+            </DetailCardContent>
+            <DetailCardContent hidden={!!representant || !isShowDireccio} size={6}>{direccion}</DetailCardContent>
+        </DetailCard>
 
-            <CardData title={t('page.interessat.rep')} hidden={!representant}>
-                <ContenidoData title={t('page.interessat.detall.nif')}>{representant?.documentNum}</ContenidoData>
-                <ContenidoData title={`${t('page.interessat.detall.nom')} / ${t('page.interessat.detall.raoSocial')}`}>{representant?.nom} {representant?.raoSocial}</ContenidoData>
-                <ContenidoData title={t('page.interessat.detall.llinatges')}>{representant?.llinatge1} {representant?.llinatge2}</ContenidoData>
-                <ContenidoData title={t('page.interessat.detall.email')}>{representant?.email}</ContenidoData>
-                <ContenidoData title={t('page.interessat.detall.telefon')}>{representant?.telefon}</ContenidoData>
-                <ContenidoData title={t('page.interessat.detall.incapacitat')} hiddenIfEmpty>{representant?.incapacitat}</ContenidoData>
-                <ContenidoData hidden={!isShowDireccio} title={<><Icon sx={{mr:1}}>place</Icon>{t('page.interessat.detall.direccioPostal')}</>}>
-                    {(representant?.adressaTipus == "NACIONAL" || representant?.adressaTipus == "ESTRANGER") && <>{getTipusVia(representant?.adressaTipusVia)} {representant?.adresa} {representant?.adressaNumCasa}</>}
-                    {representant?.adressaTipus == "APARTAT_CORREUS" && <>{getTipusVia(representant?.adressaTipusVia)} {representant?.adresa} {representant?.adressaNumCasa} {representant?.adresaApartatCorreus}</>}
-                    {representant?.adressaTipus == "SENSE_NORMALITZAR" && <>{representant?.adresa}</>}
-                </ContenidoData>
-                <ContenidoData hidden={!isShowDireccio}>{direccion}</ContenidoData>
-            </CardData>
-        </CardData>
-    </Grid>
+        <DetailCard title={t('page.interessat.rep')} hidden={!representant}>
+            <DetailCardContent title={t('page.interessat.detall.nif')} size={4}>{representant?.documentNum}</DetailCardContent>
+            <DetailCardContent title={`${t('page.interessat.detall.nom')} / ${t('page.interessat.detall.raoSocial')}`} size={4}>{representant?.nom} {representant?.raoSocial}</DetailCardContent>
+            <DetailCardContent title={t('page.interessat.detall.llinatges')} size={4}>{representant?.llinatge1} {representant?.llinatge2}</DetailCardContent>
+            <DetailCardContent title={t('page.interessat.detall.email')} size={4}>{representant?.email}</DetailCardContent>
+            <DetailCardContent title={t('page.interessat.detall.telefon')} size={4}>{representant?.telefon}</DetailCardContent>
+            <DetailCardContent title={t('page.interessat.detall.incapacitat')} size={4}>{representant?.incapacitat}</DetailCardContent>
+            <DetailCardContent hidden={!isShowDireccio} title={<><Icon sx={{mr:1}}>place</Icon>{t('page.interessat.detall.direccioPostal')}</>} size={6}>
+                {(representant?.adressaTipus == "NACIONAL" || representant?.adressaTipus == "ESTRANGER") && <>{getTipusVia(representant?.adressaTipusVia)} {representant?.adresa} {representant?.adressaNumCasa}</>}
+                {representant?.adressaTipus == "APARTAT_CORREUS" && <>{getTipusVia(representant?.adressaTipusVia)} {representant?.adresa} {representant?.adressaNumCasa} {representant?.adresaApartatCorreus}</>}
+                {representant?.adressaTipus == "SENSE_NORMALITZAR" && <>{representant?.adresa}</>}
+            </DetailCardContent>
+            <DetailCardContent hidden={!isShowDireccio} size={6}>{direccion}</DetailCardContent>
+        </DetailCard>
+    </Grid2>
 }
 
 const perspectives = ['REPRESENTANT', 'ADRESSA']
@@ -100,7 +100,7 @@ const useInteressatDetail = () => {
             open={open}
             closeCallback={handleClose}
             title={t('page.interessat.action.detail.title')}
-            componentProps={{fullWidth: true, maxWidth: 'sm'}}
+            componentProps={{fullWidth: true, maxWidth: 'md'}}
             buttons={[
                 {
                     value: 'close',
