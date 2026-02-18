@@ -72,10 +72,8 @@ public class AclSidResourceServiceImpl extends BaseMutableResourceService<AclSid
 
         Map<String, String> mapaNamedQueries = Utils.namedQueriesToMap(namedQueries);
         if (!mapaNamedQueries.isEmpty()) {
-            if (mapaNamedQueries.containsKey(AclSidResource.ClassType.ENTITY.name())) {
-                String entitatActualCodi = configHelper.getEntitatActualCodi();
-                EntitatResourceEntity entitat = entitatResourceRepository.findByCodi(entitatActualCodi);
-                filters.add(filterObject(EntitatEntity.class.getName(), String.valueOf(entitat.getId())));
+            if (mapaNamedQueries.containsKey(AclSidResource.ClassType.ENTITY.name()) && mapaNamedQueries.get(AclSidResource.ClassType.ENTITY.name()) != null) {
+                filters.add(filterObject(EntitatEntity.class.getName(), mapaNamedQueries.get(AclSidResource.ClassType.ENTITY.name())));
             }
             if (mapaNamedQueries.containsKey(AclSidResource.ClassType.GRUP.name()) && mapaNamedQueries.get(AclSidResource.ClassType.GRUP.name()) != null) {
                 filters.add(filterObject(GrupEntity.class.getName(), mapaNamedQueries.get(AclSidResource.ClassType.GRUP.name())));
@@ -120,9 +118,7 @@ public class AclSidResourceServiceImpl extends BaseMutableResourceService<AclSid
                     permis.setAdministrationLectura(params.isAdminLectura());
                     permis.setRead(params.isUser());
 
-                    String entitatActualCodi = configHelper.getEntitatActualCodi();
-                    EntitatResourceEntity entitat = entitatResourceRepository.findByCodi(entitatActualCodi);
-                    permisosHelper.updatePermis(entitat.getId(), EntitatEntity.class, permis);
+                    permisosHelper.updatePermis(params.getObjectId(), EntitatEntity.class, permis);
                     break;
                 case GRUP:
                     permis.setRead(true);
@@ -243,9 +239,7 @@ public class AclSidResourceServiceImpl extends BaseMutableResourceService<AclSid
 
             switch (params.getClassType()) {
                 case ENTITY:
-                    String entitatActualCodi = configHelper.getEntitatActualCodi();
-                    EntitatResourceEntity entitat = entitatResourceRepository.findByCodi(entitatActualCodi);
-                    permisosHelper.updatePermis(entitat.getId(), EntitatEntity.class, permis);
+                    permisosHelper.updatePermis(params.getObjectId(), EntitatEntity.class, permis);
                     break;
                 case GRUP:
                     permisosHelper.updatePermis(params.getObjectId(), GrupEntity.class, permis);

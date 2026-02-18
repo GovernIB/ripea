@@ -150,6 +150,8 @@ const translationEs = {
         expedient: "Buscador de expedientes",
         expedientPeticio: "Buscador de anotaciones de registro",
         usuariTasca: "Tareas",
+        entitat: "Gestión de entidades",
+        avis: "Gestión de avisos",
         massiu: {
             portafirmes: "Acción masiva: enviar documentos al portafirmas",
             firmasimpleweb: "Acción masiva: firmar documentos desde el navegador",
@@ -1621,6 +1623,67 @@ const translationEs = {
                 },
                 delete: {
                     ok: "Dominio eliminado correctamente",
+                },
+            },
+        },
+        entitat: {
+            title: "Entidad",
+            form: {
+                temaClar: "Configuración para el tema claro",
+                temaFosc: "Configuración para el tema oscuro",
+            },
+            action: {
+                new: {
+                    label: "Nueva entidad",
+                    ok: "Entidad creada correctamente",
+                },
+                update: {
+                    ok: "Entidad modificada correctamente",
+                },
+                delete: {
+                    ok: "Entidad eliminada correctamente",
+                },
+                config: {
+                    label: "Configurar",
+                },
+                activar: {
+                    label: "Activar",
+                    ok: "Entidad activada",
+                },
+                desactivar: {
+                    label: "Desactivar",
+                    ok: "Entidad desactivada",
+                },
+            },
+        },
+        avis: {
+            title: "Aviso",
+            action: {
+                new: {
+                    label: "Nuevo aviso",
+                    ok: "Aviso creado correctamente",
+                },
+                update: {
+                    ok: "Aviso modificado correctamente",
+                },
+                delete: {
+                    ok: "Aviso eliminado correctamente",
+                },
+                activar: {
+                    label: "Activar",
+                    ok: "Aviso activado",
+                },
+                desactivar: {
+                    label: "Desactivar",
+                    ok: "Aviso desactivado",
+                },
+            },
+        },
+        pinbalServei: {
+            title: "Servicio Pinbal",
+            action: {
+                update: {
+                    ok: "Servicio Pinbal modificado correctamente",
                 },
             },
         },

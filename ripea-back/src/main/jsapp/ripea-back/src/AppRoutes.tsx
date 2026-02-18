@@ -39,6 +39,9 @@ import {UrlInstruccioGrid} from "./pages/user/configurar/UrlInstruccioGrid.tsx";
 import {MetaExpedientElements} from "./pages/metaExpedient/details/MetaExpedientElements.tsx";
 import MetaExpedientTascaValidacioGrid
     from "./pages/metaExpedient/details/elements/MetaExpedientTascaValidacioGrid.tsx";
+import {EntitatGrid} from "./pages/entitat/EntitatGrid.tsx";
+import {AvisGrid} from "./pages/avis/AvisGrid.tsx";
+import {ServeiPinbalGrid} from "./pages/user/configurar/ServeiPinbalGrid.tsx";
 
 const ProtectedRoute = ({ allowedRoles = [], params = [] }: any) => {
     const {value: user} = useUserSession();
@@ -61,6 +64,13 @@ const AppRoutes: React.FC = () => {
         <Route path="contingut/:id/tasca/:tascaId" element={<Tasca />} />
         <Route path="expedientPeticio" element={<AnotacionsGrid />} />
         <Route path="usuariTasca" element={<TasquesGrid />} />
+
+        <Route element={<ProtectedRoute allowedRoles={['IPA_SUPER']} />}>
+            <Route path={"entitat"} element={<EntitatGrid />} />
+            <Route path={"entitat/:id/permis"} element={<PermisEntitatGrid/>} />
+            <Route path={"avis"} element={<AvisGrid/>} />
+            <Route path={"pinbalServei"} element={<ServeiPinbalGrid/>} />
+        </Route>
 
         {/* Accions massives */}
         <Route element={<ProtectedRoute allowedRoles={['IPA_ADMIN', 'IPA_ORGAN_ADMIN', 'tothom']} />}>

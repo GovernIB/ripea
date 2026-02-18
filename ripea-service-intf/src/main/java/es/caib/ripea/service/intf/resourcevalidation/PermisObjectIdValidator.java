@@ -15,8 +15,7 @@ public class PermisObjectIdValidator implements ConstraintValidator<PermisObject
 	public boolean isValid(AclSidResource.DeletePermisionFormAction resource, ConstraintValidatorContext context) {
         boolean valid = true;
 
-        if (!AclSidResource.ClassType.ENTITY.equals(resource.getClassType())
-                && !AclSidResource.ClassType.MET_EXP_ORG.equals(resource.getClassType())
+        if (!AclSidResource.ClassType.MET_EXP_ORG.equals(resource.getClassType())
                 && resource.getObjectId() == null
         ){
             context

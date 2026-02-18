@@ -150,6 +150,8 @@ const translationEn = {
         expedient: "Case search",
         expedientPeticio: "Registry entries search",
         usuariTasca: "Tasks",
+        entitat: "Entity management",
+        avis: "Notice management",
         massiu: {
             portafirmes: "Mass action: send documents to the signature portal",
             firmasimpleweb: "Mass action: sign documents from the browser",
@@ -1621,6 +1623,67 @@ const translationEn = {
                 },
                 delete: {
                     ok: "Domain deleted successfully",
+                },
+            },
+        },
+        entitat: {
+            title: "Entity",
+            form: {
+                temaClar: "Light theme configuration",
+                temaFosc: "Dark theme configuration",
+            },
+            action: {
+                new: {
+                    label: "New entity",
+                    ok: "Entity successfully created",
+                },
+                update: {
+                    ok: "Entity successfully updated",
+                },
+                delete: {
+                    ok: "Entity successfully deleted",
+                },
+                config: {
+                    label: "Configure",
+                },
+                activar: {
+                    label: "Activate",
+                    ok: "Entity activated",
+                },
+                desactivar: {
+                    label: "Deactivate",
+                    ok: "Entity deactivated",
+                },
+            },
+        },
+        avis: {
+            title: "Notice",
+            action: {
+                new: {
+                    label: "New notice",
+                    ok: "Notice successfully created",
+                },
+                update: {
+                    ok: "Notice successfully updated",
+                },
+                delete: {
+                    ok: "Notice successfully deleted",
+                },
+                activar: {
+                    label: "Activate",
+                    ok: "Notice activated",
+                },
+                desactivar: {
+                    label: "Deactivate",
+                    ok: "Notice deactivated",
+                },
+            },
+        },
+        pinbalServei: {
+            title: "Pinbal service",
+            action: {
+                update: {
+                    ok: "Pinbal service successfully updated",
                 },
             },
         },
