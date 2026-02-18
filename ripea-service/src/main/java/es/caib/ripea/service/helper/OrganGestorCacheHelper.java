@@ -16,6 +16,7 @@ import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
 
 import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.service.intf.dto.OrganismeDto;
 import lombok.extern.slf4j.Slf4j;
@@ -39,8 +40,7 @@ public class OrganGestorCacheHelper {
     }
 
     @CacheEvict(value = "codisOrgansFills", allEntries = true)
-    public void evictGetCodisOrgansFills() {
-    }
+    public void evictGetCodisOrgansFills() {}
 
     private List<String> getCodisOrgansGestorsFills(Map<String, OrganismeDto> organigrama, String codiDir3) {
 
@@ -61,7 +61,10 @@ public class OrganGestorCacheHelper {
         if (organs!=null) {
         	EntitatEntity ee = entityComprovarHelper.comprovarEntitat(codiEntitat);
             for (String organ: organs) {
-                resultat.add(organGestorRepository.findByEntitatIdAndCodi(ee.getId(), organ).getId());
+            	OrganGestorEntity ogE = organGestorRepository.findByEntitatIdAndCodi(ee.getId(), organ);
+            	if (ogE!=null) {
+            		resultat.add(ogE.getId());
+            	}
             }
         }
         return resultat;
