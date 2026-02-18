@@ -3,13 +3,27 @@
  */
 package es.caib.ripea.persistence.entity;
 
-import es.caib.ripea.service.intf.config.BaseConfig;
-import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
-import lombok.Getter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.*;
+import es.caib.ripea.service.intf.config.BaseConfig;
+import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
+import lombok.Getter;
 
 /**
  * Classe del model de dades que representa una carpeta.
@@ -27,6 +41,19 @@ public class CarpetaEntity extends ContingutEntity {
 	@ForeignKey(name = BaseConfig.DB_PREFIX + "carpeta_exprel_fk")
 	private ExpedientEntity expedientRelacionat;
 	
+	@Column(name = "restringida", nullable = false)
+	private Boolean restringida = false;
+	
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "responsable_restriccio_codi")
+    private UsuariEntity responsableRestriccio;    
+	
+	@Column(name = "motiu_restriccio")
+	private String motiuRestriccio;
+	
+	@OneToMany(mappedBy = "carpeta", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<CarpetaRestriccioEntity> restriccions = new ArrayList<>();
+	
 	public void updateNom(
 			String nom) {
 		this.nom = nom;
@@ -35,7 +62,40 @@ public class CarpetaEntity extends ContingutEntity {
 	public void updateExpedientRelacionat(ExpedientEntity expedientRelacionat) {
 		this.expedientRelacionat = expedientRelacionat;
 	}
-	
+
+	public void updateRestriccio(boolean restringida, String motiuRestriccio, List<UsuariEntity> usuarisRestriccio, UsuariEntity responsableRestriccio) {
+		this.restringida = restringida;
+		this.motiuRestriccio = motiuRestriccio;
+		this.responsableRestriccio = responsableRestriccio;
+		
+	    Map<String, CarpetaRestriccioEntity> actuales = this.restriccions.stream()
+	            .collect(Collectors.toMap(r -> r.getUsuari().getCodi(), r -> r));
+	    
+	    for (UsuariEntity usuari : usuarisRestriccio) {
+	        if (!actuales.containsKey(usuari.getCodi())) {
+	        	addUsuariRestriccio(usuari);
+	        }
+	    }
+	    
+	    this.restriccions.removeIf(r -> usuarisRestriccio.stream()
+	            .noneMatch(u -> u.getCodi().equals(r.getUsuari().getCodi())));
+	    
+	    if (! restringida) {
+	    	this.motiuRestriccio= null; 
+	    	this.restriccions.clear();
+	    }
+	}
+
+	private void addUsuariRestriccio(UsuariEntity usuari) {
+	    CarpetaRestriccioEntity rel = new CarpetaRestriccioEntity();
+	    rel.setId(new CarpetaRestriccioUsuariId(this.getId(), usuari.getCodi()));
+	    rel.setCarpeta(this);
+	    rel.setUsuari(usuari);
+	    
+	    restriccions.add(rel);
+	}
+
+
 	public static Builder getBuilder(
 			String nom,
 			ContingutEntity pare,

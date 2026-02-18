@@ -58,6 +58,7 @@ import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.exception.PermissionDeniedException;
 import es.caib.ripea.service.intf.exception.ValidationException;
+import es.caib.ripea.service.intf.service.ExpedientService;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.permission.ExtendedPermission;
 
@@ -91,6 +92,7 @@ public class EntityComprovarHelper {
 	@Autowired private ConfigHelper configHelper;
     @Autowired private OrganGestorCacheHelper organGestorCacheHelper;
     @Autowired private MetaExpedientHelper metaExpedientHelper;
+    @Autowired private ExpedientService expedientService;
 
 	public EntitatEntity comprovarEntitat(String entitatCodi) throws NotFoundException {
 		EntitatEntity entitat = entitatRepository.findByCodi(entitatCodi);
@@ -191,12 +193,15 @@ public class EntityComprovarHelper {
 			boolean esAdministradorOLectorEntitat = auth != null && permisosHelper.isGrantedAny(entitatId,
 			        EntitatEntity.class,
 			        new Permission[] { ExtendedPermission.ADMINISTRATION, ExtendedPermission.READ }, auth);
-			List<OrganGestorEntity> organs = organGestorHelper.findAmbEntitatPermis(
-					entitat,
-					ExtendedPermission.ADMINISTRATION);
-			if (!esAdministradorOLectorEntitat && (organs == null || organs.isEmpty())) {
-				throw new PermissionDeniedException(entitatId, EntitatEntity.class, auth.getName(),
-				        "ADMINISTRATION || READ || ORGAN");
+
+			List<OrganGestorEntity> organsAdmin = organGestorHelper.findAmbEntitatPermis(entitat, ExtendedPermission.ADMINISTRATION);
+			List<OrganGestorEntity> organsDisseny = organGestorHelper.findAmbEntitatPermis(entitat, ExtendedPermission.DISSENY);
+			
+			boolean senseOrgansAmbPermisos =	(organsAdmin == null || organsAdmin.isEmpty()) && 
+												(organsDisseny == null || organsDisseny.isEmpty());
+			
+			if (!esAdministradorOLectorEntitat && senseOrgansAmbPermisos) {
+				throw new PermissionDeniedException(entitatId, EntitatEntity.class, auth.getName(), "ADMINISTRATION || READ || ORGAN");
 			}
 		}
 		
@@ -204,12 +209,15 @@ public class EntityComprovarHelper {
 			boolean esAdministradorEntitat = auth != null && permisosHelper.isGrantedAny(entitatId,
 			        EntitatEntity.class,
 			        new Permission[] { ExtendedPermission.ADMINISTRATION}, auth);
-			List<OrganGestorEntity> organs = organGestorHelper.findAmbEntitatPermis(
-					entitat,
-					ExtendedPermission.ADMINISTRATION);
-			if (!esAdministradorEntitat && (organs == null || organs.isEmpty())) {
-				throw new PermissionDeniedException(entitatId, EntitatEntity.class, auth.getName(),
-				        "ADMINISTRATION || READ || ORGAN");
+			
+			List<OrganGestorEntity> organsAdmin = organGestorHelper.findAmbEntitatPermis(entitat, ExtendedPermission.ADMINISTRATION);
+			List<OrganGestorEntity> organsDisseny = organGestorHelper.findAmbEntitatPermis(entitat, ExtendedPermission.DISSENY);
+			
+			boolean senseOrgansAmbPermisos =	(organsAdmin == null || organsAdmin.isEmpty()) && 
+												(organsDisseny == null || organsDisseny.isEmpty());
+			
+			if (!esAdministradorEntitat && senseOrgansAmbPermisos) {
+				throw new PermissionDeniedException(entitatId, EntitatEntity.class, auth.getName(), "ADMINISTRATION || ORGAN");
 			}
 		}
 		return entitat;
@@ -776,8 +784,9 @@ public class EntityComprovarHelper {
 				false);
 		
 		boolean permisosAdminEntitatOAdminOrgan = comprovarAdminEntitatOAdminOrganDelExpedient(expedient);
+		boolean isExpedientPendentExecucioMassiva = expedientService.isExpedientPendentExecucioMassiva(expedient.getId());
 		
-		if (((expedientAgafatPerUsuariActual && usuariActualWrite) || permisosAdminEntitatOAdminOrgan) && expedient.getEstat() == ExpedientEstatEnumDto.OBERT) {
+		if (((expedientAgafatPerUsuariActual && usuariActualWrite) || permisosAdminEntitatOAdminOrgan) && expedient.getEstat() == ExpedientEstatEnumDto.OBERT && ! isExpedientPendentExecucioMassiva) {
 			return true;
 		} else {
 			return false;

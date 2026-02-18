@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -44,6 +45,9 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 	@Query(	"select e.relacionatsAmb from ExpedientEntity e where e.id = :expedientId")
 	List<ExpedientEntity> findRelacionatsAmb(@Param("expedientId") Long expedientId);
 
+	@Query("SELECT DISTINCT e.metaNode.id FROM ExpedientEntity e WHERE e.id IN :expedientIds")
+    List<Long> findDistinctProcedimentIds(@Param("expedientIds") Set<Long> expedientIds);
+	
 	@Query(	"select " +
 			"    e.id " +
 			"from " +
@@ -626,6 +630,8 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"		or document.estat = es.caib.ripea.service.intf.dto.DocumentEstatEnumDto.FIRMA_PENDENT_VIAFIRMA " +
 			"		or document.estat = es.caib.ripea.service.intf.dto.DocumentEstatEnumDto.FIRMA_PARCIAL)) = 0 " +
 			"and (select count(document) from DocumentEntity document where document.expedient = e and document.esborrat = 0) > 0 " +   // at least one document no esborrat
+			"and (select count(document) from DocumentEntity document where " + // no documents sense metadocument
+			"	document.expedient = e and document.metaDocument is null) = 0 " +			
 			"and (select " +
 			"	     	count(metaDada) " +
 			"	  from " +
@@ -845,9 +851,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("expedientsId") Collection<Long> expedientsId,
 			@Param("prioritat") String  prioritat);
 
-	List<ExpedientEntity> findByMetaExpedientAndEsborrat(
-			MetaExpedientEntity metaExpedient, 
-			int esborrat);
+	List<ExpedientEntity> findByMetaExpedientIdAndEsborrat(Long metaExpedientId, int esborrat);
 	
 	List<ExpedientEntity> findByEntitatAndMetaExpedientAndEstatAndEsborrat(
 			EntitatEntity entitat,

@@ -36,10 +36,8 @@ const FormActionDialog = (props:FormActionDialogProp) => {
         children,
         apiRef,
         formDialogResultProcessor,
-        onSuccess = () => temporalMessageShow(null, '', 'success'),
-        onError = (error:any) => {
-            error?.message && temporalMessageShow(null, error?.description, 'error');
-        },
+        onSuccess,
+        onError = (error:any) => error?.message && temporalMessageShow(null, error?.message, 'error'),
         onClose,
 		onSubmit
     } = props;
@@ -94,7 +92,7 @@ export const FormReportDialog = (props:FormReportDialogProp) => {
         children,
         apiRef,
         formDialogResultProcessor,
-        onSuccess = () => temporalMessageShow(null, '', 'info'),
+        onSuccess,
         onError = (error:any) => error?.message && temporalMessageShow(null, error?.message, 'error'),
     } = props;
 

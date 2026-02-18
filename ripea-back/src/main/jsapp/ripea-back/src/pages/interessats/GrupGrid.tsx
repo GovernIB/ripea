@@ -100,7 +100,8 @@ export const GrupGrid = (props:any) => {
             resourceName="interessatGrupResource"
             popupEditFormDialogResourceTitle={t('page.interessat.grup.title')}
             columns={columns}
-            height={110 + 52 * 4}
+            autoHeight
+            paginationModel={{page: 0, pageSize: 5}}
             filter={builder.eq('expedient.id', entity?.id)}
             staticSortModel={sortModel}
             perspectives={perspectives}
@@ -121,7 +122,7 @@ export const GrupGrid = (props:any) => {
         />
     </BasePage>
 }
-export const useGrupGridDialog = (entity:any) => {
+export const useGrupGridDialog = (entity:any, refresh?: () => void) => {
     const { t } = useTranslation();
 
     const [open, setOpen] = useState(false);
@@ -133,10 +134,11 @@ export const useGrupGridDialog = (entity:any) => {
     const handleClose = (reason?: string) => {
         if(reason !== 'backdropClick') {
             setOpen(false);
+            refresh?.()
         }
     };
 
-    let buttons :any[] = [
+    const buttons :any[] = [
         {
             value: 'close',
             text: t('common.close'),

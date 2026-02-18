@@ -25,7 +25,6 @@ import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.fundaciobit.apisib.apifirmasimple.v1.beans.FirmaSimpleStartTransactionRequest;
-import org.hibernate.Hibernate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +37,7 @@ import es.caib.ripea.persistence.entity.DocumentEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.ViaFirmaUsuariEntity;
+import es.caib.ripea.persistence.entity.resourceentity.DadaResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.DocumentResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.ExpedientResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.InteressatGrupResourceEntity;
@@ -68,6 +68,7 @@ import es.caib.ripea.service.helper.DocumentHelper;
 import es.caib.ripea.service.helper.DocumentNotificacioHelper;
 import es.caib.ripea.service.helper.EmailHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
+import es.caib.ripea.service.helper.EventHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
 import es.caib.ripea.service.helper.ExecucioMassivaHelper;
 import es.caib.ripea.service.helper.ExpedientHelper;
@@ -107,7 +108,6 @@ import es.caib.ripea.service.intf.dto.ElementTipusEnumDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaContingutDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaTipusDto;
-import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.InteressatDocumentTipusEnumDto;
 import es.caib.ripea.service.intf.dto.InteressatTipusEnum;
@@ -126,6 +126,7 @@ import es.caib.ripea.service.intf.dto.ViaFirmaDispositiuDto;
 import es.caib.ripea.service.intf.dto.ViaFirmaEnviarDto;
 import es.caib.ripea.service.intf.exception.ValidationException;
 import es.caib.ripea.service.intf.model.ContingutResource;
+import es.caib.ripea.service.intf.model.DadaResource;
 import es.caib.ripea.service.intf.model.DocumentResource;
 import es.caib.ripea.service.intf.model.DocumentResource.IniciarFirmaNavegador;
 import es.caib.ripea.service.intf.model.DocumentResource.NewDocPinbalForm;
@@ -138,9 +139,8 @@ import es.caib.ripea.service.intf.model.ExpedientResource;
 import es.caib.ripea.service.intf.model.InteressatGrupResource;
 import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.model.MetaDocumentResource;
-import es.caib.ripea.service.intf.model.MetaExpedientResource;
 import es.caib.ripea.service.intf.model.NodeResource.MassiveAction;
-import es.caib.ripea.service.intf.model.RegistreAnnexResource;
+import es.caib.ripea.service.intf.model.sse.ErrorsValidacioChangedEvent;
 import es.caib.ripea.service.intf.model.UsuariResource;
 import es.caib.ripea.service.intf.resourceservice.DocumentResourceService;
 import es.caib.ripea.service.intf.service.AplicacioService;
@@ -161,12 +161,12 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     private final EmailHelper emailHelper;
     private final ExpedientHelper expedientHelper;
     private final CacheHelper cacheHelper;
+    private final EventHelper eventHelper;
     private final DocumentHelper documentHelper;
     private final ContingutHelper contingutHelper;
     private final ExcepcioLogHelper excepcioLogHelper;
     private final DocumentNotificacioHelper documentNotificacioHelper;
     private final EntityComprovarHelper entityComprovarHelper;
-    private final RolHelper rolHelper;
 	private final DocumentFirmaPortafirmesHelper firmaPortafirmesHelper;
 	private final DocumentFirmaViaFirmaHelper firmaViaFirmaHelper;
 	private final UsuariHelper usuariHelper;
@@ -196,6 +196,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         register(DocumentResource.PERSPECTIVE_ARXIU_DOCUMENT_CODE, new ArxiuDocumentPerspectiveApplicator());
         register(DocumentResource.PERSPECTIVE_PATH_CODE, new PathPerspectiveApplicator());
         register(DocumentResource.PERSPECTIVE_FIRMES_CODE, new FirmesPerspectiveApplicator());
+        register(DocumentResource.PERSPECTIVE_PROCEDIMENT_CODE, new ProcedimentPerspectiveApplicator());
         register(DocumentResource.Fields.adjunt, new AdjuntFieldDownloader());
         register(DocumentResource.Fields.firmaAdjunt, new FirmaFieldDownloader());
         register(DocumentResource.Fields.imprimible, new ImprimibleFieldDownloader());
@@ -239,21 +240,27 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     	Filter filtreUsuari = (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null;
         Filter filtreBase = FilterBuilder.and(
         		filtreUsuari,
-                FilterBuilder.equal(MetaExpedientResource.Fields.entitat + "." + EntitatResource.Fields.codi, 
+                FilterBuilder.equal(ContingutResource.Fields.entitat + "." + EntitatResource.Fields.codi,
                 		entitatActualCodi != null?entitatActualCodi:"................................................................................")
         );
+        
         //Filtres opcionals, dependran de la namedQuery
         Filter filtreMetaExpedientsPermesos = null;
+        Filter filtreDocumentsNotArxiuIds = null;
         Filter filtreEstatDocument = null;
         Filter filtrePfActiu = null;
         Filter filtreExpedientObert = null;
         Filter filtreNoAdjunt = null;
         Filter filtreArxiuPendents = null;
+        Filter filtreNoEsborrat = null;
+        Filter filtreTipusDoc = null;
 
         Map<String, String> mapaNamedQueries =  Utils.namedQueriesToMap(namedQueries);
     	if (mapaNamedQueries.size()>0) {
     		
     		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitat.getId(), rolActual);
+    		boolean nomesAgafats = !rolActual.equals("IPA_ADMIN") && !rolActual.equals("IPA_ORGAN_ADMIN");
+    		String codiUsuariActual = SecurityContextHolder.getContext().getAuthentication().getName();
     		
     		if (metaExpedientsPermesos==null || metaExpedientsPermesos.size()==0) {
 				//Sense permisos
@@ -265,67 +272,82 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     			mapaNamedQueries.containsKey("MASSIU_PENDENT_ARXIU") ||
     			mapaNamedQueries.containsKey("MASSIU_ENLLAC_CSV")) {
 	    			
-				List<Long> metaExpedientsPermesosIds = new ArrayList<Long>();			
+    			if (mapaNamedQueries.containsKey("MASSIU_PENDENT_ARXIU")) {
+        			
+        			List<Long> idsArxiusPendents = documentRepository.findIdsArxiuPendents(
+        					entitat,
+        					metaExpedientsPermesos,
+        					nomesAgafats,
+        					codiUsuariActual,
+        					true, null,
+        					true, null,
+        					true, null,
+        					true, null,
+        					true, null);
+        			
+    		    	List<String> permesosClausulesIn = Utils.getIdsEnGruposMil(idsArxiusPendents);
+    		        for (String aux: permesosClausulesIn) {
+    			        if (aux != null && !aux.isEmpty()) {
+    			        	filtreDocumentsNotArxiuIds = FilterBuilder.or(filtreDocumentsNotArxiuIds, Filter.parse("id IN (" + aux + ")"));
+    			        }
+    		        }
+        			
+        		} else {    			
     			
-				for (MetaExpedientEntity mex: metaExpedientsPermesos) {
-					metaExpedientsPermesosIds.add(mex.getId());
-				}
-				
-    			String procedimentId = DocumentResource.Fields.expedient + "." + ExpedientResource.Fields.metaExpedient + ".id";
-		    	List<String> permesosClausulesIn = Utils.getIdsEnGruposMil(metaExpedientsPermesosIds);
-		        for (String aux: permesosClausulesIn) {
-			        if (aux != null && !aux.isEmpty()) {
-			        	filtreMetaExpedientsPermesos = FilterBuilder.or(filtreMetaExpedientsPermesos, Filter.parse(procedimentId + " IN (" + aux + ")"));
+					List<Long> metaExpedientsPermesosIds = new ArrayList<Long>();			
+	    			
+					for (MetaExpedientEntity mex: metaExpedientsPermesos) {
+						metaExpedientsPermesosIds.add(mex.getId());
+					}
+					
+	    			String procedimentId = DocumentResource.Fields.expedient + "." + ExpedientResource.Fields.metaExpedient + ".id";
+			    	List<String> permesosClausulesIn = Utils.getIdsEnGruposMil(metaExpedientsPermesosIds);
+			        for (String aux: permesosClausulesIn) {
+				        if (aux != null && !aux.isEmpty()) {
+				        	filtreMetaExpedientsPermesos = FilterBuilder.or(filtreMetaExpedientsPermesos, Filter.parse(procedimentId + " IN (" + aux + ")"));
+				        }
 			        }
-		        }
-
-		        String documentEsborratField = ContingutResource.Fields.esborrat;
-		        Filter filtreNoEsborrat = FilterBuilder.equal(documentEsborratField, 0); //NO BORRAT
-		        
-		        String documentTipusField = DocumentResource.Fields.documentTipus;
-		        Filter filtreTipusDoc = FilterBuilder.equal(documentTipusField, DocumentTipusEnumDto.DIGITAL.toString()); //DIGITAL
-		        
-		        if (mapaNamedQueries.containsKey("MASSIU_ENLLAC_CSV")) {
-		        	String documentEstatField = DocumentResource.Fields.estat;
-		        	filtreEstatDocument = FilterBuilder.or(
-		        		FilterBuilder.equal(documentEstatField, DocumentEstatEnumDto.FIRMAT.toString()),
-		        		FilterBuilder.equal(documentEstatField, DocumentEstatEnumDto.CUSTODIAT.toString()),
-		        		FilterBuilder.equal(documentEstatField, DocumentEstatEnumDto.DEFINITIU.toString())
-    				);
-
-			        String docAdjuntField = DocumentResource.Fields.gesDocAdjuntId;
-			        filtreNoAdjunt = FilterBuilder.isNull(docAdjuntField);
-
-		        } else {
-
-			        String documentEstatField = DocumentResource.Fields.estat;
-			        filtreEstatDocument = FilterBuilder.equal(documentEstatField, DocumentEstatEnumDto.REDACCIO.toString()); //ESBORRANY
-
-			        if (mapaNamedQueries.containsKey("MASSIU_PORTAFIRMES")) {
-			        	String metaDocPortafirmes = DocumentResource.Fields.metaDocument + "." + MetaDocumentResource.Fields.firmaPortafirmesActiva;
-			        	filtrePfActiu = FilterBuilder.equal(metaDocPortafirmes, true); //ENVIAMENT A PF ACTIU EN EL PROCEDIMENT
-				        String docAdjuntField = DocumentResource.Fields.gesDocAdjuntId;
-				        filtreNoAdjunt = FilterBuilder.isNull(docAdjuntField);
-			        } else if (mapaNamedQueries.containsKey("MASSIU_PASARELA")) {
-			        	String metaDocPortafirmes = DocumentResource.Fields.metaDocument + "." + MetaDocumentResource.Fields.firmaPassarelaActiva;
-			        	filtrePfActiu = FilterBuilder.equal(metaDocPortafirmes, true); //ENVIAMENT A PF ACTIU EN EL PROCEDIMENT
-				        String docAdjuntField = DocumentResource.Fields.gesDocAdjuntId;
-				        filtreNoAdjunt = FilterBuilder.isNull(docAdjuntField);
-			        } else if (mapaNamedQueries.containsKey("MASSIU_PENDENT_ARXIU")) {
-				        String estatExpField = ExpedientResource.Fields.estat;
-				        filtreExpedientObert = FilterBuilder.equal(estatExpField, ExpedientEstatEnumDto.OBERT.toString());
-				        
-	            		filtreArxiuPendents = FilterBuilder.or(
-	    					Filter.parse(ContingutResource.Fields.arxiuUuid+" IS NULL"),
-	    					Filter.parse(DocumentResource.Fields.annexos + "." + RegistreAnnexResource.Fields.error + " IS NOT NULL"),
-	    					Filter.parse(DocumentResource.Fields.gesDocFirmatId + " IS NOT NULL")
+	
+			        String documentEsborratField = ContingutResource.Fields.esborrat;
+			        filtreNoEsborrat = FilterBuilder.equal(documentEsborratField, 0); //NO BORRAT
+			        
+			        String documentTipusField = DocumentResource.Fields.documentTipus;
+			        filtreTipusDoc = FilterBuilder.equal(documentTipusField, DocumentTipusEnumDto.DIGITAL.toString()); //DIGITAL
+			        
+			        if (mapaNamedQueries.containsKey("MASSIU_ENLLAC_CSV")) {
+			        	String documentEstatField = DocumentResource.Fields.estat;
+			        	filtreEstatDocument = FilterBuilder.or(
+			        		FilterBuilder.equal(documentEstatField, DocumentEstatEnumDto.FIRMAT.toString()),
+			        		FilterBuilder.equal(documentEstatField, DocumentEstatEnumDto.CUSTODIAT.toString()),
+			        		FilterBuilder.equal(documentEstatField, DocumentEstatEnumDto.DEFINITIU.toString())
 	    				);
+	
+				        String docAdjuntField = DocumentResource.Fields.gesDocAdjuntId;
+				        filtreNoAdjunt = FilterBuilder.isNull(docAdjuntField);
+	
+			        } else {
+	
+				        String documentEstatField = DocumentResource.Fields.estat;
+				        filtreEstatDocument = FilterBuilder.equal(documentEstatField, DocumentEstatEnumDto.REDACCIO.toString()); //ESBORRANY
+	
+				        if (mapaNamedQueries.containsKey("MASSIU_PORTAFIRMES")) {
+				        	String metaDocPortafirmes = DocumentResource.Fields.metaDocument + "." + MetaDocumentResource.Fields.firmaPortafirmesActiva;
+				        	filtrePfActiu = FilterBuilder.equal(metaDocPortafirmes, true); //ENVIAMENT A PF ACTIU EN EL PROCEDIMENT
+					        String docAdjuntField = DocumentResource.Fields.gesDocAdjuntId;
+					        filtreNoAdjunt = FilterBuilder.isNull(docAdjuntField);
+				        } else if (mapaNamedQueries.containsKey("MASSIU_PASARELA")) {
+				        	String metaDocPortafirmes = DocumentResource.Fields.metaDocument + "." + MetaDocumentResource.Fields.firmaPassarelaActiva;
+				        	filtrePfActiu = FilterBuilder.equal(metaDocPortafirmes, true); //ENVIAMENT A PF ACTIU EN EL PROCEDIMENT
+					        String docAdjuntField = DocumentResource.Fields.gesDocAdjuntId;
+					        filtreNoAdjunt = FilterBuilder.isNull(docAdjuntField);
+				        }
 			        }
-		        }
+        		}
 		        
 		        Filter resultat = FilterBuilder.and(
 		        		filtreBase, //Entitat i filtre del usuari
 		        		filtreMetaExpedientsPermesos,
+		        		filtreDocumentsNotArxiuIds,
 		        		filtreEstatDocument,
 		        		filtreNoEsborrat,
 		        		filtreNoAdjunt,
@@ -347,7 +369,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 		public void onChange(Serializable id, DocumentResource previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, DocumentResource target) {
 			//Camps transient per inicialitzar al carregar el formulari
 	        target.setPluginSummarizeActiu(Utils.hasValue(configHelper.getConfig(PropertyConfig.SUMMARIZE_PLUGIN_CLASS)));
-	        target.setFuncionariHabilitatDigitalib(rolHelper.doesCurrentUserHasRol("DIB_USER"));
+	        target.setFuncionariHabilitatDigitalib(RolHelper.doesCurrentUserHasRol("DIB_USER"));
 	        target.setDeteccioFirmaAutomaticaActiva(configHelper.getAsBoolean(PropertyConfig.DETECCIO_FIRMA_AUTOMATICA));
 	        target.setDocumentFirmaTipus(DocumentFirmaTipusEnumDto.SENSE_FIRMA);
 	        
@@ -406,6 +428,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     				false,
     				true);
     		resource.setId(documentCreat.getId());
+    		afterDbChange(documentCreat.getExpedientId());
     	} catch (ValidationException ex) {
     		throw ex;
     	} catch (Exception ex) {
@@ -418,8 +441,10 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     @Override
     public void delete(Long id, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotFoundException {
     	try {
+    		Long expedientId = documentRepository.findById(id).get().getExpedient().getId();
     		EntitatEntity entitatEntity = entitatRepository.findByCodi(configHelper.getEntitatActualCodi());
     		contingutHelper.deleteReversible(entitatEntity.getId(), id, null, configHelper.getRolActual());
+    		afterDbChange(expedientId);
     	} catch (Exception ex) {
     		excepcioLogHelper.addExcepcio("/document/"+id+"/delete", ex);
     		throw new ResourceNotFoundException(getResourceClass(), ex.getMessage());
@@ -455,17 +480,27 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 				}
     		} else {
     			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
-        		DocumentDto documentCreat = documentHelper.updateDocument(
+        		DocumentDto documentActualitzat = documentHelper.updateDocument(
         				entitatEntity.getId(),
         				documentActual,
     					resource.toDocumentDto(),
         				true);
-        		resource.setId(documentCreat.getId());
+        		resource.setId(documentActualitzat.getId());
+        		afterDbChange(documentActual.getExpedient().getId());
     		}
     	} catch (Exception ex) {
     		excepcioLogHelper.addExcepcio("/document/"+resource.getId()+"/update", ex);
     	}
     	return resource;
+    }
+    
+    private void afterDbChange(Long expedientId) {
+    	//Esborram cache de validacions del expedient
+		cacheHelper.evictErrorsValidacioPerNode(expedientId); // Primero hace evict
+		ErrorsValidacioChangedEvent evce = new ErrorsValidacioChangedEvent(
+				expedientId,
+				cacheHelper.findErrorsValidacioPerNode(expedientId));
+		eventHelper.notifyErrorsValidacio(evce); // Luego notifica con datos frescos	
     }
 
     @Override
@@ -486,9 +521,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                 null
         ));
         
-        resource.setErrors(cacheHelper.findErrorsValidacioPerNode(entity.getId(), false));
+        resource.setErrors(cacheHelper.findErrorsValidacioPerNode(entity.getId()));
         resource.setValid(resource.getErrors().isEmpty());
-        
         resource.setAmbNotificacions(!entity.getNotificacions().isEmpty());
         
 		DocumentNotificacioEstatEnumDto estatDarreraNotificacio = documentNotificacioRepository.findLastEstatNotificacioByDocumentId(entity.getId());
@@ -501,8 +535,15 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 		resource.setErrorEnviamentPortafirmes(isErrorLastEnviament != null ? isErrorLastEnviament : false);
         
         resource.setHasFirma(resource.getDocumentFirmaTipus()!=DocumentFirmaTipusEnumDto.SENSE_FIRMA);
-        resource.setMetaDocumentInfo(objectMappingHelper.newInstanceMap(Hibernate.unproxy(entity.getMetaDocument()), MetaDocumentResource.class));
         resource.setFirmaParcial(DocumentEstatEnumDto.FIRMA_PARCIAL.equals(entity.getEstat()));
+        
+        if (entity.getMetaDocument()!=null) {
+//        	MetaDocumentResourceEntity metaDocumentResourceEntity = (MetaDocumentResourceEntity) Hibernate.unproxy(entity.getMetaDocument());
+        	resource.setMetaDocumentInfo(objectMappingHelper.newInstanceMap(
+        			entity.getMetaDocument(),
+        			MetaDocumentResource.class,
+        			"portafirmesResponsables", "serialVersionUID"));
+        }
         
         if (entity.getCreatedBy()!=null) {
     		UsuariResourceEntity usuariResourceEntity = usuariResourceRepository.findById(entity.getCreatedBy()).orElse(null);
@@ -537,6 +578,15 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
             ArxiuDetallDto arxiu = contingutResourceHelper.getArxiuDocumentDetall(arxiuDocument,entity.getEntitat().getId());
             resource.setArxiu(arxiu);
         }
+    }
+    
+    private class ProcedimentPerspectiveApplicator implements PerspectiveApplicator<DocumentResourceEntity, DocumentResource> {
+		@Override
+		public void applySingle(String code, DocumentResourceEntity entity, DocumentResource resource) throws PerspectiveApplicationException {
+			resource.setMetaExpedient(ResourceReference.toResourceReference(
+					entity.getExpedient().getMetaExpedient().getId(),
+					entity.getExpedient().getMetaExpedient().getNom()));
+		}
     }
     
     private class FirmesPerspectiveApplicator implements PerspectiveApplicator<DocumentResourceEntity, DocumentResource> {
@@ -578,6 +628,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         public void applySingle(String code, DocumentResourceEntity entity, DocumentResource resource) throws PerspectiveApplicationException {
             List<DocumentVersioDto> versions = contingutResourceHelper.getVersions(entity);
             resource.setVersions(versions);
+            resource.setCsvLinkUrl(configHelper.getConfig(PropertyConfig.CONCSV_BASE_URL));
         }
     }
     
@@ -1034,7 +1085,6 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
 		@Override
 		public Serializable exec(String code, DocumentResourceEntity entity, MassiveAction params) throws ActionExecutionException {
-			String docIdStr = entity.getId()!=null?entity.getId().toString():Utils.getIdsSeparatsComa(params.getIds());
 			try {
 
 				EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
@@ -1048,10 +1098,13 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 							null,
 							configHelper.getRolActual());
 					execucioMassivaHelper.saveExecucioMassiva(entitatEntity, execMassDto, elementsMassiva, ElementTipusEnumDto.DOCUMENT);
-
-	        	} else {
+				
+					return params.getIds()!=null?params.getIds().size():0;
+	        	
+				} else {
 
 					Exception errorGuardant = null;
+					entity = documentResourceRepository.findById(params.getIds().get(0)).get();
 					if (entity.getArxiuUuid() == null) {
 						errorGuardant = documentHelper.guardarDocumentArxiu(entity.getId());
 					} else {
@@ -1067,12 +1120,16 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 						String message = messageHelper.getMessage("message.common.action.error")+": "+errorGuardant.getMessage();
 						throw new ActionExecutionException(getResourceClass(), entity.getId(), code, message);
 					}
+					
+					return objectMappingHelper.newInstanceMap(entity, DocumentResource.class);
 	        	}
 
-				return objectMappingHelper.newInstanceMap(entity, DocumentResource.class);
-
 			} catch (Exception e) {
-				excepcioLogHelper.addExcepcio("/document/GuardarArxiuActionExecutor", e, docIdStr, "massiu="+params.isMassivo());
+				excepcioLogHelper.addExcepcio(
+						"/document/GuardarArxiuActionExecutor",
+						e,
+						Utils.getIdsSeparatsComa(params.getIds()),
+						"massiu="+params.isMassivo());
 				String message = messageHelper.getMessage("message.common.action.error")+": "+e.getMessage();
 				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, message);
 			}
@@ -1097,8 +1154,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 		public Serializable exec(String code, DocumentResourceEntity entity, MassiveAction params) throws ActionExecutionException {
 			try {
 				if (params.getIds()!=null) {
+					EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
 					for (Long docId: params.getIds()) {
-						EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
 						DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
 								entitatEntity.getId(),
 								docId,
@@ -1107,7 +1164,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 						documentHelper.actualitzarEstat(document, DocumentEstatEnumDto.DEFINITIU);
 					}
 				}
-				return objectMappingHelper.newInstanceMap(entity, DocumentResource.class);
+				int numElem = params!=null && params.getIds()!=null?params.getIds().size():0;
+				return "{\"num\": \""+numElem+"\"}";
 			} catch (Exception e) {
 				String docIdStr = Utils.getIdsSeparatsComa(params.getIds());
 				excepcioLogHelper.addExcepcio("/document/ConvertirDefinitiuActionExecutor", e, docIdStr, "massiu="+params.isMassivo());
@@ -1731,6 +1789,9 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 				String docIdStr = Utils.getIdsSeparatsComa(params.getIds());
 				excepcioLogHelper.addExcepcio("/document/EnviarPortafirmesActionExecutor", e, docIdStr, "massiu="+params.isMassivo());
 				String message = messageHelper.getMessage("message.common.action.error")+": "+e.getMessage();
+				if (e.getCause()!=null && e.getCause().getMessage()!=null) {
+					message = e.getCause().getMessage();
+				}
 				throw new ActionExecutionException(getResourceClass(), docIdStr, code, message);
 			}
         }

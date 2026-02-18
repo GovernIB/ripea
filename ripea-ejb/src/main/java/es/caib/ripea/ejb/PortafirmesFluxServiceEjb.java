@@ -38,6 +38,12 @@ public class PortafirmesFluxServiceEjb extends AbstractServiceEjb<PortafirmesFlu
 	public PortafirmesFluxRespostaDto recuperarFluxFirma(String transactionId) {
 		return delegateService.recuperarFluxFirma(transactionId);
 	}
+	
+	@Override
+	@RolesAllowed("**")
+	public Long guardarFluxFirmaMetaDocumentRipea(Long metaDocumentId, PortafirmesFluxRespostaDto portafirmesFluxResposta) {
+		return delegateService.guardarFluxFirmaMetaDocumentRipea(metaDocumentId, portafirmesFluxResposta);
+	}
 
 	@Override
 	@RolesAllowed("**")

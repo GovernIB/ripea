@@ -19,6 +19,7 @@ import java.util.Set;
 @SuppressWarnings("serial")
 public class MetaExpedientExportDto extends MetaNodeAmbMetaDadesDto implements Serializable {
 
+	private TipusProcedimentServeiEnum tipusProcedimentServei;
     private TipusClassificacioEnumDto tipusClassificacio;
     private String classificacio;
     private String serieDocumental;
@@ -29,17 +30,18 @@ public class MetaExpedientExportDto extends MetaNodeAmbMetaDadesDto implements S
     private int expedientTasquesCount;
     private int expedientDominisCount;
     private int grupsCount;
-    private List<MetaDocumentDto> metaDocuments;
     private boolean permetMetadocsGenerals;
-    private OrganGestorDto organGestor;
-    
+    private OrganGestorDto organGestor;    
     private boolean gestioAmbGrupsActiva;
-    
+    private boolean permisDirecte;
 	private MetaExpedientRevisioEstatEnumDto revisioEstat;
 	
+	private List<MetaDocumentDto> metaDocuments;
+	//private List<MetaDadaDto> metaDades; (Es troba al pare MetaNodeAmbMetaDadesDto)
 	private Set<ExpedientEstatDto> estats;
-    private List<GrupDto> grups;
     private Set<MetaExpedientTascaDto> tasques;
+    private List<GrupDto> grups; //Opcional
+    private List<MetaExpedientCarpetaMinDto> carpetes; //Opcional
 
     private boolean interessatObligatori;
 	
@@ -50,8 +52,6 @@ public class MetaExpedientExportDto extends MetaNodeAmbMetaDadesDto implements S
 			return false;
 		}
 	}
-	
-    List<ArbreJsonDto> estructuraCarpetes;
     
     public int getMetaDocumentsCount() {
         if (metaDocuments == null)

@@ -11,7 +11,6 @@ import GridFormField from "../../../components/GridFormField.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import {useSession} from "../../../components/SessionStorageContext.tsx";
 import {GridSortDirection} from "@mui/x-data-grid-pro";
-import {useGridApiRef as useMuiDatagridApiRef} from "@mui/x-data-grid-pro/hooks/utils/useGridApiRef";
 
 const EnviarPortafirmesFilterForm = () => {
     const {data} = useFormContext();
@@ -21,8 +20,8 @@ const EnviarPortafirmesFilterForm = () => {
 
     return <>
         <GridFormField xs={3} name="procediment"/>
-        <GridFormField xs={3} name="expedient" filter={expedientFilter}/>
-        <GridFormField xs={3} name="metaDocument" filter={metaDocumentFilter}/>
+        <GridFormField xs={3} name="expedient" filter={expedientFilter} disabled={!data.procediment}/>
+        <GridFormField xs={3} name="metaDocument" filter={metaDocumentFilter} disabled={!data.procediment}/>
         <GridFormField xs={3} name="nom"/>
         <GridFormField xs={3} name="dataCreacioInici" type={"date"}/>
         <GridFormField xs={3} name="dataCreacioFi" type={"date"}/>
@@ -77,22 +76,20 @@ const columns = [
     {
         field: 'createdByFullName',
         flex: 0.6,
-        sortProcessor: (field: string, sort: GridSortDirection) => [ { field: "createdBy", sort } ]
+        sortProcessor: (_field: string, sort: GridSortDirection) => [ { field: "createdBy", sort } ]
     },
 ]
 
 const EnviarPortafirmesGrid = () => {
     const {t} = useTranslation();
     const apiRef = useMuiDataGridApiRef();
-    const dataApiRef = useMuiDatagridApiRef();
     const [springFilter, setSpringFilter] = useState<string>();
 
     const sessionKey = "MASSIVE_PORTAFIRMES_FILTER";
     const { value: filterData } = useSession(sessionKey);
-    const haveRequirements = useMemo(() => {
-        dataApiRef?.current?.setRowSelectionModel?.([])
-        return !!filterData?.procediment && !!filterData?.metaDocument
-    }, [filterData?.procediment, filterData?.metaDocument])
+    const haveRequirements = useMemo(() =>
+        !!filterData?.procediment && !!filterData?.metaDocument,
+        [filterData?.procediment, filterData?.metaDocument])
 
     const refresh = () => {
         apiRef?.current?.refresh?.();
@@ -128,7 +125,6 @@ const EnviarPortafirmesGrid = () => {
 
             <StyledMuiGrid
                 apiRef={apiRef}
-                datagridApiRef={dataApiRef}
                 resourceName={"documentResource"}
                 columns={columns}
                 filter={springFilter}

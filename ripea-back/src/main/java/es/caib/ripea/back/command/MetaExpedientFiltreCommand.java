@@ -5,11 +5,13 @@ import es.caib.ripea.service.intf.dto.MetaExpedientActiuEnumDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientAmbitEnumDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientFiltreDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientRevisioEstatEnumDto;
+import es.caib.ripea.service.intf.dto.TipusProcedimentServeiEnum;
 import lombok.Getter;
 
 @Getter
 public class MetaExpedientFiltreCommand {
 
+	private TipusProcedimentServeiEnum tipusProcedimentServei;
 	private String codi;
 	private String nom;
 	private String classificacio;
@@ -49,5 +51,8 @@ public class MetaExpedientFiltreCommand {
 	public void setPermisDirecteActive(
 			boolean permisDirecteActive) {
 		this.permisDirecteActive = permisDirecteActive;
+	}
+	public void setTipusProcedimentServei(TipusProcedimentServeiEnum tipusProcedimentServei) {
+		this.tipusProcedimentServei = tipusProcedimentServei;
 	}
 }

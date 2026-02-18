@@ -21,7 +21,7 @@ import {useUserSession} from "../../../components/Session.tsx";
 import {useActions} from "./CommonActions.tsx";
 import useAlerta from "./Alerta.tsx";
 import useErrorValidacio from "./ErrorValidacio.tsx";
-import SseExpedient from "../../../components/SseExpedient.tsx";
+import SseExpedient, {useValidacioSession} from "../../../components/SseExpedient.tsx";
 import {icons} from "../../user/UserHeadToolbar.tsx";
 import {setTitlePage} from "../../../TitleHeaderConfigurator.tsx";
 
@@ -110,14 +110,14 @@ export const ExpedientInfo = (props:any) => {
 const ExpedientAlert = (props:any) => {
     const {entity: expedient} = props;
     const { t } = useTranslation();
+    const {value: user} = useUserSession();
+    const {value: validacio} = useValidacioSession()
 
     const refresh = () => {
         window.location.reload();
     }
 
-    const {value: user} = useUserSession();
     const {agafar} = useActions(refresh);
-
     const {handleOpen: handelAlert, dialog: dialogAlert, count} = useAlerta();
     const {handleOpen: hanldeErrorValidacio, dialog: dialogErrorValidacio} = useErrorValidacio();
 
@@ -136,18 +136,21 @@ const ExpedientAlert = (props:any) => {
         { expedient?.estat == "OBERT" && expedient?.hasEsborranys && user?.sessionScope?.isConvertirDefinitiuActiu &&
             <Alert severity="info">{t('page.expedient.alert.esborranys')}</Alert>
         }
+		{ expedient?.estat == "OBERT" && expedient?.pendentExecucioMassiva &&
+		    <Alert severity="warning">{t('page.expedient.alert.moureTot.info')}</Alert>
+		}
         { expedient?.numAlert!=0 && (count === null || count !== 0) &&
             <Alert severity="warning"
                    action={
-                       <Button  sx={{py: 0}} variant="outlined"
-                                onClick={() => handelAlert(expedient?.id, expedient)}>
+                       <Button sx={{py: 0}} variant="outlined"
+                               onClick={() => handelAlert(expedient?.id, expedient)}>
                             <Icon>search</Icon>
                            <Typography variant={"subtitle2"}>{t('common.consult')}</Typography>
                        </Button>
                    }
             >{t('page.expedient.alert.alert')}</Alert>
         }
-        { !expedient?.valid &&
+        { validacio?.errorsValidacio?.length > 0 &&
             <Alert severity="warning"
                    action={
                        <Button  sx={{py: 0}} variant="outlined"
@@ -163,7 +166,7 @@ const ExpedientAlert = (props:any) => {
     </>
 }
 
-const perspectives = ['COUNT', 'ESTAT', 'RELACIONAT', 'AMB_PINBAL', "META_EXPEDIENT"]
+const perspectives = ['COUNT', 'ESTAT', 'RELACIONAT', 'AMB_PINBAL', "META_EXPEDIENT", "PERMIS_CONTINGUT"]
 const Expedient = () => {
     const { t } = useTranslation();
     const { id } = useParams();
@@ -258,12 +261,12 @@ const Expedient = () => {
     ]
 
     const headerMain = <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-        <Box sx={{ display: 'flex', alignItems: 'center'}}>
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Icon sx={{ fontSize: '2rem' }}>{icons.expedient}</Icon>
             <Typography variant="h4" sx={{ display: 'flex' }}>{expedient?.nom}</Typography>
         </Box>
         <Box>
-            <Typography variant={"subtitle1"} sx={{border}} px={1} hidden={!expedient?.agafatPer}>
+            <Typography variant={"subtitle1"} sx={{border}} px={2} hidden={!expedient?.agafatPer}>
                 {t('page.expedient.title')} {t('page.expedient.detall.agafatPer')}: {expedient?.agafatPer?.description}
                 {expedient?.agafatPer?.id == user?.codi &&
                     <IconButton aria-label="lock_open" color={"inherit"} onClick={() => alliberar(id, expedient)} title={t('page.expedient.action.lliberar.label')}>

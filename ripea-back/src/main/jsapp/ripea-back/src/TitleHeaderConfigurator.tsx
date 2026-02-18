@@ -31,7 +31,7 @@ const TITLES: any = {
     '/expedientPeticioComunicades': "page.user.menu.comunicades",
 
     // Configurar
-    '/metaExpedient': "page.user.menu.procediments",
+    '/metaExpedient': "page.user.menu.procedimentsTitle",
     // '/metaExpedient/:id/permis': "page.user.menu.procedimentPermis",
     '/tipusDocumental': "page.user.menu.nti",
     '/grup': "page.user.menu.grups",
@@ -39,6 +39,9 @@ const TITLES: any = {
     '/organgestor': "page.user.menu.organs",
     // '/organgestor/:id/permis': "page.user.menu.organPermis",
     '/permis': "page.user.menu.permisos",
+    '/domini': "page.user.menu.dominis",
+    '/metaDocument': "page.user.menu.documents",
+    '/urlInstruccio': "page.user.menu.url",
 };
 
 export const setTitlePage = (title:string) => {

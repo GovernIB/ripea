@@ -1,21 +1,21 @@
 package es.caib.ripea.service.intf.model;
 
+import java.io.Serializable;
+
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+
+import org.springframework.data.annotation.Transient;
 
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
-import es.caib.ripea.service.intf.dto.MetaExpedientAmbitEnumDto;
-import es.caib.ripea.service.intf.dto.MetaExpedientRevisioEstatEnumDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
-
-import java.io.Serializable;
 
 @Getter
 @Setter
@@ -26,6 +26,9 @@ import java.io.Serializable;
         descriptionField = "descripcio",
         artifacts = {
                 @ResourceConfigArtifact(
+                        type = ResourceArtifactType.PERSPECTIVE,
+                        code = GrupResource.PERSPECTIVE_COUNT_PERMISOS),        		
+                @ResourceConfigArtifact(
                         type = ResourceArtifactType.FILTER,
                         code = GrupResource.FILTER_CODE,
                         formClass = GrupResource.FormFilter.class),
@@ -34,13 +37,11 @@ import java.io.Serializable;
 public class GrupResource extends BaseAuditableResource<Long> {
 
     public static final String FILTER_CODE = "FILTER";
+    public static final String PERSPECTIVE_COUNT_PERMISOS = "COUNT_PERMISOS";
 
 	@NotNull
 	@Size(max = 50)
 	private String codi;
-//	@NotNull
-//	@Size(max = 50)
-//	private String rol;
 	@NotNull
 	@Size(max = 512)
 	private String descripcio;
@@ -48,10 +49,15 @@ public class GrupResource extends BaseAuditableResource<Long> {
 	private ResourceReference<EntitatResource, Long> entitat;
 	private ResourceReference<OrganGestorResource, Long> organGestor;
 
+	@Transient private int numPermisos;
+	
+	@Transient private boolean importar = true;
+	
     @Getter
     @Setter
     public static class FormFilter implements Serializable {
-        private String codi;
+		private static final long serialVersionUID = -2372525041331550867L;
+		private String codi;
         private String descripcio;
         private ResourceReference<OrganGestorResource, Long> organGestor;
     }

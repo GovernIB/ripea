@@ -18,22 +18,29 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import es.caib.comanda.ms.estadistica.model.DimensioDesc;
-import es.caib.comanda.ms.estadistica.model.EstadistiquesInfo;
-import es.caib.comanda.ms.estadistica.model.IndicadorDesc;
-import es.caib.comanda.ms.estadistica.model.RegistresEstadistics;
+import es.caib.comanda.model.server.monitoring.DimensioDesc;
+import es.caib.comanda.model.server.monitoring.EstadistiquesInfo;
+import es.caib.comanda.model.server.monitoring.IndicadorDesc;
+import es.caib.comanda.model.server.monitoring.RegistresEstadistics;
+import es.caib.ripea.api.interna.config.BaseApiInternaSecurityConfig;
+import es.caib.ripea.service.intf.config.PropertyConfig;
+import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.SegonPlaService;
+import es.caib.ripea.service.intf.utils.DateUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @RestController
+@RequestMapping(BaseApiInternaSecurityConfig.VERSIO_API_COMANDA)
 @Tag(name = "Integració comanda - RIPEA", description = "Publicació de dades estadístiques de l'aplicació")
 public class EstadistiquesController extends BaseApiInternaController {
 
 	private final SegonPlaService segonPlaService;
+	private final AplicacioService aplicacioService;
 	private ManifestInfo manifestInfo;
 	
 	protected ManifestInfo getManifestInfo() throws IOException {
@@ -48,12 +55,12 @@ public class EstadistiquesController extends BaseApiInternaController {
     	autenticaAmbRolTothom();
         List<DimensioDesc> dimensions  = segonPlaService.getDimensionsInfo();
         List<IndicadorDesc> indicadors = segonPlaService.getIndicadorsInfo();
-        return EstadistiquesInfo.builder()
-        		.codi("RIP")
-        		.data(Calendar.getInstance().getTime())
+        return new EstadistiquesInfo()
+        		.codi(aplicacioService.propertyFindByNom(PropertyConfig.COMANDA_APP_CODI))
+        		.data(DateUtil.toOffsetDateTime(Calendar.getInstance().getTime()))
         		.versio(getManifestInfo().getVersion())
         		.dimensions(dimensions)
-        		.indicadors(indicadors).build();
+        		.indicadors(indicadors);
     }
 	
     @GetMapping("/estadistiques")

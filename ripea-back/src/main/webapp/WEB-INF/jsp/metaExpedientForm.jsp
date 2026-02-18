@@ -382,6 +382,13 @@ function calculateClassificacioId() {
 		<div class="tab-content">
 			<div role="tabpanel" class="tab-pane active" id="dades">
 			
+				<rip:inputSelect 
+						name="tipusProcedimentServei" 
+						optionEnum="TipusProcedimentServeiEnum" 
+						emptyOption="false" 
+						disabled="${bloquejarCamps}"
+						textKey="metaexpedient.list.filtre.camp.tipus"/>
+			
 				<rip:inputText name="codi" textKey="metaexpedient.form.camp.codi" required="true" readonly="${bloquejarCamps}"/>
 				
 				<c:set var="campErrors"><form:errors path="classificacioSia"/></c:set>

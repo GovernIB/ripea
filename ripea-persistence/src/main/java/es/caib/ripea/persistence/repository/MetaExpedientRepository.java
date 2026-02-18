@@ -1,9 +1,7 @@
 package es.caib.ripea.persistence.repository;
 
-import es.caib.ripea.persistence.entity.EntitatEntity;
-import es.caib.ripea.persistence.entity.MetaExpedientEntity;
-import es.caib.ripea.persistence.entity.OrganGestorEntity;
-import es.caib.ripea.service.intf.dto.MetaExpedientRevisioEstatEnumDto;
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -12,7 +10,11 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientEntity;
+import es.caib.ripea.persistence.entity.OrganGestorEntity;
+import es.caib.ripea.service.intf.dto.MetaExpedientRevisioEstatEnumDto;
+import es.caib.ripea.service.intf.dto.TipusProcedimentServeiEnum;
 
 @Component
 public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEntity, Long> {
@@ -105,6 +107,7 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			"    MetaExpedientEntity me left join me.organGestor org " +
 			"where " +
 			"    me.entitat = :entitat " +
+			"and (:esNullTipus = true or me.tipusProcedimentServei = :tipusProcedimentServei) " +
 			"and (:esNullCodi = true or lower(me.codi) like lower('%'||:codi||'%')) " +
 			"and (:esNullNom = true or lower(me.nom) like lower('%'||:nom||'%')) " +
 			"and (:esNullClassificacio = true or lower(me.classificacio) like lower('%'||:classificacio||'%')) " +
@@ -115,6 +118,8 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			"and (:esNullRevisioEstat = true or me.revisioEstat IN (:revisioEstats)) ")
 	Page<MetaExpedientEntity> findByEntitat(
 			@Param("entitat") EntitatEntity entitat, 
+			@Param("esNullTipus") boolean esNullTipus,
+			@Param("tipusProcedimentServei") TipusProcedimentServeiEnum tipusProcedimentServei,				
 			@Param("esNullCodi") boolean esNullCodi,
 			@Param("codi") String codi,
 			@Param("esNullNom") boolean esNullNom,
@@ -140,12 +145,15 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			"and (:esNullNom = true or lower(me.nom) like lower('%'||:nom||'%')) " +
 			"and (:esNullClassificacio = true or lower(me.classificacio) like lower('%'||:classificacio||'%')) " +
 			"and (:esNullActiu = true or me.actiu = :actiu) " +
+			"and (:esNullTipus = true or me.tipusProcedimentServei = :tipusProcedimentServei) " +
 			"and (:esNullOrganGestor = true or me.organGestor = :organGestor) " +
 			"and (:permisDirecte = false or me.permisDirecte=true)" +
 			"and me.id in (:ids)" + 
 			"and (:esNullRevisioEstat = true or me.revisioEstat = :revisioEstat) ")
 	Page<MetaExpedientEntity> findByOrganGestor(
 			@Param("entitat") EntitatEntity entitat,
+			@Param("esNullTipus") boolean esNullTipus,
+			@Param("tipusProcedimentServei") TipusProcedimentServeiEnum tipusProcedimentServei,			
 			@Param("esNullCodi") boolean esNullCodi,
 			@Param("codi") String codi,
 			@Param("esNullNom") boolean esNullNom,
@@ -247,6 +255,11 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 	List<MetaExpedientEntity> findByEntitatAndActiuTrueOrderByNomAsc(EntitatEntity entitat);
 
 	List<MetaExpedientEntity> findByEntitatAndClassificacioOrderByNomAsc(EntitatEntity entitat, String classificacio);
+	
+	List<MetaExpedientEntity> findByEntitatAndClassificacioAndTipusProcedimentServeiOrderByNomAsc(
+			EntitatEntity entitat,
+			String classificacio,
+			TipusProcedimentServeiEnum tipusProcedimentServei);
 	
 	@Query( "select " +
 			"   me.id " +

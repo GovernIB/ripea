@@ -40,7 +40,6 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 	@Autowired private ExpedientEstatHelper expedientEstatHelper;
     @Autowired private ExpedientRepositoryCommnand expedientRepositoryCommnand;
 
-
 	@Transactional(readOnly = true)
 	@Override
 	public ExpedientEstatDto findExpedientEstatById(
@@ -84,9 +83,7 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 				paginaExpedientEstats,
 				ExpedientEstatDto.class);
 		return result;
-
 	}
-	
 	
 	@Transactional(readOnly = true)
 	@Override
@@ -252,17 +249,10 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 				+ "expedientEstatId=" + expedientEstatId + ", "
 				+ "posicio=" + posicio + ")");
 		entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-		ExpedientEstatEntity estat = expedientEstatRepository.getOne(expedientEstatId);
-		canviPosicio(
-				estat,
-				posicio);
 		return conversioTipusHelper.convertir(
-				estat,
+				expedientEstatHelper.moveTo(entitatId, metaExpedientId, expedientEstatId, posicio, rolActual),
 				ExpedientEstatDto.class);
 	}
-	
-	
-	
 	
 	@Transactional(readOnly = true)
 	@Override
@@ -313,7 +303,6 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 				chosenEstat = expedientEstatRepository.getOne(estatId);
 			}
 		}
-		
 		
 		if (resultEnum == ResultEnumDto.PAGE) {
 			// ================================  RETURNS PAGE (DATATABLE) ==========================================
@@ -369,60 +358,12 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 			result.setIds(idsDocuments);
 		}
 		return result;
-		
 	}
 
-
-
-
-	private void canviPosicio(
-			ExpedientEstatEntity estat,
-			int posicio) {
-		List<ExpedientEstatEntity> estats = expedientEstatRepository.findByMetaExpedientOrderByOrdreAsc(
-				estat.getMetaExpedient());
-		
-		moveTo(
-				estat,
-				estats,
-				posicio);
-	}
-	
-	
-	public void moveTo(
-			ExpedientEstatEntity elementToMove,
-			List<ExpedientEstatEntity> elements,
-			int posicio) {
-		
-		int anteriorIndex = -1; 
-		for (int i = 0; i < elements.size(); i++) {
-			if (elements.get(i).getId().equals(elementToMove.getId())) {
-				anteriorIndex = i;
-				break;
-			}
-		}
-		elements.add(
-				posicio,
-				elements.remove(anteriorIndex));
-		for (int i = 0; i < elements.size(); i++) {
-			elements.get(i).updateOrdre(i);
-		}
-	}
-	
-	
-
-	private ExpedientDto toExpedientDto(
-			ExpedientEntity expedient,
-			boolean ambPathIPermisos) {
-		ExpedientDto expedientDto = (ExpedientDto) contingutHelper.toContingutDto(
-				expedient, false, false);
-		
+	private ExpedientDto toExpedientDto(ExpedientEntity expedient, boolean ambPathIPermisos) {
+		ExpedientDto expedientDto = (ExpedientDto) contingutHelper.toContingutDto(expedient, false, false);
 		return expedientDto;
 	}
-	
-	
-	
-	
-	
 	
 	private static final Logger logger = LoggerFactory.getLogger(ExpedientEstatServiceImpl.class);
 }

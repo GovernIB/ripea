@@ -1,10 +1,12 @@
 import React, {useEffect, useMemo, useState} from "react";
 import {Button, Icon, Tooltip} from "@mui/material";
-import {useGridApiRef as useMuiDatagridApiRef} from "@mui/x-data-grid-pro";
+import {GridSlots, useGridApiRef as useMuiDatagridApiRef} from "@mui/x-data-grid-pro";
 import {MuiDataGridProps, MuiGrid, useMuiDataGridApiRef} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {useUserSession} from "./Session.tsx";
 import MassiveActionSelector, {MassiveActionProps} from "./MassiveActionSelector.tsx";
+import {DraggableGridRow, DraggableGridRowHandler} from "./DraggableContext.tsx";
+import {DndContext} from "@dnd-kit/core";
 
 export const ToolbarButton = (props:any) => {
     const { title, icon, hidden, children, ...other } = props;
@@ -18,7 +20,7 @@ export const ToolbarButton = (props:any) => {
             <Button
                 variant="outlined"
                 size="small"
-                startIcon={<Icon sx={{m: 0}}>{icon}</Icon>}
+                startIcon={<Icon sx={children ?{} :{m: 0}}>{icon}</Icon>}
                 {...other}
                 sx={{ borderRadius: '4px',  minWidth: '20px', minHeight: '32px' }}
             >
@@ -37,6 +39,31 @@ type StyledMuiGridProps = MuiDataGridProps & {
     onRefresh?: () => any,
     disabledMassiveDefSelector?: boolean,
     hiddenMassiveDefSelector?: boolean,
+    onDragEnd?: ( event:any ) => void,
+}
+
+export const DndMuiGrid = (props:StyledMuiGridProps) => {
+    const {onDragEnd, ...other} = props
+    const dndEnabled = onDragEnd != null && !other?.readOnly
+
+    const additionalColumns:any[] = useMemo(()=> [
+        ...props.columns,
+        {
+            renderCell: () => <DraggableGridRowHandler />,
+            flex: 0.1
+        }
+    ], [props.columns])
+
+    if (!dndEnabled) return <StyledMuiGrid {...other}/>;
+
+    return <DndContext onDragEnd={onDragEnd}><StyledMuiGrid
+        {...other}
+        rowActionsColumnIndex={-1}
+        columns={additionalColumns}
+        slots={{
+            row: DraggableGridRow as GridSlots['row'],
+        }}
+    /></DndContext>;
 }
 
 const StyledMuiGrid = (props:StyledMuiGridProps) => {
@@ -67,9 +94,6 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
         formInitOnChange,
         popupEditFormDialogComponentProps,
         popupEditFormComponentProps,
-        rowHideUpdateButton = true,
-        rowHideDeleteButton = true,
-        toolbarHideQuickFilter = true,
         rowExpansionChange,
         onRefresh,
         disabledMassiveDefSelector = false,
@@ -106,7 +130,7 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
             hidden: !toolbarMassiveActions || readOnly,
         },
         {
-            position: 2,
+            position: 3,
             element: <ToolbarButton title={t('common.refresh')} icon={'refresh'} onClick={refresh} color={'primary'}/>,
             hidden: toolbarHideRefresh,
         },
@@ -146,7 +170,7 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
 
     // Applica word wrap a totes les columnes
     const columnsWithWordWrap = useMemo(()=>{
-        return columns.map((col:any) => ({
+        return columns.filter((col:any) => !col?.hidden).map((col:any) => ({
             ...col,
             flex: col.flex ?? 1,
             cellClassName: 'cell-with-wrap',
@@ -164,38 +188,7 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
     }, [user?.conf?.numElementsPagina])
 
     return <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
-        <style>
-            {`
-                    .cell-with-wrap {
-                        // white-space: normal !important;
-                        // line-height: 1.2em;
-                        // word-break: break-word;
-                        // padding: 5px 10px !important;
-                        // overflow: auto;
-                        // display: flex;
-                        // align-items: start !important;
-                        text-overflow: ellipsis !important;
-                    }
-                    
-                    .MuiDataGrid-checkboxInput {
-                        transform: scale(0.8);
-                    }
-                    .MuiDataGrid-cell--withRenderer {
-                        align-items: flex-start !important;
-                    }
-                    .MuiDataGrid-columnHeaderCheckbox {
-                        align-items: flex-start !important;
-                        padding-top: 4px !important;
-                    }
-                    [class^="row-with-color-"] .MuiDataGrid-cellCheckbox {
-                        width: 48px !important;
-                        max-width: 48px !important;
-                        min-width: 48px !important;
-                        margin-left: -4px !important;
-                    }
-            `}
-            {rowStyles}
-        </style>
+        <style>{rowStyles}</style>
 
         <MuiGrid
             resourceName={resourceName}
@@ -208,13 +201,14 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
             disableColumnMenu
             disableColumnSorting={!!staticSortModel}
             staticSortModel={staticSortModel}
-            {...others}
+
             apiRef={apiRef}
             datagridApiRef={datagridApiRef}
             columns={columnsWithWordWrap}
             getRowClassName={getRowClassName}
             onRowsChange={(rows, info) => {
                 setGridRows([...rows]);
+                setGridSelectedRows(others?.rowSelectionModel ?? [])
                 onRowsChange?.(rows, info);
                 onRowCountChange?.(info?.totalElements)
             }}
@@ -230,16 +224,21 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
             popupEditFormDialogComponentProps={{ fullWidth: true, maxWidth: 'md', initOnChangeRequest: formInitOnChange, ...popupEditFormDialogComponentProps }}
             popupEditFormComponentProps={{ ...(popupEditFormComponentProps ?? []), avoidSubmitIfAnyValidatorErrors: true }}
             popupEditFormDialogOnClose={(reason?: string) => reason !== 'backdropClick' }
+            popupEditFormDialogButtons={[
+                {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
+                {icon: 'save', text: t('common.save'), componentProps: { variant: 'contained' }, value: true },
+            ]}
 
             toolbarHideRefresh
             toolbarHideCreate
             toolbarHideExport
-            toolbarHideQuickFilter={toolbarHideQuickFilter}
+            toolbarHideQuickFilter
             toolbarElementsWithPositions={toolbarElements}
-            rowHideUpdateButton={rowHideUpdateButton}
-            rowHideDeleteButton={rowHideDeleteButton}
+            rowHideUpdateButton
+            rowHideDeleteButton
             readOnly={readOnly}
 
+            {...others}
             {...paginationProps}
         />
     </div>

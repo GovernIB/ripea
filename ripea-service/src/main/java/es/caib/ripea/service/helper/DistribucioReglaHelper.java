@@ -6,6 +6,8 @@ import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.CrearReglaResponseDto;
 import es.caib.ripea.service.intf.dto.ReglaDistribucioDto;
 import es.caib.ripea.service.intf.dto.StatusEnumDto;
+import es.caib.ripea.service.intf.dto.TipusProcedimentServeiEnum;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,13 +19,13 @@ public class DistribucioReglaHelper  {
     @Autowired private ConfigHelper configHelper;
 	
 	public CrearReglaResponseDto crearRegla(
+			TipusProcedimentServeiEnum tipusProcedimentServei,
 			String entitat, 
 			String sia)  {
 		
 		logger.debug("Creant regla en distribucio (" + "entitat=" + entitat + ", sia=" + sia + ")");
 		
 		try {
-			// Creació del client
 			ReglesRestClient client = new ReglesRestClient(
 					getServiceUrl(),
 					getServiceUsername(),
@@ -31,9 +33,11 @@ public class DistribucioReglaHelper  {
 					isAutenticacioBasic());
 
 			ClientResponse response = client.add(
+					tipusProcedimentServei,
 					entitat,
 					sia,
 					getCodiBackoffice());
+
 			int status = response.getStatus();
 			String reasonPhrase = response.getStatusInfo().getReasonPhrase();
 			String resp = response.getEntity(String.class);
@@ -57,7 +61,6 @@ public class DistribucioReglaHelper  {
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
-
 	}
 	
 	public CrearReglaResponseDto canviEstat(
@@ -67,16 +70,14 @@ public class DistribucioReglaHelper  {
 		logger.debug("Canviant estat de la regla en distribucio (sia=" + sia + ")");
 		
 		try {
-			// Creació del client
 			ReglesRestClient client = new ReglesRestClient(
 					getServiceUrl(),
 					getServiceUsername(),
 					getServicePassword(),
 					isAutenticacioBasic());
 
-			ClientResponse response = client.canviEstat(
-					sia,
-					activa);
+			ClientResponse response = client.canviEstat(sia, activa);
+			
 			int status = response.getStatus();
 			String reasonPhrase = response.getStatusInfo().getReasonPhrase();
 			String resp = response.getEntity(String.class);
@@ -93,9 +94,7 @@ public class DistribucioReglaHelper  {
 				logger.error("Error retornat al canvi d'estat de la regla en distribucio: " + status + " " + reasonPhrase + ": " + resp);
 			}
 
-			return new CrearReglaResponseDto(
-					statusEnumDto,
-					resp);
+			return new CrearReglaResponseDto(statusEnumDto, resp);
 
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);

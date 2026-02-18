@@ -8,6 +8,7 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -332,6 +333,16 @@ public class Utils {
 			str = date.format(DateTimeFormatter.ofPattern(format));
 		}
 		return str;
+	}
+	
+	public static Date localDateTimeToDateJava(LocalDateTime localDateTime) {
+		if (localDateTime==null) return null;
+		ZoneId zone = ZoneId.systemDefault();
+		return Date.from(localDateTime.atZone(zone).toInstant());
+	}
+	
+	public static LocalDateTime dateJavaToLocalDateTime(Date javaIUtilDate) {
+		return javaIUtilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
 	}
 
 	public static String convertDateToString(
@@ -677,6 +688,23 @@ public class Utils {
         return mapaNamedQueries;
 	}
 	
+	public static String findKeyStartingWith(Map<String, String> mapaNamedQueries, String prefix) {
+	    for (String key : mapaNamedQueries.keySet()) {
+	        if (key.startsWith(prefix)) {
+	            return key;
+	        }
+	    }
+	    return null;
+	}
+	
+	public static PaginacioParamsDto sensePaginacio() {
+		PaginacioParamsDto sensePaginacio = new PaginacioParamsDto();
+		sensePaginacio.setPaginaNum(0);
+		sensePaginacio.setPaginaTamany(Integer.MAX_VALUE);
+		addSortDefault(sensePaginacio, "id");
+		return sensePaginacio;
+	}
+	
 	public static void addSortDefault(PaginacioParamsDto paginacioParams, String camp) {
 		boolean isOrderedByNom = false;
 		if (paginacioParams.getOrdres() != null && !paginacioParams.getOrdres().isEmpty()) {
@@ -868,5 +896,28 @@ public class Utils {
     	}
     	
     	return fitxerContentType;
+    }
+    
+    public static String eliminaFiltreCurrentSpringFilter(String currentSpringFilter, String filtreEliminar) {
+        
+    	if (currentSpringFilter!=null && currentSpringFilter.contains(filtreEliminar)) {
+        	
+        	if (currentSpringFilter.contains("AND "+filtreEliminar)) {
+        		currentSpringFilter = currentSpringFilter.replace("AND "+filtreEliminar, "");
+        	} else if (currentSpringFilter.contains(filtreEliminar+" AND")) {
+        		currentSpringFilter = currentSpringFilter.replace(filtreEliminar+" AND", "");
+        	} else {
+        		currentSpringFilter = currentSpringFilter.replace(filtreEliminar, "");
+        	}
+        	
+        	//Elimina espais en blanc i tabulacions extres
+        	currentSpringFilter = currentSpringFilter.replaceAll("\\s+", " ");
+        	
+        	if (currentSpringFilter.equals("()") || currentSpringFilter.equals("( )") || !Utils.hasValue(currentSpringFilter)) {
+        		currentSpringFilter = null;
+        	}
+        }
+    	
+    	return currentSpringFilter;
     }
 }

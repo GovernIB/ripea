@@ -5,6 +5,7 @@ import StyledMuiGrid from '../../components/StyledMuiGrid.tsx';
 import * as builder from "../../util/springFilterUtils.ts";
 import {GridSortDirection} from "@mui/x-data-grid-pro";
 import useAnotacioDetail from "../anotacions/details/AnotacioDetail.tsx";
+import {useMemo} from "react";
 
 const sortModel:any = [{field: 'registreInfo.data', sort: 'desc'}];
 const perspectives = ['REGISTRE', 'ESTAT_VIEW'];
@@ -13,7 +14,7 @@ const AnotacionsExpedientGrid = (props:any) => {
     const { id } = props;
     const { t } = useTranslation();
 
-    const columns = [
+    const columns = useMemo(() => [
         {
             field: 'registreInfo.extracte',
             headerName: t('page.registre.grid.extracte'),
@@ -31,7 +32,7 @@ const AnotacionsExpedientGrid = (props:any) => {
             headerName: t('page.registre.grid.data'),
             flex: 0.5,
             valueFormatter: (value: any) => formatDate(value),
-            sortProcessor: (field: string, sort: GridSortDirection) => {
+            sortProcessor: (_field: string, sort: GridSortDirection) => {
                 return [{field: 'registre.data', sort}];
             },
         },
@@ -41,7 +42,7 @@ const AnotacionsExpedientGrid = (props:any) => {
             sortable: false,
             flex: 0.5,
         },
-    ];
+    ], [t]);
 
     const {actions, components} = useAnotacioActions();
     const {handleOpen, dialog} = useAnotacioDetail();

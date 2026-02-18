@@ -35,6 +35,7 @@ import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.ArxiuEstatEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaEstatDto;
+import es.caib.ripea.service.intf.dto.ExecucioMassivaTipusDto;
 import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientTascaValidacioDto;
@@ -73,7 +74,7 @@ public class ExpedientHelper2 {
 		if (anyExecucioMassiva(expedient)) {
 			throw new ValidationException("No es pot tancar un expedient amb execucions massives pendents de finalitzar");
 		}
-		List<ValidacioErrorDto> errorsExp = cacheHelper.findErrorsValidacioPerNode(expedient.getId(), false);
+		List<ValidacioErrorDto> errorsExp = cacheHelper.findErrorsValidacioPerNode(expedient.getId());
 		if (!errorsExp.isEmpty()) {
 			throw new ValidationException("No es pot tancar un expedient amb errors de validació");
 		}
@@ -345,9 +346,11 @@ public class ExpedientHelper2 {
 		for (InteressatEntity interessat: interessatsExpedient) {
 			elementIds.add(interessat.getId());
 		}
-		long pendentsCount = execucioMassivaContingutRepository.countByElementIdInAndEstat(
+		//Execucions massives pendents, excepte tancament
+		long pendentsCount = execucioMassivaContingutRepository.countByElementIdInAndEstatAndExecucioMassivaTipusNot(
 				elementIds,
-				ExecucioMassivaEstatDto.ESTAT_PENDENT);
+				ExecucioMassivaEstatDto.ESTAT_PENDENT,
+				ExecucioMassivaTipusDto.TANCAMENT);
 		return pendentsCount > 0;
 	}
 

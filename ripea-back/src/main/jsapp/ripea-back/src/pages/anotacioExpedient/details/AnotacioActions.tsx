@@ -1,7 +1,7 @@
 import {useTranslation} from "react-i18next";
 import useAnotacioDetail from "../../anotacions/details/AnotacioDetail.tsx";
 
-const useAnotacioActions = () => {
+export const useAnotacioActions = () => {
     const { t } = useTranslation();
     const {handleOpen, dialog} = useAnotacioDetail();
 

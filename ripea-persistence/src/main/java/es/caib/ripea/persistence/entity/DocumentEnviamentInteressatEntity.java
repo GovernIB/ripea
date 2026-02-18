@@ -113,37 +113,31 @@ public class DocumentEnviamentInteressatEntity extends RipeaAuditable<Long> {
 		this.enviamentCertificacioData = enviamentCertificacioData;
 	}
 	
+	public void updateEnviamentError(
+			EnviamentEstat enviamentEstat,
+			Date enviamentDatatData,
+			String enviamentDatatOrigen,
+			String errorDescripcio) {
+		this.enviamentDatatEstat	= enviamentEstat!=null?enviamentEstat.name():EnviamentEstat.DESCONEGUT.name();
+		this.enviamentDatatData		= enviamentDatatData;
+		this.enviamentDatatOrigen	= enviamentDatatOrigen;
+		this.error 					= true;
+		this.errorDescripcio 		= errorDescripcio;
+	}
+	
 	public void updateEnviamentEstat(
 			EnviamentEstat enviamentDatatEstat,
 			Date enviamentDatatData,
 			String enviamentDatatOrigen,
 			Date enviamentCertificacioData,
-			String enviamentCertificacioOrigen,
-			Boolean error,
-			String errorDescripcio) {
+			String enviamentCertificacioOrigen) {
 		this.enviamentDatatEstat = enviamentDatatEstat != null ? enviamentDatatEstat.name() : null;
 		this.enviamentDatatData = enviamentDatatData;
 		this.enviamentDatatOrigen = enviamentDatatOrigen;
 		this.enviamentCertificacioData = enviamentCertificacioData;
 		this.enviamentCertificacioOrigen = enviamentCertificacioOrigen;
-
-		this.error = error;
-		this.errorDescripcio = errorDescripcio;
-//		switch (enviamentDatatEstat) {
-//		case LLEGIDA:
-//		case NOTIFICADA:
-//			updateProcessat(true, enviamentDatatData);
-//			break;
-//		case EXPIRADA:
-//		case REBUTJADA:
-//			updateProcessat(false, enviamentDatatData);
-//			break;
-//		case NOTIB_ENVIADA:
-//			updateEnviat(enviamentDatatData);
-//			break;
-//		default:
-//			break;
-//		}
+		this.error = false;
+		this.errorDescripcio = null;
 	}
 	
 	public void updateEnviamentInfoRegistre(

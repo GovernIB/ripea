@@ -1,50 +1,61 @@
 package es.caib.ripea.service.intf.model;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
+
+import javax.validation.constraints.NotNull;
+
+import org.springframework.data.annotation.Transient;
+
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
-import es.caib.ripea.service.intf.dto.*;
+import es.caib.ripea.service.intf.dto.MetaDadaTipusEnumDto;
+import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
-import org.springframework.data.annotation.Transient;
-
-import javax.validation.constraints.NotNull;
-import java.io.Serializable;
-import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List;
 
 @Getter
 @Setter
+@FieldNameConstants
 @NoArgsConstructor
 @ResourceConfig(
-        quickFilterFields = { "codi", "nom" },
-        descriptionField = "nom"
+        quickFilterFields = { "codi", "nom", "tipus" },
+        descriptionField = "nom",
+		artifacts = {
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = MetaDadaResource.ACTION_REORDENAR_CODE,
+                        formClass = Integer.class,
+                        requiresId = true),
+		}
 )
 public class MetaDadaResource extends BaseAuditableResource<Long> {
 
-    private String codi;
-    private String nom;
-    private MetaDadaTipusEnumDto tipus;
+	public static final String ACTION_REORDENAR_CODE			= "REORDENAR";
+	
+	@NotNull private String codi;
+    @NotNull private String nom;
+    @NotNull private MetaDadaTipusEnumDto tipus = MetaDadaTipusEnumDto.TEXT;
     private String descripcio;
-    private MultiplicitatEnumDto multiplicitat;
+    @NotNull private MultiplicitatEnumDto multiplicitat = MultiplicitatEnumDto.M_1;
     private boolean readOnly;
     private int ordre;
     private boolean activa;
 
-//    private DominiDto domini;
-
     private Long valorSencer;
     private Double valorFlotant;
     private BigDecimal valorImport;
-    private Date valorData;
+    private LocalDateTime valorData;
     private Boolean valorBoolea;
     private String valorString;
-
+    private ResourceReference<DominiResource, Long> domini;
+    
     private boolean noAplica;
 
     private boolean enviable;
@@ -56,6 +67,10 @@ public class MetaDadaResource extends BaseAuditableResource<Long> {
         return this.codi + " - " + this.nom;
     }
 
-    @Transient
-    private List<DadaResource> dades;
+    @Transient private List<DadaResource> dades;
+    
+    @Transient private boolean importar = true;
+    @Transient private Long importacioId;
+    
+    private static final long serialVersionUID = 752278996924931848L;
 }

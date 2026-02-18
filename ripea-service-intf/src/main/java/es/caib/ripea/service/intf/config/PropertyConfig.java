@@ -132,13 +132,17 @@ public class PropertyConfig {
 	public static final String ARXIU_PLUGIN_PASS					= "es.caib.ripea.plugin.arxiu.caib.contrasenya";
 	public static final String ARXIU_PLUGIN_APLICACIO_CODI			= "es.caib.ripea.plugin.arxiu.caib.aplicacio.codi";
 	public static final String ARXIU_PLUGIN_ENDPOINT_NAME			= "es.caib.ripea.arxiu.endpointName";
+	public static final String ARXIU_PLUGIN_METADADES_ADICIONALS	= "es.caib.ripea.arxiu.metadades.addicionals.actiu";
+	public static final String ARXIU_PLUGIN_FIRMA_DETALLS			= "es.caib.ripea.arxiu.firma.detalls.actiu";
+	
+	public static final String ARXIU_CSV_PLUGIN_CLASS				= "es.caib.ripea.concsv.class";
 	public static final String ARXIU_PLUGIN_VERSIO_IMPR_URL			= "es.caib.ripea.plugin.arxiu.caib.conversio.imprimible.url";
 	public static final String ARXIU_PLUGIN_VERSIO_IMPR_USR			= "es.caib.ripea.plugin.arxiu.caib.conversio.imprimible.usuari";
 	public static final String ARXIU_PLUGIN_VERSIO_IMPR_PAS			= "es.caib.ripea.plugin.arxiu.caib.conversio.imprimible.contrasenya";
 	public static final String ARXIU_PLUGIN_TIMEOUT_CONNECT			= "es.caib.ripea.plugin.arxiu.caib.timeout.connect";
 	public static final String ARXIU_PLUGIN_TIMEOUT_READ			= "es.caib.ripea.plugin.arxiu.caib.timeout.read";
-	public static final String ARXIU_PLUGIN_METADADES_ADICIONALS	= "es.caib.ripea.arxiu.metadades.addicionals.actiu";
-	public static final String ARXIU_PLUGIN_FIRMA_DETALLS			= "es.caib.ripea.arxiu.firma.detalls.actiu";
+	public static final String ARXIU_PLUGIN_CSV_ENDPOINT_NAME		= "es.caib.ripea.concsv.endpointName";
+
 
 	public static final String CONVERSIO_PLUGIN_CLASS			= "es.caib.ripea.plugin.conversio.class";
 	public static final String CONVERSIO_PLUGIN_OOFICE_HOST		= "es.caib.ripea.plugin.conversio.ooffice.host";
@@ -221,12 +225,20 @@ public class PropertyConfig {
 	public static final String DIGITALITZACIO_PLUGIN_SCANNER_MOCK	= "es.caib.ripea.plugin.digitalitzacio.scanner.mock";
 
 	public static final String COMANDA_PLUGIN_ACTIU					= "es.caib.ripea.plugin.comanda.actiu";
+	public static final String COMANDA_APP_CODI						= "es.caib.ripea.plugin.comanda.aplicacio";
 	public static final String COMANDA_PLUGIN_ENTORN				= "es.caib.ripea.plugin.comanda.entorn";
 	public static final String COMANDA_PLUGIN_CLASS					= "es.caib.ripea.plugin.comanda.class";
 	public static final String COMANDA_PLUGIN_URL					= "es.caib.ripea.plugin.comanda.baseurl";
 	public static final String COMANDA_PLUGIN_USR					= "es.caib.ripea.plugin.comanda.user";
 	public static final String COMANDA_PLUGIN_PWR					= "es.caib.ripea.plugin.comanda.password";
 	public static final String COMANDA_PLUGIN_ENDPOINT				= "es.caib.ripea.plugin.comanda.endpointName";
+	
+	public static final String REGISTRE_PLUGIN_CLASS 				= "es.caib.ripea.plugin.registre.class";
+	public static final String REGISTRE_PLUGIN_URL 					= "es.caib.ripea.plugin.registre.baseurl";
+	public static final String REGISTRE_PLUGIN_USER 				= "es.caib.ripea.plugin.registre.username";
+	public static final String REGISTRE_PLUGIN_PASS 				= "es.caib.ripea.plugin.registre.password";
+	public static final String REGISTRE_PLUGIN_DEBUG 				= "es.caib.ripea.plugin.registre.log.actiu";
+	public static final String REGISTRE_PLUGIN_TIMEOUT 				= "es.caib.ripea.plugin.registre.timeout";
 	
 	public static final String REINTENTAR_CANVI_ESTAT_DISTRIBUCIO 					= "es.caib.ripea.segonpla.reintentar.anotacions.pendents.enviar.distribucio";	
 	public static final String ENVIAR_EMAILS_PENDENTS_PROCEDIMENT_COMENTARI_CRON 	= "es.caib.ripea.segonpla.email.enviament.procediment.comentari.cron";	
@@ -287,6 +299,7 @@ public class PropertyConfig {
 	public static final String EXPORTACIO_EXCEL                                     = "es.caib.ripea.expedient.exportacio.excel";
 	public static final String EXPORTACIO_INSIDE                                    = "es.caib.ripea.expedient.exportar.inside";
 	public static final String TANCAMENT_LOGIC								        = "es.caib.ripea.expedient.tancament.logic";
+	public static final String MOURE_TOT								        	= "es.caib.ripea.expedient.accio.moure.tot.activa";
 	public static final String OBTENIR_DATA_FIRMA_FROM_ATRIBUT_DOC 					= "es.caib.ripea.obtenir.data.firma.atributs.document";
 	public static final String TANCAMENT_LOGIC_DIES								    = "es.caib.ripea.expedient.tancament.logic.dies";
 	public static final String MANTENIR_ESTAT_CARPETA								= "es.caib.ripea.carpetes.mantenir.estat";

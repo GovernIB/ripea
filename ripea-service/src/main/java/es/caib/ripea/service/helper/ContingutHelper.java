@@ -11,17 +11,15 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Hibernate;
 import org.slf4j.Logger;
@@ -44,8 +42,6 @@ import com.lowagie.text.pdf.PdfReader;
 import es.caib.plugins.arxiu.api.Carpeta;
 import es.caib.plugins.arxiu.api.ContingutArxiu;
 import es.caib.plugins.arxiu.api.Document;
-import es.caib.plugins.arxiu.api.DocumentMetadades;
-import es.caib.plugins.arxiu.api.Expedient;
 import es.caib.plugins.arxiu.api.ExpedientMetadades;
 import es.caib.plugins.arxiu.caib.ArxiuCaibException;
 import es.caib.ripea.persistence.entity.CarpetaEntity;
@@ -81,7 +77,6 @@ import es.caib.ripea.persistence.repository.DadaRepository;
 import es.caib.ripea.persistence.repository.DocumentNotificacioRepository;
 import es.caib.ripea.persistence.repository.DocumentPortafirmesRepository;
 import es.caib.ripea.persistence.repository.DocumentRepository;
-import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.persistence.repository.ExpedientEstatRepository;
 import es.caib.ripea.persistence.repository.ExpedientRepository;
 import es.caib.ripea.persistence.repository.ExpedientTascaRepository;
@@ -107,7 +102,6 @@ import es.caib.ripea.service.intf.dto.DocumentDto;
 import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentFirmaTipusEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentNotificacioEstatEnumDto;
-import es.caib.ripea.service.intf.dto.DocumentNtiTipoFirmaEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentVersioDto;
 import es.caib.ripea.service.intf.dto.EntitatDto;
@@ -115,7 +109,6 @@ import es.caib.ripea.service.intf.dto.ExpedientDto;
 import es.caib.ripea.service.intf.dto.ExpedientEstatDto;
 import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
-import es.caib.ripea.service.intf.dto.ImportacioDto;
 import es.caib.ripea.service.intf.dto.InteressatDto;
 import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MetaDadaTipusEnumDto;
@@ -130,11 +123,9 @@ import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
 import es.caib.ripea.service.intf.dto.ResultDocumentsSenseContingut.ResultDocumentSenseContingut;
 import es.caib.ripea.service.intf.dto.ResultDocumentsSenseContingut.ResultDocumentSenseContingut.ResultDocumentSenseContingutBuilder;
 import es.caib.ripea.service.intf.dto.TipusDocumentalDto;
-import es.caib.ripea.service.intf.dto.TipusImportEnumDto;
 import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.dto.ValidacioErrorDto;
 import es.caib.ripea.service.intf.exception.ArxiuJaGuardatException;
-import es.caib.ripea.service.intf.exception.DocumentAlreadyImportedException;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.exception.PermissionDeniedException;
 import es.caib.ripea.service.intf.exception.ValidationException;
@@ -172,7 +163,6 @@ public class ContingutHelper {
 	@Autowired private TipusDocumentalRepository tipusDocumentalRepository;
 	@Autowired private IndexHelper indexHelper;
 	@Autowired private MessageHelper messageHelper;
-	@Autowired private DocumentFirmaPortafirmesHelper firmaPortafirmesHelper;
 	@Autowired private ConfigHelper configHelper;
 	@Autowired private OrganGestorHelper organGestorHelper;
 	@Autowired private MetaDocumentRepository metaDocumentRepository;
@@ -181,7 +171,6 @@ public class ContingutHelper {
 	@Autowired private ExpedientInteressatHelper expedientInteressatHelper;
 	@Autowired private DocumentFirmaPortafirmesHelper documentFirmaPortafirmesHelper;
 	@Autowired private CarpetaHelper carpetaHelper;
-	@Autowired private EntitatRepository entitatRepository;
 	
 	@Autowired private Environment env;
 
@@ -601,7 +590,7 @@ public class ContingutHelper {
 		}
 		dto.setAgafatPer(conversioTipusHelper.convertir(expedient.getAgafatPer(), UsuariDto.class));
 
-        List<ValidacioErrorDto> errorsValidacio = cacheHelper.findErrorsValidacioPerNode(expedient.getId(), true);
+        List<ValidacioErrorDto> errorsValidacio = cacheHelper.findErrorsValidacioPerNode(expedient.getId());
         dto.setValid(errorsValidacio.isEmpty());
         dto.setNotificacionsCaducades(expedientHelper.expedientTeNotificacionsCaducades(expedient));
 		dto.setNumSeguidors(expedient.getSeguidors().size());
@@ -937,7 +926,7 @@ public class ContingutHelper {
 	}
 
 	private void setValidationProperties(DocumentDto dto, DocumentEntity document) {
-		dto.setValid(cacheHelper.findErrorsValidacioPerNode(document.getId(), true).isEmpty());
+		dto.setValid(cacheHelper.findErrorsValidacioPerNode(document.getId()).isEmpty());
 		dto.setValidacioFirmaCorrecte(document.isValidacioFirmaCorrecte());
 		dto.setValidacioFirmaErrorMsg(document.getValidacioFirmaErrorMsg());
 	}
@@ -1152,22 +1141,22 @@ public class ContingutHelper {
 //			## Comprovar si la certificació està firmada
 			validarFirmaCertificacio(resposta, dto);
 		}
+
 		dto.setVersioCount(0);
 		dto.setDataCaptura(new Date());
 		dto.setNtiVersion("1.0");
 		dto.setNtiIdentificador(resposta.getCertificacioHash());
 		dto.setNtiOrgano(resposta.getReceptorNif());
 		dto.setNtiOrganoDescripcio(resposta.getReceptorNom());
-		dto.setNtiOrigen(metaDocument.getNtiOrigen());
-		dto.setNtiEstadoElaboracion(metaDocument.getNtiEstadoElaboracion());
-		dto.setNtiTipoDocumental(metaDocument.getNtiTipoDocumental());
-
 		dto.setNtiCsv(resposta.getCertificacioCsv());
 
-		metaNode = conversioTipusHelper.convertir(
-				metaDocument,
-				MetaDocumentDto.class);
-		dto.setMetaNode(metaNode);
+		if (metaDocument!=null) {
+			dto.setNtiOrigen(metaDocument.getNtiOrigen());
+			dto.setNtiEstadoElaboracion(metaDocument.getNtiEstadoElaboracion());
+			dto.setNtiTipoDocumental(metaDocument.getNtiTipoDocumental());
+			metaNode = conversioTipusHelper.convertir(metaDocument, MetaDocumentDto.class);
+			dto.setMetaNode(metaNode);
+		}
 		return dto;
 	}
 
@@ -1483,7 +1472,7 @@ public class ContingutHelper {
 		if ((conteDocumentsDefinitius(contingut) && isPermesEsborrarFinals()) || !conteDocumentsDefinitius(contingut)) {
 			if (!conteDocumentsAnotacions(contingut)) {
 				//Marca el contingut i tots els seus fills com a esborrats de forma recursiva
-				marcarEsborrat(contingut);
+				marcarEsborrat(entitatId, contingut, rolActual);
 			} else {
 				logger.error("Aquest contingut prové d'una anotació o conté documents que provenen de una anotació (contingutId=" + contingut.getId() + ")");
 				throw new ValidationException(
@@ -1502,11 +1491,11 @@ public class ContingutHelper {
 		// Cancel·lar enviament si el document conté enviaments pendents
 		if (contingut instanceof DocumentEntity) {
 			if (expedientPare != null) {
-				cacheHelper.evictErrorsValidacioPerNode(expedientPare.getId());
+				cacheHelper.evictErrorsValidacioAndNotify(expedientPare.getId());
 			}
 			DocumentEntity document = (DocumentEntity)contingut;
 			if (document.getEstat().equals(DocumentEstatEnumDto.FIRMA_PENDENT)) {
-				firmaPortafirmesHelper.portafirmesCancelar(
+				documentFirmaPortafirmesHelper.portafirmesCancelar(
 						entitatId,
 						document, rolActual);
 			}
@@ -2063,7 +2052,7 @@ public class ContingutHelper {
 	public void arxiuCarpetaLogicaPropagarMoviment(
 			ContingutEntity origen,
 			String uuidExpedientDesti) {
-		Set<ContingutEntity> fills = origen.getFills();
+		List<ContingutEntity> fills = contingutRepository.findByPareAndEsborratAndOrdenat(origen, 0);
 		
 		for (ContingutEntity fill : fills) {
 			if (fill instanceof DocumentEntity) {
@@ -2174,6 +2163,151 @@ public class ContingutHelper {
 		return contingutRepository.getOne(contingutActual.getId());
 	}
 
+	public void undelete(Long contingutId) {
+		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(contingutId);
+		undelete(contingut);
+	}
+	
+	public void undelete(ContingutEntity contingut) {
+		// No es comproven permisos perquè això només ho pot fer l'administrador
+		if (contingut.getEsborrat() == 0) {
+			logger.error("Aquest contingut no està esborrat (contingutId=" + contingut.getId() + ")");
+			throw new ValidationException(contingut.getId(), ContingutEntity.class, "Aquest contingut no està esborrat");
+		}
+		
+		if (contingut instanceof DocumentEntity) {
+			String uniqueNameInPare = getUniqueNameInPare(contingut.getNom(), contingut.getPare().getId());
+			contingut.updateNom(uniqueNameInPare);
+		} else {
+			boolean nomDuplicat = contingutRepository.findByPareAndNomAndEsborrat(
+					contingut.getPare(),
+					contingut.getNom(),
+					0) != null;
+			if (nomDuplicat) {
+				throw new ValidationException(
+						contingut.getId(),
+						ContingutEntity.class,
+						"Ja existeix un altre contingut amb el mateix nom dins el mateix pare");
+			}
+		}
+
+		// Recupera el contingut esborrat
+		contingut.updateEsborrat(0);
+
+		// Registra al log la recuperació del contingut
+		contingutLogHelper.log(
+				contingut,
+				LogTipusEnumDto.RECUPERACIO,
+				null,
+				null,
+				true,
+				true);
+
+		if (!conteDocumentsDefinitius(contingut) && !(contingut instanceof DocumentEntity && ((DocumentEntity) contingut).getGesDocAdjuntId() != null)) {
+
+			// Propaga l'acció a l'arxiu
+			FitxerDto fitxer = null;
+
+			if (contingut instanceof ExpedientEntity) {
+				arxiuPropagarModificacio((ExpedientEntity) contingut);
+			} else if (contingut instanceof DocumentEntity) {
+				
+				DocumentEntity document = (DocumentEntity)contingut;
+				if (DocumentTipusEnumDto.DIGITAL.equals(document.getDocumentTipus())) {
+
+					DocumentFirmaTipusEnumDto documentFirmaTipus = document.getDocumentFirmaTipus();
+					List<ArxiuFirmaDto> firmes = null;
+					
+					if (documentFirmaTipus == DocumentFirmaTipusEnumDto.SENSE_FIRMA) {
+						fitxer = fitxerDocumentEsborratLlegir(document);
+					} else if (documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA) {
+						
+						fitxer = fitxerDocumentEsborratLlegir(document);
+						firmes = documentHelper.validaFirmaDocument(
+								document, 
+								fitxer,
+								null, 
+								false, 
+								true);
+						
+					} else if (documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_SEPARADA) {
+						
+						fitxer = fitxerDocumentEsborratLlegir(document);
+						byte[] firmaContingut = firmaSeparadaEsborratLlegir(document);
+						firmes = documentHelper.validaFirmaDocument(
+								document, 
+								fitxer,
+								firmaContingut, 
+								false, 
+								true);
+					} 
+					
+					ArxiuEstatEnumDto arxiuEstat = documentHelper.getArxiuEstat(documentFirmaTipus, null, document.isFirmaParcial());
+							
+					if (arxiuEstat == ArxiuEstatEnumDto.ESBORRANY && documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_SEPARADA) {
+						pluginHelper.arxiuPropagarFirmaSeparada(
+								document,
+								firmes.get(0).getFitxer());
+					}
+					
+					if (firmes == null && (fitxer== null || Utils.isEmpty(fitxer.getContingut()))) {
+						throw new ValidationException("No s'ha pogut recuperar el contingut del document esborrat.");
+					}
+					
+					arxiuPropagarModificacio(
+							document,
+							fitxer,
+							arxiuEstat == ArxiuEstatEnumDto.ESBORRANY ? DocumentFirmaTipusEnumDto.SENSE_FIRMA : documentFirmaTipus,
+							firmes,
+							arxiuEstat);
+				}
+
+			} else if (contingut instanceof CarpetaEntity) {
+				arxiuPropagarModificacio((CarpetaEntity) contingut);
+			}
+
+			if (fitxer != null) {
+				fitxerDocumentEsborratEsborrar((DocumentEntity)contingut);
+			}
+		}
+	}
+	
+	public void deleteDefinitiu(Long contingutId) {
+		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(contingutId);
+		deleteDefinitiu(contingut);
+	}
+	
+	public void deleteDefinitiu(ContingutEntity contingut) {
+		
+		if (contingut.getPare() != null) {
+			contingut.getPare().getFills().remove(contingut);
+		}
+		
+		if (contingut instanceof ExpedientEntity && contingut.getFills() != null && !contingut.getFills().isEmpty()) {
+			
+			List<ContingutEntity> descendants = new ArrayList<>();
+			findDescendants(contingut, descendants, false, true);
+			
+			Iterator<ContingutEntity> itr = descendants.iterator();
+			while (itr.hasNext()) {
+				ContingutEntity cont = itr.next();
+				if (cont.getPare() != null) {
+					cont.getPare().getFills().remove(cont);
+				}
+				if (cont instanceof DocumentEntity) {
+					documentHelper.deleteDefinitiu((DocumentEntity) cont);
+				} else {
+					contingutRepository.delete(cont);
+				}
+				
+			}
+		} else if (contingut instanceof DocumentEntity) {
+			documentHelper.deleteDefinitiu((DocumentEntity) contingut);
+		} else {
+			contingutRepository.delete(contingut);
+		}
+	}
+	
 	public void findDescendants(
 			ContingutEntity contingut,
 			List<ContingutEntity> descendants,
@@ -2220,9 +2354,7 @@ public class ContingutHelper {
 		}
 	}
 
-	public void arxiuPropagarModificacio(
-			ExpedientEntity expedient) {
-
+	public void arxiuPropagarModificacio(ExpedientEntity expedient) { 
 		pluginHelper.arxiuExpedientActualitzar(expedient);
 	}
 
@@ -2636,14 +2768,22 @@ public class ContingutHelper {
 		}
 	}
 
-	public void marcarEsborrat(ContingutEntity contingut) {
+	public void marcarEsborrat(Long entitatId, ContingutEntity contingut, String rolActual) {
 
 		if (contingut.getEsborrat() == 0) {
 
 			for (ContingutEntity contingutFill: contingut.getFills()) {
-				marcarEsborrat(contingutFill);
+				marcarEsborrat(entitatId, contingutFill, rolActual);
 			}
 
+			//Si es un document, amb enviament a PF en curs, es cancela
+			if (contingut instanceof DocumentEntity) {
+				DocumentEntity documentEntity = (DocumentEntity)contingut;
+				if (documentEntity.getEstat().equals(DocumentEstatEnumDto.FIRMA_PENDENT)) {
+					documentFirmaPortafirmesHelper.portafirmesCancelar(entitatId, documentEntity, rolActual);
+				}
+			}
+			
 			List<ContingutEntity> continguts = contingutRepository.findByPareAndNomOrderByEsborratAsc(
 					contingut.getPare(),
 					contingut.getNom());
@@ -2793,13 +2933,6 @@ public class ContingutHelper {
 			throw new ValidationException(contingutId, ContingutEntity.class,
 					"El contingut amb id=" + contingutId + "a sincronitzar no és de tipus expedient");
 		}
-
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				false,
-				false,
-				true, false);
 		
 		List<CodiValorDto> resultat = new ArrayList<>();
 
@@ -2841,6 +2974,16 @@ public class ContingutHelper {
 			};
 			return setResultatSync(OK, messageHelper.getMessage("contingutHelper.sincronitzaExpedient.expOk"));
 		} else {
+			
+			//Si té interessats pendents de sincronitzar, feim un update
+			if (expedient.getInteressatsORepresentants()!=null) {
+				for (InteressatEntity interessat: expedient.getInteressatsORepresentants()) {
+					if (!interessat.isArxiuPropagat()) {
+						expedientInteressatHelper.arxiuPropagarInteressats(expedient, interessat);
+					}
+				}
+			}
+			
 			// Si ja està guardat, sincronitzam l'estat
 			es.caib.plugins.arxiu.api.Expedient arxiuExpedient = pluginHelper.arxiuExpedientConsultar(expedient);
 			if (arxiuExpedient == null)
@@ -2970,17 +3113,24 @@ public class ContingutHelper {
 					.codi("ERROR")
 					.valor(messageHelper.getMessage("contingutHelper.sincronitzaExpedient.docKo", new Object[] {document.getNom()}) + " " + exception.getMessage()).build();
 		} else {
-		// Actualitzar estat
+
 			Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(document.getArxiuUuid());
 			ArxiuEstatEnumDto estat = getDocumentArxiuEstat(arxiuDocument);
+			//Actualitzar les metadades del DocumentEntity amb la informació de Arxiu (no inclou estat)
+			pluginHelper.propagarMetadadesDocument(arxiuDocument, document);
+			document.setArxiuPropagat(true);
+			
+			// Actualitzar estat
 			if (estat != null && !estat.equals(document.getArxiuEstat())) {
 				document.updateArxiuEstat(estat);
-				if (ArxiuEstatEnumDto.DEFINITIU.equals(estat) && arxiuDocument.getFirmes() != null && !arxiuDocument.getFirmes().isEmpty()
+				if (ArxiuEstatEnumDto.DEFINITIU.equals(estat) 
+						&& arxiuDocument.getFirmes() != null 
+						&& !arxiuDocument.getFirmes().isEmpty()
 						&& !DocumentEstatEnumDto.DEFINITIU.equals(document.getEstat())) {
 					document.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
 				}
 				
-				return setResultatSync(OK, messageHelper.getMessage("contingutHelper.sincronitzaExpedient.docKo", new Object[] {document.getNom(), estat}));
+				return setResultatSync(OK, messageHelper.getMessage("contingutHelper.sincronitzaExpedient.docOk", new Object[] {document.getNom(), estat}));
 			}
 			return setResultatSync(INFO, messageHelper.getMessage("contingutHelper.sincronitzaExpedient.docNoNeed"));
 		}
@@ -3361,296 +3511,7 @@ public class ContingutHelper {
 
 		return contingutOrigen.getId();
 	}
-	
-	public int importarDocuments(
-			Long entitatId,
-			Long contingutId,
-			ImportacioDto params,
-			Map<String, String> documentAlreadyHasExpedient,
-			List<DocumentDto> expedientsWithImportacio) {
-		
-		ExpedientEntity expedientSuperior;
-		FitxerDto fitxer = new FitxerDto();
-		int documentsRepetits = 0;
-		boolean usingNumeroRegistre = params.getTipusImportacio().equals(TipusImportEnumDto.NUMERO_REGISTRE);
-		String numeroRegistre = params.getNumeroRegistre();
-		ExpedientEntity expedientEntity = null;
-		CarpetaEntity carpetaEntity = null;
-		boolean isCarpeta = false;
-		ContingutEntity pareActual = comprovarContingutDinsExpedientModificable(
-				entitatId,
-				contingutId,
-				false,
-				false,
-				false,
-				false, 
-				false, true, null);
-		
-		if (ContingutTipusEnumDto.EXPEDIENT.equals(pareActual.getTipus())) {
-			expedientSuperior = (ExpedientEntity)pareActual;
-		} else {
-			expedientSuperior = pareActual.getExpedient();
-		}
-		
-		List<ContingutArxiu> documentsTrobats = cercarDocumentsArxiu(params);
 
-		// IMPORTAR DETALLS DE CADA DOCUMENT I CREACIÓ DOCUMENT A L'EXPEDIENT
-		List<Document> documents = new ArrayList<Document>();
-		expedientsWithImportacio = new ArrayList<DocumentDto>();
-		documentAlreadyHasExpedient = new HashMap<String, String>();
-		
-		// ### CREA O RECUPERA CARPETA/EXPEDIENT DESTÍ
-		Map<String, Long> desti = new HashMap<String, Long>();
-		if (params.getEstructuraCarpetes() != null) {
-			desti = carpetaHelper.crearEstructuraCarpetes(
-					entitatId, 
-					params.getEstructuraCarpetes(), 
-					expedientSuperior.getId(), 
-					params.getDestiId());
-		}
-		
-		Long destiId = null;
-		try {
-			destiId = Long.valueOf(params.getDestiId());
-		} catch (NumberFormatException nfe) {
-			if (!desti.isEmpty())
-				destiId = Long.valueOf(desti.get(params.getDestiId()));
-		}
-		
-		ContingutEntity destiEntity = entityComprovarHelper.comprovarContingut(destiId);
-		
-		if (destiEntity instanceof CarpetaEntity) {
-			carpetaEntity = (CarpetaEntity)destiEntity;
-			carpetaEntity.updateNumeroRegistre(numeroRegistre);
-			isCarpeta = true;
-		} else {
-			expedientEntity = (ExpedientEntity)destiEntity;
-			expedientEntity.updateNumeroRegistre(numeroRegistre);
-			isCarpeta= false;
-		}
-		
-		for (ContingutArxiu contingutArxiu : documentsTrobats) {
-			Document documentArxiu = pluginHelper.arxiuDocumentConsultar(
-					null,
-					contingutArxiu.getIdentificador(), 
-					null, 
-					true, 
-					false);
-			DocumentMetadades metadadesDocument = contingutArxiu.getDocumentMetadades();
-			if (metadadesDocument != null) {
-				Map<String, Object> metadadesAddicionals = metadadesDocument.getMetadadesAddicionals();
-				if (metadadesAddicionals != null) {
-					documentAlreadyHasExpedient.put(documentArxiu.getNom(), (String) metadadesAddicionals.get("expedienteId"));
-				}
-			}
-			documents.add(documentArxiu);
-		}
-		
-		documents = findAndCorrectDuplicates(documents);
-		
-		outerloop: for (Document documentArxiu : documents) {
-
-			String tituloDoc = (String) documentArxiu.getMetadades().getMetadadaAddicional("tituloDoc");
-			fitxer.setNom(documentArxiu.getNom());
-			fitxer.setContentType(documentArxiu.getContingut().getTipusMime());
-			fitxer.setContingut(documentArxiu.getContingut().getContingut());
-			fitxer.setTamany(documentArxiu.getContingut().getTamany());
-
-			// COMPROVAR SI S'HA IMPORTAT PRÈVIAMENT I ES PERMET DUPLICAR CONTINGUT
-			List<DocumentDto> documentsAlreadyImported = documentHelper.findByArxiuUuid(documentArxiu.getIdentificador());
-			if (documentsAlreadyImported != null && !documentsAlreadyImported.isEmpty() && ! isIncorporacioDuplicadaPermesa()) {
-				for (DocumentDto documentAlreadyImported: documentsAlreadyImported) {
-					expedientsWithImportacio.add(documentAlreadyImported);
-					documentsRepetits++;
-				}
-				continue outerloop;
-			}
-			String nomDocument = null;
-			if (tituloDoc != null && usingNumeroRegistre) {
-				nomDocument = formatTitulo(tituloDoc, numeroRegistre);
-			} else {
-				nomDocument = documentArxiu.getNom();
-			}
-			nomDocument = nomDocument.trim();
-			comprovarNomValid(
-					isCarpeta ? carpetaEntity : expedientEntity,
-					nomDocument,
-					null,
-					DocumentEntity.class);
-
-			if (checkDocumentUniqueContraint(nomDocument, isCarpeta ? carpetaEntity : expedientEntity, entitatId)>0) {
-				throw new DocumentAlreadyImportedException();
-			}
-			
-			crearDocumentActualitzarMetadades(
-					nomDocument, 
-					documentArxiu, 
-					isCarpeta ? carpetaEntity : expedientEntity,
-					pareActual,
-					expedientSuperior,
-					fitxer,
-					usingNumeroRegistre,
-					params.getCodiEni(),
-					numeroRegistre);
-		}
-		
-		expedientSuperior.updateRegistresImportats(numeroRegistre);
-		return documentsRepetits;
-	}
-	
-	private void crearDocumentActualitzarMetadades(
-			String nomDocument,
-			Document documentArxiu,
-			ContingutEntity contenidor,
-			ContingutEntity pareActual,
-			ExpedientEntity expedient,
-			FitxerDto fitxer,
-			boolean usingNumeroRegistre,
-			String codiEniOrigen,
-			String numeroRegistre) {
-		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(expedient.getId()));
-		// TIPUS DE DOCUMENT PER DEFECTE
-		MetaDocumentEntity metaDocument = metaDocumentRepository.findByMetaExpedientAndPerDefecteTrue(expedient.getMetaExpedient());
-		
-		DocumentNtiTipoFirmaEnumDto documentNtiTipoFirmaEnum = ArxiuConversions.getNtiTipoFirma(documentArxiu);
-		
-		DocumentEntity entity = documentHelper.crearDocumentDB(
-				DocumentTipusEnumDto.IMPORTAT,
-				nomDocument,
-				null,
-				documentArxiu.getMetadades().getDataCaptura(),
-				documentArxiu.getMetadades().getDataCaptura(),
-				//Només hi ha un òrgan
-				getOrgans(documentArxiu),
-				ArxiuConversions.getOrigen(documentArxiu),
-				ArxiuConversions.getEstatElaboracio(documentArxiu),
-				ArxiuConversions.getTipusDocumental(documentArxiu),
-				metaDocument, //metaDocumentEntity
-				contenidor,
-				pareActual.getEntitat(),
-				expedient,
-				null,
-				expedient.getArxiuUuid(),
-				null, 
-				documentHelper.getDocumentFirmaTipus(documentNtiTipoFirmaEnum), 
-				expedient.getEstatAdditional());
-		
-		documentHelper.actualitzarFitxerDB(
-				entity,
-				fitxer);
-
-		entity.updateNumeroRegistre(numeroRegistre);
-		
-		// POSAR COM A CUSTODIAT O DEFINITIU
-		if (documentArxiu.getFirmes() != null && !documentArxiu.getFirmes().isEmpty()) {
-			entity.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
-		} else {
-			entity.updateEstat(DocumentEstatEnumDto.DEFINITIU);
-		}
-		entity.updateArxiuEstat(ArxiuEstatEnumDto.DEFINITIU);
-
-		// MOU/COPIA EL DOCUMENT
-		documentArxiu = pluginHelper.importarDocument(
-				expedient.getArxiuUuid(),
-				documentArxiu.getIdentificador(),
-				usingNumeroRegistre);
-		
-		// ACTUALITZAR METADADES NTI DEL DOCUMENT CREAT
-		entity.updateArxiu(documentArxiu.getIdentificador());
-		entity.updateNtiIdentificador(documentArxiu.getMetadades().getIdentificador());
-		entity.updateNti(
-				obtenirNumeroVersioEniDocument(documentArxiu.getMetadades().getVersioNti()),
-				documentArxiu.getMetadades().getIdentificador(),
-				getOrgans(documentArxiu),
-				ArxiuConversions.getOrigen(documentArxiu),
-				ArxiuConversions.getEstatElaboracio(documentArxiu),
-				ArxiuConversions.getTipusDocumental(documentArxiu),
-				documentArxiu.getMetadades().getIdentificadorOrigen(),
-				documentNtiTipoFirmaEnum,
-				ArxiuConversions.getNtiCsv(documentArxiu)[0],
-				ArxiuConversions.getNtiCsv(documentArxiu)[1]);
-		contingutLogHelper.logCreacio(
-				entity,
-				true,
-				true);
-	}
-	
-	private List<ContingutArxiu> cercarDocumentsArxiu(ImportacioDto params) {
-		// IMPORTAR DE L'ARXIU ELS DOCUMENTS
-		List<ContingutArxiu> documentsArxiu = pluginHelper.importarDocumentsArxiu(params);
-		if (documentsArxiu != null && documentsArxiu.isEmpty())
-			throw new ValidationException("No s'han trobat registres amb les dades especificades");
-		return documentsArxiu;
-	}
-	
-	
-
-	
-	private static final String ENI_DOCUMENT_PREFIX = "http://administracionelectronica.gob.es/ENI/XSD/v";
-	private String obtenirNumeroVersioEniDocument(String versio) {
-		if (versio != null) {
-			if (versio.startsWith(ENI_DOCUMENT_PREFIX)) {
-				int indexBarra = versio.indexOf("/", ENI_DOCUMENT_PREFIX.length());
-				return versio.substring(ENI_DOCUMENT_PREFIX.length(), indexBarra);
-			}
-		}
-		return null;
-	}
-	
-	private String getOrgans(Document documentArxiu) {
-		String organs = null;
-		if (documentArxiu.getMetadades().getOrgans() != null) {
-			List<String> metadadaOrgans = documentArxiu.getMetadades().getOrgans();
-			StringBuilder organsSb = new StringBuilder();
-			boolean primer = true;
-			for (String organ: metadadaOrgans) {
-				organsSb.append(organ);
-				if (primer || metadadaOrgans.size() == 1) {
-					primer = false;
-				} else {
-					organsSb.append(",");
-				}
-			}
-			organs = organsSb.toString();
-		}
-		return organs;
-	}
-	private List<Document> findAndCorrectDuplicates(
-			List<Document> documents) {
-
-		int idx = 1;
-	    List<Document> corrected = new ArrayList<Document>();
-	    Set<String> uniques = new HashSet<>();
-
-	    for(Document document : documents) {
-	    	String tituloDoc = (String)document.getMetadades().getMetadadaAddicional("tituloDoc");
-	        if(!uniques.add(tituloDoc)) {
-	            document.getMetadades().addMetadadaAddicional("tituloDoc", tituloDoc + "_" + idx);
-	            idx++;
-	        }
-	        corrected.add(document);
-	    }
-	    return corrected;
-	}
-	
-	private String formatTitulo(String tituloDoc, String numeroRegistre) {
-		String extension = FilenameUtils.getExtension(tituloDoc);
-		if (extension != null && !extension.isEmpty()) {
-			return FilenameUtils.removeExtension(tituloDoc) + " - " + numeroRegistre.replace('/', '_') + "." + extension;
-		} else {
-			return tituloDoc + " - " + numeroRegistre.replace('/', '_');
-		}
-	}
-
-	private int checkDocumentUniqueContraint (String nom, ContingutEntity pare, Long entitatId) {
-		EntitatEntity entitat = entitatId != null ? entitatRepository.getOne(entitatId) : null;
-		return  checkUniqueContraint(nom, pare, entitat, ContingutTipusEnumDto.DOCUMENT);
-	}
-	
-	private boolean isIncorporacioDuplicadaPermesa() {
-		return configHelper.getAsBoolean(PropertyConfig.INCORPORACIO_ANOTACIO_DUPLICADA);
-	}
-	
 	private ContingutEntity vincularContingut(
 			EntitatEntity entitat,
 			ContingutEntity contingutOrigen,

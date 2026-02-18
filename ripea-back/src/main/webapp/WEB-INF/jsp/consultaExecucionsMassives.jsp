@@ -125,7 +125,9 @@
 			elementTipusTranslated = "<spring:message code='element.tipus.enum.ANOTACIO'/>"
 		} else if (elementTipus == 'ANNEX') {
 			elementTipusTranslated = "<spring:message code='element.tipus.enum.ANNEX'/>"
-		} 
+		} else {
+			elementTipusTranslated = "<spring:message code='element.tipus.enum.ACCIO'/>"
+		}  
 		
 		$('#continguts_' + exm_id).empty();
 		var html_cont =

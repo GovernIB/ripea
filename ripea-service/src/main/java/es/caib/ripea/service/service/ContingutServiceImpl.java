@@ -4,12 +4,12 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -89,8 +89,6 @@ import es.caib.ripea.service.intf.dto.ContingutMassiuFiltreDto;
 import es.caib.ripea.service.intf.dto.ContingutMovimentDto;
 import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentDto;
-import es.caib.ripea.service.intf.dto.DocumentFirmaTipusEnumDto;
-import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
 import es.caib.ripea.service.intf.dto.DominiDto;
 import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
@@ -301,167 +299,19 @@ public class ContingutServiceImpl implements ContingutService {
 	@Transactional
 	@Override
 	@CacheEvict(value = "errorsValidacioNode", key = "#contingutId")
-	public void deleteDefinitiu(
-			Long entitatId,
-			Long contingutId) {
-		logger.debug("Esborrant el contingut ("
-				+ "entitatId=" + entitatId + ", "
-				+ "contingutId=" + contingutId + ")");
-		entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				true,
-				false,
-				false, false, false);
-		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
-				contingutId);
-		// No es comproven permisos perquè això només ho pot fer l'administrador
-		if (contingut.getPare() != null) {
-			contingut.getPare().getFills().remove(contingut);
-		}
-		
-		if (contingut instanceof ExpedientEntity && contingut.getFills() != null && !contingut.getFills().isEmpty()) {
-			List<ContingutEntity> descendants = new ArrayList<>();
-			contingutHelper.findDescendants(contingut, descendants, false, true);
-			
-			Iterator<ContingutEntity> itr = descendants.iterator();
-			while (itr.hasNext()) {
-				ContingutEntity cont = itr.next();
-				if (cont.getPare() != null) {
-					cont.getPare().getFills().remove(cont);
-				}
-				if (cont instanceof DocumentEntity) {
-					documentHelper.deleteDefinitiu((DocumentEntity) cont);
-				} else {
-					contingutRepository.delete(cont);
-				}
-				
-			}
-		} else if (contingut instanceof DocumentEntity) {
-			documentHelper.deleteDefinitiu((DocumentEntity) contingut);
-		} else {
-			contingutRepository.delete(contingut);
-		}
+	public void deleteDefinitiu(Long entitatId, Long contingutId) {
+		logger.debug("Esborrant el contingut (entitatId=" + entitatId + ", contingutId=" + contingutId + ")");
+		entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false, false);
+		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(contingutId);
+		contingutHelper.deleteDefinitiu(contingut);
 	}
 	
 	@Transactional
 	@Override
-	public void undelete(
-			Long entitatId,
-			Long contingutId) throws IOException {
-		logger.debug("Recuperant el contingut ("
-				+ "entitatId=" + entitatId + ", "
-				+ "contingutId=" + contingutId + ")");
-		entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				true,
-				false,
-				false, false, false);
-		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
-				contingutId);
-		// No es comproven permisos perquè això només ho pot fer l'administrador
-		if (contingut.getEsborrat() == 0) {
-			logger.error("Aquest contingut no està esborrat (contingutId=" + contingutId + ")");
-			throw new ValidationException(
-					contingutId,
-					ContingutEntity.class,
-					"Aquest contingut no està esborrat");
-		}
-		
-		if (contingut instanceof DocumentEntity) {
-			String uniqueNameInPare = contingutHelper.getUniqueNameInPare(contingut.getNom(), contingut.getPare().getId());
-			contingut.updateNom(uniqueNameInPare);
-		} else {
-			boolean nomDuplicat = contingutRepository.findByPareAndNomAndEsborrat(
-					contingut.getPare(),
-					contingut.getNom(),
-					0) != null;
-			if (nomDuplicat) {
-				throw new ValidationException(
-						contingutId,
-						ContingutEntity.class,
-						"Ja existeix un altre contingut amb el mateix nom dins el mateix pare");
-			}
-		}
-
-		// Recupera el contingut esborrat
-		contingut.updateEsborrat(0);
-
-		// Registra al log la recuperació del contingut
-		contingutLogHelper.log(
-				contingut,
-				LogTipusEnumDto.RECUPERACIO,
-				null,
-				null,
-				true,
-				true);
-
-		if (!contingutHelper.conteDocumentsDefinitius(contingut) && !(contingut instanceof DocumentEntity && ((DocumentEntity) contingut).getGesDocAdjuntId() != null)) {
-
-			// Propaga l'acció a l'arxiu
-			FitxerDto fitxer = null;
-
-			if (contingut instanceof ExpedientEntity) {
-				contingutHelper.arxiuPropagarModificacio((ExpedientEntity) contingut);
-			} else if (contingut instanceof DocumentEntity) {
-				
-				DocumentEntity document = (DocumentEntity)contingut;
-				if (DocumentTipusEnumDto.DIGITAL.equals(document.getDocumentTipus())) {
-
-					DocumentFirmaTipusEnumDto documentFirmaTipus = document.getDocumentFirmaTipus();
-					List<ArxiuFirmaDto> firmes = null;
-					
-					if (documentFirmaTipus == DocumentFirmaTipusEnumDto.SENSE_FIRMA) {
-						fitxer = contingutHelper.fitxerDocumentEsborratLlegir(document);
-					} else if (documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA) {
-						
-						fitxer = contingutHelper.fitxerDocumentEsborratLlegir(document);
-						firmes = documentHelper.validaFirmaDocument(
-								document, 
-								fitxer,
-								null, 
-								false, 
-								true);
-						
-					} else if (documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_SEPARADA) {
-						
-						fitxer = contingutHelper.fitxerDocumentEsborratLlegir(document);
-						byte[] firmaContingut = contingutHelper.firmaSeparadaEsborratLlegir(document);
-						firmes = documentHelper.validaFirmaDocument(
-								document, 
-								fitxer,
-								firmaContingut, 
-								false, 
-								true);
-					} 
-					
-					ArxiuEstatEnumDto arxiuEstat = documentHelper.getArxiuEstat(documentFirmaTipus, null, document.isFirmaParcial());
-							
-					if (arxiuEstat == ArxiuEstatEnumDto.ESBORRANY && documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_SEPARADA) {
-						pluginHelper.arxiuPropagarFirmaSeparada(
-								document,
-								firmes.get(0).getFitxer());
-					}
-					
-					if (firmes == null && Utils.isEmpty(fitxer.getContingut())) {
-						throw new ValidationException("No es pot recuperar el document perquè no conté el contingut");
-					}
-					
-					contingutHelper.arxiuPropagarModificacio(
-							document,
-							fitxer,
-							arxiuEstat == ArxiuEstatEnumDto.ESBORRANY ? DocumentFirmaTipusEnumDto.SENSE_FIRMA : documentFirmaTipus,
-							firmes,
-							arxiuEstat);
-				}
-
-			} else if (contingut instanceof CarpetaEntity) {
-				contingutHelper.arxiuPropagarModificacio((CarpetaEntity) contingut);
-			}
-
-			if (fitxer != null) {
-				contingutHelper.fitxerDocumentEsborratEsborrar((DocumentEntity)contingut);
-			}
-		}
+	public void undelete(Long entitatId, Long contingutId) throws IOException {
+		logger.debug("Recuperant el contingut (entitatId=" + entitatId + ", contingutId=" + contingutId + ")");
+		entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false, false);
+		contingutHelper.undelete(contingutId);
 	}
 	
 	@Transactional
@@ -730,7 +580,7 @@ public class ContingutServiceImpl implements ContingutService {
 	public List<ValidacioErrorDto> findErrorsValidacio(Long entitatId, Long contingutId) {
 		logger.debug("Obtenint errors de validació del contingut (entitatId=" + entitatId + ", contingutId=" + contingutId + ")");
 		NodeEntity node = contingutHelper.comprovarNodeDinsExpedientAccessible(entitatId, contingutId, true,false);
-		return cacheHelper.findErrorsValidacioPerNode(node.getId(), true);
+		return cacheHelper.findErrorsValidacioPerNode(node.getId());
 	}
 
 	@Transactional(readOnly = true)
@@ -1052,6 +902,14 @@ public class ContingutServiceImpl implements ContingutService {
 				arxiuDetall.setEniIdentificador(metadades.getIdentificador());
 				arxiuDetall.setSerieDocumental(metadades.getSerieDocumental());
 				arxiuDetall.setEniDataObertura(metadades.getDataObertura());
+				try {
+					Object fechaFinExp = arxiuExpedient.getExpedientMetadades().getMetadadaAddicional("eni:fecha_fin_exp");
+					if (fechaFinExp!=null && Utils.hasValue(fechaFinExp.toString())) {
+						OffsetDateTime odt = OffsetDateTime.parse(fechaFinExp.toString());
+						Date dateFinExp = Date.from(odt.toInstant());
+						arxiuDetall.setEniDataTancament(dateFinExp);
+					}
+				} catch (Exception ex) {}
 				arxiuDetall.setEniClassificacio(metadades.getClassificacio());
 				if (metadades.getEstat() != null) {
 					switch (metadades.getEstat()) {
@@ -1086,9 +944,12 @@ public class ContingutServiceImpl implements ContingutService {
 				arxiuDetall.setEniIdentificador(metadades.getIdentificador());
 				arxiuDetall.setSerieDocumental(metadades.getSerieDocumental());
 				arxiuDetall.setEniDataCaptura(metadades.getDataCaptura());
-				
+				String codiCsv = metadades.getCsv();
+				if (Utils.hasValue(codiCsv)) {
+					arxiuDetall.setCsv(codiCsv);
+					arxiuDetall.setCsvLink(configHelper.getConfig(PropertyConfig.CONCSV_BASE_URL));
+				}
 				arxiuDetall.setEniOrigen(ArxiuConversions.getOrigen(metadades.getOrigen()));
-
 				arxiuDetall.setEniEstatElaboracio(ArxiuConversions.getEstatElaboracio(metadades.getEstatElaboracio()));
 				
 				if (metadades.getTipusDocumental() != null) {
@@ -1302,6 +1163,7 @@ public class ContingutServiceImpl implements ContingutService {
 	@Transactional
 	@Override
 	public List<CodiValorDto> sincronitzarEstatArxiu(Long entitatId, Long contingutId) {
+		entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
 		return contingutHelper.sincronitzarEstatArxiu(entitatId, contingutId);
 	}
 

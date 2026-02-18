@@ -7,8 +7,10 @@ import org.springframework.stereotype.Service;
 
 import es.caib.ripea.service.helper.EventHelper;
 import es.caib.ripea.service.intf.dto.UsuariAnotacioDto;
+import es.caib.ripea.service.intf.dto.ValidacioErrorDto;
 import es.caib.ripea.service.intf.model.sse.AvisosActiusEvent;
 import es.caib.ripea.service.intf.model.sse.CreacioFluxFinalitzatEvent;
+import es.caib.ripea.service.intf.model.sse.ErrorsValidacioChangedEvent;
 import es.caib.ripea.service.intf.model.sse.FirmaFinalitzadaEvent;
 import es.caib.ripea.service.intf.model.sse.ScanFinalitzatEvent;
 import es.caib.ripea.service.intf.service.EventService;
@@ -78,4 +80,19 @@ public class EventServiceImpl implements EventService {
         log.debug("Notificació dels avisos activats o desactivats per data.");
         notifyAvisosActius();
     }
+
+	@Override
+	public void notifyFluxFirmaCreat(CreacioFluxFinalitzatEvent fluxEvent) {
+		eventHelper.notifyFluxFirmaCreat(fluxEvent);
+	}
+
+	@Override
+	public void notifyErrorsValidacio(ErrorsValidacioChangedEvent errors) {
+		eventHelper.notifyErrorsValidacio(errors);
+	}
+
+	@Override
+	public List<ValidacioErrorDto> getValidacionsInicialsExpedient(Long expedientId) {
+		return eventHelper.getValidacionsInicialsExpedient(expedientId);
+	}
 }

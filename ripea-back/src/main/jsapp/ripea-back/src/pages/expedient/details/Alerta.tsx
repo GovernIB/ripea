@@ -96,8 +96,6 @@ const Alerta = (props:any) => {
         apiRef={apiRef}
         rowAdditionalActions={actions}
         toolbarMassiveActions={massiveActions}
-        // height={162 + 52 * 4}
-        // paginationActive
         autoHeight
 
         onRowCountChange={onRowCountChange}
@@ -126,7 +124,7 @@ const useAlerta = () => {
     };
 
     useEffect(() => {
-        if (count == 0){
+        if (count === 0){
             handleClose()
         }
     }, [count]);

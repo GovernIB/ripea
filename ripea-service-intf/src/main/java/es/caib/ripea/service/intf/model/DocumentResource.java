@@ -84,6 +84,9 @@ import lombok.experimental.FieldNameConstants;
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = DocumentResource.PERSPECTIVE_FIRMES_CODE),
                 @ResourceConfigArtifact(
+                        type = ResourceArtifactType.PERSPECTIVE,
+                        code = DocumentResource.PERSPECTIVE_PROCEDIMENT_CODE),                
+                @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = DocumentResource.ACTION_ENVIAR_VIA_EMAIL_CODE,
                         formClass = DocumentResource.EnviarViaEmailFormAction.class,
@@ -99,7 +102,7 @@ import lombok.experimental.FieldNameConstants;
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = DocumentResource.ACTION_GUARDAR_ARXIU,
-                        requiresId = true),                
+                        formClass = NodeResource.MassiveAction.class),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = DocumentResource.ACTION_FIRMA_WEB_INI,
@@ -166,6 +169,8 @@ public class DocumentResource extends NodeResource {
     public static final String PERSPECTIVE_VERSIONS_CODE = "VERSIONS";
     public static final String PERSPECTIVE_ARXIU_DOCUMENT_CODE = "ARXIU_DOCUMENT";
     public static final String PERSPECTIVE_FIRMES_CODE = "FIRMES";
+    public static final String PERSPECTIVE_PROCEDIMENT_CODE = "PROCEDIMENT";
+    
     public static final String ACTION_ENVIAR_VIA_EMAIL_CODE = "ENVIAR_VIA_EMAIL";
     public static final String ACTION_ENVIAR_PORTAFIRMES_CODE = "ENVIAR_PORTAFIRMES";
     public static final String ACTION_RESUM_IA = "RESUM_IA";
@@ -291,7 +296,7 @@ public class DocumentResource extends NodeResource {
     @NotNull
 	private DocumentFirmaTipusEnumDto documentFirmaTipus;
     
-	private ResourceReference<ExpedientEstatResource, Long> expedientEstatAdditional;
+	private ResourceReference<MetaExpedientEstatResource, Long> expedientEstatAdditional;
     @NotNull
     private ResourceReference<ExpedientResource, Long> expedient;
     
@@ -323,6 +328,8 @@ public class DocumentResource extends NodeResource {
     @Transient private MetaDocumentResource metaDocumentInfo;
     @Transient private ResourceReference<CarpetaResource, Long> carpeta;
     @Transient private boolean isDeteccioFirmaAutomaticaActiva;
+    @Transient private ResourceReference<MetaExpedientResource, Long> metaExpedient;
+    @Transient private String csvLinkUrl;
 
     public String getFitxerExtension() {
         if (fitxerNom != null) {

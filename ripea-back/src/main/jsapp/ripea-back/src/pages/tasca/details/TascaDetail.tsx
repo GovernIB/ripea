@@ -1,10 +1,10 @@
 import {useState} from "react";
-import {Grid} from "@mui/material";
 import {MuiDialog} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {formatDate} from "../../../util/dateUtils.ts";
 import {StyledPrioritat} from "../../expedient/ExpedientGrid.tsx";
-import {ContenidoData} from "../../../components/CardData.tsx";
+import {DetailCardContent, DetailCard} from "../../../components/CardData.tsx";
+import {StyledDate} from "../TasquesGrid.tsx";
 
 const useTascaDetail = () => {
     const [open, setOpen] = useState(false);
@@ -43,20 +43,20 @@ const useTascaDetail = () => {
                 }
             }}
         >
-            <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-                <ContenidoData title={t('page.tasca.detall.metaExpedientTasca')}>{entity?.metaExpedientTasca?.description}</ContenidoData>
-                <ContenidoData title={t('page.tasca.detall.metaExpedientTascaDescription')}>{entity?.metaExpedientTascaDescription}</ContenidoData>
-                <ContenidoData title={t('page.tasca.detall.createdBy')}>{entity?.createdBy}</ContenidoData>
-                <ContenidoData title={t('page.tasca.detall.responsablesStr')}>{entity?.responsablesStr}</ContenidoData>
-                <ContenidoData title={t('page.tasca.detall.responsableActual')}>{entity?.responsableActual?.description}</ContenidoData>
-                <ContenidoData title={t('page.tasca.detall.delegat')}>{entity?.delegat?.description}</ContenidoData>
-                <ContenidoData title={t('page.tasca.detall.observadors')}>{entity?.observadorsStr}</ContenidoData>
-                <ContenidoData title={t('page.tasca.detall.dataInici')}>{formatDate(entity?.dataInici)}</ContenidoData>
-                <ContenidoData title={t('page.tasca.detall.duracio')}>{entity?.duracio}</ContenidoData>
-                <ContenidoData title={t('page.tasca.detall.dataLimit')}>{formatDate(entity?.dataLimit, "DD/MM/Y")}</ContenidoData>
-                <ContenidoData title={t('page.tasca.detall.estat')}>{entity?.estat}</ContenidoData>
-                <ContenidoData title={t('page.tasca.detall.prioritat')}><StyledPrioritat entity={entity}>{t(`enum.prioritat.${entity?.prioritat}`)}</StyledPrioritat></ContenidoData>
-            </Grid>
+            <DetailCard>
+                <DetailCardContent title={t('page.tasca.detall.metaExpedientTasca')}               >{entity?.metaExpedientTasca?.description}</DetailCardContent>
+                <DetailCardContent title={t('page.tasca.detall.metaExpedientTascaDescription')}    >{entity?.metaExpedientTascaDescription}</DetailCardContent>
+                <DetailCardContent title={t('page.tasca.detall.createdBy')}                        >{entity?.createdBy}</DetailCardContent>
+                <DetailCardContent title={t('page.tasca.detall.responsablesStr')}                  >{entity?.responsablesStr}</DetailCardContent>
+                <DetailCardContent title={t('page.tasca.detall.responsableActual')}                >{entity?.responsableActual?.description}</DetailCardContent>
+                <DetailCardContent title={t('page.tasca.detall.delegat')}                          >{entity?.delegat?.description}</DetailCardContent>
+                <DetailCardContent title={t('page.tasca.detall.observadors')}                      >{entity?.observadorsStr}</DetailCardContent>
+                <DetailCardContent title={t('page.tasca.detall.dataInici')}                        >{formatDate(entity?.dataInici)}</DetailCardContent>
+                <DetailCardContent title={t('page.tasca.detall.duracio')}                          size={6}>{entity?.duracio}</DetailCardContent>
+                <DetailCardContent title={t('page.tasca.detall.dataLimit')}                        size={6}><StyledDate entity={entity}>{formatDate(entity?.dataLimit, "DD/MM/Y")}</StyledDate></DetailCardContent>
+                <DetailCardContent title={t('page.tasca.detall.estat')}                            size={6}>{entity?.estat}</DetailCardContent>
+                <DetailCardContent title={t('page.tasca.detall.prioritat')}                        size={6}><StyledPrioritat entity={entity}>{t(`enum.prioritat.${entity?.prioritat}`)}</StyledPrioritat></DetailCardContent>
+            </DetailCard>
         </MuiDialog>
 
     return {

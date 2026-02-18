@@ -6,7 +6,7 @@ import {CanviEstatFilter, CanviEstatMuiGrid} from "./CanviEstatGrid.tsx";
 import useCambiarPrioritat, {useCambiarPrioritatMassive} from "../../expedient/actions/CambiarPrioritat.tsx";
 
 const namedQueries: string[] = ['MASSIVE_ACTION_QUERY']
-const perspectives:any = ['ESTAT']
+const perspectives:any = ['ESTAT', 'AUDITORIA']
 const CanviPrioritatGrid = () => {
     const {t} = useTranslation();
     const apiRef = useMuiDataGridApiRef();

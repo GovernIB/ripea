@@ -1,15 +1,16 @@
 package es.caib.ripea.service.resourceservice;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.time.chrono.ChronoLocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -19,8 +20,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 import javax.annotation.PostConstruct;
 
@@ -31,7 +30,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.turkraft.springfilter.FilterBuilder;
 import com.turkraft.springfilter.parser.Filter;
 
@@ -60,16 +58,17 @@ import es.caib.ripea.persistence.repository.DadaRepository;
 import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.persistence.repository.ExpedientEstatRepository;
 import es.caib.ripea.persistence.repository.ExpedientRepository;
-import es.caib.ripea.persistence.repository.ExpedientTascaRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.persistence.repository.UsuariRepository;
+import es.caib.ripea.plugin.registre.RespostaConsultaRegistre;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.ApplicationHelper;
 import es.caib.ripea.service.helper.CacheHelper;
 import es.caib.ripea.service.helper.CarpetaHelper;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.ContingutHelper;
+import es.caib.ripea.service.helper.ContingutImportacioHelper;
 import es.caib.ripea.service.helper.DocumentHelper;
 import es.caib.ripea.service.helper.DominiHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
@@ -87,6 +86,7 @@ import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
 import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
+import es.caib.ripea.service.intf.base.exception.ResourceNotFoundException;
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
 import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.base.model.FieldOption;
@@ -95,25 +95,29 @@ import es.caib.ripea.service.intf.base.model.ReportFileType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
 import es.caib.ripea.service.intf.dto.CodiValorDto;
-import es.caib.ripea.service.intf.dto.DocumentAmbTipusDto;
 import es.caib.ripea.service.intf.dto.DocumentDto;
 import es.caib.ripea.service.intf.dto.ElementTipusEnumDto;
+import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaContingutDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaEstatDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaTipusDto;
+import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.dto.FileNameOption;
 import es.caib.ripea.service.intf.dto.FitxerDto;
-import es.caib.ripea.service.intf.dto.ImportacioDto;
+import es.caib.ripea.service.intf.dto.ImportacioRegistreParamsDto;
 import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
 import es.caib.ripea.service.intf.dto.PermisosPerExpedientsDto;
+import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
+import es.caib.ripea.service.intf.dto.ProgresImportacioSgdDto;
+import es.caib.ripea.service.intf.dto.ProgresProcessamentZipDto;
 import es.caib.ripea.service.intf.dto.ResultatConsultaDto;
 import es.caib.ripea.service.intf.dto.SiNoEnumDto;
 import es.caib.ripea.service.intf.dto.TipusRegistreEnumDto;
+import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.model.ContingutResource;
 import es.caib.ripea.service.intf.model.DocumentResource;
 import es.caib.ripea.service.intf.model.EntitatResource;
-import es.caib.ripea.service.intf.model.ExpedientEstatResource;
 import es.caib.ripea.service.intf.model.ExpedientResource;
 import es.caib.ripea.service.intf.model.ExpedientResource.CanviEstatExpedientFormAction;
 import es.caib.ripea.service.intf.model.ExpedientResource.CanviPrioritatExpedientFormAction;
@@ -123,14 +127,19 @@ import es.caib.ripea.service.intf.model.ExpedientResource.ImportarDocumentsForm;
 import es.caib.ripea.service.intf.model.ExpedientResource.ImportarDocumentsZipForm;
 import es.caib.ripea.service.intf.model.ExpedientResource.ImportarExpedientFormAction;
 import es.caib.ripea.service.intf.model.ExpedientResource.MassiveImportDocsAction;
+import es.caib.ripea.service.intf.model.ExpedientResource.MoureTotFormAction;
 import es.caib.ripea.service.intf.model.ExpedientResource.TancarExpedientFormAction;
+import es.caib.ripea.service.intf.model.ImportacioZipDocument;
 import es.caib.ripea.service.intf.model.InteressatResource;
+import es.caib.ripea.service.intf.model.MetaExpedientEstatResource;
 import es.caib.ripea.service.intf.model.MetaExpedientOrganGestorResource;
 import es.caib.ripea.service.intf.model.MetaExpedientResource;
 import es.caib.ripea.service.intf.model.NodeResource.MassiveAction;
 import es.caib.ripea.service.intf.model.UsuariResource;
 import es.caib.ripea.service.intf.resourceservice.ExpedientResourceService;
+import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.utils.Utils;
+import es.caib.ripea.service.intf.utils.ZipDocumentExtractor;
 import es.caib.ripea.service.permission.ExtendedPermission;
 import es.caib.ripea.service.resourcehelper.ContingutLogResourceHelper;
 import es.caib.ripea.service.resourcehelper.ContingutResourceHelper;
@@ -145,7 +154,6 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
 	private final EntitatRepository entitatRepository;
 	private final ExpedientRepository expedientRepository;
-	private final ExpedientTascaRepository expedientTascaRepository;
 	private final OrganGestorRepository organGestorRepository;
 	private final ExpedientEstatRepository expedientEstatRepository;
     private final DocumentResourceRepository documentResourceRepository;
@@ -171,6 +179,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     private final ExpedientEstatHelper expedientEstatHelper;
     private final MetaExpedientHelper metaExpedientHelper;
     private final ContingutHelper contingutHelper;
+    private final ContingutImportacioHelper contingutImportacioHelper;
     private final DocumentHelper documentHelper;
     private final EntityComprovarHelper entityComprovarHelper;
     private final ExcepcioLogHelper excepcioLogHelper;
@@ -179,7 +188,8 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     private final ZipImportacioHelper zipImportacioHelper;
     private final MessageHelper messageHelper;
     private final ContingutLogResourceHelper contingutLogResourceHelper;
-
+    private final AplicacioService aplicacioService;
+    
     @PostConstruct
     public void init() {
         
@@ -219,10 +229,18 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         register(ExpedientResource.ACTION_CANVI_PRIORITAT_CODE, new CanviPrioritatActionExecutor());
         register(ExpedientResource.ACTION_IMPORTAR_CODE, new ImportarActionExecutor());
         register(ExpedientResource.ACTION_SYNC_ARXIU, new SincronitzarArxiuActionExecutor());
+        register(ExpedientResource.ACTION_GUARDAR_ARXIU, new GuardarArxiuActionExecutor());
         register(ExpedientResource.ACTION_IMPORT_DOCS, new ImportarDocumentsArxiuActionExecutor());
+        register(ExpedientResource.ACTION_IMPORT_INTE, new ImportarInteressatsRegistreActionExecutor());
+        register(ExpedientResource.ACTION_GET_PROGRES_SGD, new GetProgresImportacioActionExecutor());
+        register(ExpedientResource.ACTION_CANCEL_IMPORT_SGD, new CancelarImportSgdActionExecutor());
         register(ExpedientResource.ACTION_IMPORT_DOCS_ZIP, new ImportarDocumentsZipArxiuActionExecutor());
-        register(ExpedientResource.ACTION_IMPORT_INTE, new ImportarInteressatsArxiuActionExecutor());
-
+        register(ExpedientResource.ACTION_GET_PROGRES_ZIP, new GetProgresZipActionExecutor());
+        register(ExpedientResource.ACTION_CANCEL_IMPORT_ZIP, new CancelarImportZipActionExecutor());
+//        register(ExpedientResource.ACTION_IMPORT_INTE, new ImportarInteressatsArxiuActionExecutor());
+        register(ExpedientResource.ACTION_MOURE_TOT_CODE, new MoureTotActionExecutor());
+        
+        register(ExpedientResource.PERSPECTIVE_PERMIS_CONTINGUT, new PermisContingutPerspectiveApplicator());
         register(ExpedientResource.PERSPECTIVE_AMB_PINBAL_CODE, new AmbDocumentsPinbalPerspectiveApplicator());
         register(ExpedientResource.PERSPECTIVE_FOLLOWERS, new FollowersPerspectiveApplicator());
         register(ExpedientResource.PERSPECTIVE_COUNT, new CountPerspectiveApplicator());
@@ -301,7 +319,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         	
             Filter filtreFrontAndEntitat = FilterBuilder.and(
                     (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null,
-                    FilterBuilder.equal(MetaExpedientResource.Fields.entitat + "." + EntitatResource.Fields.codi, 
+                    FilterBuilder.equal(ContingutResource.Fields.entitat + "." + EntitatResource.Fields.codi,
                     		entitatActualCodi != null?entitatActualCodi:"................................................................................")
             );
 
@@ -315,6 +333,9 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         	
         	if (mapaNamedQueries.containsKey("MASSIVE_ACTION_QUERY")) {
         		
+        		String codiUsuariActual = SecurityContextHolder.getContext().getAuthentication().getName();
+        		boolean nomesAgafats = !rolActual.equals("IPA_ADMIN") && !rolActual.equals("IPA_ORGAN_ADMIN");
+        		
         		List<MetaExpedientEntity> procedimentsPermesosAccioMass = metaExpedientHelper.findPermesosAccioMassiva(
         				entitatEntity.getId(),
         				rolActual);
@@ -325,22 +346,11 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         			for (MetaExpedientEntity meeAm: procedimentsPermesosAccioMass) {
         				procedimentsPermesosAccioMassIds.add(meeAm.getId());
         			}
-        			
-	            	Filter filtreProcedimentPermesosAccioMass = null;
-	            	String procedimentId = ExpedientResource.Fields.metaExpedient + ".id";
-	            	List<String> permesosClausulesIn = Utils.getIdsEnGruposMil(procedimentsPermesosAccioMassIds);
-	            	if (permesosClausulesIn!=null) {
-	        	        for (String aux: permesosClausulesIn) {
-	        		        if (aux != null && !aux.isEmpty()) {
-	        		        	filtreProcedimentPermesosAccioMass = FilterBuilder.or(filtreProcedimentPermesosAccioMass, Filter.parse(procedimentId + " IN (" + aux + ")"));
-	        		        }
-	        	        }
-	            	}
 
 	            	Filter filtreAgafatsUsuariActual = null;
-	            	if (rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN")) {
+	            	if (nomesAgafats) {
 	            		String agafatPerCodi = ExpedientResource.Fields.agafatPer + "." + UsuariResource.Fields.codi;
-	            		filtreAgafatsUsuariActual = Filter.parse(agafatPerCodi+":'" + SecurityContextHolder.getContext().getAuthentication().getName() +  "'");
+	            		filtreAgafatsUsuariActual = Filter.parse(agafatPerCodi+":'" + codiUsuariActual +  "'");
 	            	}
 	            	
 	            	Filter filtreArxiuPendents = null;
@@ -352,12 +362,49 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 	            	}
 	            	
 	            	//El filtre del front nomes inclou estat=OBERT si filtres, no per defecte
-	            	Filter filtreNoTancats = FilterBuilder.and(FilterBuilder.equal(ExpedientResource.Fields.estat, "0"));
+	            	Filter filtreNoTancats = FilterBuilder.and(FilterBuilder.equal(ExpedientResource.Fields.estat, ExpedientEstatEnumDto.OBERT));
+
+	            	//O bé recuperam els expedients directament que es poden tancar segons condicions de documents i metadades. (Ja inclou procediments permesos) 
+	            	//O bé recuperam els expedients dels procediments permesos, seria redundant aplicar els dos filtres.
+	            	Filter filtreExpedientsOkTancar = null;
+	            	Filter filtreProcedimentPermesosAccioMass = null;
+	            	if (mapaNamedQueries.containsKey("MASSIVE_ACTION_TANCAR")) {
+	                	
+	            		List<Long> expedientsOkTancarIds = expedientRepository.findIdsExpedientsPerTancamentMassiu(
+	            				entitatEntity,
+	            				nomesAgafats,
+	            				usuariRepository.findByCodi(codiUsuariActual),
+	            				metaExpedientHelper.findPermesosAccioMassiva(entitatEntity.getId(), rolActual),
+	            				true, null, //esNullMetaExpedient
+	            				true, null, //esNullNom
+	            				true, null, //esNullDataInici
+	            				true, null);//esNullDataFi
+	            		
+	            		List<String> okTancarClausulesIn = Utils.getIdsEnGruposMil(expedientsOkTancarIds);
+		            	if (okTancarClausulesIn!=null) {
+		        	        for (String aux: okTancarClausulesIn) {
+		        		        if (aux != null && !aux.isEmpty()) {
+		        		        	filtreExpedientsOkTancar = FilterBuilder.or(filtreExpedientsOkTancar, Filter.parse("id IN (" + aux + ")"));
+		        		        }
+		        	        }
+		            	}
+	            	} else {
+		            	String procedimentId = ExpedientResource.Fields.metaExpedient + ".id";
+		            	List<String> permesosClausulesIn = Utils.getIdsEnGruposMil(procedimentsPermesosAccioMassIds);
+		            	if (permesosClausulesIn!=null) {
+		        	        for (String aux: permesosClausulesIn) {
+		        		        if (aux != null && !aux.isEmpty()) {
+		        		        	filtreProcedimentPermesosAccioMass = FilterBuilder.or(filtreProcedimentPermesosAccioMass, Filter.parse(procedimentId + " IN (" + aux + ")"));
+		        		        }
+		        	        }
+		            	}
+	            	}
 	            	
 	            	Filter filtreAccioMassiva = FilterBuilder.and(
 	            			filtreProcedimentPermesosAccioMass,
 	            			filtreAgafatsUsuariActual,
 	            			filtreFrontAndEntitat,
+	            			filtreExpedientsOkTancar,
 	            			filtreArxiuPendents,
 	            			filtreNoTancats,
 	            			filtreNoEliminats);
@@ -557,9 +604,8 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         resource.setConteDocumentsEnProcessDeFirma(CollectionUtils.isNotEmpty(documentResourceRepository.findEnProccessDeFirma(entity)));
         resource.setConteDocumentsDePortafirmesNoCustodiats(CollectionUtils.isNotEmpty(documentResourceRepository.findDocumentsDePortafirmesNoCustodiats(entity)));
         resource.setConteDocumentsPendentsReintentsArxiu(CollectionUtils.isNotEmpty(documentResourceRepository.findDocumentsPendentsReintentsArxiu(entity, contingutHelper.getArxiuMaxReintentsDocuments())));
-//        resource.setConteDocumentsDeAnotacionesNoMogutsASerieFinal(CollectionUtils.isNotEmpty(registreAnnexRepository.findDocumentsDeAnotacionesNoMogutsASerieFinalByExpedientId(entity.getId())));
-        
-        resource.setErrors(cacheHelper.findErrorsValidacioPerNode(entity.getId(), true));
+//      resource.setConteDocumentsDeAnotacionesNoMogutsASerieFinal(CollectionUtils.isNotEmpty(registreAnnexRepository.findDocumentsDeAnotacionesNoMogutsASerieFinalByExpedientId(entity.getId())));
+        resource.setErrors(cacheHelper.findErrorsValidacioPerNode(entity.getId()));
         resource.setValid(resource.getErrors().isEmpty());
 
         resource.setPotTancar(
@@ -585,11 +631,8 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		resource.setAmbNotificacionsPendents(cacheHelper.hasNotificacionsPendentsPerExpedient(expedientEntity));
 		resource.setDataDarrerEnviament(cacheHelper.getDataDarrerEnviament(expedientEntity));
 		resource.setPotModificar(entityComprovarHelper.comprovarSiEsPotModificarExpedient(expedientEntity));
-		UsuariEntity usuariEntity = usuariRepository.findById(SecurityContextHolder.getContext().getAuthentication().getName()).orElse(null);
-		if (usuariEntity!=null && entity.getId()!=null) {
-			resource.setPotModificarContingut(expedientTascaRepository.countTasquesResponsableExpedient(usuariEntity, entity.getId())>0);
-    	}
 		resource.setHasEsborranys(documentResourceRepository.hasFillsEsborranys(expedientEntity.getId()));
+		resource.setPendentExecucioMassiva(expedientHelper.isExpedientPendentExecucioMassiva(expedientEntity.getId()));		
 	}
 
     @Override
@@ -626,11 +669,59 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     	}
     }
 
+    @Override
+	public ExpedientResource update(Long id, ExpedientResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotFoundException {
+    	try {
+    		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+    		entityComprovarHelper.comprovarEstatExpedient(entitatEntity.getId(), id, ExpedientEstatEnumDto.OBERT);
+    		String rolActual = configHelper.getRolActual();
+    		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(id, false, false, true, false, false, rolActual);
+    		expedient = expedientHelper.updateExpedient(
+    				expedient,
+    				resource.getNom(),
+    				resource.getAny(),
+    				resource.getOrganGestor()!=null?resource.getOrganGestor().getId():null,
+    				rolActual,
+    				resource.getGrup()!=null?resource.getGrup().getId():null,
+    				resource.getPrioritat(),
+    				resource.getPrioritatMotiu());
+    		contingutHelper.arxiuPropagarModificacio(expedient);
+    		return resource;
+    	} catch (Exception ex) {
+    		excepcioLogHelper.addExcepcio("/expedient/update", ex);
+    		throw ex;
+    	}
+    }
+    
     private class AmbDocumentsPinbalPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
         @Override
         public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
             List<MetaDocumentEntity> metaDocuments = metaDocumentHelper.findMetaDocumentsPinbalDisponiblesPerCreacio(entity.getId());
             resource.setAmbDocumentsPinbal(metaDocuments!=null && !metaDocuments.isEmpty());
+        }
+    }
+
+    private class PermisContingutPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
+        @Override
+        public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
+    		UsuariEntity usuariEntity = usuariRepository.findById(SecurityContextHolder.getContext().getAuthentication().getName()).orElse(null);
+    		if (usuariEntity!=null && entity.getId()!=null) {
+    			try {
+    				ContingutEntity contingutEntity = contingutHelper.comprovarContingutDinsExpedientModificable(
+    						entity.getEntitat().getId(),
+    						entity.getId(),
+    						false, //comprovarPermisRead
+    						false, //comprovarPermisWrite
+    						false, //comprovarPermisCreate
+    						false, //comprovarPermisDelete
+    						false, //checkPerMassiuAdmin
+    						true, //comprovarAgafatPerUsuariActual
+    						configHelper.getRolActual());
+    				resource.setPotModificarContingut(contingutEntity!=null);
+    			}catch (Exception ex) {
+    				resource.setPotModificarContingut(false);
+    			}
+        	}
         }
     }
 
@@ -696,7 +787,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         @Override
         public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
             if (entity.getEstatAdditional()!=null) {
-                resource.setEstatAdditionalInfo(objectMappingHelper.newInstanceMap(Hibernate.unproxy(entity.getEstatAdditional()), ExpedientEstatResource.class));
+                resource.setEstatAdditionalInfo(objectMappingHelper.newInstanceMap(Hibernate.unproxy(entity.getEstatAdditional()), MetaExpedientEstatResource.class));
             }
         }
     }
@@ -1044,31 +1135,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 				if (params!=null && params.getDocuments()!=null && params.getDocuments().size()>0) {
 				
 					//1.- Guardar fitxers temporalment a disc: en un sol fitxer ZIP amb els objectes passats a fitxers JSON
-					ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		            ZipOutputStream zipOut = new ZipOutputStream(baos);
-					for (int i = 0; i < params.getDocuments().size(); i++) {
-						DocumentAmbTipusDto doc = params.getDocuments().get(i);
-						// Convertir el objeto a JSON
-						ObjectMapper objectMapper = new ObjectMapper();
-						String docAsString = objectMapper.writeValueAsString(doc);
-						// Crear una entrada en el ZIP
-						String entryName = "document_" + (i + 1) + ".json";
-						ZipEntry zipEntry = new ZipEntry(entryName);
-						zipOut.putNextEntry(zipEntry);
-		                // Escribir el JSON en la entrada
-		                byte[] jsonBytes = docAsString.getBytes("UTF-8");
-		                zipOut.write(jsonBytes, 0, jsonBytes.length);
-		                zipOut.closeEntry();
-					}
-					
-//					FitxerDto resultat = new FitxerDto();
-//					resultat.setNom(expedient.getNom().replaceAll(" ", "_") + ".zip");
-//					resultat.setContentType("application/zip");
-//					resultat.setContingut(baos.toByteArray());
-					
-					String gestioDocumentalAdjuntId = pluginHelper.gestioDocumentalCreate(
-								PluginHelper.GESDOC_AGRUPACIO_DOCS_ESBORRANYS,
-								new ByteArrayInputStream(baos.toByteArray()));
+					String gestioDocumentalAdjuntId = expedientHelper.saveImportacioMassivaDocsTemporal(params.getDocuments());
 					
 					//2.- Programar la acció massiva per els expedient seleccionats.
 					List<ExecucioMassivaContingutDto> elementsMassiva = execucioMassivaHelper.getMassivaContingutFromIds(params.getIds());
@@ -1155,17 +1222,18 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		public Serializable exec(String code, ExpedientResourceEntity entity, TancarExpedientFormAction params) throws ActionExecutionException {
 			
 			try {
+				EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
 				if (!params.isMassivo()) {
 					expedientHelper.tancar(
-							entity.getEntitat().getId(),
-							entity.getId(),
+							entitatEntity.getId(),
+							params.getIds().get(0),
 							params.getMotiu(),
 							params.getDocumentsPerFirmar().toArray(new Long[0]),
 							false);
 				} else {
 					Map<Long, List<Long>> documentsPerExpedient = new HashMap<Long, List<Long>>();
 					if(params.getIds()!=null && params.getIds().size()>0) {
-						for (Long idDocument: params.getIds()) {
+						for (Long idDocument: params.getDocumentsPerFirmar()) {
 							DocumentResourceEntity dre = documentResourceRepository.findById(idDocument).get();
 							List<Long> documentsExpActual = new ArrayList<Long>();
 							if (documentsPerExpedient.containsKey(dre.getExpedient().getId())) {
@@ -1188,14 +1256,13 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 									entry.getKey(),
 									ExecucioMassivaEstatDto.ESTAT_PENDENT);
 							execMass.setElementTipus(ElementTipusEnumDto.EXPEDIENT);
-							execMass.setElementNom(Utils.getIdsSeparatsComa(entry.getValue()));
+							execMass.setError(Utils.getIdsSeparatsComa(entry.getValue()));
 							
 							elementsMassiva.add(execMass);
 						}
 						
 		    			ExecucioMassivaDto execMassDto = new ExecucioMassivaDto(ExecucioMassivaTipusDto.TANCAMENT, new Date(), null, configHelper.getRolActual());
 		    			execMassDto.setMotiu(params.getMotiu());
-		    			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
 						execucioMassivaHelper.saveExecucioMassiva(entitatEntity, execMassDto, elementsMassiva, ElementTipusEnumDto.EXPEDIENT);
 					}
 				}
@@ -1218,19 +1285,32 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		@Override
 		public Serializable exec(String code, ExpedientResourceEntity entity, CanviPrioritatExpedientFormAction params) throws ActionExecutionException {
 			try {
+				
+				if (!PrioritatEnumDto.B_NORMAL.equals(params.getPrioritat()) && !Utils.hasValue(params.getPrioritatMotiu())) {
+					throw new Exception("Motiu obligatori.");
+				}
+				String nomExp = "";
 				if (params!=null && params.getIds()!=null) {
 					for (Long idExpedient: params.getIds()) {
-						entity = expedientResourceRepository.findById(idExpedient).get();
-						entity.setPrioritat(params.getPrioritat());
+						ExpedientEntity ee = expedientRepository.findById(idExpedient).get();
+						nomExp = ee.getNom();
+						expedientHelper.updatePrioritat(ee, params.getPrioritat(), params.getPrioritatMotiu());
 					}
 				}
-				return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
+				
+				if (params.isMassivo()) {
+					int numElem = params!=null && params.getIds()!=null?params.getIds().size():0;
+					return "{\"num\": \""+numElem+"\"}";
+				} else {
+					return "{\"nom\": \""+nomExp+"\"}";
+				}
 			} catch (Exception e) {
+				String ids = Utils.getIdsSeparatsComa(params.getIds());
 				excepcioLogHelper.addExcepcio(
 						"/expedient/CanviPrioritatActionExecutor", e,
-						Utils.getIdsSeparatsComa(params.getIds()),
+						ids,
 						"massiu="+params.isMassivo());
-				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, messageHelper.getMessage("expedient.tancar.reject", new Object[]{e.getMessage()}));
+				throw new ActionExecutionException(getResourceClass(), ids, code, messageHelper.getMessage("expedient.tancar.reject", new Object[]{e.getMessage()}));
 			}
 		}
     }
@@ -1243,16 +1323,22 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		@Override
 		public Serializable exec(String code, ExpedientResourceEntity entity, CanviEstatExpedientFormAction params) throws ActionExecutionException {
 			try {
+				String nomExp = "";
 				if (params!=null && params.getIds()!=null) {
 					for (Long idExpedient: params.getIds()) {
 						EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
-						expedientEstatHelper.updateEstatAdditional(
+						nomExp = expedientEstatHelper.updateEstatAdditional(
 								entitatEntity.getId(),
 								idExpedient,
-								params.getEstatAdditional().getId());
+								params.getEstatAdditional().getId()).getNom();
 					}
 				}
-				return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
+				if (params.isMassivo()) {
+					int numElem = params!=null && params.getIds()!=null?params.getIds().size():0;
+					return "{\"num\": \""+numElem+"\"}";
+				} else {
+					return "{\"nom\": \""+nomExp+"\"}";
+				}
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio(
 						"/expedient/CanviEstatActionExecutor", e,
@@ -1428,33 +1514,103 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     private class ImportarDocumentsZipArxiuActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.ImportarDocumentsZipForm, Serializable> {
 
 		@Override
-		public void onChange(Serializable id, ImportarDocumentsZipForm previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, ImportarDocumentsZipForm target) {}
+		public void onChange(Serializable id, ImportarDocumentsZipForm previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, ImportarDocumentsZipForm target) {
+			if (ImportarDocumentsZipForm.Fields.documentZip.equals(fieldName)) {
+				if (fieldValue!=null) {
+					ZipDocumentExtractor extractor = new ZipDocumentExtractor();
+					File tempFile = null;
+					try {
+						
+		                FileReference fileRef = (FileReference) fieldValue;
+
+		                // Crear archivo temporal
+		                tempFile = File.createTempFile("upload_", ".zip");
+		                
+		                // Escribir el contenido al archivo temporal
+		                try (FileOutputStream fos = new FileOutputStream(tempFile)) {
+		                    fos.write(fileRef.getContent());
+		                }
+						
+						List<ImportacioZipDocument> documents = extractor.extractDocuments(tempFile);
+						Collections.sort(documents);
+						target.setDocumentsZip(documents);
+					} catch (Exception ex) {
+				        excepcioLogHelper.addExcepcio("/expedient/" + id + "ImportarDocumentsZipArxiuActionExecutor.onChange", ex);
+				        String message = messageHelper.getMessage("message.common.action.error") + ": " + ex.getMessage();
+				        throw new ActionExecutionException(getResourceClass(), id, fieldName, message);
+		            } finally {
+		                // Limpiar archivo temporal
+		                if (tempFile != null && tempFile.exists()) {
+		                    tempFile.delete();
+		                }
+		            }
+				}
+			}
+		}
 
 		@Override
 		public Serializable exec(String code, ExpedientResourceEntity entity, ImportarDocumentsZipForm params) throws ActionExecutionException {
 		    try {
-		        EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
-		        ContingutEntity pare = contingutRepository.findById(entity.getId()).orElseThrow();
+		        
+		        if (params.getDocumentsZip()!=null && params.getDocumentsZip().size()>0) {
 
-		        FileReference zipFile = params.getDocumentZip();
-		        try (InputStream inputStream = new ByteArrayInputStream(zipFile.getContent())) {
-		            int total = zipImportacioHelper.descomprimirZip(
-		                    inputStream,
-		                    configHelper.getRolActual(),
-		                    pare.getId(),
-		                    null, // tascaId
-		                    entitatEntity.getId()
-		            );
-		            log.info("S'han importat {} documents des del ZIP", total);
+			        EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+			        ContingutEntity pare = contingutRepository.findById(entity.getId()).orElseThrow();
+
+			        EntitatDto entitatActual = new EntitatDto();
+			        entitatActual.setCodi(entitatEntity.getCodi());
+			        entitatActual.setId(entitatEntity.getId());
+			        entitatActual.setNom(entitatEntity.getNom());
+			        
+		        	zipImportacioHelper.processarZipReact(
+		        			entitatActual,
+		        			params.getDocumentsZip(),
+		        			pare.getId(),
+		        			aplicacioService.getUsuariActual(),
+		        			configHelper.getRolActual());
+		        	
+			        return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
+		        } else {
+		        	throw new ActionExecutionException(getResourceClass(), entity.getId(), code, "No s'han seleccionat documents per importar.");
 		        }
-
-		        return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
 		    } catch (Exception ex) {
 		        excepcioLogHelper.addExcepcio("/expedient/" + entity.getId() + "ImportarDocumentsZipArxiuActionExecutor", ex);
 		        String message = messageHelper.getMessage("message.common.action.error") + ": " + ex.getMessage();
 		        throw new ActionExecutionException(getResourceClass(), entity.getId(), code, message);
 		    }			
 		}
+    }
+    
+    private class GetProgresZipActionExecutor implements ActionExecutor<ExpedientResourceEntity, Long, ProgresProcessamentZipDto> {
+
+        @Override
+        public ProgresProcessamentZipDto exec(String code, ExpedientResourceEntity entity, Long id)
+                throws ActionExecutionException {
+        	ProgresProcessamentZipDto progres = zipImportacioHelper.obtenirProgresActual(entity.getId());
+        
+        	return progres;
+        }
+
+		@Override
+		public void onChange(Serializable id, Long previous, String fieldName, Object fieldValue,
+				Map<String, AnswerValue> answers, String[] previousFieldNames, Long target) {}
+		
+    }
+    
+    private class CancelarImportZipActionExecutor implements ActionExecutor<ExpedientResourceEntity, Long, Serializable> {
+
+        @Override
+        public Serializable exec(String code, ExpedientResourceEntity entity, Long id)
+                throws ActionExecutionException {
+        	zipImportacioHelper.cancelarProcessamentZip(entity.getId());  
+  
+        	return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
+        }
+
+		@Override
+		public void onChange(Serializable id, Long previous, String fieldName, Object fieldValue,
+				Map<String, AnswerValue> answers, String[] previousFieldNames, Long target) {}
+		
     }
     
     private class ImportarDocumentsArxiuActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.ImportarDocumentsForm, Serializable> {
@@ -1465,9 +1621,13 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		@Override
 		public Serializable exec(String code, ExpedientResourceEntity entity, ImportarDocumentsForm params) throws ActionExecutionException {
 			try {
-				String entitatActual = configHelper.getEntitatActualCodi();
-				EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatActual, false, false, false, true, false);
-				Long destiId = entity.getId();
+				String rolActual = configHelper.getRolActual();
+				EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+				Long expedientId = entity.getId();
+				Long destiId = expedientId;
+				
+				contingutImportacioHelper.inicialitzarProgres(expedientId);
+				
 				if (params.getCarpeta()==null) {
 					if (Utils.hasValue(params.getNovaCarpetaNom())) {
 						destiId = carpetaHelper.create(
@@ -1485,7 +1645,14 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 				} else {
 					destiId = params.getCarpeta().getId();
 				}
-				ImportacioDto importacioDto = new ImportacioDto();
+				
+		        UsuariDto usuariActual = aplicacioService.getUsuariActual();
+		        EntitatDto entitatActual = new EntitatDto();
+		        entitatActual.setCodi(entitatEntity.getCodi());
+		        entitatActual.setId(entitatEntity.getId());
+					
+				ImportacioRegistreParamsDto importacioDto = new ImportacioRegistreParamsDto();
+				importacioDto.setInteressats(params.getInteressats());
 				importacioDto.setTipusImportacio(params.getTipusImportacio());
 				importacioDto.setNumeroRegistre(params.getNumeroRegistre());
 				importacioDto.setCodiEni(params.getCodiEni());
@@ -1493,7 +1660,13 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 				importacioDto.setTipusRegistre(TipusRegistreEnumDto.ENTRADA);
 				importacioDto.setDestiId(String.valueOf(destiId));
 				
-				contingutHelper.importarDocuments(entitatEntity.getId(), destiId, importacioDto, new HashMap<String, String>(), new ArrayList<DocumentDto>());
+				contingutImportacioHelper.processarRegistreAsync(
+						usuariActual,
+						entitatActual, 
+						rolActual,
+						expedientId, 
+						importacioDto);
+				
 				return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
 			} catch (Exception ex) {
 				excepcioLogHelper.addExcepcio("/expedient/"+entity.getId()+"ImportarDocumentsArxiuActionExecutor", ex);
@@ -1502,17 +1675,132 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 			}
 		}
     }
-    private class ImportarInteressatsArxiuActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.ImportarInteressatsForm, Serializable> {
+    
+    private class ImportarInteressatsRegistreActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.ImportarInteressatsForm, Serializable> {
 
 		@Override
 		public void onChange(Serializable id, ExpedientResource.ImportarInteressatsForm previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, ExpedientResource.ImportarInteressatsForm target) {}
 
 		@Override
 		public Serializable exec(String code, ExpedientResourceEntity entity, ExpedientResource.ImportarInteressatsForm params) throws ActionExecutionException {
-			return null;
+			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+			RespostaConsultaRegistre resposta = pluginHelper.obtenerAsientoRegistral(
+					entitatEntity.getUnitatArrel(),
+					params.getNumeroRegistre(), 
+					1L, 
+					false);
+			
+			return resposta;
 		}
     }
+    
+    private class GetProgresImportacioActionExecutor implements ActionExecutor<ExpedientResourceEntity, Long, ProgresImportacioSgdDto> {
 
+        @Override
+        public ProgresImportacioSgdDto exec(String code, ExpedientResourceEntity entity, Long id)
+                throws ActionExecutionException {
+        	ProgresImportacioSgdDto progres = contingutImportacioHelper.obtenirProgresActual(entity.getId());
+        
+        	return progres;
+        }
+
+		@Override
+		public void onChange(Serializable id, Long previous, String fieldName, Object fieldValue,
+				Map<String, AnswerValue> answers, String[] previousFieldNames, Long target) {}
+		
+    }
+    
+    private class CancelarImportSgdActionExecutor implements ActionExecutor<ExpedientResourceEntity, Long, Serializable> {
+
+        @Override
+        public Serializable exec(String code, ExpedientResourceEntity entity, Long id)
+                throws ActionExecutionException {
+        	contingutImportacioHelper.cancelarProcessament(entity.getId());  
+  
+        	return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
+        }
+
+		@Override
+		public void onChange(Serializable id, Long previous, String fieldName, Object fieldValue,
+				Map<String, AnswerValue> answers, String[] previousFieldNames, Long target) {}
+		
+    }
+    
+//    private class ImportarInteressatsArxiuActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.ImportarInteressatsForm, Serializable> {
+//
+//		@Override
+//		public void onChange(Serializable id, ExpedientResource.ImportarInteressatsForm previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, ExpedientResource.ImportarInteressatsForm target) {}
+//
+//		@Override
+//		public Serializable exec(String code, ExpedientResourceEntity entity, ExpedientResource.ImportarInteressatsForm params) throws ActionExecutionException {
+//			return null;
+//		}
+//    }
+
+    private class MoureTotActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.MoureTotFormAction, Serializable> {
+
+    	@Override
+		public void onChange(Serializable id, MoureTotFormAction previous, String fieldName,Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames,MoureTotFormAction target) {}
+
+		@Override
+		public Serializable exec(String code, ExpedientResourceEntity entity, MoureTotFormAction params) throws ActionExecutionException {
+			try {
+				String rolActual = configHelper.getRolActual();
+            	String entitatActual = configHelper.getEntitatActualCodi();
+				EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatActual, false, false, false, true, false);
+				expedientHelper.moureEntreExpedients(entitatEntity.getId(),	entity.getId(), params.getExpedientDesti().getId(), rolActual);			
+				return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
+			} catch (Exception e) {
+				excepcioLogHelper.addExcepcio("/expedient/MoureTotActionExecutor", e);
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, messageHelper.getMessage("expedient.moure.tot.reject", new Object[]{e.getMessage()}));
+			}
+		}
+    }
+    
+    private class GuardarArxiuActionExecutor implements ActionExecutor<ExpedientResourceEntity, MassiveAction, Serializable> {
+
+		@Override
+		public void onChange(Serializable id, MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {}
+
+		@Override
+		public Serializable exec(String code, ExpedientResourceEntity entity, MassiveAction params) throws ActionExecutionException {
+			try {
+				List<CodiValorDto> resultat = new ArrayList<>();
+				String entitatActual = configHelper.getEntitatActualCodi();
+				EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatActual, false, false, false, true, false);
+	        	
+				if (params.isMassivo()) {
+					List<ExecucioMassivaContingutDto> elementsMassiva = execucioMassivaHelper.getMassivaContingutFromIds(params.getIds());
+					ExecucioMassivaDto execMassDto = new ExecucioMassivaDto(
+							ExecucioMassivaTipusDto.CUSTODIAR_ELEMENTS_PENDENTS,
+							new Date(),
+							null,
+							configHelper.getRolActual());
+					execucioMassivaHelper.saveExecucioMassiva(entitatEntity, execMassDto, elementsMassiva, ElementTipusEnumDto.EXPEDIENT);	
+	        	} else {
+	        		
+	        		Exception errorGuardant = expedientHelper.guardarExpedientArxiu(params.getIds().get(0));
+	        		
+					if (errorGuardant!=null) {
+						String message = messageHelper.getMessage("message.common.action.error")+": "+errorGuardant.getMessage();
+						throw new ActionExecutionException(getResourceClass(), params.getIds().get(0), code, message);
+					}
+	        	}
+				
+	        	return (Serializable)resultat;
+			} catch (Exception e) {
+				excepcioLogHelper.addExcepcio(
+						"/expedient/SincronitzarArxiuActionExecutor",
+						e,
+						Utils.getIdsSeparatsComa(params.getIds()),
+						"massiu="+params.isMassivo());
+				String message = messageHelper.getMessage("message.common.action.error")+": "+e.getMessage();
+				throw new ActionExecutionException(getResourceClass(), entity==null?null:entity.getId(), code, message);
+			}
+		}
+    	
+    }
+    
     private class SincronitzarArxiuActionExecutor implements ActionExecutor<ExpedientResourceEntity, MassiveAction, Serializable> {
 
 		@Override
@@ -1520,31 +1808,25 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
 		@Override
 		public Serializable exec(String code, ExpedientResourceEntity entity, MassiveAction params) throws ActionExecutionException {
-			String expIdStr = entity.getId()!=null?entity.getId().toString():Utils.getIdsSeparatsComa(params.getIds());
 			try {
 				List<CodiValorDto> resultat = new ArrayList<>();
 				String entitatActual = configHelper.getEntitatActualCodi();
 				EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatActual, false, false, false, true, false);
 	        	
 				if (params.isMassivo()) {
-	        		
-					List<ExecucioMassivaContingutDto> elementsMassiva = execucioMassivaHelper.getMassivaContingutFromIds(params.getIds());
-					ExecucioMassivaDto execMassDto = new ExecucioMassivaDto(
-							ExecucioMassivaTipusDto.CUSTODIAR_ELEMENTS_PENDENTS,
-							new Date(),
-							null,
-							configHelper.getRolActual());
-					execucioMassivaHelper.saveExecucioMassiva(entitatEntity, execMassDto, elementsMassiva, ElementTipusEnumDto.EXPEDIENT);	        		
-	        		
+					//TODO: No hi ha accio massiva per sincronitzar un expedient a arxiu. Veurer GuardarArxiuActionExecutor       		
 	        	} else {
-	        		
 	        		resultat = contingutHelper.sincronitzarEstatArxiu(entitatEntity.getId(), params.getIds().get(0));
-	        		
 	        	}
 				
 	        	return (Serializable)resultat;
+
 			} catch (Exception e) {
-				excepcioLogHelper.addExcepcio("/expedient/SincronitzarArxiuActionExecutor", e, expIdStr, "massiu="+params.isMassivo());
+				excepcioLogHelper.addExcepcio(
+						"/expedient/SincronitzarArxiuActionExecutor",
+						e,
+						Utils.getIdsSeparatsComa(params.getIds()),
+						"massiu="+params.isMassivo());
 				String message = messageHelper.getMessage("message.common.action.error")+": "+e.getMessage();
 				throw new ActionExecutionException(getResourceClass(), entity==null?null:entity.getId(), code, message);
 			}

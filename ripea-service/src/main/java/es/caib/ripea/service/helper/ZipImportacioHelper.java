@@ -1,232 +1,304 @@
 package es.caib.ripea.service.helper;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
+import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 
-import es.caib.ripea.persistence.entity.ContingutEntity;
+import es.caib.ripea.persistence.entity.MetaDocumentEntity;
+import es.caib.ripea.persistence.repository.MetaDocumentRepository;
 import es.caib.ripea.service.intf.dto.DocumentDto;
-import es.caib.ripea.service.intf.dto.DocumentFirmaTipusEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
-import es.caib.ripea.service.intf.dto.DocumentTipusFirmaEnumDto;
+import es.caib.ripea.service.intf.dto.EntitatDto;
+import es.caib.ripea.service.intf.dto.MetaNodeDto;
 import es.caib.ripea.service.intf.dto.NtiOrigenEnumDto;
 import es.caib.ripea.service.intf.dto.ProgresProcessamentZipDto;
-import es.caib.ripea.service.intf.dto.SignatureInfoDto;
-import es.caib.ripea.service.intf.service.CarpetaService;
-import es.caib.ripea.service.intf.service.DocumentService;
+import es.caib.ripea.service.intf.dto.UsuariDto;
+import es.caib.ripea.service.intf.model.ImportacioZipDocument;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
 public class ZipImportacioHelper {
 
-	private final static String NTI_VERSION = "1.0";
-	private final static String NTI_TIPO_DOCUMENTAL = "TD99"; // Altres
-	private final static DocumentNtiEstadoElaboracionEnumDto NTI_ESTADO_ELABORACION = DocumentNtiEstadoElaboracionEnumDto.EE99; // Altres
-	private final static NtiOrigenEnumDto NTI_ORIGEN = NtiOrigenEnumDto.O0; // Ciutadà
-	
-    @Autowired
-    private DocumentService documentService;
-    @Autowired
-    private CarpetaService carpetaService;
-    @Autowired
-    private CarpetaHelper carpetaHelper;
-    @Autowired
-    private EntityComprovarHelper entityComprovarHelper;
-    @Autowired
-	private MessageHelper messageHelper;
-    
-    private final Map<String, List<String>> ubicacioDocuments = new HashMap<>();
+    private static final String NTI_VERSION = "1.0";
+    private static final String NTI_TIPO_DOCUMENTAL = "TD99";
+    private static final DocumentNtiEstadoElaboracionEnumDto NTI_ESTADO_ELABORACION = DocumentNtiEstadoElaboracionEnumDto.EE99;
+    private static final NtiOrigenEnumDto NTI_ORIGEN = NtiOrigenEnumDto.O0;
+
     private final Map<Long, ProgresProcessamentZipDto> mapProgres = new HashMap<>();
+    private final AtomicBoolean cancelat = new AtomicBoolean(false);
 
-    public int descomprimirZip(
-    		InputStream zip, 
+    @Autowired private MessageHelper messageHelper;
+    @Autowired private DocumentHelper documentHelper;
+    @Autowired private MetaDocumentRepository metaDocumentRepository;
+
+    @Async
+    public void processarZip(
+    		UsuariDto usuari, 
+    		EntitatDto entitat, 
+    		Path tempZip,
     		String rolActual, 
-    		Long pareId,
-    		Long tascaId,
-    		Long entitatId) throws IOException {
-    	
-        var progres = inicialitzarProgres(pareId);
-        var mapDocuments = llegirZip(zip);
+    		Long pareId, 
+    		Long tascaId) {
+        try {
+            inicialitzarContext(usuari, entitat);
 
-        progres.setNumOperacions(mapDocuments.size());
-
-        var documents = convertirDocumentDto(mapDocuments);
-
-        for (var documentDto : documents) {
-            assignarCarpeta(
-            		documentDto, 
-            		entitatId, 
+            inicialitzarProgres(pareId);
+            
+            comptarEntradesZip(
+            		tempZip, 
             		pareId);
 
-            progres.addInfo(messageHelper.getMessage("contingut.boto.crear.document.multiple.proces", new Object[]{documentDto.getFitxerNom()}));
-            
-            documentService.create(entitatId,
-                                   documentDto.getPareId(),
-                                   documentDto,
-                                   false,
-                                   rolActual,
-                                   tascaId,
-                                   false);
-            progres.incrementOperacionsRealitzades();
+			processarEntradesZip(
+					tempZip, 
+					entitat.getId(), 
+					pareId, 
+					rolActual);
+        } catch (Exception ex) {
+            log.error("Error general processant el fitxer ZIP", ex);
+            ProgresProcessamentZipDto progres = mapProgres.get(pareId);
+            if (progres != null) {
+                progres.setError(true);
+                progres.setErrorMsg(messageHelper.getMessage("contingut.boto.crear.document.multiple.error", new Object[] {ex.getMessage()}));
+            }
+        } finally {
+            try {
+                Files.deleteIfExists(tempZip);
+                log.debug("ZIP temporal eliminat: {}", tempZip);
+            } catch (IOException e) {
+                log.warn("No s'ha pogut eliminar el ZIP temporal {}", tempZip, e);
+            }
         }
-        return progres.getNumOperacions();
+    }
+    
+    @Async
+    public void processarZipReact(
+    		EntitatDto entitat,
+    		List<ImportacioZipDocument> documentsZip,
+    		Long pareId,
+    		UsuariDto usuariActual,
+    		String rolActual) {
+    	
+    	Map<String, List<String>> ubicacioDocuments = new HashMap<>();
+    	
+    	int numTotalDocs = 0;
+    	for (ImportacioZipDocument izd: documentsZip) {
+    		if (izd.isImportar()) {
+    			numTotalDocs++;
+    		}
+    	}
+    	
+    	inicialitzarContext(usuariActual, entitat);
+    	
+    	ProgresProcessamentZipDto progres = inicialitzarProgres(pareId);
+        setNumOperacionsProgres(pareId, numTotalDocs);
+        
+        for (ImportacioZipDocument izd: documentsZip) {
+        	if (izd.isImportar()) {
+        		
+                try {
+                	
+                	registrarUbicacio(izd.getRutaCompleta(), ubicacioDocuments);
+                	
+    	        	processarEntradaZip(
+    	        			entitat.getId(),
+    	        			pareId,
+    	        			izd.getTipusDocument()!=null?izd.getTipusDocument().getId():null,
+    	        			ubicacioDocuments,
+    	        			progres,
+    	        			izd.getRutaCompleta(),
+    	        			izd.getContingut(),
+    	        			rolActual);
+                } catch (Exception ex) {
+                    log.error("Error procesant la següent entrada del fitxer ZIP {}", izd.getRutaCompleta(), ex);
+					progres.addError(
+							messageHelper.getMessage("contingut.boto.crear.document.multiple.entrada.error",
+							new Object[] { izd.getRutaCompleta(), ex.getMessage() }));
+                } finally {
+                    progres.incrementOperacionsRealitzades();
+                }        		
+        	}
+        }
+    }
+
+    public void cancelarProcessamentZip(Long pareId) {
+        cancelat.set(true);
+        this.mapProgres.remove(pareId);
+    }
+
+    public ProgresProcessamentZipDto inicialitzarProgres(Long pareId) {
+    	cancelat.set(false);
+        ProgresProcessamentZipDto progres = new ProgresProcessamentZipDto();
+        mapProgres.put(pareId, progres);
+        return progres;
     }
 
     public ProgresProcessamentZipDto obtenirProgresActual(Long pareId) {
         return mapProgres.get(pareId);
     }
+    
+    public void setNumOperacionsProgres(Long pareId, int totalOperacions) {
+    	mapProgres.get(pareId).setNumOperacions(totalOperacions);
+    }
+    
+    private void comptarEntradesZip(Path tempZip, Long pareId) throws IOException {
+    	ProgresProcessamentZipDto progres = mapProgres.get(pareId);
+    	
+    	try (InputStream in = Files.newInputStream(tempZip);
+				ZipArchiveInputStream zis = new ZipArchiveInputStream(in, StandardCharsets.UTF_8.name(), true)) {
 
-    private void assignarCarpeta(DocumentDto documentDto, Long entitatId, Long pareId) {
-        var nomFitxer = documentDto.getFitxerNom();
-        var ubicacio = ubicacioDocuments.get(documentDto.getRutaZip());
-
-        if (ubicacio != null) {
-            var pare = entityComprovarHelper.comprovarContingut(pareId);
-            var carpetaId = crearCarpetaRecursiu(
-            		entitatId, 
-            		pare, 
-            		pareId, 
-            		nomFitxer, 
-            		ubicacio.iterator());
-            documentDto.setPareId(carpetaId);
-        } else {
-            documentDto.setPareId(pareId);
-        }
+			int total = 0;
+			ZipEntry entry;
+			while ((entry = zis.getNextEntry()) != null) {
+				if (!entry.isDirectory())
+					total++;
+			}
+			progres.setNumOperacions(total);
+		}
     }
 
-    private Map<String, byte[]> llegirZip(InputStream zipInputStream) throws IOException {
-        Map<String, byte[]> mapDocuments = new HashMap<>();
+    private void processarEntradaZip(
+    		Long entitatId,
+    		Long pareId,
+    		Long metaDocumentId,
+    		Map<String, List<String>> ubicacioDocuments,
+    		ProgresProcessamentZipDto progres,
+    		String rutaCompleta,
+    		byte[] contingut,
+    		String rolActual) {
+    	
+        progres.addInfo(
+        		messageHelper.getMessage("contingut.boto.crear.document.multiple.processant",
+        		new Object[] {rutaCompleta}));
 
-        try (var zis = new ZipInputStream(zipInputStream)) {
+        DocumentDto document = crearDocumentDto(rutaCompleta, contingut, metaDocumentId);
+
+        documentHelper.processarDocumentNewTransaction(
+                ubicacioDocuments,
+                progres,
+                entitatId,
+                document,
+                pareId,
+                rolActual);
+		
+		progres.addDocumentCorrecte(document.getFitxerTamany());
+    }
+    
+    private void processarEntradesZip(
+    		Path tempZip,
+    		Long entitatId, 
+    		Long pareId, 
+    		String rolActual) throws IOException {
+    	try (InputStream in = Files.newInputStream(tempZip);
+				ZipArchiveInputStream zis = new ZipArchiveInputStream(in, StandardCharsets.UTF_8.name(), true)) {
+
+    		Map<String, List<String>> ubicacioDocuments = new HashMap<>();
+            ProgresProcessamentZipDto progres = mapProgres.get(pareId);
+
             ZipEntry entry;
-            while ((entry = zis.getNextEntry()) != null) {
+            while ((entry = zis.getNextEntry()) != null && !cancelat.get()) {
+
                 if (entry.isDirectory()) continue;
 
-                var path = Paths.get(entry.getName()).getParent();
-                var rutaCompleta = entry.getName();
-                
-                if (path != null) {
-                    var ubicacio = new ArrayList<String>();
-                    path.forEach(p -> ubicacio.add(p.toString()));
-                    ubicacioDocuments.put(rutaCompleta, ubicacio);
+                String rutaCompleta = entry.getName();
+                registrarUbicacio(rutaCompleta, ubicacioDocuments);
+
+                try {
+                	processarEntradaZip(entitatId, pareId, null, ubicacioDocuments, progres, rutaCompleta, zis.readAllBytes(), rolActual);                    
+                } catch (Exception ex) {
+                    log.error("Error procesant la següent entrada del fitxer ZIP {}", rutaCompleta, ex);
+					progres.addError(
+							messageHelper.getMessage("contingut.boto.crear.document.multiple.entrada.error",
+							new Object[] { rutaCompleta, ex.getMessage() }));
+                } finally {
+                    progres.incrementOperacionsRealitzades();
                 }
-
-                mapDocuments.put(rutaCompleta, llegirBytes(zis));
-                zis.closeEntry();
             }
-        }
-
-        if (mapDocuments.isEmpty()) {
-            throw new IllegalStateException("No s'ha trobat cap arxiu al ZIP");
-        }
-        return mapDocuments;
+		}
     }
-
-    private ProgresProcessamentZipDto inicialitzarProgres(Long pareId) {
-        log.debug("Inicialitzant el progrés d'importació de documents");
-        var progres = new ProgresProcessamentZipDto();
-        mapProgres.put(pareId, progres);
-        return progres;
-    }
-
-    private byte[] llegirBytes(InputStream inputStream) throws IOException {
-        try (var outputStream = new ByteArrayOutputStream()) {
-            var buffer = new byte[1024];
-            int len;
-            while ((len = inputStream.read(buffer)) > 0) {
-                outputStream.write(buffer, 0, len);
-            }
-            return outputStream.toByteArray();
-        }
-    }
-
-    private List<DocumentDto> convertirDocumentDto(Map<String, byte[]> mapDocuments) {
-        log.debug("Processant documents del ZIP");
-
-        var documents = mapDocuments.entrySet().stream()
-                .map(entry -> nouDocument(entry.getKey(), entry.getValue()))
-                .collect(Collectors.toList());
-
-        return documents;
-    }
-
-    private DocumentDto nouDocument(String rutaCompleta, byte[] contingut) {
-        var documentDto = new DocumentDto();
+    
+    private DocumentDto crearDocumentDto(String rutaCompleta, byte[] contingut, Long metaNodeId) {
         String fitxerNom = Paths.get(rutaCompleta).getFileName().toString();
         String nom = FilenameUtils.removeExtension(fitxerNom);
-        String mimeType = MimeTypeUtils.getMimeType(fitxerNom);
-        
+
+        DocumentDto documentDto = new DocumentDto();
         documentDto.setRutaZip(rutaCompleta);
         documentDto.setNom(nom);
         documentDto.setFitxerNom(fitxerNom);
         documentDto.setFitxerContingut(contingut);
         documentDto.setFitxerTamany((long) contingut.length);
-        documentDto.setFitxerContentType(mimeType);
+        documentDto.setFitxerContentType(MimeTypeUtils.getMimeType(fitxerNom));
         documentDto.setDocumentTipus(DocumentTipusEnumDto.DIGITAL);
         documentDto.setNtiVersion(NTI_VERSION);
         documentDto.setDataCaptura(new Date());
         documentDto.setData(new Date());
-        documentDto.setNtiOrigen(NTI_ORIGEN);
-        documentDto.setNtiEstadoElaboracion(NTI_ESTADO_ELABORACION);
-        documentDto.setNtiTipoDocumental(NTI_TIPO_DOCUMENTAL);
+
         
-        validarFirmes(mimeType, contingut, documentDto);
-        
+        if (metaNodeId==null) {
+            documentDto.setNtiOrigen(NTI_ORIGEN);
+            documentDto.setNtiEstadoElaboracion(NTI_ESTADO_ELABORACION);
+            documentDto.setNtiTipoDocumental(NTI_TIPO_DOCUMENTAL);        	
+        } else {
+        	MetaDocumentEntity mdE = metaDocumentRepository.findById(metaNodeId).get();
+        	documentDto.setNtiOrigen(mdE.getNtiOrigen());
+            documentDto.setNtiEstadoElaboracion(mdE.getNtiEstadoElaboracion());
+            documentDto.setNtiTipoDocumental(mdE.getNtiTipoDocumental());
+            MetaNodeDto metaNodeDto = new MetaNodeDto();
+            metaNodeDto.setId(mdE.getId());
+            documentDto.setMetaNode(metaNodeDto);    
+        }
+
         return documentDto;
     }
 
-	private void validarFirmes(String contentType, byte[] contingut, DocumentDto documentDto) {
-		SignatureInfoDto signatureInfo = documentService.checkIfSignedAttached(contingut, contentType);
-		
-		if (signatureInfo.isSigned()) {
-			documentDto.setAmbFirma(!signatureInfo.isError());
-			documentDto.setDocumentFirmaTipus(DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA);
-			documentDto.setTipusFirma(DocumentTipusFirmaEnumDto.ADJUNT);
-			documentDto.setValidacioFirmaCorrecte(!signatureInfo.isError());
-			documentDto.setValidacioFirmaErrorMsg(signatureInfo.getErrorMsg());
-		} else {
-			documentDto.setAmbFirma(false);
-			documentDto.setDocumentFirmaTipus(DocumentFirmaTipusEnumDto.SENSE_FIRMA);
-		}
-	}
+    private void registrarUbicacio(String rutaCompleta, Map<String, List<String>> ubicacioDocuments) {
+        var path = Paths.get(rutaCompleta).getParent();
+        if (path == null) return;
+
+        List<String> ubicacio = new ArrayList<>();
+        path.forEach(p -> ubicacio.add(p.toString()));
+        ubicacioDocuments.put(rutaCompleta, ubicacio);
+    }
     
-    private Long crearCarpetaRecursiu(
-    		Long entitatId, 
-    		ContingutEntity pare,
-    		Long pareId, 
-    		String nomFitxer,
-    		Iterator<String> ubicacio) {
-        if (!ubicacio.hasNext()) return pareId;
-
-        var nomCarpeta = ubicacio.next();
-        var carpeta = carpetaHelper.comprovarCarpetaExpedient(nomCarpeta, pare);
-        var carpetaId = carpeta != null
-                ? carpeta.getId()
-                : crearCarpeta(entitatId, pareId, nomFitxer, nomCarpeta);
-
-        return crearCarpetaRecursiu(entitatId, carpeta, carpetaId, nomFitxer, ubicacio);
+    private void inicialitzarContext(UsuariDto usuari, EntitatDto entitat) {
+        createAuthenticationContext(usuari);
+        ConfigHelper.setEntitat(entitat);
     }
 
-    private Long crearCarpeta(Long entitatId, Long pareId, String nomFitxer, String nomCarpeta) {
-        log.info("Creant la carpeta {} pel document {}", nomCarpeta, nomFitxer);
-        var carpeta = carpetaService.create(entitatId, pareId, nomCarpeta);
-        return carpeta != null ? carpeta.getId() : null;
-    }
+    private void createAuthenticationContext(UsuariDto usuariActual) {
+        if (SecurityContextHolder.getContext().getAuthentication() != null) return;
 
+        List<SimpleGrantedAuthority> authorities = Arrays.stream(usuariActual.getRols())
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList());
+
+        User user = new User(usuariActual.getCodi(), "", authorities);
+        UsernamePasswordAuthenticationToken authentication =
+                new UsernamePasswordAuthenticationToken(user, null, authorities);
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
 }

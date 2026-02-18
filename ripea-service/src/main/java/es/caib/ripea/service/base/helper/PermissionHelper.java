@@ -94,28 +94,41 @@ public class PermissionHelper {
 			if (targetType.endsWith(".AvisResource")) { return userPermissions.isSuperAdmin(); }
 			//Exclusius administradors
 			if (targetType.endsWith(".OrganGestorResource")) { return userPermissions.isAdmin(); }
-			if (targetType.endsWith(".GrupResource")) { return userPermissions.isAdmin(); }
+			if (targetType.endsWith(".GrupResource")) { 
+				return userPermissions.isAdmin() || userPermissions.isOrgan() || userPermissions.isDisseny();
+			}
 			if (targetType.endsWith(".HistoricResource")) { return userPermissions.isAdmin(); }
-			if (targetType.endsWith(".MetaExpedientResource")) { return userPermissions.isAdmin(); }
-			if (targetType.endsWith(".MetaExpedientComentariResource")) { return userPermissions.isAdmin(); }
-			if (targetType.endsWith(".MetaExpedientOrganGestorResource")) { return userPermissions.isAdmin(); }
-			if (targetType.endsWith(".MetaExpedientTascaResource")) { return userPermissions.isAdmin(); }
-			if (targetType.endsWith(".MetaExpedientTascaValidacioResource")) { return userPermissions.isAdmin(); }
 			if (targetType.endsWith(".DominiResource")) { return userPermissions.isAdmin(); }
 			if (targetType.endsWith(".TipusDocumentalResource")) { return userPermissions.isAdmin(); }
 			if (targetType.endsWith(".ConsultaPinbalResource")) { return userPermissions.isAdmin(); }
-			if (targetType.endsWith(".AclClassResource")) { return userPermissions.isAdmin(); }
-			if (targetType.endsWith(".AclEntryResource")) { return userPermissions.isAdmin(); }
-			if (targetType.endsWith(".AclSidResource")) { return userPermissions.isAdmin(); }
-			if (targetType.endsWith(".AclObjIdentityResource")) { return userPermissions.isAdmin(); }
+			//Modificació de permisos
+			if (targetType.endsWith(".AclClassResource") ||
+				targetType.endsWith(".AclEntryResource") ||
+				targetType.endsWith(".AclSidResource") ||
+				targetType.endsWith(".AclObjIdentityResource")) { 
+					return	userPermissions.isAdmin() || userPermissions.isOrgan() || userPermissions.isDisseny();
+			}
 			//Modificació de procediments
-			if (targetType.endsWith(".MetaDadaResource")) { return userPermissions.isAdmin() || userPermissions.isDisseny() || userPermissions.isRevisio(); }
-			if (targetType.endsWith(".MetaDocumentResource")) { return userPermissions.isAdmin() || userPermissions.isDisseny() || userPermissions.isRevisio(); }
-			if (targetType.endsWith(".MetaExpedientResource")) { return userPermissions.isAdmin() || userPermissions.isDisseny() || userPermissions.isRevisio(); }
-			if (targetType.endsWith(".MetaExpedientTascaResource")) { return userPermissions.isAdmin() || userPermissions.isDisseny() || userPermissions.isRevisio(); }
+			if (targetType.endsWith(".MetaExpedientResource") ||
+				targetType.endsWith(".MetaExpedientComentariResource") ||
+				targetType.endsWith(".MetaExpedientOrganGestorResource") ||
+				targetType.endsWith(".MetaExpedientTascaResource") ||
+				targetType.endsWith(".MetaDocumentFluxPortafibResource") ||
+				targetType.endsWith(".MetaDadaResource") ||
+				targetType.endsWith(".MetaDocumentResource") ||
+				targetType.endsWith(".MetaExpedientResource") ||
+				targetType.endsWith(".MetaExpedientTascaResource") ||
+				targetType.endsWith(".MetaExpedientCarpetaResource")) { 
+					return	userPermissions.isAdmin() || 
+							userPermissions.isOrgan() ||
+							userPermissions.isDisseny() ||
+							userPermissions.isRevisio();
+			}
+			
 			//Usuari
 			if (targetType.endsWith(".UsuariResource")) { return userPermissions.isConsulta(); }
 			if (targetType.endsWith(".AlertaResource")) { return userPermissions.isConsulta(); }
+			if (targetType.endsWith(".CarpetaResource")) { return userPermissions.isConsulta(); }
 			if (targetType.endsWith(".CarpetaResource")) { return userPermissions.isConsulta(); }
 			if (targetType.endsWith(".ContingutLogResource")) { return userPermissions.isConsulta(); }
 			if (targetType.endsWith(".ContingutMovimentResource")) { return userPermissions.isConsulta(); }
@@ -132,7 +145,10 @@ public class PermissionHelper {
 			if (targetType.endsWith(".ExecucioMassivaContingutResource")) { return userPermissions.isConsulta(); }
 			if (targetType.endsWith(".ExecucioMassivaResource")) { return userPermissions.isConsulta(); }
 			if (targetType.endsWith(".ExpedientComentariResource")) { return userPermissions.isConsulta(); }
-			if (targetType.endsWith(".ExpedientEstatResource")) { return userPermissions.isConsulta(); }
+			if (targetType.endsWith(".MetaExpedientEstatResource")) { return userPermissions.isConsulta(); }
+			if (targetType.endsWith(".MetaExpedientTascaResource")) { return userPermissions.isConsulta(); }
+			if (targetType.endsWith(".MetaExpedientTascaValidacioResource")) { return userPermissions.isConsulta(); }
+			if (targetType.endsWith(".ExpedientOrganPareResource")) { return userPermissions.isConsulta(); }
 			if (targetType.endsWith(".ExpedientPeticioResource")) { return userPermissions.isConsulta(); }
 			if (targetType.endsWith(".ExpedientResource")) { return userPermissions.isConsulta(); }
 			if (targetType.endsWith(".ExpedientTascaComentariResource")) { return userPermissions.isConsulta(); }
@@ -146,7 +162,8 @@ public class PermissionHelper {
 			if (targetType.endsWith(".RegistreInteressatResource")) { return userPermissions.isConsulta(); }
 			if (targetType.endsWith(".RegistreResource")) { return userPermissions.isConsulta(); }
 			if (targetType.endsWith(".ValidacioErrorResource")) { return userPermissions.isConsulta(); }
-			if (targetType.endsWith(".InteressatGrupResource")) { return userPermissions.isConsulta(); }			
+			if (targetType.endsWith(".InteressatGrupResource")) { return userPermissions.isConsulta(); }
+			if (targetType.endsWith(".URLInstruccioResource")) { return userPermissions.isConsulta(); }
 		}
 		//Es retorna false per defecte, quant es crei un nou recurs, s'ha de venir aqui a colocar-lo en el nivell adequat.
 		return false;

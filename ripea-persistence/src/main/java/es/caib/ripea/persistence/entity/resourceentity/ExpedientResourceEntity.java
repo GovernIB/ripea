@@ -155,7 +155,7 @@ public class ExpedientResourceEntity extends NodeResourceEntity<ExpedientResourc
 	@JoinColumn(
 			name = "expedient_estat_id",
 			foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "expestat_expedient_fk"))
-	private ExpedientEstatResourceEntity estatAdditional;
+	private MetaExpedientEstatResourceEntity estatAdditional;
 
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(

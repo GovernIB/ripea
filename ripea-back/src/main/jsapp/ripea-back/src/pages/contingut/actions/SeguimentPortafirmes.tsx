@@ -27,7 +27,7 @@ export const SeguimentPortafirmes = (props:any) => {
             </CardData>
 
             <Grid item xs={6}>
-                <Iframe isPDF={false} src={entity?.urlFluxSeguiment} style={{ height: '100%' }}/>
+                <Iframe src={entity?.urlFluxSeguiment} style={{ height: '100%' }}/>
             </Grid>
         </Grid>
     </Load>
@@ -127,6 +127,7 @@ const useSeguimentPortafirmes = (potModificar:boolean, refresh?: () => void) => 
             buttonCallback={(value :any) :void=>{
                 if (value=='cancel' && entity?.estat == 'ENVIAT' && potModificar && user?.rolActual != "IPA_ADMIN_LECTURA") {
                     cancelarFirma(entity?.id)
+                    handleClose();
                 }
                 if (value=='close') {
                     handleClose();

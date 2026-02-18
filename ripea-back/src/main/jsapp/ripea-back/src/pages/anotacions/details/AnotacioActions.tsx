@@ -40,8 +40,19 @@ export const useActions = (refresh?: () => void) => {
                 temporalMessageShow(null, error.message, 'error');
             });
     }
+    const consultar = (id:any) => {
+        apiAction(undefined, {code: 'CONSULTAR_I_GUARDAR', data: {ids: [id], massivo: false}})
+            .then(() => {
+                refresh?.();
+                temporalMessageShow(null, t('page.anotacio.action.consultar.ok'), 'success');
+            })
+            .catch((error) => {
+                temporalMessageShow(null, error.message, 'error');
+            });
+    }
 
     return {
+        consultar,
         downloadJustificant,
         canviEstatDistribucio,
     }
@@ -55,10 +66,20 @@ export const useMassiveActions = (refresh?: () => void) => {
     const {temporalMessageShow} = useBaseAppContext();
 
     const canviEstatDistribucio = (ids:any[]) => {
-        apiAction(undefined, {code: 'ESTAT_DISTRIBUCIO', data: {ids: [ids], massivo: false}})
-            .then(() => {
+        apiAction(undefined, {code: 'ESTAT_DISTRIBUCIO', data: {ids, massivo: true}})
+            .then((data:any) => {
                 refresh?.();
-                temporalMessageShow(null, t('page.expedient.results.actionBackgroundOk'), 'info');
+                temporalMessageShow(null, t('page.anotacio.action.canviEstatDistribucio.massiveOk', {data}), 'success');
+            })
+            .catch((error) => {
+                temporalMessageShow(null, error.message, 'error');
+            });
+    }
+    const consultar = (ids:any[]) => {
+        apiAction(undefined, {code: 'CONSULTAR_I_GUARDAR', data: {ids, massivo: true}})
+            .then((data:any) => {
+                refresh?.();
+                temporalMessageShow(null, t('page.anotacio.action.consultar.massiveOk', {data}), 'success');
             })
             .catch((error) => {
                 temporalMessageShow(null, error.message, 'error');
@@ -66,6 +87,7 @@ export const useMassiveActions = (refresh?: () => void) => {
     }
 
     return {
+        consultar,
         canviEstatDistribucio,
     }
 }
@@ -102,9 +124,9 @@ export const useAnexxActions = (refresh?: () => void) => {
     }
     const reintentarMassive = (ids:any) => {
         apiAction(undefined, {code: 'REINTENTAR', data: {ids, massivo: true}})
-            .then(() => {
+            .then((data:any) => {
                 refresh?.()
-                temporalMessageShow(null, t('page.expedient.results.actionBackgroundOk'), 'success');
+                temporalMessageShow(null, t('page.anotacio.action.procesarAnnexosPendents.massiveOk', {data}), 'success');
             })
             .catch((error) => {
                 temporalMessageShow(null, error.message, 'error');
@@ -121,8 +143,7 @@ const useAnotacioActions = (refresh?: () => void) => {
     const { t } = useTranslation();
     const navigate = useNavigate();
 
-    const { value: user } = useUserSession();
-    const isRolActualAdmin = user?.rolActual == 'IPA_ADMIN';
+    const { rol } = useUserSession();
 
     const { canviEstatDistribucio } = useActions(refresh)
     const {handleShow: handleRebutjar, content: contentRebutjar} = useRebutjar(refresh)
@@ -155,13 +176,13 @@ const useAnotacioActions = (refresh?: () => void) => {
             icon: "edit",
             showInMenu: true,
             clickShowUpdateDialog: true,
-            hidden: (row:any) => row?.estat != 'PENDENT' || row?.pendentCanviEstatDistribucio || !isRolActualAdmin,
+            hidden: (row:any) => row?.estat != 'PENDENT' || row?.pendentCanviEstatDistribucio || !rol?.isAdmin,
         },
         {
             label: t('page.expedient.title'),
             icon: icons.expedient,
             showInMenu: true,
-            onClick: (id:any, row:any) => navigate(`/contingut/${row?.expedient?.id}`),
+            onClick: (_id:any, row:any) => navigate(`/contingut/${row?.expedient?.id}`),
             hidden: (row:any) => row?.estatView != 'ACCEPTAT' || !row?.expedient,
         },
         {
@@ -169,7 +190,7 @@ const useAnotacioActions = (refresh?: () => void) => {
             icon: "turn_right",
             showInMenu: true,
             onClick: canviEstatDistribucio,
-            hidden: (row:any) => !row?.pendentCanviEstatDistribucio || !isRolActualAdmin,
+            hidden: (row:any) => !row?.pendentCanviEstatDistribucio || !rol?.isAdmin,
         },
     ];
 

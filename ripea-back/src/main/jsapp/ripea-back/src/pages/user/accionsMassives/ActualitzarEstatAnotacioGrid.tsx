@@ -25,7 +25,8 @@ const springFilterBuilder = (data: any) => {
     return builder.and(
         builder.like("identificador", data?.numero),
         builder.betweenDates("dataAlta", data?.dataAltaInici, data?.dataAltaFi),
-        builder.eq("estat", `'${data?.estat}'`)
+        builder.eq("estat", `'${data?.estat}'`),
+        data.nomesPendents && builder.eq("pendentCanviEstatDistribucio", 'true'),
     );
 }
 
@@ -54,6 +55,15 @@ const columns = [
         field: 'dataAlta',
         flex: 1,
         valueFormatter: (value: any) => formatDate(value)
+    },
+    {
+        field: 'dataActualitzacio',
+        flex: 1,
+        valueFormatter: (value: any) => formatDate(value)
+    },
+    {
+        field: 'reintentsCanviEstatDistribucio',
+        flex: 0.7,
     },
     {
         field: 'estat',

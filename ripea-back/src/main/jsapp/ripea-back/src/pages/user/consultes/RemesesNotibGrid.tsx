@@ -1,6 +1,6 @@
 import {useTranslation} from "react-i18next";
 import {useState} from "react";
-import {GridPage} from "reactlib";
+import {GridPage, useMuiDataGridApiRef} from "reactlib";
 import {CardPage} from "../../../components/CardData.tsx";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
@@ -8,7 +8,9 @@ import {StyledEstat} from "../../remesa/RemesaGrid.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import GridFormField, {GridButtonField} from "../../../components/GridFormField.tsx";
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
-import {Grid} from "@mui/material";
+import {Link as RouterLink} from "react-router-dom";
+import {Grid, Link} from "@mui/material";
+import {useActions} from "../../remesa/details/RemesaActions.tsx";
 
 // Filter
 const RemesesNotibFilterForm = () => {
@@ -67,10 +69,10 @@ const RemesesNotibFilter = (props: any) => {
 }
 
 // Grid
-const sortModel: any = [{field: 'enviatData', sort: 'desc'}]
+const sortModel: any = [{field: 'dataEnviada', sort: 'desc'}]
 const columns = [
     {
-        field: 'enviatData',
+        field: 'dataEnviada',
         flex: 0.75,
         valueFormatter: (value: any) => formatDate(value)
     },
@@ -85,7 +87,7 @@ const columns = [
     {
         field: 'expedient',
         flex: 1,
-        renderCell: (params:any) => <a href={`/contingut/${params?.row?.expedient?.id}`}>{params?.formattedValue}</a>,
+        renderCell: (params:any) => <Link component={RouterLink} to={`/contingut/${params?.row?.expedient?.id}`}>{params?.formattedValue}</Link>,
     },
     {
         field: 'assumpte',
@@ -102,7 +104,7 @@ const columns = [
     },
     {
         field: 'notificacioEstat',
-        flex: 0.5,
+        flex: 0.75,
         renderCell: (params:any) => <StyledEstat entity={params?.row}>{params.formattedValue}</StyledEstat>
     },
     {
@@ -135,13 +137,21 @@ const columns = [
 
 const RemesesNotibGrid = () => {
     const {t} = useTranslation();
+    const apiRef = useMuiDataGridApiRef();
     const [springFilter, setSpringFilter] = useState<string>();
+
+    const refresh = () => {
+        apiRef?.current?.refresh?.();
+    }
+
+    const {actualitzarEstat, actualitzarEstatMassive} = useActions(refresh);
 
     const actions = [
         {
             label: t('page.notificacio.action.actualitzarEstat.label'),
             icon: "autorenew",
             showInMenu: false,
+            onClick: actualitzarEstat,
         },
     ]
     const massiveActions = [
@@ -149,6 +159,7 @@ const RemesesNotibGrid = () => {
             label: t('page.notificacio.action.actualitzarEstat.label'),
             icon: "autorenew",
             showInMenu: false,
+            onClick: actualitzarEstatMassive,
         },
     ]
 
@@ -157,17 +168,13 @@ const RemesesNotibGrid = () => {
             <RemesesNotibFilter onSpringFilterChange={setSpringFilter}/>
 
             <StyledMuiGrid
+                apiRef={apiRef}
                 resourceName={"documentNotificacioResource"}
                 columns={columns}
-                // TODO: revisar filtro
-                filter={builder.and(
-                    builder.neq('enviatData', null),
-                    springFilter)}
+                filter={springFilter}
                 sortModel={sortModel}
-
                 rowAdditionalActions={actions}
                 toolbarMassiveActions={massiveActions}
-
                 toolbarHideCreate
             />
         </CardPage>

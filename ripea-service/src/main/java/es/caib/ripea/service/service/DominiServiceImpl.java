@@ -247,7 +247,7 @@ public class DominiServiceImpl implements DominiService {
 	}
 
 	public void evictDominiCache() {
-		cacheHelper.evictFindDominisByConsutla();
+		cacheHelper.evictFindDominisByConsulta();
 	}
 	private static final Logger logger = LoggerFactory.getLogger(DominiServiceImpl.class);
 

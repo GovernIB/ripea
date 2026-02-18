@@ -29,6 +29,10 @@ public class ExpedientComentariEntity extends RipeaAuditable<Long> {
 		return text;
 	}
 	
+	public void updateExpedient(ExpedientEntity expedient) {
+		this.expedient = expedient;
+	}
+	
 	public static Builder getBuilder(
 			ExpedientEntity expedient,
 			String text) {

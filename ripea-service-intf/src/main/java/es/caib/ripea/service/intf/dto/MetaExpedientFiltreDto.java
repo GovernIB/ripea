@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class MetaExpedientFiltreDto {
-
+	private TipusProcedimentServeiEnum tipusProcedimentServei;
 	private String codi;
 	private String nom;
 	private String classificacio;

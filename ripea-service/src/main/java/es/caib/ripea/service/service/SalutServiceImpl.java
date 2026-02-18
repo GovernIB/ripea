@@ -1,8 +1,5 @@
 package es.caib.ripea.service.service;
 
-import java.io.File;
-import java.lang.management.ManagementFactory;
-import java.lang.management.OperatingSystemMXBean;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -15,28 +12,34 @@ import java.util.concurrent.TimeUnit;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import es.caib.comanda.model.server.monitoring.ContextInfo;
+import es.caib.comanda.model.server.monitoring.EstatSalut;
+import es.caib.comanda.model.server.monitoring.EstatSalutEnum;
+import es.caib.comanda.model.server.monitoring.InformacioSistema;
+import es.caib.comanda.model.server.monitoring.IntegracioInfo;
+import es.caib.comanda.model.server.monitoring.IntegracioPeticions;
+import es.caib.comanda.model.server.monitoring.IntegracioSalut;
+import es.caib.comanda.model.server.monitoring.Manual;
+import es.caib.comanda.model.server.monitoring.MissatgeSalut;
+import es.caib.comanda.model.server.monitoring.SalutInfo;
+import es.caib.comanda.model.server.monitoring.SubsistemaInfo;
+import es.caib.comanda.model.server.monitoring.SubsistemaSalut;
 import es.caib.comanda.ms.salut.helper.EstatHelper;
-import es.caib.comanda.ms.salut.model.ContextInfo;
-import es.caib.comanda.ms.salut.model.DetallSalut;
-import es.caib.comanda.ms.salut.model.EstatSalut;
-import es.caib.comanda.ms.salut.model.EstatSalutEnum;
-import es.caib.comanda.ms.salut.model.IntegracioApp;
-import es.caib.comanda.ms.salut.model.IntegracioInfo;
-import es.caib.comanda.ms.salut.model.IntegracioPeticions;
-import es.caib.comanda.ms.salut.model.IntegracioSalut;
-import es.caib.comanda.ms.salut.model.Manual;
-import es.caib.comanda.ms.salut.model.MissatgeSalut;
-import es.caib.comanda.ms.salut.model.SalutInfo;
-import es.caib.comanda.ms.salut.model.SubsistemaInfo;
-import es.caib.comanda.ms.salut.model.SubsistemaSalut;
+import es.caib.comanda.ms.salut.helper.IntegracioApp;
+import es.caib.comanda.ms.salut.helper.MonitorHelper;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.repository.EntitatRepository;
+import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.AvisDto;
+import es.caib.ripea.service.intf.dto.IntegracioAccioDto;
+import es.caib.ripea.service.intf.dto.IntegracioAccioEstatEnumDto;
+import es.caib.ripea.service.intf.dto.IntegracioEnumDto;
 import es.caib.ripea.service.intf.dto.MetriquesRipeaInfoDto;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.AvisService;
 import es.caib.ripea.service.intf.service.SalutService;
+import es.caib.ripea.service.intf.utils.DateUtil;
 import io.micrometer.core.instrument.Meter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
@@ -54,6 +57,7 @@ public class SalutServiceImpl implements SalutService{
 	private final EntitatRepository entitatRepository;
 	private final MeterRegistry meterRegistry;
 	private final JdbcTemplate jdbcTemplate;
+	private final ConfigHelper configHelper;
 	
 	//Guardam les dades del enviament anterior, d'aquesta manera podrem calcular la diferencia
 	private static List<MetriquesRipeaInfoDto> dadesSalutRipea = new ArrayList<MetriquesRipeaInfoDto>();
@@ -172,6 +176,7 @@ public class SalutServiceImpl implements SalutService{
 		List<IntegracioInfo> integracions = new ArrayList<IntegracioInfo>();
 		integracions.add(new IntegracioInfo(IntegracioApp.PFI.toString(), IntegracioApp.PFI.getNom())); //portafirmes
 		integracions.add(new IntegracioInfo(IntegracioApp.ARX.toString(), IntegracioApp.ARX.getNom())); //Arxiu
+		integracions.add(new IntegracioInfo(IntegracioApp.CSV.toString(), IntegracioApp.CSV.getNom())); //ConCSV
 		integracions.add(new IntegracioInfo(IntegracioApp.GDC.toString(), IntegracioApp.GDC.getNom())); //Gestor documental
 		integracions.add(new IntegracioInfo(IntegracioApp.PBL.toString(), IntegracioApp.PBL.getNom())); //PINBAL
 		integracions.add(new IntegracioInfo(IntegracioApp.DIS.toString(), IntegracioApp.DIS.getNom())); //DISTRIBUCIO
@@ -191,39 +196,29 @@ public class SalutServiceImpl implements SalutService{
 	@Override
 	public List<SubsistemaInfo> getSubsistemes() {
 		List<SubsistemaInfo> subsistemes = new ArrayList<SubsistemaInfo>();
-		subsistemes.add(SubsistemaInfo.builder().codi("SUB_EXP").nom("Tramitació d'expedients").build());
-		subsistemes.add(SubsistemaInfo.builder().codi("SUB_PRC").nom("Gestió de procediments").build());
-		subsistemes.add(SubsistemaInfo.builder().codi("SUB_MAS").nom("Accions massives").build());
-		subsistemes.add(SubsistemaInfo.builder().codi("SUB_CPF").nom("Callback PORTAFIB").build());
-		subsistemes.add(SubsistemaInfo.builder().codi("SUB_CNB").nom("Callback NOTIB").build());
-		subsistemes.add(SubsistemaInfo.builder().codi("SUB_CDI").nom("Callback DISTRIBUCIO").build());
-		subsistemes.add(SubsistemaInfo.builder().codi("SUB_GDO").nom("Gestió documental FileSystem").build());
+		subsistemes.add(new SubsistemaInfo().codi("SUB_EXP").nom("Tramitació d'expedients"));
+		subsistemes.add(new SubsistemaInfo().codi("SUB_PRC").nom("Gestió de procediments"));
+		subsistemes.add(new SubsistemaInfo().codi("SUB_MAS").nom("Accions massives"));
+		subsistemes.add(new SubsistemaInfo().codi("SUB_CPF").nom("Callback PORTAFIB"));
+		subsistemes.add(new SubsistemaInfo().codi("SUB_CNB").nom("Callback NOTIB"));
+		subsistemes.add(new SubsistemaInfo().codi("SUB_CDI").nom("Callback DISTRIBUCIO"));
+		subsistemes.add(new SubsistemaInfo().codi("SUB_GDO").nom("Gestió documental FileSystem"));
 		return subsistemes;
 	}
 
 	@Override
 	public List<ContextInfo> getContexts(String baseUrl) {
         return List.of(
-                ContextInfo.builder()
-                        .codi("BACK")
-                        .nom("Backoffice")
-                        .path(baseUrl + "/ripeaback")
-                        .manuals(List.of(
-                                Manual.builder().nom("Manual d'usuari").path("https://github.com/GovernIB/ripea/raw/ripea-1.0-dev/doc/pdf/01_ripea_manual_usuari.pdf").build(),
-                                Manual.builder().nom("Manual d'administració").path("https://github.com/GovernIB/ripea/raw/ripea-1.0-dev/doc/pdf/02_ripea_manual_administradors.pdf").build()))
-                        .build(),
-                ContextInfo.builder()
-                        .codi("INT")
-                        .nom("API interna")
-                        .path(baseUrl + "/ripeaapi/interna")
-                        .api(baseUrl + "/ripeaapi/interna/swagger-ui/index.html")
-                        .build(),
-                ContextInfo.builder()
-                        .codi("EXT")
-                        .nom("API externa")
-                        .path(baseUrl + "/ripeaapi/externa")
-                        .api(null)
-                        .build()
+            new ContextInfo()
+                    .codi("BACK")
+                    .nom("Backoffice")
+                    .path(baseUrl + "/ripeaback")
+                    .manuals(List.of(
+                            new Manual().nom("Manual d'usuari").path("https://github.com/GovernIB/ripea/raw/ripea-1.0-dev/doc/pdf/01_ripea_manual_usuari.pdf"),
+                            new Manual().nom("Manual d'administració").path("https://github.com/GovernIB/ripea/raw/ripea-1.0-dev/doc/pdf/02_ripea_manual_administradors.pdf")))
+                    ,
+                    new ContextInfo().codi("INT").nom("API interna").path(baseUrl + "/ripeaapi/interna").api(baseUrl + "/ripeaapi/interna/swagger-ui/index.html"),
+                    new ContextInfo().codi("EXT").nom("API externa").path(baseUrl + "/ripeaapi/externa").api(null)
         );
 	}
 
@@ -234,26 +229,24 @@ public class SalutServiceImpl implements SalutService{
 		EstatSalut salutDb = checkDatabase();		
 		List<IntegracioSalut> salutIntegracions = checkIntegracions();
 		List<SubsistemaSalut> subsistemesSalut = checkSubsistemes();
-//		List<DetallSalut> salutAltres = checkAltres(); 		//Comparar amb MonitorSystemController
 		List<MissatgeSalut> missatgesSalut = checkMissatges();
 		
 		//Estat de salut general (depen de tots els altres)
 		EstatSalutEnum estat	= calculaEstatGlobal(salutIntegracions, subsistemesSalut);
 		int latenciaGlobal 		= calculaLatenciaGlobal(salutDb, salutIntegracions, subsistemesSalut);
 		
-		EstatSalut estatSalut = EstatSalut.builder().estat(estat).latencia(latenciaGlobal).build();
-		
-        return SalutInfo.builder()
-                .codi("RIP")
+		EstatSalut estatSalut = new EstatSalut().estat(estat).latencia(latenciaGlobal);
+		InformacioSistema systemInfo = MonitorHelper.getInfoSistema();
+        return new SalutInfo()
+                .codi(configHelper.getConfig(PropertyConfig.COMANDA_APP_CODI))
                 .versio(versio)
-                .data(new Date())
-                .estat(estatSalut)
-                .bd(salutDb)
+                .data(DateUtil.toOffsetDateTime(new Date()))
+                .estatGlobal(estatSalut)
+                .estatBaseDeDades(salutDb)
                 .integracions(salutIntegracions)
                 .subsistemes(subsistemesSalut)
-//                .altres(salutAltres)
                 .missatges(missatgesSalut)
-                .build();
+                .informacioSistema(systemInfo);
 	}
 	
 	private EstatSalutEnum calculaEstatGlobal(List<IntegracioSalut> salutIntegracions, List<SubsistemaSalut> subsistemesSalut) {
@@ -326,54 +319,12 @@ public class SalutServiceImpl implements SalutService{
             Instant start = Instant.now();
             jdbcTemplate.execute("SELECT COUNT(ID) FROM IPA_EXPEDIENT");
             Instant end = Instant.now();
-            return EstatSalut.builder().estat(EstatSalutEnum.UP).latencia((int) Duration.between(start, end).toMillis()).build();
+            return new EstatSalut().estat(EstatSalutEnum.UP).latencia((int) Duration.between(start, end).toMillis());
         } catch (Exception e) {
-            return EstatSalut.builder().estat(EstatSalutEnum.DOWN).build();
+            return new EstatSalut().estat(EstatSalutEnum.DOWN);
         }
     }
 
-    @SuppressWarnings("unused")
-	public List<DetallSalut> checkAltres() {
-
-        try {
-        	
-            OperatingSystemMXBean osBean = ManagementFactory.getOperatingSystemMXBean();
-            // Nombre de cores (CPU)
-            var availableProcessors = osBean.getAvailableProcessors();
-            var os = osBean.getName() + " " + osBean.getVersion() + " (" + osBean.getArch() + ")";
-        	
-            // Càrrega de la CPU (només per la implementació de Sun)
-            if (osBean instanceof com.sun.management.OperatingSystemMXBean) {
-                com.sun.management.OperatingSystemMXBean sunOsBean = (com.sun.management.OperatingSystemMXBean) osBean;
-                var systemCpuLoad = sunOsBean.getSystemCpuLoad() * 100 + "%";
-                var processCpuLoad = sunOsBean.getProcessCpuLoad() * 100 + "%";
-
-                var totalSpace = 0L;
-                var freeSpace = 0L;
-                for (var root : File.listRoots()) {
-                    if (root.getTotalSpace() > totalSpace) {
-                        totalSpace = root.getTotalSpace();
-                        freeSpace = root.getFreeSpace();
-                    }
-                }
-
-                return List.of(
-                        DetallSalut.builder().codi("PRC").nom("Processadors").valor(String.valueOf(Runtime.getRuntime().availableProcessors())).build(),
-                        DetallSalut.builder().codi("CRS").nom("Càrrega del sistema").valor(systemCpuLoad).build(),
-                        DetallSalut.builder().codi("CPR").nom("Càrrega del procés").valor(processCpuLoad).build(),
-                        DetallSalut.builder().codi("MED").nom("Memòria disponible").valor((Runtime.getRuntime().maxMemory() == Long.MAX_VALUE ? "Ilimitada" : humanReadableByteCount(Runtime.getRuntime().maxMemory()))).build(),
-                        DetallSalut.builder().codi("MET").nom("Memòria total").valor(humanReadableByteCount(Runtime.getRuntime().totalMemory())).build(),
-                        DetallSalut.builder().codi("EDT").nom("Espai de disc total").valor(humanReadableByteCount(totalSpace)).build(),
-                        DetallSalut.builder().codi("EDL").nom("Espai de disc lliure").valor(humanReadableByteCount(freeSpace)).build(),
-                        DetallSalut.builder().codi("SO").nom("Sistema operatiu").valor(os).build()
-                );
-            }
-        } catch (Exception e2) {
-            log.error("Salut: No s'ha pogut obtenir informació del sistema amb la implementació de Sun", e2);
-        }
-        return null;
-    }
-    
     public static String humanReadableByteCount(long bytes) {
 
         var unit = 1000;
@@ -459,7 +410,7 @@ public class SalutServiceImpl implements SalutService{
     }
     
     private IntegracioSalut getIntegracioSalutAmbTotals(
-    		String codiIntegracio,
+    		IntegracioApp codiIntegracio,
     		IntegracioPeticions ip) {
     	String endpointBase = "";
     	long numUsos = 0;
@@ -491,12 +442,27 @@ public class SalutServiceImpl implements SalutService{
 	    	
 	    	ip.setEndpoint(endpointBase);
 	    	
-	    	return IntegracioSalut.builder()
-	                .codi(codiIntegracio)
+	    	//Per calcular estat de la integracio, recuperar nomes les darreres 10 peticions
+	    	//Això no es pot obtenir amb les Métriques de spring, hem de consultar al monitor de integracions.
+	    	List<IntegracioAccioDto> darreresIntegracions = aplicacioService.getLastIntegracions(
+	    			integracioComandaToRipeaDto(codiIntegracio),
+	    			10);
+	    	long darreresOk = 0;
+	    	long darreresKo = 0;
+	    	
+	    	for (IntegracioAccioDto ia: darreresIntegracions) {
+	    		if (ia.getEstat().equals(IntegracioAccioEstatEnumDto.OK)) {
+	    			darreresOk++;
+	    		} else {
+	    			darreresKo++;
+	    		}
+	    	}
+	    	
+	    	return new IntegracioSalut()
+	                .codi(codiIntegracio.toString())
 	                .latencia(ip.getTotalTempsMig()/ip.getPeticionsPerEntorn().size())
-	                .estat(calculaEstat(ip.getTotalOk(), ip.getTotalError()))
-	                .peticions(ip)
-	                .build();
+	                .estat(calculaEstat(darreresOk, darreresKo))
+	                .peticions(ip);
     	} else {
     		
     		ip.setTotalOk(0l);
@@ -507,13 +473,34 @@ public class SalutServiceImpl implements SalutService{
     		ip.setTempsMigUltimPeriode(0);
 	    	ip.setEndpoint(endpointBase);
 	    	
-	    	return IntegracioSalut.builder()
-	                .codi(codiIntegracio)
+	    	return new IntegracioSalut()
+	                .codi(codiIntegracio.toString())
 	                .latencia(null)
 	                .estat(EstatSalutEnum.UNKNOWN)
-	                .peticions(ip)
-	                .build();
+	                .peticions(ip);
     	}
+    }
+    
+    private IntegracioEnumDto integracioComandaToRipeaDto(IntegracioApp integracioComanda) {
+    	switch (integracioComanda) {
+    		case PFI: return IntegracioEnumDto.PFIRMA;
+    		case ARX: return IntegracioEnumDto.ARXIU;
+    		case CSV: return IntegracioEnumDto.CONCSV;
+    		case GDC: return IntegracioEnumDto.GESDOC;
+    		case PBL: return IntegracioEnumDto.DADESEXT;
+    		case DIS: return IntegracioEnumDto.DISTRIBUCIO;
+    		case USR: return IntegracioEnumDto.USUARIS;
+    		case CDO: return IntegracioEnumDto.CONVERT;
+    		case DIR: return IntegracioEnumDto.DADESEXT;
+    		case NOT: return IntegracioEnumDto.NOTIFICACIO;
+    		case VIF: return IntegracioEnumDto.VIAFIRMA;
+    		case DIB: return IntegracioEnumDto.DIGITALITZACIO;
+    		case VFI: return IntegracioEnumDto.VALIDASIG;
+    		case RSC: return IntegracioEnumDto.UNITATS;
+		default:
+			break;
+		}
+    	return null;
     }
     
     public List<IntegracioSalut> checkIntegracions() {
@@ -528,7 +515,7 @@ public class SalutServiceImpl implements SalutService{
 		String[] codesFSUSR = {"METRICS@Integracions.dadesUsuari"};
 		IntegracioPeticions ipUSR = new IntegracioPeticions();
 		ipUSR.setPeticionsPerEntorn(getPeticionsPerEntorn(IntegracioApp.USR.toString(), codesFSUSR));
-		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.USR.toString(), ipUSR));
+		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.USR, ipUSR));
 		
 		String[] codesFSPFI = {
 				"METRICS@Integracions.portafirmes",
@@ -537,59 +524,64 @@ public class SalutServiceImpl implements SalutService{
 				"METRICS@Integracions.firmaSimpleWeb"};
 		IntegracioPeticions ipPFI = new IntegracioPeticions();
 		ipPFI.setPeticionsPerEntorn(getPeticionsPerEntorn(IntegracioApp.PFI.toString(), codesFSPFI));
-		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.PFI.toString(), ipPFI));
+		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.PFI, ipPFI));
     	
 		String[] codesFSARX = {"METRICS@Integracions.arxiu"};
 		IntegracioPeticions ipARX = new IntegracioPeticions();
 		ipARX.setPeticionsPerEntorn(getPeticionsPerEntorn(IntegracioApp.ARX.toString(), codesFSARX)); 
-		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.ARX.toString(), ipARX));
+		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.ARX, ipARX));
+		
+		String[] codesFSCSV = {"METRICS@Integracions.concsv"};
+		IntegracioPeticions ipCSV = new IntegracioPeticions();
+		ipCSV.setPeticionsPerEntorn(getPeticionsPerEntorn(IntegracioApp.CSV.toString(), codesFSCSV)); 
+		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.CSV, ipCSV));
 		
 		String[] codesFSPBL = {"METRICS@Integracions.pinbal"};
 		IntegracioPeticions ipPBL = new IntegracioPeticions();
 		ipPBL.setPeticionsPerEntorn(getPeticionsPerEntorn(IntegracioApp.PBL.toString(), codesFSPBL)); 
-		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.PBL.toString(), ipPBL));
+		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.PBL, ipPBL));
 
 		String[] codesFSDIS = {"METRICS@Integracions.distribucio"};
 		IntegracioPeticions ipDIS = new IntegracioPeticions();
 		ipDIS.setPeticionsPerEntorn(getPeticionsPerEntorn(IntegracioApp.DIS.toString(), codesFSDIS)); 
-		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.DIS.toString(), ipDIS));
+		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.DIS, ipDIS));
 		
 		String[] codesFSCDO = {"METRICS@Integracions.conversio"};
 		IntegracioPeticions ipCDO = new IntegracioPeticions();
 		ipCDO.setPeticionsPerEntorn(getPeticionsPerEntorn(IntegracioApp.CDO.toString(), codesFSCDO));
-		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.CDO.toString(), ipCDO));
+		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.CDO, ipCDO));
 		
 		String[] codesFSDIR = {"METRICS@Integracions.dir3"}; //getUnitatsOrganitzativesPlugin, getDadesExternesPlugin
 		IntegracioPeticions ipDIR = new IntegracioPeticions();
 		ipDIR.setPeticionsPerEntorn(getPeticionsPerEntorn(IntegracioApp.DIR.toString(), codesFSDIR));
-		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.DIR.toString(), ipDIR));
+		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.DIR, ipDIR));
 		
 		String[] codesFSNOT = {"METRICS@Integracions.notib"};
 		IntegracioPeticions ipNOT = new IntegracioPeticions();
 		ipNOT.setPeticionsPerEntorn(getPeticionsPerEntorn(IntegracioApp.NOT.toString(), codesFSNOT)); 
-		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.NOT.toString(), ipNOT));
+		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.NOT, ipNOT));
 		
 		if (Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.FIRMA_BIOMETRICA_ACTIVA))) {
 			String[] codesFSVIF = {"METRICS@Integracions.viafirma"};
 			IntegracioPeticions ipVIF = new IntegracioPeticions();
 			ipVIF.setPeticionsPerEntorn(getPeticionsPerEntorn(IntegracioApp.VIF.toString(), codesFSVIF)); 
-			integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.VIF.toString(), ipVIF));
+			integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.VIF, ipVIF));
 		}
 		
 		String[] codesFSDIB = {"METRICS@Integracions.digitalitzacio"};
 		IntegracioPeticions ipDIB = new IntegracioPeticions();
 		ipDIB.setPeticionsPerEntorn(getPeticionsPerEntorn(IntegracioApp.DIB.toString(), codesFSDIB));
-		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.DIB.toString(), ipDIB));
+		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.DIB, ipDIB));
 		
 		String[] codesFSVFI = {"METRICS@Integracions.validaFirma"};
 		IntegracioPeticions ipVFI = new IntegracioPeticions();
 		ipVFI.setPeticionsPerEntorn(getPeticionsPerEntorn(IntegracioApp.VFI.toString(), codesFSVFI)); 
-		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.VFI.toString(), ipVFI));
+		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.VFI, ipVFI));
 		
 		String[] codesFSRSC = {"METRICS@Integracions.rolsac"}; //getProcedimentPlugin
 		IntegracioPeticions ipRSC = new IntegracioPeticions();
 		ipRSC.setPeticionsPerEntorn(getPeticionsPerEntorn(IntegracioApp.RSC.toString(), codesFSRSC)); 
-		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.RSC.toString(), ipRSC));
+		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.RSC, ipRSC));
     	
     	return integracionsSalut;
     }
@@ -630,7 +622,7 @@ public class SalutServiceImpl implements SalutService{
     	
     	int		tempsPromitgActual = subsistema_total_exito==0?0:(int)(tempsPromitgSubsistema/subsistema_total_exito);
     	long	peticionsOkDarrerPeriode = getDadesOkPeriodeByCodi(codi, subsistema_total_exito); 
-    	SubsistemaSalut resultat = SubsistemaSalut.builder()
+    	SubsistemaSalut resultat = new SubsistemaSalut()
                 .codi(codi)
                 .totalTempsMig(tempsPromitgActual)
                 .estat(calculaEstat(subsistema_total_exito, subsistema_total_error))
@@ -638,8 +630,7 @@ public class SalutServiceImpl implements SalutService{
                 .totalError(subsistema_total_error)
                 .peticionsOkUltimPeriode(peticionsOkDarrerPeriode)
                 .peticionsErrorUltimPeriode(getDadesErrorPeriodeByCodi(codi, subsistema_total_error))
-                .tempsMigUltimPeriode(getDadesTempsPromitgPeriodeByCodi(codi, tempsPromitgActual, subsistema_total_exito))
-                .build();
+                .tempsMigUltimPeriode(getDadesTempsPromitgPeriodeByCodi(codi, tempsPromitgActual, subsistema_total_exito));
 		
 		actualizarDadesSalutRipeaByCodi(codi, subsistema_total_exito, subsistema_total_error, tempsPromitgActual);
 		
@@ -711,32 +702,9 @@ public class SalutServiceImpl implements SalutService{
     }
 
     private static EstatSalutEnum calculaEstat(Long totalPeticionsOk, Long totalPeticionsError) {
-        
     	final long ok = (totalPeticionsOk != null) ? totalPeticionsOk : 0L;
         final long ko = (totalPeticionsError != null) ? totalPeticionsError : 0L;
-        
         return EstatHelper.calculaEstat(ok, ko);
-        
-        /*final long total = ok + ko;
-
-        if (total==0) {
-        	return EstatSalutEnum.UNKNOWN;
-        }
-        
-        // Percentatge d'errors arrodonit correctament evitant divisió d'enters
-        final int errorRatePct = (int) Math.round((ko * 100.0) / Math.max(1L, total));
-
-        if (errorRatePct >= 100) {
-        	return EstatSalutEnum.DOWN;
-        } else if (errorRatePct > 30) {
-        	return EstatSalutEnum.ERROR;
-        } else if (errorRatePct > 10) {
-        	return EstatSalutEnum.DEGRADED;
-        } else if (errorRatePct < 5) {
-        	return EstatSalutEnum.UP;
-        } else {
-            return EstatSalutEnum.WARN; // 5-10%
-        }*/
     }
     
     public List<MissatgeSalut> checkMissatges() {
@@ -767,11 +735,10 @@ public class SalutServiceImpl implements SalutService{
 	    	}
 
 	    	for (AvisDto avis: avisos) {
-	    		MissatgeSalut ms = MissatgeSalut.builder()
-	    				.data(avis.getDataInici())
+	    		MissatgeSalut ms = new MissatgeSalut()
+	    				.data(DateUtil.toOffsetDateTime(avis.getDataInici()))
 	    				.missatge(avis.getAssumpte()+": "+avis.getMissatge())
-	    				.nivell(avis.getSalutNivellComanda())
-	    				.build();
+	    				.nivell(avis.getSalutNivellComanda());
 	    		missatges.add(ms);
 	    	}
     	} catch (Exception ex) {}

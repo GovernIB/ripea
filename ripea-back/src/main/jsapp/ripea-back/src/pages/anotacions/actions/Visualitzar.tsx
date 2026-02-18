@@ -10,7 +10,7 @@ const Visualitzar = (props:any) => {
     const { getUrl } = useToProgramaAntic();
 
     return <Load value={id}>
-        <Iframe isPDF={true} src={getUrl(`expedientPeticio/annex/${id}/content`)}/>
+        <Iframe isPDF src={getUrl(`expedientPeticio/annex/${id}/content`)}/>
     </Load>
 }
 

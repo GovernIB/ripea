@@ -40,7 +40,7 @@ pageContext.setAttribute("isRolActualAdministradorLectura", es.caib.ripea.back.h
 <c:set var="permissionWrite" scope="request" value="${expedient.usuariActualWrite}"/>
 <c:set var="potModificar" scope="request">
 	<c:choose>
-		<c:when test="${((expedientAgafatPerUsuariActual and permissionWrite) or isTascaObert or contingut.admin) and expedientObert and !isRolActualAdministradorLectura}">true</c:when>
+		<c:when test="${((expedientAgafatPerUsuariActual and permissionWrite) or isTascaObert or contingut.admin) and expedientObert and !isRolActualAdministradorLectura and !isExpedientPendentExecucioMassiva}">true</c:when>
 		<c:otherwise>false</c:otherwise>
 	</c:choose>
 </c:set>
@@ -775,6 +775,12 @@ function removeCookie(cname) {
 				<div id="botons-errors-esborranys" class="esborranys alert well-sm alert-info alert-dismissable">
 					<p><spring:message code="contingut.errors.expedient.conte.esborranys"/></p>
 					<b><spring:message code="contingut.errors.expedient.conte.esborranys.bold"/></b>
+				</div>
+			</c:if>
+			<c:if test="${contingut.expedient && !isTasca && isExpedientPendentExecucioMassiva}">
+				<div class="alert well-sm alert-warning alert-dismissable" style="text-align: center;">
+					<p><spring:message code="contingut.errors.expedient.execucio.massiva"/></p>
+					<b><spring:message code="contingut.errors.expedient.execucio.massiva.bold"/></b>
 				</div>
 			</c:if>
 			<c:if test="${!isTasca && contingut.node and contingut.alerta}">

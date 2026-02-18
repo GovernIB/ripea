@@ -1,42 +1,39 @@
 import {useState} from "react";
-import {Grid} from "@mui/material";
-import {MuiDialog} from "reactlib";
+import {MuiDialog, useBaseAppContext, useResourceApiService} from "reactlib";
 import {useTranslation} from "react-i18next";
-import {CardData, ContenidoData} from "../../../components/CardData.tsx";
+import {CardButton, DetailCard} from "../../../components/CardData.tsx";
 import AlertExpand from "../../../components/AlertExpand.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import {useActions} from "./RemesaActions.tsx";
 import Load from "../../../components/Load.tsx";
+import {FieldData, MuiDetail} from "../../../components/MuiDetail.tsx";
+import {Box} from "@mui/material";
 
-const Dades = (props:any) => {
-    const {entity} = props;
+const RemesaDetail = (props:any) => {
+    const {entity, fields} = props;
     const { t } = useTranslation();
 
     const {justificant, descarregarDocumentEnviat} = useActions()
 
-    return <Grid container direction={"row"} columnSpacing={1} rowSpacing={2}>
-        <CardData title={t('page.notificacio.detall.notificacioDades')}
-              buttons={[
-                  {
-                      text: t('page.notificacio.action.justificant.label'),
-                      icon: 'download',
-                      onClick: ()=>{justificant(entity?.id)},
-                      hidden: entity?.notificacioEstat == 'PENDENT',
-                  },
-              ]}
+    return <MuiDetail entity={entity} fields={fields}>
+        <DetailCard title={t('page.notificacio.detall.notificacioDades')}
+                    header={entity?.notificacioEstat != 'PENDENT' && <Box ml="auto">
+                        <CardButton icon={'download'}
+                                    text={t('page.notificacio.action.justificant.label')}
+                                    onClick={()=>justificant(entity?.id)}/>
+                    </Box>}
         >
-            <ContenidoData title={t('page.notificacio.detall.emisor')}>{entity?.emisor?.description}</ContenidoData>
-            <ContenidoData title={t('page.notificacio.detall.assumpte')}>{entity?.assumpte}</ContenidoData>
-            <ContenidoData title={t('page.notificacio.detall.observacions')}>{entity?.observacions}</ContenidoData>
-            <ContenidoData title={t('page.notificacio.detall.notificacioEstat')}>{entity?.notificacioEstat}</ContenidoData>
-            <ContenidoData title={t('page.notificacio.detall.createdDate')}>{formatDate(entity?.createdDate)}</ContenidoData>
-            <ContenidoData title={t('page.notificacio.detall.processatData')}
-                           hidden={!(entity?.notificacioEstat=='FINALITZADA' || entity?.notificacioEstat=='PROCESSADA')}>
-                {formatDate(entity?.processatData)}</ContenidoData>
-            <ContenidoData title={t('page.notificacio.detall.tipus')}>{entity?.tipus}</ContenidoData>
-            <ContenidoData title={t('page.notificacio.detall.entregaPostal')}>{t(`enum.siNO.${entity?.entregaPostal}`)}</ContenidoData>
-        </CardData>
-        <CardData title={t('page.notificacio.detall.notificacioDocument')}
+            <FieldData field={'emisor'}/>
+            <FieldData field={'assumpte'}/>
+            <FieldData field={'observacions'}/>
+            <FieldData field={'notificacioEstat'}/>
+            <FieldData field={'createdDate'} title={t('page.notificacio.detall.createdDate')}>{formatDate(entity?.createdDate)}</FieldData>
+            <FieldData field={'processatData'} hidden={!(entity?.notificacioEstat=='FINALITZADA' || entity?.notificacioEstat=='PROCESSADA')}>
+                {formatDate(entity?.processatData)}</FieldData>
+            <FieldData field={'tipus'}/>
+            <FieldData field={'entregaPostal'} title={t('page.notificacio.detall.entregaPostal')}>{t(`enum.siNO.${entity?.entregaPostal}`)}</FieldData>
+        </DetailCard>
+        <DetailCard title={t('page.notificacio.detall.notificacioDocument')}
                   buttons={[
                       {
                           text: t('page.notificacio.action.documentEnviat.label'),
@@ -46,19 +43,33 @@ const Dades = (props:any) => {
                       },
                   ]}
         >
-            <ContenidoData title={t('page.notificacio.detall.fitxerNom')} xs={10}>{entity?.fitxerNom}</ContenidoData>
-        </CardData>
-    </Grid>
+            <FieldData field={'fitxerNom'} title={t('page.notificacio.detall.fitxerNom')} xs={10}/>
+        </DetailCard>
+    </MuiDetail>
 }
 
 const useRemesaDetail = () => {
-    const [open, setOpen] = useState(false);
-    const [entity, setEntity] = useState<any>();
     const { t } = useTranslation();
 
-    const handleOpen = (id:any, row:any) => {
-        console.log(id, row)
-        setEntity(row);
+    const {
+        isReady: apiIsReady,
+        getOne: apiGetOne,
+        currentFields
+    } = useResourceApiService('documentNotificacioResource');
+    const {temporalMessageShow} = useBaseAppContext();
+
+    const [open, setOpen] = useState(false);
+    const [entity, setEntity] = useState<any>();
+
+    const handleOpen = (id:any) => {
+        if(apiIsReady && id){
+            apiGetOne(id)
+                .then((app) => setEntity(app))
+                .catch((error) => {
+                    handleClose()
+                    temporalMessageShow(null, error?.message, 'error');
+                });
+        }
         setOpen(true);
     }
 
@@ -92,7 +103,7 @@ const useRemesaDetail = () => {
                 {entity?.error &&
                     <AlertExpand severity={"error"} label={t('page.notificacio.detall.error')}>{entity?.errorDescripcio}</AlertExpand>
                 }
-                <Dades entity={entity}/>
+                <RemesaDetail entity={entity} fields={currentFields}/>
             </Load>
         </MuiDialog>
 

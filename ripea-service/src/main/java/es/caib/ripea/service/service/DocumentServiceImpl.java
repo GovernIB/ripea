@@ -2,6 +2,7 @@ package es.caib.ripea.service.service;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -65,7 +66,6 @@ import es.caib.ripea.service.helper.PaginacioHelper.Converter;
 import es.caib.ripea.service.helper.PinbalHelper;
 import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.helper.SynchronizationHelper;
-import es.caib.ripea.service.helper.UsuariHelper;
 import es.caib.ripea.service.helper.ViaFirmaHelper;
 import es.caib.ripea.service.helper.ZipImportacioHelper;
 import es.caib.ripea.service.intf.dto.ArbreJsonDto;
@@ -141,7 +141,6 @@ public class DocumentServiceImpl implements DocumentService {
 	@Autowired private OrganGestorHelper organGestorHelper;
 	@Autowired private IntegracioHelper integracioHelper;
 	@Autowired private ExpedientTascaRepository expedientTascaRepository;
-	@Autowired private UsuariHelper usuariHelper;
     @Autowired private EmailHelper emailHelper;
     @Autowired private ContingutLogHelper contingutLogHelper;
     @Autowired private ZipImportacioHelper zipImportacioHelper;
@@ -1569,13 +1568,36 @@ public class DocumentServiceImpl implements DocumentService {
 
 	@Override
 	@Transactional
-	public int extreureDocumentsZip(InputStream zip, String rolActual, Long pareId, Long tascaId, EntitatDto entitatActual) throws IOException {
-		return zipImportacioHelper.descomprimirZip(zip, rolActual, pareId, tascaId, entitatActual.getId());
+	public void processarZipAsync(
+			UsuariDto usuariActual, 
+			Path tempZip, 
+			String rolActual, 
+			Long pareId, 
+			Long tascaId, 
+			EntitatDto entitatActual) {
+		zipImportacioHelper.processarZip(
+                usuariActual,
+                entitatActual,
+                tempZip,
+                rolActual,
+                pareId,
+                tascaId
+        );
 	}
 
 	@Override
+	public ProgresProcessamentZipDto inicialitzarProgresProcessamentZip(Long pareId) {
+		return zipImportacioHelper.inicialitzarProgres(pareId);
+	}
+	
+	@Override
 	public ProgresProcessamentZipDto obtenirProgresProcessamentZip(Long pareId) {
 		return zipImportacioHelper.obtenirProgresActual(pareId);
+	}
+
+	@Override
+	public void cancelarProcessamentZip(Long pareId) {
+		zipImportacioHelper.cancelarProcessamentZip(pareId);
 	}
 	
 }

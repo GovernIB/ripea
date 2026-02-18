@@ -1,15 +1,13 @@
-/**
- * 
- */
 package es.caib.ripea.service.intf.dto;
-
-import es.caib.ripea.service.intf.utils.Utils;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
+
+import es.caib.ripea.service.intf.utils.Utils;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Informació d'una tasca d'un meta-expedient.
@@ -39,6 +37,8 @@ public class MetaExpedientTascaDto implements Serializable {
 	private Long estatIdFinalitzarTasca;
 	private String estatNomFinalitzarTasca;
 	private String estatColorFinalitzarTasca;
+	
+	private List<MetaExpedientTascaValidacioDto> validacions;
 
 	public String getDataLimitString() {
 		if (dataLimit != null) {
@@ -58,5 +58,4 @@ public class MetaExpedientTascaDto implements Serializable {
 	}
 	
 	private static final long serialVersionUID = -139254994389509932L;
-
 }

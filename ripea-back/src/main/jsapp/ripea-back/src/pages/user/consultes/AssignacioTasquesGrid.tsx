@@ -5,9 +5,11 @@ import {CardPage} from "../../../components/CardData.tsx";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import GridFormField from "../../../components/GridFormField.tsx";
-import {Grid} from "@mui/material";
+import {Link as RouterLink} from "react-router-dom";
+import {Grid, Link} from "@mui/material";
 import * as builder from "../../../util/springFilterUtils.ts";
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
+import useTascaDetail from "../../tasca/details/TascaDetail.tsx";
 
 const AssignacioTasquesFilterForm = () => {
     return <>
@@ -15,8 +17,8 @@ const AssignacioTasquesFilterForm = () => {
         <GridFormField xs={3} name="metaExpedientTasca"/>
         <GridFormField xs={3} name="estat"/>
         <GridFormField xs={3} name="responsable"/>
-        <GridFormField xs={4} name="dataInici" type={"date"}/>
-        <GridFormField xs={4} name="dataFi" type={"date"}/>
+        <GridFormField xs={3} name="dataInici" type={"date"}/>
+        <GridFormField xs={3} name="dataFi" type={"date"}/>
         <Grid item xs={1.6}/>
     </>
 }
@@ -27,7 +29,7 @@ const springFilterBuilder = (data:any) => {
         builder.eq('metaExpedientTasca.id', data?.metaExpedientTasca?.id),
         builder.eq('estat', `'${data?.estat}'`),
         builder.eq("responsableActual.id", data?.responsable),
-        builder.betweenDates('createdDate', data?.dataInici, data?.dataFi),
+        builder.betweenDates('dataInici', data?.dataInici, data?.dataFi),
     );
 }
 
@@ -51,7 +53,7 @@ const columns = [
     {
         field: 'expedient',
         flex: 1,
-        renderCell: (params:any) => <a href={`/contingut/${params?.row?.expedient?.id}`}>{params?.formattedValue}</a>,
+        renderCell: (params:any) => <Link component={RouterLink} to={`/contingut/${params?.row?.expedient?.id}`}>{params?.formattedValue}</Link>,
     },
     {
         field: 'titol',
@@ -67,18 +69,30 @@ const columns = [
     },
     {
         field: 'createdByFullName',
-        flex: 0.5,
+        flex: 0.75,
     },
     {
         field: 'dataInici',
-        flex: 0.75,
+        flex: 0.5,
         valueFormatter: (value: any) => formatDate(value),
     },
 ]
 
+const perspectives:any = ['AUDITORIA']
 const AssignacioTasquesGrid = () => {
     const {t} = useTranslation();
     const [springFilter, setSpringFilter] = useState<string>();
+
+    const { handleOpen, dialog } = useTascaDetail();
+
+    const actions = [
+        {
+            label: t('common.detail'),
+            icon: "info",
+            showInMenu: false,
+            onClick: handleOpen,
+        },
+    ]
 
     return <GridPage disableMargins>
         <CardPage title={t('page.user.menu.assignacio')}>
@@ -88,10 +102,13 @@ const AssignacioTasquesGrid = () => {
                 resourceName={"expedientTascaResource"}
                 columns={columns}
                 filter={springFilter}
+                perspectives={perspectives}
                 sortModel={sortModel}
+                rowAdditionalActions={actions}
                 readOnly
             />
         </CardPage>
+        {dialog}
     </GridPage>
 }
 export default AssignacioTasquesGrid;

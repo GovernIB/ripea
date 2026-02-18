@@ -181,7 +181,7 @@
 					disabled="${bloquejarCamps}"/>	
 				<rip:inputText name="duracio" textKey="tasca.list.column.duracio" comment="tasca.list.column.duracio.tip" tooltip="true" tooltipMsg="tasca.list.column.duracio.tip" readonly="${bloquejarCamps}"/>
 				<rip:inputTextarea name="descripcio" textKey="metaexpedient.tasca.form.camp.descripcio" required="true" disabled="${bloquejarCamps}"/>
-				<rip:inputSelect id="prioritat" name="prioritat" optionEnum="PrioritatEnumDto" emptyOption="false" textKey="contingut.expedient.form.camp.prioritat" templateResultFunction="showColorPriritats"/>
+				<rip:inputSelect id="prioritat" name="prioritat" optionEnum="PrioritatEnumDto" emptyOption="false" textKey="contingut.expedient.form.camp.prioritat" templateResultFunction="showColorPriritats" disabled="${bloquejarCamps}"/>
 				<rip:inputSelect id="estatIdCrearTasca" name="estatIdCrearTasca" textKey="metaexpedient.tasca.form.camp.estat.crearTasca" emptyOption="true" optionItems="${expedientEstats}" optionValueAttribute="id" optionTextAttribute="nom" disabled="${bloquejarCamps}" templateResultFunction="showColor" />
 				<rip:inputSelect id="estatIdFinalitzarTasca" name="estatIdFinalitzarTasca" textKey="metaexpedient.tasca.form.camp.estat.finalitzarTasca" emptyOption="true" optionItems="${expedientEstats}" optionValueAttribute="id" optionTextAttribute="nom" disabled="${bloquejarCamps}" templateResultFunction="showColor" />
 			</div>
@@ -197,7 +197,8 @@
 				    	required="true"
 				    	optionItems="${itemValidacioOptions}"
 				    	optionValueAttribute="value"
-				    	optionTextKeyAttribute="text"/>
+				    	optionTextKeyAttribute="text"
+				    	disabled="${bloquejarCamps}"/>
 				    <rip:inputSelect id="itemId"
 				    	name="itemId"
 				    	emptyOption="true"
@@ -205,7 +206,8 @@
 				    	required="true"				    	
 				    	optionItems="${itemsOptions}"
 				    	optionValueAttribute="id"
-				    	optionTextAttribute="nom"/>
+				    	optionTextAttribute="nom"
+				    	disabled="${bloquejarCamps}"/>
 				    <rip:inputSelect id="tipusValidacio"
 				    	name="tipusValidacio"
 				    	emptyOption="true"
@@ -213,8 +215,9 @@
 				    	required="true"
 				    	optionItems="${tipusValidacioOptions}"
 				    	optionValueAttribute="value"
-				    	optionTextKeyAttribute="text"/>
-				    <button type="button" id="guardaValidacio" class="btn btn-primary pull-right">
+				    	optionTextKeyAttribute="text"
+				    	disabled="${bloquejarCamps}"/>
+				    <button type="button" id="guardaValidacio" <c:if test="${bloquejarCamps}">disabled</c:if> class="btn btn-primary pull-right">
 				    	<span class="fa fa-plus"></span> <spring:message code="comu.boto.afegir"/>
 				    </button>
 				</fieldset>
@@ -263,7 +266,7 @@
 								{{if activa}}<span class="fa fa-check"></span>{{/if}}
 								</script>
 							</th>
-							<th data-col-name="id" data-orderable="false" data-template="#cellValidacionsAccionsTemplate" width="5%">
+							<th data-col-name="id" data-visible="${!bloquejarCamps}" data-orderable="false" data-template="#cellValidacionsAccionsTemplate" width="5%">
 								<script id="cellValidacionsAccionsTemplate" type="text/x-jsrender">
 								<div class="dropdown">
 								<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>

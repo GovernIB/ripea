@@ -446,23 +446,7 @@ public class IndexHelper {
 
 		try (Workbook workbook = new XSSFWorkbook()) {			
 			for (CarpetaEntity carpeta : carpetes) {
-				Sheet sheet = workbook.createSheet(validarNombreHoja(carpeta.getNom()));
-	            crearTitol(sheet, carpeta);
-	            crearTaulaDocuments(sheet, carpeta, entitatActual, workbook, false, false, true);
-	            
-	            List<ContingutEntity> fills = contingutRepository.findByPareAndEsborratAndOrdenat(carpeta, 0);
-	            for (ContingutEntity fill: fills) {
-					if (fill instanceof CarpetaEntity) {
-						Sheet sheetFill = workbook.createSheet(validarNombreHoja(fill.getNom()));
-			            crearTitol(sheetFill, fill);
-			            crearTaulaDocuments(sheetFill, fill, entitatActual, workbook, false, false, true);
-			            
-			         // Le da formato a la hoja
-			            formatExcel(workbook, sheetFill, false, false, true);
-					}
-				}
-	         // Le da formato a la hoja
-	            formatExcel(workbook, sheet, false, false, true);
+				generarCarpetaRecursiva(workbook, carpeta, entitatActual);
 			}
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
 	        workbook.write(out);
@@ -473,6 +457,31 @@ public class IndexHelper {
 	    }
 		
 	}
+	
+	private void generarCarpetaRecursiva(
+	        Workbook workbook,
+	        CarpetaEntity carpeta,
+	        EntitatEntity entitatActual) throws Exception {
+
+		Sheet sheet = workbook.createSheet(validarNombreHoja(carpeta.getNom()));
+	    crearTitol(sheet, carpeta);
+	    crearTaulaDocuments(sheet, carpeta, entitatActual, workbook, false, false, true);
+
+	    List<ContingutEntity> fills = contingutRepository.findByPareAndEsborratAndOrdenat(carpeta, 0);
+
+	    for (ContingutEntity fill : fills) {
+	        if (fill instanceof CarpetaEntity) {
+	            generarCarpetaRecursiva(
+	                    workbook,
+	                    (CarpetaEntity) fill,
+	                    entitatActual
+	            );
+	        }
+	    }
+
+	    formatExcel(workbook, sheet, false, false, true);
+	}
+
 
 	//### Genera índex XSL/XLSX ###
 	public byte[] generarIndexXlsxPerExpedient(List<ExpedientEntity> expedients, EntitatEntity entitatActual, boolean exportar) {

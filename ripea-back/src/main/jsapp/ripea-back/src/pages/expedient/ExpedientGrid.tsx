@@ -88,6 +88,37 @@ export const StyledPrioritat = (props: any) => {
 
     return <Typography variant="caption" sx={{...labelStyle, ...style}}>{children}</Typography>
 }
+export const Avisos = (props: any) => {
+    const {entity, hanldeErrorValidacio, handelAlert} = props;
+    const {t} = useTranslation();
+
+    return <>
+        {!entity?.valid &&
+            <Icon color={"warning"}
+                  title={t('page.expedient.alert.validation')}
+                  onClick={(event:any) => {
+                      event.stopPropagation()
+                      hanldeErrorValidacio?.(entity?.id, entity)
+                  }}>warning</Icon>}
+        {entity?.errorLastEnviament &&
+            <Icon color={"error"} title={t('page.expedient.alert.errorEnviament')}>edit</Icon>}
+        {entity?.errorLastNotificacio &&
+            <Icon color={"error"} title={t('page.expedient.alert.errorNotificacio')}>mail</Icon>}
+        {entity?.ambEnviamentsPendents &&
+            <Icon color={"primary"} title={t('page.expedient.alert.ambEnviamentsPendents')}>edit</Icon>}
+        {entity?.ambNotificacionsPendents &&
+            <Icon color={"primary"} title={t('page.expedient.alert.ambNotificacionsPendents')}>mail</Icon>}
+        {entity?.numAlert != 0 &&
+            <Icon color={"error"}
+                  title={t('page.expedient.alert.alert')}
+                  onClick={(event:any) => {
+                      event.stopPropagation()
+                      handelAlert?.(entity?.id, entity)
+                  }}>error</Icon>}
+        {entity?.arxiuUuid == null &&
+            <Icon color={"error"} title={t('page.contingut.alert.guardarPendent')}>warning</Icon>}
+    </>
+}
 
 const beforeAvis = [
     {
@@ -140,8 +171,7 @@ const ExpedientGrid = () => {
     const [load, setLoad] = useState<boolean>(false);
     const apiRef = useMuiDataGridApiRef();
 
-    const {value: user} = useUserSession();
-    const isRolActualAdminLectura = user?.rolActual == 'IPA_ADMIN_LECTURA';
+    const {value: user, rol} = useUserSession();
 
     const refresh = () => {
         apiRef?.current?.refresh?.();
@@ -160,32 +190,7 @@ const ExpedientGrid = () => {
             field: 'avisos',
             sortable: false,
             flex: 0.5,
-            renderCell: (params: any) => (<>
-                {!params.row?.valid &&
-                    <Icon color={"warning"}
-                          title={t('page.expedient.alert.validation')}
-                          onClick={(event:any) => {
-                              event.stopPropagation()
-                              hanldeErrorValidacio(params.row?.id, params.row)
-                          }}>warning</Icon>}
-                {params.row?.errorLastEnviament &&
-                    <Icon color={"error"} title={t('page.expedient.alert.errorEnviament')}>edit</Icon>}
-                {params.row?.errorLastNotificacio &&
-                    <Icon color={"error"} title={t('page.expedient.alert.errorNotificacio')}>mail</Icon>}
-                {params.row?.ambEnviamentsPendents &&
-                    <Icon color={"primary"} title={t('page.expedient.alert.ambEnviamentsPendents')}>edit</Icon>}
-                {params.row?.ambNotificacionsPendents &&
-                    <Icon color={"primary"} title={t('page.expedient.alert.ambNotificacionsPendents')}>mail</Icon>}
-                {params.row?.numAlert != 0 &&
-                    <Icon color={"error"}
-                          title={t('page.expedient.alert.alert')}
-                          onClick={(event:any) => {
-                              event.stopPropagation()
-                              handelAlert(params.row?.id, params.row)
-                          }}>error</Icon>}
-                {params.row?.arxiuUuid == null &&
-                    <Icon color={"error"} title={t('page.contingut.alert.guardarPendent')}>warning</Icon>}
-            </>),
+            renderCell: (params: any) => <Avisos entity={params?.row} hanldeErrorValidacio={hanldeErrorValidacio} handelAlert={handelAlert}/>,
         },
         ...afterAvis,
         {
@@ -274,7 +279,7 @@ const ExpedientGrid = () => {
                 popupEditCreateActive
                 popupEditFormContent={<ExpedientGridForm/>}
                 popupEditFormDialogTitle={t('page.expedient.action.new.title')}
-                readOnly={isRolActualAdminLectura}
+                readOnly={rol?.isAdminLectura}
                 onRowClick={(params: any) => navigate(`/contingut/${params?.id}`)}
                 rowAdditionalActions={actions}
                 toolbarCreateTitle={t('page.expedient.action.new.label')}
@@ -294,10 +299,6 @@ const ExpedientGrid = () => {
                     createSuccess: 'page.expedient.action.new.ok',
                     updateSuccess: 'page.expedient.action.update.ok',
                 }}
-                popupEditFormDialogButtons={[
-                    {icon: 'save', text: t('common.create'), componentProps: { variant: 'contained' }, value: true },
-                    {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false }, 
-                ]}
             />
             </Load>
 

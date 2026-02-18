@@ -11,8 +11,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.persistence.entity.FluxFirmaUsuariEntity;
+import es.caib.ripea.persistence.entity.MetaDocumentEntity;
+import es.caib.ripea.persistence.entity.MetaDocumentFluxPortafibEntity;
 import es.caib.ripea.persistence.entity.UsuariEntity;
 import es.caib.ripea.persistence.repository.FluxFirmaUsuariRepository;
+import es.caib.ripea.persistence.repository.MetaDocumentFluxPortafibRepository;
+import es.caib.ripea.persistence.repository.MetaDocumentRepository;
 import es.caib.ripea.persistence.repository.UsuariRepository;
 import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.intf.dto.PortafirmesCarrecDto;
@@ -29,6 +33,8 @@ public class PortafirmesFluxServiceImpl implements PortafirmesFluxService {
 	@Autowired private PluginHelper pluginHelper;
 	@Autowired private AplicacioService aplicacioService;
 	@Autowired private FluxFirmaUsuariRepository fluxFirmaUsuariRepository;
+	@Autowired private MetaDocumentFluxPortafibRepository metaDocumentFluxPortafibRepository;
+	@Autowired private MetaDocumentRepository metaDocumentRepository;
 	@Autowired private UsuariRepository usuariRepository;
 	
 	@Override
@@ -47,6 +53,29 @@ public class PortafirmesFluxServiceImpl implements PortafirmesFluxService {
 	@Override
 	public PortafirmesFluxRespostaDto recuperarFluxFirma(String idTransaccio) {
 		return pluginHelper.portafirmesRecuperarFluxDeFirma(idTransaccio);
+	}
+	
+	@Override
+	public Long guardarFluxFirmaMetaDocumentRipea(
+			Long metaDocumentId,
+			PortafirmesFluxRespostaDto portafirmesFluxResposta) {
+		
+		MetaDocumentFluxPortafibEntity metaDocumentFluxPortafibEntity = metaDocumentFluxPortafibRepository.findByMetaDocumentIdAndPortafirmesFluxId(
+				metaDocumentId,
+				portafirmesFluxResposta.getFluxId());
+		
+		if (metaDocumentFluxPortafibEntity==null) {
+			metaDocumentFluxPortafibEntity = new MetaDocumentFluxPortafibEntity();
+			metaDocumentFluxPortafibEntity.setPortafirmesFluxId(portafirmesFluxResposta.getFluxId());
+			metaDocumentFluxPortafibEntity.setPortafirmesFluxDesc(portafirmesFluxResposta.getNom());
+			if (metaDocumentId!=null) {
+				MetaDocumentEntity mdE = metaDocumentRepository.findById(metaDocumentId).get();
+				metaDocumentFluxPortafibEntity.setMetaDocument(mdE);
+			}
+			metaDocumentFluxPortafibEntity = metaDocumentFluxPortafibRepository.save(metaDocumentFluxPortafibEntity);
+		}
+		
+		return metaDocumentFluxPortafibEntity.getId();
 	}
 	
 	@Override

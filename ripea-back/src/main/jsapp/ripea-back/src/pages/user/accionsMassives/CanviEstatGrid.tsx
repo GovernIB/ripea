@@ -12,7 +12,6 @@ import {GridSortDirection} from "@mui/x-data-grid-pro";
 import {StyledEstat, StyledPrioritat} from "../../expedient/ExpedientGrid.tsx";
 import {useSession} from "../../../components/SessionStorageContext.tsx";
 import useCambiarEstat, {useCambiarEstatMassive} from "../../expedient/actions/CambiarEstat.tsx";
-import {useGridApiRef as useMuiDatagridApiRef} from "@mui/x-data-grid-pro/hooks/utils/useGridApiRef";
 
 const CanviEstatFilterFrom = (props:any) => {
     const { findExpedientByName = false } = props;
@@ -41,9 +40,9 @@ const springFilterBuilder = (data: any) => {
         builder.eq("id", data?.expedient?.id),
         builder.like("nom", data?.nom),
         builder.betweenDates("createdDate", data?.dataCreacioInici, data?.dataCreacioFi),
-        builder.eq("estat", `'OBERT'`),
+        data.estat && builder.eq("estat", `'OBERT'`),
         data.estat && (data.estat != '0' && data.estat != '-1') && builder.eq("estatAdditional.id", data.estat),
-        builder.eq("prioritat", data?.prioritat),
+        builder.eq("prioritat", `'${data?.prioritat}'`),
     );
 }
 
@@ -110,19 +109,15 @@ export const CanviEstatMuiGrid = (props:any) => {
     />
 }
 
-const perspectives:any = ['ESTAT']
+const perspectives:any = ['ESTAT', 'AUDITORIA']
 const CanviEstatGrid = () => {
     const {t} = useTranslation();
     const apiRef = useMuiDataGridApiRef();
-    const dataApiRef = useMuiDatagridApiRef();
     const [springFilter, setSpringFilter] = useState<string>();
 
     const sessionKey = "MASSIVE_CANVI_ESTAT_FILTER";
     const { value: filterData } = useSession(sessionKey);
-    const haveRequirements = useMemo(() => {
-        dataApiRef?.current?.setRowSelectionModel?.([])
-        return !!filterData?.procediment
-    }, [filterData?.procediment])
+    const haveRequirements = useMemo(() => !!filterData?.procediment, [filterData?.procediment])
 
     const refresh = () => {
         apiRef?.current?.refresh?.();
@@ -144,7 +139,7 @@ const CanviEstatGrid = () => {
             label: t('page.document.action.portafirmes.label'),
             icon: "logout",
             showInMenu: false,
-            onClick: handleCanviEstatMassive,
+            onClick: (ids:any[]) => handleCanviEstatMassive(ids, {metaExpedient: filterData?.procediment}),
         },
     ]
 
@@ -158,7 +153,6 @@ const CanviEstatGrid = () => {
 
             <CanviEstatMuiGrid
                 apiRef={apiRef}
-                datagridApiRef={dataApiRef}
                 filter={springFilter}
                 perspectives={perspectives}
                 namedQueries={namedQueries}

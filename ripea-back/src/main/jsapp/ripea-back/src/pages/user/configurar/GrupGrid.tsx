@@ -3,11 +3,11 @@ import {useState} from "react";
 import {GridPage} from "reactlib";
 import {CardPage} from "../../../components/CardData.tsx";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
-import {Button, Grid, Icon} from "@mui/material";
-import { Link } from "react-router-dom";
+import {Grid, Icon, Badge} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
+import LinkIcon from "../../../components/LinkIcon.tsx";
 
 const GrupFilterForm = () => {
     return <>
@@ -48,8 +48,7 @@ const GrupForm = () => {
     </Grid>
 }
 
-const sortModel: any = [{field: 'codi', sort: 'asc'}]
-const columns = [
+const columns:any[] = [
     {
         field: 'codi',
         flex: 0.5,
@@ -63,15 +62,25 @@ const columns = [
         flex: 1,
     },
     {
-        filed: 'permis',
+        field: 'permis',
         headerName: '',
         sortable: false,
         flex: 0.25,
-        renderCell: (params:any) => <Button component={Link} to={`/grupPermis/${params?.row?.id}/permis`} variant={'contained'}>
-            <Icon>key</Icon>
-        </Button>
+        renderCell: (params:any) => <LinkIcon
+            aria-label="key"
+            color="inherit"
+            title="Permisos"
+            to={`/grupPermis/${params?.row?.id}/permis`}
+        >
+            <Badge badgeContent={params?.row?.numPermisos} color="primary" showZero>
+                <Icon>key</Icon>
+            </Badge>
+        </LinkIcon>
     }
 ]
+
+const sortModel: any = [{field: 'codi', sort: 'asc'}]
+const perspectives = ["COUNT_PERMISOS"];
 
 const GrupGrid = () => {
     const {t} = useTranslation();
@@ -109,14 +118,12 @@ const GrupGrid = () => {
                 popupEditFormDialogResourceTitle={t('page.grup.title')}
                 popupEditFormContent={<GrupForm/>}
                 columns={columns}
-                // TODO: revisar filtre
                 filter={springFilter}
                 sortModel={sortModel}
-
-                // TODO: revisar accions
+                perspectives={perspectives}
                 rowAdditionalActions={actions}
                 toolbarMassiveActions={massiveActions}
-
+                toolbarCreateTitle={t('page.grup.action.new.label')}
                 popupEditFormI18nKeys={{
                     createSuccess: 'page.grup.action.new.ok',
                     updateSuccess: 'page.grup.action.update.ok',

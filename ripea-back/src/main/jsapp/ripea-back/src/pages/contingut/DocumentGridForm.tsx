@@ -7,6 +7,7 @@ import GridFormField, {FileFormField, GridButton} from "../../components/GridFor
 import Iframe from "../../components/Iframe.tsx";
 import * as builder from "../../util/springFilterUtils.ts";
 import TabComponent from "../../components/TabComponent.tsx";
+import {useCallback, useEffect, useMemo} from "react";
 
 const ScanerTabForm = () => {
     const { data, apiRef } = useFormContext();
@@ -31,15 +32,28 @@ const ScanerTabForm = () => {
         </Grid>
         <GridFormField xs={12} name="digitalitzacioPerfil"/>
         <Grid item xs={12}>
-            <Iframe isPDF={false} src={data?.digitalitzacioProcesUrl} />
+            <Iframe src={data?.digitalitzacioProcesUrl} />
         </Grid>
     </Grid>
 }
 const FileTabForm = () => {
-    const { data } = useFormContext();
+    const { data, apiRef } = useFormContext();
+
+    const onChange = useCallback(() => {
+        if (data?.deteccioFirmaAutomaticaActiva) {
+            apiRef?.current?.setFieldValue("disabled", true)
+        }
+    }, [apiRef, data?.deteccioFirmaAutomaticaActiva])
+    const componentProps = useMemo(() => (
+        (data?.disabled) ? {helperText: "Detectant firmes..."} : {}
+    ), [data?.disabled])
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <FileFormField xs={12} name="adjunt" required/>
+        <FileFormField xs={12} name="adjunt"
+                       onChange={onChange}
+                       componentProps={componentProps}
+                       readOnly={data?.disabled}
+                       required/>
         <GridFormField xs={6} name="hasFirma" hidden={!data.adjunt} disabled={data?.deteccioFirmaAutomaticaActiva && data?.documentFirmaTipus == "FIRMA_ADJUNTA"} />
         <GridFormField xs={6} name="documentFirmaTipus" hidden={!data?.adjunt || !data?.hasFirma} disabled={data?.deteccioFirmaAutomaticaActiva} required/>
         <FileFormField xs={12} name="firmaAdjunt" hidden={!data?.hasFirma || data?.documentFirmaTipus != "FIRMA_SEPARADA"} required/>
@@ -47,12 +61,23 @@ const FileTabForm = () => {
     </Grid>
 }
 
-const DocumentsGridForm = () => {
+const DocumentsGridForm = ({ setDisabled }:any) => {
     const { t } = useTranslation();
     const { data, apiRef, id } = useFormContext();
 	const { value: user } = useUserSession();
     const { artifactAction: apiAction } = useResourceApiService('documentResource');
-	
+
+    useEffect(() => {
+        if (data?.deteccioFirmaAutomaticaActiva) {
+            setDisabled?.(data?.disabled);
+        }
+    }, [setDisabled, data?.disabled, data?.deteccioFirmaAutomaticaActiva]);
+    useEffect(() => {
+        if (data?.deteccioFirmaAutomaticaActiva) {
+            apiRef?.current?.setFieldValue("disabled", data?.adjunt && !data?.fitxerNom)
+        }
+    }, [apiRef, data?.adjunt, data?.fitxerNom, data?.deteccioFirmaAutomaticaActiva]);
+
 	const isPermesModificarCustodiatsVar = () => {
 	    return user?.sessionScope?.isPermesModificarCustodiats && isInOptions(data?.estat, 'CUSTODIAT', 'FIRMAT', 'FIRMA_PARCIAL', 'DEFINITIU')
 	}
@@ -87,7 +112,7 @@ const DocumentsGridForm = () => {
         {
             value: "file",
             label: t('page.document.tabs.file'),
-            content: <FileTabForm />,
+            content: <FileTabForm/>,
         },
         {
             value: "scaner",

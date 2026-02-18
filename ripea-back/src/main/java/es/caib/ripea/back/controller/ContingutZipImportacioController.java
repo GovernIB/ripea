@@ -1,6 +1,8 @@
 package es.caib.ripea.back.controller;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -26,7 +28,7 @@ import es.caib.ripea.back.helper.RolHelper;
 import es.caib.ripea.service.intf.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.ProgresProcessamentZipDto;
-import es.caib.ripea.service.intf.exception.ElementNotValidException;
+import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.DocumentService;
 import es.caib.ripea.service.intf.service.MetaDocumentService;
@@ -72,61 +74,49 @@ public class ContingutZipImportacioController extends BaseUserOAdminOOrganContro
 	}
 
 	@RequestMapping(value = "/{pareId}/zip/importacio/processar", method = RequestMethod.POST)
-	public String processarZip(
-			HttpServletRequest request, 
-			@PathVariable Long pareId,
-			@ModelAttribute("command") @Validated({ProcessarZip.class}) ImportacioZipCommand command,
-			BindingResult bindingResult,
-			Model model) throws ClassNotFoundException, IOException {
-		
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		
-		try {
-			if (bindingResult.hasErrors()) {
-				omplirModelFormulari(
-						model, 
-						pareId, 
-						command,
-						entitatActual);
-				return "contingutZipImportacioForm";
-			}
-			int totalDocuments = 0;
-			try {
-				totalDocuments = documentService.extreureDocumentsZip(
-						command.getArxiuZip().getInputStream(), 
-						RolHelper.getRolActual(request),
-						command.getPareId(),
-						command.getTascaId(),
-						entitatActual);
-			} catch (Exception e) {
-				omplirModelFormulari(
-						model, 
-						pareId, 
-						command,
-						entitatActual);
-				
-				if (e instanceof ElementNotValidException) {
-					MissatgesHelper.error(request,  e.getMessage());
-		        	return "contingutZipImportacioForm";
-				}
-				
-				throw e;	
-			}
-			return getModalControllerReturnValueSuccess(
-					request,
-					"redirect:../../contingut/" + pareId,
-					"document.controller.multiple.creat.ok",
-					new Object[] { totalDocuments });
-		} catch (Exception ex) {
-			omplirModelFormulari(
-					model, 
-					pareId, 
-					command,
-					entitatActual);
-			MissatgesHelper.error(request, ex.getMessage(), ex);
-			return "contingutZipImportacioForm";
-		}
-	}	
+	@ResponseBody
+	public ResponseEntity<String> processarZipAsync(
+	        HttpServletRequest request,
+	        @PathVariable Long pareId,
+	        @ModelAttribute("command") @Validated({ProcessarZip.class}) ImportacioZipCommand command,
+	        BindingResult bindingResult) throws IOException {
+
+	    EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+
+	    if (bindingResult.hasErrors()) {
+	        return ResponseEntity.badRequest().body(
+	        		getMessage(
+	        				request,
+	        				"javax.validation.constraints.NotEmpty.message"));
+	    }
+	    
+	    UsuariDto usuariActual = aplicacioService.getUsuariActual();
+	    
+	    documentService.inicialitzarProgresProcessamentZip(pareId);
+	    
+	    Path tempZip = Files.createTempFile("import-", ".zip");
+	    command.getArxiuZip().transferTo(tempZip);
+	    
+	    documentService.processarZipAsync(
+	    		usuariActual,
+	    		tempZip,
+	            RolHelper.getRolActual(request),
+	            command.getPareId(),
+	            command.getTascaId(),
+	            entitatActual);
+
+	    return ResponseEntity.status(HttpStatus.ACCEPTED).body("Processament iniciat");
+	}
+
+	@RequestMapping(value = "/{pareId}/zip/importacio/cancelar", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<String> canceparProcesZip(
+	        HttpServletRequest request,
+	        @PathVariable Long pareId) throws IOException {
+	    documentService.cancelarProcessamentZip(pareId);
+
+	    return ResponseEntity.status(HttpStatus.OK).body("Processament cancelat");
+	}
 
 	@RequestMapping(value = "/{pareId}/zip/importacio/progres", method = RequestMethod.GET)
 	@ResponseBody

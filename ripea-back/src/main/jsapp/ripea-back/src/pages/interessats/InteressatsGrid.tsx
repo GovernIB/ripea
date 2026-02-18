@@ -34,7 +34,7 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
         builder.eq('esRepresentant', false)
     ),[entity])
 	
-    const columns = [
+    const columns = useMemo(() => [
         {
             field: 'tipus',
             flex: 0.5,
@@ -69,7 +69,7 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
             renderCell: (params:any) => params?.row?.grups
                 ?.map?.((g:any) => <Chip label={g?.description} size={"small"}/>),
         },
-    ];
+    ], [t]);
 
     const apiRef = useMuiDataGridApiRef()
 
@@ -83,7 +83,7 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
     const {excelInteressats} = useExpedientActions(refresh);
     const {handleShow: handleImport, content: contentImport} = useImport(entity, refresh);
     const {handleOpen, dialog} = useInteressatDetail();
-    const {handleOpen: handleGrup, dialog: dialogGrup} = useGrupGridDialog(entity);
+    const {handleOpen: handleGrup, dialog: dialogGrup} = useGrupGridDialog(entity, refresh);
 
     return <>
         <StyledMuiGrid
@@ -134,9 +134,10 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
                 },
 				{
 					position: 0,
-				    element: <ToolbarButton onClick={()=>handleGrup()}
+				    element: <ToolbarButton icon={'groups'}
+                                            onClick={()=>handleGrup()}
 				                            hidden={!entity?.potModificar}
-                   ><Icon sx={{ mr: 1 }}>groups</Icon>{t('page.interessat.grup.title')}</ToolbarButton>
+                   >{t('page.interessat.grup.title')}</ToolbarButton>
 				},
                 {
                     position: 0,
@@ -166,7 +167,7 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
             ]}
 
             onRowClick={(params: any) => {
-					handleOpen(params?.row?.id, params?.row);
+                handleOpen(params?.row?.id);
 			}}
             popupEditFormI18nKeys={{
                 createSuccess: 'page.interessat.action.new.ok',

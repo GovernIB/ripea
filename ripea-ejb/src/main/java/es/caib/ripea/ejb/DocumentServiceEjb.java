@@ -1,6 +1,7 @@
 package es.caib.ripea.ejb;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -11,6 +12,8 @@ import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import es.caib.ripea.ejb.base.AbstractServiceEjb;
 import es.caib.ripea.service.intf.dto.ArbreJsonDto;
 import es.caib.ripea.service.intf.dto.ArxiuFirmaDetallDto;
@@ -19,6 +22,7 @@ import es.caib.ripea.service.intf.dto.DocumentDto;
 import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentPortafirmesDto;
 import es.caib.ripea.service.intf.dto.DocumentViaFirmaDto;
+import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.FirmaResultatDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentFirmaFluxTipusEnumDto;
@@ -30,6 +34,7 @@ import es.caib.ripea.service.intf.dto.PinbalConsultaDto;
 import es.caib.ripea.service.intf.dto.PortafirmesBlockDto;
 import es.caib.ripea.service.intf.dto.PortafirmesCallbackEstatEnumDto;
 import es.caib.ripea.service.intf.dto.PortafirmesPrioritatEnumDto;
+import es.caib.ripea.service.intf.dto.ProgresProcessamentZipDto;
 import es.caib.ripea.service.intf.dto.RespostaJustificantEnviamentNotibDto;
 import es.caib.ripea.service.intf.dto.Resum;
 import es.caib.ripea.service.intf.dto.SignatureInfoDto;
@@ -662,4 +667,22 @@ public class DocumentServiceEjb extends AbstractServiceEjb<DocumentService> impl
 		return delegateService.getPlantillaImportacioZip();
 	}
     
+	@Override
+	@RolesAllowed("**")
+	public void processarZipAsync(UsuariDto usuariActual, Path tempZip, String rolActual, Long pareId, Long tascaId, EntitatDto entitatActual) throws IOException {
+        delegateService.processarZipAsync(usuariActual, tempZip, rolActual, pareId, tascaId, entitatActual);
+	}
+
+	@Override
+	@RolesAllowed("**")
+	public ProgresProcessamentZipDto obtenirProgresProcessamentZip(Long pareId) {
+		return delegateService.obtenirProgresProcessamentZip(pareId);
+	}
+    
+	@Override
+	@RolesAllowed("**")
+	public void cancelarProcessamentZip(Long pareId) {
+		delegateService.cancelarProcessamentZip(pareId);
+	}
+	
 }

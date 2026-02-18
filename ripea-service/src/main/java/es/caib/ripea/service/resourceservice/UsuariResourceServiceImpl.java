@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -23,12 +24,14 @@ import com.turkraft.springfilter.parser.Filter;
 
 import es.caib.ripea.persistence.entity.resourceentity.UsuariResourceEntity;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
+import es.caib.ripea.service.helper.MetaExpedientHelper;
 import es.caib.ripea.service.helper.RolHelper;
 import es.caib.ripea.service.intf.base.exception.ResourceNotFoundException;
 import es.caib.ripea.service.intf.base.model.FieldOption;
 import es.caib.ripea.service.intf.base.permission.UserPermissionInfo;
 import es.caib.ripea.service.intf.base.permission.UserPermissionInfo.PermisosEntitat;
 import es.caib.ripea.service.intf.config.BaseConfig;
+import es.caib.ripea.service.intf.dto.PermisDto;
 import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.model.UsuariResource;
 import es.caib.ripea.service.intf.resourceservice.UsuariResourceService;
@@ -50,6 +53,7 @@ public class UsuariResourceServiceImpl extends BaseMutableResourceService<Usuari
 
     private final UsuariResourceHelper usuariResourceHelper;
     private final AplicacioService aplicacioService;
+    private final MetaExpedientHelper metaExpedientHelper;
     
     @PostConstruct
     public void init() {
@@ -62,7 +66,35 @@ public class UsuariResourceServiceImpl extends BaseMutableResourceService<Usuari
 //    	Filter filtreNif = FilterBuilder.isNotNull(UsuariResource.Fields.nif);
     	Filter filtreNom1 = FilterBuilder.not(FilterBuilder.like(UsuariResource.Fields.codi, "%SYSTEM%"));
     	Filter filtreNom2 = FilterBuilder.not(FilterBuilder.like(UsuariResource.Fields.codi, "$%"));
-    	Filter filtreResultat = FilterBuilder.and(filtreBase, filtreNom1, filtreNom2);
+    	Filter filtreCodis = null;
+    	
+    	Map<String, String> mapaNamedQueries =  Utils.namedQueriesToMap(namedQueries);
+    	if (mapaNamedQueries.size()>0) {
+    		String procedimentPermisQueryKey = "AMB_PERMIS_SOBRE_PROCEDIMENT";
+    		
+	    	if (mapaNamedQueries.containsKey(procedimentPermisQueryKey)) {
+	    		String procedimentId = mapaNamedQueries.get(procedimentPermisQueryKey);
+	    		
+	    		List<String> codisPermisos = metaExpedientHelper.permisFind(Long.valueOf(procedimentId)).stream()
+	    		        .map(PermisDto::getPrincipalNom)
+	    		        .collect(Collectors.toList());
+
+	    		for (String codi : codisPermisos) {
+	    		    filtreCodis = FilterBuilder.or(
+	    		            filtreCodis,
+	    		            FilterBuilder.equal(UsuariResource.Fields.codi, codi)
+	    		    );
+	    		}
+	    	}
+    	
+    	}
+    	
+    	Filter filtreResultat = FilterBuilder.and(
+    			filtreBase, 
+    			filtreNom1, 
+    			filtreNom2,
+    			filtreCodis);
+    	
     	return filtreResultat.generate();
     }
     
@@ -85,7 +117,7 @@ public class UsuariResourceServiceImpl extends BaseMutableResourceService<Usuari
     				for (UsuariDto userExt: usuarisAddicionals) {
     					UsuariResource ur = new UsuariResource();
     					ur.setNif(userExt.getNif());
-    					ur.setNom(userExt.getNom());
+    					ur.setNom(userExt.getNom() + "("+userExt.getCodi()+")");
     					ur.setCodi(userExt.getCodi());
     					usuarisResources.add(ur);
     				}

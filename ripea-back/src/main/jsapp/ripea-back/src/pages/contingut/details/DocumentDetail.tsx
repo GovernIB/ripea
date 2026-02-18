@@ -1,9 +1,9 @@
 import {useState} from "react";
-import {Alert, Box, Button, Grid, Icon, Typography} from "@mui/material";
+import {Alert, Box, Button, Grid, Icon, Typography, Link, Grid2} from "@mui/material";
 import {BasePage, GridPage, useResourceApiService, MuiDialog, useBaseAppContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import TabComponent from "../../../components/TabComponent.tsx";
-import {CardData, ContenidoData} from "../../../components/CardData.tsx";
+import {CardButton, ContenidoData, DetailCard, DetailCardContent} from "../../../components/CardData.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import MetaDadaGrid from "../../dada/MetaDadaGrid.tsx";
 import Load from "../../../components/Load.tsx";
@@ -27,8 +27,11 @@ const Contenido = (props:any) => {
                 <ContenidoData title={t('page.document.detall.origen')}>{t(`enum.origen.${entity?.ntiOrigen}`)}</ContenidoData>
                 <ContenidoData title={t('page.document.detall.tipoDocumental')}>{entity?.ntiTipoDocumental}</ContenidoData>
                 <ContenidoData title={t('page.document.detall.estadoElaboracion')}>{t(`enum.estatElaboracio.${entity?.ntiEstadoElaboracion}`)}</ContenidoData>
-                <ContenidoData title={t('page.document.detall.csv')}>{entity?.ntiCsv}</ContenidoData>
-                <ContenidoData title={t('page.document.detall.csvRegulacion')}>{entity?.ntiCsvRegulacion}</ContenidoData>
+                <ContenidoData title={t('page.document.detall.csv')} hidden={!entity?.ntiCsv}>
+                    {entity?.ntiCsv} {entity?.csvLinkUrl &&
+                    <Link href={entity?.csvLinkUrl+entity?.ntiCsv} target={"_blank"} rel="noopener noreferrer"><Icon>launch</Icon></Link>}                    
+                </ContenidoData>
+                <ContenidoData title={t('page.document.detall.csvRegulacion')} hidden={!entity?.ntiCsvRegulacion}>{entity?.ntiCsvRegulacion}</ContenidoData>
                 <ContenidoData title={t('page.document.detall.tipoFirma')}>{entity?.ntiTipoFirma && t(`enum.tipoFirma.${entity?.ntiTipoFirma}`)}</ContenidoData>
             </Grid>
         </Load>
@@ -53,25 +56,20 @@ const Versiones = (props:any) => {
     const { t } = useTranslation();
     const {descarregarVersio} = useActions()
 
-    return <Grid container flexDirection={"column"} columnSpacing={1} rowSpacing={1}>
-        {
-            entity?.versions?.map((version:any) =>
-                <CardData key={version?.id} title={t('page.document.versio.title') + ' ' + version?.id}
-                    buttons={[
-                        {
-                            text: t('common.download'),
-                            icon: 'download',
-                            onClick: ()=>{descarregarVersio(entity?.id, version?.id)},
-                            hidden: entity?.documentTipus == 'FISIC',
-                        }
-                    ]}
-                >
-                    <ContenidoData title={t('page.document.versio.data')}>{!version?.data && formatDate(version?.data)}</ContenidoData>
-                    <ContenidoData title={t('page.document.versio.arxiuUuid')}>{version?.arxiuUuid}</ContenidoData>
-                </CardData>
-            )
-        }
-    </Grid>;
+    return <Grid2 container flexDirection={"column"} columnSpacing={1} rowSpacing={1}>
+        {entity?.versions?.map((version:any) =>
+            <DetailCard key={version?.id} title={t('page.document.versio.title') + ' ' + version?.id}
+                        header={entity?.documentTipus != 'FISIC' && <Box ml="auto">
+                            <CardButton icon={'download'}
+                                        text={t('common.download')}
+                                        onClick={()=>descarregarVersio(entity?.id, version?.id)}/>
+                        </Box>}
+            >
+                <DetailCardContent title={t('page.document.versio.data')}>{!version?.data && formatDate(version?.data)}</DetailCardContent>
+                <DetailCardContent title={t('page.document.versio.arxiuUuid')}>{version?.arxiuUuid}</DetailCardContent>
+            </DetailCard>
+        )}
+    </Grid2>;
 }
 
 export const Firmes = (props:any) => {
@@ -159,7 +157,7 @@ const useDocumentDetail = (expedient:any, refresh?: () => void) => {
         },
     ]
 
-    let buttons :any[] = [
+    const buttons :any[] = [
         {
             value: 'download',
             text: t('page.document.action.descarregarOriginal.label'),
@@ -194,6 +192,7 @@ const useDocumentDetail = (expedient:any, refresh?: () => void) => {
                 handleClose();
             }}
         >
+            <Load value={entity}>
             {!entity?.valid &&
                 <Alert severity="warning"
                        action={
@@ -212,9 +211,11 @@ const useDocumentDetail = (expedient:any, refresh?: () => void) => {
                 tabs={tabs}
                 variant="scrollable"
             />
+            </Load>
         </MuiDialog>
 
     return {
+        apiIsReady,
         handleOpen,
         handleClose,
         dialog

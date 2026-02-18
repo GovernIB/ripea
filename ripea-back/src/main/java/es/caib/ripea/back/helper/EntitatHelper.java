@@ -132,14 +132,25 @@ public class EntitatHelper {
 	public static void findOrganismesEntitatAmbPermisCache(HttpServletRequest request, OrganGestorService organGestorService) {
 		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
 		if (organGestorService != null && entitatActual != null) {
-			List<OrganGestorDto> organs = new ArrayList<OrganGestorDto>();
-			if (RolHelper.isRolActualDissenyadorOrgan(request)) {
-				organs = organGestorService.findOrganismesEntitatAmbPermisDissenyCache(entitatActual.getId());
-			} else {
-				organs = organGestorService.findOrganismesEntitatAmbPermisCache(entitatActual.getId());
-			}
+			List<OrganGestorDto> organs = findOrganismesEntitatAmbPermisCacheByRol(
+					request,
+					organGestorService,
+					entitatActual);
 			request.getSession().setAttribute(ORGANS_ACCESSIBLES, organs);
 		}
+	}
+	
+	public static List<OrganGestorDto> findOrganismesEntitatAmbPermisCacheByRol(
+			HttpServletRequest request,
+			OrganGestorService organGestorService,
+			EntitatDto entitatActual) {
+		List<OrganGestorDto> organs = new ArrayList<OrganGestorDto>();
+		if (RolHelper.isRolActualDissenyadorOrgan(request)) {
+			organs = organGestorService.findOrganismesEntitatAmbPermisDissenyCache(entitatActual.getId());
+		} else {
+			organs = organGestorService.findOrganismesEntitatAmbPermisCache(entitatActual.getId());
+		}
+		return organs;
 	}
 	
 	public static OrganGestorDto getOrganGestorActual(HttpServletRequest request) {

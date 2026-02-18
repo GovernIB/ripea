@@ -44,24 +44,50 @@ public class AjaxUserController extends BaseUserController {
 	@Autowired private SegonPlaService segonPlaService;
 	@Autowired private EntitatService entitatService;
 
-	@RequestMapping(value = "/initTasquesComanda", method = RequestMethod.GET)
-	public String initTasquesComanda(
+	/**
+	 * Cancelar enviament a PF de documents eliminats
+	 */
+	@RequestMapping(value = "/cancelaPortafirmesEliminats", method = RequestMethod.GET)
+	public String cancelaPortafirmesEliminats(HttpServletRequest request, Model model) {
+		model.addAttribute("titolProces", "Cancelar enviament a PF de documents eliminats");
+		model.addAttribute("urlTotalIteracions", "getPortafirmesEliminats");
+		model.addAttribute("urlInteracioIndividual", "executePortafirmesEliminat");
+		return "util/processAjax";
+	}
+	@RequestMapping(value = "/getPortafirmesEliminats", method = RequestMethod.GET)
+	@ResponseBody
+	public List<Long> getPortafirmesEliminats(HttpServletRequest request, Model model) {
+		return aplicacioService.getPortafirmesEliminats();
+	}
+	@RequestMapping(value = "/executePortafirmesEliminat/{documentPortafirmesId}", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<String> executePortafirmesEliminats(
 			HttpServletRequest request,
+			@PathVariable Long documentPortafirmesId,
 			Model model) {
+		try {
+			String resultat = aplicacioService.executePortafirmesEliminat(documentPortafirmesId);
+			return ResponseEntity.ok(resultat); // HTTP 200
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage()); // HTTP 500
+		}
+	}
+	
+	/**
+	 * Inicialitzar tasques Comanda
+	 */
+	@RequestMapping(value = "/initTasquesComanda", method = RequestMethod.GET)
+	public String initTasquesComanda(HttpServletRequest request, Model model) {
 		model.addAttribute("titolProces", "Inicialitzar tasques Comanda");
 		model.addAttribute("urlTotalIteracions", "getTasquesComanda");
 		model.addAttribute("urlInteracioIndividual", "executeTascaComanda");
 		return "util/processAjax";
 	}
-
 	@RequestMapping(value = "/getTasquesComanda", method = RequestMethod.GET)
 	@ResponseBody
-	public List<Long> getTasquesComanda(
-			HttpServletRequest request,
-			Model model) {
+	public List<Long> getTasquesComanda(HttpServletRequest request, Model model) {
 		return aplicacioService.getTasquesComanda();
 	}
-	
 	@RequestMapping(value = "/executeTascaComanda/{tascaId}", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<String> executeTascaComanda(
@@ -76,24 +102,21 @@ public class AjaxUserController extends BaseUserController {
 		}
 	}
 	
+	/**
+	 * Inicialitzar tasques Comanda
+	 */
 	@RequestMapping(value = "/initAvisosComanda", method = RequestMethod.GET)
-	public String initAvisosComanda(
-			HttpServletRequest request,
-			Model model) {
+	public String initAvisosComanda(HttpServletRequest request, Model model) {
 		model.addAttribute("titolProces", "Inicialitzar avisos Comanda");
 		model.addAttribute("urlTotalIteracions", "getAvisosComanda");
 		model.addAttribute("urlInteracioIndividual", "executeAvisComanda");
 		return "util/processAjax";
 	}
-	
 	@RequestMapping(value = "/getAvisosComanda", method = RequestMethod.GET)
 	@ResponseBody
-	public List<Long> getAvisosComanda(
-			HttpServletRequest request,
-			Model model) {
+	public List<Long> getAvisosComanda(HttpServletRequest request, Model model) {
 		return aplicacioService.getAvisosComanda();
 	}
-	
 	@RequestMapping(value = "/executeAvisComanda/{expedientId}", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<String> executeAvisComanda(
@@ -107,6 +130,8 @@ public class AjaxUserController extends BaseUserController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage()); // HTTP 500
 		}
 	}
+	
+	
 	
 	@RequestMapping(value = "/usuari/{codi}", method = RequestMethod.GET)
 	@ResponseBody

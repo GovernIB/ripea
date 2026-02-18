@@ -94,6 +94,11 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 			String transaccioId,
 			boolean avisFirmaParcial,
 			boolean firmaParcial) {
+		
+		if (!Utils.hasValue(portafirmesFluxId)) {
+			portafirmesFluxId = transaccioId;
+		}
+		
 		logger.debug("Enviant document a portafirmes (" +
 				"entitatId=" + entitatId + ", " +
 				"id=" + document.getId() + ", " +
@@ -107,7 +112,7 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 					DocumentEntity.class,
 					"El document a enviar al portafirmes no és del tipus " + DocumentTipusEnumDto.DIGITAL);
 		}
-		if (!cacheHelper.findErrorsValidacioPerNode(document.getId(), true).isEmpty()) {
+		if (!cacheHelper.findErrorsValidacioPerNode(document.getId()).isEmpty()) {
 			throw new ValidationException(
 					document.getId(),
 					DocumentEntity.class,

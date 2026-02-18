@@ -605,70 +605,6 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			ContingutEntity pare,
 			int esborrat);
 
-	
-
-	
-	
-	
-	
-	@Query(	"select " +
-			"    d1 " +
-			"from " +
-			"    DocumentEntity d1 inner join d1.contingut c1 " +
-			"where d1.id in " +
-			"(select " +
-			"    distinct d.id " +
-			"from " +
-			"    DocumentEntity d " +
-			"	 inner join d.contingut c inner join c.expedient e left join e.metaexpedientOrganGestorPares meogp " + // d.contingut c is used in ordenacioMap
-			"	 left join d.annexos a " + 
-			"where " +
-			"	 c.esborrat = 0 " +
-			"and (c.arxiuUuid = null " + //documents uploaded manually in ripea not saved in arxiu
-			"	  or a.error is not null " + //documents from distribucio not moved in arxiu to ripea expedient
-			"	  or (d.id in " + // documents signed in portafirmes that arrived in callback not saved in arxiu 
-			"			(select docPortafirmes.document.id from DocumentPortafirmesEntity docPortafirmes " +
-			"				where (docPortafirmes.id, docPortafirmes.createdDate) in (select docPortaf.id, max(docPortaf.createdDate) from DocumentPortafirmesEntity docPortaf group by docPortaf.id) " +
-			"				and docPortafirmes.estat = 'ENVIAT' " +
-			"				and docPortafirmes.error = true)))" +			
-			"and (" +
-			"     (:esNullIdsMetaExpedientsPermesos = false and e.metaExpedient.id in (:idsMetaExpedientsPermesos)) " +
-			"     or (:esNullIdsOrgansPermesos = false and meogp.organGestor.id in (:idsOrgansPermesos)) " +
-			"     or (:esNullIdsMetaExpedientOrganPairsPermesos = false and meogp.id in (:idsMetaExpedientOrganPairsPermesos)) " +
-			"     or (:esNullIdsOrgansAmbProcedimentsComunsPermesos = false and meogp.organGestor.id in (:idsOrgansAmbProcedimentsComunsPermesos) and e.metaExpedient.id in (:idsProcedimentsComuns))) " +
-			//TODO if organ is in :idsOrgansAmbProcedimentsComunsPermesos it is also already in :idsOrgansPermesos as well so check :idsOrgansAmbProcedimentsComunsPermesos doesn't do anything, probably :idsOrgansPermesos check should be only allowed for procediments no comuns			
-			"and c.entitat = :entitat " +
-			"and (:nomesAgafats = false or e.agafatPer.codi = :usuariActual) " +
-			"and (:esNullNom = true or lower(c.nom) like lower('%'||:nom||'%')) " +
-			"and (:esNullExpedient = true or e = :expedient) " +
-			"and (:esNullMetaExpedient = true or e.metaExpedient = :metaExpedient)) ")
-	public Page<DocumentEntity> findArxiuPendents(
-			@Param("entitat") EntitatEntity entitat,
-			@Param("esNullIdsMetaExpedientsPermesos") boolean esNullIdsMetaExpedientsPermesos, 
-			@Param("idsMetaExpedientsPermesos") List<Long> idsMetaExpedientsPermesos,
-			@Param("esNullIdsOrgansPermesos") boolean esNullIdsOrgansPermesos, 
-			@Param("idsOrgansPermesos") List<Long> idsOrgansPermesos,
-			@Param("esNullIdsMetaExpedientOrganPairsPermesos") boolean esNullIdsMetaExpedientOrganPairsPermesos, 
-			@Param("idsMetaExpedientOrganPairsPermesos") List<Long> idsMetaExpedientOrganPairsPermesos,
-			@Param("esNullIdsOrgansAmbProcedimentsComunsPermesos") boolean esNullIdsOrgansAmbProcedimentsComunsPermesos, 
-			@Param("idsOrgansAmbProcedimentsComunsPermesos") List<Long> idsOrgansAmbProcedimentsComunsPermesos,
-			@Param("idsProcedimentsComuns") List<Long> idsProcedimentsComuns,
-			@Param("nomesAgafats") boolean nomesAgafats,
-			@Param("usuariActual") String usuariActual,
-			@Param("esNullNom") boolean esNullNom,
-			@Param("nom") String nom,
-			@Param("esNullExpedient") boolean esNullExpedient,
-			@Param("expedient") ExpedientEntity expedient,			
-			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
-			@Param("metaExpedient") MetaExpedientEntity metaExpedient,
-			Pageable pageable);
-	
-	
-	
-	
-	
-	
-
 	@Query(	"select " +
 			"    d " +
 			"from " +
@@ -706,7 +642,6 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			@Param("esNullCreacioFi") boolean esNullCreacioFi,
 			@Param("creacioFi") LocalDateTime creacioFi,
 			Pageable pageable);
-	
 	
 	@Query(	"select " +
 			"    d.id " +

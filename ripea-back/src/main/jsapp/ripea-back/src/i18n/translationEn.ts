@@ -32,6 +32,11 @@ const translationEn = {
         downloadSelected: "Download selected content",
         relateSelected: "Relate selected content",
 		processing: "Processing...",
+        auditoria: {
+            create: "Created on {{createdDate}} by '{{createdBy}}'.",
+            update: "Modified on {{lastModifiedDate}} by '{{lastModifiedBy}}'.",
+        },
+        nouPermis: "New permission",
     },
     enum: {
         rol: {
@@ -167,6 +172,7 @@ const translationEn = {
         contingut: {
             grid: {
                 nom: "Name",
+                path: "Content path",
             },
             detalle: {
                 title: "Detalles del contenido",
@@ -259,7 +265,13 @@ const translationEn = {
                     label: "Archive",
                 },
                 replay: {
-                    label: "Recuperar",
+                    label: "Recover",
+                    ok: "The content has been recovered successfully",
+                    massiveOk: "The contents have been recovered successfully",
+                },
+                delete: {
+                    ok: "The content has been deleted successfully",
+                    massiveOk: "The contents have been deleted successfully",
                 },
             },
             history: {
@@ -319,6 +331,7 @@ const translationEn = {
                 canviEstatDistribucio: {
                     label: "Change state to distribution",
                     ok: "Status has been successfully changed",
+                    massiveOk: "The status of '{{data.num}}' records has been updated",
                 },
                 descargarAnnex: {
                     label: "Download annex",
@@ -327,12 +340,18 @@ const translationEn = {
                 procesarAnnexosPendents: {
                     label: "Attach",
                     ok: "The annex has been processed successfully",
+                    massiveOk: " '{{data.num}}' attachments have been processed",
                     info: "If an error occurred when accepting a record from the Records screen, causing some of the record’s documents not to be attached to the case file, from this list you can try attaching the document to the case file again.",
                 },
                 firma: {
                     label: "Signatures",
                     title: "Signatures",
-                }
+                },
+                consultar: {
+                    label: "Consult",
+                    ok: "The entry has been consulted and saved successfully",
+                    massiveOk: "{{data.num}} entries have been consulted and saved successfully",
+                },
             }
         },
         tasca: {
@@ -417,6 +436,7 @@ const translationEn = {
             title: "Interested Party",
             rep: "Representative",
             detall: {
+				tipus: "Type",
                 nif: "NIF/CIF/NIE",
                 nom: "Name",
                 raoSocial: "Company name",
@@ -497,7 +517,6 @@ const translationEn = {
 				title: "Groups of interested parties",
 				action: {
 					new: {
-						label: "New Group",
 						ok: "Group created successfully",
 					},
 					update: {
@@ -629,11 +648,13 @@ const translationEn = {
                     label: "Change priority...",
                     title: "Edit case file priority",
                     ok: "Priority of case file '{{expedient}}' was updated successfully.",
+                    massiveOk: "The priority of '{{data.num}}' cases has been changed",
                 },
                 changeEstat: {
                     label: "Change status...",
                     title: "Edit case file status",
                     ok: "Status of case file '{{expedient}}' was updated successfully.",
+                    massiveOk: "The status of '{{data.num}}' cases has been changed",
                 },
                 assignar: {
                     label: "Assign",
@@ -657,11 +678,16 @@ const translationEn = {
                 impDocMass: {
                     label: "Import documents into the selected cases",
                     title: "Import documents into cases",
-                    warning: "The cases must belong to the same procedure",
+                    warning: "The cases must belong to the same procedure.",
                 },
                 comment: {
                     ok: "Comment added to the case '{{data.expedient.description}}'",
                 },
+				moureTot: {
+				    label: "Move all...",
+				    title: "Move everything to the destination file",
+				    ok: "The bulk action to move the file '{{expedient}}' has been created successfully.",
+				},
             },
             alert: {
                 owner: "You must reserve the case file in order to edit it",
@@ -669,20 +695,32 @@ const translationEn = {
                 validation: "This case file has validation errors",
                 esborranys: "There are draft documents (B) that must be finalized or removed in order to close the case file.\nThis action will finalize the documents and they can no longer be deleted.",
                 borradors: "This case file contains drafts that will be deleted when closed. You can mark them to be signed with server signature before closing to avoid deletion. Invalid signatures will be removed and re-signed.",
-                notificacio: "This case file contains expired, uncompleted notifications. An attempt will be made to update their status. Any new information will be saved in Helium, not in the Digital Archive.",
+                notificacio: "This case file contains expired, uncompleted notifications. An attempt will be made to update their status. Any new information will be saved in RIPEA, not in the Digital Archive.",
                 documents: "This case file contains annex documents with errors. They will be reprocessed if possible. Otherwise, a copy will be saved in the Digital Archive without original signatures (both original and copy will remain accessible).",
                 errorEnviament: "This case file has send errors",
                 errorNotificacio: "This case file has notification errors",
                 ambEnviamentsPendents: "This case file has pending sends to signature portal",
                 ambNotificacionsPendents: "This case file has pending notifications",
                 canviEstat: "It is necessary to select a procedure in order to perform the mass action",
+				moureTot: {
+					info: "The file is currently locked due to an ongoing background execution.\nUntil it completes, modifications will not be possible. Check pending massive actions to know their status.",
+				  	title: "You are about to start a mass action that will move the following information to the destination file:",
+				  	items: [
+					    "Documents and folders",
+					    "Interested parties",
+					    "Followers",
+					    "Related cases",
+					    "Registry entries",
+					    "Comments"
+				  ],
+				},
             },
             modal: {
                 seguidors: "Case file followers",
             },
             results: {
-                checkDelete: "Are you sure you want to delete this item?",
-                checkRelacio: "Are you sure you want to delete this relation?",
+                checkDelete: "Are you sure you want to delete this content? If it contained ongoing signatures, they will be canceled.",
+				checkRelacio: "Are you sure you want to delete this relation?",
                 actionOk: "Action executed successfully.",
                 actionBackgroundOk: "Action has been scheduled for background execution. You can track it in the mass actions list.",
             }
@@ -701,6 +739,7 @@ const translationEn = {
                 organ: "Authority",
                 dataCaptura: "Capture date",
                 dataApertura: "Opening date",
+                dataTancament: "Closing date",
                 origen: "Origin",
                 estadoElaboracion: "Drafting status",
                 tipoDocumental: "NTI documentary type",
@@ -770,6 +809,10 @@ const translationEn = {
                 naixement: "Birth",
                 dadesAdicionals: "Additional data",
                 dataOther: "Other data",
+                senseTipus: "No type assigned",
+                extensio: "Extension",
+                ruta: "Path",
+                mida: "Size",
             },
             action: {
                 new: {
@@ -780,7 +823,7 @@ const translationEn = {
                 },
                 delete: {
                     label: "Delete",
-                    check: "Are you sure you want to continue with this action?",
+                    check: "Are you sure you want to delete this content? If it contained ongoing signatures, they will be canceled.",
                     description: "Once deleted it cannot be recovered",
                     ok: "The document {{data.nom}} has been deleted successfully"
                 },
@@ -789,15 +832,55 @@ const translationEn = {
                     title: "New PINBAL query",
                     ok: "Document created from PINBAL query '{{codiServeiPinbal}}'",
                 },
-                import: {
-                    label: "Import documents from SGD...",
-                    title: "Import documents from SGD",
-                    ok: "Documents imported successfully",
-                },
+				import: {
+					close: {
+					    check: "Are you sure you want to close this window?",
+					    description: "The import will continue in the background and you can check the result in the file later.",
+					},
+					cancel: {
+					    check: "Are you sure you want to cancel the import?",
+					    description: "The documents imported up to this point will be kept in the file.",
+					},
+				},
+				importSgd: {
+				    label: "Import documents from SGD...",
+				    title: "Import documents from SGD",
+				    ok: "Documents and Interested imported successfully",
+					interessats: "Select the interested parties you wish to associate with the file",
+					interessat: {
+					    tipus: {
+					        1: "Administration",
+					        2: "Natural person",
+					        3: "Legal entity",
+					    },
+					},
+					resultat: {
+						title: "Result:",
+						ok: "Import process completed",
+						documents: "Documents processed correctly: ",
+						interessats: "Interested processed correctly: ",
+						carpetes: "Folders created successfully: ",
+						errors: "Detailed errors: ",
+					}
+				},
                 importZip: {
                     label: "Import documents from ZIP...",
                     title: "Import documentos from ZIP",
                     ok: "Documents imported successfully",
+					resultat: {
+						title: "Result:",
+						ok: "Import process completed",
+						documents: {
+							ok: "Documents processed correctly: ",
+							ko: "Documents with errors: ",
+							firma: "Documents with signature errors: ",
+						},
+						carpetes: {
+							ok: "Folders created successfully: ",
+						},
+						tamany: "Total size processed: ",
+						errors: "Detailed errors: ",
+					},
                 },
                 detall: {
                     label: "Details",
@@ -918,6 +1001,7 @@ const translationEn = {
                     label: "Convert to definitive",
                     description: "This action will make the documents part of the file definitively and they cannot be deleted.",
                     ok: "Document '{{document}}' changed to definitive",
+                    massiveOk: " '{{data.num}}' documents have been marked as final",
                 },
             },
             alert: {
@@ -936,6 +1020,7 @@ const translationEn = {
                 scaned: "The scanning process was successful.",
                 view: "Only for PDF, ODT and DOCX",
                 portafirmes: "Es necesario seleccionar un procedimiento y un tipo de documento para poder realizar la acción masiva",
+                documentsZip: "At least one document must be selected to perform the import",
             },
             versio: {
                 title: "Version",
@@ -945,6 +1030,9 @@ const translationEn = {
         },
         carpeta: {
             title: "Folder",
+            detail: {
+                tite: "Folder details",
+            },
             action: {
                 new: {
                     label: "Folder...",
@@ -961,7 +1049,13 @@ const translationEn = {
                     description: "Once deleted, it cannot be recovered",
                     ok: "Folder '{{data.nom}}' deleted successfully",
                 }
-            }
+			},
+			restriccions: {
+				 title: "Select the users who will have access to the folder (from those who already have access to the procedure)",
+			     notEmpty: {
+				 		message: "At least one user must be selected to create the restriction"	
+				 }
+			}
         },
         dada: {
             title: "value for data '{{metaDada}}'",
@@ -987,8 +1081,32 @@ const translationEn = {
             },
         },
         metaDada: {
-            title: "Data type",
-            detail: "Values of the data '{{metaDada}}'",
+            title: "Meta-data",
+            plural: "Meta-datas",
+            detail: {
+                title: "Metadata details",
+                value: "Values of the metadata '{{metaDada}}'",
+            },
+            action: {
+                activar: {
+                    label: "Activate",
+                    ok: "Meta-data activated",
+                },
+                desactivar: {
+                    label: "Deactivate",
+                    ok: "Meta-data deactivated",
+                },
+                new: {
+                    label: "New Meta-data",
+                    ok: "Meta-data created successfully",
+                },
+                update: {
+                    ok: "Meta-data updated successfully",
+                },
+                delete: {
+                    ok: "Meta-data deleted successfully",
+                },
+            },
         },
         registre: {
             grid: {
@@ -1181,8 +1299,15 @@ const translationEn = {
         },
         grup: {
             title: "Group",
+            detail: {
+                title: "Group details",
+            },
+            grid: {
+                default: "Default",
+            },
             action: {
                 new: {
+                    label: "New Group",
                     ok: "Group '{{data.codi}}' created successfully",
                 },
                 update: {
@@ -1190,6 +1315,23 @@ const translationEn = {
                 },
                 delete: {
                     ok: "Group '{{data.codi}}' deleted successfully",
+                },
+                link: {
+                    label: "Link group",
+                    title: "Link group",
+                    ok: "Group linked",
+                },
+                unlink: {
+                    label: "Unlink",
+                    ok: "Group unlinked",
+                },
+                default: {
+                    label: "Set as default",
+                    ok: "Group set as default",
+                },
+                undefault: {
+                    label: "Remove default",
+                    ok: "Group unmarked as default",
                 },
             },
         },
@@ -1199,12 +1341,31 @@ const translationEn = {
                 update: {
                     ok: "Managing Body '{{data.codi}}' deleted successfully",
                 },
+                actualitzar: {
+                    title: "Synchronization forecast",
+                    label: "Update managing bodies from DIR3",
+                    ok: "The bodies are up to date",
+                    button: "Synchronize",
+                    tabs: {
+                        empty: "The bodies are up to date",
+                        firstSync: "First synchronization",
+                        split: "Splits",
+                        merge: "Mergers",
+                        subst: "Substitutions",
+                        change: "Attribute changes",
+                        new: "New",
+                        del: "Decommissioned",
+                    },
+                },
+                vista: "Change view",
+                pdf: "Download PDF",
             },
         },
         tipusDocumental: {
             title: "Document type",
             action: {
                 new: {
+                    label: "New document type",
                     ok: "Document type '{{data.codi}}' created successfully",
                 },
                 update: {
@@ -1212,6 +1373,272 @@ const translationEn = {
                 },
                 delete: {
                     ok: "Document type '{{data.codi}}' deleted successfully",
+                },
+            },
+        },
+        metaExpedient: {
+            title: "Procedure",
+            detall: {
+                elementsProc: "Procedure management: {{nom}}",
+                elementsServ: "Service management: {{nom}}",
+                expressioNumero: "If no expression is specified, the following default will be used: {{codi}}/{{seq}}/{{any}}",
+                permisDirecte: "An entity administrator user can modify this value.",
+                responsable: "You can change the signature responsible",
+                portafirmesResponsables: "You can change the signature responsibles",
+                regla: {
+                    create: "Created",
+                    data: "Creation date",
+                    activa: "Active",
+                    nom: "Name",
+                },
+            },
+            tabs: {
+                dades: "Data",
+                estat: "Review status",
+
+                metaDocument: "Document types",
+                metaDada: "Metadata",
+                expedientEstat: "Statuses",
+                tasca: "Tasks",
+                grup: "Groups",
+                carpeta: "Folders",
+            },
+            action: {
+                new: {
+                    label: "New procedure",
+                    ok: "Procedure created successfully",
+                },
+                update: {
+                    ok: "Procedure updated successfully",
+                },
+                delete: {
+                    ok: "Procedure deleted successfully",
+                },
+                consultar: {
+                    title: "Procedure details",
+                    label: "View",
+                    revisat: "This procedure cannot be modified because it is in a reviewed state",
+                },
+                canviEstat: {
+                    title: "Change review status",
+                    label: "Change review status",
+                    ok: "",
+                },
+                expedient: {
+                    title: "Procedure records: {{nom}}",
+                    label: "Records",
+                },
+                regla: {
+                    title: "Distribution rule status",
+                    label: "Distribution rule",
+                    create: {
+                        label: "Create distribution rule",
+                        ok: "The rule with code '{{nom}}' has been created successfully.",
+                    },
+                    active: {
+                        label: "Activate distribution rule",
+                        ok: "The rule with code '{{nom}}' has been activated successfully.",
+                    },
+                    desactive: {
+                        label: "Deactivate distribution rule",
+                        ok: "The rule with code '{{nom}}' has been deactivated successfully",
+                    },
+                },
+                activar: {
+                    label: "Activate",
+                    ok: "Procedure activated successfully",
+                },
+                desactivar: {
+                    label: "Deactivate",
+                    ok: "Procedure deactivated successfully",
+                },
+                comment: {
+                    ok: "Comment added to procedure '{{data.metaExpedient.description}}'",
+                },
+                importRolsac: {
+                    title: "Import procedure from ROLSAC",
+                    label: "Import from ROLSAC",
+                },
+                importFitxer: {
+                    title: "Import procedure",
+                    label: "Import from file",
+                    ok: "Procedure imported successfully",
+                },
+                export: {
+                    ok: "Procedure exported successfully",
+                },
+                canviPendent: {
+                    label: "Mark as pending of review",
+                    ok: "Procedure marked as pending of review",
+                },                
+                canviDisseny: {
+                    label: "Mark as design process",
+                    ok: "Procedure marked as a design process",
+                },
+                actualize: {
+                    title: "Procedure update",
+                    label: "Update from ROLSAC",
+                    description: "Do you want to update the procedures with information from ROLSAC?",
+                    ok: "Procedures updated",
+                    result: {
+                        title: "Start of the procedure update process",
+                        description: "'{{numOperacions}}' requests have been made, '{{numActualitzats}}' procedures have been updated, and '{{numErrord}}' resulted in errors",
+                        senseCanvi: "No changes",
+                    }
+                }
+            },
+            alert: {
+                pendentsRevisio: "There are {{num}} procedures or services pending review",
+            },
+        },
+        metaDocument: {
+            title: "Document type",
+            detail: {
+                title: "Document type details",
+            },
+            tabs: {
+                dades: "Data",
+                nti: "NTI data",
+                portafirmes: "Signing with signature workflow",
+                navegador: "Browser-based signing",
+                viaFirma: "Signing via viaFirma",
+                pinbal: "PINBAL",
+            },
+            action: {
+                default: {
+                    label: "Set as default",
+                    ok: "Document type set as default",
+                },
+                undefault: {
+                    label: "Unset as default",
+                    ok: "Document type unset as default",
+                },
+                activar: {
+                    label: "Activate",
+                    ok: "Document type activated",
+                },
+                desactivar: {
+                    label: "Deactivate",
+                    ok: "Document type deactivated",
+                },
+                new: {
+                    label: "New document type",
+                    ok: "Document type created successfully",
+                },
+                update: {
+                    ok: "Document type updated successfully",
+                },
+                delete: {
+                    ok: "Document type deleted successfully",
+                },
+            },
+        },
+        expedientEstat: {
+            title: "Procedure status",
+            detail: {
+                title: "Procedure status details",
+            },
+            action: {
+                new: {
+                    label: "New status",
+                    ok: "Status created successfully",
+                },
+                update: {
+                    ok: "Status updated successfully",
+                },
+                delete: {
+                    ok: "Status deleted successfully",
+                },
+            },
+        },
+        metaExpedientTasca: {
+            title: "Task",
+            detall: {
+                title: "Task details",
+                duracio: "Task duration in calendar days.",
+                validacio: "Task validations: {{nom}}",
+            },
+            action: {
+                activar: {
+                    label: "Activate",
+                    ok: "Task activated",
+                },
+                desactivar: {
+                    label: "Deactivate",
+                    ok: "Task deactivated",
+                },
+                new: {
+                    label: "New task",
+                    ok: "Task created successfully",
+                },
+                update: {
+                    ok: "Task updated successfully",
+                },
+                delete: {
+                    ok: "Task deleted successfully",
+                },
+            },
+        },
+        metaExpedientTascaValidacio: {
+            title: "Validation",
+            detail: {
+                title: "Validation details",
+            },
+            action: {
+                activate: {
+                    label: "Activate",
+                    ok: "Validation activated",
+                },
+                deactivate: {
+                    label: "Deactivate",
+                    ok: "Validation deactivated",
+                },
+                new: {
+                    label: "New validation",
+                    ok: "Validation created successfully",
+                },
+                update: {
+                    ok: "Validation updated successfully",
+                },
+                delete: {
+                    ok: "Validation deleted successfully",
+                },
+            },
+        },
+        domini: {
+            title: "Domain",
+            action: {
+                cleanCache: {
+                    label: "Clear cache",
+                    ok: "The cache has been cleared successfully",
+                },
+                new: {
+                    label: "Add domain",
+                    ok: "Domain created successfully",
+                },
+                update: {
+                    ok: "Domain updated successfully",
+                },
+                delete: {
+                    ok: "Domain deleted successfully",
+                },
+            },
+        },
+        urlInstruccio: {
+            title: "URL de instrucción",
+            detall: {
+                url: "Available formats:\n - http://URL.es/alegar/[ENI]",
+            },
+            action: {
+                new: {
+                    label: "Nueva URL de instrucción",
+                    ok: "URL creada correctamente",
+                },
+                update: {
+                    ok: "URL modificada correctamente",
+                },
+                delete: {
+                    ok: "URL eliminada correctamente",
                 },
             },
         },
@@ -1234,6 +1661,7 @@ const translationEn = {
             action: {
                 new: {
                     title: "Create new permission",
+                    label: "New permission",
                     ok: "Permission for '{{data.principal}} {{data.sid}}' has been created successfully",
                 },
                 update: {
@@ -1252,7 +1680,8 @@ const translationEn = {
                 perfil: "My profile",
                 manual: "User manual",
                 manualAdmin: "Administrator manual",
-                logout: "Log out"
+                logout: "Log out",
+                noOrgans: "No managing body assigned",
             },
             menu: {
                 entitat: "Entities",
@@ -1271,11 +1700,13 @@ const translationEn = {
                 backVersio: "Classic interface",
 
                 anotacions: "Annotations",
-                procediments: "Procedure management",
+                procediments: "Procedures and services",
+                procedimentsTitle: "Procedure and service management",
+                procedimentsRevisorTitle: "Procedure and service review",
                 procedimentPermis: "Procedure permissions: {{nom}}",
-                procedimentsTitle: "The entity has procedures with outdated managing bodies",
                 grups: "Groups",
-                revisar: "Procedure review",
+                grupPermis: "Group permissions",
+                revisar: "Procedure and service review",
                 tasca: "Tasks",
                 flux: "Signature workflows",
 
@@ -1290,9 +1721,11 @@ const translationEn = {
                 comunicades: "Communicated annotations",
 
                 documents: "Document types",
+                documentDada: "Metadata of the document type: {{nom}}",
                 nti: "NTI document types",
                 dominis: "Domains",
                 organs: "Managing bodies",
+                organPermis: "Permissions of the managing body: {{nom}}",
                 url: "Instruction URLs",
                 permisos: "Entity permissions"
             },
@@ -1330,7 +1763,7 @@ const translationEn = {
             }
         },
         alert: {
-            title: "Case Alerts",
+            title: "Case validation errors",
             action: {
                 read: {
                     label: "Mark as read",

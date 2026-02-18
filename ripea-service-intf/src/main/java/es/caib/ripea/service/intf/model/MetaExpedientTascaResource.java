@@ -1,32 +1,49 @@
 package es.caib.ripea.service.intf.model;
 
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
+import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
+import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
-import es.caib.ripea.service.intf.config.BaseConfig;
+import es.caib.ripea.service.intf.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.FieldNameConstants;
+import org.springframework.data.annotation.Transient;
 
+import javax.validation.constraints.NotNull;
+
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
-/**
- * Informació d'una aplicació a monitoritzar.
- *
- * @author Límit Tecnologies
- */
 @Getter
 @Setter
 @NoArgsConstructor
-@ResourceConfig(quickFilterFields = { "codi", "nom" }, descriptionField = "nom")
+@FieldNameConstants
+@ResourceConfig(
+		quickFilterFields = { "codi", "nom" },
+		descriptionField = "nom",
+		artifacts = {
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.PERSPECTIVE,
+                        code = MetaExpedientTascaResource.PERSPECTIVE_COUNT_VALIDACIONS),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.PERSPECTIVE,
+                        code = MetaExpedientTascaResource.PERSPECTIVE_REVISIO_ESTAT),
+        })
 public class MetaExpedientTascaResource extends BaseAuditableResource<Long> {
 
-    private String codi;
-    private String nom;
-    private String descripcio;
+	public static final String PERSPECTIVE_COUNT_VALIDACIONS = "COUNT_VALIDACIONS";
+	public static final String PERSPECTIVE_REVISIO_ESTAT = "REVISIO_ESTAT";
+
+    @NotNull private String codi;
+    @NotNull private String nom;
+    @NotNull private String descripcio;
     private ResourceReference<UsuariResource, String> responsable;
-    private boolean activa;
+    private boolean activa = true;
     private Date dataLimit;
     @SuppressWarnings("unused")
     private String dataLimitString;
@@ -34,15 +51,18 @@ public class MetaExpedientTascaResource extends BaseAuditableResource<Long> {
     @SuppressWarnings("unused")
     private String duracioFormat;
     private PrioritatEnumDto prioritat = PrioritatEnumDto.B_NORMAL;
-    private Long estatIdCrearTasca;
-    private String estatNomCrearTasca;
-    private String estatColorCrearTasca;
-    private Long estatIdFinalitzarTasca;
-    private String estatNomFinalitzarTasca;
-    private String estatColorFinalitzarTasca;
 
-    private ResourceReference<ExpedientEstatResource, Long> estatCrearTasca;
-    private ResourceReference<ExpedientEstatResource, Long> estatFinalitzarTasca;
+    private ResourceReference<MetaExpedientEstatResource, Long> estatCrearTasca;
+    private ResourceReference<MetaExpedientEstatResource, Long> estatFinalitzarTasca;
     private ResourceReference<MetaExpedientResource, Long> metaExpedient;
 
+    @Transient private int numValidacio;
+    @Transient private String estatColorCrearTasca;
+    @Transient private String estatColorFinalitzarTasca;
+    @Transient private MetaExpedientRevisioEstatEnumDto metaExpedientRevisioEstat;
+    
+    //Nomes per importacio de procediments
+    private List<MetaExpedientTascaValidacioResource> validacionsImportacio = new ArrayList<>();
+    
+    @Transient private boolean importar = true;
 }

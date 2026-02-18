@@ -18,11 +18,13 @@ import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.CacheHelper;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.DominiHelper;
+import es.caib.ripea.service.helper.EventHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.model.FieldOption;
 import es.caib.ripea.service.intf.dto.ResultatConsultaDto;
 import es.caib.ripea.service.intf.model.DadaResource;
+import es.caib.ripea.service.intf.model.sse.ErrorsValidacioChangedEvent;
 import es.caib.ripea.service.intf.resourceservice.DadaResourceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +41,7 @@ public class DadaResourceServiceImpl extends BaseMutableResourceService<DadaReso
 
 	private final DominiHelper dominiHelper;
 	private final CacheHelper cacheHelper;
+	private final EventHelper eventHelper;
 	private final ConfigHelper configHelper;
 	private final ExcepcioLogHelper excepcioLogHelper;
 	private final EntitatRepository entitatRepository;
@@ -55,7 +58,7 @@ public class DadaResourceServiceImpl extends BaseMutableResourceService<DadaReso
         beforeSave(entity, resource, answers);
     }
 
-    //Metodes "after" (volem netejar la cache de validacio del expedient)
+    //Metodes AFTER (volem netejar la cache de validacio del expedient)
     @Override
     protected void afterCreateSave(DadaResourceEntity entity, DadaResource resource, Map<String, AnswerRequiredException.AnswerValue> answers, boolean anyOrderChanged) {
     	afterDbChange(entity);
@@ -70,7 +73,14 @@ public class DadaResourceServiceImpl extends BaseMutableResourceService<DadaReso
         afterDbChange(entity);
     }    
     private void afterDbChange(DadaResourceEntity entity) {
-    	cacheHelper.evictErrorsValidacioPerNode(entity.getNode().getId());
+    	//Esborram cache de validacions del expedient
+    	if (entity.getMetaDada().getMultiplicitat().esObligatoria()) {
+    		cacheHelper.evictErrorsValidacioPerNode(entity.getNode().getId()); // Primero hace evict
+    		ErrorsValidacioChangedEvent evce = new ErrorsValidacioChangedEvent(
+    				entity.getNode().getId(),
+    				cacheHelper.findErrorsValidacioPerNode(entity.getNode().getId()));
+    		eventHelper.notifyErrorsValidacio(evce); // Luego notifica con datos frescos	
+    	}
     }
     //Fi Metodes AFTER
     

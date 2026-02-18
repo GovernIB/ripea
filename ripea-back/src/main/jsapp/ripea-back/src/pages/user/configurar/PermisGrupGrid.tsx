@@ -59,12 +59,15 @@ const PermisGrupGrid = ()=> {
                 sortModel={sortModel}
                 namedQueries={[`GRUP#${id}`]}
                 perspectives={[`PERMISION#GRUP#${id}`]}
-
                 rowAdditionalActions={actions}
                 toolbarElementsWithPositions={[
                     {
                         position: 3,
-                        element: <ToolbarButton title={t('common.create')} icon={'add'} onClick={()=>handelCreate(id)} color={'primary'}/>,
+                        element: <ToolbarButton 
+                            title={t('common.nouPermis')}
+                            icon={'add'}
+                            onClick={()=>handelCreate(id)}
+                            color={'primary'}>{t('common.nouPermis')}</ToolbarButton>,
                     },
                 ]}
                 toolbarHideCreate

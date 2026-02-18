@@ -64,7 +64,7 @@ const namedQueriesExpedient: string[] = ['MASSIVE_ACTION_QUERY', 'MASSIVE_ARXIU_
 const expedientColumns = [
     {
         field: 'nom',
-        flex: 1,
+        flex: 1.5,
         renderCell: (params:any) => <Link component={RouterLink} to={`/contingut/${params?.id}`}>{params?.formattedValue}</Link>,
     },
     {
@@ -73,11 +73,11 @@ const expedientColumns = [
     },
     {
         field: 'createdDate',
-        flex: 1,
+        flex: 0.8,
     },
     {
         field: 'arxiuIntentData',
-        flex: 1,
+        flex: 0.8,
         valueFormatter: (value: any) => formatDate(value),
     },
 ]
@@ -90,15 +90,15 @@ const CustodiarExpedientsPendentsGrid = () => {
     const refresh = () => {
         apiRef?.current?.refresh?.();
     }
-    const {syncArxiu} = useExpedientActions(refresh);
-    const {syncArxiu: syncArxiuMassive} = useExpedientMassiveActions(refresh);
+    const {guardarArxiu} = useExpedientActions(refresh);
+    const {guardarArxiu: guardarArxiuMassive} = useExpedientMassiveActions(refresh);
 
     const actions = [
         {
             label: t('page.contingut.action.custodiar.label'),
             icon: "autorenew",
             showInMenu: false,
-            onClick: syncArxiu,
+            onClick: guardarArxiu,
         },
     ]
     const massiveActions = [
@@ -106,7 +106,7 @@ const CustodiarExpedientsPendentsGrid = () => {
             label: t('page.contingut.action.custodiar.label'),
             icon: "autorenew",
             showInMenu: false,
-            onClick: syncArxiuMassive,
+            onClick: guardarArxiuMassive,
         },
     ]
 
@@ -132,6 +132,7 @@ const CustodiarExpedientsPendentsGrid = () => {
 
 // Document
 const namedQueriesDocument: string[] = ['MASSIU_PENDENT_ARXIU']
+const perspectivesDocument = ['PROCEDIMENT'];
 const springDocumentFilterBuilder = (data: any) => {
     return builder.and(
         builder.like("nom", data?.nom),
@@ -151,17 +152,17 @@ const documentColumns = [
         flex: 1.5,
         renderCell: (params:any) => <Link component={RouterLink} to={`/contingut/${params?.row?.expedient?.id}`}>{params?.formattedValue}</Link>,
     },
-    // {
-    //     field: 'metaNode',
-    //     flex: 1,
-    // },
+    {
+        field: 'metaExpedient',
+        flex: 1.5,
+    },
     {
         field: 'createdDate',
-        flex: 1,
+        flex: 0.8,
     },
     {
         field: 'arxiuIntentData',
-        flex: 1,
+        flex: 0.8,
         valueFormatter: (value: any) => formatDate(value),
     },
 ]
@@ -208,9 +209,9 @@ const CustodiarDocumentsPendentsGrid = () => {
             filter={springFilter}
             sortModel={sortModel}
             namedQueries={namedQueriesDocument}
+            perspectives={perspectivesDocument}
             rowAdditionalActions={actions}
             toolbarMassiveActions={massiveActions}
-
             toolbarHideCreate
         />
     </GridPage>
@@ -218,10 +219,11 @@ const CustodiarDocumentsPendentsGrid = () => {
 
 // Interessat
 const namedQueriesInteressat: string[] = ['MASSIU_PENDENT_ARXIU']
+const perspectivesInteressat = ['PROCEDIMENT'];
 const springInteressatFilterBuilder = (data: any) => {
     return builder.and(
         builder.like("nom", data?.nom),
-        builder.eq("metaExpedient.id", data?.procediment?.id),
+        builder.eq("expedient.metaExpedient.id", data?.procediment?.id),
         builder.eq("id", data?.expedient?.id),
         builder.betweenDates("createdDate", data?.dataCreacioInici, data?.dataCreacioFi),
     );
@@ -230,24 +232,24 @@ const springInteressatFilterBuilder = (data: any) => {
 const interessatColumns = [
     {
         field: 'nom',
-        flex: 1,
+        flex: 1.5,
     },
     {
         field: 'expedient',
         flex: 1.5,
         renderCell: (params:any) => <Link component={RouterLink} to={`/contingut/${params?.row?.expedient?.id}`}>{params?.formattedValue}</Link>,
     },
-    // {
-    //     field: 'metaNode',
-    //     flex: 1,
-    // },
     {
-        field: 'createdDate',
+        field: 'metaExpedient',
         flex: 1,
     },
     {
+        field: 'createdDate',
+        flex: 0.8,
+    },
+    {
         field: 'arxiuIntentData',
-        flex: 1,
+        flex: 0.8,
         valueFormatter: (value: any) => formatDate(value),
     },
 ]
@@ -293,6 +295,7 @@ const CustodiarInteressatsPendentsGrid = () => {
             columns={interessatColumns}
             filter={springFilter}
             sortModel={sortModel}
+            perspectives={perspectivesInteressat}
             namedQueries={namedQueriesInteressat}
             rowAdditionalActions={actions}
             toolbarMassiveActions={massiveActions}

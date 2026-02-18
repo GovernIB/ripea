@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.query.Param;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -72,6 +71,7 @@ import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.CodiValorDto;
 import es.caib.ripea.service.intf.dto.ContingutMassiuFiltreDto;
 import es.caib.ripea.service.intf.dto.ContingutVistaEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentAmbTipusDto;
 import es.caib.ripea.service.intf.dto.DocumentDto;
 import es.caib.ripea.service.intf.dto.ExpedientComentariDto;
 import es.caib.ripea.service.intf.dto.ExpedientDto;
@@ -303,7 +303,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 					entitatId,
 					associarInteressats,
 					interessatsAccionsMap,
-					agafarExpedient);
+					agafarExpedient,
+					false);
 		}
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.getOne(expedientPeticioId);
 		expedientHelper.inicialitzarExpedientsWithImportacio();
@@ -429,16 +430,10 @@ public class ExpedientServiceImpl implements ExpedientService {
 		return exception;
 	}
 	
-	
-	
-
-	
 	@Transactional
 	@Override
 	public Exception retryMoverAnnexArxiu(Long registreAnnexId) {
-		
 		Long expedientId = registreAnnexRepository.findExpedientId(registreAnnexId);
-		
 		synchronized (SynchronizationHelper.get0To99Lock(expedientId, SynchronizationHelper.locksExpedients)) {
 			return expedientHelper.moveDocumentArxiuNewTransaction(registreAnnexId);
 		}
@@ -457,27 +452,11 @@ public class ExpedientServiceImpl implements ExpedientService {
 			Long grupId,
 			PrioritatEnumDto prioritat,
 			String prioritatMotiu) {
-		
-		logger.debug(
-				"Actualitzant dades de l'expedient (" + "entitatId=" + entitatId + ", " + "id=" + id + ", " + "nom=" +
-						nom + ")");
+		logger.debug("Actualitzant dades de l'expedient (" + "entitatId=" + entitatId + ", " + "id=" + id + ", " + "nom=" + nom + ")");
 		contingutHelper.comprovarContingutDinsExpedientModificable(entitatId, id, false, true, false, false, false, true, rolActual);
-		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				id,
-				false,
-				false,
-				true,
-				false,
-				false,
-				rolActual);
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(id, false, false, true, false, false, rolActual);
 		entityComprovarHelper.comprovarEstatExpedient(entitatId, id, ExpedientEstatEnumDto.OBERT);
-		expedientHelper.updateNomExpedient(expedient, nom);
-		expedientHelper.updateAnyExpedient(expedient, any);
-		expedientHelper.updateOrganGestor(expedient, organGestorId, rolActual);
-		if (grupId != null) {
-			expedient.setGrup(grupRepository.getOne(grupId));
-		}
-		expedientHelper.updatePrioritat(expedient, prioritat, prioritatMotiu);
+		expedient = expedientHelper.updateExpedient(expedient, nom, any, organGestorId, rolActual, grupId, prioritat, prioritatMotiu);
 		ExpedientDto dto = expedientHelper.toExpedientDto(expedient, false, false, null, false);
 		contingutHelper.arxiuPropagarModificacio(expedient);
 		return dto;
@@ -486,7 +465,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 	@Transactional
 	@Override
 	public ExpedientDto changeExpedientPrioritat(Long entitatId, Long expedientId, PrioritatEnumDto prioritat, String prioritatMotiu) {
-
 		logger.debug("Canviant la prioritat de l'expedient (entitatId=" + entitatId + ", expedientId=" + expedientId + ", prioritat=" + prioritat + ")");
 		entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
@@ -497,7 +475,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				false,
 				null);
-
 		expedientHelper.updatePrioritat(expedient, prioritat, prioritatMotiu);
 		return expedientHelper.toExpedientDto(expedient, false, false, null, false);
 	}
@@ -1766,7 +1743,39 @@ public class ExpedientServiceImpl implements ExpedientService {
 		UsuariEntity usuari = usuariRepository.getOne(auth.getName());
 		return usuari.getVistaMoureActual();
 	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public Long checkAllExpedientsSameProcediment(Set<Long> expedientIds) {
+	    if (expedientIds == null || expedientIds.isEmpty()) {
+	        return 0l;
+	    }
+		List<Long> procsIds = expedientRepository.findDistinctProcedimentIds(expedientIds);
+		if (procsIds!=null) {
+			if (procsIds.size()==1) {
+				return procsIds.get(0);
+			} else {
+				return 0l;		
+			}
+		}
+		return 0l;
+	}
+	
+	@Override
+	public String saveImportacioMassivaDocsTemporal(List<DocumentAmbTipusDto> documents) throws IOException {
+		return expedientHelper.saveImportacioMassivaDocsTemporal(documents);
+	}
 
+	@Override
+	public void moure(Long entitatId, Long expedientOrigenId, Long expedientDestiId, String rolActual) {
+		expedientHelper.moureEntreExpedients(entitatId, expedientOrigenId, expedientDestiId, rolActual);
+	}
+	
+	@Override
+	public boolean isExpedientPendentExecucioMassiva(Long expedientId) {
+		return expedientHelper.isExpedientPendentExecucioMassiva(expedientId);
+	}
+	
 	private boolean isIncorporacioDuplicadaPermesa() {
 		return configHelper.getAsBoolean(PropertyConfig.INCORPORACIO_ANOTACIO_DUPLICADA);
 	}

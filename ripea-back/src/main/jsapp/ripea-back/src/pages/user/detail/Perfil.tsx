@@ -16,7 +16,7 @@ const PerfilFrom = () =>{
         <CardData
             title={t('page.user.perfil.dades')}
             cardProps={{border: '1px solid #004B99'}}
-            headerProps={{color: 'white', backgroundColor: '#004B99'}}
+            headerProps={{color: 'white', backgroundColor: '#004B99 !important', borderBottom: 'none'}}
         >
             <GridFormField xs={12} name="nom" disabled readOnly/>
             <GridFormField xs={12} name="nif" disabled readOnly/>

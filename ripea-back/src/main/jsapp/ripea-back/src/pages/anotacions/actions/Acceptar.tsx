@@ -134,7 +134,8 @@ const AcceptarTabAnnexos = () => {
                 }
             }}
 
-            height={162 + 52 * 4}
+            autoHeight
+            paginationModel={{page: 0, pageSize: 5}}
             readOnly
         />
         {dialog}
@@ -201,7 +202,8 @@ const AcceptarTabInteressats = () => {
                 }
             }}
 
-            height={162 + 52 * 4}
+            autoHeight
+            paginationModel={{page: 0, pageSize: 5}}
             readOnly
         />
         {dialog}

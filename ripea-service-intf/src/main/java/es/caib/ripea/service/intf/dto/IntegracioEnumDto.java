@@ -7,6 +7,7 @@ public enum IntegracioEnumDto {
 	CIUTADA,
 	PFIRMA,
 	ARXIU,
+	CONCSV,
 	CONVERT,
 	CALLBACK,
 	DADESEXT,

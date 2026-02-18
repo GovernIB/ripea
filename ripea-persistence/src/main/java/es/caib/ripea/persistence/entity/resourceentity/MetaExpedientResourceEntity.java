@@ -24,6 +24,7 @@ import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.dto.CrearReglaDistribucioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.TipusClassificacioEnumDto;
+import es.caib.ripea.service.intf.dto.TipusProcedimentServeiEnum;
 import es.caib.ripea.service.intf.model.MetaExpedientResource;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -37,10 +38,13 @@ import lombok.Setter;
 @Inheritance(strategy=InheritanceType.JOINED)
 public class MetaExpedientResourceEntity extends MetaNodeResourceEntity<MetaExpedientResource> {
 
+    @Column(name = "TIPUS_PROC_SERVEI")
+    @Enumerated(EnumType.STRING)
+    private TipusProcedimentServeiEnum tipusProcedimentServei;
 	@Column(name = "tipus_classificacio", length = 3, nullable = false)
 	@Enumerated(EnumType.STRING)
 	private TipusClassificacioEnumDto tipusClassificacio;
-	@Column(name = "clasif_sia", length = 30, nullable = false)
+	@Column(name = "clasif_sia", length = 46, nullable = false)
 	private String classificacio;
 	@Column(name = "serie_doc", length = 30, nullable = false)
 	private String serieDocumental;
@@ -55,11 +59,17 @@ public class MetaExpedientResourceEntity extends MetaNodeResourceEntity<MetaExpe
     private boolean permisDirecte = false;
 
 	@OneToMany(mappedBy = "metaExpedient", cascade = { CascadeType.ALL })
-	protected Set<ExpedientEstatResourceEntity> estats;
+	protected Set<MetaExpedientEstatResourceEntity> estats;
 
 	@Column(name = "codi", length = 64, nullable = false)
 	private String codiPropi;
 
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@JoinColumn(
+			name = "entitat_id",
+			foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "ENTITAT_METAEXP_FK"))
+	protected EntitatResourceEntity entitatPropia;
+	
 	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(
 			name = "organ_gestor_id",

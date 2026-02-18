@@ -14,6 +14,9 @@ import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.model.InteressatResource;
 import org.springframework.stereotype.Service;
 
+import com.turkraft.springfilter.FilterBuilder;
+import com.turkraft.springfilter.parser.Filter;
+
 import es.caib.ripea.persistence.entity.DocumentEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.resourceentity.DocumentNotificacioResourceEntity;
@@ -29,10 +32,15 @@ import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.base.model.ReportFileType;
 import es.caib.ripea.service.intf.dto.DocumentNotificacioTipusEnumDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
+import es.caib.ripea.service.intf.model.ContingutResource;
+import es.caib.ripea.service.intf.model.DocumentEnviamentResource;
 import es.caib.ripea.service.intf.model.DocumentNotificacioResource;
 import es.caib.ripea.service.intf.model.DocumentResource;
+import es.caib.ripea.service.intf.model.EntitatResource;
+import es.caib.ripea.service.intf.model.ExpedientResource;
 import es.caib.ripea.service.intf.model.DocumentNotificacioResource.MassiveAction;
 import es.caib.ripea.service.intf.resourceservice.DocumentNotificacioResourceService;
+import es.caib.ripea.service.intf.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -53,6 +61,7 @@ public class DocumentNotificacioResourceServiceImpl extends BaseMutableResourceS
 	private final EntityComprovarHelper entityComprovarHelper;
 	private final DocumentNotificacioHelper documentNotificacioHelper;
 	private final MessageHelper messageHelper;
+	private final MetaExpedientHelper metaExpedientHelper;
 
 	private final DocumentNotificacioResourceRepository documentNotificacioResourceRepository;
 	
@@ -63,6 +72,40 @@ public class DocumentNotificacioResourceServiceImpl extends BaseMutableResourceS
         register(DocumentNotificacioResource.ACTION_DESCARREGAR_DOC_ENVIAT, new DescarregarDocEnviatReportGenerator());
     }
 
+    @Override
+    protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
+    	
+    	String entitatActualCodi = configHelper.getEntitatActualCodi();
+    	String rolActual		 = configHelper.getRolActual();
+    	
+    	boolean isAdmin = "IPA_ADMIN".equals(rolActual);
+    	
+        Filter filtreBase = FilterBuilder.and(
+                (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null,
+                FilterBuilder.equal(DocumentEnviamentResource.Fields.document + "." + ContingutResource.Fields.entitat + "." + EntitatResource.Fields.codi, 
+                		entitatActualCodi != null?entitatActualCodi:"................................................................................")
+        );
+        
+        Filter filtrePermisos = null;
+        if (!isAdmin) {
+        	EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, true, false, false, false ,false);
+	        List<Long> idMetaExpedientPermesos = metaExpedientHelper.getIdsReadPermesos(entitat.getId());
+	        List<String> permesosClausulesIn = Utils.getIdsEnGruposMil(idMetaExpedientPermesos);
+	        if (permesosClausulesIn!=null) {
+	        	String campProcedimentId = DocumentEnviamentResource.Fields.expedient + "." + ExpedientResource.Fields.metaExpedient +".id";
+		        for (String aux: permesosClausulesIn) {
+			        if (aux != null && !aux.isEmpty()) {
+			        	filtrePermisos = FilterBuilder.or(filtrePermisos, Filter.parse(campProcedimentId+" IN (" + aux + ")"));
+			        }
+		        }
+	        }
+        }
+        
+        Filter filtreResultat = FilterBuilder.and(filtreBase, filtrePermisos);
+        
+        return filtreResultat.generate();
+    }    
+    
     @Override
     protected void afterConversion(DocumentNotificacioResourceEntity entity, DocumentNotificacioResource resource) {
         resource.setFitxerNom(entity.getDocument().getFitxerNom());
@@ -92,27 +135,46 @@ public class DocumentNotificacioResourceServiceImpl extends BaseMutableResourceS
     	}
     }
     
-    private class ActualitzarEstatActionExecutor implements ActionExecutor<DocumentNotificacioResourceEntity, Serializable, DocumentNotificacioResource> {
+    private class ActualitzarEstatActionExecutor implements ActionExecutor<DocumentNotificacioResourceEntity, MassiveAction, Serializable> {
 
         @Override
-        public DocumentNotificacioResource exec(String code, DocumentNotificacioResourceEntity entity, Serializable params) throws ActionExecutionException {
-            try {
-            	EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
-            	DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(entitatEntity.getId(), entity.getDocument().getId(), false, true);
-            	if (document!=null) {
-            		documentNotificacioHelper.actualitzarEstat(entity.getId());
-            	} else {
-            		throw new ActionExecutionException(getResourceClass(), entity.getId(), code, messageHelper.getMessage("documentNotificacio.actualitzarEstat.reject.credential"));
-            	}
+        public Serializable exec(String code, DocumentNotificacioResourceEntity entity, MassiveAction params) throws ActionExecutionException {
+        	try {
+        		
+        		if (params.getIds()!=null) {
+        			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+        			for (Long docId: params.getIds()) {
+        				DocumentNotificacioResourceEntity notificacio = documentNotificacioResourceRepository.findById(docId).get();
+                    	DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
+                    			entitatEntity.getId(),
+                    			notificacio.getDocument().getId(),
+                    			false,
+                    			true);
+                    	if (document!=null) {
+                    		documentNotificacioHelper.actualitzarEstat(docId);
+                    	} else {
+                    		throw new ActionExecutionException(
+                    				getResourceClass(),
+                    				docId,
+                    				code,
+                    				messageHelper.getMessage("documentNotificacio.actualitzarEstat.reject.credential"));
+                    	}
+        			}
+        		}
+
+            	int numElem = params!=null && params.getIds()!=null?params.getIds().size():0;
+            	return "{\"num\": \""+numElem+"\"}";
+            	
 			} catch (Exception e) {
-				excepcioLogHelper.addExcepcio("/notificacio/"+entity.getId()+"/DocumentNotificacioResource", e);
-				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, messageHelper.getMessage("documentNotificacio.actualitzarEstat.reject"));
+				String docIdsStr = Utils.getIdsSeparatsComa(params.getIds());
+				excepcioLogHelper.addExcepcio("/notificacio/ActualitzarEstatActionExecutor", e, docIdsStr, "massiu="+params.isMassivo());
+				String message = messageHelper.getMessage("documentNotificacio.actualitzarEstat.reject")+": "+e.getMessage();
+				throw new ActionExecutionException(getResourceClass(), docIdsStr, code, message);
             }
-            return objectMappingHelper.newInstanceMap(entity, DocumentNotificacioResource.class);
         }
 
         @Override
-        public void onChange(Serializable id, Serializable previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, Serializable target) {}
+        public void onChange(Serializable id, MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {}
     }
 
     private class JustificantReportGenerator implements ReportGenerator<DocumentNotificacioResourceEntity, DocumentNotificacioResource.MassiveAction, Serializable> {

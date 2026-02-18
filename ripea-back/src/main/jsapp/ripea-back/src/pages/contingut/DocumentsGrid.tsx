@@ -83,8 +83,11 @@ export const useExpedientsCarpetes = (commonFilter: string) => {
             .then((result)=> setExpedients(result.rows))
             .catch(()=> setExpedients([]))
     }
+	
+	const carpetaPerspectives =  ["PATH" , "RESTRICCIONS", "RESPONSABLE_RESTRICCIO"];
+	
     const findCarpetes = () => {
-        return apiCarpetaFindAll({perspectives, unpaged: true, filter: commonFilter})
+        return apiCarpetaFindAll({perspectives: carpetaPerspectives, unpaged: true, filter: commonFilter})
             .then((result)=> setCarpetes(result.rows))
             .catch(()=> setCarpetes([]))
     }
@@ -136,9 +139,9 @@ const columns = [
 const DocumentsGrid = (props: any) => {
     const { entity, onRowCountChange } = props;
     const { t } = useTranslation();
-    const { value: user } = useUserSession();
+    const { value: user, rol } = useUserSession();
 
-    const sortModel = useMemo(() => {
+    const sortModel:any[] = useMemo(() => {
         if (user?.sessionScope?.ordenacioContingutPermesa) {
             return [{ field: 'ordre', sort: 'asc' }];
         }
@@ -168,6 +171,7 @@ const DocumentsGrid = (props: any) => {
     const [treeView, setTreeView] = useState<boolean>(true);
     const [expand, setExpand] = useState<boolean>(user?.conf?.expedientExpandit);
     const [vista, setVista] = useState<string>(getFolderExpand("vista") ?? user?.conf?.vistaActual);
+    const [disabled, setDisabled] = useState<boolean>(false);
     const {
         isReady,
         carpetes,
@@ -185,13 +189,16 @@ const DocumentsGrid = (props: any) => {
     const { createActions, actions, components } = useContingutActions(entity, gridApiRef, refresh);
     const { actions: massiveActions, components: massiveComponents } = useContingutMassiveActions(entity, refresh);
 
-    const additionalColumns = useMemo(()=>[
+    const draggable = useMemo(()=> (
+        vista == View.carpeta && (entity?.potModificarContingut || entity?.potModificar) && user?.sessionScope?.ordenacioContingutPermesa
+    ),[vista, entity?.potModificarContingut, entity?.potModificar, user?.sessionScope?.ordenacioContingutPermesa])
+    const additionalColumns:any[] = useMemo(()=>[
         ...columns,
-        ...(vista == View.carpeta && (entity?.potModificarContingut || entity?.potModificar) && user?.sessionScope?.ordenacioContingutPermesa ? [{
+        ...( draggable? [{
             renderCell: () => <DraggableGridRowHandler />,
             flex: 0.1
         }] : [])
-    ], [columns, vista, user?.sessionScope?.ordenacioContingutPermesa])
+    ], [draggable])
 
     const onDrop = React.useCallback((adjunt: any) => {
         gridApiRef?.current?.showCreateDialog?.(null, { adjunt })
@@ -237,7 +244,7 @@ const DocumentsGrid = (props: any) => {
                         resourceName={"documentResource"}
                         popupEditFormDialogResourceTitle={t('page.document.title')}
                         columns={additionalColumns}
-                        rowActionsColumnIndex={4}
+                        rowActionsColumnIndex={draggable?-1:undefined}
                         paginationActive={false}
                         autoHeight
                         filter={commonFilter}
@@ -245,7 +252,7 @@ const DocumentsGrid = (props: any) => {
                         staticSortModel={sortModel}
                         //rowReordering
                         popupEditCreateActive
-                        popupEditFormContent={<DocumentsGridForm />}
+                        popupEditFormContent={<DocumentsGridForm setDisabled={setDisabled} />}
                         formAdditionalData={{
                             expedient: { id: entity?.id },
                             metaExpedient: entity?.metaExpedient,
@@ -254,10 +261,6 @@ const DocumentsGrid = (props: any) => {
                         rowAdditionalActions={actions}
                         onRowCountChange={onRowCountChange}
                         onRefresh={refresh}
-                        popupEditFormDialogButtons={[
-                            {icon: 'save', text: t('common.create'), componentProps: { variant: 'contained' }, value: true },
-                            {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false }, 
-                        ]}
                         groupingColDef={{
                             headerName: t('page.contingut.grid.nom'),
                             flex: 1.5,
@@ -299,10 +302,11 @@ const DocumentsGrid = (props: any) => {
                                 case View.tipus:
                                     if (_rows!=null){
                                         for (const row of _rows) {
-                                            if (!additionalRows.map((b) => b.id).includes(row?.metaNode?.id)) {
+                                            if (row?.metaDocumentInfo && !additionalRows.map((b) => b.id).includes(row?.metaDocumentInfo?.id)) {
                                                 additionalRows.push({
                                                     ...row?.metaDocumentInfo,
                                                     tipus: "META_" + row?.metaDocumentInfo?.tipus,
+                                                    autogenerated: true,
                                                 })
                                             }
                                         }
@@ -318,7 +322,7 @@ const DocumentsGrid = (props: any) => {
                         getTreeDataPath={(row: any): string[] => {
                             switch (vista) {
                                 case View.estat: return [`${row?.expedientEstatAdditional?.description}`, `${row.id}`];
-                                case View.tipus: return row?.metaNode ?[`${row?.metaNode?.id}`, `${row.id}`] :[`${row.id}`];
+                                case View.tipus: return row?.autogenerated ?[`${row.id}`] :row?.metaNode ?[`${row?.metaNode?.id}`, `${row.id}`] :[t('page.document.detall.senseTipus'),`${row.id}`];
                                 default: return row?.treePath?.filter((id:any)=>id!=entity?.id) ?? [`${row.id}`];
                             }
                         }}
@@ -326,6 +330,18 @@ const DocumentsGrid = (props: any) => {
                             addFolderExpand(params.groupingKey, params.childrenExpanded)
                         }}
                         isGroupExpandedByDefault={(params) => {
+							const carpeta = carpetes.find(c => c.id === params.groupingKey);
+							if (carpeta && carpeta.restringida) {
+								const isResponsableRestriccio = carpeta?.responsableRestriccio?.id === user?.codi;
+								const isUsuariAmbPermis = carpeta?.restriccions?.some(
+									(restriccio: any) => restriccio?.id === user?.codi
+								) ?? false;
+
+								if (!isResponsableRestriccio && !isUsuariAmbPermis && !rol?.isAdmin) {
+									return false;
+								}
+							}
+
                             const value = getFolderExpand(`${params?.groupingKey}`)
                             if (value !== undefined) {
                                 return value
@@ -374,6 +390,10 @@ const DocumentsGrid = (props: any) => {
 
                         toolbarHideCreate
                         popupEditFormComponentProps={{ initOnChangeRequest: true }}
+                        popupEditFormDialogButtons={[
+                            {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
+                            {icon: 'save', text: t('common.save'), componentProps: { variant: 'contained', disabled: disabled }, value: true },
+                        ]}
                         popupEditFormI18nKeys={{
                             createSuccess: 'page.document.action.new.ok',
                             updateSuccess: 'page.document.action.update.ok',

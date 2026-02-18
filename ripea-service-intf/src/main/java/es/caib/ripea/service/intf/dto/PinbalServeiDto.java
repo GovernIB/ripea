@@ -4,13 +4,15 @@ import es.caib.ripea.service.intf.utils.Utils;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Getter
 @Setter
-public class PinbalServeiDto {
+public class PinbalServeiDto implements Serializable {
 
-    private Long id;
+    private static final long serialVersionUID = -1269977174269460166L;
+	private Long id;
 	private List<PinbalServeiDocPermesEnumDto> pinbalServeiDocsPermesos;
     private String codi;
     private String nom;

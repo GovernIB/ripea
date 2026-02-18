@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.stereotype.Service;
 
 import com.turkraft.springfilter.FilterBuilder;
@@ -20,10 +22,13 @@ import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
+import es.caib.ripea.service.helper.GrupHelper;
+import es.caib.ripea.service.helper.PermisosHelper;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
+import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
+import es.caib.ripea.service.intf.dto.PermisDto;
 import es.caib.ripea.service.intf.model.EntitatResource;
 import es.caib.ripea.service.intf.model.GrupResource;
-import es.caib.ripea.service.intf.model.MetaExpedientResource;
 import es.caib.ripea.service.intf.resourceservice.GrupResourceService;
 import es.caib.ripea.service.intf.utils.Utils;
 import lombok.RequiredArgsConstructor;
@@ -35,11 +40,18 @@ import lombok.extern.slf4j.Slf4j;
 public class GrupResourceServiceImpl extends BaseMutableResourceService<GrupResource, Long, GrupResourceEntity> implements GrupResourceService {
 
 	private final ConfigHelper configHelper;
+	private final GrupHelper grupHelper;
+	private final PermisosHelper permisosHelper;
 	private final EntityComprovarHelper entityComprovarHelper;
 	private final MetaExpedientRepository metaExpedientRepository;
 	private final OrganGestorRepository organGestorRepository;
 	private final EntitatResourceRepository entitatResourceRepository;
 
+    @PostConstruct
+    public void init() {
+    	register(GrupResource.PERSPECTIVE_COUNT_PERMISOS, new CountPermisosPerspectiveApplicator());
+    }
+	
     @Override
     protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
     	
@@ -49,12 +61,12 @@ public class GrupResourceServiceImpl extends BaseMutableResourceService<GrupReso
     	EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true,false);
     	OrganGestorEntity ogEntity = null;
     	if (rolActual.equals("IPA_ORGAN_ADMIN") || rolActual.equals("IPA_DISSENY")) {
-    		organGestorRepository.findByEntitatAndCodi(entitat, configHelper.getOrganActualCodi());
+    		ogEntity = organGestorRepository.findByEntitatAndCodi(entitat, configHelper.getOrganActualCodi());
     	}
     	
     	Filter filtreGrupsPermesos = getFiltreGrupsPermesos(entitat.getId(), rolActual, ogEntity != null ?ogEntity.getId() :null);
     	
-        Map<String, String> mapaNamedQueries =  Utils.namedQueriesToMap(namedQueries);
+        Map<String, String> mapaNamedQueries = Utils.namedQueriesToMap(namedQueries);
     	if (mapaNamedQueries.size()>0) {
     		/**
     		 * S'utilitza en el formulari de acceptar anotació, per obtenir els grups de un procediment
@@ -92,6 +104,37 @@ public class GrupResourceServiceImpl extends BaseMutableResourceService<GrupReso
     			Filter filtreResultat = FilterBuilder.and(filtreGrupsProcediment, filtreGrupsPermesos);
 				return filtreResultat.generate();
 				// ----------------> return amb resultats: grups permesos del procediment
+    		} else if (mapaNamedQueries.containsKey("VINCULAR_PROCEDIMENT")) {
+                Long procedimentId = Long.parseLong(mapaNamedQueries.get("VINCULAR_PROCEDIMENT"));
+                List<GrupEntity> grups = grupHelper.findGrupsNoRelacionatAmbMetaExpedient(
+                        entitat.getId(),
+                        procedimentId,
+                        ogEntity != null ?ogEntity.getId() :null);
+
+                if (grups!=null && grups.size()>0) {
+                    List<Long> grupsIds = new ArrayList<Long>();
+                    if (grups!=null) {
+                        for (GrupEntity ge: grups) {
+                            grupsIds.add(ge.getId());
+                        }
+                    }
+
+                    List<String> grupsOrgansProcedimentIn = Utils.getIdsEnGruposMil(grupsIds);
+                    Filter filtreGrupsProcediment = null;
+                    if (grupsOrgansProcedimentIn!=null) {
+                        for (String aux: grupsOrgansProcedimentIn) {
+                            if (aux != null && !aux.isEmpty()) {
+                                filtreGrupsProcediment = FilterBuilder.or(filtreGrupsProcediment, Filter.parse("id IN (" + aux + ")"));
+                            }
+                        }
+                    }
+
+                    return filtreGrupsProcediment.generate();
+
+                } else {
+                    return FilterBuilder.equal("id", 0).generate();
+                    // ----------------> return sense resultats
+                }
     		}
     		
     		/**
@@ -108,7 +151,7 @@ public class GrupResourceServiceImpl extends BaseMutableResourceService<GrupReso
 		
         Filter filtreBase = FilterBuilder.and(
                 (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null,
-                FilterBuilder.equal(MetaExpedientResource.Fields.entitat + "." + EntitatResource.Fields.codi, 
+                FilterBuilder.equal(GrupResource.Fields.entitat + "." + EntitatResource.Fields.codi,
                 		entitatActualCodi != null?entitatActualCodi:"................................................................................")
         );
 
@@ -146,5 +189,13 @@ public class GrupResourceServiceImpl extends BaseMutableResourceService<GrupReso
         String entitatActualCodi = configHelper.getEntitatActualCodi();
         EntitatResourceEntity entitat = entitatResourceRepository.findByCodi(entitatActualCodi);
         entity.setEntitat(entitat);
+    }
+    
+    private class CountPermisosPerspectiveApplicator implements PerspectiveApplicator<GrupResourceEntity, GrupResource> {
+		@Override
+		public void applySingle(String code, GrupResourceEntity entity, GrupResource resource) throws PerspectiveApplicationException {
+			List<PermisDto> permisosGrup = permisosHelper.findPermisos(entity.getId(), GrupEntity.class); 
+			resource.setNumPermisos(permisosGrup!=null?permisosGrup.size():0);
+		}
     }
 }

@@ -13,7 +13,7 @@ import javax.persistence.TemporalType;
 import es.caib.ripea.persistence.base.entity.BaseAuditableEntity;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.dto.AvisNivellEnumDto;
-import es.caib.ripea.service.intf.model.AlertaResource;
+import es.caib.ripea.service.intf.model.AvisResource;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -23,7 +23,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class AvisResourceEntity extends BaseAuditableEntity<AlertaResource> {
+public class AvisResourceEntity extends BaseAuditableEntity<AvisResource> {
 	@Column(name = "assumpte", length = 256, nullable = false)
 	private String assumpte;
 	@Column(name = "missatge", length = 2048, nullable = false)

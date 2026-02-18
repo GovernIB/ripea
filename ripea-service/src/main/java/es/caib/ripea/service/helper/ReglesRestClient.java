@@ -6,6 +6,7 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 import es.caib.ripea.service.intf.dto.ReglaDistribucioDto;
+import es.caib.ripea.service.intf.dto.TipusProcedimentServeiEnum;
 import es.caib.ripea.service.intf.utils.Utils;
 
 import javax.ws.rs.core.MultivaluedMap;
@@ -40,11 +41,15 @@ public class ReglesRestClient extends RestClient{
 	 * 
 	 */
 	public ClientResponse add(
+			TipusProcedimentServeiEnum tipusProcedimentServei,
 			String entitat, 
 			String sia,
 			String backoffice) {
 		try {
-			String urlAmbMetode = baseUrl + CARPETA_SERVICE_PATH + "/add?entitat=" + entitat + "&sia=" + sia + "&backoffice=" + backoffice;
+			String urlAmbMetode = baseUrl + CARPETA_SERVICE_PATH + "/add?entitat=" + entitat 
+					+ "&sia=" + sia 
+					+ "&backoffice=" + backoffice 
+					+ "&tipusSia=" + (tipusProcedimentServei!=null?tipusProcedimentServei.name():TipusProcedimentServeiEnum.PROCEDIMENT.name());
 			Client jerseyClient = generarIAuthenticarClient(urlAmbMetode);
 			ClientResponse response = jerseyClient
 					.resource(urlAmbMetode)

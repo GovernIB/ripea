@@ -21,9 +21,11 @@ import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.persistence.repository.UsuariRepository;
 import es.caib.ripea.service.intf.dto.AvisDto;
 import es.caib.ripea.service.intf.dto.UsuariAnotacioDto;
+import es.caib.ripea.service.intf.dto.ValidacioErrorDto;
 import es.caib.ripea.service.intf.model.sse.AnotacionsPendentsEvent;
 import es.caib.ripea.service.intf.model.sse.AvisosActiusEvent;
 import es.caib.ripea.service.intf.model.sse.CreacioFluxFinalitzatEvent;
+import es.caib.ripea.service.intf.model.sse.ErrorsValidacioChangedEvent;
 import es.caib.ripea.service.intf.model.sse.FirmaFinalitzadaEvent;
 import es.caib.ripea.service.intf.model.sse.ScanFinalitzatEvent;
 import es.caib.ripea.service.intf.model.sse.TasquesPendentsEvent;
@@ -75,6 +77,19 @@ public class EventHelper {
     	}
     }
     
+    public void notifyErrorsValidacio(ErrorsValidacioChangedEvent errors) {
+    	try {
+    		log.debug("notifyErrorsValidacio a expedient");
+    		jmsTemplate.convertAndSend("errorsValidacioExp", errors);
+    	} catch (Exception ex) {
+    		log.error("Error al notifyErrorsValidacio a expedient", ex);
+    	}
+    }
+    
+    public List<ValidacioErrorDto> getValidacionsInicialsExpedient(Long expedientId) {
+    	return cacheHelper.findErrorsValidacioPerNode(expedientId);
+    }
+    
     public void notifyTasquesPendents(List<String> usuarisAfectats) {
     	try {
     		log.debug("notifyTasquesPendents a clients");
@@ -94,6 +109,14 @@ public class EventHelper {
     public void notifyFluxFirmaFinalitzat(CreacioFluxFinalitzatEvent fluxEvent) {
     	try {
     		jmsTemplate.convertAndSend("flux", fluxEvent);
+    	} catch (Exception ex) {
+    		log.error("Error al notifyFluxFirmaFinalitzat a expedients suscrits", ex);
+    	}
+    }
+    
+    public void notifyFluxFirmaCreat(CreacioFluxFinalitzatEvent fluxEvent) {
+    	try {
+    		jmsTemplate.convertAndSend("fluxCreatEditat", fluxEvent);
     	} catch (Exception ex) {
     		log.error("Error al notifyFluxFirmaFinalitzat a expedients suscrits", ex);
     	}

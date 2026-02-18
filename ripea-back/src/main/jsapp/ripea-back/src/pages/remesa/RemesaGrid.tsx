@@ -17,20 +17,21 @@ export const EstatMessage = (props:any) => {
         title={title || (typeof children === 'string' ?children :'')} 
         sx={{ ...commonStyle, backgroundColor: `${color}.light`, color: 'white' }}>
             <Icon fontSize={"inherit"} sx={{ mr: children!=null  ?1 :0 }}>{icon}</Icon>
-            <Typography sx={{fontSize: '0.8rem', paddingRight: '5px'}}>{children}</Typography>
+            {children && <Typography sx={{fontSize: '0.8rem', paddingRight: '5px'}}>{children}</Typography>}
     </Typography>
 }
 export const StyledEstat = (props:any) => {
     const { entity, children } = props;
-    const { t } = useTranslation()
 
     switch (entity?.notificacioEstat) {
         case 'PENDENT':
             return <>
-                <EstatMessage icon={"schedule"} color='warning'>{children}</EstatMessage>
                 { entity?.error &&
-                    <EstatMessage icon={"warning"} color={'error'}>{t('page.notificacio.detall.estatError')}</EstatMessage>
-                }
+                    <Icon fontSize={"inherit"} 
+                        title={entity.errorDescripcio} 
+                        sx={{ mr: children!=null  ?1 :0, color: 'error.light' }}>warning</Icon>
+                }            
+                <EstatMessage icon={"schedule"} color='warning'>{children}</EstatMessage>
             </>
         case 'REGISTRADA':
             if (entity?.error) {
@@ -138,7 +139,7 @@ const RemesaGrid = (props:any) => {
             onRowCountChange={onRowCountChange}
             disableColumnSorting
             toolbarHideCreate
-            onRowClick={(params: any) => handleOpen(params?.row?.id, params?.row) }
+            onRowClick={(params: any) => handleOpen(params?.row?.id) }
             popupEditFormI18nKeys={{
                 updateSuccess: 'page.notificacio.action.update.ok',
             }}

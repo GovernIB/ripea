@@ -10,7 +10,9 @@ import es.caib.ripea.back.helper.MissatgesHelper;
 import es.caib.ripea.back.helper.RolHelper;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.*;
+import es.caib.ripea.service.intf.model.sse.CreacioFluxFinalitzatEvent;
 import es.caib.ripea.service.intf.service.AplicacioService;
+import es.caib.ripea.service.intf.service.EventService;
 import es.caib.ripea.service.intf.service.MetaDocumentService;
 import es.caib.ripea.service.intf.service.PortafirmesFluxService;
 import es.caib.ripea.service.intf.service.TipusDocumentalService;
@@ -45,6 +47,7 @@ public class MetaDocumentController extends BaseAdminController {
 	@Autowired private TipusDocumentalService tipusDocumentalService;
 	@Autowired private AplicacioService aplicacioService;
 	@Autowired private PortafirmesFluxService portafirmesFluxService;
+	@Autowired private EventService eventService;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String getAll(HttpServletRequest request, Model model) {
@@ -253,6 +256,30 @@ public class MetaDocumentController extends BaseAdminController {
 			model.addAttribute("FluxDescripcio", resposta.getDescripcio());
 		}
 		return "portafirmesModalTancar";
+	}
+	
+	@RequestMapping(value = "/flux/event/{paramSecure}/returnurl/{transactionId}", method = RequestMethod.GET)
+	public void transaccioEstat(
+			HttpServletRequest request,
+			@PathVariable String paramSecure,
+			@PathVariable String transactionId,
+			Model model) {
+		String data = Utils.desencripta(paramSecure, aplicacioService.propertyFindByNom("es.caib.ripea.encription.key"));
+		String[] dataSplri = data.split("#");
+		Long metaDocumentId = null;
+		if (dataSplri[1]!=null && !"null".equals(dataSplri[1].toString()) && Utils.hasValue(dataSplri[1].toString())) {
+			metaDocumentId = Long.parseLong(dataSplri[1].toString());
+		}
+		PortafirmesFluxRespostaDto resposta = portafirmesFluxService.recuperarFluxFirma(transactionId);
+		Long fluxId = portafirmesFluxService.guardarFluxFirmaMetaDocumentRipea(metaDocumentId, resposta);
+		resposta.setId(fluxId);
+		CreacioFluxFinalitzatEvent fluxEvent = new CreacioFluxFinalitzatEvent(
+				null,
+				metaDocumentId,
+				dataSplri[0], //entitatCodi
+				dataSplri[2], //usuariCodi
+				resposta);
+		eventService.notifyFluxFirmaCreat(fluxEvent);
 	}
 
 	@RequestMapping(value = "/flux/returnurl/", method = RequestMethod.GET)

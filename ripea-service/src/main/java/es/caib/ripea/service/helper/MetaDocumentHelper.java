@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 
 import javax.transaction.Transactional;
 
@@ -22,6 +23,7 @@ import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.entity.MetaDocumentEntity;
 import es.caib.ripea.persistence.entity.MetaDocumentFluxPortafibEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientTascaValidacioEntity;
 import es.caib.ripea.persistence.entity.PinbalServeiEntity;
 import es.caib.ripea.persistence.entity.UsuariEntity;
 import es.caib.ripea.persistence.repository.DocumentRepository;
@@ -29,10 +31,15 @@ import es.caib.ripea.persistence.repository.ExpedientRepository;
 import es.caib.ripea.persistence.repository.MetaDocumentFluxPortafibRepository;
 import es.caib.ripea.persistence.repository.MetaDocumentRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientRepository;
+import es.caib.ripea.persistence.repository.MetaExpedientTascaValidacioRepository;
 import es.caib.ripea.persistence.repository.PinbalServeiRepository;
 import es.caib.ripea.persistence.repository.UsuariRepository;
+import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
+import es.caib.ripea.service.intf.dto.ItemValidacioTascaEnum;
 import es.caib.ripea.service.intf.dto.MetaDocumentDto;
 import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
+import es.caib.ripea.service.intf.exception.ExisteixenDocumentsException;
+import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.exception.SistemaExternException;
 import io.micrometer.core.instrument.Timer;
 
@@ -45,7 +52,7 @@ public class MetaDocumentHelper {
 	@Autowired private PluginHelper pluginHelper;
 	@Autowired private CacheHelper cacheHelper;
 	@Autowired private ApplicationHelper applicationHelper;
-	
+	@Autowired private MetaExpedientTascaValidacioRepository metaExpedientTascaValidacioRepository;
 	@Autowired private ExpedientRepository expedientRepository;
 	@Autowired private PinbalServeiRepository pinbalServeiRepository;
 	@Autowired private MetaExpedientRepository metaExpedientRepository;
@@ -54,29 +61,192 @@ public class MetaDocumentHelper {
 	@Autowired private DocumentRepository documentRepository;
 	@Autowired private UsuariRepository usuariRepository;
 	
+	public void moveTo(Long metaDocumentId, int posicio) throws NotFoundException {
+		
+		MetaDocumentEntity metaDocument = metaDocumentRepository.findById(metaDocumentId).get();		
+		List<MetaDocumentEntity> metaDocuments = metaDocumentRepository.findByMetaExpedientOrderByOrdreAsc(metaDocument.getMetaExpedient());
+
+		int anteriorIndex = -1; 
+		for (int i = 0; i < metaDocuments.size(); i++) {
+			if (metaDocuments.get(i).getId().equals(metaDocument.getId())) {
+				anteriorIndex = i;
+				break;
+			}
+		}
+		metaDocuments.add(
+				posicio,
+				metaDocuments.remove(anteriorIndex));
+		for (int i = 0; i < metaDocuments.size(); i++) {
+			metaDocuments.get(i).updateOrdre(i);
+		}
+	}
+	
+	public void marcarPerDefecte(
+			Long entitatId, 
+			Long metaExpedientId,
+			Long metaDocumentId,
+			boolean remove) {
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				false,
+				false,
+				false, 
+				false, 
+				true);
+		MetaDocumentEntity currentMetaDocument = entityComprovarHelper.comprovarMetaDocument(
+				metaDocumentId);
+		MetaExpedientEntity metaExpedientEntity = entityComprovarHelper.comprovarMetaExpedient(
+				entitat, 
+				metaExpedientId);
+//		Recupera els metadocuments del mateix procediment
+		Set<MetaDocumentEntity> metaDocuments = metaExpedientEntity.getMetaDocuments();
+		
+		for (MetaDocumentEntity metaDocumentEntity : metaDocuments) {
+			if (metaDocumentEntity.isPerDefecte()) {
+				metaDocumentEntity.updatePerDefecte(false);
+			}
+		}
+		if (!remove)
+			currentMetaDocument.updatePerDefecte(true);
+	}
+	
+	public MetaDocumentEntity delete(Long entitatId, Long metaExpedientId, Long id, String rolActual, Long organId) {
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				false,
+				false,
+				false, 
+				false, 
+				true);
+
+		MetaExpedientEntity metaExpedient = null;
+		MetaDocumentEntity metaDocumentEntity = null;
+		
+		if (metaExpedientId!=null) {
+			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
+			metaDocumentEntity = entityComprovarHelper.comprovarMetaDocument(entitat, metaExpedient, id);
+			evictErrorsValidacioAndNotify(entitat.getId(), metaExpedient!=null?metaExpedient.getId():null, false);
+		} else {
+			metaDocumentEntity = metaDocumentRepository.findById(id).get();
+		}
+		
+		List<DocumentEntity> docs = documentRepository.findByMetaNode(metaDocumentEntity);
+		if (docs != null && !docs.isEmpty()) {
+			throw new ExisteixenDocumentsException();
+		}
+		
+		//Eliminar les possibles validacions sobre el document
+		List<MetaExpedientTascaValidacioEntity> validacionsDoc = metaExpedientTascaValidacioRepository.findByItemValidacioAndItemId(
+				ItemValidacioTascaEnum.DOCUMENT,
+				id);
+		
+		if (validacionsDoc!=null && validacionsDoc.size()>0) {
+			metaExpedientTascaValidacioRepository.deleteAll(validacionsDoc);
+		}
+		
+		metaDocumentRepository.delete(metaDocumentEntity);
+		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId(), organId);
+		}
+		
+		return metaDocumentEntity;
+	}
+	
+	public MetaDocumentEntity updateActiu(
+			Long entitatId,
+			Long metaExpedientId,
+			Long metaDocumentId,
+			boolean actiu, String rolActual) {
+		
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				false,
+				false,
+				false, 
+				false, 
+				true);
+		
+		MetaExpedientEntity metaExpedient = null;
+		MetaDocumentEntity metaDocumentEntity = null;
+		
+		if (metaExpedientId!=null) {
+			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
+			metaDocumentEntity = entityComprovarHelper.comprovarMetaDocument(entitat, metaExpedient, metaDocumentId);
+		} else {
+			metaDocumentEntity = metaDocumentRepository.findById(metaDocumentId).get();
+		}
+
+		metaDocumentEntity.updateActiu(actiu);
+		
+		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId(), null);
+		}
+
+		evictErrorsValidacioAndNotify(entitat.getId(), metaExpedient!=null?metaExpedient.getId():null, false);
+		
+		return metaDocumentEntity;
+	}
+	
+	//Nomes es crida desde els serveis ResourceService
+	public void evictErrorsValidacioAndNotify(Long entitatId, Long metaExpedientId, boolean notificaSse) {
+
+		if (metaExpedientId!=null) {
+			
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+					entitatId,
+					false,
+					false,
+					false, 
+					false, 
+					true);
+			
+			MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
+			
+			if (metaExpedient != null) {
+			
+				List<ExpedientEntity> expedients = expedientRepository.findByEntitatAndMetaExpedientAndEstatAndEsborrat(
+						entitat, 
+						metaExpedient, 
+						ExpedientEstatEnumDto.OBERT, 
+						0);
+				for (ExpedientEntity expedient: expedients) {
+					if (notificaSse) {
+						cacheHelper.evictErrorsValidacioAndNotify(expedient.getId());
+					} else {
+						cacheHelper.evictErrorsValidacioPerNode(expedient.getId());
+					}
+				}
+			}
+		}
+	}
+	
 	public MetaDocumentEntity update(
 			Long metaExpedientId,
 			MetaDocumentDto metaDocument,
 			String plantillaNom,
 			String plantillaContentType,
 			byte[] plantillaContingut) {
-		
-		MetaDocumentEntity metaDocumentEntity = null;
-		
+
+		MetaDocumentEntity metaDocumentEntity = metaDocumentRepository.findById(metaDocument.getId()).get();
+
 		//El Metadocument pot ser generic (sense associar a un procediment)
 		if (metaExpedientId!=null) {
-			metaDocumentEntity = metaDocumentRepository.findByMetaExpedientIdAndCodi(metaExpedientId, metaDocument.getCodi());
-		} else {
-			metaDocumentEntity = metaDocumentRepository.findById(metaDocument.getId()).get();
+			//Si ha canviat la cardinalitat, refrescar cache de validacions de expedients
+			if (!metaDocument.getMultiplicitat().equals(metaDocumentEntity.getMultiplicitat())) {
+				evictErrorsValidacioAndNotify(
+						metaDocumentEntity.getEntitat().getId(),
+						metaDocumentEntity.getMetaExpedient()!=null?metaDocumentEntity.getMetaExpedient().getId():null,
+						false);
+			}
 		}
-		
+
 		PinbalServeiEntity pinbalServeiEntity = null;
 		if (metaDocument.getPinbalServei()!=null && metaDocument.getPinbalServei().getId()!=null) {
 			pinbalServeiEntity = pinbalServeiRepository.findById(metaDocument.getPinbalServei().getId()).orElse(null);
 		}
 
 		metaDocumentEntity.update(
-				metaDocumentEntity.getCodi(),
+				metaDocument.getCodi(),
 				metaDocument.getNom(),
 				metaDocument.getDescripcio(),
 				metaDocument.getMultiplicitat(),
@@ -97,20 +267,25 @@ public class MetaDocumentHelper {
 				pinbalServeiEntity,
 				metaDocument.getPinbalFinalitat(),
 				metaDocument.isPinbalUtilitzarCifOrgan());
-		
+
 		metaDocumentEntity.updatePerDefecte(metaDocument.isPerDefecte());
 		metaDocumentEntity.updateOrdre(metaDocument.getOrdre());
-		
+
 		if (plantillaContingut != null) {
 			metaDocumentEntity.updatePlantilla(
 					plantillaNom,
 					plantillaContentType,
 					plantillaContingut);
 		}
-		
+
 		updateFluxos(metaDocumentEntity, metaDocument.getPortafirmesFluxosId());
-		
+
 		return metaDocumentEntity;
+	}
+	
+	//Es crida desde el servei de BASEBOOT despres del create
+	public void updateFluxosFirmaMetaDoc(Long metaDocumentEntityId, String[] newFluxos) {
+		metaDocumentRepository.findById(metaDocumentEntityId).get();
 	}
 	
 	@Transactional(dontRollbackOn = SistemaExternException.class)
@@ -121,7 +296,12 @@ public class MetaDocumentHelper {
 			for (String fluxId : newFluxos) {
 				//Insertar els fluxos que no existeixen actualment a la entitat
 				if (!metaDocumentEntity.fluxeExistById(fluxId))	{
+					//Revisam si hi ha algun flux amb aquest ID pero sense meta-doc associat.
+					MetaDocumentFluxPortafibEntity fluxOrfe = metaDocumentFluxPortafibRepository.findByMetaDocumentIsNullAndPortafirmesFluxId(fluxId);
 					MetaDocumentFluxPortafibEntity metaDocumentFluxPortafibEntity = new MetaDocumentFluxPortafibEntity();
+					if (fluxOrfe!=null) {
+						metaDocumentFluxPortafibEntity = fluxOrfe;
+					}
 					metaDocumentFluxPortafibEntity.setMetaDocument(metaDocumentEntity);
 					metaDocumentFluxPortafibEntity.setPortafirmesFluxId(fluxId);
 					try {
@@ -175,6 +355,7 @@ public class MetaDocumentHelper {
 			if (metaExpedientId!=null) {
 				metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
 				ordre = metaDocumentRepository.countByMetaExpedient(metaExpedient);
+				evictErrorsValidacioAndNotify(entitat.getId(), metaExpedient!=null?metaExpedient.getId():null, false);
 			}
 			
 			PinbalServeiEntity pinbalServeiEntity = null;
@@ -259,7 +440,7 @@ public class MetaDocumentHelper {
 					null, 
 					findAllMarkDisponiblesPerCreacio);
 		} else {
-			MetaExpedientEntity metaExpedient =  metaExpedientRepository.getOne(metaExpedientId);
+			MetaExpedientEntity metaExpedient =  metaExpedientRepository.findById(metaExpedientId).get();
 			metaDocuments = findMetaDocumentsDisponiblesPerCreacio(
 					entitat,
 					null, 

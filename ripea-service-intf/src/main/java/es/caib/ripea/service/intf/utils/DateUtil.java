@@ -2,6 +2,7 @@ package es.caib.ripea.service.intf.utils;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -197,4 +198,15 @@ public class DateUtil {
         return cal.getTime();
 	}
 
+	public static OffsetDateTime toOffsetDateTime(Date fechaDate) {
+		if (fechaDate!=null) {
+			if (fechaDate instanceof java.sql.Date) {
+		        return ((java.sql.Date)fechaDate).toLocalDate().atStartOfDay(ZoneId.systemDefault()).toOffsetDateTime();
+			} else {
+				return fechaDate.toInstant().atZone(ZoneId.systemDefault()).toOffsetDateTime();
+			}
+		} else {
+			return null;
+		}
+	}
 }

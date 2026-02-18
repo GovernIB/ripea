@@ -1,7 +1,9 @@
 package es.caib.ripea.service.resourcehelper;
 
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
@@ -27,10 +29,12 @@ import es.caib.ripea.persistence.entity.resourcerepository.ContingutResourceRepo
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.persistence.repository.TipusDocumentalRepository;
 import es.caib.ripea.service.helper.ArxiuConversions;
+import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.ContingutHelper;
 import es.caib.ripea.service.helper.ConversioTipusHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.PluginHelper;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.ArxiuContingutDto;
 import es.caib.ripea.service.intf.dto.ArxiuContingutTipusEnumDto;
 import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
@@ -58,6 +62,7 @@ public class ContingutResourceHelper {
     private final PluginHelper pluginHelper;
     private final ConversioTipusHelper conversioTipusHelper;
     private final ContingutHelper contingutHelper;
+    private final ConfigHelper configHelper;
 
     public boolean contingutHasDocumentsFills(Long contingutPareId) {
 //    	return carpetaResourceRepository.contingutHasDocumentsFills(contingutPareId);
@@ -114,6 +119,14 @@ public class ContingutResourceHelper {
             arxiuDetall.setEniIdentificador(metadades.getIdentificador());
             arxiuDetall.setSerieDocumental(metadades.getSerieDocumental());
             arxiuDetall.setEniDataObertura(metadades.getDataObertura());
+			try {
+				Object fechaFinExp = arxiuExpedient.getExpedientMetadades().getMetadadaAddicional("eni:fecha_fin_exp");
+				if (fechaFinExp!=null && Utils.hasValue(fechaFinExp.toString())) {
+					OffsetDateTime odt = OffsetDateTime.parse(fechaFinExp.toString());
+					Date dateFinExp = Date.from(odt.toInstant());
+					arxiuDetall.setEniDataTancament(dateFinExp);
+				}
+			} catch (Exception ex) {}            
             arxiuDetall.setEniClassificacio(metadades.getClassificacio());
             if (metadades.getEstat() != null) {
                 switch (metadades.getEstat()) {
@@ -146,7 +159,11 @@ public class ContingutResourceHelper {
             arxiuDetall.setEniIdentificador(metadades.getIdentificador());
             arxiuDetall.setSerieDocumental(metadades.getSerieDocumental());
             arxiuDetall.setEniDataCaptura(metadades.getDataCaptura());
-
+			String codiCsv = metadades.getCsv();
+			if (Utils.hasValue(codiCsv)) {
+				arxiuDetall.setCsv(codiCsv);
+				arxiuDetall.setCsvLink(configHelper.getConfig(PropertyConfig.CONCSV_BASE_URL));
+			}
             arxiuDetall.setEniOrigen(ArxiuConversions.getOrigen(metadades.getOrigen()));
 
             arxiuDetall.setEniEstatElaboracio(ArxiuConversions.getEstatElaboracio(metadades.getEstatElaboracio()));

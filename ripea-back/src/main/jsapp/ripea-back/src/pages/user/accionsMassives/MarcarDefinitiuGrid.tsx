@@ -34,7 +34,7 @@ const columns = [
     {
         field: 'createdByFullName',
         flex: 0.6,
-        sortProcessor: (field: string, sort: GridSortDirection) => [ { field: "createdBy", sort } ]
+        sortProcessor: (_field: string, sort: GridSortDirection) => [ { field: "createdBy", sort } ]
     },
 ]
 
@@ -45,7 +45,6 @@ const MarcarDefinitiuGrid = () => {
     const [springFilter, setSpringFilter] = useState<string>();
 
     const refresh = () => {
-        dataApiRef?.current?.setRowSelectionModel?.([])
         apiRef?.current?.refresh?.();
     }
 

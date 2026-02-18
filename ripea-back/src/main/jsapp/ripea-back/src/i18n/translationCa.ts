@@ -31,7 +31,12 @@ const translationCa = {
         filter: "Filtrar",
         downloadSelected: "Descarrega contingut seleccionat",
         relateSelected: "Relaciona contingut seleccionat",
-        processing: "Processant..."
+        processing: "Processant...",
+        auditoria: {
+            create: "Creat el {{createdDate}} per '{{createdBy}}'.",
+            update: "Modificat el {{lastModifiedDate}} per '{{lastModifiedBy}}'.",
+        },
+        nouPermis: "Nou permís",
     },
     enum: {
         rol: {
@@ -167,6 +172,7 @@ const translationCa = {
         contingut: {
             grid: {
                 nom: "Nom",
+                path: "Ruta contingut",
             },
             detalle: {
                 title: "Detalls del contingut",
@@ -260,6 +266,12 @@ const translationCa = {
                 },
                 replay: {
                     label: "Recuperar",
+                    ok: "El contingut s'ha recuperat correctament",
+                    massiveOk: "Els continguts s'han recuperat correctament",
+                },
+                delete: {
+                    ok: "El contingut s'ha eliminat correctament",
+                    massiveOk: "Els continguts s'han eliminat correctament",
                 },
             },
             history: {
@@ -319,6 +331,7 @@ const translationCa = {
                 canviEstatDistribucio: {
                     label: "Canviar estat a distribució",
                     ok: "L'estat ha canviat correctament",
+                    massiveOk: "S'han actualitzat l'estat de '{{data.num}}' anotacions",
                 },
                 descargarAnnex: {
                     label: "Descarregar annex",
@@ -327,12 +340,18 @@ const translationCa = {
                 procesarAnnexosPendents: {
                     label: "Adjuntar",
                     ok: "El annex s'ha processat correctament",
+                    massiveOk: "S'han processat '{{data.num}}' annexos",
                     info: "Si s'ha produït algun error al acceptar una anotació des de la pantalla Anotacions, de manera que algun dels documents de l'anotació no s'han adjuntat a l'expedient, des d'aquest llistat podrà tornar a intentar adjuntar el document a l'expedient.",
                 },
                 firma: {
                     label: "Signatures",
                     title: "Signatures",
-                }
+                },
+                consultar: {
+                    label: "Consultar",
+                    ok: "L'anotació s'ha consultat y guardat correctament",
+                    massiveOk: "S'ha consultat y guardat correctament {{data.num}} annotations",
+                },
             }
         },
         tasca: {
@@ -417,6 +436,7 @@ const translationCa = {
             title: "Interessat",
             rep: "Representant",
             detall: {
+				tipus: "Tipus",
                 nif: "NIF/CIF/NIE",
                 nom: "Nom",
                 raoSocial: "Raó social",
@@ -497,7 +517,6 @@ const translationCa = {
 				title: "Grups d'interessats",
 				action: {
 					new: {
-						label: "Nou Grup",
 						ok: "Grup creat correctament",
 					},
 					update: {
@@ -508,7 +527,7 @@ const translationCa = {
 					    check: "Esteu segur que voleu continuar amb aquesta acció?",
 					    description: "Un cop esborrat no es podrà recuperar",
 					    ok: "El grup {{data.nom}} s'ha esborrat correctament",
-					},
+					},                 
 				},
 			},
         },
@@ -629,11 +648,13 @@ const translationCa = {
                     label: "Canviar prioritat...",
                     title: "Modificar prioritat de l’expedient",
                     ok: "La prioritat de l’expedient '{{expedient}}' s’ha modificat correctament.",
+                    massiveOk: "S'han cambiat la prioritat de '{{data.num}}' expedients",
                 },
                 changeEstat: {
                     label: "Canviar estat...",
                     title: "Modificar estat de l’expedient",
                     ok: "L’estat de l’expedient '{{expedient}}' s’ha modificat correctament.",
+                    massiveOk: "S'ha cambiat l'estat a '{{data.num}}' expedients"
                 },
                 assignar: {
                     label: "Assignar...",
@@ -657,11 +678,16 @@ const translationCa = {
                 impDocMass: {
                     label: "Importar documents als expedients seleccionats",
                     title: "Importar documents a expedients",
-                    warning: "Els expedients han de pertanyer al mateix procediment",
+                    warning: "Els expedients han de pertànyer al mateix procediment.",
                 },
                 comment: {
                     ok: "Comentari afegit a l'expedient '{{data.expedient.description}}'",
                 },
+				moureTot: {
+					label: "Moure tot...",
+				    title: "Moure tot a l'expedient destí",
+				    ok: "L'acció massiva per moure l'expedient '{{expedient}}' s'ha creat correctament.",
+	            },
             },
             alert: {
                 owner: "És necessari reservar l’expedient per poder-lo modificar",
@@ -669,20 +695,32 @@ const translationCa = {
                 validation: "Aquest expedient té errors de validació",
                 esborranys: "Hi ha documents en estat esborrany (B) que s’han de passar a definitius o eliminar-se si es vol tancar l’expedient.\nAquesta acció farà que els documents formin part de l’expedient definitivament i no es podran eliminar.",
                 borradors: "Aquest expedient conté esborranys que s’eliminaran en tancar-lo. Pot marcar-los per signar-los amb signatura de servidor i evitar-ne l’eliminació. Les firmes no vàlides seran eliminades i es tornaran a signar.",
-                notificacio: "Aquest expedient conté notificacions caducades no finalitzades. Es provarà d’actualitzar-ne l’estat. Les noves dades es desaran a Helium, però no a l’arxiu digital.",
+                notificacio: "Aquest expedient conté notificacions caducades no finalitzades. Es provarà d’actualitzar-ne l’estat. Les noves dades es desaran a RIPEA, però no a l’arxiu digital.",
                 documents: "Aquest expedient conté documents d’anotacions amb errors. Es provaran de reprocesar i, si no és possible, es guardarà una còpia sense signatures originals a l’arxiu digital.",
                 errorEnviament: "Aquest expedient té enviaments amb errors",
                 errorNotificacio: "Aquest expedient té notificacions amb errors",
                 ambEnviamentsPendents: "Aquest expedient té enviaments pendents de Portasignatures",
                 ambNotificacionsPendents: "Aquest expedient té notificacions pendents",
                 canviEstat: "És necessari seleccionar un procediment per poder realitzar l'acció massiva",
+				moureTot: {
+					info: "L'expedient es troba actualment bloquejat a causa d'una execució en segon pla en curs.\nFins que aquesta finalitzi, no serà possible realitzar modificacions. Consulteu les accions massives pendents per conèixer el seu estat.",
+				  	title: "Estàs a punt d'iniciar una acció massiva que mourà la informació següent cap a l'expedient destí:",
+				  	items: [
+				    	"Els documents i carpetes",
+						"Els interessats",
+				    	"Els seguidors",
+				    	"Els expedients relacionats",
+				    	"Les anotacions de registre",
+				    	"Els comentaris"
+				  ],
+				},
             },
             modal: {
                 seguidors: "Seguidors de l’expedient",
             },
             results: {
-                checkDelete: "Esteu segur que voleu eliminar aquest element?",
-                checkRelacio: "Esteu segur que voleu eliminar aquesta relació?",
+                checkDelete: "Estau segur que voleu eliminar aquest contingut? Si contenia firmes en curs, seràn cancelades.",
+                checkRelacio: "Estau segur que voleu eliminar aquesta relació?",
                 actionOk: "L’acció s’ha executat correctament.",
                 actionBackgroundOk: "L’acció s’ha preparat per executar-se en segon pla. Podeu consultar-ne l’estat al llistat d’accions massives.",
             }
@@ -701,6 +739,7 @@ const translationCa = {
                 organ: "Òrgan",
                 dataCaptura: "Data de captura",
                 dataApertura: "Data d'obertura",
+                dataTancament: "Data de tancament",
                 origen: "Origen",
                 estadoElaboracion: "Estat d'elaboració",
                 tipoDocumental: "Tipus documental NTI",
@@ -770,6 +809,10 @@ const translationCa = {
                 naixement: "Naixement",
                 dadesAdicionals: "Dades addicionals",
                 dataOther: "Altres dades",
+                senseTipus: 'Sense tipus assignat',
+                extensio: "Extensio",
+                ruta: "Ruta",
+                mida: "Mida",
             },
             action: {
                 new: {
@@ -780,7 +823,7 @@ const translationCa = {
                 },
                 delete: {
                     label: "Esborrar",
-                    check: "Està segur que vol continuar amb aquesta acció?",
+                    check: "Estau segur que voleu eliminar aquest contingut? Si contenia firma en curs, serà cancelada.",
                     description: "Un cop esborrat no es podrà recuperar",
                     ok: "El document {{data.nom}} s'ha eliminat correctament"
                 },
@@ -789,15 +832,55 @@ const translationCa = {
                     title: "Nova consulta PINBAL",
                     ok: "S'ha creat el document a partir de la consulta pinbal '{{codiServeiPinbal}}'",
                 },
-                import: {
+				import: {
+					close: {
+						check: "Estau segur que voleu tancar aquesta finestra?",
+						description: "L'importació continuarà en segon pla i podreu consultar el resultat a l'expedient més tard.",
+					},
+					cancel: {
+						check: "Esteu segur que voleu cancel·lar la importació?",
+						description: "Els documents importats fins a aquest moment es conservaran a l’expedient.",
+					},
+				},
+                importSgd: {
                     label: "Importar documents SGD...",
                     title: "Importació de documents des del SGD",
                     ok: "Documents importats correctament",
+					interessats: "Selecciona els interessats que desitgi associar a l'expedient",
+					interessat: {
+						tipus: {
+							1: "Administrador",
+							2: "Persona física",
+							3: "Persona jurídica",
+						},
+					},
+					resultat: {
+						title: "Resultat:",
+						ok: "Procés importació completat",
+						documents: "Documents processats correctament: ",
+						interessats: "Interessats processats correctament: ",
+						carpetes: "Carpetes creades correctament: ",
+						errors: "Errors detallats: ",
+					}
                 },
                 importZip: {
                     label: "Importar des de ZIP...",
                     title: "Importació de documents des d'un ZIP",
                     ok: "Documents importats correctament",
+					resultat: {
+						title: "Resultat:",
+						ok: "Procés importació completat",
+						documents: {
+							ok: "Documents processats correctament: ",
+							ko: "Documents amb error: ",
+							firma: "Documents amb error de firma: ",
+						},
+						carpetes: {
+							ok: "Carpetes creades correctament: ",
+						},
+						tamany: "Tamany total processat: ",
+						errors: "Errors detallats: ",
+					}
                 },
                 detall: {
                     label: "Detalls",
@@ -918,6 +1001,7 @@ const translationCa = {
                     label: "Convertir a definitiu",
                     description: "Aquesta acció farà que els documents passin a formar part de l'expedient de forma definitiva i no es podran eliminar.",
                     ok: "Document '{{document}}' canviat a definitiu",
+                    massiveOk: "S'han marcat com definitius '{{data.num}}' documents",
                 },
             },
             alert: {
@@ -936,6 +1020,7 @@ const translationCa = {
                 scaned: "El procés d'escaneig s'ha realitzat amb èxit.",
                 view: "Nomes per PDF, ODT i DOCX",
                 portafirmes: "És necessari seleccionar un procediment i un tipus de document per poder realitzar l'acció massiva",
+                documentsZip: "S'ha de seleccionar com a mínim un document per fer l'importació",
             },
             versio: {
                 title: "Versió",
@@ -945,6 +1030,9 @@ const translationCa = {
         },
         carpeta: {
             title: "Carpeta",
+            detail: {
+                tite: "Detall de la carpeta",
+            },
             action: {
                 new: {
                     label: "Carpeta...",
@@ -961,7 +1049,13 @@ const translationCa = {
                     description: "Un cop esborrada no es podrà recuperar",
                     ok: "Carpeta '{{data.nom}}' eliminada correctament",
                 }
-            }
+            },
+			restriccions: {
+				 title: "Selecciona els usuaris que tindran accés a la carpeta (d’entre els que ja tenen accés al procediment)",
+			     notEmpty: {
+				 		message: "S'ha de seleccionar com a mínim un usuari per crear la restricció"	
+				 }
+			}
         },
         dada: {
             title: "valor per a la dada '{{metaDada}}'",
@@ -987,8 +1081,32 @@ const translationCa = {
             },
         },
         metaDada: {
-            title: "Tipus de dada",
-            detail: "Valors de la dada '{{metaDada}}'",
+            title: "Meta-dada",
+            plural: "Meta-dades",
+            detail: {
+                title: "Detall de la meta-dada",
+                value: "Valors de la meta-dada '{{metaDada}}'",
+            },
+            action: {
+                activar: {
+                    label: "Activar",
+                    ok: "Meta-dada activada",
+                },
+                desactivar: {
+                    label: "Desactivar",
+                    ok: "Meta-dada desactivada",
+                },
+                new: {
+                    label: "Nova metadada",
+                    ok: "Meta-dada creada correctament",
+                },
+                update: {
+                    ok: "Meta-dada modificada correctament",
+                },
+                delete: {
+                    ok: "Meta-dada eliminada correctament",
+                },
+            },
         },
         registre: {
             grid: {
@@ -1181,8 +1299,15 @@ const translationCa = {
         },
         grup: {
             title: "Grup",
+            detail: {
+                title: "Detall del grup",
+            },
+            grid: {
+                default: "Per defecte",
+            },
             action: {
                 new: {
+                    label: "Nou Grup",
                     ok: "Grup '{{data.codi}}' creat correctament",
                 },
                 update: {
@@ -1190,6 +1315,23 @@ const translationCa = {
                 },
                 delete: {
                     ok: "Grup '{{data.codi}}' esborrat correctament",
+                },
+                link: {
+                    label: "Víncular grup",
+                    title: "Víncular grup",
+                    ok: "Grup vinculat",
+                },
+                unlink: {
+                    label: "Desvincular",
+                    ok: "Grup desvinculat",
+                },
+                default: {
+                    label: "Marcar per defecte",
+                    ok: "Grup marcat com defecte",
+                },
+                undefault: {
+                    label: "Llevar per defecte",
+                    ok: "Grup desmarcat com defecte",
                 },
             },
         },
@@ -1199,12 +1341,31 @@ const translationCa = {
                 update: {
                     ok: "Òrgan Gestor '{{data.codi}}' esborrat correctament",
                 },
+                actualitzar: {
+                    title: "Predicció de sincronització",
+                    label: "Actualitzar òrgans gestors de DIR3",
+                    ok: "Els òrgans estan actualitzats",
+                    button: "Sincronitza",
+                    tabs: {
+                        empty: "Els òrgans estan actualitzats",
+                        firstSync: "Primera sincronització",
+                        split: "Divisions",
+                        merge: "Fusions",
+                        subst: "Substitucions",
+                        change: "Canvis en atributs",
+                        new: "Nous",
+                        del: "Extingides",
+                    },
+                },
+                vista: "Canvi vista",
+                pdf: "Descarrega PDF",
             },
         },
         tipusDocumental: {
             title: "Tipus documental",
             action: {
                 new: {
+                    label: "Afegir tipus documental",
                     ok: "Tipus documental '{{data.codi}}' creat correctament",
                 },
                 update: {
@@ -1212,6 +1373,272 @@ const translationCa = {
                 },
                 delete: {
                     ok: "Tipus documental '{{data.codi}}' esborrat correctament",
+                },
+            },
+        },
+        metaExpedient: {
+            title: "Procediment",
+            detall: {
+                elementsProc: "Gestió del procediment: {{nom}}",
+                elementsServ: "Gestió del servei: {{nom}}",
+                expressioNumero: "Si no s'especifica cap expressió s'utilitzarà aquesta per defecte: {{codi}}/{{seq}}/{{any}}",
+                permisDirecte: "Un usuari administrador de l'entitat pot modificar aquest valor.",
+                responsable: "Podeu canviar el responsable de firma",
+                portafirmesResponsables: "Podeu canviar els responsables de firma",
+                regla: {
+                    create: "Creada",
+                    data: "Data creació",
+                    activa: "Activa",
+                    nom: "Nom",
+                },
+            },
+            tabs: {
+                dades: "Dades",
+                estat: "Estat revisió",
+
+                metaDocument: "Tipus de doc.",
+                metaDada: "Meta-Dades",
+                expedientEstat: "Estats",
+                tasca: "Tasques",
+                grup: "Grups",
+                carpeta: "Carpetes",
+            },
+            action: {
+                new: {
+                    label: "Nou procediment",
+                    ok: "Procediment creat correctament",
+                },
+                update: {
+                    ok: "Procediment modificat correctament",
+                },
+                delete: {
+                    ok: "Procediment eliminat correctament",
+                },
+                consultar: {
+                    title: "Detall del procediment",
+                    label: "Consultar",
+                    revisat: "Aquest procediment no es pot modificar ja que es troba en estat revisat",
+                },
+                canviEstat: {
+                    title: "Canviar estat de revisó",
+                    label: "Canviar l'estat de revisó",
+                    ok: "",
+                },
+                expedient: {
+                    title: "Expedients del procediment: {{nom}}",
+                    label: "Expedients",
+                },
+                regla: {
+                    title: "Estat de la regla en Distribució",
+                    label: "Regla distribució",
+                    create: {
+                        label: "Crear regla en Distribució",
+                        ok: "La regla amb codi '{{nom}}' s'ha creat correctament.",
+                    },
+                    active: {
+                        label: "Activar regla en Distribució",
+                        ok: "La regla amb codi '{{nom}}' s'ha activat correctament.",
+                    },
+                    desactive: {
+                        label: "Desactivar regla en Distribució",
+                        ok: "La regla amb codi '{{nom}}' s'ha desactivat correctament",
+                    },
+                },
+                activar: {
+                    label: "Activar",
+                    ok: "Procediment activat correctament",
+                },
+                desactivar: {
+                    label: "Desactivar",
+                    ok: "Procediment desactivat correctament",
+                },
+                comment: {
+                    ok: "Comentari afegit al procediment '{{data.metaExpedient.description}}'",
+                },
+                importRolsac: {
+                    title: "Importar procediment des de ROLSAC",
+                    label: "Importar des de ROLSAC",
+                },
+                importFitxer: {
+                    title: "Importar procediment",
+                    label: "Importar des de fitxer",
+                    ok: "Procediment importat correctament",
+                },
+                export: {
+                    ok: "Procediment exportat correctament",
+                },
+                canviPendent: {
+                    label: "Marcar com a pendent de revisió",
+                    ok: "Procediment marcat com a pendent de revisió",
+                },
+                canviDisseny: {
+                    label: "Marcar com a procés de disseny",
+                    ok: "Procediment marcat com a procés de disseny",
+                },                
+                actualize: {
+                    title: "Actualització de procediments",
+                    label: "Actualitzar desde ROLSAC",
+                    description: "Vols actualitzar els procediments amb la informació de ROLSAC?",
+                    ok: "Procediments actualitzats",
+                    result: {
+                        title: "Inici de procés d'actualització dels procediments",
+                        description: "S'han realitzat '{{numOperacions}}' peticions, s'han modificat '{{numActualitzats}}' procediments, i '{{numErrord}}' han donat error",
+                        senseCanvi: "Sense canvis",
+                    }
+                }
+            },
+            alert: {
+                pendentsRevisio: "Hi ha {{num}} procedimientos o servicios pendents de revisar",
+            },
+        },
+        metaDocument: {
+            title: "Tipus de document",
+            detail: {
+                title: "Detall de tipus de document",
+            },
+            tabs: {
+                dades: "Dades",
+                nti: "Dades NTI",
+                portafirmes: "Firma amb portafirmes",
+                navegador: "Firma amb navegador",
+                viaFirma: "Firma amb viaFirma",
+                pinbal: "PINBAL",
+            },
+            action: {
+                default: {
+                    label: "Marcar per defecte",
+                    ok: "Tipus de document marcat com defecte",
+                },
+                undefault: {
+                    label: "Borrar per defecte",
+                    ok: "Tipus de document desmarcat com defecte",
+                },
+                activar: {
+                    label: "Activar",
+                    ok: "Tipus de document activat",
+                },
+                desactivar: {
+                    label: "Desactivar",
+                    ok: "Tipus de document desactivat",
+                },
+                new: {
+                    label: "Nou tipus de document",
+                    ok: "Tipus de document creat correctament",
+                },
+                update: {
+                    ok: "Tipus de document modificat correctament",
+                },
+                delete: {
+                    ok: "Tipus de document eliminat correctament",
+                },
+            },
+        },
+        expedientEstat: {
+            title: "Estat del procediment",
+            detail: {
+                title: "Detall de l'estat del procediment"
+            },
+            action: {
+                new: {
+                    label: "Nou estat",
+                    ok: "Estat creat correctament",
+                },
+                update: {
+                    ok: "Estat modificat correctament",
+                },
+                delete: {
+                    ok: "Estat eliminat correctament",
+                },
+            },
+        },
+        metaExpedientTasca: {
+            title: "Tasca",
+            detall: {
+                title: "Detall de la tasca",
+                duracio: "Duració de la tasca en dies naturals.",
+                validacio: "Validacions de la tasca: {{nom}}",
+            },
+            action: {
+                activar: {
+                    label: "Activar",
+                    ok: "Tasca activat",
+                },
+                desactivar: {
+                    label: "Desactivar",
+                    ok: "Tasca desactivat",
+                },
+                new: {
+                    label: "Nova tasca",
+                    ok: "Tasca creat correctament",
+                },
+                update: {
+                    ok: "Tasca modificat correctament",
+                },
+                delete: {
+                    ok: "Tasca eliminat correctament",
+                },
+            },
+        },
+        metaExpedientTascaValidacio: {
+            title: "Validació",
+            detail: {
+                title: "Detall de la validació",
+            },
+            action: {
+                activar: {
+                    label: "Activar",
+                    ok: "Validació activat",
+                },
+                desactivar: {
+                    label: "Desactivar",
+                    ok: "Validació desactivat",
+                },
+                new: {
+                    label: "Nova validació",
+                    ok: "Validació creat correctament",
+                },
+                update: {
+                    ok: "Validació modificat correctament",
+                },
+                delete: {
+                    ok: "Validació eliminat correctament",
+                },
+            },
+        },
+        domini: {
+            title: "Domini",
+            action: {
+                cleanCache: {
+                    label: "Buidar cache",
+                    ok: "La cache s'ha buidat correctament",
+                },
+                new: {
+                    label: "Afegir domini",
+                    ok: "Domini creat correctament",
+                },
+                update: {
+                    ok: "Domini modificat correctament",
+                },
+                delete: {
+                    ok: "Domini eliminat correctament",
+                },
+            },
+        },
+        urlInstruccio: {
+            title: "URL Instrucció",
+            detall: {
+                url: "Formats disponibles:\n - http://URL.es/alegar/[ENI]",
+            },
+            action: {
+                new: {
+                    label: "Nova url instrucció",
+                    ok: "Url creat correctament",
+                },
+                update: {
+                    ok: "Url modificat correctament",
+                },
+                delete: {
+                    ok: "Url eliminat correctament",
                 },
             },
         },
@@ -1234,6 +1661,7 @@ const translationCa = {
             action: {
                 new: {
                     title: "Crear nou permís",
+                    label: "Nou permís",
                     ok: "El permís per '{{data.principal}} {{data.sid}}' s'ha creat correctament",
                 },
                 update: {
@@ -1272,12 +1700,13 @@ const translationCa = {
                 backVersio: "Interfície clàssica",
 
                 anotacions: "Anotacions",
-                procediments: "Gestió de procediments",
+                procediments: "Procediments i serveis",
+                procedimentsTitle: "Gestió de procediments i serveis",
+                procedimentsRevisorTitle: "Revisió de procediments i serveis",
                 procedimentPermis: "Permisos del procediment: {{nom}}",
-                procedimentsTitle: "L'entitat té procediments amb òrgans gestors no actualitzats",
                 grups: "Grups",
                 grupPermis: "Permisos del grup",
-                revisar: "Revisió de procediments",
+                revisar: "Revisió de procediments i serveis",
                 tasca: "Tasques",
                 flux: "Fluxos de firma",
 
@@ -1292,6 +1721,7 @@ const translationCa = {
                 comunicades: "Anotacions comunicades",
 
                 documents: "Tipus de documents",
+                documentDada: "Meta-dades del tipus de document: {{nom}}",
                 nti: "Tipus documentals NTI",
                 dominis: "Dominis",
                 organs: "Òrgans gestors",
@@ -1333,7 +1763,7 @@ const translationCa = {
             }
         },
         alert: {
-            title: "Alertes d'expedient",
+            title: "Errors de validació del expedient",
             action: {
                 read: {
                     label: "Marcar com a llegida",

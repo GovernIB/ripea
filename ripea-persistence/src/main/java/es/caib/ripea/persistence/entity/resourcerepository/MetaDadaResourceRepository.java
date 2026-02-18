@@ -8,8 +8,6 @@ import es.caib.ripea.persistence.entity.resourceentity.MetaNodeResourceEntity;
 import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
 
 public interface MetaDadaResourceRepository extends BaseRepository<MetaDadaResourceEntity, Long> {
-
-	List<MetaDadaResourceEntity> findByMetaNodeAndActivaTrueAndMultiplicitatIn(
-			MetaNodeResourceEntity metaExpedient,
-			MultiplicitatEnumDto[] multiplicitats);
+	List<MetaDadaResourceEntity> findByMetaNodeAndActivaTrueAndMultiplicitatIn(MetaNodeResourceEntity metaExpedient, MultiplicitatEnumDto[] multiplicitats);
+	int countByMetaNodeId(Long metaExpedientId);
 }

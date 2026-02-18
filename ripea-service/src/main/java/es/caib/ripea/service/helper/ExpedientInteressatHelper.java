@@ -112,7 +112,7 @@ public class ExpedientInteressatHelper {
 			arxiuPropagarInteressats(expedient, interessatEntity);
 		}
 		
-		cacheHelper.evictErrorsValidacioPerNode(expedient.getId());
+		cacheHelper.evictErrorsValidacioAndNotify(expedient.getId());
 		
 		return interessatEntity;
 	}
@@ -589,7 +589,7 @@ public class ExpedientInteressatHelper {
 					false,
 					false);
 			
-			cacheHelper.evictErrorsValidacioPerNode(expedient.getId());
+			cacheHelper.evictErrorsValidacioAndNotify(expedient.getId());
 		} else {
 			logger.error("No s'ha trobat l'interessat a l'expedient ("
 					+ "expedientId=" + expedientId + ", "
@@ -706,6 +706,21 @@ public class ExpedientInteressatHelper {
 		ExpedientEntity expedient = expedientRepository.getOne(expId);
 		expedient.updateArxiuIntent(true);
 		return arxiuPropagarInteressats(expedient, null);
+	}
+	
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public String importarInteressatsNewTransaction(
+			Long entitatId,
+			Long expedientId,
+			String rolActual,
+			List<InteressatDto> interessats) {
+		List<Long> seleccionats = new ArrayList<Long>();
+		if (interessats!=null) {
+			for (InteressatDto iDto: interessats) {
+				seleccionats.add(iDto.getId());			
+			}			
+		}
+		return importarInteressats(entitatId, expedientId, rolActual, interessats, seleccionats);
 	}
 
 	public String importarInteressats(
@@ -1012,10 +1027,7 @@ public class ExpedientInteressatHelper {
 		return null;
 	}
 	
-	public Exception arxiuPropagarInteressats(
-			ExpedientEntity expedient,
-			InteressatEntity interessat) {
-		
+	public Exception arxiuPropagarInteressats(ExpedientEntity expedient, InteressatEntity interessat) {
 		Exception exception = null;
 		try {
 			
@@ -1023,29 +1035,18 @@ public class ExpedientInteressatHelper {
 			if (throwExcepcionAbans) {
 				throw new RuntimeException("Mock excepcion abans de modificar expedient en arxiu");
 			}			
-			
 			contingutHelper.arxiuPropagarModificacio(expedient);
-			
-			updateArxiuIntentInteressats(
-					expedient,
-					interessat,
-					true);
+			updateArxiuIntentInteressats(expedient, interessat, true);
 
 		} catch (Exception e) {
 			logger.error("Error al custodiar interessats en arxiu (" +
 					"expedient id=" + expedient.getId() + ", entitatCodi=" + configHelper.getEntitatActualCodi() + ")",
 					e);
 			exception = e;
-			
-			updateArxiuIntentInteressats(
-					expedient,
-					interessat,
-					false);
-
+			updateArxiuIntentInteressats(expedient, interessat, false);
 		}
 		return exception;
 	}
-	
 	
 	public void updateArxiuIntentInteressats(
 			ExpedientEntity expedient,
@@ -1075,11 +1076,8 @@ public class ExpedientInteressatHelper {
                 ).collect(Collectors.toList());
 	}
 	
-	public List<InteressatEntity> findByExpedientAndNotRepresentantAndAmbDadesPerNotificacio(
-			ExpedientEntity expedient) {
-
+	public List<InteressatEntity> findByExpedientAndNotRepresentantAndAmbDadesPerNotificacio(ExpedientEntity expedient) {
 		List<InteressatEntity> interessats = new ArrayList<>();
-
 		interessats.addAll(interessatRepository.findPersFisicByExpedientAndNotRepresentantAndAmbDadesPerNotificacio(expedient));
 		interessats.addAll(interessatRepository.findPersJuridByExpedientAndNotRepresentantAndAmbDadesPerNotificacio(expedient));
 		interessats.addAll(interessatRepository.findAdminByExpedientAndNotRepresentantAndAmbDadesPerNotificacio(expedient));
@@ -1094,6 +1092,4 @@ public class ExpedientInteressatHelper {
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(ExpedientHelper.class);
-
-
 }

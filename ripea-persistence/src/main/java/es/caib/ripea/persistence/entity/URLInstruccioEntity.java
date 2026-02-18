@@ -1,6 +1,3 @@
-/**
- *
- */
 package es.caib.ripea.persistence.entity;
 
 import es.caib.ripea.service.intf.config.BaseConfig;

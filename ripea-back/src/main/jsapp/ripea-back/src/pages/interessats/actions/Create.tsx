@@ -50,17 +50,19 @@ export const useCreateRepresentant = (refresh?: () => void) => {
                 temporalMessageShow(null, t('page.interessat.action.createRep.ok',{data}), 'success');
             })
             .catch((error) => {
-                error?.message && temporalMessageShow(null, error?.message, 'error');
+                if (error?.message)
+                    temporalMessageShow(null, error?.message, 'error');
             });
     }
-    const update = (id: any, row: any) => {
+    const update = (_id: any, row: any) => {
         apiRef.current?.show(row?.representant?.id)
             .then((data:any) => {
                 refresh?.();
                 temporalMessageShow(null, t('page.interessat.action.updateRep.ok',{data}), 'success');
             })
             .catch((error) => {
-                error?.message && temporalMessageShow(null, error?.message, 'error');
+                if (error?.message)
+                    temporalMessageShow(null, error?.message, 'error');
             });
     }
 

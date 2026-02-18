@@ -3,9 +3,11 @@ package es.caib.ripea.service.resourceservice;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
@@ -17,6 +19,8 @@ import com.turkraft.springfilter.parser.Filter;
 import es.caib.ripea.persistence.entity.CarpetaEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.resourceentity.CarpetaResourceEntity;
+import es.caib.ripea.persistence.entity.resourceentity.CarpetaRestriccioResourceEntity;
+import es.caib.ripea.persistence.entity.resourceentity.UsuariResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.CarpetaResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.ContingutResourceRepository;
 import es.caib.ripea.persistence.repository.CarpetaRepository;
@@ -37,6 +41,7 @@ import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
 import es.caib.ripea.service.intf.base.exception.ResourceNotFoundException;
 import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.base.model.ReportFileType;
+import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.CarpetaDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.exception.ValidationException;
@@ -45,6 +50,7 @@ import es.caib.ripea.service.intf.model.CarpetaResource.ModificarFormAction;
 import es.caib.ripea.service.intf.model.CarpetaResource.MoureCopiarFormAction;
 import es.caib.ripea.service.intf.model.ContingutResource;
 import es.caib.ripea.service.intf.model.EntitatResource;
+import es.caib.ripea.service.intf.model.UsuariResource;
 import es.caib.ripea.service.intf.resourceservice.CarpetaResourceService;
 import es.caib.ripea.service.resourcehelper.ContingutResourceHelper;
 import lombok.RequiredArgsConstructor;
@@ -72,6 +78,8 @@ public class CarpetaResourceServiceImpl extends BaseMutableResourceService<Carpe
     @PostConstruct
     public void init() {
         register(CarpetaResource.PERSPECTIVE_PATH_CODE,	new PathPerspectiveApplicator());
+        register(CarpetaResource.PERSPECTIVE_RESPONSABLE_RESTRICCIO, new ResponsableRestriccioPerspectiveApplicator());
+        register(CarpetaResource.PERSPECTIVE_RESTRICCIONS, new RestriccionsPerspectiveApplicator());
         register(CarpetaResource.ACTION_MODIFICAR_NOM,	new ModificarNomActionExecutor());
         register(CarpetaResource.REPORT_EXPORTAR_INDEX_PDF,	new ExportIdexPdfGenerator());
         register(CarpetaResource.REPORT_EXPORTAR_INDEX_XLS,	new ExportIdexXlsGenerator());
@@ -108,6 +116,17 @@ public class CarpetaResourceServiceImpl extends BaseMutableResourceService<Carpe
 					null, 
 					true);
 			resource.setId(carpetaCreada.getId());
+			
+			List<String> usuaris = resource.getRestriccions().stream()
+                    .map(ResourceReference::getId)
+                    .collect(Collectors.toList());
+			
+			carpetaHelper.restringirCarpeta(
+					entitatEntity.getId(), 
+					carpetaCreada.getId(), 
+					resource.getRestringida(),
+					resource.getMotiuRestriccio(), 
+					usuaris);
 //			reorderIfReorderable(carpetaResourceRepository.findById(carpetaCreada.getId()).get(), null, null, true, false);
     	} catch (ValidationException ex) {
     		throw ex;
@@ -121,30 +140,43 @@ public class CarpetaResourceServiceImpl extends BaseMutableResourceService<Carpe
 	public CarpetaResource update(Long id, CarpetaResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotFoundException {
     	try {
     		if (resource.isOrdrePatch()) {
-        		CarpetaEntity carpetaActual = carpetaRepository.findById(resource.getId()).get();
-        		if (resource.isOrdrePatch()) {
-        			CarpetaResourceEntity carpetaResourceActual = carpetaResourceRepository.findById(resource.getId()).get();
-        			Long reorderPreviousParentId = reorderGetParentId(carpetaResourceActual);
-        			Long reorderResourceSequence = reorderGetSequenceFromResourceOrEntity(resource, carpetaResourceActual);
-    				if (!Objects.equals(resource.getPare().getId(), carpetaResourceActual.getPare().getId())) {
-    					carpetaResourceActual.setPare(contingutResourceRepository.findById(resource.getPare().getId()).get());
-    				}
-    				reorderIfReorderable(
-    						carpetaResourceActual,
-    						reorderResourceSequence,
-    						reorderPreviousParentId,
-    						true,
-    						false);
-					boolean parentIdChanged = !Objects.equals(carpetaResourceActual.getOrderParentId(), reorderPreviousParentId);
-					if (parentIdChanged) {
-	    				//mourer també al arxiu
-	    				pluginHelper.arxiuCarpetaMoure(
-	    						(CarpetaEntity)carpetaActual,
-	    						contingutRepository.findById(carpetaResourceActual.getOrderParentId()).get().getArxiuUuid());
-					}
-        		} else {
-            		//TODO: ara mateix falla arxiu al renombrar una carpeta
-        		}
+    			CarpetaEntity carpetaActual = carpetaRepository.findById(resource.getId()).get();
+    			CarpetaResourceEntity carpetaResourceActual = carpetaResourceRepository.findById(resource.getId()).get();
+    			Long reorderPreviousParentId = reorderGetParentId(carpetaResourceActual);
+    			Long reorderResourceSequence = reorderGetSequenceFromResourceOrEntity(resource, carpetaResourceActual);
+				if (!Objects.equals(resource.getPare().getId(), carpetaResourceActual.getPare().getId())) {
+					carpetaResourceActual.setPare(contingutResourceRepository.findById(resource.getPare().getId()).get());
+				}
+				reorderIfReorderable(
+						carpetaResourceActual,
+						reorderResourceSequence,
+						reorderPreviousParentId,
+						true,
+						false);
+				boolean parentIdChanged = !Objects.equals(carpetaResourceActual.getOrderParentId(), reorderPreviousParentId);
+				if (parentIdChanged) {
+    				//mourer també al arxiu
+    				pluginHelper.arxiuCarpetaMoure(
+    						(CarpetaEntity)carpetaActual,
+    						contingutRepository.findById(carpetaResourceActual.getOrderParentId()).get().getArxiuUuid());
+				}
+    		} else {
+        		//TODO: ara mateix falla arxiu al renombrar una carpeta
+    			carpetaHelper.modificarNomCarpeta(
+    					resource.getEntitat().getId(), 
+						id,
+						resource.getNom());
+    			
+    			List<String> usuaris = resource.getRestriccions().stream()
+	                    .map(ResourceReference::getId)
+	                    .collect(Collectors.toList());
+				
+				carpetaHelper.restringirCarpeta(
+						resource.getEntitat().getId(), 
+						id, 
+						resource.getRestringida(),
+						resource.getMotiuRestriccio(), 
+						usuaris);
     		}
     	} catch (Exception ex) {
     		excepcioLogHelper.addExcepcio("/carpeta/"+resource.getId()+"/update", ex);
@@ -173,6 +205,39 @@ public class CarpetaResourceServiceImpl extends BaseMutableResourceService<Carpe
         public void applySingle(String code, CarpetaResourceEntity entity, CarpetaResource resource) throws PerspectiveApplicationException {
             resource.setTreePath(contingutResourceHelper.getTreePath(entity));
         }
+    }
+    
+    private class ResponsableRestriccioPerspectiveApplicator implements PerspectiveApplicator<CarpetaResourceEntity, CarpetaResource> {
+        @Override
+        public void applySingle(String code, CarpetaResourceEntity entity, CarpetaResource resource) throws PerspectiveApplicationException {
+        	UsuariResourceEntity responsableRestriccio = entity.getResponsableRestriccio();
+        	
+        	if (responsableRestriccio != null) {
+//	            resource.setResponsableRestriccio(ResourceReference.toResourceReference(
+//	            		responsableRestriccio.getId(),
+//	            		responsableRestriccio.getNom()));
+        	}
+        }
+    }
+    
+    private class RestriccionsPerspectiveApplicator implements PerspectiveApplicator<CarpetaResourceEntity, CarpetaResource> {
+		@Override
+		public void applySingle(String code, CarpetaResourceEntity entity, CarpetaResource resource) throws PerspectiveApplicationException {
+	        if (entity.getRestriccions() == null || entity.getRestriccions().isEmpty()) {
+	            resource.setRestriccions(Collections.emptyList());
+	            return;
+	        }
+
+			List<ResourceReference<UsuariResource, String>> restriccions = entity.getRestriccions().stream()
+					.map(CarpetaRestriccioResourceEntity::getUsuari).filter(Objects::nonNull).map(usuari -> {
+						ResourceReference<UsuariResource, String> ref = new ResourceReference<>();
+						ref.setId(usuari.getCodi());
+						ref.setDescription(usuari.getNom());
+						return ref;
+					}).collect(Collectors.toList());
+
+			resource.setRestriccions(restriccions);
+		}
     }
     
     @Override

@@ -1,19 +1,11 @@
 package es.caib.ripea.service.helper;
 
-import es.caib.ripea.persistence.entity.EntitatEntity;
-import es.caib.ripea.persistence.entity.OrganGestorEntity;
-import es.caib.ripea.persistence.entity.config.ConfigEntity;
-import es.caib.ripea.persistence.entity.config.ConfigGroupEntity;
-import es.caib.ripea.persistence.repository.OrganGestorRepository;
-import es.caib.ripea.persistence.repository.config.ConfigGroupRepository;
-import es.caib.ripea.persistence.repository.config.ConfigRepository;
-import es.caib.ripea.plugin.PropertiesHelper;
-import es.caib.ripea.service.intf.config.PropertyConfig;
-import es.caib.ripea.service.intf.dto.EntitatDto;
-import es.caib.ripea.service.intf.dto.config.ConfigDto;
-import es.caib.ripea.service.intf.exception.NotDefinedConfigException;
-import es.caib.ripea.service.intf.utils.Utils;
-import lombok.extern.slf4j.Slf4j;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -23,7 +15,19 @@ import org.springframework.core.env.PropertySource;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.OrganGestorEntity;
+import es.caib.ripea.persistence.entity.config.ConfigEntity;
+import es.caib.ripea.persistence.entity.config.ConfigGroupEntity;
+import es.caib.ripea.persistence.repository.OrganGestorRepository;
+import es.caib.ripea.persistence.repository.config.ConfigGroupRepository;
+import es.caib.ripea.persistence.repository.config.ConfigRepository;
+import es.caib.ripea.service.intf.config.PropertyConfig;
+import es.caib.ripea.service.intf.dto.EntitatDto;
+import es.caib.ripea.service.intf.dto.config.ConfigDto;
+import es.caib.ripea.service.intf.exception.NotDefinedConfigException;
+import es.caib.ripea.service.intf.utils.Utils;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component

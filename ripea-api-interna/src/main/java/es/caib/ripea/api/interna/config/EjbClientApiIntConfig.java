@@ -70,6 +70,12 @@ public class EjbClientApiIntConfig {
 		return getLocalEjbFactoyBean(SalutService.class);
 	}
 	
+	@Bean
+	@ConditionalOnWarDeployment
+	public LocalStatelessSessionProxyFactoryBean logService() {
+		return getLocalEjbFactoyBean(LogService.class);
+	}
+	
 	private LocalStatelessSessionProxyFactoryBean getLocalEjbFactoyBean(Class<?> serviceClass) {
 		String jndiName = jndiServiceName(serviceClass, false);
 		log.info("Creating EJB proxy for " + serviceClass.getSimpleName() + " with JNDI name " + jndiName);

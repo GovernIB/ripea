@@ -1,14 +1,31 @@
-import {MuiFormDialog, MuiFormDialogApi, useBaseAppContext} from "reactlib";
+import {MuiFormDialog, MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
 import {useRef} from "react";
 import {Grid} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
 import {useTranslation} from "react-i18next";
+import UsuarisRestriccioForm from "./restriccio/UsuarisRestriccioForm.tsx";
 
 const CrearForm = () => {
-    return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="nom"/>
-    </Grid>
-}
+	const { data } = useFormContext();
+
+	return (
+		<>
+			<Grid container direction="row" columnSpacing={1} rowSpacing={1}>
+				<GridFormField xs={12} name="nom" />
+				<GridFormField xs={12} name="restringida" />
+			</Grid>
+
+			{data?.restringida && (
+				<>
+					<Grid sx={{ mt: 2, mb: 1}}>
+						<GridFormField xs={12} name="motiuRestriccio" />
+					</Grid>
+					<UsuarisRestriccioForm />
+				</>
+			)}
+		</>
+	);
+};
 
 const Crear = (props:any) => {
     const { t } = useTranslation();
@@ -35,6 +52,7 @@ const useCrear = (entity:any, refresh?: () => void) => {
     const handleShow = () => {
         apiRef.current?.show(undefined, {
             expedient: {id: entity?.id},
+			metaExpedientId: entity?.metaExpedient?.id,
             expedientRelacionat: {id: entity?.id},
         })
             .then((data:any) => {

@@ -1,23 +1,50 @@
 import {useTranslation} from "react-i18next";
-import {useState} from "react";
+import {useMemo, useState} from "react";
 import {GridPage, useMuiDataGridApiRef} from "reactlib";
 import {CardPage} from "../../../components/CardData.tsx";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
-import {Grid, Icon, Typography} from "@mui/material";
+import {Chip, Grid, Icon, Typography} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import {CommentDialog} from "../../CommentDialog.tsx";
+import {useUserSession} from "../../../components/Session.tsx";
+import TabComponent from "../../../components/TabComponent.tsx";
+import {MetaExpedientForm} from "../../metaExpedient/MetaExpedientGrid.tsx";
+import {CanviEstatRevisioForm} from "../../metaExpedient/actions/CanviEstatRevisio.tsx";
 
+// Form
+const RevisioMetaExpedientForm = (props:any) => {
+    const {revisor = false} = props;
+    const {t} = useTranslation();
+
+    const tabs = [
+        {
+            value: "dades",
+            label: t('page.metaExpedient.tabs.dades'),
+            content: <MetaExpedientForm/>,
+        },
+        {
+            value: "estat",
+            label: t('page.metaExpedient.tabs.estat'),
+            content: <CanviEstatRevisioForm revisor={revisor}/>,
+        },
+    ]
+
+    return <TabComponent tabs={tabs}/>
+}
+
+// Filter
 const RevisioMetaExpedientFilterForm = () => {
     return <>
         <GridFormField xs={4} name="codi"/>
         <GridFormField xs={4} name="classificacio"/>
         <GridFormField xs={4} name="nom"/>
-        <GridFormField xs={4} name="revisioEstat"/>
-        <GridFormField xs={4} name="organGestor"/>
-        <Grid item xs={1.6}/>
+        <GridFormField xs={3} name="revisioEstat"/>
+        <GridFormField xs={3} name="organGestor"/>
+        <GridFormField xs={3} name="tipus"/>
+        <Grid item xs={0.6}/>
     </>
 }
 
@@ -28,6 +55,7 @@ const springFilterBuilder = (data:any) => {
         builder.like('nom', data?.nom),
         builder.eq('revisioEstat', `'${data?.revisioEstat}'`),
         builder.eq('organGestor.id', data?.organGestor?.id),
+        data?.tipus && builder.eq('tipusProcedimentServei', `'${data?.tipus}'`),
     );
 }
 
@@ -48,9 +76,8 @@ const RevisioMetaExpedientFilter = (props: any) => {
 const labelStyle = {padding: '1px 4px', fontSize: '11px', fontWeight: '500', borderRadius: '2px', display: 'flex', alignItems: 'center', width: 'max-content'}
 const obertStyle = {border: '1px dashed #AAA'}
 
-const StyledEstat = (props:any) => {
+export const StyledEstat = (props:any) => {
     const { entity, children } = props;
-    // const { t } = useTranslation()
 
     let style: any = {};
     switch (entity?.revisioEstat) {
@@ -71,7 +98,9 @@ const StyledEstat = (props:any) => {
     return <Typography variant="caption" sx={{...labelStyle, ...style}}>{children}</Typography>
 }
 
-const sortModel: any = [{field: 'lastModifiedDate', sort: 'desc'}]
+const sortModel: any[] = [{field: 'lastModifiedDate', sort: 'desc'}]
+const perspectives: any[] = ['AUDITORIA']
+const namedQueries: any[] = ['CONSULTA_REVISIO_ESTAT']
 const columns = [
     {
         field: 'codi',
@@ -80,6 +109,17 @@ const columns = [
     {
         field: 'classificacio',
         flex: 0.75,
+        renderCell: (params:any) => {
+            const isProcediment = params?.row?.tipusProcedimentServei === 'PROCEDIMENT'
+            return <>
+                {params?.row?.tipusProcedimentServei &&
+                    <Chip label={isProcediment ?'P' :'S'}
+                          color={isProcediment ?"primary" :"success"}
+                          size={'small'}
+                          sx={{mr: 1}}/>}
+                {params?.formattedValue}
+            </>
+        }
     },
     {
         field: 'nom',
@@ -94,9 +134,9 @@ const columns = [
         flex: 1,
     },
     {
-        field: 'comu',
+        field: 'procedimentComu',
         flex: 0.5,
-        renderCell: (params:any) => (params?.row?.comu && <Icon>check</Icon>),
+        renderCell: (params:any) => (params?.row?.procedimentComu && <Icon>check</Icon>),
     },
     {
         field: 'gestioAmbGrupsActiva',
@@ -126,6 +166,7 @@ const columns = [
 
 const RevisioMetaExpedientGrid = () => {
     const {t} = useTranslation();
+    const {rol} = useUserSession();
     const apiRef = useMuiDataGridApiRef();
     const [springFilter, setSpringFilter] = useState<string>();
 
@@ -133,7 +174,7 @@ const RevisioMetaExpedientGrid = () => {
         apiRef?.current?.refresh?.();
     }
 
-    const columnsAddition :any[] = [
+    const columnsAddition :any[] = useMemo(() => [
         ...columns,
         {
             field: 'numComentaris',
@@ -148,25 +189,28 @@ const RevisioMetaExpedientGrid = () => {
                 onClose={refresh}
             />,
         },
-    ]
+    ], [t])
 
     return <GridPage disableMargins>
         <CardPage title={t('page.user.menu.revisar')}>
             <RevisioMetaExpedientFilter onSpringFilterChange={setSpringFilter}/>
-
             <StyledMuiGrid
                 apiRef={apiRef}
                 resourceName={"metaExpedientResource"}
                 columns={columnsAddition}
-                // TODO: revisar filtre
                 filter={springFilter}
                 sortModel={sortModel}
+                perspectives={perspectives}
+                namedQueries={namedQueries}
 
-                // TODO: revisar actions
-                // rowAdditionalActions={actions}
-                // toolbarMassiveActions={massiveActions}
-
-                readOnly
+                toolbarHideCreate
+                rowHideUpdateButton={false}
+                popupEditCreateActive
+                popupEditFormContent={<RevisioMetaExpedientForm revisor={rol?.isRevisor}/>}
+                popupEditFormDialogResourceTitle={t('page.metaExpedient.title')}
+                popupEditFormI18nKeys={{
+                    updateSuccess: 'page.metaExpedient.action.update.ok',
+                }}
             />
         </CardPage>
     </GridPage>

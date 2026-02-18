@@ -7,7 +7,7 @@ import * as builder from '../../util/springFilterUtils';
 
 const ExpedientFilterForm = () => {
     const {data} = useFormContext()
-    const { value: user } = useUserSession();
+    const { value: user, rol } = useUserSession();
 
     if (!data?.advanced) {
         return <>
@@ -41,19 +41,19 @@ const ExpedientFilterForm = () => {
 
         <GridFormField xs={2} name="numeroRegistre"/>
         <GridFormField xs={2} name="grup" hidden={!user?.sessionScope?.isFiltreGrupsVisible}/>
-        <GridFormField xs={2} name="agafatPer" hidden={user?.rolActual == "tothom"}/>
+        <GridFormField xs={2} name="agafatPer" hidden={rol?.isUser}/>
             <Grid item xs={2} hidden={user?.sessionScope?.isFiltreGrupsVisible}/>
-            <Grid item xs={2} hidden={user?.rolActual != "tothom"}/>
+            <Grid item xs={2} hidden={!rol?.isUser}/>
             <Grid item xs={6} hidden={user?.sessionScope?.isDominisEnabled}/>
 
         <GridButtonField xs={1} name={'agafat'} icon={'lock'}/>
         <GridButtonField xs={1} name={'pendentFirmar'} icon={'edit'}/>
-        <GridButtonField xs={1} name={'seguit'} icon={'group_add'} hidden={user?.rolActual != "tothom"}/>
-        <Grid item xs={user?.rolActual != "tothom" ? 7.6 : 6.6}/>
+        <GridButtonField xs={1} name={'seguit'} icon={'group_add'} hidden={!rol?.isUser}/>
+        <Grid item xs={!rol?.isUser ? 7.6 : 6.6}/>
     </>
 }
 
-export const springFilterBuilder = (data: any, user?: any): string => {
+export const springFilterBuilder = (data: any, user?: any, rol?: any): string => {
     let filterStr: string = '';
     filterStr += builder.and(
         builder.like("numero", data.numero),
@@ -79,7 +79,7 @@ export const springFilterBuilder = (data: any, user?: any): string => {
 
         builder.like("registresImportats", data.numeroRegistre),
         builder.eq("grup.id", data.grup?.id),
-        (user?.rolActual != "tothom") && builder.eq("agafatPer.codi", `'${data.agafatPer?.id}'`),
+        (!rol?.isUser) && builder.eq("agafatPer.codi", `'${data.agafatPer?.id}'`),
 
         data.pendentFirmar && (
             builder.exists(
@@ -94,7 +94,7 @@ export const springFilterBuilder = (data: any, user?: any): string => {
         ),
 
         data.agafat && builder.eq("agafatPer.codi", `'${user.codi}'`),
-        (user?.rolActual == "tothom") && data.seguit && (
+        (rol?.isUser) && data.seguit && (
             builder.exists(
                 builder.eq("seguidors.codi", `'${user.codi}'`)
             )
@@ -106,22 +106,13 @@ export const springFilterBuilder = (data: any, user?: any): string => {
 
 const ExpedientFilter = (props: any) => {
     const {onSpringFilterChange} = props;
-    const {value: user} = useUserSession();
+    const {value: user, rol} = useUserSession();
     return <StyledMuiFilter
         resourceName={"expedientResource"}
         code={"EXPEDIENT_FILTER"}
-        springFilterBuilder={(data: any)=> {
-            if (!data?.advanced) {
-                return springFilterBuilder({
-                    numero: data.numero,
-                    estat: data.estat,
-                    dataCreacioInici: data.dataCreacioInici,
-                    dataCreacioFinal: data.dataCreacioFinal,
-                    advanced: true,
-                }, user)
-            }
-            return springFilterBuilder(data, user)
-        }}
+        springFilterBuilder={(data: any)=> (
+            springFilterBuilder(data, user, rol)
+        )}
         onSpringFilterChange={onSpringFilterChange}
         advancedSearch
         filterOnFieldEnterKeyPressed

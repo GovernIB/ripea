@@ -276,6 +276,8 @@ public class ExecucioMassivaHelper {
 		execucioMassiva.setPortafirmesTransaccioId(execMassDto.getPortafirmesTransaccioId());
 		execucioMassiva.setPortafirmesAvisFirmaParcial(execMassDto.getPortafirmesAvisFirmaParcial());
 		execucioMassiva.setPortafirmesFirmaParcial(execMassDto.getPortafirmesFirmaParcial());
+		execucioMassiva.setExpedientOrigenId(execMassDto.getExpedientOrigenId());
+		execucioMassiva.setExpedientDestiId(execMassDto.getExpedientDestiId());
 		
 		execucioMassiva = execucioMassivaRepository.save(execucioMassiva);
 		
@@ -283,6 +285,8 @@ public class ExecucioMassivaHelper {
 		for (ExecucioMassivaContingutDto execElement: execElements) {
 			
 			String elementName = null;
+			ElementTipusEnumDto elementTipusContingut = elementTipus;
+			
 			if (elementTipus == ElementTipusEnumDto.EXPEDIENT || elementTipus == ElementTipusEnumDto.DOCUMENT) {
 				elementName = contingutRepository.getOne(execElement.getElementId()).getNom();
 			} else if (elementTipus == ElementTipusEnumDto.INTERESSAT) {
@@ -291,18 +295,23 @@ public class ExecucioMassivaHelper {
 				elementName = expedientPeticioRepository.getOne(execElement.getElementId()).getIdentificador();
 			} else if (elementTipus == ElementTipusEnumDto.ANNEX) {
 				elementName = registreAnnexRepository.getOne(execElement.getElementId()).getNom();
+			} else if (elementTipus == ElementTipusEnumDto.ACCIO) {
+				elementName = execElement.getElementNom();
+				elementTipusContingut = execElement.getElementTipus(); // Acció especifica
 			}
 
 			ExecucioMassivaContingutEntity emc = ExecucioMassivaContingutEntity.getBuilder(
 					execucioMassiva, 
 					execElement.getElementId(), 
 					elementName,
-					elementTipus, 
+					elementTipusContingut, 
 					ordre++).build();
 			
 			emc.updateEstatDataFi(
 					execElement.getEstat(),
 					execElement.getDataFi());
+			
+			emc.setError(execElement.getError());
 			
 			Throwable excepcioRetorn = ExceptionHelper.getRootCauseOrItself(execElement.getThrowable());
 			if (excepcioRetorn != null) {
@@ -392,7 +401,13 @@ public class ExecucioMassivaHelper {
 		        	        metaNode.setId(docExp.getTipusDocument());
 		        	        documentDto.setMetaNode(metaNode);
 		        	        documentDto.setPareId(emc.getElementId());
-		        	        MetaDocumentEntity metaDocumentEntity = metaDocumentRepository.findById(docExp.getTipusDocument()).get();
+		        	        if (docExp.getTipusDocument()==null) {
+		        	        	throw new NotFoundException(docExp.getTipusDocument(), Long.class);
+		        	        }
+		        	        MetaDocumentEntity metaDocumentEntity = metaDocumentRepository.findById(docExp.getTipusDocument()).orElse(null);
+		        	        if (metaDocumentEntity==null) {
+		        	        	throw new NotFoundException(metaDocumentEntity, MetaDocumentEntity.class);
+		        	        }
 		        	        documentDto.setDocumentTipus(DocumentTipusEnumDto.DIGITAL);
 		        	        //El nom no es pot repetir dins l'expedient
 		        	        String nomDocument = metaDocumentEntity.getNom()+" "+emc.getElementId()+ " "+emc.getExecucioMassiva().getId(); 
@@ -597,8 +612,9 @@ public class ExecucioMassivaHelper {
 					contingut.getEntitat().getId(),
 					emc.getElementId(),
 					emc.getExecucioMassiva().getMotiu(),
-					Utils.csvToLongArray(emc.getElementNom()),
+					Utils.csvToLongArray(emc.getError()),
 					false);
+			emc.setError(null); //Netejam error, que haviem emprat momentaniament per guardar els IDs dels documents.
 		} catch (Exception ex) {
 			logger.error("CONTINGUT MASSIU:" + emc.getId() + ". No s'ha pogut tancar l'expedient", ex);
 			exc = ex;

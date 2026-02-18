@@ -11,7 +11,6 @@ import {Alert, Grid, Link} from "@mui/material";
 import {useSession} from "../../../components/SessionStorageContext.tsx";
 import {GridSortDirection} from "@mui/x-data-grid-pro";
 import {useAnexxActions} from "../../anotacions/details/AnotacioActions.tsx";
-import {useGridApiRef as useMuiDatagridApiRef} from "@mui/x-data-grid-pro/hooks/utils/useGridApiRef";
 
 const AdjuntarAnnexosPendentsFilterFrom = () => {
     return <>
@@ -56,14 +55,13 @@ const AdjuntarAnnexosPendentsFilter = (props: any) => {
 
 const namedQuery: string[] = ['MASSIU_PENDENT_PROCESSAR']
 const perspectives: string[] = ['REGISTRE']
-const sortModel: any = [{field: 'expedientInfo.createdDate', sort: 'desc'}]
+// const sortModel: any = [{field: 'expedientInfo.createdDate', sort: 'desc'}]
 const AdjuntarAnnexosPendentsGrid = () => {
     const {t} = useTranslation();
     const apiRef = useMuiDataGridApiRef();
-    const dataApiRef = useMuiDatagridApiRef();
     const [springFilter, setSpringFilter] = useState<string>();
 
-    const columns = [
+    const columns = useMemo(() => [
         {
             headerName: t('page.registre.grid.nomAnnex'),
             field: 'titol',
@@ -73,7 +71,7 @@ const AdjuntarAnnexosPendentsGrid = () => {
             headerName: t('page.registre.grid.origenRegistreNumero'),
             field: 'registreInfo.identificador',
             flex: 1,
-            sortProcessor: (field: string, sort: GridSortDirection) => [{field: 'registre.identificador', sort}],
+            sortProcessor: (_field: string, sort: GridSortDirection) => [{field: 'registre.identificador', sort}],
         },
         {
             headerName: t('page.expedient.title'),
@@ -91,14 +89,11 @@ const AdjuntarAnnexosPendentsGrid = () => {
             // sortProcessor: (field: string, sort: GridSortDirection) => [{field: 'registre.expedientPeticions.expedient.createdDate', sort}],
             sortable: false,
         },
-    ]
+    ], [t]);
 
     const sessionKey = "ADJUNTAR_ANNEX_FILTER";
     const { value: filterData } = useSession(sessionKey);
-    const haveRequirements = useMemo(() => {
-        dataApiRef?.current?.setRowSelectionModel?.([])
-        return !!filterData?.procediment
-    }, [filterData?.procediment])
+    const haveRequirements = useMemo(() => !!filterData?.procediment, [filterData?.procediment])
 
     const refresh = () => {
         apiRef?.current?.refresh?.();
@@ -125,15 +120,16 @@ const AdjuntarAnnexosPendentsGrid = () => {
 
     return <GridPage disableMargins>
         <CardPage title={t('navigate.massiu.procesarAnnexosPendents')}>
+            
             <Alert severity={'info'} sx={{mb: 1}}>{t('page.anotacio.action.procesarAnnexosPendents.info')}</Alert>
-
+            <Alert severity={'info'} sx={{mb: 1}}>{t('page.expedient.alert.canviEstat')}</Alert>
+            
             <AdjuntarAnnexosPendentsFilter
                 sessionKey={sessionKey}
                 onSpringFilterChange={setSpringFilter}/>
 
             <StyledMuiGrid
                 apiRef={apiRef}
-                datagridApiRef={dataApiRef}
                 resourceName={"registreAnnexResource"}
                 columns={columns}
                 filter={springFilter}

@@ -256,27 +256,17 @@ export const Menu: React.FC<MenuProps & { onClose?: () => void, logo?: string }>
         entries,
         onTitleClose,
         shrink,
-        iconClicked,
         drawerWidth = 240,
         onClose,
         logo
     } = props;
     const smallScreen = useSmallScreen();
     const smallHeader = useSmallHeader();
-    const [open, setOpen] = React.useState<boolean>(false);
-    React.useEffect(() => {
-        // console.log('Open', open);
-        setOpen(o => !o);
-    }, [iconClicked]);
-    React.useEffect(() => {
-        setOpen(false);
-    }, [smallScreen]);
 
     // Add ESC key handling to close the menu
     React.useEffect(() => {
         const handleEscKey = (event: KeyboardEvent) => {
             if (event.key === 'Escape') {
-                setOpen(false);
                 onClose?.();
             }
         };
@@ -288,7 +278,6 @@ export const Menu: React.FC<MenuProps & { onClose?: () => void, logo?: string }>
         };
     }, []);
     const handleMenuItemClick = () => {
-        setOpen(false);
         onClose?.();
     }
     const drawerContent = <SideWrapper onOutsideClick={handleMenuItemClick}>

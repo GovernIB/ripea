@@ -174,6 +174,8 @@
 			<th data-col-name="pendentEnviarDistribucio" data-visible="false"></th>
 			<th data-col-name="registre.identificador"><spring:message code="expedient.peticio.list.columna.numero"/></th>
 			<th data-col-name="dataAlta" data-converter="datetime"><spring:message code="expedient.peticio.list.columna.data.alta"/></th>
+			<th data-col-name="dataActualitzacio" data-converter="datetime"><spring:message code="expedient.peticio.list.columna.data.update"/></th>
+			<th data-col-name="reintentsCanviEstatDistribucio"><spring:message code="expedient.peticio.list.columna.reintentsCanviEstatDistribucio"/></th>
 			<th data-col-name="estatPendentEnviarDistribucio" data-orderable="false" data-template="#cellEstatTemplate">
 				<spring:message code="expedient.peticio.list.columna.estat"/>
 				<script id="cellEstatTemplate" type="text/x-jsrender">

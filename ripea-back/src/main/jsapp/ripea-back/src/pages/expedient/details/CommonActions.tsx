@@ -16,6 +16,7 @@ import useTancar from "../actions/Tancar.tsx";
 import useDescargarDocuments from "../actions/DescargarDocuments.tsx";
 import useModifyExpedient from "../actions/ModifyExpedient.tsx";
 import {useNavigate} from "react-router-dom";
+import useMoureTot from '../actions/MoureTot.tsx';
 
 export const iniciaDescarga = (url:string, fileName:string) => {
     const link = document.createElement('a');
@@ -96,6 +97,22 @@ export const useActions = (refresh?: () => void) => {
     const agafar= (id:any, row:any): void => action(id, 'AGAFAR', t('page.expedient.action.agafar.ok', {user: user?.nom, expedient: row?.nom}));
     const retornar= (id:any, row:any) :void => action(id, 'RETORNAR', t('page.expedient.action.retornar.ok', {user: row?.createdBy, expedient: row?.nom}));
 	const alliberar= (id:any, row:any) :void => action(id, 'ALLIBERAR', t('page.expedient.action.lliberar.ok', {expedient: row?.nom}));
+    const guardarArxiu= (id:any): void => {
+        apiAction(undefined, {code: 'GUARDAR_ARXIU', data:{ ids: [id], massivo: false }})
+            .then((result) => {
+                refresh?.()
+                const success = result.filter((r:any)=>r?.codi=='OK')
+                const info = result.filter((r:any)=>r?.codi=='INFO')
+                const error = result.filter((r:any)=>r?.codi=='ERROR')
+
+                success?.length>0 && temporalMessageShow(null, success.map((r:any)=><p>{r?.valor}</p>), 'success');
+                info?.length>0 && temporalMessageShow(null, info.map((r:any)=><p>{r?.valor}</p>), 'info');
+                error?.length>0 && temporalMessageShow(null, error.map((r:any)=><p>{r?.valor}</p>), 'error');
+            })
+            .catch((error) => {
+                temporalMessageShow(null, error?.message, 'error');
+            });
+    }    
     const syncArxiu= (id:any): void => {
         apiAction(undefined, {code: 'SYNC_ARXIU', data:{ ids: [id], massivo: false }})
             .then((result) => {
@@ -194,6 +211,7 @@ export const useActions = (refresh?: () => void) => {
         exportEni,
         exportInside,
         syncArxiu,
+        guardarArxiu,
         eliminarRelacio,
         excelInteressats,
         importarExpedient,
@@ -202,9 +220,7 @@ export const useActions = (refresh?: () => void) => {
 
 export const useCommonActions = (refresh?: () => void) => {
     const { t } = useTranslation();
-    const { value: user, permisos } = useUserSession();
-    const isRolActualAdmin = user?.rolActual == 'IPA_ADMIN';
-    const isRolActualOrganAdmin = user?.rolActual == 'IPA_ORGAN_ADMIN';
+    const { value: user, rol, permisos } = useUserSession();
 
     const {
         reobrir,
@@ -232,7 +248,8 @@ export const useCommonActions = (refresh?: () => void) => {
     const {handleShow: handleDescargarDocuments, content: contentDescargarDocuments} = useDescargarDocuments();
 
     const {handleShow: handleModifyExpedient, content: contentModifyExpedient} = useModifyExpedient(refresh)
-
+	const {handleShow: handleMoureTot, content: contentMoureTot} = useMoureTot(refresh)
+	
     const isTancat = (row:any) :boolean => {
         return row?.estat != "OBERT"
     }
@@ -240,15 +257,15 @@ export const useCommonActions = (refresh?: () => void) => {
         return row?.agafatPer?.id == user?.codi
     }
     const isUsuariActualWrite = (row:any) :boolean => {
-        return row?.usuariActualWrite || user?.rolActual == "IPA_ADMIN_LECTURA"
+        return row?.usuariActualWrite || rol?.isAdminLectura
     }
     const isAdminOAdminOrgan = (row:any) :boolean => {
-        return (isRolActualAdmin && permisos?.permisAdministrador) || ( isRolActualOrganAdmin && permisos?.organs?.some((e:any)=>e.id == row?.organGestor?.id) )
+        return (rol?.isAdmin && permisos?.permisAdministrador) || ( rol?.isOrganAdmin && permisos?.organs?.some((e:any)=>e.id == row?.organGestor?.id) )
     }
 
-    const actions = [
+    const actions:any[] = [
         {
-            label: user?.rolActual == 'IPA_ADMIN_LECTURA' ?t('common.detail') :t('page.expedient.action.detall.label'),
+            label: rol?.isAdminLectura ?t('common.detail') :t('page.expedient.action.detall.label'),
             icon: "folder",
             linkTo: "/contingut/{{id}}",
             showInMenu: true,
@@ -260,6 +277,13 @@ export const useCommonActions = (refresh?: () => void) => {
             onClick: handleModifyExpedient,
             hidden: (row:any) => isTancat(row) || !row?.potModificar,
         },
+		{
+		    label: t('page.expedient.action.moureTot.label'),
+		    icon: 'open_with',
+		    showInMenu: true,
+		    onClick: handleMoureTot,
+		    hidden: (row:any) => isTancat(row) || !row?.potModificar || !user?.sessionScope?.isExpedientMoureTotActiu,
+		},
         {
             label: <Divider sx={{px: 1, width: '100%'}} color={"none"}/>,
             showInMenu: true,
@@ -448,6 +472,7 @@ export const useCommonActions = (refresh?: () => void) => {
         {contentTancar}
         {contentDescargarDocuments}
         {contentModifyExpedient}
+		{contentMoureTot}
     </>;
 
     return {

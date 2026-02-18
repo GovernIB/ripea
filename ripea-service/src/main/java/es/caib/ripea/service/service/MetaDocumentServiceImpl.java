@@ -1,7 +1,6 @@
 package es.caib.ripea.service.service;
 
 import java.util.List;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,36 +9,26 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.persistence.entity.ContingutEntity;
-import es.caib.ripea.persistence.entity.DocumentEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.entity.MetaDocumentEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
-import es.caib.ripea.persistence.entity.MetaExpedientTascaValidacioEntity;
-import es.caib.ripea.persistence.repository.DocumentRepository;
-import es.caib.ripea.persistence.repository.ExpedientRepository;
 import es.caib.ripea.persistence.repository.MetaDocumentRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientRepository;
-import es.caib.ripea.persistence.repository.MetaExpedientTascaValidacioRepository;
-import es.caib.ripea.service.helper.CacheHelper;
 import es.caib.ripea.service.helper.ConversioTipusHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.MetaDocumentHelper;
-import es.caib.ripea.service.helper.MetaExpedientHelper;
 import es.caib.ripea.service.helper.MetaNodeHelper;
 import es.caib.ripea.service.helper.PaginacioHelper;
 import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
-import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
-import es.caib.ripea.service.intf.dto.ItemValidacioTascaEnum;
 import es.caib.ripea.service.intf.dto.MetaDocumentDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentTipusGenericEnumDto;
 import es.caib.ripea.service.intf.dto.PaginaDto;
 import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
 import es.caib.ripea.service.intf.dto.PinbalServeiDto;
 import es.caib.ripea.service.intf.dto.PortafirmesDocumentTipusDto;
-import es.caib.ripea.service.intf.exception.ExisteixenDocumentsException;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.service.MetaDocumentService;
 
@@ -47,18 +36,13 @@ import es.caib.ripea.service.intf.service.MetaDocumentService;
 public class MetaDocumentServiceImpl implements MetaDocumentService {
 
 	@Autowired private MetaDocumentRepository metaDocumentRepository;
-	@Autowired private DocumentRepository documentRepository;
 	@Autowired private ConversioTipusHelper conversioTipusHelper;
 	@Autowired private MetaNodeHelper metaNodeHelper;
 	@Autowired private PaginacioHelper paginacioHelper;
 	@Autowired private PluginHelper pluginHelper;
 	@Autowired private EntityComprovarHelper entityComprovarHelper;
-	@Autowired private MetaExpedientHelper metaExpedientHelper;
 	@Autowired private MetaDocumentHelper metaDocumentHelper;
 	@Autowired private MetaExpedientRepository metaExpedientRepository;
-	@Autowired private MetaExpedientTascaValidacioRepository metaExpedientTascaValidacioRepository;
-	@Autowired private ExpedientRepository expedientRepository;
-	@Autowired private CacheHelper cacheHelper;
 	
 	@Transactional
 	@Override
@@ -92,7 +76,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 			String plantillaContentType,
 			byte[] plantillaContingut) {
 		logger.debug("Actualitzant meta-document existent ( entitatId=" + entitatId + ", metaDocument=" + metaDocument + ")");
-		entityComprovarHelper.comprovarEntitat(entitatId, false, true, false, false, false);
+		entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
 		MetaDocumentEntity entity = entityComprovarHelper.comprovarMetaDocument(metaDocument.getId());
 		entity = metaDocumentHelper.update(
 				entity.getMetaExpedient()==null?null:entity.getMetaExpedient().getId(),
@@ -108,92 +92,21 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 	public MetaDocumentDto updateActiu(
 			Long entitatId,
 			Long metaExpedientId,
-			Long id,
-			boolean actiu, String rolActual) {
-		logger.debug("Actualitzant propietat activa d'un meta-document existent (entitatId=" + entitatId + ", metaExpedientId=" + metaExpedientId + ", id=" + id + ")");
-		
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				false,
-				false, 
-				false, 
-				true);
-		
-		MetaExpedientEntity metaExpedient = null;
-		MetaDocumentEntity metaDocumentEntity = null;
-		
-		if (metaExpedientId!=null) {
-			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
-			metaDocumentEntity = entityComprovarHelper.comprovarMetaDocument(entitat, metaExpedient, id);
-		} else {
-			metaDocumentEntity = metaDocumentRepository.findById(id).get();
-		}
-
-		metaDocumentEntity.updateActiu(actiu);
-		
-		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId(), null);
-		}
-		
-		if (metaExpedient != null) {
-			List<ExpedientEntity> expedients = expedientRepository.findByEntitatAndMetaExpedientAndEstatAndEsborrat(
-					entitat, 
-					metaExpedient, 
-					ExpedientEstatEnumDto.OBERT, 
-					0);
-			for (ExpedientEntity expedient: expedients) {
-				cacheHelper.evictErrorsValidacioPerNode(expedient.getId());
-			}
-		}
-		
-		return conversioTipusHelper.convertir(metaDocumentEntity, MetaDocumentDto.class);
+			Long metaDocumentId,
+			boolean actiu,
+			String rolActual) {
+		logger.debug("Actualitzant propietat actiu d'un meta-document existent (entitatId=" + entitatId + ", metaExpedientId=" + metaExpedientId + ", metaDocumentId=" + metaDocumentId + ")");
+		return conversioTipusHelper.convertir(
+				metaDocumentHelper.updateActiu(entitatId, metaExpedientId, metaDocumentId, actiu, rolActual),
+				MetaDocumentDto.class);
 	}
 
 	@Transactional
 	@Override
 	public MetaDocumentDto delete(Long entitatId, Long metaExpedientId, Long id, String rolActual, Long organId) {
-		
 		logger.debug("Esborrant meta-document (entitatId=" + entitatId + ", metaExpedientId=" + metaExpedientId + ", id=" + id + ")");
-		
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				false,
-				false, 
-				false, 
-				true);
-
-		MetaExpedientEntity metaExpedient = null;
-		MetaDocumentEntity metaDocumentEntity = null;
-		
-		if (metaExpedientId!=null) {
-			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
-			metaDocumentEntity = entityComprovarHelper.comprovarMetaDocument(entitat, metaExpedient, id);
-		} else {
-			metaDocumentEntity = metaDocumentRepository.findById(id).get();
-		}
-		
-		List<DocumentEntity> docs = documentRepository.findByMetaNode(metaDocumentEntity);
-		if (docs != null && !docs.isEmpty()) {
-			throw new ExisteixenDocumentsException();
-		}
-		
-		//Eliminar les possibles validacions sobre el document
-		List<MetaExpedientTascaValidacioEntity> validacionsDoc = metaExpedientTascaValidacioRepository.findByItemValidacioAndItemId(
-				ItemValidacioTascaEnum.DOCUMENT,
-				id);
-		
-		if (validacionsDoc!=null && validacionsDoc.size()>0) {
-			metaExpedientTascaValidacioRepository.deleteAll(validacionsDoc);
-		}
-		
-		metaDocumentRepository.delete(metaDocumentEntity);
-		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId(), organId);
-		}
-		
-		return conversioTipusHelper.convertir(metaDocumentEntity, MetaDocumentDto.class);
+		MetaDocumentEntity metaDocumentEliminat = metaDocumentHelper.delete(entitatId, metaExpedientId, id, rolActual, organId);
+		return conversioTipusHelper.convertir(metaDocumentEliminat, MetaDocumentDto.class);
 	}
 	
 	@Override
@@ -202,35 +115,8 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 			Long entitatId,
 			Long metaDocumentId,
 			int posicio) throws NotFoundException {
-
 		entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-		MetaDocumentEntity metaDocument = metaDocumentRepository.getOne(metaDocumentId);
-		
-		List<MetaDocumentEntity> metaDocuments = metaDocumentRepository.findByMetaExpedientOrderByOrdreAsc(metaDocument.getMetaExpedient());
-		moveTo(
-				metaDocument,
-				metaDocuments,
-				posicio);
-	}
-	
-	public void moveTo(
-			MetaDocumentEntity elementToMove,
-			List<MetaDocumentEntity> elements,
-			int posicio) {
-		
-		int anteriorIndex = -1; 
-		for (int i = 0; i < elements.size(); i++) {
-			if (elements.get(i).getId().equals(elementToMove.getId())) {
-				anteriorIndex = i;
-				break;
-			}
-		}
-		elements.add(
-				posicio,
-				elements.remove(anteriorIndex));
-		for (int i = 0; i < elements.size(); i++) {
-			elements.get(i).updateOrdre(i);
-		}
+		metaDocumentHelper.moveTo(metaDocumentId, posicio);
 	}
 
 	@Transactional(readOnly = true)
@@ -609,28 +495,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		logger.debug("Marcant/desmarcant el tipus de document per defecte (" +
 				"entitatId=" + entitatId + ", " +
 				"metaDocumentId=" + metaDocumentId + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				false,
-				false, 
-				false, 
-				true);
-		MetaDocumentEntity currentMetaDocument = entityComprovarHelper.comprovarMetaDocument(
-				metaDocumentId);
-		MetaExpedientEntity metaExpedientEntity = entityComprovarHelper.comprovarMetaExpedient(
-				entitat, 
-				metaExpedientId);
-//		Recupera els metadocuments del mateix procediment
-		Set<MetaDocumentEntity> metaDocuments = metaExpedientEntity.getMetaDocuments();
-		
-		for (MetaDocumentEntity metaDocumentEntity : metaDocuments) {
-			if (metaDocumentEntity.isPerDefecte()) {
-				metaDocumentEntity.updatePerDefecte(false);
-			}
-		}
-		if (!remove)
-			currentMetaDocument.updatePerDefecte(true);
+		metaDocumentHelper.marcarPerDefecte(entitatId, metaExpedientId, metaDocumentId, remove);
 	}
 	
 	@Transactional

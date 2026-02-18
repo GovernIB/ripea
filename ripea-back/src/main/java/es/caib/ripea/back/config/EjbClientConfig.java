@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.back.config;
 
 import es.caib.ripea.service.intf.resourceservice.*;
@@ -12,38 +9,6 @@ import org.springframework.ejb.access.LocalStatelessSessionProxyFactoryBean;
 import es.caib.ripea.service.intf.base.service.PermissionEvaluatorService;
 import es.caib.ripea.service.intf.base.service.ResourceApiService;
 import es.caib.ripea.service.intf.config.BaseConfig;
-
-import es.caib.ripea.service.intf.resourceservice.AlertaResourceService;
-import es.caib.ripea.service.intf.resourceservice.CarpetaResourceService;
-import es.caib.ripea.service.intf.resourceservice.ContingutLogResourceService;
-import es.caib.ripea.service.intf.resourceservice.ContingutMovimentResourceService;
-import es.caib.ripea.service.intf.resourceservice.DadaResourceService;
-import es.caib.ripea.service.intf.resourceservice.DocumentEnviamentInteressatResourceService;
-import es.caib.ripea.service.intf.resourceservice.DocumentNotificacioResourceService;
-import es.caib.ripea.service.intf.resourceservice.DocumentPortafirmesResourceService;
-import es.caib.ripea.service.intf.resourceservice.DocumentPublicacioResourceService;
-import es.caib.ripea.service.intf.resourceservice.DocumentResourceService;
-import es.caib.ripea.service.intf.resourceservice.DocumentViafirmaResourceService;
-import es.caib.ripea.service.intf.resourceservice.EntitatResourceService;
-import es.caib.ripea.service.intf.resourceservice.ExecucioMassivaContingutResourceService;
-import es.caib.ripea.service.intf.resourceservice.ExecucioMassivaResourceService;
-import es.caib.ripea.service.intf.resourceservice.ExpedientComentariResourceService;
-import es.caib.ripea.service.intf.resourceservice.ExpedientEstatResourceService;
-import es.caib.ripea.service.intf.resourceservice.ExpedientPeticioResourceService;
-import es.caib.ripea.service.intf.resourceservice.ExpedientResourceService;
-import es.caib.ripea.service.intf.resourceservice.ExpedientTascaComentariResourceService;
-import es.caib.ripea.service.intf.resourceservice.ExpedientTascaResourceService;
-import es.caib.ripea.service.intf.resourceservice.GrupResourceService;
-import es.caib.ripea.service.intf.resourceservice.InteressatGrupResourceService;
-import es.caib.ripea.service.intf.resourceservice.InteressatResourceService;
-import es.caib.ripea.service.intf.resourceservice.MetaDadaResourceService;
-import es.caib.ripea.service.intf.resourceservice.MetaDocumentResourceService;
-import es.caib.ripea.service.intf.resourceservice.MetaExpedientResourceService;
-import es.caib.ripea.service.intf.resourceservice.MetaExpedientTascaResourceService;
-import es.caib.ripea.service.intf.resourceservice.OrganGestorResourceService;
-import es.caib.ripea.service.intf.resourceservice.RegistreAnnexResourceService;
-import es.caib.ripea.service.intf.resourceservice.RegistreInteressatResourceService;
-import es.caib.ripea.service.intf.resourceservice.UsuariResourceService;
 import es.caib.ripea.service.intf.service.AlertaService;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.AvisService;
@@ -393,8 +358,8 @@ public class EjbClientConfig {
 	}
 
 	@Bean
-	public LocalStatelessSessionProxyFactoryBean expedientEstatResourceServiceEjb() {
-		return getLocalEjbFactoyBean(ExpedientEstatResourceService.class);
+	public LocalStatelessSessionProxyFactoryBean metaExpedientEstatResourceServiceEjb() {
+		return getLocalEjbFactoyBean(MetaExpedientEstatResourceService.class);
 	}
 
 	@Bean
@@ -446,6 +411,11 @@ public class EjbClientConfig {
 	public LocalStatelessSessionProxyFactoryBean pinbalServeiResourceServiceEjb() {
 		return getLocalEjbFactoyBean(PinbalServeiResourceService.class);
 	}
+	
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean avisServeiResourceServiceEjb() {
+		return getLocalEjbFactoyBean(AvisResourceService.class);
+	}
 
 	@Bean
 	public LocalStatelessSessionProxyFactoryBean contingutResourceServiceEjb() {
@@ -481,7 +451,37 @@ public class EjbClientConfig {
 	public LocalStatelessSessionProxyFactoryBean interessatGrupResourceServiceEjb() {
 		return getLocalEjbFactoyBean(InteressatGrupResourceService.class);
 	}
-
+	
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean metaNodeResourceServiceEjb() {
+		return getLocalEjbFactoyBean(MetaNodeResourceService.class);
+	}
+	
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean dominiResourceServiceEjb() {
+		return getLocalEjbFactoyBean(DominiResourceService.class);
+	}
+	
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean metaDocumentFluxPortafibResourceServiceEjb() {
+		return getLocalEjbFactoyBean(MetaDocumentFluxPortafibResourceService.class);
+	}
+	
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean uRLInstruccioResourceServiceEjb() {
+		return getLocalEjbFactoyBean(URLInstruccioResourceService.class);
+	}
+	
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean metaExpedientTascaValidacioResourceServiceEjb() {
+		return getLocalEjbFactoyBean(MetaExpedientTascaValidacioResourceService.class);
+	}
+	
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean metaExpedientCarpetaResourceServiceEjb() {
+		return getLocalEjbFactoyBean(MetaExpedientCarpetaResourceService.class);
+	}
+	
 	/*
 	@Bean
 	public static BeanFactoryPostProcessor configurarEJBsDinamicament() {

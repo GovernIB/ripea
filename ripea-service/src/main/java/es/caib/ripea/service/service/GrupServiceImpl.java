@@ -2,7 +2,6 @@ package es.caib.ripea.service.service;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -29,10 +28,8 @@ import es.caib.ripea.service.helper.CacheHelper;
 import es.caib.ripea.service.helper.ConversioTipusHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.GrupHelper;
-import es.caib.ripea.service.helper.HibernateHelper;
 import es.caib.ripea.service.helper.MetaExpedientHelper;
 import es.caib.ripea.service.helper.OrganGestorCacheHelper;
-import es.caib.ripea.service.helper.OrganGestorHelper;
 import es.caib.ripea.service.helper.PaginacioHelper;
 import es.caib.ripea.service.helper.PermisosHelper;
 import es.caib.ripea.service.intf.dto.GrupDto;
@@ -60,7 +57,6 @@ public class GrupServiceImpl implements GrupService {
 	@Autowired private PermisosHelper permisosHelper;
 	@Autowired private OrganGestorRepository organGestorRepository;
 	@Autowired private ExpedientPeticioRepository expedientPeticioRepository;
-	@Autowired private OrganGestorHelper organGestorHelper;
 	@Autowired private CacheHelper cacheHelper;
     @Autowired private OrganGestorCacheHelper organGestorCacheHelper;
 
@@ -311,13 +307,13 @@ public class GrupServiceImpl implements GrupService {
 	public void relacionarAmbMetaExpedient(
 			Long entitatId,
 			Long metaExpedientId,
-			Long id, 
+			Long grupId, 
 			String rolActual, 
 			Long organId, 
 			boolean marcarPerDefecte) {
 		logger.debug("Relacionant un grup amb metaxpedient (" +
 				"metaExpedientId=" + metaExpedientId + ", " +
-				"id=" + id + ")");
+				"id=" + grupId + ")");
 		
 		entityComprovarHelper.comprovarEntitat(
 				entitatId,
@@ -325,22 +321,12 @@ public class GrupServiceImpl implements GrupService {
 				false,
 				false, false, false);
 		
-		MetaExpedientEntity metaExpedientEntity = metaExpedientRepository.getOne(metaExpedientId);
-		
-		GrupEntity grupEntity = grupRepository.getOne(id);
-		
-		metaExpedientEntity.addGrup(grupEntity);
-		
-		if (marcarPerDefecte) {
-			metaExpedientEntity.setGrupPerDefecte(grupEntity);
-		}
+		grupHelper.relacionarAmbMetaExpedient(metaExpedientId, grupId, marcarPerDefecte);
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientEntity.getId(), organId);
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientId, organId);
 		}
-
 	}
-	
 	
 	@Override
 	@Transactional
@@ -353,29 +339,9 @@ public class GrupServiceImpl implements GrupService {
 		logger.debug("Desvinculant un grup amb metaxpedient (" +
 				"metaExpedientId=" + metaExpedientId + ", " +
 				"id=" + id + ")");
-		
-		entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				false,
-				false, false, false);
-		
-		MetaExpedientEntity metaExpedientEntity = metaExpedientRepository.getOne(metaExpedientId);
-		
-		GrupEntity grupEntity = HibernateHelper.deproxy(grupRepository.getOne(id));
-
-		metaExpedientEntity.removeGrup(grupEntity);
-		
-		if (metaExpedientEntity.getGrupPerDefecte() != null && grupEntity.getId().equals(metaExpedientEntity.getGrupPerDefecte().getId())) {
-			metaExpedientEntity.setGrupPerDefecte(null);
-		}
-		
-		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientEntity.getId(), organId);
-		}
+		entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false, false);
+		grupHelper.desvincularAmbMetaExpedient(entitatId, metaExpedientId, id, rolActual, organId);
 	}
-	
-	
 	
 	@Transactional
 	@Override
@@ -397,7 +363,6 @@ public class GrupServiceImpl implements GrupService {
 				procedimentId);
 		
 		metaExpedientEntity.setGrupPerDefecte(grupRepository.getOne(grupId));
-		
 	}
 	
 	@Transactional
@@ -420,14 +385,11 @@ public class GrupServiceImpl implements GrupService {
 				procedimentId);
 		
 		metaExpedientEntity.setGrupPerDefecte(null);
-		
 	}
 	
 	@Transactional
 	@Override
-	public boolean checkIfHasGrupPerDefecte(
-			Long procedimentId) throws NotFoundException {
-		
+	public boolean checkIfHasGrupPerDefecte(Long procedimentId) throws NotFoundException {
 		MetaExpedientEntity metaExpedientEntity = metaExpedientRepository.getOne(procedimentId);
 		return metaExpedientEntity.getGrupPerDefecte() != null;
 	}
@@ -435,62 +397,14 @@ public class GrupServiceImpl implements GrupService {
 	@Transactional(readOnly = true)
 	@Override
 	public List<GrupDto> findGrupsNoRelacionatAmbMetaExpedient(Long entitatId, Long metaExpedientId, Long adminOrganId) {
-	
 		entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-		
-		MetaExpedientEntity metaExpedient = metaExpedientRepository.getOne(metaExpedientId);
-		Long procedimentOrganId = metaExpedient.getOrganGestor() != null ? metaExpedient.getOrganGestor().getId() : null;
-		List<GrupEntity> grupsProcedimentExisting = metaExpedient.getGrups();
-		
-		List<GrupEntity> grups = grupRepository.findByEntitatId(entitatId);
-		
-		
-		// remove grups already related to procediment
-		for (Iterator<GrupEntity> iter = grups.iterator(); iter.hasNext();) {
-			GrupEntity grup = iter.next();
-			
-			boolean contains = false;
-			for (GrupEntity gr : grupsProcedimentExisting) {
-				if (gr.getId().equals(grup.getId())) {
-					contains = true;
-					break;
-				}
-			}
-			if (contains) {
-				iter.remove();
-			}
-		}
-		
-		// if is called by administador d'organ only leave grups assigned to organ or descendents
-		if (adminOrganId != null) {
-			for (Iterator<GrupEntity> iter = grups.iterator(); iter.hasNext();) {
-				GrupEntity grup = iter.next();
-				if (grup.getOrganGestor() == null || !organGestorHelper.findParesIds(grup.getOrganGestor().getId(), true).contains(adminOrganId)) {
-					iter.remove();
-				}
-			}
-		} 
-		
-		// if procediment belongs to organ remove grups that belong to other organ
-		if (procedimentOrganId != null) {
-			for (Iterator<GrupEntity> iter = grups.iterator(); iter.hasNext();) {
-				GrupEntity grup = iter.next();
-				if (grup.getOrganGestor() != null && !organGestorHelper.findParesIds(grup.getOrganGestor().getId(), true).contains(procedimentOrganId)) {
-					iter.remove();
-				}
-			}
-		}
-
+		List<GrupEntity> grups = grupHelper.findGrupsNoRelacionatAmbMetaExpedient(entitatId, metaExpedientId, adminOrganId);
 		return conversioTipusHelper.convertirList(grups, GrupDto.class);
 	}
 	
-	
 	@Transactional(readOnly = true)
 	@Override
-	public List<GrupDto> findGrups(
-			Long entitatId,
-			Long organGestorId,
-			Long metaExpedientId) {
+	public List<GrupDto> findGrups(Long entitatId, Long organGestorId, Long metaExpedientId) {
 		
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 		List<String> codisOrgansFills = null;

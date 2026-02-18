@@ -5,12 +5,16 @@ import java.time.LocalDateTime;
 import java.time.Year;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import es.caib.ripea.service.intf.resourcevalidation.ImportarDocumentsZipValid;
 import org.springframework.data.annotation.Transient;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -27,6 +31,7 @@ import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.dto.FileNameOption;
 import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
 import es.caib.ripea.service.intf.dto.TipusImportEnumDto;
+import es.caib.ripea.service.intf.registre.RegistreInteressat;
 import es.caib.ripea.service.intf.resourcevalidation.ExpedientValid;
 import es.caib.ripea.service.intf.resourcevalidation.ImportarDocumentValid;
 import es.caib.ripea.service.intf.resourcevalidation.MassiveImportDocValid;
@@ -62,6 +67,9 @@ import lombok.experimental.FieldNameConstants;
 				@ResourceConfigArtifact(
 						type = ResourceArtifactType.PERSPECTIVE,
 						code = ExpedientResource.PERSPECTIVE_AMB_PINBAL_CODE),
+				@ResourceConfigArtifact(
+						type = ResourceArtifactType.PERSPECTIVE,
+						code = ExpedientResource.PERSPECTIVE_PERMIS_CONTINGUT),
 				@ResourceConfigArtifact(
 						type = ResourceArtifactType.PERSPECTIVE,
 						code = ExpedientResource.PERSPECTIVE_AUDIT_CODE),
@@ -142,7 +150,16 @@ import lombok.experimental.FieldNameConstants;
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientResource.ACTION_SYNC_ARXIU,
-                        formClass = ExpedientResource.MassiveAction.class),                
+                        formClass = ExpedientResource.MassiveAction.class),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = ExpedientResource.ACTION_GUARDAR_ARXIU,
+                        formClass = ExpedientResource.MassiveAction.class),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = ExpedientResource.ACTION_MOURE_TOT_CODE,
+                        formClass = ExpedientResource.MoureTotFormAction.class,
+                        requiresId = true),  
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.REPORT,
                         code = ExpedientResource.REPORT_EXPORT_SELECTED_DOCS,
@@ -162,6 +179,22 @@ import lombok.experimental.FieldNameConstants;
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientResource.ACTION_IMPORT_DOCS_ZIP,
                         formClass = ExpedientResource.ImportarDocumentsZipForm.class,
+                        requiresId = true),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = ExpedientResource.ACTION_GET_PROGRES_SGD,
+                        requiresId = true),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = ExpedientResource.ACTION_CANCEL_IMPORT_SGD,
+                        requiresId = true),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = ExpedientResource.ACTION_GET_PROGRES_ZIP,
+                        requiresId = true),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = ExpedientResource.ACTION_CANCEL_IMPORT_ZIP,
                         requiresId = true),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
@@ -248,9 +281,15 @@ public class ExpedientResource extends NodeResource implements Serializable {
 	public static final String ACTION_IMPORTAR_CODE = "IMPORTAR";
 	public static final String REPORT_EXPORT_SELECTED_DOCS = "EXPORT_SELECTED_DOCS";
 	public static final String ACTION_SYNC_ARXIU = "SYNC_ARXIU";
+	public static final String ACTION_GUARDAR_ARXIU = "GUARDAR_ARXIU";	
 	public static final String ACTION_IMPORT_DOCS = "IMPORT_DOCS";
-	public static final String ACTION_IMPORT_DOCS_ZIP = "IMPORT_DOCS_ZIP";
 	public static final String ACTION_IMPORT_INTE = "IMPORT_INTE";
+	public static final String ACTION_GET_PROGRES_SGD = "GET_PROGRES_SGD";
+	public static final String ACTION_CANCEL_IMPORT_SGD = "CANCEL_IMPORT_SGD";
+	public static final String ACTION_IMPORT_DOCS_ZIP = "IMPORT_DOCS_ZIP";
+	public static final String ACTION_GET_PROGRES_ZIP = "GET_PROGRES_ZIP";
+	public static final String ACTION_CANCEL_IMPORT_ZIP = "CANCEL_IMPORT_ZIP";
+	public static final String ACTION_MOURE_TOT_CODE = "MOURE_TOT";
 	public static final String REPORT_PLANTILLA_EXCEL_INTERESSATS = "PLANTILLA_EXCEL_INTERESSATS";
 	public static final String REPORT_PLANTILLA_DADES_CSV = "PLANTILLA_DADES_CSV";
 	
@@ -265,6 +304,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
 	public static final String PERSPECTIVE_DOCUMENTS_NO_MOGUTS = "DOCUMENTS_NO_MOGUTS";
 	public static final String PERSPECTIVE_DOCUMENTS_OBLIGATORIS_TANCAR = "DOCUMENTS_OBLIGATORIS_TANCAR";
 	public static final String PERSPECTIVE_AMB_PINBAL_CODE = "AMB_PINBAL";
+	public static final String PERSPECTIVE_PERMIS_CONTINGUT = "PERMIS_CONTINGUT";	
 	public static final String PERSPECTIVE_AUDIT_CODE = "AUDITORIA";
 	
 
@@ -297,7 +337,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
 	private ResourceReference<MetaExpedientResource, Long> metaExpedient;
     @Transient private MetaExpedientResource metaExpedientInfo;
 	private ResourceReference<UsuariResource, String> agafatPer;
-	private ResourceReference<ExpedientEstatResource, Long> estatAdditional;
+	private ResourceReference<MetaExpedientEstatResource, Long> estatAdditional;
     @Transient boolean gestioAmbGrupsActiva;
 	private ResourceReference<GrupResource, Long> grup;
 	private ResourceReference<MetaExpedientOrganGestorResource, Long> metaexpedientOrganGestorPares;
@@ -367,7 +407,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
 	@Size(max = 1024)
 	private String prioritatMotiu;
 
-    @Transient private ExpedientEstatResource estatAdditionalInfo;
+    @Transient private MetaExpedientEstatResource estatAdditionalInfo;
     @Transient private List<InteressatResource> interessats;
     @Transient private List<ResourceReference<UsuariResource, String>> seguidors;
     @Transient private boolean seguidor = false;
@@ -408,7 +448,8 @@ public class ExpedientResource extends NodeResource implements Serializable {
     @Transient private boolean ambNotificacionsPendents;
     @Transient private boolean ambDocumentsPinbal;
     @Transient private boolean creacioCarpetesActiva;
-
+    @Transient private boolean isPendentExecucioMassiva;
+    
     @Getter
 	@Setter
     @NoArgsConstructor
@@ -426,7 +467,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
         @ResourceField(enumType = true)
         private String dominiValor;
         @ResourceField(onChangeActive = true)
-        private LocalDateTime dataCreacioInici = LocalDateTime.now().withMonth(LocalDateTime.now().getMonth().getValue()-3);
+        private LocalDateTime dataCreacioInici = LocalDateTime.now().minusMonths(3);
         @ResourceField(onChangeActive = true)
         private LocalDateTime dataCreacioFinal;
         private String numeroRegistre;
@@ -491,7 +532,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
     public static class CanviEstatExpedientFormAction extends MassiveAction {
         @Transient private String nom;
         @NotNull
-        private ResourceReference<ExpedientEstatResource, Long> estatAdditional;
+        private ResourceReference<MetaExpedientEstatResource, Long> estatAdditional;
     }
     
     @Getter
@@ -500,6 +541,8 @@ public class ExpedientResource extends NodeResource implements Serializable {
         @Transient private String nom;
         @NotNull
         private PrioritatEnumDto prioritat;
+    	@Size(max = 1024)
+    	private String prioritatMotiu;
     }
     
     @Getter
@@ -507,6 +550,13 @@ public class ExpedientResource extends NodeResource implements Serializable {
     public static class ImportarExpedientFormAction implements Serializable {
         @NotNull
         private ResourceReference<ExpedientResource, Long> expedientOrigen;
+    }
+    
+    @Getter
+    @Setter
+    public static class MoureTotFormAction implements Serializable {
+    	@NotNull
+        private ResourceReference<ExpedientResource, Long> expedientDesti;
     }
     
     @Getter
@@ -519,10 +569,12 @@ public class ExpedientResource extends NodeResource implements Serializable {
     	private TipusImportEnumDto tipusImportacio = TipusImportEnumDto.NUMERO_REGISTRE;
     	private String codiEni;
     	private String numeroRegistre;
+    	private boolean importarInteressats;
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone="Europe/Madrid")
         private Date dataPresentacio;
     	private ResourceReference<CarpetaResource, Long> carpeta;
         private String novaCarpetaNom;
+        private List<RegistreInteressat> interessats;
     }
 
     @Getter
@@ -531,18 +583,24 @@ public class ExpedientResource extends NodeResource implements Serializable {
     @FieldNameConstants
     public static class ImportarInteressatsForm implements Serializable {
     	@NotNull private String numeroRegistre;
-        @NotNull @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy", timezone="Europe/Madrid")
-        private Date dataPresentacio;
     }
     
     @Getter
     @Setter
     @NoArgsConstructor
     @FieldNameConstants
+    @ImportarDocumentsZipValid
     public static class ImportarDocumentsZipForm implements Serializable {
-    	@NotNull
+//    	@NotNull
+    	@ResourceField(onChangeActive = true)
     	private FileReference documentZip;
-    	private List<DocumentResource> documentsUsuari;
+        @NotNull @NotEmpty
+    	private List<ImportacioZipDocument> documentsZip;
+
+        @Transient
+        private String nom;
+        @Transient
+        private ResourceReference<MetaDocumentResource, Long> tipusDocument;
     }
 
     @Getter
@@ -567,4 +625,5 @@ public class ExpedientResource extends NodeResource implements Serializable {
         private Date dataCreacioInici;
         private Date dataCreacioFi;
     }
+    
 }

@@ -11,27 +11,20 @@ import org.springframework.transaction.annotation.Transactional;
 import es.caib.ripea.persistence.entity.DadaEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.MetaDadaEntity;
-import es.caib.ripea.persistence.entity.MetaDocumentEntity;
-import es.caib.ripea.persistence.entity.MetaExpedientEntity;
-import es.caib.ripea.persistence.entity.MetaExpedientTascaValidacioEntity;
 import es.caib.ripea.persistence.entity.MetaNodeEntity;
 import es.caib.ripea.persistence.entity.NodeEntity;
 import es.caib.ripea.persistence.repository.DadaRepository;
 import es.caib.ripea.persistence.repository.MetaDadaRepository;
-import es.caib.ripea.persistence.repository.MetaExpedientTascaValidacioRepository;
 import es.caib.ripea.service.helper.ConversioTipusHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.MetaDadaHelper;
-import es.caib.ripea.service.helper.MetaExpedientHelper;
 import es.caib.ripea.service.helper.MetaNodeHelper;
 import es.caib.ripea.service.helper.PaginacioHelper;
-import es.caib.ripea.service.intf.dto.ItemValidacioTascaEnum;
 import es.caib.ripea.service.intf.dto.MetaDadaDto;
 import es.caib.ripea.service.intf.dto.MetaDadaTipusEnumDto;
 import es.caib.ripea.service.intf.dto.PaginaDto;
 import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
 import es.caib.ripea.service.intf.service.MetaDadaService;
-import liquibase.pro.packaged.de;
 
 @Service
 public class MetaDadaServiceImpl implements MetaDadaService {
@@ -42,23 +35,25 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 	@Autowired private PaginacioHelper paginacioHelper;
 	@Autowired private EntityComprovarHelper entityComprovarHelper;
 	@Autowired private MetaNodeHelper metaNodeHelper;
-	@Autowired private MetaExpedientHelper metaExpedientHelper;
 	@Autowired private MetaDadaHelper metaDadaHelper;
-	@Autowired private MetaExpedientTascaValidacioRepository metaExpedientTascaValidacioRepository;
 
 	@Transactional
 	@Override
 	public MetaDadaDto create(
 			Long entitatId,
 			Long metaNodeId,
-			MetaDadaDto metaDada, String rolActual, Long organId) {
+			MetaDadaDto metaDada,
+			String rolActual,
+			Long organId) {
 
-		return metaDadaHelper.create(
+		MetaDadaEntity entity = metaDadaHelper.create(
 				entitatId,
 				metaNodeId,
 				metaDada,
 				rolActual,
 				organId);
+		
+		return conversioTipusHelper.convertir(entity, MetaDadaDto.class);
 	}
 
 	@Transactional
@@ -71,27 +66,7 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 				"entitatId=" + entitatId + ", " +
 				"metaNodeId=" + metaNodeId + ", " +
 				"metaDada=" + metaDada + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-		MetaNodeEntity metaNode = entityComprovarHelper.comprovarMetaNode(
-				entitat,
-				metaNodeId);
-		MetaDadaEntity entity = entityComprovarHelper.comprovarMetaDada(
-				entitat,
-				metaNode,
-				metaDada.getId());
-
-		entity.update(metaDada);
-		
-		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			Long metaExpedientId = null;
-			if (metaNode instanceof MetaExpedientEntity) {
-				metaExpedientId = metaNode.getId();
-			} else if (metaNode instanceof MetaDocumentEntity) {
-				metaExpedientId = ((MetaDocumentEntity) metaNode).getMetaExpedient().getId();
-			}
-			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientId, organId);
-		}
-		
+		MetaDadaEntity entity = metaDadaHelper.update(entitatId, metaNodeId, metaDada, rolActual, organId);		
 		return conversioTipusHelper.convertir(entity, MetaDadaDto.class);
 	}
 	
@@ -105,40 +80,8 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 				"entitatId=" + entitatId + ", " +
 				"metaNodeId=" + metaNodeId + ", " +
 				"id=" + id + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-		MetaNodeEntity metaNode = entityComprovarHelper.comprovarMetaNode(
-				entitat,
-				metaNodeId);
-		
-		MetaDadaEntity metaDada = entityComprovarHelper.comprovarMetaDada(
-				entitat,
-				metaNode,
-				id);
-		
-		//Eliminar les possibles validacions sobre la dada
-		List<MetaExpedientTascaValidacioEntity> validacionsDada = metaExpedientTascaValidacioRepository.findByItemValidacioAndItemId(
-				ItemValidacioTascaEnum.DADA,
-				id);
-		
-		if (validacionsDada!=null && validacionsDada.size()>0) {
-			metaExpedientTascaValidacioRepository.deleteAll(validacionsDada);
-		}
-		
-		metaDadaRepository.delete(metaDada);
-		
-		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			Long metaExpedientId = null;
-			if (metaNode instanceof MetaExpedientEntity) {
-				metaExpedientId = metaNode.getId();
-			} else if (metaNode instanceof MetaDocumentEntity) {
-				metaExpedientId = ((MetaDocumentEntity) metaNode).getMetaExpedient().getId();
-			}
-			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientId, organId);
-		}
-
-		return conversioTipusHelper.convertir(
-				metaDada,
-				MetaDadaDto.class);
+		MetaDadaEntity entity = metaDadaHelper.delete(entitatId, metaNodeId, id, rolActual, organId);
+		return conversioTipusHelper.convertir(entity, MetaDadaDto.class);
 	}
 
 	@Transactional
@@ -147,34 +90,16 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 			Long entitatId,
 			Long metaNodeId,
 			Long id,
-			boolean activa, String rolActual, Long organId) {
+			boolean activa,
+			String rolActual,
+			Long organId) {
 		logger.debug("Actualitzant propietat activa de la meta-dada (" +
 				"entitatId=" + entitatId + ", " +
 				"metaNodeId=" + metaNodeId + ", " +
 				"id=" + id + "," +
 				"activa=" + activa + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-		MetaNodeEntity metaNode = entityComprovarHelper.comprovarMetaNode(
-				entitat,
-				metaNodeId);
-		MetaDadaEntity metaDada = entityComprovarHelper.comprovarMetaDada(
-				entitat,
-				metaNode,
-				id);
-		metaDada.updateActiva(activa);
-		
-		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			Long metaExpedientId = null;
-			if (metaNode instanceof MetaExpedientEntity) {
-				metaExpedientId = metaNode.getId();
-			} else if (metaNode instanceof MetaDocumentEntity) {
-				metaExpedientId = ((MetaDocumentEntity) metaNode).getMetaExpedient().getId();
-			}
-			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientId, organId);
-		}
-		return conversioTipusHelper.convertir(
-				metaDada,
-				MetaDadaDto.class);
+		MetaDadaEntity metaDada = metaDadaHelper.updateActiva(entitatId, metaNodeId, id, activa, rolActual, organId);
+		return conversioTipusHelper.convertir(metaDada, MetaDadaDto.class);
 	}
 
 	@Transactional
@@ -187,18 +112,8 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 				+ "entitatId=" + entitatId +  ", "
 				+ "metaNodeId=" + metaNodeId +  ", "
 				+ "metaDadaId=" + metaDadaId +  ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-		MetaNodeEntity metaNode = entityComprovarHelper.comprovarMetaNode(
-				entitat,
-				metaNodeId);
-		MetaDadaEntity metaDada = entityComprovarHelper.comprovarMetaDada(
-				entitat,
-				metaNode,
-				metaDadaId);
-		metaNodeHelper.moureMetaNodeMetaDada(
-				metaNode,
-				metaDada,
-				metaDada.getOrdre() - 1);
+		MetaDadaEntity metaDada = metaDadaRepository.findById(metaDadaId).get();
+		metaNodeHelper.moureMetaNodeMetaDada(entitatId, metaNodeId, metaDadaId, metaDada.getOrdre() - 1);
 	}
 
 	@Transactional
@@ -211,18 +126,8 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 				+ "entitatId=" + entitatId +  ", "
 				+ "metaNodeId=" + metaNodeId +  ", "
 				+ "metaDadaId=" + metaDadaId +  ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-		MetaNodeEntity metaNode = entityComprovarHelper.comprovarMetaNode(
-				entitat,
-				metaNodeId);
-		MetaDadaEntity metaDada = entityComprovarHelper.comprovarMetaDada(
-				entitat,
-				metaNode,
-				metaDadaId);
-		metaNodeHelper.moureMetaNodeMetaDada(
-				metaNode,
-				metaDada,
-				metaDada.getOrdre() + 1);
+		MetaDadaEntity metaDada = metaDadaRepository.findById(metaDadaId).get();		
+		metaNodeHelper.moureMetaNodeMetaDada(entitatId, metaNodeId, metaDadaId, metaDada.getOrdre() + 1);
 	}
 
 	@Transactional
@@ -278,18 +183,7 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 				+ "metaNodeId=" + metaNodeId +  ", "
 				+ "metaDadaId=" + metaDadaId +  ", "
 				+ "posicio=" + posicio +  ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-		MetaNodeEntity metaNode = entityComprovarHelper.comprovarMetaNode(
-				entitat,
-				metaNodeId);
-		MetaDadaEntity metaDada = entityComprovarHelper.comprovarMetaDada(
-				entitat,
-				metaNode,
-				metaDadaId);
-		metaNodeHelper.moureMetaNodeMetaDada(
-				metaNode,
-				metaDada,
-				posicio);
+		metaNodeHelper.moureMetaNodeMetaDada(entitatId, metaNodeId, metaDadaId, posicio);
 	}
 	
 	@Transactional(readOnly=true)

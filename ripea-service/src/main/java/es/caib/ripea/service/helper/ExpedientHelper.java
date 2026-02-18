@@ -1,5 +1,6 @@
 package es.caib.ripea.service.helper;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
@@ -17,14 +18,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -38,6 +42,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;
 import com.github.mustachejava.MustacheFactory;
@@ -63,6 +68,7 @@ import es.caib.ripea.persistence.entity.DadaEntity;
 import es.caib.ripea.persistence.entity.DocumentEntity;
 import es.caib.ripea.persistence.entity.DocumentNotificacioEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.ExpedientComentariEntity;
 import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.entity.ExpedientEstatEntity;
 import es.caib.ripea.persistence.entity.ExpedientPeticioEntity;
@@ -87,9 +93,12 @@ import es.caib.ripea.persistence.repository.DadaRepository;
 import es.caib.ripea.persistence.repository.DocumentNotificacioRepository;
 import es.caib.ripea.persistence.repository.DocumentRepository;
 import es.caib.ripea.persistence.repository.EntitatRepository;
+import es.caib.ripea.persistence.repository.ExecucioMassivaRepository;
+import es.caib.ripea.persistence.repository.ExpedientComentariRepository;
 import es.caib.ripea.persistence.repository.ExpedientEstatRepository;
 import es.caib.ripea.persistence.repository.ExpedientPeticioRepository;
 import es.caib.ripea.persistence.repository.ExpedientRepository;
+import es.caib.ripea.persistence.repository.GrupRepository;
 import es.caib.ripea.persistence.repository.InteressatRepository;
 import es.caib.ripea.persistence.repository.MetaDadaRepository;
 import es.caib.ripea.persistence.repository.MetaDocumentRepository;
@@ -103,12 +112,18 @@ import es.caib.ripea.service.auxiliary.ExpedientFiltreCalculat;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.ArxiuEstatEnumDto;
 import es.caib.ripea.service.intf.dto.CarpetaDto;
+import es.caib.ripea.service.intf.dto.DocumentAmbTipusDto;
 import es.caib.ripea.service.intf.dto.DocumentDto;
 import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentNtiTipoFirmaEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
+import es.caib.ripea.service.intf.dto.ElementTipusEnumDto;
 import es.caib.ripea.service.intf.dto.EntregaPostalTipusEnum;
+import es.caib.ripea.service.intf.dto.ExecucioMassivaContingutDto;
+import es.caib.ripea.service.intf.dto.ExecucioMassivaDto;
+import es.caib.ripea.service.intf.dto.ExecucioMassivaEstatDto;
+import es.caib.ripea.service.intf.dto.ExecucioMassivaTipusDto;
 import es.caib.ripea.service.intf.dto.ExpedientDto;
 import es.caib.ripea.service.intf.dto.ExpedientEstatDto;
 import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
@@ -136,11 +151,11 @@ import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.exception.ArxiuJaGuardatException;
 import es.caib.ripea.service.intf.exception.InteressatTipusDocumentException;
 import es.caib.ripea.service.intf.exception.ValidationException;
+import es.caib.ripea.service.intf.service.ExecucioMassivaService;
 import es.caib.ripea.service.intf.service.ExpedientSeguidorService;
 import es.caib.ripea.service.intf.utils.DateUtil;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.permission.ExtendedPermission;
-import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 
 @Component
@@ -175,6 +190,7 @@ public class ExpedientHelper {
 	@Autowired private ConversioTipusHelper conversioTipusHelper;
 	@Autowired private CacheHelper cacheHelper;
 	@Autowired private ExpedientPeticioHelper expedientPeticioHelper;
+	@Autowired private MetaExpedientHelper metaExpedientHelper;
 	@Autowired private PermisosHelper permisosHelper;
 	@Autowired private MetaExpedientRepository metaExpedientRepository;
 	@Autowired private UsuariRepository usuariRepository;
@@ -187,6 +203,10 @@ public class ExpedientHelper {
 	@Autowired private ExpedientRepositoryCommnand expedientRepositoryCommnand;
 	@Autowired private ExpedientSeguidorService expedientSeguidorService;
 	@Autowired private ApplicationHelper applicationHelper;
+	@Autowired private ExpedientComentariRepository expedientComentariRepository;
+	@Autowired private ExecucioMassivaService execucioMassivaService;
+	@Autowired private ExecucioMassivaRepository execucioMassivaRepository;
+	@Autowired private GrupRepository grupRepository;
 	
 	public static List<DocumentDto> expedientsWithImportacio = new ArrayList<DocumentDto>();
 
@@ -213,6 +233,30 @@ public class ExpedientHelper {
 	        }
         }
         return false;
+	}
+	
+	public String saveImportacioMassivaDocsTemporal(List<DocumentAmbTipusDto> documents) throws IOException {
+		//1.- Guardar fitxers temporalment a disc: en un sol fitxer ZIP amb els objectes passats a fitxers JSON
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ZipOutputStream zipOut = new ZipOutputStream(baos);
+		for (int i = 0; i < documents.size(); i++) {
+			DocumentAmbTipusDto doc = documents.get(i);
+			// Convertir el objeto a JSON
+			ObjectMapper objectMapper = new ObjectMapper();
+			String docAsString = objectMapper.writeValueAsString(doc);
+			// Crear una entrada en el ZIP
+			String entryName = "document_" + (i + 1) + ".json";
+			ZipEntry zipEntry = new ZipEntry(entryName);
+			zipOut.putNextEntry(zipEntry);
+            // Escribir el JSON en la entrada
+            byte[] jsonBytes = docAsString.getBytes("UTF-8");
+            zipOut.write(jsonBytes, 0, jsonBytes.length);
+            zipOut.closeEntry();
+		}
+		
+		return pluginHelper.gestioDocumentalCreate(
+					PluginHelper.GESDOC_AGRUPACIO_DOCS_ESBORRANYS,
+					new ByteArrayInputStream(baos.toByteArray()));
 	}
 	
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -345,6 +389,7 @@ public class ExpedientHelper {
 				}
 				ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.getOne(expedientPeticioId);
 				expedientPeticioHelper.canviEstatExpedientPeticio(expedientPeticioEntity, ExpedientPeticioEstatEnumDto.PROCESSAT_PENDENT);
+				pluginHelper.comandaAvisDelete(expedientPeticioEntity);
 			}
 			
 			// crear carpetes per defecte del procediment
@@ -875,10 +920,11 @@ public class ExpedientHelper {
 			Long entitatId, 
 			boolean associarInteressats,
 			Map<String, InteressatAssociacioAccioEnum> interessatsAccionsMap,
-			boolean agafarExpedient) {
+			boolean agafarExpedient,
+			boolean mourePeticio) {
 		
 		ExpedientPeticioEntity expedientPeticio = expedientPeticioRepository.getOne(expedientPeticioId);
-		if (expedientPeticio.getExpedient() != null) {
+		if (!mourePeticio && expedientPeticio.getExpedient() != null) {
 			throw new ValidationException(
 					"<creacio>",
 					ExpedientEntity.class,
@@ -1350,6 +1396,38 @@ public class ExpedientHelper {
 		return expedient;
 	}
 	
+	public ExpedientEntity updateExpedient(
+			ExpedientEntity expedient,
+			String nom,
+			int any,
+			Long organGestorId,
+			String rolActual,
+			Long grupId,
+			PrioritatEnumDto prioritat,
+			String prioritatMotiu) {
+		expedient = updateNomExpedient(expedient, nom);
+		//Canvi de any, implica canvi de seq i de número
+		if (expedient.getAny()!=any) {
+			//Calculam la seguent sequencia que li toca per el nou any, amb increment=true
+			long sequenciaMetaExpedient = metaExpedientHelper.obtenirProximaSequenciaExpedient(
+					expedient.getMetaExpedient(),
+					any,
+					true);
+			//Actualitzam any, seq i codi: Hi ha una unique a BBDD (IPA_EXPEDIENT_SEQ_UK)
+			expedient.updateAnySequenciaCodi(
+					any,
+					sequenciaMetaExpedient,
+					expedient.getMetaExpedient().getCodi());
+			//Recalculam el numero del expedient, pot ser per defecte o amb una fórmula.
+			expedient.updateNumero(calcularNumero(expedient));
+		}
+		expedient = updateOrganGestor(expedient, organGestorId, rolActual);
+		if (grupId != null) {
+			expedient.setGrup(grupRepository.getOne(grupId));
+		}
+		expedient = updatePrioritat(expedient, prioritat, prioritatMotiu);
+		return expedient;
+	}
 	
 	public ExpedientEntity updateOrganGestor(ExpedientEntity expedient, Long organGestorId, String rolActual) {
 		Long id = expedient.getOrganGestor() != null ? expedient.getOrganGestor().getId() : null;
@@ -1538,7 +1616,7 @@ public class ExpedientHelper {
 		dto.setNumero(entity.getNumero());
 		dto.setNom(entity.getNom());
 		dto.setAlerta(alertaRepository.countByLlegidaAndContingutId(false, entity.getId()) > 0);
-		dto.setValid(cacheHelper.findErrorsValidacioPerNode(entity.getId(), true).isEmpty());
+		dto.setValid(cacheHelper.findErrorsValidacioPerNode(entity.getId()).isEmpty());
 		dto.setErrorLastEnviament(cacheHelper.hasEnviamentsPortafirmesAmbErrorPerExpedient(entity));
 		dto.setErrorLastNotificacio(cacheHelper.hasNotificacionsAmbErrorPerExpedient(entity));
 		dto.setAmbEnviamentsPendents(cacheHelper.hasEnviamentsPortafirmesPendentsPerExpedient(entity.getId()));
@@ -2976,6 +3054,184 @@ public class ExpedientHelper {
 		}
 	}
 	
+	@Transactional
+	public void moureEntreExpedients(Long entitatId, Long expedientOrigenId, Long expedientDestiId, String rolActual) {
+		logger.debug("Preparant moviment d'expedient: entitatId={}, origen={}, desti={}", entitatId, expedientOrigenId, expedientDestiId);
+		entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
+		ExpedientEntity expedientOrigen = entityComprovarHelper.comprovarExpedient(expedientOrigenId, true, true, true, false, false, rolActual);
+		ExpedientEntity expedientDesti = entityComprovarHelper.comprovarExpedient(expedientDestiId, true, true, true, false, false, rolActual);
+		
+		List<ExecucioMassivaContingutDto> execucioMassivaContinguts = crearTasquesMoviment(expedientOrigen, expedientDesti);
+
+		ExecucioMassivaDto execucioMassiva = new ExecucioMassivaDto(
+				ExecucioMassivaTipusDto.MOURE_EXPEDIENT, 
+				new Date(),
+				null, 
+				rolActual);
+
+		execucioMassiva.setExpedientDestiId(expedientDestiId);
+		execucioMassiva.setExpedientOrigenId(expedientOrigenId);
+
+		execucioMassivaService.saveExecucioMassiva(
+				entitatId, 
+				execucioMassiva, 
+				execucioMassivaContinguts,
+				ElementTipusEnumDto.ACCIO);
+
+		logger.info("Execució massiva creada per moure expedients [{} -> {}]", expedientOrigenId, expedientDestiId);
+	}
+
+	@Transactional(readOnly = true)
+	public boolean isExpedientPendentExecucioMassiva(Long expedientId) {
+		return execucioMassivaRepository.findByExpedientOrigenIdAndDataFiNull(expedientId).isPresent();
+	}
+	
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public void moureFills(Long entitatId, Long expedientOrigenId, Long expedientDestiId) {
+		List<ContingutEntity> fills = contingutRepository.findByPareIdAndEsborratOrderByOrdreAsc(expedientOrigenId, 0);
+
+		try {
+			//Inclou: Peticions de firma i notificacions, Logs
+			for (ContingutEntity contingutFill: fills) {
+					contingutHelper.move(
+							entitatId, 
+							contingutFill.getId(), 
+							expedientDestiId, 
+							null, 
+							null);
+			}
+		} catch (Exception ex) {
+			logger.error("Hi ha hagut un error movent algun document/carpeta [expedientOrigenId={}, expedientDestiId={}]", expedientOrigenId, expedientDestiId);
+			throw ex;
+		}
+	}
+	
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public void moureInteressats(Long expedientOrigenId, Long expedientDestiId) {
+		try {
+			ExpedientEntity expedientDesti = expedientRepository.findById(expedientDestiId).get();
+			
+			List<InteressatEntity> interessats = interessatRepository.findByExpedientId(expedientOrigenId);
+			
+			for (InteressatEntity interessat: interessats) {
+				interessat.updateExpedient(expedientDesti);
+			}
+			
+			// Actualitzar arxiu
+			pluginHelper.arxiuExpedientActualitzar(expedientDesti);
+			
+		} catch (Exception ex) {
+			logger.error("Hi ha hagut un error movent algun interessat [expedientOrigenId={}, expedientDestiId={}]", expedientOrigenId, expedientDestiId);
+			throw ex;
+		}
+	}
+
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public void moureSeguidors(Long expedientOrigenId, Long expedientDestiId) {
+		try {
+			ExpedientEntity expedientOrigen = expedientRepository.findById(expedientOrigenId).get();
+			ExpedientEntity expedientDesti = expedientRepository.findById(expedientDestiId).get();
+			
+			List<UsuariEntity> seguidorsOrigen = expedientOrigen.getSeguidors();
+			expedientDesti.getSeguidors().addAll(seguidorsOrigen);
+			expedientOrigen.getSeguidors().clear();
+		} catch (Exception ex) {
+			logger.error("Hi ha hagut un error movent algun seguidor [expedientOrigenId={}, expedientDestiId={}]", expedientOrigenId, expedientDestiId);
+			throw ex;
+		}
+	}
+
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public void moureAnotacionsRegistre(Long expedientOrigenId, Long expedientDestiId) {
+		ExpedientEntity expedientOrigen = expedientRepository.findById(expedientOrigenId).get();
+		ExpedientEntity expedientDesti = expedientRepository.findById(expedientDestiId).get();
+		
+		List<ExpedientPeticioEntity> peticions = expedientOrigen.getPeticions();
+		
+		for (ExpedientPeticioEntity expedientPeticioEntity : peticions) {
+			try {
+				expedientPeticioEntity.updateExpedient(expedientDesti);
+				expedientDesti.addExpedientPeticio(expedientPeticioEntity);
+				
+				Map<String, InteressatAssociacioAccioEnum> interessatsAccionsMap = new HashMap<>();
+                if (expedientPeticioEntity.getRegistre().getInteressats() != null) {
+                	for(RegistreInteressatEntity interessat: expedientPeticioEntity.getRegistre().getInteressats()) {
+                		interessatsAccionsMap.put(interessat.getDocumentNumero(), InteressatAssociacioAccioEnum.ASSOCIAR);
+                	}
+                }
+                
+                associateInteressats(expedientDesti.getId(), expedientPeticioEntity.getId(), PermissionEnumDto.WRITE, "IPA_ADMIN", interessatsAccionsMap);
+                
+    			arxiuPropagarExpedientAmbInteressats(expedientDesti.getId());
+			} catch (Exception ex) {
+				logger.error("Hi ha hagut un error movent alguna anotació de registre [expedientOrigenId={}, expedientDestiId={}]", expedientOrigenId, expedientDestiId);
+				throw ex;
+			}
+		}
+	}
+
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public void moureComentaris(Long expedientOrigenId, Long expedientDestiId) {
+		try {
+			ExpedientEntity expedientOrigen = expedientRepository.findById(expedientOrigenId).get();
+			ExpedientEntity expedientDesti = expedientRepository.findById(expedientDestiId).get();
+			
+			List<ExpedientComentariEntity> comentaris = expedientComentariRepository.findByExpedientOrderByCreatedDateAsc(expedientOrigen);
+
+			for (ExpedientComentariEntity comentari : comentaris) {
+				comentari.updateExpedient(expedientDesti);
+			}
+		} catch (Exception ex) {
+			logger.error("Hi ha hagut un error movent algun comentari [expedientOrigenId={}, expedientDestiId={}]", expedientOrigenId, expedientDestiId);
+			throw ex;
+		}
+	}
+	
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public void moureExpedientsRelacionats(Long expedientOrigenId, Long expedientDestiId) {
+		try {
+			ExpedientEntity expedientOrigen = expedientRepository.findById(expedientOrigenId).get();
+			ExpedientEntity expedientDesti = expedientRepository.findById(expedientDestiId).get();
+			
+			List<ExpedientEntity> relacionatsAmb = expedientOrigen.getRelacionatsAmb();
+			List<ExpedientEntity> relacionatsPer = expedientOrigen.getRelacionatsPer();
+			
+			expedientDesti.getRelacionatsAmb().addAll(relacionatsAmb);
+			expedientDesti.getRelacionatsPer().addAll(relacionatsPer);
+			
+			expedientOrigen.getRelacionatsAmb().clear();
+			expedientOrigen.getRelacionatsPer().clear();
+		} catch (Exception ex) {
+			logger.error("Hi ha hagut un error movent alguna relació [expedientOrigenId={}, expedientDestiId={}]", expedientOrigenId, expedientDestiId);
+			throw ex;
+		}
+	}
+	
+	private List<ExecucioMassivaContingutDto> crearTasquesMoviment(ExpedientEntity expedientOrigen, ExpedientEntity expedientDesti) {
+		String expedientOrigenNumero = expedientOrigen.getNumero() != null ? expedientOrigen.getNumero() : calcularNumero(expedientOrigen);
+		String expedientDestiNumero = expedientDesti.getNumero() != null ? expedientDesti.getNumero() : calcularNumero(expedientDesti);
+		
+		List<Pair<ElementTipusEnumDto, String>> accionsMoure = List.of(
+	            Pair.of(ElementTipusEnumDto.MOURE_CONTINGUT, "Moure documents i carpetes de l'expedient <b>" + expedientOrigenNumero + "</b> cap a l'expedient <b>" + expedientDestiNumero + "</b>"),
+	            Pair.of(ElementTipusEnumDto.MOURE_INTERESSATS, "Moure els interessats de l'expedient <b>" + expedientOrigenNumero + "</b> cap a l'expedient <b>" + expedientDestiNumero + "</b>"),
+	            Pair.of(ElementTipusEnumDto.MOURE_SEGUIDORS, "Moure els seguidors de l'expedient <b>" + expedientOrigenNumero + "</b> cap a l'expedient <b>" + expedientDestiNumero + "</b>"),
+	            Pair.of(ElementTipusEnumDto.MOURE_RELACIONS, "Moure els expedients relacionats de l'expedient <b>" + expedientOrigenNumero + "</b> cap a l'expedient <b>" + expedientDestiNumero + "</b>"),
+	            Pair.of(ElementTipusEnumDto.MOURE_ANOTACIONS, "Moure les anotacions de registre de l'expedient <b>" + expedientOrigenNumero + "</b> cap a l'expedient <b>" + expedientDestiNumero + "</b>"),
+	            Pair.of(ElementTipusEnumDto.MOURE_COMENTARIS, "Moure els Comentaris de l'expedient <b>" + expedientOrigenNumero + "</b> cap a l'expedient <b>" + expedientDestiNumero + "</b>")
+	        );
+
+	        List<ExecucioMassivaContingutDto> execucioMassivaElements = new ArrayList<>();
+	        for (Pair<ElementTipusEnumDto, String> accio : accionsMoure) {
+	            ExecucioMassivaContingutDto dto = new ExecucioMassivaContingutDto();
+	            dto.setElementTipus(accio.getLeft());
+	            dto.setDataInici(new Date());
+	            dto.setEstat(ExecucioMassivaEstatDto.ESTAT_PENDENT);
+	            dto.setElementNom(accio.getRight());
+	            execucioMassivaElements.add(dto);
+	        }
+	        return execucioMassivaElements;
+	}
+	
 	//crea les carpetes per defecte definides al procediment
 	private void crearCarpetesMetaExpedient(
 			Long entitatId, 
@@ -3034,7 +3290,7 @@ public class ExpedientHelper {
 		List<DadaEntity> dades = dadaRepository.findByNodeIdInOrderByNodeIdAscMetaDadaCodiAsc(expedientIds);
 		int numColumnes = 10 + metaDades.size();
 		String[] columnes = new String[numColumnes];
-		columnes[0] = messageHelper.getMessage("expedient.service.exportacio.numero");
+		columnes[0] = "Número";
 		columnes[1] = messageHelper.getMessage("expedient.service.exportacio.titol");
 		columnes[2] = messageHelper.getMessage("expedient.service.exportacio.estat");
 		columnes[3] = messageHelper.getMessage("expedient.service.exportacio.datcre");
@@ -3129,24 +3385,24 @@ public class ExpedientHelper {
 		}
 		FitxerDto fitxer = new FitxerDto();
 		if ("ODS".equalsIgnoreCase(format)) {
-			Object[][] filesArray = files.toArray(new Object[files.size()][numColumnes]);
-			TableModel tableModel = new DefaultTableModel(filesArray, columnes);
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			Workbook workbook = new XSSFWorkbook();
-			Sheet sheet = workbook.createSheet("Expedient");
-			for (int i = 0; i < tableModel.getRowCount(); i++) {
-			    Row row = sheet.createRow(i);
-			    for (int j = 0; j < tableModel.getColumnCount(); j++) {
-			        Cell cell = row.createCell(j);
-			        Object aux = tableModel.getValueAt(i, j);
-			        cell.setCellValue(aux!=null?aux.toString():"");
-			    }
-			}
-			workbook.write(baos);
-			workbook.close();
-			fitxer.setNom("exportacio.ods");
-			fitxer.setContentType("application/vnd.oasis.opendocument.spreadsheet");
-			fitxer.setContingut(baos.toByteArray());
+//			Object[][] filesArray = files.toArray(new Object[files.size()][numColumnes]);
+//			TableModel tableModel = new DefaultTableModel(filesArray, columnes);
+//			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//			Workbook workbook = new XSSFWorkbook();
+//			Sheet sheet = workbook.createSheet("Expedient");
+//			for (int i = 0; i < tableModel.getRowCount(); i++) {
+//			    Row row = sheet.createRow(i);
+//			    for (int j = 0; j < tableModel.getColumnCount(); j++) {
+//			        Cell cell = row.createCell(j);
+//			        Object aux = tableModel.getValueAt(i, j);
+//			        cell.setCellValue(aux!=null?aux.toString():"");
+//			    }
+//			}
+//			workbook.write(baos);
+//			workbook.close();
+			fitxer.setNom("exportacio.xlsx");
+			fitxer.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+			fitxer.setContingut(generarContenidoExcel(columnes, files));
 		} else if ("CSV".equalsIgnoreCase(format)) {
 			fitxer.setNom("exportacio.csv");
 			fitxer.setContentType("text/csv");
@@ -3162,6 +3418,49 @@ public class ExpedientHelper {
 		return fitxer;
 	}
 	
+	private byte[] generarContenidoExcel(String[] cols, List<String[]> rows) throws IOException {
+		
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("Datos");
+
+        // Crear estilo para cabecera
+        CellStyle headerStyle = workbook.createCellStyle();
+        Font headerFont = workbook.createFont();
+        headerFont.setBold(true);
+        headerStyle.setFont(headerFont);
+        headerStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+        headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+        // Crear fila de cabecera
+        Row headerRow = sheet.createRow(0);
+        for (int i = 0; i < cols.length; i++) {
+            Cell cell = headerRow.createCell(i);
+            cell.setCellValue(cols[i]);
+            cell.setCellStyle(headerStyle);
+        }
+
+        // Crear filas de datos
+        for (int i = 0; i < rows.size(); i++) {
+            Row row = sheet.createRow(i + 1); // +1 porque la fila 0 es la cabecera
+            String[] data = rows.get(i);
+            for (int j = 0; j < data.length; j++) {
+                Cell cell = row.createCell(j);
+                cell.setCellValue(data[j] != null ? data[j] : "");
+            }
+        }
+
+        // Ajustar automáticamente el ancho de las columnas
+        for (int i = 0; i < cols.length; i++) {
+            sheet.autoSizeColumn(i);
+        }
+
+        // Escribir a un array de bytes
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        workbook.write(baos);
+        workbook.close();
+
+        return baos.toByteArray();
+    }
 	
 	private DocumentNtiTipoFirmaEnumDto toNtiTipoFirma(FirmaTipus firmaTipus) {
 		DocumentNtiTipoFirmaEnumDto documentNtiTipoFirmaEnumDto = null;

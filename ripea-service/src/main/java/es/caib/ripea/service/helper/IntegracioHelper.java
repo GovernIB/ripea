@@ -38,6 +38,7 @@ public class IntegracioHelper {
 	public static final String INTCODI_PFIRMA = "PORTAFIRMES";
 	public static final String INTCODI_FIRMASIMPLE = "FIRMA_SIMPLE_WEB";
 	public static final String INTCODI_ARXIU = "ARXIU";
+	public static final String INTCODI_CONCSV = "CONCSV";
 	public static final String INTCODI_PINBAL = "PINBAL";
 	public static final String INTCODI_CONVERT = "CONVERSIO";
 	public static final String INTCODI_CALLBACK = "CALLBACK";
@@ -53,6 +54,7 @@ public class IntegracioHelper {
 	public static final String INTCODI_SUMMARIZE = "SUMMARIZE";
 	public static final String INTCODI_DISTRIBUCIO = "DISTRIBUCIO";
 	public static final String INTCODI_COMANDA = "COMANDA";
+	public static final String INTCODI_REGISTRE = "REGISTRE";
 	
 	private Map<String, LinkedList<IntegracioAccioDto>> accionsIntegracio = Collections.synchronizedMap(new HashMap<String, LinkedList<IntegracioAccioDto>>());
 	private Map<String, Integer> maxAccionsIntegracio = new HashMap<String, Integer>();
@@ -66,6 +68,7 @@ public class IntegracioHelper {
 		integracions.add(novaIntegracio(INTCODI_FIRMASERV));
 		integracions.add(novaIntegracio(INTCODI_CALLBACK));
 		integracions.add(novaIntegracio(INTCODI_ARXIU));
+		integracions.add(novaIntegracio(INTCODI_CONCSV));
 		integracions.add(novaIntegracio(INTCODI_GESDOC));
 		integracions.add(novaIntegracio(INTCODI_PINBAL));
 		integracions.add(novaIntegracio(INTCODI_DISTRIBUCIO));
@@ -79,6 +82,7 @@ public class IntegracioHelper {
 		integracions.add(novaIntegracio(INTCODI_PROCEDIMENT));
 		integracions.add(novaIntegracio(INTCODI_COMANDA));
 		integracions.add(novaIntegracio(INTCODI_FIRMAAGIL));
+		integracions.add(novaIntegracio(INTCODI_REGISTRE));
 		return integracions;
 	}
 
@@ -156,7 +160,7 @@ public class IntegracioHelper {
 		addAccio(integracioCodi, accio);
 	}
 
-	private LinkedList<IntegracioAccioDto> getLlistaAccions(
+	public LinkedList<IntegracioAccioDto> getLlistaAccions(
 			String integracioCodi) {
 			LinkedList<IntegracioAccioDto> accions = accionsIntegracio.get(integracioCodi);
 			if (accions == null) {
@@ -234,6 +238,8 @@ public class IntegracioHelper {
 			integracio.setNom("Portafirmes");			
 		} else if (INTCODI_ARXIU.equals(codi)) {
 			integracio.setNom("Arxiu digital");
+		} else if (INTCODI_CONCSV.equals(codi)) {
+			integracio.setNom("ConvCSV");
 		} else if (INTCODI_PINBAL.equals(codi)) {
 			integracio.setNom("PINBAL");
 		} else if (INTCODI_CONVERT.equals(codi)) {
@@ -252,6 +258,8 @@ public class IntegracioHelper {
 			integracio.setNom("ViaFirma");
 		} else if (INTCODI_DIGITALITZACIO.equals(codi)) {
 			integracio.setNom("Digitalització");
+		} else if (INTCODI_REGISTRE.equals(codi)) {
+			integracio.setNom("Registre");
 		}
 		return integracio;
 	}

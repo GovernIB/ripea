@@ -14,6 +14,7 @@ import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
+import es.caib.ripea.service.intf.dto.ContenidorFiltreOpcionsEsborratEnum;
 import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,6 +30,17 @@ import lombok.experimental.FieldNameConstants;
         quickFilterFields = { "nom" },
         descriptionField = "nom",
         artifacts = {
+				@ResourceConfigArtifact(
+						type = ResourceArtifactType.PERSPECTIVE,
+						code = ContingutResource.PERSPECTIVE_AUDIT_CODE),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = ContingutResource.ACTION_DELETE_CODE,
+                        formClass = NodeResource.MassiveAction.class),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = ContingutResource.ACTION_RECUPERAR_CODE,
+                        formClass = NodeResource.MassiveAction.class),        
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.FILTER,
                         code = ContingutResource.FILTER_CODE,
@@ -38,6 +50,9 @@ public class ContingutResource extends BaseAuditableResource<Long> {
 
     public static final String FILTER_CODE = "FILTER";
     public static final String PERSPECTIVE_PATH_CODE = "PATH";
+    public static final String PERSPECTIVE_AUDIT_CODE = "AUDITORIA";
+    public static final String ACTION_DELETE_CODE = "DELETE";
+    public static final String ACTION_RECUPERAR_CODE = "RECUPERAR";
 
 	@NotNull
 	@Size(max = 1024)
@@ -83,10 +98,11 @@ public class ContingutResource extends BaseAuditableResource<Long> {
         private String nom;
         private ResourceReference<UsuariResource, String> createdBy;
         private ContingutTipusEnumDto tipus;
-        private ResourceReference<MetaNodeResource, Long> metaNode;
+//        private ResourceReference<MetaExpedientResource, Long> metaExpedient;
+//        private ResourceReference<MetaDocumentResource, Long> metaDocument;
         private Date dataEsborratInici;
         private Date dataEsborratFi;
-        private Boolean esborrat = false;
+        private ContenidorFiltreOpcionsEsborratEnum esborrat = ContenidorFiltreOpcionsEsborratEnum.NOMES_NO_ESBORRATS;
         private ResourceReference<ExpedientResource, Long> expedient;
         private Date dataInici;
         private Date dataFi;

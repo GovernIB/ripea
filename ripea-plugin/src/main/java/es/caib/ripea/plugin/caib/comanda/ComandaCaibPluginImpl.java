@@ -1,19 +1,13 @@
 package es.caib.ripea.plugin.caib.comanda;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.Properties;
 
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
-import org.springframework.web.client.RestTemplate;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import es.caib.comanda.ms.broker.model.Avis;
-import es.caib.comanda.ms.broker.model.Tasca;
+import es.caib.comanda.model.management.Avis;
+import es.caib.comanda.model.management.Tasca;
+import es.caib.comanda.model.management.TascaPage;
+import es.caib.comanda.service.management.AppComandaClient;
 import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.comanda.ComandaCaibPlugin;
 import es.caib.ripea.service.intf.config.PropertyConfig;
@@ -41,50 +35,54 @@ public class ComandaCaibPluginImpl extends RipeaAbstractPluginProperties impleme
 
 	@Override
 	public ResponseEntity<String> sendTasca(Tasca tasca) throws Exception {
-        var httpHeaders = new HttpHeaders();
-        httpHeaders.set("Content-Type", "application/json");
-        var username = getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.COMANDA_PLUGIN_USR));
-        var password = getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.COMANDA_PLUGIN_PWR));
-        String auth = username + ":" + password;
-        byte[] encodedAuth = Base64.getEncoder().encode(auth.getBytes(StandardCharsets.UTF_8));
-        String authHeader = "Basic " + new String(encodedAuth);
-        httpHeaders.set("Authorization", authHeader);
-        var mapper = new ObjectMapper();
-        var requestBody = mapper.writeValueAsString(tasca);
-        HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, httpHeaders);
-        String url = getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.COMANDA_PLUGIN_URL));
-        if (url == null) {
-            throw new Exception("La propietat es.caib.ripea.plugin.comanda.url.base no pot ser null");
-        }
-        url += (url.charAt(url.length()-1) != '/' ? "/" : "") + "jms/tasques";
-        return getRestTemplate().postForEntity(url, requestEntity, String.class);
+		String url 		= getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.COMANDA_PLUGIN_URL));
+		String username = getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.COMANDA_PLUGIN_USR));
+		String password = getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.COMANDA_PLUGIN_PWR));
+		AppComandaClient clientcomanda = new AppComandaClient(url, username, password);
+		String resultat = clientcomanda.crearTasca(tasca);
+		return ResponseEntity.ok(resultat);
+	}
+	
+	@Override
+	public ResponseEntity<String> deleteTasca(String idTasca) throws Exception {
+		String url 		= getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.COMANDA_PLUGIN_URL));
+		String username = getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.COMANDA_PLUGIN_USR));
+		String password = getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.COMANDA_PLUGIN_PWR));
+		AppComandaClient clientcomanda = new AppComandaClient(url, username, password);
+		String appCodi 	= getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.COMANDA_APP_CODI));
+		String entorn 	= getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.COMANDA_PLUGIN_ENTORN));
+		String resultat = clientcomanda.eliminarTasca(idTasca, appCodi, entorn);
+		return ResponseEntity.ok(resultat);
 	}
 
 	@Override
 	public ResponseEntity<String> sendAvis(Avis avis) throws Exception {
-        var httpHeaders = new HttpHeaders();
-        httpHeaders.set("Content-Type", "application/json");
-        var username = getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.COMANDA_PLUGIN_USR));
-        var password = getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.COMANDA_PLUGIN_PWR));
-        String auth = username + ":" + password;
-        byte[] encodedAuth = Base64.getEncoder().encode(auth.getBytes(StandardCharsets.UTF_8));
-        String authHeader = "Basic " + new String(encodedAuth);
-        httpHeaders.set("Authorization", authHeader);
-        var mapper = new ObjectMapper();
-        var requestBody = mapper.writeValueAsString(avis);
-        HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, httpHeaders);
-        String url = getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.COMANDA_PLUGIN_URL));
-        if (url == null) {
-            throw new Exception("La propietat es.caib.ripea.plugin.comanda.url.base no pot ser null");
-        }
-        url += (url.charAt(url.length()-1) != '/' ? "/" : "") + "jms/avisos";
-        return getRestTemplate().postForEntity(url, requestEntity, String.class);
+		String url 		= getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.COMANDA_PLUGIN_URL));
+		String username = getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.COMANDA_PLUGIN_USR));
+		String password = getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.COMANDA_PLUGIN_PWR));
+		AppComandaClient clientcomanda = new AppComandaClient(url, username, password);
+		String resultat = clientcomanda.crearAvis(avis);
+		return ResponseEntity.ok(resultat);
 	}
 	
-	private RestTemplate getRestTemplate() {
-        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
-        factory.setConnectTimeout(5000);
-        factory.setReadTimeout(5000);
-        return new RestTemplate(factory);
+	@Override
+	public ResponseEntity<String> deleteAvis(String idAvis) throws Exception {
+		String url 		= getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.COMANDA_PLUGIN_URL));
+		String username = getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.COMANDA_PLUGIN_USR));
+		String password = getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.COMANDA_PLUGIN_PWR));
+		AppComandaClient clientcomanda = new AppComandaClient(url, username, password);
+		String appCodi 	= getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.COMANDA_APP_CODI));
+		String entorn 	= getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.COMANDA_PLUGIN_ENTORN));
+		String resultat = clientcomanda.eliminarAvis(idAvis, appCodi, entorn);
+		return ResponseEntity.ok(resultat);
+	}
+
+	@Override
+	public TascaPage getLlistatTasques(String quickFilter) throws Exception {
+		String url 		= getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.COMANDA_PLUGIN_URL));
+		String username = getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.COMANDA_PLUGIN_USR));
+		String password = getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.COMANDA_PLUGIN_PWR));
+		AppComandaClient clientcomanda = new AppComandaClient(url, username, password);
+		return clientcomanda.obtenirLlistatTasques(quickFilter, null, "0", 1);
 	}
 }

@@ -13,5 +13,5 @@ public class ProcedimentDto {
 	private String unitatOrganitzativaCodi;
 	private String resum;
 	private Long organId;
-
+	private String organNom;
 }

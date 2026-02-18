@@ -115,25 +115,33 @@ pageContext.setAttribute("isRolActualAdministradorLectura", es.caib.ripea.back.h
 	<c:url value="metaExpedient/filtrar" var="formAction"/>
 	<form:form id="metaExpedientFiltreForm" action="${ formAction }" method="post" cssClass="well" modelAttribute="metaExpedientFiltreCommand">
 		<div class="row">
-			<div class="col-md-4">
+			<div class="col-md-3">
+				<rip:inputSelect 
+						name="tipusProcedimentServei" 
+						optionEnum="TipusProcedimentServeiEnum" 
+						emptyOption="true" 
+						placeholderKey="metaexpedient.list.filtre.camp.tipus"
+						inline="true"/>
+			</div>
+			<div class="col-md-3">
 				<rip:inputText name="codi" inline="true" placeholderKey="metaexpedient.list.filtre.camp.codi"/>
 			</div>		
-			<div class="col-md-4">
+			<div class="col-md-3">
 				<rip:inputText name="nom" inline="true" placeholderKey="metaexpedient.list.filtre.camp.nom"/>
 			</div>
-			<div class="col-md-4">
+			<div class="col-md-3">
 				<rip:inputText name="classificacio" inline="true" placeholderKey="metaexpedient.list.filtre.camp.codiSia"/>
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-md-4">
+			<div class="col-md-3">
 				<rip:inputSelect 
 						name="actiu" 
 						optionEnum="MetaExpedientActiuEnumDto" 
 						emptyOption="true" 
 						placeholderKey="metaexpedient.list.filtre.camp.actiu" inline="true"/>
 			</div>
-			<div class="col-md-4">
+			<div class="col-md-3">
 				<c:url value="/organgestorajax/organgestor" var="urlConsultaInicial"/>
 				<c:url value="/organgestorajax/organgestor" var="urlConsultaLlistat"/>
 				<rip:inputSuggest 
@@ -146,24 +154,31 @@ pageContext.setAttribute("isRolActualAdministradorLectura", es.caib.ripea.back.h
  					suggestText="codiAmbEstatINom"
  					 />
 			</div>
-			<div class="col-md-4">
-				<c:if test="${not isRolAdminOrgan}">
-					<rip:inputSelect name="ambit" optionEnum="MetaExpedientAmbitEnumDto" 
-									 emptyOption="true" 
-									 placeholderKey="metaexpedient.list.filtre.camp.ambit" inline="true"/>
-				</c:if>
-			</div>	
+
+			<c:if test="${not isRolAdminOrgan}">
+				<div class="col-md-3">
+					<rip:inputSelect 
+						name="ambit"
+						optionEnum="MetaExpedientAmbitEnumDto" 
+						emptyOption="true" 
+						placeholderKey="metaexpedient.list.filtre.camp.ambit"
+						inline="true"/>
+				</div>	
+			</c:if>
+
+			<c:if test="${isRevisioActiva}">	
+				<div class="col-md-3">
+					<rip:inputSelect name="revisioEstat" optionEnum="MetaExpedientRevisioEstatEnumDto" emptyOption="true" placeholderKey="metaexpedient.list.filtre.camp.revisioEstat" inline="true"/>
+				</div>
+			</c:if>
+
 		</div>
 		
 		<rip:inputHidden name="permisDirecteActive"/>
 		
 		<div class="row">	
-			<c:if test="${isRevisioActiva}">	
-				<div class="col-md-4">
-					<rip:inputSelect name="revisioEstat" optionEnum="MetaExpedientRevisioEstatEnumDto" emptyOption="true" placeholderKey="metaexpedient.list.filtre.camp.revisioEstat" inline="true"/>
-				</div>
-			</c:if>
-			<div class="col-md-4">
+
+			<div class="col-md-8">
 				<button id="permisDirecteBtn" class="btn btn-default <c:if test="${permisDirecteActive}">active</c:if>" data-toggle="button">
 					<span class="fa fa-hand-o-down"></span> <spring:message code="metaexpedient.list.filtre.camp.permisDir"/>
 				</button>

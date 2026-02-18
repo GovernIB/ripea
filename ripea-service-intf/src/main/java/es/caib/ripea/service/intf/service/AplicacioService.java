@@ -2,21 +2,25 @@ package es.caib.ripea.service.intf.service;
 
 import java.util.List;
 import java.util.Properties;
+
 import javax.annotation.security.PermitAll;
+
 import org.springframework.security.access.prepost.PreAuthorize;
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Timer;
+
 import es.caib.ripea.service.intf.dto.DiagnosticFiltreDto;
 import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.ExcepcioLogDto;
 import es.caib.ripea.service.intf.dto.GenericDto;
 import es.caib.ripea.service.intf.dto.IntegracioAccioDto;
 import es.caib.ripea.service.intf.dto.IntegracioDto;
+import es.caib.ripea.service.intf.dto.IntegracioEnumDto;
 import es.caib.ripea.service.intf.dto.IntegracioFiltreDto;
 import es.caib.ripea.service.intf.dto.PaginaDto;
 import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
 import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 
 /**
  * Declaració dels mètodes comuns de l'aplicació.
@@ -106,6 +110,8 @@ public interface AplicacioService {
 	@PreAuthorize("hasRole('IPA_SUPER')")
 	PaginaDto<IntegracioAccioDto> integracioFindDarreresAccionsByCodiPaginat(String codi, PaginacioParamsDto params, IntegracioFiltreDto filtre);
 
+	public List<IntegracioAccioDto> getLastIntegracions(IntegracioEnumDto codiIntegracio, int numElements);
+	
 	/**
 	 * Emmagatzema una excepció llençada per un servei.
 	 * 
@@ -258,6 +264,12 @@ public interface AplicacioService {
 	
 	@PermitAll
 	public String getMetriquesJSON() throws Exception;
+	
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	public List<Long> getPortafirmesEliminats();
+	
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	public String executePortafirmesEliminat(Long tascaId) throws Exception;
 	
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public List<Long> getTasquesComanda();

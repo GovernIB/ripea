@@ -235,7 +235,9 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			model.addAttribute("concsvBaseUrl", aplicacioService.propertyFindByNom(PropertyConfig.CONCSV_BASE_URL));
 			model.addAttribute("isExportacioInsideActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.EXPORTACIO_INSIDE)));
 			model.addAttribute("isTancamentLogicActiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.TANCAMENT_LOGIC)));
-			model.addAttribute("isMantenirEstatCarpetaActiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.MANTENIR_ESTAT_CARPETA)));
+			model.addAttribute("isMantenirEstatCarpetaActiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.MANTENIR_ESTAT_CARPETA)));			
+			model.addAttribute("isExpedientMoureTotActiu", isExpedientMoureTotActiva());
+			model.addAttribute("isExpedientPendentExecucioMassiva", isExpedientMoureTotActiva() ? expedientService.isExpedientPendentExecucioMassiva(contingut.getExpedientId()) : false);
 			
 			boolean isEntitatUserAdminOrOrgan;
 			if (entitatActual.isUsuariActualAdministration() || entitatActual.isUsuariActualTeOrgans()) {
@@ -391,8 +393,12 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 		
 		model.addAttribute("expedientAgafatPerUsuariActual", agafatUsuariActual);
 
+		boolean isExpedientPendentExecucioMassiva = isExpedientMoureTotActiva() ? expedientService.isExpedientPendentExecucioMassiva(expedient.getId()) : false;
 		boolean potModificar = ((agafatUsuariActual && expedient.isUsuariActualWrite() || isTascaObert || contingut.isAdmin()) 
-				&& expedient.getEstat().equals(ExpedientEstatEnumDto.OBERT));
+				&& expedient.getEstat().equals(ExpedientEstatEnumDto.OBERT) && ! isExpedientPendentExecucioMassiva);
+		
+		model.addAttribute("isExpedientMoureTotActiu", isExpedientMoureTotActiva());
+		model.addAttribute("isExpedientPendentExecucioMassiva", isExpedientPendentExecucioMassiva);
 		model.addAttribute("potModificar", potModificar);
 		model.addAttribute("expedientObert", expedient.getEstat().equals(ExpedientEstatEnumDto.OBERT));
 		model.addAttribute("expedientTancat", expedient.getEstat().equals(ExpedientEstatEnumDto.TANCAT));
@@ -916,6 +922,10 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 
 	private boolean isGenerarUrlsInstruccioActiu() {
 		return Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.GENERAR_URL_INSTRUCCIO));
+	}
+	
+	private boolean isExpedientMoureTotActiva() {
+		return Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.MOURE_TOT));
 	}
 	
 	@RequestMapping(value = "/contingut/{contingutId}/log", method = RequestMethod.GET)

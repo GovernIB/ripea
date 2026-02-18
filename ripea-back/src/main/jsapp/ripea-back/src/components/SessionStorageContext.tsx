@@ -71,7 +71,7 @@ const useSessionStorage = () => {
     return ctx;
 };
 
-let initialized :Map<string, boolean> = new Map();
+const initialized :Map<string, boolean> = new Map();
 export const useSession = (key:string) => {
     const {data, setValue, removeValue} = useSessionStorage();
     return {

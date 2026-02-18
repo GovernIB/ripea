@@ -18,7 +18,7 @@ import useFirmaNavegador from "../actions/FirmaNavegador.tsx";
 import useDocPinbal from "../actions/DocPinbal.tsx";
 import useEnviarViaFirma from "../actions/EnviarViaFirma.tsx";
 import useCrearCarpeta from "../../carpeta/actions/Crear.tsx";
-import useImportar from "../actions/Importar.tsx";
+import useImportar from "../actions/ImportarSgd.tsx";
 import useCarpetaActions from "../../carpeta/details/CarpetaActions.tsx";
 import useImportarExpedient from "../../expedient/actions/ImportarExpedient.tsx";
 import useImportarZip from "../actions/ImportarZip.tsx";
@@ -35,17 +35,6 @@ export const useActions = (refresh?: () => void) => {
     const {messageDialogShow, temporalMessageShow} = useBaseAppContext();
     const confirmDialogButtons = useConfirmDialogButtons();
     const confirmDialogComponentProps = {maxWidth: 'sm', fullWidth: true};
-
-    const action = (id:any, code:string, mssg:string) => {
-        apiAction(id, {code})
-            .then(()=>{
-                refresh?.()
-                temporalMessageShow(null, mssg, 'success');
-            })
-            .catch((error) => {
-                temporalMessageShow(null, error?.message, 'error');
-            });
-    }
 
     const downloadAdjunt = (id:any, fieldName:string, mssg:string) :void => {
         apiDownload(id,{fieldName})
@@ -134,7 +123,16 @@ export const useActions = (refresh?: () => void) => {
             });
     }
 
-    const guardarArxiu = (id:any, row:any) => action(id, 'GUARDAR_ARXIU', t('page.contingut.action.guardarArxiu.ok', {contingut: row?.nom}))
+    const guardarArxiu = (id:any, row:any) => {
+        apiAction(undefined, {code: 'GUARDAR_ARXIU', data: {ids: [id], massivo: false}})
+            .then(()=>{
+                refresh?.()
+                temporalMessageShow(null, t('page.contingut.action.guardarArxiu.ok', {contingut: row?.nom}), 'success');
+            })
+            .catch((error) => {
+                temporalMessageShow(null, error?.message, 'error');
+            });
+    }
 
     return {
         apiDownload: downloadAdjunt,
@@ -211,7 +209,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
 			hidden: !entity?.potModificar,
         },
         {
-            label: t('page.document.action.import.label'),
+            label: t('page.document.action.importSgd.label'),
             icon: "upload_file",
             onClick: handleImportar,
             hidden: !(user?.sessionScope?.isMostrarImportacio && entity?.potModificar),

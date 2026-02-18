@@ -16,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import es.caib.ripea.persistence.entity.DocumentPortafirmesEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.GrupEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
@@ -31,6 +32,7 @@ import es.caib.ripea.persistence.repository.ContingutRepository;
 import es.caib.ripea.persistence.repository.DadaRepository;
 import es.caib.ripea.persistence.repository.DispositiuEnviamentRepository;
 import es.caib.ripea.persistence.repository.DocumentEnviamentInteressatRepository;
+import es.caib.ripea.persistence.repository.DocumentPortafirmesRepository;
 import es.caib.ripea.persistence.repository.DominiRepository;
 import es.caib.ripea.persistence.repository.EmailPendentEnviarRepository;
 import es.caib.ripea.persistence.repository.EntitatRepository;
@@ -68,6 +70,7 @@ import es.caib.ripea.persistence.repository.ViaFirmaUsuariRepository;
 import es.caib.ripea.persistence.repository.config.ConfigRepository;
 import es.caib.ripea.persistence.repository.historic.HistoricUsuariRepository;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
+import es.caib.ripea.service.firma.DocumentFirmaPortafirmesHelper;
 import es.caib.ripea.service.helper.ApplicationHelper;
 import es.caib.ripea.service.helper.CacheHelper;
 import es.caib.ripea.service.helper.ConfigHelper;
@@ -87,6 +90,7 @@ import es.caib.ripea.service.intf.dto.ExcepcioLogDto;
 import es.caib.ripea.service.intf.dto.GenericDto;
 import es.caib.ripea.service.intf.dto.IntegracioAccioDto;
 import es.caib.ripea.service.intf.dto.IntegracioDto;
+import es.caib.ripea.service.intf.dto.IntegracioEnumDto;
 import es.caib.ripea.service.intf.dto.IntegracioFiltreDto;
 import es.caib.ripea.service.intf.dto.PaginaDto;
 import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
@@ -161,6 +165,8 @@ public class AplicacioServiceImpl implements AplicacioService {
     @Autowired private RegistreInteressatRepository registreInteressatRepository;
     @Autowired private TipusDocumentalRepository tipusDocumentalRepository;
     @Autowired private ViaFirmaUsuariRepository viaFirmaUsuariRepository;
+    @Autowired private DocumentPortafirmesRepository documentPortafirmesRepository;
+    @Autowired private DocumentFirmaPortafirmesHelper firmaPortafirmesHelper;
     @Autowired private AclSidRepository aclSidRepository;
     @Autowired private AclCache aclCache;
 
@@ -409,6 +415,17 @@ public class AplicacioServiceImpl implements AplicacioService {
 		return paginacioHelper.prepararPagina(pagina, pagines, accions);
 	}
 
+	@Override
+	public List<IntegracioAccioDto> getLastIntegracions(IntegracioEnumDto codiIntegracio, int numElements) {
+		List<IntegracioAccioDto> listaAccions = integracioHelper.getLlistaAccions(codiIntegracio.name());
+		if (listaAccions!=null) {
+			int toIndex = Math.min(listaAccions.size(), numElements);
+			return listaAccions.subList(0, toIndex);
+		} else {
+			return new ArrayList<IntegracioAccioDto>();
+		}
+	}
+	
 	@Override
 	public void excepcioSave(String uri, Throwable exception) {
 		try {
@@ -745,6 +762,20 @@ public class AplicacioServiceImpl implements AplicacioService {
 				} else {
 					return new GenericDto("integracio.diag.fa.ko", "fa fa-times vermell", new Object[] {resultatDiagnostic});
 				}
+			}  else if (codi.equals(IntegracioHelper.INTCODI_CONCSV)) {
+				String resultatDiagnostic = pluginHelper.concsvIntegracioDiagnostic(filtre);
+				if (resultatDiagnostic==null) {
+					return new GenericDto("integracio.diag.cv.ok", "fa fa-check verd", new Object[] {codi});
+				} else {
+					return new GenericDto("integracio.diag.cv.ko", "fa fa-times vermell", new Object[] {resultatDiagnostic});
+				}
+			}  else if (codi.equals(IntegracioHelper.INTCODI_COMANDA)) {
+				String resultatDiagnostic = pluginHelper.comandaIntegracioDiagnostic(filtre);
+				if (resultatDiagnostic==null) {
+					return new GenericDto("integracio.diag.cm.ok", "fa fa-check verd", new Object[] {codi});
+				} else {
+					return new GenericDto("integracio.diag.cm.ko", "fa fa-times vermell", new Object[] {resultatDiagnostic});
+				}
 			} else {
 				return new GenericDto("integracio.diag.no", "fa fa-question-circle taronja", new Object[] {codi});
 			}
@@ -911,6 +942,33 @@ public class AplicacioServiceImpl implements AplicacioService {
 
 	@Override
 	@Transactional(readOnly = true)
+	public List<Long> getPortafirmesEliminats() {
+		return documentPortafirmesRepository.findFirmaPendentDocumentEliminat();
+	}
+	
+	@Override
+	@Transactional
+	public String executePortafirmesEliminat(Long portafirmesDocIs) throws Exception {
+		
+		String resultat = "";
+		
+		try {
+			DocumentPortafirmesEntity dpe = documentPortafirmesRepository.findById(portafirmesDocIs).get();
+			String rolActual = configHelper.getRolActual();
+			firmaPortafirmesHelper.portafirmesCancelar(
+					dpe.getDocument().getEntitat().getId(),
+					dpe.getDocument(),
+					rolActual!=null?rolActual:"IPA_ADMIN");
+			resultat+="Cancelada la firma pendent del document "+dpe.getDocument().getNom()+"</br>";
+		} catch (Exception ex) {
+			throw new Exception("Error al cancelar la firma pendent del document esborrat="+portafirmesDocIs+": "+ex.getMessage());
+		}
+		
+		return resultat;
+	}
+	
+	@Override
+	@Transactional(readOnly = true)
 	public List<Long> getTasquesComanda() {
 		return expedientTascaRepository.findTasquesPendents();
 	}
@@ -951,7 +1009,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 		String resultat = "";
 		if (configHelper.getAsBoolean(PropertyConfig.COMANDA_PLUGIN_ACTIU)) {
 			try {
-				List<ValidacioErrorDto> errors = cacheHelper.findErrorsValidacioPerNode(expedientId, false);
+				List<ValidacioErrorDto> errors = cacheHelper.findErrorsValidacioPerNode(expedientId);
 				if (errors!=null && errors.size()>0) {
 					pluginHelper.comandaAvisSendNoLog(expedientRepository.findById(expedientId).get(), errors);
 					resultat+=""+errors.size()+" avisos del expedient "+expedientId+" actualitzats a Comanda.";

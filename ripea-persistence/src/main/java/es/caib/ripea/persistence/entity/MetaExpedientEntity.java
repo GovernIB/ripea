@@ -3,21 +3,39 @@
  */
 package es.caib.ripea.persistence.entity;
 
-import es.caib.ripea.service.intf.config.BaseConfig;
-import es.caib.ripea.service.intf.dto.CrearReglaDistribucioEstatEnumDto;
-import es.caib.ripea.service.intf.dto.MetaExpedientRevisioEstatEnumDto;
-import es.caib.ripea.service.intf.dto.MetaNodeTipusEnum;
-import es.caib.ripea.service.intf.dto.TipusClassificacioEnumDto;
-import lombok.Getter;
-import org.apache.commons.lang3.StringUtils;
-import org.hibernate.annotations.ForeignKey;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+import javax.persistence.UniqueConstraint;
+
+import org.apache.commons.lang3.StringUtils;
+import org.hibernate.annotations.ForeignKey;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import es.caib.ripea.service.intf.config.BaseConfig;
+import es.caib.ripea.service.intf.dto.CrearReglaDistribucioEstatEnumDto;
+import es.caib.ripea.service.intf.dto.CrearReglaResponseDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientRevisioEstatEnumDto;
+import es.caib.ripea.service.intf.dto.MetaNodeTipusEnum;
+import es.caib.ripea.service.intf.dto.TipusClassificacioEnumDto;
+import es.caib.ripea.service.intf.dto.TipusProcedimentServeiEnum;
+import lombok.Getter;
 
 /**
  * Classe del model de dades que representa un meta-expedient.
@@ -31,10 +49,13 @@ import java.util.Set;
 @Getter
 public class MetaExpedientEntity extends MetaNodeEntity {
 
+    @Column(name = "TIPUS_PROC_SERVEI")
+    @Enumerated(EnumType.STRING)
+    private TipusProcedimentServeiEnum tipusProcedimentServei;
 	@Column(name = "tipus_classificacio", length = 3, nullable = false)
 	@Enumerated(EnumType.STRING)
     private TipusClassificacioEnumDto tipusClassificacio;
-    @Column(name = "clasif_sia", length = 30, nullable = false)
+    @Column(name = "clasif_sia", length = 46, nullable = false)
     private String classificacio;
     @Column(name = "serie_doc", length = 30, nullable = false)
     private String serieDocumental;
@@ -66,7 +87,6 @@ public class MetaExpedientEntity extends MetaNodeEntity {
     
     @OneToMany(mappedBy = "metaExpedient", cascade = { CascadeType.ALL })
     private Set<HistoricEntity> historics;
-    
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "entitat_id")
@@ -96,12 +116,10 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 			inverseName = BaseConfig.DB_PREFIX + "grup_metaexpgrup_fk")
 	private List<GrupEntity> grups = new ArrayList<GrupEntity>();
 	
-	
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "grup_per_defecte")
     @ForeignKey(name = BaseConfig.DB_PREFIX + "grup_metaexp_fk")
     private GrupEntity grupPerDefecte;
-
 	
 	@Column(name = "revisio_estat", length = 8)
 	@Enumerated(EnumType.STRING)
@@ -115,7 +133,6 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 			orphanRemoval = true)
 	private List<MetaExpedientComentariEntity> comentaris = new ArrayList<MetaExpedientComentariEntity>();
 	
-	
 	@Column(name = "crear_regla_dist_estat", length = 10)
 	@Enumerated(EnumType.STRING)
 	private CrearReglaDistribucioEstatEnumDto crearReglaDistribucioEstat;
@@ -127,6 +144,12 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 
 	@Column(name = "interessat_obligatori", nullable = false)
     private boolean interessatObligatori;
+	
+	@Transient private CrearReglaResponseDto crearReglaResponse;
+	
+	public void setCrearReglaResponse(CrearReglaResponseDto crearReglaResponse) {
+		this.crearReglaResponse = crearReglaResponse;
+	}
 	
 	public void updateCrearReglaDistribucio(CrearReglaDistribucioEstatEnumDto crearReglaDistribucioEstat) {
 		this.crearReglaDistribucioEstat = crearReglaDistribucioEstat;
@@ -147,7 +170,17 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 		grups.remove(grup);
 	}
 
-
+	public boolean hasGrup(Long grupId) {
+		if (this.grups!=null && grups.size()>0) {
+			for (GrupEntity grp: this.grups) {
+				if (grp.getId().equals(grupId)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
 	public void update(
 			String codi,
 			String nom,
@@ -270,6 +303,11 @@ public class MetaExpedientEntity extends MetaNodeEntity {
             built.tipusClassificacio = tipusClassificacio;
             return this;
         }
+        
+        public Builder tipusProcedimentServei(TipusProcedimentServeiEnum tipusProcedimentServei) {
+            built.tipusProcedimentServei = tipusProcedimentServei;
+            return this;
+        }
 
         public MetaExpedientEntity build() {
             return built;
@@ -336,6 +374,10 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 	public void setPermisDirecte(
 			boolean permisDirecte) {
 		this.permisDirecte = permisDirecte;
+	}
+
+	public void setTipusProcedimentServei(TipusProcedimentServeiEnum tipusProcedimentServei) {
+		this.tipusProcedimentServei = tipusProcedimentServei;
 	}
 
 	@SuppressWarnings("unused")

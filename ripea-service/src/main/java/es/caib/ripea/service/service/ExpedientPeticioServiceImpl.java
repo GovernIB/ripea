@@ -267,14 +267,11 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		}
 
 		return result;
-
 	}
-
 
 	@Transactional
 	@Override
 	public void comunicadaReprocessar(Long expedientPeticioId) throws Throwable {
-
 		synchronized (SynchronizationHelper.get0To99Lock(expedientPeticioId, SynchronizationHelper.locksAnnotacions)) {
 			anotacioDistribucioHelper.consultarIGuardarAnotacioPeticioPendent(expedientPeticioId, true);
 		}

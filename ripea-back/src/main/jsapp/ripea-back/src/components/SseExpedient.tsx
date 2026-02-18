@@ -6,6 +6,7 @@ import {useResourceApiContext} from "reactlib";
 const sseExpedientKey = 'sseExpedient';
 const fluxCreateKey = 'flux_creat';
 const scanFinalitzatKey = 'scan_finalitzat';
+const validacioChangeKey = 'validacio_change';
 const sseConnectedKey = 'exp_connect';
 
 const useSseExpedientSession = () => useSessionList(sseExpedientKey)
@@ -33,6 +34,7 @@ const useTempSession = (key:string) => {
 
 export const useFluxCreateSession = () => useTempSession(fluxCreateKey);
 export const useScanFinalitzatSession = () => useTempSession(scanFinalitzatKey);
+export const useValidacioSession = () => useTempSession(validacioChangeKey);
 
 /**
  * Component que gestiona la connexió SSE amb el servidor
@@ -82,7 +84,10 @@ export const SseExpedient: React.FC<any> = (props:any) => {
 
 			// Gestionar l'esdeveniment de firma finalitzada
 			addEventListener(eventSource, scanFinalitzatKey)
-			
+
+			// Gestionar l'esdeveniment de validació d'expedient
+			addEventListener(eventSource, validacioChangeKey)
+
             // Gestionar errors
             eventSource.onerror = (error) => {
                 console.error('Error de connexió SSE:', error);

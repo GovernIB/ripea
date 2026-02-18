@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 public class PortafirmesFluxRespostaDto implements Serializable {
 
+	private Long id;
 	private String nom;
 	private String descripcio;
 	private String fluxId;
@@ -13,6 +14,12 @@ public class PortafirmesFluxRespostaDto implements Serializable {
 	private boolean isProcedimentDefault;
 	private String usuari; //Usuari que ha iniciat el proces de firma
 	
+	public Long getId() {
+		return id;
+	}
+	public void setId(Long id) {
+		this.id = id;
+	}
 	public String getNom() {
 		return nom;
 	}

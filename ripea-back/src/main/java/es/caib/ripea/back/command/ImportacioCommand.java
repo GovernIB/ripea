@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import es.caib.ripea.back.helper.ConversioTipusHelper;
 import es.caib.ripea.back.validation.Importacio;
 import es.caib.ripea.service.intf.dto.ArbreJsonDto;
-import es.caib.ripea.service.intf.dto.ImportacioDto;
+import es.caib.ripea.service.intf.dto.ImportacioRegistreParamsDto;
 import es.caib.ripea.service.intf.dto.TipusImportEnumDto;
 import es.caib.ripea.service.intf.dto.TipusRegistreEnumDto;
 import lombok.Getter;
@@ -40,16 +40,16 @@ public class ImportacioCommand {
 	private String estructuraCarpetesJson;
 	private String destiId;
 	
-	public static ImportacioCommand asCommand(ImportacioDto dto) {
+	public static ImportacioCommand asCommand(ImportacioRegistreParamsDto dto) {
 		ImportacioCommand command = ConversioTipusHelper.convertir(
 				dto,
 				ImportacioCommand.class);
 		return command;
 	}
-	public static ImportacioDto asDto(ImportacioCommand command) throws ParseException, JsonMappingException {
-		ImportacioDto importacioDto = ConversioTipusHelper.convertir(
+	public static ImportacioRegistreParamsDto asDto(ImportacioCommand command) throws ParseException, JsonMappingException {
+		ImportacioRegistreParamsDto importacioDto = ConversioTipusHelper.convertir(
 				command,
-				ImportacioDto.class);
+				ImportacioRegistreParamsDto.class);
 		if (command.getTipusImportacio().equals(TipusImportEnumDto.NUMERO_REGISTRE)) {
 			importacioDto.setDataPresentacioFormatted(convertToDateViaSqlTimestamp(command.getDataPresentacio()));
 			importacioDto.setTipusRegistre(TipusRegistreEnumDto.ENTRADA);

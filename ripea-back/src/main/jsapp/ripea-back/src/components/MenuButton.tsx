@@ -44,7 +44,7 @@ const MenuButton = (props:MenuButtonProps) => {
             aria-expanded={open ? 'true' : undefined}
             onClick={handleClick}
 
-            endIcon={<Icon>{open ? arrowUp : arrowDown}</Icon>}
+            endIcon={<Icon sx={{m: 0}}>{open ? arrowUp : arrowDown}</Icon>}
             {...buttonProps}
         >
             {buttonLabel}
@@ -58,7 +58,7 @@ const MenuButton = (props:MenuButtonProps) => {
             open={open}
             onClose={handleClose}
 
-            elevation={0}
+            elevation={3}
             anchorOrigin={{
                 vertical: 'bottom',
                 horizontal: 'right',

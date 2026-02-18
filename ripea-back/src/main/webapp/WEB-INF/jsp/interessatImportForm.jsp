@@ -7,7 +7,7 @@
 
 <c:set var="potModificar">${potModificar == null || potModificar == true ? true : false}</c:set>
 <c:set var="formAction"><rip:modalUrl value="/expedient/${expedientId}/interessat/importar"/></c:set>
-<c:set var="maxFileSize"><%=es.caib.ripea.back.config.WebMvcConfig.MAX_UPLOAD_SIZE%></c:set>
+<spring:eval var="maxFileSize" expression="@webMvcConfig.MAX_UPLOAD_SIZE" />
 
 <html>
 <head>

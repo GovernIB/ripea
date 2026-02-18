@@ -44,6 +44,7 @@ import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.EntitatService;
 import es.caib.ripea.service.intf.service.EventService;
 import es.caib.ripea.service.intf.service.GrupService;
+import es.caib.ripea.service.intf.service.MetaExpedientService;
 import es.caib.ripea.service.intf.service.OrganGestorService;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -67,6 +68,7 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
     @Value("${es.caib.ripea.develope.roles:IPA_SUPER,IPA_ADMIN,IPA_ORGAN_ADMIN,tothom}")
     private String developmentRoles;
 
+    private final MetaExpedientService metaExpedientService;
     private final EntitatService entitatService;
     private final OrganGestorService organGestorService;
     private final AplicacioService aplicacioService;
@@ -105,9 +107,12 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
         }
 
         EntitatDto entitatActual = EntitatHelper.getEntitatActual(request, entitatService);
+        entitatActual.setOrgansGestors(EntitatHelper.findOrganismesEntitatAmbPermisCacheByRol(request, organGestorService, entitatActual));
+        String rolActual = RolHelper.getRolActual(request);
+        aplicacioService.actualitzarRolThreadLocal(rolActual);
         entitatService.setConfigEntitat(entitatActual);
         OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
-        String rolActual = RolHelper.getRolActual(request);
+        
         List<String> roles = RolHelper.getRolsUsuariActual(request);
         List<String> rolesAuth = SecurityContextHolder.getContext().getAuthentication().getAuthorities()
                 .stream()
@@ -122,8 +127,6 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
         userPermissionInfo.setRols(roles);
         userPermissionInfo.setAuth(rolesAuth);
         userPermissionInfo.setSessionScope(getUsuariActualAdditionalInfo(request, userPermissionInfo, organActual));
-        
-        aplicacioService.actualitzarRolThreadLocal(rolActual);
         
         return ResponseEntity.ok(userPermissionInfo);
     }
@@ -151,8 +154,6 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
     	
         Map<String, Object> response = new HashMap<>();
 
-//        response.put("countAnotacionsPendents", AnotacionsPendentsHelper.countAnotacionsPendents(request));
-//        response.put("countTasquesPendent", TasquesPendentsHelper.countTasquesPendents(request));
         response.put("organsNoSincronitzats", MetaExpedientHelper.getOrgansNoSincronitzats(request));
         response.put("urlsInstruccioActiu", ExpedientHelper.isUrlsInstruccioActiu(request));
         response.put("revisioActiva", MetaExpedientHelper.getRevisioActiva(request));
@@ -161,10 +162,9 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
         response.put("isMostrarSeguimentEnviamentsUsuariActiu", SeguimentEnviamentsUsuariHelper.isMostrarSeguimentEnviamentsUsuariActiu(request));
         response.put("isConvertirDefinitiuActiu", ExpedientHelper.isConversioDefinitiuActiva(request));
         response.put("isUrlValidacioDefinida", aplicacioService.propertyFindByNom(PropertyConfig.VALIDACIO_URL_IMPRIMIBLES)!=null);
-
-        response.put("isDocumentsGeneralsEnabled", request.getSession().getAttribute("SessionHelper.isDocumentsGeneralsEnabled"));
-        response.put("isTipusDocumentsEnabled", request.getSession().getAttribute("SessionHelper.isTipusDocumentsEnabled"));
-        
+        response.put("isDocumentsGeneralsEnabled", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.DOCUMENTS_GENERALS_ACTIUS)));
+        response.put("isTipusDocumentsEnabled", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.TIPUS_DOCUMENT_ACTIUS)));       
+        response.put("isUrlInstruccioEnabled", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.GENERAR_URL_INSTRUCCIO)));
         response.put("maxUploadFileSize", aplicacioService.propertyFindByNom(PropertyConfig.MAX_UPLOAD_FILE));
         response.put("isDominisEnabled", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.DOMINIS_HABILITATS)));
         response.put("isExportacioExcelActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.EXPORTACIO_EXCEL)));
@@ -185,14 +185,25 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
         response.put("ordenacioContingutPermesa", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.ORDENACIO_CONTINGUT_ACTIU)));
         response.put("moureMateixExpedients", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.MOURE_MATEIX_EXPEDIENTS)));
         response.put("permesEsborrarFinals", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.PERMATRE_ESBORRAR_FINAL)));
-        List<GrupDto> grupsPermesos = null;
-        if (organActual!=null) {
-        	grupsPermesos = grupService.findGrupsPermesosProcedimentsGestioActiva(
+        response.put("isRevisioActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.METAEXPEDIENT_REVISIO_ACTIVA)));
+        response.put("isExpedientMoureTotActiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.MOURE_TOT)));
+        response.put("isPropagarMetadades", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.PROPAGAR_METADADES)));
+        response.put("isCarpetesDefecte", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.CARPETES_PER_DEFECTE)));
+
+        if ("IPA_ADMIN".equals(userPermissionInfo.getRolActual()) && userPermissionInfo.getEntitatActualId()!=null) {
+        	try {
+        		response.put("numProcsPendentsRevisio", metaExpedientService.countMetaExpedientsPendentRevisar(userPermissionInfo.getEntitatActualId()));
+        	} catch (Exception ex) {}
+        }
+        		
+        List<GrupDto> grupsPermesos = grupService.findGrupsPermesosProcedimentsGestioActiva(
 	        		userPermissionInfo.getEntitatActualId(),
 	        		userPermissionInfo.getRolActual(),
-	        		RolHelper.isRolActualAdministradorOrgan(request) ? organActual.getId() : null);
-        }
+	        		organActual!=null ? organActual.getId() : null);
+        
         response.put("isFiltreGrupsVisible", (grupsPermesos!=null && !grupsPermesos.isEmpty()));
+        
         return response;
     }
+
 }

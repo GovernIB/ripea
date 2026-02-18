@@ -9,4 +9,5 @@ import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
 
 public interface MetaDocumentResourceRepository extends BaseRepository<MetaDocumentResourceEntity, Long> {
 	List<MetaDocumentResourceEntity> findByMetaExpedientAndMultiplicitatIn(MetaExpedientResourceEntity metaExpedient, MultiplicitatEnumDto[] multiplicitats);
+	int countByMetaExpedientId(Long metaExpedientId);
 }

@@ -12,7 +12,7 @@ import {useActions} from "./TascaActions.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import {CardPage} from "../../../components/CardData.tsx";
 
-const expedientPerspectives = ['COUNT', 'ESTAT', 'RELACIONAT', 'AMB_PINBAL', "META_EXPEDIENT"]
+const expedientPerspectives = ['COUNT', 'ESTAT', 'RELACIONAT', 'AMB_PINBAL', "META_EXPEDIENT", "PERMIS_CONTINGUT"]
 const expedientNamedQueries = ['WITHOUT_PERMISION_CHECK'];
 const Tasca = () => {
     const { t } = useTranslation();
