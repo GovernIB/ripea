@@ -482,6 +482,21 @@ public class EjbClientConfig {
 		return getLocalEjbFactoyBean(MetaExpedientCarpetaResourceService.class);
 	}
 	
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean configResourceServiceEjb() {
+		return getLocalEjbFactoyBean(ConfigResourceService.class);
+	}
+	
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean configTypeResourceServiceEjb() {
+		return getLocalEjbFactoyBean(ConfigTypeResourceService.class);
+	}
+	
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean configGroupResourceServiceEjb() {
+		return getLocalEjbFactoyBean(ConfigGroupResourceService.class);
+	}
+	
 	/*
 	@Bean
 	public static BeanFactoryPostProcessor configurarEJBsDinamicament() {

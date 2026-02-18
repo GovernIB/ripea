@@ -1,0 +1,39 @@
+package es.caib.ripea.service.intf.model;
+
+import java.util.Date;
+
+import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
+import es.caib.ripea.service.intf.base.model.BaseResource;
+import es.caib.ripea.service.intf.base.model.ResourceReference;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.FieldNameConstants;
+
+@SuppressWarnings("serial")
+@Getter
+@Setter
+@NoArgsConstructor
+@FieldNameConstants
+@ResourceConfig(
+        quickFilterFields = { "nom" },
+        descriptionField = "nom")
+public class ConfigResource extends BaseResource<String> {
+
+    private String key;
+    private String value;
+    private String description;
+    private boolean jbossProperty;
+    private String groupCode;
+    private ResourceReference<ConfigTypeResource, String> type;
+    private String entitatCodi;
+    private boolean configurable;
+    private boolean configurableEntitatActiu;
+    private boolean configurableOrgan;
+    private boolean configurableOrganActiu;
+    private boolean configurableOrgansDescendents;
+    private String organCodi;
+    private int position;
+    private ResourceReference<UsuariResource, String> lastModifiedBy;
+    private Date lastModifiedDate;
+}
