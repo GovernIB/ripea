@@ -16,8 +16,8 @@ import lombok.experimental.FieldNameConstants;
 @NoArgsConstructor
 @FieldNameConstants
 @ResourceConfig(
-        quickFilterFields = { "nom" },
-        descriptionField = "nom")
+        quickFilterFields = { "key", "value", "description" },
+        descriptionField = "description")
 public class ConfigResource extends BaseResource<String> {
 
     private String key;
