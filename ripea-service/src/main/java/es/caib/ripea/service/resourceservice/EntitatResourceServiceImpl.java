@@ -1,5 +1,6 @@
 package es.caib.ripea.service.resourceservice;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +23,9 @@ import es.caib.ripea.service.helper.CacheHelper;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.PermisosHelper;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
+import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
+import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.dto.PermisDto;
 import es.caib.ripea.service.intf.model.EntitatResource;
 import es.caib.ripea.service.intf.resourceservice.EntitatResourceService;
@@ -42,6 +45,12 @@ public class EntitatResourceServiceImpl extends BaseMutableResourceService<Entit
     @PostConstruct
     public void init() {
     	register(EntitatResource.PERSPECTIVE_PERMISOS_CODE,	new PermisosPerspectiveApplicator());
+    	register(EntitatResource.Fields.logoImgFile, new EntitatImagesOnchangeLogicProcessor());
+    	register(EntitatResource.Fields.faviconImgFile, new EntitatImagesOnchangeLogicProcessor());
+    	register(EntitatResource.Fields.menuImgFile, new EntitatImagesOnchangeLogicProcessor());
+    	register(EntitatResource.Fields.logoBlackImgFile, new EntitatImagesOnchangeLogicProcessor());
+    	register(EntitatResource.Fields.faviconBlackImgFile, new EntitatImagesOnchangeLogicProcessor());
+    	register(EntitatResource.Fields.menuBlackImgFile, new EntitatImagesOnchangeLogicProcessor());
     }
 	
     @Override
@@ -87,6 +96,51 @@ public class EntitatResourceServiceImpl extends BaseMutableResourceService<Entit
 		public void applySingle(String code, EntitatResourceEntity entity, EntitatResource resource) throws PerspectiveApplicationException {
 			List<PermisDto> permisosEntitat = permisosHelper.findPermisos(entity.getId(), MetaNodeEntity.class);
 			resource.setNumPermisos(permisosEntitat!=null?permisosEntitat.size():0);
+		}
+    }
+    
+    private class EntitatImagesOnchangeLogicProcessor implements OnChangeLogicProcessor<EntitatResource> {
+
+		@Override
+		public void onChange(Serializable id, EntitatResource previous, String fieldName, Object fieldValue,
+				Map<String, AnswerValue> answers, String[] previousFieldNames, EntitatResource target) {
+			if (EntitatResource.Fields.logoImgFile.equals(fieldName)) {
+				if (fieldValue != null) {
+					target.setLogoImgBytes(((FileReference)fieldValue).getContent());
+				} else {
+					target.setLogoImgBytes(null);
+				}
+			}else if (EntitatResource.Fields.faviconImgFile.equals(fieldName)) {
+				if (fieldValue != null) {
+					target.setFaviconImgBytes(((FileReference)fieldValue).getContent());
+				} else {
+					target.setFaviconImgBytes(null);
+				}
+			}else if (EntitatResource.Fields.menuImgFile.equals(fieldName)) {
+				if (fieldValue != null) {
+					target.setMenuImgBytes(((FileReference)fieldValue).getContent());
+				} else {
+					target.setMenuImgBytes(null);
+				}
+			}else if (EntitatResource.Fields.logoBlackImgFile.equals(fieldName)) {
+				if (fieldValue != null) {
+					target.setBlackLogoImgBytes(((FileReference)fieldValue).getContent());
+				} else {
+					target.setBlackLogoImgBytes(null);
+				}
+			}else if (EntitatResource.Fields.faviconBlackImgFile.equals(fieldName)) {
+				if (fieldValue != null) {
+					target.setBlackFaviconImgBytes(((FileReference)fieldValue).getContent());
+				} else {
+					target.setBlackFaviconImgBytes(null);
+				}
+			}else if (EntitatResource.Fields.menuBlackImgFile.equals(fieldName)) {
+				if (fieldValue != null) {
+					target.setBlackMenuImgBytes(((FileReference)fieldValue).getContent());
+				} else {
+					target.setBlackMenuImgBytes(null);
+				}
+			}
 		}
     }
     

@@ -9,7 +9,9 @@ import org.springframework.data.annotation.Transient;
 
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
+import es.caib.ripea.service.intf.base.annotation.ResourceField;
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
+import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -67,6 +69,14 @@ public class EntitatResource extends BaseAuditableResource<Long> {
     private String blackCapsaleraColorLletra;
     
     @Transient private int numPermisos;
+    
+    @Transient @ResourceField(onChangeActive = true) private FileReference logoImgFile;
+    @Transient @ResourceField(onChangeActive = true) private FileReference faviconImgFile;
+    @Transient @ResourceField(onChangeActive = true) private FileReference menuImgFile;
+    
+    @Transient @ResourceField(onChangeActive = true) private FileReference logoBlackImgFile;
+    @Transient @ResourceField(onChangeActive = true) private FileReference faviconBlackImgFile;
+    @Transient @ResourceField(onChangeActive = true) private FileReference menuBlackImgFile;
     
     private static final long serialVersionUID = 5467286889478459953L;
 }
