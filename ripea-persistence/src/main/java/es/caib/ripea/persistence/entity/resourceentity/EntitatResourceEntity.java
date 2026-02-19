@@ -7,13 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
 import java.util.Date;
 
 /**
@@ -77,5 +71,6 @@ public class EntitatResourceEntity extends BaseAuditableEntity<EntitatResource> 
 
 //	@OneToMany(mappedBy = "entitat", cascade = {CascadeType.ALL})
 //	private Set<MetaNodeResourceEntity> metaNodes = new HashSet<>();
-
+    @Version
+    private long version = 0;
 }

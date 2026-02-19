@@ -150,6 +150,8 @@ const translationCa = {
         expedient: "Cercador d'expedients",
         expedientPeticio: "Cercador d'anotacions de registre",
         usuariTasca: "Tasques",
+        entitat: "Gestió d'entitats",
+        avis: "Gestió d'avisos",
         massiu: {
             portafirmes: "Acció massiva: enviar documents al portafirmes",
             firmasimpleweb: "Acció massiva: firmar documents des del navegador",
@@ -1621,6 +1623,68 @@ const translationCa = {
                 },
                 delete: {
                     ok: "Domini eliminat correctament",
+                },
+            },
+        },
+        entitat: {
+            title: "Entitat",
+            form: {
+                temaClar: "Configuració per el tema clar",
+                temaFosc: "Configuració per el tema fosc",
+            },
+            action: {
+                new: {
+                    label: "Nova entitat",
+                    ok: "Entitat creada correctament",
+                },
+                update: {
+                    ok: "Entitat modificada correctament",
+                },
+                delete: {
+                    ok: "Entitat eliminada correctament",
+                },
+                config: {
+                    label: "Configurar",
+                    // ok: "Entitat eliminada correctament",
+                },
+                activar: {
+                    label: "Activar",
+                    ok: "Entitat activada",
+                },
+                desactivar: {
+                    label: "Desactivar",
+                    ok: "Entitat desactivada",
+                },
+            },
+        },
+        avis: {
+            title: "Avis",
+            action: {
+                new: {
+                    label: "Nova avis",
+                    ok: "Avis creat correctament",
+                },
+                update: {
+                    ok: "Avis modificat correctament",
+                },
+                delete: {
+                    ok: "Avis eliminat correctament",
+                },
+                activar: {
+                    label: "Activar",
+                    ok: "Avis activat",
+                },
+                desactivar: {
+                    label: "Desactivar",
+                    ok: "Avis desactivat",
+                },
+            },
+        },
+        pinbalServei: {
+            title: "Servei pinbal",
+            action: {
+                update: {
+                    ok: "Servei pinbal modificat correctament",
                 },
             },
         },

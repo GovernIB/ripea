@@ -47,7 +47,7 @@ const PermisGrupGrid = ()=> {
 
     useEffect(() => {
         setTitlePage(t('page.user.menu.grupPermis'))
-    }, []);
+    }, [t]);
 
     return <GridPage disableMargins>
         <CardPage title={t('page.user.menu.grupPermis')}>

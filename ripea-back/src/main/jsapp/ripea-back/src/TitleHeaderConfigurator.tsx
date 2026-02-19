@@ -7,6 +7,10 @@ const TITLES: any = {
     '/expedientPeticio': "navigate.expedientPeticio",
     '/usuariTasca': "navigate.usuariTasca",
 
+    '/entitat': "navigate.entitat",
+    '/avis': "navigate.avis",
+    '/pinbalServei': "page.user.menu.pinbal",
+
     // Accions massives
     '/massiu/portafirmes': "navigate.massiu.portafirmes",
     '/massiu/firmasimpleweb': "navigate.massiu.firmasimpleweb",

@@ -33,10 +33,8 @@ public class AclResourceHelper {
     }
 
     public void applyPermisos(String code, List<AclEntryResourceEntity> entities, AclSidResource resource) throws PerspectiveApplicationException {
-        if (code.contains(AclSidResource.ClassType.ENTITY.name())) {
-            String entitatActualCodi = configHelper.getEntitatActualCodi();
-            EntitatResourceEntity entitat = entitatResourceRepository.findByCodi(entitatActualCodi);
-            resource.setMasks(filterEntries(entities, EntitatEntity.class.getName(), entitat.getId()).stream()
+        if (code.contains(AclSidResource.ClassType.ENTITY.name()) && code.split("#").length == 3) {
+            resource.setMasks(filterEntries(entities, EntitatEntity.class.getName(), Long.valueOf(code.split("#")[2])).stream()
                     .map(AclEntryResourceEntity::getMask)
                     .collect(Collectors.toList()));
         }

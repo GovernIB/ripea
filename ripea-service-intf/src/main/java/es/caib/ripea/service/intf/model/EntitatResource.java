@@ -25,10 +25,10 @@ import lombok.experimental.FieldNameConstants;
 @ResourceConfig(
         quickFilterFields = { "codi", "nom" },
         descriptionField = "nom",
-        		artifacts = {
-        				@ResourceConfigArtifact(
-        						type = ResourceArtifactType.PERSPECTIVE,
-        						code = EntitatResource.PERSPECTIVE_PERMISOS_CODE),
+        artifacts = {
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.PERSPECTIVE,
+                        code = EntitatResource.PERSPECTIVE_PERMISOS_CODE),
         }
 )
 public class EntitatResource extends BaseAuditableResource<Long> {
@@ -74,9 +74,9 @@ public class EntitatResource extends BaseAuditableResource<Long> {
     @Transient @ResourceField(onChangeActive = true) private FileReference faviconImgFile;
     @Transient @ResourceField(onChangeActive = true) private FileReference menuImgFile;
     
-    @Transient @ResourceField(onChangeActive = true) private FileReference logoBlackImgFile;
-    @Transient @ResourceField(onChangeActive = true) private FileReference faviconBlackImgFile;
-    @Transient @ResourceField(onChangeActive = true) private FileReference menuBlackImgFile;
+    @Transient @ResourceField(onChangeActive = true) private FileReference blackLogoImgFile;
+    @Transient @ResourceField(onChangeActive = true) private FileReference blackFaviconImgFile;
+    @Transient @ResourceField(onChangeActive = true) private FileReference blackMenuImgFile;
     
     private static final long serialVersionUID = 5467286889478459953L;
 }

@@ -1,9 +1,9 @@
 import {useState} from "react";
-import {Grid, Typography} from "@mui/material";
+import {Box, Grid2, Typography} from "@mui/material";
 import {BasePage, MuiDialog} from "reactlib";
 import {useTranslation} from "react-i18next";
 import TabComponent from "../../../components/TabComponent.tsx";
-import {CardData, ContenidoData} from "../../../components/CardData.tsx";
+import {CardButton, DetailCard, DetailCardContent} from "../../../components/CardData.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import {useActions} from "./NotificacioInteressatActions.tsx";
 
@@ -12,43 +12,43 @@ const Dades = (props:any) => {
     const { t } = useTranslation();
 
     return <BasePage>
-        <Grid container direction={"row"} columnSpacing={1} rowSpacing={2}>
-            <CardData title={t('page.notificacioInteressat.detall.enviament')}>
-                <ContenidoData title={t('page.notificacio.detall.notificacioIdentificador')} hidden={!entity?.notificacioInfo} xs={6}>{entity?.notificacioInfo?.notificacioIdentificador}</ContenidoData>
-                <ContenidoData title={t('page.notificacioInteressat.detall.enviamentReferencia')} hidden={!entity?.notificacioInfo} xs={6}>{entity?.enviamentReferencia}</ContenidoData>
-                <ContenidoData title={'NOTIB'} hidden={entity?.notificacioInfo} xs={12}>{entity?.enviamentReferencia}</ContenidoData>
+        <Grid2 container direction={"row"} columnSpacing={1} rowSpacing={2}>
+            <DetailCard title={t('page.notificacioInteressat.detall.enviament')}>
+                <DetailCardContent title={t('page.notificacio.detall.notificacioIdentificador')} hidden={!entity?.notificacioInfo} size={6}>{entity?.notificacioInfo?.notificacioIdentificador}</DetailCardContent>
+                <DetailCardContent title={t('page.notificacioInteressat.detall.enviamentReferencia')} hidden={!entity?.notificacioInfo} size={6}>{entity?.enviamentReferencia}</DetailCardContent>
+                <DetailCardContent title={'NOTIB'} hidden={entity?.notificacioInfo}>{entity?.enviamentReferencia}</DetailCardContent>
 
-                <ContenidoData title={t('page.notificacioInteressat.detall.entregaNif')}>{entity?.entregaNif}</ContenidoData>
-                <ContenidoData title={t('page.notificacioInteressat.detall.classificacio')}>{entity?.classificacio}</ContenidoData>
-                <ContenidoData title={t('page.interessat.detall.entregaDehObligat')} hidden={!entity?.representantInfo?.entregaDehObligat}>{t(`enum.siNO.${entity?.interessatInfo?.entregaDehObligat}`)}</ContenidoData>
-                <ContenidoData title={t('page.notificacio.detall.serveiTipusEnum')}>{entity?.notificacioInfo?.serveiTipusEnum ?? 'NORMAL'}</ContenidoData>
-                <ContenidoData title={t('page.notificacioInteressat.detall.enviamentDatatEstat')}>{entity?.enviamentDatatEstat}</ContenidoData>
-            </CardData>
+                <DetailCardContent title={t('page.notificacioInteressat.detall.entregaNif')}>{entity?.entregaNif}</DetailCardContent>
+                <DetailCardContent title={t('page.notificacioInteressat.detall.classificacio')}>{entity?.classificacio}</DetailCardContent>
+                <DetailCardContent title={t('page.interessat.detall.entregaDehObligat')} hidden={!entity?.representantInfo?.entregaDehObligat}>{t(`enum.siNO.${entity?.interessatInfo?.entregaDehObligat}`)}</DetailCardContent>
+                <DetailCardContent title={t('page.notificacio.detall.serveiTipusEnum')}>{entity?.notificacioInfo?.serveiTipusEnum ?? 'NORMAL'}</DetailCardContent>
+                <DetailCardContent title={t('page.notificacioInteressat.detall.enviamentDatatEstat')}>{entity?.enviamentDatatEstat}</DetailCardContent>
+            </DetailCard>
 
-            <CardData title={t('page.notificacioInteressat.detall.interessat')}>
-                <ContenidoData title={t('page.interessat.detall.nif')}>{entity?.interessatInfo?.documentNum}</ContenidoData>
+            <DetailCard title={t('page.notificacioInteressat.detall.interessat')}>
+                <DetailCardContent title={t('page.interessat.detall.nif')}>{entity?.interessatInfo?.documentNum}</DetailCardContent>
 
-                <ContenidoData title={t('page.interessat.detall.nom')} hidden={entity?.interessatInfo?.tipus != 'InteressatPersonaFisicaEntity'}
-                               hiddenIfEmpty>{entity?.interessatInfo?.nom}</ContenidoData>
-                <ContenidoData title={t('page.interessat.detall.llinatges')} hidden={entity?.interessatInfo?.tipus != 'InteressatPersonaFisicaEntity'}
-                               hiddenIfEmpty>{entity?.interessatInfo?.llinatge1} {entity?.interessatInfo?.llinatge2}</ContenidoData>
+                <DetailCardContent title={t('page.interessat.detall.nom')} hidden={entity?.interessatInfo?.tipus != 'InteressatPersonaFisicaEntity'}
+                               hiddenIfEmpty>{entity?.interessatInfo?.nom}</DetailCardContent>
+                <DetailCardContent title={t('page.interessat.detall.llinatges')} hidden={entity?.interessatInfo?.tipus != 'InteressatPersonaFisicaEntity'}
+                               hiddenIfEmpty>{entity?.interessatInfo?.llinatge1} {entity?.interessatInfo?.llinatge2}</DetailCardContent>
 
-                <ContenidoData title={t('page.interessat.detall.telefon')} hiddenIfEmpty>{entity?.interessatInfo?.telefon}</ContenidoData>
-                <ContenidoData title={t('page.interessat.detall.email')} hiddenIfEmpty>{entity?.interessatInfo?.email}</ContenidoData>
-            </CardData>
+                <DetailCardContent title={t('page.interessat.detall.telefon')} hiddenIfEmpty>{entity?.interessatInfo?.telefon}</DetailCardContent>
+                <DetailCardContent title={t('page.interessat.detall.email')} hiddenIfEmpty>{entity?.interessatInfo?.email}</DetailCardContent>
+            </DetailCard>
 
-            <CardData title={t('page.notificacioInteressat.detall.representant')} hidden={!entity?.representantInfo}>
-                <ContenidoData title={t('page.interessat.detall.nif')}>{entity?.representantInfo?.documentNum}</ContenidoData>
+            <DetailCard title={t('page.notificacioInteressat.detall.representant')} hidden={!entity?.representantInfo}>
+                <DetailCardContent title={t('page.interessat.detall.nif')}>{entity?.representantInfo?.documentNum}</DetailCardContent>
 
-                <ContenidoData title={t('page.interessat.detall.nom')} hidden={entity?.representantInfo?.tipus != 'InteressatPersonaFisicaEntity'}
-                               hiddenIfEmpty>{entity?.representantInfo?.nom}</ContenidoData>
-                <ContenidoData title={t('page.interessat.detall.llinatges')} hidden={entity?.representantInfo?.tipus != 'InteressatPersonaFisicaEntity'}
-                               hiddenIfEmpty>{entity?.representantInfo?.llinatge1} {entity?.representantInfo?.llinatge2}</ContenidoData>
+                <DetailCardContent title={t('page.interessat.detall.nom')} hidden={entity?.representantInfo?.tipus != 'InteressatPersonaFisicaEntity'}
+                               hiddenIfEmpty>{entity?.representantInfo?.nom}</DetailCardContent>
+                <DetailCardContent title={t('page.interessat.detall.llinatges')} hidden={entity?.representantInfo?.tipus != 'InteressatPersonaFisicaEntity'}
+                               hiddenIfEmpty>{entity?.representantInfo?.llinatge1} {entity?.representantInfo?.llinatge2}</DetailCardContent>
 
-                <ContenidoData title={t('page.interessat.detall.telefon')} hiddenIfEmpty>{entity?.representantInfo?.telefon}</ContenidoData>
-                <ContenidoData title={t('page.interessat.detall.email')} hiddenIfEmpty>{entity?.representantInfo?.email}</ContenidoData>
-            </CardData>
-        </Grid>
+                <DetailCardContent title={t('page.interessat.detall.telefon')} hiddenIfEmpty>{entity?.representantInfo?.telefon}</DetailCardContent>
+                <DetailCardContent title={t('page.interessat.detall.email')} hiddenIfEmpty>{entity?.representantInfo?.email}</DetailCardContent>
+            </DetailCard>
+        </Grid2>
     </BasePage>
 }
 
@@ -61,22 +61,20 @@ const Notific = (props:any) => {
     return <BasePage>
         <Typography hidden={entity?.notificacioInfo?.notificacioEstat != 'PENDENT'}>{t('page.notificacioInteressat.detall.noEnviat')}</Typography>
 
-        <CardData title={t('page.notificacioInteressat.detall.datat')} hidden={entity?.notificacioInfo?.notificacioEstat == 'PENDENT'}>
-            <ContenidoData title={t('page.notificacio.detall.notificacioEstat')}>{entity?.notificacioInfo?.notificacioEstat}</ContenidoData>
-        </CardData>
+        <DetailCard title={t('page.notificacioInteressat.detall.datat')} hidden={entity?.notificacioInfo?.notificacioEstat == 'PENDENT'}>
+            <DetailCardContent title={t('page.notificacio.detall.notificacioEstat')}>{entity?.notificacioInfo?.notificacioEstat}</DetailCardContent>
+        </DetailCard>
 
-        <CardData title={t('page.notificacioInteressat.detall.certificacio')} hidden={!entity?.enviamentCertificacioData}
-              buttons={[
-                  {
-                      text: t('page.notificacioInteressat.action.certificat.label'),
-                      icon: 'download',
-                      onClick: ()=>{certificat(entity?.id)},
-                  },
-              ]}
+        <DetailCard title={t('page.notificacioInteressat.detall.certificacio')} hidden={!entity?.enviamentCertificacioData}
+                    header={<Box ml="auto">
+                        <CardButton icon={'download'}
+                                    text={t('page.notificacioInteressat.action.certificat.label')}
+                                    onClick={()=>certificat(entity?.id)}/>
+                    </Box>}
         >
-            <ContenidoData title={t('page.notificacioInteressat.detall.enviamentCertificacioData')}>{formatDate(entity?.enviamentCertificacioData)}</ContenidoData>
-            <ContenidoData title={t('page.notificacioInteressat.detall.enviamentCertificacioOrigen')}>{entity?.enviamentCertificacioOrigen}</ContenidoData>
-        </CardData>
+            <DetailCardContent title={t('page.notificacioInteressat.detall.enviamentCertificacioData')}>{formatDate(entity?.enviamentCertificacioData)}</DetailCardContent>
+            <DetailCardContent title={t('page.notificacioInteressat.detall.enviamentCertificacioOrigen')}>{entity?.enviamentCertificacioOrigen}</DetailCardContent>
+        </DetailCard>
     </BasePage>
 }
 

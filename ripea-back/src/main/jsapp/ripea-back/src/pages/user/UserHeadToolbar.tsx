@@ -165,7 +165,7 @@ const useMenuSupAdmin = () => {
             id: 'entitat',
             title: t('page.user.menu.entitat'),
             icon: 'account_balance',
-            onClick: () => toProgramaAntic('entitat'),
+            to: '/entitat',
         },
         {
             id: 'integracions',
@@ -185,13 +185,13 @@ const useMenuSupAdmin = () => {
             id: 'entitat',
             title: t('page.user.menu.entitat'),
             icon: 'account_balance',
-            onClick: () => toProgramaAntic('entitat'),
+            to: '/entitat',
         },
         {
             id: 'avisos',
             title: t('page.user.menu.avisos'),
             icon: 'campaign',
-            onClick: () => toProgramaAntic('avis'),
+            to: '/avis',
         },
         {
             id: 'monitoritzar',
@@ -233,7 +233,7 @@ const useMenuSupAdmin = () => {
                     id: 'pinbal',
                     title: t('page.user.menu.pinbal'),
                     // icon: '',
-                    onClick: () => toProgramaAntic('pinbalServei'),
+                    to: 'pinbalServei',
                 },
                 {
                     id: 'segonPla',

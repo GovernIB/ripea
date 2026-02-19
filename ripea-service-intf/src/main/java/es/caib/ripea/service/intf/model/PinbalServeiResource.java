@@ -5,9 +5,14 @@ import javax.validation.constraints.Size;
 
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
+import es.caib.ripea.service.intf.dto.PinbalServeiDocPermesEnumDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.Transient;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -31,6 +36,9 @@ public class PinbalServeiResource extends BaseAuditableResource<Long> {
 	@NotNull
 	private boolean pinbalServeiDocPermesPas;
 	private boolean actiu;
-	
+
+    @Transient
+    private List<PinbalServeiDocPermesEnumDto> pinbalServeiDocPermesEnum = new ArrayList<>();
+
 	private static final long serialVersionUID = 6916266264935291305L;
 }

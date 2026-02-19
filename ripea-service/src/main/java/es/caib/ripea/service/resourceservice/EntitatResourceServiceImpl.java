@@ -16,7 +16,6 @@ import com.turkraft.springfilter.FilterBuilder;
 import com.turkraft.springfilter.parser.Filter;
 
 import es.caib.ripea.persistence.entity.EntitatEntity;
-import es.caib.ripea.persistence.entity.MetaNodeEntity;
 import es.caib.ripea.persistence.entity.resourceentity.EntitatResourceEntity;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.CacheHelper;
@@ -48,9 +47,9 @@ public class EntitatResourceServiceImpl extends BaseMutableResourceService<Entit
     	register(EntitatResource.Fields.logoImgFile, new EntitatImagesOnchangeLogicProcessor());
     	register(EntitatResource.Fields.faviconImgFile, new EntitatImagesOnchangeLogicProcessor());
     	register(EntitatResource.Fields.menuImgFile, new EntitatImagesOnchangeLogicProcessor());
-    	register(EntitatResource.Fields.logoBlackImgFile, new EntitatImagesOnchangeLogicProcessor());
-    	register(EntitatResource.Fields.faviconBlackImgFile, new EntitatImagesOnchangeLogicProcessor());
-    	register(EntitatResource.Fields.menuBlackImgFile, new EntitatImagesOnchangeLogicProcessor());
+    	register(EntitatResource.Fields.blackLogoImgFile, new EntitatImagesOnchangeLogicProcessor());
+    	register(EntitatResource.Fields.blackFaviconImgFile, new EntitatImagesOnchangeLogicProcessor());
+    	register(EntitatResource.Fields.blackMenuImgFile, new EntitatImagesOnchangeLogicProcessor());
     }
 	
     @Override
@@ -90,11 +89,33 @@ public class EntitatResourceServiceImpl extends BaseMutableResourceService<Entit
 
         return result.isEmpty() ? null : FilterBuilder.and(result).generate();
     }
-    
+
+    private FileReference getFileReferenceByBytes(String name, byte[] bytes) {
+        if (bytes == null) return null;
+        return new FileReference(name, bytes, null, null);
+    }
+
+    @Override
+    protected void afterConversion(EntitatResourceEntity entity, EntitatResource resource) {
+        resource.setLogoImgFile(
+                this.getFileReferenceByBytes("logo",  resource.getLogoImgBytes()));
+        resource.setFaviconImgFile(
+                this.getFileReferenceByBytes("faviconLogo",  resource.getFaviconImgBytes()));
+        resource.setMenuImgFile(
+                this.getFileReferenceByBytes("menuLogo",  resource.getMenuImgBytes()));
+
+        resource.setBlackLogoImgFile(
+                this.getFileReferenceByBytes("logo",  resource.getBlackLogoImgBytes()));
+        resource.setBlackFaviconImgFile(
+                this.getFileReferenceByBytes("faviconLogo",  resource.getBlackFaviconImgBytes()));
+        resource.setBlackMenuImgFile(
+                this.getFileReferenceByBytes("menuLogo",  resource.getBlackMenuImgBytes()));
+    }
+
     private class PermisosPerspectiveApplicator implements PerspectiveApplicator<EntitatResourceEntity, EntitatResource> {
 		@Override
 		public void applySingle(String code, EntitatResourceEntity entity, EntitatResource resource) throws PerspectiveApplicationException {
-			List<PermisDto> permisosEntitat = permisosHelper.findPermisos(entity.getId(), MetaNodeEntity.class);
+			List<PermisDto> permisosEntitat = permisosHelper.findPermisos(entity.getId(), EntitatEntity.class);
 			resource.setNumPermisos(permisosEntitat!=null?permisosEntitat.size():0);
 		}
     }
@@ -122,19 +143,19 @@ public class EntitatResourceServiceImpl extends BaseMutableResourceService<Entit
 				} else {
 					target.setMenuImgBytes(null);
 				}
-			}else if (EntitatResource.Fields.logoBlackImgFile.equals(fieldName)) {
+			}else if (EntitatResource.Fields.blackLogoImgFile.equals(fieldName)) {
 				if (fieldValue != null) {
 					target.setBlackLogoImgBytes(((FileReference)fieldValue).getContent());
 				} else {
 					target.setBlackLogoImgBytes(null);
 				}
-			}else if (EntitatResource.Fields.faviconBlackImgFile.equals(fieldName)) {
+			}else if (EntitatResource.Fields.blackFaviconImgFile.equals(fieldName)) {
 				if (fieldValue != null) {
 					target.setBlackFaviconImgBytes(((FileReference)fieldValue).getContent());
 				} else {
 					target.setBlackFaviconImgBytes(null);
 				}
-			}else if (EntitatResource.Fields.menuBlackImgFile.equals(fieldName)) {
+			}else if (EntitatResource.Fields.blackMenuImgFile.equals(fieldName)) {
 				if (fieldValue != null) {
 					target.setBlackMenuImgBytes(((FileReference)fieldValue).getContent());
 				} else {

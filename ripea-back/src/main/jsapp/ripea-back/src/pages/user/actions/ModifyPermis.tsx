@@ -65,7 +65,7 @@ const usePermisDialog = ({
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
 
-    const handleShow = (id?: any, row?: any, additionalData?: any): void => {
+    const handleShow = (id: any, row?: any, additionalData?: any): void => {
         apiRef.current?.show?.(undefined, {
             ...(row ?? {}),
             classType,

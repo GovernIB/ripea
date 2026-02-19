@@ -7,6 +7,9 @@ import {CardPage} from "../../../components/CardData.tsx";
 import StyledMuiGrid, {ToolbarButton} from "../../../components/StyledMuiGrid.tsx";
 import {Icon} from "@mui/material";
 import {usePermisEntitatCreate, usePermisEntitatModify, usePermisActions} from "../actions/ModifyPermis.tsx";
+import {useParams} from "react-router-dom";
+import {useEntitatSession} from "../../../components/Session.tsx";
+import {useMemo} from "react";
 
 const sortModel: any = [{field: 'principal', sort: 'asc'}]
 const columns = [
@@ -40,7 +43,13 @@ const columns = [
 
 const PermisEntitatGrid = ()=> {
     const {t} = useTranslation();
+    const { id } = useParams();
+    const {value: entitat} = useEntitatSession()
     const gridApiRef = useMuiDataGridApiRef();
+
+    const entitatId = useMemo(() => (
+        id || entitat?.id
+    ), [id, entitat?.id])
 
     const refresh = () => {
         gridApiRef?.current?.refresh?.();
@@ -54,13 +63,16 @@ const PermisEntitatGrid = ()=> {
             label: t('common.update'),
             icon: "edit",
             showInMenu: true,
-            onClick: (_id:any, row:any) => handelModify(undefined, row),
+            onClick: (_id:any, row:any) => handelModify(entitatId, row),
         },
         {
             label: t('common.delete'),
             icon: "delete",
             showInMenu: true,
-            onClick: (id:any) => eliminar(id, {classType: 'ENTITY'}),
+            onClick: (id:any) => eliminar(id, {
+                classType: 'ENTITY',
+                objectId: entitatId,
+            }),
         },
     ]
 
@@ -72,8 +84,8 @@ const PermisEntitatGrid = ()=> {
                 popupEditUpdateActive
                 columns={columns}
                 sortModel={sortModel}
-                namedQueries={['ENTITY']}
-                perspectives={['PERMISION#ENTITY']}
+                namedQueries={[`ENTITY#${entitatId}`]}
+                perspectives={[`PERMISION#ENTITY#${entitatId}`]}
                 rowAdditionalActions={actions}
                 toolbarElementsWithPositions={[
                     {
@@ -81,7 +93,7 @@ const PermisEntitatGrid = ()=> {
                         element: <ToolbarButton 
                             title={t('page.permision.action.new.label')}
                             icon={'add'} 
-                            onClick={()=>handelCreate()} 
+                            onClick={()=>handelCreate(entitatId)}
                             color={'primary'}>{t('page.permision.action.new.label')}</ToolbarButton>,
                     },
                 ]}
