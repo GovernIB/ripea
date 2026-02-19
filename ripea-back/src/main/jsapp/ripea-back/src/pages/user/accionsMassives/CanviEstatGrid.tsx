@@ -40,8 +40,13 @@ const springFilterBuilder = (data: any) => {
         builder.eq("id", data?.expedient?.id),
         builder.like("nom", data?.nom),
         builder.betweenDates("createdDate", data?.dataCreacioInici, data?.dataCreacioFi),
-        data.estat && builder.eq("estat", `'OBERT'`),
-        data.estat && (data.estat != '0' && data.estat != '-1') && builder.eq("estatAdditional.id", data.estat),
+		data.estat && (
+		    (data.estat === 'OBERT' || data.estat === '0')
+				? builder.neq("estat", `'TANCAT'`)
+				: (data.estat === 'TANCAT' || data.estat === '-1')
+				    ? builder.eq("estat", `'TANCAT'`)
+		            : data?.procediment?.id &&builder.eq("estatAdditional.id", data.estat)
+		),
         builder.eq("prioritat", `'${data?.prioritat}'`),
     );
 }

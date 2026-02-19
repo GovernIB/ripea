@@ -13,15 +13,19 @@ import es.caib.ripea.persistence.base.entity.ResourceEntity;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.model.ConfigTypeResource;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * Classe del model de dades que representa un del tipus de dades possibles per a una propietat de configuració.
  *
  * @author Limit Tecnologies <limit@limit.es>
  */
-@Getter
 @Entity
 @Table(	name = BaseConfig.DB_PREFIX + "CONFIG_TYPE")
+@Getter
+@Setter
+@NoArgsConstructor
 public class ConfigTypeResourceEntity implements ResourceEntity<ConfigTypeResource, String> {
     @Id
     @Column(name = "CODE", length = 128, nullable = false)

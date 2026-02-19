@@ -40,9 +40,9 @@ import org.springframework.util.ReflectionUtils;
 
 import es.caib.ripea.persistence.base.entity.ResourceEntity;
 import es.caib.ripea.persistence.base.repository.BaseRepository;
-import es.caib.ripea.service.base.helper.BasePermissionHelper;
 import es.caib.ripea.service.base.helper.JasperReportsHelper;
 import es.caib.ripea.service.base.helper.ObjectMappingHelper;
+import es.caib.ripea.service.base.helper.PermissionHelper;
 import es.caib.ripea.service.base.helper.ResourceEntityMappingHelper;
 import es.caib.ripea.service.base.springfilter.FilterSpecification;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
@@ -95,7 +95,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 	@Autowired
 	protected ResourceEntityMappingHelper resourceEntityMappingHelper;
 	@Autowired
-	protected BasePermissionHelper basePermissionHelper;
+	protected PermissionHelper basePermissionHelper;
 
 	private Class<R> resourceClass;
 	private Class<ID> pkClass;

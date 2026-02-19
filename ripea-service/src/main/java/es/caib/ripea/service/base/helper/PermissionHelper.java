@@ -1,5 +1,6 @@
 package es.caib.ripea.service.base.helper;
 
+import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import lombok.Builder;
 import lombok.Getter;
@@ -69,6 +70,13 @@ public class PermissionHelper {
 
 	}
 
+	public boolean checkResourceArtifactPermission(
+			Class<?> resourceClass,
+			ResourceArtifactType type,
+			String code) {
+		return true;
+	}
+	
 	/* Determina si els permisos de l'usuari inclouen el permís requerit.
 	 * - userPermissions: permisos de l'usuari.
 	 * - permission: permís requerit.
@@ -92,6 +100,9 @@ public class PermissionHelper {
 			if (targetType.endsWith(".EntitatResource")) { return userPermissions.isSuperAdmin(); }
 			if (targetType.endsWith(".PinbalServeiResource")) { return userPermissions.isSuperAdmin(); }
 			if (targetType.endsWith(".AvisResource")) { return userPermissions.isSuperAdmin(); }
+			if (targetType.endsWith(".ConfigResource")) { return userPermissions.isSuperAdmin(); }
+			if (targetType.endsWith(".ConfigTypeResource")) { return userPermissions.isSuperAdmin(); }
+			if (targetType.endsWith(".ConfigGroupResource")) { return userPermissions.isSuperAdmin(); }
 			//Exclusius administradors
 			if (targetType.endsWith(".OrganGestorResource")) { return userPermissions.isAdmin(); }
 			if (targetType.endsWith(".GrupResource")) { 

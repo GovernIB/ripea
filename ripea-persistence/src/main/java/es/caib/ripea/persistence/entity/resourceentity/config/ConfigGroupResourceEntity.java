@@ -14,17 +14,15 @@ import javax.persistence.Table;
 import es.caib.ripea.persistence.base.entity.ResourceEntity;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.model.ConfigGroupResource;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Getter
 @Entity
 @Table(	name = BaseConfig.DB_PREFIX + "CONFIG_GROUP")
-@Builder
+@Getter
+@Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class ConfigGroupResourceEntity implements ResourceEntity<ConfigGroupResource, String> {
 
     @Id
