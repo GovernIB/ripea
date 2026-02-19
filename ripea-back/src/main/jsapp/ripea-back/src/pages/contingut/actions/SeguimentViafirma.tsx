@@ -102,7 +102,7 @@ const useSeguimentViafirma = (potModificar:boolean, refresh?: () => void) => {
             setOpen(true)
             apiFind({
                 filter: builder.eq('document.id', id),
-                sorts: ['createdDate', 'desc']
+                sorts: ['createdDate,desc']
             })
                 .then((result) => {
                     if (result?.rows?.length>0){

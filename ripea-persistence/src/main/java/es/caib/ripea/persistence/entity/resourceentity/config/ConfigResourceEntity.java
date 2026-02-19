@@ -4,20 +4,12 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
 
+import es.caib.ripea.persistence.entity.resourceentity.UsuariResourceEntity;
 import org.hibernate.annotations.ForeignKey;
 
 import es.caib.ripea.persistence.base.entity.ResourceEntity;
-import es.caib.ripea.persistence.entity.UsuariEntity;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.model.ConfigResource;
 import lombok.Getter;
@@ -36,8 +28,11 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ConfigResourceEntity implements ResourceEntity<ConfigResource, String> {
     @Id
-    @Column(name = "KEY", length = 256, nullable = false)
+    @Column(name = "KEY", length = 256, updatable = false, nullable = false)
     private String key;
+
+    @Column(name = "KEY", insertable = false, updatable = false)
+    private String id;
 
     @Column(name = "VALUE", length = 2048, nullable = true)
     private String value;
@@ -48,8 +43,9 @@ public class ConfigResourceEntity implements ResourceEntity<ConfigResource, Stri
     @Column(name = "JBOSS_PROPERTY", nullable = false)
     private boolean jbossProperty;
 
-    @Column(name = "GROUP_CODE", length = 2048, nullable = true)
-    private String groupCode;
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "GROUP_CODE", updatable = false)
+    private ConfigGroupResourceEntity group;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "TYPE_CODE", updatable = false)
@@ -81,15 +77,13 @@ public class ConfigResourceEntity implements ResourceEntity<ConfigResource, Stri
     private int position;
 
     @ManyToOne
-    private UsuariEntity lastModifiedBy;
+    @JoinColumn(name = "LASTMODIFIEDBY_CODI", updatable = false)
+    private UsuariResourceEntity lastModifiedBy;
 
     @Temporal(TemporalType.TIMESTAMP)
+    @JoinColumn(name = "LASTMODIFIEDDATE", updatable = false)
     private Date lastModifiedDate;
 
-    public ConfigResourceEntity(String key, String value) {
-        this.key = key;
-        this.value = value;
-    }
     /**
      * Per a mapejar el Dto de la vista.
      *
@@ -105,32 +99,7 @@ public class ConfigResourceEntity implements ResourceEntity<ConfigResource, Stri
     public void update(String value) {
         this.value = value;
     }
-    
-    public void updateConfigurableEntitat(boolean configurable) {
-        this.configurableEntitatActiu = configurable;
-    }
-    
-    public void updateConfigurableOrgan(boolean configurableOrgan) {
-        this.configurableOrganActiu = configurableOrgan;
-    }
-    
-    
-    public void crearConfigNova(String key, String entitatCodi, String organCodi, ConfigResourceEntity entitat) {
 
-        this.key = key;
-        this.value = null;
-        this.description = entitat.getDescription();
-        this.jbossProperty = entitat.isJbossProperty();
-        this.groupCode = entitat.getGroupCode();
-        this.type = entitat.getType();
-        this.entitatCodi = entitatCodi;
-        this.organCodi = organCodi;
-        this.configurable = entitat.isConfigurable();
-        this.configurableEntitatActiu = entitat.isConfigurableEntitatActiu();
-        this.configurableOrgan = entitat.isConfigurableOrgan();
-        this.configurableOrganActiu = entitat.isConfigurableOrganActiu();
-    }
-    
 	@Override
 	public String getId() {
 		return this.key;

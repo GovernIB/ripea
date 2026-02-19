@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
+import org.springframework.data.annotation.Transient;
 
 @SuppressWarnings("serial")
 @Getter
@@ -24,7 +25,7 @@ public class ConfigResource extends BaseResource<String> {
     private String value;
     private String description;
     private boolean jbossProperty;
-    private String groupCode;
+    private ResourceReference<ConfigGroupResource, String> group;
     private ResourceReference<ConfigTypeResource, String> type;
     private String entitatCodi;
     private boolean configurable;
@@ -36,4 +37,9 @@ public class ConfigResource extends BaseResource<String> {
     private int position;
     private ResourceReference<UsuariResource, String> lastModifiedBy;
     private Date lastModifiedDate;
+
+    @Transient
+    public String getId() {
+        return key;
+    }
 }
