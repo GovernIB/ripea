@@ -1,7 +1,17 @@
 package es.caib.ripea.service.intf.model;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
+import org.springframework.data.annotation.Transient;
+
+import es.caib.ripea.service.intf.base.annotation.ResourceArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
-import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceField;
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
@@ -12,14 +22,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
-import org.springframework.data.annotation.Transient;
-
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 @Getter
 @Setter
@@ -29,52 +31,52 @@ import java.util.List;
         quickFilterFields = { "id, titol" },
         descriptionField = "titol",
         artifacts = {
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.FILTER,
                         code = ExpedientTascaResource.FILTER_CODE,
                         formClass = ExpedientTascaResource.TascaFilterForm.class),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = ExpedientTascaResource.PERSPECTIVE_RESPONSABLES_CODE),
-				@ResourceConfigArtifact(
+				@ResourceArtifact(
 						type = ResourceArtifactType.PERSPECTIVE,
 						code = ExpedientTascaResource.PERSPECTIVE_AUDIT_CODE),                 
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientTascaResource.ACTION_REABRIR_CODE,
                         formClass = ExpedientTascaResource.ReobrirFormAction.class,
                         requiresId = true),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientTascaResource.ACTION_CHANGE_ESTAT_CODE,
                         formClass = ExpedientTascaResource.ChangeEstatFormAction.class,
                         requiresId = true),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientTascaResource.ACTION_CHANGE_PRIORITAT_CODE,
                         formClass = ExpedientTascaResource.ChangePrioritatFormAction.class,
                         requiresId = true), 
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientTascaResource.ACTION_REASSIGNAR_CODE,
                         formClass = ExpedientTascaResource.ReassignarTascaFormAction.class,
                         requiresId = true), 
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientTascaResource.ACTION_DELEGAR_CODE,
                         formClass = ExpedientTascaResource.DelegarTascaFormAction.class,
                         requiresId = true),                 
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientTascaResource.ACTION_CHANGE_DATALIMIT_CODE,
                         formClass = ExpedientTascaResource.ChangeDataLimitFormAction.class,
                         requiresId = true),                
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientTascaResource.ACTION_REBUTJAR_CODE,
                         formClass = ExpedientTascaResource.MotiuFormAction.class,
                         requiresId = true),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientTascaResource.ACTION_RETOMAR_CODE,
                         formClass = ExpedientTascaResource.MotiuFormAction.class,

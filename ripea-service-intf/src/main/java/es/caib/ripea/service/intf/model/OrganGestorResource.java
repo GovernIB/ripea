@@ -1,10 +1,15 @@
 package es.caib.ripea.service.intf.model;
 
+import java.io.Serializable;
+import java.util.List;
+
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.springframework.data.annotation.Transient;
+
+import es.caib.ripea.service.intf.base.annotation.ResourceArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
-import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
@@ -14,10 +19,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
-import org.springframework.data.annotation.Transient;
-
-import java.io.Serializable;
-import java.util.List;
 
 @Getter
 @Setter
@@ -27,20 +28,20 @@ import java.util.List;
         quickFilterFields = { "codi", "nom" },
         descriptionField = "codiINom",
         artifacts = {
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.FILTER,
                         code = OrganGestorResource.FILTER_CODE,
                         formClass = OrganGestorResource.FormFilter.class),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = OrganGestorResource.DIR3_PREDICT_CODE),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = OrganGestorResource.DIR3_UPDATE_CODE),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = OrganGestorResource.PERSPECTIVE_PATH_CODE),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = OrganGestorResource.PERSPECTIVE_COUNT_PERMISOS),
         }

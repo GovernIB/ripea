@@ -1,23 +1,50 @@
 package es.caib.ripea.service.base.service;
 
-import es.caib.ripea.persistence.base.entity.ReorderableEntity;
-import es.caib.ripea.persistence.base.entity.ResourceEntity;
-import es.caib.ripea.service.base.helper.ResourceReferenceToEntityHelper;
-import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
-import es.caib.ripea.service.intf.base.exception.*;
-import es.caib.ripea.service.intf.base.model.*;
-import es.caib.ripea.service.intf.base.service.MutableResourceService;
-import es.caib.ripea.service.intf.base.util.TypeUtil;
-import lombok.extern.slf4j.Slf4j;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Persistable;
 import org.springframework.lang.Nullable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ReflectionUtils;
 
-import java.io.Serializable;
-import java.util.*;
-import java.util.stream.Collectors;
+import es.caib.ripea.persistence.base.entity.ReorderableEntity;
+import es.caib.ripea.persistence.base.entity.ResourceEntity;
+import es.caib.ripea.service.base.helper.ResourceReferenceToEntityHelper;
+import es.caib.ripea.service.base.service.BaseMutableResourceService.FieldFileManager;
+import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
+import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
+import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
+import es.caib.ripea.service.intf.base.exception.ArtifactNotFoundException;
+import es.caib.ripea.service.intf.base.exception.FieldArtifactNotFoundException;
+import es.caib.ripea.service.intf.base.exception.ResourceAlreadyExistsException;
+import es.caib.ripea.service.intf.base.exception.ResourceFieldNotFoundException;
+import es.caib.ripea.service.intf.base.exception.ResourceNotCreatedException;
+import es.caib.ripea.service.intf.base.exception.ResourceNotDeletedException;
+import es.caib.ripea.service.intf.base.exception.ResourceNotFoundException;
+import es.caib.ripea.service.intf.base.exception.ResourceNotUpdatedException;
+import es.caib.ripea.service.intf.base.model.DownloadableFile;
+import es.caib.ripea.service.intf.base.model.FieldOption;
+import es.caib.ripea.service.intf.base.model.FileReference;
+import es.caib.ripea.service.intf.base.model.Resource;
+import es.caib.ripea.service.intf.base.model.ResourceArtifact;
+import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
+import es.caib.ripea.service.intf.base.service.MutableResourceService;
+import es.caib.ripea.service.intf.base.util.TypeUtil;
+import liquibase.pro.packaged.E;
+import liquibase.pro.packaged.R;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Servei amb la funcionalitat básica per a la gestió d'un recurs que es pot modificar.
@@ -58,13 +85,9 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 		Map<String, Persistable<?>> referencedEntities = resourceReferenceToEntityHelper.getReferencedEntitiesForResource(
 				resource,
 				getEntityClass());
-		E entity = resourceEntityMappingHelper.resourceToEntity(
-				resource,
-				pk,
-				getEntityClass(),
-				referencedEntities);
+		E entity = resourceToEntity(resource, pk, referencedEntities);
 		beforeCreateEntity(entity, resource, answers);
-		resourceEntityMappingHelper.updateEntityWithResource(entity, resource, referencedEntities);
+		updateEntityWithResource(entity, resource, referencedEntities);
 		beforeCreateSave(entity, resource, answers);
 		boolean anyOrderChanged = reorderIfReorderable(
 				entity,
@@ -72,13 +95,10 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 				null,
 				true,
 				false);
-		E saved = saveFlushAndRefresh(entity);
+		E saved = entitySaveFlushAndRefresh(entity);
 		fieldFilesSave(resource, saved);
 		afterCreateSave(saved, resource, answers, anyOrderChanged);
-		entityRepository.detach(saved);
-		R response = resourceEntityMappingHelper.entityToResource(saved, getResourceClass());
-		entityRepository.merge(saved);
-		return response;
+		return entityDetachConvertAndMerge(saved, answers, true);
 	}
 
 	@Override
@@ -89,33 +109,25 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 			Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotFoundException {
 		log.debug("Updating resource (id={}, resource={})", id, resource);
 		completeResource(resource);
-		E entity = getEntity(id, null);
+		E entity = getEntity(id);
 		ID reorderPreviousParentId = reorderGetParentId(entity);
 		Long reorderResourceSequence = reorderGetSequenceFromResourceOrEntity(resource, entity);
-		boolean proceedWithUpdate = beforeUpdateEntity(entity, resource, answers);
-		E saved;
-		if (proceedWithUpdate) {
-			Map<String, Persistable<?>> referencedEntities = resourceReferenceToEntityHelper.getReferencedEntitiesForResource(
-					resource,
-					getEntityClass());
-			resourceEntityMappingHelper.updateEntityWithResource(entity, resource, referencedEntities);
-			beforeUpdateSave(entity, resource, answers);
-			saved = saveFlushAndRefresh(entity);
-			boolean anyOrderChanged = reorderIfReorderable(
-					saved,
-					reorderResourceSequence,
-					reorderPreviousParentId,
-					true,
-					false);
-			fieldFilesSave(resource, saved);
-			afterUpdateSave(saved, resource, answers, anyOrderChanged);
-		} else {
-			saved = entity;
-		}
-		entityRepository.detach(saved);
-		R response = resourceEntityMappingHelper.entityToResource(saved, getResourceClass());
-		entityRepository.merge(saved);
-		return response;
+		beforeUpdateEntity(entity, resource, answers);
+		Map<String, Persistable<?>> referencedEntities = resourceReferenceToEntityHelper.getReferencedEntitiesForResource(
+				resource,
+				getEntityClass());
+		updateEntityWithResource(entity, resource, referencedEntities);
+		beforeUpdateSave(entity, resource, answers);
+		E saved = entitySaveFlushAndRefresh(entity);
+		boolean anyOrderChanged = reorderIfReorderable(
+				saved,
+				reorderResourceSequence,
+				reorderPreviousParentId,
+				true,
+				false);
+		fieldFilesSave(resource, saved);
+		afterUpdateSave(saved, resource, answers, anyOrderChanged);
+		return entityDetachConvertAndMerge(saved, answers, false);
 	}
 
 	@Override
@@ -124,9 +136,9 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 			ID id,
 			Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotFoundException {
 		log.debug("Deleting resource (id={})", id);
-		E entity = getEntity(id, null);
+		E entity = getEntity(id);
 		beforeDelete(entity, answers);
-		entityRepository.delete(entity);
+		entityRepositoryDelete(entity);
 		reorderIfReorderable(
 				entity,
 				null,
@@ -134,7 +146,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 				true,
 				true);
 		fieldFilesDelete(entity);
-		entityRepository.flush();
+		entityRepositoryFlush();
 		afterDelete(entity, answers);
 	}
 
@@ -146,8 +158,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 			String fieldName,
 			Object fieldValue,
 			Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceFieldNotFoundException, AnswerRequiredException {
-		log.debug("Processing onChange event (id={}, previous={}, fieldName={}, fieldValue={}, answers={})",
-				id,
+		log.debug("Processing onChange event (previous={}, fieldName={}, fieldValue={}, answers={})",
 				previous,
 				fieldName,
 				fieldValue,
@@ -165,15 +176,37 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 
 	@Override
 	@Transactional
-	public <P extends Serializable> Serializable artifactActionExec(ID id, String code, P params) throws ArtifactNotFoundException, ActionExecutionException {
-		log.debug("Executing action (id={}, code={}, params={})", id, code, params);
+	public <P extends Serializable> Serializable artifactActionExec(
+			ID id,
+			String code,
+			P params) throws ArtifactNotFoundException, ActionExecutionException {
+		log.debug("Executing action (code={}, params={})", code, params);
 		ActionExecutor<E, P, ?> executor = (ActionExecutor<E, P, ?>)actionExecutorMap.get(code);
 		if (executor != null) {
 			E entity = null;
 			if (id != null) {
-				entity = getEntity(id, null);
+				entity = getEntity(id);
+			} else if (artifactRequiresId(ResourceArtifactType.ACTION, code)) {
+				throw new ActionExecutionException(
+						getResourceClass(),
+						null,
+						code,
+						"This action requires id");
 			}
-			return executor.exec(code, entity, params);
+			try {
+				return executor.exec(code, entity, params);
+			} catch (ActionExecutionException ex) {
+				throw ex;
+			} catch (Exception ex) {
+				ActionExecutionException aex = new ActionExecutionException(
+						getResourceClass(),
+						id,
+						code,
+						"",
+						ex);
+				log.error(aex.getMessage(), ex);
+				throw aex;
+			}
 		} else {
 			throw new ArtifactNotFoundException(getResourceClass(), ResourceArtifactType.ACTION, code);
 		}
@@ -205,6 +238,10 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 		if (type == null || type == ResourceArtifactType.ACTION) {
 			artifacts.addAll(
 					actionExecutorMap.keySet().stream().
+							filter(code -> basePermissionHelper.checkResourceArtifactPermission(
+									getResourceClass(),
+									ResourceArtifactType.ACTION,
+									code)).
 							map(code -> new ResourceArtifact(
 									ResourceArtifactType.ACTION,
 									code,
@@ -222,14 +259,46 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 		if (type == ResourceArtifactType.ACTION) {
 			ActionExecutor<E, ?, ?> generator = actionExecutorMap.get(code);
 			if (generator != null) {
-				return new ResourceArtifact(
+				boolean allowed = basePermissionHelper.checkResourceArtifactPermission(
+						getResourceClass(),
 						ResourceArtifactType.ACTION,
-						code,
-						artifactRequiresId(ResourceArtifactType.ACTION, code),
-						artifactGetFormClass(ResourceArtifactType.ACTION, code));
+						code);
+				if (allowed) {
+					return new ResourceArtifact(
+							ResourceArtifactType.ACTION,
+							code,
+							artifactRequiresId(ResourceArtifactType.ACTION, code),
+							artifactGetFormClass(ResourceArtifactType.ACTION, code));
+				}
 			}
 		}
 		return super.artifactGetOne(type, code);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public DownloadableFile fieldDownload(
+			ID id,
+			String fieldName,
+			OutputStream out) throws ResourceNotFoundException, ResourceFieldNotFoundException, FieldArtifactNotFoundException, IOException {
+		Field field = ReflectionUtils.findField(getResourceClass(), fieldName);
+		if (field != null) {
+			FieldFileManager<E> fieldFileManager = fieldFileManagerMap.get(fieldName);
+			if (fieldFileManager != null) {
+				FileReference fileReference = fieldFileManager.read(
+						getEntity(id),
+						fieldName);
+				out.write(fileReference.getContent());
+				return new DownloadableFile(
+						fileReference.getName(),
+						fileReference.getContentType(),
+						null);
+			} else {
+				return super.fieldDownload(id, fieldName, out);
+			}
+		} else {
+			throw new ResourceFieldNotFoundException(getResourceClass(), fieldName);
+		}
 	}
 
 	protected ID getPkFromResource(R resource) {
@@ -250,13 +319,11 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 	protected void beforeCreateEntity(E entity, R resource, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotCreatedException {}
 	protected void beforeCreateSave(E entity, R resource, Map<String, AnswerRequiredException.AnswerValue> answers) {}
 	protected void afterCreateSave(E entity, R resource, Map<String, AnswerRequiredException.AnswerValue> answers, boolean anyOrderChanged) {}
-	protected boolean beforeUpdateEntity(E entity, R resource, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotUpdatedException {
-		// Si es retorna true vol dir que s'ha de procedir amb l'update.
-		// Si es retorna false vol dir que l'update no s'ha de fer.
-		return true;
-	}
+	protected void afterCreate(E entity, R resource, Map<String, AnswerRequiredException.AnswerValue> answers) {}
+	protected void beforeUpdateEntity(E entity, R resource, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotUpdatedException {}
 	protected void beforeUpdateSave(E entity, R resource, Map<String, AnswerRequiredException.AnswerValue> answers) {}
 	protected void afterUpdateSave(E entity, R resource, Map<String, AnswerRequiredException.AnswerValue> answers, boolean anyOrderChanged) {}
+	protected void afterUpdate(E entity, R resource, Map<String, AnswerRequiredException.AnswerValue> answers) {}
 	protected void beforeDelete(E entity, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotDeletedException {}
 	protected void afterDelete(E entity, Map<String, AnswerRequiredException.AnswerValue> answers) {}
 
@@ -335,7 +402,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 		ID pk = getPkFromResource(resource);
 		// Si la pk no és null comprova si el recurs ja existeix
 		if (pk != null) {
-			Optional<E> existingEntity = entityRepository.findById(pk);
+			Optional<E> existingEntity = entityRepositoryFindOne(pk);
 			if (existingEntity.isPresent()) {
 				throw new ResourceAlreadyExistsException(
 						resource.getClass(),
@@ -345,8 +412,26 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 		return pk;
 	}
 
+	protected E resourceToEntity(
+			R resource,
+			ID pk,
+			Map<String, Persistable<?>> referencedEntities) {
+		return resourceEntityMappingHelper.resourceToEntity(
+				resource,
+				pk,
+				getEntityClass(),
+				referencedEntities);
+	}
+
+	protected void updateEntityWithResource(
+			E entity,
+			R resource,
+			Map<String, Persistable<?>> referencedEntities) {
+		resourceEntityMappingHelper.updateEntityWithResource(entity, resource, referencedEntities);
+	}
+
 	protected List<E> reorderFindLinesWithParent(Serializable parentId) {
-		return entityRepository.findAll();
+		return Collections.emptyList();
 	}
 	protected Integer reorderGetIncrement() {
 		return null;
@@ -487,10 +572,42 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 		fieldOptionsProviderMap.put(fieldName, fieldOptionsProvider);
 	}
 
-	private E saveFlushAndRefresh(E entity) {
+	protected E entitySaveFlushAndRefresh(E entity) {
 		E saved = entityRepository.saveAndFlush(entity);
 		entityRepository.refresh(saved);
 		return saved;
+	}
+
+	protected R entityDetachConvertAndMerge(
+			E entity,
+			Map<String, AnswerRequiredException.AnswerValue> answers,
+			boolean create) {
+		entityRepository.detach(entity);
+		R response = entityToResource(entity);
+		E merged = entityRepository.merge(entity);
+		entityAfterMergeLogic(response, merged, answers, create);
+		return response;
+	}
+
+	protected void entityRepositoryDelete(E entity) {
+		entityRepository.delete(entity);
+	}
+
+	protected void entityRepositoryFlush() {
+		entityRepository.flush();
+	}
+
+	protected void entityAfterMergeLogic(
+			R response,
+			E merged,
+			Map<String, AnswerRequiredException.AnswerValue> answers,
+			boolean create) {
+		afterConversion(merged, response);
+		if (create) {
+			afterCreate(merged, response, answers);
+		} else {
+			afterUpdate(merged, response, answers);
+		}
 	}
 
 	private void fieldFilesRead(R resource, E entity) {
@@ -604,9 +721,16 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 	 * Interfície a implementar per a retornar les opcions de camps enumerats.
 	 */
 	public interface FieldOptionsProvider {
-		List<FieldOption> getOptions(
-				String fieldName,
-				Map<String,String[]> requestParameterMap);
+		/**
+		 * Retorna la llista d'opcions que correspon al camp especificat.
+		 *
+		 * @param fieldName
+		 *            el nom del camp.
+		 * @param requestParameterMap
+		 *            Els paràmetres de la petició.
+		 * @return la llista d'opcions (si es retorna null s'indica que no hi ha opcions).
+		 */
+		List<FieldOption> getOptions(String fieldName, Map<String,String[]> requestParameterMap);
 	}
 
 }

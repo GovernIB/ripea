@@ -1,7 +1,15 @@
 package es.caib.ripea.service.intf.model;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.validation.constraints.NotNull;
+
+import org.springframework.data.annotation.Transient;
+
+import es.caib.ripea.service.intf.base.annotation.ResourceArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
-import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
@@ -11,13 +19,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
-import org.springframework.data.annotation.Transient;
-
-import javax.validation.constraints.NotNull;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 @Getter
 @Setter
@@ -27,10 +28,10 @@ import java.util.List;
 		quickFilterFields = { "codi", "nom" },
 		descriptionField = "nom",
 		artifacts = {
-                @ResourceConfigArtifact(
+				@ResourceArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = MetaExpedientTascaResource.PERSPECTIVE_COUNT_VALIDACIONS),
-                @ResourceConfigArtifact(
+				@ResourceArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = MetaExpedientTascaResource.PERSPECTIVE_REVISIO_ESTAT),
         })

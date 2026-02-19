@@ -15,4 +15,11 @@ public class StringUtil {
 		return Character.toLowerCase(str.charAt(0)) + str.substring(1);
 	}
 
+	public static String removeLeadingAndTrailingChars(String str, Integer numChars) {
+		if (str.length() > 2 * numChars) {
+			return str.substring(numChars, str.length() - numChars);
+		} else {
+			return "";
+		}
+	}
 }

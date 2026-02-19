@@ -14,8 +14,8 @@ import org.springframework.data.annotation.Transient;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import es.caib.ripea.service.intf.base.annotation.ResourceArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
-import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceField;
 import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.Resource;
@@ -68,94 +68,94 @@ import lombok.experimental.FieldNameConstants;
         descriptionField = "nom",
 		orderField = "ordreLong",
         artifacts = {
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = DocumentResource.PERSPECTIVE_COUNT_CODE),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = DocumentResource.PERSPECTIVE_VERSIONS_CODE),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = DocumentResource.PERSPECTIVE_ARXIU_DOCUMENT_CODE),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = ContingutResource.PERSPECTIVE_PATH_CODE),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = DocumentResource.PERSPECTIVE_FIRMES_CODE),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = DocumentResource.PERSPECTIVE_PROCEDIMENT_CODE),                
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = DocumentResource.ACTION_ENVIAR_VIA_EMAIL_CODE,
                         formClass = DocumentResource.EnviarViaEmailFormAction.class,
                         requiresId = true),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = DocumentResource.ACTION_GET_CSV_LINK,
                         formClass = NodeResource.MassiveAction.class),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = DocumentResource.ACTION_CONVERTIR_DEFINITIU,
                         formClass = NodeResource.MassiveAction.class),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = DocumentResource.ACTION_GUARDAR_ARXIU,
                         formClass = NodeResource.MassiveAction.class),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = DocumentResource.ACTION_FIRMA_WEB_INI,
                         formClass = DocumentResource.IniciarFirmaNavegador.class),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = DocumentResource.ACTION_VIA_FIRMA,
                         formClass = DocumentResource.ViaFirmaForm.class,
                         requiresId = true),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = DocumentResource.ACTION_NEW_DOC_PINBAL,
                         formClass = DocumentResource.NewDocPinbalForm.class),            
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = DocumentResource.ACTION_MOURE_CODE,
                         formClass = DocumentResource.MoureFormAction.class),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = DocumentResource.ACTION_PUBLICAR_CODE,
                         formClass = DocumentResource.PublicarFormAction.class,
                         requiresId = true),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = DocumentResource.ACTION_NOTIFICAR_CODE,
                         formClass = DocumentResource.NotificarFormAction.class,
                         requiresId = true),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = DocumentResource.ACTION_ENVIAR_PORTAFIRMES_CODE,
                         formClass = DocumentResource.EnviarPortafirmesFormAction.class),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = DocumentResource.ACTION_RESUM_IA,
                         formClass = DocumentResource.ResumIaFormAction.class),
-				@ResourceConfigArtifact(
+				@ResourceArtifact(
 						type = ResourceArtifactType.ACTION,
 						code = DocumentResource.ACTION_MASSIVE_NOTIFICAR_ZIP_CODE,
 						formClass = DocumentResource.NotificarDocumentsZipFormAction.class),
-				@ResourceConfigArtifact(
+				@ResourceArtifact(
 						type = ResourceArtifactType.ACTION,
 						code = DocumentResource.ACTION_MASSIVE_CANVI_TIPUS_CODE,
 						formClass = DocumentResource.UpdateTipusDocumentFormAction.class),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.REPORT,
                         code = DocumentResource.REPORT_DESCARREGAR_MASSIU,
                         formClass = DocumentResource.MassiveAction.class),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.REPORT,
                         code = DocumentResource.REPORT_DESCARREGAR_VERSIO_CODE,
                         formClass = DocumentResource.DescarregarVersionFormAction.class,
                         requiresId = true),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.FILTER,
                         code = DocumentResource.MASSIVE_PORTAFIRMES_FILTER_CODE,
                         formClass = DocumentResource.MassivePortafirmesFilter.class),

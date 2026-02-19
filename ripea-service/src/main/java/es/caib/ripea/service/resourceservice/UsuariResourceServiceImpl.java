@@ -148,7 +148,7 @@ public class UsuariResourceServiceImpl extends BaseMutableResourceService<Usuari
     public UserPermissionInfo getCurrentUserPermissionInfo() {
 
         String usuariCodi = SecurityContextHolder.getContext().getAuthentication().getName();
-        UsuariResourceEntity usuari = getEntity(usuariCodi, null);
+        UsuariResourceEntity usuari = getEntity(usuariCodi);
         if (usuari == null) {
             throw new ResourceNotFoundException(UsuariResource.class, usuariCodi);
         }
@@ -167,7 +167,7 @@ public class UsuariResourceServiceImpl extends BaseMutableResourceService<Usuari
     }
 
     @Override
-    protected UsuariResourceEntity getEntity(String id, String[] perspectives) throws ResourceNotFoundException {
+    protected UsuariResourceEntity getEntity(String id) throws ResourceNotFoundException {
         Optional<UsuariResourceEntity> result;
         Specification<UsuariResourceEntity> pkSpec = hasCodi(id);
         String additionalSpringFilter = additionalSpringFilter(null, null);

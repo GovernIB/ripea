@@ -1,22 +1,36 @@
 package es.caib.ripea.service.intf.base.util;
 
+import java.lang.reflect.Field;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.MessageSource;
 import org.springframework.context.NoSuchMessageException;
 import org.springframework.context.i18n.LocaleContextHolder;
-
-import java.lang.reflect.Field;
+import org.springframework.stereotype.Component;
 
 /**
  * Utilitats per a traduir missatges.
  * 
  * @author Límit Tecnologies
  */
-public class I18nUtil {
+@Component
+public class I18nUtil implements ApplicationContextAware {
 
-	public static String getI18nEnumDescription(
+	@Autowired
+	private MessageSource messageSource;
+
+	public String getI18nMessage(String code, Object... args) {
+		return messageSource.getMessage(
+				code,
+				args,
+				LocaleContextHolder.getLocale());
+	}
+
+	public String getI18nEnumDescription(
 			Field field,
-			String enumValue,
-			MessageSource messageSource) {
+			String enumValue) {
 		try {
 			String i18nKey = field.getDeclaringClass().getName() + "." + field.getName() + "." + enumValue;
 			return messageSource.getMessage(
@@ -40,6 +54,15 @@ public class I18nUtil {
 				return enumValue;
 			}
 		}
+	}
+
+	private static ApplicationContext applicationContext;
+	public static I18nUtil getInstance() {
+		return applicationContext.getBean(I18nUtil.class);
+	}
+	@Override
+	public void setApplicationContext(ApplicationContext applicationContext) {
+		I18nUtil.applicationContext = applicationContext;
 	}
 
 }

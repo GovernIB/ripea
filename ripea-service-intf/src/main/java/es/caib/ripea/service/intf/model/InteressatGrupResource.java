@@ -7,8 +7,8 @@ import javax.validation.constraints.Size;
 
 import org.springframework.data.annotation.Transient;
 
+import es.caib.ripea.service.intf.base.annotation.ResourceArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
-import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
@@ -30,23 +30,23 @@ import lombok.experimental.FieldNameConstants;
         quickFilterFields = { "nom" },
         descriptionField = "nom",
         artifacts = {
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = InteressatGrupResource.PERSPECTIVE_INTERESSATS_CODE,
                         requiresId = true),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = InteressatGrupResource.ACTION_DELETE_GRUP,
                         requiresId = true),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = InteressatGrupResource.ACTION_CREATE_INTERESSAT,
                         requiresId = true),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = InteressatGrupResource.ACTION_IMPORT_INTERESSAT,
                         requiresId = true),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = InteressatGrupResource.ACTION_DELETE_INTERESSAT,
                         requiresId = true),

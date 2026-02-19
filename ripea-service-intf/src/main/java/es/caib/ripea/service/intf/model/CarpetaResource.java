@@ -5,8 +5,8 @@ import java.util.List;
 
 import javax.validation.constraints.NotNull;
 
+import es.caib.ripea.service.intf.base.annotation.ResourceArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
-import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.resourcevalidation.RestriccioCarpetaValid;
@@ -24,34 +24,34 @@ import lombok.experimental.FieldNameConstants;
         descriptionField = "nom",
         orderField = "ordreLong",
         artifacts = {
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = ContingutResource.PERSPECTIVE_PATH_CODE),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = CarpetaResource.PERSPECTIVE_RESPONSABLE_RESTRICCIO),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = CarpetaResource.PERSPECTIVE_RESTRICCIONS),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = CarpetaResource.ACTION_MODIFICAR_NOM,
                         formClass = CarpetaResource.ModificarFormAction.class,
                         requiresId = true),
-				@ResourceConfigArtifact(
+				@ResourceArtifact(
 						type = ResourceArtifactType.REPORT,
 						code = CarpetaResource.REPORT_EXPORTAR_INDEX_PDF,
                         requiresId = true),
-				@ResourceConfigArtifact(
+				@ResourceArtifact(
 						type = ResourceArtifactType.REPORT,
 						code = CarpetaResource.REPORT_EXPORTAR_INDEX_XLS,
                         requiresId = true),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = CarpetaResource.ACTION_MOURE_COPIAR,
                         formClass = CarpetaResource.MoureCopiarFormAction.class,
                         requiresId = true),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = CarpetaResource.ACTION_GUARDAR_ARXIU,
                         requiresId = true),                

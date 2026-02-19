@@ -2,8 +2,8 @@ package es.caib.ripea.service.intf.model;
 
 import java.io.Serializable;
 
+import es.caib.ripea.service.intf.base.annotation.ResourceArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
-import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.dto.ViaFirmaCallbackEstatEnumDto;
 import es.caib.ripea.service.intf.dto.ViaFirmaTipusDestinatariEnum;
@@ -18,7 +18,7 @@ import lombok.Setter;
         quickFilterFields = { "nom" },
         descriptionField = "nom",
 		artifacts = {
-            @ResourceConfigArtifact(
+				@ResourceArtifact(
                     type = ResourceArtifactType.ACTION,
                     code = DocumentViaFirmaResource.ACTION_CANCEL_FIRMA,
                     formClass = Serializable.class,

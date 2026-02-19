@@ -36,6 +36,6 @@ public interface BaseRepository<E, PK extends Serializable> extends JpaRepositor
 	 * @param entity
 	 *            l'entitat a fusionar.
 	 */
-	void merge(E entity);
+	E merge(E entity);
 
 }

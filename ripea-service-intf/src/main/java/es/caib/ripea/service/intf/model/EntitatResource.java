@@ -7,8 +7,8 @@ import javax.validation.constraints.Size;
 
 import org.springframework.data.annotation.Transient;
 
+import es.caib.ripea.service.intf.base.annotation.ResourceArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
-import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceField;
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
 import es.caib.ripea.service.intf.base.model.FileReference;
@@ -26,7 +26,7 @@ import lombok.experimental.FieldNameConstants;
         quickFilterFields = { "codi", "nom" },
         descriptionField = "nom",
         		artifacts = {
-        				@ResourceConfigArtifact(
+        				@ResourceArtifact(
         						type = ResourceArtifactType.PERSPECTIVE,
         						code = EntitatResource.PERSPECTIVE_PERMISOS_CODE),
         }

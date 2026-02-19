@@ -52,6 +52,7 @@ export const DetailCard = (props:any) => {
         </Card>
     </Grid2>
 }
+
 export const DetailCardContent = (props:any) => {
     const {title, children, size = 12, titleSize = 12, textSize = 12, componentTitleProps, componentTextProps, hidden, ...other} = props;
 
@@ -63,12 +64,12 @@ export const DetailCardContent = (props:any) => {
                   {...other}
                   sx={{
                       p: 1,
-                      borderLeft: "0.5px solid",
-                      borderTop: "0.5px solid",
+                      borderLeft: "1px solid",
+                      borderTop: "1px solid",
                       borderColor: "divider",
                       ...(other?.sx ?? {})
                   }}>
-        <Grid2 size={titleSize}><Typography variant={"body1"} color={'black'} sx={componentTitleProps}>{title}</Typography></Grid2>
+        <Grid2 size={titleSize}><Typography variant={"body1"} color={'lightblue'} sx={componentTitleProps}>{title}</Typography></Grid2>
         <Grid2 size={textSize}><Typography variant={"inherit"} color={'textSecondary'} sx={componentTextProps}>
             {isEmpty(children) ?" - " :children}
         </Typography></Grid2>

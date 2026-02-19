@@ -1,5 +1,6 @@
 package es.caib.ripea.service.intf.model;
 
+import es.caib.ripea.service.intf.base.annotation.ResourceArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.model.BaseResource;
@@ -22,7 +23,7 @@ import java.util.List;
         quickFilterFields = { "codi", "nom" },
         descriptionField = "nom",
         artifacts = {
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = AclObjIdentityResource.PERSPECTIVE_SID_CODE),
         }

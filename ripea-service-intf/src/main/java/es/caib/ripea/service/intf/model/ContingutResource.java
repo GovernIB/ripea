@@ -9,8 +9,8 @@ import javax.validation.constraints.Size;
 
 import org.springframework.data.annotation.Transient;
 
+import es.caib.ripea.service.intf.base.annotation.ResourceArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
-import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
@@ -30,18 +30,18 @@ import lombok.experimental.FieldNameConstants;
         quickFilterFields = { "nom" },
         descriptionField = "nom",
         artifacts = {
-				@ResourceConfigArtifact(
+				@ResourceArtifact(
 						type = ResourceArtifactType.PERSPECTIVE,
 						code = ContingutResource.PERSPECTIVE_AUDIT_CODE),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ContingutResource.ACTION_DELETE_CODE,
                         formClass = NodeResource.MassiveAction.class),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ContingutResource.ACTION_RECUPERAR_CODE,
                         formClass = NodeResource.MassiveAction.class),        
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.FILTER,
                         code = ContingutResource.FILTER_CODE,
                         formClass = ContingutResource.FilterForm.class),
