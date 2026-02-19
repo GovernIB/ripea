@@ -262,7 +262,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     }
     
     @Override
-    protected <P> Specification<P> toProcessedSpecification(
+    protected <P> Specification<P> toFindProcessedSpecification(
         String quickFilter,
         String filter,
         String[] namedFilters) {
@@ -281,11 +281,11 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		if (namedFilters != null) {
 			for (String namedFilter: namedFilters) {
 				Specification<P> namedSpecification = null;
-				String namedSpringFilter = namedFilterToSpringFilter(namedFilter);
+				String namedSpringFilter = namedQueryToSpringFilter(namedFilter);
 				if (namedSpringFilter != null) {
 					namedSpecification = getSpringFilterSpecification(namedSpringFilter);
 				} else {
-					namedSpecification = namedFilterToSpecification(namedFilter);
+					namedSpecification = namedQueryToSpecification(namedFilter);
 				}
 				processedSpecification = appendSpecificationWithAnd(processedSpecification, namedSpecification);
 			}

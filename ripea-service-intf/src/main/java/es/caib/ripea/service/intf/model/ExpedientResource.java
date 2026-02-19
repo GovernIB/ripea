@@ -5,22 +5,18 @@ import java.time.LocalDateTime;
 import java.time.Year;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import es.caib.ripea.service.intf.resourcevalidation.ImportarDocumentsZipValid;
 import org.springframework.data.annotation.Transient;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import es.caib.ripea.service.intf.base.annotation.ResourceArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
-import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceField;
 import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
@@ -34,6 +30,7 @@ import es.caib.ripea.service.intf.dto.TipusImportEnumDto;
 import es.caib.ripea.service.intf.registre.RegistreInteressat;
 import es.caib.ripea.service.intf.resourcevalidation.ExpedientValid;
 import es.caib.ripea.service.intf.resourcevalidation.ImportarDocumentValid;
+import es.caib.ripea.service.intf.resourcevalidation.ImportarDocumentsZipValid;
 import es.caib.ripea.service.intf.resourcevalidation.MassiveImportDocValid;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -48,204 +45,204 @@ import lombok.experimental.FieldNameConstants;
 		quickFilterFields = { "numero", "nom" },
         descriptionField = "nom",
 		artifacts = {
-				@ResourceConfigArtifact(
+				@ResourceArtifact(
 						type = ResourceArtifactType.REPORT,
 						code = ExpedientResource.REPORT_MASSIVE_EXPORT_PDF_CODE,
 						formClass = ExpedientResource.ExportarDocumentMassiu.class),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = ContingutResource.PERSPECTIVE_PATH_CODE),
-				@ResourceConfigArtifact(
+				@ResourceArtifact(
 						type = ResourceArtifactType.PERSPECTIVE,
 						code = ExpedientResource.PERSPECTIVE_NOTIFICACIONS_CADUCADES),
-				@ResourceConfigArtifact(
+				@ResourceArtifact(
 						type = ResourceArtifactType.PERSPECTIVE,
 						code = ExpedientResource.PERSPECTIVE_DOCUMENTS_NO_MOGUTS),
-				@ResourceConfigArtifact(
+				@ResourceArtifact(
 						type = ResourceArtifactType.PERSPECTIVE,
 						code = ExpedientResource.PERSPECTIVE_DOCUMENTS_OBLIGATORIS_TANCAR),
-				@ResourceConfigArtifact(
+				@ResourceArtifact(
 						type = ResourceArtifactType.PERSPECTIVE,
 						code = ExpedientResource.PERSPECTIVE_AMB_PINBAL_CODE),
-				@ResourceConfigArtifact(
+				@ResourceArtifact(
 						type = ResourceArtifactType.PERSPECTIVE,
 						code = ExpedientResource.PERSPECTIVE_PERMIS_CONTINGUT),
-				@ResourceConfigArtifact(
+				@ResourceArtifact(
 						type = ResourceArtifactType.PERSPECTIVE,
 						code = ExpedientResource.PERSPECTIVE_AUDIT_CODE),
-				@ResourceConfigArtifact(
+				@ResourceArtifact(
 						type = ResourceArtifactType.PERSPECTIVE,
 						code = ExpedientResource.PERSPECTIVE_INTERESSATS_CODE),
-				@ResourceConfigArtifact(
+				@ResourceArtifact(
 						type = ResourceArtifactType.PERSPECTIVE,
 						code = ExpedientResource.PERSPECTIVE_COUNT),
-				@ResourceConfigArtifact(
+				@ResourceArtifact(
 						type = ResourceArtifactType.PERSPECTIVE,
 						code = ExpedientResource.PERSPECTIVE_ESTAT_CODE),
-				@ResourceConfigArtifact(
+				@ResourceArtifact(
 						type = ResourceArtifactType.PERSPECTIVE,
 						code = ExpedientResource.PERSPECTIVE_META_EXPEDIENT_CODE),
-				@ResourceConfigArtifact(
+				@ResourceArtifact(
 						type = ResourceArtifactType.PERSPECTIVE,
 						code = ExpedientResource.PERSPECTIVE_RELACIONAT_CODE),
-				@ResourceConfigArtifact(
+				@ResourceArtifact(
 						type = ResourceArtifactType.PERSPECTIVE,
 						code = ExpedientResource.PERSPECTIVE_ARXIU_EXPEDIENT),
-				@ResourceConfigArtifact(
+				@ResourceArtifact(
 						type = ResourceArtifactType.PERSPECTIVE,
 						code = ExpedientResource.PERSPECTIVE_FOLLOWERS),
-				@ResourceConfigArtifact(
+				@ResourceArtifact(
 						type = ResourceArtifactType.FILTER,
 						code = ExpedientResource.FILTER_CODE,
 						formClass = ExpedientResource.ExpedientFilterForm.class),
-				@ResourceConfigArtifact(
+				@ResourceArtifact(
 						type = ResourceArtifactType.FILTER,
 						code = ExpedientResource.MASSIVE_CANVI_ESTAT_FILTER_CODE,
 						formClass = ExpedientResource.MassiveCanviEstatFilter.class),
-				@ResourceConfigArtifact(
+				@ResourceArtifact(
 						type = ResourceArtifactType.FILTER,
 						code = ExpedientResource.MASSIVE_CUSTODIAR_FILTER_CODE,
 						formClass = ExpedientResource.MassiveCustodiarFilter.class),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientResource.ACTION_MASSIVE_FOLLOW_CODE,
                         formClass = ExpedientResource.MassiveAction.class),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientResource.ACTION_MASSIVE_UNFOLLOW_CODE,
                         formClass = ExpedientResource.MassiveAction.class),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientResource.ACTION_MASSIVE_AGAFAR_CODE,
                         formClass = ExpedientResource.MassiveAction.class),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientResource.ACTION_MASSIVE_ALLIBERAR_CODE,
                         formClass = ExpedientResource.MassiveAction.class),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientResource.ACTION_MASSIVE_RETORNAR_CODE,
                         formClass = ExpedientResource.MassiveAction.class),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientResource.ACTION_MASSIVE_DELETE_CODE,
                         formClass = ExpedientResource.MassiveAction.class),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientResource.ACTION_TANCAR_CODE,
                         formClass = ExpedientResource.TancarExpedientFormAction.class),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientResource.ACTION_CANVI_PRIORITAT_CODE,
                         formClass = ExpedientResource.CanviPrioritatExpedientFormAction.class),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientResource.ACTION_CANVI_ESTAT_CODE,
                         formClass = ExpedientResource.CanviEstatExpedientFormAction.class),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientResource.ACTION_IMPORTAR_CODE,
                         formClass = ExpedientResource.ImportarExpedientFormAction.class,
                         requiresId = true),                
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientResource.ACTION_SYNC_ARXIU,
                         formClass = ExpedientResource.MassiveAction.class),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientResource.ACTION_GUARDAR_ARXIU,
                         formClass = ExpedientResource.MassiveAction.class),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientResource.ACTION_MOURE_TOT_CODE,
                         formClass = ExpedientResource.MoureTotFormAction.class,
                         requiresId = true),  
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.REPORT,
                         code = ExpedientResource.REPORT_EXPORT_SELECTED_DOCS,
                         formClass = ExpedientResource.MassiveAction.class,
                         requiresId = true),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientResource.ACTION_IMPORT_DOCS,
                         formClass = ExpedientResource.ImportarDocumentsForm.class,
                         requiresId = true),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientResource.ACTION_IMPORT_INTE,
                         formClass = ExpedientResource.ImportarInteressatsForm.class,
                         requiresId = true),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientResource.ACTION_IMPORT_DOCS_ZIP,
                         formClass = ExpedientResource.ImportarDocumentsZipForm.class,
                         requiresId = true),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientResource.ACTION_GET_PROGRES_SGD,
                         requiresId = true),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientResource.ACTION_CANCEL_IMPORT_SGD,
                         requiresId = true),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientResource.ACTION_GET_PROGRES_ZIP,
                         requiresId = true),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientResource.ACTION_CANCEL_IMPORT_ZIP,
                         requiresId = true),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientResource.ACTION_MASSIVE_REOBRIR_CODE,
                         formClass = ExpedientResource.MassiveAction.class),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientResource.ACTION_MASSIVE_RELACIONAR_CODE,
                         formClass = ExpedientResource.RelacionarAction.class,
                         requiresId = true),
-				@ResourceConfigArtifact(
+				@ResourceArtifact(
 						type = ResourceArtifactType.REPORT,
 						code = ExpedientResource.REPORT_MASSIVE_EXPORT_ODS_CODE,
 						formClass = ExpedientResource.MassiveAction.class),
-				@ResourceConfigArtifact(
+				@ResourceArtifact(
 						type = ResourceArtifactType.REPORT,
 						code = ExpedientResource.REPORT_MASSIVE_EXPORT_CSV_CODE,
 						formClass = ExpedientResource.MassiveAction.class),
-				@ResourceConfigArtifact(
+				@ResourceArtifact(
 						type = ResourceArtifactType.REPORT,
 						code = ExpedientResource.REPORT_MASSIVE_EXPORT_INDEX_ZIP,
 						formClass = ExpedientResource.MassiveAction.class),
-				@ResourceConfigArtifact(
+				@ResourceArtifact(
 						type = ResourceArtifactType.REPORT,
 						code = ExpedientResource.REPORT_MASSIVE_EXPORT_INDEX_PDF,
 						formClass = ExpedientResource.MassiveAction.class),
-				@ResourceConfigArtifact(
+				@ResourceArtifact(
 						type = ResourceArtifactType.REPORT,
 						code = ExpedientResource.REPORT_MASSIVE_EXPORT_INDEX_XLS,
 						formClass = ExpedientResource.MassiveAction.class),
-				@ResourceConfigArtifact(
+				@ResourceArtifact(
 						type = ResourceArtifactType.REPORT,
 						code = ExpedientResource.REPORT_MASSIVE_EXPORT_INDEX_ENI,
 						formClass = ExpedientResource.MassiveAction.class),				
-				@ResourceConfigArtifact(
+				@ResourceArtifact(
 						type = ResourceArtifactType.REPORT,
 						code = ExpedientResource.REPORT_MASSIVE_EXPORT_ENI,
 						formClass = ExpedientResource.MassiveAction.class),
-				@ResourceConfigArtifact(
+				@ResourceArtifact(
 						type = ResourceArtifactType.REPORT,
 						code = ExpedientResource.REPORT_MASSIVE_EXPORT_INSIDE,
 						formClass = ExpedientResource.MassiveAction.class),
-				@ResourceConfigArtifact(
+				@ResourceArtifact(
 						type = ResourceArtifactType.ACTION,
 						code = ExpedientResource.ACTION_MASSIVE_IMPORT_DOCS,
 						formClass = ExpedientResource.MassiveImportDocsAction.class),
-				@ResourceConfigArtifact(
+				@ResourceArtifact(
 						type = ResourceArtifactType.REPORT,
 						code = ExpedientResource.REPORT_PLANTILLA_EXCEL_INTERESSATS,
                         requiresId = true),
-				@ResourceConfigArtifact(
+				@ResourceArtifact(
 						type = ResourceArtifactType.REPORT,
 						code = ExpedientResource.REPORT_PLANTILLA_DADES_CSV,
                         requiresId = true),				

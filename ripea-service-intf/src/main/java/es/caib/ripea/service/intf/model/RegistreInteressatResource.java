@@ -1,7 +1,9 @@
 package es.caib.ripea.service.intf.model;
 
+import org.springframework.data.annotation.Transient;
+
+import es.caib.ripea.service.intf.base.annotation.ResourceArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
-import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
@@ -12,7 +14,6 @@ import es.caib.ripea.service.intf.utils.Utils;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.data.annotation.Transient;
 
 @Getter
 @Setter
@@ -21,7 +22,7 @@ import org.springframework.data.annotation.Transient;
         quickFilterFields = { "nom" },
         descriptionField = "codiNom",
         artifacts = {
-                @ResourceConfigArtifact(
+        		@ResourceArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = RegistreInteressatResource.PERSPECTIVE_REPRESENTANT_CODE),
         }

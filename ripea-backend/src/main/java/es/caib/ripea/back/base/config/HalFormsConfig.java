@@ -1,30 +1,7 @@
 package es.caib.ripea.back.base.config;
 
-import es.caib.ripea.back.base.controller.MutableResourceController;
-import es.caib.ripea.back.base.controller.ReadonlyResourceController;
-import es.caib.ripea.back.base.util.HalFormsUtil;
-import es.caib.ripea.back.base.util.ResourceServiceLocator;
-import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
-import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
-import es.caib.ripea.service.intf.base.annotation.ResourceField;
-import es.caib.ripea.service.intf.base.model.Resource;
-import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
-import es.caib.ripea.service.intf.base.model.ResourceReference;
-import es.caib.ripea.service.intf.base.util.I18nUtil;
-import es.caib.ripea.service.intf.base.util.TypeUtil;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.hateoas.*;
-import org.springframework.hateoas.config.EnableHypermediaSupport;
-import org.springframework.hateoas.mediatype.hal.forms.HalFormsConfiguration;
-import org.springframework.hateoas.mediatype.hal.forms.HalFormsOptions;
-import org.springframework.util.ReflectionUtils;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
@@ -34,8 +11,39 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.hateoas.IanaLinkRelations;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.TemplateVariable;
+import org.springframework.hateoas.TemplateVariables;
+import org.springframework.hateoas.UriTemplate;
+import org.springframework.hateoas.config.EnableHypermediaSupport;
+import org.springframework.hateoas.mediatype.hal.forms.HalFormsConfiguration;
+import org.springframework.hateoas.mediatype.hal.forms.HalFormsOptions;
+import org.springframework.util.ReflectionUtils;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import es.caib.ripea.back.base.controller.MutableResourceController;
+import es.caib.ripea.back.base.controller.ReadonlyResourceController;
+import es.caib.ripea.back.base.util.HalFormsUtil;
+import es.caib.ripea.back.base.util.ResourceServiceLocator;
+import es.caib.ripea.service.intf.base.annotation.ResourceArtifact;
+import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
+import es.caib.ripea.service.intf.base.annotation.ResourceField;
+import es.caib.ripea.service.intf.base.model.Resource;
+import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
+import es.caib.ripea.service.intf.base.model.ResourceReference;
+import es.caib.ripea.service.intf.base.util.I18nUtil;
+import es.caib.ripea.service.intf.base.util.StringUtil;
+import es.caib.ripea.service.intf.base.util.TypeUtil;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Configuració de HAL-FORMS.
@@ -47,26 +55,26 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @EnableHypermediaSupport(type = EnableHypermediaSupport.HypermediaType.HAL_FORMS)
 public class HalFormsConfig {
 
-	@Autowired
-	private MessageSource messageSource;
 	@Autowired(required = false)
 	private Set<ReadonlyResourceController> resourceControllers;
 	@Autowired
 	private ResourceServiceLocator resourceServiceLocator;
-
+	@Autowired
+	protected ObjectMapper objectMapper;
 
 	@Bean
 	HalFormsConfiguration halFormsConfiguration() {
 		Set<Class<ReadonlyResourceController>> resourceControllerClasses = null;
 		if (resourceControllers != null) {
 			resourceControllerClasses = resourceControllers.stream().
-				map(rc -> (Class<ReadonlyResourceController>)rc.getClass()).
-				collect(Collectors.toSet());
+					map(rc -> (Class<ReadonlyResourceController>) rc.getClass()).
+					collect(Collectors.toSet());
 		}
 		return createHalFormsConfiguration(resourceControllerClasses);
 	}
 
-	private HalFormsConfiguration createHalFormsConfiguration(Set<Class<ReadonlyResourceController>> resourceControllerClasses) {
+	private HalFormsConfiguration createHalFormsConfiguration(
+			Set<Class<ReadonlyResourceController>> resourceControllerClasses) {
 		HalFormsConfiguration halFormsConfiguration = new HalFormsConfiguration();
 		if (resourceControllerClasses != null) {
 			for (Class<ReadonlyResourceController> rc: resourceControllerClasses) {
@@ -90,7 +98,6 @@ public class HalFormsConfig {
 				field -> configurationWithEnumOptions(
 						halFormsConfigurationHolder,
 						resourceClass,
-						null,
 						field),
 				this::isEnumTypeMultipleAware);
 		ReflectionUtils.doWithFields(
@@ -113,14 +120,13 @@ public class HalFormsConfig {
 				this::isFieldEnumOptions);
 		ResourceConfig resourceConfig = resourceClass.getAnnotation(ResourceConfig.class);
 		if (resourceConfig != null) {
-			for (ResourceConfigArtifact artifact: resourceConfig.artifacts()) {
+			for (ResourceArtifact artifact: resourceConfig.artifacts()) {
 				if (!Serializable.class.equals(artifact.formClass())) {
 					ReflectionUtils.doWithFields(
 							artifact.formClass(),
 							field -> configurationWithEnumOptions(
 									halFormsConfigurationHolder,
-									resourceClass,
-									artifact,
+									artifact.formClass(),
 									field),
 							this::isEnumTypeMultipleAware);
 					ReflectionUtils.doWithFields(
@@ -142,7 +148,6 @@ public class HalFormsConfig {
 									resourceControllerClasses),
 							this::isFieldEnumOptions);
 				}
-
 			}
 		}
 		return halFormsConfigurationHolder.getValue();
@@ -151,107 +156,86 @@ public class HalFormsConfig {
 	private void configurationWithEnumOptions(
 			MutableHolder<HalFormsConfiguration> halFormsConfigurationHolder,
 			Class<?> resourceClass,
-			ResourceConfigArtifact artifact,
-			Field formField) {
-		Class<?> optionsResourceClass = artifact != null ? artifact.formClass() : resourceClass;
-		log.debug("New HAL-FORMS enum options (class={}, field={})", optionsResourceClass, formField.getName());
+			Field resourceField) {
+		log.debug("New HAL-FORMS enum options (class={}, field={})", resourceClass, resourceField.getName());
 		halFormsConfigurationHolder.setValue(
 				halFormsConfigurationHolder.getValue().withOptions(
-						optionsResourceClass,
-						formField.getName(),
+						resourceClass,
+						resourceField.getName(),
 						metadata -> {
 							Map<String, Object> newResourceValues = HalFormsUtil.getNewResourceValues(
-									optionsResourceClass,
+									resourceClass,
 									resourceServiceLocator);
 							return HalFormsOptions.
-									inline(getInlineOptionsEnumConstants(formField)).
+									inline(getInlineOptionsEnumConstants(resourceField)).
 									withValueField("id").
 									withPromptField("description").
-									withMinItems(TypeUtil.isNotNullField(formField) ? 1L : 0L).
-									withMaxItems(TypeUtil.isMultipleFieldType(formField) ? null : 1L).
-									withSelectedValue(newResourceValues.get(formField.getName()));
+									withMinItems(TypeUtil.isNotNullField(resourceField) ? 1L : 0L).
+									withMaxItems(TypeUtil.isMultipleFieldType(resourceField) ? null : 1L).
+									withSelectedValue(newResourceValues.get(resourceField.getName()));
 						}));
 	}
 
 	private void configurationWithResourceReferenceOptions(
 			MutableHolder<HalFormsConfiguration> halFormsConfigurationHolder,
 			Class<?> resourceClass,
-			ResourceConfigArtifact artifact,
-			Field formField,
+			ResourceArtifact artifact,
+			Field resourceField,
 			Set<Class<ReadonlyResourceController>> resourceControllerClasses) {
-		Link remoteOptionsLink = getRemoteOptionsLink(
-				resourceClass,
-				artifact,
-				formField,
-				resourceControllerClasses);
-		if (remoteOptionsLink != null) {
-			Class<?> optionsResourceClass = artifact != null ? artifact.formClass() : resourceClass;
-			log.debug("New HAL-FORMS resource reference options (class={}, field={})", optionsResourceClass, formField.getName());
-			halFormsConfigurationHolder.setValue(
-					halFormsConfigurationHolder.getValue().withOptions(
-							optionsResourceClass,
-							formField.getName(),
-							metadata -> {
-								// Aquí hem de tornar a calcular el remoteOptionsLink perquè si no ho feim
-								// l'enllaç no inclou el prefix 'http://localhost:8080/webcontext'
-								Link repeatedRemoteOptionsLink = getRemoteOptionsLink(
-										resourceClass,
-										artifact,
-										formField,
-										resourceControllerClasses);
-								Map<String, Object> newResourceValues = HalFormsUtil.getNewResourceValues(
-										optionsResourceClass,
-										resourceServiceLocator);
-								return HalFormsOptions.
-										remote(repeatedRemoteOptionsLink).
-										withValueField("id").
-										withPromptField(getRemoteOptionsPromptField(formField)).
-										withMinItems(TypeUtil.isNotNullField(formField) ? 1L : 0L).
-										withMaxItems(TypeUtil.isCollectionFieldType(formField) ? null : 1L).
-										withSelectedValue(newResourceValues.get(formField.getName()));
-							}));
-		}
+		Class<?> optionsResourceClass = artifact != null ? artifact.formClass() : resourceClass;
+		log.debug("New HAL-FORMS resource reference options (class={}, field={})", optionsResourceClass, resourceField.getName());
+		halFormsConfigurationHolder.setValue(
+				halFormsConfigurationHolder.getValue().withOptions(
+						optionsResourceClass,
+						resourceField.getName(),
+						metadata -> {
+							Link remoteOptionsLink = getRemoteOptionsLink(
+									resourceClass,
+									artifact,
+									resourceField,
+									resourceControllerClasses);
+							Map<String, Object> newResourceValues = HalFormsUtil.getNewResourceValues(
+									resourceClass,
+									resourceServiceLocator);
+							return HalFormsOptions.
+									remote(remoteOptionsLink != null ? remoteOptionsLink : Link.of("_readonly_ref_")).
+									withValueField("id").
+									withPromptField(getRemoteOptionsPromptField(resourceField)).
+									withMinItems(TypeUtil.isNotNullField(resourceField) ? 1L : 0L).
+									withMaxItems(TypeUtil.isCollectionFieldType(resourceField) ? null : 1L).
+									withSelectedValue(newResourceValues.get(resourceField.getName()));
+						}));
 	}
 
 	private void configurationWithFieldEnumOptions(
 			MutableHolder<HalFormsConfiguration> halFormsConfigurationHolder,
 			Class<?> resourceClass,
-			ResourceConfigArtifact artifact,
+			ResourceArtifact artifact,
 			Field resourceField,
 			Set<Class<ReadonlyResourceController>> resourceControllerClasses) {
+		Class<?> optionsResourceClass = artifact != null ? artifact.formClass() : resourceClass;
 		log.debug("New HAL-FORMS field enum options (class={}, field={})", resourceClass, resourceField.getName());
-		Link remoteOptionsLink = getRemoteFieldEnumOptionsLink(
-				resourceClass,
-				artifact,
-				resourceField,
-				resourceControllerClasses);
-		if (remoteOptionsLink != null) {
-			Class<?> optionsResourceClass = artifact != null ? artifact.formClass() : resourceClass;
-			log.debug("New HAL-FORMS resource reference options (class={}, field={})", optionsResourceClass, resourceField.getName());
-			halFormsConfigurationHolder.setValue(
-					halFormsConfigurationHolder.getValue().withOptions(
-							optionsResourceClass,
-							resourceField.getName(),
-							metadata -> {
-								// Aquí hem de tornar a calcular el remoteOptionsLink perquè si no ho feim
-								// l'enllaç no inclou el prefix 'http://localhost:8080/webcontext'
-								Map<String, Object> newResourceValues = HalFormsUtil.getNewResourceValues(
-										optionsResourceClass,
-										resourceServiceLocator);
-								Link repeatedRemoteOptionsLink = getRemoteFieldEnumOptionsLink(
-										resourceClass,
-										artifact,
-										resourceField,
-										resourceControllerClasses);
-								return HalFormsOptions.
-										remote(repeatedRemoteOptionsLink).
-										withValueField("value").
-										withPromptField("description").
-										withMinItems(TypeUtil.isNotNullField(resourceField) ? 1L : 0L).
-										withMaxItems(TypeUtil.isCollectionFieldType(resourceField) ? null : 1L).
-										withSelectedValue(newResourceValues.get(resourceField.getName()));
-							}));
-		}
+		halFormsConfigurationHolder.setValue(
+				halFormsConfigurationHolder.getValue().withOptions(
+						optionsResourceClass,
+						resourceField.getName(),
+						metadata -> {
+							Link remoteOptionsLink = getRemoteFieldEnumOptionsLink(
+									resourceClass,
+									artifact,
+									resourceField,
+									resourceControllerClasses);
+							Map<String, Object> newResourceValues = HalFormsUtil.getNewResourceValues(
+									resourceClass,
+									resourceServiceLocator);
+							return HalFormsOptions.
+									remote(remoteOptionsLink != null ? remoteOptionsLink : Link.of("_readonly_enum_")).
+									withValueField("value").
+									withPromptField("description").
+									withMinItems(TypeUtil.isNotNullField(resourceField) ? 1L : 0L).
+									withMaxItems(TypeUtil.isCollectionFieldType(resourceField) ? null : 1L).
+									withSelectedValue(newResourceValues.get(resourceField.getName()));
+						}));
 	}
 
 	private boolean isEnumTypeMultipleAware(Field field) {
@@ -283,17 +267,16 @@ public class HalFormsConfig {
 		}
 		return Arrays.stream(enumConstants).
 				map(e -> new FieldOption(
-						e.toString(),
-						I18nUtil.getI18nEnumDescription(
+						getEnumFieldOptionId(e),
+						I18nUtil.getInstance().getI18nEnumDescription(
 								field,
-								e.toString(),
-								messageSource))).
+								e.toString()))).
 				toArray(FieldOption[]::new);
 	}
 
 	private Link getRemoteOptionsLink(
 			Class<?> resourceClass,
-			ResourceConfigArtifact artifact,
+			ResourceArtifact artifact,
 			Field resourceField,
 			Set<Class<ReadonlyResourceController>> resourceControllerClasses) {
 		Optional<Class<ReadonlyResourceController>> resourceControllerClass = resourceControllerClasses.stream().
@@ -323,11 +306,6 @@ public class HalFormsConfig {
 						new TemplateVariable("sort", TemplateVariable.VariableType.REQUEST_PARAM).composite());
 				return Link.of(UriTemplate.of(findLinkHref).with(findTemplateVariables), findLink.getRel());
 			} else {
-				Class<?> referencedResourceClass = TypeUtil.getReferencedResourceClass(resourceField);
-				log.error("Couldn't generate find link from field (" +
-						"resourceClass=" + resourceClass + "," +
-						"fieldName=" + resourceField.getName() + "," +
-						"referencedResourceClass=" + referencedResourceClass + ")");
 				return null;
 			}
 		} else {
@@ -342,16 +320,20 @@ public class HalFormsConfig {
 
 	private Link getRemoteFieldEnumOptionsLink(
 			Class<?> resourceClass,
-			ResourceConfigArtifact artifact,
+			ResourceArtifact artifact,
 			Field resourceField,
 			Set<Class<ReadonlyResourceController>> resourceControllerClasses) {
 		Optional<Class<ReadonlyResourceController>> resourceControllerClass = resourceControllerClasses.stream().
 				filter(rc -> {
-					Class<?> controllerResourceClass = TypeUtil.getArgumentClassFromGenericSuperclass(
-							rc,
-							MutableResourceController.class,
-							0);
-					return controllerResourceClass.equals(resourceClass);
+					if (MutableResourceController.class.isAssignableFrom(rc)) {
+						Class<?> controllerResourceClass = TypeUtil.getArgumentClassFromGenericSuperclass(
+								rc,
+								MutableResourceController.class,
+								0);
+						return controllerResourceClass.equals(resourceClass);
+					} else {
+						return false;
+					}
 				}).findFirst();
 		if (resourceControllerClass.isPresent()) {
 			if (artifact == null) {
@@ -377,7 +359,7 @@ public class HalFormsConfig {
 
 	private Link getFindLinkWithSelfRel(
 			Class<?> resourceControllerClass,
-			ResourceConfigArtifact artifact,
+			ResourceArtifact artifact,
 			String resourceFieldName) {
 		Class<ReadonlyResourceController> readonlyResourceControllerClass = (Class<ReadonlyResourceController>)resourceControllerClass;
 		boolean isMutableResourceController = MutableResourceController.class.isAssignableFrom(resourceControllerClass);
@@ -446,6 +428,11 @@ public class HalFormsConfig {
 			}
 		}
 		return descriptionField;
+	}
+
+	@SneakyThrows
+	private String getEnumFieldOptionId(Object enumValue) {
+		return StringUtil.removeLeadingAndTrailingChars(objectMapper.writeValueAsString(enumValue), 1);
 	}
 
 	@Getter

@@ -1,7 +1,7 @@
 package es.caib.ripea.service.intf.base.annotation;
 
-import es.caib.ripea.service.intf.base.model.Resource;
 import org.springframework.core.annotation.AliasFor;
+import org.springframework.data.domain.Sort;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -27,14 +27,15 @@ public @interface ResourceConfig {
 	String orderField() default "";
 	ResourceSort[] defaultSortFields() default {};
 	String[] quickFilterFields() default {};
-	Class<? extends Resource> parentEntity() default Resource.class;
-	ResourceConfigArtifact[] artifacts() default {};
+	ResourceArtifact[] artifacts() default {};
+	ResourceAccessConstraint[] accessConstraints() default {};
+	String[] mappingIgnoredFields() default {};
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.TYPE)
 	@interface ResourceSort {
 		String field() default "";
-		org.springframework.data.domain.Sort.Direction direction() default org.springframework.data.domain.Sort.Direction.ASC;
+		Sort.Direction direction() default Sort.Direction.ASC;
 	}
 
 }

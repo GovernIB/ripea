@@ -8,8 +8,8 @@ import javax.validation.constraints.NotNull;
 
 import org.springframework.data.annotation.Transient;
 
+import es.caib.ripea.service.intf.base.annotation.ResourceArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
-import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
@@ -28,7 +28,7 @@ import lombok.experimental.FieldNameConstants;
         quickFilterFields = { "codi", "nom", "tipus" },
         descriptionField = "nom",
 		artifacts = {
-                @ResourceConfigArtifact(
+				@ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = MetaDadaResource.ACTION_REORDENAR_CODE,
                         formClass = Integer.class,

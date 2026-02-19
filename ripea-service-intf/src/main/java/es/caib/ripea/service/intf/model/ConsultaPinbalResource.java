@@ -5,8 +5,8 @@ import java.util.Date;
 
 import org.springframework.data.annotation.Transient;
 
+import es.caib.ripea.service.intf.base.annotation.ResourceArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
-import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
@@ -24,14 +24,14 @@ import lombok.experimental.FieldNameConstants;
         quickFilterFields = { "servei" },
         descriptionField = "servei",
         artifacts = {
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.FILTER,
                         code = ConsultaPinbalResource.FILTER_CODE,
                         formClass = ConsultaPinbalResource.ConsultaPinbalFormFilter.class),
-				@ResourceConfigArtifact(
+				@ResourceArtifact(
 						type = ResourceArtifactType.PERSPECTIVE,
 						code = ConsultaPinbalResource.PERSPECTIVE_AUDIT_CODE),                
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = ConsultaPinbalResource.PERSPECTIVE_DOCUMENT_CODE),
         }

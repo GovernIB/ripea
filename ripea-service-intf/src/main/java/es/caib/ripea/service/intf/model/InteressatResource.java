@@ -10,17 +10,22 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import es.caib.ripea.service.intf.dto.*;
 import org.springframework.data.annotation.Transient;
 
+import es.caib.ripea.service.intf.base.annotation.ResourceArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
-import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceField;
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
 import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.Resource;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
+import es.caib.ripea.service.intf.dto.EntregaPostalTipusEnum;
+import es.caib.ripea.service.intf.dto.EntregaPostalViaTipusEnum;
+import es.caib.ripea.service.intf.dto.InteressatDocumentTipusEnumDto;
+import es.caib.ripea.service.intf.dto.InteressatIdiomaEnumDto;
+import es.caib.ripea.service.intf.dto.InteressatImportacioTipusDto;
+import es.caib.ripea.service.intf.dto.InteressatTipusEnum;
 import es.caib.ripea.service.intf.resourcevalidation.InteressatValid;
 import es.caib.ripea.service.intf.utils.Utils;
 import lombok.Getter;
@@ -37,43 +42,43 @@ import lombok.experimental.FieldNameConstants;
         quickFilterFields = { "documentNum", "nom", "llinatge1", "llinatge2", "raoSocial", "organCodi", "organNom" },
         descriptionField = "codiNom",
         artifacts = {
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.FILTER,
                         code = InteressatResource.FILTER_CODE,
                         formClass = InteressatResource.UnitatOrganitzativaFormFilter.class),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = InteressatResource.PERSPECTIVE_GRUPS_CODE),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = InteressatResource.PERSPECTIVE_REPRESENTANT_CODE),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = InteressatResource.PERSPECTIVE_ADRESSA_CODE),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = InteressatResource.PERSPECTIVE_PROCEDIMENT_CODE),                
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.REPORT,
                         code = InteressatResource.ACTION_EXPORTAR_CODE,
                         formClass = InteressatResource.ExportInteressatsFormAction.class),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = InteressatResource.ACTION_IMPORTAR_CODE,
                         formClass = InteressatResource.ImportarInteressatsFormAction.class),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = InteressatResource.ACTION_GUARDAR_ARXIU,
                         formClass = NodeResource.MassiveAction.class),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = InteressatResource.ACTION_DELETE_INTERESSAT,
                         requiresId = true),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = InteressatResource.ACTION_DELETE_REPRESENTANT,
                         requiresId = true),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = InteressatResource.ACTION_GESTIONAR_GRUPS,
                         formClass = InteressatResource.GestionarGrupsFrom.class,

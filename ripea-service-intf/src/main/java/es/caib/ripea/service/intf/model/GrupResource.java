@@ -7,8 +7,8 @@ import javax.validation.constraints.Size;
 
 import org.springframework.data.annotation.Transient;
 
+import es.caib.ripea.service.intf.base.annotation.ResourceArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
-import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
@@ -25,10 +25,10 @@ import lombok.experimental.FieldNameConstants;
         quickFilterFields = { "codi", "rol", "descripcio" },
         descriptionField = "descripcio",
         artifacts = {
-                @ResourceConfigArtifact(
+        		@ResourceArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = GrupResource.PERSPECTIVE_COUNT_PERMISOS),        		
-                @ResourceConfigArtifact(
+        		@ResourceArtifact(
                         type = ResourceArtifactType.FILTER,
                         code = GrupResource.FILTER_CODE,
                         formClass = GrupResource.FormFilter.class),

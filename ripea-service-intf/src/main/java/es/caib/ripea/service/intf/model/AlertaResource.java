@@ -1,5 +1,6 @@
 package es.caib.ripea.service.intf.model;
 
+import es.caib.ripea.service.intf.base.annotation.ResourceArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
@@ -16,7 +17,7 @@ import lombok.Setter;
         quickFilterFields = {"text"},
         descriptionField = "text",
         artifacts = {
-                @ResourceConfigArtifact(
+        		@ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = AlertaResource.ACTION_MASSIVE_LLEGIT_CODE,
                         formClass = ExpedientResource.MassiveAction.class),

@@ -8,16 +8,21 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import es.caib.ripea.service.intf.dto.*;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Sort;
 
+import es.caib.ripea.service.intf.base.annotation.ResourceArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
-import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceField;
 import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
+import es.caib.ripea.service.intf.dto.CrearReglaDistribucioEstatEnumDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientAmbitEnumDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientRevisioEstatEnumDto;
+import es.caib.ripea.service.intf.dto.ReglaDistribucioDto;
+import es.caib.ripea.service.intf.dto.TipusClassificacioEnumDto;
+import es.caib.ripea.service.intf.dto.TipusProcedimentServeiEnum;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -31,78 +36,78 @@ import lombok.experimental.FieldNameConstants;
 		quickFilterFields = { "codi", "nom" },
 		descriptionField = "nomClassificacio",
         artifacts = {
-				@ResourceConfigArtifact(
+				@ResourceArtifact(
 						type = ResourceArtifactType.PERSPECTIVE,
 						code = MetaExpedientResource.PERSPECTIVE_AUDIT_CODE),
-				@ResourceConfigArtifact(
+				@ResourceArtifact(
 						type = ResourceArtifactType.PERSPECTIVE,
 						code = MetaExpedientResource.PERSPECTIVE_COMMENTS_CODE),
-				@ResourceConfigArtifact(
+				@ResourceArtifact(
 						type = ResourceArtifactType.PERSPECTIVE,
 						code = MetaExpedientResource.PERSPECTIVE_PERMISOS_CODE),
-				@ResourceConfigArtifact(
+				@ResourceArtifact(
 						type = ResourceArtifactType.PERSPECTIVE,
 						code = MetaExpedientResource.PERSPECTIVE_ELEMENTS_CODE),
-				@ResourceConfigArtifact(
+				@ResourceArtifact(
 						type = ResourceArtifactType.PERSPECTIVE,
 						code = MetaExpedientResource.PERSPECTIVE_ROLSAC_CODE),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.FILTER,
                         code = MetaExpedientResource.FILTER_REVISIO_CODE,
                         formClass = MetaExpedientResource.GestioRevisioFormFilter.class),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.FILTER,
                         code = MetaExpedientResource.FILTER_GESTIO_CODE,
                         formClass = MetaExpedientResource.GestioRevisioFormFilter.class),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = MetaExpedientResource.ACTION_CHANGE_REVISIO_CODE,
                         formClass = MetaExpedientResource.RevisioChangeFormAction.class),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = MetaExpedientResource.ACTION_VINCULAR_GRUP_CODE,
                         formClass = MetaExpedientResource.VincularGrupFormAction.class,
                         requiresId = true),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = MetaExpedientResource.ACTION_DESVINCULAR_GRUP_CODE,
                         formClass = MetaExpedientResource.DesVincularGrupFormAction.class,
                         requiresId = true),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = MetaExpedientResource.ACTION_TOGGLE_REGLA_CODE,
                         formClass = MetaExpedientResource.ToggleReglaRolsacFormAction.class,
                         requiresId = true),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = MetaExpedientResource.ACTION_TOGGLE_GRUP_DEF_CODE,
                         formClass = MetaExpedientResource.ToggleGrupDefecteFormAction.class,
                         requiresId = true),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = MetaExpedientResource.ACTION_CREAR_REGLA_CODE,
                         requiresId = true),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = MetaExpedientResource.ACTION_CANVIAR_DISSENY_CODE,
                         requiresId = true),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = MetaExpedientResource.ACTION_CANVIAR_PENDENT_CODE,
                         requiresId = true),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = MetaExpedientResource.ACTION_UPDATE_ROLSAC_CODE,
                         formClass = NodeResource.MassiveAction.class),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = MetaExpedientResource.ACTION_IMPORT_ROLSAC_CODE,
                         formClass = MetaExpedientResource.ImportarRolsacFormAction.class),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = MetaExpedientResource.ACTION_IMPORT_FITXER_CODE,
                         formClass = MetaExpedientResource.ImportarFitxerFormAction.class),                
-				@ResourceConfigArtifact(
+				@ResourceArtifact(
 						type = ResourceArtifactType.REPORT,
 						code = MetaExpedientResource.REPORT_EXPORT_JSON,
                         requiresId = true),

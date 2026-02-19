@@ -1,20 +1,25 @@
 package es.caib.ripea.service.intf.model;
 
-import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
-import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
-import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
-import es.caib.ripea.service.intf.base.model.ResourceReference;
-import es.caib.ripea.service.intf.dto.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.springframework.data.annotation.Transient;
-
 import java.io.Serializable;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+
+import org.springframework.data.annotation.Transient;
+
+import es.caib.ripea.service.intf.base.annotation.ResourceArtifact;
+import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
+import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
+import es.caib.ripea.service.intf.base.model.ResourceReference;
+import es.caib.ripea.service.intf.dto.DocumentNotificacioEstatEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentNotificacioTipusEnumDto;
+import es.caib.ripea.service.intf.dto.NotificaEnviamentTipusEnumDto;
+import es.caib.ripea.service.intf.dto.ServeiTipusEnumDto;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -23,23 +28,23 @@ import javax.validation.constraints.NotNull;
         quickFilterFields = { "notificacioIdentificador", "enviamentReferencia", "registreNumero" },
         descriptionField = "registreNumero",
         artifacts = {
-            @ResourceConfigArtifact(
+            @ResourceArtifact(
                 type = ResourceArtifactType.ACTION,
                 code = DocumentNotificacioResource.ACTION_ACTUALITZAR_ESTAT_CODE,
                 formClass = DocumentNotificacioResource.MassiveAction.class),
-            @ResourceConfigArtifact(
+            @ResourceArtifact(
                     type = ResourceArtifactType.ACTION,
                     code = DocumentNotificacioResource.ACTION_ELIMINAR,
                     requiresId = true),
-			@ResourceConfigArtifact(
+			@ResourceArtifact(
 					type = ResourceArtifactType.REPORT,
 					code = DocumentNotificacioResource.ACTION_DESCARREGAR_JUSTIFICANT,
 					formClass = DocumentNotificacioResource.MassiveAction.class),
-            @ResourceConfigArtifact(
+            @ResourceArtifact(
                     type = ResourceArtifactType.REPORT,
                     code = DocumentNotificacioResource.ACTION_DESCARREGAR_DOC_ENVIAT,
                     requiresId = true),
-            @ResourceConfigArtifact(
+            @ResourceArtifact(
                     type = ResourceArtifactType.FILTER,
                     code = DocumentNotificacioResource.FILTER_ENVIATS_NOTIB_CODE,
                     formClass = DocumentNotificacioResource.EnviatsNotibFilter.class),

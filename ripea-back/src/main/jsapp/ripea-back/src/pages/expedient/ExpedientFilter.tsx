@@ -55,11 +55,17 @@ const ExpedientFilterForm = () => {
 
 export const springFilterBuilder = (data: any, user?: any, rol?: any): string => {
     let filterStr: string = '';
+//	console.log('>>> data:', JSON.stringify(data, null, 2));
     filterStr += builder.and(
         builder.like("numero", data.numero),
         builder.like("nom", data.nom),
-        data.estat && builder.equals("estat", `'TANCAT'`, (data.estat === '-1')),
-        data.estat && (data.estat != '0' && data.estat != '-1') && builder.eq("estatAdditional.id", data.estat),
+		data.estat && (
+		    (data.estat === 'OBERT' || data.estat === '0')
+		        ? builder.neq("estat", `'TANCAT'`)
+		        : (data.estat === 'TANCAT' || data.estat === '-1')
+		            ? builder.eq("estat", `'TANCAT'`)
+		            : data.metaExpedient?.id && builder.eq("estatAdditional.id", data.estat)
+		),
         builder.exists(
             builder.or(
                 builder.like("interessats.documentNum", data.interessat),
@@ -100,7 +106,7 @@ export const springFilterBuilder = (data: any, user?: any, rol?: any): string =>
             )
         )
     )
-    // console.log('>>> springFilterBuilder:', filterStr)
+//    console.log('>>> springFilterBuilder:', filterStr)
     return filterStr;
 }
 

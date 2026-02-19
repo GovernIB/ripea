@@ -6,8 +6,8 @@ import java.util.List;
 
 import org.springframework.data.annotation.Transient;
 
+import es.caib.ripea.service.intf.base.annotation.ResourceArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
-import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
@@ -34,21 +34,21 @@ import lombok.experimental.FieldNameConstants;
 		quickFilterFields = { "nom" },
 		descriptionField = "observacions",
 		artifacts = {
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = RegistreAnnexResource.PERSPECTIVE_FIRMES),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = RegistreAnnexResource.PERSPECTIVE_REGISTRE),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.FILTER,
                         code = RegistreAnnexResource.ADJUNTAR_ANNEX_FILTER_CODE,
                         formClass = RegistreAnnexResource.AjuntrAnnexPendentFilter.class),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.REPORT,
                         code = RegistreAnnexResource.REPORT_DOWNLOAD_ANNEX,
                         requiresId = true),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = RegistreAnnexResource.ACTION_REINTENTAR_CODE,
                         formClass = MassiveAction.class),

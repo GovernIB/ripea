@@ -35,8 +35,8 @@ public class BaseRepositoryImpl<E, PK extends Serializable> extends SimpleJpaRep
 	}
 
 	@Override
-	public void merge(E entity) {
-		entityManager.merge(entity);
+	public E merge(E entity) {
+		return entityManager.merge(entity);
 	}
 
 }

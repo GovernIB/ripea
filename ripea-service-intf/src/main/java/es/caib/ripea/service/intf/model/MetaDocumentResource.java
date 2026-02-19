@@ -5,15 +5,21 @@ import java.util.List;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import es.caib.ripea.service.intf.dto.*;
 import org.springframework.data.annotation.Transient;
 
+import es.caib.ripea.service.intf.base.annotation.ResourceArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
-import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceField;
 import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
+import es.caib.ripea.service.intf.dto.DocumentNtiEstadoElaboracionEnumDto;
+import es.caib.ripea.service.intf.dto.MetaDocumentFirmaFluxTipusEnumDto;
+import es.caib.ripea.service.intf.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
+import es.caib.ripea.service.intf.dto.MetaDocumentTipusGenericEnumDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientRevisioEstatEnumDto;
+import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
+import es.caib.ripea.service.intf.dto.NtiOrigenEnumDto;
 import es.caib.ripea.service.intf.resourcevalidation.MetaDocumentValid;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,21 +35,21 @@ import lombok.experimental.FieldNameConstants;
 		quickFilterFields = { "codi", "nom" },
 		descriptionField = "nom",
 		artifacts = {
-                @ResourceConfigArtifact(
+				@ResourceArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = MetaDocumentResource.PERSPECTIVE_COUNT_METADADES),
-                @ResourceConfigArtifact(
+				@ResourceArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = MetaDocumentResource.PERSPECTIVE_REVISIO_ESTAT),
-                @ResourceConfigArtifact(
+				@ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = MetaDocumentResource.ACTION_MARCAR_DEFECTE_CODE,
                         requiresId = true),
-                @ResourceConfigArtifact(
+				@ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = MetaDocumentResource.ACTION_DESMARCAR_DEFECTE_CODE,
                         requiresId = true),
-                @ResourceConfigArtifact(
+				@ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = MetaDocumentResource.ACTION_REORDENAR_CODE,
                         formClass = Integer.class,

@@ -10,12 +10,11 @@ import java.util.Map;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-import es.caib.ripea.service.intf.base.annotation.ResourceField;
-import es.caib.ripea.service.intf.resourcevalidation.AcceptarAnotacioValid;
 import org.springframework.data.annotation.Transient;
 
+import es.caib.ripea.service.intf.base.annotation.ResourceArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
-import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
+import es.caib.ripea.service.intf.base.annotation.ResourceField;
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
@@ -24,6 +23,7 @@ import es.caib.ripea.service.intf.dto.ExpedientPeticioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.ExpedientPeticioEstatViewEnumDto;
 import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
 import es.caib.ripea.service.intf.model.NodeResource.MassiveAction;
+import es.caib.ripea.service.intf.resourcevalidation.AcceptarAnotacioValid;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -37,43 +37,43 @@ import lombok.experimental.FieldNameConstants;
         quickFilterFields = { "identificador" },
         descriptionField = "identificador",
         artifacts = {
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.FILTER,
                         code = ExpedientPeticioResource.FILTER_CODE,
                         formClass = ExpedientPeticioResource.FilterForm.class),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.FILTER,
                         code = ExpedientPeticioResource.ACTUALITZAR_ESTAT_FILTER_CODE,
                         formClass = ExpedientPeticioResource.ActualitzarEstatFilter.class),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.FILTER,
                         code = ExpedientPeticioResource.ANOTACIONS_COMUNICADES_FILTER_CODE,
                         formClass = ExpedientPeticioResource.AnotacionsComunicadesFilter.class),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = ExpedientPeticioResource.PERSPECTIVE_REGISTRE_CODE),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = ExpedientPeticioResource.PERSPECTIVE_ESTAT_VIEW_CODE),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.REPORT,
                         code = ExpedientPeticioResource.REPORT_DOWNLOAD_JUSTIFICANT,
                         requiresId = true),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientPeticioResource.ACTION_REBUTJAR_ANOTACIO,
                         formClass = ExpedientPeticioResource.RebutjarAnotacioForm.class,
                         requiresId = true),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientPeticioResource.ACTION_ACCEPTAR_ANOTACIO,
                         formClass = ExpedientPeticioResource.AcceptarAnotacioForm.class,
                         requiresId = true),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientPeticioResource.ACTION_ESTAT_DISTRIBUCIO,
                         formClass = MassiveAction.class),
-                @ResourceConfigArtifact(
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientPeticioResource.ACTION_CONSULTAR_I_GUARDAR,
                         formClass = MassiveAction.class),

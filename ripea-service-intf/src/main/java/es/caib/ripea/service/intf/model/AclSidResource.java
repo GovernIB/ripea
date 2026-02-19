@@ -1,6 +1,8 @@
 package es.caib.ripea.service.intf.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import es.caib.ripea.service.intf.base.annotation.ResourceArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceField;
@@ -29,14 +31,14 @@ import java.util.List;
         quickFilterFields = { "principal", "sid" },
         descriptionField = "sid",
         artifacts = {
-                @ResourceConfigArtifact(
+        		@ResourceArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = AclSidResource.PERSPECTIVE_PERMISION_CODE),
-                @ResourceConfigArtifact(
+        		@ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = AclSidResource.ACTION_MODIFY_PERMISION_CODE,
                         formClass = AclSidResource.ModifyPermisionFormAction.class),
-                @ResourceConfigArtifact(
+        		@ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = AclSidResource.ACTION_DELETE_PERMISION_CODE,
                         formClass = AclSidResource.DeletePermisionFormAction.class,

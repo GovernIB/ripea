@@ -1,10 +1,8 @@
-/**
- * 
- */
 package es.caib.ripea.service.permission;
 
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.acls.model.Permission;
+import es.caib.ripea.service.intf.dto.ExtendedPermissionEnum;
 
 /**
  * Permisos addicionals pel suport d'ACLs
@@ -33,4 +31,19 @@ public class ExtendedPermission extends BasePermission {
 		super(mask, code);
 	}
 
+	public static ExtendedPermission toPermission(ExtendedPermissionEnum permissionEnum) {
+		switch(permissionEnum) {
+		case READ: return (ExtendedPermission) ExtendedPermission.READ;
+		case WRITE: return (ExtendedPermission)ExtendedPermission.WRITE;
+		case CREATE: return (ExtendedPermission)ExtendedPermission.CREATE;
+		case DELETE: return (ExtendedPermission)ExtendedPermission.DELETE;
+		case ADMINISTRATION: return (ExtendedPermission)ExtendedPermission.ADMINISTRATION;
+		case ADM_COMU: return (ExtendedPermission)ExtendedPermission.ADM_COMU;
+		case ADMINISTRATION_READ: return (ExtendedPermission)ExtendedPermission.ADMINISTRATION_READ;
+		case COMU: return (ExtendedPermission)ExtendedPermission.COMU;
+		case DISSENY: return (ExtendedPermission)ExtendedPermission.DISSENY;
+		case STATISTICS: return (ExtendedPermission)ExtendedPermission.STATISTICS;
+		default: return null;
+		}
+	}
 }

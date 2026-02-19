@@ -6,7 +6,6 @@ import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -16,8 +15,6 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import org.hibernate.annotations.ForeignKey;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.persistence.base.entity.ResourceEntity;
 import es.caib.ripea.persistence.entity.UsuariEntity;
@@ -32,13 +29,11 @@ import lombok.Setter;
  *
  * @author Limit Tecnologies <limit@limit.es>
  */
-@Getter
-@Setter
 @Entity
 @Table(	name = BaseConfig.DB_PREFIX + "config")
+@Getter
+@Setter
 @NoArgsConstructor
-@EntityListeners(AuditingEntityListener.class)
-@Transactional
 public class ConfigResourceEntity implements ResourceEntity<ConfigResource, String> {
     @Id
     @Column(name = "KEY", length = 256, nullable = false)
