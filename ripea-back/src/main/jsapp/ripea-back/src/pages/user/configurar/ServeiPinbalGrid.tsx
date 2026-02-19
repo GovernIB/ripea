@@ -26,7 +26,7 @@ const columns = [
     },
     {
         field: 'pinbalServeiDocPermesEnum',
-        flex: 1,
+        flex: 0.75,
     },
     {
         field: 'actiu',
@@ -60,6 +60,7 @@ export const ServeiPinbalGrid = () => {
                 popupEditCreateActive
                 popupEditFormContent={<ServeiPinbalGridForm/>}
                 rowAdditionalActions={actions}
+                toolbarHideQuickFilter={false}
                 toolbarHideCreate
                 popupEditFormI18nKeys={{
                     updateSuccess: 'page.entitat.action.update.ok',

@@ -318,7 +318,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		}
 		return artifacts;
 	}
-
+	
 	@Override
 	@Transactional(readOnly = true)
 	public ResourceArtifact artifactGetOne(
@@ -326,7 +326,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 			String code) throws ArtifactNotFoundException {
 		log.debug("Querying artifact form class (type={}, code={})", type, code);
 		if (type == ResourceArtifactType.PERSPECTIVE) {
-			PerspectiveApplicator<?, ?> perspectiveApplicator = perspectiveApplicatorMap.get(code);
+			PerspectiveApplicator<?, ?> perspectiveApplicator = getPerspectiveApplicator(code);
 			if (perspectiveApplicator != null) {
 				boolean allowed = basePermissionHelper.checkResourceArtifactPermission(
 						getResourceClass(),
@@ -564,7 +564,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 			List<R> resources,
 			String[] perspectives) throws ArtifactNotFoundException {
 		Arrays.stream(perspectives).forEach(p -> {
-			PerspectiveApplicator<E, R> perspectiveApplicator = perspectiveApplicatorMap.get(p);
+			PerspectiveApplicator<E, R> perspectiveApplicator = getPerspectiveApplicator(p);
 			if (perspectiveApplicator != null) {
 				boolean modified = perspectiveApplicator.applyMultiple(p, entities, resources);
 				if (!modified) {
@@ -586,7 +586,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 			R resource,
 			String[] perspectives) {
 		Arrays.stream(perspectives).forEach(p -> {
-			PerspectiveApplicator<E, R> perspectiveApplicator = perspectiveApplicatorMap.get(p);
+			PerspectiveApplicator<E, R> perspectiveApplicator = getPerspectiveApplicator(p);
 			if (perspectiveApplicator != null) {
 				perspectiveApplicator.applySingle(p, entity, resource);
 			} else {

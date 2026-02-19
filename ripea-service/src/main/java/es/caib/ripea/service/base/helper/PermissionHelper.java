@@ -117,7 +117,7 @@ public class PermissionHelper {
 				targetType.endsWith(".AclEntryResource") ||
 				targetType.endsWith(".AclSidResource") ||
 				targetType.endsWith(".AclObjIdentityResource")) { 
-					return	userPermissions.isAdmin() || userPermissions.isOrgan() || userPermissions.isDisseny();
+					return	userPermissions.isAdmin() || userPermissions.isOrgan() || userPermissions.isDisseny() || userPermissions.isSuperAdmin();
 			}
 			//Modificació de procediments
 			if (targetType.endsWith(".MetaExpedientResource") ||

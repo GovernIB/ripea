@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.back.validation;
 
 import javax.validation.Constraint;

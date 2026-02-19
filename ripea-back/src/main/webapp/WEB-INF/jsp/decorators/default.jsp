@@ -303,7 +303,9 @@ body {
                         <a href="<c:url value="/metaExpedient"/>"		class="btn btn-primary"><spring:message code="decorator.menu.metaexpedients"/><c:if test="${organsNoSincronitzats > 0}"><span class="badge small" title="<spring:message code='metaexpedient.actualitzacio.organs.no.sync'/>" style="background-color: #a94442; float: right;">${organsNoSincronitzats}</span></c:if></a>
                 	</c:when>
                     <c:when test="${isRolActualSuperusuari}">
-                        
+                		<c:if test="${sessionScope['SessionHelper.isReactActiu']!=null  && sessionScope['SessionHelper.isReactActiu']}">
+							<a href="<c:url value="/reactapp/integracio"/>"	class="btn btn-default"><span class="fa fa-folder" style="color: #004b99;"></span> <spring:message code="decorator.menu.expedients.new"/></a>
+						</c:if>
                         <%---- Entitats ----%>
                         <a href="<c:url value="/entitat"/>" class="btn btn-primary"><spring:message code="decorator.menu.entitats"/></a>
                         <div class="btn-group">

@@ -45,6 +45,11 @@ public class AvisResourceServiceImpl extends BaseMutableResourceService<AvisReso
 		eventHelper.notifyAvisosActius();
 	}
 
+	@Override
+	protected void completeResource(AvisResource resource) {
+		resource.setEntitat(null); //Els avisos creats per un superadmin no van assocciats a cap entitat.
+	}
+	
     private class MassiveActiveActionExecutor implements ActionExecutor<AvisResourceEntity, AvisResource.MassiveActiveFormAction, Serializable> {
 
         @Override
@@ -56,6 +61,7 @@ public class AvisResourceServiceImpl extends BaseMutableResourceService<AvisReso
             for (AvisResourceEntity avisEntity : avisEntityList) {
                 avisEntity.setActiu(params.getActive());
                 avisResourceRepository.save(avisEntity);
+                eventHelper.notifyAvisosActius();
             }
             return null;
         }
@@ -69,6 +75,7 @@ public class AvisResourceServiceImpl extends BaseMutableResourceService<AvisReso
         @Override
         public Serializable exec(String code, AvisResourceEntity entity, NodeResource.MassiveAction params) throws ActionExecutionException {
             avisResourceRepository.deleteAllById(params.getIds());
+            eventHelper.notifyAvisosActius();
             return null;
         }
     }

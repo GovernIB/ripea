@@ -13,6 +13,8 @@ import es.caib.ripea.service.intf.base.annotation.ResourceField;
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
 import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
+import es.caib.ripea.service.intf.resourcevalidation.ValidImageFile;
+import es.caib.ripea.service.intf.resourcevalidation.ValidImageFile;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -23,7 +25,7 @@ import lombok.experimental.FieldNameConstants;
 @NoArgsConstructor
 @FieldNameConstants
 @ResourceConfig(
-        quickFilterFields = { "codi", "nom" },
+        quickFilterFields = { "codi", "nom", "cif"},
         descriptionField = "nom",
 		artifacts = {
 				@ResourceArtifact(
@@ -70,13 +72,13 @@ public class EntitatResource extends BaseAuditableResource<Long> {
     
     @Transient private int numPermisos;
     
-    @Transient @ResourceField(onChangeActive = true) private FileReference logoImgFile;
-    @Transient @ResourceField(onChangeActive = true) private FileReference faviconImgFile;
-    @Transient @ResourceField(onChangeActive = true) private FileReference menuImgFile;
+    @Transient @ResourceField(onChangeActive = true) @ValidImageFile private FileReference logoImgFile;
+    @Transient @ResourceField(onChangeActive = true) @ValidImageFile private FileReference faviconImgFile;
+    @Transient @ResourceField(onChangeActive = true) @ValidImageFile private FileReference menuImgFile;
     
-    @Transient @ResourceField(onChangeActive = true) private FileReference blackLogoImgFile;
-    @Transient @ResourceField(onChangeActive = true) private FileReference blackFaviconImgFile;
-    @Transient @ResourceField(onChangeActive = true) private FileReference blackMenuImgFile;
+    @Transient @ResourceField(onChangeActive = true) @ValidImageFile private FileReference blackLogoImgFile;
+    @Transient @ResourceField(onChangeActive = true) @ValidImageFile private FileReference blackFaviconImgFile;
+    @Transient @ResourceField(onChangeActive = true) @ValidImageFile private FileReference blackMenuImgFile;
     
     private static final long serialVersionUID = 5467286889478459953L;
 }

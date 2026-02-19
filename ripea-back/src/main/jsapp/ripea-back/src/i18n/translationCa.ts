@@ -1661,22 +1661,22 @@ const translationCa = {
             title: "Avis",
             action: {
                 new: {
-                    label: "Nova avis",
-                    ok: "Avis creat correctament",
+                    label: "Nov avís",
+                    ok: "Avís creat correctament",
                 },
                 update: {
-                    ok: "Avis modificat correctament",
+                    ok: "Avís modificat correctament",
                 },
                 delete: {
-                    ok: "Avis eliminat correctament",
+                    ok: "Avís eliminat correctament",
                 },
                 activar: {
                     label: "Activar",
-                    ok: "Avis activat",
+                    ok: "Avís activat",
                 },
                 desactivar: {
                     label: "Desactivar",
-                    ok: "Avis desactivat",
+                    ok: "Avís desactivat",
                 },
             },
         },
