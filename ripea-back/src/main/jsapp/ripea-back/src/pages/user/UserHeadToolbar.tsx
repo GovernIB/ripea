@@ -227,7 +227,7 @@ const useMenuSupAdmin = () => {
                     id: 'props',
                     title: t('page.user.menu.props'),
                     // icon: '',
-                    onClick: () => toProgramaAntic('config'),
+                    to: 'config',
                 },
                 {
                     id: 'pinbal',

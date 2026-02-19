@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
+import org.springframework.data.annotation.Transient;
 
 @SuppressWarnings("serial")
 @Getter
@@ -14,8 +15,13 @@ import lombok.experimental.FieldNameConstants;
 @FieldNameConstants
 @ResourceConfig(
         quickFilterFields = { "code", "value" },
-        descriptionField = "code")
+        descriptionField = "value")
 public class ConfigTypeResource extends BaseResource<String> {
 	private String code;
 	private String value;
+
+    @Transient
+    public String getId() {
+        return code;
+    }
 }

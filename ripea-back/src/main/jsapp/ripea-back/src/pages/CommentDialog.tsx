@@ -40,7 +40,7 @@ const Comments = (props: any) => {
             filter: `${resourceReference}.id:${id}`,
             includeLinksInRows: true,
             unpaged: true,
-            sorts: ['createdDate', 'desc']
+            sorts: ['createdDate,desc']
         }).
         then((result) => {
             setComments(result.rows);

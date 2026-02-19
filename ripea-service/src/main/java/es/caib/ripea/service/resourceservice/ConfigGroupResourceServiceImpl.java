@@ -13,5 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 public class ConfigGroupResourceServiceImpl extends BaseMutableResourceService<ConfigGroupResource, String, ConfigGroupResourceEntity> implements ConfigGroupResourceService {
-
+    @Override
+    protected void afterConversion(ConfigGroupResourceEntity entity, ConfigGroupResource resource) {
+        resource.setChildrens(entity.getChildren() != null ?entity.getChildren().size() :0);
+    }
 }

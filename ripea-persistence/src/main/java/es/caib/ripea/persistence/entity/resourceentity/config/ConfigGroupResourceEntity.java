@@ -2,14 +2,7 @@ package es.caib.ripea.persistence.entity.resourceentity.config;
 
 import java.util.Set;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import es.caib.ripea.persistence.base.entity.ResourceEntity;
 import es.caib.ripea.service.intf.config.BaseConfig;
@@ -35,8 +28,9 @@ public class ConfigGroupResourceEntity implements ResourceEntity<ConfigGroupReso
     @Column(name = "POSITION")
     private int position;
 
-    @Column(name = "PARENT_CODE")
-    private String parentCode;
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "PARENT_CODE", updatable = false)
+    private ConfigGroupResourceEntity parent;
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "GROUP_CODE")
@@ -46,7 +40,7 @@ public class ConfigGroupResourceEntity implements ResourceEntity<ConfigGroupReso
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "PARENT_CODE")
     @OrderBy("position ASC")
-    private Set<ConfigGroupResourceEntity> innerConfigs;
+    private Set<ConfigGroupResourceEntity> children;
 
 	@Override
 	public String getId() {
