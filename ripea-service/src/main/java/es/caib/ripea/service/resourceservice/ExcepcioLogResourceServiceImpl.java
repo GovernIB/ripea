@@ -41,7 +41,7 @@ public class ExcepcioLogResourceServiceImpl extends BaseReadonlyResourceService<
 		if (excepcions!=null) {
 			List<ExcepcioLogResource> aux = new ArrayList<ExcepcioLogResource>();
 			for (ExcepcioLogDto ex: excepcions) {
-				aux.add(objectMappingHelper.newInstanceMap(ex, ExcepcioLogResource.class));
+				aux.add(objectMappingHelper.newInstanceMap(ex, ExcepcioLogResource.class,"serialVersionUID"));
 			}
 			Page<ExcepcioLogResource> page = new PageImpl<>(aux, pageable, excepcions.size());
 			return page;

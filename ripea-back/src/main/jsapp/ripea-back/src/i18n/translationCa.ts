@@ -152,6 +152,7 @@ const translationCa = {
         usuariTasca: "Tasques",
         entitat: "Gestió d'entitats",
         avis: "Gestió d'avisos",
+        exception: 'Darreres excepcions produïdes',
         massiu: {
             portafirmes: "Acció massiva: enviar documents al portafirmes",
             firmasimpleweb: "Acció massiva: firmar documents des del navegador",
@@ -1705,6 +1706,13 @@ const translationCa = {
                     ok: "Url eliminat correctament",
                 },
             },
+        },
+        exception: {
+            action: {
+                detail: {
+                    title: "Detalls de l'excepció",
+                }
+            }
         },
         permision: {
             title: "Permisos",

@@ -10,6 +10,7 @@ type MenuButtonProps = {
     menuProps?: any;
     arrowDown?: string;
     arrowUp?: string;
+    hiddenIcon?: boolean,
 }
 
 const MenuButton = (props:MenuButtonProps) => {
@@ -22,6 +23,7 @@ const MenuButton = (props:MenuButtonProps) => {
         menuProps,
         arrowDown = 'arrow_drop_down',
         arrowUp = 'arrow_drop_up',
+        hiddenIcon = false
     } = props;
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
@@ -44,7 +46,7 @@ const MenuButton = (props:MenuButtonProps) => {
             aria-expanded={open ? 'true' : undefined}
             onClick={handleClick}
 
-            endIcon={<Icon sx={{m: 0}}>{open ? arrowUp : arrowDown}</Icon>}
+            endIcon={!hiddenIcon && <Icon sx={{m: 0}}>{open ? arrowUp : arrowDown}</Icon>}
             {...buttonProps}
         >
             {buttonLabel}
