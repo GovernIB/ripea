@@ -10,6 +10,8 @@ const TITLES: any = {
     '/entitat': "navigate.entitat",
     '/avis': "navigate.avis",
     '/pinbalServei': "page.user.menu.pinbal",
+    '/config': "page.user.menu.props",
+    '/excepcio': "navigate.exception",
 
     // Accions massives
     '/massiu/portafirmes': "navigate.massiu.portafirmes",
