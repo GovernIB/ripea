@@ -1,6 +1,7 @@
 package es.caib.ripea.service.resourceservice;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
@@ -16,11 +17,14 @@ import es.caib.ripea.persistence.entity.resourceentity.config.ConfigResourceEnti
 import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
+import es.caib.ripea.service.helper.ConfigHelper;
+import es.caib.ripea.service.helper.ExcepcioLogHelper;
+import es.caib.ripea.service.helper.MessageHelper;
+import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.model.ConfigResource;
-import es.caib.ripea.service.intf.model.ExpedientResource;
 import es.caib.ripea.service.intf.resourceservice.ConfigResourceService;
 import es.caib.ripea.service.intf.utils.Utils;
 import lombok.RequiredArgsConstructor;
@@ -33,9 +37,14 @@ public class ConfigResourceServiceImpl extends BaseMutableResourceService<Config
 
 	private final EntitatRepository entitatRepository;
 	private final OrganGestorRepository organGestorRepository;
+	private final ConfigHelper configHelper;
+	private final ExcepcioLogHelper excepcioLogHelper;
+	private final MessageHelper messageHelper;
 	
     @PostConstruct
     public void init() {
+    	register(ConfigResource.ACTION_SYNC_JBOSS, new SyncJbossActionExecutor());
+    	
     	register(ConfigResource.Fields.entitat, new ConfigOnchangeLogicProcessor());
     	register(ConfigResource.Fields.organ, new ConfigOnchangeLogicProcessor());
     }
@@ -120,4 +129,21 @@ public class ConfigResourceServiceImpl extends BaseMutableResourceService<Config
     	return resource;
     }
 
+    private class SyncJbossActionExecutor implements ActionExecutor<ConfigResourceEntity, Serializable, Serializable> {
+
+		@Override
+		public void onChange(Serializable id, Serializable previous, String fieldName, Object fieldValue,
+				Map<String, AnswerValue> answers, String[] previousFieldNames, Serializable target) {}
+
+		@Override
+		public Serializable exec(String code, ConfigResourceEntity entity, Serializable params) throws ActionExecutionException {
+			try {
+				List<String> propietatsActualitzades = configHelper.syncFromJBossProperties();
+				return propietatsActualitzades!=null?propietatsActualitzades.size():0;
+			} catch (Exception e) {
+				excepcioLogHelper.addExcepcio("/config/"+entity.getId()+"/SyncJbossActionExecutor", e);
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, messageHelper.getMessage("message.common.action.error")+": "+e.getMessage());
+			}
+		}    	
+    }
 }

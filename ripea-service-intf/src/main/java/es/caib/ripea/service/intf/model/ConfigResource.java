@@ -4,9 +4,11 @@ import java.util.Date;
 
 import org.springframework.data.annotation.Transient;
 
+import es.caib.ripea.service.intf.base.annotation.ResourceArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.annotation.ResourceField;
 import es.caib.ripea.service.intf.base.model.BaseResource;
+import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,9 +22,16 @@ import lombok.experimental.FieldNameConstants;
 @FieldNameConstants
 @ResourceConfig(
         quickFilterFields = { "key", "value", "description" },
-        descriptionField = "description")
+        descriptionField = "description",
+        artifacts = {
+            @ResourceArtifact(
+                    type = ResourceArtifactType.ACTION,
+                    code = ConfigResource.ACTION_SYNC_JBOSS),
+        })
 public class ConfigResource extends BaseResource<String> {
 
+	public static final String ACTION_SYNC_JBOSS = "SYNC_JBOSS";
+	
     private String key;
     private String value;
     private String description;

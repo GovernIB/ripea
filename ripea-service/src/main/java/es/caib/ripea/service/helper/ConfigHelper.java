@@ -1,6 +1,7 @@
 package es.caib.ripea.service.helper;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +39,7 @@ public class ConfigHelper {
     @Autowired private OrganGestorRepository organGestorRepository;
     @Autowired private Environment springEnvironment;
     @Autowired private EntityComprovarHelper entityComprovarHelper;
+    @Autowired private PluginHelper pluginHelper;
 
     private static ThreadLocal<EntitatDto> entitat = new ThreadLocal<>();
     private static ThreadLocal<String> organCodi = new ThreadLocal<>();
@@ -491,6 +493,28 @@ public class ConfigHelper {
         return (value != null) ? value : defaultValue;
     }
 
+    public List<String> syncFromJBossProperties() {
+        log.info("Sincronitzant les propietats amb JBoss");
+        Properties properties = getEnvironmentPropertiesAll(null);
+        List<String> editedProperties = new ArrayList<>();
+        List<String> propertiesList = new ArrayList<>(properties.stringPropertyNames());
+        Collections.sort(propertiesList);
+        for (String key: propertiesList) {
+            String value = properties.getProperty(key);
+            log.info(key + " : " + value);
+            ConfigEntity configEntity = configRepository.findById(key).orElse(null);
+            if (configEntity != null) {
+                configEntity.update(value);
+//                pluginHelper.reloadProperties(configEntity.getGroupCode());
+                if (configEntity.getKey().endsWith(".class")){
+                    pluginHelper.resetPlugins();
+                }
+                editedProperties.add(configEntity.getKey());
+            }
+        }
+        return editedProperties;
+    }
+    
     public Properties getEnvironmentPropertiesAll(String prefix) {
         Properties properties = new Properties();
         if (springEnvironment instanceof ConfigurableEnvironment) {

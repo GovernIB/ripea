@@ -181,47 +181,21 @@ public class ConfigServiceImpl implements ConfigService {
 							suffix,
 							paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap)),
 					OrganConfigDto.class);
-		
-		
 	}
-	
 	
 	@Transactional(readOnly = true)
 	@Override
-	public OrganConfigDto findConfigOrgan(
-			String key) {
-
+	public OrganConfigDto findConfigOrgan(String key) {
 		return conversioTipusHelper.convertir(
 				configRepository.findByKey(key),
 				OrganConfigDto.class);
-		
 	}
-	
 
     @Override
     @Transactional
     public List<String> syncFromJBossProperties() {
-        log.info("Sincronitzant les propietats amb JBoss");
-        Properties properties = configHelper.getEnvironmentPropertiesAll(null);
-        List<String> editedProperties = new ArrayList<>();
-        List<String> propertiesList = new ArrayList<>(properties.stringPropertyNames());
-        Collections.sort(propertiesList);
-        for (String key: propertiesList) {
-            String value = properties.getProperty(key);
-            log.info(key + " : " + value);
-            ConfigEntity configEntity = configRepository.findById(key).orElse(null);
-            if (configEntity != null) {
-                configEntity.update(value);
-//                pluginHelper.reloadProperties(configEntity.getGroupCode());
-                if (configEntity.getKey().endsWith(".class")){
-                    pluginHelper.resetPlugins();
-                }
-                editedProperties.add(configEntity.getKey());
-            }
-        }
-        return editedProperties;
+        return configHelper.syncFromJBossProperties();
     }
-
     
     @Override
     @Transactional
@@ -236,11 +210,8 @@ public class ConfigServiceImpl implements ConfigService {
 		} else {
 			configHelper.removeConfigPerEntitats(configEntity, entitats);
 		}
-        
         pluginHelper.resetPlugins();
-
     }
-    
     
     @Override
     @Transactional
