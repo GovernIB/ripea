@@ -1709,7 +1709,12 @@ const translationCa = {
         propietats: {
             title: "Propietat",
             action: {
+                sync: {
+                    label: "Sincronitzar amb JBoss",
+                    ok: "Les propietats s'han sincronitzat correctament",
+                },
                 new: {
+                    label: "Afegir conf. específica",
                     ok: "La propietat s'ha creat correctament",
                 },
                 update: {

@@ -1709,7 +1709,12 @@ const translationEs = {
         propietats: {
             title: "Propiedad",
             action: {
+                sync: {
+                    label: "Sincronizar con JBoss",
+                    ok: "Las propiedades se han sincronizado correctamente",
+                },
                 new: {
+                    label: "Añadir conf. específica",
                     ok: "La propiedad se ha creado correctamente",
                 },
                 update: {
