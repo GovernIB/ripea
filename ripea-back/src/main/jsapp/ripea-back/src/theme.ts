@@ -159,6 +159,10 @@ export const lightTheme = createTheme(base, {
         mode: 'light',
         primary: {main: '#337ab7', contrastText: "#fff"},
         warning: {main: '#8a6d3b'},
+        action: {
+            disabled: '#555555',
+            disabledBackground: 'rgba(231,229,229,0.6)',
+        },
     },
     components: {
         MuiCssBaseline: {
@@ -169,14 +173,17 @@ export const lightTheme = createTheme(base, {
                 },
             },
         },
-        MuiFormControl: {
+        MuiOutlinedInput: {
             styleOverrides: {
-                root: {
-                    '&:has(.MuiInputBase-input[readonly][aria-hidden="false"]), &:has(.MuiInputBase-input.Mui-disabled), &:has(.MuiSelect-select[readonly]), &:has(.MuiSelect-select.Mui-disabled)': {
-                        backgroundColor: 'rgba(231,229,229,0.6)',
-                    }
-                },
-            }
+                root: ({ theme }:any) => ({
+                    '&.Mui-disabled': {
+                        backgroundColor: theme.palette.action.disabledBackground,
+                    },
+                    '& input[readonly][aria-hidden="false"]': {
+                        backgroundColor: theme.palette.action.disabledBackground,
+                    },
+                }),
+            },
         },
         MuiDialogTitle: {
             styleOverrides: {
@@ -202,11 +209,6 @@ export const lightTheme = createTheme(base, {
                         backgroundColor: 'rgba(234,234,234,0.31)',
                     }
                 }
-            },
-        },
-        MuiInputBase: {
-            styleOverrides: {
-                input: {'&.Mui-disabled': {'-webkit-text-fill-color': 'black'}},
             },
         },
         MuiDrawer: {styleOverrides: {paper: {backgroundColor: '#004B99', color: '#fff'}}},

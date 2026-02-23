@@ -19,6 +19,7 @@ import {
 import {ResourceApiRequestArgs} from "../../../../lib/components/ResourceApiProvider.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import {DetailCard} from "../../../components/CardData.tsx";
+import {usePropietatsDialog} from "./PropietatsDialog.tsx";
 
 type PropsContextType = {
     // apiCreate: (args: ResourceApiRequestArgs) => Promise<any>;
@@ -78,30 +79,26 @@ const PropsListItem: React.FC<{ item: any; highlight?: string }> = (props) => {
     const { t } = useTranslation();
     const { apiPatch } = usePropsContext();
     const { temporalMessageShow } = useBaseAppContext();
-    const [initialValue, setInitialValue] = React.useState<any | undefined>(item?.value);
-    const [changedValue, setChangedValue] = React.useState<any | undefined>(item?.value);
     const disabled = item.jbossProperty;
     const password = item.type.id === 'PASSWORD' ? true : undefined;
     const decimalScale = item.type.id === 'INT' ? 0 : undefined;
 
     const field = getFieldFromItem(item)
+    const [changedValue, setChangedValue] = React.useState<any | undefined>(field?.value);
 
     const handleFieldOnChange = (value: any) => {
         setChangedValue(value);
     };
     const handleSaveClick = () => {
         apiPatch(item.id, { data: { value: changedValue } })
-            .then((response) => {
-                setInitialValue(response.value)
-                temporalMessageShow(null, t('page.propietats.save.success'), 'success');
+            .then(() => {
+                temporalMessageShow(null, t('page.propietats.action.update.ok'), 'success');
             })
             .catch((error) =>
-                temporalMessageShow(t('page.propietats.save.error'), error.message, 'error')
+                temporalMessageShow(null, error.message, 'error')
             );
     };
-    const handleExpandClick = () => {
-        console.log('>>> expand (TODO)', item);
-    };
+    const {handleOpen, dialog} = usePropietatsDialog();
     return (
         <Grid container spacing={2} sx={{ width: '100%' }}>
             <Grid size={5}>
@@ -110,14 +107,14 @@ const PropsListItem: React.FC<{ item: any; highlight?: string }> = (props) => {
             <Grid size={6}>
                 <FormField
                     field={field}
-                    name={item.key}
-                    value={item.value}
+                    name={'item.key'}
+                    value={changedValue}
                     inline
                     // password={password}
                     decimalScale={decimalScale}
                     disabled={disabled}
                     onChange={handleFieldOnChange}
-                    componentProps={{ type: password ?'password' :'text', helperText: item.key }}
+                    componentProps={{ type: password ?'password' :field.type, helperText: item.key }}
                 />
             </Grid>
             <Grid size={1}>
@@ -126,32 +123,37 @@ const PropsListItem: React.FC<{ item: any; highlight?: string }> = (props) => {
                         size="small"
                         onClick={handleSaveClick}
                         color={'success'}
-                        disabled={disabled || changedValue === initialValue}>
+                        disabled={disabled}>
                         <Icon fontSize="small" >save</Icon>
                     </IconButton>
-                    {item.configurable && (
-                        <IconButton size="small" onClick={handleExpandClick} sx={{ ml: 1 }}>
-                            <Icon sx={{m:0}} fontSize="small">more_vert</Icon>
+                    {(!disabled && item.configurable) && (<>
+                        <IconButton size="small" onClick={() => handleOpen(item.id, {...item, value: changedValue})} sx={{ ml: 1 }}>
+                            <Icon sx={{m:0}} fontSize="small">settings</Icon>
                         </IconButton>
-                    )}
+                    </>)}
                 </Box>
             </Grid>
+            {dialog}
         </Grid>
     );
 };
 
-const getFieldFromItem = (item:any) => {
+export const getFieldFromItem = (item:any) => {
     const type = fieldPropType(item.type.id, item.type.description);
     const options = item.type.description
         ? Object.fromEntries(
             item.type.description.split(',').map((v: string) => [v, v])
         )
         : undefined;
+    const value = (item.type.id == 'BOOL' && typeof item.value == 'string')
+        ? item.value === "true"
+        : item.value
+
     return {
         label: item.description,
         name: item.key,
         type,
-        value: item.value,
+        value,
         options,
     };
 }
@@ -188,6 +190,7 @@ export const PropietatsProps: React.FC<{ quickFilter?: string; group?: any }> = 
         // apiCreate,
         apiPatch,
     };
+
     return (
         group != null &&
         configs != null && (<>
@@ -204,7 +207,7 @@ export const PropietatsProps: React.FC<{ quickFilter?: string; group?: any }> = 
                                     {configs?.map((c) => (
                                         <ListItem key={c.key} disablePadding>
                                             <ListItemButton disableRipple>
-                                                <PropsListItem item={c} highlight={quickFilter} />
+                                                <PropsListItem item={c} highlight={quickFilter}/>
                                             </ListItemButton>
                                         </ListItem>
                                     ))}

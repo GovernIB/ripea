@@ -1646,7 +1646,6 @@ const translationCa = {
                 },
                 config: {
                     label: "Configurar",
-                    // ok: "Entitat eliminada correctament",
                 },
                 activar: {
                     label: "Activar",
@@ -1706,6 +1705,20 @@ const translationCa = {
                     ok: "Url eliminat correctament",
                 },
             },
+        },
+        propietats: {
+            title: "Propietat",
+            action: {
+                new: {
+                    ok: "La propietat s'ha creat correctament",
+                },
+                update: {
+                    ok: "La propietat s'ha modificat correctament",
+                },
+                delete: {
+                    ok: "La propietat s'ha esborrat correctament",
+                },
+            }
         },
         exception: {
             action: {
