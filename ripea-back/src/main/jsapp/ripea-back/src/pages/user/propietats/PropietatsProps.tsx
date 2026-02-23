@@ -119,14 +119,13 @@ const PropsListItem: React.FC<{ item: any; highlight?: string }> = (props) => {
             </Grid>
             <Grid size={1}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <IconButton
-                        size="small"
-                        onClick={handleSaveClick}
-                        color={'success'}
-                        disabled={disabled}>
-                        <Icon fontSize="small" >save</Icon>
-                    </IconButton>
-                    {(!disabled && item.configurable) && (<>
+                     {(!disabled) && (<>
+                        <IconButton
+                            size="small"
+                            onClick={handleSaveClick}
+                            color={'success'}>
+                            <Icon fontSize="small" >save</Icon>
+                        </IconButton>                   
                         <IconButton size="small" onClick={() => handleOpen(item.id, {...item, value: changedValue})} sx={{ ml: 1 }}>
                             <Icon sx={{m:0}} fontSize="small">settings</Icon>
                         </IconButton>

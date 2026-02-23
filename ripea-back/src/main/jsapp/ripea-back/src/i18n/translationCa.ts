@@ -1708,6 +1708,7 @@ const translationCa = {
         },
         propietats: {
             title: "Propietat",
+            empty: "No s'han trobat propietats",
             action: {
                 new: {
                     ok: "La propietat s'ha creat correctament",

@@ -6,7 +6,6 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
-import es.caib.ripea.service.intf.model.EntitatResource;
 import org.springframework.stereotype.Service;
 
 import com.turkraft.springfilter.FilterBuilder;
@@ -14,9 +13,11 @@ import com.turkraft.springfilter.parser.Filter;
 
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
+import es.caib.ripea.persistence.entity.config.ConfigEntity;
 import es.caib.ripea.persistence.entity.resourceentity.config.ConfigResourceEntity;
 import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
+import es.caib.ripea.persistence.repository.config.ConfigRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
@@ -26,6 +27,7 @@ import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.model.ConfigResource;
+import es.caib.ripea.service.intf.model.EntitatResource;
 import es.caib.ripea.service.intf.resourceservice.ConfigResourceService;
 import es.caib.ripea.service.intf.utils.Utils;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +38,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class ConfigResourceServiceImpl extends BaseMutableResourceService<ConfigResource, String, ConfigResourceEntity> implements ConfigResourceService {
 
+	private final ConfigRepository configRepository;
 	private final EntitatRepository entitatRepository;
 	private final OrganGestorRepository organGestorRepository;
 	private final ConfigHelper configHelper;
@@ -83,14 +86,7 @@ public class ConfigResourceServiceImpl extends BaseMutableResourceService<Config
 				Map<String, AnswerValue> answers, String[] previousFieldNames, ConfigResource target) {
 			
 			//Primero reseteamos la propiedad key a su valor base, quitando los valores de entidad y organo que pudiera tener
-			String keyBase = previous.getKey();
-			if (Utils.hasValue(previous.getEntitatCodi())) {
-				keyBase = keyBase.replace("."+previous.getEntitatCodi()+".", ".");
-			}
-			if (Utils.hasValue(previous.getOrganCodi())) {
-				keyBase = keyBase.replace("."+previous.getOrganCodi()+".", ".");
-			}
-			
+			String keyBase = getKeyBase(previous.getKey(), previous.getEntitatCodi(), previous.getOrganCodi());
 			String[] aux = keyBase.split("es.caib.ripea.");
 			
 			//Han cambiado la entidad, puede haber organo gestor seleccionado o no, en todo caso hay que resetear el órgano gestor
@@ -116,6 +112,17 @@ public class ConfigResourceServiceImpl extends BaseMutableResourceService<Config
 		}
     }
     
+    private String getKeyBase(String keyActual, String entitatCodi, String organCodi) {
+		String keyBase = keyActual+"";
+		if (Utils.hasValue(entitatCodi)) {
+			keyBase = keyBase.replace("."+entitatCodi+".", ".");
+		}
+		if (Utils.hasValue(organCodi)) {
+			keyBase = keyBase.replace("."+organCodi+".", ".");
+		}
+		return keyBase;
+    }
+    
     @Override
     protected void afterConversion(ConfigResourceEntity entity, ConfigResource resource) {
     	if (Utils.hasValue(entity.getEntitatCodi())) {
@@ -133,6 +140,37 @@ public class ConfigResourceServiceImpl extends BaseMutableResourceService<Config
     public ConfigResource create(ConfigResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
     	//El metodo create solo sirve para añadir propiedades especificas por entidad u organo gestor.
     	//No para crear propiedades base nuevas.
+    	ConfigEntity conf = configRepository.findById(resource.getKey()).orElse(null);
+    	if (conf==null) {
+    		conf = new ConfigEntity();
+    		conf.setKey(resource.getKey());
+    	}
+    	
+    	conf.setConfigurable(true);
+    	conf.setValue(resource.getValue());
+    	conf.setDescription(resource.getDescription());
+    	
+    	if (resource.getEntitat()!=null) {
+    		conf.setEntitatCodi(resource.getEntitatCodi());
+    	}
+    	
+    	if (resource.getOrgan()!=null) {
+    		conf.setOrganCodi(resource.getOrganCodi());
+    		conf.setConfigurableOrgan(true);
+    		conf.setConfigurableOrgansDescendents(true);
+    	} else {
+    		conf.setConfigurableOrgan(false);
+    		conf.setConfigurableOrgansDescendents(false);
+    	}
+    	
+    	String keyBase = getKeyBase(resource.getKey(), resource.getEntitatCodi(), resource.getOrganCodi());
+    	ConfigEntity confBase = configRepository.findById(keyBase).orElse(null);
+    	
+    	conf.setType(confBase.getType());
+    	conf.setGroupCode(confBase.getGroupCode());
+    	
+    	configRepository.save(conf);
+    	
     	return resource;
     }
 

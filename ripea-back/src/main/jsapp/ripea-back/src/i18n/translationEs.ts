@@ -1708,6 +1708,7 @@ const translationEs = {
         },
         propietats: {
             title: "Propiedad",
+            empty: "No se han encontrado propiedades",
             action: {
                 new: {
                     ok: "La propiedad se ha creado correctamente",

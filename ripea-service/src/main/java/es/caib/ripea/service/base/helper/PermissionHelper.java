@@ -104,7 +104,7 @@ public class PermissionHelper {
 			if (targetType.endsWith(".ConfigTypeResource")) { return userPermissions.isSuperAdmin(); }
 			if (targetType.endsWith(".ConfigGroupResource")) { return userPermissions.isSuperAdmin(); }
 			//Exclusius administradors
-			if (targetType.endsWith(".OrganGestorResource")) { return userPermissions.isAdmin(); }
+			if (targetType.endsWith(".OrganGestorResource")) { return userPermissions.isAdmin() || userPermissions.isSuperAdmin(); }
 			if (targetType.endsWith(".GrupResource")) { 
 				return userPermissions.isAdmin() || userPermissions.isOrgan() || userPermissions.isDisseny();
 			}
