@@ -1,11 +1,13 @@
 package es.caib.ripea.service.resourceservice;
 
 import java.io.Serializable;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.turkraft.springfilter.FilterBuilder;
@@ -17,6 +19,7 @@ import es.caib.ripea.persistence.entity.config.ConfigEntity;
 import es.caib.ripea.persistence.entity.resourceentity.config.ConfigResourceEntity;
 import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
+import es.caib.ripea.persistence.repository.UsuariRepository;
 import es.caib.ripea.persistence.repository.config.ConfigRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.ConfigHelper;
@@ -39,6 +42,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ConfigResourceServiceImpl extends BaseMutableResourceService<ConfigResource, String, ConfigResourceEntity> implements ConfigResourceService {
 
 	private final ConfigRepository configRepository;
+	private final UsuariRepository usuariRepository;
 	private final EntitatRepository entitatRepository;
 	private final OrganGestorRepository organGestorRepository;
 	private final ConfigHelper configHelper;
@@ -131,7 +135,7 @@ public class ConfigResourceServiceImpl extends BaseMutableResourceService<Config
     	
 	    	if (Utils.hasValue(entity.getOrganCodi())) {
 	    		OrganGestorEntity oge = organGestorRepository.findByEntitatCodiAndCodi(entity.getEntitatCodi(), entity.getOrganCodi());
-	    		resource.setEntitat(ResourceReference.toResourceReference(oge.getId(), oge.getNom()));
+	    		resource.setOrgan(ResourceReference.toResourceReference(oge.getId(), oge.getNom()));
 	    	}
     	}
     }
@@ -168,6 +172,9 @@ public class ConfigResourceServiceImpl extends BaseMutableResourceService<Config
     	
     	conf.setType(confBase.getType());
     	conf.setGroupCode(confBase.getGroupCode());
+    	
+    	conf.setLastModifiedBy(usuariRepository.findByCodi(SecurityContextHolder.getContext().getAuthentication().getName()));
+    	conf.setLastModifiedDate(Calendar.getInstance().getTime());
     	
     	configRepository.save(conf);
     	
