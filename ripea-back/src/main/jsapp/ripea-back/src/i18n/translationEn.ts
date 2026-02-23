@@ -1706,6 +1706,20 @@ const translationEn = {
                 },
             },
         },
+        propietats: {
+            title: "Property",
+            action: {
+                new: {
+                    ok: "The property has been successfully created",
+                },
+                update: {
+                    ok: "The property has been successfully updated",
+                },
+                delete: {
+                    ok: "The property has been successfully deleted",
+                },
+            }
+        },
         exception: {
             action: {
                 detail: {

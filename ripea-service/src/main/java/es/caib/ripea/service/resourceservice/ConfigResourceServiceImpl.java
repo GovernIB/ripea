@@ -5,6 +5,7 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
+import es.caib.ripea.service.intf.model.EntitatResource;
 import org.springframework.stereotype.Service;
 
 import com.turkraft.springfilter.FilterBuilder;
@@ -51,8 +52,8 @@ public class ConfigResourceServiceImpl extends BaseMutableResourceService<Config
     		if (mapaNamedQueries.containsKey("QUERY_ESPECIFIQUES")) {
     			String codiKeyBase = mapaNamedQueries.get("QUERY_ESPECIFIQUES");
     			String[] aux = codiKeyBase.split("es.caib.ripea.");
-    			Filter filtrePrefixe = Filter.parse(ConfigResource.Fields.key + " like 'es.caib.ripea.*'");
-    			Filter filtreSufixe = Filter.parse(ConfigResource.Fields.key + " like '*"+aux[1]+"'");
+    			Filter filtrePrefixe = Filter.parse(ConfigResource.Fields.key + "~'es.caib.ripea.%'");
+    			Filter filtreSufixe = Filter.parse(ConfigResource.Fields.key + "~'%"+aux[1]+"'");
     			Filter filtreEntitatNotNull = Filter.parse(ConfigResource.Fields.entitatCodi + " IS NOT NULL");
     			Filter filtreOrganNotNull = Filter.parse(ConfigResource.Fields.organCodi + " IS NOT NULL");
     			
@@ -64,7 +65,7 @@ public class ConfigResourceServiceImpl extends BaseMutableResourceService<Config
     	
     	Filter filtreResultat = FilterBuilder.and(filtreFront, filtreEspecifiques);
     	
-    	return filtreResultat.generate();
+    	return filtreResultat!=null?filtreResultat.generate():null;
     }
     
     private class ConfigOnchangeLogicProcessor implements OnChangeLogicProcessor<ConfigResource> {
@@ -86,16 +87,22 @@ public class ConfigResourceServiceImpl extends BaseMutableResourceService<Config
 			//Han cambiado la entidad, puede haber organo gestor seleccionado o no, en todo caso hay que resetear el órgano gestor
 			if (ConfigResource.Fields.entitat.equals(fieldName)) {
 				if (fieldValue!=null) {
-					EntitatEntity ee = entitatRepository.findByCodi(previous.getEntitatCodi());
+					EntitatEntity ee = entitatRepository.findById(((ResourceReference<EntitatResource, Long>)fieldValue).getId()).get();
 					target.setKey("es.caib.ripea."+ee.getCodi()+"."+aux[1]);
-				}
+                    target.setEntitatCodi(ee.getCodi());
+				} else {
+                    target.setEntitatCodi(null);
+                }
 				//Reseteamos el organo gestor
 				target.setOrgan(null);
 			} else if (ConfigResource.Fields.organ.equals(fieldName)) {
 				if (fieldValue!=null) {
-					OrganGestorEntity oge = organGestorRepository.findByEntitatCodiAndCodi(previous.getEntitatCodi(), previous.getOrganCodi());
+					OrganGestorEntity oge = organGestorRepository.findById(((ResourceReference<EntitatResource, Long>)fieldValue).getId()).get();
 					target.setKey("es.caib.ripea."+oge.getEntitat().getCodi()+"."+oge.getCodi()+"."+aux[1]);
-				}
+                    target.setOrganCodi(oge.getCodi());
+                } else {
+                    target.setOrganCodi(null);
+                }
 			}			
 		}
     }

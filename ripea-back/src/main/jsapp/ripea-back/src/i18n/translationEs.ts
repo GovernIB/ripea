@@ -1706,6 +1706,20 @@ const translationEs = {
                 },
             },
         },
+        propietats: {
+            title: "Propiedad",
+            action: {
+                new: {
+                    ok: "La propiedad se ha creado correctamente",
+                },
+                update: {
+                    ok: "La propiedad se ha modificado correctamente",
+                },
+                delete: {
+                    ok: "La propiedad se ha eliminado correctamente",
+                },
+            }
+        },
         exception: {
             action: {
                 detail: {
