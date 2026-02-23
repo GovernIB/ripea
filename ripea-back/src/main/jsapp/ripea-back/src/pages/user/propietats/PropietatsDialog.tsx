@@ -101,15 +101,15 @@ export const usePropietatsDialog = () => {
         {
             label: t('common.update'),
             icon: "edit",
-            showInMenu: false,
+            showInMenu: true,
             clickShowUpdateDialog: true,
         },
-        // {
-        //     label: t('common.delete'),
-        //     icon: "delete",
-        //     showInMenu: false,
-        //     clickTriggerDelete: true,
-        // },
+        {
+            label: t('common.delete'),
+            icon: "delete",
+            showInMenu: true,
+            clickTriggerDelete: true,
+        },
     ]
 
     const dialog =
@@ -130,6 +130,7 @@ export const usePropietatsDialog = () => {
                     filter={filter}
                     popupEditCreateActive
                     popupEditFormDialogResourceTitle={t('page.propietats.title')}
+                    toolbarCreateTitle={t('page.propietats.action.new.label')}
                     popupEditFormContent={<PropietatsForm item={item} itemField={itemField}/>}
                     formAdditionalData={{
                         group: item?.group,

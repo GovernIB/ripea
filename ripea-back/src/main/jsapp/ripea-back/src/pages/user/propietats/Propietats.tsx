@@ -1,11 +1,11 @@
-import React from 'react';
+import React, {useCallback} from 'react';
 import { useTranslation } from 'react-i18next';
 // import { useDebounce } from 'reactlib';
 import {useDebounce} from "../../../../lib/util/useDebounce.ts";
 import { PropietatsGroups } from './PropietatsGroups.tsx';
 import { PropietatsProps } from './PropietatsProps.tsx';
 import {TextField, InputAdornment, Icon, IconButton, Grid2 as Grid, Button} from "@mui/material";
-import {GridPage} from "reactlib";
+import {GridPage, useBaseAppContext, useResourceApiService} from "reactlib";
 import {CardPage} from "../../../components/CardData.tsx";
 
 const PropietatsQuickFilter: React.FC<{ onChange: (quickFilter: string | undefined) => void }> = (
@@ -50,13 +50,32 @@ const Propietats: React.FC = () => {
     const {t} = useTranslation();
     const [quickFilter, setQuickFilter] = React.useState<string>();
     const [selectedGroup, setSelectedGroup] = React.useState<any>();
+
+    const {
+        isReady: apiIsReady,
+        artifactAction: apiAction
+    } = useResourceApiService('configResource');
+    const {temporalMessageShow} = useBaseAppContext();
+
+    const sync = useCallback(() => {
+        if (apiIsReady) {
+            apiAction(undefined, {code: 'SYNC_JBOSS'})
+                .then(() => {
+                    temporalMessageShow(null, t('page.propietats.action.sync.ok'), 'success');
+                })
+                .catch((error) => {
+                    temporalMessageShow(null, error?.message, 'error');
+                });
+        }
+    }, [apiIsReady]);
+
     return <GridPage disableMargins>
         <CardPage title={t('page.user.menu.props')}>
             <Grid container spacing={2}>
                 <Grid size={12} sx={{ px: 1 }} display={'flex'} justifyContent={'end'}>
                     <PropietatsQuickFilter onChange={setQuickFilter} />
-                    <Button variant="outlined" size="small" sx={{ borderRadius: '4px' }}>
-                        <Icon>cached</Icon>{t('Sincronitzar amb JBoss')}
+                    <Button variant="outlined" size="small" sx={{ borderRadius: '4px' }} onClick={sync}>
+                        <Icon>cached</Icon>{t('page.propietats.action.sync.label')}
                     </Button>
                 </Grid>
                 <Grid size={3}>

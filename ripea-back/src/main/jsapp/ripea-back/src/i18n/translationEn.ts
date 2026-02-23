@@ -1710,7 +1710,12 @@ const translationEn = {
             title: "Property",
             empty: "No properties found",
             action: {
+                sync: {
+                    label: "Synchronize with JBoss",
+                    ok: "The properties have been successfully synchronized",
+                },
                 new: {
+                    label: "Add specific config",
                     ok: "The property has been successfully created",
                 },
                 update: {
