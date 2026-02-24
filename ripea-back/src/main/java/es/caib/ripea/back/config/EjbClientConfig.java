@@ -12,6 +12,7 @@ import es.caib.ripea.service.intf.resourceservice.AclObjIdentityResourceService;
 import es.caib.ripea.service.intf.resourceservice.AclSidResourceService;
 import es.caib.ripea.service.intf.resourceservice.AlertaResourceService;
 import es.caib.ripea.service.intf.resourceservice.AvisResourceService;
+import es.caib.ripea.service.intf.resourceservice.BackGroundTaskResourceService;
 import es.caib.ripea.service.intf.resourceservice.CarpetaResourceService;
 import es.caib.ripea.service.intf.resourceservice.ConfigGroupResourceService;
 import es.caib.ripea.service.intf.resourceservice.ConfigResourceService;
@@ -55,6 +56,7 @@ import es.caib.ripea.service.intf.resourceservice.OrganGestorResourceService;
 import es.caib.ripea.service.intf.resourceservice.PinbalServeiResourceService;
 import es.caib.ripea.service.intf.resourceservice.RegistreAnnexResourceService;
 import es.caib.ripea.service.intf.resourceservice.RegistreInteressatResourceService;
+import es.caib.ripea.service.intf.resourceservice.ThreadInfoResourceService;
 import es.caib.ripea.service.intf.resourceservice.TipusDocumentalResourceService;
 import es.caib.ripea.service.intf.resourceservice.URLInstruccioResourceService;
 import es.caib.ripea.service.intf.resourceservice.UsuariResourceService;
@@ -554,6 +556,16 @@ public class EjbClientConfig {
 	@Bean
 	public LocalStatelessSessionProxyFactoryBean integracioResourceServiceEjb() {
 		return getLocalEjbFactoyBean(IntegracioResourceService.class);
+	}
+	
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean threadInfoResourceServiceEjb() {
+		return getLocalEjbFactoyBean(ThreadInfoResourceService.class);
+	}
+	
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean backGroundTaskResourceServiceEjb() {
+		return getLocalEjbFactoyBean(BackGroundTaskResourceService.class);
 	}
 	
 	/*

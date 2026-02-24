@@ -2,26 +2,18 @@ package es.caib.ripea.service.intf.model;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
-
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-
-import org.springframework.data.annotation.Transient;
 
 import es.caib.ripea.service.intf.base.annotation.ResourceArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.annotation.ResourceField;
 import es.caib.ripea.service.intf.base.model.BaseResource;
-import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.IntegracioAccioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.ripea.service.intf.dto.IntegracioDto;
-import es.caib.ripea.service.intf.resourcevalidation.ImportarDocumentsZipValid;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
