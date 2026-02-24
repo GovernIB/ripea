@@ -89,9 +89,7 @@ public class ThreadInfoResourceServiceImpl extends BaseMutableResourceService<Th
 	}
 	
 	@Override
-	public ThreadInfoResource getOne(
-			Long id,
-			String[] perspectives) throws ResourceNotFoundException {
+	public ThreadInfoResource getOne(Long id, String[] perspectives) throws ResourceNotFoundException {
 		return null;
 	}
 	
@@ -122,6 +120,10 @@ public class ThreadInfoResourceServiceImpl extends BaseMutableResourceService<Th
 				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, messageHelper.getMessage("message.common.action.error")+": "+e.getMessage());
 			}
 		}
-		
+	}
+	
+	@Override
+	public boolean isEntityRepositoryOptional() {
+		return true;
 	}
 }

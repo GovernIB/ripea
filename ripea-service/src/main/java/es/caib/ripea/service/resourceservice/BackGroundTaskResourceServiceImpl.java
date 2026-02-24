@@ -92,9 +92,7 @@ public class BackGroundTaskResourceServiceImpl extends BaseMutableResourceServic
 	}
 	
 	@Override
-	public BackGroundTaskResource getOne(
-			String id,
-			String[] perspectives) throws ResourceNotFoundException {
+	public BackGroundTaskResource getOne(String id, String[] perspectives) throws ResourceNotFoundException {
 		return null;
 	}
 	
@@ -112,7 +110,11 @@ public class BackGroundTaskResourceServiceImpl extends BaseMutableResourceServic
 				excepcioLogHelper.addExcepcio("/backGroundTask/"+entity.getId()+"/RestartTaskActionExecutor", e);
 				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, messageHelper.getMessage("message.common.action.error")+": "+e.getMessage());
 			}
-		}		
+		}
 	}
 
+	@Override
+	public boolean isEntityRepositoryOptional() {
+		return true;
+	}
 }

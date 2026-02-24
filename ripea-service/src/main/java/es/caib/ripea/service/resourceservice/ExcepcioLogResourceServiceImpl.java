@@ -50,9 +50,7 @@ public class ExcepcioLogResourceServiceImpl extends BaseReadonlyResourceService<
 	}
 	
 	@Override
-	public ExcepcioLogResource getOne(
-			Long id,
-			String[] perspectives) throws ResourceNotFoundException {
+	public ExcepcioLogResource getOne(Long id, String[] perspectives) throws ResourceNotFoundException {
 		ExcepcioLogDto aux = excepcioLogHelper.findAll().get(id.intValue());
 		return objectMappingHelper.newInstanceMap(aux, ExcepcioLogResource.class);
 	}

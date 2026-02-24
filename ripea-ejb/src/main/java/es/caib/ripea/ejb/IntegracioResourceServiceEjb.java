@@ -8,6 +8,7 @@ import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 
 import es.caib.ripea.ejb.base.AbstractServiceEjb;
+import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
 import es.caib.ripea.service.intf.base.exception.ArtifactNotFoundException;
@@ -38,5 +39,11 @@ public class IntegracioResourceServiceEjb extends AbstractServiceEjb<IntegracioR
 	public <P extends Serializable> List<?> artifactReportGenerateData(Long id, String code, P params)
 			throws ArtifactNotFoundException, ReportGenerationException {
 		return delegateService.artifactReportGenerateData(id, code, params);
+	}
+
+	@Override
+	public <P extends Serializable> Serializable artifactActionExec(Long id, String code, P params)
+			throws ArtifactNotFoundException, ActionExecutionException {
+		return delegateService.artifactActionExec(id, code, params);
 	}
 }

@@ -103,6 +103,9 @@ public class PermissionHelper {
 			if (targetType.endsWith(".ConfigResource")) { return userPermissions.isSuperAdmin(); }
 			if (targetType.endsWith(".ConfigTypeResource")) { return userPermissions.isSuperAdmin(); }
 			if (targetType.endsWith(".ConfigGroupResource")) { return userPermissions.isSuperAdmin(); }
+			if (targetType.endsWith(".BackGroundTaskResource")) { return userPermissions.isSuperAdmin(); }
+			if (targetType.endsWith(".ThreadInfoResource")) { return userPermissions.isSuperAdmin(); }
+			if (targetType.endsWith(".IntegracioResource")) { return userPermissions.isSuperAdmin(); }
 			//Exclusius administradors
 			if (targetType.endsWith(".OrganGestorResource")) { return userPermissions.isAdmin() || userPermissions.isSuperAdmin(); }
 			if (targetType.endsWith(".GrupResource")) { 
