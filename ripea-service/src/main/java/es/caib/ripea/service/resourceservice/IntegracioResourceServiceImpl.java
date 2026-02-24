@@ -2,11 +2,15 @@ package es.caib.ripea.service.resourceservice;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
+import es.caib.ripea.service.intf.base.model.FieldOption;
+import es.caib.ripea.service.intf.model.ExpedientResource;
+import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -62,6 +66,7 @@ public class IntegracioResourceServiceImpl extends BaseMutableResourceService<In
     	register(IntegracioResource.ACTION_INTEGRACIONS_LIST,	new IntegracionsListActionExecutor());
     	register(IntegracioResource.ACTION_DIAGNOSTIC_PLUGIN,	new DiagnosticPluginActionExecutor());
     	register(IntegracioResource.ACTION_REINICIAR_PLUGIN,	new ReiniciarPluginActionExecutor());
+    	register(IntegracioResource.FILTER_PLUGIN_CODE,	        new PluginFilterOnchangeLogicProcessor());
     }
 	
 	@Override
@@ -77,10 +82,10 @@ public class IntegracioResourceServiceImpl extends BaseMutableResourceService<In
 		//TODO: fer la conversió quant es pugui veurer el format del filtre.
 		
 		//2.- Fer la cerca
-		List<IntegracioAccioDto> accions = integracioHelper.findAccionsByIntegracioCodi(perspectives[0], filtre);
+		List<IntegracioAccioDto> accions = integracioHelper.findAccionsByIntegracioCodi(namedQueries[0], filtre);
 		
 		if (accions == null || accions.isEmpty()) {
-			return null;
+			return new PageImpl<>(List.of(), pageable, 0);
 		}
 
 		//3. Paginar
@@ -113,7 +118,7 @@ public class IntegracioResourceServiceImpl extends BaseMutableResourceService<In
 		List<IntegracioAccioDto> accions = integracioHelper.findAccionsByIntegracioCodi(perspectives[0], null);
 		if (accions != null) {
 			for (IntegracioAccioDto accio: accions) {
-				if (accio.getTimestamp() != null && accio.getTimestamp() == id) {
+				if (accio.getIndex() != null && id.equals(accio.getIndex())) {
 					return objectMappingHelper.newInstanceMap(accio, IntegracioResource.class);
 				}
 			}
@@ -201,7 +206,10 @@ public class IntegracioResourceServiceImpl extends BaseMutableResourceService<In
 					if (resultat.getTexte().contains("vermell")) { nivell = "ERROR"; }
 					if (resultat.getTexte().contains("taronja")) { nivell = "WARN"; }
 				}
-				return "{\"nivell\": \""+nivell+"\", \"missatge\": \""+missatge+"\"}";
+                Map<String, String> result = new HashMap<String, String>();
+                result.put("nivell", nivell);
+                result.put("missatge", missatge.length() > 100 ?missatge.substring(0, 100)+"..." :missatge);
+                return (Serializable) result;
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/integracio/"+entity.getId()+"/DiagnosticPluginActionExecutor", e);
 				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, messageHelper.getMessage("message.common.action.error")+": "+e.getMessage());
@@ -259,4 +267,13 @@ public class IntegracioResourceServiceImpl extends BaseMutableResourceService<In
 			}
 		}		
 	}
+
+    private class PluginFilterOnchangeLogicProcessor implements FilterProcessor<IntegracioResource.DiagnosticResetForm> {
+        @Override
+        public void onChange(Serializable id, DiagnosticResetForm previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, DiagnosticResetForm target) {
+            if (fieldName == null) {
+                initDiagnosticResetForm(target);
+            }
+        }
+    }
 }

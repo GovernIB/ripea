@@ -171,7 +171,7 @@ const useMenuSupAdmin = () => {
             id: 'integracions',
             title: t('page.user.menu.integracions'),
             // icon: '',
-            onClick: () => toProgramaAntic('integracio'),
+            to: 'integracio',
         },
         {
             id: 'excepcions',
@@ -202,7 +202,7 @@ const useMenuSupAdmin = () => {
                     id: 'integracions',
                     title: t('page.user.menu.integracions'),
                     // icon: '',
-                    onClick: () => toProgramaAntic('integracio'),
+                    to: 'integracio',
                 },
                 {
                     id: 'excepcions',
