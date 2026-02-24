@@ -53,10 +53,13 @@ const Link = React.forwardRef<HTMLAnchorElement, RouterLinkProps>((itemProps, re
     return <RouterLink ref={ref} {...itemProps} role={undefined} />;
 });
 
-const getAlertSeverity = (avisNivell: string) => {
+export const getAlertSeverity = (avisNivell: string) => {
   switch (avisNivell) {
+    case "OK":
+      return "success"; // Verd
     case "INFO":
       return "info"; // Azul
+    case "WARN":
     case "WARNING":
       return "warning"; // Amarillo
     case "ERROR":

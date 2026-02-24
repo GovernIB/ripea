@@ -153,6 +153,7 @@ const translationCa = {
         entitat: "Gestió d'entitats",
         avis: "Gestió d'avisos",
         exception: 'Darreres excepcions produïdes',
+        integracio: "Seguiment d'integracions",
         massiu: {
             portafirmes: "Acció massiva: enviar documents al portafirmes",
             firmasimpleweb: "Acció massiva: firmar documents des del navegador",
@@ -1731,6 +1732,28 @@ const translationCa = {
                 detail: {
                     title: "Detalls de l'excepció",
                 }
+            }
+        },
+        integracio: {
+            action: {
+                detail: {
+                    title: "Detalls de la comunicació amb la integració",
+                },
+                diagnostic: {
+                    label: "Repetir diagnòstic",
+                },
+                diagnosticAll: {
+                    title: "Diagnòstic dels sistemes externs",
+                    label: "Diagnòstic",
+                },
+                reiniciar: {
+                    label: "Reiniciar plugin",
+                    ok: "El plugin amb codi '{{nom}}' s'ha reiniciat correctament",
+                },
+                reiniciarAll: {
+                    label: "Reiniciar tots",
+                    ok: "Els plugins s'han reiniciat correctament",
+                },
             }
         },
         permision: {

@@ -153,6 +153,7 @@ const translationEn = {
         entitat: "Entity management",
         avis: "Notice management",
         exception: "Latest exceptions",
+        integracio: "Integration monitoring",
         massiu: {
             portafirmes: "Mass action: send documents to the signature portal",
             firmasimpleweb: "Mass action: sign documents from the browser",
@@ -1731,6 +1732,28 @@ const translationEn = {
                 detail: {
                     title: "Exception details",
                 }
+            }
+        },
+        integracio: {
+            action: {
+                detail: {
+                    title: "Integration communication details",
+                },
+                diagnostic: {
+                    label: "Repeat diagnostic",
+                },
+                diagnosticAll: {
+                    title: "External systems diagnostics",
+                    label: "Diagnostics",
+                },
+                reiniciar: {
+                    label: "Restart plugin",
+                    ok: "The plugin with code '{{nom}}' has been successfully restarted",
+                },
+                reiniciarAll: {
+                    label: "Restart all",
+                    ok: "All plugins have been successfully restarted",
+                },
             }
         },
         permision: {

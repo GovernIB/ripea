@@ -153,6 +153,7 @@ const translationEs = {
         entitat: "Gestión de entidades",
         avis: "Gestión de avisos",
         exception: "Últimas excepciones producidas",
+        integracio: "Seguimiento de integraciones",
         massiu: {
             portafirmes: "Acción masiva: enviar documentos al portafirmas",
             firmasimpleweb: "Acción masiva: firmar documentos desde el navegador",
@@ -1731,6 +1732,28 @@ const translationEs = {
                 detail: {
                     title: "Detalles de la excepción",
                 }
+            }
+        },
+        integracio: {
+            action: {
+                detail: {
+                    title: "Detalles de la comunicación con la integración",
+                },
+                diagnostic: {
+                    label: "Repetir diagnóstico",
+                },
+                diagnosticAll: {
+                    title: "Diagnóstico de los sistemas externos",
+                    label: "Diagnóstico",
+                },
+                reiniciar: {
+                    label: "Reiniciar plugin",
+                    ok: "El plugin con código '{{nom}}' se ha reiniciado correctamente",
+                },
+                reiniciarAll: {
+                    label: "Reiniciar todos",
+                    ok: "Los plugins se han reiniciado correctamente",
+                },
             }
         },
         permision: {

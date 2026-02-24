@@ -44,6 +44,7 @@ import {AvisGrid} from "./pages/avis/AvisGrid.tsx";
 import {ServeiPinbalGrid} from "./pages/user/configurar/ServeiPinbalGrid.tsx";
 import Propietats from "./pages/user/propietats/Propietats.tsx";
 import {ExcepcioGrid} from "./pages/user/monitor/ExcepcioGrid.tsx";
+import {IntegracioGrid} from "./pages/user/monitor/integracio/IntegracioGrid.tsx";
 
 const ProtectedRoute = ({ allowedRoles = [], params = [] }: any) => {
     const {value: user} = useUserSession();
@@ -73,6 +74,7 @@ const AppRoutes: React.FC = () => {
             <Route path={"avis"} element={<AvisGrid/>} />
             <Route path={"pinbalServei"} element={<ServeiPinbalGrid/>} />
             <Route path={"config"} element={<Propietats/>} />
+            <Route path={"integracio"} element={<IntegracioGrid/>} />
             <Route path={"excepcio"} element={<ExcepcioGrid/>} />
         </Route>
 

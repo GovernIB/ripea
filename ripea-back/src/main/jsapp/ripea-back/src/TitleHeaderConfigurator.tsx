@@ -12,6 +12,7 @@ const TITLES: any = {
     '/pinbalServei': "page.user.menu.pinbal",
     '/config': "page.user.menu.props",
     '/excepcio': "navigate.exception",
+    '/integracio': "navigate.integracio",
 
     // Accions massives
     '/massiu/portafirmes': "navigate.massiu.portafirmes",

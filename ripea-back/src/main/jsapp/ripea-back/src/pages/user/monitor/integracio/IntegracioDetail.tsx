@@ -1,0 +1,89 @@
+import {useTranslation} from "react-i18next";
+import {MuiDialog, useBaseAppContext, useResourceApiService} from "reactlib";
+import {useState} from "react";
+import Load from "../../../../components/Load.tsx";
+import {ContenidoData, DetailCard} from "../../../../components/CardData.tsx";
+import {formatDate} from "../../../../util/dateUtils.ts";
+import {FieldData, MuiDetail} from "../../../../components/MuiDetail.tsx";
+
+const IntegracioDetail = ({entity, fields}:any) => {
+    return <MuiDetail entity={entity} fields={fields}>
+        <DetailCard>
+            <FieldData field={'data'}>{formatDate(entity?.data)}</FieldData>
+            <FieldData field={'descripcio'}/>
+            <FieldData field={'tipus'}/>
+            <FieldData field={'endpoint'}/>
+            <FieldData field={'estat'}/>
+            <FieldData field={'parametres'}>
+                {entity?.data?.map?.((param:any) =>
+                    <ContenidoData title={param.key}>{param.value}</ContenidoData>
+                )}
+            </FieldData>
+        </DetailCard>
+    </MuiDetail>
+}
+
+// const perspectives:any[] = ['USUARIS']
+export const useIntegracioDetail = () => {
+    const { t } = useTranslation();
+
+    const {
+        isReady: apiIsReady,
+        getOne: apiGetOne,
+        currentFields
+    } = useResourceApiService('integracioResource');
+    const {temporalMessageShow} = useBaseAppContext();
+
+    const [open, setOpen] = useState(false);
+    const [entity, setEntity] = useState<any>();
+
+    const handleOpen = (id:any, row:any) => {
+        if(apiIsReady){
+            apiGetOne(id, {perspectives: [row?.integracio?.codi]})
+                .then((app) => setEntity(app))
+                .catch((error) => {
+                    handleClose()
+                    temporalMessageShow(null, error?.message, 'error');
+                });
+            setOpen(true);
+        }
+    }
+
+    const handleClose = (reason?: string) => {
+        if(reason !== 'backdropClick') {
+            setEntity(undefined);
+            setOpen(false);
+        }
+    };
+
+    const buttons :any[] = [
+        {
+            value: 'close',
+            text: t('common.close'),
+            icon: 'close',
+        },
+    ]
+
+    const dialog =
+        <MuiDialog
+            open={open}
+            closeCallback={handleClose}
+            title={t('page.integracio.action.detail.title')}
+            componentProps={{ fullWidth: true, maxWidth: 'md' }}
+            buttons={buttons}
+            buttonCallback={() => {
+                handleClose();
+            }}
+        >
+            <Load value={entity}>
+                <IntegracioDetail entity={entity} fields={currentFields}/>
+            </Load>
+        </MuiDialog>
+
+    return {
+        apiIsReady,
+        handleOpen,
+        handleClose,
+        dialog
+    }
+}
