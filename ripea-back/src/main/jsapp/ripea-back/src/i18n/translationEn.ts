@@ -1757,6 +1757,28 @@ const translationEn = {
                 },
             }
         },
+        sistema: {
+            detail: {
+                sistemaOperatiu: "Operating system",
+                processadors: "Processors",
+                tempsFuncionant: "Uptime",
+                jvmMemory: "Memory",
+                disksUsage: "Disk usage",
+            },
+            tabs: {
+                sistema: "System",
+                fils: "Execution threads",
+                tasques: "Background tasks",
+            },
+            action: {
+                restart: {
+                    ok: "The task has been successfully restarted",
+                },
+                restartAll: {
+                    ok: "All tasks have been successfully restarted",
+                },
+            }
+        },
         permision: {
             title: "Permissions",
             grid: {

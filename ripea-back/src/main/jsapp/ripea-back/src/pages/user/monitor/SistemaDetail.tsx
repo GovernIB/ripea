@@ -1,0 +1,295 @@
+import {useTranslation} from "react-i18next";
+import {useState} from "react";
+import {MuiDialog, useBaseAppContext, useMuiDataGridApiRef, useResourceApiService} from "reactlib";
+import TabComponent from "../../../components/TabComponent.tsx";
+import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
+import {DetailCard, DetailCardContent} from "../../../components/CardData.tsx";
+import {LinearProgress, Grid2 as Grid} from "@mui/material";
+
+const useSistemAction = () => {
+    const {
+        isReady: apiIsReady,
+        artifactAction: apiAction
+    } = useResourceApiService('threadInfoResource');
+    const {temporalMessageShow} = useBaseAppContext();
+    const [system, setSystem] = useState<any>();
+
+
+    const apiSystem = () => {
+        setSystem(undefined)
+        apiAction(undefined, {code: 'SYSTEM_INFO'})
+            .then((response) => setSystem(response))
+            .catch((error) => {
+                temporalMessageShow(null, error?.message, 'error');
+            });
+    }
+
+    return {
+        apiIsReady,
+        system,
+        apiSystem,
+    }
+}
+
+const Sistema = ({system}:any) => {
+    const { t } = useTranslation();
+
+    const getPercentage = (value:number, total:number) => {
+        return Math.round(value * 100 / total)
+    }
+
+    return <DetailCard>
+        <DetailCardContent title={t('page.sistema.detail.sistemaOperatiu')}>{system?.informacioSistema?.sistemaOperatiu}</DetailCardContent>
+        <DetailCardContent title={t('page.sistema.detail.processadors')}>{system?.informacioSistema?.processadors}</DetailCardContent>
+        <DetailCardContent title={t('page.sistema.detail.tempsFuncionant')}>{system?.informacioSistema?.tempsFuncionant}</DetailCardContent>
+
+        <DetailCardContent title={t('page.sistema.detail.jvmMemory')}>
+            <Grid container display={'flex'} alignItems={'center'}>
+                <Grid size={2}/>
+                <Grid size={6}>
+                    <LinearProgress variant="determinate" color={'success'}
+                                    value={getPercentage(system?.jvmMemory?.usedMemory, system?.jvmMemory?.totalMemory)}
+                                    sx={{width: '100%', height: 15, borderRadius: '4px'}} />
+                </Grid>
+                <Grid size={1}/>
+                <Grid size={3}>{system?.jvmMemory?.formatedFreeMemory} / {system?.jvmMemory?.formatedTotalMemory}</Grid>
+            </Grid>
+        </DetailCardContent>
+
+        <DetailCardContent title={t('page.sistema.detail.disksUsage')}>
+            <Grid container display={'flex'} alignItems={'center'}>
+                {system?.disksUsage?.map((disk:any) => <>
+                    <Grid size={2}>{disk.nom}</Grid>
+                    <Grid size={6}>
+                        <LinearProgress variant="determinate" color={'success'}
+                                        value={getPercentage(disk?.usedSpace, disk?.totalSpace)}
+                                        sx={{width: '100%', height: 15, borderRadius: '4px'}} />
+                    </Grid>
+                    <Grid size={1}/>
+                    <Grid size={3}>{disk?.formatedFreeSpace} / {disk?.formatedTotalSpace}</Grid>
+                </>)}
+            </Grid>
+        </DetailCardContent>
+    </DetailCard>
+}
+
+const columnsFils = [
+    {
+        field: 'threadName',
+        flex: 5,
+    },
+    {
+        field: 'tiempoCPU',
+        flex: 1,
+    },
+    {
+        field: 'threadState',
+        flex: 1,
+    },
+    {
+        field: 'waitedTime',
+        flex: 1,
+    },
+    {
+        field: 'blockedTime',
+        flex: 1,
+    },
+]
+const perspectivesFils:any[] = [];
+const sortModelFils:any[] = [{field: 'threadId', sort: 'asc'}];
+const Fils = () => {
+    return <StyledMuiGrid
+        resourceName={"threadInfoResource"}
+        columns={columnsFils}
+        staticSortModel={sortModelFils}
+        perspectives={perspectivesFils}
+        autoHeight
+        toolbarHideQuickFilter={false}
+        paginationActive={false}
+        readOnly
+    />
+}
+
+const useTaskAction = (refresh?: () => void) => {
+    const {t} = useTranslation()
+    const {
+        isReady: apiIsReady,
+        artifactAction: apiAction
+    } = useResourceApiService('backGroundTaskResource');
+    const {temporalMessageShow} = useBaseAppContext();
+
+    const restart = (id:any) => {
+        restartAll([id], false)
+    }
+    const restartAll = (ids:any[], massivo:boolean = true ) => {
+        apiAction(undefined, {code: 'RESTART_TASK', data: {ids}})
+            .then(() => {
+                refresh?.()
+                temporalMessageShow(null,
+                    massivo
+                        ? t('page.sistema.action.restartAll.ok')
+                        : t('page.sistema.action.restart.ok')
+                    , 'success');
+            })
+            .catch((error) => {
+                temporalMessageShow(null, error?.message, 'error');
+            });
+    }
+
+    return {
+        apiIsReady,
+        restart,
+        restartAll,
+    }
+}
+
+const columnsTasques = [
+    {
+        field: 'nom',
+        flex: 2,
+    },
+    {
+        field: 'estat',
+        flex: 1,
+    },
+    {
+        field: 'dataInici',
+        flex: 1,
+    },
+    {
+        field: 'tempsExecucio',
+        flex: 1,
+    },
+    {
+        field: 'properaExecucio',
+        flex: 1,
+    },
+]
+const perspectivesTasques:any[] = [];
+const sortModelTasques:any[] = [{field: 'id', sort: 'asc'}];
+const Tasques = () => {
+    const { t } = useTranslation();
+    const apiRef = useMuiDataGridApiRef();
+
+    const refresh = () => {
+        apiRef?.current?.refresh?.();
+    }
+
+    const { restart, restartAll } = useTaskAction(refresh);
+    const actions = [
+        {
+            label: t('common.refresh'),
+            icon: 'cached',
+            showInMenu: false,
+            onClick: restart,
+        }
+    ]
+    const actionsMassive = [
+        {
+            label: t('common.refresh'),
+            icon: 'cached',
+            showInMenu: false,
+            onClick: restartAll,
+        }
+    ]
+
+    return <StyledMuiGrid
+        apiRef={apiRef}
+        resourceName={"backGroundTaskResource"}
+        columns={columnsTasques}
+        staticSortModel={sortModelTasques}
+        perspectives={perspectivesTasques}
+        rowAdditionalActions={actions}
+        toolbarMassiveActions={actionsMassive}
+        autoHeight
+        paginationActive={false}
+        toolbarHideQuickFilter={false}
+        toolbarHideCreate
+    />
+}
+
+export const useSistemaDetail = () => {
+    const { t } = useTranslation();
+
+    const [open, setOpen] = useState(false);
+    const [tab, setTab] = useState<any>();
+
+    const {system, apiSystem} = useSistemAction();
+    const handleOpen = () => {
+        apiSystem()
+        setOpen(true);
+    }
+
+    const handleClose = (reason?: string) => {
+        if(reason !== 'backdropClick') {
+            setOpen(false);
+        }
+    };
+
+    const buttons :any[] = [
+        {
+            value: 'close',
+            text: t('common.close'),
+            icon: 'close',
+        },
+        {
+            value: 'refresh',
+            text: t('common.refresh'),
+            icon: 'cached',
+            componentProps: {
+                variant: 'contained',
+                color: 'warning',
+                disabled: tab !== 'sistema'
+            }
+        },
+    ]
+
+    const tabs = [
+        {
+            value: "sistema",
+            label: t('page.sistema.tabs.sistema'),
+            content: <Sistema system={system}/>
+        },
+        {
+            value: "fils",
+            label: t('page.sistema.tabs.fils'),
+            content: <Fils/>
+        },
+        {
+            value: "tasques",
+            label: t('page.sistema.tabs.tasques'),
+            content: <Tasques/>
+        },
+    ]
+
+    const dialog =
+        <MuiDialog
+            open={open}
+            closeCallback={handleClose}
+            title={t('page.user.menu.monitor')}
+            componentProps={{ fullWidth: true, maxWidth: 'lg' }}
+            buttons={buttons}
+            buttonCallback={(value) => {
+                if (value === 'refresh') {
+                    if (tab === 'sistema') {
+                        apiSystem();
+                    }
+                }
+                if (value === 'close') {
+                    handleClose();
+                }
+            }}
+        >
+            <TabComponent
+                tabs={tabs}
+                value={tab}
+                onChange={setTab}
+            />
+        </MuiDialog>
+
+    return {
+        handleOpen,
+        handleClose,
+        dialog
+    }
+}

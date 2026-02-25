@@ -8,11 +8,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.persistence.Id;
+
 @Getter
 @Setter
 @NoArgsConstructor
 public class ThreadInfoResourceEntity implements ResourceEntity<ThreadInfoResource, Long> {
 
+    @Id
 	private Long         threadId;
     private String       threadName;    
     private long         blockedTime;

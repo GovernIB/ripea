@@ -1757,6 +1757,28 @@ const translationCa = {
                 },
             }
         },
+        sistema: {
+            detail: {
+                sistemaOperatiu: "Sistema operatiu",
+                processadors: "Processadors",
+                tempsFuncionant: "Temps funcionant",
+                jvmMemory: "Memòria",
+                disksUsage: "Ús de disc",
+            },
+            tabs: {
+                sistema: "Sistema",
+                fils: "Fils d'execució",
+                tasques: "Tasques en segon pla",
+            },
+            action: {
+                restart: {
+                    ok: "La tasca s'ha reiniciat correctament",
+                },
+                restartAll: {
+                    ok: "Les tasques s'han reiniciat correctament",
+                },
+            }
+        },
         permision: {
             title: "Permisos",
             grid: {

@@ -38,9 +38,15 @@ const useActions = () => {
 
                 count++;
                 if (count >= integracions.length) {
-                    clearInterval(intervalRef.current);
+                    if (intervalRef.current) {
+                        clearInterval(intervalRef.current);
+                    }
                 }
-                return () => clearInterval(intervalRef.current)
+                return () => {
+                    if (intervalRef.current) {
+                        clearInterval(intervalRef.current)
+                    }
+                }
             }, 500);
         }
     }
@@ -68,7 +74,9 @@ const useActions = () => {
     }
 
     const handleClose = () => {
-        clearInterval(intervalRef.current)
+        if (intervalRef.current) {
+            clearInterval(intervalRef.current)
+        }
         setDiagnostic(new Map())
     }
 
