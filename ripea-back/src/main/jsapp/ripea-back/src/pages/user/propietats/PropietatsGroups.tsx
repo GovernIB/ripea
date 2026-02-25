@@ -87,7 +87,7 @@ export const PropietatsGroups: React.FC<{
             }}
             sx={{
                 '& .MuiTreeItem-content': {
-                    minHeight: 48,
+                    // minHeight: 48,
                     paddingY: 1,
                 },
             }}>

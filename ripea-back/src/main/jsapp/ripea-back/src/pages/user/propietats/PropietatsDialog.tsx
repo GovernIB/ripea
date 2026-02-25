@@ -31,7 +31,7 @@ const PropietatsForm = ({item, itemField}:any) => {
         <GridFormField xs={12} name={'description'} required/>
         <GridFormField xs={12} name={'value'} field={valueField} required/>
         <GridFormField xs={12} name={'entitat'} required disabled={data?.id}/>
-        <GridFormField xs={12} name={'organ'} filter={builder.eq('entitat.id', data?.entitat?.id)} disabled={data?.id}/>
+        <GridFormField xs={12} name={'organ'} filter={builder.and(builder.eq('entitat.id', data?.entitat?.id))} disabled={data?.id}/>
         <GridFormField xs={12} name={'configurableOrgansDescendents'}/>
     </Grid>
 }

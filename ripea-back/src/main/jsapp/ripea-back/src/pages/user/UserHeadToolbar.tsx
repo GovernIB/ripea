@@ -179,7 +179,7 @@ const useMenuSupAdmin = () => {
             id: 'excepcions',
             title: t('page.user.menu.excepcions'),
             // icon: '',
-            onClick: () => toProgramaAntic('excepcio'),
+            to:'excepcio',
         },
     ];
     const entries = [
