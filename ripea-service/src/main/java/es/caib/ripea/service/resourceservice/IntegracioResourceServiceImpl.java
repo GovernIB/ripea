@@ -101,10 +101,12 @@ public class IntegracioResourceServiceImpl extends BaseMutableResourceService<In
 			filtre.setEstat(IntegracioAccioEstatEnumDto.valueOf(filtres.get("estat")));
 		}
 		if (filtres.containsKey("descripcio_like")) {
-			filtre.setDescripcio(filtres.get("descripcio_like"));
+			//Esto elimina los % del String del inicio y final.
+			String descReplace = filtres.get("descripcio_like").replaceAll("^%|%$", "");
+			filtre.setDescripcio(descReplace);
 		}
-		if (filtres.containsKey("entitat")) {
-			String entitatId = filtres.get("entitat");
+		if (filtres.containsKey("entitat.id")) {
+			String entitatId = filtres.get("entitat.id");
 			if (Utils.hasValue(entitatId)) {
 				EntitatEntity ee = entitatRepository.findById(Long.parseLong(entitatId)).orElse(null);
 				filtre.setEntitatCodi(ee!=null?ee.getCodi():null);
@@ -241,8 +243,9 @@ public class IntegracioResourceServiceImpl extends BaseMutableResourceService<In
 				}
                 Map<String, String> result = new HashMap<String, String>();
                 result.put("nivell", nivell);
-                result.put("missatge", missatge);
-                result.put("traza", ExceptionUtils.getStackTrace(resultat.getExcepcio()));
+//                result.put("missatge", missatge);
+                result.put("missatge", missatge.length() > 100 ?missatge.substring(0, 100)+"..." :missatge);
+                result.put("traza", missatge+" "+ExceptionUtils.getStackTrace(resultat.getExcepcio()));
                 return (Serializable) result;
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/integracio/"+entity.getId()+"/DiagnosticPluginActionExecutor", e);

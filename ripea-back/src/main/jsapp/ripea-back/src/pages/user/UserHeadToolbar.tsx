@@ -237,18 +237,6 @@ const useMenuSupAdmin = () => {
                     // icon: '',
                     to: 'pinbalServei',
                 },
-                {
-                    id: 'segonPla',
-                    title: t('page.user.menu.segonPla'),
-                    // icon: '',
-                    onClick: () => toProgramaAntic('scheduled'),
-                },
-                {
-                    id: 'plugins',
-                    title: t('page.user.menu.plugins'),
-                    // icon: '',
-                    onClick: () => toProgramaAntic('plugin'),
-                },
             ],
         },
     ]

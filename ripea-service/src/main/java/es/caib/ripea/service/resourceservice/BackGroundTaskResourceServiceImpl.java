@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import es.caib.ripea.persistence.entity.resourceentity.BackGroundTaskResourceEntity;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
+import es.caib.ripea.service.config.SchedulingConfig;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
 import es.caib.ripea.service.helper.MessageHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
@@ -35,6 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 public class BackGroundTaskResourceServiceImpl extends BaseMutableResourceService<BackGroundTaskResource, String, BackGroundTaskResourceEntity> implements BackGroundTaskResourceService {
 	
 	private final MonitorTasquesService monitorTasquesService;
+	private final SchedulingConfig schedulingConfig;
 	private final ExcepcioLogHelper excepcioLogHelper;
 	private final MessageHelper messageHelper;
 	
@@ -105,7 +107,9 @@ public class BackGroundTaskResourceServiceImpl extends BaseMutableResourceServic
 		@Override
 		public Serializable exec(String code, BackGroundTaskResourceEntity entity, Serializable params) throws ActionExecutionException {
 			try {
-				return null;
+				monitorTasquesService.reiniciarTasquesEnSegonPla(code);
+				schedulingConfig.restartSchedulledTasks(code);
+				return "{\"resultat\": \"OK\"}";
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/backGroundTask/"+entity.getId()+"/RestartTaskActionExecutor", e);
 				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, messageHelper.getMessage("message.common.action.error")+": "+e.getMessage());
