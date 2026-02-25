@@ -16,6 +16,7 @@ public class GenericDto implements Serializable {
 	private Long id;
 	private String codi;
 	private String texte;
+	private Exception excepcio;
 	private Object[] arguments;
 	
 	public GenericDto() {
@@ -34,6 +35,14 @@ public class GenericDto implements Serializable {
 		this.codi = codi;
 		this.texte = texte;
 		this.arguments = arguments;
+	}
+	
+	public GenericDto(String codi, String texte, Object[] arguments, Exception excepcio) {
+		super();
+		this.codi = codi;
+		this.texte = texte;
+		this.arguments = arguments;
+		this.excepcio = excepcio;
 	}
 
 	@Override

@@ -1,16 +1,17 @@
 package es.caib.ripea.service.resourceservice;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
-import es.caib.ripea.service.intf.base.model.FieldOption;
-import es.caib.ripea.service.intf.model.ExpedientResource;
-import lombok.AllArgsConstructor;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -36,6 +37,8 @@ import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.DiagnosticFiltreDto;
 import es.caib.ripea.service.intf.dto.GenericDto;
 import es.caib.ripea.service.intf.dto.IntegracioAccioDto;
+import es.caib.ripea.service.intf.dto.IntegracioAccioEstatEnumDto;
+import es.caib.ripea.service.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.ripea.service.intf.dto.IntegracioDto;
 import es.caib.ripea.service.intf.dto.IntegracioFiltreDto;
 import es.caib.ripea.service.intf.dto.PaginaDto;
@@ -81,6 +84,32 @@ public class IntegracioResourceServiceImpl extends BaseMutableResourceService<In
 		IntegracioFiltreDto filtre = new IntegracioFiltreDto();
 		
 		Map<String, String> filtres = Utils.parseSpringFilter(filter);
+		if (filtres.containsKey("data_gte")) {
+			LocalDateTime localDateTime = LocalDateTime.parse(filtres.get("data_gte"));
+			Date dataInici = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+			filtre.setDataInici(dataInici);
+		}
+		if (filtres.containsKey("data_lte")) {
+			LocalDateTime localDateTime = LocalDateTime.parse(filtres.get("data_lte"));
+			Date dataFi = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+			filtre.setDataFi(dataFi);
+		}
+		if (filtres.containsKey("tipus")) {
+			filtre.setTipus(IntegracioAccioTipusEnumDto.valueOf(filtres.get("tipus")));
+		}
+		if (filtres.containsKey("estat")) {
+			filtre.setEstat(IntegracioAccioEstatEnumDto.valueOf(filtres.get("estat")));
+		}
+		if (filtres.containsKey("descripcio_like")) {
+			filtre.setDescripcio(filtres.get("descripcio_like"));
+		}
+		if (filtres.containsKey("entitat")) {
+			String entitatId = filtres.get("entitat");
+			if (Utils.hasValue(entitatId)) {
+				EntitatEntity ee = entitatRepository.findById(Long.parseLong(entitatId)).orElse(null);
+				filtre.setEntitatCodi(ee!=null?ee.getCodi():null);
+			}
+		}
 		
 		//2.- Fer la cerca
 		List<IntegracioAccioDto> accions = integracioHelper.findAccionsByIntegracioCodi(namedQueries[0], filtre);
@@ -209,7 +238,8 @@ public class IntegracioResourceServiceImpl extends BaseMutableResourceService<In
 				}
                 Map<String, String> result = new HashMap<String, String>();
                 result.put("nivell", nivell);
-                result.put("missatge", missatge.length() > 100 ?missatge.substring(0, 100)+"..." :missatge);
+                result.put("missatge", missatge);
+                result.put("traza", ExceptionUtils.getStackTrace(resultat.getExcepcio()));
                 return (Serializable) result;
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/integracio/"+entity.getId()+"/DiagnosticPluginActionExecutor", e);

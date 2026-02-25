@@ -933,7 +933,7 @@ public class PinbalHelper {
 		return sn;
 	}
 
-	public String pinbalDiagnostic(DiagnosticFiltreDto filtre) {
+	public Exception pinbalDiagnostic(DiagnosticFiltreDto filtre) {
 		try {
 			Map<Integer, String> resultat = Utils.peticioRest(
 					getPinbalBaseUrl(filtre.getEntitatCodi(), filtre.getOrganCodi())+"/interna/recobriment/test",
@@ -942,10 +942,10 @@ public class PinbalHelper {
 			if (resultat!=null && resultat.get(200)!=null) {
 				return null;
 			} else {
-				return "La resposta del mètode test no ha estat l'esperada: "+resultat.toString();
+				return new Exception("La resposta del mètode test no ha estat l'esperada: "+resultat.toString());
 			}
 		} catch (Exception ex) {
-			return ex.getMessage();
+			return ex;
 		}
 	}
 	
