@@ -14,6 +14,7 @@ import {
 } from 'react-router-dom';
 import {getImgFromBytes} from "../../App.tsx";
 import goib_escut_logo from "../../assets/goib_escut_logo.png"
+import {useSistemaDetail} from "./monitor/SistemaDetail.tsx";
 
 export const icons = {
     expedient: 'folder',
@@ -159,6 +160,7 @@ const UserHeadToolbar = () => {
 const useMenuSupAdmin = () => {
     const { t } = useTranslation();
     const { toProgramaAntic } = useToProgramaAntic();
+    const {handleOpen, dialog} = useSistemaDetail();
 
     const appEntries:any[] = [
         {
@@ -214,7 +216,7 @@ const useMenuSupAdmin = () => {
                     id: 'monitor',
                     title: t('page.user.menu.monitor'),
                     // icon: '',
-                    onClick: () => toProgramaAntic('monitor'),
+                    onClick: handleOpen,
                 },
             ],
         },
@@ -251,6 +253,7 @@ const useMenuSupAdmin = () => {
         },
     ]
     const content = <>
+        {dialog}
     </>
 
     return {

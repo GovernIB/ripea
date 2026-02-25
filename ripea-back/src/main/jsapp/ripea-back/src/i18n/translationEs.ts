@@ -1756,6 +1756,28 @@ const translationEs = {
                 },
             }
         },
+        sistema: {
+            detail: {
+                sistemaOperatiu: "Sistema operativo",
+                processadors: "Procesadores",
+                tempsFuncionant: "Tiempo en funcionamiento",
+                jvmMemory: "Memoria",
+                disksUsage: "Uso de disco",
+            },
+            tabs: {
+                sistema: "Sistema",
+                fils: "Hilos de ejecución",
+                tasques: "Tareas en segundo plano",
+            },
+            action: {
+                restart: {
+                    ok: "La tarea se ha reiniciado correctamente",
+                },
+                restartAll: {
+                    ok: "Las tareas se han reiniciado correctamente",
+                },
+            }
+        },
         permision: {
             title: "Permisos",
             grid: {

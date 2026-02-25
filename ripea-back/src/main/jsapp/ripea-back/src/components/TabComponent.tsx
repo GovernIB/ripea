@@ -1,6 +1,7 @@
 import {Box, Tab, Tabs} from "@mui/material";
 import {useEffect, useState} from "react";
 import {StyledBadge} from "./StyledBadge.tsx";
+import Load from "./Load.tsx";
 
 type TabProps = {
     value: string;
@@ -37,12 +38,8 @@ const TabPanel = (props:any) => {
 }
 
 const TabComponent = (props :any) => {
-    const { tabs, headerAdditionalData, defaultValue, ...other}=props;
-    if (!tabs || tabs?.length==0){
-        return <></>
-    }
-
-    const [value, setValue] = useState<any>(defaultValue ?? tabs[0].value);
+    const [valueDef, setValueDef] = useState<any>();
+    const { tabs, headerAdditionalData, defaultValue, value = valueDef, onChange:setValue = setValueDef, ...other}=props;
 
     const handleChange = (_event :any, newValue :string) : void => {
         if (tabs.some((tab:TabProps)=>tab?.value==newValue)) {
@@ -51,12 +48,16 @@ const TabComponent = (props :any) => {
     };
 
     useEffect(() => {
+        if (!value) {
+            setValue(defaultValue)
+        }
         if (!tabs.some((tab:TabProps)=>tab?.value==value)) {
             setValue(tabs[0].value);
         }
     }, [tabs]);
 
-    return <Box sx={{display: 'flex', flexDirection: 'column', height: '100%'}}>
+    return <Load value={tabs?.length}>
+    <Box sx={{display: 'flex', flexDirection: 'column', height: '100%'}}>
         <Box sx={{flexGrow: 1, display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%'}}>
             <Tabs
                 value={value}
@@ -83,6 +84,7 @@ const TabComponent = (props :any) => {
             </TabPanel>
         )}
     </Box>
+    </Load>
 }
 
 export default TabComponent;

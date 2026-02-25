@@ -132,7 +132,6 @@ const ExecucioMassivaGrid = () => {
 
         if (isRefresh) {
             const interval = setInterval(() => {
-                console.log("A")
                 const {isRefresh: isRefreshRef} = intervalRef.current;
                 if (isRefreshRef) {
                     gridApiRef?.current?.refresh?.();

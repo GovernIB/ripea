@@ -26,21 +26,11 @@ public class BackGroundTaskResource extends BaseResource<String> {
 
 	public static final String ACTION_RESTART_TASK	= "RESTART_TASK";
 	
-	private String id;
 	private String nom;
 	private String estat;
 	private String tempsExecucio;
 	private String dataInici;
 	private String properaExecucio;
 	private String observacions;
-	
-	@Override
-	public String getId() {
-		return this.id;
-	}
 
-	@Override
-	public void setId(String id) {
-		this.id = id;
-	}
 }
