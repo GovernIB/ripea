@@ -14,6 +14,7 @@ const IntegracioDetail = ({entity, fields}:any) => {
             <FieldData field={'tipus'}/>
             <FieldData field={'endpoint'}/>
             <FieldData field={'estat'}/>
+            <FieldData field={'tempsResposta'}/>
             <FieldData field={'parametres'}>
                 {entity?.data?.map?.((param:any) =>
                     <ContenidoData title={param.key}>{param.value}</ContenidoData>

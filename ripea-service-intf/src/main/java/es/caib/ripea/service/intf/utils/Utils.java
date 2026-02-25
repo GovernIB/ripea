@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -919,5 +920,50 @@ public class Utils {
         }
     	
     	return currentSpringFilter;
+    }
+    
+    public static Map<String, String> parseSpringFilter(String filter) {
+        Map<String, String> result = new LinkedHashMap<>();
+
+        if (filter == null || filter.isBlank()) {
+            return result;
+        }
+
+        // Eliminar paréntesis externos y espacios
+        String cleaned = filter.replaceAll("\\(", " ").replaceAll("\\)", " ").trim();
+
+        // Regex que captura: campo + operador + valor (con o sin comillas)
+        // Operadores soportados: >=, <=, >:, <:, >, <, ~, :
+        Pattern pattern = Pattern.compile(
+            "(\\w+)\\s*(>=|<=|>:|<:|>|<|~|:)\\s*'([^']*)'|" +
+            "(\\w+)\\s*(>=|<=|>:|<:|>|<|~|:)\\s*(\\S+)"
+        );
+
+        Matcher matcher = pattern.matcher(cleaned);
+
+        while (matcher.find()) {
+            String field = matcher.group(1) != null ? matcher.group(1) : matcher.group(4);
+            String operator = matcher.group(2) != null ? matcher.group(2) : matcher.group(5);
+            String value = matcher.group(3) != null ? matcher.group(3) : matcher.group(6);
+
+            String key = buildKey(field, operator);
+            result.put(key, value);
+        }
+
+        return result;
+    }
+    
+    private static String buildKey(String field, String operator) {
+        switch (operator) {
+            case ":": return field;                  // equals       → "camp"
+            case "~": return  field + "_like";        // like         → "camp_like"
+            case ">": return  field + "_gt";          // greater than → "camp_gt"
+            case "<": return  field + "_lt";          // less than    → "camp_lt"
+            case ">=":return  field + "_gte";         // >=           → "camp_gte"
+            case "<=":return  field + "_lte";         // <=           → "camp_lte"
+            case ">:":return  field + "_gte";         // >:           → "camp_gte"
+            case "<:":return  field + "_lte";         // <:           → "camp_lte"
+            default:  return  field + "_" + operator;
+        }
     }
 }

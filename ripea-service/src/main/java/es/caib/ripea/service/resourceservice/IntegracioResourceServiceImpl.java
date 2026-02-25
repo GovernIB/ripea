@@ -79,7 +79,8 @@ public class IntegracioResourceServiceImpl extends BaseMutableResourceService<In
 		
 		//1.- Convertir el filter en un IntegracioFiltreDto
 		IntegracioFiltreDto filtre = new IntegracioFiltreDto();
-		//TODO: fer la conversió quant es pugui veurer el format del filtre.
+		
+		Map<String, String> filtres = Utils.parseSpringFilter(filter);
 		
 		//2.- Fer la cerca
 		List<IntegracioAccioDto> accions = integracioHelper.findAccionsByIntegracioCodi(namedQueries[0], filtre);

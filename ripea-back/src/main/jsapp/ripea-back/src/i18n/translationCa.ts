@@ -1740,11 +1740,12 @@ const translationCa = {
                     title: "Detalls de la comunicació amb la integració",
                 },
                 diagnostic: {
+                    title: "Diagnòstic",
                     label: "Repetir diagnòstic",
                 },
                 diagnosticAll: {
                     title: "Diagnòstic dels sistemes externs",
-                    label: "Diagnòstic",
+                    label: "Diagnòstic i reinici de plugins",
                 },
                 reiniciar: {
                     label: "Reiniciar plugin",

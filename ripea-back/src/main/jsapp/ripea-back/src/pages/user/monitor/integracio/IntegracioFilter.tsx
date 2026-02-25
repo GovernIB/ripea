@@ -12,11 +12,11 @@ const IntegracioFilterForm = ({handleOpen}:any) => {
         <GridFormField xs={3} name="dataInici"/>
         <GridFormField xs={3} name="dataFi"/>
         <GridFormField xs={3} name="tipus"/>
-        <GridFormField xs={4} name="descripcio"/>
-        <GridFormField xs={4} name="estat"/>
-        <Grid xs={0.6}/>
-        <GridButton xs={1} onClick={handleOpen} variant={'contained'} color={'success'}>
-            <Icon>lists</Icon>{t('page.integracio.action.diagnosticAll.label')}
+        <GridFormField xs={3} name="descripcio"/>
+        <GridFormField xs={3} name="estat"/>
+        <Grid xs={1.6}/>
+        <GridButton xs={2} onClick={handleOpen} variant={'contained'} color={'success'}>
+            <Icon>build</Icon>{t('page.integracio.action.diagnosticAll.label')}
         </GridButton>
     </>
 }

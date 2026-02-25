@@ -33,11 +33,11 @@ const columns:any[] = [
     },
     {
         field: 'tempsResposta',
-        flex: 0.5,
+        flex: 0.4,
     },
     {
         field: 'estat',
-        flex: 0.5,
+        flex: 0.3,
     },
 ];
 const perspectives:any[] = [];

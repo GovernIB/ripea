@@ -1740,11 +1740,12 @@ const translationEs = {
                     title: "Detalles de la comunicación con la integración",
                 },
                 diagnostic: {
+                    title: "Diagnóstico",
                     label: "Repetir diagnóstico",
                 },
                 diagnosticAll: {
                     title: "Diagnóstico de los sistemas externos",
-                    label: "Diagnóstico",
+                    label: "Diagnóstico i reinicio de plugins",
                 },
                 reiniciar: {
                     label: "Reiniciar plugin",

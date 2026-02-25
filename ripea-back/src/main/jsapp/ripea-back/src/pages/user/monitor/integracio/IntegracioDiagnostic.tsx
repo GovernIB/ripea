@@ -115,8 +115,8 @@ export const IntegracioDiagnosticFilter = ({apiReiniciar}:any) => {
         },
         {
             value: 'search',
-            text: t('page.integracio.action.diagnosticAll.label'),
-            icon: 'filter_alt',
+            text: t('page.integracio.action.diagnostic.title'),
+            icon: 'monitor_heart',
             componentProps: {
                 variant: "contained",
                 sx: { borderRadius: '4px' },
@@ -173,13 +173,13 @@ export const useIntegracioDiagnostic = (integracions:any[]) => {
 
     const actions = [
         {
-            label: t('page.integracio.action.reiniciar.label'),
-            icon: 'edit',
+            label: t('page.integracio.action.diagnostic.label'),
+            icon: 'monitor_heart',
             onClick: (row:any) => apiDiagnostic(row.codi, filter?.entitat, filter?.organ)
         },
         {
             label: t('page.integracio.action.reiniciar.label'),
-            icon: 'settings',
+            icon: 'cached',
             onClick: (row:any) => apiReiniciar(row.codi, filter?.entitat, filter?.organ)
         }
     ]
@@ -201,9 +201,9 @@ export const useIntegracioDiagnostic = (integracions:any[]) => {
                 {integracions?.map?.(i => {
                     const d = diagnostic.get(i.codi)
                     return <Grid container direction={"row"} display={'flex'} alignItems={'center'} columnSpacing={1}>
-                        <Grid item xs={4}><Typography variant={"body1"} ml={1}>{i.nom || i.codi}</Typography></Grid>
+                        <Grid item xs={3}><Typography variant={"body1"} ml={1}>{i.nom || i.codi}</Typography></Grid>
                         <Load value={d}>
-                            <Grid item xs={6.5}>
+                            <Grid item xs={7.5}>
                                 <Alert severity={getAlertSeverity(d?.nivell)}>{d?.missatge}</Alert>
                             </Grid>
                             <Grid item xs={1.5}>

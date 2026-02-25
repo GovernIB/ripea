@@ -29,6 +29,7 @@ public class IntegracioHelper {
 	
 	@Autowired private CacheHelper cacheHelper;
 	@Autowired private ConfigHelper configHelper;
+	@Autowired private MessageHelper messageHelper;
 
 	public static final int DEFAULT_MAX_ACCIONS = 20;
 
@@ -231,36 +232,9 @@ public class IntegracioHelper {
 
 	//El endpoint nomes es carrega al guardar una acció (tant Ok com error), pero no en el findAll per carregar pes pipelles de Integracions
 	public IntegracioDto novaIntegracio(String codi) {
-		
 		IntegracioDto integracio = new IntegracioDto();
 		integracio.setCodi(codi);
-		if (INTCODI_PFIRMA.equals(codi)) {
-			integracio.setNom("Portafirmes");			
-		} else if (INTCODI_ARXIU.equals(codi)) {
-			integracio.setNom("Arxiu digital");
-		} else if (INTCODI_CONCSV.equals(codi)) {
-			integracio.setNom("ConvCSV");
-		} else if (INTCODI_PINBAL.equals(codi)) {
-			integracio.setNom("PINBAL");
-		} else if (INTCODI_CONVERT.equals(codi)) {
-			integracio.setNom("Conversió doc.");
-		} else if (INTCODI_USUARIS.equals(codi)) {
-			integracio.setNom("Usuaris");
-		}  else if (INTCODI_CALLBACK.equals(codi)) {
-			integracio.setNom("Callback PF");
-		} else if (INTCODI_DADESEXT.equals(codi)) {
-			integracio.setNom("Dades ext.");
-		} else if (INTCODI_NOTIFICACIO.equals(codi)) {
-			integracio.setNom("Notificació");
-		} else if (INTCODI_FIRMASERV.equals(codi)) {
-			integracio.setNom("Firma servidor");
-		} else if (INTCODI_VIAFIRMA.equals(codi)) {
-			integracio.setNom("ViaFirma");
-		} else if (INTCODI_DIGITALITZACIO.equals(codi)) {
-			integracio.setNom("Digitalització");
-		} else if (INTCODI_REGISTRE.equals(codi)) {
-			integracio.setNom("Registre");
-		}
+		integracio.setNom(messageHelper.getMessage("sistema.extern.codi."+codi));		;
 		return integracio;
 	}
 }

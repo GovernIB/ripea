@@ -1,6 +1,7 @@
 package es.caib.ripea.service.intf.model;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Map;
 
@@ -98,8 +99,8 @@ public class IntegracioResource extends BaseResource<Long> {
     @FieldNameConstants
     public static class IntegracioFilterForm implements Serializable {
         private ResourceReference<EntitatResource, Long> entitat;
-        private Date dataInici;
-        private Date dataFi;
+        private LocalDateTime dataInici;
+        private LocalDateTime dataFi;
         private IntegracioAccioTipusEnumDto tipus;
         private String descripcio;
         private IntegracioAccioEstatEnumDto estat;

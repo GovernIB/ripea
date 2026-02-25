@@ -1740,11 +1740,12 @@ const translationEn = {
                     title: "Integration communication details",
                 },
                 diagnostic: {
+                    title: "Diagnostic",
                     label: "Repeat diagnostic",
                 },
                 diagnosticAll: {
                     title: "External systems diagnostics",
-                    label: "Diagnostics",
+                    label: "Diagnose and restart plugins",
                 },
                 reiniciar: {
                     label: "Restart plugin",

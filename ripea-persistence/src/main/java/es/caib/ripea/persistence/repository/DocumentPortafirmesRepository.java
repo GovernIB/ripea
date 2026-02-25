@@ -41,8 +41,12 @@ public interface DocumentPortafirmesRepository extends JpaRepository<DocumentPor
 			"			p.document.id = :documentId) ")
 	Boolean findErrorLastEnviamentPortafirmesByDocumentId(@Param("documentId") Long documentId);
 	
-	DocumentPortafirmesEntity findByPortafirmesId(
-			String portafirmesId);
+	DocumentPortafirmesEntity findByPortafirmesId(String portafirmesId);
+	
+	@Query( "select pf.portafirmesId " +
+			"from DocumentPortafirmesEntity pf " +
+			"where pf.id = (select max(n.id) from DocumentPortafirmesEntity n)")
+	String findLastEnviamentPortafirmes();
 
 	List<DocumentPortafirmesEntity> findByDocumentOrderByCreatedDateDesc(DocumentEntity document);
 

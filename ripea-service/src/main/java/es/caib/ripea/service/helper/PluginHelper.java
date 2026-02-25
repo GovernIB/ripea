@@ -101,6 +101,7 @@ import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.entity.UsuariEntity;
 import es.caib.ripea.persistence.repository.DocumentEnviamentInteressatRepository;
+import es.caib.ripea.persistence.repository.DocumentPortafirmesRepository;
 import es.caib.ripea.persistence.repository.ExpedientPeticioRepository;
 import es.caib.ripea.persistence.repository.FluxFirmaUsuariRepository;
 import es.caib.ripea.persistence.repository.MetaDocumentFluxPortafibRepository;
@@ -296,6 +297,7 @@ public class PluginHelper {
 	@Autowired private FluxFirmaUsuariRepository fluxFirmaUsuariRepository;
 	@Autowired private MetaDocumentFluxPortafibRepository metaDocumentFluxPortafibRepository;
 	@Autowired private UsuariRepository usuariRepository;
+	@Autowired private DocumentPortafirmesRepository documentPortafirmesRepository;
 
 	public List<String> rolsUsuariFindAmbCodi(String usuariCodi) {
 
@@ -8947,7 +8949,12 @@ public class PluginHelper {
 					return new GenericDto("integracio.diag.fserv.ko", "fa fa-times vermell", new Object[] {resultatDiagnostic});
 				}
 			} else if (codi.equals(IntegracioHelper.INTCODI_CALLBACK)) {
-				return new GenericDto("integracio.diag.cb.info", "fa fa-info-circle blau", new Object[] {codi});
+				String resultatDiagnostic = portafirmesCallBackDiagnostic(filtre);
+				if (resultatDiagnostic==null) {
+					return new GenericDto("integracio.diag.cb.ok", "fa fa-check verd", new Object[] {codi});
+				} else {
+					return new GenericDto("integracio.diag.cb.ko", "fa fa-times vermell", new Object[] {resultatDiagnostic});
+				}
 			} else if (codi.equals(IntegracioHelper.INTCODI_ARXIU)) {
 				String resultatDiagnostic = arxiuDiagnostic(filtre);
 				if (resultatDiagnostic==null) {
@@ -9070,6 +9077,17 @@ public class PluginHelper {
 		} catch (Exception ex) {
 			return ex.getMessage();
 		}
+	}
+	
+	public String portafirmesCallBackDiagnostic(DiagnosticFiltreDto filtre) {
+		try {
+			PortafirmesPlugin portafirmesPlugin = getPortafirmesPlugin(filtre.getEntitatCodi(), filtre.getOrganCodi());
+			String documentPortafirmesId = documentPortafirmesRepository.findLastEnviamentPortafirmes();
+			portafirmesPlugin.download(documentPortafirmesId);
+			return null;
+		} catch (Exception ex) {
+			return ex.getMessage();
+		}			
 	}
 	
 	public String firmaSimpleDiagnostic(DiagnosticFiltreDto filtre) {
