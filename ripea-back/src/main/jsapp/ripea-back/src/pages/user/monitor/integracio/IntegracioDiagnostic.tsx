@@ -3,12 +3,13 @@ import {MuiDialog, useBaseAppContext, useFormContext, useResourceApiService} fro
 import {useEffect, useMemo, useRef, useState} from "react";
 import StyledMuiFilter from "../../../../components/StyledMuiFilter.tsx";
 import GridFormField, {GridButton} from "../../../../components/GridFormField.tsx";
-import {Alert, Grid, Icon, Typography} from "@mui/material";
+import {Alert, Box, Grid, Icon, Typography} from "@mui/material";
 import * as builder from "../../../../util/springFilterUtils.ts";
 import {useSession} from "../../../../components/SessionStorageContext.tsx";
 import Load from "../../../../components/Load.tsx";
 import {getAlertSeverity} from "../../../../components/BaseApp.tsx";
 import {MenuActionButton} from "../../../../components/MenuButton.tsx";
+import AlertExpand from "../../../../components/AlertExpand.tsx";
 
 const useActions = () => {
     const {t} = useTranslation()
@@ -210,11 +211,30 @@ export const useIntegracioDiagnostic = (integracions:any[]) => {
             <Load value={integracions}>
                 {integracions?.map?.(i => {
                     const d = diagnostic.get(i.codi)
-                    return <Grid container direction={"row"} display={'flex'} alignItems={'center'} columnSpacing={1}>
+                    return <Grid container direction={"row"} display={'flex'} columnSpacing={1}>
                         <Grid item xs={3}><Typography variant={"body1"} ml={1}>{i.nom || i.codi}</Typography></Grid>
                         <Load value={d}>
                             <Grid item xs={7.5}>
-                                <Alert severity={getAlertSeverity(d?.nivell)}>{d?.missatge}</Alert>
+                                {d?.traza == null
+                                    ? <Alert severity={getAlertSeverity(d?.nivell)}>{d?.missatge}</Alert>
+                                    : <AlertExpand label={d?.missatge} severity={getAlertSeverity(d?.nivell)}>
+                                        <Box
+                                            sx={{
+                                                border: 'solid 1px #e3e3e3',
+                                                borderRadius: '4px',
+                                                backgroundColor: '#f5f5f5',
+                                                display: 'block',
+                                                overflow: 'auto',
+                                                whiteSpace: 'pre',
+                                                fontFamily: 'monospace', // opcional para parecer <pre>
+                                                mt: 1,
+                                                p: 1
+                                            }}
+                                        >
+                                            {d?.traza}
+                                        </Box>
+                                    </AlertExpand>
+                                }
                             </Grid>
                             <Grid item xs={1.5}>
                                 <MenuActionButton

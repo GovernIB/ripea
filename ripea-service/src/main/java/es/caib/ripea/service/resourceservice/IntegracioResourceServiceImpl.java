@@ -110,7 +110,7 @@ public class IntegracioResourceServiceImpl extends BaseMutableResourceService<In
 				filtre.setEntitatCodi(ee!=null?ee.getCodi():null);
 			}
 		}
-		
+
 		//2.- Fer la cerca
 		List<IntegracioAccioDto> accions = integracioHelper.findAccionsByIntegracioCodi(namedQueries[0], filtre);
 		
@@ -242,7 +242,8 @@ public class IntegracioResourceServiceImpl extends BaseMutableResourceService<In
                 Map<String, String> result = new HashMap<String, String>();
                 result.put("nivell", nivell);
                 result.put("missatge", missatge);
-                result.put("traza", ExceptionUtils.getStackTrace(resultat.getExcepcio()));
+                if (resultat.getExcepcio() != null)
+                    result.put("traza", ExceptionUtils.getStackTrace(resultat.getExcepcio()));
                 return (Serializable) result;
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/integracio/"+entity.getId()+"/DiagnosticPluginActionExecutor", e);
