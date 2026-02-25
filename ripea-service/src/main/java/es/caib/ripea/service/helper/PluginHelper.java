@@ -8677,10 +8677,7 @@ public class PluginHelper {
 						pluginCode)) {
 			digitalitzacioPlugins = new HashMap<>();
 		}
-		if ("pf".equals(
-				pluginCode)
-				|| "xx".equals(
-						pluginCode)) {
+		if ("pf".equals(pluginCode) || "pfCall".equals(pluginCode) || "xx".equals(pluginCode)) {
 			portafirmesPlugins = new HashMap<>();
 		}
 		if ("vf".equals(

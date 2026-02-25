@@ -2,6 +2,7 @@ package es.caib.ripea.service.resourceservice;
 
 import java.io.Serializable;
 import java.lang.management.ManagementFactory;
+import java.lang.management.OperatingSystemMXBean;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
 import java.util.ArrayList;
@@ -40,6 +41,7 @@ public class ThreadInfoResourceServiceImpl extends BaseMutableResourceService<Th
 
 	private final ExcepcioLogHelper excepcioLogHelper;
 	private final MessageHelper messageHelper;
+	private static OperatingSystemMXBean osBean;
 	
     @PostConstruct
     public void init() {
@@ -105,6 +107,7 @@ public class ThreadInfoResourceServiceImpl extends BaseMutableResourceService<Th
 			try {
 				SystemInfoResource sir = new SystemInfoResource();
 				sir.setSystemInfo(MonitorHelper.getSystemInfo());
+				sir.setArquitectura(osBean!=null?osBean.getArch():null);
 				sir.setInformacioSistema(MonitorHelper.getInfoSistema());
 				sir.setJvmInfo(MonitorHelper.getJvmInfo());
 				sir.setJvmMemory(MonitorHelper.getJvmMemory());

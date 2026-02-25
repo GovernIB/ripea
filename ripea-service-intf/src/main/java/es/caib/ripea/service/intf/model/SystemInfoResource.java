@@ -19,6 +19,7 @@ import lombok.Setter;
 public class SystemInfoResource implements Serializable {
 		
 	private SystemInfo systemInfo;
+	private String arquitectura;
 	private InformacioSistema informacioSistema;
 	private JvmInfo jvmInfo;
 	private MemoryUsage jvmMemory;

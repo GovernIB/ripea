@@ -244,7 +244,7 @@ public class IntegracioResourceServiceImpl extends BaseMutableResourceService<In
                 Map<String, String> result = new HashMap<String, String>();
                 result.put("nivell", nivell);
 //                result.put("missatge", missatge);
-                result.put("missatge", missatge.length() > 100 ?missatge.substring(0, 100)+"..." :missatge);
+                result.put("missatge", missatge.length() > 120 ?missatge.substring(0, 120)+"..." :missatge);
                 if (resultat.getExcepcio() != null) {
                     result.put("traza", ExceptionUtils.getStackTrace(resultat.getExcepcio()));
                 }
@@ -275,7 +275,8 @@ public class IntegracioResourceServiceImpl extends BaseMutableResourceService<In
 						case "PORTAFIRMES": pluginHelper.resetPlugins("pf"); break;
 						case "FIRMA_SIMPLE_WEB": pluginHelper.resetPlugins("si"); break;
 						case "FIRMA_SERVIDOR": pluginHelper.resetPlugins("fs"); break;
-						//CALLBACK es el callback portafirmes, que té tab en el monitor, pero que realment no hi ha res a resetejar
+						case "CALLBACK": pluginHelper.resetPlugins("pfCall"); break;
+						case "ARXIU": pluginHelper.resetPlugins("ax"); break;
 						case "CONCSV": pluginHelper.resetPlugins("csv"); break;
 						case "GES_DOC": pluginHelper.resetPlugins("gd"); break;
 						//PINBAL no té un array de plugins en memoria que es pugui resetejar...
