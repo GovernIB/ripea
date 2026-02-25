@@ -24,6 +24,7 @@ import es.caib.ripea.service.intf.base.exception.ResourceNotFoundException;
 import es.caib.ripea.service.intf.dto.MonitorTascaEstatEnum;
 import es.caib.ripea.service.intf.dto.MonitorTascaInfo;
 import es.caib.ripea.service.intf.model.BackGroundTaskResource;
+import es.caib.ripea.service.intf.model.BackGroundTaskResource.MassiveRestartTaskForm;
 import es.caib.ripea.service.intf.resourceservice.BackGroundTaskResourceService;
 import es.caib.ripea.service.intf.service.MonitorTasquesService;
 import es.caib.ripea.service.intf.utils.Utils;
@@ -98,23 +99,27 @@ public class BackGroundTaskResourceServiceImpl extends BaseMutableResourceServic
 		return null;
 	}
 	
-	private class RestartTaskActionExecutor implements ActionExecutor<BackGroundTaskResourceEntity, Serializable, Serializable> {
+	private class RestartTaskActionExecutor implements ActionExecutor<BackGroundTaskResourceEntity, BackGroundTaskResource.MassiveRestartTaskForm, Serializable> {
 
 		@Override
-		public void onChange(Serializable id, Serializable previous, String fieldName, Object fieldValue,
-				Map<String, AnswerValue> answers, String[] previousFieldNames, Serializable target) {}
-
-		@Override
-		public Serializable exec(String code, BackGroundTaskResourceEntity entity, Serializable params) throws ActionExecutionException {
+		public Serializable exec(String code, BackGroundTaskResourceEntity entity, BackGroundTaskResource.MassiveRestartTaskForm params) throws ActionExecutionException {
 			try {
-				monitorTasquesService.reiniciarTasquesEnSegonPla(code);
-				schedulingConfig.restartSchedulledTasks(code);
+				if (params.getIds()!=null) {
+					for (String id: params.getIds()) {
+						monitorTasquesService.reiniciarTasquesEnSegonPla(id);
+						schedulingConfig.restartSchedulledTasks(id);
+					}
+				}
 				return "{\"resultat\": \"OK\"}";
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/backGroundTask/"+entity.getId()+"/RestartTaskActionExecutor", e);
 				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, messageHelper.getMessage("message.common.action.error")+": "+e.getMessage());
 			}
 		}
+
+		@Override
+		public void onChange(Serializable id, MassiveRestartTaskForm previous, String fieldName, Object fieldValue,
+				Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveRestartTaskForm target) {}
 	}
 
 	@Override

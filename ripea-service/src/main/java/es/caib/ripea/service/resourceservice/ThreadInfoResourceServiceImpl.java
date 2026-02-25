@@ -41,7 +41,6 @@ public class ThreadInfoResourceServiceImpl extends BaseMutableResourceService<Th
 
 	private final ExcepcioLogHelper excepcioLogHelper;
 	private final MessageHelper messageHelper;
-	private static OperatingSystemMXBean osBean;
 	
     @PostConstruct
     public void init() {
@@ -107,7 +106,7 @@ public class ThreadInfoResourceServiceImpl extends BaseMutableResourceService<Th
 			try {
 				SystemInfoResource sir = new SystemInfoResource();
 				sir.setSystemInfo(MonitorHelper.getSystemInfo());
-				sir.setArquitectura(osBean!=null?osBean.getArch():null);
+				sir.setArquitectura(ManagementFactory.getOperatingSystemMXBean()!=null?ManagementFactory.getOperatingSystemMXBean().getArch():null);
 				sir.setInformacioSistema(MonitorHelper.getInfoSistema());
 				sir.setJvmInfo(MonitorHelper.getJvmInfo());
 				sir.setJvmMemory(MonitorHelper.getJvmMemory());

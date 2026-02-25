@@ -1,5 +1,11 @@
 package es.caib.ripea.service.intf.model;
 
+import java.io.Serializable;
+import java.util.List;
+
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
 import es.caib.ripea.service.intf.base.annotation.ResourceArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.model.BaseResource;
@@ -20,7 +26,8 @@ import lombok.experimental.FieldNameConstants;
     artifacts = {
             @ResourceArtifact(
                     type = ResourceArtifactType.ACTION,
-                    code = BackGroundTaskResource.ACTION_RESTART_TASK),
+                    code = BackGroundTaskResource.ACTION_RESTART_TASK,
+                    formClass = BackGroundTaskResource.MassiveRestartTaskForm.class),
         })        
 public class BackGroundTaskResource extends BaseResource<String> {
 
@@ -32,5 +39,13 @@ public class BackGroundTaskResource extends BaseResource<String> {
 	private String dataInici;
 	private String properaExecucio;
 	private String observacions;
-
+    
+    @Getter
+    @Setter
+    public static class MassiveRestartTaskForm implements Serializable {
+		@NotNull
+        @NotEmpty
+        private List<String> ids;
+        private boolean massivo = false;
+    }
 }

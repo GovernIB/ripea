@@ -9079,7 +9079,7 @@ public class PluginHelper {
 	public Exception portafirmesCallBackDiagnostic(DiagnosticFiltreDto filtre) {
 		try {
 			PortafirmesPlugin portafirmesPlugin = getPortafirmesPlugin(filtre.getEntitatCodi(), filtre.getOrganCodi());
-			String documentPortafirmesId = documentPortafirmesRepository.findLastEnviamentPortafirmes();
+			String documentPortafirmesId = documentPortafirmesRepository.findLastEnviamentPortafirmesNotCancelat();
 			portafirmesPlugin.download(documentPortafirmesId);
 			return null;
 		} catch (Exception ex) {
