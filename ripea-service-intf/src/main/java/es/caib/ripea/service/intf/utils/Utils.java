@@ -935,8 +935,8 @@ public class Utils {
         // Regex que captura: campo + operador + valor (con o sin comillas)
         // Operadores soportados: >=, <=, >:, <:, >, <, ~, :
         Pattern pattern = Pattern.compile(
-            "(\\w+)\\s*(>=|<=|>:|<:|>|<|~|:)\\s*'([^']*)'|" +
-            "(\\w+)\\s*(>=|<=|>:|<:|>|<|~|:)\\s*(\\S+)"
+            "([\\w.]+)\\s*(>=|<=|>:|<:|>|<|~|:)\\s*'([^']*)'|" +
+            "([\\w.]+)\\s*(>=|<=|>:|<:|>|<|~|:)\\s*(\\S+)"
         );
 
         Matcher matcher = pattern.matcher(cleaned);
