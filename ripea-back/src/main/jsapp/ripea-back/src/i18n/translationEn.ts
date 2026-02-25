@@ -1760,10 +1760,13 @@ const translationEn = {
         sistema: {
             detail: {
                 sistemaOperatiu: "Operating system",
+                arquitectura: "Architecture",
                 processadors: "Processors",
+                jbossVersion: "JBoss version",
+                applicationServerInfo: "Application server information",
                 tempsFuncionant: "Uptime",
-                jvmMemory: "Memory",
-                disksUsage: "Disk usage",
+                jvmMemory: "Java Virtual Machine",
+                disksUsage: "Disk and CPU",
             },
             tabs: {
                 sistema: "System",

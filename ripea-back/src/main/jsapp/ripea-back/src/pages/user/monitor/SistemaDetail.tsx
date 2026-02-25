@@ -3,8 +3,8 @@ import {useState} from "react";
 import {MuiDialog, useBaseAppContext, useMuiDataGridApiRef, useResourceApiService} from "reactlib";
 import TabComponent from "../../../components/TabComponent.tsx";
 import StyledMuiGrid, {ToolbarButton} from "../../../components/StyledMuiGrid.tsx";
-import {DetailCard, DetailCardContent} from "../../../components/CardData.tsx";
-import {LinearProgress, Grid2 as Grid, Box} from "@mui/material";
+import {ContenidoData, DetailCard, DetailCardContent} from "../../../components/CardData.tsx";
+import {LinearProgress, Grid2 as Grid, Box, CardContent} from "@mui/material";
 
 const useSistemAction = () => {
     const {
@@ -43,12 +43,21 @@ const Sistema = ({system, refresh}:any) => {
             <ToolbarButton title={t('common.refresh')} icon={'refresh'} onClick={refresh} color={'primary'}/>
         </Box>
     <DetailCard>
-        <DetailCardContent title={t('page.sistema.detail.sistemaOperatiu')}>{system?.informacioSistema?.sistemaOperatiu}</DetailCardContent>
-        <DetailCardContent title={t('page.sistema.detail.processadors')}>{system?.informacioSistema?.processadors}</DetailCardContent>
-        <DetailCardContent title={t('page.sistema.detail.tempsFuncionant')}>{system?.informacioSistema?.tempsFuncionant}</DetailCardContent>
+        <DetailCardContent size={4} title={t('page.sistema.detail.sistemaOperatiu')}>{system?.informacioSistema?.sistemaOperatiu}</DetailCardContent>
+        <DetailCardContent size={4} title={t('page.sistema.detail.arquitectura')}>{system?.arquitectura}</DetailCardContent>
+        <DetailCardContent size={4} title={t('page.sistema.detail.processadors')}>{system?.informacioSistema?.processadors}</DetailCardContent>
+        <DetailCardContent size={4} title={t('page.sistema.detail.jbossVersion')}>{system?.jbossVersion}</DetailCardContent>
+        <DetailCardContent size={4} title={t('page.sistema.detail.applicationServerInfo')}>{system?.applicationServerInfo}</DetailCardContent>
+        <DetailCardContent size={4} title={t('page.sistema.detail.tempsFuncionant')}>{system?.informacioSistema?.tempsFuncionant}</DetailCardContent>
 
         <DetailCardContent title={t('page.sistema.detail.jvmMemory')}>
             <Grid container display={'flex'} alignItems={'center'}>
+                <ContenidoData xs={6} titleXs={6} textXs={6} title={'daemonThreadCount'}>{system?.jvmInfo?.daemonThreadCount}</ContenidoData>
+                <ContenidoData xs={6} titleXs={6} textXs={6} title={'gcCount'}>{system?.jvmInfo?.gcCount}</ContenidoData>
+                <ContenidoData xs={6} titleXs={6} textXs={6} title={'gcTime'}>{system?.jvmInfo?.gcTime}</ContenidoData>
+                <ContenidoData xs={6} titleXs={6} textXs={6} title={'peakThreadCount'}>{system?.jvmInfo?.peakThreadCount}</ContenidoData>
+                <ContenidoData xs={6} titleXs={6} textXs={6} title={'threadCount'}>{system?.jvmInfo?.threadCount}</ContenidoData>
+                <ContenidoData xs={6} titleXs={6} textXs={6} title={''}>{}</ContenidoData>
                 <Grid size={2}/>
                 <Grid size={6}>
                     <LinearProgress variant="determinate" color={'success'}
@@ -62,6 +71,10 @@ const Sistema = ({system, refresh}:any) => {
 
         <DetailCardContent title={t('page.sistema.detail.disksUsage')}>
             <Grid container display={'flex'} alignItems={'center'}>
+                <ContenidoData xs={6} titleXs={6} textXs={6} title={'formatedLoadAverage'}>{system?.cpuUsage?.formatedLoadAverage}</ContenidoData>
+                <ContenidoData xs={6} titleXs={6} textXs={6} title={'loadAverage'}>{system?.cpuUsage?.loadAverage}</ContenidoData>
+                <ContenidoData xs={6} titleXs={6} textXs={6} title={'validProcessCpuLoad'}>{system?.cpuUsage?.validProcessCpuLoad ?"true" :"false"}</ContenidoData>
+                <ContenidoData xs={6} titleXs={6} textXs={6} title={'validSystemCpuLoad'}>{system?.cpuUsage?.validSystemCpuLoad ?"true" :"false"}</ContenidoData>
                 {system?.disksUsage?.map((disk:any) => <>
                     <Grid size={2}>{disk.nom}</Grid>
                     <Grid size={6}>

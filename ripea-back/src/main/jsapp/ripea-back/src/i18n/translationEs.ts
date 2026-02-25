@@ -1760,10 +1760,13 @@ const translationEs = {
         sistema: {
             detail: {
                 sistemaOperatiu: "Sistema operativo",
+                arquitectura: "Arquitectura",
                 processadors: "Procesadores",
+                jbossVersion: "Versión de JBoss",
+                applicationServerInfo: "Información del servidor de aplicaciones",
                 tempsFuncionant: "Tiempo en funcionamiento",
-                jvmMemory: "Memoria",
-                disksUsage: "Uso de disco",
+                jvmMemory: "Máquina virtual de Java",
+                disksUsage: "Disco y CPU",
             },
             tabs: {
                 sistema: "Sistema",

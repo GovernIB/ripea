@@ -1760,10 +1760,13 @@ const translationCa = {
         sistema: {
             detail: {
                 sistemaOperatiu: "Sistema operatiu",
+                arquitectura: "Arquitectura",
                 processadors: "Processadors",
+                jbossVersion: "Versió de JBoss",
+                applicationServerInfo: "Informació del servidor d'aplicacions",
                 tempsFuncionant: "Temps funcionant",
-                jvmMemory: "Memòria",
-                disksUsage: "Ús de disc",
+                jvmMemory: "Màquina virtual de Java",
+                disksUsage: "Disc i CPU",
             },
             tabs: {
                 sistema: "Sistema",
