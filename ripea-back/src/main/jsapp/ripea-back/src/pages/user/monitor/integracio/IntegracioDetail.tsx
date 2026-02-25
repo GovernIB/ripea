@@ -5,6 +5,8 @@ import Load from "../../../../components/Load.tsx";
 import {ContenidoData, DetailCard} from "../../../../components/CardData.tsx";
 import {formatDate} from "../../../../util/dateUtils.ts";
 import {FieldData, MuiDetail} from "../../../../components/MuiDetail.tsx";
+import {StyledEstat} from "./IntegracioGrid.tsx";
+import {Box, Grid2 as Grid} from "@mui/material";
 
 const IntegracioDetail = ({entity, fields}:any) => {
     return <MuiDetail entity={entity} fields={fields}>
@@ -13,14 +15,37 @@ const IntegracioDetail = ({entity, fields}:any) => {
             <FieldData field={'descripcio'}/>
             <FieldData field={'tipus'}/>
             <FieldData field={'endpoint'}/>
-            <FieldData field={'estat'}/>
+            <FieldData field={'estat'} renderCell={(formattedValue:string) =>
+                <StyledEstat entity={entity}>{formattedValue}</StyledEstat>}/>
             <FieldData field={'tempsResposta'}/>
             <FieldData field={'parametres'}>
-                {entity?.data?.map?.((param:any) =>
-                    <ContenidoData title={param.key}>{param.value}</ContenidoData>
-                )}
+                <Load value={entity?.parametres} noEffect>
+                    {Object.entries(entity?.parametres)?.map?.(([key, value]) =>
+                        <ContenidoData title={key}>{value}</ContenidoData>
+                    )}
+                </Load>
             </FieldData>
+            <FieldData field={'errorDescripcio'} hidden={!entity?.errorDescripcio}/>
+            <FieldData field={'excepcioMessage'} hidden={!entity?.excepcioMessage}/>
         </DetailCard>
+
+        <Grid size={12} hidden={!entity?.excepcioStacktrace}>
+            <Box
+                sx={{
+                    border: 'solid 1px #e3e3e3',
+                    borderRadius: '4px',
+                    backgroundColor: '#f5f5f5',
+                    display: 'block',
+                    overflow: 'auto',
+                    whiteSpace: 'pre',
+                    fontFamily: 'monospace', // opcional para parecer <pre>
+                    mt: 1,
+                    p: 1
+                }}
+            >
+                {entity?.excepcioStacktrace}
+            </Box>
+        </Grid>
     </MuiDetail>
 }
 

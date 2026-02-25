@@ -31,6 +31,7 @@ const useActions = () => {
 
     const apiDiagnosticAll = (integracions:string[], entitat:any, organ:any) => {
         if (integracions != null && integracions.length > 0) {
+            setDiagnostic(new Map())
             let count = 0;
 
             intervalRef.current = setInterval(() => {
@@ -52,6 +53,7 @@ const useActions = () => {
     }
 
     const apiDiagnostic = (codiIntegracio:any, entitat:any, organ:any) => {
+        putDiagnostic(codiIntegracio, undefined)
         apiAction(undefined, {code: 'DIAGNOSTIC_PLUGIN', data: {codiIntegracio, entitat, organ}})
             .then((response) => putDiagnostic(codiIntegracio, response))
             .catch((error) => {

@@ -120,7 +120,10 @@ public class IntegracioResourceServiceImpl extends BaseMutableResourceService<In
 		if (accions != null) {
 			for (IntegracioAccioDto accio: accions) {
 				if (accio.getIndex() != null && id.equals(accio.getIndex())) {
-					return objectMappingHelper.newInstanceMap(accio, IntegracioResource.class);
+                    IntegracioResource integracioResource = objectMappingHelper.newInstanceMap(accio, IntegracioResource.class);
+                    integracioResource.setParametres(accio.getParametres());
+                    return integracioResource;
+//					return objectMappingHelper.newInstanceMap(accio, IntegracioResource.class);
 				}
 			}
 		}

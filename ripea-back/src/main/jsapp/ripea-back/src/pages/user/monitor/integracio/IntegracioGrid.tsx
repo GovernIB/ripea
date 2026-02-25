@@ -8,6 +8,18 @@ import Load from "../../../../components/Load.tsx";
 import {IntegracioFilter} from "./IntegracioFilter.tsx";
 import {useIntegracioTab} from "./IntegracioTab.tsx";
 import {useIntegracioDetail} from "./IntegracioDetail.tsx";
+import {EstatMessage} from "../../../remesa/RemesaGrid.tsx";
+
+export const StyledEstat = (props:any) => {
+    const {entity, children} = props;
+
+    switch (entity?.estat) {
+        case "OK": return <EstatMessage icon={"check"} color='success'>{children}</EstatMessage>
+        case "ERROR": return <EstatMessage icon={"warning"} color='error'>{children}</EstatMessage>
+    }
+
+    return <>{children}</>
+}
 
 const columns:any[] = [
     {
@@ -38,6 +50,7 @@ const columns:any[] = [
     {
         field: 'estat',
         flex: 0.3,
+        renderCell: (params:any) => <StyledEstat entity={params?.row}>{params?.formattedValue}</StyledEstat>
     },
 ];
 const perspectives:any[] = [];
@@ -68,7 +81,7 @@ export const IntegracioGrid = () => {
                 columns={columns}
                 sortModel={sortModel}
                 perspectives={perspectives}
-                namedQueries={[value]}
+                namedQueries={useMemo(() => [value], [value])}
                 // onRefresh={refresh}
                 rowAdditionalActions={actions}
                 toolbarElementsWithPositions={[
@@ -79,8 +92,8 @@ export const IntegracioGrid = () => {
                 ]}
                 readOnly
             />
-            {dialog}
             </Load>
+            {dialog}
         </CardPage>
     </GridPage>
 }
