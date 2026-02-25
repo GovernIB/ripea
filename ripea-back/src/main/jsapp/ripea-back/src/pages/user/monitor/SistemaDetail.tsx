@@ -2,9 +2,9 @@ import {useTranslation} from "react-i18next";
 import {useState} from "react";
 import {MuiDialog, useBaseAppContext, useMuiDataGridApiRef, useResourceApiService} from "reactlib";
 import TabComponent from "../../../components/TabComponent.tsx";
-import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
+import StyledMuiGrid, {ToolbarButton} from "../../../components/StyledMuiGrid.tsx";
 import {DetailCard, DetailCardContent} from "../../../components/CardData.tsx";
-import {LinearProgress, Grid2 as Grid} from "@mui/material";
+import {LinearProgress, Grid2 as Grid, Box} from "@mui/material";
 
 const useSistemAction = () => {
     const {
@@ -31,14 +31,18 @@ const useSistemAction = () => {
     }
 }
 
-const Sistema = ({system}:any) => {
+const Sistema = ({system, refresh}:any) => {
     const { t } = useTranslation();
 
     const getPercentage = (value:number, total:number) => {
         return Math.round(value * 100 / total)
     }
 
-    return <DetailCard>
+    return <>
+        <Box display={'flex'} justifyContent={'end'} mb={1}>
+            <ToolbarButton title={t('common.refresh')} icon={'refresh'} onClick={refresh} color={'primary'}/>
+        </Box>
+    <DetailCard>
         <DetailCardContent title={t('page.sistema.detail.sistemaOperatiu')}>{system?.informacioSistema?.sistemaOperatiu}</DetailCardContent>
         <DetailCardContent title={t('page.sistema.detail.processadors')}>{system?.informacioSistema?.processadors}</DetailCardContent>
         <DetailCardContent title={t('page.sistema.detail.tempsFuncionant')}>{system?.informacioSistema?.tempsFuncionant}</DetailCardContent>
@@ -70,7 +74,7 @@ const Sistema = ({system}:any) => {
                 </>)}
             </Grid>
         </DetailCardContent>
-    </DetailCard>
+    </DetailCard></>
 }
 
 const columnsFils = [
@@ -212,7 +216,6 @@ export const useSistemaDetail = () => {
     const { t } = useTranslation();
 
     const [open, setOpen] = useState(false);
-    const [tab, setTab] = useState<any>();
 
     const {system, apiSystem} = useSistemAction();
     const handleOpen = () => {
@@ -232,23 +235,13 @@ export const useSistemaDetail = () => {
             text: t('common.close'),
             icon: 'close',
         },
-        {
-            value: 'refresh',
-            text: t('common.refresh'),
-            icon: 'cached',
-            componentProps: {
-                variant: 'contained',
-                color: 'warning',
-                disabled: tab !== 'sistema'
-            }
-        },
     ]
 
     const tabs = [
         {
             value: "sistema",
             label: t('page.sistema.tabs.sistema'),
-            content: <Sistema system={system}/>
+            content: <Sistema system={system} refresh={apiSystem}/>
         },
         {
             value: "fils",
@@ -270,21 +263,12 @@ export const useSistemaDetail = () => {
             componentProps={{ fullWidth: true, maxWidth: 'lg' }}
             buttons={buttons}
             buttonCallback={(value) => {
-                if (value === 'refresh') {
-                    if (tab === 'sistema') {
-                        apiSystem();
-                    }
-                }
                 if (value === 'close') {
                     handleClose();
                 }
             }}
         >
-            <TabComponent
-                tabs={tabs}
-                value={tab}
-                onChange={setTab}
-            />
+            <TabComponent tabs={tabs} />
         </MuiDialog>
 
     return {
