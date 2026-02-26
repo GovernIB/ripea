@@ -20,6 +20,11 @@ const useActions = () => {
     const {temporalMessageShow} = useBaseAppContext();
 
     const intervalRef = useRef<number | null>(null);
+    const clean = () => {
+        if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+        }
+    }
 
     const [diagnostic, setDiagnostic] = useState<Map<string, any>>(new Map());
     const putDiagnostic = (key:string, value:any) => {
@@ -32,23 +37,19 @@ const useActions = () => {
 
     const apiDiagnosticAll = (integracions:string[], entitat:any, organ:any) => {
         if (integracions != null && integracions.length > 0) {
+            clean()
             setDiagnostic(new Map())
             let count = 0;
 
             intervalRef.current = setInterval(() => {
-                apiDiagnostic(integracions[count], entitat, organ)
+                if (integracions.length > count) {
+                    apiDiagnostic(integracions[count], entitat, organ)
+                } else {
+                    clean()
+                }
 
                 count++;
-                if (count >= integracions.length) {
-                    if (intervalRef.current) {
-                        clearInterval(intervalRef.current);
-                    }
-                }
-                return () => {
-                    if (intervalRef.current) {
-                        clearInterval(intervalRef.current)
-                    }
-                }
+                return clean
             }, 500);
         }
     }
@@ -57,9 +58,7 @@ const useActions = () => {
         putDiagnostic(codiIntegracio, undefined)
         apiAction(undefined, {code: 'DIAGNOSTIC_PLUGIN', data: {codiIntegracio, entitat, organ}})
             .then((response) => putDiagnostic(codiIntegracio, response))
-            .catch((error) => {
-                temporalMessageShow(null, error?.message, 'error');
-            });
+            .catch((error) => putDiagnostic(codiIntegracio, {nivell: "ERROR", missatge: error?.message}));
     }
 
     const apiReiniciar = (codiIntegracio:any, entitat:any, organ:any) => {
