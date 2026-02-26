@@ -18,6 +18,7 @@ const AlertExpand = (props:any) => {
                 fontSize: '0.85rem',
                 minHeight: 'unset',
                 lineHeight: 1.3,
+                padding: '6px',
                 ...sx, // permite sobrescribir desde fuera
             }}
             action={

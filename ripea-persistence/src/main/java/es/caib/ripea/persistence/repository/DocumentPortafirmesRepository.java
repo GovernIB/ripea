@@ -45,9 +45,8 @@ public interface DocumentPortafirmesRepository extends JpaRepository<DocumentPor
 	
 	@Query( "select pf.portafirmesId " +
 			"from DocumentPortafirmesEntity pf " +
-			"where pf.id = (select max(n.id) from DocumentPortafirmesEntity n) "+
-			"and pf.estat IN ('PENDENT', 'ENVIAT', 'PROCESSAT')")
-	String findLastEnviamentPortafirmesNotCancelat();
+			"where pf.id = (select max(n.id) from DocumentPortafirmesEntity n) ")
+	String findLastEnviamentPortafirmes();
 
 	List<DocumentPortafirmesEntity> findByDocumentOrderByCreatedDateDesc(DocumentEntity document);
 

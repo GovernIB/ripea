@@ -233,7 +233,6 @@ const PermisEntitatModifyForm = () => {
         <GridFormField xs={12} name="principal" disabled={!!data?.id} readOnly={!!data?.id} required/>
         <GridFormField xs={12} name="sid" disabled={!!data?.id} readOnly={!!data?.id}/>
         <GridFormField xs={12} name="admin"/>
-        <GridFormField xs={12} name="adminLectura"/>
         <GridFormField xs={12} name="user"/>
     </Grid>
 }

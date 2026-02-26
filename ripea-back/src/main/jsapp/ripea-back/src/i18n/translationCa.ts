@@ -1662,7 +1662,7 @@ const translationCa = {
             title: "Avis",
             action: {
                 new: {
-                    label: "Nov avís",
+                    label: "Nou avís",
                     ok: "Avís creat correctament",
                 },
                 update: {

@@ -150,15 +150,14 @@ public class IntegracioController extends BaseUserController {
 	
 	@RequestMapping(value = "/diagnostic/{codi}", method = RequestMethod.GET)
 	@ResponseBody
-	public GenericDto integracioDiagnosticAmbCodi(HttpServletRequest request, @PathVariable String codi, Model model) {
-		
+	public GenericDto integracioDiagnosticAmbCodi(HttpServletRequest request, @PathVariable String codi, Model model) throws Exception {
 		Object filtreObj = RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_FILTRE_DIAG);
 		DiagnosticFiltreDto filtre = new DiagnosticFiltreDto();
 		if (filtreObj!=null) {
 			filtre = (DiagnosticFiltreDto)filtreObj;
 		}
-		
 		GenericDto resultat = aplicacioService.integracioDiagnostic(codi, filtre);
+		resultat.setExcepcio(null);
 		String missatge = getMessage(request, resultat.getCodi(), resultat.getArguments());
 		resultat.setCodi(Utils.abbreviate(missatge, 200));
 		return resultat;

@@ -9079,11 +9079,13 @@ public class PluginHelper {
 	public Exception portafirmesCallBackDiagnostic(DiagnosticFiltreDto filtre) {
 		try {
 			PortafirmesPlugin portafirmesPlugin = getPortafirmesPlugin(filtre.getEntitatCodi(), filtre.getOrganCodi());
-			String documentPortafirmesId = documentPortafirmesRepository.findLastEnviamentPortafirmesNotCancelat();
+			String documentPortafirmesId = documentPortafirmesRepository.findLastEnviamentPortafirmes();
 			portafirmesPlugin.download(documentPortafirmesId);
 			return null;
 		} catch (Exception ex) {
-			return ex;
+			if (ex.getCause().getMessage()!=null && ex.getCause().getMessage().contains("no és el propietari de la petició de firma")) {
+				return null;
+			} else return ex;
 		}			
 	}
 	
