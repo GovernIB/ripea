@@ -966,4 +966,124 @@ public class Utils {
             default:  return  field + "_" + operator;
         }
     }
+    
+    /**
+     * Parsea un filtro Oracle en String a un Map de clave-valor.
+     * Soporta:
+     *   - campo is null
+     *   - campo is not null
+     *   - campo:'valor'
+     *   - campo:valor
+     *   - campo operator valor (=, !=, <, >, <=, >=)
+     *   - operadores AND / OR (ignorados como separadores)
+     */
+    public static Map<String, Object> parseOracleFilter(String filter) {
+        Map<String, Object> result = new LinkedHashMap<>();
+
+        if (filter == null || filter.isBlank()) {
+            return result;
+        }
+
+        // Eliminar paréntesis externos y espacios
+        String cleaned = filter.trim();
+        cleaned = cleaned.replaceAll("^\\(+|\\)+$", "").trim();
+
+        // Dividir por AND / OR (case-insensitive), respetando que no estén dentro de comillas
+        List<String> conditions = splitByLogicalOperators(cleaned);
+
+        for (String condition : conditions) {
+            condition = condition.trim();
+            if (condition.isEmpty()) continue;
+
+            parseCondition(condition, result);
+        }
+
+        return result;
+    }
+
+    private static void parseCondition(String condition, Map<String, Object> result) {
+        // Caso: campo IS NULL
+        Pattern isNullPattern = Pattern.compile("^([\\w.]+)\\s+is\\s+null$", Pattern.CASE_INSENSITIVE);
+        Matcher m = isNullPattern.matcher(condition);
+        if (m.matches()) {
+            result.put(m.group(1), null);
+            return;
+        }
+
+        // Caso: campo IS NOT NULL
+        Pattern isNotNullPattern = Pattern.compile("^([\\w.]+)\\s+is\\s+not\\s+null$", Pattern.CASE_INSENSITIVE);
+        m = isNotNullPattern.matcher(condition);
+        if (m.matches()) {
+            result.put(m.group(1), "__NOT_NULL__");
+            return;
+        }
+
+        // Caso: campo:'valor' o campo:valor o campo.nested:'valor'
+        Pattern colonPattern = Pattern.compile("^([\\w.]+):'?([^']*)'?$");
+        m = colonPattern.matcher(condition);
+        if (m.matches()) {
+            result.put(m.group(1), m.group(2));
+            return;
+        }
+
+        // Caso: campo operador valor (=, !=, <=, >=, <, >)
+        Pattern operatorPattern = Pattern.compile("^([\\w.]+)\\s*(!=|<=|>=|=|<|>)\\s*'?([^']*)'?$");
+        m = operatorPattern.matcher(condition);
+        if (m.matches()) {
+            result.put(m.group(1) + "[" + m.group(2) + "]", m.group(3));
+            return;
+        }
+
+        // Si no encaja con nada, guardar la condición raw
+        result.put("__unparsed__", condition);
+    }
+
+    /**
+     * Divide la expresión por AND/OR sin romper valores entre comillas simples.
+     */
+    private static List<String> splitByLogicalOperators(String expression) {
+        List<String> parts = new ArrayList<>();
+        StringBuilder current = new StringBuilder();
+        boolean inQuotes = false;
+        int i = 0;
+
+        while (i < expression.length()) {
+            char c = expression.charAt(i);
+
+            if (c == '\'') {
+                inQuotes = !inQuotes;
+                current.append(c);
+                i++;
+            } else if (!inQuotes) {
+                // Comprobar AND
+                if (i + 4 <= expression.length() &&
+                        expression.substring(i, i + 4).equalsIgnoreCase(" AND") &&
+                        (i + 4 == expression.length() || !Character.isLetterOrDigit(expression.charAt(i + 4)))) {
+                    parts.add(current.toString().trim());
+                    current = new StringBuilder();
+                    i += 4;
+                }
+                // Comprobar OR
+                else if (i + 3 <= expression.length() &&
+                        expression.substring(i, i + 3).equalsIgnoreCase(" OR") &&
+                        (i + 3 == expression.length() || !Character.isLetterOrDigit(expression.charAt(i + 3)))) {
+                    parts.add(current.toString().trim());
+                    current = new StringBuilder();
+                    i += 3;
+                } else {
+                    current.append(c);
+                    i++;
+                }
+            } else {
+                current.append(c);
+                i++;
+            }
+        }
+
+        if (!current.toString().isBlank()) {
+            parts.add(current.toString().trim());
+        }
+
+        return parts;
+    }
 }
