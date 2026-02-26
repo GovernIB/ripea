@@ -1775,9 +1775,11 @@ const translationCa = {
             },
             action: {
                 restart: {
+                    label: "Reiniciar",
                     ok: "La tasca s'ha reiniciat correctament",
                 },
                 restartAll: {
+                    label: "Reiniciar seleccionades",
                     ok: "Les tasques s'han reiniciat correctament",
                 },
             }

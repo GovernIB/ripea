@@ -195,7 +195,7 @@ const Tasques = () => {
     const { restart, restartAll } = useTaskAction(refresh);
     const actions = [
         {
-            label: t('common.refresh'),
+            title: t('page.sistema.action.restart.label'),
             icon: 'cached',
             showInMenu: false,
             onClick: restart,
@@ -203,7 +203,7 @@ const Tasques = () => {
     ]
     const actionsMassive = [
         {
-            label: t('common.refresh'),
+            title: t('page.sistema.action.restartAll.label'),
             icon: 'cached',
             showInMenu: false,
             onClick: restartAll,

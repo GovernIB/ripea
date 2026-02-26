@@ -1775,9 +1775,11 @@ const translationEn = {
             },
             action: {
                 restart: {
+                    label: "Restart",
                     ok: "The task has been successfully restarted",
                 },
                 restartAll: {
+                    label: "Restart selected",
                     ok: "All tasks have been successfully restarted",
                 },
             }

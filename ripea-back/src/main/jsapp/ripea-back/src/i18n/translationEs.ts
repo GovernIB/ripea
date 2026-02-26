@@ -1775,9 +1775,11 @@ const translationEs = {
             },
             action: {
                 restart: {
+                    label: "Reiniciar",
                     ok: "La tarea se ha reiniciado correctamente",
                 },
                 restartAll: {
+                    label: "Reiniciar seleccionadas",
                     ok: "Las tareas se han reiniciado correctamente",
                 },
             }
