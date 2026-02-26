@@ -32,7 +32,7 @@ public  class SeguimentServiceEjb extends AbstractServiceEjb<SeguimentService> i
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("**")
 	public PaginaDto<SeguimentDto> findPortafirmesEnviaments(
 			Long entitatId,
 			SeguimentFiltreDto filtre,
@@ -42,7 +42,7 @@ public  class SeguimentServiceEjb extends AbstractServiceEjb<SeguimentService> i
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("**")
 	public ResultDto<SeguimentDto> findNotificacionsEnviaments(
 			Long entitatId,
 			SeguimentNotificacionsFiltreDto filtre,
@@ -58,7 +58,7 @@ public  class SeguimentServiceEjb extends AbstractServiceEjb<SeguimentService> i
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("**")
 	public PaginaDto<SeguimentDto> findTasques(
 			Long entitatId,
 			SeguimentFiltreDto filtre,
@@ -70,7 +70,7 @@ public  class SeguimentServiceEjb extends AbstractServiceEjb<SeguimentService> i
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("**")
 	public PaginaDto<ExpedientPeticioListDto> findAnotacionsPendents(
 			Long entitatId,
 			ExpedientPeticioFiltreDto filtre,

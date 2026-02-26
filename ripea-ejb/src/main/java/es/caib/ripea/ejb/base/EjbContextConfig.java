@@ -68,7 +68,7 @@ public class EjbContextConfig {
 	@Bean
 	public MessageSource messageSource() {
 		ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
-		messageSource.setBasename("classpath:" + BaseConfig.APP_NAME + "-service-messages");
+		messageSource.setBasename("classpath:" + BaseConfig.APP_NAME + "-messages");
 		messageSource.setDefaultEncoding(StandardCharsets.UTF_8.name());
 		messageSource.setFallbackToSystemLocale(false);
 		return messageSource;
