@@ -14,25 +14,10 @@ import {
     FormField,
     useBaseAppContext,
     useResourceApiService,
-    // ResourceApiRequestArgs,
 } from 'reactlib';
-import {ResourceApiRequestArgs} from "../../../../lib/components/ResourceApiProvider.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import {DetailCard} from "../../../components/CardData.tsx";
 import {usePropietatsDialog} from "./PropietatsDialog.tsx";
-
-type PropsContextType = {
-    // apiCreate: (args: ResourceApiRequestArgs) => Promise<any>;
-    apiPatch: (id: any, args: ResourceApiRequestArgs) => Promise<any>;
-};
-const PropsContext = React.createContext<PropsContextType | undefined>(undefined);
-const usePropsContext = () => {
-    const context = React.useContext(PropsContext);
-    if (context === undefined) {
-        throw new Error('usePropsContext must be used within a PropsContext provider');
-    }
-    return context;
-};
 
 const fieldPropType = (typeCode: string, typeValue?: string) => {
     if (typeValue != null) {
@@ -74,11 +59,8 @@ export const TextHighlight: React.FC<{ text: string; match?: string; ignoreCase?
     );
 };
 
-const PropsListItem: React.FC<{ item: any; highlight?: string }> = (props) => {
-    const { item, highlight } = props;
-    const { t } = useTranslation();
-    const { apiPatch } = usePropsContext();
-    const { temporalMessageShow } = useBaseAppContext();
+const PropsListItem: React.FC<{ item: any; highlight?: string, handleSaveClick: (value: any) => void }> = (props) => {
+    const { item, highlight, handleSaveClick } = props;
     const disabled = item.jbossProperty;
     const password = item.type.id === 'PASSWORD' ? true : undefined;
     const decimalScale = item.type.id === 'INT' ? 0 : undefined;
@@ -88,15 +70,6 @@ const PropsListItem: React.FC<{ item: any; highlight?: string }> = (props) => {
 
     const handleFieldOnChange = (value: any) => {
         setChangedValue(value);
-    };
-    const handleSaveClick = () => {
-        apiPatch(item.id, { data: { value: changedValue } })
-            .then(() => {
-                temporalMessageShow(null, t('page.propietats.action.update.ok'), 'success');
-            })
-            .catch((error) =>
-                temporalMessageShow(null, error.message, 'error')
-            );
     };
     const {handleOpen, dialog} = usePropietatsDialog();
     return (
@@ -114,7 +87,7 @@ const PropsListItem: React.FC<{ item: any; highlight?: string }> = (props) => {
                     decimalScale={decimalScale}
                     disabled={disabled}
                     onChange={handleFieldOnChange}
-                    componentProps={{ type: password ?'password' :field.type, helperText: item.key }}
+                    componentProps={{ type: password ?'password' :field.type, placeholder: item.key, helperText: item.key }}
                 />
             </Grid>
             <Grid size={1}>
@@ -122,13 +95,14 @@ const PropsListItem: React.FC<{ item: any; highlight?: string }> = (props) => {
                      {(!disabled) && (<>
                         <IconButton
                             size="small"
-                            onClick={handleSaveClick}
+                            onClick={() => handleSaveClick(changedValue)}
                             color={'success'}>
-                            <Icon fontSize="small" >save</Icon>
-                        </IconButton>                   
-                        <IconButton size="small" onClick={() => handleOpen(item.id, {...item, value: changedValue})} sx={{ ml: 1 }}>
-                            <Icon sx={{m:0}} fontSize="small">settings</Icon>
+                            <Icon fontSize="small">save</Icon>
                         </IconButton>
+                        {(item?.configurable && !item?.entitatCodi && !item?.organCodi) &&
+                            <IconButton size="small" onClick={() => handleOpen(item.id, {...item, value: changedValue})} sx={{ ml: 1 }}>
+                                <Icon sx={{m:0}} fontSize="small">settings</Icon>
+                            </IconButton>}
                     </>)}
                 </Box>
             </Grid>
@@ -157,25 +131,28 @@ export const getFieldFromItem = (item:any) => {
     };
 }
 
-export const PropietatsProps: React.FC<{ quickFilter?: string; group?: any }> = (props) => {
-    const { quickFilter, group } = props;
+export const PropietatsProps: React.FC<{ quickFilter?: string; entitatCodi?: string; group?: any }> = (props) => {
+    const { quickFilter, entitatCodi, group } = props;
     const { t } = useTranslation();
     const {
         isReady: apiIsReady,
         find: apiFind,
-        // create: apiCreate,
-        patch: apiPatch,
+        artifactAction: apiAction,
     } = useResourceApiService('configResource');
+    const { temporalMessageShow } = useBaseAppContext();
     const [configs, setConfigs] = React.useState<any[]>();
     React.useEffect(() => {
         if (apiIsReady && group != null) {
             const args = {
                 quickFilter,
                 filter: builder.and(
-                    builder.eq('entitatCodi', null),
+                    entitatCodi
+                        ? builder.eq('entitatCodi', `'${entitatCodi}'`)
+                        : builder.eq('entitatCodi', null),
                     builder.eq('organCodi', null),
                     builder.eq('group.key', `'${group.id}'`),
                 ),
+                namedQueries: entitatCodi ?[`BY_ENTITAT#${entitatCodi}`] :undefined,
                 sorts: ['position,asc'],
                 unpaged: true,
             };
@@ -185,53 +162,58 @@ export const PropietatsProps: React.FC<{ quickFilter?: string; group?: any }> = 
             });
         }
     }, [apiIsReady, quickFilter, group]);
-    const propsContextValue = {
-        // apiCreate,
-        apiPatch,
+
+    const update = (res:any, value:any) => {
+        // console.log("update", value, { ...res, value })
+        apiAction(undefined, { code: 'UPDATE', data: { ...res, value } })
+            .then(() => {
+                temporalMessageShow(null, t('page.propietats.action.update.ok'), 'success');
+            })
+            .catch((error) =>
+                temporalMessageShow(null, error.message, 'error')
+            );
     };
 
     return (
         group != null &&
         configs != null && (<>
-            <PropsContext.Provider value={propsContextValue}>
-                <Box sx={{ px: 3 }}>
-                    <DetailCard title={group.description}>
-                        <Grid size={12}>
-                        <List component={Paper}>
-                            {configs.length ? (
-                                <MuiForm
-                                    resourceName="configResource"
-                                    hiddenToolbar
-                                    commonFieldComponentProps={{ size: 'small' }}>
-                                    {configs?.map((c) => (
-                                        <ListItem key={c.key} disablePadding>
-                                            <ListItemButton disableRipple>
-                                                <PropsListItem item={c} highlight={quickFilter}/>
-                                            </ListItemButton>
-                                        </ListItem>
-                                    ))}
-                                </MuiForm>
-                            ) : (
-                                <Box
-                                    sx={{
-                                        width: '100%',
-                                        textAlign: 'center',
-                                        px: 2,
-                                        py: 4,
-                                    }}>
-                                    <Icon fontSize="large" color="disabled">
-                                        block
-                                    </Icon>
-                                    <Typography variant="h5" color="text.secondary">
-                                        {t('page.propietats.empty')}
-                                    </Typography>
-                                </Box>
-                            )}
-                        </List>
-                        </Grid>
-                    </DetailCard>
-                </Box>
-            </PropsContext.Provider>
+            <Box sx={{ px: 3 }}>
+                <DetailCard title={group.description}>
+                    <Grid size={12}>
+                    <List component={Paper}>
+                        {configs.length ? (
+                            <MuiForm
+                                resourceName="configResource"
+                                hiddenToolbar
+                                commonFieldComponentProps={{ size: 'small' }}>
+                                {configs?.map((c) => (
+                                    <ListItem key={c.key} disablePadding>
+                                        <ListItemButton disableRipple>
+                                            <PropsListItem item={c} highlight={quickFilter} handleSaveClick={(value:any) => update(c, value)}/>
+                                        </ListItemButton>
+                                    </ListItem>
+                                ))}
+                            </MuiForm>
+                        ) : (
+                            <Box
+                                sx={{
+                                    width: '100%',
+                                    textAlign: 'center',
+                                    px: 2,
+                                    py: 4,
+                                }}>
+                                <Icon fontSize="large" color="disabled">
+                                    block
+                                </Icon>
+                                <Typography variant="h5" color="text.secondary">
+                                    {t('page.propietats.empty')}
+                                </Typography>
+                            </Box>
+                        )}
+                    </List>
+                    </Grid>
+                </DetailCard>
+            </Box>
         </>)
     );
 };

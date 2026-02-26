@@ -1,12 +1,14 @@
-import React, {useCallback} from 'react';
+import React, {useCallback, useEffect} from 'react';
 import { useTranslation } from 'react-i18next';
-// import { useDebounce } from 'reactlib';
-import {useDebounce} from "../../../../lib/util/useDebounce.ts";
+import { useDebounce } from 'reactlib';
 import { PropietatsGroups } from './PropietatsGroups.tsx';
 import { PropietatsProps } from './PropietatsProps.tsx';
 import {TextField, InputAdornment, Icon, IconButton, Grid2 as Grid, Button} from "@mui/material";
 import {GridPage, useBaseAppContext, useResourceApiService} from "reactlib";
 import {CardPage} from "../../../components/CardData.tsx";
+import {useParams} from "react-router-dom";
+import Load from "../../../components/Load.tsx";
+import {setTitlePage} from "../../../TitleHeaderConfigurator.tsx";
 
 const PropietatsQuickFilter: React.FC<{ onChange: (quickFilter: string | undefined) => void }> = (
     props
@@ -46,7 +48,7 @@ const PropietatsQuickFilter: React.FC<{ onChange: (quickFilter: string | undefin
     );
 };
 
-const Propietats: React.FC = () => {
+export const Propietats: React.FC = () => {
     const {t} = useTranslation();
     const [quickFilter, setQuickFilter] = React.useState<string>();
     const [selectedGroup, setSelectedGroup] = React.useState<any>();
@@ -89,4 +91,50 @@ const Propietats: React.FC = () => {
     </GridPage>
 };
 
-export default Propietats;
+export const PropietatsByEntitat: React.FC = () => {
+    const {t} = useTranslation();
+    const { id } = useParams();
+    const [entity, setEntity] = React.useState<any>();
+    const [quickFilter, setQuickFilter] = React.useState<string>();
+    const [selectedGroup, setSelectedGroup] = React.useState<any>();
+
+    const {
+        isReady: apiIsReady,
+        getOne: apiGetOne
+    } = useResourceApiService('entitatResource');
+    const {temporalMessageShow} = useBaseAppContext();
+
+    useEffect(() => {
+        if (apiIsReady) {
+            apiGetOne(id)
+                .then((response) => setEntity(response))
+                .catch((error) => {
+                    temporalMessageShow(null, error?.message, 'error');
+                });
+        }
+    }, [apiIsReady]);
+
+    useEffect(() => {
+        if (entity) {
+            setTitlePage(`${t('page.user.menu.props')} - ${entity?.nom}`)
+        }
+    }, [entity]);
+
+    return <GridPage disableMargins>
+        <CardPage title={`${t('page.user.menu.props')} - ${entity?.nom}`}>
+            <Load value={entity}>
+                <Grid container spacing={2}>
+                    <Grid size={12} sx={{ px: 1 }} display={'flex'} justifyContent={'end'}>
+                        <PropietatsQuickFilter onChange={setQuickFilter} />
+                    </Grid>
+                    <Grid size={3}>
+                        <PropietatsGroups ambConfigurables quickFilter={quickFilter} onChange={setSelectedGroup} />
+                    </Grid>
+                    <Grid size={9}>
+                        <PropietatsProps entitatCodi={entity?.codi} group={selectedGroup} quickFilter={quickFilter} />
+                    </Grid>
+                </Grid>
+            </Load>
+        </CardPage>
+    </GridPage>
+};

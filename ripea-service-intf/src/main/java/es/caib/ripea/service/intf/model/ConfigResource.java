@@ -15,6 +15,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 
+import javax.validation.constraints.NotNull;
+
 @SuppressWarnings("serial")
 @Getter
 @Setter
@@ -27,17 +29,25 @@ import lombok.experimental.FieldNameConstants;
             @ResourceArtifact(
                     type = ResourceArtifactType.ACTION,
                     code = ConfigResource.ACTION_SYNC_JBOSS),
+            @ResourceArtifact(
+                    type = ResourceArtifactType.ACTION,
+                    code = ConfigResource.ACTION_UPDATE,
+                    formClass = ConfigResource.class),
         })
 public class ConfigResource extends BaseResource<String> {
 
 	public static final String ACTION_SYNC_JBOSS = "SYNC_JBOSS";
-	
+	public static final String ACTION_UPDATE = "UPDATE";
+
+    @NotNull
     private String key;
     private String value;
     private String description;
     private boolean jbossProperty;
-    
+
+    @NotNull
     private ResourceReference<ConfigGroupResource, String> group;
+    @NotNull
     private ResourceReference<ConfigTypeResource, String> type;
     
     @ResourceField(onChangeActive = true)

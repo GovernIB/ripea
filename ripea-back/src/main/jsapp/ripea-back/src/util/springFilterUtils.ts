@@ -58,8 +58,5 @@ export const between = (option :string, paramStart :any, paramEnd :any) => {
     );
 }
 export const betweenDates = (option :string, paramStart :any, paramEnd :any) => {
-    return and(
-        greaterEq(option, `'${formatStartOfDay(paramStart)}'`),
-        lessEq(option, `'${formatEndOfDay(paramEnd)}'`)
-    );
+    return between(option, `'${formatStartOfDay(paramStart)}'`, `'${formatEndOfDay(paramEnd)}'`);
 }

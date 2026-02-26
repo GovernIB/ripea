@@ -42,7 +42,7 @@ import MetaExpedientTascaValidacioGrid
 import {EntitatGrid} from "./pages/entitat/EntitatGrid.tsx";
 import {AvisGrid} from "./pages/avis/AvisGrid.tsx";
 import {ServeiPinbalGrid} from "./pages/user/configurar/ServeiPinbalGrid.tsx";
-import Propietats from "./pages/user/propietats/Propietats.tsx";
+import {Propietats, PropietatsByEntitat} from "./pages/user/propietats/Propietats.tsx";
 import {ExcepcioGrid} from "./pages/user/monitor/ExcepcioGrid.tsx";
 import {IntegracioGrid} from "./pages/user/monitor/integracio/IntegracioGrid.tsx";
 
@@ -71,6 +71,7 @@ const AppRoutes: React.FC = () => {
         <Route element={<ProtectedRoute allowedRoles={['IPA_SUPER']} />}>
             <Route path={"entitat"} element={<EntitatGrid />} />
             <Route path={"entitat/:id/permis"} element={<PermisEntitatGrid/>} />
+            <Route path={"entitat/:id/configurar"} element={<PropietatsByEntitat/>} />
             <Route path={"avis"} element={<AvisGrid/>} />
             <Route path={"pinbalServei"} element={<ServeiPinbalGrid/>} />
             <Route path={"config"} element={<Propietats/>} />

@@ -8,6 +8,8 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
+import es.caib.ripea.service.intf.model.ConfigGroupResource;
+import org.apache.commons.lang.SerializationUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -56,7 +58,8 @@ public class ConfigResourceServiceImpl extends BaseMutableResourceService<Config
     @PostConstruct
     public void init() {
     	register(ConfigResource.ACTION_SYNC_JBOSS, new SyncJbossActionExecutor());
-    	
+    	register(ConfigResource.ACTION_UPDATE, (ActionExecutor<ConfigResourceEntity, ?, ?>) new UpdateActionExecutor());
+
     	register(ConfigResource.Fields.entitat, new ConfigOnchangeLogicProcessor());
     	register(ConfigResource.Fields.organ, new ConfigOnchangeLogicProcessor());
     }
@@ -80,10 +83,6 @@ public class ConfigResourceServiceImpl extends BaseMutableResourceService<Config
     			Filter filtreAux = FilterBuilder.or(filtreEntitatNotNull, filtreOrganNotNull);
     			
     			filtreEspecifiques = FilterBuilder.and(filtrePrefixe, filtreSufixe, filtreAux);
-    		} else if (mapaNamedQueries.containsKey("BY_ENTITAT")) {
-    			Long entitatId = Long.parseLong(mapaNamedQueries.get("BY_ENTITAT"));
-    			EntitatEntity entitatEntity = entitatRepository.findById(entitatId).get();
-    			filtreEspecifiques = FilterBuilder.equal(ConfigResource.Fields.entitatCodi, entitatEntity.getCodi());
     		}
     	}
     	
@@ -105,48 +104,57 @@ public class ConfigResourceServiceImpl extends BaseMutableResourceService<Config
     	Map<String, String> mapaNamedQueries =  Utils.namedQueriesToMap(namedQueries);
     	if (mapaNamedQueries.containsKey("BY_ENTITAT")) {
     		//Afegir totes les configuracions base que no tenguin configuracio per la entitat seleccionada.
-    		Long entitatId = Long.parseLong(mapaNamedQueries.get("BY_ENTITAT"));
+    		String entitatCodi = mapaNamedQueries.get("BY_ENTITAT");
     		Map<String, Object> filtro = Utils.parseOracleFilter(filter);
-    		
-    		EntitatEntity ee = entitatRepository.findById(entitatId).get();
     		
     		//Aprofitam per aplicar ara el filtre per grup, i ja no recuperam tants de resultats.
     		List<ConfigEntity> configsBase = null;
     		Object codiGrup = filtro.get("group.key");
-    		if (codiGrup!=null && Utils.hasValue(codiGrup.toString())) {
-    			configsBase = configRepository.findByEntitatCodiIsNullAndGroupCode(codiGrup.toString());
-    		} else {
-    			configsBase = configRepository.findByEntitatCodiIsNull();
+    		if (codiGrup == null || !Utils.hasValue(codiGrup.toString())) {
+                if (configsBBDD!=null && configsBBDD.getContent()!=null) {
+                    codiGrup = configsBBDD.getContent().get(0).getGroup().getId();
+                }
     		}
+
+            String myfilter = FilterBuilder.and(
+                    FilterBuilder.isNull(ConfigResource.Fields.entitatCodi),
+                    FilterBuilder.isNull(ConfigResource.Fields.organCodi),
+                    FilterBuilder.equal(ConfigResource.Fields.group +'.'+ ConfigGroupResource.Fields.key, codiGrup),
+                    FilterBuilder.equal(ConfigResource.Fields.configurable, true)
+            ).generate();
+
+            List<ConfigResource> myResources = super.findPage(quickFilter, myfilter, namedQueries, perspectives, pageable).getContent();
     		
     		List<ConfigResource> nousConfigsByEntitat = new ArrayList<ConfigResource>();
     		if (configsBBDD!=null && configsBBDD.getContent()!=null) {
     			nousConfigsByEntitat.addAll(configsBBDD.getContent());
     		}
     		
-    		if (configsBase!=null) {
-    			for (ConfigEntity configBaseEntity: configsBase) {
-    				/**
-    				 * - Mirar si no existeix ja la propietat per entitat a la llista original de configsBBDD
-    				 * - Aplicar possibles filtres per grup o quickFilter.
-    				 * - Si passa les validacons, crear la config per entitat i afegir-la a la llista. 
-    				 */
-    				String[] aux = configBaseEntity.getKey().split("es.caib.ripea.");
-    				String keyAmbEntitat = "es.caib.ripea."+ee.getCodi()+"."+aux[1];
-    				
-    				ConfigResource cofigJaExistent = getConfigEntitatByBaseKey(nousConfigsByEntitat, keyAmbEntitat);
-    				
-    				if (cofigJaExistent==null && superaFiltres(configBaseEntity, quickFilter)) {
-    					//La configuració per entitat no existeix al llistat inicial, i apliquen els filtres
-    					//Per tant l'hem de afegir a la llista
-    					ConfigResource newConfigPerEntitat = objectMappingHelper.newInstanceMap(configBaseEntity, ConfigResource.class);
-    					newConfigPerEntitat.setKey(keyAmbEntitat);
-    					nousConfigsByEntitat.add(newConfigPerEntitat);
-    				}
-    			}
-    			
-				//No es pot modificar la "Page" inicial: java.util.Collections$UnmodifiableCollection.add(Collections.java:1058)
-				return new PageImpl<>(nousConfigsByEntitat, configsBBDD.getPageable(), nousConfigsByEntitat.size());
+    		if (myResources!=null) {
+    			for (ConfigResource configBase: myResources) {
+                    /**
+                     * - Mirar si no existeix ja la propietat per entitat a la llista original de configsBBDD
+                     * - Aplicar possibles filtres per grup o quickFilter.
+                     * - Si passa les validacons, crear la config per entitat i afegir-la a la llista.
+                     */
+                    String[] aux = configBase.getKey().split("es.caib.ripea.");
+                    String keyAmbEntitat = "es.caib.ripea." + entitatCodi + "." + aux[1];
+
+                    ConfigResource cofigJaExistent = getConfigEntitatByBaseKey(nousConfigsByEntitat, keyAmbEntitat);
+
+                    if (cofigJaExistent == null) {
+                        //La configuració per entitat no existeix al llistat inicial, i apliquen els filtres
+                        //Per tant l'hem de afegir a la llista
+
+                        ConfigResource newConfigPerEntitat = objectMappingHelper.clone(configBase);
+                        newConfigPerEntitat.setKey(keyAmbEntitat);
+                        newConfigPerEntitat.setEntitatCodi(entitatCodi);
+                        nousConfigsByEntitat.add(newConfigPerEntitat);
+                    }
+                }
+
+                //No es pot modificar la "Page" inicial: java.util.Collections$UnmodifiableCollection.add(Collections.java:1058)
+                return new PageImpl<>(nousConfigsByEntitat, configsBBDD.getPageable(), nousConfigsByEntitat.size());
     		}
     	}
     	
@@ -165,17 +173,6 @@ public class ConfigResourceServiceImpl extends BaseMutableResourceService<Config
     		}
     	}
     	return null;
-    }
-    
-    private boolean superaFiltres(ConfigEntity configBase, String quickFilter) {
-    	if (Utils.hasValue(quickFilter)) {
-    		if( !configBase.getKey().contains(quickFilter) && 
-    			!configBase.getValue().contains(quickFilter) &&
-    			!configBase.getDescription().contains(quickFilter)) {
-    			return false;
-    		}
-    	}
-    	return true;
     }
     
     private class ConfigOnchangeLogicProcessor implements OnChangeLogicProcessor<ConfigResource> {
@@ -233,7 +230,7 @@ public class ConfigResourceServiceImpl extends BaseMutableResourceService<Config
 	    	}
     	}
     }
-    
+
     @Override
     public ConfigResource create(ConfigResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
     	//El metodo create solo sirve para añadir propiedades especificas por entidad u organo gestor.
@@ -248,11 +245,11 @@ public class ConfigResourceServiceImpl extends BaseMutableResourceService<Config
     	conf.setValue(resource.getValue());
     	conf.setDescription(resource.getDescription());
     	
-    	if (resource.getEntitat()!=null) {
+    	if (resource.getEntitatCodi()!=null) {
     		conf.setEntitatCodi(resource.getEntitatCodi());
     	}
     	
-    	if (resource.getOrgan()!=null) {
+    	if (resource.getOrganCodi()!=null) {
     		conf.setOrganCodi(resource.getOrganCodi());
     		conf.setConfigurableOrgan(true);
     		conf.setConfigurableOrgansDescendents(true);
@@ -266,7 +263,8 @@ public class ConfigResourceServiceImpl extends BaseMutableResourceService<Config
     	
     	conf.setType(confBase.getType());
     	conf.setGroupCode(confBase.getGroupCode());
-    	
+//    	conf.setPosition(confBase.getPosition());
+
     	conf.setLastModifiedBy(usuariRepository.findByCodi(SecurityContextHolder.getContext().getAuthentication().getName()));
     	conf.setLastModifiedDate(Calendar.getInstance().getTime());
     	
@@ -275,20 +273,6 @@ public class ConfigResourceServiceImpl extends BaseMutableResourceService<Config
     	return resource;
     }
 
-    @Override
-    public ConfigResource update(String id, ConfigResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
-    	//En este caso, aunque se llame al metodo update, es posible que el objeto no exista en BBDD
-    	//por la adicion de configuraciones por entidad que se realiza en el método "findPage"
-    	ConfigEntity configEntity = configRepository.findByKey(id);
-    	if (configEntity==null) {
-    		return create(resource, answers);
-    	} else {
-    		configEntity.setValue(resource.getValue());
-    		configRepository.save(configEntity);
-    	}
-    	return resource;
-    }
-    
     private class SyncJbossActionExecutor implements ActionExecutor<ConfigResourceEntity, Serializable, Serializable> {
 
 		@Override
@@ -305,5 +289,23 @@ public class ConfigResourceServiceImpl extends BaseMutableResourceService<Config
 				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, messageHelper.getMessage("message.common.action.error")+": "+e.getMessage());
 			}
 		}    	
+    }
+
+    private class UpdateActionExecutor implements ActionExecutor<ConfigResourceEntity, ConfigResource, ConfigResource> {
+		@Override
+		public void onChange(Serializable id, ConfigResource previous, String fieldName, Object fieldValue,
+				Map<String, AnswerValue> answers, String[] previousFieldNames, ConfigResource target) {}
+
+		@Override
+		public ConfigResource exec(String code, ConfigResourceEntity entity, ConfigResource resource) throws ActionExecutionException {
+            ConfigEntity configEntity = configRepository.findByKey(resource.getId());
+            if (configEntity==null) {
+                return create(resource, null);
+            } else {
+                configEntity.setValue(resource.getValue());
+                configRepository.save(configEntity);
+            }
+            return resource;
+		}
     }
 }

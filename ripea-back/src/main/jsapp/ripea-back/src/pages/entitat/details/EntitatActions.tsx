@@ -55,6 +55,7 @@ export const useEntitatActions = (refresh?: () => void) => {
             label: t('page.entitat.action.config.label'),
             icon: "settings",
             showInMenu: true,
+            linkTo: (row:any) => `/entitat/${row?.id}/configurar`,
         },
         {
             label: t('page.entitat.action.activar.label'),

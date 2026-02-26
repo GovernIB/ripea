@@ -29,7 +29,7 @@ export { ActionReportButton as MuiActionReportButton, useActionReportLogic as us
 
 export { FormField } from './components/form/FormField';
 export { FormIsolatedField } from './components/form/FormIsolatedField';
-export { useFormContext } from './components/form/FormContext';
+export { useFormContext, FormFieldDataActionType } from './components/form/FormContext';
 export { useFormApiRef, useFormApiContext } from './components/form/Form';
 export { useFilterContext } from './components/form/FilterContext';
 export { useFilterApiRef, useFilterApiContext } from './components/form/Filter';
@@ -43,6 +43,7 @@ export { dateFormatLocale, timeFormatLocale, isoDateToDate, isoDateTimeToDate } 
 export { parseIsoDuration } from './util/durationFormat';
 export { toolbarBackgroundStyle } from './util/toolbar';
 export { useSmallScreen, useSmallHeader } from './util/useSmallScreen';
+export { useDebounce } from './util/useDebounce';
 export { toBase64 } from './util/files';
 export * as springFilterBuilder from './util/springFilterBuilder';
 
