@@ -31,12 +31,16 @@ const useSistemAction = () => {
     }
 }
 
+const LinearSpace = ({value, total}: { value:number, total?:number }) => {
+    const v = total ?Math.round(value * 100 / total) :value
+    return <LinearProgress variant="determinate"
+                           value={v}
+                           color={v >= 90 ?'error' :v >= 80 ?'warning' :'success'}
+                           sx={{width: '100%', height: 15, borderRadius: '4px'}}/>
+}
+
 const Sistema = ({system, refresh}:any) => {
     const { t } = useTranslation();
-
-    const getPercentage = (value:number, total:number) => {
-        return Math.round(value * 100 / total)
-    }
 
     return <>
         <Box display={'flex'} justifyContent={'end'} mb={1}>
@@ -60,9 +64,7 @@ const Sistema = ({system, refresh}:any) => {
                 <ContenidoData xs={6} titleXs={6} textXs={6} title={''}>{}</ContenidoData>
                 <Grid size={2}/>
                 <Grid size={6}>
-                    <LinearProgress variant="determinate" color={'success'}
-                                    value={getPercentage(system?.jvmMemory?.usedMemory, system?.jvmMemory?.totalMemory)}
-                                    sx={{width: '100%', height: 15, borderRadius: '4px'}} />
+                    <LinearSpace value={system?.jvmMemory?.usedMemory} total={system?.jvmMemory?.totalMemory} />
                 </Grid>
                 <Grid size={1}/>
                 <Grid size={3}>{system?.jvmMemory?.formatedFreeMemory} / {system?.jvmMemory?.formatedTotalMemory}</Grid>
@@ -78,9 +80,7 @@ const Sistema = ({system, refresh}:any) => {
                 {system?.disksUsage?.map((disk:any) => <>
                     <Grid size={2}>{disk.nom}</Grid>
                     <Grid size={6}>
-                        <LinearProgress variant="determinate" color={'success'}
-                                        value={getPercentage(disk?.usedSpace, disk?.totalSpace)}
-                                        sx={{width: '100%', height: 15, borderRadius: '4px'}} />
+                        <LinearSpace value={disk?.usedSpace} total={disk?.totalSpace} />
                     </Grid>
                     <Grid size={1}/>
                     <Grid size={3}>{disk?.formatedFreeSpace} / {disk?.formatedTotalSpace}</Grid>
