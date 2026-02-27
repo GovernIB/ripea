@@ -78,7 +78,7 @@ public class DadaResourceServiceImpl extends BaseMutableResourceService<DadaReso
     		cacheHelper.evictErrorsValidacioPerNode(entity.getNode().getId()); // Primero hace evict
     		ErrorsValidacioChangedEvent evce = new ErrorsValidacioChangedEvent(
     				entity.getNode().getId(),
-    				cacheHelper.findErrorsValidacioPerNode(entity.getNode().getId()));
+    				cacheHelper.findErrorsValidacioPerNodeAndSendComanda(entity.getNode().getId()));
     		eventHelper.notifyErrorsValidacio(evce); // Luego notifica con datos frescos	
     	}
     }

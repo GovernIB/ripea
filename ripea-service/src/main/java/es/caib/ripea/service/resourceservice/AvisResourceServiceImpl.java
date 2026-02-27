@@ -47,6 +47,7 @@ public class AvisResourceServiceImpl extends BaseMutableResourceService<AvisReso
 
 	@Override
 	protected void completeResource(AvisResource resource) {
+		resource.setAvisAdministrador(false);
 		resource.setEntitat(null); //Els avisos creats per un superadmin no van assocciats a cap entitat.
 	}
 	

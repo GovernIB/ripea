@@ -705,7 +705,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         @Override
         public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
     		UsuariEntity usuariEntity = usuariRepository.findById(SecurityContextHolder.getContext().getAuthentication().getName()).orElse(null);
-    		if (usuariEntity!=null && entity.getId()!=null) {
+    		if (usuariEntity!=null && entity.getId()!=null && ExpedientEstatEnumDto.OBERT.equals(entity.getEstat())) {
     			try {
     				ContingutEntity contingutEntity = contingutHelper.comprovarContingutDinsExpedientModificable(
     						entity.getEntitat().getId(),
@@ -1272,7 +1272,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 						"/expedient/TancarActionExecutor", e,
 						Utils.getIdsSeparatsComa(params.getIds()),
 						"massiu="+params.isMassivo());
-				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, messageHelper.getMessage("expedient.tancar.reject", new Object[]{e.getMessage()}));
+				throw new ActionExecutionException(getResourceClass(), params.getIds().toString(), code, messageHelper.getMessage("expedient.tancar.reject", new Object[]{e.getMessage()}));
 			}
 		}
     }

@@ -197,13 +197,15 @@ public class PortafirmesPluginPortafib extends RipeaAbstractPluginProperties imp
 			downloadedDocument.setTipusFirma(fitxerDescarregat.getSignedFileInfo().getSignType());
 			
 			List<PortafirmesDocumentFirmant> firmants = new ArrayList<PortafirmesDocumentFirmant>();
-			for (FirmaAsyncSimpleSignerInfo signer: fitxerDescarregat.getSignedFileInfo().getSignersInfo()) {
-				PortafirmesDocumentFirmant firmant = new PortafirmesDocumentFirmant();
-				firmant.setData(signer.getSignDate());
-				firmant.setResponsableNif(signer.getEniSignerAdministrationId());
-				firmant.setResponsableNom(signer.getEniSignerName());
-				firmant.setEmissorCertificat(signer.getIssuerCert());
-				firmants.add(firmant);
+			if (fitxerDescarregat.getSignedFileInfo()!=null && fitxerDescarregat.getSignedFileInfo().getSignersInfo()!=null) {
+				for (FirmaAsyncSimpleSignerInfo signer: fitxerDescarregat.getSignedFileInfo().getSignersInfo()) {
+					PortafirmesDocumentFirmant firmant = new PortafirmesDocumentFirmant();
+					firmant.setData(signer.getSignDate());
+					firmant.setResponsableNif(signer.getEniSignerAdministrationId());
+					firmant.setResponsableNom(signer.getEniSignerName());
+					firmant.setEmissorCertificat(signer.getIssuerCert());
+					firmants.add(firmant);
+				}
 			}
 			downloadedDocument.setFirmants(firmants);
 			return downloadedDocument;

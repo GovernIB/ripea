@@ -55,6 +55,7 @@ import es.caib.comanda.model.management.Avis;
 import es.caib.comanda.model.management.AvisTipus;
 import es.caib.comanda.model.management.Tasca;
 import es.caib.comanda.model.management.TascaEstat;
+import es.caib.comanda.service.management.ApiException;
 import es.caib.distribucio.rest.client.integracio.domini.Annex;
 import es.caib.distribucio.rest.client.integracio.domini.AnotacioRegistreEntrada;
 import es.caib.distribucio.rest.client.integracio.domini.AnotacioRegistreId;
@@ -6257,9 +6258,9 @@ public class PluginHelper {
 				
 				if (TascaEstatEnumDto.FINALITZADA.equals(tascaEntity.getEstat()) ||
 					TascaEstatEnumDto.CANCELLADA.equals(tascaEntity.getEstat())) {
-					resultat = comandaCaibPlugin.sendTasca(tascaRipeaToComanda(tascaEntity));
-				} else {
 					resultat = comandaCaibPlugin.deleteTasca(tascaEntity.getId() + "");
+				} else {
+					resultat = comandaCaibPlugin.sendTasca(tascaRipeaToComanda(tascaEntity));
 				}
 				
 				if (resultat.getStatusCode().equals(HttpStatus.OK)) {
@@ -6286,17 +6287,22 @@ public class PluginHelper {
 				}
 							
 			} catch (Exception ex) {
-				String errorDescripcio = "Error al enviar una tasca a comanda.";
-				integracioHelper.addAccioError(
-						IntegracioHelper.INTCODI_COMANDA,
-						accioDescripcio,
-						endpoint,
-						accioParams,
-						IntegracioAccioTipusEnumDto.ENVIAMENT,
-						System.currentTimeMillis() - t0,
-						errorDescripcio,
-						ex);
-				applicationHelper.stopTimer(sample, "METRICS@Integracions.comanda", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
+				if(ex instanceof ApiException && ((ApiException)ex).getCode()==404) {
+					//No s'ha trobat l'element que es volia eliminar
+					applicationHelper.stopTimer(sample, "METRICS@Integracions.comanda", "resultado", "nulo", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
+				} else {
+					String errorDescripcio = "Error al enviar una tasca a comanda.";
+					integracioHelper.addAccioError(
+							IntegracioHelper.INTCODI_COMANDA,
+							accioDescripcio,
+							endpoint,
+							accioParams,
+							IntegracioAccioTipusEnumDto.ENVIAMENT,
+							System.currentTimeMillis() - t0,
+							errorDescripcio,
+							ex);
+					applicationHelper.stopTimer(sample, "METRICS@Integracions.comanda", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
+				}
 			}
 		}
 	}
@@ -6481,17 +6487,22 @@ public class PluginHelper {
 				}
 				
 			} catch (Exception ex) {
-				String errorDescripcio = "Error al enviar un avís a comanda.";
-				integracioHelper.addAccioError(
-						IntegracioHelper.INTCODI_COMANDA,
-						accioDescripcio,
-						endpoint,
-						accioParams,
-						IntegracioAccioTipusEnumDto.ENVIAMENT,
-						System.currentTimeMillis() - t0,
-						errorDescripcio,
-						ex);
-				applicationHelper.stopTimer(sample, "METRICS@Integracions.comanda", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
+				if(ex instanceof ApiException && ((ApiException)ex).getCode()==404) {
+					//No s'ha trobat l'element que es volia eliminar
+					applicationHelper.stopTimer(sample, "METRICS@Integracions.comanda", "resultado", "nulo", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
+				} else {
+					String errorDescripcio = "Error al enviar un avís a comanda.";
+					integracioHelper.addAccioError(
+							IntegracioHelper.INTCODI_COMANDA,
+							accioDescripcio,
+							endpoint,
+							accioParams,
+							IntegracioAccioTipusEnumDto.ENVIAMENT,
+							System.currentTimeMillis() - t0,
+							errorDescripcio,
+							ex);
+					applicationHelper.stopTimer(sample, "METRICS@Integracions.comanda", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
+				}
 			}
 		}
 	}
@@ -6604,17 +6615,22 @@ public class PluginHelper {
 				}
 				
 			} catch (Exception ex) {
-				String errorDescripcio = "Error al enviar un avís a comanda.";
-				integracioHelper.addAccioError(
-						IntegracioHelper.INTCODI_COMANDA,
-						accioDescripcio,
-						endpoint,
-						accioParams,
-						IntegracioAccioTipusEnumDto.ENVIAMENT,
-						System.currentTimeMillis() - t0,
-						errorDescripcio,
-						ex);
-				applicationHelper.stopTimer(sample, "METRICS@Integracions.comanda", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
+				if(ex instanceof ApiException && ((ApiException)ex).getCode()==404) {
+					//No s'ha trobat l'element que es volia eliminar
+					applicationHelper.stopTimer(sample, "METRICS@Integracions.comanda", "resultado", "nulo", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
+				} else {				
+					String errorDescripcio = "Error al enviar un avís a comanda.";
+					integracioHelper.addAccioError(
+							IntegracioHelper.INTCODI_COMANDA,
+							accioDescripcio,
+							endpoint,
+							accioParams,
+							IntegracioAccioTipusEnumDto.ENVIAMENT,
+							System.currentTimeMillis() - t0,
+							errorDescripcio,
+							ex);
+					applicationHelper.stopTimer(sample, "METRICS@Integracions.comanda", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
+				}
 			}
 		}
 	}

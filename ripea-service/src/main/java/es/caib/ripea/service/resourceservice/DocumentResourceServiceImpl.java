@@ -497,7 +497,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 		cacheHelper.evictErrorsValidacioPerNode(expedientId); // Primero hace evict
 		ErrorsValidacioChangedEvent evce = new ErrorsValidacioChangedEvent(
 				expedientId,
-				cacheHelper.findErrorsValidacioPerNode(expedientId));
+				cacheHelper.findErrorsValidacioPerNodeAndSendComanda(expedientId));
 		eventHelper.notifyErrorsValidacio(evce); // Luego notifica con datos frescos	
     }
 
