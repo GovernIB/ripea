@@ -24,10 +24,9 @@ const PropietatsGroupTreeItems: React.FC<{
 
 export const PropietatsGroups: React.FC<{
     quickFilter?: string;
-    ambConfigurables?: boolean;
     onChange: (group: any) => void;
 }> = (props) => {
-    const { quickFilter, ambConfigurables, onChange } = props;
+    const { quickFilter, onChange } = props;
     const { isReady: apiIsReady, find: apiFind } = useResourceApiService('configGroupResource');
     const [configGroups, setConfigGroups] = React.useState<any[]>();
     const [selectedGroupId, setSelectedGroupId] = React.useState<string>();
@@ -35,8 +34,8 @@ export const PropietatsGroups: React.FC<{
     React.useEffect(() => {
         if (apiIsReady) {
             const args = {
-                filter: builder.and(
-                    quickFilter?.length && builder.or(
+                filter: quickFilter?.length
+                    ? builder.or(
                         builder.exists(
                             builder.or(
                                 builder.like('configs.key', quickFilter),
@@ -51,20 +50,8 @@ export const PropietatsGroups: React.FC<{
                                 builder.like('children.configs.value', quickFilter),
                             ),
                         ),
-                    ),
-                    ambConfigurables && builder.or(
-                        builder.exists(
-                            builder.or(
-                                builder.eq('configs.configurable', true),
-                            ),
-                        ),
-                        builder.exists(
-                            builder.or(
-                                builder.eq('children.configs.configurable', true),
-                            ),
-                        ),
-                    ),
-                ),
+                    )
+                    :undefined,
                 sorts: ['position,asc'],
                 unpaged: true,
             };

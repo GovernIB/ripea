@@ -128,7 +128,7 @@ export const PropietatsByEntitat: React.FC = () => {
                         <PropietatsQuickFilter onChange={setQuickFilter} />
                     </Grid>
                     <Grid size={3}>
-                        <PropietatsGroups ambConfigurables quickFilter={quickFilter} onChange={setSelectedGroup} />
+                        <PropietatsGroups quickFilter={quickFilter} onChange={setSelectedGroup} />
                     </Grid>
                     <Grid size={9}>
                         <PropietatsProps entitatCodi={entity?.codi} group={selectedGroup} quickFilter={quickFilter} />
