@@ -99,9 +99,10 @@ const PropsListItem: React.FC<{ item: any; highlight?: string, handleSaveClick: 
                             color={'success'}>
                             <Icon fontSize="small">save</Icon>
                         </IconButton>
-                        <IconButton size="small" onClick={() => handleOpen(item.id, {...item, value: changedValue})} sx={{ ml: 1 }}>
-                            <Icon sx={{m:0}} fontSize="small">settings</Icon>
-                        </IconButton>
+                         {(!item?.entitatCodi && !item?.organCodi) &&
+                             <IconButton size="small" onClick={() => handleOpen(item.id, {...item, value: changedValue})} sx={{ ml: 1 }}>
+                                 <Icon sx={{m:0}} fontSize="small">settings</Icon>
+                             </IconButton>}
                     </>)}
                 </Box>
             </Grid>
