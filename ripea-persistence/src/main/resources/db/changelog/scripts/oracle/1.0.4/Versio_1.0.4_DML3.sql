@@ -14,4 +14,4 @@ INSERT INTO IPA_CONFIG (KEY,VALUE,DESCRIPTION,GROUP_CODE,POSITION,JBOSS_PROPERTY
 values ('es.caib.ripea.concsv.class','es.caib.plugins.arxiu.caib.ArxiuPluginCaib','Classe del plugin','CONCSV','0','0','TEXT');
 
 INSERT INTO IPA_CONFIG (KEY,VALUE,DESCRIPTION,GROUP_CODE,POSITION,JBOSS_PROPERTY,TYPE_CODE) 
-values ('es.caib.ripea.concsv.endpointName','concsvapi SE','Descripcio amigable del endpoint de CONCSV.','CONCSV','20','0','TEXT');
+values ('es.caib.ripea.concsv.endpointName','concsvapi SE','Descripcio del endpoint de CONCSV.','CONCSV','20','0','TEXT');
