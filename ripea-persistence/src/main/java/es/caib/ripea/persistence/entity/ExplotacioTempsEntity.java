@@ -9,8 +9,8 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Table;
 
-import es.caib.comanda.model.server.monitoring.DiaSetmanaEnum;
 import es.caib.ripea.service.intf.config.BaseConfig;
+import es.caib.ripea.service.intf.dto.DiaSetmanaEnum;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -55,13 +55,13 @@ public class ExplotacioTempsEntity extends RipeaPersistable<Long> {
 		this.setmana = data.get(WeekFields.ISO.weekOfWeekBasedYear());
 		this.dia = data.getDayOfMonth();
 		switch (data.getDayOfWeek()) {
-			case SUNDAY:	this.diaSetmana = DiaSetmanaEnum.DG; break;
 			case MONDAY:	this.diaSetmana = DiaSetmanaEnum.DL; break;
 			case TUESDAY:	this.diaSetmana = DiaSetmanaEnum.DM; break;
 			case WEDNESDAY: this.diaSetmana = DiaSetmanaEnum.DC; break;
 			case THURSDAY:	this.diaSetmana = DiaSetmanaEnum.DJ; break;
 			case FRIDAY:	this.diaSetmana = DiaSetmanaEnum.DV; break;
 			case SATURDAY:	this.diaSetmana = DiaSetmanaEnum.DS; break;
+			case SUNDAY:	this.diaSetmana = DiaSetmanaEnum.DG; break;
 		}
 	}
 }
