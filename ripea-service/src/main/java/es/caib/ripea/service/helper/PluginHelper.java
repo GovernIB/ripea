@@ -4710,10 +4710,10 @@ public class PluginHelper {
 					null,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.regweb", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			return resposta;
 		} catch (Exception ex) {
-			String errorDescripcio = "Error al accedir al plugin de dades externes PINBAL";
+			String errorDescripcio = "Error al accedir al plugin de REGWEB";
 			integracioHelper.addAccioError(
 					IntegracioHelper.INTCODI_REGISTRE,
 					accioDescripcio,
@@ -4723,7 +4723,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.dir3", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.regweb", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_REGISTRE, errorDescripcio, ex);
 		}
 	}
