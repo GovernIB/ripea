@@ -12,11 +12,12 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Component;
 
 import es.caib.ripea.persistence.entity.ExecucioMassivaEntity;
+import es.caib.ripea.service.intf.dto.ExecucioMassivaTipusDto;
 
 @Component
 public interface ExecucioMassivaRepository extends JpaRepository<ExecucioMassivaEntity, Long> {
 
-	Optional<ExecucioMassivaEntity> findByExpedientOrigenIdAndDataFiNull(Long expedientOrigenId);
+	Optional<ExecucioMassivaEntity> findByExpedientOrigenIdAndTipusAndDataFiNull(Long expedientOrigenId, ExecucioMassivaTipusDto tipus);
 	
 	List<ExecucioMassivaEntity> findByCreatedByAndEntitatIdOrderByCreatedDateDesc(String createdBy, Long entitatId, Pageable pageable);
 	

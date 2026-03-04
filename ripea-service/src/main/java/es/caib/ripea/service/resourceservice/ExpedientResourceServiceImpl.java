@@ -632,7 +632,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		resource.setDataDarrerEnviament(cacheHelper.getDataDarrerEnviament(expedientEntity));
 		resource.setPotModificar(entityComprovarHelper.comprovarSiEsPotModificarExpedient(expedientEntity));
 		resource.setHasEsborranys(documentResourceRepository.hasFillsEsborranys(expedientEntity.getId()));
-		resource.setPendentExecucioMassiva(expedientHelper.isExpedientPendentExecucioMassiva(expedientEntity.getId()));		
+		resource.setPendentExecucioMassiva(expedientHelper.isExpedientPendentExecucioMassivaMourerTot(expedientEntity.getId()));		
 	}
 
     @Override
@@ -716,10 +716,8 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     						false, //comprovarPermisDelete
     						false, //checkPerMassiuAdmin
     						true, //comprovarAgafatPerUsuariActual
-    						configHelper.getRolActual());
-    				
-    				boolean isExpedientPendentExecucioMassiva = expedientHelper.isExpedientPendentExecucioMassiva(contingutEntity.getId());
-    				
+    						configHelper.getRolActual());    				
+    				boolean isExpedientPendentExecucioMassiva = expedientHelper.isExpedientPendentExecucioMassivaMourerTot(contingutEntity.getId());
     				resource.setPotModificarContingut(contingutEntity!=null && !isExpedientPendentExecucioMassiva);
     			}catch (Exception ex) {
     				resource.setPotModificarContingut(false);

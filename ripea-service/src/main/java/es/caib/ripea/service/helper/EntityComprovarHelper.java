@@ -784,7 +784,7 @@ public class EntityComprovarHelper {
 				false);
 		
 		boolean permisosAdminEntitatOAdminOrgan = comprovarAdminEntitatOAdminOrganDelExpedient(expedient);
-		boolean isExpedientPendentExecucioMassiva = expedientService.isExpedientPendentExecucioMassiva(expedient.getId());
+		boolean isExpedientPendentExecucioMassiva = expedientService.isExpedientPendentExecucioMassivaMourerTot(expedient.getId());
 		
 		if (((expedientAgafatPerUsuariActual && usuariActualWrite) || permisosAdminEntitatOAdminOrgan) && expedient.getEstat() == ExpedientEstatEnumDto.OBERT && ! isExpedientPendentExecucioMassiva) {
 			return true;

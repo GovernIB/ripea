@@ -3082,8 +3082,8 @@ public class ExpedientHelper {
 	}
 
 	@Transactional(readOnly = true)
-	public boolean isExpedientPendentExecucioMassiva(Long expedientId) {
-		return execucioMassivaRepository.findByExpedientOrigenIdAndDataFiNull(expedientId).isPresent();
+	public boolean isExpedientPendentExecucioMassivaMourerTot(Long expedientId) {
+		return execucioMassivaRepository.findByExpedientOrigenIdAndTipusAndDataFiNull(expedientId, ExecucioMassivaTipusDto.MOURE_EXPEDIENT).isPresent();
 	}
 	
 	@Transactional(propagation = Propagation.REQUIRES_NEW)

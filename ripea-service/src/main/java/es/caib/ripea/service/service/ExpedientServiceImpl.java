@@ -1772,8 +1772,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 	}
 	
 	@Override
-	public boolean isExpedientPendentExecucioMassiva(Long expedientId) {
-		return expedientHelper.isExpedientPendentExecucioMassiva(expedientId);
+	public boolean isExpedientPendentExecucioMassivaMourerTot(Long expedientId) {
+		return expedientHelper.isExpedientPendentExecucioMassivaMourerTot(expedientId);
 	}
 	
 	private boolean isIncorporacioDuplicadaPermesa() {

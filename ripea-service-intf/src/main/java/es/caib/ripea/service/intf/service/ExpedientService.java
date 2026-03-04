@@ -575,6 +575,6 @@ public interface ExpedientService {
 	public void moure(Long entitatId, Long expedientOrigenId, Long expedientDestiId, String rolActual);
 	
 	@PreAuthorize("isAuthenticated()")
-	public boolean isExpedientPendentExecucioMassiva(Long expedientId);
+	public boolean isExpedientPendentExecucioMassivaMourerTot(Long expedientId);
 	
 }
