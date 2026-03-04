@@ -218,6 +218,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
 		    label: t('page.document.action.importZip.label'),
 		    icon: "upload_file",
 		    onClick: handleImportarZip,
+			hidden: !entity?.potModificar,
 		},
         {
             label: t('page.contingut.action.importarExpedient.label'),

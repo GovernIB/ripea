@@ -717,7 +717,10 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     						false, //checkPerMassiuAdmin
     						true, //comprovarAgafatPerUsuariActual
     						configHelper.getRolActual());
-    				resource.setPotModificarContingut(contingutEntity!=null);
+    				
+    				boolean isExpedientPendentExecucioMassiva = expedientHelper.isExpedientPendentExecucioMassiva(contingutEntity.getId());
+    				
+    				resource.setPotModificarContingut(contingutEntity!=null && !isExpedientPendentExecucioMassiva);
     			}catch (Exception ex) {
     				resource.setPotModificarContingut(false);
     			}
