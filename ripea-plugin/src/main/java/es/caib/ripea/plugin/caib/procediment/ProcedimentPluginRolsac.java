@@ -269,11 +269,7 @@ public class ProcedimentPluginRolsac extends RipeaAbstractPluginProperties imple
 			if (codiUnitatAdministrativa!=null) {
 				dto.setUnitatOrganitzativaCodi(getUnitatAdministrativa(codiUnitatAdministrativa));
 			}
-			//Com que Procediment ens ve amb Boolean i al nostre sistema ho tenim amb boolean primitiu, si es null ho tractam com false:
-			if (procediment.getComun() != null)
-				dto.setComu(procediment.getComun().booleanValue());	
-			else 
-				dto.setComu(false);
+			dto.setComu(procediment.getComun()>0?true:false);
 		}
 		return dto;
 	}
