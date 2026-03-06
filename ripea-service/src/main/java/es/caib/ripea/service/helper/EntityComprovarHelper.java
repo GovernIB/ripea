@@ -80,11 +80,12 @@ public class EntityComprovarHelper {
 	@Autowired private DocumentNotificacioRepository documentNotificacioRepository;
 	@Autowired private DocumentPublicacioRepository documentPublicacioRepository;
 	@Autowired private OrganGestorRepository organGestorRepository;
-	
+
 	@Autowired private GrupRepositoryCommnand grupRepositoryCommnand;
-	
+
+	@Autowired private ContingutHelper contingutHelper;
 	@Autowired private PermisosHelper permisosHelper;
-    @Autowired private OrganGestorHelper organGestorHelper;
+	@Autowired private OrganGestorHelper organGestorHelper;
     @Autowired private MetaExpedientOrganGestorRepository metaExpedientOrganGestorRepository;
 	@Autowired private RolHelper rolHelper;
 	@Autowired private GrupRepository grupRepository;
@@ -783,10 +784,15 @@ public class EntityComprovarHelper {
 				"WRITE",
 				false);
 		
-		boolean permisosAdminEntitatOAdminOrgan = comprovarAdminEntitatOAdminOrganDelExpedient(expedient);
+		String rolActual = configHelper.getRolActual();
+		boolean permisosAdminEntitatOAdminOrgan = contingutHelper.checkIfUserIsAdminOfContingut(expedient.getId(), rolActual); 
+				//comprovarAdminEntitatOAdminOrganDelExpedient(expedient);
 		boolean isExpedientPendentExecucioMassiva = expedientService.isExpedientPendentExecucioMassivaMourerTot(expedient.getId());
 		
-		if (((expedientAgafatPerUsuariActual && usuariActualWrite) || permisosAdminEntitatOAdminOrgan) && expedient.getEstat() == ExpedientEstatEnumDto.OBERT && ! isExpedientPendentExecucioMassiva) {
+		//((expedientAgafatPerUsuariActual and permissionWrite) or isTascaObert or contingut.admin) and expedientObert and !isRolActualAdministradorLectura and !isExpedientPendentExecucioMassiva
+		
+		if (((expedientAgafatPerUsuariActual && usuariActualWrite) || permisosAdminEntitatOAdminOrgan) 
+				&& ExpedientEstatEnumDto.OBERT.equals(expedient.getEstat()) && !"IPA_ADMIN_LECTURA".equals(rolActual) &&  !isExpedientPendentExecucioMassiva) {
 			return true;
 		} else {
 			return false;
