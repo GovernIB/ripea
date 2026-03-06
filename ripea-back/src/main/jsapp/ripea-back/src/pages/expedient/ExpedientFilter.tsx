@@ -46,10 +46,10 @@ const ExpedientFilterForm = () => {
             <Grid item xs={2} hidden={!rol?.isUser}/>
             <Grid item xs={6} hidden={user?.sessionScope?.isDominisEnabled}/>
 
-        <GridButtonField xs={1} name={'agafat'} icon={'lock'}/>
-        <GridButtonField xs={1} name={'pendentFirmar'} icon={'edit'}/>
-        <GridButtonField xs={1} name={'seguit'} icon={'group_add'} hidden={!rol?.isUser}/>
-        <Grid item xs={!rol?.isUser ? 7.6 : 6.6}/>
+        <GridButtonField xs={1.5} name={'agafat'} icon={'lock'} whitLabel/>
+        <GridButtonField xs={1.5} name={'pendentFirmar'} icon={'edit'} whitLabel/>
+        <GridButtonField xs={1.5} name={'seguit'} icon={'group_add'} hidden={!rol?.isUser} whitLabel/>
+        <Grid item xs={!rol?.isUser ? 6.6 : 5.1}/>
     </>
 }
 

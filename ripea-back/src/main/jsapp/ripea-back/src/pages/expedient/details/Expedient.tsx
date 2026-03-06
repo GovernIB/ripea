@@ -2,7 +2,7 @@ import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 import {GridPage, useResourceApiService} from 'reactlib';
 import {useState, useEffect} from "react";
-import {Typography, Grid2 as Grid, Icon, IconButton, Link, Alert, Button, Box} from '@mui/material';
+import {Typography, Grid2 as Grid, Icon, IconButton, Link, Alert, Button, Box, Grid2} from '@mui/material';
 import {formatDate} from '../../../util/dateUtils.ts';
 import TabComponent from "../../../components/TabComponent.tsx";
 import InteressatsGrid from "../../interessats/InteressatsGrid.tsx";
@@ -15,7 +15,7 @@ import {StyledEstat, StyledPrioritat} from "../ExpedientGrid.tsx";
 import {ExpedientComment} from "../../CommentDialog.tsx";
 import RemesaGrid from "../../remesa/RemesaGrid.tsx";
 import PublicacioGrid from "../../publicacio/PublicacioGrid.tsx";
-import {CardData, CardPage, ContenidoData} from "../../../components/CardData.tsx";
+import {CardPage, DetailCard, DetailCardContent} from "../../../components/CardData.tsx";
 import Load from "../../../components/Load.tsx";
 import {useUserSession} from "../../../components/Session.tsx";
 import {useActions} from "./CommonActions.tsx";
@@ -24,20 +24,6 @@ import useErrorValidacio from "./ErrorValidacio.tsx";
 import SseExpedient, {useValidacioSession} from "../../../components/SseExpedient.tsx";
 import {icons} from "../../user/UserHeadToolbar.tsx";
 import {setTitlePage} from "../../../TitleHeaderConfigurator.tsx";
-
-const Contenido = (props :any) => {
-    const { title, children } = props;
-    return <ContenidoData
-        title={title}
-        titleXs={12}
-        textXs={12}
-        componentTitleProps={{ color: 'text.secondary', fontSize: 14, fontStyle: "italic" }}
-        componentTextProps={{ color: 'text.primary', wordWrap: "break-word" }}
-        sx={{ display: 'flex', flexDirection:'column' }}
-    >
-        {children}
-    </ContenidoData>
-}
 
 const border= { border: '1px solid #e3e3e3', borderRadius: '4px' };
 
@@ -56,8 +42,11 @@ const ExpedientsRelacionats = (props:any) => {
         ...expedient?.relacionatsAmb ?? []
     ])];
 
-    return <Box sx={{ my: 2 }}>
-        <CardData title={t('page.contingut.action.importarExpedient.title')} display={'flex'} flexDirection={'column'} hidden={relacionats?.length==0}>
+    if (relacionats.length == 0)
+        return <></>
+
+    return <Grid2 size={12} p={1} my={2}>
+        <DetailCard title={t('page.contingut.action.importarExpedient.title')} display={'flex'} flexDirection={'column'} hidden={relacionats?.length==0}>
             {
                 relacionats?.map((relacionat:any) =>
                     <Grid key={relacionat?.id} container alignItems="center">
@@ -80,31 +69,31 @@ const ExpedientsRelacionats = (props:any) => {
                     </Grid>
                 )
             }
-        </CardData>
-    </Box>
+        </DetailCard>
+    </Grid2>
 }
 
 export const ExpedientInfo = (props:any) => {
     const {title, entity: expedient, xs, readOnly} = props;
     const { t } = useTranslation();
-    return <CardData title={title ?? t('page.expedient.detall.title')} direction={'column'} xs={xs}>
-        <Contenido title={t('page.contingut.detalle.numero')}>{expedient?.numero}</Contenido>
-        <Contenido title={t('page.contingut.detalle.titol')}>{expedient?.nom}</Contenido>
-        <Contenido title={t('page.contingut.detalle.metaExpedient')}>{expedient?.metaExpedient?.description}</Contenido>
-        <Contenido title={t('page.contingut.detalle.organGestor')}>{expedient?.organGestor?.description}</Contenido>
-        <Contenido title={t('page.contingut.detalle.fechaApertura')}>{formatDate(expedient?.ntiFechaApertura)}</Contenido>
-        <Contenido title={t('page.contingut.detalle.estat')}><StyledEstat entity={expedient}>{t(`enum.estat.${expedient?.estat}`)}</StyledEstat></Contenido>
-        <Contenido title={t('page.contingut.detalle.prioritat')}><StyledPrioritat entity={expedient}>{t(`enum.prioritat.${expedient?.prioritat}`)}</StyledPrioritat></Contenido>
-        <Contenido title={t('page.contingut.detalle.clasificacio')}>{expedient?.ntiClasificacionSia}</Contenido>
+    return <DetailCard title={title ?? t('page.expedient.detall.title')} size={xs}>
+        <DetailCardContent title={t('page.contingut.detalle.numero')}>{expedient?.numero}</DetailCardContent>
+        <DetailCardContent title={t('page.contingut.detalle.titol')}>{expedient?.nom}</DetailCardContent>
+        <DetailCardContent title={t('page.contingut.detalle.metaExpedient')}>{expedient?.metaExpedient?.description}</DetailCardContent>
+        <DetailCardContent title={t('page.contingut.detalle.organGestor')}>{expedient?.organGestor?.description}</DetailCardContent>
+        <DetailCardContent title={t('page.contingut.detalle.fechaApertura')}>{formatDate(expedient?.ntiFechaApertura)}</DetailCardContent>
+        <DetailCardContent title={t('page.contingut.detalle.estat')} size={4} sx={{ borderBottom: "1px solid" }}><StyledEstat entity={expedient}>{t(`enum.estat.${expedient?.estat}`)}</StyledEstat></DetailCardContent>
+        <DetailCardContent title={t('page.contingut.detalle.prioritat')} size={4} sx={{ borderBottom: "1px solid" }}><StyledPrioritat entity={expedient}>{t(`enum.prioritat.${expedient?.prioritat}`)}</StyledPrioritat></DetailCardContent>
+        <DetailCardContent title={t('page.contingut.detalle.clasificacio')} size={4} sx={{ borderBottom: "1px solid" }}>{expedient?.ntiClasificacionSia}</DetailCardContent>
 
         <ExpedientsRelacionats entity={expedient}/>
 
         {!readOnly &&
-            <Grid size={12} display={'flex'} justifyContent={'end'}>
+            <Grid2 size={12} display={'flex'} justifyContent={'end'} p={1}>
                 <ExpedientActionButton entity={expedient}/>
-            </Grid>
+            </Grid2>
         }
-    </CardData>
+    </DetailCard>
 }
 
 const ExpedientAlert = (props:any) => {
