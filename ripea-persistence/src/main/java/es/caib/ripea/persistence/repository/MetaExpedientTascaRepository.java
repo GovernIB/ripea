@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Component;
 
 import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.ExpedientEstatEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientTascaEntity;
 
@@ -41,6 +42,8 @@ public interface MetaExpedientTascaRepository extends JpaRepository<MetaExpedien
 	MetaExpedientTascaEntity findByMetaExpedientAndCodi(MetaExpedientEntity metaExpedient, String codi);
 	
 	int countByMetaExpedient(MetaExpedientEntity metaExpedient);
+	
+	int countByEstatCrearTascaOrEstatFinalitzarTasca(ExpedientEstatEntity estatCrearTasca, ExpedientEstatEntity estatFinalitzarTasca);
 	
 	@Modifying
  	@Query(value = "UPDATE IPA_METAEXP_TASCA " +

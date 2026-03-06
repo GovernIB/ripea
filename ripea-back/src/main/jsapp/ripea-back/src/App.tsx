@@ -37,9 +37,9 @@ export const App: React.FC = () => {
             pl: 2,
             pr: 4,
             mr: 4,
-            borderRight: `2px solid ${entitat?.conf?.colorLletra}`
+            borderRight: `1px solid ${entitat?.conf?.colorLletra}`
         }}
-        title={<img src={ripea_logo} style={{ height: '80px', paddingTop: '5px' }} />}
+        title={<img src={ripea_logo} style={{ height: '80px', paddingTop: '8px' }} />}
         version={version}
         appbarBackgroundColor={entitat?.conf?.colorFons}>
         <TitleHeaderConfigurator/>

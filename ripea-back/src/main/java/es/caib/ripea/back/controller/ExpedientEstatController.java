@@ -221,9 +221,11 @@ public class ExpedientEstatController extends BaseAdminController {
 					expedientEstatId, 
 					rolActual, organActual != null ? organActual.getId() : null);
 		}catch (Exception e) {
-			if (ExceptionHelper.isExceptionOrCauseInstanceOf(e, ValidationException.class))
-				return getAjaxControllerReturnValueError(request, "redirect:expedientEstat", 
-						"expedient.estat.controller.esborrat.error.restriccio", e);
+			String missatge = "expedient.estat.controller.esborrat.ko";
+			if (ExceptionHelper.isExceptionOrCauseInstanceOf(e, ValidationException.class)) {
+				missatge = e.getCause().getMessage();
+			}
+			return getAjaxControllerReturnValueError(request, "redirect:expedientEstat", missatge, e);
 		}
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
