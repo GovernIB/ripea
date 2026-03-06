@@ -22,18 +22,20 @@ export const GridButton = (props:any) => {
 }
 
 export const GridButtonField = (props:any) => {
-    const {name, icon, ...other} = props;
+    const {name, icon, whitLabel, ...other} = props;
     const {data, apiRef, fields} = useFormContext()
 
+    const label = fields?.find?.(item => item?.name === name)?.label || ''
     return <Load value={apiRef} noEffect><GridButton
         onClick={()=>{
             apiRef?.current?.setFieldValue?.(name, !data?.[name])
         }}
         variant={ data?.[name] ?"contained":"outlined" }
-        title={fields?.find?.(item => item?.name === name)?.label || ''}
+        title={label}
         {...other}
     >
-        <Icon sx={{m: 0}}>{icon}</Icon>
+        <Icon sx={{mr: (whitLabel && label) ?1 :0}}>{icon}</Icon>
+        {whitLabel && label}
     </GridButton></Load>
 }
 
