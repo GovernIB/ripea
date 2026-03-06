@@ -173,7 +173,7 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
         return columns.filter((col:any) => !col?.hidden).map((col:any) => ({
             ...col,
             flex: col.flex ?? 1,
-            cellClassName: 'cell-with-wrap',
+            cellClassName: col?.wordWrap ? 'multi-line-cell' : undefined,
         }));
     }, [columns])
 

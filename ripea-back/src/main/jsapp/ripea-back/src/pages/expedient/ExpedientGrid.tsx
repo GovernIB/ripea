@@ -129,6 +129,7 @@ const beforeAvis = [
         field: 'metaExpedient',
         flex: 1.15,
         sortable: false,
+        wordWrap: true,
     },
     {
         field: 'nom',
@@ -209,6 +210,7 @@ const ExpedientGrid = () => {
             field: 'interessats',
             sortable: false,
             flex: 1,
+            cellClassName: 'multi-line-cell',
             valueFormatter: (value: any) => {
                 let resum = '';
                 for (const interessat of value) {

@@ -10,8 +10,10 @@ const base: ThemeOptions = {
                     backgroundImage: `url(${backgroundPattern})`,
                     color: '#666666'
                 },
-                '.cell-with-wrap': {
-                    textOverflow: "ellipsis !important",
+                '.multi-line-cell': {
+                    display: 'flex',
+                    alignItems: 'baseline !important',
+                    whiteSpace: 'break-spaces !important',
                 },
             },
         },
