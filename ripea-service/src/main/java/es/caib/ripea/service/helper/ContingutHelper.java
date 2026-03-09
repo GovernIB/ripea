@@ -1218,6 +1218,13 @@ public class ContingutHelper {
 			boolean comprovarAgafatPerUsuariActual, 
 			String rolActual) {
 		
+		if (RolHelper.isAdminLecturaEntitat(rolActual)) {
+			throw new ValidationException(
+					contingutId,
+					ContingutEntity.class,
+					"El rol actual es de nomes lectura i no pot modificar contingut: "+rolActual);
+		}
+		
 		entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
@@ -1248,7 +1255,6 @@ public class ContingutHelper {
 		if (!checkPerMassiuAdmin &&
 			!checkIfUserIsAdminOfContingut(contingutId, rolActual) &&
 			!RolHelper.isAdminEntitat(rolActual) &&
-			!RolHelper.isAdminLecturaEntitat(rolActual) &&
 			!RolHelper.isAdminOrgan(rolActual) &&
 			comprovarAgafatPerUsuariActual) {
 			// Comprova que l'usuari actual te agafat l'expedient

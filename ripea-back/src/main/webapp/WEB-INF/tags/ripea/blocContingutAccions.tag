@@ -410,7 +410,7 @@
 				</c:choose>
 				
 				<c:set var="permDeleteExpedient">${contingut.expedient && !contingut.conteDocumentsDefinitius && expedient.usuariActualDelete}</c:set>
-				<c:set var="permDeleteCarpeta">${contingut.carpeta && isCreacioCarpetesActiva && expedient.usuariActualWrite}</c:set>
+				<c:set var="permDeleteCarpeta">${contingut.carpeta && isCreacioCarpetesActiva && expedient.usuariActualWrite && potModificar}</c:set>
 				<c:set var="permDeleteDocument">${(contingut.document && !contingut.documentDeAnotacio && (!contingut.arxiuEstatDefinitiu || (contingut.arxiuEstatDefinitiu && isPermesEsborrarFinals))) && (expedient.usuariActualWrite || isTasca)}</c:set>
 	
 				<c:if test="${(permDeleteExpedient || permDeleteCarpeta  || permDeleteDocument) && expedientObert}">

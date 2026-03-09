@@ -174,8 +174,11 @@ public class EntityComprovarHelper {
 			}
 		}
 		if (comprovarPermisAdmin) {
-			boolean esAdministradorEntitat = auth != null && permisosHelper.isGrantedAll(entitatId, EntitatEntity.class,
-			        new Permission[] { ExtendedPermission.ADMINISTRATION }, auth);
+			boolean esAdministradorEntitat = auth != null && permisosHelper.isGrantedAny(
+					entitatId,
+					EntitatEntity.class,
+			        new Permission[] { ExtendedPermission.ADMINISTRATION, ExtendedPermission.ADMINISTRATION_READ },
+			        auth);
 			if (!esAdministradorEntitat) {
 				throw new PermissionDeniedException(entitatId, EntitatEntity.class, auth.getName(),
 				        "ADMINISTRATION");
