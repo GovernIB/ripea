@@ -62,6 +62,7 @@ public class JBossWebSecurityConfig extends BaseWebSecurityConfig {
 	@Value("${es.caib.ripea.security.mappableRoles:" +
 			BaseConfig.ROLE_SUPER + "," +
 			BaseConfig.ROLE_ADMIN + "," +
+			BaseConfig.ROLE_ADMIN_LECTURA + "," +
 			BaseConfig.ROLE_DISSENY + "," +
 			BaseConfig.ROLE_ORGAN_ADMIN + "," +
 			BaseConfig.ROLE_BSTWS + "," +

@@ -33,6 +33,7 @@
 		<rip:inputSelect name="principalTipus" textKey="entitat.permis.form.camp.tipus" disabled="${not empty permisCommand.id}" optionEnum="PrincipalTipusEnumDto"/>
 		<rip:inputText name="principalNom" required="true" textKey="entitat.permis.form.camp.principal" disabled="${not empty permisCommand.id}" placeholderKey="entitat.permis.form.camp.principal"/>
 		<rip:inputCheckbox name="administration" textKey="entitat.permis.form.camp.administracio"/>
+		<rip:inputCheckbox name="administrationLectura" textKey="entitat.permis.form.camp.adminLectura"/>
 		<rip:inputCheckbox name="read" textKey="entitat.permis.form.camp.usuari"/>
 		<div id="modal-botons">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span>

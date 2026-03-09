@@ -64,6 +64,7 @@ import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ReportFileType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
+import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.dto.DominiDto;
 import es.caib.ripea.service.intf.dto.ExpedientEstatDto;
 import es.caib.ripea.service.intf.dto.GrupDto;
@@ -176,10 +177,11 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
         String entitatActualCodi = configHelper.getEntitatActualCodi();
         String rolActual		 = configHelper.getRolActual();
         
-		boolean isAdmin = "IPA_ADMIN".equals(rolActual);
-		boolean isAdminOrgan = "IPA_ORGAN_ADMIN".equals(rolActual);
-		boolean isDissenyador = "IPA_DISSENY".equals(rolActual);
-		boolean isRevisor = "IPA_REVISIO".equals(rolActual);
+		boolean isAdmin 		= BaseConfig.ROLE_ADMIN.equals(rolActual);
+		boolean isAdminLectura	= BaseConfig.ROLE_ADMIN_LECTURA.equals(rolActual);
+		boolean isAdminOrgan	= BaseConfig.ROLE_ORGAN_ADMIN.equals(rolActual);
+		boolean isDissenyador	= BaseConfig.ROLE_DISSENY.equals(rolActual);
+		boolean isRevisor		= BaseConfig.ROLE_REVISIO.equals(rolActual);
         
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true,false);
     	Map<String, String> mapaNamedQueries =  Utils.namedQueriesToMap(namedQueries);
@@ -246,7 +248,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
         				entitat.getId(),
         				ogEntity.getId(),
         				hasPermisAdminComu);
-        	} else if (isAdmin || isRevisor) {
+        	} else if (isAdmin || isAdminLectura || isRevisor) {
         		MetaExpedientFiltreDto filtre = new MetaExpedientFiltreDto();
         		metaExpPermesos = metaExpedientHelper.findByEntitat(entitat, filtre, Utils.sensePaginacio(), null).getContent();
         		procsPermesosIds = metaExpedientEntityToListLong(metaExpPermesos);

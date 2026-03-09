@@ -28,6 +28,12 @@ const columns = [
         renderCell: (params:any) => (params?.row?.admin && <Icon>check</Icon>),
     },
     {
+        field: 'adminLectura',
+        flex: 0.5,
+        sortable: false,
+        renderCell: (params:any) => (params?.row?.adminLectura && <Icon>check</Icon>),
+    },
+    {
         field: 'user',
         flex: 0.5,
         sortable: false,

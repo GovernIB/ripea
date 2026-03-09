@@ -51,6 +51,7 @@ public class BaseAdminController extends BaseController {
 			throw new SecurityException("No te cap entitat assignada");
 		}
 		if (!entitat.isUsuariActualAdministration() &&
+			!entitat.isUsuariActualAdministrationRead() &&
 			!entitat.isUsuariActualTeOrgans() &&
 			!RolHelper.isRolActualRevisor(request) && 
 			!RolHelper.isRolActualDissenyadorOrgan(request)) {

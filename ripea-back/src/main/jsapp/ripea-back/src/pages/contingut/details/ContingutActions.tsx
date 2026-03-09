@@ -146,7 +146,7 @@ export const useActions = (refresh?: () => void) => {
 
 export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refresh?: () => void) => {
     const { t } = useTranslation();
-    const { value: user } = useUserSession()
+    const { value: user, rol } = useUserSession();
 
     const {handleShow: handleDocPinbal, content: contentDocPinbal} = useDocPinbal(entity, refresh)
     const {handleShow: handleCrearCarpeta, content: contentCrearCarpeta} = useCrearCarpeta(entity, refresh)
@@ -278,7 +278,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             icon: "delete",
             showInMenu: true,
             onClick: eliminar,
-            hidden: (row:any) => !(entity?.potModificarContingut || entity?.potModificar) || !isDocument(row) || (row?.arxiuEstat == 'DEFINITIU' && !user?.sessionScope?.permesEsborrarFinals)
+            hidden: (row:any) => !(entity?.potModificarContingut || entity?.potModificar) || !isDocument(row) || (row?.arxiuEstat == 'DEFINITIU' && !user?.sessionScope?.permesEsborrarFinals) || rol?.isAdminLectura
         },
         {
             label: <Divider sx={{width: '100%'}} color={"none"}/>,

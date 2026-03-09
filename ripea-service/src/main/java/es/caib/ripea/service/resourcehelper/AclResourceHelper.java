@@ -1,27 +1,23 @@
 package es.caib.ripea.service.resourcehelper;
 
-import es.caib.ripea.persistence.base.entity.BaseAuditableEntity;
-import es.caib.ripea.persistence.entity.*;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Component;
+
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.GrupEntity;
+import es.caib.ripea.persistence.entity.MetaNodeEntity;
+import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.entity.resourceentity.AclEntryResourceEntity;
-import es.caib.ripea.persistence.entity.resourceentity.AclSidResourceEntity;
-import es.caib.ripea.persistence.entity.resourceentity.EntitatResourceEntity;
-import es.caib.ripea.persistence.entity.resourcerepository.EntitatResourceRepository;
-import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
 import es.caib.ripea.service.intf.dto.ExtendedPermissionEnum;
 import es.caib.ripea.service.intf.model.AclSidResource;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
 public class AclResourceHelper {
-
-    private final ConfigHelper configHelper;
-    private final EntitatResourceRepository entitatResourceRepository;
 
     public List<AclEntryResourceEntity> filterEntries(List<AclEntryResourceEntity> entities, String classname, Long objectId) {
         return entities.stream()

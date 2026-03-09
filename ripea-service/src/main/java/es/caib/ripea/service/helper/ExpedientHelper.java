@@ -109,6 +109,7 @@ import es.caib.ripea.persistence.repository.RegistreAnnexRepository;
 import es.caib.ripea.persistence.repository.UsuariRepository;
 import es.caib.ripea.persistence.repository.command.ExpedientRepositoryCommnand;
 import es.caib.ripea.service.auxiliary.ExpedientFiltreCalculat;
+import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.ArxiuEstatEnumDto;
 import es.caib.ripea.service.intf.dto.CarpetaDto;
@@ -2219,7 +2220,7 @@ public class ExpedientHelper {
 				permisosPerExpedients.getIdsOrgansAmbProcedimentsComunsPermesos() == null,
 				permisosPerExpedients.getIdsOrgansAmbProcedimentsComunsPermesos(),
 				permisosPerExpedients.getIdsProcedimentsComuns(),
-				rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_SUPER"));
+				rolActual.equals(BaseConfig.ROLE_ADMIN) || rolActual.equals(BaseConfig.ROLE_SUPER));
 	}
 	
 	public PermisosPerExpedientsDto findPermisosPerExpedients(
@@ -2238,7 +2239,7 @@ public class ExpedientHelper {
 		List<Long> idsGrupsPermesos = null;
 		List<Long> organsComunsAndFills = null;
 
-		if (rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ADMIN_LECTURA")) {
+		if (rolActual.equals(BaseConfig.ROLE_ADMIN) || rolActual.equals(BaseConfig.ROLE_ADMIN_LECTURA)) {
 
 			//Si ets admin veruas els expedients de tots els procediments de la entitat
 			idsMetaExpedientsPermesos = metaExpedientRepository.findAllIdsByEntitat(entitat);

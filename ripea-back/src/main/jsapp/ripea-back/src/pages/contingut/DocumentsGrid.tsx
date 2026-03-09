@@ -369,7 +369,7 @@ const DocumentsGrid = (props: any) => {
                                 position: 3,
                                 element: <MenuActionButton
                                     id={'createDocument'}
-                                    hidden={!(entity?.potModificarContingut || entity?.potModificar)}
+                                    hidden={!(entity?.potModificarContingut || entity?.potModificar) || rol?.isAdminLectura}
                                     buttonLabel={t('page.contingut.action.create.label')}
                                     buttonProps={{
                                         startIcon: <Icon>add</Icon>,
