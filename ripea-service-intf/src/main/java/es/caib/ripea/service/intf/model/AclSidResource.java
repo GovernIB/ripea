@@ -51,7 +51,7 @@ public class AclSidResource extends BaseResource<Long> {
     public static final String ACTION_MODIFY_PERMISION_CODE = "MODIFY_PERMISION";
     public static final String ACTION_DELETE_PERMISION_CODE = "DELETE_PERMISION";
 
-    private PrincipalTipusEnumDto principal;
+    private PrincipalTipusEnumDto principal = PrincipalTipusEnumDto.ROL;
     private String sid;
 
     @Transient private boolean admin;// ADMINISTRATION

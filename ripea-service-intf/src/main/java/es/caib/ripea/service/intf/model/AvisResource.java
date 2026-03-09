@@ -1,5 +1,7 @@
 package es.caib.ripea.service.intf.model;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 
 import javax.validation.constraints.NotNull;
@@ -39,7 +41,9 @@ public class AvisResource extends BaseAuditableResource<Long> {
 
     @NotNull private String assumpte;
     @NotNull private String missatge;
-    @NotNull private Date dataInici = new Date();
+    @NotNull private Date dataInici = Date.from(
+    			LocalDate.now().atStartOfDay(ZoneId.of("UTC")).toInstant()
+    		);
     @NotNull private Date dataFinal;
 	private Boolean actiu = true;
     @NotNull private AvisNivellEnumDto avisNivell = AvisNivellEnumDto.INFO;

@@ -225,6 +225,11 @@ public class ConfigResourceServiceImpl extends BaseMutableResourceService<Config
     
     @Override
     protected void afterConversion(ConfigResourceEntity entity, ConfigResource resource) {
+    	if (resource.isJbossProperty()) {
+            // Les propietats de Jboss es llegeixen del fitxer de properties, 
+    		// si no estan definides prenen el valor especificat a la base de dades.
+    		resource.setValue(configHelper.getEnvironmentProperty(resource.getKey(), resource.getValue()));
+        }
     	if (Utils.hasValue(entity.getEntitatCodi())) {
     		EntitatEntity ee = entitatRepository.findByCodi(entity.getEntitatCodi());
     		resource.setEntitat(ResourceReference.toResourceReference(ee.getId(), ee.getNom()));

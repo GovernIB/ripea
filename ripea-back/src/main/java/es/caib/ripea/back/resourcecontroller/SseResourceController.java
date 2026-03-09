@@ -214,13 +214,19 @@ public class SseResourceController {
                     .data("Connexió establerta a " + LocalDateTime.now())
                     .id(String.valueOf(System.currentTimeMillis())));
             //Carregam els valors inicials de les validacions del expedient
-            ErrorsValidacioChangedEvent evce = new ErrorsValidacioChangedEvent(
-            		expedientId,
-            		eventService.getValidacionsInicialsExpedient(expedientId));
-            emitter.send(SseEmitter.event()
-            		.name(ExpedientEventType.VALIDACIO_CHANGE.getEventName())
-            		.data(evce)
-            		.id(String.valueOf(System.currentTimeMillis())));
+            /**
+             * 09/03/2026
+             * 
+             *  No es necessari, ja es carreguen en el afterConversion de ExpedientResourceServiceImpl.
+             *  A mes, els resultats que recupera aquí no estan actualitzats i apareixen errors que no haurien d'apareixer.
+             */
+//            ErrorsValidacioChangedEvent evce = new ErrorsValidacioChangedEvent(
+//            		expedientId,
+//            		eventService.getValidacionsInicialsExpedient(expedientId));
+//            emitter.send(SseEmitter.event()
+//            		.name(ExpedientEventType.VALIDACIO_CHANGE.getEventName())
+//            		.data(evce)
+//            		.id(String.valueOf(System.currentTimeMillis())));
         } catch (IOException e) {
             log.error("Error enviant esdeveniment inicial SSE", e);
             emitter.complete();

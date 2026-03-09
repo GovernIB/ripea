@@ -1,46 +1,59 @@
 package es.caib.ripea.service.resourceservice;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
+
+import javax.annotation.PostConstruct;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionTemplate;
+
 import com.turkraft.springfilter.FilterBuilder;
 import com.turkraft.springfilter.parser.Filter;
-import es.caib.ripea.persistence.entity.*;
-import es.caib.ripea.persistence.entity.resourceentity.*;
-import es.caib.ripea.persistence.entity.resourcerepository.EntitatResourceRepository;
+
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.GrupEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientOrganGestorEntity;
+import es.caib.ripea.persistence.entity.MetaNodeEntity;
+import es.caib.ripea.persistence.entity.OrganGestorEntity;
+import es.caib.ripea.persistence.entity.resourceentity.AclSidResourceEntity;
+import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientOrganGestorResourceEntity;
+import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientResourceEntity;
+import es.caib.ripea.persistence.entity.resourceentity.OrganGestorResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientOrganGestorResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.OrganGestorResourceRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
-import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.PermisosHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.PermisDto;
-import es.caib.ripea.service.intf.model.*;
+import es.caib.ripea.service.intf.model.AclClassResource;
+import es.caib.ripea.service.intf.model.AclEntryResource;
+import es.caib.ripea.service.intf.model.AclObjIdentityResource;
+import es.caib.ripea.service.intf.model.AclSidResource;
 import es.caib.ripea.service.intf.resourceservice.AclSidResourceService;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.resourcehelper.AclResourceHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.support.TransactionTemplate;
-
-import javax.annotation.PostConstruct;
-import java.io.Serializable;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class AclSidResourceServiceImpl extends BaseMutableResourceService<AclSidResource, Long, AclSidResourceEntity> implements AclSidResourceService {
 
-    private final ConfigHelper configHelper;
     private final PermisosHelper permisosHelper;
     private final AclResourceHelper aclResourceHelper;
-    private final EntitatResourceRepository entitatResourceRepository;
     private final OrganGestorRepository organGestorRepository;
     private final MetaExpedientOrganGestorResourceRepository metaExpedientOrganGestorResourceRepository;
     private final MetaExpedientResourceRepository metaExpedientResourceRepository;
