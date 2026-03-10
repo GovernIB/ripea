@@ -3,8 +3,9 @@ import GridFormField, {GridButtonField} from "../../components/GridFormField.tsx
 import StyledMuiFilter from "../../components/StyledMuiFilter.tsx";
 import * as builder from "../../util/springFilterUtils.ts";
 import {Grid} from "@mui/material";
+import {useUserSession} from "../../components/Session.tsx";
 
-const MetaExpedientFilterForm = () => {
+const MetaExpedientFilterForm = ({ user }:any) => {
     const { data } = useFormContext();
     return <>
         <GridFormField xs={2} name="tipus"/>
@@ -12,11 +13,12 @@ const MetaExpedientFilterForm = () => {
         <GridFormField xs={3} name="nom"/>
         <GridFormField xs={3} name="classificacio"/>
         <GridFormField xs={2} name="actiu"/>
-        <GridFormField xs={2} name="revisioEstat"/>
+        <GridFormField xs={2} name="revisioEstat" hidden={!user?.sessionScope?.revisioActiva}/>
         <GridFormField xs={2} name="ambit"/>
         <GridFormField xs={3} name="organGestor" disabled={data?.ambit == 'COMUNS'}/>
-        <Grid xs={2}/>
-        <GridButtonField xs={0.6} name="permisDirecte" icon={"pan_tool_alt"}/>
+        <Grid xs={2} hidden={user?.sessionScope?.revisioActiva}/>
+        <Grid xs={1}/>
+        <GridButtonField xs={1.6} name="permisDirecte" icon={"pan_tool_alt"} whitLabel/>
     </>
 }
 
@@ -35,7 +37,7 @@ const springFilterBuilder = (data:any) => {
 }
 
 export const MetaExpedientFilter = (props: any) => {
-    // const {onSpringFilterChange} = props;
+    const {value: user} = useUserSession()
 
     return <StyledMuiFilter
         resourceName={"metaExpedientResource"}
@@ -43,6 +45,6 @@ export const MetaExpedientFilter = (props: any) => {
         springFilterBuilder={springFilterBuilder}
         {...props}
     >
-        <MetaExpedientFilterForm/>
+        <MetaExpedientFilterForm user={user}/>
     </StyledMuiFilter>
 }

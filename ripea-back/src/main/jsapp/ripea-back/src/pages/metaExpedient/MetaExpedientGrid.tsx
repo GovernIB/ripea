@@ -132,7 +132,7 @@ const MetaExpedientGrid = () => {
     }
 
     const readOnly = useMemo(() => {
-        return rol.isRevisor
+        return rol.isRevisor || rol.isAdminLectura
     }, [rol])
 
     const additionalColumns = useMemo(() => [

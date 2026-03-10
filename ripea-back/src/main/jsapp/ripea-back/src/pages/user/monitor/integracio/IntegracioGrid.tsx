@@ -46,6 +46,7 @@ const columns:any[] = [
     {
         field: 'tempsResposta',
         flex: 0.4,
+        valueFormatter: (value:string) => value && `${value} ms`,
     },
     {
         field: 'estat',

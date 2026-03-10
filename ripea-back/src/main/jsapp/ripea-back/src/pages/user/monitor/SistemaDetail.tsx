@@ -4,7 +4,7 @@ import {MuiDialog, useBaseAppContext, useMuiDataGridApiRef, useResourceApiServic
 import TabComponent from "../../../components/TabComponent.tsx";
 import StyledMuiGrid, {ToolbarButton} from "../../../components/StyledMuiGrid.tsx";
 import {ContenidoData, DetailCard, DetailCardContent} from "../../../components/CardData.tsx";
-import {LinearProgress, Grid2 as Grid, Box, CardContent} from "@mui/material";
+import {LinearProgress, Grid2 as Grid, Box} from "@mui/material";
 
 const useSistemAction = () => {
     const {

@@ -3,7 +3,7 @@ import {MuiDialog, useBaseAppContext, useFormContext, useResourceApiService} fro
 import {useEffect, useMemo, useRef, useState} from "react";
 import StyledMuiFilter from "../../../../components/StyledMuiFilter.tsx";
 import GridFormField, {GridButton} from "../../../../components/GridFormField.tsx";
-import {Alert, Box, Grid, Icon, Typography} from "@mui/material";
+import {Alert, Box, Grid, Icon, IconButton, Typography} from "@mui/material";
 import * as builder from "../../../../util/springFilterUtils.ts";
 import {useSession} from "../../../../components/SessionStorageContext.tsx";
 import Load from "../../../../components/Load.tsx";
@@ -161,7 +161,7 @@ export const useIntegracioDiagnostic = (integracions:any[]) => {
     }
 
     useEffect(() => {
-        if (apiIsReady && open) {
+        if (apiIsReady && open && filter != undefined) {
             apiDiagnosticAll(integracions.map((i:any) => i.codi), filter?.entitat, filter?.organ)
         }
     }, [open, filter?.entitat, filter?.organ]);
@@ -207,7 +207,7 @@ export const useIntegracioDiagnostic = (integracions:any[]) => {
         >
             <IntegracioDiagnosticFilter apiReiniciar={() => apiReiniciar(undefined, filter?.entitat, filter?.organ)}/>
 
-            <Load value={integracions}>
+            <Load value={integracions && filter != undefined}>
                 {integracions?.map?.(i => {
                     const d = diagnostic.get(i.codi)
                     return <Grid container direction={"row"} display={'flex'} columnSpacing={1}>
@@ -216,7 +216,19 @@ export const useIntegracioDiagnostic = (integracions:any[]) => {
                             <Grid item xs={7.5}>
                                 {d?.traza == null
                                     ? <Alert severity={getAlertSeverity(d?.nivell)}>{d?.missatge}</Alert>
-                                    : <AlertExpand label={d?.missatge} severity={getAlertSeverity(d?.nivell)}>
+                                    : <AlertExpand
+                                        label={d?.missatge}
+                                        severity={getAlertSeverity(d?.nivell)}
+                                        action={<>
+                                            <IconButton
+                                                color="inherit"
+                                                size="small"
+                                                onClick={() => navigator.clipboard.writeText(d?.traza)}
+                                            >
+                                                <Icon sx={{ m: 0 }}>content_copy</Icon>
+                                            </IconButton>
+                                        </>}
+                                    >
                                         <Box
                                             sx={{
                                                 border: 'solid 1px #e3e3e3',
@@ -226,7 +238,7 @@ export const useIntegracioDiagnostic = (integracions:any[]) => {
                                                 overflow: 'auto',
                                                 whiteSpace: 'pre',
                                                 fontFamily: 'monospace', // opcional para parecer <pre>
-                                                mt: 1,
+                                                maxHeight: '500px',
                                                 p: 1
                                             }}
                                         >

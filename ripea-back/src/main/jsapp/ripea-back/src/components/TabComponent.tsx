@@ -48,13 +48,12 @@ const TabComponent = (props :any) => {
     };
 
     useEffect(() => {
-        if (!value) {
+        if (!value && defaultValue) {
             setValue(defaultValue)
-        }
-        if (!tabs.some((tab:TabProps)=>tab?.value==value)) {
+        }else if (!tabs.some((tab:TabProps)=>tab?.value==value)) {
             setValue(tabs[0].value);
         }
-    }, [tabs]);
+    }, [tabs, value]);
 
     return <Load value={tabs?.length}>
     <Box sx={{display: 'flex', flexDirection: 'column', height: '100%'}}>

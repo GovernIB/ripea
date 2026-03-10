@@ -134,7 +134,7 @@ export const useActions = (refresh?: () => void) => {
 
 export const useMetaExpedientActions = (refresh?: () => void) => {
     const {t} = useTranslation();
-    const {rol} = useUserSession()
+    const {value: user, rol} = useUserSession()
 
     const {handleOpen: handleExpedient, dialog: dialogExpedient} = useExpedientDialog();
     const {handleOpen: handleDetail, dialog: dialogDetail} = useMetaExpedientDetail();
@@ -169,7 +169,7 @@ export const useMetaExpedientActions = (refresh?: () => void) => {
             icon: "edit",
             showInMenu: true,
             onClick: handleCanviEstat,
-            hidden: !(rol?.isRevisor || rol?.isAdmin),
+            hidden: !(rol?.isRevisor || rol?.isAdmin) || !user?.sessionScope?.revisioActiva,
         },
         {
             label: t('page.metaExpedient.action.expedient.label'),

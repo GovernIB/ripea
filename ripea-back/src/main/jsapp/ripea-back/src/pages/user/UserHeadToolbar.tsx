@@ -159,7 +159,6 @@ const UserHeadToolbar = () => {
 
 const useMenuSupAdmin = () => {
     const { t } = useTranslation();
-    const { toProgramaAntic } = useToProgramaAntic();
     const {handleOpen, dialog} = useSistemaDetail();
 
     const appEntries:any[] = [
