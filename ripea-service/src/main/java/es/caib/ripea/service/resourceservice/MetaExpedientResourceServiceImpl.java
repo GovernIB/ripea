@@ -519,13 +519,16 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
     private class PermisosPerspectiveApplicator implements PerspectiveApplicator<MetaExpedientResourceEntity, MetaExpedientResource> {
 		@Override
 		public void applySingle(String code, MetaExpedientResourceEntity entity, MetaExpedientResource resource) throws PerspectiveApplicationException {
-			List<PermisDto> permisosProcediment = null;
+/*			List<PermisDto> permisosProcediment = null;
 			if (entity.isComu()) {
 				permisosProcediment = permisosHelper.findPermisos(entity.getId(), MetaExpedientOrganGestorEntity.class);
 			} else {
 				permisosProcediment = permisosHelper.findPermisos(entity.getId(), MetaNodeEntity.class);
 			}
 			resource.setNumPermisos(permisosProcediment!=null?permisosProcediment.size():0);
+*/
+			List<PermisDto> permisosMetaNode = metaExpedientHelper.permisFind(entity.getId());
+			resource.setNumPermisos(permisosMetaNode!=null?permisosMetaNode.size():0);
 		}
     }
     

@@ -156,15 +156,10 @@ public class MetaNodeHelper {
 		}
 		// Obté els permisos per a totes les entitats només amb una consulta
 		if (ambLlistaPermisos) {
-
 			for (MetaNodeDto metaNode: metaNodes) {
 				metaNode.setPermisos(metaExpedientHelper.permisFind(metaNode.getId()));
 			}
-			
 		}
 	}
-	
-	
-
 
 }

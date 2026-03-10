@@ -192,7 +192,7 @@ public class IntegracioResourceServiceImpl extends BaseMutableResourceService<In
 	        	
 	        	if (Utils.hasValue(entitatActualCodi)) {
 	            	OrganGestorEntity oge = organGestorRepository.findByEntitatAndCodi(ee, organActualCodi);
-	            	if (ee!=null) {
+	            	if (oge!=null) {
 	            		target.setOrgan(ResourceReference.toResourceReference(oge.getId(), oge.getNom()));
 	            	}
 	        	}
