@@ -5,9 +5,9 @@ import {
 } from "reactlib";
 import {CardPage} from "../../../components/CardData.tsx";
 import StyledMuiGrid, {ToolbarButton} from "../../../components/StyledMuiGrid.tsx";
-import {Icon} from "@mui/material";
+import {Button, Icon} from "@mui/material";
 import {usePermisEntitatCreate, usePermisEntitatModify, usePermisActions} from "../actions/ModifyPermis.tsx";
-import {useParams} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import {useEntitatSession} from "../../../components/Session.tsx";
 import {useMemo} from "react";
 
@@ -46,6 +46,7 @@ const PermisEntitatGrid = ()=> {
     const { id } = useParams();
     const {value: entitat} = useEntitatSession()
     const gridApiRef = useMuiDataGridApiRef();
+    const navigate = useNavigate();
 
     const entitatId = useMemo(() => (
         id || entitat?.id
@@ -77,7 +78,20 @@ const PermisEntitatGrid = ()=> {
     ]
 
     return <GridPage disableMargins>
-        <CardPage title={t('page.user.menu.permisos')}>
+        <CardPage
+            title={t('page.user.menu.permisos')}
+            header={<>
+                <Button
+                    variant="outlined"
+                    color={"inherit"}
+                    sx={{ borderRadius: '4px', padding: '0px 10px', marginLeft: "auto !important" }}
+                    onClick={()=>navigate('/entitat')}
+                >
+                    <Icon>arrow_back</Icon>
+                    {t('common.back')}
+                </Button>
+            </>}
+        >
             <StyledMuiGrid
                 apiRef={gridApiRef}
                 resourceName={"aclSidResource"}

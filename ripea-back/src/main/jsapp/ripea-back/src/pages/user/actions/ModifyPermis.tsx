@@ -120,10 +120,11 @@ const usePermisDialog = ({
 
 // MetaExpedientOrgan
 const PermisMetaExpedientOrganCreateForm = () => {
+    const {data} = useFormContext()
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="principal" required/>
-        <GridFormField xs={12} name="sid"/>
-        <GridFormField xs={12} name="organGestor" required/>
+        <GridFormField xs={12} name="principal" required disabled={data?.id}/>
+        <GridFormField xs={12} name="sid" disabled={data?.id}/>
+        <GridFormField xs={12} name="organGestor" required disabled={data?.id}/>
 
         <GridFormField xs={12} name="all"/>
         <Grid item xs={2}/><GridFormField xs={10} name="create"/>
@@ -148,9 +149,10 @@ export const usePermisMetaExpedientOrganModify = (refresh?: () => void) =>
     });
 // MetaExpedientNode
 const PermisMetaExpedientNodeCreateForm = () => {
+    const {data} = useFormContext()
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="principal" required/>
-        <GridFormField xs={12} name="sid"/>
+        <GridFormField xs={12} name="principal" required disabled={data?.id}/>
+        <GridFormField xs={12} name="sid" disabled={data?.id}/>
 
         <GridFormField xs={12} name="all"/>
         <Grid item xs={2}/><GridFormField xs={10} name="create"/>
@@ -179,20 +181,20 @@ const PermisOrganGestorCreateForm = () => {
     const { data } = useFormContext();
     const { t } = useTranslation();
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="organGestor" disabled readOnly/>
-        <GridFormField xs={12} name="principal" required/>
-        <GridFormField xs={12} name="sid"/>
+        <GridFormField xs={12} name="organGestor" disabled/>
+        <GridFormField xs={12} name="principal" required disabled={data?.id}/>
+        <GridFormField xs={12} name="sid" disabled={data?.id}/>
 
         <CardData title={t("page.permision.tabs.expedient")} xs={6}>
-            <GridFormField xs={12} name="all" disabled={!!data?.admin} readOnly={!!data?.admin}/>
-            <Grid item xs={2}/><GridFormField xs={10} name="read" disabled={!!data?.admin} readOnly={!!data?.admin}/>
-            <Grid item xs={2}/><GridFormField xs={10} name="create" disabled={!!data?.admin} readOnly={!!data?.admin}/>
-            <Grid item xs={2}/><GridFormField xs={10} name="write" disabled={!!data?.admin} readOnly={!!data?.admin}/>
-            <Grid item xs={2}/><GridFormField xs={10} name="delete" disabled={!!data?.admin} readOnly={!!data?.admin}/>
+            <GridFormField xs={12} name="all" disabled={!!data?.admin}/>
+            <Grid item xs={2}/><GridFormField xs={10} name="read" disabled={!!data?.admin}/>
+            <Grid item xs={2}/><GridFormField xs={10} name="create" disabled={!!data?.admin}/>
+            <Grid item xs={2}/><GridFormField xs={10} name="write" disabled={!!data?.admin}/>
+            <Grid item xs={2}/><GridFormField xs={10} name="delete" disabled={!!data?.admin}/>
         </CardData>
         <CardData title={t("page.permision.tabs.admin")} xs={6}>
             <GridFormField xs={12} name="procedimentsComuns"/>
-            <GridFormField xs={12} name="admin" disabled={!!data?.adminComuns} readOnly={!!data?.adminComuns}/>
+            <GridFormField xs={12} name="admin" disabled={!!data?.adminComuns}/>
             <GridFormField xs={12} name="adminComuns"/>
             <GridFormField xs={12} name="disseny"/>
         </CardData>
@@ -214,9 +216,10 @@ export const usePermisOrganGestorModify = (refresh?: () => void) =>
 
 // Grup
 const PermisGrupCreateForm = () => {
+    const { data } = useFormContext();
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="principal" required/>
-        <GridFormField xs={12} name="sid"/>
+        <GridFormField xs={12} name="principal" required disabled={data?.id}/>
+        <GridFormField xs={12} name="sid" disabled={data?.id}/>
     </Grid>
 }
 export const usePermisGrupCreate = (refresh?: () => void) =>
@@ -230,8 +233,8 @@ export const usePermisGrupCreate = (refresh?: () => void) =>
 const PermisEntitatModifyForm = () => {
     const { data } = useFormContext();
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="principal" disabled={!!data?.id} readOnly={!!data?.id} required/>
-        <GridFormField xs={12} name="sid" disabled={!!data?.id} readOnly={!!data?.id}/>
+        <GridFormField xs={12} name="principal" disabled={!!data?.id} required/>
+        <GridFormField xs={12} name="sid" disabled={!!data?.id}/>
         <GridFormField xs={12} name="admin"/>
         <GridFormField xs={12} name="adminLectura"/>
         <GridFormField xs={12} name="user"/>

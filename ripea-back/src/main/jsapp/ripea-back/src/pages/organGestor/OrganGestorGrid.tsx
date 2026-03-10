@@ -41,7 +41,7 @@ const OrganGestorGrid = () => {
 
     const perspectives = useMemo(() => treeView?['PATH','COUNT_PERMISOS']:['COUNT_PERMISOS'], [treeView])
     const columns:any[] = useMemo(()=>[
-        ...(treeView ?[
+        ...(!treeView ?[
             {
                 field: 'codi',
                 flex: 0.5,

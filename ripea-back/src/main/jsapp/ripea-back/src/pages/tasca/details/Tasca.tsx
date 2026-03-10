@@ -46,7 +46,7 @@ const Tasca = () => {
         }
     },[apiTascaIsReady])
 
-    const headerMain = <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    const headerMain = <>
         <Box sx={{ display: 'flex', alignItems: 'center'}}>
             <Icon sx={{ fontSize: '2rem' }}>{icons.tasca}</Icon>
             <Typography variant="h4" sx={{ display: 'flex' }}>{tasca?.metaExpedientTasca?.description}</Typography>
@@ -98,11 +98,11 @@ const Tasca = () => {
                 readOnly={tasca?.usuariActualOnlyObservador}
             />
         </Box>
-    </Box>;
+    </>;
 
     return <GridPage disableMargins>
         <Load value={expedient && tasca} noEffect>
-            <CardPage header={headerMain}>
+            <CardPage header={headerMain} componentProps={{ justifyContent: 'space-between' }}>
                 <Grid container spacing={2}>
                     <Grid size={3}>
                         <ExpedientInfo title={tasca?.expedient?.description} entity={expedient} readOnly/>

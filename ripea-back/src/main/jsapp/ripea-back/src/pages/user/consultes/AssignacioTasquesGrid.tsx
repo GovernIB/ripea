@@ -56,7 +56,7 @@ const columns = [
         renderCell: (params:any) => <Link component={RouterLink} to={`/contingut/${params?.row?.expedient?.id}`}>{params?.formattedValue}</Link>,
     },
     {
-        field: 'titol',
+        field: 'metaExpedientTasca',
         flex: 1,
     },
     {

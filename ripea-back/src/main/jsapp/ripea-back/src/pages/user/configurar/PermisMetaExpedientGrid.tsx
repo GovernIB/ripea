@@ -5,9 +5,9 @@ import {
 } from "reactlib";
 import {CardPage} from "../../../components/CardData.tsx";
 import StyledMuiGrid, {ToolbarButton} from "../../../components/StyledMuiGrid.tsx";
-import {Icon} from "@mui/material";
+import {Button, Icon} from "@mui/material";
 import {useEffect, useMemo, useState} from "react";
-import {useParams} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import {setTitlePage} from "../../../TitleHeaderConfigurator.tsx";
 import {
     usePermisActions,
@@ -265,6 +265,7 @@ const PermisMetaExpedientNodeGrid = (props:any) => {
 const PermisMetaExpedientGrid = ()=> {
     const {t} = useTranslation();
     const { id } = useParams();
+    const navigate = useNavigate();
 
     const {
         isReady: apiIsReady,
@@ -291,7 +292,18 @@ const PermisMetaExpedientGrid = ()=> {
 
     return <GridPage disableMargins>
         <Load value={entity}>
-            <CardPage title={t('page.user.menu.procedimentPermis', {nom: entity?.nom})}>
+            <CardPage title={t('page.user.menu.procedimentPermis', {nom: entity?.nom})}
+                      header={<>
+                          <Button
+                              variant="outlined"
+                              color={"inherit"}
+                              sx={{ borderRadius: '4px', padding: '0px 10px', marginLeft: "auto !important" }}
+                              onClick={()=>navigate('/metaExpedient')}
+                          >
+                              <Icon>arrow_back</Icon>
+                              {t('common.back')}
+                          </Button>
+                      </>}>
                 {entity?.procedimentComu
                     ?<PermisMetaExpedientOrganGrid id={id}/>
                     :<PermisMetaExpedientNodeGrid id={id}/>

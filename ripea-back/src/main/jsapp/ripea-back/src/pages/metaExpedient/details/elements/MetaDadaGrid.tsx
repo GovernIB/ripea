@@ -2,9 +2,9 @@ import {useTranslation} from "react-i18next";
 import {GridPage, useBaseAppContext, useFormContext, useMuiDataGridApiRef, useResourceApiService} from "reactlib";
 import {CardPage} from "../../../../components/CardData.tsx";
 import {DndMuiGrid} from "../../../../components/StyledMuiGrid.tsx";
-import {Grid, Icon, Divider} from "@mui/material";
+import {Grid, Icon, Divider, Button} from "@mui/material";
 import * as builder from "../../../../util/springFilterUtils.ts";
-import {useParams} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import GridFormField from "../../../../components/GridFormField.tsx";
 import {useEffect, useMemo, useState} from "react";
 import {setTitlePage} from "../../../../TitleHeaderConfigurator.tsx";
@@ -200,6 +200,7 @@ const MetaDadaGrid = () => {
     const {t} = useTranslation();
     const { id } = useParams();
     const {rol} = useUserSession();
+    const navigate = useNavigate();
 
     const {
         isReady: apiIsReady,
@@ -224,7 +225,18 @@ const MetaDadaGrid = () => {
     }, [metaDocument, rol])
 
     return <GridPage disableMargins>
-        <CardPage title={t('page.user.menu.documentDada', {nom: metaDocument?.nom})}>
+        <CardPage title={t('page.user.menu.documentDada', {nom: metaDocument?.nom})}
+                  header={<>
+                      <Button
+                          variant="outlined"
+                          color={"inherit"}
+                          sx={{ borderRadius: '4px', padding: '0px 10px', marginLeft: "auto !important" }}
+                          onClick={()=>navigate(`/metaExpedient/${metaDocument?.metaExpedient?.id}/metaDocument`)}
+                      >
+                          <Icon>arrow_back</Icon>
+                          {t('common.back')}
+                      </Button>
+                  </>}>
             <MetDadaGrid id={id} readOnly={readOnly}/>
         </CardPage>
     </GridPage>

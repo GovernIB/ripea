@@ -6,6 +6,13 @@ const cardBorder= { borderRadius: '4px' };
 const cardHeader= { py: 1, px: 2 };
 const iconButton = { p: 0.5, borderRadius: '5px', maxWidth: 'max-content', border: '1px solid grey' }
 
+const CardHead = (props:any) => {
+    const {icon, children, componentProps, ...other} = props;
+    return <CardHeader title={<Box display={'flex'} alignItems={'center'} {...componentProps}>
+        {icon && <Icon>{icon}</Icon>}{children}
+    </Box>} {...other}/>
+}
+
 export const CardButton = (props:any) => {
     const {text, icon, onClick, flex, buttonProps, hidden} = props;
 
@@ -37,11 +44,12 @@ export const DetailCard = (props:any) => {
     return <Grid2 size={size}>
         <Card sx={{...cardBorder, ...cardProps}}>
             {(title || header) &&
-                <CardHeader title={<Box display={'flex'} alignItems={'center'}>
-                    {icon && <Icon>{icon}</Icon>}
+                <CardHead icon={icon} className={'detail'}
+                          sx={{ py: 0, px: 2, ...headerProps }}
+                >
                     {title && <Typography mt={0.5} variant={variant}>{title}</Typography>}
                     {header}
-                </Box>} className={'detail'} sx={{ py: 0, px: 2, ...headerProps }}/>
+                </CardHead>
             }
 
             <CardContent sx={{ p: '0 !important' }}>
@@ -77,7 +85,7 @@ export const DetailCardContent = (props:any) => {
 }
 
 export const CardData = (props:any) => {
-    const {title, header, children, xs, hidden, hiddenIfEmpty, buttons, cardProps, headerProps = {}, variant, ...other} = props;
+    const {icon, title, header, children, xs, hidden, hiddenIfEmpty, buttons, cardProps, headerProps = {}, variant = "h4", ...other} = props;
 
     if (hidden || (hiddenIfEmpty && isEmpty(children))){
         return <></>
@@ -85,8 +93,12 @@ export const CardData = (props:any) => {
 
     return <Grid item xs={xs ?? 12}>
         <Card sx={{...cardBorder, ...cardProps}}>
-            {title && <CardHeader title={<Typography variant={variant ?? "h4"}>{title}</Typography>} sx={{...cardHeader, ...headerProps}}/>}
-            {header && <CardContent sx={{...cardHeader, ...headerProps}}>{header}</CardContent>}
+            {(title || header) &&
+                <CardHead icon={icon} sx={{...cardHeader, ...headerProps }}>
+                    {title && <Typography mt={0.5} variant={variant}>{title}</Typography>}
+                    {header}
+                </CardHead>
+            }
 
             <CardContent hidden={!children}>
                 <Grid container columnSpacing={1} rowSpacing={1} item xs={12} {...other}>
@@ -99,15 +111,19 @@ export const CardData = (props:any) => {
 }
 
 export const CardPage = (props:any) => {
-    const {title, header, headerProps = cardHeader, children} = props;
+    const {icon, title, header, headerProps, children, ...other} = props;
     return <Card sx={{
         ...cardBorder,
         height: '100%',
         display: 'flex',
         flexDirection: 'column'
     }}>
-        {title && <CardHeader title={title} sx={headerProps}/>}
-        {header && <CardContent sx={headerProps} className={'cardHeader'}>{header}</CardContent>}
+        {(title || header) &&
+            <CardHead icon={icon} sx={{...cardHeader, ...headerProps }} {...other}>
+                {title && <Typography mt={0.5} variant={"h4"}>{title}</Typography>}
+                {header}
+            </CardHead>
+        }
 
         <CardContent sx={{height: '100%', display: 'flex', flexDirection: 'column'}}>
             {children}

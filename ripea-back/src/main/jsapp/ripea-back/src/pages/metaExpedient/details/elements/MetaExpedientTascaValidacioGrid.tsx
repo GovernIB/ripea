@@ -1,10 +1,10 @@
 import {GridPage, useBaseAppContext, useFormContext, useMuiDataGridApiRef, useResourceApiService} from "reactlib";
 import StyledMuiGrid from "../../../../components/StyledMuiGrid.tsx";
-import {Grid, Icon, Divider} from "@mui/material";
+import {Grid, Icon, Divider, Button} from "@mui/material";
 import {useTranslation} from "react-i18next";
 import GridFormField from "../../../../components/GridFormField.tsx";
 import * as builder from "../../../../util/springFilterUtils.ts";
-import {useParams} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import {CardPage} from "../../../../components/CardData.tsx";
 import {useEffect, useMemo, useState} from "react";
 import Load from "../../../../components/Load.tsx";
@@ -81,6 +81,7 @@ const MetaExpedientTascaValidacioGrid = () => {
     const { id, tascaId } = useParams();
     const {rol} = useUserSession();
     const apiRef = useMuiDataGridApiRef();
+    const navigate = useNavigate();
 
     const refresh = () => {
         apiRef?.current?.refresh?.();
@@ -147,7 +148,18 @@ const MetaExpedientTascaValidacioGrid = () => {
 
     return <GridPage disableMargins>
         <Load value={metaExpedientTasca}>
-            <CardPage title={t('page.metaExpedientTasca.detall.validacio', {nom: metaExpedientTasca?.nom})}>
+            <CardPage title={t('page.metaExpedientTasca.detall.validacio', {nom: metaExpedientTasca?.nom})}
+                      header={<>
+                          <Button
+                              variant="outlined"
+                              color={"inherit"}
+                              sx={{ borderRadius: '4px', padding: '0px 10px', marginLeft: "auto !important" }}
+                              onClick={()=>navigate(`/metaExpedient/${id}/tasca`)}
+                          >
+                              <Icon>arrow_back</Icon>
+                              {t('common.back')}
+                          </Button>
+                      </>}>
                 <StyledMuiGrid
                     apiRef={apiRef}
                     resourceName={'metaExpedientTascaValidacioResource'}

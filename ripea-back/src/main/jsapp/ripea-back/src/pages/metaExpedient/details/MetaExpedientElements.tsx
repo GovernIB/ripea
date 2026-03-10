@@ -1,7 +1,7 @@
 import {GridPage, useResourceApiService} from "reactlib";
 import {CardPage} from "../../../components/CardData.tsx";
 import {useTranslation} from "react-i18next";
-import {useParams} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import {useEffect, useMemo, useState} from "react";
 import Load from "../../../components/Load.tsx";
 import TabComponent from "../../../components/TabComponent.tsx";
@@ -13,12 +13,14 @@ import {MetaExpedientEstatGrid} from "./elements/MetaExpedientEstatGrid.tsx";
 import {setTitlePage} from "../../../TitleHeaderConfigurator.tsx";
 import {MetaExpedientCarpetaGrid} from "./elements/MetaExpedientCarpetaGrid.tsx";
 import {useUserSession} from "../../../components/Session.tsx";
+import {Button, Icon} from "@mui/material";
 
 const perspectives :string[] = ["ELEMENTS_COUNT"]
 export const MetaExpedientElements = () => {
     const {t} = useTranslation()
     const { id, element } = useParams();
     const {value: user, rol} = useUserSession();
+    const navigate = useNavigate();
 
     const {
         isReady: apiIsReady,
@@ -108,7 +110,18 @@ export const MetaExpedientElements = () => {
 
     return <GridPage disableMargins>
         <Load value={metaExpedient}>
-            <CardPage title={title}>
+            <CardPage title={title}
+                      header={<>
+                          <Button
+                              variant="outlined"
+                              color={"inherit"}
+                              sx={{ borderRadius: '4px', padding: '0px 10px', marginLeft: "auto !important" }}
+                              onClick={()=>navigate('/metaExpedient')}
+                          >
+                              <Icon>arrow_back</Icon>
+                              {t('common.back')}
+                          </Button>
+                      </>}>
                 <TabComponent defaultValue={element} tabs={tabs}/>
             </CardPage>
         </Load>
