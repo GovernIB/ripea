@@ -34,7 +34,7 @@ export const GridButtonField = (props:any) => {
         title={label}
         {...other}
     >
-        <Icon sx={{mr: (whitLabel && label) ?1 :0}}>{icon}</Icon>
+        <Icon sx={{mr: (whitLabel && label) ?1 :0, ...props.iconSx}}>{icon}</Icon>
         {whitLabel && label}
     </GridButton></Load>
 }

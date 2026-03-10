@@ -44,7 +44,7 @@ const OrganGestorGrid = () => {
         ...(!treeView ?[
             {
                 field: 'codi',
-                flex: 0.5,
+                flex: 0.4,
             },
             {
                 field: 'nom',
@@ -57,7 +57,7 @@ const OrganGestorGrid = () => {
         ] :[]),
         {
             field: 'cif',
-            flex: 0.5,
+            flex: 0.4,
         },
         {
             field: 'estat',
@@ -67,7 +67,7 @@ const OrganGestorGrid = () => {
             filed: 'permis',
             headerName: '',
             sortable: false,
-            flex: 0.25,
+            flex: 0.2,
             renderCell: (params:any) => <LinkIcon
                 aria-label="key"
                 color="inherit"

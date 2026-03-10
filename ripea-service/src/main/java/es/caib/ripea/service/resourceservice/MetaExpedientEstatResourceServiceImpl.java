@@ -12,11 +12,13 @@ import com.turkraft.springfilter.parser.Filter;
 
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientEstatResourceEntity;
+import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientEstatResourceRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.ExpedientEstatHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
+import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
 import es.caib.ripea.service.intf.model.EntitatResource;
 import es.caib.ripea.service.intf.model.MetaExpedientEstatResource;
@@ -33,6 +35,7 @@ public class MetaExpedientEstatResourceServiceImpl extends BaseMutableResourceSe
 	private final ConfigHelper configHelper;
 	private final ExpedientEstatHelper expedientEstatHelper;
 	private final EntityComprovarHelper entityComprovarHelper;
+	private final MetaExpedientEstatResourceRepository metaExpedientEstatResourceRepository;
 	
     @PostConstruct
     public void init() {
@@ -51,7 +54,24 @@ public class MetaExpedientEstatResourceServiceImpl extends BaseMutableResourceSe
         
         return filtreBase.generate();
     }
+
+    protected void afterCreateSave(MetaExpedientEstatResourceEntity entity, MetaExpedientEstatResource resource, Map<String, AnswerRequiredException.AnswerValue> answers, boolean anyOrderChanged) {
+    	updateInicialNomesUnActiu(entity);
+    }
     
+    protected void afterUpdateSave(MetaExpedientEstatResourceEntity entity, MetaExpedientEstatResource resource, Map<String, AnswerRequiredException.AnswerValue> answers, boolean anyOrderChanged) {
+    	updateInicialNomesUnActiu(entity);
+    }
+    
+    private void updateInicialNomesUnActiu(MetaExpedientEstatResourceEntity entity) {
+    	//Si el que s'acaba de guardar es inicial, els inicials anteriors, s'han de desactivar
+    	if (entity.isInicial()) {
+    		metaExpedientEstatResourceRepository.updateInicialFalseForSameMetaExpedientExcludingId(
+    				entity.getMetaExpedient().getId(),
+    				entity.getId());
+    	}
+    }
+
     private class ReordenarActionExecutor implements ActionExecutor<MetaExpedientEstatResourceEntity, Integer, Serializable> {
 		@Override
 		public void onChange(Serializable id, Integer previous, String fieldName, Object fieldValue,

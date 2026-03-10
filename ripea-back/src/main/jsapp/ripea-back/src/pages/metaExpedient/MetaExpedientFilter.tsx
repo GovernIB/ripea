@@ -16,9 +16,13 @@ const MetaExpedientFilterForm = ({ user }:any) => {
         <GridFormField xs={2} name="revisioEstat" hidden={!user?.sessionScope?.revisioActiva}/>
         <GridFormField xs={2} name="ambit"/>
         <GridFormField xs={3} name="organGestor" disabled={data?.ambit == 'COMUNS'}/>
-        <Grid xs={2} hidden={!user?.sessionScope?.revisioActiva}/>
-        <Grid xs={1}/>
-        <GridButtonField xs={1.6} name="permisDirecte" icon={"pan_tool_alt"} whitLabel/>
+        <GridButtonField xs={1.6} 
+            name="permisDirecte"
+            icon={"pan_tool_alt"}
+            whitLabel
+            iconSx={{ transform: 'rotate(180deg)' }}/>
+        <Grid xs={2} hidden={user?.sessionScope?.revisioActiva}/>
+        <Grid xs={1}/>            
     </>
 }
 

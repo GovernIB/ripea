@@ -1,17 +1,32 @@
 package es.caib.ripea.persistence.entity.resourceentity;
 
-import es.caib.ripea.persistence.entity.InteressatEntity;
-import es.caib.ripea.persistence.entity.MetaExpedientCarpetaEntity;
-import es.caib.ripea.service.intf.config.BaseConfig;
-import es.caib.ripea.service.intf.dto.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+import es.caib.ripea.service.intf.dto.DocumentNotificacioEstatEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentNotificacioTipusEnumDto;
+import es.caib.ripea.service.intf.dto.ServeiTipusEnumDto;
 import es.caib.ripea.service.intf.model.DocumentNotificacioResource;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import javax.persistence.*;
-
-import java.util.*;
 
 @Entity
 @Getter

@@ -1,15 +1,7 @@
-/**
- * 
- */
 package es.caib.ripea.service.intf.dto;
 
 import java.io.Serializable;
 
-/**
- * Tipus de principal per als permisos.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 public enum PrincipalTipusEnumDto implements Serializable {
     ROL,
 	USUARI

@@ -69,11 +69,13 @@ const RemesesNotibFilter = (props: any) => {
 }
 
 // Grid
-const sortModel: any = [{field: 'dataEnviada', sort: 'desc'}]
+const sortModel: any = [{field: 'createdDate', sort: 'desc'}]
 const columns = [
     {
-        field: 'dataEnviada',
-        flex: 0.75,
+        field: 'createdDate',
+        flex: 0.5,
+        wordWrap: true,
+        align: 'left',
         valueFormatter: (value: any) => formatDate(value)
     },
     {
@@ -83,6 +85,7 @@ const columns = [
     {
         field: 'procediment',
         flex: 1,
+        wordWrap: true,
     },
     {
         field: 'expedient',
@@ -98,8 +101,9 @@ const columns = [
         flex: 1,
     },
     {
-        field: 'dataFinalitzada',
-        flex: 0.75,
+        field: 'processatData',
+        flex: 0.5,
+        wordWrap: true,
         valueFormatter: (value: any) => formatDate(value)
     },
     {
