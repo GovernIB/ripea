@@ -1,4 +1,3 @@
-import {Grid} from "@mui/material";
 import GridFormField from "../../components/GridFormField.tsx";
 import StyledMuiFilter from "../../components/StyledMuiFilter.tsx";
 import * as builder from '../../util/springFilterUtils';
@@ -24,7 +23,6 @@ const AnotacioFilterForm = () => {
         <GridFormField xs={4} name="dataRecepcioFinal" type={"date"}/>
         <GridFormField xs={4} name="estat"/>
         <GridFormField xs={4} name="interessat"/>
-        <Grid xs={1.6}></Grid>
     </>
 }
 

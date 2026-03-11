@@ -7,7 +7,7 @@ import {formatDate} from "../../../util/dateUtils.ts";
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import GridFormField from "../../../components/GridFormField.tsx";
-import {Alert, Grid, Link} from "@mui/material";
+import {Alert, Link} from "@mui/material";
 import {useSession} from "../../../components/SessionStorageContext.tsx";
 import {GridSortDirection} from "@mui/x-data-grid-pro";
 import {useAnexxActions} from "../../anotacions/details/AnotacioActions.tsx";
@@ -20,7 +20,6 @@ const AdjuntarAnnexosPendentsFilterFrom = () => {
         <GridFormField xs={3} name="dataFi" type={"date"}/>
         <GridFormField xs={4} name="procediment"/>
         <GridFormField xs={4} name="expedient"/>
-        <Grid item xs={1.6}/>
     </>
 }
 

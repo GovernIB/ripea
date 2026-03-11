@@ -5,7 +5,7 @@ import {useSession} from "./SessionStorageContext.tsx";
 import {useEffect, useMemo} from "react";
 import {GridButtonField} from "./GridFormField.tsx";
 
-const filterStyle = { sx: {mb: 2, p: 2, backgroundColor: '#f5f5f5', border: '1px solid #e3e3e3', borderRadius: '4px'} };
+const filterStyle = { className: "styledFilter" };
 
 export type FilterButtonProps = {
     value: string;
@@ -71,10 +71,14 @@ const StyledMuiFilter = (props:any) => {
 
     const cercar = ()=> {
         apiRef?.current?.filter?.()
-        !!sessionKey && saveFilterData(formApiRef?.current?.getData?.())
+        if (sessionKey) {
+            saveFilterData(formApiRef?.current?.getData?.())
+        }
     }
     const netejar = ()=> {
-        !!sessionKey && saveFilterData(null)
+        if (sessionKey) {
+            saveFilterData(null)
+        }
         apiRef?.current?.clear?.()
     }
 
@@ -108,7 +112,7 @@ const StyledMuiFilter = (props:any) => {
         <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
             {children}
 
-            <Grid item xs={2.4} sx={{ display: 'flex', justifyContent: 'end' }} {...buttonGridProps}>
+            <Grid item xs={2.4} sx={{ display: 'flex', justifyContent: 'end', marginLeft: 'auto' }} {...buttonGridProps}>
                 {advancedSearch && <GridButtonField name={"advanced"} icon={"filter_list"}/>}
                 {
                     buttons?.map((button:FilterButtonProps)=>

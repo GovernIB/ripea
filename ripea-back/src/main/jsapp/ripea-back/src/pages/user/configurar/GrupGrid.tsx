@@ -14,7 +14,6 @@ const GrupFilterForm = () => {
         <GridFormField xs={3} name="codi"/>
         <GridFormField xs={3} name="descripcio"/>
         <GridFormField xs={3} name="organGestor"/>
-        <Grid item xs={0.6}/>
     </>
 }
 

@@ -33,7 +33,7 @@ const columns = [
     {
         field: 'estat',
         flex: 0.5,
-        renderCell: (params: any) => <StyledEstat entity={params?.row} icon={"folder"}>{params.formattedValue}</StyledEstat>,
+        renderCell: (params: any) => <StyledEstat entity={params?.row}>{params.formattedValue}</StyledEstat>,
         sortProcessor: (field: string, sort: GridSortDirection) => {
             return [
                 { field: "estatAdditional", sort },

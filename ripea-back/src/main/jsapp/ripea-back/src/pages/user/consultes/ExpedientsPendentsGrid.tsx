@@ -6,7 +6,6 @@ import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import {GridSortDirection} from "@mui/x-data-grid-pro";
 import GridFormField from "../../../components/GridFormField.tsx";
-import {Grid} from "@mui/material";
 import * as builder from "../../../util/springFilterUtils.ts";
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
 import useAnotacioActions from "../../anotacioExpedient/details/AnotacioActions.tsx";
@@ -18,7 +17,6 @@ const ExpedientsPendentsFilterForm = () => {
         <GridFormField xs={4} name="metaExpedient"/>
         <GridFormField xs={4} name="dataRecepcioInicial" type={"date"}/>
         <GridFormField xs={4} name="dataRecepcioFinal" type={"date"}/>
-        <Grid item xs={1.6}/>
     </>
 }
 

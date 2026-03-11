@@ -4,7 +4,7 @@ import {useState} from "react";
 import {useTranslation} from "react-i18next";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
-import {Grid, Icon} from "@mui/material";
+import {Icon} from "@mui/material";
 import GridFormField, {GridButtonField} from "../../../components/GridFormField.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
@@ -16,7 +16,6 @@ const AnotacionsComunicadesFilterForm = () => {
         <GridFormField xs={3} name="estat"/>
         <GridFormField xs={3} name="dataAltaInici" type={"date"}/>
         <GridFormField xs={3} name="dataAltaFi" type={"date"}/>
-        <Grid item xs={9}/>
         <GridButtonField xs={0.6} name={"nomesAmbErrors"} icon={"warning"}/>
     </>
 }

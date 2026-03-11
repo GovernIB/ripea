@@ -1,5 +1,5 @@
 import {useMuiDataGridApiRef} from "reactlib";
-import {Grid, Typography, Icon} from "@mui/material";
+import {Grid, Icon} from "@mui/material";
 import useRemesaActions from "./details/RemesaActions.tsx";
 import GridFormField from "../../components/GridFormField.tsx";
 import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
@@ -7,18 +7,18 @@ import {formatDate} from "../../util/dateUtils.ts";
 import * as builder from "../../util/springFilterUtils.ts";
 import {useTranslation} from "react-i18next";
 import useRemesaDetail from "./details/RemesaDetail.tsx";
+import {StyledLabel} from "../../components/StyledLabel.tsx";
 
-const commonStyle = {p: 0.5, display: 'flex', alignItems: 'center', borderRadius: '5px', width: 'max-content'}
 export const EstatMessage = (props:any) => {
     const {title, icon, color, children} = props;
 
-    return <Typography 
-        variant="caption" 
-        title={title || (typeof children === 'string' ?children :'')} 
-        sx={{ ...commonStyle, backgroundColor: `${color}.light`, color: 'white' }}>
-            <Icon fontSize={"inherit"} sx={{ mr: children!=null  ?1 :0 }}>{icon}</Icon>
-            {children && <Typography sx={{fontSize: '0.8rem', paddingRight: '5px'}}>{children}</Typography>}
-    </Typography>
+    return <StyledLabel
+        title={title || (typeof children === 'string' ?children :'')}
+        sx={{ backgroundColor: `${color}.light`, color: 'white' }}
+        icon={icon}
+    >
+        {children}
+    </StyledLabel>
 }
 export const StyledEstat = (props:any) => {
     const { entity, children } = props;

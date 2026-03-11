@@ -2,7 +2,6 @@ import {useFormContext} from "reactlib";
 import GridFormField, {GridButtonField} from "../../components/GridFormField.tsx";
 import StyledMuiFilter from "../../components/StyledMuiFilter.tsx";
 import * as builder from "../../util/springFilterUtils.ts";
-import {Grid} from "@mui/material";
 import {useUserSession} from "../../components/Session.tsx";
 
 const MetaExpedientFilterForm = ({ user }:any) => {
@@ -21,8 +20,6 @@ const MetaExpedientFilterForm = ({ user }:any) => {
             icon={"pan_tool_alt"}
             whitLabel
             iconSx={{ transform: 'rotate(180deg)' }}/>
-        <Grid xs={2} hidden={user?.sessionScope?.isRevisioActiva}/>
-        <Grid xs={1}/>
     </>
 }
 

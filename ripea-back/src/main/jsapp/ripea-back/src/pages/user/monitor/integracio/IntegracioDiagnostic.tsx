@@ -106,7 +106,6 @@ export const IntegracioDiagnosticFilterForm = ({apiReiniciar}:any) => {
         <GridButton xs={2} onClick={apiReiniciar} variant={'contained'} color={'warning'}>
             <Icon>cached</Icon>{t('page.integracio.action.reiniciarAll.label')}
         </GridButton>
-        <Grid xs={7.6}/>
     </>
 
 }

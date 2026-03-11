@@ -3,7 +3,7 @@ import {GridPage, useFormContext, useMuiDataGridApiRef} from "reactlib";
 import {useMemo, useState} from "react";
 import { CardPage } from "../../../components/CardData.tsx";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
-import {Alert, Grid, Link} from "@mui/material";
+import {Alert, Link} from "@mui/material";
 import {Link as RouterLink } from 'react-router-dom';
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
@@ -30,7 +30,6 @@ const CanviEstatFilterFrom = (props:any) => {
         <GridFormField xs={3} name="dataCreacioFi" type={"date"}/>
         <GridFormField xs={3} name="estat" requestParams={{metaExpedientId: data?.procediment?.id, withoutTancar: true}}/>
         <GridFormField xs={3} name="prioritat"/>
-        <Grid item xs={3.6}/>
     </>
 }
 
@@ -80,7 +79,7 @@ const columns = [
     {
         field: 'estat',
         flex: 0.75,
-        renderCell: (params: any) => <StyledEstat entity={params?.row} icon={"folder"}>{params.formattedValue}</StyledEstat>,
+        renderCell: (params: any) => <StyledEstat entity={params?.row}>{params.formattedValue}</StyledEstat>,
         sortProcessor: (field: string, sort: GridSortDirection) => {
             return [
                 { field: "estatAdditional", sort },

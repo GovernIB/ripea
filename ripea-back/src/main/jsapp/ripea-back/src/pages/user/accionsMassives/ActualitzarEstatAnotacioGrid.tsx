@@ -7,7 +7,6 @@ import {formatDate} from "../../../util/dateUtils.ts";
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import GridFormField, {GridButtonField} from "../../../components/GridFormField.tsx";
-import {Grid} from "@mui/material";
 import {useActions, useMassiveActions} from "../../anotacions/details/AnotacioActions.tsx";
 
 const ActualitzarEstatAnotacioFilterFrom = () => {
@@ -17,7 +16,6 @@ const ActualitzarEstatAnotacioFilterFrom = () => {
         <GridFormField xs={3} name="dataAltaFi" type={"date"}/>
         <GridFormField xs={2} name="estat"/>
         <GridButtonField xs={1} icon={"warning"} name="nomesPendents"/>
-        <Grid item xs={9.6}/>
     </>
 }
 

@@ -9,7 +9,7 @@ import {formatDate} from "../../../util/dateUtils.ts";
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
 import GridFormField from "../../../components/GridFormField.tsx";
 import {Link as RouterLink} from "react-router-dom";
-import {Grid, Link} from "@mui/material";
+import {Link} from "@mui/material";
 import useDocumentDetail from "../../contingut/details/DocumentDetail.tsx";
 import {useActions} from "../../contingut/details/ContingutActions.tsx";
 import useVisualitzar from "../../contingut/actions/Visualitzar.tsx";
@@ -78,7 +78,6 @@ const ConsultesPinbalFilterForm = () => {
         <GridFormField xs={4} name="createdDateInici" type={"date"}/>
         <GridFormField xs={4} name="createdDateFi" type={"date"}/>
         <GridFormField xs={4} name="estat"/>
-        <Grid item xs={5.6}/>
     </>
 }
 

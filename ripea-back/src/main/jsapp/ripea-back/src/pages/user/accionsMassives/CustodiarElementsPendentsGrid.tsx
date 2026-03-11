@@ -27,13 +27,12 @@ const CustodiarPendentsFilterFrom = (props:any) => {
     return <>
         <GridFormField xs={4} name="nom"/>
         <GridFormField xs={4} name="procediment"/>
-        {!!filtrarExpedient
+        {filtrarExpedient
             ?<GridFormField xs={4} name="expedient" filter={expedientFilter}/>
             :<Grid item xs={4}/>
         }
         <GridFormField xs={4} name="dataCreacioInici" type={"date"}/>
         <GridFormField xs={4} name="dataCreacioFi" type={"date"}/>
-        <Grid item xs={1.6}/>
     </>
 }
 

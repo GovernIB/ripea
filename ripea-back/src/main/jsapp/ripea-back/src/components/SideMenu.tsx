@@ -140,17 +140,6 @@ const MenuItem: React.FC<MenuItemProps> = (props) => {
         py: 0,
         pl: 3,
         pr: !shrink ? 1 : 3,
-        '> :before': (level ?? 0) > 0 && !shrink ? {
-            content: '""',
-            display: 'block',
-            position: 'absolute',
-            zIndex: '100',
-            left: '34px',
-            height: '70%',
-            width: '2px',
-            opacity: '1',
-            background: selected ? 'hsl(210, 100%, 60%)' : 'hsl(215, 15%, 92%)',
-        } : undefined
     };
     const itemIconSx = {
         minWidth: 0,

@@ -9,7 +9,7 @@ import * as builder from "../../../util/springFilterUtils.ts";
 import GridFormField, {GridButtonField} from "../../../components/GridFormField.tsx";
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
 import {Link as RouterLink} from "react-router-dom";
-import {Grid, Link} from "@mui/material";
+import {Link} from "@mui/material";
 import {useActions} from "../../remesa/details/RemesaActions.tsx";
 
 // Filter
@@ -25,7 +25,6 @@ const RemesesNotibFilterForm = () => {
         <GridFormField xs={3} name="procediment"/>
         <GridFormField xs={3} name="dataEnviamentInici" type={"date"}/>
         <GridFormField xs={3} name="dataEnviamentFi" type={"date"}/>
-        <Grid item xs={3}/>
         <GridButtonField xs={0.6} name={"nomesAmbError"} icon={"warning"}/>
     </>
 }
@@ -70,7 +69,7 @@ const RemesesNotibFilter = (props: any) => {
 
 // Grid
 const sortModel: any = [{field: 'createdDate', sort: 'desc'}]
-const columns = [
+const columns: any[] = [
     {
         field: 'createdDate',
         flex: 0.5,

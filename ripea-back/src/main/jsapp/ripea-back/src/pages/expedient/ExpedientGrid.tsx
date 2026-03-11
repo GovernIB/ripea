@@ -18,10 +18,7 @@ import {GridSortDirection} from "@mui/x-data-grid-pro";
 import useAlerta from "./details/Alerta.tsx";
 import useErrorValidacio from "./details/ErrorValidacio.tsx";
 import * as builder from '../../util/springFilterUtils';
-
-const labelStyle = {padding: '1px 4px', fontSize: '11px', fontWeight: '500', borderRadius: '2px', display: 'flex', alignItems: 'center', width: 'max-content'}
-const obertStyle = {border: '1px dashed #AAA'}
-const tancatStyle = {backgroundColor: 'grey', color: 'white'}
+import {StyledLabel} from "../../components/StyledLabel.tsx";
 
 export const ExpedientGridForm = () => {
     const {data} = useFormContext();
@@ -50,43 +47,33 @@ export const ExpedientGridForm = () => {
 }
 
 export const StyledEstat = (props: any) => {
-    const {entity: expedient, icon, children} = props;
+    const {entity: expedient, children} = props;
+    const icon = expedient?.estat == 'TANCAT' ? 'folder' : 'folder_open'
 
-    const style = expedient?.estatAdditionalInfo
-        ? {backgroundColor: expedient?.estatAdditionalInfo?.color}
-        : expedient?.estat == 'TANCAT'
-            ? tancatStyle
-            : obertStyle;
-
-    const icona = expedient?.estat == 'TANCAT' ? 'folder' : 'folder_open'
-
-    return <Typography variant="caption" sx={{...labelStyle, ...style}}>
-        {icon && <Icon fontSize={"inherit"}>{icona}</Icon>}
-        {expedient?.estatAdditionalInfo?.nom ?? children}
-    </Typography>
+    if (expedient?.estatAdditionalInfo) {
+        return <StyledLabel icon={icon} backgroundColor={expedient?.estatAdditionalInfo?.color}>{expedient?.estatAdditionalInfo?.nom}</StyledLabel>
+    } else if (expedient?.estat == 'TANCAT') {
+        return <StyledLabel icon={icon} backgroundColor={'grey'}>{children}</StyledLabel>
+    } else {
+        return <StyledLabel dashed>{children}</StyledLabel>
+    }
 }
 
 export const StyledPrioritat = (props: any) => {
     const {entity: expedient, children} = props;
 
-    let style: any = {};
-
     switch (expedient?.prioritat) {
         case "D_MOLT_ALTA":
-            style = {backgroundColor: '#d99b9d', color: 'white'}
-            break;
+            return <StyledLabel backgroundColor={'#d99b9d'}>{children}</StyledLabel>
         case "C_ALTA":
-            style = {backgroundColor: '#ffebae'}
-            break;
+            return <StyledLabel backgroundColor={'#ffebae'}>{children}</StyledLabel>
         case "B_NORMAL":
-            style = obertStyle
-            break;
+            return <StyledLabel dashed>{children}</StyledLabel>
         case "A_BAIXA":
-            style = {backgroundColor: '#c3e8d1'}
-            break;
+            return <StyledLabel backgroundColor={'#c3e8d1'}>{children}</StyledLabel>
     }
 
-    return <Typography variant="caption" sx={{...labelStyle, ...style}}>{children}</Typography>
+    return <></>
 }
 export const Avisos = (props: any) => {
     const {entity, hanldeErrorValidacio, handelAlert} = props;

@@ -312,9 +312,6 @@ const useMenuAdmin = () => {
                     hidden: !user?.sessionScope?.isDocumentsGeneralsEnabled,
                 },
                 {
-                    divider: true,
-                },
-                {
                     id: 'nti',
                     title: t('page.user.menu.nti'),
                     // icon: '',
@@ -348,9 +345,6 @@ const useMenuAdmin = () => {
                     hidden: !user?.sessionScope?.isUrlInstruccioEnabled,
                 },
                 {
-                    divider: true,
-                },
-                {
                     id: 'permisos',
                     title: t('page.user.menu.permisos'),
                     // icon: '',
@@ -380,7 +374,7 @@ const useMenuAdmin = () => {
                     title: t('page.user.menu.revisar'),
                     // icon: '',
                     to: '/metaExpedientRevisio',
-                    hidden: !user?.sessionScope?.revisioActiva,
+                    hidden: !user?.sessionScope?.isRevisioActiva,
                 },*/
                 {
                     id: 'portafib',
@@ -753,18 +747,12 @@ const useAccionesMassivas = () => {
                     to: '/massiu/canviPrioritats',
                 },
                 {
-                    divider: true,
-                },
-                {
                     id: 'masives',
                     title: t('page.user.action.massives.label'),
                     // icon: '',
                     onClick: handleOpen,
                 },
             ],
-        },
-        {
-            divider: true,
         },
     ]
     const content = <>
@@ -779,7 +767,6 @@ const useAccionesMassivas = () => {
 }
 const useMenuRevisor = () => {
     const { t } = useTranslation();
-    const { toProgramaAntic } = useToProgramaAntic();
 
     const appEntries:any[] = [];
     const entries = [
@@ -787,7 +774,8 @@ const useMenuRevisor = () => {
             id: 'revisar',
             title: t('page.user.menu.revisar'),
             // icon: '',
-            onClick: () => toProgramaAntic('metaExpedientRevisio'),
+            to: '/metaExpedientRevisio',
+            // hidden: !user?.sessionScope?.isRevisioActiva,
         },
     ]
     const content = <>

@@ -1,7 +1,6 @@
 import * as builder from "../../util/springFilterUtils.ts";
 import StyledMuiFilter from "../../components/StyledMuiFilter.tsx";
 import GridFormField from "../../components/GridFormField.tsx";
-import {Grid} from "@mui/material";
 
 
 const OrganGestorFilterForm = () => {
@@ -10,7 +9,6 @@ const OrganGestorFilterForm = () => {
         <GridFormField xs={2} name="nom"/>
         <GridFormField xs={3} name="organGestor"/>
         <GridFormField xs={2} name="estat"/>
-        <Grid item xs={0.6}/>
     </>
 }
 

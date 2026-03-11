@@ -6,7 +6,7 @@ import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import GridFormField from "../../../components/GridFormField.tsx";
 import {Link as RouterLink} from "react-router-dom";
-import {Grid, Link} from "@mui/material";
+import {Link} from "@mui/material";
 import * as builder from "../../../util/springFilterUtils.ts";
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
 import useTascaDetail from "../../tasca/details/TascaDetail.tsx";
@@ -19,7 +19,6 @@ const AssignacioTasquesFilterForm = () => {
         <GridFormField xs={3} name="responsable"/>
         <GridFormField xs={3} name="dataInici" type={"date"}/>
         <GridFormField xs={3} name="dataFi" type={"date"}/>
-        <Grid item xs={1.6}/>
     </>
 }
 

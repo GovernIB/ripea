@@ -174,7 +174,6 @@ const ContingutFilterForm = () => {
         <GridFormField xs={2} name="esborrat" required/>
         <GridFormField xs={1.9} name="dataInici" type={"date"}/>
         <GridFormField xs={1.9} name="dataFi" type={"date"}/>
-        {/*<Grid item xs={0.6}/>*/}
     </>
 }
 

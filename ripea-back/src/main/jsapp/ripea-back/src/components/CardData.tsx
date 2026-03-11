@@ -2,8 +2,6 @@ import {Box, Card, CardContent, CardHeader, Grid, Grid2, Typography} from "@mui/
 import IconButton from "@mui/material/IconButton";
 import Icon from "@mui/material/Icon";
 
-const cardBorder= { borderRadius: '4px' };
-const cardHeader= { py: 1, px: 2 };
 const iconButton = { p: 0.5, borderRadius: '5px', maxWidth: 'max-content', border: '1px solid grey' }
 
 const CardHead = (props:any) => {
@@ -42,7 +40,7 @@ export const DetailCard = (props:any) => {
     }
 
     return <Grid2 size={size}>
-        <Card sx={{...cardBorder, ...cardProps}}>
+        <Card sx={cardProps}>
             {(title || header) &&
                 <CardHead icon={icon} className={'detail'}
                           sx={{ py: 0, px: 2, ...headerProps }}
@@ -92,9 +90,9 @@ export const CardData = (props:any) => {
     }
 
     return <Grid item xs={xs ?? 12}>
-        <Card sx={{...cardBorder, ...cardProps}}>
+        <Card sx={cardProps}>
             {(title || header) &&
-                <CardHead icon={icon} sx={{...cardHeader, ...headerProps }}>
+                <CardHead icon={icon} sx={headerProps}>
                     {title && <Typography mt={0.5} variant={variant}>{title}</Typography>}
                     {header}
                 </CardHead>
@@ -113,13 +111,12 @@ export const CardData = (props:any) => {
 export const CardPage = (props:any) => {
     const {icon, title, header, headerProps, children, ...other} = props;
     return <Card sx={{
-        ...cardBorder,
         height: '100%',
         display: 'flex',
         flexDirection: 'column'
     }}>
         {(title || header) &&
-            <CardHead icon={icon} sx={{...cardHeader, ...headerProps }} {...other}>
+            <CardHead icon={icon} sx={headerProps} {...other}>
                 {title && <Typography mt={0.5} variant={"h4"}>{title}</Typography>}
                 {header}
             </CardHead>

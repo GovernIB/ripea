@@ -46,7 +46,7 @@ const ExpedientsRelacionats = (props:any) => {
         return <></>
 
     return <Grid2 size={12} p={1} my={2}>
-        <DetailCard title={t('page.contingut.action.importarExpedient.title')} display={'flex'} flexDirection={'column'} hidden={relacionats?.length==0}>
+        <DetailCard title={t('page.contingut.action.importarExpedient.title')} display={'flex'} flexDirection={'column'} sx={{ px: 1 }} hidden={relacionats?.length==0}>
             {
                 relacionats?.map((relacionat:any) =>
                     <Grid key={relacionat?.id} container alignItems="center">

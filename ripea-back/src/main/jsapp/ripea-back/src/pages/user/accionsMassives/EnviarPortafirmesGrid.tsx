@@ -1,7 +1,7 @@
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import {GridPage, useFormContext, useMuiDataGridApiRef} from "reactlib";
 import {CardPage} from "../../../components/CardData.tsx";
-import {Alert, Grid, Link} from "@mui/material";
+import {Alert, Link} from "@mui/material";
 import {Link as RouterLink } from 'react-router-dom';
 import {useTranslation} from "react-i18next";
 import {useMemo, useState} from "react";
@@ -25,7 +25,6 @@ const EnviarPortafirmesFilterForm = () => {
         <GridFormField xs={3} name="nom"/>
         <GridFormField xs={3} name="dataCreacioInici" type={"date"}/>
         <GridFormField xs={3} name="dataCreacioFi" type={"date"}/>
-        <Grid item xs={3.6}/>
     </>
 }
 

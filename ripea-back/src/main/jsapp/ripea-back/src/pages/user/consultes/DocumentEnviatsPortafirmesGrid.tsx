@@ -8,7 +8,7 @@ import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import GridFormField from "../../../components/GridFormField.tsx";
 import {Link as RouterLink} from "react-router-dom";
-import {Grid, Link} from "@mui/material";
+import {Link} from "@mui/material";
 import {SeguimentPortafirmes} from "../../contingut/actions/SeguimentPortafirmes.tsx";
 
 // Detail
@@ -30,7 +30,7 @@ const useDetail = () => {
         }
     };
 
-    let buttons :any[] = [
+    const buttons :any[] = [
         {
             value: 'close',
             text: t('common.close'),
@@ -66,7 +66,6 @@ const DocumentEnviatsPortafirmesFilterForm = () => {
         <GridFormField xs={4} name="estat"/>
         <GridFormField xs={4} name="dataEnviamentInici" type={"date"}/>
         <GridFormField xs={4} name="dataEnviamentFi" type={"date"}/>
-        <Grid item xs={1.6}/>
     </>
 }
 

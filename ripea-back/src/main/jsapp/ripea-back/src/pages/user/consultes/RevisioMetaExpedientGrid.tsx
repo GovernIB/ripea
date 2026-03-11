@@ -3,7 +3,7 @@ import {useMemo, useState} from "react";
 import {GridPage, useMuiDataGridApiRef} from "reactlib";
 import {CardPage} from "../../../components/CardData.tsx";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
-import {Chip, Grid, Icon, Typography} from "@mui/material";
+import {Chip, Icon, Typography} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
@@ -44,7 +44,6 @@ const RevisioMetaExpedientFilterForm = () => {
         <GridFormField xs={3} name="revisioEstat"/>
         <GridFormField xs={3} name="organGestor"/>
         <GridFormField xs={3} name="tipus"/>
-        <Grid item xs={0.6}/>
     </>
 }
 

@@ -15,6 +15,21 @@ const base: ThemeOptions = {
                     alignItems: 'baseline !important',
                     whiteSpace: 'break-spaces !important',
                 },
+                '.styledFilter': {
+                    marginBottom: '16px',
+                    padding: '16px',
+                    borderRadius: '4px',
+                    backgroundColor: 'inherit',
+                },
+                '.myLabel': {
+                    padding: '4px 8px',
+                    fontSize: '11px',
+                    // fontWeight: '500',
+                    borderRadius: '5px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    width: 'max-content',
+                },
             },
         },
         MuiDataGrid: {
@@ -49,6 +64,7 @@ const base: ThemeOptions = {
                 },
             },
         },
+        MuiTab: {styleOverrides: {root: {textTransform: 'none', fontSize: '1rem'}}},
         MuiTabs: {
             styleOverrides: {
                 scrollButtons: {
@@ -139,7 +155,6 @@ const base: ThemeOptions = {
             },
         },
         MuiIcon: {styleOverrides: {root: {fontSize: '18px', marginRight: '4px'}}},
-        MuiTab: {styleOverrides: {root: {textTransform: 'none', fontSize: '1rem'}}},
         MuiChip: {
             styleOverrides: {
                 root: {
@@ -158,6 +173,25 @@ const base: ThemeOptions = {
                     alignItems: "center",
                 }
             }
+        },
+        MuiCard: {
+            styleOverrides: {
+                root: {
+                    borderRadius: '4px',
+                }
+            },
+        },
+        MuiCardHeader: {
+            styleOverrides: {
+                root: {
+                    backgroundColor: 'inherit',
+                    color: 'inherit',
+                    paddingTop: '8px',
+                    paddingBottom: '8px',
+                    paddingLeft: '16px',
+                    paddingRight: '16px',
+                }
+            },
         },
     }
 };
@@ -178,9 +212,9 @@ export const lightTheme = createTheme(base, {
     components: {
         MuiCssBaseline: {
             styleOverrides: {
-                '.cardHeader': {
-                    backgroundColor: `${lightPalete.action.disabledBackground} !important`,
-                    borderBottom: '1px solid #e3e3e3',
+                '.styledFilter': {
+                    backgroundColor: '#f5f5f5',
+                    border: '1px solid #e3e3e3'
                 },
             },
         },
@@ -226,7 +260,7 @@ export const lightTheme = createTheme(base, {
         MuiAlert: {
             styleOverrides: {
                 standardWarning: {
-                    color: "#8a6d3b",
+                    color: lightPalete.warning.main,
                     backgroundColor: "#fcf8e3",
                     borderColor: "#faebcc"
                 }
@@ -234,12 +268,12 @@ export const lightTheme = createTheme(base, {
         },
         MuiDataGrid: {
             styleOverrides: {
-                root: {
-                    '& .Mui-selected': {
-                        backgroundColor: `${lightPalete.action.selected} !important`,
+                row: {
+                    '&.Mui-selected': {
+                        backgroundColor: `${lightPalete.action.selected}`,
                     },
-                    '& .Mui-selected:hover': {
-                        backgroundColor: `${darken(lightPalete.action.selected, 0.2)} !important`,
+                    '&.Mui-selected:hover': {
+                        backgroundColor: `${darken(lightPalete.action.selected, 0.2)}`,
                     },
                 },
             },
@@ -272,10 +306,8 @@ export const darkTheme = createTheme(base, {
     components: {
         MuiCssBaseline: {
             styleOverrides: {
-                'div[class*="MuiBox-root"]': {backgroundColor: 'inherit'},
-                '.cardHeader': {
-                    backgroundColor: 'inherit !important',
-                    borderBottom: '1px solid white',
+                '.styledFilter': {
+                    border: '1px solid #e3e3e3'
                 },
             },
         },
@@ -297,11 +329,11 @@ export const darkTheme = createTheme(base, {
         },
         MuiDataGrid: {
             styleOverrides: {
-                root: {
-                    '& .MuiDataGrid-row.Mui-selected': {
+                row: {
+                    '&.MuiDataGrid-row.Mui-selected': {
                         backgroundColor: `${darkPalette.action.selected} !important`,
                     },
-                    '& .MuiDataGrid-row.Mui-selected:hover': {
+                    '&.MuiDataGrid-row.Mui-selected:hover': {
                         backgroundColor: `${darken(darkPalette.action.selected, 0.2)} !important`,
                     },
                 },
@@ -317,8 +349,6 @@ export const darkTheme = createTheme(base, {
         MuiCardHeader: {
             styleOverrides: {
                 root: {
-                    backgroundColor: 'inherit',
-                    color: 'inherit',
                     borderBottom: '1px solid white',
                 }
             },

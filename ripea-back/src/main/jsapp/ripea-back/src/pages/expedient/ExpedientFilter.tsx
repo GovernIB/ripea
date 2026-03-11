@@ -49,7 +49,6 @@ const ExpedientFilterForm = () => {
         <GridButtonField xs={1.5} name={'agafat'} icon={'lock'} whitLabel/>
         <GridButtonField xs={1.5} name={'pendentFirmar'} icon={'edit'} whitLabel/>
         <GridButtonField xs={1.5} name={'seguit'} icon={'group_add'} hidden={!rol?.isUser} whitLabel/>
-        <Grid item xs={!rol?.isUser ? 6.6 : 5.1}/>
     </>
 }
 

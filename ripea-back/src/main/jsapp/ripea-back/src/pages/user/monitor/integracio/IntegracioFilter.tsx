@@ -1,7 +1,7 @@
 import GridFormField, {GridButton} from "../../../../components/GridFormField.tsx";
 import * as builder from "../../../../util/springFilterUtils.ts";
 import StyledMuiFilter from "../../../../components/StyledMuiFilter.tsx";
-import {Grid, Icon} from "@mui/material";
+import {Icon} from "@mui/material";
 import {useIntegracioDiagnostic} from "./IntegracioDiagnostic.tsx";
 import {useTranslation} from "react-i18next";
 
@@ -14,7 +14,6 @@ const IntegracioFilterForm = ({handleOpen}:any) => {
         <GridFormField xs={3} name="tipus"/>
         <GridFormField xs={3} name="descripcio"/>
         <GridFormField xs={3} name="estat"/>
-        <Grid xs={1.6}/>
         <GridButton xs={2} onClick={handleOpen} variant={'contained'} color={'success'}>
             <Icon>build</Icon>{t('page.integracio.action.diagnosticAll.label')}
         </GridButton>

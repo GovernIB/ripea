@@ -101,7 +101,7 @@ const useRemesaDetail = () => {
         >
             <Load value={entity}>
                 {entity?.error &&
-                    <AlertExpand severity={"error"} label={t('page.notificacio.detall.error')}>{entity?.errorDescripcio}</AlertExpand>
+                    <AlertExpand severity={"error"} label={t('page.notificacio.detall.error')} sx={{mb: 1}}>{entity?.errorDescripcio}</AlertExpand>
                 }
                 <RemesaDetail entity={entity} fields={currentFields}/>
             </Load>
