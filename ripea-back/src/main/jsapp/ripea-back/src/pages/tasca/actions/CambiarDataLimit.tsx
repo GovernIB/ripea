@@ -20,6 +20,10 @@ const CambiarDataLimit = (props:any) => {
         resourceName={"expedientTascaResource"}
         title={t('page.tasca.action.changeDataLimit.title')}
         action={'CHANGE_DATALIMIT'}
+        formDialogButtons={[
+            {icon: 'schedule', text: t('page.tasca.action.changeDataLimit.label').replace('...', ''), componentProps: { variant: 'contained' }, value: true },
+            {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
+        ]}
         {...props}
     >
         <CambiarFechaLimiteForm/>

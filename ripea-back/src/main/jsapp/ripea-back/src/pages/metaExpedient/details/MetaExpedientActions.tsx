@@ -7,10 +7,12 @@ import {iniciaDescargaJSON} from "../../expedient/details/CommonActions.tsx";
 import useReglaDistribucio from "../actions/ReglaDistribucio.tsx";
 import useExpedientDialog from "./ExpedientDialog.tsx";
 import {Divider} from "@mui/material";
+import {useMemo} from "react";
 
 export const useActions = (refresh?: () => void) => {
     const {t} = useTranslation()
     const {
+        isReady: apiIsReady,
         patch: apiPatch,
         artifactAction: apiAction,
         artifactReport: apiReport,
@@ -129,7 +131,7 @@ export const useActions = (refresh?: () => void) => {
             });
     }
 
-    return {active, desactive, exportar, defecte, llevarDefecte, crearRegla, toogleRegla, desvincularGrup, canviDisseny, canviPendent}
+    return {apiIsReady, active, desactive, exportar, defecte, llevarDefecte, crearRegla, toogleRegla, desvincularGrup, canviDisseny, canviPendent}
 }
 
 export const useMetaExpedientActions = (refresh?: () => void) => {
@@ -140,9 +142,9 @@ export const useMetaExpedientActions = (refresh?: () => void) => {
     const {handleOpen: handleDetail, dialog: dialogDetail} = useMetaExpedientDetail();
     const {handleShow: handleCanviEstat, content: contentCanviEstat} = useCanviEstatRevisio(refresh);
     const {handleOpen: handleRegla, dialog: dialogRegla} = useReglaDistribucio(refresh);
-    const {active, desactive, exportar, canviDisseny, canviPendent} = useActions(refresh)
+    const {apiIsReady, active, desactive, exportar, canviDisseny, canviPendent} = useActions(refresh)
 
-    const actions:any[] = [
+    const actions:any[] = useMemo(() => [
         {
             label: t('page.metaExpedient.action.consultar.label'),
             icon: "search",
@@ -169,7 +171,7 @@ export const useMetaExpedientActions = (refresh?: () => void) => {
             icon: "edit",
             showInMenu: true,
             onClick: handleCanviEstat,
-            hidden: !(rol?.isRevisor || rol?.isAdmin) || !user?.sessionScope?.revisioActiva,
+            hidden: !(rol?.isRevisor || rol?.isAdmin) || !user?.sessionScope?.isRevisioActiva,
         },
         {
             label: t('page.metaExpedient.action.expedient.label'),
@@ -233,7 +235,7 @@ export const useMetaExpedientActions = (refresh?: () => void) => {
             clickTriggerDelete: true,
             hidden: (row:any) => !(rol?.isAdmin || rol?.isDissenyOrgan || (row?.revisioEstat != 'REVISAT' && rol?.isOrganAdmin)),
         },
-    ]
+    ], [apiIsReady]);
 
     const components = <>
         {dialogExpedient}

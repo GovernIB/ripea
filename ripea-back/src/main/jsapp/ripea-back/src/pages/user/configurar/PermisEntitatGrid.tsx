@@ -80,7 +80,7 @@ const PermisEntitatGrid = ()=> {
     return <GridPage disableMargins>
         <CardPage
             title={t('page.user.menu.permisos')}
-            header={<>
+            header={ id &&
                 <Button
                     variant="outlined"
                     color={"inherit"}
@@ -90,7 +90,7 @@ const PermisEntitatGrid = ()=> {
                     <Icon>arrow_back</Icon>
                     {t('common.back')}
                 </Button>
-            </>}
+            }
         >
             <StyledMuiGrid
                 apiRef={gridApiRef}

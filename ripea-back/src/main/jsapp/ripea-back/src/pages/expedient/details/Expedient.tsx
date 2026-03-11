@@ -249,7 +249,7 @@ const Expedient = () => {
         },
     ]
 
-    const headerMain = <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+    const headerMain = <>
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Icon sx={{ fontSize: '2rem' }}>{icons.expedient}</Icon>
             <Typography variant="h4" sx={{ display: 'flex' }}>{expedient?.nom}</Typography>
@@ -264,11 +264,11 @@ const Expedient = () => {
                 }
             </Typography>
         </Box>
-    </Box>;
+    </>;
     return <GridPage disableMargins>
         <SseExpedient id={id}/>
         <Load value={expedient} noEffect>
-            <CardPage header={headerMain}>
+            <CardPage header={headerMain} componentProps={{ justifyContent: 'space-between' }}>
                 <Grid container spacing={2}>
                     <Grid size={3}>
                         <ExpedientInfo entity={expedient} />

@@ -19,6 +19,10 @@ const Reobrir = (props:any) => {
         resourceName={"expedientTascaResource"}
         action={"REABRIR"}
         title={t('page.tasca.action.reobrir.title')}
+        formDialogButtons={[
+            {icon: 'undo', text: t('page.tasca.action.reobrir.label').replace('...', ''), componentProps: { variant: 'contained' }, value: true },
+            {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
+        ]}
         {...props}
     >
         <ReobrirForm/>

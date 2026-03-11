@@ -19,7 +19,7 @@ const Rebutjar = (props:any) => {
         action={"REBUTJAR"}
         title={t('page.tasca.action.rebutjar.title')}
         formDialogButtons={[
-            {icon: 'save', text: t('common.rebutja'), componentProps: { variant: 'contained' }, value: true },
+            {icon: 'reply', text: t('common.rebutja'), componentProps: { variant: 'contained' }, value: true },
             {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
         ]}
         {...props}

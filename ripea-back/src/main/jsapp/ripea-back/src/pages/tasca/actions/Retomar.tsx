@@ -18,6 +18,10 @@ const Retomar = (props:any) => {
         resourceName={"expedientTascaResource"}
         action={"RETOMAR"}
         title={t('page.tasca.action.retomar.title')}
+        formDialogButtons={[
+            {icon: 'close', text: t('page.tasca.action.retomar.label').replace('...', ''), componentProps: { variant: 'contained' }, value: true },
+            {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
+        ]}
         {...props}
     >
         <RetomarForm/>

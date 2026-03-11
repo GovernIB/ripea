@@ -156,7 +156,6 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
 
         response.put("organsNoSincronitzats", MetaExpedientHelper.getOrgansNoSincronitzats(request));
         response.put("urlsInstruccioActiu", ExpedientHelper.isUrlsInstruccioActiu(request));
-        response.put("revisioActiva", MetaExpedientHelper.getRevisioActiva(request));
         response.put("isCreacioFluxUsuariActiu", FluxFirmaHelper.isCreacioFluxUsuariActiu(request));
         response.put("teAccesEstadistiques", ExpedientHelper.teAccesEstadistiques(request));
         response.put("isMostrarSeguimentEnviamentsUsuariActiu", SeguimentEnviamentsUsuariHelper.isMostrarSeguimentEnviamentsUsuariActiu(request));

@@ -17,7 +17,7 @@ const IntegracioDetail = ({entity, fields}:any) => {
             <FieldData field={'endpoint'}/>
             <FieldData field={'estat'} renderCell={(formattedValue:string) =>
                 <StyledEstat entity={entity}>{formattedValue}</StyledEstat>}/>
-            <FieldData field={'tempsResposta'}/>
+            <FieldData field={'tempsResposta'} renderCell={(formattedValue:string) => `${formattedValue} ms`}/>
             <FieldData field={'parametres'}>
                 <Load value={entity?.parametres} noEffect>
                     {Object.entries(entity?.parametres)?.map?.(([key, value]) =>

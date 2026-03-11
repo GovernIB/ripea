@@ -17,8 +17,12 @@ const Delegar = (props:any) => {
 
     return <FormActionDialog
         resourceName={"expedientTascaResource"}
-        title={t('page.tasca.action.delegar.title')}
         action={'DELEGAR'}
+        title={t('page.tasca.action.delegar.title')}
+        formDialogButtons={[
+            {icon: 'turn_right', text: t('page.tasca.action.delegar.label').replace('...', ''), componentProps: { variant: 'contained' }, value: true },
+            {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
+        ]}
         {...props}
     >
         <DelegarForm/>

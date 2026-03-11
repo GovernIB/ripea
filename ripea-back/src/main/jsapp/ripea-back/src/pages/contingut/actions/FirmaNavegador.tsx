@@ -1,4 +1,4 @@
-import {useRef} from "react";
+import {useRef, useState} from "react";
 import {Grid} from "@mui/material";
 import {MuiFormDialogApi, useBaseAppContext} from "reactlib";
 import {useTranslation} from "react-i18next";
@@ -22,7 +22,7 @@ const FirmaNavegador = (props: any) => {
         title={t('page.document.action.firma.title')}
         action={"FIRMA_WEB_INI"}
         formDialogButtons={[
-            {icon: 'play_arrow', text: t('page.document.action.firma.button'), componentProps: { variant: 'contained' }, value: true },
+            {icon: 'play_arrow', text: t('page.document.action.firma.button'), componentProps: { variant: 'contained', disabled: props?.disabled }, value: true },
             {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
         ]}
         {...props}
@@ -36,8 +36,10 @@ export const useFirmaNavegador = (refresh?: () => void) => {
     const {temporalMessageShow} = useBaseAppContext();
     const { onChange } = useFirmaFinalitzadaSession();
     const { value: user } = useUserSession();
+    const [disabled, setDisabled] = useState<boolean>()
 
     const handleShow = (id: any, row: any): void => {
+        setDisabled(false)
         apiRef.current?.show?.(undefined, {
             ids: [id],
             massivo: false,
@@ -59,12 +61,13 @@ export const useFirmaNavegador = (refresh?: () => void) => {
         })
     }
     const formDialogResultProcessor = (result: any) => {
+        setDisabled(true)
         return <Iframe src={result?.url}/>
     }
 
     return {
         handleShow,
-        content: <FirmaNavegador apiRef={apiRef} onSuccess={onSuccess} formDialogResultProcessor={formDialogResultProcessor}/>
+        content: <FirmaNavegador apiRef={apiRef} onSuccess={onSuccess} formDialogResultProcessor={formDialogResultProcessor} disabled={disabled}/>
     }
 }
 export const useFirmaNavegadorMassive = (refresh?: () => void) => {

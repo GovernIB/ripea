@@ -1,4 +1,4 @@
-import {ThemeOptions, createTheme} from '@mui/material/styles';
+import {ThemeOptions, createTheme, darken} from '@mui/material/styles';
 import backgroundPattern from './assets/background-pattern.png';
 import type {} from '@mui/x-data-grid/themeAugmentation';
 
@@ -20,6 +20,12 @@ const base: ThemeOptions = {
         MuiDataGrid: {
             styleOverrides: {
                 root: {
+                    '& .MuiDataGrid-row.even.MuiDataGrid-row': {
+                        backgroundColor: 'inherit',
+                    },
+                    '& .MuiDataGrid-row.even.MuiDataGrid-row:hover': {
+                        backgroundColor: 'inherit',
+                    },
                     '& [class^="row-with-color-"] .MuiDataGrid-cellCheckbox': {
                         width: '48px !important',
                         maxWidth: '48px !important',
@@ -156,41 +162,44 @@ const base: ThemeOptions = {
     }
 };
 
-export const lightTheme = createTheme(base, {
-    palette: {
-        mode: 'light',
-        primary: {main: '#337ab7', contrastText: "#fff"},
-        warning: {main: '#8a6d3b'},
-        action: {
-            disabled: '#555555',
-            disabledBackground: 'rgba(231,229,229,0.6)',
-        },
+const lightPalete = {
+    mode: 'light',
+    primary: {main: '#337ab7', contrastText: "#fff"},
+    warning: {main: '#8a6d3b'},
+    action: {
+        disabled: '#555555',
+        selected: 'rgba(51, 122, 183, 0.28)',
+        disabledBackground: 'rgba(231,229,229,0.6)',
     },
+}
+
+export const lightTheme = createTheme(base, {
+    palette: { ...lightPalete },
     components: {
         MuiCssBaseline: {
             styleOverrides: {
                 '.cardHeader': {
-                    backgroundColor: 'rgba(231,229,229,0.6) !important',
+                    backgroundColor: `${lightPalete.action.disabledBackground} !important`,
                     borderBottom: '1px solid #e3e3e3',
                 },
             },
         },
         MuiOutlinedInput: {
             styleOverrides: {
-                root: ({ theme }:any) => ({
+                root: {
                     '&.Mui-disabled': {
-                        backgroundColor: theme.palette.action.disabledBackground,
+                        backgroundColor: lightPalete.action.disabledBackground,
                     },
                     '& input[readonly][aria-hidden="false"]': {
-                        backgroundColor: theme.palette.action.disabledBackground,
+                        backgroundColor: lightPalete.action.disabledBackground,
                     },
-                }),
+                },
             },
         },
         MuiDialogTitle: {
             styleOverrides: {
                 root: {
-                    backgroundColor: "rgba(231,229,229,0.6)",
+                    backgroundColor: lightPalete.action.disabledBackground,
                 }
             }
         },
@@ -204,7 +213,7 @@ export const lightTheme = createTheme(base, {
         MuiCardHeader: {
             styleOverrides: {
                 root: {
-                    backgroundColor: 'rgba(231,229,229,0.6)',
+                    backgroundColor: lightPalete.action.disabledBackground,
                     borderBottom: '1px solid #e3e3e3',
 
                     '&.detail': {
@@ -223,29 +232,43 @@ export const lightTheme = createTheme(base, {
                 }
             }
         },
+        MuiDataGrid: {
+            styleOverrides: {
+                root: {
+                    '& .Mui-selected': {
+                        backgroundColor: `${lightPalete.action.selected} !important`,
+                    },
+                    '& .Mui-selected:hover': {
+                        backgroundColor: `${darken(lightPalete.action.selected, 0.2)} !important`,
+                    },
+                },
+            },
+        },
     }
 });
 
-export const darkTheme = createTheme(base, {
-    palette: {
-        mode: 'dark',
-        background: {default: '#121212', paper: '#1e1e1e'},
-        primary: {main: '#90caf9', contrastText: '#000000'},
-        secondary: {main: '#f48fb1', contrastText: '#000000'},
-        error: {main: '#f44336'},
-        warning: {main: '#ffa726'},
-        info: {main: '#29b6f6'},
-        success: {main: '#66bb6a'},
-        text: {primary: '#ffffff', secondary: '#bbbbbb', disabled: '#777777 !important'},
-        divider: '#ffffff',
-        action: {
-            active: '#ffffff',
-            hover: '#333333',
-            selected: '#444444',
-            disabled: '#555555',
-            disabledBackground: '#2c2c2c'
-        },
+const darkPalette = {
+    mode: 'dark',
+    background: {default: '#121212', paper: '#1e1e1e'},
+    primary: {main: '#90caf9', contrastText: '#000000'},
+    secondary: {main: '#f48fb1', contrastText: '#000000'},
+    error: {main: '#f44336'},
+    warning: {main: '#ffa726'},
+    info: {main: '#29b6f6'},
+    success: {main: '#66bb6a'},
+    text: {primary: '#ffffff', secondary: '#bbbbbb', disabled: '#777777 !important'},
+    divider: '#ffffff',
+    action: {
+        active: '#ffffff',
+        hover: '#333333',
+        selected: '#444444',
+        disabled: '#555555',
+        disabledBackground: '#2c2c2c'
     },
+}
+
+export const darkTheme = createTheme(base, {
+    palette: { ...darkPalette },
     components: {
         MuiCssBaseline: {
             styleOverrides: {
@@ -256,23 +279,33 @@ export const darkTheme = createTheme(base, {
                 },
             },
         },
-        MuiOutlinedInput: {styleOverrides: {input: {'&:-webkit-autofill': {WebkitBoxShadow: '0 0 0 100px #1e1e1e inset'}}}},
+        MuiOutlinedInput: {styleOverrides: {
+            input: {
+                '&:-webkit-autofill': {
+                    WebkitBoxShadow: `0 0 0 100px ${darkPalette.background.paper} inset`
+                }
+            }
+        }},
         MuiDialogContent: {styleOverrides: {root: {backgroundColor: "#2d2d2d"}}},
         MuiDialogTitle: {
             styleOverrides: {
                 root: {
-                    color: '#1e1e1e',
-                    backgroundColor: '#ffffff'
-                }
+                    color: darkPalette.background.paper,
+                    backgroundColor: darkPalette.action.active,
+                },
             }
         },
         MuiDataGrid: {
             styleOverrides: {
-                row: {
-                    background: '#212830 !important',
-                    '&:hover': {backgroundColor: '#222222 !important'},
-                }
-            }
+                root: {
+                    '& .MuiDataGrid-row.Mui-selected': {
+                        backgroundColor: `${darkPalette.action.selected} !important`,
+                    },
+                    '& .MuiDataGrid-row.Mui-selected:hover': {
+                        backgroundColor: `${darken(darkPalette.action.selected, 0.2)} !important`,
+                    },
+                },
+            },
         },
         MuiCard: {
             styleOverrides: {
@@ -301,17 +334,17 @@ export const darkTheme = createTheme(base, {
             styleOverrides: {
                 root: {
                     '&.Mui-disabled': {
-                        '& .MuiChip-root': {color: '#90caf9'},
-                        '& .MuiIcon-root': {color: '#90caf9'},
-                        backgroundColor: '#2c2c2c',
-                        borderColor: '#444444',
+                        '& .MuiChip-root': {color: darkPalette.primary.main},
+                        '& .MuiIcon-root': {color: darkPalette.primary.main},
+                        backgroundColor: darkPalette.action.disabledBackground,
+                        borderColor: darkPalette.action.selected,
                         opacity: 0.6,
                         cursor: 'not-allowed'
                     },
                 },
             },
         },
-        MuiInputBase: {styleOverrides: {root: {backgroundColor: '#1e1e1e'}}},
+        MuiInputBase: {styleOverrides: {root: {backgroundColor: darkPalette.background.paper}}},
         MuiAutocomplete: {styleOverrides: {root: {backgroundColor: 'inherit !important'}}},
         MuiTextField: {styleOverrides: {root: {backgroundColor: 'inherit !important'}}},
         MuiInputLabel: {
@@ -326,8 +359,8 @@ export const darkTheme = createTheme(base, {
                 root: {
                     color: 'inherit !important',
                     backgroundColor: 'inherit !important',
-                    '&.Mui-disabled': {color: '#7777 !important'}
-                }
+                    '&.Mui-disabled': {color: darkPalette.text.disabled}
+                },
             }
         },
         MuiButtonGroup: {

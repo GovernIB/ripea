@@ -6,6 +6,7 @@ import {useVincularGrup} from "../../actions/VincularGrup.tsx";
 import {useActions} from "../MetaExpedientActions.tsx";
 import {useMemo} from "react";
 import useGrupDetail from "./details/GrupDetail.tsx";
+import Load from "../../../../components/Load.tsx";
 
 const sortModel: any = [{field: 'codi', sort: 'asc'}]
 const perspectives: string[] = [];
@@ -38,7 +39,7 @@ export const GrupGrid = ({ entity, refresh: refreshEntity, onRowCountChange, rea
     ], [t, entity]);
 
     const {handleShow: handleVincular, content: contentVincular} = useVincularGrup(refresh);
-    const {defecte, llevarDefecte, desvincularGrup} = useActions(refresh)
+    const {apiIsReady: procIsReady, defecte, llevarDefecte, desvincularGrup} = useActions(refresh)
     const {apiIsReady, handleOpen, dialog} = useGrupDetail()
     const actions = useMemo(() => readOnly ?[
         {
@@ -68,7 +69,7 @@ export const GrupGrid = ({ entity, refresh: refreshEntity, onRowCountChange, rea
             onClick: () => llevarDefecte(entity?.id),
             hidden: (row:any) => row?.id != entity?.grupPerDefecte?.id
         },
-    ], [t, readOnly, apiIsReady]);
+    ], [t, entity, readOnly, apiIsReady, procIsReady]);
 
     const elementsWithPositions:any[] = useMemo(() => [
         {
@@ -80,7 +81,7 @@ export const GrupGrid = ({ entity, refresh: refreshEntity, onRowCountChange, rea
         },
     ], [t, readOnly]);
 
-    return <>
+    return <Load value={apiIsReady && procIsReady}>
         <StyledMuiGrid
             resourceName={'grupResource'}
             columns={columns}
@@ -97,5 +98,5 @@ export const GrupGrid = ({ entity, refresh: refreshEntity, onRowCountChange, rea
         />
         {contentVincular}
         {dialog}
-    </>
+    </Load>
 }

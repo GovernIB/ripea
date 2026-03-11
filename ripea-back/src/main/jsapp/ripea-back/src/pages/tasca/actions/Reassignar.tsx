@@ -16,8 +16,12 @@ const Reassignar = (props:any) => {
 
     return <FormActionDialog
         resourceName={"expedientTascaResource"}
-        title={t('page.tasca.action.reassignar.title')}
         action={'REASSIGNAR'}
+        title={t('page.tasca.action.reassignar.title')}
+        formDialogButtons={[
+            {icon: 'person', text: t('page.tasca.action.reassignar.label').replace('...', ''), componentProps: { variant: 'contained' }, value: true },
+            {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
+        ]}
         {...props}
     >
         <ReassignarForm/>

@@ -1,5 +1,6 @@
 import React, {MutableRefObject} from "react";
 import { useBaseAppContext, useMuiActionReportLogic, DialogButton } from "reactlib";
+import {useTranslation} from "react-i18next";
 
 type CommonProps = {
     title?: string | ((data:any) => string),
@@ -25,12 +26,16 @@ type FormReportDialogProp = CommonProps & {
 }
 
 const FormActionDialog = (props:FormActionDialogProp) => {
+    const { t } = useTranslation();
     const {temporalMessageShow} = useBaseAppContext();
     const {
         title,
         resourceName,
         action,
-        formDialogButtons,
+        formDialogButtons = [
+            {icon: 'save', text: t('common.save'), componentProps: { variant: 'contained' }, value: true },
+            {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
+        ],
         formDialogComponentProps,
         initialOnChange,
         children,
