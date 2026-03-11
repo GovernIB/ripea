@@ -6,7 +6,7 @@ import {CanviEstatFilter, CanviEstatMuiGrid} from "./CanviEstatGrid.tsx";
 import useTancar, {useTancarMassive} from "../../expedient/actions/Tancar.tsx";
 
 const namedQueries: string[] = ['MASSIVE_ACTION_QUERY', 'MASSIVE_ACTION_TANCAR']
-const perspectives:any = ['ESTAT']
+const perspectives:any = ['ESTAT','AUDITORIA']
 const TancarGrid = () => {
     const {t} = useTranslation();
     const apiRef = useMuiDataGridApiRef();

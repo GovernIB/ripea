@@ -25,14 +25,14 @@ const CustodiarPendentsFilterFrom = (props:any) => {
     const expedientFilter = builder.and(builder.eq('metaExpedient.id', data?.procediment?.id));
 
     return <>
-        <GridFormField xs={4} name="nom"/>
-        <GridFormField xs={4} name="procediment"/>
+        <GridFormField xs={3} name="nom"/>
+        <GridFormField xs={3} name="procediment"/>
         {filtrarExpedient
-            ?<GridFormField xs={4} name="expedient" filter={expedientFilter}/>
-            :<Grid item xs={4}/>
+            ?<GridFormField xs={3} name="expedient" filter={expedientFilter}/>
+            :<Grid item xs={3}/>
         }
-        <GridFormField xs={4} name="dataCreacioInici" type={"date"}/>
-        <GridFormField xs={4} name="dataCreacioFi" type={"date"}/>
+        <GridFormField xs={3} name="dataCreacioInici" type={"date"}/>
+        <GridFormField xs={3} name="dataCreacioFi" type={"date"}/>
     </>
 }
 

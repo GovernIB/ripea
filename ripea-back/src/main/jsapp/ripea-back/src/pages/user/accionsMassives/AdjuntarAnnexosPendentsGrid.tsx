@@ -18,8 +18,8 @@ const AdjuntarAnnexosPendentsFilterFrom = () => {
         <GridFormField xs={3} name="numero"/>
         <GridFormField xs={3} name="dataInici" type={"date"}/>
         <GridFormField xs={3} name="dataFi" type={"date"}/>
-        <GridFormField xs={4} name="procediment"/>
-        <GridFormField xs={4} name="expedient"/>
+        <GridFormField xs={3} name="procediment"/>
+        <GridFormField xs={3} name="expedient"/>
     </>
 }
 

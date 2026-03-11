@@ -21,11 +21,13 @@ const columns = [
     },
     {
         field: 'createdDate',
-        flex: 0.75,
+        flex: 0.4,
+        wordWrap: true,
+        align: 'left',
         valueFormatter: (value: any) => formatDate(value)
     },
     {
-        field: 'createdBy',
+        field: 'createdByFullName',
         flex: 0.5,
     },
 ]
@@ -59,6 +61,7 @@ const TancarForm = () => {
                     'DOCUMENTS_OBLIGATORIS_TANCAR',// documentObligatorisAlTancar
                     'NOTIFICACIONS_CADUCADES',// conteNotificacionsCaducades
                     'DOCUMENTS_NO_MOGUTS',// conteDocumentsDeAnotacionesNoMogutsASerieFinal
+                    'AUDITORIA'
                 ]
             })
                 .then((app) => setEntities(app?.rows))
@@ -105,7 +108,6 @@ const TancarForm = () => {
                         autoHeight
                         paginationActive={false}
                         readOnly
-
                         groupingColDef={{
                             headerName: t('page.contingut.grid.nom'),
                             flex: 1,

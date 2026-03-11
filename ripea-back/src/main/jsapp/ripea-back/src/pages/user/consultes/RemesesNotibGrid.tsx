@@ -15,10 +15,10 @@ import {useActions} from "../../remesa/details/RemesaActions.tsx";
 // Filter
 const RemesesNotibFilterForm = () => {
     return <>
-        <GridFormField xs={2} name="tipusEnviament"/>
-        <GridFormField xs={4} name="concepte"/>
-        <GridFormField xs={2} name="estat"/>
-        <GridFormField xs={4} name="interessat"/>
+        <GridFormField xs={3} name="tipusEnviament"/>
+        <GridFormField xs={3} name="concepte"/>
+        <GridFormField xs={3} name="estat"/>
+        <GridFormField xs={3} name="interessat"/>
         <GridFormField xs={3} name="expedient"/>
         <GridFormField xs={3} name="nom"/>
         <GridFormField xs={3} name="emisor"/>
