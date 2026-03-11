@@ -787,7 +787,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
 	                			errorGuardant,
 	                			Utils.getIdsSeparatsComa(params.getIds()),
 	                			"massiu="+params.isMassivo());
-	                    throw new ActionExecutionException(getResourceClass(), entity.getId(), code, errorGuardant);
+	                    throw new ActionExecutionException(getResourceClass(), entity.getId(), code, errorGuardant.getMessage());
 	                }
 	        	}
             } catch (Exception e) {

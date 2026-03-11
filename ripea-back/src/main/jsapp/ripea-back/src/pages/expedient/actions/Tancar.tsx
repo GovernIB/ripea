@@ -183,7 +183,7 @@ export const useTancar = (refresh?: () => void) => {
     }
     const onSuccess = (result: any): void => {
         refresh?.()
-        temporalMessageShow(null, t('page.expedient.action.close.title', {expedient: result?.nom}), 'success');
+        temporalMessageShow(null, t('page.expedient.action.close.ok', {expedient: result?.nom}), 'success');
     }
 
     return {
