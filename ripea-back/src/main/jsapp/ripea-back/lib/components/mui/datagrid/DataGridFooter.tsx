@@ -58,9 +58,9 @@ const GridFooterPagination: React.FC<DataGridFooterPaginationProps> = (props) =>
     const { paginationModel, pageInfo, pageSizeOptions } = props;
     const { t } = useBaseAppContext();
     const apiRef = useGridApiContext();
+    const page = useGridSelector(apiRef, gridPageSelector);
+    const pageSize = useGridSelector(apiRef, gridPageSizeSelector);
     if (pageInfo?.totalElements) {
-        const page = useGridSelector(apiRef, gridPageSelector);
-        const pageSize = useGridSelector(apiRef, gridPageSizeSelector);
         const pageCount =
             pageInfo?.totalElements && pageSize
                 ? Math.ceil(pageInfo.totalElements / pageSize)

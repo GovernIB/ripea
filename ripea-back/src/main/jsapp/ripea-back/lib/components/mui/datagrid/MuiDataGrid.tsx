@@ -2,20 +2,24 @@ import React from 'react';
 import {
     DataGridProProps as DataGridProps,
     GridRowsProp,
-    GridRowParams,
+    GridRenderCellParams,
     GridRowClassNameParams,
     GridColDef,
     GridSortModel,
     GridSortDirection,
     GridPaginationModel,
     GridRowSelectionModel,
+    GridRowParams,
     GridSlots,
-    GridRowModes,
     GridRowModesModel,
     GridApiPro,
     GridEventListener,
     GridCallbackDetails,
+    GridActionsCell,
     useGridApiRef as useMuiDatagridApiRef,
+    useGridApiContext,
+    useGridSelector,
+    gridEditRowsStateSelector,
 } from '@mui/x-data-grid-pro';
 import Box from '@mui/material/Box';
 import { capitalize } from '../../../util/text';
@@ -191,7 +195,8 @@ const getRowActionOnClick = (
 
 const rowActionsToGridActionsCellItems = (
     rowActions: DataCommonAdditionalAction[],
-    params: GridRowParams,
+    id: any,
+    row: any,
     showCreateDialog: DataCommonShowCreateDialogFn,
     showUpdateDialog: DataCommonShowUpdateDialogFn,
     triggerDelete: DataCommonTriggerDeleteFn,
@@ -199,25 +204,25 @@ const rowActionsToGridActionsCellItems = (
     forceDisabled?: boolean): React.ReactElement[] => {
     const actions: React.ReactElement[] = [];
     rowActions.forEach((rowAction: DataCommonAdditionalAction) => {
-        const rowLink = rowLinkFind(rowAction.rowLink, params.row['_actions']);
-        const rowLinkShow = rowLinkShowCheck(rowAction.rowLink, params.row['_actions']);
+        const rowLink = rowLinkFind(rowAction.rowLink, row['_actions']);
+        const rowLinkShow = rowLinkShowCheck(rowAction.rowLink, row['_actions']);
         const rowArtifactShow = rowArtifactShowCheck(rowAction.action, rowAction.report, artifacts);
-        const rowActionLinkTo = (typeof rowAction.linkTo === 'function') ? rowAction.linkTo?.(params.row) : rowAction.linkTo?.replace('{{id}}', '' + params.id);
-        const rowActionLinkState = (typeof rowAction.linkState === 'function') ? rowAction.linkState?.(params.row) : rowAction.linkState;
+        const rowActionLinkTo = (typeof rowAction.linkTo === 'function') ? rowAction.linkTo?.(row) : rowAction.linkTo?.replace('{{id}}', '' + id);
+        const rowActionLinkState = (typeof rowAction.linkState === 'function') ? rowAction.linkState?.(row) : rowAction.linkState;
         const rowActionOnClick = getRowActionOnClick(rowAction, showCreateDialog, showUpdateDialog, triggerDelete);
-        const label = typeof rowAction.label === 'function' ? rowAction.label(params.row) : rowAction.label;
-        const title = typeof rowAction.title === 'function' ? rowAction.title(params.row) : rowAction.title;
-        const icon = typeof rowAction.icon === 'function' ? rowAction.icon(params.row) : rowAction.icon;
-        const showInMenu = (typeof rowAction.showInMenu === 'function') ? rowAction.showInMenu(params.row) : rowAction.showInMenu;
-        const disabled = forceDisabled || ((typeof rowAction.disabled === 'function') ? rowAction.disabled(params.row) : rowAction.disabled);
-        const hidden = (typeof rowAction.hidden === 'function') ? rowAction.hidden(params.row) : rowAction.hidden;
+        const label = typeof rowAction.label === 'function' ? rowAction.label(row) : rowAction.label;
+        const title = typeof rowAction.title === 'function' ? rowAction.title(row) : rowAction.title;
+        const icon = typeof rowAction.icon === 'function' ? rowAction.icon(row) : rowAction.icon;
+        const showInMenu = (typeof rowAction.showInMenu === 'function') ? rowAction.showInMenu(row) : rowAction.showInMenu;
+        const disabled = forceDisabled || ((typeof rowAction.disabled === 'function') ? rowAction.disabled(row) : rowAction.disabled);
+        const hidden = (typeof rowAction.hidden === 'function') ? rowAction.hidden(row) : rowAction.hidden;
         rowLinkShow && rowArtifactShow && !hidden && actions.push(
             toDataGridActionItem(
-                params.id,
+                id,
                 label ?? (rowLink != null ? rowLink?.title : rowAction),
                 title,
                 icon,
-                params.row,
+                row,
                 rowActionLinkTo,
                 rowActionLinkState,
                 rowActionOnClick,
@@ -283,17 +288,24 @@ const useGridColumns = (
             const actionsColumn = {
                 field: ' ',
                 type: 'actions',
+                sortable: false,
+                hideable: false,
+                exportable: false,
                 getActions: (params: GridRowParams) => {
-                    const anyRowInEditMode = rowModesModel && Object.keys(rowModesModel).filter(m => rowModesModel[m].mode === GridRowModes.Edit).length > 0;
-                    const isEditMode = rowModesModel && rowModesModel[params.id]?.mode === GridRowModes.Edit;
+                    const { apiRef: dataGridApiRef } = useDataGridContext();
+                    const gridApiRef = useGridApiContext();
+                    const rowModesModel = useGridSelector(gridApiRef, gridEditRowsStateSelector);
+                    const anyRowInEditMode = Object.keys(rowModesModel).length > 0;
+                    const currentRowInEditMode = typeof rowModesModel[params.id] !== 'undefined';
                     return rowActionsToGridActionsCellItems(
-                        isEditMode ? rowEditActions : rowActions,
-                        params,
-                        showCreateDialog,
-                        showUpdateDialog,
+                        currentRowInEditMode ? rowEditActions : rowActions,
+                        params.id,
+                        params.row,
+                        () => dataGridApiRef.current?.showCreateDialog(),
+                        (id) => dataGridApiRef.current?.showUpdateDialog(id),
                         triggerDelete,
                         artifacts,
-                        anyRowInEditMode && !isEditMode);
+                        anyRowInEditMode && !currentRowInEditMode);
                 },
                 ...rowActionsColumnProps,
             };
