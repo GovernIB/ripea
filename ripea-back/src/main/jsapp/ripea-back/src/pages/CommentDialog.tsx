@@ -20,10 +20,6 @@ import { formatDate } from '../util/dateUtils';
 import { useUserSession } from '../components/Session';
 import {useTranslation} from "react-i18next";
 
-const comment = {borderRadius: 2, px: 2, py: 1}
-const myComment = {...comment, bgcolor: '#a5d6a7', alignSelf: 'end'}
-const otherComment = {...comment, bgcolor: '#e0e0e0'}
-
 const Comments = (props: any) => {
     const { resourceName, id, resourceReference, readOnly, i18nKeys } = props;
     const { value: user } = useUserSession();
@@ -40,7 +36,7 @@ const Comments = (props: any) => {
             filter: `${resourceReference}.id:${id}`,
             includeLinksInRows: true,
             unpaged: true,
-            sorts: ['createdDate,desc']
+            sorts: ['createdDate,asc']
         }).
         then((result) => {
             setComments(result.rows);
@@ -74,7 +70,7 @@ const Comments = (props: any) => {
         ref={gridRef}
         sx={{ justifyContent: 'center', alignItems: 'flex-start', pb: 1 }}>
         {comments?.map((a:any)=>
-            <Grid key={a?.id} sx={a?.createdBy == user?.codi ? myComment : otherComment}>
+            <Grid key={a?.id} className={`comment ${a?.createdBy == user?.codi ? 'myComment' : 'otherComment'}`}>
                 <Typography variant="subtitle2" color="textDisabled">{a?.createdBy}</Typography>
                 <Typography variant="body2" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(a?.text) }}/>
                 <Typography variant="caption" color="textDisabled">{formatDate(a?.createdDate)}</Typography>

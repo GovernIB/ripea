@@ -3,7 +3,7 @@ import {useMemo, useState} from "react";
 import {GridPage, useMuiDataGridApiRef} from "reactlib";
 import {CardPage} from "../../../components/CardData.tsx";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
-import {Chip, Icon, Typography} from "@mui/material";
+import {Chip, Icon} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
@@ -13,6 +13,7 @@ import {useUserSession} from "../../../components/Session.tsx";
 import TabComponent from "../../../components/TabComponent.tsx";
 import {MetaExpedientForm} from "../../metaExpedient/MetaExpedientGrid.tsx";
 import {CanviEstatRevisioForm} from "../../metaExpedient/actions/CanviEstatRevisio.tsx";
+import {StyledLabel} from "../../../components/StyledLabel.tsx";
 
 // Form
 const RevisioMetaExpedientForm = (props:any) => {
@@ -72,29 +73,21 @@ const RevisioMetaExpedientFilter = (props: any) => {
 }
 
 // Grid
-const labelStyle = {padding: '1px 4px', fontSize: '11px', fontWeight: '500', borderRadius: '2px', display: 'flex', alignItems: 'center', width: 'max-content'}
-const obertStyle = {border: '1px dashed #AAA'}
-
 export const StyledEstat = (props:any) => {
     const { entity, children } = props;
 
-    let style: any = {};
     switch (entity?.revisioEstat) {
         case 'PENDENT':
-            style = {backgroundColor: '#ffebae'}
-            break;
+            return <StyledLabel backgroundColor={'#ffebae'}>{children}</StyledLabel>
         case 'REVISAT':
-            style = {backgroundColor: '#c3e8d1'}
-            break;
+                return <StyledLabel backgroundColor={'#c3e8d1'}>{children}</StyledLabel>
         case 'REBUTJAT':
-            style = {backgroundColor: '#d99b9d', color: 'white'}
-            break;
+            return <StyledLabel backgroundColor={'#d99b9d'}>{children}</StyledLabel>
         case 'DISSENY':
-            style = obertStyle
-            break;
+            return <StyledLabel dashed>{children}</StyledLabel>
     }
 
-    return <Typography variant="caption" sx={{...labelStyle, ...style}}>{children}</Typography>
+    return <>{children}</>
 }
 
 const sortModel: any[] = [{field: 'lastModifiedDate', sort: 'desc'}]

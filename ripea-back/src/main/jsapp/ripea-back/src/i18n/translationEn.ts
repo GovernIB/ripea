@@ -793,6 +793,7 @@ const translationEn = {
             view: {
                 title: "View type",
                 estat: "View by status",
+                nullEstat: "No status",
                 tipus: "View by document type",
                 carpeta: "View by folder",
             },
@@ -1169,6 +1170,8 @@ const translationEn = {
                 optional: "Optional Data",
                 infoResumida: "Summarized Registration Information",
                 interessats: "Interested Parties",
+                identifier: "Identification",
+                registre: "Registration information",
                 annexos: "Annexes",
             },
             justificant: {

@@ -4,27 +4,14 @@ import {useDadaActions} from "./details/DadaActions.tsx";
 import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
 import {useEffect, useMemo, useState} from "react";
 import {MultiplicitatStyled} from "../contingut/details/MetaExpedient.tsx";
-import {Typography} from "@mui/material";
 import useDataGrid from "./details/DataGrid.tsx";
+import {StyledLabel} from "../../components/StyledLabel.tsx";
 
 const dadesFilter = (metaDada:any, dades:any[]) :any[] => {
     return dades?.filter((dada)=>dada?.metaDada?.id == metaDada?.id)
 }
 
 const sortModel:any = [{ field: 'ordre', sort: 'asc' }]
-
-export const StyledDadaValor = (props: any) => {
-    const {valor} = props;
-    const style = {
-                border: '1px solid lightgray',
-                borderRadius: '4px',
-                padding: '2px 6px',
-                marginRight: '4px',
-                display: 'inline-block'
-            };
-    return <Typography variant="caption" sx={style}> {valor} </Typography>
-}
-
 const MetaDadaGrid = (props: any) => {
     const apiRef = useMuiDataGridApiRef()
     const { entity, onRowCountChange, onRefresh } = props
@@ -76,11 +63,11 @@ const MetaDadaGrid = (props: any) => {
                 const row = params.row;
                 if (row?.tipus == 'DOMINI') {
                     return value?.map((dada: any) => (
-                        <StyledDadaValor valor={dada?.dominiDescription}/>
+                        <StyledLabel className={'multiplicitat'} sx={{marginRight: '4px'}}>{dada?.dominiDescription}</StyledLabel>
                     ));
                 }
                 return value?.map((dada: any) => (
-                    <StyledDadaValor valor={dada?.valor}/>
+                    <StyledLabel className={'multiplicitat'} sx={{marginRight: '4px'}}>{dada?.valor}</StyledLabel>
                 ));
             },
         }

@@ -10,7 +10,7 @@ import {formatDate} from "../../../util/dateUtils.ts";
 import * as builder from "../../../util/springFilterUtils.ts";
 import ContingutIcon from "../../contingut/details/ContingutIcon.tsx";
 
-const columns = [
+const columns: any[] = [
     // {
     //     field: 'nom',
     //     flex: 0.5,

@@ -1,24 +1,10 @@
-import {Grid, Typography} from "@mui/material";
-
-const style = {
-    border: '1px solid lightgray',
-    display: 'flex',
-    alignItems: 'center',
-    width: 'max-content',
-    padding: '1px 4px',
-    fontSize: '11px',
-    fontWeight: '500',
-    borderRadius: '2px',
-    color: 'white',
-    backgroundColor: 'info.main',
-}
+import {Grid} from "@mui/material";
+import {StyledLabel} from "../../../components/StyledLabel.tsx";
 
 export const MultiplicitatStyled = (props:any) => {
-    const {multiplicitat, sx} = props;
+    const {multiplicitat} = props;
 
-    return <Typography variant="caption" sx={{...style, ...sx}}>
-        {multiplicitat}
-    </Typography>
+    return <StyledLabel className={'multiplicitat'} backgroundColor={'info'} color={'white'}>{multiplicitat}</StyledLabel>
 }
 
 const MetaExpedient = (props:any) => {
@@ -45,7 +31,7 @@ const MetaExpedient = (props:any) => {
 
     return <Grid width={'330px'} display={"flex"} alignItems={"center"} justifyContent={'space-between'}>
         {entity?.nom}
-        <MultiplicitatStyled multiplicitat={multiplicitat} sx={{display: 'flex', justifySelf: 'end'}}/>
+        <MultiplicitatStyled multiplicitat={multiplicitat}/>
     </Grid>
 }
 export default MetaExpedient;

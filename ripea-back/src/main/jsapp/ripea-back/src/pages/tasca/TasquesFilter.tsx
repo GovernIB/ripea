@@ -6,28 +6,27 @@ import {useFormContext} from "reactlib";
 const TasquesFilterForm = () => {
     const {data} = useFormContext()
 
-    if (!data?.advanced) {
-        return <>
+    const expedientFilter = builder.and(builder.eq("metaExpedient.id", data?.metaExpedient?.id))
+
+    return <>
+        {(!data?.advanced) && <>
             <GridFormField xs={3} name="metaExpedient"/>
             <GridFormField xs={2} name="titol"/>
             <GridFormField xs={2} name="prioritat"/>
             <GridFormField xs={2.5} name="estat" multiple/>
-        </>
-    }
-
-    const expedientFilter = builder.and(builder.eq("metaExpedient.id", data?.metaExpedient?.id))
-
-    return <>
-        <GridFormField xs={3} name="metaExpedient"/>
-        <GridFormField xs={3} name="expedient" filter={expedientFilter}/>
-        <GridFormField xs={2} name="metaExpedientTasca"/>
-        <GridFormField xs={2} name="titol"/>
-        <GridFormField xs={2} name="prioritat"/>
-        <GridFormField xs={1.5} name="dataInici" type={"date"}/>
-        <GridFormField xs={1.5} name="dataFi" type={"date"}/>
-        <GridFormField xs={1.5} name="dataLimitInici" type={"date"}/>
-        <GridFormField xs={1.5} name="dataLimitFi" type={"date"}/>
-        <GridFormField xs={3.5} name="estats" multiple/>
+        </>}
+        {(data?.advanced) && <>
+            <GridFormField xs={3} name="metaExpedient"/>
+            <GridFormField xs={3} name="expedient" filter={expedientFilter}/>
+            <GridFormField xs={2} name="metaExpedientTasca"/>
+            <GridFormField xs={2} name="titol"/>
+            <GridFormField xs={2} name="prioritat"/>
+            <GridFormField xs={1.5} name="dataInici" type={"date"}/>
+            <GridFormField xs={1.5} name="dataFi" type={"date"}/>
+            <GridFormField xs={1.5} name="dataLimitInici" type={"date"}/>
+            <GridFormField xs={1.5} name="dataLimitFi" type={"date"}/>
+            <GridFormField xs={3.5} name="estats" multiple/>
+        </>}
     </>
 }
 

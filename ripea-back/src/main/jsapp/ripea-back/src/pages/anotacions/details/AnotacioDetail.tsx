@@ -21,14 +21,14 @@ const Resum = (props:any) => {
 
     return <BasePage>
         <Grid2 container direction={"row"} columnSpacing={1} rowSpacing={1}>
-            <DetailCard title={'Identificació'}>
+            <DetailCard title={t('page.registre.detall.identifier')}>
                 <DetailCardContent title={t('page.registre.detall.identificador')} size={6}>{registre?.identificador}</DetailCardContent>
                 <DetailCardContent title={t('page.registre.detall.data')}          size={6}>{formatDate(registre?.data)}</DetailCardContent>
                 <DetailCardContent title={t('page.registre.detall.oficina')}       size={6}>{registre?.oficinaDescripcio} ({registre?.oficinaCodi})</DetailCardContent>
                 <DetailCardContent title={t('page.registre.detall.extracte')}      size={6}>{registre?.extracte}</DetailCardContent>
             </DetailCard>
 
-            <DetailCard title={'Informació de registre'}>
+            <DetailCard title={t('page.registre.detall.registre')}>
                 <DetailCardContent title={t('page.registre.detall.observacions')}      size={6}>{registre?.observacions}</DetailCardContent>
                 <DetailCardContent title={t('page.registre.detall.identificador')}     size={6}>{registre?.identificador}</DetailCardContent>
                 <DetailCardContent title={t('page.registre.detall.data')}              size={6}>{formatDate(registre?.data)}</DetailCardContent>

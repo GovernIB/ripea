@@ -53,7 +53,7 @@ export const StyledEstat = (props: any) => {
     if (expedient?.estatAdditionalInfo) {
         return <StyledLabel icon={icon} backgroundColor={expedient?.estatAdditionalInfo?.color}>{expedient?.estatAdditionalInfo?.nom}</StyledLabel>
     } else if (expedient?.estat == 'TANCAT') {
-        return <StyledLabel icon={icon} backgroundColor={'grey'}>{children}</StyledLabel>
+        return <StyledLabel icon={icon} backgroundColor={'#9e9e9e'}>{children}</StyledLabel>
     } else {
         return <StyledLabel dashed>{children}</StyledLabel>
     }
