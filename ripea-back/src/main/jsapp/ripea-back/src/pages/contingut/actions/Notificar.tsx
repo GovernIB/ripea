@@ -8,6 +8,7 @@ import TabComponent from "../../../components/TabComponent.tsx";
 import useCreate from "../../interessats/actions/Create.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import {InteressatDetail} from "../../interessats/details/InteressatDetail.tsx";
+import Load from "../../../components/Load.tsx";
 
 const perspectives = ['REPRESENTANT', 'ADRESSA']
 const AdditionalInfo = (props:any) => {
@@ -119,7 +120,9 @@ const NotificarForm = () => {
         <GridFormField xs={12} name="entregaPostal" hidden={!data?.permetreEnviamentPostal}/>
 
         <Grid item xs={12}>
-            <AdditionalInfo data={data}/>
+            <Load value={data?.interessats} noEffect>
+                <AdditionalInfo data={data}/>
+            </Load>
         </Grid>
     </Grid>
 }

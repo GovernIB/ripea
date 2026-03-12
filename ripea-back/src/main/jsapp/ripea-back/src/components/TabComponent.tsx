@@ -51,7 +51,7 @@ const TabComponent = (props :any) => {
         if (!value && defaultValue) {
             setValue(defaultValue)
         }else if (!tabs.some((tab:TabProps)=>tab?.value==value)) {
-            setValue(tabs[0].value);
+            setValue(tabs?.[0]?.value);
         }
     }, [tabs, value]);
 
