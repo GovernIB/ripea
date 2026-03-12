@@ -239,8 +239,6 @@ const useGridColumns = (
     rowActions: DataCommonAdditionalAction[],
     rowEditActions: DataCommonAdditionalAction[],
     fields: any[] | undefined,
-    showCreateDialog: DataCommonShowCreateDialogFn,
-    showUpdateDialog: DataCommonShowUpdateDialogFn,
     triggerDelete: DataCommonTriggerDeleteFn,
     artifacts: any[] | undefined,
     rowModesModel?: GridRowModesModel) => {
@@ -550,8 +548,6 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         [...rowAdditionalActions, ...rowEditActions],
         rowEditActions,
         fields,
-        showCreateDialog,
-        showUpdateDialog,
         triggerDelete,
         artifacts,
         otherProps.rowModesModel);
@@ -562,6 +558,15 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         showUpdateDialog,
         setFilter: (filter) => setInternalFilter(filter ?? undefined),
     });
+    React.useEffect(() => {
+        apiRef.current = {
+            refresh,
+            export: gridExport,
+            showCreateDialog,
+            showUpdateDialog,
+            setFilter: (filter) => setInternalFilter(filter ?? undefined),
+        };
+    }, [refresh, gridExport, showCreateDialog, showUpdateDialog, setInternalFilter]);
     if (apiRefProp) {
         if (apiRefProp.current) {
             apiRefProp.current.refresh = refresh;
