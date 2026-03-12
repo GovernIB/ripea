@@ -793,6 +793,7 @@ const translationCa = {
             view: {
                 title: "Tipus de vista",
                 estat: "Vista per estat",
+                nullEstat: "Sense estat",
                 tipus: "Vista per tipus de document",
                 carpeta: "Vista per carpeta",
             },
@@ -1169,6 +1170,8 @@ const translationCa = {
                 optional: "Dades opcionals",
                 infoResumida: "Informació de registre resumida",
                 interessats: "Interessats",
+                identifier: "Identificació",
+                registre: "Informació de registre",
                 annexos: "Annexos",
             },
             justificant: {

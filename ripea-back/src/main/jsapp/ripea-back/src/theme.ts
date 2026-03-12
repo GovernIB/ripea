@@ -30,6 +30,24 @@ const base: ThemeOptions = {
                     alignItems: 'center',
                     width: 'max-content',
                 },
+                '.comment': {
+                    padding: '8px 16px',
+                    borderRadius: '8px',
+                },
+                '.myComment': {
+                    alignSelf: 'end'
+                },
+                '.multiplicitat': {
+                    border: '1px solid lightgray',
+                    display: 'flex',
+                    alignItems: 'center',
+                    width: 'max-content',
+                    padding: '2px 6px',
+                    fontSize: '11px',
+                    fontWeight: '500',
+                    borderRadius: '4px',
+                    color: 'white',
+                },
             },
         },
         MuiDataGrid: {
@@ -83,6 +101,10 @@ const base: ThemeOptions = {
                     textTransform: 'none',
                     '&:not(.MuiButtonGroup-grouped)': {marginLeft: '10px'},
                     '& .MuiButton-startIcon': {marginRight: '0'},
+                    '&.Mui-disabled': {
+                        opacity: 0.6,
+                        cursor: 'not-allowed'
+                    },
                 },
             },
         },
@@ -216,6 +238,12 @@ export const lightTheme = createTheme(base, {
                     backgroundColor: '#f5f5f5',
                     border: '1px solid #e3e3e3'
                 },
+                '.myComment': {
+                    backgroundColor: '#a5d6a7',
+                },
+                '.otherComment': {
+                    backgroundColor: '#e0e0e0',
+                },
             },
         },
         MuiOutlinedInput: {
@@ -309,6 +337,14 @@ export const darkTheme = createTheme(base, {
                 '.styledFilter': {
                     border: '1px solid #e3e3e3'
                 },
+                '.myComment': {
+                    color: 'black',
+                    backgroundColor: '#a5d6a7',
+                },
+                '.otherComment': {
+                    color: 'black',
+                    backgroundColor: '#e0e0e0',
+                },
             },
         },
         MuiOutlinedInput: {styleOverrides: {
@@ -359,20 +395,6 @@ export const darkTheme = createTheme(base, {
                     backgroundColor: '#2d2d2d'
                 }
             }
-        },
-        MuiButton: {
-            styleOverrides: {
-                root: {
-                    '&.Mui-disabled': {
-                        '& .MuiChip-root': {color: darkPalette.primary.main},
-                        '& .MuiIcon-root': {color: darkPalette.primary.main},
-                        backgroundColor: darkPalette.action.disabledBackground,
-                        borderColor: darkPalette.action.selected,
-                        opacity: 0.6,
-                        cursor: 'not-allowed'
-                    },
-                },
-            },
         },
         MuiInputBase: {styleOverrides: {root: {backgroundColor: darkPalette.background.paper}}},
         MuiAutocomplete: {styleOverrides: {root: {backgroundColor: 'inherit !important'}}},

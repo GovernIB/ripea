@@ -1,34 +1,62 @@
-import {Icon, Typography} from "@mui/material";
-import {getContrastRatio} from "@mui/material/styles";
+import { Typography, Icon } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
+import { getContrastRatio } from "@mui/material/styles";
 
 export const StyledLabel = (props: any) => {
+    const theme = useTheme();
+
     const {
         title,
         icon,
         backgroundColor,
-        color = backgroundColor && getContrastRatio(backgroundColor, '#fff') >= 4.5 ? '#fff' : '#000',
+        color,
         sx = {},
         dashed,
         children,
         ...other
     } = props;
 
-    if (dashed)
-        return <Typography variant="caption" className={'myLabel'}
-                           sx={{border: '1px dashed #AAA'}}>{children}</Typography>
+    const resolvedBg =
+        backgroundColor && theme?.palette?.[backgroundColor]
+            ? theme?.palette?.[backgroundColor]?.main
+            : backgroundColor;
 
-    return <Typography
-        title={title}
-        variant={"caption"}
-        className={'myLabel'}
-        sx={{
-            color,
-            backgroundColor,
-            ...sx,
-        }}
-        {...other}
-    >
-        {icon && <Icon fontSize={"inherit"} sx={{mr: children != null ? 1 : 0}}>{icon}</Icon>}
-        {children}
-    </Typography>
-}
+    const resolvedColor =
+        color ??
+        (resolvedBg &&
+        (getContrastRatio(resolvedBg, "#fff") >= 4.5
+            ? "#fff"
+            : "#000") || 'inherit');
+
+    if (dashed)
+        return (
+            <Typography
+                variant={"caption"}
+                className={"myLabel"}
+                sx={{ border: "1px dashed #AAA" }}
+            >
+                {children}
+            </Typography>
+        );
+
+    return (
+        <Typography
+            title={title}
+            variant={"caption"}
+            className={"myLabel"}
+            sx={{
+                color: resolvedColor,
+                backgroundColor: resolvedBg,
+                ...sx,
+            }}
+            {...other}
+        >
+            {icon && (
+                <Icon fontSize={"inherit"} sx={{ mr: children != null ? 1 : 0 }}>
+                    {icon}
+                </Icon>
+            )}
+            {children}
+        </Typography>
+    );
+};

@@ -9,46 +9,45 @@ const ExpedientFilterForm = () => {
     const {data} = useFormContext()
     const { value: user, rol } = useUserSession();
 
-    if (!data?.advanced) {
-        return <>
-            <GridFormField xs={2.4} name="numero"/>
-            <GridFormField xs={2.4} name="estat" requestParams={{metaExpedientId: data?.metaExpedient?.id}} />
-            <GridFormField xs={2.4} name="dataCreacioInici"/>
-            <GridFormField xs={2.4} name="dataCreacioFinal"/>
-        </>
-    }
-
     const filterMetaExpedient = builder.and(
         builder.eq('organGestor.id', data?.organGestor?.id),
     );
 
     return <>
-        <GridFormField xs={3} name="numero"/>
-        <GridFormField xs={3} name="nom"/>
-        <GridFormField xs={3} name="estat" requestParams={{metaExpedientId: data?.metaExpedient?.id}} />
-        <GridFormField xs={3} name="interessat"/>
-        <GridFormField xs={3} name="organGestor" />
-        <GridFormField xs={3} name="metaExpedient" filter={filterMetaExpedient}/>
-        <GridFormField xs={3} name="dataCreacioInici"/>
-        <GridFormField xs={3} name="dataCreacioFinal"/>
+        {(!data?.advanced) && <>
+            <GridFormField xs={2.4} name="numero"/>
+            <GridFormField xs={2.4} name="estat" requestParams={{metaExpedientId: data?.metaExpedient?.id}} />
+            <GridFormField xs={2.4} name="dataCreacioInici"/>
+            <GridFormField xs={2.4} name="dataCreacioFinal"/>
+        </>}
+        {(data?.advanced) && <>
+            <GridFormField xs={3} name="numero"/>
+            <GridFormField xs={3} name="nom"/>
+            <GridFormField xs={3} name="estat" requestParams={{metaExpedientId: data?.metaExpedient?.id}} />
+            <GridFormField xs={3} name="interessat"/>
+            <GridFormField xs={3} name="organGestor" />
+            <GridFormField xs={3} name="metaExpedient" filter={filterMetaExpedient}/>
+            <GridFormField xs={3} name="dataCreacioInici"/>
+            <GridFormField xs={3} name="dataCreacioFinal"/>
 
-        <GridFormField xs={3} name="domini" hidden={!user?.sessionScope?.isDominisEnabled}/>
-        <GridFormField xs={3} name="dominiValor"
-                       requestParams={{domini: data?.domini?.id}}
-                       disabled={!data?.domini}
-                       reanOnly={!data?.domini}
-                       hidden={!user?.sessionScope?.isDominisEnabled}/>
+            <GridFormField xs={3} name="domini" hidden={!user?.sessionScope?.isDominisEnabled}/>
+            <GridFormField xs={3} name="dominiValor"
+                           requestParams={{domini: data?.domini?.id}}
+                           disabled={!data?.domini}
+                           reanOnly={!data?.domini}
+                           hidden={!user?.sessionScope?.isDominisEnabled}/>
 
-        <GridFormField xs={2} name="numeroRegistre"/>
-        <GridFormField xs={2} name="grup" hidden={!user?.sessionScope?.isFiltreGrupsVisible}/>
-        <GridFormField xs={2} name="agafatPer" hidden={rol?.isUser}/>
-            <Grid item xs={2} hidden={user?.sessionScope?.isFiltreGrupsVisible}/>
-            <Grid item xs={2} hidden={!rol?.isUser}/>
-            <Grid item xs={6} hidden={user?.sessionScope?.isDominisEnabled}/>
+            <GridFormField xs={2} name="numeroRegistre"/>
+            <GridFormField xs={2} name="grup" hidden={!user?.sessionScope?.isFiltreGrupsVisible}/>
+            <GridFormField xs={2} name="agafatPer" hidden={rol?.isUser}/>
+                <Grid item xs={2} hidden={user?.sessionScope?.isFiltreGrupsVisible}/>
+                <Grid item xs={2} hidden={!rol?.isUser}/>
+                <Grid item xs={6} hidden={user?.sessionScope?.isDominisEnabled}/>
 
-        <GridButtonField xs={1.5} name={'agafat'} icon={'lock'} whitLabel/>
-        <GridButtonField xs={1.5} name={'pendentFirmar'} icon={'edit'} whitLabel/>
-        <GridButtonField xs={1.5} name={'seguit'} icon={'group_add'} hidden={!rol?.isUser} whitLabel/>
+            <GridButtonField xs={1.5} name={'agafat'} icon={'lock'} whitLabel/>
+            <GridButtonField xs={1.5} name={'pendentFirmar'} icon={'edit'} whitLabel/>
+            <GridButtonField xs={1.5} name={'seguit'} icon={'group_add'} hidden={!rol?.isUser} whitLabel/>
+        </>}
     </>
 }
 

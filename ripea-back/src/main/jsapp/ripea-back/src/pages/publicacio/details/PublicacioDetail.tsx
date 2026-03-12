@@ -1,8 +1,7 @@
 import {useState} from "react";
-import {Grid} from "@mui/material";
 import {MuiDialog} from "reactlib";
 import {useTranslation} from "react-i18next";
-import {ContenidoData} from "../../../components/CardData.tsx";
+import {DetailCardContent, DetailCard} from "../../../components/CardData.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import Load from "../../../components/Load.tsx";
 
@@ -10,14 +9,14 @@ const PublicacioDetail = (props:any) => {
     const {entity} = props
     const { t } = useTranslation();
 
-    return <Grid container direction={"row"} columnSpacing={1}>
-        <ContenidoData title={t('page.publicacio.detall.document')}>{entity?.document?.description}</ContenidoData>
-        <ContenidoData title={t('page.publicacio.detall.enviatData')}>{formatDate(entity?.enviatData)}</ContenidoData>
-        <ContenidoData title={t('page.publicacio.detall.estat')}>{entity?.estat}</ContenidoData>
-        <ContenidoData title={t('page.publicacio.detall.tipus')}>{entity?.tipus}</ContenidoData>
-        <ContenidoData title={t('page.publicacio.detall.assumpte')}>{entity?.assumpte}</ContenidoData>
-        <ContenidoData title={t('page.publicacio.detall.observacions')} hiddenIfEmpty>{entity?.observacions}</ContenidoData>
-    </Grid>
+    return <DetailCard>
+        <DetailCardContent title={t('page.publicacio.detall.document')}>{entity?.document?.description}</DetailCardContent>
+        <DetailCardContent title={t('page.publicacio.detall.enviatData')}>{formatDate(entity?.enviatData)}</DetailCardContent>
+        <DetailCardContent title={t('page.publicacio.detall.estat')}>{entity?.estat}</DetailCardContent>
+        <DetailCardContent title={t('page.publicacio.detall.tipus')}>{entity?.tipus}</DetailCardContent>
+        <DetailCardContent title={t('page.publicacio.detall.assumpte')}>{entity?.assumpte}</DetailCardContent>
+        <DetailCardContent title={t('page.publicacio.detall.observacions')} hiddenIfEmpty>{entity?.observacions}</DetailCardContent>
+    </DetailCard>
 }
 
 const usePublicacioDetail = () => {
@@ -25,8 +24,8 @@ const usePublicacioDetail = () => {
     const [entity, setEntity] = useState<any>();
     const { t } = useTranslation();
 
-    const handleOpen = (id:any, row:any) => {
-        console.log(id, row)
+    const handleOpen = (_id:any, row:any) => {
+        // console.log(id, row)
         setEntity(row);
         setOpen(true);
     }

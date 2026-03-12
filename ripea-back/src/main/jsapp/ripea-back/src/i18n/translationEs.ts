@@ -793,6 +793,7 @@ const translationEs = {
             view: {
                 title: "Tipo de vista",
                 estat: "Vista por estado",
+                nullEstat: "Sin estado",
                 tipus: "Vista por tipo documento",
                 carpeta: "Vista por carpeta",
             },
@@ -1169,6 +1170,8 @@ const translationEs = {
                 optional: "Datos opcionales",
                 infoResumida: "Información de registro resumida",
                 interessats: "Interesados",
+                identifier: "Identificación",
+                registre: "Información de registro",
                 annexos: "Anexos",
             },
             justificant: {

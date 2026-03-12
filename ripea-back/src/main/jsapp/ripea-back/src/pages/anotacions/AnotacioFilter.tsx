@@ -5,24 +5,24 @@ import {useFormContext} from "reactlib";
 
 const AnotacioFilterForm = () => {
     const {data} = useFormContext()
-    if (!data?.advanced) {
-        return <>
+
+    return <>
+        {(!data?.advanced) && <>
             <GridFormField xs={3.5} name="metaExpedient"/>
             <GridFormField xs={2} name="estat"/>
             <GridFormField xs={2} name="dataRecepcioInicial" type={"date"}/>
             <GridFormField xs={2} name="dataRecepcioFinal" type={"date"}/>
-        </>
-    }
-
-    return <>
-        <GridFormField xs={4} name="numRegistre"/>
-        <GridFormField xs={4} name="extracte"/>
-        <GridFormField xs={4} name="destinacio"/>
-        <GridFormField xs={4} name="metaExpedient"/>
-        <GridFormField xs={4} name="dataRecepcioInicial" type={"date"}/>
-        <GridFormField xs={4} name="dataRecepcioFinal" type={"date"}/>
-        <GridFormField xs={4} name="estat"/>
-        <GridFormField xs={4} name="interessat"/>
+        </>}
+        {(data?.advanced) && <>
+            <GridFormField xs={4} name="numRegistre"/>
+            <GridFormField xs={4} name="extracte"/>
+            <GridFormField xs={4} name="destinacio"/>
+            <GridFormField xs={4} name="metaExpedient"/>
+            <GridFormField xs={4} name="dataRecepcioInicial" type={"date"}/>
+            <GridFormField xs={4} name="dataRecepcioFinal" type={"date"}/>
+            <GridFormField xs={4} name="estat"/>
+            <GridFormField xs={4} name="interessat"/>
+        </>}
     </>
 }
 
