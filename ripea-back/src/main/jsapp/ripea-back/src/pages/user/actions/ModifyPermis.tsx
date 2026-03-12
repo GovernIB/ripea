@@ -20,7 +20,7 @@ export const usePermisActions = (refresh?: () => void) => {
         artifactAction: apiAction,
     } = useResourceApiService('aclSidResource');
     const {messageDialogShow, temporalMessageShow} = useBaseAppContext();
-    const confirmDialogButtons = useConfirmDialogButtons();
+    const confirmDialogButtons = useConfirmDialogButtons().reverse();
     const confirmDialogComponentProps = {maxWidth: 'sm', fullWidth: true};
 
     const eliminar = (id:any, data:any) :void => {

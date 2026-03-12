@@ -19,7 +19,7 @@ export const Assignar = (props: { apiRef:any }) => {
         title={t('page.expedient.action.assignar.title')}
         onClose={(reason?: string) => reason !== 'backdropClick'}
         dialogButtons={[
-            {icon: 'save', text: t('common.save'), componentProps: { variant: 'contained' }, value: true },
+            {icon: 'person', text: t('page.expedient.action.assignar.button'), componentProps: { variant: 'contained' }, value: true },
             {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
         ]}
         apiRef={apiRef}

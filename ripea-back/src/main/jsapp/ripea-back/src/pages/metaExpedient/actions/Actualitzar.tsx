@@ -58,8 +58,8 @@ export const Actualitzar = (props: any) => {
         title={t('page.metaExpedient.action.actualize.title')}
         action={"UPDATE_ROLSAC"}
         formDialogButtons={[
+            {icon: 'cached', text: t('page.metaExpedient.action.actualize.button'), componentProps: { variant: 'contained', disabled: props?.disabled }, value: true },
             {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
-            {icon: 'save', text: t('common.actualize'), componentProps: { variant: 'contained', disabled: props?.disabled }, value: true },
         ]}
         {...props}
     >

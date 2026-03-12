@@ -18,6 +18,10 @@ const ImportarSGD = (props:any) => {
         resourceName={"expedientResource"}
         action={"IMPORT_INTE"}
         title={t('page.interessat.action.importSGD.title')}
+        formDialogButtons={[
+            {icon: 'group_search', text: t('common.import'), componentProps: { variant: 'contained' }, value: true },
+            {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
+        ]}
         {...props}
     >
         <ImportarSGDForm/>

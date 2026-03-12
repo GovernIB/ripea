@@ -20,7 +20,7 @@ const Reobrir = (props:any) => {
         action={"REABRIR"}
         title={t('page.tasca.action.reobrir.title')}
         formDialogButtons={[
-            {icon: 'undo', text: t('page.tasca.action.reobrir.label').replace('...', ''), componentProps: { variant: 'contained' }, value: true },
+            {icon: 'undo', text: t('page.tasca.action.reobrir.button'), componentProps: { variant: 'contained' }, value: true },
             {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
         ]}
         {...props}

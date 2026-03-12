@@ -29,8 +29,6 @@ const translationCa = {
         export: "Exporta",
         consult: "Consulta",
         filter: "Filtrar",
-        downloadSelected: "Descarrega contingut seleccionat",
-        relateSelected: "Relaciona contingut seleccionat",
         processing: "Processant...",
         auditoria: {
             create: "Creat el {{createdDate}} per '{{createdBy}}'.",
@@ -319,11 +317,13 @@ const translationCa = {
                 },
                 acceptar: {
                     label: "Acceptar...",
+                    button: "Accepta",
                     title: "Acceptar expedient",
                     ok: "L'anotació s'ha acceptat correctament",
                 },
                 rebutjar: {
                     label: "Rebutjar...",
+                    button: "Rebutja",
                     title: "Rebutjar expedient",
                     ok: "L'anotació s'ha rebutjat correctament",
                 },
@@ -389,6 +389,7 @@ const translationCa = {
                 },
                 rebutjar: {
                     label: "Rebutjar...",
+                    button: "Rebutja",
                     title: "Rebutjar tasca",
                     ok: "La tasca s'ha rebutjat correctament",
                 },
@@ -403,31 +404,37 @@ const translationCa = {
                 },
                 reassignar: {
                     label: "Reassignar...",
+                    button: "Reassigna",
                     title: "Reassignar tasca",
                     ok: "La tasca s'ha reassignat correctament",
                 },
                 delegar: {
                     label: "Delegar...",
+                    button: "Delega",
                     title: "Delegar tasca",
                     ok: "La tasca s'ha delegat correctament",
                 },
                 retomar: {
-                    label: "Cancel·lar delegació",
+                    label: "Cancel·lar delegació...",
+                    button: "Cancel·la delegació",
                     title: "Cancel·lar delegació de tasca",
                     ok: "La delegació de la tasca s'ha cancel·lat correctament",
                 },
                 changeDataLimit: {
                     label: "Modificar data límit...",
+                    button: "Modifica data límit",
                     title: "Canviar data límit",
                     ok: "La tasca s'ha modificat correctament",
                 },
                 changePrioritat: {
                     label: "Canviar prioritat...",
+                    button: "Canvia prioritat",
                     title: "Modificar prioritat de la tasca",
                     ok: "La tasca s'ha modificat correctament",
                 },
                 reobrir: {
                     label: "Reobrir...",
+                    button: "Reobri",
                     title: "Reobrir tasca",
                     ok: "La tasca s'ha reobert correctament",
                 },
@@ -498,7 +505,7 @@ const translationCa = {
                     ok: "Interessats importats correctament",
                 },
 				gestGrups: {
-				    label: "Gestionar grups",
+				    label: "Gestionar grups...",
 					title: "Gestionar grups",
 				    ok: "Grups modificats correctament",
 				},
@@ -589,6 +596,7 @@ const translationCa = {
                 },
                 close: {
                     label: "Tancar...",
+                    button: "Tanca",
                     title: "Tancar expedient",
                     ok: "L’expedient '{{expedient}}' ha estat tancat correctament",
                 },
@@ -599,6 +607,7 @@ const translationCa = {
                 },
                 download: {
                     label: "Descarregar documents...",
+                    button: "Descarrega seleccionat",
                     title: "Selecció de documents",
                     ok: "Els documents s’han descarregat correctament",
                 },
@@ -607,7 +616,8 @@ const translationCa = {
                     ok: "El full de càlcul s’ha descarregat correctament",
                 },
                 exportZIP: {
-                    label: "Exportar índex ZIP",
+                    label: "Exportar índex ZIP...",
+                    button: "Exporta ZIP",
                     title: "Exportar documents a ZIP",
                     ok: "El document ZIP s’ha descarregat correctament",
                 },
@@ -641,6 +651,7 @@ const translationCa = {
                 },
                 export: {
                     label: "Exportar els documents...",
+                    button: "Exporta els documents",
                     title: "Exportar documents",
                     ok: "Els documents s’han descarregat correctament",
                 },
@@ -650,26 +661,29 @@ const translationCa = {
                 },
                 changePrioritat: {
                     label: "Canviar prioritat...",
+                    button: "Canvia prioritat",
                     title: "Modificar prioritat de l’expedient",
                     ok: "La prioritat de l’expedient '{{expedient}}' s’ha modificat correctament.",
                     massiveOk: "S'han cambiat la prioritat de '{{data.num}}' expedients",
                 },
                 changeEstat: {
                     label: "Canviar estat...",
+                    button: "Canvia estat",
                     title: "Modificar estat de l’expedient",
                     ok: "L’estat de l’expedient '{{expedient}}' s’ha modificat correctament.",
                     massiveOk: "S'ha cambiat l'estat a '{{data.num}}' expedients"
                 },
                 assignar: {
                     label: "Assignar...",
+                    button: "Assigna",
                     title: "Assignar expedient a usuari",
                     ok: "L’expedient '{{expedient}}' s’ha assignat correctament.",
                 },
                 relacio: {
                     label: "Relacionar...",
+                    button: "Relaciona",
                     title: "Relacionar expedient",
                     ok: "Les relacions de l’expedient '{{expedient}}' han canviat correctament.",
-                    labelDialog: "Relacionar",
                 },
                 eliminarRelacio: {
                     label: "Eliminar relació",
@@ -689,6 +703,7 @@ const translationCa = {
                 },
 				moureTot: {
 					label: "Moure tot...",
+                    button: "Moure tot",
 				    title: "Moure tot a l'expedient destí",
 				    ok: "L'acció massiva per moure l'expedient '{{expedient}}' s'ha creat correctament.",
 	            },
@@ -832,7 +847,8 @@ const translationCa = {
                     ok: "El document {{data.nom}} s'ha eliminat correctament"
                 },
                 pinbal: {
-                    label: "Consulta PINBAL...",
+                    label: "Consultar PINBAL...",
+                    button: "Consulta",
                     title: "Nova consulta PINBAL",
                     ok: "S'ha creat el document a partir de la consulta pinbal '{{codiServeiPinbal}}'",
                 },
@@ -901,8 +917,8 @@ const translationCa = {
                     ok: "Document descarregat correctament",
                 },
                 firma: {
+                    label: "Descarregar signatura...",
                     button: "Iniciar procés de firma",
-                    label: "Descarregar signatura",
                     title: "Signar des del navegador",
                     ok: "Document signat correctament",
                 },
@@ -915,8 +931,8 @@ const translationCa = {
                     ok: "Enllaç CSV copiat correctament",
                 },
                 portafirmes: {
-                    button: "Envia a portafirmes",
                     label: "Enviar a portafirmes...",
+                    button: "Envia a portafirmes",
                     title: "Enviar document a portafirmes",
                     ok: "Document '{{document}}' enviat a portafirmes",
                 },
@@ -925,34 +941,34 @@ const translationCa = {
                     title: "Visualitzar versió PDF",
                 },
                 firmar: {
-                    button: "Inicia procés de firma",
                     label: "Signatura des del navegador...",
+                    button: "Inicia procés de firma",
                 },
                 viaFirma: {
-                    button: "Envia a ViaFirma",
                     label: "Enviar viaFirma...",
+                    button: "Envia a ViaFirma",
                     title: "Enviar document a ViaFirma",
                     ok: "Document '{{document}}' enviat a viaFirma",
                 },
                 mail: {
                     label: "Enviar via email...",
+                    button: "Envia via email",
                     title: "Enviar document per email",
                     ok: "Document '{{document}}' enviat via email",
                 },
                 seguiment: {
                     label: "Seguiment portafirmes",
-                    cancel: "Cancel·la enviament",
                     title: "Detalls de la firma",
+                },
+                cancel: {
+                    label: "Cancel·la enviament",
                     ok: "La signatura ha estat cancel·lada correctament",
                     check: "Confirmau l'acció",
                     description: "Segur que voleu cancel·lar la firma actualment en procés?",
                 },
-                cancel: {
-                    label: "Cancel·la enviament",
-                },
                 notificar: {
-                    button: "Notifica",
                     label: "Notificar o comunicar...",
+                    button: "Notifica",
                     title: "Crear notificació document",
                     ok: "Notificació creada correctament",
                     alert: {
@@ -977,6 +993,7 @@ const translationCa = {
                 },
                 notificarMasiva: {
                     label: "Notificar o comunicar...",
+                    button: "Notifica",
                     title: "Generar document per notificar",
                     ok: "S'ha generat un zip dels elements seleccionats",
                 },
@@ -985,6 +1002,7 @@ const translationCa = {
                 },
                 publicar: {
                     label: "Publicar...",
+                    button: "Publica",
                     title: "Crear publicació",
                     ok: "Publicació creada correctament",
                 },
@@ -998,6 +1016,7 @@ const translationCa = {
                 },
                 changeType: {
                     label: "Canviar tipus...",
+                    button: "Canvia tipus",
                     title: "Canviar tipus",
                     ok: "Els documents s'han modificat correctament",
                 },
@@ -1202,7 +1221,7 @@ const translationCa = {
                 },
                 justificant: {
                     label: "Justificant d'enviament",
-                    ok: "",
+                    ok: "S'ha descarregat el justificant",
                 },
                 documentEnviat: {
                     label: "Document enviat",
@@ -1233,7 +1252,8 @@ const translationCa = {
             },
             action: {
                 ampliarPlac: {
-                    label: "Ampliar plaç",
+                    label: "Ampliar plaç...",
+                    button: "Amplia plaç",
                     title: "Ampliació del plaç dels enviaments de la remesa",
                     ok: "El plaç del enviament ha estat ampliat",
                 },
@@ -1321,7 +1341,8 @@ const translationCa = {
                     ok: "Grup '{{data.codi}}' esborrat correctament",
                 },
                 link: {
-                    label: "Víncular grup",
+                    label: "Víncular grup...",
+                    button: "Víncula grup",
                     title: "Víncular grup",
                     ok: "Grup vinculat",
                 },
@@ -1424,9 +1445,10 @@ const translationCa = {
                     revisat: "Aquest procediment no es pot modificar ja que es troba en estat revisat",
                 },
                 canviEstat: {
+                    label: "Canviar l'estat de revisó...",
+                    button: "Canvia estat",
                     title: "Canviar estat de revisó",
-                    label: "Canviar l'estat de revisó",
-                    ok: "",
+                    ok: "Estat canviat correctament",
                 },
                 expedient: {
                     title: "Expedients del procediment: {{nom}}",
@@ -1460,12 +1482,12 @@ const translationCa = {
                     ok: "Comentari afegit al procediment '{{data.metaExpedient.description}}'",
                 },
                 importRolsac: {
+                    label: "Importar des de ROLSAC...",
                     title: "Importar procediment des de ROLSAC",
-                    label: "Importar des de ROLSAC",
                 },
                 importFitxer: {
+                    label: "Importar des de fitxer...",
                     title: "Importar procediment",
-                    label: "Importar des de fitxer",
                     ok: "Procediment importat correctament",
                 },
                 export: {
@@ -1480,8 +1502,9 @@ const translationCa = {
                     ok: "Procediment marcat com a procés de disseny",
                 },                
                 actualize: {
+                    label: "Actualitzar desde ROLSAC...",
+                    button: "Actualitza",
                     title: "Actualització de procediments",
-                    label: "Actualitzar desde ROLSAC",
                     description: "Vols actualitzar els procediments amb la informació de ROLSAC?",
                     ok: "Procediments actualitzats",
                     result: {
@@ -1802,8 +1825,8 @@ const translationCa = {
             },
             action: {
                 new: {
-                    title: "Crear nou permís",
                     label: "Nou permís",
+                    title: "Crear nou permís",
                     ok: "El permís per '{{data.principal}} {{data.sid}}' s'ha creat correctament",
                 },
                 update: {
@@ -1836,8 +1859,8 @@ const translationCa = {
                 config: "Configurar",
                 props: "Propietats configurables",
                 pinbal: "Serveis PINBAL",
-                segonPla: "Reiniciar tasques en segon pla ...",
-                plugins: "Reiniciar plugins ...",
+                segonPla: "Reiniciar tasques en segon pla...",
+                plugins: "Reiniciar plugins...",
                 avisos: "Avisos",
                 backVersio: "Interfície clàssica",
 

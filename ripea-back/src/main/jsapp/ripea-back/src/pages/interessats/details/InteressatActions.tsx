@@ -15,7 +15,7 @@ export const useActions = (refresh?: () => void) => {
     const { t } = useTranslation();
 
     const {messageDialogShow, temporalMessageShow} = useBaseAppContext();
-    const confirmDialogButtons = useConfirmDialogButtons();
+    const confirmDialogButtons = useConfirmDialogButtons().reverse();
     const confirmDialogComponentProps = {maxWidth: 'sm', fullWidth: true};
 
     const {

@@ -9,7 +9,7 @@ export const useMassiveActions = (refresh?: () => void) => {
     const { t } = useTranslation();
     const {artifactAction: apiAction, artifactReport: apiReport} = useResourceApiService('documentResource');
     const {messageDialogShow, temporalMessageShow} = useBaseAppContext();
-    const confirmDialogButtons = useConfirmDialogButtons();
+    const confirmDialogButtons = useConfirmDialogButtons().reverse();
     const confirmDialogComponentProps = {maxWidth: 'sm', fullWidth: true};
 
     const massiveReport = (ids:any, code:string, msg:string, fileType:any) => {

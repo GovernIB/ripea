@@ -284,8 +284,8 @@ const ImportFitxer = (props: any) => {
         title={t('page.metaExpedient.action.importFitxer.title')}
         action={"IMPORT_FITXER"}
         formDialogButtons={[
+            {icon: 'download', text: t('common.import'), componentProps: { variant: 'contained', disabled: !file }, value: true },
             {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
-            {icon: 'save', text: t('common.import'), componentProps: { variant: 'contained', disabled: !file }, value: true },
         ]}
         {...props}
     >

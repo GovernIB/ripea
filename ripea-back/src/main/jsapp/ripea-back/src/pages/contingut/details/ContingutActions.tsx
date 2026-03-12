@@ -33,7 +33,7 @@ export const useActions = (refresh?: () => void) => {
         delete: apiDelete
     } = useResourceApiService('documentResource');
     const {messageDialogShow, temporalMessageShow} = useBaseAppContext();
-    const confirmDialogButtons = useConfirmDialogButtons();
+    const confirmDialogButtons = useConfirmDialogButtons().reverse();
     const confirmDialogComponentProps = {maxWidth: 'sm', fullWidth: true};
 
     const downloadAdjunt = (id:any, fieldName:string, mssg:string) :void => {

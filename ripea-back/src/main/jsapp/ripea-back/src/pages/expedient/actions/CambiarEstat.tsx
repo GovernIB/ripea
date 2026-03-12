@@ -25,7 +25,7 @@ export const CambiarEstat = (props: any) => {
         title={t('page.expedient.action.changeEstat.title')}
         action={"CANVI_ESTAT"}
         formDialogButtons={[
-            {icon: 'save', text: t('common.save'), componentProps: { variant: 'contained' }, value: true },
+            {icon: 'logout', text: t('page.expedient.action.changeEstat.button'), componentProps: { variant: 'contained' }, value: true },
             {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
         ]}
         {...props}

@@ -20,7 +20,7 @@ const Delegar = (props:any) => {
         action={'DELEGAR'}
         title={t('page.tasca.action.delegar.title')}
         formDialogButtons={[
-            {icon: 'turn_right', text: t('page.tasca.action.delegar.label').replace('...', ''), componentProps: { variant: 'contained' }, value: true },
+            {icon: 'turn_right', text: t('page.tasca.action.delegar.button'), componentProps: { variant: 'contained' }, value: true },
             {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
         ]}
         {...props}

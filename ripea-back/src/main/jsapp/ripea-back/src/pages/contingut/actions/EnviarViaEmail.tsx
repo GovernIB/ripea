@@ -22,7 +22,7 @@ const EnviarViaEmail = (props:any) => {
         action={"ENVIAR_VIA_EMAIL"}
         title={t('page.document.action.mail.title')}
         formDialogButtons={[
-            {icon: 'send', text: t('common.send'), componentProps: { variant: 'contained' }, value: true },
+            {icon: 'send', text: t('page.document.action.mail.button'), componentProps: { variant: 'contained' }, value: true },
             {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
         ]}
         initialOnChange

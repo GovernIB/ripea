@@ -20,7 +20,7 @@ const BackdropLoading: React.FC<BackdropLoadingProps> = ({
 }) => {
 	const { t } = useTranslation();
 	const { messageDialogShow } = useBaseAppContext();
-	const confirmDialogButtons = useConfirmDialogButtons();
+	const confirmDialogButtons = useConfirmDialogButtons().reverse();
 
 	const handleCancelClick = () => {
 		messageDialogShow(

@@ -24,7 +24,7 @@ const Publicar = (props:any) => {
         action={"PUBLICAR"}
         title={t('page.document.action.publicar.title')}
         formDialogButtons={[
-            {icon: 'publish', text: t('page.document.action.publicar.label').replace('...', ''), componentProps: { variant: 'contained' }, value: true },
+            {icon: 'publish', text: t('page.document.action.publicar.button'), componentProps: { variant: 'contained' }, value: true },
             {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
         ]}        
         {...props}

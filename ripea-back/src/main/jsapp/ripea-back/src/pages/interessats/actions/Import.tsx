@@ -83,8 +83,12 @@ const Import = (props:any) => {
         resourceName={"interessatResource"}
         action={"IMPORTAR"}
         title={t('page.interessat.action.importar.title')}
-        {...props}
         formDialogComponentProps={{fullWidth: true, maxWidth: 'md'}}
+        formDialogButtons={[
+            {icon: 'download', text: t('common.import'), componentProps: { variant: 'contained' }, value: true },
+            {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
+        ]}
+        {...props}
     >
         <ImportForm/>
     </FormActionDialog>

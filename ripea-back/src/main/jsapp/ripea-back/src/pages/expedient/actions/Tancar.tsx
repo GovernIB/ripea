@@ -107,6 +107,7 @@ const TancarForm = () => {
                         }}
                         autoHeight
                         paginationActive={false}
+                        toolbarHide
                         readOnly
                         groupingColDef={{
                             headerName: t('page.contingut.grid.nom'),
@@ -162,7 +163,7 @@ const Tancar = (props: any) => {
         action={"TANCAR"}
         title={t('page.expedient.action.close.title')}
         formDialogButtons={[
-            {icon: 'check', text: t('common.close'), componentProps: { variant: 'contained' }, value: true },
+            {icon: 'check', text: t('page.expedient.action.close.button'), componentProps: { variant: 'contained' }, value: true },
             {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
         ]}
         {...props}

@@ -28,7 +28,7 @@ const useActions = (refresh?: () => void) => {
         artifactAction: apiAction,
     } = useResourceApiService('contingutResource');
     const {messageDialogShow, temporalMessageShow} = useBaseAppContext();
-    const confirmDialogButtons = useConfirmDialogButtons();
+    const confirmDialogButtons = useConfirmDialogButtons().reverse();
     const confirmDialogComponentProps = {maxWidth: 'sm', fullWidth: true};
 
     const action = (id:any, code:string, msg:string) => {
