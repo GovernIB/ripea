@@ -33,8 +33,8 @@ export const ExpedientGridForm = () => {
         <GridFormField xs={12} name="nom"/>
         <GridFormField xs={12} name="organGestor"
                        namedQueries={[`EXPEDIENT_FORM#${data?.metaExpedient?.id || 0}`]}
-                       disabled={!!data?.id || !data?.metaExpedient || data?.disableOrganGestor}
-                       readOnly={!!data?.id || !data?.metaExpedient || data?.disableOrganGestor}/>
+                       disabled={!data?.metaExpedient || data?.disableOrganGestor}
+                       readOnly={!data?.metaExpedient || data?.disableOrganGestor}/>
         <GridFormField xs={6} name="sequencia" disabled/>
         <GridFormField xs={6} name="any" thousandSeparator={false}/>
         <GridFormField xs={12} name="grup"

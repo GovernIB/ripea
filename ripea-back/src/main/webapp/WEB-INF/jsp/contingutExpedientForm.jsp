@@ -214,10 +214,11 @@
 			$('input#any').change(function (event) {
 				refrescarSequencia();
 			});
-			refrescarSequencia();
 			refrescarGrups();
 			refrescarOrgan();
+			<c:if test="${empty expedientCommand.id}">
 			$('input#any').trigger('change');
+			</c:if>
 			changedPrioritat();
 			$("#prioritat").change(function (event) {
 				changedPrioritat();

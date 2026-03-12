@@ -632,7 +632,11 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		resource.setDataDarrerEnviament(cacheHelper.getDataDarrerEnviament(expedientEntity));
 		resource.setPotModificar(entityComprovarHelper.comprovarSiEsPotModificarExpedient(expedientEntity));
 		resource.setHasEsborranys(documentResourceRepository.hasFillsEsborranys(expedientEntity.getId()));
-		resource.setPendentExecucioMassiva(expedientHelper.isExpedientPendentExecucioMassivaMourerTot(expedientEntity.getId()));		
+		resource.setPendentExecucioMassiva(expedientHelper.isExpedientPendentExecucioMassivaMourerTot(expedientEntity.getId()));
+		
+		if (expedientEntity.getMetaExpedient()!=null) {
+			resource.setDisableOrganGestor(!expedientEntity.getMetaExpedient().isComu());
+		}
 	}
 
     @Override
@@ -2255,6 +2259,13 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         }
     }
     private class AnyOnchangeLogicProcessor implements OnChangeLogicProcessor<ExpedientResource> {
+    	
+    	private boolean isSameValue(Integer año, Object fieldValue) {
+    	    if (año == null && fieldValue == null) return true;
+    	    if (año == null || fieldValue == null) return false;
+    	    return año.toString().equals(fieldValue.toString());
+    	}
+    	
         @Override
         public void onChange(
 		        Serializable id,
@@ -2265,7 +2276,11 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
                 String[] previousFieldNames,
                 ExpedientResource target) {
 
-            if (fieldValue != null && previous.getMetaExpedient() != null) {
+        	if (id!=null && isSameValue(previous.getAny(), fieldValue)) {
+        		return; //Estam modificant un expedient, l'any no ha canviat
+        	}
+        	
+            if (fieldValue!=null && previous.getMetaExpedient() != null) {
                 Optional<MetaExpedientResourceEntity> metaExpedientResourceOptional =
                         metaExpedientResourceRepository.findById(previous.getMetaExpedient().getId());
 
