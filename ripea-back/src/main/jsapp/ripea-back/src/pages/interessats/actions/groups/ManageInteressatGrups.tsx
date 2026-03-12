@@ -64,10 +64,6 @@ const ManageInteressatGrups = (props:any) => {
             resourceName={"interessatResource"}
             action={"GESTIONAR_GRUPS"}
             title={t('page.interessat.action.gestGrups.title')}
-			dialogButtons={[
-			    {icon: 'save', text: t('common.update'), componentProps: { variant: 'contained' }, value: true },
-			    {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
-			]}
             {...props}
         >
             <InteressatsManageGrupsForm/>

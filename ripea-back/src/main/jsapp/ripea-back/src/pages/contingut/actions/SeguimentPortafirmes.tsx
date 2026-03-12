@@ -39,13 +39,13 @@ const useActions = (refresh?: () => void) => {
         artifactAction: apiAction,
     } = useResourceApiService('documentPortafirmesResource')
     const {messageDialogShow, temporalMessageShow} = useBaseAppContext();
-    const confirmDialogButtons = useConfirmDialogButtons();
+    const confirmDialogButtons = useConfirmDialogButtons().reverse();
     const confirmDialogComponentProps = {maxWidth: 'sm', fullWidth: true};
 
     const cancelarFirma = (id:any) => {
         messageDialogShow(
-            t('page.document.action.seguiment.check'),
-            t('page.document.action.seguiment.description'),
+            t('page.document.action.cancel.check'),
+            t('page.document.action.cancel.description'),
             confirmDialogButtons,
             confirmDialogComponentProps)
             .then((value: any) => {
@@ -53,7 +53,7 @@ const useActions = (refresh?: () => void) => {
                     apiAction(id, {code: 'CANCEL_FIRMA'})
                         .then(() => {
                             refresh?.()
-                            temporalMessageShow(null, t('page.document.action.seguiment.ok'), 'success');
+                            temporalMessageShow(null, t('page.document.action.cancel.ok'), 'success');
                         })
                         .catch((error) => {
                             temporalMessageShow(null, error?.message, 'error');

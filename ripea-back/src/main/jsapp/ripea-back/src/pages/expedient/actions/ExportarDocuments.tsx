@@ -15,14 +15,9 @@ const ExportarDocumentsForm = () => {
 }
 
 const ExportarDocuments = (props:any) => {
-    const { t } = useTranslation();
     return <FormReportDialog
         resourceName={"expedientResource"}
         report={"EXPORT_DOC"}
-        formDialogButtons={[
-            {icon: 'check', text: t('common.export'), componentProps: { variant: 'contained' }, value: true },
-            {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
-        ]}
         {...props}
     >
         <ExportarDocumentsForm/>
@@ -45,6 +40,10 @@ export const useExportarDocuments = () => {
     return {
         handleShow,
         content: <ExportarDocuments title={t('page.expedient.action.export.title')}
+                                    formDialogButtons={[
+                                        {icon: 'description', text: t('page.expedient.action.export.button'), componentProps: { variant: 'contained' }, value: true },
+                                        {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
+                                    ]}
                                     apiRef={apiRef}
                                     onSuccess={onSuccess}/>
     }
@@ -66,6 +65,10 @@ export const useExportarDocumentsMassive = (refresh?: () => void) => {
     return {
         handleMassiveShow,
         content: <ExportarDocuments title={t('page.expedient.action.exportZIP.title')}
+                                    formDialogButtons={[
+                                        {icon: 'download', text: t('page.expedient.action.exportZIP.button'), componentProps: { variant: 'contained' }, value: true },
+                                        {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
+                                    ]}
                                     apiRef={apiRef}
                                     onSuccess={onSuccess}/>
     }

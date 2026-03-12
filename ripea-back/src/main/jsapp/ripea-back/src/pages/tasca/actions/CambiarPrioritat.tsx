@@ -21,7 +21,7 @@ const CambiarPrioritat = (props:any) => {
         title={t('page.tasca.action.changePrioritat.title')}
         action={'CHANGE_PRIORITAT'}
         formDialogButtons={[
-            {icon: 'info', text: t('page.tasca.action.changePrioritat.label').replace('...', ''), componentProps: { variant: 'contained' }, value: true },
+            {icon: 'info', text: t('page.tasca.action.changePrioritat.button'), componentProps: { variant: 'contained' }, value: true },
             {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
         ]}
         {...props}

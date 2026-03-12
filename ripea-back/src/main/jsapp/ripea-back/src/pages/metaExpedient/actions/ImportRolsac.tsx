@@ -18,10 +18,10 @@ const ImportRolsac = (props: any) => {
         resourceName={"metaExpedientResource"}
         title={t('page.metaExpedient.action.importRolsac.title')}
         action={"IMPORT_ROLSAC"}
-        // formDialogButtons={[
-        //     {icon: 'save', text: t('common.save'), componentProps: { variant: 'contained' }, value: true },
-        //     {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
-        // ]}
+        formDialogButtons={[
+            {icon: 'download', text: t('common.import'), componentProps: { variant: 'contained' }, value: true },
+            {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
+        ]}
         {...props}
     >
         <ImportRolsacForm/>

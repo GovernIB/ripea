@@ -21,11 +21,13 @@ const columns = [
     },
     {
         field: 'createdDate',
-        flex: 0.75,
+        flex: 0.4,
+        wordWrap: true,
+        align: 'left',
         valueFormatter: (value: any) => formatDate(value)
     },
     {
-        field: 'createdBy',
+        field: 'createdByFullName',
         flex: 0.5,
     },
 ]
@@ -59,6 +61,7 @@ const TancarForm = () => {
                     'DOCUMENTS_OBLIGATORIS_TANCAR',// documentObligatorisAlTancar
                     'NOTIFICACIONS_CADUCADES',// conteNotificacionsCaducades
                     'DOCUMENTS_NO_MOGUTS',// conteDocumentsDeAnotacionesNoMogutsASerieFinal
+                    'AUDITORIA'
                 ]
             })
                 .then((app) => setEntities(app?.rows))
@@ -104,8 +107,8 @@ const TancarForm = () => {
                         }}
                         autoHeight
                         paginationActive={false}
+                        toolbarHide
                         readOnly
-
                         groupingColDef={{
                             headerName: t('page.contingut.grid.nom'),
                             flex: 1,
@@ -160,7 +163,7 @@ const Tancar = (props: any) => {
         action={"TANCAR"}
         title={t('page.expedient.action.close.title')}
         formDialogButtons={[
-            {icon: 'check', text: t('common.close'), componentProps: { variant: 'contained' }, value: true },
+            {icon: 'check', text: t('page.expedient.action.close.button'), componentProps: { variant: 'contained' }, value: true },
             {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
         ]}
         {...props}
@@ -181,7 +184,7 @@ export const useTancar = (refresh?: () => void) => {
     }
     const onSuccess = (result: any): void => {
         refresh?.()
-        temporalMessageShow(null, t('page.expedient.action.close.title', {expedient: result?.nom}), 'success');
+        temporalMessageShow(null, t('page.expedient.action.close.ok', {expedient: result?.nom}), 'success');
     }
 
     return {

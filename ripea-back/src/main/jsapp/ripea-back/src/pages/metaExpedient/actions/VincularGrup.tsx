@@ -21,10 +21,10 @@ const VincularGrup = (props: any) => {
         resourceName={"metaExpedientResource"}
         title={t('page.grup.action.link.title')}
         action={"VINCULAR_GRUP"}
-        // formDialogButtons={[
-        //     {icon: 'save', text: t('common.save'), componentProps: { variant: 'contained' }, value: true },
-        //     {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
-        // ]}
+        formDialogButtons={[
+            {icon: 'add', text: t('page.grup.action.link.button'), componentProps: { variant: 'contained' }, value: true },
+            {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
+        ]}
         {...props}
     >
         <VincularGrupForm/>

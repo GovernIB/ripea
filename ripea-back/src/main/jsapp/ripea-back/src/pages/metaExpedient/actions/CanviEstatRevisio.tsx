@@ -23,7 +23,7 @@ export const CanviEstatRevisio = (props: { apiRef:any }) => {
         title={t('page.metaExpedient.action.canviEstat.title')}
         onClose={(reason?: string) => reason !== 'backdropClick'}
         dialogButtons={[
-            {icon: 'save', text: t('common.save'), componentProps: { variant: 'contained' }, value: true },
+            {icon: 'edit', text: t('page.metaExpedient.action.canviEstat.button'), componentProps: { variant: 'contained' }, value: true },
             {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
         ]}
         apiRef={apiRef}

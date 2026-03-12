@@ -29,8 +29,6 @@ const translationEn = {
         export: "Export",
         consult: "Consult",
         filter: "Filter",
-        downloadSelected: "Download selected content",
-        relateSelected: "Relate selected content",
 		processing: "Processing...",
         auditoria: {
             create: "Created on {{createdDate}} by '{{createdBy}}'.",
@@ -319,16 +317,18 @@ const translationEn = {
                 },
                 acceptar: {
                     label: "Accept...",
-                    title: "Accept record",
-                    ok: "The annotation has been successfully accepted",
+                    button: "Accept",
+                    title: "Accept case file",
+                    ok: "The record has been successfully accepted",
                 },
                 rebutjar: {
                     label: "Reject...",
-                    title: "Reject record",
-                    ok: "The annotation has been successfully rejected",
+                    button: "Reject",
+                    title: "Reject case file",
+                    ok: "The record has been successfully rejected",
                 },
                 canviProcediment: {
-                    label: "Change procedure",
+                    label: "Change procedure...",
                     title: "Change procedure",
                     ok: "Annotation {{data.identificador}} has been successfully modified",
                 },
@@ -388,7 +388,8 @@ const translationEn = {
                     ok: "The task has been started successfully",
                 },
                 rebutjar: {
-                    label: "Reject",
+                    label: "Reject...",
+                    button: "Reject",
                     title: "Reject task",
                     ok: "The task has been rejected successfully",
                 },
@@ -402,34 +403,40 @@ const translationEn = {
                     ok: "The task has been finished successfully",
                 },
                 reassignar: {
-                    label: "Reassign",
+                    label: "Reassign...",
+                    button: "Reassign",
                     title: "Reassign task",
-                    ok: "The task has been reassigned successfully",
+                    ok: "The task has been successfully reassigned",
                 },
                 delegar: {
-                    label: "Delegate",
+                    label: "Delegate...",
+                    button: "Delegate",
                     title: "Delegate task",
-                    ok: "The task has been delegated successfully",
+                    ok: "The task has been successfully delegated",
                 },
                 retomar: {
-                    label: "Resume",
-                    title: "Resume task",
-                    ok: "The task has been resumed successfully",
+                    label: "Cancel delegation...",
+                    button: "Cancel delegation",
+                    title: "Cancel task delegation",
+                    ok: "The task delegation has been successfully cancelled",
                 },
                 changeDataLimit: {
-                    label: "Modify deadline...",
+                    label: "Change deadline...",
+                    button: "Change deadline",
                     title: "Change deadline",
-                    ok: "The task has been modified successfully",
+                    ok: "The task has been successfully updated",
                 },
                 changePrioritat: {
                     label: "Change priority...",
+                    button: "Change priority",
                     title: "Modify task priority",
-                    ok: "The task has been modified successfully",
+                    ok: "The task has been successfully updated",
                 },
                 reobrir: {
-                    label: "Reopen",
+                    label: "Reopen...",
+                    button: "Reopen",
                     title: "Reopen task",
-                    ok: "The task has been reopened successfully",
+                    ok: "The task has been successfully reopened",
                 },
                 comment: {
                     ok: "Comment added to the task '{{data.expedientTasca.description}}'",
@@ -498,7 +505,7 @@ const translationEn = {
                     ok: "Stakeholders successfully imported",
                 },
 				gestGrups: {
-				    label: "Manage groups",
+				    label: "Manage groups...",
 					title: "Manage groups",
 				    ok: "Groups successfully modified",
 				},
@@ -589,6 +596,7 @@ const translationEn = {
                 },
                 close: {
                     label: "Close...",
+                    button: "Close",
                     title: "Close case file",
                     ok: "The case file '{{expedient}}' was closed successfully",
                 },
@@ -599,6 +607,7 @@ const translationEn = {
                 },
                 download: {
                     label: "Download documents...",
+                    button: "Download documents",
                     title: "Document selection",
                     ok: "Documents downloaded successfully",
                 },
@@ -607,7 +616,8 @@ const translationEn = {
                     ok: "Spreadsheet downloaded successfully",
                 },
                 exportZIP: {
-                    label: "Export ZIP index",
+                    label: "Export ZIP index...",
+                    button: "Export ZIP index",
                     title: "Export documents to ZIP",
                     ok: "ZIP document downloaded successfully",
                 },
@@ -641,6 +651,7 @@ const translationEn = {
                 },
                 export: {
                     label: "Export documents...",
+                    button: "Export documents",
                     title: "Export documents",
                     ok: "Documents downloaded successfully",
                 },
@@ -650,26 +661,29 @@ const translationEn = {
                 },
                 changePrioritat: {
                     label: "Change priority...",
+                    button: "Change priority",
                     title: "Edit case file priority",
                     ok: "Priority of case file '{{expedient}}' was updated successfully.",
                     massiveOk: "The priority of '{{data.num}}' cases has been changed",
                 },
                 changeEstat: {
                     label: "Change status...",
+                    button: "Change status",
                     title: "Edit case file status",
                     ok: "Status of case file '{{expedient}}' was updated successfully.",
                     massiveOk: "The status of '{{data.num}}' cases has been changed",
                 },
                 assignar: {
-                    label: "Assign",
+                    label: "Assign...",
+                    button: "Assign",
                     title: "Assign case file to user",
                     ok: "Case file '{{expedient}}' was assigned successfully.",
                 },
                 relacio: {
                     label: "Relate...",
+                    button: "Relate",
                     title: "Relate case file",
                     ok: "Relations of case file '{{expedient}}' were updated successfully.",
-                    labelDialog: "Relate",
                 },
                 eliminarRelacio: {
                     label: "Delete relation",
@@ -689,6 +703,7 @@ const translationEn = {
                 },
 				moureTot: {
 				    label: "Move all...",
+                    button: "Move all",
 				    title: "Move everything to the destination file",
 				    ok: "The bulk action to move the file '{{expedient}}' has been created successfully.",
 				},
@@ -833,6 +848,7 @@ const translationEn = {
                 },
                 pinbal: {
                     label: "PINBAL query...",
+                    button: "PINBAL query",
                     title: "New PINBAL query",
                     ok: "Document created from PINBAL query '{{codiServeiPinbal}}'",
                 },
@@ -901,8 +917,8 @@ const translationEn = {
                     ok: "Document downloaded successfully",
                 },
                 firma: {
+                    label: "Download signature...",
                     button: "Start signing process",
-                    label: "Download signature",
                     title: "Sign from the browser",
                     ok: "Document signed successfully",
                 },
@@ -915,8 +931,8 @@ const translationEn = {
                     ok: "CSV link copied successfully",
                 },
                 portafirmes: {
-                    button: "Send to Portafirmes",
                     label: "Send to Portafirmes...",
+                    button: "Send to Portafirmes",
                     title: "Send document to Portafirmes",
                     ok: "Document '{{document}}' sent to Portafirmes",
                 },
@@ -925,34 +941,34 @@ const translationEn = {
                     title: "View PDF version",
                 },
                 firmar: {
-                    button: "Start signing process",
                     label: "Browser signature...",
+                    button: "Start signing process",
                 },
                 viaFirma: {
-                    button: "Send to viaFirma",
                     label: "Send viaFirma...",
+                    button: "Send to viaFirma",
                     title: "Send document to viaFirma",
                     ok: "Document '{{document}}' sent to viaFirma",
                 },
                 mail: {
                     label: "Send via email...",
+                    button: "Send via email",
                     title: "Send document by email",
                     ok: "Document '{{document}}' sent via email",
                 },
                 seguiment: {
                     label: "Portafirmes tracking",
-                    cancel: "Cancel sending",
                     title: "Signature details",
+                },
+                cancel: {
+                    label: "Cancel sending",
                     ok: "The signature has been cancelled successfully",
                     check: "Are you sure you want to continue with this action?",
                     description: "Once deleted, it cannot be recovered",
                 },
-                cancel: {
-                    label: "Cancel sending",
-                },
                 notificar: {
-                    button: "Notify",
                     label: "Notify or communicate...",
+                    button: "Notify",
                     title: "Create document notification",
                     ok: "Notification created successfully",
                     alert: {
@@ -977,6 +993,7 @@ const translationEn = {
                 },
                 notificarMasiva: {
                     label: "Notify or communicate...",
+                    button: "Notify",
                     title: "Generate document to notify",
                     ok: "A zip with the selected items has been generated",
                 },
@@ -985,6 +1002,7 @@ const translationEn = {
                 },
                 publicar: {
                     label: "Publish...",
+                    button: "Publish",
                     title: "Create publication",
                     ok: "Publication created successfully",
                 },
@@ -998,6 +1016,7 @@ const translationEn = {
                 },
                 changeType: {
                     label: "Change type...",
+                    button: "Change type",
                     title: "Change type",
                     ok: "Documents have been modified successfully",
                 },
@@ -1202,7 +1221,7 @@ const translationEn = {
                 },
                 justificant: {
                     label: "Delivery receipt",
-                    ok: "",
+                    ok: "The receipt has been downloaded",
                 },
                 documentEnviat: {
                     label: "Sent document",
@@ -1233,7 +1252,8 @@ const translationEn = {
             },
             action: {
                 ampliarPlac: {
-                    label: "Extend deadline",
+                    label: "Extend deadline...",
+                    button: "Extend deadline",
                     title: "Extension of the deadline for the batch shipments",
                     ok: "The deadline has been extended",
                 },
@@ -1321,7 +1341,8 @@ const translationEn = {
                     ok: "Group '{{data.codi}}' deleted successfully",
                 },
                 link: {
-                    label: "Link group",
+                    label: "Link group...",
+                    button: "Link group",
                     title: "Link group",
                     ok: "Group linked",
                 },
@@ -1424,9 +1445,10 @@ const translationEn = {
                     revisat: "This procedure cannot be modified because it is in a reviewed state",
                 },
                 canviEstat: {
+                    label: "Change review status...",
+                    button: "Change review status",
                     title: "Change review status",
-                    label: "Change review status",
-                    ok: "",
+                    ok: "Status changed successfully",
                 },
                 expedient: {
                     title: "Procedure records: {{nom}}",
@@ -1460,12 +1482,12 @@ const translationEn = {
                     ok: "Comment added to procedure '{{data.metaExpedient.description}}'",
                 },
                 importRolsac: {
+                    label: "Import from ROLSAC...",
                     title: "Import procedure from ROLSAC",
-                    label: "Import from ROLSAC",
                 },
                 importFitxer: {
+                    label: "Import from file...",
                     title: "Import procedure",
-                    label: "Import from file",
                     ok: "Procedure imported successfully",
                 },
                 export: {
@@ -1480,8 +1502,9 @@ const translationEn = {
                     ok: "Procedure marked as a design process",
                 },
                 actualize: {
+                    label: "Update from ROLSAC...",
+                    button: "Update from ROLSAC",
                     title: "Procedure update",
-                    label: "Update from ROLSAC",
                     description: "Do you want to update the procedures with information from ROLSAC?",
                     ok: "Procedures updated",
                     result: {
@@ -1802,8 +1825,8 @@ const translationEn = {
             },
             action: {
                 new: {
-                    title: "Create new permission",
                     label: "New permission",
+                    title: "Create new permission",
                     ok: "Permission for '{{data.principal}} {{data.sid}}' has been created successfully",
                 },
                 update: {
@@ -1836,8 +1859,8 @@ const translationEn = {
                 config: "Configuration",
                 props: "Configurable properties",
                 pinbal: "PINBAL services",
-                segonPla: "Restart background tasks",
-                plugins: "Restart plugins",
+                segonPla: "Restart background tasks...",
+                plugins: "Restart plugins...",
                 avisos: "Notifications",
                 backVersio: "Classic interface",
 

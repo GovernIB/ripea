@@ -99,7 +99,7 @@ export const ExpedientInfo = (props:any) => {
 const ExpedientAlert = (props:any) => {
     const {entity: expedient} = props;
     const { t } = useTranslation();
-    const {value: user} = useUserSession();
+    const {value: user, rol} = useUserSession();
     const {value: validacio} = useValidacioSession()
 
     const refresh = () => {
@@ -111,7 +111,7 @@ const ExpedientAlert = (props:any) => {
     const {handleOpen: hanldeErrorValidacio, dialog: dialogErrorValidacio} = useErrorValidacio();
 
     return <>
-        {expedient?.agafatPer?.id != user?.codi && expedient?.usuariActualWrite &&
+        {expedient?.agafatPer?.id != user?.codi && expedient?.usuariActualWrite && !rol?.isAdminLectura &&
             <Alert severity="info"
                    action={
                        <Button sx={{py:0}} 

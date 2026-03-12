@@ -21,7 +21,7 @@ const CambiarDataLimit = (props:any) => {
         title={t('page.tasca.action.changeDataLimit.title')}
         action={'CHANGE_DATALIMIT'}
         formDialogButtons={[
-            {icon: 'schedule', text: t('page.tasca.action.changeDataLimit.label').replace('...', ''), componentProps: { variant: 'contained' }, value: true },
+            {icon: 'schedule', text: t('page.tasca.action.changeDataLimit.button'), componentProps: { variant: 'contained' }, value: true },
             {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
         ]}
         {...props}

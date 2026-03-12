@@ -50,7 +50,7 @@ const FirmaNavegadorGrid = () => {
 
     const actions = [
         {
-            label: t('page.document.action.firma.title'),
+            label: t('page.document.action.firma.label'),
             icon: "edit_document",
             showInMenu: false,
             onClick: handleFirmaShow,
@@ -58,7 +58,7 @@ const FirmaNavegadorGrid = () => {
     ]
     const massiveActions = [
         {
-            label: t('page.document.action.firma.title'),
+            label: t('page.document.action.firma.label'),
             icon: "edit_document",
             showInMenu: false,
             onClick: handleFirmaMassive,

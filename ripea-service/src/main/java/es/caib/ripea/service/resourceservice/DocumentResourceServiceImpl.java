@@ -57,7 +57,6 @@ import es.caib.ripea.persistence.repository.DocumentNotificacioRepository;
 import es.caib.ripea.persistence.repository.DocumentPortafirmesRepository;
 import es.caib.ripea.persistence.repository.DocumentRepository;
 import es.caib.ripea.persistence.repository.EntitatRepository;
-import es.caib.ripea.persistence.repository.MetaDocumentRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.firma.DocumentFirmaPortafirmesHelper;
 import es.caib.ripea.service.firma.DocumentFirmaViaFirmaHelper;
@@ -178,7 +177,6 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 	private final ContingutResourceRepository contingutResourceRepository;
     private final DocumentResourceRepository documentResourceRepository;
     private final MetaDocumentResourceRepository metaDocumentResourceRepository;
-    private final MetaDocumentRepository metaDocumentRepository;
     private final InteressatResourceRepository interessatResourceRepository;
     private final RegistreAnnexResourceRepository registreAnnexResourceRepository;
     private final ContingutMovimentRepository contingutMovimentRepository;
@@ -1117,8 +1115,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 					}
 
 					if (errorGuardant!=null) {
-						String message = messageHelper.getMessage("message.common.action.error")+": "+errorGuardant.getMessage();
-						throw new ActionExecutionException(getResourceClass(), entity.getId(), code, message);
+						throw new ActionExecutionException(getResourceClass(), entity.getId(), code, errorGuardant.getMessage());
 					}
 					
 					return objectMappingHelper.newInstanceMap(entity, DocumentResource.class);

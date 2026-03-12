@@ -105,8 +105,8 @@ const Importar = ({ ...props }: any) => {
 				action="IMPORT_DOCS"
 				title={t('page.document.action.importSgd.title')}
 				formDialogButtons={[
+                    { icon: 'upload_file', text: t('common.import'), componentProps: { variant: 'contained', disabled: isProcessed }, value: true },
 					{ text: t('common.close'), componentProps: { variant: 'outlined' }, value: false },
-					{ text: t('common.import'), componentProps: { variant: 'contained', disabled: isProcessed }, value: true },
 				]}
 				{...props}
 			>

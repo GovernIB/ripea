@@ -25,7 +25,7 @@ const NotificarMassive = (props:any) => {
         action={"MASSIVE_NOTIFICAR_ZIP"}
         title={t('page.document.action.notificarMasiva.title')}
         formDialogButtons={[
-            {icon: 'save', text: t('common.save'), componentProps: { variant: 'contained' }, value: true },
+            {icon: 'send', text: t('page.document.action.notificarMasiva.button'), componentProps: { variant: 'contained' }, value: true },
             {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
         ]}        
         {...props}

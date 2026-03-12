@@ -160,7 +160,7 @@ const Relacionar = (props:any) => {
         title={t('page.expedient.action.relacio.title')}
         formDialogComponentProps={{fullWidth: true, maxWidth: 'xl'}}
         formDialogButtons={[
-            {icon: 'link', text: t('page.expedient.action.relacio.labelDialog'), componentProps: { variant: 'contained' }, value: true },
+            {icon: 'link', text: t('page.expedient.action.relacio.button'), componentProps: { variant: 'contained' }, value: true },
             {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
         ]}
         {...props}

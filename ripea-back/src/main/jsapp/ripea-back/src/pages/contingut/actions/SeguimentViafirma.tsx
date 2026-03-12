@@ -1,6 +1,6 @@
 import {useState} from "react";
 import {Alert, Grid, Icon} from "@mui/material";
-import {MuiDialog, useBaseAppContext, useResourceApiService} from "reactlib";
+import {MuiDialog, useBaseAppContext, useConfirmDialogButtons, useResourceApiService} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {CardData, ContenidoData} from "../../../components/CardData.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
@@ -75,7 +75,6 @@ const Errors = (props:any) => {
 
 const useSeguimentViafirma = (potModificar:boolean, refresh?: () => void) => {
     const { t } = useTranslation();
-    const {temporalMessageShow} = useBaseAppContext();
     const { value: user } = useUserSession();
 
     const {
@@ -83,17 +82,30 @@ const useSeguimentViafirma = (potModificar:boolean, refresh?: () => void) => {
         find: apiFind,
         artifactAction: apiAction,
     } = useResourceApiService('documentViaFirmaResource')
+    const {messageDialogShow, temporalMessageShow} = useBaseAppContext();
+    const confirmDialogButtons = useConfirmDialogButtons().reverse();
+    const confirmDialogComponentProps = {maxWidth: 'sm', fullWidth: true};
+
     const [open, setOpen] = useState(false);
     const [entity, setEntity] = useState<any>();
 
     const cancelarFirma = (id:any) => {
-        apiAction(id, {code: 'CANCEL_FIRMA'})
-            .then(()=>{
-                refresh?.()
-                temporalMessageShow(null, t('page.document.action.seguiment.ok'), 'success');
-            })
-            .catch((error) => {
-                temporalMessageShow(null, error?.message, 'error');
+        messageDialogShow(
+            t('page.document.action.cancel.check'),
+            t('page.document.action.cancel.description'),
+            confirmDialogButtons,
+            confirmDialogComponentProps)
+            .then((value: any) => {
+                if (value) {
+                    apiAction(id, {code: 'CANCEL_FIRMA'})
+                        .then(() => {
+                            refresh?.()
+                            temporalMessageShow(null, t('page.document.action.cancel.ok'), 'success');
+                        })
+                        .catch((error) => {
+                            temporalMessageShow(null, error?.message, 'error');
+                        });
+                }
             });
     }
 

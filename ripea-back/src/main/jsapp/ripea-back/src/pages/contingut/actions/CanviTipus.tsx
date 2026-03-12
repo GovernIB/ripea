@@ -28,7 +28,7 @@ const CanviTipus = (props:any) => {
         action={"MASSIVE_CANVI_TIPUS"}
         title={t('page.document.action.changeType.title')}
         formDialogButtons={[
-            {icon: 'edit', text: t('page.document.action.changeType.title'), componentProps: { variant: 'contained' }, value: true },
+            {icon: 'edit', text: t('page.document.action.changeType.button'), componentProps: { variant: 'contained' }, value: true },
             {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
         ]}
         {...props}

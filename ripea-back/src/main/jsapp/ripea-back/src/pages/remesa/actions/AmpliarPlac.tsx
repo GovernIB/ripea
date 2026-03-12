@@ -20,7 +20,7 @@ const AmpliarPlac = (props:any) => {
         action={"AMPLIAR_PLAC"}
         title={t('page.notificacioInteressat.action.ampliarPlac.title')}
         formDialogButtons={[
-            {icon: 'edit_calendar', text: t('page.notificacioInteressat.action.ampliarPlac.label').replace('...', ''), componentProps: { variant: 'contained' }, value: true },
+            {icon: 'edit_calendar', text: t('page.notificacioInteressat.action.ampliarPlac.button'), componentProps: { variant: 'contained' }, value: true },
             {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
         ]}
         {...props}

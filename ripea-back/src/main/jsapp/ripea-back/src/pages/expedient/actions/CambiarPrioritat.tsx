@@ -23,7 +23,7 @@ export const CambiarPrioritat = (props:any) => {
         title={t('page.expedient.action.changePrioritat.title')}
         action={"CANVI_PRIORITAT"}
         dialogButtons={[
-            {icon: 'save', text: t('common.save'), componentProps: { variant: 'contained' }, value: true },
+            {icon: 'logout', text: t('page.expedient.action.changePrioritat.button'), componentProps: { variant: 'contained' }, value: true },
             {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
         ]}
         {...props}

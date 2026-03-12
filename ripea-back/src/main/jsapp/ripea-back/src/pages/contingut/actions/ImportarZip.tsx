@@ -207,8 +207,8 @@ const ImportarZip = ({ ...props }: any) => {
 				title={t('page.document.action.importZip.title')}
                 formDialogComponentProps={{fullWidth: true, maxWidth: 'lg'}}
 				formDialogButtons={[
+                    { icon: 'upload_file', text: t('common.import'), componentProps: { variant: 'contained', disabled: isProcessed }, value: true },
 					{ text: t('common.close'), componentProps: { variant: 'outlined' }, value: false },
-					{ text: t('common.import'), icon: 'check', componentProps: { variant: 'contained', disabled: isProcessed }, value: true },
 				]}
 				{...props}
 			>

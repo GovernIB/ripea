@@ -175,7 +175,7 @@ const DocPinbal = (props:any) => {
         action={"NEW_DOC_PINBAL"}
         title={t('page.document.action.pinbal.title')}
         formDialogButtons={[
-            {icon: 'description', text: t('common.consult'), componentProps: { variant: 'contained' }, value: true },
+            {icon: 'description', text: t('page.document.action.pinbal.button'), componentProps: { variant: 'contained' }, value: true },
             {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
         ]}
         {...props}

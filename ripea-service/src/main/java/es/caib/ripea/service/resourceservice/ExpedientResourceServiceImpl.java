@@ -1229,7 +1229,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 							entitatEntity.getId(),
 							params.getIds().get(0),
 							params.getMotiu(),
-							params.getDocumentsPerFirmar().toArray(new Long[0]),
+							params.getDocumentsPerFirmar()!=null?params.getDocumentsPerFirmar().toArray(new Long[0]):null,
 							false);
 				} else {
 					Map<Long, List<Long>> documentsPerExpedient = new HashMap<Long, List<Long>>();

@@ -29,8 +29,6 @@ const translationEs = {
         export: "Exportar",
         consult: "Consultar",
         filter: "Filtrar",
-        downloadSelected: "Descargar contenido seleccionado",
-        relateSelected: "Relacionar contenido seleccionado",
         processing: "Procesando...",
         auditoria: {
             create: "Creado el {{createdDate}} por '{{createdBy}}'.",
@@ -319,11 +317,13 @@ const translationEs = {
                 },
                 acceptar: {
                     label: "Aceptar...",
+                    button: "Acepta",
                     title: "Aceptar expediente",
                     ok: "La anotación se ha aceptado correctamente",
                 },
                 rebutjar: {
                     label: "Rechazar...",
+                    button: "Rechaza",
                     title: "Rechazar expediente",
                     ok: "La anotación se ha rechazado correctamente",
                 },
@@ -389,6 +389,7 @@ const translationEs = {
                 },
                 rebutjar: {
                     label: "Rechazar...",
+                    button: "Rechaza",
                     title: "Rechazar tarea",
                     ok: "La tarea se ha rechazado correctamente",
                 },
@@ -403,31 +404,37 @@ const translationEs = {
                 },
                 reassignar: {
                     label: "Reasignar...",
+                    button: "Reasigna",
                     title: "Reasignar tarea",
                     ok: "La tarea se ha reasignado correctamente",
                 },
                 delegar: {
                     label: "Delegar...",
+                    button: "Delega",
                     title: "Delegar tarea",
                     ok: "La tarea se ha delegado correctamente",
                 },
                 retomar: {
-                    label: "Cancelar delegación",
-                    title: "Cancelar delegación de la tarea",
+                    label: "Cancelar delegación...",
+                    button: "Cancela delegación",
+                    title: "Cancelar delegación de tarea",
                     ok: "La delegación de la tarea se ha cancelado correctamente",
                 },
                 changeDataLimit: {
-                    label: "Modificar fecha limite...",
-                    title: "Cambiar fecha limite",
+                    label: "Modificar fecha límite...",
+                    button: "Modifica fecha límite",
+                    title: "Cambiar fecha límite",
                     ok: "La tarea se ha modificado correctamente",
                 },
                 changePrioritat: {
                     label: "Cambiar prioridad...",
+                    button: "Cambia prioridad",
                     title: "Modificar prioridad de la tarea",
                     ok: "La tarea se ha modificado correctamente",
                 },
                 reobrir: {
                     label: "Reabrir...",
+                    button: "Reabre",
                     title: "Reabrir tarea",
                     ok: "La tarea se ha reabierto correctamente",
                 },
@@ -498,7 +505,7 @@ const translationEs = {
                     ok: "Interesados importados correctamente",
                 },
 				gestGrups: {
-				    label: "Gestionar grupos",
+				    label: "Gestionar grupos...",
 					title: "Gestionar grupos",
 				    ok: "Grupos modificados correctamente",
 				},
@@ -589,6 +596,7 @@ const translationEs = {
                 },
                 close: {
                     label: "Cerrar...",
+                    button: "Cierrar",
                     title: "Cerrar expediente",
                     ok: "El expediente '{{expedient}}' ha sido cerrado correctamente",
                 },
@@ -599,6 +607,7 @@ const translationEs = {
                 },
                 download: {
                     label: "Descargar documentos...",
+                    button: "Descarga documentos",
                     title: "Selección documentos",
                     ok: "Los documentos se han descargado correctamente",
                 },
@@ -607,7 +616,8 @@ const translationEs = {
                     ok: "La hoja de cálculo se ha descargado correctamente",
                 },
                 exportZIP: {
-                    label: "Exportar índice ZIP",
+                    label: "Exportar índice ZIP...",
+                    button: "Exporta ZIP",
                     title: "Exportar documentos a ZIP",
                     ok: "El documento ZIP se ha descargado correctamente",
                 },
@@ -641,6 +651,7 @@ const translationEs = {
                 },
                 export: {
                     label: "Exportar los documentos...",
+                    button: "Exporta los documentos",
                     title: "Exportar documentos",
                     ok: "Los documentos se han descargado correctamente",
                 },
@@ -650,26 +661,29 @@ const translationEs = {
                 },
                 changePrioritat: {
                     label: "Cambiar prioridad...",
+                    button: "Cambia prioridad",
                     title: "Modificar prioridad del expediente",
                     ok: "La prioridad del expediente '{{expedient}}' se ha modificado correctamente.",
                     massiveOk: "Se ha cambiado la prioridad de '{{data.num}}' expedientes",
                 },
                 changeEstat: {
                     label: "Cambiar estado...",
+                    button: "Cambia estado",
                     title: "Modificar estado del expediente",
                     ok: "El estado del expediente '{{expedient}}' se ha modificado correctamente.",
                     massiveOk: "Se ha cambiado el estado de '{{data.num}}' expedientes",
                 },
                 assignar: {
                     label: "Asignar...",
+                    button: "Asigna",
                     title: "Asignar expediente a usuario",
                     ok: "El expediente '{{expedient}}' se ha assignado correctamente.",
                 },
                 relacio: {
                     label: "Relacionar...",
+                    button: "Relaciona",
                     title: "Relacionar expediente",
                     ok: "Las relaciones del expediente '{{expedient}}' han cambiado correctamente.",
-                    labelDialog: "Relacionar",
                 },
                 eliminarRelacio: {
                     label: "Eliminar relación",
@@ -689,6 +703,7 @@ const translationEs = {
                 },
 				moureTot: {
 					label: "Mover todo...",
+                    button: "Mover todo",
 				    title: "Mover todo al expediente destino",
 				    ok: "La acción masiva para mover el expediente '{{expedient}}' se ha creado correctamente.",
 				},
@@ -832,7 +847,8 @@ const translationEs = {
                     ok: "El documento {{data.nom}} se ha eliminado correctamente"
                 },
                 pinbal: {
-                    label: "Consulta PINBAL...",
+                    label: "Consultar PINBAL...",
+                    button: "Consulta",
                     title: "Nueva consulta PINBAL",
                     ok: "Se ha creado el documento a partir de la consulta pinbal '{{codiServeiPinbal}}'",
                 },
@@ -901,8 +917,8 @@ const translationEs = {
                     ok: "El documento se ha descargado correctamente",
                 },
                 firma: {
+                    label: "Descargar firma...",
                     button: "Iniciar proceso de firma",
-                    label: "Descargar firma",
                     title: "Firmar desde el navegador",
                     ok: "Documento firmado correctamente",
                 },
@@ -915,8 +931,8 @@ const translationEs = {
                     ok: "Enlace CSV copiado correctamente",
                 },
                 portafirmes: {
-                    button: "Envia a portafirmas",
                     label: "Enviar a portafirmas...",
+                    button: "Envia a portafirmas",
                     title: "Enviar documento a portafirmas",
                     ok: "Documento '{{document}}' enviado a portafirmas",
                 },
@@ -925,34 +941,34 @@ const translationEs = {
                     title: "Visualizar versión PDF",
                 },
                 firmar: {
-                    button: "Inicia proceso de firma",
                     label: "Firma desde el navegador...",
+                    button: "Inicia proceso de firma",
                 },
                 viaFirma: {
-                    button: "Enviar a ViaFirma",
                     label: "Enviar viaFirma...",
+                    button: "Enviar a ViaFirma",
                     title: "Enviar documento a ViaFirma",
                     ok: "Documento '{{document}}' enviado a viaFirma",
                 },
                 mail: {
                     label: "Enviar via email...",
+                    button: "Envia via email",
                     title: "Enviar documento por email",
                     ok: "Documento '{{document}}' enviado via email",
                 },
                 seguiment: {
                     label: "Seguimiento portafirmes",
-                    cancel: "Cancelar envío",
                     title: "Detalles de la firma",
+                },
+                cancel: {
+                    label: "Cancelar envío",
                     ok: "La firma ha sido cancelada correctamente",
                     check: "Confirme la acción",
                     description: "¿Seguro que desea cancelar la firma actualmente en proceso?",
                 },
-                cancel: {
-                    label: "Cancelar envío",
-                },
                 notificar: {
-                    button: "Notifica",
                     label: "Notificar o comunicar...",
+                    button: "Notifica",
                     title: "Crear notificación documento",
                     ok: "Notificación creada correctamente",
                     alert: {
@@ -977,6 +993,7 @@ const translationEs = {
                 },
                 notificarMasiva: {
                     label: "Notificar o comunicar...",
+                    button: "Notifica",
                     title: "Generar documento para notificar",
                     ok: "Se ha generado un zip de los elementos seleccionados",
                 },
@@ -985,6 +1002,7 @@ const translationEs = {
                 },
                 publicar: {
                     label: "Publicar...",
+                    button: "Publica",
                     title: "Crear publicación",
                     ok: "Publicación creada correctamente",
                 },
@@ -998,6 +1016,7 @@ const translationEs = {
                 },
                 changeType: {
                     label: "Cambiar tipo...",
+                    button: "Cambia tipo",
                     title: "Cambiar tipo",
                     ok: "Los documentos se han modificado correctamente",
                 },
@@ -1202,7 +1221,7 @@ const translationEs = {
                 },
                 justificant: {
                     label: "Justificante de envio",
-                    ok: "",
+                    ok: "Se ha descargado el justificant",
                 },
                 documentEnviat: {
                     label: "Documento enviado",
@@ -1233,7 +1252,8 @@ const translationEs = {
             },
             action: {
                 ampliarPlac: {
-                    label: "Ampliar plazo",
+                    label: "Ampliar plazo...",
+                    button: "Amplia plazo",
                     title: "Ampliación del plazo de los envíos de la remesa",
                     ok: "El plazo ha sido ampliado",
                 },
@@ -1321,7 +1341,8 @@ const translationEs = {
                     ok: "Grupo '{{data.codi}}' eliminado correctamente",
                 },
                 link: {
-                    label: "Vincular grupo",
+                    label: "Vincular grupo...",
+                    button: "Vincula grupo",
                     title: "Vincular grupo",
                     ok: "Grupo vinculado",
                 },
@@ -1424,9 +1445,10 @@ const translationEs = {
                     revisat: "Este procedimiento no se puede modificar ya que se encuentra en estado revisado",
                 },
                 canviEstat: {
+                    label: "Cambiar el estado de revisión...",
+                    button: "Cambia el estado",
                     title: "Cambiar estado de revisión",
-                    label: "Cambiar el estado de revisión",
-                    ok: "",
+                    ok: "Estado canbiado correctamente",
                 },
                 expedient: {
                     title: "Expedientes del procedimiento: {{nom}}",
@@ -1460,12 +1482,12 @@ const translationEs = {
                     ok: "Comentario añadido al procedimiento '{{data.metaExpedient.description}}'",
                 },
                 importRolsac: {
+                    label: "Importar desde ROLSAC...",
                     title: "Importar procedimiento desde ROLSAC",
-                    label: "Importar desde ROLSAC",
                 },
                 importFitxer: {
+                    label: "Importar desde fichero...",
                     title: "Importar procedimiento",
-                    label: "Importar desde fichero",
                     ok: "Procedimiento importado correctamente",
                 },
                 export: {
@@ -1480,8 +1502,9 @@ const translationEs = {
                     ok: "Procedimiento marcado como proceso de diseño",
                 },
                 actualize: {
+                    label: "Actualizar desde ROLSAC...",
+                    button: "Actualiza",
                     title: "Actualización de procedimientos",
-                    label: "Actualizar desde ROLSAC",
                     description: "¿Desea actualizar los procedimientos con la información de ROLSAC?",
                     ok: "Procedimientos actualizados",
                     result: {
@@ -1802,8 +1825,8 @@ const translationEs = {
             },
             action: {
                 new: {
-                    title: "Crear nuevo permiso",
                     label: "Nuevo permiso",
+                    title: "Crear nuevo permiso",
                     ok: "El permiso para '{{data.principal}} {{data.sid}}' se ha creado correctamente",
                 },
                 update: {
@@ -1836,8 +1859,8 @@ const translationEs = {
                 config: "Configuración",
                 props: "Propiedades configurables",
                 pinbal: "Servicios PINBAL",
-                segonPla: "Reiniciar tareas en segundo plano ...",
-                plugins: "Reiniciar plugins ...",
+                segonPla: "Reiniciar tareas en segundo plano...",
+                plugins: "Reiniciar plugins...",
                 avisos: "Avisos",
                 backVersio: "Interfaz clásica",
 

@@ -250,7 +250,7 @@ const Acceptar = (props:any) => {
         title={t('page.anotacio.action.acceptar.title')}
         initialOnChange
         formDialogButtons={[
-            {icon: 'check_circle', text: t('page.anotacio.action.acceptar.label').replace('...', ''), componentProps: { variant: 'contained' }, value: true },
+            {icon: 'check_circle', text: t('page.anotacio.action.acceptar.button'), componentProps: { variant: 'contained' }, value: true },
             {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
         ]}
         {...props}

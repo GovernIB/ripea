@@ -41,7 +41,7 @@ const MoureTot = (props:any) => {
 		title={t('page.expedient.action.moureTot.title')}
 		action={'MOURE_TOT'}
 	    formDialogButtons={[
-	        {icon: 'save', text: t('common.save'), componentProps: { variant: 'contained' }, value: true },
+	        {icon: 'open_with', text: t('page.expedient.action.moureTot.button'), componentProps: { variant: 'contained' }, value: true },
 	        {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
 	    ]}
 	    {...props}
