@@ -187,44 +187,50 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
         return options.includes(value)
     }
 
+    //console.log('createDocumentActions - entity', entity);
+    //console.log('createDocumentActions - sessionScope', user?.sessionScope);
+
+    //Mateixes condicions a totes les accions que impliquin afegir contingut
+    const potModificarExpedientOrContingut = entity?.potModificar || entity?.potModificarContingut;
+
     const createDocumentActions = [
         {
             label: t('page.document.title')+"...",
             icon: "description",
             onClick: () => apiRef?.current?.showCreateDialog?.(),
-            hidden: !(entity?.potModificarContingut || entity?.potModificar),
+            hidden: !potModificarExpedientOrContingut,
         },
         {
             label: t('page.document.action.pinbal.label'),
             icon: "description",
             onClick: handleDocPinbal,
             disabled: !entity?.ambDocumentsPinbal,
-			hidden: !entity?.potModificar,
+			hidden: !potModificarExpedientOrContingut,
         },
         {
             label: t('page.carpeta.action.new.label'),
             icon: "folder",
             onClick: handleCrearCarpeta,
             disabled: !user?.sessionScope?.isCreacioCarpetesActiva,
-			hidden: !entity?.potModificar,
+			hidden: !potModificarExpedientOrContingut,
         },
         {
             label: t('page.document.action.importSgd.label'),
             icon: "upload_file",
             onClick: handleImportar,
-            hidden: !(user?.sessionScope?.isMostrarImportacio && entity?.potModificar),
+            hidden: !(user?.sessionScope?.isMostrarImportacio && potModificarExpedientOrContingut),
         },
 		{
 		    label: t('page.document.action.importZip.label'),
 		    icon: "upload_file",
 		    onClick: handleImportarZip,
-			hidden: !entity?.potModificar,
+			hidden: !potModificarExpedientOrContingut,
 		},
         {
             label: t('page.contingut.action.importarExpedient.label'),
             icon: "link",
             onClick: handleImportarExpedient,
-            hidden: !(user?.sessionScope?.isImportacioRelacionatsActiva && entity?.potModificar),
+            hidden: !(user?.sessionScope?.isImportacioRelacionatsActiva && potModificarExpedientOrContingut),
         },
     ];
 
