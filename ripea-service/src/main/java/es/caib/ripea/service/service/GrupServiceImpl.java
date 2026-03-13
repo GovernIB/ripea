@@ -405,23 +405,8 @@ public class GrupServiceImpl implements GrupService {
 	@Transactional(readOnly = true)
 	@Override
 	public List<GrupDto> findGrups(Long entitatId, Long organGestorId, Long metaExpedientId) {
-		
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
-		List<String> codisOrgansFills = null;
-
-		if (organGestorId != null) {
-			OrganGestorEntity organ = organGestorRepository.getOne(organGestorId);
-			codisOrgansFills = organGestorCacheHelper.getCodisOrgansFills(entitat.getCodi(), organ.getCodi());
-		}
-		
-		List<GrupEntity> grups = grupRepositoryCommnand.findByEntitatAndOrgan(
-				entitat,
-				metaExpedientId,
-				codisOrgansFills);
-		
-		return conversioTipusHelper.convertirList(
-				grups, 
-				GrupDto.class);
+		List<GrupEntity> grups = grupHelper.findGrups(entitatId, organGestorId, metaExpedientId);
+		return conversioTipusHelper.convertirList(grups, GrupDto.class);
 	}
 	
 	@Transactional(readOnly = true)

@@ -483,17 +483,23 @@ public class DocumentController extends BaseUserOAdminOOrganController {
         
 		String data = Utils.desencripta(dades, aplicacioService.propertyFindByNom("es.caib.ripea.encription.key"));
 		String[] dataSplri = data.split("#");
-		boolean execMassiva = Boolean.parseBoolean(dataSplri[0]);
         
 		//Comunicam a PF que la firma ha finalitzat
 		FirmaResultatDto firmaResultat =  documentService.firmaSimpleWebEnd(transactionID);
-		String resultat = null;
+		
+		if (firmaResultat==null) {
+			firmaResultat = new FirmaResultatDto(StatusEnumDto.ERROR, "El resultat de la firma no s'ha pogut recuperar.");
+		}
+		
+		//Tancar totes les modals de firma en navegador del usuari que ha iniciat la firma
+		firmaResultat.setUsuari(dataSplri[2]);
+		
 		if (StatusEnumDto.OK.equals(firmaResultat.getStatus())) {
 			
 			for (FirmaSignatureStatus firmaSignatureStatus : firmaResultat.getSignatures()) {
 			
 				if (StatusEnumDto.OK.equals(firmaResultat.getSignatures().get(0).getStatus())) {
-					Long expedientId = documentService.processarFirmaClient(
+					documentService.processarFirmaClient(
 							getEntitatActualComprovantPermisos(request).getId(),
 							Long.valueOf(firmaSignatureStatus.getSignID()),
 							firmaResultat.getSignatures().get(0).getFitxerFirmatNom(),
@@ -503,25 +509,20 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 					if (!Utils.hasValue(firmaResultat.getMsg())) {
 						firmaResultat.setMsg("La firma ha finalitzat correctament.");
 					}
-					resultat = "La firma ha finalitzat correctament. Podeu tancar la finestra.";
-					
-//					if (!execMassiva) {
-//						firmaResultat.setUsuari(dataSplri[2]);
-//						FirmaFinalitzadaEvent ffe = new FirmaFinalitzadaEvent(expedientId, firmaResultat);
-//						eventService.notifyFirmaNavegadorFinalitzada(ffe);
-//					}
+					firmaResultat.setMsg("La firma ha finalitzat correctament.");
+				} else {
+					firmaResultat.setMsg("La firma "+firmaSignatureStatus.getSignID()+" no ha finalitzat correctament: "+firmaSignatureStatus.getMsg());
 				}
 			}
-			
-			//Tancar totes les modals de firma en navegador del usuari que ha iniciat la firma
-			firmaResultat.setUsuari(dataSplri[2]);
-			FirmaFinalitzadaEvent ffe = new FirmaFinalitzadaEvent(null, firmaResultat);
-			eventService.notifyFirmaNavegadorFinalitzada(ffe);
+
+		} else {
+			firmaResultat.setMsg("Firma finalitzada amb estat no correcte: "+firmaResultat.getMsg());
 		}
-		if (resultat==null) {
-			resultat = "La firma no s'ha pogut finalitzar: "+firmaResultat.getMsg()+". Tancau la finestra i tornau-ho a provar passats uns minuts.";
-		}
-		return ResponseEntity.ok().header("Content-Type", "text/plain; charset=UTF-8").body(resultat);
+		
+		FirmaFinalitzadaEvent ffe = new FirmaFinalitzadaEvent(null, firmaResultat);
+		eventService.notifyFirmaNavegadorFinalitzada(ffe);
+		
+		return ResponseEntity.ok().header("Content-Type", "text/plain; charset=UTF-8").body("OK");
 	}
 	
 	@RequestMapping(value = "/{documentId}/firmaSimpleWebEnd")

@@ -23,6 +23,7 @@ import es.caib.ripea.persistence.entity.config.ConfigGroupEntity;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.persistence.repository.config.ConfigGroupRepository;
 import es.caib.ripea.persistence.repository.config.ConfigRepository;
+import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.config.ConfigDto;
@@ -398,6 +399,13 @@ public class ConfigHelper {
     @Transactional(readOnly = true)
     public String getRolActual() {
         return rolActual != null ? rolActual.get() : null;
+    }
+    
+    @Transactional(readOnly = true)
+    public boolean isRolActualTreballaAmbOrgan() {
+        return rolActual != null ? 
+        		(BaseConfig.ROLE_ORGAN_ADMIN.equals(rolActual.get()) || BaseConfig.ROLE_DISSENY.equals(rolActual.get())) 
+        		: false;
     }
 
     @Transactional(readOnly = true)

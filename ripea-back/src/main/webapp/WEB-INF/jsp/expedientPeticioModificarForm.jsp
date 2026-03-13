@@ -27,12 +27,10 @@
 }
 </style>
 
-
 <script>
 
 //################################################## document ready START ##############################################################
 $(document).ready(function() {
-
 
 	$('#expedientPeticioModificarForm').on('submit', function () {
 		  $(this).find('select#grupId').prop('disabled', false);
@@ -47,11 +45,8 @@ $(document).ready(function() {
 
 });//################################################## document ready END ##############################################################
 
-
-
 function refrescarGrup(firstTime) {
 	$("#grupId").empty();
-	debugger
 	const metaExpedientId = $('#metaExpedientId').val();
 	if (metaExpedientId != undefined ) {
 
@@ -60,7 +55,6 @@ function refrescarGrup(firstTime) {
 	        type: "GET",
 	        url: findUrl,
 	        success: function (data) {
-		        debugger
 
 	        	if (data != undefined && data != 0) {
 
@@ -81,8 +75,6 @@ function refrescarGrup(firstTime) {
 
 	    			$('#grupId').trigger('change');
 	    		    $("#grupId").parent().parent().show();
-	    		    
-
 
 	        	} else {
 	        		$("#grupId").parent().parent().hide();
@@ -93,13 +85,7 @@ function refrescarGrup(firstTime) {
 	} else {
 		$("#grupId").parent().parent().hide();
 	}
-
-
 }
-
-
-
-
 </script>
 
 </head>
@@ -129,8 +115,6 @@ function refrescarGrup(firstTime) {
 			textKey="metaexpedient.relacionar.grup.form.camp.grup" 
 			emptyOption="true"
 			disabled="${rolActual == 'tothom'}"/>
-	
-
 
 		<div id="modal-botons">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
@@ -139,4 +123,3 @@ function refrescarGrup(firstTime) {
 	</form:form>
 </body>
 </html>
-

@@ -21,11 +21,13 @@ const AnotacionsGridForm = () => {
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField xs={12} name="identificador" disabled readOnly/>
+        <GridFormField xs={12} name="registreExtracte" disabled readOnly/>
         <GridFormField xs={12} name="metaExpedient"/>
         <GridFormField xs={12} name="grup"
                        namedQueries={[`BY_PROCEDIMENT#${data?.metaExpedient?.id}`]}
                        disabled={!data?.metaExpedient}
-                       readOnly={!data?.metaExpedient}/>
+                       readOnly={!data?.metaExpedient}
+                       hidden={!data?.mostrarGrups}/>
     </Grid>
 }
 
@@ -124,6 +126,7 @@ const AnotacionsGrid = () => {
                     popupEditFormContent={<AnotacionsGridForm/>}
                     toolbarHide
                     popupEditFormDialogTitle={t('page.anotacio.action.canviProcediment.title')}
+                    popupEditFormComponentProps={{ initOnChangeRequest: true }}
                     popupEditFormI18nKeys={{
                         updateSuccess: 'page.anotacio.action.canviProcediment.ok',
                     }}

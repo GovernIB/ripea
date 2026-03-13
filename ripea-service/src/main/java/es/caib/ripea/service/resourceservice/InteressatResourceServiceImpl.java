@@ -861,7 +861,11 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
                             }
                         } catch (Exception e) {
                             excepcioLogHelper.addExcepcio("/expedient/interessats/ImportarInteressatsActionExecutor/" + previous.getTipusImportacio() + ".onChange", e);
-                            throw new AnswerRequiredException(InteressatResource.ImportarInteressatsFormAction.class, NOT_COMPATIBLE, "interessat.import.reject");
+                            String message = messageHelper.getMessage("interessat.import.reject") + ": " + e.getMessage();
+                            throw new AnswerRequiredException(
+                            		InteressatResource.ImportarInteressatsFormAction.class, 
+                            		NOT_COMPATIBLE,
+                            		message);
                         }
                     }
 

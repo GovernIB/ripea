@@ -2,7 +2,13 @@ package es.caib.ripea.service.resourceservice;
 
 import java.io.OutputStream;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -18,15 +24,18 @@ import es.caib.plugins.arxiu.api.ContingutOrigen;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.ExpedientPeticioEntity;
+import es.caib.ripea.persistence.entity.GrupEntity;
 import es.caib.ripea.persistence.entity.MetaDocumentEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.entity.resourceentity.ExpedientPeticioResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.RegistreInteressatResourceEntity;
+import es.caib.ripea.persistence.entity.resourceentity.RegistreResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientSequenciaResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.RegistreAnnexResourceRepository;
+import es.caib.ripea.persistence.entity.resourcerepository.RegistreResourceRepository;
 import es.caib.ripea.persistence.repository.ExpedientPeticioRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
@@ -39,6 +48,7 @@ import es.caib.ripea.service.helper.EventHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
 import es.caib.ripea.service.helper.ExpedientHelper;
 import es.caib.ripea.service.helper.ExpedientPeticioHelper;
+import es.caib.ripea.service.helper.GrupHelper;
 import es.caib.ripea.service.helper.MessageHelper;
 import es.caib.ripea.service.helper.MetaDocumentHelper;
 import es.caib.ripea.service.helper.PermisosPerAnotacions;
@@ -97,6 +107,8 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 	private final OrganGestorRepository organGestorRepository;
 	private final MetaExpedientRepository metaExpedientRepository;
 	private final ExpedientPeticioRepository expedientPeticioRepository;
+	private final RegistreResourceRepository registreResourceRepository;
+	private final GrupHelper grupHelper;
 
 	private final RegistreAnnexResourceRepository registreAnnexResourceRepository;
 
@@ -112,8 +124,63 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
         register(ExpedientPeticioResource.ACTION_ACCEPTAR_ANOTACIO, new AcceptarAnotacioActionExecutor());
         register(ExpedientPeticioResource.ACTION_ESTAT_DISTRIBUCIO, new CanviEstatDistribucioActionExecutor());
         register(ExpedientPeticioResource.ACTION_CONSULTAR_I_GUARDAR, new ConsultarGuardarAnotacioPendentActionExecutor());
+        
+        register(ExpedientPeticioResource.Fields.metaExpedient, new MetaExpedientOnchangeLogicProcessor());
+        register(null, new InitialOnChangeDocumentResourceLogicProcessor());
+    }
+    
+    public class InitialOnChangeDocumentResourceLogicProcessor implements OnChangeLogicProcessor<ExpedientPeticioResource> {
+		@Override
+		public void onChange(Serializable id, ExpedientPeticioResource previous, String fieldName, Object fieldValue,
+				Map<String, AnswerValue> answers, String[] previousFieldNames, ExpedientPeticioResource target) {
+			setGrupsFromProcediment(previous.getMetaExpedient(), target);
+			
+			RegistreResourceEntity rre = registreResourceRepository.findById(previous.getRegistre().getId()).get();
+			target.setRegistreExtracte(rre.getExtracte());
+		}
     }
 
+    private class MetaExpedientOnchangeLogicProcessor implements OnChangeLogicProcessor<ExpedientPeticioResource> {
+		@Override
+		public void onChange(Serializable id, ExpedientPeticioResource previous, String fieldName, Object fieldValue,
+				Map<String, AnswerValue> answers, String[] previousFieldNames, ExpedientPeticioResource target) {
+			setGrupsFromProcediment(fieldValue, target);
+		}
+    }
+    
+    private void setGrupsFromProcediment(Object fieldValue, ExpedientPeticioResource target) {
+    	
+		if (fieldValue!=null) {
+			
+			ResourceReference<MetaExpedientResource, Long> metaExpRR = (ResourceReference<MetaExpedientResource, Long>)fieldValue;
+			
+			if (metaExpRR!=null && metaExpRR.getId()!=null) {
+    	
+				String entitatActualCodi = configHelper.getEntitatActualCodi();
+		        EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true,false);
+		        
+		        Long organGestorId = null;
+		        
+		        if (configHelper.isRolActualTreballaAmbOrgan()) {
+		        	OrganGestorEntity ogEntity	= organGestorRepository.findByEntitatIdAndCodi(
+		        			entitat.getId(),
+		        			configHelper.getOrganActualCodi());
+		        	if (ogEntity!=null) {
+		        		organGestorId = ogEntity.getId();
+		        	}
+		        }
+		        
+		        List<GrupEntity> grupsProcediment = grupHelper.findGrups(entitat.getId(), organGestorId, metaExpRR.getId());
+		        target.setMostrarGrups(grupsProcediment.size()>0);
+		        
+			} else {
+				target.setMostrarGrups(false);
+			}
+		} else {
+			target.setMostrarGrups(false);
+		}
+    }
+    
     @Override
     protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
         List<Filter> filters = new ArrayList<>();
@@ -211,7 +278,11 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
     @Override
 	public ExpedientPeticioResource update(Long id, ExpedientPeticioResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotFoundException {
     	try {
-    		expedientPeticioHelper.canviarProcediment(resource.getId(), resource.getMetaExpedient().getId(), resource.getGrup().getId());
+    		expedientPeticioHelper.canviarProcediment(
+    				resource.getId(),
+    				resource.getMetaExpedient().getId(),
+    				resource.getGrup()!=null?resource.getGrup().getId():null);
+    		return resource;
     	} catch (Exception ex) {
     		excepcioLogHelper.addExcepcio("/anotacio/"+resource.getId()+"/update", ex);
     	}
@@ -221,8 +292,10 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
     private class RegistrePerspectiveApplicator implements PerspectiveApplicator<ExpedientPeticioResourceEntity, ExpedientPeticioResource> {
         @Override
         public void applySingle(String code, ExpedientPeticioResourceEntity entity, ExpedientPeticioResource resource) throws PerspectiveApplicationException {
-            resource.setRegistreInfo(objectMappingHelper.newInstanceMap(Hibernate.unproxy(entity.getRegistre()), RegistreResource.class));
-
+            
+        	RegistreResource rr = objectMappingHelper.newInstanceMap(Hibernate.unproxy(entity.getRegistre()), RegistreResource.class);
+        	resource.setRegistreInfo(rr);
+           
             resource.getRegistreInfo().setInteressats(
                     entity.getRegistre().getInteressats().stream()
                             .map(interessat -> {

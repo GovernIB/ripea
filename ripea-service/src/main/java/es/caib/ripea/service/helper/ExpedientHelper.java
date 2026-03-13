@@ -3084,7 +3084,11 @@ public class ExpedientHelper {
 
 	@Transactional(readOnly = true)
 	public boolean isExpedientPendentExecucioMassivaMourerTot(Long expedientId) {
-		return execucioMassivaRepository.findByExpedientOrigenIdAndTipusAndDataFiNull(expedientId, ExecucioMassivaTipusDto.MOURE_EXPEDIENT).isPresent();
+		try {
+			return execucioMassivaRepository.findByExpedientOrigenIdAndTipusAndDataFiNull(expedientId, ExecucioMassivaTipusDto.MOURE_EXPEDIENT).isPresent();
+		} catch (Exception ex) {
+			return false; //Possibles null pointers o valors de tipus de execució no existents
+		}
 	}
 	
 	@Transactional(propagation = Propagation.REQUIRES_NEW)

@@ -105,6 +105,7 @@ public class ExpedientPeticioResource extends BaseAuditableResource<Long> {
     private String observacions;
 
     private ResourceReference<RegistreResource, Long> registre;
+    @ResourceField(onChangeActive = true)
     private ResourceReference<MetaExpedientResource, Long> metaExpedient;
     private ResourceReference<GrupResource, Long> grup;
     private ResourceReference<ExpedientResource, Long> expedient;
@@ -117,6 +118,8 @@ public class ExpedientPeticioResource extends BaseAuditableResource<Long> {
     private Date consultaWsErrorDate;
 
     @Transient private RegistreResource registreInfo;
+    @Transient private String registreExtracte;
+    @Transient private boolean mostrarGrups = false;
     @Transient private ExpedientPeticioEstatViewEnumDto estatView;
 
     @Getter

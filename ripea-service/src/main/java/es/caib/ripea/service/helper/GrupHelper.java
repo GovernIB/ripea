@@ -12,9 +12,11 @@ import org.springframework.transaction.annotation.Transactional;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.GrupEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
+import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.repository.GrupRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
+import es.caib.ripea.persistence.repository.command.GrupRepositoryCommnand;
 import es.caib.ripea.service.intf.dto.GrupDto;
 import es.caib.ripea.service.intf.dto.PermisDto;
 import es.caib.ripea.service.intf.dto.PrincipalTipusEnumDto;
@@ -31,6 +33,8 @@ public class GrupHelper {
 	@Autowired private MetaExpedientRepository metaExpedientRepository;
 	@Autowired private OrganGestorHelper organGestorHelper;
 	@Autowired private MetaExpedientHelper metaExpedientHelper;
+	@Autowired private OrganGestorCacheHelper organGestorCacheHelper;
+	@Autowired private GrupRepositoryCommnand grupRepositoryCommnand;
 
 	public void relacionarAmbMetaExpedient(Long metaExpedientId, Long grupId, boolean marcarPerDefecte) {
 		MetaExpedientEntity metaExpedientEntity = metaExpedientRepository.getOne(metaExpedientId);
@@ -89,6 +93,21 @@ public class GrupHelper {
 		permisosHelper.updatePermis(grup.getId(), GrupEntity.class, dto);
 	}
 	
+	public List<GrupEntity> findGrups(Long entitatId, Long organGestorId, Long metaExpedientId) {
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+		List<String> codisOrgansFills = null;
+
+		if (organGestorId != null) {
+			OrganGestorEntity organ = organGestorRepository.getOne(organGestorId);
+			codisOrgansFills = organGestorCacheHelper.getCodisOrgansFills(entitat.getCodi(), organ.getCodi());
+		}
+		
+		return grupRepositoryCommnand.findByEntitatAndOrgan(
+				entitat,
+				metaExpedientId,
+				codisOrgansFills);
+	}
+	
 	public List<GrupEntity> findGrupsNoRelacionatAmbMetaExpedient(Long entitatId, Long metaExpedientId, Long adminOrganId) {
 		
 		List<GrupEntity> grups = grupRepository.findByEntitatId(entitatId);
@@ -137,6 +156,4 @@ public class GrupHelper {
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(GrupHelper.class);
-	
-
 }
