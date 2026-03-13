@@ -843,8 +843,8 @@ const translationEn = {
                 },
                 delete: {
                     label: "Delete",
-                    check: "Are you sure you want to delete this content? If it contained ongoing signatures, they will be canceled.",
-                    description: "Once deleted it cannot be recovered",
+                    check: "Are you sure you want to delete this content?",
+                    description: "Once deleted it cannot be recovered. If it contained ongoing signatures, they will be canceled.",
                     ok: "The document {{data.nom}} has been deleted successfully"
                 },
                 pinbal: {

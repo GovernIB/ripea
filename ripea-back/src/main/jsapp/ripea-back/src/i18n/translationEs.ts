@@ -843,8 +843,8 @@ const translationEs = {
                 },
                 delete: {
                     label: "Borrar",
-                    check: "¿Está seguro de que quiere borrar este contenido? Si contenia firmas en curso, seran canceladas.",
-                    description: "Una vez borrado no se podrá recuperar.",
+                    check: "¿Está seguro de que quiere borrar este contenido?",
+                    description: "Una vez borrado no se podrá recuperar. Si contenia firmas en curso, seran canceladas.",
                     ok: "El documento {{data.nom}} se ha eliminado correctamente"
                 },
                 pinbal: {
