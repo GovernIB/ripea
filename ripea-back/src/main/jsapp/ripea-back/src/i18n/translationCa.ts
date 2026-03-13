@@ -843,8 +843,8 @@ const translationCa = {
                 },
                 delete: {
                     label: "Esborrar",
-                    check: "Estau segur que voleu eliminar aquest contingut? Si contenia firma en curs, serà cancelada.",
-                    description: "Un cop esborrat no es podrà recuperar",
+                    check: "Estau segur que voleu eliminar aquest contingut?",
+                    description: "Un cop esborrat no es podrà recuperar. Si contenia firma en curs, serà cancelada.",
                     ok: "El document {{data.nom}} s'ha eliminat correctament"
                 },
                 pinbal: {

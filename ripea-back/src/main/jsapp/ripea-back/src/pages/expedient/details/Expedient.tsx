@@ -77,14 +77,15 @@ export const ExpedientInfo = (props:any) => {
     const {title, entity: expedient, xs, readOnly} = props;
     const { t } = useTranslation();
     return <DetailCard title={title ?? t('page.expedient.detall.title')} size={xs}>
-        <DetailCardContent title={t('page.contingut.detalle.numero')}>{expedient?.numero}</DetailCardContent>
+        <DetailCardContent title={t('page.contingut.detalle.numero')} size={8}>{expedient?.numero}</DetailCardContent>
+        <DetailCardContent title={t('page.contingut.detalle.clasificacio')} size={4}>{expedient?.ntiClasificacionSia}</DetailCardContent>
+
         <DetailCardContent title={t('page.contingut.detalle.titol')}>{expedient?.nom}</DetailCardContent>
         <DetailCardContent title={t('page.contingut.detalle.metaExpedient')}>{expedient?.metaExpedient?.description}</DetailCardContent>
         <DetailCardContent title={t('page.contingut.detalle.organGestor')}>{expedient?.organGestor?.description}</DetailCardContent>
         <DetailCardContent title={t('page.contingut.detalle.fechaApertura')}>{formatDate(expedient?.ntiFechaApertura)}</DetailCardContent>
-        <DetailCardContent title={t('page.contingut.detalle.estat')} size={4} sx={{ borderBottom: "1px solid" }}><StyledEstat entity={expedient}>{t(`enum.estat.${expedient?.estat}`)}</StyledEstat></DetailCardContent>
+        <DetailCardContent title={t('page.contingut.detalle.estat')} size={8} sx={{ borderBottom: "1px solid" }}><StyledEstat entity={expedient}>{t(`enum.estat.${expedient?.estat}`)}</StyledEstat></DetailCardContent>
         <DetailCardContent title={t('page.contingut.detalle.prioritat')} size={4} sx={{ borderBottom: "1px solid" }}><StyledPrioritat entity={expedient}>{t(`enum.prioritat.${expedient?.prioritat}`)}</StyledPrioritat></DetailCardContent>
-        <DetailCardContent title={t('page.contingut.detalle.clasificacio')} size={4} sx={{ borderBottom: "1px solid" }}>{expedient?.ntiClasificacionSia}</DetailCardContent>
 
         <ExpedientsRelacionats entity={expedient}/>
 
@@ -139,7 +140,7 @@ const ExpedientAlert = (props:any) => {
                    }
             >{t('page.expedient.alert.alert')}</Alert>
         }
-        { validacio?.errorsValidacio?.length > 0 &&
+        { ((!expedient?.valid && validacio?.errorsValidacio == null) || (validacio?.errorsValidacio?.length > 0)) &&
             <Alert severity="warning"
                    action={
                        <Button  sx={{py: 0}} variant="outlined"

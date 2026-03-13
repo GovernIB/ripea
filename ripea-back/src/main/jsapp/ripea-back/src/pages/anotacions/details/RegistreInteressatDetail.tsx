@@ -11,20 +11,20 @@ const RegistreInteressatDetail = (props:any) => {
 
     return <Grid2 container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <DetailCard title={t('page.interessat.title')}>
-            <DetailCardContent title={t('page.interessat.detall.nif')}>{entity?.documentNumero}</DetailCardContent>
-            <DetailCardContent title={`${t('page.interessat.detall.nom')} / ${t('page.interessat.detall.raoSocial')}`}>{entity?.nom} {entity?.raoSocial}</DetailCardContent>
+            <DetailCardContent title={t('page.interessat.detall.nif')} size={6}>{entity?.documentNumero}</DetailCardContent>
+            <DetailCardContent title={`${t('page.interessat.detall.nom')} / ${t('page.interessat.detall.raoSocial')}`} size={6}>{entity?.nom} {entity?.raoSocial}</DetailCardContent>
             <DetailCardContent title={t('page.interessat.detall.llinatges')}>{entity?.llinatge1} {entity?.llinatge2}</DetailCardContent>
-            <DetailCardContent title={t('page.interessat.detall.email')}>{entity?.email}</DetailCardContent>
-            <DetailCardContent title={t('page.interessat.detall.telefon')}>{entity?.telefon}</DetailCardContent>
+            <DetailCardContent title={t('page.interessat.detall.email')} size={6}>{entity?.email}</DetailCardContent>
+            <DetailCardContent title={t('page.interessat.detall.telefon')} size={6}>{entity?.telefon}</DetailCardContent>
             <DetailCardContent title={t('page.interessat.detall.incapacitat')}>{entity?.incapacitat}</DetailCardContent>
             <DetailCardContent title={t('page.interessat.detall.direccio')}>{entity?.pais} {entity?.provincia} {entity?.municipi} {entity?.codiPostal} {entity?.adresa}</DetailCardContent>
         </DetailCard>
         <DetailCard title={t('page.interessat.rep')} hidden={!representant}>
-            <DetailCardContent title={t('page.interessat.detall.nif')}>{representant?.documentNumero}</DetailCardContent>
-            <DetailCardContent title={`${t('page.interessat.detall.nom')} / ${t('page.interessat.detall.raoSocial')}`}>{representant?.nom} {representant?.raoSocial}</DetailCardContent>
+            <DetailCardContent title={t('page.interessat.detall.nif')} size={6}>{representant?.documentNumero}</DetailCardContent>
+            <DetailCardContent title={`${t('page.interessat.detall.nom')} / ${t('page.interessat.detall.raoSocial')}`} size={6}>{representant?.nom} {representant?.raoSocial}</DetailCardContent>
             <DetailCardContent title={t('page.interessat.detall.llinatges')}>{representant?.llinatge1} {representant?.llinatge2}</DetailCardContent>
-            <DetailCardContent title={t('page.interessat.detall.email')}>{representant?.email}</DetailCardContent>
-            <DetailCardContent title={t('page.interessat.detall.telefon')}>{representant?.telefon}</DetailCardContent>
+            <DetailCardContent title={t('page.interessat.detall.email')} size={6}>{representant?.email}</DetailCardContent>
+            <DetailCardContent title={t('page.interessat.detall.telefon')} size={6}>{representant?.telefon}</DetailCardContent>
             <DetailCardContent title={t('page.interessat.detall.incapacitat')}>{representant?.incapacitat}</DetailCardContent>
             <DetailCardContent title={t('page.interessat.detall.direccio')}>{representant?.pais} {representant?.provincia} {representant?.municipi} {representant?.codiPostal} {representant?.adresa}</DetailCardContent>
         </DetailCard>
