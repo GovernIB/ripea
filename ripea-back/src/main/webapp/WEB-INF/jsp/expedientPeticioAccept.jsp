@@ -349,7 +349,7 @@ function refrescarGrups() {
 			<div id="grupsActiu" class="<c:if test="${not expedientCommand.gestioAmbGrupsActiva}">hidden</c:if>">
 				<rip:inputSelect name="grupId" optionItems="${grups}" required="true" optionValueAttribute="id" optionTextAttribute="descripcio" textKey="contingut.expedient.form.camp.grup"/>
 			</div>	
- 			<rip:inputCheckbox name="seguidor" textKey="contingut.expedient.form.camp.seguidor" labelSize="2"/>				
+ 			<rip:inputCheckbox name="seguidor" textKey="contingut.expedient.form.camp.seguidor" labelSize="4"/>
 		</div>
 		
 		<rip:inputCheckbox name="associarInteressats"

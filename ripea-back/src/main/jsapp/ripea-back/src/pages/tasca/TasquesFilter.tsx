@@ -6,7 +6,7 @@ import {useFormContext} from "reactlib";
 const TasquesFilterForm = () => {
     const {data} = useFormContext()
 
-    const expedientFilter = builder.and(builder.eq("metaExpedient.id", data?.metaExpedient?.id))
+    const procedimentFilter = builder.and(builder.eq("metaExpedient.id", data?.metaExpedient?.id))
 
     return <>
         {(!data?.advanced) && <>
@@ -17,8 +17,8 @@ const TasquesFilterForm = () => {
         </>}
         {(data?.advanced) && <>
             <GridFormField xs={3} name="metaExpedient"/>
-            <GridFormField xs={3} name="expedient" filter={expedientFilter}/>
-            <GridFormField xs={2} name="metaExpedientTasca"/>
+            <GridFormField xs={3} name="expedient" filter={procedimentFilter}/>
+            <GridFormField xs={2} name="metaExpedientTasca" filter={procedimentFilter}/>
             <GridFormField xs={2} name="titol"/>
             <GridFormField xs={2} name="prioritat"/>
             <GridFormField xs={1.5} name="dataInici" type={"date"}/>

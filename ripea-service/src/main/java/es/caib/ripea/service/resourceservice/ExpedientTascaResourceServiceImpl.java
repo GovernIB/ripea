@@ -80,9 +80,7 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
 	public void init() {
 		register(ExpedientTascaResource.PERSPECTIVE_RESPONSABLES_CODE, new ResponsablesPerspectiveApplicator());
 		register(ExpedientTascaResource.PERSPECTIVE_AUDIT_CODE, new AuditoriaPerspectiveApplicator());
-        register(ExpedientTascaResource.Fields.metaExpedientTasca, new MetaExpedientTascaOnchangeLogicProcessor());
-        register(ExpedientTascaResource.Fields.duracio, new DuracioOnchangeLogicProcessor());
-        register(ExpedientTascaResource.Fields.dataLimit, new DataLimitOnchangeLogicProcessor());
+
         register(ExpedientTascaResource.ACTION_CHANGE_ESTAT_CODE, new ChangeEstatActionExecutor());
         register(ExpedientTascaResource.ACTION_CHANGE_PRIORITAT_CODE, new ChangePrioritatActionExecutor());
         register(ExpedientTascaResource.ACTION_CHANGE_DATALIMIT_CODE, new ChangeDataLimitActionExecutor());
@@ -91,8 +89,12 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
         register(ExpedientTascaResource.ACTION_RETOMAR_CODE, new RetomarActionExecutor());
         register(ExpedientTascaResource.ACTION_REASSIGNAR_CODE, new ReassignarActionExecutor());
         register(ExpedientTascaResource.ACTION_DELEGAR_CODE, new DelegarActionExecutor());
+        
+        register(ExpedientTascaResource.Fields.metaExpedientTasca, new MetaExpedientTascaOnchangeLogicProcessor());
+        register(ExpedientTascaResource.Fields.duracio, new DuracioOnchangeLogicProcessor());
+        register(ExpedientTascaResource.Fields.dataLimit, new DataLimitOnchangeLogicProcessor());
 	}
-
+	
     @Override
     protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
     		

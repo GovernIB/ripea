@@ -110,10 +110,9 @@ public class ExpedientPeticioEntity extends RipeaAuditable<Long> {
 			}
 		}
 	}
-
 	
 	public void updateNotificaDistError(String notificaDistError) {
-		this.notificaDistError = StringUtils.abbreviate(notificaDistError, 4000);
+		this.notificaDistError = StringUtils.abbreviate(notificaDistError, 3995); //Abbreviate afegeix "..." al final
 	}
 
 	public void updateExpedient(ExpedientEntity expedient) {

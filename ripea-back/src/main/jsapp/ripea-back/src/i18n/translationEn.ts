@@ -918,7 +918,7 @@ const translationEn = {
                     ok: "Document downloaded successfully",
                 },
                 firma: {
-                    label: "Download signature...",
+                    label: "Download signature",
                     button: "Start signing process",
                     title: "Sign from the browser",
                     ok: "Document signed successfully",
