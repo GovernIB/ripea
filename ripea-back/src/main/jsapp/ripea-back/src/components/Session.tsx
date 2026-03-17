@@ -25,10 +25,15 @@ export const useUserSession = () => {
             })
     }
 
-    const apiSave = (value:any) => {
+    const apiSave = (value:any, navigate?:any) => {
         axios.post(apiUrl + 'usuari/actual/changeInfo', value)
             .then((response) => {
                 save(response.data);
+                if (response.data?.rolActual == 'IPA_SUPER') {
+                    navigate?.('/integracio')
+                } else {
+                    navigate?.('/expedient')
+                }
             })
             .catch((error) => {
                 save(null);

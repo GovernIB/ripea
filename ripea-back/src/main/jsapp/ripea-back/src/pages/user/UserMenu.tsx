@@ -2,7 +2,6 @@ import {FormControl, Icon, ListItemIcon, MenuItem, Select} from "@mui/material";
 import React, {useEffect, useMemo, useState} from "react";
 import {useTranslation} from "react-i18next";
 import {useUserSession} from "../../components/Session.tsx";
-import {useNavigate} from "react-router-dom";
 import {iniciaDescarga} from "../expedient/details/CommonActions.tsx";
 import usePerfil from "./detail/Perfil.tsx";
 import ListItemText from "@mui/material/ListItemText";
@@ -12,9 +11,10 @@ import {TextAvatar} from "reactlib";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Load from "../../components/Load.tsx";
 import {useToProgramaAntic} from "./UserHeadToolbar.tsx";
+import {useNavigate} from "react-router-dom";
 
 const MenuSelect = (props:any) => {
-    const {icon, value, onChange, color = "#000", children, ...other} = props
+    const {icon, value, onChange, children, ...other} = props
     const [open, setOpen] = useState<boolean>(false)
 
     return <MenuItem onClick={()=>setOpen(prev=>!prev)}>
@@ -65,9 +65,6 @@ export const UserMenu = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
 
-    // const { value: entitat } = useEntitatSession()
-    // const textColor = entitat?.capsaleraColorLletra ?? '#000';
-
     const { value: user, rol: rolActual, permisos, save: apiSave } = useUserSession();
 
     const {handleOpen, dialog} = usePerfil();
@@ -103,8 +100,7 @@ export const UserMenu = () => {
 
     useEffect(() => {
         if (rol && rol!=user?.rolActual){
-            apiSave({canviRol: rol})
-            navigate('/expedient')
+            apiSave({canviRol: rol}, navigate)
         }
     }, [rol]);
 
