@@ -75,7 +75,7 @@ export const DetailCardContent = (props:any) => {
                       ...(other?.sx ?? {}),
                       borderColor: other?.sx?.borderColor || "divider",
                   }}>
-        <Grid2 size={titleSize}><Typography variant={"body1"} color={'lightskyblue'} sx={componentTitleProps}>{title}</Typography></Grid2>
+        <Grid2 size={titleSize}><Typography variant={"body1"} color={'primary'} sx={componentTitleProps}>{title}</Typography></Grid2>
         <Grid2 size={textSize}><Typography variant={"inherit"} color={'textSecondary'} sx={componentTextProps}>
             {isEmpty(children) ?" - " :children}
         </Typography></Grid2>

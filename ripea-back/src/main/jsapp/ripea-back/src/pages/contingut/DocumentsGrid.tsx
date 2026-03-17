@@ -106,7 +106,7 @@ export const useExpedientsCarpetes = (commonFilter: string) => {
     }
     return {
         isReady: apiExpedientIsReady && apiCarpetaIsReady,
-        expedients,
+        expedients: expedients,
         carpetes,
         refresh,
     };

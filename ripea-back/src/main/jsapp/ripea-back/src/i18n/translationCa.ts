@@ -1771,7 +1771,7 @@ const translationCa = {
                 },
                 diagnosticAll: {
                     title: "Diagnòstic dels sistemes externs",
-                    label: "Diagnòstic i reinici de plugins",
+                    label: "Diagnòstic",
                 },
                 reiniciar: {
                     label: "Reiniciar plugin",

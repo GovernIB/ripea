@@ -1771,7 +1771,7 @@ const translationEs = {
                 },
                 diagnosticAll: {
                     title: "Diagnóstico de los sistemas externos",
-                    label: "Diagnóstico i reinicio de plugins",
+                    label: "Diagnóstico",
                 },
                 reiniciar: {
                     label: "Reiniciar plugin",

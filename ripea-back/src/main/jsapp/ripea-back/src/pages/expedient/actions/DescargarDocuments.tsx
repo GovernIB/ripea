@@ -51,7 +51,7 @@ const DescargarDocumentsForm = () => {
 
     const {isReady, carpetes, expedients, refresh} = useExpedientsCarpetes(commonFilter)
 
-    return <Load value={apiRef && isReady}>
+    return <Load value={apiRef && carpetes && expedients && isReady}>
         <StyledMuiGrid
             resourceName="documentResource"
             columns={columns}

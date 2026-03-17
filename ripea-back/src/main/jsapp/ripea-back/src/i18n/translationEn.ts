@@ -1771,7 +1771,7 @@ const translationEn = {
                 },
                 diagnosticAll: {
                     title: "External systems diagnostics",
-                    label: "Diagnose and restart plugins",
+                    label: "Diagnose",
                 },
                 reiniciar: {
                     label: "Restart plugin",
