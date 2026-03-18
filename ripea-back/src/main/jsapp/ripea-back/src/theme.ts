@@ -53,12 +53,6 @@ const base: ThemeOptions = {
         MuiDataGrid: {
             styleOverrides: {
                 root: {
-                    '& .MuiDataGrid-row.even.MuiDataGrid-row': {
-                        backgroundColor: 'inherit',
-                    },
-                    '& .MuiDataGrid-row.even.MuiDataGrid-row:hover': {
-                        backgroundColor: 'inherit',
-                    },
                     '& [class^="row-with-color-"] .MuiDataGrid-cellCheckbox': {
                         width: '48px !important',
                         maxWidth: '48px !important',
@@ -296,6 +290,11 @@ export const lightTheme = createTheme(base, {
         },
         MuiDataGrid: {
             styleOverrides: {
+                root: {
+                    '& .MuiDataGrid-row:hover': {
+                        backgroundColor: `rgba(144, 202, 249, 0.66) !important`,
+                    },
+                },
                 row: {
                     '&.Mui-selected': {
                         backgroundColor: `${lightPalete.action.selected}`,
@@ -365,6 +364,14 @@ export const darkTheme = createTheme(base, {
         },
         MuiDataGrid: {
             styleOverrides: {
+                root: {
+                    '& .MuiDataGrid-row.even.MuiDataGrid-row': {
+                        backgroundColor: 'inherit',
+                    },
+                    '& .MuiDataGrid-row:hover': {
+                        backgroundColor: `rgba(77, 128, 172, 0.75)  !important`,
+                    },
+                },
                 row: {
                     '&.MuiDataGrid-row.Mui-selected': {
                         backgroundColor: `${darkPalette.action.selected} !important`,

@@ -173,13 +173,14 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
         return columns.filter((col:any) => !col?.hidden).map((col:any) => ({
             ...col,
             flex: col.flex ?? 1,
-            cellClassName: col?.wordWrap ? 'multi-line-cell' : undefined,
+            // cellClassName: col?.wordWrap ? 'multi-line-cell' : undefined,
         }));
     }, [columns])
 
     const paginationProps = useMemo(() => {
         return user?.conf?.numElementsPagina != null
             ? {
+                getRowHeight: () => 'auto',
                 autoHeight: true,
                 paginationModel: {page: 0, pageSize: +user?.conf?.numElementsPagina},
                 pageSizeOptions: [10, 20, 50, 100, 250],

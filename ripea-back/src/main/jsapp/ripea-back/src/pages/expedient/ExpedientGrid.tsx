@@ -197,7 +197,7 @@ const ExpedientGrid = () => {
             field: 'interessats',
             sortable: false,
             flex: 1,
-            cellClassName: 'multi-line-cell',
+            wordWrap: true,
             valueFormatter: (value: any) => {
                 let resum = '';
                 for (const interessat of value) {
