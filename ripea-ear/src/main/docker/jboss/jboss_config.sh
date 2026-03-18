@@ -8,8 +8,7 @@ KEYCLOAK_FILE=$SCRIPT_DIR/keycloak.xml
 LOGGING_FILE=$SCRIPT_DIR/logging.xml
 MAIL_FILE=$SCRIPT_DIR/mail.xml
 TEMP_PROPS_FILE=$SCRIPT_DIR/jboss_properties.tmp
-JBOSS_PROPS_FILE=/home/jboss/apps/ripea/jboss.properties
-JBOSS_SYSTEM_PROPS_FILE=/home/jboss/apps/ripea/jboss_system.properties
+JBOSS_SYSTEM_PROPS_FILE=$JBOSS_HOME/apps/ripea/ripea_system.properties
 
 if ! grep -q "<system-properties" $CONFIG_STANDALONE_FILE; then
 	echo "Configuració inicial de JBoss..."
@@ -34,6 +33,5 @@ sed -e '/<subsystem xmlns="urn:jboss:domain:mail:3.0"\/>/ {' -e "r $MAIL_FILE" -
 echo "...fitxer de configuració de JBoss modificat"
 
 echo "Modificant fitxers de properties per incorporar variables d'entorn..."
-awk -F '=' 'NF {if (ENVIRON[$1]) {print $1 "=" ENVIRON[$1]} else {print $1 "=" $2}}' $JBOSS_PROPS_FILE > $TEMP_PROPS_FILE && mv $TEMP_PROPS_FILE $JBOSS_PROPS_FILE
 awk -F '=' 'NF {if (ENVIRON[$1]) {print $1 "=" ENVIRON[$1]} else {print $1 "=" $2}}' $JBOSS_SYSTEM_PROPS_FILE > $TEMP_PROPS_FILE && mv $TEMP_PROPS_FILE $JBOSS_SYSTEM_PROPS_FILE
 echo "...fitxers de properties modificats"
