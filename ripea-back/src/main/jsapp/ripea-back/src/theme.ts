@@ -59,6 +59,9 @@ const base: ThemeOptions = {
                         minWidth: '48px !important',
                         marginLeft: '-4px !important',
                     },
+                    '& .MuiDataGrid-cell': {
+                        display: 'flex',
+                    }
                 },
                 cell: {
                     '&.MuiDataGrid-cell--withRenderer': {
