@@ -1,5 +1,5 @@
 import {useMemo, useState} from "react";
-import {Icon, Grid} from "@mui/material";
+import {Icon, Grid, Box} from "@mui/material";
 import {GridPage, useFormContext, useMuiDataGridApiRef,} from 'reactlib';
 import {useTranslation} from "react-i18next";
 import {useNavigate} from "react-router-dom";
@@ -218,6 +218,11 @@ const ExpedientGrid = () => {
                 }
                 return resum;
             },
+            renderCell: (params: any)=> (
+                <Box sx={{ whiteSpace: 'pre-line' }}>
+                    {params?.formattedValue}
+                </Box>
+            ),
             hidden: !user?.conf?.expedientListInteressats,
         },
         {
