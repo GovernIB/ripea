@@ -322,7 +322,7 @@ const darkPalette = {
     action: {
         active: '#ffffff',
         hover: '#333333',
-        selected: '#444444',
+		selected: 'rgba(51, 122, 183, 0.28)',
         disabled: '#555555',
         disabledBackground: '#2c2c2c'
     },
@@ -365,19 +365,19 @@ export const darkTheme = createTheme(base, {
         MuiDataGrid: {
             styleOverrides: {
                 root: {
-                    '& .MuiDataGrid-row.even.MuiDataGrid-row': {
-                        backgroundColor: 'inherit',
-                    },
+					'& .MuiDataGrid-row.even.MuiDataGrid-row': {
+					    backgroundColor: '#464646',
+					},
                     '& .MuiDataGrid-row:hover': {
-                        backgroundColor: `rgba(77, 128, 172, 0.75)  !important`,
+                        backgroundColor: `${darken(darkPalette.action.selected, 0.2)} !important`,
                     },
                 },
                 row: {
                     '&.MuiDataGrid-row.Mui-selected': {
-                        backgroundColor: `${darkPalette.action.selected} !important`,
+						backgroundColor: `${darkPalette.action.selected} !important`,
                     },
                     '&.MuiDataGrid-row.Mui-selected:hover': {
-                        backgroundColor: `${darken(darkPalette.action.selected, 0.2)} !important`,
+						backgroundColor: `${darken(darkPalette.action.selected, 0.2)} !important`,                        
                     },
                 },
             },

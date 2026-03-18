@@ -25,8 +25,11 @@ import org.springframework.stereotype.Service;
 
 import es.caib.comanda.model.server.monitoring.FitxerContingut;
 import es.caib.comanda.model.server.monitoring.FitxerInfo;
+import es.caib.comanda.ms.log.helper.LogFileStream;
+import es.caib.comanda.ms.log.helper.LogHelper;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.ContingutHelper;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.service.LogService;
 import es.caib.ripea.service.intf.utils.DateUtil;
@@ -45,13 +48,15 @@ public class LogServiceImpl implements LogService {
 	@Override
 	public List<FitxerInfo> llistarFitxers() {
 		
-        var directoriPath = configHelper.getConfig("es.caib.ripea.plugin.fitxer.logs.path");
+        var directoriPath = configHelper.getConfig(PropertyConfig.COMANDA_LOGS_PATH);
         
         if (!Utils.hasValue(directoriPath)) {
             return new ArrayList<>();
         }
         
-        List<FitxerInfo> fitxers = new ArrayList<>();
+        return LogHelper.llistarFitxers(directoriPath, "ripea");
+        
+        /*List<FitxerInfo> fitxers = new ArrayList<>();
         try (Stream<Path> paths = Files.list(Paths.get(directoriPath))) {
             paths.filter(Files::isRegularFile).forEach(f -> {
                 var file = f.toFile();
@@ -72,19 +77,21 @@ public class LogServiceImpl implements LogService {
         } catch (Exception ex) {
         	logger.error("Error generant la info dels fitxers pel directori " + directoriPath, ex);
         }
-        return fitxers;
+        return fitxers;*/
 	}
 
 	@Override
 	public FitxerContingut getFitxerByNom(String nom) {
         try {
         	
-            var directoriPath = configHelper.getConfig("es.caib.ripea.plugin.fitxer.logs.path");
+            var directoriPath = configHelper.getConfig(PropertyConfig.COMANDA_LOGS_PATH);
             if (!Utils.hasValue(directoriPath)) {
                 return new FitxerContingut();
             }
             
-            var filePath = Paths.get(directoriPath, nom);
+            return LogHelper.getFitxerByNom(directoriPath, nom);
+            
+            /*var filePath = Paths.get(directoriPath, nom);
             if (!Files.exists(filePath) || !Files.isRegularFile(filePath)) {
                 return new FitxerContingut();
             }
@@ -110,22 +117,25 @@ public class LogServiceImpl implements LogService {
                                             .dataCreacio(DateUtil.toOffsetDateTime(dataCreacio))
                                             .dataModificacio(DateUtil.toOffsetDateTime(dataModificacio))
                                             .mida((long)contingut.length);
-        } catch (IOException ex) {
+             */
+        } catch (Exception ex) {
         	logger.error("Error reading file content for " + nom, ex);
             return new FitxerContingut();
         }
 	}
 
 	@Override
-	public void tailLogFile(String filePath) {
+	public LogFileStream tailLogFile(String nomFitxer) {
 		
-        var directoriPath = configHelper.getConfig("es.caib.ripea.plugin.fitxer.logs.path");
+        var directoriPath = configHelper.getConfig(PropertyConfig.COMANDA_LOGS_PATH);
         if (!Utils.hasValue(directoriPath)) {
-        	logger.error("[LogService.tailLogFile] No s'ha especificat valor a la propietat \"es.caib.ripea.plugin.fitxer.logs.path\"");
-            return;
+        	logger.error("[LogService.tailLogFile] No s'ha especificat valor a la propietat: "+PropertyConfig.COMANDA_LOGS_PATH);
+            return null;
         }
         
-        var path = Paths.get(directoriPath, filePath);
+        return LogHelper.getFileStreamByNom(directoriPath, nomFitxer);
+        
+        /*var path = Paths.get(directoriPath, filePath);
         new Thread(() -> {
             try (BufferedReader reader = Files.newBufferedReader(path)) {
                 reader.skip(Files.size(path));
@@ -146,6 +156,7 @@ public class LogServiceImpl implements LogService {
                 logger.error("[LogService.tailLogFile] Thread interrupted: " + e.getMessage());
             }
         }).start();
+        */
 	}
 
 	@Override
@@ -162,10 +173,13 @@ public class LogServiceImpl implements LogService {
         		logger.error("[LogService.readLastNLines] Parametres incorrectes, nomFitxer " + nomFitxer + " nLinies" + nLinies);
                 return new ArrayList<>();
             }
+
+        	var directoriPath = configHelper.getConfig(PropertyConfig.COMANDA_LOGS_PATH);
+        	return LogHelper.readLastNLines(directoriPath, nomFitxer, nLinies);
         	
-            var directoriPath = configHelper.getConfig("es.caib.ripea.plugin.fitxer.logs.path");
+        	/*
             if (!Utils.hasValue(nomFitxer)) {
-            	logger.error("[LogService.nomFitxer] No s'ha especificat valor a la propietat \"es.caib.ripea.plugin.fitxer.logs.path\"");
+            	logger.error("[LogService.nomFitxer] No s'ha especificat valor a la propietat: "+PropertyConfig.COMANDA_LOGS_PATH);
                 return new ArrayList<>();
             }
             
@@ -200,6 +214,7 @@ public class LogServiceImpl implements LogService {
                 }
                 return lines;
             }
+            */
         } catch (Exception ex) {
         	logger.error("[LogService.readLastNLines] Error no controlat", ex);
             return new ArrayList<>();
