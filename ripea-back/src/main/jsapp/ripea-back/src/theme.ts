@@ -147,6 +147,8 @@ const base: ThemeOptions = {
             styleOverrides: {
                 h5: {fontSize: '1.8rem', lineHeight: 1.2, fontWeight: 400},
                 h4: {fontSize: '1.5rem', lineHeight: 1.2, fontWeight: 400},
+                body1: {fontWeight: 500},
+                overline: {fontSize: '1.2rem', letterSpacing: '0em', textTransform: 'none'},
             },
         },
         MuiInputBase: {
