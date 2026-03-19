@@ -171,7 +171,7 @@
 									<run>curl -L https://github.com/keycloak/keycloak/releases/download/12.0.4/keycloak-oidc-wildfly-adapter-12.0.4.tar.gz -o $JBOSS_HOME/keycloak-adapter.tar.gz</run>
 									<run>tar xvzf $JBOSS_HOME/keycloak-adapter.tar.gz -C $JBOSS_HOME</run>
 									<run>rm $JBOSS_HOME/keycloak-adapter.tar.gz</run>
-									<run>$JBOSS_HOME/bin/jboss-cli.sh --file=$JBOSS_HOME/bin/adapter-install-offline.cli</run>									
+									<run>$JBOSS_HOME/bin/jboss-cli.sh --file=$JBOSS_HOME/bin/adapter-install-offline.cli -Djboss.server.config.file=standalone-openshift.xml</run>									
 								</runCmds>
 								<tags>
 									<tag>latest</tag>

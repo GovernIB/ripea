@@ -63,6 +63,9 @@ const base: ThemeOptions = {
                         display: 'flex',
                     }
                 },
+				row: {
+					minHeight: '40px !important',
+				},
                 cell: {
                     '&.MuiDataGrid-cell--withRenderer': {
                         alignItems: 'flex-start !important',
