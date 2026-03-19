@@ -6347,7 +6347,7 @@ public class PluginHelper {
                 .entornCodi(configHelper.getConfig(PropertyConfig.COMANDA_PLUGIN_ENTORN))
                 .identificador(tascaEntity.getId() + "")
                 .tipus(tascaEntity.getMetaTasca().getNom())
-                .nom(tascaEntity.getTitol())
+                .nom(tascaEntity.getTitol()!=null?tascaEntity.getTitol():tascaEntity.getMetaTasca().getNom())
                 .descripcio(tascaEntity.getObservacions())
                 .dataInici(DateUtil.toOffsetDateTime(tascaEntity.getDataInici()))
                 .dataFi(DateUtil.toOffsetDateTime(tascaEntity.getDataFi()))
