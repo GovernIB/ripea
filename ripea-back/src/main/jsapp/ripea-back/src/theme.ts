@@ -61,6 +61,10 @@ const base: ThemeOptions = {
                     },
                     '& .MuiDataGrid-cell': {
                         display: 'flex',
+                    },
+                    '& .MuiDataGrid-treeDataGroupingCell > *': {
+                        display: 'flex',
+                        alignItems: 'center'
                     }
                 },
 				row: {
