@@ -256,6 +256,7 @@ export const lightTheme = createTheme(base, {
             styleOverrides: {
                 root: {
                     '&.Mui-disabled': {
+                        color: lightPalete.action.disabled,
                         backgroundColor: lightPalete.action.disabledBackground,
                     },
                     '& input[readonly][aria-hidden="false"]': {

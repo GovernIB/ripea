@@ -19,7 +19,7 @@ const PerfilFrom = () =>{
             headerProps={{color: 'white', backgroundColor: '#004B99 !important', borderBottom: 'none'}}
         >
             <GridFormField xs={12} name="nom" disabled readOnly/>
-            <GridFormField xs={12} name="nif" disabled readOnly/>
+            {/*<GridFormField xs={12} name="nif" disabled readOnly/>*/}
             <GridFormField xs={12} name="email" disabled readOnly/>
             <GridFormField xs={12} name="emailAlternatiu"/>
             <GridFormField xs={12} name="rols" value={user?.auth} disabled readOnly multiple/>
