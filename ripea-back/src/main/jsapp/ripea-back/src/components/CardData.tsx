@@ -60,7 +60,7 @@ export const DetailCard = (props:any) => {
 }
 
 export const DetailCardContent = (props:any) => {
-    const {title, children, size = 12, titleSize = 12, textSize = 12, componentTitleProps, componentTextProps, hidden, ...other} = props;
+    const {title, children, isObject, size = 12, titleSize = 12, textSize = 12, componentTitleProps, componentTextProps, hidden, ...other} = props;
 
     if (hidden){
         return <></>
@@ -76,9 +76,17 @@ export const DetailCardContent = (props:any) => {
                       borderColor: other?.sx?.borderColor || "divider",
                   }}>
         <Grid2 size={titleSize}><Typography variant={"body1"} color={'primary'} sx={componentTitleProps}>{title}</Typography></Grid2>
-        <Grid2 size={textSize}><Typography variant={"inherit"} color={'textSecondary'} sx={componentTextProps}>
-            {isEmpty(children) ?" - " :children}
-        </Typography></Grid2>
+        <Grid2 size={textSize}>
+            {isEmpty(children) ? (
+                " - "
+            ) : isObject ? (
+                children
+            ) : (
+                <Typography variant="inherit" color="textSecondary" sx={componentTextProps}>
+                    {children}
+                </Typography>
+            )}
+        </Grid2>
     </Grid2>
 }
 
