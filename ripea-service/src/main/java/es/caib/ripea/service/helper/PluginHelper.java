@@ -6354,7 +6354,7 @@ public class PluginHelper {
                 .dataCaducitat(DateUtil.toOffsetDateTime(tascaEntity.getDataLimit()))
                 .estat(estatTascaComanda)
                 .estatDescripcio(tascaEntity.getMotiuRebuig())
-                .numeroExpedient(tascaEntity.getExpedient().getCodi()+"/"+tascaEntity.getExpedient().getNumero()+"/"+tascaEntity.getExpedient().getAny())
+                .numeroExpedient(tascaEntity.getExpedient().getNumero())
                 .responsable(tascaEntity.getResponsableActual()!=null?tascaEntity.getResponsableActual().getCodi():null)
                 .usuarisAmbPermis(usuarisAmbPermis)
                 .grupsAmbPermis(null)
