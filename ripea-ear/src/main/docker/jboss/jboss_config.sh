@@ -20,6 +20,7 @@ sed -i 's/\r//' $KEYCLOAK_FILE
 sed -i 's/\r//' $KEYCLOAK_SD_FILE
 sed -i 's/\r//' $LOGGING_FILE
 sed -i 's/\r//' $MAIL_FILE
+sed -i 's/\r//' $JBOSS_SYSTEM_PROPS_FILE
 
 if ! grep -q "<system-properties" $CONFIG_STANDALONE_FILE; then
 	echo "Configuració inicial de JBoss..."
@@ -64,5 +65,19 @@ sed -e '/<subsystem xmlns="urn:jboss:domain:mail:3.0"\/>/ {' -e "r $MAIL_FILE" -
 echo "...fitxer de configuració de JBoss modificat"
 
 echo "Modificant fitxers de properties per incorporar variables d'entorn..."
-awk -F '=' 'NF {if (ENVIRON[$1]) {print $1 "=" ENVIRON[$1]} else {print $1 "=" $2}}' $JBOSS_SYSTEM_PROPS_FILE > $TEMP_PROPS_FILE && mv $TEMP_PROPS_FILE $JBOSS_SYSTEM_PROPS_FILE
+awk -F '=' '{
+    if (/^#/ || /^[[:space:]]*$/) {
+        print
+    } else if (NF) {
+        # $2 es el nombre de la variable de entorno (ej: BASE_URL)
+        # Eliminar posibles \r residuales del valor
+        envvar = $2
+        gsub(/\r/, "", envvar)
+        if (envvar in ENVIRON) {
+            print $1 "=" ENVIRON[envvar]
+        } else {
+            print $1 "=" envvar
+        }
+    }
+}' $JBOSS_SYSTEM_PROPS_FILE > $TEMP_PROPS_FILE && mv $TEMP_PROPS_FILE $JBOSS_SYSTEM_PROPS_FILE
 echo "...fitxers de properties modificats"
