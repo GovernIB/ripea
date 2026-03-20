@@ -695,7 +695,8 @@ const translationCa = {
                 },
                 impDocMass: {
                     label: "Importar documents als expedients seleccionats",
-                    title: "Importar documents a expedients",
+                    title: "Importació de documents",
+                    mssg: "Els documents que adjunteu s'incorporaran als {{num}} expedients seleccionats",
                     warning: "Els expedients han de pertànyer al mateix procediment.",
                 },
                 comment: {

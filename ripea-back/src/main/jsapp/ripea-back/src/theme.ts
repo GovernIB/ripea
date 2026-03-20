@@ -227,6 +227,7 @@ const base: ThemeOptions = {
 const lightPalete = {
     mode: 'light',
     primary: {main: '#337ab7', contrastText: "#fff"},
+    text: { disabled: '#555555 !important' },
     warning: {main: '#8a6d3b'},
     action: {
         disabled: '#555555',
@@ -256,7 +257,6 @@ export const lightTheme = createTheme(base, {
             styleOverrides: {
                 root: {
                     '&.Mui-disabled': {
-                        color: lightPalete.action.disabled,
                         backgroundColor: lightPalete.action.disabledBackground,
                     },
                     '& input[readonly][aria-hidden="false"]': {
