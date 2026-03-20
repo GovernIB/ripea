@@ -2,7 +2,7 @@ import {useRef} from "react";
 import {Box, Grid} from "@mui/material";
 import {MuiFormDialog, useBaseAppContext, MuiFormDialogApi, useFormContext} from "reactlib";
 import {useTranslation} from "react-i18next";
-import {CardData, DetailCardContent} from "../../../components/CardData.tsx";
+import {CardData} from "../../../components/CardData.tsx";
 import GridFormField from "../../../components/GridFormField.tsx";
 import {useUserSession} from "../../../components/Session.tsx";
 import * as builder from '../../../util/springFilterUtils';
