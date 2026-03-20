@@ -1,14 +1,16 @@
 import {useRef} from "react";
-import {Grid} from "@mui/material";
+import {Box, Grid} from "@mui/material";
 import {MuiFormDialog, useBaseAppContext, MuiFormDialogApi, useFormContext} from "reactlib";
 import {useTranslation} from "react-i18next";
-import {CardData} from "../../../components/CardData.tsx";
+import {CardData, DetailCardContent} from "../../../components/CardData.tsx";
 import GridFormField from "../../../components/GridFormField.tsx";
 import {useUserSession} from "../../../components/Session.tsx";
 import * as builder from '../../../util/springFilterUtils';
+import {FieldData, MuiDetail} from "../../../components/MuiDetail.tsx";
+import {StyledLabel} from "../../../components/StyledLabel.tsx";
 
 const PerfilFrom = () =>{
-    const {data} = useFormContext();
+    const {data, fields} = useFormContext();
     const { t } = useTranslation();
     const { value: user } = useUserSession();
 
@@ -18,11 +20,21 @@ const PerfilFrom = () =>{
             cardProps={{border: '1px solid #004B99'}}
             headerProps={{color: 'white', backgroundColor: '#004B99 !important', borderBottom: 'none'}}
         >
-            <GridFormField xs={12} name="nom" disabled readOnly/>
+            <MuiDetail entity={data} fields={fields} sx={{ width: '100%'}}>
+                <FieldData field={"nom"} sx={{border: 'none'}} size={4}/>
+                <FieldData field={"email"} sx={{borderTop: 'none'}} size={4}/>
+                <FieldData field={"rols"} sx={{borderTop: 'none'}} size={4} commponentProps={{ component: Box }} isObject>
+                    <Box display={'flex'} flexWrap="wrap" gap={1}>
+                        {user?.auth.map((r) => <StyledLabel backgroundColor={'#6e6e6e'}>{r}</StyledLabel>)}
+                    </Box>
+                </FieldData>
+            </MuiDetail>
+
+            {/*<GridFormField xs={12} name="nom" disabled readOnly/>*/}
             {/*<GridFormField xs={12} name="nif" disabled readOnly/>*/}
-            <GridFormField xs={12} name="email" disabled readOnly/>
+            {/*<GridFormField xs={12} name="email" disabled readOnly/>*/}
             <GridFormField xs={12} name="emailAlternatiu"/>
-            <GridFormField xs={12} name="rols" value={user?.auth} disabled readOnly multiple/>
+            {/*<GridFormField xs={12} name="rols" value={user?.auth} disabled readOnly multiple/>*/}
             <GridFormField xs={12} name="idioma" required/>
         </CardData>
 
