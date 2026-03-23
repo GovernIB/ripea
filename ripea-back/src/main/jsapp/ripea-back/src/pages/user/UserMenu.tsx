@@ -22,7 +22,7 @@ const MenuSelect = (props:any) => {
             <Icon fontSize="small">{icon}</Icon>
         </ListItemIcon>
 
-        <FormControl sx={{ minWidth: 90 }} size="small">
+        <FormControl sx={{ minWidth: 90, width: '100%' }} size="small">
             <Select
                 open={open}
                 size="small" variant="standard"

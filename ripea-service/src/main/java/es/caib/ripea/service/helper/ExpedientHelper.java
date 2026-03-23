@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -980,6 +981,57 @@ public class ExpedientHelper {
 
 	}
 
+	static Map<Long, Object> locks = new ConcurrentHashMap<>();
+	
+	@Transactional
+	public Exception retryCreateDocFromAnnex(Long registreAnnexId, Long metaDocumentId, String rolActual) {
+
+		Exception exception;
+		boolean creatDbOk = true;
+		
+		if (!locks.containsKey(registreAnnexId)) {
+			locks.put(registreAnnexId, new Object());
+		}
+		
+		synchronized (locks.get(registreAnnexId)) {
+
+			try {
+				RegistreAnnexEntity registreAnnexEntity = registreAnnexRepository.getOne(registreAnnexId);
+				ExpedientPeticioEntity expedientPeticioEntity = registreAnnexEntity.getRegistre().getExpedientPeticions().get(0);
+				if (expedientPeticioEntity.getExpedient() == null) {
+					throw new RuntimeException("Anotació pendent amb id: " + expedientPeticioEntity.getId() + " no té expedient associat en la base de dades.");
+				}
+
+				exception = crearDocFromAnnex(expedientPeticioEntity.getExpedient().getId(), registreAnnexId, expedientPeticioEntity.getId(), metaDocumentId, rolActual);
+			} catch (Exception e) {
+				exception = e;
+				creatDbOk = false;
+				logger.error("Error al crear doc from annex", e);
+				updateRegistreAnnexError(registreAnnexId, ExceptionUtils.getStackTrace(e));
+			}
+			
+	
+			RegistreAnnexEntity registreAnnexEntity = registreAnnexRepository.getOne(registreAnnexId);
+			ExpedientPeticioEntity expedientPeticioEntity = registreAnnexEntity.getRegistre().getExpedientPeticions().get(0);
+			
+			boolean allOk = true;
+			for (RegistreAnnexEntity registreAnnex : expedientPeticioEntity.getRegistre().getAnnexos()) {
+				if (registreAnnex.getError() != null) {
+					allOk = false;
+				}
+			}
+			if (allOk) {
+				notificarICanviEstatToProcessatNotificat(expedientPeticioEntity);
+			}
+		}
+		
+		if (creatDbOk){
+			locks.remove(registreAnnexId);
+		}
+
+		return exception;
+	}
+	
 	/**
 	 * Creates document from registre annex
 	 * @param expedientId 

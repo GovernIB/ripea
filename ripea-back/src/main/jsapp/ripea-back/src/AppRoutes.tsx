@@ -45,6 +45,7 @@ import {ServeiPinbalGrid} from "./pages/user/configurar/ServeiPinbalGrid.tsx";
 import {Propietats, PropietatsByEntitat} from "./pages/user/propietats/Propietats.tsx";
 import {ExcepcioGrid} from "./pages/user/monitor/ExcepcioGrid.tsx";
 import {IntegracioGrid} from "./pages/user/monitor/integracio/IntegracioGrid.tsx";
+import Accesibilitat from "./pages/Accesibilitat.tsx";
 
 const ProtectedRoute = ({ allowedRoles = [], params = [] }: any) => {
     const {value: user} = useUserSession();
@@ -134,6 +135,7 @@ const AppRoutes: React.FC = () => {
             </Route>
         </Route>
 
+        <Route path="accessibilitat" element={<Accesibilitat />} />
         <Route path="*" element={<NotFoundPage />} />
     </Routes>;
 }

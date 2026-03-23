@@ -2,7 +2,7 @@ import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 import {GridPage, useResourceApiService} from 'reactlib';
 import {useState, useEffect} from "react";
-import {Typography, Grid2 as Grid, Icon, IconButton, Link, Alert, Button, Box, Grid2} from '@mui/material';
+import {Typography, Grid2 as Grid, Icon, IconButton, Link, Alert, Button, Box} from '@mui/material';
 import {formatDate} from '../../../util/dateUtils.ts';
 import TabComponent from "../../../components/TabComponent.tsx";
 import InteressatsGrid from "../../interessats/InteressatsGrid.tsx";
@@ -45,11 +45,11 @@ const ExpedientsRelacionats = (props:any) => {
     if (relacionats.length == 0)
         return <></>
 
-    return <Grid2 size={12} p={1} my={2}>
+    return <Grid size={12} p={1} my={2}>
         <DetailCard title={t('page.contingut.action.importarExpedient.title')} display={'flex'} flexDirection={'column'} sx={{ px: 1 }} hidden={relacionats?.length==0}>
             {
                 relacionats?.map((relacionat:any) =>
-                    <Grid key={relacionat?.id} container alignItems="center">
+                    <Grid key={relacionat?.id} container display={'flex'} alignItems="center">
                         <Grid size={1}>
                             <Icon sx={{ fontSize: "1.3rem", paddingTop: "4px" }}>drive_file_move</Icon>
                         </Grid>
@@ -70,7 +70,7 @@ const ExpedientsRelacionats = (props:any) => {
                 )
             }
         </DetailCard>
-    </Grid2>
+    </Grid>
 }
 
 export const ExpedientInfo = (props:any) => {
@@ -90,9 +90,9 @@ export const ExpedientInfo = (props:any) => {
         <ExpedientsRelacionats entity={expedient}/>
 
         {!readOnly &&
-            <Grid2 size={12} display={'flex'} justifyContent={'end'} p={1}>
+            <Grid size={12} display={'flex'} justifyContent={'end'} p={1}>
                 <ExpedientActionButton entity={expedient}/>
-            </Grid2>
+            </Grid>
         }
     </DetailCard>
 }
@@ -112,7 +112,7 @@ const ExpedientAlert = (props:any) => {
     const {handleOpen: hanldeErrorValidacio, dialog: dialogErrorValidacio} = useErrorValidacio();
 
     return <>
-        {expedient?.agafatPer?.id != user?.codi && expedient?.usuariActualWrite && !rol?.isAdminLectura &&
+        {expedient?.agafatPer?.id != user?.codi && expedient?.usuariActualWrite && !rol?.isAdminLectura && user?.rolActual != 'IPA_ADMIN' &&
             <Alert severity="info"
                    action={
                        <Button sx={{py:0}} 
@@ -121,7 +121,7 @@ const ExpedientAlert = (props:any) => {
 						   <Typography variant={"subtitle2"}>{t('page.expedient.action.agafar.label')}</Typography>
                        </Button>
                    }
-            >{user?.rolActual != 'IPA_ADMIN' && t('page.expedient.alert.owner')}</Alert>
+            >{t('page.expedient.alert.owner')}</Alert>
         }
         { expedient?.estat == "OBERT" && expedient?.hasEsborranys && user?.sessionScope?.isConvertirDefinitiuActiu &&
             <Alert severity="info">{t('page.expedient.alert.esborranys')}</Alert>
@@ -143,8 +143,8 @@ const ExpedientAlert = (props:any) => {
         { ((!expedient?.valid && validacio?.errorsValidacio == null) || (validacio?.errorsValidacio?.length > 0)) &&
             <Alert severity="warning"
                    action={
-                       <Button  sx={{py: 0}} variant="outlined"
-                                onClick={() => hanldeErrorValidacio(expedient?.id, expedient)}>
+                       <Button sx={{py: 0}} variant="outlined"
+                               onClick={() => hanldeErrorValidacio(expedient?.id, expedient)}>
                             <Icon>search</Icon>
                            <Typography variant={"subtitle2"}>{t('common.consult')}</Typography>
                        </Button>

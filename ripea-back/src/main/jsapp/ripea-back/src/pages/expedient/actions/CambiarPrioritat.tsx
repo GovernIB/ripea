@@ -1,5 +1,5 @@
 import {MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
-import {Grid} from "@mui/material";
+import {Grid2 as Grid} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
 import {useRef} from "react";
 import {useTranslation} from "react-i18next";
@@ -9,9 +9,9 @@ const CambiarPrioritatForm = () => {
     const {data} = useFormContext();
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="nom" disabled readOnly hidden={data?.massivo}/>
-        <GridFormField xs={12} name="prioritat" required/>
-        <GridFormField xs={12} name="prioritatMotiu" type={"textarea"} hidden={data?.prioritat=='B_NORMAL'} required/>
+        <GridFormField name="nom" disabled readOnly hidden={data?.massivo}/>
+        <GridFormField name="prioritat" required/>
+        <GridFormField name="prioritatMotiu" type={"textarea"} hidden={data?.prioritat=='B_NORMAL'} required/>
     </Grid>
 }
 
@@ -70,7 +70,7 @@ export const useCambiarPrioritatMassive = (refresh?: () => void) => {
     }
     const onSuccess = (data:any) :void => {
         refresh?.()
-        temporalMessageShow(null, t('page.expedient.action.changePrioritat.massiveOk', {data}), 'success');
+        temporalMessageShow(null, t('page.expedient.action.changePrioritat.massiveOk', {data}), 'info');
     }
 
     return {

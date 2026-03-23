@@ -11,11 +11,11 @@ import {useActions, useMassiveActions} from "../../anotacions/details/AnotacioAc
 
 const ActualitzarEstatAnotacioFilterFrom = () => {
     return <>
-        <GridFormField xs={3} name="numero"/>
-        <GridFormField xs={3} name="dataAltaInici" type={"date"}/>
-        <GridFormField xs={3} name="dataAltaFi" type={"date"}/>
-        <GridFormField xs={2} name="estat"/>
-        <GridButtonField xs={1} icon={"warning"} name="nomesPendents"/>
+        <GridFormField size={{xs: 12, sm: 4, md: 3}} name="numero"/>
+        <GridFormField size={{xs: 12, sm: 4, md: 3}} name="dataAltaInici" type={"date"}/>
+        <GridFormField size={{xs: 12, sm: 4, md: 3}} name="dataAltaFi" type={"date"}/>
+        <GridFormField size={{xs: 12, sm: 3, md: 2}} name="estat"/>
+        <GridButtonField size={{xs: 12, sm: 3, md: 1}} icon={"warning"} name="nomesPendents"/>
     </>
 }
 

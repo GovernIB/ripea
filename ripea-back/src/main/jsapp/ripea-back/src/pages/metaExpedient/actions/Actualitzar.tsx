@@ -1,5 +1,5 @@
 import {useRef, useState} from "react";
-import {Grid} from "@mui/material";
+import {Grid2 as Grid} from "@mui/material";
 import {useBaseAppContext, MuiFormDialogApi } from "reactlib";
 import {useTranslation} from "react-i18next";
 import {CardData} from "../../../components/CardData.tsx";
@@ -11,7 +11,7 @@ const ActualitzarResultProcessor = (props:any) => {
 
     return <Grid container sx={{display: "flex", flexDirection: "row", wordWrap: "break-word"}} columnSpacing={1} rowSpacing={1}>
         <CardData title={t('page.metaExpedient.action.actualize.result.title')} variant={"h6"}>
-            <Grid item xs={12}>
+            <Grid size={12}>
                 {t('page.metaExpedient.action.actualize.result.description', {
                     numOperacions: entity?.numOperacions,
                     numActualitzats: entity?.numElementsActualitzats,
@@ -28,23 +28,23 @@ const ActualitzarResultProcessor = (props:any) => {
                 hidden={!i?.codiSia || !i?.hasError}
                 variant={"h6"}
             >
-                <Grid item xs={12}>{i?.errorText}</Grid>
+                <Grid size={12}>{i?.errorText}</Grid>
             </CardData>
             <CardData
-                title={`Procediment: ${i?.codiSia} - ${i?.nomAntic}`}
+                title={`${t('page.metaExpedient.title')}: ${i?.codiSia} - ${i?.nomAntic}`}
                 cardProps={{border: '1px solid #e3f2fd'}}
                 headerProps={{ backgroundColor: '#e3f2fd', color: 'info.main' }}
                 hidden={!i?.codiSia || !i?.hasCanvis}
                 variant={"h6"}
             >
-                <Grid item xs={12}>{i?.descripcioNova}</Grid>
+                <Grid size={12}>{i?.descripcioNova}</Grid>
             </CardData>
             <CardData
-                title={`Procediment: ${i?.codiSia} - ${i?.nomAntic}`}
+                title={`${t('page.metaExpedient.title')}: ${i?.codiSia} - ${i?.nomAntic}`}
                 hidden={!i?.codiSia || i?.hasCanvis || i?.hasError}
                 variant={"h6"}
             >
-                <Grid item xs={12}>{t('page.metaExpedient.action.actualize.result.senseCanvi')}</Grid>
+                <Grid size={12}>{t('page.metaExpedient.action.actualize.result.senseCanvi')}</Grid>
             </CardData>
         </>)}
     </Grid>

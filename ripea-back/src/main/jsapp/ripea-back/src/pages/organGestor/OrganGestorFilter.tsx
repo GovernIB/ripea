@@ -5,10 +5,10 @@ import GridFormField from "../../components/GridFormField.tsx";
 
 const OrganGestorFilterForm = () => {
     return <>
-        <GridFormField xs={2} name="codi"/>
-        <GridFormField xs={2} name="nom"/>
-        <GridFormField xs={3} name="organGestor"/>
-        <GridFormField xs={2} name="estat"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 2}} name="codi"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 2.6}} name="nom"/>
+        <GridFormField size={{xs: 12, sm: 12, md: 3}} name="organGestor"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 2}} name="estat"/>
     </>
 }
 

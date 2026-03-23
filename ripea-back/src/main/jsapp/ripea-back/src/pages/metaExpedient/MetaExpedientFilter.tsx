@@ -7,15 +7,15 @@ import {useUserSession} from "../../components/Session.tsx";
 const MetaExpedientFilterForm = ({ user }:any) => {
     const { data } = useFormContext();
     return <>
-        <GridFormField xs={2} name="tipus"/>
-        <GridFormField xs={2} name="codi"/>
-        <GridFormField xs={3} name="nom"/>
-        <GridFormField xs={3} name="classificacio"/>
-        <GridFormField xs={2} name="actiu"/>
-        <GridFormField xs={2} name="revisioEstat" hidden={!user?.sessionScope?.isRevisioActiva}/>
-        <GridFormField xs={2} name="ambit"/>
-        <GridFormField xs={3} name="organGestor" disabled={data?.ambit == 'COMUNS'}/>
-        <GridButtonField xs={1.6}
+        <GridFormField size={{xs: 12, sm: 6, md: 2}} name="tipus"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 2}} name="codi"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="nom"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="classificacio"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 2}} name="actiu"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 2}} name="revisioEstat" hidden={!user?.sessionScope?.isRevisioActiva}/>
+        <GridFormField size={{xs: 12, sm: 6, md: 2}} name="ambit"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="organGestor" disabled={data?.ambit == 'COMUNS'}/>
+        <GridButtonField size={{xs: 12, sm: 3, md: 2}}
             name="permisDirecte"
             icon={"pan_tool_alt"}
             whitLabel

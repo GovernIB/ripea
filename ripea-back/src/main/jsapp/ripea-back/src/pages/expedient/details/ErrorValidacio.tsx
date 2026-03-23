@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {Grid, Alert, Icon} from "@mui/material";
+import {Grid2 as Grid, Alert, Icon} from "@mui/material";
 import {MuiDialog} from "reactlib";
 import {useTranslation} from "react-i18next";
 import Load from "../../../components/Load.tsx";
@@ -11,13 +11,13 @@ const ErrorValidacio = (props:any) => {
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         {
-            errors?.map((validacio:any, index:number)=> <Grid item xs={12} key={`validacio-${index}`} container direction={"row"} columnSpacing={1} rowSpacing={1}>
-                <Grid item xs={12} hidden={!validacio?.metaDada}><Alert severity="warning" icon={<Icon>create</Icon>}>{t('page.alert.errors.metaDada')} {validacio?.metaDada?.nom} ({validacio?.metaDada?.tipus})</Alert></Grid>
-                <Grid item xs={12} hidden={!validacio?.metaDocument}><Alert severity="warning" icon={<Icon>insert_drive_file</Icon>}>{t('page.alert.errors.metaDocument')} {validacio?.metaDocument?.nom}</Alert></Grid>
+            errors?.map((validacio:any, index:number)=> <Grid size={12} key={`validacio-${index}`} container direction={"row"} columnSpacing={1} rowSpacing={1}>
+                <Grid size={12} hidden={!validacio?.metaDada}><Alert severity="warning" icon={<Icon>create</Icon>}>{t('page.alert.errors.metaDada')} {validacio?.metaDada?.nom} ({validacio?.metaDada?.tipus})</Alert></Grid>
+                <Grid size={12} hidden={!validacio?.metaDocument}><Alert severity="warning" icon={<Icon>insert_drive_file</Icon>}>{t('page.alert.errors.metaDocument')} {validacio?.metaDocument?.nom}</Alert></Grid>
 
-                <Grid item xs={12} hidden={!validacio?.documentsWithoutMetaDocument}><Alert severity="warning">{t('page.alert.errors.metaNode')}</Alert></Grid>
-                <Grid item xs={12} hidden={!validacio?.withNotificacionsNoFinalitzades}><Alert severity="warning">{t('page.alert.errors.noFinalitzades')}</Alert></Grid>
-                <Grid item xs={12} hidden={!validacio?.expedientWithoutInteressats}><Alert severity="warning">{t('page.alert.errors.interessatObligatori')}</Alert></Grid>
+                <Grid size={12} hidden={!validacio?.documentsWithoutMetaDocument}><Alert severity="warning">{t('page.alert.errors.metaNode')}</Alert></Grid>
+                <Grid size={12} hidden={!validacio?.withNotificacionsNoFinalitzades}><Alert severity="warning">{t('page.alert.errors.noFinalitzades')}</Alert></Grid>
+                <Grid size={12} hidden={!validacio?.expedientWithoutInteressats}><Alert severity="warning">{t('page.alert.errors.interessatObligatori')}</Alert></Grid>
             </Grid>)
         }
     </Grid>

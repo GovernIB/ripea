@@ -2,7 +2,7 @@ import {useTranslation} from "react-i18next";
 import {GridPage, useBaseAppContext, useMuiDataGridApiRef, useResourceApiService} from "reactlib";
 import {CardPage} from "../../../components/CardData.tsx";
 import StyledMuiGrid, {ToolbarButton} from "../../../components/StyledMuiGrid.tsx";
-import { Grid } from "@mui/material";
+import { Grid2 as Grid } from "@mui/material";
 import GridFormField, {PasswordFormField} from "../../../components/GridFormField.tsx";
 
 const useActions = (refresh?: () => void) => {
@@ -32,12 +32,12 @@ const useActions = (refresh?: () => void) => {
 // Grid
 const DominiForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="codi"/>
-        <GridFormField xs={12} name="nom"/>
-        <GridFormField xs={12} name="descripcio" type={"textarea"}/>
-        <GridFormField xs={12} name="consulta" type={"textarea"}
+        <GridFormField name="codi"/>
+        <GridFormField name="nom"/>
+        <GridFormField name="descripcio" type={"textarea"}/>
+        <GridFormField name="consulta" type={"textarea"}
                        componentProps={{ InputLabelProps: { shrink: true }, placeholder: "SELECT field_id AS ID, field_valor AS VALOR FROM tables" }}/>
-        <GridFormField xs={12} name="cadena" type={"textarea"}
+        <GridFormField name="cadena" type={"textarea"}
                        componentProps={{ InputLabelProps: { shrink: true }, placeholder: "" +
                                "<local-tx-datasource>\n" +
                                "  <connection-url>jdbc:oracle:thin:@localhost:1521/orcl</connection-url>\n" +
@@ -45,7 +45,7 @@ const DominiForm = () => {
                                "  <user-name>usuari</user-name>\n" +
                                "</local-tx-datasource>"
                        }}/>
-        <PasswordFormField xs={12} name="contrasenya" />
+        <PasswordFormField name="contrasenya" />
     </Grid>
 }
 

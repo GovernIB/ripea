@@ -17,6 +17,7 @@ import useDescargarDocuments from "../actions/DescargarDocuments.tsx";
 import useModifyExpedient from "../actions/ModifyExpedient.tsx";
 import {useNavigate} from "react-router-dom";
 import useMoureTot from '../actions/MoureTot.tsx';
+import {useExportarExpedient} from "../actions/ExportarExpedientsMassive.tsx";
 
 export const iniciaDescarga = (url:string, fileName:string) => {
     const link = document.createElement('a');
@@ -54,6 +55,7 @@ export const useActions = (refresh?: () => void) => {
         artifactAction: apiAction,
 		artifactReport: apiReport,
     } = useResourceApiService('expedientResource');
+
     const {messageDialogShow, temporalMessageShow} = useBaseAppContext();
     const confirmDialogButtons = useConfirmDialogButtons().reverse();
     const confirmDialogComponentProps = {maxWidth: 'sm', fullWidth: true};
@@ -161,11 +163,9 @@ export const useActions = (refresh?: () => void) => {
             });
     }
 
-    const exportIndexPdf= (id:any) => report(id, 'EXPORT_INDEX_PDF', t('page.expedient.results.actionOk'), 'PDF')
-	const exportIndexXls= (id:any) => report(id, 'EXPORT_INDEX_XLS', t('page.expedient.results.actionOk'), 'XLSX')
+    const exportGeneric= (id:any) => report(id, 'EXPORT_GENERIC', t('page.expedient.results.actionOk'), 'PDF')
 	const exportPdfEni= (id:any) => report(id, 'EXPORT_INDEX_ENI', t('page.expedient.results.actionOk'), 'ZIP')
-	const exportEni= (id:any) => report(id, 'EXPORT_ENI', t('page.expedient.results.actionOk'), 'ZIP')
-	const exportInside= (id:any) => report(id, 'EXPORT_INSIDE', t('page.expedient.results.actionOk'), 'ZIP')
+
     const eliminarRelacio = (id:any, row:any, relacioId:any) => {
         messageDialogShow(
             '',
@@ -205,11 +205,8 @@ export const useActions = (refresh?: () => void) => {
         retornar,
         alliberar,
         eliminar,
-        exportIndexPdf,
-        exportIndexXls,
+        exportGeneric,
         exportPdfEni,
-        exportEni,
-        exportInside,
         syncArxiu,
         guardarArxiu,
         eliminarRelacio,
@@ -230,11 +227,7 @@ export const useCommonActions = (refresh?: () => void) => {
         retornar,
         alliberar,
         eliminar,
-        exportIndexPdf,
-        exportIndexXls,
         exportPdfEni,
-        exportEni,
-        exportInside,
         syncArxiu,
     } = useActions(refresh);
     const {handleOpen: handelHistoricOpen, dialog: dialogHistoric} = useHistoric();
@@ -246,7 +239,7 @@ export const useCommonActions = (refresh?: () => void) => {
     const {handleShow: handleExportDoc, content: contentExportDoc} = useExportarDocuments();
     const {handleShow: handleTancar, content: contentTancar} = useTancar(refresh);
     const {handleShow: handleDescargarDocuments, content: contentDescargarDocuments} = useDescargarDocuments();
-
+    const {handleShow: handleExportExp, content: contentExportMass} = useExportarExpedient();
     const {handleShow: handleModifyExpedient, content: contentModifyExpedient} = useModifyExpedient(refresh)
 	const {handleShow: handleMoureTot, content: contentMoureTot} = useMoureTot(refresh)
 	
@@ -389,58 +382,27 @@ export const useCommonActions = (refresh?: () => void) => {
             onClick: handelHistoricOpen,
         },
         {
-            label: t('page.expedient.action.download.label'),
-            icon: "download",
+            label: t('page.expedient.action.exportMass.unic'),
+            icon: "file_download",
             showInMenu: true,
-            onClick: handleDescargarDocuments,
+			onClick: handleExportExp,
             hidden: (row:any) => !row?.conteDocuments,
-        },
-        {
-            label: t('page.expedient.action.exportPDF.label'),
-            icon: "format_list_numbered",
-            showInMenu: true,
-			onClick: exportIndexPdf,
-            hidden: (row:any) => !row?.conteDocuments,
-        },
-        {
-            label: t('page.expedient.action.exportEXCEL.label'),
-            icon: "lists",
-            showInMenu: true,
-			onClick: exportIndexXls,
-            hidden: (row:any) => !(row?.conteDocuments && user?.sessionScope?.isExportacioExcelActiva),
-        },
-        {
-            label: t('page.expedient.action.exportPDF_ENI.label'),
-            icon: "format_list_numbered",
-            showInMenu: true,
-			onClick: exportPdfEni,
-            disabled: (row:any) => !row?.conteDocumentsDefinitius,
-            hidden: (row:any) => !row?.conteDocuments,
-        },
-        {
-            label: t('page.expedient.action.exportENI.label'),
-            icon: "folder_code",
-            showInMenu: true,
-			onClick: exportEni,
-			disabled: (row:any) => !row?.conteDocumentsDefinitius,
-			hidden: (row:any) => !row?.conteDocuments,
-        },
-        {
-            label: t('page.expedient.action.exportINSIDE.label'),
-            icon: "folder_zip",
-            showInMenu: true,
-			onClick: exportInside,
-            disabled: (row:any) => !row?.conteDocumentsDefinitius,
-            hidden: (row:any) => !(row?.conteDocuments && user?.sessionScope?.isExportacioInsideActiva),
         },
         {
             label: t('page.expedient.action.export.label'),
-            icon: "description",
+            icon: "folder_zip",
             showInMenu: true,
 			onClick: handleExportDoc,
             disabled: (row:any) => !row?.conteDocumentsDefinitius,
             hidden: (row:any) => !row?.conteDocuments,
         },
+        {
+            label: t('page.expedient.action.download.label'),
+            icon: "description",
+            showInMenu: true,
+            onClick: handleDescargarDocuments,
+            hidden: (row:any) => !row?.conteDocuments,
+        },        
         {
             label: t('page.contingut.action.infoArxiu.label'),
             icon: "info",
@@ -473,6 +435,7 @@ export const useCommonActions = (refresh?: () => void) => {
         {contentDescargarDocuments}
         {contentModifyExpedient}
 		{contentMoureTot}
+        {contentExportMass}
     </>;
 
     return {

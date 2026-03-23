@@ -1,5 +1,5 @@
 import React, {useEffect, useMemo, useState} from "react";
-import {Button, Icon, Tooltip} from "@mui/material";
+import {Button, Icon, Tooltip, Typography} from "@mui/material";
 import {GridSlots, useGridApiRef as useMuiDatagridApiRef} from "@mui/x-data-grid-pro";
 import {MuiDataGridProps, MuiGrid, useMuiDataGridApiRef} from "reactlib";
 import {useTranslation} from "react-i18next";
@@ -20,11 +20,12 @@ export const ToolbarButton = (props:any) => {
             <Button
                 variant="outlined"
                 size="small"
-                startIcon={<Icon sx={children ?{} :{m: 0}}>{icon}</Icon>}
+                startIcon={<Icon sx={{m: 0}}>{icon}</Icon>}
                 {...other}
                 sx={{ borderRadius: '4px',  minWidth: '20px', minHeight: '32px' }}
             >
-                {children}
+                {children && <Typography variant={'body2'} sx={{display: {xs: 'none', sm: 'none', md: 'block'}}}
+                             ml={1}>{children}</Typography>}
             </Button>
         </span>
     </Tooltip>
@@ -173,7 +174,7 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
         return columns.filter((col:any) => !col?.hidden).map((col:any) => ({
             ...col,
             flex: col.flex ?? 1,
-            // cellClassName: col?.wordWrap ? 'multi-line-cell' : undefined,
+            //cellClassName: (user?.conf?.numElementsPagina!= null) ? 'multi-line-cell' : undefined,
         }));
     }, [columns])
 

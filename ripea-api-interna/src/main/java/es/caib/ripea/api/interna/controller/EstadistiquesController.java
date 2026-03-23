@@ -6,16 +6,11 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,7 +30,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping(BaseApiInternaSecurityConfig.VERSIO_API_COMANDA)
+@RequestMapping(BaseApiInternaSecurityConfig.VERSIO_API_COMANDA+"/estadistiques")
 @Tag(name = "Integració comanda - RIPEA", description = "Publicació de dades estadístiques de l'aplicació")
 public class EstadistiquesController extends BaseApiInternaController {
 
@@ -50,9 +45,8 @@ public class EstadistiquesController extends BaseApiInternaController {
         return manifestInfo;
     }
 	
-    @GetMapping("/estadistiquesInfo")
+    @GetMapping("/info")
     public EstadistiquesInfo statsInfo() throws IOException {
-    	autenticaAmbRolTothom();
         List<DimensioDesc> dimensions  = segonPlaService.getDimensionsInfo();
         List<IndicadorDesc> indicadors = segonPlaService.getIndicadorsInfo();
         return new EstadistiquesInfo()
@@ -63,16 +57,15 @@ public class EstadistiquesController extends BaseApiInternaController {
         		.indicadors(indicadors);
     }
 	
-    @GetMapping("/estadistiques")
+    @GetMapping
     public RegistresEstadistics estadistiques(HttpServletRequest request) throws Exception {
         LocalDate ayer = LocalDate.now().minusDays(1);
         DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd-MM-yyyy");
     	return estadistiques(request, ayer.format(formato));
     }
     
-    @GetMapping("/estadistiques/of/{data}")
+    @GetMapping("/of/{data}")
     public RegistresEstadistics estadistiques(HttpServletRequest request, @PathVariable String data) throws Exception {
-    	autenticaAmbRolTothom();
         LocalDate date = LocalDate.parse(data, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
         if (!segonPlaService.existeixenEstadistiques(date)) {
     		Date dateJava = Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
@@ -81,9 +74,8 @@ public class EstadistiquesController extends BaseApiInternaController {
         return segonPlaService.consultaEstadistiques(date);
     }
 
-    @GetMapping("/estadistiques/from/{dataInici}/to/{dataFi}")
+    @GetMapping("/from/{dataInici}/to/{dataFi}")
     public List<RegistresEstadistics> estadistiques(HttpServletRequest request, @PathVariable String dataInici, @PathVariable String dataFi) throws Exception {
-    	autenticaAmbRolTothom();
         List<RegistresEstadistics> result = new ArrayList<>();
         LocalDate dataFrom = LocalDate.parse(dataInici, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
         LocalDate dataTo = LocalDate.parse(dataFi, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
@@ -103,11 +95,5 @@ public class EstadistiquesController extends BaseApiInternaController {
 	        fechaLoop = fechaLoop.plusDays(1);
 	    }
 		return result;
-    }
-    
-    private void autenticaAmbRolTothom() {
-        User user = new User("$comanda_ripea", "comanda_ripea", Collections.singletonList(new SimpleGrantedAuthority("tothom")));
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 }

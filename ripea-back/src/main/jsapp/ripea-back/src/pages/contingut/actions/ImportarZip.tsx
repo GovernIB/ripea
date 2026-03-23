@@ -1,5 +1,5 @@
 import {useEffect, useRef, useState} from "react";
-import {Alert, Box, Grid} from "@mui/material";
+import {Alert, Box, Grid2 as Grid} from "@mui/material";
 import {FormField, MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
 import { useTranslation } from "react-i18next";
 import GridFormField, {FileFormField, formatByteCount} from "../../../components/GridFormField.tsx";
@@ -129,11 +129,10 @@ const ImportarZipForm = () => {
     ]
 
 	return <Grid container direction="row" columnSpacing={1} rowSpacing={1}>
-        <FileFormField xs={12} name="documentZip" required />
+        <FileFormField name="documentZip" required />
 
         <Load value={data?.documentsZip} noEffect>
-            <GridFormField xs={12}
-                           name={"tipusDocument#default"}
+            <GridFormField name={"tipusDocument#default"}
                            field={fieldTipusDocument}
                            onChange={(value:any) => {
                                data.documentsZip.forEach((row:any) => {
@@ -142,7 +141,7 @@ const ImportarZipForm = () => {
                            }}
                            namedQueries={[`CREATE_NEW_DOC#${apiRef?.current?.getId()}`]}
                            filter={metaDocumentFilter}/>
-            <Grid item xs={12}>
+            <Grid size={12}>
             <DataGridPro
                 rows={data.documentsZip}
                 columns={columns}
@@ -161,7 +160,7 @@ const ImportarZipForm = () => {
             </Grid>
 
             {!data?.documentsZip?.some?.((doc:any) => doc.importar) &&
-                <Grid item xs={12}>
+                <Grid size={12}>
                     <Alert severity={'error'}>{t('page.document.alert.documentsZip')}</Alert>
                 </Grid>
             }

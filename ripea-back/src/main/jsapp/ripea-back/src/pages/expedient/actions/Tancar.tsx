@@ -1,5 +1,5 @@
 import {useEffect, useMemo, useRef, useState} from "react";
-import {Grid, Alert, Box} from "@mui/material";
+import {Grid2 as Grid, Alert, Box} from "@mui/material";
 import {MuiFormDialogApi, useBaseAppContext, useFormContext, useResourceApiService} from "reactlib";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
@@ -22,7 +22,6 @@ const columns: any[] = [
     {
         field: 'createdDate',
         flex: 0.4,
-        wordWrap: true,
         align: 'left',
         valueFormatter: (value: any) => formatDate(value)
     },
@@ -89,10 +88,10 @@ const TancarForm = () => {
 
     return <Load value={entities && temp}>
         <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-            <Grid item xs={12} hidden={!rowsCount}>
+            <Grid size={12} hidden={!rowsCount}>
                 <Alert severity={"info"}>{t('page.expedient.alert.borradors')}</Alert>
             </Grid>
-            <Grid item xs={12}>
+            <Grid size={12}>
                 <Load value={selectedModel} noEffect>
                     <StyledMuiGrid
                         resourceName={"documentResource"}
@@ -143,14 +142,14 @@ const TancarForm = () => {
                 </Load>
             </Grid>
 
-            <Grid item xs={12} hidden={!temp?.conteNotificacionsCaducades}>
+            <Grid size={12} hidden={!temp?.conteNotificacionsCaducades}>
                 <Alert severity={"warning"}>{t('page.expedient.alert.notificacio')}</Alert>
             </Grid>
-            <Grid item xs={12} hidden={!temp?.conteDocumentsDeAnotacionesNoMogutsASerieFinal}>
+            <Grid size={12} hidden={!temp?.conteDocumentsDeAnotacionesNoMogutsASerieFinal}>
                 <Alert severity={"warning"}>{t('page.expedient.alert.documents')}</Alert>
             </Grid>
 
-            <GridFormField xs={12} name="motiu" type={"textarea"} required/>
+            <GridFormField name="motiu" type={"textarea"} required/>
         </Grid>
     </Load>
 }

@@ -17,25 +17,34 @@ const CanviEstatFilterFrom = (props:any) => {
     const { findExpedientByName = false } = props;
     const {data} = useFormContext();
 
-    const expedientFilter = builder.and(builder.eq('metaExpedient.id', data?.procediment?.id));
+    const expedientFilter = builder.and(
+        builder.eq('metaExpedient.id', data?.procediment?.id),
+        builder.eq('grup.id', data?.grup?.id)
+    );
 
     return <>
-        <GridFormField xs={3} name="procediment"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="procediment"/>
+        <GridFormField name="grup" size={{xs: 12, sm: 6, md: 3}}
+                       namedQueries={[`BY_PROCEDIMENT#${data?.procediment?.id}`]}
+                       disabled={!data?.procediment}
+                       hidden={!data?.mostrarGrups}/>
+
         {findExpedientByName
-            ? <GridFormField xs={3} name="nom"/>
-            : <GridFormField xs={3} name="expedient" filter={expedientFilter}/>
+            ? <GridFormField size={{xs: 12, sm: 6, md: 3}} name="nom"/>
+            : <GridFormField size={{xs: 12, sm: 6, md: 3}} name="expedient" filter={expedientFilter}/>
         }
 
-        <GridFormField xs={3} name="dataCreacioInici" type={"date"}/>
-        <GridFormField xs={3} name="dataCreacioFi" type={"date"}/>
-        <GridFormField xs={3} name="estat" requestParams={{metaExpedientId: data?.procediment?.id, withoutTancar: true}}/>
-        <GridFormField xs={3} name="prioritat"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="dataCreacioInici" type={"date"}/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="dataCreacioFi" type={"date"}/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="estat" requestParams={{metaExpedientId: data?.procediment?.id, withoutTancar: true}}/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="prioritat"/>
     </>
 }
 
 const springFilterBuilder = (data: any) => {
     return builder.and(
         builder.eq("metaExpedient.id", data?.procediment?.id),
+        builder.eq("grup.id", data?.grup?.id),
         builder.eq("id", data?.expedient?.id),
         builder.like("nom", data?.nom),
         builder.betweenDates("createdDate", data?.dataCreacioInici, data?.dataCreacioFi),

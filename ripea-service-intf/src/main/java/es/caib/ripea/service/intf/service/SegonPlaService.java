@@ -40,13 +40,18 @@ public interface SegonPlaService {
 	
 	void generarJsonMetriques() throws Exception;
 	
+	@PreAuthorize("hasRole('IPA_COM')")
 	List<ExplotFetsAmbDimensioDto> generarEstadistiquesDiaries(Date fecha) throws Exception;
 	
+	@PreAuthorize("hasRole('IPA_COM')")
 	public boolean existeixenEstadistiques(LocalDate date);
 	
+	@PreAuthorize("hasRole('IPA_COM')")
 	public RegistresEstadistics consultaEstadistiques(LocalDate date);	
 	
+	@PreAuthorize("hasRole('IPA_COM')")
 	public List<DimensioDesc> getDimensionsInfo();
 	
+	@PreAuthorize("hasRole('IPA_COM')")
 	public List<IndicadorDesc> getIndicadorsInfo();
 }

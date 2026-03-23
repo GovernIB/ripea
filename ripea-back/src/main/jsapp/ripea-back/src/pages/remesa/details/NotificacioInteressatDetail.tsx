@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {Box, Grid2, Typography} from "@mui/material";
+import {Box, Grid2 as Grid, Typography} from "@mui/material";
 import {BasePage, MuiDialog} from "reactlib";
 import {useTranslation} from "react-i18next";
 import TabComponent from "../../../components/TabComponent.tsx";
@@ -12,7 +12,7 @@ const Dades = (props:any) => {
     const { t } = useTranslation();
 
     return <BasePage>
-        <Grid2 container direction={"row"} columnSpacing={1} rowSpacing={2}>
+        <Grid container direction={"row"} columnSpacing={1} rowSpacing={2}>
             <DetailCard title={t('page.notificacioInteressat.detall.enviament')}>
                 <DetailCardContent title={t('page.notificacio.detall.notificacioIdentificador')} hidden={!entity?.notificacioInfo} size={6}>{entity?.notificacioInfo?.notificacioIdentificador}</DetailCardContent>
                 <DetailCardContent title={t('page.notificacioInteressat.detall.enviamentReferencia')} hidden={!entity?.notificacioInfo} size={6}>{entity?.enviamentReferencia}</DetailCardContent>
@@ -48,7 +48,7 @@ const Dades = (props:any) => {
                 <DetailCardContent title={t('page.interessat.detall.telefon')} hiddenIfEmpty>{entity?.representantInfo?.telefon}</DetailCardContent>
                 <DetailCardContent title={t('page.interessat.detall.email')} hiddenIfEmpty>{entity?.representantInfo?.email}</DetailCardContent>
             </DetailCard>
-        </Grid2>
+        </Grid>
     </BasePage>
 }
 

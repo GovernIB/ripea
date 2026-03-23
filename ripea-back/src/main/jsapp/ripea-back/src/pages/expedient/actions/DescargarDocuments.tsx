@@ -108,7 +108,7 @@ const DescargarDocuments = (props:any) => {
         reportFileType={'ZIP'}
         title={t('page.expedient.action.download.title')}
         formDialogButtons={[
-            {icon: 'download', text: t('page.expedient.action.download.button'), componentProps: { variant: 'contained' }, value: true },
+            {icon: 'description', text: t('page.expedient.action.download.button'), componentProps: { variant: 'contained' }, value: true },
             {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
         ]}
         formDialogComponentProps={{fullWidth: true, maxWidth: 'lg'}}

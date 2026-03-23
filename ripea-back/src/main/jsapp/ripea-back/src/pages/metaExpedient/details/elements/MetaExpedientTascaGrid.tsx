@@ -1,5 +1,5 @@
 import {useTranslation} from "react-i18next";
-import {Badge, Grid, Icon, Divider} from "@mui/material";
+import {Badge, Grid2 as Grid, Icon, Divider} from "@mui/material";
 import StyledMuiGrid from "../../../../components/StyledMuiGrid.tsx";
 import * as builder from "../../../../util/springFilterUtils.ts";
 import {useBaseAppContext, useFormContext, useMuiDataGridApiRef, useResourceApiService} from "reactlib";
@@ -46,16 +46,16 @@ const MetaExpedientTascaForm = () => {
     const {data} = useFormContext()
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="codi"/>
-        <GridFormField xs={12} name="nom"/>
-        <GridFormField xs={12} name="responsable"/>
-        <GridFormField xs={12} name="duracio" decimalScale={0}
+        <GridFormField name="codi"/>
+        <GridFormField name="nom"/>
+        <GridFormField name="responsable"/>
+        <GridFormField name="duracio" decimalScale={0}
                        componentProps={{helperText: t('page.metaExpedientTasca.detall.duracio')}}/>
-        <GridFormField xs={12} name="descripcio" type={"textarea"}/>
-        <GridFormField xs={12} name="prioritat" required/>
-        <GridFormField xs={12} name="estatCrearTasca" filter={builder.eq("metaExpedient.id", data?.metaExpedient?.id)}/>
-        <GridFormField xs={12} name="estatFinalitzarTasca" filter={builder.eq("metaExpedient.id", data?.metaExpedient?.id)}/>
-        <GridFormField xs={12} name="activa"/>
+        <GridFormField name="descripcio" type={"textarea"}/>
+        <GridFormField name="prioritat" required/>
+        <GridFormField name="estatCrearTasca" filter={builder.eq("metaExpedient.id", data?.metaExpedient?.id)}/>
+        <GridFormField name="estatFinalitzarTasca" filter={builder.eq("metaExpedient.id", data?.metaExpedient?.id)}/>
+        <GridFormField name="activa"/>
     </Grid>
 }
 

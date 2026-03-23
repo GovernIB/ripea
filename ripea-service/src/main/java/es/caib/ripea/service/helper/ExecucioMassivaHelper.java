@@ -10,6 +10,7 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -42,6 +43,7 @@ import es.caib.ripea.persistence.repository.InteressatRepository;
 import es.caib.ripea.persistence.repository.MetaDocumentRepository;
 import es.caib.ripea.persistence.repository.RegistreAnnexRepository;
 import es.caib.ripea.service.firma.DocumentFirmaPortafirmesHelper;
+import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentAmbTipusDto;
@@ -60,6 +62,7 @@ import es.caib.ripea.service.intf.dto.SignatureInfoDto;
 import es.caib.ripea.service.intf.exception.ArxiuJaGuardatException;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.exception.ValidationException;
+import es.caib.ripea.service.intf.model.ExpedientResource.ExportGenericForm;
 import es.caib.ripea.service.intf.utils.Utils;
 
 @Component
@@ -105,6 +108,88 @@ public class ExecucioMassivaHelper {
 			return resultat;
 		}
 		return null;
+	}
+	
+	public DownloadableFile getDownloadableFileFromExport(Long entitatId, ExportGenericForm params) throws IOException {
+    	
+		List<FitxerDto> fitxersGenerats = new ArrayList<FitxerDto>();
+		DownloadableFile resultat = null;
+				
+    	if (params.isExportarIndexXls()) {
+    		fitxersGenerats.add(expedientHelper.generarIndexExpedients(
+    				entitatId,
+    				new HashSet<>(params.getIds()),
+    				false,
+    				"XLSX"));
+    	}
+    	
+    	//Seria redundant exportar index PDF haguent marcat la opció de ExportarIndexPdfEni
+    	if (params.isExportarIndexPdf() && !params.isInlourerEstructEni()) {
+    		fitxersGenerats.add(expedientHelper.generarIndexExpedients(
+    				entitatId,
+    				new HashSet<>(params.getIds()),
+    				false,
+    				"PDF"));
+    	}
+    	
+    	if (params.isInlourerEstructEni()) {
+    		fitxersGenerats.add(expedientHelper.generarIndexExpedients(
+    				entitatId,
+    				new HashSet<>(params.getIds()),
+    				true,
+    				"PDF"));
+    	}
+
+    	if (params.isExportarIndexZip()) {
+    		fitxersGenerats.add(expedientHelper.generarIndexExpedients(
+    				entitatId,
+    				Utils.listToSet(params.getIds()),
+    				false,
+    				"ZIP"));
+    	}
+
+    	//Seria redundant exportar ENI haguent marcat la opció de ExportarIndexPdfEni
+    	if (params.isExportarEni() && !params.isInlourerEstructEni()) {
+    		fitxersGenerats.add(expedientHelper.exportarExpedient(new HashSet<>(params.getIds()), false));
+    	}
+
+    	if (params.isExportarInside()) {
+    		fitxersGenerats.add(expedientHelper.exportarExpedient(new HashSet<>(params.getIds()), true));
+    	}
+    	
+    	if (fitxersGenerats.size()==1) {
+        	resultat = new DownloadableFile(
+        			fitxersGenerats.get(0).getNom(),
+        			fitxersGenerats.get(0).getContentType(),
+        			fitxersGenerats.get(0).getContingut());
+    	} else {
+    		
+    	    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+    	    try (ZipOutputStream zipOut = new ZipOutputStream(baos)) {
+
+    	        for (FitxerDto fitxer : fitxersGenerats) {
+
+    	            if (fitxer.getContingut() == null || fitxer.getNom() == null) {
+    	                continue; // Saltar fitxers invàlids
+    	            }
+
+    	            ZipEntry zipEntry = new ZipEntry(fitxer.getNom());
+    	            zipEntry.setSize(fitxer.getContingut().length);
+    	            zipOut.putNextEntry(zipEntry);
+    	            zipOut.write(fitxer.getContingut());
+    	            zipOut.closeEntry();
+    	        }
+
+    	    } // El try-with-resources tanca i finalitza el ZipOutputStream aquí
+    	    
+        	resultat = new DownloadableFile(
+        			"Exportacio_expedient_"+params.getIds().get(0)+".zip",
+        			"application/zip",
+        			baos.toByteArray());
+    	}
+    	
+    	return resultat;
 	}
 	
 	public ByteArrayOutputStream getZipFromDocuments(List<DocumentDto> docsExp) throws IOException {
@@ -248,6 +333,76 @@ public class ExecucioMassivaHelper {
 		}
 		
 		return docsExp;
+	}
+	
+	public void crearExecucioMassiva(Long entitatId, ExecucioMassivaDto dto, ElementTipusEnumDto elementTipus) throws NotFoundException, ValidationException {
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				false,
+				false,
+				false, 
+				true, false);
+		
+		ExecucioMassivaEntity execucioMassiva = null;
+		
+		Date dataInici;
+		if (dto.getDataInici() == null) {
+			dataInici = new Date();
+		} else {
+			dataInici = dto.getDataInici();
+		}
+		
+		if (ExecucioMassivaTipusDto.PORTASIGNATURES.equals(dto.getTipus())) {
+			execucioMassiva = ExecucioMassivaEntity.getBuilder(
+					ExecucioMassivaTipusDto.PORTASIGNATURES,
+					dataInici,
+					dto.getMotiu(), 
+					dto.getPrioritat(),
+					dto.getPortafirmesResponsablesString(),
+					dto.getPortafirmesSequenciaTipus(),
+					dto.getPortafirmesFluxId(),
+					dto.getPortafirmesTransaccioId(),
+					dto.getDataCaducitat(), 
+					dto.getEnviarCorreu(),
+					entitat,
+					dto.getRolActual(),
+					dto.getPortafirmesAvisFirmaParcial(),
+					dto.getPortafirmesFirmaParcial()).build();
+		} else {
+			execucioMassiva = ExecucioMassivaEntity.getBuilder(dto.getTipus(), new Date(), null, entitat, dto.getRolActual()).build();
+			execucioMassiva.setExpedientOrigenId(dto.getExpedientOrigenId());
+			execucioMassiva.setExpedientDestiId(dto.getExpedientDestiId());
+			execucioMassiva.setIdentificadorAuxiliar(dto.getIdentificadorAuxiliar());
+		}
+		
+		int ordre = 0;
+		for (Long contingutId: dto.getContingutIds()) {
+			
+			String elementName = null;
+			
+			if (elementTipus == ElementTipusEnumDto.EXPEDIENT || elementTipus == ElementTipusEnumDto.DOCUMENT) {
+				elementName = contingutRepository.getOne(contingutId).getNom();
+			} else if (elementTipus == ElementTipusEnumDto.INTERESSAT) {
+				elementName = interessatRepository.getOne(contingutId).getNom();
+			} else if (elementTipus == ElementTipusEnumDto.ANOTACIO) {
+				elementName = expedientPeticioRepository.getOne(contingutId).getIdentificador();
+			} else if (elementTipus == ElementTipusEnumDto.ANNEX) {
+				elementName = registreAnnexRepository.getOne(contingutId).getNom();
+			} else if (elementTipus == ElementTipusEnumDto.ACCIO) {
+				elementName = "Element #"+contingutId;
+			}			
+			
+			ExecucioMassivaContingutEntity emc = ExecucioMassivaContingutEntity.getBuilder(
+					execucioMassiva, 
+					contingutId, 
+					elementName,
+					elementTipus, 
+					ordre++).build();
+			
+			execucioMassiva.addContingut(emc);
+		}
+
+		execucioMassivaRepository.save(execucioMassiva);
 	}
 	
 	public void saveExecucioMassiva(
@@ -452,7 +607,7 @@ public class ExecucioMassivaHelper {
 				} else if (ExecucioMassivaTipusDto.TANCAMENT.equals(tipus)){
 					exc = tancarExpedients(emc);
 				} else if (ExecucioMassivaTipusDto.ADJUNTAR_ANNEXOS_PENDENTS.equals(tipus)){
-					//TODO: Veurer com es la logica a MassiuAnnexProcesarController
+					exc = retryCreateDocFromAnnex(emc);
 				} else if (ExecucioMassivaTipusDto.ACTUALITZAR_ESTAT_ANOTACIONS.equals(tipus)){
 					exc = reintentarCanviEstatDistribucio(emc);
 				} else if (ExecucioMassivaTipusDto.FIRMASIMPLEWEB.equals(tipus)){
@@ -540,10 +695,24 @@ public class ExecucioMassivaHelper {
 		return exc;		
 	}
 	
+	private Throwable retryCreateDocFromAnnex(ExecucioMassivaContingutEntity emc) {
+		Throwable exc = null;
+		try {
+			exc = expedientHelper.retryCreateDocFromAnnex(
+					emc.getElementId(),
+					emc.getExecucioMassiva().getIdentificadorAuxiliar(),
+					"IPA_ADMIN");
+		} catch (Exception ex) {
+			logger.error("CONTINGUT MASSIU:" + emc.getId() + ". No s'ha pogut crear el document a partir del annex", ex);
+			exc = ex;
+		}
+		return exc;
+	}
+	
 	private Throwable reintentarCanviEstatDistribucio(ExecucioMassivaContingutEntity emc) {
 		Throwable exc = null;
 		try {
-			expedientPeticioHelper.reintentarCanviEstatDistribucio(emc.getElementId());
+			exc = expedientPeticioHelper.reintentarCanviEstatDistribucio(emc.getElementId());
 		} catch (Exception ex) {
 			logger.error("CONTINGUT MASSIU:" + emc.getId() + ". No s'ha pogut actualitzat l'estat a distribució de l'element", ex);
 			exc = ex;

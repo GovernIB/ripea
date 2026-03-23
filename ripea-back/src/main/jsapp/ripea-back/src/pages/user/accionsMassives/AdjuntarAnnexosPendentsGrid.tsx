@@ -1,6 +1,6 @@
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import {useTranslation} from "react-i18next";
-import {GridPage, useMuiDataGridApiRef} from "reactlib";
+import {GridPage, useFormContext, useMuiDataGridApiRef} from "reactlib";
 import {useMemo, useState} from "react";
 import {CardPage} from "../../../components/CardData.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
@@ -11,16 +11,26 @@ import {Alert, Link} from "@mui/material";
 import {Link as RouterLink } from 'react-router-dom';
 import {useSession} from "../../../components/SessionStorageContext.tsx";
 import {GridSortDirection} from "@mui/x-data-grid-pro";
-import {useAnexxActions} from "../../anotacions/details/AnotacioActions.tsx";
+import {useReintentar, useReintentarMassive} from "../../anotacions/actions/Reintentar.tsx";
 
 const AdjuntarAnnexosPendentsFilterFrom = () => {
+    const {data} = useFormContext();
+
+    const expedientFilter = builder.and(
+        builder.eq('metaExpedient.id', data?.procediment?.id),
+        builder.eq('grup.id', data?.grup?.id)
+    );
     return <>
-        <GridFormField xs={3} name="nom"/>
-        <GridFormField xs={3} name="numero"/>
-        <GridFormField xs={3} name="dataInici" type={"date"}/>
-        <GridFormField xs={3} name="dataFi" type={"date"}/>
-        <GridFormField xs={3} name="procediment"/>
-        <GridFormField xs={3} name="expedient"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="nom"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="numero"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="dataInici" type={"date"}/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="dataFi" type={"date"}/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="procediment"/>
+        <GridFormField name="grup" size={{xs: 12, sm: 6, md: 3}}
+                       namedQueries={[`BY_PROCEDIMENT#${data?.procediment?.id}`]}
+                       disabled={!data?.procediment}
+                       hidden={!data?.mostrarGrups}/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="expedient" filter={expedientFilter}/>
     </>
 }
 
@@ -31,6 +41,7 @@ const springFilterBuilder = (data: any) => {
         builder.exists(
             builder.and(
                 builder.eq("registre.expedientPeticions.expedient.id", data.expedient?.id),
+                builder.eq("registre.expedientPeticions.expedient.grup.id", data.grup?.id),
                 builder.eq("registre.expedientPeticions.expedient.metaExpedient.id", data.procediment?.id),
                 builder.betweenDates("registre.expedientPeticions.expedient.createdDate", data?.dataAltaInici, data?.dataAltaFi),
             )
@@ -99,14 +110,15 @@ const AdjuntarAnnexosPendentsGrid = () => {
         apiRef?.current?.refresh?.();
     }
 
-    const { reintentar, reintentarMassive } = useAnexxActions(refresh)
+    const {handleShow: handleReintentar, content: contentReintentar} = useReintentar(refresh, filterData?.procediment)
+    const {handleShow: handleReintentarMassive, content: contentReintentarMassive} = useReintentarMassive(refresh, filterData?.procediment)
 
     const actions = [
         {
             label: t('page.anotacio.action.procesarAnnexosPendents.label'),
             icon: "reply",
             showInMenu: false,
-            onClick: reintentar,
+            onClick: handleReintentar,
         },
     ]
     const massiveActions = [
@@ -114,7 +126,7 @@ const AdjuntarAnnexosPendentsGrid = () => {
             label: t('page.anotacio.action.procesarAnnexosPendents.label'),
             icon: "reply",
             showInMenu: false,
-            onClick: reintentarMassive,
+            onClick: handleReintentarMassive,
         },
     ]
 
@@ -143,6 +155,8 @@ const AdjuntarAnnexosPendentsGrid = () => {
                 toolbarHideCreate
             />
         </CardPage>
+        {contentReintentar}
+        {contentReintentarMassive}
     </GridPage>
 }
 export default AdjuntarAnnexosPendentsGrid;

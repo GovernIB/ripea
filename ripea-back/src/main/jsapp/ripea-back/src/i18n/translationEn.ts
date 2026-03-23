@@ -35,6 +35,7 @@ const translationEn = {
             update: "Modified on {{lastModifiedDate}} by '{{lastModifiedBy}}'.",
         },
         nouPermis: "New permission",
+        advancedSearch: "Advanced search",
     },
     enum: {
         rol: {
@@ -72,6 +73,15 @@ const translationEn = {
             FIRMAT: "Signed",
             REBUTJAT: "Rejected",
             PARCIAL: "Partial",
+        },
+        estatNotificacio: {
+            ENVIADA: "Sent",
+            ENVIADA_AMB_ERRORS: "Sent with errors",
+            FINALITZADA: "Completed",
+            FINALITZADA_AMB_ERRORS: "Completed with errors",
+            PENDENT: "Pending",
+            PROCESSADA: "Processed",
+            REGISTRADA: "Registered",
         },
         origen: {
             O0: "Citizen",
@@ -145,6 +155,7 @@ const translationEn = {
         },
     },
     navigate: {
+        accessibilitat: "Accessibility",
         expedient: "Case search",
         expedientPeticio: "Registry entries search",
         usuariTasca: "Tasks",
@@ -167,6 +178,7 @@ const translationEn = {
     },
     page: {
         comment: {
+            label: "Comments",
             expedient: "Expedient Comments",
             tasca: "Task Comments",
             metaExpedient: "Procedure comments",
@@ -335,7 +347,7 @@ const translationEn = {
                 canviEstatDistribucio: {
                     label: "Change state to distribution",
                     ok: "Status has been successfully changed",
-                    massiveOk: "The status of '{{data.num}}' records has been updated",
+                    massiveOk: "Massive action scheduled to update the status of '{{data.num}}' records.",
                 },
                 descargarAnnex: {
                     label: "Download annex",
@@ -344,7 +356,7 @@ const translationEn = {
                 procesarAnnexosPendents: {
                     label: "Attach",
                     ok: "The annex has been processed successfully",
-                    massiveOk: " '{{data.num}}' attachments have been processed",
+                    massiveOk: "Massive action scheduled to process '{{data.num}}' pending attachments.",
                     info: "If an error occurred when accepting a record from the Records screen, causing some of the record’s documents not to be attached to the case file, from this list you can try attaching the document to the case file again.",
                 },
                 firma: {
@@ -356,6 +368,9 @@ const translationEn = {
                     ok: "The entry has been consulted and saved successfully",
                     massiveOk: "{{data.num}} entries have been consulted and saved successfully",
                 },
+                reintentar: {
+                    title: "Select document type for the pending annex/annexes",
+                }
             }
         },
         tasca: {
@@ -607,7 +622,7 @@ const translationEn = {
                 },
                 download: {
                     label: "Download documents...",
-                    button: "Download documents",
+                    button: "Download selected",
                     title: "Document selection",
                     ok: "Documents downloaded successfully",
                 },
@@ -616,7 +631,7 @@ const translationEn = {
                     ok: "Spreadsheet downloaded successfully",
                 },
                 exportZIP: {
-                    label: "Export ZIP index...",
+                    label: "Export ZIP index",
                     button: "Export ZIP index",
                     title: "Export documents to ZIP",
                     ok: "ZIP document downloaded successfully",
@@ -646,7 +661,7 @@ const translationEn = {
                     ok: "INSIDE document downloaded successfully",
                 },
                 exportDocs: {
-                    label: "Export selected files' documents",
+                    label: "Export selected cases documents...",
                     ok: "The documents have been exported successfully",
                 },
                 export: {
@@ -694,10 +709,19 @@ const translationEn = {
                     ok: "Interested parties exported successfully",
                 },
                 impDocMass: {
-                    label: "Import documents into the selected cases",
-                    title: "Import documents into cases",
-                    warning: "The cases must belong to the same procedure.",
+                    label: "Import documents into the selected cases...",
+                    title: "Document import",
+                    mssg: "The documents you attach will be added to the {{num}} selected case files",
+                    warning: "The case files must belong to the same procedure.",
                 },
+                exportMass: {
+                    unic: "Export case...",
+                    label: "Export selected cases...",
+                    title: "Export selected cases",
+                    titleUni: "Export cases",
+                    info: "You can select various export formats. The export process will be executed in the background and you can track its progress in the massive actions list.",
+                    info2: "You can select various export formats. The export can take a few moments to finish, once completed, the download will start automatically.",
+                },                
                 comment: {
                     ok: "Comment added to the case '{{data.expedient.description}}'",
                 },
@@ -735,7 +759,10 @@ const translationEn = {
 				},
             },
             modal: {
-                seguidors: "Case file followers",
+                seguidors: {
+                    label: "Followers",
+                    title: "Case followers",
+                },
             },
             results: {
                 checkDelete: "Are you sure you want to delete this content? If it contained ongoing signatures, they will be canceled.",
@@ -1852,6 +1879,8 @@ const translationEn = {
                 noOrgans: "No managing body assigned",
             },
             menu: {
+                title: "Menu",
+
                 entitat: "Entities",
                 expedient: "Cases",
                 monitoritzar: "Monitor",
@@ -1935,6 +1964,7 @@ const translationEn = {
             action: {
                 read: {
                     label: "Mark as read",
+                    title: "Case alerts",
                     ok: "The alert has been marked as read",
                     massiveOk: "The alerts have been marked as read",
                 },

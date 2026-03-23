@@ -1,5 +1,5 @@
 import {GridPage, useFormContext} from "reactlib";
-import {Grid, Icon} from "@mui/material";
+import {Grid2 as Grid, Icon} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
 import {useTranslation} from "react-i18next";
 import {CardPage} from "../../../components/CardData.tsx";
@@ -8,10 +8,10 @@ import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 const ServeiPinbalGridForm = () => {
     const {data} = useFormContext()
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name={'codi'} disabled={data?.id}/>
-        <GridFormField xs={12} name={'nom'} type={'textarea'}/>
-        <GridFormField xs={12} name={'pinbalServeiDocPermesEnum'} multiple/>
-        <GridFormField xs={12} name={'actiu'}/>
+        <GridFormField name={'codi'} disabled={data?.id}/>
+        <GridFormField name={'nom'} type={'textarea'}/>
+        <GridFormField name={'pinbalServeiDocPermesEnum'} multiple/>
+        <GridFormField name={'actiu'}/>
     </Grid>
 }
 

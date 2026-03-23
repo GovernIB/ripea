@@ -1,7 +1,7 @@
 import {useTranslation} from "react-i18next";
 import {MuiDialog, useFormContext} from "reactlib";
 import {useMemo, useState} from "react";
-import {Grid, Icon} from "@mui/material";
+import {Grid2 as Grid, Icon} from "@mui/material";
 import Load from "../../../components/Load.tsx";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
@@ -27,12 +27,12 @@ const PropietatsForm = ({item, itemField}:any) => {
     }
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name={'key'} disabled required/>
-        <GridFormField xs={12} name={'description'} required/>
-        <GridFormField xs={12} name={'value'} field={valueField} required/>
-        <GridFormField xs={12} name={'entitat'} required disabled={data?.id}/>
-        <GridFormField xs={12} name={'organ'} filter={builder.and(builder.eq('entitat.id', data?.entitat?.id))} disabled={data?.id}/>
-        <GridFormField xs={12} name={'configurableOrgansDescendents'}/>
+        <GridFormField name={'key'} disabled required/>
+        <GridFormField name={'description'} required/>
+        <GridFormField name={'value'} field={valueField} required/>
+        <GridFormField name={'entitat'} required disabled={data?.id}/>
+        <GridFormField name={'organ'} filter={builder.and(builder.eq('entitat.id', data?.entitat?.id))} disabled={data?.id}/>
+        <GridFormField name={'configurableOrgansDescendents'}/>
     </Grid>
 }
 

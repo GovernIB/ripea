@@ -1,4 +1,4 @@
-import {Grid} from "@mui/material";
+import {Grid2 as Grid} from "@mui/material";
 import GridFormField from "../../../../components/GridFormField.tsx";
 import {useTranslation} from "react-i18next";
 import StyledMuiGrid from "../../../../components/StyledMuiGrid.tsx";
@@ -11,8 +11,8 @@ import useMetaExpCarpetaDetail from "./details/MetaExpCarpetaDetail.tsx";
 const MetaExpedientCarpetaForm = () => {
     const {data} = useFormContext()
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="nom"/>
-        <GridFormField xs={12} name="pare"
+        <GridFormField name="nom"/>
+        <GridFormField name="pare"
                        filter={builder.and(
                            builder.eq("metaExpedient.id", data?.metaExpedient?.id),
                            builder.eq("pare", null),

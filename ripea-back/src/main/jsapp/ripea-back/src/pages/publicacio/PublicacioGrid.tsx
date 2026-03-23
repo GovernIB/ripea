@@ -1,4 +1,4 @@
-import {Grid} from "@mui/material";
+import {Grid2 as Grid} from "@mui/material";
 import * as builder from "../../util/springFilterUtils.ts";
 import {formatDate} from "../../util/dateUtils.ts";
 import GridFormField from "../../components/GridFormField.tsx";
@@ -26,12 +26,12 @@ const StyledEstat = (props:any) => {
 
 const PublicacioGridForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="tipus" required/>
-        <GridFormField xs={12} name="estat" required/>
-        <GridFormField xs={12} name="assumpte" required/>
-        <GridFormField xs={12} name="dataPublicacio" type={"date"}/>
-        <GridFormField xs={12} name="enviatData" type={"date"} required/>
-        <GridFormField xs={12} name="observacions" type={"textarea"}/>
+        <GridFormField name="tipus" required/>
+        <GridFormField name="estat" required/>
+        <GridFormField name="assumpte" required/>
+        <GridFormField name="dataPublicacio" type={"date"}/>
+        <GridFormField name="enviatData" type={"date"} required/>
+        <GridFormField name="observacions" type={"textarea"}/>
     </Grid>
 }
 

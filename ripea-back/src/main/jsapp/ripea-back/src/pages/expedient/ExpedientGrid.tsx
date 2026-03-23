@@ -1,5 +1,5 @@
 import {useMemo, useState} from "react";
-import {Icon, Grid} from "@mui/material";
+import {Icon, Grid2 as Grid, Box} from "@mui/material";
 import {GridPage, useFormContext, useMuiDataGridApiRef,} from 'reactlib';
 import {useTranslation} from "react-i18next";
 import {useNavigate} from "react-router-dom";
@@ -26,23 +26,23 @@ export const ExpedientGridForm = () => {
         builder.eq('actiu', true),
     );
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField  xs={12} name="metaExpedient"
-                        hidden={!!data?.id}
-                        filter={filterMetaExpedientCrear}
-                        namedQueries={[ data?.id ? 'EXPEDIENT_UPDATE' : 'EXPEDIENT_CREATE' ]}/>
-        <GridFormField xs={12} name="nom"/>
-        <GridFormField xs={12} name="organGestor"
+        <GridFormField name="metaExpedient"
+                       hidden={!!data?.id}
+                       filter={filterMetaExpedientCrear}
+                       namedQueries={[ data?.id ? 'EXPEDIENT_UPDATE' : 'EXPEDIENT_CREATE' ]}/>
+        <GridFormField name="nom"/>
+        <GridFormField name="organGestor"
                        namedQueries={[`EXPEDIENT_FORM#${data?.metaExpedient?.id || 0}`]}
                        disabled={!data?.metaExpedient || data?.disableOrganGestor}
                        readOnly={!data?.metaExpedient || data?.disableOrganGestor}/>
-        <GridFormField xs={6} name="sequencia" disabled/>
-        <GridFormField xs={6} name="any" thousandSeparator={false}/>
-        <GridFormField xs={12} name="grup"
+        <GridFormField size={6} name="sequencia" disabled/>
+        <GridFormField size={6} name="any" thousandSeparator={false}/>
+        <GridFormField name="grup"
                        namedQueries={[`BY_PROCEDIMENT#${data?.metaExpedient?.id ?? 0}`]}
                        hidden={!data?.grup && !data?.gestioAmbGrupsActiva} required/>
-        <GridFormField xs={12} name="prioritat" required/>
-        <GridFormField xs={12} name="prioritatMotiu" type={"textarea"} hidden={data?.prioritat == 'B_NORMAL'} required/>
-        <GridFormField xs={12} name="asignarSeguidor" type={"checkbox"} hidden={!!data?.id}/>
+        <GridFormField name="prioritat" required/>
+        <GridFormField name="prioritatMotiu" type={"textarea"} hidden={data?.prioritat == 'B_NORMAL'} required/>
+        <GridFormField name="asignarSeguidor" type={"checkbox"} hidden={!!data?.id}/>
     </Grid>
 }
 
@@ -116,7 +116,6 @@ const beforeAvis = [
         field: 'metaExpedient',
         flex: 1.15,
         sortable: false,
-        wordWrap: true,
     },
     {
         field: 'nom',
@@ -197,7 +196,6 @@ const ExpedientGrid = () => {
             field: 'interessats',
             sortable: false,
             flex: 1,
-            wordWrap: true,
             valueFormatter: (value: any) => {
                 let resum = '';
                 for (const interessat of value) {
@@ -220,6 +218,11 @@ const ExpedientGrid = () => {
                 }
                 return resum;
             },
+            renderCell: (params: any)=> (
+                <Box sx={{ whiteSpace: 'pre-line' }}>
+                    {params?.formattedValue}
+                </Box>
+            ),
             hidden: !user?.conf?.expedientListInteressats,
         },
         {

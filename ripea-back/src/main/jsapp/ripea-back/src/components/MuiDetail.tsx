@@ -29,12 +29,12 @@ const useMuiDetailContext = () => {
     if (!ctx) throw new Error('useMuiDetailContext debe usarse dentro de <MuiDetail>');
     return ctx;
 }
-export const MuiDetail = ({ entity, fields, children }: MuiDetailProps) => {
+export const MuiDetail = ({ entity, fields, children, ...other }: MuiDetailProps) => {
     const getField = (name: string) => fields?.find((item: any) => item?.name === name) ?? {};
 
     return (<MuiDetailContext.Provider value={{ entity, getField }}>
         <Load value={entity}>
-            <Grid2 container sx={{display: "flex", flexDirection: "row", wordWrap: "break-word"}} columnSpacing={1} rowSpacing={1}>
+            <Grid2 container sx={{display: "flex", flexDirection: "row", wordWrap: "break-word"}} columnSpacing={1} rowSpacing={1} {...other}>
                 {children}
             </Grid2>
         </Load>

@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {Grid, Link, Icon, Grid2} from "@mui/material";
+import {Grid2 as Grid, Link, Icon} from "@mui/material";
 import {BasePage, useResourceApiService, MuiDialog, useBaseAppContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {formatDate} from "../util/dateUtils.ts";
@@ -13,7 +13,7 @@ const InformacionArxiu = (props:any) => {
 
     return <BasePage>
         <Load value={arxiu}>
-            <Grid2 container sx={{wordWrap: "break-word" }} direction={"row"} columnSpacing={1} rowSpacing={1}>
+            <Grid container sx={{wordWrap: "break-word" }} direction={"row"} columnSpacing={1} rowSpacing={1}>
                 <ContenidoData title={t('page.arxiu.detall.arxiuUuid')}>{arxiu?.identificador}</ContenidoData>
                 <ContenidoData title={t('page.arxiu.detall.fitxerNom')}>{arxiu?.nom}</ContenidoData>
                 <ContenidoData title={t('page.arxiu.detall.serie')}>{arxiu?.serieDocumental}</ContenidoData>
@@ -46,7 +46,7 @@ const InformacionArxiu = (props:any) => {
                     <DetailCardContent title={t('page.arxiu.detall.interessats')}>{arxiu?.eniInteressats?.join(', ')}</DetailCardContent>
                     <DetailCardContent title={t('page.arxiu.detall.documentOrigen')}>{arxiu?.eniDocumentOrigenId}</DetailCardContent>
                 </DetailCard>
-            </Grid2>
+            </Grid>
         </Load>
     </BasePage>
 }

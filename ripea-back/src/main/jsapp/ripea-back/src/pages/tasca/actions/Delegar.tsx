@@ -1,5 +1,5 @@
 import {useRef} from "react";
-import {Grid} from "@mui/material";
+import {Grid2 as Grid} from "@mui/material";
 import {MuiFormDialogApi, useBaseAppContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
@@ -7,8 +7,8 @@ import GridFormField from "../../../components/GridFormField.tsx";
 
 const DelegarForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="usuari" required/>
-        <GridFormField xs={12} name="motiu" type={"textarea"}/>
+        <GridFormField name="usuari" required/>
+        <GridFormField name="motiu" type={"textarea"}/>
     </Grid>
 }
 

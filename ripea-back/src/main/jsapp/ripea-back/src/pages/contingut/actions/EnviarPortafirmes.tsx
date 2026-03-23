@@ -1,5 +1,5 @@
 import {useRef, useState, forwardRef, useImperativeHandle } from "react";
-import {Alert, Grid, Icon} from "@mui/material";
+import {Alert, Grid2 as Grid, Icon} from "@mui/material";
 import {MuiDialog, MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import GridFormField, {GridButton} from "../../../components/GridFormField.tsx";
@@ -132,7 +132,7 @@ const EnviarPortafirmesForm = forwardRef((_props, ref) => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
 
         { !data?.massivo && data?.extension != 'pdf' &&
-            <Grid xs={12}>
+            <Grid size={12}>
                 <Alert severity={'warning'}
                        action={
                            <IconButton onClick={()=>handleOpen(apiRef?.current?.getId())}>
@@ -146,23 +146,23 @@ const EnviarPortafirmesForm = forwardRef((_props, ref) => {
         }
         {dialog}
 
-        <GridFormField xs={12} name="dataInici" hidden={!data?.massivo} type={"date"}/>
-        <GridFormField xs={12} name="enviarCorreu" hidden={!data?.massivo}/>
-        <GridFormField xs={12} name="motiu"/>
-        <GridFormField xs={12} name="prioritat" required/>
+        <GridFormField name="dataInici" hidden={!data?.massivo} type={"date"}/>
+        <GridFormField name="enviarCorreu" hidden={!data?.massivo}/>
+        <GridFormField name="motiu"/>
+        <GridFormField name="prioritat" required/>
 
         {/* SIMPLE */}
         {data?.portafirmesFluxTipus=='SIMPLE' && <>
-            <GridFormField xs={12} name="responsables" multiple autocomplete filter={filterResponsables} namedQueries={[`ADD_PLUGIN_USERS`]}/>
-            <GridFormField xs={12} name={"nifsManuals"} multiple/>
-            <GridFormField xs={12} name={"carrecs"} multiple hidden={!user?.sessionScope?.isWsUsuariEntitatActiu}/>
-            <GridFormField xs={12} name="portafirmesSequenciaTipus" required/>
+            <GridFormField name="responsables" multiple autocomplete filter={filterResponsables} namedQueries={[`ADD_PLUGIN_USERS`]}/>
+            <GridFormField name={"nifsManuals"} multiple/>
+            <GridFormField name={"carrecs"} multiple hidden={!user?.sessionScope?.isWsUsuariEntitatActiu}/>
+            <GridFormField name="portafirmesSequenciaTipus" required/>
         </>}
 
         {/* PORTAFIB */}
         {data?.portafirmesFluxTipus=='PORTAFIB' && <>
-            <GridFormField xs={12} name="annexos" multiple filter={filterAnnexos} hidden={data?.massivo}/>
-            <GridFormField xs={10} name="portafirmesEnviarFluxId"
+            <GridFormField name="annexos" multiple filter={filterAnnexos} hidden={data?.massivo}/>
+            <GridFormField size={10} name="portafirmesEnviarFluxId"
                            componentProps={{title: t('page.document.detall.flux')}}
                            requestParams={{additionalOption: 
                                 {
@@ -176,7 +176,7 @@ const EnviarPortafirmesForm = forwardRef((_props, ref) => {
 
             <GridButton
                 variant={open ?"contained" :"outlined"}
-                xs={1} onClick={()=>{
+                size={1} onClick={()=>{
                     setOpenNewFlux(false)
                     setOpen(!open)
                 }}
@@ -186,7 +186,7 @@ const EnviarPortafirmesForm = forwardRef((_props, ref) => {
             </GridButton>
             <GridButton
                 variant={openNewFlux ?"contained" :"outlined"}
-                xs={1} onClick={()=>{
+                size={1} onClick={()=>{
                     setOpen(false)
                     setOpenNewFlux(!openNewFlux)
                 }}
@@ -195,14 +195,14 @@ const EnviarPortafirmesForm = forwardRef((_props, ref) => {
             </GridButton>
         </>}
 
-        <GridFormField xs={12} name="firmaParcial" hidden={!data?.mostrarFirmaParcial}/>
-        <GridFormField xs={12} name="avisFirmaParcial" hidden={!data?.mostrarAvisFirmaParcial}/>
+        <GridFormField name="firmaParcial" hidden={!data?.mostrarFirmaParcial}/>
+        <GridFormField name="avisFirmaParcial" hidden={!data?.mostrarAvisFirmaParcial}/>
 
-        <Grid item xs={12} hidden={!data?.portafirmesFluxUrl || !open}>
+        <Grid size={12} hidden={!data?.portafirmesFluxUrl || !open}>
             <Iframe src={data?.portafirmesFluxUrl}/>
         </Grid>
 
-        <Grid item xs={12} hidden={!data?.urlInicioFlujoFirma || !openNewFlux}>
+        <Grid size={12} hidden={!data?.urlInicioFlujoFirma || !openNewFlux}>
             <Iframe src={data?.urlInicioFlujoFirma}/>
         </Grid>
     </Grid>

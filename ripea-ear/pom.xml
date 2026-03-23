@@ -10,8 +10,11 @@
 	<packaging>ear</packaging>
 	<properties>
 		<docker.image.name>${project.parent.artifactId}</docker.image.name>
-		<docker.image.from>280421/jboss-eap-caib-7.2</docker.image.from>
-		<docker.jboss.userhome>/home/jboss</docker.jboss.userhome>
+		<!--docker.image.from>280421/jboss-eap-caib-7.2</!docker.image.from-->
+		<docker.image.from>${env.DOCKER_IMAGE_FROM}</docker.image.from>
+		<docker.user.group>${env.DOCKER_USER_GROUP}</docker.user.group>
+		<docker.auth.username>${env.DOCKER_USER}</docker.auth.username>
+       	<docker.auth.password>${env.DOCKER_PASSWORD}</docker.auth.password>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -64,6 +67,10 @@
 				<version>0.42.1</version>
 				<configuration>
 					<verbose>true</verbose>
+	                <authConfig>
+	                   <username>${docker.auth.username}</username>
+	                   <password>${docker.auth.password}</password>
+	                </authConfig>
 					<images>
 						<image>
 							<name>${docker.image.name}</name>
@@ -89,8 +96,8 @@
 												</fileSet>
 											</fileSets>
 										</inline>
-										<targetDir>$JBOSS_USERHOME</targetDir>
-										<user>jboss:nogroup</user>
+										<targetDir>$JBOSS_HOME</targetDir>
+										<user>${docker.user.group}</user>
 									</assembly>
 									<assembly>
 										<name>copy_properties</name>
@@ -98,12 +105,12 @@
 											<fileSets>
 												<fileSet>
 													<directory>src/main/docker/properties</directory>
-													<outputDirectory>${project.parent.artifactId}</outputDirectory>
+													<outputDirectory>.</outputDirectory>
 												</fileSet>
 											</fileSets>
 										</inline>
-										<targetDir>$JBOSS_USERHOME/apps</targetDir>
-										<user>jboss:nogroup</user>
+										<targetDir>$JBOSS_HOME/apps/ripea</targetDir>
+										<user>${docker.user.group}</user>
 									</assembly>
 									<assembly>
 										<name>copy_keystores</name>
@@ -111,12 +118,12 @@
 											<fileSets>
 												<fileSet>
 													<directory>src/main/docker/keystores</directory>
-													<outputDirectory>keystores</outputDirectory>
+													<outputDirectory>.</outputDirectory>
 												</fileSet>
 											</fileSets>
 										</inline>
-										<targetDir>$JBOSS_USERHOME</targetDir>
-										<user>jboss:nogroup</user>
+										<targetDir>$JBOSS_HOME/apps/ripea</targetDir>
+										<user>${docker.user.group}</user>
 									</assembly>
 									<assembly>
 										<name>copy_transformers</name>
@@ -124,28 +131,47 @@
 											<fileSets>
 												<fileSet>
 													<directory>src/main/docker/transformers</directory>
-													<outputDirectory>/opt/transformers</outputDirectory>
+													<outputDirectory>.</outputDirectory>
 													<includes>
 														<include>**/*</include>
 													</includes>
 												</fileSet>
 											</fileSets>
 										</inline>
-										<targetDir>/</targetDir>
-										<user>jboss:nogroup</user>
+										<targetDir>$JBOSS_HOME/apps/ripea</targetDir>
+										<user>${docker.user.group}</user>
 									</assembly>
+									<assembly>
+									    <name>copy_oracle_module</name>
+									    <inline>
+									        <fileSets>
+									            <fileSet>
+									                <directory>src/main/docker/oracle</directory>
+									                <outputDirectory>modules/system/layers/base/com/oracle/main</outputDirectory>
+									            </fileSet>
+									        </fileSets>
+									    </inline>
+									    <targetDir>$JBOSS_HOME</targetDir>
+									    <user>${docker.user.group}</user>
+									</assembly>									
 									<assembly>
 										<descriptorRef>artifact</descriptorRef>
 										<targetDir>$JBOSS_HOME/standalone/deployments</targetDir>
-										<user>jboss:nogroup</user>
+										<user>${docker.user.group}</user>
 									</assembly>
 								</assemblies>
 								<runCmds>
+									<run>rm -f $JBOSS_HOME/modules/system/layers/base/com/oracle/main/ojdbc8.jar</run>
 									<run>mkdir -p /opt/webapps/ripea</run>
 									<run>chmod 755 /opt/webapps/ripea</run>
-									<run>chmod a+x $JBOSS_USERHOME/config/jboss_config.sh</run>
-									<run>dos2unix $JBOSS_USERHOME/config/jboss_config.sh</run>
-									<run>sed -i 's~#!/bin/sh~#!/bin/sh\n$JBOSS_USERHOME/config/jboss_config.sh~' $JBOSS_HOME/bin/standalone.sh</run>
+									<run>chmod a+x $JBOSS_HOME/config/jboss_config.sh</run>
+									<run>sed -i 's/\r//' $JBOSS_HOME/config/jboss_config.sh</run>
+<!--									<run>dos2unix $JBOSS_HOME/config/jboss_config.sh</run>-->
+									<run>sed -i 's~#!/bin/sh~#!/bin/sh\n$JBOSS_HOME/config/jboss_config.sh~' $JBOSS_HOME/bin/standalone.sh</run>
+									<run>curl -L https://github.com/keycloak/keycloak/releases/download/12.0.4/keycloak-oidc-wildfly-adapter-12.0.4.tar.gz -o $JBOSS_HOME/keycloak-adapter.tar.gz</run>
+									<run>tar xvzf $JBOSS_HOME/keycloak-adapter.tar.gz -C $JBOSS_HOME</run>
+									<run>rm $JBOSS_HOME/keycloak-adapter.tar.gz</run>
+									<run>$JBOSS_HOME/bin/jboss-cli.sh --file=$JBOSS_HOME/bin/adapter-install-offline.cli -Djboss.server.config.file=standalone-openshift.xml</run>									
 								</runCmds>
 								<tags>
 									<tag>latest</tag>

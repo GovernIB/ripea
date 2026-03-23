@@ -2,14 +2,14 @@ import {useTranslation} from "react-i18next";
 import {GridPage} from "reactlib";
 import {CardPage} from "../../../components/CardData.tsx";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
-import {Grid} from "@mui/material";
+import {Grid2 as Grid} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
 
 const TipusDocumentalForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="codi"/>
-        <GridFormField xs={12} name="nomEspanyol"/>
-        <GridFormField xs={12} name="nomCatala"/>
+        <GridFormField name="codi"/>
+        <GridFormField name="nomEspanyol"/>
+        <GridFormField name="nomCatala"/>
     </Grid>
 }
 

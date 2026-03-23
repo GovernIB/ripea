@@ -7,7 +7,7 @@ import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import * as builder from "../../../util/springFilterUtils.ts";
 import GridFormField from "../../../components/GridFormField.tsx";
-import {Grid, Link} from "@mui/material";
+import {Grid2 as Grid, Link} from "@mui/material";
 import {Link as RouterLink } from 'react-router-dom';
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
 import {useActions as useDocumentActions} from "../../contingut/details/ContingutActions.tsx";
@@ -22,17 +22,24 @@ const CustodiarPendentsFilterFrom = (props:any) => {
     const { filtrarExpedient = false } = props
     const {data} = useFormContext();
 
-    const expedientFilter = builder.and(builder.eq('metaExpedient.id', data?.procediment?.id));
+    const expedientFilter = builder.and(
+        builder.eq('metaExpedient.id', data?.procediment?.id),
+        builder.eq('grup.id', data?.grup?.id)
+    );
 
     return <>
-        <GridFormField xs={3} name="nom"/>
-        <GridFormField xs={3} name="procediment"/>
+        <GridFormField size={{xs: 12, sm: 6, md: (filtrarExpedient && data?.mostrarGrups) ?3 :4}} name="nom"/>
+        <GridFormField size={{xs: 12, sm: 6, md: (filtrarExpedient && data?.mostrarGrups) ?3 :4}} name="procediment"/>
+        <GridFormField size={{xs: 12, sm: 6, md: (filtrarExpedient && data?.mostrarGrups) ?3 :4}} name="grup"
+                       namedQueries={[`BY_PROCEDIMENT#${data?.procediment?.id}`]}
+                       disabled={!data?.procediment}
+                       hidden={!data?.mostrarGrups}/>
         {filtrarExpedient
-            ?<GridFormField xs={3} name="expedient" filter={expedientFilter}/>
-            :<Grid item xs={3}/>
+            ?<GridFormField size={{xs: 12, sm: 6, md: (data?.mostrarGrups ?3 :4)}} name="expedient" filter={expedientFilter}/>
+            : !data?.mostrarGrups && <Grid size={{xs: 0, sm: 0, md: 4}} sx={{ display: { xs: 'none', sm: 'none', md: 'block' } }}/>
         }
-        <GridFormField xs={3} name="dataCreacioInici" type={"date"}/>
-        <GridFormField xs={3} name="dataCreacioFi" type={"date"}/>
+        <GridFormField size={{xs: 12, sm: 6, md: 4}} name="dataCreacioInici" type={"date"}/>
+        <GridFormField size={{xs: 12, sm: 6, md: 4}} name="dataCreacioFi" type={"date"}/>
     </>
 }
 
@@ -55,6 +62,7 @@ const springExpedientFilterBuilder = (data: any) => {
     return builder.and(
         builder.like("nom", data?.nom),
         builder.eq("metaExpedient.id", data?.procediment?.id),
+        builder.eq("grup.id", data?.grup?.id),
         builder.betweenDates("createdDate", data?.dataCreacioInici, data?.dataCreacioFi),
     );
 }
@@ -136,6 +144,7 @@ const springDocumentFilterBuilder = (data: any) => {
     return builder.and(
         builder.like("nom", data?.nom),
         builder.eq("expedient.metaExpedient.id", data?.procediment?.id),
+        builder.eq("expedient.grup.id", data?.grup?.id),
         builder.eq("expedient.id", data?.expedient?.id),
         builder.betweenDates("createdDate", data?.dataCreacioInici, data?.dataCreacioFi),
     );
@@ -223,7 +232,8 @@ const springInteressatFilterBuilder = (data: any) => {
     return builder.and(
         builder.like("nom", data?.nom),
         builder.eq("expedient.metaExpedient.id", data?.procediment?.id),
-        builder.eq("id", data?.expedient?.id),
+        builder.eq("expedient.grup.id", data?.grup?.id),
+        builder.eq("expedient.id", data?.expedient?.id),
         builder.betweenDates("createdDate", data?.dataCreacioInici, data?.dataCreacioFi),
     );
 }

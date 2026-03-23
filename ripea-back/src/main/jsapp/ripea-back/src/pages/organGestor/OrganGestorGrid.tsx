@@ -3,7 +3,7 @@ import {useMemo, useState} from "react";
 import {GridPage, useFormContext} from "reactlib";
 import {CardPage} from "../../components/CardData.tsx";
 import StyledMuiGrid, {ToolbarButton} from "../../components/StyledMuiGrid.tsx";
-import {Grid, Icon, Badge} from "@mui/material";
+import {Grid2 as Grid, Icon, Badge} from "@mui/material";
 import GridFormField from "../../components/GridFormField.tsx";
 import {OrganGestorFilter} from "./OrganGestorFilter.tsx";
 import {useOrganGestorSyncDialog} from "./actions/OrganGestorSync.tsx";
@@ -12,13 +12,13 @@ import LinkIcon from "../../components/LinkIcon.tsx";
 const OrganGestorForm = () => {
     const {data} = useFormContext()
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="codi" disabled readOnly/>
-        <GridFormField xs={12} name="nom" disabled readOnly/>
-        <GridFormField xs={12} name="pare" disabled readOnly/>
-        <GridFormField xs={12} name="cif" disabled readOnly/>
-        <GridFormField xs={12} name="utilitzarCifPinbal"/>
-        <GridFormField xs={12} name="permetreEnviamentPostal"/>
-        <GridFormField xs={12} name="permetreEnviamentPostalDescendents" hidden={!data?.permetreEnviamentPostal}/>
+        <GridFormField name="codi" disabled readOnly/>
+        <GridFormField name="nom" disabled readOnly/>
+        <GridFormField name="pare" disabled readOnly/>
+        <GridFormField name="cif" disabled readOnly/>
+        <GridFormField name="utilitzarCifPinbal"/>
+        <GridFormField name="permetreEnviamentPostal"/>
+        <GridFormField name="permetreEnviamentPostalDescendents" hidden={!data?.permetreEnviamentPostal}/>
     </Grid>
 }
 

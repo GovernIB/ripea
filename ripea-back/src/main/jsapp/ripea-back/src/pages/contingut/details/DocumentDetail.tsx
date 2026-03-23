@@ -1,9 +1,9 @@
 import {useState} from "react";
-import {Alert, Box, Button, Grid, Icon, Typography, Link, Grid2} from "@mui/material";
+import {Alert, Box, Button, Grid2 as Grid, Icon, Typography, Link} from "@mui/material";
 import {BasePage, GridPage, useResourceApiService, MuiDialog, useBaseAppContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import TabComponent from "../../../components/TabComponent.tsx";
-import {CardButton, ContenidoData, DetailCard, DetailCardContent} from "../../../components/CardData.tsx";
+import {CardButton, DetailCard, DetailCardContent} from "../../../components/CardData.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import MetaDadaGrid from "../../dada/MetaDadaGrid.tsx";
 import Load from "../../../components/Load.tsx";
@@ -17,23 +17,23 @@ const Contenido = (props:any) => {
 
     return <BasePage>
         <Load value={entity}>
-            <Grid container sx={{ display:'flex', flexDirection: "row", wordWrap: "break-word" }} columnSpacing={1} rowSpacing={1}>
-                <ContenidoData title={t('page.document.detall.fitxerNom')}>{entity?.fitxerNom}</ContenidoData>
-                <ContenidoData title={t('page.document.detall.fitxerContentType')}>{entity?.fitxerContentType}</ContenidoData>
-                <ContenidoData title={t('page.document.detall.metaDocument')}>{entity?.metaDocument?.description}</ContenidoData>
-                <ContenidoData title={t('page.document.detall.createdDate')}>{formatDate(entity?.createdDate)}</ContenidoData>
-                <ContenidoData title={t('page.document.detall.estat')}>{entity?.estat}</ContenidoData>
-                <ContenidoData title={t('page.document.detall.dataCaptura')}>{formatDate(entity?.dataCaptura)}</ContenidoData>
-                <ContenidoData title={t('page.document.detall.origen')}>{t(`enum.origen.${entity?.ntiOrigen}`)}</ContenidoData>
-                <ContenidoData title={t('page.document.detall.tipoDocumental')}>{entity?.ntiTipoDocumental}</ContenidoData>
-                <ContenidoData title={t('page.document.detall.estadoElaboracion')}>{t(`enum.estatElaboracio.${entity?.ntiEstadoElaboracion}`)}</ContenidoData>
-                <ContenidoData title={t('page.document.detall.csv')} hidden={!entity?.ntiCsv}>
+            <DetailCard key={entity?.id} title={entity?.nom}>
+                <DetailCardContent size={6} title={t('page.document.detall.fitxerNom')}>{entity?.fitxerNom}</DetailCardContent>
+                <DetailCardContent size={6} title={t('page.document.detall.fitxerContentType')}>{entity?.fitxerContentType}</DetailCardContent>
+                <DetailCardContent size={6} title={t('page.document.detall.metaDocument')}>{entity?.metaDocument?.description}</DetailCardContent>
+                <DetailCardContent size={6} title={t('page.document.detall.createdDate')}>{formatDate(entity?.createdDate)}</DetailCardContent>
+                <DetailCardContent size={6} title={t('page.document.detall.estat')}>{entity?.estat}</DetailCardContent>
+                <DetailCardContent size={6} title={t('page.document.detall.dataCaptura')}>{formatDate(entity?.dataCaptura)}</DetailCardContent>
+                <DetailCardContent size={6} title={t('page.document.detall.origen')}>{t(`enum.origen.${entity?.ntiOrigen}`)}</DetailCardContent>
+                <DetailCardContent size={6} title={t('page.document.detall.tipoDocumental')}>{entity?.ntiTipoDocumental}</DetailCardContent>
+                <DetailCardContent size={6} title={t('page.document.detall.estadoElaboracion')}>{t(`enum.estatElaboracio.${entity?.ntiEstadoElaboracion}`)}</DetailCardContent>
+                <DetailCardContent size={6} title={t('page.document.detall.tipoFirma')}>{entity?.ntiTipoFirma && t(`enum.tipoFirma.${entity?.ntiTipoFirma}`)}</DetailCardContent>
+                <DetailCardContent title={t('page.document.detall.csv')} hidden={!entity?.ntiCsv}>
                     {entity?.ntiCsv} {entity?.csvLinkUrl &&
                     <Link href={entity?.csvLinkUrl+entity?.ntiCsv} target={"_blank"} rel="noopener noreferrer"><Icon>launch</Icon></Link>}                    
-                </ContenidoData>
-                <ContenidoData title={t('page.document.detall.csvRegulacion')} hidden={!entity?.ntiCsvRegulacion}>{entity?.ntiCsvRegulacion}</ContenidoData>
-                <ContenidoData title={t('page.document.detall.tipoFirma')}>{entity?.ntiTipoFirma && t(`enum.tipoFirma.${entity?.ntiTipoFirma}`)}</ContenidoData>
-            </Grid>
+                </DetailCardContent>
+                <DetailCardContent title={t('page.document.detall.csvRegulacion')} hidden={!entity?.ntiCsvRegulacion}>{entity?.ntiCsvRegulacion}</DetailCardContent>
+            </DetailCard>
         </Load>
     </BasePage>
 }
@@ -56,7 +56,7 @@ const Versiones = (props:any) => {
     const { t } = useTranslation();
     const {descarregarVersio} = useActions()
 
-    return <Grid2 container flexDirection={"column"} columnSpacing={1} rowSpacing={1}>
+    return <Grid container flexDirection={"column"} columnSpacing={1} rowSpacing={1}>
         {entity?.versions?.map((version:any) =>
             <DetailCard key={version?.id} title={t('page.document.versio.title') + ' ' + version?.id}
                         header={entity?.documentTipus != 'FISIC' && <Box ml="auto">
@@ -69,7 +69,7 @@ const Versiones = (props:any) => {
                 <DetailCardContent title={t('page.document.versio.arxiuUuid')}>{version?.arxiuUuid}</DetailCardContent>
             </DetailCard>
         )}
-    </Grid2>;
+    </Grid>;
 }
 
 export const Firmes = (props:any) => {
@@ -79,10 +79,10 @@ export const Firmes = (props:any) => {
         {
             entity?.firmes?.map((firma:any, index:number) => {
                 return firma?.errorFirma
-                    ? <Grid item xs={12} key={index}><Alert severity={"error"}>{firma?.errorDesc}</Alert></Grid>
+                    ? <Grid size={12} key={index}><Alert severity={"error"}>{firma?.errorDesc}</Alert></Grid>
                     : <>
                         {firma?.detalls?.map((detall: any, i: number) =>
-                            <Grid item xs={12} key={`${index}-${i}`}>
+                            <Grid size={12} key={`${index}-${i}`}>
                                 <Icon>{icons.firma}</Icon> {detall?.responsableNom} - {detall?.responsableNif} - {formatDate(detall?.data)} - {detall?.emissorCertificat}
                             </Grid>
                         )}

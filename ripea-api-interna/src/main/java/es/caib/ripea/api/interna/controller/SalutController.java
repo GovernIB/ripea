@@ -27,7 +27,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping(BaseApiInternaSecurityConfig.VERSIO_API_COMANDA)
+@RequestMapping(BaseApiInternaSecurityConfig.VERSIO_API_COMANDA+"/salut")
 @Tag(name = "Integració comanda - RIPEA", description = "Publicació de dades de salut i informació de l'aplicació")
 public class SalutController extends BaseApiInternaController {
 
@@ -42,9 +42,8 @@ public class SalutController extends BaseApiInternaController {
         return manifestInfo;
     }
 	
-    @GetMapping("/appInfo")
+    @GetMapping("/info")
     public AppInfo appInfo(HttpServletRequest request) throws IOException {
-    	autenticaAmbRolTothom();
         var manifestInfo = getManifestInfo();
         return new AppInfo()
                 .codi(aplicacioService.propertyFindByNom(PropertyConfig.COMANDA_APP_CODI))
@@ -53,13 +52,14 @@ public class SalutController extends BaseApiInternaController {
                 .versio(manifestInfo.getVersion())
                 .revisio(manifestInfo.getBuildScmRevision())
                 .jdkVersion(manifestInfo.getBuildJDK())
+                .versioJboss(MonitorHelper.getApplicationServerInfo())
                 .integracions(salutService.getIntegracions())
                 .subsistemes(salutService.getSubsistemes())
                 .contexts(salutService.getContexts(getBaseUrl(request)))
                 .versioJboss(MonitorHelper.getApplicationServerInfo());
     }
     
-    @GetMapping("/salut")
+    @GetMapping
     public SalutInfo health(HttpServletRequest request) throws IOException {
     	autenticaAmbRolTothom();
         var manifestInfo = getManifestInfo();

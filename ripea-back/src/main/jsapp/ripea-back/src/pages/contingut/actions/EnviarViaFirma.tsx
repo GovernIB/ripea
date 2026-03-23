@@ -1,5 +1,5 @@
 import {MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
-import {Grid, Typography} from "@mui/material";
+import {Grid2 as Grid, Typography} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
 import {useRef} from "react";
 import {useTranslation} from "react-i18next";
@@ -16,26 +16,26 @@ const EnviarViaFirmaForm = () => {
     );
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <Grid item xs={12} ><Typography sx={{ borderBottom: '1px solid gray' }}>{t('page.document.detall.dataBasic')}</Typography></Grid>
-        <GridFormField xs={12} name="titol"/>
-        <GridFormField xs={12} name="descripcio"/>
-        <GridFormField xs={12} name="tipusDestinatari"/>
-        <GridFormField xs={12} name="emplenable" hidden={data?.tipusDestinatari != 'EMAIL'}/>
-        <GridFormField xs={12} name="codiUsuariViaFirma" hidden={data?.tipusDestinatari == 'EMAIL'}/>
-        <GridFormField xs={12} name="viaFirmaDispositiuCodi" hidden={!data?.isDispositiusEnabled}/>
+        <Grid size={12} ><Typography sx={{ borderBottom: '1px solid gray' }}>{t('page.document.detall.dataBasic')}</Typography></Grid>
+        <GridFormField name="titol"/>
+        <GridFormField name="descripcio"/>
+        <GridFormField name="tipusDestinatari"/>
+        <GridFormField name="emplenable" hidden={data?.tipusDestinatari != 'EMAIL'}/>
+        <GridFormField name="codiUsuariViaFirma" hidden={data?.tipusDestinatari == 'EMAIL'}/>
+        <GridFormField name="viaFirmaDispositiuCodi" hidden={!data?.isDispositiusEnabled}/>
 
-        <Grid item xs={12} ><Typography sx={{ borderBottom: '1px solid gray' }}>{t('page.document.detall.dataInteressat')}</Typography></Grid>
-        <GridFormField xs={12} name="interessat" filter={interessatFilter}/>
-        <GridFormField xs={6} name="signantNif"/>
-        <GridFormField xs={6} name="signantNom"/>
-        <GridFormField xs={6} name="signantEmail"   hidden={data?.tipusDestinatari != 'EMAIL'}/>
+        <Grid size={12} ><Typography sx={{ borderBottom: '1px solid gray' }}>{t('page.document.detall.dataInteressat')}</Typography></Grid>
+        <GridFormField name="interessat" filter={interessatFilter}/>
+        <GridFormField size={6} name="signantNif"/>
+        <GridFormField size={6} name="signantNom"/>
+        <GridFormField size={6} name="signantEmail" hidden={data?.tipusDestinatari != 'EMAIL'}/>
 
-        <Grid item xs={12} ><Typography sx={{ borderBottom: '1px solid gray' }}>{t('page.document.detall.dataOther')}</Typography></Grid>
-        <GridFormField xs={4} name="firmaParcial"/>
-        <GridFormField xs={4} name="validateCodeEnabled"/>
-        <GridFormField xs={4} name="rebreCorreu"/>
-        <GridFormField xs={12} name="validateCode" hidden={!data?.validateCodeEnabled}/>
-        <GridFormField xs={12} name="observacions" type={"textarea"}/>
+        <Grid size={12} ><Typography sx={{ borderBottom: '1px solid gray' }}>{t('page.document.detall.dataOther')}</Typography></Grid>
+        <GridFormField size={4} name="firmaParcial"/>
+        <GridFormField size={4} name="validateCodeEnabled"/>
+        <GridFormField size={4} name="rebreCorreu"/>
+        <GridFormField name="validateCode" hidden={!data?.validateCodeEnabled}/>
+        <GridFormField name="observacions" type={"textarea"}/>
     </Grid>
 }
 

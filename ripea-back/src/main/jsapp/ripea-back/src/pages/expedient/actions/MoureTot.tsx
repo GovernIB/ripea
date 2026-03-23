@@ -1,5 +1,5 @@
 import {MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
-import {Alert, Grid} from "@mui/material";
+import {Alert, Grid2 as Grid} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
 import {useRef} from "react";
 import {useTranslation} from "react-i18next";
@@ -15,7 +15,7 @@ const MoureTotForm = () => {
 	//namedQueries={[`BY_PROCEDIMENT#${data?.metaExpedientId}`]}
 	
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-		<Grid item xs={12}>
+		<Grid size={12}>
 			<Alert severity="info">
 			  <div>
 			    <div>{t('page.expedient.alert.moureTot.title')}</div>
@@ -29,7 +29,7 @@ const MoureTotForm = () => {
 			</Alert>
 		</Grid>
 		
-        <GridFormField xs={12} name="expedientDesti" filter={filtreProcediment} required/>
+        <GridFormField name="expedientDesti" filter={filtreProcediment} required/>
     </Grid>
 }
 

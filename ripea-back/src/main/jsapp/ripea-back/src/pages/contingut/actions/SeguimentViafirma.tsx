@@ -1,8 +1,8 @@
 import {useState} from "react";
-import {Alert, Grid, Icon} from "@mui/material";
+import {Alert, Grid2 as Grid, Icon} from "@mui/material";
 import {MuiDialog, useBaseAppContext, useConfirmDialogButtons, useResourceApiService} from "reactlib";
 import {useTranslation} from "react-i18next";
-import {CardData, ContenidoData} from "../../../components/CardData.tsx";
+import {DetailCard, DetailCardContent} from "../../../components/CardData.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import Load from "../../../components/Load.tsx";
 import * as builder from '../../../util/springFilterUtils.ts'
@@ -15,17 +15,17 @@ const Dades = (props:any) => {
     const {entity} = props;
     const { t } = useTranslation();
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <CardData xs={12} title={entity?.document?.description}>
-            {/*<ContenidoData title={t('page.documentVia.detall.document')}>{entity?.document?.description}</ContenidoData>*/}
-            <ContenidoData title={t('page.documentVia.detall.titol')}>{entity?.titol}</ContenidoData>
-            <ContenidoData title={t('page.documentVia.detall.descripcio')}>{entity?.descripcio}</ContenidoData>
-            <ContenidoData title={t('page.documentVia.detall.enviatData')}>{formatDate(entity?.enviatData)}</ContenidoData>
-            <ContenidoData title={t('page.documentVia.detall.estat')}>{t(`enum.estat.${entity?.estat}`)}</ContenidoData>
-            <ContenidoData title={t('page.documentVia.detall.tipusDestinatari')}>{t(`enum.tipusDestinatari.${entity?.tipusDestinatari}`)}</ContenidoData>
-            <ContenidoData title={t('page.documentVia.detall.codiUsuari')} hidden={entity?.tipusDestinatari != 'TABLET'}>{entity?.codiUsuari}</ContenidoData>
-            <ContenidoData title={t('page.documentVia.detall.signantEmail')} hidden={entity?.tipusDestinatari != 'EMAIL'}>{entity?.signantEmail}</ContenidoData>
-            <ContenidoData title={t('page.documentVia.detall.messageCode')} hiddenIfEmpty>{entity?.messageCode}</ContenidoData>
-        </CardData>
+        <DetailCard title={entity?.document?.description}>
+            {/*<DetailCardContent title={t('page.documentVia.detall.document')}>{entity?.document?.description}</DetailCardContent>*/}
+            <DetailCardContent title={t('page.documentVia.detall.titol')}>{entity?.titol}</DetailCardContent>
+            <DetailCardContent title={t('page.documentVia.detall.descripcio')}>{entity?.descripcio}</DetailCardContent>
+            <DetailCardContent title={t('page.documentVia.detall.enviatData')}>{formatDate(entity?.enviatData)}</DetailCardContent>
+            <DetailCardContent title={t('page.documentVia.detall.estat')}>{t(`enum.estat.${entity?.estat}`)}</DetailCardContent>
+            <DetailCardContent title={t('page.documentVia.detall.tipusDestinatari')}>{t(`enum.tipusDestinatari.${entity?.tipusDestinatari}`)}</DetailCardContent>
+            <DetailCardContent title={t('page.documentVia.detall.codiUsuari')} hidden={entity?.tipusDestinatari != 'TABLET'}>{entity?.codiUsuari}</DetailCardContent>
+            <DetailCardContent title={t('page.documentVia.detall.signantEmail')} hidden={entity?.tipusDestinatari != 'EMAIL'}>{entity?.signantEmail}</DetailCardContent>
+            <DetailCardContent title={t('page.documentVia.detall.messageCode')} hiddenIfEmpty>{entity?.messageCode}</DetailCardContent>
+        </DetailCard>
     </Grid>
 }
 const Errors = (props:any) => {
@@ -34,7 +34,7 @@ const Errors = (props:any) => {
 
     if (entity?.error) {
         return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-            <Grid xs={12} sx={{ pl:1, pt:1 }}>
+            <Grid size={12}>
                 <Alert severity={'error'}
                        icon={<Icon>warning</Icon>}
                        action={<IconButton title={t('page.documentVia.alert.reintentar')} size="small">
@@ -47,11 +47,11 @@ const Errors = (props:any) => {
                 </Alert>
             </Grid>
 
-            <CardData xs={12} title={t('page.documentVia.alert.enviament')}>
-                <ContenidoData xs={12} title={t('page.documentVia.detall.intentData')}>{formatDate(entity?.intentData)}</ContenidoData>
-                <ContenidoData xs={12} title={t('page.documentVia.detall.intentNum')}>{entity?.intentNum}</ContenidoData>
+            <DetailCard title={t('page.documentVia.alert.enviament')}>
+                <DetailCardContent title={t('page.documentVia.detall.intentData')}>{formatDate(entity?.intentData)}</DetailCardContent>
+                <DetailCardContent title={t('page.documentVia.detall.intentNum')}  sx={{ borderBottom: "1px solid" }}>{entity?.intentNum}</DetailCardContent>
 
-                <Grid xs={12}>
+                <Grid size={12} p={1}>
                     <Box
                         sx={{
                             border: 'solid 1px #e3e3e3',
@@ -61,14 +61,14 @@ const Errors = (props:any) => {
                             overflow: 'auto',
                             whiteSpace: 'pre',
                             fontFamily: 'monospace', // opcional para parecer <pre>
-                            mt: 1,
+                            width: 'max-container',
                             p: 1
                         }}
                     >
                         {entity?.errorDescripcio}
                     </Box>
                 </Grid>
-            </CardData>
+            </DetailCard>
         </Grid>
     }
 }

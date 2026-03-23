@@ -80,7 +80,7 @@ const Alerta = (props:any) => {
         {
             label: t('page.alert.action.read.label'),
             icon: "mark_email_read",
-            showInMenu: true,
+            showInMenu: false,
             onClick: massiveLlegit,
         },
     ] :undefined
@@ -132,7 +132,7 @@ const useAlerta = () => {
     const dialog = <MuiDialog
         open={open}
         closeCallback={handleClose}
-        title={t('page.alert.title')}
+        title={t('page.alert.action.read.title')}
         componentProps={{ fullWidth: true, maxWidth: 'md'}}
         buttons={[
             {

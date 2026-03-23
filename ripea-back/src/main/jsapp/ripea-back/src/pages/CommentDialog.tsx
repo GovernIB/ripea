@@ -128,7 +128,7 @@ export const CommentDialog = (props: any) => {
             });
     }
     return <>
-        <IconButton aria-label="forum" color="inherit" onClick={handleOpen}>
+        <IconButton title={t('page.comment.label')} aria-label="forum" color="inherit" onClick={handleOpen}>
             <Badge badgeContent={entity?.numComentaris} color="primary" showZero>
                 <Icon sx={iconStyle}>forum</Icon>
             </Badge>

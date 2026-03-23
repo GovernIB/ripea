@@ -7,7 +7,7 @@
 						<user-name>sa</user-name>
 						<password>sa</password>
 					</security>
-				</datasource>
+				</datasource>			
 				<datasource jndi-name="java:jboss/datasources/ripeaDS" pool-name="ripeaDS" enabled="true" use-java-context="true">
 					<connection-url>${env.JBOSS_DB_URL}</connection-url>
 					<driver>${env.JBOSS_DB_DRIVER}</driver>
@@ -26,6 +26,7 @@
 						<xa-datasource-class>org.h2.jdbcx.JdbcDataSource</xa-datasource-class>
 					</driver>
 					<driver name="oracle" module="com.oracle">
+						<driver-class>oracle.jdbc.OracleDriver</driver-class>
 						<xa-datasource-class>oracle.jdbc.xa.client.OracleXADataSource</xa-datasource-class>
 					</driver>
 					<driver name="postgresql" module="org.postgresql">

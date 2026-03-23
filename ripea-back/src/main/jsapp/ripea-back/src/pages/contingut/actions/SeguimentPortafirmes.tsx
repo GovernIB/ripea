@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {Grid} from "@mui/material";
+import {Grid2 as Grid} from "@mui/material";
 import {MuiDialog, useBaseAppContext, useConfirmDialogButtons, useResourceApiService} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {CardData, ContenidoData} from "../../../components/CardData.tsx";
@@ -14,7 +14,7 @@ export const SeguimentPortafirmes = (props:any) => {
     const { t } = useTranslation();
     return <Load value={entity}>
         <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-            <CardData xs={6} title={entity?.document?.description}>
+            <CardData size={6} title={entity?.document?.description}>
                 <ContenidoData title={t('page.documentPortafirmes.detall.assumpte')}>{entity?.assumpte}</ContenidoData>
                 <ContenidoData title={t('page.documentPortafirmes.detall.enviatData')}>{formatDate(entity?.enviatData)}</ContenidoData>
                 <ContenidoData title={t('page.documentPortafirmes.detall.estat')}>{t(`enum.estat.${entity?.estat}`)}</ContenidoData>
@@ -26,7 +26,7 @@ export const SeguimentPortafirmes = (props:any) => {
                 <ContenidoData title={t('page.documentPortafirmes.detall.portafirmesId')}>{entity?.portafirmesId}</ContenidoData>
             </CardData>
 
-            <Grid item xs={6}>
+            <Grid size={6}>
                 <Iframe src={entity?.urlFluxSeguiment} style={{ height: '100%' }}/>
             </Grid>
         </Grid>

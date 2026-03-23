@@ -1,5 +1,5 @@
 import {useRef} from "react";
-import {Grid} from "@mui/material";
+import {Grid2 as Grid} from "@mui/material";
 import {MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
@@ -16,7 +16,7 @@ const CanviTipusForm = () => {
     )
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="metaDocument" filter={filter} required/>
+        <GridFormField name="metaDocument" filter={filter} required/>
     </Grid>
 }
 

@@ -3,7 +3,7 @@ import {useState} from "react";
 import {GridPage} from "reactlib";
 import {CardPage} from "../../../components/CardData.tsx";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
-import {Grid, Icon, Badge} from "@mui/material";
+import {Grid2 as Grid, Icon, Badge} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
@@ -11,9 +11,9 @@ import LinkIcon from "../../../components/LinkIcon.tsx";
 
 const GrupFilterForm = () => {
     return <>
-        <GridFormField xs={3} name="codi"/>
-        <GridFormField xs={3} name="descripcio"/>
-        <GridFormField xs={3} name="organGestor"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="codi"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="descripcio"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="organGestor"/>
     </>
 }
 
@@ -41,9 +41,9 @@ const GrupFilter = (props: any) => {
 // Grid
 const GrupForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="codi"/>
-        <GridFormField xs={12} name="descripcio"/>
-        <GridFormField xs={12} name="organGestor"/>
+        <GridFormField name="codi"/>
+        <GridFormField name="descripcio" type={'textarea'}/>
+        <GridFormField name="organGestor"/>
     </Grid>
 }
 

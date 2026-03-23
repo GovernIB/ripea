@@ -1,5 +1,5 @@
 import {MuiFormDialogApi, useBaseAppContext} from "reactlib";
-import {Grid} from "@mui/material";
+import {Grid2 as Grid} from "@mui/material";
 import {useRef} from "react";
 import GridFormField from "../../../components/GridFormField.tsx";
 import {FormReportDialog} from "../../../components/FormActionDialog.tsx";
@@ -8,9 +8,9 @@ import {iniciaDescargaBlob} from "../details/CommonActions.tsx";
 
 const ExportarDocumentsForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="carpetes"/>
-        <GridFormField xs={12} name="versioImprimible"/>
-        <GridFormField xs={12} name="nomFitxer" required/>
+        <GridFormField name="carpetes"/>
+        <GridFormField name="versioImprimible"/>
+        <GridFormField name="nomFitxer" required/>
     </Grid>
 }
 
@@ -30,6 +30,7 @@ export const useExportarDocuments = () => {
     const {temporalMessageShow} = useBaseAppContext();
 
     const handleShow = (id:any) :void => {
+        debugger;
         apiRef.current?.show?.(undefined, {ids: [id], massivo: false})
     }
     const onSuccess = (result:any) :void => {
@@ -41,13 +42,14 @@ export const useExportarDocuments = () => {
         handleShow,
         content: <ExportarDocuments title={t('page.expedient.action.export.title')}
                                     formDialogButtons={[
-                                        {icon: 'description', text: t('page.expedient.action.export.button'), componentProps: { variant: 'contained' }, value: true },
+                                        {icon: 'folder_zip', text: t('page.expedient.action.export.button'), componentProps: { variant: 'contained' }, value: true },
                                         {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
                                     ]}
                                     apiRef={apiRef}
                                     onSuccess={onSuccess}/>
     }
 }
+
 export const useExportarDocumentsMassive = (refresh?: () => void) => {
     const { t } = useTranslation();
     const apiRef = useRef<MuiFormDialogApi>();

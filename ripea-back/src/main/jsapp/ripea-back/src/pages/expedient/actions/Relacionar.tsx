@@ -68,10 +68,10 @@ const ActionFilterFrom = () => {
     );
 
     return <>
-        <GridFormField xs={3} name="metaExpedient" filter={filterMetaExpedient}/>
-        <GridFormField xs={2} name="numero"/>
-        <GridFormField xs={2} name="nom"/>
-        <GridFormField xs={2} name="estat" requestParams={{metaExpedientId: data?.metaExpedient?.id}}/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="metaExpedient" filter={filterMetaExpedient}/>
+        <GridFormField size={{xs: 12, sm: 6, md: 2}} name="numero"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 2}} name="nom"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 2}} name="estat" requestParams={{metaExpedientId: data?.metaExpedient?.id}}/>
     </>
 }
 
@@ -83,7 +83,6 @@ const ActionFilter = (props:any) => {
         code="EXPEDIENT_FILTER"
         springFilterBuilder={springFilterBuilder}
         onSpringFilterChange={onSpringFilterChange}
-        buttonGridProps={{xs: 3}}
     >
         <ActionFilterFrom/>
     </StyledMuiFilter>

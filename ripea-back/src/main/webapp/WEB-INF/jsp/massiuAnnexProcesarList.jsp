@@ -89,13 +89,8 @@ $(document).ready(function() {
 		$('tbody tr td:nth-child(1)', $('#taula')).each(function() {
 			enableDisableSelection($(this), metaExpedientId);
 		});
-
 	});	
-
-							
-
 });
-
 	
 function enableDisableSelection($this, tipus) {
     if (tipus != undefined && tipus != "") {
@@ -115,21 +110,15 @@ function enableDisableSelection($this, tipus) {
 		$('.botons .btn-group button').attr('disabled','disabled');
 	}
 }
-
-
-
 </script>
-
 
 </head>
 <body>
 
-
-
 	<div class="alert well-sm alert-info" style="min-height: 40px;">
-		<span class="fa fa-info-circle"></span> <spring:message code="massiu.procesar.annexos.pendents.info"/> 
+		<span class="fa fa-info-circle"></span> <spring:message code="massiu.procesar.annexos.pendents.info"/> <br/>
+		<span class="fa fa-info-circle"></span> <spring:message code="accio.massiva.list.filtre.procediment.comment"/>		
 	</div>
-
 
 	<form:form action="" method="post" cssClass="well" modelAttribute="massiuAnnexProcesarFiltreCommand">
 		<div class="row">
@@ -161,8 +150,7 @@ function enableDisableSelection($this, tipus) {
  					suggestValue="id"
  					suggestText="nomINumero"
 					inline="true"/>	
-			</div>						
-			
+			</div>
 
 			<div class="col-md-4 pull-right">
 				<div class="pull-right">

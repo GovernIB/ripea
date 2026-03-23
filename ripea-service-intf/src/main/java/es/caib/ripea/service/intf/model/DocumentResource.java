@@ -646,6 +646,8 @@ public class DocumentResource extends NodeResource {
         private String nom;
         private Date dataCreacioInici;
         private Date dataCreacioFi;
+        private ResourceReference<GrupResource, Long> grup;
+        private boolean mostrarGrups;
     }
 
     public DocumentDto toDocumentDto() {

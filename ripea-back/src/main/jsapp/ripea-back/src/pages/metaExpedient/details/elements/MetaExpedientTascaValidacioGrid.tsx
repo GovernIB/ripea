@@ -1,6 +1,6 @@
 import {GridPage, useBaseAppContext, useFormContext, useMuiDataGridApiRef, useResourceApiService} from "reactlib";
 import StyledMuiGrid from "../../../../components/StyledMuiGrid.tsx";
-import {Grid, Icon, Divider, Button} from "@mui/material";
+import {Grid2 as Grid, Icon, Divider, Button} from "@mui/material";
 import {useTranslation} from "react-i18next";
 import GridFormField from "../../../../components/GridFormField.tsx";
 import * as builder from "../../../../util/springFilterUtils.ts";
@@ -45,10 +45,10 @@ const useActions = (refresh?: () => void) => {
 const MetaExpedientTascaValidacioForm = () => {
     const {data} = useFormContext()
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="itemValidacio" required/>
-        <GridFormField xs={12} name="metaDada" hidden={data?.itemValidacio!="DADA"} filter={builder.eq("metaNode.id", data?.metaExpedient?.id)}/>
-        <GridFormField xs={12} name="metaDocument" hidden={data?.itemValidacio!="DOCUMENT"} filter={builder.eq("metaExpedient.id", data?.metaExpedient?.id)}/>
-        <GridFormField xs={12} name="tipusValidacio" disabled={data?.itemValidacio=="DADA"} required/>
+        <GridFormField name="itemValidacio" required/>
+        <GridFormField name="metaDada" hidden={data?.itemValidacio!="DADA"} filter={builder.eq("metaNode.id", data?.metaExpedient?.id)}/>
+        <GridFormField name="metaDocument" hidden={data?.itemValidacio!="DOCUMENT"} filter={builder.eq("metaExpedient.id", data?.metaExpedient?.id)}/>
+        <GridFormField name="tipusValidacio" disabled={data?.itemValidacio=="DADA"} required/>
     </Grid>
 }
 

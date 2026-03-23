@@ -39,12 +39,12 @@ const RevisioMetaExpedientForm = (props:any) => {
 // Filter
 const RevisioMetaExpedientFilterForm = () => {
     return <>
-        <GridFormField xs={4} name="codi"/>
-        <GridFormField xs={4} name="classificacio"/>
-        <GridFormField xs={4} name="nom"/>
-        <GridFormField xs={3} name="revisioEstat"/>
-        <GridFormField xs={3} name="organGestor"/>
-        <GridFormField xs={3} name="tipus"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 4}} name="codi"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 4}} name="classificacio"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 4}} name="nom"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="revisioEstat"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="organGestor"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="tipus"/>
     </>
 }
 

@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {Alert, Grid} from "@mui/material";
+import {Alert, Grid2 as Grid} from "@mui/material";
 import {useResourceApiService, MuiDialog, useBaseAppContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import Load from "../../../components/Load.tsx";
@@ -15,7 +15,7 @@ const MetaExpedientDetail = (props:any) => {
     return <MuiDetail entity={entity} fields={fields}>
         <DetailCard>
             {(entity?.revisioEstat == 'REVISAT' && isOrganAdmin) &&
-                <Grid xs={12}>
+                <Grid size={12}>
                     <Alert severity={'info'}>{t('page.metaExpedient.action.consultar.revisat')}</Alert>
                 </Grid>
             }

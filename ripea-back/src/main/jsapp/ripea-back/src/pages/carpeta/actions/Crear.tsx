@@ -1,6 +1,6 @@
 import {MuiFormDialog, MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
 import {useRef} from "react";
-import {Grid} from "@mui/material";
+import {Box, Grid2 as Grid} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
 import {useTranslation} from "react-i18next";
 import UsuarisRestriccioForm from "./restriccio/UsuarisRestriccioForm.tsx";
@@ -11,17 +11,15 @@ const CrearForm = () => {
 	return (
 		<>
 			<Grid container direction="row" columnSpacing={1} rowSpacing={1}>
-				<GridFormField xs={12} name="nom" />
-				<GridFormField xs={12} name="restringida" />
+				<GridFormField name={"nom"}/>
+				<GridFormField name={"restringida"}/>
+                <GridFormField name={"motiuRestriccio"} hidden={!data?.restringida}/>
 			</Grid>
 
 			{data?.restringida && (
-				<>
-					<Grid sx={{ mt: 2, mb: 1}}>
-						<GridFormField xs={12} name="motiuRestriccio" />
-					</Grid>
+				<Box p={1}>
 					<UsuarisRestriccioForm />
-				</>
+				</Box>
 			)}
 		</>
 	);

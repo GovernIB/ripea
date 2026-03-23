@@ -35,6 +35,7 @@ const translationEs = {
             update: "Modificado el {{lastModifiedDate}} por '{{lastModifiedBy}}'.",
         },
         nouPermis: "Nuevo permiso",
+        advancedSearch: "Búsqueda avanzada",
     },
     enum: {
         rol: {
@@ -72,6 +73,15 @@ const translationEs = {
             FIRMAT: "Firmado",
             REBUTJAT: "Rechazado",
             PARCIAL: "Parcial",
+        },
+        estatNotificacio: {
+            ENVIADA: "Enviada",
+            ENVIADA_AMB_ERRORS: "Enviada con errores",
+            FINALITZADA: "Finalizada",
+            FINALITZADA_AMB_ERRORS: "Finalizada con errores",
+            PENDENT: "Pendiente",
+            PROCESSADA: "Procesada",
+            REGISTRADA: "Registrada",
         },
         origen: {
             O0: "Ciudadano",
@@ -145,6 +155,7 @@ const translationEs = {
         },
     },
     navigate: {
+        accessibilitat: "Accesibilidad",
         expedient: "Buscador de expedientes",
         expedientPeticio: "Buscador de anotaciones de registro",
         usuariTasca: "Tareas",
@@ -167,6 +178,7 @@ const translationEs = {
     },
     page: {
         comment: {
+            label: "Comentarios",
             expedient: "Comentarios del expediente",
             tasca: "Comentarios de la tarea",
             metaExpedient: "Comentarios del procedimiento",
@@ -335,7 +347,7 @@ const translationEs = {
                 canviEstatDistribucio: {
                     label: "Cambiar estado a distribución",
                     ok: "El estado ha cambiado correctamente",
-                    massiveOk: "Se ha actualizado el estado de '{{data.num}}' anotaciones",
+                    massiveOk: "Se ha programado una acción masiva para actualizar el estado de '{{data.num}}' anotaciones.",
                 },
                 descargarAnnex: {
                     label: "Descargar Anexo",
@@ -344,7 +356,7 @@ const translationEs = {
                 procesarAnnexosPendents: {
                     label: "Adjuntar",
                     ok: "El anexo se ha procesado correctamente",
-                    massiveOk: "Se han procesado '{{data.num}}' anexos",
+                    massiveOk: "Se ha programado una acción masiva para procesar '{{data.num}}' anexos.",
                     info: "Si se ha producido algún error al aceptar una anotación desde la pantalla de Anotaciones, de manera que alguno de los documentos de la anotación no se haya adjuntado al expediente, desde este listado podrá volver a intentar adjuntar el documento al expediente.",
                 },
                 firma: {
@@ -356,6 +368,9 @@ const translationEs = {
                     ok: "La anotación se ha consultado y guardado correctamente",
                     massiveOk: "Se han consultado y guardado correctamente {{data.num}} anotaciones",
                 },
+                reintentar: {
+                    title: "Seleccionar tipo de documento para el anexo/anexos pendientes",
+                }                
             }
         },
         tasca: {
@@ -607,7 +622,7 @@ const translationEs = {
                 },
                 download: {
                     label: "Descargar documentos...",
-                    button: "Descarga documentos",
+                    button: "Descarga seleccionados",
                     title: "Selección documentos",
                     ok: "Los documentos se han descargado correctamente",
                 },
@@ -616,7 +631,7 @@ const translationEs = {
                     ok: "La hoja de cálculo se ha descargado correctamente",
                 },
                 exportZIP: {
-                    label: "Exportar índice ZIP...",
+                    label: "Exportar índice ZIP",
                     button: "Exporta ZIP",
                     title: "Exportar documentos a ZIP",
                     ok: "El documento ZIP se ha descargado correctamente",
@@ -646,7 +661,7 @@ const translationEs = {
                     ok: "El documento INSIDE se ha descargado correctamente",
                 },
                 exportDocs: {
-                    label: "Exportar los documentos de los expedientes seleccionados",
+                    label: "Exportar documentos de los exp. seleccionados...",
                     ok: "Los documentos se han exportado correctamente",
                 },
                 export: {
@@ -694,10 +709,19 @@ const translationEs = {
                     ok: "Los interesados se han exportado correctamente",
                 },
                 impDocMass: {
-                    label: "Importar documentos a los expedientes seleccionados",
-                    title: "Importar documentos a expedientes",
+                    label: "Importar documentos a los exp. seleccionados...",
+                    title: "Importación de documentos",
+                    mssg: "Los documentos que adjunte se incorporarán a los {{num}} expedientes seleccionados",
                     warning: "Los expedientes deben pertenecer al mismo procedimiento.",
                 },
+                exportMass: {
+                    unic: "Exporta el expediente...",
+                    label: "Exportar expedientes seleccionados..",
+                    title: "Exportar expedientes seleccionados",
+                    titleUni: "Exportar expediente",
+                    info: "Puede seleccionar varios formatos de exportación a la vez. La exportación se realizará en segundo plano, y una vez finalizada, podrá descargar el documento generado desde el listado de acciones masivas.",
+                    info2: "Puede seleccionar varios formatos de exportación a la vez. La exportacion puede tardar unos instantos, una vez finalizada, se iniciará la descarga automáticamente.",
+                },                
                 comment: {
                     ok: "Comentario añadido al expediente '{{data.expedient.description}}'",
                 },
@@ -735,7 +759,10 @@ const translationEs = {
 				},
             },
             modal: {
-                seguidors: "Seguidores del expediente",
+                seguidors: {
+                    label: "Seguidores",
+                    title: "Seguidores del expediente",
+                },
             },
             results: {
                 checkDelete: "¿Está seguro de que quiere borrar este contenido? Si contenia firmas en curso, seran canceladas.",
@@ -1852,6 +1879,8 @@ const translationEs = {
                 noOrgans: "Ningún órgano gestor asignado",
             },
             menu: {
+                title: "Menú",
+
                 entitat: "Entidades",
                 expedient: "Expedientes",
                 monitoritzar: "Monitorizar",
@@ -1935,6 +1964,7 @@ const translationEs = {
             action: {
                 read: {
                     label: "Marcar como leído",
+                    title: "Alertas del expediente",
                     ok: "La alerta se ha marcado como leida",
                     massiveOk: "Las alertas se han marcado como leídas",
                 },

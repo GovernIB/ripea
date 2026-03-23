@@ -1,5 +1,5 @@
 import {MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
-import {Grid} from "@mui/material";
+import {Grid2 as Grid} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
 import {useRef} from "react";
 import {useTranslation} from "react-i18next";
@@ -8,9 +8,9 @@ import FormActionDialog from "../../../components/FormActionDialog.tsx";
 const VincularGrupForm = () => {
     const {data} = useFormContext()
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="grup" namedQueries={`VINCULAR_PROCEDIMENT#${data?.id}`}/>
-        <GridFormField xs={12} name="organGestor" disabled/>
-        <GridFormField xs={12} name="perDefecte"/>
+        <GridFormField name="grup" namedQueries={`VINCULAR_PROCEDIMENT#${data?.id}`}/>
+        <GridFormField name="organGestor" disabled/>
+        <GridFormField name="perDefecte"/>
     </Grid>
 }
 

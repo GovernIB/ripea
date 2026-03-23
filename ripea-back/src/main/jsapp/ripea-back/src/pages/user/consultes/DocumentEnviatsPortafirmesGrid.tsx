@@ -61,11 +61,11 @@ const useDetail = () => {
 // Filter
 const DocumentEnviatsPortafirmesFilterForm = () => {
     return <>
-        <GridFormField xs={4} name="expedient"/>
-        <GridFormField xs={4} name="document"/>
-        <GridFormField xs={4} name="estat"/>
-        <GridFormField xs={4} name="dataEnviamentInici" type={"date"}/>
-        <GridFormField xs={4} name="dataEnviamentFi" type={"date"}/>
+        <GridFormField size={{xs: 12, sm: 6, md: 4}} name="expedient"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 4}} name="document"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 4}} name="estat"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 4}} name="dataEnviamentInici" type={"date"}/>
+        <GridFormField size={{xs: 12, sm: 6, md: 4}} name="dataEnviamentFi" type={"date"}/>
     </>
 }
 

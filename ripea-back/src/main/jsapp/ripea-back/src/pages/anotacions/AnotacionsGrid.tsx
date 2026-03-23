@@ -7,7 +7,7 @@ import {CardPage} from "../../components/CardData.tsx";
 import AnotacioFilter from "./AnotacioFilter.tsx";
 import Load from "../../components/Load.tsx";
 import {useMemo, useState} from "react";
-import {Grid} from "@mui/material";
+import {Grid2 as Grid} from "@mui/material";
 import GridFormField from "../../components/GridFormField.tsx";
 import {GridSortDirection} from "@mui/x-data-grid-pro";
 import useAnotacioDetail from "./details/AnotacioDetail.tsx";
@@ -20,10 +20,10 @@ const AnotacionsGridForm = () => {
     const {data} = useFormContext();
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="identificador" disabled readOnly/>
-        <GridFormField xs={12} name="registreExtracte" disabled readOnly/>
-        <GridFormField xs={12} name="metaExpedient"/>
-        <GridFormField xs={12} name="grup"
+        <GridFormField name="identificador" disabled readOnly/>
+        <GridFormField name="registreExtracte" disabled readOnly/>
+        <GridFormField name="metaExpedient"/>
+        <GridFormField name="grup"
                        namedQueries={[`BY_PROCEDIMENT#${data?.metaExpedient?.id}`]}
                        disabled={!data?.metaExpedient}
                        readOnly={!data?.metaExpedient}

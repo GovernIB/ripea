@@ -3,7 +3,7 @@ import {MuiDialog, useBaseAppContext, useFormContext, useResourceApiService} fro
 import {useEffect, useMemo, useRef, useState} from "react";
 import StyledMuiFilter from "../../../../components/StyledMuiFilter.tsx";
 import GridFormField, {GridButton} from "../../../../components/GridFormField.tsx";
-import {Alert, Box, Grid, Icon, IconButton, Typography} from "@mui/material";
+import {Alert, Box, Grid2 as Grid, Icon, IconButton, Typography} from "@mui/material";
 import * as builder from "../../../../util/springFilterUtils.ts";
 import {useSession} from "../../../../components/SessionStorageContext.tsx";
 import Load from "../../../../components/Load.tsx";
@@ -101,10 +101,10 @@ export const IntegracioDiagnosticFilterForm = ({apiReiniciar}:any) => {
     ), [data?.entitat?.id])
 
     return <>
-        <GridFormField xs={6} name="entitat"/>
-        <GridFormField xs={6} name="organ" filter={organFilter}/>
-        <GridButton xs={2} onClick={apiReiniciar} variant={'contained'} color={'warning'}>
-            <Icon>cached</Icon>{t('page.integracio.action.reiniciarAll.label')}
+        <GridFormField size={{xs: 12, sm: 6}} name="entitat"/>
+        <GridFormField size={{xs: 12, sm: 6}} name="organ" filter={organFilter}/>
+        <GridButton size={{xs: 12, sm: 3, md: 2}} icon={'cached'} onClick={apiReiniciar} variant={'contained'} color={'warning'}>
+            {t('page.integracio.action.reiniciarAll.label')}
         </GridButton>
     </>
 
@@ -119,7 +119,6 @@ export const IntegracioDiagnosticFilter = ({apiReiniciar}:any) => {
             icon: 'auto_fix_normal',
             componentProps: {
                 variant: "outlined",
-                sx: { borderRadius: '4px' },
             },
         },
         {
@@ -128,7 +127,6 @@ export const IntegracioDiagnosticFilter = ({apiReiniciar}:any) => {
             icon: 'monitor_heart',
             componentProps: {
                 variant: "contained",
-                sx: { borderRadius: '4px' },
             },
         },
     ]
@@ -210,9 +208,9 @@ export const useIntegracioDiagnostic = (integracions:any[]) => {
                 {integracions?.map?.(i => {
                     const d = diagnostic.get(i.codi)
                     return <Grid container direction={"row"} display={'flex'} columnSpacing={1}>
-                        <Grid item xs={3}><Typography variant={"body1"} ml={1}>{i.nom || i.codi}</Typography></Grid>
+                        <Grid size={3}><Typography variant={"body1"} ml={1}>{i.nom || i.codi}</Typography></Grid>
                         <Load value={d}>
-                            <Grid item xs={7.5}>
+                            <Grid size={7.5}>
                                 {d?.traza == null
                                     ? <Alert severity={getAlertSeverity(d?.nivell)}>{d?.missatge}</Alert>
                                     : <AlertExpand
@@ -246,7 +244,7 @@ export const useIntegracioDiagnostic = (integracions:any[]) => {
                                     </AlertExpand>
                                 }
                             </Grid>
-                            <Grid item xs={1.5}>
+                            <Grid size={1.5}>
                                 <MenuActionButton
                                     id={`action-${i.codi}`}
                                     entity={i}

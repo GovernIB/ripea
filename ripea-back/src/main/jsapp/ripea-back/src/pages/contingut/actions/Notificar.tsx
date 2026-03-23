@@ -1,5 +1,5 @@
 import {useEffect, useRef, useState} from "react";
-import {Grid, Alert, Icon} from "@mui/material";
+import {Grid2 as Grid, Alert, Icon} from "@mui/material";
 import {MuiFormDialogApi, useBaseAppContext, useFormContext, useResourceApiService} from "reactlib";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
@@ -94,14 +94,14 @@ const NotificarForm = () => {
                 {t('page.document.action.notificar.alert.administracioSir.title')}<b>{t('page.document.action.notificar.alert.administracioSir.warning')}</b>
             </Alert>}
 
-        <GridFormField xs={12} name="tipus" required hiddenEnumValues={['MANUAL']}/>
-        <GridFormField xs={12} name="estat" required disabled/>
+        <GridFormField name="tipus" required hiddenEnumValues={['MANUAL']}/>
+        <GridFormField name="estat" required disabled/>
 
-		<GridFormField xs={12} name="grups" multiple filter={grupsFilter}/>
-        <GridFormField xs={9.5} name="interessats" multiple filter={interessatsFilter}/>
+		<GridFormField name="grups" multiple filter={grupsFilter}/>
+        <GridFormField size={9.5} name="interessats" multiple filter={interessatsFilter}/>
 
         <GridButton
-            xs={2.5}
+            size={2.5}
             onClick={()=> {
                 create({expedient: data?.expedient}, onCreateInteressat)
             }}
@@ -110,16 +110,16 @@ const NotificarForm = () => {
         </GridButton>
         {content}
 
-        <GridFormField xs={12} name="concepte" required/>
-        <GridFormField xs={12} name="serveiTipus" required/>
-        <GridFormField xs={12} name="descripcio" type={"textarea"}/>
-        <GridFormField xs={12} name="dataProgramada" type={"date"} componentProps={{title: t('page.contingut.detalle.dataProgramada')}}/>
-        <GridFormField xs={6} name="duracio" componentProps={{title: t('page.contingut.detalle.duracio')}}/>
-        <GridFormField xs={6} name="dataCaducitat" type={"date"} componentProps={{title: t('page.contingut.detalle.dataCaducitat')}}/>
-        <GridFormField xs={12} name="retard" componentProps={{title: t('page.contingut.detalle.retard')}}/>
-        <GridFormField xs={12} name="entregaPostal" hidden={!data?.permetreEnviamentPostal}/>
+        <GridFormField name="concepte" required/>
+        <GridFormField name="serveiTipus" required/>
+        <GridFormField name="descripcio" type={"textarea"}/>
+        <GridFormField name="dataProgramada" type={"date"} componentProps={{title: t('page.contingut.detalle.dataProgramada')}}/>
+        <GridFormField size={6} name="duracio" componentProps={{title: t('page.contingut.detalle.duracio')}}/>
+        <GridFormField size={6} name="dataCaducitat" type={"date"} componentProps={{title: t('page.contingut.detalle.dataCaducitat')}}/>
+        <GridFormField name="retard" componentProps={{title: t('page.contingut.detalle.retard')}}/>
+        <GridFormField name="entregaPostal" hidden={!data?.permetreEnviamentPostal}/>
 
-        <Grid item xs={12}>
+        <Grid size={12}>
             <Load value={data?.interessats} noEffect>
                 <AdditionalInfo data={data}/>
             </Load>

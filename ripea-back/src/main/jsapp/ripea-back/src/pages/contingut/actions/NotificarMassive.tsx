@@ -1,5 +1,5 @@
 import {MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
-import {Grid} from "@mui/material";
+import {Grid2 as Grid} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
 import {useRef} from "react";
 import {useTranslation} from "react-i18next";
@@ -12,9 +12,9 @@ const NotificarMassiveForm = () => {
     const filterMetaDocument = builder.eq('metaExpedient.id', data?.metaExpedient?.id)
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="metaDocument" filter={filterMetaDocument} required/>
-        <GridFormField xs={12} name="ntiOrigen" required/>
-        <GridFormField xs={12} name="ntiEstadoElaboracion" required/>
+        <GridFormField name="metaDocument" filter={filterMetaDocument} required/>
+        <GridFormField name="ntiOrigen" required/>
+        <GridFormField name="ntiEstadoElaboracion" required/>
     </Grid>
 }
 

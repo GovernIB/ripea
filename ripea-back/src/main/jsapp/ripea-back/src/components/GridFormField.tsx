@@ -1,4 +1,4 @@
-import {Button, Grid, Icon, IconButton} from "@mui/material";
+import {Button, Grid2 as Grid, Icon, IconButton, useMediaQuery, useTheme} from "@mui/material";
 import {FormField, FormFieldProps, FormFieldDataActionType, useFormContext} from "reactlib";
 import Load from "./Load.tsx";
 import {useTranslation} from "react-i18next";
@@ -7,22 +7,26 @@ import {useCallback, useEffect, useMemo, useState} from "react";
 import InputAdornment from "@mui/material/InputAdornment";
 
 export const GridButton = (props:any) => {
-    const { title, xs, children, hidden, ...other} = props;
+    const { title, icon, size, children, hidden, sx, ...other} = props;
 
-    return <Grid item title={title} xs={xs} hidden={hidden}>
+    const theme = useTheme();
+    const iconOnly = useMediaQuery(theme.breakpoints.down('md'));
+
+    return <Grid title={title} size={size} hidden={hidden}>
         <Button
             variant="outlined"
-            sx={{ borderRadius: '4px', width: '100%', height: '100%'}}
+            sx={{ borderRadius: '4px', width: '100%', height: '100%', ...sx }}
             style={{margin: 0}}
             {...other}
         >
-            {children}
+            <Icon sx={{mr: (!iconOnly && children) ?0.5 :0, ...props.iconSx}}>{icon}</Icon>
+            {!iconOnly && children}
         </Button>
     </Grid>
 }
 
 export const GridButtonField = (props:any) => {
-    const {name, icon, whitLabel, ...other} = props;
+    const {name, whitLabel, ...other} = props;
     const {data, apiRef, fields} = useFormContext()
 
     const label = fields?.find?.(item => item?.name === name)?.label || ''
@@ -34,13 +38,12 @@ export const GridButtonField = (props:any) => {
         title={label}
         {...other}
     >
-        <Icon sx={{mr: (whitLabel && label) ?1 :0, ...props.iconSx}}>{icon}</Icon>
         {whitLabel && label}
     </GridButton></Load>
 }
 
 type GridFormField = FormFieldProps & {
-    xs: number,
+    size?: any,
     hidden?: boolean,
 }
 
@@ -95,7 +98,7 @@ export const PasswordFormField = (props:GridFormField) => {
 const GridFormField = (props:GridFormField) => {
     const {
         name,
-        xs,
+        size = 12,
         hidden,
         componentProps = {},
         disabled,
@@ -124,7 +127,7 @@ const GridFormField = (props:GridFormField) => {
         }
     }, [dataDispatchAction, field, name]);
 
-    return <Grid item xs={xs} hidden={!!hidden}>
+    return <Grid size={size} hidden={!!hidden}>
         <FormField
             name={name}
             disabled={disabled}

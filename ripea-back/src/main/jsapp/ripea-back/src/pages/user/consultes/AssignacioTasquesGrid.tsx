@@ -13,12 +13,12 @@ import useTascaDetail from "../../tasca/details/TascaDetail.tsx";
 
 const AssignacioTasquesFilterForm = () => {
     return <>
-        <GridFormField xs={3} name="titol"/>
-        <GridFormField xs={3} name="metaExpedientTasca"/>
-        <GridFormField xs={3} name="estat"/>
-        <GridFormField xs={3} name="responsable"/>
-        <GridFormField xs={3} name="dataInici" type={"date"}/>
-        <GridFormField xs={3} name="dataFi" type={"date"}/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="titol"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="metaExpedientTasca"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="estat"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="responsable"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="dataInici" type={"date"}/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="dataFi" type={"date"}/>
     </>
 }
 

@@ -1,5 +1,5 @@
 import {FormField, MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
-import {Grid, Box, Alert} from "@mui/material";
+import {Grid2 as Grid, Box, Alert, Typography} from "@mui/material";
 import {useEffect, useMemo, useRef, useState} from "react";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
@@ -38,7 +38,7 @@ const ImportarDocumentMassiveForm = (props:any) => {
             flex: 1,
             renderCell: (params:any) => {
                 const value = data?.documents.find((d:any) => d.id === params.row.id)?.fitxer
-                return <Box mt={1.5}><FormField
+                return <Box mt={1.5} width={'100%'}><FormField
                     name={'file' + (value ? `#${params?.row?.id}` : '')}
                     field={fieldFitxer}
                     componentProps={{size: "small"}}
@@ -54,7 +54,7 @@ const ImportarDocumentMassiveForm = (props:any) => {
             flex: 1,
             renderCell: (params:any) => {
                 const value = data?.documents.find((d:any) => d.id === params.row.id)?.tipusDocument
-                return <Box mt={1.5}><FormField
+                return <Box mt={1.5} width={'100%'}><FormField
                     name={'tipusDocument' + (value ? `#${params?.row?.id}` : '')}
                     field={fieldTipusDocument}
                     componentProps={{size: "small"}}
@@ -84,7 +84,8 @@ const ImportarDocumentMassiveForm = (props:any) => {
     ], [apiRef, data.documents, data?.metaExpedientId, fieldFitxer, fieldTipusDocument, updateDocument]);
 
     const CustomToolbar = () => {
-        return <GridToolbarContainer sx={{ height: '52px', display: 'flex', justifyContent: 'end', mr: 1 }}>
+        return <GridToolbarContainer sx={{ height: '52px', display: 'flex', justifyContent: 'space-between', mr: 1 }}>
+            <Typography ml={1}>{t('page.expedient.action.impDocMass.mssg', {num: data?.ids?.length})}</Typography>
             <ToolbarButton
                 title={t('common.create')}
                 icon={'add'}
@@ -97,7 +98,7 @@ const ImportarDocumentMassiveForm = (props:any) => {
     }
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <Grid xs={12}>
+        <Grid size={12}>
             <DataGridPro
                 rows={data?.documents}
                 columns={columns}

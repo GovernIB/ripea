@@ -1,5 +1,5 @@
 import React, {useCallback, useMemo} from "react";
-import {Grid, Button, Icon} from "@mui/material";
+import {Grid2 as Grid, Button, Icon} from "@mui/material";
 import {StyledBadge} from "../../components/StyledBadge.tsx";
 import {useEntitatSession, useUserSession} from "../../components/Session.tsx";
 import {useTranslation} from "react-i18next";
@@ -15,6 +15,7 @@ import {
 import {getImgFromBytes} from "../../App.tsx";
 import goib_escut_logo from "../../assets/goib_escut_logo.png"
 import {useSistemaDetail} from "./monitor/SistemaDetail.tsx";
+import {useTheme, useMediaQuery} from "@mui/material";
 
 export const icons = {
     expedient: 'folder',
@@ -49,7 +50,7 @@ const Link = React.forwardRef<HTMLAnchorElement, RouterLinkProps>((itemProps, re
     return <RouterLink ref={ref} {...itemProps} role={undefined} />;
 });
 
-const generateMenuItems = (appMenuEntries: any[], entitat:any) => {
+const generateMenuItems = (appMenuEntries: any[], entitat:any, iconOnly:boolean) => {
 	/*
 	 iconVariant — valores posibles (Material Icons):
 	  - 'material-icons'          : filled (por defecto)
@@ -63,13 +64,14 @@ const generateMenuItems = (appMenuEntries: any[], entitat:any) => {
         ? appMenuEntries.map((entry) => (
             <Button
                 className="appMenuItem"
+                title={entry.hover || entry.title}
                 key={entry.id}
-                style={{ color: entitat?.conf?.colorLletra, marginLeft: 0, ...entry?.componentProps }}
+                style={{ color: entitat?.conf?.colorLletra, minWidth: '3rem', marginLeft: 0, ...entry?.componentProps }}
                 component={Link}
                 to={entry.to} // Navegació amb React Router
                 onClick={entry?.onClick}>
                 {entry?.icon && <Icon baseClassName={entry?.iconVariant ?? 'material-icons'}>{entry?.icon}</Icon>}
-                {entry.title}
+                {!iconOnly && entry.children}
             </Button>
         )) : [];
 }
@@ -141,16 +143,19 @@ const UserHeadToolbar = () => {
     });
 
     appMenuEntries.forEach((entrie)=>{
-        entrie.title = <AppMenuBadge badgeContent={entrie?.badge} title={entrie?.hover}>{entrie.title}</AppMenuBadge>
+        entrie.children = <AppMenuBadge badgeContent={entrie?.badge}>{entrie.title}</AppMenuBadge>
     })
 
     menuEntries.forEach((entrie)=>{
-        entrie.title = <MenuBadge badgeContent={entrie?.badge} title={entrie?.hover}>{entrie.title}</MenuBadge>
+        entrie.title = <MenuBadge badgeContent={entrie?.badge} title={entrie?.hover || entrie.title}>{entrie.title}</MenuBadge>
     })
 
-    return <Grid container rowSpacing={1} columnSpacing={1} item xs={8} flexDirection={"row"} alignContent={'center'} justifyContent={'end'}>
-        <Grid item xs={10} display={"flex"} justifyContent={"end"}>{...generateMenuItems(appMenuEntries, entitat)} {/* Menu */}</Grid>
-        {menuEntries?.length > 0 && <Grid item xs={1} display={"flex"} justifyContent={"center"}>
+    const theme = useTheme();
+    const iconOnly = useMediaQuery(theme.breakpoints.down('md'));
+
+    return <Grid container rowSpacing={1} columnSpacing={1} size={8} flexDirection={"row"} alignContent={'center'} justifyContent={'end'}>
+        <Grid size={10} display={"flex"} justifyContent={"end"}>{...generateMenuItems(appMenuEntries, entitat, iconOnly)} {/* Menu */}</Grid>
+        {menuEntries?.length > 0 && <Grid size={2} display={"flex"} justifyContent={"center"}>
             <AppMenu key="app_menu" menuEntries={menuEntries} logo={menuLogo}/> {/* Side Menu */}
             {...contents} {/* Additional content */}
         </Grid>}
@@ -171,13 +176,13 @@ const useMenuSupAdmin = () => {
         {
             id: 'integracions',
             title: t('page.user.menu.integracions'),
-            // icon: '',
+            icon: 'build',
             to: 'integracio',
         },
         {
             id: 'excepcions',
             title: t('page.user.menu.excepcions'),
-            // icon: '',
+            icon: 'warning',
             to:'excepcio',
         },
     ];

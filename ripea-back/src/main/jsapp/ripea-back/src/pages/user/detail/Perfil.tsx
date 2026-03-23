@@ -1,14 +1,16 @@
 import {useRef} from "react";
-import {Grid} from "@mui/material";
+import {Grid2 as Grid, Box} from "@mui/material";
 import {MuiFormDialog, useBaseAppContext, MuiFormDialogApi, useFormContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {CardData} from "../../../components/CardData.tsx";
 import GridFormField from "../../../components/GridFormField.tsx";
 import {useUserSession} from "../../../components/Session.tsx";
 import * as builder from '../../../util/springFilterUtils';
+import {FieldData, MuiDetail} from "../../../components/MuiDetail.tsx";
+import {StyledLabel} from "../../../components/StyledLabel.tsx";
 
 const PerfilFrom = () =>{
-    const {data} = useFormContext();
+    const {data, fields} = useFormContext();
     const { t } = useTranslation();
     const { value: user } = useUserSession();
 
@@ -18,43 +20,48 @@ const PerfilFrom = () =>{
             cardProps={{border: '1px solid #004B99'}}
             headerProps={{color: 'white', backgroundColor: '#004B99 !important', borderBottom: 'none'}}
         >
-            <GridFormField xs={12} name="nom" disabled readOnly/>
-            <GridFormField xs={12} name="nif" disabled readOnly/>
-            <GridFormField xs={12} name="email" disabled readOnly/>
+            <MuiDetail entity={data} fields={fields} sx={{ width: '100%'}}>
+                <FieldData field={"nom"} sx={{border: 'none'}} size={4}/>
+                <FieldData field={"email"} sx={{borderTop: 'none'}} size={4}/>
+                <FieldData field={"rols"} sx={{borderTop: 'none'}} size={4} commponentProps={{ component: Box }} isObject>
+                    <Box display={'flex'} flexWrap="wrap" gap={1}>
+                        {user?.auth.map((r) => <StyledLabel backgroundColor={'#6e6e6e'}>{r}</StyledLabel>)}
+                    </Box>
+                </FieldData>
+            </MuiDetail>
             <GridFormField xs={12} name="emailAlternatiu"/>
-            <GridFormField xs={12} name="rols" value={user?.auth} disabled readOnly multiple/>
             <GridFormField xs={12} name="idioma" required/>
         </CardData>
 
         <CardData title={t('page.user.perfil.correu')}>
-            <GridFormField xs={12} name="rebreEmailsAgrupats"/>
-            <GridFormField xs={12} name="rebreAvisosNovesAnotacions"/>
+            <GridFormField name="rebreEmailsAgrupats"/>
+            <GridFormField name="rebreAvisosNovesAnotacions"/>
         </CardData>
 
         <CardData title={t('page.user.perfil.generic')}>
-            <GridFormField xs={12} name="numElementsPagina" />
-            <GridFormField xs={12} name="entitatPerDefecte" namedQueries={[`BY_USUARI`]}/>
-            <GridFormField xs={12} name="procediment" filter={builder.and(
+            <GridFormField name="numElementsPagina" />
+            <GridFormField name="entitatPerDefecte" namedQueries={[`BY_USUARI`]}/>
+            <GridFormField name="procediment" filter={builder.and(
                 builder.eq('entitat.id', data?.entitatPerDefecte?.id)
             )}/>
-            <GridFormField xs={12} name="modeFosc"/>
+            <GridFormField name="modeFosc"/>
         </CardData>
 
         <CardData title={t('page.user.perfil.column')}>
-            <GridFormField xs={12} name="expedientListDataDarrerEnviament"/>
-            <GridFormField xs={12} name="expedientListAgafatPer"/>
-            <GridFormField xs={12} name="expedientListInteressats"/>
-            <GridFormField xs={12} name="expedientListComentaris"/>
-            <GridFormField xs={12} name="expedientListGrup"/>
+            <GridFormField name="expedientListDataDarrerEnviament"/>
+            <GridFormField name="expedientListAgafatPer"/>
+            <GridFormField name="expedientListInteressats"/>
+            <GridFormField name="expedientListComentaris"/>
+            <GridFormField name="expedientListGrup"/>
         </CardData>
 
         <CardData title={t('page.user.perfil.vista')}>
-            <GridFormField xs={12} name="vistaActual" required/>
-            <GridFormField xs={12} name="expedientExpandit"/>
+            <GridFormField name="vistaActual" required/>
+            <GridFormField name="expedientExpandit"/>
         </CardData>
 
         {/* <CardData title={t('page.user.perfil.moure')}>
-            <GridFormField xs={12} name="vistaMoureActual" required/>
+            <GridFormField name="vistaMoureActual" required/>
         </CardData> */}
     </Grid>
 }

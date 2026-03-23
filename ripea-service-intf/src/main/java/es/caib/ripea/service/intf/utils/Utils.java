@@ -23,6 +23,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -1086,4 +1087,14 @@ public class Utils {
 
         return parts;
     }
+    
+	public static Set<Long> listToSet(List<Long> ids) {
+		Set<Long> resultat = new HashSet<Long>();
+		if (ids!=null) {
+			for (Long id : ids) {
+				if (!resultat.contains(id)) resultat.add(id);
+			}
+		}
+		return resultat;
+	}
 }

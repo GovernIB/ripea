@@ -48,6 +48,28 @@ const base: ThemeOptions = {
                     borderRadius: '4px',
                     color: 'white',
                 },
+                '.massive-selector' : {
+                    '& .MuiButton-root': {
+                        borderColor: 'rgba(0, 0, 0, 0.23)' // Standard MUI outlined button border color
+                    },
+                    '& .MuiButton-root:hover': {
+                        borderColor: 'rgba(0, 0, 0, 0.50)' // Standard MUI outlined button border color
+                    },
+                    '& .MuiButton-root.Mui-disabled': {
+                        borderColor: 'rgba(0, 0, 0, 0.23)',
+                    },
+                    '& .MuiButtonGroup-grouped:first-of-type': {
+                        borderTopLeftRadius: '4px',
+                        borderBottomLeftRadius: '4px',
+                    },
+                    '& .MuiButtonGroup-grouped:last-of-type': {
+                        borderTopRightRadius: '4px',
+                        borderBottomRightRadius: '4px',
+                    },
+                    '& .MuiButton': {
+                        color: 'inherit',
+                    },
+                }
             },
         },
         MuiDataGrid: {
@@ -59,7 +81,17 @@ const base: ThemeOptions = {
                         minWidth: '48px !important',
                         marginLeft: '-4px !important',
                     },
+                    '& .MuiDataGrid-cell': {
+                        display: 'flex',
+                    },
+                    '& .MuiDataGrid-treeDataGroupingCell > *': {
+                        display: 'flex',
+                        alignItems: 'center'
+                    }
                 },
+				row: {
+					minHeight: '40px !important',
+				},
                 cell: {
                     '&.MuiDataGrid-cell--withRenderer': {
                         alignItems: 'flex-start !important',
@@ -102,20 +134,6 @@ const base: ThemeOptions = {
                 },
             },
         },
-        MuiButtonGroup: {
-            styleOverrides: {
-                root: {
-                    '& .MuiButtonGroup-grouped:first-of-type': {
-                        borderTopLeftRadius: '4px',
-                        borderBottomLeftRadius: '4px',
-                    },
-                    '& .MuiButtonGroup-grouped:last-of-type': {
-                        borderTopRightRadius: '4px',
-                        borderBottomRightRadius: '4px',
-                    },
-                },
-            },
-        },
         MuiDrawer: {
             styleOverrides: {
                 paper: {
@@ -141,6 +159,8 @@ const base: ThemeOptions = {
             styleOverrides: {
                 h5: {fontSize: '1.8rem', lineHeight: 1.2, fontWeight: 400},
                 h4: {fontSize: '1.5rem', lineHeight: 1.2, fontWeight: 400},
+                body1: {fontWeight: 500},
+                overline: {fontSize: '1.2rem', letterSpacing: '0em', textTransform: 'none'},
             },
         },
         MuiInputBase: {
@@ -215,9 +235,10 @@ const base: ThemeOptions = {
 const lightPalete = {
     mode: 'light',
     primary: {main: '#337ab7', contrastText: "#fff"},
+    text: { disabled: '#555555 !important' },
     warning: {main: '#8a6d3b'},
     action: {
-        disabled: '#555555',
+        disabled: '#333333',
         selected: 'rgba(51, 122, 183, 0.28)',
         disabledBackground: 'rgba(231,229,229,0.6)',
     },
@@ -251,6 +272,11 @@ export const lightTheme = createTheme(base, {
                     },
                 },
             },
+        },
+        MuiButtonGroup: {
+            styleOverrides: {
+                grouped: {'&.Mui-disabled': { backgroundColor: `${lightPalete.action.disabledBackground} !important` }}
+            }
         },
         MuiDialogTitle: {
             styleOverrides: {
@@ -322,7 +348,7 @@ const darkPalette = {
     action: {
         active: '#ffffff',
         hover: '#333333',
-        selected: '#444444',
+		selected: 'rgba(51, 122, 183, 0.28)',
         disabled: '#555555',
         disabledBackground: '#2c2c2c'
     },
@@ -365,19 +391,19 @@ export const darkTheme = createTheme(base, {
         MuiDataGrid: {
             styleOverrides: {
                 root: {
-                    '& .MuiDataGrid-row.even.MuiDataGrid-row': {
-                        backgroundColor: 'inherit',
-                    },
+					'& .MuiDataGrid-row.even.MuiDataGrid-row': {
+					    backgroundColor: '#464646',
+					},
                     '& .MuiDataGrid-row:hover': {
-                        backgroundColor: `rgba(77, 128, 172, 0.75)  !important`,
+                        backgroundColor: `${darken(darkPalette.action.selected, 0.2)} !important`,
                     },
                 },
                 row: {
                     '&.MuiDataGrid-row.Mui-selected': {
-                        backgroundColor: `${darkPalette.action.selected} !important`,
+						backgroundColor: `${darkPalette.action.selected} !important`,
                     },
                     '&.MuiDataGrid-row.Mui-selected:hover': {
-                        backgroundColor: `${darken(darkPalette.action.selected, 0.2)} !important`,
+						backgroundColor: `${darken(darkPalette.action.selected, 0.2)} !important`,                        
                     },
                 },
             },
@@ -424,7 +450,7 @@ export const darkTheme = createTheme(base, {
         },
         MuiButtonGroup: {
             styleOverrides: {
-                grouped: {'&.Mui-disabled': {color: 'grey !important'}}
+                grouped: {'&.Mui-disabled': {color: darkPalette.text.disabled}}
             }
         },
         MuiDrawer: {styleOverrides: {paper: {backgroundColor: '#2d2d2d'}}},

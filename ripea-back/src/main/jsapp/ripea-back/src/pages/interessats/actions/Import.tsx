@@ -1,5 +1,5 @@
 import {useEffect, useMemo, useRef, useState} from "react";
-import {Grid, Icon} from "@mui/material";
+import {Grid2 as Grid, Icon} from "@mui/material";
 import {DataGridPro} from "@mui/x-data-grid-pro";
 import {MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
 import {useTranslation} from "react-i18next";
@@ -50,11 +50,11 @@ const ImportForm = () => {
     }, [selectedRows]);
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-		<GridFormField xs={12} name="tipusImportacio" required/>
-        <FileFormField xs={12} name="fitxerJsonInteressats" required/>
+		<GridFormField name="tipusImportacio" required/>
+        <FileFormField name="fitxerJsonInteressats" required/>
 
         <Load value={data?.interessatsFitxer} noEffect>
-            <Grid item xs={12}>
+            <Grid size={12}>
             <DataGridPro
                 rows={data?.interessatsFitxer}
                 columns={columns}

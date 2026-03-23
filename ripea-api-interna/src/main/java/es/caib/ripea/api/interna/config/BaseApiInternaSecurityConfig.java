@@ -36,11 +36,11 @@ public class BaseApiInternaSecurityConfig {
 				new AntPathRequestMatcher("/api/viaFirmaResponse"),
 				new AntPathRequestMatcher("/notib/**/*"),
 //				new AntPathRequestMatcher(VERSIO_API_COMANDA+"/**")
-				new AntPathRequestMatcher(VERSIO_API_COMANDA+"/appInfo"),
+//				new AntPathRequestMatcher(VERSIO_API_COMANDA+"/appInfo"),
 				new AntPathRequestMatcher(VERSIO_API_COMANDA+"/salut"),
-				new AntPathRequestMatcher(VERSIO_API_COMANDA+"/estadistiquesInfo"),
-				new AntPathRequestMatcher(VERSIO_API_COMANDA+"/estadistiques"),
-				new AntPathRequestMatcher(VERSIO_API_COMANDA+"/estadistiques/**"), 
+//				new AntPathRequestMatcher(VERSIO_API_COMANDA+"/estadistiquesInfo"),
+//				new AntPathRequestMatcher(VERSIO_API_COMANDA+"/estadistiques"),
+//				new AntPathRequestMatcher(VERSIO_API_COMANDA+"/estadistiques/**"), 
 //				new AntPathRequestMatcher(VERSIO_API_COMANDA+"/logs/**") //No es publica (BASIC)
 		};
 	}

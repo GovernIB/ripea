@@ -145,11 +145,10 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
     		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
     		ExpedientTascaEntity tascaCreada = tascaHelper.createTasca(entitatEntity.getId(), resource.getExpedient().getId(), toTascaDto(resource));
     		resource.setId(tascaCreada.getId());
-    		return resource;
     	} catch (Exception ex) {
-    		excepcioLogHelper.addExcepcio("/document/"+resource.getId()+"/create", ex);
+    		excepcioLogHelper.addExcepcio("/tasca/create", ex);
     	}
-    	return null;
+    	return resource;
     }
     
     private ExpedientTascaDto toTascaDto(ExpedientTascaResource resource) {

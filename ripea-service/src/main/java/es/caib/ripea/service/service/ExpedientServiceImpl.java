@@ -357,14 +357,11 @@ public class ExpedientServiceImpl implements ExpedientService {
 		}
 		return processatOk;
 	}
-
-
 	
 	@Override
 	public List<DocumentDto> consultaExpedientsAmbImportacio() {
 		return expedientHelper.consultaExpedientsAmbImportacio();
 	}
-	
 
 	public void notificarICanviEstatToProcessatNotificat(Long expedientPeticioId) {
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.getOne(expedientPeticioId);
@@ -377,57 +374,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 		}
 	}
 	
-
-	static Map<Long, Object> locks = new ConcurrentHashMap<>();
-	
-	@Transactional
 	@Override
 	public Exception retryCreateDocFromAnnex(Long registreAnnexId, Long metaDocumentId, String rolActual) {
-
-//		boolean processatOk = true;
-		Exception exception;
-		boolean creatDbOk = true;
-
-		
-		if (!locks.containsKey(registreAnnexId))
-			locks.put(registreAnnexId, new Object());
-		synchronized (locks.get(registreAnnexId)) {
-
-			try {
-				RegistreAnnexEntity registreAnnexEntity = registreAnnexRepository.getOne(registreAnnexId);
-				ExpedientPeticioEntity expedientPeticioEntity = registreAnnexEntity.getRegistre().getExpedientPeticions().get(0);
-				if (expedientPeticioEntity.getExpedient() == null) {
-					throw new RuntimeException("Anotació pendent amb id: " + expedientPeticioEntity.getId() + " no té expedient associat en la base de dades.");
-				}
-
-				exception = expedientHelper.crearDocFromAnnex(expedientPeticioEntity.getExpedient().getId(), registreAnnexId, expedientPeticioEntity.getId(), metaDocumentId, rolActual);
-			} catch (Exception e) {
-				exception = e;
-				creatDbOk = false;
-				logger.error("Error al crear doc from annex", e);
-				expedientHelper.updateRegistreAnnexError(registreAnnexId, ExceptionUtils.getStackTrace(e));
-			}
-			
-	
-			RegistreAnnexEntity registreAnnexEntity = registreAnnexRepository.getOne(registreAnnexId);
-			ExpedientPeticioEntity expedientPeticioEntity = registreAnnexEntity.getRegistre().getExpedientPeticions().get(0);
-			
-			boolean allOk = true;
-			for (RegistreAnnexEntity registreAnnex : expedientPeticioEntity.getRegistre().getAnnexos()) {
-				if (registreAnnex.getError() != null) {
-					allOk = false;
-				}
-			}
-			if (allOk) {
-				notificarICanviEstatToProcessatNotificat(expedientPeticioEntity.getId());
-			}
-		}
-		
-		if (creatDbOk){
-			locks.remove(registreAnnexId);
-		}
-
-		return exception;
+		return expedientHelper.retryCreateDocFromAnnex(registreAnnexId, metaDocumentId, rolActual);
 	}
 	
 	@Transactional

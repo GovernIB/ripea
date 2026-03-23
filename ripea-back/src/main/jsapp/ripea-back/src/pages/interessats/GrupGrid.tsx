@@ -3,9 +3,8 @@ import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
 import * as builder from "../../util/springFilterUtils.ts";
 import {BasePage, MuiDialog, useFormContext, useMuiDataGridApiRef} from "reactlib";
 import {useEffect, useMemo, useState} from "react";
-import Grid from "@mui/material/Grid";
 import GridFormField from "../../components/GridFormField.tsx";
-import {Typography} from "@mui/material";
+import {Typography, Grid2 as Grid} from "@mui/material";
 
 const sortModelInteressat: any = [{ field: 'nomComplet', sort: 'asc' }];
 const columnsInteressat = [
@@ -34,8 +33,8 @@ const CrearGrupForm = () => {
 
     return <>
         <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-            <GridFormField xs={12} name="nom" required/>
-            <GridFormField xs={12} name="descripcio" />
+            <GridFormField name="nom" required/>
+            <GridFormField name="descripcio" />
         </Grid>
 
         <Typography variant="subtitle2">

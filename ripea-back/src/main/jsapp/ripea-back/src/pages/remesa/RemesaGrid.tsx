@@ -1,5 +1,5 @@
 import {useMuiDataGridApiRef} from "reactlib";
-import {Grid, Icon} from "@mui/material";
+import {Grid2 as Grid, Icon} from "@mui/material";
 import useRemesaActions from "./details/RemesaActions.tsx";
 import GridFormField from "../../components/GridFormField.tsx";
 import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
@@ -63,19 +63,19 @@ export const StyledEstat = (props:any) => {
 
 const RemesaGridForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="tipus"/>
-        <GridFormField xs={12} name="estat" disabled readOnly/>
-        {/*<GridFormField xs={12} name="interessats" multiple/>*/}
-        <GridFormField xs={12} name="assumpte"/>
-        <GridFormField xs={12} name="serveiTipusEnum"/>
-        <GridFormField xs={12} name="observacions"/>
-        <GridFormField xs={12} name="dataProgramada" type={'date'}/>
+        <GridFormField name="tipus"/>
+        <GridFormField name="estat" disabled readOnly/>
+        {/*<GridFormField name="interessats" multiple/>*/}
+        <GridFormField name="assumpte"/>
+        <GridFormField name="serveiTipusEnum"/>
+        <GridFormField name="observacions"/>
+        <GridFormField name="dataProgramada" type={'date'}/>
 
-        {/*<GridFormField xs={12} name="caducitatDiesNaturals"/>*/}
-        <GridFormField xs={12} name="dataCaducitat" type={'date'}/>
+        {/*<GridFormField name="caducitatDiesNaturals"/>*/}
+        <GridFormField name="dataCaducitat" type={'date'}/>
 
-        <GridFormField xs={12} name="retard"/>
-        <GridFormField xs={12} name="entregaPostal" disabled/>
+        <GridFormField name="retard"/>
+        <GridFormField name="entregaPostal" disabled/>
     </Grid>
 }
 

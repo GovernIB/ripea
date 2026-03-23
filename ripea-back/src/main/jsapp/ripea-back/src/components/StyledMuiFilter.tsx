@@ -1,9 +1,9 @@
-import {Button, Grid, Icon, Typography} from "@mui/material";
+import {Grid2 as Grid, Typography} from "@mui/material";
 import {MuiFilter, useFilterApiRef, useFormApiRef} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {useSession} from "./SessionStorageContext.tsx";
 import {useEffect, useMemo} from "react";
-import {GridButtonField} from "./GridFormField.tsx";
+import {GridButton, GridButtonField} from "./GridFormField.tsx";
 
 const filterStyle = { className: "styledFilter" };
 
@@ -31,10 +31,6 @@ const StyledMuiFilter = (props:any) => {
             value: 'clear',
             text: t('common.clear'),
             icon: 'auto_fix_normal',
-            componentProps: {
-                variant: "outlined",
-                sx: { borderRadius: '4px' },
-            },
         },
         {
             value: 'search',
@@ -42,19 +38,13 @@ const StyledMuiFilter = (props:any) => {
             icon: 'filter_alt',
             componentProps: {
                 variant: "contained",
-                sx: { borderRadius: '4px' },
             },
         },
     ], [filterRef]);
 
-    const callback = (value: string) => {
-        if (value === 'clear') netejar();
-        if (value === 'search') cercar();
-    };
-
     const {
         buttons = defaultButtons,
-        buttonCallback = callback,
+        buttonCallback,
         buttonGridProps,
         apiRef = filterRef,
         formApiRef = formRef,
@@ -82,6 +72,12 @@ const StyledMuiFilter = (props:any) => {
         apiRef?.current?.clear?.()
     }
 
+    const callback = (value: string) => {
+        if (value === 'clear') netejar();
+        if (value === 'search') cercar();
+        buttonCallback?.(value)
+    };
+
     const { value: filterData, save: saveFilterData } = useSession(sessionKey);
 
     useEffect(() => {
@@ -89,6 +85,8 @@ const StyledMuiFilter = (props:any) => {
             onSpringFilterChange(springFilterBuilder(filterData));
         }
     }, []);
+
+    const buttonSize = 12 / (buttons.length + (advancedSearch ?1 :0))
 
     return <MuiFilter
         code={code}
@@ -112,14 +110,18 @@ const StyledMuiFilter = (props:any) => {
         <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
             {children}
 
-            <Grid item xs={2.4} sx={{ display: 'flex', justifyContent: 'end', marginLeft: 'auto' }} {...buttonGridProps}>
-                {advancedSearch && <GridButtonField name={"advanced"} icon={"filter_list"}/>}
+            <Grid container direction={"row"} columnSpacing={1} rowSpacing={1} size={{xs: 12, sm: 6, md: 2.4}} sx={{ display: 'flex', justifyContent: 'end', marginLeft: 'auto' }} {...buttonGridProps}>
+                {advancedSearch && <GridButtonField size={buttonSize} name={"advanced"} title={t('common.advancedSearch')} icon={"filter_list"}/>}
                 {
                     buttons?.map((button:FilterButtonProps)=>
-                        <Button key={button.value} onClick={() => buttonCallback?.(button.value)} {...button?.componentProps}>
-                            {button?.icon && <Icon sx={{ mr: 0 }}>{button?.icon}</Icon>}
-                            <Typography sx={{ paddingLeft: '5px', marginTop: '1px' }}>{button.text}</Typography>
-                        </Button>)
+                        <GridButton size={buttonSize}
+                                    key={button.value}
+                                    title={button.text}
+                                    icon={button.icon}
+                                    onClick={() => callback(button.value)}
+                                    {...button?.componentProps}>
+                            <Typography sx={{paddingLeft: '5px', marginTop: '1px', maxWidth: 'max-content'}}>{button.text}</Typography>
+                        </GridButton>)
                 }
             </Grid>
         </Grid>

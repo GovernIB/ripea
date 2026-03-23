@@ -1,5 +1,5 @@
 import {MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
-import {Grid} from "@mui/material";
+import {Grid2 as Grid} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
 import {useRef} from "react";
 import {useTranslation} from "react-i18next";
@@ -12,8 +12,8 @@ const CambiarEstatForm = () => {
     const filterEstatAdditional = builder.eq('metaExpedient.id', data?.metaExpedient?.id)
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="nom" disabled readOnly hidden={data?.massivo}/>
-        <GridFormField xs={12} name="estatAdditional" filter={filterEstatAdditional}/>
+        <GridFormField name="nom" disabled readOnly hidden={data?.massivo}/>
+        <GridFormField name="estatAdditional" filter={filterEstatAdditional}/>
     </Grid>
 }
 
@@ -72,7 +72,7 @@ export const useCambiarEstatMassive = (refresh?: () => void) => {
     }
     const onSuccess = (data:any) :void => {
         refresh?.()
-        temporalMessageShow(null, t('page.expedient.action.changeEstat.massiveOk', {data}), 'success');
+        temporalMessageShow(null, t('page.expedient.action.changeEstat.massiveOk', {data}), 'info');
     }
 
     return {

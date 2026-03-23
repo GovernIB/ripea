@@ -10,7 +10,7 @@ import {
 } from "reactlib";
 import {CardPage, ContenidoData} from "../../../components/CardData.tsx";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
-import {Grid, Icon, Link} from "@mui/material";
+import {Grid2 as Grid, Icon, Link} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
@@ -163,17 +163,17 @@ const ContingutFilterForm = () => {
     const isOther = !isExpedient && !isDocument;
 
     return <>
-        <GridFormField xs={3} name="nom"/>
-        <GridFormField xs={3} name="createdBy"/>
-        <GridFormField xs={3} name="tipus"/>
-        <GridFormField xs={3} name="expedient" disabled={isOther}/>
-        {/*<GridFormField xs={3} name="metaExpedient" hidden={!isExpedient}/>*/}
-        {/*<GridFormField xs={3} name="metaDocument" hidden={!isDocument}/>*/}
-        <GridFormField xs={1.9} name="dataEsborratInici" type={"date"}/>
-        <GridFormField xs={1.9} name="dataEsborratFi" type={"date"}/>
-        <GridFormField xs={2} name="esborrat" required/>
-        <GridFormField xs={1.9} name="dataInici" type={"date"}/>
-        <GridFormField xs={1.9} name="dataFi" type={"date"}/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="nom"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="createdBy"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="tipus"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="expedient" disabled={isOther}/>
+        {/*<GridFormField size={3} name="metaExpedient" hidden={!isExpedient}/>*/}
+        {/*<GridFormField size={3} name="metaDocument" hidden={!isDocument}/>*/}
+        <GridFormField size={{xs: 12, sm: 6, md: 1.9}} name="dataEsborratInici" type={"date"}/>
+        <GridFormField size={{xs: 12, sm: 6, md: 1.9}} name="dataEsborratFi" type={"date"}/>
+        <GridFormField size={{xs: 12, sm: 6, md: 1.9}} name="dataInici" type={"date"}/>
+        <GridFormField size={{xs: 12, sm: 6, md: 1.9}} name="dataFi" type={"date"}/>
+        <GridFormField size={{xs: 12, sm: 6, md: 2}} name="esborrat" required/>
     </>
 }
 

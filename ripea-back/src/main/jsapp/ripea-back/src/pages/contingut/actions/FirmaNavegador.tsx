@@ -1,5 +1,5 @@
 import {useRef, useState} from "react";
-import {Grid} from "@mui/material";
+import {Grid2 as Grid} from "@mui/material";
 import {MuiFormDialogApi, useBaseAppContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import GridFormField from "../../../components/GridFormField.tsx";
@@ -10,7 +10,7 @@ import {useFirmaFinalitzadaSession} from "../../../components/SseClient.tsx";
 
 const FirmaNavegadorForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="motiu"/>
+        <GridFormField name="motiu"/>
     </Grid>
 }
 

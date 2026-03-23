@@ -1,4 +1,4 @@
-import {Grid, Icon, Divider} from "@mui/material";
+import {Grid2 as Grid, Icon, Divider} from "@mui/material";
 import GridFormField from "../../../../components/GridFormField.tsx";
 import {StyledBadge} from "../../../../components/StyledBadge.tsx";
 import {useTranslation} from "react-i18next";
@@ -27,11 +27,11 @@ const useActions = (refresh?: () => void) => {
 
 const MetaExpedientEstatForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="codi"/>
-        <GridFormField xs={12} name="nom"/>
-        <GridFormField xs={12} name="color" type={'color'}/>
-        <GridFormField xs={12} name="inicial"/>
-        <GridFormField xs={12} name="responsable"/>
+        <GridFormField name="codi"/>
+        <GridFormField name="nom"/>
+        <GridFormField name="color" type={'color'}/>
+        <GridFormField name="inicial"/>
+        <GridFormField name="responsable"/>
     </Grid>
 }
 

@@ -2,7 +2,7 @@ import {useTranslation} from "react-i18next";
 import {GridPage, useBaseAppContext, useFormContext, useMuiDataGridApiRef, useResourceApiService} from "reactlib";
 import {CardPage} from "../../../../components/CardData.tsx";
 import {DndMuiGrid} from "../../../../components/StyledMuiGrid.tsx";
-import {Grid, Icon, Divider, Button} from "@mui/material";
+import {Grid2 as Grid, Icon, Divider, Button} from "@mui/material";
 import * as builder from "../../../../util/springFilterUtils.ts";
 import {useNavigate, useParams} from "react-router-dom";
 import GridFormField from "../../../../components/GridFormField.tsx";
@@ -57,24 +57,24 @@ const useActions = (refresh?: () => void) => {
 const MetaDocumentDadaForm = ({ enviable }:any) => {
     const {data} = useFormContext()
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="codi"/>
-        <GridFormField xs={12} name="nom"/>
-        <GridFormField xs={12} name="tipus" disabled={!!data?.id} required/>
-        <GridFormField xs={12} name="multiplicitat" required/>
+        <GridFormField name="codi"/>
+        <GridFormField name="nom"/>
+        <GridFormField name="tipus" disabled={!!data?.id} required/>
+        <GridFormField name="multiplicitat" required/>
 
-        <GridFormField xs={12} name="valorString" hidden={data?.tipus!="TEXT"}/>
-        <GridFormField xs={12} name="valorData" type={"date"} hidden={data?.tipus!="DATA"}/>
-        <GridFormField xs={12} name="valorImport" decimalScale={2} hidden={data?.tipus!="IMPORT"}/>
-        <GridFormField xs={12} name="valorSencer" decimalScale={0} hidden={data?.tipus!="SENCER"}/>
-        <GridFormField xs={12} name="valorFlotant" hidden={data?.tipus!="FLOTANT"}/>
-        <GridFormField xs={12} name="valorBoolea" hidden={data?.tipus!="BOOLEA"}/>
-        <GridFormField xs={12} name="domini" hidden={data?.tipus!="DOMINI"}/>
-        <GridFormField xs={12} name="noAplica" hidden={data?.tipus!="DOMINI"}/>
+        <GridFormField name="valorString" hidden={data?.tipus!="TEXT"}/>
+        <GridFormField name="valorData" type={"date"} hidden={data?.tipus!="DATA"}/>
+        <GridFormField name="valorImport" decimalScale={2} hidden={data?.tipus!="IMPORT"}/>
+        <GridFormField name="valorSencer" decimalScale={0} hidden={data?.tipus!="SENCER"}/>
+        <GridFormField name="valorFlotant" hidden={data?.tipus!="FLOTANT"}/>
+        <GridFormField name="valorBoolea" hidden={data?.tipus!="BOOLEA"}/>
+        <GridFormField name="domini" hidden={data?.tipus!="DOMINI"}/>
+        <GridFormField name="noAplica" hidden={data?.tipus!="DOMINI"}/>
 
-        <GridFormField xs={12} name="descripcio" type={"textarea"}/>
+        <GridFormField name="descripcio" type={"textarea"}/>
 
-        <GridFormField xs={12} name="enviable" hidden={!enviable}/>
-        <GridFormField xs={12} name="metadadaArxiu" hidden={!enviable || !data?.enviable} required/>
+        <GridFormField name="enviable" hidden={!enviable}/>
+        <GridFormField name="metadadaArxiu" hidden={!enviable || !data?.enviable} required/>
     </Grid>
 }
 

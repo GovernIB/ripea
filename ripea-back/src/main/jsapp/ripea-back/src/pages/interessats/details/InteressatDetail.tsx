@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {Alert, Grid2, Icon} from "@mui/material";
+import {Alert, Grid2 as Grid, Icon} from "@mui/material";
 import {MuiDialog, useBaseAppContext, useResourceApiService} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {DetailCard, DetailCardContent} from "../../../components/CardData.tsx";
@@ -25,7 +25,7 @@ export const InteressatDetail = (props: any) => {
         return tipusVia ?t(`enum.tipusVia.${tipusVia}`) :'';
     }
 
-    return <Grid2 container direction={"row"} columnSpacing={1} rowSpacing={1}>
+    return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
 
         { entity?.incapacitat == true && (!entity?.representant || entity?.representant?.incapacitat) &&
             <Alert severity="warning">{t('page.interessat.alert.incapacitat')}</Alert>
@@ -60,7 +60,7 @@ export const InteressatDetail = (props: any) => {
             </DetailCardContent>
             <DetailCardContent hidden={!isShowDireccio} size={6}>{direccion}</DetailCardContent>
         </DetailCard>
-    </Grid2>
+    </Grid>
 }
 
 const perspectives = ['REPRESENTANT', 'ADRESSA']

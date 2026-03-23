@@ -1,4 +1,4 @@
-import {Grid, Icon} from "@mui/material";
+import {Grid2 as Grid, Icon} from "@mui/material";
 import {useUserSession} from "../../../components/Session.tsx";
 import {useTranslation} from "react-i18next";
 
@@ -37,16 +37,16 @@ const DocumentIcon = (props:any) => {
         {/*{entity?.expedient && entity?.estat == 'OBERT' && <Icon>O</Icon>}*/}
         {/*{entity?.expedient && entity?.estat != 'OBERT' && <Icon>T</Icon>}*/}
 
-        {isInOptions(extension, 'pdf') ?<Icon>picture_as_pdf</Icon>
-        :isInOptions(extension, 'doc', 'docx', 'odt') ?<Icon>description</Icon>
-        :isInOptions(extension, 'xls', 'xlsx', 'ods') ?<Icon>description</Icon>
-        :isInOptions(extension, 'zip') ?<Icon>folder_zip</Icon>
-        :isInOptions(extension, 'xsig', 'xml', 'json', 'html') ?<Icon>code</Icon>
-        :isInOptions(extension, 'jpeg', 'png', 'bmp', 'jpg') ?<Icon>image</Icon>
-        :isInOptions(extension, 'txt') ?<Icon>description</Icon>
-        :isInOptions(extension, 'mp3', 'wav') ?<Icon>audio_file</Icon>
-        :isInOptions(extension, 'mpeg', 'avi') ?<Icon>video_file</Icon>
-        :<Icon title={t('page.document.title')} >description</Icon>}
+        {isInOptions(extension, 'pdf') ?<Icon title={extension}>picture_as_pdf</Icon>
+        :isInOptions(extension, 'doc', 'docx', 'odt') ?<Icon title={extension}>description</Icon>
+        :isInOptions(extension, 'xls', 'xlsx', 'ods') ?<Icon title={extension}>description</Icon>
+        :isInOptions(extension, 'zip') ?<Icon title={extension}>folder_zip</Icon>
+        :isInOptions(extension, 'xsig', 'xml', 'json', 'html') ?<Icon title={extension}>code</Icon>
+        :isInOptions(extension, 'jpeg', 'png', 'bmp', 'jpg') ?<Icon title={extension}>image</Icon>
+        :isInOptions(extension, 'txt') ?<Icon title={extension}>description</Icon>
+        :isInOptions(extension, 'mp3', 'wav') ?<Icon title={extension}>audio_file</Icon>
+        :isInOptions(extension, 'mpeg', 'avi') ?<Icon title={extension}>video_file</Icon>
+        :<Icon title={t('page.document.title')}>description</Icon>}
 
         {isInOptions(entity?.documentTipus, 'IMPORTAT') && <Icon title={t('page.document.alert.import')} color={"info"}>info</Icon>}
         {isInOptions(entity?.estat, 'REDACCIO') && <Icon sx={{marginBottom: '5px'}} title={t('page.document.alert.delete')} color={"warning"}>B</Icon>}
@@ -67,15 +67,15 @@ const DocumentIcon = (props:any) => {
         {entity?.ambNotificacions && (!entity?.errorDarreraNotificacio
                 ?<>
                     {isInOptions(entity?.estatDarreraNotificacio, 'PENDENT', 'REGISTRADA') &&
-                        <Icon color={"info"}>mail</Icon>}
+                        <Icon color={"info"} title={t(`enum.estatNotificacio.${entity?.estatDarreraNotificacio}`)}>mail</Icon>}
 
                     {isInOptions(entity?.estatDarreraNotificacio, 'ENVIADA_AMB_ERRORS', 'FINALITZADA_AMB_ERRORS') &&
-                        <Icon color={"error"}>mail</Icon>}
+                        <Icon color={"error"} title={t(`enum.estatNotificacio.${entity?.estatDarreraNotificacio}`)}>mail</Icon>}
 
                     {isInOptions(entity?.estatDarreraNotificacio, 'PROCESSADA', 'FINALITZADA') &&
-                        <Icon color={"success"}>mail</Icon>}
+                        <Icon color={"success"} title={t(`enum.estatNotificacio.${entity?.estatDarreraNotificacio}`)}>mail</Icon>}
                 </>
-                :<Icon color={"error"}>mail</Icon>
+                :<Icon color={"error"} title={t(`enum.estatNotificacio.${entity?.estatDarreraNotificacio}`)}>mail</Icon>
         )}
         {/*—------------------- FI ICONES DE NOTIFICACIO —----------------------*/}
 
@@ -89,11 +89,11 @@ const DocumentIcon = (props:any) => {
             <Icon title={t('page.document.alert.errorPortafirmes')} color={"error"}>edit</Icon>}
     </>
 }
-const CarpetaIcon = (props:any) => {
-    const {} = props;
+const CarpetaIcon = (_props:any) => {
+    const { t } = useTranslation();
 
     return <>
-        <Icon>folder</Icon>
+        <Icon title={t('page.carpeta.title')}>folder</Icon>
     </>
 }
 export default ContingutIcon;

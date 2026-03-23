@@ -43,7 +43,7 @@ import lombok.experimental.FieldNameConstants;
                 @ResourceArtifact(
                         type = ResourceArtifactType.FILTER,
                         code = RegistreAnnexResource.ADJUNTAR_ANNEX_FILTER_CODE,
-                        formClass = RegistreAnnexResource.AjuntrAnnexPendentFilter.class),
+                        formClass = RegistreAnnexResource.AjuntarAnnexPendentFilter.class),
                 @ResourceArtifact(
                         type = ResourceArtifactType.REPORT,
                         code = RegistreAnnexResource.REPORT_DOWNLOAD_ANNEX,
@@ -51,7 +51,7 @@ import lombok.experimental.FieldNameConstants;
                 @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = RegistreAnnexResource.ACTION_REINTENTAR_CODE,
-                        formClass = MassiveAction.class),
+                        formClass = RegistreAnnexResource.ReintentarAnnexPendentForm.class),
 		}
 )
 public class RegistreAnnexResource extends BaseAuditableResource<Long> {
@@ -100,13 +100,21 @@ public class RegistreAnnexResource extends BaseAuditableResource<Long> {
 
     @Getter
     @Setter
-    public static class AjuntrAnnexPendentFilter implements Serializable {
+    public static class AjuntarAnnexPendentFilter implements Serializable {
         private String nom;
         private String numero;
         private ResourceReference<MetaExpedientResource, Long> procediment;
         private ResourceReference<ExpedientResource, Long> expedient;
         private Date dataInici;
         private Date dataFi;
+        private ResourceReference<GrupResource, Long> grup;
+        private boolean mostrarGrups;
+    }
+    
+    @Getter
+    @Setter
+    public static class ReintentarAnnexPendentForm extends MassiveAction {
+    	private ResourceReference<MetaDocumentResource, Long> metaDocument;
     }
 
     public String getFitxerExtension() {

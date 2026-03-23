@@ -56,12 +56,12 @@ const Sistema = ({system, refresh}:any) => {
 
         <DetailCardContent title={t('page.sistema.detail.jvmMemory')}>
             <Grid container display={'flex'} alignItems={'center'}>
-                <ContenidoData xs={6} titleXs={6} textXs={6} title={'daemonThreadCount'}>{system?.jvmInfo?.daemonThreadCount}</ContenidoData>
-                <ContenidoData xs={6} titleXs={6} textXs={6} title={'gcCount'}>{system?.jvmInfo?.gcCount}</ContenidoData>
-                <ContenidoData xs={6} titleXs={6} textXs={6} title={'gcTime'}>{system?.jvmInfo?.gcTime}</ContenidoData>
-                <ContenidoData xs={6} titleXs={6} textXs={6} title={'peakThreadCount'}>{system?.jvmInfo?.peakThreadCount}</ContenidoData>
-                <ContenidoData xs={6} titleXs={6} textXs={6} title={'threadCount'}>{system?.jvmInfo?.threadCount}</ContenidoData>
-                <ContenidoData xs={6} titleXs={6} textXs={6} title={''}>{}</ContenidoData>
+                <ContenidoData size={6} titleSize={6} textSize={6} title={'daemonThreadCount'}>{system?.jvmInfo?.daemonThreadCount}</ContenidoData>
+                <ContenidoData size={6} titleSize={6} textSize={6} title={'gcCount'}>{system?.jvmInfo?.gcCount}</ContenidoData>
+                <ContenidoData size={6} titleSize={6} textSize={6} title={'gcTime'}>{system?.jvmInfo?.gcTime}</ContenidoData>
+                <ContenidoData size={6} titleSize={6} textSize={6} title={'peakThreadCount'}>{system?.jvmInfo?.peakThreadCount}</ContenidoData>
+                <ContenidoData size={6} titleSize={6} textSize={6} title={'threadCount'}>{system?.jvmInfo?.threadCount}</ContenidoData>
+                {/*<ContenidoData size={6} titleSize={6} textSize={6} title={''}>{}</ContenidoData>*/}
                 <Grid size={2}/>
                 <Grid size={6}>
                     <LinearSpace value={system?.jvmMemory?.usedMemory} total={system?.jvmMemory?.totalMemory} />
@@ -73,10 +73,10 @@ const Sistema = ({system, refresh}:any) => {
 
         <DetailCardContent title={t('page.sistema.detail.disksUsage')}>
             <Grid container display={'flex'} alignItems={'center'}>
-                <ContenidoData xs={6} titleXs={6} textXs={6} title={'formatedLoadAverage'}>{system?.cpuUsage?.formatedLoadAverage}</ContenidoData>
-                <ContenidoData xs={6} titleXs={6} textXs={6} title={'loadAverage'}>{system?.cpuUsage?.loadAverage}</ContenidoData>
-                <ContenidoData xs={6} titleXs={6} textXs={6} title={'validProcessCpuLoad'}>{system?.cpuUsage?.validProcessCpuLoad ?"true" :"false"}</ContenidoData>
-                <ContenidoData xs={6} titleXs={6} textXs={6} title={'validSystemCpuLoad'}>{system?.cpuUsage?.validSystemCpuLoad ?"true" :"false"}</ContenidoData>
+                <ContenidoData size={6} titleSize={6} textSize={6} title={'formatedLoadAverage'}>{system?.cpuUsage?.formatedLoadAverage}</ContenidoData>
+                <ContenidoData size={6} titleSize={6} textSize={6} title={'loadAverage'}>{system?.cpuUsage?.loadAverage}</ContenidoData>
+                <ContenidoData size={6} titleSize={6} textSize={6} title={'validProcessCpuLoad'}>{system?.cpuUsage?.validProcessCpuLoad ?"true" :"false"}</ContenidoData>
+                <ContenidoData size={6} titleSize={6} textSize={6} title={'validSystemCpuLoad'}>{system?.cpuUsage?.validSystemCpuLoad ?"true" :"false"}</ContenidoData>
                 {system?.disksUsage?.map((disk:any) => <>
                     <Grid size={2}>{disk.nom}</Grid>
                     <Grid size={6}>

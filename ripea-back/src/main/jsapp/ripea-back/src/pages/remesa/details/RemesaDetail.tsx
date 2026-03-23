@@ -43,7 +43,7 @@ const RemesaDetail = (props:any) => {
                       },
                   ]}
         >
-            <FieldData field={'fitxerNom'} title={t('page.notificacio.detall.fitxerNom')} xs={10}/>
+            <FieldData field={'fitxerNom'} title={t('page.notificacio.detall.fitxerNom')} size={10}/>
         </DetailCard>
     </MuiDetail>
 }

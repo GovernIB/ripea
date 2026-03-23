@@ -15,16 +15,23 @@ import {GridSortDirection} from "@mui/x-data-grid-pro";
 const EnviarPortafirmesFilterForm = () => {
     const {data} = useFormContext();
 
-    const expedientFilter = builder.and(builder.eq('metaExpedient.id', data?.procediment?.id));
+    const expedientFilter = builder.and(
+        builder.eq('metaExpedient.id', data?.procediment?.id),
+        builder.eq('grup.id', data?.grup?.id)
+    );
     const metaDocumentFilter = builder.eq('metaExpedient.id', data?.procediment?.id || 0);
 
     return <>
-        <GridFormField xs={3} name="procediment"/>
-        <GridFormField xs={3} name="expedient" filter={expedientFilter} disabled={!data.procediment}/>
-        <GridFormField xs={3} name="metaDocument" filter={metaDocumentFilter} disabled={!data.procediment}/>
-        <GridFormField xs={3} name="nom"/>
-        <GridFormField xs={3} name="dataCreacioInici" type={"date"}/>
-        <GridFormField xs={3} name="dataCreacioFi" type={"date"}/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="procediment" />
+        <GridFormField name="grup" size={{xs: 12, sm: 6, md: 3}}
+                       namedQueries={[`BY_PROCEDIMENT#${data?.procediment?.id}`]}
+                       disabled={!data?.procediment}
+                       hidden={!data?.mostrarGrups}/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="expedient" filter={expedientFilter} disabled={!data.procediment}/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="metaDocument" filter={metaDocumentFilter} disabled={!data.procediment}/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="nom"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="dataCreacioInici" type={"date"}/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="dataCreacioFi" type={"date"}/>
     </>
 }
 
@@ -32,6 +39,7 @@ const springFilterBuilder = (data: any) => {
     return builder.and(
         builder.like("nom", data?.nom),
         builder.eq("expedient.metaExpedient.id", data?.procediment?.id),
+        builder.eq("expedient.grup.id", data?.grup?.id),
         builder.eq("expedient.id", data?.expedient?.id),
         builder.eq("metaNode.id", data?.metaDocument?.id),
         builder.betweenDates("createdDate", data?.dataCreacioInici, data?.dataCreacioFi)

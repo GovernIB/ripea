@@ -46,6 +46,7 @@ import es.caib.ripea.service.helper.EmailHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.EventHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
+import es.caib.ripea.service.helper.ExecucioMassivaHelper;
 import es.caib.ripea.service.helper.ExpedientHelper;
 import es.caib.ripea.service.helper.ExpedientPeticioHelper;
 import es.caib.ripea.service.helper.GrupHelper;
@@ -65,6 +66,9 @@ import es.caib.ripea.service.intf.base.model.ReportFileType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.ArxiuEstatEnumDto;
+import es.caib.ripea.service.intf.dto.ElementTipusEnumDto;
+import es.caib.ripea.service.intf.dto.ExecucioMassivaDto;
+import es.caib.ripea.service.intf.dto.ExecucioMassivaTipusDto;
 import es.caib.ripea.service.intf.dto.ExpedientPeticioAccioEnumDto;
 import es.caib.ripea.service.intf.dto.ExpedientPeticioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.ExpedientPeticioEstatViewEnumDto;
@@ -103,6 +107,7 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 	private final ExpedientHelper expedientHelper;
 	private final MessageHelper messageHelper;
 	private final AnotacioDistribucioHelper anotacioDistribucioHelper;
+	private final ExecucioMassivaHelper execucioMassivaHelper;
 
 	private final OrganGestorRepository organGestorRepository;
 	private final MetaExpedientRepository metaExpedientRepository;
@@ -678,11 +683,32 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 		@Override
 		public Serializable exec(String code, ExpedientPeticioResourceEntity entity, MassiveAction params) throws ActionExecutionException {
 			try {
-				for (Long petId: params.getIds()) {
-					expedientPeticioHelper.reintentarCanviEstatDistribucio(petId);
+				if (!params.isMassivo()) {
+					//En teoria només hauria de arribar un element
+					Exception exCanviEstat = expedientPeticioHelper.reintentarCanviEstatDistribucio(params.getIds().get(0));
+					
+					if (exCanviEstat!=null) {
+						String ids = Utils.getIdsSeparatsComa(params.getIds());
+						excepcioLogHelper.addExcepcio("/anotacio/CanviEstatDistribucioActionExecutor", exCanviEstat, ids, "massiu="+params.isMassivo());
+						String message = messageHelper.getMessage("message.common.action.error")+": "+exCanviEstat.getMessage();
+						throw new ActionExecutionException(getResourceClass(), ids, code, message);
+					}
+					
+				} else {
+					ExecucioMassivaDto dto = new ExecucioMassivaDto();
+					dto.setTipus(ExecucioMassivaTipusDto.ACTUALITZAR_ESTAT_ANOTACIONS);
+					dto.setContingutIds(params.getIds());
+					dto.setRolActual(configHelper.getRolActual());
+					
+			        String entitatActualCodi = configHelper.getEntitatActualCodi();
+			        EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true,false);
+			        
+			        execucioMassivaHelper.crearExecucioMassiva(entitat.getId(), dto, ElementTipusEnumDto.ANOTACIO);
 				}
+				
 				int numElem = params!=null && params.getIds()!=null?params.getIds().size():0;
 				return "{\"num\": \""+numElem+"\"}";
+				
 			} catch (Exception e) {
 				String ids = Utils.getIdsSeparatsComa(params.getIds());
 				excepcioLogHelper.addExcepcio("/anotacio/CanviEstatDistribucioActionExecutor", e, ids, "massiu="+params.isMassivo());

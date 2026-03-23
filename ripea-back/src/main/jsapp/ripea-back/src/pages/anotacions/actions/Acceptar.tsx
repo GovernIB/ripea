@@ -1,5 +1,5 @@
 import {useEffect, useMemo, useRef, useState} from "react";
-import {Grid} from "@mui/material";
+import {Grid2 as Grid} from "@mui/material";
 import {FormField, MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
@@ -20,42 +20,42 @@ const AcceptarTabExpedient = () => {
     );
     
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="accio" required/>
-        <GridFormField xs={12} name="metaExpedient" required
+        <GridFormField name="accio" required/>
+        <GridFormField name="metaExpedient" required
             filter={filterMetaExpedientAnotacioCrear}
             namedQueries={['EXPEDIENT_CREATE']}/>
 
         {data?.accio == "CREAR" &&
             <>
-                <GridFormField xs={12} name="newExpedientTitol" required/>
-                <GridFormField xs={12} name="prioritat" required/>
-                <GridFormField xs={12} name="prioritatMotiu" type={"textarea"} hidden={data?.prioritat == "B_NORMAL"} required/>
-                <GridFormField xs={12} name="organGestor"
+                <GridFormField name="newExpedientTitol" required/>
+                <GridFormField name="prioritat" required/>
+                <GridFormField name="prioritatMotiu" type={"textarea"} hidden={data?.prioritat == "B_NORMAL"} required/>
+                <GridFormField name="organGestor"
                             namedQueries={[`EXPEDIENT_FORM#${data?.metaExpedient?.id ?? 0}`]}
                             disabled={!data?.metaExpedient || data?.disableOrganGestor}
                             readOnly={!data?.metaExpedient || data?.disableOrganGestor}
                             required/>
-                <GridFormField xs={6} name="sequencia" required disabled readOnly/>
-                <GridFormField xs={6} name="any" required/>
-                <GridFormField xs={12} name="grup"
+                <GridFormField size={6} name="sequencia" required disabled readOnly/>
+                <GridFormField size={6} name="any" required/>
+                <GridFormField name="grup"
                                namedQueries={[`BY_PROCEDIMENT#${data?.metaExpedient?.id ?? 0}`]}
                                hidden={!data?.grup && !data?.gestioAmbGrupsActiva} required/>
-				<GridFormField xs={12} name="seguidor"/>
+				<GridFormField name="seguidor"/>
             </>
         }
         {data?.accio == "INCORPORAR" &&
             <>
-                <GridFormField xs={12} name="expedient"
+                <GridFormField name="expedient"
                         filter={builder.and(
                            builder.eq('metaExpedient.id', data?.metaExpedient?.id),
 						   builder.eq('esborrat', 0),
                        )}                
                 required/>
-                <GridFormField xs={12} name="agafarExpedient"/>
+                <GridFormField name="agafarExpedient"/>
             </>
         }
 
-        <GridFormField xs={12} name="associarInteressats"/>
+        <GridFormField name="associarInteressats"/>
     </Grid>
 }
 

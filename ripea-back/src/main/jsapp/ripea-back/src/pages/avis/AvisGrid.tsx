@@ -2,18 +2,18 @@ import {CardPage} from "../../components/CardData.tsx";
 import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
 import {GridPage, useMuiDataGridApiRef} from "reactlib";
 import {useTranslation} from "react-i18next";
-import {Grid, Icon} from "@mui/material";
+import {Grid2 as Grid, Icon} from "@mui/material";
 import {formatDate} from "../../util/dateUtils.ts";
 import {useAvisActions} from "./details/AvisActions.tsx";
 import GridFormField from "../../components/GridFormField.tsx";
 
 const AvisGridForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name={'assumpte'}/>
-        <GridFormField xs={12} name={'missatge'} type={'textarea'}/>
-        <GridFormField xs={12} name={'dataInici'} type={'date'}/>
-        <GridFormField xs={12} name={'dataFinal'} type={'date'}/>
-        <GridFormField xs={12} name={'avisNivell'} required/>
+        <GridFormField name={'assumpte'}/>
+        <GridFormField name={'missatge'} type={'textarea'}/>
+        <GridFormField name={'dataInici'} type={'date'}/>
+        <GridFormField name={'dataFinal'} type={'date'}/>
+        <GridFormField name={'avisNivell'} required/>
     </Grid>
 }
 

@@ -35,6 +35,7 @@ const translationCa = {
             update: "Modificat el {{lastModifiedDate}} per '{{lastModifiedBy}}'.",
         },
         nouPermis: "Nou permís",
+        advancedSearch: 'Cerca avançada',
     },
     enum: {
         rol: {
@@ -72,6 +73,15 @@ const translationCa = {
             FIRMAT: "Firmat",
             REBUTJAT: "Rebutjat",
             PARCIAL: "Parcial",
+        },
+        estatNotificacio: {
+            ENVIADA: "Enviada",
+            ENVIADA_AMB_ERRORS: "Enviada amb errors",
+            FINALITZADA: "Finalitzada",
+            FINALITZADA_AMB_ERRORS: "Finalitzada amb errors",
+            PENDENT: "Pendent",
+            PROCESSADA: "Processada",
+            REGISTRADA: "Registrada",
         },
         origen: {
             O0: "Ciutadà",
@@ -145,6 +155,7 @@ const translationCa = {
         },
     },
     navigate: {
+        accessibilitat: "Accessibilitat",
         expedient: "Cercador d'expedients",
         expedientPeticio: "Cercador d'anotacions de registre",
         usuariTasca: "Tasques",
@@ -167,6 +178,7 @@ const translationCa = {
     },
     page: {
         comment: {
+            label: "Comentaris",
             expedient: "Comentaris de l'expedient",
             tasca: "Comentaris de la tasca",
             metaExpedient: "Comentaris del procediment",
@@ -335,7 +347,7 @@ const translationCa = {
                 canviEstatDistribucio: {
                     label: "Canviar estat a distribució",
                     ok: "L'estat ha canviat correctament",
-                    massiveOk: "S'han actualitzat l'estat de '{{data.num}}' anotacions",
+                    massiveOk: "S'ha programat l'acció massiva per actualitzar l'estat de '{{data.num}}' anotacions.",
                 },
                 descargarAnnex: {
                     label: "Descarregar annex",
@@ -344,7 +356,7 @@ const translationCa = {
                 procesarAnnexosPendents: {
                     label: "Adjuntar",
                     ok: "El annex s'ha processat correctament",
-                    massiveOk: "S'han processat '{{data.num}}' annexos",
+                    massiveOk: "S'ha programat l'acció massiva per processar '{{data.num}}' annexos pendents.",
                     info: "Si s'ha produït algun error al acceptar una anotació des de la pantalla Anotacions, de manera que algun dels documents de l'anotació no s'han adjuntat a l'expedient, des d'aquest llistat podrà tornar a intentar adjuntar el document a l'expedient.",
                 },
                 firma: {
@@ -356,6 +368,9 @@ const translationCa = {
                     ok: "L'anotació s'ha consultat y guardat correctament",
                     massiveOk: "S'ha consultat y guardat correctament {{data.num}} annotations",
                 },
+                reintentar: {
+                    title: "Seleccionar tipus de document per el annex/annexos pendents",
+                }
             }
         },
         tasca: {
@@ -607,7 +622,7 @@ const translationCa = {
                 },
                 download: {
                     label: "Descarregar documents...",
-                    button: "Descarrega seleccionat",
+                    button: "Descarrega seleccionats",
                     title: "Selecció de documents",
                     ok: "Els documents s’han descarregat correctament",
                 },
@@ -616,7 +631,7 @@ const translationCa = {
                     ok: "El full de càlcul s’ha descarregat correctament",
                 },
                 exportZIP: {
-                    label: "Exportar índex ZIP...",
+                    label: "Exportar índex ZIP",
                     button: "Exporta ZIP",
                     title: "Exportar documents a ZIP",
                     ok: "El document ZIP s’ha descarregat correctament",
@@ -646,7 +661,7 @@ const translationCa = {
                     ok: "El document INSIDE s’ha descarregat correctament",
                 },
                 exportDocs: {
-                    label: "Exportar els documents dels expedients seleccionats",
+                    label: "Exporta documents dels exp. seleccionats...",
                     ok: "Els documents s’han exportat correctament",
                 },
                 export: {
@@ -664,14 +679,14 @@ const translationCa = {
                     button: "Canvia prioritat",
                     title: "Modificar prioritat de l’expedient",
                     ok: "La prioritat de l’expedient '{{expedient}}' s’ha modificat correctament.",
-                    massiveOk: "S'han cambiat la prioritat de '{{data.num}}' expedients",
+                    massiveOk: "S'ha cambiat la prioritat de '{{data.num}}' expedients.",
                 },
                 changeEstat: {
                     label: "Canviar estat...",
                     button: "Canvia estat",
                     title: "Modificar estat de l’expedient",
                     ok: "L’estat de l’expedient '{{expedient}}' s’ha modificat correctament.",
-                    massiveOk: "S'ha cambiat l'estat a '{{data.num}}' expedients"
+                    massiveOk: "S'ha cambiat l'estat a '{{data.num}}' expedients."
                 },
                 assignar: {
                     label: "Assignar...",
@@ -694,9 +709,18 @@ const translationCa = {
                     ok: "Els interessats s’han exportat correctament",
                 },
                 impDocMass: {
-                    label: "Importar documents als expedients seleccionats",
-                    title: "Importar documents a expedients",
+                    label: "Importar documents als exp. seleccionats...",
+                    title: "Importació de documents",
+                    mssg: "Els documents que adjunteu s'incorporaran als {{num}} expedients seleccionats",
                     warning: "Els expedients han de pertànyer al mateix procediment.",
+                },
+                exportMass: {
+                    unic: "Exporta l'expedient...",
+                    label: "Exporta els expedients seleccionats...",
+                    title: "Exportar expedients seleccionats",
+                    titleUni: "Exportar expedient",
+                    info: "Podeu seleccionar diversos formats d'exportació. L'exportació es realitzarà en segon pla, i un cop finalitzada, podreu descarregar el document generat des del llistat d'accions massives.",
+                    info2: "Podeu seleccionar diversos formats d'exportació. L'exportació pot tardar uns instants en completar-se, un cop finalitzada, s'iniciarà la descarrega automàticament.",
                 },
                 comment: {
                     ok: "Comentari afegit a l'expedient '{{data.expedient.description}}'",
@@ -735,7 +759,10 @@ const translationCa = {
 				},
             },
             modal: {
-                seguidors: "Seguidors de l’expedient",
+                seguidors: {
+                    label: "Seguidors",
+                    title: "Seguidors de l’expedient",
+                },
             },
             results: {
                 checkDelete: "Estau segur que voleu eliminar aquest contingut? Si contenia firmes en curs, seràn cancelades.",
@@ -1255,10 +1282,10 @@ const translationCa = {
             },
             action: {
                 ampliarPlac: {
-                    label: "Ampliar plaç...",
-                    button: "Amplia plaç",
-                    title: "Ampliació del plaç dels enviaments de la remesa",
-                    ok: "El plaç del enviament ha estat ampliat",
+                    label: "Ampliar termini...",
+                    button: "Amplia termini",
+                    title: "Ampliació del termini dels enviaments de la remesa",
+                    ok: "El termini del enviament ha estat ampliat",
                 },
                 certificat: {
                     label: "Certificació",
@@ -1852,6 +1879,8 @@ const translationCa = {
                 noOrgans: "Cap organ gestor assignat"
             },
             menu: {
+                title: "Menú",
+
                 entitat: "Entitats",
                 expedient: "Expedients",
                 monitoritzar: "Monitoritzar",
@@ -1935,6 +1964,7 @@ const translationCa = {
             action: {
                 read: {
                     label: "Marcar com a llegida",
+                    title: "Alertes de l'expedient",
                     ok: "L'alerta s'ha marcat com a llegida",
                     massiveOk: "Les alertes s'han marcat com a llegides",
                 },
