@@ -73,7 +73,6 @@ const columns: any[] = [
     {
         field: 'createdDate',
         flex: 0.5,
-        wordWrap: true,
         align: 'left',
         valueFormatter: (value: any) => formatDate(value)
     },
@@ -84,7 +83,6 @@ const columns: any[] = [
     {
         field: 'procediment',
         flex: 1,
-        wordWrap: true,
     },
     {
         field: 'expedient',
@@ -102,7 +100,6 @@ const columns: any[] = [
     {
         field: 'processatData',
         flex: 0.5,
-        wordWrap: true,
         valueFormatter: (value: any) => formatDate(value)
     },
     {

@@ -9,6 +9,7 @@ import javax.ejb.Stateless;
 
 import es.caib.comanda.model.server.monitoring.FitxerContingut;
 import es.caib.comanda.model.server.monitoring.FitxerInfo;
+import es.caib.comanda.ms.log.helper.LogFileStream;
 import es.caib.ripea.ejb.base.AbstractServiceEjb;
 import es.caib.ripea.service.intf.service.LogService;
 import lombok.experimental.Delegate;
@@ -37,8 +38,8 @@ public class LogServiceEjb extends AbstractServiceEjb<LogService> implements Log
 
 	@Override
 	@PermitAll
-	public void tailLogFile(String filePath) {
-		delegateService.tailLogFile(filePath);
+	public LogFileStream tailLogFile(String filePath) {
+		return delegateService.tailLogFile(filePath);
 	}
 
 	@Override

@@ -1,5 +1,5 @@
 import {useMemo, useState} from "react";
-import {Icon, Grid} from "@mui/material";
+import {Icon, Grid, Box} from "@mui/material";
 import {GridPage, useFormContext, useMuiDataGridApiRef,} from 'reactlib';
 import {useTranslation} from "react-i18next";
 import {useNavigate} from "react-router-dom";
@@ -116,7 +116,6 @@ const beforeAvis = [
         field: 'metaExpedient',
         flex: 1.15,
         sortable: false,
-        wordWrap: true,
     },
     {
         field: 'nom',
@@ -197,7 +196,6 @@ const ExpedientGrid = () => {
             field: 'interessats',
             sortable: false,
             flex: 1,
-            wordWrap: true,
             valueFormatter: (value: any) => {
                 let resum = '';
                 for (const interessat of value) {
@@ -220,6 +218,11 @@ const ExpedientGrid = () => {
                 }
                 return resum;
             },
+            renderCell: (params: any)=> (
+                <Box sx={{ whiteSpace: 'pre-line' }}>
+                    {params?.formattedValue}
+                </Box>
+            ),
             hidden: !user?.conf?.expedientListInteressats,
         },
         {

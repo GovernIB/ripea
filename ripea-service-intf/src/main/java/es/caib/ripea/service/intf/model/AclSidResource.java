@@ -72,6 +72,8 @@ public class AclSidResource extends BaseResource<Long> {
     @JsonIgnore @Transient private List<ExtendedPermissionEnum> masks = new ArrayList<>();
     private List<ResourceReference<AclEntryResource, Long>> entries = new ArrayList<>();
 
+    @Transient private String nomComplet;
+    
     @Getter
     @Setter
     @FieldNameConstants

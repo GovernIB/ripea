@@ -59,7 +59,17 @@ const base: ThemeOptions = {
                         minWidth: '48px !important',
                         marginLeft: '-4px !important',
                     },
+                    '& .MuiDataGrid-cell': {
+                        display: 'flex',
+                    },
+                    '& .MuiDataGrid-treeDataGroupingCell > *': {
+                        display: 'flex',
+                        alignItems: 'center'
+                    }
                 },
+				row: {
+					minHeight: '40px !important',
+				},
                 cell: {
                     '&.MuiDataGrid-cell--withRenderer': {
                         alignItems: 'flex-start !important',
@@ -141,6 +151,8 @@ const base: ThemeOptions = {
             styleOverrides: {
                 h5: {fontSize: '1.8rem', lineHeight: 1.2, fontWeight: 400},
                 h4: {fontSize: '1.5rem', lineHeight: 1.2, fontWeight: 400},
+                body1: {fontWeight: 500},
+                overline: {fontSize: '1.2rem', letterSpacing: '0em', textTransform: 'none'},
             },
         },
         MuiInputBase: {
@@ -215,6 +227,7 @@ const base: ThemeOptions = {
 const lightPalete = {
     mode: 'light',
     primary: {main: '#337ab7', contrastText: "#fff"},
+    text: { disabled: '#555555 !important' },
     warning: {main: '#8a6d3b'},
     action: {
         disabled: '#555555',
@@ -322,7 +335,7 @@ const darkPalette = {
     action: {
         active: '#ffffff',
         hover: '#333333',
-        selected: '#444444',
+		selected: 'rgba(51, 122, 183, 0.28)',
         disabled: '#555555',
         disabledBackground: '#2c2c2c'
     },
@@ -365,19 +378,19 @@ export const darkTheme = createTheme(base, {
         MuiDataGrid: {
             styleOverrides: {
                 root: {
-                    '& .MuiDataGrid-row.even.MuiDataGrid-row': {
-                        backgroundColor: 'inherit',
-                    },
+					'& .MuiDataGrid-row.even.MuiDataGrid-row': {
+					    backgroundColor: '#464646',
+					},
                     '& .MuiDataGrid-row:hover': {
-                        backgroundColor: `rgba(77, 128, 172, 0.75)  !important`,
+                        backgroundColor: `${darken(darkPalette.action.selected, 0.2)} !important`,
                     },
                 },
                 row: {
                     '&.MuiDataGrid-row.Mui-selected': {
-                        backgroundColor: `${darkPalette.action.selected} !important`,
+						backgroundColor: `${darkPalette.action.selected} !important`,
                     },
                     '&.MuiDataGrid-row.Mui-selected:hover': {
-                        backgroundColor: `${darken(darkPalette.action.selected, 0.2)} !important`,
+						backgroundColor: `${darken(darkPalette.action.selected, 0.2)} !important`,                        
                     },
                 },
             },

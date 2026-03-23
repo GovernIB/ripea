@@ -32,11 +32,13 @@ import es.caib.ripea.persistence.entity.resourcerepository.OrganGestorResourceRe
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.PermisosHelper;
+import es.caib.ripea.service.helper.UsuariHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.PermisDto;
+import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.model.AclClassResource;
 import es.caib.ripea.service.intf.model.AclEntryResource;
 import es.caib.ripea.service.intf.model.AclObjIdentityResource;
@@ -54,6 +56,7 @@ public class AclSidResourceServiceImpl extends BaseMutableResourceService<AclSid
 
     private final PermisosHelper permisosHelper;
     private final AclResourceHelper aclResourceHelper;
+    private final UsuariHelper usuariHelper;
     private final OrganGestorRepository organGestorRepository;
     private final MetaExpedientOrganGestorResourceRepository metaExpedientOrganGestorResourceRepository;
     private final MetaExpedientResourceRepository metaExpedientResourceRepository;
@@ -106,6 +109,21 @@ public class AclSidResourceServiceImpl extends BaseMutableResourceService<AclSid
         return result.isEmpty() ? null : FilterBuilder.and(result).generate();
     }
 
+    @Override
+    protected void afterConversion(AclSidResourceEntity entity, AclSidResource resource) {
+    	if (entity.getPrincipal()!=null) {
+    		switch (entity.getPrincipal()) {
+			case ROL:
+				resource.setNomComplet(entity.getSid());
+				break;
+			default:
+				UsuariDto aux = usuariHelper.getUsuariByCodiDades(entity.getSid());
+				resource.setNomComplet(aux!=null?aux.getCodiAndNom():"Usuari no trobat ("+entity.getSid()+")");
+				break;
+			}
+    	}
+    }
+    
     @Override
     protected PerspectiveApplicator<AclSidResourceEntity, AclSidResource> getPerspectiveApplicator(String code) {
         return super.getPerspectiveApplicator(code.split("#")[0]);

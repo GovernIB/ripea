@@ -37,6 +37,7 @@ const PermisMetaExpedientOrganGrid = (props:any) => {
             field: 'sid',
             headerName: t('page.permision.grid.sid'),
             flex: 1,
+            renderCell: (params:any) => (params?.row?.nomComplet),
         },
         {
             field: 'create',
@@ -172,7 +173,7 @@ const columnsNode = [
     {
         field: 'sid',
         flex: 1,
-    },
+        renderCell: (params:any) => (params?.row?.nomComplet),    },
     {
         field: 'create',
         flex: 0.5,

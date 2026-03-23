@@ -22,7 +22,6 @@ const columns: any[] = [
     {
         field: 'createdDate',
         flex: 0.4,
-        wordWrap: true,
         align: 'left',
         valueFormatter: (value: any) => formatDate(value)
     },

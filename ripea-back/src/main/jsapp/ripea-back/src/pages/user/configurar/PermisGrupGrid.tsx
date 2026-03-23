@@ -10,7 +10,7 @@ import {useParams} from "react-router-dom";
 import {setTitlePage} from "../../../TitleHeaderConfigurator.tsx";
 import {usePermisGrupCreate, usePermisActions} from "../actions/ModifyPermis.tsx";
 
-const sortModel: any = [{field: 'principal', sort: 'asc'}]
+const sortModel: any = [{field: 'sid', sort: 'asc'}]
 const columns = [
     {
         field: 'principal',
@@ -19,6 +19,7 @@ const columns = [
     {
         field: 'sid',
         flex: 1,
+        renderCell: (params:any) => (params?.row?.nomComplet),
     },
 ]
 

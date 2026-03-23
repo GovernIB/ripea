@@ -31,6 +31,9 @@ public interface AvisRepository extends JpaRepository<AvisEntity, Long> {
 			"and a.dataInici <= :currentDate " +
 			"and a.dataFinal >= :currentDate")
 	List<AvisEntity> findActive(@Param("currentDate") Date currentDate);
+	
+	@Query(	"from AvisEntity a where a.actiu = true and a.dataInici <= TRUNC(sysdate) and a.dataFinal >= TRUNC(sysdate)")
+	List<AvisEntity> findAllActives();
 
 	List<AvisEntity> findByEntitatIdAndAssumpte(Long entitatId, String assumpte);
 	

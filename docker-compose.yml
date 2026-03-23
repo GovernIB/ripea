@@ -1,0 +1,37 @@
+version: "3"
+
+services:
+  ripea:
+    image: ripea:latest
+    env_file:
+    - .env
+    environment:
+      - JBOSS_DB_URL=${JBOSS_DB_URL}
+      - JBOSS_DB_USERNAME=${JBOSS_DB_USERNAME}
+      - JBOSS_DB_PASSWORD=${JBOSS_DB_PASSWORD}
+      - JBOSS_DB_DRIVER=${JBOSS_DB_DRIVER}
+      - JBOSS_AUTH_URL=${KEYCLOAK_URL}
+      - JBOSS_AUTH_REALM=${KEYCLOAK_REALM}
+      - JBOSS_AUTH_CLIENTID=${KEYCLOAK_CLIENTID}
+      - JBOSS_AUTH_CLIENTID_REST=${KEYCLOAK_CLIENTID_REST}
+      - JBOSS_AUTH_SECRET=${KEYCLOAK_SECRET}
+      - JBOSS_MAIL_HOST=${MAIL_HOST}
+      - JBOSS_MAIL_PORT=${MAIL_PORT}
+      - JBOSS_MAIL_USERNAME=${MAIL_USERNAME}
+      - JBOSS_MAIL_PASSWORD=${MAIL_PASSWORD}
+      - JBOSS_MAIL_SSL=${MAIL_SSL}
+      - JBOSS_MAIL_TLS=${MAIL_TLS}
+      - JAVA_OPTS_APPEND=${JAVA_OPTS_APPEND}
+      - DEBUG=${DEBUG:-}
+    ports:
+      - ${APP_PORT:-8080}:8080
+      - "8787:8787"
+      - ${MGM_PORT:-9990}:9990
+    restart: no
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    volumes:
+      - ripea_store:/opt/webapps/ripea
+
+volumes:
+  ripea_store:

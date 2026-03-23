@@ -7,6 +7,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 
 import es.caib.comanda.model.server.monitoring.FitxerContingut;
 import es.caib.comanda.model.server.monitoring.FitxerInfo;
+import es.caib.comanda.ms.log.helper.LogFileStream;
 
 public interface LogService {
 
@@ -17,7 +18,7 @@ public interface LogService {
     FitxerContingut getFitxerByNom(String nom);
 
     @PreAuthorize("hasRole('IPA_COM')")
-    void tailLogFile(String filePath);
+    LogFileStream tailLogFile(String filePath);
 
     @PreAuthorize("hasRole('IPA_COM')")
     BlockingQueue<String> getQueue();

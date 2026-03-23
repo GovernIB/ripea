@@ -694,9 +694,10 @@ const translationEn = {
                     ok: "Interested parties exported successfully",
                 },
                 impDocMass: {
-                    label: "Import documents into the selected cases",
-                    title: "Import documents into cases",
-                    warning: "The cases must belong to the same procedure.",
+                    label: "Import documents to selected case files",
+                    title: "Document import",
+                    mssg: "The documents you attach will be added to the {{num}} selected case files",
+                    warning: "The case files must belong to the same procedure.",
                 },
                 comment: {
                     ok: "Comment added to the case '{{data.expedient.description}}'",

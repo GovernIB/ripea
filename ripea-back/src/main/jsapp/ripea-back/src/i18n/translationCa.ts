@@ -695,7 +695,8 @@ const translationCa = {
                 },
                 impDocMass: {
                     label: "Importar documents als expedients seleccionats",
-                    title: "Importar documents a expedients",
+                    title: "Importació de documents",
+                    mssg: "Els documents que adjunteu s'incorporaran als {{num}} expedients seleccionats",
                     warning: "Els expedients han de pertànyer al mateix procediment.",
                 },
                 comment: {
@@ -1255,10 +1256,10 @@ const translationCa = {
             },
             action: {
                 ampliarPlac: {
-                    label: "Ampliar plaç...",
-                    button: "Amplia plaç",
-                    title: "Ampliació del plaç dels enviaments de la remesa",
-                    ok: "El plaç del enviament ha estat ampliat",
+                    label: "Ampliar termini...",
+                    button: "Amplia termini",
+                    title: "Ampliació del termini dels enviaments de la remesa",
+                    ok: "El termini del enviament ha estat ampliat",
                 },
                 certificat: {
                     label: "Certificació",

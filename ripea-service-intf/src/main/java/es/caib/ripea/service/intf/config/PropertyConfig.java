@@ -232,6 +232,7 @@ public class PropertyConfig {
 	public static final String COMANDA_PLUGIN_USR					= "es.caib.ripea.plugin.comanda.user";
 	public static final String COMANDA_PLUGIN_PWR					= "es.caib.ripea.plugin.comanda.password";
 	public static final String COMANDA_PLUGIN_ENDPOINT				= "es.caib.ripea.plugin.comanda.endpointName";
+	public static final String COMANDA_LOGS_PATH					= "es.caib.ripea.plugin.fitxer.logs.path";
 	
 	public static final String REGISTRE_PLUGIN_CLASS 				= "es.caib.ripea.plugin.registre.class";
 	public static final String REGISTRE_PLUGIN_URL 					= "es.caib.ripea.plugin.registre.baseurl";

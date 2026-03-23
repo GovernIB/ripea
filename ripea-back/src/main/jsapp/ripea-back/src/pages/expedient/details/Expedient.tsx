@@ -112,7 +112,7 @@ const ExpedientAlert = (props:any) => {
     const {handleOpen: hanldeErrorValidacio, dialog: dialogErrorValidacio} = useErrorValidacio();
 
     return <>
-        {expedient?.agafatPer?.id != user?.codi && expedient?.usuariActualWrite && !rol?.isAdminLectura &&
+        {expedient?.agafatPer?.id != user?.codi && expedient?.usuariActualWrite && !rol?.isAdminLectura && user?.rolActual != 'IPA_ADMIN' &&
             <Alert severity="info"
                    action={
                        <Button sx={{py:0}} 
@@ -121,7 +121,7 @@ const ExpedientAlert = (props:any) => {
 						   <Typography variant={"subtitle2"}>{t('page.expedient.action.agafar.label')}</Typography>
                        </Button>
                    }
-            >{user?.rolActual != 'IPA_ADMIN' && t('page.expedient.alert.owner')}</Alert>
+            >{t('page.expedient.alert.owner')}</Alert>
         }
         { expedient?.estat == "OBERT" && expedient?.hasEsborranys && user?.sessionScope?.isConvertirDefinitiuActiu &&
             <Alert severity="info">{t('page.expedient.alert.esborranys')}</Alert>
@@ -143,8 +143,8 @@ const ExpedientAlert = (props:any) => {
         { ((!expedient?.valid && validacio?.errorsValidacio == null) || (validacio?.errorsValidacio?.length > 0)) &&
             <Alert severity="warning"
                    action={
-                       <Button  sx={{py: 0}} variant="outlined"
-                                onClick={() => hanldeErrorValidacio(expedient?.id, expedient)}>
+                       <Button sx={{py: 0}} variant="outlined"
+                               onClick={() => hanldeErrorValidacio(expedient?.id, expedient)}>
                             <Icon>search</Icon>
                            <Typography variant={"subtitle2"}>{t('common.consult')}</Typography>
                        </Button>

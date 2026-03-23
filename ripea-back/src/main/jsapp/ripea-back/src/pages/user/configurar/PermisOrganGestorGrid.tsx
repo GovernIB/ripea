@@ -25,6 +25,7 @@ const columns = [
     {
         field: 'sid',
         flex: 1,
+        renderCell: (params:any) => (params?.row?.nomComplet),
     },
     {
         field: 'create',

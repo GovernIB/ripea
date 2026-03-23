@@ -3,7 +3,7 @@ import {Alert, Box, Button, Grid, Icon, Typography, Link, Grid2} from "@mui/mate
 import {BasePage, GridPage, useResourceApiService, MuiDialog, useBaseAppContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import TabComponent from "../../../components/TabComponent.tsx";
-import {CardButton, ContenidoData, DetailCard, DetailCardContent} from "../../../components/CardData.tsx";
+import {CardButton, DetailCard, DetailCardContent} from "../../../components/CardData.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import MetaDadaGrid from "../../dada/MetaDadaGrid.tsx";
 import Load from "../../../components/Load.tsx";
@@ -17,23 +17,23 @@ const Contenido = (props:any) => {
 
     return <BasePage>
         <Load value={entity}>
-            <Grid container sx={{ display:'flex', flexDirection: "row", wordWrap: "break-word" }} columnSpacing={1} rowSpacing={1}>
-                <ContenidoData title={t('page.document.detall.fitxerNom')}>{entity?.fitxerNom}</ContenidoData>
-                <ContenidoData title={t('page.document.detall.fitxerContentType')}>{entity?.fitxerContentType}</ContenidoData>
-                <ContenidoData title={t('page.document.detall.metaDocument')}>{entity?.metaDocument?.description}</ContenidoData>
-                <ContenidoData title={t('page.document.detall.createdDate')}>{formatDate(entity?.createdDate)}</ContenidoData>
-                <ContenidoData title={t('page.document.detall.estat')}>{entity?.estat}</ContenidoData>
-                <ContenidoData title={t('page.document.detall.dataCaptura')}>{formatDate(entity?.dataCaptura)}</ContenidoData>
-                <ContenidoData title={t('page.document.detall.origen')}>{t(`enum.origen.${entity?.ntiOrigen}`)}</ContenidoData>
-                <ContenidoData title={t('page.document.detall.tipoDocumental')}>{entity?.ntiTipoDocumental}</ContenidoData>
-                <ContenidoData title={t('page.document.detall.estadoElaboracion')}>{t(`enum.estatElaboracio.${entity?.ntiEstadoElaboracion}`)}</ContenidoData>
-                <ContenidoData title={t('page.document.detall.csv')} hidden={!entity?.ntiCsv}>
+            <DetailCard key={entity?.id} title={entity?.nom}>
+                <DetailCardContent size={6} title={t('page.document.detall.fitxerNom')}>{entity?.fitxerNom}</DetailCardContent>
+                <DetailCardContent size={6} title={t('page.document.detall.fitxerContentType')}>{entity?.fitxerContentType}</DetailCardContent>
+                <DetailCardContent size={6} title={t('page.document.detall.metaDocument')}>{entity?.metaDocument?.description}</DetailCardContent>
+                <DetailCardContent size={6} title={t('page.document.detall.createdDate')}>{formatDate(entity?.createdDate)}</DetailCardContent>
+                <DetailCardContent size={6} title={t('page.document.detall.estat')}>{entity?.estat}</DetailCardContent>
+                <DetailCardContent size={6} title={t('page.document.detall.dataCaptura')}>{formatDate(entity?.dataCaptura)}</DetailCardContent>
+                <DetailCardContent size={6} title={t('page.document.detall.origen')}>{t(`enum.origen.${entity?.ntiOrigen}`)}</DetailCardContent>
+                <DetailCardContent size={6} title={t('page.document.detall.tipoDocumental')}>{entity?.ntiTipoDocumental}</DetailCardContent>
+                <DetailCardContent size={6} title={t('page.document.detall.estadoElaboracion')}>{t(`enum.estatElaboracio.${entity?.ntiEstadoElaboracion}`)}</DetailCardContent>
+                <DetailCardContent size={6} title={t('page.document.detall.tipoFirma')}>{entity?.ntiTipoFirma && t(`enum.tipoFirma.${entity?.ntiTipoFirma}`)}</DetailCardContent>
+                <DetailCardContent title={t('page.document.detall.csv')} hidden={!entity?.ntiCsv}>
                     {entity?.ntiCsv} {entity?.csvLinkUrl &&
                     <Link href={entity?.csvLinkUrl+entity?.ntiCsv} target={"_blank"} rel="noopener noreferrer"><Icon>launch</Icon></Link>}                    
-                </ContenidoData>
-                <ContenidoData title={t('page.document.detall.csvRegulacion')} hidden={!entity?.ntiCsvRegulacion}>{entity?.ntiCsvRegulacion}</ContenidoData>
-                <ContenidoData title={t('page.document.detall.tipoFirma')}>{entity?.ntiTipoFirma && t(`enum.tipoFirma.${entity?.ntiTipoFirma}`)}</ContenidoData>
-            </Grid>
+                </DetailCardContent>
+                <DetailCardContent title={t('page.document.detall.csvRegulacion')} hidden={!entity?.ntiCsvRegulacion}>{entity?.ntiCsvRegulacion}</DetailCardContent>
+            </DetailCard>
         </Load>
     </BasePage>
 }

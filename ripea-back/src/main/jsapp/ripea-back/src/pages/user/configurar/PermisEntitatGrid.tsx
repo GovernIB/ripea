@@ -11,7 +11,7 @@ import {useNavigate, useParams} from "react-router-dom";
 import {useEntitatSession} from "../../../components/Session.tsx";
 import {useMemo} from "react";
 
-const sortModel: any = [{field: 'principal', sort: 'asc'}]
+const sortModel: any = [{field: 'sic', sort: 'asc'}]
 const columns = [
     {
         field: 'principal',
@@ -20,6 +20,7 @@ const columns = [
     {
         field: 'sid',
         flex: 1,
+        renderCell: (params:any) => (params?.row?.nomComplet),
     },
     {
         field: 'admin',

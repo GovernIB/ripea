@@ -1,22 +1,31 @@
 package es.caib.ripea.api.interna.controller;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import es.caib.comanda.model.server.monitoring.FitxerContingut;
 import es.caib.comanda.model.server.monitoring.FitxerInfo;
+import es.caib.comanda.ms.log.helper.LogFileStream;
 import es.caib.ripea.api.interna.config.BaseApiInternaSecurityConfig;
 import es.caib.ripea.service.intf.service.LogService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -30,24 +39,73 @@ public class LogController {
     private LogService logService;
 
     @GetMapping
+	@Operation(
+			summary = "Llista dels fitxers de log disponibles a la carpeta de logs del servidor.",
+			security = { @SecurityRequirement(name = "basicAuth") })
     public List<FitxerInfo> llistarFitxers() {
         return logService.llistarFitxers();
     }
 
-    @GetMapping("/{nom}")
-    public FitxerContingut getFitxerByNom(@PathVariable("nom") String nom) {
-        return logService.getFitxerByNom(nom);
+    @GetMapping("/{nomFitxer}")
+	@Operation(
+			summary = "Consulta el contingut de un fitxer de log per nom.",
+			security = { @SecurityRequirement(name = "basicAuth") })
+    public FitxerContingut getFitxerByNom(@PathVariable("nomFitxer") String nomFitxer) {
+        return logService.getFitxerByNom(nomFitxer);
     }
 
     @GetMapping("/{nomFitxer}/linies/{nLinies}")
+	@Operation(
+			summary = "Consulta les darreres linies del contingut de un fitxer de log determinat.",
+			security = { @SecurityRequirement(name = "basicAuth") })
     public List<String> llegitUltimesLinies(@PathVariable("nLinies") Long nLinies, @PathVariable("nomFitxer") String nomFitxer) {
         return logService.readLastNLines(nomFitxer, nLinies);
     }
 
-    @GetMapping(value = "/stream/{filename}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public SseEmitter streamLogFile(@PathVariable String filename, HttpServletResponse response) throws IOException {
+    @GetMapping(value = "/{nomFitxer}/directe", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+	@Operation(
+			summary = "Consulta en temps real el contingut de un fitxer de log determinat.",
+			security = { @SecurityRequirement(name = "basicAuth") })
+    public ResponseEntity<StreamingResponseBody> streamLogFile(@PathVariable String nomFitxer, HttpServletResponse response) throws IOException {
     	
-        logService.tailLogFile(filename);
+    	LogFileStream file = logService.tailLogFile(nomFitxer);
+    	
+        if (file == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Fitxer no trobat");
+        }
+
+        StreamingResponseBody body = outputStream -> {
+            try (InputStream in = file.getInputStream()) {
+                byte[] buffer = new byte[8192];
+                int read;
+                while ((read = in.read(buffer)) != -1) {
+                    outputStream.write(buffer, 0, read);
+                }
+                outputStream.flush();
+            }
+        };
+
+        MediaType mediaType;
+        try {
+            mediaType = (file.getContentType() != null && !file.getContentType().isBlank())
+                    ? MediaType.parseMediaType(file.getContentType())
+                    : MediaType.APPLICATION_OCTET_STREAM;
+        } catch (Exception e) {
+            mediaType = MediaType.APPLICATION_OCTET_STREAM;
+        }
+
+        return ResponseEntity.ok()
+                .contentType(mediaType)
+                .contentLength(file.getSize())
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        ContentDisposition.attachment()
+                                .filename(file.getFileName())
+                                .build()
+                                .toString())
+                .body(body);
+    	
+        /*
+    	logService.tailLogFile(nomFitxer);
 
         SseEmitter emitter = new SseEmitter();
         new Thread(() -> {
@@ -77,5 +135,6 @@ public class LogController {
         });
 
         return emitter; // Returns the emitter and allows the client to receive updates
+        */
     }
 }
