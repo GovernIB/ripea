@@ -24,6 +24,8 @@ import es.caib.comanda.model.server.monitoring.FitxerInfo;
 import es.caib.comanda.ms.log.helper.LogFileStream;
 import es.caib.ripea.api.interna.config.BaseApiInternaSecurityConfig;
 import es.caib.ripea.service.intf.service.LogService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -37,21 +39,33 @@ public class LogController {
     private LogService logService;
 
     @GetMapping
+	@Operation(
+			summary = "Llista dels fitxers de log disponibles a la carpeta de logs del servidor.",
+			security = { @SecurityRequirement(name = "basicAuth") })
     public List<FitxerInfo> llistarFitxers() {
         return logService.llistarFitxers();
     }
 
     @GetMapping("/{nomFitxer}")
+	@Operation(
+			summary = "Consulta el contingut de un fitxer de log per nom.",
+			security = { @SecurityRequirement(name = "basicAuth") })
     public FitxerContingut getFitxerByNom(@PathVariable("nomFitxer") String nomFitxer) {
         return logService.getFitxerByNom(nomFitxer);
     }
 
     @GetMapping("/{nomFitxer}/linies/{nLinies}")
+	@Operation(
+			summary = "Consulta les darreres linies del contingut de un fitxer de log determinat.",
+			security = { @SecurityRequirement(name = "basicAuth") })
     public List<String> llegitUltimesLinies(@PathVariable("nLinies") Long nLinies, @PathVariable("nomFitxer") String nomFitxer) {
         return logService.readLastNLines(nomFitxer, nLinies);
     }
 
     @GetMapping(value = "/{nomFitxer}/directe", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+	@Operation(
+			summary = "Consulta en temps real el contingut de un fitxer de log determinat.",
+			security = { @SecurityRequirement(name = "basicAuth") })
     public ResponseEntity<StreamingResponseBody> streamLogFile(@PathVariable String nomFitxer, HttpServletResponse response) throws IOException {
     	
     	LogFileStream file = logService.tailLogFile(nomFitxer);

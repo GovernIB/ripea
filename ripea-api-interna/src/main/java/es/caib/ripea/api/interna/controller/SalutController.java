@@ -22,6 +22,8 @@ import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.SalutService;
 import es.caib.ripea.service.intf.utils.DateUtil;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
@@ -33,16 +35,11 @@ public class SalutController extends BaseApiInternaController {
 
 	private final SalutService salutService;
 	private final AplicacioService aplicacioService;
-	private ManifestInfo manifestInfo;
-	
-	protected ManifestInfo getManifestInfo() throws IOException {
-        if (manifestInfo == null) {
-            manifestInfo = buildManifestInfo();
-        }
-        return manifestInfo;
-    }
 	
     @GetMapping("/info")
+	@Operation(
+			summary = "Consulta de dades bàsiques de l'aplicació.",
+			security = { @SecurityRequirement(name = "basicAuth") })
     public AppInfo appInfo(HttpServletRequest request) throws IOException {
         var manifestInfo = getManifestInfo();
         return new AppInfo()
@@ -60,6 +57,7 @@ public class SalutController extends BaseApiInternaController {
     }
     
     @GetMapping
+    @Operation(summary = "Consulta de dades de salut d'integracions i subsistemes.")
     public SalutInfo health(HttpServletRequest request) throws IOException {
     	autenticaAmbRolTothom();
         var manifestInfo = getManifestInfo();
@@ -72,6 +70,14 @@ public class SalutController extends BaseApiInternaController {
         User user = new User("$comanda_ripea", "comanda_ripea", Collections.singletonList(new SimpleGrantedAuthority("tothom")));
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
+    
+    private ManifestInfo manifestInfo;
+	protected ManifestInfo getManifestInfo() throws IOException {
+        if (manifestInfo == null) {
+            manifestInfo = buildManifestInfo();
+        }
+        return manifestInfo;
     }
     
     public String getBaseUrl(HttpServletRequest request) {

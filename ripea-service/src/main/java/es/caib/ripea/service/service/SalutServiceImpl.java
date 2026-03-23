@@ -22,16 +22,20 @@ import es.caib.comanda.model.server.monitoring.IntegracioSalut;
 import es.caib.comanda.model.server.monitoring.Manual;
 import es.caib.comanda.model.server.monitoring.MissatgeSalut;
 import es.caib.comanda.model.server.monitoring.SalutInfo;
+import es.caib.comanda.model.server.monitoring.SalutNivell;
 import es.caib.comanda.model.server.monitoring.SubsistemaInfo;
 import es.caib.comanda.model.server.monitoring.SubsistemaSalut;
 import es.caib.comanda.ms.salut.helper.EstatHelper;
 import es.caib.comanda.ms.salut.helper.IntegracioApp;
 import es.caib.comanda.ms.salut.helper.MonitorHelper;
+import es.caib.ripea.persistence.entity.AvisEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.repository.AvisRepository;
 import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.AvisDto;
+import es.caib.ripea.service.intf.dto.AvisNivellEnumDto;
 import es.caib.ripea.service.intf.dto.IntegracioAccioDto;
 import es.caib.ripea.service.intf.dto.IntegracioAccioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.IntegracioEnumDto;
@@ -55,6 +59,7 @@ public class SalutServiceImpl implements SalutService{
 	private final AplicacioService aplicacioService;
 	private final AvisService avisService;
 	private final EntitatRepository entitatRepository;
+	private final AvisRepository avisRepository;
 	private final MeterRegistry meterRegistry;
 	private final JdbcTemplate jdbcTemplate;
 	private final ConfigHelper configHelper;
@@ -713,7 +718,7 @@ public class SalutServiceImpl implements SalutService{
     	
     	try {
     	
-	    	List<AvisDto> avisos = new ArrayList<AvisDto>();
+	    	/*List<AvisDto> avisos = new ArrayList<AvisDto>();
 	    	
 	    	List<AvisDto> avisosUser = avisService.findActive();
 	    	if (avisosUser!=null) {
@@ -740,9 +745,38 @@ public class SalutServiceImpl implements SalutService{
 	    				.missatge(avis.getAssumpte()+": "+avis.getMissatge())
 	    				.nivell(avis.getSalutNivellComanda());
 	    		missatges.add(ms);
+	    	}*/
+	    	
+	    	List<AvisEntity> avisosActius = avisRepository.findAllActives();
+	    	for (AvisEntity avis: avisosActius) {
+	    		String missatge = "";
+	    		if (avis.getEntitatId()!=null) {
+	    			missatge+="[Entitat "+avis.getEntitatId()+"] ";
+	    		}
+	    		if (avis.getAssumpte()!=null) {
+	    			missatge+=avis.getAssumpte();
+	    		}
+	    		if (avis.getMissatge()!=null) {
+	    			missatge+=": "+avis.getMissatge();
+	    		}
+	    		MissatgeSalut ms = new MissatgeSalut()
+	    				.data(DateUtil.toOffsetDateTime(avis.getDataInici()))
+	    				.missatge(missatge)
+	    				.nivell(getSalutNivellComanda(avis.getAvisNivell()));
+	    		missatges.add(ms);
 	    	}
+	    	
     	} catch (Exception ex) {}
 
     	return missatges;
     }
+    
+	private SalutNivell getSalutNivellComanda(AvisNivellEnumDto avisNivell) {
+		switch (avisNivell) {
+			case ERROR: return SalutNivell.ERROR;
+			case INFO: return SalutNivell.INFO;
+			case WARNING: return SalutNivell.WARN;
+		}
+		return null;
+	}
 }

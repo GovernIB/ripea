@@ -25,6 +25,8 @@ import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.SegonPlaService;
 import es.caib.ripea.service.intf.utils.DateUtil;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
@@ -36,16 +38,11 @@ public class EstadistiquesController extends BaseApiInternaController {
 
 	private final SegonPlaService segonPlaService;
 	private final AplicacioService aplicacioService;
-	private ManifestInfo manifestInfo;
-	
-	protected ManifestInfo getManifestInfo() throws IOException {
-        if (manifestInfo == null) {
-            manifestInfo = buildManifestInfo();
-        }
-        return manifestInfo;
-    }
 	
     @GetMapping("/info")
+	@Operation(
+			summary = "Consulta de paràmetres estadístics de l'aplicació (indicadors i dimensions disponibles).",
+			security = { @SecurityRequirement(name = "basicAuth") })
     public EstadistiquesInfo statsInfo() throws IOException {
         List<DimensioDesc> dimensions  = segonPlaService.getDimensionsInfo();
         List<IndicadorDesc> indicadors = segonPlaService.getIndicadorsInfo();
@@ -58,6 +55,9 @@ public class EstadistiquesController extends BaseApiInternaController {
     }
 	
     @GetMapping
+	@Operation(
+			summary = "Consulta d'estadístiques del dia anterior.",
+			security = { @SecurityRequirement(name = "basicAuth") })
     public RegistresEstadistics estadistiques(HttpServletRequest request) throws Exception {
         LocalDate ayer = LocalDate.now().minusDays(1);
         DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd-MM-yyyy");
@@ -65,6 +65,9 @@ public class EstadistiquesController extends BaseApiInternaController {
     }
     
     @GetMapping("/of/{data}")
+	@Operation(
+			summary = "Consulta d'estadístiques d'una data determinada.",
+			security = { @SecurityRequirement(name = "basicAuth") })
     public RegistresEstadistics estadistiques(HttpServletRequest request, @PathVariable String data) throws Exception {
         LocalDate date = LocalDate.parse(data, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
         if (!segonPlaService.existeixenEstadistiques(date)) {
@@ -75,6 +78,9 @@ public class EstadistiquesController extends BaseApiInternaController {
     }
 
     @GetMapping("/from/{dataInici}/to/{dataFi}")
+	@Operation(
+			summary = "Consulta d'estadístiques entre dues dates determinades.",
+			security = { @SecurityRequirement(name = "basicAuth") })
     public List<RegistresEstadistics> estadistiques(HttpServletRequest request, @PathVariable String dataInici, @PathVariable String dataFi) throws Exception {
         List<RegistresEstadistics> result = new ArrayList<>();
         LocalDate dataFrom = LocalDate.parse(dataInici, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
@@ -95,5 +101,13 @@ public class EstadistiquesController extends BaseApiInternaController {
 	        fechaLoop = fechaLoop.plusDays(1);
 	    }
 		return result;
+    }
+    
+	private ManifestInfo manifestInfo;
+	protected ManifestInfo getManifestInfo() throws IOException {
+        if (manifestInfo == null) {
+            manifestInfo = buildManifestInfo();
+        }
+        return manifestInfo;
     }
 }

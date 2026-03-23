@@ -6249,10 +6249,12 @@ public class PluginHelper {
 			Map<String, String> accioParams = new HashMap<String, String>();
 			accioParams.put("prodeciment", tascaEntity.getMetaTasca().getMetaExpedient().getNom());
 			accioParams.put("titol", tascaEntity.getTitol());
-			ComandaCaibPlugin comandaCaibPlugin = getComandaPlugin();
-			String endpoint = comandaCaibPlugin.getEndpointURL();
+			String endpoint = "desconegut";
 			
 			try {
+
+				ComandaCaibPlugin comandaCaibPlugin = getComandaPlugin();
+				endpoint = comandaCaibPlugin.getEndpointURL();
 				
 				ResponseEntity<String> resultat = null;
 				
@@ -6456,10 +6458,12 @@ public class PluginHelper {
 			long t0 = System.currentTimeMillis();
 			String accioDescripcio = "Eliminar un avís";
 			Map<String, String> accioParams = new HashMap<String, String>();
-			ComandaCaibPlugin comandaCaibPlugin = getComandaPlugin();
-			String endpoint = comandaCaibPlugin.getEndpointURL();
+			String endpoint = "desconegut";
 			
 			try {
+
+				ComandaCaibPlugin comandaCaibPlugin = getComandaPlugin();
+				endpoint = comandaCaibPlugin.getEndpointURL();
 				
 				ResponseEntity<String> resultat = comandaCaibPlugin.deleteAvis("ANOTACIO#"+expedientPeticioEntity.getId());
 				
@@ -6515,10 +6519,12 @@ public class PluginHelper {
 			long t0 = System.currentTimeMillis();
 			String accioDescripcio = "Enviament de un avís";
 			Map<String, String> accioParams = new HashMap<String, String>();
-			ComandaCaibPlugin comandaCaibPlugin = getComandaPlugin();
-			String endpoint = comandaCaibPlugin.getEndpointURL();
+			String endpoint = "desconegut";
 			
 			try {
+
+				ComandaCaibPlugin comandaCaibPlugin = getComandaPlugin();
+				endpoint = comandaCaibPlugin.getEndpointURL();
 				
 				Avis avisComanda = anotacioRipeaToAvisComanda(expedientPeticioEntity);
 				ResponseEntity<String> resultat = comandaCaibPlugin.sendAvis(avisComanda);
@@ -6577,11 +6583,13 @@ public class PluginHelper {
 			long t0 = System.currentTimeMillis();
 			String accioDescripcio = "Enviament de un avís";
 			Map<String, String> accioParams = new HashMap<String, String>();
-			ComandaCaibPlugin comandaCaibPlugin = getComandaPlugin();
-			String endpoint = comandaCaibPlugin.getEndpointURL();
 			ResponseEntity<String> resultat = null;
-					
+			String endpoint = "desconegut";
+			
 			try {
+				
+				ComandaCaibPlugin comandaCaibPlugin = getComandaPlugin();
+				endpoint = comandaCaibPlugin.getEndpointURL();
 				
 				if (errors==null || errors.size()==0) {
 					resultat = comandaCaibPlugin.deleteAvis(expedient.getId()+"");
