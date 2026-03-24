@@ -1944,7 +1944,7 @@ const translationEs = {
             errors: {
                 metaDada: "Faltan los siguientes datos:",
                 metaDocument: "Faltan los siguientes documentos:",
-                metaNode: "Existen documentos sin un tipo de documento asigando",
+                metaNode: "Existen documentos sin un tipo de documento asignado",
                 noFinalitzades: "Existen notificaciones con un estado que no es final",
                 interessatObligatori: "Falta informar un interesado",
             },

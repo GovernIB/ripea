@@ -77,12 +77,12 @@ public class IntegracioResource extends BaseResource<Long> {
 	
 	@Override
 	public Long getId() {
-		return this.index;
+		return this.timestamp;
 	}
 
 	@Override
 	public void setId(Long id) {
-		this.index = id;
+		this.timestamp = id;
 	}
 
     @Getter

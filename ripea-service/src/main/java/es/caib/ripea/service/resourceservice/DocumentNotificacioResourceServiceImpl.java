@@ -113,9 +113,11 @@ public class DocumentNotificacioResourceServiceImpl extends BaseMutableResourceS
         resource.setProcediment(ResourceReference.toResourceReference(
                 entity.getExpedient().getMetaExpedient().getId(),
                 entity.getExpedient().getMetaExpedient().getNomClassificacio()));
-        resource.setDestinatari(
-                objectMappingHelper.newInstanceMap(entity.getDocumentInteressats().iterator().next().getInteressat(), InteressatResource.class)
-        );
+        if (entity.getDocumentInteressats()!=null && !entity.getDocumentInteressats().isEmpty()) {
+	        resource.setDestinatari(
+	                objectMappingHelper.newInstanceMap(entity.getDocumentInteressats().iterator().next().getInteressat(), InteressatResource.class)
+	        );
+        }
     }
 
     @Override

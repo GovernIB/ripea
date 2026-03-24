@@ -20,8 +20,8 @@ import javax.persistence.Id;
 @NoArgsConstructor
 public class IntegracioResourceEntity implements ResourceEntity<IntegracioResource, Long> {
 
-    @Id
 	private Long index;
+	@Id
 	private Long timestamp;
 	private Date data;
 	private String descripcio;
@@ -40,7 +40,7 @@ public class IntegracioResourceEntity implements ResourceEntity<IntegracioResour
 	
 	@Override
 	public Long getId() {
-		return this.index;
+		return this.timestamp;
 	}
 
 	@Override

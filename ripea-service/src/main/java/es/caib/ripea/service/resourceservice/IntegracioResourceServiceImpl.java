@@ -150,7 +150,7 @@ public class IntegracioResourceServiceImpl extends BaseMutableResourceService<In
 		List<IntegracioAccioDto> accions = integracioHelper.findAccionsByIntegracioCodi(perspectives[0], null);
 		if (accions != null) {
 			for (IntegracioAccioDto accio: accions) {
-				if (accio.getIndex() != null && id.equals(accio.getIndex())) {
+				if (accio.getTimestamp() != null && id.equals(accio.getTimestamp())) {
                     IntegracioResource integracioResource = objectMappingHelper.newInstanceMap(accio, IntegracioResource.class);
                     integracioResource.setParametres(accio.getParametres());
                     return integracioResource;
