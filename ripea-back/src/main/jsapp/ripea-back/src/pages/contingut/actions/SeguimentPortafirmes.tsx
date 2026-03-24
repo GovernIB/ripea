@@ -1,35 +1,35 @@
 import {useState} from "react";
-import {Grid} from "@mui/material";
+import {Grid2 as Grid} from "@mui/material";
 import {MuiDialog, useBaseAppContext, useConfirmDialogButtons, useResourceApiService} from "reactlib";
 import {useTranslation} from "react-i18next";
-import {CardData, ContenidoData} from "../../../components/CardData.tsx";
+import {DetailCard} from "../../../components/CardData.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import Load from "../../../components/Load.tsx";
 import * as builder from '../../../util/springFilterUtils.ts'
 import Iframe from "../../../components/Iframe.tsx";
 import {useUserSession} from "../../../components/Session.tsx";
+import {FieldData, MuiDetail} from "../../../components/MuiDetail.tsx";
 
 export const SeguimentPortafirmes = (props:any) => {
-    const {entity} = props;
-    const { t } = useTranslation();
+    const {entity, fields} = props;
     return <Load value={entity}>
-        <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-            <CardData xs={6} title={entity?.document?.description}>
-                <ContenidoData title={t('page.documentPortafirmes.detall.assumpte')}>{entity?.assumpte}</ContenidoData>
-                <ContenidoData title={t('page.documentPortafirmes.detall.enviatData')}>{formatDate(entity?.enviatData)}</ContenidoData>
-                <ContenidoData title={t('page.documentPortafirmes.detall.estat')}>{t(`enum.estat.${entity?.estat}`)}</ContenidoData>
-                <ContenidoData title={t('page.documentPortafirmes.detall.prioritat')}>{t(`enum.prioritat.${entity?.prioritat}`)}</ContenidoData>
-                <ContenidoData title={t('page.documentPortafirmes.detall.documentTipusNom')}>{entity?.documentTipusNom}</ContenidoData>
-                <ContenidoData title={t('page.documentPortafirmes.detall.fluxTipus')}>{t(`enum.fluxTipus.${entity?.fluxTipus}`)}</ContenidoData>
-                <ContenidoData title={t('page.documentPortafirmes.detall.responsables')} hiddenIfEmpty>{entity?.responsables}</ContenidoData>
-                <ContenidoData title={t('page.documentPortafirmes.detall.sequenciaTipus')} hidden={!entity?.sequenciaTipus}>{t(`enum.tipusSequencia.${entity?.sequenciaTipus}`)}</ContenidoData>
-                <ContenidoData title={t('page.documentPortafirmes.detall.portafirmesId')}>{entity?.portafirmesId}</ContenidoData>
-            </CardData>
+        <MuiDetail entity={entity} fields={fields}>
+            <DetailCard size={6} title={entity?.document?.description}>
+                <FieldData field={"assumpte"}/>
+                <FieldData field={"enviatData"}>{formatDate(entity?.enviatData)}</FieldData>
+                <FieldData field={"estat"}/>
+                <FieldData field={"prioritat"}/>
+                <FieldData field={"documentTipusNom"}/>
+                <FieldData field={"fluxTipus"}/>
+                <FieldData field={"responsables"}/>
+                <FieldData field={"sequenciaTipus"}/>
+                <FieldData field={"portafirmesId"}/>
+            </DetailCard>
 
-            <Grid item xs={6}>
+            <Grid size={6}>
                 <Iframe src={entity?.urlFluxSeguiment} style={{ height: '100%' }}/>
             </Grid>
-        </Grid>
+        </MuiDetail>
     </Load>
 }
 
@@ -74,6 +74,7 @@ const useSeguimentPortafirmes = (potModificar:boolean, refresh?: () => void) => 
     const {
         isReady: apiIsReady,
         find: apiFind,
+        currentFields: fields,
     } = useResourceApiService('documentPortafirmesResource')
     const [open, setOpen] = useState(false);
     const [entity, setEntity] = useState<any>();
@@ -134,7 +135,7 @@ const useSeguimentPortafirmes = (potModificar:boolean, refresh?: () => void) => 
                 }
             }}
         >
-            <SeguimentPortafirmes entity={entity}/>
+            <SeguimentPortafirmes entity={entity} fields={fields}/>
         </MuiDialog>;
 
     return {
