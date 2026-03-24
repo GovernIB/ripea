@@ -172,13 +172,13 @@ const useMenuSupAdmin = () => {
             id: 'integracions',
             title: t('page.user.menu.integracions'),
             // icon: '',
-            to: 'integracio',
+            to: '/integracio',
         },
         {
             id: 'excepcions',
             title: t('page.user.menu.excepcions'),
             // icon: '',
-            to:'excepcio',
+            to:'/excepcio',
         },
     ];
     const entries = [
@@ -203,7 +203,7 @@ const useMenuSupAdmin = () => {
                     id: 'integracions',
                     title: t('page.user.menu.integracions'),
                     // icon: '',
-                    to: 'integracio',
+                    to: '/integracio',
                 },
                 {
                     id: 'excepcions',
@@ -228,13 +228,13 @@ const useMenuSupAdmin = () => {
                     id: 'props',
                     title: t('page.user.menu.props'),
                     // icon: '',
-                    to: 'config',
+                    to: '/config',
                 },
                 {
                     id: 'pinbal',
                     title: t('page.user.menu.pinbal'),
                     // icon: '',
-                    to: 'pinbalServei',
+                    to: '/pinbalServei',
                 },
             ],
         },
@@ -361,7 +361,7 @@ const useMenuAdmin = () => {
                     id: 'continguts',
                     title: t('page.user.menu.continguts'),
                     // icon: '',
-                    to: 'contingutAdmin',
+                    to: '/contingutAdmin',
                 },
                 /*{
                     id: 'dadesEstadistiques',
@@ -654,7 +654,7 @@ const useMenuUsuari = () => {
                     id: 'notib',
                     title: t('page.user.menu.notib'),
                     // icon: '',
-                    to: 'seguimentNotificacions',
+                    to: '/seguimentNotificacions',
                     hidden: !user?.sessionScope?.isMostrarSeguimentEnviamentsUsuariActiu,
                 },
             ],

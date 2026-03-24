@@ -15,7 +15,7 @@ import {StyledEstat, StyledPrioritat} from "../ExpedientGrid.tsx";
 import {ExpedientComment} from "../../CommentDialog.tsx";
 import RemesaGrid from "../../remesa/RemesaGrid.tsx";
 import PublicacioGrid from "../../publicacio/PublicacioGrid.tsx";
-import {CardPage, DetailCard, DetailCardContent} from "../../../components/CardData.tsx";
+import {CardPage, DetailCard} from "../../../components/CardData.tsx";
 import Load from "../../../components/Load.tsx";
 import {useUserSession} from "../../../components/Session.tsx";
 import {useActions} from "./CommonActions.tsx";
@@ -24,6 +24,7 @@ import useErrorValidacio from "./ErrorValidacio.tsx";
 import SseExpedient, {useValidacioSession} from "../../../components/SseExpedient.tsx";
 import {icons} from "../../user/UserHeadToolbar.tsx";
 import {setTitlePage} from "../../../TitleHeaderConfigurator.tsx";
+import {FieldData, MuiDetail} from "../../../components/MuiDetail.tsx";
 
 const border= { border: '1px solid #e3e3e3', borderRadius: '4px' };
 
@@ -74,18 +75,18 @@ const ExpedientsRelacionats = (props:any) => {
 }
 
 export const ExpedientInfo = (props:any) => {
-    const {title, entity: expedient, xs, readOnly} = props;
+    const {title, entity: expedient, fields, xs, readOnly} = props;
     const { t } = useTranslation();
-    return <DetailCard title={title ?? t('page.expedient.detall.title')} size={xs}>
-        <DetailCardContent title={t('page.contingut.detalle.numero')} size={8}>{expedient?.numero}</DetailCardContent>
-        <DetailCardContent title={t('page.contingut.detalle.clasificacio')} size={4}>{expedient?.ntiClasificacionSia}</DetailCardContent>
 
-        <DetailCardContent title={t('page.contingut.detalle.titol')}>{expedient?.nom}</DetailCardContent>
-        <DetailCardContent title={t('page.contingut.detalle.metaExpedient')}>{expedient?.metaExpedient?.description}</DetailCardContent>
-        <DetailCardContent title={t('page.contingut.detalle.organGestor')}>{expedient?.organGestor?.description}</DetailCardContent>
-        <DetailCardContent title={t('page.contingut.detalle.fechaApertura')}>{formatDate(expedient?.ntiFechaApertura)}</DetailCardContent>
-        <DetailCardContent title={t('page.contingut.detalle.estat')} size={8} sx={{ borderBottom: "1px solid" }}><StyledEstat entity={expedient}>{t(`enum.estat.${expedient?.estat}`)}</StyledEstat></DetailCardContent>
-        <DetailCardContent title={t('page.contingut.detalle.prioritat')} size={4} sx={{ borderBottom: "1px solid" }}><StyledPrioritat entity={expedient}>{t(`enum.prioritat.${expedient?.prioritat}`)}</StyledPrioritat></DetailCardContent>
+    return <MuiDetail entity={expedient} fields={fields}><DetailCard title={title ?? t('page.expedient.detall.title')} size={xs}>
+        <FieldData size={8} field={"numero"}/>
+        <FieldData size={4} field={"ntiClasificacionSia"}/>
+        <FieldData field={"nom"}/>
+        <FieldData field={"metaExpedient"}/>
+        <FieldData field={"organGestor"}/>
+        <FieldData field={"ntiFechaApertura"}>{formatDate(expedient?.ntiFechaApertura)}</FieldData>
+        <FieldData size={8} sx={{ borderBottom: "1px solid" }} field={"estat"} renderCell={(formattedValue:string) => <StyledEstat entity={expedient}>{formattedValue}</StyledEstat>}/>
+        <FieldData size={4} sx={{ borderBottom: "1px solid" }} field={"prioritat"} renderCell={(formattedValue:string) => <StyledPrioritat entity={expedient}>{formattedValue}</StyledPrioritat>}/>
 
         <ExpedientsRelacionats entity={expedient}/>
 
@@ -94,7 +95,7 @@ export const ExpedientInfo = (props:any) => {
                 <ExpedientActionButton entity={expedient}/>
             </Grid2>
         }
-    </DetailCard>
+    </DetailCard></MuiDetail>
 }
 
 const ExpedientAlert = (props:any) => {
@@ -171,6 +172,7 @@ const Expedient = () => {
     const {
         isReady: apiIsReady,
         getOne: appGetOne,
+        currentFields: fields
     } = useResourceApiService('expedientResource');
     const [expedient, setExpedient] = useState<any>();
 
@@ -272,7 +274,7 @@ const Expedient = () => {
             <CardPage header={headerMain} componentProps={{ justifyContent: 'space-between' }}>
                 <Grid container spacing={2}>
                     <Grid size={3}>
-                        <ExpedientInfo entity={expedient} />
+                        <ExpedientInfo entity={expedient} fields={fields} />
                     </Grid>
                     <Grid size={9}>
                         <ExpedientAlert entity={expedient} />

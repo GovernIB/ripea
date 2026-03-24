@@ -1,6 +1,6 @@
 import {useState} from "react";
 import {Alert, Box, Button, Grid, Icon, Typography, Link, Grid2} from "@mui/material";
-import {BasePage, GridPage, useResourceApiService, MuiDialog, useBaseAppContext} from "reactlib";
+import {GridPage, useResourceApiService, MuiDialog, useBaseAppContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import TabComponent from "../../../components/TabComponent.tsx";
 import {CardButton, DetailCard, DetailCardContent} from "../../../components/CardData.tsx";
@@ -10,32 +10,33 @@ import Load from "../../../components/Load.tsx";
 import {useActions} from "./ContingutActions.tsx";
 import {icons} from "../../user/UserHeadToolbar.tsx";
 import useErrorValidacio from "../../expedient/details/ErrorValidacio.tsx";
+import {FieldData, MuiDetail} from "../../../components/MuiDetail.tsx";
 
 const Contenido = (props:any) => {
-    const {entity} = props;
+    const {entity, fields} = props;
     const { t } = useTranslation();
 
-    return <BasePage>
-        <Load value={entity}>
-            <DetailCard key={entity?.id} title={entity?.nom}>
-                <DetailCardContent size={6} title={t('page.document.detall.fitxerNom')}>{entity?.fitxerNom}</DetailCardContent>
-                <DetailCardContent size={6} title={t('page.document.detall.fitxerContentType')}>{entity?.fitxerContentType}</DetailCardContent>
-                <DetailCardContent size={6} title={t('page.document.detall.metaDocument')}>{entity?.metaDocument?.description}</DetailCardContent>
-                <DetailCardContent size={6} title={t('page.document.detall.createdDate')}>{formatDate(entity?.createdDate)}</DetailCardContent>
-                <DetailCardContent size={6} title={t('page.document.detall.estat')}>{entity?.estat}</DetailCardContent>
-                <DetailCardContent size={6} title={t('page.document.detall.dataCaptura')}>{formatDate(entity?.dataCaptura)}</DetailCardContent>
-                <DetailCardContent size={6} title={t('page.document.detall.origen')}>{t(`enum.origen.${entity?.ntiOrigen}`)}</DetailCardContent>
-                <DetailCardContent size={6} title={t('page.document.detall.tipoDocumental')}>{entity?.ntiTipoDocumental}</DetailCardContent>
-                <DetailCardContent size={6} title={t('page.document.detall.estadoElaboracion')}>{t(`enum.estatElaboracio.${entity?.ntiEstadoElaboracion}`)}</DetailCardContent>
-                <DetailCardContent size={6} title={t('page.document.detall.tipoFirma')}>{entity?.ntiTipoFirma && t(`enum.tipoFirma.${entity?.ntiTipoFirma}`)}</DetailCardContent>
-                <DetailCardContent title={t('page.document.detall.csv')} hidden={!entity?.ntiCsv}>
+    return <Load value={entity}>
+        <MuiDetail entity={entity} fields={fields}>
+            <DetailCard>
+                <FieldData size={6} field={"fitxerNom"}/>
+                <FieldData size={6} field={"fitxerContentType"}/>
+                <FieldData size={6} field={"metaDocument"}/>
+                <FieldData size={6} title={t('page.document.detall.createdDate')} field={"createdDate"}>{formatDate(entity?.createdDate)}</FieldData>
+                <FieldData size={6} field={"estat"}/>
+                <FieldData size={6} title={t('page.document.detall.dataCaptura')} field={"dataCaptura"}>{formatDate(entity?.dataCaptura)}</FieldData>
+                <FieldData size={6} field={"ntiOrigen"}/>
+                <FieldData size={6} field={"ntiTipoDocumental"}/>
+                <FieldData size={6} field={"ntiEstadoElaboracion"}/>
+                <FieldData size={6} field={"ntiTipoFirma"}/>
+                <FieldData size={12} field={"ntiCsv"} hidden={!entity?.ntiCsv}>
                     {entity?.ntiCsv} {entity?.csvLinkUrl &&
-                    <Link href={entity?.csvLinkUrl+entity?.ntiCsv} target={"_blank"} rel="noopener noreferrer"><Icon>launch</Icon></Link>}                    
-                </DetailCardContent>
-                <DetailCardContent title={t('page.document.detall.csvRegulacion')} hidden={!entity?.ntiCsvRegulacion}>{entity?.ntiCsvRegulacion}</DetailCardContent>
+                    <Link href={entity?.csvLinkUrl+entity?.ntiCsv} target={"_blank"} rel="noopener noreferrer"><Icon>launch</Icon></Link>}
+                </FieldData>
+                <FieldData size={12} field={"ntiCsvRegulacion"} hiddenIfEmpty/>
             </DetailCard>
-        </Load>
-    </BasePage>
+        </MuiDetail>
+    </Load>
 }
 
 const Dada = (props:any) => {
@@ -99,6 +100,7 @@ const useDocumentDetail = (expedient:any, refresh?: () => void) => {
     const {
         isReady: apiIsReady,
         getOne: apiGetOne,
+        currentFields: fields,
     } = useResourceApiService('documentResource');
     const {temporalMessageShow} = useBaseAppContext();
 
@@ -132,7 +134,7 @@ const useDocumentDetail = (expedient:any, refresh?: () => void) => {
         {
             value: 'resum',
             label: t('page.document.tabs.resum'),
-            content: <Contenido entity={entity}/>,
+            content: <Contenido entity={entity} fields={fields}/>,
         },
         {
             value: "dades",

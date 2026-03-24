@@ -8,9 +8,9 @@ import {
     useResourceApiService,
     useBaseAppContext, useConfirmDialogButtons
 } from "reactlib";
-import {CardPage, ContenidoData} from "../../../components/CardData.tsx";
+import {CardPage, DetailCard} from "../../../components/CardData.tsx";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
-import {Grid, Icon, Link} from "@mui/material";
+import {Icon, Link} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
@@ -20,6 +20,8 @@ import Load from "../../../components/Load.tsx";
 import {Link as RouterLink} from "react-router-dom";
 import useAssignar from "../../expedient/actions/Assignar.tsx";
 import {useSession} from "../../../components/SessionStorageContext.tsx";
+import {FieldData, MuiDetail} from "../../../components/MuiDetail.tsx";
+import Box from "@mui/material/Box";
 
 const useActions = (refresh?: () => void) => {
     const {t} = useTranslation();
@@ -92,12 +94,26 @@ const useActions = (refresh?: () => void) => {
 // Detail
 const useDetail = () => {
     const { t } = useTranslation();
+
+    const {
+        isReady: apiIsReady,
+        getOne: apiGetOne,
+        currentFields: fields,
+    } = useResourceApiService('contingutResource');
+    const {temporalMessageShow} = useBaseAppContext();
+
     const [open, setOpen] = useState(false);
     const [entity, setEntity] = useState<any>();
 
-    const handleOpen = (_id:any, row:any) => {
-        // console.log(_id, row)
-        setEntity(row)
+    const handleOpen = (id:any) => {
+        if(apiIsReady && id){
+            apiGetOne(id, {perspectives})
+                .then((app) => setEntity(app))
+                .catch((error) => {
+                    handleClose()
+                    temporalMessageShow(null, error?.message, 'error');
+                });
+        }
         setOpen(true);
     }
 
@@ -108,7 +124,7 @@ const useDetail = () => {
         }
     };
 
-    let buttons :any[] = [
+    const buttons :any[] = [
         {
             value: 'close',
             text: t('common.close'),
@@ -127,23 +143,26 @@ const useDetail = () => {
             }}
         >
             <Load value={entity}>
-                <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-                    <ContenidoData title={t('page.contingut.detalle.nom')}>
-                        {entity?.tipus == "EXPEDIENT" && <Icon>folder_open</Icon>}
-                        {entity?.tipus == "CARPETA" && <Icon>folder</Icon>}
-                        {entity?.tipus == "DOCUMENT" && <Icon>description</Icon>}
-                        {entity?.nom}</ContenidoData>
-                    <ContenidoData title={t('page.contingut.detalle.metaExpedient')} hiddenIfEmpty>{entity?.metaNode?.description}</ContenidoData>
-                    <ContenidoData title={t('page.contingut.detalle.data')} hiddenIfEmpty>{formatDate(entity?.createdDate)}</ContenidoData>
-                    <ContenidoData title={t('page.contingut.detalle.estat')} hiddenIfEmpty>{entity?.estat}</ContenidoData>
-                    <ContenidoData title={t('page.arxiu.detall.versions')} hiddenIfEmpty>{entity?.ntiVersion}</ContenidoData>
-                    <ContenidoData title={t('page.arxiu.detall.identificador')} hiddenIfEmpty>{entity?.ntiIdentificador}</ContenidoData>
-                    <ContenidoData title={t('page.arxiu.detall.organ')} hiddenIfEmpty>{entity?.ntiOrgano}</ContenidoData>
-                    <ContenidoData title={t('page.arxiu.detall.dataCaptura')} hiddenIfEmpty>{formatDate(entity?.dataCaptura)}</ContenidoData>
-                    <ContenidoData title={t('page.arxiu.detall.origen')} hiddenIfEmpty>{entity?.ntiOrigen}</ContenidoData>
-                    <ContenidoData title={t('page.arxiu.detall.estadoElaboracion')} hiddenIfEmpty>{entity?.ntiEstadoElaboracion}</ContenidoData>
-                    <ContenidoData title={t('page.arxiu.detall.tipoDocumental')} hiddenIfEmpty>{entity?.ntiTipoDocumental}</ContenidoData>
-                </Grid>
+                <MuiDetail entity={entity} fields={fields}>
+                    <DetailCard>
+                        <FieldData titleSize={4} textSize={8} field={"nom"} renderCell={(formattedValue:string) => (<Box display={'flex'} alignItems={'center'}>
+                            {entity?.tipus == "EXPEDIENT" && <Icon>folder_open</Icon>}
+                            {entity?.tipus == "CARPETA" && <Icon>folder</Icon>}
+                            {entity?.tipus == "DOCUMENT" && <Icon>description</Icon>}
+                            {formattedValue}
+                        </Box>)} hiddenIfEmpty/>
+                        <FieldData titleSize={4} textSize={8} field={"metaNode"} hiddenIfEmpty/>
+                        <FieldData titleSize={4} textSize={8} title={t('page.document.detall.createdDate')} field={"createdDate"} hidden={!entity?.createdDate}>{formatDate(entity?.createdDate)}</FieldData>
+                        <FieldData titleSize={4} textSize={8} field={"estat"} hiddenIfEmpty/>
+                        <FieldData titleSize={4} textSize={8} field={"ntiVersion"} hiddenIfEmpty/>
+                        <FieldData titleSize={4} textSize={8} field={"ntiIdentificador"} hiddenIfEmpty/>
+                        <FieldData titleSize={4} textSize={8} field={"ntiOrgano"} hiddenIfEmpty/>
+                        <FieldData titleSize={4} textSize={8} field={"dataCaptura"} hidden={!entity?.dataCaptura}>{formatDate(entity?.dataCaptura)}</FieldData>
+                        <FieldData titleSize={4} textSize={8} field={"ntiOrigen"} hiddenIfEmpty/>
+                        <FieldData titleSize={4} textSize={8} field={"ntiEstadoElaboracion"} hiddenIfEmpty/>
+                        <FieldData titleSize={4} textSize={8} field={"ntiTipoDocumental"} hiddenIfEmpty/>
+                    </DetailCard>
+                </MuiDetail>
             </Load>
         </MuiDialog>
 
@@ -344,7 +363,7 @@ const ContingutGrid = () => {
                 perspectives={perspectives}
                 rowAdditionalActions={actions}
                 toolbarMassiveActions={massiveActions}
-                onRowClick={(params: any) => handleDetail(params?.row?.id, params?.row)}
+                onRowClick={(params: any) => handleDetail(params?.row?.id)}
                 isRowSelectable={(params:any) => params?.row?.esborrat == 1 }
                 disabledMassiveDefSelector={!haveRequirements}
                 toolbarHideCreate

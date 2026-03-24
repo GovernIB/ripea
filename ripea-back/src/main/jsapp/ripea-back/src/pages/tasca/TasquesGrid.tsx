@@ -133,7 +133,7 @@ const TasquesGrid = () => {
                         if (isTramitable(params?.row)) {
                             navigate(`/contingut/${params?.row?.expedient?.id}/tasca/${params?.id}`)
                         } else {
-                            handleOpen(params?.row?.id, params?.row)
+                            handleOpen(params?.row?.id)
                         }
                     }}
                     rowProps={(row: any) => {

@@ -1,8 +1,8 @@
 import {useState} from "react";
-import {Alert, Grid, Icon} from "@mui/material";
+import {Alert, Grid2 as Grid, Icon} from "@mui/material";
 import {MuiDialog, useBaseAppContext, useConfirmDialogButtons, useResourceApiService} from "reactlib";
 import {useTranslation} from "react-i18next";
-import {CardData, ContenidoData} from "../../../components/CardData.tsx";
+import {DetailCard} from "../../../components/CardData.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import Load from "../../../components/Load.tsx";
 import * as builder from '../../../util/springFilterUtils.ts'
@@ -10,31 +10,30 @@ import IconButton from "@mui/material/IconButton";
 import TabComponent from "../../../components/TabComponent.tsx";
 import Box from "@mui/material/Box";
 import {useUserSession} from "../../../components/Session.tsx";
+import {FieldData, MuiDetail} from "../../../components/MuiDetail.tsx";
 
 const Dades = (props:any) => {
-    const {entity} = props;
-    const { t } = useTranslation();
-    return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <CardData xs={12} title={entity?.document?.description}>
-            {/*<ContenidoData title={t('page.documentVia.detall.document')}>{entity?.document?.description}</ContenidoData>*/}
-            <ContenidoData title={t('page.documentVia.detall.titol')}>{entity?.titol}</ContenidoData>
-            <ContenidoData title={t('page.documentVia.detall.descripcio')}>{entity?.descripcio}</ContenidoData>
-            <ContenidoData title={t('page.documentVia.detall.enviatData')}>{formatDate(entity?.enviatData)}</ContenidoData>
-            <ContenidoData title={t('page.documentVia.detall.estat')}>{t(`enum.estat.${entity?.estat}`)}</ContenidoData>
-            <ContenidoData title={t('page.documentVia.detall.tipusDestinatari')}>{t(`enum.tipusDestinatari.${entity?.tipusDestinatari}`)}</ContenidoData>
-            <ContenidoData title={t('page.documentVia.detall.codiUsuari')} hidden={entity?.tipusDestinatari != 'TABLET'}>{entity?.codiUsuari}</ContenidoData>
-            <ContenidoData title={t('page.documentVia.detall.signantEmail')} hidden={entity?.tipusDestinatari != 'EMAIL'}>{entity?.signantEmail}</ContenidoData>
-            <ContenidoData title={t('page.documentVia.detall.messageCode')} hiddenIfEmpty>{entity?.messageCode}</ContenidoData>
-        </CardData>
-    </Grid>
+    const {entity, fields} = props;
+    return <MuiDetail entity={entity} fields={fields}>
+        <DetailCard>
+            <FieldData titleSize={4} textSize={8} field={'titol'}/>
+            <FieldData titleSize={4} textSize={8} field={'descripcio'}/>
+            <FieldData titleSize={4} textSize={8} field={'enviatData'}>{formatDate(entity?.enviatData)}</FieldData>
+            <FieldData titleSize={4} textSize={8} field={'estat'}/>
+            <FieldData titleSize={4} textSize={8} field={'tipusDestinatari'}/>
+            <FieldData titleSize={4} textSize={8} field={'codiUsuari'} hidden={entity?.tipusDestinatari != 'TABLET'}/>
+            <FieldData titleSize={4} textSize={8} field={'signantEmail'} hidden={entity?.tipusDestinatari != 'EMAIL'}/>
+            <FieldData titleSize={4} textSize={8} field={'messageCode'}/>
+        </DetailCard>
+    </MuiDetail>
 }
 const Errors = (props:any) => {
-    const {entity} = props;
+    const {entity, fields} = props;
     const { t } = useTranslation();
 
     if (entity?.error) {
-        return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-            <Grid xs={12} sx={{ pl:1, pt:1 }}>
+        return <MuiDetail entity={entity} fields={fields}>
+            <Grid size={12}>
                 <Alert severity={'error'}
                        icon={<Icon>warning</Icon>}
                        action={<IconButton title={t('page.documentVia.alert.reintentar')} size="small">
@@ -47,11 +46,11 @@ const Errors = (props:any) => {
                 </Alert>
             </Grid>
 
-            <CardData xs={12} title={t('page.documentVia.alert.enviament')}>
-                <ContenidoData xs={12} title={t('page.documentVia.detall.intentData')}>{formatDate(entity?.intentData)}</ContenidoData>
-                <ContenidoData xs={12} title={t('page.documentVia.detall.intentNum')}>{entity?.intentNum}</ContenidoData>
+            <DetailCard title={t('page.documentVia.alert.enviament')}>
+                <FieldData titleSize={4} textSize={8} field={'intentData'}/>
+                <FieldData titleSize={4} textSize={8} field={'intentNum'} sx={{ borderBottom: "1px solid" }}/>
 
-                <Grid xs={12}>
+                <Grid size={12} p={1}>
                     <Box
                         sx={{
                             border: 'solid 1px #e3e3e3',
@@ -68,8 +67,8 @@ const Errors = (props:any) => {
                         {entity?.errorDescripcio}
                     </Box>
                 </Grid>
-            </CardData>
-        </Grid>
+            </DetailCard>
+        </MuiDetail>
     }
 }
 
@@ -81,6 +80,7 @@ const useSeguimentViafirma = (potModificar:boolean, refresh?: () => void) => {
         isReady: apiIsReady,
         find: apiFind,
         artifactAction: apiAction,
+        currentFields: fields,
     } = useResourceApiService('documentViaFirmaResource')
     const {messageDialogShow, temporalMessageShow} = useBaseAppContext();
     const confirmDialogButtons = useConfirmDialogButtons().reverse();
@@ -154,12 +154,12 @@ const useSeguimentViafirma = (potModificar:boolean, refresh?: () => void) => {
         {
             value: "dades",
             label: t('page.documentVia.tabs.dades'),
-            content: <Dades entity={entity}/>,
+            content: <Dades entity={entity} fields={fields}/>,
         },
         {
             value: "errors",
             label: t('page.documentVia.tabs.errors'),
-            content: <Errors entity={entity}/>,
+            content: <Errors entity={entity} fields={fields}/>,
             disabled: !entity?.error
         },
     ]

@@ -24,6 +24,7 @@ const Tasca = () => {
     const {
         isReady: apiIsReady,
         find: appFind,
+        currentFields: fields,
     } = useResourceApiService('expedientResource');
     const [expedient, setExpedient] = useState<any>();
 
@@ -105,7 +106,7 @@ const Tasca = () => {
             <CardPage header={headerMain} componentProps={{ justifyContent: 'space-between' }}>
                 <Grid container spacing={2}>
                     <Grid size={3}>
-                        <ExpedientInfo title={tasca?.expedient?.description} entity={expedient} readOnly/>
+                        <ExpedientInfo title={tasca?.expedient?.description} entity={expedient} fields={fields} readOnly/>
                     </Grid>
                     <Grid size={9}>
                         <DocumentsGrid entity={expedient}/>
