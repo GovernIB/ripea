@@ -131,7 +131,7 @@ const TasquesExpedientGrid = (props: any) => {
             rowAdditionalActions={actions}
             toolbarHideCreate={!entity?.potModificar}
 
-            onRowClick={(params: any) => handleOpen(params?.row?.id, params?.row) }
+            onRowClick={(params: any) => handleOpen(params?.row?.id) }
             popupEditFormI18nKeys={{
                 createSuccess: 'page.tasca.action.new.ok',
             }}

@@ -363,7 +363,7 @@ const ContingutGrid = () => {
                 perspectives={perspectives}
                 rowAdditionalActions={actions}
                 toolbarMassiveActions={massiveActions}
-                onRowClick={(params: any) => handleDetail(params?.row?.id, params?.row)}
+                onRowClick={(params: any) => handleDetail(params?.row?.id)}
                 isRowSelectable={(params:any) => params?.row?.esborrat == 1 }
                 disabledMassiveDefSelector={!haveRequirements}
                 toolbarHideCreate
