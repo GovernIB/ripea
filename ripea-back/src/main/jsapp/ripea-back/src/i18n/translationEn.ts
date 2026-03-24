@@ -837,6 +837,7 @@ const translationEn = {
             },
             action: {
                 new: {
+                    dropMessg: "Drag the file here or onto the table...",
                     ok: "The document {{data.nom}} has been created successfully"
                 },
                 update: {

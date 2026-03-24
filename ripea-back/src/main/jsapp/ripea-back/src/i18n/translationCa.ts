@@ -837,6 +837,7 @@ const translationCa = {
             },
             action: {
                 new: {
+                    dropMessg: "Arrossega el fitxer aquí o sobre la taula...",
                     ok: "El document {{data.nom}} s'ha creat correctament"
                 },
                 update: {

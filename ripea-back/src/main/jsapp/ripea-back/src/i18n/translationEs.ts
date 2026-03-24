@@ -837,6 +837,7 @@ const translationEs = {
             },
             action: {
                 new: {
+                    dropMessg: "Arrastra el fichero aquí o sobre la tabla...",
                     ok: "El documento {{data.nom}} se ha creado correctamente"
                 },
                 update: {
