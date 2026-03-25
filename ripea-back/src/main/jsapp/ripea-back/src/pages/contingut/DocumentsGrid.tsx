@@ -405,7 +405,7 @@ const DocumentsGrid = (props: any) => {
                     {dialogVisualitzar}
                 </DndContext>
 
-                <Box
+                {(entity?.potModificarContingut || entity?.potModificar) && <Box
                     sx={{
                         minHeight: '50px',
                         display: 'flex',
@@ -415,9 +415,9 @@ const DocumentsGrid = (props: any) => {
                         opacity: 0.5,
                     }}
                 >
-                    <Icon sx={{ fontSize: '5rem' }}>upload</Icon>
+                    <Icon sx={{fontSize: '5rem'}}>upload</Icon>
                     {t('page.document.action.new.dropMessg')}
-                </Box>
+                </Box>}
             </DropZone>
         </Load>
     </>

@@ -109,7 +109,7 @@ const Tasca = () => {
                         <ExpedientInfo title={tasca?.expedient?.description} entity={expedient} fields={fields} readOnly/>
                     </Grid>
                     <Grid size={9}>
-                        <DocumentsGrid entity={expedient}/>
+                        <DocumentsGrid entity={{...expedient, potModificar: (expedient?.potModificar || tasca?.usuariActualResponsable || tasca?.usuariActualDelegat)}}/>
                     </Grid>
                 </Grid>
             </CardPage>
