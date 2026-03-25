@@ -13,7 +13,7 @@ const TasquesFilterForm = () => {
             <GridFormField xs={3} name="metaExpedient"/>
             <GridFormField xs={2} name="titol"/>
             <GridFormField xs={2} name="prioritat"/>
-            <GridFormField xs={2.5} name="estat" multiple/>
+            <GridFormField xs={2.5} name="estats" multiple/>
         </>}
         {(data?.advanced) && <>
             <GridFormField xs={3} name="metaExpedient"/>
