@@ -66,9 +66,9 @@ public class UsuariTascaController extends BaseUserController {
         List<MetaExpedientDto> metaExpedientDtoList = metaExpedientService.findActiusAmbEntitatPerModificacio(entitatActual.getId(), rolActual);
         model.addAttribute("metaExpedients", metaExpedientDtoList);
 
-        if (metaExpedientDtoList.size() == 1) {
+        /*if (metaExpedientDtoList.size() == 1) {
             command.setMetaExpedientId(metaExpedientDtoList.get(0).getId());
-        }
+        }*/
 
         if (command.getMetaExpedientId() != null) {
             model.addAttribute("metaexpTasques",

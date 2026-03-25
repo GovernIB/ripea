@@ -121,25 +121,33 @@ public class IntegracioResourceServiceImpl extends BaseMutableResourceService<In
 		}
 
 		//3. Paginar
-		List<List<IntegracioAccioDto>> pagines = paginacioHelper.getPages(accions, pageable.getPageSize());
-		PaginaDto<IntegracioAccioDto> pagina = paginacioHelper.toPaginaDto(pagines.get(pageable.getPageNumber()), null);
-		pagina.setContingut(pagines.get(pageable.getPageNumber()));
-		PaginaDto<IntegracioAccioDto> aux = paginacioHelper.prepararPagina(pagina, pagines, accions);
-		
-		List<IntegracioResource> resultatResource = new ArrayList<IntegracioResource>();
-		if (aux!=null && aux.getContingut()!=null) {
-			for (IntegracioAccioDto accioDto: aux.getContingut()) {
-				resultatResource.add(objectMappingHelper.newInstanceMap(accioDto, IntegracioResource.class));
+		if (pageable.isPaged()) {
+			List<List<IntegracioAccioDto>> pagines = paginacioHelper.getPages(accions, pageable.getPageSize());
+			PaginaDto<IntegracioAccioDto> pagina = paginacioHelper.toPaginaDto(pagines.get(pageable.getPageNumber()), null);
+			pagina.setContingut(pagines.get(pageable.getPageNumber()));
+			PaginaDto<IntegracioAccioDto> aux = paginacioHelper.prepararPagina(pagina, pagines, accions);
+			
+			List<IntegracioResource> resultatResource = new ArrayList<IntegracioResource>();
+			if (aux!=null && aux.getContingut()!=null) {
+				for (IntegracioAccioDto accioDto: aux.getContingut()) {
+					resultatResource.add(objectMappingHelper.newInstanceMap(accioDto, IntegracioResource.class));
+				}
 			}
+			
+			//4.- Convertir la paginacio dto a paginació spring
+		    return new PageImpl<>(resultatResource, pageable, aux.getElementsTotal());
+
+		} else {
+			
+			List<IntegracioResource> resultatResource = new ArrayList<IntegracioResource>();
+			if (accions!=null) {
+				for (IntegracioAccioDto accioDto: accions) {
+					resultatResource.add(objectMappingHelper.newInstanceMap(accioDto, IntegracioResource.class));
+				}
+			}
+			
+			return new PageImpl<>(resultatResource, pageable, accions.size());
 		}
-		
-		//4.- Convertir la paginacio dto a paginació spring
-	    return new PageImpl<>(
-	    	resultatResource,
-	        pageable,
-	        aux.getElementsTotal()
-	    );
-		
 	}
     
 	@Override
