@@ -4,15 +4,20 @@ import {MuiFormDialog, MuiFormDialogApi, useBaseAppContext, useFormContext} from
 import {useTranslation} from "react-i18next";
 import GridFormField from "../../../components/GridFormField.tsx";
 import UsuarisRestriccioForm from "./restriccio/UsuarisRestriccioForm.tsx";
+import {useUserSession} from "../../../components/Session.tsx";
 
 const ModificarForm = () => {
 	const { data } = useFormContext();
-	
+	const { value: user } = useUserSession();
+
 	return (
 		<>
 			<Grid container direction="row" columnSpacing={1} rowSpacing={1}>
 				<GridFormField xs={12} name="nom" />
-				<GridFormField xs={12} name="restringida" />
+
+				{user?.sessionScope?.isRestringirCarpetesActiu &&
+				    <GridFormField xs={12} name="restringida" />
+                }
 			</Grid>
 
 			{data?.restringida && (

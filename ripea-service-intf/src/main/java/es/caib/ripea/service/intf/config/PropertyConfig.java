@@ -267,6 +267,7 @@ public class PropertyConfig {
 	public static final String CARPETES_CREACIO_ACTIVA								= "es.caib.ripea.creacio.carpetes.activa";
 	public static final String CARPETES_ANOTACIONS_ACTIVES							= "es.caib.ripea.mostrar.carpetes.anotacions";
 	public static final String CARPETES_LOGIQUES_ACTIVES							= "es.caib.ripea.carpetes.logiques";
+	public static final String CARPETES_RESTRINGIR_ACTIU							= "es.caib.ripea.restringir.carpetes.actiu";
 	public static final String ORDENACIO_CONTINGUT_ACTIU							= "es.caib.ripea.ordenacio.contingut.habilitada";
 	public static final String INDEX_EXPEDIENTS_RELACIONATS							= "es.caib.ripea.index.expedients.relacionats";
 	public static final String INDEX_CAMPS_ADDICIONALS								= "es.caib.ripea.index.expedient.camps.addicionals";
