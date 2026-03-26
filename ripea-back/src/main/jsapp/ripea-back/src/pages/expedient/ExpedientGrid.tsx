@@ -219,7 +219,7 @@ const ExpedientGrid = () => {
                 return resum;
             },
             renderCell: (params: any)=> (
-                <Box sx={{ whiteSpace: 'pre-line' }}>
+                <Box sx={{ whiteSpace: 'pre-line' }} title={params?.formattedValue}>
                     {params?.formattedValue}
                 </Box>
             ),
