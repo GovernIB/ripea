@@ -11,6 +11,7 @@ import useCambiarPrioritat from "../actions/CambiarPrioritat.tsx";
 import {useUserSession} from "../../../components/Session.tsx";
 import useRetomar from "../actions/Retomar.tsx";
 import {useNavigate} from "react-router-dom";
+import useHistoric, {HistoricContingutTipusEnum} from "../../Historic.tsx";
 
 export const useActions = (refresh?: () => void) => {
     const { t } = useTranslation();
@@ -55,6 +56,8 @@ const useTascaActions = (entity:any, refresh?: () => void) => {
     const navigate = useNavigate();
     const {changeEstat, cancelar} = useActions(refresh)
     const { value: user } = useUserSession();
+
+    const {handleOpen: handleHistoricOpen, dialog: dialogHistoric} = useHistoric(HistoricContingutTipusEnum.TASCA);
     const {handleShow: handleRebutjar, content: rebutjarContent} = useRebutjar(refresh);
     const {handleShow: handleReassignar, content: reassignarContent} = useReassignar(refresh);
     const {handleShow: handleDelegar, content: delegarContent} = useDelegar(refresh);
@@ -85,15 +88,19 @@ const useTascaActions = (entity:any, refresh?: () => void) => {
         {
             label: t('common.detail'),
             icon: "info",
-            //Les rebutjades i cancel·lades només es poden veure els detalls. També si ets només observador.
-            showInMenu: (row:any)=> !isOnlyObservador(row) && !nomesMostraDetalls(row) && entity?.potModificar,
+            showInMenu: true,
             onClick: handleOpen,
+        },
+        {
+            label: t('page.contingut.action.history.label'),
+            icon: "list",
+            showInMenu: true,
+            onClick: handleHistoricOpen,
         },
         {
             label: <Divider sx={{px: 1, width: '100%'}} color={"none"}/>,
             showInMenu: true,
             disabled: true,
-            hidden: (row: any) => isOnlyObservador(row) || nomesMostraDetalls(row) || !entity?.potModificar,
         },
         {
             label: t('page.tasca.action.tramitar.label'),
@@ -199,6 +206,7 @@ const useTascaActions = (entity:any, refresh?: () => void) => {
         {cambiarPrioritatContent}
         {cambiarDataLimitContent}
         {retomarContent}
+        {dialogHistoric}
         {dialog}
     </>;
 

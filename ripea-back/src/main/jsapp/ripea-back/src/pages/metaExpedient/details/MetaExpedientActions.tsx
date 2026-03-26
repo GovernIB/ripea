@@ -8,6 +8,7 @@ import useReglaDistribucio from "../actions/ReglaDistribucio.tsx";
 import useExpedientDialog from "./ExpedientDialog.tsx";
 import {Divider} from "@mui/material";
 import {useMemo} from "react";
+import useHistoric, {HistoricContingutTipusEnum} from "../../Historic.tsx";
 
 export const useActions = (refresh?: () => void) => {
     const {t} = useTranslation()
@@ -138,6 +139,7 @@ export const useMetaExpedientActions = (refresh?: () => void) => {
     const {t} = useTranslation();
     const {value: user, rol} = useUserSession()
 
+    const {handleOpen: handleHistoricOpen, dialog: dialogHistoric} = useHistoric(HistoricContingutTipusEnum.METANODE);
     const {handleOpen: handleExpedient, dialog: dialogExpedient} = useExpedientDialog();
     const {handleOpen: handleDetail, dialog: dialogDetail} = useMetaExpedientDetail();
     const {handleShow: handleCanviEstat, content: contentCanviEstat} = useCanviEstatRevisio(refresh);
@@ -151,6 +153,17 @@ export const useMetaExpedientActions = (refresh?: () => void) => {
             showInMenu: true,
             onClick: handleDetail,
             hidden: !(rol?.isRevisor || rol?.isAdminLectura),
+        },
+        {
+            label: t('page.contingut.action.history.label'),
+            icon: "list",
+            showInMenu: true,
+            onClick: handleHistoricOpen,
+        },
+        {
+            label: <Divider sx={{px: 1, width: '100%'}} color={"none"}/>,
+            showInMenu: true,
+            disabled: true,
         },
         {
             label: t('common.update'),
@@ -242,6 +255,7 @@ export const useMetaExpedientActions = (refresh?: () => void) => {
         {contentCanviEstat}
         {dialogDetail}
         {dialogRegla}
+        {dialogHistoric}
     </>
 
     return {

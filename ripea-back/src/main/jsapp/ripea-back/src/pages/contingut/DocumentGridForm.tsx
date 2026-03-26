@@ -2,7 +2,7 @@ import {useFormContext, useResourceApiService} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {useScanFinalitzatSession} from "../../components/SseExpedient.tsx";
 import {useUserSession} from "../../components/Session.tsx";
-import {Alert, Grid2 as Grid, Icon} from "@mui/material";
+import {Alert, Grid2 as Grid} from "@mui/material";
 import GridFormField, {FileFormField, GridButton} from "../../components/GridFormField.tsx";
 import Iframe from "../../components/Iframe.tsx";
 import * as builder from "../../util/springFilterUtils.ts";
@@ -133,10 +133,11 @@ const DocumentsGridForm = ({ setDisabled }:any) => {
                        filter={metaDocumentFilter} />
         <GridFormField size={data.pluginSummarizeActiu ? 11 : 12} name="nom" />
         <GridButton size={1} title={t('page.document.detall.summarize')}
+                    icon={'assistant'}
                     onClick={actualizarDatos}
                     disabled={!data?.adjunt}
                     hidden={!data.pluginSummarizeActiu}>
-            <Icon>assistant</Icon>IA
+            IA
         </GridButton>
         <GridFormField name="descripcio" type={"textarea"} />
         <GridFormField name="dataCaptura" type={"date"} disabled required />

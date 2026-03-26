@@ -16,7 +16,7 @@ public class ContingutLogResourceHelper {
 
     public ContingutLogResourceEntity crearRelacioExpedientLog(ExpedientResourceEntity entity, Long relacionatId) {
         ContingutLogResourceEntity log = new ContingutLogResourceEntity();
-        log.setContingut(entity);
+        log.setContingutId(entity.getId());
         log.setTipus(LogTipusEnumDto.MODIFICACIO);
         log.setObjecteId(entity.getId() + "#" + relacionatId);
         log.setObjecteTipus(LogObjecteTipusEnumDto.RELACIO);
@@ -28,7 +28,7 @@ public class ContingutLogResourceHelper {
     }
     public ContingutLogResourceEntity eliminarRelacioExpedientLog(ExpedientResourceEntity entity, Long relacionatId) {
         ContingutLogResourceEntity log = new ContingutLogResourceEntity();
-        log.setContingut(entity);
+        log.setContingutId(entity.getId());
         log.setTipus(LogTipusEnumDto.MODIFICACIO);
         log.setObjecteId(entity.getId() + "#" + relacionatId);
         log.setObjecteTipus(LogObjecteTipusEnumDto.RELACIO);

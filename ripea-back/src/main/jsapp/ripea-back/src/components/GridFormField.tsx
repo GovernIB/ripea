@@ -19,7 +19,7 @@ export const GridButton = (props:any) => {
             style={{margin: 0}}
             {...other}
         >
-            <Icon sx={{mr: (!iconOnly && children) ?0.5 :0, ...props.iconSx}}>{icon}</Icon>
+            {icon && <Icon sx={{mr: (!iconOnly && children) ? 0.5 : 0, ...props.iconSx}}>{icon}</Icon>}
             {!iconOnly && children}
         </Button>
     </Grid>

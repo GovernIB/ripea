@@ -130,10 +130,9 @@ const PortafirmesMetaDocumentForm = () => {
         {data?.portafirmesFluxTipus == "PORTAFIB" && <>
             <GridFormField size={11} name="fluxosFirma" multiple required/>
             <GridButton size={1}
+                        icon={'add'}
                         onClick={() => handleOpen(undefined, { metaDocument: { id: data?.id } })}
-            >
-                <Icon>add</Icon>
-            </GridButton>
+            />
             <StyledMuiGrid
                 apiRef={apiRef}
                 resourceName={'metaDocumentFluxPortafibResource'}
@@ -253,7 +252,7 @@ const MetaDocumentGrid = () => {
                 aria-label="key" 
                 color="inherit"
                 title={t('page.metaDada.plural')}
-                onClick={`/metaDocument/${params?.row?.id}/metaDada`}
+                to={`/metaDocument/${params?.row?.id}/metaDada`}
             >
                 <Badge badgeContent={params?.row?.numMetadades} color="primary" showZero>
                     <Typography sx={{fontSize: '1rem', paddingRight: '10px'}}>{t('page.metaDada.plural')}</Typography>

@@ -2,6 +2,7 @@ package es.caib.ripea.service.intf.model;
 
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
+import es.caib.ripea.service.intf.dto.LogContingutTipusEnumDto;
 import es.caib.ripea.service.intf.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
 import lombok.Getter;
@@ -21,7 +22,9 @@ public class ContingutLogResource extends BaseAuditableResource<Long> {
     private String param1;
     private String param2;
 
-    private ResourceReference<ContingutResource, Long> contingut;
+    private Long contingutId;
+    private LogContingutTipusEnumDto contingutTipus;
+//    private ResourceReference<ContingutResource, Long> contingut;
 //    private ResourceReference<ContingutMovimentResource, Long> contingutMoviment;
 //    private ResourceReference<ContingutLogResource, Long> pare;
 

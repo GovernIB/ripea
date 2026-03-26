@@ -1,5 +1,5 @@
 import {MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
-import {Grid2 as Grid, Icon} from "@mui/material";
+import {Grid2 as Grid} from "@mui/material";
 import GridFormField, {GridButton} from "../../../components/GridFormField.tsx";
 import {useRef} from "react";
 import {useTranslation} from "react-i18next";
@@ -49,12 +49,13 @@ const DocPinbalForm = () => {
 
         <GridFormField size={9.5} name="titular" filter={titularFilter}/>
         <GridButton
+            icon={'add'}
             size={2.5}
             onClick={()=> {
                 create({expedient: data?.expedient}, onCreateInteressat)
             }}
         >
-            <Icon>add</Icon>{t('page.interessat.action.new.label')}
+            {t('page.interessat.action.new.label')}
         </GridButton>
         {content}
 
