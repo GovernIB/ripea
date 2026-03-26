@@ -93,7 +93,7 @@ const DataGrid = (props:any) => {
                 element: <span style={{ color: '#337ab7', fontWeight: 300 }}>{t('page.dada.mensajeToolbar.maxDades')}</span>,
                 hidden: !(numDades > 0 && !(entity?.multiplicitat == 'M_0_N' || entity?.multiplicitat == 'M_1_N')),
             }
-        ]}
+        ] as any[]}
         toolbarHideRefresh
         toolbarHideCreate={ !contingut?.potModificar || numDades > 0 && !(entity?.multiplicitat == 'M_0_N' || entity?.multiplicitat == 'M_1_N') }
         toolbarCreateTitle={t('page.dada.action.new.label')}

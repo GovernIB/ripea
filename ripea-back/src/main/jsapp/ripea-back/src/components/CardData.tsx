@@ -1,12 +1,13 @@
 import {Box, Card, CardContent, CardHeader, Grid2 as Grid, Typography, Icon, IconButton} from "@mui/material";
+import React from "react";
 
 const iconButton = { p: 0.5, borderRadius: '5px', maxWidth: 'max-content', border: '1px solid grey' }
 
 type CardPageProps = {
     icon?: string;
     title?: string;
-    header?: any;
-    children: any;
+    header?: React.ReactNode;
+    children: React.ReactNode;
     headerProps?: any;
     [key: string]: any;
 }
@@ -22,7 +23,7 @@ type CardDataProps = DetailCardProps & {
 }
 type ContenidoDataProps = {
     title?: string | any;
-    children: any;
+    children: React.ReactNode | any;
     size?: any;
     titleSize?: any;
     textSize?: any;
@@ -33,6 +34,7 @@ type ContenidoDataProps = {
 }
 type DetailCardContentProps = ContenidoDataProps & {
     sx?: any;
+    isObject?:boolean;
 }
 
 const CardHead = (props:any) => {
@@ -43,13 +45,13 @@ const CardHead = (props:any) => {
 }
 
 export const CardButton = (props:any) => {
-    const {text, icon, onClick, flex, buttonProps, hidden} = props;
+    const {text, icon, onClick, flex = 12, buttonProps, hidden} = props;
 
     if (hidden){
         return <></>
     }
 
-    return <Grid size={flex ?? 12} display={'flex'} justifyContent={'end'}>
+    return <Grid size={flex} display={'flex'} justifyContent={'end'}>
         <IconButton sx={{...iconButton, ...buttonProps}} title={text} onClick={onClick}>
             <Typography sx={{display: 'flex', alignItems: 'center'}} variant={'caption'} color={'textPrimary'}>
                 {icon && <Icon fontSize={'inherit'}>{icon}</Icon>}
@@ -90,15 +92,14 @@ export const DetailCard = (props:DetailCardProps) => {
     </Grid>
 }
 
-export const DetailCardContent = (props:any) => {
-
+export const DetailCardContent = (props:DetailCardContentProps) => {
     const {title, children, isObject, size = 12, titleSize = 12, textSize = 12, componentTitleProps, componentTextProps, hidden, ...other} = props;
 
     if (hidden){
         return <></>
     }
 
-    return <Grid item size={size} container direction={"row"}
+    return <Grid size={size} container direction={"row"}
                   {...other}
                   sx={{
                       p: 1,

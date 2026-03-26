@@ -1,6 +1,6 @@
 import {useTranslation} from "react-i18next";
 import {useState} from "react";
-import {Grid2} from "@mui/material";
+import {Grid2 as Grid} from "@mui/material";
 import { MuiDialog } from "reactlib";
 import {DetailCard, DetailCardContent} from "../../../components/CardData.tsx";
 
@@ -9,7 +9,7 @@ const RegistreInteressatDetail = (props:any) => {
     const {t} = useTranslation();
     const representant = entity?.representantInfo
 
-    return <Grid2 container direction={"row"} columnSpacing={1} rowSpacing={1}>
+    return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <DetailCard title={t('page.interessat.title')}>
             <DetailCardContent title={t('page.interessat.detall.nif')} size={6}>{entity?.documentNumero}</DetailCardContent>
             <DetailCardContent title={`${t('page.interessat.detall.nom')} / ${t('page.interessat.detall.raoSocial')}`} size={6}>{entity?.nom} {entity?.raoSocial}</DetailCardContent>
@@ -28,7 +28,7 @@ const RegistreInteressatDetail = (props:any) => {
             <DetailCardContent title={t('page.interessat.detall.incapacitat')}>{representant?.incapacitat}</DetailCardContent>
             <DetailCardContent title={t('page.interessat.detall.direccio')}>{representant?.pais} {representant?.provincia} {representant?.municipi} {representant?.codiPostal} {representant?.adresa}</DetailCardContent>
         </DetailCard>
-    </Grid2>
+    </Grid>
 }
 
 const useRegistreInteressatDetail = () => {

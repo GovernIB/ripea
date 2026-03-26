@@ -1,10 +1,8 @@
-import { useTranslation } from 'react-i18next';
 import { Box, Typography } from '@mui/material';
 import { BasePage } from 'reactlib';
 import {CardPage} from "../components/CardData.tsx";
 
 const Accesibilitat: React.FC = () => {
-    const { t } = useTranslation();
     return <BasePage>
         <CardPage>
             <Box

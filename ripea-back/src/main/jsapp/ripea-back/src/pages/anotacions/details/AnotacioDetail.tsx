@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {Box, Grid2} from "@mui/material";
+import {Box, Grid2 as Grid} from "@mui/material";
 import {BasePage, MuiDialog} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {CardButton, DetailCard, DetailCardContent} from "../../../components/CardData.tsx";
@@ -20,7 +20,7 @@ const Resum = (props:any) => {
     const { t } = useTranslation();
 
     return <BasePage>
-        <Grid2 container direction={"row"} columnSpacing={1} rowSpacing={1}>
+        <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
             <DetailCard title={t('page.registre.detall.identifier')}>
                 <DetailCardContent title={t('page.registre.detall.identificador')} size={6}>{registre?.identificador}</DetailCardContent>
                 <DetailCardContent title={t('page.registre.detall.data')}          size={6}>{formatDate(registre?.data)}</DetailCardContent>
@@ -50,7 +50,7 @@ const Resum = (props:any) => {
             <DetailCard title={t('page.registre.detall.annexos')}>
                 <Annexos entity={registre} onRowCountChange={setNumAnnexos}/>
             </DetailCard>
-        </Grid2>
+        </Grid>
     </BasePage>
 }
 
@@ -87,7 +87,7 @@ const InformeRegistre = (props:any) => {
     const { t } = useTranslation();
 
     return <BasePage>
-        <Grid2 container direction={"row"} columnSpacing={1} rowSpacing={1}>
+        <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
             <DetailCard>
                 <DetailCardContent title={t('page.registre.detall.tipus')}          size={6}>{t('page.registre.detall.entrada')}</DetailCardContent>
                 <DetailCardContent title={t('page.registre.detall.identificador')}  size={6}>{entity?.identificador}</DetailCardContent>
@@ -114,7 +114,7 @@ const InformeRegistre = (props:any) => {
                 <DetailCardContent title={t('page.registre.detall.origenData')}           >{formatDate(entity?.origenData)}</DetailCardContent>
                 <DetailCardContent title={t('page.registre.detall.observacions')}         >{entity?.observacions}</DetailCardContent>
             </DetailCard>
-        </Grid2>
+        </Grid>
     </BasePage>
 }
 
@@ -278,7 +278,7 @@ const Justificant = (props:any) => {
 
     const {downloadJustificant} = useActions()
 
-    return <Grid2 container direction={"row"} columnSpacing={1} rowSpacing={1}>
+    return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <DetailCard icon={'description'} title={entity?.titol}
                     header={<Box ml="auto">
                         <CardButton icon={'download'}
@@ -297,7 +297,7 @@ const Justificant = (props:any) => {
             <DetailCardContent title={t('page.registre.justificant.firmaTipus')}    size={6}>{entity?.firmaTipus}</DetailCardContent>
             <DetailCardContent title={t('page.registre.justificant.firmaPerfil')}   size={6}>{entity?.firmaPerfil}</DetailCardContent>
         </DetailCard>
-    </Grid2>
+    </Grid>
 }
 
 const useAnotacioDetail = () => {

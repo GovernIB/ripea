@@ -28,7 +28,7 @@ const columnsAccions = [
 
 const sortModel:any = [{ field: 'createdDate', sort: 'asc' }];
 const Accions = (props:any) => {
-    const { id, onRowCountChange, objecteTipus } = props;
+    const { id, onRowCountChange, contingutTipus } = props;
     const { t } = useTranslation();
 
     const {handleOpen, dialog} = useAccioDialog()
@@ -47,7 +47,7 @@ const Accions = (props:any) => {
             resourceName={'contingutLogResource'}
             filter={builder.and(
                 builder.eq('contingutId', id),
-                builder.eq('contingutTipus', `'${objecteTipus}'`),
+                builder.eq('contingutTipus', `'${contingutTipus}'`),
             )}
             staticSortModel={sortModel}
             columns={columnsAccions}
@@ -194,7 +194,7 @@ export const HistoricContingutTipusEnum = {
     TASCA: "TASCA",
 } as const;
 type HistoricContingutTipus = keyof typeof HistoricContingutTipusEnum;
-const useHistoric = (objecteTipus:HistoricContingutTipus = HistoricContingutTipusEnum.CONTINGUT) => {
+const useHistoric = (contingutTipus:HistoricContingutTipus = HistoricContingutTipusEnum.CONTINGUT) => {
     const { t } = useTranslation();
     const [open, setOpen] = useState(false);
     const [entity, setEntity] = useState<any>();
@@ -219,13 +219,13 @@ const useHistoric = (objecteTipus:HistoricContingutTipus = HistoricContingutTipu
         {
             value: 'actions',
             label: t('page.contingut.tabs.actions'),
-            content: <Accions id={entity?.id} objecteTipus={objecteTipus} onRowCountChange={setNumAccions}/>,
+            content: <Accions id={entity?.id} contingutTipus={contingutTipus} onRowCountChange={setNumAccions}/>,
             badge: numAccions,
         },
         {
             value: "move",
             label: t('page.contingut.tabs.move'),
-            content: <Moviment id={entity?.id} objecteTipus={objecteTipus} onRowCountChange={setMoviment}/>,
+            content: <Moviment id={entity?.id} contingutTipus={contingutTipus} onRowCountChange={setMoviment}/>,
             badge: numMoviment ?? entity?.numMoviments,
             disabled: entity?.numMoviments === 0,
             hidden: entity?.numMoviments == null,

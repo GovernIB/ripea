@@ -1,6 +1,6 @@
 import {DetailCardContent} from "./CardData.tsx";
 import React, { ReactNode } from "react";
-import {Grid2} from "@mui/material";
+import {Grid2 as Grid} from "@mui/material";
 import Load from "./Load.tsx";
 
 export const FieldData = ({ label, field, renderCell = (formattedValue:any) => formattedValue,  children, ...other }: any) => {
@@ -20,8 +20,9 @@ const MuiDetailContext = React.createContext<MuiDetailContextType | undefined>(u
 
 type MuiDetailProps = {
     entity: any;
-    fields: any[];
+    fields?: any[];
     children: ReactNode;
+    [key: string]: any;
 };
 
 const useMuiDetailContext = () => {
@@ -30,13 +31,14 @@ const useMuiDetailContext = () => {
     return ctx;
 }
 export const MuiDetail = ({ entity, fields, children, ...other }: MuiDetailProps) => {
+    if (!fields) return <></>
     const getField = (name: string) => fields?.find((item: any) => item?.name === name) ?? {};
 
     return (<MuiDetailContext.Provider value={{ entity, getField }}>
         <Load value={entity}>
-            <Grid2 container sx={{display: "flex", flexDirection: "row", wordWrap: "break-word"}} columnSpacing={1} rowSpacing={1} {...other}>
+            <Grid container sx={{display: "flex", flexDirection: "row", wordWrap: "break-word"}} columnSpacing={1} rowSpacing={1} {...other}>
                 {children}
-            </Grid2>
+            </Grid>
         </Load>
     </MuiDetailContext.Provider>);
 };

@@ -227,7 +227,6 @@ export const useCommonActions = (refresh?: () => void) => {
         retornar,
         alliberar,
         eliminar,
-        exportPdfEni,
         syncArxiu,
     } = useActions(refresh);
     const {handleOpen: handelHistoricOpen, dialog: dialogHistoric} = useHistoric();
