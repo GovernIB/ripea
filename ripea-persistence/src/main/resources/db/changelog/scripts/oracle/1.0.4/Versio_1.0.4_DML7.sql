@@ -1,0 +1,2 @@
+UPDATE IPA_CONFIG SET DESCRIPTION='Habilita l''opció de menú de publicar document', TYPE_CODE='BOOL' WHERE KEY LIKE '%.creacio.documents.publicar.activa';
+UPDATE IPA_CONFIG SET DESCRIPTION='Activar firma biomètrica', TYPE_CODE='BOOL' WHERE KEY LIKE '%.firma.biometrica.activa';

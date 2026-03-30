@@ -14,6 +14,8 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -108,6 +110,7 @@ public class CacheHelper {
 	@Autowired private ConfigHelper configHelper;
 	@Autowired private MutableAclService aclService;
 	@Autowired private EventHelper eventHelper;
+	@Autowired private CacheManager cacheManager;
 	
 	private PluginHelper pluginHelper;
 	@Autowired
@@ -333,12 +336,20 @@ public class CacheHelper {
 	}
 	
 	@CacheEvict(value = "errorsValidacioNode", key = "#nodeId")
-	public void evictErrorsValidacioPerNode(Long nodeId) {}
+	public void evictErrorsValidacioPerNode(Long nodeId) {
+		logger.debug("### EVICT errorsValidacioNode per nodeId=" + nodeId);
+	}
 	
 	public void evictErrorsValidacioAndNotify(Long nodeId) {
-		evictErrorsValidacioPerNode(nodeId); // Primero hace evict
+		//cridar al mètode evictErrorsValidacioPerNode de la mateixa classe, crea el problema: Self-invocation y el proxy de Spring:
+		//estas llamadas son llamadas internas (this.metodo()), que van directamente al objeto real, saltándose completamente el proxy AOP
+	    Cache cache = cacheManager.getCache("errorsValidacioNode");
+	    if (cache != null) {
+	        cache.evict(nodeId); // evict manual, no depende del proxy
+	    }
+		//evictErrorsValidacioPerNode(nodeId);
 		ErrorsValidacioChangedEvent evce = new ErrorsValidacioChangedEvent(nodeId, findErrorsValidacioPerNode(nodeId));
-		eventHelper.notifyErrorsValidacio(evce); // Luego notifica con datos frescos
+		eventHelper.notifyErrorsValidacio(evce); //Notifica con datos frescos
 	}
 	
 	@Cacheable(value = "usuariAmbCodi", key="#usuariCodi")
