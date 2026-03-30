@@ -527,7 +527,7 @@ public class DocumentHelper {
 				DocumentEntity.class);
 
 		cacheHelper.evictErrorsValidacioPerNode(documentEntity.getId());
-		cacheHelper.evictErrorsValidacioPerNode(documentEntity.getExpedient().getId());
+		cacheHelper.evictErrorsValidacioAndNotify(documentEntity.getExpedient().getId());
 		
 		String nomOriginal = documentEntity.getNom();
 		
@@ -957,7 +957,7 @@ public class DocumentHelper {
 				documentCreat,
 				entitat.getUnitatArrel());
 		if (expedient != null) {
-			cacheHelper.evictErrorsValidacioPerNode(expedient.getId());
+			cacheHelper.evictErrorsValidacioAndNotify(expedient.getId());
 		}
 		return documentCreat;
 	}
