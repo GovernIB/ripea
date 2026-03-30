@@ -59,9 +59,9 @@ Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values 
 ('0','CONTINGUT','es.caib.ripea.document.nou.escanejar.actiu','false','Activar l’escaneig en document nou','13','BOOL','1','1','0','1','0');
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values 
-('0','SCHEDULLED','es.caib.ripea.tasca.consulta.anotacio.temps.espera.execucio','30000','Interval de temps (ms) en que s’’executa la tasca periòdica de consultar i guardar anotacions per peticions pedents de creacio del expedients','0','INT','0','0','0','0','0');
+('0','SCHEDULLED','es.caib.ripea.tasca.consulta.anotacio.temps.espera.execucio','30000','Interval de temps (ms) en que s’executa la tasca periòdica de consultar i guardar anotacions per peticions pedents de creacio del expedients','0','INT','0','0','0','0','0');
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values 
-('0','SCHEDULLED','es.caib.ripea.segonpla.massives.periode.comprovacio','30000','Interval de temps (ms) en que s’’executa la tasca periòdica que comprova les execucions massives.','0','INT','0','0','0','0','0');
+('0','SCHEDULLED','es.caib.ripea.segonpla.massives.periode.comprovacio','30000','Interval de temps (ms) en que s’executa la tasca periòdica que comprova les execucions massives.','0','INT','0','0','0','0','0');
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values 
 ('0','SCHEDULLED','es.caib.ripea.segonpla.email.enviament.agrupat.cron','0 * * * * *','Expressió cron per indicar quan executar la tasca periòdica per enviar els correus electrònics pendents agrupats.','0','CRON','0','0','0','0','0');
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values 
@@ -75,9 +75,9 @@ Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values 
 ('0','SCHEDULLED','es.caib.ripea.segonpla.email.enviament.procediment.comentari.cron','0 0 * * * *','Expressió cron per indicar quan executar la tasca periodica per enviar els correus electronics avisant que s''ha afegit un comentari a procediment','8','CRON','0','0','0','0','0');
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values 
-('0','SCHEDULLED','es.caib.ripea.segonpla.guardar.arxiu.continguts.pendents','600000','Interval de temps (ms) en que s’’executa la tasca periodica de guardar documents i expedient pendents en arxiu','1','INT','0','0','0','0','0');
+('0','SCHEDULLED','es.caib.ripea.segonpla.guardar.arxiu.continguts.pendents','600000','Interval de temps (ms) en que s’executa la tasca periodica de guardar documents i expedient pendents en arxiu','1','INT','0','0','0','0','0');
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values 
-('0','SCHEDULLED','es.caib.ripea.segonpla.guardar.arxiu.interessats','600000','Interval de temps (ms) en que s’’executa la tasca periodica de guardar interessats pendents en arxiu','2','INT','0','0','0','0','0');
+('0','SCHEDULLED','es.caib.ripea.segonpla.guardar.arxiu.interessats','600000','Interval de temps (ms) en que s’executa la tasca periodica de guardar interessats pendents en arxiu','2','INT','0','0','0','0','0');
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values 
 ('0','SCHEDULLED','es.caib.ripea.procediment.actualitzar.cron','0 15 * * * *','Cron per a la actualització de procediments','6','TEXT','0','0','0','0','0');
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values 
@@ -168,7 +168,7 @@ Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values 
 ('0','FIRMA_SERVIDOR','es.caib.ripea.plugin.firmaservidor.portafib.location','Palma','Ubicació del firmant','6','TEXT','1','1','0','1','0');
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values 
-('1','FIRMA_SERVIDOR','es.caib.ripea.plugin.firmaservidor.portafib.username','preprod-dgmad','Nom d’’usuari per a la firma de servidor emprant PortaFIB','7','TEXT','1','1','0','1','0');
+('1','FIRMA_SERVIDOR','es.caib.ripea.plugin.firmaservidor.portafib.username','preprod-dgmad','Nom d’usuari per a la firma de servidor emprant PortaFIB','7','TEXT','1','1','0','1','0');
 
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values 
 ('0','PORTAFIRMES','es.caib.ripea.plugin.portafirmes.class','es.caib.ripea.plugin.caib.portafirmes.PortafirmesPluginPortafib','Classe del portafirmes','0','PORTAFIRMES_CLASS','1','1','1','1','0');
@@ -232,13 +232,13 @@ Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values 
 ('0','ARXIU','es.caib.ripea.plugin.arxiu.class','es.caib.plugins.arxiu.caib.ArxiuPluginCaib','Classe del plugin','1','TEXT','1','1','0','1','0');
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values 
-('1','ARXIU','es.caib.ripea.plugin.arxiu.caib.base.url','https://esbse.caib.es:4430/esb','Url de l’’arxiu','2','TEXT','1','1','0','1','0');
+('1','ARXIU','es.caib.ripea.plugin.arxiu.caib.base.url','https://esbse.caib.es:4430/esb','Url de l’arxiu','2','TEXT','1','1','0','1','0');
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values 
-('1','ARXIU','es.caib.ripea.plugin.arxiu.caib.usuari','ripea','Usuari de l’’arxiu','3','TEXT','1','1','0','1','0');
+('1','ARXIU','es.caib.ripea.plugin.arxiu.caib.usuari','ripea','Usuari de l’arxiu','3','TEXT','1','1','0','1','0');
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values 
-('1','ARXIU','es.caib.ripea.plugin.arxiu.caib.contrasenya',null,'Contrasenya de l’’arxiu','4','PASSWORD','1','1','0','1','0');
+('1','ARXIU','es.caib.ripea.plugin.arxiu.caib.contrasenya',null,'Contrasenya de l’arxiu','4','PASSWORD','1','1','0','1','0');
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values 
-('0','ARXIU','es.caib.ripea.plugin.arxiu.caib.aplicacio.codi','RIPEA','Codi de l’’aplicació','8','TEXT','1','1','0','1','0');
+('0','ARXIU','es.caib.ripea.plugin.arxiu.caib.aplicacio.codi','RIPEA','Codi de l’aplicació','8','TEXT','1','1','0','1','0');
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values 
 ('0','ARXIU','es.caib.ripea.arxiu.endpointName','esbse.caib.es:4430','Nom del endpoint del plugin','3','TEXT','0','0','0','1','0');
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values 
@@ -328,7 +328,7 @@ Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values 
 ('0','FIRMA_VIAFIRMA','es.caib.ripea.plugin.viafirma.caib.authmode','client_auth','Mode d’autentificació','0','TEXT','0','1','0','1','0');
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values 
-('0','FIRMA_VIAFIRMA','es.caib.ripea.plugin.viafirma.caib.group.codi','apb','Codi de l’’aplicació (informar si la propietat anterior es false)','0','TEXT','0','1','0','1','0');
+('0','FIRMA_VIAFIRMA','es.caib.ripea.plugin.viafirma.caib.group.codi','apb','Codi de l’aplicació (informar si la propietat anterior es false)','0','TEXT','0','1','0','1','0');
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values 
 ('0','FIRMA_VIAFIRMA','es.caib.ripea.plugin.viafirma.caib.authtype','OAUTH_APPLICATION','Tipus d’autentificació OAUTH','0','TEXT','0','1','0','1','0');
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values 
@@ -366,7 +366,7 @@ Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values 
 ('0','DIGITALITZACIO','es.caib.ripea.plugin.digitalitzacio.endpointName',null,'Nom del endpoint del plugin de digitalitzacio','3','TEXT','0','0','0','1','0');
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values 
-('1','DIGITALITZACIO','es.caib.ripea.plugin.digitalitzacio.digitalib.username',null,'Nom d’’usuari de DigitalIB','3','TEXT','0','1','0','1','0');
+('1','DIGITALITZACIO','es.caib.ripea.plugin.digitalitzacio.digitalib.username',null,'Nom d’usuari de DigitalIB','3','TEXT','0','1','0','1','0');
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values 
 ('1','DIGITALITZACIO','es.caib.ripea.plugin.digitalitzacio.digitalib.password',null,'Contrasenya de DigitalIB','4','PASSWORD','0','1','0','1','0');
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values 
@@ -441,7 +441,7 @@ Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values 
 ('1','CONTINGUT','es.caib.ripea.index.logo',null,'Especifica el path del logo a mostrar a index','4','TEXT','0','1','0','1','0');
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values 
-('0','ASPECTE','es.caib.ripea.capsalera.color.fons',null,'Color del fons per defecte de l’’aplicació','2','TEXT','0','0','0','0','0');
+('0','ASPECTE','es.caib.ripea.capsalera.color.fons',null,'Color del fons per defecte de l’aplicació','2','TEXT','0','0','0','0','0');
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values 
 ('0','ASPECTE','es.caib.ripea.capsalera.color.lletra',null,'Color de la lletra per defecte en la capçalera','3','TEXT','0','0','0','0','0');
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values 
@@ -455,7 +455,7 @@ Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values 
 ('0','CONTINGUT','es.caib.ripea.index.expedients.relacionats','false','Crear index per expedients relacionats','5','BOOL','0','1','0','1','0');
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values 
-('0','CONTINGUT','es.caib.ripea.index.expedient.camps.addicionals','false','Mostrar camps adicionals a l’’índex de l’expedient','6','BOOL','0','1','0','1','0');
+('0','CONTINGUT','es.caib.ripea.index.expedient.camps.addicionals','false','Mostrar camps adicionals a l’índex de l’expedient','6','BOOL','0','1','0','1','0');
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values 
 ('0','CONTINGUT','es.caib.ripea.creacio.importacio.activa','true','Activar per a mostrar la importació','7','BOOL','1','1','0','1','0');
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values 
@@ -517,7 +517,7 @@ Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values
 ('0','CONTINGUT','es.caib.ripea.expedient.tancament.logic','false','Habilitar tancament lògic dels expedients','39','BOOL','0','0','0','1','0');
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values
-('0','CONTINGUT','es.caib.ripea.obtenir.data.firma.atributs.document','false','Obtenir informaciÃ³ firma utilitzant les metadades del document','40','BOOL','0','0','0','0','0');
+('0','CONTINGUT','es.caib.ripea.obtenir.data.firma.atributs.document','false','Obtenir informació firma utilitzant les metadades del document','40','BOOL','0','0','0','0','0');
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values
 ('0','CONTINGUT','es.caib.ripea.expedient.tancament.logic.dies','60','Dies per tancar un expedient a l''arxiu des del seu tancament a Ripea','40','INT','0','0','0','1','0');
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values
@@ -530,7 +530,7 @@ Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values
 ('0','GENERAL','es.caib.ripea.anotacions.annexos.save','false','Guardar annexos de les anotacions en FileSystem (instal·lació de Ripea i Distribució en servidors separats)','5','BOOL','0','0','0','1','0');
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values
-('0','GENERAL','es.caib.ripea.anotacions.registre.expedient.serie.documental',null,'Serie documental del contenidor dels annexos de DistribuciÃ³','6','TEXT','0','0','0','0','0');
+('0','GENERAL','es.caib.ripea.anotacions.registre.expedient.serie.documental',null,'Serie documental del contenidor dels annexos de Distribució','6','TEXT','0','0','0','0','0');
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values
 ('0','GENERAL','es.caib.ripea.permetre.obligar.interessat','true','Activar l''opció per obligar a informar interessat a nivell de procediment','8','BOOL','0','0','0','0','0');
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values 
