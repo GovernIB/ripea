@@ -92,10 +92,10 @@ export const DetailCard = (props:DetailCardProps) => {
     </Grid>
 }
 
-export const DetailCardContent = (props:DetailCardContentProps) => {
-    const {title, children, isObject, size = 12, titleSize = 12, textSize = 12, componentTitleProps, componentTextProps, hidden, ...other} = props;
+export const DetailCardContent = (props:any) => {
+    const {title, children, isObject, size = 12, titleSize = 12, textSize = 12, componentTitleProps, componentTextProps, hidden, hiddenIfEmpty, ...other} = props;
 
-    if (hidden){
+    if (hidden || (hiddenIfEmpty && isEmpty(children))){
         return <></>
     }
 

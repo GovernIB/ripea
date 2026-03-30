@@ -94,15 +94,9 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 			HttpServletRequest request,
 			@PathVariable Long expedientTascaId,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		getEntitatActualComprovantPermisos(request);
 		ExpedientTascaDto expedientTascaDto = expedientTascaService.findOne(expedientTascaId);
-		expedientService.findById(
-				entitatActual.getId(),
-				expedientTascaDto.getExpedient().getId(), null);
-		model.addAttribute(
-				"expedientTascaDto",
-				expedientTascaDto);
-		
+		model.addAttribute("expedientTascaDto", expedientTascaDto);
 		return "expedientTascaDetall";
 	}
 

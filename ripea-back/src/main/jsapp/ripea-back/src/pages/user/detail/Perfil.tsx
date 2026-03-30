@@ -20,7 +20,7 @@ const PerfilFrom = () =>{
             cardProps={{border: '1px solid #004B99'}}
             headerProps={{color: 'white', backgroundColor: '#004B99 !important', borderBottom: 'none'}}
         >
-            <MuiDetail entity={data} fields={fields} sx={{ width: '100%'}}>
+            <MuiDetail entity={data} fields={fields} sx={{ width: '100%' }}>
                 <FieldData field={"nom"} sx={{border: 'none'}} size={4}/>
                 <FieldData field={"email"} sx={{borderTop: 'none'}} size={4}/>
                 <FieldData field={"rols"} sx={{borderTop: 'none'}} size={4} commponentProps={{ component: Box }} isObject>

@@ -93,6 +93,7 @@ export const IntegracioGrid = () => {
                      }
                 ]}
                 readOnly
+                paginationActive={false}
             />
             </Load>
             {dialog}

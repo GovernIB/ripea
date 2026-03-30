@@ -1,19 +1,34 @@
 import {useState} from "react";
-import {MuiDialog} from "reactlib";
+import {MuiDialog, useBaseAppContext, useResourceApiService} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {formatDate} from "../../../util/dateUtils.ts";
 import {StyledPrioritat} from "../../expedient/ExpedientGrid.tsx";
-import {DetailCardContent, DetailCard} from "../../../components/CardData.tsx";
+import {DetailCard} from "../../../components/CardData.tsx";
 import {StyledDate} from "../TasquesGrid.tsx";
+import {FieldData, MuiDetail} from "../../../components/MuiDetail.tsx";
 
 const useTascaDetail = () => {
-    const [open, setOpen] = useState(false);
-    const [entity, setEntity] = useState<any>();
     const { t } = useTranslation();
 
-    const handleOpen = (id:any, row:any) => {
-        console.log(id, row)
-        setEntity(row);
+    const {
+        isReady: apiIsReady,
+        getOne: apiGetOne,
+        currentFields: fields,
+    } = useResourceApiService('expedientTascaResource')
+    const {temporalMessageShow} = useBaseAppContext();
+
+    const [open, setOpen] = useState(false);
+    const [entity, setEntity] = useState<any>();
+
+    const handleOpen = (id:any) => {
+        if(apiIsReady && id){
+            apiGetOne(id)
+                .then((app) => setEntity(app))
+                .catch((error) => {
+                    handleClose()
+                    temporalMessageShow(null, error?.message, 'error');
+                });
+        }
         setOpen(true);
     }
 
@@ -43,20 +58,22 @@ const useTascaDetail = () => {
                 }
             }}
         >
+            <MuiDetail entity={entity} fields={fields}>
             <DetailCard>
-                <DetailCardContent title={t('page.tasca.detall.metaExpedientTasca')}               >{entity?.metaExpedientTasca?.description}</DetailCardContent>
-                <DetailCardContent title={t('page.tasca.detall.metaExpedientTascaDescription')}    >{entity?.metaExpedientTascaDescription}</DetailCardContent>
-                <DetailCardContent title={t('page.tasca.detall.createdBy')}                        >{entity?.createdBy}</DetailCardContent>
-                <DetailCardContent title={t('page.tasca.detall.responsablesStr')}                  >{entity?.responsablesStr}</DetailCardContent>
-                <DetailCardContent title={t('page.tasca.detall.responsableActual')}                >{entity?.responsableActual?.description}</DetailCardContent>
-                <DetailCardContent title={t('page.tasca.detall.delegat')}                          >{entity?.delegat?.description}</DetailCardContent>
-                <DetailCardContent title={t('page.tasca.detall.observadors')}                      >{entity?.observadorsStr}</DetailCardContent>
-                <DetailCardContent title={t('page.tasca.detall.dataInici')}                        >{formatDate(entity?.dataInici)}</DetailCardContent>
-                <DetailCardContent title={t('page.tasca.detall.duracio')}                          size={6}>{entity?.duracio}</DetailCardContent>
-                <DetailCardContent title={t('page.tasca.detall.dataLimit')}                        size={6}><StyledDate entity={entity}>{formatDate(entity?.dataLimit, "DD/MM/Y")}</StyledDate></DetailCardContent>
-                <DetailCardContent title={t('page.tasca.detall.estat')}                            size={6}>{entity?.estat}</DetailCardContent>
-                <DetailCardContent title={t('page.tasca.detall.prioritat')}                        size={6}><StyledPrioritat entity={entity}>{t(`enum.prioritat.${entity?.prioritat}`)}</StyledPrioritat></DetailCardContent>
+                <FieldData field={"metaExpedientTasca"}/>
+                <FieldData field={"metaExpedientTascaDescription"}/>
+                <FieldData size={6} field={"createdByFullName"}/>
+                <FieldData size={6} field={"dataInici"}>{formatDate(entity?.dataInici)}</FieldData>
+                <FieldData field={"responsablesStr"}/>
+                <FieldData field={"responsableActual"}/>
+                <FieldData field={"delegat"}/>
+                <FieldData field={"observadorsStr"}/>
+                <FieldData size={6} field={"duracio"}/>
+                <FieldData size={6} field={"dataLimit"} renderCell={(formattedValue:string) => <StyledDate entity={entity}>{formatDate(formattedValue, "DD/MM/Y")}</StyledDate>}/>
+                <FieldData size={6} field={"estat"}/>
+                <FieldData size={6} field={"prioritat"} renderCell={(formattedValue:string) => <StyledPrioritat entity={entity}>{formattedValue}</StyledPrioritat>}/>
             </DetailCard>
+            </MuiDetail>
         </MuiDialog>
 
     return {

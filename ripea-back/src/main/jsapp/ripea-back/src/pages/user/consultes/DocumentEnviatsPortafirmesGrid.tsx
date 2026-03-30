@@ -1,5 +1,5 @@
 import {useTranslation} from "react-i18next";
-import {GridPage, MuiDialog} from "reactlib";
+import {GridPage, MuiDialog, useBaseAppContext, useResourceApiService} from "reactlib";
 import {useState} from "react";
 import {CardPage} from "../../../components/CardData.tsx";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
@@ -14,12 +14,26 @@ import {SeguimentPortafirmes} from "../../contingut/actions/SeguimentPortafirmes
 // Detail
 const useDetail = () => {
     const { t } = useTranslation();
+
+    const {
+        isReady: apiIsReady,
+        getOne: apiGetOne,
+        currentFields: fields,
+    } = useResourceApiService('documentPortafirmesResource')
+    const {temporalMessageShow} = useBaseAppContext();
+
     const [open, setOpen] = useState(false);
     const [entity, setEntity] = useState<any>();
 
-    const handleOpen = (id:any, row:any) => {
-        console.log(id, row)
-        setEntity(row)
+    const handleOpen = (id:any) => {
+        if(apiIsReady && id){
+            apiGetOne(id)
+                .then((app) => setEntity(app))
+                .catch((error) => {
+                    handleClose()
+                    temporalMessageShow(null, error?.message, 'error');
+                });
+        }
         setOpen(true);
     }
 
@@ -48,7 +62,7 @@ const useDetail = () => {
                 handleClose();
             }}
         >
-            <SeguimentPortafirmes entity={entity}/>
+            <SeguimentPortafirmes entity={entity} fields={fields}/>
         </MuiDialog>
 
     return {

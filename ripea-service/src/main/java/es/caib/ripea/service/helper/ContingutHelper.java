@@ -16,6 +16,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -171,7 +173,7 @@ public class ContingutHelper {
 	@Autowired private ExpedientInteressatHelper expedientInteressatHelper;
 	@Autowired private DocumentFirmaPortafirmesHelper documentFirmaPortafirmesHelper;
 	@Autowired private CarpetaHelper carpetaHelper;
-	
+	@Autowired private ExecutorService executor;
 	@Autowired private Environment env;
 
 	private static final int NO_ESBORRAT = 0;
@@ -559,7 +561,7 @@ public class ContingutHelper {
 		logMsg("toExpedientDto start (" + expedient.getId() + ", level=" + params.getLevel() + ") ");
 
 		ExpedientDto dto = new ExpedientDto();
-		setExpedientBasicProperties(dto, expedient);
+		List<ValidacioErrorDto> errorsValidacio = setExpedientBasicProperties(dto, expedient);
 
 		if (params.isAmbPermisos()) {
 			setExpedientPermisos(
@@ -576,13 +578,17 @@ public class ContingutHelper {
 			setExpedientNomesPerLlista(dto, expedient, params.getRolActual());
 		} else {
 			setExpedientComplet(dto, expedient, params);
+			//Enviam els errors de validacio a comanda (nomes quant entram al expedient, no llistat) y sense repetir la crida a cacheHelper
+			CompletableFuture.runAsync(() -> {
+				pluginHelper.comandaAvisSend(expedient, errorsValidacio);
+			}, executor);
 		}
 
 		logMsg("toExpedientDto end (" + expedient.getId() + "):  " + (System.currentTimeMillis() - t1) + " ms");
 		return dto;
 	}
 
-	private void setExpedientBasicProperties(ExpedientDto dto, ExpedientEntity expedient) {
+	private List<ValidacioErrorDto> setExpedientBasicProperties(ExpedientDto dto, ExpedientEntity expedient) {
 		dto.setNumero(expedient.getNumero());
 		dto.setEstat(expedient.getEstat());
 		if (expedient.getEstatAdditional() != null) {
@@ -601,6 +607,8 @@ public class ContingutHelper {
 		dto.setGrupNom(expedient.getGrup() != null ? expedient.getGrup().getDescripcio() : null);
         dto.setPrioritat(expedient.getPrioritat());
         dto.setPrioritatMotiu(expedient.getPrioritatMotiu());
+        
+        return errorsValidacio;
 	}
 
 	private void setExpedientPermisos(ExpedientDto dto, Long expedientId, boolean llancarExcepcio) {
@@ -653,10 +661,10 @@ public class ContingutHelper {
 	}
 
 	private void setExpedientComplet(ExpedientDto dto, ExpedientEntity expedient, ToContingutParams params) {
+		
 		setExpedientInformacioBasica(dto, expedient);
 		setExpedientInformacioDocumental(dto, expedient);
 		setExpedientNextEstat(dto, expedient);
-//		dto.setInteressatsNotificable(conversioTipusHelper.convertirList(expedientInteressatHelper.findByExpedientAndNotRepresentantAndAmbDadesPerNotificacio(expedient), InteressatDto.class));
 		setExpedientOrganGestor(dto, expedient);
 
 		if (params.isAmbMapPerTipusDocument() && params.isAmbFills()) {
@@ -666,7 +674,6 @@ public class ContingutHelper {
 		if (params.isAmbMapPerEstat() && params.isAmbFills()) {
 			setMapPerEstat(dto, expedient, params);
 		}
-
 	}
 
 	private void setExpedientInformacioBasica(ExpedientDto dto, ExpedientEntity expedient) {

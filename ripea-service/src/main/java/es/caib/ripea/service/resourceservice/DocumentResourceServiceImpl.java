@@ -893,13 +893,18 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
     			
                 if (params!=null) {
+                	Long expedientId = null; //Tots els documents son del mateix expedient.
                 	for (Long id: params.getIds()) {
                 		DocumentEntity  document = documentHelper.comprovarDocument(entitatEntity.getId(), id, false, true, false, false, false, configHelper.getRolActual());
+                		expedientId = document.getExpedient().getId();
             			documentHelper.updateTipusDocumentDocument(
             					entitatEntity.getId(),
             					document,
             					params.getMetaDocument().getId(),
             					false);
+                	}
+                	if (expedientId!=null) {
+                		afterDbChange(expedientId);
                 	}
                 }
                 

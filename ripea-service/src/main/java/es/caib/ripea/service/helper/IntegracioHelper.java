@@ -197,11 +197,6 @@ public class IntegracioHelper {
 			afegirParametreUsuari(accio);
 			//#1544 Mostar informació de l'endpoint al monitor d'integracions
 			String entitatCodi = configHelper.getEntitatActualCodi();
-//			if (entitatCodi!=null) {
-//				String organCodi = configHelper.getOrganActualCodi();
-//				Properties propietatsPlugin = configHelper.getGroupPropertiesOrganOrEntitatOrGeneral(integracioCodi, entitatCodi, organCodi);
-//				accio.getIntegracio().setEndpoint(getEndpointNameFromProperties(propietatsPlugin));
-//			}
 			accio.setEntitatCodi(entitatCodi);
 			LinkedList<IntegracioAccioDto> accions = getLlistaAccions(integracioCodi);
 			int max = getMaxAccions(integracioCodi);
@@ -209,10 +204,20 @@ public class IntegracioHelper {
 				accions.remove(accions.size() - 1);
 			}
 			accio.setTimestamp(System.currentTimeMillis());
+			ensureUniqueTimestamp(accions, accio);
 			accions.add(0, accio);
 		}
 	}
 
+	private void ensureUniqueTimestamp(LinkedList<IntegracioAccioDto> accions, IntegracioAccioDto accio) {
+	    boolean exists = accions.stream()
+	            .anyMatch(a -> a.getTimestamp() != null && a.getTimestamp().equals(accio.getTimestamp()));
+	    if (exists) {
+	        accio.setTimestamp(accio.getTimestamp() + 1);
+	        ensureUniqueTimestamp(accions, accio);
+	    }
+	}
+	
 	private void afegirParametreUsuari(IntegracioAccioDto accio) {
 
 		String usuariNomCodi = null;

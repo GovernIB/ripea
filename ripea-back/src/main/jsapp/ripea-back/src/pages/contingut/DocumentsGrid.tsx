@@ -403,6 +403,20 @@ const DocumentsGrid = (props: any) => {
                     {massiveComponents}
                     {dialogVisualitzar}
                 </DndContext>
+
+                {(entity?.potModificarContingut || entity?.potModificar) && <Box
+                    sx={{
+                        minHeight: '50px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        opacity: 0.5,
+                    }}
+                >
+                    <Icon sx={{fontSize: '5rem'}}>upload</Icon>
+                    {t('page.document.action.new.dropMessg')}
+                </Box>}
             </DropZone>
         </Load>
     </>

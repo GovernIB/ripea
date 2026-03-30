@@ -51,19 +51,6 @@ const translationEs = {
             true: "Si",
             false: "No",
         },
-        prioritat: {
-            D_MOLT_ALTA: "Muy alta",
-            C_ALTA: "Alta",
-            B_NORMAL: "Normal",
-            A_BAIXA: "Baja",
-            BAIXA: "Baja",
-            NORMAL: "Normal",
-            ALTA: "Alta",
-        },
-        fluxTipus: {
-            SIMPLE: "Simple",
-            PORTAFIB: "Portafib",
-        },
         estat: {
             TANCAT: "Cerrado",
             OBERT: "Abierto",
@@ -93,21 +80,6 @@ const translationEs = {
             EE03: "Copia electrónica auténtica de documento en papel",
             EE04: "Copia electrónica parcial auténtica",
             EE99: "Otros",
-        },
-        tipoFirma: {
-            TF01: "CSV",
-            TF02: "Firma XAdES internamente separada",
-            TF03: "Firma XAdES envuelta",
-            TF04: "Firma CAdES separada/explícita",
-            TF05: "Firma CAdES adjunta/implícita",
-            TF06: "PAdES",
-            TF07: "SMIME",
-            TF08: "ODT",
-            TF09: "OOXML",
-        },
-        tipusDestinatari: {
-            TABLET: "Tablet",
-            EMAIL: "Email",
         },
         tipusVia: {
             ALAMEDA: "Alameda",
@@ -142,17 +114,6 @@ const translationEs = {
             URBANIZACION: "Urbanización",
             VIA: "Vía",
 		},
-        documentEnviamentEstat: {
-            PENDENT: "Pendiente",
-            ENVIAT: "Enviado",
-            PROCESSAT: "Procesado",
-            REBUTJAT: "Rechazado",
-            CANCELAT: "Cancelado",
-        },
-        tipusSequencia: {
-            SERIE: "Serie",
-            PARALEL: "Paralela",
-        },
     },
     navigate: {
         accessibilitat: "Accesibilidad",
@@ -190,16 +151,6 @@ const translationEs = {
             },
             detalle: {
                 title: "Content details",
-                nom: "Name",
-                data: "Date",
-                numero: "Numero",
-                titol: "Titulo",
-                metaExpedient: "Tipo",
-                organGestor: "Organo gestor",
-                fechaApertura: "Fecha apertura",
-                estat: "Estado",
-                prioritat: "Prioridad",
-                clasificacio: "Clasificación",
                 dataProgramada: "Fecha en que se hará efectivo el envio de la notificación a Notific@",
                 duracio: "Días naturales\nLa notificación estará disponible hasta las 23:59:59 del día introducido, expirando a las 00:00 del día siguiente. Sólo se aplica a Notificaciones Electrónicas. Puede indicarse tanto en número de días naturales, como con una fecha concreta.",
                 dataCaducitat: "Días naturales\nLa notificación estará disponible hasta las 23:59:59 del día introducido, expirando a las 00:00 del día siguiente. Sólo se aplica a Notificaciones Electrónicas. Puede indicarse tanto en número de días naturales, como con una fecha concreta.",
@@ -832,19 +783,10 @@ const translationEs = {
                 firmes: "Firmas",
             },
             detall: {
-                fitxerNom: "Nombre del fichero",
-                fitxerContentType: "Tipo de contenido",
-                metaDocument: "Tipo de documento",
                 createdDate: "Fecha de creación",
                 createdBy: "Creado por",
-                estat: "Estado",
                 dataCaptura: "Fecha de captura",
-                origen: "Origen",
-                tipoDocumental: "Tipo documental NTI",
-                estadoElaboracion: "Estado de elaboración",
                 csv: "CSV",
-                csvRegulacion: "Regulación del CSV",
-                tipoFirma: "Tipo de firma",
                 flux: "Existe un flujo de firma predefinido. La creación de un nuevo flujo de firma implica sobrescribir el seleccionado.",
                 summarize: "Generar título y descripción con inteligencia artificial.\n(Requiere haber adjuntado un documento previamente)",
                 documentOrigenFormat: "Formato: ES_<Órgano>_<AAAA>_<ID_específico>",
@@ -863,6 +805,7 @@ const translationEs = {
             },
             action: {
                 new: {
+                    dropMessg: "Arrastra el fichero aquí o sobre la tabla...",
                     ok: "El documento {{data.nom}} se ha creado correctamente"
                 },
                 update: {
@@ -1223,18 +1166,11 @@ const translationEs = {
                 notificacioDocument: "Documento de la notificación",
                 error: "Se han producido errores enviando la notificación",
 
-                emisor: "Emisor",
-                assumpte: "Concepto",
-                observacions: "Descripción",
                 notificacioEstat: "Estado",
                 createdDate: "Enviada el",
-                processatData: "Finalitzada el",
-                tipus: "Tipos",
                 entregaPostal: "Entrega postal",
-                fitxerNom: "Nombre de archivo",
                 serveiTipusEnum: "Tipo de servicio",
                 notificacioIdentificador: "Identificador",
-                estatError: "Error procesando la notificación dentro de Notib",
             },
             action: {
                 update: {
@@ -1313,33 +1249,7 @@ const translationEs = {
                 }
             },
         },
-        documentPortafirmes: {
-            detall: {
-                assumpte: "Asunto",
-                enviatData: "Fecha de envío",
-                estat: "Estado",
-                prioritat: "Prioridad",
-                documentTipusNom: "Tipo de documento",
-                fluxTipus: "Tipo de flujo",
-                responsables: "Responsables",
-                sequenciaTipus: "Tipo de secuencia de firma",
-                portafirmesId: "ID Portafirmes",
-            },
-        },
         documentVia: {
-            detall: {
-                document: "Documento",
-                titol: "Título notificación",
-                descripcio: "Descripción notificación",
-                enviatData: "Fecha de envío",
-                estat: "Estado",
-                tipusDestinatari: "Tipo de destinatario",
-                codiUsuari: "Usuario viaFirma",
-                signantEmail: "Email destinatario",
-                messageCode: "Código mensaje viaFirma",
-                intentData: "Fecha último intento",
-                intentNum: "Número reintentos",
-            },
             tabs: {
                 dades: "Datos",
                 errors: "Errores",
@@ -1972,7 +1882,7 @@ const translationEs = {
             errors: {
                 metaDada: "Faltan los siguientes datos:",
                 metaDocument: "Faltan los siguientes documentos:",
-                metaNode: "Existen documentos sin un tipo de documento asigando",
+                metaNode: "Existen documentos sin un tipo de documento asignado",
                 noFinalitzades: "Existen notificaciones con un estado que no es final",
                 interessatObligatori: "Falta informar un interesado",
             },

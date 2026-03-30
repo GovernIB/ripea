@@ -392,7 +392,7 @@
 									</target>
 								</configuration>
 							</execution>
-						</executions>
+						</executions>					        
 					</plugin>
 					<plugin>
 						<groupId>com.github.eirslett</groupId>
@@ -447,30 +447,30 @@
 							</webResources>
 						</configuration>
 					</plugin>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-resources-plugin</artifactId>
-						<version>3.2.0</version>
-						<executions>
-							<execution>
-								<id>copy-react-resources</id>
-								<phase>process-resources</phase>
-								<goals>
-									<goal>copy-resources</goal>
-								</goals>
-								<configuration>
-									<outputDirectory>src/main/webapp/reactapp</outputDirectory>
-									<overwrite>true</overwrite>
-									<resources>
-										<resource>
-											<directory>${frontend.app.path}/dist</directory>
-											<filtering>false</filtering>
-										</resource>
-									</resources>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
+<!--					<plugin>-->
+<!--						<groupId>org.apache.maven.plugins</groupId>-->
+<!--						<artifactId>maven-resources-plugin</artifactId>-->
+<!--						<version>3.2.0</version>-->
+<!--						<executions>-->
+<!--							<execution>-->
+<!--								<id>copy-react-resources</id>-->
+<!--								<phase>process-resources</phase>-->
+<!--								<goals>-->
+<!--									<goal>copy-resources</goal>-->
+<!--								</goals>-->
+<!--								<configuration>-->
+<!--									<outputDirectory>src/main/webapp/reactapp</outputDirectory>-->
+<!--									<overwrite>true</overwrite>-->
+<!--									<resources>-->
+<!--										<resource>-->
+<!--											<directory>${frontend.app.path}/dist</directory>-->
+<!--											<filtering>false</filtering>-->
+<!--										</resource>-->
+<!--									</resources>-->
+<!--								</configuration>-->
+<!--							</execution>-->
+<!--						</executions>-->
+<!--					</plugin>-->
 				</plugins>
 			</build>
 		</profile>

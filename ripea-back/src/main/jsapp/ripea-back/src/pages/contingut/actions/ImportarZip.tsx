@@ -81,7 +81,7 @@ const ImportarZipForm = () => {
             flex: 1,
             renderCell: (params:any) => {
                 const value = data?.documentsZip.find((d: any) => d.id === params.id)?.nom
-                return <Box mt={1}><FormField
+                return <Box mt={1} width={'100%'}><FormField
                     name={"nom" + (value ? `#${params.id}` : '')}
                     value={value}
                     field={fieldNom}
@@ -111,7 +111,7 @@ const ImportarZipForm = () => {
             flex: 1,
             renderCell: (params:any) => {
                 const value = data?.documentsZip.find((d:any) => d.id === params.row.id)?.tipusDocument
-                return <Box mt={1}><FormField
+                return <Box mt={1} width={'100%'}><FormField
                     name={"tipusDocument" + (value ? `#${params.id}` : '')}
                     value={value}
                     field={fieldTipusDocument}

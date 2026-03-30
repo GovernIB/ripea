@@ -10,30 +10,29 @@ import IconButton from "@mui/material/IconButton";
 import TabComponent from "../../../components/TabComponent.tsx";
 import Box from "@mui/material/Box";
 import {useUserSession} from "../../../components/Session.tsx";
+import {FieldData, MuiDetail} from "../../../components/MuiDetail.tsx";
 
 const Dades = (props:any) => {
-    const {entity} = props;
-    const { t } = useTranslation();
-    return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <DetailCard title={entity?.document?.description}>
-            {/*<DetailCardContent title={t('page.documentVia.detall.document')}>{entity?.document?.description}</DetailCardContent>*/}
-            <DetailCardContent title={t('page.documentVia.detall.titol')}>{entity?.titol}</DetailCardContent>
-            <DetailCardContent title={t('page.documentVia.detall.descripcio')}>{entity?.descripcio}</DetailCardContent>
-            <DetailCardContent title={t('page.documentVia.detall.enviatData')}>{formatDate(entity?.enviatData)}</DetailCardContent>
-            <DetailCardContent title={t('page.documentVia.detall.estat')}>{t(`enum.estat.${entity?.estat}`)}</DetailCardContent>
-            <DetailCardContent title={t('page.documentVia.detall.tipusDestinatari')}>{t(`enum.tipusDestinatari.${entity?.tipusDestinatari}`)}</DetailCardContent>
-            <DetailCardContent title={t('page.documentVia.detall.codiUsuari')} hidden={entity?.tipusDestinatari != 'TABLET'}>{entity?.codiUsuari}</DetailCardContent>
-            <DetailCardContent title={t('page.documentVia.detall.signantEmail')} hidden={entity?.tipusDestinatari != 'EMAIL'}>{entity?.signantEmail}</DetailCardContent>
-            <DetailCardContent title={t('page.documentVia.detall.messageCode')} hiddenIfEmpty>{entity?.messageCode}</DetailCardContent>
+    const {entity, fields} = props;
+    return <MuiDetail entity={entity} fields={fields}>
+        <DetailCard>
+            <FieldData titleSize={4} textSize={8} field={'titol'}/>
+            <FieldData titleSize={4} textSize={8} field={'descripcio'}/>
+            <FieldData titleSize={4} textSize={8} field={'enviatData'}>{formatDate(entity?.enviatData)}</FieldData>
+            <FieldData titleSize={4} textSize={8} field={'estat'}/>
+            <FieldData titleSize={4} textSize={8} field={'tipusDestinatari'}/>
+            <FieldData titleSize={4} textSize={8} field={'codiUsuari'} hidden={entity?.tipusDestinatari != 'TABLET'}/>
+            <FieldData titleSize={4} textSize={8} field={'signantEmail'} hidden={entity?.tipusDestinatari != 'EMAIL'}/>
+            <FieldData titleSize={4} textSize={8} field={'messageCode'}/>
         </DetailCard>
-    </Grid>
+    </MuiDetail>
 }
 const Errors = (props:any) => {
-    const {entity} = props;
+    const {entity, fields} = props;
     const { t } = useTranslation();
 
     if (entity?.error) {
-        return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
+        return <MuiDetail entity={entity} fields={fields}>
             <Grid size={12}>
                 <Alert severity={'error'}
                        icon={<Icon>warning</Icon>}
@@ -48,8 +47,9 @@ const Errors = (props:any) => {
             </Grid>
 
             <DetailCard title={t('page.documentVia.alert.enviament')}>
-                <DetailCardContent title={t('page.documentVia.detall.intentData')}>{formatDate(entity?.intentData)}</DetailCardContent>
-                <DetailCardContent title={t('page.documentVia.detall.intentNum')}  sx={{ borderBottom: "1px solid" }}>{entity?.intentNum}</DetailCardContent>
+
+                <FieldData titleSize={4} textSize={8} field={'intentData'}/>
+                <FieldData titleSize={4} textSize={8} field={'intentNum'} sx={{ borderBottom: "1px solid" }}/>
 
                 <Grid size={12} p={1}>
                     <Box
@@ -69,7 +69,7 @@ const Errors = (props:any) => {
                     </Box>
                 </Grid>
             </DetailCard>
-        </Grid>
+        </MuiDetail>
     }
 }
 
@@ -81,6 +81,7 @@ const useSeguimentViafirma = (potModificar:boolean, refresh?: () => void) => {
         isReady: apiIsReady,
         find: apiFind,
         artifactAction: apiAction,
+        currentFields: fields,
     } = useResourceApiService('documentViaFirmaResource')
     const {messageDialogShow, temporalMessageShow} = useBaseAppContext();
     const confirmDialogButtons = useConfirmDialogButtons().reverse();
@@ -154,12 +155,12 @@ const useSeguimentViafirma = (potModificar:boolean, refresh?: () => void) => {
         {
             value: "dades",
             label: t('page.documentVia.tabs.dades'),
-            content: <Dades entity={entity}/>,
+            content: <Dades entity={entity} fields={fields}/>,
         },
         {
             value: "errors",
             label: t('page.documentVia.tabs.errors'),
-            content: <Errors entity={entity}/>,
+            content: <Errors entity={entity} fields={fields}/>,
             disabled: !entity?.error
         },
     ]
