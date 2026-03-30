@@ -98,7 +98,9 @@ export const useFormDialog: UseFormDialogFn = (
                 if (isCustomSubmit) {
                     formApiRef.current.handleSubmissionErrors(error, customSubmitErrorMessage);
                 }
-            }).finally(() => setLoading(false));
+            }).finally(() => {
+                setLoading(false);
+            });
         } else {
             // S'ha fet clic al botó de cancel·lar
             rejectFn?.(undefined);
@@ -126,6 +128,7 @@ export const useFormDialog: UseFormDialogFn = (
         args?.formComponentProps != null && setFormComponentProps(args.formComponentProps);
         setOpen(true);
         setSubmitReturnedContent(undefined);
+        setLoading(undefined);
         return new Promise<any>((resolve, reject) => {
             setResolveFn(() => resolve);
             setRejectFn(() => reject);

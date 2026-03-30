@@ -316,8 +316,8 @@ export const Form: React.FC<FormProps> = (props) => {
                 setApiFieldErrors(fieldErrors);
             } else {
                 temporalMessageShow(temporalMessageTitle ?? '', error.description ?? error.message, 'error');
-                reject?.(error);
             }
+            reject?.(error);
         }
     };
     const reset = (data: any) => {
