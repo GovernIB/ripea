@@ -6,7 +6,8 @@ import {formatDate} from "../../../util/dateUtils.ts";
 import Load from "../../../components/Load.tsx";
 import {useMemo, useState} from "react";
 import {FieldData, MuiDetail} from "../../../components/MuiDetail.tsx";
-import {Grid2 as Grid, Box} from "@mui/material";
+import {Grid2} from "@mui/material";
+import {ErrorArea} from "../../../components/ErrorPage.tsx";
 
 const ExcepcioDetail = ({entity, currentFields}:any) => {
     return <MuiDetail entity={entity} fields={currentFields}>
@@ -17,24 +18,11 @@ const ExcepcioDetail = ({entity, currentFields}:any) => {
             <FieldData field={'message'}/>
         </DetailCard>
 
-        <Grid size={12}>
-            <Box
-                sx={{
-                    border: 'solid 1px #e3e3e3',
-                    borderRadius: '4px',
-                    backgroundColor: '#f5f5f5',
-                    display: 'block',
-                    overflow: 'auto',
-                    whiteSpace: 'pre',
-                    fontFamily: 'monospace', // opcional para parecer <pre>
-                    maxHeight: '400px',
-                    mt: 1,
-                    p: 1
-                }}
-            >
+        <Grid2 size={12}>
+            <ErrorArea sx={{ maxHeight: '400px' }}>
                 {entity?.stacktrace}
-            </Box>
-        </Grid>
+            </ErrorArea>
+        </Grid2>
     </MuiDetail>
 }
 

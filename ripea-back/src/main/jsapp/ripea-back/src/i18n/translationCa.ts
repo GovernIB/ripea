@@ -36,6 +36,11 @@ const translationCa = {
         },
         nouPermis: "Nou permís",
         advancedSearch: 'Cerca avançada',
+        error: {
+            status: "Codi d'error",
+            title: "Títol",
+            message: "Missatge",
+        },
     },
     enum: {
         rol: {

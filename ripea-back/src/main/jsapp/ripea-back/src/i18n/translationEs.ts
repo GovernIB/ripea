@@ -36,6 +36,11 @@ const translationEs = {
         },
         nouPermis: "Nuevo permiso",
         advancedSearch: "Búsqueda avanzada",
+        error: {
+            status: "Código de error",
+            title: "Título",
+            message: "Mensaje",
+        },
     },
     enum: {
         rol: {

@@ -1,16 +1,15 @@
 import {useState} from "react";
-import {Alert, Grid2 as Grid, Icon} from "@mui/material";
+import {Alert, Grid2 as Grid, Icon, IconButton} from "@mui/material";
 import {MuiDialog, useBaseAppContext, useConfirmDialogButtons, useResourceApiService} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {DetailCard, DetailCardContent} from "../../../components/CardData.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import Load from "../../../components/Load.tsx";
 import * as builder from '../../../util/springFilterUtils.ts'
-import IconButton from "@mui/material/IconButton";
 import TabComponent from "../../../components/TabComponent.tsx";
-import Box from "@mui/material/Box";
 import {useUserSession} from "../../../components/Session.tsx";
 import {FieldData, MuiDetail} from "../../../components/MuiDetail.tsx";
+import {ErrorArea} from "../../../components/ErrorPage.tsx";
 
 const Dades = (props:any) => {
     const {entity, fields} = props;
@@ -47,26 +46,12 @@ const Errors = (props:any) => {
             </Grid>
 
             <DetailCard title={t('page.documentVia.alert.enviament')}>
-
                 <FieldData titleSize={4} textSize={8} field={'intentData'}/>
                 <FieldData titleSize={4} textSize={8} field={'intentNum'} sx={{ borderBottom: "1px solid" }}/>
-
                 <Grid size={12} p={1}>
-                    <Box
-                        sx={{
-                            border: 'solid 1px #e3e3e3',
-                            borderRadius: '4px',
-                            backgroundColor: '#f5f5f5',
-                            display: 'block',
-                            overflow: 'auto',
-                            whiteSpace: 'pre',
-                            fontFamily: 'monospace', // opcional para parecer <pre>
-                            width: 'max-container',
-                            p: 1
-                        }}
-                    >
+                    <ErrorArea>
                         {entity?.errorDescripcio}
-                    </Box>
+                    </ErrorArea>
                 </Grid>
             </DetailCard>
         </MuiDetail>

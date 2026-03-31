@@ -3,13 +3,14 @@ import {MuiDialog, useBaseAppContext, useFormContext, useResourceApiService} fro
 import {useEffect, useMemo, useRef, useState} from "react";
 import StyledMuiFilter from "../../../../components/StyledMuiFilter.tsx";
 import GridFormField, {GridButton} from "../../../../components/GridFormField.tsx";
-import {Alert, Box, Grid2 as Grid, Icon, IconButton, Typography} from "@mui/material";
+import {Alert, Grid2 as Grid, Icon, IconButton, Typography} from "@mui/material";
 import * as builder from "../../../../util/springFilterUtils.ts";
 import {useSession} from "../../../../components/SessionStorageContext.tsx";
 import Load from "../../../../components/Load.tsx";
 import {getAlertSeverity} from "../../../../components/BaseApp.tsx";
 import {MenuActionButton} from "../../../../components/MenuButton.tsx";
 import AlertExpand from "../../../../components/AlertExpand.tsx";
+import {ErrorArea} from "../../../../components/ErrorPage.tsx";
 
 const useActions = () => {
     const {t} = useTranslation()
@@ -226,21 +227,9 @@ export const useIntegracioDiagnostic = (integracions:any[]) => {
                                             </IconButton>
                                         </>}
                                     >
-                                        <Box
-                                            sx={{
-                                                border: 'solid 1px #e3e3e3',
-                                                borderRadius: '4px',
-                                                backgroundColor: '#f5f5f5',
-                                                display: 'block',
-                                                overflow: 'auto',
-                                                whiteSpace: 'pre',
-                                                fontFamily: 'monospace', // opcional para parecer <pre>
-                                                maxHeight: '500px',
-                                                p: 1
-                                            }}
-                                        >
+                                        <ErrorArea sx={{ maxHeight: '500px' }}>
                                             {d?.traza}
-                                        </Box>
+                                        </ErrorArea>
                                     </AlertExpand>
                                 }
                             </Grid>

@@ -17,8 +17,8 @@ export const StyledLabel = (props: any) => {
     } = props;
 
     const resolvedBg =
-        backgroundColor && theme.palette[backgroundColor as keyof typeof theme.palette]
-            ? theme.palette[backgroundColor as keyof typeof theme.palette]?.main
+        backgroundColor && theme?.palette?.[backgroundColor as keyof typeof theme.palette]
+            ? theme?.palette?.[backgroundColor as keyof typeof theme.palette]?.main
             : backgroundColor;
 
     const resolvedColor =

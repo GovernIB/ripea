@@ -11,6 +11,7 @@ import {setTitlePage} from "../../../../TitleHeaderConfigurator.tsx";
 import {useUserSession} from "../../../../components/Session.tsx";
 import {MultiplicitatStyled} from "../../../contingut/details/MetaExpedient.tsx";
 import useMetaDadaDetail from "./details/MetaDadaDetail.tsx";
+import {ErrorPage} from "../../../../components/ErrorPage.tsx";
 
 const useActions = (refresh?: () => void) => {
     const {t} = useTranslation();
@@ -201,6 +202,7 @@ const MetaDadaGrid = () => {
     const { id } = useParams();
     const {rol} = useUserSession();
     const navigate = useNavigate();
+    const [error, setError] = useState<any>();
 
     const {
         isReady: apiIsReady,
@@ -210,7 +212,9 @@ const MetaDadaGrid = () => {
 
     useEffect(()=>{
         if (apiIsReady) {
-            appGetOne(id).then((app) => setMetaDocument(app))
+            appGetOne(id)
+                .then((app) => setMetaDocument(app))
+                .catch((error) => setError(error))
         }
     },[apiIsReady, id])
 
@@ -223,6 +227,9 @@ const MetaDadaGrid = () => {
     const readOnly = useMemo(() => {
         return !(rol.isAdmin || (rol.isOrganAdmin && metaDocument?.metaExpedientRevisioEstat != 'REVISAT') || rol.isDissenyOrgan)
     }, [metaDocument, rol])
+
+    if (error)
+        return <ErrorPage error={error}/>
 
     return <GridPage disableMargins>
         <CardPage title={t('page.user.menu.documentDada', {nom: metaDocument?.nom})}
