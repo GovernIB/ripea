@@ -25,6 +25,7 @@ import SseExpedient, {useValidacioSession} from "../../../components/SseExpedien
 import {icons} from "../../user/UserHeadToolbar.tsx";
 import {setTitlePage} from "../../../TitleHeaderConfigurator.tsx";
 import {FieldData, MuiDetail} from "../../../components/MuiDetail.tsx";
+import {ErrorPage} from "../../../components/ErrorPage.tsx";
 
 const border= { border: '1px solid #e3e3e3', borderRadius: '4px' };
 
@@ -161,6 +162,7 @@ const perspectives = ['COUNT', 'ESTAT', 'RELACIONAT', 'AMB_PINBAL', "META_EXPEDI
 const Expedient = () => {
     const { t } = useTranslation();
     const { id } = useParams();
+    const [error, setError] = useState<any>();
 
     const refresh = () => {
         window.location.reload();
@@ -178,7 +180,9 @@ const Expedient = () => {
 
     useEffect(()=>{
         if (apiIsReady) {
-            appGetOne(id, {perspectives}).then((app) => setExpedient(app))
+            appGetOne(id, {perspectives})
+                .then((app) => setExpedient(app))
+                .catch((error) => setError(error))
         }
     },[apiIsReady])
 
@@ -195,6 +199,9 @@ const Expedient = () => {
     const [numAnotacions, setNumAnotacions] = useState<number>(expedient?.numAnotacions);
     const [numRemeses, setNumRemeses] = useState<number>(expedient?.numRemeses);
     const [numPublicacions, setNumPublicacions] = useState<number>(expedient?.numPublicacions);
+
+    if (error)
+        return <ErrorPage error={error}/>
 
     const tabs = [
         {

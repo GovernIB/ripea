@@ -10,6 +10,7 @@ import {useEffect, useMemo, useState} from "react";
 import Load from "../../../../components/Load.tsx";
 import {useUserSession} from "../../../../components/Session.tsx";
 import useMetaExpTasaValidacioDetail from "./details/MetaExpTasaValidacioDetail.tsx";
+import {ErrorPage} from "../../../../components/ErrorPage.tsx";
 
 const useActions = (refresh?: () => void) => {
     const {t} = useTranslation();
@@ -82,6 +83,7 @@ const MetaExpedientTascaValidacioGrid = () => {
     const {rol} = useUserSession();
     const apiRef = useMuiDataGridApiRef();
     const navigate = useNavigate();
+    const [error, setError] = useState<any>();
 
     const refresh = () => {
         apiRef?.current?.refresh?.();
@@ -96,6 +98,7 @@ const MetaExpedientTascaValidacioGrid = () => {
         if (apiIsReady) {
             appGetOne(tascaId, {perspectives: ['REVISIO_ESTAT']})
                 .then((app) => setMetaExpedientTasca(app))
+                .catch((error) => setError(error))
         }
     },[apiIsReady, tascaId])
 
@@ -145,6 +148,9 @@ const MetaExpedientTascaValidacioGrid = () => {
             clickTriggerDelete: true,
         },
     ], [t, readOnly, apiValidIsReady]);
+
+    if (error)
+        return <ErrorPage error={error}/>
 
     return <GridPage disableMargins>
         <Load value={metaExpedientTasca}>

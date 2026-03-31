@@ -14,6 +14,7 @@ import {setTitlePage} from "../../../TitleHeaderConfigurator.tsx";
 import {MetaExpedientCarpetaGrid} from "./elements/MetaExpedientCarpetaGrid.tsx";
 import {useUserSession} from "../../../components/Session.tsx";
 import {Button, Icon} from "@mui/material";
+import {ErrorPage} from "../../../components/ErrorPage.tsx";
 
 const perspectives :string[] = ["ELEMENTS_COUNT"]
 export const MetaExpedientElements = () => {
@@ -21,6 +22,7 @@ export const MetaExpedientElements = () => {
     const { id, element } = useParams();
     const {value: user, rol} = useUserSession();
     const navigate = useNavigate();
+    const [error, setError] = useState<any>();
 
     const {
         isReady: apiIsReady,
@@ -30,6 +32,7 @@ export const MetaExpedientElements = () => {
     const refreshMetaExpedient = () => {
         appGetOne(id, {perspectives})
             .then((app) => setMetaExpedient(app))
+            .catch((error) => setError(error))
     }
 
     useEffect(() => {
@@ -107,6 +110,9 @@ export const MetaExpedientElements = () => {
             setTitlePage(title)
         }
     }, [metaExpedient]);
+
+    if (error)
+        return <ErrorPage error={error}/>
 
     return <GridPage disableMargins>
         <Load value={metaExpedient}>
