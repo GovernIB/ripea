@@ -35,6 +35,11 @@ const translationEs = {
             update: "Modificado el {{lastModifiedDate}} por '{{lastModifiedBy}}'.",
         },
         nouPermis: "Nuevo permiso",
+        error: {
+            status: "Code",
+            title: "Title",
+            message: "Message",
+        },
     },
     enum: {
         rol: {

@@ -11,6 +11,7 @@ import {TascaComment} from "../../CommentDialog.tsx";
 import {useActions} from "./TascaActions.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import {CardPage} from "../../../components/CardData.tsx";
+import {ErrorPage} from "../../../components/ErrorPage.tsx";
 
 const expedientPerspectives = ['COUNT', 'ESTAT', 'RELACIONAT', 'AMB_PINBAL', "META_EXPEDIENT", "PERMIS_CONTINGUT"]
 const expedientNamedQueries = ['WITHOUT_PERMISION_CHECK'];
@@ -18,6 +19,7 @@ const Tasca = () => {
     const { t } = useTranslation();
     const { id, tascaId } = useParams();
     const navigate = useNavigate();
+    const [error, setError] = useState<any>();
 
     const { changeEstat } = useActions();
 
@@ -32,6 +34,7 @@ const Tasca = () => {
         if (apiIsReady) {
             appFind( {unpaged: true, filter: builder.eq('id', id), perspectives: expedientPerspectives, namedQueries: expedientNamedQueries} )
                 .then((params) => setExpedient(params?.rows?.[0] || undefined) )
+                .catch((error) => setError(error))
         }
     },[apiIsReady])
 
@@ -43,9 +46,14 @@ const Tasca = () => {
 
     useEffect(()=>{
         if (apiTascaIsReady) {
-            appTascaGetOne(tascaId).then((app) => setTasca(app))
+            appTascaGetOne(tascaId)
+                .then((app) => setTasca(app))
+                .catch((error) => setError(error))
         }
     },[apiTascaIsReady])
+
+    if (error)
+        return <ErrorPage error={error}/>
 
     const headerMain = <>
         <Box sx={{ display: 'flex', alignItems: 'center'}}>

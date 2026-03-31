@@ -35,6 +35,11 @@ const translationCa = {
             update: "Modificat el {{lastModifiedDate}} per '{{lastModifiedBy}}'.",
         },
         nouPermis: "Nou permís",
+        error: {
+            status: "Codi",
+            title: "Títol",
+            message: "Missatge",
+        },
     },
     enum: {
         rol: {
