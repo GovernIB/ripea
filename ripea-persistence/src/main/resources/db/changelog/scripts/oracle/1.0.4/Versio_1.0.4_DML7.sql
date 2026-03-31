@@ -15,4 +15,6 @@ UPDATE IPA_CONFIG SET DESCRIPTION='Codi de l’aplicació (informar si la propie
 UPDATE IPA_CONFIG SET DESCRIPTION='Nom d’usuari per a la firma de servidor emprant PortaFIB' WHERE KEY LIKE '%.plugin.firmaservidor.portafib.username';
 UPDATE IPA_CONFIG SET DESCRIPTION='Color del fons per defecte de l’aplicació' WHERE KEY LIKE '%.capsalera.color.fons';
 UPDATE IPA_CONFIG SET DESCRIPTION='Mostrar camps adicionals a l’índex de l’expedient' WHERE KEY LIKE '%.index.expedient.camps.addicionals';
-UPDATE IPA_CONFIG SET DESCRIPTION='Obtenir informació firma utilitzant les metadades del document' WHERE KEY LIKE '%.obtenir.data.firma.atributs.document';
+UPDATE IPA_CONFIG SET DESCRIPTION='Obtenir informació de firma utilitzant les metadades del document' WHERE KEY LIKE '%.obtenir.data.firma.atributs.document';
+UPDATE IPA_CONFIG SET DESCRIPTION='Separador del número d’expedient' WHERE KEY LIKE '%.numero.expedient.separador';
+UPDATE IPA_CONFIG SET DESCRIPTION='Propagar el número d’expedient a l’arxiu' WHERE KEY LIKE '%.numero.expedient.propagar.arxiu';
