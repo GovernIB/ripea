@@ -284,12 +284,13 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         					true, null);
         			
     		    	List<String> permesosClausulesIn = Utils.getIdsEnGruposMil(idsArxiusPendents);
-    		        for (String aux: permesosClausulesIn) {
-    			        if (aux != null && !aux.isEmpty()) {
-    			        	filtreDocumentsNotArxiuIds = FilterBuilder.or(filtreDocumentsNotArxiuIds, Filter.parse("id IN (" + aux + ")"));
-    			        }
-    		        }
-        			
+    		    	if (permesosClausulesIn!=null) {
+	    		        for (String aux: permesosClausulesIn) {
+	    			        if (aux != null && !aux.isEmpty()) {
+	    			        	filtreDocumentsNotArxiuIds = FilterBuilder.or(filtreDocumentsNotArxiuIds, Filter.parse("id IN (" + aux + ")"));
+	    			        }
+	    		        }
+    		    	}
         		} else {    			
     			
 					List<Long> metaExpedientsPermesosIds = new ArrayList<Long>();			
