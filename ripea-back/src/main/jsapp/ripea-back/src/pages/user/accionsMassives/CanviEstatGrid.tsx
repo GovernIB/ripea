@@ -11,11 +11,13 @@ import GridFormField from "../../../components/GridFormField.tsx";
 import {GridSortDirection} from "@mui/x-data-grid-pro";
 import {StyledEstat, StyledPrioritat} from "../../expedient/ExpedientGrid.tsx";
 import {useSession} from "../../../components/SessionStorageContext.tsx";
+import {useUserSession} from "../../../components/Session.tsx";
 import useCambiarEstat, {useCambiarEstatMassive} from "../../expedient/actions/CambiarEstat.tsx";
 
 const CanviEstatFilterFrom = (props:any) => {
     const { findExpedientByName = false } = props;
     const {data} = useFormContext();
+    const { value: user } = useUserSession();
 
     const expedientFilter = builder.and(
         builder.eq('metaExpedient.id', data?.procediment?.id),
@@ -27,7 +29,7 @@ const CanviEstatFilterFrom = (props:any) => {
         <GridFormField name="grup" size={{xs: 12, sm: 6, md: 3}}
                        namedQueries={[`BY_PROCEDIMENT#${data?.procediment?.id}`]}
                        disabled={!data?.procediment}
-                       hidden={!data?.mostrarGrups}/>
+                       hidden={!user?.sessionScope?.isFiltreGrupsVisible}/>
 
         {findExpedientByName
             ? <GridFormField size={{xs: 12, sm: 6, md: 3}} name="nom"/>

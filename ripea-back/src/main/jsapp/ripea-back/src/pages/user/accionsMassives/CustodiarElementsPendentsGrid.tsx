@@ -14,32 +14,30 @@ import {useActions as useDocumentActions} from "../../contingut/details/Contingu
 import {useMassiveActions as useDocumentMassiveActions} from "../../contingut/details/ContingutMassiveActions.tsx";
 import {useActions as useExpedientActions} from "../../expedient/details/CommonActions.tsx";
 import {useMassiveActions as useExpedientMassiveActions} from "../../expedient/details/ExpedientMassiveActions.tsx";
-
+import {useUserSession} from "../../../components/Session.tsx";
 import {useActions as useInteressatActions, useMassiveActions as useInteressatMassiveActions} from "../../interessats/details/InteressatActions.tsx";
 
 const sortModel:any = [{field: 'createdDate', sort: 'desc'}]
 const CustodiarPendentsFilterFrom = (props:any) => {
     const { filtrarExpedient = false } = props
     const {data} = useFormContext();
-
+    const { value: user } = useUserSession();
     const expedientFilter = builder.and(
         builder.eq('metaExpedient.id', data?.procediment?.id),
         builder.eq('grup.id', data?.grup?.id)
     );
+    const filtreSize = Boolean(filtrarExpedient) !== Boolean(user?.sessionScope?.isFiltreGrupsVisible) ? 4 : 3;
 
     return <>
-        <GridFormField size={{xs: 12, sm: 6, md: (filtrarExpedient && data?.mostrarGrups) ?3 :4}} name="nom"/>
-        <GridFormField size={{xs: 12, sm: 6, md: (filtrarExpedient && data?.mostrarGrups) ?3 :4}} name="procediment"/>
-        <GridFormField size={{xs: 12, sm: 6, md: (filtrarExpedient && data?.mostrarGrups) ?3 :4}} name="grup"
+        <GridFormField size={{xs: 12, sm: 6, md: filtreSize}} name="procediment"/>
+        <GridFormField size={{xs: 12, sm: 6, md: filtreSize}} name="grup"
                        namedQueries={[`BY_PROCEDIMENT#${data?.procediment?.id}`]}
                        disabled={!data?.procediment}
-                       hidden={!data?.mostrarGrups}/>
-        {filtrarExpedient
-            ?<GridFormField size={{xs: 12, sm: 6, md: (data?.mostrarGrups ?3 :4)}} name="expedient" filter={expedientFilter}/>
-            : !data?.mostrarGrups && <Grid size={{xs: 0, sm: 0, md: 4}} sx={{ display: { xs: 'none', sm: 'none', md: 'block' } }}/>
-        }
-        <GridFormField size={{xs: 12, sm: 6, md: 4}} name="dataCreacioInici" type={"date"}/>
-        <GridFormField size={{xs: 12, sm: 6, md: 4}} name="dataCreacioFi" type={"date"}/>
+                       hidden={!user?.sessionScope?.isFiltreGrupsVisible}/>
+        <GridFormField size={{xs: 12, sm: 6, md: filtreSize}} hidden={!filtrarExpedient} name="expedient" filter={expedientFilter}/>
+        <GridFormField size={{xs: 12, sm: 6, md: filtreSize}} name="nom"/>
+        <GridFormField size={{xs: 12, sm: 6, md: filtreSize}} name="dataCreacioInici" type={"date"}/>
+        <GridFormField size={{xs: 12, sm: 6, md: filtreSize}} name="dataCreacioFi" type={"date"}/>
     </>
 }
 

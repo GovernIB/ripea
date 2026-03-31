@@ -10,10 +10,12 @@ import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
 import GridFormField from "../../../components/GridFormField.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import {useSession} from "../../../components/SessionStorageContext.tsx";
+import {useUserSession} from "../../../components/Session.tsx";
 import {GridSortDirection} from "@mui/x-data-grid-pro";
 
 const EnviarPortafirmesFilterForm = () => {
     const {data} = useFormContext();
+    const { value: user } = useUserSession();
 
     const expedientFilter = builder.and(
         builder.eq('metaExpedient.id', data?.procediment?.id),
@@ -26,7 +28,7 @@ const EnviarPortafirmesFilterForm = () => {
         <GridFormField name="grup" size={{xs: 12, sm: 6, md: 3}}
                        namedQueries={[`BY_PROCEDIMENT#${data?.procediment?.id}`]}
                        disabled={!data?.procediment}
-                       hidden={!data?.mostrarGrups}/>
+                       hidden={!user?.sessionScope?.isFiltreGrupsVisible}/>
         <GridFormField size={{xs: 12, sm: 6, md: 3}} name="expedient" filter={expedientFilter} disabled={!data.procediment}/>
         <GridFormField size={{xs: 12, sm: 6, md: 3}} name="metaDocument" filter={metaDocumentFilter} disabled={!data.procediment}/>
         <GridFormField size={{xs: 12, sm: 6, md: 3}} name="nom"/>

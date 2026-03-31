@@ -154,6 +154,9 @@ public class ExpedientPeticioResource extends BaseAuditableResource<Long> {
         private Date dataAltaInici;
         private Date dataAltaFi;
         private ExpedientPeticioEstatEnumDto estat;
+        private ResourceReference<MetaExpedientResource, Long> procediment;
+        private ResourceReference<ExpedientResource, Long> expedient;
+        private ResourceReference<GrupResource, Long> grup;
         private boolean nomesPendents = true;
     }
     
