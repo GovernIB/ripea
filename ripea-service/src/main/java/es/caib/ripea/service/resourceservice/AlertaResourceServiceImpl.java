@@ -35,7 +35,7 @@ public class AlertaResourceServiceImpl extends BaseMutableResourceService<Alerta
         register(AlertaResource.ACTION_MASSIVE_LLEGIT_CODE,	new LlegitActionExecutor());
     }
 
-    private class LlegitActionExecutor implements ActionExecutor<AlertaResourceEntity, ExpedientResource.MassiveAction, Serializable> {
+    protected class LlegitActionExecutor implements ActionExecutor<AlertaResourceEntity, ExpedientResource.MassiveAction, Serializable> {
 
         @Override
         public Serializable exec(String code, AlertaResourceEntity entity, ExpedientResource.MassiveAction params) throws ActionExecutionException {
