@@ -155,17 +155,6 @@ export const useMetaExpedientActions = (refresh?: () => void) => {
             hidden: !(rol?.isRevisor || rol?.isAdminLectura),
         },
         {
-            label: t('page.contingut.action.history.label'),
-            icon: "list",
-            showInMenu: true,
-            onClick: handleHistoricOpen,
-        },
-        {
-            label: <Divider sx={{px: 1, width: '100%'}} color={"none"}/>,
-            showInMenu: true,
-            disabled: true,
-        },
-        {
             label: t('common.update'),
             icon: "edit",
             showInMenu: true,
@@ -239,7 +228,12 @@ export const useMetaExpedientActions = (refresh?: () => void) => {
             label: <Divider sx={{px: 1, width: '100%'}} color={"none"}/>,
             showInMenu: true,
             disabled: true,
-            hidden: (row:any) => !(rol?.isAdmin || rol?.isDissenyOrgan || (row?.revisioEstat != 'REVISAT' && rol?.isOrganAdmin)),
+        },
+        {
+            label: t('page.contingut.action.history.label'),
+            icon: "list",
+            showInMenu: true,
+            onClick: handleHistoricOpen,
         },
         {
             label: t('common.delete'),

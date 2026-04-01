@@ -73,9 +73,9 @@ const useTascaActions = (entity:any, refresh?: () => void) => {
     const hiddenByEstat = (row: any): boolean => {
         return isInOptions(row?.estat, 'CANCELLADA', 'FINALITZADA', 'REBUTJADA');
     }
-    // const nomesMostraDetalls = (row: any): boolean => {
-    //     return isInOptions(row?.estat, 'CANCELLADA', 'REBUTJADA');
-    // }
+    const nomesMostraDetalls = (row: any): boolean => {
+        return isInOptions(row?.estat, 'CANCELLADA', 'REBUTJADA');
+    }
     const isInOptions = (value:string, ...options:string[]) => {
         return options.includes(value)
     }
@@ -90,12 +90,6 @@ const useTascaActions = (entity:any, refresh?: () => void) => {
             icon: "info",
             showInMenu: true,
             onClick: handleOpen,
-        },
-        {
-            label: t('page.contingut.action.history.label'),
-            icon: "list",
-            showInMenu: true,
-            onClick: handleHistoricOpen,
         },
         {
             label: <Divider sx={{px: 1, width: '100%'}} color={"none"}/>,
@@ -174,6 +168,12 @@ const useTascaActions = (entity:any, refresh?: () => void) => {
             showInMenu: true,
             disabled: true,
             hidden: (row: any) => isOnlyObservador(row) || row?.usuariActualDelegat || hiddenByEstat(row) || !entity?.potModificar,
+        },
+        {
+            label: t('page.contingut.action.history.label'),
+            icon: "list",
+            showInMenu: true,
+            onClick: handleHistoricOpen,
         },
         {
             label: t('page.tasca.action.changeDataLimit.label'),

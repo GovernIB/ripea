@@ -77,7 +77,7 @@ const generateMenuItems = (appMenuEntries: any[], entitat:any, iconOnly:boolean)
 }
 
 const AppMenuBadge = (props:any) => {
-    return <StyledBadge textcolor={'white'} badgecolor={'primary'} {...props}/>
+    return <StyledBadge sx={{px: 0.5}} textcolor={'white'} badgecolor={'primary'} {...props}/>
 }
 const MenuBadge = (props:any) => {
     return <StyledBadge sx={{pl: 0}} textcolor={'primary'} badgecolor={'white'} {...props}/>
@@ -153,9 +153,9 @@ const UserHeadToolbar = () => {
     const theme = useTheme();
     const iconOnly = useMediaQuery(theme.breakpoints.down('md'));
 
-    return <Grid container rowSpacing={1} columnSpacing={1} size={8} flexDirection={"row"} alignContent={'center'} justifyContent={'end'}>
-        <Grid size={10} display={"flex"} justifyContent={"end"}>{...generateMenuItems(appMenuEntries, entitat, iconOnly)} {/* Menu */}</Grid>
-        {menuEntries?.length > 0 && <Grid size={2} display={"flex"} justifyContent={"center"}>
+    return <Grid container display={"flex"} rowSpacing={1} flexDirection={"row"} alignContent={'center'} justifyContent={'end'}>
+        <Grid size={11} gap={1.5} display={"flex"} justifyContent={"end"}>{...generateMenuItems(appMenuEntries, entitat, iconOnly)} {/* Menu */}</Grid>
+        {menuEntries?.length > 0 && <Grid size={1} display={"flex"} justifyContent={"end"}>
             <AppMenu key="app_menu" menuEntries={menuEntries} logo={menuLogo}/> {/* Side Menu */}
             {...contents} {/* Additional content */}
         </Grid>}

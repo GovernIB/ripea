@@ -53,6 +53,7 @@ export const MetaExpedientForm = ({ isAdmin }:any) => {
             <Grid size={12} sx={{ pl: '8px', pt: '8px' }}>
                 <Alert severity={'info'}>
                     {t('common.auditoria.create', {createdDate: formatDate(data.createdDate), createdBy: data.createdByFullName})}
+                    &nbsp;
                     {data.lastModifiedDate != null &&
                         t('common.auditoria.update', {lastModifiedDate: formatDate(data.lastModifiedDate), lastModifiedBy: data.lastModifiedByFullName})}
                 </Alert>
