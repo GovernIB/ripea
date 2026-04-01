@@ -41,6 +41,7 @@ const translationEs = {
             title: "Título",
             message: "Mensaje",
         },
+        dragdrop: "Reordenar contenido",
     },
     enum: {
         rol: {

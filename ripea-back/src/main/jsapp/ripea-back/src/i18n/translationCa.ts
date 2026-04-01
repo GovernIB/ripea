@@ -41,6 +41,7 @@ const translationCa = {
             title: "Títol",
             message: "Missatge",
         },
+        dragdrop: "Reordenar contingut",
     },
     enum: {
         rol: {

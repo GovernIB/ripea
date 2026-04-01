@@ -13,6 +13,8 @@ const ExpedientFilterForm = () => {
         builder.eq('organGestor.id', data?.organGestor?.id),
     );
 
+    const mostrarGrups = user?.sessionScope?.isFiltreGrupsVisible;
+
     return <>
         {(!data?.advanced) && <>
             <GridFormField size={{xs: 12, sm: 6, md: 2.4}} name="numero"/>
@@ -37,10 +39,10 @@ const ExpedientFilterForm = () => {
                            reanOnly={!data?.domini}
                            hidden={!user?.sessionScope?.isDominisEnabled}/>
 
-            <GridFormField size={{xs: 12, sm: (12 / (1 + (user?.sessionScope?.isFiltreGrupsVisible ?1: 0) + (!rol?.isUser ?1 :0))), md: 2}} name="numeroRegistre"/>
-            <GridFormField size={{xs: 12, sm: (12 / (1 + (user?.sessionScope?.isFiltreGrupsVisible ?1: 0) + (!rol?.isUser ?1 :0))), md: 2}} name="grup" hidden={!user?.sessionScope?.isFiltreGrupsVisible}/>
-            <GridFormField size={{xs: 12, sm: (12 / (1 + (user?.sessionScope?.isFiltreGrupsVisible ?1: 0) + (!rol?.isUser ?1 :0))), md: 2}} name="agafatPer" hidden={rol?.isUser}/>
-                <Grid size={{xs: 12, sm: 12, md: 2}} hidden={user?.sessionScope?.isFiltreGrupsVisible}/>
+            <GridFormField size={{xs: 12, sm: (12 / (1 + (mostrarGrups ?1: 0) + (!rol?.isUser ?1 :0))), md: 2}} name="numeroRegistre"/>
+            <GridFormField size={{xs: 12, sm: (12 / (1 + (mostrarGrups ?1: 0) + (!rol?.isUser ?1 :0))), md: 2}} name="grup" hidden={!mostrarGrups}/>
+            <GridFormField size={{xs: 12, sm: (12 / (1 + (mostrarGrups ?1: 0) + (!rol?.isUser ?1 :0))), md: 2}} name="agafatPer" hidden={rol?.isUser}/>
+                <Grid size={{xs: 12, sm: 12, md: 2}} hidden={mostrarGrups}/>
                 <Grid size={{xs: 12, sm: 12, md: 2}} hidden={!rol?.isUser}/>
                 <Grid size={{xs: 12, sm: 12, md: 6}} hidden={user?.sessionScope?.isDominisEnabled}/>
 

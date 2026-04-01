@@ -2,6 +2,7 @@ import React from "react";
 import {useDraggable, useDroppable} from "@dnd-kit/core";
 import {GridRow} from "@mui/x-data-grid-pro";
 import {Icon, IconButton} from "@mui/material";
+import {useTranslation} from "react-i18next";
 
 type DraggableContextType = {
     draggableAttributes: any;
@@ -56,9 +57,11 @@ export const DraggableGridRow: React.FC<any> = (props) => {
     </div>;
 }
 export const DraggableGridRowHandler: React.FC = () => {
+    const { t } = useTranslation();
     const { draggableAttributes, draggableListeners, draggableSetActivatorNodeRef } = useDraggableContext();
     return <IconButton
         size="small"
+        title={t('common.dragdrop')}
         ref={draggableSetActivatorNodeRef}
         {...draggableAttributes}
         {...draggableListeners}

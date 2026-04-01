@@ -3,8 +3,9 @@ import Toolbar from '@mui/material/Toolbar';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { toolbarBackgroundStyle } from 'reactlib';
-import {Link} from "@mui/material";
 import {useTranslation} from "react-i18next";
+import {Link} from "@mui/material";
+import {useNavigate} from "react-router-dom";
 
 type AppFootProps = {
     title?: string;
@@ -28,6 +29,7 @@ export const Footer: React.FC<AppFootProps> = (props) => {
     } = props;
 
     const {t} = useTranslation();
+    const navigate = useNavigate();
     const [buildTimestamp, setBuildTimestamp] = useState<string | null>(null);
     const [scmRevision, setScmRevision] = useState<string | null>(null);
     const [comandaVersion, setComandaVersion] = useState<string>(version ?? '');
@@ -86,7 +88,7 @@ export const Footer: React.FC<AppFootProps> = (props) => {
                     ({buildTimestamp} | Revisió: {scmRevision})
                 </span>
             </Typography>
-            <Link href={'/accessibilitat'} color={'#F6F6F6'} variant={'body2'}>{t('navigate.accessibilitat')}</Link>
+            <Link onClick={()=>navigate('/accessibilitat')} color={'#F6F6F6'} variant={'body2'}>{t('navigate.accessibilitat')}</Link>
             {logos && logos.map((logo) =>
                 <Box sx={{ mr: 0, pt: 0, pr: 0, height: '36px', cursor: 'pointer', ...logoStyle }} key={logo}>
                     <img src={logo} alt="foot_logo" style={{maxHeight: '36px'}}/>
