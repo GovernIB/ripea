@@ -291,7 +291,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 	    			        }
 	    		        }
     		    	}
-        		} else {    			
+
+        		} else {
     			
 					List<Long> metaExpedientsPermesosIds = new ArrayList<Long>();			
 	    			

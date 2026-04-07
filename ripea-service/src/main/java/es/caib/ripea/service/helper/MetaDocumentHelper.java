@@ -36,6 +36,8 @@ import es.caib.ripea.persistence.repository.PinbalServeiRepository;
 import es.caib.ripea.persistence.repository.UsuariRepository;
 import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.dto.ItemValidacioTascaEnum;
+import es.caib.ripea.service.intf.dto.LogObjecteTipusEnumDto;
+import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentDto;
 import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
 import es.caib.ripea.service.intf.exception.ExisteixenDocumentsException;
@@ -60,6 +62,7 @@ public class MetaDocumentHelper {
 	@Autowired private MetaDocumentFluxPortafibRepository metaDocumentFluxPortafibRepository;
 	@Autowired private DocumentRepository documentRepository;
 	@Autowired private UsuariRepository usuariRepository;
+	@Autowired private ContingutLogHelper contingutLogHelper;
 	
 	public void moveTo(Long metaDocumentId, int posicio) throws NotFoundException {
 		
@@ -106,8 +109,19 @@ public class MetaDocumentHelper {
 				metaDocumentEntity.updatePerDefecte(false);
 			}
 		}
-		if (!remove)
+		
+		if (!remove) {
 			currentMetaDocument.updatePerDefecte(true);
+		}
+		
+		contingutLogHelper.logProcedimentObjecte(
+				metaExpedientEntity.getId(),
+				LogTipusEnumDto.MODIFICACIO,
+				currentMetaDocument,
+				LogObjecteTipusEnumDto.METADOCUMENT,
+				LogTipusEnumDto.PER_DEFECTE,
+				currentMetaDocument.getCodi(),
+				currentMetaDocument.getNom());
 	}
 	
 	public MetaDocumentEntity delete(Long entitatId, Long metaExpedientId, Long id, String rolActual, Long organId) {
@@ -119,13 +133,13 @@ public class MetaDocumentHelper {
 				false, 
 				true);
 
-		MetaExpedientEntity metaExpedient = null;
+		MetaExpedientEntity metaExpedientEntity = null;
 		MetaDocumentEntity metaDocumentEntity = null;
 		
 		if (metaExpedientId!=null) {
-			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
-			metaDocumentEntity = entityComprovarHelper.comprovarMetaDocument(entitat, metaExpedient, id);
-			evictErrorsValidacioAndNotify(entitat.getId(), metaExpedient!=null?metaExpedient.getId():null, false);
+			metaExpedientEntity = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
+			metaDocumentEntity = entityComprovarHelper.comprovarMetaDocument(entitat, metaExpedientEntity, id);
+			evictErrorsValidacioAndNotify(entitat.getId(), metaExpedientEntity!=null?metaExpedientEntity.getId():null, false);
 		} else {
 			metaDocumentEntity = metaDocumentRepository.findById(id).get();
 		}
@@ -146,7 +160,19 @@ public class MetaDocumentHelper {
 		
 		metaDocumentRepository.delete(metaDocumentEntity);
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId(), organId);
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientEntity.getId(), organId);
+		}
+		
+		//Hi ha metaDocuments generics (sense procediment)
+		if (metaExpedientEntity!=null) {
+			contingutLogHelper.logProcedimentObjecte(
+					metaExpedientEntity.getId(),
+					LogTipusEnumDto.MODIFICACIO,
+					null,
+					LogObjecteTipusEnumDto.METADOCUMENT,
+					LogTipusEnumDto.ELIMINACIO,
+					metaDocumentEntity.getCodi(),
+					metaDocumentEntity.getNom());
 		}
 		
 		return metaDocumentEntity;
@@ -156,7 +182,8 @@ public class MetaDocumentHelper {
 			Long entitatId,
 			Long metaExpedientId,
 			Long metaDocumentId,
-			boolean actiu, String rolActual) {
+			boolean actiu,
+			String rolActual) {
 		
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
@@ -166,12 +193,12 @@ public class MetaDocumentHelper {
 				false, 
 				true);
 		
-		MetaExpedientEntity metaExpedient = null;
+		MetaExpedientEntity metaExpedientEntity = null;
 		MetaDocumentEntity metaDocumentEntity = null;
 		
 		if (metaExpedientId!=null) {
-			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
-			metaDocumentEntity = entityComprovarHelper.comprovarMetaDocument(entitat, metaExpedient, metaDocumentId);
+			metaExpedientEntity = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
+			metaDocumentEntity = entityComprovarHelper.comprovarMetaDocument(entitat, metaExpedientEntity, metaDocumentId);
 		} else {
 			metaDocumentEntity = metaDocumentRepository.findById(metaDocumentId).get();
 		}
@@ -179,10 +206,22 @@ public class MetaDocumentHelper {
 		metaDocumentEntity.updateActiu(actiu);
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId(), null);
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientEntity.getId(), null);
 		}
 
-		evictErrorsValidacioAndNotify(entitat.getId(), metaExpedient!=null?metaExpedient.getId():null, false);
+		evictErrorsValidacioAndNotify(entitat.getId(), metaExpedientEntity!=null?metaExpedientEntity.getId():null, false);
+		
+		//Hi ha metaDocuments generics (sense procediment)
+		if (metaExpedientEntity!=null) {
+			contingutLogHelper.logProcedimentObjecte(
+					metaExpedientEntity.getId(),
+					LogTipusEnumDto.MODIFICACIO,
+					metaDocumentEntity,
+					LogObjecteTipusEnumDto.METADOCUMENT,
+					actiu?LogTipusEnumDto.ACTIVACIO:LogTipusEnumDto.DESACTIVACIO,
+					metaDocumentEntity.getCodi(),
+					metaDocumentEntity.getNom());
+		}
 		
 		return metaDocumentEntity;
 	}
@@ -280,6 +319,18 @@ public class MetaDocumentHelper {
 
 		updateFluxos(metaDocumentEntity, metaDocument.getPortafirmesFluxosId());
 
+		//Hi ha metaDocuments generics (sense procediment)
+		if (metaExpedientId!=null) {
+			contingutLogHelper.logProcedimentObjecte(
+					metaDocumentEntity.getMetaExpedient().getId(),
+					LogTipusEnumDto.MODIFICACIO,
+					metaDocumentEntity,
+					LogObjecteTipusEnumDto.METADOCUMENT,
+					LogTipusEnumDto.MODIFICACIO,
+					metaDocumentEntity.getCodi(),
+					metaDocumentEntity.getNom());
+		}
+		
 		return metaDocumentEntity;
 	}
 	
@@ -349,13 +400,13 @@ public class MetaDocumentHelper {
 					false, 
 					true, false);
 			
-			MetaExpedientEntity metaExpedient = null;
+			MetaExpedientEntity metaExpedientEntity = null;
 			int ordre = 0;
 			//El Metadocument pot ser generic (sense associar a un procediment)
 			if (metaExpedientId!=null) {
-				metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
-				ordre = metaDocumentRepository.countByMetaExpedient(metaExpedient);
-				evictErrorsValidacioAndNotify(entitat.getId(), metaExpedient!=null?metaExpedient.getId():null, false);
+				metaExpedientEntity = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
+				ordre = metaDocumentRepository.countByMetaExpedient(metaExpedientEntity);
+				evictErrorsValidacioAndNotify(entitat.getId(), metaExpedientEntity!=null?metaExpedientEntity.getId():null, false);
 			}
 			
 			PinbalServeiEntity pinbalServeiEntity = null;
@@ -368,7 +419,7 @@ public class MetaDocumentHelper {
 					metaDocument.getCodi(),
 					metaDocument.getNom(),
 					metaDocument.getMultiplicitat(),
-					metaExpedient,
+					metaExpedientEntity,
 					metaDocument.getNtiOrigen(),
 					metaDocument.getNtiEstadoElaboracion(),
 					metaDocument.getNtiTipoDocumental(),
@@ -409,6 +460,18 @@ public class MetaDocumentHelper {
 
 			applicationHelper.stopTimer(sample, "METRICS@Subsystem_Procediment.metaDoc", "resultado", "exito");
 		
+			//Hi ha metaDocuments generics (sense procediment)
+			if (metaExpedientEntity!=null) {
+				contingutLogHelper.logProcedimentObjecte(
+						metaExpedientEntity.getId(),
+						LogTipusEnumDto.MODIFICACIO,
+						newMetaDocumententity,
+						LogObjecteTipusEnumDto.METADOCUMENT,
+						LogTipusEnumDto.CREACIO,
+						newMetaDocumententity.getCodi(),
+						newMetaDocumententity.getNom());
+			}
+			
 			return newMetaDocumententity;
 			
 		} catch (Exception e) {

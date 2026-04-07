@@ -26,8 +26,6 @@ import com.turkraft.springfilter.parser.Filter;
 
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
-import es.caib.ripea.persistence.entity.MetaExpedientOrganGestorEntity;
-import es.caib.ripea.persistence.entity.MetaNodeEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.entity.resourceentity.GrupResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientResourceEntity;
@@ -1339,11 +1337,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 
 		@Override
 		public Serializable exec(String code, MetaExpedientResourceEntity entity, ToggleGrupDefecteFormAction params) throws ActionExecutionException {
-			if (params.getGrupId()!=null) {
-				entity.setGrupPerDefecte(grupResourceRepository.findById(params.getGrupId()).get());
-			} else {
-				entity.setGrupPerDefecte(null);
-			}
+			grupHelper.canviarGrupPerDefecte(entity.getId(), params.getGrupId());
 			return "{\"resultado\": \"OK\"}";
 		}
     }

@@ -90,7 +90,7 @@ const base: ThemeOptions = {
                     }
                 },
 				row: {
-					minHeight: '40px !important',
+					minHeight: '45px !important',
 				},
                 cell: {
                     '&.MuiDataGrid-cell--withRenderer': {

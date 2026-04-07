@@ -273,7 +273,7 @@ const columnsContingut = [
         valueFormatter: (value: any) => formatDate(value),
     },
 ]
-const sortModelContingut: any = [{field: 'ordre', sort: 'asc'}];
+const sortModelContingut: any = [{field: 'dataFi', sort: 'desc'}];
 
 const estatColor :any = {
     'ESTAT_FINALITZAT': 'green',

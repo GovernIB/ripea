@@ -4,6 +4,7 @@
 package es.caib.ripea.persistence.entity;
 
 import es.caib.ripea.service.intf.config.BaseConfig;
+import es.caib.ripea.service.intf.dto.LogContingutTipusEnumDto;
 import es.caib.ripea.service.intf.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
 import es.caib.ripea.service.intf.utils.Utils;
@@ -28,19 +29,18 @@ import java.io.Serializable;
 public class ContingutLogEntity extends RipeaAuditable<Long> {
 
 	@Column(name = "tipus", nullable = false)
-	private LogTipusEnumDto tipus;
-//	@ManyToOne(optional = false, fetch = FetchType.LAZY)
-//	@JoinColumn(name = "contingut_id")
-//	@ForeignKey(name = BaseConfig.DB_PREFIX + "contingut_contlog_fk")
+	private LogTipusEnumDto tipus; //el tipo de acción sobre el contenido (ej Modificando el expediente)
 	@Column(name = "contingut_id")
 	protected Long contingutId;
-	
+    @Column(name = "contingut_tipus", length = 64)
+    @Enumerated(EnumType.STRING)
+    private LogContingutTipusEnumDto contingutTipus; //indica de qué objeto es el contingutId (CONTINGUT, METANODE, TASCA)
 	@Column(name = "objecte_id", length = 64)
 	private String objecteId;
 	@Column(name = "objecte_tipus")
-	private LogObjecteTipusEnumDto objecteTipus;
+	private LogObjecteTipusEnumDto objecteTipus; //objeto que ha generado la creación del log
 	@Column(name = "objecte_log_tipus")
-	private LogTipusEnumDto objecteLogTipus;
+	private LogTipusEnumDto objecteLogTipus; //el tipo de acción sobre el objeto (Ej Creando un interesado)
 	@Column(name = "param1", length = 256)
 	private String param1;
 	@Column(name = "param2", length = 256)
@@ -87,6 +87,10 @@ public class ContingutLogEntity extends RipeaAuditable<Long> {
 		}
 		public Builder objecteLogTipus(LogTipusEnumDto objecteLogTipus) {
 			built.objecteLogTipus = objecteLogTipus;
+			return this;
+		}
+		public Builder contingutTipus(LogContingutTipusEnumDto contingutTipus) {
+			built.contingutTipus = contingutTipus;
 			return this;
 		}
 		public Builder param1(String param1) {

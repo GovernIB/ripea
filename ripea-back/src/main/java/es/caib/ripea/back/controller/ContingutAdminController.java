@@ -169,12 +169,12 @@ public class ContingutAdminController extends BaseAdminController {
 				"logTipusEnumOptions",
 				EnumHelper.getOptionsForEnum(
 						LogTipusEnumDto.class,
-						"log.tipus.enum."));
+						"es.caib.ripea.service.intf.dto.LogTipusEnumDto."));
 		model.addAttribute(
 				"logObjecteTipusEnumOptions",
 				EnumHelper.getOptionsForEnum(
 						LogObjecteTipusEnumDto.class,
-						"log.objecte.tipus.enum."));		
+						"es.caib.ripea.service.intf.dto.LogObjecteTipusEnumDto."));		
 		return "contingutLog";
 	}
 	

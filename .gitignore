@@ -6,6 +6,8 @@ target/
 .classpath
 .project
 
+CLAUDE.md
+
 # intellij files
 .idea
 *.iml

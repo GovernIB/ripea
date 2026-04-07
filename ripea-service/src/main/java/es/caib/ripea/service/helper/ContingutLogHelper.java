@@ -18,24 +18,33 @@ import es.caib.ripea.persistence.entity.ContingutLogEntity;
 import es.caib.ripea.persistence.entity.ContingutMovimentEntity;
 import es.caib.ripea.persistence.entity.DocumentEntity;
 import es.caib.ripea.persistence.entity.ExpedientEntity;
+import es.caib.ripea.persistence.entity.ExpedientTascaEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientEntity;
+import es.caib.ripea.persistence.entity.MetaNodeEntity;
 import es.caib.ripea.persistence.entity.UsuariEntity;
 import es.caib.ripea.persistence.repository.ContingutLogRepository;
 import es.caib.ripea.persistence.repository.ContingutMovimentRepository;
 import es.caib.ripea.persistence.repository.ContingutRepository;
+import es.caib.ripea.persistence.repository.ExpedientTascaRepository;
+import es.caib.ripea.persistence.repository.MetaNodeRepository;
 import es.caib.ripea.persistence.repository.UsuariRepository;
 import es.caib.ripea.service.intf.dto.ContingutLogDetallsDto;
 import es.caib.ripea.service.intf.dto.ContingutLogDto;
 import es.caib.ripea.service.intf.dto.ContingutMovimentDto;
+import es.caib.ripea.service.intf.dto.LogContingutTipusEnumDto;
 import es.caib.ripea.service.intf.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
 import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.exception.ValidationException;
+import es.caib.ripea.service.intf.utils.Utils;
 
 @Component
 public class ContingutLogHelper {
 
 	@Autowired private ContingutRepository contingutRepository;
 	@Autowired private ContingutLogRepository contingutLogRepository;
+	@Autowired private ExpedientTascaRepository expedientTascaRepository;
+	@Autowired private MetaNodeRepository metaNodeRepository;
 	@Autowired private ContingutMovimentRepository contingutMovimentRepository;
 	@Autowired private ConversioTipusHelper conversioTipusHelper;
 	@Autowired private UsuariRepository usuariRepository;	
@@ -117,6 +126,7 @@ public class ContingutLogHelper {
 				logContingutPare,
 				logExpedientSuperior);
 	}
+	
 	public ContingutLogEntity log(
 			ContingutEntity contingut,
 			LogTipusEnumDto tipus,
@@ -135,10 +145,69 @@ public class ContingutLogHelper {
 				logContingutPare,
 				logExpedientSuperior);
 	}
+	
+	public ContingutLogEntity logProcediment(
+			MetaExpedientEntity metaExpentity,
+			LogTipusEnumDto tipusContingut, //acción sobre el contenido (ej Modificando el procedimiento)
+			String param1,
+			String param2) {
+		return logSave(
+				LogContingutTipusEnumDto.METANODE,
+				metaExpentity.getId(),
+				tipusContingut,
+				null,
+				null,
+				metaExpentity,
+				LogObjecteTipusEnumDto.METAEXPEDIENT,
+				tipusContingut,
+				param1!=null?Utils.abbreviate(param1, 250):null,
+				param2!=null?Utils.abbreviate(param2, 250):null);				
+	}
+	
+	public ContingutLogEntity logProcedimentObjecte(
+			Long metaExpId,
+			LogTipusEnumDto accioSobreContingut, //acción sobre el contenido (ej Modificando el procedimiento)
+			Persistable<? extends Serializable> objecte,
+			LogObjecteTipusEnumDto objecteTipusEnum,
+			LogTipusEnumDto accioSobreObjecte, //el tipo de acción sobre el objeto (Ej Creando un metadato)
+			String param1,
+			String param2) {
+		return logSave(
+				LogContingutTipusEnumDto.METANODE,
+				metaExpId,
+				accioSobreContingut,
+				null,
+				null,
+				objecte,
+				objecteTipusEnum,
+				accioSobreObjecte,
+				param1!=null?Utils.abbreviate(param1, 250):null,
+				param2!=null?Utils.abbreviate(param2, 250):null);				
+	}
+	
+	public ContingutLogEntity logTasca(
+			Long expedientTascaId,
+			LogTipusEnumDto tipusContingut, //acción sobre el contenido (ej Modificando el procedimiento)
+			String param1,
+			String param2) {
+		ExpedientTascaEntity expedientTascaEntity = expedientTascaRepository.findById(expedientTascaId).get();
+		return logSave(
+				LogContingutTipusEnumDto.TASCA,
+				expedientTascaId,
+				tipusContingut,
+				null,
+				null,
+				expedientTascaEntity,
+				LogObjecteTipusEnumDto.TASCA,
+				tipusContingut,
+				param1!=null?Utils.abbreviate(param1, 250):null,
+				param2!=null?Utils.abbreviate(param2, 250):null);				
+	}
 
 	public List<ContingutLogDto> findLogsContingut(
 			ContingutEntity contingut) {
-		List<ContingutLogEntity> logs = contingutLogRepository.findByContingutIdOrderByCreatedDateAsc(
+		List<ContingutLogEntity> logs = contingutLogRepository.findByContingutTipusAndContingutIdOrderByCreatedDateAsc(
+				LogContingutTipusEnumDto.CONTINGUT,
 				contingut.getId());
 		List<ContingutLogDto> dtos = new ArrayList<ContingutLogDto>();
 		for (ContingutLogEntity log: logs) {
@@ -152,7 +221,7 @@ public class ContingutLogHelper {
 	public ContingutLogDetallsDto findLogDetalls(
 			Long contingutId,
 			Long contingutLogId) {
-		ContingutLogEntity log = contingutLogRepository.getOne(contingutLogId);
+		ContingutLogEntity log = contingutLogRepository.findById(contingutLogId).get();
 		if (!log.getContingutId().equals(contingutId)) {
 			throw new ValidationException(
 					contingutLogId,
@@ -174,8 +243,16 @@ public class ContingutLogHelper {
 		}
 		if (log.getObjecteId() != null) {
 			String objecteNom = null;
-			ContingutEntity c = contingutRepository.findById(Long.valueOf(log.getObjecteId())).orElse(null);
-			objecteNom = c != null ? c.getNom() : "";
+			if (LogContingutTipusEnumDto.CONTINGUT.equals(log.getContingutTipus())) {
+				ContingutEntity c = contingutRepository.findById(Long.valueOf(log.getObjecteId())).orElse(null);
+				objecteNom = c != null ? c.getNom() : "";
+			} else if (LogContingutTipusEnumDto.METANODE.equals(log.getContingutTipus())) {
+				MetaNodeEntity mn = metaNodeRepository.findById(contingutLogId).orElse(null);
+				objecteNom = mn != null ? mn.getNom() : "";
+			} else {
+				ExpedientTascaEntity et = expedientTascaRepository.findById(contingutLogId).orElse(null);
+				objecteNom = (et != null) ? (et.getTitol()!=null ? et.getTitol() : et.getMetaTasca().getNom()) : "";
+			}
 			detalls.setObjecteNom(objecteNom);
 		}
 		return detalls;
@@ -196,8 +273,6 @@ public class ContingutLogHelper {
 		return dtos;
 	}
 
-
-
 	private ContingutLogEntity log(
 			ContingutEntity contingut,
 			LogTipusEnumDto tipus,
@@ -210,6 +285,7 @@ public class ContingutLogHelper {
 			boolean logContingutPare,
 			boolean logExpedientSuperior) {
 		ContingutLogEntity logPare = logSave(
+				LogContingutTipusEnumDto.CONTINGUT,
 				contingut.getId(),
 				tipus,
 				null,
@@ -217,8 +293,8 @@ public class ContingutLogHelper {
 				objecte,
 				objecteTipus,
 				objecteLogTipus,
-				param1,
-				param2);
+				param1!=null?Utils.abbreviate(param1, 250):null,
+				param2!=null?Utils.abbreviate(param2, 250):null);
 		if (logContingutPare) {
 			logContingutPare(logPare, contingut, tipus, contingutMoviment);
 		}
@@ -254,6 +330,7 @@ public class ContingutLogHelper {
 		}
 		return logPare;
 	}
+	
 	private void logContingutPare(
 			ContingutLogEntity logPare,
 			ContingutEntity contingut,
@@ -285,16 +362,12 @@ public class ContingutLogHelper {
 			}
 		}
 	}
+	
 	private void logExpedientSuperior(
 			ContingutEntity contingut,
 			LogTipusEnumDto tipus,
 			Long contingutSuperiorId,
 			ContingutLogEntity contingutLogPare) {
-//		ExpedientEntity expedientSuperior = contenidorHelper.getExpedientSuperior(
-//				contingutSuperior,
-//				false,
-//				false,
-//				false);
 		if (contingutSuperiorId != null) {
 			logContingutSuperior(
 					contingut,
@@ -303,12 +376,14 @@ public class ContingutLogHelper {
 					contingutLogPare);
 		}
 	}
+	
 	private void logContingutSuperior(
 			ContingutEntity contingut,
 			LogTipusEnumDto tipus,
 			Long contingutSuperiorId,
 			ContingutLogEntity contingutLogPare) {
 		logSave(
+				LogContingutTipusEnumDto.CONTINGUT,
 				contingutSuperiorId,
 				LogTipusEnumDto.MODIFICACIO,
 				contingutLogPare,
@@ -321,6 +396,7 @@ public class ContingutLogHelper {
 	}
 
 	private ContingutLogEntity logSave(
+			LogContingutTipusEnumDto contingutTipus,
 			Long contingutId,
 			LogTipusEnumDto tipus,
 			ContingutLogEntity pare,
@@ -330,6 +406,7 @@ public class ContingutLogHelper {
 			LogTipusEnumDto objecteLogTipus,
 			String param1,
 			String param2) {
+		
 		logger.debug("Guardant log per contenidor (" +
 				"contingutId=" + contingutId + ", " +
 				"tipus=" + tipus + ", " +
@@ -339,23 +416,22 @@ public class ContingutLogHelper {
 				"objecteLogTipus=" + ((objecteLogTipus != null) ? objecteLogTipus.name() : "null") + ", " +
 				"param1=" + param1 + ", " +
 				"param2=" + param2 + ")");
+		
 		ContingutLogEntity.Builder logBuilder = ContingutLogEntity.getBuilder(
 				tipus,
 				contingutId).
 				param1(param1).
 				param2(param2).
 				pare(pare).
-				contingutMoviment(contingutMoviment);
-		if (objecte != null) {
-			logBuilder.
-			objecte(objecte).
-			objecteTipus(objecteTipus).
-			objecteLogTipus(objecteLogTipus);
-		}
-		return contingutLogRepository.save(
-				logBuilder.build());
-	}
+				contingutMoviment(contingutMoviment).
+				contingutTipus(contingutTipus).
+				objecte(objecte).
+				objecteTipus(objecteTipus).
+				objecteLogTipus(objecteLogTipus);
 
+		return contingutLogRepository.save(logBuilder.build());
+	}
+	
 	private void emplenarLogDto(
 			ContingutLogEntity log,
 			ContingutLogDto dto) {

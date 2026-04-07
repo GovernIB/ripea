@@ -82,6 +82,8 @@ import es.caib.ripea.service.intf.dto.CrearReglaResponseDto;
 import es.caib.ripea.service.intf.dto.DominiDto;
 import es.caib.ripea.service.intf.dto.ExpedientEstatDto;
 import es.caib.ripea.service.intf.dto.GrupDto;
+import es.caib.ripea.service.intf.dto.LogObjecteTipusEnumDto;
+import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MetaDadaDto;
 import es.caib.ripea.service.intf.dto.MetaDadaTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentDto;
@@ -144,6 +146,7 @@ public class MetaExpedientHelper {
     @Autowired private MetaDocumentHelper metaDocumentHelper;
     @Autowired private MetaDadaHelper metaDadaHelper;
     @Autowired private ExpedientEstatHelper expedientEstatHelper;
+    @Autowired private ContingutLogHelper contingutLogHelper;
 	@Autowired private GrupHelper grupHelper;
 	@Autowired private GrupRepository grupRepository;
 	@Autowired private HistoricExpedientRepository historicExpedientRepository;
@@ -153,17 +156,15 @@ public class MetaExpedientHelper {
 
     public static final String PROCEDIMENT_ORGAN_NO_SYNC = "Hi ha procediments que pertanyen a òrgans no existents en l'organigrama actual";
     
-    public CrearReglaResponseDto canviarEstatReglaDistribucio(
-			Long metaExpedientId, 
-			boolean activa) {
-		MetaExpedientEntity metaExpedient = metaExpedientRepository.getOne(metaExpedientId);
-		metaExpedient.updateCrearReglaDistribucio(CrearReglaDistribucioEstatEnumDto.PENDENT);
+    public CrearReglaResponseDto canviarEstatReglaDistribucio(Long metaExpedientId, boolean activa) {
+    	
+		MetaExpedientEntity metaExpedient = metaExpedientRepository.findById(metaExpedientId).get();
 
 		try {
 
-			CrearReglaResponseDto rearReglaResponseDto = distribucioReglaHelper.canviEstat(
-					metaExpedient.getClassificacio(), 
-					activa);
+			metaExpedient.updateCrearReglaDistribucio(CrearReglaDistribucioEstatEnumDto.PENDENT);
+			
+			CrearReglaResponseDto rearReglaResponseDto = distribucioReglaHelper.canviEstat(metaExpedient, activa);
 
 			if (rearReglaResponseDto.getStatus() == StatusEnumDto.OK) {
 				metaExpedient.updateCrearReglaDistribucio(CrearReglaDistribucioEstatEnumDto.PROCESSAT);
@@ -187,14 +188,14 @@ public class MetaExpedientHelper {
     	try {
 
 	    	EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-	    	MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarAccesMetaExpedient(entitat, metaExpedientId, organId, true);
-			MetaExpedientExportDto metaExpedientDto = conversioTipusHelper.convertir(metaExpedient, MetaExpedientExportDto.class);
+	    	MetaExpedientEntity metaExpedientEntity = entityComprovarHelper.comprovarAccesMetaExpedient(entitat, metaExpedientId, organId, true);
+			MetaExpedientExportDto metaExpedientDto = conversioTipusHelper.convertir(metaExpedientEntity, MetaExpedientExportDto.class);
 			
 			ObjectMapper objectMapper = new ObjectMapper();
 			
 			//En el conversor tipus helper no inclou les validacions de les tasques
-			if (metaExpedient.getTasques() != null) {
-				for (MetaExpedientTascaEntity tascaEntity : metaExpedient.getTasques()) {
+			if (metaExpedientEntity.getTasques() != null) {
+				for (MetaExpedientTascaEntity tascaEntity : metaExpedientEntity.getTasques()) {
 					if (tascaEntity.getValidacions()!=null && tascaEntity.getValidacions().size()>0) {
 						for (MetaExpedientTascaDto tascaDto : metaExpedientDto.getTasques()) {
 							if (tascaEntity.getId().equals(tascaDto.getId())) {
@@ -208,7 +209,7 @@ public class MetaExpedientHelper {
 			}
 			
 			//Carpetes per defecte (segons property)
-			List<MetaExpedientCarpetaDto> carpetesProcediment = metaExpedientCarpetaHelper.findCarpetesMetaExpedient(metaExpedient);
+			List<MetaExpedientCarpetaDto> carpetesProcediment = metaExpedientCarpetaHelper.findCarpetesMetaExpedient(metaExpedientEntity);
 			metaExpedientDto.setCarpetes(conversioTipusHelper.convertirList(carpetesProcediment, MetaExpedientCarpetaMinDto.class));
 			
 			//Meta-dades amb dominis
@@ -243,6 +244,13 @@ public class MetaExpedientHelper {
 			
 			String procedimentAsString = objectMapper.writeValueAsString(metaExpedientDto);
 			logger.info(procedimentAsString);
+			
+			contingutLogHelper.logProcediment(
+					metaExpedientEntity,
+					LogTipusEnumDto.EXPORT_PROCED_JSON,
+					metaExpedientEntity.getClassificacio(),
+					metaExpedientEntity.getNom());
+			
 			return procedimentAsString;
 		
 		} catch (Exception e) {
@@ -935,6 +943,12 @@ public class MetaExpedientHelper {
 			}
 		}
 		
+		contingutLogHelper.logProcediment(
+				metaExpedientEntity,
+				LogTipusEnumDto.CREACIO,
+				metaExpedientEntity.getClassificacio(),
+				metaExpedientEntity.getNom());
+		
 		return metaExpedientEntity; 
 	}
 	
@@ -996,6 +1010,13 @@ public class MetaExpedientHelper {
 					metaExpedient.getId(),
 					metaExpedient.getRevisioEstat());
 		}
+		
+		contingutLogHelper.logProcediment(
+				metaExpedientEntity,
+				LogTipusEnumDto.MODIFICACIO,
+				metaExpedientEntity.getClassificacio(),
+				metaExpedientEntity.getNom());
+		
 		return metaExpedientEntity;
 	}
 	
@@ -1111,6 +1132,12 @@ public class MetaExpedientHelper {
 			emailHelper.canviEstatRevisioMetaExpedientEnviarAAdminOrganCreador(metaExpedientEntity, entitatId);
 		}
 
+		contingutLogHelper.logProcediment(
+				metaExpedientEntity,
+				LogTipusEnumDto.CANVI_ESTAT,
+				metaExpedientEntity.getCodi(),
+				revisio!=null?revisio.name():null);
+		
 		return conversioTipusHelper.convertir(metaExpedientEntity, MetaExpedientDto.class);
 	}
 	
@@ -1120,10 +1147,7 @@ public class MetaExpedientHelper {
 
 		try {
 
-			CrearReglaResponseDto rearReglaResponseDto = distribucioReglaHelper.crearRegla(
-					metaExpedient.getTipusProcedimentServei(),
-					metaExpedient.getEntitat().getUnitatArrel(),
-					metaExpedient.getClassificacio());
+			CrearReglaResponseDto rearReglaResponseDto = distribucioReglaHelper.crearRegla(metaExpedient);
 
 			if (rearReglaResponseDto.getStatus() == StatusEnumDto.OK) {
 				metaExpedient.updateCrearReglaDistribucio(CrearReglaDistribucioEstatEnumDto.PROCESSAT);
@@ -1181,29 +1205,29 @@ public class MetaExpedientHelper {
 			Integer modificats = 0;
 			Integer fallat = 0;
 			
-			for(MetaExpedientEntity metaExpedient: metaExpedients) {
+			for(MetaExpedientEntity metaExpedientEntity: metaExpedients) {
 				
-				if (TipusClassificacioEnumDto.SIA.equals(metaExpedient.getTipusClassificacio())) {
+				if (TipusClassificacioEnumDto.SIA.equals(metaExpedientEntity.getTipusClassificacio())) {
 				
 					ActualitzacioInfo.ActualitzacioInfoBuilder infoBuilder = ActualitzacioInfo.builder()
-							.codiSia(metaExpedient.getClassificacio())
-							.nomAntic(metaExpedient.getNom())
-							.descripcioAntiga(metaExpedient.getDescripcio())
-							.comuAntic(metaExpedient.isComu());
-					if (metaExpedient.getOrganGestor() != null)
-						infoBuilder.organAntic(metaExpedient.getOrganGestor().getCodi());
+							.codiSia(metaExpedientEntity.getClassificacio())
+							.nomAntic(metaExpedientEntity.getNom())
+							.descripcioAntiga(metaExpedientEntity.getDescripcio())
+							.comuAntic(metaExpedientEntity.isComu());
+					if (metaExpedientEntity.getOrganGestor() != null)
+						infoBuilder.organAntic(metaExpedientEntity.getOrganGestor().getCodi());
 	
 					ProcedimentDto procedimentGga = null;
 					try {
-						logger.info("Procediment DB: " + metaExpedient);
+						logger.info("Procediment DB: " + metaExpedientEntity);
 						procedimentGga = pluginHelper.procedimentFindByCodiSia(
 								entitat.getUnitatArrel(),
-								metaExpedient.getClassificacio());
+								metaExpedientEntity.getClassificacio());
 						infoBuilder.exist(procedimentGga != null);
 						
 						logger.info(" Procediment WS: " + procedimentGga);
 					} catch (SistemaExternException se) {
-						logger.error("Error Procediment WS id="+ metaExpedient.getId(), se);
+						logger.error("Error Procediment WS id="+ metaExpedientEntity.getId(), se);
 						infoBuilder.hasError(true);
 						infoBuilder.errorText(msg("procediment.synchronize.error.rolsac", se.getMessage()));
 						progres.addInfo(infoBuilder.build(), true);
@@ -1213,7 +1237,7 @@ public class MetaExpedientHelper {
 	
 					if (procedimentGga == null) {
 						infoBuilder.hasError(true);
-						infoBuilder.errorText(msg("procediment.synchronize.error.exist", metaExpedient.getClassificacio()));
+						infoBuilder.errorText(msg("procediment.synchronize.error.exist", metaExpedientEntity.getClassificacio()));
 						progres.addInfo(infoBuilder.build(), true);
 						fallat++;
 						continue;
@@ -1246,7 +1270,7 @@ public class MetaExpedientHelper {
 						if (organGestor == null) {
 							organNoSincronitzat = true;
 							organsNoSincronitzats++;
-							organGestor = metaExpedient.getOrganGestor();
+							organGestor = metaExpedientEntity.getOrganGestor();
 							info.setHasError(true);
 							info.setErrorText(msg("procediment.synchronize.error.organ", procedimentGga.getUnitatOrganitzativaCodi()));
 							fallat++;
@@ -1255,9 +1279,15 @@ public class MetaExpedientHelper {
 						}
 					}
 	
-					metaExpedient.updateSync(nom, descripcio, organGestor, organNoSincronitzat);
+					metaExpedientEntity.updateSync(nom, descripcio, organGestor, organNoSincronitzat);
 					metaExpedientRepository.flush();
 					progres.addInfo(info, true);
+					
+					contingutLogHelper.logProcediment(
+							metaExpedientEntity,
+							LogTipusEnumDto.UPDATE_PROCED_ROLSAC,
+							metaExpedientEntity.getClassificacio(),
+							metaExpedientEntity.getNom());
 				}
 								
 				modificats++;
@@ -1340,15 +1370,21 @@ public class MetaExpedientHelper {
 			entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false, true);
 		}
 		
-		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
+		MetaExpedientEntity metaExpedientEntity = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
 
 		//truncam a 1024 caracters
 		if (text.length() > 1024)
 			text = text.substring(0, 1024);
 		MetaExpedientComentariEntity comentari = MetaExpedientComentariEntity.getBuilder(
-				metaExpedient, 
+				metaExpedientEntity, 
 				text).build();
 		metaExpedientComentariRepository.save(comentari);
+		
+		contingutLogHelper.logProcediment(
+				metaExpedientEntity,
+				LogTipusEnumDto.COMENTAR,
+				metaExpedientEntity.getCodi(),
+				text);
 		
 		return true;
 	}
@@ -1673,13 +1709,20 @@ public class MetaExpedientHelper {
 	
 	public MetaExpedientEntity updateActiu(Long entitatId, Long id, boolean actiu, String rolActual, Long organId) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarAccesMetaExpedient(entitat, id, organId, true);
-		metaExpedient.updateActiu(actiu);
+		MetaExpedientEntity metaExpedientEntity = entityComprovarHelper.comprovarAccesMetaExpedient(entitat, id, organId, true);
+		metaExpedientEntity.updateActiu(actiu);
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			canviarRevisioADisseny(entitatId, metaExpedient.getId(), organId);
+			canviarRevisioADisseny(entitatId, metaExpedientEntity.getId(), organId);
 		}
-		return metaExpedient;
+		
+		contingutLogHelper.logProcediment(
+				metaExpedientEntity,
+				actiu?LogTipusEnumDto.ACTIVACIO:LogTipusEnumDto.DESACTIVACIO,
+				metaExpedientEntity.getClassificacio(),
+				metaExpedientEntity.getNom());
+		
+		return metaExpedientEntity;
 	}
 	
 	public MetaExpedientEntity delete(Long entitatId, Long id, Long organId) {

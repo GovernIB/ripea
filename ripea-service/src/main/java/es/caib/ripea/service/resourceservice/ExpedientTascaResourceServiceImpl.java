@@ -34,6 +34,7 @@ import es.caib.ripea.persistence.entity.resourcerepository.UsuariResourceReposit
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.ApplicationHelper;
 import es.caib.ripea.service.helper.ConfigHelper;
+import es.caib.ripea.service.helper.ContingutLogHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
 import es.caib.ripea.service.helper.MessageHelper;
@@ -44,6 +45,7 @@ import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerV
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.ExpedientTascaDto;
+import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientTascaValidacioDto;
 import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
 import es.caib.ripea.service.intf.dto.TascaEstatEnumDto;
@@ -67,14 +69,15 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
 
     private final ExpedientTascaResourceRepository expedientTascaResourceRepository;
     private final MetaExpedientTascaResourceRepository metaExpedientTascaResourceRepository;
-
+    private final UsuariResourceRepository usuariResourceRepository;
+    
     private final ConfigHelper configHelper;
     private final TascaHelper tascaHelper;
     private final ExcepcioLogHelper excepcioLogHelper;
     private final EntityComprovarHelper entityComprovarHelper;
     private final MessageHelper messageHelper;
     private final ApplicationHelper applicationHelper;
-    private final UsuariResourceRepository usuariResourceRepository;
+    private final ContingutLogHelper contingutLogHelper;
     
 	@PostConstruct
 	public void init() {
@@ -145,10 +148,27 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
     		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
     		ExpedientTascaEntity tascaCreada = tascaHelper.createTasca(entitatEntity.getId(), resource.getExpedient().getId(), toTascaDto(resource));
     		resource.setId(tascaCreada.getId());
+    		//contingutLogHelper.logTasca (JA INCLUIT EN EL HELPER)
     	} catch (Exception ex) {
     		excepcioLogHelper.addExcepcio("/tasca/create", ex);
     	}
     	return resource;
+    }
+    
+    protected void afterUpdateSave(ExpedientTascaResourceEntity entity, ExpedientTascaResource resource, Map<String, AnswerRequiredException.AnswerValue> answers, boolean anyOrderChanged) {
+    	logProcedimentTascaAccio(entity, LogTipusEnumDto.MODIFICACIO);
+    }
+    
+    protected void afterDelete(ExpedientTascaResourceEntity entity, Map<String, AnswerRequiredException.AnswerValue> answers) {
+    	logProcedimentTascaAccio(entity, LogTipusEnumDto.ELIMINACIO);
+    }
+    
+    private void logProcedimentTascaAccio(ExpedientTascaResourceEntity entity, LogTipusEnumDto accio) {
+		contingutLogHelper.logTasca(
+			entity.getId(),
+			accio,
+			entity.getTitol()!=null?entity.getTitol():entity.getMetaExpedientTasca().getNom(),
+			entity.getResponsableActual()!=null?entity.getResponsableActual().getCodi():"Sense responsble actual.");
     }
     
     private ExpedientTascaDto toTascaDto(ExpedientTascaResource resource) {
