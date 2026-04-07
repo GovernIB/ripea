@@ -25,7 +25,7 @@
 		const metaDocumentActiu = [];
 		<c:forEach var="metaDocument" items="${metaDocuments}">
 		metaDocumentServeiScsp[${metaDocument.id}] = "${metaDocument.pinbalServei.codi}";
-		metaDocumentFinalitat[${metaDocument.id}] = "${metaDocument.pinbalFinalitat}";
+		metaDocumentFinalitat[${metaDocument.id}] = "<spring:escapeBody javaScriptEscape='true'>${metaDocument.pinbalFinalitat}</spring:escapeBody>";
 		metaDocumentActiu[${metaDocument.id}] = "${metaDocument.pinbalServei.actiu}";
 		</c:forEach>
 		$(document).ready(function() {
