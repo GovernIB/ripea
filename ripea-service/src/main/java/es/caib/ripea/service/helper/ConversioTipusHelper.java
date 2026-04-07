@@ -36,6 +36,7 @@ import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.ExecucioMassivaContingutEntity;
 import es.caib.ripea.persistence.entity.ExecucioMassivaEntity;
 import es.caib.ripea.persistence.entity.ExpedientComentariEntity;
+import es.caib.ripea.persistence.entity.ExpedientTascaComentariEntity;
 import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.entity.ExpedientPeticioEntity;
 import es.caib.ripea.persistence.entity.ExpedientTascaEntity;
@@ -77,6 +78,7 @@ import es.caib.ripea.service.intf.dto.ExecucioMassivaContingutDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaEstatDto;
 import es.caib.ripea.service.intf.dto.ExpedientComentariDto;
+import es.caib.ripea.service.intf.dto.ExpedientTascaComentariDto;
 import es.caib.ripea.service.intf.dto.ExpedientDto;
 import es.caib.ripea.service.intf.dto.ExpedientPeticioDto;
 import es.caib.ripea.service.intf.dto.ExpedientPeticioEstatPendentDistribucioEnumDto;
@@ -244,6 +246,36 @@ public class ConversioTipusHelper {
 	      .customize(new CustomMapper<ExpedientComentariEntity, ExpedientComentariDto>() {
 	      		@Override
 				public void mapAtoB(ExpedientComentariEntity source, ExpedientComentariDto target, MappingContext context) {
+					if (source.getCreatedBy()!=null && source.getCreatedBy().isPresent()) {
+		      			UsuariEntity ue = usuariRepository.findByCodi(source.getCreatedBy().get());
+		      			UsuariDto uDto = new UsuariDto();
+		      			uDto.setCodi(ue.getCodi());
+		      			uDto.setNom(ue.getNom());
+		      			uDto.setNif(ue.getNif());
+		      			uDto.setEmail(ue.getEmail());
+		      			target.setCreatedBy(uDto);
+					}
+					if (source.getLastModifiedBy()!=null && source.getLastModifiedBy().isPresent()) {
+		      			UsuariEntity ue = usuariRepository.findByCodi(source.getLastModifiedBy().get());
+		      			UsuariDto uDto = new UsuariDto();
+		      			uDto.setCodi(ue.getCodi());
+		      			uDto.setNom(ue.getNom());
+		      			uDto.setNif(ue.getNif());
+		      			uDto.setEmail(ue.getEmail());
+		      			target.setLastModifiedBy(uDto);
+					}
+					if (source.getCreatedDate()!=null) {
+						LocalDateTime localDateTime = source.getCreatedDate().get();
+						target.setCreatedDate(Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant()));
+					}
+	      		}
+		      })
+	      .byDefault().register();
+
+	      mapperFactory.classMap(ExpedientTascaComentariEntity.class, ExpedientTascaComentariDto.class)
+	      .customize(new CustomMapper<ExpedientTascaComentariEntity, ExpedientTascaComentariDto>() {
+	      		@Override
+				public void mapAtoB(ExpedientTascaComentariEntity source, ExpedientTascaComentariDto target, MappingContext context) {
 					if (source.getCreatedBy()!=null && source.getCreatedBy().isPresent()) {
 		      			UsuariEntity ue = usuariRepository.findByCodi(source.getCreatedBy().get());
 		      			UsuariDto uDto = new UsuariDto();
