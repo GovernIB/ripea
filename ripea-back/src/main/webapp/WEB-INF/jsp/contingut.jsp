@@ -800,7 +800,7 @@ function removeCookie(cname) {
 						<c:when test="${contingut.expedient or contingut.carpeta}"><spring:message code="contingut.errors.expedient.validacio"/></c:when>
 						<c:when test="${contingut.document}"><spring:message code="contingut.errors.document.validacio"/></c:when>
 					</c:choose>
-					<a href="<c:url value="/contingut/${expedientId}/errors"/>" class="btn btn-xs btn-default pull-right" data-toggle="modal"><spring:message code="contingut.errors.consultar"/></a>
+					<a href="<c:url value="/contingut/${contingut.id}/errors"/>" class="btn btn-xs btn-default pull-right" data-toggle="modal"><spring:message code="contingut.errors.consultar"/></a>
 				</div>
 			</c:if>
 			

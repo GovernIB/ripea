@@ -16,7 +16,7 @@ const CanviTipusForm = () => {
     )
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField name="metaDocument" filter={filter} required/>
+        <GridFormField name="metaDocument" filter={filter} namedQueries={[`CREATE_NEW_DOC#${data?.expedientId}`]} required/>
     </Grid>
 }
 
@@ -47,6 +47,7 @@ const useCanviTipus = (entity:any, refresh?: () => void) => {
             ids: ids,
             massivo: true,
             metaExpedient: entity?.metaExpedient,
+            expedientId: entity?.id,
         })
     }
     const onSuccess = () :void => {
