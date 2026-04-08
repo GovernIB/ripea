@@ -1,6 +1,6 @@
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
-import {GridPage, useResourceApiService} from 'reactlib';
+import {GridPage, useBaseAppContext, useResourceApiService} from 'reactlib';
 import {useState, useEffect} from "react";
 import {Typography, Grid2 as Grid, Icon, IconButton, Link, Alert, Button, Box} from '@mui/material';
 import {formatDate} from '../../../util/dateUtils.ts';
@@ -26,6 +26,7 @@ import {icons} from "../../user/UserHeadToolbar.tsx";
 import {setTitlePage} from "../../../TitleHeaderConfigurator.tsx";
 import {FieldData, MuiDetail} from "../../../components/MuiDetail.tsx";
 import {ErrorPage} from "../../../components/ErrorPage.tsx";
+import * as builder from "../../../util/springFilterUtils.ts";
 
 const border= { border: '1px solid #e3e3e3', borderRadius: '4px' };
 
@@ -33,21 +34,40 @@ const ExpedientsRelacionats = (props:any) => {
     const { entity: expedient } = props;
     const { t } = useTranslation();
 
-    const refresh = () => {
-        window.location.reload();
+    const {
+        isReady: apiIsReady,
+        find: apiFind,
+    } = useResourceApiService('expedientResource');
+    const {temporalMessageShow} = useBaseAppContext();
+    const [relacionats, setRelacionats] = useState<any[]>([]);
+
+    const findRelacionats = () => {
+        apiFind({
+            filter: builder.or(
+                builder.exists(builder.eq('relacionatsPer.id', expedient?.id)),
+                builder.exists(builder.eq('relacionatsAmb.id', expedient?.id)),
+            ),
+            unpaged: true,
+        })
+            .then((result) => {
+                setRelacionats(result?.rows)
+            })
+            .catch((error) => {
+                temporalMessageShow(null, error?.message, 'error');
+                setRelacionats([])
+            });
     }
 
-    const {eliminarRelacio} = useActions(refresh)
+    const {eliminarRelacio} = useActions(findRelacionats)
 
-    const relacionats :any[] = [...new Set([
-        ...expedient?.relacionatsPer ?? [],
-        ...expedient?.relacionatsAmb ?? []
-    ])];
+    useEffect(() => {
+        if (apiIsReady) {
+            findRelacionats()
+        }
+    }, [apiIsReady, expedient]);
 
-    if (relacionats.length == 0)
-        return <></>
-
-    return <Grid size={12} p={1} my={2}>
+    return <Load value={relacionats.length > 0} noEffect>
+        <Grid size={12} p={1} my={2}>
         <DetailCard title={t('page.contingut.action.importarExpedient.title')} display={'flex'} flexDirection={'column'} sx={{ px: 1 }} hidden={relacionats?.length==0}>
             {
                 relacionats?.map((relacionat:any) =>
@@ -56,7 +76,7 @@ const ExpedientsRelacionats = (props:any) => {
                             <Icon sx={{ fontSize: "1.3rem", paddingTop: "4px" }}>drive_file_move</Icon>
                         </Grid>
                         <Grid size={10}>
-                            <Link sx={{ fontSize: "0.9rem" }} href={`./${relacionat?.id}`}>{relacionat?.description}</Link>
+                            <Link sx={{ fontSize: "0.9rem" }} href={`./${relacionat?.id}`}>{relacionat?.nom}</Link>
                         </Grid>
                         <Grid size={1}>
                             {expedient?.potModificar &&
@@ -64,7 +84,7 @@ const ExpedientsRelacionats = (props:any) => {
                                     onClick={()=>eliminarRelacio(expedient?.id, expedient, relacionat?.id)}
                                     title={t('page.expedient.action.eliminarRelacio.label')}
                                     sx={{ color: 'black'}}>
-                                        <Icon sx={{ fontSize: "1.3rem" }}>link_off</Icon>
+                                    <Icon sx={{ fontSize: "1.3rem" }}>link_off</Icon>
                                 </IconButton>
                             }
                         </Grid>
@@ -73,6 +93,7 @@ const ExpedientsRelacionats = (props:any) => {
             }
         </DetailCard>
     </Grid>
+    </Load>
 }
 
 export const ExpedientInfo = (props:any) => {
@@ -117,7 +138,7 @@ const ExpedientAlert = (props:any) => {
         {expedient?.agafatPer?.id != user?.codi && expedient?.usuariActualWrite && !rol?.isAdminLectura && user?.rolActual != 'IPA_ADMIN' &&
             <Alert severity="info"
                    action={
-                       <Button sx={{py:0}} 
+                       <Button sx={{py:0}}
                        onClick={()=>agafar(expedient?.id, expedient)} variant="outlined">
                            <Icon>lock</Icon>
 						   <Typography variant={"subtitle2"}>{t('page.expedient.action.agafar.label')}</Typography>
@@ -158,7 +179,7 @@ const ExpedientAlert = (props:any) => {
     </>
 }
 
-const perspectives = ['COUNT', 'ESTAT', 'RELACIONAT', 'AMB_PINBAL', "META_EXPEDIENT", "PERMIS_CONTINGUT"]
+const perspectives = ['COUNT', 'ESTAT', 'AMB_PINBAL', "META_EXPEDIENT", "PERMIS_CONTINGUT"]
 const Expedient = () => {
     const { t } = useTranslation();
     const { id } = useParams();

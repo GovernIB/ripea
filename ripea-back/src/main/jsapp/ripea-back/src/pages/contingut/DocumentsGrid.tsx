@@ -1,6 +1,6 @@
 import React, {useEffect, useMemo, useState} from "react";
 import { DndContext } from '@dnd-kit/core';
-import { FormControl, Grid2 as Grid, InputLabel, Select, MenuItem, Icon, Box } from "@mui/material";
+import { FormControl, Grid2 as Grid, Select, MenuItem, Icon, Box } from "@mui/material";
 import {
     GridSlots,
     GridTreeDataGroupingCell,
@@ -52,9 +52,10 @@ const TreeViewSelector = (props: { value: any, onChange: (value: any) => void })
 
     return <Grid size={3} sx={{ ml: 1 }}>
         <FormControl fullWidth size="small">
-            <InputLabel id="demo-simple-select-label">{t('page.document.view.title')}</InputLabel>
+            {/*<InputLabel id="demo-simple-select-label">{t('page.document.view.title')}</InputLabel>*/}
             <Select
                 sx={{ maxHeight: '32px' }}
+                title={t('page.document.view.title')}
                 labelId="demo-simple-select-label"
                 value={value}
                 onChange={(event) => onChange(event.target.value)}
@@ -67,6 +68,7 @@ const TreeViewSelector = (props: { value: any, onChange: (value: any) => void })
     </Grid>
 }
 
+const carpetaPerspectives =  ["PATH" , "RESTRICCIONS", "RESPONSABLE_RESTRICCIO"];
 export const useExpedientsCarpetes = (commonFilter: string) => {
     const {
         isReady: apiExpedientIsReady,
@@ -83,9 +85,7 @@ export const useExpedientsCarpetes = (commonFilter: string) => {
             .then((result)=> setExpedients(result.rows))
             .catch(()=> setExpedients([]))
     }
-	
-	const carpetaPerspectives =  ["PATH" , "RESTRICCIONS", "RESPONSABLE_RESTRICCIO"];
-	
+
     const findCarpetes = () => {
         return apiCarpetaFindAll({perspectives: carpetaPerspectives, unpaged: true, filter: commonFilter})
             .then((result)=> setCarpetes(result.rows))

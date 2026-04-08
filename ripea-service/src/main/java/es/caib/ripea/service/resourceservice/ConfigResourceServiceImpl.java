@@ -9,6 +9,7 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
+import es.caib.ripea.persistence.entity.resourcerepository.config.ConfigResourceRepository;
 import es.caib.ripea.service.intf.model.ConfigGroupResource;
 import org.apache.commons.lang.SerializationUtils;
 import org.springframework.data.domain.Page;
@@ -55,7 +56,8 @@ public class ConfigResourceServiceImpl extends BaseMutableResourceService<Config
 	private final ConfigHelper configHelper;
 	private final ExcepcioLogHelper excepcioLogHelper;
 	private final MessageHelper messageHelper;
-	
+    private final ConfigResourceRepository configResourceRepository;
+
     @PostConstruct
     public void init() {
     	register(ConfigResource.ACTION_SYNC_JBOSS, new SyncJbossActionExecutor());
@@ -320,21 +322,22 @@ public class ConfigResourceServiceImpl extends BaseMutableResourceService<Config
 		}
     }
 
-    private class ReorderActionExecutor implements ActionExecutor<ConfigResourceEntity, Integer, Serializable> {
+    private class ReorderActionExecutor implements ActionExecutor<ConfigResourceEntity, ConfigResource.ReordenarForm, Serializable> {
 		@Override
-		public void onChange(Serializable id, Integer previous, String fieldName, Object fieldValue,
-				Map<String, AnswerValue> answers, String[] previousFieldNames, Integer target) {}
+		public void onChange(Serializable id, ConfigResource.ReordenarForm previous, String fieldName, Object fieldValue,
+				Map<String, AnswerValue> answers, String[] previousFieldNames, ConfigResource.ReordenarForm target) {}
 
 		@Override
-		public Serializable exec(String code, ConfigResourceEntity entity, Integer newPosition) throws ActionExecutionException {
-			
-			List<ConfigEntity> groupConfigs = configRepository.findByEntitatCodiIsNullAndGroupCode(entity.getGroup().getKey());
+		public Serializable exec(String code, ConfigResourceEntity entity, ConfigResource.ReordenarForm resource) throws ActionExecutionException {
+
+            ConfigResourceEntity configEntity = configResourceRepository.findById(resource.getKey()).get();
+			List<ConfigEntity> groupConfigs = configRepository.findByEntitatCodiIsNullAndGroupCode(configEntity.getGroup().getKey());
 			
 			groupConfigs.sort(Comparator.comparingInt(ConfigEntity::getPosition));
 
 			ConfigEntity toMove = null;
 			for (ConfigEntity c : groupConfigs) {
-				if (c.getKey().equals(entity.getKey())) {
+				if (c.getKey().equals(resource.getKey())) {
 					toMove = c;
 					break;
 				}
@@ -345,7 +348,7 @@ public class ConfigResourceServiceImpl extends BaseMutableResourceService<Config
 						"Element not found in group: " + entity.getKey());
 			}
 
-			int clampedPosition = Math.max(0, Math.min(newPosition, groupConfigs.size() - 1));
+			int clampedPosition = Math.max(0, Math.min(resource.getPosition(), groupConfigs.size() - 1));
 			groupConfigs.remove(toMove);
 			groupConfigs.add(clampedPosition, toMove);
 

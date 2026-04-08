@@ -36,18 +36,19 @@ export const Footer: React.FC<AppFootProps> = (props) => {
 
 	useEffect(() => {
 	    // Comprova si window.__MANIFEST__ ja està disponible
-	    if (window.__MANIFEST__) {
-	        setBuildTimestamp(window.__MANIFEST__["Build-Timestamp"]);
-	        setScmRevision(window.__MANIFEST__["Implementation-SCM-Revision"]);
-	        setComandaVersion(window.__MANIFEST__["Implementation-Version"]);
+        const manifest = window.__MANIFEST__;
+	    if (manifest) {
+	        setBuildTimestamp(manifest["Build-Timestamp"]);
+	        setScmRevision(manifest["Implementation-SCM-Revision"]);
+	        setComandaVersion(manifest["Implementation-Version"]);
 	    } else {
 	        // Si no està disponible, espera a que l'script es carregui
 	        const checkManifestInterval = setInterval(() => {
-	            if (window.__MANIFEST__) {
+	            if (manifest) {
 	                clearInterval(checkManifestInterval);
-	                setBuildTimestamp(window.__MANIFEST__["Build-Timestamp"]);
-	                setScmRevision(window.__MANIFEST__["Implementation-SCM-Revision"]);
-	                setComandaVersion(window.__MANIFEST__["Implementation-Version"]);
+	                setBuildTimestamp(manifest["Build-Timestamp"]);
+	                setScmRevision(manifest["Implementation-SCM-Revision"]);
+	                setComandaVersion(manifest["Implementation-Version"]);
 	            }
 	        }, 100);
 
@@ -55,7 +56,7 @@ export const Footer: React.FC<AppFootProps> = (props) => {
 	        const timeoutId = setTimeout(() => {
 	            clearInterval(checkManifestInterval);
 	            // Si el manifest encara no està disponible, podem establir valors per defecte o deixar-ho com a null
-	            if (!window.__MANIFEST__) {
+	            if (!manifest) {
 	                console.warn('Manifest no disponible després del temps d\'espera');
 	            }
 	        }, 5000);
