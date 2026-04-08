@@ -416,7 +416,8 @@ public class ExpedientResource extends NodeResource implements Serializable {
     @Transient private boolean ambDocumentsPinbal;
     @Transient private boolean creacioCarpetesActiva;
     @Transient private boolean isPendentExecucioMassiva;
-    
+    @Transient private boolean hideTasca;
+
     @Getter
 	@Setter
     @NoArgsConstructor

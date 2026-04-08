@@ -60,7 +60,7 @@ const columns:any[] = [
     },
 ];
 const perspectives:any[] = [];
-const sortModel:any[] = [{field: 'position', sort: 'asc'}];
+const sortModel:any[] = [{field: 'entitatCodi', sort: 'asc'}];
 const filter = builder.or(
     builder.neq('entitatCodi', null),
     builder.neq('organCodi ', null),
