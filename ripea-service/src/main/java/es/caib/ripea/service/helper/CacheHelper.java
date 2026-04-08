@@ -352,7 +352,7 @@ public class CacheHelper {
 		eventHelper.notifyErrorsValidacio(evce); //Notifica con datos frescos
 	}
 	
-	@Cacheable(value = "usuariAmbCodi", key="#usuariCodi")
+	@Cacheable(value = "usuariAmbCodi", key="#usuariCodi", unless = "#result == null")
 	public DadesUsuari findUsuariAmbCodi(String usuariCodi) {
 		return pluginHelper.dadesUsuariFindAmbCodi(usuariCodi);
 	}
