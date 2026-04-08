@@ -7,7 +7,7 @@ import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import * as builder from "../../../util/springFilterUtils.ts";
 import GridFormField from "../../../components/GridFormField.tsx";
-import {Grid2 as Grid, Link} from "@mui/material";
+import {Link} from "@mui/material";
 import {Link as RouterLink } from 'react-router-dom';
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
 import {useActions as useDocumentActions} from "../../contingut/details/ContingutActions.tsx";

@@ -73,9 +73,9 @@ const useTascaActions = (entity:any, refresh?: () => void) => {
     const hiddenByEstat = (row: any): boolean => {
         return isInOptions(row?.estat, 'CANCELLADA', 'FINALITZADA', 'REBUTJADA');
     }
-    const nomesMostraDetalls = (row: any): boolean => {
-        return isInOptions(row?.estat, 'CANCELLADA', 'REBUTJADA');
-    }
+    // const nomesMostraDetalls = (row: any): boolean => {
+    //     return isInOptions(row?.estat, 'CANCELLADA', 'REBUTJADA');
+    // }
     const isInOptions = (value:string, ...options:string[]) => {
         return options.includes(value)
     }

@@ -2,7 +2,7 @@ import {useState} from "react";
 import {Alert, Grid2 as Grid, Icon, IconButton} from "@mui/material";
 import {MuiDialog, useBaseAppContext, useConfirmDialogButtons, useResourceApiService} from "reactlib";
 import {useTranslation} from "react-i18next";
-import {DetailCard, DetailCardContent} from "../../../components/CardData.tsx";
+import {DetailCard} from "../../../components/CardData.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import Load from "../../../components/Load.tsx";
 import * as builder from '../../../util/springFilterUtils.ts'

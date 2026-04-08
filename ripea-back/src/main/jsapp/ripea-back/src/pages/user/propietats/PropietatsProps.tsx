@@ -185,8 +185,8 @@ export const PropietatsProps: React.FC<{ quickFilter?: string; entitatCodi?: str
             );
     };
 
-    const reordering = (id:any, ordre:number) => {
-        apiAction(id, { code: 'REORDENAR', data: ordre })
+    const reordering = (key:any, position:number) => {
+        apiAction(undefined, { code: 'REORDER', data: {key, position} })
             .then(() => refresh())
             .catch((error) => {
                 temporalMessageShow(null, error?.message, 'error');
@@ -196,9 +196,9 @@ export const PropietatsProps: React.FC<{ quickFilter?: string; entitatCodi?: str
     const handleDragEnd = (event: any) => {
         const sourceData = event.active.data.current;
         const targetData = event.over.data.current;
-        console.log('>>> ', sourceData.id, '(', sourceData.position, ') ->', targetData.id, '(', targetData.position, ')')
+        // console.log('>>> ', sourceData.id, '(', sourceData.position, ') ->', targetData.id, '(', targetData.position, ')')
         if (sourceData.id != targetData.id) {
-        //     reordering(sourceData.id, targetData.position)
+            reordering(sourceData.id, targetData.position)
         }
     }
 
