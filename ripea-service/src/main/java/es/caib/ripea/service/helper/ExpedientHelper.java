@@ -99,6 +99,8 @@ import es.caib.ripea.persistence.repository.ExpedientComentariRepository;
 import es.caib.ripea.persistence.repository.ExpedientEstatRepository;
 import es.caib.ripea.persistence.repository.ExpedientPeticioRepository;
 import es.caib.ripea.persistence.repository.ExpedientRepository;
+import es.caib.ripea.persistence.repository.ExpedientTascaRepository;
+import es.caib.ripea.persistence.repository.MetaExpedientTascaRepository;
 import es.caib.ripea.persistence.repository.GrupRepository;
 import es.caib.ripea.persistence.repository.InteressatRepository;
 import es.caib.ripea.persistence.repository.MetaDadaRepository;
@@ -209,6 +211,8 @@ public class ExpedientHelper {
 	@Autowired private ExecucioMassivaService execucioMassivaService;
 	@Autowired private ExecucioMassivaRepository execucioMassivaRepository;
 	@Autowired private GrupRepository grupRepository;
+	@Autowired private ExpedientTascaRepository expedientTascaRepository;
+	@Autowired private MetaExpedientTascaRepository metaExpedientTascaRepository;
 	
 	public static List<DocumentDto> expedientsWithImportacio = new ArrayList<DocumentDto>();
 
@@ -3566,6 +3570,13 @@ public class ExpedientHelper {
 	}
 	
 	private boolean isImportacioRelacionatsActiva() { return configHelper.getAsBoolean(PropertyConfig.IMPORTACIO_RELACIONATS_ACTIVA);}
+
+	public boolean expedientOProcedimentTeTasques(Long expedientId, Long procedimentId) {
+		if (expedientTascaRepository.existsByExpedientId(expedientId)) {
+			return true;
+		}
+		return metaExpedientTascaRepository.existsByMetaExpedientIdAndActivaTrue(procedimentId);
+	}
 
 	private static final Logger logger = LoggerFactory.getLogger(ExpedientHelper.class);
 }

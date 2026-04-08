@@ -60,6 +60,7 @@ public class ConfigResourceServiceImpl extends BaseMutableResourceService<Config
     public void init() {
     	register(ConfigResource.ACTION_SYNC_JBOSS, new SyncJbossActionExecutor());
     	register(ConfigResource.ACTION_UPDATE, (ActionExecutor<ConfigResourceEntity, ?, ?>) new UpdateActionExecutor());
+    	register(ConfigResource.ACTION_REORDER, (ActionExecutor<ConfigResourceEntity, ?, ?>) new ReorderActionExecutor());
 
     	register(ConfigResource.Fields.entitat, new ConfigOnchangeLogicProcessor());
     	register(ConfigResource.Fields.organ, new ConfigOnchangeLogicProcessor());
@@ -316,6 +317,44 @@ public class ConfigResourceServiceImpl extends BaseMutableResourceService<Config
                 configRepository.save(configEntity);
             }
             return resource;
+		}
+    }
+
+    private class ReorderActionExecutor implements ActionExecutor<ConfigResourceEntity, Integer, Serializable> {
+		@Override
+		public void onChange(Serializable id, Integer previous, String fieldName, Object fieldValue,
+				Map<String, AnswerValue> answers, String[] previousFieldNames, Integer target) {}
+
+		@Override
+		public Serializable exec(String code, ConfigResourceEntity entity, Integer newPosition) throws ActionExecutionException {
+			
+			List<ConfigEntity> groupConfigs = configRepository.findByEntitatCodiIsNullAndGroupCode(entity.getGroup().getKey());
+			
+			groupConfigs.sort(Comparator.comparingInt(ConfigEntity::getPosition));
+
+			ConfigEntity toMove = null;
+			for (ConfigEntity c : groupConfigs) {
+				if (c.getKey().equals(entity.getKey())) {
+					toMove = c;
+					break;
+				}
+			}
+			
+			if (toMove == null) {
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code,
+						"Element not found in group: " + entity.getKey());
+			}
+
+			int clampedPosition = Math.max(0, Math.min(newPosition, groupConfigs.size() - 1));
+			groupConfigs.remove(toMove);
+			groupConfigs.add(clampedPosition, toMove);
+
+			for (int i = 0; i < groupConfigs.size(); i++) {
+				groupConfigs.get(i).setPosition(i);
+			}
+			configRepository.saveAll(groupConfigs);
+
+			return null;
 		}
     }
 }

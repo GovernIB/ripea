@@ -33,11 +33,15 @@ import javax.validation.constraints.NotNull;
                     type = ResourceArtifactType.ACTION,
                     code = ConfigResource.ACTION_UPDATE,
                     formClass = ConfigResource.class),
+            @ResourceArtifact(
+                    type = ResourceArtifactType.ACTION,
+                    code = ConfigResource.ACTION_REORDER),
         })
 public class ConfigResource extends BaseResource<String> {
 
 	public static final String ACTION_SYNC_JBOSS = "SYNC_JBOSS";
 	public static final String ACTION_UPDATE = "UPDATE";
+	public static final String ACTION_REORDER = "REORDER";
 
     @NotNull
     private String key;

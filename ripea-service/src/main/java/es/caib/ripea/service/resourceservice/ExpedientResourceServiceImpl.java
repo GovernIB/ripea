@@ -779,6 +779,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         @Override
         public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
         	resource.setMetaExpedientInfo(objectMappingHelper.newInstanceMap(Hibernate.unproxy(entity.getMetaExpedient()), MetaExpedientResource.class));
+        	resource.setHideTasca(!expedientHelper.expedientOProcedimentTeTasques(entity.getId(), entity.getMetaExpedient().getId()));
         }
     }
 
