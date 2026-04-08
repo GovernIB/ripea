@@ -18,43 +18,64 @@ export const useDraggableContext = () => {
     return context;
 }
 
-export const DraggableGridRow: React.FC<any> = (props) => {
+interface DraggableContainerProps {
+    id: string | number;
+    data?: any;
+    style?: any;
+    styleOver?: any;
+    children: React.ReactNode;
+}
+
+export const DraggableItem: React.FC<DraggableContainerProps> = ({ id, data, style, styleOver, children }) => {
     const {
         attributes: draggableAttributes,
         listeners: draggableListeners,
         transform: draggableTransform,
         setNodeRef: draggableSetNodeRef,
-        setActivatorNodeRef: draggableSetActivatorNodeRef
-    } = useDraggable({
-        id: 'draggable_' + props.row.id,
-        data: props.row,
-    });
-    const droppableProps = useDroppable({
-        id: 'droppable_' + props.row.id,
-        data: props.row,
-    });
-    const { isOver, setNodeRef: droppableSetNodeRef } = droppableProps;
-    const draggableStyle = draggableTransform ? {
-        transform: `translate3d(${draggableTransform.x}px, ${draggableTransform.y}px, 0)`,
-    } : undefined;
-    const droppableStyle = {
-        border: isOver && props.row.tipus === 'CARPETA' ? '2px solid grey' : undefined,
-        borderTop: isOver && props.row.tipus !== 'CARPETA' ? '2px solid grey' : undefined,
+        setActivatorNodeRef: draggableSetActivatorNodeRef,
+    } = useDraggable({ id: `draggable_${id}`, data });
+
+    const { isOver, setNodeRef: droppableSetNodeRef } = useDroppable({ id: `droppable_${id}`, data });
+
+    // Combinar refs de draggable + droppable en un solo div
+    const combinedRef = (node: HTMLDivElement | null) => {
+        draggableSetNodeRef(node);
+        droppableSetNodeRef(node);
     };
-    return <div ref={droppableSetNodeRef} style={droppableStyle}>
-        <DraggableContext.Provider
-            value={{
-                draggableAttributes,
-                draggableListeners,
-                draggableSetActivatorNodeRef
-            }}>
-            <GridRow
-                ref={draggableSetNodeRef}
-                style={draggableStyle}
-                {...props}>
-            </GridRow>
-        </DraggableContext.Provider>
-    </div>;
+
+    const draggableStyle = draggableTransform
+        ? { transform: `translate3d(${draggableTransform.x}px, ${draggableTransform.y}px, 0)`, zIndex: 1, position: 'relative' }
+        : undefined;
+
+    const droppableStyle = {
+        borderTop: isOver ? '2px solid grey' : undefined,
+        ...(isOver ?styleOver :{}),
+        ...(style ?? {}),
+    };
+
+    return (
+        <div ref={combinedRef} style={droppableStyle}>
+            <DraggableContext.Provider
+                value={{ draggableAttributes, draggableListeners, draggableSetActivatorNodeRef }}
+            >
+                <div style={draggableStyle}>
+                    {children}
+                </div>
+            </DraggableContext.Provider>
+        </div>
+    );
+};
+
+export const DraggableGridRow: React.FC<any> = (props) => {
+    const droppableStyle = {
+        border: props.row.tipus === 'CARPETA' ? '2px solid grey' : undefined,
+        borderTop: props.row.tipus !== 'CARPETA' ? '2px solid grey' : undefined,
+    };
+    return (
+        <DraggableItem id={props.row.id} data={props.row} styleOver={droppableStyle}>
+            <GridRow {...props} />
+        </DraggableItem>
+    );
 }
 export const DraggableGridRowHandler: React.FC = () => {
     const { t } = useTranslation();

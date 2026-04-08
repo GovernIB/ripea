@@ -255,6 +255,7 @@ const Expedient = () => {
             label: t('page.contingut.tabs.tasques'),
             content: <TasquesExpedientGrid entity={expedient} onRowCountChange={setNumTasques}/>,
             badge: numTasques ?? expedient?.numTasques,
+            hidden: expedient?.hideTasca,
             showZero: true,
         },
     ]
