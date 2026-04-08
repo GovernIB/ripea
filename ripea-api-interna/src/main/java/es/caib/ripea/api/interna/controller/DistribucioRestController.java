@@ -2,6 +2,8 @@ package es.caib.ripea.api.interna.controller;
 
 import java.util.List;
 
+import javax.ejb.EJBAccessException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -46,6 +48,9 @@ public class DistribucioRestController {
 			expedientPeticioService.crearExpedientPeticion(event);
 			aplicacioService.stopTimer(sample, "METRICS@Subsystem_Callback_Distribucio.event", "resultado", "exito");
 			return new ResponseEntity<String>("OK", HttpStatus.OK);
+		} catch (EJBAccessException e) {
+			aplicacioService.stopTimer(sample, "METRICS@Subsystem_Callback_Distribucio.event", "resultado", "error");
+			return new ResponseEntity<String>(e.getMessage(), HttpStatus.FORBIDDEN);
 		} catch (Exception e) {
 			aplicacioService.stopTimer(sample, "METRICS@Subsystem_Callback_Distribucio.event", "resultado", "error");
 			return new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
