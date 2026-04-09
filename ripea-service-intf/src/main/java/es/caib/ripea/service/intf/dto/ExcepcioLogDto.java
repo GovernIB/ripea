@@ -25,6 +25,8 @@ public class ExcepcioLogDto implements Serializable {
 	private String message;
 	private String stacktrace;
 
+	public ExcepcioLogDto() {}
+
 	public ExcepcioLogDto(String uri, Throwable exception) {
 		if (exception instanceof NotFoundException) {
 			this.objectId = ((NotFoundException)exception).getObjectId();
