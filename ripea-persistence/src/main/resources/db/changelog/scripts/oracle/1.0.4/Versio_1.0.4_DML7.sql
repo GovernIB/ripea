@@ -86,3 +86,44 @@ UPDATE IPA_CONFIG_GROUP SET DESCRIPTION='Plugin de creació de regles en DISTRIB
 UPDATE IPA_CONFIG_GROUP SET DESCRIPTION='Configuració del plugin de validació de firmes' WHERE CODE='VALIDATE_SIGNATURE';
 
 UPDATE IPA_PINBAL_SERVEI SET NOM='Consulta d''inexistència de delictes sexuals per dades de filiació' WHERE CODI = 'SVDDELSEXWS01';
+
+UPDATE IPA_CONFIG SET DESCRIPTION = SUBSTR(DESCRIPTION, 1, LENGTH(DESCRIPTION) - 1) WHERE DESCRIPTION LIKE '%.';
+
+UPDATE IPA_CONFIG SET DESCRIPTION = 'Generar logs de rendiment de funcions d''anotacions' WHERE KEY LIKE '%.mostrar.logs.rendiment.descarregar.anotacio';
+UPDATE IPA_CONFIG SET DESCRIPTION = 'Indica si el servei web UsuariEntitat està actiu per obtenir responsables' WHERE KEY LIKE '%.plugin.portafirmes.usuarientitatws.actiu';
+UPDATE IPA_CONFIG SET DESCRIPTION = 'Màxim tamany dels fitxers dels camps fileUpload dels formularis' WHERE KEY LIKE '%.maxUploadSize';
+UPDATE IPA_CONFIG SET DESCRIPTION = 'URL de l''API per a l''aplicació REACT' WHERE KEY LIKE '%.front.api.url';
+UPDATE IPA_CONFIG SET DESCRIPTION = 'URL base de l''aplicació de comanda, exemple: https://dev.caib.es' WHERE KEY LIKE '%.plugin.comanda.baseurl';
+UPDATE IPA_CONFIG SET DESCRIPTION = 'El plugin de comanda està actiu per enviar dades (Avisos i tasques)' WHERE KEY LIKE '%.plugin.comanda.actiu';
+UPDATE IPA_CONFIG SET DESCRIPTION = 'Usuari aplicació de registre' WHERE KEY LIKE '%.plugin.registre.username';
+UPDATE IPA_CONFIG SET DESCRIPTION = 'Activar validació firmes àgils' WHERE KEY LIKE '%.plugin.validarsignatura.agil.activa';
+UPDATE IPA_CONFIG SET DESCRIPTION = 'Usuari integració d''API EvidenciesIB' WHERE KEY LIKE '%.plugins.validarsignatura.agil.api.evidenciesib.username';
+UPDATE IPA_CONFIG SET DESCRIPTION = 'Contrasenya usuari integració API EvidenciesIB' WHERE KEY LIKE '%.plugins.validarsignatura.agil.api.evidenciesib.password';
+UPDATE IPA_CONFIG SET DESCRIPTION = 'Interval de temps (ms) en què buidar la cache de dominis' WHERE KEY LIKE '%.dominis.cache.execucio';
+UPDATE IPA_CONFIG SET DESCRIPTION = 'Nom del endpoint del plugin d''Organismes (DIR3)' WHERE KEY LIKE '%.plugin.unitats.organitzatives.endpointName';
+UPDATE IPA_CONFIG SET DESCRIPTION = 'Indica si s''ha de mostrar el botó per accedir a la nova interfície' WHERE KEY LIKE '%.reactActivat';
+UPDATE IPA_CONFIG SET DESCRIPTION = 'Mostrar camps addicionals a l''índex de l''expedient' WHERE KEY LIKE '%.index.expedient.camps.addicionals';
+UPDATE IPA_CONFIG SET DESCRIPTION = 'Sèrie documental del contenidor dels annexos de Distribució' WHERE KEY LIKE '%.anotacions.registre.expedient.serie.documental';
+UPDATE IPA_CONFIG SET DESCRIPTION = 'Cron per guardar estadístiques del dia actual' WHERE KEY LIKE '%.segonpla.estadistiques.diaries';
+UPDATE IPA_CONFIG SET DESCRIPTION = 'Model d''IA a utilitzar si escau' WHERE KEY LIKE '%.plugin.summarize.model';
+UPDATE IPA_CONFIG SET DESCRIPTION = 'Especifica el path del logo a mostrar a l''índex' WHERE KEY LIKE '%.index.logo';
+UPDATE IPA_CONFIG SET DESCRIPTION = 'Classe que implementa el plugin de registre' WHERE KEY LIKE '%.plugin.registre.class';
+UPDATE IPA_CONFIG SET DESCRIPTION = 'Contrasenya d''AfirmaCxf' WHERE KEY LIKE '%.plugins.validatesignature.afirmacxf.authorization.password';
+UPDATE IPA_CONFIG SET DESCRIPTION = 'Usuari d''AfirmaCxf' WHERE KEY LIKE '%.plugins.validatesignature.afirmacxf.authorization.username';
+UPDATE IPA_CONFIG SET DESCRIPTION = 'Classe del plugin d''usuaris' WHERE KEY LIKE '%.plugin.dades.usuari.class';
+UPDATE IPA_CONFIG SET DESCRIPTION = 'Cron per guardar JSON en brut de mètriques diàries' WHERE KEY LIKE '%.segonpla.json.metriques';
+UPDATE IPA_CONFIG SET DESCRIPTION = 'Password usuari aplicació de comanda' WHERE KEY LIKE '%.plugin.comanda.password';
+UPDATE IPA_CONFIG SET DESCRIPTION = 'Classe que implementa el plugin de comanda' WHERE KEY LIKE '%.plugin.comanda.class';
+UPDATE IPA_CONFIG SET DESCRIPTION = 'Password usuari aplicació de registre' WHERE KEY LIKE '%.plugin.registre.password';
+UPDATE IPA_CONFIG SET DESCRIPTION = 'Habilitar l''ordenació del contingut' WHERE KEY LIKE '%.ordenacio.contingut.habilitada';
+UPDATE IPA_CONFIG SET DESCRIPTION = 'Nom del endpoint del plugin de distribució' WHERE KEY LIKE '%.distribucio.backofficeIntegracio.endpointName';
+UPDATE IPA_CONFIG SET DESCRIPTION = 'Descripció amigable del endpoint de CONCSV' WHERE KEY LIKE '%.concsv.endpointName';
+UPDATE IPA_CONFIG SET DESCRIPTION = 'Endpoint d''AfirmaCxf' WHERE KEY LIKE '%.plugins.validatesignature.afirmacxf.endpoint';
+UPDATE IPA_CONFIG SET DESCRIPTION = 'Clau per encriptar i desencriptar paràmetres de les URLs (firma, escaneig, flux firma)' WHERE KEY LIKE '%.encription.key';
+UPDATE IPA_CONFIG SET DESCRIPTION = 'Usuari aplicació de comanda' WHERE KEY LIKE '%.plugin.comanda.user';
+UPDATE IPA_CONFIG SET DESCRIPTION = 'Nom del endpoint del plugin d''IA' WHERE KEY LIKE '%.plugin.summarize.endpointName';
+UPDATE IPA_CONFIG SET DESCRIPTION = 'Crear índex per expedients relacionats' WHERE KEY LIKE '%.index.expedients.relacionats';
+UPDATE IPA_CONFIG SET DESCRIPTION = 'Període d''actualització del comptador d''anotacions pendents en segons' WHERE KEY LIKE '%.periode.actualitzacio.contador.anotacions.pendents';
+UPDATE IPA_CONFIG SET DESCRIPTION = 'Nom del endpoint del plugin de digitalització' WHERE KEY LIKE '%.plugin.digitalitzacio.endpointName';
+
+UPDATE IPA_CONFIG SET DESCRIPTION = SUBSTR(DESCRIPTION, 1, LENGTH(DESCRIPTION) - 1) WHERE DESCRIPTION LIKE '%.';
