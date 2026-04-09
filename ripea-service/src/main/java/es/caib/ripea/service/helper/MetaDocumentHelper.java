@@ -21,6 +21,7 @@ import es.caib.ripea.persistence.entity.DocumentEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.entity.MetaDocumentEntity;
+import es.caib.ripea.persistence.entity.FluxFirmaUsuariEntity;
 import es.caib.ripea.persistence.entity.MetaDocumentFluxPortafibEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientTascaValidacioEntity;
@@ -28,6 +29,7 @@ import es.caib.ripea.persistence.entity.PinbalServeiEntity;
 import es.caib.ripea.persistence.entity.UsuariEntity;
 import es.caib.ripea.persistence.repository.DocumentRepository;
 import es.caib.ripea.persistence.repository.ExpedientRepository;
+import es.caib.ripea.persistence.repository.FluxFirmaUsuariRepository;
 import es.caib.ripea.persistence.repository.MetaDocumentFluxPortafibRepository;
 import es.caib.ripea.persistence.repository.MetaDocumentRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientRepository;
@@ -40,6 +42,7 @@ import es.caib.ripea.service.intf.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentDto;
 import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
+import es.caib.ripea.service.intf.dto.PortafirmesFluxInfoDto;
 import es.caib.ripea.service.intf.exception.ExisteixenDocumentsException;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.exception.SistemaExternException;
@@ -60,6 +63,7 @@ public class MetaDocumentHelper {
 	@Autowired private MetaExpedientRepository metaExpedientRepository;
 	@Autowired private MetaDocumentRepository metaDocumentRepository;
 	@Autowired private MetaDocumentFluxPortafibRepository metaDocumentFluxPortafibRepository;
+	@Autowired private FluxFirmaUsuariRepository fluxFirmaUsuariRepository;
 	@Autowired private DocumentRepository documentRepository;
 	@Autowired private UsuariRepository usuariRepository;
 	@Autowired private ContingutLogHelper contingutLogHelper;
@@ -615,7 +619,59 @@ public class MetaDocumentHelper {
 		return findMetaDocumentsPinbalDisponiblesPerCreacio(expedientRepository.findById(expedientId).get());
 	}
 
-	public String initMetaDocumentFlux(Long metaDocId) throws Exception {return "";}
+	public String initMetaDocumentFlux() throws Exception {
+
+		StringBuilder sb = new StringBuilder("<ul>");
+
+		List<MetaDocumentFluxPortafibEntity> fluxosMetaDoc = metaDocumentFluxPortafibRepository.findAll();
+
+		if (fluxosMetaDoc != null && !fluxosMetaDoc.isEmpty()) {
+			for (MetaDocumentFluxPortafibEntity fluxMetaDocEntity: fluxosMetaDoc) {
+				String fluxId = fluxMetaDocEntity.getPortafirmesFluxId();
+				String nomActual = fluxMetaDocEntity.getPortafirmesFluxDesc();
+				try {
+					PortafirmesFluxInfoDto fluxInfo = pluginHelper.portafirmesRecuperarInfoFluxDeFirma(fluxId, "ca", false);
+					if (fluxInfo != null) {
+						fluxMetaDocEntity.setPortafirmesFluxDesc(fluxInfo.getNom());
+						sb.append("<li style=\"color:green\">OK [").append(fluxId).append("] \"").append(nomActual).append("\" -> \"").append(fluxInfo.getNom()).append("\"</li>");
+					} else {
+						sb.append("<li style=\"color:orange\">NO TROBAT [").append(fluxId).append("] \"").append(nomActual).append("\"</li>");
+					}
+				} catch (Exception pfEx) {
+					sb.append("<li style=\"color:red\">ERROR [").append(fluxId).append("] \"").append(nomActual).append("\": ").append(ExceptionHelper.getRootCauseOrItself(pfEx).getMessage()).append("</li>");
+				}
+			}
+		} else {
+			sb.append("<li>No hi ha fluxos a actualitzar</li>");
+		}
+
+		sb.append("<li><strong>Fluxos d'usuari:</strong></li>");
+
+		List<FluxFirmaUsuariEntity> fluxosUsuari = fluxFirmaUsuariRepository.findAll();
+
+		if (fluxosUsuari != null && !fluxosUsuari.isEmpty()) {
+			for (FluxFirmaUsuariEntity fluxUsuariEntity : fluxosUsuari) {
+				String fluxId = fluxUsuariEntity.getPortafirmesFluxId();
+				String nomActual = fluxUsuariEntity.getNom();
+				try {
+					PortafirmesFluxInfoDto fluxInfo = pluginHelper.portafirmesRecuperarInfoFluxDeFirma(fluxId, "ca", false);
+					if (fluxInfo != null) {
+						fluxUsuariEntity.updateNomDescripcio(fluxInfo.getNom(), fluxInfo.getDescripcio());
+						sb.append("<li style=\"color:green\">OK [").append(fluxId).append("] \"").append(nomActual).append("\" -> \"").append(fluxInfo.getNom()).append("\"</li>");
+					} else {
+						sb.append("<li style=\"color:orange\">NO TROBAT [").append(fluxId).append("] \"").append(nomActual).append("\"</li>");
+					}
+				} catch (Exception pfEx) {
+					sb.append("<li style=\"color:red\">ERROR [").append(fluxId).append("] \"").append(nomActual).append("\": ").append(ExceptionHelper.getRootCauseOrItself(pfEx).getMessage()).append("</li>");
+				}
+			}
+		} else {
+			sb.append("<li>No hi ha fluxos d'usuari a actualitzar</li>");
+		}
+
+		sb.append("</ul>");
+		return sb.toString();
+	}
 
 	private static final Logger logger = LoggerFactory.getLogger(MetaDocumentHelper.class);
 }

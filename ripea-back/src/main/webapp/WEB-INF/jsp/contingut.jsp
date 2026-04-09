@@ -574,10 +574,11 @@ function removeCookie(cname) {
 	</script>
 </c:if>
 
-
 </head>
 <body>
+
 	<div class="rmodal"></div>
+	
 	<input id="contingutId" type="hidden" value="${contingut.id}">
 
 	<!---------------------------------------- AGAFAR / ALLIBERAR  ------------------------------------------>
@@ -594,7 +595,8 @@ function removeCookie(cname) {
 	  		</ul>
 		</div>
 	</c:if>
-	<c:if test="${!isTasca && not expedientAgafatPerUsuariActual and !isRolActualAdministradorLectura}">
+	
+	<c:if test="${!isTasca && not expedientAgafatPerUsuariActual and !isRolActualAdministradorLectura and contingut.expedient}">
 		<div id="alerta-no-agafat" class="alert well-sm alert-info alert-dismissable" style="min-height: 40px;">
 			<c:if test="${!contingut.admin}">
 				<span class="fa fa-info-circle"></span> 
@@ -603,7 +605,6 @@ function removeCookie(cname) {
 			<a href="<c:url value="../expedient/${expedient.id}/agafar?contingutId=${contingut.id}"/>" class="btn btn-xs btn-default pull-right"><span class="fa fa-lock"></span>&nbsp;&nbsp;<spring:message code="comu.boto.agafar"/></a>
 		</div>
 	</c:if>
-	
 	
 	<div>
 		<c:if test="${contingut.expedient or contingut.carpeta}">

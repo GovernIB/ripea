@@ -4052,7 +4052,7 @@ public class PluginHelper {
 				for (FluxFirmaUsuariEntity fluxFirmaUsuari : plantillesUsuari) {
 					PortafirmesFluxRespostaDto fluxUsuari = new PortafirmesFluxRespostaDto();
 					fluxUsuari.setFluxId(fluxFirmaUsuari.getPortafirmesFluxId());
-					fluxUsuari.setNom(fluxFirmaUsuari.getDescripcio());
+					fluxUsuari.setNom(fluxFirmaUsuari.getNom());
 					fluxUsuari.setDescripcio(messageHelper.getMessage("portafirmesRecuperarPlantillesDisponibles.origen.usuari"));
 					fluxUsuari.setUsuariActual(true);
 					respostesDto.add(fluxUsuari);

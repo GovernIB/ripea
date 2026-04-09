@@ -39,6 +39,7 @@ import es.caib.ripea.service.helper.ConversioTipusHelper;
 import es.caib.ripea.service.helper.DistribucioReglaHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.MessageHelper;
+import es.caib.ripea.service.helper.MetaDocumentHelper;
 import es.caib.ripea.service.helper.MetaExpedientHelper;
 import es.caib.ripea.service.helper.MetaNodeHelper;
 import es.caib.ripea.service.helper.PaginacioHelper;
@@ -97,6 +98,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	@Autowired private ConfigHelper configHelper;
 	@Autowired private MetaExpedientComentariRepository metaExpedientComentariRepository;
 	@Autowired private MetaExpedientTascaValidacioRepository metaExpedientTascaValidacioRepository;
+	@Autowired private MetaDocumentHelper metaDocumentHelper;
 	@Autowired private DistribucioReglaHelper distribucioReglaHelper;
 	@Autowired private CacheHelper cacheHelper;
 	@Autowired private ApplicationHelper applicationHelper;
@@ -1218,5 +1220,11 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		}
 		
 		return resultat;
+	}
+
+	@Override
+	@Transactional
+	public String initMetaDocumentFlux() throws Exception {
+		return metaDocumentHelper.initMetaDocumentFlux();
 	}
 }

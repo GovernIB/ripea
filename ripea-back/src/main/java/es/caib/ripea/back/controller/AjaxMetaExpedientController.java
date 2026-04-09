@@ -5,6 +5,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,6 +29,20 @@ import es.caib.ripea.service.intf.service.MetaExpedientService;
 public class AjaxMetaExpedientController extends BaseUserOAdminOOrganController {
 
 	@Autowired private MetaExpedientService metaExpedientService;
+
+	@RequestMapping(value = "/updateMetaDocumentFluxNom", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<String> executeRenomFlux(
+			HttpServletRequest request,
+			Model model) {
+		try {
+			String resultat = metaExpedientService.initMetaDocumentFlux();
+			return ResponseEntity.ok(resultat);
+		} catch (Exception e) {
+			String message = "Error al actualitzar el nom dels fluxos: "+e.getMessage();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(message);
+		}
+	}	
 	
 	@RequestMapping(value = "/metaexpedients/{text}/{organId}", method = RequestMethod.GET)
 	@ResponseBody
