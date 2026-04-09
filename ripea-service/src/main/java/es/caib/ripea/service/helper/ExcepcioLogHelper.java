@@ -1,6 +1,7 @@
 package es.caib.ripea.service.helper;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -31,6 +32,12 @@ public class ExcepcioLogHelper {
 			result.add(toDto(entity, index++));
 		}
 		return result;
+	}
+
+	public int esborrarExcepcionsMesAntigues3Mesos() {
+		Calendar cal = Calendar.getInstance();
+		cal.add(Calendar.MONTH, -3);
+		return excepcioLogResourceRepository.deleteByDataBefore(cal.getTime());
 	}
 
 	public void addExcepcio(String uri, Throwable exception) {

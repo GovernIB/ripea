@@ -47,6 +47,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
     @Autowired private AplicacioService aplicacioService;
     @Autowired private MonitorTasquesService monitorTasquesService;
     @Autowired private ConfigHelper configHelper;
+    @Autowired private es.caib.ripea.service.helper.ExcepcioLogHelper excepcioLogHelper;
 
     private Boolean[] primeraVez = {
             Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE
@@ -71,6 +72,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
     private final String codiBuidarCachesDominis = "buidarCachesDominis";
     private final String codiGenerarJsonMetriques = "generarJsonMetriques";
     private final String codiGenerarEstadistiquesDiaries = "generarEstadistiquesDiaries";
+    private final String codiEsborrarExcepcionsMesAntigues = "esborrarExcepcionsMesAntigues";
 
      @Bean
      public TaskScheduler taskScheduler() {
@@ -442,6 +444,27 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 },
                 getTrigger(codiGenerarEstadistiquesDiaries)
         );
+        addTask(
+                codiEsborrarExcepcionsMesAntigues,
+                new Runnable() {
+                    @SneakyThrows
+                    @Override
+                    public void run() {
+                        monitorTasquesService.inici(codiEsborrarExcepcionsMesAntigues);
+                        try {
+                            createAuthenticationContext();
+                            int esborrats = excepcioLogHelper.esborrarExcepcionsMesAntigues3Mesos();
+                            log.info("Esborrades {} excepcions de log amb més de 3 mesos d'antiguitat", esborrats);
+                            monitorTasquesService.fi(codiEsborrarExcepcionsMesAntigues);
+                        } catch (Throwable th) {
+                            tractarErrorTascaSegonPla(th, codiEsborrarExcepcionsMesAntigues);
+                        } finally {
+                            SecurityContextHolder.clearContext();
+                        }
+                    }
+                },
+                getTrigger(codiEsborrarExcepcionsMesAntigues)
+        );
     } //Fi de configureTasks
 
     private Trigger getTrigger(String taskCodi) {
@@ -702,6 +725,17 @@ public class SchedulingConfig implements SchedulingConfigurer {
                     Date nextExecution = trigger.nextExecutionTime(triggerContext);
                     Long longNextExecution = nextExecution.getTime() - System.currentTimeMillis();
                     monitorTasquesService.updateProperaExecucio(codiGenerarEstadistiquesDiaries, longNextExecution);
+                    return nextExecution;
+                }
+            };
+        } else if (taskCodi.equals(codiEsborrarExcepcionsMesAntigues)) {
+            return new Trigger() {
+                @Override
+                public Date nextExecutionTime(TriggerContext triggerContext) {
+                    CronTrigger trigger = new CronTrigger("0 0 3 * * SAT");
+                    Date nextExecution = trigger.nextExecutionTime(triggerContext);
+                    Long longNextExecution = nextExecution.getTime() - System.currentTimeMillis();
+                    monitorTasquesService.updateProperaExecucio(codiEsborrarExcepcionsMesAntigues, longNextExecution);
                     return nextExecution;
                 }
             };
