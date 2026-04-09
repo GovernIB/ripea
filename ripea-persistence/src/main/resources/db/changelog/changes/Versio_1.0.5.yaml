@@ -31,3 +31,19 @@ databaseChangeLog:
           splitStatements: true
           stripComments: true
           relativeToChangelogFile: true
+- changeSet:
+    id: Versio_1.0.5_3
+    author: limit
+    changes:
+      - sqlFile:
+          dbms: oracle
+          path: ../scripts/oracle/1.0.5/Versio_1.0.5_DML_1.sql
+          splitStatements: true
+          stripComments: true
+          relativeToChangelogFile: true
+      - sqlFile:
+          dbms: postgresql
+          path: ../scripts/postgres/1.0.5/Versio_1.0.5_DML_1.sql
+          splitStatements: true
+          stripComments: true
+          relativeToChangelogFile: true

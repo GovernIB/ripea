@@ -311,7 +311,7 @@ public class PluginHelper {
 		String endpoint = dadesUsuariPlugin.getEndpointURL();
 		
 		try {
-			List<String> rolsDisponibles = dadesUsuariPlugin.findRolsAmbCodi(usuariCodi);
+			List<String> rolsDisponibles = dadesUsuariPlugin.findRolsAmbCodi(usuariCodi.toLowerCase());
 			integracioHelper.addAccioOk(
 					IntegracioHelper.INTCODI_USUARIS,
 					accioDescripcio,
@@ -348,7 +348,7 @@ public class PluginHelper {
 		String endpoint = dadesUsuariPlugin.getEndpointURL();
 		
 		try {
-			DadesUsuari dadesUsuari = dadesUsuariPlugin.findAmbCodi(usuariCodi);
+			DadesUsuari dadesUsuari = dadesUsuariPlugin.findAmbCodi(usuariCodi.toLowerCase());
 			integracioHelper.addAccioOk(
 					IntegracioHelper.INTCODI_USUARIS,
 					accioDescripcio,
@@ -9171,7 +9171,7 @@ public class PluginHelper {
 		try {
 			DadesUsuariPlugin dadesUsuariPlugin = getDadesUsuariPlugin();
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			dadesUsuariPlugin.findAmbCodi(auth.getName());
+			dadesUsuariPlugin.findAmbCodi(auth.getName().toLowerCase());
 			return null;
 		} catch (Exception ex) {
 			return ex;
