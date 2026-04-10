@@ -356,7 +356,14 @@ public class ConversioTipusHelper {
 						organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(source.getExpedient().getId()));
 						ExpedientTascaDto target = new ExpedientTascaDto();
 						target.setId(source.getId());
-						target.setExpedient((ExpedientDto) contingutHelper.toContingutDto(source.getExpedient(), false, false));
+						ExpedientDto expedientDto = new ExpedientDto();
+						if (source.getExpedient()!=null) {
+							expedientDto.setId(source.getExpedient().getId());
+							expedientDto.setNom(source.getExpedient().getNom());
+							expedientDto.setNumero(source.getExpedient().getNumero());
+						}
+//						target.setExpedient((ExpedientDto) contingutHelper.toContingutDto(source.getExpedient(), false, false));
+						target.setExpedient(expedientDto);
 						target.setMetaExpedientTasca(convertir(source.getMetaTasca(), MetaExpedientTascaDto.class));
 						target.setResponsableActual(convertir(source.getResponsableActual(), UsuariDto.class));
 						target.setResponsables(convertirList(source.getResponsables(), UsuariDto.class));

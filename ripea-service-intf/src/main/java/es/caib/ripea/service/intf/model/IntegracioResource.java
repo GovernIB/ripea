@@ -58,8 +58,7 @@ public class IntegracioResource extends BaseResource<Long> {
 	public static final String FILTER_CODE = "FILTER";
 	public static final String FILTER_PLUGIN_CODE = "FILTER_PLUGIN";
 
-	private Long index;
-	private Long timestamp;
+	private Long id;
 	private Date data;
 	private String descripcio;
 	private String endpoint;
@@ -74,15 +73,15 @@ public class IntegracioResource extends BaseResource<Long> {
 	private String errorDescripcio;
 	private String excepcioMessage;
 	private String excepcioStacktrace;
-	
+
 	@Override
 	public Long getId() {
-		return this.timestamp;
+		return this.id;
 	}
 
 	@Override
 	public void setId(Long id) {
-		this.timestamp = id;
+		this.id = id;
 	}
 
     @Getter

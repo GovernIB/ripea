@@ -177,20 +177,11 @@ public class IntegracioController extends BaseUserController {
 		return DatatablesHelper.getDatatableResponse(request, aplicacioService.integracioFindDarreresAccionsByCodiPaginat(codi, params, filtre.asDto()));
 	}
 
-	@RequestMapping(value = "/{codi}/{timestamp}", method = RequestMethod.GET)
-	public String detall(HttpServletRequest request, @PathVariable String codi, @PathVariable long timestamp, Model model) {
-		List<IntegracioAccioDto> accions = aplicacioService.integracioFindDarreresAccionsByCodi(codi);
-		if (accions != null) {
-			IntegracioAccioDto found = null;
-			for (IntegracioAccioDto accio: accions) {
-				if (accio.getTimestamp() != null && accio.getTimestamp() == timestamp) {
-					found = accio;
-					break;
-				}
-			}
-			if (found != null) {
-				model.addAttribute("integracio", found);
-			}
+	@RequestMapping(value = "/{codi}/{id}", method = RequestMethod.GET)
+	public String detall(HttpServletRequest request, @PathVariable String codi, @PathVariable Long id, Model model) {
+		IntegracioAccioDto accio = aplicacioService.integracioFindOne(id);
+		if (accio != null) {
+			model.addAttribute("integracio", accio);
 		}
 		model.addAttribute("codiActual", codi);
 		return "integracioDetall";

@@ -1,10 +1,6 @@
 package es.caib.ripea.service.resourceservice;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,15 +8,14 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.entity.resourceentity.IntegracioResourceEntity;
+import es.caib.ripea.service.intf.dto.IntegracioCodiEnum;
 import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
@@ -28,20 +23,13 @@ import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
 import es.caib.ripea.service.helper.IntegracioHelper;
 import es.caib.ripea.service.helper.MessageHelper;
-import es.caib.ripea.service.helper.PaginacioHelper;
 import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
-import es.caib.ripea.service.intf.base.exception.ResourceNotFoundException;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.DiagnosticFiltreDto;
 import es.caib.ripea.service.intf.dto.GenericDto;
-import es.caib.ripea.service.intf.dto.IntegracioAccioDto;
-import es.caib.ripea.service.intf.dto.IntegracioAccioEstatEnumDto;
-import es.caib.ripea.service.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.ripea.service.intf.dto.IntegracioDto;
-import es.caib.ripea.service.intf.dto.IntegracioFiltreDto;
-import es.caib.ripea.service.intf.dto.PaginaDto;
 import es.caib.ripea.service.intf.model.IntegracioResource;
 import es.caib.ripea.service.intf.model.IntegracioResource.DiagnosticResetForm;
 import es.caib.ripea.service.intf.resourceservice.IntegracioResourceService;
@@ -56,14 +44,28 @@ public class IntegracioResourceServiceImpl extends BaseMutableResourceService<In
 
 	private final OrganGestorRepository organGestorRepository;
 	private final EntitatRepository entitatRepository;
-	
+
 	private final ExcepcioLogHelper excepcioLogHelper;
 	private final IntegracioHelper integracioHelper;
-	private final PaginacioHelper paginacioHelper;
 	private final ConfigHelper configHelper;
 	private final PluginHelper pluginHelper;
 	private final MessageHelper messageHelper;
-	
+
+	@Override
+	protected void afterConversion(IntegracioResourceEntity entity, IntegracioResource resource) {
+		resource.setParametres(entity.getParametres());
+	}
+
+	@Override
+	protected <P> Specification<P> namedQueryToSpecification(String namedQuery) {
+		try {
+			IntegracioCodiEnum codi = IntegracioCodiEnum.valueOf(namedQuery);
+			return (root, query, cb) -> cb.equal(root.get("codi"), codi);
+		} catch (IllegalArgumentException e) {
+			return null;
+		}
+	}
+
     @PostConstruct
     public void init() {
     	register(IntegracioResource.ACTION_INTEGRACIONS_LIST,	new IntegracionsListActionExecutor());
@@ -71,110 +73,7 @@ public class IntegracioResourceServiceImpl extends BaseMutableResourceService<In
     	register(IntegracioResource.ACTION_REINICIAR_PLUGIN,	new ReiniciarPluginActionExecutor());
     	register(IntegracioResource.FILTER_PLUGIN_CODE,	        new PluginFilterOnchangeLogicProcessor());
     }
-	
-	@Override
-	public Page<IntegracioResource> findPage(
-			String quickFilter,
-			String filter,
-			String[] namedQueries,
-			String[] perspectives,
-			Pageable pageable) {
-		
-		//1.- Convertir el filter en un IntegracioFiltreDto
-		IntegracioFiltreDto filtre = new IntegracioFiltreDto();
-		
-		Map<String, String> filtres = Utils.parseSpringFilter(filter);
-		if (filtres.containsKey("data_gte")) {
-			LocalDateTime localDateTime = LocalDateTime.parse(filtres.get("data_gte"));
-			Date dataInici = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
-			filtre.setDataInici(dataInici);
-		}
-		if (filtres.containsKey("data_lte")) {
-			LocalDateTime localDateTime = LocalDateTime.parse(filtres.get("data_lte"));
-			Date dataFi = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
-			filtre.setDataFi(dataFi);
-		}
-		if (filtres.containsKey("tipus")) {
-			filtre.setTipus(IntegracioAccioTipusEnumDto.valueOf(filtres.get("tipus")));
-		}
-		if (filtres.containsKey("estat")) {
-			filtre.setEstat(IntegracioAccioEstatEnumDto.valueOf(filtres.get("estat")));
-		}
-		if (filtres.containsKey("descripcio_like")) {
-			//Esto elimina los % del String del inicio y final.
-			String descReplace = filtres.get("descripcio_like").replaceAll("^%|%$", "");
-			filtre.setDescripcio(descReplace);
-		}
-		if (filtres.containsKey("entitat.id")) {
-			String entitatId = filtres.get("entitat.id");
-			if (Utils.hasValue(entitatId)) {
-				EntitatEntity ee = entitatRepository.findById(Long.parseLong(entitatId)).orElse(null);
-				filtre.setEntitatCodi(ee!=null?ee.getCodi():null);
-			}
-		}
 
-		//2.- Fer la cerca
-		List<IntegracioAccioDto> accions = integracioHelper.findAccionsByIntegracioCodi(namedQueries[0], filtre);
-		
-		if (accions == null || accions.isEmpty()) {
-			return new PageImpl<>(List.of(), pageable, 0);
-		}
-
-		//3. Paginar
-		if (pageable.isPaged()) {
-			List<List<IntegracioAccioDto>> pagines = paginacioHelper.getPages(accions, pageable.getPageSize());
-			PaginaDto<IntegracioAccioDto> pagina = paginacioHelper.toPaginaDto(pagines.get(pageable.getPageNumber()), null);
-			pagina.setContingut(pagines.get(pageable.getPageNumber()));
-			PaginaDto<IntegracioAccioDto> aux = paginacioHelper.prepararPagina(pagina, pagines, accions);
-			
-			List<IntegracioResource> resultatResource = new ArrayList<IntegracioResource>();
-			if (aux!=null && aux.getContingut()!=null) {
-				for (IntegracioAccioDto accioDto: aux.getContingut()) {
-					resultatResource.add(objectMappingHelper.newInstanceMap(accioDto, IntegracioResource.class));
-				}
-			}
-			
-			//4.- Convertir la paginacio dto a paginació spring
-		    return new PageImpl<>(resultatResource, pageable, aux.getElementsTotal());
-
-		} else {
-			
-			List<IntegracioResource> resultatResource = new ArrayList<IntegracioResource>();
-			if (accions!=null) {
-				for (IntegracioAccioDto accioDto: accions) {
-					resultatResource.add(objectMappingHelper.newInstanceMap(accioDto, IntegracioResource.class));
-				}
-			}
-			
-			return new PageImpl<>(resultatResource, pageable, accions.size());
-		}
-	}
-    
-	@Override
-	public IntegracioResource getOne(
-			Long id,
-			String[] perspectives) throws ResourceNotFoundException {
-		
-		List<IntegracioAccioDto> accions = integracioHelper.findAccionsByIntegracioCodi(perspectives[0], null);
-		if (accions != null) {
-			for (IntegracioAccioDto accio: accions) {
-				if (accio.getTimestamp() != null && id.equals(accio.getTimestamp())) {
-                    IntegracioResource integracioResource = objectMappingHelper.newInstanceMap(accio, IntegracioResource.class);
-                    integracioResource.setParametres(accio.getParametres());
-                    return integracioResource;
-//					return objectMappingHelper.newInstanceMap(accio, IntegracioResource.class);
-				}
-			}
-		}
-		
-		return null;
-	}
-    
-	@Override
-	public boolean isEntityRepositoryOptional() {
-		return true;
-	}
-	
 	private class IntegracionsListActionExecutor implements ActionExecutor<IntegracioResourceEntity, Serializable, IntegracioDto[]> {
 		@Override
 		public void onChange(Serializable id, Serializable previous, String fieldName, Object fieldValue,
@@ -184,20 +83,20 @@ public class IntegracioResourceServiceImpl extends BaseMutableResourceService<In
 			return integracioHelper.findAll().toArray(new IntegracioDto[0]);
 		}
 	}
-	
+
 	private void initDiagnosticResetForm(DiagnosticResetForm target) {
-		
+
         String entitatActualCodi = configHelper.getEntitatActualCodi();
         String organActualCodi	 = configHelper.getOrganActualCodi();
-		
+
         if (Utils.hasValue(entitatActualCodi)) {
-        	
+
         	EntitatEntity ee = entitatRepository.findByCodi(entitatActualCodi);
-        	
+
         	if (ee!=null) {
-        	
+
 	       		target.setEntitat(ResourceReference.toResourceReference(ee.getId(), ee.getNom()));
-	        	
+
 	        	if (Utils.hasValue(entitatActualCodi)) {
 	            	OrganGestorEntity oge = organGestorRepository.findByEntitatAndCodi(ee, organActualCodi);
 	            	if (oge!=null) {
@@ -205,7 +104,7 @@ public class IntegracioResourceServiceImpl extends BaseMutableResourceService<In
 	            	}
 	        	}
         	}
-        	
+
         } else {
         	List<EntitatEntity> entitats = entitatRepository.findBy(Sort.by("id"));
         	if (entitats!=null && entitats.size()>0) {
@@ -214,9 +113,9 @@ public class IntegracioResourceServiceImpl extends BaseMutableResourceService<In
         		target.setEntitat(null);
         	}
         	target.setOrgan(null);
-        }		
+        }
 	}
-	
+
 	private class DiagnosticPluginActionExecutor implements ActionExecutor<IntegracioResourceEntity, IntegracioResource.DiagnosticResetForm, Serializable> {
 		@Override
 		public void onChange(Serializable id, DiagnosticResetForm previous, String fieldName, Object fieldValue,
@@ -237,10 +136,10 @@ public class IntegracioResourceServiceImpl extends BaseMutableResourceService<In
 				if (params.getOrgan()!=null) {
 					oge = organGestorRepository.findById(params.getOrgan().getId()).get();
 				}
-				
+
 				df.setEntitatCodi((ee!=null)?ee.getCodi():null);
 				df.setOrganCodi((oge!=null)?oge.getCodi():null);
-				
+
 				GenericDto resultat = pluginHelper.integracioDiagnostic(params.getCodiIntegracio(), df);
 				String missatge = messageHelper.getMessage(resultat.getCodi(), resultat.getArguments());
 				String nivell = "OK";
@@ -251,7 +150,6 @@ public class IntegracioResourceServiceImpl extends BaseMutableResourceService<In
 				}
                 Map<String, String> result = new HashMap<String, String>();
                 result.put("nivell", nivell);
-//                result.put("missatge", missatge);
                 result.put("missatge", missatge.length() > 120 ?missatge.substring(0, 120)+"..." :missatge);
                 if (resultat.getExcepcio() != null) {
                     result.put("traza", ExceptionUtils.getStackTrace(resultat.getExcepcio()));
@@ -261,9 +159,9 @@ public class IntegracioResourceServiceImpl extends BaseMutableResourceService<In
 				excepcioLogHelper.addExcepcio("/integracio/"+entity.getId()+"/DiagnosticPluginActionExecutor", e);
 				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, messageHelper.getMessage("message.common.action.error")+": "+e.getMessage());
 			}
-		}		
+		}
 	}
-	
+
 	private class ReiniciarPluginActionExecutor implements ActionExecutor<IntegracioResourceEntity, IntegracioResource.DiagnosticResetForm, Serializable> {
 		@Override
 		public void onChange(Serializable id, DiagnosticResetForm previous, String fieldName, Object fieldValue,
@@ -274,9 +172,7 @@ public class IntegracioResourceServiceImpl extends BaseMutableResourceService<In
 		}
 		@Override
 		public Serializable exec(String code, IntegracioResourceEntity entity, DiagnosticResetForm params) throws ActionExecutionException {
-			
 			try {
-			
 				if (Utils.hasValue(params.getCodiIntegracio())) {
 					//En el mateix ordre que apareixen les pipelles en pantalla:
 					switch (params.getCodiIntegracio()) {
@@ -313,7 +209,7 @@ public class IntegracioResourceServiceImpl extends BaseMutableResourceService<In
 				excepcioLogHelper.addExcepcio("/integracio/"+entity.getId()+"/ReiniciarPluginActionExecutor", e);
 				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, messageHelper.getMessage("message.common.action.error")+": "+e.getMessage());
 			}
-		}		
+		}
 	}
 
     private class PluginFilterOnchangeLogicProcessor implements FilterProcessor<IntegracioResource.DiagnosticResetForm> {

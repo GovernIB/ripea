@@ -19,9 +19,9 @@ const IntegracioDetail = ({entity, fields}:any) => {
             <FieldData field={'estat'} renderCell={(formattedValue:string) =>
                 <StyledEstat entity={entity}>{formattedValue}</StyledEstat>}/>
             <FieldData field={'tempsResposta'} renderCell={(formattedValue:string) => `${formattedValue} ms`}/>
-            <FieldData field={'parametres'}>
+            <FieldData field={'parametres'} isObject>
                 <Load value={entity?.parametres} noEffect>
-                    {Object.entries(entity?.parametres)?.map?.(([key, value]) =>
+                    {Object.entries(entity?.parametres ?? {})?.map?.(([key, value]) =>
                         <ContenidoData title={key}>{value}</ContenidoData>
                     )}
                 </Load>
@@ -52,9 +52,9 @@ export const useIntegracioDetail = () => {
     const [open, setOpen] = useState(false);
     const [entity, setEntity] = useState<any>();
 
-    const handleOpen = (id:any, row:any) => {
+    const handleOpen = (id:any, row?:any) => {
         if(apiIsReady){
-            apiGetOne(id, {perspectives: [row?.integracio?.codi]})
+            apiGetOne(id)
                 .then((app) => setEntity(app))
                 .catch((error) => {
                     handleClose()

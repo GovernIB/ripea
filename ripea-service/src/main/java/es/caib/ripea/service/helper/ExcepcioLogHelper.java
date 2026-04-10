@@ -8,6 +8,8 @@ import java.util.List;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.persistence.entity.resourceentity.ExcepcioLogResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.ExcepcioLogResourceRepository;
@@ -40,11 +42,13 @@ public class ExcepcioLogHelper {
 		return excepcioLogResourceRepository.deleteByDataBefore(cal.getTime());
 	}
 
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void addExcepcio(String uri, Throwable exception) {
 		if (exception == null) return;
 		excepcioLogResourceRepository.save(toEntity(uri, exception, null, null));
 	}
 
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void addExcepcio(String uri, Throwable exception, String param1, String param2) {
 		if (exception == null) return;
 		excepcioLogResourceRepository.save(toEntity(uri, exception, param1, param2));

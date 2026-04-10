@@ -417,13 +417,18 @@ public class AplicacioServiceImpl implements AplicacioService {
 
 	@Override
 	public List<IntegracioAccioDto> getLastIntegracions(IntegracioEnumDto codiIntegracio, int numElements) {
-		List<IntegracioAccioDto> listaAccions = integracioHelper.getLlistaAccions(codiIntegracio.name());
-		if (listaAccions!=null) {
-			int toIndex = Math.min(listaAccions.size(), numElements);
-			return listaAccions.subList(0, toIndex);
+		List<IntegracioAccioDto> listaAccions = integracioHelper.findAccionsByIntegracioCodi(codiIntegracio.name(), null);
+		if (listaAccions != null) {
+			return listaAccions.subList(0, Math.min(listaAccions.size(), numElements));
 		} else {
 			return new ArrayList<IntegracioAccioDto>();
 		}
+	}
+
+	@Override
+	public IntegracioAccioDto integracioFindOne(Long id) {
+		logger.debug("Consultant el detall d'una acció d'integració (id=" + id + ")");
+		return integracioHelper.findOne(id);
 	}
 	
 	@Override

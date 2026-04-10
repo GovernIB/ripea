@@ -110,6 +110,15 @@ public interface AplicacioService {
 	@PreAuthorize("hasRole('IPA_SUPER')")
 	PaginaDto<IntegracioAccioDto> integracioFindDarreresAccionsByCodiPaginat(String codi, PaginacioParamsDto params, IntegracioFiltreDto filtre);
 
+	/**
+	 * Obté el detall d'una acció d'integració donat el seu identificador.
+	 *
+	 * @param id Identificador de l'acció.
+	 * @return L'acció d'integració, o null si no existeix.
+	 */
+	@PreAuthorize("hasRole('IPA_SUPER')")
+	IntegracioAccioDto integracioFindOne(Long id);
+
 	public List<IntegracioAccioDto> getLastIntegracions(IntegracioEnumDto codiIntegracio, int numElements);
 	
 	/**
