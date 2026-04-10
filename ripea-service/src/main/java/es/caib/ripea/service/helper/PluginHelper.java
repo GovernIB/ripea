@@ -6442,7 +6442,7 @@ public class PluginHelper {
                 .dataInici(DateUtil.toOffsetDateTime(Calendar.getInstance().getTime()))
                 .entornCodi(configHelper.getConfig(PropertyConfig.COMANDA_PLUGIN_ENTORN))
                 .identificador(expedient.getId()+"")
-                .nom(expedient.getCodi()+"/"+expedient.getNumero()+"/"+expedient.getAny())
+                .nom(expedient.getNumero())
                 .descripcio(descripcio)
                 .tipus(AvisTipus.ALERTA)
                 .redireccio(new URL(redireccio))

@@ -226,16 +226,18 @@ public class AplicacioServiceImpl implements AplicacioService {
 	public void processarAutenticacioUsuari(boolean comprovaAmbUsuariPlugin) {
 		
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		logger.debug("Processant autenticació (usuariCodi=" + auth.getName() + ")");
-		UsuariEntity usuari = usuariRepository.findById(auth.getName()).orElse(null);
+		String codiUsuariLowerCase = auth.getName().toLowerCase();
+		
+		logger.debug("Processant autenticació (usuariCodi=" + codiUsuariLowerCase + ")");
+		UsuariEntity usuari = usuariRepository.findById(codiUsuariLowerCase).orElse(null);
 
-		logger.debug("Consultant plugin de dades d'usuari (usuariCodi=" + auth.getName() + ")");		
-		DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(auth.getName());
+		logger.debug("Consultant plugin de dades d'usuari (usuariCodi=" + codiUsuariLowerCase + ")");		
+		DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(codiUsuariLowerCase);
 		
 		//Per si de cas s'ha quedat cacheat el null https://github.com/GovernIB/ripea/issues/1700
 		if (dadesUsuari==null) {
-			cacheHelper.evictUsuariAmbCodi(auth.getName());
-			dadesUsuari = cacheHelper.findUsuariAmbCodi(auth.getName());
+			cacheHelper.evictUsuariAmbCodi(codiUsuariLowerCase);
+			dadesUsuari = cacheHelper.findUsuariAmbCodi(codiUsuariLowerCase);
 		}
 		
 		if (dadesUsuari != null) {
@@ -259,7 +261,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 				logger.debug("Dades usuari getEmail: "+dadesUsuari.getEmail());
 				usuari = usuariRepository.save(
 						UsuariEntity.getBuilder(
-								dadesUsuari.getCodi(),
+								codiUsuariLowerCase,
 								dadesUsuari.getNomSencer(),
 								dadesUsuari.getNif(),
 								dadesUsuari.getEmail(),
@@ -272,7 +274,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 					logger.debug("auth.getName(): "+auth.getName());
 					usuari = usuariRepository.save(
 							UsuariEntity.getBuilder(
-									auth.getName(),
+									codiUsuariLowerCase,
 									auth.getName(),
 									null,
 									null,
