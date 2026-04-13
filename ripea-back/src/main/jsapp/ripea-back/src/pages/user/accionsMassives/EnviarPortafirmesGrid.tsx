@@ -63,7 +63,8 @@ export const EnviarPortafirmesFilter = (props: any) => {
     </StyledMuiFilter>
 }
 
-const namedQueries: string[] = ['MASSIU_PORTAFIRMES', 'EN_PROCES_PORTAFIB']
+const namedQueries: string[] = ['MASSIU_PORTAFIRMES']
+const perspectives: string[] = ['EN_PROCES_PORTAFIB']
 const sortModel: any = [{field: 'createdDate', sort: 'desc'}]
 const columns = [
     {
@@ -122,7 +123,7 @@ const EnviarPortafirmesGrid = () => {
             icon: "schedule",
             showInMenu: false,
             onClick: (row:any) => handleContingutOpen(row?.execucioMassivaPortafibId),
-            hidden: (row:any) => !row?.execucioMassivaPortafibId && row?.id
+            hidden: (row:any) => !row?.execucioMassivaPortafibId
         },
     ]
     const massiveActions = [
@@ -147,6 +148,7 @@ const EnviarPortafirmesGrid = () => {
                 resourceName={"documentResource"}
                 columns={columns}
                 filter={springFilter}
+                perspectives={perspectives}
                 namedQueries={namedQueries}
                 sortModel={sortModel}
                 rowAdditionalActions={actions}
