@@ -1865,8 +1865,9 @@ const translationEs = {
                 massives: {
                     label: "Consultar acciones masivas",
                     title: "Ejecuciones masivas de {{name}}",
-                    detail: "Detalle de la acción masiva",
+                    detail: "Detalle de la acción masiva: {{tipus}}",
                     ok: "El documento se ha descargado correctamente",
+                    pending: "Este elemento se está procesando actualmente",
                 },
             },
             perfil: {

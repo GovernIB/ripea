@@ -127,6 +127,7 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
                 actions={toolbarMassiveActions ?? []}
                 disabledDefSelector={disabledMassiveDefSelector}
                 hiddenDefSelector={hiddenMassiveDefSelector}
+                isRowSelectable={props?.isRowSelectable}
             />,
             hidden: !toolbarMassiveActions || readOnly,
         },

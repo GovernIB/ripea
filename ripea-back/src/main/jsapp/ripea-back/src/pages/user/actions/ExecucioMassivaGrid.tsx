@@ -1,5 +1,5 @@
 import {useTranslation} from "react-i18next";
-import {useEffect, useRef, useState} from "react";
+import {useEffect, useMemo, useRef, useState} from "react";
 import {MuiDialog, useBaseAppContext, useMuiDataGridApiRef, useResourceApiService} from "reactlib";
 import {Chip, Checkbox, FormControlLabel, LinearProgress, Box, Icon, Tooltip} from "@mui/material";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
@@ -282,12 +282,19 @@ const estatColor :any = {
     'ESTAT_CANCELAT': 'grey',
 }
 
-const useExecucioMassivaContingut = () => {
+export const useExecucioMassivaContingut = () => {
     const {t} = useTranslation();
     const [open, setOpen] = useState(false);
-    const [entityId, setEntityId] = useState<any>();
+    const [entity, setEntity] = useState<any>();
 
     const gridApiRef = useMuiDataGridApiRef();
+
+    const {
+        isReady: apiIsReady,
+        getOne: apiGetOne,
+        currentFields: fields,
+    } = useResourceApiService('execucioMassivaResource');
+    const {temporalMessageShow} = useBaseAppContext();
 
     const intervalRef = useRef<any>();
 
@@ -301,24 +308,34 @@ const useExecucioMassivaContingut = () => {
         }
     };
 
-    const handleOpen = (id: any, row: any) => {
-        console.log(id, row)
-        setEntityId(id)
+    const handleOpen = (id: any) => {
+        if(apiIsReady && id){
+            apiGetOne(id)
+                .then((app) => setEntity(app))
+                .catch((error) => {
+                    handleClose()
+                    temporalMessageShow(null, error?.message, 'error');
+                });
+        }
         setOpen(true);
     }
 
     const handleClose = (reason?: string) => {
         if(reason !== 'backdropClick') {
-            setEntityId(undefined);
+            setEntity(undefined);
             setOpen(false);
         }
     };
+
+    const tipus = useMemo(() =>
+        fields?.find((item: any) => item?.name === "tipus")?.options[entity?.tipus] ?? ''
+    , [fields, entity]);
 
     const dialog =
         <MuiDialog
             open={open}
             closeCallback={handleClose}
-            title={t('page.user.action.massives.detail')}
+            title={t('page.user.action.massives.detail', {tipus})}
             componentProps={{fullWidth: true, maxWidth: 'lg'}}
             buttons={[
                 {
@@ -333,10 +350,10 @@ const useExecucioMassivaContingut = () => {
                 }
             }}
         >
-            <Load value={entityId}>
+            <Load value={entity}>
             <StyledMuiGrid
                 resourceName={'execucioMassivaContingutResource'}
-                filter={builder.eq('execucioMassiva.id', `'${entityId}'`)}
+                filter={builder.eq('execucioMassiva.id', `'${entity?.id}'`)}
                 apiRef={gridApiRef}
                 sortModel={sortModelContingut}
                 columns={columnsContingut}

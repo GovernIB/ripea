@@ -1865,8 +1865,9 @@ const translationCa = {
                 massives: {
                     label: "Consultar accions massives",
                     title: "Execucions massives de {{name}}",
-                    detail: "Detall de l'acció massiva",
+                    detail: "Detall de l'acció massiva: {{tipus}}",
                     ok: "El document s'ha baixat correctament",
+                    pending: "Aquest element s'està processant actualment",
                 },
             },
             perfil: {

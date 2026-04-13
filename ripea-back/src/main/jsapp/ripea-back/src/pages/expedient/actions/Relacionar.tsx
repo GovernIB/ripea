@@ -92,7 +92,7 @@ const RelacionarForm= () => {
     const {data, apiRef} = useFormContext();
     const selectionModel = useMemo(()=>{
         return data?.ids
-    }, [])
+    }, [data])
 
     const [springFilter, setSpringFilter] = useState<string>();
     const [selectedRows, setSelectedRows] = useState<any[]>(selectionModel || []);

@@ -12,6 +12,7 @@ import * as builder from "../../../util/springFilterUtils.ts";
 import {useSession} from "../../../components/SessionStorageContext.tsx";
 import {useUserSession} from "../../../components/Session.tsx";
 import {GridSortDirection} from "@mui/x-data-grid-pro";
+import {useExecucioMassivaContingut} from "../actions/ExecucioMassivaGrid.tsx";
 
 const EnviarPortafirmesFilterForm = () => {
     const {data} = useFormContext();
@@ -62,7 +63,7 @@ export const EnviarPortafirmesFilter = (props: any) => {
     </StyledMuiFilter>
 }
 
-const namedQueries: string[] = ['MASSIU_PORTAFIRMES']
+const namedQueries: string[] = ['MASSIU_PORTAFIRMES', 'EN_PROCES_PORTAFIB']
 const sortModel: any = [{field: 'createdDate', sort: 'desc'}]
 const columns = [
     {
@@ -106,6 +107,7 @@ const EnviarPortafirmesGrid = () => {
 
     const {handleShow: handleEviarPortafirmesShow, content: contentEviarPortafirmes} = useEnviarPortafirmes(refresh);
     const {handleShow: handleEviarMassiveShow, content: contentEviarMassive} = useEnviarPortafirmesMassive(refresh);
+    const {handleOpen: handleContingutOpen, dialog: dialogContingut} = useExecucioMassivaContingut();
 
     const actions = [
         {
@@ -113,6 +115,15 @@ const EnviarPortafirmesGrid = () => {
             icon: "mail",
             showInMenu: false,
             onClick: handleEviarPortafirmesShow,
+            hidden: (row:any) => row?.execucioMassivaPortafibId || row?.id == 18541
+        },
+        {
+            label: t('page.user.action.massives.pending'),
+            icon: "schedule",
+            showInMenu: false,
+            // onClick: (row:any) => handleContingutOpen(row?.execucioMassivaPortafibId),
+            onClick: (row:any) => handleContingutOpen(21749),
+            hidden: (row:any) => !row?.execucioMassivaPortafibId && row?.id != 18541
         },
     ]
     const massiveActions = [
@@ -141,13 +152,16 @@ const EnviarPortafirmesGrid = () => {
                 sortModel={sortModel}
                 rowAdditionalActions={actions}
                 toolbarMassiveActions={massiveActions}
-                isRowSelectable={() => haveRequirements}
+                isRowSelectable={(params:any) => !params?.row?.execucioMassivaPortafibId
+                    && params?.row?.id != 18541
+                    && haveRequirements}
                 disabledMassiveDefSelector={!haveRequirements}
                 toolbarHideCreate
             />
         </CardPage>
         {contentEviarPortafirmes}
         {contentEviarMassive}
+        {dialogContingut}
     </GridPage>
 }
 export default EnviarPortafirmesGrid;
