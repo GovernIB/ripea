@@ -1,6 +1,6 @@
-import {useRef} from "react";
+import {useMemo, useRef} from "react";
 import {Grid2 as Grid, Box} from "@mui/material";
-import {MuiFormDialog, useBaseAppContext, MuiFormDialogApi, useFormContext} from "reactlib";
+import {MuiFormDialog, useBaseAppContext, MuiFormDialogApi, useFormContext, DialogButton} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {CardData} from "../../../components/CardData.tsx";
 import GridFormField from "../../../components/GridFormField.tsx";
@@ -8,8 +8,9 @@ import {useUserSession} from "../../../components/Session.tsx";
 import * as builder from '../../../util/springFilterUtils';
 import {FieldData, MuiDetail} from "../../../components/MuiDetail.tsx";
 import {StyledLabel} from "../../../components/StyledLabel.tsx";
+import {TemaAplicacio, useThemeUserContext} from "../../../components/ThemeUserProvider.tsx";
 
-const PerfilFrom = () =>{
+const PerfilFrom = ({setTheme}: { setTheme: (value:TemaAplicacio) => void }) =>{
     const {data, fields} = useFormContext();
     const { t } = useTranslation();
     const { value: user } = useUserSession();
@@ -44,7 +45,10 @@ const PerfilFrom = () =>{
             <GridFormField name="procediment" filter={builder.and(
                 builder.eq('entitat.id', data?.entitatPerDefecte?.id)
             )}/>
-            <GridFormField name="modeFosc"/>
+            <GridFormField name="modeFosc"
+                           onChange={(value)=>{
+                               setTheme(value ?TemaAplicacio.OBSCUR :TemaAplicacio.CLAR)
+                           }}/>
         </CardData>
 
         <CardData title={t('page.user.perfil.column')}>
@@ -69,9 +73,10 @@ const PerfilFrom = () =>{
 const usePerfil = () => {
     const { t } = useTranslation();
     const { value: user, refresh } = useUserSession();
+    const {setValue: setTheme, removeValue: removeTheme} = useThemeUserContext()
 
     const formApiRef = useRef<MuiFormDialogApi>();
-    const {temporalMessageShow} = useBaseAppContext();
+    const {temporalMessageShow, t: tBase } = useBaseAppContext();
 
     const handleOpen = () => {
         formApiRef.current?.show(user?.codi)
@@ -80,19 +85,41 @@ const usePerfil = () => {
                 temporalMessageShow(null, t('page.user.perfil.ok', {nom: user.nom}), 'success');
             })
             .catch((error) => {
-                error?.message && temporalMessageShow(null, error?.message, 'error');
+                if (error?.message)
+                    temporalMessageShow(null, error?.message, 'error');
             });
     }
+
+    const dialogButtons = useMemo<DialogButton[]>(() => [
+        {
+            value: false,
+            text: tBase('buttons.form.cancel'),
+            componentProps: {
+                variant: 'outlined',
+                onClick: () => {
+                    removeTheme();
+                    formApiRef.current?.close();
+                },
+            },
+        },
+        {
+            value: true,
+            text: tBase('buttons.form.save'),
+            icon: 'save',
+            componentProps: { variant: 'contained' },
+        },
+    ], [formApiRef, removeTheme, tBase]);
 
     const dialog =
         <MuiFormDialog
             resourceName={'usuariResource'}
             title={t('page.user.perfil.title')}
             onClose={(reason?: string) => reason !== 'backdropClick'}
+            dialogButtons={dialogButtons}
             apiRef={formApiRef}
             dialogComponentProps={{ fullWidth: true, maxWidth: 'lg'}}
         >
-            <PerfilFrom/>
+            <PerfilFrom setTheme={setTheme}/>
         </MuiFormDialog>
 
     return {
