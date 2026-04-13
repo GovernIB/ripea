@@ -115,15 +115,14 @@ const EnviarPortafirmesGrid = () => {
             icon: "mail",
             showInMenu: false,
             onClick: handleEviarPortafirmesShow,
-            hidden: (row:any) => row?.execucioMassivaPortafibId || row?.id == 18541
+            hidden: (row:any) => row?.execucioMassivaPortafibId
         },
         {
             label: t('page.user.action.massives.pending'),
             icon: "schedule",
             showInMenu: false,
-            // onClick: (row:any) => handleContingutOpen(row?.execucioMassivaPortafibId),
-            onClick: (row:any) => handleContingutOpen(21749),
-            hidden: (row:any) => !row?.execucioMassivaPortafibId && row?.id != 18541
+            onClick: (row:any) => handleContingutOpen(row?.execucioMassivaPortafibId),
+            hidden: (row:any) => !row?.execucioMassivaPortafibId && row?.id
         },
     ]
     const massiveActions = [
@@ -153,7 +152,6 @@ const EnviarPortafirmesGrid = () => {
                 rowAdditionalActions={actions}
                 toolbarMassiveActions={massiveActions}
                 isRowSelectable={(params:any) => !params?.row?.execucioMassivaPortafibId
-                    && params?.row?.id != 18541
                     && haveRequirements}
                 disabledMassiveDefSelector={!haveRequirements}
                 toolbarHideCreate
