@@ -52,6 +52,7 @@ import es.caib.ripea.persistence.entity.resourcerepository.MetaDocumentResourceR
 import es.caib.ripea.persistence.entity.resourcerepository.RegistreAnnexResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.UsuariResourceRepository;
 import es.caib.ripea.persistence.repository.ContingutMovimentRepository;
+import es.caib.ripea.persistence.repository.ExecucioMassivaContingutRepository;
 import es.caib.ripea.persistence.repository.ContingutRepository;
 import es.caib.ripea.persistence.repository.DocumentNotificacioRepository;
 import es.caib.ripea.persistence.repository.DocumentPortafirmesRepository;
@@ -186,6 +187,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     private final DocumentRepository documentRepository;
     private final EntitatRepository entitatRepository;
     private final InteressatGrupResourceRepository interessatGrupResourceRepository;
+    private final ExecucioMassivaContingutRepository execucioMassivaContingutRepository;
 
     @PostConstruct
     public void init() {
@@ -195,6 +197,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         register(DocumentResource.PERSPECTIVE_PATH_CODE, new PathPerspectiveApplicator());
         register(DocumentResource.PERSPECTIVE_FIRMES_CODE, new FirmesPerspectiveApplicator());
         register(DocumentResource.PERSPECTIVE_PROCEDIMENT_CODE, new ProcedimentPerspectiveApplicator());
+        register(DocumentResource.PERSPECTIVE_EN_PROCES_PORTAFIB_CODE, new EnProcesPortafibPerspectiveApplicator());
         register(DocumentResource.Fields.adjunt, new AdjuntFieldDownloader());
         register(DocumentResource.Fields.firmaAdjunt, new FirmaFieldDownloader());
         register(DocumentResource.Fields.imprimible, new ImprimibleFieldDownloader());
@@ -587,6 +590,18 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 					entity.getExpedient().getMetaExpedient().getId(),
 					entity.getExpedient().getMetaExpedient().getNom()));
 		}
+    }
+
+    private class EnProcesPortafibPerspectiveApplicator implements PerspectiveApplicator<DocumentResourceEntity, DocumentResource> {
+        @Override
+        public void applySingle(String code, DocumentResourceEntity entity, DocumentResource resource) throws PerspectiveApplicationException {
+            execucioMassivaContingutRepository
+                    .findFirstByElementIdAndElementTipusAndExecucioMassivaTipusAndExecucioMassivaDataFiNull(
+                            entity.getId(),
+                            ElementTipusEnumDto.DOCUMENT,
+                            ExecucioMassivaTipusDto.PORTASIGNATURES)
+                    .ifPresent(contingut -> resource.setExecucioMassivaPortafibId(contingut.getExecucioMassiva().getId()));
+        }
     }
     
     private class FirmesPerspectiveApplicator implements PerspectiveApplicator<DocumentResourceEntity, DocumentResource> {
