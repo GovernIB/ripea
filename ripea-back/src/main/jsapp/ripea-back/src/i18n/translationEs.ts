@@ -1439,6 +1439,11 @@ const translationEs = {
                 export: {
                     ok: "Procedimiento exportado correctamente",
                 },
+                clonar: {
+                    label: "Clonar",
+                    title: "Clonar procedimiento",
+                    ok: "Nuevo procedimiento clonado: {{codi}}",
+                },
                 canviPendent: {
                     label: "Marcar como pendiente de revisión",
                     ok: "Procedimiento marcado como pendiente de revisión",

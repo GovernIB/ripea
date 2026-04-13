@@ -1439,6 +1439,11 @@ const translationCa = {
                 export: {
                     ok: "Procediment exportat correctament",
                 },
+                clonar: {
+                    label: "Clonar",
+                    title: "Clonar procediment",
+                    ok: "Nou procediment clonat: {{codi}}",
+                },
                 canviPendent: {
                     label: "Marcar com a pendent de revisió",
                     ok: "Procediment marcat com a pendent de revisió",

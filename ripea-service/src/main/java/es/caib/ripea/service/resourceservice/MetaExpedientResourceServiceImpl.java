@@ -160,7 +160,8 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
     	
     	register(MetaExpedientResource.ACTION_IMPORT_ROLSAC_CODE, 	new ImportarRolsacActionExecutor());
     	register(MetaExpedientResource.ACTION_IMPORT_FITXER_CODE,	new ImportarFitxerActionExecutor());
-    	
+    	register(MetaExpedientResource.ACTION_CLONAR_CODE,			new ClonarActionExecutor());
+
     	register(MetaExpedientResource.REPORT_EXPORT_JSON,			new ExportJsonGenerator());
     	
     	register(MetaExpedientResource.Fields.classificacio,		new OnchangeLogicProcessor());
@@ -1487,6 +1488,47 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 		}    	
     }
     
+    private class ClonarActionExecutor implements ActionExecutor<MetaExpedientResourceEntity, MetaExpedientResource.ClonarFormAction, Serializable> {
+		@Override
+		public void onChange(Serializable id, MetaExpedientResource.ClonarFormAction previous, String fieldName, Object fieldValue,
+				Map<String, AnswerValue> answers, String[] previousFieldNames, MetaExpedientResource.ClonarFormAction target) {
+			if (fieldName == null) {
+				// Càrrega inicial: pre-calcular el codi suggerit
+				try {
+					String entitatActualCodi = configHelper.getEntitatActualCodi();
+					EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true, false);
+					String codiSuggerit = metaExpedientHelper.calcularCodiClon(entitat.getId(), (Long) id);
+					target.setCodi(codiSuggerit);
+				} catch (Exception e) {
+					excepcioLogHelper.addExcepcio("/metaExpedient/"+id+"/ClonarActionExecutor.onChange", e);
+				}
+			}
+		}
+
+		@Override
+		public Serializable exec(String code, MetaExpedientResourceEntity entity, MetaExpedientResource.ClonarFormAction params) throws ActionExecutionException {
+			try {
+				String entitatActualCodi = configHelper.getEntitatActualCodi();
+				EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true, false);
+				String organActualCodi = configHelper.getOrganActualCodi();
+				OrganGestorEntity ogEntity = organGestorRepository.findByEntitatIdAndCodi(entitat.getId(), organActualCodi);
+
+				metaExpedientHelper.clonar(
+						entitat.getId(),
+						entity.getId(),
+						ogEntity != null ? ogEntity.getId() : null,
+						configHelper.getRolActual(),
+						params.getCodi(),
+						params.getClassificacio());
+
+				return "{\"codi\": \"" + params.getCodi() + "\"}";
+			} catch (Exception e) {
+				excepcioLogHelper.addExcepcio("/metaExpedient/"+entity.getId()+"/ClonarActionExecutor", e);
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, messageHelper.getMessage("message.common.action.error")+": "+e.getMessage());
+			}
+		}
+    }
+
     private class ExportJsonGenerator implements ReportGenerator<MetaExpedientResourceEntity, Serializable, Serializable> {
 
     	@Override

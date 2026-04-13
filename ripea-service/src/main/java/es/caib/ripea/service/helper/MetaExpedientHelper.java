@@ -186,78 +186,117 @@ public class MetaExpedientHelper {
     public String export(Long entitatId, Long metaExpedientId, Long organId) {
 
     	try {
-
 	    	EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
 	    	MetaExpedientEntity metaExpedientEntity = entityComprovarHelper.comprovarAccesMetaExpedient(entitat, metaExpedientId, organId, true);
-			MetaExpedientExportDto metaExpedientDto = conversioTipusHelper.convertir(metaExpedientEntity, MetaExpedientExportDto.class);
-			
+
+	    	MetaExpedientExportDto metaExpedientDto = exportToDto(entitat, metaExpedientEntity);
+
 			ObjectMapper objectMapper = new ObjectMapper();
-			
-			//En el conversor tipus helper no inclou les validacions de les tasques
-			if (metaExpedientEntity.getTasques() != null) {
-				for (MetaExpedientTascaEntity tascaEntity : metaExpedientEntity.getTasques()) {
-					if (tascaEntity.getValidacions()!=null && tascaEntity.getValidacions().size()>0) {
-						for (MetaExpedientTascaDto tascaDto : metaExpedientDto.getTasques()) {
-							if (tascaEntity.getId().equals(tascaDto.getId())) {
-								tascaDto.setValidacions(conversioTipusHelper.convertirList(
-										tascaEntity.getValidacions(),
-										MetaExpedientTascaValidacioDto.class));
-							}
-						}
-					}
-				}
-			}
-			
-			//Carpetes per defecte (segons property)
-			List<MetaExpedientCarpetaDto> carpetesProcediment = metaExpedientCarpetaHelper.findCarpetesMetaExpedient(metaExpedientEntity);
-			metaExpedientDto.setCarpetes(conversioTipusHelper.convertirList(carpetesProcediment, MetaExpedientCarpetaMinDto.class));
-			
-			//Meta-dades amb dominis
-			if (metaExpedientDto.getMetaDades() != null) {
-				for (MetaDadaDto metaDadaDto : metaExpedientDto.getMetaDades()) {
-					if (metaDadaDto.getTipus().equals(MetaDadaTipusEnumDto.DOMINI) && Utils.hasValue(metaDadaDto.getValorString())) {
-						List<DominiEntity> dominis = dominiRepository.findByEntitatAndCodi(entitat, metaDadaDto.getValorString());
-						if (dominis != null && !dominis.isEmpty()) {
-							DominiEntity domini = dominis.get(0);
-							metaDadaDto.setDomini(conversioTipusHelper.convertir(domini, DominiDto.class));
-						}
-					}
-				}
-			}
-	
-			//Meta-documents amb meta-dades amb dominis
-			if (metaExpedientDto.getMetaDocuments() != null) {
-				for (MetaDocumentDto metaDocumentDto : metaExpedientDto.getMetaDocuments()) {
-					if (metaDocumentDto.getMetaDades() != null) {
-						for (MetaDadaDto metaDadaDto : metaDocumentDto.getMetaDades()) {
-							if (metaDadaDto.getTipus().equals(MetaDadaTipusEnumDto.DOMINI)) {
-								List<DominiEntity> dominis = dominiRepository.findByEntitatAndCodi(entitat, metaDadaDto.getValorString());
-								if (dominis != null && !dominis.isEmpty()) {
-									DominiEntity domini = dominis.get(0);
-									metaDadaDto.setDomini(conversioTipusHelper.convertir(domini, DominiDto.class));
-								}
-							}
-						}
-					}
-				}
-			}
-			
 			String procedimentAsString = objectMapper.writeValueAsString(metaExpedientDto);
 			logger.info(procedimentAsString);
-			
+
 			contingutLogHelper.logProcediment(
 					metaExpedientEntity,
 					LogTipusEnumDto.EXPORT_PROCED_JSON,
 					metaExpedientEntity.getClassificacio(),
 					metaExpedientEntity.getNom());
-			
+
 			return procedimentAsString;
-		
+
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
     }
-    
+
+    private MetaExpedientExportDto exportToDto(EntitatEntity entitat, MetaExpedientEntity metaExpedientEntity) {
+    	MetaExpedientExportDto metaExpedientDto = conversioTipusHelper.convertir(metaExpedientEntity, MetaExpedientExportDto.class);
+
+    	//En el conversor tipus helper no inclou les validacions de les tasques
+    	if (metaExpedientEntity.getTasques() != null) {
+    		for (MetaExpedientTascaEntity tascaEntity : metaExpedientEntity.getTasques()) {
+    			if (tascaEntity.getValidacions()!=null && tascaEntity.getValidacions().size()>0) {
+    				for (MetaExpedientTascaDto tascaDto : metaExpedientDto.getTasques()) {
+    					if (tascaEntity.getId().equals(tascaDto.getId())) {
+    						tascaDto.setValidacions(conversioTipusHelper.convertirList(
+    								tascaEntity.getValidacions(),
+    								MetaExpedientTascaValidacioDto.class));
+    					}
+    				}
+    			}
+    		}
+    	}
+
+    	//Carpetes per defecte (segons property)
+    	List<MetaExpedientCarpetaDto> carpetesProcediment = metaExpedientCarpetaHelper.findCarpetesMetaExpedient(metaExpedientEntity);
+    	metaExpedientDto.setCarpetes(conversioTipusHelper.convertirList(carpetesProcediment, MetaExpedientCarpetaMinDto.class));
+
+    	//Meta-dades amb dominis
+    	if (metaExpedientDto.getMetaDades() != null) {
+    		for (MetaDadaDto metaDadaDto : metaExpedientDto.getMetaDades()) {
+    			if (metaDadaDto.getTipus().equals(MetaDadaTipusEnumDto.DOMINI) && Utils.hasValue(metaDadaDto.getValorString())) {
+    				List<DominiEntity> dominis = dominiRepository.findByEntitatAndCodi(entitat, metaDadaDto.getValorString());
+    				if (dominis != null && !dominis.isEmpty()) {
+    					DominiEntity domini = dominis.get(0);
+    					metaDadaDto.setDomini(conversioTipusHelper.convertir(domini, DominiDto.class));
+    				}
+    			}
+    		}
+    	}
+
+    	//Meta-documents amb meta-dades amb dominis
+    	if (metaExpedientDto.getMetaDocuments() != null) {
+    		for (MetaDocumentDto metaDocumentDto : metaExpedientDto.getMetaDocuments()) {
+    			if (metaDocumentDto.getMetaDades() != null) {
+    				for (MetaDadaDto metaDadaDto : metaDocumentDto.getMetaDades()) {
+    					if (metaDadaDto.getTipus().equals(MetaDadaTipusEnumDto.DOMINI)) {
+    						List<DominiEntity> dominis = dominiRepository.findByEntitatAndCodi(entitat, metaDadaDto.getValorString());
+    						if (dominis != null && !dominis.isEmpty()) {
+    							DominiEntity domini = dominis.get(0);
+    							metaDadaDto.setDomini(conversioTipusHelper.convertir(domini, DominiDto.class));
+    						}
+    					}
+    				}
+    			}
+    		}
+    	}
+
+    	return metaExpedientDto;
+    }
+
+    public String calcularCodiClon(Long entitatId, Long metaExpedientId) {
+    	EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
+    	MetaExpedientEntity metaExpedientEntity = metaExpedientRepository.findById(metaExpedientId).get();
+    	String baseCodi = metaExpedientEntity.getCodi();
+    	String nouCodi = baseCodi + "_1";
+    	int comptador = 1;
+    	while (metaExpedientRepository.findByEntitatAndCodi(entitat, nouCodi) != null) {
+    		comptador++;
+    		nouCodi = baseCodi + "_" + comptador;
+    	}
+    	return nouCodi;
+    }
+
+    public void clonar(Long entitatId, Long metaExpedientId, Long organId, String rolActual, String nouCodi, String novaClassificacio) {
+    	EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
+    	MetaExpedientEntity metaExpedientEntity = entityComprovarHelper.comprovarAccesMetaExpedient(entitat, metaExpedientId, organId, true);
+
+    	if (metaExpedientRepository.findByEntitatAndCodi(entitat, nouCodi) != null) {
+    		throw new RuntimeException("Ja existeix un procediment amb el codi '" + nouCodi + "'");
+    	}
+
+    	MetaExpedientExportDto exportDto = exportToDto(entitat, metaExpedientEntity);
+    	exportDto.setId(null);
+    	exportDto.setCodi(nouCodi);
+    	exportDto.setClassificacio(novaClassificacio);
+
+    	createFromImport(entitatId, exportDto, rolActual, organId);
+
+    	// El clon sempre es crea en estat DISSENY
+    	MetaExpedientEntity clonat = metaExpedientRepository.findByEntitatAndCodi(entitat, nouCodi);
+    	canviarRevisioADisseny(entitatId, clonat.getId(), organId);
+    }
+
+
 	public long obtenirProximaSequenciaExpedient(
 			MetaExpedientEntity metaExpedient,
 			Integer any,

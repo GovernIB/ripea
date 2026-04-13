@@ -9,6 +9,7 @@ import useExpedientDialog from "./ExpedientDialog.tsx";
 import {Divider} from "@mui/material";
 import {useMemo} from "react";
 import useHistoric, {HistoricContingutTipusEnum} from "../../Historic.tsx";
+import useClonarProcediment from "../actions/ClonarProcediment.tsx";
 
 export const useActions = (refresh?: () => void) => {
     const {t} = useTranslation()
@@ -145,6 +146,7 @@ export const useMetaExpedientActions = (refresh?: () => void) => {
     const {handleShow: handleCanviEstat, content: contentCanviEstat} = useCanviEstatRevisio(refresh);
     const {handleOpen: handleRegla, dialog: dialogRegla} = useReglaDistribucio(refresh);
     const {apiIsReady, active, desactive, exportar, canviDisseny, canviPendent} = useActions(refresh)
+    const {handleShow: handleClonar, content: contentClonar} = useClonarProcediment(refresh)
 
     const actions:any[] = useMemo(() => [
         {
@@ -187,6 +189,13 @@ export const useMetaExpedientActions = (refresh?: () => void) => {
             icon: "upload",
             showInMenu: true,
             onClick: exportar,
+            hidden: !(rol?.isAdmin || rol?.isOrganAdmin || rol?.isDissenyOrgan),
+        },
+        {
+            label: t('page.metaExpedient.action.clonar.label'),
+            icon: "content_copy",
+            showInMenu: true,
+            onClick: handleClonar,
             hidden: !(rol?.isAdmin || rol?.isOrganAdmin || rol?.isDissenyOrgan),
         },
         {
@@ -250,6 +259,7 @@ export const useMetaExpedientActions = (refresh?: () => void) => {
         {dialogDetail}
         {dialogRegla}
         {dialogHistoric}
+        {contentClonar}
     </>
 
     return {

@@ -1439,6 +1439,11 @@ const translationEn = {
                 export: {
                     ok: "Procedure exported successfully",
                 },
+                clonar: {
+                    label: "Clone",
+                    title: "Clone procedure",
+                    ok: "New cloned procedure: {{codi}}",
+                },
                 canviPendent: {
                     label: "Mark as pending of review",
                     ok: "Procedure marked as pending of review",
