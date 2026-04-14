@@ -137,7 +137,8 @@ const EnviarPortafirmesGrid = () => {
 
     return <GridPage disableMargins>
         <CardPage title={t('navigate.massiu.portafirmes')}>
-            <Alert severity={'info'} sx={{mb: 1}}>{t('page.document.alert.portafirmes')}</Alert>
+            {!haveRequirements &&
+                <Alert severity={'info'} sx={{mb: 1}}>{t('page.document.alert.portafirmes')}</Alert>}
 
             <EnviarPortafirmesFilter
                 sessionKey={sessionKey}

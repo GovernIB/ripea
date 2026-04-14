@@ -170,7 +170,8 @@ const CanviEstatGrid = () => {
 
     return <GridPage disableMargins>
         <CardPage title={t('navigate.massiu.canviEstat')}>
-            <Alert severity={'info'} sx={{mb: 1}}>{t('page.expedient.alert.canviEstat')}</Alert>
+            {!haveRequirements &&
+                <Alert severity={'info'} sx={{mb: 1}}>{t('page.expedient.alert.canviEstat')}</Alert>}
 
             <CanviEstatFilter
                 sessionKey={sessionKey}
