@@ -20,13 +20,12 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.hibernate.Hibernate;
+import org.springframework.data.domain.Persistable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -73,6 +72,7 @@ import es.caib.ripea.service.helper.CarpetaHelper;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.ContingutHelper;
 import es.caib.ripea.service.helper.ContingutImportacioHelper;
+import es.caib.ripea.service.helper.ContingutLogHelper;
 import es.caib.ripea.service.helper.DocumentHelper;
 import es.caib.ripea.service.helper.DominiHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
@@ -110,6 +110,8 @@ import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.dto.FileNameOption;
 import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.ImportacioRegistreParamsDto;
+import es.caib.ripea.service.intf.dto.LogObjecteTipusEnumDto;
+import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
 import es.caib.ripea.service.intf.dto.PermisosPerExpedientsDto;
 import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
@@ -146,7 +148,6 @@ import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.intf.utils.ZipDocumentExtractor;
 import es.caib.ripea.service.permission.ExtendedPermission;
-import es.caib.ripea.service.resourcehelper.ContingutLogResourceHelper;
 import es.caib.ripea.service.resourcehelper.ContingutResourceHelper;
 import io.micrometer.core.instrument.Timer;
 import lombok.RequiredArgsConstructor;
@@ -193,7 +194,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     private final MetaDocumentHelper metaDocumentHelper;
     private final ZipImportacioHelper zipImportacioHelper;
     private final MessageHelper messageHelper;
-    private final ContingutLogResourceHelper contingutLogResourceHelper;
+    private final ContingutLogHelper contingutLogHelper;
     private final AplicacioService aplicacioService;
     
     @PostConstruct
@@ -922,7 +923,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
                 for (ExpedientResourceEntity expedientResourceEntity : expedientResourceEntityList) {
                     if (!entity.getRelacionatsAmb().contains(expedientResourceEntity)) {
                         entity.getRelacionatsAmb().add(expedientResourceEntity);
-                        contingutLogResourceHelper.crearRelacioExpedientLog(entity, expedientResourceEntity.getId());
+                        expedientHelper.logRelacionarExpedients(entity.getId(), expedientResourceEntity.getId(), LogTipusEnumDto.CREACIO);                       
                     }
                 }
 
@@ -935,17 +936,17 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
                 }
                 for (ExpedientResourceEntity expedientResourceEntity : toRemove) {
                     entity.getRelacionatsAmb().remove(expedientResourceEntity);
-                    contingutLogResourceHelper.eliminarRelacioExpedientLog(entity, expedientResourceEntity.getId());
+                    expedientHelper.logRelacionarExpedients(entity.getId(), expedientResourceEntity.getId(), LogTipusEnumDto.ELIMINACIO);
                 }
             } else {
                 for (ExpedientResourceEntity expedientResourceEntity : expedientResourceEntityList) {
                     if (entity.getRelacionatsAmb().contains(expedientResourceEntity)) {
                         entity.getRelacionatsAmb().remove(expedientResourceEntity);
-                        contingutLogResourceHelper.eliminarRelacioExpedientLog(entity, expedientResourceEntity.getId());
+                        expedientHelper.logRelacionarExpedients(entity.getId(), expedientResourceEntity.getId(), LogTipusEnumDto.ELIMINACIO);
                     }
                     if (entity.getRelacionatsPer().contains(expedientResourceEntity)) {
                         entity.getRelacionatsPer().remove(expedientResourceEntity);
-                        contingutLogResourceHelper.eliminarRelacioExpedientLog(entity, expedientResourceEntity.getId());
+                        expedientHelper.logRelacionarExpedients(entity.getId(), expedientResourceEntity.getId(), LogTipusEnumDto.ELIMINACIO);
                     }
                 }
             }

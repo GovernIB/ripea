@@ -491,24 +491,9 @@ public class ExpedientHelper {
 			throw new ValidationException("Expedient ja relacionat");
 		}
 		expedient.addRelacionat(toRelate);
-		contingutLogHelper.log(
-				expedient, 
-				LogTipusEnumDto.MODIFICACIO, new Persistable<String>() {
-					@Override
-					public String getId() {
-						return id + "#" + relacionatId;
-					}
-					@Override
-					public boolean isNew() {
-						return false;
-					}
-				},
-				LogObjecteTipusEnumDto.RELACIO,
-				LogTipusEnumDto.CREACIO,
-				id.toString(),
-				relacionatId.toString(),
-				false,
-				false);
+		
+		logRelacionarExpedients(expedient, relacionatId, LogTipusEnumDto.CREACIO);
+		
 		boolean isPropagarRelacioActiva = configHelper.getAsBoolean(PropertyConfig.PROPAGAR_RELACIO_EXPEDIENTS);
 		if (isPropagarRelacioActiva) {
 			pluginHelper.arxiuExpedientEnllacar(
@@ -543,25 +528,7 @@ public class ExpedientHelper {
 			trobat = false;
 		}
 		if (trobat) {
-			contingutLogHelper.log(
-					expedient, 
-					LogTipusEnumDto.MODIFICACIO, new Persistable<String>() {
-						@Override
-						public String getId() {
-							return id + "#" + relacionatId;
-						}
-						@Override
-						public boolean isNew() {
-							return false;
-						}
-		
-					},
-					LogObjecteTipusEnumDto.RELACIO,
-					LogTipusEnumDto.ELIMINACIO,
-					id.toString(),
-					relacionatId.toString(),
-					false,
-					false);
+			logRelacionarExpedients(expedient, relacionatId, LogTipusEnumDto.ELIMINACIO);
 		}
 		boolean isPropagarRelacioActiva = configHelper.getAsBoolean(PropertyConfig.PROPAGAR_RELACIO_EXPEDIENTS);
 		if (isPropagarRelacioActiva) {
@@ -579,6 +546,45 @@ public class ExpedientHelper {
 			}
 		}
 		return trobat;
+	}
+	
+	public void logRelacionarExpedients(
+			Long contingutId,
+			Long relacionatId,
+			LogTipusEnumDto tipusLog) {
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+				contingutId,
+				true,
+				false,
+				true,
+				false,
+				false,
+				configHelper.getRolActual());
+		logRelacionarExpedients(expedient, relacionatId, tipusLog);
+	}			
+	
+	public void logRelacionarExpedients(
+			ContingutEntity contingutEntity,
+			Long relacionatId,
+			LogTipusEnumDto tipusLog) {
+		contingutLogHelper.log(
+				contingutEntity, 
+				LogTipusEnumDto.MODIFICACIO, new Persistable<String>() {
+					@Override
+					public String getId() {
+						return contingutEntity.getId() + "#" + relacionatId;
+					}
+					@Override
+					public boolean isNew() {
+						return false;
+					}
+				},
+				LogObjecteTipusEnumDto.RELACIO,
+				tipusLog,
+				contingutEntity.getId().toString(),
+				relacionatId.toString(),
+				false,
+				false);
 	}
 	
 	@Transactional
