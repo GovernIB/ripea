@@ -1140,9 +1140,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 							null,
 							configHelper.getRolActual());
 					execucioMassivaHelper.saveExecucioMassiva(entitatEntity, execMassDto, elementsMassiva, ElementTipusEnumDto.DOCUMENT);
-				
-					return params.getIds()!=null?params.getIds().size():0;
-	        	
+					
 				} else {
 
 					Exception errorGuardant = null;
@@ -1161,10 +1159,10 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 					if (errorGuardant!=null) {
 						throw new ActionExecutionException(getResourceClass(), entity.getId(), code, errorGuardant.getMessage());
 					}
-					
-					return objectMappingHelper.newInstanceMap(entity, DocumentResource.class);
 	        	}
 
+				return objectMappingHelper.newInstanceMap(entity, DocumentResource.class);
+				
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio(
 						"/document/GuardarArxiuActionExecutor",
