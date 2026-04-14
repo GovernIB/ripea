@@ -198,6 +198,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         register(DocumentResource.PERSPECTIVE_FIRMES_CODE, new FirmesPerspectiveApplicator());
         register(DocumentResource.PERSPECTIVE_PROCEDIMENT_CODE, new ProcedimentPerspectiveApplicator());
         register(DocumentResource.PERSPECTIVE_EN_PROCES_PORTAFIB_CODE, new EnProcesPortafibPerspectiveApplicator());
+        register(DocumentResource.PERSPECTIVE_EN_PROCES_FIRMA_WEB_CODE, new EnProcesFirmaWebPerspectiveApplicator());
+        register(DocumentResource.PERSPECTIVE_EN_PROCES_CUSTODIAR_CODE, new EnProcesCustodiarPerspectiveApplicator());
         register(DocumentResource.Fields.adjunt, new AdjuntFieldDownloader());
         register(DocumentResource.Fields.firmaAdjunt, new FirmaFieldDownloader());
         register(DocumentResource.Fields.imprimible, new ImprimibleFieldDownloader());
@@ -604,6 +606,26 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         }
     }
     
+    private class EnProcesFirmaWebPerspectiveApplicator implements PerspectiveApplicator<DocumentResourceEntity, DocumentResource> {
+        @Override
+        public void applySingle(String code, DocumentResourceEntity entity, DocumentResource resource) throws PerspectiveApplicationException {
+            execucioMassivaContingutRepository
+                    .findFirstByElementIdAndElementTipusAndExecucioMassivaTipusAndExecucioMassivaDataFiNull(
+                            entity.getId(), ElementTipusEnumDto.DOCUMENT, ExecucioMassivaTipusDto.FIRMASIMPLEWEB)
+                    .ifPresent(contingut -> resource.setExecucioMassivaFirmaWebId(contingut.getExecucioMassiva().getId()));
+        }
+    }
+
+    private class EnProcesCustodiarPerspectiveApplicator implements PerspectiveApplicator<DocumentResourceEntity, DocumentResource> {
+        @Override
+        public void applySingle(String code, DocumentResourceEntity entity, DocumentResource resource) throws PerspectiveApplicationException {
+            execucioMassivaContingutRepository
+                    .findFirstByElementIdAndElementTipusAndExecucioMassivaTipusAndExecucioMassivaDataFiNull(
+                            entity.getId(), ElementTipusEnumDto.DOCUMENT, ExecucioMassivaTipusDto.CUSTODIAR_ELEMENTS_PENDENTS)
+                    .ifPresent(contingut -> resource.setExecucioMassivaCustodiarId(contingut.getExecucioMassiva().getId()));
+        }
+    }
+
     private class FirmesPerspectiveApplicator implements PerspectiveApplicator<DocumentResourceEntity, DocumentResource> {
         @Override
         public void applySingle(String code, DocumentResourceEntity entity, DocumentResource resource) throws PerspectiveApplicationException {

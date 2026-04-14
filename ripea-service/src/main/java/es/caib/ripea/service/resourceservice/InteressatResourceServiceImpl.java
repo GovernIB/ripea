@@ -43,6 +43,7 @@ import es.caib.ripea.persistence.entity.resourceentity.InteressatResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.InteressatGrupResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.InteressatResourceRepository;
 import es.caib.ripea.persistence.repository.EntitatRepository;
+import es.caib.ripea.persistence.repository.ExecucioMassivaContingutRepository;
 import es.caib.ripea.persistence.repository.InteressatRepository;
 import es.caib.ripea.plugin.dadesext.Municipi;
 import es.caib.ripea.plugin.dadesext.Pais;
@@ -115,6 +116,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
     private final EventHelper eventHelper;
     private final EntityComprovarHelper entityComprovarHelper;
     private final ExecucioMassivaHelper execucioMassivaHelper;
+    private final ExecucioMassivaContingutRepository execucioMassivaContingutRepository;
     private final MessageHelper messageHelper;
     private final MetaExpedientHelper metaExpedientHelper;
     private final EntitatRepository entitatRepository;
@@ -130,6 +132,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
         register(InteressatResource.PERSPECTIVE_REPRESENTANT_CODE, new RespresentantPerspectiveApplicator());
         register(InteressatResource.PERSPECTIVE_ADRESSA_CODE, new AdressaPerspectiveApplicator());
         register(InteressatResource.PERSPECTIVE_PROCEDIMENT_CODE, new ProcedimentPerspectiveApplicator());
+        register(InteressatResource.PERSPECTIVE_EN_PROCES_CUSTODIAR_CODE, new EnProcesCustodiarPerspectiveApplicator());
         register(InteressatResource.ACTION_EXPORTAR_CODE, new ExportarReportGenerator());
         register(InteressatResource.ACTION_IMPORTAR_CODE, new ImportarInteressatsActionExecutor());
         register(InteressatResource.ACTION_GUARDAR_ARXIU, new GuardarArxiuActionExecutor());
@@ -518,6 +521,16 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
                 // Si no pertenece a ningún grupo lo dejamos vacío
                 resource.setGrups(Collections.emptyList());
             }
+        }
+    }
+
+    private class EnProcesCustodiarPerspectiveApplicator implements PerspectiveApplicator<InteressatResourceEntity, InteressatResource> {
+        @Override
+        public void applySingle(String code, InteressatResourceEntity entity, InteressatResource resource) throws PerspectiveApplicationException {
+            execucioMassivaContingutRepository
+                    .findFirstByElementIdAndElementTipusAndExecucioMassivaTipusAndExecucioMassivaDataFiNull(
+                            entity.getId(), ElementTipusEnumDto.INTERESSAT, ExecucioMassivaTipusDto.CUSTODIAR_ELEMENTS_PENDENTS)
+                    .ifPresent(contingut -> resource.setExecucioMassivaCustodiarId(contingut.getExecucioMassiva().getId()));
         }
     }
 

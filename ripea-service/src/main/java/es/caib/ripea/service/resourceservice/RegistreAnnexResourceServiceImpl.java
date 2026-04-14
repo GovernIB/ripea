@@ -19,6 +19,7 @@ import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.entity.resourceentity.ExpedientPeticioResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.RegistreAnnexResourceEntity;
+import es.caib.ripea.persistence.repository.ExecucioMassivaContingutRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.persistence.repository.RegistreAnnexRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
@@ -65,6 +66,7 @@ public class RegistreAnnexResourceServiceImpl extends BaseMutableResourceService
 	private final EntityComprovarHelper entityComprovarHelper;
 	private final ExpedientPeticioHelper expedientPeticioHelper;
 	private final ExecucioMassivaHelper execucioMassivaHelper;
+	private final ExecucioMassivaContingutRepository execucioMassivaContingutRepository;
 
 	private final RegistreAnnexRepository registreAnnexRepository;
 	private final OrganGestorRepository organGestorRepository;
@@ -74,6 +76,7 @@ public class RegistreAnnexResourceServiceImpl extends BaseMutableResourceService
     	register(RegistreAnnexResource.REPORT_DOWNLOAD_ANNEX, new DescarregarAnnexReportGenerator());
         register(RegistreAnnexResource.PERSPECTIVE_FIRMES, new AnnexFirmesPerspectiveApplicator());
         register(RegistreAnnexResource.PERSPECTIVE_REGISTRE, new AnnexRegistrePerspectiveApplicator());
+        register(RegistreAnnexResource.PERSPECTIVE_EN_PROCES_ADJUNTAR_ANNEXOS_CODE, new EnProcesAdjuntarAnnexosPerspectiveApplicator());
         register(RegistreAnnexResource.ACTION_REINTENTAR_CODE, new ReintentarArxiuActionExecutor());
     }
     
@@ -163,6 +166,16 @@ public class RegistreAnnexResourceServiceImpl extends BaseMutableResourceService
         }
     }
     
+    private class EnProcesAdjuntarAnnexosPerspectiveApplicator implements PerspectiveApplicator<RegistreAnnexResourceEntity, RegistreAnnexResource> {
+        @Override
+        public void applySingle(String code, RegistreAnnexResourceEntity entity, RegistreAnnexResource resource) throws PerspectiveApplicationException {
+            execucioMassivaContingutRepository
+                    .findFirstByElementIdAndElementTipusAndExecucioMassivaTipusAndExecucioMassivaDataFiNull(
+                            entity.getId(), ElementTipusEnumDto.ANNEX, ExecucioMassivaTipusDto.ADJUNTAR_ANNEXOS_PENDENTS)
+                    .ifPresent(contingut -> resource.setExecucioMassivaAdjuntarAnnexosId(contingut.getExecucioMassiva().getId()));
+        }
+    }
+
     private class DescarregarAnnexReportGenerator implements ReportGenerator<RegistreAnnexResourceEntity, Serializable, Serializable> {
 
 		@Override

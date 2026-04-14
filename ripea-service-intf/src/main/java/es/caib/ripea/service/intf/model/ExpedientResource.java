@@ -221,7 +221,16 @@ import lombok.experimental.FieldNameConstants;
 				@ResourceArtifact(
 						type = ResourceArtifactType.REPORT,
 						code = ExpedientResource.REPORT_PLANTILLA_DADES_CSV,
-                        requiresId = true),				
+                        requiresId = true),
+				@ResourceArtifact(
+						type = ResourceArtifactType.PERSPECTIVE,
+						code = ExpedientResource.PERSPECTIVE_EN_PROCES_CANVI_ESTAT_CODE),
+				@ResourceArtifact(
+						type = ResourceArtifactType.PERSPECTIVE,
+						code = ExpedientResource.PERSPECTIVE_EN_PROCES_TANCAMENT_CODE),
+				@ResourceArtifact(
+						type = ResourceArtifactType.PERSPECTIVE,
+						code = ExpedientResource.PERSPECTIVE_EN_PROCES_CUSTODIAR_CODE),
 		})
 @ExpedientValid
 public class ExpedientResource extends NodeResource implements Serializable {
@@ -271,8 +280,11 @@ public class ExpedientResource extends NodeResource implements Serializable {
 	public static final String PERSPECTIVE_DOCUMENTS_NO_MOGUTS = "DOCUMENTS_NO_MOGUTS";
 	public static final String PERSPECTIVE_DOCUMENTS_OBLIGATORIS_TANCAR = "DOCUMENTS_OBLIGATORIS_TANCAR";
 	public static final String PERSPECTIVE_AMB_PINBAL_CODE = "AMB_PINBAL";
-	public static final String PERSPECTIVE_PERMIS_CONTINGUT = "PERMIS_CONTINGUT";	
+	public static final String PERSPECTIVE_PERMIS_CONTINGUT = "PERMIS_CONTINGUT";
 	public static final String PERSPECTIVE_AUDIT_CODE = "AUDITORIA";
+	public static final String PERSPECTIVE_EN_PROCES_CANVI_ESTAT_CODE = "EN_PROCES_CANVI_ESTAT";
+	public static final String PERSPECTIVE_EN_PROCES_TANCAMENT_CODE = "EN_PROCES_TANCAMENT";
+	public static final String PERSPECTIVE_EN_PROCES_CUSTODIAR_CODE = "EN_PROCES_CUSTODIAR";
 	
 
 	public static final String FILTER_CODE = "EXPEDIENT_FILTER";
@@ -417,6 +429,9 @@ public class ExpedientResource extends NodeResource implements Serializable {
     @Transient private boolean creacioCarpetesActiva;
     @Transient private boolean isPendentExecucioMassiva;
     @Transient private boolean hideTasca;
+    @Transient private Long execucioMassivaCanviEstatId;
+    @Transient private Long execucioMassivaTancamentId;
+    @Transient private Long execucioMassivaCustodiarId;
 
     @Getter
 	@Setter

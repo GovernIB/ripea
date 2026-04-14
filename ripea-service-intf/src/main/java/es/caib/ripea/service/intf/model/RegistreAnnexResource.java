@@ -41,6 +41,9 @@ import lombok.experimental.FieldNameConstants;
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = RegistreAnnexResource.PERSPECTIVE_REGISTRE),
                 @ResourceArtifact(
+                        type = ResourceArtifactType.PERSPECTIVE,
+                        code = RegistreAnnexResource.PERSPECTIVE_EN_PROCES_ADJUNTAR_ANNEXOS_CODE),
+                @ResourceArtifact(
                         type = ResourceArtifactType.FILTER,
                         code = RegistreAnnexResource.ADJUNTAR_ANNEX_FILTER_CODE,
                         formClass = RegistreAnnexResource.AjuntarAnnexPendentFilter.class),
@@ -60,6 +63,7 @@ public class RegistreAnnexResource extends BaseAuditableResource<Long> {
 	
 	public static final String PERSPECTIVE_FIRMES 		= "FIRMES";
 	public static final String PERSPECTIVE_REGISTRE		= "REGISTRE";
+	public static final String PERSPECTIVE_EN_PROCES_ADJUNTAR_ANNEXOS_CODE = "EN_PROCES_ADJUNTAR_ANNEXOS";
     public static final String ADJUNTAR_ANNEX_FILTER_CODE= "ADJUNTAR_ANNEX_FILTER";
     public static final String REPORT_DOWNLOAD_ANNEX	= "DOWNLOAD_ANNEX";
 	public static final String ACTION_REINTENTAR_CODE	= "REINTENTAR";
@@ -97,6 +101,7 @@ public class RegistreAnnexResource extends BaseAuditableResource<Long> {
     @Transient private RegistreResource registreInfo;
     @Transient private ExpedientResource expedientInfo;
     @Transient private List<ArxiuFirmaDto> firmes;
+    @Transient private Long execucioMassivaAdjuntarAnnexosId;
 
     @Getter
     @Setter

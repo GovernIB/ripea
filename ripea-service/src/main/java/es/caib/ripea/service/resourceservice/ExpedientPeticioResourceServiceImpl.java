@@ -36,6 +36,7 @@ import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientResource
 import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientSequenciaResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.RegistreAnnexResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.RegistreResourceRepository;
+import es.caib.ripea.persistence.repository.ExecucioMassivaContingutRepository;
 import es.caib.ripea.persistence.repository.ExpedientPeticioRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
@@ -108,6 +109,7 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 	private final MessageHelper messageHelper;
 	private final AnotacioDistribucioHelper anotacioDistribucioHelper;
 	private final ExecucioMassivaHelper execucioMassivaHelper;
+	private final ExecucioMassivaContingutRepository execucioMassivaContingutRepository;
 
 	private final OrganGestorRepository organGestorRepository;
 	private final MetaExpedientRepository metaExpedientRepository;
@@ -124,6 +126,7 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
     public void init() {
         register(ExpedientPeticioResource.PERSPECTIVE_REGISTRE_CODE, new RegistrePerspectiveApplicator());
         register(ExpedientPeticioResource.PERSPECTIVE_ESTAT_VIEW_CODE, new EstatViewPerspectiveApplicator());
+        register(ExpedientPeticioResource.PERSPECTIVE_EN_PROCES_ACTUALITZAR_ESTAT_CODE, new EnProcesActualitzarEstatPerspectiveApplicator());
         register(ExpedientPeticioResource.REPORT_DOWNLOAD_JUSTIFICANT, new DescarregarJustificantReportGenerator());
         register(ExpedientPeticioResource.ACTION_REBUTJAR_ANOTACIO, new RebutjarAnotacioActionExecutor());
         register(ExpedientPeticioResource.ACTION_ACCEPTAR_ANOTACIO, new AcceptarAnotacioActionExecutor());
@@ -380,6 +383,16 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
         }
     }
     
+    private class EnProcesActualitzarEstatPerspectiveApplicator implements PerspectiveApplicator<ExpedientPeticioResourceEntity, ExpedientPeticioResource> {
+        @Override
+        public void applySingle(String code, ExpedientPeticioResourceEntity entity, ExpedientPeticioResource resource) throws PerspectiveApplicationException {
+            execucioMassivaContingutRepository
+                    .findFirstByElementIdAndElementTipusAndExecucioMassivaTipusAndExecucioMassivaDataFiNull(
+                            entity.getId(), ElementTipusEnumDto.ANOTACIO, ExecucioMassivaTipusDto.ACTUALITZAR_ESTAT_ANOTACIONS)
+                    .ifPresent(contingut -> resource.setExecucioMassivaActualitzarEstatId(contingut.getExecucioMassiva().getId()));
+        }
+    }
+
     private class AcceptarAnotacioActionExecutor implements ActionExecutor<ExpedientPeticioResourceEntity, AcceptarAnotacioForm, Serializable> {
 
         private Map<String, String> parseToMap(String input){

@@ -90,6 +90,12 @@ import lombok.experimental.FieldNameConstants;
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = DocumentResource.PERSPECTIVE_EN_PROCES_PORTAFIB_CODE),
                 @ResourceArtifact(
+                        type = ResourceArtifactType.PERSPECTIVE,
+                        code = DocumentResource.PERSPECTIVE_EN_PROCES_FIRMA_WEB_CODE),
+                @ResourceArtifact(
+                        type = ResourceArtifactType.PERSPECTIVE,
+                        code = DocumentResource.PERSPECTIVE_EN_PROCES_CUSTODIAR_CODE),
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = DocumentResource.ACTION_ENVIAR_VIA_EMAIL_CODE,
                         formClass = DocumentResource.EnviarViaEmailFormAction.class,
@@ -174,6 +180,8 @@ public class DocumentResource extends NodeResource {
     public static final String PERSPECTIVE_FIRMES_CODE = "FIRMES";
     public static final String PERSPECTIVE_PROCEDIMENT_CODE = "PROCEDIMENT";
     public static final String PERSPECTIVE_EN_PROCES_PORTAFIB_CODE = "EN_PROCES_PORTAFIB";
+    public static final String PERSPECTIVE_EN_PROCES_FIRMA_WEB_CODE = "EN_PROCES_FIRMA_WEB";
+    public static final String PERSPECTIVE_EN_PROCES_CUSTODIAR_CODE = "EN_PROCES_CUSTODIAR";
     
     public static final String ACTION_ENVIAR_VIA_EMAIL_CODE = "ENVIAR_VIA_EMAIL";
     public static final String ACTION_ENVIAR_PORTAFIRMES_CODE = "ENVIAR_PORTAFIRMES";
@@ -335,6 +343,8 @@ public class DocumentResource extends NodeResource {
     @Transient private ResourceReference<MetaExpedientResource, Long> metaExpedient;
     @Transient private String csvLinkUrl;
     @Transient private Long execucioMassivaPortafibId;
+    @Transient private Long execucioMassivaFirmaWebId;
+    @Transient private Long execucioMassivaCustodiarId;
 
     public String getFitxerExtension() {
         if (fitxerNom != null) {

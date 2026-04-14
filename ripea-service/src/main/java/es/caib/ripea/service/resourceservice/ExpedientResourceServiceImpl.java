@@ -59,6 +59,7 @@ import es.caib.ripea.persistence.repository.ContingutMovimentRepository;
 import es.caib.ripea.persistence.repository.ContingutRepository;
 import es.caib.ripea.persistence.repository.DadaRepository;
 import es.caib.ripea.persistence.repository.EntitatRepository;
+import es.caib.ripea.persistence.repository.ExecucioMassivaContingutRepository;
 import es.caib.ripea.persistence.repository.ExpedientEstatRepository;
 import es.caib.ripea.persistence.repository.ExpedientRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientRepository;
@@ -188,6 +189,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     private final EntityComprovarHelper entityComprovarHelper;
     private final ExcepcioLogHelper excepcioLogHelper;
     private final ExecucioMassivaHelper execucioMassivaHelper;
+    private final ExecucioMassivaContingutRepository execucioMassivaContingutRepository;
     private final MetaDocumentHelper metaDocumentHelper;
     private final ZipImportacioHelper zipImportacioHelper;
     private final MessageHelper messageHelper;
@@ -248,7 +250,10 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         register(ExpedientResource.PERSPECTIVE_DOCUMENTS_OBLIGATORIS_TANCAR, new DocumentsObligatorisAlTancarPerspectiveApplicator());
         register(ExpedientResource.PERSPECTIVE_PATH_CODE, new PathPerspectiveApplicator());
         register(ExpedientResource.PERSPECTIVE_AUDIT_CODE, new AuditoriaPerspectiveApplicator());
-        
+        register(ExpedientResource.PERSPECTIVE_EN_PROCES_CANVI_ESTAT_CODE, new EnProcesCanviEstatPerspectiveApplicator());
+        register(ExpedientResource.PERSPECTIVE_EN_PROCES_TANCAMENT_CODE, new EnProcesTancamentPerspectiveApplicator());
+        register(ExpedientResource.PERSPECTIVE_EN_PROCES_CUSTODIAR_CODE, new EnProcesCustodiarPerspectiveApplicator());
+
         register(ExpedientResource.Fields.metaExpedient, new MetaExpedientOnchangeLogicProcessor());
         register(ExpedientResource.Fields.any, new AnyOnchangeLogicProcessor());
         register(ExpedientResource.FILTER_CODE, new FilterOnchangeLogicProcessor());
@@ -875,6 +880,36 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
                     })
                     .collect(Collectors.toList());
             resource.setSeguidors(seguidors);
+        }
+    }
+
+    private class EnProcesCanviEstatPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
+        @Override
+        public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
+            execucioMassivaContingutRepository
+                    .findFirstByElementIdAndElementTipusAndExecucioMassivaTipusAndExecucioMassivaDataFiNull(
+                            entity.getId(), ElementTipusEnumDto.EXPEDIENT, ExecucioMassivaTipusDto.CANVI_ESTAT)
+                    .ifPresent(contingut -> resource.setExecucioMassivaCanviEstatId(contingut.getExecucioMassiva().getId()));
+        }
+    }
+
+    private class EnProcesTancamentPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
+        @Override
+        public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
+            execucioMassivaContingutRepository
+                    .findFirstByElementIdAndElementTipusAndExecucioMassivaTipusAndExecucioMassivaDataFiNull(
+                            entity.getId(), ElementTipusEnumDto.EXPEDIENT, ExecucioMassivaTipusDto.TANCAMENT)
+                    .ifPresent(contingut -> resource.setExecucioMassivaTancamentId(contingut.getExecucioMassiva().getId()));
+        }
+    }
+
+    private class EnProcesCustodiarPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
+        @Override
+        public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
+            execucioMassivaContingutRepository
+                    .findFirstByElementIdAndElementTipusAndExecucioMassivaTipusAndExecucioMassivaDataFiNull(
+                            entity.getId(), ElementTipusEnumDto.EXPEDIENT, ExecucioMassivaTipusDto.CUSTODIAR_ELEMENTS_PENDENTS)
+                    .ifPresent(contingut -> resource.setExecucioMassivaCustodiarId(contingut.getExecucioMassiva().getId()));
         }
     }
 

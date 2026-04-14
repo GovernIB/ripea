@@ -57,7 +57,10 @@ import lombok.experimental.FieldNameConstants;
                         code = InteressatResource.PERSPECTIVE_ADRESSA_CODE),
                 @ResourceArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
-                        code = InteressatResource.PERSPECTIVE_PROCEDIMENT_CODE),                
+                        code = InteressatResource.PERSPECTIVE_PROCEDIMENT_CODE),
+                @ResourceArtifact(
+                        type = ResourceArtifactType.PERSPECTIVE,
+                        code = InteressatResource.PERSPECTIVE_EN_PROCES_CUSTODIAR_CODE),
                 @ResourceArtifact(
                         type = ResourceArtifactType.REPORT,
                         code = InteressatResource.ACTION_EXPORTAR_CODE,
@@ -91,6 +94,7 @@ public class InteressatResource extends BaseAuditableResource<Long> {
     public static final String PERSPECTIVE_REPRESENTANT_CODE = "REPRESENTANT";
     public static final String PERSPECTIVE_ADRESSA_CODE = "ADRESSA";
     public static final String PERSPECTIVE_PROCEDIMENT_CODE = "PROCEDIMENT";
+    public static final String PERSPECTIVE_EN_PROCES_CUSTODIAR_CODE = "EN_PROCES_CUSTODIAR";
     public static final String ACTION_EXPORTAR_CODE  = "EXPORTAR";
     public static final String ACTION_IMPORTAR_CODE  = "IMPORTAR";
     public static final String ACTION_GUARDAR_ARXIU  = "GUARDAR_ARXIU";
@@ -198,6 +202,7 @@ public class InteressatResource extends BaseAuditableResource<Long> {
     @Transient private String provinciaNom;
     @Transient private String municipiNom;
     @Transient private ResourceReference<MetaExpedientResource, Long> metaExpedient;
+    @Transient private Long execucioMassivaCustodiarId;
     
     protected List<ResourceReference<InteressatGrupResource, Long>> grups;
     
