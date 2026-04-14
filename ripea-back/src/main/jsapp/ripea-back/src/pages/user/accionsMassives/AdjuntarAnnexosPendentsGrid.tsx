@@ -13,6 +13,7 @@ import {useSession} from "../../../components/SessionStorageContext.tsx";
 import {useUserSession} from "../../../components/Session.tsx";
 import {GridSortDirection} from "@mui/x-data-grid-pro";
 import {useReintentar, useReintentarMassive} from "../../anotacions/actions/Reintentar.tsx";
+import {useExecucioMassivaContingut} from "../actions/ExecucioMassivaGrid.tsx";
 
 const AdjuntarAnnexosPendentsFilterFrom = () => {
     const {data} = useFormContext();
@@ -66,7 +67,7 @@ const AdjuntarAnnexosPendentsFilter = (props: any) => {
 }
 
 const namedQuery: string[] = ['MASSIU_PENDENT_PROCESSAR']
-const perspectives: string[] = ['REGISTRE']
+const perspectives: string[] = ['REGISTRE', 'EN_PROCES_ADJUNTAR_ANNEXOS'];
 // const sortModel: any = [{field: 'expedientInfo.createdDate', sort: 'desc'}]
 const AdjuntarAnnexosPendentsGrid = () => {
     const {t} = useTranslation();
@@ -113,6 +114,7 @@ const AdjuntarAnnexosPendentsGrid = () => {
 
     const {handleShow: handleReintentar, content: contentReintentar} = useReintentar(refresh, filterData?.procediment)
     const {handleShow: handleReintentarMassive, content: contentReintentarMassive} = useReintentarMassive(refresh, filterData?.procediment)
+    const {handleOpen: handleContingutOpen, dialog: dialogContingut} = useExecucioMassivaContingut();
 
     const actions = [
         {
@@ -120,6 +122,14 @@ const AdjuntarAnnexosPendentsGrid = () => {
             icon: "reply",
             showInMenu: false,
             onClick: handleReintentar,
+            hidden: (row:any) => row?.execucioMassivaAdjuntarAnnexosId,
+        },
+        {
+            label: t('page.user.action.massives.pending'),
+            icon: "schedule",
+            showInMenu: false,
+            onClick: (row:any) => handleContingutOpen(row?.execucioMassivaAdjuntarAnnexosId),
+            hidden: (row:any) => !row?.execucioMassivaAdjuntarAnnexosId,
         },
     ]
     const massiveActions = [
@@ -151,13 +161,15 @@ const AdjuntarAnnexosPendentsGrid = () => {
                 namedQueries={namedQuery}
                 rowAdditionalActions={actions}
                 toolbarMassiveActions={massiveActions}
-                isRowSelectable={() => haveRequirements}
+                isRowSelectable={(params:any) => !params?.row?.execucioMassivaAdjuntarAnnexosId
+                    && haveRequirements}
                 disabledMassiveDefSelector={!haveRequirements}
                 toolbarHideCreate
             />
         </CardPage>
         {contentReintentar}
         {contentReintentarMassive}
+        {dialogContingut}
     </GridPage>
 }
 export default AdjuntarAnnexosPendentsGrid;

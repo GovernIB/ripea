@@ -4,9 +4,10 @@ import {useState} from "react";
 import { CardPage } from "../../../components/CardData.tsx";
 import {CanviEstatFilter, CanviEstatMuiGrid} from "./CanviEstatGrid.tsx";
 import useTancar, {useTancarMassive} from "../../expedient/actions/Tancar.tsx";
+import {useExecucioMassivaContingut} from "../actions/ExecucioMassivaGrid.tsx";
 
 const namedQueries: string[] = ['MASSIVE_ACTION_QUERY', 'MASSIVE_ACTION_TANCAR']
-const perspectives:any = ['ESTAT','AUDITORIA']
+const perspectives:any = ['ESTAT','AUDITORIA', 'EN_PROCES_TANCAMENT'];
 const TancarGrid = () => {
     const {t} = useTranslation();
     const apiRef = useMuiDataGridApiRef();
@@ -18,6 +19,7 @@ const TancarGrid = () => {
 
     const {handleShow: handleTancar, content: contentTancar} = useTancar(refresh)
     const {handleShow: handleTancarMassive, content: contentTancarMassive} = useTancarMassive(refresh)
+    const {handleOpen: handleContingutOpen, dialog: dialogContingut} = useExecucioMassivaContingut();
 
     const actions = [
         {
@@ -25,6 +27,14 @@ const TancarGrid = () => {
             icon: "check",
             showInMenu: false,
             onClick: handleTancar,
+            hidden: (row:any) => row?.execucioMassivaTancamentId,
+        },
+        {
+            label: t('page.user.action.massives.pending'),
+            icon: "schedule",
+            showInMenu: false,
+            onClick: (row:any) => handleContingutOpen(row?.execucioMassivaTancamentId),
+            hidden: (row:any) => !row?.execucioMassivaTancamentId,
         },
     ]
     const massiveActions = [
@@ -50,10 +60,12 @@ const TancarGrid = () => {
                 namedQueries={namedQueries}
                 rowAdditionalActions={actions}
                 toolbarMassiveActions={massiveActions}
+                isRowSelectable={(params:any) => !params?.row?.execucioMassivaTancamentId}
             />
         </CardPage>
         {contentTancar}
         {contentTancarMassive}
+        {dialogContingut}
     </GridPage>
 }
 export default TancarGrid;

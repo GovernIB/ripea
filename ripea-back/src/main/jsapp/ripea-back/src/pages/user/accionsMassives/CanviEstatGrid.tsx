@@ -13,6 +13,7 @@ import {StyledEstat, StyledPrioritat} from "../../expedient/ExpedientGrid.tsx";
 import {useSession} from "../../../components/SessionStorageContext.tsx";
 import {useUserSession} from "../../../components/Session.tsx";
 import useCambiarEstat, {useCambiarEstatMassive} from "../../expedient/actions/CambiarEstat.tsx";
+import {useExecucioMassivaContingut} from "../actions/ExecucioMassivaGrid.tsx";
 
 const CanviEstatFilterFrom = (props:any) => {
     const { findExpedientByName = false } = props;
@@ -124,7 +125,7 @@ export const CanviEstatMuiGrid = (props:any) => {
     />
 }
 
-const perspectives:any = ['ESTAT', 'AUDITORIA']
+const perspectives:any = ['ESTAT', 'AUDITORIA', 'EN_PROCES_CANVI_ESTAT'];
 const CanviEstatGrid = () => {
     const {t} = useTranslation();
     const apiRef = useMuiDataGridApiRef();
@@ -140,6 +141,7 @@ const CanviEstatGrid = () => {
 
     const {handleShow: handleCanviEstat, content: contentCanviEstat} = useCambiarEstat(refresh)
     const {handleShow: handleCanviEstatMassive, content: contentCanviEstatMassive} = useCambiarEstatMassive(refresh)
+    const {handleOpen: handleContingutOpen, dialog: dialogContingut} = useExecucioMassivaContingut();
 
     const actions = [
         {
@@ -147,6 +149,14 @@ const CanviEstatGrid = () => {
             icon: "logout",
             showInMenu: false,
             onClick: handleCanviEstat,
+            hidden: (row:any) => row?.execucioMassivaCanviEstatId
+        },
+        {
+            label: t('page.user.action.massives.pending'),
+            icon: "schedule",
+            showInMenu: false,
+            onClick: (row:any) => handleContingutOpen(row?.execucioMassivaCanviEstatId),
+            hidden: (row:any) => !row?.execucioMassivaCanviEstatId,
         },
     ]
     const massiveActions = [
@@ -173,12 +183,14 @@ const CanviEstatGrid = () => {
                 namedQueries={namedQueries}
                 rowAdditionalActions={actions}
                 toolbarMassiveActions={massiveActions}
-                isRowSelectable={() => haveRequirements}
+                isRowSelectable={(params:any) => !params?.row?.execucioMassivaCanviEstatId
+                    && haveRequirements}
                 disabledMassiveDefSelector={!haveRequirements}
             />
         </CardPage>
         {contentCanviEstat}
         {contentCanviEstatMassive}
+        {dialogContingut}
     </GridPage>
 }
 export default CanviEstatGrid;

@@ -8,8 +8,10 @@ import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import {EnviarPortafirmesFilter} from "./EnviarPortafirmesGrid.tsx";
 import {GridSortDirection} from "@mui/x-data-grid-pro";
 import useFirmaNavegador, {useFirmaNavegadorMassive} from "../../contingut/actions/FirmaNavegador.tsx";
+import {useExecucioMassivaContingut} from "../actions/ExecucioMassivaGrid.tsx";
 
 const namedQueries: string[] = ['MASSIU_PASARELA']
+const perspectives:any = ['EN_PROCES_FIRMA_WEB'];
 const sortModel: any = [{field: 'createdDate', sort: 'desc'}]
 const columns = [
     {
@@ -47,6 +49,7 @@ const FirmaNavegadorGrid = () => {
 
     const {handleShow: handleFirmaShow, content: contentFirma} = useFirmaNavegador(refresh);
     const {handleShow: handleFirmaMassive, content: contentFirmaMassive} = useFirmaNavegadorMassive(refresh);
+    const {handleOpen: handleContingutOpen, dialog: dialogContingut} = useExecucioMassivaContingut();
 
     const actions = [
         {
@@ -54,6 +57,14 @@ const FirmaNavegadorGrid = () => {
             icon: "edit_document",
             showInMenu: false,
             onClick: handleFirmaShow,
+            hidden: (row:any) => row?.execucioMassivaFirmaWebId,
+        },
+        {
+            label: t('page.user.action.massives.pending'),
+            icon: "schedule",
+            showInMenu: false,
+            onClick: (row:any) => handleContingutOpen(row?.execucioMassivaFirmaWebId),
+            hidden: (row:any) => !row?.execucioMassivaFirmaWebId,
         },
     ]
     const massiveActions = [
@@ -76,15 +87,18 @@ const FirmaNavegadorGrid = () => {
                 resourceName={"documentResource"}
                 columns={columns}
                 filter={springFilter}
+                perspectives={perspectives}
 				namedQueries={namedQueries}
                 sortModel={sortModel}
                 rowAdditionalActions={actions}
                 toolbarMassiveActions={massiveActions}
+                isRowSelectable={(params:any) => !params?.row?.execucioMassivaFirmaWebId}
                 toolbarHideCreate
             />
         </CardPage>
         {contentFirma}
         {contentFirmaMassive}
+        {dialogContingut}
     </GridPage>
 }
 export default FirmaNavegadorGrid;

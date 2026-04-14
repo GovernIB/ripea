@@ -16,6 +16,7 @@ import {useActions as useExpedientActions} from "../../expedient/details/CommonA
 import {useMassiveActions as useExpedientMassiveActions} from "../../expedient/details/ExpedientMassiveActions.tsx";
 import {useUserSession} from "../../../components/Session.tsx";
 import {useActions as useInteressatActions, useMassiveActions as useInteressatMassiveActions} from "../../interessats/details/InteressatActions.tsx";
+import {useExecucioMassivaContingut} from "../actions/ExecucioMassivaGrid.tsx";
 
 const sortModel:any = [{field: 'createdDate', sort: 'desc'}]
 const CustodiarPendentsFilterFrom = (props:any) => {
@@ -66,6 +67,7 @@ const springExpedientFilterBuilder = (data: any) => {
 }
 
 const namedQueriesExpedient: string[] = ['MASSIVE_ACTION_QUERY', 'MASSIVE_ARXIU_PENDENT']
+const perspectivesExpedient: string[] = ['EN_PROCES_CUSTODIAR'];
 const expedientColumns = [
     {
         field: 'nom',
@@ -87,7 +89,8 @@ const expedientColumns = [
     },
 ]
 
-const CustodiarExpedientsPendentsGrid = () => {
+const CustodiarExpedientsPendentsGrid = (props:any) => {
+    const { handleDetail } = props;
     const {t} = useTranslation();
     const apiRef = useMuiDataGridApiRef();
     const [springFilter, setSpringFilter] = useState<string>();
@@ -104,6 +107,14 @@ const CustodiarExpedientsPendentsGrid = () => {
             icon: "autorenew",
             showInMenu: false,
             onClick: guardarArxiu,
+            hidden: (row:any) => row?.execucioMassivaCustodiarId,
+        },
+        {
+            label: t('page.user.action.massives.pending'),
+            icon: "schedule",
+            showInMenu: false,
+            onClick: (row:any) => handleDetail(row?.execucioMassivaCustodiarId),
+            hidden: (row:any) => !row?.execucioMassivaCustodiarId,
         },
     ]
     const massiveActions = [
@@ -127,9 +138,11 @@ const CustodiarExpedientsPendentsGrid = () => {
             columns={expedientColumns}
             filter={springFilter}
             sortModel={sortModel}
+            perspectives={perspectivesExpedient}
             namedQueries={namedQueriesExpedient}
             rowAdditionalActions={actions}
             toolbarMassiveActions={massiveActions}
+            isRowSelectable={(params:any) => !params?.row?.execucioMassivaCustodiarId}
             toolbarHideCreate
         />
     </GridPage>
@@ -137,7 +150,7 @@ const CustodiarExpedientsPendentsGrid = () => {
 
 // Document
 const namedQueriesDocument: string[] = ['MASSIU_PENDENT_ARXIU']
-const perspectivesDocument = ['PROCEDIMENT'];
+const perspectivesDocument = ['PROCEDIMENT', 'EN_PROCES_CUSTODIAR'];
 const springDocumentFilterBuilder = (data: any) => {
     return builder.and(
         builder.like("nom", data?.nom),
@@ -173,7 +186,8 @@ const documentColumns = [
     },
 ]
 
-const CustodiarDocumentsPendentsGrid = () => {
+const CustodiarDocumentsPendentsGrid = (props:any) => {
+    const { handleDetail } = props;
     const {t} = useTranslation();
     const apiRef = useMuiDataGridApiRef();
     const [springFilter, setSpringFilter] = useState<string>();
@@ -184,12 +198,21 @@ const CustodiarDocumentsPendentsGrid = () => {
 
     const {guardarArxiu} = useDocumentActions(refresh)
     const {guardarArxiu: guardarArxiuMassive} = useDocumentMassiveActions(refresh)
+
     const actions = [
         {
             label: t('page.contingut.action.custodiar.label'),
             icon: "autorenew",
             showInMenu: false,
             onClick: guardarArxiu,
+            hidden: (row:any) => row?.execucioMassivaCustodiarId,
+        },
+        {
+            label: t('page.user.action.massives.pending'),
+            icon: "schedule",
+            showInMenu: false,
+            onClick: (row:any) => handleDetail(row?.execucioMassivaCustodiarId),
+            hidden: (row:any) => !row?.execucioMassivaCustodiarId,
         },
     ]
     const massiveActions = [
@@ -218,6 +241,7 @@ const CustodiarDocumentsPendentsGrid = () => {
             perspectives={perspectivesDocument}
             rowAdditionalActions={actions}
             toolbarMassiveActions={massiveActions}
+            isRowSelectable={(params:any) => !params?.row?.execucioMassivaCustodiarId}
             toolbarHideCreate
         />
     </GridPage>
@@ -225,7 +249,7 @@ const CustodiarDocumentsPendentsGrid = () => {
 
 // Interessat
 const namedQueriesInteressat: string[] = ['MASSIU_PENDENT_ARXIU']
-const perspectivesInteressat = ['PROCEDIMENT'];
+const perspectivesInteressat = ['PROCEDIMENT', 'EN_PROCES_CUSTODIAR'];
 const springInteressatFilterBuilder = (data: any) => {
     return builder.and(
         builder.like("nom", data?.nom),
@@ -261,7 +285,8 @@ const interessatColumns = [
     },
 ]
 
-const CustodiarInteressatsPendentsGrid = () => {
+const CustodiarInteressatsPendentsGrid = (props:any) => {
+    const { handleDetail } = props;
     const {t} = useTranslation();
     const apiRef = useMuiDataGridApiRef();
     const [springFilter, setSpringFilter] = useState<string>();
@@ -278,6 +303,14 @@ const CustodiarInteressatsPendentsGrid = () => {
             icon: "autorenew",
             showInMenu: false,
             onClick: guardarArxiu,
+            hidden: (row:any) => row?.execucioMassivaCustodiarId,
+        },
+        {
+            label: t('page.user.action.massives.pending'),
+            icon: "schedule",
+            showInMenu: false,
+            onClick: (row:any) => handleDetail(row?.execucioMassivaCustodiarId),
+            hidden: (row:any) => !row?.execucioMassivaCustodiarId,
         },
     ]
     const massiveActions = [
@@ -306,6 +339,7 @@ const CustodiarInteressatsPendentsGrid = () => {
             namedQueries={namedQueriesInteressat}
             rowAdditionalActions={actions}
             toolbarMassiveActions={massiveActions}
+            isRowSelectable={(params:any) => !params?.row?.execucioMassivaCustodiarId}
             toolbarHideCreate
         />
     </GridPage>
@@ -313,22 +347,23 @@ const CustodiarInteressatsPendentsGrid = () => {
 
 const CustodiarElementsPendentsGrid = () => {
     const {t} = useTranslation();
+    const {handleOpen: handleContingutOpen, dialog: dialogContingut} = useExecucioMassivaContingut();
 
     const tabs = [
         {
             value: "expedient",
             label: t('page.expedient.title'),
-            content: <CustodiarExpedientsPendentsGrid/>,
+            content: <CustodiarExpedientsPendentsGrid handleDetail={handleContingutOpen}/>,
         },
         {
             value: "document",
             label: t('page.document.title'),
-            content: <CustodiarDocumentsPendentsGrid/>,
+            content: <CustodiarDocumentsPendentsGrid handleDetail={handleContingutOpen}/>,
         },
         {
             value: "interessat",
             label: t('page.interessat.title'),
-            content: <CustodiarInteressatsPendentsGrid/>,
+            content: <CustodiarInteressatsPendentsGrid handleDetail={handleContingutOpen}/>,
         },
     ]
 
@@ -338,6 +373,7 @@ const CustodiarElementsPendentsGrid = () => {
                 tabs={tabs}
                 variant="scrollable"
             />
+            {dialogContingut}
         </CardPage>
     </GridPage>
 }
