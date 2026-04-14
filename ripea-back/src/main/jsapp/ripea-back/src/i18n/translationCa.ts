@@ -891,10 +891,11 @@ const translationCa = {
                     ok: "El document original s'ha descarregat correctament",
                 },
                 download: {
+                    firma: "Descarregar signatura",
                     ok: "Document descarregat correctament",
                 },
                 firma: {
-                    label: "Descarregar signatura",
+                    label: "Signar des del navegador...",
                     button: "Iniciar procés de firma",
                     title: "Signar des del navegador",
                     ok: "Document signat correctament",

@@ -314,7 +314,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             hidden: (row:any) => !isDigitalOrImportat(row) || !row?.gesDocOriginalId
         },
         {
-            label: t('page.document.action.firma.label'),
+            label: t('page.document.action.download.firma'),
             icon: "download",
             showInMenu: true,
 			onClick: (id:any) => apiDownload(id, 'firmaAdjunt', t('page.document.action.download.ok')),

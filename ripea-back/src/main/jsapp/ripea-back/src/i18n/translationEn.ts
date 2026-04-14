@@ -891,10 +891,11 @@ const translationEn = {
                     ok: "Original document downloaded successfully",
                 },
                 download: {
+                    firma: "Download signature",
                     ok: "Document downloaded successfully",
                 },
                 firma: {
-                    label: "Download signature",
+                    label: "Sign from the browser...",
                     button: "Start signing process",
                     title: "Sign from the browser",
                     ok: "Document signed successfully",

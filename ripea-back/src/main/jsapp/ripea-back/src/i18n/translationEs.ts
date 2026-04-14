@@ -891,10 +891,11 @@ const translationEs = {
                     ok: "El documenmto original se ha descargado correctamente",
                 },
                 download: {
+                    firma: "Descargar firma",
                     ok: "El documento se ha descargado correctamente",
                 },
                 firma: {
-                    label: "Descargar firma",
+                    label: "Firmar desde el navegador....",
                     button: "Iniciar proceso de firma",
                     title: "Firmar desde el navegador",
                     ok: "Documento firmado correctamente",
