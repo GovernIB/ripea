@@ -145,7 +145,7 @@ const CanviEstatGrid = () => {
 
     const actions = [
         {
-            label: t('page.document.action.portafirmes.label'),
+            label: t('page.expedient.action.changeEstat.label'),
             icon: "logout",
             showInMenu: false,
             onClick: handleCanviEstat,
@@ -155,7 +155,7 @@ const CanviEstatGrid = () => {
             label: t('page.user.action.massives.pending'),
             icon: "schedule",
             showInMenu: false,
-            onClick: (row:any) => handleContingutOpen(row?.execucioMassivaCanviEstatId),
+            onClick: (_id:any, row:any) => handleContingutOpen(row?.execucioMassivaCanviEstatId),
             hidden: (row:any) => !row?.execucioMassivaCanviEstatId,
         },
     ]

@@ -122,7 +122,7 @@ const EnviarPortafirmesGrid = () => {
             label: t('page.user.action.massives.pending'),
             icon: "schedule",
             showInMenu: false,
-            onClick: (row:any) => handleContingutOpen(row?.execucioMassivaPortafibId),
+            onClick: (_id:any, row:any) => handleContingutOpen(row?.execucioMassivaPortafibId),
             hidden: (row:any) => !row?.execucioMassivaPortafibId
         },
     ]

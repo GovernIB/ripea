@@ -33,7 +33,7 @@ const TancarGrid = () => {
             label: t('page.user.action.massives.pending'),
             icon: "schedule",
             showInMenu: false,
-            onClick: (row:any) => handleContingutOpen(row?.execucioMassivaTancamentId),
+            onClick: (_id:any, row:any) => handleContingutOpen(row?.execucioMassivaTancamentId),
             hidden: (row:any) => !row?.execucioMassivaTancamentId,
         },
     ]

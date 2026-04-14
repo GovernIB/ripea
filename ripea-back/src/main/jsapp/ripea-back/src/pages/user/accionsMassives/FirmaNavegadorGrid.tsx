@@ -63,7 +63,7 @@ const FirmaNavegadorGrid = () => {
             label: t('page.user.action.massives.pending'),
             icon: "schedule",
             showInMenu: false,
-            onClick: (row:any) => handleContingutOpen(row?.execucioMassivaFirmaWebId),
+            onClick: (_id:any, row:any) => handleContingutOpen(row?.execucioMassivaFirmaWebId),
             hidden: (row:any) => !row?.execucioMassivaFirmaWebId,
         },
     ]

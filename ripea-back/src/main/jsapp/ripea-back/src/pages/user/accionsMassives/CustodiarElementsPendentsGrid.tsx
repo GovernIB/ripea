@@ -113,7 +113,7 @@ const CustodiarExpedientsPendentsGrid = (props:any) => {
             label: t('page.user.action.massives.pending'),
             icon: "schedule",
             showInMenu: false,
-            onClick: (row:any) => handleDetail(row?.execucioMassivaCustodiarId),
+            onClick: (_id:any, row:any) => handleDetail(row?.execucioMassivaCustodiarId),
             hidden: (row:any) => !row?.execucioMassivaCustodiarId,
         },
     ]
@@ -211,7 +211,7 @@ const CustodiarDocumentsPendentsGrid = (props:any) => {
             label: t('page.user.action.massives.pending'),
             icon: "schedule",
             showInMenu: false,
-            onClick: (row:any) => handleDetail(row?.execucioMassivaCustodiarId),
+            onClick: (_id:any, row:any) => handleDetail(row?.execucioMassivaCustodiarId),
             hidden: (row:any) => !row?.execucioMassivaCustodiarId,
         },
     ]
@@ -309,7 +309,7 @@ const CustodiarInteressatsPendentsGrid = (props:any) => {
             label: t('page.user.action.massives.pending'),
             icon: "schedule",
             showInMenu: false,
-            onClick: (row:any) => handleDetail(row?.execucioMassivaCustodiarId),
+            onClick: (_id:any, row:any) => handleDetail(row?.execucioMassivaCustodiarId),
             hidden: (row:any) => !row?.execucioMassivaCustodiarId,
         },
     ]

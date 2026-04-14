@@ -109,7 +109,7 @@ const ActualitzarEstatAnotacioGrid = () => {
             label: t('page.user.action.massives.pending'),
             icon: "schedule",
             showInMenu: false,
-            onClick: (row:any) => handleContingutOpen(row?.execucioMassivaActualitzarEstatId),
+            onClick: (_id:any, row:any) => handleContingutOpen(row?.execucioMassivaActualitzarEstatId),
             hidden: (row:any) => !row?.execucioMassivaActualitzarEstatId,
         },
     ]

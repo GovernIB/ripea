@@ -128,7 +128,7 @@ const AdjuntarAnnexosPendentsGrid = () => {
             label: t('page.user.action.massives.pending'),
             icon: "schedule",
             showInMenu: false,
-            onClick: (row:any) => handleContingutOpen(row?.execucioMassivaAdjuntarAnnexosId),
+            onClick: (_id:any, row:any) => handleContingutOpen(row?.execucioMassivaAdjuntarAnnexosId),
             hidden: (row:any) => !row?.execucioMassivaAdjuntarAnnexosId,
         },
     ]
