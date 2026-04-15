@@ -263,21 +263,42 @@ public class TestDataFactory {
         metaExp7.setGrupPerDefecte(data.grup);
         data.metaExpedients.add(metaExpedientRepository.save(metaExp7));
 
+        // --- Entitat 2 (per validar que els filtres d'entitat aïllen correctament ENT_TEST) ---
+        data.entitat2 = entitatRepository.save(
+                EntitatEntity.getBuilder(
+                        "ENT_TEST2",
+                        "Entitat de test 2",
+                        "Descripció de la segona entitat de proves",
+                        "B00000000",
+                        "B00000000"
+                ).build()
+        );
+
+        // --- Procediment 8: pertany a ENT_TEST2 (no ha d'aparèixer en les consultes de ENT_TEST) ---
+        MetaExpedientEntity metaExp8 = MetaExpedientEntity.getBuilder(
+                "PROC_08", "Procediment 8", "Descripció del procediment 8",
+                "SERIE_08", "SIA008",
+                false, false, data.entitat2, null, null, false, false, false
+        ).tipusClassificacio(TipusClassificacioEnumDto.SIA).build();
+        data.metaExpedients.add(metaExpedientRepository.save(metaExp8));
+
         return data;
     }
 
     /**
      * Contenidor de les referències a les entitats creades pel conjunt bàsic de dades.
      *
-     * Conté 7 procediments en total:
+     * Conté 8 procediments en total:
      *   - PROC_01..03: actius, tipus PROCEDIMENT, sense organGestor (amb metadades, documents, estats, tasques)
      *   - PROC_04: actiu, tipus SERVEI, sense organGestor
      *   - PROC_05: inactiu, tipus PROCEDIMENT, sense organGestor
      *   - PROC_06: actiu, tipus PROCEDIMENT, amb organGestor organs[0]
      *   - PROC_07: actiu, tipus PROCEDIMENT, amb organGestor organs[1]
+     *   - PROC_08: pertany a ENT_TEST2 (no apareix en consultes filtrades per ENT_TEST)
      */
     public static class TestData {
         public EntitatEntity            entitat;
+        public EntitatEntity            entitat2;
         public UsuariEntity             usuari;
         public GrupEntity               grup;
         public PinbalServeiEntity       pinbalServei;

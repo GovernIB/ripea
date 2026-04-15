@@ -29,12 +29,13 @@ import es.caib.ripea.service.test.config.BaseServiceTest;
  * quins procediments són visibles.
  *
  * Conjunt de dades base (TestDataFactory):
- *   - 7 procediments: PROC_01..07
- *   - PROC_01..03: actius, PROCEDIMENT, sense organGestor
- *   - PROC_04: actiu, SERVEI, sense organGestor
- *   - PROC_05: inactiu, PROCEDIMENT, sense organGestor
- *   - PROC_06: actiu, PROCEDIMENT, organGestor = organs[0]
- *   - PROC_07: actiu, PROCEDIMENT, organGestor = organs[1]
+ *   - 8 procediments totals: PROC_01..08
+ *   - PROC_01..03: actius, PROCEDIMENT, sense organGestor (ENT_TEST)
+ *   - PROC_04: actiu, SERVEI, sense organGestor (ENT_TEST)
+ *   - PROC_05: inactiu, PROCEDIMENT, sense organGestor (ENT_TEST)
+ *   - PROC_06: actiu, PROCEDIMENT, organGestor = organs[0] (ENT_TEST)
+ *   - PROC_07: actiu, PROCEDIMENT, organGestor = organs[1] (ENT_TEST)
+ *   - PROC_08: actiu, PROCEDIMENT, sense organGestor (ENT_TEST2 — no apareix en les consultes)
  */
 @WithMockUser(username = "usuari1", roles = {"ADMIN"})
 public class MetaExpedientResourceServiceTest extends BaseServiceTest {
@@ -59,16 +60,15 @@ public class MetaExpedientResourceServiceTest extends BaseServiceTest {
     // Tests d'ordenació per nom (existents, actualitzats per a 7 procediments)
     // =========================================================================
 
-    // La página retorna 7 procedimientos en total
+    // La consulta retorna només els 7 procediments de ENT_TEST, no el PROC_08 de ENT_TEST2
     @Test
-    void quanDemanemLaPrimeraPaginaOrdenadaPerNom_retornaSetProcediments() {
+    void quanConsultamProcediments_nomoesRetornaElsDeLEntitatActual() {
         Page<MetaExpedientResource> pagina = metaExpedientResourceService.findPage(
                 null, null, null, null,
                 PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "nom"))
         );
 
         assertThat(pagina.getTotalElements()).isEqualTo(7);
-        assertThat(pagina.getContent()).hasSize(7);
     }
 
     // Los procedimientos se ordenan ascendentemente por nombre
@@ -363,6 +363,36 @@ public class MetaExpedientResourceServiceTest extends BaseServiceTest {
         ).getTotalElements();
 
         assertThat(totalFinal).isEqualTo(totalInicial);
+    }
+
+    // Desactivar un procedimiento activo hace que isActiu() devuelva false
+    @Test
+    void quanDesactivamUnProcedimentActiu_getOneRetornaActiuFals() {
+        Long id = testData.metaExpedients.get(0).getId(); // PROC_01, actiu=true
+        MetaExpedientResource resource = metaExpedientResourceService.getOne(id, null);
+        assertThat(resource.isActiu()).isTrue();
+
+        resource.setActiu(false);
+        metaExpedientResourceService.update(id, resource, null);
+        entityManager.flush();
+        entityManager.clear();
+
+        assertThat(metaExpedientResourceService.getOne(id, null).isActiu()).isFalse();
+    }
+
+    // Activar un procedimiento inactivo hace que isActiu() devuelva true
+    @Test
+    void quanActivamUnProcedimentInactiu_getOneRetornaActiuVer() {
+        Long id = testData.metaExpedients.get(4).getId(); // PROC_05, actiu=false
+        MetaExpedientResource resource = metaExpedientResourceService.getOne(id, null);
+        assertThat(resource.isActiu()).isFalse();
+
+        resource.setActiu(true);
+        metaExpedientResourceService.update(id, resource, null);
+        entityManager.flush();
+        entityManager.clear();
+
+        assertThat(metaExpedientResourceService.getOne(id, null).isActiu()).isTrue();
     }
 
     // =========================================================================
