@@ -44,7 +44,7 @@ export const DraggableItem: React.FC<DraggableContainerProps> = ({ id, data, sty
     };
 
     const draggableStyle = draggableTransform
-        ? { transform: `translate3d(${draggableTransform.x}px, ${draggableTransform.y}px, 0)`, zIndex: 1, position: 'relative' }
+        ? { transform: `translate3d(${draggableTransform.x}px, ${draggableTransform.y}px, 0)`, zIndex: 1, position: 'relative' as const }
         : undefined;
 
     const droppableStyle = {

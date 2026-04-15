@@ -5,6 +5,7 @@ import { CardPage } from "../../../components/CardData.tsx";
 import {CanviEstatFilter, CanviEstatMuiGrid} from "./CanviEstatGrid.tsx";
 import useTancar, {useTancarMassive} from "../../expedient/actions/Tancar.tsx";
 import {useExecucioMassivaContingut} from "../actions/ExecucioMassivaGrid.tsx";
+import {Box} from "@mui/material";
 
 const namedQueries: string[] = ['MASSIVE_ACTION_QUERY', 'MASSIVE_ACTION_TANCAR']
 const perspectives:any = ['ESTAT','AUDITORIA', 'EN_PROCES_TANCAMENT'];
@@ -31,7 +32,7 @@ const TancarGrid = () => {
         },
         {
             label: t('page.user.action.massives.pending'),
-            icon: "schedule",
+            icon: <Box sx={{ color: 'warning.main' }}>schedule</Box>,
             showInMenu: false,
             onClick: (_id:any, row:any) => handleContingutOpen(row?.execucioMassivaTancamentId),
             hidden: (row:any) => !row?.execucioMassivaTancamentId,

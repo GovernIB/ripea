@@ -238,7 +238,7 @@ const lightPalete = {
     text: { disabled: '#555555 !important' },
     warning: {main: '#8a6d3b'},
     action: {
-        disabled: '#333333',
+        disabled: 'rgba(81,81,81,0.49)',
         selected: 'rgba(51, 122, 183, 0.28)',
         disabledBackground: 'rgba(231,229,229,0.6)',
     },

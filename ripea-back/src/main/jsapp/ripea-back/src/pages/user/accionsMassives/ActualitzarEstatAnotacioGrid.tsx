@@ -10,6 +10,7 @@ import GridFormField, {GridButtonField} from "../../../components/GridFormField.
 import {useActions, useMassiveActions} from "../../anotacions/details/AnotacioActions.tsx";
 import {useUserSession} from "../../../components/Session.tsx";
 import {useExecucioMassivaContingut} from "../actions/ExecucioMassivaGrid.tsx";
+import {Box} from "@mui/material";
 
 const ActualitzarEstatAnotacioFilterFrom = () => {
     const {data} = useFormContext();
@@ -107,7 +108,7 @@ const ActualitzarEstatAnotacioGrid = () => {
         },
         {
             label: t('page.user.action.massives.pending'),
-            icon: "schedule",
+            icon: <Box sx={{ color: 'warning.main' }}>schedule</Box>,
             showInMenu: false,
             onClick: (_id:any, row:any) => handleContingutOpen(row?.execucioMassivaActualitzarEstatId),
             hidden: (row:any) => !row?.execucioMassivaActualitzarEstatId,

@@ -24,12 +24,12 @@ export const useMassiveActions = (refresh?: () => void) => {
             });
     }
 
-    const download = (ids: any[]): void => { massiveReport(ids, 'DESCARREGAR_MASSIU', t('page.expedient.results.actionOk'), 'ZIP'); }
+    const download = (ids: any[]): void => { massiveReport(ids, 'DESCARREGAR_MASSIU', t('page.expedient.results.actionBackgroundOk'), 'ZIP'); }
     const guardarArxiu = (ids: any[]): void => {
         apiAction(undefined, {code :'GUARDAR_ARXIU', data:{ ids, massivo: true }})
             .then(() => {
                 refresh?.();
-                temporalMessageShow(null, t('page.expedient.results.actionOk'), 'info');
+                temporalMessageShow(null, t('page.expedient.results.actionBackgroundOk'), 'info');
             })
             .catch((error) => {
                 temporalMessageShow(null, error?.message, 'error');
