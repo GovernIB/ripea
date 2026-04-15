@@ -116,7 +116,7 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 			inverseName = BaseConfig.DB_PREFIX + "grup_metaexpgrup_fk")
 	private List<GrupEntity> grups = new ArrayList<GrupEntity>();
 	
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "grup_per_defecte")
     @ForeignKey(name = BaseConfig.DB_PREFIX + "grup_metaexp_fk")
     private GrupEntity grupPerDefecte;

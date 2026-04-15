@@ -133,7 +133,6 @@ public class ConversioTipusHelper {
 
 	private MapperFactory mapperFactory;
 
-	@Autowired private ContingutHelper contingutHelper;
 	@Autowired private OrganGestorRepository organGestorRepository;
 	@Autowired private MetaDadaRepository metaDadaRepository;
 	@Autowired private MetaDocumentRepository metaDocumentRepository;

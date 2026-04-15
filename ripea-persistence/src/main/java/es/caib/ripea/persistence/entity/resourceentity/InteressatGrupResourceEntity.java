@@ -5,7 +5,6 @@ import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.ForeignKey;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
@@ -38,9 +37,7 @@ public class InteressatGrupResourceEntity extends BaseAuditableEntity<Interessat
 	private String descripcio;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(
-			name = "expedient_id",
-			foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "interessat_grupexped_fk"))
+	@JoinColumn(name = "expedient_id")
 	protected ExpedientResourceEntity expedient;
 	
 	@ManyToMany(mappedBy = "grups", fetch = FetchType.LAZY)

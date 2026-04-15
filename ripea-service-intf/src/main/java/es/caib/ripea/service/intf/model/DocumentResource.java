@@ -604,7 +604,7 @@ public class DocumentResource extends NodeResource {
         @Transient private String idTransaccio;
         
         //CAMPS NOMES VISIBLES A ACCIO MASSIVA
-        private Date dataInici;
+        private Date dataInici = Calendar.getInstance().getTime();
         private boolean enviarCorreu;
     }
     

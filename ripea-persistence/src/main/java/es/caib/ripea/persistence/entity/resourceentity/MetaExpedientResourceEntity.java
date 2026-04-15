@@ -90,7 +90,7 @@ public class MetaExpedientResourceEntity extends MetaNodeResourceEntity<MetaExpe
 			foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "metaexp_metaexpgrup_fk"))
 	private List<GrupResourceEntity> grups = new ArrayList<>();
 
-	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(
 			name = "grup_per_defecte",
 			foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "grup_metaexp_fk"))

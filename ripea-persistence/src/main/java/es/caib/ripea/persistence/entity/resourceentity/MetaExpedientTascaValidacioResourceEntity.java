@@ -9,8 +9,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.ForeignKey;
-
 import es.caib.ripea.persistence.base.entity.BaseAuditableEntity;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.dto.ItemValidacioTascaEnum;
@@ -43,6 +41,5 @@ public class MetaExpedientTascaValidacioResourceEntity extends BaseAuditableEnti
 	
 	@ManyToOne(optional = false, fetch = FetchType.EAGER)
 	@JoinColumn(name = "TASCA_ID")
-	@ForeignKey(name = BaseConfig.DB_PREFIX + "METAEXP_TASCA_VALIDACIO_FK")
 	private MetaExpedientTascaResourceEntity metaExpedientTasca;
 }

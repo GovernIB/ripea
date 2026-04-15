@@ -12,8 +12,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
-import org.hibernate.annotations.ForeignKey;
-
 import es.caib.ripea.persistence.base.entity.BaseAuditableEntity;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.model.MetaExpedientCarpetaResource;
@@ -37,7 +35,6 @@ public class MetaExpedientCarpetaResourceEntity extends BaseAuditableEntity<Meta
 	
 	@ManyToOne(optional = true, fetch = FetchType.EAGER)
 	@JoinColumn(name = "pare_id")
-	@ForeignKey(name = BaseConfig.DB_PREFIX + "metaexpedient_carpeta_pare_fk")
 	protected MetaExpedientCarpetaResourceEntity pare;
 	
 	
@@ -49,6 +46,5 @@ public class MetaExpedientCarpetaResourceEntity extends BaseAuditableEntity<Meta
 	
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "meta_expedient_id")
-	@ForeignKey(name = BaseConfig.DB_PREFIX + "metaexp_metaexpcarp_fk")
 	private MetaExpedientResourceEntity metaExpedient;
 }

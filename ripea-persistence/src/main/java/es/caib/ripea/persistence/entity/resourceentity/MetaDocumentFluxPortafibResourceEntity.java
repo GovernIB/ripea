@@ -19,7 +19,7 @@ import javax.persistence.*;
 public class MetaDocumentFluxPortafibResourceEntity extends BaseAuditableEntity<MetaDocumentFluxPortafibResource> {
 
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
-    @JoinColumn(name = "metaDocument_id", foreignKey = @javax.persistence.ForeignKey(name = BaseConfig.DB_PREFIX + "metaDocument_fk"))
+    @JoinColumn(name = "metaDocument_id")
     private MetaDocumentResourceEntity metaDocument;
     
 	@Column(name = "portafirmes_flux_id")
