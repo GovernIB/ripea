@@ -51,7 +51,7 @@ const FirmaNavegadorGrid = () => {
     const {handleShow: handleFirmaMassive, content: contentFirmaMassive} = useFirmaNavegadorMassive(refresh);
     const {handleOpen: handleContingutOpen, dialog: dialogContingut} = useExecucioMassivaContingut();
 
-    const actions = [
+    const actions:any[] = [
         {
             label: t('page.document.action.firma.label'),
             icon: "edit_document",

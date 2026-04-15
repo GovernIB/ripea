@@ -173,7 +173,7 @@ const MetaExpedientTascaValidacioGrid = () => {
                     popupEditFormDialogResourceTitle={t('page.metaExpedientTascaValidacio.title')}
                     popupEditFormContent={<MetaExpedientTascaValidacioForm/>}
                     columns={columns}
-                    toolbarHideQuickFilter={false}
+                    toolbarShowQuickFilter
                     filter={builder.eq("metaExpedientTasca.id", tascaId)}
                     formAdditionalData={{ metaExpedient: {id}, metaExpedientTasca: {id: tascaId} }}
                     staticSortModel={sortModel}

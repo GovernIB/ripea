@@ -41,6 +41,8 @@ type StyledMuiGridProps = MuiDataGridProps & {
     disabledMassiveDefSelector?: boolean,
     hiddenMassiveDefSelector?: boolean,
     onDragEnd?: ( event:any ) => void,
+    toolbarShowCreate?: boolean,
+    toolbarShowQuickFilter?: boolean,
 }
 
 export const DndMuiGrid = (props:StyledMuiGridProps) => {
@@ -99,6 +101,8 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
         onRefresh,
         disabledMassiveDefSelector = false,
         hiddenMassiveDefSelector = false,
+        toolbarShowCreate = false,
+        toolbarShowQuickFilter = false,
         ...others
     } = props
     const [gridRows, setGridRows] = useState<any[]>([]);
@@ -183,7 +187,7 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
         return user?.conf?.numElementsPagina != null
             ? {
                 getRowHeight: () => 'auto',
-                autoHeight: true,
+                autoHeight: true as const,
                 paginationModel: {page: 0, pageSize: +user?.conf?.numElementsPagina},
                 pageSizeOptions: [10, 20, 50, 100, 250],
             }
@@ -233,9 +237,9 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
             ]}
 
             toolbarHideRefresh
-            toolbarHideCreate
-            toolbarHideExport
-            toolbarHideQuickFilter
+            toolbarHideCreate={!toolbarShowCreate ?true :undefined}
+            // toolbarHideExport
+            toolbarHideQuickFilter={!toolbarShowQuickFilter ?true :undefined}
             toolbarElementsWithPositions={toolbarElements}
             rowHideUpdateButton
             rowHideDeleteButton

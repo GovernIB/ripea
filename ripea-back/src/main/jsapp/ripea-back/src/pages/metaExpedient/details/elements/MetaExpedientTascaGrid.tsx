@@ -173,7 +173,7 @@ export const MetaExpedientTascaGrid = ({ entity, onRowCountChange, readOnly } :a
         popupEditFormDialogResourceTitle={t('page.metaExpedientTasca.title')}
         popupEditFormContent={<MetaExpedientTascaForm/>}
         columns={columns}
-        toolbarHideQuickFilter={false}
+        toolbarShowQuickFilter
         filter={builder.eq("metaExpedient.id", entity?.id)}
         formAdditionalData={{ metaExpedient: {id: entity?.id} }}
         sortModel={sortModel}

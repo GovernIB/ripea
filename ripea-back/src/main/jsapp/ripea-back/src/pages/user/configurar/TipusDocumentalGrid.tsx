@@ -57,7 +57,7 @@ const TipusDocumentalGrid = () => {
                 columns={columns}
                 sortModel={sortModel}
                 rowAdditionalActions={actions}
-                toolbarHideQuickFilter={false}
+                toolbarShowQuickFilter
                 toolbarCreateTitle={t('page.tipusDocumental.action.new.label')}
                 popupEditFormI18nKeys={{
                     createSuccess: 'page.tipusDocumental.action.new.ok',

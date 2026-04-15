@@ -110,7 +110,7 @@ const EnviarPortafirmesGrid = () => {
     const {handleShow: handleEviarMassiveShow, content: contentEviarMassive} = useEnviarPortafirmesMassive(refresh);
     const {handleOpen: handleContingutOpen, dialog: dialogContingut} = useExecucioMassivaContingut();
 
-    const actions = [
+    const actions:any[] = [
         {
             label: t('page.document.action.portafirmes.label'),
             icon: "mail",

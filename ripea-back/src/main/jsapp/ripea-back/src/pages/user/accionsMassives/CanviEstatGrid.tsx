@@ -143,7 +143,7 @@ const CanviEstatGrid = () => {
     const {handleShow: handleCanviEstatMassive, content: contentCanviEstatMassive} = useCambiarEstatMassive(refresh)
     const {handleOpen: handleContingutOpen, dialog: dialogContingut} = useExecucioMassivaContingut();
 
-    const actions = [
+    const actions:any[] = [
         {
             label: t('page.expedient.action.changeEstat.label'),
             icon: "logout",

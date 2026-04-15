@@ -60,7 +60,7 @@ export const ServeiPinbalGrid = () => {
                 popupEditCreateActive
                 popupEditFormContent={<ServeiPinbalGridForm/>}
                 rowAdditionalActions={actions}
-                toolbarHideQuickFilter={false}
+                toolbarShowQuickFilter
                 toolbarHideCreate
                 popupEditFormI18nKeys={{
                     updateSuccess: 'page.entitat.action.update.ok',

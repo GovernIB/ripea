@@ -129,7 +129,7 @@ const TasquesExpedientGrid = (props: any) => {
                 metaExpedient: entity?.metaExpedient,
             }}
             rowAdditionalActions={actions}
-            toolbarHideCreate={!entity?.potModificar}
+            toolbarShowCreate={entity?.potModificar}
 
             onRowClick={(params: any) => handleOpen(params?.row?.id) }
             popupEditFormI18nKeys={{

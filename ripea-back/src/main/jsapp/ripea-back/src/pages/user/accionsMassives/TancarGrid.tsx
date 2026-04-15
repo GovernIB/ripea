@@ -22,7 +22,7 @@ const TancarGrid = () => {
     const {handleShow: handleTancarMassive, content: contentTancarMassive} = useTancarMassive(refresh)
     const {handleOpen: handleContingutOpen, dialog: dialogContingut} = useExecucioMassivaContingut();
 
-    const actions = [
+    const actions:any[] = [
         {
             label: t('page.expedient.action.close.label'),
             icon: "check",
