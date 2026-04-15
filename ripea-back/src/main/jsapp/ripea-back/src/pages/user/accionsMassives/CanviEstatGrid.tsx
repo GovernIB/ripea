@@ -3,7 +3,7 @@ import {GridPage, useFormContext, useMuiDataGridApiRef} from "reactlib";
 import {useMemo, useState} from "react";
 import { CardPage } from "../../../components/CardData.tsx";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
-import {Alert, Link} from "@mui/material";
+import {Alert, Box, Link} from "@mui/material";
 import {Link as RouterLink } from 'react-router-dom';
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
@@ -153,7 +153,7 @@ const CanviEstatGrid = () => {
         },
         {
             label: t('page.user.action.massives.pending'),
-            icon: "schedule",
+            icon: <Box sx={{ color: 'warning.main' }}>schedule</Box>,
             showInMenu: false,
             onClick: (_id:any, row:any) => handleContingutOpen(row?.execucioMassivaCanviEstatId),
             hidden: (row:any) => !row?.execucioMassivaCanviEstatId,

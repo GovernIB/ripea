@@ -1,6 +1,6 @@
 import {useTranslation} from "react-i18next";
 import {GridPage, useMuiDataGridApiRef} from "reactlib";
-import {Link} from "@mui/material";
+import {Box, Link} from "@mui/material";
 import {Link as RouterLink } from 'react-router-dom';
 import {useState} from "react";
 import {CardPage} from "../../../components/CardData.tsx";
@@ -61,7 +61,7 @@ const FirmaNavegadorGrid = () => {
         },
         {
             label: t('page.user.action.massives.pending'),
-            icon: "schedule",
+            icon: <Box sx={{ color: 'warning.main' }}>schedule</Box>,
             showInMenu: false,
             onClick: (_id:any, row:any) => handleContingutOpen(row?.execucioMassivaFirmaWebId),
             hidden: (row:any) => !row?.execucioMassivaFirmaWebId,

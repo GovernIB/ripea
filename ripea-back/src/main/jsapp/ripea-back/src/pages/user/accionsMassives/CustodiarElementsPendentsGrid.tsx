@@ -7,7 +7,7 @@ import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import * as builder from "../../../util/springFilterUtils.ts";
 import GridFormField from "../../../components/GridFormField.tsx";
-import {Link} from "@mui/material";
+import {Box, Link} from "@mui/material";
 import {Link as RouterLink } from 'react-router-dom';
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
 import {useActions as useDocumentActions} from "../../contingut/details/ContingutActions.tsx";
@@ -111,7 +111,7 @@ const CustodiarExpedientsPendentsGrid = (props:any) => {
         },
         {
             label: t('page.user.action.massives.pending'),
-            icon: "schedule",
+            icon: <Box sx={{ color: 'warning.main' }}>schedule</Box>,
             showInMenu: false,
             onClick: (_id:any, row:any) => handleDetail(row?.execucioMassivaCustodiarId),
             hidden: (row:any) => !row?.execucioMassivaCustodiarId,
@@ -209,7 +209,7 @@ const CustodiarDocumentsPendentsGrid = (props:any) => {
         },
         {
             label: t('page.user.action.massives.pending'),
-            icon: "schedule",
+            icon: <Box sx={{ color: 'warning.main' }}>schedule</Box>,
             showInMenu: false,
             onClick: (_id:any, row:any) => handleDetail(row?.execucioMassivaCustodiarId),
             hidden: (row:any) => !row?.execucioMassivaCustodiarId,
@@ -307,7 +307,7 @@ const CustodiarInteressatsPendentsGrid = (props:any) => {
         },
         {
             label: t('page.user.action.massives.pending'),
-            icon: "schedule",
+            icon: <Box sx={{ color: 'warning.main' }}>schedule</Box>,
             showInMenu: false,
             onClick: (_id:any, row:any) => handleDetail(row?.execucioMassivaCustodiarId),
             hidden: (row:any) => !row?.execucioMassivaCustodiarId,

@@ -7,7 +7,7 @@ import {formatDate} from "../../../util/dateUtils.ts";
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import GridFormField from "../../../components/GridFormField.tsx";
-import {Alert, Link} from "@mui/material";
+import {Alert, Box, Link} from "@mui/material";
 import {Link as RouterLink } from 'react-router-dom';
 import {useSession} from "../../../components/SessionStorageContext.tsx";
 import {useUserSession} from "../../../components/Session.tsx";
@@ -126,7 +126,7 @@ const AdjuntarAnnexosPendentsGrid = () => {
         },
         {
             label: t('page.user.action.massives.pending'),
-            icon: "schedule",
+            icon: <Box sx={{ color: 'warning.main' }}>schedule</Box>,
             showInMenu: false,
             onClick: (_id:any, row:any) => handleContingutOpen(row?.execucioMassivaAdjuntarAnnexosId),
             hidden: (row:any) => !row?.execucioMassivaAdjuntarAnnexosId,
