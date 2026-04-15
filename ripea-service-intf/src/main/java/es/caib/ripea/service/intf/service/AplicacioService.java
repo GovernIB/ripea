@@ -288,7 +288,13 @@ public interface AplicacioService {
 	
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public List<Long> getAvisosComanda();
-	
+
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public String executeAvisComanda(Long expedientId) throws Exception;
+
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	public List<Long> getEntitatsSenseTipusDocumentals();
+
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	public String executeCrearTipusDocumentalsEntitat(Long entitatId) throws Exception;
 }

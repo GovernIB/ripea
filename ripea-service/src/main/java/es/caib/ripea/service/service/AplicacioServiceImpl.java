@@ -76,6 +76,7 @@ import es.caib.ripea.service.helper.CacheHelper;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.ConversioTipusHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
+import es.caib.ripea.service.helper.TipusDocumentalHelper;
 import es.caib.ripea.service.helper.IntegracioHelper;
 import es.caib.ripea.service.helper.MetaExpedientHelper;
 import es.caib.ripea.service.helper.PaginacioHelper;
@@ -120,6 +121,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Autowired private MetaExpedientHelper metaExpedientHelper;
     @Autowired private EntitatRepository entitatRepository;
     @Autowired private OrganGestorRepository organGestorRepository;
+    @Autowired private TipusDocumentalHelper tipusDocumentalHelper;
 
     //UpdateUsuaris
     @Autowired private ExpedientRepository expedientRepository;
@@ -895,5 +897,23 @@ public class AplicacioServiceImpl implements AplicacioService {
 		}
 		
 		return resultat;
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<Long> getEntitatsSenseTipusDocumentals() {
+		return entitatRepository.findAllIds();
+	}
+
+	@Override
+	@Transactional
+	public String executeCrearTipusDocumentalsEntitat(Long entitatId) throws Exception {
+		try {
+			EntitatEntity entitat = entitatRepository.findById(entitatId).get();
+			tipusDocumentalHelper.crearTipusDocumentalsEntitat(entitat.getCodi());
+			return "Tipus documentals creats per a l'entitat " + entitat.getCodi();
+		} catch (Exception ex) {
+			throw new Exception("Error al crear els tipus documentals per a l'entitat amb id=" + entitatId + ": " + ex.getMessage());
+		}
 	}
 }

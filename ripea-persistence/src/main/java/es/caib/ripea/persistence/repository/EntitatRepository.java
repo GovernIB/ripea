@@ -29,6 +29,9 @@ public interface EntitatRepository extends JpaRepository<EntitatEntity, Long> {
 	@Query("SELECT e.codi FROM EntitatEntity e ORDER BY e.codi")
 	List<String> findCodisOrdenats();
 
+	@Query("SELECT e.id FROM EntitatEntity e")
+	List<Long> findAllIds();
+
 	@Query("select org.entitat " + 
 			"from " + 
 			"    OrganGestorEntity org " + 

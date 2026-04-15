@@ -34,6 +34,11 @@ public interface TipusDocumentalRepository extends JpaRepository<TipusDocumental
 	TipusDocumentalEntity findByCodiAndEntitat(String codi, EntitatEntity entitat);
 	
 	@Modifying
+	@Query(value = "DELETE FROM ipa_tipus_documental WHERE entitat_id IN " +
+			"(SELECT id FROM ipa_entitat WHERE codi = :codiEntitat)", nativeQuery = true)
+	void deleteByEntitatCodi(@Param("codiEntitat") String codiEntitat);
+
+	@Modifying
  	@Query(value = "UPDATE IPA_TIPUS_DOCUMENTAL " +
  			"SET CREATEDBY_CODI = CASE WHEN CREATEDBY_CODI = :codiAntic THEN :codiNou ELSE CREATEDBY_CODI END, " +
  			"    LASTMODIFIEDBY_CODI = CASE WHEN LASTMODIFIEDBY_CODI = :codiAntic THEN :codiNou ELSE LASTMODIFIEDBY_CODI END " +

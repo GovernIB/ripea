@@ -59,6 +59,7 @@ public class MetaExpedientResourceServiceTest extends BaseServiceTest {
     // Tests d'ordenació per nom (existents, actualitzats per a 7 procediments)
     // =========================================================================
 
+    // La página retorna 7 procedimientos en total
     @Test
     void quanDemanemLaPrimeraPaginaOrdenadaPerNom_retornaSetProcediments() {
         Page<MetaExpedientResource> pagina = metaExpedientResourceService.findPage(
@@ -70,6 +71,7 @@ public class MetaExpedientResourceServiceTest extends BaseServiceTest {
         assertThat(pagina.getContent()).hasSize(7);
     }
 
+    // Los procedimientos se ordenan ascendentemente por nombre
     @Test
     void quanDemanemLaPrimeraPaginaOrdenadaPerNom_elsResultatsSonEnOrdreCrescent() {
         Page<MetaExpedientResource> pagina = metaExpedientResourceService.findPage(
@@ -85,6 +87,7 @@ public class MetaExpedientResourceServiceTest extends BaseServiceTest {
                 );
     }
 
+    // Todos los procedimientos pertenecen a la misma entidad
     @Test
     void quanDemanemLaPrimeraPaginaOrdenadaPerNom_totsTenenLaMateixaEntitat() {
         Page<MetaExpedientResource> pagina = metaExpedientResourceService.findPage(
@@ -102,6 +105,7 @@ public class MetaExpedientResourceServiceTest extends BaseServiceTest {
     // Tests d'ordenació per altres camps
     // =========================================================================
 
+    // Los procedimientos se ordenan ascendentemente por código
     @Test
     void quanOrdenamPerCodiAsc_elsResultatsSonEnOrdreCrescent() {
         Page<MetaExpedientResource> pagina = metaExpedientResourceService.findPage(
@@ -118,6 +122,7 @@ public class MetaExpedientResourceServiceTest extends BaseServiceTest {
                 );
     }
 
+    // Los procedimientos se ordenan ascendentemente por clasificación
     @Test
     void quanOrdenamPerClassificacioAsc_elsResultatsSonEnOrdreCrescent() {
         Page<MetaExpedientResource> pagina = metaExpedientResourceService.findPage(
@@ -134,6 +139,7 @@ public class MetaExpedientResourceServiceTest extends BaseServiceTest {
                 );
     }
 
+    // Los procedimientos se ordenan ascendentemente por serie documental
     @Test
     void quanOrdenamPerSerieDocumentalAsc_elsResultatsSonEnOrdreCrescent() {
         Page<MetaExpedientResource> pagina = metaExpedientResourceService.findPage(
@@ -150,6 +156,7 @@ public class MetaExpedientResourceServiceTest extends BaseServiceTest {
                 );
     }
 
+    // Los procedimientos con organGestor se ordenan por id de órgano gestor
     @Test
     void quanOrdenamPerOrganGestorAmbFiltreNoNull_elsOrganGestorsSortosEnOrdreCrescent() {
         // Filtra per organGestor is not null i ordena per organGestor (→ organGestor.id ASC)
@@ -174,6 +181,7 @@ public class MetaExpedientResourceServiceTest extends BaseServiceTest {
     // Tests de filtre
     // =========================================================================
 
+    // Filtro por tipo SERVEI retorna únicamente PROC_04
     @Test
     void quanFiltramPerTipusServei_retornaUnicamentElServei() {
         Page<MetaExpedientResource> pagina = metaExpedientResourceService.findPage(
@@ -187,6 +195,7 @@ public class MetaExpedientResourceServiceTest extends BaseServiceTest {
         assertThat(pagina.getContent().get(0).getCodi()).isEqualTo("PROC_04");
     }
 
+    // Filtro por código retorna únicamente el procedimiento con ese código
     @Test
     void quanFiltramPerCodi_retornaUnicamentElProcedimentAmbAquellCodi() {
         Page<MetaExpedientResource> pagina = metaExpedientResourceService.findPage(
@@ -200,6 +209,7 @@ public class MetaExpedientResourceServiceTest extends BaseServiceTest {
         assertThat(pagina.getContent().get(0).getCodi()).isEqualTo("PROC_01");
     }
 
+    // Filtro por nombre retorna únicamente el procedimiento con ese nombre
     @Test
     void quanFiltramPerNom_retornaUnicamentElProcedimentAmbAquellNom() {
         Page<MetaExpedientResource> pagina = metaExpedientResourceService.findPage(
@@ -213,6 +223,7 @@ public class MetaExpedientResourceServiceTest extends BaseServiceTest {
         assertThat(pagina.getContent().get(0).getNom()).isEqualTo("Procediment 2");
     }
 
+    // Filtro por clasificación retorna únicamente el procedimiento con esa clasificación
     @Test
     void quanFiltramPerClassificacio_retornaUnicamentElProcedimentAmbAquellaClassificacio() {
         Page<MetaExpedientResource> pagina = metaExpedientResourceService.findPage(
@@ -226,6 +237,7 @@ public class MetaExpedientResourceServiceTest extends BaseServiceTest {
         assertThat(pagina.getContent().get(0).getClassificacio()).isEqualTo("SIA003");
     }
 
+    // Filtro por actiu:false retorna únicamente PROC_05 (inactivo)
     @Test
     void quanFiltramPerActiuFals_retornaUnicamentElProcedimentInactiu() {
         Page<MetaExpedientResource> pagina = metaExpedientResourceService.findPage(
@@ -239,6 +251,7 @@ public class MetaExpedientResourceServiceTest extends BaseServiceTest {
         assertThat(pagina.getContent().get(0).getCodi()).isEqualTo("PROC_05");
     }
 
+    // Filtro organGestor null retorna los 5 procedimientos comunes (PROC_01..05)
     @Test
     void quanFiltramPerAmbitComus_retornaElsProcedimentsSenseOrganGestor() {
         // Ambit COMUNS = procediments sense organGestor (PROC_01..05)
@@ -255,6 +268,7 @@ public class MetaExpedientResourceServiceTest extends BaseServiceTest {
                 .containsExactly("PROC_01", "PROC_02", "PROC_03", "PROC_04", "PROC_05");
     }
 
+    // Filtro organGestor not null retorna PROC_06 y PROC_07
     @Test
     void quanFiltramPerAmbitAssignatsAOrgan_retornaElsProcedimentsAmbOrganGestor() {
         // Ambit ASSIGNATS_A_ORGAN = procediments amb organGestor (PROC_06, PROC_07)
@@ -271,6 +285,7 @@ public class MetaExpedientResourceServiceTest extends BaseServiceTest {
                 .containsExactly("PROC_06", "PROC_07");
     }
 
+    // Filtro por id de órgano retorna únicamente los procedimientos de ese órgano
     @Test
     void quanFiltramPerOrganGestor_retornaUnicamentElsProcedimentsDeAquellOrgan() {
         Long organ1Id = testData.organs.get(0).getId();
@@ -290,6 +305,7 @@ public class MetaExpedientResourceServiceTest extends BaseServiceTest {
     // Tests CRUD: create, update, delete
     // =========================================================================
 
+    // Crear un procedimiento incrementa el total en 1
     @Test
     void quanCreemUnNouProcedimentAmbElsCampsMinims_laConsultaRetornaUnElementMes() {
         long totalInicial = metaExpedientResourceService.findPage(
@@ -308,6 +324,7 @@ public class MetaExpedientResourceServiceTest extends BaseServiceTest {
         assertThat(totalFinal).isEqualTo(totalInicial + 1);
     }
 
+    // Actualizar el nombre de un procedimiento es persistente
     @Test
     void quanCreemIActualitzamElNomDUnProcediment_getOneRetornaElNomActualitzat() {
         MetaExpedientResource nou = buildResourceMinim();
@@ -325,6 +342,7 @@ public class MetaExpedientResourceServiceTest extends BaseServiceTest {
         assertThat(actualitzat.getNom()).isEqualTo("Nom Actualitzat");
     }
 
+    // Borrar un procedimiento devuelve el total al valor inicial
     @Test
     void quanCreemIEsborrамUnProcediment_laConsultaRetornaNomesElsOriginals() {
         long totalInicial = metaExpedientResourceService.findPage(
