@@ -10,7 +10,11 @@
         "build-jboss": "tsc && vite build --base=/ripeaback/reactapp/",
         "lint": "eslint .",
         "preview": "vite preview",
-        "postinstall": "patch-package"
+        "postinstall": "patch-package",
+        "e2e": "playwright test",
+        "e2e:ui": "playwright test --ui",
+        "e2e:headed": "playwright test --headed",
+        "e2e:report": "playwright show-report tests_e2e/report"
     },
     "dependencies": {
         "@dnd-kit/core": "^6.3.1",
@@ -44,6 +48,7 @@
         "url-template": "^3.1.0"
     },
     "devDependencies": {
+        "@playwright/test": "^1.49.0",
         "@eslint/js": "^9.13.0",
         "@types/react": "^18.3.12",
         "@types/react-dom": "^18.3.1",

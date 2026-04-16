@@ -1,0 +1,130 @@
+====================================================================
+  TESTS END-TO-END AMB PLAYWRIGHT  —  RIPEA
+====================================================================
+
+PER QUÈ PLAYWRIGHT?
+-------------------
+RIPEA té una interfície React (MUI DataGrid) que s'executa sobre
+JBoss EAP 7.2 i queda protegida per Keycloak. Les proves unitàries
+(JUnit + H2) cobreixen la lògica de negoci, però no detecten
+trencaments visuals ni errors d'integració frontend ↔ backend.
+
+Playwright permet:
+  - Obrir un navegador real (Chrome) i navegar per l'aplicació.
+  - Autenticar-se contra Keycloak i reutilitzar la sessió.
+  - Verificar que les pàgines carreguen, mostren dades i responen
+    a les accions de l'usuari (filtres, botons, etc.).
+  - Executar els tests sense modificar l'aplicació (no cal
+    instrumentar el codi React ni el backend).
+
+
+PREREQUISITS
+------------
+1. Tenir Node.js >= 18 instal·lat.
+2. Des de la carpeta  ripea-back/src/main/jsapp/ripea-back/  executar:
+
+     npm install
+     npx playwright install chromium   (opcional si uses Chrome del sistema)
+
+3. Tenir JBoss EAP 7.2 arrencat amb RIPEA desplegat i Keycloak accessible.
+   Per defecte s'espera que l'aplicació respongui a:
+     http://localhost:8080/ripeaback/reactapp/
+
+4. Crear el fitxer de credencials locals (NO es puja al repositori):
+
+     Copia:   tests_e2e/auth/credentials.json.example
+     Reanomena a:  tests_e2e/auth/credentials.json
+     Omple els camps usuari/password de cada rol.
+
+   Exemple del contingut:
+     {
+       "admin": { "usuari": "rip_admin", "password": "la_teva_clau" }
+     }
+
+
+ESTRUCTURA DE FITXERS
+---------------------
+tests_e2e/
+  auth/
+    admin.setup.ts          — Autenticació de l'usuari admin (IPA_ADMIN).
+                              Navega a l'app, emplena el formulari Keycloak
+                              i desa la sessió a .auth/admin.json.
+    credentials.json        — Credencials locals (IGNORAT pel git).
+    credentials.json.example— Plantilla de credencials (inclosa al git).
+
+  metaExpedient/
+    metaExpedient.admin.spec.ts
+                            — Tests del llistat de procediments per al
+                              rol IPA_ADMIN: càrrega, columnes, botons
+                              d'acció, filtre per nom, etc.
+
+  LLEGEIX-ME.txt            — Aquest fitxer.
+
+
+COM FUNCIONA L'AUTENTICACIÓ
+----------------------------
+Playwright executa primer el "setup" (admin.setup.ts) que:
+  1. Navega a /ripeaback/reactapp/ → Keycloak redirigeix al login.
+  2. Emplena #username i #password i fa clic a #kc-login.
+  3. Espera la redirecció de tornada a l'aplicació.
+  4. Desa cookies + localStorage a tests_e2e/.auth/admin.json.
+
+Els tests posteriors carreguen aquesta sessió desada (storageState)
+i s'executen directament ja autenticats, sense repetir el login.
+
+Si vols afegir un nou rol (p. ex. rip_user):
+  1. Afegeix l'entrada al credentials.json:
+       "user": { "usuari": "rip_user", "password": "..." }
+  2. Crea tests_e2e/auth/user.setup.ts (copia admin.setup.ts i ajusta
+     el rol i el nom del fitxer de sessió).
+  3. Afegeix el projecte a playwright.config.ts:
+       { name: 'setup-user', testMatch: /auth[\/\\]user\.setup\.ts/ }
+       { name: 'user', dependencies: ['setup-user'],
+         use: { storageState: 'tests_e2e/.auth/user.json', ... },
+         testMatch: '**/*.user.spec.ts' }
+  4. Crea els fitxers de test amb extensió .user.spec.ts.
+
+
+COM EXECUTAR ELS TESTS
+----------------------
+Des de  ripea-back/src/main/jsapp/ripea-back/  (amb JBoss arrencat):
+
+  # Execució estàndard (sense finestra de navegador):
+  npm run e2e
+
+  # Amb navegador visible (útil per depurar):
+  npm run e2e:headed
+
+  # Amb la interfície gràfica de Playwright (interactiu):
+  # Desde cmd (no Powershell)
+  npm run e2e:ui
+  # Obre la interfície de Playwright, y s'ha de premer el boto de play per començar.
+
+  # Executar només un fitxer de test concret:
+  npx playwright test tests_e2e/metaExpedient/metaExpedient.admin.spec.ts
+
+  # Veure l'informe HTML de l'última execució:
+  npx playwright show-report tests_e2e/report
+
+
+CONVENCIÓ DE NOMS
+-----------------
+  *.admin.spec.ts   → tests per al rol IPA_ADMIN
+  *.user.spec.ts    → tests per al rol IPA_SUPER (o similars)
+  auth/*.setup.ts   → scripts d'autenticació (no són tests en si)
+
+Cada pàgina o funcionalitat rep la seva pròpia carpeta dins tests_e2e/,
+seguint l'estructura de src/pages/ de l'aplicació React.
+
+
+NOTES
+-----
+- Els fitxers tests_e2e/.auth/*.json i tests_e2e/auth/credentials.json
+  estan exclosos del git (.gitignore arrel del projecte). Mai els pugis.
+- Si els tokens caduquen, esborra .auth/*.json i torna a executar
+  els tests; el setup tornarà a autenticar-se automàticament.
+- El navegador per defecte és Chrome del sistema (channel: 'chrome').
+  Si no el tens instal·lat, executa  npx playwright install chromium
+  i elimina la línia  channel: 'chrome'  de playwright.config.ts.
+
+====================================================================
