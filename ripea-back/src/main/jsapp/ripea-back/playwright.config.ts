@@ -42,5 +42,17 @@ export default defineConfig({
             },
             testMatch: '**/*.admin.spec.ts',
         },
+        {
+            name: 'admin-jsp',
+            dependencies: ['setup-admin'],
+            use: {
+                ...devices['Desktop Chrome'],
+                channel: 'chrome',
+                // Reutilitza la mateixa sessió Keycloak que la interfície React
+                // (mateix WAR → mateixa cookie de sessió)
+                storageState: 'tests_e2e/.auth/admin.json',
+            },
+            testMatch: '**/*.admin.jsp.spec.ts',
+        },
     ],
 });
