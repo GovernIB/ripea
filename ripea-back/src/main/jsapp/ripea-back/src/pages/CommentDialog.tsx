@@ -19,6 +19,7 @@ import {
 import { formatDate } from '../util/dateUtils';
 import { useUserSession } from '../components/Session';
 import {useTranslation} from "react-i18next";
+import {useRef} from "react";
 
 const Comments = (props: any) => {
     const { resourceName, id, resourceReference, readOnly, i18nKeys } = props;
@@ -30,7 +31,7 @@ const Comments = (props: any) => {
     const [comments, setComments] = React.useState<any[]>();
     const {temporalMessageShow} = useBaseAppContext();
     const formApiRef = React.useRef<FormApi | any>({});
-    const gridRef = React.useRef<HTMLDivElement | undefined>();
+    const ref = useRef<HTMLDivElement | null>(null);
     const refresh = () => {
         apiFind({
             filter: `${resourceReference}.id:${id}`,
@@ -41,7 +42,7 @@ const Comments = (props: any) => {
         then((result) => {
             setComments(result.rows);
             setTimeout(() => {
-                const contentRef = gridRef.current?.parentElement;
+                const contentRef = ref.current?.parentElement;
                 if (contentRef) {
                     contentRef.scrollTop = contentRef.scrollHeight;
                 }
@@ -67,7 +68,8 @@ const Comments = (props: any) => {
         container
         direction="column"
         rowGap={1}
-        ref={gridRef}
+        component={"div"}
+        ref={ref}
         sx={{ justifyContent: 'center', alignItems: 'flex-start', pb: 1 }}>
         {comments?.map((a:any)=>
             <Grid key={a?.id} className={`comment ${a?.createdBy == user?.codi ? 'myComment' : 'otherComment'}`}>

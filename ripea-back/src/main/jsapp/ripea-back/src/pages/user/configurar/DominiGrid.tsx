@@ -99,7 +99,7 @@ const DominiGrid = () => {
                 popupEditFormDialogResourceTitle={t('page.domini.title')}
                 popupEditFormContent={<DominiForm/>}
                 columns={columns}
-                toolbarHideQuickFilter={false}
+                toolbarShowQuickFilter
                 sortModel={sortModel}
                 // perspectives={perspectives}
                 rowAdditionalActions={actions}

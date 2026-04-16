@@ -119,7 +119,7 @@ export const MetaDocumentGrid = ({ entity, onRowCountChange, readOnly } :any) =>
         popupEditFormDialogResourceTitle={t('page.metaDocument.title')}
         popupEditFormContent={<MetaDocumentForm/>}
         columns={additionalColumns}
-        toolbarHideQuickFilter={false}
+        toolbarShowQuickFilter
         filter={builder.eq("metaExpedient.id", entity?.id)}
         formAdditionalData={{ metaExpedient: {id: entity?.id} }}
         staticSortModel={sortModel}

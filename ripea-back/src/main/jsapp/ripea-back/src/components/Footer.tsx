@@ -36,7 +36,7 @@ export const Footer: React.FC<AppFootProps> = (props) => {
 
 	useEffect(() => {
 	    // Comprova si window.__MANIFEST__ ja està disponible
-        const manifest = window.__MANIFEST__;
+        const manifest = (window as any).__MANIFEST__;
 	    if (manifest) {
 	        setBuildTimestamp(manifest["Build-Timestamp"]);
 	        setScmRevision(manifest["Implementation-SCM-Revision"]);

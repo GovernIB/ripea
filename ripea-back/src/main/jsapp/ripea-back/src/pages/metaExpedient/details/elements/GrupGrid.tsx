@@ -85,7 +85,7 @@ export const GrupGrid = ({ entity, refresh: refreshEntity, onRowCountChange, rea
         <StyledMuiGrid
             resourceName={'grupResource'}
             columns={columns}
-            toolbarHideQuickFilter={false}
+            toolbarShowQuickFilter
             filter={builder.exists(builder.eq("metaExpedients.id", entity?.id))}
             sortModel={sortModel}
             perspectives={perspectives}

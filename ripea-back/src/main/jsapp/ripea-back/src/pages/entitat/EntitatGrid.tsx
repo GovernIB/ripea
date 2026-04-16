@@ -94,7 +94,7 @@ export const EntitatGrid = () => {
                 popupEditCreateActive
                 popupEditFormContent={<EntitatGridForm/>}
                 rowAdditionalActions={actions}
-                toolbarHideQuickFilter={false}
+                toolbarShowQuickFilter
                 toolbarCreateTitle={t('page.entitat.action.new.label')}
                 onRefresh={refresh}
                 popupEditFormI18nKeys={{

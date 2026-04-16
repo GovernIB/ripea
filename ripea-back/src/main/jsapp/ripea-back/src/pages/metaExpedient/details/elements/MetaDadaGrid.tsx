@@ -175,7 +175,7 @@ export const MetDadaGrid = ({ id, enviable = false, readOnly, ...other }: any) =
         popupEditFormDialogResourceTitle={t('page.metaDada.title')}
         popupEditFormContent={<MetaDocumentDadaForm enviable={enviable && user?.sessionScope?.isPropagarMetadades}/>}
         columns={columns}
-        toolbarHideQuickFilter={false}
+        toolbarShowQuickFilter
         filter={builder.eq("metaNode.id", id)}
         formAdditionalData={{ metaNode: {id} }}
         staticSortModel={sortModel}

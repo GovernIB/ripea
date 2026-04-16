@@ -137,7 +137,7 @@ const useActions = (refresh?: () => void) => {
 export const useOrganGestorSyncDialog = () => {
     const { t } = useTranslation();
     const [open, setOpen] = useState(false);
-    const ref = useRef();
+    const ref = useRef<HTMLDivElement | null>(null);
 
     const handleOpen = () => {
         getPrediccio();
@@ -208,7 +208,7 @@ export const useOrganGestorSyncDialog = () => {
             }}
         >
             <Load value={prediccio}>
-                <Grid ref={ref} container direction="row" columnSpacing={1} rowSpacing={1}>
+                <Grid component={"div"} ref={ref} container direction="row" columnSpacing={1} rowSpacing={1}>
                     {prediccio?.noCanvis ?<>
                         <Grid size={12}>
                             <Alert severity={"info"}>{t('page.organGestor.action.actualitzar.tabs.empty')}</Alert>

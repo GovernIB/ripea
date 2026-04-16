@@ -67,7 +67,7 @@ export const AvisGrid = () => {
                 popupEditFormContent={<AvisGridForm/>}
                 rowAdditionalActions={actions}
                 toolbarMassiveActions={massiveActions}
-                toolbarHideQuickFilter={false}
+                toolbarShowQuickFilter
                 toolbarCreateTitle={t('page.avis.action.new.label')}
                 popupEditFormI18nKeys={{
                     createSuccess: 'page.avis.action.new.ok',

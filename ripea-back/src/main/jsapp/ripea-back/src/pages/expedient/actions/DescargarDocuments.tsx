@@ -73,9 +73,9 @@ const DescargarDocumentsForm = () => {
                 },
             }}
             treeData={true}
-            treeDataAdditionalRows={(_rows:any) => {
+            treeDataAdditionalRows={() => {
                 const additionalRows :any[] = [];
-                for (const contingut of [...carpetes, ...expedients]) {
+                for (const contingut of [...(carpetes ?? []), ...(expedients ?? [])]) {
                     if (apiRef?.current?.getId() != contingut.id && !additionalRows.map((b) => b.id).includes(contingut.id)) {
                         additionalRows.push(contingut)
                     }

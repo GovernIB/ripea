@@ -95,7 +95,7 @@ const DataGrid = (props:any) => {
             }
         ] as any[]}
         toolbarHideRefresh
-        toolbarHideCreate={ !contingut?.potModificar || numDades > 0 && !(entity?.multiplicitat == 'M_0_N' || entity?.multiplicitat == 'M_1_N') }
+        toolbarHideCreate={(!contingut?.potModificar || numDades > 0 && !(entity?.multiplicitat == 'M_0_N' || entity?.multiplicitat == 'M_1_N')) ?true :undefined}
         toolbarCreateTitle={t('page.dada.action.new.label')}
         popupEditFormI18nKeys={{
             createSuccess: 'page.dada.action.new.ok',

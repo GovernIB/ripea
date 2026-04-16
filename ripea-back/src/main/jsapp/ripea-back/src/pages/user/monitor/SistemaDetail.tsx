@@ -121,7 +121,7 @@ const Fils = () => {
         staticSortModel={sortModelFils}
         perspectives={perspectivesFils}
         autoHeight
-        toolbarHideQuickFilter={false}
+        toolbarShowQuickFilter
         paginationActive={false}
         readOnly
     />
@@ -195,7 +195,7 @@ const Tasques = () => {
     const { restart, restartAll } = useTaskAction(refresh);
     const actions = [
         {
-            title: t('page.sistema.action.restart.label'),
+            label: t('page.sistema.action.restart.label'),
             icon: 'cached',
             showInMenu: false,
             onClick: restart,
@@ -220,7 +220,7 @@ const Tasques = () => {
         toolbarMassiveActions={actionsMassive}
         autoHeight
         paginationActive={false}
-        toolbarHideQuickFilter={false}
+        toolbarShowQuickFilter
         toolbarHideCreate
     />
 }

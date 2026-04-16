@@ -101,7 +101,7 @@ const CustodiarExpedientsPendentsGrid = (props:any) => {
     const {guardarArxiu} = useExpedientActions(refresh);
     const {guardarArxiu: guardarArxiuMassive} = useExpedientMassiveActions(refresh);
 
-    const actions = [
+    const actions:any[] = [
         {
             label: t('page.contingut.action.custodiar.label'),
             icon: "autorenew",
@@ -199,7 +199,7 @@ const CustodiarDocumentsPendentsGrid = (props:any) => {
     const {guardarArxiu} = useDocumentActions(refresh)
     const {guardarArxiu: guardarArxiuMassive} = useDocumentMassiveActions(refresh)
 
-    const actions = [
+    const actions:any[] = [
         {
             label: t('page.contingut.action.custodiar.label'),
             icon: "autorenew",
@@ -297,7 +297,7 @@ const CustodiarInteressatsPendentsGrid = (props:any) => {
     const {guardarArxiu} = useInteressatActions(refresh)
     const {guardarArxiu: guardarArxiuMassive} = useInteressatMassiveActions(refresh)
 
-    const actions = [
+    const actions:any[] = [
         {
             label: t('page.contingut.action.custodiar.label'),
             icon: "autorenew",

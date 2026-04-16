@@ -98,7 +98,7 @@ const ActualitzarEstatAnotacioGrid = () => {
     const { canviEstatDistribucio: canviMassiuEstatDis } = useMassiveActions(refresh)
     const {handleOpen: handleContingutOpen, dialog: dialogContingut} = useExecucioMassivaContingut();
 
-    const actions = [
+    const actions:any[] = [
         {
             label: t('page.anotacio.action.canviEstatDistribucio.label'),
             icon: "autorenew",

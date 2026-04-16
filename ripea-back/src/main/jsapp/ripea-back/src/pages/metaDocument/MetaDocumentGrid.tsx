@@ -270,7 +270,7 @@ const MetaDocumentGrid = () => {
                 popupEditFormDialogResourceTitle={t('page.metaDocument.title')}
                 popupEditFormContent={<MetaDocumentForm/>}
                 columns={columns}
-                toolbarHideQuickFilter={false}
+                toolbarShowQuickFilter
                 filter={builder.eq("metaExpedient", null)}
                 sortModel={sortModel}
                 perspectives={perspectives}

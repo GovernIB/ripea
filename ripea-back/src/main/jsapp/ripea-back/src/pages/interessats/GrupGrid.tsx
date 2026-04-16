@@ -109,7 +109,7 @@ export const GrupGrid = (props:any) => {
             formAdditionalData={{
                 expedient: {id: entity?.id},
             }}
-            toolbarHideCreate={!entity?.potModificar}
+            toolbarShowCreate={entity?.potModificar}
             rowAdditionalActions={actions}
             toolbarHideRefresh
 
