@@ -42,11 +42,11 @@
         <extension module="org.keycloak.keycloak-adapter-subsystem"/>
 </extensions>
 <system-properties>
-    <property name="es.caib.ripea.properties" value="/opt/eap/apps/ripea/ripea.properties"/>
-    <property name="es.caib.ripea.system.properties" value="/opt/eap/apps/ripea/ripea_system.properties"/>
-    <property name="javax.net.ssl.trustStore" value="/opt/eap/apps/ripea/truststore.jks"/>
+    <property name="es.caib.ripea.properties" value="${env.JBOSS_RIPEA_PROPERTIES_PATH:/opt/eap/apps/ripea/ripea.properties}"/>
+    <property name="es.caib.ripea.system.properties" value="${env.JBOSS_RIPEA_SYSTEM_PROPERTIES_PATH:/opt/eap/apps/ripea/ripea_system.properties}"/>
+    <property name="javax.net.ssl.trustStore" value="${env.JBOSS_TRUSTSTORE:/opt/eap/apps/ripea/truststore.jks}"/>
     <property name="javax.net.ssl.trustStorePassword" value="${env.JBOSS_TRUSTSTORE_PASSWORD}"/>
-    <property name="com.sun.jersey.server.impl.cdi.lookupExtensionInBeanManager" value="true"/>
+    <property name="com.sun.jersey.server.impl.cdi.lookupExtensionInBeanManager" value="${env.JERSEY_CDI_LOOKUP_EXTENSION_IN_BEAN_MANAGER:true}"/>
 </system-properties>
     <management>
         <security-realms>
