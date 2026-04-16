@@ -17,52 +17,95 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
     test.beforeEach(async ({ page }) => {
         await page.goto(URL_PROCEDIMENTS);
-        // Esperar que la graella MUI hagi carregat (desapareix el spinner)
         await expect(getGrid(page)).toBeVisible();
     });
 
-    // ── Càrrega inicial ───────────────────────────────────────────────────────
+    // ── Disposició ────────────────────────────────────────────────────────────
 
-    test('la pàgina carrega i mostra la graella', async ({ page }) => {
-        await expect(getGrid(page)).toBeVisible();
+    test('disposició dels elements en pantalla', async ({ page }) => {
+
+        await test.step('graella visible amb dades', async () => {
+            await expect(getGrid(page)).toBeVisible();
+            await expect(getRows(page).first()).toBeVisible();
+        });
+
+        await test.step('barra d\'eines visible', async () => {
+            await expect(getToolbar(page)).toBeVisible();
+        });
+
+        await test.step('columnes esperades visibles', async () => {
+            const headers = page.locator('.MuiDataGrid-columnHeaderTitle');
+            await expect(headers.filter({ hasText: /codi/i }).first()).toBeVisible();              // Codi intern / Código interno
+            await expect(headers.filter({ hasText: /classificaci/i }).first()).toBeVisible();      // Classificació / Clasificación
+            await expect(headers.filter({ hasText: /\bnom\b|nombre/i }).first()).toBeVisible();    // Nom / Nombre
+            await expect(headers.filter({ hasText: /documental/i }).first()).toBeVisible();        // Sèrie documental / Serie documental
+            await expect(headers.filter({ hasText: /gestor/i }).first()).toBeVisible();            // Òrgan gestor / Órgano gestor
+            await expect(headers.filter({ hasText: /revis/i }).first()).toBeVisible();             // Estat revisió / Estado revisión
+        });
+
+        await test.step('botons d\'acció per a IPA_ADMIN visibles', async () => {
+            await expect(page.getByRole('button', { name: /nou procediment|nuevo procediment|new/i })).toBeVisible();
+            await expect(page.getByRole('button', { name: /importa/i })).toBeVisible();
+        });
+
+        await test.step('formulari de filtre visible', async () => {
+            await expect(getFilterArea(page)).toBeVisible();
+        });
+
+        await test.step('files alternes tenen color de fons diferent', async () => {
+            const primeraFila  = getRows(page).nth(0);
+            const segonaFila   = getRows(page).nth(1);
+            await expect(primeraFila).toBeVisible();
+            await expect(segonaFila).toBeVisible();
+
+            const bgPrimera = await primeraFila.evaluate(el => getComputedStyle(el).backgroundColor);
+            const bgSegona  = await segonaFila.evaluate(el => getComputedStyle(el).backgroundColor);
+            expect(bgPrimera).not.toBe(bgSegona);
+        });
+
     });
 
-    test('la graella mostra almenys una fila de dades', async ({ page }) => {
-        await expect(getRows(page).first()).toBeVisible();
-    });
+    // ── Creació ───────────────────────────────────────────────────────────────
 
-    test('la barra d\'eines és visible', async ({ page }) => {
-        await expect(getToolbar(page)).toBeVisible();
-    });
+    test('creació d\'un nou procediment', async ({ page }) => {
 
-    // ── Columnes esperades ────────────────────────────────────────────────────
+        await test.step('obrir formulari de nou procediment', async () => {
+            await page.getByRole('button', { name: /nou procediment|nuevo procediment|new/i }).click();
+            await expect(page.locator('[role="dialog"]')).toBeVisible();
+        });
 
-    test('la graella té les columnes esperades', async ({ page }) => {
-        const headers = page.locator('.MuiDataGrid-columnHeaderTitle');
-        // Comprova que existeixen les capçaleres principals
-        // (els noms provenen dels fitxers de traduccions i18n)
-        await expect(headers.filter({ hasText: /codi/i }).first()).toBeVisible();
-        await expect(headers.filter({ hasText: /nom/i }).first()).toBeVisible();
-    });
+        await test.step('omplir el formulari', async () => {
+            const dialog = page.locator('[role="dialog"]');
 
-    // ── Accions disponibles per a IPA_ADMIN ──────────────────────────────────
+            await dialog.locator('input[name="codi"]').fill('PLAYWIGHT');
 
-    test('el botó de nou procediment és visible per a l\'admin', async ({ page }) => {
-        // El botó de crear nou element està a la toolbar del grid
-        const botoNou = page.getByRole('button', { name: /nou procediment|nuevo procediment|new/i });
-        await expect(botoNou).toBeVisible();
-    });
+            // tipusClassificacio: camp select/enum amb valors SIA i ID
+            await dialog.getByLabel(/tipus classificaci/i).click();
+            await page.getByRole('option', { name: /^SIA$/i }).click();
 
-    test('el botó d\'importar és visible per a l\'admin', async ({ page }) => {
-        const botoImportar = page.getByRole('button', { name: /importa/i });
-        await expect(botoImportar).toBeVisible();
+            // classificacio: camp amb debounce que comprova el codi a Rolsac (pot mostrar avís, no bloqueja)
+            await dialog.locator('input[name="classificacio"]').fill('00110011');
+
+            await dialog.locator('input[name="nom"], textarea[name="nom"]').fill('prova creació play wright');
+            await dialog.locator('input[name="serieDocumental"]').fill('S0002');
+
+            // procedimentComu: en marcar-lo s'oculta el camp organGestor (no cal omplir-lo)
+            await dialog.locator('input[name="procedimentComu"]').check();
+        });
+
+        await test.step('enviar el formulari', async () => {
+            // Registrar el handler abans del click per si apareix algun diàleg natiu
+            page.once('dialog', dialog => dialog.accept());
+            await page.locator('[role="dialog"]').getByRole('button', { name: /desar|guardar|save/i }).click();
+        });
+
+        await test.step('verificar missatge d\'èxit', async () => {
+            await expect(page.locator('.MuiAlert-standardSuccess')).toBeVisible({ timeout: 10_000 });
+        });
+
     });
 
     // ── Filtre ────────────────────────────────────────────────────────────────
-
-    test('el formulari de filtre és visible', async ({ page }) => {
-        await expect(getFilterArea(page)).toBeVisible();
-    });
 
     test('filtrar per nom redueix els resultats', async ({ page }) => {
         // Obtenir el nombre inicial de files
