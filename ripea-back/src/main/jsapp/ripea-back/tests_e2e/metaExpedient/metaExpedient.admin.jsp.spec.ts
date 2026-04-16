@@ -76,37 +76,48 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
 
         await test.step('obrir formulari de nou procediment', async () => {
             await page.getByRole('link', { name: /nou/i }).click();
-            // El modal JSP carrega el formulari en un <iframe> dins .modal-body
-            await expect(page.locator('.modal')).toBeVisible();
+            // S'usa .modal.in per evitar conflicte amb el modal ocult #modal-copied.
+            await expect(page.locator('.modal.in')).toBeVisible();
+            // Esperar que l'iframe hagi carregat el seu contingut (codi intern visible)
+            const frame = page.locator('.modal.in').frameLocator('.modal-body iframe');
+            await expect(frame.locator('input[name="codi"]')).toBeVisible();
         });
 
         await test.step('omplir el formulari dins l\'iframe del modal', async () => {
-            // Tot el contingut del formulari es dins l'iframe
-            const frame = page.frameLocator('.modal-body iframe');
+            // Tot el contingut del formulari es dins l'iframe del modal actiu
+            const frame = page.locator('.modal.in').frameLocator('.modal-body iframe');
 
             await frame.locator('input[name="codi"]').fill('PLAYWIGHT');
 
-            // tipusClassificacio: radio buttons amb valors SIA i ID
-            // SIA s'autoselecciona quan no hi ha organGestor, però ho confirmem explícitament
-            await frame.locator('input[name="tipusClassificacio"][value="SIA"]').check();
+            // organGestor: cal seleccionar-lo PRIMER; fins que no s'ha seleccionat
+            // hi ha un botó overlay que bloqueja la resta de camps del formulari.
+            // El select pot estar fora del viewport: fer scroll fins a ell.
+            // Les opcions es carreguen via AJAX: esperar que n'hi hagi almenys una
+            // a part del placeholder buit (índex 0).
+            const selectOrgan = frame.locator('select[name="organGestor"]');
+            await selectOrgan.scrollIntoViewIfNeeded();
+            await expect(selectOrgan.locator('option').nth(1)).toBeAttached({ timeout: 15_000 });
+            await selectOrgan.selectOption({ index: 1 });
 
-            // classificacioSia: es mostra quan tipusClassificacio=SIA
-            await frame.locator('#classificacioSia').fill('00110011');
+            // tipusClassificacio: seleccionar ID (ara ja no hi ha overlay)
+            await frame.locator('input[name="tipusClassificacio"][value="ID"]').check();
+
+            // classificacioId: es mostra quan tipusClassificacio=ID
+            await frame.locator('#classificacioId').fill('00110011');
 
             await frame.locator('textarea[name="nom"]').fill('prova creació play wright');
             await frame.locator('input[name="serieDocumental"]').fill('S0002');
 
-            // comu: en marcar-lo s'oculta el camp organGestor (no cal omplir-lo)
-            await frame.locator('#comu').check();
+            // comu: ha d'estar desmarcat
+            const checkComu = frame.locator('#comu');
+            if (await checkComu.isChecked()) {
+                await checkComu.uncheck();
+            }
         });
 
-        await test.step('enviar el formulari i acceptar el diàleg de confirmació', async () => {
-            // El codi SIA 00110011 probablement no existeix a Rolsac → apareix confirm() natiu
-            // page.once capta dialogs de tots els frames, inclòs l'iframe del modal
-            page.once('dialog', dialog => dialog.accept());
-
-            // El botó de submit és clonat al .modal-footer del pare (el de dins l'iframe s'amaga)
-            await page.locator('.modal-footer').getByRole('button', { name: /crear/i }).click();
+        await test.step('enviar el formulari', async () => {
+            // El botó de submit és clonat al .modal-footer del modal actiu (el de dins l'iframe s'amaga)
+            await page.locator('.modal.in .modal-footer').getByRole('button', { name: /crear/i }).click();
         });
 
         await test.step('verificar missatge d\'èxit', async () => {

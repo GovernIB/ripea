@@ -7,7 +7,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import es.caib.ripea.persistence.entity.ExpedientEstatEntity;
 import es.caib.ripea.service.intf.dto.ExpedientEstatDto;
 import es.caib.ripea.service.intf.service.ExpedientEstatService;
-import es.caib.ripea.service.test.config.BaseServiceTest;
+import es.caib.ripea.service.test.config.BaseServiceIT;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * una BBDD H2 in-memory amb el conjunt de dades bàsic.
  */
 @WithMockUser(username = "usuari1", roles = {"ADMIN"})
-public class ExpedientEstatServiceTest extends BaseServiceTest {
+public class ExpedientEstatServiceIT extends BaseServiceIT {
 
     @Autowired
     private ExpedientEstatService expedientEstatService;

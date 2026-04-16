@@ -17,7 +17,7 @@ import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.dto.TipusClassificacioEnumDto;
 import es.caib.ripea.service.intf.model.MetaExpedientResource;
 import es.caib.ripea.service.intf.resourceservice.MetaExpedientResourceService;
-import es.caib.ripea.service.test.config.BaseServiceTest;
+import es.caib.ripea.service.test.config.BaseServiceIT;
 
 /**
  * Tests d'integració per a MetaExpedientResourceService.
@@ -38,7 +38,7 @@ import es.caib.ripea.service.test.config.BaseServiceTest;
  *   - PROC_08: actiu, PROCEDIMENT, sense organGestor (ENT_TEST2 — no apareix en les consultes)
  */
 @WithMockUser(username = "usuari1", roles = {"ADMIN"})
-public class MetaExpedientResourceServiceTest extends BaseServiceTest {
+public class MetaExpedientResourceServiceIT extends BaseServiceIT {
 
     @Autowired
     private MetaExpedientResourceService metaExpedientResourceService;

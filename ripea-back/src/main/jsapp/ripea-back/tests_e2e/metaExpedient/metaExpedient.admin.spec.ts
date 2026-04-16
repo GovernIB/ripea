@@ -79,24 +79,35 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
             await dialog.locator('input[name="codi"]').fill('PLAYWIGHT');
 
-            // tipusClassificacio: camp select/enum amb valors SIA i ID
+            // tipusClassificacio: seleccionar ID
             await dialog.getByLabel(/tipus classificaci/i).click();
-            await page.getByRole('option', { name: /^SIA$/i }).click();
+            await page.getByRole('option', { name: /^ID$/i }).click();
 
-            // classificacio: camp amb debounce que comprova el codi a Rolsac (pot mostrar avís, no bloqueja)
-            await dialog.locator('input[name="classificacio"]').fill('00110011');
+            // classificacio: amb tipusClassificacio=ID el camp és readonly (s'omple automàticament)
 
             await dialog.locator('input[name="nom"], textarea[name="nom"]').fill('prova creació play wright');
             await dialog.locator('input[name="serieDocumental"]').fill('S0002');
 
-            // procedimentComu: en marcar-lo s'oculta el camp organGestor (no cal omplir-lo)
-            await dialog.locator('input[name="procedimentComu"]').check();
+            // procedimentComu: ha d'estar desmarcat
+            const checkComu = dialog.locator('input[name="procedimentComu"]');
+            if (await checkComu.isChecked()) {
+                await checkComu.uncheck();
+            }
+
+            // crearReglaDisseny: ha d'estar desmarcat (pot bloquejar el botó Guarda si no)
+            const checkRegla = dialog.locator('input[name="crearReglaDisseny"]');
+            if (await checkRegla.count() > 0 && await checkRegla.isChecked()) {
+                await checkRegla.uncheck();
+            }
+
+            // organGestor: el label és "Òrgan gestor" (Ò acentuada); s'usa el name de l'input
+            // perquè getByLabel amb /i no captura accents Unicode
+            await dialog.locator('[name="organGestor"]').click();
+            await page.getByRole('option').first().click();
         });
 
         await test.step('enviar el formulari', async () => {
-            // Registrar el handler abans del click per si apareix algun diàleg natiu
-            page.once('dialog', dialog => dialog.accept());
-            await page.locator('[role="dialog"]').getByRole('button', { name: /desar|guardar|save/i }).click();
+            await page.locator('[role="dialog"]').getByRole('button', { name: /desar|guarda|guardar|save/i }).click();
         });
 
         await test.step('verificar missatge d\'èxit', async () => {

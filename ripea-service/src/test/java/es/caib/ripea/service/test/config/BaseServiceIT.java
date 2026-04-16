@@ -38,7 +38,7 @@ import es.caib.ripea.service.helper.PluginHelper;
 @Transactional
 @Rollback
 @WithMockUser(username = "usuari1", roles = {"ADMIN"})
-public abstract class BaseServiceTest {
+public abstract class BaseServiceIT {
 
     @PersistenceContext(unitName = "ripeaPU")
     protected EntityManager entityManager;

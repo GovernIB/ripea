@@ -14,7 +14,7 @@ import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.persistence.repository.TipusDocumentalRepository;
 import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.service.EntitatService;
-import es.caib.ripea.service.test.config.BaseServiceTest;
+import es.caib.ripea.service.test.config.BaseServiceIT;
 
 /**
  * Tests d'integració per a EntitatService.
@@ -27,7 +27,7 @@ import es.caib.ripea.service.test.config.BaseServiceTest;
  * amb una entitat addicional per no interferir amb les dades base.
  */
 @WithMockUser(username = "usuari1", roles = {"ADMIN"})
-public class EntitatServiceTest extends BaseServiceTest {
+public class EntitatServiceIT extends BaseServiceIT {
 
     @Autowired
     private EntitatService entitatService;
