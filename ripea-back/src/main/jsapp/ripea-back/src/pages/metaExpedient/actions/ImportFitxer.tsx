@@ -80,7 +80,7 @@ const FieldResponsable = ({ fieldList, element, field, ...other }: any) => {
     />
 }
 
-const ImportFitxerFormBase = () => {
+export const ImportFitxerFormBase = () => {
     const {t} = useTranslation()
     const {data} = useFormContext()
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
@@ -186,7 +186,7 @@ const ImportFitxerFormCarpeta = () => {
     </Grid>
 }
 
-function editarElemento(array:any[], codi:string, cambios:any, identifiator:string = 'codi') {
+export function editarElemento(array:any[], codi:string, cambios:any, identifiator:string = 'codi') {
     return array.map((item:any) =>
         item?.[identifiator] === codi
             ? { ...item, ...cambios }

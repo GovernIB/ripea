@@ -12,7 +12,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.test.context.support.WithMockUser;
 
-import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.dto.TipusClassificacioEnumDto;
 import es.caib.ripea.service.intf.model.MetaExpedientResource;
@@ -42,9 +41,6 @@ public class MetaExpedientResourceServiceIT extends BaseServiceIT {
 
     @Autowired
     private MetaExpedientResourceService metaExpedientResourceService;
-
-    @MockBean
-    private ConfigHelper configHelper;
 
     @BeforeEach
     @Override

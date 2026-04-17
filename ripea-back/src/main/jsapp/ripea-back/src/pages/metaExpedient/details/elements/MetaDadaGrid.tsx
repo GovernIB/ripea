@@ -55,7 +55,7 @@ const useActions = (refresh?: () => void) => {
 }
 
 // Form
-const MetaDocumentDadaForm = ({ enviable }:any) => {
+export const MetaDocumentDadaForm = ({ enviable }:any) => {
     const {data} = useFormContext()
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField name="codi"/>

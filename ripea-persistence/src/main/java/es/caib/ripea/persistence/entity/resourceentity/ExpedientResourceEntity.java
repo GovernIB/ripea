@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.ConstraintMode;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -162,7 +163,7 @@ public class ExpedientResourceEntity extends NodeResourceEntity<ExpedientResourc
 			name = BaseConfig.DB_PREFIX + "expedient_seguidor",
 			joinColumns = {@JoinColumn(name = "expedient_id", referencedColumnName = "id")},
 			inverseJoinColumns = {@JoinColumn(name = "seguidor_codi", referencedColumnName = "codi")},
-			foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "expedient_expseguidor_fk"))
+			foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
 	protected List<UsuariResourceEntity> seguidors = new ArrayList<>();
 
 	@ManyToOne(optional = true, fetch = FetchType.LAZY)

@@ -17,6 +17,7 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.service.config.SchedulingConfig;
+import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.PermisosHelper;
 import es.caib.ripea.service.helper.PluginHelper;
 
@@ -65,6 +66,9 @@ public abstract class BaseServiceIT {
 
     @MockBean
     protected SmartValidator smartValidator;
+
+    @MockBean
+    protected ConfigHelper configHelper;
 
     @BeforeEach
     public void setUpTestData() {

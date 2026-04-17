@@ -23,7 +23,7 @@ const MetaExpedientFilterForm = ({ user }:any) => {
     </>
 }
 
-const springFilterBuilder = (data:any) => {
+export const springFilterBuilder = (data:any) => {
     return builder.and(
         builder.like('codi', data?.codi),
         builder.like('nom', data?.nom),

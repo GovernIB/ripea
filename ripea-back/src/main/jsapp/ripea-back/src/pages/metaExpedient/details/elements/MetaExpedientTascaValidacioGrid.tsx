@@ -43,7 +43,7 @@ const useActions = (refresh?: () => void) => {
 
     return {active, desactive}
 }
-const MetaExpedientTascaValidacioForm = () => {
+export const MetaExpedientTascaValidacioForm = () => {
     const {data} = useFormContext()
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField name="itemValidacio" required/>
@@ -55,7 +55,7 @@ const MetaExpedientTascaValidacioForm = () => {
 
 const sortModel: any = [{field: 'id', sort: 'asc'}]
 const perspectives: string[] = [];
-const columns = [
+export const columns = [
     {
         field: 'itemValidacio',
         flex: 1,

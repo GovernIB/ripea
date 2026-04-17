@@ -6,7 +6,7 @@ import Load from "../../../components/Load.tsx";
 import {ContenidoData} from "../../../components/CardData.tsx";
 import {useActions} from "../details/MetaExpedientActions.tsx";
 
-const ReglaDistribucio = (props:any) => {
+export const ReglaDistribucio = (props:any) => {
     const {entity} = props;
     const { t } = useTranslation();
 

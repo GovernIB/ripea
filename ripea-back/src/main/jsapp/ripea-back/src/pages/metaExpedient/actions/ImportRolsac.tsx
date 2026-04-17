@@ -5,7 +5,7 @@ import {MutableRefObject, useRef} from "react";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 
-const ImportRolsacForm = () => {
+export const ImportRolsacForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField name="codiSia"/>
     </Grid>

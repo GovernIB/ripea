@@ -110,10 +110,9 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 	@JoinTable(
 			name = BaseConfig.DB_PREFIX + "metaexpedient_grup",
 			joinColumns = {@JoinColumn(name = "metaexpedient_id", referencedColumnName="id")},
-			inverseJoinColumns = {@JoinColumn(name = "grup_id")})
-	@ForeignKey(
-			name = BaseConfig.DB_PREFIX + "metaexp_metaexpgrup_fk",
-			inverseName = BaseConfig.DB_PREFIX + "grup_metaexpgrup_fk")
+			inverseJoinColumns = {@JoinColumn(name = "grup_id")},
+			foreignKey = @javax.persistence.ForeignKey(name = BaseConfig.DB_PREFIX + "metaexp_metaexpgrup_fk"),
+			inverseForeignKey = @javax.persistence.ForeignKey(name = BaseConfig.DB_PREFIX + "mexp_grup_grup_fk"))
 	private List<GrupEntity> grups = new ArrayList<GrupEntity>();
 	
     @ManyToOne(optional = true, fetch = FetchType.LAZY)

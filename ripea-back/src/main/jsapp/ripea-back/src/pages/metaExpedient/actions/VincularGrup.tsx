@@ -5,7 +5,7 @@ import {useRef} from "react";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 
-const VincularGrupForm = () => {
+export const VincularGrupForm = () => {
     const {data} = useFormContext()
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField name="grup" namedQueries={`VINCULAR_PROCEDIMENT#${data?.id}`}/>

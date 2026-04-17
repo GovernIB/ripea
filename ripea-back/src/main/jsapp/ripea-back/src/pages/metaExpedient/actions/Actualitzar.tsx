@@ -5,7 +5,7 @@ import {useTranslation} from "react-i18next";
 import {CardData} from "../../../components/CardData.tsx";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 
-const ActualitzarResultProcessor = (props:any) => {
+export const ActualitzarResultProcessor = (props:any) => {
     const {entity} = props;
     const { t } = useTranslation();
 

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.ConstraintMode;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -87,7 +88,7 @@ public class MetaExpedientResourceEntity extends MetaNodeResourceEntity<MetaExpe
 			name = BaseConfig.DB_PREFIX + "metaexpedient_grup",
 			joinColumns = {@JoinColumn(name = "metaexpedient_id", referencedColumnName="id")},
 			inverseJoinColumns = {@JoinColumn(name = "grup_id")},
-			foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "metaexp_metaexpgrup_fk"))
+			foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
 	private List<GrupResourceEntity> grups = new ArrayList<>();
 
 	@ManyToOne(optional = true, fetch = FetchType.LAZY)
