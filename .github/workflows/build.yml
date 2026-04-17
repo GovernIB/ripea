@@ -12,7 +12,7 @@ on:
         default: 'ripea-1.0-dev'
         required: true
       skip_tests:
-        description: '🧪 Run tests'
+        description: '🧪 Skip tests'
         type: choice
         options: ['true', 'false']
         default: 'false'
@@ -57,20 +57,19 @@ jobs:
           source .env
           set +o allexport
 
-          # Export to GitHub environment
           while IFS= read -r line; do
             if [[ "$line" != "" && "$line" != \#* ]]; then
               echo "$line" >> $GITHUB_ENV
             fi
           done < .env
 
-      - name: 🧱 Build EAR
+      - name: 🧱 Build EAR (Maven)
         working-directory: ripea
         run: |
           mvn -B clean package \
             -DskipTests=${{ inputs.skip_tests }}
 
-      - name: 📦 Upload EAR to GitHub Release
+      - name: 📦 Upload EAR artifact
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.vars.outputs.tag }}
@@ -80,31 +79,30 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: 🐳 Build Docker (Fabric8)
+      # =========================
+      # DOCKER BUILD (Dockerfile)
+      # =========================
+
+      - name: 🔐 Login to Quay
+        if: ${{ inputs.build_docker == 'true' }}
+        run: |
+          echo "${{ secrets.QUAY_PASSWORD }}" | docker login ${{ secrets.QUAY_URL }} \
+            -u "${{ secrets.QUAY_USER }}" --password-stdin
+
+      - name: 🐳 Build Docker image
         if: ${{ inputs.build_docker == 'true' }}
         working-directory: ripea
         env:
-          DOCKER_IMAGE_FROM: ${{ secrets.DOCKER_IMAGE_FROM }}
-          DOCKER_USER: ${{ secrets.DOCKER_USER }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-          DOCKER_USER_GROUP: ${{ secrets.DOCKER_USER_GROUP }}
+          BASE_IMAGE: ${{ secrets.QUAY_URL }}/${{ secrets.ORGANIZATION }}/jboss:eap72-openjdk11-rhel8
         run: |
-          mvn docker:build
+          docker build \
+            --build-arg BASE_IMAGE=$BASE_IMAGE \
+            -t ${{ secrets.QUAY_REPO }}:${{ steps.vars.outputs.tag }} \
+            -t ${{ secrets.QUAY_REPO }}:latest \
+            .
 
-      - name: 🔐 Login to private Quay
+      - name: 📤 Push Docker image
         if: ${{ inputs.build_docker == 'true' }}
-        env:
-          QUAY_URL: ${{ secrets.QUAY_URL }}
-          QUAY_USER: ${{ secrets.QUAY_USER }}
-          QUAY_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
         run: |
-          echo "$QUAY_PASSWORD" | docker login $QUAY_URL -u "$QUAY_USER" --password-stdin
-
-      - name: 📤 Push Docker to private Quay
-        if: ${{ inputs.build_docker == 'true' }}
-        env:
-          QUAY_URL: ${{ secrets.QUAY_URL }}
-          QUAY_REPO: ${{ secrets.QUAY_REPO }}
-        run: |
-          docker tag ripea:latest $QUAY_REPO:${{ steps.vars.outputs.tag }}
-          docker push $QUAY_REPO:${{ steps.vars.outputs.tag }}
+          docker push ${{ secrets.QUAY_REPO }}:${{ steps.vars.outputs.tag }}
+          docker push ${{ secrets.QUAY_REPO }}:latest
