@@ -7,19 +7,23 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+import java.util.function.ToDoubleFunction;
+import java.util.function.ToLongFunction;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,6 +31,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -34,9 +40,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.ExpedientEntity;
+import es.caib.ripea.persistence.entity.GrupEntity;
+import es.caib.ripea.persistence.entity.MetaDocumentEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientCarpetaEntity;
-import es.caib.ripea.persistence.entity.MetaExpedientOrganGestorEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientOrganGestorEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientSequenciaEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientTascaEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientTascaValidacioEntity;
@@ -64,18 +72,43 @@ import es.caib.ripea.service.intf.dto.ArbreJsonDto;
 import es.caib.ripea.service.intf.dto.ArbreNodeDto;
 import es.caib.ripea.service.intf.dto.CrearReglaDistribucioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.CrearReglaResponseDto;
+import es.caib.ripea.service.intf.dto.ExpedientEstatDto;
+import es.caib.ripea.service.intf.dto.GrupDto;
 import es.caib.ripea.service.intf.dto.ItemValidacioTascaEnum;
+import es.caib.ripea.service.intf.dto.MetaDadaDto;
+import es.caib.ripea.service.intf.dto.MetaDadaTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientCarpetaDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientCarpetaMinDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientExportDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientFiltreDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientTascaDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientTascaValidacioDto;
+import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
+import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
+import es.caib.ripea.service.intf.dto.PermisDto;
 import es.caib.ripea.service.intf.dto.StatusEnumDto;
+import es.caib.ripea.service.intf.dto.TipusValidacioTascaEnum;
 import es.caib.ripea.service.intf.exception.ExisteixenExpedientsEsborratsException;
 import es.caib.ripea.service.intf.exception.ExisteixenExpedientsException;
 import es.caib.ripea.service.permission.ExtendedPermission;
+import es.caib.ripea.service.service.MetaExpedientServiceImpl;
+import io.micrometer.core.instrument.Clock;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.DistributionSummary;
+import io.micrometer.core.instrument.FunctionCounter;
+import io.micrometer.core.instrument.FunctionTimer;
+import io.micrometer.core.instrument.Gauge;
+import io.micrometer.core.instrument.Measurement;
+import io.micrometer.core.instrument.Meter;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
+import io.micrometer.core.instrument.Meter.Id;
+import io.micrometer.core.instrument.Meter.Type;
+import io.micrometer.core.instrument.distribution.DistributionStatisticConfig;
+import io.micrometer.core.instrument.distribution.pause.PauseDetector;
 
 /**
  * Tests unitaris per a MetaExpedientHelper.
@@ -744,6 +777,28 @@ class MetaExpedientHelperTest {
         verify(metaExpedientCarpetaHelper, never()).crearNovaCarpeta(anyString(), any(), any());
     }
 
+    @Test
+    void crearEstructuraCarpetesDto_quanCarpetaAmbPareExistent_creanomesLaFilla() {
+        MetaExpedientEntity metaExpedient = mock(MetaExpedientEntity.class);
+        MetaExpedientCarpetaEntity pareEntity = mock(MetaExpedientCarpetaEntity.class);
+        MetaExpedientCarpetaMinDto pare = new MetaExpedientCarpetaMinDto();
+        pare.setNom("Pare");
+        MetaExpedientCarpetaMinDto filla = new MetaExpedientCarpetaMinDto();
+        filla.setNom("Filla");
+        filla.setPare(pare);
+        when(metaExpedientCarpetaHelper.existeixCarpetaMetaExpedient(metaExpedient, "Pare", null))
+                .thenReturn(Collections.singletonList(pareEntity));
+        when(metaExpedientCarpetaHelper.existeixCarpetaMetaExpedient(metaExpedient, "Filla", pareEntity))
+                .thenReturn(Collections.emptyList());
+        when(metaExpedientCarpetaHelper.crearNovaCarpeta("Filla", pareEntity, metaExpedient))
+                .thenReturn(mock(MetaExpedientCarpetaEntity.class));
+
+        helper.crearEstructuraCarpetesDto(Collections.singletonList(filla), metaExpedient);
+
+        verify(metaExpedientCarpetaHelper, never()).crearNovaCarpeta(eq("Pare"), any(), any());
+        verify(metaExpedientCarpetaHelper).crearNovaCarpeta("Filla", pareEntity, metaExpedient);
+    }
+
     // =========================================================================
     // deleteCarpetaMetaExpedient
     // =========================================================================
@@ -998,6 +1053,36 @@ class MetaExpedientHelperTest {
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("CLON");
     }
+    
+    @Test
+    void clonar_quanCodiLliure_clonaICanviaRevisioADisseny() {
+        EntitatEntity entitat = mock(EntitatEntity.class);
+        MetaExpedientEntity original = mock(MetaExpedientEntity.class);
+        MetaExpedientEntity savedEntity = mock(MetaExpedientEntity.class);
+        MetaExpedientEntity clonat = mock(MetaExpedientEntity.class);
+        MetaExpedientExportDto exportDto = new MetaExpedientExportDto();
+        exportDto.setCodi("ORIG");
+        exportDto.setNom("Procediment original");
+
+        when(entityComprovarHelper.comprovarEntitatPerMetaExpedients(ENTITAT_ID)).thenReturn(entitat);
+        when(entityComprovarHelper.comprovarAccesMetaExpedient(entitat, META_EXPEDIENT_ID, ORGAN_ID, true))
+                .thenReturn(original);
+        when(metaExpedientRepository.findByEntitatAndCodi(entitat, "CLON"))
+                .thenReturn(null)
+                .thenReturn(clonat);
+        when(conversioTipusHelper.convertir(original, MetaExpedientExportDto.class)).thenReturn(exportDto);
+        when(original.getTasques()).thenReturn(null);
+        when(metaExpedientCarpetaHelper.findCarpetesMetaExpedient(original)).thenReturn(Collections.emptyList());
+        when(metaExpedientRepository.save(any(MetaExpedientEntity.class))).thenReturn(savedEntity);
+        when(clonat.getId()).thenReturn(50L);
+        when(entityComprovarHelper.comprovarAccesMetaExpedient(entitat, 50L, ORGAN_ID, false))
+                .thenReturn(mock(MetaExpedientEntity.class));
+
+        helper.clonar(ENTITAT_ID, META_EXPEDIENT_ID, ORGAN_ID, "IPA_ADMIN", "CLON", "SIA999");
+
+        verify(metaExpedientRepository).save(any());
+        verify(savedEntity).updateRevisioEstat(MetaExpedientRevisioEstatEnumDto.REVISAT);
+    }
 
     // =========================================================================
     // findActiusAmbOrganGestorPermisLectura
@@ -1014,7 +1099,7 @@ class MetaExpedientHelperTest {
                 .thenReturn(Collections.emptyList());
         when(permisosHelper.isGrantedAny(eq(ENTITAT_ID), eq(EntitatEntity.class),
                 any(org.springframework.security.acls.model.Permission[].class), any(Authentication.class)))
-                .thenReturn(true);
+                .thenReturn(false);
 
         List<MetaExpedientEntity> resultat = helper.findActiusAmbOrganGestorPermisLectura(ENTITAT_ID, ORGAN_ID, null);
 
@@ -1052,18 +1137,33 @@ class MetaExpedientHelperTest {
     @Test
     void permisFind_quanElNodeEsMetaExpedient_retornaElsPermisosDelNode() {
         MetaExpedientEntity metaExpedient = mock(MetaExpedientEntity.class);
+        MetaExpedientOrganGestorEntity organGestorRelacio = mock(MetaExpedientOrganGestorEntity.class);
+        OrganGestorEntity organGestor = mock(OrganGestorEntity.class);
+        PermisDto permisOrgan = mock(PermisDto.class);
+
         when(metaNodeRepository.getOne(META_EXPEDIENT_ID)).thenReturn(metaExpedient);
         when(metaExpedientOrganGestorRepository.findByMetaExpedient(metaExpedient))
-                .thenReturn(Collections.emptyList());
+                .thenReturn(Collections.singletonList(organGestorRelacio));
+        when(organGestorRelacio.getId()).thenReturn(5L);
+        when(organGestorRelacio.getOrganGestor()).thenReturn(organGestor);
+        when(organGestor.getId()).thenReturn(6L);
+        when(organGestor.getNom()).thenReturn("Organ Test");
+        when(organGestor.getCodi()).thenReturn("ORG_TEST");
+
+        Map<Serializable, List<PermisDto>> permisosMap = new HashMap<>();
+        permisosMap.put(5L, Collections.singletonList(permisOrgan));
         when(permisosHelper.findPermisos(anyList(), eq(MetaExpedientOrganGestorEntity.class)))
-                .thenReturn(java.util.Collections.emptyMap());
+                .thenReturn(permisosMap);
         when(permisosHelper.findPermisos(eq(META_EXPEDIENT_ID),
                 eq(es.caib.ripea.persistence.entity.MetaNodeEntity.class)))
                 .thenReturn(Collections.emptyList());
 
-        List<es.caib.ripea.service.intf.dto.PermisDto> resultat = helper.permisFind(META_EXPEDIENT_ID);
+        List<PermisDto> resultat = helper.permisFind(META_EXPEDIENT_ID);
 
-        assertThat(resultat).isNotNull();
+        assertThat(resultat).isNotEmpty();
+        verify(permisOrgan).setOrganGestorId(6L);
+        verify(permisOrgan).setOrganGestorNom("Organ Test");
+        verify(permisOrgan).setOrganGestorCodi("ORG_TEST");
     }
 
     // =========================================================================
@@ -1073,12 +1173,16 @@ class MetaExpedientHelperTest {
     @Test
     void findByEntitat_delegaAlRepository() {
         EntitatEntity entitat = mock(EntitatEntity.class);
-        es.caib.ripea.service.intf.dto.MetaExpedientFiltreDto filtre =
-                new es.caib.ripea.service.intf.dto.MetaExpedientFiltreDto();
-        es.caib.ripea.service.intf.dto.PaginacioParamsDto paginacio =
-                new es.caib.ripea.service.intf.dto.PaginacioParamsDto();
+        OrganGestorEntity organGestor = mock(OrganGestorEntity.class);
+        MetaExpedientFiltreDto filtre = new MetaExpedientFiltreDto();
+        filtre.setCodi("PROC");
+        filtre.setNom("Nom test");
+        filtre.setClassificacio("SIA001");
+        filtre.setOrganGestorId(ORGAN_ID);
+        PaginacioParamsDto paginacio = new PaginacioParamsDto();
         org.springframework.data.domain.PageImpl<MetaExpedientEntity> page =
                 new org.springframework.data.domain.PageImpl<>(Collections.emptyList());
+        when(organGestorRepository.getOne(ORGAN_ID)).thenReturn(organGestor);
         when(paginacioHelper.toSpringDataPageable(any(), any()))
                 .thenReturn(org.springframework.data.domain.PageRequest.of(0, 10));
         when(metaExpedientRepository.findByEntitat(
@@ -1092,6 +1196,7 @@ class MetaExpedientHelperTest {
                 helper.findByEntitat(entitat, filtre, paginacio, Collections.emptyMap());
 
         assertThat(resultat).isNotNull();
+        verify(organGestorRepository).getOne(ORGAN_ID);
     }
 
     // =========================================================================
@@ -1102,25 +1207,26 @@ class MetaExpedientHelperTest {
     void tascaCreate_rolIpaAdmin_creaIRetornaLaTasca() throws Exception {
         EntitatEntity entitat = mock(EntitatEntity.class);
         MetaExpedientEntity metaExpedient = mock(MetaExpedientEntity.class);
-        MetaExpedientTascaEntity tascaEntity = mock(MetaExpedientTascaEntity.class);
         MetaExpedientTascaDto tascaDto = new MetaExpedientTascaDto();
         tascaDto.setCodi("T01");
         tascaDto.setNom("Tasca nova");
-        tascaDto.setValidacions(null);
-        io.micrometer.core.instrument.MeterRegistry meterRegistry =
-                new io.micrometer.core.instrument.simple.SimpleMeterRegistry();
+        MetaExpedientTascaValidacioDto validacioDto = new MetaExpedientTascaValidacioDto();
+        validacioDto.setItemValidacio(ItemValidacioTascaEnum.DADA);
+        validacioDto.setTipusValidacio(TipusValidacioTascaEnum.AP);
+        validacioDto.setItemId(1L);
+        validacioDto.setActiva(true);
+        tascaDto.setValidacions(Collections.singletonList(validacioDto));
         when(entityComprovarHelper.comprovarEntitatPerMetaExpedients(ENTITAT_ID)).thenReturn(entitat);
         when(entityComprovarHelper.comprovarMetaExpedient(entitat, META_EXPEDIENT_ID)).thenReturn(metaExpedient);
-        when(applicationHelper.getMeterRegistry()).thenReturn(meterRegistry);
-        when(metaExpedientTascaRepository.save(any(MetaExpedientTascaEntity.class)))
-                .thenAnswer(inv -> inv.getArgument(0));
-        when(conversioTipusHelper.convertir(any(MetaExpedientTascaEntity.class), eq(MetaExpedientTascaDto.class)))
-                .thenReturn(tascaDto);
-
+        when(metaExpedientTascaRepository.save(any(MetaExpedientTascaEntity.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(conversioTipusHelper.convertir(any(MetaExpedientTascaEntity.class), eq(MetaExpedientTascaDto.class))).thenReturn(tascaDto);
+        initMeterRegistry();
+        
         MetaExpedientTascaDto resultat = helper.tascaCreate(ENTITAT_ID, META_EXPEDIENT_ID, tascaDto, "IPA_ADMIN", ORGAN_ID);
 
         assertThat(resultat).isNotNull();
         verify(metaExpedientTascaRepository).save(any());
+        verify(metaExpedientTascaValidacioRepository).save(any(MetaExpedientTascaValidacioEntity.class));
     }
 
     // =========================================================================
@@ -1313,6 +1419,28 @@ class MetaExpedientHelperTest {
         assertThat(progres.getProgres()).isEqualTo(100);
     }
 
+    @Test
+    void actualitzarProcediments_quanProgresNul_creaNovaInstanciaIFinalitza() {
+        MetaExpedientServiceImpl.progresActualitzacio.remove("ENT_NULL");
+        EntitatEntity entitat = mock(EntitatEntity.class);
+        MetaExpedientEntity metaExpedient = mock(MetaExpedientEntity.class);
+        when(entitat.getCodi()).thenReturn("ENT_NULL");
+        when(entitat.getId()).thenReturn(ENTITAT_ID);
+        when(messageHelper.getMessage(anyString())).thenReturn("");
+        when(messageHelper.getMessage(anyString(), any(Object[].class))).thenReturn("");
+        when(avisRepository.findByEntitatIdAndAssumpte(any(), any())).thenReturn(Collections.emptyList());
+
+        helper.actualitzarProcediments(entitat,
+                new ArrayList<>(Collections.singletonList(metaExpedient)),
+                java.util.Locale.getDefault(), null);
+
+        es.caib.ripea.service.intf.dto.ProgresActualitzacioDto resultat =
+                MetaExpedientServiceImpl.progresActualitzacio.get("ENT_NULL");
+        assertThat(resultat).isNotNull();
+        assertThat(resultat.getProgres()).isEqualTo(100);
+        assertThat(resultat.isFinished()).isTrue();
+    }
+
     // =========================================================================
     // toMetaExpedientDto
     // =========================================================================
@@ -1437,29 +1565,76 @@ class MetaExpedientHelperTest {
 
     @Test
     void createFromImport_ambDtoMinim_creaElProcedimentSenseErrors() {
+    	
         EntitatEntity entitat = mock(EntitatEntity.class);
         MetaExpedientEntity procedimentCreat = mock(MetaExpedientEntity.class);
-        es.caib.ripea.service.intf.dto.MetaExpedientExportDto importDto =
-                new es.caib.ripea.service.intf.dto.MetaExpedientExportDto();
+        MetaExpedientEntity tascaMetaExpedient = mock(MetaExpedientEntity.class);
+        MetaDocumentEntity metaDocumentEntity = mock(MetaDocumentEntity.class);
+        GrupEntity grupEntity = mock(GrupEntity.class);
+
+        MetaDocumentDto metaDocumentDto = new MetaDocumentDto();
+        metaDocumentDto.setCodi("DOC_1");
+        metaDocumentDto.setNom("Document 1");
+        metaDocumentDto.setMetaDades(null);
+
+        MetaDadaDto metaDadaDto = new MetaDadaDto();
+        metaDadaDto.setCodi("DADA_1");
+        metaDadaDto.setNom("Dada 1");
+        metaDadaDto.setTipus(MetaDadaTipusEnumDto.TEXT);
+        metaDadaDto.setMultiplicitat(MultiplicitatEnumDto.M_1);
+
+        ExpedientEstatDto estatDto = new ExpedientEstatDto();
+        estatDto.setId(200L);
+        estatDto.setCodi("ESTAT_1");
+        ExpedientEstatDto estatCreated = new ExpedientEstatDto();
+        estatCreated.setId(201L);
+
+        MetaExpedientTascaDto tascaDto = new MetaExpedientTascaDto();
+        tascaDto.setCodi("T01");
+        tascaDto.setNom("Tasca 1");
+        tascaDto.setValidacions(null);
+
+        GrupDto grupDto = new GrupDto();
+        grupDto.setCodi("GRUP_1");
+
+        MetaExpedientExportDto importDto = new MetaExpedientExportDto();
         importDto.setCodi("IMP_PROC");
         importDto.setNom("Procediment importat");
         importDto.setOrganGestor(null);
         importDto.setPareId(null);
         importDto.setCarpetes(null);
-        importDto.setMetaDocuments(null);
-        importDto.setMetaDades(null);
-        importDto.setEstats(null);
-        importDto.setTasques(null);
-        importDto.setGrups(null);
+        importDto.setMetaDocuments(Collections.singletonList(metaDocumentDto));
+        importDto.setMetaDades(Collections.singletonList(metaDadaDto));
+        importDto.setEstats(new HashSet<>(Collections.singletonList(estatDto)));
+        importDto.setTasques(new HashSet<>(Collections.singletonList(tascaDto)));
+        importDto.setGrups(Collections.singletonList(grupDto));
+
         when(entityComprovarHelper.comprovarEntitatPerMetaExpedients(ENTITAT_ID)).thenReturn(entitat);
         when(metaExpedientRepository.save(any(MetaExpedientEntity.class))).thenReturn(procedimentCreat);
         when(procedimentCreat.getId()).thenReturn(META_EXPEDIENT_ID);
-
-        // IPA_ADMIN → updateRevisioEstat(REVISAT), no canviarRevisioADisseny
+        when(metaDocumentHelper.create(any(), any(), any(), any(), any(), any(), any(), any()))
+                .thenReturn(metaDocumentEntity);
+        MetaDocumentDto convertedMetaDoc = new MetaDocumentDto();
+        convertedMetaDoc.setId(50L);
+        when(conversioTipusHelper.convertir(any(MetaDocumentEntity.class), eq(MetaDocumentDto.class)))
+                .thenReturn(convertedMetaDoc);
+        when(expedientEstatHelper.createExpedientEstat(any(), any(), any(), any())).thenReturn(estatCreated);
+        when(entityComprovarHelper.comprovarMetaExpedient(any(), any())).thenReturn(tascaMetaExpedient);
+        when(metaExpedientTascaRepository.save(any(MetaExpedientTascaEntity.class)))
+                .thenAnswer(inv -> inv.getArgument(0));
+        when(conversioTipusHelper.convertir(any(MetaExpedientTascaEntity.class), eq(MetaExpedientTascaDto.class)))
+                .thenReturn(tascaDto);
+        when(grupRepository.findByEntitatIdAndCodi(any(), any())).thenReturn(grupEntity);
+        initMeterRegistry();
+        
         helper.createFromImport(ENTITAT_ID, importDto, "IPA_ADMIN", ORGAN_ID);
 
         verify(metaExpedientRepository).save(any());
         verify(procedimentCreat).updateRevisioEstat(MetaExpedientRevisioEstatEnumDto.REVISAT);
+        verify(metaDocumentHelper).create(any(), any(), any(), any(), any(), any(), any(), any());
+        verify(metaDadaHelper, org.mockito.Mockito.atLeastOnce()).create(any(), any(), any(), any(), any());
+        verify(expedientEstatHelper).createExpedientEstat(any(), any(), any(), any());
+        verify(metaExpedientTascaRepository).save(any());
     }
 
     // =========================================================================
@@ -1470,26 +1645,160 @@ class MetaExpedientHelperTest {
     void updateFromImport_ambDtoMinim_actualitzaElProcedimentSenseErrors() {
         EntitatEntity entitat = mock(EntitatEntity.class);
         MetaExpedientEntity procedimentOriginal = mock(MetaExpedientEntity.class);
-        es.caib.ripea.service.intf.dto.MetaExpedientExportDto importDto =
-                new es.caib.ripea.service.intf.dto.MetaExpedientExportDto();
+        MetaDocumentEntity metaDocumentEntity = mock(MetaDocumentEntity.class);
+        GrupEntity grupEntity = mock(GrupEntity.class);
+
+        MetaDocumentDto metaDocumentDto = new MetaDocumentDto();
+        metaDocumentDto.setCodi("DOC_1");
+        metaDocumentDto.setNom("Document 1");
+        metaDocumentDto.setMetaDades(null);
+
+        MetaDadaDto metaDadaDto = new MetaDadaDto();
+        metaDadaDto.setCodi("DADA_1");
+        metaDadaDto.setNom("Dada 1");
+        metaDadaDto.setTipus(MetaDadaTipusEnumDto.TEXT);
+        metaDadaDto.setMultiplicitat(MultiplicitatEnumDto.M_1);
+
+        ExpedientEstatDto estatDto = new ExpedientEstatDto();
+        estatDto.setId(200L);
+        estatDto.setCodi("ESTAT_1");
+
+        MetaExpedientTascaDto tascaDto = new MetaExpedientTascaDto();
+        tascaDto.setCodi("T01");
+        tascaDto.setNom("Tasca 1");
+        tascaDto.setValidacions(null);
+
+        GrupDto grupDto = new GrupDto();
+        grupDto.setId(100L);
+        grupDto.setCodi("GRUP_1");
+
+        MetaExpedientExportDto importDto = new MetaExpedientExportDto();
         importDto.setId(META_EXPEDIENT_ID);
         importDto.setCodi("PROC");
         importDto.setNom("Nom actualitzat");
         importDto.setOrganGestor(null);
         importDto.setCarpetes(null);
-        importDto.setMetaDocuments(null);
-        importDto.setMetaDades(null);
-        importDto.setEstats(null);
-        importDto.setTasques(null);
-        importDto.setGrups(null);
+        importDto.setMetaDocuments(Collections.singletonList(metaDocumentDto));
+        importDto.setMetaDades(Collections.singletonList(metaDadaDto));
+        importDto.setEstats(new HashSet<>(Collections.singletonList(estatDto)));
+        importDto.setTasques(new HashSet<>(Collections.singletonList(tascaDto)));
+        importDto.setGrups(Collections.singletonList(grupDto));
+
         when(entityComprovarHelper.comprovarEntitatPerMetaExpedients(ENTITAT_ID)).thenReturn(entitat);
         when(entityComprovarHelper.comprovarMetaExpedient(entitat, META_EXPEDIENT_ID)).thenReturn(procedimentOriginal);
         when(procedimentOriginal.getCodi()).thenReturn("PROC");
         when(procedimentOriginal.getPare()).thenReturn(null);
+        when(procedimentOriginal.getId()).thenReturn(META_EXPEDIENT_ID);
 
+        // MetaDocuments: cerca per codi → null → crea
+        when(metaDocumentHelper.findByCodiAndProcediment(procedimentOriginal, "DOC_1")).thenReturn(null);
+        when(metaDocumentHelper.create(any(), any(), any(), any(), any(), any(), any(), any()))
+                .thenReturn(metaDocumentEntity);
+
+        // MetaDades: cerca per codi → null → crea
+        when(metaDadaHelper.findByMetaNodeAndCodi(procedimentOriginal, "DADA_1")).thenReturn(null);
+
+        // Estats: cerca per codi → null → crea
+        when(expedientEstatHelper.findByMetaExpedientAndCodi(procedimentOriginal, "ESTAT_1")).thenReturn(null);
+        ExpedientEstatDto estatCreated = new ExpedientEstatDto();
+        estatCreated.setId(201L);
+        when(expedientEstatHelper.createExpedientEstat(any(), any(), any(), any())).thenReturn(estatCreated);
+
+        // Tasques: cerca per codi → null → tascaCreate (intern)
+        when(metaExpedientTascaRepository.findByMetaExpedientAndCodi(procedimentOriginal, "T01")).thenReturn(null);
+        when(metaExpedientTascaRepository.save(any(MetaExpedientTascaEntity.class)))
+                .thenAnswer(inv -> inv.getArgument(0));
+        when(conversioTipusHelper.convertir(any(MetaExpedientTascaEntity.class), eq(MetaExpedientTascaDto.class)))
+                .thenReturn(tascaDto);
+
+        // Grups: no existeix → grupCreate
+        when(procedimentOriginal.hasGrup(100L)).thenReturn(false);
+        when(grupRepository.findByEntitatIdAndCodi(any(), any())).thenReturn(grupEntity);
+
+        initMeterRegistry();
+        
         helper.updateFromImport(ENTITAT_ID, importDto, "IPA_ADMIN", ORGAN_ID);
 
         verify(procedimentOriginal).update(any(), any(), any(), any(), any(), any(),
                 anyBoolean(), anyBoolean(), any(), any(), anyBoolean(), any(), anyBoolean(), anyBoolean());
+        verify(metaDocumentHelper).create(any(), any(), any(), any(), any(), any(), any(), any());
+        verify(metaDadaHelper).create(any(), any(), any(), any(), any());
+        verify(expedientEstatHelper).createExpedientEstat(any(), any(), any(), any());
+        verify(metaExpedientTascaRepository).save(any());
+    }
+    
+    private void initMeterRegistry() {
+        when(applicationHelper.getMeterRegistry()).thenReturn(new MeterRegistry(new Clock() {
+			
+			@Override
+			public long wallTime() {
+				// TODO Auto-generated method stub
+				return 0;
+			}
+			
+			@Override
+			public long monotonicTime() {
+				// TODO Auto-generated method stub
+				return 0;
+			}
+		}) {
+			
+			@Override
+			protected Timer newTimer(Id id, DistributionStatisticConfig distributionStatisticConfig,
+					PauseDetector pauseDetector) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			
+			@Override
+			protected Meter newMeter(Id id, Type type, Iterable<Measurement> measurements) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			
+			@Override
+			protected <T> Gauge newGauge(Id id, T obj, ToDoubleFunction<T> valueFunction) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			
+			@Override
+			protected <T> FunctionTimer newFunctionTimer(Id id, T obj, ToLongFunction<T> countFunction,
+					ToDoubleFunction<T> totalTimeFunction, TimeUnit totalTimeFunctionUnit) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			
+			@Override
+			protected <T> FunctionCounter newFunctionCounter(Id id, T obj, ToDoubleFunction<T> countFunction) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			
+			@Override
+			protected DistributionSummary newDistributionSummary(Id id, DistributionStatisticConfig distributionStatisticConfig,
+					double scale) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			
+			@Override
+			protected Counter newCounter(Id id) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			
+			@Override
+			protected TimeUnit getBaseTimeUnit() {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			
+			@Override
+			protected DistributionStatisticConfig defaultHistogramConfig() {
+				// TODO Auto-generated method stub
+				return null;
+			}
+		});
     }
 }
