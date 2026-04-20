@@ -55,6 +55,7 @@ import es.caib.comanda.model.management.Avis;
 import es.caib.comanda.model.management.AvisTipus;
 import es.caib.comanda.model.management.Tasca;
 import es.caib.comanda.model.management.TascaEstat;
+import es.caib.comanda.model.server.monitoring.EstatSalutEnum;
 import es.caib.comanda.service.management.ApiException;
 import es.caib.distribucio.rest.client.integracio.domini.Annex;
 import es.caib.distribucio.rest.client.integracio.domini.AnotacioRegistreEntrada;
@@ -9075,10 +9076,14 @@ public class PluginHelper {
 					return new GenericDto("integracio.diag.cv.ko", "fa fa-times vermell", new Object[] {resultatDiagnostic.getMessage()}, resultatDiagnostic);
 				}
 			}  else if (codi.equals(IntegracioHelper.INTCODI_COMANDA)) {
-				Exception resultatDiagnostic = comandaIntegracioDiagnostic(filtre);
-				if (resultatDiagnostic==null) {
-					return new GenericDto("integracio.diag.cm.ok", "fa fa-check verd", new Object[] {codi});
-				} else {
+				try {
+					EstatSalutEnum resultatDiagnostic = comandaIntegracioDiagnostic(filtre);
+					if (EstatSalutEnum.UP.equals(resultatDiagnostic)) {
+						return new GenericDto("integracio.diag.cm.response", "fa fa-check verd", new Object[] {resultatDiagnostic.toString()});
+					} else {
+						return new GenericDto("integracio.diag.cm.response", "fa fa-question-circle taronja", new Object[] {resultatDiagnostic.toString()});
+					}
+				} catch (Exception resultatDiagnostic) {
 					return new GenericDto("integracio.diag.cm.ko", "fa fa-times vermell", new Object[] {resultatDiagnostic.getMessage()}, resultatDiagnostic);
 				}
 			} else {
@@ -9310,14 +9315,9 @@ public class PluginHelper {
 		}	
 	}
 	
-	public Exception comandaIntegracioDiagnostic(DiagnosticFiltreDto filtre) {
-		try {
+	public EstatSalutEnum comandaIntegracioDiagnostic(DiagnosticFiltreDto filtre) throws Exception {
 			ComandaCaibPlugin comandaCaibPlugin = getComandaPlugin(filtre.getEntitatCodi(), filtre.getOrganCodi());
-			comandaCaibPlugin.getLlistatTasques("prova");
-			return null;
-		} catch (Exception ex) {
-			return ex;
-		}				
+			return comandaCaibPlugin.getSalutComanda();
 	}
 	
 	public Exception concsvIntegracioDiagnostic(DiagnosticFiltreDto filtre) {

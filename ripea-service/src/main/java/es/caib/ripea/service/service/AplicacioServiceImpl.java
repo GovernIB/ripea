@@ -97,6 +97,8 @@ import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
 import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.dto.ValidacioErrorDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
+import es.caib.ripea.service.intf.exception.SistemaExternException;
+import es.caib.ripea.service.intf.exception.ValidationException;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.permission.ExtendedPermission;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -594,9 +596,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 	}
 	
 	@Override
-	public boolean doesCurrentUserHasRol(
-			String rolToCheck) {
-
+	public boolean doesCurrentUserHasRol(String rolToCheck) {
 		return rolHelper.doesCurrentUserHasRol(rolToCheck);
 	}
 
@@ -833,6 +833,10 @@ public class AplicacioServiceImpl implements AplicacioService {
 					dpe.getDocument(),
 					rolActual!=null?rolActual:"IPA_ADMIN");
 			resultat+="Cancelada la firma pendent del document "+dpe.getDocument().getNom()+"</br>";
+		} catch (ValidationException vEx) {
+			resultat+=vEx.getMessage()+"</br>";
+		} catch (SistemaExternException seEx) {
+			resultat+=seEx.getMessage()+"</br>";
 		} catch (Exception ex) {
 			throw new Exception("Error al cancelar la firma pendent del document esborrat="+portafirmesDocIs+": "+ex.getMessage());
 		}
@@ -845,8 +849,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 	public List<Long> getTasquesComanda() {
 		return expedientTascaRepository.findTasquesPendents();
 	}
-	
-	
+
 	@Override
 	@Transactional
 	public String executeTascaComanda(Long tascaId) throws Exception {
