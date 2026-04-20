@@ -73,7 +73,7 @@ jobs:
           tag_name: ${{ steps.vars.outputs.tag }}
           name: "RIPEA EAR ${{ steps.vars.outputs.tag }}"
           body: "EAR build for branch ${{ inputs.branch }}"
-          files: ripea/target/*.ear
+          files: ripea/ripea-ear/target/*.ear
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
