@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=${{ secrets.QUAY_URL }}/${{ secrets.ORGANIZATION }}/jboss:eap72-openjdk11-rhel8
+ARG BASE_IMAGE
 FROM ${BASE_IMAGE}
 
 WORKDIR /home/jboss
