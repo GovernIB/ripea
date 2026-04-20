@@ -53,8 +53,7 @@ public class TipusDocumentalHelper {
                         entrada.codi,
                         entrada.nom,
                         entitat,
-                        entrada.nomCatala,
-                        null
+                        entrada.nomCatala
                 ).build());
             }
         }
