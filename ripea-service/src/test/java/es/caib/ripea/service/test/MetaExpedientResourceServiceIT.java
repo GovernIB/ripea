@@ -6,16 +6,21 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.test.context.support.WithMockUser;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+
 import es.caib.ripea.service.intf.config.BaseConfig;
+import es.caib.ripea.service.intf.dto.MetaExpedientExportDto;
 import es.caib.ripea.service.intf.dto.TipusClassificacioEnumDto;
 import es.caib.ripea.service.intf.model.MetaExpedientResource;
 import es.caib.ripea.service.intf.resourceservice.MetaExpedientResourceService;
+import es.caib.ripea.service.intf.service.MetaExpedientService;
+import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.test.config.BaseServiceIT;
 
 /**
@@ -39,8 +44,8 @@ import es.caib.ripea.service.test.config.BaseServiceIT;
 @WithMockUser(username = "usuari1", roles = {"ADMIN"})
 public class MetaExpedientResourceServiceIT extends BaseServiceIT {
 
-    @Autowired
-    private MetaExpedientResourceService metaExpedientResourceService;
+    @Autowired private MetaExpedientResourceService metaExpedientResourceService;
+    @Autowired private MetaExpedientService metaExpedientService;
 
     @BeforeEach
     @Override
@@ -391,6 +396,51 @@ public class MetaExpedientResourceServiceIT extends BaseServiceIT {
         assertThat(metaExpedientResourceService.getOne(id, null).isActiu()).isTrue();
     }
 
+    // =========================================================================
+    // Tests de exportació i importació
+    // =========================================================================
+    @Test
+    void quanExportamImportamUnProcediment_retornaJsonAndFindImportatByCodi() {
+    	String resultat = metaExpedientService.export(testData.entitat.getId(), testData.metaExpedients.get(0).getId(), null);
+    	MetaExpedientExportDto metaExpedientExport = null;
+    	try {
+    		metaExpedientExport = Utils.convertirJsonToMetaExpedientDto(resultat.getBytes());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+    	
+    	assertThat(metaExpedientExport).isNotNull();
+    	
+    	//Emplenam alguns atributs que s'emplenaríen desde el formulari de importació:
+    	metaExpedientExport.setCodi("IMPORTAT_JUNIT");
+    	metaExpedientExport.setClassificacio("IMPORTAT_JUNIT");
+    	
+    	metaExpedientService.createFromImport(testData.entitat.getId(), metaExpedientExport, BaseConfig.ROLE_ADMIN, null);
+    	
+        Page<MetaExpedientResource> pagina = metaExpedientResourceService.findPage(
+        		"IMPORTAT_JUNIT", null, null, null,
+                PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "nom"))
+        );
+        
+        assertThat(pagina.getTotalElements()).isEqualTo(1);
+
+        // flush+clear needed: Hibernate initializes the `estats` lazy collection as empty for the newly
+        // created entity in this same transaction, so cascade REMOVE would skip it without a DB reload.
+        entityManager.flush();
+        entityManager.clear();
+
+        metaExpedientService.delete(testData.entitat.getId(), pagina.getContent().get(0).getId(), null);
+        entityManager.flush();
+        entityManager.clear();
+        
+        pagina = metaExpedientResourceService.findPage(
+        		"IMPORTAT_JUNIT", null, null, null,
+                PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "nom"))
+        );
+        
+        assertThat(pagina.getTotalElements()).isEqualTo(0);
+    }
+    
     // =========================================================================
     // Mètode auxiliar
     // =========================================================================

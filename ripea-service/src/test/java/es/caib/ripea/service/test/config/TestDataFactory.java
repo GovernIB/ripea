@@ -16,6 +16,7 @@ import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientTascaEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.entity.PinbalServeiEntity;
+import es.caib.ripea.persistence.entity.TipusDocumentalEntity;
 import es.caib.ripea.persistence.entity.UsuariEntity;
 import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.persistence.repository.ExpedientEstatRepository;
@@ -26,6 +27,7 @@ import es.caib.ripea.persistence.repository.MetaExpedientRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientTascaRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.persistence.repository.PinbalServeiRepository;
+import es.caib.ripea.persistence.repository.TipusDocumentalRepository;
 import es.caib.ripea.persistence.repository.UsuariRepository;
 import es.caib.ripea.service.intf.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.service.intf.dto.MetaDadaTipusEnumDto;
@@ -56,6 +58,7 @@ import es.caib.ripea.service.intf.dto.TipusProcedimentServeiEnum;
 public class TestDataFactory {
 
     @Autowired private EntitatRepository            entitatRepository;
+    @Autowired private TipusDocumentalRepository	tipusDocumentalRepository;
     @Autowired private GrupRepository               grupRepository;
     @Autowired private PinbalServeiRepository       pinbalServeiRepository;
     @Autowired private MetaExpedientRepository      metaExpedientRepository;
@@ -86,6 +89,8 @@ public class TestDataFactory {
                 ).build()
         );
 
+        tipusDocumentalRepository.save(TipusDocumentalEntity.getBuilder("TD01", "Resolución", data.entitat, "Resolució").build());
+        
         // --- Usuaris de @WithMockUser (necessaris per a la conversió entitat→DTO) ---
         // ConversioTipusHelper cerca l'usuari per createdBy/lastModifiedBy. Si no existeix, llança NPE.
         data.usuari = usuariRepository.save(

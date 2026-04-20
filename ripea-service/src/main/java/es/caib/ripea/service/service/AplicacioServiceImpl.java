@@ -597,7 +597,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 	
 	@Override
 	public boolean doesCurrentUserHasRol(String rolToCheck) {
-		return rolHelper.doesCurrentUserHasRol(rolToCheck);
+		return RolHelper.doesCurrentUserHasRol(rolToCheck);
 	}
 
 	private String getIdiomaPerDefecte() {

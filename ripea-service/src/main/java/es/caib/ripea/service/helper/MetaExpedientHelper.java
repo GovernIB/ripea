@@ -82,7 +82,6 @@ import es.caib.ripea.service.intf.dto.CrearReglaResponseDto;
 import es.caib.ripea.service.intf.dto.DominiDto;
 import es.caib.ripea.service.intf.dto.ExpedientEstatDto;
 import es.caib.ripea.service.intf.dto.GrupDto;
-import es.caib.ripea.service.intf.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MetaDadaDto;
 import es.caib.ripea.service.intf.dto.MetaDadaTipusEnumDto;
