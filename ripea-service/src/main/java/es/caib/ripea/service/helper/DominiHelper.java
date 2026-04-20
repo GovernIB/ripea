@@ -1,6 +1,6 @@
 package es.caib.ripea.service.helper;
 
-import java.io.IOException;
+import java.io.ByteArrayInputStream;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Properties;
@@ -11,7 +11,10 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 import javax.sql.DataSource;
-import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
@@ -20,10 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.stereotype.Component;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 import es.caib.ripea.persistence.entity.DominiEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
@@ -142,35 +141,53 @@ public class DominiHelper {
 		try {
 			String cadena = domini.getCadena();
 			String password = domini.getContrasenya();
-			Document document = XmlHelper.getDocumentFromContent(cadena.getBytes());
-			if (document != null) {
-				for (int i = 0; i < document.getElementsByTagName("local-tx-datasource").getLength(); i++) {
-					NodeList childList = document.getElementsByTagName("local-tx-datasource").item(i).getChildNodes();
-					if (childList != null) {
-						for (int j = 0; j < childList.getLength(); j++) {
-							Node childNode = childList.item(j);
-							switch (childNode.getNodeName()) {
-							case "connection-url":
-								conProps.setProperty("url", childList.item(j).getTextContent().trim());
-								break;
-							case "driver-class":
-								conProps.setProperty("driver", childList.item(j).getTextContent().trim());
-								break;
-							case "user-name":
-								conProps.setProperty("user", childList.item(j).getTextContent().trim());
-								break;
-							default:
-								break;
+			if (cadena != null && !cadena.trim().isEmpty()) {
+				XMLStreamReader reader = XMLInputFactory.newInstance()
+						.createXMLStreamReader(new ByteArrayInputStream(cadena.getBytes()));
+				try {
+					boolean inDatasource = false;
+					String currentTag = null;
+					while (reader.hasNext()) {
+						int event = reader.next();
+						if (event == XMLStreamConstants.START_ELEMENT) {
+							String name = reader.getLocalName();
+							if ("local-tx-datasource".equals(name)) {
+								inDatasource = true;
+							} else if (inDatasource) {
+								currentTag = name;
 							}
+						} else if (event == XMLStreamConstants.CHARACTERS && inDatasource && currentTag != null) {
+							String text = reader.getText().trim();
+							if (!text.isEmpty()) {
+								switch (currentTag) {
+								case "connection-url":
+									conProps.setProperty("url", text);
+									break;
+								case "driver-class":
+									conProps.setProperty("driver", text);
+									break;
+								case "user-name":
+									conProps.setProperty("user", text);
+									break;
+								default:
+									break;
+								}
+							}
+						} else if (event == XMLStreamConstants.END_ELEMENT) {
+							if ("local-tx-datasource".equals(reader.getLocalName())) {
+								inDatasource = false;
+							}
+							currentTag = null;
 						}
 					}
+				} finally {
+					reader.close();
 				}
 			}
 			if (password != null && !password.isEmpty()) {
-				password = desxifrarContrasenya(password);
-				conProps.setProperty("password", password);
+				conProps.setProperty("password", desxifrarContrasenya(password));
 			}
-		} catch (ParserConfigurationException | SAXException | IOException e) {
+		} catch (XMLStreamException e) {
 			throw new ValidationException(e.getMessage());
 		}
 		return conProps;
