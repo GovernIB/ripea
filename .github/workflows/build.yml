@@ -11,11 +11,10 @@ on:
         description: '🌿 Branch'
         default: 'ripea-1.0-dev'
         required: true
-      skip_tests:
-        description: '🧪 Skip tests'
-        type: choice
-        options: ['true', 'false']
-        default: 'false'
+      run_tests:
+        description: '🧪 Run tests'
+        type: boolean
+        default: false
       build_docker:
         description: '🐳 Build Docker image'
         type: choice
@@ -67,7 +66,7 @@ jobs:
         working-directory: ripea
         run: |
           mvn -B clean package \
-            -DskipTests=${{ inputs.skip_tests }}
+            -DskipTests=${{ !inputs.run_tests }}
 
       - name: 📦 Upload EAR artifact
         uses: softprops/action-gh-release@v2
