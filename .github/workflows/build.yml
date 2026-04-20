@@ -97,12 +97,12 @@ jobs:
         run: |
           docker build \
             --build-arg BASE_IMAGE=$BASE_IMAGE \
-            -t ${{ secrets.QUAY_REPO }}:${{ steps.vars.outputs.tag }} \
-            -t ${{ secrets.QUAY_REPO }}:latest \
+            -t ${{ secrets.QUAY_URL }}/${{ secrets.ORGANIZATION }}/ripea:${{ steps.vars.outputs.tag }} \
+            -t ${{ secrets.QUAY_URL }}/${{ secrets.ORGANIZATION }}/ripea:latest \
             .
 
       - name: 📤 Push Docker image
         if: ${{ inputs.build_docker == 'true' }}
         run: |
-          docker push ${{ secrets.QUAY_REPO }}:${{ steps.vars.outputs.tag }}
-          docker push ${{ secrets.QUAY_REPO }}:latest
+          docker push ${{ secrets.QUAY_URL }}/${{ secrets.ORGANIZATION }}/ripea:${{ steps.vars.outputs.tag }}
+          docker push ${{ secrets.QUAY_URL }}/${{ secrets.ORGANIZATION }}/ripea:latest
