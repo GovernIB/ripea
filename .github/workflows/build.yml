@@ -39,6 +39,13 @@ jobs:
         run: |
           git clone --branch ${{ inputs.branch }} --depth 1 https://github.com/${{ inputs.repo }} ripea
 
+      - name: 🏷️ Get project version
+        id: project_version
+        working-directory: ripea
+        run: |
+          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout -f ripea-ear/pom.xml)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
       - name: ☕ Setup Java 11
         uses: actions/setup-java@v5
         with:
@@ -71,7 +78,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.vars.outputs.tag }}
-          name: "RIPEA EAR ${{ steps.vars.outputs.tag }}"
+          name: "RIPEA EAR ${{ steps.project_version.outputs.version }}"
           body: "EAR build for branch ${{ inputs.branch }}"
           files: ripea/ripea-ear/target/*.ear
         env:
