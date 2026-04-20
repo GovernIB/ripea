@@ -17,9 +17,8 @@ on:
         default: false
       build_docker:
         description: '🐳 Build Docker image'
-        type: choice
-        options: ['true', 'false']
-        default: 'false'
+        type: boolean
+        default: false
 
 permissions:
   contents: write
