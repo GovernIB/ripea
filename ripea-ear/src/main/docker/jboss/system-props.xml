@@ -1,6 +1,0 @@
-<system-properties>
-    <property name="es.caib.ripea.system.properties" value="/opt/eap/apps/ripea/ripea_system.properties"/>
-    <property name="javax.net.ssl.trustStore" value="/opt/eap/apps/ripea/truststore.jks"/>
-    <property name="javax.net.ssl.trustStorePassword" value="tecnologies"/>
-    <property name="com.sun.jersey.server.impl.cdi.lookupExtensionInBeanManager" value="true"/>
-</system-properties>

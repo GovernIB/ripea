@@ -11,20 +11,19 @@ on:
         description: '🌿 Branch'
         default: 'ripea-1.0-dev'
         required: true
-      skip_tests:
+      run_tests:
         description: '🧪 Run tests'
-        type: choice
-        options: ['true', 'false']
-        default: 'false'
+        type: boolean
+        default: false
       build_docker:
         description: '🐳 Build Docker image'
-        type: choice
-        options: ['true', 'false']
-        default: 'false'
+        type: boolean
+        default: false
 
 permissions:
   contents: write
   packages: write
+  issues: read
 
 jobs:
   build:
@@ -40,6 +39,13 @@ jobs:
       - name: 🌐 Clone repository
         run: |
           git clone --branch ${{ inputs.branch }} --depth 1 https://github.com/${{ inputs.repo }} ripea
+
+      - name: 🏷️ Get package version
+        id: package_version
+        working-directory: ripea
+        run: |
+          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout -f ripea-ear/pom.xml)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: ☕ Setup Java 11
         uses: actions/setup-java@v5
@@ -57,54 +63,78 @@ jobs:
           source .env
           set +o allexport
 
-          # Export to GitHub environment
           while IFS= read -r line; do
             if [[ "$line" != "" && "$line" != \#* ]]; then
               echo "$line" >> $GITHUB_ENV
             fi
           done < .env
 
-      - name: 🧱 Build EAR
+      - name: 🧪 Run Unit Tests
+        if: ${{ inputs.run_tests == true }}
+        working-directory: ripea
+        run: mvn test
+
+      - name: 🧱 Build EAR (Maven)
         working-directory: ripea
         run: |
-          mvn -B clean package \
-            -DskipTests=${{ inputs.skip_tests }}
+          mvn -B clean package -DskipTests=true
 
-      - name: 📦 Upload EAR to GitHub Release
-        uses: softprops/action-gh-release@v2
+      - name: 📝 Generate Release Notes
+        id: release_notes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          MILESTONE=$(echo "${{ inputs.branch }}" | sed 's/-dev//')
+          echo "Milestone: $MILESTONE"
+
+          ISSUES=$(gh issue list -R ${{ inputs.repo }} -m "$MILESTONE" -s closed --json number,title --template '{{range .}}* [#{{.number}}] {{.title}}{{"\n"}}{{end}}')
+
+          {
+            echo "notes<<EOF"
+            echo "### 🚀 Associated Issues ($MILESTONE)"
+            if [ -z "$ISSUES" ]; then
+              echo "No closed issues found for this milestone."
+            else
+              echo "$ISSUES"
+            fi
+            echo ""
+            echo "---"
+            echo "Built from branch: \`${{ inputs.branch }}\`"
+            echo "EOF"
+          } >> $GITHUB_OUTPUT
+
+      - name: 📦 Upload EAR artifact
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ steps.vars.outputs.tag }}
-          name: "RIPEA EAR ${{ steps.vars.outputs.tag }}"
-          body: "EAR build for branch ${{ inputs.branch }}"
-          files: ripea/target/*.ear
+          name: "Ripea EAR ${{ steps.package_version.outputs.version }}"
+          prerelease: true
+          generate_release_notes: false
+          body: ${{ steps.release_notes.outputs.notes }}
+          files: ripea/ripea-ear/target/*.ear
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: 🐳 Build Docker (Fabric8)
-        if: ${{ inputs.build_docker == 'true' }}
+      - name: 🔐 Login to Quay
+        if: ${{ inputs.build_docker == true }}
+        run: |
+          echo "${{ secrets.QUAY_PASSWORD }}" | docker login ${{ secrets.QUAY_URL }} \
+            -u "${{ secrets.QUAY_USER }}" --password-stdin
+
+      - name: 🐳 Build Docker image
+        if: ${{ inputs.build_docker == true }}
         working-directory: ripea
         env:
-          DOCKER_IMAGE_FROM: ${{ secrets.DOCKER_IMAGE_FROM }}
-          DOCKER_USER: ${{ secrets.DOCKER_USER }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-          DOCKER_USER_GROUP: ${{ secrets.DOCKER_USER_GROUP }}
+          BASE_IMAGE: ${{ secrets.QUAY_URL }}/${{ secrets.ORGANIZATION }}/jboss:eap72-openjdk11-rhel8
         run: |
-          mvn docker:build
+          docker build \
+            --build-arg BASE_IMAGE=$BASE_IMAGE \
+            -t ${{ secrets.QUAY_URL }}/${{ secrets.QUAY_ENVIRONMENT_DES }}/ripea/ripea-ear:${{ steps.vars.outputs.tag }} \
+            -t ${{ secrets.QUAY_URL }}/${{ secrets.QUAY_ENVIRONMENT_DES }}/ripea/ripea-ear:latest \
+            .
 
-      - name: 🔐 Login to private Quay
-        if: ${{ inputs.build_docker == 'true' }}
-        env:
-          QUAY_URL: ${{ secrets.QUAY_URL }}
-          QUAY_USER: ${{ secrets.QUAY_USER }}
-          QUAY_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
+      - name: 📤 Push Docker image
+        if: ${{ inputs.build_docker == true }}
         run: |
-          echo "$QUAY_PASSWORD" | docker login $QUAY_URL -u "$QUAY_USER" --password-stdin
-
-      - name: 📤 Push Docker to private Quay
-        if: ${{ inputs.build_docker == 'true' }}
-        env:
-          QUAY_URL: ${{ secrets.QUAY_URL }}
-          QUAY_REPO: ${{ secrets.QUAY_REPO }}
-        run: |
-          docker tag ripea:latest $QUAY_REPO:${{ steps.vars.outputs.tag }}
-          docker push $QUAY_REPO:${{ steps.vars.outputs.tag }}
+          docker push ${{ secrets.QUAY_URL }}/${{ secrets.QUAY_ENVIRONMENT_DES }}/ripea/ripea-ear:${{ steps.vars.outputs.tag }}
+          docker push ${{ secrets.QUAY_URL }}/${{ secrets.QUAY_ENVIRONMENT_DES }}/ripea/ripea-ear:latest

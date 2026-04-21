@@ -2093,9 +2093,10 @@ public class PluginHelper {
 				}
 			}
 			if (generarVersioImprimible) {
-				documentDetalls.setContingut(
-						arxiuPluginWrapper.getPlugin().documentImprimible(
-								documentDetalls.getIdentificador()));
+				documentDetalls.setContingut(arxiuDocumentVersioImprimible(arxiuUuid));
+//				documentDetalls.setContingut(
+//						arxiuPluginWrapper.getPlugin().documentImprimible(
+//								documentDetalls.getIdentificador()));
 			}
 			integracioHelper.addAccioOk(
 					IntegracioHelper.INTCODI_ARXIU,
@@ -2659,6 +2660,43 @@ public class PluginHelper {
 		}
 	}
 
+	public DocumentContingut arxiuDocumentVersioImprimible(String getArxiuUuid) {
+
+		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
+		String accioDescripcio = "Obtenir versió imprimible del document";
+		Map<String, String> accioParams = new HashMap<String, String>();
+		accioParams.put("uuid", getArxiuUuid);
+		long t0 = System.currentTimeMillis();
+		IArxiuPluginWrapper arxiuPluginWrapper = getConcsvPlugin();
+		String endpoint = arxiuPluginWrapper.getEndpoint();
+		
+		try {
+			DocumentContingut documentContingut = arxiuPluginWrapper.getPlugin().documentImprimible(getArxiuUuid);
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_CONCSV,
+					accioDescripcio,
+					arxiuPluginWrapper.getEndpoint(),
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.concsv", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
+			return documentContingut;
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_CONCSV,
+					accioDescripcio,
+					arxiuPluginWrapper.getEndpoint(),
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.concsv", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
+			throw new SistemaExternException(IntegracioHelper.INTCODI_CONCSV, errorDescripcio, ex);
+		}
+	}
+	
 	public FitxerDto arxiuDocumentVersioImprimible(DocumentEntity document) {
 
 		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());

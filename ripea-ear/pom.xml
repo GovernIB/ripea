@@ -10,9 +10,7 @@
 	<packaging>ear</packaging>
 	<properties>
 		<docker.image.name>${project.parent.artifactId}</docker.image.name>
-		<!--docker.image.from>280421/jboss-eap-caib-7.2</!docker.image.from-->
 		<docker.image.from>${env.DOCKER_IMAGE_FROM}</docker.image.from>
-		<docker.user.group>${env.DOCKER_USER_GROUP}</docker.user.group>
 		<docker.auth.username>${env.DOCKER_USER}</docker.auth.username>
        	<docker.auth.password>${env.DOCKER_PASSWORD}</docker.auth.password>
 	</properties>
@@ -73,8 +71,8 @@
 	                </authConfig>
 					<images>
 						<image>
-							<name>${docker.image.name}</name>
-							<alias>${project.parent.artifactId}</alias>
+							<name>280421/${docker.image.name}</name>
+							<alias>280421/${project.parent.artifactId}</alias>
 							<build>
 								<from>${docker.image.from}</from>
 								<maintainer>limit@limit.es</maintainer>
@@ -87,43 +85,18 @@
 								</ports>
 								<assemblies>
 									<assembly>
-										<name>copy_jboss_config</name>
+										<name>copy_standalone_config</name>
 										<inline>
-											<fileSets>
-												<fileSet>
-													<directory>src/main/docker/jboss</directory>
-													<outputDirectory>config</outputDirectory>
-												</fileSet>
-											</fileSets>
-										</inline>
-										<targetDir>$JBOSS_HOME</targetDir>
-										<user>${docker.user.group}</user>
-									</assembly>
-									<assembly>
-										<name>copy_properties</name>
-										<inline>
-											<fileSets>
-												<fileSet>
-													<directory>src/main/docker/properties</directory>
+											<files>
+												<file>
+													<source>src/main/docker/jboss/standalone-openshift.xml</source>
 													<outputDirectory>.</outputDirectory>
-												</fileSet>
-											</fileSets>
+													<destName>standalone-openshift.xml</destName>
+													<fileMode>0644</fileMode>
+												</file>
+											</files>
 										</inline>
-										<targetDir>$JBOSS_HOME/apps/ripea</targetDir>
-										<user>${docker.user.group}</user>
-									</assembly>
-									<assembly>
-										<name>copy_keystores</name>
-										<inline>
-											<fileSets>
-												<fileSet>
-													<directory>src/main/docker/keystores</directory>
-													<outputDirectory>.</outputDirectory>
-												</fileSet>
-											</fileSets>
-										</inline>
-										<targetDir>$JBOSS_HOME/apps/ripea</targetDir>
-										<user>${docker.user.group}</user>
+										<targetDir>$JBOSS_HOME/standalone/configuration</targetDir>
 									</assembly>
 									<assembly>
 										<name>copy_transformers</name>
@@ -135,11 +108,12 @@
 													<includes>
 														<include>**/*</include>
 													</includes>
+													<fileMode>0644</fileMode>
+													<directoryMode>0755</directoryMode>
 												</fileSet>
 											</fileSets>
 										</inline>
 										<targetDir>$JBOSS_HOME/apps/ripea</targetDir>
-										<user>${docker.user.group}</user>
 									</assembly>
 									<assembly>
 									    <name>copy_oracle_module</name>
@@ -152,31 +126,38 @@
 									        </fileSets>
 									    </inline>
 									    <targetDir>$JBOSS_HOME</targetDir>
-									    <user>${docker.user.group}</user>
-									</assembly>									
+									</assembly>
 									<assembly>
 										<descriptorRef>artifact</descriptorRef>
 										<targetDir>$JBOSS_HOME/standalone/deployments</targetDir>
-										<user>${docker.user.group}</user>
 									</assembly>
 								</assemblies>
-								<runCmds>
-									<run>rm -f $JBOSS_HOME/modules/system/layers/base/com/oracle/main/ojdbc8.jar</run>
-									<run>mkdir -p /opt/webapps/ripea</run>
-									<run>chmod 755 /opt/webapps/ripea</run>
-									<run>chmod a+x $JBOSS_HOME/config/jboss_config.sh</run>
-									<run>sed -i 's/\r//' $JBOSS_HOME/config/jboss_config.sh</run>
-<!--									<run>dos2unix $JBOSS_HOME/config/jboss_config.sh</run>-->
-									<run>sed -i 's~#!/bin/sh~#!/bin/sh\n$JBOSS_HOME/config/jboss_config.sh~' $JBOSS_HOME/bin/standalone.sh</run>
-									<run>curl -L https://github.com/keycloak/keycloak/releases/download/12.0.4/keycloak-oidc-wildfly-adapter-12.0.4.tar.gz -o $JBOSS_HOME/keycloak-adapter.tar.gz</run>
-									<run>tar xvzf $JBOSS_HOME/keycloak-adapter.tar.gz -C $JBOSS_HOME</run>
-									<run>rm $JBOSS_HOME/keycloak-adapter.tar.gz</run>
-									<run>$JBOSS_HOME/bin/jboss-cli.sh --file=$JBOSS_HOME/bin/adapter-install-offline.cli -Djboss.server.config.file=standalone-openshift.xml</run>									
-								</runCmds>
 								<tags>
 									<tag>latest</tag>
 									<tag>${project.version}</tag>
 								</tags>
+								<runCmds>
+									<!-- Instal·lar adaptador de keycloak -->
+									<run>curl -fL https://github.com/keycloak/keycloak/releases/download/12.0.4/keycloak-oidc-wildfly-adapter-12.0.4.tar.gz -o $JBOSS_HOME/keycloak-adapter.tar.gz</run>
+									<run>tar xzf $JBOSS_HOME/keycloak-adapter.tar.gz -C $JBOSS_HOME --no-same-owner --no-same-permissions --touch</run>
+									<run>rm $JBOSS_HOME/keycloak-adapter.tar.gz</run>
+									<run>$JBOSS_HOME/bin/jboss-cli.sh --file=$JBOSS_HOME/bin/adapter-install-offline.cli -Djboss.server.config.file=standalone-openshift.xml</run>
+									<run>rm -rf $JBOSS_HOME/standalone/configuration/standalone_xml_history</run>
+									<run>mkdir -p $JBOSS_HOME/standalone/configuration/standalone_xml_history/current</run>
+
+									<!-- Donar permisos -->
+									<run>mkdir -p $JBOSS_HOME/standalone/data/content</run>
+									<run>mkdir -p $JBOSS_HOME/standalone/tmp</run>
+									<run>mkdir -p $JBOSS_HOME/standalone/log</run>
+									<run>chmod -R g=u $JBOSS_HOME/standalone/data</run>
+									<run>chmod -R g=u $JBOSS_HOME/standalone/tmp</run>
+									<run>chmod -R g=u $JBOSS_HOME/standalone/log</run>
+									<run>chmod -R g=u $JBOSS_HOME/standalone/configuration/standalone_xml_history</run>
+									<run>test ! -d $JBOSS_HOME/config || chmod -R g=u $JBOSS_HOME/config</run>
+
+									<run>mkdir -p /opt/webapps/ripea</run>
+									<run>chmod -R g=u /opt/webapps/ripea</run>
+								</runCmds>
 							</build>
 							<run>
 								<ports>
@@ -203,7 +184,6 @@
 					<version>6</version>
 					<initializeInOrder>true</initializeInOrder>
 					<skinnyWars>true</skinnyWars>
-<!--					<outputDirectory>C:\jboss-eap-7.2\standalone\deployments</outputDirectory> -->
 					<archive>
 						<manifestEntries>
 							<Build-Timestamp>${maven.build.timestamp}</Build-Timestamp>
