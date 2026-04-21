@@ -23,6 +23,7 @@ on:
 permissions:
   contents: write
   packages: write
+  issues: read
 
 jobs:
   build:
@@ -39,8 +40,8 @@ jobs:
         run: |
           git clone --branch ${{ inputs.branch }} --depth 1 https://github.com/${{ inputs.repo }} ripea
 
-      - name: 🏷️ Get project version
-        id: project_version
+      - name: 🏷️ Get package version
+        id: package_version
         working-directory: ripea
         run: |
           VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout -f ripea-ear/pom.xml)
@@ -74,14 +75,38 @@ jobs:
           mvn -B clean package \
             -DskipTests=${{ !inputs.run_tests }}
 
+      - name: 📝 Generate Release Notes
+        id: release_notes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          MILESTONE=$(echo "${{ inputs.branch }}" | sed 's/-dev//')
+          echo "Milestone: $MILESTONE"
+
+          ISSUES=$(gh issue list -m "$MILESTONE" -s closed --json number,title --template '{{range .}}* [#{{.number}}] {{.title}}{{"\n"}}{{end}}')
+
+          {
+            echo "notes<<EOF"
+            echo "### 🚀 Associated Issues ($MILESTONE)"
+            if [ -z "$ISSUES" ]; then
+              echo "No closed issues found for this milestone."
+            else
+              echo "$ISSUES"
+            fi
+            echo ""
+            echo "---"
+            echo "Built from branch: \`${{ inputs.branch }}\`"
+            echo "EOF"
+          } >> $GITHUB_OUTPUT
+
       - name: 📦 Upload EAR artifact
         uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ steps.vars.outputs.tag }}
-          name: "RIPEA EAR ${{ steps.project_version.outputs.version }}"
+          name: "RIPEA EAR ${{ steps.package_version.outputs.version }}"
           prerelease: true
-          generate_release_notes: true
-          body: "EAR build for branch ${{ inputs.branch }}"
+          generate_release_notes: false
+          body: ${{ steps.release_notes.outputs.notes }}
           files: ripea/ripea-ear/target/*.ear
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
