@@ -69,11 +69,15 @@ jobs:
             fi
           done < .env
 
+      - name: 🧪 Run Unit Tests
+        if: ${{ inputs.run_tests == true }}
+        working-directory: ripea
+        run: mvn test
+
       - name: 🧱 Build EAR (Maven)
         working-directory: ripea
         run: |
-          mvn -B clean package \
-            -DskipTests=${{ !inputs.run_tests }}
+          mvn -B clean package -DskipTests=true
 
       - name: 📝 Generate Release Notes
         id: release_notes
@@ -103,7 +107,7 @@ jobs:
         uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ steps.vars.outputs.tag }}
-          name: "RIPEA EAR ${{ steps.package_version.outputs.version }}"
+          name: "Ripea EAR ${{ steps.package_version.outputs.version }}"
           prerelease: true
           generate_release_notes: false
           body: ${{ steps.release_notes.outputs.notes }}
