@@ -69,11 +69,15 @@ jobs:
             fi
           done < .env
 
+      - name: 🧪 Run Unit Tests
+        if: ${{ inputs.run_tests == true }}
+        working-directory: ripea
+        run: mvn test
+
       - name: 🧱 Build EAR (Maven)
         working-directory: ripea
         run: |
-          mvn -B clean package \
-            -DskipTests=${{ !inputs.run_tests }}
+          mvn -B clean package -DskipTests=true
 
       - name: 📝 Generate Release Notes
         id: release_notes
@@ -103,7 +107,7 @@ jobs:
         uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ steps.vars.outputs.tag }}
-          name: "RIPEA EAR ${{ steps.package_version.outputs.version }}"
+          name: "Ripea EAR ${{ steps.package_version.outputs.version }}"
           prerelease: true
           generate_release_notes: false
           body: ${{ steps.release_notes.outputs.notes }}
@@ -112,25 +116,25 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: 🔐 Login to Quay
-        if: ${{ inputs.build_docker == 'true' }}
+        if: ${{ inputs.build_docker == true }}
         run: |
           echo "${{ secrets.QUAY_PASSWORD }}" | docker login ${{ secrets.QUAY_URL }} \
             -u "${{ secrets.QUAY_USER }}" --password-stdin
 
       - name: 🐳 Build Docker image
-        if: ${{ inputs.build_docker == 'true' }}
+        if: ${{ inputs.build_docker == true }}
         working-directory: ripea
         env:
           BASE_IMAGE: ${{ secrets.QUAY_URL }}/${{ secrets.ORGANIZATION }}/jboss:eap72-openjdk11-rhel8
         run: |
           docker build \
             --build-arg BASE_IMAGE=$BASE_IMAGE \
-            -t ${{ secrets.QUAY_URL }}/${{ secrets.ORGANIZATION }}/ripea:${{ steps.vars.outputs.tag }} \
-            -t ${{ secrets.QUAY_URL }}/${{ secrets.ORGANIZATION }}/ripea:latest \
+            -t ${{ secrets.QUAY_URL }}/${{ secrets.QUAY_ENVIRONMENT_DES }}/ripea/ripea-ear:${{ steps.vars.outputs.tag }} \
+            -t ${{ secrets.QUAY_URL }}/${{ secrets.QUAY_ENVIRONMENT_DES }}/ripea/ripea-ear:latest \
             .
 
       - name: 📤 Push Docker image
-        if: ${{ inputs.build_docker == 'true' }}
+        if: ${{ inputs.build_docker == true }}
         run: |
-          docker push ${{ secrets.QUAY_URL }}/${{ secrets.ORGANIZATION }}/ripea:${{ steps.vars.outputs.tag }}
-          docker push ${{ secrets.QUAY_URL }}/${{ secrets.ORGANIZATION }}/ripea:latest
+          docker push ${{ secrets.QUAY_URL }}/${{ secrets.QUAY_ENVIRONMENT_DES }}/ripea/ripea-ear:${{ steps.vars.outputs.tag }}
+          docker push ${{ secrets.QUAY_URL }}/${{ secrets.QUAY_ENVIRONMENT_DES }}/ripea/ripea-ear:latest
