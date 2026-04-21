@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,14 +24,20 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 
+import es.caib.ripea.persistence.entity.ContingutEntity;
 import es.caib.ripea.persistence.entity.DocumentEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.ExpedientEntity;
+import es.caib.ripea.persistence.entity.FluxFirmaUsuariEntity;
 import es.caib.ripea.persistence.entity.MetaDocumentEntity;
+import es.caib.ripea.persistence.entity.MetaDocumentFluxPortafibEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientTascaValidacioEntity;
 import es.caib.ripea.persistence.entity.PinbalServeiEntity;
+import es.caib.ripea.persistence.entity.UsuariEntity;
 import es.caib.ripea.persistence.repository.DocumentRepository;
 import es.caib.ripea.persistence.repository.ExpedientRepository;
 import es.caib.ripea.persistence.repository.FluxFirmaUsuariRepository;
@@ -46,6 +53,7 @@ import es.caib.ripea.service.intf.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentDto;
 import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
+import es.caib.ripea.service.intf.dto.PortafirmesFluxInfoDto;
 import es.caib.ripea.service.intf.exception.ExisteixenDocumentsException;
 
 /**
@@ -85,11 +93,21 @@ class MetaDocumentHelperTest {
     private static final Long META_DOCUMENT_ID  = 20L;
     private static final Long ORGAN_ID          = 30L;
 
+    private static final String TEST_USER = "usuari1";
+
     @BeforeEach
-    void configurarMeterRegistry() {
+    void configurar() {
         io.micrometer.core.instrument.MeterRegistry meterRegistry =
                 new io.micrometer.core.instrument.simple.SimpleMeterRegistry();
         when(applicationHelper.getMeterRegistry()).thenReturn(meterRegistry);
+
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(TEST_USER, "pass", Collections.emptyList()));
+    }
+
+    @AfterEach
+    void netejarSecurityContext() {
+        SecurityContextHolder.clearContext();
     }
 
     // =========================================================================
@@ -915,5 +933,286 @@ class MetaDocumentHelperTest {
         List<MetaDocumentEntity> resultat = helper.findMetaDocumentsPinbalDisponiblesPerCreacio(expedient);
 
         assertThat(resultat).isEmpty();
+    }
+
+    // =========================================================================
+    // updateFluxos (via update) — flux no existent, entra al if
+    // =========================================================================
+
+    private MetaDocumentDto buildMetaDocumentDtoAmbFlux(MultiplicitatEnumDto multiplicitat, String... fluxIds) {
+        MetaDocumentDto dto = new MetaDocumentDto();
+        dto.setId(META_DOCUMENT_ID);
+        dto.setCodi("COD");
+        dto.setNom("Nom");
+        dto.setMultiplicitat(multiplicitat);
+        dto.setPortafirmesFluxosId(fluxIds);
+        return dto;
+    }
+
+    @Test
+    void update_ambFluxNou_desaElFluxIActualitzaDesc() throws Exception {
+        MetaDocumentEntity metaDocument = mock(MetaDocumentEntity.class);
+        MetaExpedientEntity metaExpedient = mock(MetaExpedientEntity.class);
+        when(metaDocument.getMultiplicitat()).thenReturn(MultiplicitatEnumDto.M_1);
+        when(metaDocument.getMetaExpedient()).thenReturn(metaExpedient);
+        when(metaDocument.getEntitat()).thenReturn(mock(EntitatEntity.class));
+        when(metaDocument.getFluxosFirma()).thenReturn(new ArrayList<>());
+        when(metaDocument.fluxeExistById("FLUX_01")).thenReturn(false);
+        when(metaDocumentRepository.findById(META_DOCUMENT_ID)).thenReturn(Optional.of(metaDocument));
+        when(metaExpedient.getId()).thenReturn(META_EXPEDIENT_ID);
+
+        UsuariEntity usuari = mock(UsuariEntity.class);
+        when(usuari.getIdioma()).thenReturn("ca");
+        when(usuariRepository.findById(TEST_USER)).thenReturn(Optional.of(usuari));
+
+        when(metaDocumentFluxPortafibRepository.findByMetaDocumentIsNullAndPortafirmesFluxId("FLUX_01"))
+                .thenReturn(null);
+
+        PortafirmesFluxInfoDto fluxInfo = new PortafirmesFluxInfoDto();
+        fluxInfo.setNom("Flux de prova");
+        when(pluginHelper.portafirmesRecuperarInfoFluxDeFirma("FLUX_01", "ca", false))
+                .thenReturn(fluxInfo);
+
+        helper.update(META_EXPEDIENT_ID, buildMetaDocumentDtoAmbFlux(MultiplicitatEnumDto.M_1, "FLUX_01"), null, null, null);
+
+        verify(metaDocumentFluxPortafibRepository).save(any(MetaDocumentFluxPortafibEntity.class));
+    }
+
+    @Test
+    void update_ambFluxJaExistent_noTornaADesar() throws Exception {
+        MetaDocumentEntity metaDocument = mock(MetaDocumentEntity.class);
+        MetaExpedientEntity metaExpedient = mock(MetaExpedientEntity.class);
+        when(metaDocument.getMultiplicitat()).thenReturn(MultiplicitatEnumDto.M_1);
+        when(metaDocument.getMetaExpedient()).thenReturn(metaExpedient);
+        when(metaDocument.getEntitat()).thenReturn(mock(EntitatEntity.class));
+        when(metaDocument.getFluxosFirma()).thenReturn(new ArrayList<>());
+        when(metaDocument.fluxeExistById("FLUX_01")).thenReturn(true);
+        when(metaDocumentRepository.findById(META_DOCUMENT_ID)).thenReturn(Optional.of(metaDocument));
+        when(metaExpedient.getId()).thenReturn(META_EXPEDIENT_ID);
+
+        helper.update(META_EXPEDIENT_ID, buildMetaDocumentDtoAmbFlux(MultiplicitatEnumDto.M_1, "FLUX_01"), null, null, null);
+
+        verify(metaDocumentFluxPortafibRepository, never()).save(any());
+    }
+
+    @Test
+    void update_ambFluxNouIOrfeExistent_reutilitzaFluxOrfe() throws Exception {
+        MetaDocumentEntity metaDocument = mock(MetaDocumentEntity.class);
+        MetaExpedientEntity metaExpedient = mock(MetaExpedientEntity.class);
+        when(metaDocument.getMultiplicitat()).thenReturn(MultiplicitatEnumDto.M_1);
+        when(metaDocument.getMetaExpedient()).thenReturn(metaExpedient);
+        when(metaDocument.getEntitat()).thenReturn(mock(EntitatEntity.class));
+        when(metaDocument.getFluxosFirma()).thenReturn(new ArrayList<>());
+        when(metaDocument.fluxeExistById("FLUX_ORFE")).thenReturn(false);
+        when(metaDocumentRepository.findById(META_DOCUMENT_ID)).thenReturn(Optional.of(metaDocument));
+        when(metaExpedient.getId()).thenReturn(META_EXPEDIENT_ID);
+
+        MetaDocumentFluxPortafibEntity fluxOrfe = new MetaDocumentFluxPortafibEntity();
+        fluxOrfe.setPortafirmesFluxId("FLUX_ORFE");
+        when(metaDocumentFluxPortafibRepository.findByMetaDocumentIsNullAndPortafirmesFluxId("FLUX_ORFE"))
+                .thenReturn(fluxOrfe);
+
+        UsuariEntity usuari = mock(UsuariEntity.class);
+        when(usuari.getIdioma()).thenReturn("ca");
+        when(usuariRepository.findById(TEST_USER)).thenReturn(Optional.of(usuari));
+
+        PortafirmesFluxInfoDto fluxInfo = new PortafirmesFluxInfoDto();
+        fluxInfo.setNom("Flux Orfe");
+        when(pluginHelper.portafirmesRecuperarInfoFluxDeFirma("FLUX_ORFE", "ca", false))
+                .thenReturn(fluxInfo);
+
+        helper.update(META_EXPEDIENT_ID, buildMetaDocumentDtoAmbFlux(MultiplicitatEnumDto.M_1, "FLUX_ORFE"), null, null, null);
+
+        verify(metaDocumentFluxPortafibRepository).save(fluxOrfe);
+        assertThat(fluxOrfe.getMetaDocument()).isSameAs(metaDocument);
+    }
+
+    // =========================================================================
+    // initMetaDocumentFlux
+    // =========================================================================
+
+    @Test
+    void initMetaDocumentFlux_senseFluxos_retornaHtmlNoHiHaFluxos() throws Exception {
+        when(metaDocumentFluxPortafibRepository.findAll()).thenReturn(Collections.emptyList());
+        when(fluxFirmaUsuariRepository.findAll()).thenReturn(Collections.emptyList());
+
+        String html = helper.initMetaDocumentFlux();
+
+        assertThat(html).contains("No hi ha fluxos a actualitzar");
+        assertThat(html).contains("No hi ha fluxos d'usuari a actualitzar");
+    }
+
+    @Test
+    void initMetaDocumentFlux_ambFluxMetaDocOk_retornaHtmlOk() throws Exception {
+        MetaDocumentFluxPortafibEntity flux = mock(MetaDocumentFluxPortafibEntity.class);
+        when(flux.getPortafirmesFluxId()).thenReturn("FLUX_01");
+        when(flux.getPortafirmesFluxDesc()).thenReturn("Nom Antic");
+        when(metaDocumentFluxPortafibRepository.findAll()).thenReturn(Collections.singletonList(flux));
+        when(fluxFirmaUsuariRepository.findAll()).thenReturn(Collections.emptyList());
+
+        PortafirmesFluxInfoDto fluxInfo = new PortafirmesFluxInfoDto();
+        fluxInfo.setNom("Nom Nou");
+        when(pluginHelper.portafirmesRecuperarInfoFluxDeFirma("FLUX_01", "ca", false))
+                .thenReturn(fluxInfo);
+
+        String html = helper.initMetaDocumentFlux();
+
+        assertThat(html).contains("OK");
+        assertThat(html).contains("FLUX_01");
+        verify(flux).setPortafirmesFluxDesc("Nom Nou");
+    }
+
+    @Test
+    void initMetaDocumentFlux_ambFluxMetaDocRetornaNul_retornaHtmlNoTrobat() throws Exception {
+        MetaDocumentFluxPortafibEntity flux = mock(MetaDocumentFluxPortafibEntity.class);
+        when(flux.getPortafirmesFluxId()).thenReturn("FLUX_02");
+        when(flux.getPortafirmesFluxDesc()).thenReturn("Nom Antic 2");
+        when(metaDocumentFluxPortafibRepository.findAll()).thenReturn(Collections.singletonList(flux));
+        when(fluxFirmaUsuariRepository.findAll()).thenReturn(Collections.emptyList());
+
+        when(pluginHelper.portafirmesRecuperarInfoFluxDeFirma("FLUX_02", "ca", false))
+                .thenReturn(null);
+
+        String html = helper.initMetaDocumentFlux();
+
+        assertThat(html).contains("NO TROBAT");
+        assertThat(html).contains("FLUX_02");
+    }
+
+    @Test
+    void initMetaDocumentFlux_ambFluxMetaDocLlencaExcepcio_retornaHtmlError() throws Exception {
+        MetaDocumentFluxPortafibEntity flux = mock(MetaDocumentFluxPortafibEntity.class);
+        when(flux.getPortafirmesFluxId()).thenReturn("FLUX_03");
+        when(flux.getPortafirmesFluxDesc()).thenReturn("Nom Antic 3");
+        when(metaDocumentFluxPortafibRepository.findAll()).thenReturn(Collections.singletonList(flux));
+        when(fluxFirmaUsuariRepository.findAll()).thenReturn(Collections.emptyList());
+
+        when(pluginHelper.portafirmesRecuperarInfoFluxDeFirma("FLUX_03", "ca", false))
+                .thenThrow(new RuntimeException("connexió fallida"));
+
+        String html = helper.initMetaDocumentFlux();
+
+        assertThat(html).contains("ERROR");
+        assertThat(html).contains("FLUX_03");
+    }
+
+    @Test
+    void initMetaDocumentFlux_ambFluxUsuariOk_retornaHtmlOkUsuari() throws Exception {
+        when(metaDocumentFluxPortafibRepository.findAll()).thenReturn(Collections.emptyList());
+
+        FluxFirmaUsuariEntity fluxUsuari = mock(FluxFirmaUsuariEntity.class);
+        when(fluxUsuari.getPortafirmesFluxId()).thenReturn("FLUX_USR_01");
+        when(fluxUsuari.getNom()).thenReturn("Flux Usuari Antic");
+        when(fluxFirmaUsuariRepository.findAll()).thenReturn(Collections.singletonList(fluxUsuari));
+
+        PortafirmesFluxInfoDto fluxInfo = new PortafirmesFluxInfoDto();
+        fluxInfo.setNom("Flux Usuari Nou");
+        fluxInfo.setDescripcio("Desc");
+        when(pluginHelper.portafirmesRecuperarInfoFluxDeFirma("FLUX_USR_01", "ca", false))
+                .thenReturn(fluxInfo);
+
+        String html = helper.initMetaDocumentFlux();
+
+        assertThat(html).contains("OK");
+        assertThat(html).contains("FLUX_USR_01");
+        verify(fluxUsuari).updateNomDescripcio("Flux Usuari Nou", "Desc");
+    }
+
+    // =========================================================================
+    // findActiusPerCreacio
+    // =========================================================================
+
+    @Test
+    void findActiusPerCreacio_ambContingutId_retornaMetaDocumentsDisponibles() {
+        EntitatEntity entitat = mock(EntitatEntity.class);
+        ContingutEntity contingut = mock(ContingutEntity.class);
+        ExpedientEntity expedient = mock(ExpedientEntity.class);
+        MetaExpedientEntity metaExpedient = mock(MetaExpedientEntity.class);
+        MetaDocumentEntity doc = mock(MetaDocumentEntity.class);
+
+        when(entityComprovarHelper.comprovarContingut(99L)).thenReturn(contingut);
+        when(contingutHelper.getExpedientSuperior(contingut, true, false, false, null)).thenReturn(expedient);
+        when(expedient.getMetaExpedient()).thenReturn(metaExpedient);
+        when(metaExpedient.isPermetMetadocsGenerals()).thenReturn(false);
+        when(metaDocumentRepository.findByMetaExpedientAndActiuTrue(metaExpedient))
+                .thenReturn(Collections.singletonList(doc));
+        when(documentRepository.findByExpedientAndEsborrat(expedient, 0)).thenReturn(Collections.emptyList());
+
+        List<MetaDocumentEntity> resultat = helper.findActiusPerCreacio(entitat, 99L, null, false);
+
+        assertThat(resultat).containsExactly(doc);
+        verify(entityComprovarHelper).comprovarContingut(99L);
+        verify(contingutHelper).getExpedientSuperior(contingut, true, false, false, null);
+    }
+
+    @Test
+    void findActiusPerCreacio_senseContingutId_retornaMetaDocumentsDelMetaExpedient() {
+        EntitatEntity entitat = mock(EntitatEntity.class);
+        MetaExpedientEntity metaExpedient = mock(MetaExpedientEntity.class);
+        MetaDocumentEntity doc = mock(MetaDocumentEntity.class);
+
+        when(metaExpedientRepository.findById(META_EXPEDIENT_ID)).thenReturn(Optional.of(metaExpedient));
+        when(metaExpedient.isPermetMetadocsGenerals()).thenReturn(false);
+        when(metaDocumentRepository.findByMetaExpedientAndActiuTrue(metaExpedient))
+                .thenReturn(Collections.singletonList(doc));
+
+        List<MetaDocumentEntity> resultat = helper.findActiusPerCreacio(entitat, null, META_EXPEDIENT_ID, false);
+
+        assertThat(resultat).containsExactly(doc);
+        verify(metaExpedientRepository).findById(META_EXPEDIENT_ID);
+    }
+
+    // =========================================================================
+    // findActiusPerModificacio
+    // =========================================================================
+
+    @Test
+    void findActiusPerModificacio_retornaMetaDocumentsDisponibles() {
+        EntitatEntity entitat = mock(EntitatEntity.class);
+        DocumentEntity document = mock(DocumentEntity.class);
+        ExpedientEntity expedient = mock(ExpedientEntity.class);
+        MetaExpedientEntity metaExpedient = mock(MetaExpedientEntity.class);
+        MetaDocumentEntity docDisponible = mock(MetaDocumentEntity.class);
+
+        when(entityComprovarHelper.comprovarDocument(entitat, null, 77L, false, false, false, false))
+                .thenReturn(document);
+        when(contingutHelper.getExpedientSuperior(document, true, false, false, null)).thenReturn(expedient);
+        when(expedient.getMetaExpedient()).thenReturn(metaExpedient);
+        when(metaExpedient.isPermetMetadocsGenerals()).thenReturn(false);
+        when(metaDocumentRepository.findByMetaExpedientAndActiuTrue(metaExpedient))
+                .thenReturn(new ArrayList<>(Collections.singletonList(docDisponible)));
+        when(documentRepository.findByExpedientAndEsborrat(expedient, 0)).thenReturn(Collections.emptyList());
+        when(document.getMetaDocument()).thenReturn(docDisponible);
+        when(docDisponible.getNom()).thenReturn("Doc A");
+
+        List<MetaDocumentEntity> resultat = helper.findActiusPerModificacio(entitat, 77L);
+
+        assertThat(resultat).contains(docDisponible);
+    }
+
+    @Test
+    void findActiusPerModificacio_metaDocumentNoDisponible_safegeixAlFinal() {
+        EntitatEntity entitat = mock(EntitatEntity.class);
+        DocumentEntity document = mock(DocumentEntity.class);
+        ExpedientEntity expedient = mock(ExpedientEntity.class);
+        MetaExpedientEntity metaExpedient = mock(MetaExpedientEntity.class);
+        MetaDocumentEntity docDisponible = mock(MetaDocumentEntity.class);
+        MetaDocumentEntity docDelDocument = mock(MetaDocumentEntity.class);
+
+        when(entityComprovarHelper.comprovarDocument(entitat, null, 77L, false, false, false, false))
+                .thenReturn(document);
+        when(contingutHelper.getExpedientSuperior(document, true, false, false, null)).thenReturn(expedient);
+        when(expedient.getMetaExpedient()).thenReturn(metaExpedient);
+        when(metaExpedient.isPermetMetadocsGenerals()).thenReturn(false);
+        when(metaDocumentRepository.findByMetaExpedientAndActiuTrue(metaExpedient))
+                .thenReturn(new ArrayList<>(Collections.singletonList(docDisponible)));
+        when(documentRepository.findByExpedientAndEsborrat(expedient, 0)).thenReturn(Collections.emptyList());
+        when(document.getMetaDocument()).thenReturn(docDelDocument);
+        when(docDisponible.getNom()).thenReturn("Doc A");
+        when(docDelDocument.getNom()).thenReturn("Doc B");
+
+        List<MetaDocumentEntity> resultat = helper.findActiusPerModificacio(entitat, 77L);
+
+        assertThat(resultat).contains(docDisponible, docDelDocument);
     }
 }

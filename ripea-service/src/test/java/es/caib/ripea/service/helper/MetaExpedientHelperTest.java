@@ -89,6 +89,9 @@ import es.caib.ripea.service.intf.dto.MetaExpedientTascaValidacioDto;
 import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
 import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
 import es.caib.ripea.service.intf.dto.PermisDto;
+import es.caib.ripea.service.intf.dto.ProcedimentDto;
+import es.caib.ripea.service.intf.dto.ProgresActualitzacioDto;
+import es.caib.ripea.service.intf.dto.TipusClassificacioEnumDto;
 import es.caib.ripea.service.intf.dto.StatusEnumDto;
 import es.caib.ripea.service.intf.dto.TipusValidacioTascaEnum;
 import es.caib.ripea.service.intf.exception.ExisteixenExpedientsEsborratsException;
@@ -1001,14 +1004,40 @@ class MetaExpedientHelperTest {
     void export_camiFelix_retornaJsonNoNull() throws Exception {
         EntitatEntity entitat = mock(EntitatEntity.class);
         MetaExpedientEntity metaExpedient = mock(MetaExpedientEntity.class);
-        es.caib.ripea.service.intf.dto.MetaExpedientExportDto exportDto =
-                new es.caib.ripea.service.intf.dto.MetaExpedientExportDto();
+
+        // Tasca amb una validació per exercir el bucle de validacions
+        MetaExpedientTascaEntity tascaEntity = mock(MetaExpedientTascaEntity.class);
+        MetaExpedientTascaValidacioEntity validacioEntity = mock(MetaExpedientTascaValidacioEntity.class);
+        when(tascaEntity.getId()).thenReturn(100L);
+        when(tascaEntity.getValidacions()).thenReturn(Collections.singletonList(validacioEntity));
+
+        MetaExpedientTascaDto tascaDto = new MetaExpedientTascaDto();
+        tascaDto.setId(100L);
+
+        // Meta-dada de tipus TEXT (no DOMINI: no cal stub del domini)
+        MetaDadaDto metaDadaDto = new MetaDadaDto();
+        metaDadaDto.setTipus(MetaDadaTipusEnumDto.TEXT);
+        metaDadaDto.setCodi("MD1");
+
+        // Meta-document amb una meta-dada TEXT
+        MetaDocumentDto metaDocumentDto = new MetaDocumentDto();
+        metaDocumentDto.setCodi("MDOC1");
+        metaDocumentDto.setMultiplicitat(MultiplicitatEnumDto.M_0_1);
+        metaDocumentDto.setMetaDades(Collections.singletonList(metaDadaDto));
+
+        MetaExpedientExportDto exportDto = new MetaExpedientExportDto();
+        exportDto.setTasques(new HashSet<>(Collections.singletonList(tascaDto)));
+        exportDto.setMetaDades(Collections.singletonList(metaDadaDto));
+        exportDto.setMetaDocuments(Collections.singletonList(metaDocumentDto));
+
         when(entityComprovarHelper.comprovarEntitatPerMetaExpedients(ENTITAT_ID)).thenReturn(entitat);
         when(entityComprovarHelper.comprovarAccesMetaExpedient(entitat, META_EXPEDIENT_ID, ORGAN_ID, true))
                 .thenReturn(metaExpedient);
-        when(conversioTipusHelper.convertir(metaExpedient,
-                es.caib.ripea.service.intf.dto.MetaExpedientExportDto.class)).thenReturn(exportDto);
-        when(metaExpedient.getTasques()).thenReturn(null);
+        when(conversioTipusHelper.convertir(metaExpedient, MetaExpedientExportDto.class)).thenReturn(exportDto);
+        when(metaExpedient.getTasques()).thenReturn(new HashSet<>(Collections.singletonList(tascaEntity)));
+        when(conversioTipusHelper.convertirList(Collections.singletonList(validacioEntity),
+                MetaExpedientTascaValidacioDto.class))
+                .thenReturn(Collections.singletonList(new MetaExpedientTascaValidacioDto()));
         when(metaExpedientCarpetaHelper.findCarpetesMetaExpedient(metaExpedient))
                 .thenReturn(Collections.emptyList());
         when(metaExpedient.getClassificacio()).thenReturn("SIA001");
@@ -1434,11 +1463,59 @@ class MetaExpedientHelperTest {
                 new ArrayList<>(Collections.singletonList(metaExpedient)),
                 java.util.Locale.getDefault(), null);
 
-        es.caib.ripea.service.intf.dto.ProgresActualitzacioDto resultat =
+        ProgresActualitzacioDto resultat =
                 MetaExpedientServiceImpl.progresActualitzacio.get("ENT_NULL");
         assertThat(resultat).isNotNull();
         assertThat(resultat.getProgres()).isEqualTo(100);
         assertThat(resultat.isFinished()).isTrue();
+    }
+
+    @Test
+    void actualitzarProcediments_ambProcedimentSia_actualitzaElProcedimentILogeja() {
+        EntitatEntity entitat = mock(EntitatEntity.class);
+        MetaExpedientEntity metaExpedient = mock(MetaExpedientEntity.class);
+        OrganGestorEntity organGestor = mock(OrganGestorEntity.class);
+        when(entitat.getCodi()).thenReturn("ENT_SIA");
+        when(entitat.getId()).thenReturn(ENTITAT_ID);
+        when(entitat.getUnitatArrel()).thenReturn("UNI001");
+
+        // Procediment amb classificació SIA i nom diferent al que retorna el WS
+        when(metaExpedient.getTipusClassificacio()).thenReturn(TipusClassificacioEnumDto.SIA);
+        when(metaExpedient.getClassificacio()).thenReturn("SIA001");
+        when(metaExpedient.getNom()).thenReturn("Nom Antic");
+        when(metaExpedient.getDescripcio()).thenReturn("Desc Antiga");
+        when(metaExpedient.isComu()).thenReturn(false);
+        when(metaExpedient.getOrganGestor()).thenReturn(null);
+
+        // El WS retorna comu=false amb un organ específic → passa pel else de isComu()
+        // i crida organGestorRepository.findByEntitatAndCodi que retorna l'organ trobat
+        ProcedimentDto procedimentWs = new ProcedimentDto();
+        procedimentWs.setNom("Nom Nou");
+        procedimentWs.setResum("Desc Antiga");
+        procedimentWs.setComu(false);
+        procedimentWs.setUnitatOrganitzativaCodi("ORG001");
+
+        when(organGestorRepository.findByEntitatAndCodi(entitat, "ORG001")).thenReturn(organGestor);
+        when(pluginHelper.procedimentFindByCodiSia("UNI001", "SIA001")).thenReturn(procedimentWs);
+        when(messageHelper.getMessage(anyString())).thenReturn("");
+        when(messageHelper.getMessage(anyString(), any(Object[].class))).thenReturn("");
+        // actualitzaAvisosSyncProcediments sempre s'executa al final;
+        // com l'organ s'ha trobat, avisosProcedimentsOrgans és buit i no es crea cap avís
+        when(avisRepository.findByEntitatIdAndAssumpte(any(), any())).thenReturn(Collections.emptyList());
+
+        ProgresActualitzacioDto progres = new ProgresActualitzacioDto();
+
+        helper.actualitzarProcediments(entitat,
+                new ArrayList<>(Collections.singletonList(metaExpedient)),
+                java.util.Locale.getDefault(), progres);
+
+        // Verifica que s'ha consultat l'organ del WS i s'ha actualitzat el procediment
+        verify(organGestorRepository).findByEntitatAndCodi(entitat, "ORG001");
+        verify(metaExpedient).updateSync("Nom Nou", "Desc Antiga", organGestor, false);
+        verify(contingutLogHelper).logProcediment(eq(metaExpedient),
+                eq(es.caib.ripea.service.intf.dto.LogTipusEnumDto.UPDATE_PROCED_ROLSAC),
+                anyString(), anyString());
+        assertThat(progres.getProgres()).isEqualTo(100);
     }
 
     // =========================================================================
@@ -1572,10 +1649,16 @@ class MetaExpedientHelperTest {
         MetaDocumentEntity metaDocumentEntity = mock(MetaDocumentEntity.class);
         GrupEntity grupEntity = mock(GrupEntity.class);
 
+        MetaDadaDto metaDadaDocumentDto = new MetaDadaDto();
+        metaDadaDocumentDto.setCodi("DADA_DOC_1");
+        metaDadaDocumentDto.setNom("Dada de metadoc 1");
+        metaDadaDocumentDto.setTipus(MetaDadaTipusEnumDto.IMPORT);
+        metaDadaDocumentDto.setMultiplicitat(MultiplicitatEnumDto.M_1);
+        
         MetaDocumentDto metaDocumentDto = new MetaDocumentDto();
         metaDocumentDto.setCodi("DOC_1");
         metaDocumentDto.setNom("Document 1");
-        metaDocumentDto.setMetaDades(null);
+        metaDocumentDto.setMetaDades(Collections.singletonList(metaDadaDocumentDto));
 
         MetaDadaDto metaDadaDto = new MetaDadaDto();
         metaDadaDto.setCodi("DADA_1");

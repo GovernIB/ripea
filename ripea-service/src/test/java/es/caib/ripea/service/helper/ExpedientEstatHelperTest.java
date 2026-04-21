@@ -251,7 +251,7 @@ class ExpedientEstatHelperTest {
 
         helper.updateEstatAdditional(ENTITAT_ID, EXPEDIENT_ID, EXPEDIENT_ESTAT_ID);
 
-        verify(contingutLogHelper, never()).log(any(), eq(LogTipusEnumDto.CANVI_ESTAT), any(), any(), any(), any());
+        verify(contingutLogHelper, never()).log(any(), eq(LogTipusEnumDto.CANVI_ESTAT), any(), any(), anyBoolean(), anyBoolean());
     }
 
     @Test

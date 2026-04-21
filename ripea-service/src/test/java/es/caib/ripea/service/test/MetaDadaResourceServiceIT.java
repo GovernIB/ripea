@@ -164,10 +164,10 @@ public class MetaDadaResourceServiceIT extends BaseServiceIT {
     }
 
     @Test
-    void quanFiltramPerQuickFilterTipus_retornaResultatsCoincidents() {
-        // quickFilterFields inclou "tipus", tots TEXT → retorna els 9
+    void quanFiltramPerTipusText_retornaResultatsCoincidents() {
+        // tipus és un enum: es filtra via springFilter, no quickFilter
         Page<MetaDadaResource> pagina = metaDadaResourceService.findPage(
-                "TEXT", null, null, null,
+                null, "tipus:'TEXT'", null, null,
                 PageRequest.of(0, 20)
         );
 

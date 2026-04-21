@@ -78,7 +78,9 @@ public class ContingutLogEntity extends RipeaAuditable<Long> {
 			built.contingutId = contingutId;
 		}
 		public Builder objecte(Persistable<? extends Serializable> objecte) {
-			built.objecteId = objecte.getId().toString();
+			if (objecte != null) {
+				built.objecteId = objecte.getId().toString();
+			}
 			return this;
 		}
 		public Builder objecteTipus(LogObjecteTipusEnumDto objecteTipus) {

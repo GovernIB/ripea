@@ -171,25 +171,23 @@ public class TestDataFactory {
                 );
             }
 
-            // 3 Meta-dades per procediment
+            // 3 Meta-dades per procediment (activa=false per als tests de filtre)
             for (int j = 1; j <= 3; j++) {
-                data.metaDades.add(
-                        metaDadaRepository.save(
-                                MetaDadaEntity.getBuilder(
-                                        String.format("METADADA_%d_%d", i, j),
-                                        "Meta-dada " + i + "." + j,
-                                        MetaDadaTipusEnumDto.TEXT,
-                                        MultiplicitatEnumDto.M_0_1,
-                                        null,   // valor per defecte
-                                        false,  // readOnly
-                                        j,      // ordre
-                                        savedMetaExp,
-                                        false,  // noAplica
-                                        false,  // enviable
-                                        null    // metadadaArxiu
-                                ).build()
-                        )
-                );
+                MetaDadaEntity metaDada = MetaDadaEntity.getBuilder(
+                        String.format("METADADA_%d_%d", i, j),
+                        "Meta-dada " + i + "." + j,
+                        MetaDadaTipusEnumDto.TEXT,
+                        MultiplicitatEnumDto.M_0_1,
+                        null,   // valor per defecte
+                        false,  // readOnly
+                        j,      // ordre
+                        savedMetaExp,
+                        false,  // noAplica
+                        false,  // enviable
+                        null    // metadadaArxiu
+                ).build();
+                metaDada.updateActiva(false);
+                data.metaDades.add(metaDadaRepository.save(metaDada));
             }
 
             // 3 Estats per procediment

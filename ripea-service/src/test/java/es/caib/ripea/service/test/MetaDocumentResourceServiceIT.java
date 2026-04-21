@@ -518,6 +518,8 @@ public class MetaDocumentResourceServiceIT extends BaseServiceIT {
         r.setNtiTipoDocumental("TD01");
         r.setMetaExpedient(ResourceReference.toResourceReference(
                 testData.metaExpedients.get(0).getId(), "PROC_01"));
+        r.setPinbalServei(ResourceReference.toResourceReference(
+                testData.pinbalServei.getId(), testData.pinbalServei.getCodi()));
         return r;
     }
 }
