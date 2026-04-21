@@ -116,13 +116,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: 🔐 Login to Quay
-        if: ${{ inputs.build_docker == 'true' }}
+        if: ${{ inputs.build_docker == true }}
         run: |
           echo "${{ secrets.QUAY_PASSWORD }}" | docker login ${{ secrets.QUAY_URL }} \
             -u "${{ secrets.QUAY_USER }}" --password-stdin
 
       - name: 🐳 Build Docker image
-        if: ${{ inputs.build_docker == 'true' }}
+        if: ${{ inputs.build_docker == true }}
         working-directory: ripea
         env:
           BASE_IMAGE: ${{ secrets.QUAY_URL }}/${{ secrets.ORGANIZATION }}/jboss:eap72-openjdk11-rhel8
@@ -134,7 +134,7 @@ jobs:
             .
 
       - name: 📤 Push Docker image
-        if: ${{ inputs.build_docker == 'true' }}
+        if: ${{ inputs.build_docker == true }}
         run: |
           docker push ${{ secrets.QUAY_URL }}/${{ secrets.QUAY_ENVIRONMENT_DES }}/ripea/ripea-ear:${{ steps.vars.outputs.tag }}
           docker push ${{ secrets.QUAY_URL }}/${{ secrets.QUAY_ENVIRONMENT_DES }}/ripea/ripea-ear:latest
