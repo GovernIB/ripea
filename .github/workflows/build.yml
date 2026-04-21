@@ -83,7 +83,7 @@ jobs:
           MILESTONE=$(echo "${{ inputs.branch }}" | sed 's/-dev//')
           echo "Milestone: $MILESTONE"
 
-          ISSUES=$(gh issue list -m "$MILESTONE" -s closed --json number,title --template '{{range .}}* [#{{.number}}] {{.title}}{{"\n"}}{{end}}')
+          ISSUES=$(gh issue list -R ${{ inputs.repo }} -m "$MILESTONE" -s closed --json number,title --template '{{range .}}* [#{{.number}}] {{.title}}{{"\n"}}{{end}}')
 
           {
             echo "notes<<EOF"
