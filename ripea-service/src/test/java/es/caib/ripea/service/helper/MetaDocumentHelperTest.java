@@ -109,7 +109,7 @@ class MetaDocumentHelperTest {
         when(doc2.getMetaExpedient()).thenReturn(metaExpedient);
 
         when(metaDocumentRepository.findById(META_DOCUMENT_ID)).thenReturn(Optional.of(doc2));
-        List<MetaDocumentEntity> llista = Arrays.asList(doc0, doc1, doc2);
+        List<MetaDocumentEntity> llista = new ArrayList<>(Arrays.asList(doc0, doc1, doc2));
         when(metaDocumentRepository.findByMetaExpedientOrderByOrdreAsc(metaExpedient)).thenReturn(llista);
 
         helper.moveTo(META_DOCUMENT_ID, 0);
@@ -128,7 +128,7 @@ class MetaDocumentHelperTest {
         when(doc.getId()).thenReturn(META_DOCUMENT_ID);
         when(doc.getMetaExpedient()).thenReturn(metaExpedient);
         when(metaDocumentRepository.findById(META_DOCUMENT_ID)).thenReturn(Optional.of(doc));
-        when(metaDocumentRepository.findByMetaExpedientOrderByOrdreAsc(metaExpedient)).thenReturn(Collections.singletonList(doc));
+        when(metaDocumentRepository.findByMetaExpedientOrderByOrdreAsc(metaExpedient)).thenReturn(new ArrayList<>(Collections.singletonList(doc)));
 
         helper.moveTo(META_DOCUMENT_ID, 0);
 
@@ -788,7 +788,7 @@ class MetaDocumentHelperTest {
         MetaDocumentEntity docGeneric = mock(MetaDocumentEntity.class);
         when(metaExpedient.isPermetMetadocsGenerals()).thenReturn(true);
         when(metaDocumentRepository.findByMetaExpedientAndActiuTrue(metaExpedient))
-                .thenReturn(Collections.singletonList(docProcediment));
+                .thenReturn(new ArrayList<>(Collections.singletonList(docProcediment)));
         when(metaDocumentRepository.findWithoutMetaExpedient())
                 .thenReturn(Collections.singletonList(docGeneric));
 
@@ -880,7 +880,9 @@ class MetaDocumentHelperTest {
 
         when(metaExpedient.isPermetMetadocsGenerals()).thenReturn(false);
         when(docPinbal.isPinbalActiu()).thenReturn(true);
+        when(docPinbal.getNom()).thenReturn("DocPinbal");
         when(docNoPinbal.isPinbalActiu()).thenReturn(false);
+        when(docNoPinbal.getNom()).thenReturn("DocNoPinbal");
 
         ExpedientEntity expedient = mock(ExpedientEntity.class);
         when(expedient.getMetaExpedient()).thenReturn(metaExpedient);

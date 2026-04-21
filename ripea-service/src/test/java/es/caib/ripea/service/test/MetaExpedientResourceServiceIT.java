@@ -11,11 +11,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.test.context.support.WithMockUser;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-
+import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.config.BaseConfig;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.MetaExpedientExportDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.TipusClassificacioEnumDto;
 import es.caib.ripea.service.intf.model.MetaExpedientResource;
 import es.caib.ripea.service.intf.resourceservice.MetaExpedientResourceService;
@@ -441,6 +441,158 @@ public class MetaExpedientResourceServiceIT extends BaseServiceIT {
         assertThat(pagina.getTotalElements()).isEqualTo(0);
     }
     
+    // =========================================================================
+    // Accions: VINCULAR_GRUP, DESVINCULAR_GRUP, TOGGLE_GRUP_DEF
+    // =========================================================================
+
+    @Test
+    void quanVinculamUnGrupAUnProcediment_elGrupPerDefecteEsElGrupVinculat() {
+        Long id = testData.metaExpedients.get(0).getId(); // PROC_01
+
+        MetaExpedientResource.VincularGrupFormAction params = new MetaExpedientResource.VincularGrupFormAction();
+        params.setGrup(ResourceReference.toResourceReference(testData.grup.getId(), testData.grup.getCodi()));
+        params.setPerDefecte(true);
+
+        metaExpedientResourceService.artifactActionExec(id, MetaExpedientResource.ACTION_VINCULAR_GRUP_CODE, params);
+        entityManager.flush();
+        entityManager.clear();
+
+        MetaExpedientResource resultat = metaExpedientResourceService.getOne(id, null);
+        assertThat(resultat.getGrupPerDefecte()).isNotNull();
+        assertThat(resultat.getGrupPerDefecte().getId()).isEqualTo(testData.grup.getId());
+    }
+
+    @Test
+    void quanDesvincularElGrupPerDefecte_elGrupPerDefecteEsNull() {
+        Long id = testData.metaExpedients.get(0).getId(); // PROC_01, grupPerDefecte=GRP_TEST
+
+        // Primer vincular per assegurar que GRP_TEST és a la col·lecció grups
+        MetaExpedientResource.VincularGrupFormAction vincularParams = new MetaExpedientResource.VincularGrupFormAction();
+        vincularParams.setGrup(ResourceReference.toResourceReference(testData.grup.getId(), testData.grup.getCodi()));
+        vincularParams.setPerDefecte(true);
+        metaExpedientResourceService.artifactActionExec(id, MetaExpedientResource.ACTION_VINCULAR_GRUP_CODE, vincularParams);
+
+        MetaExpedientResource.DesVincularGrupFormAction desvincularParams = new MetaExpedientResource.DesVincularGrupFormAction();
+        desvincularParams.setGrup(ResourceReference.toResourceReference(testData.grup.getId(), testData.grup.getCodi()));
+        metaExpedientResourceService.artifactActionExec(id, MetaExpedientResource.ACTION_DESVINCULAR_GRUP_CODE, desvincularParams);
+        entityManager.flush();
+        entityManager.clear();
+
+        MetaExpedientResource resultat = metaExpedientResourceService.getOne(id, null);
+        assertThat(resultat.getGrupPerDefecte()).isNull();
+    }
+
+    @Test
+    void quanToggleGrupDefecteANull_elGrupPerDefecteEsNull() {
+        Long id = testData.metaExpedients.get(0).getId(); // PROC_01, grupPerDefecte=GRP_TEST
+
+        MetaExpedientResource.ToggleGrupDefecteFormAction params = new MetaExpedientResource.ToggleGrupDefecteFormAction();
+        params.setGrupId(null);
+        metaExpedientResourceService.artifactActionExec(id, MetaExpedientResource.ACTION_TOGGLE_GRUP_DEF_CODE, params);
+        entityManager.flush();
+        entityManager.clear();
+
+        MetaExpedientResource resultat = metaExpedientResourceService.getOne(id, null);
+        assertThat(resultat.getGrupPerDefecte()).isNull();
+    }
+
+    @Test
+    void quanToggleGrupDefecteAmbGrupId_elGrupPerDefecteCanviaAlGrupIndicat() {
+        Long id = testData.metaExpedients.get(0).getId(); // PROC_01
+
+        MetaExpedientResource.ToggleGrupDefecteFormAction params = new MetaExpedientResource.ToggleGrupDefecteFormAction();
+        params.setGrupId(testData.grup.getId());
+        metaExpedientResourceService.artifactActionExec(id, MetaExpedientResource.ACTION_TOGGLE_GRUP_DEF_CODE, params);
+        entityManager.flush();
+        entityManager.clear();
+
+        MetaExpedientResource resultat = metaExpedientResourceService.getOne(id, null);
+        assertThat(resultat.getGrupPerDefecte()).isNotNull();
+        assertThat(resultat.getGrupPerDefecte().getId()).isEqualTo(testData.grup.getId());
+    }
+
+    // =========================================================================
+    // Accions: CANVIAR_DISSENY, CANVIAR_PENDENT
+    // =========================================================================
+
+    @Test
+    void quanCanviarEstatDisseny_elRevisioEstatEsDisseny() {
+        Long id = testData.metaExpedients.get(0).getId(); // PROC_01, revisioEstat=null
+
+        metaExpedientResourceService.artifactActionExec(id, MetaExpedientResource.ACTION_CANVIAR_DISSENY_CODE, null);
+        entityManager.flush();
+        entityManager.clear();
+
+        MetaExpedientResource resultat = metaExpedientResourceService.getOne(id, null);
+        assertThat(resultat.getRevisioEstat()).isEqualTo(MetaExpedientRevisioEstatEnumDto.DISSENY);
+    }
+
+    @Test
+    void quanCanviarEstatPendentAmbRevisioActiva_elRevisioEstatEsPendent() {
+        Mockito.lenient().when(configHelper.getAsBoolean(PropertyConfig.METAEXPEDIENT_REVISIO_ACTIVA)).thenReturn(true);
+        Long id = testData.metaExpedients.get(0).getId(); // PROC_01, revisioEstat=null
+
+        metaExpedientResourceService.artifactActionExec(id, MetaExpedientResource.ACTION_CANVIAR_PENDENT_CODE, null);
+        entityManager.flush();
+        entityManager.clear();
+
+        MetaExpedientResource resultat = metaExpedientResourceService.getOne(id, null);
+        assertThat(resultat.getRevisioEstat()).isEqualTo(MetaExpedientRevisioEstatEnumDto.PENDENT);
+    }
+
+    // =========================================================================
+    // Accions: CLONAR
+    // =========================================================================
+
+    @Test
+    void quanClonamUnProcediment_elClonApareixALaConsulta() {
+        Long id = testData.metaExpedients.get(0).getId(); // PROC_01
+
+        MetaExpedientResource.ClonarFormAction params = new MetaExpedientResource.ClonarFormAction();
+        params.setCodi("PROC_CLON");
+        params.setClassificacio("SIA_CLON");
+        metaExpedientResourceService.artifactActionExec(id, MetaExpedientResource.ACTION_CLONAR_CODE, params);
+        entityManager.flush();
+        entityManager.clear();
+
+        Page<MetaExpedientResource> pagina = metaExpedientResourceService.findPage(
+                "PROC_CLON", null, null, null, PageRequest.of(0, 10));
+        assertThat(pagina.getTotalElements()).isEqualTo(1);
+        assertThat(pagina.getContent().get(0).getCodi()).isEqualTo("PROC_CLON");
+    }
+
+    // =========================================================================
+    // Accions: CHANGE_REVISIO
+    // =========================================================================
+
+    @Test
+    void quanChangeRevisioARevisat_elRevisioEstatEsRevisat() {
+        Long id = testData.metaExpedients.get(0).getId(); // PROC_01
+
+        MetaExpedientResource.RevisioChangeFormAction params = new MetaExpedientResource.RevisioChangeFormAction();
+        params.setRevisioEstat(MetaExpedientRevisioEstatEnumDto.REVISAT);
+        metaExpedientResourceService.artifactActionExec(id, MetaExpedientResource.ACTION_CHANGE_REVISIO_CODE, params);
+        entityManager.flush();
+        entityManager.clear();
+
+        MetaExpedientResource resultat = metaExpedientResourceService.getOne(id, null);
+        assertThat(resultat.getRevisioEstat()).isEqualTo(MetaExpedientRevisioEstatEnumDto.REVISAT);
+    }
+
+    @Test
+    void quanChangeRevisioAPendent_elRevisioEstatEsPendent() {
+        Long id = testData.metaExpedients.get(0).getId(); // PROC_01
+
+        MetaExpedientResource.RevisioChangeFormAction params = new MetaExpedientResource.RevisioChangeFormAction();
+        params.setRevisioEstat(MetaExpedientRevisioEstatEnumDto.PENDENT);
+        metaExpedientResourceService.artifactActionExec(id, MetaExpedientResource.ACTION_CHANGE_REVISIO_CODE, params);
+        entityManager.flush();
+        entityManager.clear();
+
+        MetaExpedientResource resultat = metaExpedientResourceService.getOne(id, null);
+        assertThat(resultat.getRevisioEstat()).isEqualTo(MetaExpedientRevisioEstatEnumDto.PENDENT);
+    }
+
     // =========================================================================
     // Mètode auxiliar
     // =========================================================================

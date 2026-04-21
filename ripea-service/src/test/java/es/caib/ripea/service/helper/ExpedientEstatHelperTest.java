@@ -2,6 +2,7 @@ package es.caib.ripea.service.helper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
@@ -10,6 +11,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -104,7 +106,7 @@ class ExpedientEstatHelperTest {
         when(estat2.getMetaExpedient()).thenReturn(metaExpedient);
 
         when(expedientEstatRepository.getOne(EXPEDIENT_ESTAT_ID)).thenReturn(estat2);
-        List<ExpedientEstatEntity> llista = Arrays.asList(estat0, estat1, estat2);
+        List<ExpedientEstatEntity> llista = new ArrayList<>(Arrays.asList(estat0, estat1, estat2));
         when(expedientEstatRepository.findByMetaExpedientOrderByOrdreAsc(metaExpedient)).thenReturn(llista);
 
         helper.moveTo(ENTITAT_ID, META_EXPEDIENT_ID, EXPEDIENT_ESTAT_ID, 0, "IPA_ADMIN");
@@ -123,7 +125,7 @@ class ExpedientEstatHelperTest {
 
         when(expedientEstatRepository.getOne(EXPEDIENT_ESTAT_ID)).thenReturn(estat);
         when(expedientEstatRepository.findByMetaExpedientOrderByOrdreAsc(metaExpedient))
-                .thenReturn(Collections.singletonList(estat));
+                .thenReturn(new ArrayList<>(Collections.singletonList(estat)));
 
         helper.moveTo(ENTITAT_ID, META_EXPEDIENT_ID, EXPEDIENT_ESTAT_ID, 0, "IPA_ADMIN");
 
@@ -139,7 +141,7 @@ class ExpedientEstatHelperTest {
 
         when(expedientEstatRepository.getOne(EXPEDIENT_ESTAT_ID)).thenReturn(estat);
         when(expedientEstatRepository.findByMetaExpedientOrderByOrdreAsc(metaExpedient))
-                .thenReturn(Collections.singletonList(estat));
+                .thenReturn(new ArrayList<>(Collections.singletonList(estat)));
 
         ExpedientEstatEntity resultat = helper.moveTo(ENTITAT_ID, META_EXPEDIENT_ID, EXPEDIENT_ESTAT_ID, 0, "IPA_ADMIN");
 
@@ -219,8 +221,10 @@ class ExpedientEstatHelperTest {
                 .thenReturn(expedient);
         when(expedientEstatRepository.getOne(EXPEDIENT_ESTAT_ID)).thenReturn(estatNou);
         when(expedient.getEstatAdditional())
-                .thenReturn(estatAnterior)  // primera crida (codiEstatAnterior)
-                .thenReturn(estatNou);       // segona crida (codiEstatNou, after update)
+                .thenReturn(estatAnterior)  // null-check before update
+                .thenReturn(estatAnterior)  // getCodi() before update
+                .thenReturn(estatNou)       // null-check after update
+                .thenReturn(estatNou);      // getCodi() after update
 
         helper.updateEstatAdditional(ENTITAT_ID, EXPEDIENT_ID, EXPEDIENT_ESTAT_ID);
 

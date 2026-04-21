@@ -54,7 +54,7 @@ public class ExpedientEstatServiceIT extends BaseServiceIT {
     void donatUnEstatDelTercerProcediment_quanElCercamPerId_elMetaExpedientAssociatEsCorrect() {
         // L'estat número 7 (índex 6) pertany al tercer procediment (estats 7, 8, 9)
         ExpedientEstatEntity estat = testData.estats.get(6);
-        ExpedientEstatEntity estatDelTercerProc = testData.estats.get(6);
+//        ExpedientEstatEntity estatDelTercerProc = testData.estats.get(6);
 
         ExpedientEstatDto dto = expedientEstatService.findExpedientEstatById(
                 testData.entitat.getId(),
