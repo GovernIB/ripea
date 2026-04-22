@@ -14,6 +14,8 @@ import org.springframework.security.test.context.support.WithMockUser;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.dto.DocumentNtiEstadoElaboracionEnumDto;
+import es.caib.ripea.service.intf.dto.MetaDocumentFirmaFluxTipusEnumDto;
+import es.caib.ripea.service.intf.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
 import es.caib.ripea.service.intf.dto.NtiOrigenEnumDto;
 import es.caib.ripea.service.intf.model.MetaDocumentResource;
@@ -505,6 +507,136 @@ public class MetaDocumentResourceServiceIT extends BaseServiceIT {
     }
 
     // =========================================================================
+    // Crear amb tots els camps i verificar detalls
+    // =========================================================================
+
+    @Test
+    void quanCreemUnMetaDocumentAmbTotsElsCamps_getOneRetornaTotsElsCampsCorrectes() {
+        metaDocumentResourceService.create(buildResourceAmbTotsElsCamps(), null);
+        entityManager.flush();
+        entityManager.clear();
+
+        MetaDocumentResource recuperat = metaDocumentResourceService.findPage(
+                null, "codi:'METADOC_COMPLET'", null, null, PageRequest.of(0, 1)
+        ).getContent().get(0);
+        Long id = recuperat.getId();
+        recuperat = metaDocumentResourceService.getOne(id, null);
+
+        assertThat(recuperat.getCodi()).isEqualTo("METADOC_COMPLET");
+        assertThat(recuperat.getNom()).isEqualTo("Meta-document Complet");
+        assertThat(recuperat.getDescripcio()).isEqualTo("Descripció completa del meta-document");
+        assertThat(recuperat.getMultiplicitat()).isEqualTo(MultiplicitatEnumDto.M_1_N);
+        assertThat(recuperat.isActiu()).isTrue();
+        assertThat(recuperat.getNtiOrigen()).isEqualTo(NtiOrigenEnumDto.O1);
+        assertThat(recuperat.getNtiEstadoElaboracion()).isEqualTo(DocumentNtiEstadoElaboracionEnumDto.EE02);
+        assertThat(recuperat.getNtiTipoDocumental()).isEqualTo("TD02");
+        assertThat(recuperat.isFirmaPortafirmesActiva()).isTrue();
+        assertThat(recuperat.getPortafirmesDocumentTipus()).isEqualTo("TIPUS_PORTAFIRMES");
+        assertThat(recuperat.getPortafirmesSequenciaTipus()).isEqualTo(MetaDocumentFirmaSequenciaTipusEnumDto.PARALEL);
+        assertThat(recuperat.getPortafirmesCustodiaTipus()).isEqualTo("CUSTODIA_PORTAFIRMES");
+        assertThat(recuperat.getPortafirmesFluxTipus()).isEqualTo(MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB);
+        assertThat(recuperat.isFirmaPassarelaActiva()).isTrue();
+        assertThat(recuperat.getFirmaPassarelaCustodiaTipus()).isEqualTo("CUSTODIA_PASSARELA");
+        assertThat(recuperat.isFirmaBiometricaActiva()).isTrue();
+        assertThat(recuperat.isBiometricaLectura()).isTrue();
+        assertThat(recuperat.isPinbalActiu()).isTrue();
+        assertThat(recuperat.getPinbalFinalitat()).isEqualTo("FINALITAT_PROVA");
+        assertThat(recuperat.getMetaExpedient().getId()).isEqualTo(testData.metaExpedients.get(0).getId());
+        assertThat(recuperat.getPinbalServei().getId()).isEqualTo(testData.pinbalServei.getId());
+    }
+
+    // =========================================================================
+    // Activar un tipus de document i verificar que apareix com a actiu
+    // =========================================================================
+
+    @Test
+    void quanActivamUnMetaDocumentInactiu_apareixALaConsultaDAcitius() {
+        Long id = testData.metaDocuments.get(0).getId(); // METADOC_1_1 (actiu=true)
+
+        // Desactivam per tenir un document inactiu com a punt de partida
+        MetaDocumentResource existent = metaDocumentResourceService.getOne(id, null);
+        existent.setActiu(false);
+        metaDocumentResourceService.update(id, existent, null);
+        entityManager.flush();
+        entityManager.clear();
+        assertThat(metaDocumentResourceService.getOne(id, null).isActiu()).isFalse();
+
+        // Activam el document
+        existent = metaDocumentResourceService.getOne(id, null);
+        existent.setActiu(true);
+        metaDocumentResourceService.update(id, existent, null);
+        entityManager.flush();
+        entityManager.clear();
+
+        // Verificam via getOne que l'estat és actiu
+        assertThat(metaDocumentResourceService.getOne(id, null).isActiu()).isTrue();
+
+        // Verificam via findPage (simulant "recarregar la pàgina") que apareix com a actiu
+        Page<MetaDocumentResource> pagina = metaDocumentResourceService.findPage(
+                null, "actiu:true", null, null,
+                PageRequest.of(0, 20)
+        );
+        assertThat(pagina.getContent())
+                .extracting(MetaDocumentResource::getId)
+                .contains(id);
+    }
+
+    // =========================================================================
+    // Modificar tots els camps i verificar les modificacions
+    // =========================================================================
+
+    @Test
+    void quanModificamTotsElsCampsDeUnMetaDocument_getOneRetornaTotsElsValorsActualitzats() {
+        Long id = testData.metaDocuments.get(0).getId(); // METADOC_1_1
+
+        MetaDocumentResource existent = metaDocumentResourceService.getOne(id, null);
+
+        // Modifiquem tots els camps editables (mantenint actiu=true perquè el
+        // servei només crida updateActiu si canvia, i altrament aplicaria update general)
+        existent.setNom("Nom Totalment Modificat");
+        existent.setDescripcio("Descripció modificada completa");
+        existent.setMultiplicitat(MultiplicitatEnumDto.M_1);
+        existent.setNtiEstadoElaboracion(DocumentNtiEstadoElaboracionEnumDto.EE02);
+        existent.setNtiTipoDocumental("TD02");
+        existent.setFirmaPortafirmesActiva(true);
+        existent.setPortafirmesFluxTipus(MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB);
+        existent.setPortafirmesDocumentTipus("PFIRMES_TIPUS_MOD");
+        existent.setPortafirmesSequenciaTipus(MetaDocumentFirmaSequenciaTipusEnumDto.PARALEL);
+        existent.setPortafirmesCustodiaTipus("PFIRMES_CUSTODIA_MOD");
+        existent.setFirmaPassarelaActiva(true);
+        existent.setFirmaPassarelaCustodiaTipus("PASS_CUSTODIA_MOD");
+        existent.setFirmaBiometricaActiva(true);
+        existent.setBiometricaLectura(true);
+        existent.setPinbalActiu(true);
+        existent.setPinbalFinalitat("PINBAL_FINALITAT_MOD");
+        existent.setPinbalUtilitzarCifOrgan(true);
+
+        metaDocumentResourceService.update(id, existent, null);
+        entityManager.flush();
+        entityManager.clear();
+
+        MetaDocumentResource resultat = metaDocumentResourceService.getOne(id, null);
+
+        assertThat(resultat.getNom()).isEqualTo("Nom Totalment Modificat");
+        assertThat(resultat.getDescripcio()).isEqualTo("Descripció modificada completa");
+        assertThat(resultat.getMultiplicitat()).isEqualTo(MultiplicitatEnumDto.M_1);
+        assertThat(resultat.getNtiEstadoElaboracion()).isEqualTo(DocumentNtiEstadoElaboracionEnumDto.EE02);
+        assertThat(resultat.getNtiTipoDocumental()).isEqualTo("TD02");
+        assertThat(resultat.isFirmaPortafirmesActiva()).isTrue();
+        assertThat(resultat.getPortafirmesFluxTipus()).isEqualTo(MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB);
+        assertThat(resultat.getPortafirmesDocumentTipus()).isEqualTo("PFIRMES_TIPUS_MOD");
+        assertThat(resultat.getPortafirmesSequenciaTipus()).isEqualTo(MetaDocumentFirmaSequenciaTipusEnumDto.PARALEL);
+        assertThat(resultat.getPortafirmesCustodiaTipus()).isEqualTo("PFIRMES_CUSTODIA_MOD");
+        assertThat(resultat.isFirmaPassarelaActiva()).isTrue();
+        assertThat(resultat.getFirmaPassarelaCustodiaTipus()).isEqualTo("PASS_CUSTODIA_MOD");
+        assertThat(resultat.isFirmaBiometricaActiva()).isTrue();
+        assertThat(resultat.isBiometricaLectura()).isTrue();
+        assertThat(resultat.isPinbalActiu()).isTrue();
+        assertThat(resultat.getPinbalFinalitat()).isEqualTo("PINBAL_FINALITAT_MOD");
+        assertThat(resultat.isPinbalUtilitzarCifOrgan()).isTrue();
+    }
+
+    // =========================================================================
     // Mètode auxiliar
     // =========================================================================
 
@@ -516,6 +648,34 @@ public class MetaDocumentResourceServiceIT extends BaseServiceIT {
         r.setNtiOrigen(NtiOrigenEnumDto.O1);
         r.setNtiEstadoElaboracion(DocumentNtiEstadoElaboracionEnumDto.EE01);
         r.setNtiTipoDocumental("TD01");
+        r.setMetaExpedient(ResourceReference.toResourceReference(
+                testData.metaExpedients.get(0).getId(), "PROC_01"));
+        r.setPinbalServei(ResourceReference.toResourceReference(
+                testData.pinbalServei.getId(), testData.pinbalServei.getCodi()));
+        return r;
+    }
+
+    private MetaDocumentResource buildResourceAmbTotsElsCamps() {
+        MetaDocumentResource r = new MetaDocumentResource();
+        r.setCodi("METADOC_COMPLET");
+        r.setNom("Meta-document Complet");
+        r.setDescripcio("Descripció completa del meta-document");
+        r.setMultiplicitat(MultiplicitatEnumDto.M_1_N);
+        r.setActiu(true);
+        r.setNtiOrigen(NtiOrigenEnumDto.O1);
+        r.setNtiEstadoElaboracion(DocumentNtiEstadoElaboracionEnumDto.EE02);
+        r.setNtiTipoDocumental("TD02");
+        r.setFirmaPortafirmesActiva(true);
+        r.setPortafirmesFluxTipus(MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB);
+        r.setPortafirmesDocumentTipus("TIPUS_PORTAFIRMES");
+        r.setPortafirmesSequenciaTipus(MetaDocumentFirmaSequenciaTipusEnumDto.PARALEL);
+        r.setPortafirmesCustodiaTipus("CUSTODIA_PORTAFIRMES");
+        r.setFirmaPassarelaActiva(true);
+        r.setFirmaPassarelaCustodiaTipus("CUSTODIA_PASSARELA");
+        r.setFirmaBiometricaActiva(true);
+        r.setBiometricaLectura(true);
+        r.setPinbalActiu(true);
+        r.setPinbalFinalitat("FINALITAT_PROVA");
         r.setMetaExpedient(ResourceReference.toResourceReference(
                 testData.metaExpedients.get(0).getId(), "PROC_01"));
         r.setPinbalServei(ResourceReference.toResourceReference(

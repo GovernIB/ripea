@@ -12,6 +12,7 @@ import es.caib.ripea.persistence.repository.ExpedientRepository;
 import es.caib.ripea.service.intf.dto.ExpedientDto;
 import es.caib.ripea.service.intf.dto.PaginaDto;
 import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
+import es.caib.ripea.service.intf.dto.PaginacioParamsDto.OrdreDireccioDto;
 import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
 import es.caib.ripea.service.intf.service.ExpedientService;
 import es.caib.ripea.service.test.config.BaseServiceIT;
@@ -49,6 +50,7 @@ public class ExpedientServiceIT extends BaseServiceIT {
         PaginacioParamsDto paginacio = new PaginacioParamsDto();
         paginacio.setPaginaNum(0);
         paginacio.setPaginaTamany(10);
+        paginacio.afegirOrdre("createdDate", OrdreDireccioDto.DESCENDENT);
 
         PaginaDto<ExpedientDto> resultat = expedientService.findExpedientMetaExpedientPaginat(
                 testData.entitat.getId(),
@@ -71,7 +73,7 @@ public class ExpedientServiceIT extends BaseServiceIT {
                 "A00000000",
                 new Date(),
                 "SIA001",
-                null,
+                testData.organs.get(0),
                 PrioritatEnumDto.B_NORMAL,
                 null
         ).build();

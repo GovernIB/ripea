@@ -11,6 +11,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.test.context.support.WithMockUser;
 
+import es.caib.ripea.persistence.entity.MetaDocumentEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.dto.MetaDadaTipusEnumDto;
@@ -277,12 +279,35 @@ public class MetaDadaResourceServiceIT extends BaseServiceIT {
     }
 
     @Test
-    void quanCreemUnaNouaMetaDada_laConsultaRetornaUnElementMes() {
+    void quanCreemUnaNouaMetaDadaPerMetaExpedient_laConsultaRetornaUnElementMes() {
+    	
+    	MetaExpedientEntity me = testData.metaExpedients.get(0);
+    	
         long totalInicial = metaDadaResourceService.findPage(
+                null, "metaNode.id:"+me.getId(), null, null, PageRequest.of(0, 1)
+        ).getTotalElements();
+
+        metaDadaResourceService.create(buildResourceMinimPerMetaExpedient(me), null);
+        entityManager.flush();
+        entityManager.clear();
+
+        long totalFinal = metaDadaResourceService.findPage(
                 null, null, null, null, PageRequest.of(0, 1)
         ).getTotalElements();
 
-        metaDadaResourceService.create(buildResourceMinim(), null);
+        assertThat(totalFinal).isEqualTo(totalInicial + 1);
+    }
+    
+    @Test
+    void quanCreemUnaNouaMetaDadaPerMetaDocument_laConsultaRetornaUnElementMes() {
+    	
+    	MetaDocumentEntity mdE = testData.metaDocuments.get(0);
+    	
+        long totalInicial = metaDadaResourceService.findPage(
+                null, "metaNode.id:"+mdE.getId(), null, null, PageRequest.of(0, 1)
+        ).getTotalElements();
+
+        metaDadaResourceService.create(buildResourceMinimPerMetaDocument(mdE), null);
         entityManager.flush();
         entityManager.clear();
 
@@ -453,17 +478,87 @@ public class MetaDadaResourceServiceIT extends BaseServiceIT {
     }
 
     // =========================================================================
+    // Modificació de tots els camps i desactivació
+    // =========================================================================
+
+    @Test
+    void quanModificamTotsElsCampsDeUnaMetaDada_getOneRetornaTotsElsValorsActualitzats() {
+        Long id = testData.metaDades.get(0).getId(); // METADADA_1_1 (activa=false, tipus=TEXT)
+        MetaDadaResource existent = metaDadaResourceService.getOne(id, null);
+        // activa=false roman false perquè el service cridi update() i no updateActiva()
+        existent.setNom("Nom Totalment Modificat");
+        existent.setDescripcio("Descripció modificada completa");
+        existent.setMultiplicitat(MultiplicitatEnumDto.M_1);
+        existent.setReadOnly(true);
+        existent.setNoAplica(true);
+        existent.setEnviable(true);
+        existent.setMetadadaArxiu("camp-arxiu-test");
+        existent.setValorString("valor-modificat");
+
+        metaDadaResourceService.update(id, existent, null);
+        entityManager.flush();
+        entityManager.clear();
+
+        MetaDadaResource resultat = metaDadaResourceService.getOne(id, null);
+        assertThat(resultat.getNom()).isEqualTo("Nom Totalment Modificat");
+        assertThat(resultat.getDescripcio()).isEqualTo("Descripció modificada completa");
+        assertThat(resultat.getMultiplicitat()).isEqualTo(MultiplicitatEnumDto.M_1);
+        assertThat(resultat.isReadOnly()).isTrue();
+        assertThat(resultat.isNoAplica()).isTrue();
+        assertThat(resultat.isEnviable()).isTrue();
+        assertThat(resultat.getMetadadaArxiu()).isEqualTo("camp-arxiu-test");
+        assertThat(resultat.getValorString()).isEqualTo("valor-modificat");
+    }
+
+    @Test
+    void quanDesactivamUnaMetaDadaActiva_apareixComAInactiva() {
+        Long id = testData.metaDades.get(0).getId(); // METADADA_1_1 (activa=false)
+
+        // Les dades de test tenen activa=false; primer activem
+        MetaDadaResource existent = metaDadaResourceService.getOne(id, null);
+        existent.setActiva(true);
+        metaDadaResourceService.update(id, existent, null);
+        entityManager.flush();
+        entityManager.clear();
+        assertThat(metaDadaResourceService.getOne(id, null).isActiva()).isTrue();
+
+        // Ara desactivem
+        existent = metaDadaResourceService.getOne(id, null);
+        existent.setActiva(false);
+        metaDadaResourceService.update(id, existent, null);
+        entityManager.flush();
+        entityManager.clear();
+
+        assertThat(metaDadaResourceService.getOne(id, null).isActiva()).isFalse();
+        Page<MetaDadaResource> pagina = metaDadaResourceService.findPage(
+                null, "activa:false", null, null, PageRequest.of(0, 20));
+        assertThat(pagina.getContent())
+                .extracting(MetaDadaResource::getId)
+                .contains(id);
+    }
+
+    // =========================================================================
     // Mètode auxiliar
     // =========================================================================
 
-    private MetaDadaResource buildResourceMinim() {
+    private MetaDadaResource buildResourceMinimPerMetaExpedient(MetaExpedientEntity me) {
         MetaDadaResource r = new MetaDadaResource();
         r.setCodi("METADADA_NOU");
         r.setNom("Meta-dada Nova");
         r.setTipus(MetaDadaTipusEnumDto.TEXT);
         r.setMultiplicitat(MultiplicitatEnumDto.M_1);
-        r.setMetaNode(ResourceReference.toResourceReference(
-                testData.metaExpedients.get(0).getId(), "PROC_01"));
+        r.setMetaNode(ResourceReference.toResourceReference(me.getId(), me.getCodi()));
         return r;
     }
+    
+    private MetaDadaResource buildResourceMinimPerMetaDocument(MetaDocumentEntity mdE) {
+        MetaDadaResource r = new MetaDadaResource();
+        r.setCodi("METADADA_NOU");
+        r.setNom("Meta-dada Nova");
+        r.setTipus(MetaDadaTipusEnumDto.TEXT);
+        r.setMultiplicitat(MultiplicitatEnumDto.M_1);
+        r.setMetaNode(ResourceReference.toResourceReference(mdE.getId(), mdE.getCodi()));
+        return r;
+    }
+
 }

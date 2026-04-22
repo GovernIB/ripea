@@ -6,6 +6,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 
 import es.caib.ripea.persistence.entity.ExpedientEstatEntity;
 import es.caib.ripea.service.intf.dto.ExpedientEstatDto;
+import es.caib.ripea.service.intf.resourceservice.MetaExpedientEstatResourceService;
 import es.caib.ripea.service.intf.service.ExpedientEstatService;
 import es.caib.ripea.service.test.config.BaseServiceIT;
 
@@ -20,14 +21,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 @WithMockUser(username = "usuari1", roles = {"ADMIN"})
 public class ExpedientEstatServiceIT extends BaseServiceIT {
 
-    @Autowired
-    private ExpedientEstatService expedientEstatService;
+    @Autowired private ExpedientEstatService metaExpedientEstatService;
+    @Autowired private MetaExpedientEstatResourceService metaExpedientEstatResourceService;
 
     @Test
     void donatUnEstatExistent_quanElCercamPerId_elRetornaCorrèctament() {
         ExpedientEstatEntity estat = testData.estats.get(0);
 
-        ExpedientEstatDto dto = expedientEstatService.findExpedientEstatById(
+        ExpedientEstatDto dto = metaExpedientEstatService.findExpedientEstatById(
                 testData.entitat.getId(),
                 estat.getId()
         );
@@ -42,7 +43,7 @@ public class ExpedientEstatServiceIT extends BaseServiceIT {
     void donatUnEstatExistent_quanElCercamPerId_elColorEsCorrect() {
         ExpedientEstatEntity estat = testData.estats.get(0);
 
-        ExpedientEstatDto dto = expedientEstatService.findExpedientEstatById(
+        ExpedientEstatDto dto = metaExpedientEstatService.findExpedientEstatById(
                 testData.entitat.getId(),
                 estat.getId()
         );
@@ -56,7 +57,7 @@ public class ExpedientEstatServiceIT extends BaseServiceIT {
         ExpedientEstatEntity estat = testData.estats.get(6);
 //        ExpedientEstatEntity estatDelTercerProc = testData.estats.get(6);
 
-        ExpedientEstatDto dto = expedientEstatService.findExpedientEstatById(
+        ExpedientEstatDto dto = metaExpedientEstatService.findExpedientEstatById(
                 testData.entitat.getId(),
                 estat.getId()
         );
