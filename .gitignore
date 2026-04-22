@@ -26,3 +26,7 @@ settings.local.json
 /ripea-back/src/main/jsapp/ripea-back/tests_e2e/report/
 /ripea-back/src/main/jsapp/ripea-back/tests_e2e/test-results/
 /ripea-back/src/main/jsapp/ripea-back/test-results/
+
+manual_admins.xhtml
+manual_usuaris.xhtml
+odt_to_xhtml.py
