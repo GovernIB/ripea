@@ -292,7 +292,7 @@ public class MetaDadaResourceServiceIT extends BaseServiceIT {
         entityManager.clear();
 
         long totalFinal = metaDadaResourceService.findPage(
-                null, null, null, null, PageRequest.of(0, 1)
+                null, "metaNode.id:"+me.getId(), null, null, PageRequest.of(0, 1)
         ).getTotalElements();
 
         assertThat(totalFinal).isEqualTo(totalInicial + 1);
@@ -312,7 +312,7 @@ public class MetaDadaResourceServiceIT extends BaseServiceIT {
         entityManager.clear();
 
         long totalFinal = metaDadaResourceService.findPage(
-                null, null, null, null, PageRequest.of(0, 1)
+                null, "metaNode.id:"+mdE.getId(), null, null, PageRequest.of(0, 1)
         ).getTotalElements();
 
         assertThat(totalFinal).isEqualTo(totalInicial + 1);
