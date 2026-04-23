@@ -16,7 +16,7 @@ on:
         type: boolean
         default: false
       build_docker:
-        description: '🐳 Build Docker image'
+        description: '🐳 Push Docker image'
         type: boolean
         default: false
 
@@ -115,14 +115,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: 🔐 Login to Quay
-        if: ${{ inputs.build_docker == true }}
-        run: |
-          echo "${{ secrets.QUAY_PASSWORD }}" | docker login ${{ secrets.QUAY_URL }} \
-            -u "${{ secrets.QUAY_USER }}" --password-stdin
-
       - name: 🐳 Build Docker image
-        if: ${{ inputs.build_docker == true }}
         working-directory: ripea
         env:
           BASE_IMAGE: ${{ secrets.QUAY_URL }}/${{ secrets.ORGANIZATION }}/jboss:eap72-openjdk11-rhel8
@@ -132,6 +125,24 @@ jobs:
             -t ${{ secrets.QUAY_URL }}/${{ secrets.QUAY_ENVIRONMENT_DES }}/ripea/ripea-ear:${{ steps.vars.outputs.tag }} \
             -t ${{ secrets.QUAY_URL }}/${{ secrets.QUAY_ENVIRONMENT_DES }}/ripea/ripea-ear:latest \
             .
+
+      - name: 💾 Save Docker image
+        run: |
+          docker save ${{ secrets.QUAY_URL }}/${{ secrets.QUAY_ENVIRONMENT_DES }}/ripea/ripea-ear:${{ steps.vars.outputs.tag }} | gzip > ripea-docker-image.tar.gz
+
+      - name: 📦 Upload Docker image to Release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ${{ steps.vars.outputs.tag }}
+          files: ripea-docker-image.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🔐 Login to Quay
+        if: ${{ inputs.build_docker == true }}
+        run: |
+          echo "${{ secrets.QUAY_PASSWORD }}" | docker login ${{ secrets.QUAY_URL }} \
+            -u "${{ secrets.QUAY_USER }}" --password-stdin
 
       - name: 📤 Push Docker image
         if: ${{ inputs.build_docker == true }}
