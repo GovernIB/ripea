@@ -1,7 +1,15 @@
 import { test, expect, Page } from '@playwright/test';
 
 const URL_PROCEDIMENTS = '/ripeaback/metaExpedient';
-const CODI_TEST = 'zz_PLAYWRIGHT_JSP_zz';
+const CODI_TEST      = 'zz_PLAYWRIGHT_JSP_zz';
+const NOM_MODIFICAT  = 'prova modificació playwright';
+const DESC_MODIFICADA = 'descripció de prova per playwright';
+
+const CODI_DOC1     = 'DOC_PW_JSP_01';
+const NOM_DOC1      = 'document tipus doc pw 1';
+const CODI_DOC2     = 'DOC_PW_JSP_02';
+const NOM_DOC1_MOD  = 'doc modificat pw 1';
+const DESC_DOC1_MOD = 'descripció modificada doc 1';
 
 // Helpers per localitzar elements de la pàgina
 const getGrid       = (page: Page) => page.locator('#metaexpedients');
@@ -32,6 +40,53 @@ const filtrarPerCodi = async (page: Page, codi: string) => {
     await page.locator('button[value="filtrar"]').click();
     await dt;
     await expect(page.locator('#metaexpedients_processing')).toBeHidden();
+};
+
+// ── Helpers per a Tipus de Documents ─────────────────────────────────────────
+
+const getDocRows = (p: Page) =>
+    p.locator('#metadocuments tbody tr').filter({ hasNot: p.locator('td.dataTables_empty') });
+
+const waitDatatableDocs = (p: Page) =>
+    p.waitForResponse(resp => resp.url().includes('/metaDocument/datatable') && resp.status() === 200);
+
+const quickFilterDocs = async (p: Page, text: string) => {
+    const dt = waitDatatableDocs(p);
+    await p.locator('#metadocuments_filter input').fill(text);
+    await dt;
+    await expect(p.locator('#metadocuments_processing')).toBeHidden();
+};
+
+const anarATipusDocs = async (page: Page): Promise<Page> => {
+    await filtrarPerCodi(page, CODI_TEST);
+    await expect(getRows(page)).toHaveCount(1);
+    const fila = getRows(page).first();
+    await fila.getByRole('button', { name: /elements/i }).click();
+    const tipusDocsPagePromise = page.context().waitForEvent('page');
+    await fila.getByRole('link', { name: /tipus docs/i }).click();
+    const tipusDocsPage = await tipusDocsPagePromise;
+    await tipusDocsPage.waitForLoadState('load');
+    await expect(tipusDocsPage.locator('#metadocuments_processing')).toBeHidden({ timeout: 10_000 });
+    return tipusDocsPage;
+};
+
+const crearDocument = async (tipusDocsPage: Page, codi: string, nom: string) => {
+    await tipusDocsPage.locator('a[href*="metaDocument/new"]').click();
+    await expect(tipusDocsPage.locator('.modal.in')).toBeVisible();
+    const frame = tipusDocsPage.locator('.modal.in').frameLocator('.modal-body iframe');
+    await expect(frame.locator('input[name="codi"]')).toBeVisible();
+    await frame.locator('input[name="codi"]').fill(codi);
+    await frame.locator('input[name="nom"]').fill(nom);
+    await frame.locator('a[href="#dades-nti"]').click();
+    await frame.locator('select[name="ntiOrigen"]').selectOption('O0');
+    await frame.locator('select[name="ntiTipoDocumental"]').selectOption('TD10');
+    await frame.locator('select[name="ntiEstadoElaboracion"]').selectOption('EE01');
+    const dtRefresh = waitDatatableDocs(tipusDocsPage);
+    const submitBtn = tipusDocsPage.locator('.modal.in .modal-footer button[type="submit"]');
+    await submitBtn.waitFor({ state: 'visible' });
+    await submitBtn.click();
+    await dtRefresh;
+    await expectSuccessAlert(tipusDocsPage);
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -199,6 +254,237 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
             await expectSuccessAlert(page);
         });
 
+    });
+
+    // ── Modificació ───────────────────────────────────────────────────────────
+
+    test('modificació d\'un procediment', async ({ page }) => {
+
+        await test.step('filtrar i obrir modal de modificació', async () => {
+            await filtrarPerCodi(page, CODI_TEST);
+            await expect(getRows(page)).toHaveCount(1);
+            const fila = getRows(page).first();
+            await fila.getByRole('button', { name: /accions/i }).click();
+            await fila.getByRole('link', { name: /modificar/i }).click();
+            await expect(page.locator('.modal.in')).toBeVisible();
+            const frame = page.locator('.modal.in').frameLocator('.modal-body iframe');
+            await expect(frame.locator('input[name="codi"]')).toBeVisible();
+        });
+
+        await test.step('modificar camps dins l\'iframe del modal', async () => {
+            const frame = page.locator('.modal.in').frameLocator('.modal-body iframe');
+
+            await frame.locator('textarea[name="nom"]').fill(NOM_MODIFICAT);
+            await frame.locator('textarea[name="descripcio"]').fill(DESC_MODIFICADA);
+
+            const checkGestio = frame.locator('#gestioAmbGrupsActiva');
+            if (!await checkGestio.isChecked()) await checkGestio.check();
+
+            const checkInteressat = frame.locator('#interessatObligatori');
+            if (!await checkInteressat.isChecked()) await checkInteressat.check();
+
+            const checkPermis = frame.locator('#permisDirecte');
+            if (!await checkPermis.isChecked()) await checkPermis.check();
+        });
+
+        await test.step('guardar la modificació', async () => {
+            const submitBtn = page.locator('.modal.in .modal-footer button[type="submit"]');
+            await submitBtn.waitFor({ state: 'visible' });
+            await submitBtn.click();
+        });
+
+        await test.step('verificar missatge d\'èxit', async () => {
+            await expectSuccessAlert(page);
+        });
+
+    });
+
+    // ── Verificació de la modificació ─────────────────────────────────────────
+
+    test('verificació de la modificació del procediment', async ({ page }) => {
+
+        await test.step('filtrar per codi i nom parcial', async () => {
+            const dt = waitDatatable(page);
+            await page.locator('input[name="codi"]').fill(CODI_TEST);
+            await page.locator('input[name="nom"]').fill('modificació');
+            const clearActiu = page.locator('#select2-actiu-container .select2-selection__clear');
+            if (await clearActiu.isVisible()) await clearActiu.click();
+            await page.locator('button[value="filtrar"]').click();
+            await dt;
+            await expect(page.locator('#metaexpedients_processing')).toBeHidden();
+        });
+
+        await test.step('activar filtre de permís directe i verificar resultat', async () => {
+            // permisDirecteBtn actualitza el camp ocult permisDirecteActive i refresca el datatable AJAX.
+            // Cal registrar la Promise ABANS del click per no perdre la resposta.
+            const dt = waitDatatable(page);
+            await page.locator('#permisDirecteBtn').click();
+            await dt;
+            await expect(page.locator('#metaexpedients_processing')).toBeHidden();
+            await expect(getRows(page)).toHaveCount(1);
+        });
+
+    });
+
+    // ── Tipus de Documents ────────────────────────────────────────────────────
+
+    test('accedir a tipus docs, verificar buit i crear dos documents', async ({ page }) => {
+
+        const tipusDocsPage = await anarATipusDocs(page);
+
+        await test.step('verificar que la llista de documents està buida', async () => {
+            await expect(getDocRows(tipusDocsPage)).toHaveCount(0);
+        });
+
+        await test.step('crear el primer document', async () => {
+            await crearDocument(tipusDocsPage, CODI_DOC1, NOM_DOC1);
+        });
+
+        await test.step('crear el segon document', async () => {
+            await crearDocument(tipusDocsPage, CODI_DOC2, 'document tipus doc pw 2');
+        });
+
+        await test.step('verificar que hi ha dos documents', async () => {
+            await expect(getDocRows(tipusDocsPage)).toHaveCount(2);
+        });
+
+        await tipusDocsPage.close();
+    });
+
+    test('quickfilter, activar i desactivar un tipus de document', async ({ page }) => {
+
+        const tipusDocsPage = await anarATipusDocs(page);
+
+        await test.step('quickfilter mostra només el document filtrat', async () => {
+            await quickFilterDocs(tipusDocsPage, CODI_DOC1);
+            await expect(getDocRows(tipusDocsPage)).toHaveCount(1);
+        });
+
+        const fila = getDocRows(tipusDocsPage).first();
+
+        await test.step('obrir menú accions', async () => {
+            await fila.getByRole('button', { name: /accions/i }).click();
+        });
+
+        const estaActiu = await fila.getByRole('link', { name: /desactivar/i }).isVisible();
+
+        if (estaActiu) {
+            await test.step('desactivar el document', async () => {
+                const dt = waitDatatableDocs(tipusDocsPage);
+                await fila.getByRole('link', { name: /desactivar/i }).click();
+                await dt;
+                await expectSuccessAlert(tipusDocsPage);
+            });
+
+            await test.step('activar el document', async () => {
+                await fila.getByRole('button', { name: /accions/i }).click();
+                const dt = waitDatatableDocs(tipusDocsPage);
+                await fila.getByRole('link', { name: /activar/i }).click();
+                await dt;
+                await expectSuccessAlert(tipusDocsPage);
+            });
+        } else {
+            await test.step('activar el document', async () => {
+                const dt = waitDatatableDocs(tipusDocsPage);
+                await fila.getByRole('link', { name: /activar/i }).click();
+                await dt;
+                await expectSuccessAlert(tipusDocsPage);
+            });
+
+            await test.step('desactivar el document', async () => {
+                await fila.getByRole('button', { name: /accions/i }).click();
+                const dt = waitDatatableDocs(tipusDocsPage);
+                await fila.getByRole('link', { name: /desactivar/i }).click();
+                await dt;
+                await expectSuccessAlert(tipusDocsPage);
+            });
+        }
+
+        await tipusDocsPage.close();
+    });
+
+    test('modificació d\'un tipus de document', async ({ page }) => {
+
+        const tipusDocsPage = await anarATipusDocs(page);
+
+        await test.step('filtrar i obrir modal de modificació', async () => {
+            await quickFilterDocs(tipusDocsPage, CODI_DOC1);
+            await expect(getDocRows(tipusDocsPage)).toHaveCount(1);
+            const fila = getDocRows(tipusDocsPage).first();
+            await fila.getByRole('button', { name: /accions/i }).click();
+            await fila.getByRole('link', { name: /modificar/i }).click();
+            await expect(tipusDocsPage.locator('.modal.in')).toBeVisible();
+            const frame = tipusDocsPage.locator('.modal.in').frameLocator('.modal-body iframe');
+            await expect(frame.locator('input[name="codi"]')).toBeVisible();
+        });
+
+        await test.step('modificar camps del document', async () => {
+            const frame = tipusDocsPage.locator('.modal.in').frameLocator('.modal-body iframe');
+            await frame.locator('input[name="nom"]').fill(NOM_DOC1_MOD);
+            await frame.locator('textarea[name="descripcio"]').fill(DESC_DOC1_MOD);
+            await frame.locator('select[name="multiplicitat"]').selectOption('M_0_N');
+        });
+
+        await test.step('guardar la modificació', async () => {
+            const dtRefresh = waitDatatableDocs(tipusDocsPage);
+            const submitBtn = tipusDocsPage.locator('.modal.in .modal-footer button[type="submit"]');
+            await submitBtn.waitFor({ state: 'visible' });
+            await submitBtn.click();
+            await dtRefresh;
+            await expectSuccessAlert(tipusDocsPage);
+        });
+
+        await tipusDocsPage.close();
+    });
+
+    test('verificació de la modificació del tipus de document via quickfilter', async ({ page }) => {
+
+        const tipusDocsPage = await anarATipusDocs(page);
+
+        await test.step('quickfilter pel nom modificat mostra el document', async () => {
+            await quickFilterDocs(tipusDocsPage, NOM_DOC1_MOD);
+            await expect(getDocRows(tipusDocsPage)).toHaveCount(1);
+        });
+
+        await tipusDocsPage.close();
+    });
+
+    test('marcar per defecte un tipus de document', async ({ page }) => {
+
+        const tipusDocsPage = await anarATipusDocs(page);
+
+        await test.step('filtrar i marcar per defecte el primer document', async () => {
+            await quickFilterDocs(tipusDocsPage, CODI_DOC1);
+            await expect(getDocRows(tipusDocsPage)).toHaveCount(1);
+            const fila = getDocRows(tipusDocsPage).first();
+            await fila.getByRole('button', { name: /accions/i }).click();
+            const dt = waitDatatableDocs(tipusDocsPage);
+            await fila.getByRole('link', { name: /marcar per defecte/i }).click();
+            await dt;
+            await expectSuccessAlert(tipusDocsPage);
+        });
+
+        await tipusDocsPage.close();
+    });
+
+    test('eliminar un tipus de document', async ({ page }) => {
+
+        const tipusDocsPage = await anarATipusDocs(page);
+
+        await test.step('filtrar i eliminar el segon document', async () => {
+            await quickFilterDocs(tipusDocsPage, CODI_DOC2);
+            await expect(getDocRows(tipusDocsPage)).toHaveCount(1);
+            const fila = getDocRows(tipusDocsPage).first();
+            tipusDocsPage.on('dialog', dialog => dialog.accept());
+            await fila.getByRole('button', { name: /accions/i }).click();
+            const dt = waitDatatableDocs(tipusDocsPage);
+            await fila.getByRole('link', { name: /esborrar/i }).click();
+            await dt;
+            await expectSuccessAlert(tipusDocsPage);
+            await expect(getDocRows(tipusDocsPage)).toHaveCount(0);
+        });
+
+        await tipusDocsPage.close();
     });
 
     // ── Activar / Desactivar ──────────────────────────────────────────────────

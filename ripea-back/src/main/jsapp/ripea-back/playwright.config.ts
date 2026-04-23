@@ -21,7 +21,6 @@ export default defineConfig({
         video: 'retain-on-failure',
         // Traces per depurar fallades
         trace: 'retain-on-failure',
-		slowMo: 500,
 		launchOptions: {
 		  args: ['--window-size=1920,1080']
 		},
