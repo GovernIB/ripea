@@ -65,6 +65,30 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
     });
 
+	// ── Filtre ────────────────────────────────────────────────────────────────
+
+	test('filtrar per codi del test i esborrar si existeix', async ({ page }) => {
+	    const campCodi = page.locator('input[name="codi"]');
+	    await campCodi.fill('PLAYWRIGHT_REACT');
+
+	    const responsePromise = page.waitForResponse(
+	        resp => resp.url().includes('/metaExpedient') && resp.request().method() === 'GET' && resp.status() === 200
+	    );
+	    await page.getByRole('button', { name: /filtrar/i }).click();
+	    await responsePromise;
+
+	    const filesFiltrades = await getRows(page).count();
+	    if (filesFiltrades === 0) {
+	        return;
+	    }
+
+	    const row = getRows(page).first();
+	    await row.getByRole('menuitem').click();
+	    await page.getByRole('menuitem', { name: /esborrar/i }).click();
+	    await page.getByRole('button', { name: /acceptar/i }).click();
+	    await expect(page.locator('.MuiAlert-standardSuccess')).toBeVisible({ timeout: 10_000 });
+	});
+	
     // ── Creació ───────────────────────────────────────────────────────────────
 
     test('creació d\'un nou procediment', async ({ page }) => {
@@ -77,12 +101,11 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
         await test.step('omplir el formulari', async () => {
             const dialog = page.locator('[role="dialog"]');
 
-            await dialog.locator('input[name="codi"]').fill('PLAYWIGHT');
+            await dialog.locator('input[name="codi"]').fill('PLAYWRIGHT_REACT');
 
             // tipusClassificacio: seleccionar ID
             await dialog.getByLabel(/tipus classificaci/i).click();
             await page.getByRole('option', { name: /^ID$/i }).click();
-
             // classificacio: amb tipusClassificacio=ID el camp és readonly (s'omple automàticament)
 
             await dialog.locator('input[name="nom"], textarea[name="nom"]').fill('prova creació play wright');
@@ -94,8 +117,10 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
                 await checkComu.uncheck();
             }
 
-            // crearReglaDisseny: ha d'estar desmarcat (pot bloquejar el botó Guarda si no)
-            const checkRegla = dialog.locator('input[name="crearReglaDisseny"]');
+            // crearReglaDistribucio: ha d'estar desmarcat; el servei de Distribució pot no
+            // estar disponible i causaria un error de transacció en desar.
+            // L'element és un checkbox MUI sense atribut name → s'usa getByRole.
+            const checkRegla = dialog.getByRole('checkbox', { name: /crear regla/i });
             if (await checkRegla.count() > 0 && await checkRegla.isChecked()) {
                 await checkRegla.uncheck();
             }
@@ -114,29 +139,6 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
             await expect(page.locator('.MuiAlert-standardSuccess')).toBeVisible({ timeout: 10_000 });
         });
 
-    });
-
-    // ── Filtre ────────────────────────────────────────────────────────────────
-
-    test('filtrar per nom redueix els resultats', async ({ page }) => {
-        // Obtenir el nombre inicial de files
-        const filesInicial = await getRows(page).count();
-
-        // Omplir el camp "nom" del filtre
-        const campNom = page.locator('input[name="nom"]');
-        await campNom.fill('zzz_inexistent_zzz');
-
-        // Clicar el botó Filtrar i esperar la resposta específica de l'API
-        // (no s'usa waitForLoadState('networkidle') perquè el polling en segon pla
-        //  impedeix que la xarxa arribi mai a l'estat idle)
-        const responsePromise = page.waitForResponse(
-            resp => resp.url().includes('/metaExpedient') && resp.request().method() === 'GET' && resp.status() === 200
-        );
-        await page.getByRole('button', { name: /filtrar/i }).click();
-        await responsePromise;
-
-        const filesFiltrades = await getRows(page).count();
-        expect(filesFiltrades).toBeLessThanOrEqual(filesInicial);
     });
 
 });

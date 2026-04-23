@@ -93,15 +93,16 @@ Des de  ripea-back/src/main/jsapp/ripea-back/  (amb JBoss arrencat):
   npm run e2e
 
   # Amb navegador visible (útil per depurar):
-  npm run e2e:headed
+  npm run e2e:headed --slow-mo=300"
 
   # Amb la interfície gràfica de Playwright (interactiu):
   # Desde cmd (no Powershell)
   npm run e2e:ui
   # Obre la interfície de Playwright, y s'ha de premer el boto de play per començar.
 
-  # Executar només un fitxer de test concret:
+  # Executar només un fitxer de test concret (2 opcions):
   npx playwright test tests_e2e/metaExpedient/metaExpedient.admin.spec.ts
+  npm run e2e:headed --slow-mo="300" -- tests_e2e/metaExpedient/metaExpedient.admin.spec.ts
 
   # Veure l'informe HTML de l'última execució:
   npx playwright show-report tests_e2e/report

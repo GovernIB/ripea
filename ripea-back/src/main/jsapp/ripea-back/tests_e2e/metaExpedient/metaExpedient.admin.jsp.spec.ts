@@ -1,7 +1,7 @@
 import { test, expect, Page } from '@playwright/test';
 
-// URL de la pàgina de procediments (interfície JSP clàssica)
 const URL_PROCEDIMENTS = '/ripeaback/metaExpedient';
+const CODI_TEST = 'zz_PLAYWRIGHT_JSP_zz';
 
 // Helpers per localitzar elements de la pàgina
 const getGrid       = (page: Page) => page.locator('#metaexpedients');
@@ -9,22 +9,52 @@ const getRows       = (page: Page) => page.locator('#metaexpedients tbody tr').f
 const getToolbar    = (page: Page) => page.locator('[data-toggle="botons-titol"]');
 const getFilterArea = (page: Page) => page.locator('input[name="codi"]');
 
+// Helper: verificar missatge d'èxit (reutilitzable al llarg de tot el test)
+const expectSuccessAlert = (page: Page) =>
+    expect(page.locator('.alert.alert-success')).toBeVisible({ timeout: 10_000 });
+
+// Helper: crear Promise d'espera de resposta del datatable
+const waitDatatable = (page: Page) =>
+    page.waitForResponse(
+        resp => resp.url().includes('/metaExpedient/datatable') && resp.status() === 200,
+    );
+
+// Helper: filtrar per codi intern i esperar que el datatable es recarregui
+const filtrarPerCodi = async (page: Page, codi: string) => {
+    const dt = waitDatatable(page);
+    await page.locator('input[name="codi"]').fill(codi);
+	// Netejar el filtre "Actiu" perquè el procediment pot estar inactiu i no aparèixer.
+	// El botó × (select2-selection__clear) només existeix quan hi ha un valor seleccionat.
+	const clearActiu = page.locator('#select2-actiu-container .select2-selection__clear');
+	if (await clearActiu.isVisible()) {
+	    await clearActiu.click();
+	}
+    await page.locator('button[value="filtrar"]').click();
+    await dt;
+    await expect(page.locator('#metaexpedients_processing')).toBeHidden();
+};
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Pàgina: Gestió de Procediments JSP  (rol IPA_ADMIN)
 // ─────────────────────────────────────────────────────────────────────────────
 
 test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
 
-    test.beforeEach(async ({ page }) => {
-        // Esperar la resposta AJAX del DataTable per assegurar que les dades han carregat
-        const datatablePromise = page.waitForResponse(
-            resp => resp.url().includes('/metaExpedient/datatable') && resp.status() === 200,
-        );
-        await page.goto(URL_PROCEDIMENTS);
-        await datatablePromise;
-        await expect(page.locator('#metaexpedients_processing')).toBeHidden();
-    });
+	test.beforeEach(async ({ page }) => {
+	    // Esperar la resposta AJAX del DataTable per assegurar que les dades han carregat
+	    let dt = waitDatatable(page);
+	    await page.goto(URL_PROCEDIMENTS);
+	    await dt;
+	    await expect(page.locator('#metaexpedients_processing')).toBeHidden();
 
+	    // Netejar filtres guardats en sessió: el botó fa un POST que recarrega la pàgina
+	    // sense cap filtre actiu, evitant que resultats d'un test anterior contaminin el següent.
+	    dt = waitDatatable(page);
+	    await page.locator('button[value="netejar"]').click();
+	    await dt;
+	    await expect(page.locator('#metaexpedients_processing')).toBeHidden();
+	});	
+	
     // ── Disposició ────────────────────────────────────────────────────────────
 
     test('disposició dels elements en pantalla', async ({ page }) => {
@@ -70,6 +100,30 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
 
     });
 
+    // ── Filtre i neteja prèvia ────────────────────────────────────────────────
+
+    test('filtrar per codi i esborrar si el procediment de test ja existeix', async ({ page }) => {
+		
+        await filtrarPerCodi(page, CODI_TEST);
+
+        const count = await getRows(page).count();
+        if (count === 0) {
+			console.log("No existeix, l'entorn ja és net"); 
+			return;
+		} else {
+			console.log("Existeix → esborrar-lo per deixar l'entorn net per al test de creació"); 
+		}
+
+        const fila = getRows(page).first();
+        page.on('dialog', dialog => dialog.accept());
+        const dt = waitDatatable(page);
+        await fila.getByRole('button', { name: /accions/i }).click();
+        await fila.getByRole('link', { name: /esborrar/i }).click();
+        await dt;
+        await expect(page.locator('#metaexpedients_processing')).toBeHidden();
+        await expect(getRows(page)).toHaveCount(0);
+    });
+
     // ── Creació ───────────────────────────────────────────────────────────────
 
     test('creació d\'un nou procediment', async ({ page }) => {
@@ -84,71 +138,116 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
         });
 
         await test.step('omplir el formulari dins l\'iframe del modal', async () => {
-            // Tot el contingut del formulari es dins l'iframe del modal actiu
             const frame = page.locator('.modal.in').frameLocator('.modal-body iframe');
 
-            await frame.locator('input[name="codi"]').fill('PLAYWIGHT');
-
-            // organGestor: cal seleccionar-lo PRIMER; fins que no s'ha seleccionat
-            // hi ha un botó overlay que bloqueja la resta de camps del formulari.
-            // El select pot estar fora del viewport: fer scroll fins a ell.
-            // Les opcions es carreguen via AJAX: esperar que n'hi hagi almenys una
-            // a part del placeholder buit (índex 0).
-            const selectOrgan = frame.locator('select[name="organGestor"]');
-            await selectOrgan.scrollIntoViewIfNeeded();
-            await expect(selectOrgan.locator('option').nth(1)).toBeAttached({ timeout: 15_000 });
-            await selectOrgan.selectOption({ index: 1 });
-
-            // tipusClassificacio: seleccionar ID (ara ja no hi ha overlay)
-            await frame.locator('input[name="tipusClassificacio"][value="ID"]').check();
-
-            // classificacioId: es mostra quan tipusClassificacio=ID
-            await frame.locator('#classificacioId').fill('00110011');
-
+            await frame.locator('input[name="codi"]').fill(CODI_TEST);
             await frame.locator('textarea[name="nom"]').fill('prova creació play wright');
             await frame.locator('input[name="serieDocumental"]').fill('S0002');
 
-            // comu: ha d'estar desmarcat
+            // Desmarcar crearReglaDistribucio per evitar errors en entorns sense el servei
+            const checkRegla = frame.getByRole('checkbox', { name: /crear regla/i });
+            if (await checkRegla.isChecked()) {
+                await checkRegla.uncheck();
+            }
+
+            // Desmarcar "Procediment comú" per poder seleccionar un òrgan gestor.
+            // Mentre #comu està marcat, el JS amaga #organGestorContainer.
             const checkComu = frame.locator('#comu');
             if (await checkComu.isChecked()) {
                 await checkComu.uncheck();
             }
+            await expect(frame.locator('#organGestorContainer')).toBeVisible();
+
+            // Seleccionar el primer òrgan gestor disponible via select2 suggest (AJAX).
+            // El camp requereix mínim 3 caràcters per disparar la cerca.
+            // El dropdown (span.select2-dropdown) s'afegeix al body de l'iframe en posició absoluta.
+            await frame.locator('#organGestorContainer .select2-selection').click();
+            const suggestResponse = page.waitForResponse(
+                resp => resp.url().includes('/organgestorajax/organgestor') && resp.status() === 200,
+            );
+            await frame.locator('.select2-search__field').fill('GOV');
+            await suggestResponse;
+            // Esperar que les opcions siguin visibles abans de fer clic
+            const primerResultat = frame.locator('.select2-results__option').first();
+            await primerResultat.waitFor({ timeout: 5_000 });
+            await primerResultat.click();
+			
+            // El dropdown del select2 és un span posicionat absolutament que pot cobrir el footer.
+            // Esperar que desaparegui del DOM i que l'AJAX calculateClassificacioId completi.
+            await frame.locator('.select2-dropdown').waitFor({ state: 'detached', timeout: 5_000 }).catch(() => {});
+            await page.waitForResponse(
+                resp => resp.url().includes('/calculateClassificacioId/') && resp.status() === 200,
+                { timeout: 5_000 },
+            ).catch(() => {});
+
+            // Seleccionar la classificació per ID (auto-calculada a partir de l'òrgan gestor).
+            // El botó "ID" del btn-group conté el radio input; és habilitat un cop s'ha seleccionat organ gestor.
+            await frame.locator('button:has(input[value="ID"][name="tipusClassificacio"])').click();
+            // Quan es selecciona "ID", showHideClassificacioInput() mostra el camp classificacioId (readonly)
+            await expect(frame.locator('#classificacioId')).toBeVisible();
         });
 
         await test.step('enviar el formulari', async () => {
-            // El botó de submit és clonat al .modal-footer del modal actiu (el de dins l'iframe s'amaga)
-            await page.locator('.modal.in .modal-footer').getByRole('button', { name: /crear/i }).click();
+            // El botó submit és clonat al .modal-footer de la pàgina pare (l'original dins l'iframe s'amaga).
+            // S'usa button[type="submit"] directe per evitar ambigüitats d'accessible name amb la icona FA.
+            const submitBtn = page.locator('.modal.in .modal-footer button[type="submit"]');
+            await submitBtn.waitFor({ state: 'visible' });
+            await submitBtn.click();
         });
 
         await test.step('verificar missatge d\'èxit', async () => {
-            // Quan el modal es tanca, webutilRefreshMissatges() injecta els missatges al DOM
-            await expect(page.locator('.alert.alert-success')).toBeVisible({ timeout: 10_000 });
+            await expectSuccessAlert(page);
         });
 
     });
 
-    // ── Filtre ────────────────────────────────────────────────────────────────
+    // ── Activar / Desactivar ──────────────────────────────────────────────────
 
-    test('filtrar per nom redueix els resultats', async ({ page }) => {
-        // Obtenir el nombre inicial de files
-        const filesInicial = await getRows(page).count();
+    test('activar i desactivar procediment', async ({ page }) => {
 
-        // Omplir el camp "nom" del filtre
-        const campNom = page.locator('input[name="nom"]');
-        await campNom.fill('zzz_inexistent_zzz');
+        await test.step('filtrar per localitzar el procediment de test', async () => {
+            await filtrarPerCodi(page, CODI_TEST);
+            await expect(getRows(page)).toHaveCount(1);
+        });
 
-        // El formulari fa POST (recàrrega completa de pàgina) → el DataTable torna a
-        // carregar via AJAX. S'espera la resposta específica en lloc de networkidle,
-        // que expiraria per les peticions de polling en segon pla.
-        const datatablePromise = page.waitForResponse(
-            resp => resp.url().includes('/metaExpedient/datatable') && resp.status() === 200,
-        );
-        await page.locator('button[value="filtrar"]').click();
-        await datatablePromise;
-        await expect(page.locator('#metaexpedients_processing')).toBeHidden();
+        const fila = getRows(page).first();
 
-        const filesFiltrades = await getRows(page).count();
-        expect(filesFiltrades).toBeLessThanOrEqual(filesInicial);
+        // Determinar estat inicial per executar el cicle en l'ordre correcte
+        await fila.getByRole('button', { name: /accions/i }).click();
+        const estaActiu = await fila.getByRole('link', { name: /desactivar/i }).isVisible();
+
+        if (estaActiu) {
+            await test.step('desactivar el procediment', async () => {
+                const dt = waitDatatable(page);
+                await fila.getByRole('link', { name: /desactivar/i }).click();
+                await dt;
+                await expectSuccessAlert(page);
+            });
+
+            await test.step('activar el procediment', async () => {
+                await fila.getByRole('button', { name: /accions/i }).click();
+                const dt = waitDatatable(page);
+                await fila.getByRole('link', { name: /activar/i }).click();
+                await dt;
+                await expectSuccessAlert(page);
+            });
+        } else {
+            await test.step('activar el procediment', async () => {
+                const dt = waitDatatable(page);
+                await fila.getByRole('link', { name: /activar/i }).click();
+                await dt;
+                await expectSuccessAlert(page);
+            });
+
+            await test.step('desactivar el procediment', async () => {
+                await fila.getByRole('button', { name: /accions/i }).click();
+                const dt = waitDatatable(page);
+                await fila.getByRole('link', { name: /desactivar/i }).click();
+                await dt;
+                await expectSuccessAlert(page);
+            });
+        }
+
     });
 
 });

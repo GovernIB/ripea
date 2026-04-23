@@ -21,6 +21,11 @@ export default defineConfig({
         video: 'retain-on-failure',
         // Traces per depurar fallades
         trace: 'retain-on-failure',
+		slowMo: 500,
+		launchOptions: {
+		  args: ['--window-size=1920,1080']
+		},
+		viewport: null, // IMPORTANTE: permite que la ventana use el tamaño real	
     },
 
     projects: [
@@ -28,6 +33,7 @@ export default defineConfig({
         {
             name: 'setup-admin',
             testMatch: /auth[\/\\]admin\.setup\.ts/,
+			workers: 1,
         },
 
         // ── Tests per rol ──
