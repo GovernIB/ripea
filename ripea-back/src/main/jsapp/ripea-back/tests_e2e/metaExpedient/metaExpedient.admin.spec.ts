@@ -42,7 +42,7 @@ const humanDelay = async (page: Page) => {
 };
 
 const waitApiGet = async (page: Page, urlFragment: string) => {
-    logDebug('Esperant resposta GET a' + urlFragment);
+    logDebug('Esperant resposta GET a ' + urlFragment);
     await page.waitForResponse(
       resp =>
         resp.url().includes(urlFragment) &&
@@ -50,15 +50,21 @@ const waitApiGet = async (page: Page, urlFragment: string) => {
         resp.status() === 200,
       { timeout: 15_000 }
     );
-    logDebug('Esperant spinner de MUI...');
-    // Espera a que desaparezca el spinner de MUI --> las filas del datatable estan renderizadas
-    await page.waitForSelector('.MuiCircularProgress-root', {
+    logDebug('Resposta GET rebuda. Esperant que el spinner del DataGrid desaparegui...');
+    // El spinner esta scoped al DataGrid per no confondre'l amb spinners d'altres components (modals, etc.)
+    // Si la resposta és molt ràpida i el spinner no arriba a apareixer, waitForSelector amb
+    // state:'detached' resol immediatament (element no existeix al DOM = ja desadjuntat).
+    await page.waitForSelector('.MuiDataGrid-root .MuiCircularProgress-root', {
       state: 'detached',
-      timeout: 15_000,
+      timeout: 10_000,
     });
-    logDebug('Loading ha desaparegut, esta carregant la info...');
-    const count = await getRows(page).count();
-    logDebug('Num files: ' + count);
+    logDebug('Spinner desaparegut. Confirmant estabilitat del grid...');
+    // Confirmació final: dona a React un cicle de renders per acabar de pintar files o l'overlay de buit.
+    await page.waitForFunction(
+      () => !document.querySelector('.MuiDataGrid-root .MuiCircularProgress-root'),
+      { timeout: 5_000 }
+    );
+    logDebug('Grid estable. Num files: ' + await getRows(page).count());
 };
 
 // Interacciona amb un MUI Select (native input ocult) i selecciona una opció per text/regex
@@ -85,21 +91,16 @@ const triaMuiSelectFirst = async (page: Page, container: Locator, inputName: str
     await page.waitForSelector('[role="listbox"]', { state: 'detached', timeout: 3_000 }).catch(() => {});
 };
 
-// Filtra la llista principal per codi intern i espera la resposta de l'API
+// Filtra la llista principal per codi intern i espera la resposta de l'API.
+// IMPORTANT: waitApiGet s'ha de registrar ABANS del click per evitar la race condition
+// en que la resposta arriba abans que el listener estigui actiu (localhost és molt ràpid).
 const aplicarFiltreProcediments = async (page: Page, codi: string, permisDirecte: boolean) => {
-	
-    //Primer de tot neteja el filtre de nom per evitar contaminació entre tests, ja que el filtre es guarda en sessió i es comparteix entre tests
-    //await page.getByRole('button', { name: 'Netejar', exact: true }).click();
-    //await waitApiGet(page, '/metaExpedient');
-	//await humanDelay(page);
     await page.locator('input[name="codi"]').fill(codi);
     if (permisDirecte) {
         await page.getByRole('button', { name: /amb permis directe/i }).click();
     }
+    const resp = waitApiGet(page, '/metaExpedient');
     await page.getByRole('button', { name: 'Filtrar', exact: true }).click();
-    await humanDelay(page);
-	//Esperam a que el grid carregui amb el filtre aplicat
-	const resp = waitApiGet(page, '/metaExpedient');
     await resp;
 };
 
@@ -224,15 +225,15 @@ const crearTasca = async (page: Page, codi: string, nom: string, full = false) =
 test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
     test.beforeEach(async ({ page }) => {
-        await page.goto(URL_PROCEDIMENTS);
-        //await expect(getGrid(page)).toBeVisible({ timeout: 15_000 });
-        // Netejar filtres guardats en sessió per evitar contaminació entre tests
-        // "Netejar selecció" és un altre botó de la DataGrid → cal exact: true
+        // Registrem el listener ABANS del goto per capturar la GET de càrrega inicial de React.
         const respCarregaInicial = waitApiGet(page, '/metaExpedient');
+        await page.goto(URL_PROCEDIMENTS);
         await respCarregaInicial;
-        //await humanDelay(page);
-        await page.getByRole('button', { name: 'Netejar', exact: true }).click();
+        // Netejar filtres guardats en sessió per evitar contaminació entre tests.
+        // "Netejar selecció" és un altre botó de la DataGrid → cal exact: true.
+        // Registrem el listener ABANS del click per la mateixa raó (race condition).
         const respCarregaReset = waitApiGet(page, '/metaExpedient');
+        await page.getByRole('button', { name: 'Netejar', exact: true }).click();
         await respCarregaReset;
     });
 
