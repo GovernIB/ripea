@@ -102,7 +102,7 @@ Des de  ripea-back/src/main/jsapp/ripea-back/  (amb JBoss arrencat):
 
   # Executar només un fitxer de test concret (2 opcions):
   npx playwright test tests_e2e/metaExpedient/metaExpedient.admin.spec.ts
-  npm run e2e:headed --slow-mo="300" -- tests_e2e/metaExpedient/metaExpedient.admin.spec.ts
+  npm run e2e:headed -- tests_e2e/metaExpedient/metaExpedient.admin.spec.ts
 
   # Veure l'informe HTML de l'última execució:
   npx playwright show-report tests_e2e/report
