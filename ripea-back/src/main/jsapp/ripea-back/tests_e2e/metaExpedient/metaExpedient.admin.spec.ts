@@ -1,7 +1,7 @@
 import { test, expect, Page, Locator } from '@playwright/test';
 
 const DEBUG_ACTIVAT	= true;
-const HUMAN_DELAY	= 2000; //milisegons de retard entre execució de accions
+const HUMAN_DELAY	= 100; //milisegons de retard entre execució de accions
 
 const URL_PROCEDIMENTS = '/ripeaback/reactapp/metaExpedient';
 
@@ -41,30 +41,49 @@ const humanDelay = async (page: Page) => {
     }
 };
 
-const waitApiGet = async (page: Page, urlFragment: string) => {
-    logDebug('Esperant resposta GET a ' + urlFragment);
-    await page.waitForResponse(
-      resp =>
-        resp.url().includes(urlFragment) &&
-        resp.request().method() === 'GET' &&
-        resp.status() === 200,
-      { timeout: 15_000 }
-    );
-    logDebug('Resposta GET rebuda. Esperant que el spinner del DataGrid desaparegui...');
-    // El spinner esta scoped al DataGrid per no confondre'l amb spinners d'altres components (modals, etc.)
-    // Si la resposta és molt ràpida i el spinner no arriba a apareixer, waitForSelector amb
-    // state:'detached' resol immediatament (element no existeix al DOM = ja desadjuntat).
-    await page.waitForSelector('.MuiDataGrid-root .MuiCircularProgress-root', {
-      state: 'detached',
-      timeout: 10_000,
-    });
-    logDebug('Spinner desaparegut. Confirmant estabilitat del grid...');
-    // Confirmació final: dona a React un cicle de renders per acabar de pintar files o l'overlay de buit.
+// Espera que el DataGrid estigui completament carregat, hagi o no resultats.
+//
+// Estats observats als HTMLs renderitzats (RENDERS/REACT/GRID/):
+//   Loading:     .MuiDataGrid-overlay  PRESENT  (conté el CircularProgress)
+//   Amb dades:   .MuiDataGrid-overlay  ABSENT   (.MuiDataGrid-row presents)
+//   Sense dades: .MuiDataGrid-overlay  ABSENT   (.MuiDataGrid-overlayWrapper amb "Sense dades")
+//
+// Condició "carregat" = .MuiDataGrid-root al DOM  AND  .MuiDataGrid-overlay absent.
+const esperarGridCarregat = async (page: Page) => {
+    logDebug('[Grid] Esperant que el grid estigui completament carregat...');
     await page.waitForFunction(
-      () => !document.querySelector('.MuiDataGrid-root .MuiCircularProgress-root'),
-      { timeout: 5_000 }
+        () => {
+            const grid = document.querySelector('.MuiDataGrid-root');
+            if (!grid) return false;                              // Grid encara no muntat
+            if (grid.querySelector('.MuiDataGrid-overlay')) return false; // Overlay de càrrega present
+            return true;
+        },
+        { timeout: 15_000 }
     );
-    logDebug('Grid estable. Num files: ' + await getRows(page).count());
+    logDebug('[Grid] Carregat OK. Num files: ' + await getRows(page).count());
+};
+
+// Registra un listener de resposta GET i, un cop rebuda, espera que el grid hagi acabat
+// de renderitzar via esperarGridCarregat.
+// IMPORTANT: cridar ABANS de l'acció que dispara la petició (click/goto) per evitar la
+// race condition en que la resposta arriba abans que el listener estigui actiu.
+//
+// urlMatcher: string → coincidència per includes(); funció → predicat personalitzat.
+// Usa un predicat quan calgui excloure sub-rutes (p.ex. /metaExpedient/artifacts).
+const waitApiGet = async (page: Page, urlMatcher: string | ((url: string) => boolean)) => {
+    const urlCheck = typeof urlMatcher === 'string'
+        ? (url: string) => url.includes(urlMatcher)
+        : urlMatcher;
+    logDebug('[API] Listener registrat...');
+    const response = await page.waitForResponse(
+        resp =>
+            urlCheck(resp.url()) &&
+            resp.request().method() === 'GET' &&
+            resp.status() === 200,
+        { timeout: 15_000 }
+    );
+    logDebug('[API] GET rebut: ' + response.url().split('?')[0] + ' → status ' + response.status());
+    await esperarGridCarregat(page);
 };
 
 // Interacciona amb un MUI Select (native input ocult) i selecciona una opció per text/regex
@@ -77,14 +96,18 @@ const triaMuiSelect = async (page: Page, container: Locator, inputName: string, 
 };
 
 // Selecciona la primera opció no buida d'un MUI Select
-const triaMuiSelectFirst = async (page: Page, container: Locator, inputName: string) => {
+const triaMuiSelectFirst = async (page: Page, container: Locator, inputName: string, allowBlank: boolean=false) => {
     const muiRoot = container.locator(`.MuiInputBase-root:has(input[name="${inputName}"])`);
     await muiRoot.locator('[role="combobox"]').click();
     await page.waitForSelector('[role="listbox"]', { timeout: 5_000 });
     const opts = page.getByRole('option');
     const firstText = await opts.first().textContent();
     if (!firstText || firstText.trim() === '') {
-        await opts.nth(1).click();
+        if (allowBlank) {
+            await opts.first().click();
+        } else {
+            await opts.nth(1).click();
+        }
     } else {
         await opts.first().click();
     }
@@ -95,13 +118,19 @@ const triaMuiSelectFirst = async (page: Page, container: Locator, inputName: str
 // IMPORTANT: waitApiGet s'ha de registrar ABANS del click per evitar la race condition
 // en que la resposta arriba abans que el listener estigui actiu (localhost és molt ràpid).
 const aplicarFiltreProcediments = async (page: Page, codi: string, permisDirecte: boolean) => {
+    logDebug('[Filtre] Omplint codi="' + codi + '"' + (permisDirecte ? ' + permisDirecte' : ''));
     await page.locator('input[name="codi"]').fill(codi);
+    const dialog = page.locator('.styledFilter');
+    await triaMuiSelectFirst(page, dialog, 'actiu', true);
     if (permisDirecte) {
         await page.getByRole('button', { name: /amb permis directe/i }).click();
     }
-    const resp = waitApiGet(page, '/metaExpedient');
+    // Exclou sub-rutes com /metaExpedient/artifacts que es criden en paral·lel.
+    const resp = waitApiGet(page, url => url.includes('/metaExpedient') && !url.includes('/metaExpedient/'));
+    logDebug('[Filtre] Listener registrat. Fent click a Filtrar...');
     await page.getByRole('button', { name: 'Filtrar', exact: true }).click();
     await resp;
+    logDebug('[Filtre] Filtre aplicat. Num files resultants: ' + await getRows(page).count());
 };
 
 // Navega a la sub-pàgina del procediment de test i activa la pestanya indicada
@@ -130,8 +159,7 @@ const logInfo  = (message: string) => { console.log(message); };
 
 // ── Helpers per a Tipus de Documents ─────────────────────────────────────────
 
-const getDocRows = (page: Page) =>
-    page.locator('#simple-tabpanel-metaDocument .MuiDataGrid-row');
+const getDocRows = (page: Page) => page.locator('#simple-tabpanel-metaDocument .MuiDataGrid-row');
 
 const quickFilterDocs = async (page: Page, text: string) => {
     await page.locator('#simple-tabpanel-metaDocument .MuiToolbar-root input[type="text"]').fill(text);
@@ -225,16 +253,30 @@ const crearTasca = async (page: Page, codi: string, nom: string, full = false) =
 test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
     test.beforeEach(async ({ page }) => {
-        // Registrem el listener ABANS del goto per capturar la GET de càrrega inicial de React.
-        const respCarregaInicial = waitApiGet(page, '/metaExpedient');
+        // 1. Navegar i esperar càrrega inicial del grid.
+        logDebug('[beforeEach] Navegant a ' + URL_PROCEDIMENTS + '...');
         await page.goto(URL_PROCEDIMENTS);
-        await respCarregaInicial;
-        // Netejar filtres guardats en sessió per evitar contaminació entre tests.
-        // "Netejar selecció" és un altre botó de la DataGrid → cal exact: true.
-        // Registrem el listener ABANS del click per la mateixa raó (race condition).
-        const respCarregaReset = waitApiGet(page, '/metaExpedient');
+        await esperarGridCarregat(page);
+        logDebug('[beforeEach] Càrrega inicial OK.');
+
+        // 2. Netejar filtres de sessió i esperar que el reset sigui efectiu al DOM.
+        //    NO usem waitApiGet aquí: el GET de Netejar pot arribar tard (mentre el test
+        //    ja ha aplicat el seu propi filtre), sobreescrivint el resultat i causant
+        //    errors. En comptes, verifiquem directament l'estat DOM esperat:
+        //      - camp codi buit  → el formulari s'ha netejat
+        //      - .MuiDataGrid-overlay absent → el grid no està carregant
+        //      - almenys 1 fila visible → la recàrrega sense filtre ha acabat
+        logDebug('[beforeEach] Fent click a Netejar...');
         await page.getByRole('button', { name: 'Netejar', exact: true }).click();
-        await respCarregaReset;
+        logDebug('[beforeEach] Esperant reset DOM: codi buit + grid carregat amb files...');
+        await page.waitForFunction(() => {
+            const codi = document.querySelector('input[name="codi"]');
+            if (!(codi instanceof HTMLInputElement) || codi.value !== '') return false;
+            const grid = document.querySelector('.MuiDataGrid-root');
+            if (!grid || grid.querySelector('.MuiDataGrid-overlay')) return false;
+            return document.querySelectorAll('.MuiDataGrid-row').length > 0;
+        }, { timeout: 15_000 });
+        logDebug('[beforeEach] Netejar OK. Num files: ' + await getRows(page).count());
     });
 
     // ── Disposició ────────────────────────────────────────────────────────────
@@ -369,7 +411,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
         await test.step('filtrar i obrir modal de modificació', async () => {
             logInfo('  -> filtrar i obrir modal de modificació');
-            await aplicarFiltreProcediments(page, CODI_TEST, true);
+            await aplicarFiltreProcediments(page, CODI_TEST, false);
             await expect(getRows(page)).toHaveCount(1);
             const fila = getRows(page).first();
 			await humanDelay(page);
@@ -416,15 +458,14 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
             logInfo('  -> filtrar per codi i nom parcial');
             await page.locator('input[name="codi"]').fill(CODI_TEST);
             await page.locator('input[name="nom"]').fill('modificació');
-            await page.getByRole('button', { name: 'Filtrar', exact: true }).click();
-            const resp = waitApiGet(page, '/metaExpedient');
+            const resp = waitApiGet(page, url => url.includes('/metaExpedient') && !url.includes('/metaExpedient/'));
             await page.getByRole('button', { name: 'Filtrar', exact: true }).click();
             await resp;
         });
 
         await test.step('activar filtre de permís directe i verificar resultat', async () => {
             logInfo('  -> activar filtre de permís directe i verificar resultat');
-            const resp = waitApiGet(page, '/metaExpedient');
+            const resp = waitApiGet(page, url => url.includes('/metaExpedient') && !url.includes('/metaExpedient/'));
             await page.getByRole('button', { name: /amb permis directe/i }).click();
             await resp;
             await expect(getRows(page)).toHaveCount(1);
