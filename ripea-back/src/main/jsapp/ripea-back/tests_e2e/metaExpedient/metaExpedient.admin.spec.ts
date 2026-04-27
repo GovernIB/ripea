@@ -367,7 +367,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
     // ── Disposició ────────────────────────────────────────────────────────────
 
-    test('disposició dels elements en pantalla', async ({ page }) => {
+    test('PROCEDIMENT VISTA', async ({ page }) => {
 
         await test.step('graella visible amb dades', async () => {
             logInfo('  -> graella visible amb dades');
@@ -417,7 +417,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
     // ── Filtre i neteja prèvia ────────────────────────────────────────────────
 
-    test('filtrar per codi i esborrar si el procediment de test ja existeix', async ({ page }) => {
+    test('PROCEDIMENT FILTRE', async ({ page }) => {
 
         await aplicarFiltreProcediments(page, CODI_TEST, false);
 
@@ -446,7 +446,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
     // ── Creació ───────────────────────────────────────────────────────────────
 
-    test('creació d\'un nou procediment', async ({ page }) => {
+    test('PROCEDIMENT CREAR', async ({ page }) => {
 
         await test.step('obrir formulari de nou procediment', async () => {
             logInfo('  -> obrir formulari de nou procediment');
@@ -497,7 +497,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
     // ── Modificació ───────────────────────────────────────────────────────────
 
-    test('modificació d\'un procediment', async ({ page }) => {
+    test('PROCEDIMENT MODIFICAR', async ({ page }) => {
 
         await test.step('filtrar i obrir modal de modificació', async () => {
             logInfo('  -> filtrar i obrir modal de modificació');
@@ -553,7 +553,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
     // ── Verificació de la modificació ─────────────────────────────────────────
 
-    test('verificació de la modificació del procediment', async ({ page }) => {
+    test('PROCEDIMENT VERIFICAR MODIFICACIO', async ({ page }) => {
 
         await test.step('filtrar per codi, nom parcial i permís directe i verificar resultat', async () => {
             logInfo('  -> filtrar per codi i nom parcial');
@@ -578,7 +578,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
     // ── Tipus de Documents ────────────────────────────────────────────────────
 
-    test('accedir a tipus docs, verificar buit i crear dos documents', async ({ page }) => {
+    test('METADOC CREAR', async ({ page }) => {
 
         await anarASubPagina(page, 'metaDocument');
 
@@ -604,7 +604,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
     });
 
-    test('quickfilter, activar i desactivar un tipus de document', async ({ page }) => {
+    test('METADOC ACTIVAR', async ({ page }) => {
 
         await anarASubPagina(page, 'metaDocument');
 
@@ -648,7 +648,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
     });
 
-    test('modificació d\'un tipus de document', async ({ page }) => {
+    test('METADOC MODIFICAR', async ({ page }) => {
 
         await anarASubPagina(page, 'metaDocument');
 
@@ -684,7 +684,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
     });
 
-    test('verificació de la modificació del tipus de document via quickfilter', async ({ page }) => {
+    test('METADOC VERIFICAR MODIFICACIO', async ({ page }) => {
 
         await anarASubPagina(page, 'metaDocument');
 
@@ -696,7 +696,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
     });
 
-    test('marcar per defecte un tipus de document', async ({ page }) => {
+    test('METADOC PER DEFECTE', async ({ page }) => {
 
         await anarASubPagina(page, 'metaDocument');
 
@@ -712,7 +712,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
     });
 
-    test('eliminar un tipus de document', async ({ page }) => {
+    test('METADOC ELIMINAR', async ({ page }) => {
 
         await anarASubPagina(page, 'metaDocument');
 
@@ -734,7 +734,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
     // ── Meta-dades ────────────────────────────────────────────────────────────
 
-    test('accedir a meta-dades, verificar buit i crear dos meta-dades', async ({ page }) => {
+    test('METADADA CREAR', async ({ page }) => {
 
         await anarASubPagina(page, 'metaDada');
 
@@ -760,7 +760,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
     });
 
-    test('quickfilter, activar i desactivar una meta-dada', async ({ page }) => {
+    test('METADADA ACTIVAR', async ({ page }) => {
 
         await anarASubPagina(page, 'metaDada');
 
@@ -804,7 +804,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
     });
 
-    test('modificació d\'una meta-dada', async ({ page }) => {
+    test('METADADA MODIFICAR', async ({ page }) => {
 
         await anarASubPagina(page, 'metaDada');
 
@@ -840,7 +840,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
     });
 
-    test('verificació de la modificació de la meta-dada via quickfilter', async ({ page }) => {
+    test('METADADA VERIFICAR MODIFICAR', async ({ page }) => {
 
         await anarASubPagina(page, 'metaDada');
 
@@ -852,7 +852,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
     });
 
-    test('eliminar una meta-dada', async ({ page }) => {
+    test('METADADA ELIMINAR', async ({ page }) => {
 
         await anarASubPagina(page, 'metaDada');
 
@@ -873,7 +873,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
     // ── Tasques ───────────────────────────────────────────────────────────────
 
-    test('accedir a tasques, verificar buit i crear dues tasques', async ({ page }) => {
+    test('TASCA CREAR', async ({ page }) => {
 
         await anarASubPagina(page, 'tasca');
 
@@ -899,7 +899,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
     });
 
-    test('quickfilter, activar i desactivar una tasca', async ({ page }) => {
+    test('TASCA ACTIVAR', async ({ page }) => {
 
         await anarASubPagina(page, 'tasca');
 
@@ -943,7 +943,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
     });
 
-    test('modificació d\'una tasca', async ({ page }) => {
+    test('TASCA MODIFICAR', async ({ page }) => {
 
         await anarASubPagina(page, 'tasca');
 
@@ -981,7 +981,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
     });
 
-    test('verificació de la modificació de la tasca via quickfilter', async ({ page }) => {
+    test('TASCA VERIFICAR MODIFICACIO', async ({ page }) => {
 
         await anarASubPagina(page, 'tasca');
 
@@ -993,7 +993,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
     });
 
-    test('eliminar una tasca', async ({ page }) => {
+    test('TASCA ELIMINAR', async ({ page }) => {
 
         await anarASubPagina(page, 'tasca');
 
@@ -1014,7 +1014,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
     // ── Estats ────────────────────────────────────────────────────────────────
 
-    test('accedir a estats, verificar buit i crear dos estats', async ({ page }) => {
+    test('ESTAT CREAR', async ({ page }) => {
 
         await anarASubPagina(page, 'estat');
 
@@ -1040,7 +1040,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
     });
 
-    test('modificació d\'un estat', async ({ page }) => {
+    test('ESTAT MODIFICAR', async ({ page }) => {
 
         await anarASubPagina(page, 'estat');
 
@@ -1074,7 +1074,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
     });
 
-    test('verificació de la modificació de l\'estat via grid', async ({ page }) => {
+    test('ESTAT VERIFICAR MODIFICACIO', async ({ page }) => {
 
         await anarASubPagina(page, 'estat');
 
@@ -1085,7 +1085,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
     });
 
-    test('ELIMINAR ESTAT', async ({ page }) => {
+    test('ESTAT ELIMINAR', async ({ page }) => {
 
         await anarASubPagina(page, 'estat');
 
@@ -1104,7 +1104,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
     // ── Grups ─────────────────────────────────────────────────────────────────
 
-    test('VINCULAR GRUP', async ({ page }) => {
+    test('GRUP VINCULAR', async ({ page }) => {
 
         await anarASubPagina(page, 'grup');
 
@@ -1119,7 +1119,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
     });
 
-    test('PER DEFECTE GRUP', async ({ page }) => {
+    test('GRUP PER DEFECTE', async ({ page }) => {
 
         await anarASubPagina(page, 'grup');
 
@@ -1149,7 +1149,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
     });
 
-    test('DESVINCULAR GRUP', async ({ page }) => {
+    test('GRUP DESVINCULAR', async ({ page }) => {
 
         await anarASubPagina(page, 'grup');
 
@@ -1167,7 +1167,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
     // ── Activar / Desactivar ──────────────────────────────────────────────────
 
-    test('activar i desactivar procediment', async ({ page }) => {
+    test('PROCEDIMENT ACTIVAR', async ({ page }) => {
 
         await test.step('filtrar per localitzar el procediment de test', async () => {
             logInfo('  -> filtrar per localitzar el procediment de test');
@@ -1206,6 +1206,28 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
                 await expectSuccessAlert(page);
             });
         }
+
+    });
+
+    // ── Eliminar procediment de proves ────────────────────────────────────────
+
+    test('PROCEDIMENT ELIMINAR', async ({ page }) => {
+
+        await aplicarFiltreProcediments(page, CODI_TEST, false);
+        await expect(getRows(page)).toHaveCount(1);
+
+        await test.step('eliminar el procediment de proves', async () => {
+            logInfo('  -> eliminar el procediment de proves');
+            const fila = getRows(page).first();
+            await humanDelay(page);
+            await fila.locator('button[aria-label="more"]').click();
+            await humanDelay(page);
+            await page.getByRole('menuitem', { name: /esborrar/i }).click();
+            await expect(page.locator('[role="dialog"]')).toBeVisible({ timeout: 5_000 });
+            await humanDelay(page);
+            await page.locator('[role="dialog"]').getByRole('button', { name: /acceptar|confirmar|ok/i }).click();
+            await expectSuccessAlert(page);
+        });
 
     });
 
