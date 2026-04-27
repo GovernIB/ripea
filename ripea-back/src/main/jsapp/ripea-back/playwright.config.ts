@@ -17,8 +17,8 @@ export default defineConfig({
         baseURL: 'http://localhost:8080',
         // Captura screenshot només en cas de fallada
         screenshot: 'only-on-failure',
-        // Vídeo només en cas de fallada
-        video: 'retain-on-failure',
+        // Vídeo de tots els tests (èxit i fallada)
+        video: 'on',
         // Traces per depurar fallades
         trace: 'retain-on-failure',
 		launchOptions: {

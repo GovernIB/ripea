@@ -1288,9 +1288,9 @@ const translationCa = {
                     ok: "Grup '{{data.codi}}' esborrat correctament",
                 },
                 link: {
-                    label: "Víncular grup...",
-                    button: "Víncula grup",
-                    title: "Víncular grup",
+                    label: "Vincular grup...",
+                    button: "Vincula grup",
+                    title: "Vincular grup",
                     ok: "Grup vinculat",
                 },
                 unlink: {
