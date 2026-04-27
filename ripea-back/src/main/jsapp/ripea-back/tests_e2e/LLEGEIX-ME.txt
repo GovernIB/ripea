@@ -104,6 +104,9 @@ Des de  ripea-back/src/main/jsapp/ripea-back/  (amb JBoss arrencat):
   npx playwright test tests_e2e/metaExpedient/metaExpedient.admin.spec.ts
   npm run e2e:headed -- tests_e2e/metaExpedient/metaExpedient.admin.spec.ts
 
+  # Executar un test concret
+  npm run e2e:headed -- tests_e2e/metaExpedient/metaExpedient.admin.spec.ts -g "accedir a grups i vincular un grup"
+
   # Veure l'informe HTML de l'última execució:
   npx playwright show-report tests_e2e/report
 
