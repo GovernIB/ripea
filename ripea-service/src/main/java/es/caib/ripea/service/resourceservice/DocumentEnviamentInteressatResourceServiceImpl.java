@@ -104,25 +104,22 @@ public class DocumentEnviamentInteressatResourceServiceImpl extends BaseMutableR
 		@Override
 		public DownloadableFile generateFile(String code, List<?> data, ReportFileType fileType, OutputStream out) {
 
-			DownloadableFile resultat = null;
-			Long documentEnviamentInteressatId = data.get(0)!=null?(Long)data.get(0):null;
+			DocumentEnviamentInteressatResource.MassiveAction params = (DocumentEnviamentInteressatResource.MassiveAction)data.get(1);
 
 			try {
 				
-				DocumentEnviamentInteressatResource.MassiveAction params = (DocumentEnviamentInteressatResource.MassiveAction)data.get(1);
-				
 				if (params.isMassivo()) {
-					throw new ReportGenerationException(DocumentEnviamentInteressatResource.class, documentEnviamentInteressatId, code, "documentEnviamentInteressat.certificat.massive.reject");
+					throw new ReportGenerationException(DocumentEnviamentInteressatResource.class, params.toString(), code, "documentEnviamentInteressat.certificat.massive.reject");
 				} else {
                     return new DownloadableFile(
-	            			"certificacio_"+documentEnviamentInteressatId+".pdf",
+	            			"certificacio_"+params.getIds().get(0)+".pdf",
 	            			"application/pdf",
-	            			pluginHelper.notificacioConsultarIDescarregarCertificacio(documentEnviamentInteressatId));
+	            			pluginHelper.notificacioConsultarIDescarregarCertificacio(params.getIds().get(0)));
 				}
 				
 			} catch (Exception e) {
-				excepcioLogHelper.addExcepcio("/notificacioInteressat/"+documentEnviamentInteressatId+"/CertificatReportGenerator", e);
-				throw new ReportGenerationException(getResourceClass(), documentEnviamentInteressatId, code, "documentEnviamentInteressat.certificat.reject");
+				excepcioLogHelper.addExcepcio("/notificacioInteressat/"+params.toString()+"/CertificatReportGenerator", e);
+				throw new ReportGenerationException(getResourceClass(), params.toString(), code, "documentEnviamentInteressat.certificat.reject");
 			}
 		}
 		

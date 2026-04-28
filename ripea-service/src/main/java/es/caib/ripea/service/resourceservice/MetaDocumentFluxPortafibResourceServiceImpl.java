@@ -80,7 +80,7 @@ public class MetaDocumentFluxPortafibResourceServiceImpl extends BaseMutableReso
                 Authentication auth = SecurityContextHolder.getContext().getAuthentication();
                 String idioma = usuariRepository.getOne(auth.getName()).getIdioma();
                 String url = pluginHelper.portafirmesRecuperarUrlPlantilla(
-                        String.valueOf(entity.getId()),
+                        entity.getPortafirmesFluxId(),
                         idioma!=null?idioma:"ca",
                         urlReturn,
                         true);

@@ -38,10 +38,10 @@ const springFilterBuilder = (data:any) => {
         builder.betweenDates("enviatData", data?.dataEnviamentInici, data?.dataEnviamentFi),
         builder.exists(
             builder.or(
-                builder.like("documentInteressats.interessats.documentNum", data.interessat),
-                builder.like(builder.concat("documentInteressats.interessats.nom", "documentInteressats.interessats.llinatge1", "documentInteressats.interessats.llinatge2"), data.interessat),
-                builder.like("documentInteressats.interessats.raoSocial", data.interessat),
-                builder.like("documentInteressats.interessats.organNom", data.interessat)
+                builder.like("documentInteressats.interessat.documentNum", data.interessat),
+                builder.like(builder.concat("documentInteressats.interessat.nom", "documentInteressats.interessat.llinatge1", "documentInteressats.interessat.llinatge2"), data.interessat),
+                builder.like("documentInteressats.interessat.raoSocial", data.interessat),
+                builder.like("documentInteressats.interessat.organNom", data.interessat)
             )
         ),
         builder.eq('expedient.id', data?.expedient?.id),
