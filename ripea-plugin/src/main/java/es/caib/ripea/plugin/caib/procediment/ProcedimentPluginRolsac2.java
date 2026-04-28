@@ -1,6 +1,5 @@
 package es.caib.ripea.plugin.caib.procediment;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -12,11 +11,8 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 
 import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
@@ -25,21 +21,16 @@ import es.caib.ripea.plugin.procediment.ProcedimentPlugin;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.ProcedimentDto;
 
-/**
- * Implementació del plugin de consulta de procediments emprant ROLSAC.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
-public class ProcedimentPluginRolsac extends RipeaAbstractPluginProperties implements ProcedimentPlugin {
+public class ProcedimentPluginRolsac2 extends RipeaAbstractPluginProperties implements ProcedimentPlugin {
 
 	private static Map<String, String> unitatsAdministratives = new HashMap<String, String>();
 	private Client jerseyClient;
 	private ObjectMapper mapper;
 
-	public ProcedimentPluginRolsac() {
+	public ProcedimentPluginRolsac2() {
 		super();
 	}
-	public ProcedimentPluginRolsac(String propertyKeyBase, Properties properties) {
+	public ProcedimentPluginRolsac2(String propertyKeyBase, Properties properties) {
 		super(propertyKeyBase, properties);
 	}
 	
@@ -49,12 +40,41 @@ public class ProcedimentPluginRolsac extends RipeaAbstractPluginProperties imple
 		logger.debug("Consulta del procediment pel codi SIA i codiDir3 (codiSia=" + codiSia + "codiDir3=" + codiDir3 + ")");
 		
 		try {
-
 			String url = getServiceUrl();
 			url += (url.charAt(url.length()-1) != '/' ? "/" : "") + "procedimientos";
-			String params = "lang=ca&filtro={\"codigoUADir3\":\"" + codiDir3 + "\",\"codigoSia\":\"" + codiSia + "\",\"estadoSia\":\"A\",\"buscarEnDescendientesUA\":\"1\"}";
-			return findProcedimentsRolsac(url, params, codiSia);
+
+			Rolsac2ProcedimentFilterRequest body = Rolsac2ProcedimentFilterRequest.builder()
+					.codigoSia(codiSia)
+					.codigoUADir3(codiDir3)
+					.estadoSia("A")
+					.buscarEnDescendientesUA(1)
+					.activo(1)
+					.filtroPaginacion(new Rolsac2FiltrePaginacio(0, 1))
+					.build();
 			
+			logger.debug("Enviant petició REST a ROLSAC2 (" +
+					"url=" + url + ", " +
+					"tipus=application/json, " +
+					"body=" + body + ")");
+			ClientResponse clientResponse = getJerseyClient().
+					resource(url).
+					accept("application/json").
+					type("application/json").
+					post(ClientResponse.class, body);
+			Rolsac2ProcedimientosResponse response = clientResponse.getEntity(Rolsac2ProcedimientosResponse.class);
+			
+			if (response != null && response.getStatus().equals("200")) {
+				if (response.getItems() != null && !response.getItems().isEmpty()) {
+					return toProcedimentDto2(response.getItems().get(0));
+				} else { 
+					return null;
+				}
+			} else if (response != null && response.getStatus().equals("400") && Utils.isEmpty(response.getItems()) && es.caib.ripea.service.intf.utils.Utils.equals(response.getMensaje(), "La petición recibida es incorrecta(parametro: filtro // Tipo esperado: filtro)")) {
+				return null;
+			} else {
+				throw new SistemaExternException(
+						"No s'han pogut consultar el procediment de ROLSAC2 (codiSia=" + body.getCodigoSia() + "). Resposta rebuda amb el codi " + response.getStatus());
+			}		
 		} catch (Exception ex) {
 			throw new SistemaExternException("No s'han pogut consultar el procediment de ROLSAC (codiSia=" + codiSia + ")",ex);
 		}
@@ -71,26 +91,22 @@ public class ProcedimentPluginRolsac extends RipeaAbstractPluginProperties imple
 			String url = getServiceUrl();
 			url += (url.charAt(url.length()-1) != '/' ? "/" : "") + "unidades_administrativas/" + codi;
 			
-			String json = getJerseyClient().resource(url).post(String.class);
-			
-			logger.debug("Response get unitat administrativa del rolsac (codi=" + codi + "): " + json);
-			
-			ObjectMapper mapper  = new ObjectMapper();
-			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-			RespostaUnitatAdministrativa resposta = mapper.readValue(json, RespostaUnitatAdministrativa.class);
 			String unitatCodi = null;
-			if (resposta.getResultado() != null && !resposta.getResultado().isEmpty()) {
-				UnitatAdministrativa unitat = resposta.getResultado().get(0);
+			
+			Rolsac2UAResponse resposta = getJerseyClient().resource(url).post(Rolsac2UAResponse.class);
+			
+			logger.debug("Response get unitat administrativa del ROLSAC2 (codi=" + codi + "): " + resposta.toString());
+			
+			if (resposta.getItems() != null && !resposta.getItems().isEmpty()) {
+				Rolsac2UnitatAdministrativa unitat = resposta.getItems().get(0);
 				if (unitat.getCodigoDIR3() != null && !unitat.getCodigoDIR3().isEmpty()) {
 					unitatCodi = unitat.getCodigoDIR3();
-				} else if (unitat.getPadre() != null && unitat.getPadre().getCodigo() != null && !unitat.getPadre().getCodigo().isEmpty()){
-					unitatCodi = getUnitatAdministrativa(unitat.getPadre().getCodigo());
+				} else if (unitat.getLink_padre()!=null) {
+					unitatCodi = getUnitatAdministrativa(unitat.getLink_padre().getCodigo());
 				}
 			}
-			if (unitatCodi!=null) {
-				unitatsAdministratives.put(codi, unitatCodi);
-			}
-			return unitatCodi;
+			unitatsAdministratives.put(codi, unitatCodi);
+			return unitatCodi;				
 			
 		} catch (Exception ex) {
 			throw new SistemaExternException("No s'ha pogut consultar la UA via REST a ROLSAC",ex);
@@ -139,45 +155,29 @@ public class ProcedimentPluginRolsac extends RipeaAbstractPluginProperties imple
 		return jerseyClient;
 	}
 
-	private ProcedimentDto findProcedimentsRolsac(String url, String body, String codiSia)
-			throws UniformInterfaceException, ClientHandlerException, IOException, SistemaExternException {
-		
-		logger.debug("Enviant petició a ROLSAC (" +
-				"url=" + url + ", " +
-				"tipus=application/json, " +
-				"body=" + body + ")");
-		
-		ClientResponse clientResponse = getJerseyClient().
-				resource(url).
-				accept("application/json").
-				type("application/json").
-				post(ClientResponse.class, body);
-		String json = clientResponse.getEntity(String.class);
-		
-		System.out.println("Response find procediment rolsac: " + json);
-		ProcedimientosResponse response = mapper.readValue(
-				json,
-				TypeFactory.defaultInstance().constructType(ProcedimientosResponse.class));
-		
-		if (response != null && response.getStatus().equals("200")) {
-			if (response.getResultado() != null && !response.getResultado().isEmpty()) {
-				for (Procediment procediment: response.getResultado()) {
-//					logger.info("Codi sia: " + procediment.getCodigoSIA());
-					return toProcedimentDto(procediment);
-				}
-				
-				return toProcedimentDto(response.getResultado().get(0));
-			} else { 
-				return null;
+	private ProcedimentDto toProcedimentDto2(Rolsac2Procediment procediment) throws  SistemaExternException {
+		ProcedimentDto dto = new ProcedimentDto();
+		if (procediment != null) {
+			dto.setCodi(String.valueOf(procediment.getCodigo()));
+			dto.setCodiSia(procediment.getCodigoSIA()!=null?procediment.getCodigoSIA().toString():null);
+			dto.setNom(procediment.getNombreProcedimientoWorkFlow());
+			String resum = procediment.getObjeto()!=null?procediment.getObjeto():"";
+			resum += procediment.getDestinatarios()!=null?". Dirigit a " +procediment.getDestinatarios()+".":"";
+			dto.setResum(es.caib.ripea.service.intf.utils.Utils.abbreviate(resum, 1024));
+			String codiUnitatAdministrativa = null;
+			if (procediment.getLinkUnidadAdministrativaResponsable() != null) {
+				codiUnitatAdministrativa = procediment.getLinkUnidadAdministrativaResponsable().getCodigo();
+			} else if (procediment.getLinkUnidadAdministrativaCompetente() != null) {
+				codiUnitatAdministrativa = procediment.getLinkUnidadAdministrativaCompetente().getCodigo();
+			} else if (procediment.getLinkUnidadAdministrativaInstructora() != null) {
+				codiUnitatAdministrativa = procediment.getLinkUnidadAdministrativaInstructora().getCodigo();
 			}
-			
-		} else if (response != null && response.getStatus().equals("400") && Utils.isEmpty(response.getResultado()) && es.caib.ripea.service.intf.utils.Utils.equals(response.getMensaje(), "La petición recibida es incorrecta(parametro: filtro // Tipo esperado: filtro)")) {
-			return null;
-		} else {
-			throw new SistemaExternException(
-					"No s'han pogut consultar el procediment de ROLSAC (" +
-					"codiSia=" + codiSia + "). Resposta rebuda amb el codi " + response.getStatus());
+			if (codiUnitatAdministrativa!=null) {
+				dto.setUnitatOrganitzativaCodi(getUnitatAdministrativa(codiUnitatAdministrativa));
+			}
+			dto.setComu(procediment.getComun()>0?true:false);
 		}
+		return dto;
 	}
 
 	private String getServiceUrl() {
