@@ -1393,7 +1393,7 @@ const translationEn = {
                 },
                 canviEstat: {
                     label: "Change review status...",
-                    button: "Change review status",
+                    button: "Change status",
                     title: "Change review status",
                     ok: "Status changed successfully",
                 },

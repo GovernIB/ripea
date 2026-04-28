@@ -80,7 +80,12 @@ const AnotacionsGrid = () => {
             headerName: t('page.registre.grid.interessats'),
             sortable: false,
             flex: 0.5,
-            valueFormatter: (value: any) => value.map((i:any)=>i?.description).join(", \n")
+            valueFormatter: (value: any) => value.map((i:any)=>i?.description).join(", \n"),
+            renderCell: (params: any)=> (
+                <Box sx={{ whiteSpace: 'pre-line' }} title={params?.formattedValue}>
+                    {params?.formattedValue}
+                </Box>
+            ),
         },
         {
             field: 'grup',
@@ -98,7 +103,7 @@ const AnotacionsGrid = () => {
             flex: 0.5,
             valueFormatter: (value: any) => formatDate(value)
         },
-    ], []);
+    ], [t]);
 
     const refresh = () => {
         apiRef?.current?.refresh?.();

@@ -7,6 +7,16 @@ const userkey :string = 'usuario';
 const entitatKey = 'entitat';
 const organKey = 'organ';
 
+export enum rols {
+    SUPER = 'IPA_SUPER',
+    ADMIN = 'IPA_ADMIN',
+    ADMIN_LECTURA = 'IPA_ADMIN_LECTURA',
+    ORGAN_ADMIN = 'IPA_ORGAN_ADMIN',
+    DISSENY = 'IPA_DISSENY',
+    REVISIO = 'IPA_REVISIO',
+    tothom = 'tothom',
+}
+
 let alreadyRequested = false;
 export const useUserSession = () => {
     axios.defaults.withCredentials = true;
@@ -29,11 +39,7 @@ export const useUserSession = () => {
         axios.post(apiUrl + 'usuari/actual/changeInfo', value)
             .then((response) => {
                 save(response.data);
-                if (response.data?.rolActual == 'IPA_SUPER') {
-                    navigate?.('/integracio')
-                } else {
-                    navigate?.('/expedient')
-                }
+                navigate?.('/')
             })
             .catch((error) => {
                 save(null);
@@ -67,13 +73,13 @@ export const useUserSession = () => {
     }, []);
 
     const rol = useMemo(() => ({
-        isSupAdmin: value?.rolActual == 'IPA_SUPER',
-        isAdmin: value?.rolActual == 'IPA_ADMIN',
-        isAdminLectura: value?.rolActual == 'IPA_ADMIN_LECTURA',
-        isOrganAdmin: value?.rolActual == 'IPA_ORGAN_ADMIN',
-        isDissenyOrgan: value?.rolActual == 'IPA_DISSENY',
-        isRevisor: value?.rolActual == 'IPA_REVISIO',
-        isUser: value?.rolActual == 'tothom',
+        isSupAdmin: value?.rolActual == rols.SUPER,
+        isAdmin: value?.rolActual == rols.ADMIN,
+        isAdminLectura: value?.rolActual == rols.ADMIN_LECTURA,
+        isOrganAdmin: value?.rolActual == rols.ORGAN_ADMIN,
+        isDissenyOrgan: value?.rolActual == rols.DISSENY,
+        isRevisor: value?.rolActual == rols.REVISIO,
+        isUser: value?.rolActual == rols.tothom,
     }), [value])
 
     return {

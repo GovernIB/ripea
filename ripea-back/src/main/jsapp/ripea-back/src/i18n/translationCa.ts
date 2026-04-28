@@ -1392,9 +1392,9 @@ const translationCa = {
                     revisat: "Aquest procediment no es pot modificar ja que es troba en estat revisat",
                 },
                 canviEstat: {
-                    label: "Canviar l'estat de revisó...",
+                    label: "Canviar l'estat de revisió...",
                     button: "Canvia estat",
-                    title: "Canviar estat de revisó",
+                    title: "Canviar estat de revisió",
                     ok: "Estat canviat correctament",
                 },
                 expedient: {

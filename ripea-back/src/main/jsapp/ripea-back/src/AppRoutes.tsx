@@ -20,7 +20,6 @@ import ConsultesPinbalGrid from "./pages/user/consultes/ConsultesPinbalGrid.tsx"
 import AssignacioTasquesGrid from "./pages/user/consultes/AssignacioTasquesGrid.tsx";
 import ExpedientsPendentsGrid from "./pages/user/consultes/ExpedientsPendentsGrid.tsx";
 import AnotacionsComunicadesGrid from "./pages/user/consultes/AnotacionsComunicadesGrid.tsx";
-import RevisioMetaExpedientGrid from "./pages/user/consultes/RevisioMetaExpedientGrid.tsx";
 import ContingutGrid from "./pages/user/consultes/ContingutGrid.tsx";
 import MetaExpedientGrid from "./pages/metaExpedient/MetaExpedientGrid.tsx";
 import GrupGrid from "./pages/user/configurar/GrupGrid.tsx";
@@ -34,7 +33,7 @@ import AdjuntarAnnexosPendentsGrid from "./pages/user/accionsMassives/AdjuntarAn
 import DominiGrid from "./pages/user/configurar/DominiGrid.tsx";
 import MetaDocumentGrid from "./pages/metaDocument/MetaDocumentGrid.tsx";
 import MetaDadaGrid from "./pages/metaExpedient/details/elements/MetaDadaGrid.tsx";
-import {useUserSession} from "./components/Session.tsx";
+import {rols, useUserSession} from "./components/Session.tsx";
 import {UrlInstruccioGrid} from "./pages/user/configurar/UrlInstruccioGrid.tsx";
 import {MetaExpedientElements} from "./pages/metaExpedient/details/MetaExpedientElements.tsx";
 import MetaExpedientTascaValidacioGrid
@@ -60,16 +59,29 @@ const ProtectedRoute = ({ allowedRoles = [], params = [] }: any) => {
     return <Outlet />;
 };
 
+const HomeRedirect = () => {
+    const {value: user} = useUserSession();
+
+    switch (user?.rolActual) {
+        case rols.SUPER:
+            return <Navigate to="/integracio" replace />;
+        case rols.REVISIO:
+            return <Navigate to="/metaExpedient" replace />;
+        default:
+            return <Navigate to="/expedient" replace />;
+    }
+};
+
 const AppRoutes: React.FC = () => {
     return <Routes>
-        <Route path="/" element={<Navigate to="/expedient" />} />
+        <Route path="/" element={<HomeRedirect />} />
         <Route path="expedient" element={<ExpedientGrid />}/>
         <Route path="contingut/:id" element={<Expedient />} />
         <Route path="contingut/:id/tasca/:tascaId" element={<Tasca />} />
         <Route path="expedientPeticio" element={<AnotacionsGrid />} />
         <Route path="usuariTasca" element={<TasquesGrid />} />
 
-        <Route element={<ProtectedRoute allowedRoles={['IPA_SUPER']} />}>
+        <Route element={<ProtectedRoute allowedRoles={[rols.SUPER]} />}>
             <Route path={"entitat"} element={<EntitatGrid />} />
             <Route path={"entitat/:id/permis"} element={<PermisEntitatGrid/>} />
             <Route path={"entitat/:id/configurar"} element={<PropietatsByEntitat/>} />
@@ -81,7 +93,7 @@ const AppRoutes: React.FC = () => {
         </Route>
 
         {/* Accions massives */}
-        <Route element={<ProtectedRoute allowedRoles={['IPA_ADMIN', 'IPA_ORGAN_ADMIN', 'tothom']} />}>
+        <Route element={<ProtectedRoute allowedRoles={[rols.ADMIN, rols.ORGAN_ADMIN, rols.tothom]} />}>
             <Route path="massiu">
                 <Route path={"portafirmes"} element={<EnviarPortafirmesGrid />} />
                 <Route path={"firmasimpleweb"} element={<FirmaNavegadorGrid />} />
@@ -97,32 +109,32 @@ const AppRoutes: React.FC = () => {
         </Route>
 
         {/* Consultes */}
-        <Route element={<ProtectedRoute allowedRoles={['IPA_ADMIN']} />}>
+        <Route element={<ProtectedRoute allowedRoles={[rols.ADMIN]} />}>
             <Route path="contingutAdmin" element={<ContingutGrid/>} />
-            <Route path="metaExpedientRevisio" element={<RevisioMetaExpedientGrid />} />
+            {/*<Route path="metaExpedientRevisio" element={<RevisioMetaExpedientGrid />} />*/}
             <Route path="seguimentNotificacions" element={<RemesesNotibGrid />} />
             <Route path="seguimentPinbal" element={<ConsultesPinbalGrid />} />
             <Route path="seguimentTasques" element={<AssignacioTasquesGrid />} />
             <Route path="seguimentExpedientsPendents" element={<ExpedientsPendentsGrid />} />
             <Route path="expedientPeticioComunicades" element={<AnotacionsComunicadesGrid/>} />
         </Route>
-        <Route element={<ProtectedRoute allowedRoles={['IPA_ADMIN', 'tothom']} />}>
+        <Route element={<ProtectedRoute allowedRoles={[rols.ADMIN, rols.tothom]} />}>
             <Route path="seguimentPortafirmes" element={<DocumentEnviatsPortafirmesGrid />} />
         </Route>
 
         {/* Configurar */}
-        <Route element={<ProtectedRoute allowedRoles={['IPA_ADMIN', 'IPA_ADMIN_LECTURA', 'IPA_ORGAN_ADMIN', 'IPA_DISSENY']} />}>
+        <Route element={<ProtectedRoute allowedRoles={[rols.ADMIN, rols.ADMIN_LECTURA, rols.ORGAN_ADMIN, rols.DISSENY, rols.REVISIO]} />}>
             <Route path="metaExpedient" element={<MetaExpedientGrid/>} />
             <Route path="metaExpedient/:id/permis" element={<PermisMetaExpedientGrid/>} />
             <Route path="metaExpedient/:id/:element" element={<MetaExpedientElements/>} />
             <Route path="expedientEstat/:id" element={<MetaExpedientElements/>} />
             <Route path="metaExpedient/:id/tasca/:tascaId/validacio" element={<MetaExpedientTascaValidacioGrid/>} />
         </Route>
-        <Route element={<ProtectedRoute allowedRoles={['IPA_ADMIN', 'IPA_ORGAN_ADMIN', 'IPA_DISSENY']} />}>
+        <Route element={<ProtectedRoute allowedRoles={[rols.ADMIN, rols.ORGAN_ADMIN, rols.DISSENY]} />}>
             <Route path="grup" element={<GrupGrid/>} />
             <Route path="grupPermis/:id/permis" element={<PermisGrupGrid/>} />
         </Route>
-        <Route element={<ProtectedRoute allowedRoles={['IPA_ADMIN']} />}>
+        <Route element={<ProtectedRoute allowedRoles={[rols.ADMIN]} />}>
             <Route path="tipusDocumental" element={<TipusDocumentalGrid/>} />
             <Route path="organgestor" element={<OrganGestorGrid/>} />
             <Route path="organgestor/:id/permis" element={<PermisOrganGestorGrid/>} />
