@@ -7,7 +7,7 @@ const translationEs = {
         update: "Modificar",
         actualize: "Actualiza",
         save: "Guarda",
-        delete: "Borrar",
+        delete: "Eliminar",
         accepta: "Acepta",
         rebutja: "Rechaza",
         action: "Acciones",
@@ -818,7 +818,7 @@ const translationEs = {
                     ok: "El documento {{data.nom}} se ha modificado correctamente"
                 },
                 delete: {
-                    label: "Borrar",
+                    label: "Eliminar",
                     check: "¿Está seguro de que quiere borrar este contenido?",
                     description: "Una vez borrado no se podrá recuperar. Si contenia firmas en curso, seran canceladas.",
                     ok: "El documento {{data.nom}} se ha eliminado correctamente"

@@ -78,9 +78,9 @@ const anarATipusDocs = async (page: Page): Promise<Page> => {
     await filtrarPerCodi(page, CODI_TEST);
     await expect(getRows(page)).toHaveCount(1);
     const fila = getRows(page).first();
-    await fila.getByRole('button', { name: /elements/i }).click();
+    await fila.getByRole('button', { name: /elements|elementos/i }).click();
     const tipusDocsPagePromise = page.context().waitForEvent('page');
-    await fila.getByRole('link', { name: /tipus docs/i }).click();
+    await fila.getByRole('link', { name: /tipus docs|tipos docs/i }).click();
     const tipusDocsPage = await tipusDocsPagePromise;
     await tipusDocsPage.waitForLoadState('load');
     await expect(tipusDocsPage.locator('#metadocuments_processing')).toBeHidden({ timeout: 10_000 });
@@ -125,9 +125,9 @@ const anarAMetaDades = async (page: Page): Promise<Page> => {
     await filtrarPerCodi(page, CODI_TEST);
     await expect(getRows(page)).toHaveCount(1);
     const fila = getRows(page).first();
-    await fila.getByRole('button', { name: /elements/i }).click();
+    await fila.getByRole('button', { name: /elements|elementos/i }).click();
     const metaDadesPagePromise = page.context().waitForEvent('page');
-    await fila.getByRole('link', { name: /meta-dades/i }).click();
+    await fila.getByRole('link', { name: /meta-dades|meta-datos/i }).click();
     const metaDadesPage = await metaDadesPagePromise;
     await metaDadesPage.waitForLoadState('load');
     await expect(metaDadesPage.locator('#metadades_processing')).toBeHidden({ timeout: 10_000 });
@@ -176,9 +176,9 @@ const anarATasques = async (page: Page): Promise<Page> => {
     await filtrarPerCodi(page, CODI_TEST);
     await expect(getRows(page)).toHaveCount(1);
     const fila = getRows(page).first();
-    await fila.getByRole('button', { name: /elements/i }).click();
+    await fila.getByRole('button', { name: /elements|elementos/i }).click();
     const tascaPagePromise = page.context().waitForEvent('page');
-    await fila.getByRole('link', { name: /tasques/i }).click();
+    await fila.getByRole('link', { name: /tasques|tareas/i }).click();
     const tascaPage = await tascaPagePromise;
     await tascaPage.waitForLoadState('load');
     await expect(tascaPage.locator('#metadades_processing')).toBeHidden({ timeout: 10_000 });
@@ -232,9 +232,9 @@ const anarAEstats = async (page: Page): Promise<Page> => {
     await filtrarPerCodi(page, CODI_TEST);
     await expect(getRows(page)).toHaveCount(1);
     const fila = getRows(page).first();
-    await fila.getByRole('button', { name: /elements/i }).click();
+    await fila.getByRole('button', { name: /elements|elementos/i }).click();
     const estatPagePromise = page.context().waitForEvent('page');
-    await fila.getByRole('link', { name: /estats/i }).click();
+    await fila.getByRole('link', { name: /estats|estados/i }).click();
     const estatPage = await estatPagePromise;
     await estatPage.waitForLoadState('load');
     await expect(estatPage.locator('#estats_processing')).toBeHidden({ timeout: 10_000 });
@@ -243,7 +243,7 @@ const anarAEstats = async (page: Page): Promise<Page> => {
 
 const crearEstat = async (estatPage: Page, codi: string, nom: string) => {
     // El botó "Nou estat" és renderitzat pel jsrender template #botonsTemplate via webutil.datatable.js
-    await estatPage.getByRole('link', { name: /nou estat/i }).click();
+    await estatPage.getByRole('link', { name: /nou estat|nuevo estado/i }).click();
     await expect(estatPage.locator('.modal.in')).toBeVisible();
     const frame = estatPage.locator('.modal.in').frameLocator('.modal-body iframe');
     await expect(frame.locator('input[name="codi"]')).toBeVisible();
@@ -272,9 +272,9 @@ const anarAGrups = async (page: Page): Promise<Page> => {
     await filtrarPerCodi(page, CODI_TEST);
     await expect(getRows(page)).toHaveCount(1);
     const fila = getRows(page).first();
-    await fila.getByRole('button', { name: /elements/i }).click();
+    await fila.getByRole('button', { name: /elements|elementos/i }).click();
     const grupPagePromise = page.context().waitForEvent('page');
-    await fila.getByRole('link', { name: /grups/i }).click();
+    await fila.getByRole('link', { name: /grups|grupos/i }).click();
     const grupPage = await grupPagePromise;
     await grupPage.waitForLoadState('load');
     await expect(grupPage.locator('#metadades_processing')).toBeHidden({ timeout: 10_000 });
@@ -335,8 +335,8 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
         await test.step('columnes esperades visibles', async () => {
             console.log('  -> columnes esperades visibles');
             const headers = page.locator('#metaexpedients thead th');
-            await expect(headers.filter({ hasText: /codi/i }).first()).toBeVisible();              // Codi intern / Código interno
-            await expect(headers.filter({ hasText: /classificaci/i }).first()).toBeVisible();      // Classificació / Clasificación
+            await expect(headers.filter({ hasText: /codi|c.digo/i }).first()).toBeVisible();         // Codi intern / Código interno
+            await expect(headers.filter({ hasText: /class?ific/i }).first()).toBeVisible();        // Classificació / Clasificación
             await expect(headers.filter({ hasText: /\bnom\b|nombre/i }).first()).toBeVisible();    // Nom / Nombre
             await expect(headers.filter({ hasText: /documental/i }).first()).toBeVisible();        // Sèrie documental / Serie documental
             await expect(headers.filter({ hasText: /gestor/i }).first()).toBeVisible();            // Òrgan gestor / Órgano gestor
@@ -345,7 +345,7 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
 
         await test.step('botons d\'acció per a IPA_ADMIN visibles', async () => {
             console.log('  -> botons d\'acció per a IPA_ADMIN visibles');
-            await expect(page.getByRole('link', { name: /nou/i })).toBeVisible();
+            await expect(page.getByRole('link', { name: /nou|nuevo/i })).toBeVisible();
             await expect(page.getByRole('button', { name: /importa/i })).toBeVisible();
         });
 
@@ -385,8 +385,8 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
         const fila = getRows(page).first();
         page.on('dialog', dialog => dialog.accept());
         const dt = waitDatatable(page);
-        await fila.getByRole('button', { name: /accions/i }).click();
-        await fila.getByRole('link', { name: /esborrar/i }).click();
+        await fila.getByRole('button', { name: /accions|acciones/i }).click();
+        await fila.getByRole('link', { name: /esborrar|eliminar|borrar/i }).click();
         await dt;
         await expect(page.locator('#metaexpedients_processing')).toBeHidden();
         await expect(getRows(page)).toHaveCount(0);
@@ -398,7 +398,7 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
 
         await test.step('obrir formulari de nou procediment', async () => {
             console.log('  -> obrir formulari de nou procediment');
-            await page.getByRole('link', { name: /nou/i }).click();
+            await page.getByRole('link', { name: /nou|nuevo/i }).click();
             // S'usa .modal.in per evitar conflicte amb el modal ocult #modal-copied.
             await expect(page.locator('.modal.in')).toBeVisible();
             // Esperar que l'iframe hagi carregat el seu contingut (codi intern visible)
@@ -482,7 +482,7 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
             await filtrarPerCodi(page, CODI_TEST);
             await expect(getRows(page)).toHaveCount(1);
             const fila = getRows(page).first();
-            await fila.getByRole('button', { name: /accions/i }).click();
+            await fila.getByRole('button', { name: /accions|acciones/i }).click();
             await fila.getByRole('link', { name: /modificar/i }).click();
             await expect(page.locator('.modal.in')).toBeVisible();
             const frame = page.locator('.modal.in').frameLocator('.modal-body iframe');
@@ -592,7 +592,7 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
 
         await test.step('obrir menú accions', async () => {
             console.log('  -> obrir menú accions');
-            await fila.getByRole('button', { name: /accions/i }).click();
+            await fila.getByRole('button', { name: /accions|acciones/i }).click();
         });
 
         const estaActiu = await fila.getByRole('link', { name: /desactivar/i }).isVisible();
@@ -608,7 +608,7 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
 
             await test.step('activar el document', async () => {
                 console.log('  -> activar el document');
-                await fila.getByRole('button', { name: /accions/i }).click();
+                await fila.getByRole('button', { name: /accions|acciones/i }).click();
                 const dt = waitDatatableDocs(tipusDocsPage);
                 await fila.getByRole('link', { name: /activar/i }).click();
                 await dt;
@@ -625,7 +625,7 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
 
             await test.step('desactivar el document', async () => {
                 console.log('  -> desactivar el document');
-                await fila.getByRole('button', { name: /accions/i }).click();
+                await fila.getByRole('button', { name: /accions|acciones/i }).click();
                 const dt = waitDatatableDocs(tipusDocsPage);
                 await fila.getByRole('link', { name: /desactivar/i }).click();
                 await dt;
@@ -645,7 +645,7 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
             await quickFilterDocs(tipusDocsPage, CODI_DOC1);
             await expect(getDocRows(tipusDocsPage)).toHaveCount(1);
             const fila = getDocRows(tipusDocsPage).first();
-            await fila.getByRole('button', { name: /accions/i }).click();
+            await fila.getByRole('button', { name: /accions|acciones/i }).click();
             await fila.getByRole('link', { name: /modificar/i }).click();
             await expect(tipusDocsPage.locator('.modal.in')).toBeVisible();
             const frame = tipusDocsPage.locator('.modal.in').frameLocator('.modal-body iframe');
@@ -695,9 +695,9 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
             await quickFilterDocs(tipusDocsPage, CODI_DOC1);
             await expect(getDocRows(tipusDocsPage)).toHaveCount(1);
             const fila = getDocRows(tipusDocsPage).first();
-            await fila.getByRole('button', { name: /accions/i }).click();
+            await fila.getByRole('button', { name: /accions|acciones/i }).click();
             const dt = waitDatatableDocs(tipusDocsPage);
-            await fila.getByRole('link', { name: /marcar per defecte/i }).click();
+            await fila.getByRole('link', { name: /marcar (per defecte|por defecto)/i }).click();
             await dt;
             await expectSuccessAlert(tipusDocsPage);
         });
@@ -715,9 +715,9 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
             await expect(getDocRows(tipusDocsPage)).toHaveCount(1);
             const fila = getDocRows(tipusDocsPage).first();
             tipusDocsPage.on('dialog', dialog => dialog.accept());
-            await fila.getByRole('button', { name: /accions/i }).click();
+            await fila.getByRole('button', { name: /accions|acciones/i }).click();
             const dt = waitDatatableDocs(tipusDocsPage);
-            await fila.getByRole('link', { name: /esborrar/i }).click();
+            await fila.getByRole('link', { name: /esborrar|eliminar|borrar/i }).click();
             await dt;
             await expectSuccessAlert(tipusDocsPage);
             await expect(getDocRows(tipusDocsPage)).toHaveCount(0);
@@ -769,7 +769,7 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
 
         await test.step('obrir menú accions', async () => {
             console.log('  -> obrir menú accions');
-            await fila.getByRole('button', { name: /accions/i }).click();
+            await fila.getByRole('button', { name: /accions|acciones/i }).click();
         });
 
         const estaActiva = await fila.getByRole('link', { name: /desactivar/i }).isVisible();
@@ -785,7 +785,7 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
 
             await test.step('activar la meta-dada', async () => {
                 console.log('  -> activar la meta-dada');
-                await fila.getByRole('button', { name: /accions/i }).click();
+                await fila.getByRole('button', { name: /accions|acciones/i }).click();
                 const dt = waitDatatableMeta(metaDadesPage);
                 await fila.getByRole('link', { name: /activar/i }).click();
                 await dt;
@@ -802,7 +802,7 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
 
             await test.step('desactivar la meta-dada', async () => {
                 console.log('  -> desactivar la meta-dada');
-                await fila.getByRole('button', { name: /accions/i }).click();
+                await fila.getByRole('button', { name: /accions|acciones/i }).click();
                 const dt = waitDatatableMeta(metaDadesPage);
                 await fila.getByRole('link', { name: /desactivar/i }).click();
                 await dt;
@@ -822,7 +822,7 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
             await quickFilterMeta(metaDadesPage, CODI_META1);
             await expect(getMetaRows(metaDadesPage)).toHaveCount(1);
             const fila = getMetaRows(metaDadesPage).first();
-            await fila.getByRole('button', { name: /accions/i }).click();
+            await fila.getByRole('button', { name: /accions|acciones/i }).click();
             await fila.getByRole('link', { name: /modificar/i }).click();
             await expect(metaDadesPage.locator('.modal.in')).toBeVisible();
             const frame = metaDadesPage.locator('.modal.in').frameLocator('.modal-body iframe');
@@ -873,9 +873,9 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
             await expect(getMetaRows(metaDadesPage)).toHaveCount(1);
             const fila = getMetaRows(metaDadesPage).first();
             metaDadesPage.on('dialog', dialog => dialog.accept());
-            await fila.getByRole('button', { name: /accions/i }).click();
+            await fila.getByRole('button', { name: /accions|acciones/i }).click();
             const dt = waitDatatableMeta(metaDadesPage);
-            await fila.getByRole('link', { name: /esborrar/i }).click();
+            await fila.getByRole('link', { name: /esborrar|eliminar|borrar/i }).click();
             await dt;
             await expectSuccessAlert(metaDadesPage);
             await expect(getMetaRows(metaDadesPage)).toHaveCount(0);
@@ -927,7 +927,7 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
 
         await test.step('obrir menú accions', async () => {
             console.log('  -> obrir menú accions');
-            await fila.getByRole('button', { name: /accions/i }).click();
+            await fila.getByRole('button', { name: /accions|acciones/i }).click();
         });
 
         const estaActiva = await fila.getByRole('link', { name: /desactivar/i }).isVisible();
@@ -943,7 +943,7 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
 
             await test.step('activar la tasca', async () => {
                 console.log('  -> activar la tasca');
-                await fila.getByRole('button', { name: /accions/i }).click();
+                await fila.getByRole('button', { name: /accions|acciones/i }).click();
                 const dt = waitDatatableTasques(tascaPage);
                 await fila.getByRole('link', { name: /activar/i }).click();
                 await dt;
@@ -960,7 +960,7 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
 
             await test.step('desactivar la tasca', async () => {
                 console.log('  -> desactivar la tasca');
-                await fila.getByRole('button', { name: /accions/i }).click();
+                await fila.getByRole('button', { name: /accions|acciones/i }).click();
                 const dt = waitDatatableTasques(tascaPage);
                 await fila.getByRole('link', { name: /desactivar/i }).click();
                 await dt;
@@ -980,7 +980,7 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
             await quickFilterTasques(tascaPage, CODI_TASCA1);
             await expect(getTascaRows(tascaPage)).toHaveCount(1);
             const fila = getTascaRows(tascaPage).first();
-            await fila.getByRole('button', { name: /accions/i }).click();
+            await fila.getByRole('button', { name: /accions|acciones/i }).click();
             await fila.getByRole('link', { name: /modificar/i }).click();
             await expect(tascaPage.locator('.modal.in')).toBeVisible();
             const frame = tascaPage.locator('.modal.in').frameLocator('.modal-body iframe');
@@ -1032,9 +1032,9 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
             await expect(getTascaRows(tascaPage)).toHaveCount(1);
             const fila = getTascaRows(tascaPage).first();
             tascaPage.on('dialog', dialog => dialog.accept());
-            await fila.getByRole('button', { name: /accions/i }).click();
+            await fila.getByRole('button', { name: /accions|acciones/i }).click();
             const dt = waitDatatableTasques(tascaPage);
-            await fila.getByRole('link', { name: /esborrar/i }).click();
+            await fila.getByRole('link', { name: /esborrar|eliminar|borrar/i }).click();
             await dt;
             await expectSuccessAlert(tascaPage);
             await expect(getTascaRows(tascaPage)).toHaveCount(0);
@@ -1079,7 +1079,7 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
         await test.step('obrir modal de modificació del primer estat', async () => {
             console.log('  -> obrir modal de modificació del primer estat');
             const fila = getEstatRows(estatPage).filter({ hasText: CODI_ESTAT1 });
-            await fila.getByRole('button', { name: /accions/i }).click();
+            await fila.getByRole('button', { name: /accions|acciones/i }).click();
             await fila.getByRole('link', { name: /modificar/i }).click();
             await expect(estatPage.locator('.modal.in')).toBeVisible();
             const frame = estatPage.locator('.modal.in').frameLocator('.modal-body iframe');
@@ -1127,9 +1127,9 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
             console.log('  -> eliminar el segon estat');
             const fila = getEstatRows(estatPage).filter({ hasText: CODI_ESTAT2 });
             estatPage.on('dialog', dialog => dialog.accept());
-            await fila.getByRole('button', { name: /accions/i }).click();
+            await fila.getByRole('button', { name: /accions|acciones/i }).click();
             const dtRefresh = waitDatatableEstats(estatPage);
-            await fila.getByRole('link', { name: /esborrar/i }).click();
+            await fila.getByRole('link', { name: /esborrar|eliminar|borrar/i }).click();
             await dtRefresh;
             await expectSuccessAlert(estatPage);
         });
@@ -1163,11 +1163,11 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
 
         await test.step('marcar per defecte el darrer grup', async () => {
             console.log('  -> marcar per defecte el darrer grup');
-            await fila.getByRole('button', { name: /accions/i }).click();
-            const esPotMarcar = await fila.getByRole('link', { name: /marcar per defecte/i }).isVisible();
+            await fila.getByRole('button', { name: /accions|acciones/i }).click();
+            const esPotMarcar = await fila.getByRole('link', { name: /marcar (per defecte|por defecto)/i }).isVisible();
             if (esPotMarcar) {
                 const dt = waitDatatableGrups(grupPage);
-                await fila.getByRole('link', { name: /marcar per defecte/i }).click();
+                await fila.getByRole('link', { name: /marcar (per defecte|por defecto)/i }).click();
                 await dt;
                 await expectSuccessAlert(grupPage);
             } else {
@@ -1180,9 +1180,9 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
 
         await test.step('llevar per defecte (esborrar per defecte)', async () => {
             console.log('  -> llevar per defecte');
-            await fila.getByRole('button', { name: /accions/i }).click();
+            await fila.getByRole('button', { name: /accions|acciones/i }).click();
             const dt = waitDatatableGrups(grupPage);
-            await fila.getByRole('link', { name: /esborrar per defecte/i }).click();
+            await fila.getByRole('link', { name: /esborrar per defecte|borrar por defecto/i }).click();
             await dt;
             await expectSuccessAlert(grupPage);
         });
@@ -1198,7 +1198,7 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
             console.log('  -> desvincular el darrer grup');
             const fila = getGrupRows(grupPage).last();
             grupPage.on('dialog', dialog => dialog.accept());
-            await fila.getByRole('button', { name: /accions/i }).click();
+            await fila.getByRole('button', { name: /accions|acciones/i }).click();
             const dt = waitDatatableGrups(grupPage);
             await fila.getByRole('link', { name: /desvincular/i }).click();
             await dt;
@@ -1221,7 +1221,7 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
         const fila = getRows(page).first();
 
         // Determinar estat inicial per executar el cicle en l'ordre correcte
-        await fila.getByRole('button', { name: /accions/i }).click();
+        await fila.getByRole('button', { name: /accions|acciones/i }).click();
         const estaActiu = await fila.getByRole('link', { name: /desactivar/i }).isVisible();
 
         if (estaActiu) {
@@ -1235,7 +1235,7 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
 
             await test.step('activar el procediment', async () => {
                 console.log('  -> activar el procediment');
-                await fila.getByRole('button', { name: /accions/i }).click();
+                await fila.getByRole('button', { name: /accions|acciones/i }).click();
                 const dt = waitDatatable(page);
                 await fila.getByRole('link', { name: /activar/i }).click();
                 await dt;
@@ -1252,7 +1252,7 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
 
             await test.step('desactivar el procediment', async () => {
                 console.log('  -> desactivar el procediment');
-                await fila.getByRole('button', { name: /accions/i }).click();
+                await fila.getByRole('button', { name: /accions|acciones/i }).click();
                 const dt = waitDatatable(page);
                 await fila.getByRole('link', { name: /desactivar/i }).click();
                 await dt;
@@ -1274,8 +1274,8 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
             const fila = getRows(page).first();
             page.on('dialog', dialog => dialog.accept());
             const dt = waitDatatable(page);
-            await fila.getByRole('button', { name: /accions/i }).click();
-            await fila.getByRole('link', { name: /esborrar/i }).click();
+            await fila.getByRole('button', { name: /accions|acciones/i }).click();
+            await fila.getByRole('link', { name: /esborrar|eliminar|borrar/i }).click();
             await dt;
             await expect(page.locator('#metaexpedients_processing')).toBeHidden();
             await expect(getRows(page)).toHaveCount(0);

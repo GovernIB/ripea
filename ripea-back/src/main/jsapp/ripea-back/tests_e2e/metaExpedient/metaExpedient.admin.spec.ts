@@ -37,7 +37,7 @@ const NOM_ESTAT1_MOD = 'estat modificat pw react 1';
 
 const getGrid               = (page: Page) => page.locator('.MuiDataGrid-root').first();
 const getRows               = (page: Page) => page.locator('.MuiDataGrid-row');
-const getToolbar            = (page: Page) => page.locator('.MuiToolbar-root').filter({ hasText: /nou procediment/i });
+const getToolbar            = (page: Page) => page.locator('.MuiToolbar-root').filter({ hasText: /nou procediment|nuevo procedimiento/i });
 const expectSuccessAlert    = (page: Page) => expect(page.locator('.MuiAlert-standardSuccess')).toBeVisible({ timeout: 10_000 });
 
 const humanDelay = async (page: Page) => { 
@@ -161,7 +161,7 @@ const aplicarFiltreProcediments = async (page: Page, codi: string, permisDirecte
     const dialog = page.locator('.styledFilter');
     await triaMuiSelectFirst(page, dialog, 'actiu', true);
     if (permisDirecte) {
-        await page.getByRole('button', { name: /amb permis directe/i }).click();
+        await page.getByRole('button').filter({ hasText: /amb permis directe|con permiso directo/i }).click();
     }
     logDebug('[Filtre] Fent click a Filtrar...');
     await page.getByRole('button', { name: 'Filtrar', exact: true }).click();
@@ -178,15 +178,15 @@ const anarASubPagina = async (page: Page, tabId: 'metaDocument' | 'metaDada' | '
     await expect(page.locator('[role="tablist"]')).toBeVisible({ timeout: 10_000 });
 
     const TAB_LABEL: Record<string, RegExp> = {
-        metaDocument: /tipus de doc/i,
-        metaDada:     /meta-dades/i,
-        estat:        /estats/i,
-        tasca:        /tasques/i,
-        grup:         /grups/i,
+        metaDocument: /tipus de doc|tipos de doc/i,
+        metaDada:     /meta-dades|metadatos/i,
+        estat:        /estats|estados/i,
+        tasca:        /tasques|tareas/i,
+        grup:         /grups|grupos/i,
     };
 
     if (tabId !== 'metaDocument') {
-        await page.getByRole('tab', { name: TAB_LABEL[tabId] }).click();
+        await page.getByRole('tab').filter({ hasText: TAB_LABEL[tabId] }).click();
         await expect(page.locator(`#simple-tabpanel-${tabId}:not([hidden])`)).toBeVisible({ timeout: 5_000 });
     }
     await expect(page.locator(`#simple-tabpanel-${tabId} .MuiDataGrid-root`)).toBeVisible({ timeout: 10_000 });
@@ -203,7 +203,7 @@ const getDocRows = (page: Page) => page.locator('#simple-tabpanel-metaDocument .
 
 const crearDocument = async (page: Page, codi: string, nom: string) => {
 	await page.waitForTimeout(SYSTEM_DELAY);
-    await page.getByRole('button', { name: /nou tipus de document/i }).click();
+    await page.getByRole('button').filter({ hasText: /nou tipus de document|nuevo tipo de documento/i }).click();
     const dialog = page.locator('[role="dialog"]');
     await expect(dialog).toBeVisible({ timeout: 5_000 });
     // Anar primer a NTI per dues raons:
@@ -213,7 +213,7 @@ const crearDocument = async (page: Page, codi: string, nom: string) => {
     //    (quan la pestanya Dades s'amaga, els seus inputs poden desregistrar-se i
     //    perdre el valor si react-hook-form té shouldUnregister actiu).
     // Omplim NTI primer i, un cop segurs que el reset ja ha passat, tornem a Dades.
-    await dialog.getByRole('tab', { name: /dades nti/i }).click();
+    await dialog.getByRole('tab').filter({ hasText: /dades nti|datos nti/i }).click();
     await expect(dialog.locator('.MuiInputBase-root:has(input[name="ntiOrigen"])')).toBeVisible({ timeout: 5_000 });
     await triaMuiSelectFirst(page, dialog, 'ntiOrigen');
     await triaMuiSelectFirst(page, dialog, 'ntiTipoDocumental');
@@ -226,8 +226,8 @@ const crearDocument = async (page: Page, codi: string, nom: string) => {
     await expect(dialog.locator('input[name="codi"]')).toBeVisible({ timeout: 5_000 });
     await dialog.locator('input[name="codi"]').fill(codi);
     await dialog.locator('input[name="nom"]').fill(nom);
-	await guardaAmbDelay(page, dialog.getByRole('button', { name: /guarda/i }));
-    //await dialog.getByRole('button', { name: /guarda/i }).click();
+	await guardaAmbDelay(page, dialog.getByRole('button').filter({ hasText: /guarda/i }));
+    //await dialog.getByRole('button').filter({ hasText: /guarda/i }).click();
     await expectSuccessAlert(page);
 };
 
@@ -237,7 +237,7 @@ const getMetaRows = (page: Page) => page.locator('#simple-tabpanel-metaDada .Mui
 
 const crearMetaDada = async (page: Page, codi: string, nom: string, full = false) => {
 	await page.waitForTimeout(SYSTEM_DELAY);
-    await page.getByRole('button', { name: /nova metadada/i }).click();
+    await page.getByRole('button').filter({ hasText: /nova metadada|nuevo meta-dato/i }).click();
     const dialog = page.locator('[role="dialog"]');
     await expect(dialog).toBeVisible({ timeout: 5_000 });
     await dialog.locator('input[name="codi"]').fill(codi);
@@ -250,8 +250,8 @@ const crearMetaDada = async (page: Page, codi: string, nom: string, full = false
         await expect(dialog.locator('input[name="metadadaArxiu"]')).toBeVisible();
         await dialog.locator('input[name="metadadaArxiu"]').fill('metadada_arxiu_pw_2');
     }
-	await guardaAmbDelay(page, dialog.getByRole('button', { name: /guarda/i }));
-    //await dialog.getByRole('button', { name: /guarda/i }).click();
+	await guardaAmbDelay(page, dialog.getByRole('button').filter({ hasText: /guarda/i }));
+    //await dialog.getByRole('button').filter({ hasText: /guarda/i }).click();
     await expectSuccessAlert(page);
 };
 
@@ -261,13 +261,13 @@ const getEstatRows = (page: Page) => page.locator('#simple-tabpanel-estat .MuiDa
 
 const crearEstat = async (page: Page, codi: string, nom: string) => {
 	await page.waitForTimeout(SYSTEM_DELAY);
-    await page.getByRole('button', { name: /nou estat/i }).click();
+    await page.getByRole('button').filter({ hasText: /nou estat|nuevo estado/i }).click();
     const dialog = page.locator('[role="dialog"]');
     await expect(dialog).toBeVisible({ timeout: 5_000 });
     await dialog.locator('input[name="codi"]').fill(codi);
     await dialog.locator('input[name="nom"]').fill(nom);
-	await guardaAmbDelay(page, dialog.getByRole('button', { name: /guarda/i }));
-    //await dialog.getByRole('button', { name: /guarda/i }).click();
+	await guardaAmbDelay(page, dialog.getByRole('button').filter({ hasText: /guarda/i }));
+    //await dialog.getByRole('button').filter({ hasText: /guarda/i }).click();
     await expectSuccessAlert(page);
 };
 
@@ -276,12 +276,12 @@ const crearEstat = async (page: Page, codi: string, nom: string) => {
 const getGrupRows = (page: Page) => page.locator('#simple-tabpanel-grup .MuiDataGrid-row');
 
 const vincularGrup = async (page: Page) => {
-    await page.getByRole('button', { name: /vincular grup/i }).click();
+    await page.getByRole('button').filter({ hasText: /vincular grup(o)?/i }).click();
     const dialog = page.locator('[role="dialog"]');
     await expect(dialog).toBeVisible({ timeout: 5_000 }).catch(() => { 
         //throw new Error('No s\'ha obert el diàleg de vincular grup');
         logDebug('Error: No s\'ha obert el diàleg de vincular grup');
-        page.getByRole('button', { name: /vincular grup/i }).click();
+        page.getByRole('button').filter({ hasText: /vincular grup(o)?/i }).click();
         expect(dialog).toBeVisible({ timeout: 5_000 }).catch(() => { 
             throw new Error('No s\'ha obert el diàleg de vincular grup després de reintentar');
         });
@@ -293,7 +293,7 @@ const vincularGrup = async (page: Page) => {
     await page.waitForTimeout(SYSTEM_DELAY);
     await page.waitForSelector('[role="listbox"]', { state: 'detached', timeout: 3_000 }).catch(() => {});
     await page.waitForTimeout(SYSTEM_DELAY);
-	await guardaAmbDelay(page, dialog.getByRole('button', { name: /vincula grup/i }));
+	await guardaAmbDelay(page, dialog.getByRole('button').filter({ hasText: /vincula grup(o)?/i }));
     await expectSuccessAlert(page);
 };
 
@@ -315,7 +315,7 @@ const seleccionarResponsable = async (page: Page, dialog: Locator) => {
 
 const crearTasca = async (page: Page, codi: string, nom: string, full = false) => {
 	await page.waitForTimeout(SYSTEM_DELAY);
-    await page.getByRole('button', { name: /nova tasca/i }).click();
+    await page.getByRole('button').filter({ hasText: /nova tasca|nueva tarea/i }).click();
     const dialog = page.locator('[role="dialog"]');
     await expect(dialog).toBeVisible({ timeout: 5_000 });
     await dialog.locator('input[name="codi"]').fill(codi);
@@ -327,8 +327,8 @@ const crearTasca = async (page: Page, codi: string, nom: string, full = false) =
         await dialog.locator('input[name="duracio"]').fill('5');
         await triaMuiSelect(page, dialog, 'prioritat', /alta/i);
     }
-	await guardaAmbDelay(page, dialog.getByRole('button', { name: /guarda/i }));
-    //await dialog.getByRole('button', { name: /guarda/i }).click();
+	await guardaAmbDelay(page, dialog.getByRole('button').filter({ hasText: /guarda/i }));
+    //await dialog.getByRole('button').filter({ hasText: /guarda/i }).click();
     await expectSuccessAlert(page);
 };
 
@@ -353,7 +353,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
         //      - .MuiDataGrid-overlay absent → el grid no està carregant
         //      - almenys 1 fila visible → la recàrrega sense filtre ha acabat
         logDebug('[beforeEach] Fent click a Netejar...');
-        await page.getByRole('button', { name: 'Netejar', exact: true }).click();
+        await page.getByRole('button').filter({ hasText: /(netejar|limpiar)/i }).click();
         logDebug('[beforeEach] Esperant reset DOM: codi buit + grid carregat amb files...');
         await page.waitForFunction(() => {
             const codi = document.querySelector('input[name="codi"]');
@@ -383,8 +383,8 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
         await test.step('columnes esperades visibles', async () => {
             logInfo('  -> columnes esperades visibles');
             const headers = page.locator('.MuiDataGrid-columnHeaderTitle');
-            await expect(headers.filter({ hasText: /codi/i }).first()).toBeVisible();
-            await expect(headers.filter({ hasText: /classificaci/i }).first()).toBeVisible();
+            await expect(headers.filter({ hasText: /codi|c.digo/i }).first()).toBeVisible();
+            await expect(headers.filter({ hasText: /class?ific/i }).first()).toBeVisible();
             await expect(headers.filter({ hasText: /\bnom\b|nombre/i }).first()).toBeVisible();
             await expect(headers.filter({ hasText: /documental/i }).first()).toBeVisible();
             await expect(headers.filter({ hasText: /gestor/i }).first()).toBeVisible();
@@ -393,8 +393,8 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
         await test.step('botons d\'acció per a IPA_ADMIN visibles', async () => {
             logInfo('  -> botons d\'acció per a IPA_ADMIN visibles');
-            await expect(page.getByRole('button', { name: /nou procediment/i })).toBeVisible();
-            await expect(page.getByRole('button', { name: /importa/i })).toBeVisible();
+            await expect(page.getByRole('button').filter({ hasText: /nou procediment|nuevo procedimiento/i })).toBeVisible();
+            await expect(page.getByRole('button').filter({ hasText: /importa/i })).toBeVisible();
         });
 
         await test.step('formulari de filtre visible', async () => {
@@ -431,10 +431,10 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
             await humanDelay(page);
             const fila = getRows(page).first();
             await fila.locator('button[aria-label="more"]').click();
-            await page.getByRole('menuitem', { name: /esborrar/i }).click();
+            await page.getByRole('menuitem').filter({ hasText: /esborrar|eliminar|borrar/i }).click();
             // Confirmació de l'esborrat (diàleg MUI)
             await expect(page.locator('[role="dialog"]')).toBeVisible({ timeout: 5_000 });
-            await page.locator('[role="dialog"]').getByRole('button', { name: /acceptar|confirmar|ok/i }).click();
+            await page.locator('[role="dialog"]').getByRole('button').filter({ hasText: /acceptar|aceptar|confirmar|ok/i }).click();
             await expectSuccessAlert(page);
             // Esperar que el grid acabi el seu auto-reload post-esborrat abans de filtrar,
             // per evitar que waitApiGet capturi la resposta de l'auto-reload en lloc de la del filtre.
@@ -450,7 +450,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
         await test.step('obrir formulari de nou procediment', async () => {
             logInfo('  -> obrir formulari de nou procediment');
-            await page.getByRole('button', { name: /nou procediment/i }).click();
+            await page.getByRole('button').filter({ hasText: /nou procediment|nuevo procedimiento/i }).click();
             await expect(page.locator('[role="dialog"]')).toBeVisible();
         });
 
@@ -484,8 +484,8 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
         await test.step('enviar el formulari', async () => {
             logInfo('  -> enviar el formulari');
-			await guardaAmbDelay(page, page.locator('[role="dialog"]').getByRole('button', { name: /guarda/i }));
-            //await page.locator('[role="dialog"]').getByRole('button', { name: /guarda/i }).click();
+			await guardaAmbDelay(page, page.locator('[role="dialog"]').getByRole('button').filter({ hasText: /guarda/i }));
+            //await page.locator('[role="dialog"]').getByRole('button').filter({ hasText: /guarda/i }).click();
         });
 
         await test.step('verificar missatge d\'èxit', async () => {
@@ -512,7 +512,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 			await humanDelay(page);
             await fila.locator('button[aria-label="more"]').click();
 			await humanDelay(page);
-            await page.getByRole('menuitem', { name: 'Modifica', exact: true }).click();
+            await page.getByRole('menuitem').filter({ hasText: /modifica(r)?/i }).click();
 			await humanDelay(page);
             await expect(page.locator('[role="dialog"]')).toBeVisible();
             await entityResp;
@@ -541,7 +541,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
         await test.step('guardar la modificació', async () => {
             logInfo('  -> guardar la modificació');
-			await guardaAmbDelay(page, page.locator('[role="dialog"]').getByRole('button', { name: /guarda/i }));
+			await guardaAmbDelay(page, page.locator('[role="dialog"]').getByRole('button').filter({ hasText: /guarda/i }));
         });
 
         await test.step('verificar missatge d\'èxit', async () => {
@@ -559,7 +559,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
             logInfo('  -> filtrar per codi i nom parcial');
             await page.locator('input[name="codi"]').fill(CODI_TEST);
             await page.locator('input[name="nom"]').fill('modificació');
-			await page.getByRole('button', { name: /amb permis directe/i }).click();
+			await page.getByRole('button').filter({ hasText: /amb permis directe|con permiso directo/i }).click();
             const resp = waitApiGet(page, url => url.includes('/metaExpedient') && !url.includes('/metaExpedient/'));
             await page.getByRole('button', { name: 'Filtrar', exact: true }).click();
             await resp;
@@ -569,7 +569,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
         /*await test.step('activar filtre de permís directe i verificar resultat', async () => {
             logInfo('  -> activar filtre de permís directe i verificar resultat');
             const resp = waitApiGet(page, url => url.includes('/metaExpedient') && !url.includes('/metaExpedient/'));
-            await page.getByRole('button', { name: /amb permis directe/i }).click();
+            await page.getByRole('button').filter({ hasText: /amb permis directe|con permiso directo/i }).click();
             await resp;
             await expect(getRows(page)).toHaveCount(1);
         });*/
@@ -616,32 +616,32 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
         const fila = getDocRows(page).first();
         await fila.locator('button[aria-label="more"]').click();
-        const estaActiu = await page.getByRole('menuitem', { name: /desactivar/i }).isVisible();
+        const estaActiu = await page.getByRole('menuitem').filter({ hasText: /desactivar/i }).isVisible();
 
         if (estaActiu) {
             await test.step('desactivar el document', async () => {
                 logInfo('  -> desactivar el document');
-                await page.getByRole('menuitem', { name: /desactivar/i }).click();
+                await page.getByRole('menuitem').filter({ hasText: /desactivar/i }).click();
                 await expectSuccessAlert(page);
             });
 
             await test.step('activar el document', async () => {
                 logInfo('  -> activar el document');
                 await fila.locator('button[aria-label="more"]').click();
-                await page.getByRole('menuitem', { name: /activar/i }).click();
+                await page.getByRole('menuitem').filter({ hasText: /activar/i }).click();
                 await expectSuccessAlert(page);
             });
         } else {
             await test.step('activar el document', async () => {
                 logInfo('  -> activar el document');
-                await page.getByRole('menuitem', { name: /activar/i }).click();
+                await page.getByRole('menuitem').filter({ hasText: /activar/i }).click();
                 await expectSuccessAlert(page);
             });
 
             await test.step('desactivar el document', async () => {
                 logInfo('  -> desactivar el document');
                 await fila.locator('button[aria-label="more"]').click();
-                await page.getByRole('menuitem', { name: /desactivar/i }).click();
+                await page.getByRole('menuitem').filter({ hasText: /desactivar/i }).click();
                 await expectSuccessAlert(page);
             });
         }
@@ -660,7 +660,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
             const rowId = await fila.getAttribute('data-id');
             const entityResp = waitApiEntityLoad(page, rowId);
             await fila.locator('button[aria-label="more"]').click();
-            await page.getByRole('menuitem', { name: 'Modifica', exact: true }).click();
+            await page.getByRole('menuitem').filter({ hasText: /modifica(r)?/i }).click();
             await expect(page.locator('[role="dialog"]')).toBeVisible();
             await entityResp;
         });
@@ -677,8 +677,8 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
         await test.step('guardar la modificació', async () => {
             logInfo('  -> guardar la modificació');
-			await guardaAmbDelay(page, page.locator('[role="dialog"]').getByRole('button', { name: /guarda/i }));
-            //await page.locator('[role="dialog"]').getByRole('button', { name: /guarda/i }).click();
+			await guardaAmbDelay(page, page.locator('[role="dialog"]').getByRole('button').filter({ hasText: /guarda/i }));
+            //await page.locator('[role="dialog"]').getByRole('button').filter({ hasText: /guarda/i }).click();
             await expectSuccessAlert(page);
         });
 
@@ -706,7 +706,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
             await expect(getDocRows(page)).toHaveCount(1);
             const fila = getDocRows(page).first();
             await fila.locator('button[aria-label="more"]').click();
-            await page.getByRole('menuitem', { name: /per defecte/i }).click();
+            await page.getByRole('menuitem').filter({ hasText: /per defecte|por defecto/i }).click();
             await expectSuccessAlert(page);
         });
 
@@ -722,10 +722,10 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
             await expect(getDocRows(page)).toHaveCount(1);
             const fila = getDocRows(page).first();
             await fila.locator('button[aria-label="more"]').click();
-            await page.getByRole('menuitem', { name: /esborrar/i }).click();
+            await page.getByRole('menuitem').filter({ hasText: /esborrar|eliminar|borrar/i }).click();
             await expect(page.locator('[role="dialog"]')).toBeVisible({ timeout: 5_000 });
             await humanDelay(page);
-            await page.locator('[role="dialog"]').getByRole('button', { name: /acceptar|confirmar|ok/i }).click();
+            await page.locator('[role="dialog"]').getByRole('button').filter({ hasText: /acceptar|aceptar|confirmar|ok/i }).click();
             await expectSuccessAlert(page);
 //            await expect(getDocRows(page)).toHaveCount(0);
         });
@@ -772,32 +772,32 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
         const fila = getMetaRows(page).first();
         await fila.locator('button[aria-label="more"]').click();
-        const estaActiva = await page.getByRole('menuitem', { name: /desactivar/i }).isVisible();
+        const estaActiva = await page.getByRole('menuitem').filter({ hasText: /desactivar/i }).isVisible();
 
         if (estaActiva) {
             await test.step('desactivar la meta-dada', async () => {
                 logInfo('  -> desactivar la meta-dada');
-                await page.getByRole('menuitem', { name: /desactivar/i }).click();
+                await page.getByRole('menuitem').filter({ hasText: /desactivar/i }).click();
                 await expectSuccessAlert(page);
             });
 
             await test.step('activar la meta-dada', async () => {
                 logInfo('  -> activar la meta-dada');
                 await fila.locator('button[aria-label="more"]').click();
-                await page.getByRole('menuitem', { name: /activar/i }).click();
+                await page.getByRole('menuitem').filter({ hasText: /activar/i }).click();
                 await expectSuccessAlert(page);
             });
         } else {
             await test.step('activar la meta-dada', async () => {
                 logInfo('  -> activar la meta-dada');
-                await page.getByRole('menuitem', { name: /activar/i }).click();
+                await page.getByRole('menuitem').filter({ hasText: /activar/i }).click();
                 await expectSuccessAlert(page);
             });
 
             await test.step('desactivar la meta-dada', async () => {
                 logInfo('  -> desactivar la meta-dada');
                 await fila.locator('button[aria-label="more"]').click();
-                await page.getByRole('menuitem', { name: /desactivar/i }).click();
+                await page.getByRole('menuitem').filter({ hasText: /desactivar/i }).click();
                 await expectSuccessAlert(page);
             });
         }
@@ -816,7 +816,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
             const rowId = await fila.getAttribute('data-id');
             const entityResp = waitApiEntityLoad(page, rowId);
             await fila.locator('button[aria-label="more"]').click();
-            await page.getByRole('menuitem', { name: 'Modifica', exact: true }).click();
+            await page.getByRole('menuitem').filter({ hasText: /modifica(r)?/i }).click();
             await expect(page.locator('[role="dialog"]')).toBeVisible();
             await entityResp;
         });
@@ -833,8 +833,8 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
         await test.step('guardar la modificació', async () => {
             logInfo('  -> guardar la modificació');
-			await guardaAmbDelay(page, page.locator('[role="dialog"]').getByRole('button', { name: /guarda/i }));
-            //await page.locator('[role="dialog"]').getByRole('button', { name: /guarda/i }).click();
+			await guardaAmbDelay(page, page.locator('[role="dialog"]').getByRole('button').filter({ hasText: /guarda/i }));
+            //await page.locator('[role="dialog"]').getByRole('button').filter({ hasText: /guarda/i }).click();
             await expectSuccessAlert(page);
         });
 
@@ -862,9 +862,9 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
             await expect(getMetaRows(page)).toHaveCount(1);
             const fila = getMetaRows(page).first();
             await fila.locator('button[aria-label="more"]').click();
-            await page.getByRole('menuitem', { name: /esborrar/i }).click();
+            await page.getByRole('menuitem').filter({ hasText: /esborrar|eliminar|borrar/i }).click();
             await expect(page.locator('[role="dialog"]')).toBeVisible({ timeout: 5_000 });
-            await page.locator('[role="dialog"]').getByRole('button', { name: /acceptar|confirmar|ok/i }).click();
+            await page.locator('[role="dialog"]').getByRole('button').filter({ hasText: /acceptar|aceptar|confirmar|ok/i }).click();
             await expectSuccessAlert(page);
 //            await expect(getMetaRows(page)).toHaveCount(0);
         });
@@ -911,32 +911,32 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
         const fila = getTascaRows(page).first();
         await fila.locator('button[aria-label="more"]').click();
-        const estaActiva = await page.getByRole('menuitem', { name: /desactivar/i }).isVisible();
+        const estaActiva = await page.getByRole('menuitem').filter({ hasText: /desactivar/i }).isVisible();
 
         if (estaActiva) {
             await test.step('desactivar la tasca', async () => {
                 logInfo('  -> desactivar la tasca');
-                await page.getByRole('menuitem', { name: /desactivar/i }).click();
+                await page.getByRole('menuitem').filter({ hasText: /desactivar/i }).click();
                 await expectSuccessAlert(page);
             });
 
             await test.step('activar la tasca', async () => {
                 logInfo('  -> activar la tasca');
                 await fila.locator('button[aria-label="more"]').click();
-                await page.getByRole('menuitem', { name: /activar/i }).click();
+                await page.getByRole('menuitem').filter({ hasText: /activar/i }).click();
                 await expectSuccessAlert(page);
             });
         } else {
             await test.step('activar la tasca', async () => {
                 logInfo('  -> activar la tasca');
-                await page.getByRole('menuitem', { name: /activar/i }).click();
+                await page.getByRole('menuitem').filter({ hasText: /activar/i }).click();
                 await expectSuccessAlert(page);
             });
 
             await test.step('desactivar la tasca', async () => {
                 logInfo('  -> desactivar la tasca');
                 await fila.locator('button[aria-label="more"]').click();
-                await page.getByRole('menuitem', { name: /desactivar/i }).click();
+                await page.getByRole('menuitem').filter({ hasText: /desactivar/i }).click();
                 await expectSuccessAlert(page);
             });
         }
@@ -955,7 +955,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
             const rowId = await fila.getAttribute('data-id');
             const entityResp = waitApiEntityLoad(page, rowId);
             await fila.locator('button[aria-label="more"]').click();
-            await page.getByRole('menuitem', { name: 'Modifica', exact: true }).click();
+            await page.getByRole('menuitem').filter({ hasText: /modifica(r)?/i }).click();
             await expect(page.locator('[role="dialog"]')).toBeVisible();
             await entityResp;
         });
@@ -974,8 +974,8 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
         await test.step('guardar la modificació', async () => {
             logInfo('  -> guardar la modificació');
-			await guardaAmbDelay(page, page.locator('[role="dialog"]').getByRole('button', { name: /guarda/i }));
-            //await page.locator('[role="dialog"]').getByRole('button', { name: /guarda/i }).click();
+			await guardaAmbDelay(page, page.locator('[role="dialog"]').getByRole('button').filter({ hasText: /guarda/i }));
+            //await page.locator('[role="dialog"]').getByRole('button').filter({ hasText: /guarda/i }).click();
             await expectSuccessAlert(page);
         });
 
@@ -1003,9 +1003,9 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
             await expect(getTascaRows(page)).toHaveCount(1);
             const fila = getTascaRows(page).first();
             await fila.locator('button[aria-label="more"]').click();
-            await page.getByRole('menuitem', { name: /esborrar/i }).click();
+            await page.getByRole('menuitem').filter({ hasText: /esborrar|eliminar|borrar/i }).click();
             await expect(page.locator('[role="dialog"]')).toBeVisible({ timeout: 5_000 });
-            await page.locator('[role="dialog"]').getByRole('button', { name: /acceptar|confirmar|ok/i }).click();
+            await page.locator('[role="dialog"]').getByRole('button').filter({ hasText: /acceptar|aceptar|confirmar|ok/i }).click();
             await expectSuccessAlert(page);
 //            await expect(getTascaRows(page)).toHaveCount(0);
         });
@@ -1050,7 +1050,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
             const rowId = await fila.getAttribute('data-id');
             const entityResp = waitApiEntityLoad(page, rowId);
             await fila.locator('button[aria-label="more"]').click();
-            await page.getByRole('menuitem', { name: 'Modifica', exact: true }).click();
+            await page.getByRole('menuitem').filter({ hasText: /modifica(r)?/i }).click();
             await expect(page.locator('[role="dialog"]')).toBeVisible();
             await entityResp;
         });
@@ -1067,8 +1067,8 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
         await test.step('guardar la modificació', async () => {
             logInfo('  -> guardar la modificació');
-			await guardaAmbDelay(page, page.locator('[role="dialog"]').getByRole('button', { name: /guarda/i }));
-            //await page.locator('[role="dialog"]').getByRole('button', { name: /guarda/i }).click();
+			await guardaAmbDelay(page, page.locator('[role="dialog"]').getByRole('button').filter({ hasText: /guarda/i }));
+            //await page.locator('[role="dialog"]').getByRole('button').filter({ hasText: /guarda/i }).click();
             await expectSuccessAlert(page);
         });
 
@@ -1093,9 +1093,9 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
             logInfo('  -> eliminar el segon estat');
             const fila = getEstatRows(page).filter({ hasText: CODI_ESTAT2 });
             await fila.locator('button[aria-label="more"]').click();
-            await page.getByRole('menuitem', { name: /esborrar/i }).click();
+            await page.getByRole('menuitem').filter({ hasText: /esborrar|eliminar|borrar/i }).click();
             await expect(page.locator('[role="dialog"]')).toBeVisible({ timeout: 5_000 });
-            await page.locator('[role="dialog"]').getByRole('button', { name: /acceptar|confirmar|ok/i }).click();
+            await page.locator('[role="dialog"]').getByRole('button').filter({ hasText: /acceptar|aceptar|confirmar|ok/i }).click();
             await expectSuccessAlert(page);
 //            await expect(getEstatRows(page).filter({ hasText: CODI_ESTAT2 })).toHaveCount(0);
         });
@@ -1128,9 +1128,9 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
         await test.step('marcar per defecte el darrer grup', async () => {
             logInfo('  -> marcar per defecte el darrer grup');
             await fila.locator('button[aria-label="more"]').click();
-            const esPotMarcar = await page.getByRole('menuitem', { name: /marcar per defecte/i }).isVisible();
+            const esPotMarcar = await page.getByRole('menuitem').filter({ hasText: /marcar (per defecte|por defecto)/i }).isVisible();
             if (esPotMarcar) {
-                await page.getByRole('menuitem', { name: /marcar per defecte/i }).click();
+                await page.getByRole('menuitem').filter({ hasText: /marcar (per defecte|por defecto)/i }).click();
                 await expectSuccessAlert(page);
             } else {
                 await page.keyboard.press('Escape');
@@ -1143,7 +1143,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
         await test.step('llevar per defecte', async () => {
             logInfo('  -> llevar per defecte');
             await fila.locator('button[aria-label="more"]').click();
-            await page.getByRole('menuitem', { name: /llevar per defecte/i }).click();
+            await page.getByRole('menuitem').filter({ hasText: /llevar per defecte|quitar por defecto/i }).click();
             await expectSuccessAlert(page);
         });
 
@@ -1159,7 +1159,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
             logInfo('  -> desvincular el darrer grup');
             const fila = getGrupRows(page).last();
             await fila.locator('button[aria-label="more"]').click();
-            await page.getByRole('menuitem', { name: /desvincular/i }).click();
+            await page.getByRole('menuitem').filter({ hasText: /desvincular/i }).click();
             await expectSuccessAlert(page);
         });
 
@@ -1177,32 +1177,32 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
         const fila = getRows(page).first();
         await fila.locator('button[aria-label="more"]').click();
-        const estaActiu = await page.getByRole('menuitem', { name: /desactivar/i }).isVisible();
+        const estaActiu = await page.getByRole('menuitem').filter({ hasText: /desactivar/i }).isVisible();
 
         if (estaActiu) {
             await test.step('desactivar el procediment', async () => {
                 logInfo('  -> desactivar el procediment');
-                await page.getByRole('menuitem', { name: /desactivar/i }).click();
+                await page.getByRole('menuitem').filter({ hasText: /desactivar/i }).click();
                 await expectSuccessAlert(page);
             });
 
             await test.step('activar el procediment', async () => {
                 logInfo('  -> activar el procediment');
                 await fila.locator('button[aria-label="more"]').click();
-                await page.getByRole('menuitem', { name: /activar/i }).click();
+                await page.getByRole('menuitem').filter({ hasText: /activar/i }).click();
                 await expectSuccessAlert(page);
             });
         } else {
             await test.step('activar el procediment', async () => {
                 logInfo('  -> activar el procediment');
-                await page.getByRole('menuitem', { name: /activar/i }).click();
+                await page.getByRole('menuitem').filter({ hasText: /activar/i }).click();
                 await expectSuccessAlert(page);
             });
 
             await test.step('desactivar el procediment', async () => {
                 logInfo('  -> desactivar el procediment');
                 await fila.locator('button[aria-label="more"]').click();
-                await page.getByRole('menuitem', { name: /desactivar/i }).click();
+                await page.getByRole('menuitem').filter({ hasText: /desactivar/i }).click();
                 await expectSuccessAlert(page);
             });
         }
@@ -1222,10 +1222,10 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
             await humanDelay(page);
             await fila.locator('button[aria-label="more"]').click();
             await humanDelay(page);
-            await page.getByRole('menuitem', { name: /esborrar/i }).click();
+            await page.getByRole('menuitem').filter({ hasText: /esborrar|eliminar|borrar/i }).click();
             await expect(page.locator('[role="dialog"]')).toBeVisible({ timeout: 5_000 });
             await humanDelay(page);
-            await page.locator('[role="dialog"]').getByRole('button', { name: /acceptar|confirmar|ok/i }).click();
+            await page.locator('[role="dialog"]').getByRole('button').filter({ hasText: /acceptar|aceptar|confirmar|ok/i }).click();
             await expectSuccessAlert(page);
         });
 
