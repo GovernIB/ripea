@@ -1212,25 +1212,20 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
         await test.step('marcar tots els permisos', async () => {
             logInfo('  -> marcar tots els permisos');
             const fila = getRows(page).filter({ hasText: PRINCIPAL_NOM_TEST });
-            const rowId = await fila.getAttribute('data-id');
-            const entityResp = waitApiEntityLoad(page, rowId);
+            await expect(fila).toHaveCount(1);
             await fila.locator('button[aria-label="more"]').click();
             await page.getByRole('menuitem').filter({ hasText: /modifica(r)?/i }).click();
             const dialog = page.locator('[role="dialog"]');
             await expect(dialog).toBeVisible({ timeout: 5_000 });
-            await entityResp;
-            // MUI PrivateSwitchBase-input is hidden (opacity:0); clicking the hidden input
-            // bypasses React's synthetic event system and the state does not change.
-            // Click the visible MuiButtonBase-root parent to trigger the proper onClick handler.
-            /*
-            const chkbx = dialog.locator('input[name="all"]').locator('..');
-            logDebug((chkbx.count()).toString());
-            logDebug((chkbx.first().evaluate(el => el.outerHTML)).toString());
-            await chkbx.click();
-            //await expect(dialog.locator('input[name="all"]')).toBeChecked({ timeout: 3_000 });
-            await guardaAmbDelay(page, dialog.getByRole('button').filter({ hasText: /guarda/i }));
+            // El formulari de permisos es carrega des de les dades del row, sense apiGetOne.
+            // Usar span.MuiButtonBase-root:has(input[name="all"]) per clicar el wrapper visible
+            // i activar el handler de React (l'<input> MUI és invisible amb opacity:0).
+            const chkbxAll = dialog.locator('span.MuiButtonBase-root:has(input[name="all"])');
+            await expect(chkbxAll).toBeVisible({ timeout: 5_000 });
+            await chkbxAll.click();
+            await expect(dialog.locator('input[name="all"]')).toBeChecked({ timeout: 3_000 });
+            await guardaAmbDelay(page, dialog.getByRole('button').filter({ hasText: /guarda|modifica/i }));
             await expectSuccessAlert(page);
-            */
         });
 
     });
