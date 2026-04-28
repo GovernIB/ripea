@@ -22,6 +22,12 @@ const CODI_META2     = 'meTADPWREACT02';
 const NOM_META1_MOD  = 'meta-dada modificada pw react 1';
 const DESC_META1_MOD = 'descripció modificada meta-dada 1 react';
 
+const CODI_DOCMETA1     = 'dmeTADPWREACT01';
+const NOM_DOCMETA1      = 'doc meta-dada pw react 1';
+const CODI_DOCMETA2     = 'dmeTADPWREACT02';
+const NOM_DOCMETA1_MOD  = 'doc meta-dada mod pw react 1';
+const DESC_DOCMETA1_MOD = 'desc mod doc meta-dada 1 react';
+
 const CODI_TASCA1    = 'tscPWREACT01';
 const NOM_TASCA1     = 'tasca pw react 1';
 const CODI_TASCA2    = 'tscPWREACT02';
@@ -58,6 +64,16 @@ const aplicaQuickFilter = async (page: Page, locator: Locator, text: string) => 
 	await page.waitForTimeout(SYSTEM_DELAY);
 	await locator.fill(text);
 	esperarGridCarregat(page);
+};
+
+// Clica un MUI Checkbox ocult (opacity:0) a través del wrapper visible MuiButtonBase-root.
+// `checkbox` és un selector CSS de l'<input> (p.ex. 'input[name="read"]').
+// Assumeix que el checkbox passarà a estat marcat després del clic.
+const checkBoxOcultClick = async (dialog: Locator, checkbox: string) => {
+    const wrapper = dialog.locator(`span.MuiButtonBase-root:has(${checkbox})`);
+    await expect(wrapper).toBeVisible({ timeout: 5_000 });
+    await wrapper.click();
+    await expect(dialog.locator(checkbox)).toBeChecked({ timeout: 3_000 });
 };
 
 // Espera que el DataGrid estigui completament carregat, hagi o no resultats.
@@ -247,14 +263,29 @@ const crearMetaDada = async (page: Page, codi: string, nom: string, full = false
     if (full) {
         await triaMuiSelectFirst(page, dialog, 'multiplicitat', false);
         await dialog.locator('textarea[name="descripcio"]').fill('descripció meta-dada completa 2');
+        await dialog.locator('input[name="valorString"]').fill('pw react valor text 2');
         const enviable = dialog.locator('input[name="enviable"]');
-        if (!await enviable.isChecked()) await enviable.click();
-        await expect(dialog.locator('input[name="metadadaArxiu"]')).toBeVisible();
-        await dialog.locator('input[name="metadadaArxiu"]').fill('metadada_arxiu_pw_2');
+        if (await enviable.isVisible()) {
+            if (!await enviable.isChecked()) await enviable.click();
+            await expect(dialog.locator('input[name="metadadaArxiu"]')).toBeVisible();
+            await dialog.locator('input[name="metadadaArxiu"]').fill('metadada_arxiu_pw_2');
+        }
+
     }
 	await guardaAmbDelay(page, dialog.getByRole('button').filter({ hasText: /guarda/i }));
     //await dialog.getByRole('button').filter({ hasText: /guarda/i }).click();
     await expectSuccessAlert(page);
+};
+
+// ── Helpers per a Meta-dades de Meta-document ────────────────────────────────
+
+const anarAMetaDadesDoc = async (page: Page): Promise<void> => {
+    await anarASubPagina(page, 'metaDocument');
+    await aplicaQuickFilter(page, page.locator('#simple-tabpanel-metaDocument .MuiToolbar-root input[type="text"]'), CODI_DOC1);
+    await expect(getDocRows(page)).toHaveCount(1);
+    await getDocRows(page).first().locator('[aria-label="key"]').click();
+    await esperarGridCarregat(page);
+    await page.waitForTimeout(SYSTEM_DELAY);
 };
 
 // ── Helpers per a Estats ──────────────────────────────────────────────────────
@@ -613,6 +644,89 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
         await test.step('verificar que hi ha dos documents', async () => {
             logInfo('  -> verificar que hi ha dos documents');
             await expect(getDocRows(page)).toHaveCount(2);
+        });
+
+    });
+
+    test('METADOC METADADA CREAR', async ({ page }) => {
+
+        await anarAMetaDadesDoc(page);
+
+        await test.step('verificar que la llista de meta-dades del document és buida', async () => {
+            logInfo('  -> verificar que la llista de meta-dades del document és buida');
+            await expect(getRows(page)).toHaveCount(0);
+        });
+
+        await test.step('crear la primera meta-dada del document (camps mínims)', async () => {
+            logInfo('  -> crear la primera meta-dada del document (camps mínims)');
+            await crearMetaDada(page, CODI_DOCMETA1, NOM_DOCMETA1);
+        });
+
+        await test.step('crear la segona meta-dada del document (tots els camps)', async () => {
+            logInfo('  -> crear la segona meta-dada del document (tots els camps)');
+            await crearMetaDada(page, CODI_DOCMETA2, 'doc meta-dada pw react 2', true);
+        });
+
+        await test.step('verificar que hi ha dos meta-dades al document', async () => {
+            logInfo('  -> verificar que hi ha dos meta-dades al document');
+            await expect(getRows(page)).toHaveCount(2);
+        });
+
+    });
+
+    test('METADOC METADADA MODIFICAR', async ({ page }) => {
+
+        await anarAMetaDadesDoc(page);
+
+        await test.step('filtrar i obrir modal de modificació', async () => {
+            logInfo('  -> filtrar i obrir modal de modificació');
+            const fila = getRows(page).filter({ hasText: CODI_DOCMETA1 });
+            await expect(fila).toHaveCount(1);
+            const rowId = await fila.getAttribute('data-id');
+            const entityResp = waitApiEntityLoad(page, rowId);
+            await fila.locator('button[aria-label="more"]').click();
+            await page.getByRole('menuitem').filter({ hasText: /modifica(r)?/i }).click();
+            await expect(page.locator('[role="dialog"]')).toBeVisible();
+            await entityResp;
+        });
+
+        await test.step('modificar camps de la meta-dada del document', async () => {
+            logInfo('  -> modificar camps de la meta-dada del document');
+            const dialog = page.locator('[role="dialog"]');
+            await expect(dialog.locator('input[name="nom"]')).toBeVisible({ timeout: 3_000 });
+            await dialog.locator('input[name="nom"]').fill(NOM_DOCMETA1_MOD);
+            await dialog.locator('textarea[name="descripcio"]').fill(DESC_DOCMETA1_MOD);
+            await triaMuiSelectFirst(page, dialog, 'multiplicitat', false);
+        });
+
+        await test.step('guardar la modificació', async () => {
+            logInfo('  -> guardar la modificació');
+            await guardaAmbDelay(page, page.locator('[role="dialog"]').getByRole('button').filter({ hasText: /guarda/i }));
+            await expectSuccessAlert(page);
+        });
+
+    });
+
+    test('METADOC METADADA ELIMINAR', async ({ page }) => {
+
+        await anarAMetaDadesDoc(page);
+
+        await test.step('eliminar la segona meta-dada del document', async () => {
+            logInfo('  -> eliminar la segona meta-dada del document');
+            const fila = getRows(page).filter({ hasText: CODI_DOCMETA2 });
+            await expect(fila).toHaveCount(1);
+            await fila.locator('button[aria-label="more"]').click();
+            await page.getByRole('menuitem').filter({ hasText: /esborrar|eliminar|borrar/i }).click();
+            await expect(page.locator('[role="dialog"]')).toBeVisible({ timeout: 5_000 });
+            await humanDelay(page);
+            await page.locator('[role="dialog"]').getByRole('button').filter({ hasText: /acceptar|aceptar|confirmar|ok/i }).click();
+            await expectSuccessAlert(page);
+        });
+
+        await test.step('verificar que la meta-dada ha estat eliminada', async () => {
+            logInfo('  -> verificar que la meta-dada ha estat eliminada');
+            await esperarGridCarregat(page);
+            await expect(getRows(page).filter({ hasText: CODI_DOCMETA2 })).toHaveCount(0);
         });
 
     });
@@ -1217,13 +1331,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
             await page.getByRole('menuitem').filter({ hasText: /modifica(r)?/i }).click();
             const dialog = page.locator('[role="dialog"]');
             await expect(dialog).toBeVisible({ timeout: 5_000 });
-            // El formulari de permisos es carrega des de les dades del row, sense apiGetOne.
-            // Usar span.MuiButtonBase-root:has(input[name="all"]) per clicar el wrapper visible
-            // i activar el handler de React (l'<input> MUI és invisible amb opacity:0).
-            const chkbxAll = dialog.locator('span.MuiButtonBase-root:has(input[name="all"])');
-            await expect(chkbxAll).toBeVisible({ timeout: 5_000 });
-            await chkbxAll.click();
-            await expect(dialog.locator('input[name="all"]')).toBeChecked({ timeout: 3_000 });
+            await checkBoxOcultClick(dialog, 'input[name="all"]');
             await guardaAmbDelay(page, dialog.getByRole('button').filter({ hasText: /guarda|modifica/i }));
             await expectSuccessAlert(page);
         });

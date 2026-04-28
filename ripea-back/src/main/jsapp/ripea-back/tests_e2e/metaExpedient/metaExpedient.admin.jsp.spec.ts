@@ -17,6 +17,12 @@ const CODI_META2     = 'meTADDPWJSP02';
 const NOM_META1_MOD  = 'meta-dada modificada pw 1';
 const DESC_META1_MOD = 'descripció modificada meta-dada 1';
 
+const CODI_DOCMETA1     = 'dmeTADPWJSP01';
+const NOM_DOCMETA1      = 'doc meta-dada pw 1';
+const CODI_DOCMETA2     = 'dmeTADPWJSP02';
+const NOM_DOCMETA1_MOD  = 'doc meta-dada mod pw 1';
+const DESC_DOCMETA1_MOD = 'desc mod doc meta-dada 1';
+
 const CODI_TASCA1     = 'tscPWJSP01';
 const NOM_TASCA1      = 'tasca pw 1';
 const CODI_TASCA2     = 'tscPWJSP02';
@@ -146,9 +152,13 @@ const crearMetaDada = async (metaDadesPage: Page, codi: string, nom: string, ful
     if (full) {
         await frame.locator('select[name="multiplicitat"]').selectOption('M_0_N');
         await frame.locator('textarea[name="descripcio"]').fill('descripció meta-dada completa 2');
-        await frame.locator('#enviable').check();
-        await expect(frame.locator('input[name="metadadaArxiu"]')).toBeVisible();
-        await frame.locator('input[name="metadadaArxiu"]').fill('metadada_arxiu_pw_2');
+        await frame.locator('input[name="valorString"]').fill('pw react valor text 2');
+        const enviable = frame.locator('#enviable');
+        if (await enviable.isVisible()) {
+            await enviable.check();
+            await expect(frame.locator('input[name="metadadaArxiu"]')).toBeVisible();
+            await frame.locator('input[name="metadadaArxiu"]').fill('metadada_arxiu_pw_2');
+        }
     }
     const dtRefresh = waitDatatableMeta(metaDadesPage);
     const submitBtn = metaDadesPage.locator('.modal.in .modal-footer button[type="submit"]');
@@ -156,6 +166,19 @@ const crearMetaDada = async (metaDadesPage: Page, codi: string, nom: string, ful
     await submitBtn.click();
     await dtRefresh;
     await expectSuccessAlert(metaDadesPage);
+};
+
+// ── Helpers per a Meta-dades de Meta-document ────────────────────────────────
+
+const anarAMetaDadesDoc = async (page: Page): Promise<Page> => {
+    const tipusDocsPage = await anarATipusDocs(page);
+    await quickFilterDocs(tipusDocsPage, CODI_DOC1);
+    await expect(getDocRows(tipusDocsPage)).toHaveCount(1);
+    const dtMeta = waitDatatableMeta(tipusDocsPage);
+    await getDocRows(tipusDocsPage).first().locator('a[href*="metaDada"]').click();
+    await dtMeta;
+    await expect(tipusDocsPage.locator('#metadades_processing')).toBeHidden({ timeout: 10_000 });
+    return tipusDocsPage;
 };
 
 // ── Helpers per a Tasques ─────────────────────────────────────────────────────
@@ -598,6 +621,91 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
         });
 
         await tipusDocsPage.close();
+    });
+
+    test('METADOC METADADA CREAR', async ({ page }) => {
+
+        const docMetaDadesPage = await anarAMetaDadesDoc(page);
+
+        await test.step('verificar que la llista de meta-dades del document és buida', async () => {
+            console.log('  -> verificar que la llista de meta-dades del document és buida');
+            await expect(getMetaRows(docMetaDadesPage)).toHaveCount(0);
+        });
+
+        await test.step('crear la primera meta-dada del document (camps mínims)', async () => {
+            console.log('  -> crear la primera meta-dada del document (camps mínims)');
+            await crearMetaDada(docMetaDadesPage, CODI_DOCMETA1, NOM_DOCMETA1);
+        });
+
+        await test.step('crear la segona meta-dada del document (tots els camps)', async () => {
+            console.log('  -> crear la segona meta-dada del document (tots els camps)');
+            await crearMetaDada(docMetaDadesPage, CODI_DOCMETA2, 'doc meta-dada pw 2', true);
+        });
+
+        await test.step('verificar que hi ha dos meta-dades al document', async () => {
+            console.log('  -> verificar que hi ha dos meta-dades al document');
+            await expect(getMetaRows(docMetaDadesPage)).toHaveCount(2);
+        });
+
+        await docMetaDadesPage.close();
+    });
+
+    test('METADOC METADADA MODIFICAR', async ({ page }) => {
+
+        const docMetaDadesPage = await anarAMetaDadesDoc(page);
+
+        await test.step('filtrar i obrir modal de modificació', async () => {
+            console.log('  -> filtrar i obrir modal de modificació');
+            await quickFilterMeta(docMetaDadesPage, CODI_DOCMETA1);
+            await expect(getMetaRows(docMetaDadesPage)).toHaveCount(1);
+            const fila = getMetaRows(docMetaDadesPage).first();
+            await fila.getByRole('button', { name: /accions|acciones/i }).click();
+            await fila.getByRole('link', { name: /modificar/i }).click();
+            await expect(docMetaDadesPage.locator('.modal.in')).toBeVisible();
+            const frame = docMetaDadesPage.locator('.modal.in').frameLocator('.modal-body iframe');
+            await expect(frame.locator('input[name="codi"]')).toBeVisible();
+        });
+
+        await test.step('modificar camps de la meta-dada del document', async () => {
+            console.log('  -> modificar camps de la meta-dada del document');
+            const frame = docMetaDadesPage.locator('.modal.in').frameLocator('.modal-body iframe');
+            await frame.locator('input[name="nom"]').fill(NOM_DOCMETA1_MOD);
+            await frame.locator('textarea[name="descripcio"]').fill(DESC_DOCMETA1_MOD);
+            await frame.locator('select[name="multiplicitat"]').selectOption('M_0_N');
+        });
+
+        await test.step('guardar la modificació', async () => {
+            console.log('  -> guardar la modificació');
+            const dtRefresh = waitDatatableMeta(docMetaDadesPage);
+            const submitBtn = docMetaDadesPage.locator('.modal.in .modal-footer button[type="submit"]');
+            await submitBtn.waitFor({ state: 'visible' });
+            await submitBtn.click();
+            await dtRefresh;
+            await expectSuccessAlert(docMetaDadesPage);
+        });
+
+        await docMetaDadesPage.close();
+    });
+
+    test('METADOC METADADA ELIMINAR', async ({ page }) => {
+
+        const docMetaDadesPage = await anarAMetaDadesDoc(page);
+
+        await test.step('eliminar la segona meta-dada del document', async () => {
+            console.log('  -> eliminar la segona meta-dada del document');
+            await quickFilterMeta(docMetaDadesPage, CODI_DOCMETA2);
+            await expect(getMetaRows(docMetaDadesPage)).toHaveCount(1);
+            const fila = getMetaRows(docMetaDadesPage).first();
+            docMetaDadesPage.on('dialog', dialog => dialog.accept());
+            await fila.getByRole('button', { name: /accions|acciones/i }).click();
+            const dt = waitDatatableMeta(docMetaDadesPage);
+            await fila.getByRole('link', { name: /esborrar|eliminar|borrar/i }).click();
+            await dt;
+            await expectSuccessAlert(docMetaDadesPage);
+            await expect(getMetaRows(docMetaDadesPage)).toHaveCount(0);
+        });
+
+        await docMetaDadesPage.close();
     });
 
     test('METADOC ACTIVAR', async ({ page }) => {
