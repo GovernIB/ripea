@@ -132,7 +132,7 @@ const CanviEstatGrid = () => {
 
     const actions = [
         {
-            label: t('page.document.action.portafirmes.label'),
+            label: t('page.expedient.action.changeEstat.label'),
             icon: "logout",
             showInMenu: false,
             onClick: handleCanviEstat,
@@ -140,7 +140,7 @@ const CanviEstatGrid = () => {
     ]
     const massiveActions = [
         {
-            label: t('page.document.action.portafirmes.label'),
+            label: t('page.expedient.action.changeEstat.label'),
             icon: "logout",
             showInMenu: false,
             onClick: (ids:any[]) => handleCanviEstatMassive(ids, {metaExpedient: filterData?.procediment}),

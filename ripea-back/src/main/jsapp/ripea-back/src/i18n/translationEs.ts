@@ -1365,9 +1365,9 @@ const translationEs = {
                 },
                 canviEstat: {
                     label: "Cambiar el estado de revisión...",
-                    button: "Cambia el estado",
+                    button: "Cambiar estado",
                     title: "Cambiar estado de revisión",
-                    ok: "Estado canbiado correctamente",
+                    ok: "Estado cambiado correctamente",
                 },
                 expedient: {
                     title: "Expedientes del procedimiento: {{nom}}",

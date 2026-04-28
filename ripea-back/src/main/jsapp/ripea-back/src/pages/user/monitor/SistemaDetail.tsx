@@ -195,7 +195,7 @@ const Tasques = () => {
     const { restart, restartAll } = useTaskAction(refresh);
     const actions = [
         {
-            title: t('page.sistema.action.restart.label'),
+            label: t('page.sistema.action.restart.label'),
             icon: 'cached',
             showInMenu: false,
             onClick: restart,

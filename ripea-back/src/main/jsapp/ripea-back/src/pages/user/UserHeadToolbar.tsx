@@ -768,16 +768,15 @@ const useAccionesMassivas = () => {
 const useMenuRevisor = () => {
     const { t } = useTranslation();
 
-    const appEntries:any[] = [];
-    const entries = [
+    const appEntries:any[] = [
         {
             id: 'revisar',
             title: t('page.user.menu.revisar'),
             // icon: '',
-            to: '/metaExpedientRevisio',
-            // hidden: !user?.sessionScope?.isRevisioActiva,
+            to: '/metaExpedient',
         },
-    ]
+    ];
+    const entries:any[] = []
     const content = <>
     </>
 

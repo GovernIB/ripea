@@ -330,6 +330,7 @@ const ContingutGrid = () => {
             icon: "person",
             showInMenu: true,
             onClick: hanldeAssignar,
+            disabled: (row:any) => row?.esborrat == 1,
             hidden: (row:any) => row?.tipus !== 'EXPEDIENT',
         },
     ]
