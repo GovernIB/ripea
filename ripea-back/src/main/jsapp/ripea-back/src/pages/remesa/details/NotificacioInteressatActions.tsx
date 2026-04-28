@@ -13,7 +13,7 @@ export const useActions = () => {
     const {temporalMessageShow} = useBaseAppContext();
 
     const report = (id:any, code:any, mssg:any, fileType:any) => {
-        apiReport(id, {code, fileType})
+        apiReport(undefined, {code, data: {ids: [id], massivo: false}, fileType})
             .then((result) => {
                 iniciaDescargaBlob(result);
                 temporalMessageShow(null, mssg, 'success');
