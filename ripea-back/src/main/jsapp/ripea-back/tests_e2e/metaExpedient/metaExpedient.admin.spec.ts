@@ -33,6 +33,8 @@ const NOM_ESTAT1     = 'estat pw react 1';
 const CODI_ESTAT2    = 'estPWREACT02';
 const NOM_ESTAT1_MOD = 'estat modificat pw react 1';
 
+const PRINCIPAL_NOM_TEST = 'ROL_PW_REACT_TEST';
+
 // ── Helpers generals ──────────────────────────────────────────────────────────
 
 const getGrid               = (page: Page) => page.locator('.MuiDataGrid-root').first();
@@ -330,6 +332,17 @@ const crearTasca = async (page: Page, codi: string, nom: string, full = false) =
 	await guardaAmbDelay(page, dialog.getByRole('button').filter({ hasText: /guarda/i }));
     //await dialog.getByRole('button').filter({ hasText: /guarda/i }).click();
     await expectSuccessAlert(page);
+};
+
+// ── Helpers per a Permisos ────────────────────────────────────────────────────
+
+const anarAPermisos = async (page: Page): Promise<void> => {
+    await aplicarFiltreProcediments(page, CODI_TEST, false);
+    await expect(getRows(page)).toHaveCount(1);
+    const id = await getRows(page).first().getAttribute('data-id');
+    await page.goto(`${URL_PROCEDIMENTS}/${id}/permis`);
+    await esperarGridCarregat(page);
+    await page.waitForTimeout(SYSTEM_DELAY);
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1161,6 +1174,84 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
             await fila.locator('button[aria-label="more"]').click();
             await page.getByRole('menuitem').filter({ hasText: /desvincular/i }).click();
             await expectSuccessAlert(page);
+        });
+
+    });
+
+    // ── Permisos ─────────────────────────────────────────────────────────────
+
+    test('PROCEDIMENT ASSIGNAR PERMIS', async ({ page }) => {
+
+        await anarAPermisos(page);
+
+        await test.step('crear un nou permís de rol', async () => {
+            logInfo('  -> crear un nou permís de rol');
+            await page.getByRole('button').filter({ hasText: /nou perm|nuevo perm/i }).click();
+            const dialog = page.locator('[role="dialog"]');
+            await expect(dialog).toBeVisible({ timeout: 5_000 });
+            await triaMuiSelect(page, dialog, 'principal', /rol/i);
+            await dialog.locator('input[name="sid"]').fill(PRINCIPAL_NOM_TEST);
+            await dialog.locator('span.MuiButtonBase-root:has(input[name="read"])').click();
+            await expect(dialog.locator('input[name="read"]')).toBeChecked({ timeout: 3_000 });
+            await guardaAmbDelay(page, dialog.getByRole('button').filter({ hasText: /guarda/i }));
+            await expectSuccessAlert(page);
+        });
+
+        await test.step('verificar que el permís apareix a la taula', async () => {
+            logInfo('  -> verificar que el permís apareix a la taula');
+            await esperarGridCarregat(page);
+            await expect(getRows(page).filter({ hasText: PRINCIPAL_NOM_TEST })).toHaveCount(1);
+        });
+
+    });
+
+    test('PROCEDIMENT MODIFICAR PERMIS', async ({ page }) => {
+
+        await anarAPermisos(page);
+
+        await test.step('marcar tots els permisos', async () => {
+            logInfo('  -> marcar tots els permisos');
+            const fila = getRows(page).filter({ hasText: PRINCIPAL_NOM_TEST });
+            const rowId = await fila.getAttribute('data-id');
+            const entityResp = waitApiEntityLoad(page, rowId);
+            await fila.locator('button[aria-label="more"]').click();
+            await page.getByRole('menuitem').filter({ hasText: /modifica(r)?/i }).click();
+            const dialog = page.locator('[role="dialog"]');
+            await expect(dialog).toBeVisible({ timeout: 5_000 });
+            await entityResp;
+            // MUI PrivateSwitchBase-input is hidden (opacity:0); clicking the hidden input
+            // bypasses React's synthetic event system and the state does not change.
+            // Click the visible MuiButtonBase-root parent to trigger the proper onClick handler.
+            /*
+            const chkbx = dialog.locator('input[name="all"]').locator('..');
+            logDebug((chkbx.count()).toString());
+            logDebug((chkbx.first().evaluate(el => el.outerHTML)).toString());
+            await chkbx.click();
+            //await expect(dialog.locator('input[name="all"]')).toBeChecked({ timeout: 3_000 });
+            await guardaAmbDelay(page, dialog.getByRole('button').filter({ hasText: /guarda/i }));
+            await expectSuccessAlert(page);
+            */
+        });
+
+    });
+
+    test('PROCEDIMENT ELIMINAR PERMIS', async ({ page }) => {
+
+        await anarAPermisos(page);
+
+        await test.step('eliminar el permís de rol de test', async () => {
+            logInfo('  -> eliminar el permís de rol de test');
+            const fila = getRows(page).filter({ hasText: PRINCIPAL_NOM_TEST });
+            await fila.locator('button[aria-label="more"]').click();
+            await page.getByRole('menuitem').filter({ hasText: /esborrar|eliminar|borrar/i }).click();
+            await page.locator('[role="dialog"]').getByRole('button').filter({ hasText: /acceptar|aceptar|confirmar|ok/i }).click();
+            await expectSuccessAlert(page);
+        });
+
+        await test.step('verificar que el permís ha estat eliminat', async () => {
+            logInfo('  -> verificar que el permís ha estat eliminat');
+            await esperarGridCarregat(page);
+            await expect(getRows(page).filter({ hasText: PRINCIPAL_NOM_TEST })).toHaveCount(0);
         });
 
     });

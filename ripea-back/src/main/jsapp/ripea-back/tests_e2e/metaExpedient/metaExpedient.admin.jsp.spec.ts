@@ -28,6 +28,8 @@ const NOM_ESTAT1      = 'estat pw 1';
 const CODI_ESTAT2     = 'estPWJSP02';
 const NOM_ESTAT1_MOD  = 'estat modificat pw 1';
 
+const PRINCIPAL_NOM_TEST = 'ROL_PW_TEST';
+
 // Helpers per localitzar elements de la pàgina
 const getGrid       = (page: Page) => page.locator('#metaexpedients');
 const getRows       = (page: Page) => page.locator('#metaexpedients tbody tr').filter({ hasNot: page.locator('td.dataTables_empty') });
@@ -294,6 +296,26 @@ const vincularGrupJsp = async (grupPage: Page) => {
     await submitBtn.click();
     await dtRefresh;
     await expectSuccessAlert(grupPage);
+};
+
+// ── Helpers per a Permisos ────────────────────────────────────────────────────
+
+const getPermisRows = (p: Page) =>
+    p.locator('#taulaDades tbody tr').filter({ hasNot: p.locator('td.dataTables_empty') });
+
+const waitDatatablePermisos = (p: Page) =>
+    p.waitForResponse(resp => resp.url().includes('/permis/datatable') && resp.status() === 200);
+
+const anarAPermisos = async (page: Page): Promise<Page> => {
+    await filtrarPerCodi(page, CODI_TEST);
+    await expect(getRows(page)).toHaveCount(1);
+    const fila = getRows(page).first();
+    const permisosPagePromise = page.context().waitForEvent('page');
+    await fila.getByRole('link', { name: /permisos/i }).click();
+    const permisosPage = await permisosPagePromise;
+    await permisosPage.waitForLoadState('load');
+    await expect(permisosPage.locator('#taulaDades_processing')).toBeHidden({ timeout: 10_000 });
+    return permisosPage;
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1206,6 +1228,87 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
         });
 
         await grupPage.close();
+    });
+
+    // ── Permisos ─────────────────────────────────────────────────────────────
+
+    test('PROCEDIMENT ASSIGNAR PERMIS', async ({ page }) => {
+
+        const permisosPage = await anarAPermisos(page);
+
+        await test.step('crear un nou permís de rol', async () => {
+            console.log('  -> crear un nou permís de rol');
+            await permisosPage.locator('a[href*="permis/new"]').click();
+            await expect(permisosPage.locator('.modal.in')).toBeVisible();
+            const frame = permisosPage.locator('.modal.in').frameLocator('.modal-body iframe');
+            await frame.locator('select[name="principalTipus"]').selectOption({ value: 'ROL' });
+            await frame.locator('input[name="principalNom"]').fill(PRINCIPAL_NOM_TEST);
+            await frame.locator('input[name="read"]').check({ force: true });
+            const dtRefresh = waitDatatablePermisos(permisosPage);
+            const submitBtn = permisosPage.locator('.modal.in .modal-footer button[type="submit"]');
+            await submitBtn.waitFor({ state: 'visible' });
+            await submitBtn.click();
+            await dtRefresh;
+            await expectSuccessAlert(permisosPage);
+        });
+
+        await test.step('verificar que el permís apareix a la taula', async () => {
+            console.log('  -> verificar que el permís apareix a la taula');
+            await expect(getPermisRows(permisosPage).filter({ hasText: PRINCIPAL_NOM_TEST })).toHaveCount(1);
+        });
+
+        await permisosPage.close();
+    });
+
+    test('PROCEDIMENT MODIFICAR PERMIS', async ({ page }) => {
+
+        const permisosPage = await anarAPermisos(page);
+
+        await test.step('obrir el modal de modificació', async () => {
+            console.log('  -> obrir el modal de modificació');
+            const fila = getPermisRows(permisosPage).filter({ hasText: PRINCIPAL_NOM_TEST });
+            await fila.getByRole('button', { name: /accions|acciones/i }).click();
+            await fila.getByRole('link', { name: /modificar/i }).click();
+            await expect(permisosPage.locator('.modal.in')).toBeVisible();
+        });
+
+        await test.step('marcar tots els permisos', async () => {
+            console.log('  -> marcar tots els permisos');
+            const frame = permisosPage.locator('.modal.in').frameLocator('.modal-body iframe');
+            await expect(frame.locator('input[name="selectAll"]')).toBeVisible();
+            await frame.locator('input[name="selectAll"]').check({ force: true });
+            const dtRefresh = waitDatatablePermisos(permisosPage);
+            const submitBtn = permisosPage.locator('.modal.in .modal-footer button[type="submit"]');
+            await submitBtn.waitFor({ state: 'visible' });
+            await submitBtn.click();
+            await dtRefresh;
+            await expectSuccessAlert(permisosPage);
+        });
+
+        await permisosPage.close();
+    });
+
+    test('PROCEDIMENT ELIMINAR PERMIS', async ({ page }) => {
+
+        const permisosPage = await anarAPermisos(page);
+
+        await test.step('eliminar el permís de rol de test', async () => {
+            console.log('  -> eliminar el permís de rol de test');
+            const fila = getPermisRows(permisosPage).filter({ hasText: PRINCIPAL_NOM_TEST });
+            permisosPage.on('dialog', dialog => dialog.accept());
+            await fila.getByRole('button', { name: /accions|acciones/i }).click();
+            const dtRefresh = waitDatatablePermisos(permisosPage);
+            await fila.getByRole('link', { name: /eliminar/i }).click();
+            await dtRefresh;
+            await expectSuccessAlert(permisosPage);
+        });
+
+        await test.step('verificar que el permís ha estat eliminat', async () => {
+            console.log('  -> verificar que el permís ha estat eliminat');
+            await expect(getPermisRows(permisosPage).filter({ hasText: PRINCIPAL_NOM_TEST })).toHaveCount(0);
+        });
+
+        await permisosPage.close();
     });
 
     // ── Activar / Desactivar ──────────────────────────────────────────────────
