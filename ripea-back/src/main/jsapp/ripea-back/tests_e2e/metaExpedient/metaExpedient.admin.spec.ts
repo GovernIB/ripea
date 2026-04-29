@@ -365,6 +365,34 @@ const crearTasca = async (page: Page, codi: string, nom: string, full = false) =
     await expectSuccessAlert(page);
 };
 
+// ── Helpers per a Validacions de Tasca ───────────────────────────────────────
+
+const anarAValidacionsTasca = async (page: Page): Promise<void> => {
+    await anarASubPagina(page, 'tasca');
+    await aplicaQuickFilter(page, page.locator('#simple-tabpanel-tasca .MuiToolbar-root input[type="text"]'), CODI_TASCA1);
+    await expect(getTascaRows(page)).toHaveCount(1);
+    await getTascaRows(page).first().locator('[aria-label="key"]').click();
+    await esperarGridCarregat(page);
+    await page.waitForTimeout(SYSTEM_DELAY);
+};
+
+const crearValidacioReact = async (page: Page, tipus: 'DADA' | 'DOCUMENT') => {
+    await page.waitForTimeout(SYSTEM_DELAY);
+    await page.getByRole('button').filter({ hasText: /nova validaci|nueva validaci/i }).click();
+    const dialog = page.locator('[role="dialog"]');
+    await expect(dialog).toBeVisible({ timeout: 5_000 });
+    const matcher = tipus === 'DADA' ? /dato|dada/i : /document/i;
+    await triaMuiSelect(page, dialog, 'itemValidacio', matcher);
+    const elemName = tipus === 'DADA' ? 'metaDada' : 'metaDocument';
+    const elemInput = dialog.locator(`[name="${elemName}"] input[type="text"]`);
+    await elemInput.click();
+    await page.waitForSelector('[role="listbox"]', { timeout: 5_000 });
+    await page.getByRole('option').first().click();
+    await page.waitForSelector('[role="listbox"]', { state: 'detached', timeout: 3_000 }).catch(() => {});
+    await guardaAmbDelay(page, dialog.getByRole('button').filter({ hasText: /guarda/i }));
+    await expectSuccessAlert(page);
+};
+
 // ── Helpers per a Permisos ────────────────────────────────────────────────────
 
 const anarAPermisos = async (page: Page): Promise<void> => {
@@ -1022,6 +1050,87 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
         await test.step('verificar que hi ha dues tasques', async () => {
             logInfo('  -> verificar que hi ha dues tasques');
             await expect(getTascaRows(page)).toHaveCount(2);
+        });
+
+    });
+
+    test('TASCA VALIDACIO CREAR', async ({ page }) => {
+
+        await anarAValidacionsTasca(page);
+
+        await test.step('verificar que la llista de validacions és buida', async () => {
+            logInfo('  -> verificar que la llista de validacions és buida');
+            await expect(getRows(page)).toHaveCount(0);
+        });
+
+        await test.step('crear validació de tipus DADA', async () => {
+            logInfo('  -> crear validació de tipus DADA');
+            await crearValidacioReact(page, 'DADA');
+        });
+
+        await test.step('crear validació de tipus DOCUMENT', async () => {
+            logInfo('  -> crear validació de tipus DOCUMENT');
+            await crearValidacioReact(page, 'DOCUMENT');
+        });
+
+        await test.step('verificar que hi ha dues validacions', async () => {
+            logInfo('  -> verificar que hi ha dues validacions');
+            await esperarGridCarregat(page);
+            await expect(getRows(page)).toHaveCount(2);
+        });
+
+    });
+
+    test('TASCA VALIDACIO MODIFICAR', async ({ page }) => {
+
+        await anarAValidacionsTasca(page);
+
+        await test.step('filtrar i obrir modal de modificació de la validació DADA', async () => {
+            logInfo('  -> filtrar i obrir modal de modificació de la validació DADA');
+            const fila = getRows(page).filter({ hasText: /dato|dada/i }).first();
+            await expect(fila).toBeVisible({ timeout: 5_000 });
+            const rowId = await fila.getAttribute('data-id');
+            const entityResp = waitApiEntityLoad(page, rowId);
+            await fila.locator('button[aria-label="more"]').click();
+            await page.getByRole('menuitem').filter({ hasText: /modifica(r)?/i }).click();
+            await expect(page.locator('[role="dialog"]')).toBeVisible();
+            await entityResp;
+        });
+
+        await test.step('re-seleccionar la meta-dada i guardar', async () => {
+            logInfo('  -> re-seleccionar la meta-dada i guardar');
+            const dialog = page.locator('[role="dialog"]');
+            const elemInput = dialog.locator('[name="metaDada"] input[type="text"]');
+            await elemInput.click();
+            await page.waitForSelector('[role="listbox"]', { timeout: 5_000 });
+            await page.getByRole('option').first().click();
+            await page.waitForSelector('[role="listbox"]', { state: 'detached', timeout: 3_000 }).catch(() => {});
+            await guardaAmbDelay(page, dialog.getByRole('button').filter({ hasText: /guarda/i }));
+            await expectSuccessAlert(page);
+        });
+
+    });
+
+    test('TASCA VALIDACIO ELIMINAR', async ({ page }) => {
+
+        await anarAValidacionsTasca(page);
+
+        await test.step('eliminar la validació de tipus DOCUMENT', async () => {
+            logInfo('  -> eliminar la validació de tipus DOCUMENT');
+            const fila = getRows(page).filter({ hasText: /document/i }).first();
+            await expect(fila).toBeVisible({ timeout: 5_000 });
+            await fila.locator('button[aria-label="more"]').click();
+            await page.getByRole('menuitem').filter({ hasText: /esborrar|eliminar|borrar/i }).click();
+            await expect(page.locator('[role="dialog"]')).toBeVisible({ timeout: 5_000 });
+            await humanDelay(page);
+            await page.locator('[role="dialog"]').getByRole('button').filter({ hasText: /acceptar|aceptar|confirmar|ok/i }).click();
+            await expectSuccessAlert(page);
+        });
+
+        await test.step('verificar que la validació ha estat eliminada', async () => {
+            logInfo('  -> verificar que la validació ha estat eliminada');
+            await esperarGridCarregat(page);
+            await expect(getRows(page).filter({ hasText: /document/i })).toHaveCount(0);
         });
 
     });

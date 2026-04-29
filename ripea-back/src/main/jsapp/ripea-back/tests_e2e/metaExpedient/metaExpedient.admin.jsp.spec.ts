@@ -1025,9 +1025,61 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
             await expect(getTascaRows(tascaPage)).toHaveCount(0);
         });
 
-        await test.step('crear la primera tasca (camps mínims + responsable)', async () => {
-            console.log('  -> crear la primera tasca (camps mínims + responsable)');
-            await crearTasca(tascaPage, CODI_TASCA1, NOM_TASCA1);
+        await test.step('crear la primera tasca amb validacions (camps mínims + responsable)', async () => {
+            console.log('  -> crear la primera tasca amb validacions');
+            await tascaPage.locator('a[href*="tasca/new"]').click();
+            await expect(tascaPage.locator('.modal.in')).toBeVisible();
+            const frame = tascaPage.locator('.modal.in').frameLocator('.modal-body iframe');
+            await expect(frame.locator('input[name="codi"]')).toBeVisible();
+            await frame.locator('input[name="codi"]').fill(CODI_TASCA1);
+            await frame.locator('input[name="nom"]').fill(NOM_TASCA1);
+            await seleccionarResponsable(tascaPage, frame);
+            await frame.locator('textarea[name="descripcio"]').fill('descripció tasca 1');
+
+            // Navegar a la pestanya Validacions
+            await frame.locator('a[href="#validacions"]').click();
+
+            // Validació de tipus DOCUMENT
+            const ajaxDoc = tascaPage.waitForResponse(
+                resp => resp.url().includes('/getElements/') && resp.status() === 200,
+                { timeout: 10_000 },
+            );
+            await frame.locator('select#itemValidacio').selectOption('DOCUMENT');
+            await ajaxDoc;
+            await expect(frame.locator('select#itemId option').nth(1)).toBeAttached({ timeout: 5_000 });
+            await frame.locator('select#itemId').selectOption({ index: 1 });
+            await frame.locator('select#tipusValidacio').selectOption({ index: 1 });
+            const save1 = tascaPage.waitForResponse(
+                resp => resp.url().includes('/newValidacio') && resp.status() === 200,
+                { timeout: 10_000 },
+            );
+            await frame.locator('button#guardaValidacio').click();
+            await save1;
+
+            // Validació de tipus DADA
+            const ajaxDada = tascaPage.waitForResponse(
+                resp => resp.url().includes('/getElements/') && resp.status() === 200,
+                { timeout: 10_000 },
+            );
+            await frame.locator('select#itemValidacio').selectOption('DADA');
+            await ajaxDada;
+            await expect(frame.locator('select#itemId option').nth(1)).toBeAttached({ timeout: 5_000 });
+            await frame.locator('select#itemId').selectOption({ index: 1 });
+            // tipusValidacio s'auto-selecciona a AP per a DADA (única opció)
+            const save2 = tascaPage.waitForResponse(
+                resp => resp.url().includes('/newValidacio') && resp.status() === 200,
+                { timeout: 10_000 },
+            );
+            await frame.locator('button#guardaValidacio').click();
+            await save2;
+
+            // Enviar el formulari de la tasca
+            const dtRefresh = waitDatatableTasques(tascaPage);
+            const submitBtn = tascaPage.locator('.modal.in .modal-footer button[type="submit"]');
+            await submitBtn.waitFor({ state: 'visible' });
+            await submitBtn.click();
+            await dtRefresh;
+            await expectSuccessAlert(tascaPage);
         });
 
         await test.step('crear la segona tasca (tots els camps)', async () => {
