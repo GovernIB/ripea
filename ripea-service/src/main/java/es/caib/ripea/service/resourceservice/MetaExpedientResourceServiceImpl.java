@@ -402,7 +402,6 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 				
 				if (fieldValue==null || (boolean)fieldValue) {
 					target.setOrganGestor(null);
-					target.setClassificacio(null);
 					target.setTipusClassificacio(TipusClassificacioEnumDto.SIA);
 				}
 				
@@ -441,7 +440,9 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 					}
 					target.setClassificacio(idCalculat);
 				} else {
-					target.setClassificacio(null);
+                    if (TipusClassificacioEnumDto.ID.equals(previous.getTipusClassificacio())) {
+                        target.setClassificacio(null);
+                    }
 				}
 				
 			} else if (MetaExpedientResource.Fields.organGestor.equals(fieldName)) {
