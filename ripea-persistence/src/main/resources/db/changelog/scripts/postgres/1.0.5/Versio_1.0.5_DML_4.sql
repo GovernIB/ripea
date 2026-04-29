@@ -1,0 +1,1 @@
+UPDATE IPA_CONFIG_TYPE SET VALUE='es.caib.ripea.plugin.caib.portafirmes.PortafirmesPluginPortafib,es.caib.ripea.plugin.caib.portafirmes.PortafirmesPluginMock' WHERE CODE='PORTAFIRMES_CLASS';
