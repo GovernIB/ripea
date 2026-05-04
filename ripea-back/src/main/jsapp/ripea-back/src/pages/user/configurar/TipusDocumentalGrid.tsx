@@ -2,7 +2,7 @@ import {useTranslation} from "react-i18next";
 import {GridPage} from "reactlib";
 import {CardPage} from "../../../components/CardData.tsx";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
-import {Grid2 as Grid} from "@mui/material";
+import {Grid} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
 
 const TipusDocumentalForm = () => {

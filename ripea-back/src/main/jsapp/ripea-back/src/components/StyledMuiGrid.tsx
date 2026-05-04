@@ -7,6 +7,7 @@ import {useUserSession} from "./Session.tsx";
 import MassiveActionSelector, {MassiveActionProps} from "./MassiveActionSelector.tsx";
 import {DraggableGridRow, DraggableGridRowHandler} from "./DraggableContext.tsx";
 import {DndContext} from "@dnd-kit/core";
+import {toSelectionModel, fromSelectionModel, EMPTY_SELECTION_MODEL} from "./selectionModelUtils";
 
 export const ToolbarButton = (props:any) => {
     const { title, icon, hidden, children, ...other } = props;
@@ -105,6 +106,7 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
         toolbarShowQuickFilter = false,
         ...others
     } = props
+    const { rowSelectionModel: rowSelectionModelProp, ...othersWithoutSelection } = others as any;
     const [gridRows, setGridRows] = useState<any[]>([]);
     const [selectedRows, setSelectedRows] = useState<any[]>([]);
 
@@ -215,13 +217,14 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
             getRowClassName={getRowClassName}
             onRowsChange={(rows, info) => {
                 setGridRows([...rows]);
-                setGridSelectedRows(others?.rowSelectionModel ?? [])
+                setGridSelectedRows(toSelectionModel(rowSelectionModelProp))
                 onRowsChange?.(rows, info);
                 onRowCountChange?.(info?.totalElements)
             }}
             onRowSelectionModelChange={(newSelection, details) => {
-                setSelectedRows([...newSelection]);
-                onRowSelectionModelChange?.(newSelection, details);
+                const ids = fromSelectionModel(newSelection);
+                setSelectedRows(ids);
+                onRowSelectionModelChange?.(ids as any, details);
             }}
 
             selectionActive={selectionActive || (!!toolbarMassiveActions && !readOnly)}
@@ -245,7 +248,8 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
             rowHideDeleteButton
             readOnly={readOnly}
 
-            {...others}
+            rowSelectionModel={rowSelectionModelProp != null ? toSelectionModel(rowSelectionModelProp) : EMPTY_SELECTION_MODEL}
+            {...othersWithoutSelection}
             {...paginationProps}
         />
     </div>

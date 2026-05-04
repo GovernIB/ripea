@@ -4,7 +4,7 @@ import * as builder from "../../util/springFilterUtils.ts";
 import {BasePage, MuiDialog, useFormContext, useMuiDataGridApiRef} from "reactlib";
 import {useEffect, useMemo, useState} from "react";
 import GridFormField from "../../components/GridFormField.tsx";
-import {Typography, Grid2 as Grid} from "@mui/material";
+import {Typography, Grid} from "@mui/material";
 
 const sortModelInteressat: any = [{ field: 'nomComplet', sort: 'asc' }];
 const columnsInteressat = [

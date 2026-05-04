@@ -8,7 +8,7 @@ import {
     useFormContext,
     useResourceApiService
 } from "reactlib";
-import {Grid2 as Grid} from "@mui/material";
+import {Grid} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
 import {CardData} from "../../../components/CardData.tsx";
 

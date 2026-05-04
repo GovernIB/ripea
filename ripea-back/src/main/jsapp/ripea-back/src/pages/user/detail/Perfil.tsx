@@ -1,5 +1,5 @@
 import {useMemo, useRef} from "react";
-import {Grid2 as Grid, Box} from "@mui/material";
+import {Grid, Box} from "@mui/material";
 import {MuiFormDialog, useBaseAppContext, MuiFormDialogApi, useFormContext, DialogButton} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {CardData} from "../../../components/CardData.tsx";

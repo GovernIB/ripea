@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {Box, Grid2 as Grid, Typography} from "@mui/material";
+import {Box, Grid, Typography} from "@mui/material";
 import {BasePage, MuiDialog} from "reactlib";
 import {useTranslation} from "react-i18next";
 import TabComponent from "../../../components/TabComponent.tsx";

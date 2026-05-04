@@ -2,7 +2,7 @@ import {CardPage} from "../../components/CardData.tsx";
 import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
 import {GridPage, useMuiDataGridApiRef} from "reactlib";
 import {useTranslation} from "react-i18next";
-import {Grid2 as Grid, Icon} from "@mui/material";
+import {Grid, Icon} from "@mui/material";
 import {formatDate} from "../../util/dateUtils.ts";
 import {useAvisActions} from "./details/AvisActions.tsx";
 import GridFormField from "../../components/GridFormField.tsx";

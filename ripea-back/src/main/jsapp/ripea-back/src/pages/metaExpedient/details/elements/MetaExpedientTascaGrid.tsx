@@ -1,5 +1,5 @@
 import {useTranslation} from "react-i18next";
-import {Badge, Grid2 as Grid, Icon, Divider} from "@mui/material";
+import {Badge, Grid, Icon, Divider} from "@mui/material";
 import StyledMuiGrid from "../../../../components/StyledMuiGrid.tsx";
 import * as builder from "../../../../util/springFilterUtils.ts";
 import {useBaseAppContext, useFormContext, useMuiDataGridApiRef, useResourceApiService} from "reactlib";

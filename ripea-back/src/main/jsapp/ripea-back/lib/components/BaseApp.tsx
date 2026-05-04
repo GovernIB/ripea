@@ -13,8 +13,8 @@ import {
     TemporalMessageSeverity,
     RouterNavigateFunction,
 } from './BaseAppContext';
+import { DetailFieldCustomProps } from './detail/DetailField';
 import { useResourceApiContext } from './ResourceApiContext';
-import { ResourceApiUserSessionValuePair } from './ResourceApiContext';
 
 export const MARGIN_UNIT_PX = 8;
 export const LIB_I18N_NS = 'reactlib';
@@ -33,7 +33,6 @@ type ContentComponentSlots = {
 
 export type BaseAppProps = React.PropsWithChildren & {
     code: string;
-    persistentSession?: boolean;
     persistentLanguage?: boolean;
     i18nUseTranslation: (ns?: string) => { t: any };
     i18nCurrentLanguage?: string;
@@ -42,11 +41,15 @@ export type BaseAppProps = React.PropsWithChildren & {
     routerGoBack: (fallback?: string) => void;
     routerNavigate: RouterNavigateFunction;
     routerAnyHistoryEntryExist: () => boolean;
+    routerUseBlocker?: (shouldBlock: boolean | ((args: any) => boolean)) => void;
     routerUseLocationPath: () => string;
     linkComponent: React.ElementType;
     saveAs?: (data: Blob | string, filename?: string) => void;
     formFieldComponents?: FormFieldComponent[];
+    detailFieldComponent?: React.FC<DetailFieldCustomProps>;
     contentComponentSlots: ContentComponentSlots;
+    fixedContentExpandsToAvailableHeightEnabled?: boolean;
+    marginsDisabled?: boolean;
 };
 
 export type BaseAppContentComponentProps = React.PropsWithChildren & {
@@ -65,50 +68,52 @@ const useDialog = () => {
     const dialogShowFn = React.useRef<MessageDialogShowFn>(undefined);
     const setMessageDialogShow = (fn: MessageDialogShowFn) => {
         dialogShowFn.current = fn;
-    }
+    };
     const messageDialogShow: MessageDialogShowFn = (
         title: string | null,
         message: string | React.ReactElement,
         dialogButtons?: DialogButton[],
-        componentProps?: any) => {
+        componentProps?: any
+    ) => {
         if (dialogShowFn.current) {
             return dialogShowFn.current(title, message, dialogButtons, componentProps);
         } else {
             console.warn('Dialog component not configured in BaseApp');
             return new Promise((_resolve, reject) => reject());
         }
-    }
+    };
     return {
         setMessageDialogShow,
         messageDialogShow,
     };
-}
+};
 
 const useTemporalMessage = () => {
     const temporalMessageShowFn = React.useRef<TemporalMessageShowFn>(undefined);
     const setTemporalMessageShow = (fn: TemporalMessageShowFn) => {
         temporalMessageShowFn.current = fn;
-    }
+    };
     const temporalMessageShow: TemporalMessageShowFn = (
         title: string | null,
         message: string,
         severity?: TemporalMessageSeverity,
-        additionalComponents?: React.ReactElement[]) => {
+        additionalComponents?: React.ReactElement[]
+    ) => {
         if (temporalMessageShowFn.current) {
             temporalMessageShowFn.current(title, message, severity, additionalComponents);
         } else {
             console.warn('Temporal message component not configured in BaseApp');
         }
-    }
+    };
     return {
         setTemporalMessageShow,
         temporalMessageShow,
     };
-}
+};
 
 const useFormFieldComponents = (formFieldComponents?: FormFieldComponent[]) => {
     const formFieldComponentsMap: any = {};
-    formFieldComponents?.forEach(ffc => {
+    formFieldComponents?.forEach((ffc) => {
         formFieldComponentsMap[ffc.type] = ffc.component;
     });
     const formFieldComponentsRef = React.useRef<any>(formFieldComponentsMap);
@@ -116,12 +121,12 @@ const useFormFieldComponents = (formFieldComponents?: FormFieldComponent[]) => {
         if (type && formFieldComponentsRef.current && formFieldComponentsRef.current[type]) {
             return formFieldComponentsRef.current[type];
         } else {
-            console.warn('Form field type ' + type + ' not found, using default')
+            console.warn('Form field type ' + type + ' not found, using default');
             return ResourceApiFormFieldDefault;
         }
-    }
+    };
     return getFormFieldComponent;
-}
+};
 
 const useI18n = (
     code: string,
@@ -129,18 +134,13 @@ const useI18n = (
     i18nUseTranslation: (ns?: string) => { t: any },
     i18nCurrentLanguage?: string,
     i18nHandleLanguageChange?: I18nHandleLanguageChangeFn,
-    i18nAddResourceBundleCallback?: I18nAddResourceBundleCallback) => {
-    const {
-        persistentStateReady,
-        persistentStateGet,
-        persistentStateSet,
-    } = usePersistentState(code);
+    i18nAddResourceBundleCallback?: I18nAddResourceBundleCallback
+) => {
+    const { persistentStateReady, persistentStateGet, persistentStateSet } =
+        usePersistentState(code);
     const { t: tI18Next } = i18nUseTranslation(LIB_I18N_NS);
     const { t: tI18NextGlobal } = i18nUseTranslation();
-    const {
-        currentLanguage,
-        setCurrentLanguage,
-    } = useResourceApiContext();
+    const { currentLanguage, setCurrentLanguage } = useResourceApiContext();
     React.useEffect(() => {
         i18nAddResourceBundleCallback?.('ca', LIB_I18N_NS, componentsCa);
         i18nAddResourceBundleCallback?.('es', LIB_I18N_NS, componentsEs);
@@ -169,59 +169,13 @@ const useI18n = (
             return tI18NextGlobal(key, params);
         }
         return result;
-    }
+    };
     return {
         currentLanguage,
         setCurrentLanguage,
-        t
+        t,
     };
-}
-
-const useUserSession = (code: string, persistentSession: boolean) => {
-    const {
-        userSession,
-        setUserSession,
-        setUserSessionAttributes
-    } = useResourceApiContext();
-    const {
-        persistentStateReady,
-        persistentStateGet,
-        persistentStateSet,
-        persistentStateRemove,
-    } = usePersistentState(code);
-    React.useEffect(() => {
-        if (persistentSession && persistentStateReady && userSession == null) {
-            const session = persistentStateGet(PERSISTENT_SESSION_KEY);
-            setUserSession(session ?? {});
-        }
-    }, [persistentStateReady]);
-    React.useEffect(() => {
-        if (persistentSession && persistentStateReady) {
-            persistentStateSet(PERSISTENT_SESSION_KEY, userSession);
-        }
-    }, [userSession]);
-    const localSetUserSessionAttribute = (attribute: string, value: any): boolean => {
-        return localSetUserSessionAttributes([{ attribute, value }])
-    }
-    const localSetUserSessionAttributes = (attributeValuePairs: ResourceApiUserSessionValuePair[]): boolean => {
-        if (persistentSession) {
-            const session = persistentStateGet(PERSISTENT_SESSION_KEY);
-            const changes: any = {};
-            attributeValuePairs.forEach(c => changes[c.attribute] = c.value);
-            persistentStateSet(PERSISTENT_SESSION_KEY, { ...session, ...changes });
-        }
-        return setUserSessionAttributes(attributeValuePairs);
-    }
-    return {
-        userSession,
-        setUserSessionAttribute: localSetUserSessionAttribute,
-        setUserSessionAttributes: localSetUserSessionAttributes,
-        persistentStateReady,
-        persistentStateGet,
-        persistentStateSet,
-        persistentStateRemove
-    };
-}
+};
 
 const ContentComponentDefault: React.FC<BaseAppContentComponentProps> = (props) => {
     const {
@@ -237,29 +191,40 @@ const ContentComponentDefault: React.FC<BaseAppContentComponentProps> = (props) 
     } = props;
     const mainBoxHeight = contentExpandsToAvailableHeight ? '100vh' : undefined;
     const childrenOrOfflineComponent = !offline ? children : offlineComponent;
-    return <div style={{ display: 'flex', flexDirection: 'column', height: mainBoxHeight }}>
-        {appbarComponent}
-        <div style={{
-            display: 'flex',
-            flexGrow: 1,
-        }}>
-            {menuComponent}
-            <main style={{
-                flexGrow: 1,
-                minWidth: 0,
-                ...(!marginsDisabled ? { margin: '16px 24px' } : null),
+    return (
+        <div
+            style={{
+                display: 'flex',
+                flexDirection: 'column',
+                height: mainBoxHeight,
             }}>
-                {appReady ? childrenOrOfflineComponent : null}
-            </main>
+            {appbarComponent}
+            <div
+                style={{
+                    display: 'flex',
+                    flexGrow: 1,
+                    minHeight: 0,
+                }}>
+                <nav>{menuComponent}</nav>
+                <main
+                    style={{
+                        flexGrow: 1,
+                        minWidth: 0,
+                        ...(!marginsDisabled ? { margin: '16px 24px' } : null),
+                    }}>
+                    {appReady ? childrenOrOfflineComponent : null}
+                </main>
+            </div>
+            {footerComponent && <footer>{footerComponent}</footer>}
         </div>
-        {footerComponent}
-    </div>;
-}
+    );
+};
+
+const emptyFunction = () => {};
 
 export const BaseApp: React.FC<BaseAppProps> = (props) => {
     const {
         code,
-        persistentSession,
         persistentLanguage,
         i18nUseTranslation,
         i18nCurrentLanguage,
@@ -267,89 +232,90 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
         i18nAddResourceBundleCallback,
         routerGoBack,
         routerNavigate,
+        routerUseBlocker,
         routerUseLocationPath,
         routerAnyHistoryEntryExist,
         linkComponent,
         saveAs,
         formFieldComponents,
+        detailFieldComponent,
         contentComponentSlots,
+        fixedContentExpandsToAvailableHeightEnabled,
+        marginsDisabled: marginsDisabledProp,
         children,
     } = props;
     const { offline } = useResourceApiContext();
-    const [marginsDisabled, setMarginsDisabled] = React.useState<boolean>(false);
-    const [contentExpandsToAvailableHeight, setContentExpandsToAvailableHeight] = React.useState<boolean>(false);
+    const [marginsDisabled, setMarginsDisabled] = React.useState<boolean>(
+        marginsDisabledProp ?? false
+    );
+    const [contentExpandsToAvailableHeight, setContentExpandsToAvailableHeight] =
+        React.useState<boolean>(fixedContentExpandsToAvailableHeightEnabled ?? false);
     const getLinkComponent = () => linkComponent;
-    const {
-        setMessageDialogShow,
-        messageDialogShow,
-    } = useDialog();
-    const {
-        setTemporalMessageShow,
-        temporalMessageShow
-    } = useTemporalMessage();
+    const { setMessageDialogShow, messageDialogShow } = useDialog();
+    const { setTemporalMessageShow, temporalMessageShow } = useTemporalMessage();
     const getFormFieldComponent = useFormFieldComponents(formFieldComponents);
-    const {
-        currentLanguage,
-        setCurrentLanguage,
-        t,
-    } = useI18n(
+    const getDetailFieldComponent = (_type?: string) => detailFieldComponent;
+    const { currentLanguage, setCurrentLanguage, t } = useI18n(
         code,
         persistentLanguage ?? false,
         i18nUseTranslation,
         i18nCurrentLanguage,
         i18nHandleLanguageChange,
-        i18nAddResourceBundleCallback);
-    const {
-        userSession,
-        setUserSessionAttribute,
-        setUserSessionAttributes,
-        persistentStateReady,
-        persistentStateGet,
-        persistentStateSet,
-        persistentStateRemove
-    } = useUserSession(code, persistentSession ?? false);
+        i18nAddResourceBundleCallback
+    );
+    const locationPath = routerUseLocationPath();
+    const previousLocationPath = React.useRef<string>(locationPath);
+    const [topLevelRouteChanged, setTopLevelRouteChanged] = React.useState<boolean>(false);
+    React.useEffect(() => {
+        const prev = previousLocationPath.current;
+        const getTopLevel = (path: string) => path.split('/')[1] || '';
+        const topLevelRouteChanged = getTopLevel(prev) !== getTopLevel(locationPath);
+        setTopLevelRouteChanged(topLevelRouteChanged);
+        previousLocationPath.current = locationPath;
+    }, [locationPath]);
     const context = {
+        code,
         getFormFieldComponent,
-        setMarginsDisabled,
+        getDetailFieldComponent,
+        setMarginsDisabled: marginsDisabledProp == null ? setMarginsDisabled : emptyFunction,
         contentExpandsToAvailableHeight,
-        setContentExpandsToAvailableHeight,
+        setContentExpandsToAvailableHeight:
+            fixedContentExpandsToAvailableHeightEnabled == null
+                ? setContentExpandsToAvailableHeight
+                : emptyFunction,
         getLinkComponent,
         goBack: routerGoBack,
         navigate: routerNavigate,
-        anyHistoryEntryExist: routerAnyHistoryEntryExist,
+        useBlocker: routerUseBlocker,
         useLocationPath: routerUseLocationPath,
+        anyHistoryEntryExist: routerAnyHistoryEntryExist,
+        topLevelRouteChanged,
         setMessageDialogShow,
         messageDialogShow,
         setTemporalMessageShow,
         temporalMessageShow,
-        userSession,
-        setUserSessionAttribute,
-        setUserSessionAttributes,
         currentLanguage,
         setCurrentLanguage,
         t,
-        persistentStateReady,
-        persistentStateGet,
-        persistentStateSet,
-        persistentStateRemove,
         saveAs,
     };
-    const sessionReady = !persistentSession || userSession != null;
     const languageReady = !persistentLanguage || currentLanguage != null;
-    const appReady = sessionReady && languageReady;
-    return <BaseAppContext.Provider value={context}>
-        <ContentComponentDefault
-            offline={offline}
-            appReady={appReady}
-            marginsDisabled={marginsDisabled}
-            contentExpandsToAvailableHeight={contentExpandsToAvailableHeight}
-            appbarComponent={contentComponentSlots.appbar}
-            footerComponent={contentComponentSlots.footer}
-            menuComponent={contentComponentSlots.menu}
-            offlineComponent={contentComponentSlots.offline}>
-            {children}
-        </ContentComponentDefault>
-    </BaseAppContext.Provider>;
-}
+    const appReady = languageReady;
+    return (
+        <BaseAppContext.Provider value={context}>
+            <ContentComponentDefault
+                offline={offline}
+                appReady={appReady}
+                marginsDisabled={marginsDisabled}
+                contentExpandsToAvailableHeight={contentExpandsToAvailableHeight}
+                appbarComponent={contentComponentSlots.appbar}
+                footerComponent={contentComponentSlots.footer}
+                menuComponent={contentComponentSlots.menu}
+                offlineComponent={contentComponentSlots.offline}>
+                {children}
+            </ContentComponentDefault>
+        </BaseAppContext.Provider>
+    );
+};
 
 export default BaseApp;

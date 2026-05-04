@@ -2,7 +2,7 @@ import {useTranslation} from "react-i18next";
 import {GridPage, useBaseAppContext, useMuiDataGridApiRef, useResourceApiService} from "reactlib";
 import {CardPage} from "../../../components/CardData.tsx";
 import StyledMuiGrid, {ToolbarButton} from "../../../components/StyledMuiGrid.tsx";
-import { Grid2 as Grid } from "@mui/material";
+import { Grid } from "@mui/material";
 import GridFormField, {PasswordFormField} from "../../../components/GridFormField.tsx";
 
 const useActions = (refresh?: () => void) => {

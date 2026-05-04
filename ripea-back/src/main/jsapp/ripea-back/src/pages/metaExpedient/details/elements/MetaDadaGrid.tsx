@@ -2,7 +2,7 @@ import {useTranslation} from "react-i18next";
 import {GridPage, useBaseAppContext, useFormContext, useMuiDataGridApiRef, useResourceApiService} from "reactlib";
 import {CardPage} from "../../../../components/CardData.tsx";
 import {DndMuiGrid} from "../../../../components/StyledMuiGrid.tsx";
-import {Grid2 as Grid, Icon, Divider, Button} from "@mui/material";
+import {Grid, Icon, Divider, Button} from "@mui/material";
 import * as builder from "../../../../util/springFilterUtils.ts";
 import {useNavigate, useParams} from "react-router-dom";
 import GridFormField from "../../../../components/GridFormField.tsx";

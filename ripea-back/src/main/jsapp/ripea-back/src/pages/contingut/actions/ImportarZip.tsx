@@ -1,5 +1,5 @@
 import {useEffect, useRef, useState} from "react";
-import {Alert, Box, Grid2 as Grid} from "@mui/material";
+import {Alert, Box, Grid} from "@mui/material";
 import {FormField, MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
 import { useTranslation } from "react-i18next";
 import GridFormField, {FileFormField, formatByteCount} from "../../../components/GridFormField.tsx";
@@ -8,6 +8,7 @@ import { usePollingArtifactAction } from "../../../components/ActionPollingOptio
 import ImportarZipResults from "./ImportarZipResults.tsx";
 import BackdropLoading from "../../../components/BackdropLoading.tsx";
 import {DataGridPro} from "@mui/x-data-grid-pro";
+import {toSelectionModel, fromSelectionModel} from "../../../components/selectionModelUtils";
 import Load from "../../../components/Load.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 
@@ -146,12 +147,13 @@ const ImportarZipForm = () => {
                 rows={data.documentsZip}
                 columns={columns}
                 onRowSelectionModelChange={(newSelection) => {
+                    const ids = fromSelectionModel(newSelection);
                     data.documentsZip.forEach((row:any) => {
-                        updateDocument(row.id, "importar", newSelection.includes(row.id))
+                        updateDocument(row.id, "importar", ids.includes(row.id))
                     })
                 }}
 
-                rowSelectionModel={data?.documentsZip?.filter?.((row:any)=> row?.importar)?.map?.((row:any) => row.id)}
+                rowSelectionModel={toSelectionModel(data?.documentsZip?.filter?.((row:any)=> row?.importar)?.map?.((row:any) => row.id) ?? [])}
                 checkboxSelection
                 disableRowSelectionOnClick
                 disableColumnMenu

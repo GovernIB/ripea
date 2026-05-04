@@ -1,5 +1,5 @@
 import {useRef, useState, forwardRef, useImperativeHandle } from "react";
-import {Alert, Grid2 as Grid, Icon} from "@mui/material";
+import {Alert, Grid, Icon} from "@mui/material";
 import {MuiDialog, MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import GridFormField, {GridButton} from "../../../components/GridFormField.tsx";

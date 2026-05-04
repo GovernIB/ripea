@@ -1,7 +1,7 @@
 import {useTranslation} from "react-i18next";
 import {MuiDialog, useFormContext} from "reactlib";
 import {useMemo, useState} from "react";
-import {Grid2 as Grid, Icon} from "@mui/material";
+import {Grid, Icon} from "@mui/material";
 import Load from "../../../components/Load.tsx";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";

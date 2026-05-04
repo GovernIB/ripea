@@ -12,9 +12,12 @@ const componentsEs = {
         },
         offline: {
             message: 'Sin conexión con el servidor',
-        }
+        },
     },
     datacommon: {
+        back: {
+            label: 'Volver atrás',
+        },
         details: {
             label: 'Detalles',
         },
@@ -28,9 +31,17 @@ const componentsEs = {
             label: 'Borrar',
             single: {
                 label: 'Confirmación',
-                confirm: '¿Está seguro de que desea borrar este elemento (esta acción no se puede deshacer)?',
+                confirm:
+                    '¿Está seguro de que desea borrar este elemento (esta acción no se puede deshacer)?',
                 success: 'Elemento borrado',
                 error: 'Error borrando elemento',
+            },
+            multiple: {
+                label: 'Confirmación',
+                confirm:
+                    '¿Está seguro de que desea borrar los {{count}} elementos seleccionados (esta acción no se puede deshacer)?',
+                success: '{{count}} elementos borrados',
+                error: 'No se han podido borrar {{count}} elementos',
             },
         },
         export: {
@@ -39,11 +50,13 @@ const componentsEs = {
         refresh: {
             label: 'Refrescar',
         },
+        quickfilter: {
+            label: 'Filtro rápido',
+        },
         toolbar: {
             error: 'Se ha producido un error',
         },
-        findDisabled: 'Sin consultar',
-        noRows: 'Sin datos',
+        noRows: 'Sin resultados',
         error: 'Error',
     },
     grid: {
@@ -51,7 +64,20 @@ const componentsEs = {
             one: '1 fila seleccionada',
             multiple: '{{count}} filas seleccionadas',
         },
-        pageInfo: '{{from}} a {{to}} de {{count}}',
+        edit: {
+            save: 'Guardar',
+            cancel: 'Cancelar',
+        },
+        row: {
+            single: 'fila',
+            multiple: 'filas',
+        },
+        footer: {
+            pageInfo: '{{from}} a {{to}} de {{count}}',
+            sizeAuto: 'Automático',
+            pageSizeTitle: 'Número de elementos por página',
+        },
+        requestPending: 'Pendiente de consultar',
     },
     form: {
         goBack: {
@@ -70,11 +96,13 @@ const componentsEs = {
             title: 'Modificar',
             success: 'Elemento modificado',
             error: 'Error modificando elemento',
-            wrong_resource_type: 'No es posible guardar los formularios con tipo de recurso "{{resourceType}}"',
+            wrong_resource_type:
+                'No es posible guardar los formularios con tipo de recurso "{{resourceType}}"',
         },
         delete: {
             title: 'Borrar',
-            confirm: '¿Está seguro de que desea borrar este elemento (esta acción no se puede deshacer)?',
+            confirm:
+                '¿Está seguro de que desea borrar este elemento (esta acción no se puede deshacer)?',
             success: 'Elemento borrado',
             error: 'Error borrando elemento',
         },
@@ -91,8 +119,8 @@ const componentsEs = {
                 noOptions: 'Sin opciones',
                 page: 'Mostrando {{size}} de {{totalElements}} elementos',
                 advanced: {
-                    title: 'Seleccionar valor'
-                }
+                    title: 'Seleccionar valor',
+                },
             },
             checkboxSelect: {
                 true: 'Si',
@@ -107,18 +135,27 @@ const componentsEs = {
             error: 'Error de validación',
             saveErrors: 'Hay errores de validación',
         },
+        blocker:
+            'Esta seguro de que desea salir de este formulario? Es posible que se pierdan los cambios que ha hecho.',
     },
     actionreport: {
         action: {
             confirm: {
                 title: 'Confirmación',
-                message: '¿Está seguro de que desea ejecutar la acción {{action}}?'
+                message: '¿Está seguro de que desea ejecutar la acción {{action}}?',
             },
-            error: 'Error ejecutando la acción'
+            success: 'Acción ejecutada correctamente',
+            error: 'Error ejecutando la acción',
         },
         report: {
-            error: 'Error generando el informe'
-        }
+            success: 'Informe generado correctamente',
+            error: 'Error generando el informe',
+        },
+    },
+    copyToClipboard: {
+        copy: 'Copiar',
+        default: 'Contenido copiado al portapapeles',
+        error: 'Error copiando contenido en el portapapeles',
     },
     buttons: {
         answerRequired: {

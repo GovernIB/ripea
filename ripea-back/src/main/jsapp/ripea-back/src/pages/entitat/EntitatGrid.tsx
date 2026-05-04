@@ -2,7 +2,7 @@ import {GridPage, useFormContext, useMuiDataGridApiRef} from "reactlib";
 import {CardPage} from "../../components/CardData.tsx";
 import {useTranslation} from "react-i18next";
 import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
-import {Badge, Grid2 as Grid, Icon, Typography} from "@mui/material";
+import {Badge, Grid, Icon, Typography} from "@mui/material";
 import LinkIcon from "../../components/LinkIcon.tsx";
 import GridFormField, {FileFormField} from "../../components/GridFormField.tsx";
 import {useEntitatActions} from "./details/EntitatActions.tsx";

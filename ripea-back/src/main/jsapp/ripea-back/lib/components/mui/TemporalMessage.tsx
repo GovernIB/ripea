@@ -16,55 +16,59 @@ type TemporalMessageProps = {
     additionalComponents?: React.ReactElement[];
 };
 
-export const useTemporalMessage: (() => [TemporalMessageShowFn, React.ReactElement]) = () => {
+export const useTemporalMessage: () => [TemporalMessageShowFn, React.ReactElement] = () => {
     const [open, setOpen] = React.useState<boolean>(false);
     const [title, setTitle] = React.useState<string>();
     const [message, setMessage] = React.useState<string>();
     const [severity, setSeverity] = React.useState<TemporalMessageSeverity>();
-    const [additionalComponents, setAdditionalComponents] = React.useState<React.ReactElement[] | undefined>();
+    const [additionalComponents, setAdditionalComponents] = React.useState<
+        React.ReactElement[] | undefined
+    >();
     const show: TemporalMessageShowFn = (
         title: string | null,
         message: string,
         severity?: TemporalMessageSeverity,
-        additionalComponents?: React.ReactElement[]) => {
+        additionalComponents?: React.ReactElement[]
+    ) => {
         setTitle(title ?? undefined);
         setMessage(message);
-        setSeverity(severity)
+        setSeverity(severity);
         setAdditionalComponents(additionalComponents);
         setOpen(true);
-    }
-    const component = <TemporalMessage
-        open={open}
-        setOpen={setOpen}
-        title={title}
-        message={message}
-        severity={severity}
-        additionalComponents={additionalComponents} />;
+    };
+    const component = (
+        <TemporalMessage
+            open={open}
+            setOpen={setOpen}
+            title={title}
+            message={message}
+            severity={severity}
+            additionalComponents={additionalComponents}
+        />
+    );
     return [show, component];
-}
+};
 
 export const TemporalMessage: React.FC<TemporalMessageProps> = (props) => {
-    const {
-        open,
-        setOpen,
-        title,
-        message,
-        severity,
-        additionalComponents,
-    } = props;
+    const { open, setOpen, title, message, severity, additionalComponents } = props;
     const autoHideDuration =
         severity === 'error' ? TEMPORALMSG_DURATION_ERROR : TEMPORALMSG_DURATION_DEFAULT;
-    return <Snackbar
-        open={open}
-        onClose={() => setOpen(false)}
-        autoHideDuration={autoHideDuration}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
-        <Alert onClose={() => setOpen(false)} severity={severity ?? 'info'} sx={{ width: '100%' }}>
-            {title && <AlertTitle>{title}</AlertTitle>}
-            {message}
-            {additionalComponents}
-        </Alert>
-    </Snackbar>;
-}
+    return (
+        <Snackbar
+            open={open}
+            onClose={() => setOpen(false)}
+            autoHideDuration={autoHideDuration}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
+            <Alert
+                onClose={() => setOpen(false)}
+                severity={severity ?? 'info'}
+                sx={{ width: '100%' }}>
+                {title && <AlertTitle>{title}</AlertTitle>}
+                {message}
+                {additionalComponents}
+            </Alert>
+        </Snackbar>
+    );
+};
 
 export default TemporalMessage;

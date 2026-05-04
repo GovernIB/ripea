@@ -10,6 +10,7 @@ import {
     ResourceApiProvider
 } from 'reactlib';
 import {SessionStorageProvider} from "./components/SessionStorageContext.tsx";
+import {RipeaAuthProvider} from "./components/RipeaAuthProvider.tsx";
 import SseProvider from "./components/SseClient.tsx";
 import {ThemeUserProvider} from "./components/ThemeUserProvider.tsx";
 
@@ -54,14 +55,16 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         {/*<AuthProvider config={getAuthConfig()} mandatory everetAuthPatch>*/}
         <ResourceApiProvider apiUrl={getEnvApiUrl()} userSessionActive>
             <SessionStorageProvider>
-                <SseProvider>
-                    <ThemeUserProvider>
-                        {/*<CssBaseline />*/}
-                        <BrowserRouter basename={import.meta.env.BASE_URL}>
-                            <App />
-                        </BrowserRouter>
-                    </ThemeUserProvider>
-                </SseProvider>
+                <RipeaAuthProvider>
+                    <SseProvider>
+                        <ThemeUserProvider>
+                            {/*<CssBaseline />*/}
+                            <BrowserRouter basename={import.meta.env.BASE_URL}>
+                                <App />
+                            </BrowserRouter>
+                        </ThemeUserProvider>
+                    </SseProvider>
+                </RipeaAuthProvider>
             </SessionStorageProvider>
         </ResourceApiProvider>
         {/*</AuthProvider>*/}

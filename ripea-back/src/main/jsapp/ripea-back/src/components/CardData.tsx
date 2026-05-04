@@ -1,4 +1,4 @@
-import {Box, Card, CardContent, CardHeader, Grid2 as Grid, Typography, Icon, IconButton} from "@mui/material";
+import {Box, Card, CardContent, CardHeader, Grid, Typography, Icon, IconButton} from "@mui/material";
 import React from "react";
 
 const iconButton = { p: 0.5, borderRadius: '5px', maxWidth: 'max-content', border: '1px solid grey' }

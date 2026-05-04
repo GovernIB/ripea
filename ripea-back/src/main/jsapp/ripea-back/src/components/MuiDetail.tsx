@@ -1,6 +1,6 @@
 import {DetailCardContent} from "./CardData.tsx";
 import React, { ReactNode } from "react";
-import {Grid2 as Grid, Grid2Props} from "@mui/material";
+import {Grid, GridProps} from "@mui/material";
 import Load from "./Load.tsx";
 
 export const FieldData = ({ label, field, renderCell = (formattedValue:any) => formattedValue,  children, ...other }: any) => {
@@ -18,7 +18,7 @@ export const FieldData = ({ label, field, renderCell = (formattedValue:any) => f
 type MuiDetailContextType = { entity: any; getField: (name: string) => any; };
 const MuiDetailContext = React.createContext<MuiDetailContextType | undefined>(undefined);
 
-type MuiDetailProps = Grid2Props & {
+type MuiDetailProps = GridProps & {
     entity: any;
     fields?: any[];
     children: ReactNode;

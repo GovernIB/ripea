@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {Alert, Grid2 as Grid} from "@mui/material";
+import {Alert, Grid} from "@mui/material";
 import {useResourceApiService, MuiDialog, useBaseAppContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import Load from "../../../components/Load.tsx";

@@ -1,6 +1,6 @@
 import {useTranslation} from "react-i18next";
 import {useFormContext} from "reactlib";
-import {Grid2 as Grid} from "@mui/material";
+import {Grid} from "@mui/material";
 import GridFormField, {GridButtonField} from "../../components/GridFormField.tsx";
 import StyledMuiFilter from "../../components/StyledMuiFilter.tsx";
 import {useState} from "react";

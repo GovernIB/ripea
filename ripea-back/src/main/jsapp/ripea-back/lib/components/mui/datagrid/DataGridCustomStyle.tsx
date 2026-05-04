@@ -17,20 +17,20 @@ const DataGridCustomStyle = styled(DataGrid)((props) => {
             '&.Mui-selected': {
                 backgroundColor: alpha(
                     theme.palette.primary.main,
-                    ODD_OPACITY + theme.palette.action.selectedOpacity,
+                    ODD_OPACITY + theme.palette.action.selectedOpacity
                 ),
                 '&:hover': {
                     backgroundColor: alpha(
                         theme.palette.primary.main,
                         ODD_OPACITY +
-                        theme.palette.action.selectedOpacity +
-                        theme.palette.action.hoverOpacity,
+                            theme.palette.action.selectedOpacity +
+                            theme.palette.action.hoverOpacity
                     ),
                     // Reset on touch devices, it doesn't add specificity
                     '@media (hover: none)': {
                         backgroundColor: alpha(
                             theme.palette.primary.main,
-                            ODD_OPACITY + theme.palette.action.selectedOpacity,
+                            ODD_OPACITY + theme.palette.action.selectedOpacity
                         ),
                     },
                 },
@@ -55,7 +55,9 @@ const DataGridCustomStyle = styled(DataGrid)((props) => {
     if (semiBordered) {
         customStyle['&.MuiDataGrid-root'] = { border: 'none' } as any;
         customStyle['& .MuiDataGrid-columnSeparator'] = { display: 'none' } as any;
-        customStyle[`& .${gridClasses.columnHeaders}`] = { borderBottom: '1px solid ' + theme.palette.divider } as any;
+        customStyle[`& .${gridClasses.columnHeaders}`] = {
+            borderBottom: '1px solid ' + theme.palette.divider,
+        } as any;
     }
     return customStyle;
 });

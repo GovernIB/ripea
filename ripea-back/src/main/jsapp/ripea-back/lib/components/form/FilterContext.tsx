@@ -5,7 +5,7 @@ export type FilterApi = {
     filter: (data?: any) => void;
 };
 
-export type FilterApiRef = React.MutableRefObject<FilterApi | undefined>;
+export type FilterApiRef = React.RefObject<FilterApi | undefined>;
 
 export type FilterContextType = {
     resourceName: string;
@@ -21,10 +21,10 @@ export const useFilterContext = () => {
         throw new Error('useFilterContext must be used within a FilterProvider');
     }
     return context;
-}
+};
 
 export const useOptionalFilterContext = (): FilterContextType | undefined => {
     return React.useContext(FilterContext);
-}
+};
 
 export default FilterContext;

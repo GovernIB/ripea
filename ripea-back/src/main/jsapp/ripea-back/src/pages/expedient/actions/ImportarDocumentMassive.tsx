@@ -1,5 +1,5 @@
 import {FormField, MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
-import {Grid2 as Grid, Box, Alert, Typography} from "@mui/material";
+import {Grid, Box, Alert, Typography} from "@mui/material";
 import {useEffect, useMemo, useRef, useState} from "react";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";

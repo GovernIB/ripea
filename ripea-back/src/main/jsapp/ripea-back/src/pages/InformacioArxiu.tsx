@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {Grid2 as Grid, Link, Icon} from "@mui/material";
+import {Grid, Link, Icon} from "@mui/material";
 import {BasePage, useResourceApiService, MuiDialog, useBaseAppContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {formatDate} from "../util/dateUtils.ts";

@@ -1,5 +1,5 @@
 import {useRef, useState} from "react";
-import {Grid2 as Grid} from "@mui/material";
+import {Grid} from "@mui/material";
 import {MuiFormDialogApi, useBaseAppContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import GridFormField from "../../../components/GridFormField.tsx";

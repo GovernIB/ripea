@@ -1,6 +1,6 @@
 import React, {useEffect, useMemo, useState} from "react";
 import { DndContext } from '@dnd-kit/core';
-import { FormControl, Grid2 as Grid, Select, MenuItem, Icon, Box } from "@mui/material";
+import { FormControl, Grid, Select, MenuItem, Icon, Box } from "@mui/material";
 import {
     GridSlots,
     GridTreeDataGroupingCell,

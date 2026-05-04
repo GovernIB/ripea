@@ -1,6 +1,6 @@
 import {GridPage, useBaseAppContext, useFormContext, useMuiDataGridApiRef, useResourceApiService} from "reactlib";
 import StyledMuiGrid from "../../../../components/StyledMuiGrid.tsx";
-import {Grid2 as Grid, Icon, Divider, Button} from "@mui/material";
+import {Grid, Icon, Divider, Button} from "@mui/material";
 import {useTranslation} from "react-i18next";
 import GridFormField from "../../../../components/GridFormField.tsx";
 import * as builder from "../../../../util/springFilterUtils.ts";

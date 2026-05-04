@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {Grid2 as Grid} from "@mui/material";
+import {Grid} from "@mui/material";
 import {useFormContext, MuiDialog} from "reactlib";
 import {useTranslation} from "react-i18next";
 import * as builder from "../../../util/springFilterUtils.ts";

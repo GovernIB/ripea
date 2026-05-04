@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useDebounce } from 'reactlib';
 import { PropietatsGroups } from './PropietatsGroups.tsx';
 import { PropietatsProps } from './PropietatsProps.tsx';
-import {TextField, InputAdornment, Icon, IconButton, Grid2 as Grid, Button} from "@mui/material";
+import {TextField, InputAdornment, Icon, IconButton, Grid, Button} from "@mui/material";
 import {GridPage, useBaseAppContext, useResourceApiService} from "reactlib";
 import {CardPage} from "../../../components/CardData.tsx";
 import {useParams} from "react-router-dom";

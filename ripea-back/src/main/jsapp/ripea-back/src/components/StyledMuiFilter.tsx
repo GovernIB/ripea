@@ -1,4 +1,4 @@
-import {Grid2 as Grid, Typography} from "@mui/material";
+import {Grid, Typography} from "@mui/material";
 import {MuiFilter, useFilterApiRef, useFormApiRef} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {useSession} from "./SessionStorageContext.tsx";

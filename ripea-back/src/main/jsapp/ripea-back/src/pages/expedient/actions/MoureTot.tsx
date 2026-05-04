@@ -1,5 +1,5 @@
 import {MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
-import {Alert, Grid2 as Grid} from "@mui/material";
+import {Alert, Grid} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
 import {useRef} from "react";
 import {useTranslation} from "react-i18next";

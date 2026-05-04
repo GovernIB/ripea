@@ -1,4 +1,4 @@
-import {Grid2 as Grid, Icon, Divider} from "@mui/material";
+import {Grid, Icon, Divider} from "@mui/material";
 import GridFormField from "../../../../components/GridFormField.tsx";
 import {StyledBadge} from "../../../../components/StyledBadge.tsx";
 import {useTranslation} from "react-i18next";

@@ -3,7 +3,7 @@ import {useMemo, useState} from "react";
 import {GridPage, useFilterApiRef, useFormApiRef, useFormContext, useMuiDataGridApiRef} from "reactlib";
 import {CardPage} from "../../components/CardData.tsx";
 import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
-import {Alert, Badge, Chip, Grid2 as Grid, Icon, IconButton, MenuItem} from "@mui/material";
+import {Alert, Badge, Chip, Grid, Icon, IconButton, MenuItem} from "@mui/material";
 import GridFormField from "../../components/GridFormField.tsx";
 import {MetaExpedientComment} from "../CommentDialog.tsx";
 import LinkIcon from "../../components/LinkIcon.tsx";

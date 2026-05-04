@@ -1,5 +1,5 @@
 import {useEffect, useMemo, useRef, useState} from "react";
-import {Grid2 as Grid, Icon} from "@mui/material";
+import {Grid, Icon} from "@mui/material";
 import {DataGridPro} from "@mui/x-data-grid-pro";
 import {MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
 import {useTranslation} from "react-i18next";

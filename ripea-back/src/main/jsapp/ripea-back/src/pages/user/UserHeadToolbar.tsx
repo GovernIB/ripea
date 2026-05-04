@@ -1,5 +1,5 @@
 import React, {useCallback, useMemo} from "react";
-import {Grid2 as Grid, Button, Icon} from "@mui/material";
+import {Grid, Button, Icon} from "@mui/material";
 import {StyledBadge} from "../../components/StyledBadge.tsx";
 import {useEntitatSession, useUserSession} from "../../components/Session.tsx";
 import {useTranslation} from "react-i18next";

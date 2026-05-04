@@ -2,7 +2,8 @@ import { useBaseAppContext, useFormContext, useResourceApiService } from "reactl
 import { useTranslation } from "react-i18next";
 import { useEffect, useMemo, useState } from "react";
 import { FormControl, Typography } from "@mui/material";
-import { GridRowSelectionModel } from '@mui/x-data-grid';
+import { GridRowSelectionModel } from '@mui/x-data-grid-pro';
+import { toSelectionModel, fromSelectionModel } from '../../../components/selectionModelUtils';
 import { DataGridPro } from "@mui/x-data-grid-pro";
 
 
@@ -101,10 +102,11 @@ const InteressatsRegistre = (props: any) => {
 	  })) ?? [];
 	}, [interessats]);
 
-	const [selectionModel, setSelectionModel] = useState<GridRowSelectionModel>([]);
+	const [selectionModel, setSelectionModel] = useState<GridRowSelectionModel>(toSelectionModel([]));
 
 	useEffect(() => {
-	  const interessatsSeleccionats = selectionModel.map((id) =>
+	  const selectedIds = fromSelectionModel(selectionModel);
+	  const interessatsSeleccionats = selectedIds.map((id) =>
 	    mapRegistreDadesInteressat(rows[id].__raw)
 	  );
 
@@ -126,7 +128,7 @@ const InteressatsRegistre = (props: any) => {
 					checkboxSelection
 					rowSelectionModel={selectionModel}
 					onRowSelectionModelChange={(newSelection) => {
-						setSelectionModel(newSelection);
+						setSelectionModel(newSelection as GridRowSelectionModel);
 					}}
 					style={{
 						height: 162 + 75 * (rows.length > 0 ? rows.length : 1),

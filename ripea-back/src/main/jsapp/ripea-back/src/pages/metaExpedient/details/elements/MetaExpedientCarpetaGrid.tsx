@@ -1,4 +1,4 @@
-import {Grid2 as Grid} from "@mui/material";
+import {Grid} from "@mui/material";
 import GridFormField from "../../../../components/GridFormField.tsx";
 import {useTranslation} from "react-i18next";
 import StyledMuiGrid from "../../../../components/StyledMuiGrid.tsx";

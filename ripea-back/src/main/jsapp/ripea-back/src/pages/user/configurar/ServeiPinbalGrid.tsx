@@ -1,5 +1,5 @@
 import {GridPage, useFormContext} from "reactlib";
-import {Grid2 as Grid, Icon} from "@mui/material";
+import {Grid, Icon} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
 import {useTranslation} from "react-i18next";
 import {CardPage} from "../../../components/CardData.tsx";

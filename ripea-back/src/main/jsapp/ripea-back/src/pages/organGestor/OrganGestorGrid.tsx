@@ -3,7 +3,7 @@ import {useMemo, useState} from "react";
 import {GridPage, useFormContext} from "reactlib";
 import {CardPage} from "../../components/CardData.tsx";
 import StyledMuiGrid, {ToolbarButton} from "../../components/StyledMuiGrid.tsx";
-import {Grid2 as Grid, Icon, Badge} from "@mui/material";
+import {Grid, Icon, Badge} from "@mui/material";
 import GridFormField from "../../components/GridFormField.tsx";
 import {OrganGestorFilter} from "./OrganGestorFilter.tsx";
 import {useOrganGestorSyncDialog} from "./actions/OrganGestorSync.tsx";

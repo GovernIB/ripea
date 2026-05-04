@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {Box, Grid2 as Grid} from "@mui/material";
+import {Box, Grid} from "@mui/material";
 import {BasePage, MuiDialog} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {CardButton, DetailCard, DetailCardContent} from "../../../components/CardData.tsx";

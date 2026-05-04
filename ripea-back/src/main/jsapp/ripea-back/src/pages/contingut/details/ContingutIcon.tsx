@@ -1,4 +1,4 @@
-import {Grid2 as Grid, Icon} from "@mui/material";
+import {Grid, Icon} from "@mui/material";
 import {useUserSession} from "../../../components/Session.tsx";
 import {useTranslation} from "react-i18next";
 

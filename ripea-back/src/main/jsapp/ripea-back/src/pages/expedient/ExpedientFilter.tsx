@@ -1,4 +1,4 @@
-import {Grid2 as Grid} from "@mui/material";
+import {Grid} from "@mui/material";
 import {useFormContext} from 'reactlib';
 import GridFormField, {GridButtonField} from "../../components/GridFormField.tsx";
 import {useUserSession} from "../../components/Session.tsx";
