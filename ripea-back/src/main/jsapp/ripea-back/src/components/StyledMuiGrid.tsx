@@ -115,7 +115,7 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
         apiRef?.current?.refresh?.();
     }
     const create = () => {
-        apiRef?.current?.showCreateDialog?.();
+        apiRef?.current?.triggerCreate?.();
     }
     const setGridSelectedRows = (value:any) => {
         datagridApiRef?.current?.setRowSelectionModel?.(value)
@@ -240,7 +240,7 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
             ]}
 
             toolbarHideRefresh
-            toolbarHideCreate={!toolbarShowCreate ?true :undefined}
+            toolbarHideCreate={true}
             // toolbarHideExport
             toolbarHideQuickFilter={!toolbarShowQuickFilter ?true :undefined}
             toolbarElementsWithPositions={toolbarElements}

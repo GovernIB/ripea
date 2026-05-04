@@ -7,7 +7,7 @@ import {CardPage} from "../../components/CardData.tsx";
 import AnotacioFilter from "./AnotacioFilter.tsx";
 import Load from "../../components/Load.tsx";
 import {useMemo, useState} from "react";
-import {Grid} from "@mui/material";
+import {Box, Grid} from "@mui/material";
 import GridFormField from "../../components/GridFormField.tsx";
 import {GridSortDirection} from "@mui/x-data-grid-pro";
 import useAnotacioDetail from "./details/AnotacioDetail.tsx";
