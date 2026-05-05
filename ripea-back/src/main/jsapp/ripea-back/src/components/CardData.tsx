@@ -158,7 +158,7 @@ export const CardPage = (props:CardPageProps) => {
     }}>
         {(title || header) &&
             <CardHead icon={icon} sx={headerProps} {...other}>
-                {title && <Typography mt={0.5} variant={"h4"}>{title}</Typography>}
+                {title && <Typography mt={0.5} variant={"h4"} component={"h1"}>{title}</Typography>}
                 {header}
             </CardHead>
         }

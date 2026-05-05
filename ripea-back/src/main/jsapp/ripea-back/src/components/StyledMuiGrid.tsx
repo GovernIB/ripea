@@ -7,6 +7,7 @@ import {useUserSession} from "./Session.tsx";
 import MassiveActionSelector, {MassiveActionProps} from "./MassiveActionSelector.tsx";
 import {DraggableGridRow, DraggableGridRowHandler} from "./DraggableContext.tsx";
 import {DndContext} from "@dnd-kit/core";
+import {dndScreenReaderInstructions} from "../util/dndAccessibility.tsx";
 import {toSelectionModel, fromSelectionModel, EMPTY_SELECTION_MODEL} from "./selectionModelUtils";
 
 export const ToolbarButton = (props:any) => {
@@ -60,7 +61,7 @@ export const DndMuiGrid = (props:StyledMuiGridProps) => {
 
     if (!dndEnabled) return <StyledMuiGrid {...other}/>;
 
-    return <DndContext onDragEnd={onDragEnd}><StyledMuiGrid
+    return <DndContext onDragEnd={onDragEnd} accessibility={{screenReaderInstructions: dndScreenReaderInstructions}}><StyledMuiGrid
         {...other}
         rowActionsColumnIndex={-1}
         columns={additionalColumns}

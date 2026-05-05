@@ -6,10 +6,11 @@ type DropZoneProps = {
     onDrop: (file:any) => void,
     children: ReactNode,
     disabled?: boolean,
+    'aria-label'?: string,
 }
 
 const DropZone = (props:DropZoneProps) => {
-    const {onDrop: onDropFile, children, disabled = false} = props;
+    const {onDrop: onDropFile, children, disabled = false, 'aria-label': ariaLabel} = props;
 
     const onDrop = React.useCallback((acceptedFiles: any) => {
         const droppedFile = acceptedFiles[0];
@@ -38,7 +39,7 @@ const DropZone = (props:DropZoneProps) => {
             ...dragDropStyle
         }}
         {...getRootProps()}>
-        <input {...getInputProps()} />
+        <input {...getInputProps()} aria-label={ariaLabel} />
         {children}
     </div>
 }

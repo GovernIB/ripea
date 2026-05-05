@@ -20,6 +20,7 @@ import {DetailCard} from "../../../components/CardData.tsx";
 import {usePropietatsDialog} from "./PropietatsDialog.tsx";
 import {DraggableGridRowHandler, DraggableItem} from "../../../components/DraggableContext.tsx";
 import {DndContext} from "@dnd-kit/core";
+import {dndScreenReaderInstructions} from "../../../util/dndAccessibility.tsx";
 
 const fieldPropType = (typeCode: string, typeValue?: string) => {
     if (typeValue != null) {
@@ -207,7 +208,7 @@ export const PropietatsProps: React.FC<{ quickFilter?: string; entitatCodi?: str
         configs != null && (<>
             <Box sx={{ px: 3 }}>
                 <DetailCard title={group.description}>
-                    <Grid size={12}><DndContext onDragEnd={handleDragEnd}>
+                    <Grid size={12}><DndContext onDragEnd={handleDragEnd} accessibility={{screenReaderInstructions: dndScreenReaderInstructions}}>
                     <List component={Paper}>
                         {configs.length ? (
                             <MuiForm

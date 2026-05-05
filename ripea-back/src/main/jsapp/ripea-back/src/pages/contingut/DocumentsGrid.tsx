@@ -1,5 +1,6 @@
 import React, {useEffect, useMemo, useState} from "react";
 import { DndContext } from '@dnd-kit/core';
+import {dndScreenReaderInstructions} from "../../util/dndAccessibility.tsx";
 import { FormControl, Grid, Select, MenuItem, Icon, Box } from "@mui/material";
 import {
     GridSlots,
@@ -238,8 +239,8 @@ const DocumentsGrid = (props: any) => {
 
     return <>
         <Load value={entity && carpetes && expedients && isReady}>
-            <DropZone onDrop={onDrop} disabled={!(entity?.potModificarContingut || entity?.potModificar)}>
-                <DndContext onDragEnd={handleDragEnd}>
+            <DropZone onDrop={onDrop} disabled={!(entity?.potModificarContingut || entity?.potModificar)} aria-label={t('page.document.action.new.dropMessg')}>
+                <DndContext onDragEnd={handleDragEnd} accessibility={{screenReaderInstructions: dndScreenReaderInstructions}}>
                     <StyledMuiGrid
                         resourceName={"documentResource"}
                         popupEditFormDialogResourceTitle={t('page.document.title')}
