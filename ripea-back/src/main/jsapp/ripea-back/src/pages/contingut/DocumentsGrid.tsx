@@ -201,7 +201,7 @@ const DocumentsGrid = (props: any) => {
     ], [draggable])
 
     const onDrop = React.useCallback((adjunt: any) => {
-        gridApiRef?.current?.showCreateDialog?.(null, { adjunt })
+        gridApiRef?.current?.triggerCreate?.(null, { adjunt })
     }, [])
 
     const handleDragEnd = (event: any) => {

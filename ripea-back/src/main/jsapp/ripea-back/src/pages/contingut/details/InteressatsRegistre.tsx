@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useEffect, useMemo, useState } from "react";
 import { FormControl, Typography } from "@mui/material";
 import { GridRowSelectionModel } from '@mui/x-data-grid-pro';
-import { toSelectionModel, fromSelectionModel } from '../../../components/selectionModelUtils';
+import { toSelectionModel, fromSelectionModel } from '../../../util/selectionModelUtils.ts';
 import { DataGridPro } from "@mui/x-data-grid-pro";
 
 

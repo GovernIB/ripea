@@ -252,7 +252,7 @@ const ExpedientGrid = () => {
     ]
         .filter((col:any)=>!col?.hidden), [user]);
 
-    return <GridPage disableMargins>
+    return <GridPage>
         <CardPage title={t('page.expedient.filter.title')}>
             <ExpedientFilter onSpringFilterChange={(value:any)=>{
                 setSpringFilter(value)

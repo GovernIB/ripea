@@ -79,7 +79,7 @@ const DataGrid = (props:any) => {
             tipusValor: entity?.tipus,
         }}
         rowAdditionalActions={actions}
-        paginationNoRowsText={t('page.dada.noRowsText')}
+        noRowsText={t('page.dada.noRowsText')}
         popupEditFormDialogComponentProps={{ fullWidth: true, maxWidth: 'xs' }}
         onRowCountChange={(count:number)=>{
             setNumDades?.(count)
