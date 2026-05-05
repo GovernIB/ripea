@@ -33,7 +33,7 @@ const MetaDadaGrid = (props: any) => {
     }
 
     const refresh = () => {
-        apiRef.current.refresh();
+        apiRef.current?.refresh();
         onRefresh?.();
         findByExpedient(entity?.id)
     }

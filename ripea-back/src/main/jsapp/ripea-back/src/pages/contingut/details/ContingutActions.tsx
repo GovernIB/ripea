@@ -197,7 +197,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
         {
             label: t('page.document.title')+"...",
             icon: "description",
-            onClick: () => apiRef?.current?.showCreateDialog?.(),
+            onClick: () => apiRef?.current?.triggerCreate?.(),
             hidden: !potModificarExpedientOrContingut,
         },
         {

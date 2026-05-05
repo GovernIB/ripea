@@ -203,7 +203,7 @@ const ContentComponentDefault: React.FC<BaseAppContentComponentProps> = (props) 
                 style={{
                     display: 'flex',
                     flexGrow: 1,
-                    minHeight: 0,
+                    // minHeight: 0,
                 }}>
                 <nav>{menuComponent}</nav>
                 <main

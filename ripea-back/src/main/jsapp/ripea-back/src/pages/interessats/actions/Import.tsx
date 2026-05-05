@@ -59,7 +59,7 @@ const ImportForm = () => {
                 rows={data?.interessatsFitxer}
                 columns={columns}
                 onRowSelectionModelChange={(newSelection) => {
-                    setSelectedRows([...newSelection]);
+                    setSelectedRows([...newSelection.ids]);
                 }}
                 isRowSelectable={(params: any) => Object.keys(params?.row?.errors)?.length == 0}
 

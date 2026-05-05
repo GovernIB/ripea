@@ -1,17 +1,17 @@
 import {useTranslation} from "react-i18next";
 import {GridPage, useBaseAppContext, useFormContext, useMuiDataGridApiRef, useResourceApiService} from "reactlib";
-import {CardPage} from "../../../../components/CardData.tsx";
-import {DndMuiGrid} from "../../../../components/StyledMuiGrid.tsx";
+import {CardPage} from "@src/components/CardData.tsx";
+import {DndMuiGrid} from "@src/components/StyledMuiGrid.tsx";
 import {Grid, Icon, Divider, Button} from "@mui/material";
-import * as builder from "../../../../util/springFilterUtils.ts";
+import * as builder from "@src/util/springFilterUtils.ts";
 import {useNavigate, useParams} from "react-router-dom";
-import GridFormField from "../../../../components/GridFormField.tsx";
+import GridFormField from "@src/components/GridFormField.tsx";
 import {useEffect, useMemo, useState} from "react";
-import {setTitlePage} from "../../../../TitleHeaderConfigurator.tsx";
-import {useUserSession} from "../../../../components/Session.tsx";
-import {MultiplicitatStyled} from "../../../contingut/details/MetaExpedient.tsx";
+import {setTitlePage} from "@src/TitleHeaderConfigurator.tsx";
+import {useUserSession} from "@src/components/Session.tsx";
+import {MultiplicitatStyled} from "@src/pages/contingut/details/MetaExpedient.tsx";
 import useMetaDadaDetail from "./details/MetaDadaDetail.tsx";
-import {ErrorPage} from "../../../../components/ErrorPage.tsx";
+import {ErrorPage} from "@src/components/ErrorPage.tsx";
 
 const useActions = (refresh?: () => void) => {
     const {t} = useTranslation();

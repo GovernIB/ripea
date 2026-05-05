@@ -198,7 +198,11 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
         headerAppbarStyle={style}
         headerAppbarBackgroundColor={appbarBackgroundColor}
         headerAppbarBackgroundImg={appbarBackgroundImg}
-        headerAdditionalComponents={[<UserHeadToolbar/>]}
+        headerAdditionalComponents={[
+            <MuiBaseAppContext.Provider value={{ defaultMuiComponentProps: {} }}>
+                <UserHeadToolbar/>
+            </MuiBaseAppContext.Provider>
+        ]}
         headerAdditionalAuthComponents={
             <MuiBaseAppContext.Provider value={{ defaultMuiComponentProps: {} }}>
                 <UserMenu/>
@@ -215,6 +219,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
         routerUseLocationPath={useLocationPath}
         routerAnyHistoryEntryExist={anyHistoryEntryExist}
         linkComponent={Link}
+        marginsDisabled
         menuEntries={baseAppMenuEntries}>
         <CustomLocalizationProvider>
             <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>

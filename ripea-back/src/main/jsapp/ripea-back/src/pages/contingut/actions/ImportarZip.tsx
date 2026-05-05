@@ -8,7 +8,7 @@ import { usePollingArtifactAction } from "../../../components/ActionPollingOptio
 import ImportarZipResults from "./ImportarZipResults.tsx";
 import BackdropLoading from "../../../components/BackdropLoading.tsx";
 import {DataGridPro} from "@mui/x-data-grid-pro";
-import {toSelectionModel, fromSelectionModel} from "../../../components/selectionModelUtils";
+import {toSelectionModel, fromSelectionModel} from "../../../util/selectionModelUtils.ts";
 import Load from "../../../components/Load.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 
