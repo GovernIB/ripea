@@ -1,6 +1,6 @@
-import {useEffect, useRef, useState} from "react";
+import {useEffect, useState} from "react";
 import {Grid, Alert, Icon} from "@mui/material";
-import {MuiFormDialogApi, useBaseAppContext, useFormContext, useResourceApiService} from "reactlib";
+import {useMuiFormDialogApiRef, useBaseAppContext, useFormContext, useResourceApiService} from "reactlib";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 import GridFormField, {GridButton} from "../../../components/GridFormField.tsx";
@@ -147,7 +147,7 @@ const Notificar = (props:any) => {
 
 const useNotificar = (refresh?: () => void) => {
     const { t } = useTranslation();
-    const apiRef = useRef<MuiFormDialogApi>();
+    const apiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow} = useBaseAppContext();
 
     const handleShow = (id:any, row:any) :void => {

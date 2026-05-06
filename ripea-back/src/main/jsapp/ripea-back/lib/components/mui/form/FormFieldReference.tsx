@@ -60,7 +60,7 @@ type AdvancedSearchDialogProps = React.PropsWithChildren & {
     sortModel?: GridSortModel;
     namedQueries?: string[];
     perspectives?: string[];
-    apiRef: React.RefObject<AdvancedSearchDialogApi | undefined>;
+    apiRef: React.RefObject<AdvancedSearchDialogApi | null>;
     dialogHeight?: number;
     dialogComponentProps?: any;
 };
@@ -119,7 +119,9 @@ const AdvancedSearchDialog: React.FC<AdvancedSearchDialogProps> = (props) => {
             },
         });
     };
-    apiRef.current = { show };
+    if (apiRef) {
+        apiRef.current = { show };
+    }
     return <>{gridDialogComponent}</>;
 };
 
@@ -184,7 +186,7 @@ export const FormFieldReference: React.FC<FormFieldRefProps> = (props) => {
     } = props;
     const { t } = useBaseAppContext();
     const { requestHref } = useResourceApiContext();
-    const advancedSearchApiRef = React.useRef<AdvancedSearchDialogApi>(undefined);
+    const advancedSearchApiRef = React.useRef<AdvancedSearchDialogApi>(null);
     const multiple = (field?.multiple || multipleProp) ?? false;
     const isEmptyValue = multiple ? !value?.length : value == null;
     const [open, setOpen] = React.useState<boolean>(false);

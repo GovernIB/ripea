@@ -1,6 +1,5 @@
-import {MuiFormDialogApi, useFormContext, useBaseAppContext} from "reactlib";
+import {useMuiFormDialogApiRef, useFormContext, useBaseAppContext} from "reactlib";
 import {Grid, Alert} from "@mui/material";
-import {useRef} from "react";
 import {useTranslation} from "react-i18next";
 import { FormReportDialog } from "../../../components/FormActionDialog.tsx";
 import GridFormField from "../../../components/GridFormField.tsx";
@@ -46,7 +45,7 @@ export const ExportarExpedientsMassive = (props:any) => {
 
 export const useExportarExpedient = () => {
     const { t } = useTranslation();
-    const apiRef = useRef<MuiFormDialogApi>();
+    const apiRef = useMuiFormDialogApiRef();
     const handleShow = (id:any) :void => {
         apiRef.current?.show?.(undefined, { ids: [id], massivo: false })
     }
@@ -61,7 +60,7 @@ export const useExportarExpedient = () => {
 
 export const useExportarExpedientsMassive = (refresh?: () => void) => {
     const { t } = useTranslation();
-    const apiRef = useRef<MuiFormDialogApi>();
+    const apiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow} = useBaseAppContext();
     const handleShow = (ids:any[]) :void => {
         apiRef.current?.show?.(undefined, { ids, massivo: true })

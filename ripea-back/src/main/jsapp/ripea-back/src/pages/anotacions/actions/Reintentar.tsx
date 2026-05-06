@@ -1,6 +1,5 @@
-import {useRef} from "react";
 import {Grid} from "@mui/material";
-import {MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
+import {useMuiFormDialogApiRef, useBaseAppContext, useFormContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 import GridFormField from "../../../components/GridFormField.tsx";
@@ -34,7 +33,7 @@ export const Reintentar = (props: any) => {
 
 export const useReintentar = (refresh?: () => void, procediment?: any) => {
     const { t } = useTranslation();
-    const apiRef = useRef<MuiFormDialogApi>();
+    const apiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow} = useBaseAppContext();
     const handleShow = (id:any) :void => {
         apiRef.current?.show?.(undefined, {
@@ -55,7 +54,7 @@ export const useReintentar = (refresh?: () => void, procediment?: any) => {
 
 export const useReintentarMassive = (refresh?: () => void, procediment?: any) => {
     const { t } = useTranslation();
-    const apiRef = useRef<MuiFormDialogApi>();
+    const apiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow} = useBaseAppContext();
     const handleShow = (ids:any[]) :void => {
         apiRef.current?.show?.(undefined, {

@@ -1,6 +1,6 @@
 import {useRef, useState, forwardRef, useImperativeHandle } from "react";
 import {Alert, Grid, Icon} from "@mui/material";
-import {MuiDialog, MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
+import {MuiDialog, useMuiFormDialogApiRef, useBaseAppContext, useFormContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import GridFormField, {GridButton} from "../../../components/GridFormField.tsx";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
@@ -210,7 +210,7 @@ const EnviarPortafirmesForm = forwardRef((_props, ref) => {
 
 const EnviarPortafirmes = (props:any) => {
     const { t } = useTranslation();
-    const formRef = useRef<any>();
+    const formRef = useRef<any>(undefined);
     
     return <FormActionDialog
         resourceName={"documentResource"}
@@ -230,7 +230,7 @@ const EnviarPortafirmes = (props:any) => {
 
 export const useEnviarPortafirmes = (refresh?: () => void) => {
     const { t } = useTranslation();
-    const apiRef = useRef<MuiFormDialogApi>();
+    const apiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow} = useBaseAppContext();
 
     const handleShow = (id:any, row:any) :void => {
@@ -255,7 +255,7 @@ export const useEnviarPortafirmes = (refresh?: () => void) => {
 }
 export const useEnviarPortafirmesMassive = (refresh?: () => void) => {
     const { t } = useTranslation();
-    const apiRef = useRef<MuiFormDialogApi>();
+    const apiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow} = useBaseAppContext();
 
     const handleShow = (ids:any[]) :void => {

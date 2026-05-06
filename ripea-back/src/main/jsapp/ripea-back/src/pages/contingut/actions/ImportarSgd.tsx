@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Alert, Grid } from "@mui/material";
-import { MuiFormDialogApi, useBaseAppContext, useFormContext } from "reactlib";
+import { useMuiFormDialogApiRef, useBaseAppContext, useFormContext } from "reactlib";
 import { useTranslation } from "react-i18next";
 import GridFormField from "../../../components/GridFormField.tsx";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
@@ -126,7 +126,7 @@ const Importar = ({ ...props }: any) => {
 };
 
 const useImportar = (entity: any, refresh?: () => void) => {
-	const apiRef = useRef<MuiFormDialogApi>();
+	const apiRef = useMuiFormDialogApiRef();
 	const { temporalMessageShow } = useBaseAppContext();
 	const { t } = useTranslation();
 

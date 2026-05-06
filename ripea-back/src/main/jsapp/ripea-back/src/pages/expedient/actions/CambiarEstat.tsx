@@ -1,7 +1,6 @@
-import {MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
+import {useMuiFormDialogApiRef, useBaseAppContext, useFormContext} from "reactlib";
 import {Grid} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
-import {useRef} from "react";
 import {useTranslation} from "react-i18next";
 import * as builder from "../../../util/springFilterUtils.ts";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
@@ -36,7 +35,7 @@ export const CambiarEstat = (props: any) => {
 
 const useCambiarEstat = (refresh?: () => void) => {
     const { t } = useTranslation();
-    const apiRef = useRef<MuiFormDialogApi>();
+    const apiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow} = useBaseAppContext();
 
     const handleShow = (id:any, row:any) :void => {
@@ -60,7 +59,7 @@ const useCambiarEstat = (refresh?: () => void) => {
 }
 export const useCambiarEstatMassive = (refresh?: () => void) => {
     const { t } = useTranslation();
-    const apiRef = useRef<MuiFormDialogApi>();
+    const apiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow} = useBaseAppContext();
 
     const handleShow = (ids:any[], additionalData:any = {}) :void => {

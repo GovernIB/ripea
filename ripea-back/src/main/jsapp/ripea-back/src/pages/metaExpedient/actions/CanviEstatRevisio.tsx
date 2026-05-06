@@ -1,7 +1,6 @@
-import {MuiFormDialog, MuiFormDialogApi, useBaseAppContext} from "reactlib";
+import {MuiFormDialog, useMuiFormDialogApiRef, useBaseAppContext} from "reactlib";
 import {Grid} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
-import {useRef} from "react";
 import {useTranslation} from "react-i18next";
 import {useUserSession} from "../../../components/Session.tsx";
 
@@ -34,7 +33,7 @@ export const CanviEstatRevisio = (props: { apiRef:any }) => {
 
 const useCanviEstatRevisio = (refresh?: () => void) => {
     const { t } = useTranslation();
-    const apiRef = useRef<MuiFormDialogApi>();
+    const apiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow} = useBaseAppContext();
 
     const handleShow = (id:any, row:any) :void => {

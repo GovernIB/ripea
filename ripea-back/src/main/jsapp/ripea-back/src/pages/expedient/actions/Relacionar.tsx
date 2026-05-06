@@ -1,6 +1,6 @@
-import {useEffect, useMemo, useRef, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import {
-    useBaseAppContext, useFormContext, MuiFormDialogApi
+    useBaseAppContext, useFormContext, useMuiFormDialogApiRef
 } from "reactlib";
 import {useTranslation} from "react-i18next";
 import GridFormField from "../../../components/GridFormField.tsx";
@@ -170,7 +170,7 @@ const Relacionar = (props:any) => {
 
 const useRelacionar= (refresh?: () => void) => {
     const { t } = useTranslation();
-    const formApiRef = useRef<MuiFormDialogApi>()
+    const formApiRef = useMuiFormDialogApiRef()
     const {temporalMessageShow} = useBaseAppContext();
 
     const handleShow = (id:any, row:any) :void => {

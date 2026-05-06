@@ -1,5 +1,4 @@
-import {MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
-import {useRef} from "react";
+import {useMuiFormDialogApiRef, useBaseAppContext, useFormContext} from "reactlib";
 import {Grid} from "@mui/material";
 import {useTranslation} from "react-i18next";
 import GridFormField from "../../../components/GridFormField.tsx";
@@ -44,7 +43,7 @@ const Moure = (props:any) => {
 }
 
 const useAction = (code:string, title:string, onSuccess?: (result:any) => void) => {
-    const apiRef = useRef<MuiFormDialogApi>();
+    const apiRef = useMuiFormDialogApiRef();
 
     const handleShow = (id:any, row:any) :void => {
         const carpeta = row?.expedient?.id != row?.pare?.id ?row?.pare :null

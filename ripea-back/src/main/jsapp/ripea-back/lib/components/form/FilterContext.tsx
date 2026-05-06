@@ -1,11 +1,12 @@
 import React from 'react';
+import { FormApi } from './FormContext';
 
 export type FilterApi = {
-    clear: (data?: any) => void;
+    clear: () => void;
     filter: (data?: any) => void;
-};
+} & FormApi;
 
-export type FilterApiRef = React.RefObject<FilterApi | undefined>;
+export type FilterApiRef = React.RefObject<FilterApi | null>;
 
 export type FilterContextType = {
     resourceName: string;

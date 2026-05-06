@@ -1,6 +1,6 @@
 import {useEffect, useRef, useState} from "react";
 import {Alert, Box, Grid} from "@mui/material";
-import {FormField, MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
+import {FormField, useMuiFormDialogApiRef, useBaseAppContext, useFormContext} from "reactlib";
 import { useTranslation } from "react-i18next";
 import GridFormField, {FileFormField, formatByteCount} from "../../../components/GridFormField.tsx";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
@@ -53,7 +53,7 @@ const ImportarZipForm = () => {
         builder.eq("actiu", true),
     );
 
-    const localVariableDocs = useRef<any[]>()
+    const localVariableDocs = useRef<any[] | undefined>(undefined)
     const updateDocument = (rowId: any, field: string, value: any) => {
         if (!localVariableDocs.current)
             localVariableDocs.current = data?.documentsZip;
@@ -231,7 +231,7 @@ const ImportarZip = ({ ...props }: any) => {
 
 const useImportarZip = (entity: any, refresh?: () => void) => {
 	const { t } = useTranslation();
-	const apiRef = useRef<MuiFormDialogApi>();
+	const apiRef = useMuiFormDialogApiRef();
 	const { temporalMessageShow } = useBaseAppContext();
 
 	const polling = usePolling();

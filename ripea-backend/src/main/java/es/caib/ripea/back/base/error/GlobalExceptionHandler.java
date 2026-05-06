@@ -24,7 +24,6 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import javax.ejb.EJBException;
 import java.lang.reflect.Field;
-import java.util.Objects;
 
 /**
  * Tractament global de les excepcions en els controladors.

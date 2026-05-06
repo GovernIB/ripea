@@ -1,6 +1,6 @@
-import {useEffect, useMemo, useRef, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import {Grid, Alert, Box} from "@mui/material";
-import {MuiFormDialogApi, useBaseAppContext, useFormContext, useResourceApiService} from "reactlib";
+import {useMuiFormDialogApiRef, useBaseAppContext, useFormContext, useResourceApiService} from "reactlib";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 import GridFormField from "../../../components/GridFormField.tsx";
@@ -172,7 +172,7 @@ const Tancar = (props: any) => {
 }
 export const useTancar = (refresh?: () => void) => {
     const { t } = useTranslation();
-    const apiRef = useRef<MuiFormDialogApi>();
+    const apiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow} = useBaseAppContext();
 
     const handleShow = (id: any): void => {
@@ -193,7 +193,7 @@ export const useTancar = (refresh?: () => void) => {
 }
 export const useTancarMassive = (refresh?: () => void) => {
     const { t } = useTranslation();
-    const apiRef = useRef<MuiFormDialogApi>();
+    const apiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow} = useBaseAppContext();
 
     const handleShow = (ids: any[]): void => {

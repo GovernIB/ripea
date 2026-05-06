@@ -25,11 +25,6 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>javax.ejb</groupId>
-			<artifactId>javax.ejb-api</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-core</artifactId>
 		</dependency>
@@ -235,10 +230,10 @@
 		<dependency>
 			<groupId>org.apache.activemq</groupId>
 			<artifactId>artemis-jms-client</artifactId>
-		</dependency>  		
+		</dependency>
 		<dependency>
-		  <groupId>commons-beanutils</groupId>
-		  <artifactId>commons-beanutils</artifactId>
+			<groupId>commons-beanutils</groupId>
+			<artifactId>commons-beanutils</artifactId>
 		</dependency>
 	</dependencies>
 	<profiles>
@@ -282,11 +277,11 @@
 					</exclusions>
 				</dependency>
 <!--				<dependency>-->
-<!--		        	<groupId>org.springframework.boot</groupId>-->
-<!--		        	<artifactId>spring-boot-devtools</artifactId>-->
-<!--				    <optional>true</optional>-->
-<!--				    <scope>provided</scope>            	-->
-<!--		    	</dependency>					-->
+<!--					<groupId>org.springframework.boot</groupId>-->
+<!--					<artifactId>spring-boot-devtools</artifactId>-->
+<!--					<optional>true</optional>-->
+<!--					<scope>provided</scope>-->
+<!--				</dependency>-->
 			</dependencies>
 			<build>
 				<plugins>

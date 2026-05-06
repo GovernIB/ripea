@@ -29,7 +29,6 @@ import { caES, esES, enUS } from '@mui/x-data-grid/locales';
 import Box from '@mui/material/Box';
 import Icon from '@mui/material/Icon';
 import { capitalize } from '../../../util/text';
-import useLogConsole from '../../../util/useLogConsole';
 import { useDebounce } from '../../../util/useDebounce';
 import { formattedFieldValue, isFieldNumericType } from '../../../util/fields';
 import * as springFilterBuilder from '../../../util/springFilterBuilder';
@@ -64,7 +63,6 @@ import DataGridContext, {
     DEFAULT_ROW_SELECTION,
 } from './DataGridContext';
 
-export const LOG_PREFIX = 'GRID';
 const CREATE_ROW_ID = '###_CREATE_ID_###';
 
 /**
@@ -873,7 +871,6 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         debug = false,
         ...otherProps
     } = { ...defaultMuiComponentProps.dataGrid, ...props };
-    const logConsole = useLogConsole(LOG_PREFIX);
     const datagridApiRefInternal = useMuiDatagridApiRef();
     const datagridApiRef = datagridApiRefProp ?? datagridApiRefInternal;
     const formApiRef = useFormApiRef();
@@ -909,14 +906,14 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         } else {
             datagridApiRef.current?.updateRows([{ id: CREATE_ROW_ID, isNew: true }]);
         }
-        formApiRef.current.reset();
+        formApiRef.current?.reset();
         datagridApiRef.current?.startRowEditMode({ id: CREATE_ROW_ID });
-        setTimeout(() => formApiRef.current.focus());
+        setTimeout(() => formApiRef.current?.focus());
     };
     const inlineUpdate = (id: any, row?: any) => {
-        formApiRef.current.reset(row, id);
+        formApiRef.current?.reset(row, id);
         datagridApiRef.current?.startRowEditMode({ id });
-        setTimeout(() => formApiRef.current.focus());
+        setTimeout(() => formApiRef.current?.focus());
     };
     const inlineStopRowEditMode = (id: any, ignoreModifications?: boolean) => {
         if (ignoreModifications) {
@@ -1171,7 +1168,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         toolbarHideQuickFilter,
         joinedToolbarElementsWithPositions
     );
-    const apiRef = React.useRef<MuiDataGridApi>({
+    const getDataGridApi = () => ({
         refresh,
         export: gridExport,
         triggerCreate,
@@ -1179,26 +1176,12 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         triggerDelete,
         setFilter,
     });
+    const apiRef = React.useRef<MuiDataGridApi>(getDataGridApi());
     React.useEffect(() => {
-        apiRef.current = {
-            refresh,
-            export: gridExport,
-            triggerCreate,
-            triggerUpdate,
-            triggerDelete,
-            setFilter,
-        };
+        apiRef.current = getDataGridApi();
     }, [refresh, gridExport, triggerCreate, triggerUpdate, triggerDelete, setFilter]);
     if (apiRefProp) {
-        if (apiRefProp.current) {
-            apiRefProp.current.refresh = refresh;
-            apiRefProp.current.export = gridExport;
-            apiRefProp.current.triggerCreate = triggerCreate;
-            apiRefProp.current.triggerUpdate = triggerUpdate;
-            apiRefProp.current.setFilter = setFilter;
-        } else {
-            logConsole.warn('apiRef prop must be initialized with an empty object');
-        }
+        apiRefProp.current = getDataGridApi();
     }
     const filteringProps: any = {
         filterMode: !otherProps.treeData ? 'server' : undefined,
@@ -1245,8 +1228,8 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
                   editMode: 'row',
                   onRowModesModelChange: setRowModesModel,
                   onRowEditStart: (params: any) => {
-                      formApiRef.current.reset(params.row, params.id);
-                      setTimeout(() => formApiRef.current.focus(params.field));
+                      formApiRef.current?.reset(params.row, params.id);
+                      setTimeout(() => formApiRef.current?.focus(params.field));
                   },
                   onRowEditStop: (params: any) => {
                       if (params.id === CREATE_ROW_ID) {
@@ -1285,7 +1268,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
                               ?.filter((e: any) => e.field != null)
                               .map((e: any) => e.field);
                           if (fieldErrors?.length) {
-                              setTimeout(() => formApiRef.current.focus(fieldErrors[0]));
+                              setTimeout(() => formApiRef.current?.focus(fieldErrors[0]));
                           }
                       }
                   },
@@ -1319,7 +1302,6 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
                 pageInfo,
                 setRowSelectionModel,
                 pageSizeOptions: otherProps?.pageSizeOptions,
-                enableAutoPageSizeOption: true,
                 autoPageSize,
                 setAutoPageSize,
             },

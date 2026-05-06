@@ -1,6 +1,6 @@
-import {useMemo, useRef} from "react";
+import {useMemo} from "react";
 import {Grid, Box} from "@mui/material";
-import {MuiFormDialog, useBaseAppContext, MuiFormDialogApi, useFormContext, DialogButton} from "reactlib";
+import {MuiFormDialog, useBaseAppContext, useMuiFormDialogApiRef, useFormContext, DialogButton} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {CardData} from "../../../components/CardData.tsx";
 import GridFormField from "../../../components/GridFormField.tsx";
@@ -75,7 +75,7 @@ const usePerfil = () => {
     const { value: user, refresh } = useUserSession();
     const {setValue: setTheme, removeValue: removeTheme} = useThemeUserContext()
 
-    const formApiRef = useRef<MuiFormDialogApi>();
+    const formApiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow, t: tBase } = useBaseAppContext();
 
     const handleOpen = () => {

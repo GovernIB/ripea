@@ -1,9 +1,10 @@
 import React, { KeyboardEvent } from 'react';
 import { useAuthContext } from '../AuthContext';
 import { useBaseAppContext } from '../BaseAppContext';
-import Form from './Form';
+import { ResourceApiError } from '../ResourceApiProvider';
+import Form, { useFormApiRef } from './Form';
 import { FilterApi, FilterApiRef, FilterContext, useFilterContext } from './FilterContext';
-import { FormApiRef, FormApi, FormFieldError } from './FormContext';
+import { FormFieldError } from './FormContext';
 
 /**
  * Propietats del component Filter.
@@ -25,8 +26,6 @@ export type FilterProps = React.PropsWithChildren & {
     persistentStateStorage?: 'local' | 'session';
     /** Referència a l'api del component */
     apiRef?: FilterApiRef;
-    /** Referència a l'api del component Form */
-    formApiRef?: FormApiRef;
     /** Funció encarregada de transforma les dades del filtre en una cadena en format Spring Filter */
     springFilterBuilder: (data: any) => string | undefined;
     /** Dades inicials pel filtre */
@@ -92,8 +91,8 @@ const usePersistentState = (
  *
  * @returns referència a l'API del component Filter.
  */
-export const useFilterApiRef: () => React.RefObject<FilterApi> = () => {
-    const filterApiRef = React.useRef<FilterApi | any>({});
+export const useFilterApiRef: () => FilterApiRef = () => {
+    const filterApiRef = React.useRef<FilterApi>(null);
     return filterApiRef;
 };
 
@@ -130,7 +129,6 @@ export const Filter: React.FC<FilterProps> = (props) => {
         onSpringFilterChange,
         validationErrors,
         apiRef: apiRefProp,
-        formApiRef: formApiRefProp,
         children,
         ...otherFormProps
     } = props;
@@ -142,11 +140,7 @@ export const Filter: React.FC<FilterProps> = (props) => {
     );
     const [nextDataChangeAsUncontrolled, setNextDataChangeAsUncontrolled] =
         React.useState<boolean>(false);
-    const apiRef = React.useRef<FilterApi>(undefined);
-    const formApiRef = React.useRef<FormApi | any>({});
-    if (formApiRefProp != null) {
-        formApiRefProp.current = formApiRef.current;
-    }
+    const formApiRef = useFormApiRef();
     const filter = (data?: any) => {
         const applyFilter = () => {
             const formData = data ?? formApiRef.current?.getData();
@@ -154,14 +148,14 @@ export const Filter: React.FC<FilterProps> = (props) => {
             onSpringFilterChange?.(springFilter);
         };
         if (validationActive) {
-            formApiRef.current.validate().then(applyFilter);
+            formApiRef.current?.validate().then(applyFilter);
         } else {
             applyFilter();
         }
     };
-    const clear = (data?: any) => {
+    const clear = () => {
         setNextDataChangeAsUncontrolled(!buttonControlled);
-        formApiRef.current?.reset(data);
+        formApiRef.current?.revert(true);
     };
     const handleDataChange = (data: any) => {
         onDataChange?.(data);
@@ -187,17 +181,26 @@ export const Filter: React.FC<FilterProps> = (props) => {
               }
           }
         : undefined;
-    apiRef.current = {
+    const getFilterApi = () => ({
         clear,
         filter,
-    };
+        getId: () => formApiRef.current?.getId(),
+        getData: () => formApiRef.current?.getData(),
+        refresh: () => formApiRef.current?.refresh(),
+        reset: (data?: any, id?: any) => formApiRef.current?.reset(data, id),
+        revert: (unconfirmed?: boolean) => formApiRef.current?.revert(unconfirmed),
+        validate: async () => await formApiRef.current?.validate(),
+        save: async () => await formApiRef.current?.save(),
+        delete: () => formApiRef.current?.delete(),
+        focus: (name?: string) => formApiRef.current?.focus(name),
+        setFieldValue: (name: string, value: any) => formApiRef.current?.setFieldValue(name, value),
+        setModified: (modified: boolean) => formApiRef.current?.setModified(modified),
+        handleSubmissionErrors: (error: ResourceApiError, temporalMessageTitle?: string) =>
+            formApiRef.current?.handleSubmissionErrors(error, temporalMessageTitle),
+    });
+    const apiRef = React.useRef<FilterApi>(getFilterApi());
     if (apiRefProp) {
-        if (apiRefProp.current) {
-            apiRefProp.current.clear = clear;
-            apiRefProp.current.filter = filter;
-        } else {
-            console.warn('apiRef prop must be initialized with an empty object');
-        }
+        apiRefProp.current = getFilterApi();
     }
     const context = {
         resourceName,

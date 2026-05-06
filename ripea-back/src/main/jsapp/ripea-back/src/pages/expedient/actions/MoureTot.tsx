@@ -1,7 +1,6 @@
-import {MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
+import {useMuiFormDialogApiRef, useBaseAppContext, useFormContext} from "reactlib";
 import {Alert, Grid} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
-import {useRef} from "react";
 import {useTranslation} from "react-i18next";
 import * as builder from "../../../util/springFilterUtils.ts";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
@@ -52,7 +51,7 @@ const MoureTot = (props:any) => {
 
 const useMoureTot = (refresh?: () => void) => {
     const { t } = useTranslation();
-    const apiRef = useRef<MuiFormDialogApi>();
+    const apiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow} = useBaseAppContext();
 	
 	const handleShow = (id:any, row:any) :void => {

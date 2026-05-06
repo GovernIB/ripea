@@ -10,7 +10,7 @@ export type MuiDataGridApi = {
     setFilter: (filter: string | undefined) => void;
 };
 
-export type MuiDataGridApiRef = React.RefObject<MuiDataGridApi | undefined>;
+export type MuiDataGridApiRef = React.RefObject<MuiDataGridApi | null>;
 
 export type DataGridContextType = {
     resourceName: string;

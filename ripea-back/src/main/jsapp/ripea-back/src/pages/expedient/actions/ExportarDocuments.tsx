@@ -1,6 +1,5 @@
-import {MuiFormDialogApi, useBaseAppContext} from "reactlib";
+import {useMuiFormDialogApiRef, useBaseAppContext} from "reactlib";
 import {Grid} from "@mui/material";
-import {useRef} from "react";
 import GridFormField from "../../../components/GridFormField.tsx";
 import {FormReportDialog} from "../../../components/FormActionDialog.tsx";
 import {useTranslation} from "react-i18next";
@@ -26,7 +25,7 @@ const ExportarDocuments = (props:any) => {
 
 export const useExportarDocuments = () => {
     const { t } = useTranslation();
-    const apiRef = useRef<MuiFormDialogApi>();
+    const apiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow} = useBaseAppContext();
 
     const handleShow = (id:any) :void => {
@@ -52,7 +51,7 @@ export const useExportarDocuments = () => {
 
 export const useExportarDocumentsMassive = (refresh?: () => void) => {
     const { t } = useTranslation();
-    const apiRef = useRef<MuiFormDialogApi>();
+    const apiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow} = useBaseAppContext();
 
     const handleMassiveShow = (ids:any[]) :void => {
