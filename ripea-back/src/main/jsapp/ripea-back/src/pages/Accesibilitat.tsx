@@ -1,74 +1,150 @@
 import React from 'react';
-import {Box, Icon, Typography} from '@mui/material';
-import { BasePage } from 'reactlib';
+import {Box, Icon, Link, Typography} from '@mui/material';
+import {useTranslation} from 'react-i18next';
 import {CardPage} from "../components/CardData.tsx";
 
+const SectionTitle: React.FC<{
+    icon?: string;
+    color?: 'primary' | 'secondary' | 'success' | 'error' | 'warning' | 'info' | 'action' | 'disabled' | 'inherit';
+    children: React.ReactNode;
+}> = ({icon, color = 'success', children}) => (
+    <Typography variant="h6" component="h2" display="flex" alignItems="center" gutterBottom sx={{mt: 1}}>
+        {icon && <Icon color={color} sx={{fontSize: 'inherit'}}>{icon}</Icon>}
+        {children}
+    </Typography>
+);
+
 const Accesibilitat: React.FC = () => {
-    return <BasePage>
-        <CardPage header={<Typography variant="h3" component="h1">Declaración de Accesibilidad (en proceso)</Typography>}>
-            <Box>
-                <Box sx={{p:1}}>
-                    <Typography variant="h3" component="h2">Introducción</Typography>
+    const {t} = useTranslation();
+    const p = 'page.accesibilitat';
+    const rdUrl = 'https://www.boe.es/diario_boe/txt.php?id=BOE-A-2018-12699';
+
+    return <CardPage header={<Typography variant="h4" component="h1">{t(`${p}.title`)}</Typography>}>
+            <Box sx={{'& .MuiTypography-body1': {fontWeight: 400}}}>
+                {/* Introducció */}
+                <Box sx={{p: 1}}>
+                    <SectionTitle icon="info" color="info">{t(`${p}.intro.title`)}</SectionTitle>
                     <Typography component="p">
-                        El presente documento constituye la Declaración de Accesibilidad del sitio web https://intranet.caib.es/ripeaback/reactapp, desarrollado con tecnología React y Material-UI. Esta declaración se elabora en cumplimiento del Real Decreto 1112/2018, de 7 de septiembre, sobre accesibilidad de los sitios web y aplicaciones para dispositivos móviles del sector público, y tiene como objetivo informar de forma transparente sobre el grado de conformidad con los criterios de accesibilidad reconocidos.
+                        {t(`${p}.intro.p1Part1`)}{' '}
+                        <Link href={rdUrl} target="_blank" rel="noopener noreferrer">
+                            {t(`${p}.intro.p1LinkText`)}
+                        </Link>
+                        {t(`${p}.intro.p1Part2`)}
+                    </Typography>
+                    <Typography component="p">
+                        {t(`${p}.intro.p2Part1`)}{' '}
+                        <Link href="https://intranet.caib.es/ripeaback/" target="_blank" rel="noopener noreferrer">
+                            https://intranet.caib.es/ripeaback/
+                        </Link>
+                        {' '}{t(`${p}.intro.p2Part2`)}
                     </Typography>
                 </Box>
-                <Box sx={{p:1}}>
-                    <Typography variant="h3" component="h2" display={'flex'} alignItems={'center'}><Icon color={'success'} sx={{fontSize: 'inherit'}}>check_circle</Icon>Situación de cumplimiento</Typography>
+
+                {/* Situació de compliment */}
+                <Box sx={{p: 1}}>
+                    <SectionTitle icon="check_circle" color="success">{t(`${p}.compliment.title`)}</SectionTitle>
                     <Typography component="p">
-                        Este sitio web se encuentra parcialmente conforme con el Real Decreto 1112/2018. Se han implementado medidas correctoras para la mayoría de los criterios de accesibilidad de los niveles A y AA de la norma UNE-EN 301549:2022, aunque persisten algunas incidencias técnicas que se detallan a continuación, junto con las soluciones aplicadas o en proceso de implementación.
-                    </Typography>
-                    <Typography component="p" sx={{p:1}}>Criterio A - 4.1.2 Name, Role, Value: Algunos botones iconográficos carecían de alternativa textual accesible. Solución aplicada: se ha añadido el atributo "title" y el atributo "aria-label" con texto descriptivo a todos los botones que no disponían de etiqueta visible, garantizando que los lectores de pantalla puedan identificar su función.</Typography>
-                    <Typography component="p" sx={{p:1}}>Criterio A - 1.1.1 Non-text Content: Algunas imágenes informativas no disponían de texto alternativo. Solución aplicada: se ha realizado una auditoría de todos los recursos gráficos. Las imágenes no decorativas incluyen ahora un atributo "alt" descriptivo y contextual. Las imágenes puramente decorativas utilizan "alt" vacío o "role=presentation" para ser ignoradas por las tecnologías de apoyo.</Typography>
-                    <Typography component="p" sx={{p:1}}>Criterio AA - 1.4.4 Resize Text: El texto se truncaba al escalar la interfaz al 200%. Solución aplicada: en tamaños de pantalla reducidos, los botones muestran únicamente el icono acompañado de un atributo "title" descriptivo. Se ha eliminado el uso de "overflow: hidden" en contenedores de texto y se ha verificado que todo el contenido permanezca accesible con zoom del 200%.</Typography>
-                    <Typography component="p" sx={{p:1}}>Criterio AA - 2.5.8 Target Size (Minimum): Determinados elementos interactivos no cumplían con el tamaño mínimo de 24x24 píxeles o el espaciado requerido. Solución aplicada: se ha modificado el posicionamiento y maquetación de los componentes para garantizar un área de pulsación adecuada y un espaciado mínimo de 8 píxeles entre elementos interactivos, facilitando su uso en dispositivos táctiles y por personas con dificultades de movilidad.</Typography>
-                </Box>
-                <Box sx={{p:1}}>
-                    <Typography variant="h3" component="h2" display={'flex'} alignItems={'center'}><Icon color={'error'} sx={{fontSize: 'inherit'}}>cancel</Icon>Lista de contenido no accesible y explicación del motivo</Typography>
-                    <Typography component="p" sx={{p:1}}>Criterio A - 2.5.3 Label in Name: En ciertos componentes interactivos derivados de librerías de terceros, el nombre accesible no coincidía con la etiqueta visible. Solución aplicada: se ha informado de esta incidencia al equipo mantenedor de la librería. Mientras se publica una corrección oficial, se aplica una sincronización manual entre el texto visible y el atributo "aria-label" en los componentes afectados.</Typography>
-                    <Typography component="p" sx={{p:1}}>Criterio A - 3.1.1 Language of Page: El idioma principal de la página no se declara mediante el atributo "lang" en el elemento HTML raíz. Explicación: en nuestra arquitectura, la gestión del idioma se realiza a través de la sesión de usuario y el contexto de la aplicación React, no mediante atributos estáticos en el HTML. Como medida compensatoria, el atributo "lang" se inyecta dinámicamente en el contenedor principal según el idioma seleccionado por el usuario.</Typography>
-                    <Typography component="p" sx={{p:1}}>Criterio AA - 1.4.3 Contrast (Minimum): Se detectó contraste insuficiente entre texto y fondo en algunos elementos de la interfaz. Solución aplicada: se ha revisado la paleta de colores corporativa para asegurar una relación de contraste mínima de 4.5:1 para texto normal y 3:1 para texto grande, conforme a los requisitos WCAG 2.1 nivel AA.</Typography>
-                </Box>
-                <Box sx={{p:1}}>
-                    <Typography variant="h3" component="h2" display={'flex'} alignItems={'center'}><Icon color={'warning'} sx={{fontSize: 'inherit'}}>calendar_today</Icon>Preparación de la presente declaración</Typography>
-                    <Typography component="p">
-                        Esta declaración se ha elaborado mediante autoevaluación realizada por el equipo de desarrollo utilizando la herramienta automatizada: Rastreador Web del Observatoria de Accesibilidad Web. Fecha de preparación: 01/05/2026. Última revisión: 05/05/2026. Próxima revisión programada: 05/05/2027. Norma de referencia: UNE-EN 301549:2022, niveles A y AA.
+                        {t(`${p}.compliment.introPart1`)}{' '}
+                        <Link href={rdUrl} target="_blank" rel="noopener noreferrer">
+                            {t(`${p}.compliment.introLinkText`)}
+                        </Link>
+                        {' '}{t(`${p}.compliment.introPart2`)}
                     </Typography>
                 </Box>
-                <Box sx={{p:1}}>
-                    <Typography variant="h3" component="h2" display={'flex'} alignItems={'center'}><Icon color={'success'} sx={{fontSize: 'inherit'}}>mail</Icon>Observaciones y datos de contacto</Typography>
-                    <Typography component="p">
-                        Si identifica alguna barrera de accesibilidad no recogida en esta declaración, o tiene dificultades para acceder a algún contenido, póngase en contacto con nosotros a través de:
-                    </Typography>
-                    <ul>
-                        <li>Correo electrónico: accesibilidad@[dominio].es</li>
-                        <li>Teléfono: [NÚMERO] (horario de atención: lunes a viernes, 9:00 a 18:00)</li>
-                        <li>Formulario web: [URL del formulario]</li>
-                        <li>Dirección postal: [DIRECCIÓN COMPLETA]</li>
-                        <li>Todas las comunicaciones serán gestionadas por la Unidad de Accesibilidad Digital, en cumplimiento del artículo 10.2.a) del Real Decreto 1112/2018.</li>
-                    </ul>
+
+                {/* Contingut no accessible */}
+                <Box sx={{p: 1}}>
+                    <SectionTitle icon="cancel" color="error">{t(`${p}.noAccesible.title`)}</SectionTitle>
+                    <Box component="ol">
+                        {([1, 2, 3] as const).map(i => (
+                            <Box component="li" key={i} sx={{mb: 1}}>
+                                <Typography component="span" sx={{fontWeight: 600}}>
+                                    {t(`${p}.noAccesible.item${i}.title`)}
+                                </Typography>
+                                <Typography component="p">{t(`${p}.noAccesible.item${i}.desc1`)}</Typography>
+                                <Typography component="p">{t(`${p}.noAccesible.item${i}.desc2`)}</Typography>
+                            </Box>
+                        ))}
+                    </Box>
                 </Box>
-                <Box sx={{p:1}}>
-                    <Typography variant="h3" component="h2" display={'flex'} alignItems={'center'}><Icon color={'error'} sx={{fontSize: 'inherit'}}>error</Icon>Procedimiento de aplicación</Typography>
-                    <Typography component="p">
-                        En caso de recibir una comunicación sobre una posible incidencia de accesibilidad, se seguirá el siguiente procedimiento:
-                    </Typography>
-                    <ol>
-                        <li>Acuse de recibo en un plazo máximo de 5 días hábiles.</li>
-                        <li>Análisis técnico de la incidencia reportada y evaluación de su conformidad con la normativa.</li>
-                        <li>Respuesta motivada en un plazo máximo de 20 días hábiles, indicando las medidas correctoras aplicables o, en su caso, los motivos de desestimación.</li>
-                        <li>Si la respuesta no fuera satisfactoria, el interesado podrá presentar reclamación administrativa a través de los registros electrónicos o presenciales habilitados, conforme a la Ley 39/2015, de 1 de octubre, del Procedimiento Administrativo Común de las Administraciones Públicas.</li>
-                    </ol>
+
+                {/* Preparació */}
+                <Box sx={{p: 1}}>
+                    <SectionTitle icon="calendar_today" color="warning">{t(`${p}.preparacio.title`)}</SectionTitle>
+                    <Typography component="p">{t(`${p}.preparacio.elaborat`)}</Typography>
+                    <Box component="ul">
+                        <Box component="li">{t(`${p}.preparacio.dataPrep`)}</Box>
+                        <Box component="li">{t(`${p}.preparacio.darreraRevisio`)}</Box>
+                        <Box component="li">{t(`${p}.preparacio.properaRevisio`)}</Box>
+                        <Box component="li">{t(`${p}.preparacio.norma`)}</Box>
+                    </Box>
+                    <Typography component="p" sx={{fontWeight: 600, mt: 1}}>{t(`${p}.preparacio.resultatTitle`)}</Typography>
+					<Box component="ul">
+						<Box component="li">{t(`${p}.preparacio.puntuacioLabel`)}: {t(`${p}.preparacio.puntuacioVal`)}</Box>
+						<Box component="li">{t(`${p}.preparacio.nivellLabel`)}: {t(`${p}.preparacio.nivellVal`)}</Box>
+						<Box component="li">{t(`${p}.preparacio.situacioLabel`)}: {t(`${p}.preparacio.situacioVal`)}</Box>
+					</Box>
+					<Typography component="p">{t(`${p}.preparacio.responsive`)}</Typography>
                 </Box>
-                <Box sx={{p:1}}>
-                    <Typography variant="h3" component="h2" display={'flex'} alignItems={'center'}><Icon color={'warning'} sx={{fontSize: 'inherit'}}>add_circle</Icon>Contenido opcional</Typography>
-                    <Typography component="p" sx={{p:1}}>Medidas de accesibilidad adicionales implementadas: estructura de encabezados revisada, añadidas etiquetas de los campos que no tenian, corrección de bloques de texto de más de 150 caracteres sin marcado de texto.</Typography>
-                    <Typography component="p" sx={{p:1}}>Configuración técnica recomendada: navegadores actualizados (Chrome, Firefox, Edge, Safari en sus dos últimas versiones), resolución mínima de 1280x720 píxeles, y soporte de zoom hasta 200% sin pérdida de contenido o funcionalidad.</Typography>
-                    <Typography component="p" sx={{p:1}}>Recursos de interés: Guía de accesibilidad web del W3C (https://www.w3.org/WAI/), validadores automáticos de accesibilidad (https://achecker.ca/), y documentación oficial del Real Decreto 1112/2018.</Typography>
+
+                {/* Observacions i contacte */}
+                <Box sx={{p: 1}}>
+                    <SectionTitle icon="mail" color="success">{t(`${p}.contacte.title`)}</SectionTitle>
+                    <Typography component="p">{t(`${p}.contacte.p1`)}</Typography>
+                    <Box component="ul">
+                        <Box component="li">{t(`${p}.contacte.li1`)}</Box>
+                        <Box component="li">{t(`${p}.contacte.li2`)}</Box>
+                        <Box component="li">{t(`${p}.contacte.li3`)}</Box>
+                    </Box>
+                    <Typography component="p">
+                        {t(`${p}.contacte.p2Part1`)}{' '}
+                        <Link href="https://www.caib.es/seucaib/es/200/persones/tramites/servicio/4055206/" target="_blank" rel="noopener noreferrer">
+                            {t(`${p}.contacte.p2LinkText`)}
+                        </Link>
+                        {' '}{t(`${p}.contacte.p2Part2`)}
+                    </Typography>
+                    <Box component="ul">
+                        <Box component="li">{t(`${p}.contacte.li4`)}</Box>
+                        <Box component="li">
+                            {t(`${p}.contacte.li5`)}
+                            <Box component="ul">
+                                <Box component="li">{t(`${p}.contacte.li5a`)}</Box>
+                                <Box component="li">{t(`${p}.contacte.li5b`)}</Box>
+                            </Box>
+                        </Box>
+                    </Box>
+                    <Typography component="p">
+                        {t(`${p}.contacte.p4Part1`)}{' '}
+                        <Link href="https://www.caib.es/seucaib/es/200/personas/tramites/tramite/4055271/" target="_blank" rel="noopener noreferrer">
+                            {t(`${p}.contacte.p4LinkText`)}
+                        </Link>
+                    </Typography>
+                </Box>
+
+                {/* Procediment */}
+                <Box sx={{p: 1}}>
+                    <SectionTitle icon="error" color="error">{t(`${p}.procediment.title`)}</SectionTitle>
+                    <Typography component="p">{t(`${p}.procediment.p1`)}</Typography>
+                    <Typography component="p">{t(`${p}.procediment.p2`)}</Typography>
+                    <Typography component="p">
+                        {t(`${p}.procediment.p3Part1`)}{' '}
+                        <Link href="https://www.caib.es/seucaib/es/200/personas/tramites/tramite/4057494" target="_blank" rel="noopener noreferrer">
+                            {t(`${p}.procediment.p3LinkText`)}
+                        </Link>
+                    </Typography>
+                </Box>
+
+                {/* Contingut opcional */}
+                <Box sx={{p: 1}}>
+                    <SectionTitle icon="add_circle" color="warning">{t(`${p}.opcional.title`)}</SectionTitle>
+                    <Box component="ul">
+                        <Box component="li">{t(`${p}.opcional.mesures`)}</Box>
+                        <Box component="li">{t(`${p}.opcional.config`)}</Box>
+                        <Box component="li">{t(`${p}.opcional.recursos`)}</Box>
+                    </Box>
                 </Box>
             </Box>
-        </CardPage>
-    </BasePage>;
+        </CardPage>;
 }
 
 export default Accesibilitat;

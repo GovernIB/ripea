@@ -141,7 +141,7 @@ const ExpedientAlert = (props:any) => {
                        <Button sx={{py:0}}
                        onClick={()=>agafar(expedient?.id, expedient)} variant="outlined">
                            <Icon>lock</Icon>
-						   <Typography variant={"subtitle2"}>{t('page.expedient.action.agafar.label')}</Typography>
+						   <Typography variant={"subtitle2"} component="span">{t('page.expedient.action.agafar.label')}</Typography>
                        </Button>
                    }
             >{t('page.expedient.alert.owner')}</Alert>
@@ -158,7 +158,7 @@ const ExpedientAlert = (props:any) => {
                        <Button sx={{py: 0}} variant="outlined"
                                onClick={() => handelAlert(expedient?.id, expedient)}>
                             <Icon>search</Icon>
-                           <Typography variant={"subtitle2"}>{t('common.consult')}</Typography>
+                           <Typography variant={"subtitle2"} component="span">{t('common.consult')}</Typography>
                        </Button>
                    }
             >{t('page.expedient.alert.alert')}</Alert>
@@ -169,7 +169,7 @@ const ExpedientAlert = (props:any) => {
                        <Button sx={{py: 0}} variant="outlined"
                                onClick={() => hanldeErrorValidacio(expedient?.id, expedient)}>
                             <Icon>search</Icon>
-                           <Typography variant={"subtitle2"}>{t('common.consult')}</Typography>
+                           <Typography variant={"subtitle2"} component="span">{t('common.consult')}</Typography>
                        </Button>
                    }
             >{t('page.expedient.alert.validation')}</Alert>
