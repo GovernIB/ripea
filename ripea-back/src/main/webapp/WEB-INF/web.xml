@@ -3,6 +3,16 @@
 		 xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
 		 version="4.0">
 	<display-name>RIPEA</display-name>
+	<!-- TEMPORAL: eliminar quan es reprengui l'autenticació real -->
+	<!-- filter>
+		<filter-name>fakeAuthFilter</filter-name>
+		<filter-class>es.caib.ripea.back.filter.FakeAuthenticationFilter</filter-class>
+		<async-supported>true</async-supported>
+	</filter-->
+	<filter-mapping>
+		<filter-name>fakeAuthFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
 	<login-config>
 		<auth-method>KEYCLOAK</auth-method>
 		<realm-name>Govern de les Illes Balears</realm-name>
@@ -43,6 +53,7 @@
 	<security-constraint>
 		<web-resource-collection>
 			<web-resource-name>Public areas</web-resource-name>
+			<!-- url-pattern>/*</url-pattern -->
 			<url-pattern>/api</url-pattern>
 			<url-pattern>/api/*</url-pattern>
 			<url-pattern>/ws/v0/bustia</url-pattern>
