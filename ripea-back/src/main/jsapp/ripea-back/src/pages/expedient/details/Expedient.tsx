@@ -67,7 +67,7 @@ const ExpedientsRelacionats = (props:any) => {
     }, [apiIsReady, expedient]);
 
     return <Load value={relacionats.length > 0} noEffect>
-        <Grid size={12} p={1} my={2}>
+        <Grid size={12} p={1} my={1}>
         <DetailCard title={t('page.contingut.action.importarExpedient.title')} display={'flex'} flexDirection={'column'} sx={{ px: 1 }} hidden={relacionats?.length==0}>
             {
                 relacionats?.map((relacionat:any) =>

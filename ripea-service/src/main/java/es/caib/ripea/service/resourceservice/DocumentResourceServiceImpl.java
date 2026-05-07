@@ -469,9 +469,9 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 				}
 				reorderIfReorderable(
 						documentResourceActual,
+                        documentResourceActual.getOrder(),
 						reorderResourceSequence,
 						reorderPreviousParentId,
-						true,
 						false);
 				//mourer també al arxiu
 				boolean parentIdChanged = !Objects.equals(documentResourceActual.getOrderParentId(), reorderPreviousParentId);
@@ -562,10 +562,10 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     	}
     }
 
-	@Override
-	protected List<DocumentResourceEntity> reorderFindLinesWithParent(Serializable parentId) {
-		return documentResourceRepository.findAllByPareIdOrderByOrdreAsc((Long)parentId);
-	}
+//	@Override
+//	protected List<DocumentResourceEntity> reorderFindLinesWithParent(Serializable parentId) {
+//		return documentResourceRepository.findAllByPareIdOrderByOrdreAsc((Long)parentId);
+//	}
 
     private class PathPerspectiveApplicator implements PerspectiveApplicator<DocumentResourceEntity, DocumentResource> {
         @Override

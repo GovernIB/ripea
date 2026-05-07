@@ -35,7 +35,7 @@ export const ThemeUserProvider = ({ children }: { children: React.ReactNode }) =
             default:
                 return (user?.conf?.modeFosc) ? darkTheme : lightTheme;
         }
-    }, [th]);
+    }, [th, user]);
 
     return (
         <ThemeUserContext.Provider value={{

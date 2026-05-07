@@ -1,7 +1,7 @@
 import {useTranslation} from "react-i18next";
 import {GridPage, useBaseAppContext, useFormContext, useMuiDataGridApiRef, useResourceApiService} from "reactlib";
 import {CardPage} from "@src/components/CardData.tsx";
-import {DndMuiGrid} from "@src/components/StyledMuiGrid.tsx";
+import StyledMuiGrid from "@src/components/StyledMuiGrid.tsx";
 import {Grid, Icon, Divider, Button} from "@mui/material";
 import * as builder from "@src/util/springFilterUtils.ts";
 import {useNavigate, useParams} from "react-router-dom";
@@ -45,7 +45,6 @@ const useActions = (refresh?: () => void) => {
 
     const reordering = (id:any, ordre:number) => {
         apiAction(id, { code: 'REORDENAR', data: ordre })
-            .then(() => refresh?.())
             .catch((error) => {
                 temporalMessageShow(null, error?.message, 'error');
             });
@@ -159,16 +158,13 @@ export const MetDadaGrid = ({ id, enviable = false, readOnly, ...other }: any) =
         },
     ], [t, readOnly, apiIsReady])
 
-    const handleDragEnd = (event: any) => {
-        const sourceData = event.active.data.current;
-        const targetData = event.over.data.current;
-        // console.log('>>> ', sourceData.codi, '(', sourceData.ordre, ') ->', targetData.codi, '(', targetData.ordre, ')')
-        if (sourceData.id != targetData.id) {
-            reordering(sourceData.id, targetData.ordre)
+    const handleDragEnd = (params: any) => {
+        if (params.targetIndex != params.oldIndex) {
+            reordering(params.row.id, params.targetIndex)
         }
     }
 
-    return <><DndMuiGrid
+    return <><StyledMuiGrid
         apiRef={apiRef}
         resourceName={"metaDadaResource"}
         popupEditUpdateActive
@@ -183,7 +179,8 @@ export const MetDadaGrid = ({ id, enviable = false, readOnly, ...other }: any) =
         rowAdditionalActions={actions}
         {...other}
 
-        onDragEnd={handleDragEnd}
+        rowReordering={!readOnly}
+        onRowOrderChange={handleDragEnd}
 
         toolbarCreateTitle={t('page.metaDada.action.new.label')}
         popupEditFormI18nKeys={{

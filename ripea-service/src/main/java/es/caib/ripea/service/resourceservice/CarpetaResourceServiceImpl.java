@@ -149,9 +149,9 @@ public class CarpetaResourceServiceImpl extends BaseMutableResourceService<Carpe
 				}
 				reorderIfReorderable(
 						carpetaResourceActual,
+                        (long) carpetaActual.getOrdre(),
 						reorderResourceSequence,
 						reorderPreviousParentId,
-						true,
 						false);
 				boolean parentIdChanged = !Objects.equals(carpetaResourceActual.getOrderParentId(), reorderPreviousParentId);
 				if (parentIdChanged) {
@@ -195,10 +195,10 @@ public class CarpetaResourceServiceImpl extends BaseMutableResourceService<Carpe
     	}
     }
 
-	@Override
-	protected List<CarpetaResourceEntity> reorderFindLinesWithParent(Serializable parentId) {
-		return carpetaResourceRepository.findAllByPareId((Long)parentId);
-	}
+//	@Override
+//	protected List<CarpetaResourceEntity> reorderFindLinesWithParent(Serializable parentId) {
+//		return carpetaResourceRepository.findAllByPareId((Long)parentId);
+//	}
 
     private class PathPerspectiveApplicator implements PerspectiveApplicator<CarpetaResourceEntity, CarpetaResource> {
         @Override

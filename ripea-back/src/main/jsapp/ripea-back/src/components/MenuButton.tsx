@@ -1,5 +1,5 @@
 import React, {ReactElement} from "react";
-import {Button, Icon, Menu, MenuItem} from "@mui/material";
+import {Box, Button, Icon, Menu, MenuItem} from "@mui/material";
 
 type MenuButtonProps = {
     id: string;
@@ -72,7 +72,9 @@ const MenuButton = (props:MenuButtonProps) => {
 
             {...menuProps}
         >
-            {children}
+            <Box>
+                {children}
+            </Box>
         </Menu>
     </>)
 }

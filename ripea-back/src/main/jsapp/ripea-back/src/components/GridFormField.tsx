@@ -135,7 +135,7 @@ const GridFormField = (props:GridFormField) => {
             readOnly={disabled}
             {...other}
             componentProps={{
-                sx: {color: 'black', backgroundColor: 'white'},
+                className: 'input',
                 ...componentProps
             }}
             onFieldValueChange={handleFieldValueChange}

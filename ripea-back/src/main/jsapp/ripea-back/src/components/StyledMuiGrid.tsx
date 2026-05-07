@@ -1,13 +1,10 @@
 import React, {useEffect, useMemo, useState} from "react";
 import {Button, Icon, Tooltip, Typography} from "@mui/material";
-import {GridSlots, useGridApiRef as useMuiDatagridApiRef} from "@mui/x-data-grid-pro";
+import {useGridApiRef as useMuiDatagridApiRef} from "@mui/x-data-grid-pro";
 import {MuiDataGridProps, MuiGrid, useMuiDataGridApiRef} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {useUserSession} from "./Session.tsx";
 import MassiveActionSelector, {MassiveActionProps} from "./MassiveActionSelector.tsx";
-import {DraggableGridRow, DraggableGridRowHandler} from "./DraggableContext.tsx";
-import {DndContext} from "@dnd-kit/core";
-import {dndScreenReaderInstructions} from "../util/dndAccessibility.tsx";
 import {toSelectionModel, fromSelectionModel, EMPTY_SELECTION_MODEL} from "../util/selectionModelUtils";
 
 export const ToolbarButton = (props:any) => {
@@ -47,7 +44,6 @@ type StyledMuiGridProps = Omit<MuiDataGridProps,
     onRefresh?: () => any,
     disabledMassiveDefSelector?: boolean,
     hiddenMassiveDefSelector?: boolean,
-    onDragEnd?: ( event:any ) => void,
     toolbarShowCreate?: boolean,
     toolbarShowQuickFilter?: boolean,
     staticSortModel?: any[],
@@ -55,30 +51,6 @@ type StyledMuiGridProps = Omit<MuiDataGridProps,
     onRowSelectionModelChange?: (ids:any[], detail:any) => void,
     paginationActive?: boolean,
     readOnly?: boolean,
-}
-
-export const DndMuiGrid = (props:StyledMuiGridProps) => {
-    const {onDragEnd, ...other} = props
-    const dndEnabled = onDragEnd != null && !other?.readOnly
-
-    const additionalColumns:any[] = useMemo(()=> [
-        ...props.columns,
-        {
-            renderCell: () => <DraggableGridRowHandler />,
-            flex: 0.1
-        }
-    ], [props.columns])
-
-    if (!dndEnabled) return <StyledMuiGrid {...other}/>;
-
-    return <DndContext onDragEnd={onDragEnd} accessibility={{screenReaderInstructions: dndScreenReaderInstructions}}><StyledMuiGrid
-        {...other}
-        rowActionsColumnIndex={-1}
-        columns={additionalColumns}
-        slots={{
-            row: DraggableGridRow as GridSlots['row'],
-        }}
-    /></DndContext>;
 }
 
 const StyledMuiGrid = (props:StyledMuiGridProps) => {
@@ -212,12 +184,9 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
         <style>{rowStyles}</style>
 
         <MuiGrid
-            autoPageSize={false}
             resourceName={resourceName}
             filter={filter}
             namedQueries={namedQueries}
-            // autoHeight
-            key={user?.conf?.numElementsPagina}
             paginationActive={paginationActive ?true :undefined}
             titleDisabled
             disableColumnMenu
