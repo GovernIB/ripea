@@ -1,9 +1,9 @@
 import { alpha, styled } from '@mui/material/styles';
-import { DataGridPro as DataGrid, gridClasses } from '@mui/x-data-grid-pro';
+import { DataGridPro as MuiDataGrid, gridClasses } from '@mui/x-data-grid-pro';
 
 const ODD_OPACITY = 0.2;
 
-const DataGridCustomStyle = styled(DataGrid)((props) => {
+const DataGridCustomStyle = styled(MuiDataGrid)((props) => {
     const { theme, semiBordered } = props as any;
     const customStyle = {
         [`& .${gridClasses.row}.even`]: {
