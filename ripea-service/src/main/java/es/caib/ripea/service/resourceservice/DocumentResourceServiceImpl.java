@@ -462,6 +462,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     		DocumentEntity documentActual = documentRepository.findById(resource.getId()).get();
     		if (resource.isOrdrePatch()) {
     			DocumentResourceEntity documentResourceActual = documentResourceRepository.findById(resource.getId()).get();
+			    Long reorderPreviousSequence = reorderGetPreviousSequence(documentResourceActual);
     			Long reorderPreviousParentId = reorderGetParentId(documentResourceActual);
     			Long reorderResourceSequence = reorderGetSequenceFromResourceOrEntity(resource, documentResourceActual);
 				if (!Objects.equals(resource.getPare().getId(), documentResourceActual.getPare().getId())) {
@@ -469,7 +470,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 				}
 				reorderIfReorderable(
 						documentResourceActual,
-                        documentResourceActual.getOrder(),
+						reorderPreviousSequence,
 						reorderResourceSequence,
 						reorderPreviousParentId,
 						false);
@@ -562,10 +563,10 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     	}
     }
 
-//	@Override
-//	protected List<DocumentResourceEntity> reorderFindLinesWithParent(Serializable parentId) {
-//		return documentResourceRepository.findAllByPareIdOrderByOrdreAsc((Long)parentId);
-//	}
+	@Override
+	protected List<DocumentResourceEntity> reorderFindLinesWithParentAndSorted(Serializable parentId) {
+		return documentResourceRepository.findAllByPareIdOrderByOrdreAsc((Long)parentId);
+	}
 
     private class PathPerspectiveApplicator implements PerspectiveApplicator<DocumentResourceEntity, DocumentResource> {
         @Override

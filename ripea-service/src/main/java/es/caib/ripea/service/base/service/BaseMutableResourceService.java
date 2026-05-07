@@ -67,7 +67,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 
 	@Override
 	public R newResourceInstance() {
-		log.debug("Creating new resource instance");
+		//log.debug("Creating new resource instance");
 		return newClassInstance(getResourceClass());
 	}
 
