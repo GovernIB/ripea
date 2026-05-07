@@ -139,45 +139,22 @@ public class CarpetaResourceServiceImpl extends BaseMutableResourceService<Carpe
     @Override
 	public CarpetaResource update(Long id, CarpetaResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotFoundException {
     	try {
-    		if (resource.isOrdrePatch()) {
-    			CarpetaEntity carpetaActual = carpetaRepository.findById(resource.getId()).get();
-    			CarpetaResourceEntity carpetaResourceActual = carpetaResourceRepository.findById(resource.getId()).get();
-    			Long reorderPreviousParentId = reorderGetParentId(carpetaResourceActual);
-    			Long reorderResourceSequence = reorderGetSequenceFromResourceOrEntity(resource, carpetaResourceActual);
-				if (!Objects.equals(resource.getPare().getId(), carpetaResourceActual.getPare().getId())) {
-					carpetaResourceActual.setPare(contingutResourceRepository.findById(resource.getPare().getId()).get());
-				}
-				reorderIfReorderable(
-						carpetaResourceActual,
-                        (long) carpetaActual.getOrdre(),
-						reorderResourceSequence,
-						reorderPreviousParentId,
-						false);
-				boolean parentIdChanged = !Objects.equals(carpetaResourceActual.getOrderParentId(), reorderPreviousParentId);
-				if (parentIdChanged) {
-    				//mourer també al arxiu
-    				pluginHelper.arxiuCarpetaMoure(
-    						(CarpetaEntity)carpetaActual,
-    						contingutRepository.findById(carpetaResourceActual.getOrderParentId()).get().getArxiuUuid());
-				}
-    		} else {
-        		//TODO: ara mateix falla arxiu al renombrar una carpeta
-    			carpetaHelper.modificarNomCarpeta(
-    					resource.getEntitat().getId(), 
-						id,
-						resource.getNom());
-    			
-    			List<String> usuaris = resource.getRestriccions().stream()
-	                    .map(ResourceReference::getId)
-	                    .collect(Collectors.toList());
-				
-				carpetaHelper.restringirCarpeta(
-						resource.getEntitat().getId(), 
-						id, 
-						resource.getRestringida(),
-						resource.getMotiuRestriccio(), 
-						usuaris);
-    		}
+            //TODO: ara mateix falla arxiu al renombrar una carpeta
+            carpetaHelper.modificarNomCarpeta(
+                    resource.getEntitat().getId(),
+                    id,
+                    resource.getNom());
+
+            List<String> usuaris = resource.getRestriccions().stream()
+                    .map(ResourceReference::getId)
+                    .collect(Collectors.toList());
+
+            carpetaHelper.restringirCarpeta(
+                    resource.getEntitat().getId(),
+                    id,
+                    resource.getRestringida(),
+                    resource.getMotiuRestriccio(),
+                    usuaris);
     	} catch (Exception ex) {
     		excepcioLogHelper.addExcepcio("/carpeta/"+resource.getId()+"/update", ex);
     	}
@@ -194,11 +171,6 @@ public class CarpetaResourceServiceImpl extends BaseMutableResourceService<Carpe
     		throw new ResourceNotFoundException(getResourceClass(), ex.getMessage());
     	}
     }
-
-//	@Override
-//	protected List<CarpetaResourceEntity> reorderFindLinesWithParent(Serializable parentId) {
-//		return carpetaResourceRepository.findAllByPareId((Long)parentId);
-//	}
 
     private class PathPerspectiveApplicator implements PerspectiveApplicator<CarpetaResourceEntity, CarpetaResource> {
         @Override

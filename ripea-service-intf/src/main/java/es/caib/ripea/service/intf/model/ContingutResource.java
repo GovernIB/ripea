@@ -29,6 +29,7 @@ import lombok.experimental.FieldNameConstants;
 @ResourceConfig(
         quickFilterFields = { "nom" },
         descriptionField = "nom",
+        orderField = "ordreLong",
         artifacts = {
 				@ResourceArtifact(
 						type = ResourceArtifactType.PERSPECTIVE,
@@ -45,6 +46,11 @@ import lombok.experimental.FieldNameConstants;
                         type = ResourceArtifactType.FILTER,
                         code = ContingutResource.FILTER_CODE,
                         formClass = ContingutResource.FilterForm.class),
+                @ResourceArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = ContingutResource.ACTION_REORDER,
+                        formClass = ContingutResource.ReordenarForm.class,
+                        requiresId = true),
         })
 public class ContingutResource extends BaseAuditableResource<Long> {
 
@@ -53,6 +59,7 @@ public class ContingutResource extends BaseAuditableResource<Long> {
     public static final String PERSPECTIVE_AUDIT_CODE = "AUDITORIA";
     public static final String ACTION_DELETE_CODE = "DELETE";
     public static final String ACTION_RECUPERAR_CODE = "RECUPERAR";
+    public static final String ACTION_REORDER = "REORDER";
 
 	@NotNull
 	@Size(max = 1024)
@@ -107,8 +114,15 @@ public class ContingutResource extends BaseAuditableResource<Long> {
         private Date dataInici;
         private Date dataFi;
     }
-	private boolean ordrePatch;
-	public Long getOrdreLong() {
-		return (long)ordre;
-	}
+
+    @Getter
+    @Setter
+    public static class ReordenarForm implements Serializable {
+        @NotNull private Long ordre;
+        @NotNull private Long pare;
+    }
+
+    public Long getOrdreLong() {
+        return (long)ordre;
+    }
 }

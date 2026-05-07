@@ -1,5 +1,3 @@
-import React from 'react';
-
 // Wraps the default dnd-kit screen reader instructions in <p> elements to satisfy
 // WCAG 2.1 AA (SC 1.3.1): text blocks must use proper semantic markup.
 export const dndScreenReaderInstructions = {

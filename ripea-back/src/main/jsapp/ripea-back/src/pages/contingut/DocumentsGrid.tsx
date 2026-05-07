@@ -79,13 +79,13 @@ export const useExpedientsCarpetes = (commonFilter: string) => {
     const [expedients, setExpedients] = useState<any[]>();
     const [carpetes, setCarpetes] = useState<any[]>();
     const findExpedients = () => {
-        return apiExpedientFindAll({perspectives, unpaged: true, filter: commonFilter})
+        return apiExpedientFindAll({perspectives, unpaged: true, filter: commonFilter, sorts: ['ordre']})
             .then((result)=> setExpedients(result.rows))
             .catch(()=> setExpedients([]))
     }
 
     const findCarpetes = () => {
-        return apiCarpetaFindAll({perspectives: carpetaPerspectives, unpaged: true, filter: commonFilter})
+        return apiCarpetaFindAll({perspectives: carpetaPerspectives, unpaged: true, filter: commonFilter, sorts: ['ordre']})
             .then((result)=> setCarpetes(result.rows))
             .catch(()=> setCarpetes([]))
     }
@@ -147,13 +147,9 @@ const DocumentsGrid = (props: any) => {
     }, [user?.sessionScope?.ordenacioContingutPermesa]);
 
     const {
-        isReady: apiDocumentIsReady,
-        patch: apiDocumentPatch,
-    } = useResourceApiService('documentResource');
-    const {
-        isReady: apiCarpetaIsReady,
-        patch: apiCarpetaPatch,
-    } = useResourceApiService('carpetaResource');
+        isReady: apiContingutIsReady,
+        artifactAction: apiAction,
+    } = useResourceApiService('contingutResource');
 
     const commonFilter = useMemo(() => builder.and(
         builder.or(
@@ -199,27 +195,19 @@ const DocumentsGrid = (props: any) => {
     }, [apiRef])
 
     const handleDragEnd = (params: any) => {
-        console.log("params", params)
+        // console.log("params", params)
         if (params.newParent != params.oldParent || params.targetIndex != params.oldIndex) {
             const patchData = {
                 ordre: params.targetIndex +1,
-                pare: { id: params.newParent ?? entity.id },
-                ordrePatch: true
+                pare: params.newParent ?? entity.id,
             };
-            if (params.row.tipus === 'DOCUMENT') {
-                //console.log('>>> document patch', patchData)
-                if (apiDocumentIsReady) {
-                    apiDocumentPatch(params.row.id, {data: patchData}).then(() => refresh());
-                } else {
-                    console.error('Servei de l\'API pels documents no disponible'); refresh()
-                }
-            } else if (params.row.tipus === 'CARPETA') {
-                //console.log('>>> carpeta patch', patchData)
-                if (apiCarpetaIsReady) {
-                    apiCarpetaPatch(params.row.id, {data: patchData}).then(() => refresh());
-                } else {
-                    console.error('Servei de l\'API per les carpetes no disponible'); refresh()
-                }
+
+            if (apiContingutIsReady) {
+                apiAction(params.row.id, {code: 'REORDER', data: patchData})
+                    // .then(() => refresh())
+                    .catch(() => refresh())
+            } else {
+                console.error('Servei de l\'API pels documents no disponible'); refresh()
             }
         }
     }
@@ -308,6 +296,10 @@ const DocumentsGrid = (props: any) => {
                             }
                             return additionalRows;
                         }}
+                        // sortAditionalRows={(additionalRows: any[], rows: any[])=>{
+                        //     return [...additionalRows, ...rows]
+                        //         .sort((a, b) => a?.ordre - b?.ordre);
+                        // }}
                         getTreeDataPath={(row: any): string[] => {
                             switch (vista) {
                                 case View.estat: return [(`${row?.expedientEstatAdditional?.description || t('page.document.view.nullEstat')}`), `${row.id}`];

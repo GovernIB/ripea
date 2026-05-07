@@ -63,11 +63,11 @@ const MetaDadaGrid = (props: any) => {
                 const row = params.row;
                 if (row?.tipus == 'DOMINI') {
                     return value?.map((dada: any) => (
-                        <StyledLabel className={'multiplicitat'} sx={{marginRight: '4px'}}>{dada?.dominiDescription}</StyledLabel>
+                        <StyledLabel key={dada.id} className={'multiplicitat'} sx={{marginRight: '4px'}}>{dada?.dominiDescription}</StyledLabel>
                     ));
                 }
                 return value?.map((dada: any) => (
-                    <StyledLabel className={'multiplicitat'} sx={{marginRight: '4px'}}>{dada?.valor}</StyledLabel>
+                    <StyledLabel key={dada.id} className={'multiplicitat'} sx={{marginRight: '4px'}}>{dada?.valor}</StyledLabel>
                 ));
             },
         }

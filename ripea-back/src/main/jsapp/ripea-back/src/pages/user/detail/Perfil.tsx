@@ -24,9 +24,9 @@ const PerfilFrom = ({setTheme}: { setTheme: (value:TemaAplicacio) => void }) =>{
             <MuiDetail entity={data} fields={fields} sx={{ width: '100%' }}>
                 <FieldData field={"nom"} sx={{border: 'none'}} size={4}/>
                 <FieldData field={"email"} sx={{borderTop: 'none'}} size={4}/>
-                <FieldData field={"rols"} sx={{borderTop: 'none'}} size={4} commponentProps={{ component: Box }} isObject>
+                <FieldData field={"rols"} sx={{borderTop: 'none'}} size={4} componentTextProps={{ component: Box }} isObject>
                     <Box display={'flex'} flexWrap="wrap" gap={1}>
-                        {user?.auth.map((r:string) => <StyledLabel backgroundColor={'#6e6e6e'}>{r}</StyledLabel>)}
+                        {user?.auth.map((r:string) => <StyledLabel key={r} backgroundColor={'#6e6e6e'}>{r}</StyledLabel>)}
                     </Box>
                 </FieldData>
             </MuiDetail>

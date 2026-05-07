@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface CarpetaResourceRepository extends BaseRepository<CarpetaResourceEntity, Long> {
 
-	List<CarpetaResourceEntity> findAllByPareId(Long pareId);
+	List<CarpetaResourceEntity> findAllByPareIdOrderByOrdreAsc(Long pareId);
 
 }
