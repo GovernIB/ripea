@@ -159,7 +159,7 @@ const DocumentsGrid = (props: any) => {
         builder.eq('esborrat', 0),
     ), [entity?.id]);
 
-    const { get: getFolderExpand, save: addFolderExpand } = useSessionList(`folder_expand#${entity?.id}`)
+    const { get: getFolderExpand, save: addFolderExpand, removeAll } = useSessionList(`folder_expand#${entity?.id}`)
 
     const apiRef = useMuiDataGridApiRef();
     const dataApiRef: RefObject<GridApiPro | null> = useMuiDatagridApiRef();
@@ -265,9 +265,9 @@ const DocumentsGrid = (props: any) => {
                         rowReordering={draggable}
                         onRowOrderChange={handleDragEnd}
                         setTreeDataPath={(path, row) => ({...row, treePath: path})}
-                        treeDataAdditionalRows={(_rows: any) => {
+                        rowsTransformer={(_rows: any) => {
                             if (!_rows) return [];
-                            const additionalRows: any[] = [];
+                            const additionalRows: any[] = _rows;
                             switch (vista) {
                                 case View.carpeta:
                                 case View.icona:
@@ -294,12 +294,9 @@ const DocumentsGrid = (props: any) => {
                                     setTreeView(true)
                                     break;
                             }
-                            return additionalRows;
+                            return additionalRows
+                                .sort((a, b) => a?.ordre - b?.ordre);
                         }}
-                        // sortAditionalRows={(additionalRows: any[], rows: any[])=>{
-                        //     return [...additionalRows, ...rows]
-                        //         .sort((a, b) => a?.ordre - b?.ordre);
-                        // }}
                         getTreeDataPath={(row: any): string[] => {
                             switch (vista) {
                                 case View.estat: return [(`${row?.expedientEstatAdditional?.description || t('page.document.view.nullEstat')}`), `${row.id}`];
@@ -309,7 +306,7 @@ const DocumentsGrid = (props: any) => {
                         }}
                         rowExpansionChange={(params: any) => {
                             if (params.groupingKey) {
-                                addFolderExpand(params.groupingKey, params.childrenExpanded)
+                                addFolderExpand(`${params.groupingKey}`, params.childrenExpanded)
                             }
                         }}
                         isGroupExpandedByDefault={(params) => {
@@ -334,13 +331,9 @@ const DocumentsGrid = (props: any) => {
                             {
                                 position: 0,
                                 element: <ExpandButton value={expand} onChange={(value) => {
-                                    setExpand(value);
-                                    (value)
-                                        ?dataApiRef.current?.expandAllRows()
-                                        :dataApiRef.current?.collapseAllRows()
-                                    carpetes?.forEach((carpeta:any) => {
-                                        addFolderExpand(`${carpeta.id}`, value)
-                                    })
+                                    removeAll()
+                                    addFolderExpand("vista", vista)
+                                    setExpand(value)
                                 }} hidden={!treeView} />,
                             },
                             {

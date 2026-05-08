@@ -121,8 +121,9 @@ const OrganGestorGrid = () => {
                     flex: 1,
                     valueFormatter: (_value: any, row: any) => row?.codi +" - "+ row?.nom,
                 }}
-                treeDataAdditionalRows={(rows: any) => {
-                    const additionalRows: any[] = [];
+                rowsTransformer={(rows: any) => {
+                    if (!rows) return [];
+                    const additionalRows: any[] = _rows;
                         if (rows!=null && treeView){
                             for (const row of rows) {
                                 for (const r of row?.path) {

@@ -144,7 +144,7 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
         if (datagridApiRef.current && Object.keys(datagridApiRef.current).length > 0 && rowExpansionChange) {
             datagridApiRef.current.subscribeEvent('rowExpansionChange', rowExpansionChange);
         }
-    }, [datagridApiRef.current]);
+    }, [datagridApiRef]);
 
     // Custom row styling with colored bar
     const getRowClassName = (params: any) :string =>

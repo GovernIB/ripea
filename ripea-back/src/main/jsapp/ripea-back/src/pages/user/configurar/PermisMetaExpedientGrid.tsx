@@ -133,8 +133,9 @@ const PermisMetaExpedientOrganGrid = (props:any) => {
                         :row?.organGestor?.description;
                 },
             }}
-            treeDataAdditionalRows={(_rows: any) => {
-                const additionalRows: any[] = [];
+            rowsTransformer={(_rows: any) => {
+                if (!_rows) return [];
+                const additionalRows: any[] = _rows;
                 if (_rows!=null){
                     for (const row of _rows) {
                         for (const sid of row?.sids) {

@@ -632,16 +632,18 @@ const usePersistentState = (
         paginationModelProp !== undefined && setPaginationModel(paginationModelProp);
     }, [paginationModelProp]);
     React.useEffect(() => {
-        const unsubscribe = apiRef.current?.subscribeEvent('rowExpansionChange', (params: any) => {
-            setExpandedRowIds((prev) => {
-                if (params.childrenExpanded) {
-                    return [...prev, params.id];
-                } else {
-                    return prev.filter((id) => id !== params.id);
-                }
+        if (active) {
+            const unsubscribe = apiRef.current?.subscribeEvent('rowExpansionChange', (params: any) => {
+                setExpandedRowIds((prev) => {
+                    if (params.childrenExpanded) {
+                        return [...prev, params.id];
+                    } else {
+                        return prev.filter((id) => id !== params.id);
+                    }
+                });
             });
-        });
-        return unsubscribe;
+            return unsubscribe;
+        }
     }, []);
     React.useEffect(() => {
         active &&

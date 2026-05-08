@@ -121,8 +121,9 @@ const TancarForm = () => {
                             },
                         }}
                         treeData
-                        treeDataAdditionalRows={(_rows: any) => {
-                            const additionalRows: any[] = [];
+                        rowsTransformer={(_rows: any) => {
+                            if (!_rows) return [];
+                            const additionalRows: any[] = _rows;
                             if (_rows!=null && entities!=null){
                                 for (const entity of entities) {
                                     if (!additionalRows.map((b) => b.id).includes(entity?.id)) {
