@@ -570,6 +570,7 @@ const translationEn = {
                     label: "Close...",
                     button: "Close",
                     title: "Close case file",
+                    titleMassive: "Closing {{num}} case files in bulk",
                     ok: "The case file '{{expedient}}' was closed successfully",
                 },
                 open: {

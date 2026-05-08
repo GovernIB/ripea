@@ -52,7 +52,7 @@ const TancarForm = () => {
     } = useResourceApiService('expedientResource');
 
     useEffect(() => {
-        if (apiIsReady && data?.ids) {
+        if (apiIsReady && data?.ids && data?.massivo) {
             apiFind({
                 filter: builder.inside('id', data?.ids),
                 unpaged: true,
@@ -86,7 +86,7 @@ const TancarForm = () => {
         return defaultSelection;
     }, [temp?.documentObligatorisAlTancar])
 
-    return <Load value={entities && temp}>
+    return <Load value={(entities || !data?.massivo) && temp}>
         <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
             <Grid size={12} hidden={!rowsCount}>
                 <Alert severity={"info"}>{t('page.expedient.alert.borradors')}</Alert>
@@ -124,7 +124,7 @@ const TancarForm = () => {
                         rowsTransformer={(_rows: any) => {
                             if (!_rows) return [];
                             const additionalRows: any[] = _rows;
-                            if (_rows!=null && entities!=null){
+                            if (entities!=null && data?.massivo){
                                 for (const entity of entities) {
                                     if (!additionalRows.map((b) => b.id).includes(entity?.id)) {
                                         additionalRows.push(entity)
@@ -134,7 +134,7 @@ const TancarForm = () => {
                             return additionalRows;
                         }}
                         getTreeDataPath={(row: any): string[] => {
-                            return row?.expedient ?[`${row?.expedient?.id}`, `${row.id}`] :[`${row.id}`]
+                            return (data?.massivo && row?.expedient) ?[`${row?.expedient?.id}`, `${row.id}`] :[`${row.id}`]
                         }}
                         isGroupExpandedByDefault={() => {
                             return true;
@@ -161,7 +161,11 @@ const Tancar = (props: any) => {
     return <FormActionDialog
         resourceName={"expedientResource"}
         action={"TANCAR"}
-        title={t('page.expedient.action.close.title')}
+        title={(data) => {
+            return (data?.massivo)
+                ? t('page.expedient.action.close.titleMassive', {num: data?.ids?.length})
+                : t('page.expedient.action.close.title')
+        }}
         formDialogButtons={[
             {icon: 'check', text: t('page.expedient.action.close.button'), componentProps: { variant: 'contained' }, value: true },
             {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },

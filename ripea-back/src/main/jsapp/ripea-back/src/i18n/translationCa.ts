@@ -570,6 +570,7 @@ const translationCa = {
                     label: "Tancar...",
                     button: "Tanca",
                     title: "Tancar expedient",
+                    titleMassive: "Tancant massivament {{num}} expedients",
                     ok: "L’expedient '{{expedient}}' ha estat tancat correctament",
                 },
                 open: {

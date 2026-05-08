@@ -570,6 +570,7 @@ const translationEs = {
                     label: "Cerrar...",
                     button: "Cierrar",
                     title: "Cerrar expediente",
+                    titleMassive: "Cerrando masivamente {{num}} expedientes",
                     ok: "El expediente '{{expedient}}' ha sido cerrado correctamente",
                 },
                 open: {
