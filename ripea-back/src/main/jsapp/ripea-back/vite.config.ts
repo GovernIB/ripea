@@ -9,6 +9,11 @@ export default defineConfig({
     react(),
     tsconfigPaths(),
   ],
+  server: {
+    proxy: {
+      '/ripeaback': 'http://localhost:8080',
+    },
+  },
   test: {
     globals: true,
     environment: 'jsdom',

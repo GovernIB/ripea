@@ -1,10 +1,8 @@
-import React, {useEffect, useMemo, useState} from "react";
+import React, {RefObject, useEffect, useMemo, useState} from "react";
 import { DndContext } from '@dnd-kit/core';
-import { FormControl, Grid2 as Grid, Select, MenuItem, Icon, Box } from "@mui/material";
-import {
-    GridSlots,
-    GridTreeDataGroupingCell,
-} from "@mui/x-data-grid-pro";
+import {dndScreenReaderInstructions} from "../../util/dndAccessibility.tsx";
+import { FormControl, Grid, Select, MenuItem, Icon, Box } from "@mui/material";
+import {GridApiPro, GridTreeDataGroupingCell} from "@mui/x-data-grid-pro";
 import { useMuiDataGridApiRef, useResourceApiService } from 'reactlib';
 import { useTranslation } from "react-i18next";
 import ContingutIcon from "./details/ContingutIcon.tsx";
@@ -19,14 +17,14 @@ import { useSessionList } from "../../components/SessionStorageContext.tsx";
 import DropZone from "../../components/DropZone.tsx";
 import DocumentsGridForm from "./DocumentGridForm.tsx";
 import MetaExpedient from "./details/MetaExpedient.tsx";
-import {DraggableGridRow, DraggableGridRowHandler} from "../../components/DraggableContext.tsx";
 import useVisualitzar from "./actions/Visualitzar.tsx";
+import {useGridApiRef as useMuiDatagridApiRef} from "@mui/x-data-grid-pro";
 
-const View = {
-    estat: 'TREETABLE_PER_ESTAT',
-    tipus: 'TREETABLE_PER_TIPUS_DOCUMENT',
-    carpeta: 'TREETABLE_PER_CARPETA',
-    icona: 'GRID',
+enum View {
+    estat = 'TREETABLE_PER_ESTAT',
+    tipus = 'TREETABLE_PER_TIPUS_DOCUMENT',
+    carpeta = 'TREETABLE_PER_CARPETA',
+    icona = 'GRID',
 }
 
 const ExpandButton = (props: { value: any, onChange: (value: any) => void, hidden: boolean }) => {
@@ -38,7 +36,7 @@ const ExpandButton = (props: { value: any, onChange: (value: any) => void, hidde
     }
 
     return <ToolbarButton
-        startIcon={<Icon>{value ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}</Icon>}
+        startIcon={<Icon sx={{m: 0}}>{value ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}</Icon>}
         onClick={() => onChange(!value)}
         color={'none'}
     >
@@ -81,13 +79,13 @@ export const useExpedientsCarpetes = (commonFilter: string) => {
     const [expedients, setExpedients] = useState<any[]>();
     const [carpetes, setCarpetes] = useState<any[]>();
     const findExpedients = () => {
-        return apiExpedientFindAll({perspectives, unpaged: true, filter: commonFilter})
+        return apiExpedientFindAll({perspectives, unpaged: true, filter: commonFilter, sorts: ['ordre']})
             .then((result)=> setExpedients(result.rows))
             .catch(()=> setExpedients([]))
     }
 
     const findCarpetes = () => {
-        return apiCarpetaFindAll({perspectives: carpetaPerspectives, unpaged: true, filter: commonFilter})
+        return apiCarpetaFindAll({perspectives: carpetaPerspectives, unpaged: true, filter: commonFilter, sorts: ['ordre']})
             .then((result)=> setCarpetes(result.rows))
             .catch(()=> setCarpetes([]))
     }
@@ -149,13 +147,9 @@ const DocumentsGrid = (props: any) => {
     }, [user?.sessionScope?.ordenacioContingutPermesa]);
 
     const {
-        isReady: apiDocumentIsReady,
-        patch: apiDocumentPatch,
-    } = useResourceApiService('documentResource');
-    const {
-        isReady: apiCarpetaIsReady,
-        patch: apiCarpetaPatch,
-    } = useResourceApiService('carpetaResource');
+        isReady: apiContingutIsReady,
+        artifactAction: apiAction,
+    } = useResourceApiService('contingutResource');
 
     const commonFilter = useMemo(() => builder.and(
         builder.or(
@@ -167,10 +161,11 @@ const DocumentsGrid = (props: any) => {
 
     const { get: getFolderExpand, save: addFolderExpand, removeAll } = useSessionList(`folder_expand#${entity?.id}`)
 
-    const gridApiRef = useMuiDataGridApiRef();
+    const apiRef = useMuiDataGridApiRef();
+    const dataApiRef: RefObject<GridApiPro | null> = useMuiDatagridApiRef();
     const [treeView, setTreeView] = useState<boolean>(true);
     const [expand, setExpand] = useState<boolean>(user?.conf?.expedientExpandit);
-    const [vista, setVista] = useState<string>(getFolderExpand("vista") ?? user?.conf?.vistaActual);
+    const [vista, setVista] = useState<View>(getFolderExpand("vista") ?? user?.conf?.vistaActual);
     const [disabled, setDisabled] = useState<boolean>(false);
     const {
         isReady,
@@ -178,56 +173,41 @@ const DocumentsGrid = (props: any) => {
         expedients,
         refresh: refreshTree
     } = useExpedientsCarpetes(commonFilter);
-    const refresh = async () => {
+    const refresh = () => {
         if (vista == View.carpeta || vista == View.icona) {
-            await refreshTree()
+            refreshTree()
+                .then(() => apiRef?.current?.refresh?.())
+        } else {
+            apiRef?.current?.refresh?.();
         }
-        gridApiRef?.current?.refresh?.();
     }
 
     const {handleOpen: handleVisualitzarOpen, dialog: dialogVisualitzar, isValid} = useVisualitzar();
-    const { createActions, actions, components } = useContingutActions(entity, gridApiRef, refresh);
+    const { createActions, actions, components } = useContingutActions(entity, apiRef, refresh);
     const { actions: massiveActions, components: massiveComponents } = useContingutMassiveActions(entity, refresh);
 
     const draggable = useMemo(()=> (
         vista == View.carpeta && (entity?.potModificarContingut || entity?.potModificar) && user?.sessionScope?.ordenacioContingutPermesa
     ),[vista, entity?.potModificarContingut, entity?.potModificar, user?.sessionScope?.ordenacioContingutPermesa])
-    const additionalColumns:any[] = useMemo(()=>[
-        ...columns,
-        ...( draggable? [{
-            renderCell: () => <DraggableGridRowHandler />,
-            flex: 0.1
-        }] : [])
-    ], [draggable])
 
     const onDrop = React.useCallback((adjunt: any) => {
-        gridApiRef?.current?.showCreateDialog?.(null, { adjunt })
-    }, [])
+        apiRef?.current?.triggerCreate?.(null, { adjunt })
+    }, [apiRef])
 
-    const handleDragEnd = (event: any) => {
-        const sourceData = event.active.data.current;
-        const targetData = event.over.data.current;
-        //console.log('>>> ', sourceData.nom, '(', sourceData.ordre, ')->', targetData.nom, '(', targetData.ordre, ')')
-        if (sourceData.id != targetData.id || sourceData.pare.id != targetData.pare.id) {
+    const handleDragEnd = (params: any) => {
+        // console.log("params", params)
+        if (params.newParent != params.oldParent || params.targetIndex != params.oldIndex) {
             const patchData = {
-                ...(targetData.tipus === 'DOCUMENT' && { ordre: targetData.ordre }),
-                pare: { id: targetData.tipus === 'DOCUMENT' ? targetData.pare.id : targetData.id },
-                ordrePatch: true
+                ordre: params.targetIndex +1,
+                pare: params.newParent ?? entity.id,
             };
-            if (sourceData.tipus === 'DOCUMENT') {
-                //console.log('>>> document patch', patchData)
-                if (apiDocumentIsReady) {
-                    apiDocumentPatch(sourceData.id, {data: patchData}).then(() => refresh());
-                } else {
-                    console.error('Servei de l\'API pels documents no disponible')
-                }
-            } else if (sourceData.tipus === 'CARPETA') {
-                //console.log('>>> carpeta patch', patchData)
-                if (apiCarpetaIsReady) {
-                    apiCarpetaPatch(sourceData.id, {data: patchData}).then(() => refresh());
-                } else {
-                    console.error('Servei de l\'API per les carpetes no disponible')
-                }
+
+            if (apiContingutIsReady) {
+                apiAction(params.row.id, {code: 'REORDER', data: patchData})
+                    // .then(() => refresh())
+                    .catch(() => refresh())
+            } else {
+                console.error('Servei de l\'API pels documents no disponible'); refresh()
             }
         }
     }
@@ -238,29 +218,29 @@ const DocumentsGrid = (props: any) => {
 
     return <>
         <Load value={entity && carpetes && expedients && isReady}>
-            <DropZone onDrop={onDrop} disabled={!(entity?.potModificarContingut || entity?.potModificar)}>
-                <DndContext onDragEnd={handleDragEnd}>
+            <DropZone onDrop={onDrop} disabled={!(entity?.potModificarContingut || entity?.potModificar)} aria-label={t('page.document.action.new.dropMessg')}>
+                <DndContext onDragEnd={handleDragEnd} accessibility={{screenReaderInstructions: dndScreenReaderInstructions}}>
                     <StyledMuiGrid
                         resourceName={"documentResource"}
                         popupEditFormDialogResourceTitle={t('page.document.title')}
-                        columns={additionalColumns}
-                        rowActionsColumnIndex={draggable?-1:undefined}
+                        columns={columns}
                         paginationActive={false}
                         autoHeight
                         filter={commonFilter}
                         perspectives={perspectives}
                         staticSortModel={sortModel}
-                        //rowReordering
                         popupEditCreateActive
                         popupEditFormContent={<DocumentsGridForm setDisabled={setDisabled} />}
                         formAdditionalData={{
                             expedient: { id: entity?.id },
                             metaExpedient: entity?.metaExpedient,
                         }}
-                        apiRef={gridApiRef}
+                        apiRef={apiRef}
+                        datagridApiRef={dataApiRef}
                         rowAdditionalActions={actions}
                         onRowCountChange={onRowCountChange}
                         onRefresh={refresh}
+
                         groupingColDef={{
                             headerName: t('page.contingut.grid.nom'),
                             flex: 1.5,
@@ -277,19 +257,17 @@ const DocumentsGrid = (props: any) => {
                             },
                             renderCell: (params: any) => {
                                 return treeView
-                                    ? <>
-                                        <GridTreeDataGroupingCell {...params} />
-                                    </>
+                                    ? <GridTreeDataGroupingCell {...params} />
                                     : params.formattedValue
                             },
                         }}
-                        slots={{
-                            row: DraggableGridRow as GridSlots['row'],
-                        }}
                         treeData
-                        treeDataAdditionalRows={(_rows: any) => {
+                        rowReordering={draggable}
+                        onRowOrderChange={handleDragEnd}
+                        setTreeDataPath={(path, row) => ({...row, treePath: path})}
+                        rowsTransformer={(_rows: any) => {
                             if (!_rows) return [];
-                            const additionalRows: any[] = [];
+                            const additionalRows: any[] = _rows;
                             switch (vista) {
                                 case View.carpeta:
                                 case View.icona:
@@ -316,7 +294,8 @@ const DocumentsGrid = (props: any) => {
                                     setTreeView(true)
                                     break;
                             }
-                            return additionalRows;
+                            return additionalRows
+                                .sort((a, b) => a?.ordre - b?.ordre);
                         }}
                         getTreeDataPath={(row: any): string[] => {
                             switch (vista) {
@@ -326,26 +305,26 @@ const DocumentsGrid = (props: any) => {
                             }
                         }}
                         rowExpansionChange={(params: any) => {
-                            addFolderExpand(params.groupingKey, params.childrenExpanded)
+                            if (params.groupingKey) {
+                                addFolderExpand(`${params.groupingKey}`, params.childrenExpanded)
+                            }
                         }}
                         isGroupExpandedByDefault={(params) => {
-							const carpeta = carpetes?.find?.(c => c.id === params.groupingKey);
-							if (carpeta && carpeta.restringida) {
-								const isResponsableRestriccio = carpeta?.responsableRestriccio?.id === user?.codi;
-								const isUsuariAmbPermis = carpeta?.restriccions?.some(
-									(restriccio: any) => restriccio?.id === user?.codi
-								) ?? false;
+                            const carpeta = carpetes?.find?.(c => c.id === params.groupingKey);
+                            if (carpeta && carpeta.restringida) {
+                                const isResponsableRestriccio = carpeta?.responsableRestriccio?.id === user?.codi;
+                                const isUsuariAmbPermis = carpeta?.restriccions?.some(
+                                    (restriccio: any) => restriccio?.id === user?.codi
+                                ) ?? false;
 
-								if (!isResponsableRestriccio && !isUsuariAmbPermis && !rol?.isAdmin) {
-									return false;
-								}
-							}
-
-                            const value = getFolderExpand(`${params?.groupingKey}`)
-                            if (value !== undefined) {
-                                return value
+                                if (!isResponsableRestriccio && !isUsuariAmbPermis && !rol?.isAdmin) {
+                                    return false;
+                                }
                             }
-                            addFolderExpand(`${params?.groupingKey}`, expand)
+
+                            const value = getFolderExpand(`${params.groupingKey}`)
+                            if (value !== undefined) { return value }
+                            addFolderExpand(`${params.groupingKey}`, expand)
                             return expand
                         }}
                         toolbarElementsWithPositions={[

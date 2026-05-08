@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {Alert, Grid2 as Grid, Icon, IconButton} from "@mui/material";
+import {Alert, Grid, Icon, IconButton} from "@mui/material";
 import {MuiDialog, useBaseAppContext, useConfirmDialogButtons, useResourceApiService} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {DetailCard} from "../../../components/CardData.tsx";

@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {Grid2 as Grid} from "@mui/material";
+import {Grid} from "@mui/material";
 import {useFormContext, MuiDialog} from "reactlib";
 import {useTranslation} from "react-i18next";
 import * as builder from "../../../util/springFilterUtils.ts";
@@ -79,7 +79,7 @@ const DataGrid = (props:any) => {
             tipusValor: entity?.tipus,
         }}
         rowAdditionalActions={actions}
-        paginationNoRowsText={t('page.dada.noRowsText')}
+        noRowsText={t('page.dada.noRowsText')}
         popupEditFormDialogComponentProps={{ fullWidth: true, maxWidth: 'xs' }}
         onRowCountChange={(count:number)=>{
             setNumDades?.(count)

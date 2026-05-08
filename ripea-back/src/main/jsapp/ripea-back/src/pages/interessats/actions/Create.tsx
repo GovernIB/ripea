@@ -1,5 +1,4 @@
-import {MuiFormDialog, MuiFormDialogApi, useBaseAppContext} from "reactlib";
-import {useRef} from "react";
+import {MuiFormDialog, useMuiFormDialogApiRef, useBaseAppContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {InteressatsGridForm} from "../InteressatsGridForm.tsx";
 
@@ -14,7 +13,7 @@ const CreateForm = (props:any) => {
 }
 const useCreate = (refresh?: () => void) => {
     const { t } = useTranslation();
-    const apiRef = useRef<MuiFormDialogApi>();
+    const apiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow} = useBaseAppContext();
 
     const create = (additionalData?:any, after?: (result?:any) => void) => {
@@ -36,7 +35,7 @@ const useCreate = (refresh?: () => void) => {
 }
 export const useCreateRepresentant = (refresh?: () => void) => {
     const { t } = useTranslation();
-    const apiRef = useRef<MuiFormDialogApi>();
+    const apiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow} = useBaseAppContext();
 
     const create = (id: any, row:any) => {

@@ -126,7 +126,7 @@ const ExecucioMassivaGrid = () => {
         }
     ]
 
-    const intervalRef = useRef<any>();
+    const intervalRef = useRef<any>(undefined);
     useEffect(() => {
         intervalRef.current = {isRefresh}
 
@@ -296,7 +296,7 @@ export const useExecucioMassivaContingut = () => {
     } = useResourceApiService('execucioMassivaResource');
     const {temporalMessageShow} = useBaseAppContext();
 
-    const intervalRef = useRef<any>();
+    const intervalRef = useRef<any>(undefined);
 
     useEffect(() => {
         intervalRef.current = {open};

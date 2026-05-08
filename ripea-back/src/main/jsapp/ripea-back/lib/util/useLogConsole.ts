@@ -1,4 +1,3 @@
-
 export type LogConsoleType = {
     log: (...args: any[]) => void;
     error: (...args: any[]) => void;
@@ -18,6 +17,6 @@ export const useLogConsole = (prefix: String): LogConsoleType => {
         debug: (...args: any[]) => console.debug(logPrefix, ...args),
         trace: (...args: any[]) => console.trace(logPrefix, ...args),
     };
-}
+};
 
 export default useLogConsole;

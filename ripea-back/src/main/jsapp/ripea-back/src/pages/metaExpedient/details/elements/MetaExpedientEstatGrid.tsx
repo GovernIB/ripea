@@ -1,10 +1,10 @@
-import {Grid2 as Grid, Icon, Divider} from "@mui/material";
+import {Grid, Icon, Divider} from "@mui/material";
 import GridFormField from "../../../../components/GridFormField.tsx";
 import {StyledBadge} from "../../../../components/StyledBadge.tsx";
 import {useTranslation} from "react-i18next";
-import {DndMuiGrid} from "../../../../components/StyledMuiGrid.tsx";
+import StyledMuiGrid from "../../../../components/StyledMuiGrid.tsx";
 import * as builder from "../../../../util/springFilterUtils.ts";
-import {useBaseAppContext, useMuiDataGridApiRef, useResourceApiService} from "reactlib";
+import {useBaseAppContext, useResourceApiService} from "reactlib";
 import {useMemo} from "react";
 import useMetaExpEstatDetail from "./details/MetaExpEstatDetail.tsx";
 
@@ -63,13 +63,8 @@ const columns:any = [
 ]
 export const MetaExpedientEstatGrid = ({ entity, onRowCountChange, readOnly } :any) => {
     const {t} = useTranslation()
-    const apiRef = useMuiDataGridApiRef();
 
-    const refresh = () => {
-        apiRef?.current?.refresh?.();
-    }
-
-    const {reordering} = useActions(refresh)
+    const {reordering} = useActions()
     const {apiIsReady, handleOpen, dialog} = useMetaExpEstatDetail()
     const actions:any[] = useMemo(() => readOnly ?[
         {
@@ -98,17 +93,13 @@ export const MetaExpedientEstatGrid = ({ entity, onRowCountChange, readOnly } :a
         },
     ], [t, readOnly, apiIsReady]);
 
-    const handleDragEnd = (event: any) => {
-        const sourceData = event.active.data.current;
-        const targetData = event.over.data.current;
-        // console.log('>>> ', sourceData.codi, '(', sourceData.ordre, ') ->', targetData.codi, '(', targetData.ordre, ')')
-        if (sourceData.id != targetData.id) {
-            reordering(sourceData.id, targetData.ordre)
+    const handleDragEnd = (params: any) => {
+        if (params.targetIndex != params.oldIndex) {
+            reordering(params.row.id, params.targetIndex)
         }
     }
 
-    return <><DndMuiGrid
-        apiRef={apiRef}
+    return <><StyledMuiGrid
         resourceName={'metaExpedientEstatResource'}
         popupEditUpdateActive
         popupEditFormDialogResourceTitle={t('page.expedientEstat.title')}
@@ -121,7 +112,8 @@ export const MetaExpedientEstatGrid = ({ entity, onRowCountChange, readOnly } :a
         rowAdditionalActions={actions}
         onRowCountChange={onRowCountChange}
 
-        onDragEnd={handleDragEnd}
+        rowReordering={!readOnly}
+        onRowOrderChange={handleDragEnd}
 
         popupEditFormDialogComponentProps={{ fullWidth: true, maxWidth: 'lg' }}
         toolbarCreateTitle={t('page.expedientEstat.action.new.label')}

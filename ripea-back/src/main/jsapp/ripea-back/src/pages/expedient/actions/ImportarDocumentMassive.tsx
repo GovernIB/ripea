@@ -1,6 +1,6 @@
-import {FormField, MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
-import {Grid2 as Grid, Box, Alert, Typography} from "@mui/material";
-import {useEffect, useMemo, useRef, useState} from "react";
+import {FormField, useMuiFormDialogApiRef, useBaseAppContext, useFormContext} from "reactlib";
+import {Grid, Box, Alert, Typography} from "@mui/material";
+import {useEffect, useMemo, useState} from "react";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 import {DataGridPro, GridToolbarContainer} from "@mui/x-data-grid-pro";
@@ -139,7 +139,7 @@ export const ImportarDocumentMassive = (props:any) => {
 
 const useImportarDocumentMassive = (refresh?: () => void) => {
     const { t } = useTranslation();
-    const apiRef = useRef<MuiFormDialogApi>();
+    const apiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow} = useBaseAppContext();
 
     const handleShow = (ids:any[]) :void => {

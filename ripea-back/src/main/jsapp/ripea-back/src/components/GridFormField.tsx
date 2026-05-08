@@ -1,5 +1,6 @@
-import {Button, Grid2 as Grid, Icon, IconButton, useMediaQuery, useTheme} from "@mui/material";
-import {FormField, FormFieldProps, FormFieldDataActionType, useFormContext} from "reactlib";
+import {Button, Grid, Icon, IconButton, useMediaQuery, useTheme} from "@mui/material";
+import {FormField, FormFieldProps, useFormContext} from "reactlib";
+import {FormFieldDataActionType} from "../../lib/components/form/FormContext";
 import Load from "./Load.tsx";
 import {useTranslation} from "react-i18next";
 import {useUserSession} from "./Session.tsx";
@@ -134,7 +135,7 @@ const GridFormField = (props:GridFormField) => {
             readOnly={disabled}
             {...other}
             componentProps={{
-                sx: {color: 'black', backgroundColor: 'white'},
+                className: 'input',
                 ...componentProps
             }}
             onFieldValueChange={handleFieldValueChange}

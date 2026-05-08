@@ -8,7 +8,7 @@ import {
 } from "reactlib";
 import {CardPage} from "../../components/CardData.tsx";
 import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
-import {Alert, Typography, Grid2 as Grid, Icon, Badge} from "@mui/material";
+import {Alert, Typography, Grid, Icon, Badge} from "@mui/material";
 import GridFormField, {FileFormField, GridButton} from "../../components/GridFormField.tsx";
 import * as builder from "../../util/springFilterUtils.ts";
 import TabComponent from "../../components/TabComponent.tsx";

@@ -6,7 +6,7 @@ import {ContenidoData, DetailCard} from "../../../../components/CardData.tsx";
 import {formatDate} from "../../../../util/dateUtils.ts";
 import {FieldData, MuiDetail} from "../../../../components/MuiDetail.tsx";
 import {StyledEstat} from "./IntegracioGrid.tsx";
-import {Grid2 as Grid} from "@mui/material";
+import {Grid} from "@mui/material";
 import {ErrorArea} from "../../../../components/ErrorPage.tsx";
 
 const IntegracioDetail = ({entity, fields}:any) => {

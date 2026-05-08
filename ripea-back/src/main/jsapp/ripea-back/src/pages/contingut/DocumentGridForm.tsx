@@ -2,7 +2,7 @@ import {useFormContext, useResourceApiService} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {useScanFinalitzatSession} from "../../components/SseExpedient.tsx";
 import {useUserSession} from "../../components/Session.tsx";
-import {Alert, Grid2 as Grid} from "@mui/material";
+import {Alert, Grid} from "@mui/material";
 import GridFormField, {FileFormField, GridButton} from "../../components/GridFormField.tsx";
 import Iframe from "../../components/Iframe.tsx";
 import * as builder from "../../util/springFilterUtils.ts";

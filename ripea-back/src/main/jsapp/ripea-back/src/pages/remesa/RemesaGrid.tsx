@@ -1,5 +1,5 @@
 import {useMuiDataGridApiRef} from "reactlib";
-import {Grid2 as Grid, Icon} from "@mui/material";
+import {Grid, Icon} from "@mui/material";
 import useRemesaActions from "./details/RemesaActions.tsx";
 import GridFormField from "../../components/GridFormField.tsx";
 import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";

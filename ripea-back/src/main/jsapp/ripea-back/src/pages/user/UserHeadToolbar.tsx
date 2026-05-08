@@ -1,5 +1,5 @@
 import React, {useCallback, useMemo} from "react";
-import {Grid2 as Grid, Button, Icon} from "@mui/material";
+import {Grid, Button, Icon} from "@mui/material";
 import {StyledBadge} from "../../components/StyledBadge.tsx";
 import {useEntitatSession, useUserSession} from "../../components/Session.tsx";
 import {useTranslation} from "react-i18next";
@@ -67,8 +67,7 @@ const generateMenuItems = (appMenuEntries: any[], entitat:any, iconOnly:boolean)
                 title={entry.hover || entry.title}
                 key={entry.id}
                 style={{ color: entitat?.conf?.colorLletra, minWidth: '3rem', marginLeft: 0, ...entry?.componentProps }}
-                component={Link}
-                to={entry.to} // Navegació amb React Router
+                {...(entry.to ? { component: Link, to: entry.to } : {})}
                 onClick={entry?.onClick}>
                 {entry?.icon && <Icon baseClassName={entry?.iconVariant ?? 'material-icons'}>{entry?.icon}</Icon>}
                 {!iconOnly && entry.children}

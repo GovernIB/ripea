@@ -13,6 +13,7 @@ import 'dayjs/locale/ca';
 import 'dayjs/locale/es';
 import {
     MuiBaseApp,
+    MuiBaseAppContext,
     MenuEntry,
     useBaseAppContext,
     useResourceApiContext,
@@ -21,7 +22,7 @@ import {
 import Footer from './Footer';
 import drassana from '../assets/drassana.png';
 import UserHeadToolbar from "../pages/user/UserHeadToolbar.tsx";
-import UserMenuButton, {UserMenu} from "../pages/user/UserMenu.tsx";
+import {UserMenu} from "../pages/user/UserMenu.tsx";
 import {useAlertesSession} from "./SseClient.tsx";
 import {useUserSession} from "./Session";
 import AlertExpand from "./AlertExpand.tsx";
@@ -197,10 +198,17 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
         headerAppbarStyle={style}
         headerAppbarBackgroundColor={appbarBackgroundColor}
         headerAppbarBackgroundImg={appbarBackgroundImg}
-        headerAdditionalComponents={[<UserHeadToolbar/>, <UserMenuButton/>]}
-        headerAdditionalAuthComponents={<UserMenu/>}
+        headerAdditionalComponents={[
+            <MuiBaseAppContext.Provider value={{ defaultMuiComponentProps: {} }}>
+                <UserHeadToolbar/>
+            </MuiBaseAppContext.Provider>
+        ]}
+        headerAdditionalAuthComponents={
+            <MuiBaseAppContext.Provider value={{ defaultMuiComponentProps: {} }}>
+                <UserMenu/>
+            </MuiBaseAppContext.Provider>
+        }
         footer={generateFooter(version)}
-        persistentSession
         persistentLanguage
         i18nUseTranslation={i18nUseTranslation}
         i18nCurrentLanguage={i18nCurrentLanguage}
@@ -211,6 +219,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
         routerUseLocationPath={useLocationPath}
         routerAnyHistoryEntryExist={anyHistoryEntryExist}
         linkComponent={Link}
+        marginsDisabled
         menuEntries={baseAppMenuEntries}>
         <CustomLocalizationProvider>
             <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>

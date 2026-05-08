@@ -1,14 +1,13 @@
-import { useRef } from "react";
 import { useTranslation } from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 import {
-    MuiFormDialogApi,
+    useMuiFormDialogApiRef,
     useBaseAppContext,
     useConfirmDialogButtons,
     useFormContext,
     useResourceApiService
 } from "reactlib";
-import {Grid2 as Grid} from "@mui/material";
+import {Grid} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
 import {CardData} from "../../../components/CardData.tsx";
 
@@ -62,7 +61,7 @@ const usePermisDialog = ({
     refresh?: () => void;
 }) => {
     const { t } = useTranslation();
-    const apiRef = useRef<MuiFormDialogApi>();
+    const apiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow} = useBaseAppContext();
 
     const handleShow = (id: any, row?: any, additionalData?: any): void => {

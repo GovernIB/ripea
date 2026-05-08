@@ -1,7 +1,7 @@
-import {FormField, MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
-import {Alert, Grid2 as Grid} from "@mui/material";
+import {FormField, useMuiFormDialogApiRef, useBaseAppContext, useFormContext} from "reactlib";
+import {Alert, Grid} from "@mui/material";
 import GridFormField, {FileFormField} from "../../../components/GridFormField.tsx";
-import {useEffect, useMemo, useRef, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 import {CardData} from "../../../components/CardData.tsx";
@@ -294,7 +294,7 @@ const ImportFitxer = (props: any) => {
 
 export const useImportFitxer = (refresh?: () => void) => {
     const { t } = useTranslation();
-    const apiRef = useRef<MuiFormDialogApi>();
+    const apiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow} = useBaseAppContext();
 
     const handleShow = () :void => {

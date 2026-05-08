@@ -1,5 +1,5 @@
 import React from 'react';
-import { GridColDef, GridRowParams, GridSortModel } from '@mui/x-data-grid-pro';
+import { GridColDef, GridRowParams } from '@mui/x-data-grid-pro';
 import { ResourceType } from '../../ResourceApiContext';
 import Dialog, { DialogProps } from '../Dialog';
 import MuiDataGrid from './MuiDataGrid';
@@ -10,15 +10,22 @@ type DataGridDialogProps = DialogProps & {
     resourceType?: ResourceType;
     resourceTypeCode?: string;
     resourceFieldName?: string;
-    staticFilter?: string;
-    staticSortModel?: GridSortModel;
-    namedQueries?: string[];
-    perspectives?: string[];
-    onRowClick?: (params: GridRowParams) => void;
+    dataGridHeight?: number;
+    dataGridOnRowClick?: (params: GridRowParams) => void;
     height?: number | null;
+    dialogComponentProps?: any;
+    dataGridComponentProps?: any;
 };
 
-export type DataGridDialogShowFn = (title: string | null, height?: number | null, componentProps?: any) => Promise<string>;
+export type DataGridDialogShowArgs = {
+    title?: string;
+    height?: number;
+    dialogComponentProps?: any;
+    dataGridComponentProps?: any;
+};
+
+export type DataGridDialogShowFn = (args?: DataGridDialogShowArgs) => Promise<any>;
+export type DataGridDialogCloseFn = () => void;
 
 export type UseDataGridDialogFn = (
     resourceName: string,
@@ -26,10 +33,10 @@ export type UseDataGridDialogFn = (
     resourceType?: ResourceType,
     resourceTypeCode?: string,
     resourceFieldName?: string,
-    staticFilter?: string,
-    staticSortModel?: GridSortModel,
-    namedQueries?: string[],
-    perspectives?: string[]) => [DataGridDialogShowFn, React.ReactElement];
+    onRowClickEnabled?: boolean | ((row: any) => boolean),
+    defaultDialogComponentProps?: any,
+    defaultDataGridComponentProps?: any
+) => [DataGridDialogShowFn, React.ReactElement, DataGridDialogCloseFn];
 
 export const useDataGridDialog: UseDataGridDialogFn = (
     resourceName: string,
@@ -37,53 +44,78 @@ export const useDataGridDialog: UseDataGridDialogFn = (
     resourceType?: ResourceType,
     resourceTypeCode?: string,
     resourceFieldName?: string,
-    staticFilter?: string,
-    staticSortModel?: GridSortModel,
-    namedQueries?: string[],
-    perspectives?: string[]) => {
+    onRowClickEnabled?: boolean | ((row: any) => boolean),
+    defaultDialogComponentProps?: any,
+    defaultDataGridComponentProps?: any
+) => {
     const [open, setOpen] = React.useState<boolean>(false);
-    const [title, setTitle] = React.useState<string | null>();
-    const [height, setHeight] = React.useState<number | undefined | null>();
-    const [componentProps, setComponentProps] = React.useState<any>();
+    const [title, setTitle] = React.useState<string>();
+    const [height, setHeight] = React.useState<number>();
+    const [dialogComponentProps, setDialogComponentProps] = React.useState<any>(
+        defaultDialogComponentProps
+    );
+    const [dataGridComponentProps, setDataGridComponentProps] = React.useState<any>(
+        defaultDataGridComponentProps
+    );
     const [resolveFn, setResolveFn] = React.useState<(value?: any) => void>();
     const [rejectFn, setRejectFn] = React.useState<(value: any) => void>();
-    const showDialog = (title: string | null, height?: number | null, componentProps?: any) => {
-        setTitle(title);
-        setHeight(height);
-        setComponentProps(componentProps);
+    const showDialog = (args?: DataGridDialogShowArgs) => {
+        setTitle(args?.title);
+        setHeight(args?.height);
+        setDialogComponentProps(
+            args?.dialogComponentProps != null
+                ? { ...defaultDialogComponentProps, ...args?.dialogComponentProps }
+                : defaultDialogComponentProps
+        );
+        setDataGridComponentProps(
+            args?.dataGridComponentProps != null
+                ? { ...defaultDataGridComponentProps, ...args?.dataGridComponentProps }
+                : defaultDataGridComponentProps
+        );
         setOpen(true);
         return new Promise<string>((resolve, reject) => {
             setResolveFn(() => resolve);
             setRejectFn(() => reject);
         });
-    }
+    };
     const closeCallback = () => {
         // S'ha tancat la modal o s'ha fet click a fora de la finestra
-        rejectFn?.(undefined);
+        onRowClickEnabled && rejectFn?.(undefined);
         setOpen(false);
-    }
+    };
     const handleRowClick = (params: GridRowParams) => {
-        resolveFn?.(params.row);
-        setOpen(false);
-    }
-    const dialogComponent = <DataGridDialog
-        resourceName={resourceName}
-        columns={columns}
-        resourceType={resourceType}
-        resourceTypeCode={resourceTypeCode}
-        resourceFieldName={resourceFieldName}
-        staticFilter={staticFilter}
-        staticSortModel={staticSortModel}
-        namedQueries={namedQueries}
-        perspectives={perspectives}
-        onRowClick={handleRowClick}
-        height={height}
-        open={open}
-        closeCallback={closeCallback}
-        title={title}
-        componentProps={componentProps} />;
-    return [showDialog, dialogComponent];
-}
+        if (onRowClickEnabled != null) {
+            if (typeof onRowClickEnabled === 'function') {
+                const enabled = onRowClickEnabled(params.row);
+                enabled && resolveFn?.(params.row);
+                enabled && setOpen(false);
+            } else {
+                onRowClickEnabled && resolveFn?.(params.row);
+                setOpen(false);
+            }
+        } else {
+            setOpen(false);
+        }
+    };
+    const closeDialog = () => setOpen(false);
+    const dialogComponent = (
+        <DataGridDialog
+            resourceName={resourceName}
+            columns={columns}
+            resourceType={resourceType}
+            resourceTypeCode={resourceTypeCode}
+            resourceFieldName={resourceFieldName}
+            dataGridOnRowClick={onRowClickEnabled ? handleRowClick : undefined}
+            height={height}
+            open={open}
+            closeCallback={closeCallback}
+            title={title}
+            dialogComponentProps={dialogComponentProps}
+            dataGridComponentProps={dataGridComponentProps}
+        />
+    );
+    return [showDialog, dialogComponent, closeDialog];
+};
 
 export const DataGridDialog: React.FC<DataGridDialogProps> = (props) => {
     const {
@@ -92,35 +124,27 @@ export const DataGridDialog: React.FC<DataGridDialogProps> = (props) => {
         resourceType,
         resourceTypeCode,
         resourceFieldName,
-        staticFilter,
-        staticSortModel,
-        namedQueries,
-        perspectives,
-        onRowClick,
-        height,
+        dataGridHeight,
+        dataGridOnRowClick,
+        dialogComponentProps,
+        dataGridComponentProps,
         children,
         ...otherProps
     } = props;
-    return <Dialog {...otherProps}>
-        <MuiDataGrid
-            columns={columns}
-            resourceName={resourceName}
-            resourceType={resourceType}
-            resourceTypeCode={resourceTypeCode}
-            resourceFieldName={resourceFieldName}
-            paginationActive
-            titleDisabled
-            quickFilterSetFocus
-            quickFilterFullWidth
-            toolbarHideRefresh
-            readOnly
-            staticFilter={staticFilter}
-            staticSortModel={staticSortModel}
-            namedQueries={namedQueries}
-            perspectives={perspectives}
-            onRowClick={onRowClick}
-            height={height ?? 370} />
-    </Dialog>;
-}
+    return (
+        <Dialog componentProps={dialogComponentProps} {...otherProps}>
+            <MuiDataGrid
+                columns={columns}
+                resourceName={resourceName}
+                resourceType={resourceType}
+                resourceTypeCode={resourceTypeCode}
+                resourceFieldName={resourceFieldName}
+                onRowClick={dataGridOnRowClick}
+                height={dataGridHeight ?? 370}
+                {...dataGridComponentProps}
+            />
+        </Dialog>
+    );
+};
 
 export default DataGridDialog;

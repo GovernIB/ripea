@@ -17,7 +17,8 @@ import {
     Theme,
     CSSObject
 } from '@mui/material/styles';
-import {useBaseAppContext, useSmallScreen, useSmallHeader} from "reactlib";
+import {useBaseAppContext} from "reactlib";
+import {useSmallScreen, useSmallHeader} from "../../lib/util/useSmallScreen";
 import SideWrapper from "./SideWrapper";
 import {useTranslation} from "react-i18next";
 

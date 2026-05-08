@@ -1,6 +1,6 @@
-import {useMemo, useRef} from "react";
-import {Grid2 as Grid, Box} from "@mui/material";
-import {MuiFormDialog, useBaseAppContext, MuiFormDialogApi, useFormContext, DialogButton} from "reactlib";
+import {useMemo} from "react";
+import {Grid, Box} from "@mui/material";
+import {MuiFormDialog, useBaseAppContext, useMuiFormDialogApiRef, useFormContext, DialogButton} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {CardData} from "../../../components/CardData.tsx";
 import GridFormField from "../../../components/GridFormField.tsx";
@@ -24,9 +24,9 @@ const PerfilFrom = ({setTheme}: { setTheme: (value:TemaAplicacio) => void }) =>{
             <MuiDetail entity={data} fields={fields} sx={{ width: '100%' }}>
                 <FieldData field={"nom"} sx={{border: 'none'}} size={4}/>
                 <FieldData field={"email"} sx={{borderTop: 'none'}} size={4}/>
-                <FieldData field={"rols"} sx={{borderTop: 'none'}} size={4} commponentProps={{ component: Box }} isObject>
+                <FieldData field={"rols"} sx={{borderTop: 'none'}} size={4} componentTextProps={{ component: Box }} isObject>
                     <Box display={'flex'} flexWrap="wrap" gap={1}>
-                        {user?.auth.map((r:string) => <StyledLabel backgroundColor={'#6e6e6e'}>{r}</StyledLabel>)}
+                        {user?.auth.map((r:string) => <StyledLabel key={r} backgroundColor={'#6e6e6e'}>{r}</StyledLabel>)}
                     </Box>
                 </FieldData>
             </MuiDetail>
@@ -75,7 +75,7 @@ const usePerfil = () => {
     const { value: user, refresh } = useUserSession();
     const {setValue: setTheme, removeValue: removeTheme} = useThemeUserContext()
 
-    const formApiRef = useRef<MuiFormDialogApi>();
+    const formApiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow, t: tBase } = useBaseAppContext();
 
     const handleOpen = () => {

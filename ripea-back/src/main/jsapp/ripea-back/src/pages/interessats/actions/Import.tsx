@@ -1,7 +1,7 @@
-import {useEffect, useMemo, useRef, useState} from "react";
-import {Grid2 as Grid, Icon} from "@mui/material";
+import {useEffect, useMemo, useState} from "react";
+import {Grid, Icon} from "@mui/material";
 import {DataGridPro} from "@mui/x-data-grid-pro";
-import {MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
+import {useMuiFormDialogApiRef, useBaseAppContext, useFormContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 import GridFormField, {FileFormField} from "../../../components/GridFormField.tsx";
@@ -59,7 +59,7 @@ const ImportForm = () => {
                 rows={data?.interessatsFitxer}
                 columns={columns}
                 onRowSelectionModelChange={(newSelection) => {
-                    setSelectedRows([...newSelection]);
+                    setSelectedRows([...newSelection.ids]);
                 }}
                 isRowSelectable={(params: any) => Object.keys(params?.row?.errors)?.length == 0}
 
@@ -95,7 +95,7 @@ const Import = (props:any) => {
 }
 const useImport = (entity:any, refresh?: () => void) => {
     const {t} = useTranslation();
-    const apiRef = useRef<MuiFormDialogApi>();
+    const apiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow} = useBaseAppContext();
 
     const handleShow = (): void => {

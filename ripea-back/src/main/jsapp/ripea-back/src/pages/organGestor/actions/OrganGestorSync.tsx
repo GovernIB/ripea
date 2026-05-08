@@ -1,6 +1,6 @@
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
-import {Grid2 as Grid, Divider, Typography, Alert} from "@mui/material";
+import {Grid, Divider, Typography, Alert} from "@mui/material";
 import {useMemo, useRef, useState} from "react";
 import {MuiDialog, useBaseAppContext, useResourceApiService} from "reactlib";
 import {CardData} from "../../../components/CardData.tsx";

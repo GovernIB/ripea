@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {Grid2 as Grid, Alert, Icon} from "@mui/material";
+import {Grid, Alert, Icon} from "@mui/material";
 import {MuiDialog} from "reactlib";
 import {useTranslation} from "react-i18next";
 import Load from "../../../components/Load.tsx";

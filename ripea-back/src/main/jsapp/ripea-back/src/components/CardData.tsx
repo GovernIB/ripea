@@ -1,4 +1,4 @@
-import {Box, Card, CardContent, CardHeader, Grid2 as Grid, Typography, Icon, IconButton} from "@mui/material";
+import {Box, Card, CardContent, CardHeader, Grid, Typography, Icon, IconButton} from "@mui/material";
 import React from "react";
 
 const iconButton = { p: 0.5, borderRadius: '5px', maxWidth: 'max-content', border: '1px solid grey' }
@@ -158,7 +158,7 @@ export const CardPage = (props:CardPageProps) => {
     }}>
         {(title || header) &&
             <CardHead icon={icon} sx={headerProps} {...other}>
-                {title && <Typography mt={0.5} variant={"h4"}>{title}</Typography>}
+                {title && <Typography mt={0.5} variant={"h4"} component={"h1"}>{title}</Typography>}
                 {header}
             </CardHead>
         }

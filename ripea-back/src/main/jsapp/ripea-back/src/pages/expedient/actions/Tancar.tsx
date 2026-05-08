@@ -1,6 +1,6 @@
-import {useEffect, useMemo, useRef, useState} from "react";
-import {Grid2 as Grid, Alert, Box} from "@mui/material";
-import {MuiFormDialogApi, useBaseAppContext, useFormContext, useResourceApiService} from "reactlib";
+import {useEffect, useMemo, useState} from "react";
+import {Grid, Alert, Box} from "@mui/material";
+import {useMuiFormDialogApiRef, useBaseAppContext, useFormContext, useResourceApiService} from "reactlib";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 import GridFormField from "../../../components/GridFormField.tsx";
@@ -121,8 +121,9 @@ const TancarForm = () => {
                             },
                         }}
                         treeData
-                        treeDataAdditionalRows={(_rows: any) => {
-                            const additionalRows: any[] = [];
+                        rowsTransformer={(_rows: any) => {
+                            if (!_rows) return [];
+                            const additionalRows: any[] = _rows;
                             if (_rows!=null && entities!=null){
                                 for (const entity of entities) {
                                     if (!additionalRows.map((b) => b.id).includes(entity?.id)) {
@@ -172,7 +173,7 @@ const Tancar = (props: any) => {
 }
 export const useTancar = (refresh?: () => void) => {
     const { t } = useTranslation();
-    const apiRef = useRef<MuiFormDialogApi>();
+    const apiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow} = useBaseAppContext();
 
     const handleShow = (id: any): void => {
@@ -193,7 +194,7 @@ export const useTancar = (refresh?: () => void) => {
 }
 export const useTancarMassive = (refresh?: () => void) => {
     const { t } = useTranslation();
-    const apiRef = useRef<MuiFormDialogApi>();
+    const apiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow} = useBaseAppContext();
 
     const handleShow = (ids: any[]): void => {

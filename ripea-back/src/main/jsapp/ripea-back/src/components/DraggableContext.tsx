@@ -67,6 +67,9 @@ export const DraggableItem: React.FC<DraggableContainerProps> = ({ id, data, sty
 };
 
 export const DraggableGridRow: React.FC<any> = (props) => {
+    if (props.row?.id == null) {
+        return <GridRow {...props} />;
+    }
     const droppableStyle = {
         border: props.row.tipus === 'CARPETA' ? '2px solid grey' : undefined,
         borderTop: props.row.tipus !== 'CARPETA' ? '2px solid grey' : undefined,
@@ -79,7 +82,9 @@ export const DraggableGridRow: React.FC<any> = (props) => {
 }
 export const DraggableGridRowHandler: React.FC = () => {
     const { t } = useTranslation();
-    const { draggableAttributes, draggableListeners, draggableSetActivatorNodeRef } = useDraggableContext();
+    const context = React.useContext(DraggableContext);
+    if (!context) return null;
+    const { draggableAttributes, draggableListeners, draggableSetActivatorNodeRef } = context;
     return <IconButton
         size="small"
         title={t('common.dragdrop')}

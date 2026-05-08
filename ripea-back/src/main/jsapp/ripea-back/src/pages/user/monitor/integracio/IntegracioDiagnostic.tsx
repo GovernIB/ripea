@@ -3,7 +3,7 @@ import {MuiDialog, useBaseAppContext, useFormContext, useResourceApiService} fro
 import {useEffect, useMemo, useRef, useState} from "react";
 import StyledMuiFilter from "../../../../components/StyledMuiFilter.tsx";
 import GridFormField, {GridButton} from "../../../../components/GridFormField.tsx";
-import {Alert, Grid2 as Grid, Icon, IconButton, Typography} from "@mui/material";
+import {Alert, Grid, Icon, IconButton, Typography} from "@mui/material";
 import * as builder from "../../../../util/springFilterUtils.ts";
 import {useSession} from "../../../../components/SessionStorageContext.tsx";
 import Load from "../../../../components/Load.tsx";

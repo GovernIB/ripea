@@ -12,12 +12,13 @@ type AppBarProps = {
     version?: string;
     logo?: string;
     logoStyle?: any;
-    menuButton: React.ReactNode,
+    menuButton: React.ReactNode;
     additionalToolbarComponents?: React.ReactElement | React.ReactElement[];
     additionalAuthComponents?: React.ReactElement | React.ReactElement[];
     style?: any;
     backgroundColor?: string;
     backgroundImg?: string;
+    authBadgeIcon?: string;
 };
 
 export const AppBar: React.FC<AppBarProps> = (props) => {
@@ -32,28 +33,47 @@ export const AppBar: React.FC<AppBarProps> = (props) => {
         style,
         backgroundColor,
         backgroundImg,
+        authBadgeIcon,
     } = props;
     const authContext = useOptionalAuthContext();
-    const authButton = authContext != null ? <AuthButton additionalComponents={additionalAuthComponents} /> : null;
-    const backgroundStyle = backgroundColor ? toolbarBackgroundStyle(backgroundColor, backgroundImg) : {};
-    return <MuiAppBar position="sticky" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
-        <Toolbar style={{ ...style, ...backgroundStyle }}>
-            {menuButton}
-            {logo ? <Box sx={{ mr: 2, pt: 1, pr: 2, cursor: 'pointer', ...logoStyle }}>
-                <img src={logo} alt="logo" />
-            </Box> : null}
-            <Typography
-                variant="h6"
-                component="div"
-                title={title + (version ? ' v' + version : '')}
-                sx={{ flexGrow: 1 }}>
-                {title}
-                {/*version && <Typography variant="caption">&nbsp;v{version}</Typography>*/}
-            </Typography>
-            {additionalToolbarComponents}
-            {authButton}
-        </Toolbar>
-    </MuiAppBar>;
-}
+    const authButton =
+        authContext != null ? (
+            <AuthButton badgeIcon={authBadgeIcon} additionalComponents={additionalAuthComponents} />
+        ) : null;
+    const backgroundStyle = backgroundColor
+        ? toolbarBackgroundStyle(backgroundColor, backgroundImg)
+        : {};
+    return (
+        <MuiAppBar position="sticky" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+            <Toolbar style={{ ...style, ...backgroundStyle }}>
+                {menuButton}
+                {logo ? (
+                    <Box sx={{ mr: 2, pt: 1, pr: 2, cursor: 'pointer', ...logoStyle }}>
+                        <img src={logo} alt="logo" />
+                    </Box>
+                ) : null}
+                {typeof title === 'string' ? (
+                    <Typography
+                        variant="h6"
+                        component="div"
+                        title={title + (version ? ' v' + version : '')}
+                        sx={{ flexGrow: 1 }}>
+                        {title}
+                        {/*version && <Typography variant="caption">&nbsp;v{version}</Typography>*/}
+                    </Typography>
+                ) : (
+                    <div
+                        style={{
+                            flexGrow: 1,
+                        }}>
+                        {title}
+                    </div>
+                )}
+                {additionalToolbarComponents}
+                {authButton}
+            </Toolbar>
+        </MuiAppBar>
+    );
+};
 
 export default AppBar;

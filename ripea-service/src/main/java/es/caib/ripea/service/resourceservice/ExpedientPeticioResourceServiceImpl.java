@@ -304,14 +304,16 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
         	RegistreResource rr = objectMappingHelper.newInstanceMap(Hibernate.unproxy(entity.getRegistre()), RegistreResource.class);
         	resource.setRegistreInfo(rr);
            
-            resource.getRegistreInfo().setInteressats(
-                    entity.getRegistre().getInteressats().stream()
-                            .map(interessat -> {
-                                RegistreInteressatResource interessatResource = objectMappingHelper.newInstanceMap(interessat, RegistreInteressatResource.class);
-                                return ResourceReference.<RegistreInteressatResource, Long>toResourceReference(interessatResource.getId(), interessatResource.getCodiNom());
-                            })
-                            .collect(Collectors.toList())
-            );
+        	if (entity.getRegistre().getInteressats()!=null) {
+	            resource.getRegistreInfo().setInteressats(
+	                    entity.getRegistre().getInteressats().stream()
+	                            .map(interessat -> {
+	                                RegistreInteressatResource interessatResource = objectMappingHelper.newInstanceMap(interessat, RegistreInteressatResource.class);
+	                                return ResourceReference.<RegistreInteressatResource, Long>toResourceReference(interessatResource.getId(), interessatResource.getCodiNom());
+	                            })
+	                            .collect(Collectors.toList())
+	            );
+        	}
 
             if (resource.getRegistreInfo().getJustificantArxiuUuid()!=null && Boolean.parseBoolean(configHelper.getConfig(PropertyConfig.INCORPORAR_JUSTIFICANT))) {
             	RegistreAnnexResource justificant = new RegistreAnnexResource();

@@ -1,11 +1,12 @@
 import React from 'react';
+import { FormApi } from './FormContext';
 
 export type FilterApi = {
-    clear: (data?: any) => void;
+    clear: () => void;
     filter: (data?: any) => void;
-};
+} & FormApi;
 
-export type FilterApiRef = React.MutableRefObject<FilterApi | undefined>;
+export type FilterApiRef = React.RefObject<FilterApi | null>;
 
 export type FilterContextType = {
     resourceName: string;
@@ -21,10 +22,10 @@ export const useFilterContext = () => {
         throw new Error('useFilterContext must be used within a FilterProvider');
     }
     return context;
-}
+};
 
 export const useOptionalFilterContext = (): FilterContextType | undefined => {
     return React.useContext(FilterContext);
-}
+};
 
 export default FilterContext;

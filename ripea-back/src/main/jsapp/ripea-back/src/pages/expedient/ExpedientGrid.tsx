@@ -1,5 +1,5 @@
 import {useMemo, useState} from "react";
-import {Icon, Grid2 as Grid, Box} from "@mui/material";
+import {Icon, Grid, Box} from "@mui/material";
 import {GridPage, useFormContext, useMuiDataGridApiRef,} from 'reactlib';
 import {useTranslation} from "react-i18next";
 import {useNavigate} from "react-router-dom";
@@ -252,7 +252,7 @@ const ExpedientGrid = () => {
     ]
         .filter((col:any)=>!col?.hidden), [user]);
 
-    return <GridPage disableMargins>
+    return <GridPage>
         <CardPage title={t('page.expedient.filter.title')}>
             <ExpedientFilter onSpringFilterChange={(value:any)=>{
                 setSpringFilter(value)

@@ -1,6 +1,6 @@
-import {useEffect, useMemo, useRef, useState} from "react";
-import {Grid2 as Grid} from "@mui/material";
-import {FormField, MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
+import {useEffect, useMemo, useState} from "react";
+import {Grid} from "@mui/material";
+import {FormField, useMuiFormDialogApiRef, useBaseAppContext, useFormContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 import GridFormField from "../../../components/GridFormField.tsx";
@@ -261,7 +261,7 @@ const Acceptar = (props:any) => {
 
 const useAcceptar = (refresh?: () => void) => {
     const { t } = useTranslation();
-    const apiRef = useRef<MuiFormDialogApi>();
+    const apiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow} = useBaseAppContext();
 
     const handleShow = (id:any, row:any) :void => {

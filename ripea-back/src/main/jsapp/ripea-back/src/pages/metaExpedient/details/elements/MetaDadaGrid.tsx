@@ -1,17 +1,17 @@
 import {useTranslation} from "react-i18next";
 import {GridPage, useBaseAppContext, useFormContext, useMuiDataGridApiRef, useResourceApiService} from "reactlib";
-import {CardPage} from "../../../../components/CardData.tsx";
-import {DndMuiGrid} from "../../../../components/StyledMuiGrid.tsx";
-import {Grid2 as Grid, Icon, Divider, Button} from "@mui/material";
-import * as builder from "../../../../util/springFilterUtils.ts";
+import {CardPage} from "@src/components/CardData.tsx";
+import StyledMuiGrid from "@src/components/StyledMuiGrid.tsx";
+import {Grid, Icon, Divider, Button} from "@mui/material";
+import * as builder from "@src/util/springFilterUtils.ts";
 import {useNavigate, useParams} from "react-router-dom";
-import GridFormField from "../../../../components/GridFormField.tsx";
+import GridFormField from "@src/components/GridFormField.tsx";
 import {useEffect, useMemo, useState} from "react";
-import {setTitlePage} from "../../../../TitleHeaderConfigurator.tsx";
-import {useUserSession} from "../../../../components/Session.tsx";
-import {MultiplicitatStyled} from "../../../contingut/details/MetaExpedient.tsx";
+import {setTitlePage} from "@src/TitleHeaderConfigurator.tsx";
+import {useUserSession} from "@src/components/Session.tsx";
+import {MultiplicitatStyled} from "@src/pages/contingut/details/MetaExpedient.tsx";
 import useMetaDadaDetail from "./details/MetaDadaDetail.tsx";
-import {ErrorPage} from "../../../../components/ErrorPage.tsx";
+import {ErrorPage} from "@src/components/ErrorPage.tsx";
 
 const useActions = (refresh?: () => void) => {
     const {t} = useTranslation();
@@ -45,7 +45,6 @@ const useActions = (refresh?: () => void) => {
 
     const reordering = (id:any, ordre:number) => {
         apiAction(id, { code: 'REORDENAR', data: ordre })
-            .then(() => refresh?.())
             .catch((error) => {
                 temporalMessageShow(null, error?.message, 'error');
             });
@@ -159,16 +158,13 @@ export const MetDadaGrid = ({ id, enviable = false, readOnly, ...other }: any) =
         },
     ], [t, readOnly, apiIsReady])
 
-    const handleDragEnd = (event: any) => {
-        const sourceData = event.active.data.current;
-        const targetData = event.over.data.current;
-        // console.log('>>> ', sourceData.codi, '(', sourceData.ordre, ') ->', targetData.codi, '(', targetData.ordre, ')')
-        if (sourceData.id != targetData.id) {
-            reordering(sourceData.id, targetData.ordre)
+    const handleDragEnd = (params: any) => {
+        if (params.targetIndex != params.oldIndex) {
+            reordering(params.row.id, params.targetIndex)
         }
     }
 
-    return <><DndMuiGrid
+    return <><StyledMuiGrid
         apiRef={apiRef}
         resourceName={"metaDadaResource"}
         popupEditUpdateActive
@@ -183,7 +179,8 @@ export const MetDadaGrid = ({ id, enviable = false, readOnly, ...other }: any) =
         rowAdditionalActions={actions}
         {...other}
 
-        onDragEnd={handleDragEnd}
+        rowReordering={!readOnly}
+        onRowOrderChange={handleDragEnd}
 
         toolbarCreateTitle={t('page.metaDada.action.new.label')}
         popupEditFormI18nKeys={{

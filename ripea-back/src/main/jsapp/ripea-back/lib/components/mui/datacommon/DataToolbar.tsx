@@ -4,7 +4,7 @@ import Toolbar from '../Toolbar';
 import { toToolbarIcon } from '../ToolbarIcon';
 import {
     ReactElementWithPosition,
-    joinReactElementsWithPositionWithReactElementsWithPositions
+    joinReactElementsWithPositionWithReactElementsWithPositions,
 } from '../../../util/reactNodePosition';
 import { useBaseAppContext } from '../../BaseAppContext';
 
@@ -27,37 +27,52 @@ export const useDataToolbar = (
     quickFilterComponent: React.ReactElement,
     doRefresh: () => void,
     doExport: () => void,
+    toolbarShowBack?: boolean,
     toolbarHideExport?: boolean,
     toolbarHideRefresh?: boolean,
     toolbarHideQuickFilter?: boolean,
-    toolbarElementsWithPositions?: ReactElementWithPosition[]) => {
-    const { t } = useBaseAppContext();
+    toolbarElementsWithPositions?: ReactElementWithPosition[]
+) => {
+    const { t, goBack } = useBaseAppContext();
     const isUpperToolbarType = toolbarType === 'upper';
     const isHiddenToolbarType = toolbarType === 'hidden';
     const elementsWithPosition: ReactElementWithPosition[] = [];
+    toolbarShowBack &&
+        elementsWithPosition.push({
+            position: 0,
+            element: toToolbarIcon('arrow_back', {
+                title: t('datacommon.back.label'),
+                onClick: () => goBack(),
+                sx: { mr: 1 },
+            }),
+        });
     const toolbarNodesPosition = 2;
-    !toolbarHideExport && elementsWithPosition.push({
-        position: toolbarNodesPosition,
-        element: toToolbarIcon('file_download', {
-            title: t('datacommon.export.label'),
-            onClick: () => doExport(),
-        }),
-    });
-    !toolbarHideRefresh && elementsWithPosition.push({
-        position: toolbarNodesPosition,
-        element: toToolbarIcon('refresh', {
-            title: t('datacommon.refresh.label'),
-            onClick: () => doRefresh(),
-        }),
-    });
-    !toolbarHideQuickFilter && elementsWithPosition.push({
-        position: toolbarNodesPosition,
-        element: quickFilterComponent
-    });
+    !toolbarHideExport &&
+        elementsWithPosition.push({
+            position: toolbarNodesPosition,
+            element: toToolbarIcon('file_download', {
+                title: t('datacommon.export.label'),
+                onClick: () => doExport(),
+            }),
+        });
+    !toolbarHideRefresh &&
+        elementsWithPosition.push({
+            position: toolbarNodesPosition,
+            element: toToolbarIcon('refresh', {
+                title: t('datacommon.refresh.label'),
+                onClick: () => doRefresh(),
+            }),
+        });
+    !toolbarHideQuickFilter &&
+        elementsWithPosition.push({
+            position: toolbarNodesPosition,
+            element: quickFilterComponent,
+        });
     const joinedElementsWithPositions = joinReactElementsWithPositionWithReactElementsWithPositions(
-            2,
-            elementsWithPosition,
-            toolbarElementsWithPositions);
+        2,
+        elementsWithPosition,
+        toolbarElementsWithPositions
+    );
     const toolbarElementProps = {
         title: !titleDisabled ? title : undefined,
         subtitle,
@@ -66,7 +81,7 @@ export const useDataToolbar = (
         error: apiCurrentError ?? undefined,
     };
     return !isHiddenToolbarType ? <DataToolbar {...toolbarElementProps} /> : null;
-}
+};
 
 const DataToolbar: React.FC<DataToolbarProps> = (props) => {
     const {
@@ -92,25 +107,29 @@ const DataToolbar: React.FC<DataToolbarProps> = (props) => {
                 sx: { mx: 1 },
             }),
         });
-        errorShown && elementsWithPositions.push({
-            position: 1,
-            element: toToolbarIcon('close', {
-                title: 'Tancar',
-                onClick: () => setErrorShown(false),
-                sx: { mr: 1 },
-            }),
-        });
+        errorShown &&
+            elementsWithPositions.push({
+                position: 1,
+                element: toToolbarIcon('close', {
+                    title: 'Tancar',
+                    onClick: () => setErrorShown(false),
+                    sx: { mr: 1 },
+                }),
+            });
     }
     !errorShown && elementsWithPositions.push(...(elementsWithPositionsProp ?? []));
-    return <Box sx={{ p: 0 }}>
-        <Toolbar
-            title={error && errorShown ? t('datacommon.toolbar.error') : title}
-            subtitle={error && errorShown ? error?.message : subtitle}
-            elementsWithPositions={elementsWithPositions}
-            upperToolbar={upperToolbar}
-            error={error}
-            sx={!upperToolbar ? { mt: -1.5 } : undefined} />
-    </Box>;
-}
+    return (
+        <Box sx={{ p: 0 }}>
+            <Toolbar
+                title={error && errorShown ? t('datacommon.toolbar.error') : title}
+                subtitle={error && errorShown ? error?.message : subtitle}
+                elementsWithPositions={elementsWithPositions}
+                upperToolbar={upperToolbar}
+                error={error}
+                sx={!upperToolbar ? { mt: -1.5 } : undefined}
+            />
+        </Box>
+    );
+};
 
 export default DataToolbar;

@@ -5,4 +5,4 @@ export const envVar = (name: string, envVars: any) => {
     } else {
         return envVars[name];
     }
-}
+};

@@ -1,7 +1,6 @@
-import {MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
-import {Grid2 as Grid} from "@mui/material";
+import {useMuiFormDialogApiRef, useBaseAppContext, useFormContext} from "reactlib";
+import {Grid} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
-import {useRef} from "react";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 import useNotificar from "./Notificar.tsx";
@@ -36,7 +35,7 @@ const NotificarMassive = (props:any) => {
 
 const useNotificarMassive = (entity:any, refresh?: () => void) => {
     const { t } = useTranslation();
-    const apiRef = useRef<MuiFormDialogApi>();
+    const apiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow} = useBaseAppContext();
 
     const {handleShow: handleNotificar, content} = useNotificar(refresh)

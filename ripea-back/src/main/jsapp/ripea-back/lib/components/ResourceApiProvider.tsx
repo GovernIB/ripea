@@ -1,14 +1,6 @@
 import React from 'react';
 import { parseTemplate } from 'url-template';
-import {
-    Client,
-    Resource,
-    State,
-    Action,
-    Links,
-    Link,
-    Problem
-} from 'ketting';
+import { Client, Resource, State, Action, Links, Link, Problem } from 'ketting';
 import { processApiFields } from '../util/fields';
 import useLogConsole, { LogConsoleType } from '../util/useLogConsole';
 import useControlledUncontrolledState from '../util/useControlledUncontrolledState';
@@ -16,7 +8,6 @@ import { useOptionalAuthContext } from './AuthContext';
 import ResourceApiContext, {
     useResourceApiContext,
     OpenAnswerRequiredDialogFn,
-    ResourceApiUserSessionValuePair,
     ResourceType,
     ExportFileType,
 } from './ResourceApiContext';
@@ -37,13 +28,21 @@ type ResourceApiMethods = {
     artifactFormOnChange: (args: ResourceApiArtifactOnChangeArgs) => Promise<any>;
     artifactFormValidate: (args: ResourceApiArtifactFormArgs) => Promise<void>;
     artifactFieldOptionsFields: (args: ResourceApiArtifactFieldOptionsArgs) => Promise<any[]>;
-    artifactFieldOptionsFind: (args: ResourceApiArtifactFieldOptionsFindArgs) => Promise<ResourceApiFindResponse>;
+    artifactFieldOptionsFind: (
+        args: ResourceApiArtifactFieldOptionsFindArgs
+    ) => Promise<ResourceApiFindResponse>;
     artifactAction: (id: any, args: ResourceApiActionArgs) => Promise<any>;
-    artifactReport: (id: any, args: ResourceApiReportArgs) => Promise<any[] | ResourceApiBlobResponse>;
+    artifactReport: (
+        id: any,
+        args: ResourceApiReportArgs
+    ) => Promise<any[] | ResourceApiBlobResponse>;
     fieldOptionsFields: (args: ResourceApiFieldArgs) => Promise<any[]>;
     fieldOptionsFind: (args: ResourceApiFieldOptionsFindArgs) => Promise<ResourceApiFindResponse>;
     fieldDownload: (id: any, args: ResourceApiFieldArgs) => Promise<ResourceApiBlobResponse>;
-}
+    bulkPatch: (ids: any[], args: ResourceApiRequestArgs) => Promise<ResourceApiBulkResponse>;
+    bulkAction: (ids: any[], args: ResourceApiActionArgs) => Promise<ResourceApiBulkResponse>;
+    bulkDelete: (ids: any[], args?: ResourceApiRequestArgs) => Promise<ResourceApiBulkResponse>;
+};
 
 export type ResourceApiService = {
     isLoading: boolean;
@@ -69,7 +68,8 @@ export type ResourceApiGenericRequest = (
     id?: any,
     args?: ResourceApiRequestArgs,
     state?: State,
-    linkIsHref?: boolean) => Promise<State>;
+    linkIsHref?: boolean
+) => Promise<State>;
 
 export type ResourceApiActionSubmitArgs = {
     data?: any;
@@ -105,7 +105,14 @@ export type ResourceApiFindArgs = ResourceApiFindCommonArgs & {
 
 export type ResourceApiFindResponse = {
     rows: any[];
-    page: any;
+    page: ResourceApiFindResponsePage;
+};
+
+export type ResourceApiFindResponsePage = {
+    number: number;
+    size: number;
+    totalElements: number;
+    totalPages: number;
 };
 
 export type ResourceApiExportArgs = ResourceApiFindCommonArgs & {
@@ -116,6 +123,17 @@ export type ResourceApiExportArgs = ResourceApiFindCommonArgs & {
 export type ResourceApiBlobResponse = {
     blob: Blob;
     fileName: string;
+};
+
+export type ResourceApiBulkResponse = {
+    successCount: number;
+    errorCount: number;
+    items: {
+        id: any;
+        actionResult?: any;
+        error?: boolean;
+        errorMessage?: string;
+    }[];
 };
 
 export type ResourceApiArtifact = {
@@ -145,7 +163,8 @@ export type ResourceApiArtifactFieldOptionsArgs = ResourceApiArtifactFormArgs & 
     fieldName: string;
 };
 
-export type ResourceApiArtifactFieldOptionsFindArgs = ResourceApiArtifactFieldOptionsArgs & ResourceApiFindArgs;
+export type ResourceApiArtifactFieldOptionsFindArgs = ResourceApiArtifactFieldOptionsArgs &
+    ResourceApiFindArgs;
 
 export type ResourceApiArtifactOnChangeArgs = ResourceApiArtifactFormArgs & ResourceApiOnChangeArgs;
 
@@ -165,6 +184,7 @@ export type ResourceApiFieldArgs = ResourceApiRequestArgs & {
 export type ResourceApiFieldOptionsFindArgs = ResourceApiFieldArgs & ResourceApiFindArgs;
 
 export type ResourceApiProviderProps = React.PropsWithChildren & {
+    /** URL base de l'API REST */
     apiUrl: string;
     defaultLanguage?: string;
     currentLanguage?: string;
@@ -177,6 +197,9 @@ export type ResourceApiProviderProps = React.PropsWithChildren & {
     debugAvailableServices?: boolean;
 };
 
+/**
+ * Informació d'error retornada per les cridades a l'API.
+ */
 export type ResourceApiError = Error & {
     /** Codi d'estat HTTP de l'error */
     status: number;
@@ -195,16 +218,19 @@ export type ResourceApiError = Error & {
 };
 
 export const processStateLinks = (links?: Links) => {
-    return links?.getAll().reduce((acc: any, curr: Link) => (acc[curr.rel] = curr, acc), {});
-}
+    return links?.getAll().reduce((acc: any, curr: Link) => ((acc[curr.rel] = curr), acc), {});
+};
 export const processStateActions = (actions?: Action[]) => {
-    return actions?.reduce((acc: any, curr: Action) => (acc[curr.name ?? ''] = curr, acc), {});
-}
+    return actions?.reduce((acc: any, curr: Action) => ((acc[curr.name ?? ''] = curr), acc), {});
+};
 
 const stateToBlobResponse = (state: State) => {
     const contentDispositionHeader = state.headers.get('content-disposition');
     const fileNameIndex = contentDispositionHeader?.indexOf('filename=') ?? -1;
-    const fileName = fileNameIndex !== -1 ? contentDispositionHeader?.substring(fileNameIndex + 'filename='.length) : undefined;
+    const fileName =
+        fileNameIndex !== -1
+            ? contentDispositionHeader?.substring(fileNameIndex + 'filename='.length)
+            : undefined;
     if (typeof state.data === 'string') {
         const contentType = state.headers.get('content-type') ?? 'text/plain';
         return {
@@ -217,11 +243,14 @@ const stateToBlobResponse = (state: State) => {
             fileName: fileName ?? 'unknown',
         };
     }
-}
+};
 
 // Clone of Ketting's Action.submit() function (https://github.com/badgateway/ketting/blob/version-7.x/src/action.ts#L109)
 // with a new parameter to allow custom HTTP request headers.
-const kettingActionSubmit = async (action: Action, args?: ResourceApiActionSubmitArgs | undefined) => {
+const kettingActionSubmit = async (
+    action: Action,
+    args?: ResourceApiActionSubmitArgs | undefined
+) => {
     const { data, headers, urlData } = args ?? {};
     const uri = new URL(action.uri);
     if (action.method === 'GET') {
@@ -238,7 +267,9 @@ const kettingActionSubmit = async (action: Action, args?: ResourceApiActionSubmi
             body = JSON.stringify(data);
             break;
         default:
-            throw new Error(`Serializing mimetype ${action.contentType} is not yet supported in actions`);
+            throw new Error(
+                `Serializing mimetype ${action.contentType} is not yet supported in actions`
+            );
     }
     let urlSearchParams: URLSearchParams | null = null;
     if (urlData != null) {
@@ -257,22 +288,31 @@ const kettingActionSubmit = async (action: Action, args?: ResourceApiActionSubmi
         },
     });
     return (action as any).client.getStateForResponse(uri.toString(), response);
-}
+};
 
 const getStateAction = (state: State, action: string) => {
     try {
         return state.actions().length > 0 ? state.action(action) : undefined;
-    } catch (error) { }
-}
-const getPromiseFromResourceLink = async (resource: Resource, link?: string, refresh?: boolean): Promise<State> => {
+    } catch (error) {}
+};
+const getPromiseFromResourceLink = async (
+    resource: Resource,
+    link?: string,
+    refresh?: boolean
+): Promise<State> => {
     if (link) {
         const followedResource = await resource.follow(link);
         return refresh ? followedResource.refresh() : followedResource.get();
     } else {
         return refresh ? resource.refresh() : resource.get();
     }
-}
-const getPromiseFromStateLink = (state: State, link: string, args?: ResourceApiActionSubmitArgs | undefined, refresh?: boolean): Promise<State> => {
+};
+const getPromiseFromStateLink = (
+    state: State,
+    link: string,
+    args?: ResourceApiActionSubmitArgs | undefined,
+    refresh?: boolean
+): Promise<State> => {
     try {
         const stateAction = getStateAction(state, link);
         if (stateAction) {
@@ -287,7 +327,7 @@ const getPromiseFromStateLink = (state: State, link: string, args?: ResourceApiA
             reject(ex);
         });
     }
-}
+};
 
 const callRequestExecFn = (
     state: State,
@@ -298,23 +338,41 @@ const callRequestExecFn = (
     resourceName: string,
     id: any,
     debugRequests: boolean | undefined,
-    logConsole: LogConsoleType) => {
+    logConsole: LogConsoleType
+) => {
     if (debugRequests) {
         const stateAction = getStateAction(state, link);
-        const isUpdateAction = stateAction && ['POST', 'PUT', 'PATCH', 'DELETE'].includes(stateAction.method);
+        const isUpdateAction =
+            stateAction && ['POST', 'PUT', 'PATCH', 'DELETE'].includes(stateAction.method);
         const messagePrefix = isUpdateAction ? 'Executing action' : 'Sending request';
         const messageSuffix = id != null ? 'with id ' + id : '';
-        logConsole.debug('[>] ' + messagePrefix + ' \'' + link + '\' on resource \'' + resourceName + '\' ' + messageSuffix);
+        logConsole.debug(
+            '[>] ' +
+                messagePrefix +
+                " '" +
+                link +
+                "' on resource '" +
+                resourceName +
+                "' " +
+                messageSuffix
+        );
         if (args) {
             logConsole.debug('\t args:', args);
         }
     }
     const refresh = args?.refresh != null ? args?.refresh : true;
-    getPromiseFromStateLink(state, link, args, refresh).
-        then((state: State) => {
+    getPromiseFromStateLink(state, link, args, refresh)
+        .then((state: State) => {
             if (debugRequests) {
                 const messageSuffix = id != null ? 'with id ' + id : '';
-                logConsole.debug('[<] Response received for request \'' + link + '\' on resource \'' + resourceName + '\' ' + messageSuffix);
+                logConsole.debug(
+                    "[<] Response received for request '" +
+                        link +
+                        "' on resource '" +
+                        resourceName +
+                        "' " +
+                        messageSuffix
+                );
                 if (state) {
                     logConsole.debug('\t response:', state);
                 }
@@ -322,13 +380,13 @@ const callRequestExecFn = (
             args?.callbacks?.state?.(state);
             args?.callbacks?.links?.(processStateLinks(state.links));
             resolve(state);
-        }).
-        catch((error: Problem) => {
+        })
+        .catch((error: Problem) => {
             debugRequests && logConsole.debug('[x] Request error', error);
             args?.callbacks?.error?.(error);
             reject(error);
         });
-}
+};
 
 const toResourceApiError = (problem: Problem): ResourceApiError => {
     return {
@@ -343,40 +401,51 @@ const toResourceApiError = (problem: Problem): ResourceApiError => {
         answerRequiredError: problem.body?.answerRequiredError,
         modificationCanceledError: problem.body?.modificationCanceledError,
     };
-}
+};
 
 const processAnswerRequiredError = (
     problem: Problem,
     id: any,
     args: ResourceApiRequestArgs | undefined,
     callback: (id: any, args: any) => Promise<any>,
-    openAnswerRequiredDialog?: OpenAnswerRequiredDialogFn): Promise<any> => {
+    openAnswerRequiredDialog?: OpenAnswerRequiredDialogFn
+): Promise<any> => {
     if (problem.body) {
-        if (problem.status === 422 && problem.body.answerRequiredError && openAnswerRequiredDialog) {
-            const {
-                answerCode,
-                question,
-                trueFalseAnswerRequired,
-                availableAnswers
-            } = problem.body.answerRequiredError;
+        if (
+            problem.status === 422 &&
+            problem.body.answerRequiredError &&
+            openAnswerRequiredDialog
+        ) {
+            const { answerCode, question, trueFalseAnswerRequired, availableAnswers } =
+                problem.body.answerRequiredError;
             return new Promise((resolve, reject) => {
                 openAnswerRequiredDialog(
                     undefined,
                     question,
                     trueFalseAnswerRequired,
-                    availableAnswers).
-                    then((answer: string) => {
+                    availableAnswers
+                )
+                    .then((answer: string) => {
                         const answersHeader = args?.headers?.['Bb-Answers'];
                         const answers = answersHeader ? JSON.parse(answersHeader) : {};
-                        const updatedAnswers = { ...answers, [answerCode]: trueFalseAnswerRequired || !availableAnswers ? answer === 'true' : answer };
+                        const updatedAnswers = {
+                            ...answers,
+                            [answerCode]:
+                                trueFalseAnswerRequired || !availableAnswers
+                                    ? answer === 'true'
+                                    : answer,
+                        };
                         const currentHeaders = args?.headers ? args.headers : {};
-                        const updatedHeaders = { ...currentHeaders, ['Bb-Answers']: JSON.stringify(updatedAnswers) };
+                        const updatedHeaders = {
+                            ...currentHeaders,
+                            ['Bb-Answers']: JSON.stringify(updatedAnswers),
+                        };
                         const updatedArgs = { ...args, headers: updatedHeaders };
-                        callback(id, updatedArgs).
-                            then((data: any) => resolve(data)).
-                            catch((error: Error) => reject(error));
-                    }).
-                    catch((error: Error) => {
+                        callback(id, updatedArgs)
+                            .then((data: any) => resolve(data))
+                            .catch((error: Error) => reject(error));
+                    })
+                    .catch((error: Error) => {
                         return new Promise((_resolve, reject) => reject(error));
                     });
             });
@@ -387,7 +456,7 @@ const processAnswerRequiredError = (
         console.error('[' + LOG_PREFIX + '] Error response type not application/problem+json');
         return new Promise((_resolve, reject) => reject(toResourceApiError(problem)));
     }
-}
+};
 
 const buildFindArgs = (args?: ResourceApiFindArgs, additionalData?: any) => {
     const pageArgs = args?.unpaged ? { page: 'UNPAGED' } : { page: args?.page, size: args?.size };
@@ -404,454 +473,616 @@ const buildFindArgs = (args?: ResourceApiFindArgs, additionalData?: any) => {
         },
         refresh: args?.refresh ?? true,
     };
-}
+};
 
-const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDialog: Function): ResourceApiMethods => {
-    const getOne = React.useCallback((id: any, args?: ResourceApiGetOneArgs): Promise<any> => {
-        const argsData = args?.data;
-        const requestArgs = {
-            ...args,
-            data: {
-                id,
-                perspective: args?.perspectives,
-                ...argsData,
-            },
-            refresh: args?.refresh ?? true,
-        };
-        return new Promise((resolve, reject) => {
-            request('getOne', null, requestArgs).
-                then((state: State) => {
-                    if (args?.includeLinks) {
-                        resolve({
-                            ...state.data,
-                            '_links': processStateLinks(state.links),
-                            '_actions': processStateActions(state.actions()),
-                        });
-                    } else {
-                        resolve(state.data);
-                    }
-                }).
-                catch((problem: Problem) => {
-                    reject(toResourceApiError(problem));
-                });
-        });
-    }, [request]);
-    const find = React.useCallback((args?: ResourceApiFindArgs): Promise<ResourceApiFindResponse> => {
-        return new Promise((resolve, reject) => {
-            request('find', null, buildFindArgs(args)).
-                then((state: State) => {
-                    const rows = state.getEmbedded().map((e: any) => {
-                        if (args?.includeLinksInRows) {
-                            return {
-                                ...e.data,
-                                '_links': processStateLinks(e.links),
-                                '_actions': processStateActions(e.actions()),
-                            };
-                        } else {
-                            return e.data;
-                        }
-                    });
-                    const page = state.data.page;
-                    resolve({ rows, page });
-                }).
-                catch((problem: Problem) => {
-                    reject(toResourceApiError(problem));
-                });
-        });
-    }, [request]);
-    const exportt = React.useCallback((args?: ResourceApiExportArgs): Promise<ResourceApiBlobResponse> => {
-        const additionalData = {
-            field: args?.fields,
-            fileType: args?.fileType
-        };
-        return new Promise((resolve, reject) => {
-            request('export', null, buildFindArgs(args, additionalData)).
-                then((state: State) => {
-                    resolve(stateToBlobResponse(state));
-                }).
-                catch((problem: Problem) => {
-                    reject(toResourceApiError(problem));
-                });
-        });
-    }, [request]);
-    const create = React.useCallback((args?: ResourceApiRequestArgs): Promise<any> => {
-        const requestArgs = {
-            ...args,
-            data: args?.data,
-        };
-        return new Promise((resolve, reject) => {
-            request('create', null, requestArgs).
-                then((state: State) => {
-                    resolve(state.data);
-                }).
-                catch((error: Problem) => {
-                    processAnswerRequiredError(
-                        error,
-                        null,
-                        args,
-                        create,
-                        getOpenAnswerRequiredDialog()).
-                        then(resolve).
-                        catch(reject);
-                });
-        });
-    }, [request]);
-    const update = React.useCallback((id: any, args?: ResourceApiRequestArgs): Promise<any> => {
-        const requestArgs = {
-            ...args,
-            data: args?.data,
-        };
-        return new Promise((resolve, reject) => {
-            request('update', id, requestArgs).
-                then((state: State) => {
-                    resolve(state.data);
-                }).
-                catch((error: Problem) => {
-                    processAnswerRequiredError(
-                        error,
-                        id,
-                        args,
-                        update,
-                        getOpenAnswerRequiredDialog()).
-                        then(resolve).
-                        catch(reject);
-                });
-        });
-    }, [request]);
-    const patch = React.useCallback((id: any, args?: ResourceApiRequestArgs): Promise<any> => {
-        const requestArgs = {
-            ...args,
-            data: args?.data,
-        };
-        return new Promise((resolve, reject) => {
-            request('patch', id, requestArgs).
-                then((state: State) => {
-                    resolve(state.data);
-                }).
-                catch((error: Problem) => {
-                    processAnswerRequiredError(
-                        error,
-                        id,
-                        args,
-                        patch,
-                        getOpenAnswerRequiredDialog()).
-                        then(resolve).
-                        catch(reject);
-                });
-        });
-    }, [request]);
-    const delette = React.useCallback((id: any, args?: ResourceApiRequestArgs): Promise<void> => {
-        return new Promise((resolve, reject) => {
-            request('delete', id, { ...args }).
-                then(() => {
-                    resolve();
-                }).
-                catch((error: Problem) => {
-                    processAnswerRequiredError(
-                        error,
-                        id,
-                        args,
-                        delette,
-                        getOpenAnswerRequiredDialog()).
-                        then(resolve).
-                        catch(reject);
-                });
-        });
-    }, [request]);
-    const onChange = React.useCallback((id: any, args: ResourceApiOnChangeArgs): Promise<any> => {
-        const onChangeData = {
-            id,
-            previous: args.previous,
-            fieldName: args.fieldName,
-            fieldValue: args.fieldValue,
-        };
-        return new Promise((resolve, reject) => {
-            request('onChange', null, { ...args, data: onChangeData }).
-                then((state: State) => {
-                    resolve(state.data);
-                }).
-                catch((error: Problem) => {
-                    processAnswerRequiredError(
-                        error,
-                        id,
-                        args,
-                        onChange,
-                        getOpenAnswerRequiredDialog()).
-                        then(resolve).
-                        catch(reject);
-                });
-        });
-    }, [request]);
-    const artifacts = React.useCallback((args?: ResourceApiArtifactsArgs): Promise<ResourceApiArtifact[]> => {
-        return new Promise((resolve, reject) => {
-            request('artifacts', null, args).
-                then((state: State) => {
-                    const getActionRelFromArtifact = (artifact: any) => {
-                        if (artifact?.type === 'ACTION') {
-                            return 'exec_' + artifact.code;
-                        } else if (artifact?.type === 'REPORT') {
-                            return 'generate_' + artifact.code;
-                        } else if (artifact?.type === 'FILTER') {
-                            return 'filter_' + artifact.code;
-                        }
-                    }
-                    const artifacts = state.getEmbedded().map((e: any) => {
-                        const data = e.data;
-                        const actionRel = getActionRelFromArtifact(data);
-                        const fields = data.formClassActive ? e.action(actionRel)?.fields as any[] : undefined;
-                        const artifact = {
-                            type: data.type,
-                            code: data.code,
-                            formClassActive: data.formClassActive,
-                            fields,
-                        };
+const generateResourceApiMethods = (
+    request: Function,
+    getOpenAnswerRequiredDialog: Function
+): ResourceApiMethods => {
+    const getOne = React.useCallback(
+        (id: any, args?: ResourceApiGetOneArgs): Promise<any> => {
+            const argsData = args?.data;
+            const requestArgs = {
+                ...args,
+                data: {
+                    id,
+                    perspective: args?.perspectives,
+                    ...argsData,
+                },
+                refresh: args?.refresh ?? true,
+            };
+            return new Promise((resolve, reject) => {
+                request('getOne', null, requestArgs)
+                    .then((state: State) => {
                         if (args?.includeLinks) {
-                            return {
-                                ...artifact,
-                                '_links': processStateLinks(e.links),
-                                '_actions': processStateActions(e.actions())
-                            };
+                            resolve({
+                                ...state.data,
+                                _links: processStateLinks(state.links),
+                                _actions: processStateActions(state.actions()),
+                            });
                         } else {
-                            return artifact;
+                            resolve(state.data);
                         }
+                    })
+                    .catch((problem: Problem) => {
+                        reject(toResourceApiError(problem));
                     });
-                    resolve(artifacts);
-                }).
-                catch((problem: Problem) => {
-                    reject(toResourceApiError(problem));
-                });
-        });
-    }, [request]);
-    const artifactFormOnChange = React.useCallback((args: ResourceApiArtifactOnChangeArgs): Promise<any> => {
-        return new Promise((resolve, reject) => {
-            request('artifacts', null, args).
-                then((state: State) => {
-                    const artifactState = state.getEmbedded().find(e => e.data.type === args.type && e.data.code === args.code);
-                    if (artifactState != null) {
-                        const onChangeLink = artifactState.links.get('formOnChange');
-                        if (onChangeLink != null) {
-                            const onChangeData = {
-                                id: args.id,
-                                previous: args.previous,
-                                fieldName: args.fieldName,
-                                fieldValue: args.fieldValue,
-                            };
-                            request(onChangeLink.rel, null, { ...args, data: onChangeData }, artifactState).
-                                then((state: State) => {
-                                    const result = state.data;
-                                    resolve(result);
-                                }).
-                                catch((error: Problem) => {
-                                    processAnswerRequiredError(
-                                        error,
-                                        null,
-                                        args,
-                                        artifactFormOnChange,
-                                        getOpenAnswerRequiredDialog()).
-                                        then(resolve).
-                                        catch(reject);
-                                });
-                        }
-                    }
-                }).
-                catch((problem: Problem) => {
-                    reject(toResourceApiError(problem));
-                });
-        });
-    }, [request]);
-    const artifactFormValidate = React.useCallback((args: ResourceApiArtifactFormArgs): Promise<void> => {
-        return new Promise((resolve, reject) => {
-            request('artifacts', null, args).
-                then((state: State) => {
-                    const artifactState = state.getEmbedded().find(e => e.data.type === args.type && e.data.code === args.code);
-                    if (artifactState != null) {
-                        const validateLink = artifactState.links.get('formValidate');
-                        if (validateLink != null) {
-                            request(validateLink.rel, null, args, artifactState).
-                                then((state: State) => {
-                                    const result = state.data;
-                                    resolve(result);
-                                }).
-                                catch((problem: Problem) => {
-                                    reject(toResourceApiError(problem));
-                                });
-                        }
-                    }
-                }).
-                catch((problem: Problem) => {
-                    reject(toResourceApiError(problem));
-                });
-        });
-    }, [request]);
-    const artifactFieldOptionsFields = React.useCallback((args: ResourceApiArtifactFieldOptionsArgs): Promise<any[]> => {
-        return new Promise((resolve, reject) => {
-            request('artifacts', null, args).
-                then((state: State) => {
-                    const artifactState = state.getEmbedded().find(e => e.data.type === args.type && e.data.code === args.code);
-                    if (artifactState != null) {
-                        const fieldOptionsFindLink = artifactState.links.get('artifactFieldOptionsFind');
-                        if (fieldOptionsFindLink != null) {
-                            request(fieldOptionsFindLink.rel, null, { data: { fieldName: args.fieldName } }, artifactState).
-                                then((state: State) => {
-                                    const processedFields = processApiFields(state.action().fields);
-                                    resolve(processedFields);
-                                }).
-                                catch((problem: Problem) => {
-                                    reject(toResourceApiError(problem));
-                                });
-                        }
-                    }
-                }).
-                catch((problem: Problem) => {
-                    reject(toResourceApiError(problem));
-                });
-        });
-    }, [request]);
-    const artifactFieldOptionsFind = React.useCallback((args: ResourceApiArtifactFieldOptionsFindArgs): Promise<ResourceApiFindResponse> => {
-        return new Promise((resolve, reject) => {
-            request('artifacts', null, args).
-                then((state: State) => {
-                    const artifactState = state.getEmbedded().find(e => e.data.type === args.type && e.data.code === args.code);
-                    if (artifactState != null) {
-                        const fieldOptionsFindLink = artifactState.links.get('artifactFieldOptionsFind');
-                        if (fieldOptionsFindLink != null) {
-                            const additionalData = { fieldName: args.fieldName };
-                            request(fieldOptionsFindLink.rel, null, buildFindArgs(args, additionalData), artifactState).
-                                then((state: State) => {
-                                    const rows = state.getEmbedded().map((e: any) => {
-                                        if (args?.includeLinksInRows) {
-                                            return {
-                                                ...e.data,
-                                                '_links': processStateLinks(e.links),
-                                                '_actions': processStateActions(e.actions()),
-                                            };
-                                        } else {
-                                            return e.data;
-                                        }
-                                    });
-                                    const page = state.data.page;
-                                    resolve({ rows, page });
-                                }).
-                                catch((problem: Problem) => {
-                                    reject(toResourceApiError(problem));
-                                });
-                        }
-                    }
-                }).
-                catch((problem: Problem) => {
-                    reject(toResourceApiError(problem));
-                });
-        });
-    }, [request]);
-    const artifactAction = React.useCallback((id: any, args: ResourceApiActionArgs): Promise<any[]> => {
-        return new Promise((resolve, reject) => {
-            if (args?.code != null) {
-                const actionRel = 'exec_' + args.code;
-                request(actionRel, id, args).
-                    then((state: State) => {
-                        const result = state.data;
-                        resolve(result);
-                    }).
-                    catch((error: Problem) => {
+            });
+        },
+        [request]
+    );
+    const find = React.useCallback(
+        (args?: ResourceApiFindArgs): Promise<ResourceApiFindResponse> => {
+            return new Promise((resolve, reject) => {
+                request('find', null, buildFindArgs(args))
+                    .then((state: State) => {
+                        const rows = state.getEmbedded().map((e: any) => {
+                            if (args?.includeLinksInRows) {
+                                return {
+                                    ...e.data,
+                                    _links: processStateLinks(e.links),
+                                    _actions: processStateActions(e.actions()),
+                                };
+                            } else {
+                                return e.data;
+                            }
+                        });
+                        const page = state.data.page;
+                        resolve({ rows, page });
+                    })
+                    .catch((problem: Problem) => {
+                        reject(toResourceApiError(problem));
+                    });
+            });
+        },
+        [request]
+    );
+    const exportt = React.useCallback(
+        (args?: ResourceApiExportArgs): Promise<ResourceApiBlobResponse> => {
+            const additionalData = {
+                field: args?.fields,
+                fileType: args?.fileType,
+            };
+            return new Promise((resolve, reject) => {
+                request('export', null, buildFindArgs(args, additionalData))
+                    .then((state: State) => {
+                        resolve(stateToBlobResponse(state));
+                    })
+                    .catch((problem: Problem) => {
+                        reject(toResourceApiError(problem));
+                    });
+            });
+        },
+        [request]
+    );
+    const create = React.useCallback(
+        (args?: ResourceApiRequestArgs): Promise<any> => {
+            const requestArgs = {
+                ...args,
+                data: args?.data,
+            };
+            return new Promise((resolve, reject) => {
+                request('create', null, requestArgs)
+                    .then((state: State) => {
+                        resolve(state.data);
+                    })
+                    .catch((problem: Problem) => {
                         processAnswerRequiredError(
-                            error,
+                            problem,
                             null,
                             args,
-                            onChange,
-                            getOpenAnswerRequiredDialog()).
-                            then(resolve).
-                            catch(reject);
+                            create,
+                            getOpenAnswerRequiredDialog()
+                        )
+                            .then(resolve)
+                            .catch(reject);
                     });
-            } else {
-                reject('Action code not specified')
-            }
-        });
-    }, [request]);
-    const artifactReport = React.useCallback((id: any, args: ResourceApiReportArgs): Promise<any[] | ResourceApiBlobResponse> => {
-        return new Promise((resolve, reject) => {
-            if (args?.code != null) {
-                const reportRel = 'generate_' + args.code;
-                const reportArgs = {
-                    ...args,
-                    fileType: undefined,
-                    urlData: { fileType: args.fileType }
-                };
-                request(reportRel, id, reportArgs).
-                    then((state: State) => {
-                        if (args.fileType != null) {
-                            resolve(stateToBlobResponse(state));
-                        } else {
+            });
+        },
+        [request]
+    );
+    const update = React.useCallback(
+        (id: any, args?: ResourceApiRequestArgs): Promise<any> => {
+            const requestArgs = {
+                ...args,
+                data: args?.data,
+            };
+            return new Promise((resolve, reject) => {
+                request('update', id, requestArgs)
+                    .then((state: State) => {
+                        resolve(state.data);
+                    })
+                    .catch((problem: Problem) => {
+                        processAnswerRequiredError(
+                            problem,
+                            id,
+                            args,
+                            update,
+                            getOpenAnswerRequiredDialog()
+                        )
+                            .then(resolve)
+                            .catch(reject);
+                    });
+            });
+        },
+        [request]
+    );
+    const patch = React.useCallback(
+        (id: any, args?: ResourceApiRequestArgs): Promise<any> => {
+            const requestArgs = {
+                ...args,
+                data: args?.data,
+            };
+            return new Promise((resolve, reject) => {
+                request('patch', id, requestArgs)
+                    .then((state: State) => {
+                        resolve(state.data);
+                    })
+                    .catch((problem: Problem) => {
+                        processAnswerRequiredError(
+                            problem,
+                            id,
+                            args,
+                            patch,
+                            getOpenAnswerRequiredDialog()
+                        )
+                            .then(resolve)
+                            .catch(reject);
+                    });
+            });
+        },
+        [request]
+    );
+    const delette = React.useCallback(
+        (id: any, args?: ResourceApiRequestArgs): Promise<void> => {
+            return new Promise((resolve, reject) => {
+                request('delete', id, { ...args })
+                    .then(() => {
+                        resolve();
+                    })
+                    .catch((problem: Problem) => {
+                        processAnswerRequiredError(
+                            problem,
+                            id,
+                            args,
+                            delette,
+                            getOpenAnswerRequiredDialog()
+                        )
+                            .then(resolve)
+                            .catch(reject);
+                    });
+            });
+        },
+        [request]
+    );
+    const onChange = React.useCallback(
+        (id: any, args: ResourceApiOnChangeArgs): Promise<any> => {
+            const onChangeData = {
+                id,
+                previous: args.previous,
+                fieldName: args.fieldName,
+                fieldValue: args.fieldValue,
+            };
+            return new Promise((resolve, reject) => {
+                request('onChange', null, { ...args, data: onChangeData })
+                    .then((state: State) => {
+                        resolve(state.data);
+                    })
+                    .catch((problem: Problem) => {
+                        processAnswerRequiredError(
+                            problem,
+                            id,
+                            args,
+                            onChange,
+                            getOpenAnswerRequiredDialog()
+                        )
+                            .then(resolve)
+                            .catch(reject);
+                    });
+            });
+        },
+        [request]
+    );
+    const artifacts = React.useCallback(
+        (args?: ResourceApiArtifactsArgs): Promise<ResourceApiArtifact[]> => {
+            return new Promise((resolve, reject) => {
+                request('artifacts', null, args)
+                    .then((state: State) => {
+                        const getActionRelFromArtifact = (artifact: any) => {
+                            if (artifact?.type === 'ACTION') {
+                                return 'exec_' + artifact.code;
+                            } else if (artifact?.type === 'REPORT') {
+                                return 'generate_' + artifact.code;
+                            } else if (artifact?.type === 'FILTER') {
+                                return 'filter_' + artifact.code;
+                            }
+                        };
+                        const artifacts = state.getEmbedded().map((e: any) => {
+                            const data = e.data;
+                            const actionRel = getActionRelFromArtifact(data);
+                            const fields = data.formClassActive
+                                ? (e.action(actionRel)?.fields as any[])
+                                : undefined;
+                            const artifact = {
+                                type: data.type,
+                                code: data.code,
+                                formClassActive: data.formClassActive,
+                                fields,
+                            };
+                            if (args?.includeLinks) {
+                                return {
+                                    ...artifact,
+                                    _links: processStateLinks(e.links),
+                                    _actions: processStateActions(e.actions()),
+                                };
+                            } else {
+                                return artifact;
+                            }
+                        });
+                        resolve(artifacts);
+                    })
+                    .catch((problem: Problem) => {
+                        reject(toResourceApiError(problem));
+                    });
+            });
+        },
+        [request]
+    );
+    const artifactFormOnChange = React.useCallback(
+        (args: ResourceApiArtifactOnChangeArgs): Promise<any> => {
+            return new Promise((resolve, reject) => {
+                request('artifacts', null, args)
+                    .then((state: State) => {
+                        const artifactState = state
+                            .getEmbedded()
+                            .find((e) => e.data.type === args.type && e.data.code === args.code);
+                        if (artifactState != null) {
+                            const onChangeLink = artifactState.links.get('formOnChange');
+                            if (onChangeLink != null) {
+                                const onChangeData = {
+                                    id: args.id,
+                                    previous: args.previous,
+                                    fieldName: args.fieldName,
+                                    fieldValue: args.fieldValue,
+                                };
+                                request(
+                                    onChangeLink.rel,
+                                    null,
+                                    { ...args, data: onChangeData },
+                                    artifactState
+                                )
+                                    .then((state: State) => {
+                                        const result = state.data;
+                                        resolve(result);
+                                    })
+                                    .catch((error: Problem) => {
+                                        processAnswerRequiredError(
+                                            error,
+                                            null,
+                                            args,
+                                            artifactFormOnChange,
+                                            getOpenAnswerRequiredDialog()
+                                        )
+                                            .then(resolve)
+                                            .catch(reject);
+                                    });
+                            }
+                        }
+                    })
+                    .catch((problem: Problem) => {
+                        reject(toResourceApiError(problem));
+                    });
+            });
+        },
+        [request]
+    );
+    const artifactFormValidate = React.useCallback(
+        (args: ResourceApiArtifactFormArgs): Promise<void> => {
+            return new Promise((resolve, reject) => {
+                request('artifacts', null, args)
+                    .then((state: State) => {
+                        const artifactState = state
+                            .getEmbedded()
+                            .find((e) => e.data.type === args.type && e.data.code === args.code);
+                        if (artifactState != null) {
+                            const validateLink = artifactState.links.get('formValidate');
+                            if (validateLink != null) {
+                                request(validateLink.rel, null, args, artifactState)
+                                    .then((state: State) => {
+                                        const result = state.data;
+                                        resolve(result);
+                                    })
+                                    .catch((problem: Problem) => {
+                                        reject(toResourceApiError(problem));
+                                    });
+                            }
+                        }
+                    })
+                    .catch((problem: Problem) => {
+                        reject(toResourceApiError(problem));
+                    });
+            });
+        },
+        [request]
+    );
+    const artifactFieldOptionsFields = React.useCallback(
+        (args: ResourceApiArtifactFieldOptionsArgs): Promise<any[]> => {
+            return new Promise((resolve, reject) => {
+                request('artifacts', null, args)
+                    .then((state: State) => {
+                        const artifactState = state
+                            .getEmbedded()
+                            .find((e) => e.data.type === args.type && e.data.code === args.code);
+                        if (artifactState != null) {
+                            const fieldOptionsFindLink = artifactState.links.get(
+                                'artifactFieldOptionsFind'
+                            );
+                            if (fieldOptionsFindLink != null) {
+                                request(
+                                    fieldOptionsFindLink.rel,
+                                    null,
+                                    { data: { fieldName: args.fieldName } },
+                                    artifactState
+                                )
+                                    .then((state: State) => {
+                                        const processedFields = processApiFields(
+                                            state.action().fields
+                                        );
+                                        resolve(processedFields);
+                                    })
+                                    .catch((problem: Problem) => {
+                                        reject(toResourceApiError(problem));
+                                    });
+                            }
+                        }
+                    })
+                    .catch((problem: Problem) => {
+                        reject(toResourceApiError(problem));
+                    });
+            });
+        },
+        [request]
+    );
+    const artifactFieldOptionsFind = React.useCallback(
+        (args: ResourceApiArtifactFieldOptionsFindArgs): Promise<ResourceApiFindResponse> => {
+            return new Promise((resolve, reject) => {
+                request('artifacts', null, args)
+                    .then((state: State) => {
+                        const artifactState = state
+                            .getEmbedded()
+                            .find((e) => e.data.type === args.type && e.data.code === args.code);
+                        if (artifactState != null) {
+                            const fieldOptionsFindLink = artifactState.links.get(
+                                'artifactFieldOptionsFind'
+                            );
+                            if (fieldOptionsFindLink != null) {
+                                const additionalData = { fieldName: args.fieldName };
+                                request(
+                                    fieldOptionsFindLink.rel,
+                                    null,
+                                    buildFindArgs(args, additionalData),
+                                    artifactState
+                                )
+                                    .then((state: State) => {
+                                        const rows = state.getEmbedded().map((e: any) => {
+                                            if (args?.includeLinksInRows) {
+                                                return {
+                                                    ...e.data,
+                                                    _links: processStateLinks(e.links),
+                                                    _actions: processStateActions(e.actions()),
+                                                };
+                                            } else {
+                                                return e.data;
+                                            }
+                                        });
+                                        const page = state.data.page;
+                                        resolve({ rows, page });
+                                    })
+                                    .catch((problem: Problem) => {
+                                        reject(toResourceApiError(problem));
+                                    });
+                            }
+                        }
+                    })
+                    .catch((problem: Problem) => {
+                        reject(toResourceApiError(problem));
+                    });
+            });
+        },
+        [request]
+    );
+    const artifactAction = React.useCallback(
+        (id: any, args: ResourceApiActionArgs): Promise<any[]> => {
+            return new Promise((resolve, reject) => {
+                if (args?.code != null) {
+                    const actionRel = 'exec_' + args.code;
+                    request(actionRel, id, args)
+                        .then((state: State) => {
                             const result = state.data;
                             resolve(result);
-                        }
-                    }).
-                    catch((error: Problem) => {
-                        processAnswerRequiredError(
-                            error,
-                            null,
-                            args,
-                            onChange,
-                            getOpenAnswerRequiredDialog()).
-                            then(resolve).
-                            catch(reject);
+                        })
+                        .catch((problem: Problem) => {
+                            processAnswerRequiredError(
+                                problem,
+                                null,
+                                args,
+                                onChange,
+                                getOpenAnswerRequiredDialog()
+                            )
+                                .then(resolve)
+                                .catch(reject);
+                        });
+                } else {
+                    reject('Action code not specified');
+                }
+            });
+        },
+        [request]
+    );
+    const artifactReport = React.useCallback(
+        (id: any, args: ResourceApiReportArgs): Promise<any[] | ResourceApiBlobResponse> => {
+            return new Promise((resolve, reject) => {
+                if (args?.code != null) {
+                    const reportRel = 'generate_' + args.code;
+                    const reportArgs = {
+                        ...args,
+                        fileType: undefined,
+                        urlData: { fileType: args.fileType },
+                    };
+                    request(reportRel, id, reportArgs)
+                        .then((state: State) => {
+                            if (args.fileType != null) {
+                                resolve(stateToBlobResponse(state));
+                            } else {
+                                const result = state.data.content;
+                                resolve(result);
+                            }
+                        })
+                        .catch((problem: Problem) => {
+                            processAnswerRequiredError(
+                                problem,
+                                null,
+                                args,
+                                onChange,
+                                getOpenAnswerRequiredDialog()
+                            )
+                                .then(resolve)
+                                .catch(reject);
+                        });
+                } else {
+                    reject('Report code not specified');
+                }
+            });
+        },
+        [request]
+    );
+    const fieldOptionsFields = React.useCallback(
+        (args: ResourceApiFieldArgs): Promise<any[]> => {
+            return new Promise((resolve, reject) => {
+                request('fieldOptionsFind', null, { data: { fieldName: args.fieldName } })
+                    .then((state: State) => {
+                        const processedFields = processApiFields(state.action().fields);
+                        resolve(processedFields);
+                    })
+                    .catch((problem: Problem) => {
+                        reject(toResourceApiError(problem));
                     });
-            } else {
-                reject('Report code not specified')
-            }
-        });
-    }, [request]);
-    const fieldOptionsFields = React.useCallback((args: ResourceApiFieldArgs): Promise<any[]> => {
-        return new Promise((resolve, reject) => {
-            request('fieldOptionsFind', null, { data: { fieldName: args.fieldName } }).
-                then((state: State) => {
-                    const processedFields = processApiFields(state.action().fields);
-                    resolve(processedFields);
-                }).
-                catch((problem: Problem) => {
-                    reject(toResourceApiError(problem));
-                });
-        });
-    }, [request]);
-    const fieldOptionsFind = React.useCallback((args: ResourceApiFieldOptionsFindArgs): Promise<ResourceApiFindResponse> => {
-        return new Promise((resolve, reject) => {
-            const additionalData = { fieldName: args.fieldName };
-            request('fieldOptionsFind', null, buildFindArgs(args, additionalData)).
-                then((state: State) => {
-                    const rows = state.getEmbedded().map((e: any) => {
-                        if (args?.includeLinksInRows) {
-                            return {
-                                ...e.data,
-                                '_links': processStateLinks(e.links),
-                                '_actions': processStateActions(e.actions()),
-                            };
-                        } else {
-                            return e.data;
-                        }
+            });
+        },
+        [request]
+    );
+    const fieldOptionsFind = React.useCallback(
+        (args: ResourceApiFieldOptionsFindArgs): Promise<ResourceApiFindResponse> => {
+            return new Promise((resolve, reject) => {
+                const additionalData = { fieldName: args.fieldName };
+                request('fieldOptionsFind', null, buildFindArgs(args, additionalData))
+                    .then((state: State) => {
+                        const rows = state.getEmbedded().map((e: any) => {
+                            if (args?.includeLinksInRows) {
+                                return {
+                                    ...e.data,
+                                    _links: processStateLinks(e.links),
+                                    _actions: processStateActions(e.actions()),
+                                };
+                            } else {
+                                return e.data;
+                            }
+                        });
+                        const page = state.data.page;
+                        resolve({ rows, page });
+                    })
+                    .catch((problem: Problem) => {
+                        reject(toResourceApiError(problem));
                     });
-                    const page = state.data.page;
-                    resolve({ rows, page });
-                }).
-                catch((problem: Problem) => {
-                    reject(toResourceApiError(problem));
-                });
-        });
-    }, [request]);
-    const fieldDownload = React.useCallback((id: any, args: ResourceApiFieldArgs): Promise<ResourceApiBlobResponse> => {
-        const requestArgs = {
-            ...args,
-            data: { fieldName: args.fieldName },
-            refresh: args?.refresh ?? true,
-        };
-        return new Promise((resolve, reject) => {
-            request('fieldDownload', id, requestArgs).
-                then((state: State) => {
-                    resolve(stateToBlobResponse(state));
-                }).
-                catch((problem: Problem) => {
-                    reject(toResourceApiError(problem));
-                });
-        });
-    }, [request]);
+            });
+        },
+        [request]
+    );
+    const fieldDownload = React.useCallback(
+        (id: any, args: ResourceApiFieldArgs): Promise<ResourceApiBlobResponse> => {
+            const requestArgs = {
+                ...args,
+                data: { fieldName: args.fieldName },
+                refresh: args?.refresh ?? true,
+            };
+            return new Promise((resolve, reject) => {
+                request('fieldDownload', id, requestArgs)
+                    .then((state: State) => {
+                        resolve(stateToBlobResponse(state));
+                    })
+                    .catch((problem: Problem) => {
+                        reject(toResourceApiError(problem));
+                    });
+            });
+        },
+        [request]
+    );
+    const bulkPatch = React.useCallback(
+        (ids: any[], args: ResourceApiRequestArgs): Promise<ResourceApiBulkResponse> => {
+            const requestArgs = {
+                ...args,
+                data: {
+                    ids,
+                    type: 'PATCH',
+                    params: args.data,
+                },
+            };
+            return new Promise((resolve, reject) => {
+                request('bulk', null, requestArgs)
+                    .then((state: State) => {
+                        resolve(state.data);
+                    })
+                    .catch((problem: Problem) => {
+                        reject(toResourceApiError(problem));
+                    });
+            });
+        },
+        [request]
+    );
+    const bulkAction = React.useCallback(
+        (ids: any[], args: ResourceApiActionArgs): Promise<ResourceApiBulkResponse> => {
+            const requestArgs = {
+                ...args,
+                data: {
+                    ids,
+                    type: 'ACTION',
+                    actionCode: args.code,
+                    params: args.data,
+                },
+            };
+            return new Promise((resolve, reject) => {
+                request('bulk', null, requestArgs)
+                    .then((state: State) => {
+                        resolve(state.data);
+                    })
+                    .catch((problem: Problem) => {
+                        reject(toResourceApiError(problem));
+                    });
+            });
+        },
+        [request]
+    );
+    const bulkDelete = React.useCallback(
+        (ids: any[], args?: ResourceApiRequestArgs): Promise<ResourceApiBulkResponse> => {
+            const requestArgs = {
+                ...args,
+                data: {
+                    ids,
+                    type: 'DELETE',
+                },
+            };
+            return new Promise((resolve, reject) => {
+                request('bulk', null, requestArgs)
+                    .then((state: State) => {
+                        resolve(state.data);
+                    })
+                    .catch((problem: Problem) => {
+                        reject(toResourceApiError(problem));
+                    });
+            });
+        },
+        [request]
+    );
     return {
         getOne,
         find,
@@ -871,8 +1102,11 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
         fieldOptionsFields,
         fieldOptionsFind,
         fieldDownload,
+        bulkPatch,
+        bulkAction,
+        bulkDelete,
     };
-}
+};
 
 export const useResourceApiService = (resourceName?: string): ResourceApiService => {
     const logConsole = useLogConsole(LOG_PREFIX);
@@ -891,106 +1125,125 @@ export const useResourceApiService = (resourceName?: string): ResourceApiService
     const debugRequests = isDebugRequests();
     const currentLinks = processStateLinks(currentState?.links);
     const currentActions = processStateActions(currentState?.actions());
-    const getLink = (link?: string, id?: any): Promise<Link | undefined> => new Promise((resolve, reject) => {
-        if (link != null) {
-            if (id != null) {
-                if (currentState != null) {
-                    getPromiseFromStateLink(currentState, 'getOne', { data: { resourceId: id } }, true).
-                        then((state: State) => {
-                            resolve(state.links.get(link));
-                        }).
-                        catch(reject);
+    const getLink = (link?: string, id?: any): Promise<Link | undefined> =>
+        new Promise((resolve, reject) => {
+            if (link != null) {
+                if (id != null) {
+                    if (currentState != null) {
+                        getPromiseFromStateLink(
+                            currentState,
+                            'getOne',
+                            { data: { resourceId: id } },
+                            true
+                        )
+                            .then((state: State) => {
+                                resolve(state.links.get(link));
+                            })
+                            .catch(reject);
+                    } else {
+                        reject('[' + LOG_PREFIX + '] API not initalized');
+                    }
                 } else {
-                    reject('[' + LOG_PREFIX + '] API not initalized');
+                    return resolve(currentLinks != null ? currentLinks[link] : undefined);
                 }
             } else {
-                return resolve(currentLinks != null ? currentLinks[link] : undefined);
+                resolve(undefined);
             }
-        } else {
-            resolve(undefined);
-        }
-    });
+        });
     const currentRefresh = (args?: ResourceApiRequestArgs) => {
-        indexState != null && resourceName != null && getPromiseFromStateLink(indexState, resourceName, args, true).
-            then((state: State) => {
-                setCurrentState(state);
-                const processedFields = processApiFields(state.action('default').fields);
-                setCurrentFields(processedFields);
-                setIsCurrentLoading(false);
-                !isCurrentLoaded && setIsCurrentLoaded(true);
-            }).catch((error: Error) => {
-                setCurrentError(error);
-                setIsCurrentLoading(false);
-                !isCurrentLoaded && setIsCurrentLoaded(true);
-            });
-    }
-    React.useEffect(() => {
-        if (indexIsReady && indexState && !currentState) {
-            currentRefresh();
-        } else if (!indexIsReady && isCurrentLoaded) {
+        if (indexState != null && resourceName != null) {
             setIsCurrentLoading(true);
-            setIsCurrentLoaded(false)
+            setIsCurrentLoaded(false);
             setCurrentState(undefined);
             setCurrentFields(undefined);
             setCurrentError(undefined);
+            getPromiseFromStateLink(indexState, resourceName, args, true)
+                .then((state: State) => {
+                    setCurrentState(state);
+                    if (state.actions().length) {
+                        const processedFields = processApiFields(state.action('default').fields);
+                        setCurrentFields(processedFields);
+                    }
+                    setIsCurrentLoading(false);
+                    !isCurrentLoaded && setIsCurrentLoaded(true);
+                })
+                .catch((error: Error) => {
+                    setCurrentError(error);
+                    setIsCurrentLoading(false);
+                    !isCurrentLoaded && setIsCurrentLoaded(true);
+                });
         }
-    }, [indexIsReady]);
+    };
+    React.useEffect(() => {
+        if (indexIsReady && indexState) {
+            currentRefresh();
+        }
+    }, [indexState]);
     React.useEffect(() => {
         if (currentError) {
-            logConsole.error('Couldn\'t get API service \'' + resourceName + '\'', currentError);
+            logConsole.error("Couldn't get API service '" + resourceName + "'", currentError);
         }
     }, [currentError]);
-    const request: ResourceApiGenericRequest = React.useCallback((
-        link: string,
-        id?: any,
-        args?: ResourceApiRequestArgs,
-        state?: State): Promise<State> => {
-        return new Promise((resolve, reject) => {
-            const realState = state ?? currentState;
-            if (resourceName && !isCurrentLoading && realState) {
-                if (id != null) {
-                    getPromiseFromStateLink(realState, 'getOne', { data: { id, ...args?.getOneData } }, true).
-                        then((state: State) => {
-                            callRequestExecFn(
-                                state,
-                                link,
-                                args,
-                                resolve,
-                                reject,
-                                resourceName,
-                                id,
-                                debugRequests,
-                                logConsole);
-                        }).
-                        catch((error: Problem) => {
-                            args?.callbacks?.error?.(error);
-                            reject(error);
-                        });
+    const request: ResourceApiGenericRequest = React.useCallback(
+        (link: string, id?: any, args?: ResourceApiRequestArgs, state?: State): Promise<State> => {
+            return new Promise((resolve, reject) => {
+                const realState = state ?? currentState;
+                if (resourceName && !isCurrentLoading && realState) {
+                    if (id != null) {
+                        getPromiseFromStateLink(
+                            realState,
+                            'getOne',
+                            { data: { id, ...args?.getOneData } },
+                            true
+                        )
+                            .then((state: State) => {
+                                callRequestExecFn(
+                                    state,
+                                    link,
+                                    args,
+                                    resolve,
+                                    reject,
+                                    resourceName,
+                                    id,
+                                    debugRequests,
+                                    logConsole
+                                );
+                            })
+                            .catch((error: Problem) => {
+                                args?.callbacks?.error?.(error);
+                                reject(error);
+                            });
+                    } else {
+                        callRequestExecFn(
+                            realState,
+                            link,
+                            args,
+                            resolve,
+                            reject,
+                            resourceName,
+                            null,
+                            debugRequests,
+                            logConsole
+                        );
+                    }
                 } else {
-                    callRequestExecFn(
-                        realState,
-                        link,
-                        args,
-                        resolve,
-                        reject,
-                        resourceName,
-                        null,
-                        debugRequests,
-                        logConsole);
+                    const error = {
+                        name: 'ApiStillLoadingError',
+                        message:
+                            "Couldn't exec request to link/action '" +
+                            link +
+                            "' on resource '" +
+                            resourceName +
+                            "': API is still loading",
+                    };
+                    args?.callbacks?.error?.(error);
+                    reject(error);
                 }
-            } else {
-                const error = {
-                    name: 'ApiStillLoadingError',
-                    message: 'Couldn\'t exec request to link/action \'' + link + '\' on resource \'' + resourceName + '\': API is still loading',
-                }
-                args?.callbacks?.error?.(error);
-                reject(error);
-            }
-        });
-    }, [resourceName, debugRequests, isCurrentLoading, currentState]);
-    const resourceApiMethods = generateResourceApiMethods(
-        request,
-        getOpenAnswerRequiredDialog);
+            });
+        },
+        [resourceName, debugRequests, isCurrentLoading, currentState]
+    );
+    const resourceApiMethods = generateResourceApiMethods(request, getOpenAnswerRequiredDialog);
     return {
         isLoading: isCurrentLoading,
         isReady,
@@ -1004,7 +1257,7 @@ export const useResourceApiService = (resourceName?: string): ResourceApiService
         currentLinks,
         currentActions,
     };
-}
+};
 
 export const ResourceApiProvider = (props: ResourceApiProviderProps) => {
     const {
@@ -1012,68 +1265,75 @@ export const ResourceApiProvider = (props: ResourceApiProviderProps) => {
         defaultLanguage,
         currentLanguage: currentLanguageProp,
         onCurrentLanguageChange,
-        userSessionActive,
-        defaultUserSession,
         offlineAutoCheck,
         debug,
         debugRequests,
         debugAvailableServices,
-        children
+        children,
     } = props;
     const logConsole = useLogConsole(LOG_PREFIX);
     const authContext = useOptionalAuthContext();
     const isAuthReady = authContext?.isReady;
     const isAuthenticated = authContext?.isAuthenticated;
+    const bearerTokenActive = authContext?.bearerTokenActive;
     const getToken = authContext?.getToken;
     const kettingClientRef = React.useRef<Client>(undefined);
     const openAnswerRequiredDialogRef = React.useRef<OpenAnswerRequiredDialogFn>(undefined);
-    const [userSession, setUserSession] = React.useState<any | undefined>(defaultUserSession);
-    const [currentLanguage, setCurrentLanguage] = useControlledUncontrolledState<string | undefined>(
-        defaultLanguage,
-        currentLanguageProp,
-        onCurrentLanguageChange);
+    const [httpHeaders, setHttpHeaders] = React.useState<Record<string, string>[]>();
+    const [currentLanguage, setCurrentLanguage] = useControlledUncontrolledState<
+        string | undefined
+    >(defaultLanguage, currentLanguageProp, onCurrentLanguageChange);
     const [isIndexLoading, setIsIndexLoading] = React.useState<boolean>(true);
     const [indexState, setIndexState] = React.useState<State | undefined>();
     const [indexError, setIndexError] = React.useState<Error | undefined>();
     const [offline, setOffline] = React.useState<boolean>(false);
     const indexPath = new URL(apiUrl).pathname;
-    const refreshKettingClient = (userSession: any, currentLanguage: string | undefined) => {
+    const indexPathWithoutApi = indexPath.endsWith('/api') ? indexPath.slice(0, -4) : indexPath;
+    const refreshKettingClient = (
+        currentLanguage: string | undefined,
+        currentHttpHeaders: Record<string, string>[] | undefined
+    ) => {
         const kettingClient = new Client(apiUrl);
         kettingClient.use((request, next) => {
             // Crear una nova instància de Request amb les propietats modificades
             const newRequest = new Request(request, {
                 credentials: 'include', // Afegir el suport per a cookies
             });
-
             // Actualitzar les capçaleres
             const token = getToken?.();
-            if (isAuthenticated && token) {
+            if (isAuthenticated && bearerTokenActive && token) {
                 newRequest.headers.set('Authorization', 'Bearer ' + token);
-            }
-            if (userSession && Object.keys(userSession).length > 0) {
-                newRequest.headers.set('Bb-Session', JSON.stringify(userSession));
             }
             if (currentLanguage && currentLanguage.length) {
                 newRequest.headers.set('Accept-Language', currentLanguage);
             }
+            if (currentHttpHeaders && Object.keys(currentHttpHeaders).length > 0) {
+                currentHttpHeaders.forEach((e) => {
+                    Object.entries(e).forEach(([key, value]) => newRequest.headers.set(key, value));
+                });
+            }
             return next(newRequest);
         });
         kettingClientRef.current = kettingClient;
-    }
+    };
     const refreshApiIndex = React.useCallback(() => {
         if (kettingClientRef.current) {
             setIsIndexLoading(true);
             setIndexError(undefined);
             if (debug) {
-                logConsole.debug((!indexState ? 'Connecting' : 'Reconnecting') + ' to API URL', indexPath);
+                logConsole.debug(
+                    (!indexState ? 'Connecting' : 'Reconnecting') + ' to API URL',
+                    indexPath
+                );
             }
             setIndexState(undefined);
-            getPromiseFromResourceLink(kettingClientRef.current.go(indexPath), undefined, true).
-                then((response: State) => {
+            getPromiseFromResourceLink(kettingClientRef.current.go(indexPath), undefined, true)
+                .then((response: State) => {
                     setIndexState(response);
                     setIsIndexLoading(false);
                     setOffline(false);
-                }).catch((error: Error) => {
+                })
+                .catch((error: Error) => {
                     setIndexError(error);
                     setIsIndexLoading(false);
                     setOffline(true);
@@ -1082,9 +1342,16 @@ export const ResourceApiProvider = (props: ResourceApiProviderProps) => {
     }, []);
     const requestHref = React.useCallback((href: string, templateData?: any): Promise<State> => {
         if (kettingClientRef.current) {
-            const isEmptyTemplateData = templateData == null || Object.keys(templateData).length === 0;
-            const processedHref = !isEmptyTemplateData ? parseTemplate(href).expand(templateData) : href;
-            return getPromiseFromResourceLink(kettingClientRef.current.go(processedHref), undefined, true);
+            const isEmptyTemplateData =
+                templateData == null || Object.keys(templateData).length === 0;
+            const processedHref = !isEmptyTemplateData
+                ? parseTemplate(href).expand(templateData)
+                : href;
+            return getPromiseFromResourceLink(
+                kettingClientRef.current.go(processedHref),
+                undefined,
+                true
+            );
         } else {
             throw new Error('Ketting client not initialized');
         }
@@ -1093,25 +1360,30 @@ export const ResourceApiProvider = (props: ResourceApiProviderProps) => {
         if (offlineAutoCheck && !isIndexLoading && (indexState || indexError)) {
             const timeoutFn = () => {
                 if (kettingClientRef.current) {
-                    getPromiseFromResourceLink(kettingClientRef.current.go(indexPath + '/ping'), undefined, true).then(() => {
-                        setOffline(false);
-                        !indexState && refreshApiIndex();
-                    }).catch(() => {
-                        setOffline(true);
-                    });
+                    getPromiseFromResourceLink(
+                        kettingClientRef.current.go(indexPathWithoutApi + '/ping'),
+                        undefined,
+                        true
+                    )
+                        .then(() => {
+                            setOffline(false);
+                            !indexState && refreshApiIndex();
+                        })
+                        .catch(() => {
+                            setOffline(true);
+                        });
                 }
-            }
+            };
             const intervalId = setInterval(timeoutFn, OFFLINE_CHECK_TIMEOUT);
-            return () => intervalId ? clearInterval(intervalId) : undefined;
+            return () => (intervalId ? clearInterval(intervalId) : undefined);
         }
     }, [isIndexLoading, indexState, indexError, offlineAutoCheck]);
     React.useEffect(() => {
-        const sessionInitialized = userSessionActive ? userSession != null : true;
-        if (sessionInitialized && (authContext == null || isAuthReady)) {
-            refreshKettingClient(userSession, currentLanguage);
+        if (authContext == null || isAuthReady) {
+            refreshKettingClient(currentLanguage, httpHeaders);
             refreshApiIndex();
         }
-    }, [isAuthReady, currentLanguage, userSession]);
+    }, [isAuthReady, currentLanguage, httpHeaders]);
     React.useEffect(() => {
         if (indexState && debug) {
             debugAvailableServices && logConsole.debug('Resource API services from index:');
@@ -1126,32 +1398,27 @@ export const ResourceApiProvider = (props: ResourceApiProviderProps) => {
     const isDebugRequests = React.useCallback(() => {
         return (debug == null && debugRequests != null && debugRequests) || debug;
     }, []);
-    const setUserSessionAttributes = (attributeValuePairs: ResourceApiUserSessionValuePair[]): boolean => {
-        const changedPairs = attributeValuePairs?.filter(p => p.value !== userSession?.[p.attribute]);
-        if (changedPairs?.length) {
-            const changes: any = {};
-            changedPairs.forEach(c => changes[c.attribute] = c.value);
-            setUserSession((s: any) => ({ ...s, ...changes }));
-            refreshKettingClient({ ...userSession, ...changes }, currentLanguage);
-            return true;
-        } else {
-            return false;
-        }
-    }
-    const clearUserSession = React.useCallback(() => {
-        setUserSession({});
-        refreshApiIndex();
-    }, []);
-    const setOpenAnswerRequiredDialog = React.useCallback((oarDialog: OpenAnswerRequiredDialogFn) => {
-        openAnswerRequiredDialogRef.current = oarDialog;
-    }, []);
+    const setOpenAnswerRequiredDialog = React.useCallback(
+        (oarDialog: OpenAnswerRequiredDialogFn) => {
+            openAnswerRequiredDialogRef.current = oarDialog;
+        },
+        []
+    );
     const getOpenAnswerRequiredDialog = React.useCallback(() => {
         return openAnswerRequiredDialogRef.current;
     }, []);
     const setCurrentLanguageInternal = (currentLanguage?: string) => {
-        refreshKettingClient(userSession, currentLanguage);
         setCurrentLanguage(currentLanguage);
-    }
+    };
+    const setHttpHeadersInternal = (currentHttpHeaders?: Record<string, string>[]) => {
+        // Només canviam l'estat si les capçaleres que volem establir son diferents
+        if (JSON.stringify(httpHeaders) === JSON.stringify(currentHttpHeaders)) {
+            return;
+        }
+        // Si no forçam l'estat d'índex carregant, pot ser que es faci alguna petició a l'API REST amb les capçaleres antigues.
+        setIsIndexLoading(true);
+        setHttpHeaders(currentHttpHeaders);
+    };
     const isReady = !isIndexLoading && !indexError && !offline;
     const context = {
         isLoading: isIndexLoading,
@@ -1160,20 +1427,16 @@ export const ResourceApiProvider = (props: ResourceApiProviderProps) => {
         offline,
         indexState,
         indexError,
-        userSession,
         currentLanguage,
         refreshApiIndex,
         getKettingClient,
         requestHref,
         isDebugRequests,
-        setUserSession,
-        setUserSessionAttributes,
-        clearUserSession,
         setCurrentLanguage: setCurrentLanguageInternal,
+        httpHeaders,
+        setHttpHeaders: setHttpHeadersInternal,
         setOpenAnswerRequiredDialog,
         getOpenAnswerRequiredDialog,
     };
-    return <ResourceApiContext.Provider value={context}>
-        {children}
-    </ResourceApiContext.Provider>;
-}
+    return <ResourceApiContext.Provider value={context}>{children}</ResourceApiContext.Provider>;
+};

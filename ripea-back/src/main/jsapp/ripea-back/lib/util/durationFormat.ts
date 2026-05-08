@@ -1,4 +1,5 @@
-const isoDurationRegex = /(-)?P(?:([.,\d]+)Y)?(?:([.,\d]+)M)?(?:([.,\d]+)W)?(?:([.,\d]+)D)?T(?:([.,\d]+)H)?(?:([.,\d]+)M)?(?:([.,\d]+)S)?/;
+const isoDurationRegex =
+    /(-)?P(?:([.,\d]+)Y)?(?:([.,\d]+)M)?(?:([.,\d]+)W)?(?:([.,\d]+)D)?T(?:([.,\d]+)H)?(?:([.,\d]+)M)?(?:([.,\d]+)S)?/;
 
 export const parseIsoDuration = (isoDuration: string) => {
     const matches = isoDuration?.match(isoDurationRegex);
@@ -18,14 +19,14 @@ export const parseIsoDuration = (isoDuration: string) => {
     } else {
         return null;
     }
-}
+};
 
 const processDuration = (duration: any) => {
     processDurationField(duration, 'years', 'months', 12);
     processDurationField(duration, 'days', 'hours', 24);
     processDurationField(duration, 'hours', 'minutes', 60);
     processDurationField(duration, 'minutes', 'seconds', 60);
-}
+};
 
 const processDurationField = (duration: any, bigField: string, smallField: string, num: number) => {
     const div = Math.floor(duration[smallField] / num);
@@ -34,4 +35,4 @@ const processDurationField = (duration: any, bigField: string, smallField: strin
         duration[bigField] = duration[bigField] + div;
         duration[smallField] = remainder;
     }
-}
+};

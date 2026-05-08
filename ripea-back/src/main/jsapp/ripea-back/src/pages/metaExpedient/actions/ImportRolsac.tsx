@@ -1,7 +1,7 @@
-import {MuiDataGridApi, MuiFormDialogApi} from "reactlib";
-import {Grid2 as Grid} from "@mui/material";
+import {MuiDataGridApi, useMuiFormDialogApiRef} from "reactlib";
+import {Grid} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
-import {MutableRefObject, useRef} from "react";
+import {RefObject} from "react";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 
@@ -28,14 +28,14 @@ const ImportRolsac = (props: any) => {
     </FormActionDialog>
 }
 
-export const useImportRolsac = (apiGridRef:MutableRefObject<MuiDataGridApi>) => {
-    const apiRef = useRef<MuiFormDialogApi>();
+export const useImportRolsac = (apiGridRef:RefObject<MuiDataGridApi>) => {
+    const apiRef = useMuiFormDialogApiRef();
 
     const handleShow = () :void => {
         apiRef.current?.show?.()
     }
     const onSuccess = (response:any) :void => {
-        apiGridRef.current?.showCreateDialog(undefined, response)
+        apiGridRef.current?.triggerCreate(undefined, response)
     }
 
     return {

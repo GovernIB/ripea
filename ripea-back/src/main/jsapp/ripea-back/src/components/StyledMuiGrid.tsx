@@ -1,12 +1,11 @@
 import React, {useEffect, useMemo, useState} from "react";
 import {Button, Icon, Tooltip, Typography} from "@mui/material";
-import {GridSlots, useGridApiRef as useMuiDatagridApiRef} from "@mui/x-data-grid-pro";
+import {useGridApiRef as useMuiDatagridApiRef} from "@mui/x-data-grid-pro";
 import {MuiDataGridProps, MuiGrid, useMuiDataGridApiRef} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {useUserSession} from "./Session.tsx";
 import MassiveActionSelector, {MassiveActionProps} from "./MassiveActionSelector.tsx";
-import {DraggableGridRow, DraggableGridRowHandler} from "./DraggableContext.tsx";
-import {DndContext} from "@dnd-kit/core";
+import {toSelectionModel, fromSelectionModel, EMPTY_SELECTION_MODEL} from "../util/selectionModelUtils";
 
 export const ToolbarButton = (props:any) => {
     const { title, icon, hidden, children, ...other } = props;
@@ -31,7 +30,12 @@ export const ToolbarButton = (props:any) => {
     </Tooltip>
 }
 
-type StyledMuiGridProps = MuiDataGridProps & {
+type StyledMuiGridProps = Omit<MuiDataGridProps,
+    'rowSelectionModel'
+    | 'onRowSelectionModelChange'
+    | 'readOnly'
+    | 'paginationActive'
+> & {
     toolbarCreateTitle?: string,
     toolbarMassiveActions?: MassiveActionProps[],
     rowProps?: (row:any) => any,
@@ -40,33 +44,13 @@ type StyledMuiGridProps = MuiDataGridProps & {
     onRefresh?: () => any,
     disabledMassiveDefSelector?: boolean,
     hiddenMassiveDefSelector?: boolean,
-    onDragEnd?: ( event:any ) => void,
     toolbarShowCreate?: boolean,
     toolbarShowQuickFilter?: boolean,
-}
-
-export const DndMuiGrid = (props:StyledMuiGridProps) => {
-    const {onDragEnd, ...other} = props
-    const dndEnabled = onDragEnd != null && !other?.readOnly
-
-    const additionalColumns:any[] = useMemo(()=> [
-        ...props.columns,
-        {
-            renderCell: () => <DraggableGridRowHandler />,
-            flex: 0.1
-        }
-    ], [props.columns])
-
-    if (!dndEnabled) return <StyledMuiGrid {...other}/>;
-
-    return <DndContext onDragEnd={onDragEnd}><StyledMuiGrid
-        {...other}
-        rowActionsColumnIndex={-1}
-        columns={additionalColumns}
-        slots={{
-            row: DraggableGridRow as GridSlots['row'],
-        }}
-    /></DndContext>;
+    staticSortModel?: any[],
+    rowSelectionModel?: any[],
+    onRowSelectionModelChange?: (ids:any[], detail:any) => void,
+    paginationActive?: boolean,
+    readOnly?: boolean,
 }
 
 const StyledMuiGrid = (props:StyledMuiGridProps) => {
@@ -89,9 +73,11 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
         toolbarMassiveActions,
         selectionActive,
         staticSortModel,
+        paginationActive = true,
         readOnly,
         onRowsChange,
         onRowCountChange,
+        rowSelectionModel: rowSelectionModelProp,
         onRowSelectionModelChange,
         rowProps,
         formInitOnChange,
@@ -101,7 +87,7 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
         onRefresh,
         disabledMassiveDefSelector = false,
         hiddenMassiveDefSelector = false,
-        toolbarShowCreate = false,
+        toolbarShowCreate = true,
         toolbarShowQuickFilter = false,
         ...others
     } = props
@@ -113,10 +99,10 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
         apiRef?.current?.refresh?.();
     }
     const create = () => {
-        apiRef?.current?.showCreateDialog?.();
+        apiRef?.current?.triggerCreate?.();
     }
     const setGridSelectedRows = (value:any) => {
-        datagridApiRef?.current?.setRowSelectionModel?.(value)
+        datagridApiRef?.current?.setRowSelectionModel?.(toSelectionModel(value))
     }
 
     const toolbarElements = [
@@ -143,7 +129,7 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
         {
             position: 3,
             element: <ToolbarButton title={t('common.create')} icon={'add'} onClick={create} color={'primary'}>{toolbarCreateTitle}</ToolbarButton>,
-            hidden: toolbarHideCreate || readOnly,
+            hidden: toolbarHideCreate || !toolbarShowCreate || readOnly,
         },
         ...(toolbarElementsWithPositions ?? []),
     ]
@@ -158,7 +144,7 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
         if (datagridApiRef.current && Object.keys(datagridApiRef.current).length > 0 && rowExpansionChange) {
             datagridApiRef.current.subscribeEvent('rowExpansionChange', rowExpansionChange);
         }
-    }, [datagridApiRef.current]);
+    }, [datagridApiRef]);
 
     // Custom row styling with colored bar
     const getRowClassName = (params: any) :string =>
@@ -187,11 +173,11 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
         return user?.conf?.numElementsPagina != null
             ? {
                 getRowHeight: () => 'auto',
-                autoHeight: true as const,
-                paginationModel: {page: 0, pageSize: +user?.conf?.numElementsPagina},
+                autoHeight: true,
+                defaultPaginationModel: {page: 0, pageSize: +user?.conf?.numElementsPagina},
                 pageSizeOptions: [10, 20, 50, 100, 250],
             }
-            : {}
+            : {autoPageSize: true}
     }, [user?.conf?.numElementsPagina])
 
     return <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
@@ -201,13 +187,11 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
             resourceName={resourceName}
             filter={filter}
             namedQueries={namedQueries}
-            // autoHeight
-            key={user?.conf?.numElementsPagina}
-            paginationActive
+            paginationActive={paginationActive ?true :undefined}
             titleDisabled
             disableColumnMenu
             disableColumnSorting={!!staticSortModel}
-            staticSortModel={staticSortModel}
+            fixedSortModel={staticSortModel}
 
             apiRef={apiRef}
             datagridApiRef={datagridApiRef}
@@ -215,16 +199,18 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
             getRowClassName={getRowClassName}
             onRowsChange={(rows, info) => {
                 setGridRows([...rows]);
-                setGridSelectedRows(others?.rowSelectionModel ?? [])
+                setGridSelectedRows(toSelectionModel(rowSelectionModelProp))
                 onRowsChange?.(rows, info);
                 onRowCountChange?.(info?.totalElements)
             }}
+            rowSelectionModel={rowSelectionModelProp != null ? toSelectionModel(rowSelectionModelProp) : EMPTY_SELECTION_MODEL}
             onRowSelectionModelChange={(newSelection, details) => {
-                setSelectedRows([...newSelection]);
-                onRowSelectionModelChange?.(newSelection, details);
+                const ids = fromSelectionModel(newSelection);
+                setSelectedRows(ids);
+                onRowSelectionModelChange?.(ids, details);
             }}
 
-            selectionActive={selectionActive || (!!toolbarMassiveActions && !readOnly)}
+            selectionActive={(selectionActive || (!!toolbarMassiveActions && !readOnly)) ?true :undefined}
             checkboxSelection={selectionActive || (!!toolbarMassiveActions && !readOnly)}
             keepNonExistentRowsSelected={selectionActive || (!!toolbarMassiveActions && !readOnly)}
 
@@ -237,13 +223,13 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
             ]}
 
             toolbarHideRefresh
-            toolbarHideCreate={!toolbarShowCreate ?true :undefined}
+            toolbarHideCreate
             // toolbarHideExport
             toolbarHideQuickFilter={!toolbarShowQuickFilter ?true :undefined}
             toolbarElementsWithPositions={toolbarElements}
             rowHideUpdateButton
             rowHideDeleteButton
-            readOnly={readOnly}
+            readOnly={readOnly ?true :undefined}
 
             {...others}
             {...paginationProps}

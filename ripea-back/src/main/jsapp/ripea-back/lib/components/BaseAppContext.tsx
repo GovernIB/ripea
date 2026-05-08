@@ -1,7 +1,6 @@
 import React from 'react';
-import { PersistentStateReturned } from '../util/usePersistentState';
 import { FormFieldCustomProps } from './form/FormField';
-import { ResourceApiUserSessionValuePair } from './ResourceApiContext';
+import { DetailFieldCustomProps } from './detail/DetailField';
 
 export interface RouterNavigateFunction {
     (to: any, options?: any): void;
@@ -13,11 +12,22 @@ export type TemporalMessageShowFn = (
     title: string | null,
     message: string,
     severity?: TemporalMessageSeverity,
-    additionalComponents?: React.ReactElement[]) => void;
+    additionalComponents?: React.ReactElement[]
+) => void;
 
 export type DialogVariant = 'text' | 'outlined' | 'contained';
-export type ContentDialogShowFn = (title: string | null, content: React.ReactElement, dialogButtons?: DialogButton[], componentProps?: any) => Promise<any>;
-export type MessageDialogShowFn = (title: string | null, message: string | React.ReactElement, dialogButtons?: DialogButton[], componentProps?: any) => Promise<string>;
+export type ContentDialogShowFn = (
+    title: string | null,
+    content: React.ReactElement,
+    dialogButtons?: DialogButton[],
+    componentProps?: any
+) => Promise<any>;
+export type MessageDialogShowFn = (
+    title: string | null,
+    message: string | React.ReactElement,
+    dialogButtons?: DialogButton[],
+    componentProps?: any
+) => Promise<string>;
 export type DialogButton = {
     value: any;
     text: string;
@@ -26,33 +36,30 @@ export type DialogButton = {
 };
 
 export type BaseAppContextType = {
+    code: string;
     getFormFieldComponent: (type?: string) => React.FC<FormFieldCustomProps> | undefined;
+    getDetailFieldComponent: (type?: string) => React.FC<DetailFieldCustomProps> | undefined;
     setMarginsDisabled: (marginsDisabled: boolean) => void;
     contentExpandsToAvailableHeight: boolean;
     setContentExpandsToAvailableHeight: (expand: boolean) => void;
     getLinkComponent: () => any;
     goBack: (fallback?: string) => void;
     navigate: RouterNavigateFunction;
+    useBlocker: ((shouldBlock: boolean | ((args: any) => boolean)) => void) | undefined;
     useLocationPath: () => string;
     anyHistoryEntryExist: () => boolean;
+    topLevelRouteChanged: boolean;
     setMessageDialogShow: (fn: MessageDialogShowFn) => void;
     messageDialogShow: MessageDialogShowFn;
     setTemporalMessageShow: (fn: TemporalMessageShowFn) => void;
     temporalMessageShow: TemporalMessageShowFn;
-    userSession: any | undefined;
-    setUserSessionAttribute: (attribute: string, value: any) => boolean;
-    setUserSessionAttributes: (attributeValuePairs: ResourceApiUserSessionValuePair[]) => boolean;
     currentLanguage: string | undefined;
     setCurrentLanguage: (lang?: string | undefined) => void;
     t: (key: string, params?: any) => any;
-    persistentStateReady: boolean;
-    persistentStateGet: (field?: string) => any;
-    persistentStateSet: (field: string, value: any) => void;
-    persistentStateRemove: (field: string) => void;
     useDrag?: (fn: () => any, deps?: unknown[]) => any;
     useDrop?: (fn: () => any, deps?: unknown[]) => any;
     saveAs?: (data: Blob | string, filename?: string) => void;
-} & PersistentStateReturned;
+};
 
 export const BaseAppContext = React.createContext<BaseAppContextType | undefined>(undefined);
 export const useBaseAppContext = () => {
@@ -61,10 +68,10 @@ export const useBaseAppContext = () => {
         throw new Error('useAppContext must be used within an AppProvider');
     }
     return context;
-}
+};
 
 export const useOptionalBaseAppContext = (): BaseAppContextType | undefined => {
     return React.useContext(BaseAppContext);
-}
+};
 
 export default BaseAppContext;

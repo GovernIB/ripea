@@ -1,6 +1,5 @@
-import {useRef} from "react";
-import {Grid2 as Grid} from "@mui/material";
-import {MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
+import {Grid} from "@mui/material";
+import {useMuiFormDialogApiRef, useBaseAppContext, useFormContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 import GridFormField from "../../../components/GridFormField.tsx";
@@ -39,7 +38,7 @@ const CanviTipus = (props:any) => {
 
 const useCanviTipus = (entity:any, refresh?: () => void) => {
     const { t } = useTranslation();
-    const apiRef = useRef<MuiFormDialogApi>();
+    const apiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow} = useBaseAppContext();
 
     const handleMassiveShow = (ids:any[]) :void => {

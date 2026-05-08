@@ -2,7 +2,7 @@ import * as React from 'react';
 import DOMPurify from 'dompurify';
 import {
     Badge,
-    Grid2 as Grid,
+    Grid,
     Button,
     Icon,
     IconButton,

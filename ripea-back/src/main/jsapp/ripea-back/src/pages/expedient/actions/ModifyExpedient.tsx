@@ -1,5 +1,4 @@
-import {MuiFormDialog, MuiFormDialogApi, useBaseAppContext} from "reactlib";
-import {useRef} from "react";
+import {MuiFormDialog, useMuiFormDialogApiRef, useBaseAppContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {ExpedientGridForm} from "../ExpedientGrid.tsx";
 
@@ -23,7 +22,7 @@ export const ModifyExpedient = (props: { apiRef:any }) => {
 
 const useModifyExpedient = (refresh?: () => void) => {
     const { t } = useTranslation();
-    const apiRef = useRef<MuiFormDialogApi>();
+    const apiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow} = useBaseAppContext();
 
     const handleShow = (id:any) :void => {

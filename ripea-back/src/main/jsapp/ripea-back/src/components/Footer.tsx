@@ -89,9 +89,9 @@ export const Footer: React.FC<AppFootProps> = (props) => {
                     ({buildTimestamp} | Revisió: {scmRevision})
                 </span>
             </Typography>
-            <Link onClick={()=>navigate('/accessibilitat')} color={'#F6F6F6'} variant={'body2'}>{t('navigate.accessibilitat')}</Link>
+            <Link onClick={()=>navigate('/accessibilitat')} color={'#F6F6F6'} variant={'body2'} sx={{cursor: 'pointer'}}>{t('navigate.accessibilitat')}</Link>
             {logos && logos.map((logo) =>
-                <Box sx={{ mr: 0, pt: 0, pr: 0, height: '36px', cursor: 'pointer', ...logoStyle }} key={logo}>
+                <Box sx={{ ml: '10px', pt: 0, pr: 0, height: '36px', ...logoStyle }} key={logo}>
                     <img src={logo} alt="foot_logo" style={{maxHeight: '36px'}}/>
                 </Box>)
             }

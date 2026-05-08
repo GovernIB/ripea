@@ -1,5 +1,5 @@
-import {useEffect, useRef, useState} from "react";
-import {MuiFormDialogApi, useBaseAppContext, useFormContext,} from "reactlib";
+import {useEffect, useState} from "react";
+import {useMuiFormDialogApiRef, useBaseAppContext, useFormContext,} from "reactlib";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import ContingutIcon from "../../contingut/details/ContingutIcon.tsx";
 import {FormReportDialog} from "../../../components/FormActionDialog.tsx";
@@ -73,8 +73,9 @@ const DescargarDocumentsForm = () => {
                 },
             }}
             treeData={true}
-            treeDataAdditionalRows={() => {
-                const additionalRows :any[] = [];
+            rowsTransformer={(_rows: any) => {
+                if (!_rows) return [];
+                const additionalRows: any[] = _rows;
                 for (const contingut of [...(carpetes ?? []), ...(expedients ?? [])]) {
                     if (apiRef?.current?.getId() != contingut.id && !additionalRows.map((b) => b.id).includes(contingut.id)) {
                         additionalRows.push(contingut)
@@ -120,7 +121,7 @@ const DescargarDocuments = (props:any) => {
 
 const useDescargarDocuments = () => {
     const { t } = useTranslation();
-    const apiRef = useRef<MuiFormDialogApi>();
+    const apiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow} = useBaseAppContext();
 
     const handleShow = (id:any) :void => {

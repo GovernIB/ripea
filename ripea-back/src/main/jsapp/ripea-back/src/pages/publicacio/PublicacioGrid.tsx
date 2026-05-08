@@ -1,4 +1,4 @@
-import {Grid2 as Grid} from "@mui/material";
+import {Grid} from "@mui/material";
 import * as builder from "../../util/springFilterUtils.ts";
 import {formatDate} from "../../util/dateUtils.ts";
 import GridFormField from "../../components/GridFormField.tsx";

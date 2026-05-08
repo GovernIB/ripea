@@ -2,7 +2,7 @@ import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 import {GridPage, useBaseAppContext, useResourceApiService} from 'reactlib';
 import {useState, useEffect} from "react";
-import {Typography, Grid2 as Grid, Icon, IconButton, Link, Alert, Button, Box} from '@mui/material';
+import {Typography, Grid, Icon, IconButton, Link, Alert, Button, Box} from '@mui/material';
 import {formatDate} from '../../../util/dateUtils.ts';
 import TabComponent from "../../../components/TabComponent.tsx";
 import InteressatsGrid from "../../interessats/InteressatsGrid.tsx";
@@ -67,7 +67,7 @@ const ExpedientsRelacionats = (props:any) => {
     }, [apiIsReady, expedient]);
 
     return <Load value={relacionats.length > 0} noEffect>
-        <Grid size={12} p={1} my={2}>
+        <Grid size={12} p={1} my={1}>
         <DetailCard title={t('page.contingut.action.importarExpedient.title')} display={'flex'} flexDirection={'column'} sx={{ px: 1 }} hidden={relacionats?.length==0}>
             {
                 relacionats?.map((relacionat:any) =>
@@ -141,7 +141,7 @@ const ExpedientAlert = (props:any) => {
                        <Button sx={{py:0}}
                        onClick={()=>agafar(expedient?.id, expedient)} variant="outlined">
                            <Icon>lock</Icon>
-						   <Typography variant={"subtitle2"}>{t('page.expedient.action.agafar.label')}</Typography>
+						   <Typography variant={"subtitle2"} component="span">{t('page.expedient.action.agafar.label')}</Typography>
                        </Button>
                    }
             >{t('page.expedient.alert.owner')}</Alert>
@@ -158,7 +158,7 @@ const ExpedientAlert = (props:any) => {
                        <Button sx={{py: 0}} variant="outlined"
                                onClick={() => handelAlert(expedient?.id, expedient)}>
                             <Icon>search</Icon>
-                           <Typography variant={"subtitle2"}>{t('common.consult')}</Typography>
+                           <Typography variant={"subtitle2"} component="span">{t('common.consult')}</Typography>
                        </Button>
                    }
             >{t('page.expedient.alert.alert')}</Alert>
@@ -169,7 +169,7 @@ const ExpedientAlert = (props:any) => {
                        <Button sx={{py: 0}} variant="outlined"
                                onClick={() => hanldeErrorValidacio(expedient?.id, expedient)}>
                             <Icon>search</Icon>
-                           <Typography variant={"subtitle2"}>{t('common.consult')}</Typography>
+                           <Typography variant={"subtitle2"} component="span">{t('common.consult')}</Typography>
                        </Button>
                    }
             >{t('page.expedient.alert.validation')}</Alert>
@@ -284,10 +284,10 @@ const Expedient = () => {
     const headerMain = <>
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Icon sx={{ fontSize: '2rem' }}>{icons.expedient}</Icon>
-            <Typography variant="h4" sx={{ display: 'flex' }}>{expedient?.nom}</Typography>
+            <Typography variant="h4" component="h1" sx={{ display: 'flex' }}>{expedient?.nom}</Typography>
         </Box>
         <Box>
-            <Typography variant={"subtitle1"} sx={{border}} px={2} hidden={!expedient?.agafatPer}>
+            <Typography variant={"subtitle1"} component="p" sx={{border}} px={2} hidden={!expedient?.agafatPer}>
                 {t('page.expedient.title')} {t('page.expedient.detall.agafatPer')}: {expedient?.agafatPer?.description}
                 {expedient?.agafatPer?.id == user?.codi &&
                     <IconButton aria-label="lock_open" color={"inherit"} onClick={() => alliberar(id, expedient)} title={t('page.expedient.action.lliberar.label')}>

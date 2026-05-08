@@ -1,6 +1,6 @@
-import {useRef, useState} from "react";
-import {Grid2 as Grid} from "@mui/material";
-import {useBaseAppContext, MuiFormDialogApi } from "reactlib";
+import {useState} from "react";
+import {Grid} from "@mui/material";
+import {useBaseAppContext, useMuiFormDialogApiRef } from "reactlib";
 import {useTranslation} from "react-i18next";
 import {CardData} from "../../../components/CardData.tsx";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
@@ -69,7 +69,7 @@ export const Actualitzar = (props: any) => {
 
 export const useActualitzar = (refresh?: () => void) => {
     const { t } = useTranslation();
-    const apiRef = useRef<MuiFormDialogApi>();
+    const apiRef = useMuiFormDialogApiRef();
     const [disabled, setDisabled] = useState<boolean>(false);
     const {temporalMessageShow} = useBaseAppContext();
 

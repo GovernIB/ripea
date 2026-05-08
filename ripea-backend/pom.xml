@@ -69,11 +69,6 @@
 			<artifactId>keycloak-core</artifactId>
 		</dependency-->
 		<dependency>
-			<groupId>javax.ejb</groupId>
-			<artifactId>javax.ejb-api</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<scope>provided</scope>
@@ -98,6 +93,33 @@
 			<groupId>${project.groupId}</groupId>
 			<artifactId>ripea-plugin-intf</artifactId>
 			<version>${project.version}</version>
-		</dependency>		
+		</dependency>
 	</dependencies>
+	<profiles>
+		<profile>
+			<id>ide</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>javax.ejb</groupId>
+					<artifactId>javax.ejb-api</artifactId>
+				</dependency>
+			</dependencies>
+		</profile>
+		<profile>
+			<id>jboss</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>javax.ejb</groupId>
+					<artifactId>javax.ejb-api</artifactId>
+					<scope>provided</scope>
+				</dependency>
+			</dependencies>
+		</profile>
+	</profiles>
 </project>

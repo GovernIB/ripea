@@ -460,39 +460,14 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 	public DocumentResource update(Long id, DocumentResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotFoundException {
     	try {
     		DocumentEntity documentActual = documentRepository.findById(resource.getId()).get();
-    		if (resource.isOrdrePatch()) {
-    			DocumentResourceEntity documentResourceActual = documentResourceRepository.findById(resource.getId()).get();
-    			Long reorderPreviousParentId = reorderGetParentId(documentResourceActual);
-    			Long reorderResourceSequence = reorderGetSequenceFromResourceOrEntity(resource, documentResourceActual);
-				if (!Objects.equals(resource.getPare().getId(), documentResourceActual.getPare().getId())) {
-					documentResourceActual.setPare(contingutResourceRepository.findById(resource.getPare().getId()).get());
-				}
-				reorderIfReorderable(
-						documentResourceActual,
-						reorderResourceSequence,
-						reorderPreviousParentId,
-						true,
-						false);
-				//mourer també al arxiu
-				boolean parentIdChanged = !Objects.equals(documentResourceActual.getOrderParentId(), reorderPreviousParentId);
-				if (parentIdChanged) {
-					ContingutEntity contingutPare = contingutRepository.findById(documentResourceActual.getOrderParentId()).get();
-//					pluginHelper.arxiuDocumentMoure(documentActual.getArxiuUuid(), contingutPare.getArxiuUuid());
-					contingutHelper.arxiuDocumentPropagarMoviment(
-							documentActual.getArxiuUuid(),
-							contingutPare,
-							documentActual.getExpedient().getArxiuUuid());
-				}
-    		} else {
-    			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
-        		DocumentDto documentActualitzat = documentHelper.updateDocument(
-        				entitatEntity.getId(),
-        				documentActual,
-    					resource.toDocumentDto(),
-        				true);
-        		resource.setId(documentActualitzat.getId());
-        		afterDbChange(documentActual.getExpedient().getId());
-    		}
+            EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+            DocumentDto documentActualitzat = documentHelper.updateDocument(
+                    entitatEntity.getId(),
+                    documentActual,
+                    resource.toDocumentDto(),
+                    true);
+            resource.setId(documentActualitzat.getId());
+            afterDbChange(documentActual.getExpedient().getId());
     	} catch (Exception ex) {
     		excepcioLogHelper.addExcepcio("/document/"+resource.getId()+"/update", ex);
     	}
@@ -561,11 +536,6 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     		resource.setLastModifiedByFullName(usuariResourceEntity.getNom() + " (" + usuariResourceEntity.getCodi() + ")");
     	}
     }
-
-	@Override
-	protected List<DocumentResourceEntity> reorderFindLinesWithParent(Serializable parentId) {
-		return documentResourceRepository.findAllByPareIdOrderByOrdreAsc((Long)parentId);
-	}
 
     private class PathPerspectiveApplicator implements PerspectiveApplicator<DocumentResourceEntity, DocumentResource> {
         @Override
