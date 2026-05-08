@@ -119,6 +119,12 @@ public class AplicacioServiceEjb extends AbstractServiceEjb<AplicacioService> im
 	}
 
 	@Override
+	@RolesAllowed({"IPA_SUPER"})
+	public PaginaDto<ExcepcioLogDto> excepcioFindPage(PaginacioParamsDto params) {
+		return delegateService.excepcioFindPage(params);
+	}
+
+	@Override
 	@RolesAllowed("**")
 	public List<String> permisosFindRolsDistinctAll() {
 		return delegateService.permisosFindRolsDistinctAll();

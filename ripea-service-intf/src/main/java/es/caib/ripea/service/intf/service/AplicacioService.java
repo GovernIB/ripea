@@ -141,11 +141,21 @@ public interface AplicacioService {
 
 	/**
 	 * Retorna una llista amb les darreres excepcions emmagatzemades.
-	 * 
+	 *
 	 * @return La llista amb les darreres excepcions.
 	 */
 	@PreAuthorize("hasRole('IPA_SUPER')")
 	public List<ExcepcioLogDto> excepcioFindAll();
+
+	/**
+	 * Retorna una pàgina d'excepcions emmagatzemades.
+	 *
+	 * @param params
+	 *             Paràmetres de paginació i ordenació.
+	 * @return La pàgina d'excepcions.
+	 */
+	@PreAuthorize("hasRole('IPA_SUPER')")
+	public PaginaDto<ExcepcioLogDto> excepcioFindPage(PaginacioParamsDto params);
 
 	/**
 	 * Retorna una llista amb els diferents rols els quals

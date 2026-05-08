@@ -18,6 +18,8 @@ public interface TipusDocumentalRepository extends JpaRepository<TipusDocumental
 
 	List<TipusDocumentalEntity> findByEntitatOrderByNomEspanyolAsc(EntitatEntity entitat);
 	
+	List<TipusDocumentalEntity> findByEntitatCodiOrderByNomEspanyolAsc(String entitatCodi);
+	
 	List<TipusDocumentalEntity> findByCodi(String codi);
 	
 	@Query(	"from " +

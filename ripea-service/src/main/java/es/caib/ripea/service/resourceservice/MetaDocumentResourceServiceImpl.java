@@ -92,7 +92,8 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
     public class TipusDocFieldOptionsProvider implements FieldOptionsProvider {
         public List<FieldOption> getOptions(String fieldName, Map<String, String[]> requestParameterMap) {
             List<FieldOption> resultat = new ArrayList<FieldOption>();
-            List<TipusDocumentalEntity> tipusDocumentalEntity = tipusDocumentalRepository.findAll();
+            String entitatActualCodi = configHelper.getEntitatActualCodi();
+            List<TipusDocumentalEntity> tipusDocumentalEntity = tipusDocumentalRepository.findByEntitatCodiOrderByNomEspanyolAsc(entitatActualCodi);
             if (tipusDocumentalEntity != null) {
                 for (TipusDocumentalEntity tde : tipusDocumentalEntity) {
                 	resultat.add(new FieldOption(

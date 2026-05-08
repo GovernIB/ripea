@@ -459,6 +459,20 @@ public class AplicacioServiceImpl implements AplicacioService {
 	}
 
 	@Override
+	public PaginaDto<ExcepcioLogDto> excepcioFindPage(PaginacioParamsDto params) {
+		logger.debug("Consulta paginada de les excepcions disponibles");
+		List<ExcepcioLogDto> excepcions = excepcioLogHelper.findAll();
+		if (excepcions == null || excepcions.isEmpty()) {
+			return new PaginaDto<>();
+		}
+		List<List<ExcepcioLogDto>> pagines = paginacioHelper.getPages(excepcions, params.getPaginaTamany());
+		int paginaNum = Math.min(params.getPaginaNum(), pagines.size() - 1);
+		PaginaDto<ExcepcioLogDto> pagina = paginacioHelper.toPaginaDto(pagines.get(paginaNum), null);
+		pagina.setContingut(pagines.get(paginaNum));
+		return paginacioHelper.prepararPagina(pagina, pagines, excepcions);
+	}
+
+	@Override
 	public List<String> permisosFindRolsDistinctAll() {
 		logger.debug("Consulta dels rols definits a les ACLs");
 		List<String> rolsAcls = cacheHelper.rolsDisponiblesEnAcls();

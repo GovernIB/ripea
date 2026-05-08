@@ -3,8 +3,9 @@ package es.caib.ripea.service.intf.dto;
 import java.util.Date;
 
 public class MonitorTascaInfo {
-	
+
 	private String codi;
+	private String descripcio;
 	private MonitorTascaEstatEnum estat;
 	private Date dataInici;
 	private Date dataFi;
@@ -16,6 +17,12 @@ public class MonitorTascaInfo {
 	}
 	public void setCodi(String codi) {
 		this.codi = codi;
+	}
+	public String getDescripcio() {
+		return descripcio;
+	}
+	public void setDescripcio(String descripcio) {
+		this.descripcio = descripcio;
 	}
 	public MonitorTascaEstatEnum getEstat() {
 		return estat;
