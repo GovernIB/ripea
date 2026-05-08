@@ -89,10 +89,16 @@ const base: ThemeOptions = {
                     '& .MuiDataGrid-cell': {
                         display: 'flex',
                     },
+                    '& .MuiDataGrid-treeDataGroupingCell': {
+                        '--DataGrid-t-spacing-unit': '16px',
+                    },
                     '& .MuiDataGrid-treeDataGroupingCell > *': {
                         display: 'flex',
                         alignItems: 'center'
-                    }
+                    },
+                    '& .MuiDataGrid-treeDataGroupingCellToggle': {
+                        marginRight: 0,
+                    },
                 },
 				row: {
 					minHeight: '45px !important',
