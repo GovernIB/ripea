@@ -16,6 +16,11 @@ Actualment encara es troba en procés però es pot dir que les principals caract
 * Programming Language: Java & JSP 
 * Translations : Catalan & Spanish 
 * User Interface: Web-based
+## <a name="docs"></a> Accessibilitat
+Aquest lloc web és parcialment conforme amb el RD 1112/2018:
+* Puntuació mitja del lloc web: 8.16
+* Nivell d'adequació estimat: A
+* Darrera revisió: 06/05/2026
 ## <a name="docs"></a> Documentació
 * [Manual d'usuari](https://github.com/GovernIB/ripea/raw/ripea-1.0/doc/pdf/01_ripea_manual_usuari.pdf)
 * [Manual d'administrador](https://github.com/GovernIB/ripea/raw/ripea-1.0/doc/pdf/02_ripea_manual_administradors.pdf)
