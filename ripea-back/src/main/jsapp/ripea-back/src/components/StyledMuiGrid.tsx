@@ -5,7 +5,7 @@ import {MuiDataGridProps, MuiGrid, useMuiDataGridApiRef} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {useUserSession} from "./Session.tsx";
 import MassiveActionSelector, {MassiveActionProps} from "./MassiveActionSelector.tsx";
-import {toSelectionModel, fromSelectionModel, EMPTY_SELECTION_MODEL} from "../util/selectionModelUtils";
+import {toSelectionModel, fromSelectionModel} from "../util/selectionModelUtils";
 
 export const ToolbarButton = (props:any) => {
     const { title, icon, hidden, children, ...other } = props;
@@ -203,7 +203,7 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
                 onRowsChange?.(rows, info);
                 onRowCountChange?.(info?.totalElements)
             }}
-            rowSelectionModel={rowSelectionModelProp != null ? toSelectionModel(rowSelectionModelProp) : EMPTY_SELECTION_MODEL}
+            rowSelectionModel={toSelectionModel(rowSelectionModelProp)}
             onRowSelectionModelChange={(newSelection, details) => {
                 const ids = fromSelectionModel(newSelection);
                 setSelectedRows(ids);

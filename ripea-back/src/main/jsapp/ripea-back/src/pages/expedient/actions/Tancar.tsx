@@ -1,6 +1,11 @@
 import {useEffect, useMemo, useState} from "react";
 import {Grid, Alert, Box} from "@mui/material";
-import {useMuiFormDialogApiRef, useBaseAppContext, useFormContext, useResourceApiService} from "reactlib";
+import {
+    useMuiFormDialogApiRef,
+    useBaseAppContext,
+    useFormContext,
+    useResourceApiService,
+} from "reactlib";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 import GridFormField from "../../../components/GridFormField.tsx";
@@ -52,7 +57,7 @@ const TancarForm = () => {
     } = useResourceApiService('expedientResource');
 
     useEffect(() => {
-        if (apiIsReady && data?.ids && data?.massivo) {
+        if (apiIsReady && data?.ids) {
             apiFind({
                 filter: builder.inside('id', data?.ids),
                 unpaged: true,
@@ -86,7 +91,7 @@ const TancarForm = () => {
         return defaultSelection;
     }, [temp?.documentObligatorisAlTancar])
 
-    return <Load value={(entities || !data?.massivo) && temp}>
+    return <Load value={entities && temp}>
         <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
             <Grid size={12} hidden={!rowsCount}>
                 <Alert severity={"info"}>{t('page.expedient.alert.borradors')}</Alert>
@@ -104,7 +109,6 @@ const TancarForm = () => {
                         onRowSelectionModelChange={(newSelection) => {
                             setSelectedRows([...newSelection]);
                         }}
-                        autoHeight
                         paginationActive={false}
                         toolbarHide
                         readOnly
@@ -136,9 +140,7 @@ const TancarForm = () => {
                         getTreeDataPath={(row: any): string[] => {
                             return (data?.massivo && row?.expedient) ?[`${row?.expedient?.id}`, `${row.id}`] :[`${row.id}`]
                         }}
-                        isGroupExpandedByDefault={() => {
-                            return true;
-                        }}
+                        isGroupExpandedByDefault={() => true}
                     />
                 </Load>
             </Grid>
