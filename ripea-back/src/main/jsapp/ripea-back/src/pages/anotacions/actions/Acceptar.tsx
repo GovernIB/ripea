@@ -9,6 +9,8 @@ import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import useVisualitzar from "./Visualitzar.tsx";
 import useRegistreInteressatDetail from "../details/RegistreInteressatDetail.tsx";
+import {useUserSession} from "@src/components/Session.tsx";
+import {useIframeDialog} from "@src/components/Iframe.tsx";
 
 const AcceptarTabExpedient = () => {
 
@@ -102,6 +104,7 @@ const AcceptarTabAnnexos = () => {
     ]
 
     const {handleOpen, dialog, isValid} = useVisualitzar()
+    const {handleOpen: handleIframeOpen, dialog: dialogIframe} = useIframeDialog();
 
     const actions = [
         {
@@ -109,8 +112,15 @@ const AcceptarTabAnnexos = () => {
             icon: "search",
             showInMenu: false,
             onClick: handleOpen,
-            hidden: (row:any) => !isValid(row),
+            hidden: (row:any) => !isValid(row) || row?.justificant,
         },
+        {
+            label: t('page.document.action.view.label'),
+            icon: "search",
+            showInMenu: false,
+            onClick: (_id:any, row:any) => handleIframeOpen(`expedientPeticio/descarregarJustificant/${row?.registreId}`),
+            hidden: (row:any) => !(['pdf', 'odt', 'docx'].includes(row?.fitxerExtension) && row?.justificant),
+        }
     ]
 
     return <>
@@ -119,7 +129,19 @@ const AcceptarTabAnnexos = () => {
             filter={filter}
             columns={columnsAnnexos}
             rowAdditionalActions={actions}
-            onRowsChange={(rows) => {
+            rowsTransformer={(_rows: any) => {
+                if (!_rows || _rows.length == 0) return [];
+                const additionalRows: any[] = _rows;
+                if (data?.isIncorporacioJustificantActiva && data?.justificant && !additionalRows.map((b) => b.id).includes(0)) {
+                    additionalRows.push({
+                        ...data?.justificant,
+                        id: 0,
+                        justificant: true,
+                    })
+                }
+                return additionalRows;
+            }}
+            onRowsChange={(rows:any) => {
                 if (rows.length > 0 && rows.length != Object.keys(data?.annexos).length) {
                     const annexos = Object.fromEntries(
                         rows.map((row) => [row.id, (data?.annexos[row.id] || '')])
@@ -133,12 +155,12 @@ const AcceptarTabAnnexos = () => {
                     handleOpen(params?.id)
                 }
             }}
-
-            autoHeight
-            paginationModel={{page: 0, pageSize: 5}}
+            toolbarHide
+            paginationActive={false}
             readOnly
         />
         {dialog}
+        {dialogIframe}
     </>
 }
 
@@ -260,16 +282,23 @@ const Acceptar = (props:any) => {
 }
 
 const useAcceptar = (refresh?: () => void) => {
+    const {value: user} = useUserSession();
     const { t } = useTranslation();
     const apiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow} = useBaseAppContext();
 
     const handleShow = (id:any, row:any) :void => {
+        const isIncorporacioJustificantActiva = user?.sessionScope?.isIncorporacioJustificantActiva
         apiRef.current?.show?.(id, {
             metaExpedient: row?.metaExpedient,
             registre: row?.registre,
             interessats: row?.registreInfo?.interessats?.map((i:any)=>i.id) || [],
             grup: row?.grup,
+            isIncorporacioJustificantActiva: isIncorporacioJustificantActiva,
+            justificant: isIncorporacioJustificantActiva ? {
+                registreId: row?.registreInfo?.id,
+                ...row?.registreInfo?.justificant
+            } :{}
         })
     }
     const onSuccess = () :void => {

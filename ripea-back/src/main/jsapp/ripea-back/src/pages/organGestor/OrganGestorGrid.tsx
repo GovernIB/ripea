@@ -123,7 +123,7 @@ const OrganGestorGrid = () => {
                 }}
                 rowsTransformer={(rows: any) => {
                     if (!rows) return [];
-                    const additionalRows: any[] = _rows;
+                    const additionalRows: any[] = rows;
                         if (rows!=null && treeView){
                             for (const row of rows) {
                                 for (const r of row?.path) {
