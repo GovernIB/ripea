@@ -62,6 +62,14 @@ const ProtectedRoute = ({ allowedRoles = [], params = [] }: any) => {
 const HomeRedirect = () => {
     const {value: user} = useUserSession();
 
+    if (user?.conf?.interficieUsuari === 'JSP') {
+        const pathname = window.location.pathname;
+        const idx = pathname.indexOf('/reactapp');
+        const jspRoot = idx >= 0 ? pathname.substring(0, idx) + '/' : '/';
+        window.location.replace(jspRoot);
+        return null;
+    }
+
     switch (user?.rolActual) {
         case rols.SUPER:
             return <Navigate to="/integracio" replace />;

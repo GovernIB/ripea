@@ -1880,7 +1880,8 @@ const translationEn = {
                 generic: "General settings",
                 column: "Column configuration of case list",
                 vista: "Document view settings in cases",
-                moure: "Destination view settings when moving documents"
+                moure: "Destination view settings when moving documents",
+                interficie: "Default interface"
             }
         },
         alert: {

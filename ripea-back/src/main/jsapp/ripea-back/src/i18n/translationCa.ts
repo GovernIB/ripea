@@ -1880,7 +1880,8 @@ const translationCa = {
                 generic: "Configuració genèrica",
                 column: "Configuració de columnes del llistat d'expedients",
                 vista: "Configuració vista de documents dels expedients",
-                moure: "Configuració vista destí al moure documents"
+                moure: "Configuració vista destí al moure documents",
+                interficie: "Interfície per defecte"
             }
         },
         alert: {

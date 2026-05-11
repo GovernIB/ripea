@@ -45,6 +45,7 @@ const PerfilFrom = ({setTheme}: { setTheme: (value:TemaAplicacio) => void }) =>{
             <GridFormField name="procediment" filter={builder.and(
                 builder.eq('entitat.id', data?.entitatPerDefecte?.id)
             )}/>
+            <GridFormField name="interficieUsuari" required/>
             <GridFormField name="modeFosc"
                            onChange={(value)=>{
                                setTheme(value ?TemaAplicacio.OBSCUR :TemaAplicacio.CLAR)

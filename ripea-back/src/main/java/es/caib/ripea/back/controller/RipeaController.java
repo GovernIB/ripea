@@ -7,7 +7,9 @@ import es.caib.ripea.back.helper.AjaxHelper;
 import es.caib.ripea.back.helper.EntitatHelper;
 import es.caib.ripea.back.helper.ModalHelper;
 import es.caib.ripea.back.helper.RolHelper;
+import es.caib.ripea.back.helper.SessioHelper;
 import es.caib.ripea.service.intf.dto.EntitatDto;
+import es.caib.ripea.service.intf.dto.InterficieUsuariEnumDto;
 import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -35,6 +37,15 @@ public class RipeaController {
 	@RequestMapping(path = { "/", "/index" }, method = RequestMethod.GET)
 	public String get(
 			HttpServletRequest request) {
+		UsuariDto usuariActual = SessioHelper.getUsuariActual(request);
+		boolean usaReact = usuariActual == null
+				|| usuariActual.getInterficieUsuari() == null
+				|| InterficieUsuariEnumDto.REACT.equals(usuariActual.getInterficieUsuari());
+
+		if (usaReact) {
+			return "redirect:/reactapp/";
+		}
+
 		if (RolHelper.isRolActualSuperusuari(request)) {
 			return "redirect:integracio";
 		} else if (RolHelper.isRolActualDissenyadorOrgan(request)) {

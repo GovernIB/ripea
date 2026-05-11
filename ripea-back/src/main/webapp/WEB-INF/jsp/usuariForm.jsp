@@ -104,6 +104,7 @@
 			<rip:inputSelect name="numElementsPagina" optionItems="${numElementsPagina}" optionValueAttribute="id" optionTextAttribute="nom" textKey="usuari.form.camp.numElementsPagina"/>
 			<div id="selectorEntitat"><rip:inputSelect name="entitatPerDefecteId" optionItems="${entitats}" optionMinimumResultsForSearch="1" optionValueAttribute="id" emptyOption="true" optionTextAttribute="nom" textKey="usuari.form.camp.entitatPerDefecte" placeholder="Selecciona..."/></div>
 			<div id="selectorProcediment"><rip:inputSelect name="procedimentId" optionItems="${procediments}" optionMinimumResultsForSearch="1" optionValueAttribute="id" emptyOption="true" optionTextAttribute="codiSiaINom" textKey="usuari.form.camp.procedimentPerDefecte" placeholder="Selecciona..."/></div>
+			<rip:inputSelect name="interficieUsuari" optionEnum="InterficieUsuariEnumDto" textKey="usuari.form.camp.interficieUsuari"/>
 		</div>
 	</div>
 	<div class="panel panel-default">

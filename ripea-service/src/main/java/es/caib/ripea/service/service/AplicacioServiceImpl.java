@@ -76,12 +76,12 @@ import es.caib.ripea.service.helper.CacheHelper;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.ConversioTipusHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
-import es.caib.ripea.service.helper.TipusDocumentalHelper;
 import es.caib.ripea.service.helper.IntegracioHelper;
 import es.caib.ripea.service.helper.MetaExpedientHelper;
 import es.caib.ripea.service.helper.PaginacioHelper;
 import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.helper.RolHelper;
+import es.caib.ripea.service.helper.TipusDocumentalHelper;
 import es.caib.ripea.service.helper.UsuariHelper;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.DiagnosticFiltreDto;
@@ -116,7 +116,6 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Autowired private ExcepcioLogHelper excepcioLogHelper;
 	@Autowired private UsuariHelper usuariHelper;
 	@Autowired private GrupRepository grupRepository;
-	@Autowired private RolHelper rolHelper;
 	@Autowired private ConfigHelper configHelper;
 	@Autowired private PaginacioHelper paginacioHelper;
 	@Autowired private MetaExpedientRepository metaExpedientRepository;
@@ -346,10 +345,11 @@ public class AplicacioServiceImpl implements AplicacioService {
 				dto.isExpedientListComentaris(),
 				dto.isExpedientListGrup(),
 				dto.getProcedimentId() != null ? metaExpedientRepository.getOne(dto.getProcedimentId()) : null,
-				dto.getVistaActual(), 
+				dto.getVistaActual(),
 				dto.isExpedientExpandit(),
 				dto.getEntitatPerDefecteId() != null ? entitatRepository.getOne(dto.getEntitatPerDefecteId()) : null,
-				dto.getVistaMoureActual());
+				dto.getVistaMoureActual(),
+				dto.getInterficieUsuari());
 		
 		return toUsuariDtoAmbRols(usuari);
 	}
@@ -797,7 +797,8 @@ public class AplicacioServiceImpl implements AplicacioService {
 				 usuariAntic.getVistaActual(),
 				 usuariAntic.isExpedientExpandit(),
 				 usuariAntic.getEntitatPerDefecte(),
-				 usuariAntic.getVistaMoureActual());
+				 usuariAntic.getVistaMoureActual(),
+				 usuariAntic.getInterficieUsuari());
 		 
 		 usuariNou.setInicialitzat(usuariAntic.isInicialitzat());
 		 usuariNou.setRolActual(usuariAntic.getRolActual());
