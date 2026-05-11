@@ -531,13 +531,6 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
                 boolean expCreatArxiuOk = true;
                 Long expedientId = null;
 
-                Map<Long, Long> anexosIdsMetaDocsIdsMap = new HashMap<Long, Long>();
-                if (params.getAnnexos()!=null) {
-                	for (Map.Entry<Long, String> entry : params.getAnnexos().entrySet()) {
-                		anexosIdsMetaDocsIdsMap.put(entry.getKey(), Long.parseLong(entry.getValue()));
-                	}
-                }
-
                 Map<String, InteressatAssociacioAccioEnum> interessatsAccionsMap = new HashMap<>();
                 if (params.getInteressats()!=null && entity.getRegistre().getInteressats()!=null) {
                 	for(Long interessatId: params.getInteressats()) {
@@ -595,12 +588,29 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 
 					for (Map.Entry<Long, String> entry : params.getAnnexos().entrySet()) {
 						try {
-							expedientHelper.crearDocFromAnnex(
-									expedientId,
-									entry.getKey(),
-									expedientPeticioId,
-									Long.parseLong(entry.getValue()),
-									rolActual);
+							
+							if (entry.getKey()>0) {
+								
+								//És un annex
+								expedientHelper.crearDocFromAnnex(
+										expedientId,
+										entry.getKey(),
+										expedientPeticioId,
+										Long.parseLong(entry.getValue()),
+										rolActual);
+								
+							} else {
+								
+								//És un justificant
+								String arxiuUuid = entity.getRegistre().getJustificantArxiuUuid();
+								if (arxiuUuid != null && configHelper.getAsBoolean(PropertyConfig.INCORPORAR_JUSTIFICANT)) {
+									expedientHelper.crearDocFromUuid(
+											expedientId,
+											arxiuUuid,
+											expedientPeticioId,
+											Long.parseLong(entry.getValue()));
+								}
+							}
 							
 						} catch (Exception e) {
 							expedientHelper.updateRegistreAnnexError(
