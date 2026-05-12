@@ -4,7 +4,7 @@ import {BasePage, useResourceApiService, MuiDialog, useBaseAppContext} from "rea
 import {useTranslation} from "react-i18next";
 import {formatDate} from "../util/dateUtils.ts";
 import TabComponent from "../components/TabComponent.tsx";
-import {CardData, ContenidoData, DetailCard, DetailCardContent} from "../components/CardData.tsx";
+import {DetailCard, DetailCardContent} from "../components/CardData.tsx";
 import Load from "../components/Load.tsx";
 
 const InformacionArxiu = (props:any) => {
@@ -14,14 +14,14 @@ const InformacionArxiu = (props:any) => {
     return <BasePage>
         <Load value={arxiu}>
             <Grid container sx={{wordWrap: "break-word" }} direction={"row"} columnSpacing={1} rowSpacing={1}>
-                <ContenidoData title={t('page.arxiu.detall.arxiuUuid')}>{arxiu?.identificador}</ContenidoData>
-                <ContenidoData title={t('page.arxiu.detall.fitxerNom')}>{arxiu?.nom}</ContenidoData>
-                <ContenidoData title={t('page.arxiu.detall.serie')}>{arxiu?.serieDocumental}</ContenidoData>
-                <ContenidoData title={t('page.arxiu.detall.arxiuEstat')} hiddenIfEmpty>{arxiu?.arxiuEstat}</ContenidoData>
 
-                <DetailCard title={t('page.arxiu.detall.document')} hidden={!arxiu?.contingutTipusMime && !arxiu?.contingutArxiuNom}>
-                    <DetailCardContent title={t('page.arxiu.detall.fitxerContentType')}>{arxiu?.contingutTipusMime}</DetailCardContent>
-                    <DetailCardContent title={t('page.arxiu.detall.fitxerNom')}>{arxiu?.contingutArxiuNom}</DetailCardContent>
+                <DetailCard title={t('page.arxiu.detall.dades')}>
+                    <DetailCardContent title={t('page.arxiu.detall.arxiuUuid')}>{arxiu?.identificador}</DetailCardContent>
+                    <DetailCardContent title={t('page.arxiu.detall.fitxerNom')}>{arxiu?.nom}</DetailCardContent>
+                    <DetailCardContent title={t('page.arxiu.detall.serie')}>{arxiu?.serieDocumental}</DetailCardContent>
+                    <DetailCardContent title={t('page.arxiu.detall.arxiuEstat')} hiddenIfEmpty>{arxiu?.arxiuEstat}</DetailCardContent>                    
+                    <DetailCardContent title={t('page.arxiu.detall.fitxerContentType')} hidden={!arxiu?.contingutTipusMime}>{arxiu?.contingutTipusMime}</DetailCardContent>
+                    <DetailCardContent title={t('page.arxiu.detall.fitxerNom')} hidden={!arxiu?.contingutArxiuNom}>{arxiu?.contingutArxiuNom}</DetailCardContent>
                 </DetailCard>
 
                 <DetailCard title={t('page.arxiu.detall.metadata')} hidden={!arxiu?.eniIdentificador}>
@@ -55,12 +55,11 @@ const Hijos = (props:any) => {
     const { fills } = props;
 
     return<BasePage>
-        <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
+        <DetailCard>
             {
-                fills?.map((cont:any)=>
-                    <ContenidoData key={cont?.identificador} title={cont?.tipus}>{cont?.nom}</ContenidoData>)
+                fills?.map((cont:any)=> <DetailCardContent key={cont?.identificador} title={cont?.tipus}>{cont?.nom}</DetailCardContent>)
             }
-        </Grid>
+        </DetailCard>
     </BasePage>
 }
 
@@ -69,19 +68,17 @@ const Firmes = (props:any) => {
     const { t } = useTranslation();
 
     return <BasePage>
-        <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-            {
-                firmes?.map((firma:any) =>
-                    <CardData key={firma?.tipus} title={t('page.arxiu.firma.title') + ' ' + firma?.tipus}>
-                        <ContenidoData title={t('page.arxiu.firma.perfil')} hiddenIfEmpty>{firma?.perfil}</ContenidoData>
-                        <ContenidoData title={t('page.arxiu.firma.fitxerNom')} hiddenIfEmpty>{firma?.fitxerNom}</ContenidoData>
-                        <ContenidoData title={t('page.arxiu.firma.tipusMime')} hiddenIfEmpty>{firma?.tipusMime}</ContenidoData>
-                        <ContenidoData title={t('page.arxiu.firma.contingut')} hidden={firma?.tipus!='CSV'}>{firma?.contingutComString}</ContenidoData>
-                        <ContenidoData title={t('page.arxiu.firma.csvRegulacio')} hiddenIfEmpty>{firma?.csvRegulacio}</ContenidoData>
-                    </CardData>
-                )
-            }
-        </Grid>
+        {
+            firmes?.map((firma:any) =>
+                <DetailCard key={firma?.tipus} title={t('page.arxiu.firma.title') + ' ' + firma?.tipus}>
+                    <DetailCardContent title={t('page.arxiu.firma.perfil')} hiddenIfEmpty>{firma?.perfil}</DetailCardContent>
+                    <DetailCardContent title={t('page.arxiu.firma.fitxerNom')} hiddenIfEmpty>{firma?.fitxerNom}</DetailCardContent>
+                    <DetailCardContent title={t('page.arxiu.firma.tipusMime')} hiddenIfEmpty>{firma?.tipusMime}</DetailCardContent>
+                    <DetailCardContent title={t('page.arxiu.firma.contingut')} hidden={firma?.tipus!='CSV'}>{firma?.contingutComString}</DetailCardContent>
+                    <DetailCardContent title={t('page.arxiu.firma.csvRegulacio')} hiddenIfEmpty>{firma?.csvRegulacio}</DetailCardContent>
+                </DetailCard>
+            )
+        }
     </BasePage>;
 }
 
@@ -89,18 +86,18 @@ const Metadatos = (props:any) => {
     const {metadades} = props;
 
     return <BasePage>
-        <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
+        <DetailCard>
             {
                 metadades && Object.entries(metadades).map(([key, value]:any[]) =>
-                    <ContenidoData key={key} title={key} hiddenIfEmpty>
+                    <DetailCardContent key={key} title={key} hiddenIfEmpty>
                         {
                             key.includes("fecha")
                                 ?formatDate(value)
                                 :value
                         }
-                    </ContenidoData>)
+                    </DetailCardContent>)
             }
-        </Grid>
+        </DetailCard>
     </BasePage>;
 }
 

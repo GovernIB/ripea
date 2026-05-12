@@ -84,7 +84,7 @@ export const DetailCard = (props:DetailCardProps) => {
             }
 
             <CardContent sx={{ p: '0 !important' }}>
-                <Grid container {...other}>
+                <Grid container {...other} sx={{ ...(other?.sx ?? {}), ...( !(title || header) && { paddingTop: '0 !important' } ) }}>
                     {children}
                 </Grid>
             </CardContent>

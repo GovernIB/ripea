@@ -735,7 +735,7 @@ const translationCa = {
                 fitxerNom: "Nom del document",
                 serie: "Sèrie documental",
                 arxiuEstat: "Estat a l'arxiu",
-                document: "Contingut del document",
+                dades: "Dades generals",
                 fitxerContentType: "Tipus MIME",
                 metadata: "Metadades ENI",
                 versions: "Versió",

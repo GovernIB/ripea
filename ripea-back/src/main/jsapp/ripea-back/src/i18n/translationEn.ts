@@ -735,7 +735,7 @@ const translationEn = {
                 fitxerNom: "File name",
                 serie: "Documentary series",
                 arxiuEstat: "File status",
-                document: "Document content",
+                dades: "General data of the content",
                 fitxerContentType: "MIME type",
                 metadata: "ENI metadata",
                 versions: "Version",

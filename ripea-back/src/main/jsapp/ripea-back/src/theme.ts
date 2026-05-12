@@ -22,7 +22,10 @@ const base: ThemeOptions = {
                 },
                 '.styledFilter': {
                     marginBottom: '16px',
-                    padding: '16px',
+                    paddingTop: '11px',
+					paddingBottom: '16px',
+					paddingLeft: '16px',
+					paddingRight: '16px',
                     borderRadius: '4px',
                     backgroundColor: 'inherit',
                 },
@@ -117,6 +120,11 @@ const base: ThemeOptions = {
                 checkboxInput: {
                     transform: 'scale(0.8)',
                 },
+            },
+        },
+        MuiGrid: {
+            styleOverrides: {
+                root: {paddingTop: '5px'},
             },
         },
         MuiTab: {styleOverrides: {root: {textTransform: 'none', fontSize: '1rem'}}},

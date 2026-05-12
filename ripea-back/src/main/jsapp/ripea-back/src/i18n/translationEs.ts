@@ -735,7 +735,7 @@ const translationEs = {
                 fitxerNom: "Nombre del documento",
                 serie: "Serie documental",
                 arxiuEstat: "Estado en arxiu",
-                document: "Contenido documento",
+                dades: "Datos generales",
                 fitxerContentType: "Tipo MIME",
                 metadata: "Metadatos ENI",
                 versions: "Versión",
