@@ -1,5 +1,5 @@
 import {Grid, Typography} from "@mui/material";
-import {MuiFilter, useFilterApiRef, useFormApiRef} from "reactlib";
+import {MuiFilter, useFilterApiRef} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {useSession} from "./SessionStorageContext.tsx";
 import {useEffect, useMemo} from "react";
@@ -24,7 +24,6 @@ export type FilterButtonProps = {
 const StyledMuiFilter = (props:any) => {
     const { t } = useTranslation();
     const filterRef = useFilterApiRef();
-    const formRef = useFormApiRef();
 
     const defaultButtons = useMemo<FilterButtonProps[]>(() => [
         {
@@ -47,7 +46,6 @@ const StyledMuiFilter = (props:any) => {
         buttonCallback,
         buttonGridProps,
         apiRef = filterRef,
-        formApiRef = formRef,
         springFilterBuilder,
         onSpringFilterChange,
         commonFieldComponentProps,
@@ -62,7 +60,7 @@ const StyledMuiFilter = (props:any) => {
     const cercar = ()=> {
         apiRef?.current?.filter?.()
         if (sessionKey) {
-            saveFilterData(formApiRef?.current?.getData?.())
+            saveFilterData(apiRef?.current?.getData?.())
         }
     }
     const netejar = ()=> {
@@ -91,7 +89,6 @@ const StyledMuiFilter = (props:any) => {
     return <MuiFilter
         code={code}
         apiRef={apiRef}
-        formApiRef={formApiRef}
         commonFieldComponentProps={{size: 'small', ...commonFieldComponentProps}}
         componentProps={{...filterStyle, ...componentProps}}
         buttonControlled

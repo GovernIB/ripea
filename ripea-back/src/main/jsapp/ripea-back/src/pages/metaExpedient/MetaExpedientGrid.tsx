@@ -1,6 +1,6 @@
 import {useTranslation} from "react-i18next";
 import {useMemo, useState} from "react";
-import {GridPage, useFilterApiRef, useFormApiRef, useFormContext, useMuiDataGridApiRef} from "reactlib";
+import {GridPage, useFilterApiRef, useFormContext, useMuiDataGridApiRef} from "reactlib";
 import {CardPage} from "../../components/CardData.tsx";
 import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
 import {Alert, Badge, Chip, Grid, Icon, IconButton, MenuItem} from "@mui/material";
@@ -261,7 +261,6 @@ const MetaExpedientGrid = () => {
     ],[t])
 
     const filterRef = useFilterApiRef();
-    const formRef = useFormApiRef();
     const [load, setLoad] = useState<boolean>(true);
     const {value: revisioEstatMssg, save: setRevisioEstatMssg} = useSessionContext('revisioEstatMssg')
 
@@ -272,7 +271,7 @@ const MetaExpedientGrid = () => {
                 <Alert severity={'info'} sx={{mb:1}}>
                     {t('page.metaExpedient.alert.pendentsRevisio', {num: user?.sessionScope?.numProcsPendentsRevisio})}
                     <IconButton sx={{ml: 1, p: 0}} onClick={() => {
-                        formRef.current?.setFieldValue('revisioEstat', 'PENDENT')
+                        filterRef.current?.setFieldValue?.('revisioEstat', 'PENDENT')
                         filterRef.current?.filter()
                         setLoad(true)
                         setRevisioEstatMssg(true)
@@ -282,7 +281,7 @@ const MetaExpedientGrid = () => {
                 </Alert>
             }
 
-            <MetaExpedientFilter apiRef={filterRef} formApiRef={formRef} onSpringFilterChange={(filter:string) => {
+            <MetaExpedientFilter apiRef={filterRef} onSpringFilterChange={(filter:string) => {
                 setSpringFilter(filter)
                 setLoad(false)
             }}/>

@@ -1,7 +1,6 @@
-import {MuiDataGridApi, useMuiFormDialogApiRef} from "reactlib";
+import {useMuiFormDialogApiRef} from "reactlib";
 import {Grid} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
-import {RefObject} from "react";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 
@@ -28,7 +27,7 @@ const ImportRolsac = (props: any) => {
     </FormActionDialog>
 }
 
-export const useImportRolsac = (apiGridRef:RefObject<MuiDataGridApi>) => {
+export const useImportRolsac = (apiGridRef:any) => {
     const apiRef = useMuiFormDialogApiRef();
 
     const handleShow = () :void => {
