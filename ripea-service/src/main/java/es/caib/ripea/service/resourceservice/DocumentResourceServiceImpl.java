@@ -44,7 +44,6 @@ import es.caib.ripea.persistence.entity.resourceentity.InteressatResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaDocumentResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.RegistreAnnexResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.UsuariResourceEntity;
-import es.caib.ripea.persistence.entity.resourcerepository.ContingutResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.DocumentResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.InteressatGrupResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.InteressatResourceRepository;
@@ -52,12 +51,12 @@ import es.caib.ripea.persistence.entity.resourcerepository.MetaDocumentResourceR
 import es.caib.ripea.persistence.entity.resourcerepository.RegistreAnnexResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.UsuariResourceRepository;
 import es.caib.ripea.persistence.repository.ContingutMovimentRepository;
-import es.caib.ripea.persistence.repository.ExecucioMassivaContingutRepository;
 import es.caib.ripea.persistence.repository.ContingutRepository;
 import es.caib.ripea.persistence.repository.DocumentNotificacioRepository;
 import es.caib.ripea.persistence.repository.DocumentPortafirmesRepository;
 import es.caib.ripea.persistence.repository.DocumentRepository;
 import es.caib.ripea.persistence.repository.EntitatRepository;
+import es.caib.ripea.persistence.repository.ExecucioMassivaContingutRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.firma.DocumentFirmaPortafirmesHelper;
 import es.caib.ripea.service.firma.DocumentFirmaViaFirmaHelper;
@@ -175,7 +174,6 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     private final AplicacioService aplicacioService;
 
     private final UsuariResourceRepository usuariResourceRepository;
-	private final ContingutResourceRepository contingutResourceRepository;
     private final DocumentResourceRepository documentResourceRepository;
     private final MetaDocumentResourceRepository metaDocumentResourceRepository;
     private final InteressatResourceRepository interessatResourceRepository;

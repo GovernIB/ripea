@@ -21,10 +21,7 @@ import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.resourceentity.CarpetaResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.CarpetaRestriccioResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.UsuariResourceEntity;
-import es.caib.ripea.persistence.entity.resourcerepository.CarpetaResourceRepository;
-import es.caib.ripea.persistence.entity.resourcerepository.ContingutResourceRepository;
 import es.caib.ripea.persistence.repository.CarpetaRepository;
-import es.caib.ripea.persistence.repository.ContingutRepository;
 import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.CarpetaHelper;
@@ -32,7 +29,6 @@ import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.ContingutHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
-import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
@@ -63,15 +59,11 @@ public class CarpetaResourceServiceImpl extends BaseMutableResourceService<Carpe
 
 	private final EntitatRepository entitatRepository;
 	private final CarpetaRepository carpetaRepository;
-	private final ContingutRepository contingutRepository;
-	private final CarpetaResourceRepository carpetaResourceRepository;
-	private final ContingutResourceRepository contingutResourceRepository;
 	
 	private final ContingutHelper contingutHelper;
 	private final ExcepcioLogHelper excepcioLogHelper;
 	private final CarpetaHelper carpetaHelper;
 	private final ConfigHelper configHelper;
-	private final PluginHelper pluginHelper;
 	private final ContingutResourceHelper contingutResourceHelper;
 	private final EntityComprovarHelper entityComprovarHelper;
 
