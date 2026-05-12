@@ -7,13 +7,13 @@ import {
     useResourceApiService,
 } from "reactlib";
 import {useTranslation} from "react-i18next";
-import FormActionDialog from "../../../components/FormActionDialog.tsx";
-import GridFormField from "../../../components/GridFormField.tsx";
-import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
-import Load from "../../../components/Load.tsx";
-import {formatDate} from "../../../util/dateUtils.ts";
-import * as builder from "../../../util/springFilterUtils.ts";
-import ContingutIcon from "../../contingut/details/ContingutIcon.tsx";
+import FormActionDialog from "@src/components/FormActionDialog.tsx";
+import GridFormField from "@src/components/GridFormField.tsx";
+import StyledMuiGrid from "@src/components/StyledMuiGrid.tsx";
+import Load from "@src/components/Load.tsx";
+import {formatDate} from "@src/util/dateUtils.ts";
+import * as builder from "@src/util/springFilterUtils.ts";
+import ContingutIcon from "@src/pages/contingut/details/ContingutIcon.tsx";
 
 const columns: any[] = [
     // {
@@ -73,10 +73,6 @@ const TancarForm = () => {
         }
     }, [apiIsReady]);
 
-    useEffect(() => {
-        formApiRef?.current?.setFieldValue('documentsPerFirmar', selectedRows);
-    }, [selectedRows]);
-
     const temp = useMemo(()=>{
         return {
             documentObligatorisAlTancar: entities?.flatMap?.((e:any) => e?.documentObligatorisAlTancar),
@@ -85,11 +81,14 @@ const TancarForm = () => {
         }
     },[entities])
 
-    const selectedModel: any[] = useMemo(() => {
-        const defaultSelection = temp?.documentObligatorisAlTancar?.map?.((row: any) => row?.id) ?? []
-        formApiRef?.current?.setFieldValue('documentsPerFirmar', defaultSelection);
-        return defaultSelection;
-    }, [temp?.documentObligatorisAlTancar])
+    const selectedModel: any[] = useMemo(() =>
+        temp?.documentObligatorisAlTancar?.map?.((row: any) => row?.id) ?? []
+    , [temp?.documentObligatorisAlTancar])
+
+    useEffect(() => {
+        const selected = Array.from(new Set([...selectedRows, ...selectedModel || []]))
+        formApiRef?.current?.setFieldValue('documentsPerFirmar', selected.filter((s) => !data.ids.includes(s)) );
+    }, [selectedRows, selectedModel]);
 
     return <Load value={entities && temp}>
         <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
@@ -104,7 +103,7 @@ const TancarForm = () => {
                         filter={filter}
                         selectionActive
                         rowSelectionModel={selectedModel}
-                        isRowSelectable={(params) => !selectedModel.includes(params.row?.id) && params.row?.tipus=="DOCUMENT"}
+                        // isRowSelectable={(params) => !selectedModel.includes(params.row?.id) && params.row?.tipus=="DOCUMENT"}
                         onRowCountChange={setRowsCount}
                         onRowSelectionModelChange={(newSelection) => {
                             setSelectedRows([...newSelection]);
