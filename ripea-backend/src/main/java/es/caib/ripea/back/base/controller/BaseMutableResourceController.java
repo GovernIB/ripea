@@ -560,6 +560,19 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 	}
 
 	@Override
+	protected List<Link> buildCollectionItemLinks(
+			Serializable id,
+			String[] perspective,
+			boolean withDownloadLink,
+			Link singleResourceBaseSelfLink,
+			ResourcePermissions resourcePermissions) {
+		return super.buildSingleResourceLinks(id, perspective, withDownloadLink, singleResourceBaseSelfLink, resourcePermissions)
+				.stream()
+				.map(link -> Link.of(link.getHref(), link.getRel()))
+				.collect(Collectors.toList());
+	}
+
+	@Override
 	protected List<Link> buildResourceCollectionLinks(
 			String quickFilter,
 			String filter,

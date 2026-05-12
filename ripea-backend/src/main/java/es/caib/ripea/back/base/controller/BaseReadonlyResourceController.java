@@ -901,7 +901,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 			Link... links) {
 		return PagedModel.of(
 				page.getContent().stream().map(resource -> {
-					Link[] resourceLinks = resource != null ? buildSingleResourceLinks(
+					Link[] resourceLinks = resource != null ? buildCollectionItemLinks(
 							resource.getId(),
 							perspectives,
 							withDownloadLink,
@@ -1145,6 +1145,18 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 		}
 		ls.addAll(buildSingleResourceArtifactLinks(id));
 		return ls;
+	}
+
+	protected List<Link> buildCollectionItemLinks(
+			Serializable id,
+			String[] perspective,
+			boolean withDownloadLink,
+			Link singleResourceBaseSelfLink,
+			ResourcePermissions resourcePermissions) {
+		return buildSingleResourceLinks(id, perspective, withDownloadLink, singleResourceBaseSelfLink, resourcePermissions)
+				.stream()
+				.map(link -> Link.of(link.getHref(), link.getRel()))
+				.collect(Collectors.toList());
 	}
 
 	@SneakyThrows
