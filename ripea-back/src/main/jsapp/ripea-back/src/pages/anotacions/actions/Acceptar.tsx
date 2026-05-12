@@ -144,7 +144,7 @@ const AcceptarTabAnnexos = () => {
             onRowsChange={(rows:any) => {
                 if (rows.length > 0 && rows.length != Object.keys(data?.annexos).length) {
                     const annexos = Object.fromEntries(
-                        rows.map((row) => [row.id, (data?.annexos[row.id] || '')])
+                        rows.map((row:any) => [row.id, (data?.annexos[row.id] || '')])
                     );
 
                     apiRef?.current?.setFieldValue('annexos', annexos)
