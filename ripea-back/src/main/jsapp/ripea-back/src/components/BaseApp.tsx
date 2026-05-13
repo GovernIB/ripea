@@ -23,6 +23,7 @@ import Footer from './Footer';
 import drassana from '../assets/drassana.png';
 import UserHeadToolbar from "../pages/user/UserHeadToolbar.tsx";
 import {UserMenu} from "../pages/user/UserMenu.tsx";
+import AppFormFieldReference from './AppFormFieldReference';
 import {useAlertesSession} from "./SseClient.tsx";
 import {useUserSession} from "./Session";
 import AlertExpand from "./AlertExpand.tsx";
@@ -220,6 +221,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
         routerAnyHistoryEntryExist={anyHistoryEntryExist}
         linkComponent={Link}
         marginsDisabled
+        formFieldComponents={[{ type: 'reference', component: AppFormFieldReference }]}
         menuEntries={baseAppMenuEntries}>
         <CustomLocalizationProvider>
             <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>

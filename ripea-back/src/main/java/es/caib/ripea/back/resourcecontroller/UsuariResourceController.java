@@ -189,6 +189,8 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
         response.put("isPropagarMetadades", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.PROPAGAR_METADADES)));
         response.put("isCarpetesDefecte", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.CARPETES_PER_DEFECTE)));
         response.put("isRestringirCarpetesActiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.CARPETES_RESTRINGIR_ACTIU)));
+        String maxResultsSelects = aplicacioService.propertyFindByNom(PropertyConfig.MAX_RESULTS_SELECT);
+        response.put("maxResultSelects", maxResultsSelects!=null?Integer.parseInt(maxResultsSelects):30);
 
         if ("IPA_ADMIN".equals(userPermissionInfo.getRolActual()) && userPermissionInfo.getEntitatActualId()!=null) {
         	try {
