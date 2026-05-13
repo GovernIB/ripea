@@ -17,10 +17,6 @@ const ImportarDocumentMassiveForm = (props:any) => {
         }
     }, [data?.totsExpedientsMateixProcediment]);
 
-    if (!data?.totsExpedientsMateixProcediment) {
-        return <Alert severity={"warning"}>{t('page.expedient.action.impDocMass.warning')}</Alert>
-    }
-
     const fieldFitxer = fields?.filter(i=>i.name=='file')[0];
     const fieldTipusDocument = fields?.filter(i=>i.name=='tipusDocument')[0];
 
@@ -83,6 +79,10 @@ const ImportarDocumentMassiveForm = (props:any) => {
         }
     ], [apiRef, data.documents, data?.metaExpedientId, fieldFitxer, fieldTipusDocument, updateDocument]);
 
+    if (!data?.totsExpedientsMateixProcediment) {
+        return <Alert severity={"warning"}>{t('page.expedient.action.impDocMass.warning')}</Alert>
+    }
+
     const CustomToolbar = () => {
         return <GridToolbarContainer sx={{ height: '52px', display: 'flex', justifyContent: 'space-between', mr: 1 }}>
             <Typography ml={1}>{t('page.expedient.action.impDocMass.mssg', {num: data?.ids?.length})}</Typography>
@@ -103,13 +103,14 @@ const ImportarDocumentMassiveForm = (props:any) => {
                 rows={data?.documents}
                 columns={columns}
 
-                getRowHeight={() => 75}
+                getRowHeight={() => 70}
                 style={{
                     height: 162 + 75 * (data?.documents.length>0 ?data?.documents.length :1),
                 }}
                 disableColumnMenu
                 disableColumnSorting
                 disableRowSelectionOnClick
+                showToolbar
                 slots={{ // añadimos nuestra Toolbar
                     toolbar: CustomToolbar,
                 }}
@@ -127,9 +128,10 @@ export const ImportarDocumentMassive = (props:any) => {
         action={"IMPORT_DOCS_MASS"}
         title={t('page.expedient.action.impDocMass.title')}
         formDialogButtons={[
-            !disabled && {icon: 'check', text: t('common.import'), componentProps: { variant: 'contained' }, value: true },
+            {icon: 'check', text: t('common.import'), componentProps: { variant: 'contained', disabled }, value: true },
             {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
         ]}
+        onClose={() => setDisabled(true)}
         initialOnChange
         {...props}
     >
