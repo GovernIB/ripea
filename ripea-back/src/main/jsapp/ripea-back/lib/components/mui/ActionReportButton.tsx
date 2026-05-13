@@ -67,6 +67,8 @@ export type ActionReportButtonProps = {
     formDialogContent?: React.ReactElement;
     /** Component que mostra que l'acció/informe s'està executant */
     formDialogLoading?: React.ReactElement;
+    /** Indica si s'ha de mostrar la icona de tancar al component de diàleg */
+    formDialogCloseIcon?: boolean;
     /** Botons pel component de diàleg */
     formDialogButtons?: DialogButton[];
     /** Propietats pel component de diàleg */
@@ -161,6 +163,7 @@ const TextCustomButton: React.FC<TextCustomButtonProps> = (props) => {
  * @param onSuccess - Event que es llença quan l'execució de l'artefacte finalitza sense errors.
  * @param onError - Event que es llença quan l'execució de l'artefacte finalitza amb errors.
  * @param onClose - Event que es llença quan es tanca la modal del formulari de l'artefacte.
+ * @param dialogCloseIcon - Indica si s'ha de mostrar la icona de tancar a la modal del formulari de l'artefacte.
  * @param dialogCloseCallback - Callback que es crida quan es tanca el diàleg.
  * @param dialogAutoSubmit - Indica si s'ha d'executar l'acció automàticament al obrir el diàleg.
  * @returns un objecte amb el resultat d'executar la lògica.
@@ -183,6 +186,7 @@ export const useActionReportLogic = (
     onSuccess?: (result?: any) => void,
     onError?: (error?: any) => void,
     onClose?: () => void,
+    dialogCloseIcon?: boolean,
     dialogCloseCallback?: (reason?: string) => boolean,
     dialogAutoSubmit?: boolean
 ): ActionReportLogicResult => {
@@ -265,7 +269,7 @@ export const useActionReportLogic = (
         },
         formI18nKeys,
         dialogCloseCallback,
-        true,
+        dialogCloseIcon ?? false,
         dialogAutoSubmit
     );
     const exec = (
@@ -387,6 +391,7 @@ export const ActionReportButton: React.FC<ActionReportButtonProps> = (props) => 
         formDialogTitle,
         formDialogContent,
         formDialogLoading,
+        formDialogCloseIcon,
         formDialogButtons,
         formDialogComponentProps,
         formDialogResultProcessor,
@@ -420,6 +425,7 @@ export const ActionReportButton: React.FC<ActionReportButtonProps> = (props) => 
         onSuccess,
         onError,
         onClose,
+        formDialogCloseIcon,
         undefined,
         dialogAutoSubmit
     );

@@ -69,6 +69,7 @@ const FormActionDialog = (props:FormActionDialogProp) => {
         onSuccess,
         onError,
         onClose,
+        true,
         (reason?: string) => reason !== 'backdropClick'
     )
 
@@ -126,6 +127,7 @@ export const FormReportDialog = (props:FormReportDialogProp) => {
         onSuccess,
         onError,
         onClose,
+        true,
         (reason?: string) => reason !== 'backdropClick'
     )
 
