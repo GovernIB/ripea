@@ -141,9 +141,11 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 						perspectives,
 						true,
 						null,
+						null,
 						resourceApiService.permissionsCurrentUser(
 								getResourceClass(),
-								id)).toArray(new Link[0]));
+								id),
+						true).toArray(new Link[0]));
 		return ResponseEntity.ok(entityModel);
 	}
 
@@ -197,6 +199,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 					true,
 					null,
 					resourcePermissions,
+					false,
 					buildResourceCollectionLinks(
 							quickFilter,
 							filter,
@@ -321,7 +324,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 		return ResponseEntity.ok(
 				CollectionModel.of(
 						artifactsAsEntities,
-						buildArtifactsLinks(artifacts)));
+						buildArtifactsLinks()));
 	}
 
 	@Override
@@ -898,15 +901,19 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 			boolean withDownloadLink,
 			Link singleResourceSelfLink,
 			ResourcePermissions resourcePermissions,
+			boolean withEditLinksInputAndOutput,
 			Link... links) {
+		List<ResourceArtifact> artifactsAll = getReadonlyResourceService().artifactFindAll(null);
 		return PagedModel.of(
 				page.getContent().stream().map(resource -> {
-					Link[] resourceLinks = resource != null ? buildCollectionItemLinks(
+					Link[] resourceLinks = resource != null ? buildSingleResourceLinks(
 							resource.getId(),
 							perspectives,
 							withDownloadLink,
 							singleResourceSelfLink,
-							resourcePermissions).toArray(new Link[0]) : new Link[0];
+							artifactsAll,
+							resourcePermissions,
+							withEditLinksInputAndOutput).toArray(new Link[0]) : new Link[0];
 					return toEntityModel(resource, resourceLinks);
 				}).collect(Collectors.toList()),
 				new PagedModel.PageMetadata(
@@ -1060,6 +1067,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 								false,
 								singleResourceBaseSelfLink,
 								ResourcePermissions.readOnly(),
+								true,
 								buildOptionsLinks(
 										referencedResourceFieldAndClass.get().getClazz(),
 										quickFilter,
@@ -1113,7 +1121,9 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 							perspectives,
 							false,
 							singleResourceBaseSelfLink,
-							ResourcePermissions.readOnly()).toArray(new Link[0]));
+							null,
+							ResourcePermissions.readOnly(),
+							true).toArray(new Link[0]));
 			return ResponseEntity.ok(entityModel);
 		} else {
 			throw new ResourceFieldNotFoundException(resourceClass, fieldName);
@@ -1126,7 +1136,9 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 			String[] perspective,
 			boolean withDownloadLink,
 			Link singleResourceBaseSelfLink,
-			ResourcePermissions resourcePermissions) {
+			List<ResourceArtifact> artifactsAll,
+			ResourcePermissions resourcePermissions,
+			boolean withEditLinksInputAndOutput) {
 		List<Link> ls = new ArrayList<>();
 		Link selfLink;
 		if (singleResourceBaseSelfLink != null) {
@@ -1143,20 +1155,8 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 		if (withDownloadLink) {
 			ls.add(buildFieldDownloadLink(id));
 		}
-		ls.addAll(buildSingleResourceArtifactLinks(id));
+		ls.addAll(buildSingleResourceArtifactLinks(id, artifactsAll));
 		return ls;
-	}
-
-	protected List<Link> buildCollectionItemLinks(
-			Serializable id,
-			String[] perspective,
-			boolean withDownloadLink,
-			Link singleResourceBaseSelfLink,
-			ResourcePermissions resourcePermissions) {
-		return buildSingleResourceLinks(id, perspective, withDownloadLink, singleResourceBaseSelfLink, resourcePermissions)
-				.stream()
-				.map(link -> Link.of(link.getHref(), link.getRel()))
-				.collect(Collectors.toList());
 	}
 
 	@SneakyThrows
@@ -1389,9 +1389,11 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 		return expandMap.isEmpty() ? link : link.expand(expandMap);
 	}
 
-	protected List<Link> buildSingleResourceArtifactLinks(Serializable id) {
-		List<ResourceArtifact> artifacts = getReadonlyResourceService().artifactFindAll(null);
-		return artifacts.stream().
+	protected List<Link> buildSingleResourceArtifactLinks(Serializable id, List<ResourceArtifact> artifactsAll) {
+		List<ResourceArtifact> thisArtifactsAll = artifactsAll != null ?
+				artifactsAll :
+				getReadonlyResourceService().artifactFindAll(null);
+		return thisArtifactsAll.stream().
 				filter(a -> a.getType() == ResourceArtifactType.REPORT && a.getRequiresId() != null && a.getRequiresId()).
 				map(a -> buildReportLinkWithAffordances(a, id)).
 				collect(Collectors.toList());
@@ -1405,7 +1407,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 				collect(Collectors.toList());
 	}
 
-	protected Link[] buildArtifactsLinks(List<ResourceArtifact> artifacts) {
+	protected Link[] buildArtifactsLinks() {
 		List<Link> ls = new ArrayList<>();
 		Link selfLink = linkTo(methodOn(getClass()).artifacts()).withSelfRel();
 		ls.add(selfLinkWithDefaultProperties(selfLink, false));
