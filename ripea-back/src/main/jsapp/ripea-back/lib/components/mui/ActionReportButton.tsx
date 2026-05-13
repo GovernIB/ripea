@@ -265,7 +265,7 @@ export const useActionReportLogic = (
         },
         formI18nKeys,
         dialogCloseCallback,
-        false,
+        true,
         dialogAutoSubmit
     );
     const exec = (
