@@ -21,7 +21,7 @@ const IntegracioFilterForm = ({handleOpen}:any) => {
 
 const springFilterBuilder = (data:any) => {
     return builder.and(
-        builder.eq('entitat.id', data?.entitat?.id),
+        builder.eq('entitat.id', data?.entitat?.id), //Al back (additionalSpringFilter) es substitueix per entitatCodi
         builder.betweenDates('data', data?.dataInici, data?.dataFi),
         builder.eq('tipus', `'${data?.tipus}'`),
         builder.like('descripcio', data?.descripcio),

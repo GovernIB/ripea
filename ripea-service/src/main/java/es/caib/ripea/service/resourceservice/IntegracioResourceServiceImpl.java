@@ -4,6 +4,9 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.annotation.PostConstruct;
 
@@ -56,6 +59,32 @@ public class IntegracioResourceServiceImpl extends BaseMutableResourceService<In
 		resource.setParametres(entity.getParametres());
 	}
 
+    private static final Pattern ENTITAT_ID_PATTERN = Pattern.compile("entitat\\.id:(\\d+)");
+
+    @Override
+    protected <P> Specification<P> toFindProcessedSpecification(String quickFilter, String filter, String[] namedQueries) {
+    	//Substituir entitat.id (que no existeix al IntegracioResourceEntity), per entitatCodi 
+        return super.toFindProcessedSpecification(quickFilter, translateEntitatFilter(filter), namedQueries);
+    }
+
+    private String translateEntitatFilter(String filter) {
+        if (filter == null) return null;
+        Matcher matcher = ENTITAT_ID_PATTERN.matcher(filter);
+        if (!matcher.find()) return filter;
+        matcher.reset();
+        StringBuffer sb = new StringBuffer();
+        while (matcher.find()) {
+            long entitatId = Long.parseLong(matcher.group(1));
+            Optional<EntitatEntity> entitat = entitatRepository.findById(entitatId);
+            String replacement = entitat.isPresent()
+                    ? "entitatCodi:'" + entitat.get().getCodi() + "'"
+                    : "entitatCodi:'__NOT_FOUND__'";
+            matcher.appendReplacement(sb, Matcher.quoteReplacement(replacement));
+        }
+        matcher.appendTail(sb);
+        return sb.toString();
+    }
+	
 	@Override
 	protected <P> Specification<P> namedQueryToSpecification(String namedQuery) {
 		try {

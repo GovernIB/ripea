@@ -12,7 +12,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @ResourceConfig(
-        quickFilterFields = { "uri", "message" },
+        quickFilterFields = { "tipus", "uri", "message" },
         descriptionField = "message"
 )
 public class ExcepcioLogResource implements Resource<Long> {

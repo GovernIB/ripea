@@ -123,6 +123,7 @@ export const ExcepcioGrid = () => {
                 sortModel={sortModel}
                 perspectives={perspectives}
                 rowAdditionalActions={actions}
+                toolbarShowQuickFilter
                 readOnly
             />
             {dialog}

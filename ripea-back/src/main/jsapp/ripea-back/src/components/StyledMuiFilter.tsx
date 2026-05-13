@@ -67,7 +67,8 @@ const StyledMuiFilter = (props:any) => {
         if (sessionKey) {
             saveFilterData(null)
         }
-        apiRef?.current?.clear?.()
+        apiRef?.current?.reset?.({})
+        apiRef?.current?.filter?.({})
     }
 
     const callback = (value: string) => {
