@@ -151,10 +151,11 @@ const DocumentsGridForm = ({ setDisabled }:any) => {
 		               hidden={!data?.ntiEstadoElaboracion
 		                   || data?.ntiEstadoElaboracion == 'EE01'
 		                   || data?.ntiEstadoElaboracion == 'EE99'}/>		
-        {id == null && user?.sessionScope?.isCreacioCarpetesActiva && (
+        {id == null && (user?.sessionScope?.isCreacioCarpetesActiva || data?.contingutScopeDestiCarpeta) && (
             <GridFormField
                 name="carpeta"
                 filter={carpetaFilter}
+                readOnly={!user?.sessionScope?.isCreacioCarpetesActiva}
             />
         )}
 		{!isPermesModificarCustodiatsVar() &&	

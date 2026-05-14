@@ -1,5 +1,4 @@
-import React, {RefObject, useEffect, useMemo, useState} from "react";
-import { useNavigate } from 'react-router-dom';
+import React, {RefObject, useCallback, useEffect, useMemo, useState} from "react";
 import { DndContext } from '@dnd-kit/core';
 import {dndScreenReaderInstructions} from "../../util/dndAccessibility.tsx";
 import { FormControl, Grid, Select, MenuItem, Icon, Box } from "@mui/material";
@@ -155,7 +154,6 @@ const columns = [
 const DocumentsGrid = (props: any) => {
     const { entity, onRowCountChange, contingutScopeId } = props;
     const { t } = useTranslation();
-    const navigate = useNavigate();
     const { value: user, rol } = useUserSession();
     const contingutCarpetaDetallAccesActiva = user?.sessionScope?.isContingutCarpetaDetallAccesActiva === true;
 
@@ -195,6 +193,18 @@ const DocumentsGrid = (props: any) => {
         refresh: refreshTree
     } = useExpedientsCarpetes(commonFilter);
 
+    const formCarpetaDestiPerScope = useMemo(() => {
+        if (contingutScopeId == null || contingutScopeId === '') {
+            return undefined;
+        }
+        const actual = carpetes?.find((c: any) => String(c?.id) === String(contingutScopeId));
+        const nom = actual?.nom;
+        return {
+            id: contingutScopeId,
+            description: nom != null && nom !== '' ? nom : String(contingutScopeId),
+        };
+    }, [contingutScopeId, carpetes]);
+
     const refresh = () => {
         if (vista == View.carpeta || vista == View.icona) {
             refreshTree()
@@ -212,7 +222,7 @@ const DocumentsGrid = (props: any) => {
     }, [contingutScopeId, entity?.id]);
 
     const {handleOpen: handleVisualitzarOpen, dialog: dialogVisualitzar, isValid} = useVisualitzar();
-    const { createActions, actions, components } = useContingutActions(entity, apiRef, refresh, contingutScopeId);
+    const { createActions, actions, components } = useContingutActions(entity, apiRef, refresh, contingutScopeId, formCarpetaDestiPerScope?.description);
     const { actions: massiveActions, components: massiveComponents } = useContingutMassiveActions(entity, refresh);
 
     const draggable = useMemo(()=> (
@@ -222,6 +232,17 @@ const DocumentsGrid = (props: any) => {
     const onDrop = React.useCallback((adjunt: any) => {
         apiRef?.current?.triggerCreate?.(null, { adjunt })
     }, [apiRef])
+
+    const toggleCarpetaExpansion = useCallback((rowId: any) => {
+        const api = dataApiRef.current;
+        if (!api || !treeView) {
+            return;
+        }
+        const node = api.getRowNode(rowId);
+        const expanded = (node as { childrenExpanded?: boolean })?.childrenExpanded ?? false;
+        api.setRowChildrenExpansion(rowId, !expanded);
+        addFolderExpand(`${rowId}`, !expanded);
+    }, [dataApiRef, treeView, addFolderExpand]);
 
     const handleDragEnd = (params: any) => {
         // console.log("params", params)
@@ -270,6 +291,12 @@ const DocumentsGrid = (props: any) => {
                         formAdditionalData={{
                             expedient: { id: entity?.id },
                             metaExpedient: entity?.metaExpedient,
+                            ...(formCarpetaDestiPerScope
+                                ? {
+                                    carpeta: formCarpetaDestiPerScope,
+                                    contingutScopeDestiCarpeta: true,
+                                }
+                                : {}),
                         }}
                         apiRef={apiRef}
                         datagridApiRef={dataApiRef}
@@ -420,8 +447,8 @@ const DocumentsGrid = (props: any) => {
                         toolbarMassiveActions={massiveActions}
                         isRowSelectable={(data: any) => data?.row?.tipus == "DOCUMENT"}
                         onRowClick={(params: any) => {
-                            if (params?.row.tipus === 'CARPETA' && params?.row?.id != null && contingutCarpetaDetallAccesActiva) {
-                                navigate(`/contingut/${params.row.id}`);
+                            if (params?.row.tipus === 'CARPETA' && params?.row?.id != null) {
+                                toggleCarpetaExpansion(params.row.id);
                                 return;
                             }
                             if (params?.row.tipus === 'DOCUMENT' && isValid(params?.row)) {
@@ -433,17 +460,19 @@ const DocumentsGrid = (props: any) => {
                         popupEditFormComponentProps={{
                             initOnChangeRequest: true,
                             onBeforeCreateSuccess: (formData: any) => {
+                                const clean: any = { ...formData };
+                                delete clean.contingutScopeDestiCarpeta;
                                 if (!contingutCarpetaDetallAccesActiva || contingutScopeId == null || contingutScopeId === '') {
-                                    return formData;
+                                    return clean;
                                 }
-                                if (formData?.carpeta != null && formData?.carpeta?.id != null) {
-                                    return formData;
+                                if (clean?.carpeta != null && clean?.carpeta?.id != null) {
+                                    return clean;
                                 }
                                 const scopeId = contingutScopeId;
                                 const actual = carpetes?.find((c: any) => String(c?.id) === String(scopeId));
                                 const nom = actual?.nom;
                                 return {
-                                    ...formData,
+                                    ...clean,
                                     carpeta: {
                                         id: scopeId,
                                         description: nom != null && nom !== '' ? nom : String(scopeId),

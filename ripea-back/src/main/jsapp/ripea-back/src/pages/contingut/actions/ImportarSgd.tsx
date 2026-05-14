@@ -125,7 +125,7 @@ const Importar = ({ ...props }: any) => {
 	);
 };
 
-const useImportar = (entity: any, refresh?: () => void) => {
+const useImportar = (entity: any, refresh?: () => void, contingutPareId?: string | number | null, contingutPareNom?: string | null) => {
 	const apiRef = useMuiFormDialogApiRef();
 	const { temporalMessageShow } = useBaseAppContext();
 	const { t } = useTranslation();
@@ -137,7 +137,19 @@ const useImportar = (entity: any, refresh?: () => void) => {
 	const handleShow = () => {
 		polling.setFinished(true);
 		setIsProcessed(false);
-		apiRef.current?.show?.(entity?.id);
+		if (contingutPareId != null && contingutPareId !== '') {
+			apiRef.current?.show?.(entity?.id, {
+				carpeta: {
+					id: contingutPareId,
+					description:
+						contingutPareNom != null && contingutPareNom !== ''
+							? contingutPareNom
+							: String(contingutPareId),
+				},
+			});
+		} else {
+			apiRef.current?.show?.(entity?.id);
+		}
 	};
 
 	const processResult = async (resultat: any) => {
