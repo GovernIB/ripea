@@ -181,7 +181,7 @@ export const UserMenu = () => {
 }
 const UserMenuButton = () => {
     const { t } = useTranslation();
-    const { toProgramaAntic } = useToProgramaAntic();
+    const { getUrl } = useToProgramaAntic();
     const { value: user, remove: signOut } = useUserSession();
 
     return <Load value={user} noEffect>
@@ -210,8 +210,9 @@ const UserMenuButton = () => {
             <Divider/>
 
             <MenuItem onClick={() => {
-                signOut?.()
-                toProgramaAntic('usuari/logout')
+                const logoutUrl = getUrl('usuari/logout');
+                signOut?.();
+                window.location.href = logoutUrl;
             }}>
                 <ListItemIcon>
                     <Icon fontSize="small">logout</Icon>

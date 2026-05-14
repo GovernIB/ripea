@@ -1,10 +1,18 @@
 import React from 'react';
-import { AuthContext } from 'reactlib';
+import { AuthContext, useResourceApiContext } from 'reactlib';
 import { useUserSession } from './Session';
 
 export const RipeaAuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
-    const { value: user } = useUserSession();
+    const { value: user, remove: clearSession } = useUserSession();
+    const { apiUrl } = useResourceApiContext();
     const isAuthenticated = user != null;
+
+    const signOut = () => {
+        const logoutUrl = apiUrl.replace(/\/api\/?$/, '/') + 'usuari/logout';
+        clearSession?.();
+        window.location.href = logoutUrl;
+    };
+
     const context = {
         isLoading: false,
         isReady: true,
@@ -20,7 +28,7 @@ export const RipeaAuthProvider: React.FC<React.PropsWithChildren> = ({ children 
         getUserName: () => user?.nom ?? '',
         getUserEmail: () => user?.email ?? '',
         signIn: undefined,
-        signOut: undefined,
+        signOut,
     };
     return <AuthContext.Provider value={context}>{children}</AuthContext.Provider>;
 };

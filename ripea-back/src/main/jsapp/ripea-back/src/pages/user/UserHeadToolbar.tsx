@@ -38,7 +38,7 @@ export const useToProgramaAntic = () => {
             ref = "/" + ref
         }
         return `${cleanApiUrl}${ref}`;
-    },[]);
+    },[cleanApiUrl]);
 
     return {
         getUrl,
