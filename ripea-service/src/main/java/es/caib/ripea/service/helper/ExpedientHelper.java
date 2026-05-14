@@ -1581,7 +1581,7 @@ public class ExpedientHelper {
 
 		logger.debug("Tancant l'expedient (" + "entitatId=" + entitatId + ", " + "id=" + expedientId + "," + "motiu=" + motiu + ")");
 
-		expedientHelper2.checkIfExpedientCanBeClosed(expedientId);
+		expedientHelper2.checkIfExpedientCanBeClosed(entitatId, expedientId, documentsPerFirmar);
 		
 		/**
 		 * #1525 Permetre tancar un expedient encara que hi hagi remeses tipus comunicació no finalitzades
