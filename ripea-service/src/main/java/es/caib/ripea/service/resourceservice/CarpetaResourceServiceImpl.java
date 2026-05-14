@@ -96,9 +96,12 @@ public class CarpetaResourceServiceImpl extends BaseMutableResourceService<Carpe
     	try {
 			//La entitat ja es comprova a pinbalHelper
 			EntitatEntity entitatEntity = entitatRepository.findByCodi(configHelper.getEntitatActualCodi());
+			Long pareId = resource.getPare() != null && resource.getPare().getId() != null
+					? resource.getPare().getId()
+					: resource.getExpedient().getId();
 			CarpetaDto carpetaCreada = carpetaHelper.create(
 					entitatEntity.getId(),
-					resource.getExpedient().getId(),
+					pareId,
 					resource.getNom(),
 					false,
 					null,

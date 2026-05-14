@@ -103,10 +103,12 @@ const DocumentsGridForm = ({ setDisabled }:any) => {
         builder.eq("actiu", true),
     );
 	
-	const carpetaFilter: string = builder.and(
-	    builder.eq("expedient.id", data?.expedient?.id),
-	    builder.eq("esborrat", 0),
-	);
+	const carpetaFilter: string = useMemo(() => (
+	    builder.and(
+	        builder.eq("expedient.id", data?.expedient?.id),
+	        builder.eq("esborrat", 0),
+	    )
+	), [data?.expedient?.id]);
 
     const tabs = [
         {
@@ -149,11 +151,12 @@ const DocumentsGridForm = ({ setDisabled }:any) => {
 		               hidden={!data?.ntiEstadoElaboracion
 		                   || data?.ntiEstadoElaboracion == 'EE01'
 		                   || data?.ntiEstadoElaboracion == 'EE99'}/>		
-        {id==null &&
-            <GridFormField name="carpeta"
-                        filter={carpetaFilter}
-                        hidden={!user?.sessionScope?.isCreacioCarpetesActiva}/>
-        }
+        {id == null && user?.sessionScope?.isCreacioCarpetesActiva && (
+            <GridFormField
+                name="carpeta"
+                filter={carpetaFilter}
+            />
+        )}
 		{!isPermesModificarCustodiatsVar() &&	
 	        <Grid size={12}>
 	            <TabComponent

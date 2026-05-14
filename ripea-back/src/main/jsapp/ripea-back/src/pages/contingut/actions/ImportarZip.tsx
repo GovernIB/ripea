@@ -229,7 +229,7 @@ const ImportarZip = ({ ...props }: any) => {
 	);
 };
 
-const useImportarZip = (entity: any, refresh?: () => void) => {
+const useImportarZip = (entity: any, refresh?: () => void, contingutPareId?: string | number | null) => {
 	const { t } = useTranslation();
 	const apiRef = useMuiFormDialogApiRef();
 	const { temporalMessageShow } = useBaseAppContext();
@@ -241,7 +241,11 @@ const useImportarZip = (entity: any, refresh?: () => void) => {
 	const handleShow = () => {
 		polling.setFinished(true);
 		setIsProcessed(false);
-		apiRef.current?.show?.(entity?.id);
+		const extra =
+			contingutPareId != null && contingutPareId !== ''
+				? { carpeta: { id: contingutPareId } }
+				: undefined;
+		apiRef.current?.show?.(entity?.id, extra);
 	};
 
 	const processResult = async (resultat: any) => {

@@ -595,6 +595,8 @@ public class ExpedientResource extends NodeResource implements Serializable {
         @NotNull @NotEmpty
     	private List<ImportacioZipDocument> documentsZip;
 
+        private ResourceReference<CarpetaResource, Long> carpeta;
+
         @Transient
         private String nom;
         @Transient

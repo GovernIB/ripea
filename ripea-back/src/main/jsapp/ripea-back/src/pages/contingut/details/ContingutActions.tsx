@@ -144,15 +144,15 @@ export const useActions = (refresh?: () => void) => {
     }
 }
 
-export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refresh?: () => void) => {
+export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refresh?: () => void, contingutParentId?: string | number | null) => {
     const { t } = useTranslation();
     const { value: user } = useUserSession();
 
     const {handleShow: handleDocPinbal, content: contentDocPinbal} = useDocPinbal(entity, refresh)
-    const {handleShow: handleCrearCarpeta, content: contentCrearCarpeta} = useCrearCarpeta(entity, refresh)
+    const {handleShow: handleCrearCarpeta, content: contentCrearCarpeta} = useCrearCarpeta(entity, refresh, contingutParentId)
     const {handleShow: handleImportar, content: contentImportar} = useImportar(entity, refresh)
     const {handleOpen: handleImportarExpedient, dialog: dialogImportarExpedient} = useImportarExpedient(entity, refresh)
-	const {handleShow: handleImportarZip, content: contentImportarZip} = useImportarZip(entity, refresh)
+	const {handleShow: handleImportarZip, content: contentImportarZip} = useImportarZip(entity, refresh, contingutParentId)
 
     const {eliminar, apiDownload, getLinkCSV, definitiu, guardarArxiu} = useActions(refresh)
     const {handleOpen: handleDetallOpen, dialog: dialogDetall} = useDocumentDetail(entity, refresh);

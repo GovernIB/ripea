@@ -44,17 +44,21 @@ const Crear = (props:any) => {
     </MuiFormDialog>
 }
 
-const useCrear = (entity:any, refresh?: () => void) => {
+const useCrear = (entity:any, refresh?: () => void, contingutPareId?: string | number | null) => {
     const { t } = useTranslation();
     const apiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow} = useBaseAppContext();
 
     const handleShow = () => {
-        apiRef.current?.show(undefined, {
-            expedient: {id: entity?.id},
-			metaExpedientId: entity?.metaExpedient?.id,
-            expedientRelacionat: {id: entity?.id},
-        })
+        const initial: Record<string, unknown> = {
+            expedient: { id: entity?.id },
+            metaExpedientId: entity?.metaExpedient?.id,
+            expedientRelacionat: { id: entity?.id },
+        };
+        if (contingutPareId != null && contingutPareId !== '') {
+            initial.pare = { id: contingutPareId };
+        }
+        apiRef.current?.show(undefined, initial)
             .then((data:any) => {
                 refresh?.()
                 temporalMessageShow(null, t('page.carpeta.action.new.ok', {data}), 'success');

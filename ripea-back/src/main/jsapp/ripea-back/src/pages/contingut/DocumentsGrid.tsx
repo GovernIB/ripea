@@ -1,4 +1,5 @@
 import React, {RefObject, useEffect, useMemo, useState} from "react";
+import { useNavigate } from 'react-router-dom';
 import { DndContext } from '@dnd-kit/core';
 import {dndScreenReaderInstructions} from "../../util/dndAccessibility.tsx";
 import { FormControl, Grid, Select, MenuItem, Icon, Box } from "@mui/material";
@@ -26,6 +27,22 @@ enum View {
     carpeta = 'TREETABLE_PER_CARPETA',
     icona = 'GRID',
 }
+
+// Només deixa les files del subarbre de la carpeta. Filtre de client damunt el llistat de l'expedient
+const rowsEnSubarbre = (rows: any[], contingutScopeId: string | number) => {
+    const scope = String(contingutScopeId);
+    return rows.filter((row: any) => {
+        if (String(row?.id) === scope) {
+            return false;
+        }
+        const path = row?.treePath;
+        if (Array.isArray(path) && path.length > 0) {
+            return path.some((p: any) => String(p) === scope);
+        }
+        const pareId = row?.pare?.id ?? row?.pareId;
+        return pareId != null && String(pareId) === scope;
+    });
+};
 
 const ExpandButton = (props: { value: any, onChange: (value: any) => void, hidden: boolean }) => {
     const { value, onChange, hidden } = props;
@@ -93,12 +110,12 @@ export const useExpedientsCarpetes = (commonFilter: string) => {
         if (apiExpedientIsReady) {
             findExpedients();
         }
-    }, [apiExpedientIsReady]);
+    }, [apiExpedientIsReady, commonFilter]);
     useEffect(() => {
         if (apiCarpetaIsReady) {
             findCarpetes();
         }
-    }, [apiCarpetaIsReady]);
+    }, [apiCarpetaIsReady, commonFilter]);
     const refresh = async () => {
         await Promise.allSettled([findExpedients(), findCarpetes()]);
     }
@@ -134,10 +151,13 @@ const columns = [
         flex: 0.45,
     },
 ];
+
 const DocumentsGrid = (props: any) => {
-    const { entity, onRowCountChange } = props;
+    const { entity, onRowCountChange, contingutScopeId } = props;
     const { t } = useTranslation();
+    const navigate = useNavigate();
     const { value: user, rol } = useUserSession();
+    const contingutCarpetaDetallAccesActiva = user?.sessionScope?.isContingutCarpetaDetallAccesActiva === true;
 
     const sortModel:any[] = useMemo(() => {
         if (user?.sessionScope?.ordenacioContingutPermesa) {
@@ -159,7 +179,8 @@ const DocumentsGrid = (props: any) => {
         builder.eq('esborrat', 0),
     ), [entity?.id]);
 
-    const { get: getFolderExpand, save: addFolderExpand, removeAll } = useSessionList(`folder_expand#${entity?.id}`)
+    const folderSessionKey = `folder_expand#${entity?.id}#${contingutScopeId ?? 'root'}`;
+    const { get: getFolderExpand, save: addFolderExpand, removeAll } = useSessionList(folderSessionKey)
 
     const apiRef = useMuiDataGridApiRef();
     const dataApiRef: RefObject<GridApiPro | null> = useMuiDatagridApiRef();
@@ -173,6 +194,7 @@ const DocumentsGrid = (props: any) => {
         expedients,
         refresh: refreshTree
     } = useExpedientsCarpetes(commonFilter);
+
     const refresh = () => {
         if (vista == View.carpeta || vista == View.icona) {
             refreshTree()
@@ -182,8 +204,15 @@ const DocumentsGrid = (props: any) => {
         }
     }
 
+    useEffect(() => {
+        if (entity?.id == null) {
+            return;
+        }
+        apiRef?.current?.refresh?.();
+    }, [contingutScopeId, entity?.id]);
+
     const {handleOpen: handleVisualitzarOpen, dialog: dialogVisualitzar, isValid} = useVisualitzar();
-    const { createActions, actions, components } = useContingutActions(entity, apiRef, refresh);
+    const { createActions, actions, components } = useContingutActions(entity, apiRef, refresh, contingutScopeId);
     const { actions: massiveActions, components: massiveComponents } = useContingutMassiveActions(entity, refresh);
 
     const draggable = useMemo(()=> (
@@ -197,9 +226,10 @@ const DocumentsGrid = (props: any) => {
     const handleDragEnd = (params: any) => {
         // console.log("params", params)
         if (params.newParent != params.oldParent || params.targetIndex != params.oldIndex) {
+            const parePerDefecte = contingutScopeId ?? entity.id;
             const patchData = {
                 ordre: params.targetIndex +1,
-                pare: params.newParent ?? entity.id,
+                pare: params.newParent ?? parePerDefecte,
             };
 
             if (apiContingutIsReady) {
@@ -215,6 +245,12 @@ const DocumentsGrid = (props: any) => {
     useEffect(() => {
         addFolderExpand("vista", vista)
     }, [vista]);
+
+    useEffect(() => {
+        if (contingutScopeId != null && contingutScopeId !== '' && contingutCarpetaDetallAccesActiva) {
+            setVista(View.carpeta);
+        }
+    }, [contingutScopeId, contingutCarpetaDetallAccesActiva]);
 
     return <>
         <Load value={entity && carpetes && expedients && isReady}>
@@ -294,14 +330,35 @@ const DocumentsGrid = (props: any) => {
                                     setTreeView(true)
                                     break;
                             }
-                            return additionalRows
-                                .sort((a, b) => a?.ordre - b?.ordre);
+                            /**
+                             * Vista dins una carpeta ('contingutScopeId'):
+                             * - ordenam per 'ordre' i filtram amb 'rowsEnSubarbre' (només files del subarbre)
+                             */
+                            let sorted = additionalRows.sort((a, b) => a?.ordre - b?.ordre);
+                            if (contingutScopeId != null && contingutScopeId !== '') {
+                                sorted = rowsEnSubarbre(sorted, contingutScopeId);
+                            }
+                            return sorted;
                         }}
                         getTreeDataPath={(row: any): string[] => {
                             switch (vista) {
                                 case View.estat: return [(`${row?.expedientEstatAdditional?.description || t('page.document.view.nullEstat')}`), `${row.id}`];
                                 case View.tipus: return row?.autogenerated ?[`${row.id}`] :row?.metaNode ?[`${row?.metaNode?.id}`, `${row.id}`] :[t('page.document.detall.senseTipus'),`${row.id}`];
-                                default: return row?.treePath?.filter((id:any)=>id!=entity?.id) ?? [`${row.id}`];
+                                default: {
+									/**
+									 * Vista dins una carpeta ('contingutScopeId'):
+									 * - Camí d'arbre relatiu tallant 'treePath' després de la carpeta.
+									 */
+                                    if (contingutScopeId != null && contingutScopeId !== '' && Array.isArray(row?.treePath)) {
+                                        const scope = String(contingutScopeId);
+                                        const idx = row.treePath.findIndex((p: any) => String(p) === scope);
+                                        if (idx >= 0) {
+                                            const sub = row.treePath.slice(idx + 1).map((x: any) => String(x));
+                                            return sub.length ? sub : [`${row.id}`];
+                                        }
+                                    }
+                                    return row?.treePath?.filter((id:any)=>id!=entity?.id) ?? [`${row.id}`];
+                                }
                             }
                         }}
                         rowExpansionChange={(params: any) => {
@@ -338,10 +395,12 @@ const DocumentsGrid = (props: any) => {
                             },
                             {
                                 position: 1,
-                                element: <TreeViewSelector value={vista} onChange={(value: any) => {
-                                    setVista(value);
-                                    refresh();
-                                }} />,
+                                element: contingutScopeId != null && contingutScopeId !== ''
+                                    ? <></>
+                                    : <TreeViewSelector value={vista} onChange={(value: any) => {
+                                        setVista(value);
+                                        refresh();
+                                    }} />,
                             },
                             {
                                 position: 3,
@@ -361,13 +420,37 @@ const DocumentsGrid = (props: any) => {
                         toolbarMassiveActions={massiveActions}
                         isRowSelectable={(data: any) => data?.row?.tipus == "DOCUMENT"}
                         onRowClick={(params: any) => {
+                            if (params?.row.tipus === 'CARPETA' && params?.row?.id != null && contingutCarpetaDetallAccesActiva) {
+                                navigate(`/contingut/${params.row.id}`);
+                                return;
+                            }
                             if (params?.row.tipus === 'DOCUMENT' && isValid(params?.row)) {
                                 handleVisualitzarOpen(params?.id)
                             }
                         }}
 
                         toolbarHideCreate
-                        popupEditFormComponentProps={{ initOnChangeRequest: true }}
+                        popupEditFormComponentProps={{
+                            initOnChangeRequest: true,
+                            onBeforeCreateSuccess: (formData: any) => {
+                                if (!contingutCarpetaDetallAccesActiva || contingutScopeId == null || contingutScopeId === '') {
+                                    return formData;
+                                }
+                                if (formData?.carpeta != null && formData?.carpeta?.id != null) {
+                                    return formData;
+                                }
+                                const scopeId = contingutScopeId;
+                                const actual = carpetes?.find((c: any) => String(c?.id) === String(scopeId));
+                                const nom = actual?.nom;
+                                return {
+                                    ...formData,
+                                    carpeta: {
+                                        id: scopeId,
+                                        description: nom != null && nom !== '' ? nom : String(scopeId),
+                                    },
+                                };
+                            },
+                        }}
                         popupEditFormDialogButtons={[
                             {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
                             {icon: 'save', text: t('common.save'), componentProps: { variant: 'contained', disabled: disabled }, value: true },

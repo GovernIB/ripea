@@ -1503,7 +1503,10 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		        if (params.getDocumentsZip()!=null && params.getDocumentsZip().size()>0) {
 
 			        EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
-			        ContingutEntity pare = contingutRepository.findById(entity.getId()).orElseThrow();
+			        Long pareContingutId = (params.getCarpeta() != null && params.getCarpeta().getId() != null)
+			        		? params.getCarpeta().getId()
+			        		: entity.getId();
+			        ContingutEntity pare = contingutRepository.findById(pareContingutId).orElseThrow();
 
 			        EntitatDto entitatActual = new EntitatDto();
 			        entitatActual.setCodi(entitatEntity.getCodi());

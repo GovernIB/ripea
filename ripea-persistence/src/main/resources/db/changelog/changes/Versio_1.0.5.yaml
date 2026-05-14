@@ -96,7 +96,7 @@ databaseChangeLog:
           stripComments: true
           relativeToChangelogFile: true
 - changeSet:
-    id: Versio_1.0.5_5
+    id: Versio_1.0.5_7
     author: limit
     changes:
       - sqlFile:
@@ -112,7 +112,7 @@ databaseChangeLog:
           stripComments: true
           relativeToChangelogFile: true
 - changeSet:
-    id: Versio_1.0.5_5
+    id: Versio_1.0.5_8
     author: limit
     changes:
       - sqlFile:
@@ -128,23 +128,7 @@ databaseChangeLog:
           stripComments: true
           relativeToChangelogFile: true
 - changeSet:
-    id: Versio_1.0.5_7
-    author: limit
-    changes:
-      - sqlFile:
-          dbms: oracle
-          path: ../scripts/oracle/1.0.5/Versio_1.0.5_DDL_5.sql
-          splitStatements: true
-          stripComments: true
-          relativeToChangelogFile: true
-      - sqlFile:
-          dbms: postgresql
-          path: ../scripts/postgres/1.0.5/Versio_1.0.5_DDL_5.sql
-          splitStatements: true
-          stripComments: true
-          relativeToChangelogFile: true
-- changeSet:
-    id: Versio_1.0.5_8
+    id: Versio_1.0.5_9
     author: limit
     changes:
       - sqlFile:
@@ -160,7 +144,7 @@ databaseChangeLog:
           stripComments: true
           relativeToChangelogFile: true
 - changeSet:
-    id: Versio_1.0.5_8
+    id: Versio_1.0.5_10
     author: limit
     changes:
       - sqlFile:
@@ -172,6 +156,22 @@ databaseChangeLog:
       - sqlFile:
           dbms: postgresql
           path: ../scripts/postgres/1.0.5/Versio_1.0.5_DML_6.sql
+          splitStatements: true
+          stripComments: true
+          relativeToChangelogFile: true
+- changeSet:
+    id: Versio_1.0.5_11
+    author: limit
+    changes:
+      - sqlFile:
+          dbms: oracle
+          path: ../scripts/oracle/1.0.5/Versio_1.0.5_DML_7.sql
+          splitStatements: true
+          stripComments: true
+          relativeToChangelogFile: true
+      - sqlFile:
+          dbms: postgresql
+          path: ../scripts/postgres/1.0.5/Versio_1.0.5_DML_7.sql
           splitStatements: true
           stripComments: true
           relativeToChangelogFile: true
