@@ -21,6 +21,10 @@ vi.mock('@src/components/GridFormField', () => ({
     ),
 }));
 
+vi.mock('@src/components/StyledMuiGrid', () => ({
+    default: ({ children }: any) => <div>{children}</div>,
+}));
+
 // ─── Camps base ───────────────────────────────────────────────────────────────
 
 describe('MetaDocumentDadaForm - camps base', () => {

@@ -48,6 +48,12 @@ const getRows               = (page: Page) => page.locator('.MuiDataGrid-row');
 const getToolbar            = (page: Page) => page.locator('.MuiToolbar-root').filter({ hasText: /nou procediment|nuevo procedimiento/i });
 const expectSuccessAlert    = (page: Page) => expect(page.locator('.MuiAlert-standardSuccess')).toBeVisible({ timeout: 10_000 });
 
+// Obre el menú d'accions d'una fila del DataGrid.
+// Usa button[aria-haspopup="menu"] dins .MuiDataGrid-actionsCell, independent de l'idioma
+// (l'aria-label varia: "more" / "més" / "más" segons la llengua activa).
+const obrirMenuAccions = (fila: Locator) =>
+    fila.locator('.MuiDataGrid-actionsCell button[aria-haspopup="menu"]').click();
+
 const humanDelay = async (page: Page) => { 
     if (HUMAN_DELAY>0) { 
         logDebug('Esperant ' + HUMAN_DELAY + 'ms'); 
@@ -133,6 +139,42 @@ const waitApiEntityLoad = (page: Page, id: string | null) =>
                 resp.status() === 200,
         { timeout: 10_000 }
     );
+
+// Ordinals disponibles per seleccionar opcions d'un desplegable
+type OrdinalOpcio = 'first' | 'second' | 'third';
+const ORDINAL_IDX: Record<OrdinalOpcio, number> = { first: 0, second: 1, third: 2 };
+
+// Selecciona una opció d'un camp MUI Autocomplete (tipus llista amb cerca):
+//   1. Clica l'input per obrir la llista
+//   2. Espera que desaparegui el MuiCircularProgress-root (indica càrrega de dades)
+//   3. Espera que el listbox contingui almenys una opció visible
+//   4. Selecciona l'opció indicada per ordinal
+//
+// inputSelector: selector CSS de l'<input> del camp (p.ex. '[name="organGestor"] input[type="text"]')
+// ordinal:       'first' | 'second' | 'third' (per defecte: 'first')
+const seleccionarOpcioAutocompletament = async (
+    page: Page,
+    container: Page | Locator,
+    inputSelector: string,
+    ordinal: OrdinalOpcio = 'first'
+): Promise<void> => {
+    logDebug(`[Autocomplete] Obrint "${inputSelector}", seleccionant: ${ordinal}`);
+    await container.locator(inputSelector).click();
+    await page.waitForFunction(
+        (sel: string) => {
+            const input = document.querySelector(sel);
+            if (!input) return false;
+            const root = input.closest('[class*="MuiAutocomplete-root"]');
+            if (!root || root.querySelector('.MuiCircularProgress-root')) return false;
+            const listbox = document.querySelector('[role="listbox"]');
+            return !!listbox && listbox.querySelectorAll('[role="option"]').length > 0;
+        },
+        inputSelector,
+        { timeout: 15_000 }
+    );
+    await page.getByRole('option').nth(ORDINAL_IDX[ordinal]).click();
+    await page.waitForSelector('[role="listbox"]', { state: 'detached', timeout: 5_000 }).catch(() => {});
+};
 
 // Interacciona amb un MUI Select (native input ocult) i selecciona una opció per text/regex
 const triaMuiSelect = async (page: Page, container: Locator, inputName: string, matcher: string | RegExp) => {
@@ -502,7 +544,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
             logInfo("Existeix → esborrar-lo per deixar l'entorn net per al test de creació");
             await humanDelay(page);
             const fila = getRows(page).first();
-            await fila.locator('button[aria-label="more"]').click();
+            await obrirMenuAccions(fila);
             await page.getByRole('menuitem').filter({ hasText: /esborrar|eliminar|borrar/i }).click();
             // Confirmació de l'esborrat (diàleg MUI)
             await expect(page.locator('[role="dialog"]')).toBeVisible({ timeout: 5_000 });
@@ -547,11 +589,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
             if (await checkRegla.isChecked()) await checkRegla.click();
 
             // Seleccionar el primer òrgan gestor disponible via Autocomplete
-            const organGestorInput = dialog.locator('[name="organGestor"] input[type="text"]');
-            await organGestorInput.click();
-            await page.waitForSelector('[role="listbox"]', { timeout: 5_000 });
-            await page.getByRole('option').first().click();
-            await page.waitForSelector('[role="listbox"]', { state: 'detached', timeout: 3_000 }).catch(() => {});
+            await seleccionarOpcioAutocompletament(page, dialog, '[name="organGestor"] input[type="text"]');
         });
 
         await test.step('enviar el formulari', async () => {
@@ -582,7 +620,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
             // no esperem la resposta, el fill pot arribar abans que reset sobreescrigui.
             const entityResp = waitApiEntityLoad(page, rowId);
 			await humanDelay(page);
-            await fila.locator('button[aria-label="more"]').click();
+            await obrirMenuAccions(fila);
 			await humanDelay(page);
             await page.getByRole('menuitem').filter({ hasText: /modifica(r)?/i }).click();
 			await humanDelay(page);
@@ -631,20 +669,14 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
             logInfo('  -> filtrar per codi i nom parcial');
             await page.locator('input[name="codi"]').fill(CODI_TEST);
             await page.locator('input[name="nom"]').fill('modificació');
+			await humanDelay(page);
 			await page.getByRole('button').filter({ hasText: /amb permis directe|con permiso directo/i }).click();
-            const resp = waitApiGet(page, url => url.includes('/metaExpedient') && !url.includes('/metaExpedient/'));
-            await page.getByRole('button', { name: 'Filtrar', exact: true }).click();
-            await resp;
+			await humanDelay(page);
+			const resp = waitApiGet(page, url => url.includes('/metaExpedient') && !url.includes('/metaExpedient/'));
+			await page.getByRole('button', { name: 'Filtrar', exact: true }).click();
+			await resp;
 			await expect(getRows(page)).toHaveCount(1);
         });
-
-        /*await test.step('activar filtre de permís directe i verificar resultat', async () => {
-            logInfo('  -> activar filtre de permís directe i verificar resultat');
-            const resp = waitApiGet(page, url => url.includes('/metaExpedient') && !url.includes('/metaExpedient/'));
-            await page.getByRole('button').filter({ hasText: /amb permis directe|con permiso directo/i }).click();
-            await resp;
-            await expect(getRows(page)).toHaveCount(1);
-        });*/
 
     });
 
@@ -712,7 +744,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
             await expect(fila).toHaveCount(1);
             const rowId = await fila.getAttribute('data-id');
             const entityResp = waitApiEntityLoad(page, rowId);
-            await fila.locator('button[aria-label="more"]').click();
+            await obrirMenuAccions(fila);
             await page.getByRole('menuitem').filter({ hasText: /modifica(r)?/i }).click();
             await expect(page.locator('[role="dialog"]')).toBeVisible();
             await entityResp;
@@ -743,7 +775,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
             logInfo('  -> eliminar la segona meta-dada del document');
             const fila = getRows(page).filter({ hasText: CODI_DOCMETA2 });
             await expect(fila).toHaveCount(1);
-            await fila.locator('button[aria-label="more"]').click();
+            await obrirMenuAccions(fila);
             await page.getByRole('menuitem').filter({ hasText: /esborrar|eliminar|borrar/i }).click();
             await expect(page.locator('[role="dialog"]')).toBeVisible({ timeout: 5_000 });
             await humanDelay(page);
@@ -770,7 +802,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
         });
 
         const fila = getDocRows(page).first();
-        await fila.locator('button[aria-label="more"]').click();
+        await obrirMenuAccions(fila);
         const estaActiu = await page.getByRole('menuitem').filter({ hasText: /desactivar/i }).isVisible();
 
         if (estaActiu) {
@@ -782,7 +814,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
             await test.step('activar el document', async () => {
                 logInfo('  -> activar el document');
-                await fila.locator('button[aria-label="more"]').click();
+                await obrirMenuAccions(fila);
                 await page.getByRole('menuitem').filter({ hasText: /activar/i }).click();
                 await expectSuccessAlert(page);
             });
@@ -795,7 +827,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
             await test.step('desactivar el document', async () => {
                 logInfo('  -> desactivar el document');
-                await fila.locator('button[aria-label="more"]').click();
+                await obrirMenuAccions(fila);
                 await page.getByRole('menuitem').filter({ hasText: /desactivar/i }).click();
                 await expectSuccessAlert(page);
             });
@@ -814,7 +846,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
             const fila = getDocRows(page).first();
             const rowId = await fila.getAttribute('data-id');
             const entityResp = waitApiEntityLoad(page, rowId);
-            await fila.locator('button[aria-label="more"]').click();
+            await obrirMenuAccions(fila);
             await page.getByRole('menuitem').filter({ hasText: /modifica(r)?/i }).click();
             await expect(page.locator('[role="dialog"]')).toBeVisible();
             await entityResp;
@@ -860,7 +892,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 			await aplicaQuickFilter(page, page.locator('#simple-tabpanel-metaDocument .MuiToolbar-root input[type="text"]'), CODI_DOC1);
             await expect(getDocRows(page)).toHaveCount(1);
             const fila = getDocRows(page).first();
-            await fila.locator('button[aria-label="more"]').click();
+            await obrirMenuAccions(fila);
             await page.getByRole('menuitem').filter({ hasText: /per defecte|por defecto/i }).click();
             await expectSuccessAlert(page);
         });
@@ -876,7 +908,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 			await aplicaQuickFilter(page, page.locator('#simple-tabpanel-metaDocument .MuiToolbar-root input[type="text"]'), CODI_DOC2);
             await expect(getDocRows(page)).toHaveCount(1);
             const fila = getDocRows(page).first();
-            await fila.locator('button[aria-label="more"]').click();
+            await obrirMenuAccions(fila);
             await page.getByRole('menuitem').filter({ hasText: /esborrar|eliminar|borrar/i }).click();
             await expect(page.locator('[role="dialog"]')).toBeVisible({ timeout: 5_000 });
             await humanDelay(page);
@@ -926,7 +958,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
         });
 
         const fila = getMetaRows(page).first();
-        await fila.locator('button[aria-label="more"]').click();
+        await obrirMenuAccions(fila);
         const estaActiva = await page.getByRole('menuitem').filter({ hasText: /desactivar/i }).isVisible();
 
         if (estaActiva) {
@@ -938,7 +970,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
             await test.step('activar la meta-dada', async () => {
                 logInfo('  -> activar la meta-dada');
-                await fila.locator('button[aria-label="more"]').click();
+                await obrirMenuAccions(fila);
                 await page.getByRole('menuitem').filter({ hasText: /activar/i }).click();
                 await expectSuccessAlert(page);
             });
@@ -951,7 +983,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
             await test.step('desactivar la meta-dada', async () => {
                 logInfo('  -> desactivar la meta-dada');
-                await fila.locator('button[aria-label="more"]').click();
+                await obrirMenuAccions(fila);
                 await page.getByRole('menuitem').filter({ hasText: /desactivar/i }).click();
                 await expectSuccessAlert(page);
             });
@@ -970,7 +1002,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
             const fila = getMetaRows(page).first();
             const rowId = await fila.getAttribute('data-id');
             const entityResp = waitApiEntityLoad(page, rowId);
-            await fila.locator('button[aria-label="more"]').click();
+            await obrirMenuAccions(fila);
             await page.getByRole('menuitem').filter({ hasText: /modifica(r)?/i }).click();
             await expect(page.locator('[role="dialog"]')).toBeVisible();
             await entityResp;
@@ -1016,7 +1048,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 			await aplicaQuickFilter(page, page.locator('#simple-tabpanel-metaDada .MuiToolbar-root input[type="text"]'), CODI_META2);
             await expect(getMetaRows(page)).toHaveCount(1);
             const fila = getMetaRows(page).first();
-            await fila.locator('button[aria-label="more"]').click();
+            await obrirMenuAccions(fila);
             await page.getByRole('menuitem').filter({ hasText: /esborrar|eliminar|borrar/i }).click();
             await expect(page.locator('[role="dialog"]')).toBeVisible({ timeout: 5_000 });
             await page.locator('[role="dialog"]').getByRole('button').filter({ hasText: /acceptar|aceptar|confirmar|ok/i }).click();
@@ -1091,7 +1123,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
             await expect(fila).toBeVisible({ timeout: 5_000 });
             const rowId = await fila.getAttribute('data-id');
             const entityResp = waitApiEntityLoad(page, rowId);
-            await fila.locator('button[aria-label="more"]').click();
+            await obrirMenuAccions(fila);
             await page.getByRole('menuitem').filter({ hasText: /modifica(r)?/i }).click();
             await expect(page.locator('[role="dialog"]')).toBeVisible();
             await entityResp;
@@ -1100,11 +1132,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
         await test.step('re-seleccionar la meta-dada i guardar', async () => {
             logInfo('  -> re-seleccionar la meta-dada i guardar');
             const dialog = page.locator('[role="dialog"]');
-            const elemInput = dialog.locator('[name="metaDada"] input[type="text"]');
-            await elemInput.click();
-            await page.waitForSelector('[role="listbox"]', { timeout: 5_000 });
-            await page.getByRole('option').first().click();
-            await page.waitForSelector('[role="listbox"]', { state: 'detached', timeout: 3_000 }).catch(() => {});
+            await seleccionarOpcioAutocompletament(page, dialog, '[name="metaDada"] input[type="text"]');
             await guardaAmbDelay(page, dialog.getByRole('button').filter({ hasText: /guarda/i }));
             await expectSuccessAlert(page);
         });
@@ -1119,7 +1147,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
             logInfo('  -> eliminar la validació de tipus DOCUMENT');
             const fila = getRows(page).filter({ hasText: /document/i }).first();
             await expect(fila).toBeVisible({ timeout: 5_000 });
-            await fila.locator('button[aria-label="more"]').click();
+            await obrirMenuAccions(fila);
             await page.getByRole('menuitem').filter({ hasText: /esborrar|eliminar|borrar/i }).click();
             await expect(page.locator('[role="dialog"]')).toBeVisible({ timeout: 5_000 });
             await humanDelay(page);
@@ -1146,7 +1174,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
         });
 
         const fila = getTascaRows(page).first();
-        await fila.locator('button[aria-label="more"]').click();
+        await obrirMenuAccions(fila);
         const estaActiva = await page.getByRole('menuitem').filter({ hasText: /desactivar/i }).isVisible();
 
         if (estaActiva) {
@@ -1158,7 +1186,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
             await test.step('activar la tasca', async () => {
                 logInfo('  -> activar la tasca');
-                await fila.locator('button[aria-label="more"]').click();
+                await obrirMenuAccions(fila);
                 await page.getByRole('menuitem').filter({ hasText: /activar/i }).click();
                 await expectSuccessAlert(page);
             });
@@ -1171,7 +1199,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
             await test.step('desactivar la tasca', async () => {
                 logInfo('  -> desactivar la tasca');
-                await fila.locator('button[aria-label="more"]').click();
+                await obrirMenuAccions(fila);
                 await page.getByRole('menuitem').filter({ hasText: /desactivar/i }).click();
                 await expectSuccessAlert(page);
             });
@@ -1190,7 +1218,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
             const fila = getTascaRows(page).first();
             const rowId = await fila.getAttribute('data-id');
             const entityResp = waitApiEntityLoad(page, rowId);
-            await fila.locator('button[aria-label="more"]').click();
+            await obrirMenuAccions(fila);
             await page.getByRole('menuitem').filter({ hasText: /modifica(r)?/i }).click();
             await expect(page.locator('[role="dialog"]')).toBeVisible();
             await entityResp;
@@ -1238,7 +1266,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 			await aplicaQuickFilter(page, page.locator('#simple-tabpanel-tasca .MuiToolbar-root input[type="text"]'), CODI_TASCA2);
             await expect(getTascaRows(page)).toHaveCount(1);
             const fila = getTascaRows(page).first();
-            await fila.locator('button[aria-label="more"]').click();
+            await obrirMenuAccions(fila);
             await page.getByRole('menuitem').filter({ hasText: /esborrar|eliminar|borrar/i }).click();
             await expect(page.locator('[role="dialog"]')).toBeVisible({ timeout: 5_000 });
             await page.locator('[role="dialog"]').getByRole('button').filter({ hasText: /acceptar|aceptar|confirmar|ok/i }).click();
@@ -1285,7 +1313,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
             const fila = getEstatRows(page).filter({ hasText: CODI_ESTAT1 });
             const rowId = await fila.getAttribute('data-id');
             const entityResp = waitApiEntityLoad(page, rowId);
-            await fila.locator('button[aria-label="more"]').click();
+            await obrirMenuAccions(fila);
             await page.getByRole('menuitem').filter({ hasText: /modifica(r)?/i }).click();
             await expect(page.locator('[role="dialog"]')).toBeVisible();
             await entityResp;
@@ -1328,7 +1356,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
         await test.step('eliminar el segon estat', async () => {
             logInfo('  -> eliminar el segon estat');
             const fila = getEstatRows(page).filter({ hasText: CODI_ESTAT2 });
-            await fila.locator('button[aria-label="more"]').click();
+            await obrirMenuAccions(fila);
             await page.getByRole('menuitem').filter({ hasText: /esborrar|eliminar|borrar/i }).click();
             await expect(page.locator('[role="dialog"]')).toBeVisible({ timeout: 5_000 });
             await page.locator('[role="dialog"]').getByRole('button').filter({ hasText: /acceptar|aceptar|confirmar|ok/i }).click();
@@ -1363,7 +1391,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
         await test.step('marcar per defecte el darrer grup', async () => {
             logInfo('  -> marcar per defecte el darrer grup');
-            await fila.locator('button[aria-label="more"]').click();
+            await obrirMenuAccions(fila);
             const esPotMarcar = await page.getByRole('menuitem').filter({ hasText: /marcar (per defecte|por defecto)/i }).isVisible();
             if (esPotMarcar) {
                 await page.getByRole('menuitem').filter({ hasText: /marcar (per defecte|por defecto)/i }).click();
@@ -1378,7 +1406,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
         await test.step('llevar per defecte', async () => {
             logInfo('  -> llevar per defecte');
-            await fila.locator('button[aria-label="more"]').click();
+            await obrirMenuAccions(fila);
             await page.getByRole('menuitem').filter({ hasText: /llevar per defecte|quitar por defecto/i }).click();
             await expectSuccessAlert(page);
         });
@@ -1394,7 +1422,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
         await test.step('desvincular el darrer grup de la llista', async () => {
             logInfo('  -> desvincular el darrer grup');
             const fila = getGrupRows(page).last();
-            await fila.locator('button[aria-label="more"]').click();
+            await obrirMenuAccions(fila);
             await page.getByRole('menuitem').filter({ hasText: /desvincular/i }).click();
             await expectSuccessAlert(page);
         });
@@ -1403,7 +1431,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
     // ── Permisos ─────────────────────────────────────────────────────────────
 
-    test('PROCEDIMENT ASSIGNAR PERMIS', async ({ page }) => {
+    test('PROCEDIMENT PERMIS ASSIGNAR', async ({ page }) => {
 
         await anarAPermisos(page);
 
@@ -1428,7 +1456,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
     });
 
-    test('PROCEDIMENT MODIFICAR PERMIS', async ({ page }) => {
+    test('PROCEDIMENT PERMIS MODIFICAR', async ({ page }) => {
 
         await anarAPermisos(page);
 
@@ -1436,7 +1464,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
             logInfo('  -> marcar tots els permisos');
             const fila = getRows(page).filter({ hasText: PRINCIPAL_NOM_TEST });
             await expect(fila).toHaveCount(1);
-            await fila.locator('button[aria-label="more"]').click();
+            await obrirMenuAccions(fila);
             await page.getByRole('menuitem').filter({ hasText: /modifica(r)?/i }).click();
             const dialog = page.locator('[role="dialog"]');
             await expect(dialog).toBeVisible({ timeout: 5_000 });
@@ -1447,14 +1475,14 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
     });
 
-    test('PROCEDIMENT ELIMINAR PERMIS', async ({ page }) => {
+    test('PROCEDIMENT PERMIS ELIMINAR', async ({ page }) => {
 
         await anarAPermisos(page);
 
         await test.step('eliminar el permís de rol de test', async () => {
             logInfo('  -> eliminar el permís de rol de test');
             const fila = getRows(page).filter({ hasText: PRINCIPAL_NOM_TEST });
-            await fila.locator('button[aria-label="more"]').click();
+            await obrirMenuAccions(fila);
             await page.getByRole('menuitem').filter({ hasText: /esborrar|eliminar|borrar/i }).click();
             await page.locator('[role="dialog"]').getByRole('button').filter({ hasText: /acceptar|aceptar|confirmar|ok/i }).click();
             await expectSuccessAlert(page);
@@ -1479,7 +1507,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
         });
 
         const fila = getRows(page).first();
-        await fila.locator('button[aria-label="more"]').click();
+        await obrirMenuAccions(fila);
         const estaActiu = await page.getByRole('menuitem').filter({ hasText: /desactivar/i }).isVisible();
 
         if (estaActiu) {
@@ -1491,7 +1519,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
             await test.step('activar el procediment', async () => {
                 logInfo('  -> activar el procediment');
-                await fila.locator('button[aria-label="more"]').click();
+                await obrirMenuAccions(fila);
                 await page.getByRole('menuitem').filter({ hasText: /activar/i }).click();
                 await expectSuccessAlert(page);
             });
@@ -1504,7 +1532,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
             await test.step('desactivar el procediment', async () => {
                 logInfo('  -> desactivar el procediment');
-                await fila.locator('button[aria-label="more"]').click();
+                await obrirMenuAccions(fila);
                 await page.getByRole('menuitem').filter({ hasText: /desactivar/i }).click();
                 await expectSuccessAlert(page);
             });
@@ -1523,7 +1551,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
             logInfo('  -> eliminar el procediment de proves');
             const fila = getRows(page).first();
             await humanDelay(page);
-            await fila.locator('button[aria-label="more"]').click();
+            await obrirMenuAccions(fila);
             await humanDelay(page);
             await page.getByRole('menuitem').filter({ hasText: /esborrar|eliminar|borrar/i }).click();
             await expect(page.locator('[role="dialog"]')).toBeVisible({ timeout: 5_000 });

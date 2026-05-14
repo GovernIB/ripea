@@ -1914,15 +1914,19 @@ public class DocumentHelper {
 		}
 		return documentsDto;
 	}
-
+	
 	public DocumentEntity findLastDocumentPujatArxiuByExtensio(List<String> contentTypes) {
+		return findLastDocumentPujatArxiuByExtensio(contentTypes, null);
+	}
+	
+	public DocumentEntity findLastDocumentPujatArxiuByExtensio(List<String> contentTypes, ArxiuEstatEnumDto arxiuEstat) {
 		Pageable pageable = PageRequest.of(0, 1);
 		List<DocumentEntity> l = null;
 		
 		if (contentTypes!=null && contentTypes.size()>0) {
-			l = documentRepository.findLastByUuid(contentTypes, pageable).getContent();
+			l = documentRepository.findLastByUuid(contentTypes, arxiuEstat, pageable).getContent();
 		} else {
-			l = documentRepository.findLastByUuid(pageable).getContent();
+			l = documentRepository.findLastByUuid(arxiuEstat, pageable).getContent();
 		}
 		
 		if (l!=null && l.size()>0) {

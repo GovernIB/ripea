@@ -27,11 +27,19 @@ import es.caib.ripea.service.intf.dto.DocumentNotificacioEstatEnumDto;
 @Component
 public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> {
 
-	@Query(	"select d from DocumentEntity d where d.arxiuUuid is not null order by data desc")
-	Page<DocumentEntity> findLastByUuid(Pageable pageable);
+	@Query(	"select d from DocumentEntity d where d.arxiuUuid is not null "
+			+ "and (:arxiuEstat is null OR d.arxiuEstat=:arxiuEstat) "
+			+ "order by data desc")
+	Page<DocumentEntity> findLastByUuid(@Param("arxiuEstat") ArxiuEstatEnumDto arxiuEstat, Pageable pageable);
 	
-	@Query(	"select d from DocumentEntity d where d.arxiuUuid is not null and d.fitxerContentType in (:fitxerContentTypes) order by data desc")
-	Page<DocumentEntity> findLastByUuid(@Param("fitxerContentTypes") List<String> fitxerContentTypes, Pageable pageable);
+	@Query(	"select d from DocumentEntity d where d.arxiuUuid is not null "
+			+ "and d.fitxerContentType in (:fitxerContentTypes) "
+			+ "and (:arxiuEstat is null OR d.arxiuEstat=:arxiuEstat) "
+			+ "order by data desc")
+	Page<DocumentEntity> findLastByUuid(
+			@Param("fitxerContentTypes") List<String> fitxerContentTypes,
+			@Param("arxiuEstat") ArxiuEstatEnumDto arxiuEstat,
+			Pageable pageable);
 	
 	List<DocumentEntity> findByExpedientAndEstatAndEsborrat(
 			ExpedientEntity expedient,

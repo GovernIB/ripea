@@ -25,6 +25,10 @@ vi.mock('@src/components/GridFormField', () => ({
     ),
 }));
 
+vi.mock('@src/components/StyledMuiGrid', () => ({
+    default: ({ children }: any) => <div>{children}</div>,
+}));
+
 // ─── MetaExpedientTascaValidacioForm ──────────────────────────────────────────
 
 describe('MetaExpedientTascaValidacioForm - camps base', () => {

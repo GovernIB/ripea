@@ -26,6 +26,14 @@ vi.mock('@src/util/springFilterUtils', () => ({
     eq: vi.fn(() => ''),
 }));
 
+vi.mock('@src/components/StyledMuiGrid', () => ({
+    default: ({ children }: any) => <div>{children}</div>,
+}));
+
+vi.mock('@mui/x-data-grid-pro', () => ({
+    GridTreeDataGroupingCell: () => null,
+}));
+
 // ─── MetaExpedientCarpetaForm ─────────────────────────────────────────────────
 
 describe('MetaExpedientCarpetaForm', () => {

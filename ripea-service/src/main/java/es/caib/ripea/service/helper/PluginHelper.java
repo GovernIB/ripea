@@ -9361,7 +9361,9 @@ public class PluginHelper {
 	public Exception concsvIntegracioDiagnostic(DiagnosticFiltreDto filtre) {
 		try {
 			IArxiuPluginWrapper iArxiuPluginWrapper = getConcsvPlugin(filtre.getEntitatCodi(), filtre.getOrganCodi());
-			DocumentEntity doc = documentHelper.findLastDocumentPujatArxiuByExtensio(null);
+			List<String> extensions = new ArrayList<String>();
+			extensions.add("application/pdf");
+			DocumentEntity doc = documentHelper.findLastDocumentPujatArxiuByExtensio(extensions, ArxiuEstatEnumDto.DEFINITIU);
 			iArxiuPluginWrapper.getPlugin().documentImprimible(doc.getArxiuUuid());
 			return null;
 		} catch (Exception ex) {
