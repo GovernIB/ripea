@@ -1414,11 +1414,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
     });
 
     test('GRUP DESVINCULAR', async ({ page }) => {
-
         await anarASubPagina(page, 'grup');
-
-        const countInici = await getGrupRows(page).count();
-
         await test.step('desvincular el darrer grup de la llista', async () => {
             logInfo('  -> desvincular el darrer grup');
             const fila = getGrupRows(page).last();

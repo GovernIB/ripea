@@ -1392,7 +1392,7 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
 
     // ── Permisos ─────────────────────────────────────────────────────────────
 
-    test('PROCEDIMENT ASSIGNAR PERMIS', async ({ page }) => {
+    test('PROCEDIMENT PERMIS ASSIGNAR', async ({ page }) => {
 
         const permisosPage = await anarAPermisos(page);
 
@@ -1420,7 +1420,7 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
         await permisosPage.close();
     });
 
-    test('PROCEDIMENT MODIFICAR PERMIS', async ({ page }) => {
+    test('PROCEDIMENT PERMIS MODIFICAR', async ({ page }) => {
 
         const permisosPage = await anarAPermisos(page);
 
@@ -1448,7 +1448,7 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
         await permisosPage.close();
     });
 
-    test('PROCEDIMENT ELIMINAR PERMIS', async ({ page }) => {
+    test('PROCEDIMENT PERMIS ELIMINAR', async ({ page }) => {
 
         const permisosPage = await anarAPermisos(page);
 
@@ -1458,7 +1458,7 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
             permisosPage.on('dialog', dialog => dialog.accept());
             await fila.getByRole('button', { name: /accions|acciones/i }).click();
             const dtRefresh = waitDatatablePermisos(permisosPage);
-            await fila.getByRole('link', { name: /eliminar/i }).click();
+            await fila.getByRole('link', { name: /esborrar|eliminar|borrar/i }).click();
             await dtRefresh;
             await expectSuccessAlert(permisosPage);
         });
