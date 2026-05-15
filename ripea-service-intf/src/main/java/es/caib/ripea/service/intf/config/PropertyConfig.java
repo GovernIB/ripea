@@ -25,6 +25,7 @@ public class PropertyConfig {
 	public static final String PERSISTENCE_TRANSACTION_MANAGER_ENABLED = PROPERTY_PREFIX + "persist.transaction-manager.enabled";
 
 	public static final String IDIOMA_DEFECTE 		= "es.caib.ripea.usuari.idioma.defecte";
+	public static final String INTERFACE_DEFECTE	= "es.caib.ripea.interface.default";
 	public static final String APP_DATA_DIR 		= "es.caib.ripea.app.data.dir";
 	public static final String EMAIL_REMITENT 		= "es.caib.ripea.email.remitent";
 	public static final String BASE_URL 			= "es.caib.ripea.base.url";
