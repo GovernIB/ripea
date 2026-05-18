@@ -77,7 +77,6 @@ public class SessioHelper {
                 habilitarTipusDocument = aplicacioService.propertyBooleanFindByKey(PropertyConfig.TIPUS_DOCUMENT_ACTIUS, false);
                 habilitarDocumentsGenerals = aplicacioService.propertyBooleanFindByKey(PropertyConfig.DOCUMENTS_GENERALS_ACTIUS, false);
                 habilitarDominis = aplicacioService.propertyBooleanFindByKey(PropertyConfig.DOMINIS_HABILITATS);
-                isReactActiu = aplicacioService.propertyBooleanFindByKey(PropertyConfig.REACT_ACTIU);
 				propietatsInicialitzades = true;
 			}
 			String idioma_usuari = usuariActual.getIdioma();
@@ -88,7 +87,7 @@ public class SessioHelper {
 			request.getSession().setAttribute("SessionHelper.isTipusDocumentsEnabled", habilitarTipusDocument);
 			request.getSession().setAttribute("SessionHelper.isDocumentsGeneralsEnabled", habilitarDocumentsGenerals);
 			request.getSession().setAttribute("SessionHelper.isDominisEnabled", habilitarDominis);
-			request.getSession().setAttribute("SessionHelper.isReactActiu", isReactActiu);
+			request.getSession().setAttribute("SessionHelper.isReactActiu", aplicacioService.propertyBooleanFindByKey(PropertyConfig.REACT_ACTIU));
 			request.getSession().setAttribute(SESSION_ATTRIBUTE_IDIOMA_USUARI, idioma_usuari);
 			aplicacioService.actualitzarEntitatThreadLocal(entitatActual);
 			Object rolActualSessio = request.getSession().getAttribute(RolHelper.SESSION_ATTRIBUTE_ROL_ACTUAL);

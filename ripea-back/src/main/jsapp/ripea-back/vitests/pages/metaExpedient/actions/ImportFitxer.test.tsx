@@ -10,6 +10,7 @@ vi.mock('react-i18next', () => ({
 vi.mock('reactlib', () => ({
     useFormContext: vi.fn(() => ({ data: {}, fields: [], apiRef: { current: null } })),
     useBaseAppContext: () => ({ temporalMessageShow: vi.fn() }),
+    useMuiFormDialogApiRef: () => ({ current: null }),
     FormField: () => null,
     MuiFormDialogApi: undefined,
 }));

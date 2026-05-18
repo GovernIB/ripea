@@ -7,6 +7,7 @@ vi.mock('react-i18next', () => ({
 }));
 
 vi.mock('reactlib', () => ({
+    useMuiFormDialogApiRef: () => ({ current: null }),
     MuiFormDialogApi: undefined,
     MuiDataGridApi: undefined,
 }));

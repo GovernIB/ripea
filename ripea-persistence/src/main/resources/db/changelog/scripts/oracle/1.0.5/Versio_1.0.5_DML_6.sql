@@ -1,2 +1,2 @@
 INSERT INTO IPA_CONFIG (KEY,VALUE,DESCRIPTION,GROUP_CODE,POSITION,JBOSS_PROPERTY,TYPE_CODE,LASTMODIFIEDBY_CODI,LASTMODIFIEDDATE,CONFIGURABLE_ORGAN,ORGAN_CODI,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,ENTITAT_CODI,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) 
-values ('es.caib.ripea.app.maxresults.selects','30','Nombre de resultats maxim a mostrar per les llistes desplegables','GENERAL','7','0','INT',null,null,'0',null,'0','0',null,'0','0');
+values ('es.caib.ripea.app.maxresults.selects','20','Nombre de resultats maxim a mostrar per les llistes desplegables','GENERAL','7','0','INT',null,null,'0',null,'0','0',null,'0','0');

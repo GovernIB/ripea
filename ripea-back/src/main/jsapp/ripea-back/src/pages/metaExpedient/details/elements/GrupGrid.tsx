@@ -7,13 +7,16 @@ import {useActions} from "../MetaExpedientActions.tsx";
 import {useMemo} from "react";
 import useGrupDetail from "./details/GrupDetail.tsx";
 import Load from "../../../../components/Load.tsx";
+import {useMuiDataGridApiRef} from "reactlib";
 
 const sortModel: any = [{field: 'codi', sort: 'asc'}]
 const perspectives: string[] = [];
 export const GrupGrid = ({ entity, refresh: refreshEntity, onRowCountChange, readOnly } :any) => {
     const {t} = useTranslation()
+    const apiRef = useMuiDataGridApiRef();
 
     const refresh = () => {
+        apiRef?.current?.refresh?.();
         refreshEntity?.();
     }
 
@@ -83,6 +86,7 @@ export const GrupGrid = ({ entity, refresh: refreshEntity, onRowCountChange, rea
 
     return <Load value={apiIsReady && procIsReady}>
         <StyledMuiGrid
+            apiRef={apiRef}
             resourceName={'grupResource'}
             columns={columns}
             toolbarShowQuickFilter

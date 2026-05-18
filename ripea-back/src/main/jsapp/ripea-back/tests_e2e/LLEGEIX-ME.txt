@@ -93,7 +93,7 @@ Des de  ripea-back/src/main/jsapp/ripea-back/  (amb JBoss arrencat):
   npm run e2e
 
   # Amb navegador visible (útil per depurar):
-  npm run e2e:headed --slow-mo=300"
+  npm run e2e:headed
 
   # Amb la interfície gràfica de Playwright (interactiu):
   # Desde cmd (no Powershell)

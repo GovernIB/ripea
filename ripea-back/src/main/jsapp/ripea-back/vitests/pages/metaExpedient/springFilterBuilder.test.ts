@@ -1,5 +1,22 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { springFilterBuilder } from '@src/pages/metaExpedient/MetaExpedientFilter';
+
+vi.mock('reactlib', () => ({
+    useFormContext: vi.fn(() => ({ data: {}, fields: [] })),
+}));
+
+vi.mock('@src/components/StyledMuiFilter', () => ({
+    default: () => null,
+}));
+
+vi.mock('@src/components/GridFormField', () => ({
+    default: () => null,
+    GridButtonField: () => null,
+}));
+
+vi.mock('@src/components/Session', () => ({
+    useUserSession: vi.fn(() => ({ value: null })),
+}));
 
 describe('springFilterBuilder', () => {
 
