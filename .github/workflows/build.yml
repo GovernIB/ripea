@@ -25,7 +25,6 @@ on:
 
 permissions:
   contents: write
-  packages: write
   issues: read
 
 jobs:
@@ -40,7 +39,7 @@ jobs:
           OWNER=$(echo "${{ inputs.repo }}" | cut -d '/' -f1)
           REPO=$(echo "${{ inputs.repo }}" | cut -d '/' -f2)
 
-          IMAGE_NAME="ghcr.io/${OWNER}/${REPO}/ripea-ear"
+          IMAGE_NAME="${OWNER}/${REPO}/ripea-ear"
 
           echo "owner=$OWNER" >> $GITHUB_OUTPUT
           echo "repo=$REPO" >> $GITHUB_OUTPUT
@@ -103,24 +102,32 @@ jobs:
         working-directory: ripea
         run: mvn -B clean package -DskipTests=true
 
-      - name: 🔐 Login to GHCR
+      - name: 🔐 Login to Docker Hub
         if: ${{ inputs.build_docker == true }}
         run: |
-          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io \
-            -u "${{ github.actor }}" \
+          echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login \
+            -u "${{ secrets.DOCKERHUB_USERNAME }}" \
             --password-stdin
 
       - name: 🐳 Build Docker image
         if: ${{ inputs.build_docker == true }}
         working-directory: ripea
         env:
-          BASE_IMAGE: ghcr.io/${{ steps.vars.outputs.owner }}/jboss:eap72-openjdk11-rhel8
+          BASE_IMAGE: ${{ secrets.DOCKER_BASE_IMAGE }}
         run: |
+          echo "Using base image: $BASE_IMAGE"
+
           docker build \
             --build-arg BASE_IMAGE=$BASE_IMAGE \
             -t ${{ steps.vars.outputs.image_name }}:${{ steps.package_version.outputs.build_version }} \
             -t ${{ steps.vars.outputs.image_name }}:latest \
             .
+
+      - name: 📤 Push Docker image
+        if: ${{ inputs.build_docker == true }}
+        run: |
+          docker push ${{ steps.vars.outputs.image_name }}:${{ steps.package_version.outputs.build_version }}
+          docker push ${{ steps.vars.outputs.image_name }}:latest
 
       - name: 💾 Save Docker image
         if: ${{ inputs.build_docker == true }}
@@ -182,9 +189,3 @@ jobs:
           files: ripea-docker-image.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: 📤 Push Docker image
-        if: ${{ inputs.build_docker == true }}
-        run: |
-          docker push ${{ steps.vars.outputs.image_name }}:${{ steps.package_version.outputs.build_version }}
-          docker push ${{ steps.vars.outputs.image_name }}:latest
