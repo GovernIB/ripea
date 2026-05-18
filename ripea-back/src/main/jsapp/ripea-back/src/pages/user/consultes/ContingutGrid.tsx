@@ -285,9 +285,7 @@ const ContingutGrid = () => {
 
     const sessionKey = "MASSIVE_CONTINGUT_FILTER";
     const { value: filterData } = useSession(sessionKey);
-    const haveRequirements = useMemo(() =>
-        filterData?.esborrat === "NOMES_ESBORRATS",
-        [filterData?.esborrat])
+    const [esborratFilter, setEsborratFilter] = useState<string | undefined>(() => filterData?.esborrat);
 
     const refresh = () => {
         apiRef?.current?.refresh?.();
@@ -316,14 +314,14 @@ const ContingutGrid = () => {
             icon: "replay",
             showInMenu: true,
             onClick: recuperar,
-            hidden: (row:any) => row?.esborrat != 1,
+            hidden: (row:any) => row?.esborrat == 0,
         },
         {
             label: t('common.delete'),
             icon: "delete",
             showInMenu: true,
             onClick: esborrar,
-            hidden: (row:any) => row?.esborrat != 1,
+            hidden: (row:any) => row?.esborrat == 1,
         },
         {
             label: t('page.expedient.action.assignar.label'),
@@ -334,26 +332,29 @@ const ContingutGrid = () => {
             hidden: (row:any) => row?.tipus !== 'EXPEDIENT',
         },
     ]
-    const massiveActions = [
+    const massiveActions = useMemo(() => [
         {
             label: t('page.contingut.action.replay.label'),
             icon: "replay",
             showInMenu: true,
             onClick: recuperarMassive,
+            hidden: esborratFilter === 'NOMES_NO_ESBORRATS',
         },
         {
             label: t('common.delete'),
             icon: "delete",
             showInMenu: true,
             onClick: esborrarMassive,
+            hidden: esborratFilter === 'NOMES_ESBORRATS',
         },
-    ]
+    ], [esborratFilter, t, recuperarMassive, esborrarMassive])
 
     return <GridPage disableMargins>
         <CardPage title={t('page.user.menu.continguts')}>
             <ContingutFilter
                 sessionKey={sessionKey}
-                onSpringFilterChange={setSpringFilter}/>
+                onSpringFilterChange={setSpringFilter}
+                onDataChange={(data: any) => setEsborratFilter(data?.esborrat)}/>
 
             <StyledMuiGrid
                 apiRef={apiRef}
@@ -365,8 +366,6 @@ const ContingutGrid = () => {
                 rowAdditionalActions={actions}
                 toolbarMassiveActions={massiveActions}
                 onRowClick={(params: any) => handleDetail(params?.row?.id)}
-                isRowSelectable={(params:any) => params?.row?.esborrat == 1 }
-                disabledMassiveDefSelector={!haveRequirements}
                 toolbarHideCreate
             />
         </CardPage>

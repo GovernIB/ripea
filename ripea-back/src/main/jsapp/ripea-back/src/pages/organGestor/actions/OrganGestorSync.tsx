@@ -165,15 +165,6 @@ export const useOrganGestorSyncDialog = () => {
             hidden: !prediccio || prediccio?.noCanvis,
         },
         {
-            value: 'close',
-            text: t('common.close'),
-            icon: 'close',
-            componentProps: {
-                variant: "outlined",
-            },
-            hidden: !prediccio,
-        },
-        {
             value: 'sync',
             text: t('page.organGestor.action.actualitzar.button'),
             icon: 'save',
@@ -183,6 +174,14 @@ export const useOrganGestorSyncDialog = () => {
             },
             hidden: !prediccio || prediccio?.noCanvis,
         },
+        {
+            value: 'close',
+            text: t('common.cancel'),
+            componentProps: {
+                variant: "outlined",
+            },
+            hidden: !prediccio,
+        },        
     ].filter((button:any)=>!button?.hidden), [t, prediccio])
 
     const dialog =

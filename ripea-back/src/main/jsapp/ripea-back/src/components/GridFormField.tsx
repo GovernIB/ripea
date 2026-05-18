@@ -1,3 +1,4 @@
+import React from "react";
 import {Button, Grid, Icon, IconButton, useMediaQuery, useTheme} from "@mui/material";
 import {FormField, FormFieldProps, useFormContext} from "reactlib";
 import {FormFieldDataActionType} from "../../lib/components/form/FormContext";
@@ -43,9 +44,12 @@ export const GridButtonField = (props:any) => {
     </GridButton></Load>
 }
 
+const DIGITS_ALLOWED_KEYS = ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'ArrowLeft', 'ArrowRight', 'Home', 'End'];
+
 type GridFormField = FormFieldProps & {
     size?: any,
     hidden?: boolean,
+    digitsOnly?: boolean,
 }
 
 export function formatByteCount(bytes:number) {
@@ -105,8 +109,18 @@ const GridFormField = (props:GridFormField) => {
         disabled,
         onChange,
         validator,
+        digitsOnly,
         ...other
     } = props;
+
+    const digitsOnlyProps = digitsOnly ? {
+        slotProps: { htmlInput: { inputMode: 'numeric' as const, ...componentProps?.slotProps?.htmlInput } },
+        onKeyDown: (e: React.KeyboardEvent) => {
+            if (/^\d$/.test(e.key) || DIGITS_ALLOWED_KEYS.includes(e.key) || e.ctrlKey || e.metaKey) return;
+            e.preventDefault();
+        },
+        ...componentProps,
+    } : componentProps;
     const {fields, dataDispatchAction, validationSetFieldErrors} = useFormContext()
 
     const [field, setField] = useState<any>();
@@ -136,7 +150,7 @@ const GridFormField = (props:GridFormField) => {
             {...other}
             componentProps={{
                 className: 'input',
-                ...componentProps
+                ...digitsOnlyProps
             }}
             onFieldValueChange={handleFieldValueChange}
             debounce

@@ -152,6 +152,7 @@ const RemesesNotibGrid = () => {
             icon: "autorenew",
             showInMenu: false,
             onClick: actualitzarEstat,
+            hidden: (row: any) => row?.notificacioEstat === 'PROCESSADA',
         },
     ]
     const massiveActions = [

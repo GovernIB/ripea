@@ -1,6 +1,6 @@
 import {useTranslation} from "react-i18next";
 import {useState} from "react";
-import {GridPage} from "reactlib";
+import {GridPage, useFormContext} from "reactlib";
 import {CardPage} from "../../../components/CardData.tsx";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
@@ -12,9 +12,10 @@ import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
 import useTascaDetail from "../../tasca/details/TascaDetail.tsx";
 
 const AssignacioTasquesFilterForm = () => {
+    const {data} = useFormContext();
     return <>
-        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="titol"/>
-        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="metaExpedientTasca"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="expedient"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="metaExpedientTasca" namedQueries={[`BY_EXPEDIENT#${data?.expedient?.id ?? 0}`]}/>
         <GridFormField size={{xs: 12, sm: 6, md: 3}} name="estat"/>
         <GridFormField size={{xs: 12, sm: 6, md: 3}} name="responsable"/>
         <GridFormField size={{xs: 12, sm: 6, md: 3}} name="dataInici" type={"date"}/>
@@ -24,7 +25,7 @@ const AssignacioTasquesFilterForm = () => {
 
 const springFilterBuilder = (data:any) => {
     return builder.and(
-        builder.like('titol', data?.titol),
+        builder.eq('expedient.id', data?.expedient?.id),
         builder.eq('metaExpedientTasca.id', data?.metaExpedientTasca?.id),
         builder.eq('estat', `'${data?.estat}'`),
         builder.eq("responsableActual.id", data?.responsable),

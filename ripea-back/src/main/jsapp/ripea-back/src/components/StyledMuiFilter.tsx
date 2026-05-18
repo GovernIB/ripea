@@ -48,6 +48,7 @@ const StyledMuiFilter = (props:any) => {
         apiRef = filterRef,
         springFilterBuilder,
         onSpringFilterChange,
+        onDataChange: externalOnDataChange,
         commonFieldComponentProps,
         componentProps,
         children,
@@ -102,6 +103,7 @@ const StyledMuiFilter = (props:any) => {
             if (data && Object.keys(data).length > 0 && (!!sessionKey && !filterData)) {
                 cercar()
             }
+            externalOnDataChange?.(data);
         }}
         {...other}
     >

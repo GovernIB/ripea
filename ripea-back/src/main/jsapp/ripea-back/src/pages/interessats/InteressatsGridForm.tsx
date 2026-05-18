@@ -89,7 +89,8 @@ export const InteressatsGridForm = () => {
                        readOnly={data?.tipus == 'InteressatAdministracioEntity'} autocomplete/>
         <GridFormField size={6} name="codiPostal"
                        disabled={data?.tipus == 'InteressatAdministracioEntity'}
-                       readOnly={data?.tipus == 'InteressatAdministracioEntity'}/>
+                       readOnly={data?.tipus == 'InteressatAdministracioEntity'}
+                       digitsOnly/>
 
         <GridFormField name="adressaTipus" required
                        disabled={data?.tipus == 'InteressatAdministracioEntity'}
