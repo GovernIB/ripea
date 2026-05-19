@@ -80,14 +80,14 @@ const namedQueries: string[] = ['MASSIVE_ACTION_QUERY']
 const sortModel: any = [{field: 'createdDate', sort: 'desc'}]
 const columns = [
     {
-        field: 'nom',
-        flex: 1,
-        renderCell: (params:any) => <Link component={RouterLink} to={`/contingut/${params?.id}`}>{params?.formattedValue}</Link>,
-    },
-    {
         field: 'metaExpedient',
         flex: 1,
     },
+    {
+        field: 'nom',
+        flex: 1,
+        renderCell: (params:any) => <Link component={RouterLink} to={`/contingut/${params?.id}`}>{params?.formattedValue}</Link>,
+    },    
     {
         field: 'estat',
         flex: 0.75,

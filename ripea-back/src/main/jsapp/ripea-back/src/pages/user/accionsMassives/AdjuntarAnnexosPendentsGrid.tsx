@@ -112,7 +112,7 @@ const AdjuntarAnnexosPendentsGrid = () => {
         apiRef?.current?.refresh?.();
     }
 
-    const {handleShow: handleReintentar, content: contentReintentar} = useReintentar(refresh, filterData?.procediment)
+    const {handleShow: handleReintentar, content: contentReintentar} = useReintentar(refresh)
     const {handleShow: handleReintentarMassive, content: contentReintentarMassive} = useReintentarMassive(refresh, filterData?.procediment)
     const {handleOpen: handleContingutOpen, dialog: dialogContingut} = useExecucioMassivaContingut();
 
@@ -121,7 +121,7 @@ const AdjuntarAnnexosPendentsGrid = () => {
             label: t('page.anotacio.action.procesarAnnexosPendents.label'),
             icon: "reply",
             showInMenu: false,
-            onClick: handleReintentar,
+            onClick: (id: any, row: any) => handleReintentar(id, row?.expedientInfo?.metaExpedient),
             hidden: (row:any) => row?.execucioMassivaAdjuntarAnnexosId,
         },
         {

@@ -8,7 +8,6 @@ import * as builder from "../../../util/springFilterUtils.ts";
 const ReintentarForm = () => {
     const { data } = useFormContext();
     const filterEstatAdditional = builder.eq('metaExpedient.id', data?.procediment?.id)
-
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField name="metaDocument" filter={filterEstatAdditional}/>
     </Grid>
@@ -31,11 +30,11 @@ export const Reintentar = (props: any) => {
     </FormActionDialog>
 }
 
-export const useReintentar = (refresh?: () => void, procediment?: any) => {
+export const useReintentar = (refresh?: () => void) => {
     const { t } = useTranslation();
     const apiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow} = useBaseAppContext();
-    const handleShow = (id:any) :void => {
+    const handleShow = (id:any, procediment?: any) :void => {
         apiRef.current?.show?.(undefined, {
             ids: [id],
             massivo: false,

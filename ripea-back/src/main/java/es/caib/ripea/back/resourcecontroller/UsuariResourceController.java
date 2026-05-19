@@ -159,7 +159,7 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
         response.put("isCreacioFluxUsuariActiu", FluxFirmaHelper.isCreacioFluxUsuariActiu(request));
         response.put("teAccesEstadistiques", ExpedientHelper.teAccesEstadistiques(request));
         response.put("isMostrarSeguimentEnviamentsUsuariActiu", SeguimentEnviamentsUsuariHelper.isMostrarSeguimentEnviamentsUsuariActiu(request));
-        response.put("isConvertirDefinitiuActiu", ExpedientHelper.isConversioDefinitiuActiva(request));
+        response.put("isConvertirDefinitiuActiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.CONVERSIO_DEFINITIU)));
         response.put("isUrlValidacioDefinida", aplicacioService.propertyFindByNom(PropertyConfig.VALIDACIO_URL_IMPRIMIBLES)!=null);
         response.put("isDocumentsGeneralsEnabled", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.DOCUMENTS_GENERALS_ACTIUS)));
         response.put("isTipusDocumentsEnabled", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.TIPUS_DOCUMENT_ACTIUS)));       
