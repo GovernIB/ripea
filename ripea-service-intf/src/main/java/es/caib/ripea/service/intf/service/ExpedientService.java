@@ -459,7 +459,7 @@ public interface ExpedientService {
 			Long organActual);
 
 
-	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN') or hasRole('IPA_DISSENY')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ADMIN_LECTURA') or hasRole('IPA_ORGAN_ADMIN') or hasRole('IPA_DISSENY')")
 	PaginaDto<ExpedientDto> findExpedientMetaExpedientPaginat(
 			Long entitatId, 
 			Long metaExpedientId,

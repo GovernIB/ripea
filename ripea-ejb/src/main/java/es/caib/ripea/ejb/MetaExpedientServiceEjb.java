@@ -426,7 +426,7 @@ public class MetaExpedientServiceEjb extends AbstractServiceEjb<MetaExpedientSer
 	}
 
 	@Override
-	@RolesAllowed({"IPA_ADMIN", "IPA_DISSENY", "IPA_ORGAN_ADMIN", "IPA_REVISIO"})
+	@RolesAllowed({"IPA_ADMIN", "IPA_ADMIN_LECTURA", "IPA_DISSENY", "IPA_ORGAN_ADMIN", "IPA_REVISIO"})
 	public String export(
 			Long entitatId,
 			Long id,

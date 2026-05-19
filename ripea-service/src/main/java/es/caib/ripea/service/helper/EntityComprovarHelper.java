@@ -525,11 +525,11 @@ public class EntityComprovarHelper {
 
 		MetaExpedientEntity metaExpedient = comprovarMetaExpedient(entitat, id);
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		boolean esAdministradorEntitat = permisosHelper.isGrantedAll(entitat.getId(),
+		boolean esAdministradorEntitatOrLectura = permisosHelper.isGrantedAny(entitat.getId(),
 				EntitatEntity.class,
-				new Permission[] { ExtendedPermission.ADMINISTRATION },
+				new Permission[] { ExtendedPermission.ADMINISTRATION, ExtendedPermission.ADMINISTRATION_READ },
 				auth);
-		if (esAdministradorEntitat) {
+		if (esAdministradorEntitatOrLectura) {
 			return metaExpedient;
 		}
 		if (metaExpedient.getOrganGestor() == null) {
