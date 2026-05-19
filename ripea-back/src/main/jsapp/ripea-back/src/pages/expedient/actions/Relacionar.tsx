@@ -24,15 +24,15 @@ const columns = [
     },
     {
         field: 'numero',
-        flex: 1,
+        flex: 0.9,
     },
     {
         field: 'nom',
-        flex: 1.6,
+        flex: 1.5,
     },
     {
         field: 'estat',
-        flex: 0.5,
+        flex: 0.7,
         renderCell: (params: any) => <StyledEstat entity={params?.row}>{params.formattedValue}</StyledEstat>,
         sortProcessor: (field: string, sort: GridSortDirection) => {
             return [

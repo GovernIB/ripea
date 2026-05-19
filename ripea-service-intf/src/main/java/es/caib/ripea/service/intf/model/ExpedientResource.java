@@ -45,6 +45,12 @@ import lombok.experimental.FieldNameConstants;
 		quickFilterFields = { "numero", "nom" },
         descriptionField = "nom",
 		artifacts = {
+        		@ResourceArtifact(
+						type = ResourceArtifactType.PERSPECTIVE,
+						code = ExpedientResource.PERSPECTIVE_BASE_CODE),
+        		@ResourceArtifact(
+						type = ResourceArtifactType.PERSPECTIVE,
+						code = ExpedientResource.PERSPECTIVE_AVISOS_CODE),        		
 				@ResourceArtifact(
 						type = ResourceArtifactType.REPORT,
 						code = ExpedientResource.REPORT_MASSIVE_EXPORT_PDF_CODE,
@@ -269,6 +275,8 @@ public class ExpedientResource extends NodeResource implements Serializable {
 	public static final String REPORT_PLANTILLA_EXCEL_INTERESSATS = "PLANTILLA_EXCEL_INTERESSATS";
 	public static final String REPORT_PLANTILLA_DADES_CSV = "PLANTILLA_DADES_CSV";
 	
+	public static final String PERSPECTIVE_BASE_CODE = "BASIC";
+	public static final String PERSPECTIVE_AVISOS_CODE = "AVISOS";
 	public static final String PERSPECTIVE_FOLLOWERS = "FOLLOWERS";
 	public static final String PERSPECTIVE_ARXIU_EXPEDIENT = "ARXIU_EXPEDIENT";
 	public static final String PERSPECTIVE_COUNT = "COUNT";

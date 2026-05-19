@@ -233,6 +233,8 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 //        register(ExpedientResource.ACTION_IMPORT_INTE, new ImportarInteressatsArxiuActionExecutor());
         register(ExpedientResource.ACTION_MOURE_TOT_CODE, new MoureTotActionExecutor());
         
+        register(ExpedientResource.PERSPECTIVE_BASE_CODE, new BasicPerspectiveApplicator());
+        register(ExpedientResource.PERSPECTIVE_AVISOS_CODE, new AvisosPerspectiveApplicator());
         register(ExpedientResource.PERSPECTIVE_PERMIS_CONTINGUT, new PermisContingutPerspectiveApplicator());
         register(ExpedientResource.PERSPECTIVE_AMB_PINBAL_CODE, new AmbDocumentsPinbalPerspectiveApplicator());
         register(ExpedientResource.PERSPECTIVE_FOLLOWERS, new FollowersPerspectiveApplicator());
@@ -586,54 +588,6 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     	
     	return filtrePermisos;
     }
-    
-    @Override
-    protected void afterConversion(ExpedientResourceEntity entity, ExpedientResource resource) {
-        resource.setGestioAmbGrupsActiva(entity.getMetaExpedient().isGestioAmbGrupsActiva());
-        usuariResourceRepository.findById(SecurityContextHolder.getContext().getAuthentication().getName())
-                .ifPresent(usuariResourceEntity -> resource.setSeguidor(entity.getSeguidors().contains(usuariResourceEntity)));
-        resource.setUsuariActualWrite(entityComprovarHelper.comprovarPermisExpedient(entity.getId(), ExtendedPermission.WRITE, "WRITE", false));
-        ExpedientEntity expedientEntity = expedientRepository.findById(entity.getId()).get();
-        
-        resource.setConteDocuments(CollectionUtils.isNotEmpty(documentResourceRepository.findByExpedientAndEsborrat(entity, 0)));
-        resource.setConteDocumentsDefinitius(documentResourceRepository.expedientHasDocumentsDefinitius(entity));
-        resource.setConteDocumentsEnProcessDeFirma(CollectionUtils.isNotEmpty(documentResourceRepository.findEnProccessDeFirma(entity)));
-        resource.setConteDocumentsDePortafirmesNoCustodiats(CollectionUtils.isNotEmpty(documentResourceRepository.findDocumentsDePortafirmesNoCustodiats(entity)));
-        resource.setConteDocumentsPendentsReintentsArxiu(CollectionUtils.isNotEmpty(documentResourceRepository.findDocumentsPendentsReintentsArxiu(entity, contingutHelper.getArxiuMaxReintentsDocuments())));
-//      resource.setConteDocumentsDeAnotacionesNoMogutsASerieFinal(CollectionUtils.isNotEmpty(registreAnnexRepository.findDocumentsDeAnotacionesNoMogutsASerieFinalByExpedientId(entity.getId())));
-        resource.setErrors(cacheHelper.findErrorsValidacioPerNode(entity.getId()));
-        resource.setValid(resource.getErrors().isEmpty());
-
-        resource.setPotTancar(
-                resource.isValid()
-                        && resource.isConteDocuments()
-                        && !resource.isConteDocumentsEnProcessDeFirma()
-                        && !resource.isConteDocumentsDePortafirmesNoCustodiats()
-                        && !resource.isConteDocumentsPendentsReintentsArxiu()
-//                        && !resource.isConteDocumentsDeAnotacionesNoMogutsASerieFinal()
-        );
-        if(!resource.isPotTancar()) {
-            if (!resource.isValid()) resource.setTancarDisabledMessage(messageHelper.getMessage("contingut.errors.expedient.validacio"));
-            if (!resource.isConteDocuments()) resource.setTancarDisabledMessage(messageHelper.getMessage("disabled.button.msg.noConteCapDocument"));
-            if (resource.isConteDocumentsEnProcessDeFirma()) resource.setTancarDisabledMessage(messageHelper.getMessage("disabled.button.msg.conteDocumentsEnProcessDeFirma"));
-            if (resource.isConteDocumentsDePortafirmesNoCustodiats()) resource.setTancarDisabledMessage(messageHelper.getMessage("disabled.button.msg.conteDocumentsDePortafirmesNoCustodiats"));
-            if (resource.isConteDocumentsPendentsReintentsArxiu()) resource.setTancarDisabledMessage(messageHelper.getMessage("disabled.button.msg.conteDocumentsPendentsReintentsArxiu"));
-//            if (resource.isConteDocumentsDeAnotacionesNoMogutsASerieFinal()) resource.setTancarDisabledMessage(messageHelper.getMessage("disabled.button.msg.conteDocumentsDeAnotacionesNoMogutsASerieFinal"));
-        }
-        
-        resource.setErrorLastEnviament(cacheHelper.hasEnviamentsPortafirmesAmbErrorPerExpedient(expedientEntity));
-		resource.setErrorLastNotificacio(cacheHelper.hasNotificacionsAmbErrorPerExpedient(expedientEntity));
-		resource.setAmbEnviamentsPendents(cacheHelper.hasEnviamentsPortafirmesPendentsPerExpedient(expedientEntity.getId()));
-		resource.setAmbNotificacionsPendents(cacheHelper.hasNotificacionsPendentsPerExpedient(expedientEntity));
-		resource.setDataDarrerEnviament(cacheHelper.getDataDarrerEnviament(expedientEntity));
-		resource.setPotModificar(entityComprovarHelper.comprovarSiEsPotModificarExpedient(expedientEntity));
-		resource.setHasEsborranys(documentResourceRepository.hasFillsEsborranys(expedientEntity.getId()));
-		resource.setPendentExecucioMassiva(expedientHelper.isExpedientPendentExecucioMassivaMourerTot(expedientEntity.getId()));
-		
-		if (expedientEntity.getMetaExpedient()!=null) {
-			resource.setDisableOrganGestor(!expedientEntity.getMetaExpedient().isComu());
-		}
-	}
 
     @Override
     public ExpedientResource create(ExpedientResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
@@ -701,6 +655,62 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         }
     }
 
+    private class AvisosPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
+    	@Override
+		public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
+    		ExpedientEntity expedientEntity = expedientRepository.findById(entity.getId()).get();
+    		resource.setErrors(cacheHelper.findErrorsValidacioPerNode(entity.getId()));
+	        resource.setValid(resource.getErrors().isEmpty());
+	        resource.setErrorLastEnviament(cacheHelper.hasEnviamentsPortafirmesAmbErrorPerExpedient(expedientEntity));
+			resource.setErrorLastNotificacio(cacheHelper.hasNotificacionsAmbErrorPerExpedient(expedientEntity));
+			resource.setAmbEnviamentsPendents(cacheHelper.hasEnviamentsPortafirmesPendentsPerExpedient(expedientEntity.getId()));
+			resource.setAmbNotificacionsPendents(cacheHelper.hasNotificacionsPendentsPerExpedient(expedientEntity));
+			resource.setNumAlert(entity.getAlertes().size());
+    	}
+    }    
+    
+    private class BasicPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
+		@Override
+		public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
+	        resource.setGestioAmbGrupsActiva(entity.getMetaExpedient().isGestioAmbGrupsActiva());
+	        usuariResourceRepository.findById(SecurityContextHolder.getContext().getAuthentication().getName())
+	                .ifPresent(usuariResourceEntity -> resource.setSeguidor(entity.getSeguidors().contains(usuariResourceEntity)));
+	        resource.setUsuariActualWrite(entityComprovarHelper.comprovarPermisExpedient(entity.getId(), ExtendedPermission.WRITE, "WRITE", false));
+	        ExpedientEntity expedientEntity = expedientRepository.findById(entity.getId()).get();
+	        
+	        resource.setConteDocuments(CollectionUtils.isNotEmpty(documentResourceRepository.findByExpedientAndEsborrat(entity, 0)));
+	        resource.setConteDocumentsDefinitius(documentResourceRepository.expedientHasDocumentsDefinitius(entity));
+	        resource.setConteDocumentsEnProcessDeFirma(CollectionUtils.isNotEmpty(documentResourceRepository.findEnProccessDeFirma(entity)));
+	        resource.setConteDocumentsDePortafirmesNoCustodiats(CollectionUtils.isNotEmpty(documentResourceRepository.findDocumentsDePortafirmesNoCustodiats(entity)));
+	        resource.setConteDocumentsPendentsReintentsArxiu(CollectionUtils.isNotEmpty(documentResourceRepository.findDocumentsPendentsReintentsArxiu(entity, contingutHelper.getArxiuMaxReintentsDocuments())));
+	        resource.setPotTancar(
+	                resource.isValid()
+	                        && resource.isConteDocuments()
+	                        && !resource.isConteDocumentsEnProcessDeFirma()
+	                        && !resource.isConteDocumentsDePortafirmesNoCustodiats()
+	                        && !resource.isConteDocumentsPendentsReintentsArxiu()
+//	                        && !resource.isConteDocumentsDeAnotacionesNoMogutsASerieFinal()
+	        );
+	        if(!resource.isPotTancar()) {
+	            if (!resource.isValid()) resource.setTancarDisabledMessage(messageHelper.getMessage("contingut.errors.expedient.validacio"));
+	            if (!resource.isConteDocuments()) resource.setTancarDisabledMessage(messageHelper.getMessage("disabled.button.msg.noConteCapDocument"));
+	            if (resource.isConteDocumentsEnProcessDeFirma()) resource.setTancarDisabledMessage(messageHelper.getMessage("disabled.button.msg.conteDocumentsEnProcessDeFirma"));
+	            if (resource.isConteDocumentsDePortafirmesNoCustodiats()) resource.setTancarDisabledMessage(messageHelper.getMessage("disabled.button.msg.conteDocumentsDePortafirmesNoCustodiats"));
+	            if (resource.isConteDocumentsPendentsReintentsArxiu()) resource.setTancarDisabledMessage(messageHelper.getMessage("disabled.button.msg.conteDocumentsPendentsReintentsArxiu"));
+//	            if (resource.isConteDocumentsDeAnotacionesNoMogutsASerieFinal()) resource.setTancarDisabledMessage(messageHelper.getMessage("disabled.button.msg.conteDocumentsDeAnotacionesNoMogutsASerieFinal"));
+	        }
+
+			resource.setDataDarrerEnviament(cacheHelper.getDataDarrerEnviament(expedientEntity));
+			resource.setPotModificar(entityComprovarHelper.comprovarSiEsPotModificarExpedient(expedientEntity));
+			resource.setHasEsborranys(documentResourceRepository.hasFillsEsborranys(expedientEntity.getId()));
+			resource.setPendentExecucioMassiva(expedientHelper.isExpedientPendentExecucioMassivaMourerTot(expedientEntity.getId()));
+			
+			if (expedientEntity.getMetaExpedient()!=null) {
+				resource.setDisableOrganGestor(!expedientEntity.getMetaExpedient().isComu());
+			}
+		}
+    }    
+    
     private class PermisContingutPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
         @Override
         public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
@@ -763,7 +773,6 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
             resource.setNumMoviments(contingutMovimentRepository.countByContingutId(entity.getId()));
             resource.setNumComentaris(entity.getComentaris().size());
             resource.setNumSeguidors(entity.getSeguidors().size());
-            resource.setNumAlert(entity.getAlertes().size());
         }
     }
     

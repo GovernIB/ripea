@@ -433,8 +433,7 @@ public class ExpedientHelper {
 	}
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public boolean arxiuPropagarExpedientAmbInteressatsNewTransaction(
-			Long expedientId) {
+	public boolean arxiuPropagarExpedientAmbInteressatsNewTransaction(Long expedientId) {
 		return arxiuPropagarExpedientAmbInteressats(expedientId);
 	}
 	
