@@ -64,7 +64,7 @@ export const EnviarPortafirmesFilter = (props: any) => {
 }
 
 const namedQueries: string[] = ['MASSIU_PORTAFIRMES']
-const perspectives: string[] = ['EN_PROCES_PORTAFIB']
+const perspectives: string[] = ['EN_PROCES_PORTAFIB', 'RESUM']
 const sortModel: any = [{field: 'createdDate', sort: 'desc'}]
 const columns = [
     {

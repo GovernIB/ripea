@@ -93,7 +93,7 @@ export const Firmes = (props:any) => {
     </Grid>
 }
 
-const perspectives = ['VERSIONS', 'COUNT', 'FIRMES']
+const perspectives = ['VERSIONS', 'COUNT', 'FIRMES', 'RESUM']
 const useDocumentDetail = (expedient:any, refresh?: () => void) => {
     const { t } = useTranslation();
 

@@ -198,6 +198,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         register(DocumentResource.PERSPECTIVE_EN_PROCES_PORTAFIB_CODE, new EnProcesPortafibPerspectiveApplicator());
         register(DocumentResource.PERSPECTIVE_EN_PROCES_FIRMA_WEB_CODE, new EnProcesFirmaWebPerspectiveApplicator());
         register(DocumentResource.PERSPECTIVE_EN_PROCES_CUSTODIAR_CODE, new EnProcesCustodiarPerspectiveApplicator());
+        register(DocumentResource.PERSPECTIVE_RESUM_CODE, new ResumPerspectiveApplicator());
         register(DocumentResource.Fields.adjunt, new AdjuntFieldDownloader());
         register(DocumentResource.Fields.firmaAdjunt, new FirmaFieldDownloader());
         register(DocumentResource.Fields.imprimible, new ImprimibleFieldDownloader());
@@ -483,7 +484,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
     @Override
     protected void afterConversion(DocumentResourceEntity entity, DocumentResource resource) {
-        if(entity.getMetaNode()!=null) {
+        if (entity.getMetaNode() != null) {
             resource.setMetaDocument(ResourceReference.toResourceReference(entity.getMetaNode().getId(), entity.getMetaNode().getNom()));
         }
         resource.setAdjunt(new FileReference(
@@ -498,41 +499,46 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                 null,
                 null
         ));
-        
-        resource.setErrors(cacheHelper.findErrorsValidacioPerNode(entity.getId()));
-        resource.setValid(resource.getErrors().isEmpty());
-        resource.setAmbNotificacions(!entity.getNotificacions().isEmpty());
-        
-		DocumentNotificacioEstatEnumDto estatDarreraNotificacio = documentNotificacioRepository.findLastEstatNotificacioByDocumentId(entity.getId());
-		resource.setEstatDarreraNotificacio(estatDarreraNotificacio != null ? estatDarreraNotificacio.name() : "");
-
-		Boolean isErrorLastNotificacio = documentNotificacioRepository.findErrorLastNotificacioByDocumentId(entity.getId());
-		resource.setErrorDarreraNotificacio(isErrorLastNotificacio != null ? isErrorLastNotificacio : false);
-
-		Boolean isErrorLastEnviament = documentPortafirmesRepository.findErrorLastEnviamentPortafirmesByDocumentId(entity.getId());
-		resource.setErrorEnviamentPortafirmes(isErrorLastEnviament != null ? isErrorLastEnviament : false);
-        
-        resource.setHasFirma(resource.getDocumentFirmaTipus()!=DocumentFirmaTipusEnumDto.SENSE_FIRMA);
+        resource.setHasFirma(resource.getDocumentFirmaTipus() != DocumentFirmaTipusEnumDto.SENSE_FIRMA);
         resource.setFirmaParcial(DocumentEstatEnumDto.FIRMA_PARCIAL.equals(entity.getEstat()));
-        
-        if (entity.getMetaDocument()!=null) {
-//        	MetaDocumentResourceEntity metaDocumentResourceEntity = (MetaDocumentResourceEntity) Hibernate.unproxy(entity.getMetaDocument());
-        	resource.setMetaDocumentInfo(objectMappingHelper.newInstanceMap(
-        			entity.getMetaDocument(),
-        			MetaDocumentResource.class,
-        			"portafirmesResponsables", "serialVersionUID"));
+    }
+
+    private class ResumPerspectiveApplicator implements PerspectiveApplicator<DocumentResourceEntity, DocumentResource> {
+        @Override
+        public void applySingle(String code, DocumentResourceEntity entity, DocumentResource resource) throws PerspectiveApplicationException {
+            resource.setErrors(cacheHelper.findErrorsValidacioPerNode(entity.getId()));
+            resource.setValid(resource.getErrors().isEmpty());
+            resource.setAmbNotificacions(!entity.getNotificacions().isEmpty());
+
+            DocumentNotificacioEstatEnumDto estatDarreraNotificacio = documentNotificacioRepository.findLastEstatNotificacioByDocumentId(entity.getId());
+            resource.setEstatDarreraNotificacio(estatDarreraNotificacio != null ? estatDarreraNotificacio.name() : "");
+
+            Boolean isErrorLastNotificacio = documentNotificacioRepository.findErrorLastNotificacioByDocumentId(entity.getId());
+            resource.setErrorDarreraNotificacio(isErrorLastNotificacio != null ? isErrorLastNotificacio : false);
+
+            Boolean isErrorLastEnviament = documentPortafirmesRepository.findErrorLastEnviamentPortafirmesByDocumentId(entity.getId());
+            resource.setErrorEnviamentPortafirmes(isErrorLastEnviament != null ? isErrorLastEnviament : false);
+
+            if (entity.getMetaDocument() != null) {
+                resource.setMetaDocumentInfo(objectMappingHelper.newInstanceMap(
+                        entity.getMetaDocument(),
+                        MetaDocumentResource.class,
+                        "portafirmesResponsables", "serialVersionUID"));
+            }
+
+            if (entity.getCreatedBy() != null) {
+                UsuariResourceEntity usuariResourceEntity = usuariResourceRepository.findById(entity.getCreatedBy()).orElse(null);
+                if (usuariResourceEntity != null) {
+                    resource.setCreatedByFullName(usuariResourceEntity.getNom() + " (" + usuariResourceEntity.getCodi() + ")");
+                }
+            }
+            if (entity.getLastModifiedBy() != null) {
+                UsuariResourceEntity usuariResourceEntity = usuariResourceRepository.findById(entity.getLastModifiedBy()).orElse(null);
+                if (usuariResourceEntity != null) {
+                    resource.setLastModifiedByFullName(usuariResourceEntity.getNom() + " (" + usuariResourceEntity.getCodi() + ")");
+                }
+            }
         }
-        
-        if (entity.getCreatedBy()!=null) {
-    		UsuariResourceEntity usuariResourceEntity = usuariResourceRepository.findById(entity.getCreatedBy()).orElse(null);
-    		if (usuariResourceEntity!=null) {
-    			resource.setCreatedByFullName(usuariResourceEntity.getNom() + " (" + usuariResourceEntity.getCodi() + ")");
-    		}
-    	}
-    	if (entity.getLastModifiedBy()!=null) {
-    		UsuariResourceEntity usuariResourceEntity = usuariResourceRepository.findById(entity.getLastModifiedBy()).orElse(null);
-    		resource.setLastModifiedByFullName(usuariResourceEntity.getNom() + " (" + usuariResourceEntity.getCodi() + ")");
-    	}
     }
 
     private class PathPerspectiveApplicator implements PerspectiveApplicator<DocumentResourceEntity, DocumentResource> {

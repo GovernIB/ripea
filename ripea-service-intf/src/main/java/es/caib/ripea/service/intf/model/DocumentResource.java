@@ -95,6 +95,9 @@ import lombok.experimental.FieldNameConstants;
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = DocumentResource.PERSPECTIVE_EN_PROCES_CUSTODIAR_CODE),
                 @ResourceArtifact(
+                        type = ResourceArtifactType.PERSPECTIVE,
+                        code = DocumentResource.PERSPECTIVE_RESUM_CODE),
+                @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = DocumentResource.ACTION_ENVIAR_VIA_EMAIL_CODE,
                         formClass = DocumentResource.EnviarViaEmailFormAction.class,
@@ -181,6 +184,7 @@ public class DocumentResource extends NodeResource {
     public static final String PERSPECTIVE_EN_PROCES_PORTAFIB_CODE = "EN_PROCES_PORTAFIB";
     public static final String PERSPECTIVE_EN_PROCES_FIRMA_WEB_CODE = "EN_PROCES_FIRMA_WEB";
     public static final String PERSPECTIVE_EN_PROCES_CUSTODIAR_CODE = "EN_PROCES_CUSTODIAR";
+    public static final String PERSPECTIVE_RESUM_CODE = "RESUM";
     
     public static final String ACTION_ENVIAR_VIA_EMAIL_CODE = "ENVIAR_VIA_EMAIL";
     public static final String ACTION_ENVIAR_PORTAFIRMES_CODE = "ENVIAR_PORTAFIRMES";

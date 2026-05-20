@@ -83,6 +83,7 @@ const TreeViewSelector = (props: { value: any, onChange: (value: any) => void })
 }
 
 const carpetaPerspectives =  ["PATH" , "RESTRICCIONS", "RESPONSABLE_RESTRICCIO"];
+const expedientPerspectives = ["PATH"];
 export const useExpedientsCarpetes = (commonFilter: string) => {
     const {
         isReady: apiExpedientIsReady,
@@ -95,7 +96,7 @@ export const useExpedientsCarpetes = (commonFilter: string) => {
     const [expedients, setExpedients] = useState<any[]>();
     const [carpetes, setCarpetes] = useState<any[]>();
     const findExpedients = () => {
-        return apiExpedientFindAll({perspectives, unpaged: true, filter: commonFilter, sorts: ['ordre']})
+        return apiExpedientFindAll({perspectives: expedientPerspectives, unpaged: true, filter: commonFilter, sorts: ['ordre']})
             .then((result)=> setExpedients(result.rows))
             .catch(()=> setExpedients([]))
     }
@@ -126,7 +127,7 @@ export const useExpedientsCarpetes = (commonFilter: string) => {
     };
 }
 
-const perspectives = ["PATH"]
+const perspectives = ["PATH", "RESUM"]
 const columns = [
     // {
     //     field: 'nom',
