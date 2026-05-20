@@ -556,7 +556,7 @@ const translationEs = {
                 },
                 retornar: {
                     label: "Devolver",
-                    ok: "El expediente '{{expedient}}' ha sido devuelto al usuario '{{user}}'",
+                    ok: "El expediente '{{expedient}}' ha sido devuelto al gestor original '{{user}}'",
                 },
                 lliberar: {
                     label: "Liberar",

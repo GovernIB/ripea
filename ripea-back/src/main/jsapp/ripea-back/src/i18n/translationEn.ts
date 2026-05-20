@@ -556,7 +556,7 @@ const translationEn = {
                 },
                 retornar: {
                     label: "Return",
-                    ok: "The case file '{{expedient}}' has been returned to user '{{user}}'",
+                    ok: "The case file '{{expedient}}' has been returned to the original manager '{{user}}'",
                 },
                 lliberar: {
                     label: "Release",

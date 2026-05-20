@@ -183,7 +183,7 @@ const ExpedientAlert = (props:any) => {
 
 const CARPETA_PATH_PERSPECTIVES = ['PATH', 'RESTRICCIONS', 'RESPONSABLE_RESTRICCIO'];
 
-const perspectives = ['BASIC', 'AVISOS', 'COUNT', 'ESTAT', 'AMB_PINBAL', "META_EXPEDIENT", "PERMIS_CONTINGUT"];
+const perspectives = ['BASIC', 'AVISOS', 'COUNT', 'ESTAT', 'AMB_PINBAL', "META_EXPEDIENT", "PERMIS_CONTINGUT", "AUDITORIA"];
 const Expedient = () => {
     const { t } = useTranslation();
     const { id } = useParams();

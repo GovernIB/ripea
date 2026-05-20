@@ -448,7 +448,7 @@ public class ExpedientHelper {
 		
 		boolean throwExcepcion = false;
 		if (throwExcepcion) {
-			throw new RuntimeException("Mock excepcion després de crear expedient en arxiu");
+			throw new RuntimeException("Mock excepcion DESPRES de crear expedient en arxiu");
 		}
 		
 		if (cacheHelper.mostrarLogsCreacioContingut())

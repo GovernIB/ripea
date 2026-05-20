@@ -555,8 +555,8 @@ const translationCa = {
                     ok: "L’usuari '{{user}}' ha deixat de seguir l’expedient '{{expedient}}'.",
                 },
                 retornar: {
-                    label: "Tornar",
-                    ok: "L’expedient '{{expedient}}' ha estat tornat a l’usuari '{{user}}'",
+                    label: "Retornar",
+                    ok: "L’expedient '{{expedient}}' ha estat retornat al gestor original '{{user}}'",
                 },
                 lliberar: {
                     label: "Alliberar",
