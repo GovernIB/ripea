@@ -25,6 +25,7 @@ import javax.annotation.PostConstruct;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.hibernate.Hibernate;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -301,7 +302,31 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		
 		return distinctSpecification != null ? distinctSpecification : Specification.where(null);
     }
-    
+
+    @Override
+    protected Sort processSort(Sort sort) {
+        if (sort == null || sort.isUnsorted()) return sort;
+        List<Sort.Order> orders = new ArrayList<>();
+        for (Sort.Order order : sort) {
+            if ("estatAdditional".equals(order.getProperty())) {
+                // estatAdditional.id requereix JOIN amb DISTINCT i provoca ORA-01791 a Oracle.
+                // estatAdditionalId mapeja la mateixa columna FK directament, sense JOIN.
+                orders.add(order.withProperty("estatAdditionalId"));
+            } else if ("agafatPer".equals(order.getProperty())) {
+                // agafatPer.id requereix JOIN amb DISTINCT i provoca ORA-01791 a Oracle.
+                // agafatPerCodi mapeja la mateixa columna FK directament, sense JOIN.
+                orders.add(order.withProperty("agafatPerCodi"));
+            } else if ("metaExpedient".equals(order.getProperty())) {
+                // metaExpedient.id requereix JOIN amb DISTINCT i provoca ORA-01791 a Oracle.
+                // metaExpedientId mapeja la mateixa columna FK directament, sense JOIN.
+                orders.add(order.withProperty("metaExpedientId"));
+            } else {
+                orders.add(order);
+            }
+        }
+        return Sort.by(orders);
+    }
+
     @Override
     protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
     	

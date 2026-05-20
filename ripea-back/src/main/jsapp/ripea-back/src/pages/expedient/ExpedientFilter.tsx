@@ -1,4 +1,5 @@
 import {Grid} from "@mui/material";
+import {useMemo} from "react";
 import {useFormContext} from 'reactlib';
 import GridFormField, {GridButtonField} from "../../components/GridFormField.tsx";
 import {useUserSession} from "../../components/Session.tsx";
@@ -9,23 +10,32 @@ const ExpedientFilterForm = () => {
     const {data} = useFormContext()
     const { value: user, rol } = useUserSession();
 
-    const filterMetaExpedient = builder.and(
-        builder.eq('organGestor.id', data?.organGestor?.id),
-    );
+    const filterMetaExpedient = useMemo(() =>
+        builder.and(builder.eq('organGestor.id', data?.organGestor?.id)),
+    [data?.organGestor?.id]);
+
+    const requestParamsEstat = useMemo(() =>
+        ({metaExpedientId: data?.metaExpedient?.id}),
+    [data?.metaExpedient?.id]);
+
+    const requestParamsDominiValor = useMemo(() =>
+        ({domini: data?.domini?.id}),
+    [data?.domini?.id]);
 
     const mostrarGrups = user?.sessionScope?.isFiltreGrupsVisible;
 
     return <>
         {(!data?.advanced) && <>
-            <GridFormField size={{xs: 12, sm: 6, md: 2.4}} name="numero"/>
-            <GridFormField size={{xs: 12, sm: 6, md: 2.4}} name="estat" requestParams={{metaExpedientId: data?.metaExpedient?.id}} />
-            <GridFormField size={{xs: 12, sm: 6, md: 2.4}} name="dataCreacioInici"/>
-            <GridFormField size={{xs: 12, sm: 6, md: 2.4}} name="dataCreacioFinal"/>
+            <GridFormField size={{xs: 12, sm: 6, md: 2}} name="numero"/>
+            <GridFormField size={{xs: 12, sm: 6, md: 2}} name="metaExpedient" filter={filterMetaExpedient}/>
+            <GridFormField size={{xs: 12, sm: 6, md: 2}} name="estat" requestParams={requestParamsEstat} />
+            <GridFormField size={{xs: 12, sm: 6, md: 2}} name="dataCreacioInici"/>
+            <GridFormField size={{xs: 12, sm: 6, md: 2}} name="dataCreacioFinal"/>
         </>}
         {(data?.advanced) && <>
             <GridFormField size={{xs: 12, sm: 6, md: 3}} name="numero"/>
             <GridFormField size={{xs: 12, sm: 6, md: 3}} name="nom"/>
-            <GridFormField size={{xs: 12, sm: 6, md: 3}} name="estat" requestParams={{metaExpedientId: data?.metaExpedient?.id}} />
+            <GridFormField size={{xs: 12, sm: 6, md: 3}} name="estat" requestParams={requestParamsEstat} />
             <GridFormField size={{xs: 12, sm: 6, md: 3}} name="interessat"/>
             <GridFormField size={{xs: 12, sm: 6, md: 3}} name="organGestor" />
             <GridFormField size={{xs: 12, sm: 6, md: 3}} name="metaExpedient" filter={filterMetaExpedient}/>
@@ -34,7 +44,7 @@ const ExpedientFilterForm = () => {
 
             <GridFormField size={{xs: 12, sm: 6, md: 3}} name="domini" hidden={!user?.sessionScope?.isDominisEnabled}/>
             <GridFormField size={{xs: 12, sm: 6, md: 3}} name="dominiValor"
-                           requestParams={{domini: data?.domini?.id}}
+                           requestParams={requestParamsDominiValor}
                            disabled={!data?.domini}
                            reanOnly={!data?.domini}
                            hidden={!user?.sessionScope?.isDominisEnabled}/>
@@ -110,6 +120,12 @@ export const springFilterBuilder = (data: any, user?: any, rol?: any): string =>
     return filterStr;
 }
 
+const defaultExpedientFilterData = () => {
+    const dataCreacioInici = new Date();
+    dataCreacioInici.setMonth(dataCreacioInici.getMonth() - 3);
+    return { estat: '0', dataCreacioInici };
+}
+
 const ExpedientFilter = (props: any) => {
     const {onSpringFilterChange} = props;
     const {value: user, rol} = useUserSession();
@@ -122,6 +138,8 @@ const ExpedientFilter = (props: any) => {
         onSpringFilterChange={onSpringFilterChange}
         advancedSearch
         filterOnFieldEnterKeyPressed
+        defaultData={defaultExpedientFilterData}
+        buttonGridProps={{size: {xs: 12, sm: 6, md: 2}}}
     >
         <ExpedientFilterForm/>
     </StyledMuiFilter>

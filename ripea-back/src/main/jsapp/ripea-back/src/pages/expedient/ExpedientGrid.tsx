@@ -115,7 +115,6 @@ const beforeAvis = [
     {
         field: 'metaExpedient',
         flex: 1.15,
-        sortable: false,
     },
     {
         field: 'nom',

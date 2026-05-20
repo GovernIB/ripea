@@ -12,7 +12,7 @@ const CambiarEstatForm = () => {
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField name="nom" disabled readOnly hidden={data?.massivo}/>
-        <GridFormField name="estatAdditional" filter={filterEstatAdditional}/>
+        <GridFormField name="estatAdditional" filter={filterEstatAdditional} optionsUnpaged/>
     </Grid>
 }
 

@@ -47,6 +47,8 @@ public class ExpedientResourceEntity extends NodeResourceEntity<ExpedientResourc
 			name = "metaexpedient_id",
 			foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "metaexp_expedient_fk"))
 	private MetaExpedientResourceEntity metaExpedient;
+	@Column(name = "metaexpedient_id", insertable = false, updatable = false)
+	private Long metaExpedientId;
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "tancat_data")
 	protected Date tancatData;
@@ -89,6 +91,9 @@ public class ExpedientResourceEntity extends NodeResourceEntity<ExpedientResourc
 			name = "agafat_per_codi",
 			foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "agafatper_expedient_fk"))
 	protected UsuariResourceEntity agafatPer;
+
+	@Column(name = "agafat_per_codi", insertable = false, updatable = false)
+	protected String agafatPerCodi;
 	@OneToMany(
 			mappedBy = "expedient",
 			fetch = FetchType.LAZY,
@@ -157,6 +162,9 @@ public class ExpedientResourceEntity extends NodeResourceEntity<ExpedientResourc
 			name = "expedient_estat_id",
 			foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "expestat_expedient_fk"))
 	private MetaExpedientEstatResourceEntity estatAdditional;
+
+	@Column(name = "expedient_estat_id", insertable = false, updatable = false)
+	private Long estatAdditionalId;
 
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(

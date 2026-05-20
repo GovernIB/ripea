@@ -55,6 +55,7 @@ const StyledMuiFilter = (props:any) => {
         code,
         sessionKey = code,
         advancedSearch = false,
+        defaultData,
         ...other
     } = props
 
@@ -65,11 +66,12 @@ const StyledMuiFilter = (props:any) => {
         }
     }
     const netejar = ()=> {
+        const data = typeof defaultData === 'function' ? defaultData() : (defaultData ?? {});
         if (sessionKey) {
-            saveFilterData(null)
+            saveFilterData(Object.keys(data).length > 0 ? data : null)
         }
-        apiRef?.current?.reset?.({})
-        apiRef?.current?.filter?.({})
+        apiRef?.current?.reset?.(data)
+        apiRef?.current?.filter?.(data)
     }
 
     const callback = (value: string) => {
