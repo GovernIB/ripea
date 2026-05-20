@@ -85,7 +85,8 @@ const useSeguimentPortafirmes = (potModificar:boolean, refresh?: () => void) => 
         if (apiIsReady && id){
             apiFind({
                 filter: builder.eq('document.id', id),
-                sorts: ['createdDate,desc']
+                sorts: ['createdDate,desc'],
+                perspectives: ['PORTAFIB_DETALL'],
             })
                 .then((result) => {
                     if (result?.rows?.length>0){

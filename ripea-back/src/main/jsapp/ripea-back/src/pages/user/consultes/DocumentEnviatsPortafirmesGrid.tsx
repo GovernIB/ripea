@@ -27,7 +27,7 @@ const useDetail = () => {
 
     const handleOpen = (id:any) => {
         if(apiIsReady && id){
-            apiGetOne(id)
+            apiGetOne(id, { perspectives: ['PORTAFIB_DETALL'] })
                 .then((app) => setEntity(app))
                 .catch((error) => {
                     handleClose()
