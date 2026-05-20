@@ -83,6 +83,7 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
 	public void init() {
 		register(ExpedientTascaResource.PERSPECTIVE_RESPONSABLES_CODE, new ResponsablesPerspectiveApplicator());
 		register(ExpedientTascaResource.PERSPECTIVE_AUDIT_CODE, new AuditoriaPerspectiveApplicator());
+		register(ExpedientTascaResource.PERSPECTIVE_CONTEXT_USUARI_CODE, new ContextUsuariPerspectiveApplicator());
 
         register(ExpedientTascaResource.ACTION_CHANGE_ESTAT_CODE, new ChangeEstatActionExecutor());
         register(ExpedientTascaResource.ACTION_CHANGE_PRIORITAT_CODE, new ChangePrioritatActionExecutor());
@@ -195,27 +196,6 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
         resource.setObservadors(entity.getObservadors()
                 .stream().map(obs->ResourceReference.<UsuariResource, String>toResourceReference(obs.getId(), obs.getCodiAndNom()))
                 .collect(Collectors.toList()));
-        String usuariActualCodi = SecurityContextHolder.getContext().getAuthentication().getName();
-        boolean usuariActualResponsable = false;
-        if (resource.getResponsables()!=null) {
-        	for (ResourceReference<UsuariResource,String> resp: resource.getResponsables()) {
-        		if (resp.getId().equals(usuariActualCodi)) {
-        			usuariActualResponsable = true;
-        			break;
-        		}
-        	}
-        }
-       	resource.setUsuariActualResponsable(usuariActualResponsable);
-        resource.setUsuariActualDelegat(resource.getDelegat()!=null && usuariActualCodi.equals(resource.getDelegat().getId()));
-        if (entity.getDataLimit()!=null) {
-	        if (entity.getDataLimit().before(Calendar.getInstance().getTime())) {
-	        	resource.setDataLimitExpirada(true);
-	        } else {
-	        	resource.setShouldNotifyAboutDeadline(tascaHelper.shouldNotifyAboutDeadline(entity.getDataLimit()));
-	        }
-        }
-        resource.setUsuariActualOnlyObservador(entity.isUsuariActualOnlyObservador(usuariActualCodi));
-        resource.setAgafadaUsuariActual(entity.getResponsableActual()!=null && entity.getResponsableActual().getId().equals(usuariActualCodi));
         resource.setResponsablesStr(entity.getResponsablesStr());
         resource.setObservadorsStr(entity.getObservadorsStr());
         if (entity.getResponsableActual()!=null) {
@@ -251,7 +231,34 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
         		resource.setLastModifiedByFullName(usuariResourceEntity.getNom() + " (" + usuariResourceEntity.getCodi() + ")");
         	}
         }
-    }	
+    }
+
+    private class ContextUsuariPerspectiveApplicator implements PerspectiveApplicator<ExpedientTascaResourceEntity, ExpedientTascaResource> {
+        @Override
+        public void applySingle(String code, ExpedientTascaResourceEntity entity, ExpedientTascaResource resource) throws PerspectiveApplicationException {
+            String usuariActualCodi = SecurityContextHolder.getContext().getAuthentication().getName();
+            boolean usuariActualResponsable = false;
+            if (resource.getResponsables() != null) {
+                for (ResourceReference<UsuariResource, String> resp : resource.getResponsables()) {
+                    if (resp.getId().equals(usuariActualCodi)) {
+                        usuariActualResponsable = true;
+                        break;
+                    }
+                }
+            }
+            resource.setUsuariActualResponsable(usuariActualResponsable);
+            resource.setUsuariActualDelegat(resource.getDelegat() != null && usuariActualCodi.equals(resource.getDelegat().getId()));
+            if (entity.getDataLimit() != null) {
+                if (entity.getDataLimit().before(Calendar.getInstance().getTime())) {
+                    resource.setDataLimitExpirada(true);
+                } else {
+                    resource.setShouldNotifyAboutDeadline(tascaHelper.shouldNotifyAboutDeadline(entity.getDataLimit()));
+                }
+            }
+            resource.setUsuariActualOnlyObservador(entity.isUsuariActualOnlyObservador(usuariActualCodi));
+            resource.setAgafadaUsuariActual(entity.getResponsableActual() != null && entity.getResponsableActual().getId().equals(usuariActualCodi));
+        }
+    }
 
     // OnChangeLogicProcessor
     private class MetaExpedientTascaOnchangeLogicProcessor implements OnChangeLogicProcessor<ExpedientTascaResource> {

@@ -35,7 +35,7 @@ const TasquesGridForm = () => {
     </Grid>
 }
 
-const perspectives = ["RESPONSABLES_RESUM"]
+const perspectives = ["RESPONSABLES_RESUM", "CONTEXT_USUARI"]
 const columns = [
     {
         field: 'metaExpedientTasca',

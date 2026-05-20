@@ -46,7 +46,7 @@ const Tasca = () => {
 
     useEffect(()=>{
         if (apiTascaIsReady) {
-            appTascaGetOne(tascaId)
+            appTascaGetOne(tascaId, {perspectives: ['CONTEXT_USUARI']})
                 .then((app) => setTasca(app))
                 .catch((error) => setError(error))
         }
