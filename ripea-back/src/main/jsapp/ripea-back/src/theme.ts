@@ -10,6 +10,11 @@ const base: ThemeOptions = {
                     backgroundImage: `url(${backgroundPattern})`,
                     color: '#666666'
                 },
+                '.input': {
+                    height: '100%',
+                    '& .MuiInputBase-root': { height: '100%' },
+                    '& .MuiTextField-root': { height: '100%' },
+                },
                 '.multi-line-cell': {
                     display: 'flex',
                     alignItems: 'baseline !important',
@@ -17,7 +22,10 @@ const base: ThemeOptions = {
                 },
                 '.styledFilter': {
                     marginBottom: '16px',
-                    padding: '16px',
+                    paddingTop: '11px',
+					paddingBottom: '16px',
+					paddingLeft: '16px',
+					paddingRight: '16px',
                     borderRadius: '4px',
                     backgroundColor: 'inherit',
                 },
@@ -48,6 +56,28 @@ const base: ThemeOptions = {
                     borderRadius: '4px',
                     color: 'white',
                 },
+                '.massive-selector' : {
+                    '& .MuiButton-root': {
+                        borderColor: 'rgba(0, 0, 0, 0.23)' // Standard MUI outlined button border color
+                    },
+                    '& .MuiButton-root:hover': {
+                        borderColor: 'rgba(0, 0, 0, 0.50)' // Standard MUI outlined button border color
+                    },
+                    '& .MuiButton-root.Mui-disabled': {
+                        borderColor: 'rgba(0, 0, 0, 0.23)',
+                    },
+                    '& .MuiButtonGroup-grouped:first-of-type': {
+                        borderTopLeftRadius: '4px',
+                        borderBottomLeftRadius: '4px',
+                    },
+                    '& .MuiButtonGroup-grouped:last-of-type': {
+                        borderTopRightRadius: '4px',
+                        borderBottomRightRadius: '4px',
+                    },
+                    '& .MuiButton': {
+                        color: 'inherit',
+                    },
+                }
             },
         },
         MuiDataGrid: {
@@ -62,13 +92,19 @@ const base: ThemeOptions = {
                     '& .MuiDataGrid-cell': {
                         display: 'flex',
                     },
+                    '& .MuiDataGrid-treeDataGroupingCell': {
+                        '--DataGrid-t-spacing-unit': '16px',
+                    },
                     '& .MuiDataGrid-treeDataGroupingCell > *': {
                         display: 'flex',
                         alignItems: 'center'
-                    }
+                    },
+                    '& .MuiDataGrid-treeDataGroupingCellToggle': {
+                        marginRight: 0,
+                    },
                 },
 				row: {
-					minHeight: '40px !important',
+					minHeight: '45px !important',
 				},
                 cell: {
                     '&.MuiDataGrid-cell--withRenderer': {
@@ -86,7 +122,12 @@ const base: ThemeOptions = {
                 },
             },
         },
-        MuiTab: {styleOverrides: {root: {textTransform: 'none', fontSize: '1rem'}}},
+        MuiGrid: {
+            styleOverrides: {
+                root: {paddingTop: '5px'},
+            },
+        },
+        MuiTab: {styleOverrides: {root: {textTransform: 'none', fontSize: '1rem', '&.Mui-disabled': {opacity: 0.4}}}},
         MuiTabs: {
             styleOverrides: {
                 scrollButtons: {
@@ -108,20 +149,6 @@ const base: ThemeOptions = {
                     '&.Mui-disabled': {
                         opacity: 0.6,
                         cursor: 'not-allowed'
-                    },
-                },
-            },
-        },
-        MuiButtonGroup: {
-            styleOverrides: {
-                root: {
-                    '& .MuiButtonGroup-grouped:first-of-type': {
-                        borderTopLeftRadius: '4px',
-                        borderBottomLeftRadius: '4px',
-                    },
-                    '& .MuiButtonGroup-grouped:last-of-type': {
-                        borderTopRightRadius: '4px',
-                        borderBottomRightRadius: '4px',
                     },
                 },
             },
@@ -230,7 +257,7 @@ const lightPalete = {
     text: { disabled: '#555555 !important' },
     warning: {main: '#8a6d3b'},
     action: {
-        disabled: '#555555',
+        disabled: 'rgba(81,81,81,0.49)',
         selected: 'rgba(51, 122, 183, 0.28)',
         disabledBackground: 'rgba(231,229,229,0.6)',
     },
@@ -241,6 +268,13 @@ export const lightTheme = createTheme(base, {
     components: {
         MuiCssBaseline: {
             styleOverrides: {
+                '.input': {
+                    color: 'black',
+                    backgroundColor: 'white',
+                    '& .MuiInputBase-root.Mui-disabled': {
+                        backgroundColor: lightPalete.action.disabledBackground,
+                    }
+                },
                 '.styledFilter': {
                     backgroundColor: '#f5f5f5',
                     border: '1px solid #e3e3e3'
@@ -253,32 +287,9 @@ export const lightTheme = createTheme(base, {
                 },
             },
         },
-        MuiOutlinedInput: {
-            styleOverrides: {
-                root: {
-                    '&.Mui-disabled': {
-                        backgroundColor: lightPalete.action.disabledBackground,
-                    },
-                    '& input[readonly][aria-hidden="false"]': {
-                        backgroundColor: lightPalete.action.disabledBackground,
-                    },
-                },
-            },
-        },
-        MuiDialogTitle: {
-            styleOverrides: {
-                root: {
-                    backgroundColor: lightPalete.action.disabledBackground,
-                }
-            }
-        },
-        MuiCard: {
-            styleOverrides: {
-                root: {
-                    border: '1px solid #e3e3e3'
-                }
-            },
-        },
+        MuiButtonGroup: {styleOverrides: {grouped: {'&.Mui-disabled': { backgroundColor: lightPalete.action.disabledBackground }}}},
+        MuiDialogTitle: {styleOverrides: {root: {backgroundColor: lightPalete.action.disabledBackground,}}},
+        MuiCard: {styleOverrides: {root: {border: '1px solid #e3e3e3'}}},
         MuiCardHeader: {
             styleOverrides: {
                 root: {
@@ -346,6 +357,12 @@ export const darkTheme = createTheme(base, {
     components: {
         MuiCssBaseline: {
             styleOverrides: {
+                '.input': {
+                    '& .MuiInputBase-root, & .MuiPickersInputBase-root': {
+                        color: 'inherit',
+                        backgroundColor: darkPalette.background.paper,
+                    }
+                },
                 '.styledFilter': {
                     border: '1px solid #e3e3e3'
                 },
@@ -395,51 +412,20 @@ export const darkTheme = createTheme(base, {
                 },
             },
         },
-        MuiCard: {
-            styleOverrides: {
-                root: {
-                    border: '1px solid white'
-                }
-            },
-        },
-        MuiCardHeader: {
-            styleOverrides: {
-                root: {
-                    borderBottom: '1px solid white',
-                }
-            },
-        },
-        MuiCardContent: {
-            styleOverrides: {
-                root: {
-                    backgroundColor: '#2d2d2d'
-                }
-            }
-        },
-        MuiInputBase: {styleOverrides: {root: {backgroundColor: darkPalette.background.paper}}},
-        MuiAutocomplete: {styleOverrides: {root: {backgroundColor: 'inherit !important'}}},
-        MuiTextField: {styleOverrides: {root: {backgroundColor: 'inherit !important'}}},
-        MuiInputLabel: {
-            styleOverrides: {
-                root: {
-                    color: '#fff',
-                }
-            }
-        },
+        MuiCard: {styleOverrides: {root: {border: '1px solid white'}}},
+        MuiCardHeader: {styleOverrides: {root: {borderBottom: '1px solid white'}}},
+        MuiCardContent: {styleOverrides: {root: {backgroundColor: '#2d2d2d'}}},
+        MuiInputLabel: {styleOverrides: {root: {color: '#fff'}}},
         MuiCheckbox: {
             styleOverrides: {
                 root: {
                     color: 'inherit !important',
-                    backgroundColor: 'inherit !important',
+                    // backgroundColor: 'inherit !important',
                     '&.Mui-disabled': {color: darkPalette.text.disabled}
                 },
             }
         },
-        MuiButtonGroup: {
-            styleOverrides: {
-                grouped: {'&.Mui-disabled': {color: 'grey !important'}}
-            }
-        },
+        MuiButtonGroup: {styleOverrides: {grouped: {'&.Mui-disabled': {color: darkPalette.text.disabled}}}},
         MuiDrawer: {styleOverrides: {paper: {backgroundColor: '#2d2d2d'}}},
         MuiAlert: {
             styleOverrides: {

@@ -1,26 +1,38 @@
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import {useTranslation} from "react-i18next";
-import {GridPage, useMuiDataGridApiRef} from "reactlib";
+import {GridPage, useFormContext, useMuiDataGridApiRef} from "reactlib";
 import {useMemo, useState} from "react";
 import {CardPage} from "../../../components/CardData.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import GridFormField from "../../../components/GridFormField.tsx";
-import {Alert, Link} from "@mui/material";
+import {Alert, Box, Link} from "@mui/material";
 import {Link as RouterLink } from 'react-router-dom';
 import {useSession} from "../../../components/SessionStorageContext.tsx";
+import {useUserSession} from "../../../components/Session.tsx";
 import {GridSortDirection} from "@mui/x-data-grid-pro";
-import {useAnexxActions} from "../../anotacions/details/AnotacioActions.tsx";
+import {useReintentar, useReintentarMassive} from "../../anotacions/actions/Reintentar.tsx";
+import {useExecucioMassivaContingut} from "../actions/ExecucioMassivaGrid.tsx";
 
 const AdjuntarAnnexosPendentsFilterFrom = () => {
+    const {data} = useFormContext();
+    const { value: user } = useUserSession();
+    const expedientFilter = builder.and(
+        builder.eq('metaExpedient.id', data?.procediment?.id),
+        builder.eq('grup.id', data?.grup?.id)
+    );
     return <>
-        <GridFormField xs={3} name="nom"/>
-        <GridFormField xs={3} name="numero"/>
-        <GridFormField xs={3} name="dataInici" type={"date"}/>
-        <GridFormField xs={3} name="dataFi" type={"date"}/>
-        <GridFormField xs={3} name="procediment"/>
-        <GridFormField xs={3} name="expedient"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="procediment"/>
+        <GridFormField name="grup" size={{xs: 12, sm: 6, md: 3}}
+                       namedQueries={[`BY_PROCEDIMENT#${data?.procediment?.id}`]}
+                       disabled={!data?.procediment}
+                       hidden={!user?.sessionScope?.isFiltreGrupsVisible}/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="expedient" filter={expedientFilter}/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="numero"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="nom"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="dataInici" type={"date"}/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="dataFi" type={"date"}/>
     </>
 }
 
@@ -31,6 +43,7 @@ const springFilterBuilder = (data: any) => {
         builder.exists(
             builder.and(
                 builder.eq("registre.expedientPeticions.expedient.id", data.expedient?.id),
+                builder.eq("registre.expedientPeticions.expedient.grup.id", data.grup?.id),
                 builder.eq("registre.expedientPeticions.expedient.metaExpedient.id", data.procediment?.id),
                 builder.betweenDates("registre.expedientPeticions.expedient.createdDate", data?.dataAltaInici, data?.dataAltaFi),
             )
@@ -54,7 +67,7 @@ const AdjuntarAnnexosPendentsFilter = (props: any) => {
 }
 
 const namedQuery: string[] = ['MASSIU_PENDENT_PROCESSAR']
-const perspectives: string[] = ['REGISTRE']
+const perspectives: string[] = ['REGISTRE', 'EN_PROCES_ADJUNTAR_ANNEXOS'];
 // const sortModel: any = [{field: 'expedientInfo.createdDate', sort: 'desc'}]
 const AdjuntarAnnexosPendentsGrid = () => {
     const {t} = useTranslation();
@@ -99,14 +112,24 @@ const AdjuntarAnnexosPendentsGrid = () => {
         apiRef?.current?.refresh?.();
     }
 
-    const { reintentar, reintentarMassive } = useAnexxActions(refresh)
+    const {handleShow: handleReintentar, content: contentReintentar} = useReintentar(refresh)
+    const {handleShow: handleReintentarMassive, content: contentReintentarMassive} = useReintentarMassive(refresh, filterData?.procediment)
+    const {handleOpen: handleContingutOpen, dialog: dialogContingut} = useExecucioMassivaContingut();
 
-    const actions = [
+    const actions:any[] = [
         {
             label: t('page.anotacio.action.procesarAnnexosPendents.label'),
             icon: "reply",
             showInMenu: false,
-            onClick: reintentar,
+            onClick: (id: any, row: any) => handleReintentar(id, row?.expedientInfo?.metaExpedient),
+            hidden: (row:any) => row?.execucioMassivaAdjuntarAnnexosId,
+        },
+        {
+            label: t('page.user.action.massives.pending'),
+            icon: <Box sx={{ color: 'warning.main' }}>schedule</Box>,
+            showInMenu: false,
+            onClick: (_id:any, row:any) => handleContingutOpen(row?.execucioMassivaAdjuntarAnnexosId),
+            hidden: (row:any) => !row?.execucioMassivaAdjuntarAnnexosId,
         },
     ]
     const massiveActions = [
@@ -114,7 +137,7 @@ const AdjuntarAnnexosPendentsGrid = () => {
             label: t('page.anotacio.action.procesarAnnexosPendents.label'),
             icon: "reply",
             showInMenu: false,
-            onClick: reintentarMassive,
+            onClick: handleReintentarMassive,
         },
     ]
 
@@ -122,7 +145,8 @@ const AdjuntarAnnexosPendentsGrid = () => {
         <CardPage title={t('navigate.massiu.procesarAnnexosPendents')}>
             
             <Alert severity={'info'} sx={{mb: 1}}>{t('page.anotacio.action.procesarAnnexosPendents.info')}</Alert>
-            <Alert severity={'info'} sx={{mb: 1}}>{t('page.expedient.alert.canviEstat')}</Alert>
+            {!haveRequirements &&
+                <Alert severity={'info'} sx={{mb: 1}}>{t('page.expedient.alert.canviEstat')}</Alert>}
             
             <AdjuntarAnnexosPendentsFilter
                 sessionKey={sessionKey}
@@ -138,11 +162,15 @@ const AdjuntarAnnexosPendentsGrid = () => {
                 namedQueries={namedQuery}
                 rowAdditionalActions={actions}
                 toolbarMassiveActions={massiveActions}
-                isRowSelectable={() => haveRequirements}
+                isRowSelectable={(params:any) => !params?.row?.execucioMassivaAdjuntarAnnexosId
+                    && haveRequirements}
                 disabledMassiveDefSelector={!haveRequirements}
                 toolbarHideCreate
             />
         </CardPage>
+        {contentReintentar}
+        {contentReintentarMassive}
+        {dialogContingut}
     </GridPage>
 }
 export default AdjuntarAnnexosPendentsGrid;

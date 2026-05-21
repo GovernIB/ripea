@@ -62,10 +62,9 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 	@JoinTable(
 			name = BaseConfig.DB_PREFIX + "expedient_tasca_resp",
 			joinColumns = {@JoinColumn(name = "tasca_id", referencedColumnName="id")},
-			inverseJoinColumns = {@JoinColumn(name = "responsable_codi")})
-	@ForeignKey(
-			name = BaseConfig.DB_PREFIX + "expedient_tasca_fk",
-			inverseName = BaseConfig.DB_PREFIX + "expedient_tascaresp_fk")
+			inverseJoinColumns = {@JoinColumn(name = "responsable_codi")},
+			foreignKey = @javax.persistence.ForeignKey(name = BaseConfig.DB_PREFIX + "expedient_tasca_fk"),
+			inverseForeignKey = @javax.persistence.ForeignKey(name = BaseConfig.DB_PREFIX + "expedient_tascaresp_fk"))
 	private List<UsuariEntity> responsables = new ArrayList<UsuariEntity>();
 	
 	@OneToOne
@@ -76,10 +75,9 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 	@JoinTable(
 			name = BaseConfig.DB_PREFIX + "expedient_tasca_obse",
 			joinColumns = {@JoinColumn(name = "tasca_id", referencedColumnName="id")},
-			inverseJoinColumns = {@JoinColumn(name = "observador_codi")})
-	@ForeignKey(
-			name = BaseConfig.DB_PREFIX + "expedient_obse_tasca_fk",
-			inverseName = BaseConfig.DB_PREFIX + "expedient_tascaobse_fk")
+			inverseJoinColumns = {@JoinColumn(name = "observador_codi")},
+			foreignKey = @javax.persistence.ForeignKey(name = BaseConfig.DB_PREFIX + "expedient_obse_tasca_fk"),
+			inverseForeignKey = @javax.persistence.ForeignKey(name = BaseConfig.DB_PREFIX + "expedient_tascaobse_fk"))
 	private List<UsuariEntity> observadors = new ArrayList<UsuariEntity>();
 	
 	@Temporal(TemporalType.TIMESTAMP)

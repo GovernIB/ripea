@@ -5,6 +5,7 @@ package es.caib.ripea.back.command;
 
 import es.caib.ripea.back.helper.ConversioTipusHelper;
 import es.caib.ripea.service.intf.dto.ContingutVistaEnumDto;
+import es.caib.ripea.service.intf.dto.InterficieUsuariEnumDto;
 import es.caib.ripea.service.intf.dto.MoureDestiVistaEnumDto;
 import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.utils.Utils;
@@ -44,6 +45,7 @@ public class UsuariCommand implements Serializable {
 	private ContingutVistaEnumDto vistaActual;
 	private boolean expedientExpandit;
 	private MoureDestiVistaEnumDto vistaMoureActual;
+	private InterficieUsuariEnumDto interficieUsuari;
 	
 	
 	public void setCodi(String codi) {

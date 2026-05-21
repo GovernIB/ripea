@@ -9,12 +9,10 @@ const columns = [
   { field: 'nom', flex: 0.6 },
 ];
 
-
+const sortModel: any = [{ field: 'nom', sort: 'asc' }];
 const UsuarisRestriccioForm = () => {
 	const { data, apiRef } = useFormContext();
 	const { t } = useTranslation();
-	
-	const sortModel: any = [{ field: 'nom', sort: 'asc' }];
 
 	const selectionModel = useMemo(()=>{
 	    return data?.restriccions?.map?.((a:any) => a.id)
@@ -32,9 +30,7 @@ const UsuarisRestriccioForm = () => {
 	useEffect(() => {
 		apiRef?.current?.setFieldValue(
 			"restriccions", 
-			selectedRows.map((codi: string) => ({
-			      id: codi
-		    })))
+			selectedRows.map((id: string) => ({ id })))
 	}, [selectedRows]);
 	
 	const hasError = data?.restringida && selectedRows.length === 0;

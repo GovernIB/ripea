@@ -1,12 +1,11 @@
-import {MuiFormDialog, MuiFormDialogApi, useBaseAppContext} from "reactlib";
+import {MuiFormDialog, useMuiFormDialogApiRef, useBaseAppContext} from "reactlib";
 import {Grid} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
-import {useRef} from "react";
 import {useTranslation} from "react-i18next";
 
 const AssignarForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="agafatPer" required/>
+        <GridFormField name="agafatPer" required/>
     </Grid>
 }
 
@@ -30,7 +29,7 @@ export const Assignar = (props: { apiRef:any }) => {
 
 const useAssignar = (refresh?: () => void) => {
     const { t } = useTranslation();
-    const apiRef = useRef<MuiFormDialogApi>();
+    const apiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow} = useBaseAppContext();
 
     const handleShow = (id:any, row:any) :void => {

@@ -24,7 +24,7 @@ import java.util.List;
 @Table(name = BaseConfig.DB_PREFIX + "document_enviament")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @EntityListeners(AuditingEntityListener.class)
-public abstract class DocumentEnviamentEntity extends RipeaAuditable<Long> { //TODO: shouldn't be one table, brings confusion
+public abstract class DocumentEnviamentEntity extends RipeaAuditable<Long> {
 
 	@Column(name = "estat", nullable = false)
 	@Enumerated(EnumType.STRING)

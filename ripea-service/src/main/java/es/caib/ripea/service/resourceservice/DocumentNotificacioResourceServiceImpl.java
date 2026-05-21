@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service;
 import com.turkraft.springfilter.FilterBuilder;
 import com.turkraft.springfilter.parser.Filter;
 
+import org.hibernate.Hibernate;
+
 import es.caib.ripea.persistence.entity.DocumentEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.resourceentity.DocumentNotificacioResourceEntity;
@@ -82,8 +84,9 @@ public class DocumentNotificacioResourceServiceImpl extends BaseMutableResourceS
     	
         Filter filtreBase = FilterBuilder.and(
                 (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null,
-                FilterBuilder.equal(DocumentEnviamentResource.Fields.document + "." + ContingutResource.Fields.entitat + "." + EntitatResource.Fields.codi, 
-                		entitatActualCodi != null?entitatActualCodi:"................................................................................")
+                FilterBuilder.equal(DocumentEnviamentResource.Fields.document + "." + ContingutResource.Fields.entitat + "." + EntitatResource.Fields.codi,
+                		entitatActualCodi != null?entitatActualCodi:"................................................................................"),
+                Filter.parse("exists(documentInteressats.id is not null)")
         );
         
         Filter filtrePermisos = null;
@@ -115,7 +118,7 @@ public class DocumentNotificacioResourceServiceImpl extends BaseMutableResourceS
                 entity.getExpedient().getMetaExpedient().getNomClassificacio()));
         if (entity.getDocumentInteressats()!=null && !entity.getDocumentInteressats().isEmpty()) {
 	        resource.setDestinatari(
-	                objectMappingHelper.newInstanceMap(entity.getDocumentInteressats().iterator().next().getInteressat(), InteressatResource.class)
+	                objectMappingHelper.newInstanceMap(Hibernate.unproxy(entity.getDocumentInteressats().iterator().next().getInteressat()), InteressatResource.class)
 	        );
         }
     }

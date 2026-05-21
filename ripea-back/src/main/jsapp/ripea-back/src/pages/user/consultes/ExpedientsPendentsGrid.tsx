@@ -12,11 +12,11 @@ import useAnotacioActions from "../../anotacioExpedient/details/AnotacioActions.
 
 const ExpedientsPendentsFilterForm = () => {
     return <>
-        <GridFormField xs={4} name="numRegistre"/>
-        <GridFormField xs={4} name="extracte"/>
-        <GridFormField xs={4} name="metaExpedient"/>
-        <GridFormField xs={4} name="dataRecepcioInicial" type={"date"}/>
-        <GridFormField xs={4} name="dataRecepcioFinal" type={"date"}/>
+        <GridFormField size={{xs: 12, sm: 6, md: 4}} name="numRegistre"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 4}} name="extracte"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 4}} name="metaExpedient"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 4}} name="dataRecepcioInicial" type={"date"}/>
+        <GridFormField size={{xs: 12, sm: 6, md: 4}} name="dataRecepcioFinal" type={"date"}/>
     </>
 }
 

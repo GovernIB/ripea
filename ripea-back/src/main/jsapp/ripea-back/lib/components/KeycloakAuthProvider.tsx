@@ -1,28 +1,34 @@
 import React from 'react';
 import Keycloak, { KeycloakError } from 'keycloak-js';
 import useLogConsole, { LogConsoleType } from '../util/useLogConsole';
-import AuthContext from './AuthContext';
+import AuthContext, { AuthConfig } from './AuthContext';
 
 const LOG_PREFIX = '[KAUTH]';
 
-type AuthProviderProps = React.PropsWithChildren & {
-    config: any;
-    mandatory?: boolean;
-    offlineToken?: boolean;
-    everetAuthPatch?: boolean;
-    debug?: boolean;
-}
+type KeycloakAuthProviderProps = React.PropsWithChildren & {
+    /** La configuració necessària per a crear la instància del Keycloak */
+    config: AuthConfig;
+    /** Indica que l'autenticació és obligatòria (no es pot veure res si no s'està autenticat) */
+    mandatory?: true;
+    /** Indica que s'ha d'activar l'access token offline */
+    offlineAccess?: true;
+    /** Indica si s'ha de forçar el valor 'check-sso' a l'onLoad */
+    forceCheckSso?: true;
+    /** Indica si s'han d'imprimir a la consola missatges de depuració */
+    debug?: true;
+};
 
 const kcInit = async (
     keycloak: Keycloak,
     mandatory: boolean | undefined,
     offlineAccess: boolean | undefined,
-    everetAuthPatch: boolean | undefined,
+    forceCheckSso: boolean | undefined,
     debug: boolean | undefined,
-    logConsole: LogConsoleType) => {
+    logConsole: LogConsoleType
+) => {
     try {
         const isAuthenticated = await keycloak.init({
-            onLoad: everetAuthPatch ? 'check-sso' : (mandatory ? 'login-required' : 'check-sso'),
+            onLoad: forceCheckSso ? 'check-sso' : mandatory ? 'login-required' : 'check-sso',
             scope: offlineAccess ? 'offline_access' : undefined,
             enableLogging: debug,
         });
@@ -31,55 +37,60 @@ const kcInit = async (
         logConsole.error('Failed to initialize adapter:', error);
     }
     return keycloak;
-}
+};
 
 const kcNewInstance = (
     authConfig: any,
     mandatory: boolean | undefined,
     offlineToken: boolean | undefined,
-    everetAuthPatch: boolean | undefined,
+    forceCheckSso: boolean | undefined,
     setIsLoading: React.Dispatch<React.SetStateAction<boolean>>,
     setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>,
     setToken: (token: string | undefined) => void,
     setTokenParsed: (tokenParsed: any | undefined) => void,
     debug: boolean | undefined,
-    logConsole: LogConsoleType) => {
+    logConsole: LogConsoleType
+) => {
     const keycloak = new Keycloak(authConfig);
-    kcInit(keycloak, mandatory, offlineToken, everetAuthPatch, debug, logConsole);
+    kcInit(keycloak, mandatory, offlineToken, forceCheckSso, debug, logConsole);
     keycloak.onReady = (isAuthenticated) => {
         debug && logConsole.debug('Callback onReady', isAuthenticated);
         setIsLoading(false);
-    }
+    };
     keycloak.onAuthSuccess = () => {
         debug && logConsole.debug('Callback onAuthSuccess');
         setIsAuthenticated(true);
         setToken(keycloak.token);
         setTokenParsed(keycloak.tokenParsed);
-    }
+    };
     keycloak.onAuthError = (errorData: KeycloakError) => {
-        logConsole.error('Callback onAuthError', '[' + errorData?.error + ']', errorData?.error_description);
+        logConsole.error(
+            'Callback onAuthError',
+            '[' + errorData?.error + ']',
+            errorData?.error_description
+        );
         setIsAuthenticated(false);
         setToken(undefined);
         setTokenParsed(undefined);
-    }
+    };
     keycloak.onAuthRefreshSuccess = () => {
         debug && logConsole.debug('Callback onAuthRefreshSuccess');
         setIsAuthenticated(keycloak.authenticated ?? false);
         setToken(keycloak.token);
         setTokenParsed(keycloak.tokenParsed);
-    }
+    };
     keycloak.onAuthRefreshError = () => {
         logConsole.error('Callback onAuthRefreshError');
         setIsAuthenticated(false);
         setToken(undefined);
         setTokenParsed(undefined);
-    }
+    };
     keycloak.onAuthLogout = () => {
         debug && logConsole.debug('Callback onAuthLogout');
         setIsAuthenticated(false);
         setToken(undefined);
         setTokenParsed(undefined);
-    }
+    };
     keycloak.onTokenExpired = async () => {
         try {
             debug && logConsole.debug('Callback onTokenExpired, refreshing token');
@@ -92,19 +103,12 @@ const kcNewInstance = (
         } catch (error) {
             logConsole.error('Callback onTokenExpired, failed to refresh the token:', error);
         }
-    }
+    };
     return keycloak;
-}
+};
 
-export const AuthProvider = (props: AuthProviderProps) => {
-    const {
-        config,
-        mandatory,
-        offlineToken,
-        everetAuthPatch,
-        debug,
-        children
-    } = props;
+export const AuthProvider = (props: KeycloakAuthProviderProps) => {
+    const { config, mandatory, offlineAccess, forceCheckSso, debug, children } = props;
     const logConsole = useLogConsole(LOG_PREFIX);
     const [isLoading, setIsLoading] = React.useState<boolean>(true);
     const [isAuthenticated, setIsAuthenticated] = React.useState<boolean>(false);
@@ -117,32 +121,38 @@ export const AuthProvider = (props: AuthProviderProps) => {
             const keycloak = kcNewInstance(
                 config,
                 mandatory,
-                offlineToken,
-                everetAuthPatch,
+                offlineAccess,
+                forceCheckSso,
                 setIsLoading,
                 setIsAuthenticated,
-                (token: string | undefined) => tokenRef.current = token,
-                (tokenParsed: any | undefined) => tokenParsedRef.current = tokenParsed,
+                (token: string | undefined) => (tokenRef.current = token),
+                (tokenParsed: any | undefined) => (tokenParsedRef.current = tokenParsed),
                 debug,
-                logConsole);
+                logConsole
+            );
             keycloakRef.current = keycloak;
         }
     }, []);
     React.useEffect(() => {
-        if (everetAuthPatch && !isLoading && mandatory && !isAuthenticated) {
+        if (forceCheckSso && !isLoading && mandatory && !isAuthenticated) {
             keycloakRef.current?.login();
         }
-    }, [everetAuthPatch, isLoading, mandatory, isAuthenticated]);
-    const signIn = isLoading ? undefined : () => {
-        keycloakRef.current?.login();
-    }
-    const signOut = isLoading ? undefined : () => {
-        keycloakRef.current?.logout();
-    }
+    }, [forceCheckSso, isLoading, mandatory, isAuthenticated]);
+    const signIn = isLoading
+        ? undefined
+        : () => {
+              keycloakRef.current?.login();
+          };
+    const signOut = isLoading
+        ? undefined
+        : () => {
+              keycloakRef.current?.logout();
+          };
     const context = {
         isLoading,
         isReady: !isLoading,
         isAuthenticated,
+        bearerTokenActive: true,
         getToken: () => tokenRef.current,
         getTokenParsed: () => tokenParsedRef.current,
         getUserId: () => tokenParsedRef.current?.['preferred_username'],
@@ -150,9 +160,11 @@ export const AuthProvider = (props: AuthProviderProps) => {
         getUserEmail: () => tokenParsedRef.current?.['email'],
         signIn,
         signOut,
-    }
+    };
     const showChildren = !isLoading && (!mandatory || (mandatory && isAuthenticated));
-    return <AuthContext.Provider value={context}>
-        {showChildren ? children : null}
-    </AuthContext.Provider>;
-}
+    return (
+        <AuthContext.Provider value={context}>
+            {showChildren ? children : null}
+        </AuthContext.Provider>
+    );
+};

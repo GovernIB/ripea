@@ -27,6 +27,7 @@ import es.caib.ripea.service.helper.MetaExpedientHelper;
 import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
+import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
 import es.caib.ripea.service.intf.dto.PortafirmesDocumentTipusDto;
 import es.caib.ripea.service.intf.model.ContingutResource;
 import es.caib.ripea.service.intf.model.DocumentEnviamentResource;
@@ -55,6 +56,7 @@ public class DocumentPortafirmesResourceServiceImpl extends BaseMutableResourceS
     @PostConstruct
     public void init() {
     	register(DocumentPortafirmesResource.ACTION_CANCEL_FIRMA, new CancelFirmaActionExecutor());
+    	register(DocumentPortafirmesResource.PERSPECTIVE_PORTAFIB_DETALL_CODE, new PortafibDetallPerspectiveApplicator());
     }
     
     @Override
@@ -92,25 +94,27 @@ public class DocumentPortafirmesResourceServiceImpl extends BaseMutableResourceS
         return filtreResultat.generate();
     }
     
-    @Override
-    protected void afterConversion(DocumentPortafirmesResourceEntity entity, DocumentPortafirmesResource resource) {
-    	try {
-    		UsuariResourceEntity usuari = usuariResourceRepository.findById(SecurityContextHolder.getContext().getAuthentication().getName()).get();
-    		resource.setUrlFluxSeguiment(pluginHelper.portafirmesRecuperarUrlEstatFluxFirmes(
-    				Long.valueOf(entity.getPortafirmesId()),
-    				usuari.getIdioma()!=null?usuari.getIdioma().toString():"ca"));
-    		List<PortafirmesDocumentTipusDto> list = pluginHelper.portafirmesFindDocumentTipus();
-    		for (PortafirmesDocumentTipusDto doctipus : list) {
-    			if (Long.toString(doctipus.getId()).equals(entity.getDocumentTipus())) {
-    				resource.setDocumentTipusNom(doctipus.getNom());
-    				break;
-    			}
-    		}
-    	} catch (Exception ex) {
-    		//No s'ha pogut carregar la URL del fluxe
-    	}
+    private class PortafibDetallPerspectiveApplicator implements PerspectiveApplicator<DocumentPortafirmesResourceEntity, DocumentPortafirmesResource> {
+        @Override
+        public void applySingle(String code, DocumentPortafirmesResourceEntity entity, DocumentPortafirmesResource resource) throws PerspectiveApplicationException {
+            try {
+                UsuariResourceEntity usuari = usuariResourceRepository.findById(SecurityContextHolder.getContext().getAuthentication().getName()).get();
+                resource.setUrlFluxSeguiment(pluginHelper.portafirmesRecuperarUrlEstatFluxFirmes(
+                        Long.valueOf(entity.getPortafirmesId()),
+                        usuari.getIdioma() != null ? usuari.getIdioma().toString() : "ca"));
+                List<PortafirmesDocumentTipusDto> list = pluginHelper.portafirmesFindDocumentTipus();
+                for (PortafirmesDocumentTipusDto doctipus : list) {
+                    if (Long.toString(doctipus.getId()).equals(entity.getDocumentTipus())) {
+                        resource.setDocumentTipusNom(doctipus.getNom());
+                        break;
+                    }
+                }
+            } catch (Exception ex) {
+                // No s'ha pogut carregar la URL del flux ni el tipus de document
+            }
+        }
     }
-    
+
     private class CancelFirmaActionExecutor implements ActionExecutor<DocumentPortafirmesResourceEntity, Serializable, DocumentPortafirmesResource> {
 
 		@Override

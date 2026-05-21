@@ -66,7 +66,6 @@ import lombok.experimental.FieldNameConstants;
 @ResourceConfig(
         quickFilterFields = { "nom", "fitxerNom" },
         descriptionField = "nom",
-		orderField = "ordreLong",
         artifacts = {
                 @ResourceArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
@@ -85,7 +84,19 @@ import lombok.experimental.FieldNameConstants;
                         code = DocumentResource.PERSPECTIVE_FIRMES_CODE),
                 @ResourceArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
-                        code = DocumentResource.PERSPECTIVE_PROCEDIMENT_CODE),                
+                        code = DocumentResource.PERSPECTIVE_PROCEDIMENT_CODE),
+                @ResourceArtifact(
+                        type = ResourceArtifactType.PERSPECTIVE,
+                        code = DocumentResource.PERSPECTIVE_EN_PROCES_PORTAFIB_CODE),
+                @ResourceArtifact(
+                        type = ResourceArtifactType.PERSPECTIVE,
+                        code = DocumentResource.PERSPECTIVE_EN_PROCES_FIRMA_WEB_CODE),
+                @ResourceArtifact(
+                        type = ResourceArtifactType.PERSPECTIVE,
+                        code = DocumentResource.PERSPECTIVE_EN_PROCES_CUSTODIAR_CODE),
+                @ResourceArtifact(
+                        type = ResourceArtifactType.PERSPECTIVE,
+                        code = DocumentResource.PERSPECTIVE_RESUM_CODE),
                 @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = DocumentResource.ACTION_ENVIAR_VIA_EMAIL_CODE,
@@ -170,6 +181,10 @@ public class DocumentResource extends NodeResource {
     public static final String PERSPECTIVE_ARXIU_DOCUMENT_CODE = "ARXIU_DOCUMENT";
     public static final String PERSPECTIVE_FIRMES_CODE = "FIRMES";
     public static final String PERSPECTIVE_PROCEDIMENT_CODE = "PROCEDIMENT";
+    public static final String PERSPECTIVE_EN_PROCES_PORTAFIB_CODE = "EN_PROCES_PORTAFIB";
+    public static final String PERSPECTIVE_EN_PROCES_FIRMA_WEB_CODE = "EN_PROCES_FIRMA_WEB";
+    public static final String PERSPECTIVE_EN_PROCES_CUSTODIAR_CODE = "EN_PROCES_CUSTODIAR";
+    public static final String PERSPECTIVE_RESUM_CODE = "RESUM";
     
     public static final String ACTION_ENVIAR_VIA_EMAIL_CODE = "ENVIAR_VIA_EMAIL";
     public static final String ACTION_ENVIAR_PORTAFIRMES_CODE = "ENVIAR_PORTAFIRMES";
@@ -330,6 +345,9 @@ public class DocumentResource extends NodeResource {
     @Transient private boolean isDeteccioFirmaAutomaticaActiva;
     @Transient private ResourceReference<MetaExpedientResource, Long> metaExpedient;
     @Transient private String csvLinkUrl;
+    @Transient private Long execucioMassivaPortafibId;
+    @Transient private Long execucioMassivaFirmaWebId;
+    @Transient private Long execucioMassivaCustodiarId;
 
     public String getFitxerExtension() {
         if (fitxerNom != null) {
@@ -589,7 +607,7 @@ public class DocumentResource extends NodeResource {
         @Transient private String idTransaccio;
         
         //CAMPS NOMES VISIBLES A ACCIO MASSIVA
-        private Date dataInici;
+        private Date dataInici = Calendar.getInstance().getTime();
         private boolean enviarCorreu;
     }
     
@@ -646,6 +664,8 @@ public class DocumentResource extends NodeResource {
         private String nom;
         private Date dataCreacioInici;
         private Date dataCreacioFi;
+        private ResourceReference<GrupResource, Long> grup;
+        private boolean mostrarGrups;
     }
 
     public DocumentDto toDocumentDto() {

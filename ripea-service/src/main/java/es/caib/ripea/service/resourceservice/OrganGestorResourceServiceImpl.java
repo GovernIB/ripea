@@ -66,6 +66,7 @@ public class OrganGestorResourceServiceImpl extends BaseMutableResourceService<O
         register(OrganGestorResource.PERSPECTIVE_COUNT_PERMISOS, new CountPermisosPerspectiveApplicator());
         register(OrganGestorResource.DIR3_PREDICT_CODE, new PredictDir3ActionExecutor());
         register(OrganGestorResource.DIR3_UPDATE_CODE, new UpdateDir3ActionExecutor());
+        register(OrganGestorResource.Fields.permetreEnviamentPostal, new PermetreEnviamentPostalOnchangeLogicProcessor());
     }
 	
     @Override
@@ -264,6 +265,16 @@ public class OrganGestorResourceServiceImpl extends BaseMutableResourceService<O
 				throw new ActionExecutionException(getResourceClass(), null, code, messageHelper.getMessage("message.common.action.error")+": "+e.getMessage());
 			}				
 		}
+    }
+
+    private class PermetreEnviamentPostalOnchangeLogicProcessor implements OnChangeLogicProcessor<OrganGestorResource> {
+        @Override
+        public void onChange(Serializable id, OrganGestorResource previous, String fieldName, Object fieldValue,
+                Map<String, AnswerValue> answers, String[] previousFieldNames, OrganGestorResource target) {
+            if (Boolean.FALSE.equals(fieldValue)) {
+                target.setPermetreEnviamentPostalDescendents(false);
+            }
+        }
     }
 
     private class UpdateDir3ActionExecutor implements ActionExecutor<OrganGestorResourceEntity, Serializable, Serializable> {

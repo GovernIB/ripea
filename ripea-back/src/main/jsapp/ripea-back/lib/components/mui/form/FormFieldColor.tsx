@@ -23,23 +23,31 @@ export const FormFieldColor: React.FC<FormFieldCustomProps> = (props) => {
     const fileInputRef = React.useRef<HTMLInputElement>(undefined);
     const handleClearClick = () => {
         onChange(null);
-    }
-    const {
-        helperText,
-        title,
-        startAdornment,
-    } = useFormFieldCommon(field, fieldError, inline, componentProps);
-    const endAdornment = <>
-        {componentProps?.slotProps?.input?.endAdornment}
-        <InputAdornment position="end">
-            {value != null && !readOnly && <IconButton disabled={disabled} onClick={handleClearClick} size="small">
-                <Icon fontSize="small">clear</Icon>
-            </IconButton>}
-            <IconButton disabled={disabled || readOnly} onClick={() => (fileInputRef.current as any)?.querySelector('input').click()} size="small">
-                <Icon fontSize="small">palette</Icon>
-            </IconButton>
-        </InputAdornment>
-    </>;
+    };
+    const { helperText, title, startAdornment } = useFormFieldCommon(
+        field,
+        fieldError,
+        inline,
+        componentProps
+    );
+    const endAdornment = (
+        <>
+            {componentProps?.slotProps?.input?.endAdornment}
+            <InputAdornment position="end">
+                {value != null && !readOnly && (
+                    <IconButton disabled={disabled} onClick={handleClearClick} size="small">
+                        <Icon fontSize="small">clear</Icon>
+                    </IconButton>
+                )}
+                <IconButton
+                    disabled={disabled || readOnly}
+                    onClick={() => (fileInputRef.current as any)?.querySelector('input').click()}
+                    size="small">
+                    <Icon fontSize="small">palette</Icon>
+                </IconButton>
+            </InputAdornment>
+        </>
+    );
     const inputProps = {
         readOnly,
         disabled: readOnly,
@@ -48,26 +56,31 @@ export const FormFieldColor: React.FC<FormFieldCustomProps> = (props) => {
         endAdornment,
         ref: fileInputRef,
     };
-    return <TextField
-        name={name}
-        label={!inline ? label : undefined}
-        placeholder={componentProps?.placeholder ?? (inline ? label : undefined)}
-        type="color"
-        value={value ?? ''}
-        required={required ?? field.required}
-        disabled={disabled}
-        error={fieldError != null}
-        title={title}
-        helperText={helperText}
-        onChange={(e) => !readOnly && !disabled && onChange(e.target.value === '' ? null : e.target.value)}
-        fullWidth
-        {...componentProps}
-        slotProps={{
-            input: inputProps,
-        }}
-        sx={{
-            '& input': { opacity: value ? undefined : '0' },
-            ...componentProps?.sx
-        }} />;
-}
+    return (
+        <TextField
+            name={name}
+            label={!inline ? label : undefined}
+            placeholder={componentProps?.placeholder ?? (inline ? label : undefined)}
+            type="color"
+            value={value ?? ''}
+            required={required ?? field.required}
+            disabled={disabled}
+            error={fieldError != null}
+            title={title}
+            onChange={(e) =>
+                !readOnly && !disabled && onChange(e.target.value === '' ? null : e.target.value)
+            }
+            fullWidth
+            {...componentProps}
+            helperText={helperText ?? componentProps.helperText}
+            slotProps={{
+                input: inputProps,
+            }}
+            sx={{
+                '& input': { opacity: value ? undefined : '0' },
+                ...componentProps?.sx,
+            }}
+        />
+    );
+};
 export default FormFieldColor;

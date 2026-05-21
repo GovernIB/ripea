@@ -1,7 +1,10 @@
-import {IconButton} from "@mui/material";
+import {IconButton, IconButtonProps} from "@mui/material";
 import {useNavigate} from "react-router-dom";
 
-const LinkIcon = (props:any) => {
+type LinkIconProps = IconButtonProps & {
+    to: string,
+}
+const LinkIcon = (props:LinkIconProps) => {
     const navigate = useNavigate();
     return <IconButton
         {...props}

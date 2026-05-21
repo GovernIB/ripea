@@ -13,7 +13,7 @@ import lombok.ToString;
 
 /**
  * Acció realitzada sobre una integració.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 
@@ -22,8 +22,7 @@ import lombok.ToString;
 @Setter
 public class IntegracioAccioDto implements Serializable {
 
-	private Long index;
-	private Long timestamp;
+	private Long id;
 	private Date data;
 	private String descripcio;
 	private String endpoint;
@@ -45,14 +44,14 @@ public class IntegracioAccioDto implements Serializable {
 		else
 			return "";
 	}
-	
+
 	public String getExcepcioStacktrace() {
 		if (excepcioStacktrace!=null)
 			return HtmlUtils.htmlEscape(excepcioStacktrace);
 		else
 			return "";
 	}
-	
+
 	public int getParametresCount() {
 		if (parametres == null) {
 			return 0;

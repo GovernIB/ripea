@@ -24,18 +24,19 @@ public class PropertyConfig {
 	public static final String PERSISTENCE_CONTAINER_TRANSACTIONS_DISABLED = PROPERTY_PREFIX + "persist.container-transactions-disabled";
 	public static final String PERSISTENCE_TRANSACTION_MANAGER_ENABLED = PROPERTY_PREFIX + "persist.transaction-manager.enabled";
 
-	public static final String IDIOMA_DEFECTE 	= "es.caib.ripea.usuari.idioma.defecte";
-	public static final String APP_DATA_DIR 	= "es.caib.ripea.app.data.dir";
-	public static final String EMAIL_REMITENT 	= "es.caib.ripea.email.remitent";
-	public static final String BASE_URL 		= "es.caib.ripea.base.url";
-	public static final String ENTITAT_LOGO		= "es.caib.ripea.capsalera.logo";
-	public static final String INDEX_LOGO		= "es.caib.ripea.index.logo";
-	public static final String CAPSALERA_FONS	= "es.caib.ripea.capsalera.color.fons";
-	public static final String CAPSALERA_LLETRA	= "es.caib.ripea.capsalera.color.lletra";
-	public static final String CLAU_ENCRIPTACIO	= "es.caib.ripea.encription.key";
-	public static final String MAX_UPLOAD_FILE	= "es.caib.ripea.maxUploadSize";
-	public static final String REACT_ACTIU		= "es.caib.ripea.reactActivat";
-
+	public static final String IDIOMA_DEFECTE 		= "es.caib.ripea.usuari.idioma.defecte";
+	public static final String INTERFACE_DEFECTE	= "es.caib.ripea.interface.default";
+	public static final String APP_DATA_DIR 		= "es.caib.ripea.app.data.dir";
+	public static final String EMAIL_REMITENT 		= "es.caib.ripea.email.remitent";
+	public static final String BASE_URL 			= "es.caib.ripea.base.url";
+	public static final String ENTITAT_LOGO			= "es.caib.ripea.capsalera.logo";
+	public static final String INDEX_LOGO			= "es.caib.ripea.index.logo";
+	public static final String CAPSALERA_FONS		= "es.caib.ripea.capsalera.color.fons";
+	public static final String CAPSALERA_LLETRA		= "es.caib.ripea.capsalera.color.lletra";
+	public static final String CLAU_ENCRIPTACIO		= "es.caib.ripea.encription.key";
+	public static final String MAX_UPLOAD_FILE		= "es.caib.ripea.maxUploadSize";
+	public static final String MAX_RESULTS_SELECT	= "es.caib.ripea.app.maxresults.selects";
+	public static final String REACT_ACTIU			= "es.caib.ripea.reactActivat";
 	public static final String PINBAL_BASE_URL 		= "es.caib.ripea.pinbal.base.url";
 	public static final String PINBAL_USER 			= "es.caib.ripea.pinbal.user";
 	public static final String PINBAL_PASS 			= "es.caib.ripea.pinbal.password";
@@ -269,6 +270,7 @@ public class PropertyConfig {
 	public static final String CARPETES_LOGIQUES_ACTIVES							= "es.caib.ripea.carpetes.logiques";
 	public static final String CARPETES_RESTRINGIR_ACTIU							= "es.caib.ripea.restringir.carpetes.actiu";
 	public static final String ORDENACIO_CONTINGUT_ACTIU							= "es.caib.ripea.ordenacio.contingut.habilitada";
+	public static final String CARPETA_DETALL_ACCES_ACTIVA						= "es.caib.ripea.carpeta.detall.acces.activa";
 	public static final String INDEX_EXPEDIENTS_RELACIONATS							= "es.caib.ripea.index.expedients.relacionats";
 	public static final String INDEX_CAMPS_ADDICIONALS								= "es.caib.ripea.index.expedient.camps.addicionals";
 	public static final String IMPORTACIO_ACTIVA									= "es.caib.ripea.creacio.importacio.activa";

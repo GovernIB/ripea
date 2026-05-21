@@ -33,8 +33,9 @@ public abstract class BaseWebSecurityConfig {
 
 	protected RequestMatcher[] publicRequestMatchers() {
 		return new RequestMatcher[] {
-//				new AntPathRequestMatcher("/api"),
-//				new AntPathRequestMatcher("/api/**"),
+//				new AntPathRequestMatcher("/**/*"),
+//				new AntPathRequestMatcher("/**"),
+//				new AntPathRequestMatcher("/*"),
 				new AntPathRequestMatcher("/api/auth/**"),
 				new AntPathRequestMatcher("/public/**"),
 				new AntPathRequestMatcher("/api-docs"),

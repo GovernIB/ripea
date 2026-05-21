@@ -24,7 +24,6 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import javax.ejb.EJBException;
 import java.lang.reflect.Field;
-import java.util.Objects;
 
 /**
  * Tractament global de les excepcions en els controladors.
@@ -316,7 +315,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 			HttpStatus httpStatus,
 			WebRequest request) {
 		ErrorResponse errorResponse = new ErrorResponse(httpStatus.value(), message);
-		if (printStackTrace && isTraceOn(request)) {
+		if (printStackTrace) {// && isTraceOn(request)) {
 			errorResponse.setStackTrace(ExceptionUtils.getStackTrace(ex));
 		}
 		return toErrorResponseEntity(httpStatus, errorResponse);
@@ -330,7 +329,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 			AnswerRequiredException.AnswerRequiredError answerRequiredError) {
 		ErrorResponse errorResponse = new ErrorResponse(httpStatus.value(), message);
 		errorResponse.setAnswerRequiredError(answerRequiredError);
-		if (printStackTrace && isTraceOn(request)) {
+		if (printStackTrace) {// && isTraceOn(request)) {
 			errorResponse.setStackTrace(ExceptionUtils.getStackTrace(ex));
 		}
 		return toErrorResponseEntity(httpStatus, errorResponse);
@@ -346,7 +345,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 				httpStatus.value(),
 				message,
 				action);
-		if (printStackTrace && isTraceOn(request)) {
+		if (printStackTrace) {// && isTraceOn(request)) {
 			errorResponse.setStackTrace(ExceptionUtils.getStackTrace(ex));
 		}
 		return toErrorResponseEntity(httpStatus, errorResponse);
@@ -367,16 +366,16 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		} else {
 			errorResponse = new ErrorResponse(httpStatus.value(), message);
 		}
-		if (printStackTrace && isTraceOn(request)) {
+		if (printStackTrace) {// && isTraceOn(request)) {
 			errorResponse.setStackTrace(ExceptionUtils.getStackTrace(ex));
 		}
 		return toErrorResponseEntity(httpStatus, errorResponse);
 	}
 
-	private boolean isTraceOn(WebRequest request) {
-		String[] value = request.getParameterValues(REQUEST_PARAM_TRACE);
-		return Objects.nonNull(value) && value.length > 0 && (value[0].isEmpty() || value[0].contentEquals("true"));
-	}
+//	private boolean isTraceOn(WebRequest request) {
+//		String[] value = request.getParameterValues(REQUEST_PARAM_TRACE);
+//		return Objects.nonNull(value) && value.length > 0 && (value[0].isEmpty() || value[0].contentEquals("true"));
+//	}
 
 	private ResponseEntity<Object> toErrorResponseEntity(
 			HttpStatus httpStatus,

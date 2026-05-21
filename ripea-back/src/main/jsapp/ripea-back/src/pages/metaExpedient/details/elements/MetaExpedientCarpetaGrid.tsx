@@ -8,11 +8,11 @@ import {GridTreeDataGroupingCell} from "@mui/x-data-grid-pro";
 import {useMemo} from "react";
 import useMetaExpCarpetaDetail from "./details/MetaExpCarpetaDetail.tsx";
 
-const MetaExpedientCarpetaForm = () => {
+export const MetaExpedientCarpetaForm = () => {
     const {data} = useFormContext()
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="nom"/>
-        <GridFormField xs={12} name="pare"
+        <GridFormField name="nom"/>
+        <GridFormField name="pare"
                        filter={builder.and(
                            builder.eq("metaExpedient.id", data?.metaExpedient?.id),
                            builder.eq("pare", null),

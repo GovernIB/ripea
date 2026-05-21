@@ -2,6 +2,7 @@ package es.caib.ripea.persistence.repository;
 
 import es.caib.ripea.persistence.entity.ExecucioMassivaContingutEntity;
 import es.caib.ripea.persistence.entity.ExecucioMassivaEntity;
+import es.caib.ripea.service.intf.dto.ElementTipusEnumDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaEstatDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaTipusDto;
 
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public interface ExecucioMassivaContingutRepository extends JpaRepository<ExecucioMassivaContingutEntity, Long> {
@@ -36,6 +38,9 @@ public interface ExecucioMassivaContingutRepository extends JpaRepository<Execuc
 	public Long findExecucioMassivaContingutId(@Param("ara") Date ara);
 
 	long countByElementIdInAndEstatAndExecucioMassivaTipusNot(List<Long> elementIds, ExecucioMassivaEstatDto estat, ExecucioMassivaTipusDto tipus);
+
+	Optional<ExecucioMassivaContingutEntity> findFirstByElementIdAndElementTipusAndExecucioMassivaTipusAndExecucioMassivaDataFiNull(
+			Long elementId, ElementTipusEnumDto elementTipus, ExecucioMassivaTipusDto tipus);
 	
 	//------------------------------------------------------------------------//
 	

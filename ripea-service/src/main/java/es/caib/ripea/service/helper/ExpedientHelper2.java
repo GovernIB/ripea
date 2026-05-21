@@ -1,6 +1,7 @@
 package es.caib.ripea.service.helper;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,6 +40,7 @@ import es.caib.ripea.service.intf.dto.ExecucioMassivaTipusDto;
 import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientTascaValidacioDto;
+import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
 import es.caib.ripea.service.intf.dto.TascaEstatEnumDto;
 import es.caib.ripea.service.intf.dto.ValidacioErrorDto;
 import es.caib.ripea.service.intf.exception.SistemaExternException;
@@ -68,9 +70,11 @@ public class ExpedientHelper2 {
 	@Autowired private ExpedientTascaRepository expedientTascaRepository;
  
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public void checkIfExpedientCanBeClosed(Long expedientId) {
+	public void checkIfExpedientCanBeClosed(Long entitatId, Long expedientId, Long[] documentsPerFirmar) {
+		
 		ExpedientEntity expedient = expedientRepository.getOne(expedientId);
 		expedientHelper.concurrencyCheckExpedientJaTancat(expedient);
+		
 		if (anyExecucioMassiva(expedient)) {
 			throw new ValidationException("No es pot tancar un expedient amb execucions massives pendents de finalitzar");
 		}
@@ -91,6 +95,20 @@ public class ExpedientHelper2 {
 			throw new ValidationException("No es pot tancar un expedient amb documents amb reintents pendents de guardar a l'arxiu");
 		}
 
+		//Validar els documents: tots els obligatoris, han de estar firmats o seleccionats per firmar
+		List<DocumentEntity> documentsExpedient = documentHelper.findDocumentsNoFirmatsOAmbFirmaInvalidaONoGuardatsEnArxiu(entitatId, expedientId);
+		if (documentsExpedient!=null) {
+			for (DocumentEntity docmnt: documentsExpedient) {
+				//Hi ha un document no firmat, que hauria de estar entre la llista de "documentsPerFirmar"
+				if (docmnt.getMetaDocument().getMultiplicitat().esObligatoria() || docmnt.getAnnexAnotacioId()!=null) {
+					//Comprovam si es troba a la llista
+					if (documentsPerFirmar==null || documentsPerFirmar.length==0 || !Arrays.asList(documentsPerFirmar).contains(docmnt.getId())) {
+						throw new ValidationException("El document "+docmnt.getNom()+" s'ha de enviar a firmar en servidor: és obligatori o pertany a una anotació.");
+					}
+				}
+			}
+		}
+		
 		//Validar les tasques del expedient
 		List<ExpedientTascaEntity> tasquesExpedient = expedientTascaRepository.findByExpedient(expedient, null);
 		if (tasquesExpedient!=null) {
@@ -105,6 +123,13 @@ public class ExpedientHelper2 {
 		}
 	}
 
+	//Un document, si es obligatori
+	private List<DocumentEntity> getDocumentsObligatoris(List<DocumentEntity> documentsExpedient) {
+		List<DocumentEntity> resultat = new ArrayList<DocumentEntity>();
+		
+		return resultat;
+	}
+	
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void deleteDocumentsEsborranysArxiu(Long expedientId) {
 		ExpedientEntity expedient = expedientRepository.getOne(expedientId);

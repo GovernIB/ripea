@@ -7,11 +7,11 @@ const SMALL_HEADER_LIMIT = 'sm';
 export const useSmallScreen = () => {
     const theme = useTheme();
     return useMediaQuery(theme.breakpoints.down(SMALL_SCREEN_LIMIT));
-}
+};
 
 export const useSmallHeader = () => {
     const theme = useTheme();
     return useMediaQuery(theme.breakpoints.down(SMALL_HEADER_LIMIT));
-}
+};
 
 export default useSmallScreen;

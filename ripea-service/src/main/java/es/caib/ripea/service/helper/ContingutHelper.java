@@ -2992,7 +2992,11 @@ public class ContingutHelper {
 			if (expedient.getInteressatsORepresentants()!=null) {
 				for (InteressatEntity interessat: expedient.getInteressatsORepresentants()) {
 					if (!interessat.isArxiuPropagat()) {
-						expedientInteressatHelper.arxiuPropagarInteressats(expedient, interessat);
+						Exception exception = expedientInteressatHelper.arxiuPropagarInteressats(expedient, interessat);
+						if (exception != null) {
+							return setResultatSync(ERROR, messageHelper.getMessage("contingutHelper.sincronitzaExpedient.error") + " " + exception.getMessage());
+						};
+						return setResultatSync(OK, messageHelper.getMessage("contingutHelper.sincronitzaExpedient.intOk") + " " + interessat.getDocumentNum());
 					}
 				}
 			}

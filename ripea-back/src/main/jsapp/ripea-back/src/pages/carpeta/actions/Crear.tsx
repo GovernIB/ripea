@@ -1,6 +1,5 @@
-import {MuiFormDialog, MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
-import {useRef} from "react";
-import {Grid} from "@mui/material";
+import {MuiFormDialog, useMuiFormDialogApiRef, useBaseAppContext, useFormContext} from "reactlib";
+import {Box, Grid} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
 import {useTranslation} from "react-i18next";
 import UsuarisRestriccioForm from "./restriccio/UsuarisRestriccioForm.tsx";
@@ -14,19 +13,15 @@ const CrearForm = () => {
 		<>
 			<Grid container direction="row" columnSpacing={1} rowSpacing={1}>
 				<GridFormField xs={12} name="nom" />
-
 				{user?.sessionScope?.isRestringirCarpetesActiu &&
 				    <GridFormField xs={12} name="restringida" />
 				}
 			</Grid>
 
 			{data?.restringida && (
-				<>
-					<Grid sx={{ mt: 2, mb: 1}}>
-						<GridFormField xs={12} name="motiuRestriccio" />
-					</Grid>
+				<Box p={1}>
 					<UsuarisRestriccioForm />
-				</>
+				</Box>
 			)}
 		</>
 	);
@@ -49,17 +44,21 @@ const Crear = (props:any) => {
     </MuiFormDialog>
 }
 
-const useCrear = (entity:any, refresh?: () => void) => {
+const useCrear = (entity:any, refresh?: () => void, contingutPareId?: string | number | null) => {
     const { t } = useTranslation();
-    const apiRef = useRef<MuiFormDialogApi>();
+    const apiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow} = useBaseAppContext();
 
     const handleShow = () => {
-        apiRef.current?.show(undefined, {
-            expedient: {id: entity?.id},
-			metaExpedientId: entity?.metaExpedient?.id,
-            expedientRelacionat: {id: entity?.id},
-        })
+        const initial: Record<string, unknown> = {
+            expedient: { id: entity?.id },
+            metaExpedientId: entity?.metaExpedient?.id,
+            expedientRelacionat: { id: entity?.id },
+        };
+        if (contingutPareId != null && contingutPareId !== '') {
+            initial.pare = { id: contingutPareId };
+        }
+        apiRef.current?.show(undefined, initial)
             .then((data:any) => {
                 refresh?.()
                 temporalMessageShow(null, t('page.carpeta.action.new.ok', {data}), 'success');

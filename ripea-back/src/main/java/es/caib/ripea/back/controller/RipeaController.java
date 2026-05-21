@@ -1,13 +1,13 @@
-/**
- * 
- */
 package es.caib.ripea.back.controller;
 
 import es.caib.ripea.back.helper.AjaxHelper;
 import es.caib.ripea.back.helper.EntitatHelper;
 import es.caib.ripea.back.helper.ModalHelper;
 import es.caib.ripea.back.helper.RolHelper;
+import es.caib.ripea.back.helper.SessioHelper;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.EntitatDto;
+import es.caib.ripea.service.intf.dto.InterficieUsuariEnumDto;
 import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -21,11 +21,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.servlet.http.HttpServletRequest;
 
-/**
- * Controlador amb utilitats per a l'aplicació RIPEA.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Controller
 public class RipeaController {
 
@@ -33,8 +28,26 @@ public class RipeaController {
 	private AplicacioService aplicacioService;
 
 	@RequestMapping(path = { "/", "/index" }, method = RequestMethod.GET)
-	public String get(
-			HttpServletRequest request) {
+	public String get(HttpServletRequest request) {
+		
+		UsuariDto usuariActual = SessioHelper.getUsuariActual(request);
+		String interficieDefecteStr = aplicacioService.propertyFindByNom(PropertyConfig.INTERFACE_DEFECTE);
+		
+		InterficieUsuariEnumDto interficieEfectiva;
+		if (usuariActual != null && usuariActual.getInterficieUsuari() != null) {
+			interficieEfectiva = usuariActual.getInterficieUsuari();
+		} else {
+			try {
+				interficieEfectiva = InterficieUsuariEnumDto.valueOf(interficieDefecteStr.toUpperCase());
+			} catch (IllegalArgumentException e) {
+				interficieEfectiva = InterficieUsuariEnumDto.REACT;
+			}
+		}
+
+		if (InterficieUsuariEnumDto.REACT.equals(interficieEfectiva)) {
+			return "redirect:/reactapp/";
+		}
+
 		if (RolHelper.isRolActualSuperusuari(request)) {
 			return "redirect:integracio";
 		} else if (RolHelper.isRolActualDissenyadorOrgan(request)) {

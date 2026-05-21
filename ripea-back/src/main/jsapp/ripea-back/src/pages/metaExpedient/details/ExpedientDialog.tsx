@@ -11,7 +11,7 @@ import {Link} from "@mui/material";
 import {Link as RouterLink} from "react-router-dom";
 
 const sortModel:any = [{ field: 'createdDate', sort: 'desc' }];
-const perspectives = ["ESTAT"];
+const perspectives = ["AVISOS", "ESTAT"];
 
 const ExpedientDialog = (props:any) => {
     const {entity} = props;

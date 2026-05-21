@@ -1,16 +1,15 @@
-import {MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
+import {useMuiFormDialogApiRef, useBaseAppContext, useFormContext} from "reactlib";
 import {Grid} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
-import {useRef} from "react";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 
 const EnviarViaEmailForm = () => {
     const {data} = useFormContext();
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-		<GridFormField xs={12} name="versioDocument" disabled={data?.disableVersioDocument} required/>
-	    <GridFormField xs={12} name="email" type={"text"}/>
-        <GridFormField xs={12} name="responsables" multiple/>
+		<GridFormField name="versioDocument" disabled={data?.disableVersioDocument} required/>
+	    <GridFormField name="email" type={"text"}/>
+        <GridFormField name="responsables" multiple/>
     </Grid>
 }
 
@@ -34,7 +33,7 @@ const EnviarViaEmail = (props:any) => {
 
 const useEnviarViaEmail = (refresh?: () => void) => {
     const { t } = useTranslation();
-    const apiRef = useRef<MuiFormDialogApi>();
+    const apiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow} = useBaseAppContext();
 
     const handleShow = (id:any) :void => {

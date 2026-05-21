@@ -44,6 +44,7 @@ import {ServeiPinbalGrid} from "./pages/user/configurar/ServeiPinbalGrid.tsx";
 import {Propietats, PropietatsByEntitat} from "./pages/user/propietats/Propietats.tsx";
 import {ExcepcioGrid} from "./pages/user/monitor/ExcepcioGrid.tsx";
 import {IntegracioGrid} from "./pages/user/monitor/integracio/IntegracioGrid.tsx";
+import Accesibilitat from "./pages/Accesibilitat.tsx";
 
 const ProtectedRoute = ({ allowedRoles = [], params = [] }: any) => {
     const {value: user} = useUserSession();
@@ -60,6 +61,14 @@ const ProtectedRoute = ({ allowedRoles = [], params = [] }: any) => {
 
 const HomeRedirect = () => {
     const {value: user} = useUserSession();
+
+    if (user?.conf?.interficieUsuari === 'JSP') {
+        const pathname = window.location.pathname;
+        const idx = pathname.indexOf('/reactapp');
+        const jspRoot = idx >= 0 ? pathname.substring(0, idx) + '/' : '/';
+        window.location.replace(jspRoot);
+        return null;
+    }
 
     switch (user?.rolActual) {
         case rols.SUPER:
@@ -146,6 +155,7 @@ const AppRoutes: React.FC = () => {
             </Route>
         </Route>
 
+        <Route path="accessibilitat" element={<Accesibilitat />} />
         <Route path="*" element={<NotFoundPage />} />
     </Routes>;
 }

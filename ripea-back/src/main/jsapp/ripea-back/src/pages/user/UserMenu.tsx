@@ -22,7 +22,7 @@ const MenuSelect = (props:any) => {
             <Icon fontSize="small">{icon}</Icon>
         </ListItemIcon>
 
-        <FormControl sx={{ minWidth: 90 }} size="small">
+        <FormControl sx={{ minWidth: 90, width: '100%' }} size="small">
             <Select
                 open={open}
                 size="small" variant="standard"
@@ -181,7 +181,7 @@ export const UserMenu = () => {
 }
 const UserMenuButton = () => {
     const { t } = useTranslation();
-    const { toProgramaAntic } = useToProgramaAntic();
+    const { getUrl } = useToProgramaAntic();
     const { value: user, remove: signOut } = useUserSession();
 
     return <Load value={user} noEffect>
@@ -210,8 +210,9 @@ const UserMenuButton = () => {
             <Divider/>
 
             <MenuItem onClick={() => {
-                signOut?.()
-                toProgramaAntic('usuari/logout')
+                const logoutUrl = getUrl('usuari/logout');
+                signOut?.();
+                window.location.href = logoutUrl;
             }}>
                 <ListItemIcon>
                     <Icon fontSize="small">logout</Icon>

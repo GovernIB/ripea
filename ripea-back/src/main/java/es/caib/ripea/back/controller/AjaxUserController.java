@@ -294,6 +294,37 @@ public class AjaxUserController extends BaseUserController {
 		return decodedParam;
 	}
 
+	/**
+	 * Inicialitzar tipus documentals per a entitats existents sense registres
+	 */
+	@RequestMapping(value = "/initTipusDocumentalsEntitats", method = RequestMethod.GET)
+	public String initTipusDocumentalsEntitats(HttpServletRequest request, Model model) {
+		model.addAttribute("titolProces", "Inicialitzar tipus documentals per a entitats existents");
+		model.addAttribute("urlTotalIteracions", "getEntitatsSenseTipusDocumentals");
+		model.addAttribute("urlInteracioIndividual", "executeCrearTipusDocumentalsEntitat");
+		return "util/processAjax";
+	}
+
+	@RequestMapping(value = "/getEntitatsSenseTipusDocumentals", method = RequestMethod.GET)
+	@ResponseBody
+	public List<Long> getEntitatsSenseTipusDocumentals(HttpServletRequest request, Model model) {
+		return aplicacioService.getEntitatsSenseTipusDocumentals();
+	}
+
+	@RequestMapping(value = "/executeCrearTipusDocumentalsEntitat/{entitatId}", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<String> executeCrearTipusDocumentalsEntitat(
+			HttpServletRequest request,
+			@PathVariable Long entitatId,
+			Model model) {
+		try {
+			String resultat = aplicacioService.executeCrearTipusDocumentalsEntitat(entitatId);
+			return ResponseEntity.ok(resultat);
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+		}
+	}
+
 	private static final Logger logger = LoggerFactory.getLogger(AjaxUserController.class);
 
 }

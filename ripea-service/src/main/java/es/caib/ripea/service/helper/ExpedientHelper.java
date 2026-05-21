@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -98,6 +99,8 @@ import es.caib.ripea.persistence.repository.ExpedientComentariRepository;
 import es.caib.ripea.persistence.repository.ExpedientEstatRepository;
 import es.caib.ripea.persistence.repository.ExpedientPeticioRepository;
 import es.caib.ripea.persistence.repository.ExpedientRepository;
+import es.caib.ripea.persistence.repository.ExpedientTascaRepository;
+import es.caib.ripea.persistence.repository.MetaExpedientTascaRepository;
 import es.caib.ripea.persistence.repository.GrupRepository;
 import es.caib.ripea.persistence.repository.InteressatRepository;
 import es.caib.ripea.persistence.repository.MetaDadaRepository;
@@ -208,6 +211,8 @@ public class ExpedientHelper {
 	@Autowired private ExecucioMassivaService execucioMassivaService;
 	@Autowired private ExecucioMassivaRepository execucioMassivaRepository;
 	@Autowired private GrupRepository grupRepository;
+	@Autowired private ExpedientTascaRepository expedientTascaRepository;
+	@Autowired private MetaExpedientTascaRepository metaExpedientTascaRepository;
 	
 	public static List<DocumentDto> expedientsWithImportacio = new ArrayList<DocumentDto>();
 
@@ -428,8 +433,7 @@ public class ExpedientHelper {
 	}
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public boolean arxiuPropagarExpedientAmbInteressatsNewTransaction(
-			Long expedientId) {
+	public boolean arxiuPropagarExpedientAmbInteressatsNewTransaction(Long expedientId) {
 		return arxiuPropagarExpedientAmbInteressats(expedientId);
 	}
 	
@@ -444,7 +448,7 @@ public class ExpedientHelper {
 		
 		boolean throwExcepcion = false;
 		if (throwExcepcion) {
-			throw new RuntimeException("Mock excepcion després de crear expedient en arxiu");
+			throw new RuntimeException("Mock excepcion DESPRES de crear expedient en arxiu");
 		}
 		
 		if (cacheHelper.mostrarLogsCreacioContingut())
@@ -486,24 +490,9 @@ public class ExpedientHelper {
 			throw new ValidationException("Expedient ja relacionat");
 		}
 		expedient.addRelacionat(toRelate);
-		contingutLogHelper.log(
-				expedient, 
-				LogTipusEnumDto.MODIFICACIO, new Persistable<String>() {
-					@Override
-					public String getId() {
-						return id + "#" + relacionatId;
-					}
-					@Override
-					public boolean isNew() {
-						return false;
-					}
-				},
-				LogObjecteTipusEnumDto.RELACIO,
-				LogTipusEnumDto.CREACIO,
-				id.toString(),
-				relacionatId.toString(),
-				false,
-				false);
+		
+		logRelacionarExpedients(expedient, relacionatId, LogTipusEnumDto.CREACIO);
+		
 		boolean isPropagarRelacioActiva = configHelper.getAsBoolean(PropertyConfig.PROPAGAR_RELACIO_EXPEDIENTS);
 		if (isPropagarRelacioActiva) {
 			pluginHelper.arxiuExpedientEnllacar(
@@ -538,25 +527,7 @@ public class ExpedientHelper {
 			trobat = false;
 		}
 		if (trobat) {
-			contingutLogHelper.log(
-					expedient, 
-					LogTipusEnumDto.MODIFICACIO, new Persistable<String>() {
-						@Override
-						public String getId() {
-							return id + "#" + relacionatId;
-						}
-						@Override
-						public boolean isNew() {
-							return false;
-						}
-		
-					},
-					LogObjecteTipusEnumDto.RELACIO,
-					LogTipusEnumDto.ELIMINACIO,
-					id.toString(),
-					relacionatId.toString(),
-					false,
-					false);
+			logRelacionarExpedients(expedient, relacionatId, LogTipusEnumDto.ELIMINACIO);
 		}
 		boolean isPropagarRelacioActiva = configHelper.getAsBoolean(PropertyConfig.PROPAGAR_RELACIO_EXPEDIENTS);
 		if (isPropagarRelacioActiva) {
@@ -574,6 +545,45 @@ public class ExpedientHelper {
 			}
 		}
 		return trobat;
+	}
+	
+	public void logRelacionarExpedients(
+			Long contingutId,
+			Long relacionatId,
+			LogTipusEnumDto tipusLog) {
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+				contingutId,
+				true,
+				false,
+				true,
+				false,
+				false,
+				configHelper.getRolActual());
+		logRelacionarExpedients(expedient, relacionatId, tipusLog);
+	}			
+	
+	public void logRelacionarExpedients(
+			ContingutEntity contingutEntity,
+			Long relacionatId,
+			LogTipusEnumDto tipusLog) {
+		contingutLogHelper.log(
+				contingutEntity, 
+				LogTipusEnumDto.MODIFICACIO, new Persistable<String>() {
+					@Override
+					public String getId() {
+						return contingutEntity.getId() + "#" + relacionatId;
+					}
+					@Override
+					public boolean isNew() {
+						return false;
+					}
+				},
+				LogObjecteTipusEnumDto.RELACIO,
+				tipusLog,
+				contingutEntity.getId().toString(),
+				relacionatId.toString(),
+				false,
+				false);
 	}
 	
 	@Transactional
@@ -980,6 +990,57 @@ public class ExpedientHelper {
 
 	}
 
+	static Map<Long, Object> locks = new ConcurrentHashMap<>();
+	
+	@Transactional
+	public Exception retryCreateDocFromAnnex(Long registreAnnexId, Long metaDocumentId, String rolActual) {
+
+		Exception exception;
+		boolean creatDbOk = true;
+		
+		if (!locks.containsKey(registreAnnexId)) {
+			locks.put(registreAnnexId, new Object());
+		}
+		
+		synchronized (locks.get(registreAnnexId)) {
+
+			try {
+				RegistreAnnexEntity registreAnnexEntity = registreAnnexRepository.getOne(registreAnnexId);
+				ExpedientPeticioEntity expedientPeticioEntity = registreAnnexEntity.getRegistre().getExpedientPeticions().get(0);
+				if (expedientPeticioEntity.getExpedient() == null) {
+					throw new RuntimeException("Anotació pendent amb id: " + expedientPeticioEntity.getId() + " no té expedient associat en la base de dades.");
+				}
+
+				exception = crearDocFromAnnex(expedientPeticioEntity.getExpedient().getId(), registreAnnexId, expedientPeticioEntity.getId(), metaDocumentId, rolActual);
+			} catch (Exception e) {
+				exception = e;
+				creatDbOk = false;
+				logger.error("Error al crear doc from annex", e);
+				updateRegistreAnnexError(registreAnnexId, ExceptionUtils.getStackTrace(e));
+			}
+			
+	
+			RegistreAnnexEntity registreAnnexEntity = registreAnnexRepository.getOne(registreAnnexId);
+			ExpedientPeticioEntity expedientPeticioEntity = registreAnnexEntity.getRegistre().getExpedientPeticions().get(0);
+			
+			boolean allOk = true;
+			for (RegistreAnnexEntity registreAnnex : expedientPeticioEntity.getRegistre().getAnnexos()) {
+				if (registreAnnex.getError() != null) {
+					allOk = false;
+				}
+			}
+			if (allOk) {
+				notificarICanviEstatToProcessatNotificat(expedientPeticioEntity);
+			}
+		}
+		
+		if (creatDbOk){
+			locks.remove(registreAnnexId);
+		}
+
+		return exception;
+	}
+	
 	/**
 	 * Creates document from registre annex
 	 * @param expedientId 
@@ -1519,7 +1580,7 @@ public class ExpedientHelper {
 
 		logger.debug("Tancant l'expedient (" + "entitatId=" + entitatId + ", " + "id=" + expedientId + "," + "motiu=" + motiu + ")");
 
-		expedientHelper2.checkIfExpedientCanBeClosed(expedientId);
+		expedientHelper2.checkIfExpedientCanBeClosed(entitatId, expedientId, documentsPerFirmar);
 		
 		/**
 		 * #1525 Permetre tancar un expedient encara que hi hagi remeses tipus comunicació no finalitzades
@@ -3514,6 +3575,13 @@ public class ExpedientHelper {
 	}
 	
 	private boolean isImportacioRelacionatsActiva() { return configHelper.getAsBoolean(PropertyConfig.IMPORTACIO_RELACIONATS_ACTIVA);}
+
+	public boolean expedientOProcedimentTeTasques(Long expedientId, Long procedimentId) {
+		if (expedientTascaRepository.existsByExpedientId(expedientId)) {
+			return true;
+		}
+		return metaExpedientTascaRepository.existsByMetaExpedientIdAndActivaTrue(procedimentId);
+	}
 
 	private static final Logger logger = LoggerFactory.getLogger(ExpedientHelper.class);
 }

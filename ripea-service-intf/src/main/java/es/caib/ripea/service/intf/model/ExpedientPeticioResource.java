@@ -56,6 +56,9 @@ import lombok.experimental.FieldNameConstants;
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = ExpedientPeticioResource.PERSPECTIVE_ESTAT_VIEW_CODE),
                 @ResourceArtifact(
+                        type = ResourceArtifactType.PERSPECTIVE,
+                        code = ExpedientPeticioResource.PERSPECTIVE_EN_PROCES_ACTUALITZAR_ESTAT_CODE),
+                @ResourceArtifact(
                         type = ResourceArtifactType.REPORT,
                         code = ExpedientPeticioResource.REPORT_DOWNLOAD_JUSTIFICANT,
                         requiresId = true),
@@ -87,6 +90,7 @@ public class ExpedientPeticioResource extends BaseAuditableResource<Long> {
 
     public static final String PERSPECTIVE_REGISTRE_CODE = "REGISTRE";
     public static final String PERSPECTIVE_ESTAT_VIEW_CODE = "ESTAT_VIEW";
+    public static final String PERSPECTIVE_EN_PROCES_ACTUALITZAR_ESTAT_CODE = "EN_PROCES_ACTUALITZAR_ESTAT";
     public static final String REPORT_DOWNLOAD_JUSTIFICANT = "DOWNLOAD_JUSTIFICANT";
     public static final String ACTION_REBUTJAR_ANOTACIO = "REBUTJAR_ANOTACIO";
     public static final String ACTION_ACCEPTAR_ANOTACIO = "ACCEPTAR_ANOTACIO";
@@ -121,6 +125,7 @@ public class ExpedientPeticioResource extends BaseAuditableResource<Long> {
     @Transient private String registreExtracte;
     @Transient private boolean mostrarGrups = false;
     @Transient private ExpedientPeticioEstatViewEnumDto estatView;
+    @Transient private Long execucioMassivaActualitzarEstatId;
 
     @Getter
     @Setter
@@ -154,6 +159,9 @@ public class ExpedientPeticioResource extends BaseAuditableResource<Long> {
         private Date dataAltaInici;
         private Date dataAltaFi;
         private ExpedientPeticioEstatEnumDto estat;
+        private ResourceReference<MetaExpedientResource, Long> procediment;
+        private ResourceReference<ExpedientResource, Long> expedient;
+        private ResourceReference<GrupResource, Long> grup;
         private boolean nomesPendents = true;
     }
     

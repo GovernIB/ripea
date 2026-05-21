@@ -35,11 +35,13 @@ const translationCa = {
             update: "Modificat el {{lastModifiedDate}} per '{{lastModifiedBy}}'.",
         },
         nouPermis: "Nou permís",
+        advancedSearch: 'Cerca avançada',
         error: {
-            status: "Codi",
+            status: "Codi d'error",
             title: "Títol",
             message: "Missatge",
         },
+        dragdrop: "Reordenar contingut",
     },
     enum: {
         rol: {
@@ -64,6 +66,15 @@ const translationCa = {
             FIRMAT: "Firmat",
             REBUTJAT: "Rebutjat",
             PARCIAL: "Parcial",
+        },
+        estatNotificacio: {
+            ENVIADA: "Enviada",
+            ENVIADA_AMB_ERRORS: "Enviada amb errors",
+            FINALITZADA: "Finalitzada",
+            FINALITZADA_AMB_ERRORS: "Finalitzada amb errors",
+            PENDENT: "Pendent",
+            PROCESSADA: "Processada",
+            REGISTRADA: "Registrada",
         },
         origen: {
             O0: "Ciutadà",
@@ -111,6 +122,7 @@ const translationCa = {
 		},
     },
     navigate: {
+        accessibilitat: "Accessibilitat",
         expedient: "Cercador d'expedients",
         expedientPeticio: "Cercador d'anotacions de registre",
         usuariTasca: "Tasques",
@@ -133,6 +145,7 @@ const translationCa = {
     },
     page: {
         comment: {
+            label: "Comentaris",
             expedient: "Comentaris de l'expedient",
             tasca: "Comentaris de la tasca",
             metaExpedient: "Comentaris del procediment",
@@ -291,7 +304,7 @@ const translationCa = {
                 canviEstatDistribucio: {
                     label: "Canviar estat a distribució",
                     ok: "L'estat ha canviat correctament",
-                    massiveOk: "S'han actualitzat l'estat de '{{data.num}}' anotacions",
+                    massiveOk: "S'ha programat l'acció massiva per actualitzar l'estat de '{{data.num}}' anotacions.",
                 },
                 descargarAnnex: {
                     label: "Descarregar annex",
@@ -300,7 +313,7 @@ const translationCa = {
                 procesarAnnexosPendents: {
                     label: "Adjuntar",
                     ok: "El annex s'ha processat correctament",
-                    massiveOk: "S'han processat '{{data.num}}' annexos",
+                    massiveOk: "S'ha programat l'acció massiva per processar '{{data.num}}' annexos pendents.",
                     info: "Si s'ha produït algun error al acceptar una anotació des de la pantalla Anotacions, de manera que algun dels documents de l'anotació no s'han adjuntat a l'expedient, des d'aquest llistat podrà tornar a intentar adjuntar el document a l'expedient.",
                 },
                 firma: {
@@ -312,6 +325,9 @@ const translationCa = {
                     ok: "L'anotació s'ha consultat y guardat correctament",
                     massiveOk: "S'ha consultat y guardat correctament {{data.num}} annotations",
                 },
+                reintentar: {
+                    title: "Seleccionar tipus de document per el annex/annexos pendents",
+                }
             }
         },
         tasca: {
@@ -539,8 +555,8 @@ const translationCa = {
                     ok: "L’usuari '{{user}}' ha deixat de seguir l’expedient '{{expedient}}'.",
                 },
                 retornar: {
-                    label: "Tornar",
-                    ok: "L’expedient '{{expedient}}' ha estat tornat a l’usuari '{{user}}'",
+                    label: "Retornar",
+                    ok: "L’expedient '{{expedient}}' ha estat retornat al gestor original '{{user}}'",
                 },
                 lliberar: {
                     label: "Alliberar",
@@ -554,6 +570,7 @@ const translationCa = {
                     label: "Tancar...",
                     button: "Tanca",
                     title: "Tancar expedient",
+                    titleMassive: "Tancant massivament {{num}} expedients",
                     ok: "L’expedient '{{expedient}}' ha estat tancat correctament",
                 },
                 open: {
@@ -563,7 +580,7 @@ const translationCa = {
                 },
                 download: {
                     label: "Descarregar documents...",
-                    button: "Descarrega seleccionat",
+                    button: "Descarrega seleccionats",
                     title: "Selecció de documents",
                     ok: "Els documents s’han descarregat correctament",
                 },
@@ -572,7 +589,7 @@ const translationCa = {
                     ok: "El full de càlcul s’ha descarregat correctament",
                 },
                 exportZIP: {
-                    label: "Exportar índex ZIP...",
+                    label: "Exportar índex ZIP",
                     button: "Exporta ZIP",
                     title: "Exportar documents a ZIP",
                     ok: "El document ZIP s’ha descarregat correctament",
@@ -602,7 +619,7 @@ const translationCa = {
                     ok: "El document INSIDE s’ha descarregat correctament",
                 },
                 exportDocs: {
-                    label: "Exportar els documents dels expedients seleccionats",
+                    label: "Exporta documents dels exp. seleccionats...",
                     ok: "Els documents s’han exportat correctament",
                 },
                 export: {
@@ -620,14 +637,14 @@ const translationCa = {
                     button: "Canvia prioritat",
                     title: "Modificar prioritat de l’expedient",
                     ok: "La prioritat de l’expedient '{{expedient}}' s’ha modificat correctament.",
-                    massiveOk: "S'han cambiat la prioritat de '{{data.num}}' expedients",
+                    massiveOk: "S'ha cambiat la prioritat de '{{data.num}}' expedients.",
                 },
                 changeEstat: {
                     label: "Canviar estat...",
                     button: "Canvia estat",
                     title: "Modificar estat de l’expedient",
                     ok: "L’estat de l’expedient '{{expedient}}' s’ha modificat correctament.",
-                    massiveOk: "S'ha cambiat l'estat a '{{data.num}}' expedients"
+                    massiveOk: "S'ha cambiat l'estat a '{{data.num}}' expedients."
                 },
                 assignar: {
                     label: "Assignar...",
@@ -650,10 +667,18 @@ const translationCa = {
                     ok: "Els interessats s’han exportat correctament",
                 },
                 impDocMass: {
-                    label: "Importar documents als expedients seleccionats",
+                    label: "Importar documents als exp. seleccionats...",
                     title: "Importació de documents",
                     mssg: "Els documents que adjunteu s'incorporaran als {{num}} expedients seleccionats",
                     warning: "Els expedients han de pertànyer al mateix procediment.",
+                },
+                exportMass: {
+                    unic: "Exporta l'expedient...",
+                    label: "Exporta els expedients seleccionats...",
+                    title: "Exportar expedients seleccionats",
+                    titleUni: "Exportar expedient",
+                    info: "Podeu seleccionar diversos formats d'exportació. L'exportació es realitzarà en segon pla, i un cop finalitzada, podreu descarregar el document generat des del llistat d'accions massives.",
+                    info2: "Podeu seleccionar diversos formats d'exportació. L'exportació pot tardar uns instants en completar-se, un cop finalitzada, s'iniciarà la descarrega automàticament.",
                 },
                 comment: {
                     ok: "Comentari afegit a l'expedient '{{data.expedient.description}}'",
@@ -692,7 +717,10 @@ const translationCa = {
 				},
             },
             modal: {
-                seguidors: "Seguidors de l’expedient",
+                seguidors: {
+                    label: "Seguidors",
+                    title: "Seguidors de l’expedient",
+                },
             },
             results: {
                 checkDelete: "Estau segur que voleu eliminar aquest contingut? Si contenia firmes en curs, seràn cancelades.",
@@ -707,7 +735,7 @@ const translationCa = {
                 fitxerNom: "Nom del document",
                 serie: "Sèrie documental",
                 arxiuEstat: "Estat a l'arxiu",
-                document: "Contingut del document",
+                dades: "Dades generals",
                 fitxerContentType: "Tipus MIME",
                 metadata: "Metadades ENI",
                 versions: "Versió",
@@ -854,6 +882,7 @@ const translationCa = {
                 },
                 detall: {
                     label: "Detalls",
+                    noUuid: "El document no està sincronitzat amb l'arxiu",
                 },
                 imprimible: {
                     label: "Còpia autèntica imprimible",
@@ -864,10 +893,11 @@ const translationCa = {
                     ok: "El document original s'ha descarregat correctament",
                 },
                 download: {
+                    firma: "Descarregar signatura",
                     ok: "Document descarregat correctament",
                 },
                 firma: {
-                    label: "Descarregar signatura",
+                    label: "Signar des del navegador...",
                     button: "Iniciar procés de firma",
                     title: "Signar des del navegador",
                     ok: "Document signat correctament",
@@ -1260,9 +1290,9 @@ const translationCa = {
                     ok: "Grup '{{data.codi}}' esborrat correctament",
                 },
                 link: {
-                    label: "Víncular grup...",
-                    button: "Víncula grup",
-                    title: "Víncular grup",
+                    label: "Vincular grup...",
+                    button: "Vincula grup",
+                    title: "Vincular grup",
                     ok: "Grup vinculat",
                 },
                 unlink: {
@@ -1411,6 +1441,11 @@ const translationCa = {
                 },
                 export: {
                     ok: "Procediment exportat correctament",
+                },
+                clonar: {
+                    label: "Clonar",
+                    title: "Clonar procediment",
+                    ok: "Nou procediment clonat: {{codi}}",
                 },
                 canviPendent: {
                     label: "Marcar com a pendent de revisió",
@@ -1768,6 +1803,8 @@ const translationCa = {
                 noOrgans: "Cap organ gestor assignat"
             },
             menu: {
+                title: "Menú",
+
                 entitat: "Entitats",
                 expedient: "Expedients",
                 monitoritzar: "Monitoritzar",
@@ -1831,8 +1868,9 @@ const translationCa = {
                 massives: {
                     label: "Consultar accions massives",
                     title: "Execucions massives de {{name}}",
-                    detail: "Detall de l'acció massiva",
+                    detail: "Detall de l'acció massiva: {{tipus}}",
                     ok: "El document s'ha baixat correctament",
+                    pending: "Aquest element s'està processant actualment",
                 },
             },
             perfil: {
@@ -1843,7 +1881,8 @@ const translationCa = {
                 generic: "Configuració genèrica",
                 column: "Configuració de columnes del llistat d'expedients",
                 vista: "Configuració vista de documents dels expedients",
-                moure: "Configuració vista destí al moure documents"
+                moure: "Configuració vista destí al moure documents",
+                interficie: "Interfície per defecte"
             }
         },
         alert: {
@@ -1851,6 +1890,7 @@ const translationCa = {
             action: {
                 read: {
                     label: "Marcar com a llegida",
+                    title: "Alertes de l'expedient",
                     ok: "L'alerta s'ha marcat com a llegida",
                     massiveOk: "Les alertes s'han marcat com a llegides",
                 },
@@ -1861,6 +1901,90 @@ const translationCa = {
                 metaNode: "Hi ha documents sense un tipus de document assignat",
                 noFinalitzades: "Hi ha notificacions amb un estat que no és final",
                 interessatObligatori: "Falta informar un interessat",
+            },
+        },
+        accesibilitat: {
+            title: "Declaració d'Accessibilitat",
+            intro: {
+                title: "Introducció",
+                p1Part1: "El Govern de les Illes Balears s'ha compromès a fer accessible el seu lloc web i la seva aplicació per a dispositius mòbils, de conformitat amb",
+                p1LinkText: "el Reial decret 1112/2018",
+                p1Part2: ", de 7 de setembre, d'accessibilitat dels llocs web i aplicacions mòbils del sector públic.",
+                p2Part1: "La present declaració d'accessibilitat s'aplica al lloc web",
+                p2Part2: "i exclou les pàgines que condueixen a enllaços externs.",
+            },
+            compliment: {
+                title: "Situació de compliment",
+                introPart1: "Aquest lloc web és parcialment conforme amb",
+                introLinkText: "el RD 1112/2018",
+                introPart2: "a causa de les excepcions i de la manca de conformitat dels aspectes que s'indiquen a continuació.",
+                criteri1: "Criteri A - 4.1.2 Name, Role, Value: Alguns botons iconogràfics mancaven d'alternativa textual accessible. Solució aplicada: s'ha afegit l'atribut \"title\" i l'atribut \"aria-label\" amb text descriptiu a tots els botons que no disposaven d'etiqueta visible, garantint que els lectors de pantalla puguin identificar la seva funció.",
+                criteri2: "Criteri A - 1.1.1 Non-text Content: Algunes imatges informatives no disposaven de text alternatiu. Solució aplicada: s'ha realitzat una auditoria de tots els recursos gràfics. Les imatges no decoratives inclouen ara un atribut \"alt\" descriptiu i contextual. Les imatges purament decoratives utilitzen \"alt\" buit o \"role=presentation\" per ser ignorades per les tecnologies de suport.",
+                criteri3: "Criteri AA - 1.4.4 Resize Text: El text es truncava en escalar la interfície al 200%. Solució aplicada: en mides de pantalla reduïdes, els botons mostren únicament la icona acompanyada d'un atribut \"title\" descriptiu. S'ha eliminat l'ús de \"overflow: hidden\" en contenidors de text i s'ha verificat que tot el contingut romangui accessible amb zoom del 200%.",
+                criteri4: "Criteri AA - 2.5.8 Target Size (Minimum): Determinats elements interactius no complien amb la mida mínima de 24x24 píxels o l'espaiat requerit. Solució aplicada: s'ha modificat el posicionament i maquetació dels components per garantir una àrea de polsació adequada i un espaiat mínim de 8 píxels entre elements interactius, facilitant-ne l'ús en dispositius tàctils i per a persones amb dificultats de mobilitat.",
+            },
+            noAccesible: {
+                title: "Llista de contingut no accessible i explicació del motiu",
+                item1: {
+                    title: "Identificació de l'idioma principal",
+                    desc1: "El codi d'idioma usat per identificar l'idioma principal no és un codi correcte.",
+                    desc2: "En el codi font generat s'ha comprovat que l'atribut lang del node HTML té valor \"ca\", que és vàlid com a codi d'idioma de IANA. És possible que l'error vingui donat perquè pugui haver-hi textos puntuals (els que es guarden a la BBDD introduïts per l'usuari) que no s'adeqüen a l'idioma indicat, o perquè per arquitectura, la gestió de l'idioma es realitza a través de la sessió d'usuari i el context de l'aplicació React, no mitjançant atributs estàtics a l'HTML. Com a mesura compensatòria, l'atribut \"lang\" s'injecta dinàmicament al contenidor principal segons l'idioma seleccionat per l'usuari.",
+                },
+                item2: {
+                    title: "Formularis i etiquetes",
+                    desc1: "No es realitza l'associació explícita adequadament entre controls i etiquetes.",
+                    desc2: "Als camps de formulari de tipus selector, l'identificador del input no coincideix amb l'atribut \"for\" de l'etiqueta. El validador utilitzat reporta estrictament l'error, tot i que la llibreria Material UI (MUI) declara complir amb la normativa d'accessibilitat WCAG 2.1; en aquest cas només ho compleix parcialment compensant-ho amb l'atribut \"aria-labelledby\", que proporciona un nom accessible correcte per als lectors de pantalla.",
+                },
+                item3: {
+                    title: "Múltiples vies de navegació",
+                    desc1: "Absència d'un enllaç al mapa web i d'un cercador al lloc.",
+                    desc2: "Nivell d'advertència en no proporcionar cap mètode complementari de navegació com un mapa web o una opció de cerca al lloc web.",
+                },
+            },
+            preparacio: {
+                title: "Preparació de la present declaració",
+                elaborat: "Aquesta declaració s'ha elaborat mitjançant autoavaluació realitzada per l'equip de desenvolupament utilitzant l'eina automatitzada: Rastrejador Web de l'Observatori d'Accessibilitat Web.",
+                dataPrep: "Data de preparació: 01/05/2026",
+                darreraRevisio: "Darrera revisió: 05/05/2026",
+                properaRevisio: "Propera revisió programada: 05/05/2027",
+                norma: "Norma de referència: UNE-EN 301549:2022, nivells A i AA",
+                resultatTitle: "Resultat",
+                puntuacioLabel: "Puntuació mitjana del lloc web",
+                puntuacioVal: "8.16",
+                nivellLabel: "Nivell d'adequació estimat",
+                nivellVal: "A",
+                situacioLabel: "Situació de compliment estimada",
+                situacioVal: "Parcialment conforme",
+                responsive: "El lloc web està dissenyat per a la seva visualització responsive, de manera que es visualitza de forma òptima en dispositius tauleta i mòbils.",
+            },
+            contacte: {
+                title: "Observacions i dades de contacte",
+                p1: "El Govern de les Illes Balears pretén continuar millorant i oferir als ciutadans el millor servei possible. Podeu realitzar comunicacions sobre requisits d'accessibilitat (article 10.2.a) del RD 1112/2018, com per exemple:",
+                li1: "Informar sobre qualsevol possible incompliment per part d'aquest lloc web",
+                li2: "Transmetre altres dificultats d'accés al contingut",
+                li3: "Formular qualsevol altra consulta o suggeriment de millora relativa a l'accessibilitat del lloc web",
+                p2Part1: "A través del següent formulari de",
+                p2LinkText: "contacte",
+                p2Part2: "o trucant al telèfon 971177140. Podeu presentar:",
+                li4: "Una queixa relativa al compliment dels requisits del RD 1112/2018, o",
+                li5: "Una sol·licitud d'informació accessible relativa a:",
+                li5a: "Continguts que estan exclosos de l'àmbit d'aplicació del RD 1112/2018 segons el que estableix l'article 3, apartat 4, o",
+                li5b: "Continguts que estan exempts del compliment dels requisits d'accessibilitat per imposar una càrrega desproporcionada.",
+                p4Part1: "A través del següent procediment:",
+                p4LinkText: "Peticions d'informació accessible i queixes relatives a l'accessibilitat de llocs web i aplicacions mòbils.",
+            },
+            procediment: {
+                title: "Procediment d'aplicació",
+                p1: "El procediment de reclamació recollit a l'article 13 del RD 1112/2018 va entrar en vigor el 20 de setembre de 2020.",
+                p2: "Si un cop realitzada una sol·licitud d'informació accessible o una queixa, aquesta ha estat desestimada, no s'està d'acord amb la decisió adoptada, o la resposta no compleix els requisits contemplats a l'article 12.5, la persona interessada podrà iniciar una reclamació. Igualment, es podrà iniciar una reclamació en el cas que hagi transcorregut el termini de vint dies hàbils sense haver obtingut resposta.",
+                p3Part1: "La reclamació pot ser presentada a través del procediment",
+                p3LinkText: "Reclamacions relatives a l'accessibilitat de llocs web i aplicacions mòbils",
+            },
+            opcional: {
+                title: "Contingut opcional",
+                mesures: "Mesures d'accessibilitat addicionals implementades: estructura d'encapçalaments revisada, afegides etiquetes dels camps que no en tenien, correcció de blocs de text de més de 150 caràcters sense marcatge de text.",
+                config: "Configuració tècnica recomanada: navegadors actualitzats (Chrome, Firefox, Edge, Safari en les seves dues darreres versions), resolució mínima de 1280x720 píxels, i suport de zoom fins al 200% sense pèrdua de contingut o funcionalitat.",
+                recursos: "Recursos d'interès: Guia d'accessibilitat web del W3C (https://www.w3.org/WAI/), validadors automàtics d'accessibilitat (https://achecker.ca/), i documentació oficial del Reial Decret 1112/2018.",
             },
         },
         notFound: "No trobat",

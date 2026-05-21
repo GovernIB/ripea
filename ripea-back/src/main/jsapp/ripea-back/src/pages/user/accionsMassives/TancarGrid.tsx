@@ -4,9 +4,11 @@ import {useState} from "react";
 import { CardPage } from "../../../components/CardData.tsx";
 import {CanviEstatFilter, CanviEstatMuiGrid} from "./CanviEstatGrid.tsx";
 import useTancar, {useTancarMassive} from "../../expedient/actions/Tancar.tsx";
+import {useExecucioMassivaContingut} from "../actions/ExecucioMassivaGrid.tsx";
+import {Box} from "@mui/material";
 
 const namedQueries: string[] = ['MASSIVE_ACTION_QUERY', 'MASSIVE_ACTION_TANCAR']
-const perspectives:any = ['ESTAT','AUDITORIA']
+const perspectives:any = ['ESTAT','AUDITORIA', 'EN_PROCES_TANCAMENT'];
 const TancarGrid = () => {
     const {t} = useTranslation();
     const apiRef = useMuiDataGridApiRef();
@@ -18,13 +20,22 @@ const TancarGrid = () => {
 
     const {handleShow: handleTancar, content: contentTancar} = useTancar(refresh)
     const {handleShow: handleTancarMassive, content: contentTancarMassive} = useTancarMassive(refresh)
+    const {handleOpen: handleContingutOpen, dialog: dialogContingut} = useExecucioMassivaContingut();
 
-    const actions = [
+    const actions:any[] = [
         {
             label: t('page.expedient.action.close.label'),
             icon: "check",
             showInMenu: false,
             onClick: handleTancar,
+            hidden: (row:any) => row?.execucioMassivaTancamentId,
+        },
+        {
+            label: t('page.user.action.massives.pending'),
+            icon: <Box sx={{ color: 'warning.main' }}>schedule</Box>,
+            showInMenu: false,
+            onClick: (_id:any, row:any) => handleContingutOpen(row?.execucioMassivaTancamentId),
+            hidden: (row:any) => !row?.execucioMassivaTancamentId,
         },
     ]
     const massiveActions = [
@@ -50,10 +61,12 @@ const TancarGrid = () => {
                 namedQueries={namedQueries}
                 rowAdditionalActions={actions}
                 toolbarMassiveActions={massiveActions}
+                isRowSelectable={(params:any) => !params?.row?.execucioMassivaTancamentId}
             />
         </CardPage>
         {contentTancar}
         {contentTancarMassive}
+        {dialogContingut}
     </GridPage>
 }
 export default TancarGrid;

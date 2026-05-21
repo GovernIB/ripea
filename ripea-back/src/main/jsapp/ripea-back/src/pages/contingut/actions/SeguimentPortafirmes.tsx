@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {Grid2 as Grid} from "@mui/material";
+import {Grid} from "@mui/material";
 import {MuiDialog, useBaseAppContext, useConfirmDialogButtons, useResourceApiService} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {DetailCard} from "../../../components/CardData.tsx";
@@ -85,7 +85,8 @@ const useSeguimentPortafirmes = (potModificar:boolean, refresh?: () => void) => 
         if (apiIsReady && id){
             apiFind({
                 filter: builder.eq('document.id', id),
-                sorts: ['createdDate,desc']
+                sorts: ['createdDate,desc'],
+                perspectives: ['PORTAFIB_DETALL'],
             })
                 .then((result) => {
                     if (result?.rows?.length>0){

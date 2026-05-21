@@ -18,6 +18,8 @@ import es.caib.ripea.persistence.repository.MetaExpedientRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.persistence.repository.command.GrupRepositoryCommnand;
 import es.caib.ripea.service.intf.dto.GrupDto;
+import es.caib.ripea.service.intf.dto.LogObjecteTipusEnumDto;
+import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
 import es.caib.ripea.service.intf.dto.PermisDto;
 import es.caib.ripea.service.intf.dto.PrincipalTipusEnumDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
@@ -35,19 +37,30 @@ public class GrupHelper {
 	@Autowired private MetaExpedientHelper metaExpedientHelper;
 	@Autowired private OrganGestorCacheHelper organGestorCacheHelper;
 	@Autowired private GrupRepositoryCommnand grupRepositoryCommnand;
+	@Autowired private ContingutLogHelper contingutLogHelper;
 
 	public void relacionarAmbMetaExpedient(Long metaExpedientId, Long grupId, boolean marcarPerDefecte) {
-		MetaExpedientEntity metaExpedientEntity = metaExpedientRepository.getOne(metaExpedientId);
-		GrupEntity grupEntity = grupRepository.getOne(grupId);
+		
+		MetaExpedientEntity metaExpedientEntity = metaExpedientRepository.findById(metaExpedientId).get();
+		GrupEntity grupEntity = grupRepository.findById(grupId).get();
 		metaExpedientEntity.addGrup(grupEntity);
 		if (marcarPerDefecte) {
 			metaExpedientEntity.setGrupPerDefecte(grupEntity);
 		}
+		
+		contingutLogHelper.logProcedimentObjecte(
+				metaExpedientEntity.getId(),
+				LogTipusEnumDto.VINCULAR_GRUP,
+				grupEntity,
+				LogObjecteTipusEnumDto.GRUP,
+				LogTipusEnumDto.VINCULAR_GRUP,
+				grupEntity.getCodi(),
+				(marcarPerDefecte)?"El grup està assignat per defecte.":"El grup no està assignat per defecte.");
 	}
 	
 	public void desvincularAmbMetaExpedient(Long entitatId, Long metaExpedientId, Long idGrup, String rolActual, Long organId) {
-		MetaExpedientEntity metaExpedientEntity = metaExpedientRepository.getOne(metaExpedientId);
-		GrupEntity grupEntity = HibernateHelper.deproxy(grupRepository.getOne(idGrup));
+		MetaExpedientEntity metaExpedientEntity = metaExpedientRepository.findById(metaExpedientId).get();
+		GrupEntity grupEntity = grupRepository.findById(idGrup).get();
 		metaExpedientEntity.removeGrup(grupEntity);
 		if (metaExpedientEntity.getGrupPerDefecte() != null && grupEntity.getId().equals(metaExpedientEntity.getGrupPerDefecte().getId())) {
 			metaExpedientEntity.setGrupPerDefecte(null);
@@ -55,6 +68,31 @@ public class GrupHelper {
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
 			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientEntity.getId(), organId);
 		}
+		contingutLogHelper.logProcedimentObjecte(
+				metaExpedientEntity.getId(),
+				LogTipusEnumDto.DESVINCULAR_GRUP,
+				grupEntity,
+				LogObjecteTipusEnumDto.GRUP,
+				LogTipusEnumDto.DESVINCULAR_GRUP,
+				grupEntity.getCodi(),
+				(metaExpedientEntity.getGrupPerDefecte()==null)?"El procediment ha quedat sense grup per defecte.":null);
+	}
+	
+	public void canviarGrupPerDefecte(Long metaExpedientId, Long idGrup) {
+		MetaExpedientEntity metaExpedientEntity = metaExpedientRepository.findById(metaExpedientId).get();
+		GrupEntity grupEntity = null;
+		if (idGrup!=null) {
+			grupEntity = grupRepository.findById(idGrup).get();
+		}
+		metaExpedientEntity.setGrupPerDefecte(grupEntity);
+		contingutLogHelper.logProcedimentObjecte(
+				metaExpedientEntity.getId(),
+				LogTipusEnumDto.CANVI_GRUP_DEFAULT,
+				grupEntity,
+				LogObjecteTipusEnumDto.GRUP,
+				LogTipusEnumDto.CANVI_GRUP_DEFAULT,
+				(grupEntity==null)?null:grupEntity.getCodi(),
+				(grupEntity==null)?"El procediment ha quedat sense grup per defecte.":null);
 	}
 	
 	public GrupDto create(Long entitatId, GrupDto grupDto) throws NotFoundException {
@@ -85,7 +123,7 @@ public class GrupHelper {
 	public void crearPermisosDeGrup(
 			Long grupId, 
 			PermisDto permis)  {
-		GrupEntity grup = grupRepository.getOne(grupId);
+		GrupEntity grup = grupRepository.findById(grupId).get();
 		PermisDto dto = new PermisDto();
 		dto.setRead(true);
 		dto.setPrincipalTipus(PrincipalTipusEnumDto.ROL);
@@ -98,7 +136,7 @@ public class GrupHelper {
 		List<String> codisOrgansFills = null;
 
 		if (organGestorId != null) {
-			OrganGestorEntity organ = organGestorRepository.getOne(organGestorId);
+			OrganGestorEntity organ = organGestorRepository.findById(organGestorId).get();
 			codisOrgansFills = organGestorCacheHelper.getCodisOrgansFills(entitat.getCodi(), organ.getCodi());
 		}
 		
@@ -112,7 +150,7 @@ public class GrupHelper {
 		
 		List<GrupEntity> grups = grupRepository.findByEntitatId(entitatId);
 		
-		MetaExpedientEntity metaExpedient = metaExpedientRepository.getOne(metaExpedientId);
+		MetaExpedientEntity metaExpedient = metaExpedientRepository.findById(metaExpedientId).get();
 		Long procedimentOrganId = metaExpedient.getOrganGestor() != null ? metaExpedient.getOrganGestor().getId() : null;
 		List<GrupEntity> grupsProcedimentExisting = metaExpedient.getGrups();
 		

@@ -34,7 +34,7 @@ public class DominiEntity extends RipeaAuditable<Long> {
 
 	@ManyToOne(optional = false, fetch = FetchType.EAGER)
 	@JoinColumn(name = "entitat_id")
-	@ForeignKey(name = BaseConfig.DB_PREFIX + "entitat_tipus_doc_fk")
+	@ForeignKey(name = BaseConfig.DB_PREFIX + "domini_entitat_fk")
 	protected EntitatEntity entitat;
 
 	public String getCodi() {

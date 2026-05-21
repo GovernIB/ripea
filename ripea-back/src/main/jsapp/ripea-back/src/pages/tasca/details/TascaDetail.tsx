@@ -22,7 +22,7 @@ const useTascaDetail = () => {
 
     const handleOpen = (id:any) => {
         if(apiIsReady && id){
-            apiGetOne(id)
+            apiGetOne(id, {perspectives: ['CONTEXT_USUARI', 'AUDITORIA']})
                 .then((app) => setEntity(app))
                 .catch((error) => {
                     handleClose()

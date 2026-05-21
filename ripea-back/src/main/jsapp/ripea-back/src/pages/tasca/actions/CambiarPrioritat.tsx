@@ -1,15 +1,14 @@
-import {useRef} from "react";
 import {Grid} from "@mui/material";
-import {MuiFormDialogApi, useBaseAppContext} from "reactlib";
+import {useMuiFormDialogApiRef, useBaseAppContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import GridFormField from "../../../components/GridFormField.tsx";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 
 const CambiarPrioritatForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={6} name="titol" disabled readOnly/>
-        <GridFormField xs={6} name="metaExpedientTasca" disabled readOnly/>
-        <GridFormField xs={12} name="prioritat" required/>
+        <GridFormField size={6} name="titol" disabled readOnly/>
+        <GridFormField size={6} name="metaExpedientTasca" disabled readOnly/>
+        <GridFormField name="prioritat" required/>
     </Grid>
 }
 
@@ -32,7 +31,7 @@ const CambiarPrioritat = (props:any) => {
 
 const useCambiarPrioritat = (refresh?: () => void) => {
     const { t } = useTranslation();
-    const apiRef = useRef<MuiFormDialogApi>();
+    const apiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow} = useBaseAppContext();
 
     const handleShow = (id:any, row:any) :void => {

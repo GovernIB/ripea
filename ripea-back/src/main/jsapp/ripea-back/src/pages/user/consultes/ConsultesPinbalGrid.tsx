@@ -71,13 +71,13 @@ const useConsultaPinbalActions = (refresh?: () => void) => {
 // Filter
 const ConsultesPinbalFilterForm = () => {
     return <>
-        <GridFormField xs={4} name="expedient"/>
-        <GridFormField xs={4} name="metaExpedient"/>
-        <GridFormField xs={4} name="servei"/>
-        <GridFormField xs={4} name="createdBy"/>
-        <GridFormField xs={4} name="createdDateInici" type={"date"}/>
-        <GridFormField xs={4} name="createdDateFi" type={"date"}/>
-        <GridFormField xs={4} name="estat"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="metaExpedient"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="expedient"/>        
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="servei"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="createdBy"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="createdDateInici" type={"date"}/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="createdDateFi" type={"date"}/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="estat"/>
     </>
 }
 

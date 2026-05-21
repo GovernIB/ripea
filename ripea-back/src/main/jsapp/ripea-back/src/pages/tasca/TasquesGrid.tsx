@@ -30,6 +30,7 @@ export const StyledDate = (props: any) => {
 
 const sortModel:any = [{field: 'dataInici', sort: 'desc'}];
 const namedQueries:any = ['USUARI_RELACIONAT'];
+const perspectives:any = ['CONTEXT_USUARI'];
 const TasquesGrid = () => {
     const { t } = useTranslation();
     const { value: user } = useUserSession();
@@ -128,6 +129,7 @@ const TasquesGrid = () => {
                     filter={springFilter}
                     namedQueries={namedQueries}
                     sortModel={sortModel}
+                    perspectives={perspectives}
                     rowAdditionalActions={actions}
                     onRowClick={(params: any) => {
                         if (isTramitable(params?.row)) {

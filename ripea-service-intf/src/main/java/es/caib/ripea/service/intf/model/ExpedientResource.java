@@ -45,6 +45,12 @@ import lombok.experimental.FieldNameConstants;
 		quickFilterFields = { "numero", "nom" },
         descriptionField = "nom",
 		artifacts = {
+        		@ResourceArtifact(
+						type = ResourceArtifactType.PERSPECTIVE,
+						code = ExpedientResource.PERSPECTIVE_BASE_CODE),
+        		@ResourceArtifact(
+						type = ResourceArtifactType.PERSPECTIVE,
+						code = ExpedientResource.PERSPECTIVE_AVISOS_CODE),        		
 				@ResourceArtifact(
 						type = ResourceArtifactType.REPORT,
 						code = ExpedientResource.REPORT_MASSIVE_EXPORT_PDF_CODE,
@@ -204,35 +210,11 @@ import lombok.experimental.FieldNameConstants;
                         requiresId = true),
 				@ResourceArtifact(
 						type = ResourceArtifactType.REPORT,
-						code = ExpedientResource.REPORT_MASSIVE_EXPORT_ODS_CODE,
-						formClass = ExpedientResource.MassiveAction.class),
-				@ResourceArtifact(
-						type = ResourceArtifactType.REPORT,
-						code = ExpedientResource.REPORT_MASSIVE_EXPORT_CSV_CODE,
-						formClass = ExpedientResource.MassiveAction.class),
-				@ResourceArtifact(
-						type = ResourceArtifactType.REPORT,
-						code = ExpedientResource.REPORT_MASSIVE_EXPORT_INDEX_ZIP,
-						formClass = ExpedientResource.MassiveAction.class),
-				@ResourceArtifact(
-						type = ResourceArtifactType.REPORT,
-						code = ExpedientResource.REPORT_MASSIVE_EXPORT_INDEX_PDF,
-						formClass = ExpedientResource.MassiveAction.class),
-				@ResourceArtifact(
-						type = ResourceArtifactType.REPORT,
-						code = ExpedientResource.REPORT_MASSIVE_EXPORT_INDEX_XLS,
-						formClass = ExpedientResource.MassiveAction.class),
+						code = ExpedientResource.REPORT_MASSIVE_EXPORT_GENERIC,
+						formClass = ExpedientResource.ExportGenericForm.class),
 				@ResourceArtifact(
 						type = ResourceArtifactType.REPORT,
 						code = ExpedientResource.REPORT_MASSIVE_EXPORT_INDEX_ENI,
-						formClass = ExpedientResource.MassiveAction.class),				
-				@ResourceArtifact(
-						type = ResourceArtifactType.REPORT,
-						code = ExpedientResource.REPORT_MASSIVE_EXPORT_ENI,
-						formClass = ExpedientResource.MassiveAction.class),
-				@ResourceArtifact(
-						type = ResourceArtifactType.REPORT,
-						code = ExpedientResource.REPORT_MASSIVE_EXPORT_INSIDE,
 						formClass = ExpedientResource.MassiveAction.class),
 				@ResourceArtifact(
 						type = ResourceArtifactType.ACTION,
@@ -245,7 +227,16 @@ import lombok.experimental.FieldNameConstants;
 				@ResourceArtifact(
 						type = ResourceArtifactType.REPORT,
 						code = ExpedientResource.REPORT_PLANTILLA_DADES_CSV,
-                        requiresId = true),				
+                        requiresId = true),
+				@ResourceArtifact(
+						type = ResourceArtifactType.PERSPECTIVE,
+						code = ExpedientResource.PERSPECTIVE_EN_PROCES_CANVI_ESTAT_CODE),
+				@ResourceArtifact(
+						type = ResourceArtifactType.PERSPECTIVE,
+						code = ExpedientResource.PERSPECTIVE_EN_PROCES_TANCAMENT_CODE),
+				@ResourceArtifact(
+						type = ResourceArtifactType.PERSPECTIVE,
+						code = ExpedientResource.PERSPECTIVE_EN_PROCES_CUSTODIAR_CODE),
 		})
 @ExpedientValid
 public class ExpedientResource extends NodeResource implements Serializable {
@@ -253,14 +244,8 @@ public class ExpedientResource extends NodeResource implements Serializable {
 	private static final long serialVersionUID = 7440910672703796468L;
 	
 	public static final String REPORT_MASSIVE_EXPORT_PDF_CODE  = "EXPORT_DOC";
-	public static final String REPORT_MASSIVE_EXPORT_ODS_CODE  = "EXPORT_EXCEL";
-	public static final String REPORT_MASSIVE_EXPORT_CSV_CODE  = "EXPORT_CSV";
-	public static final String REPORT_MASSIVE_EXPORT_INDEX_ZIP = "EXPORT_INDEX_ZIP";
-	public static final String REPORT_MASSIVE_EXPORT_INDEX_PDF = "EXPORT_INDEX_PDF";
-	public static final String REPORT_MASSIVE_EXPORT_INDEX_XLS = "EXPORT_INDEX_XLS";
+	public static final String REPORT_MASSIVE_EXPORT_GENERIC   = "EXPORT_GENERIC";
 	public static final String REPORT_MASSIVE_EXPORT_INDEX_ENI = "EXPORT_INDEX_ENI";
-	public static final String REPORT_MASSIVE_EXPORT_ENI       = "EXPORT_ENI";
-	public static final String REPORT_MASSIVE_EXPORT_INSIDE    = "EXPORT_INSIDE";
 	
 	public static final String ACTION_MASSIVE_FOLLOW_CODE = "FOLLOW";
 	public static final String ACTION_MASSIVE_UNFOLLOW_CODE = "UNFOLLOW";
@@ -290,6 +275,8 @@ public class ExpedientResource extends NodeResource implements Serializable {
 	public static final String REPORT_PLANTILLA_EXCEL_INTERESSATS = "PLANTILLA_EXCEL_INTERESSATS";
 	public static final String REPORT_PLANTILLA_DADES_CSV = "PLANTILLA_DADES_CSV";
 	
+	public static final String PERSPECTIVE_BASE_CODE = "BASIC";
+	public static final String PERSPECTIVE_AVISOS_CODE = "AVISOS";
 	public static final String PERSPECTIVE_FOLLOWERS = "FOLLOWERS";
 	public static final String PERSPECTIVE_ARXIU_EXPEDIENT = "ARXIU_EXPEDIENT";
 	public static final String PERSPECTIVE_COUNT = "COUNT";
@@ -301,8 +288,11 @@ public class ExpedientResource extends NodeResource implements Serializable {
 	public static final String PERSPECTIVE_DOCUMENTS_NO_MOGUTS = "DOCUMENTS_NO_MOGUTS";
 	public static final String PERSPECTIVE_DOCUMENTS_OBLIGATORIS_TANCAR = "DOCUMENTS_OBLIGATORIS_TANCAR";
 	public static final String PERSPECTIVE_AMB_PINBAL_CODE = "AMB_PINBAL";
-	public static final String PERSPECTIVE_PERMIS_CONTINGUT = "PERMIS_CONTINGUT";	
+	public static final String PERSPECTIVE_PERMIS_CONTINGUT = "PERMIS_CONTINGUT";
 	public static final String PERSPECTIVE_AUDIT_CODE = "AUDITORIA";
+	public static final String PERSPECTIVE_EN_PROCES_CANVI_ESTAT_CODE = "EN_PROCES_CANVI_ESTAT";
+	public static final String PERSPECTIVE_EN_PROCES_TANCAMENT_CODE = "EN_PROCES_TANCAMENT";
+	public static final String PERSPECTIVE_EN_PROCES_CUSTODIAR_CODE = "EN_PROCES_CUSTODIAR";
 	
 
 	public static final String FILTER_CODE = "EXPEDIENT_FILTER";
@@ -446,7 +436,11 @@ public class ExpedientResource extends NodeResource implements Serializable {
     @Transient private boolean ambDocumentsPinbal;
     @Transient private boolean creacioCarpetesActiva;
     @Transient private boolean isPendentExecucioMassiva;
-    
+    @Transient private boolean hideTasca;
+    @Transient private Long execucioMassivaCanviEstatId;
+    @Transient private Long execucioMassivaTancamentId;
+    @Transient private Long execucioMassivaCustodiarId;
+
     @Getter
 	@Setter
     @NoArgsConstructor
@@ -487,7 +481,22 @@ public class ExpedientResource extends NodeResource implements Serializable {
         private boolean versioImprimible = false;
         private FileNameOption nomFitxer = FileNameOption.ORIGINAL;
     }
-    
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @FieldNameConstants
+    public static class ExportGenericForm extends MassiveAction {
+    	private boolean exportarExcel		= false;
+    	private boolean exportarCsv			= false;
+    	private boolean exportarIndexXls 	= false; //isExportacioExcelActiva --> es.caib.ripea.expedient.exportacio.excel
+    	private boolean exportarIndexZip 	= false;
+    	private boolean exportarIndexPdf 	= false;
+    	private boolean inlourerEstructEni	= false;
+    	private boolean exportarEni 		= false;
+    	private boolean exportarInside 		= false; //isExportacioInsideActiva --> es.caib.ripea.expedient.exportar.inside
+    }
+
     @Getter
     @Setter
     @NoArgsConstructor
@@ -594,6 +603,8 @@ public class ExpedientResource extends NodeResource implements Serializable {
         @NotNull @NotEmpty
     	private List<ImportacioZipDocument> documentsZip;
 
+        private ResourceReference<CarpetaResource, Long> carpeta;
+
         @Transient
         private String nom;
         @Transient
@@ -611,6 +622,8 @@ public class ExpedientResource extends NodeResource implements Serializable {
         @ResourceField(enumType = true)
         private String estat;
         private PrioritatEnumDto prioritat;
+        private ResourceReference<GrupResource, Long> grup;
+        private boolean mostrarGrups;
     }
 
     @Getter
@@ -621,6 +634,8 @@ public class ExpedientResource extends NodeResource implements Serializable {
         private ResourceReference<ExpedientResource, Long> expedient;
         private Date dataCreacioInici;
         private Date dataCreacioFi;
+        private ResourceReference<GrupResource, Long> grup;
+        private boolean mostrarGrups;
     }
     
 }

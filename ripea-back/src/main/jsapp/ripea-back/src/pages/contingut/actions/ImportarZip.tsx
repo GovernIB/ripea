@@ -1,6 +1,6 @@
 import {useEffect, useRef, useState} from "react";
 import {Alert, Box, Grid} from "@mui/material";
-import {FormField, MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
+import {FormField, useMuiFormDialogApiRef, useBaseAppContext, useFormContext} from "reactlib";
 import { useTranslation } from "react-i18next";
 import GridFormField, {FileFormField, formatByteCount} from "../../../components/GridFormField.tsx";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
@@ -8,6 +8,7 @@ import { usePollingArtifactAction } from "../../../components/ActionPollingOptio
 import ImportarZipResults from "./ImportarZipResults.tsx";
 import BackdropLoading from "../../../components/BackdropLoading.tsx";
 import {DataGridPro} from "@mui/x-data-grid-pro";
+import {toSelectionModel, fromSelectionModel} from "../../../util/selectionModelUtils.ts";
 import Load from "../../../components/Load.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 
@@ -52,7 +53,7 @@ const ImportarZipForm = () => {
         builder.eq("actiu", true),
     );
 
-    const localVariableDocs = useRef<any[]>()
+    const localVariableDocs = useRef<any[] | undefined>(undefined)
     const updateDocument = (rowId: any, field: string, value: any) => {
         if (!localVariableDocs.current)
             localVariableDocs.current = data?.documentsZip;
@@ -129,11 +130,10 @@ const ImportarZipForm = () => {
     ]
 
 	return <Grid container direction="row" columnSpacing={1} rowSpacing={1}>
-        <FileFormField xs={12} name="documentZip" required />
+        <FileFormField name="documentZip" required />
 
         <Load value={data?.documentsZip} noEffect>
-            <GridFormField xs={12}
-                           name={"tipusDocument#default"}
+            <GridFormField name={"tipusDocument#default"}
                            field={fieldTipusDocument}
                            onChange={(value:any) => {
                                data.documentsZip.forEach((row:any) => {
@@ -142,17 +142,18 @@ const ImportarZipForm = () => {
                            }}
                            namedQueries={[`CREATE_NEW_DOC#${apiRef?.current?.getId()}`]}
                            filter={metaDocumentFilter}/>
-            <Grid item xs={12}>
+            <Grid size={12}>
             <DataGridPro
                 rows={data.documentsZip}
                 columns={columns}
                 onRowSelectionModelChange={(newSelection) => {
+                    const ids = fromSelectionModel(newSelection);
                     data.documentsZip.forEach((row:any) => {
-                        updateDocument(row.id, "importar", newSelection.includes(row.id))
+                        updateDocument(row.id, "importar", ids.includes(row.id))
                     })
                 }}
 
-                rowSelectionModel={data?.documentsZip?.filter?.((row:any)=> row?.importar)?.map?.((row:any) => row.id)}
+                rowSelectionModel={toSelectionModel(data?.documentsZip?.filter?.((row:any)=> row?.importar)?.map?.((row:any) => row.id) ?? [])}
                 checkboxSelection
                 disableRowSelectionOnClick
                 disableColumnMenu
@@ -161,7 +162,7 @@ const ImportarZipForm = () => {
             </Grid>
 
             {!data?.documentsZip?.some?.((doc:any) => doc.importar) &&
-                <Grid item xs={12}>
+                <Grid size={12}>
                     <Alert severity={'error'}>{t('page.document.alert.documentsZip')}</Alert>
                 </Grid>
             }
@@ -228,9 +229,9 @@ const ImportarZip = ({ ...props }: any) => {
 	);
 };
 
-const useImportarZip = (entity: any, refresh?: () => void) => {
+const useImportarZip = (entity: any, refresh?: () => void, contingutPareId?: string | number | null) => {
 	const { t } = useTranslation();
-	const apiRef = useRef<MuiFormDialogApi>();
+	const apiRef = useMuiFormDialogApiRef();
 	const { temporalMessageShow } = useBaseAppContext();
 
 	const polling = usePolling();
@@ -240,7 +241,11 @@ const useImportarZip = (entity: any, refresh?: () => void) => {
 	const handleShow = () => {
 		polling.setFinished(true);
 		setIsProcessed(false);
-		apiRef.current?.show?.(entity?.id);
+		const extra =
+			contingutPareId != null && contingutPareId !== ''
+				? { carpeta: { id: contingutPareId } }
+				: undefined;
+		apiRef.current?.show?.(entity?.id, extra);
 	};
 
 	const processResult = async (resultat: any) => {

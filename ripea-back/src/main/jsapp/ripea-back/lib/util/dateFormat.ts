@@ -2,20 +2,25 @@ export const dateFormatLocale = (date: any, withTime?: boolean, noFixedSize?: bo
     if (date) {
         let dateFormated;
         if (noFixedSize) {
-            dateFormated = Intl.DateTimeFormat().format(new Date(date)) + withTime ? ' ' + timeFormatLocale(date) : '';
+            dateFormated =
+                Intl.DateTimeFormat().format(new Date(date)) + withTime
+                    ? ' ' + timeFormatLocale(date)
+                    : '';
         } else {
             const parts = Intl.DateTimeFormat().formatToParts(new Date(date));
-            dateFormated = parts.map(p => {
-                if (p.type === 'day' || p.type === 'month') {
-                    return ('0' + p.value).slice(-2);
-                } else {
-                    return p.value;
-                }
-            }).join('');
+            dateFormated = parts
+                .map((p) => {
+                    if (p.type === 'day' || p.type === 'month') {
+                        return ('0' + p.value).slice(-2);
+                    } else {
+                        return p.value;
+                    }
+                })
+                .join('');
         }
         return dateFormated + (withTime ? ' ' + timeFormatLocale(date) : '');
     }
-}
+};
 
 const TIME_SEPARATOR = ':';
 export const timeFormatLocale = (date: any, noSeconds?: boolean) => {
@@ -26,7 +31,10 @@ export const timeFormatLocale = (date: any, noSeconds?: boolean) => {
             return date;
         } else {
             const dateObj = new Date(date);
-            const hourMinute = ('0' + dateObj.getHours()).slice(-2) + TIME_SEPARATOR + ('0' + dateObj.getMinutes()).slice(-2);
+            const hourMinute =
+                ('0' + dateObj.getHours()).slice(-2) +
+                TIME_SEPARATOR +
+                ('0' + dateObj.getMinutes()).slice(-2);
             if (noSeconds) {
                 return hourMinute;
             } else {
@@ -34,7 +42,7 @@ export const timeFormatLocale = (date: any, noSeconds?: boolean) => {
             }
         }
     }
-}
+};
 
 export const timestampToIsoDate = (timestamp: number): string => {
     const date = new Date(timestamp);
@@ -42,11 +50,11 @@ export const timestampToIsoDate = (timestamp: number): string => {
     const month = ('' + (date.getMonth() + 1)).padStart(2, '0');
     const day = ('' + date.getDate()).padStart(2, '0');
     return year + '-' + month + '-' + day;
-}
+};
 
 export const timestampToIsoDateTime = (timestamp: number): string => {
     return timestampToIsoDate(timestamp) + 'T' + timeFormatLocale(timestamp);
-}
+};
 
 export const isoDateToDate = (isoDate: string): Date | undefined => {
     const isoDateParts = isoDate?.split('-');
@@ -57,11 +65,12 @@ export const isoDateToDate = (isoDate: string): Date | undefined => {
             parseInt(isoDateParts[2]),
             0,
             0,
-            0);
+            0
+        );
     } else {
         return undefined;
     }
-}
+};
 
 export const isoDateTimeToDate = (isoDateTime: string): Date | undefined => {
     if (isoDateTime.includes('T')) {
@@ -74,8 +83,9 @@ export const isoDateTimeToDate = (isoDateTime: string): Date | undefined => {
             parseInt(isoDateParts[2]),
             parseInt(isoTimeParts[0]),
             parseInt(isoTimeParts[1]),
-            parseInt(isoTimeParts[2]));
+            parseInt(isoTimeParts[2])
+        );
     } else {
         return isoDateToDate(isoDateTime);
     }
-}
+};

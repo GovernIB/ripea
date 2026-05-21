@@ -2,7 +2,7 @@ import {useFormContext, useResourceApiService} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {useScanFinalitzatSession} from "../../components/SseExpedient.tsx";
 import {useUserSession} from "../../components/Session.tsx";
-import {Alert, Grid, Icon} from "@mui/material";
+import {Alert, Grid} from "@mui/material";
 import GridFormField, {FileFormField, GridButton} from "../../components/GridFormField.tsx";
 import Iframe from "../../components/Iframe.tsx";
 import * as builder from "../../util/springFilterUtils.ts";
@@ -27,11 +27,11 @@ const ScanerTabForm = () => {
     });
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <Grid item xs={12} hidden={!data?.scaned}>
+        <Grid size={12} hidden={!data?.scaned}>
             <Alert severity={"success"}>{t('page.document.alert.scaned')}</Alert>
         </Grid>
-        <GridFormField xs={12} name="digitalitzacioPerfil"/>
-        <Grid item xs={12}>
+        <GridFormField name="digitalitzacioPerfil"/>
+        <Grid size={12}>
             <Iframe src={data?.digitalitzacioProcesUrl} />
         </Grid>
     </Grid>
@@ -49,15 +49,18 @@ const FileTabForm = () => {
     ), [data?.disabled])
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <FileFormField xs={12} name="adjunt"
+        <FileFormField size={12} name="adjunt"
                        onChange={onChange}
                        componentProps={componentProps}
                        readOnly={data?.disabled}
                        required/>
-        <GridFormField xs={6} name="hasFirma" hidden={!data.adjunt} disabled={data?.deteccioFirmaAutomaticaActiva && data?.documentFirmaTipus == "FIRMA_ADJUNTA"} />
-        <GridFormField xs={6} name="documentFirmaTipus" hidden={!data?.adjunt || !data?.hasFirma} disabled={data?.deteccioFirmaAutomaticaActiva} required/>
-        <FileFormField xs={12} name="firmaAdjunt" hidden={!data?.hasFirma || data?.documentFirmaTipus != "FIRMA_SEPARADA"} required/>
-		<GridFormField xs={6} name="firmaParcial" hidden={!data?.hasFirma} />
+        <Grid size={12} hidden={data?.validacioFirmaCorrecte !== false || !data?.validacioFirmaErrorMsg}>
+            <Alert severity={"warning"}>{data?.validacioFirmaErrorMsg}</Alert>
+        </Grid>
+        <GridFormField size={6} name="hasFirma" hidden={!data.adjunt} disabled={data?.deteccioFirmaAutomaticaActiva && data?.documentFirmaTipus == "FIRMA_ADJUNTA"} />
+        <GridFormField size={6} name="documentFirmaTipus" hidden={!data?.adjunt || !data?.hasFirma} disabled={data?.deteccioFirmaAutomaticaActiva} required/>
+        <FileFormField name="firmaAdjunt" hidden={!data?.hasFirma || data?.documentFirmaTipus != "FIRMA_SEPARADA"} required/>
+		<GridFormField size={6} name="firmaParcial" hidden={!data?.hasFirma} />
     </Grid>
 }
 
@@ -103,10 +106,12 @@ const DocumentsGridForm = ({ setDisabled }:any) => {
         builder.eq("actiu", true),
     );
 	
-	const carpetaFilter: string = builder.and(
-	    builder.eq("expedient.id", data?.expedient?.id),
-	    builder.eq("esborrat", 0),
-	);
+	const carpetaFilter: string = useMemo(() => (
+	    builder.and(
+	        builder.eq("expedient.id", data?.expedient?.id),
+	        builder.eq("esborrat", 0),
+	    )
+	), [data?.expedient?.id]);
 
     const tabs = [
         {
@@ -124,37 +129,40 @@ const DocumentsGridForm = ({ setDisabled }:any) => {
     ];
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="metaDocument"
+        <GridFormField name="metaDocument"
                        namedQueries={
                            apiRef?.current?.getId()
                                ? [`UPDATE_DOC#${apiRef?.current?.getId()}`]
                                : [`CREATE_NEW_DOC#${data?.expedient?.id}`]
                        }
                        filter={metaDocumentFilter} />
-        <GridFormField xs={data.pluginSummarizeActiu ? 11 : 12} name="nom" />
-        <GridButton xs={1} title={t('page.document.detall.summarize')}
+        <GridFormField size={data.pluginSummarizeActiu ? 11 : 12} name="nom" />
+        <GridButton size={1} title={t('page.document.detall.summarize')}
+                    icon={'assistant'}
                     onClick={actualizarDatos}
                     disabled={!data?.adjunt}
                     hidden={!data.pluginSummarizeActiu}>
-            <Icon>assistant</Icon>IA
+            IA
         </GridButton>
-        <GridFormField xs={12} name="descripcio" type={"textarea"} />
-        <GridFormField xs={12} name="dataCaptura" type={"date"} disabled required />
-        <GridFormField xs={12} name="ntiOrigen" required />
-        <GridFormField xs={12} name="ntiEstadoElaboracion" required />
-		<GridFormField xs={12} name="ntiIdDocumentoOrigen"
+        <GridFormField name="descripcio" type={"textarea"} />
+        <GridFormField name="dataCaptura" type={"date"} disabled required />
+        <GridFormField name="ntiOrigen" required />
+        <GridFormField name="ntiEstadoElaboracion" required />
+		<GridFormField name="ntiIdDocumentoOrigen"
 		               componentProps={{ title: t('page.document.detall.documentOrigenFormat') }}
 		               required={!!data?.ntiEstadoElaboracion}
 		               hidden={!data?.ntiEstadoElaboracion
 		                   || data?.ntiEstadoElaboracion == 'EE01'
 		                   || data?.ntiEstadoElaboracion == 'EE99'}/>		
-        {id==null &&
-            <GridFormField xs={12} name="carpeta"
-                        filter={carpetaFilter}
-                        hidden={!user?.sessionScope?.isCreacioCarpetesActiva}/>
-        }
+        {id == null && (user?.sessionScope?.isCreacioCarpetesActiva || data?.contingutScopeDestiCarpeta) && (
+            <GridFormField
+                name="carpeta"
+                filter={carpetaFilter}
+                readOnly={!user?.sessionScope?.isCreacioCarpetesActiva}
+            />
+        )}
 		{!isPermesModificarCustodiatsVar() &&	
-	        <Grid item xs={12}>
+	        <Grid size={12}>
 	            <TabComponent
 	                tabs={tabs}
 	                variant="scrollable"

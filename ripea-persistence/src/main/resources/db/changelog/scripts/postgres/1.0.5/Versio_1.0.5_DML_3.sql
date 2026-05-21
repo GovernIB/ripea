@@ -1,0 +1,1 @@
+UPDATE IPA_CONFIG_TYPE SET VALUE='es.caib.ripea.plugin.caib.procediment.ProcedimentPluginRolsac,es.caib.ripea.plugin.caib.procediment.ProcedimentPluginRolsac2' WHERE CODE='GESCONADM_CLASS';

@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {Alert, Grid2 as Grid, Icon, IconButton} from "@mui/material";
+import {Alert, Grid, Icon, IconButton} from "@mui/material";
 import {MuiDialog, useBaseAppContext, useConfirmDialogButtons, useResourceApiService} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {DetailCard} from "../../../components/CardData.tsx";
@@ -48,7 +48,6 @@ const Errors = (props:any) => {
             <DetailCard title={t('page.documentVia.alert.enviament')}>
                 <FieldData titleSize={4} textSize={8} field={'intentData'}/>
                 <FieldData titleSize={4} textSize={8} field={'intentNum'} sx={{ borderBottom: "1px solid" }}/>
-
                 <Grid size={12} p={1}>
                     <ErrorArea>
                         {entity?.errorDescripcio}

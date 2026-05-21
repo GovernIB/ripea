@@ -31,7 +31,7 @@ import lombok.experimental.FieldNameConstants;
 		})
 public class MetaExpedientEstatResource extends BaseAuditableResource<Long> {
 
-	public static final String ACTION_REORDENAR_CODE			= "REORDENAR";
+	public static final String ACTION_REORDENAR_CODE = "REORDENAR";
 	
 	@NotNull
 	@Size(max = 256)

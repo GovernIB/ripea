@@ -11,6 +11,7 @@ import {Box, Grid} from "@mui/material";
 import GridFormField from "../../components/GridFormField.tsx";
 import {GridSortDirection} from "@mui/x-data-grid-pro";
 import useAnotacioDetail from "./details/AnotacioDetail.tsx";
+import {useUserSession} from "../../components/Session.tsx";
 
 const sortModel:any = [{field: 'registreInfo.data', sort: 'desc'}];
 const perspectives = ['REGISTRE', 'ESTAT_VIEW'];
@@ -18,16 +19,18 @@ const namedQueries = ['LLISTAT_ANOTACIONS'];
 
 const AnotacionsGridForm = () => {
     const {data} = useFormContext();
+    const { value: user } = useUserSession();
 
+    const mostrarGrups = user?.sessionScope?.isFiltreGrupsVisible;
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="identificador" disabled readOnly/>
-        <GridFormField xs={12} name="registreExtracte" disabled readOnly/>
-        <GridFormField xs={12} name="metaExpedient"/>
-        <GridFormField xs={12} name="grup"
+        <GridFormField name="identificador" disabled readOnly/>
+        <GridFormField name="registreExtracte" disabled readOnly/>
+        <GridFormField name="metaExpedient"/>
+        <GridFormField name="grup"
                        namedQueries={[`BY_PROCEDIMENT#${data?.metaExpedient?.id}`]}
                        disabled={!data?.metaExpedient}
                        readOnly={!data?.metaExpedient}
-                       hidden={!data?.mostrarGrups}/>
+                       hidden={!mostrarGrups}/>
     </Grid>
 }
 

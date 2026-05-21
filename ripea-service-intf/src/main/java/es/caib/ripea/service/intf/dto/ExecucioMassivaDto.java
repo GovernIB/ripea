@@ -48,6 +48,8 @@ public class ExecucioMassivaDto extends AuditoriaDto implements Serializable {
 	private String documentNom;
 	private Long expedientOrigenId;
 	private Long expedientDestiId;
+	
+	private Long identificadorAuxiliar;
 
 	public ExecucioMassivaDto() {}
 

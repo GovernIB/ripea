@@ -8,20 +8,20 @@ const AnotacioFilterForm = () => {
 
     return <>
         {(!data?.advanced) && <>
-            <GridFormField xs={3.5} name="metaExpedient"/>
-            <GridFormField xs={2} name="estat"/>
-            <GridFormField xs={2} name="dataRecepcioInicial" type={"date"}/>
-            <GridFormField xs={2} name="dataRecepcioFinal" type={"date"}/>
+            <GridFormField size={{xs: 12, sm: 6, md: 3.5}} name="metaExpedient"/>
+            <GridFormField size={{xs: 12, sm: 6, md: 2}} name="estat"/>
+            <GridFormField size={{xs: 12, sm: 6, md: 2}} name="dataRecepcioInicial" type={"date"}/>
+            <GridFormField size={{xs: 12, sm: 6, md: 2}} name="dataRecepcioFinal" type={"date"}/>
         </>}
         {(data?.advanced) && <>
-            <GridFormField xs={4} name="numRegistre"/>
-            <GridFormField xs={4} name="extracte"/>
-            <GridFormField xs={4} name="destinacio"/>
-            <GridFormField xs={4} name="metaExpedient"/>
-            <GridFormField xs={4} name="dataRecepcioInicial" type={"date"}/>
-            <GridFormField xs={4} name="dataRecepcioFinal" type={"date"}/>
-            <GridFormField xs={4} name="estat"/>
-            <GridFormField xs={4} name="interessat"/>
+            <GridFormField size={{xs: 12, sm: 6, md: 4}} name="numRegistre"/>
+            <GridFormField size={{xs: 12, sm: 6, md: 4}} name="extracte"/>
+            <GridFormField size={{xs: 12, sm: 6, md: 4}} name="destinacio"/>
+            <GridFormField size={{xs: 12, sm: 6, md: 4}} name="metaExpedient"/>
+            <GridFormField size={{xs: 12, sm: 6, md: 4}} name="dataRecepcioInicial" type={"date"}/>
+            <GridFormField size={{xs: 12, sm: 6, md: 4}} name="dataRecepcioFinal" type={"date"}/>
+            <GridFormField size={{xs: 12, sm: 6, md: 4}} name="estat"/>
+            <GridFormField size={{xs: 12, sm: 6, md: 4}} name="interessat"/>
         </>}
     </>
 }

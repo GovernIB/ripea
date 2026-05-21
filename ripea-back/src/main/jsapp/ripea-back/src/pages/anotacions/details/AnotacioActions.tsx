@@ -69,7 +69,7 @@ export const useMassiveActions = (refresh?: () => void) => {
         apiAction(undefined, {code: 'ESTAT_DISTRIBUCIO', data: {ids, massivo: true}})
             .then((data:any) => {
                 refresh?.();
-                temporalMessageShow(null, t('page.anotacio.action.canviEstatDistribucio.massiveOk', {data}), 'success');
+                temporalMessageShow(null, t('page.anotacio.action.canviEstatDistribucio.massiveOk', {data}), 'info');
             })
             .catch((error) => {
                 temporalMessageShow(null, error.message, 'error');
@@ -91,13 +91,14 @@ export const useMassiveActions = (refresh?: () => void) => {
         canviEstatDistribucio,
     }
 }
-export const useAnexxActions = (refresh?: () => void) => {
+
+export const useAnexxActions = () => {
     const { t } = useTranslation();
 
     const {
         artifactReport: apiReport,
-        artifactAction: apiAction,
     } = useResourceApiService('registreAnnexResource');
+
     const {temporalMessageShow} = useBaseAppContext();
 
     const report = (id:any, code:any, mssg:any, fileType:any) => {
@@ -112,29 +113,8 @@ export const useAnexxActions = (refresh?: () => void) => {
     }
 
     const download = (id:any) => report(id, 'DOWNLOAD_ANNEX', t('page.anotacio.action.descargarAnnex.ok'), 'PDF')
-    const reintentar = (id:any) => {
-        apiAction(undefined, {code: 'REINTENTAR', data: {ids: [id], massivo: false}})
-            .then(() => {
-                refresh?.()
-                temporalMessageShow(null, t('page.anotacio.action.procesarAnnexosPendents.ok'), 'success');
-            })
-            .catch((error) => {
-                temporalMessageShow(null, error.message, 'error');
-            });
-    }
-    const reintentarMassive = (ids:any) => {
-        apiAction(undefined, {code: 'REINTENTAR', data: {ids, massivo: true}})
-            .then((data:any) => {
-                refresh?.()
-                temporalMessageShow(null, t('page.anotacio.action.procesarAnnexosPendents.massiveOk', {data}), 'success');
-            })
-            .catch((error) => {
-                temporalMessageShow(null, error.message, 'error');
-            });
-    }
+
     return {
-        reintentar,
-        reintentarMassive,
         download,
     }
 }

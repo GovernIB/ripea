@@ -106,8 +106,8 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
             rowAdditionalActions={actions}
             onRowCountChange={onRowCountChange}
             toolbarCreateTitle={t('page.interessat.action.new.label')}
-            toolbarHideCreate={user?.sessionScope?.isMostrarImportacio || !entity?.potModificar}
-            toolbarHideQuickFilter={false}
+            toolbarShowCreate={!user?.sessionScope?.isMostrarImportacio && entity?.potModificar}
+            toolbarShowQuickFilter
             toolbarHideRefresh
             selectionActive
             onRowSelectionModelChange={(newSelection) => {

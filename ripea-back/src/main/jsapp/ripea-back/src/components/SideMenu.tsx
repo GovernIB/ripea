@@ -17,8 +17,10 @@ import {
     Theme,
     CSSObject
 } from '@mui/material/styles';
-import {useBaseAppContext, useSmallScreen, useSmallHeader} from "reactlib";
+import {useBaseAppContext} from "reactlib";
+import {useSmallScreen, useSmallHeader} from "../../lib/util/useSmallScreen";
 import SideWrapper from "./SideWrapper";
+import {useTranslation} from "react-i18next";
 
 export type MenuEntry = {
     id: string;
@@ -236,7 +238,6 @@ const MenuTitle: React.FC<MenuTitleProps> = (props) => {
     </Box>;
 }
 const sideMenuClass = 'side-menu';
-const titol = "Menú";
 const closeIcon = 'close';
 
 export const Menu: React.FC<MenuProps & { onClose?: () => void, logo?: string }> = (props) => {
@@ -251,6 +252,9 @@ export const Menu: React.FC<MenuProps & { onClose?: () => void, logo?: string }>
     } = props;
     const smallScreen = useSmallScreen();
     const smallHeader = useSmallHeader();
+    const {t} = useTranslation()
+
+    const titol = t('page.user.menu.title');
 
     // Add ESC key handling to close the menu
     React.useEffect(() => {
@@ -272,7 +276,7 @@ export const Menu: React.FC<MenuProps & { onClose?: () => void, logo?: string }>
     const drawerContent = <SideWrapper onOutsideClick={handleMenuItemClick}>
         <Box sx={{ mt: smallHeader ? 1 : 1 }} >
             <Box sx={{ display: 'flex', mr: 2, pt: 1, pr: 2, cursor: 'pointer', 'img': { height: '38px' }, pl: 4 }}>
-                {logo && <img src={logo} alt="logo"/>}
+                {logo && <img src={logo} alt="logo_menu"/>}
                 <Typography
                     variant="h6"
                     component="span"

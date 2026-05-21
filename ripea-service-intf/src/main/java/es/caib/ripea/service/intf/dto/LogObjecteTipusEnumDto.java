@@ -11,10 +11,11 @@ package es.caib.ripea.service.intf.dto;
  * @author Limit Tecnologies <limit@limit.es>
  */
 public enum LogObjecteTipusEnumDto {
+	//LogContingutTipusEnumDto = expedient
 	CONTINGUT,
 	EXPEDIENT,
 	CARPETA,
-	DOCUMENT,
+	DOCUMENT, //També val per LogContingutTipusEnumDto = tasca
 	DADA,
 	BUSTIA,
 	ARXIU,
@@ -24,5 +25,13 @@ public enum LogObjecteTipusEnumDto {
 	RELACIO,
 	NOTIFICACIO,
 	PUBLICACIO,
-	ALTRES
+	//LogContingutTipusEnumDto = procediment
+	METAEXPEDIENT,
+	METADOCUMENT,
+	METADADA,
+	METAESTAT,
+	METATASCA,
+	GRUP,
+	//Generics
+	ALTRES,
 }

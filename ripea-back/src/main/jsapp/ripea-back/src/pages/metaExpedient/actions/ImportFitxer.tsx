@@ -1,7 +1,7 @@
-import {FormField, MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
+import {FormField, useMuiFormDialogApiRef, useBaseAppContext, useFormContext} from "reactlib";
 import {Alert, Grid} from "@mui/material";
 import GridFormField, {FileFormField} from "../../../components/GridFormField.tsx";
-import {useEffect, useMemo, useRef, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 import {CardData} from "../../../components/CardData.tsx";
@@ -25,11 +25,11 @@ const Item = ({ identifiator = 'codi', fieldList, element, children, label }: an
                     columnSpacing={1}
                     rowSpacing={1}
                 >
-                    <Grid xs={11.5} sx={{ pl: 1, pt: 1 }}>
+                    <Grid size={11.5} sx={{ pl: 1, pt: 1 }}>
                         {label ?? element?.nom}
                     </Grid>
 
-                    <Grid xs={0.5}>
+                    <Grid size={0.5}>
                         <FormField
                             componentProps={{ title: fieldImportar?.label }}
                             label=""
@@ -64,7 +64,6 @@ const FieldResponsable = ({ fieldList, element, field, ...other }: any) => {
     const {data, fields, apiRef} = useFormContext()
     const fieldResponsables = useMemo(() => (fields?.filter(i=>i.name==field)[0]), [fields]);
     return <GridFormField
-        xs={12}
         name={field + (element.codi ?`#${element.codi}`:'')}
         value={element?.[field]}
         field={fieldResponsables}
@@ -81,30 +80,30 @@ const FieldResponsable = ({ fieldList, element, field, ...other }: any) => {
     />
 }
 
-const ImportFitxerFormBase = () => {
+export const ImportFitxerFormBase = () => {
     const {t} = useTranslation()
     const {data} = useFormContext()
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name={'procediment'}/>
-        <GridFormField xs={12} name="codi" disabled={data?.procediment != null}/>
-        <GridFormField xs={2} name="tipusClassificacio" required disabled={data?.procediment != null}/>
-        <GridFormField xs={10} 
+        <GridFormField name={'procediment'}/>
+        <GridFormField name="codi" disabled={data?.procediment != null}/>
+        <GridFormField size={2} name="tipusClassificacio" required disabled={data?.procediment != null}/>
+        <GridFormField size={10}
             name="classificacio"
             debounce
             disabled={data?.tipusClassificacio == 'ID' || data?.procediment != null}/>
-        <Grid item xs={12} hidden={data?.msgSiaRolsac == null}>
+        <Grid size={12} hidden={data?.msgSiaRolsac == null}>
             <Alert severity={'warning'} sx={{ mt: 0.5 }}>{data.msgSiaRolsac}</Alert>
         </Grid>
-        <GridFormField xs={12} name="nom"/>
-        <GridFormField xs={12} name="descripcio"/>
-        <GridFormField xs={12} name="serieDocumental"/>
-        <GridFormField xs={4} name="procedimentComu"/>
-        <GridFormField xs={8} 
+        <GridFormField name="nom"/>
+        <GridFormField name="descripcio"/>
+        <GridFormField name="serieDocumental"/>
+        <GridFormField size={4} name="procedimentComu"/>
+        <GridFormField size={8}
             name="organGestor"
             required
             hidden={data?.procedimentComu}
             disabled={data?.procediment != null}/>
-        <GridFormField xs={12} name="expressioNumero"
+        <GridFormField name="expressioNumero"
                        componentProps={{ helperText: t('page.metaExpedient.detall.expressioNumero') }}/>
     </Grid>
 }
@@ -187,7 +186,7 @@ const ImportFitxerFormCarpeta = () => {
     </Grid>
 }
 
-function editarElemento(array:any[], codi:string, cambios:any, identifiator:string = 'codi') {
+export function editarElemento(array:any[], codi:string, cambios:any, identifiator:string = 'codi') {
     return array.map((item:any) =>
         item?.[identifiator] === codi
             ? { ...item, ...cambios }
@@ -267,8 +266,8 @@ const ImportFitxerForm = ({ onFileChange }: any) => {
     ]
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <FileFormField xs={12} name={'importJson'} hidden={data?.importJson}/>
-        {data?.importJson && <Grid xs={12}>
+        <FileFormField name={'importJson'} hidden={data?.importJson}/>
+        {data?.importJson && <Grid size={12}>
             <TabComponent tabs={tabs}/>
         </Grid>}
     </Grid>
@@ -295,7 +294,7 @@ const ImportFitxer = (props: any) => {
 
 export const useImportFitxer = (refresh?: () => void) => {
     const { t } = useTranslation();
-    const apiRef = useRef<MuiFormDialogApi>();
+    const apiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow} = useBaseAppContext();
 
     const handleShow = () :void => {

@@ -26,8 +26,6 @@ import com.turkraft.springfilter.parser.Filter;
 
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
-import es.caib.ripea.persistence.entity.MetaExpedientOrganGestorEntity;
-import es.caib.ripea.persistence.entity.MetaNodeEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.entity.resourceentity.GrupResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientResourceEntity;
@@ -162,7 +160,8 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
     	
     	register(MetaExpedientResource.ACTION_IMPORT_ROLSAC_CODE, 	new ImportarRolsacActionExecutor());
     	register(MetaExpedientResource.ACTION_IMPORT_FITXER_CODE,	new ImportarFitxerActionExecutor());
-    	
+    	register(MetaExpedientResource.ACTION_CLONAR_CODE,			new ClonarActionExecutor());
+
     	register(MetaExpedientResource.REPORT_EXPORT_JSON,			new ExportJsonGenerator());
     	
     	register(MetaExpedientResource.Fields.classificacio,		new OnchangeLogicProcessor());
@@ -403,7 +402,6 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 				
 				if (fieldValue==null || (boolean)fieldValue) {
 					target.setOrganGestor(null);
-					target.setClassificacio(null);
 					target.setTipusClassificacio(TipusClassificacioEnumDto.SIA);
 				}
 				
@@ -442,7 +440,9 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 					}
 					target.setClassificacio(idCalculat);
 				} else {
-					target.setClassificacio(null);
+                    if (TipusClassificacioEnumDto.ID.equals(previous.getTipusClassificacio())) {
+                        target.setClassificacio(null);
+                    }
 				}
 				
 			} else if (MetaExpedientResource.Fields.organGestor.equals(fieldName)) {
@@ -1339,11 +1339,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 
 		@Override
 		public Serializable exec(String code, MetaExpedientResourceEntity entity, ToggleGrupDefecteFormAction params) throws ActionExecutionException {
-			if (params.getGrupId()!=null) {
-				entity.setGrupPerDefecte(grupResourceRepository.findById(params.getGrupId()).get());
-			} else {
-				entity.setGrupPerDefecte(null);
-			}
+			grupHelper.canviarGrupPerDefecte(entity.getId(), params.getGrupId());
 			return "{\"resultado\": \"OK\"}";
 		}
     }
@@ -1493,6 +1489,47 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 		}    	
     }
     
+    private class ClonarActionExecutor implements ActionExecutor<MetaExpedientResourceEntity, MetaExpedientResource.ClonarFormAction, Serializable> {
+		@Override
+		public void onChange(Serializable id, MetaExpedientResource.ClonarFormAction previous, String fieldName, Object fieldValue,
+				Map<String, AnswerValue> answers, String[] previousFieldNames, MetaExpedientResource.ClonarFormAction target) {
+			if (fieldName == null) {
+				// Càrrega inicial: pre-calcular el codi suggerit
+				try {
+					String entitatActualCodi = configHelper.getEntitatActualCodi();
+					EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true, false);
+					String codiSuggerit = metaExpedientHelper.calcularCodiClon(entitat.getId(), (Long) id);
+					target.setCodi(codiSuggerit);
+				} catch (Exception e) {
+					excepcioLogHelper.addExcepcio("/metaExpedient/"+id+"/ClonarActionExecutor.onChange", e);
+				}
+			}
+		}
+
+		@Override
+		public Serializable exec(String code, MetaExpedientResourceEntity entity, MetaExpedientResource.ClonarFormAction params) throws ActionExecutionException {
+			try {
+				String entitatActualCodi = configHelper.getEntitatActualCodi();
+				EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true, false);
+				String organActualCodi = configHelper.getOrganActualCodi();
+				OrganGestorEntity ogEntity = organGestorRepository.findByEntitatIdAndCodi(entitat.getId(), organActualCodi);
+
+				metaExpedientHelper.clonar(
+						entitat.getId(),
+						entity.getId(),
+						ogEntity != null ? ogEntity.getId() : null,
+						configHelper.getRolActual(),
+						params.getCodi(),
+						params.getClassificacio());
+
+				return "{\"codi\": \"" + params.getCodi() + "\"}";
+			} catch (Exception e) {
+				excepcioLogHelper.addExcepcio("/metaExpedient/"+entity.getId()+"/ClonarActionExecutor", e);
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, messageHelper.getMessage("message.common.action.error")+": "+e.getMessage());
+			}
+		}
+    }
+
     private class ExportJsonGenerator implements ReportGenerator<MetaExpedientResourceEntity, Serializable, Serializable> {
 
     	@Override

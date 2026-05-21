@@ -41,9 +41,12 @@ import lombok.experimental.FieldNameConstants;
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = RegistreAnnexResource.PERSPECTIVE_REGISTRE),
                 @ResourceArtifact(
+                        type = ResourceArtifactType.PERSPECTIVE,
+                        code = RegistreAnnexResource.PERSPECTIVE_EN_PROCES_ADJUNTAR_ANNEXOS_CODE),
+                @ResourceArtifact(
                         type = ResourceArtifactType.FILTER,
                         code = RegistreAnnexResource.ADJUNTAR_ANNEX_FILTER_CODE,
-                        formClass = RegistreAnnexResource.AjuntrAnnexPendentFilter.class),
+                        formClass = RegistreAnnexResource.AjuntarAnnexPendentFilter.class),
                 @ResourceArtifact(
                         type = ResourceArtifactType.REPORT,
                         code = RegistreAnnexResource.REPORT_DOWNLOAD_ANNEX,
@@ -51,7 +54,7 @@ import lombok.experimental.FieldNameConstants;
                 @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = RegistreAnnexResource.ACTION_REINTENTAR_CODE,
-                        formClass = MassiveAction.class),
+                        formClass = RegistreAnnexResource.ReintentarAnnexPendentForm.class),
 		}
 )
 public class RegistreAnnexResource extends BaseAuditableResource<Long> {
@@ -60,6 +63,7 @@ public class RegistreAnnexResource extends BaseAuditableResource<Long> {
 	
 	public static final String PERSPECTIVE_FIRMES 		= "FIRMES";
 	public static final String PERSPECTIVE_REGISTRE		= "REGISTRE";
+	public static final String PERSPECTIVE_EN_PROCES_ADJUNTAR_ANNEXOS_CODE = "EN_PROCES_ADJUNTAR_ANNEXOS";
     public static final String ADJUNTAR_ANNEX_FILTER_CODE= "ADJUNTAR_ANNEX_FILTER";
     public static final String REPORT_DOWNLOAD_ANNEX	= "DOWNLOAD_ANNEX";
 	public static final String ACTION_REINTENTAR_CODE	= "REINTENTAR";
@@ -97,16 +101,25 @@ public class RegistreAnnexResource extends BaseAuditableResource<Long> {
     @Transient private RegistreResource registreInfo;
     @Transient private ExpedientResource expedientInfo;
     @Transient private List<ArxiuFirmaDto> firmes;
+    @Transient private Long execucioMassivaAdjuntarAnnexosId;
 
     @Getter
     @Setter
-    public static class AjuntrAnnexPendentFilter implements Serializable {
+    public static class AjuntarAnnexPendentFilter implements Serializable {
         private String nom;
         private String numero;
         private ResourceReference<MetaExpedientResource, Long> procediment;
         private ResourceReference<ExpedientResource, Long> expedient;
         private Date dataInici;
         private Date dataFi;
+        private ResourceReference<GrupResource, Long> grup;
+        private boolean mostrarGrups;
+    }
+    
+    @Getter
+    @Setter
+    public static class ReintentarAnnexPendentForm extends MassiveAction {
+    	private ResourceReference<MetaDocumentResource, Long> metaDocument;
     }
 
     public String getFitxerExtension() {

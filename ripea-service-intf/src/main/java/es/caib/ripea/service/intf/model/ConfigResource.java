@@ -1,5 +1,6 @@
 package es.caib.ripea.service.intf.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import org.springframework.data.annotation.Transient;
@@ -33,11 +34,16 @@ import javax.validation.constraints.NotNull;
                     type = ResourceArtifactType.ACTION,
                     code = ConfigResource.ACTION_UPDATE,
                     formClass = ConfigResource.class),
+            @ResourceArtifact(
+                    type = ResourceArtifactType.ACTION,
+                    code = ConfigResource.ACTION_REORDER,
+                    formClass = ConfigResource.ReordenarForm.class),
         })
 public class ConfigResource extends BaseResource<String> {
 
 	public static final String ACTION_SYNC_JBOSS = "SYNC_JBOSS";
 	public static final String ACTION_UPDATE = "UPDATE";
+	public static final String ACTION_REORDER = "REORDER";
 
     @NotNull
     private String key;
@@ -61,7 +67,7 @@ public class ConfigResource extends BaseResource<String> {
     private boolean configurableEntitatActiu;
     private boolean configurableOrgan;
     private boolean configurableOrganActiu;
-    private boolean configurableOrgansDescendents;    
+    private boolean configurableOrgansDescendents;
     private int position;
     
     private ResourceReference<UsuariResource, String> lastModifiedBy;
@@ -70,5 +76,12 @@ public class ConfigResource extends BaseResource<String> {
     @Transient
     public String getId() {
         return key;
+    }
+
+    @Getter
+    @Setter
+    public static class ReordenarForm implements Serializable {
+        @NotNull private String key;
+        @NotNull private int position;
     }
 }

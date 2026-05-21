@@ -10,6 +10,7 @@ import {
     ResourceApiProvider
 } from 'reactlib';
 import {SessionStorageProvider} from "./components/SessionStorageContext.tsx";
+import {RipeaAuthProvider} from "./components/RipeaAuthProvider.tsx";
 import SseProvider from "./components/SseClient.tsx";
 import {ThemeUserProvider} from "./components/ThemeUserProvider.tsx";
 
@@ -33,18 +34,21 @@ export const envVars = {
 //     clientId: envVar('VITE_AUTH_KEYCLOAK_CLIENTID', envVars),
 // });
 
+const toAbsoluteUrl = (url: string) =>
+    url.startsWith('/') ? window.location.origin + url : url;
+
 const getEnvApiUrl = () => {
     const envApiPublicUrl = envVar('VITE_API_PUBLIC_URL', envVars);
     const envApiUrl = envVar('VITE_API_URL', envVars);
     if (envApiPublicUrl || envApiUrl) {
-        return envApiPublicUrl ?? envApiUrl;
+        return toAbsoluteUrl(envApiPublicUrl ?? envApiUrl);
     } else {
         const envApiBaseUrl = envVar('VITE_API_BASE_URL', envVars);
         const envApiSuffix = envVar('VITE_API_SUFFIX', envVars) ?? '/api';
         if (envApiBaseUrl) {
-            return envApiBaseUrl + envApiSuffix;
+            return toAbsoluteUrl(envApiBaseUrl + envApiSuffix);
         } else {
-            return window.location.protocol + '//' + window.location.host + ':' + window.location.port + envApiSuffix;
+            return window.location.origin + envApiSuffix;
         }
     }
 }
@@ -54,14 +58,16 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         {/*<AuthProvider config={getAuthConfig()} mandatory everetAuthPatch>*/}
         <ResourceApiProvider apiUrl={getEnvApiUrl()} userSessionActive>
             <SessionStorageProvider>
-                <SseProvider>
-                    <ThemeUserProvider>
-                        {/*<CssBaseline />*/}
-                        <BrowserRouter basename={import.meta.env.BASE_URL}>
-                            <App />
-                        </BrowserRouter>
-                    </ThemeUserProvider>
-                </SseProvider>
+                <RipeaAuthProvider>
+                    <SseProvider>
+                        <ThemeUserProvider>
+                            {/*<CssBaseline />*/}
+                            <BrowserRouter basename={import.meta.env.BASE_URL}>
+                                <App />
+                            </BrowserRouter>
+                        </ThemeUserProvider>
+                    </SseProvider>
+                </RipeaAuthProvider>
             </SessionStorageProvider>
         </ResourceApiProvider>
         {/*</AuthProvider>*/}

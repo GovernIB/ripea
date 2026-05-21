@@ -1,6 +1,6 @@
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import {useTranslation} from "react-i18next";
-import {GridPage, useMuiDataGridApiRef} from "reactlib";
+import {GridPage, useFormContext, useMuiDataGridApiRef} from "reactlib";
 import {useState} from "react";
 import {CardPage} from "../../../components/CardData.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
@@ -8,14 +8,29 @@ import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import GridFormField, {GridButtonField} from "../../../components/GridFormField.tsx";
 import {useActions, useMassiveActions} from "../../anotacions/details/AnotacioActions.tsx";
+import {useUserSession} from "../../../components/Session.tsx";
+import {useExecucioMassivaContingut} from "../actions/ExecucioMassivaGrid.tsx";
+import {Box} from "@mui/material";
 
 const ActualitzarEstatAnotacioFilterFrom = () => {
+    const {data} = useFormContext();
+    const { value: user } = useUserSession();
+    const expedientFilter = builder.and(
+        builder.eq('metaExpedient.id', data?.procediment?.id),
+        builder.eq('grup.id', data?.grup?.id)
+    );    
     return <>
-        <GridFormField xs={3} name="numero"/>
-        <GridFormField xs={3} name="dataAltaInici" type={"date"}/>
-        <GridFormField xs={3} name="dataAltaFi" type={"date"}/>
-        <GridFormField xs={2} name="estat"/>
-        <GridButtonField xs={1} icon={"warning"} name="nomesPendents"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="procediment"/>
+        <GridFormField name="grup" size={{xs: 12, sm: 6, md: 3}}
+                       namedQueries={[`BY_PROCEDIMENT#${data?.procediment?.id}`]}
+                       disabled={!data?.procediment}
+                       hidden={!user?.sessionScope?.isFiltreGrupsVisible}/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="expedient" filter={expedientFilter}/>    
+        <GridFormField size={{xs: 12, sm: 4, md: 3}} name="numero"/>
+        <GridFormField size={{xs: 12, sm: 4, md: 3}} name="dataAltaInici" type={"date"}/>
+        <GridFormField size={{xs: 12, sm: 4, md: 3}} name="dataAltaFi" type={"date"}/>
+        <GridFormField size={{xs: 12, sm: 3, md: 2}} name="estat"/>
+        <GridButtonField size={{xs: 12, sm: 3, md: 1}} icon={"warning"} name="nomesPendents"/>
     </>
 }
 
@@ -43,6 +58,7 @@ const ActualitzarEstatAnotacioFilter = (props: any) => {
 }
 
 const namedQuery: string[] = ['MASSIU_ANOTACIONS_ESTAT']
+const perspectives:any = ['EN_PROCES_ACTUALITZAR_ESTAT'];
 const sortModel: any = [{field: 'dataAlta', sort: 'desc'}]
 const columns = [
     {
@@ -80,13 +96,22 @@ const ActualitzarEstatAnotacioGrid = () => {
 
     const { canviEstatDistribucio } = useActions(refresh)
     const { canviEstatDistribucio: canviMassiuEstatDis } = useMassiveActions(refresh)
+    const {handleOpen: handleContingutOpen, dialog: dialogContingut} = useExecucioMassivaContingut();
 
-    const actions = [
+    const actions:any[] = [
         {
             label: t('page.anotacio.action.canviEstatDistribucio.label'),
             icon: "autorenew",
             showInMenu: false,
             onClick: canviEstatDistribucio,
+            hidden: (row:any) => row?.execucioMassivaActualitzarEstatId,
+        },
+        {
+            label: t('page.user.action.massives.pending'),
+            icon: <Box sx={{ color: 'warning.main' }}>schedule</Box>,
+            showInMenu: false,
+            onClick: (_id:any, row:any) => handleContingutOpen(row?.execucioMassivaActualitzarEstatId),
+            hidden: (row:any) => !row?.execucioMassivaActualitzarEstatId,
         },
     ]
     const massiveActions = [
@@ -108,11 +133,14 @@ const ActualitzarEstatAnotacioGrid = () => {
                 columns={columns}
                 filter={springFilter}
                 sortModel={sortModel}
+                perspectives={perspectives}
                 namedQueries={namedQuery}
                 rowAdditionalActions={actions}
                 toolbarMassiveActions={massiveActions}
+                isRowSelectable={(params:any) => !params?.row?.execucioMassivaActualitzarEstatId}
                 toolbarHideCreate
             />
+            {dialogContingut}
         </CardPage>
     </GridPage>
 }

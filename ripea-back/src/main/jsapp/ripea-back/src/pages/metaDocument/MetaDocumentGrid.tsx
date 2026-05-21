@@ -120,20 +120,19 @@ const PortafirmesMetaDocumentForm = () => {
     })
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="firmaPortafirmesActiva"/>
-        <GridFormField xs={12} name="portafirmesFluxTipus" required/>
+        <GridFormField name="firmaPortafirmesActiva"/>
+        <GridFormField name="portafirmesFluxTipus" required/>
         {data?.portafirmesFluxTipus == "SIMPLE" && <>
-            <GridFormField xs={12} name="portafirmesResponsables" multiple autocomplete
+            <GridFormField name="portafirmesResponsables" multiple autocomplete
                            filter={filterResponsables} namedQueries={[`ADD_PLUGIN_USERS`]}/>
-            <GridFormField xs={12} name="portafirmesSequenciaTipus" required/>
+            <GridFormField name="portafirmesSequenciaTipus" required/>
         </>}
         {data?.portafirmesFluxTipus == "PORTAFIB" && <>
-            <GridFormField xs={11} name="fluxosFirma" multiple required/>
-            <GridButton xs={1}
+            <GridFormField size={11} name="fluxosFirma" multiple required/>
+            <GridButton size={1}
+                        icon={'add'}
                         onClick={() => handleOpen(undefined, { metaDocument: { id: data?.id } })}
-            >
-                <Icon>add</Icon>
-            </GridButton>
+            />
             <StyledMuiGrid
                 apiRef={apiRef}
                 resourceName={'metaDocumentFluxPortafibResource'}
@@ -159,11 +158,11 @@ export const MetaDocumentForm = () => {
             value: "dades",
             label: t('page.metaDocument.tabs.dades'),
             content: <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-                <GridFormField xs={12} name="codi"/>
-                <GridFormField xs={12} name="nom"/>
-                <GridFormField xs={12} name="descripcio" type={"textarea"}/>
-                <GridFormField xs={12} name="multiplicitat" required/>
-                <FileFormField xs={12} name="plantilla"/>
+                <GridFormField name="codi"/>
+                <GridFormField name="nom"/>
+                <GridFormField name="descripcio" type={"textarea"}/>
+                <GridFormField name="multiplicitat" required/>
+                <FileFormField name="plantilla"/>
             </Grid>,
             error: ["codi", "nom"].some(field =>
                 fieldErrors?.some?.(error => error.field === field)
@@ -173,9 +172,9 @@ export const MetaDocumentForm = () => {
             value: "nti",
             label: t('page.metaDocument.tabs.nti'),
             content: <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-                <GridFormField xs={12} name="ntiOrigen"/>
-                <GridFormField xs={12} name="ntiTipoDocumental" required/>
-                <GridFormField xs={12} name="ntiEstadoElaboracion"/>
+                <GridFormField name="ntiOrigen"/>
+                <GridFormField name="ntiTipoDocumental" required/>
+                <GridFormField name="ntiEstadoElaboracion"/>
             </Grid>,
             error: ["ntiOrigen", "ntiTipoDocumental"].some(field =>
                 fieldErrors?.some?.(error => error.field === field)
@@ -190,15 +189,15 @@ export const MetaDocumentForm = () => {
             value: "navegador",
             label: t('page.metaDocument.tabs.navegador'),
             content: <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-                <GridFormField xs={12} name="firmaPassarelaActiva"/>
+                <GridFormField name="firmaPassarelaActiva"/>
             </Grid>,
         },
         {
             value: "viaFirma",
             label: t('page.metaDocument.tabs.viaFirma'),
             content: <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-                <GridFormField xs={12} name="firmaBiometricaActiva"/>
-                <GridFormField xs={12} name="biometricaLectura"/>
+                <GridFormField name="firmaBiometricaActiva"/>
+                <GridFormField name="biometricaLectura"/>
             </Grid>,
         },
         {
@@ -206,10 +205,10 @@ export const MetaDocumentForm = () => {
             label: t('page.metaDocument.tabs.pinbal'),
             content: <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
                 <Alert severity={"warning"}>Recordau que per poder realizar consultes a un servei concret de PINBAL en producció, s'ha de demanar permis a l'usuari d'integració de RIPEA per aquest procediment</Alert>
-                <GridFormField xs={12} name="pinbalActiu"/>
-                <GridFormField xs={12} name="pinbalServei" required/>
-                <GridFormField xs={12} name="pinbalFinalitat" type={"textarea"} required/>
-                <GridFormField xs={12} name="pinbalUtilitzarCifOrgan"/>
+                <GridFormField name="pinbalActiu"/>
+                <GridFormField name="pinbalServei" required/>
+                <GridFormField name="pinbalFinalitat" type={"textarea"} required/>
+                <GridFormField name="pinbalUtilitzarCifOrgan"/>
             </Grid>,
         },
     ]
@@ -271,7 +270,7 @@ const MetaDocumentGrid = () => {
                 popupEditFormDialogResourceTitle={t('page.metaDocument.title')}
                 popupEditFormContent={<MetaDocumentForm/>}
                 columns={columns}
-                toolbarHideQuickFilter={false}
+                toolbarShowQuickFilter
                 filter={builder.eq("metaExpedient", null)}
                 sortModel={sortModel}
                 perspectives={perspectives}

@@ -6,6 +6,9 @@ target/
 .classpath
 .project
 
+CLAUDE.md
+settings.local.json
+
 # intellij files
 .idea
 *.iml
@@ -16,3 +19,15 @@ target/
 /ripea-back/src/main/webapp/reactapp/
 /ripea-back/src/main/jsapp/ripea-back/public/build-info.json
 /.env
+
+# Playwright (tests_e2e)
+/ripea-back/src/main/jsapp/ripea-back/tests_e2e/.auth/
+/ripea-back/src/main/jsapp/ripea-back/tests_e2e/auth/credentials.json
+/ripea-back/src/main/jsapp/ripea-back/tests_e2e/report/
+/ripea-back/src/main/jsapp/ripea-back/tests_e2e/test-results/
+/ripea-back/src/main/jsapp/ripea-back/test-results/
+
+manual_admins.xhtml
+manual_usuaris.xhtml
+odt_to_xhtml.py
+RENDERS/

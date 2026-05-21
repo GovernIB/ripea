@@ -1,6 +1,6 @@
-import {useEffect, useMemo, useRef, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import {Grid} from "@mui/material";
-import {FormField, MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
+import {FormField, useMuiFormDialogApiRef, useBaseAppContext, useFormContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 import GridFormField from "../../../components/GridFormField.tsx";
@@ -9,6 +9,8 @@ import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import useVisualitzar from "./Visualitzar.tsx";
 import useRegistreInteressatDetail from "../details/RegistreInteressatDetail.tsx";
+import {useUserSession} from "@src/components/Session.tsx";
+import {useIframeDialog} from "@src/components/Iframe.tsx";
 
 const AcceptarTabExpedient = () => {
 
@@ -20,42 +22,42 @@ const AcceptarTabExpedient = () => {
     );
     
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="accio" required/>
-        <GridFormField xs={12} name="metaExpedient" required
+        <GridFormField name="accio" required/>
+        <GridFormField name="metaExpedient" required
             filter={filterMetaExpedientAnotacioCrear}
             namedQueries={['EXPEDIENT_CREATE']}/>
 
         {data?.accio == "CREAR" &&
             <>
-                <GridFormField xs={12} name="newExpedientTitol" required/>
-                <GridFormField xs={12} name="prioritat" required/>
-                <GridFormField xs={12} name="prioritatMotiu" type={"textarea"} hidden={data?.prioritat == "B_NORMAL"} required/>
-                <GridFormField xs={12} name="organGestor"
+                <GridFormField name="newExpedientTitol" required/>
+                <GridFormField name="prioritat" required/>
+                <GridFormField name="prioritatMotiu" type={"textarea"} hidden={data?.prioritat == "B_NORMAL"} required/>
+                <GridFormField name="organGestor"
                             namedQueries={[`EXPEDIENT_FORM#${data?.metaExpedient?.id ?? 0}`]}
                             disabled={!data?.metaExpedient || data?.disableOrganGestor}
                             readOnly={!data?.metaExpedient || data?.disableOrganGestor}
                             required/>
-                <GridFormField xs={6} name="sequencia" required disabled readOnly/>
-                <GridFormField xs={6} name="any" required/>
-                <GridFormField xs={12} name="grup"
+                <GridFormField size={6} name="sequencia" required disabled readOnly/>
+                <GridFormField size={6} name="any" required/>
+                <GridFormField name="grup"
                                namedQueries={[`BY_PROCEDIMENT#${data?.metaExpedient?.id ?? 0}`]}
                                hidden={!data?.grup && !data?.gestioAmbGrupsActiva} required/>
-				<GridFormField xs={12} name="seguidor"/>
+				<GridFormField name="seguidor"/>
             </>
         }
         {data?.accio == "INCORPORAR" &&
             <>
-                <GridFormField xs={12} name="expedient"
+                <GridFormField name="expedient"
                         filter={builder.and(
                            builder.eq('metaExpedient.id', data?.metaExpedient?.id),
 						   builder.eq('esborrat', 0),
                        )}                
                 required/>
-                <GridFormField xs={12} name="agafarExpedient"/>
+                <GridFormField name="agafarExpedient"/>
             </>
         }
 
-        <GridFormField xs={12} name="associarInteressats"/>
+        <GridFormField name="associarInteressats"/>
     </Grid>
 }
 
@@ -102,6 +104,7 @@ const AcceptarTabAnnexos = () => {
     ]
 
     const {handleOpen, dialog, isValid} = useVisualitzar()
+    const {handleOpen: handleIframeOpen, dialog: dialogIframe} = useIframeDialog();
 
     const actions = [
         {
@@ -109,8 +112,15 @@ const AcceptarTabAnnexos = () => {
             icon: "search",
             showInMenu: false,
             onClick: handleOpen,
-            hidden: (row:any) => !isValid(row),
+            hidden: (row:any) => !isValid(row) || row?.justificant,
         },
+        {
+            label: t('page.document.action.view.label'),
+            icon: "search",
+            showInMenu: false,
+            onClick: (_id:any, row:any) => handleIframeOpen(`expedientPeticio/descarregarJustificant/${row?.registreId}`),
+            hidden: (row:any) => !(['pdf', 'odt', 'docx'].includes(row?.fitxerExtension) && row?.justificant),
+        }
     ]
 
     return <>
@@ -119,10 +129,22 @@ const AcceptarTabAnnexos = () => {
             filter={filter}
             columns={columnsAnnexos}
             rowAdditionalActions={actions}
-            onRowsChange={(rows) => {
+            rowsTransformer={(_rows: any) => {
+                if (!_rows || _rows.length == 0) return [];
+                const additionalRows: any[] = _rows;
+                if (data?.isIncorporacioJustificantActiva && data?.justificant && !additionalRows.map((b) => b.id).includes(0)) {
+                    additionalRows.push({
+                        ...data?.justificant,
+                        id: 0,
+                        justificant: true,
+                    })
+                }
+                return additionalRows;
+            }}
+            onRowsChange={(rows:any) => {
                 if (rows.length > 0 && rows.length != Object.keys(data?.annexos).length) {
                     const annexos = Object.fromEntries(
-                        rows.map((row) => [row.id, (data?.annexos[row.id] || '')])
+                        rows.map((row:any) => [row.id, (data?.annexos[row.id] || '')])
                     );
 
                     apiRef?.current?.setFieldValue('annexos', annexos)
@@ -133,12 +155,12 @@ const AcceptarTabAnnexos = () => {
                     handleOpen(params?.id)
                 }
             }}
-
-            autoHeight
-            paginationModel={{page: 0, pageSize: 5}}
+            toolbarHide
+            paginationActive={false}
             readOnly
         />
         {dialog}
+        {dialogIframe}
     </>
 }
 
@@ -260,16 +282,23 @@ const Acceptar = (props:any) => {
 }
 
 const useAcceptar = (refresh?: () => void) => {
+    const {value: user} = useUserSession();
     const { t } = useTranslation();
-    const apiRef = useRef<MuiFormDialogApi>();
+    const apiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow} = useBaseAppContext();
 
     const handleShow = (id:any, row:any) :void => {
+        const isIncorporacioJustificantActiva = user?.sessionScope?.isIncorporacioJustificantActiva
         apiRef.current?.show?.(id, {
             metaExpedient: row?.metaExpedient,
             registre: row?.registre,
             interessats: row?.registreInfo?.interessats?.map((i:any)=>i.id) || [],
             grup: row?.grup,
+            isIncorporacioJustificantActiva: isIncorporacioJustificantActiva,
+            justificant: isIncorporacioJustificantActiva ? {
+                registreId: row?.registreInfo?.id,
+                ...row?.registreInfo?.justificant
+            } :{}
         })
     }
     const onSuccess = () :void => {

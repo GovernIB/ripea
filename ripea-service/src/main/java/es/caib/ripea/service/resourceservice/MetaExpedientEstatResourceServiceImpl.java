@@ -13,13 +13,17 @@ import com.turkraft.springfilter.parser.Filter;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientEstatResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientEstatResourceRepository;
+import es.caib.ripea.persistence.repository.ExpedientEstatRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.ConfigHelper;
+import es.caib.ripea.service.helper.ContingutLogHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.ExpedientEstatHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
+import es.caib.ripea.service.intf.dto.LogObjecteTipusEnumDto;
+import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
 import es.caib.ripea.service.intf.model.EntitatResource;
 import es.caib.ripea.service.intf.model.MetaExpedientEstatResource;
 import es.caib.ripea.service.intf.model.MetaNodeResource;
@@ -35,7 +39,9 @@ public class MetaExpedientEstatResourceServiceImpl extends BaseMutableResourceSe
 	private final ConfigHelper configHelper;
 	private final ExpedientEstatHelper expedientEstatHelper;
 	private final EntityComprovarHelper entityComprovarHelper;
+	private final ContingutLogHelper contingutLogHelper;
 	private final MetaExpedientEstatResourceRepository metaExpedientEstatResourceRepository;
+	private final ExpedientEstatRepository metaExpedientEstatRepository;
 	
     @PostConstruct
     public void init() {
@@ -57,10 +63,16 @@ public class MetaExpedientEstatResourceServiceImpl extends BaseMutableResourceSe
 
     protected void afterCreateSave(MetaExpedientEstatResourceEntity entity, MetaExpedientEstatResource resource, Map<String, AnswerRequiredException.AnswerValue> answers, boolean anyOrderChanged) {
     	updateInicialNomesUnActiu(entity);
+    	logProcedimentEstatAccio(entity, LogTipusEnumDto.CREACIO);
     }
     
     protected void afterUpdateSave(MetaExpedientEstatResourceEntity entity, MetaExpedientEstatResource resource, Map<String, AnswerRequiredException.AnswerValue> answers, boolean anyOrderChanged) {
     	updateInicialNomesUnActiu(entity);
+    	logProcedimentEstatAccio(entity, LogTipusEnumDto.MODIFICACIO);
+    }
+    
+    protected void afterDelete(MetaExpedientEstatResourceEntity entity, Map<String, AnswerRequiredException.AnswerValue> answers) {
+    	logProcedimentEstatAccio(entity, LogTipusEnumDto.ELIMINACIO);
     }
     
     private void updateInicialNomesUnActiu(MetaExpedientEstatResourceEntity entity) {
@@ -70,6 +82,17 @@ public class MetaExpedientEstatResourceServiceImpl extends BaseMutableResourceSe
     				entity.getMetaExpedient().getId(),
     				entity.getId());
     	}
+    }
+    
+    private void logProcedimentEstatAccio(MetaExpedientEstatResourceEntity entity, LogTipusEnumDto accio) {
+    	contingutLogHelper.logProcedimentObjecte(
+    			entity.getMetaExpedient().getId(),
+    			LogTipusEnumDto.MODIFICACIO,
+    			(LogTipusEnumDto.ELIMINACIO.equals(accio))?null:metaExpedientEstatRepository.findById(entity.getId()).get(),
+    			LogObjecteTipusEnumDto.METAESTAT,
+    			accio,
+    			entity.getCodi(),
+    			entity.getNom());
     }
 
     private class ReordenarActionExecutor implements ActionExecutor<MetaExpedientEstatResourceEntity, Integer, Serializable> {

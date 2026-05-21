@@ -53,6 +53,7 @@ import es.caib.ripea.persistence.repository.NodeRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.persistence.repository.command.GrupRepositoryCommnand;
 import es.caib.ripea.service.helper.PermisosHelper.ObjectIdentifierExtractor;
+import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
@@ -524,11 +525,11 @@ public class EntityComprovarHelper {
 
 		MetaExpedientEntity metaExpedient = comprovarMetaExpedient(entitat, id);
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		boolean esAdministradorEntitat = permisosHelper.isGrantedAll(entitat.getId(),
+		boolean esAdministradorEntitatOrLectura = permisosHelper.isGrantedAny(entitat.getId(),
 				EntitatEntity.class,
-				new Permission[] { ExtendedPermission.ADMINISTRATION },
+				new Permission[] { ExtendedPermission.ADMINISTRATION, ExtendedPermission.ADMINISTRATION_READ },
 				auth);
-		if (esAdministradorEntitat) {
+		if (esAdministradorEntitatOrLectura) {
 			return metaExpedient;
 		}
 		if (metaExpedient.getOrganGestor() == null) {
@@ -719,7 +720,7 @@ public class EntityComprovarHelper {
 	
 	public boolean comprovarAdminEntitatOAdminOrganDelExpedient(ExpedientEntity expedient) {
 		
-		if (!rolHelper.doesCurrentUserHasRol("IPA_ADMIN") && !rolHelper.doesCurrentUserHasRol("IPA_ORGAN_ADMIN")) {
+		if (!RolHelper.doesCurrentUserHasRol(BaseConfig.ROLE_ADMIN) && !RolHelper.doesCurrentUserHasRol(BaseConfig.ROLE_ORGAN_ADMIN)) {
 			return false;
 		}
 		

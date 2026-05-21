@@ -1,6 +1,5 @@
 import React from 'react';
 import Icon from '@mui/material/Icon';
-import Tooltip from '@mui/material/Tooltip';
 import { GridActionsCellItem } from '@mui/x-data-grid-pro';
 import { useBaseAppContext } from '../../BaseAppContext';
 

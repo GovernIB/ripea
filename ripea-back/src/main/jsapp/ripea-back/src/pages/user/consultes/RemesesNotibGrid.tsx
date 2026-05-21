@@ -15,17 +15,17 @@ import {useActions} from "../../remesa/details/RemesaActions.tsx";
 // Filter
 const RemesesNotibFilterForm = () => {
     return <>
-        <GridFormField xs={3} name="tipusEnviament"/>
-        <GridFormField xs={3} name="concepte"/>
-        <GridFormField xs={3} name="estat"/>
-        <GridFormField xs={3} name="interessat"/>
-        <GridFormField xs={3} name="expedient"/>
-        <GridFormField xs={3} name="nom"/>
-        <GridFormField xs={3} name="emisor"/>
-        <GridFormField xs={3} name="procediment"/>
-        <GridFormField xs={3} name="dataEnviamentInici" type={"date"}/>
-        <GridFormField xs={3} name="dataEnviamentFi" type={"date"}/>
-        <GridButtonField xs={0.6} name={"nomesAmbError"} icon={"warning"}/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="tipusEnviament"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="concepte"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="estat"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="interessat"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="expedient"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="nom"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="emisor"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="procediment"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="dataEnviamentInici" type={"date"}/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="dataEnviamentFi" type={"date"}/>
+        <GridButtonField size={{xs: 12, sm: 2, md: 1}} name={"nomesAmbError"} icon={"warning"}/>
     </>
 }
 
@@ -152,6 +152,7 @@ const RemesesNotibGrid = () => {
             icon: "autorenew",
             showInMenu: false,
             onClick: actualitzarEstat,
+            hidden: (row: any) => row?.notificacioEstat === 'PROCESSADA',
         },
     ]
     const massiveActions = [

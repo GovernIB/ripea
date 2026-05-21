@@ -61,32 +61,7 @@
 		style="width:100%">
 		<thead>
 			<tr>
-				<th data-col-name="codi" data-orderable="false" data-template="#cellTascaCodiTemplate" width="30%">
-					<spring:message code="monitor.tasques.tasca"/>
-					<script id="cellTascaCodiTemplate" type="text/x-jsrender">
-					{{if codi == 'actualitzacioDeProcediments'}}
-						<spring:message code="monitor.tasques.tasca.codi.actualitzacioDeProcediments"/>
-					{{else codi == 'enviarEmailsInformantDeNouComentariPerProcediment'}}
-						<spring:message code="monitor.tasques.tasca.codi.enviarEmailsInformantDeNouComentariPerProcediment"/>
-					{{else codi == 'tancarExpedientsEnArxiu'}}
-						<spring:message code="monitor.tasques.tasca.codi.tancarExpedientsEnArxiu"/>
-					{{else codi == 'consultaDeCanvisAlOrganigrama'}}
-						<spring:message code="monitor.tasques.tasca.codi.consultaDeCanvisAlOrganigrama"/>
-					{{else codi == 'consultarIGuardarAnotacionsPendents'}}
-						<spring:message code="monitor.tasques.tasca.codi.consultarIGuardarAnotacionsPendents"/>
-					{{else codi == 'enviarEmailsAgrupats'}}
-						<spring:message code="monitor.tasques.tasca.codi.enviarEmailsAgrupats"/>
-					{{else codi == 'enviarDocumentsAlPortafirmes'}}
-						<spring:message code="monitor.tasques.tasca.codi.enviarDocumentsAlPortafirmes"/>
-					{{else codi == 'canviarEstatEnDistribucio'}}
-						<spring:message code="monitor.tasques.tasca.codi.canviarEstatEnDistribucio"/>
-					{{else codi == 'guardarEnArxiuContingutsPendents'}}
-						<spring:message code="monitor.tasques.tasca.codi.guardarEnArxiuContingutsPendents"/>
-					{{else codi == 'guardarEnArxiuInteressats'}}
-						<spring:message code="monitor.tasques.tasca.codi.guardarEnArxiuInteressats"/>
-					{{/if}}
-					</script>
-				</th>
+				<th data-col-name="descripcio" data-orderable="false" width="30%"><spring:message code="monitor.tasques.tasca"/></th>
 				<th data-col-name="estat" data-orderable="false" data-template="#cellTascaEstatTemplate" width="15%">
 					<spring:message code="monitor.tasques.estat"/>
 					<script id="cellTascaEstatTemplate" type="text/x-jsrender">

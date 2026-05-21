@@ -8,10 +8,10 @@ import GridFormField from "../../../components/GridFormField.tsx";
 const UrlInstruccioGridForm = () => {
     const {t} = useTranslation()
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="codi"/>
-        <GridFormField xs={12} name="nom"/>
-        <GridFormField xs={12} name="descripcio"/>
-        <GridFormField xs={12} name="url" type={"textarea"}
+        <GridFormField name="codi"/>
+        <GridFormField name="nom"/>
+        <GridFormField name="descripcio"/>
+        <GridFormField name="url" type={"textarea"}
                        componentProps={{
                            InputLabelProps: { shrink: true },
                            placeholder: t('page.urlInstruccio.detall.url')

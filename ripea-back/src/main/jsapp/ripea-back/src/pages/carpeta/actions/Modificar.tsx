@@ -1,6 +1,5 @@
-import {useRef} from "react";
-import {Grid} from "@mui/material";
-import {MuiFormDialog, MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
+import {Box, Grid} from "@mui/material";
+import {MuiFormDialog, useMuiFormDialogApiRef, useBaseAppContext, useFormContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import GridFormField from "../../../components/GridFormField.tsx";
 import UsuarisRestriccioForm from "./restriccio/UsuarisRestriccioForm.tsx";
@@ -20,14 +19,11 @@ const ModificarForm = () => {
                 }
 			</Grid>
 
-			{data?.restringida && (
-				<>
-					<Grid sx={{ mt: 2, mb: 1}}>
-						<GridFormField xs={12} name="motiuRestriccio" />
-					</Grid>
-					<UsuarisRestriccioForm />
-				</>
-			)}
+            {data?.restringida && (
+                <Box p={1}>
+                    <UsuarisRestriccioForm />
+                </Box>
+            )}
 		</>
 	);
 };
@@ -50,7 +46,7 @@ const Modificar = (props:any) => {
 
 const useModificar = (entity:any, refresh?: () => void) => {
     const { t } = useTranslation();
-    const apiRef = useRef<MuiFormDialogApi>();
+    const apiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow} = useBaseAppContext();
 
     const handleShow = (id:any, row:any) :void => {

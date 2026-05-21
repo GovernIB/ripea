@@ -10,6 +10,7 @@ import org.springframework.data.annotation.Transient;
 
 import es.caib.ripea.service.intf.base.annotation.ResourceArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
+import es.caib.ripea.service.intf.base.annotation.ResourceField;
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
@@ -67,6 +68,7 @@ public class OrganGestorResource extends BaseAuditableResource<Long> {
 	@Size(max = 10)
 	private String cif;
 	private boolean utilitzarCifPinbal;
+	@ResourceField(onChangeActive = true)
 	private boolean permetreEnviamentPostal;
 	private boolean permetreEnviamentPostalDescendents;
 	private OrganEstatEnumDto estat;

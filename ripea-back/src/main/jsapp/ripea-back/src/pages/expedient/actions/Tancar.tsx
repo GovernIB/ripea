@@ -1,14 +1,19 @@
-import {useEffect, useMemo, useRef, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import {Grid, Alert, Box} from "@mui/material";
-import {MuiFormDialogApi, useBaseAppContext, useFormContext, useResourceApiService} from "reactlib";
+import {
+    useMuiFormDialogApiRef,
+    useBaseAppContext,
+    useFormContext,
+    useResourceApiService,
+} from "reactlib";
 import {useTranslation} from "react-i18next";
-import FormActionDialog from "../../../components/FormActionDialog.tsx";
-import GridFormField from "../../../components/GridFormField.tsx";
-import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
-import Load from "../../../components/Load.tsx";
-import {formatDate} from "../../../util/dateUtils.ts";
-import * as builder from "../../../util/springFilterUtils.ts";
-import ContingutIcon from "../../contingut/details/ContingutIcon.tsx";
+import FormActionDialog from "@src/components/FormActionDialog.tsx";
+import GridFormField from "@src/components/GridFormField.tsx";
+import StyledMuiGrid from "@src/components/StyledMuiGrid.tsx";
+import Load from "@src/components/Load.tsx";
+import {formatDate} from "@src/util/dateUtils.ts";
+import * as builder from "@src/util/springFilterUtils.ts";
+import ContingutIcon from "@src/pages/contingut/details/ContingutIcon.tsx";
 
 const columns: any[] = [
     // {
@@ -68,10 +73,6 @@ const TancarForm = () => {
         }
     }, [apiIsReady]);
 
-    useEffect(() => {
-        formApiRef?.current?.setFieldValue('documentsPerFirmar', selectedRows);
-    }, [selectedRows]);
-
     const temp = useMemo(()=>{
         return {
             documentObligatorisAlTancar: entities?.flatMap?.((e:any) => e?.documentObligatorisAlTancar),
@@ -80,18 +81,21 @@ const TancarForm = () => {
         }
     },[entities])
 
-    const selectedModel: any[] = useMemo(() => {
-        const defaultSelection = temp?.documentObligatorisAlTancar?.map?.((row: any) => row?.id) ?? []
-        formApiRef?.current?.setFieldValue('documentsPerFirmar', defaultSelection);
-        return defaultSelection;
-    }, [temp?.documentObligatorisAlTancar])
+    const selectedModel: any[] = useMemo(() =>
+        temp?.documentObligatorisAlTancar?.map?.((row: any) => row?.id) ?? []
+    , [temp?.documentObligatorisAlTancar])
+
+    useEffect(() => {
+        const selected = Array.from(new Set([...selectedRows, ...selectedModel || []]))
+        formApiRef?.current?.setFieldValue('documentsPerFirmar', selected.filter((s) => !data.ids.includes(s)) );
+    }, [selectedRows, selectedModel]);
 
     return <Load value={entities && temp}>
         <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-            <Grid item xs={12} hidden={!rowsCount}>
+            <Grid size={12} hidden={!rowsCount}>
                 <Alert severity={"info"}>{t('page.expedient.alert.borradors')}</Alert>
             </Grid>
-            <Grid item xs={12}>
+            <Grid size={12}>
                 <Load value={selectedModel} noEffect>
                     <StyledMuiGrid
                         resourceName={"documentResource"}
@@ -99,12 +103,11 @@ const TancarForm = () => {
                         filter={filter}
                         selectionActive
                         rowSelectionModel={selectedModel}
-                        isRowSelectable={(params) => !selectedModel.includes(params.row?.id) && params.row?.tipus=="DOCUMENT"}
+                        // isRowSelectable={(params) => !selectedModel.includes(params.row?.id) && params.row?.tipus=="DOCUMENT"}
                         onRowCountChange={setRowsCount}
                         onRowSelectionModelChange={(newSelection) => {
                             setSelectedRows([...newSelection]);
                         }}
-                        autoHeight
                         paginationActive={false}
                         toolbarHide
                         readOnly
@@ -121,9 +124,10 @@ const TancarForm = () => {
                             },
                         }}
                         treeData
-                        treeDataAdditionalRows={(_rows: any) => {
-                            const additionalRows: any[] = [];
-                            if (_rows!=null && entities!=null){
+                        rowsTransformer={(_rows: any) => {
+                            if (!_rows) return [];
+                            const additionalRows: any[] = _rows;
+                            if (entities!=null && data?.massivo){
                                 for (const entity of entities) {
                                     if (!additionalRows.map((b) => b.id).includes(entity?.id)) {
                                         additionalRows.push(entity)
@@ -133,23 +137,21 @@ const TancarForm = () => {
                             return additionalRows;
                         }}
                         getTreeDataPath={(row: any): string[] => {
-                            return row?.expedient ?[`${row?.expedient?.id}`, `${row.id}`] :[`${row.id}`]
+                            return (data?.massivo && row?.expedient) ?[`${row?.expedient?.id}`, `${row.id}`] :[`${row.id}`]
                         }}
-                        isGroupExpandedByDefault={() => {
-                            return true;
-                        }}
+                        isGroupExpandedByDefault={() => true}
                     />
                 </Load>
             </Grid>
 
-            <Grid item xs={12} hidden={!temp?.conteNotificacionsCaducades}>
+            <Grid size={12} hidden={!temp?.conteNotificacionsCaducades}>
                 <Alert severity={"warning"}>{t('page.expedient.alert.notificacio')}</Alert>
             </Grid>
-            <Grid item xs={12} hidden={!temp?.conteDocumentsDeAnotacionesNoMogutsASerieFinal}>
+            <Grid size={12} hidden={!temp?.conteDocumentsDeAnotacionesNoMogutsASerieFinal}>
                 <Alert severity={"warning"}>{t('page.expedient.alert.documents')}</Alert>
             </Grid>
 
-            <GridFormField xs={12} name="motiu" type={"textarea"} required/>
+            <GridFormField name="motiu" type={"textarea"} required/>
         </Grid>
     </Load>
 }
@@ -160,7 +162,11 @@ const Tancar = (props: any) => {
     return <FormActionDialog
         resourceName={"expedientResource"}
         action={"TANCAR"}
-        title={t('page.expedient.action.close.title')}
+        title={(data) => {
+            return (data?.massivo)
+                ? t('page.expedient.action.close.titleMassive', {num: data?.ids?.length})
+                : t('page.expedient.action.close.title')
+        }}
         formDialogButtons={[
             {icon: 'check', text: t('page.expedient.action.close.button'), componentProps: { variant: 'contained' }, value: true },
             {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
@@ -172,7 +178,7 @@ const Tancar = (props: any) => {
 }
 export const useTancar = (refresh?: () => void) => {
     const { t } = useTranslation();
-    const apiRef = useRef<MuiFormDialogApi>();
+    const apiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow} = useBaseAppContext();
 
     const handleShow = (id: any): void => {
@@ -193,7 +199,7 @@ export const useTancar = (refresh?: () => void) => {
 }
 export const useTancarMassive = (refresh?: () => void) => {
     const { t } = useTranslation();
-    const apiRef = useRef<MuiFormDialogApi>();
+    const apiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow} = useBaseAppContext();
 
     const handleShow = (ids: any[]): void => {

@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Alert, Grid } from "@mui/material";
-import { MuiFormDialogApi, useBaseAppContext, useFormContext } from "reactlib";
+import { useMuiFormDialogApiRef, useBaseAppContext, useFormContext } from "reactlib";
 import { useTranslation } from "react-i18next";
 import GridFormField from "../../../components/GridFormField.tsx";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
@@ -11,6 +11,7 @@ import ImportarSgdResults from "./ImportarSgdResults.tsx";
 import BackdropLoading from "../../../components/BackdropLoading.tsx";
 
 export const usePollingImportSgd = () => {
+    const { t } = useTranslation();
 	const [progress, setProgress] = useState(0);
 	const [progressMessage, setProgressMessage] = useState('');
 	const [finished, setFinished] = useState(true);
@@ -22,7 +23,7 @@ export const usePollingImportSgd = () => {
 			setProgress(data?.progres ?? 0);
 			setFinished(data?.finished ?? false);
 			const lastInfo = data?.info?.[data.info.length - 1];
-			setProgressMessage(lastInfo?.text ?? "Processant...");
+			setProgressMessage(lastInfo?.text ?? t('common.processing'));
 		}
 	});
 
@@ -42,14 +43,14 @@ const ImportarForm = () => {
 	return (
 		<>
 			<Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-				<GridFormField xs={12} name="tipusImportacio" required />
-				<GridFormField xs={12} name="codiEni" hidden={data?.tipusImportacio != "CODI_ENI"} required />
-				<GridFormField xs={6} name="numeroRegistre" hidden={data?.tipusImportacio != "NUMERO_REGISTRE"} required />
-				<GridFormField xs={6} name="dataPresentacio" type={"datetime-local"} hidden={data?.tipusImportacio != "NUMERO_REGISTRE"} required />
-				<GridFormField xs={12} name="importarInteressats" disabled={!data?.numeroRegistre} /> 
+				<GridFormField name="tipusImportacio" required />
+				<GridFormField name="codiEni" hidden={data?.tipusImportacio != "CODI_ENI"} required />
+				<GridFormField size={6} name="numeroRegistre" hidden={data?.tipusImportacio != "NUMERO_REGISTRE"} required />
+				<GridFormField size={6} name="dataPresentacio" type={"datetime-local"} hidden={data?.tipusImportacio != "NUMERO_REGISTRE"} required />
+				<GridFormField name="importarInteressats" disabled={!data?.numeroRegistre} />
 
 				{data?.importarInteressats && (
-					<Grid item xs={12}>
+					<Grid size={12}>
 						<InteressatsRegistre
 							expedientId={apiRef.current?.getId()}
 							numeroRegistre={data?.numeroRegistre}
@@ -57,12 +58,12 @@ const ImportarForm = () => {
 					</Grid>
 				)}
 
-				<GridFormField xs={12} name="carpeta"
+				<GridFormField name="carpeta"
 					filter={filterCarpeta}
 					disabled={data?.novaCarpetaNom} />
-				<GridFormField xs={12} name="novaCarpetaNom" disabled={data?.carpeta} />
+				<GridFormField name="novaCarpetaNom" disabled={data?.carpeta} />
 
-				<Grid item xs={12} hidden={data?.carpeta || data?.novaCarpetaNom}>
+				<Grid size={12} hidden={data?.carpeta || data?.novaCarpetaNom}>
 					<Alert severity={"info"}>{t('page.document.alert.folder')}</Alert>
 				</Grid>
 			</Grid>
@@ -124,8 +125,8 @@ const Importar = ({ ...props }: any) => {
 	);
 };
 
-const useImportar = (entity: any, refresh?: () => void) => {
-	const apiRef = useRef<MuiFormDialogApi>();
+const useImportar = (entity: any, refresh?: () => void, contingutPareId?: string | number | null, contingutPareNom?: string | null) => {
+	const apiRef = useMuiFormDialogApiRef();
 	const { temporalMessageShow } = useBaseAppContext();
 	const { t } = useTranslation();
 
@@ -136,7 +137,19 @@ const useImportar = (entity: any, refresh?: () => void) => {
 	const handleShow = () => {
 		polling.setFinished(true);
 		setIsProcessed(false);
-		apiRef.current?.show?.(entity?.id);
+		if (contingutPareId != null && contingutPareId !== '') {
+			apiRef.current?.show?.(entity?.id, {
+				carpeta: {
+					id: contingutPareId,
+					description:
+						contingutPareNom != null && contingutPareNom !== ''
+							? contingutPareNom
+							: String(contingutPareId),
+				},
+			});
+		} else {
+			apiRef.current?.show?.(entity?.id);
+		}
 	};
 
 	const processResult = async (resultat: any) => {

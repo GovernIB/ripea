@@ -21,6 +21,7 @@ import es.caib.ripea.persistence.base.entity.ResourceEntity;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.dto.ContingutVistaEnumDto;
 import es.caib.ripea.service.intf.dto.IdiomaEnumDto;
+import es.caib.ripea.service.intf.dto.InterficieUsuariEnumDto;
 import es.caib.ripea.service.intf.dto.MoureDestiVistaEnumDto;
 import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.model.UsuariResource;
@@ -97,6 +98,10 @@ public class UsuariResourceEntity implements ResourceEntity<UsuariResource, Stri
 	@Column(name="vista_moure_actual", length = 16)
 	@Enumerated(EnumType.STRING)
 	private MoureDestiVistaEnumDto vistaMoureActual = MoureDestiVistaEnumDto.LLISTA;
+	
+	@Column(name="interficie_usuari", length = 5)
+	@Enumerated(EnumType.STRING)
+	private InterficieUsuariEnumDto interficieUsuari = InterficieUsuariEnumDto.REACT;
 
     @Column(name = "codi", insertable = false, updatable = false)
     private String id;

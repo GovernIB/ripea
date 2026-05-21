@@ -70,13 +70,16 @@ public class ExpedientEntity extends NodeEntity {
 	protected String registresImportats;
 	@ManyToOne(optional = true, fetch = FetchType.EAGER)
 	@JoinColumn(name = "agafat_per_codi")
+	
 	@ForeignKey(name = BaseConfig.DB_PREFIX + "agafatper_expedient_fk")
 	protected UsuariEntity agafatPer;
+	
 	@OneToMany(
 			mappedBy = "expedient",
 			fetch = FetchType.LAZY,
 			orphanRemoval = true)
 	protected Set<InteressatEntity> interessats = new HashSet<InteressatEntity>();
+	
 	@ManyToMany(
 			cascade = {
 					CascadeType.DETACH,
@@ -90,28 +93,12 @@ public class ExpedientEntity extends NodeEntity {
 			joinColumns = {
 					@JoinColumn(name = "expedient_id", referencedColumnName = "id")},
 			inverseJoinColumns = {
-					@JoinColumn(name = "expedient_rel_id", referencedColumnName = "id")})
-	@ForeignKey(
-			name = BaseConfig.DB_PREFIX + "exprel_exprel_fk",
-			inverseName = BaseConfig.DB_PREFIX + "expedient_exprel_fk")
+					@JoinColumn(name = "expedient_rel_id", referencedColumnName = "id")},
+			foreignKey = @javax.persistence.ForeignKey(name = BaseConfig.DB_PREFIX + "exp_rel_expedient_fk"),
+			inverseForeignKey = @javax.persistence.ForeignKey(name = BaseConfig.DB_PREFIX + "exp_rel_exprel_fk"))
 	protected List<ExpedientEntity> relacionatsAmb = new ArrayList<ExpedientEntity>();
-	@ManyToMany(
-			cascade = {
-					CascadeType.DETACH,
-					CascadeType.MERGE,
-					CascadeType.REFRESH,
-					CascadeType.PERSIST
-			},
-			fetch = FetchType.LAZY)
-	@JoinTable(
-			name = BaseConfig.DB_PREFIX + "expedient_rel",
-			joinColumns = {
-					@JoinColumn(name = "expedient_rel_id", referencedColumnName="id")},
-			inverseJoinColumns = {
-					@JoinColumn(name = "expedient_id", referencedColumnName="id")})
-	@ForeignKey(
-			name = BaseConfig.DB_PREFIX + "expedient_rel_rel_fk",
-			inverseName = BaseConfig.DB_PREFIX + "expedient_rel_exp_fk")
+	
+	@ManyToMany(mappedBy = "relacionatsAmb", fetch = FetchType.LAZY)
 	protected List<ExpedientEntity> relacionatsPer = new ArrayList<ExpedientEntity>();
 	
 	@OneToMany(mappedBy = "expedient")
@@ -140,10 +127,9 @@ public class ExpedientEntity extends NodeEntity {
 			joinColumns = {
 					@JoinColumn(name = "expedient_id", referencedColumnName = "id")},
 			inverseJoinColumns = {
-					@JoinColumn(name = "seguidor_codi", referencedColumnName = "codi")})
-	@ForeignKey(
-			name = BaseConfig.DB_PREFIX + "expedient_expseguidor_fk",
-			inverseName = BaseConfig.DB_PREFIX + "persona_expseguidor_fk")
+					@JoinColumn(name = "seguidor_codi", referencedColumnName = "codi")},
+			foreignKey = @javax.persistence.ForeignKey(name = BaseConfig.DB_PREFIX + "exp_seg_expedient_fk"),
+			inverseForeignKey = @javax.persistence.ForeignKey(name = BaseConfig.DB_PREFIX + "exp_seg_usuari_fk"))
 	protected List<UsuariEntity> seguidors = new ArrayList<UsuariEntity>();
 	
 	@ManyToOne(optional = true, fetch = FetchType.LAZY)

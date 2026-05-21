@@ -11,13 +11,13 @@ const DadaForm = () => {
     const { data }  = useFormContext();
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} label={t('page.dada.grid.valor')} name={data.tipusValor?.toLowerCase()} hidden={data.tipusValor != 'DATA'} type={"date"} required/>
-        <GridFormField xs={12} label={t('page.dada.grid.valor')} name={'importe'} hidden={data.tipusValor != 'IMPORT'} required/>
-        <GridFormField xs={12} label={t('page.dada.grid.valor')} name={data.tipusValor?.toLowerCase()} hidden={data.tipusValor != 'TEXT'} required/>
-        <GridFormField xs={12} label={t('page.dada.grid.valor')} name={data.tipusValor?.toLowerCase()} hidden={data.tipusValor != 'SENCER'} decimalScale={0} required/>
-        <GridFormField xs={12} label={t('page.dada.grid.valor')} name={data.tipusValor?.toLowerCase()} hidden={data.tipusValor != 'FLOTANT'} required/>
-        <GridFormField xs={12} label={t('page.dada.grid.valor')} name={data.tipusValor?.toLowerCase()} hidden={data.tipusValor != 'BOOLEA'} required/>
-        <GridFormField xs={12} label={t('page.dada.grid.valor')} name={data.tipusValor?.toLowerCase()} hidden={data.tipusValor != 'DOMINI'} required
+        <GridFormField label={t('page.dada.grid.valor')} name={data.tipusValor?.toLowerCase()} hidden={data.tipusValor != 'DATA'} type={"date"} required/>
+        <GridFormField label={t('page.dada.grid.valor')} name={'importe'} hidden={data.tipusValor != 'IMPORT'} required/>
+        <GridFormField label={t('page.dada.grid.valor')} name={data.tipusValor?.toLowerCase()} hidden={data.tipusValor != 'TEXT'} required/>
+        <GridFormField label={t('page.dada.grid.valor')} name={data.tipusValor?.toLowerCase()} hidden={data.tipusValor != 'SENCER'} decimalScale={0} required/>
+        <GridFormField label={t('page.dada.grid.valor')} name={data.tipusValor?.toLowerCase()} hidden={data.tipusValor != 'FLOTANT'} required/>
+        <GridFormField label={t('page.dada.grid.valor')} name={data.tipusValor?.toLowerCase()} hidden={data.tipusValor != 'BOOLEA'} required/>
+        <GridFormField label={t('page.dada.grid.valor')} name={data.tipusValor?.toLowerCase()} hidden={data.tipusValor != 'DOMINI'} required
                        requestParams={{metaDada: data?.metaDada?.codi}}/>
     </Grid>
 }
@@ -59,10 +59,6 @@ const DataGrid = (props:any) => {
         },
     ]
 
-    const mensajeToolbar = (numDades > 0 && !(entity?.multiplicitat == 'M_0_N' || entity?.multiplicitat == 'M_1_N'))
-        ? <span style={{ color: '#337ab7', fontWeight: 300 }}>{t('page.dada.mensajeToolbar.maxDades')}</span>
-        : <></>;
-
     return <StyledMuiGrid
         resourceName={"dadaResource"}
         popupEditFormDialogResourceTitle={t('page.dada.title', {metaDada: entity?.nom})}
@@ -83,7 +79,7 @@ const DataGrid = (props:any) => {
             tipusValor: entity?.tipus,
         }}
         rowAdditionalActions={actions}
-        paginationNoRowsText={t('page.dada.noRowsText')}
+        noRowsText={t('page.dada.noRowsText')}
         popupEditFormDialogComponentProps={{ fullWidth: true, maxWidth: 'xs' }}
         onRowCountChange={(count:number)=>{
             setNumDades?.(count)
@@ -94,11 +90,12 @@ const DataGrid = (props:any) => {
         toolbarElementsWithPositions={[
             {
                 position: 0,
-                element: mensajeToolbar
+                element: <span style={{ color: '#337ab7', fontWeight: 300 }}>{t('page.dada.mensajeToolbar.maxDades')}</span>,
+                hidden: !(numDades > 0 && !(entity?.multiplicitat == 'M_0_N' || entity?.multiplicitat == 'M_1_N')),
             }
-        ]}
+        ] as any[]}
         toolbarHideRefresh
-        toolbarHideCreate={ !contingut?.potModificar || numDades > 0 && !(entity?.multiplicitat == 'M_0_N' || entity?.multiplicitat == 'M_1_N') }
+        toolbarHideCreate={(!contingut?.potModificar || numDades > 0 && !(entity?.multiplicitat == 'M_0_N' || entity?.multiplicitat == 'M_1_N')) ?true :undefined}
         toolbarCreateTitle={t('page.dada.action.new.label')}
         popupEditFormI18nKeys={{
             createSuccess: 'page.dada.action.new.ok',

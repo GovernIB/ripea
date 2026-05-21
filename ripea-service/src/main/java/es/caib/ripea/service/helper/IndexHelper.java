@@ -493,8 +493,8 @@ public class IndexHelper {
 				List<ExpedientEntity> relacionatsPer = new ArrayList<ExpedientEntity>();
 				List<ExpedientEntity> relacionatsAmb = new ArrayList<ExpedientEntity>();
 				if (indexExpedientsRelacionats()) {
-					relacionatsPer = HibernateHelper.deproxy(expedient.getRelacionatsPer());
-					relacionatsAmb = HibernateHelper.deproxy(expedient.getRelacionatsAmb());
+					relacionatsPer = expedientRepository.findRelacionatsPer(expedient.getId());
+					relacionatsAmb = expedientRepository.findRelacionatsAmb(expedient.getId());
 				}
 	        	
 	        	boolean hasRelacions = !relacionatsPer.isEmpty() || !relacionatsAmb.isEmpty();

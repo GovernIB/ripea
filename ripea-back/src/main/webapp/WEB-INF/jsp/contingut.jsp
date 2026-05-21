@@ -574,10 +574,11 @@ function removeCookie(cname) {
 	</script>
 </c:if>
 
-
 </head>
 <body>
+
 	<div class="rmodal"></div>
+	
 	<input id="contingutId" type="hidden" value="${contingut.id}">
 
 	<!---------------------------------------- AGAFAR / ALLIBERAR  ------------------------------------------>
@@ -594,7 +595,8 @@ function removeCookie(cname) {
 	  		</ul>
 		</div>
 	</c:if>
-	<c:if test="${!isTasca && not expedientAgafatPerUsuariActual and !isRolActualAdministradorLectura}">
+	
+	<c:if test="${!isTasca && not expedientAgafatPerUsuariActual and !isRolActualAdministradorLectura and contingut.expedient}">
 		<div id="alerta-no-agafat" class="alert well-sm alert-info alert-dismissable" style="min-height: 40px;">
 			<c:if test="${!contingut.admin}">
 				<span class="fa fa-info-circle"></span> 
@@ -603,7 +605,6 @@ function removeCookie(cname) {
 			<a href="<c:url value="../expedient/${expedient.id}/agafar?contingutId=${contingut.id}"/>" class="btn btn-xs btn-default pull-right"><span class="fa fa-lock"></span>&nbsp;&nbsp;<spring:message code="comu.boto.agafar"/></a>
 		</div>
 	</c:if>
-	
 	
 	<div>
 		<c:if test="${contingut.expedient or contingut.carpeta}">
@@ -800,7 +801,7 @@ function removeCookie(cname) {
 						<c:when test="${contingut.expedient or contingut.carpeta}"><spring:message code="contingut.errors.expedient.validacio"/></c:when>
 						<c:when test="${contingut.document}"><spring:message code="contingut.errors.document.validacio"/></c:when>
 					</c:choose>
-					<a href="<c:url value="/contingut/${expedientId}/errors"/>" class="btn btn-xs btn-default pull-right" data-toggle="modal"><spring:message code="contingut.errors.consultar"/></a>
+					<a href="<c:url value="/contingut/${contingut.id}/errors"/>" class="btn btn-xs btn-default pull-right" data-toggle="modal"><spring:message code="contingut.errors.consultar"/></a>
 				</div>
 			</c:if>
 			

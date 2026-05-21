@@ -12,8 +12,8 @@ const AnnexFirma = (props:any) => {
         {
             entity?.firmes.map((firma:any)=>{
                 return <CardData key={firma?.id} title={firma?.fitxerNom}>
-                    <ContenidoData xs={6} title={t('page.registre.justificant.firmaTipus')}>{firma?.tipus}</ContenidoData>
-                    <ContenidoData xs={6} title={t('page.registre.justificant.firmaPerfil')}>{firma?.perfil}</ContenidoData>
+                    <ContenidoData size={6} title={t('page.registre.justificant.firmaTipus')}>{firma?.tipus}</ContenidoData>
+                    <ContenidoData size={6} title={t('page.registre.justificant.firmaPerfil')}>{firma?.perfil}</ContenidoData>
                 </CardData>
             })
         }

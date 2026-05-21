@@ -564,7 +564,7 @@ public interface MetaExpedientService {
 			Long metaExpedientId,
 			String rolActual);
 
-	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_DISSENY') or hasRole('IPA_ORGAN_ADMIN') or hasRole('IPA_REVISIO')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ADMIN_LECTURA') or hasRole('IPA_DISSENY') or hasRole('IPA_ORGAN_ADMIN') or hasRole('IPA_REVISIO')")
 	public String export(
 			Long entitatId,
 			Long id,
@@ -621,4 +621,7 @@ public interface MetaExpedientService {
 
 	@PreAuthorize("isAuthenticated()")
 	public boolean hasPermissionForAnyProcediment(Long entitatId, String rolActual, PermissionEnumDto permis);
+	
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	public String initMetaDocumentFlux() throws Exception;
 }

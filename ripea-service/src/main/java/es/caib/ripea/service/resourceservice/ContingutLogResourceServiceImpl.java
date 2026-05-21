@@ -50,12 +50,12 @@ public class ContingutLogResourceServiceImpl extends BaseMutableResourceService<
         }
 
         if (resource.getTipus() != null) {
-            String tipus = messageHelper.getMessage("log.tipus.enum." + resource.getTipus());
+            String tipus = messageHelper.getMessage("es.caib.ripea.service.intf.dto.LogTipusEnumDto." + resource.getTipus());
             resource.setTipusString(tipus);
         }
         if (resource.getObjecteId() != null) {
-            String objTipus = messageHelper.getMessage("log.objecte.tipus.enum." + resource.getObjecteTipus());
-            String logObjTipus = messageHelper.getMessage("log.tipus.enum." + resource.getObjecteLogTipus());
+            String objTipus = messageHelper.getMessage("es.caib.ripea.service.intf.dto.LogObjecteTipusEnumDto." + resource.getObjecteTipus());
+            String logObjTipus = messageHelper.getMessage("es.caib.ripea.service.intf.dto.LogTipusEnumDto." + resource.getObjecteLogTipus());
             resource.setMssg((resource.getObjecteLogTipus() != null ? logObjTipus : "") + "[" + objTipus + "#" + resource.getObjecteId() + "]");
         }
 

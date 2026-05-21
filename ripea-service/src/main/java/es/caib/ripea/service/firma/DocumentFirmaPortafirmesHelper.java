@@ -493,15 +493,23 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 		List<DocumentPortafirmesEntity> enviamentsPendents = documentPortafirmesRepository.findByDocumentAndEstatInOrderByCreatedDateDesc(
 				document,
 				new DocumentEnviamentEstatEnumDto[] {DocumentEnviamentEstatEnumDto.ENVIAT});
+		
 		if (enviamentsPendents.size() == 0) {
 			throw new ValidationException(
 					document.getId(),
 					DocumentEntity.class,
 					"Aquest document no te enviaments a portafirmes pendents");
 		}
+		
 		DocumentPortafirmesEntity documentPortafirmes = enviamentsPendents.get(0);
 		if (DocumentEnviamentEstatEnumDto.ENVIAT.equals(documentPortafirmes.getEstat())) {
-			pluginHelper.portafirmesDelete(documentPortafirmes);
+			try {
+				pluginHelper.portafirmesDelete(documentPortafirmes);
+			} catch (SistemaExternException seEX) {
+				//Si dona error, ja haura quedat registrat al monitor de integracions
+				//En tot cas, com que l'error segurament será degut a que el document no es troba o ja esta cancelat a PF
+				//podem continuar amb la cancelació de firma a RIPEA, capturant la excepció i asegurant la persistencia.
+			}
 			List<PortafirmesBlockEntity> portafirmesBlocks = portafirmesBlockRepository.findByEnviament(documentPortafirmes);
 			if (portafirmesBlocks != null && !portafirmesBlocks.isEmpty()) {
 				for (PortafirmesBlockEntity portafirmesBlock : portafirmesBlocks) {
@@ -509,6 +517,7 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 				}
 			}
 		}
+		
 		documentPortafirmes.updateCancelat(new Date());
 		if (!hasFirmaParcial)
 			document.updateEstat(DocumentEstatEnumDto.REDACCIO);
@@ -541,7 +550,6 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 			}
 			documentPortafirmes = enviamentsPendents.get(0);
 		}
-		
 		
 		if (DocumentEnviamentEstatEnumDto.ENVIAT.equals(documentPortafirmes.getEstat())) {
 			List<PortafirmesBlockEntity> portafirmesBlocks = portafirmesBlockRepository.findByEnviament(documentPortafirmes);

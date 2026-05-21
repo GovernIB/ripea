@@ -3,6 +3,9 @@ import Toolbar from '@mui/material/Toolbar';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { toolbarBackgroundStyle } from 'reactlib';
+import {useTranslation} from "react-i18next";
+import {Link} from "@mui/material";
+import {useNavigate} from "react-router-dom";
 
 type AppFootProps = {
     title?: string;
@@ -25,24 +28,27 @@ export const Footer: React.FC<AppFootProps> = (props) => {
         backgroundImg,
     } = props;
 
+    const {t} = useTranslation();
+    const navigate = useNavigate();
     const [buildTimestamp, setBuildTimestamp] = useState<string | null>(null);
     const [scmRevision, setScmRevision] = useState<string | null>(null);
     const [comandaVersion, setComandaVersion] = useState<string>(version ?? '');
 
 	useEffect(() => {
 	    // Comprova si window.__MANIFEST__ ja està disponible
-	    if (window.__MANIFEST__) {
-	        setBuildTimestamp(window.__MANIFEST__["Build-Timestamp"]);
-	        setScmRevision(window.__MANIFEST__["Implementation-SCM-Revision"]);
-	        setComandaVersion(window.__MANIFEST__["Implementation-Version"]);
+        const manifest = (window as any).__MANIFEST__;
+	    if (manifest) {
+	        setBuildTimestamp(manifest["Build-Timestamp"]);
+	        setScmRevision(manifest["Implementation-SCM-Revision"]);
+	        setComandaVersion(manifest["Implementation-Version"]);
 	    } else {
 	        // Si no està disponible, espera a que l'script es carregui
 	        const checkManifestInterval = setInterval(() => {
-	            if (window.__MANIFEST__) {
+	            if (manifest) {
 	                clearInterval(checkManifestInterval);
-	                setBuildTimestamp(window.__MANIFEST__["Build-Timestamp"]);
-	                setScmRevision(window.__MANIFEST__["Implementation-SCM-Revision"]);
-	                setComandaVersion(window.__MANIFEST__["Implementation-Version"]);
+	                setBuildTimestamp(manifest["Build-Timestamp"]);
+	                setScmRevision(manifest["Implementation-SCM-Revision"]);
+	                setComandaVersion(manifest["Implementation-Version"]);
 	            }
 	        }, 100);
 
@@ -50,7 +56,7 @@ export const Footer: React.FC<AppFootProps> = (props) => {
 	        const timeoutId = setTimeout(() => {
 	            clearInterval(checkManifestInterval);
 	            // Si el manifest encara no està disponible, podem establir valors per defecte o deixar-ho com a null
-	            if (!window.__MANIFEST__) {
+	            if (!manifest) {
 	                console.warn('Manifest no disponible després del temps d\'espera');
 	            }
 	        }, 5000);
@@ -83,8 +89,9 @@ export const Footer: React.FC<AppFootProps> = (props) => {
                     ({buildTimestamp} | Revisió: {scmRevision})
                 </span>
             </Typography>
+            <Link onClick={()=>navigate('/accessibilitat')} color={'#F6F6F6'} variant={'body2'} sx={{cursor: 'pointer'}}>{t('navigate.accessibilitat')}</Link>
             {logos && logos.map((logo) =>
-                <Box sx={{ mr: 0, pt: 0, pr: 0, height: '36px', cursor: 'pointer', ...logoStyle }} key={logo}>
+                <Box sx={{ ml: '10px', pt: 0, pr: 0, height: '36px', ...logoStyle }} key={logo}>
                     <img src={logo} alt="foot_logo" style={{maxHeight: '36px'}}/>
                 </Box>)
             }

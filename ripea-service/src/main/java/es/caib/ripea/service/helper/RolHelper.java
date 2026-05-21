@@ -1,18 +1,15 @@
 package es.caib.ripea.service.helper;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Component
 public class RolHelper {
-	
-	@Autowired private CacheHelper cacheHelper;
 	
 	public static boolean isAdminEntitat(String rolActual) {
 		if (rolActual != null && rolActual.equals("IPA_ADMIN")) {
@@ -37,7 +34,6 @@ public class RolHelper {
 			return false;
 		}
 	}
-
 	
 	public static List<String> getRolsCurrentUser() {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -63,5 +59,4 @@ public class RolHelper {
 		}
 		return hasRol;
 	}
-
 }

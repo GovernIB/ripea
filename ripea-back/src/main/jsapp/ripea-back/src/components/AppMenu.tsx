@@ -4,6 +4,7 @@ import Icon from '@mui/material/Icon';
 import IconButton from '@mui/material/IconButton';
 import SideMenu from "./SideMenu.tsx";
 import {useEntitatSession} from "./Session.tsx";
+import {useTranslation} from "react-i18next";
 
 const menuIcon = 'menu';
 
@@ -13,6 +14,7 @@ export interface AppMenuProps {
 }
 
 export const AppMenu: React.FC<AppMenuProps> = ({ menuEntries, logo }) => {
+  const {t} = useTranslation()
   const [open, setOpen] = React.useState(false);
   const { value: entitat } = useEntitatSession()
 
@@ -23,6 +25,7 @@ export const AppMenu: React.FC<AppMenuProps> = ({ menuEntries, logo }) => {
   return (
     <>
       <IconButton
+        title={t('page.user.menu.title')}
         aria-label="open menu"
         onClick={toggleMenu}
         edge="start"

@@ -3,7 +3,7 @@ import {useTranslation} from "react-i18next";
 import {useNavigate, useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
 import Load from "../../../components/Load.tsx";
-import {Button, Grid2 as Grid, Icon, Typography, Box} from "@mui/material";
+import {Button, Grid, Icon, Typography, Box} from "@mui/material";
 import {icons} from "../../user/UserHeadToolbar.tsx";
 import {ExpedientInfo} from "../../expedient/details/Expedient.tsx";
 import DocumentsGrid from "../../contingut/DocumentsGrid.tsx";
@@ -46,7 +46,7 @@ const Tasca = () => {
 
     useEffect(()=>{
         if (apiTascaIsReady) {
-            appTascaGetOne(tascaId)
+            appTascaGetOne(tascaId, {perspectives: ['CONTEXT_USUARI']})
                 .then((app) => setTasca(app))
                 .catch((error) => setError(error))
         }

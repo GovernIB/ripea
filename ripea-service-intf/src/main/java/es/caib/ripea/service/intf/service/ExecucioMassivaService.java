@@ -34,6 +34,9 @@ public interface ExecucioMassivaService {
 	public void crearExecucioMassiva(Long entitatId, ExecucioMassivaDto dto) throws NotFoundException, ValidationException;
 
 	@PreAuthorize("isAuthenticated()")
+	public void crearExecucioMassiva(Long entitatId, ExecucioMassivaDto dto, ElementTipusEnumDto elementTipus) throws NotFoundException, ValidationException;
+	
+	@PreAuthorize("isAuthenticated()")
 	public FitxerDto descarregarDocumentExecMassiva(Long entitatId, Long execMassivaId);
 
 	public List<ExecucioMassivaDto> findExecucionsMassivesPerUsuari(Long entitatId, UsuariDto usuari, int pagina) throws NotFoundException;

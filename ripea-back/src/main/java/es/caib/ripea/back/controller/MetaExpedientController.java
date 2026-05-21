@@ -464,13 +464,8 @@ public class MetaExpedientController extends BaseAdminController {
 			return "importMetaExpedientFileForm";
 		}
 		
-		ObjectMapper objectMapper = new ObjectMapper();
-		objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-		objectMapper.setVisibility(VisibilityChecker.Std.defaultInstance().withFieldVisibility(JsonAutoDetect.Visibility.ANY));
+		MetaExpedientExportDto metaExpedientExport = Utils.convertirJsonToMetaExpedientDto(command.getFile().getBytes());
 		
-		String jsonString = new String(command.getFile().getBytes(), StandardCharsets.UTF_8);
-		
-		MetaExpedientExportDto metaExpedientExport = objectMapper.readValue(jsonString, MetaExpedientExportDto.class);
 		MetaExpedientImportEditCommand metaExpedientImportEditCommand = new MetaExpedientImportEditCommand();
 		fillImportEditForm(metaExpedientExport, model, entitatActual, request, metaExpedientImportEditCommand);
 		

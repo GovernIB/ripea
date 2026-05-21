@@ -1,7 +1,6 @@
-import {MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
+import {useMuiFormDialogApiRef, useBaseAppContext, useFormContext} from "reactlib";
 import {Alert, Grid} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
-import {useRef} from "react";
 import {useTranslation} from "react-i18next";
 import * as builder from "../../../util/springFilterUtils.ts";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
@@ -15,7 +14,7 @@ const MoureTotForm = () => {
 	//namedQueries={[`BY_PROCEDIMENT#${data?.metaExpedientId}`]}
 	
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-		<Grid item xs={12}>
+		<Grid size={12}>
 			<Alert severity="info">
 			  <div>
 			    <div>{t('page.expedient.alert.moureTot.title')}</div>
@@ -29,7 +28,7 @@ const MoureTotForm = () => {
 			</Alert>
 		</Grid>
 		
-        <GridFormField xs={12} name="expedientDesti" filter={filtreProcediment} required/>
+        <GridFormField name="expedientDesti" filter={filtreProcediment} required/>
     </Grid>
 }
 
@@ -52,7 +51,7 @@ const MoureTot = (props:any) => {
 
 const useMoureTot = (refresh?: () => void) => {
     const { t } = useTranslation();
-    const apiRef = useRef<MuiFormDialogApi>();
+    const apiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow} = useBaseAppContext();
 	
 	const handleShow = (id:any, row:any) :void => {

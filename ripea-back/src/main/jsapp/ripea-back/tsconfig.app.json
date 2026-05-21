@@ -22,11 +22,17 @@
         "noFallthroughCasesInSwitch": true,
         "noUncheckedSideEffectImports": true,
 
+        /* Test */
+        "types": ["vitest/globals", "@testing-library/jest-dom"],
+
         "paths": {
             "reactlib": [
                 "./lib/main"
+            ],
+            "@src/*": [
+                "./src/*"
             ]
         },
     },
-    "include": ["src"]
+    "include": ["src", "vitests"]
 }

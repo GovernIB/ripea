@@ -9,7 +9,7 @@ import {EnviarPortafirmesFilter} from "./EnviarPortafirmesGrid.tsx";
 import {GridSortDirection} from "@mui/x-data-grid-pro";
 import {useActions} from "../../contingut/details/ContingutActions.tsx";
 import {useMassiveActions} from "../../contingut/details/ContingutMassiveActions.tsx";
-import {useGridApiRef as useMuiDatagridApiRef} from "@mui/x-data-grid-pro/hooks/utils/useGridApiRef";
+import {useGridApiRef as useMuiDatagridApiRef} from "@mui/x-data-grid-pro";
 
 const namedQueries: string[] = ['MASSIU_PORTAFIRMES']
 const sortModel: any = [{field: 'createdDate', sort: 'desc'}]

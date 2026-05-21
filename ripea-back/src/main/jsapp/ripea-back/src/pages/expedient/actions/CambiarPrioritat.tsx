@@ -1,7 +1,6 @@
-import {MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
+import {useMuiFormDialogApiRef, useBaseAppContext, useFormContext} from "reactlib";
 import {Grid} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
-import {useRef} from "react";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 
@@ -9,9 +8,9 @@ const CambiarPrioritatForm = () => {
     const {data} = useFormContext();
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="nom" disabled readOnly hidden={data?.massivo}/>
-        <GridFormField xs={12} name="prioritat" required/>
-        <GridFormField xs={12} name="prioritatMotiu" type={"textarea"} hidden={data?.prioritat=='B_NORMAL'} required/>
+        <GridFormField name="nom" disabled readOnly hidden={data?.massivo}/>
+        <GridFormField name="prioritat" required/>
+        <GridFormField name="prioritatMotiu" type={"textarea"} hidden={data?.prioritat=='B_NORMAL'} required/>
     </Grid>
 }
 
@@ -34,7 +33,7 @@ export const CambiarPrioritat = (props:any) => {
 
 export const useCambiarPrioritat = (refresh?: () => void) => {
     const { t } = useTranslation();
-    const apiRef = useRef<MuiFormDialogApi>();
+    const apiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow} = useBaseAppContext();
 
     const handleShow = (id:any, row:any) :void => {
@@ -59,7 +58,7 @@ export const useCambiarPrioritat = (refresh?: () => void) => {
 
 export const useCambiarPrioritatMassive = (refresh?: () => void) => {
     const { t } = useTranslation();
-    const apiRef = useRef<MuiFormDialogApi>();
+    const apiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow} = useBaseAppContext();
 
     const handleShow = (ids:any[]) :void => {
@@ -70,7 +69,7 @@ export const useCambiarPrioritatMassive = (refresh?: () => void) => {
     }
     const onSuccess = (data:any) :void => {
         refresh?.()
-        temporalMessageShow(null, t('page.expedient.action.changePrioritat.massiveOk', {data}), 'success');
+        temporalMessageShow(null, t('page.expedient.action.changePrioritat.massiveOk', {data}), 'info');
     }
 
     return {

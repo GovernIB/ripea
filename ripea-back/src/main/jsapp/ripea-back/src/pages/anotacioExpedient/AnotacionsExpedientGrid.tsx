@@ -22,8 +22,7 @@ const AnotacionsExpedientGrid = (props:any) => {
             flex: 1,
         },
         {
-            field: 'registreInfo.origenRegistreNumero',
-            headerName: t('page.registre.grid.origenRegistreNumero'),
+            field: 'identificador',
             sortable: false,
             flex: 0.5,
         },

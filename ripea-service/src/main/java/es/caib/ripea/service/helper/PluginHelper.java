@@ -55,6 +55,7 @@ import es.caib.comanda.model.management.Avis;
 import es.caib.comanda.model.management.AvisTipus;
 import es.caib.comanda.model.management.Tasca;
 import es.caib.comanda.model.management.TascaEstat;
+import es.caib.comanda.model.server.monitoring.EstatSalutEnum;
 import es.caib.comanda.service.management.ApiException;
 import es.caib.distribucio.rest.client.integracio.domini.Annex;
 import es.caib.distribucio.rest.client.integracio.domini.AnotacioRegistreEntrada;
@@ -311,7 +312,7 @@ public class PluginHelper {
 		String endpoint = dadesUsuariPlugin.getEndpointURL();
 		
 		try {
-			List<String> rolsDisponibles = dadesUsuariPlugin.findRolsAmbCodi(usuariCodi);
+			List<String> rolsDisponibles = dadesUsuariPlugin.findRolsAmbCodi(usuariCodi.toLowerCase());
 			integracioHelper.addAccioOk(
 					IntegracioHelper.INTCODI_USUARIS,
 					accioDescripcio,
@@ -348,7 +349,7 @@ public class PluginHelper {
 		String endpoint = dadesUsuariPlugin.getEndpointURL();
 		
 		try {
-			DadesUsuari dadesUsuari = dadesUsuariPlugin.findAmbCodi(usuariCodi);
+			DadesUsuari dadesUsuari = dadesUsuariPlugin.findAmbCodi(usuariCodi.toLowerCase());
 			integracioHelper.addAccioOk(
 					IntegracioHelper.INTCODI_USUARIS,
 					accioDescripcio,
@@ -4090,7 +4091,7 @@ public class PluginHelper {
 				for (FluxFirmaUsuariEntity fluxFirmaUsuari : plantillesUsuari) {
 					PortafirmesFluxRespostaDto fluxUsuari = new PortafirmesFluxRespostaDto();
 					fluxUsuari.setFluxId(fluxFirmaUsuari.getPortafirmesFluxId());
-					fluxUsuari.setNom(fluxFirmaUsuari.getDescripcio());
+					fluxUsuari.setNom(fluxFirmaUsuari.getNom());
 					fluxUsuari.setDescripcio(messageHelper.getMessage("portafirmesRecuperarPlantillesDisponibles.origen.usuari"));
 					fluxUsuari.setUsuariActual(true);
 					respostesDto.add(fluxUsuari);
@@ -4862,7 +4863,7 @@ public class PluginHelper {
 				} else if (missatge.indexOf("SignedDataNotProvided")>0) {
 					missatge = "SignedDataNotProvided: Se debe aportar el fichero original.";
 				} else if (!RolHelper.getRolsCurrentUser().contains("IPA_ADMIN")) {
-                    missatge = "Error al detectar firma de document.";
+                    missatge = "Error al detectar firma de document. És possible que el document no es pugui guardar al Arxiu.";
                 }
                 return new SignatureInfoDto(true, true, missatge);
 			}
@@ -6480,7 +6481,7 @@ public class PluginHelper {
                 .dataInici(DateUtil.toOffsetDateTime(Calendar.getInstance().getTime()))
                 .entornCodi(configHelper.getConfig(PropertyConfig.COMANDA_PLUGIN_ENTORN))
                 .identificador(expedient.getId()+"")
-                .nom(expedient.getCodi()+"/"+expedient.getNumero()+"/"+expedient.getAny())
+                .nom(expedient.getNumero())
                 .descripcio(descripcio)
                 .tipus(AvisTipus.ALERTA)
                 .redireccio(new URL(redireccio))
@@ -9113,10 +9114,14 @@ public class PluginHelper {
 					return new GenericDto("integracio.diag.cv.ko", "fa fa-times vermell", new Object[] {resultatDiagnostic.getMessage()}, resultatDiagnostic);
 				}
 			}  else if (codi.equals(IntegracioHelper.INTCODI_COMANDA)) {
-				Exception resultatDiagnostic = comandaIntegracioDiagnostic(filtre);
-				if (resultatDiagnostic==null) {
-					return new GenericDto("integracio.diag.cm.ok", "fa fa-check verd", new Object[] {codi});
-				} else {
+				try {
+					EstatSalutEnum resultatDiagnostic = comandaIntegracioDiagnostic(filtre);
+					if (EstatSalutEnum.UP.equals(resultatDiagnostic)) {
+						return new GenericDto("integracio.diag.cm.response", "fa fa-check verd", new Object[] {resultatDiagnostic.toString()});
+					} else {
+						return new GenericDto("integracio.diag.cm.response", "fa fa-question-circle taronja", new Object[] {resultatDiagnostic.toString()});
+					}
+				} catch (Exception resultatDiagnostic) {
 					return new GenericDto("integracio.diag.cm.ko", "fa fa-times vermell", new Object[] {resultatDiagnostic.getMessage()}, resultatDiagnostic);
 				}
 			} else {
@@ -9209,7 +9214,7 @@ public class PluginHelper {
 		try {
 			DadesUsuariPlugin dadesUsuariPlugin = getDadesUsuariPlugin();
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			dadesUsuariPlugin.findAmbCodi(auth.getName());
+			dadesUsuariPlugin.findAmbCodi(auth.getName().toLowerCase());
 			return null;
 		} catch (Exception ex) {
 			return ex;
@@ -9348,20 +9353,17 @@ public class PluginHelper {
 		}	
 	}
 	
-	public Exception comandaIntegracioDiagnostic(DiagnosticFiltreDto filtre) {
-		try {
+	public EstatSalutEnum comandaIntegracioDiagnostic(DiagnosticFiltreDto filtre) throws Exception {
 			ComandaCaibPlugin comandaCaibPlugin = getComandaPlugin(filtre.getEntitatCodi(), filtre.getOrganCodi());
-			comandaCaibPlugin.getLlistatTasques("prova");
-			return null;
-		} catch (Exception ex) {
-			return ex;
-		}				
+			return comandaCaibPlugin.getSalutComanda();
 	}
 	
 	public Exception concsvIntegracioDiagnostic(DiagnosticFiltreDto filtre) {
 		try {
 			IArxiuPluginWrapper iArxiuPluginWrapper = getConcsvPlugin(filtre.getEntitatCodi(), filtre.getOrganCodi());
-			DocumentEntity doc = documentHelper.findLastDocumentPujatArxiuByExtensio(null);
+			List<String> extensions = new ArrayList<String>();
+			extensions.add("application/pdf");
+			DocumentEntity doc = documentHelper.findLastDocumentPujatArxiuByExtensio(extensions, ArxiuEstatEnumDto.DEFINITIU);
 			iArxiuPluginWrapper.getPlugin().documentImprimible(doc.getArxiuUuid());
 			return null;
 		} catch (Exception ex) {
