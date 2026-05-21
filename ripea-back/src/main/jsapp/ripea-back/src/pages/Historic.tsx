@@ -54,7 +54,6 @@ const Accions = (props:any) => {
             rowAdditionalActions={actions}
             onRowCountChange={onRowCountChange}
             autoHeight
-            paginationModel={{page: 0, pageSize: 5}}
             toolbarHide
             readOnly
         />
@@ -164,7 +163,6 @@ const Moviment = (props:any) => {
             columns={columnsMoviment}
             onRowCountChange={onRowCountChange}
             autoHeight
-            paginationModel={{page: 0, pageSize: 5}}
             toolbarHide
             readOnly
         />

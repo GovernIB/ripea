@@ -4863,7 +4863,7 @@ public class PluginHelper {
 				} else if (missatge.indexOf("SignedDataNotProvided")>0) {
 					missatge = "SignedDataNotProvided: Se debe aportar el fichero original.";
 				} else if (!RolHelper.getRolsCurrentUser().contains("IPA_ADMIN")) {
-                    missatge = "Error al detectar firma de document.";
+                    missatge = "Error al detectar firma de document. És possible que el document no es pugui guardar al Arxiu.";
                 }
                 return new SignatureInfoDto(true, true, missatge);
 			}

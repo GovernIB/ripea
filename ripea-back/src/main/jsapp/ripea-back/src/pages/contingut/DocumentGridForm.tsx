@@ -54,6 +54,9 @@ const FileTabForm = () => {
                        componentProps={componentProps}
                        readOnly={data?.disabled}
                        required/>
+        <Grid size={12} hidden={data?.validacioFirmaCorrecte !== false || !data?.validacioFirmaErrorMsg}>
+            <Alert severity={"warning"}>{data?.validacioFirmaErrorMsg}</Alert>
+        </Grid>
         <GridFormField size={6} name="hasFirma" hidden={!data.adjunt} disabled={data?.deteccioFirmaAutomaticaActiva && data?.documentFirmaTipus == "FIRMA_ADJUNTA"} />
         <GridFormField size={6} name="documentFirmaTipus" hidden={!data?.adjunt || !data?.hasFirma} disabled={data?.deteccioFirmaAutomaticaActiva} required/>
         <FileFormField name="firmaAdjunt" hidden={!data?.hasFirma || data?.documentFirmaTipus != "FIRMA_SEPARADA"} required/>

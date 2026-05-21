@@ -767,8 +767,6 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     
     private class AdjuntOnchangeLogicProcessor implements OnChangeLogicProcessor<DocumentResource> {
 
-        private static final String ERROR_SIGNATURE_VALIDATION= "ERROR_SIGNATURE_VALIDATION";
-
         @Override
         public void onChange(Serializable id, DocumentResource previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource target) {
             if (fieldValue != null) {
@@ -793,9 +791,6 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
                     if (signatureInfoDto.isSigned()) {
                         target.setDocumentFirmaTipus(DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA);
-                        if (signatureInfoDto.isError() && !answers.containsKey(ERROR_SIGNATURE_VALIDATION)) {
-                            throw new AnswerRequiredException(DocumentResource.class, ERROR_SIGNATURE_VALIDATION, signatureInfoDto.getErrorMsg());
-                        }
                     } else {
                     	target.setDocumentFirmaTipus(DocumentFirmaTipusEnumDto.SENSE_FIRMA);
                     }

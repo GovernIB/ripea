@@ -248,6 +248,8 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             icon: "folder",
             showInMenu: true,
             onClick: handleDetallOpen,
+            disabled: (row:any) => !row?.arxiuUuid,
+            title: (row:any) => !row?.arxiuUuid ? t('page.document.action.detall.noUuid') : undefined,
         },
         {
             label: t('common.update')+'...',

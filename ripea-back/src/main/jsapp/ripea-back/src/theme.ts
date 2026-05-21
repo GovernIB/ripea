@@ -127,7 +127,7 @@ const base: ThemeOptions = {
                 root: {paddingTop: '5px'},
             },
         },
-        MuiTab: {styleOverrides: {root: {textTransform: 'none', fontSize: '1rem'}}},
+        MuiTab: {styleOverrides: {root: {textTransform: 'none', fontSize: '1rem', '&.Mui-disabled': {opacity: 0.4}}}},
         MuiTabs: {
             styleOverrides: {
                 scrollButtons: {

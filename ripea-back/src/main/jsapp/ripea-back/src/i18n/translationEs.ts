@@ -882,6 +882,7 @@ const translationEs = {
                 },
                 detall: {
                     label: "Detalles",
+                    noUuid: "El documento no está sincronizado con el archivo",
                 },
                 imprimible: {
                     label: "Copia auténtica imprimible",

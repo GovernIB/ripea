@@ -882,6 +882,7 @@ const translationCa = {
                 },
                 detall: {
                     label: "Detalls",
+                    noUuid: "El document no està sincronitzat amb l'arxiu",
                 },
                 imprimible: {
                     label: "Còpia autèntica imprimible",

@@ -882,6 +882,7 @@ const translationEn = {
                 },
                 detall: {
                     label: "Details",
+                    noUuid: "The document is not synchronized with the archive",
                 },
                 imprimible: {
                     label: "Printable authentic copy",
