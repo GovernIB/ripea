@@ -920,7 +920,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                 
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/expedient/CanviTipusDocumentsActionExecutor", e);
-				throw new ReportGenerationException(DocumentResource.class, null, code, "document.canviTipus.reject");
+				String msg = messageHelper.getMessage("document.canviTipus.reject")+": "+e.getMessage();
+				throw new ActionExecutionException(DocumentResource.class, null, code, msg);
 			}
 		}
     }
@@ -952,7 +953,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/expedient/descarregarDocumentsMassiuZip", e);
-				throw new ReportGenerationException(ExpedientResource.class, null, code, "document.descarregar.reject");
+				String msg = messageHelper.getMessage("document.descarregar.reject")+": "+e.getMessage();
+				throw new ActionExecutionException(ExpedientResource.class, null, code, msg);
 			}
 		}
     }
@@ -966,7 +968,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                 return parametres;
             } catch (Exception e) {
                 excepcioLogHelper.addExcepcio("/expedient/"+entity.getId()+"/descarregarDocumentsMassiuZip", e);
-                throw new ReportGenerationException(ExpedientResource.class, entity.getId(), code, "document.descarregar.reject");
+                String msg = messageHelper.getMessage("document.descarregar.reject")+": "+e.getMessage();
+                throw new ActionExecutionException(ExpedientResource.class, entity.getId(), code, msg);
             }
         }
 
@@ -1042,7 +1045,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         		
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/expedient/NotificarDocumentsZipActionExecutor", e);
-				throw new ReportGenerationException(DocumentResource.class, null, code, "document.notificarDocuments.reject");
+				String msg = messageHelper.getMessage("document.notificarDocuments.reject")+": "+e.getMessage();
+				throw new ActionExecutionException(DocumentResource.class, null, code, msg);
 			}
 		}
     }
