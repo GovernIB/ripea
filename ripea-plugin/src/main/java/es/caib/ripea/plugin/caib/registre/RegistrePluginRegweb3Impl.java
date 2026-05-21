@@ -37,61 +37,8 @@ public class RegistrePluginRegweb3Impl extends RegistrePluginUtils implements Re
 			boolean ambAnnexos) {
 		var resposta = new RespostaConsultaRegistre();
 		
-//		try {
-//			log.info("[REGISTRE] Creant assentament registral codiDir3Entitat {} numeroRegistre {} tipusOperacio {} ambAnnexos {}", 
-//					codiDir3Entitat,
-//					numeroRegistre, 
-//					tipusOperacio, 
-//					ambAnnexos);
-//			
-//			var asientoRegistralWs = new AsientoRegistralWs();
-//			var interesados = new ArrayList<InteresadoWs>();
-//			var interesadoWs = new InteresadoWs();
-//			var datosInteresadoWs = new DatosInteresadoWs();
-//			datosInteresadoWs.setTipoInteresado(2L);
-//			datosInteresadoWs.setRazonSocial("Raó social");
-//			datosInteresadoWs.setTipoDocumentoIdentificacion("C");
-//			datosInteresadoWs.setDocumento("12345678Z");
-//			
-//			interesadoWs.setInteresado(datosInteresadoWs);
-//			interesados.add(interesadoWs);
-//			
-//			var interesado2Ws = new InteresadoWs();
-//			var datosInteresado2Ws = new DatosInteresadoWs();
-//			datosInteresado2Ws.setTipoInteresado(1L);
-//			datosInteresado2Ws.setNombre("Nom física");
-//			datosInteresado2Ws.setApellido1("Llinatges 1");
-//			datosInteresado2Ws.setApellido2("Llinatges 2");
-//			datosInteresado2Ws.setTipoDocumentoIdentificacion("N");
-//			datosInteresado2Ws.setDocumento("12345679Z");
-//
-//			interesado2Ws.setInteresado(datosInteresado2Ws);
-//			
-//			var datosRepersentanteWs = new DatosInteresadoWs();
-//			datosRepersentanteWs.setTipoInteresado(2L);
-//			datosRepersentanteWs.setRazonSocial("Raó social representant");
-//			datosRepersentanteWs.setTipoDocumentoIdentificacion("C");
-//			datosRepersentanteWs.setDocumento("12345674Z");
-//			
-//			interesado2Ws.setRepresentante(datosRepersentanteWs);
-//			
-//			
-//			interesados.add(interesado2Ws);
-//			
-//			asientoRegistralWs.getInteresados().addAll(interesados);
-//			
-//			log.info("[REGISTRE] Assentament registral {}", asientoRegistralWs);
-//			var respostaConsulta = toRespostaConsultaRegistre(asientoRegistralWs);
-//			return respostaConsulta;
-//		} catch (Exception e) {
-//			log.error("Error no controlat toRespostaConsultaRegistre", e);
-//			resposta.setErrorCodi("2");
-//			resposta.setErrorDescripcio(e.getMessage());
-//			return resposta;
-//		}
-		
 		try {
-			log.info("[REGISTRE] Creant assentament registral codiDir3Entitat {} numeroRegistre {} tipusOperacio {} ambAnnexos {}", 
+			log.info("[REGISTRE] Recuperant assentament registral codiDir3Entitat {} numeroRegistre {} tipusOperacio {} ambAnnexos {}", 
 					codiDir3Entitat,
 					numeroRegistre, 
 					tipusOperacio, 
@@ -106,10 +53,12 @@ public class RegistrePluginRegweb3Impl extends RegistrePluginUtils implements Re
 			log.debug("[REGISTRE] Assentament registral {}", asientoRegistralWs);
 			return toRespostaConsultaRegistre(asientoRegistralWs);
 		} catch (WsI18NException e) {
+			log.error("Error no controlat obtenerAsientoRegistral", e);
 			resposta.setErrorCodi("0");
 			resposta.setErrorDescripcio(e.getMessage());
 			return resposta;
 		} catch (WsValidationException e) {
+			log.error("Error no controlat obtenerAsientoRegistral", e);
 			resposta.setErrorCodi("1");
 			resposta.setErrorDescripcio(e.getMessage());
 			return resposta;
