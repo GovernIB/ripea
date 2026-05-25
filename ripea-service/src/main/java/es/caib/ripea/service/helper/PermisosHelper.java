@@ -213,7 +213,7 @@ public class PermisosHelper {
 			}
 		}
 		if (!sids.isEmpty()) {
-			return aclObjectIdentityRepository.findObjectsWithPermissions(
+			return aclObjectIdentityRepository.findObjectsWithPermissionsBoth(
 					clazz.getName(),
 					sids,
 					permission1.getMask(),
@@ -222,6 +222,46 @@ public class PermisosHelper {
 			return new ArrayList<Long>();
 		}
 	}
+	
+	/**
+	 * Obté els identificadors de tots els objectes de la classe especificada sobre
+	 * els quals l'usuari actual té algun dels dos permisos
+	 * 
+	 * @param clazz Classe dels objectes a consultar
+	 * @param permission1 per comporvar
+	 * @param permission2 per comporvar
+	 * @return Llista dels identificadors dels objectes seleccionats
+	 */
+	public List<Long> getObjectsIdsWithAnyTwoPermissions(Class<?> clazz, Permission permission1, Permission permission2) {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (auth == null) {
+			return new ArrayList<>();
+		}
+
+		List<AclSidEntity> sids = new ArrayList<AclSidEntity>();
+		AclSidEntity userSid = aclSidRepository.getUserSid(auth.getName());
+		if (userSid != null) {
+			sids.add(userSid);
+		}
+		List<String> rolesNames = new ArrayList<String>();
+		for (GrantedAuthority authority : auth.getAuthorities()) {
+			rolesNames.add(authority.getAuthority());
+		}
+		for (AclSidEntity aclSid: aclSidRepository.findRolesSid(rolesNames)) {
+			if (aclSid != null) {
+				sids.add(aclSid);
+			}
+		}
+		if (!sids.isEmpty()) {
+			return aclObjectIdentityRepository.findObjectsWithPermissionsAny(
+					clazz.getName(),
+					sids,
+					permission1.getMask(),
+					permission2.getMask());
+		} else {
+			return new ArrayList<Long>();
+		}
+	}	
 
 	/**
 	 * Filtre un llistat d'identificadors d'objectes amb els que tenen uns

@@ -32,6 +32,14 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			"  me.organGestor in (:organGestors) order by me.nom ASC")
 	List<Long> findByOrgansGestors(@Param("organGestors") List<OrganGestorEntity> organGestors);
 
+	@Query( "select " +
+			"	me.organGestor.codi " +
+			"from " +
+			"    MetaExpedientEntity me " +
+			"where " +
+			"  me.organGestor is not null and me.id in (:procedimentsIds)")
+	List<String> findOrgansGestorsOfProcediments(@Param("procedimentsIds") List<Long> procedimentsIds);
+	
 	@Query(	"from " +
 			"    MetaExpedientEntity me " +
 			"where " +

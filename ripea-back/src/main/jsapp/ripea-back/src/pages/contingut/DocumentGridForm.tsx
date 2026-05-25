@@ -135,7 +135,8 @@ const DocumentsGridForm = ({ setDisabled }:any) => {
                                ? [`UPDATE_DOC#${apiRef?.current?.getId()}`]
                                : [`CREATE_NEW_DOC#${data?.expedient?.id}`]
                        }
-                       filter={metaDocumentFilter} />
+                       filter={metaDocumentFilter}
+                       optionsUnpaged/>
         <GridFormField size={data.pluginSummarizeActiu ? 11 : 12} name="nom" />
         <GridButton size={1} title={t('page.document.detall.summarize')}
                     icon={'assistant'}
