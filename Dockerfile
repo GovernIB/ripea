@@ -18,18 +18,6 @@ COPY ripea-ear/src/main/docker/oracle/ \
 COPY ripea-ear/target/ripea.ear \
     $JBOSS_HOME/standalone/deployments/
 
-#RUN curl -fL \
-#        https://github.com/keycloak/keycloak/releases/download/12.0.4/keycloak-oidc-wildfly-adapter-12.0.4.tar.gz \
-#        -o $JBOSS_HOME/keycloak-adapter.tar.gz \
-#    && tar xzf $JBOSS_HOME/keycloak-adapter.tar.gz \
-#        -C $JBOSS_HOME \
-#        --no-same-owner \
-#        --no-same-permissions \
-#        --touch \
-#    && rm $JBOSS_HOME/keycloak-adapter.tar.gz \
-#    && $JBOSS_HOME/bin/jboss-cli.sh \
-#        --file=$JBOSS_HOME/bin/adapter-install-offline.cli \
-#        -Djboss.server.config.file=standalone-openshift.xml
 RUN rm -rf $JBOSS_HOME/standalone/configuration/standalone_xml_history \
     && mkdir -p $JBOSS_HOME/standalone/configuration/standalone_xml_history/current \
     && mkdir -p $JBOSS_HOME/standalone/data/content \
