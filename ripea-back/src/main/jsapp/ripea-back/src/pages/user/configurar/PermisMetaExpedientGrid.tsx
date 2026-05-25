@@ -138,7 +138,7 @@ const PermisMetaExpedientOrganGrid = (props:any) => {
                 const additionalRows: any[] = _rows;
                 if (_rows!=null){
                     for (const row of _rows) {
-                        for (const sid of row?.sids) {
+                        for (const sid of (row?.sids ?? [])) {
                             const newId = row?.id+"-"+sid.id
                             if (!additionalRows.map((b) => b.id).includes(newId)) {
                                 additionalRows.push({
