@@ -16,7 +16,7 @@ import { useUserSession } from "../../components/Session.tsx";
 import { useSessionList } from "../../components/SessionStorageContext.tsx";
 import DropZone from "../../components/DropZone.tsx";
 import DocumentsGridForm from "./DocumentGridForm.tsx";
-import MetaExpedient from "./details/MetaExpedient.tsx";
+import MetaExpedient, {formatMultiplicitat, MultiplicitatStyled} from "./details/MetaExpedient.tsx";
 import useVisualitzar from "./actions/Visualitzar.tsx";
 import {useGridApiRef as useMuiDatagridApiRef} from "@mui/x-data-grid-pro";
 
@@ -311,7 +311,7 @@ const DocumentsGrid = (props: any) => {
                             valueFormatter: (value: any, row: any) => {
                                 if (row?.id) {
                                     if (vista == View.tipus && row?.multiplicitat) {
-                                        return <MetaExpedient entity={row}/>;
+                                        return <MetaExpedient entity={row} hideMultiplicitat={treeView}/>;
                                     }
                                     return <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                         <ContingutIcon entity={row} />
@@ -320,9 +320,49 @@ const DocumentsGrid = (props: any) => {
                                 return value;
                             },
                             renderCell: (params: any) => {
-                                return treeView
-                                    ? <GridTreeDataGroupingCell {...params} />
-                                    : params.formattedValue
+                                if (!treeView) return params.formattedValue;
+                                const childCount = params.rowNode?.children?.length ?? 0;
+                                const showPill = childCount > 0
+                                    || params.row?.tipus === 'CARPETA'
+                                    || params.rowNode?.type === 'group';
+                                const multiplicitatLabel = vista === View.tipus && params.row?.multiplicitat
+                                    ? formatMultiplicitat(params.row.multiplicitat)
+                                    : null;
+                                return (
+                                    <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', minWidth: 0 }}>
+                                        <Box sx={{ flex: '0 1 auto', minWidth: 0, overflow: 'hidden', '& .MuiDataGrid-treeDataGroupingCell': { width: 'auto' } }}>
+                                            <GridTreeDataGroupingCell {...params} hideDescendantCount />
+                                        </Box>
+                                        {showPill && (
+                                            <Box
+                                                component="span"
+                                                sx={{
+                                                    ml: 0.75,
+                                                    px: 0.75,
+                                                    py: 0.1,
+                                                    borderRadius: '10px',
+                                                    border: '1px solid',
+                                                    borderColor: 'divider',
+                                                    backgroundColor: 'action.hover',
+                                                    fontSize: '0.7rem',
+                                                    fontWeight: 600,
+                                                    lineHeight: 1.5,
+                                                    color: 'text.secondary',
+                                                    flexShrink: 0,
+                                                    userSelect: 'none',
+                                                }}
+                                            >
+                                                {childCount} elem.
+                                            </Box>
+                                        )}
+                                        {multiplicitatLabel && (
+                                            <>
+                                                <Box sx={{ flex: 1 }} />
+                                                <MultiplicitatStyled multiplicitat={multiplicitatLabel} />
+                                            </>
+                                        )}
+                                    </Box>
+                                );
                             },
                         }}
                         treeData

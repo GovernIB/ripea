@@ -1,6 +1,16 @@
 import {Grid} from "@mui/material";
 import {StyledLabel} from "../../../components/StyledLabel.tsx";
 
+export const formatMultiplicitat = (raw: string): string => {
+    switch (raw) {
+        case "M_0_1": return "0..1";
+        case "M_0_N": return "0..N";
+        case "M_1":   return "1";
+        case "M_1_N": return "1..N";
+        default:      return raw;
+    }
+}
+
 export const MultiplicitatStyled = (props:any) => {
     const {multiplicitat} = props;
 
@@ -8,30 +18,17 @@ export const MultiplicitatStyled = (props:any) => {
 }
 
 const MetaExpedient = (props:any) => {
-    const {entity} = props;
-    let multiplicitat;
+    const {entity, hideMultiplicitat} = props;
+    const multiplicitat = formatMultiplicitat(entity?.multiplicitat);
 
-    switch (entity?.multiplicitat) {
-        case "M_0_1":
-            multiplicitat = "0..1"
-            break;
-        case "M_0_N":
-            multiplicitat = "0..N"
-            break;
-        case "M_1":
-            multiplicitat = "1"
-            break;
-        case "M_1_N":
-            multiplicitat = "1..N"
-            break;
-        default:
-            multiplicitat = entity?.multiplicitat;
-            break;
-    }
-
-    return <Grid width={'330px'} display={"flex"} alignItems={"center"} justifyContent={'space-between'}>
+    return <Grid
+        width={hideMultiplicitat ? 'auto' : '330px'}
+        display={"flex"}
+        alignItems={"center"}
+        justifyContent={hideMultiplicitat ? 'flex-start' : 'space-between'}
+    >
         {entity?.nom}
-        <MultiplicitatStyled multiplicitat={multiplicitat}/>
+        {!hideMultiplicitat && <MultiplicitatStyled multiplicitat={multiplicitat}/>}
     </Grid>
 }
 export default MetaExpedient;
