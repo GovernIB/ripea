@@ -26,6 +26,7 @@ on:
 permissions:
   contents: write
   issues: read
+  packages: write
 
 jobs:
   build:
@@ -36,10 +37,12 @@ jobs:
       - name: 🔧 Set variables
         id: vars
         run: |
-          OWNER=$(echo "${{ inputs.repo }}" | cut -d '/' -f1)
-          REPO=$(echo "${{ inputs.repo }}" | cut -d '/' -f2)
+          set -e
 
-          IMAGE_NAME="${OWNER}/${REPO}/ripea-ear"
+          OWNER=$(echo "${{ inputs.repo }}" | cut -d '/' -f1 | tr '[:upper:]' '[:lower:]')
+          REPO=$(echo "${{ inputs.repo }}" | cut -d '/' -f2 | tr '[:upper:]' '[:lower:]')
+
+          IMAGE_NAME="ghcr.io/${OWNER}/${REPO}/ripea-ear"
 
           echo "owner=$OWNER" >> $GITHUB_OUTPUT
           echo "repo=$REPO" >> $GITHUB_OUTPUT
@@ -47,6 +50,7 @@ jobs:
 
       - name: 🌐 Clone repository
         run: |
+          set -e
           git clone \
             --branch ${{ inputs.branch }} \
             --depth 1 \
@@ -60,10 +64,18 @@ jobs:
           java-version: 11
           cache: maven
 
+      - name: 📦 Cache Maven dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2
+          key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
+
       - name: 🏷️ Get Maven version + build version
         id: package_version
         working-directory: ripea
         run: |
+          set -e
+
           VERSION=$(mvn help:evaluate \
             -Dexpression=project.version \
             -q \
@@ -81,6 +93,8 @@ jobs:
       - name: 📄 Load .env variables
         working-directory: ripea
         run: |
+          set -e
+
           cp .env.example .env
 
           set -o allexport
@@ -102,11 +116,11 @@ jobs:
         working-directory: ripea
         run: mvn -B clean package -DskipTests=true
 
-      - name: 🔐 Login to Docker Hub
+      - name: 🔐 Login to GHCR
         if: ${{ inputs.build_docker == true }}
         run: |
-          echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login \
-            -u "${{ secrets.DOCKERHUB_USERNAME }}" \
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io \
+            -u "${{ github.actor }}" \
             --password-stdin
 
       - name: 🐳 Build Docker image
@@ -115,6 +129,8 @@ jobs:
         env:
           BASE_IMAGE: ${{ secrets.DOCKER_BASE_IMAGE }}
         run: |
+          set -e
+
           echo "Using base image: $BASE_IMAGE"
 
           docker build \
@@ -126,22 +142,18 @@ jobs:
       - name: 📤 Push Docker image
         if: ${{ inputs.build_docker == true }}
         run: |
+          set -e
+
           docker push ${{ steps.vars.outputs.image_name }}:${{ steps.package_version.outputs.build_version }}
           docker push ${{ steps.vars.outputs.image_name }}:latest
-
-      - name: 💾 Save Docker image
-        if: ${{ inputs.build_docker == true }}
-        run: |
-          docker save \
-            ${{ steps.vars.outputs.image_name }}:${{ steps.package_version.outputs.build_version }} \
-            ${{ steps.vars.outputs.image_name }}:latest \
-            | gzip > ripea-docker-image.tar.gz
 
       - name: 📝 Generate Release Notes
         id: release_notes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          set -e
+
           MILESTONE=$(echo "${{ inputs.branch }}" | sed 's/-dev//')
 
           ISSUES=$(gh issue list \
@@ -178,14 +190,5 @@ jobs:
           generate_release_notes: false
           body: ${{ steps.release_notes.outputs.notes }}
           files: ripea/ripea-ear/target/*.ear
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: 📦 Upload Docker image to Release
-        if: ${{ inputs.build_docker == true }}
-        uses: softprops/action-gh-release@v3
-        with:
-          tag_name: v${{ steps.package_version.outputs.build_version }}
-          files: ripea-docker-image.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
