@@ -135,6 +135,10 @@ const columns = [
     //     renderCell: (params: any) => <ContingutIcon entity={params?.row}/>
     // },
     {
+        field: 'id',
+        flex: 0.75,
+    },
+    {
         field: 'descripcio',
         flex: 0.75,
     },
@@ -246,21 +250,39 @@ const DocumentsGrid = (props: any) => {
     }, [dataApiRef, treeView, addFolderExpand]);
 
     const handleDragEnd = (params: any) => {
-        // console.log("params", params)
+        console.log('>>> Canvi d\'ordre', params.targetIndex + 1)
         if (params.newParent != params.oldParent || params.targetIndex != params.oldIndex) {
-            const parePerDefecte = contingutScopeId ?? entity.id;
+            //const parePerDefecte = contingutScopeId ?? entity.id;
             const patchData = {
-                ordre: params.targetIndex +1,
-                pare: params.newParent ?? parePerDefecte,
+                ordre: params.targetIndex + 1,
+                //pare: params.newParent ?? parePerDefecte,
             };
-
             if (apiContingutIsReady) {
                 apiAction(params.row.id, {code: 'REORDER', data: patchData})
-                    // .then(() => refresh())
                     .catch(() => refresh())
             } else {
                 console.error('Servei de l\'API pels documents no disponible'); refresh()
             }
+        }
+    }
+    const processRowUpdate = (updatedRow: any, oldRow: any, params: any) => {
+        const treePathOld = (oldRow.treePath[0] === entity?.id) ? oldRow.treePath.slice(1).map((p: any) => '' + p) : oldRow.treePath.map((p: any) => '' + p);
+        const treePathUpdated = updatedRow.treePath;
+        const treePathChanged = JSON.stringify(treePathUpdated) !== JSON.stringify(treePathOld);
+        if (treePathChanged) {
+            return new Promise((resolve, reject) => {
+                const parent = treePathUpdated.at(-2);
+                console.log('>>> Canvi de pare', parent, treePathUpdated.slice(0, -1), params)
+                const patchData = {
+                    ordre: 1,
+                    pare: parent,
+                };
+                apiAction(updatedRow.id, {code: 'REORDER', data: patchData}).
+                then(() => resolve(updatedRow)).
+                catch(reject);
+            });
+        } else {
+            return updatedRow;
         }
     }
 
@@ -327,6 +349,7 @@ const DocumentsGrid = (props: any) => {
                         }}
                         treeData
                         rowReordering={draggable}
+                        processRowUpdate={processRowUpdate}
                         onRowOrderChange={handleDragEnd}
                         setTreeDataPath={(path, row) => ({...row, treePath: path})}
                         rowsTransformer={(_rows: any) => {
