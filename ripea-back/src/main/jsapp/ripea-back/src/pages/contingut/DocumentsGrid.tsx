@@ -1,6 +1,4 @@
 import React, {RefObject, useCallback, useEffect, useMemo, useState} from "react";
-import { DndContext } from '@dnd-kit/core';
-import {dndScreenReaderInstructions} from "../../util/dndAccessibility.tsx";
 import { FormControl, Grid, Select, MenuItem, Icon, Box } from "@mui/material";
 import {GridApiPro, GridTreeDataGroupingCell} from "@mui/x-data-grid-pro";
 import { useMuiDataGridApiRef, useResourceApiService } from 'reactlib';
@@ -135,10 +133,6 @@ const columns = [
     //     renderCell: (params: any) => <ContingutIcon entity={params?.row}/>
     // },
     {
-        field: 'id',
-        flex: 0.75,
-    },
-    {
         field: 'descripcio',
         flex: 0.75,
     },
@@ -250,12 +244,12 @@ const DocumentsGrid = (props: any) => {
     }, [dataApiRef, treeView, addFolderExpand]);
 
     const handleDragEnd = (params: any) => {
-        console.log('>>> Canvi d\'ordre', params.targetIndex + 1)
         if (params.newParent != params.oldParent || params.targetIndex != params.oldIndex) {
-            //const parePerDefecte = contingutScopeId ?? entity.id;
+            console.log('>>> Canvi d\'ordre', params.targetIndex + 1, params)
+            const parePerDefecte = params.newParent || contingutScopeId || entity.id;
             const patchData = {
                 ordre: params.targetIndex + 1,
-                //pare: params.newParent ?? parePerDefecte,
+                pare: parePerDefecte,
             };
             if (apiContingutIsReady) {
                 apiAction(params.row.id, {code: 'REORDER', data: patchData})
@@ -265,24 +259,22 @@ const DocumentsGrid = (props: any) => {
             }
         }
     }
-    const processRowUpdate = (updatedRow: any, oldRow: any, params: any) => {
-        const treePathOld = (oldRow.treePath[0] === entity?.id) ? oldRow.treePath.slice(1).map((p: any) => '' + p) : oldRow.treePath.map((p: any) => '' + p);
-        const treePathUpdated = updatedRow.treePath;
-        const treePathChanged = JSON.stringify(treePathUpdated) !== JSON.stringify(treePathOld);
-        if (treePathChanged) {
+    const processRowUpdate = (newRow: any, oldRow: any) => {
+        const newParent = +newRow.treePath.at(-2) || contingutScopeId || entity?.id;
+        const oldParent = +oldRow.treePath.at(-2) || contingutScopeId || entity?.id;
+        if (newParent != oldParent && carpetes?.find((c: any) => c?.id == newParent) != null) {
+            console.log('>>> Canvi de pare', oldParent, newParent)
             return new Promise((resolve, reject) => {
-                const parent = treePathUpdated.at(-2);
-                console.log('>>> Canvi de pare', parent, treePathUpdated.slice(0, -1), params)
                 const patchData = {
                     ordre: 1,
-                    pare: parent,
+                    pare: newParent,
                 };
-                apiAction(updatedRow.id, {code: 'REORDER', data: patchData}).
-                then(() => resolve(updatedRow)).
+                apiAction(newRow.id, {code: 'REORDER', data: patchData}).
+                then(() => resolve(newRow)).
                 catch(reject);
             });
         } else {
-            return updatedRow;
+            return newRow;
         }
     }
 
@@ -299,7 +291,7 @@ const DocumentsGrid = (props: any) => {
     return <>
         <Load value={entity && carpetes && expedients && isReady}>
             <DropZone onDrop={onDrop} disabled={!(entity?.potModificarContingut || entity?.potModificar)} aria-label={t('page.document.action.new.dropMessg')}>
-                <DndContext onDragEnd={handleDragEnd} accessibility={{screenReaderInstructions: dndScreenReaderInstructions}}>
+                {/*<DndContext onDragEnd={handleDragEnd} accessibility={{screenReaderInstructions: dndScreenReaderInstructions}}>*/}
                     <StyledMuiGrid
                         resourceName={"documentResource"}
                         popupEditFormDialogResourceTitle={t('page.document.title')}
@@ -517,7 +509,7 @@ const DocumentsGrid = (props: any) => {
                     {components}
                     {massiveComponents}
                     {dialogVisualitzar}
-                </DndContext>
+                {/*</DndContext>*/}
 
                 {(entity?.potModificarContingut || entity?.potModificar) && <Box
                     sx={{
