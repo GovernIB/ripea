@@ -259,6 +259,12 @@ const DocumentsGrid = (props: any) => {
             };
             if (apiContingutIsReady) {
                 apiAction(params.row.id, {code: 'REORDER', data: patchData})
+                    .then(() => {
+                        if (params.newParent != null && params.newParent != params.oldParent) {
+                            addFolderExpand(String(params.newParent), true);
+                            refresh();
+                        }
+                    })
                     .catch(() => refresh())
             } else {
                 console.error('Servei de l\'API pels documents no disponible'); refresh()
@@ -276,7 +282,10 @@ const DocumentsGrid = (props: any) => {
                     pare: newParent,
                 };
                 apiAction(newRow.id, {code: 'REORDER', data: patchData}).
-                then(() => resolve(newRow)).
+                then(() => {
+                    addFolderExpand(String(newParent), true);
+                    resolve(newRow);
+                }).
                 catch(reject);
             });
         } else {

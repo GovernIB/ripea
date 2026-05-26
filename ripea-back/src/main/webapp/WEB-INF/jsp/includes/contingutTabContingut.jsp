@@ -526,7 +526,7 @@
 
 	function expandAll() {
 		var $tableDocuments = $("#table-documents");
-		debugger;
+
 		$tableDocuments.find("tbody tr:not(.isDocument)").each(function () {
 			var nodeId = $(this).data("node");
 			var attrId = $(this).attr("id");
@@ -555,7 +555,7 @@
 
 		// Mostrar carpeta
 		$selectedNode.show();
-		debugger;
+
 		let vistaActiva = $('#vistes').children("a.active").attr('id');
 		// Cargar contenido del servidor
 		if (vistaActiva == 'vistaTreetablePerCarpetes') {
@@ -1302,8 +1302,7 @@
 		var $tableDocuments = $("#table-documents");
 		var $selectedCarpeta = $tableDocuments.find('tr[id="' + carpetaId + '"]');
 		var currentState = sessionStorage.getItem("nodeState-treetable-" + carpetaId);
-// 		var expedientActualId = '${expedientId}';
-		debugger;
+
 		if (currentState === "expanded") {
 
 			showLoadingCurrentFolder(carpetaId);
