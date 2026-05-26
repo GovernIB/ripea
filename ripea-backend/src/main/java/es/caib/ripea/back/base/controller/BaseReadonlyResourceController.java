@@ -145,6 +145,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 						resourceApiService.permissionsCurrentUser(
 								getResourceClass(),
 								id),
+						true,
 						true).toArray(new Link[0]));
 		return ResponseEntity.ok(entityModel);
 	}
@@ -200,6 +201,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 					null,
 					resourcePermissions,
 					false,
+					true,
 					buildResourceCollectionLinks(
 							quickFilter,
 							filter,
@@ -902,6 +904,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 			Link singleResourceSelfLink,
 			ResourcePermissions resourcePermissions,
 			boolean withEditLinksInputAndOutput,
+			boolean withArtifactLinks,
 			Link... links) {
 		List<ResourceArtifact> artifactsAll = getReadonlyResourceService().artifactFindAll(null);
 		return PagedModel.of(
@@ -913,7 +916,8 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 							singleResourceSelfLink,
 							artifactsAll,
 							resourcePermissions,
-							withEditLinksInputAndOutput).toArray(new Link[0]) : new Link[0];
+							withEditLinksInputAndOutput,
+							withArtifactLinks).toArray(new Link[0]) : new Link[0];
 					return toEntityModel(resource, resourceLinks);
 				}).collect(Collectors.toList()),
 				new PagedModel.PageMetadata(
@@ -1067,7 +1071,8 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 								false,
 								singleResourceBaseSelfLink,
 								ResourcePermissions.readOnly(),
-								true,
+								false,
+								false,
 								buildOptionsLinks(
 										referencedResourceFieldAndClass.get().getClazz(),
 										quickFilter,
@@ -1123,6 +1128,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 							singleResourceBaseSelfLink,
 							null,
 							ResourcePermissions.readOnly(),
+							true,
 							true).toArray(new Link[0]));
 			return ResponseEntity.ok(entityModel);
 		} else {
@@ -1138,7 +1144,8 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 			Link singleResourceBaseSelfLink,
 			List<ResourceArtifact> artifactsAll,
 			ResourcePermissions resourcePermissions,
-			boolean withEditLinksInputAndOutput) {
+			boolean withEditLinksInputAndOutput,
+			boolean withArtifactLinks) {
 		List<Link> ls = new ArrayList<>();
 		Link selfLink;
 		if (singleResourceBaseSelfLink != null) {
@@ -1155,7 +1162,9 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 		if (withDownloadLink) {
 			ls.add(buildFieldDownloadLink(id));
 		}
-		ls.addAll(buildSingleResourceArtifactLinks(id, artifactsAll));
+		if (withArtifactLinks) {
+			ls.addAll(buildSingleResourceArtifactLinks(id, artifactsAll));
+		}
 		return ls;
 	}
 
