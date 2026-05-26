@@ -1608,7 +1608,7 @@ public class ContingutServiceImpl implements ContingutService {
 			Long contingutId,
 			Map<Integer, Long> orderedElements)
 			throws NotFoundException, ValidationException {
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				true,
 				false,
@@ -1622,7 +1622,9 @@ public class ContingutServiceImpl implements ContingutService {
 				true,
 				false,
 				false,
-				false, true, null);
+				false,
+				true,
+				configHelper.getRolActual());
 		for (Map.Entry<Integer, Long> fill: orderedElements.entrySet()) {
 			Integer ordre = fill.getKey();
 			Long fillId = fill.getValue();
