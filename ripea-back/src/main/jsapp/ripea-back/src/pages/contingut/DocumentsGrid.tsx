@@ -1,6 +1,4 @@
 import React, {RefObject, useCallback, useEffect, useMemo, useState} from "react";
-import { DndContext } from '@dnd-kit/core';
-import {dndScreenReaderInstructions} from "../../util/dndAccessibility.tsx";
 import { FormControl, Grid, Select, MenuItem, Icon, Box } from "@mui/material";
 import {GridApiPro, GridTreeDataGroupingCell} from "@mui/x-data-grid-pro";
 import { useMuiDataGridApiRef, useResourceApiService } from 'reactlib';
@@ -246,21 +244,37 @@ const DocumentsGrid = (props: any) => {
     }, [dataApiRef, treeView, addFolderExpand]);
 
     const handleDragEnd = (params: any) => {
-        // console.log("params", params)
         if (params.newParent != params.oldParent || params.targetIndex != params.oldIndex) {
-            const parePerDefecte = contingutScopeId ?? entity.id;
+            console.log('>>> Canvi d\'ordre', params.targetIndex + 1, params)
+            const parePerDefecte = params.newParent || contingutScopeId || entity.id;
             const patchData = {
-                ordre: params.targetIndex +1,
-                pare: params.newParent ?? parePerDefecte,
+                ordre: params.targetIndex + 1,
+                pare: parePerDefecte,
             };
-
             if (apiContingutIsReady) {
                 apiAction(params.row.id, {code: 'REORDER', data: patchData})
-                    // .then(() => refresh())
                     .catch(() => refresh())
             } else {
                 console.error('Servei de l\'API pels documents no disponible'); refresh()
             }
+        }
+    }
+    const processRowUpdate = (newRow: any, oldRow: any) => {
+        const newParent = +newRow.treePath.at(-2) || contingutScopeId || entity?.id;
+        const oldParent = +oldRow.treePath.at(-2) || contingutScopeId || entity?.id;
+        if (newParent != oldParent && carpetes?.find((c: any) => c?.id == newParent) != null) {
+            console.log('>>> Canvi de pare', oldParent, newParent)
+            return new Promise((resolve, reject) => {
+                const patchData = {
+                    ordre: 1,
+                    pare: newParent,
+                };
+                apiAction(newRow.id, {code: 'REORDER', data: patchData}).
+                then(() => resolve(newRow)).
+                catch(reject);
+            });
+        } else {
+            return newRow;
         }
     }
 
@@ -277,7 +291,7 @@ const DocumentsGrid = (props: any) => {
     return <>
         <Load value={entity && carpetes && expedients && isReady}>
             <DropZone onDrop={onDrop} disabled={!(entity?.potModificarContingut || entity?.potModificar)} aria-label={t('page.document.action.new.dropMessg')}>
-                <DndContext onDragEnd={handleDragEnd} accessibility={{screenReaderInstructions: dndScreenReaderInstructions}}>
+                {/*<DndContext onDragEnd={handleDragEnd} accessibility={{screenReaderInstructions: dndScreenReaderInstructions}}>*/}
                     <StyledMuiGrid
                         resourceName={"documentResource"}
                         popupEditFormDialogResourceTitle={t('page.document.title')}
@@ -367,6 +381,7 @@ const DocumentsGrid = (props: any) => {
                         }}
                         treeData
                         rowReordering={draggable}
+                        processRowUpdate={processRowUpdate}
                         onRowOrderChange={handleDragEnd}
                         setTreeDataPath={(path, row) => ({...row, treePath: path})}
                         rowsTransformer={(_rows: any) => {
@@ -534,7 +549,7 @@ const DocumentsGrid = (props: any) => {
                     {components}
                     {massiveComponents}
                     {dialogVisualitzar}
-                </DndContext>
+                {/*</DndContext>*/}
 
                 {(entity?.potModificarContingut || entity?.potModificar) && <Box
                     sx={{

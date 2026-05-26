@@ -9,10 +9,11 @@
 	<artifactId>ripea-ear</artifactId>
 	<packaging>ear</packaging>
 	<properties>
-		<docker.image.name>${project.parent.artifactId}</docker.image.name>
-		<docker.image.from>${env.DOCKER_IMAGE_FROM}</docker.image.from>
-		<docker.auth.username>${env.DOCKER_USER}</docker.auth.username>
-       	<docker.auth.password>${env.DOCKER_PASSWORD}</docker.auth.password>
+		<docker.image.name>goib/${project.parent.artifactId}</docker.image.name>
+		<docker.image.from>docker.io/goib/jboss-eap72-openshift-base:latest</docker.image.from>
+		<docker.image.platform>linux/amd64</docker.image.platform>
+		<docker.image.context>${project.basedir}/..</docker.image.context>
+		<docker.image.dockerfile>${project.basedir}/../Dockerfile</docker.image.dockerfile>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -65,99 +66,24 @@
 				<version>0.42.1</version>
 				<configuration>
 					<verbose>true</verbose>
-	                <authConfig>
-	                   <username>${docker.auth.username}</username>
-	                   <password>${docker.auth.password}</password>
-	                </authConfig>
 					<images>
 						<image>
-							<name>280421/${docker.image.name}</name>
-							<alias>280421/${project.parent.artifactId}</alias>
+							<name>goib/${docker.image.name}</name>
+							<alias>goib/${docker.image.name}</alias>
 							<build>
-								<from>${docker.image.from}</from>
-								<maintainer>limit@limit.es</maintainer>
+								<dockerFile>${docker.image.dockerfile}</dockerFile>
+								<contextDir>${docker.image.context}</contextDir>
 								<args>
-									<VITE_APP_VERSION>${project.version}</VITE_APP_VERSION>
+									<BASE_IMAGE>${docker.image.from}</BASE_IMAGE>
+									<BASE_PLATFORM>${docker.image.platform}</BASE_PLATFORM>
 								</args>
-								<ports>
-									<port>8080</port>
-									<port>8787</port>
-								</ports>
-								<assemblies>
-									<assembly>
-										<name>copy_standalone_config</name>
-										<inline>
-											<files>
-												<file>
-													<source>src/main/docker/jboss/standalone-openshift.xml</source>
-													<outputDirectory>.</outputDirectory>
-													<destName>standalone-openshift.xml</destName>
-													<fileMode>0644</fileMode>
-												</file>
-											</files>
-										</inline>
-										<targetDir>$JBOSS_HOME/standalone/configuration</targetDir>
-									</assembly>
-									<assembly>
-										<name>copy_transformers</name>
-										<inline>
-											<fileSets>
-												<fileSet>
-													<directory>src/main/docker/transformers</directory>
-													<outputDirectory>.</outputDirectory>
-													<includes>
-														<include>**/*</include>
-													</includes>
-													<fileMode>0644</fileMode>
-													<directoryMode>0755</directoryMode>
-												</fileSet>
-											</fileSets>
-										</inline>
-										<targetDir>$JBOSS_HOME/apps/ripea</targetDir>
-									</assembly>
-									<assembly>
-									    <name>copy_oracle_module</name>
-									    <inline>
-									        <fileSets>
-									            <fileSet>
-									                <directory>src/main/docker/oracle</directory>
-									                <outputDirectory>modules/system/layers/base/com/oracle/main</outputDirectory>
-									            </fileSet>
-									        </fileSets>
-									    </inline>
-									    <targetDir>$JBOSS_HOME</targetDir>
-									</assembly>
-									<assembly>
-										<descriptorRef>artifact</descriptorRef>
-										<targetDir>$JBOSS_HOME/standalone/deployments</targetDir>
-									</assembly>
-								</assemblies>
+								<buildOptions>
+									<platform>${docker.image.platform}</platform>
+								</buildOptions>
 								<tags>
 									<tag>latest</tag>
 									<tag>${project.version}</tag>
 								</tags>
-								<runCmds>
-									<!-- Instal·lar adaptador de keycloak -->
-									<run>curl -fL https://github.com/keycloak/keycloak/releases/download/12.0.4/keycloak-oidc-wildfly-adapter-12.0.4.tar.gz -o $JBOSS_HOME/keycloak-adapter.tar.gz</run>
-									<run>tar xzf $JBOSS_HOME/keycloak-adapter.tar.gz -C $JBOSS_HOME --no-same-owner --no-same-permissions --touch</run>
-									<run>rm $JBOSS_HOME/keycloak-adapter.tar.gz</run>
-									<run>$JBOSS_HOME/bin/jboss-cli.sh --file=$JBOSS_HOME/bin/adapter-install-offline.cli -Djboss.server.config.file=standalone-openshift.xml</run>
-									<run>rm -rf $JBOSS_HOME/standalone/configuration/standalone_xml_history</run>
-									<run>mkdir -p $JBOSS_HOME/standalone/configuration/standalone_xml_history/current</run>
-
-									<!-- Donar permisos -->
-									<run>mkdir -p $JBOSS_HOME/standalone/data/content</run>
-									<run>mkdir -p $JBOSS_HOME/standalone/tmp</run>
-									<run>mkdir -p $JBOSS_HOME/standalone/log</run>
-									<run>chmod -R g=u $JBOSS_HOME/standalone/data</run>
-									<run>chmod -R g=u $JBOSS_HOME/standalone/tmp</run>
-									<run>chmod -R g=u $JBOSS_HOME/standalone/log</run>
-									<run>chmod -R g=u $JBOSS_HOME/standalone/configuration/standalone_xml_history</run>
-									<run>test ! -d $JBOSS_HOME/config || chmod -R g=u $JBOSS_HOME/config</run>
-
-									<run>mkdir -p /opt/webapps/ripea</run>
-									<run>chmod -R g=u /opt/webapps/ripea</run>
-								</runCmds>
 							</build>
 							<run>
 								<ports>
