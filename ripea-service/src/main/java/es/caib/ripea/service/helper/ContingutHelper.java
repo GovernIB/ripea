@@ -1237,7 +1237,8 @@ public class ContingutHelper {
 				false,
 				false,
 				false,
-				true, false);
+				true,
+				false);
 		
 		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(contingutId);
 		contingut = HibernateHelper.deproxy(contingut);

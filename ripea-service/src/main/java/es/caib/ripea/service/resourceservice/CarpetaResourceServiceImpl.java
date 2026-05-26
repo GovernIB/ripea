@@ -108,7 +108,7 @@ public class CarpetaResourceServiceImpl extends BaseMutableResourceService<Carpe
 					false,
 					null, 
 					false, 
-					null, 
+					configHelper.getRolActual(), 
 					true);
 			resource.setId(carpetaCreada.getId());
 			

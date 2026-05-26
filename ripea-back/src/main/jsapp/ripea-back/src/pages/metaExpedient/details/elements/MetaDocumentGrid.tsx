@@ -12,6 +12,7 @@ import {MultiplicitatStyled} from "../../../contingut/details/MetaExpedient.tsx"
 
 const sortModel: any = [{field: 'ordre', sort: 'asc'}]
 const perspectives = ["COUNT_METADADES"];
+const editPerspectives = ["PORTAFIRMES_RESPONSABLES"];
 const columns: any[] = [
     {
         field: 'codi',
@@ -123,6 +124,7 @@ export const MetaDocumentGrid = ({ entity, onRowCountChange, readOnly } :any) =>
         perspectives={perspectives}
         rowAdditionalActions={additionalActions}
         onRowCountChange={onRowCountChange}
+        popupEditFormComponentProps={{ perspectives: editPerspectives }}
 
         rowReordering={!readOnly}
         onRowOrderChange={handleDragEnd}

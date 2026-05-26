@@ -219,6 +219,7 @@ export const MetaDocumentForm = () => {
 // Grid
 const sortModel: any = [{field: 'nom', sort: 'asc'}]
 const perspectives = ["COUNT_METADADES"];
+const editPerspectives = ["PORTAFIRMES_RESPONSABLES"];
 
 const MetaDocumentGrid = () => {
     const {t} = useTranslation();
@@ -276,6 +277,7 @@ const MetaDocumentGrid = () => {
                 perspectives={perspectives}
                 rowAdditionalActions={actions}
 
+                popupEditFormComponentProps={{ perspectives: editPerspectives }}
                 popupEditFormDialogComponentProps={{ fullWidth: true, maxWidth: 'lg' }}
                 toolbarCreateTitle={t('page.metaDocument.action.new.label')}
                 popupEditFormI18nKeys={{
