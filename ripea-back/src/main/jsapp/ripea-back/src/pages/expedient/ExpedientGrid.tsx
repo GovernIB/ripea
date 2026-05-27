@@ -251,54 +251,63 @@ const ExpedientGrid = () => {
     ]
         .filter((col:any)=>!col?.hidden), [user]);
 
-    return <GridPage>
-        <CardPage title={t('page.expedient.filter.title')}>
-            <ExpedientFilter onSpringFilterChange={(value:any)=>{
-                setSpringFilter(value)
-                setLoad(true)
-            }}/>
+    return (
+        <GridPage>
+            <CardPage title={t('page.expedient.filter.title')}>
+                <ExpedientFilter
+                    onSpringFilterChange={(value: any) => {
+                        setSpringFilter(value);
+                        setLoad(true);
+                    }}
+                />
 
-            <Load value={load} noEffect>
-            <StyledMuiGrid
-                resourceName={"expedientResource"}
-                popupEditFormDialogResourceTitle={t('page.expedient.title')}
-                columns={columnsAddition}
-                filter={springFilter}
-                sortModel={sortModel}
-                perspectives={perspectives}
-                apiRef={apiRef}
-                popupEditCreateActive
-                popupEditFormContent={<ExpedientGridForm/>}
-                popupEditFormDialogTitle={t('page.expedient.action.new.title')}
-                readOnly={rol?.isAdminLectura}
-                onRowClick={(params: any) => navigate(`/contingut/${params?.id}`)}
-                rowAdditionalActions={actions}
-                toolbarCreateTitle={t('page.expedient.action.new.label')}
-                toolbarMassiveActions={massiveActions}
-                rowProps={(row: any) => {
-                    const color = row?.estatAdditionalInfo?.color;
-                    return color
-                        ? {
-                            'box-shadow': `${color} -6px 0px 0px`,
-                            'border-left': `6px solid ${color}`,
-                        }
-                        : {
-                            'padding-left': '6px'
-                        }
-                }}
-                popupEditFormI18nKeys={{
-                    createSuccess: 'page.expedient.action.new.ok',
-                    updateSuccess: 'page.expedient.action.update.ok',
-                }}
-            />
-            </Load>
-
-            {components}
-            {massiveComponents}
-            {dialogAlert}
-            {dialogErrorValidacio}
-        </CardPage>
-    </GridPage>
+                <Load value={load} noEffect>
+                    <StyledMuiGrid
+                        resourceName={'expedientResource'}
+                        popupEditFormDialogResourceTitle={t('page.expedient.title')}
+                        columns={columnsAddition}
+                        filter={springFilter}
+                        sortModel={sortModel}
+                        perspectives={perspectives}
+                        apiRef={apiRef}
+                        popupEditCreateActive
+                        popupEditFormContent={<ExpedientGridForm />}
+                        popupEditFormDialogTitle={t('page.expedient.action.new.title')}
+                        readOnly={rol?.isAdminLectura}
+                        onRowClick={(params: any) => navigate(`/contingut/${params?.id}`)}
+                        rowAdditionalActions={actions}
+                        toolbarCreateTitle={t('page.expedient.action.new.label')}
+                        toolbarMassiveActions={massiveActions}
+                        rowProps={(row: any) => {
+                            const color = row?.estatAdditionalInfo?.color;
+                            return color
+                                ? {
+                                      'box-shadow': `${color} -6px 0px 0px`,
+                                      'border-left': `6px solid ${color}`,
+                                  }
+                                : {
+                                      'padding-left': '6px',
+                                  };
+                        }}
+                        popupEditFormI18nKeys={{
+                            createSuccess: 'page.expedient.action.new.ok',
+                            updateSuccess: 'page.expedient.action.update.ok',
+                        }}
+                        sx={{
+                            '& .MuiDataGrid-cell': {
+                                paddingTop: '5px',
+                                paddingBottom: '5px',
+                            },
+                        }}
+                    />
+                </Load>
+                {components}
+                {massiveComponents}
+                {dialogAlert}
+                {dialogErrorValidacio}
+            </CardPage>
+        </GridPage>
+    );
 }
 
 export default ExpedientGrid;
