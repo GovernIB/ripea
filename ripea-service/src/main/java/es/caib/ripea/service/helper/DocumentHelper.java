@@ -400,7 +400,7 @@ public class DocumentHelper {
             		ubicacio.iterator());
             
             String rutaCarpeta = String.join("/", ubicacio);
-            if (!progres.getCarpetesCreadesSet().contains(rutaCarpeta)) {
+            if (!progres.getCarpetesCreadesSet().contains(rutaCarpeta) && Utils.hasValue(rutaCarpeta)) {
                 progres.getCarpetesCreadesSet().add(rutaCarpeta);
                 progres.setCarpetesCreades(progres.getCarpetesCreades() + 1);
             }
