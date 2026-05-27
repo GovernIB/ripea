@@ -149,7 +149,6 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
     		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
     		ExpedientTascaEntity tascaCreada = tascaHelper.createTasca(entitatEntity.getId(), resource.getExpedient().getId(), toTascaDto(resource));
     		resource.setId(tascaCreada.getId());
-    		//contingutLogHelper.logTasca (JA INCLUIT EN EL HELPER)
     	} catch (Exception ex) {
     		excepcioLogHelper.addExcepcio("/tasca/create", ex);
     	}
@@ -285,12 +284,21 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
                                 resource.getResponsable().getCodi(),
                                 resource.getResponsable().getCodiAndNom()
                         ));
+                        List<ResourceReference<UsuariResource, String>> responsables = new ArrayList<>();
+                        responsables.add(ResourceReference.toResourceReference(
+                                resource.getResponsable().getCodi(),
+                                resource.getResponsable().getCodiAndNom()
+                        ));
+                        target.setResponsables(responsables);
+                    } else {
+                        target.setResponsables(new ArrayList<>());
                     }
                 });
             } else {
 //                target.setDuracio(null);
                 target.setPrioritat(PrioritatEnumDto.B_NORMAL);
                 target.setResponsableActual(null);
+                target.setResponsables(new ArrayList<>());
                 target.setMetaExpedientTascaDescription(null);
             }
         }
@@ -387,7 +395,12 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
 
         @Override
         public ExpedientTascaResource exec(String code, ExpedientTascaResourceEntity entity, ExpedientTascaResource.ChangePrioritatFormAction params) throws ActionExecutionException {
-            entity.setPrioritat(params.getPrioritat());
+            contingutLogHelper.logTasca(
+            		entity.getId(),
+            		LogTipusEnumDto.CANVI_PRIORITAT,
+            		entity.getPrioritat()!=null?entity.getPrioritat().toString():null,
+            		params.getPrioritat()!=null?params.getPrioritat().toString():null);
+        	entity.setPrioritat(params.getPrioritat());
             expedientTascaResourceRepository.save(entity);
             ExpedientTascaResource resultat = objectMappingHelper.newInstanceMap(entity, ExpedientTascaResource.class);
             resultat.setPrioritat(params.getPrioritat());

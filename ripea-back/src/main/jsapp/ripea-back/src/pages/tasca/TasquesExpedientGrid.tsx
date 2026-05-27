@@ -35,7 +35,7 @@ const TasquesGridForm = () => {
     </Grid>
 }
 
-const perspectives = ["RESPONSABLES_RESUM", "CONTEXT_USUARI"]
+const perspectives = ["RESPONSABLES_RESUM", "CONTEXT_USUARI", "AUDITORIA"]
 const columns = [
     {
         field: 'metaExpedientTasca',
@@ -123,7 +123,9 @@ const TasquesExpedientGrid = (props: any) => {
             onRowCountChange={onRowCountChange}
             popupEditCreateActive
 			toolbarCreateTitle={t('page.tasca.action.new.label')}
+            toolbarShowQuickFilter
             popupEditFormContent={<TasquesGridForm/>}
+            popupEditFormComponentProps={{ perspectives: ["RESPONSABLES_RESUM"] }}
             formAdditionalData={{
                 expedient: {id: entity?.id},
                 metaExpedient: entity?.metaExpedient,

@@ -1,7 +1,7 @@
 import {useState} from "react";
 import {MuiDialog, useBaseAppContext, useResourceApiService} from "reactlib";
 import {useTranslation} from "react-i18next";
-import {formatDate} from "../../../util/dateUtils.ts";
+import {formatDate, formatDuracio} from "../../../util/dateUtils.ts";
 import {StyledPrioritat} from "../../expedient/ExpedientGrid.tsx";
 import {DetailCard} from "../../../components/CardData.tsx";
 import {StyledDate} from "../TasquesGrid.tsx";
@@ -68,7 +68,7 @@ const useTascaDetail = () => {
                 <FieldData field={"responsableActual"}/>
                 <FieldData field={"delegat"}/>
                 <FieldData field={"observadorsStr"}/>
-                <FieldData size={6} field={"duracio"}/>
+                <FieldData size={6} field={"duracio"} renderCell={() => formatDuracio(entity?.duracio, entity?.dataLimit, t)}/>
                 <FieldData size={6} field={"dataLimit"} renderCell={(formattedValue:string) => <StyledDate entity={entity}>{formatDate(formattedValue, "DD/MM/Y")}</StyledDate>}/>
                 <FieldData size={6} field={"estat"}/>
                 <FieldData size={6} field={"prioritat"} renderCell={(formattedValue:string) => <StyledPrioritat entity={entity}>{formattedValue}</StyledPrioritat>}/>

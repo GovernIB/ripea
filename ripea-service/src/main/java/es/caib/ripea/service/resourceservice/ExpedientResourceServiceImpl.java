@@ -1568,7 +1568,6 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         public ProgresProcessamentZipDto exec(String code, ExpedientResourceEntity entity, Long id)
                 throws ActionExecutionException {
         	ProgresProcessamentZipDto progres = zipImportacioHelper.obtenirProgresActual(entity.getId());
-        
         	return progres;
         }
 
