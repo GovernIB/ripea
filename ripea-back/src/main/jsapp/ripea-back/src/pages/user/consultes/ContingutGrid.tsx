@@ -6,7 +6,7 @@ import {
     useMuiDataGridApiRef,
     useFormContext,
     useResourceApiService,
-    useBaseAppContext, useConfirmDialogButtons
+    useBaseAppContext
 } from "reactlib";
 import {CardPage, DetailCard} from "../../../components/CardData.tsx";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
@@ -22,6 +22,7 @@ import useAssignar from "../../expedient/actions/Assignar.tsx";
 import {useSession} from "../../../components/SessionStorageContext.tsx";
 import {FieldData, MuiDetail} from "../../../components/MuiDetail.tsx";
 import Box from "@mui/material/Box";
+import { useConfirmDialogButtons } from "@src/util/buttonsOverride.tsx";
 
 const useActions = (refresh?: () => void) => {
     const {t} = useTranslation();

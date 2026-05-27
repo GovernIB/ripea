@@ -1,5 +1,5 @@
 import {Divider} from "@mui/material";
-import {MuiDataGridApiRef, useBaseAppContext, useConfirmDialogButtons, useResourceApiService} from "reactlib";
+import {MuiDataGridApiRef, useBaseAppContext, useResourceApiService} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {useUserSession} from "../../../components/Session.tsx";
 import useDocumentDetail from "./DocumentDetail.tsx";
@@ -22,6 +22,7 @@ import useImportar from "../actions/ImportarSgd.tsx";
 import useCarpetaActions from "../../carpeta/details/CarpetaActions.tsx";
 import useImportarExpedient from "../../expedient/actions/ImportarExpedient.tsx";
 import useImportarZip from "../actions/ImportarZip.tsx";
+import { useConfirmDialogButtons } from "@src/util/buttonsOverride.tsx";
 
 export const useActions = (refresh?: () => void) => {
     const { t } = useTranslation();

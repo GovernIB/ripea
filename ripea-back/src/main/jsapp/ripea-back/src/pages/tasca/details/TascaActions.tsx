@@ -1,5 +1,5 @@
 import {Divider} from "@mui/material";
-import {useBaseAppContext, useConfirmDialogButtons,useResourceApiService} from "reactlib";
+import {useBaseAppContext,useResourceApiService} from "reactlib";
 import {useTranslation} from "react-i18next";
 import useTascaDetail from "./TascaDetail.tsx";
 import useRebutjar from "../actions/Rebutjar.tsx";
@@ -12,6 +12,7 @@ import {useUserSession} from "../../../components/Session.tsx";
 import useRetomar from "../actions/Retomar.tsx";
 import {useNavigate} from "react-router-dom";
 import useHistoric, {HistoricContingutTipusEnum} from "../../Historic.tsx";
+import { useConfirmDialogButtons } from "@src/util/buttonsOverride.tsx";
 
 export const useActions = (refresh?: () => void) => {
     const { t } = useTranslation();

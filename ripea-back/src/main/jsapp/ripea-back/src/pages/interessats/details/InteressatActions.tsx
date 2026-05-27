@@ -1,7 +1,6 @@
 import {Divider} from "@mui/material";
 import {
     useBaseAppContext,
-    useConfirmDialogButtons,
     useResourceApiService
 } from "reactlib";
 import {useTranslation} from "react-i18next";
@@ -10,6 +9,7 @@ import useCreate, {useCreateRepresentant} from "../actions/Create.tsx";
 import {iniciaDescargaBlob, iniciaDescargaJSON} from "../../expedient/details/CommonActions.tsx";
 import useImportarSGD from "../actions/ImportarSGD.tsx";
 import useManageInteressatGrups from "../actions/groups/ManageInteressatGrups.tsx";
+import { useConfirmDialogButtons } from "@src/util/buttonsOverride.tsx";
 
 export const useActions = (refresh?: () => void) => {
     const { t } = useTranslation();

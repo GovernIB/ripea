@@ -1,6 +1,6 @@
 import {
     useResourceApiService,
-    useBaseAppContext, useConfirmDialogButtons,
+    useBaseAppContext,
 } from 'reactlib';
 import useAssignar from "../actions/Assignar.tsx";
 import useCambiarEstat from "../actions/CambiarEstat.tsx";
@@ -18,6 +18,7 @@ import useModifyExpedient from "../actions/ModifyExpedient.tsx";
 import {useNavigate} from "react-router-dom";
 import useMoureTot from '../actions/MoureTot.tsx';
 import {useExportarExpedient} from "../actions/ExportarExpedientsMassive.tsx";
+import { useConfirmDialogButtons } from '@src/util/buttonsOverride.tsx';
 
 export const iniciaDescarga = (url:string, fileName:string) => {
     const link = document.createElement('a');

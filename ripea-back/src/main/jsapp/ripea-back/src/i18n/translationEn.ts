@@ -43,6 +43,32 @@ const translationEn = {
         },
         dragdrop: "Reorder content",
     },
+    buttons: {
+        answerRequired: {
+            accept: 'Accept',
+            cancel: 'Cancel',
+        },
+        confirm: {
+            accept: 'Accept',
+            cancel: 'Cancel',
+        },
+        form: {
+            save: 'Save',
+            cancel: 'Cancel',
+        },
+        action: {
+            exec: 'Execute',
+            cancel: 'Cancel',
+        },
+        report: {
+            generate: 'Generate',
+            cancel: 'Cancel',
+        },
+        misc: {
+            close: 'Close',
+            retry: 'Try again',
+        },
+    },
     enum: {
         rol: {
             IPA_SUPER: "Superuser",
@@ -1174,7 +1200,7 @@ const translationEn = {
                 notificacioDades: "Notification data",
                 notificacioDocument: "Notification document",
                 error: "Errors occurred while sending the notification",
-
+                fitxerNom: "File name",
                 notificacioEstat: "Status",
                 createdDate: "Sent on",
                 entregaPostal: "Postal delivery",

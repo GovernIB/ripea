@@ -1,9 +1,10 @@
 import {useTranslation} from "react-i18next";
 import {useMoure} from "../actions/Moure.tsx";
-import {useBaseAppContext, useConfirmDialogButtons, useResourceApiService} from "reactlib";
+import {useBaseAppContext, useResourceApiService} from "reactlib";
 import useNotificarMassive from "../actions/NotificarMassive.tsx";
 import useCanviTipus from "../actions/CanviTipus.tsx";
 import {iniciaDescargaBlob} from "../../expedient/details/CommonActions.tsx";
+import { useConfirmDialogButtons } from "@src/util/buttonsOverride.tsx";
 
 export const useMassiveActions = (refresh?: () => void) => {
     const { t } = useTranslation();
