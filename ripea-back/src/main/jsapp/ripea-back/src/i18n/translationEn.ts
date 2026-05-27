@@ -809,6 +809,7 @@ const translationEn = {
                 extensio: "Extension",
                 ruta: "Path",
                 mida: "Size",
+                tipusDocumentDefault: "Document type to apply to all files",
             },
             action: {
                 new: {

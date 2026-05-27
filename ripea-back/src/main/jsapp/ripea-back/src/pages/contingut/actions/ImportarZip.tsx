@@ -134,6 +134,7 @@ const ImportarZipForm = () => {
 
         <Load value={data?.documentsZip} noEffect>
             <GridFormField name={"tipusDocument#default"}
+                           label={t('page.document.detall.tipusDocumentDefault')}
                            field={fieldTipusDocument}
                            onChange={(value:any) => {
                                data.documentsZip.forEach((row:any) => {
@@ -146,8 +147,10 @@ const ImportarZipForm = () => {
             <DataGridPro
                 rows={data.documentsZip}
                 columns={columns}
-                onRowSelectionModelChange={(newSelection) => {
-                    const ids = fromSelectionModel(newSelection);
+                onRowSelectionModelChange={(newSelection, event) => {
+                    const ids = (newSelection.type == 'exclude' && newSelection.ids.size == 0)
+                        ? event.api.getAllRowIds()
+                        : fromSelectionModel(newSelection);
                     data.documentsZip.forEach((row:any) => {
                         updateDocument(row.id, "importar", ids.includes(row.id))
                     })

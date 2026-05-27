@@ -809,6 +809,7 @@ const translationCa = {
                 extensio: "Extensio",
                 ruta: "Ruta",
                 mida: "Mida",
+                tipusDocumentDefault: "Tipus de document a aplicar a tots els fitxers",
             },
             action: {
                 new: {
