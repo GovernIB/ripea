@@ -2,33 +2,33 @@ const translationEs = {
     common: {
         close: "Cerrar",
         cancel: "Cancela",
-        copy: "Copiar",
+        copy: "Copia",
         create: "Crear",
         update: "Modificar",
         actualize: "Actualiza",
         save: "Guarda",
-        delete: "Eliminar",
+        delete: "Elimina",
         accepta: "Acepta",
         rebutja: "Rechaza",
         action: "Acciones",
-        expand: "Expandir",
-        contract: "Contraer",
-        download: "Descargar",
+        expand: "Expande",
+        contract: "Contrae",
+        download: "Descarga",
         send: "Envia",
         detail: "Detalles",
-        refresh: "Refrescar",
-        clear: "Limpiar",
-        back: "Volver",
+        refresh: "Refresca",
+        clear: "Limpia",
+        back: "Vuelve",
         search: "Buscar",
         options: "Opciones",
         select: {
-            all: "Seleccionar todos",
-            clear: "Limpiar selección",
+            all: "Selecciona todo",
+            clear: "Limpia la selección",
         },
         import: "Importar",
         export: "Exportar",
         consult: "Consultar",
-        filter: "Filtrar",
+        filter: "Filtra",
         processing: "Procesando...",
         auditoria: {
             create: "Creado el {{createdDate}} por '{{createdBy}}'.",
@@ -41,7 +41,33 @@ const translationEs = {
             title: "Título",
             message: "Mensaje",
         },
-        dragdrop: "Reordenar contenido",
+        dragdrop: "Reordena el contenido",
+    },
+    buttons: {
+        answerRequired: {
+            accept: 'Acepta',
+            cancel: 'Cancela',
+        },
+        confirm: {
+            accept: 'Acepta',
+            cancel: 'Cancela',
+        },
+        form: {
+            save: 'Guarda',
+            cancel: 'Cancela',
+        },
+        action: {
+            exec: 'Ejecuta',
+            cancel: 'Cancela',
+        },
+        report: {
+            generate: 'Genera',
+            cancel: 'Cancela',
+        },
+        misc: {
+            close: 'Cierra',
+            retry: 'Reintenta',
+        },
     },
     enum: {
         rol: {
@@ -190,7 +216,7 @@ const translationEs = {
             },
             action: {
                 guardarArxiu: {
-                    label: "Guardar en archivo",
+                    label: "Guarda el archivo",
                     ok: "Elemento '{{contingut}}' guardado en archivo",
                 },
                 move: {
@@ -209,7 +235,7 @@ const translationEs = {
                     ok: "Documento '{{document}}' vinculado correctamente",
                 },
                 create: {
-                    label: "Crear contenido",
+                    label: "Crea contenido",
                 },
                 history: {
                     label: "Histórico de acciones",
@@ -281,7 +307,7 @@ const translationEs = {
             },
             action: {
                 justificant: {
-                    label: "Descargar justificante",
+                    label: "Descarga justificante",
                     ok: "El justificante se ha descargado correctamente",
                 },
                 acceptar: {
@@ -902,7 +928,7 @@ const translationEs = {
                     ok: "La copia auténtica imprimible se ha descargado correctamente"
                 },
                 original: {
-                    label: "Descargar original",
+                    label: "Descarga original",
                     ok: "El documenmto original se ha descargado correctamente",
                 },
                 download: {
@@ -911,7 +937,7 @@ const translationEs = {
                 },
                 firma: {
                     label: "Firmar desde el navegador....",
-                    button: "Iniciar proceso de firma",
+                    button: "Inicia proceso de firma",
                     title: "Firmar desde el navegador",
                     ok: "Documento firmado correctamente",
                 },
@@ -1004,7 +1030,7 @@ const translationEs = {
                     ok: "El documento original se ha descargado correctamente"
                 },
                 descarregarImprimible: {
-                    label: "Descargar copia auténtica",
+                    label: "Descarga copia auténtica",
                     ok: "La copia auténtica se ha descargado correctamente",
                 },
                 changeType: {
@@ -1187,7 +1213,7 @@ const translationEs = {
                 notificacioDades: "Datos de la notificación",
                 notificacioDocument: "Documento de la notificación",
                 error: "Se han producido errores enviando la notificación",
-
+                fitxerNom: "Nombre del archivo",
                 notificacioEstat: "Estado",
                 createdDate: "Enviada el",
                 entregaPostal: "Entrega postal",

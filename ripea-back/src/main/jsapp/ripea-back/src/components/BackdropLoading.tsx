@@ -1,7 +1,8 @@
 import React from 'react';
 import { Typography, Box, Backdrop, LinearProgress, Button } from '@mui/material';
-import { useBaseAppContext, useConfirmDialogButtons } from 'reactlib'; // ← Importar el contexto
+import { useBaseAppContext } from 'reactlib'; // ← Importar el contexto
 import { useTranslation } from 'react-i18next';
+import { useConfirmDialogButtons } from '@src/util/buttonsOverride';
 
 interface BackdropLoadingProps {
 	open: boolean;

@@ -1,6 +1,6 @@
 import {useState} from "react";
 import {Alert, Grid, Icon, IconButton} from "@mui/material";
-import {MuiDialog, useBaseAppContext, useConfirmDialogButtons, useResourceApiService} from "reactlib";
+import {MuiDialog, useBaseAppContext, useResourceApiService} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {DetailCard} from "../../../components/CardData.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
@@ -10,6 +10,7 @@ import TabComponent from "../../../components/TabComponent.tsx";
 import {useUserSession} from "../../../components/Session.tsx";
 import {FieldData, MuiDetail} from "../../../components/MuiDetail.tsx";
 import {ErrorArea} from "../../../components/ErrorPage.tsx";
+import { useConfirmDialogButtons } from "@src/util/buttonsOverride.tsx";
 
 const Dades = (props:any) => {
     const {entity, fields} = props;

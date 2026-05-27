@@ -3,32 +3,32 @@ const translationCa = {
         close: "Tanca",
         cancel: "Cancel·la",
         create: "Crea",
-        copy: "Copiar",
+        copy: "Copia",
         update: "Modifica",
         actualize: "Actualitza",
         save: "Guarda",
-        delete: "Esborrar",
+        delete: "Esborra",
         accepta: "Accepta",
         rebutja: "Rebutja",
         action: "Accions",
-        expand: "Expandir",
-        contract: "Contreure",
-        download: "Descarregar",
+        expand: "Expandeix",
+        contract: "Contreu",
+        download: "Descarrega",
         send: "Envia",
         detail: "Detalls",
-        refresh: "Refrescar",
-        clear: "Netejar",
-        back: "Tornar",
-        search: "Filtrar",
+        refresh: "Refresca",
+        clear: "Neteja",
+        back: "Torna",
+        search: "Filtra",
         options: "Opcions",
         select: {
-            all: "Seleccionar tots",
-            clear: "Netejar selecció",
+            all: "Selecciona-ho tot",
+            clear: "Neteja la selecció",
         },
         import: "Importa",
         export: "Exporta",
         consult: "Consulta",
-        filter: "Filtrar",
+        filter: "Filtra",
         processing: "Processant...",
         auditoria: {
             create: "Creat el {{createdDate}} per '{{createdBy}}'.",
@@ -41,7 +41,33 @@ const translationCa = {
             title: "Títol",
             message: "Missatge",
         },
-        dragdrop: "Reordenar contingut",
+        dragdrop: "Reordena el contingut",
+    },
+    buttons: {
+        answerRequired: {
+            accept: 'Accepta',
+            cancel: 'Cancel·la',
+        },
+        confirm: {
+            accept: 'Accepta',
+            cancel: 'Cancel·la',
+        },
+        form: {
+            save: 'Desa',
+            cancel: 'Cancel·la',
+        },
+        action: {
+            exec: 'Executa',
+            cancel: 'Cancel·la',
+        },
+        report: {
+            generate: 'Genera',
+            cancel: 'Cancel·la',
+        },
+        misc: {
+            close: 'Tanca',
+            retry: 'Torna a provar',
+        },
     },
     enum: {
         rol: {
@@ -190,7 +216,7 @@ const translationCa = {
             },
             action: {
                 guardarArxiu: {
-                    label: "Desar a l'arxiu",
+                    label: "Desa l'arxiu",
                     ok: "Element '{{contingut}}' desat a l'arxiu",
                 },
                 move: {
@@ -209,7 +235,7 @@ const translationCa = {
                     ok: "Document '{{document}}' vinculat correctament",
                 },
                 create: {
-                    label: "Crear contingut",
+                    label: "Crea contingut",
                 },
                 history: {
                     label: "Històric d'accions",
@@ -281,7 +307,7 @@ const translationCa = {
             },
             action: {
                 justificant: {
-                    label: "Descarregar justificant",
+                    label: "Descarrega justificant",
                     ok: "El justificant s'ha descarregat correctament",
                 },
                 acceptar: {
@@ -902,7 +928,7 @@ const translationCa = {
                     ok: "La còpia autèntica imprimible s'ha descarregat correctament",
                 },
                 original: {
-                    label: "Descarregar original",
+                    label: "Descarrega original",
                     ok: "El document original s'ha descarregat correctament",
                 },
                 download: {
@@ -911,7 +937,7 @@ const translationCa = {
                 },
                 firma: {
                     label: "Signar des del navegador...",
-                    button: "Iniciar procés de firma",
+                    button: "Inicia procés de firma",
                     title: "Signar des del navegador",
                     ok: "Document signat correctament",
                 },
@@ -1004,7 +1030,7 @@ const translationCa = {
                     ok: "El document original s'ha descarregat correctament",
                 },
                 descarregarImprimible: {
-                    label: "Descarregar còpia auténtica imprimible",
+                    label: "Descarrega còpia auténtica imprimible",
                     ok: "La còpia auténtica imprimible s'ha descarregat correctament",
                 },
                 changeType: {
@@ -1187,7 +1213,7 @@ const translationCa = {
                 notificacioDades: "Dades de la notificació",
                 notificacioDocument: "Document de la notificació",
                 error: "S'han produït errors en enviar la notificació",
-
+                fitxerNom: "Nom de l'arxiu",
                 notificacioEstat: "Estat",
                 createdDate: "Enviada el",
                 entregaPostal: "Lliurament postal",

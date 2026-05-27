@@ -3,13 +3,13 @@ import FormActionDialog from "../../../components/FormActionDialog.tsx";
 import {
     useMuiFormDialogApiRef,
     useBaseAppContext,
-    useConfirmDialogButtons,
     useFormContext,
     useResourceApiService
 } from "reactlib";
 import {Grid} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
 import {CardData} from "../../../components/CardData.tsx";
+import { useConfirmDialogButtons } from "@src/util/buttonsOverride.tsx";
 
 export const usePermisActions = (refresh?: () => void) => {
     const { t } = useTranslation();
