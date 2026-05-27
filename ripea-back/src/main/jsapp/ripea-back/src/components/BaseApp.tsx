@@ -199,11 +199,11 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
         headerAppbarStyle={style}
         headerAppbarBackgroundColor={appbarBackgroundColor}
         headerAppbarBackgroundImg={appbarBackgroundImg}
-        headerAdditionalComponents={[
+        headerAdditionalComponents={
             <MuiBaseAppContext.Provider value={{ defaultMuiComponentProps: {} }}>
                 <UserHeadToolbar/>
             </MuiBaseAppContext.Provider>
-        ]}
+        }
         headerAdditionalAuthComponents={
             <MuiBaseAppContext.Provider value={{ defaultMuiComponentProps: {} }}>
                 <UserMenu/>
