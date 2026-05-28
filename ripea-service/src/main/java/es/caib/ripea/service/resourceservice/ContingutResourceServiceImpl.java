@@ -103,7 +103,7 @@ implements ContingutResourceService {
             reorderIfReorderable(
                     entity,
                     reorderPreviousSequence,
-		            reorderNewSequence,
+                    reorderNewSequence,
                     reorderPreviousParentId,
                     false);
 

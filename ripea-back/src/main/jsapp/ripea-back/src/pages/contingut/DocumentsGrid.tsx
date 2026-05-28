@@ -133,6 +133,10 @@ const columns = [
     //     renderCell: (params: any) => <ContingutIcon entity={params?.row}/>
     // },
     {
+        field: 'id',
+        flex: 0.75,
+    },
+    {
         field: 'descripcio',
         flex: 0.75,
     },
@@ -251,11 +255,11 @@ const DocumentsGrid = (props: any) => {
 
     const handleDragEnd = (params: any) => {
         if (params.newParent != params.oldParent || params.targetIndex != params.oldIndex) {
-            console.log('>>> Canvi d\'ordre', params.targetIndex + 1, params)
+            // console.log('>>> Canvi d\'ordre', params.targetIndex + 1, params)
             const parePerDefecte = params.newParent || contingutScopeId || entity.id;
             const patchData = {
-                ordre: params.targetIndex + 1,
                 pare: parePerDefecte,
+                ordre: params.targetIndex + 1,
             };
             if (apiContingutIsReady) {
                 apiAction(params.row.id, {code: 'REORDER', data: patchData})
@@ -275,13 +279,13 @@ const DocumentsGrid = (props: any) => {
         const newParent = +newRow.treePath.at(-2) || contingutScopeId || entity?.id;
         const oldParent = +oldRow.treePath.at(-2) || contingutScopeId || entity?.id;
         if (newParent != oldParent && carpetes?.find((c: any) => c?.id == newParent) != null) {
-            console.log('>>> Canvi de pare', oldParent, newParent)
+            // console.log('>>> Canvi de pare', oldParent, '->', newParent)
             return new Promise((resolve, reject) => {
                 const patchData = {
-                    ordre: 1,
                     pare: newParent,
+                    ordre: 1,
                 };
-                apiAction(newRow.id, {code: 'REORDER', data: patchData}).
+                apiAction(newRow.id, { code: 'REORDER', data: patchData }).
                 then(() => {
                     addFolderExpand(String(newParent), true);
                     resolve(newRow);
@@ -406,7 +410,6 @@ const DocumentsGrid = (props: any) => {
                         rowReordering={draggable}
                         processRowUpdate={processRowUpdate}
                         onRowOrderChange={handleDragEnd}
-                        setTreeDataPath={(path, row) => ({...row, treePath: path})}
                         rowsTransformer={(_rows: any) => {
                             if (!_rows) return [];
                             const additionalRows: any[] = _rows;
@@ -475,6 +478,10 @@ const DocumentsGrid = (props: any) => {
                                     return row?.treePath?.filter((id:any)=>id!=entity?.id) ?? [`${row.id}`];
                                 }
                             }
+                        }}
+                        setTreeDataPath={(path, row) => {
+                            const treePath = [row.expedient.id, ...(path.map(p => parseInt(p)))];
+                            return { ...row, treePath };
                         }}
                         rowExpansionChange={(params: any) => {
                             if (params.groupingKey) {
