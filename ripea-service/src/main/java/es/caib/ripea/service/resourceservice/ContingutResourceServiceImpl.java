@@ -96,14 +96,14 @@ implements ContingutResourceService {
             ContingutResource contingutResource = objectMappingHelper.newInstanceMap(entity, ContingutResource.class);
             contingutResource.setOrdre(Math.toIntExact(resource.getOrdre()));
             contingutResource.setPare(ResourceReference.toResourceReference(resource.getPare()));
-            Long reorderResourceSequence = reorderGetSequenceFromResourceOrEntity(contingutResource, entity);
+            Long reorderNewSequence = reorderGetNewSequence(contingutResource);
             if (!Objects.equals(resource.getPare(), entity.getPare().getId())) {
                 entity.setPare(contingutResourceRepository.findById(resource.getPare()).get());
             }
             reorderIfReorderable(
                     entity,
                     reorderPreviousSequence,
-                    reorderResourceSequence,
+		            reorderNewSequence,
                     reorderPreviousParentId,
                     false);
 
