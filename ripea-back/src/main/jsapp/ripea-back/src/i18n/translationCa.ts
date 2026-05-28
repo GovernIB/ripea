@@ -481,6 +481,7 @@ const translationCa = {
                 exportar: {
                     label: "Exportar...",
                     ok: "Interessats exportats correctament",
+                    hint: "Seleccioni els interessats que vol exportar.",
                 },
                 importSGD: {
                     label: "Importar interessats des de Registre...",

@@ -231,7 +231,6 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         register(ExpedientResource.ACTION_IMPORT_DOCS_ZIP, new ImportarDocumentsZipArxiuActionExecutor());
         register(ExpedientResource.ACTION_GET_PROGRES_ZIP, new GetProgresZipActionExecutor());
         register(ExpedientResource.ACTION_CANCEL_IMPORT_ZIP, new CancelarImportZipActionExecutor());
-//        register(ExpedientResource.ACTION_IMPORT_INTE, new ImportarInteressatsArxiuActionExecutor());
         register(ExpedientResource.ACTION_MOURE_TOT_CODE, new MoureTotActionExecutor());
         
         register(ExpedientResource.PERSPECTIVE_BASE_CODE, new BasicPerspectiveApplicator());

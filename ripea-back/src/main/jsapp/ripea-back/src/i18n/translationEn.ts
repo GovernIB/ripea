@@ -481,6 +481,7 @@ const translationEn = {
                 exportar: {
                     label: "Export...",
                     ok: "Interested parties exported successfully",
+                    hint: "Select the interested parties you want to export.",
                 },
                 importSGD: {
                     label: "Import stakeholders from Registry...",

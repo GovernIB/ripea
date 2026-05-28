@@ -12,6 +12,8 @@ import javax.validation.constraints.Size;
 
 import org.springframework.data.annotation.Transient;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import es.caib.ripea.service.intf.base.annotation.ResourceArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.annotation.ResourceField;
@@ -190,6 +192,7 @@ public class InteressatResource extends BaseAuditableResource<Long> {
 	private ResourceReference<InteressatResource, Long> representant;
     
 	@Transient private InteressatResource representantInfo;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     @Transient private ResourceReference<InteressatResource, Long> representat;
     @Transient private boolean hasRepresentats;
 

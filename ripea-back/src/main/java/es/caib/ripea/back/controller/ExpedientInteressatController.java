@@ -29,6 +29,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.exc.InvalidTypeIdException;
 
 import es.caib.ripea.back.command.DocumentNotificacionsCommand;
 import es.caib.ripea.back.command.InteressatCommand;
@@ -238,7 +239,11 @@ public class ExpedientInteressatController extends BaseUserOAdminOOrganControlle
 					request.getSession().setAttribute("FITXER_IMPORT_INTERESSATS", lista);
 				}
             } catch (Exception e) {
-				MissatgesHelper.error(request, getMessage(request, "contingut.importar.interessats.err"), e);
+            	if (e instanceof InvalidTypeIdException) {
+            		MissatgesHelper.error(request, getMessage(request, "interessat.import.reject"));
+            	} else {
+            		MissatgesHelper.error(request, getMessage(request, "contingut.importar.interessats.err"), e);
+            	}
             }
 		}
 

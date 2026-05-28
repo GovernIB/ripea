@@ -481,6 +481,7 @@ const translationEs = {
                 exportar: {
                     label: "Exportar...",
                     ok: "Interesados exportados correctamente",
+                    hint: "Seleccione los interesados que desea exportar.",
                 },
                 importSGD: {
                     label: "Importar interesados desde Registro...",

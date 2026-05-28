@@ -54,7 +54,7 @@ export const useCreateRepresentant = (refresh?: () => void) => {
             });
     }
     const update = (_id: any, row: any) => {
-        apiRef.current?.show(row?.representant?.id)
+        apiRef.current?.show(row?.representant?.id, { representat: { id: row?.id } })
             .then((data:any) => {
                 refresh?.();
                 temporalMessageShow(null, t('page.interessat.action.updateRep.ok',{data}), 'success');
