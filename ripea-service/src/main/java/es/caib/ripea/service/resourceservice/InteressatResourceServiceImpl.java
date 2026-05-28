@@ -559,7 +559,59 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
 	                    ) {
 	                    	throw new AnswerRequiredException(InteressatResource.class, NOT_REPRESENT_HIMSELF, messageHelper.getMessage("es.caib.ripea.service.intf.resourcevalidation.InteressatValid.representHimself"));
 	                    } else if (!interessatExistent.getId().equals(previous.getId())) {
-	                    	throw new AnswerRequiredException(InteressatResource.class, INT_ALREADY_EXISTS, messageHelper.getMessage("es.caib.ripea.service.intf.resourcevalidation.InteressatValid.documentNumExists"));
+	                    	if (!previous.isEsRepresentant()) {
+	                    		//Si cream un interessat, no permetem continuar creant-ne un de repetit
+	                    		//i no carregam dades de un existent, per no crear un patró oscur (el usuari no sap que esta modificant en lloc de crear)
+	                    		throw new AnswerRequiredException(InteressatResource.class, INT_ALREADY_EXISTS, messageHelper.getMessage("es.caib.ripea.service.intf.resourcevalidation.InteressatValid.documentNumExists"));
+	                    	} else {
+	                    		//si el que cream es un representant, si que podem copiar les dades del interessat existent
+		                        //Controlar que no estam introduint un interessat repetit
+		//                    	target.setId(interessatExistent.getId());
+		                        target.setDocumentTipus(interessatExistent.getDocumentTipus());
+		                        target.setNom(interessatExistent.getNom());
+		                        target.setEmail(interessatExistent.getEmail());
+		                        target.setTelefon(interessatExistent.getTelefon());
+		                        target.setObservacions(interessatExistent.getObservacions());
+		                        target.setPreferenciaIdioma(interessatExistent.getPreferenciaIdioma());
+		                        target.setEntregaDeh(interessatExistent.getEntregaDeh());
+		                        target.setEntregaDehObligat(interessatExistent.getEntregaDehObligat());
+
+		                        target.setTipus(interessatExistent.getTipus());
+		                        switch (interessatExistent.getTipus()) {
+		                            case InteressatAdministracioEntity:
+//		                                target.setOrganCodi(interessatExistent.getOrganCodi());
+//		                                target.setOrganNom(interessatExistent.getOrganNom());
+		                                break;
+		                            case InteressatPersonaFisicaEntity:
+		                                target.setLlinatge1(interessatExistent.getLlinatge1());
+		                                target.setLlinatge2(interessatExistent.getLlinatge2());
+		                                break;
+		                            case InteressatPersonaJuridicaEntity:
+		                                target.setRaoSocial(interessatExistent.getRaoSocial());
+		                                break;
+		                        }
+		
+		                        // Adreça
+		                        target.setPais(interessatExistent.getPais());
+		                        target.setProvincia(interessatExistent.getProvincia());
+		                        target.setMunicipi(interessatExistent.getMunicipi());
+		                        target.setCodiPostal(interessatExistent.getCodiPostal());
+		                        target.setAdresa(interessatExistent.getAdresa());
+		                        target.setAdressaTipus(interessatExistent.getAdressaTipus());
+		                        target.setAdressaTipusVia(interessatExistent.getAdressaTipusVia());
+		
+		                        target.setAdressaNumCasa(interessatExistent.getAdressaNumCasa());
+		                        target.setAdresaQualificador(interessatExistent.getAdresaQualificador());
+		                        target.setAdresaPuntKm(interessatExistent.getAdresaPuntKm());
+		                        target.setAdresaApartatCorreus(interessatExistent.getAdresaApartatCorreus());
+		                        target.setAdresaPortal(interessatExistent.getAdresaPortal());
+		                        target.setAdresaEscala(interessatExistent.getAdresaEscala());
+		                        target.setAdresaPlanta(interessatExistent.getAdresaPlanta());
+		                        target.setAdresaPorta(interessatExistent.getAdresaPorta());
+		                        target.setAdresaBloc(interessatExistent.getAdresaBloc());
+		                        target.setAdresaComplement(interessatExistent.getAdresaComplement());
+		                        target.setAdresaPoblacio(interessatExistent.getAdresaPoblacio());
+	                    	}
 	                    }
 	                }
 	            }
