@@ -1,4 +1,5 @@
 ARG BASE_IMAGE=docker.io/goib/jboss-eap72-openshift-base:latest
+
 ARG BASE_PLATFORM=linux/amd64
 FROM --platform=${BASE_PLATFORM} ${BASE_IMAGE}
 
