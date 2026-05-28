@@ -68,8 +68,8 @@
 					<verbose>true</verbose>
 					<images>
 						<image>
-							<name>goib/${docker.image.name}</name>
-							<alias>goib/${docker.image.name}</alias>
+							<name>${docker.image.name}</name>
+							<alias>${docker.image.name}</alias>
 							<build>
 								<dockerFile>${docker.image.dockerfile}</dockerFile>
 								<contextDir>${docker.image.context}</contextDir>
