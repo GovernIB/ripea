@@ -19,6 +19,7 @@ settings.local.json
 /ripea-back/src/main/webapp/reactapp/
 /ripea-back/src/main/jsapp/ripea-back/public/build-info.json
 /.env
+/.playwright-mcp
 
 # Playwright (tests_e2e)
 /ripea-back/src/main/jsapp/ripea-back/tests_e2e/.auth/
@@ -31,3 +32,4 @@ manual_admins.xhtml
 manual_usuaris.xhtml
 odt_to_xhtml.py
 RENDERS/
+/ripea_credentials.json

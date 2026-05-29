@@ -2,7 +2,7 @@ import {useTranslation} from "react-i18next";
 import {useState} from "react";
 import {MuiDialog} from "reactlib";
 import {Grid} from "@mui/material";
-import {CardData, ContenidoData} from "../../../components/CardData.tsx";
+import {CardData, ContenidoData, DetailCard, DetailCardContent} from "../../../components/CardData.tsx";
 
 const AnnexFirma = (props:any) => {
     const {entity} = props;
@@ -11,10 +11,10 @@ const AnnexFirma = (props:any) => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={2}>
         {
             entity?.firmes.map((firma:any)=>{
-                return <CardData key={firma?.id} title={firma?.fitxerNom}>
-                    <ContenidoData size={6} title={t('page.registre.justificant.firmaTipus')}>{firma?.tipus}</ContenidoData>
-                    <ContenidoData size={6} title={t('page.registre.justificant.firmaPerfil')}>{firma?.perfil}</ContenidoData>
-                </CardData>
+                return <DetailCard key={firma?.id} title={firma?.fitxerNom}>
+                    <DetailCardContent size={6} title={t('page.registre.justificant.firmaTipus')}>{firma?.tipus}</DetailCardContent>
+                    <DetailCardContent size={6} title={t('page.registre.justificant.firmaPerfil')}>{firma?.perfil}</DetailCardContent>
+                </DetailCard>
             })
         }
     </Grid>

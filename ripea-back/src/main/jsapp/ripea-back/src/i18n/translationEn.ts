@@ -369,6 +369,17 @@ const translationEn = {
                 observadors: "Observers",
                 dataInici: "Start date",
                 duracio: "Duration",
+                duracioFormat: {
+                    expirada: "Deadline expired.",
+                    avui: "Today is the deadline.",
+                    falten: "{{count}} days remaining.",
+                    mateixDia: "Same day.",
+                    i: " and ",
+                    setmana_1: "1 week",
+                    setmana_n: "{{count}} weeks",
+                    dia_1: "1 day",
+                    dia_n: "{{count}} days",
+                },
                 dataLimit: "Deadline",
                 estat: "Status",
                 prioritat: "Priority",
@@ -496,6 +507,7 @@ const translationEn = {
                 exportar: {
                     label: "Export...",
                     ok: "Interested parties exported successfully",
+                    hint: "Select the interested parties you want to export.",
                 },
                 importSGD: {
                     label: "Import stakeholders from Registry...",
@@ -835,6 +847,7 @@ const translationEn = {
                 extensio: "Extension",
                 ruta: "Path",
                 mida: "Size",
+                tipusDocumentDefault: "Document type to apply to all files",
             },
             action: {
                 new: {

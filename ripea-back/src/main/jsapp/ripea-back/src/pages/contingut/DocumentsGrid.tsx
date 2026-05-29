@@ -1,6 +1,4 @@
 import React, {RefObject, useCallback, useEffect, useMemo, useState} from "react";
-import { DndContext } from '@dnd-kit/core';
-import {dndScreenReaderInstructions} from "../../util/dndAccessibility.tsx";
 import { FormControl, Grid, Select, MenuItem, Icon, Box } from "@mui/material";
 import {GridApiPro, GridTreeDataGroupingCell} from "@mui/x-data-grid-pro";
 import { useMuiDataGridApiRef, useResourceApiService } from 'reactlib';
@@ -16,7 +14,7 @@ import { useUserSession } from "../../components/Session.tsx";
 import { useSessionList } from "../../components/SessionStorageContext.tsx";
 import DropZone from "../../components/DropZone.tsx";
 import DocumentsGridForm from "./DocumentGridForm.tsx";
-import MetaExpedient from "./details/MetaExpedient.tsx";
+import MetaExpedient, {formatMultiplicitat, MultiplicitatStyled} from "./details/MetaExpedient.tsx";
 import useVisualitzar from "./actions/Visualitzar.tsx";
 import {useGridApiRef as useMuiDatagridApiRef} from "@mui/x-data-grid-pro";
 
@@ -135,6 +133,10 @@ const columns = [
     //     renderCell: (params: any) => <ContingutIcon entity={params?.row}/>
     // },
     {
+        field: 'id',
+        flex: 0.75,
+    },
+    {
         field: 'descripcio',
         flex: 0.75,
     },
@@ -169,6 +171,12 @@ const DocumentsGrid = (props: any) => {
         isReady: apiContingutIsReady,
         artifactAction: apiAction,
     } = useResourceApiService('contingutResource');
+
+    const {
+        isReady: apiMetaDocumentIsReady,
+        find: apiMetaDocumentFindAll,
+    } = useResourceApiService('metaDocumentResource');
+    const [metaDocuments, setMetaDocuments] = useState<any[]>();
 
     const commonFilter = useMemo(() => builder.and(
         builder.or(
@@ -246,21 +254,46 @@ const DocumentsGrid = (props: any) => {
     }, [dataApiRef, treeView, addFolderExpand]);
 
     const handleDragEnd = (params: any) => {
-        // console.log("params", params)
         if (params.newParent != params.oldParent || params.targetIndex != params.oldIndex) {
-            const parePerDefecte = contingutScopeId ?? entity.id;
+            // console.log('>>> Canvi d\'ordre', params.targetIndex + 1, params)
+            const parePerDefecte = params.newParent || contingutScopeId || entity.id;
             const patchData = {
-                ordre: params.targetIndex +1,
-                pare: params.newParent ?? parePerDefecte,
+                pare: parePerDefecte,
+                ordre: params.targetIndex + 1,
             };
-
             if (apiContingutIsReady) {
                 apiAction(params.row.id, {code: 'REORDER', data: patchData})
-                    // .then(() => refresh())
+                    .then(() => {
+                        if (params.newParent != null && params.newParent != params.oldParent) {
+                            addFolderExpand(String(params.newParent), true);
+                            refresh();
+                        }
+                    })
                     .catch(() => refresh())
             } else {
                 console.error('Servei de l\'API pels documents no disponible'); refresh()
             }
+        }
+    }
+    const processRowUpdate = (newRow: any, oldRow: any) => {
+        const newParent = +newRow.treePath.at(-2) || contingutScopeId || entity?.id;
+        const oldParent = +oldRow.treePath.at(-2) || contingutScopeId || entity?.id;
+        if (newParent != oldParent && carpetes?.find((c: any) => c?.id == newParent) != null) {
+            // console.log('>>> Canvi de pare', oldParent, '->', newParent)
+            return new Promise((resolve, reject) => {
+                const patchData = {
+                    pare: newParent,
+                    ordre: 1,
+                };
+                apiAction(newRow.id, { code: 'REORDER', data: patchData }).
+                then(() => {
+                    addFolderExpand(String(newParent), true);
+                    resolve(newRow);
+                }).
+                catch(reject);
+            });
+        } else {
+            return newRow;
         }
     }
 
@@ -274,10 +307,18 @@ const DocumentsGrid = (props: any) => {
         }
     }, [contingutScopeId, contingutCarpetaDetallAccesActiva]);
 
+    useEffect(() => {
+        if (apiMetaDocumentIsReady && entity?.metaExpedient?.id != null) {
+            apiMetaDocumentFindAll({ unpaged: true, filter: builder.eq('metaExpedient.id', entity?.metaExpedient?.id) })
+                .then((result: any) => setMetaDocuments(result.rows))
+                .catch(() => setMetaDocuments([]));
+        }
+    }, [apiMetaDocumentIsReady, entity?.metaExpedient?.id]);
+
     return <>
-        <Load value={entity && carpetes && expedients && isReady}>
+        <Load value={entity && carpetes && expedients && isReady && metaDocuments}>
             <DropZone onDrop={onDrop} disabled={!(entity?.potModificarContingut || entity?.potModificar)} aria-label={t('page.document.action.new.dropMessg')}>
-                <DndContext onDragEnd={handleDragEnd} accessibility={{screenReaderInstructions: dndScreenReaderInstructions}}>
+                {/*<DndContext onDragEnd={handleDragEnd} accessibility={{screenReaderInstructions: dndScreenReaderInstructions}}>*/}
                     <StyledMuiGrid
                         resourceName={"documentResource"}
                         popupEditFormDialogResourceTitle={t('page.document.title')}
@@ -311,7 +352,7 @@ const DocumentsGrid = (props: any) => {
                             valueFormatter: (value: any, row: any) => {
                                 if (row?.id) {
                                     if (vista == View.tipus && row?.multiplicitat) {
-                                        return <MetaExpedient entity={row}/>;
+                                        return <MetaExpedient entity={row} hideMultiplicitat={treeView}/>;
                                     }
                                     return <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                         <ContingutIcon entity={row} />
@@ -320,15 +361,55 @@ const DocumentsGrid = (props: any) => {
                                 return value;
                             },
                             renderCell: (params: any) => {
-                                return treeView
-                                    ? <GridTreeDataGroupingCell {...params} />
-                                    : params.formattedValue
+                                if (!treeView) return params.formattedValue;
+                                const childCount = params.rowNode?.children?.length ?? 0;
+                                const showPill = childCount > 0
+                                    || params.row?.tipus === 'CARPETA'
+                                    || params.rowNode?.type === 'group';
+                                const multiplicitatLabel = vista === View.tipus && params.row?.multiplicitat
+                                    ? formatMultiplicitat(params.row.multiplicitat)
+                                    : null;
+                                return (
+                                    <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', minWidth: 0 }}>
+                                        <Box sx={{ flex: '0 1 auto', minWidth: 0, overflow: 'hidden', '& .MuiDataGrid-treeDataGroupingCell': { width: 'auto' } }}>
+                                            <GridTreeDataGroupingCell {...params} hideDescendantCount />
+                                        </Box>
+                                        {showPill && (
+                                            <Box
+                                                component="span"
+                                                sx={{
+                                                    ml: 0.75,
+                                                    px: 0.75,
+                                                    py: 0.1,
+                                                    borderRadius: '10px',
+                                                    border: '1px solid',
+                                                    borderColor: 'divider',
+                                                    backgroundColor: 'action.hover',
+                                                    fontSize: '0.7rem',
+                                                    fontWeight: 600,
+                                                    lineHeight: 1.5,
+                                                    color: 'text.secondary',
+                                                    flexShrink: 0,
+                                                    userSelect: 'none',
+                                                }}
+                                            >
+                                                {childCount} elem.
+                                            </Box>
+                                        )}
+                                        {multiplicitatLabel && (
+                                            <>
+                                                <Box sx={{ flex: 1 }} />
+                                                <MultiplicitatStyled multiplicitat={multiplicitatLabel} />
+                                            </>
+                                        )}
+                                    </Box>
+                                );
                             },
                         }}
                         treeData
                         rowReordering={draggable}
+                        processRowUpdate={processRowUpdate}
                         onRowOrderChange={handleDragEnd}
-                        setTreeDataPath={(path, row) => ({...row, treePath: path})}
                         rowsTransformer={(_rows: any) => {
                             if (!_rows) return [];
                             const additionalRows: any[] = _rows;
@@ -348,6 +429,15 @@ const DocumentsGrid = (props: any) => {
                                             additionalRows.push({
                                                 ...row?.metaDocumentInfo,
                                                 tipus: "META_" + row?.metaDocumentInfo?.tipus,
+                                                autogenerated: true,
+                                            })
+                                        }
+                                    }
+                                    for (const metaDoc of (metaDocuments || [])) {
+                                        if (!additionalRows.map((b) => b.id).includes(metaDoc.id)) {
+                                            additionalRows.push({
+                                                ...metaDoc,
+                                                tipus: "META_" + metaDoc.tipus,
                                                 autogenerated: true,
                                             })
                                         }
@@ -389,6 +479,10 @@ const DocumentsGrid = (props: any) => {
                                 }
                             }
                         }}
+                        setTreeDataPath={(path, row) => {
+                            const treePath = [row.expedient.id, ...(path.map(p => parseInt(p)))];
+                            return { ...row, treePath };
+                        }}
                         rowExpansionChange={(params: any) => {
                             if (params.groupingKey) {
                                 addFolderExpand(`${params.groupingKey}`, params.childrenExpanded)
@@ -419,6 +513,14 @@ const DocumentsGrid = (props: any) => {
                                     removeAll()
                                     addFolderExpand("vista", vista)
                                     setExpand(value)
+                                    const api = dataApiRef.current;
+                                    if (api) {
+                                        if (value) {
+                                            api.expandAllRows();
+                                        } else {
+                                            api.collapseAllRows();
+                                        }
+                                    }
                                 }} hidden={!treeView} />,
                             },
                             {
@@ -494,7 +596,7 @@ const DocumentsGrid = (props: any) => {
                     {components}
                     {massiveComponents}
                     {dialogVisualitzar}
-                </DndContext>
+                {/*</DndContext>*/}
 
                 {(entity?.potModificarContingut || entity?.potModificar) && <Box
                     sx={{

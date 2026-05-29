@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.actuate.autoconfigure.metrics.jersey.JerseyServerMetricsAutoConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.freemarker.FreeMarkerAutoConfiguration;
+import org.springframework.boot.autoconfigure.jms.artemis.ArtemisAutoConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.*;
@@ -28,7 +29,8 @@ import java.util.Locale;
 @Slf4j
 @EnableAutoConfiguration(exclude = {
 		FreeMarkerAutoConfiguration.class,
-		JerseyServerMetricsAutoConfiguration.class
+		JerseyServerMetricsAutoConfiguration.class,
+		ArtemisAutoConfiguration.class
 })
 @ComponentScan({
 		BaseConfig.BASE_PACKAGE + ".service",
@@ -44,12 +46,16 @@ public class EjbContextConfig {
 	private static boolean initialized;
 	private static ApplicationContext applicationContext;
 
-	public static ApplicationContext getApplicationContext() {
+	//Afegit synchronized per evitar errors de race condition al arrancar
+	public static synchronized ApplicationContext getApplicationContext() {
 		if (!initialized) {
-			initialized = true;
 			log.info("Starting EJB spring application...");
-			applicationContext = new AnnotationConfigApplicationContext(EjbContextConfig.class);
-			log.info("...EJB spring application started.");
+			try {
+				applicationContext = new AnnotationConfigApplicationContext(EjbContextConfig.class);
+				log.info("...EJB spring application started.");
+			} finally {
+				initialized = true;
+			}
 		}
 		return applicationContext;
 	}

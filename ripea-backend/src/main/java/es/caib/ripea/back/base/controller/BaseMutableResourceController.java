@@ -106,6 +106,7 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 								resourceApiService.permissionsCurrentUser(
 										getResourceClass(),
 										created.getId()),
+								true,
 								true).toArray(new Link[0])));
 	}
 
@@ -144,6 +145,7 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 								resourceApiService.permissionsCurrentUser(
 										getResourceClass(),
 										id),
+								true,
 								true).toArray(new Link[0])));
 	}
 
@@ -185,6 +187,7 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 								resourceApiService.permissionsCurrentUser(
 										getResourceClass(),
 										id),
+								true,
 								true).toArray(new Link[0])));
 	}
 
@@ -526,7 +529,8 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 			Link singleResourceSelfLink,
 			List<ResourceArtifact> artifactsAll,
 			ResourcePermissions resourcePermissions,
-			boolean withEditLinksInputAndOutput) {
+			boolean withEditLinksInputAndOutput,
+			boolean withArtifactLinks) {
 		List<Link> links = super.buildSingleResourceLinks(
 				id,
 				perspective,
@@ -534,7 +538,8 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 				singleResourceSelfLink,
 				artifactsAll,
 				resourcePermissions,
-				withEditLinksInputAndOutput);
+				withEditLinksInputAndOutput,
+				withArtifactLinks);
 		Link selfLink = links.stream().
 				filter(l -> l.getRel().value().equals("self")).
 				findFirst().orElse(null);

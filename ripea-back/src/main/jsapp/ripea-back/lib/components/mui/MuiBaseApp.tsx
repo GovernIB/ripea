@@ -134,7 +134,15 @@ const MuiComponentsConfigurer: React.FC = () => {
         return messageDialogShow(
             title ?? 'Atenció',
             question,
-            getAnswerRequiredButtons(trueFalseAnswerRequired, availableAnswers)
+            getAnswerRequiredButtons(trueFalseAnswerRequired, availableAnswers),
+            {
+                slotProps: {
+                    paper: {
+                        sx: { minWidth: 400 },
+                    },
+                },
+            },
+            true
         );
     };
     React.useEffect(() => {

@@ -137,8 +137,8 @@ const formDataReducer = (state: any, action: FormFieldDataAction): any => {
         case FormFieldDataActionType.FIELD_CHANGE: {
             return {
                 ...state,
-                ...payload.changes,
                 [payload.fieldName]: payload.value,
+				...payload.changes,
             };
         }
     }

@@ -108,8 +108,8 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 		completeResource(resource);
 		E entity = getEntity(id);
 		Long reorderPreviousSequence = reorderGetPreviousSequence(entity);
+		Long reorderNewSequence = reorderGetNewSequence(resource);
 		ID reorderPreviousParentId = reorderGetParentId(entity);
-		Long reorderResourceSequence = reorderGetSequenceFromResourceOrEntity(resource, entity);
 		beforeUpdateEntity(entity, resource, answers);
 		Map<String, Persistable<?>> referencedEntities = resourceReferenceToEntityHelper.getReferencedEntitiesForResource(
 				resource,
@@ -120,7 +120,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 		boolean anyOrderChanged = reorderIfReorderable(
 				saved,
 				reorderPreviousSequence,
-				reorderResourceSequence,
+				reorderNewSequence,
 				reorderPreviousParentId,
 				false);
 		fieldFilesSave(resource, saved);
@@ -434,18 +434,6 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 	protected Integer reorderGetIncrement() {
 		return null;
 	}
-	protected Long reorderGetSequenceFromResourceOrEntity(R resource, E entity) {
-		Long sequence = null;
-		ResourceConfig resourceConfig = resource.getClass().getAnnotation(ResourceConfig.class);
-		if (resourceConfig != null && !resourceConfig.orderField().isEmpty()) {
-			sequence = TypeUtil.getFieldOrGetterValue(resourceConfig.orderField(), resource, Long.class);
-		}
-		if (sequence == null && entity instanceof ReorderableEntity<?>) {
-			ReorderableEntity<ID> reorderableEntity = (ReorderableEntity<ID>)entity;
-			sequence = reorderableEntity.getOrder();
-		}
-		return sequence;
-	}
 	protected Long reorderGetPreviousSequence(E entity) {
 		if (entity instanceof ReorderableEntity<?>) {
 			ReorderableEntity<ID> reorderableEntity = (ReorderableEntity<ID>)entity;
@@ -453,6 +441,14 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 		} else {
 			return null;
 		}
+	}
+	protected Long reorderGetNewSequence(R resource) {
+		Long sequence = null;
+		ResourceConfig resourceConfig = resource.getClass().getAnnotation(ResourceConfig.class);
+		if (resourceConfig != null && !resourceConfig.orderField().isEmpty()) {
+			sequence = TypeUtil.getFieldOrGetterValue(resourceConfig.orderField(), resource, Long.class);
+		}
+		return sequence;
 	}
 	protected ID reorderGetParentId(E entity) {
 		if (entity instanceof ReorderableEntity<?>) {
@@ -488,11 +484,14 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 				log.debug("\tReordenant entitat {} eliminada", entity);
 			}
 			boolean goingUp = (previousSequence != null ? previousSequence : 0) > (newSequence != null ? newSequence : 0);
+			if (parentIdChanged) {
+				goingUp = true;
+			}
+			Long reorderSequence = (newSequence == null && !parentIdChanged) ? previousSequence : newSequence;
 			boolean anyOrderChanged1 = reorderWithParentId(
 					reorderableEntity,
-					newSequence,
+					reorderSequence,
 					reorderableEntity.getOrderParentId(),
-					parentIdChanged,
 					goingUp,
 					isDelete);
 			if (anyOrderChanged1) anyOrderChanged = true;
@@ -501,7 +500,6 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 						null,
 						null,
 						previousParentId,
-						false,
 						false,
 						false);
 				if (anyOrderChanged2) anyOrderChanged = true;
@@ -513,7 +511,6 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 			@Nullable ReorderableEntity<ID> reorderableEntity,
 			@Nullable Long newSequence,
 			@Nullable ID parentId,
-			boolean parentIdChanged,
 			boolean sameSequenceInsertBefore,
 			boolean isDelete) {
 		boolean anyOrderChanged = false;
@@ -527,7 +524,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 			ReorderableEntity<ID> line = (ReorderableEntity<ID>)value;
 			if (!line.equals(reorderableEntity)) {
 				Long currentSequence = line.getOrder();
-				boolean insertHere = !parentIdChanged && newSequence != null && (sameSequenceInsertBefore ?
+				boolean insertHere = newSequence != null && (sameSequenceInsertBefore ?
 						currentSequence != null && currentSequence.compareTo(newSequence) >= 0 :
 						currentSequence != null && currentSequence.compareTo(newSequence) > 0);
 				if (!inserted && insertHere) {

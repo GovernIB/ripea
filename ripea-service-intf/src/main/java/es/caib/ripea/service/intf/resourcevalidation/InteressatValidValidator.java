@@ -52,6 +52,11 @@ public class InteressatValidValidator implements ConstraintValidator<InteressatV
             }
         }
         if (InteressatTipusEnum.InteressatAdministracioEntity.equals(resource.getTipus())) {
+            if (resource.isEsRepresentant()) {
+                addViolation(context, InteressatResource.Fields.tipus,
+                        "{es.caib.ripea.service.intf.resourcevalidation.InteressatValid.repAdmin}");
+                valid = false;
+            }
             if (resource.getOrganCodi() == null) {
                 notNullViolation(context, InteressatResource.Fields.organCodi);
                 valid = false;

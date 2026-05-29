@@ -81,8 +81,11 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
 
     @PostConstruct
     public void init() {
-    	register(MetaDocumentResource.PERSPECTIVE_COUNT_METADADES,	new CountMetaDadesPerspectiveApplicator());
-    	register(MetaDocumentResource.PERSPECTIVE_REVISIO_ESTAT,	new RevisioEstatPerspectiveApplicator());
+    	register(MetaDocumentResource.PERSPECTIVE_COUNT_METADADES,			new CountMetaDadesPerspectiveApplicator());
+    	register(MetaDocumentResource.PERSPECTIVE_REVISIO_ESTAT,			new RevisioEstatPerspectiveApplicator());
+    	register(MetaDocumentResource.PERSPECTIVE_PORTAFIRMES_RESPONSABLES,	new PortafirmesResponsablesPerspectiveApplicator());
+    	register(MetaDocumentResource.ACTION_ACTIVAR_CODE,			new ActivarActionExecutor());
+    	register(MetaDocumentResource.ACTION_DESACTIVAR_CODE,		new DesactivarActionExecutor());
     	register(MetaDocumentResource.ACTION_MARCAR_DEFECTE_CODE,	new MarcarPerDefecteActionExecutor());
     	register(MetaDocumentResource.ACTION_DESMARCAR_DEFECTE_CODE,new DesMarcarPerDefecteActionExecutor());
     	register(MetaDocumentResource.ACTION_REORDENAR_CODE,		new ReordenarActionExecutor());
@@ -213,6 +216,44 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
 		}
     }
     
+    private class ActivarActionExecutor implements ActionExecutor<MetaDocumentResourceEntity, Serializable, Serializable> {
+		@Override
+		public void onChange(Serializable id, Serializable previous, String fieldName, Object fieldValue,
+				Map<String, AnswerValue> answers, String[] previousFieldNames, Serializable target) {
+		}
+		@Override
+		public Serializable exec(String code, MetaDocumentResourceEntity entity, Serializable params) throws ActionExecutionException {
+			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+			metaDocumentHelper.updateActiu(
+					entitatEntity.getId(),
+					entity.getMetaExpedient() != null ? entity.getMetaExpedient().getId() : null,
+					entity.getId(),
+					true,
+					configHelper.getRolActual());
+			afterDbChange(entitatEntity.getId(), entity.getMetaExpedient() != null ? entity.getMetaExpedient().getId() : null);
+			return "{\"resultado\": \"OK\"}";
+		}
+    }
+
+    private class DesactivarActionExecutor implements ActionExecutor<MetaDocumentResourceEntity, Serializable, Serializable> {
+		@Override
+		public void onChange(Serializable id, Serializable previous, String fieldName, Object fieldValue,
+				Map<String, AnswerValue> answers, String[] previousFieldNames, Serializable target) {
+		}
+		@Override
+		public Serializable exec(String code, MetaDocumentResourceEntity entity, Serializable params) throws ActionExecutionException {
+			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+			metaDocumentHelper.updateActiu(
+					entitatEntity.getId(),
+					entity.getMetaExpedient() != null ? entity.getMetaExpedient().getId() : null,
+					entity.getId(),
+					false,
+					configHelper.getRolActual());
+			afterDbChange(entitatEntity.getId(), entity.getMetaExpedient() != null ? entity.getMetaExpedient().getId() : null);
+			return "{\"resultado\": \"OK\"}";
+		}
+    }
+
     private class MarcarPerDefecteActionExecutor implements ActionExecutor<MetaDocumentResourceEntity, Serializable, Serializable> {
 		@Override
 		public void onChange(Serializable id, Serializable previous, String fieldName, Object fieldValue,
@@ -316,15 +357,10 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
 				"portafirmesResponsables", "serialVersionUID");
 		if (Utils.hasValue(entity.getPortafirmesResponsables())) {
 			List<ResourceReference<UsuariResource, String>> responsables = new ArrayList<>();
-			String[] pfResponsables = entity.getPortafirmesResponsables().split(",");
-            for (String codi : pfResponsables) {
-            	UsuariDto usuariResponsable = usuariHelper.findUsuariCarrecAmbCodiDades(codi);
-                if (usuariResponsable != null) {
-                	String txtDisplay = usuariResponsable.getNom() + " (" + Utils.nifMask(usuariResponsable.getNif()) +")";
-                    responsables.add(ResourceReference.toResourceReference(usuariResponsable.getCodi(), txtDisplay));
-                }
-            }
-            metaDocumentResource.setPortafirmesResponsables(responsables);
+			for (String codi : entity.getPortafirmesResponsables().split(",")) {
+				responsables.add(ResourceReference.toResourceReference(codi, codi));
+			}
+			metaDocumentResource.setPortafirmesResponsables(responsables);
 		}
 		if (entity.getPinbalServei()!=null) {
 			metaDocumentResource.setPinbalServei(ResourceReference.toResourceReference(
@@ -340,6 +376,24 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
 		}
 		return metaDocumentResource;
 	}
+
+    private class PortafirmesResponsablesPerspectiveApplicator implements PerspectiveApplicator<MetaDocumentResourceEntity, MetaDocumentResource> {
+		@Override
+		public void applySingle(String code, MetaDocumentResourceEntity entity, MetaDocumentResource resource) throws PerspectiveApplicationException {
+			if (Utils.hasValue(entity.getPortafirmesResponsables())) {
+				List<ResourceReference<UsuariResource, String>> responsables = new ArrayList<>();
+				String[] pfResponsables = entity.getPortafirmesResponsables().split(",");
+				for (String codi : pfResponsables) {
+					UsuariDto usuariResponsable = usuariHelper.findUsuariCarrecAmbCodiDades(codi);
+					if (usuariResponsable != null) {
+						String txtDisplay = usuariResponsable.getNom() + " (" + Utils.nifMask(usuariResponsable.getNif()) + ")";
+						responsables.add(ResourceReference.toResourceReference(usuariResponsable.getCodi(), txtDisplay));
+					}
+				}
+				resource.setPortafirmesResponsables(responsables);
+			}
+		}
+    }
 	
 	private MetaDocumentDto resourceToMetaDocumentDto(MetaDocumentResource resource) {
 		MetaDocumentDto metaDocumentDto = objectMappingHelper.newInstanceMap(

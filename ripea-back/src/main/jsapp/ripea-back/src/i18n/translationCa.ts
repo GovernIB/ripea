@@ -369,6 +369,17 @@ const translationCa = {
                 observadors: "Observadors",
                 dataInici: "Data d'inici",
                 duracio: "Durada",
+                duracioFormat: {
+                    expirada: "Data límit expirada.",
+                    avui: "La data límit és avui.",
+                    falten: "Falten {{count}} dies.",
+                    mateixDia: "El mateix dia.",
+                    i: " i ",
+                    setmana_1: "1 setmana",
+                    setmana_n: "{{count}} setmanes",
+                    dia_1: "1 dia",
+                    dia_n: "{{count}} dies",
+                },
                 dataLimit: "Data límit",
                 estat: "Estat",
                 prioritat: "Prioritat",
@@ -496,6 +507,7 @@ const translationCa = {
                 exportar: {
                     label: "Exportar...",
                     ok: "Interessats exportats correctament",
+                    hint: "Seleccioni els interessats que vol exportar.",
                 },
                 importSGD: {
                     label: "Importar interessats des de Registre...",
@@ -835,6 +847,7 @@ const translationCa = {
                 extensio: "Extensio",
                 ruta: "Ruta",
                 mida: "Mida",
+                tipusDocumentDefault: "Tipus de document a aplicar a tots els fitxers",
             },
             action: {
                 new: {
@@ -1793,8 +1806,8 @@ const translationCa = {
                 organGestor: "Organ gestor",
                 principal: "Tipus",
                 sid: "Principal",
-                create: "Consulta",
-                read: "Creació",
+                create: "Creació",
+                read: "Consulta",
                 write: "Modificació",
                 delete: "Eliminació",
                 estadistic: "Estadístiques",

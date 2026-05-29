@@ -96,14 +96,14 @@ implements ContingutResourceService {
             ContingutResource contingutResource = objectMappingHelper.newInstanceMap(entity, ContingutResource.class);
             contingutResource.setOrdre(Math.toIntExact(resource.getOrdre()));
             contingutResource.setPare(ResourceReference.toResourceReference(resource.getPare()));
-            Long reorderResourceSequence = reorderGetSequenceFromResourceOrEntity(contingutResource, entity);
+            Long reorderNewSequence = reorderGetNewSequence(contingutResource);
             if (!Objects.equals(resource.getPare(), entity.getPare().getId())) {
                 entity.setPare(contingutResourceRepository.findById(resource.getPare()).get());
             }
             reorderIfReorderable(
                     entity,
                     reorderPreviousSequence,
-                    reorderResourceSequence,
+                    reorderNewSequence,
                     reorderPreviousParentId,
                     false);
 
@@ -111,16 +111,20 @@ implements ContingutResourceService {
             if (parentIdChanged) {
                 if (ContingutTipusEnumDto.DOCUMENT.equals(entity.getTipus())) {
                     DocumentEntity documentActual = documentRepository.findById(entity.getId()).get();
-                    contingutHelper.arxiuDocumentPropagarMoviment(
-                            entity.getArxiuUuid(),
-                            documentActual.getPare(),
-                            entity.getExpedient().getArxiuUuid());
+                    if (Utils.hasValue(documentActual.getArxiuUuid())) {
+	                    contingutHelper.arxiuDocumentPropagarMoviment(
+	                            entity.getArxiuUuid(),
+	                            documentActual.getPare(),
+	                            entity.getExpedient().getArxiuUuid());
+                    }
                 } else if (ContingutTipusEnumDto.CARPETA.equals(entity.getTipus())) {
                     CarpetaEntity carpetaActual = carpetaRepository.findById(entity.getId()).get();
                     //mourer també al arxiu
-                    pluginHelper.arxiuCarpetaMoure(
-                            carpetaActual,
-                            contingutRepository.findById(entity.getOrderParentId()).get().getArxiuUuid());
+                    if (Utils.hasValue(carpetaActual.getArxiuUuid())) {
+	                    pluginHelper.arxiuCarpetaMoure(
+	                            carpetaActual,
+	                            contingutRepository.findById(entity.getOrderParentId()).get().getArxiuUuid());
+                    }
                 }
             }
 

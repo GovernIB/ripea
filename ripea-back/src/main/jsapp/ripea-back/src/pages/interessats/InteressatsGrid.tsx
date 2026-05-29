@@ -123,6 +123,7 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
 												exportar(originalIds, entity)
 											}}
                                             disabled={selectedRows?.length==0}
+                                            title={selectedRows?.length==0 ? t('page.interessat.action.exportar.hint') : undefined}
                     >{t('page.interessat.action.exportar.label')}</ToolbarButton>
                 },
                 {

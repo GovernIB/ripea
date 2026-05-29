@@ -302,22 +302,6 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 		}
 	}
 	
-	private void reordenaFillsCarpetesFirst(ContingutDto contingut) {
-		List<ContingutDto> fillsReordenats = new ArrayList<ContingutDto>();
-		if (contingut.getFills()!=null) {
-			for (ContingutDto fill: contingut.getFills()) {
-				if (fill.isCarpeta()) {
-					reordenaFillsCarpetesFirst(fill);
-					fillsReordenats.add(fill);
-				}
-			}
-			for (ContingutDto fill: contingut.getFills()) {
-				if (fill.isDocument()) { fillsReordenats.add(fill); }
-			}
-		}
-		contingut.setFills(fillsReordenats);
-	}
-	
 	@RequestMapping(value = "/contingut/tag/{contingutId}", method = RequestMethod.GET)
 	public String contingutTagGet(
 			HttpServletRequest request,
@@ -550,6 +534,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 						entitatActual.getId(),
 						docIdx,
 						destiId,
+						null,
 						command.getCarpetaNova(),
 						RolHelper.getRolActual(request));
 			}
@@ -558,6 +543,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 					entitatActual.getId(),
 					contingutOrigenId,
 					destiId,
+					null,
 					command.getCarpetaNova(),
 					RolHelper.getRolActual(request));
 		}
@@ -572,6 +558,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			HttpServletRequest request,
 			@PathVariable Long contingutOrigenId,
 			@PathVariable Long contingutDestiId,
+			@RequestParam(value = "tascaId", required = false) Long tascaId,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		ContingutDto contingutOrigen = contingutService.findAmbIdUser(
@@ -612,18 +599,22 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			destiId = contingutDesti.getPare().getId();
 		}
 
+		String redirectBase = "redirect:../../" + contingutOrigen.getExpedientPare().getId() +
+				(tascaId != null ? "?tascaId=" + tascaId : "");
+
 		try {
 			if (!justSorting) {
 				contingutService.move(
 						entitatActual.getId(),
 						contingutOrigenId,
-						destiId, 
+						destiId,
+						tascaId,
 						null,
 						RolHelper.getRolActual(request));
 			}
-			
+
 			List<ContingutDto> contingutFillsDestiPare = contingutService.getFillsBasicInfo(destiId);
-			
+
 			Map<Integer, Long> orderedElements = new HashMap<Integer, Long>();
 			if (contingutFillsDestiPare!=null) {
 				int ordreAssignat = 0;
@@ -644,30 +635,31 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 					}
 				}
 			}
+
+			contingutService.order(entitatActual.getId(), destiId, tascaId, orderedElements);
 			
-			contingutService.order(entitatActual.getId(), destiId, orderedElements);
 		} catch (Exception ex) {
-			
+
 			if (ex instanceof ValidationException) {
 				MissatgesHelper.error(request, getMessage(request, "contingut.controller.element.mogut.ko")+": "+ex.getMessage());
-				return "redirect:../../" + contingutOrigen.getExpedientPare().getId();
+				return redirectBase;
 			}
-			
+
 			if (ex.getCause()!=null && ex.getCause() instanceof ValidationException) {
 				MissatgesHelper.error(request, getMessage(request, "contingut.controller.element.mogut.ko")+": "+ex.getCause().getMessage());
-				return "redirect:../../" + contingutOrigen.getExpedientPare().getId();
+				return redirectBase;
 			}
 
 			return getAjaxControllerReturnValueError(
-					request, 
-					"redirect:../../" + contingutOrigen.getExpedientPare().getId(), 
-					"contingut.controller.element.mogut.ko", 
+					request,
+					redirectBase,
+					"contingut.controller.element.mogut.ko",
 					ex);
 		}
 
 		return getAjaxControllerReturnValueSuccess(
 				request,
-				"redirect:../../" + contingutOrigen.getExpedientPare().getId(),
+				redirectBase,
 				"contingut.controller.element.mogut.ok");
 	}
 	
@@ -680,7 +672,8 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		contingutService.order(
 				entitatActual.getId(), 
-				contingutId, 
+				contingutId,
+				null,
 				orderedElements);
 	}
 

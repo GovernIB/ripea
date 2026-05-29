@@ -30,7 +30,7 @@ const springFilterBuilder = (data: any): string => {
     return builder.and(
         builder.like("identificador", data.numRegistre),
         builder.like("registre.extracte", data.extracte),
-        builder.like("registre.destiCodiINom", data.destinacio),
+        builder.likeNormalized("registre.destiCodiINomFiltre", data.destinacio),
         builder.eq("metaExpedient.id", data?.metaExpedient?.id),
         builder.betweenDates("registre.data", data.dataRecepcioInicial, data.dataRecepcioFinal),
 
@@ -38,15 +38,12 @@ const springFilterBuilder = (data: any): string => {
             ? builder.like("estat", "PROCESSAT")
             : builder.eq("estat", `'${data.estat}'`),
         builder.exists(
-            builder.or(
-                builder.like("registre.interessats.documentNumero", data.interessat),
-                builder.like(builder.concat("registre.interessats.nom", "registre.interessats.llinatge1", "registre.interessats.llinatge2"), data.interessat),
-                builder.like("registre.interessats.raoSocial", data.interessat),
-                builder.like("registre.interessats.organCodi", data.interessat)
-            )
+            builder.likeNormalized("registre.interessats.codiNomFiltre", data.interessat)
         ),
     )
 }
+
+const defaultAnotacioFilterData = () => ({ estat: 'PENDENT' });
 
 const AnotacioFilter = (props: any) => {
     const {onSpringFilterChange} = props;
@@ -56,8 +53,9 @@ const AnotacioFilter = (props: any) => {
         code={"ANOTACIO_FILTER"}
         springFilterBuilder={springFilterBuilder}
         onSpringFilterChange={onSpringFilterChange}
-		filterOnFieldEnterKeyPressed
+        filterOnFieldEnterKeyPressed
         advancedSearch
+        defaultData={defaultAnotacioFilterData}
     >
         <AnotacioFilterForm/>
     </StyledMuiFilter>

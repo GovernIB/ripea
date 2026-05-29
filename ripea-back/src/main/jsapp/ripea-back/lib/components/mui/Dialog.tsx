@@ -16,6 +16,7 @@ export type DialogProps = React.PropsWithChildren & {
     buttons?: DialogButton[];
     buttonCallback?: (value: any) => void;
     closeIcon?: boolean;
+    modal?: boolean;
     componentProps?: any;
     ref?: React.RefObject<HTMLDivElement | null>;
 };
@@ -34,6 +35,7 @@ export const useContentDialog: (
     const defaultDialogButtons = useConfirmDialogButtons();
     const [open, setOpen] = React.useState<boolean>(false);
     const [title, setTitle] = React.useState<string | null>();
+    const [modal, setModal] = React.useState<boolean | undefined>();
     const [content, setContent] = React.useState<React.ReactElement>();
     const [buttons, setButtons] = React.useState<DialogButton[]>(
         dialogButtons ?? defaultDialogButtons
@@ -46,13 +48,15 @@ export const useContentDialog: (
         title: string | null,
         content: React.ReactElement,
         dialogButtons?: DialogButton[],
-        dialogProps?: any
+        dialogProps?: any,
+        modal?: boolean
     ) => {
         setTitle(title);
         setContent(content);
         dialogButtons && setButtons(dialogButtons);
         setDialogProps(dialogProps);
         setOpen(true);
+        setModal(modal);
         return new Promise<string>((resolve, reject) => {
             setResolveFn(() => resolve);
             setRejectFn(() => reject);
@@ -93,6 +97,7 @@ export const useContentDialog: (
             closeCallback={closeCallback}
             title={title}
             buttons={buttons}
+            modal={modal}
             componentProps={dialogProps}
             ref={dialogRef}>
             {content}
@@ -108,10 +113,11 @@ export const useMessageDialog: () => [MessageDialogShowFn, React.ReactElement] =
         title: string | null,
         message: string | React.ReactElement,
         dialogButtons?: DialogButton[],
-        componentProps?: any
+        componentProps?: any,
+        modal?: boolean
     ) => {
         const content = message ? <DialogContentText>{message}</DialogContentText> : <></>;
-        return showContentDialog(title, content, dialogButtons, componentProps);
+        return showContentDialog(title, content, dialogButtons, componentProps, modal);
     };
     return [showDialog, dialogComponent];
 };
@@ -124,6 +130,7 @@ export const Dialog: React.FC<DialogProps> = (props) => {
         title,
         buttons,
         closeIcon = true,
+        modal = false,
         componentProps,
         ref,
         children,
@@ -131,11 +138,11 @@ export const Dialog: React.FC<DialogProps> = (props) => {
     return (
         <MuiDialog
             open={open}
-            onClose={(_event, reason) => closeCallback(reason)}
+            onClose={!modal ? (_event, reason) => closeCallback(reason) : undefined}
             ref={ref}
             {...componentProps}>
             {title && <DialogTitle>{title}</DialogTitle>}
-            {closeIcon && (
+            {closeIcon && !modal && (
                 <IconButton
                     aria-label="close"
                     onClick={() => closeCallback('buttonClick')}

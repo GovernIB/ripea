@@ -477,7 +477,7 @@ class PermisosHelperTest {
         AclSidEntity rolSid = mock(AclSidEntity.class);
         when(aclSidRepository.getUserSid("usuari1")).thenReturn(userSid);
         when(aclSidRepository.findRolesSid(Collections.singletonList("ROL_GESTOR"))).thenReturn(Collections.singletonList(rolSid));
-        when(aclObjectIdentityRepository.findObjectsWithPermissions(
+        when(aclObjectIdentityRepository.findObjectsWithPermissionsBoth(
                 EntidadProva.class.getName(),
                 Arrays.asList(userSid, rolSid),
                 ExtendedPermission.READ.getMask(),
@@ -501,7 +501,7 @@ class PermisosHelperTest {
                 EntidadProva.class, ExtendedPermission.READ, ExtendedPermission.WRITE);
 
         assertThat(result).isEmpty();
-        verify(aclObjectIdentityRepository, never()).findObjectsWithPermissions(
+        verify(aclObjectIdentityRepository, never()).findObjectsWithPermissionsBoth(
                 any(), anyList(), any(Integer.class), any(Integer.class));
     }
 

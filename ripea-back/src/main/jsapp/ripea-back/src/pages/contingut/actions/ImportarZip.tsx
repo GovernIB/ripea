@@ -41,9 +41,14 @@ const usePolling = () => {
 	};
 };
 
-const ImportarZipForm = () => {
+const ImportarZipForm = (props:any) => {
     const {t} = useTranslation()
+    const {setDisabled} = props;
     const {data, fields, apiRef} = useFormContext()
+
+    useEffect(() => {
+        setDisabled(data?.documentsZip == null || !data?.documentsZip?.some?.((doc:any) => doc.importar));
+    }, [data?.documentsZip]);
 
     const fieldNom = fields?.filter(i=>i.name=='nom')[0];
     const fieldTipusDocument = fields?.filter(i=>i.name=='tipusDocument')[0];
@@ -134,6 +139,7 @@ const ImportarZipForm = () => {
 
         <Load value={data?.documentsZip} noEffect>
             <GridFormField name={"tipusDocument#default"}
+                           label={t('page.document.detall.tipusDocumentDefault')}
                            field={fieldTipusDocument}
                            onChange={(value:any) => {
                                data.documentsZip.forEach((row:any) => {
@@ -146,8 +152,10 @@ const ImportarZipForm = () => {
             <DataGridPro
                 rows={data.documentsZip}
                 columns={columns}
-                onRowSelectionModelChange={(newSelection) => {
-                    const ids = fromSelectionModel(newSelection);
+                onRowSelectionModelChange={(newSelection, event) => {
+                    const ids = (newSelection.type == 'exclude' && newSelection.ids.size == 0)
+                        ? event.api.getAllRowIds()
+                        : fromSelectionModel(newSelection);
                     data.documentsZip.forEach((row:any) => {
                         updateDocument(row.id, "importar", ids.includes(row.id))
                     })
@@ -171,10 +179,11 @@ const ImportarZipForm = () => {
 };
 
 const ImportarZip = ({ ...props }: any) => {
-	const { entity, refresh, polling, apiRef, isProcessed } = props;
+	const { entity, refresh, polling, apiRef } = props;
 	const { t } = useTranslation();
 	const { progress, finished, progressMessage, cancelPolling } = polling;
 	const [showBackdrop, setShowBackdrop] = useState(false);
+	const [disabled, setDisabled] = useState(true);
 
 	useEffect(() => {
 		setShowBackdrop(!finished);
@@ -206,14 +215,15 @@ const ImportarZip = ({ ...props }: any) => {
 				resourceName="expedientResource"
 				action="IMPORT_DOCS_ZIP"
 				title={t('page.document.action.importZip.title')}
+                onSuccess={()=>setDisabled(true)}
                 formDialogComponentProps={{fullWidth: true, maxWidth: 'lg'}}
 				formDialogButtons={[
-                    { icon: 'upload_file', text: t('common.import'), componentProps: { variant: 'contained', disabled: isProcessed }, value: true },
+                    { icon: 'upload_file', text: t('common.import'), componentProps: { variant: 'contained', disabled: disabled }, value: true },
 					{ text: t('common.close'), componentProps: { variant: 'outlined' }, value: false },
 				]}
 				{...props}
 			>
-				<ImportarZipForm/>
+				<ImportarZipForm setDisabled={setDisabled}/>
 			</FormActionDialog>
 
 			<BackdropLoading
@@ -236,11 +246,9 @@ const useImportarZip = (entity: any, refresh?: () => void, contingutPareId?: str
 
 	const polling = usePolling();
 	const [isProcessing, setIsProcessing] = useState(false);
-	const [isProcessed, setIsProcessed] = useState(false);
 
 	const handleShow = () => {
 		polling.setFinished(true);
-		setIsProcessed(false);
 		const extra =
 			contingutPareId != null && contingutPareId !== ''
 				? { carpeta: { id: contingutPareId } }
@@ -266,7 +274,6 @@ const useImportarZip = (entity: any, refresh?: () => void, contingutPareId?: str
 					'success'
 				);
 				setIsProcessing(false);
-				setIsProcessed(true);
 				return <ImportarZipResults results={finalResult} />;
 			}
 
@@ -284,7 +291,6 @@ const useImportarZip = (entity: any, refresh?: () => void, contingutPareId?: str
 				refresh={refresh}
 				apiRef={apiRef}
 				polling={polling}
-				isProcessed={isProcessed}
 				formDialogResultProcessor={processResult}
 			/>
 		)

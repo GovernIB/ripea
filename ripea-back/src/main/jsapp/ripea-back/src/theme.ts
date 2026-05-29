@@ -10,11 +10,6 @@ const base: ThemeOptions = {
                     backgroundImage: `url(${backgroundPattern})`,
                     color: '#666666'
                 },
-                '.input': {
-                    height: '100%',
-                    '& .MuiInputBase-root': { height: '100%' },
-                    '& .MuiTextField-root': { height: '100%' },
-                },
                 '.multi-line-cell': {
                     display: 'flex',
                     alignItems: 'baseline !important',
@@ -120,11 +115,6 @@ const base: ThemeOptions = {
                 checkboxInput: {
                     transform: 'scale(0.8)',
                 },
-            },
-        },
-        MuiGrid: {
-            styleOverrides: {
-                root: {paddingTop: '5px'},
             },
         },
         MuiTab: {styleOverrides: {root: {textTransform: 'none', fontSize: '1rem', '&.Mui-disabled': {opacity: 0.4}}}},

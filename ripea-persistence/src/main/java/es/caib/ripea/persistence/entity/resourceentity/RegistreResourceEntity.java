@@ -106,6 +106,11 @@ public class RegistreResourceEntity extends BaseAuditableEntity<RegistreResource
     @Formula("DESTI_CODI||' - '||DESTI_DESCRIPCIO")
     private String destiCodiINom;
 
+    @Formula("UPPER(TRANSLATE(DESTI_CODI||' - '||DESTI_DESCRIPCIO," +
+            "'àáâãäåèéêëìíîïòóôõöùúûüçñÀÁÂÃÄÅÈÉÊËÌÍÎÏÒÓÔÕÖÙÚÛÜÇÑ'," +
+            "'aaaaaaeeeeiiiioooouuuucnAAAAAAEEEEIIIIOOOOOUUUUCN'))")
+    private String destiCodiINomFiltre;
+
     @OneToMany(
             mappedBy = "registre",
             cascade = CascadeType.ALL,

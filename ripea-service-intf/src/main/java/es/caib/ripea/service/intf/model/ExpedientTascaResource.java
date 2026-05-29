@@ -28,7 +28,7 @@ import lombok.experimental.FieldNameConstants;
 @NoArgsConstructor
 @FieldNameConstants
 @ResourceConfig(
-        quickFilterFields = { "id, titol" },
+        quickFilterFields = { "titol", "observacions", "metaExpedientTasca.nom"},
         descriptionField = "titol",
         artifacts = {
                 @ResourceArtifact(

@@ -1061,7 +1061,13 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                     Long contingutDestiId = params.getCarpeta()!=null?params.getCarpeta().getId():params.getExpedient().getId();
                     switch (params.getAction()) {
                     case MOURE:
-                        contingutHelper.move(entitatEntity.getId(), contingutOrigenId, contingutDestiId, params.getCarpetaNova(), configHelper.getRolActual());
+                        contingutHelper.move(
+                        		entitatEntity.getId(),
+                        		contingutOrigenId,
+                        		contingutDestiId,
+                        		null,
+                        		params.getCarpetaNova(),
+                        		configHelper.getRolActual());
                         break;
                     case COPIAR:
                         contingutHelper.copy(entitatEntity.getId(), contingutOrigenId, contingutDestiId, false); //No recursiu

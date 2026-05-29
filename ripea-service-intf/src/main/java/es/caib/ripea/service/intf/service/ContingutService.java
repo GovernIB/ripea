@@ -100,24 +100,22 @@ public interface ContingutService {
 	/**
 	 * Mou un contingut al destí especificat.
 	 * 
-	 * @param entitatId
-	 *            Atribut id de l'entitat a la qual pertany el contingut.
-	 * @param contingutOrigenId
-	 *            Atribut id del contingut que es vol moure.
-	 * @param contingutDestiId
-	 *            Atribut id del contingut a on es vol moure l'origen.
+	 * @param entitatId Atribut id de l'entitat a la qual pertany el contingut.
+	 * @param contingutOrigenId Atribut id del contingut que es vol moure.
+	 * @param contingutDestiId Atribut id del contingut a on es vol moure l'origen.
+	 * @param tascaId Si venim de una tasca, no es necessari tenir el expedient afagat per mourer contingut.
 	 * @param rolActual TODO
-	 * @throws NotFoundException
-	 *             Si no s'ha trobat l'objecte amb l'id especificat.
-	 * @throws ValidationException
-	 *             Si ja existeix un altre contingut amb el mateix nom
-	 *             a dins el destí.
+	 * @throws NotFoundException Si no s'ha trobat l'objecte amb l'id especificat.
+	 * @throws ValidationException Si ja existeix un altre contingut amb el mateix nom a dins el destí.
 	 */
 	@PreAuthorize("isAuthenticated()")
 	public void move(
 			Long entitatId,
 			Long contingutOrigenId,
-			Long contingutDestiId, String carpetaNova, String rolActual) throws NotFoundException, ValidationException;
+			Long contingutDestiId,
+			Long tascaId,
+			String carpetaNova,
+			String rolActual) throws NotFoundException, ValidationException;
 
 	/**
 	 * Copia un contingut al destí especificat.
@@ -493,6 +491,7 @@ public interface ContingutService {
 	public void order(
 			Long entitatId,
 			Long contingutId,
+			Long tascaId,
 			Map<Integer, Long> orderedElements) throws NotFoundException, ValidationException;
 
 

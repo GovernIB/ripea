@@ -2,36 +2,148 @@ version: "3"
 
 services:
   ripea:
-    image: ripea:latest
+    image: goib/ripea:latest
+    platform: ${DOCKER_PLATFORM:-linux/amd64}
     env_file:
     - .env
     environment:
-      - JBOSS_DB_URL=${JBOSS_DB_URL}
-      - JBOSS_DB_USERNAME=${JBOSS_DB_USERNAME}
-      - JBOSS_DB_PASSWORD=${JBOSS_DB_PASSWORD}
-      - JBOSS_DB_DRIVER=${JBOSS_DB_DRIVER}
-      - JBOSS_AUTH_URL=${KEYCLOAK_URL}
-      - JBOSS_AUTH_REALM=${KEYCLOAK_REALM}
-      - JBOSS_AUTH_CLIENTID=${KEYCLOAK_CLIENTID}
-      - JBOSS_AUTH_CLIENTID_REST=${KEYCLOAK_CLIENTID_REST}
-      - JBOSS_AUTH_SECRET=${KEYCLOAK_SECRET}
+      - JBOSS_DB_URL=${DB_URL}
+      - JBOSS_DB_USERNAME=${DB_USERNAME}
+      - JBOSS_DB_PASSWORD=${DB_PASSWORD}
+      - JBOSS_DB_DRIVER=${DB_DRIVER}
+      - JBOSS_AUTH_URL=${AUTH_URL}
+      - JBOSS_AUTH_REALM=${AUTH_REALM}
+      - JBOSS_AUTH_CLIENTID=${AUTH_CLIENTID}
+      - JBOSS_AUTH_CLIENTID_REST=${AUTH_CLIENTID_REST}
+      - JBOSS_AUTH_SECRET=${AUTH_SECRET}
       - JBOSS_MAIL_HOST=${MAIL_HOST}
       - JBOSS_MAIL_PORT=${MAIL_PORT}
       - JBOSS_MAIL_USERNAME=${MAIL_USERNAME}
       - JBOSS_MAIL_PASSWORD=${MAIL_PASSWORD}
       - JBOSS_MAIL_SSL=${MAIL_SSL}
       - JBOSS_MAIL_TLS=${MAIL_TLS}
+      - JBOSS_RIPEA_PROPERTIES_PATH=${PROPERTIES_PATH}
+      - JBOSS_RIPEA_SYSTEM_PROPERTIES_PATH=${SYSTEM_PROPERTIES_PATH}
+      - JBOSS_TRUSTSTORE=${TRUSTSTORE}
+      - JBOSS_TRUSTSTORE_PASSWORD=${TRUSTSTORE_PASSWORD}
       - JAVA_OPTS_APPEND=${JAVA_OPTS_APPEND}
+#      PROPIETATS
+      - es.caib.ripea.base.url=${BASE_URL}
+      - es.caib.ripea.email.remitent=${REMITENT_EMAIL}
+      - es.caib.ripea.capsalera.logo=${CAPSALERA_LOGO}
+      - es.caib.ripea.index.logo=${INDEX_LOGO}
+      - es.caib.ripea.front.api.url=${FRONT_API_URL}
+      - es.caib.ripea.app.data.dir=${FILES_DIR}
+      - es.caib.ripea.plugin.gesdoc.filesystem.base.dir=${GESDOC_DIR}
+#      PLUGIN PINBAL
+      - es.caib.ripea.pinbal.base.url=${PINBAL_URL}
+      - es.caib.ripea.pinbal.user=${PINBAL_USERNAME}
+      - es.caib.ripea.pinbal.password=${PINBAL_PASSWORD}
+#      PLUGIN DADES USUARI LDAP
+      - es.caib.ripea.plugin.dades.usuari.pluginsib.userinformation.ldap.host_url=${LDAP_URL}
+      - es.caib.ripea.plugin.dades.usuari.pluginsib.userinformation.ldap.security_principal=${LDAP_PRINCIPAL}
+      - es.caib.ripea.plugin.dades.usuari.pluginsib.userinformation.ldap.security_credentials=${LDAP_CREDENTIALS}
+#      PLUGIN DADES USUARI KEYCLOAK
+      - es.caib.ripea.plugin.dades.usuari.pluginsib.userinformation.keycloak.serverurl=${KEYCLOAK_URL}
+      - es.caib.ripea.plugin.dades.usuari.pluginsib.userinformation.keycloak.password_secret=${KEYCLOAK_SECRET}
+#      PLUGIN DADES DIR3
+      - es.caib.ripea.plugin.unitats.organitzatives.dir3.service.url=${DIR3_URL}
+      - es.caib.ripea.plugin.unitats.organitzatives.dir3.service.username=${DIR3_USERNAME}
+      - es.caib.ripea.plugin.unitats.organitzatives.dir3.service.password=${DIR3_PASSWORD}
+      - es.caib.ripea.plugin.unitats.cerca.dir3.service.url=${DIR3_CERCA_URL}
+#      PLUGIN NOTIB
+      - es.caib.ripea.plugin.notificacio.url=${NOTIB_URL}
+      - es.caib.ripea.plugin.notificacio.username=${NOTIB_USERNAME}
+      - es.caib.ripea.plugin.notificacio.password=${NOTIB_PASSWORD}
+#      PLUGIN FIRMA EN SERVIDOR
+      - es.caib.ripea.plugin.firmaservidor.portafib.endpoint=${FIRMASERVIDOR_URL}
+      - es.caib.ripea.plugin.firmaservidor.portafib.auth.username=${FIRMASERVIDOR_USERNAME}
+      - es.caib.ripea.plugin.firmaservidor.portafib.auth.password=${FIRMASERVIDOR_PASSWORD}
+#      PLUGIN PORTAFIRMES
+      - es.caib.ripea.plugin.portafirmes.firmasimpleasync.url=${FIRMA_SIMPLE_ASYNC_URL}
+      - es.caib.ripea.plugin.portafirmes.firmasimpleasync.username=${FIRMA_SIMPLE_ASYNC_USERNAME}
+      - es.caib.ripea.plugin.portafirmes.firmasimpleasync.password=${FIRMA_SIMPLE_ASYNC_PASSWORD}
+      - es.caib.ripea.plugin.portafirmes.firmasimpleflux.url=${FIRMA_SIMPLE_FLUX_URL}
+      - es.caib.ripea.plugin.portafirmes.firmasimpleflux.username=${FIRMA_SIMPLE_FLUX_USERNAME}
+      - es.caib.ripea.plugin.portafirmes.firmasimpleflux.password=${FIRMA_SIMPLE_FLUX_PASSWORD}
+      - es.caib.ripea.plugin.portafirmes.usuarientitatws.url=${FIRMA_USUARIS_ENTITAT_URL}
+      - es.caib.ripea.plugin.portafirmes.usuarientitatws.username=${FIRMA_USUARIS_ENTITAT_USERNAME}
+      - es.caib.ripea.plugin.portafirmes.usuarientitatws.password=${FIRMA_USUARIS_ENTITAT_PASSWORD}
+#      PLUGIN FIRMA SIMPLE WEB
+      - es.caib.ripea.plugin.firmasimpleweb.endpoint=${FIRMA_SIMPLE_WEB_URL}
+      - es.caib.ripea.plugin.firmasimpleweb.username=${FIRMA_SIMPLE_WEB_USERNAME}
+      - es.caib.ripea.plugin.firmasimpleweb.password=${FIRMA_SIMPLE_WEB_PASSWORD}
+#      PLUGIN ARXIU DIGITAL
+      - es.caib.ripea.plugin.arxiu.caib.base.url=${ARXIU_URL}
+      - es.caib.ripea.plugin.arxiu.caib.usuari=${ARXIU_USERNAME}
+      - es.caib.ripea.plugin.arxiu.caib.contrasenya=${ARXIU_PASSWORD}
+#      PLUGIN CONCSV
+      - es.caib.ripea.concsv.base.url=${CONCSV_URL}
+      - es.caib.ripea.plugin.arxiu.caib.conversio.imprimible.url=${CONCSV_IMPRIMIBLE_URL}
+      - es.caib.ripea.plugin.arxiu.caib.conversio.imprimible.usuari=${CONCSV_IMPRIMIBLE_USERNAME}
+      - es.caib.ripea.plugin.arxiu.caib.conversio.imprimible.contrasenya=${CONCSV_IMPRIMIBLE_PASSWORD}
+#      PLUGIN DADES EXTERNES DIR3
+      - es.caib.ripea.plugin.dadesext.service.url=${DADESEXT_DIR3_URL}
+      - es.caib.ripea.plugin.dadesext.dir3.rest.url=${DADESEXT_DIR3_REST_URL}
+#      PLUGIN DADES EXTERNES PINBAL
+      - es.caib.ripea.plugin.dadesextcaib.service.url=${DADESEXT_CAIB_URL}
+#      PLUGIN VALIDACIO FIRMA
+      - es.caib.ripea.plugins.validatesignature.afirmacxf.endpoint=${VALIDATE_SIGNATURE_URL}
+      - es.caib.ripea.plugins.validatesignature.afirmacxf.authorization.username=${VALIDATE_SIGNATURE_USERNAME}
+      - es.caib.ripea.plugins.validatesignature.afirmacxf.authorization.password=${VALIDATE_SIGNATURE_PASSWORD}
+      - es.caib.ripea.plugins.validatesignature.afirmacxf.TransformersTemplatesPath=${TRANSFORMERS_PATH}
+#      PLUGIN ROLSAC
+      - es.caib.ripea.plugin.procediment.rolsac.service.url=${ROLSAC_URL}
+      - es.caib.ripea.plugin.procediment.rolsac.service.username=${ROLSAC_USERNAME}
+      - es.caib.ripea.plugin.procediment.rolsac.service.password=${ROLSAC_PASSWORD}
+#      PLUGIN VIAFIRMA
+      - es.caib.ripea.plugin.viafirma.caib.apiurl=${VIAFIRMA_URL}
+      - es.caib.ripea.plugin.viafirma.caib.consumerkey=${VIAFIRMA_KEY}
+      - es.caib.ripea.plugin.viafirma.caib.consumersecret=${VIAFIRMA_SECRET}
+      - es.caib.ripea.plugin.viafirma.caib.callback.url=${VIAFIRMA_CALLBACK_URL}
+      - es.caib.ripea.plugin.viafirma.caib.callback.username=${VIAFIRMA_CALLBACK_USERNAME}
+      - es.caib.ripea.plugin.viafirma.caib.callback.password=${VIAFIRMA_CALLBACK_PASSWORD}
+      - es.caib.ripea.plugin.viafirma.caib.proxy.host=${VIAFIRMA_PROXY_HOST}
+      - es.caib.ripea.plugin.viafirma.caib.proxy.port=${VIAFIRMA_PROXY_PORT}
+#      PLUGIN DISTRIBUCIO
+      - es.caib.ripea.distribucio.backofficeIntegracio.ws.url=${DISTRIBUCIO_URL}
+      - es.caib.ripea.distribucio.backofficeIntegracio.ws.username=${DISTRIBUCIO_USERNAME}
+      - es.caib.ripea.distribucio.backofficeIntegracio.ws.password=${DISTRIBUCIO_PASSWORD}
+      - es.caib.ripea.distribucio.regla.ws.url=${DISTRIBUCIO_REGLA_URL}
+      - es.caib.ripea.distribucio.regla.ws.username=${DISTRIBUCIO_REGLA_USERNAME}
+      - es.caib.ripea.distribucio.regla.ws.password=${DISTRIBUCIO_REGLA_PASSWORD}
+#      PLUGIN DIGITALITZACIO
+      - es.caib.ripea.plugin.digitalitzacio.digitalib.base.url=${DIGITALIB_URL}
+      - es.caib.ripea.plugin.digitalitzacio.digitalib.username=${DIGITALIB_USERNAME}
+      - es.caib.ripea.plugin.digitalitzacio.digitalib.password=${DIGITALIB_PASSWORD}
+#      PLUGIN CONVERSIO DOCUMENTS OPEN OFFICE
+      - es.caib.ripea.plugin.conversio.ooffice.host=${CONVERSIO_OPENOFICE_HOST}
+      - es.caib.ripea.plugin.conversio.ooffice.port=${CONVERSIO_OPENOFICE_PORT}
+#      PLUGIN RESUM AMB IA ##
+      - es.caib.ripea.plugin.summarize.url=${RESUM_URL}
+      - es.caib.ripea.plugin.summarize.usuari=${RESUM_USERNAME}
+      - es.caib.ripea.plugin.summarize.password=${RESUM_PASSWORD}
+#      PLUGIN COMANDA ##
+      - es.caib.ripea.plugin.comanda.baseurl=${COMANDA_URL}
+      - es.caib.ripea.plugin.comanda.user=${COMANDA_USER}
+      - es.caib.ripea.plugin.comanda.password=${COMANDA_PASSWORD}
+      - es.caib.ripea.plugin.fitxer.logs.path=${COMANDA_LOGS_PATH}
+#      REGWEB ###
+      - es.caib.ripea.plugin.registre.baseurl=${REGWEB_URL}
+      - es.caib.ripea.plugin.registre.username=${REGWEB_USER}
+      - es.caib.ripea.plugin.registre.password=${REGWEB_PASSWORD}
+      - es.caib.ripea.plugin.registre.timeout=${REGWEB_TIMEOUT}
       - DEBUG=${DEBUG:-}
     ports:
       - ${APP_PORT:-8080}:8080
       - "8787:8787"
       - ${MGM_PORT:-9990}:9990
-    restart: no
+#    restart: always
     extra_hosts:
       - host.docker.internal:host-gateway
     volumes:
       - ripea_store:/opt/webapps/ripea
+      - ./ripea-ear/src/main/docker/keystores/truststore.jks:/opt/eap/apps/ripea/truststore.jks:ro,z
 
 volumes:
   ripea_store:

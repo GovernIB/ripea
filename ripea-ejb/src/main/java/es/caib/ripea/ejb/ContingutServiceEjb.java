@@ -93,9 +93,10 @@ public class ContingutServiceEjb extends AbstractServiceEjb<ContingutService> im
 			Long entitatId,
 			Long contingutOrigenId,
 			Long contingutDestiId,
+			Long tascaId,
 			String carpetaNova,
 			String rolActual) {
-		delegateService.move(entitatId, contingutOrigenId, contingutDestiId, carpetaNova, rolActual);
+		delegateService.move(entitatId, contingutOrigenId, contingutDestiId, tascaId, carpetaNova, rolActual);
 	}
 	
 	@Override
@@ -300,10 +301,11 @@ public class ContingutServiceEjb extends AbstractServiceEjb<ContingutService> im
 	@RolesAllowed("**")
 	public void order(
 			Long entitatId,
-			Long contingutId, 
+			Long contingutId,
+			Long tascaId,
 			Map<Integer, Long> orderedElements)
 			throws NotFoundException, ValidationException {
-		delegateService.order(entitatId, contingutId, orderedElements);
+		delegateService.order(entitatId, contingutId, tascaId, orderedElements);
 	}
 
 	@Override

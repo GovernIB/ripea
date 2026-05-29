@@ -369,6 +369,17 @@ const translationEs = {
                 observadors: "Observadores",
                 dataInici: "Fecha inicio",
                 duracio: "Duración",
+                duracioFormat: {
+                    expirada: "Fecha límite expirada.",
+                    avui: "La fecha límite es hoy.",
+                    falten: "Faltan {{count}} días.",
+                    mateixDia: "El mismo día.",
+                    i: " y ",
+                    setmana_1: "1 semana",
+                    setmana_n: "{{count}} semanas",
+                    dia_1: "1 día",
+                    dia_n: "{{count}} días",
+                },
                 dataLimit: "Fecha limite",
                 estat: "Estado",
                 prioritat: "Prioridad",
@@ -496,6 +507,7 @@ const translationEs = {
                 exportar: {
                     label: "Exportar...",
                     ok: "Interesados exportados correctamente",
+                    hint: "Seleccione los interesados que desea exportar.",
                 },
                 importSGD: {
                     label: "Importar interesados desde Registro...",
@@ -835,6 +847,7 @@ const translationEs = {
                 extensio: "Extensión",
                 ruta: "Ruta",
                 mida: "Tamaño",
+                tipusDocumentDefault: "Tipo de documento a aplicar a todos los ficheros",
             },
             action: {
                 new: {

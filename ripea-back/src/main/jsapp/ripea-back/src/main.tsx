@@ -16,8 +16,6 @@ import {ThemeUserProvider} from "./components/ThemeUserProvider.tsx";
 
 dayjs.extend(duration);
 
-LicenseInfo.setLicenseKey('e0bde345c6cb2453171a44e15a0c58f5Tz0xMjQ4NTIsRT0xODAxMDk0Mzk5MDAwLFM9cHJvLExNPXN1YnNjcmlwdGlvbixQVj1pbml0aWFsLEtWPTI=');
-
 export const envVars = {
     VITE_API_URL: import.meta.env.VITE_API_URL,
     VITE_API_PUBLIC_URL: import.meta.env.VITE_API_PUBLIC_URL,
@@ -26,7 +24,10 @@ export const envVars = {
     VITE_AUTH_KEYCLOAK_URL: import.meta.env.VITE_AUTH_KEYCLOAK_URL,
     VITE_AUTH_KEYCLOAK_REALM: import.meta.env.VITE_AUTH_KEYCLOAK_REALM,
     VITE_AUTH_KEYCLOAK_CLIENTID: import.meta.env.VITE_AUTH_KEYCLOAK_CLIENTID,
+    VITE_MLK: import.meta.env.VITE_MLK,
 }
+
+LicenseInfo.setLicenseKey(envVar('VITE_MLK', envVars));
 
 // const getAuthConfig = () => ({
 //     url: envVar('VITE_AUTH_KEYCLOAK_URL', envVars),

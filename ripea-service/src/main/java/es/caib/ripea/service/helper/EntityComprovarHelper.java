@@ -88,7 +88,6 @@ public class EntityComprovarHelper {
 	@Autowired private PermisosHelper permisosHelper;
 	@Autowired private OrganGestorHelper organGestorHelper;
     @Autowired private MetaExpedientOrganGestorRepository metaExpedientOrganGestorRepository;
-	@Autowired private RolHelper rolHelper;
 	@Autowired private GrupRepository grupRepository;
 	@Autowired private CacheHelper cacheHelper;
 	@Autowired private ConfigHelper configHelper;
@@ -283,6 +282,11 @@ public class EntityComprovarHelper {
 		return filtrats;
 	}
 	
+	/**
+	 * Recupera els organs gestors accessibles quant es té seleccionat el rol "tothom"
+	 * directOrganPermisRequired 	--> es true quant es filtra desde el selector de organs del cercador de anotacions
+	 * 								--> false en la resta de casos
+	 */
 	public List<OrganGestorEntity> findAccessiblesUsuariActualRolUsuari(Long entitatId, String filter, boolean directOrganPermisRequired) {
 		
 		List<OrganGestorEntity> filtrats = new ArrayList<OrganGestorEntity>();
@@ -331,19 +335,40 @@ public class EntityComprovarHelper {
 	public List<OrganGestorEntity> getOrgansByOrgansAndCombinacioMetaExpedientsOrgansPermissions(EntitatEntity entitat) {
 
 		Set<String> organCodis = new HashSet<>();
-		// Cercam els òrgans amb permisos assignats directament
-		List<Long> organIdPermesos = permisosHelper.getObjectsIdsWithPermission(OrganGestorEntity.class, ExtendedPermission.READ);
-//		organGestorHelper.afegirOrganGestorFillsIds(entitat, organIdPermesos);
+		// ORGAN GESTOR --> Cercam els òrgans amb permisos assignats directament
+		List<Long> organIdPermesos = permisosHelper.getObjectsIdsWithAnyTwoPermissions(
+				OrganGestorEntity.class,
+				ExtendedPermission.READ,
+				ExtendedPermission.ADMINISTRATION);
 		organCodis.addAll(organGestorRepository.findCodisByIdList(entitat.getId(), organIdPermesos));
 
-		// Cercam las parelles metaExpedient-organ amb permisos assignats directament
-		List<Long> metaExpedientOrganIdPermesos = permisosHelper.getObjectsIdsWithPermission(MetaExpedientOrganGestorEntity.class, ExtendedPermission.READ);
+		// PROCEDIMENT COMU --> Cercam las parelles metaExpedient-organ (procediments comuns) amb permisos assignats directament
+		List<Long> metaExpedientOrganIdPermesos = permisosHelper.getObjectsIdsWithAnyTwoPermissions(
+				MetaExpedientOrganGestorEntity.class,
+				ExtendedPermission.READ,
+				ExtendedPermission.ADMINISTRATION);
 		if (metaExpedientOrganIdPermesos != null && !metaExpedientOrganIdPermesos.isEmpty()) {
 			organCodis.addAll(metaExpedientOrganGestorRepository.findOrganGestorCodisByMetaExpedientOrganGestorIds(metaExpedientOrganIdPermesos));
-//			organGestorHelper.afegirOrganGestorFillsIds(entitat, organsIdsPerMetaExpedientOrganIdPermesos);
-//			organIdPermesos.addAll(organsIdsPerMetaExpedientOrganIdPermesos);
+		}
+		
+		// PROCEDIMENT NO COMU --> Cercam els procediments amb permisos assignats directament
+		List<Long> procedimentsPermesos = permisosHelper.getObjectsIdsWithAnyTwoPermissions(
+				MetaNodeEntity.class,
+				ExtendedPermission.READ,
+				ExtendedPermission.ADMINISTRATION);
+		// GRUP --> PROCEDIMENT Cercam els procediments amb permisos indirectament per permis de grup (no comuns)
+		List<Long> grupsPermesosIds = permisosHelper.getObjectsIdsWithAnyTwoPermissions(
+				GrupEntity.class,
+				ExtendedPermission.READ,
+				ExtendedPermission.ADMINISTRATION);
+		procedimentsPermesos.addAll(grupRepository.findOrgansGestorsOfProcedimentsNoComunsGrups(grupsPermesosIds));
+		if (procedimentsPermesos != null && !procedimentsPermesos.isEmpty()) {
+			organCodis.addAll(metaExpedientRepository.findOrgansGestorsOfProcediments(procedimentsPermesos));
 		}
 
+		// GRUP --> Organs gestors del propi grup (si s'ha definit, (es opcional al crear el grup))
+		organCodis.addAll(grupRepository.findOrgansGestorsCodisOfGrups(grupsPermesosIds));
+		
 		List<String> organsGestorsPermesos = organGestorCacheHelper.getCodisOrgansFills(entitat.getCodi(), new ArrayList<>(organCodis));
 
 		List<OrganGestorEntity> organGestors = new ArrayList<>();

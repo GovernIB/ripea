@@ -80,4 +80,9 @@ public class RegistreInteressatResourceEntity extends BaseAuditableEntity<Regist
     private String organCodi;
     @Formula("DOC_NUMERO||' - '||COALESCE(NOM, RAO_SOCIAL)||' '||COALESCE(LLINATGE1, '')||' '||COALESCE(LLINATGE2, '')")
     private String codiNom;
+
+    @Formula("UPPER(TRANSLATE(DOC_NUMERO||' - '||COALESCE(NOM, RAO_SOCIAL, ORGAN_CODI)||' '||COALESCE(LLINATGE1, '')||' '||COALESCE(LLINATGE2, '')||' '||COALESCE(ORGAN_CODI, '')," +
+            "'àáâãäåèéêëìíîïòóôõöùúûüçñÀÁÂÃÄÅÈÉÊËÌÍÎÏÒÓÔÕÖÙÚÛÜÇÑ'," +
+            "'aaaaaaeeeeiiiioooouuuucnAAAAAAEEEEIIIIOOOOOUUUUCN'))")
+    private String codiNomFiltre;
 }

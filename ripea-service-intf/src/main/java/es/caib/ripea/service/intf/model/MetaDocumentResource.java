@@ -42,6 +42,17 @@ import lombok.experimental.FieldNameConstants;
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = MetaDocumentResource.PERSPECTIVE_REVISIO_ESTAT),
 				@ResourceArtifact(
+                        type = ResourceArtifactType.PERSPECTIVE,
+                        code = MetaDocumentResource.PERSPECTIVE_PORTAFIRMES_RESPONSABLES),
+				@ResourceArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = MetaDocumentResource.ACTION_ACTIVAR_CODE,
+                        requiresId = true),
+				@ResourceArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = MetaDocumentResource.ACTION_DESACTIVAR_CODE,
+                        requiresId = true),
+				@ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = MetaDocumentResource.ACTION_MARCAR_DEFECTE_CODE,
                         requiresId = true),
@@ -57,8 +68,11 @@ import lombok.experimental.FieldNameConstants;
         })
 public class MetaDocumentResource extends MetaNodeResource {
 
-	public static final String PERSPECTIVE_COUNT_METADADES		= "COUNT_METADADES";
-    public static final String PERSPECTIVE_REVISIO_ESTAT        = "REVISIO_ESTAT";
+	public static final String PERSPECTIVE_COUNT_METADADES			= "COUNT_METADADES";
+    public static final String PERSPECTIVE_REVISIO_ESTAT        	= "REVISIO_ESTAT";
+    public static final String PERSPECTIVE_PORTAFIRMES_RESPONSABLES = "PORTAFIRMES_RESPONSABLES";
+	public static final String ACTION_ACTIVAR_CODE				= "ACTIVAR";
+	public static final String ACTION_DESACTIVAR_CODE			= "DESACTIVAR";
 	public static final String ACTION_MARCAR_DEFECTE_CODE		= "MARCAR_DEFECTE";
 	public static final String ACTION_DESMARCAR_DEFECTE_CODE	= "DESMARCAR_DEFECTE";
 	public static final String ACTION_REORDENAR_CODE			= "REORDENAR";

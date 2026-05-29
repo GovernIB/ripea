@@ -429,9 +429,13 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
 
     @Override
     public InteressatResource create(InteressatResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
-    	InteressatResource ir = interessatResourceHelper.create(resource);
-		afterDbChange(resource.getExpedient().getId());
-		return ir;
+    	try {
+    		InteressatResource ir = interessatResourceHelper.create(resource);
+    		afterDbChange(resource.getExpedient().getId());
+    		return ir;
+    	} catch (Exception ex) {
+    		throw ex;
+    	}
     }
     
     @Override
@@ -536,77 +540,82 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
 
     private class NumDocOnchangeLogicProcessor implements OnChangeLogicProcessor<InteressatResource> {
 
-        public static final String NOT_REPRESENT_HIMSELF = "NOT_REPRESENT_HIMSELF";
+        public static final String NOT_REPRESENT_HIMSELF 	= "NOT_REPRESENT_HIMSELF";
+        public static final String INT_ALREADY_EXISTS 		= "INT_ALREADY_EXISTS";
 
         @Override
         public void onChange(Serializable id, InteressatResource previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, InteressatResource target) {
+        	if (fieldValue != null && fieldValue.toString().length() == 9 && !fieldValue.toString().equals(previous.getDocumentNum())) {
+	        	if (answers.containsKey(NOT_REPRESENT_HIMSELF) || answers.containsKey(INT_ALREADY_EXISTS)) {
+	        		target.setDocumentNum(null);
+	        	} else {
+	                InteressatResourceEntity interessatExistent = interessatResourceRepository.findByExpedientIdAndDocumentNum(previous.getExpedient().getId(), fieldValue.toString()).orElse(null);
+	                if (interessatExistent != null) {
+	                    //Controlar que el interessat no es representa a ell mateix (nomes en cas de estar creant un representant)
+	                    if (previous.isEsRepresentant() && (
+	                    		(	previous.getRepresentat() != null && Objects.equals(previous.getRepresentat().getId(), interessatExistent.getId()))
+	                            || (previous.getRepresentant() != null && Objects.equals(previous.getRepresentant().getId(), interessatExistent.getId()))
+	                            )
+	                    ) {
+	                    	throw new AnswerRequiredException(InteressatResource.class, NOT_REPRESENT_HIMSELF, messageHelper.getMessage("es.caib.ripea.service.intf.resourcevalidation.InteressatValid.representHimself"));
+	                    } else if (!interessatExistent.getId().equals(previous.getId())) {
+	                    	if (!previous.isEsRepresentant()) {
+	                    		//Si cream un interessat, no permetem continuar creant-ne un de repetit
+	                    		//i no carregam dades de un existent, per no crear un patró oscur (el usuari no sap que esta modificant en lloc de crear)
+	                    		throw new AnswerRequiredException(InteressatResource.class, INT_ALREADY_EXISTS, messageHelper.getMessage("es.caib.ripea.service.intf.resourcevalidation.InteressatValid.documentNumExists"));
+	                    	} else {
+	                    		//si el que cream es un representant, si que podem copiar les dades del interessat existent
+		                        //Controlar que no estam introduint un interessat repetit
+		//                    	target.setId(interessatExistent.getId());
+		                        target.setDocumentTipus(interessatExistent.getDocumentTipus());
+		                        target.setNom(interessatExistent.getNom());
+		                        target.setEmail(interessatExistent.getEmail());
+		                        target.setTelefon(interessatExistent.getTelefon());
+		                        target.setObservacions(interessatExistent.getObservacions());
+		                        target.setPreferenciaIdioma(interessatExistent.getPreferenciaIdioma());
+		                        target.setEntregaDeh(interessatExistent.getEntregaDeh());
+		                        target.setEntregaDehObligat(interessatExistent.getEntregaDehObligat());
 
-            if (fieldValue != null && fieldValue.toString().length() == 9 && !fieldValue.toString().equals(previous.getDocumentNum())) {
-
-                InteressatResourceEntity interessatExistent = interessatResourceRepository.findByExpedientIdAndDocumentNum(previous.getExpedient().getId(), fieldValue.toString()).orElse(null);
-
-                if (interessatExistent != null) {
-
-                    //Controlar que el interessat no es representa a ell mateix
-                    if (
-                            (previous.getRepresentat() != null && Objects.equals(previous.getRepresentat().getId(), interessatExistent.getId()))
-                                    || (previous.getRepresentant() != null && Objects.equals(previous.getRepresentant().getId(), interessatExistent.getId()))
-                    ) {
-                        if (answers.containsKey(NOT_REPRESENT_HIMSELF)) {
-                            target.setDocumentNum(null);
-                        } else {
-                            throw new AnswerRequiredException(InteressatResource.class, NOT_REPRESENT_HIMSELF, messageHelper.getMessage("es.caib.ripea.service.intf.resourcevalidation.InteressatValid.representHimself"));
-                        }
-                    } else if (!interessatExistent.getId().equals(previous.getId())) {
-                        //Controlar que no estam introduint un interessat repetit
-//                    	target.setId(interessatExistent.getId());
-                        target.setDocumentTipus(interessatExistent.getDocumentTipus());
-                        target.setNom(interessatExistent.getNom());
-                        target.setEmail(interessatExistent.getEmail());
-                        target.setTelefon(interessatExistent.getTelefon());
-                        target.setObservacions(interessatExistent.getObservacions());
-                        target.setPreferenciaIdioma(interessatExistent.getPreferenciaIdioma());
-                        target.setEntregaDeh(interessatExistent.getEntregaDeh());
-                        target.setEntregaDehObligat(interessatExistent.getEntregaDehObligat());
-
-                        target.setTipus(interessatExistent.getTipus());
-                        switch (interessatExistent.getTipus()) {
-                            case InteressatAdministracioEntity:
-                                target.setOrganCodi(interessatExistent.getOrganCodi());
-                                target.setOrganNom(interessatExistent.getOrganNom());
-                                break;
-                            case InteressatPersonaFisicaEntity:
-                                target.setLlinatge1(interessatExistent.getLlinatge1());
-                                target.setLlinatge2(interessatExistent.getLlinatge2());
-                                break;
-                            case InteressatPersonaJuridicaEntity:
-                                target.setRaoSocial(interessatExistent.getRaoSocial());
-                                break;
-                        }
-
-                        // Adreça
-                        target.setPais(interessatExistent.getPais());
-                        target.setProvincia(interessatExistent.getProvincia());
-                        target.setMunicipi(interessatExistent.getMunicipi());
-                        target.setCodiPostal(interessatExistent.getCodiPostal());
-                        target.setAdresa(interessatExistent.getAdresa());
-                        target.setAdressaTipus(interessatExistent.getAdressaTipus());
-                        target.setAdressaTipusVia(interessatExistent.getAdressaTipusVia());
-
-                        target.setAdressaNumCasa(interessatExistent.getAdressaNumCasa());
-                        target.setAdresaQualificador(interessatExistent.getAdresaQualificador());
-                        target.setAdresaPuntKm(interessatExistent.getAdresaPuntKm());
-                        target.setAdresaApartatCorreus(interessatExistent.getAdresaApartatCorreus());
-                        target.setAdresaPortal(interessatExistent.getAdresaPortal());
-                        target.setAdresaEscala(interessatExistent.getAdresaEscala());
-                        target.setAdresaPlanta(interessatExistent.getAdresaPlanta());
-                        target.setAdresaPorta(interessatExistent.getAdresaPorta());
-                        target.setAdresaBloc(interessatExistent.getAdresaBloc());
-                        target.setAdresaComplement(interessatExistent.getAdresaComplement());
-                        target.setAdresaPoblacio(interessatExistent.getAdresaPoblacio());
-                    }
-                }
-            }
+		                        target.setTipus(interessatExistent.getTipus());
+		                        switch (interessatExistent.getTipus()) {
+		                            case InteressatAdministracioEntity:
+//		                                target.setOrganCodi(interessatExistent.getOrganCodi());
+//		                                target.setOrganNom(interessatExistent.getOrganNom());
+		                                break;
+		                            case InteressatPersonaFisicaEntity:
+		                                target.setLlinatge1(interessatExistent.getLlinatge1());
+		                                target.setLlinatge2(interessatExistent.getLlinatge2());
+		                                break;
+		                            case InteressatPersonaJuridicaEntity:
+		                                target.setRaoSocial(interessatExistent.getRaoSocial());
+		                                break;
+		                        }
+		
+		                        // Adreça
+		                        target.setPais(interessatExistent.getPais());
+		                        target.setProvincia(interessatExistent.getProvincia());
+		                        target.setMunicipi(interessatExistent.getMunicipi());
+		                        target.setCodiPostal(interessatExistent.getCodiPostal());
+		                        target.setAdresa(interessatExistent.getAdresa());
+		                        target.setAdressaTipus(interessatExistent.getAdressaTipus());
+		                        target.setAdressaTipusVia(interessatExistent.getAdressaTipusVia());
+		
+		                        target.setAdressaNumCasa(interessatExistent.getAdressaNumCasa());
+		                        target.setAdresaQualificador(interessatExistent.getAdresaQualificador());
+		                        target.setAdresaPuntKm(interessatExistent.getAdresaPuntKm());
+		                        target.setAdresaApartatCorreus(interessatExistent.getAdresaApartatCorreus());
+		                        target.setAdresaPortal(interessatExistent.getAdresaPortal());
+		                        target.setAdresaEscala(interessatExistent.getAdresaEscala());
+		                        target.setAdresaPlanta(interessatExistent.getAdresaPlanta());
+		                        target.setAdresaPorta(interessatExistent.getAdresaPorta());
+		                        target.setAdresaBloc(interessatExistent.getAdresaBloc());
+		                        target.setAdresaComplement(interessatExistent.getAdresaComplement());
+		                        target.setAdresaPoblacio(interessatExistent.getAdresaPoblacio());
+	                    	}
+	                    }
+	                }
+	            }
+        	}
         }
     }
 
