@@ -2,7 +2,7 @@ version: "3"
 
 services:
   ripea:
-    image: goib/goib/ripea:latest
+    image: goib/ripea:1.0.4
     platform: ${DOCKER_PLATFORM:-linux/amd64}
     env_file:
     - .env

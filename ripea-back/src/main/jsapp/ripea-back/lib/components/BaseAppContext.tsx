@@ -20,13 +20,15 @@ export type ContentDialogShowFn = (
     title: string | null,
     content: React.ReactElement,
     dialogButtons?: DialogButton[],
-    componentProps?: any
+    componentProps?: any,
+    modal?: boolean
 ) => Promise<any>;
 export type MessageDialogShowFn = (
     title: string | null,
     message: string | React.ReactElement,
     dialogButtons?: DialogButton[],
-    componentProps?: any
+    componentProps?: any,
+    modal?: boolean
 ) => Promise<string>;
 export type DialogButton = {
     value: any;
