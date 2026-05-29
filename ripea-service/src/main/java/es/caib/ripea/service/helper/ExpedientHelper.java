@@ -3162,7 +3162,8 @@ public class ExpedientHelper {
 					contingutHelper.move(
 							entitatId, 
 							contingutFill.getId(), 
-							expedientDestiId, 
+							expedientDestiId,
+							null,
 							null, 
 							null);
 			}

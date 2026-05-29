@@ -327,6 +327,7 @@ public class ContingutServiceImpl implements ContingutService {
 			Long entitatId,
 			Long contingutOrigenId,
 			Long contingutDestiId,
+			Long tascaId,
 			String carpetaNova,
 			String rolActual) {
 		
@@ -336,7 +337,7 @@ public class ContingutServiceImpl implements ContingutService {
 				+ "contingutOrigenId=" + contingutOrigenId + ", "
 				+ "contingutDestiId=" + contingutDestiId + ")");
 		
-		contingutHelper.move(entitatId, contingutOrigenId, contingutDestiId, carpetaNova, rolActual);
+		contingutHelper.move(entitatId, contingutOrigenId, contingutDestiId, tascaId, carpetaNova, rolActual);
 	}
 
 	@Transactional
@@ -1606,6 +1607,7 @@ public class ContingutServiceImpl implements ContingutService {
 	public void order(
 			Long entitatId, 
 			Long contingutId,
+			Long tascaId,
 			Map<Integer, Long> orderedElements)
 			throws NotFoundException, ValidationException {
 		entityComprovarHelper.comprovarEntitat(
@@ -1615,6 +1617,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false, 
 				false);
+		if (tascaId==null) {
 		contingutHelper.comprovarContingutDinsExpedientModificable(
 				entitatId,
 				contingutId,
@@ -1625,10 +1628,13 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				true,
 				configHelper.getRolActual());
+		} else {
+			contingutHelper.comprovarContingutPertanyTascaAccesible(tascaId, contingutId);
+		}
+		
 		for (Map.Entry<Integer, Long> fill: orderedElements.entrySet()) {
 			Integer ordre = fill.getKey();
 			Long fillId = fill.getValue();
-			
 			ContingutEntity contingut = entityComprovarHelper.comprovarContingut(fillId);
 			contingut.updateOrdre(ordre);
 		}

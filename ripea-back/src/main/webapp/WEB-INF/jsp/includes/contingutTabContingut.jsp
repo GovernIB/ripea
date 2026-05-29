@@ -62,14 +62,15 @@
 		try {
 			if (documentDrag!=null) {
 				let vistaActiva = $('#vistes').children("a.active").attr('id');
+				let tascaParam = <c:choose><c:when test="${isTasca}">'?tascaId=${tascaId}'</c:when><c:otherwise>''</c:otherwise></c:choose>;
 				if (vistaActiva == 'vistaTreetablePerCarpetes') {
 					showLoadingModal('<spring:message code="contingut.moure.processant"/>');
 					let destiDocDrag = event.target.id;
-					window.location = documentDrag + "/moure/" + destiDocDrag;
+					window.location = documentDrag + "/moure/" + destiDocDrag + tascaParam;
 				} else if (vistaActiva == 'vistaGrid') {
 					showLoadingModal('<spring:message code="contingut.moure.processant"/>');
 					let destiDocDrag = event.target.id;
-					window.location = documentDrag + "/moure/" + destiDocDrag;
+					window.location = documentDrag + "/moure/" + destiDocDrag + tascaParam;
 					dropped = true;
 					$(event.target).addClass('dropped');
 				} else {

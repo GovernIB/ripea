@@ -46,9 +46,9 @@ public class EjbContextConfig {
 
 	public static ApplicationContext getApplicationContext() {
 		if (!initialized) {
-			initialized = true;
 			log.info("Starting EJB spring application...");
 			applicationContext = new AnnotationConfigApplicationContext(EjbContextConfig.class);
+			initialized = true;
 			log.info("...EJB spring application started.");
 		}
 		return applicationContext;

@@ -1929,6 +1929,7 @@ public class ContingutHelper {
 			Long entitatId,
 			Long contingutOrigenId,
 			Long contingutDestiId,
+			Long tascaId,
 			String carpetaNova,
 			String rolActual) {
 
@@ -1947,24 +1948,34 @@ public class ContingutHelper {
 			contingutDestiId = carpeta.getId();
 		}
 		
-		ContingutEntity contingutOrigen = comprovarContingutDinsExpedientModificable(
-				entitatId,
-				contingutOrigenId,
-				true,
-				false,
-				false,
-				true, 
-				false, 
-				true, rolActual);
-		ContingutEntity contingutDesti = comprovarContingutDinsExpedientModificable(
-				entitatId,
-				contingutDestiId,
-				false,
-				false,
-				true,
-				false, 
-				false, 
-				true, rolActual);
+		ContingutEntity contingutOrigen = null;
+		ContingutEntity contingutDesti = null;
+		
+		if (tascaId==null) {
+			contingutOrigen = comprovarContingutDinsExpedientModificable(
+					entitatId,
+					contingutOrigenId,
+					true,
+					false,
+					false,
+					true, 
+					false, 
+					true,
+					rolActual);
+			contingutDesti = comprovarContingutDinsExpedientModificable(
+					entitatId,
+					contingutDestiId,
+					false,
+					false,
+					true,
+					false, 
+					false, 
+					true,
+					rolActual);
+		} else {
+			contingutOrigen= comprovarContingutPertanyTascaAccesible(tascaId, contingutOrigenId);
+			contingutDesti= comprovarContingutPertanyTascaAccesible(tascaId, contingutDestiId);
+		}
 		
 		if (contingutOrigen.equals(contingutDesti)) {
 			throw new ValidationException(

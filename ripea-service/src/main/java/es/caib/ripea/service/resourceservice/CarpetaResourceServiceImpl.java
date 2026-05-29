@@ -302,7 +302,13 @@ public class CarpetaResourceServiceImpl extends BaseMutableResourceService<Carpe
 				Long contingutDestiId = params.getCarpeta()!=null?params.getCarpeta().getId():params.getExpedient().getId();
 				switch (params.getAction()) {
 				case MOURE:
-					contingutHelper.move(entitatEntity.getId(), entity.getId(), contingutDestiId, params.getCarpetaNova(), configHelper.getRolActual());							
+					contingutHelper.move(
+							entitatEntity.getId(),
+							entity.getId(),
+							contingutDestiId,
+							null,
+							params.getCarpetaNova(),
+							configHelper.getRolActual());							
 					break;
 				case COPIAR:
 					contingutHelper.copy(entitatEntity.getId(), entity.getId(), contingutDestiId, false); //No recursiu
