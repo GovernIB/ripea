@@ -5,6 +5,7 @@ import java.time.ZoneId;
 import java.util.Date;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import es.caib.ripea.service.intf.base.annotation.ResourceArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
@@ -39,14 +40,20 @@ public class AvisResource extends BaseAuditableResource<Long> {
     public static final String ACTION_MASSIVE_ACTIVE_CODE	= "MASSIVE_ACTIVE";
     public static final String ACTION_MASSIVE_DELETE_CODE   = "MASSIVE_DELETE";
 
-    @NotNull private String assumpte;
-    @NotNull private String missatge;
-    @NotNull private Date dataInici = Date.from(
-    			LocalDate.now().atStartOfDay(ZoneId.of("UTC")).toInstant()
-    		);
-    @NotNull private Date dataFinal;
+    @NotNull
+    @Size(max = 256)
+    private String assumpte;
+    @NotNull
+    @Size(max = 2048)
+    private String missatge;
+    @NotNull
+    private Date dataInici = Date.from(
+        LocalDate.now().atStartOfDay(ZoneId.of("UTC")).toInstant()
+    );
+    private Date dataFinal;
 	private Boolean actiu = true;
-    @NotNull private AvisNivellEnumDto avisNivell = AvisNivellEnumDto.INFO;
+    @NotNull
+    private AvisNivellEnumDto avisNivell = AvisNivellEnumDto.INFO;
 	private Boolean avisAdministrador;
 	protected ResourceReference<EntitatResource, Long> entitat;
 	

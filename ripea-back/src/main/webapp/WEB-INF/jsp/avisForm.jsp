@@ -36,7 +36,7 @@
 		<rip:inputText name="assumpte" textKey="avis.form.camp.assumpte" required="true"/>
 		<rip:inputTextarea name="missatge" textKey="avis.form.camp.missatge" required="true"/>
 		<rip:inputDate name="dataInici" textKey="avis.form.camp.dataInici" required="true"/>
-		<rip:inputDate name="dataFinal" textKey="avis.form.camp.dataFinal" required="true"/>
+		<rip:inputDate name="dataFinal" textKey="avis.form.camp.dataFinal"/>
 		<rip:inputSelect name="avisNivell" textKey="avis.form.camp.avisNivell" optionEnum="AvisNivellEnumDto" required="true"/>
 		
 		
