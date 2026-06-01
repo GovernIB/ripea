@@ -8,8 +8,6 @@ import es.caib.ripea.persistence.entity.resourcerepository.EntitatResourceReposi
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
-import es.caib.ripea.service.intf.base.exception.ResourceNotCreatedException;
-import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.model.EntitatResource;
 import es.caib.ripea.service.intf.model.TipusDocumentalResource;
 import es.caib.ripea.service.intf.resourceservice.TipusDocumentalResourceService;

@@ -1227,6 +1227,7 @@ const translationEn = {
                 actualitzarEstat: {
                     label: "Update status",
                     ok: "Status has been updated successfully",
+                    massiveOk: "The massive execution has been created. You can check its status in the massive actions list.",
                 },
                 notificacioInteressat: {
                     label: "Deliveries",

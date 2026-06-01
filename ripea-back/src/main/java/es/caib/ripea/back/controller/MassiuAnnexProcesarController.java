@@ -1,7 +1,6 @@
 package es.caib.ripea.back.controller;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -31,7 +30,6 @@ import es.caib.ripea.back.helper.RequestSessionHelper;
 import es.caib.ripea.back.helper.RolHelper;
 import es.caib.ripea.service.intf.dto.ElementTipusEnumDto;
 import es.caib.ripea.service.intf.dto.EntitatDto;
-import es.caib.ripea.service.intf.dto.ExecucioMassivaContingutDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaTipusDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentDto;

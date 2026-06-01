@@ -38,7 +38,6 @@ import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException
 import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
 import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.base.model.ReportFileType;
-import es.caib.ripea.service.intf.dto.CodiValorDto;
 import es.caib.ripea.service.intf.dto.ElementTipusEnumDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaTipusDto;

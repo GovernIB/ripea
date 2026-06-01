@@ -1227,6 +1227,7 @@ const translationCa = {
                 actualitzarEstat: {
                     label: "Actualitzar estat",
                     ok: "L'estat s'ha actualitzat correctament",
+                    massiveOk: "S'ha creat l'execució massiva. Podeu consultar-ne l'estat al llistat d'accions massives.",
                 },
                 notificacioInteressat: {
                     label: "Enviaments",

@@ -201,6 +201,12 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             onClick: () => apiRef?.current?.triggerCreate?.(),
             hidden: !potModificarExpedientOrContingut,
         },
+		{
+		    label: t('page.document.action.importZip.label'),
+		    icon: "upload_file",
+		    onClick: handleImportarZip,
+			hidden: !potModificarExpedientOrContingut,
+		},
         {
             label: t('page.document.action.pinbal.label'),
             icon: "description",
@@ -221,12 +227,6 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             onClick: handleImportar,
             hidden: !(user?.sessionScope?.isMostrarImportacio && potModificarExpedientOrContingut),
         },
-		{
-		    label: t('page.document.action.importZip.label'),
-		    icon: "upload_file",
-		    onClick: handleImportarZip,
-			hidden: !potModificarExpedientOrContingut,
-		},
         {
             label: t('page.contingut.action.importarExpedient.label'),
             icon: "link",

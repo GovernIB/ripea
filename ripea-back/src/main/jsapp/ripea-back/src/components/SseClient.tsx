@@ -81,11 +81,16 @@ export const SseClient: React.FC = () => {
 
     useEffect(() => {
     if(user && user?.codi) {
-        const alreadyConnected = get(sseConnectedKey);
-        if (alreadyConnected) return;
+
+        const isLive = () =>
+            eventSourceRef.current !== null &&
+            eventSourceRef.current.readyState !== EventSource.CLOSED;
 
         // Funció per a connectar amb el servidor SSE
         const connectToSSE = () => {
+            // No reconnectar si ja hi ha una connexió activa
+            if (isLive()) return;
+
             // Tancar la connexió anterior si existeix
             if (eventSourceRef.current) {
                 eventSourceRef.current.close();
@@ -110,7 +115,7 @@ export const SseClient: React.FC = () => {
 
             // Gestionar l'esdeveniment de tasques
             addEventListener(eventSource, tasquesKey)
-            
+
             // Gestionar l'esdeveniment de firma finalitzada
             addEventListener(eventSource, firmaFinalitzadaKey)
 
@@ -131,11 +136,21 @@ export const SseClient: React.FC = () => {
             };
         };
 
+        // Reconnectar quan l'usuari torna a la pestanya (cobreix reinicis de servidor)
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === 'visible' && !isLive()) {
+                console.log('Pestanya activa i sense connexió SSE, reconnectant...');
+                connectToSSE();
+            }
+        };
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+
         // Iniciar la connexió
         connectToSSE();
 
         // Netejar en desmuntar el component
         return () => {
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
             console.log('Netejam o desmontam el component');
             if (eventSourceRef.current) {
                 console.log('Desconnectam SSE');

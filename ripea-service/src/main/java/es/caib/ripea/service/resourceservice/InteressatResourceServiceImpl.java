@@ -545,10 +545,14 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
 
         @Override
         public void onChange(Serializable id, InteressatResource previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, InteressatResource target) {
-        	if (fieldValue != null && fieldValue.toString().length() == 9 && !fieldValue.toString().equals(previous.getDocumentNum())) {
-	        	if (answers.containsKey(NOT_REPRESENT_HIMSELF) || answers.containsKey(INT_ALREADY_EXISTS)) {
+        	if (fieldValue != null && fieldValue.toString().length() == 9) {
+	        	if (answers.containsKey(NOT_REPRESENT_HIMSELF)) {
 	        		target.setDocumentNum(null);
-	        	} else {
+	        		answers.remove(NOT_REPRESENT_HIMSELF);
+	        	} else if (answers.containsKey(INT_ALREADY_EXISTS)) {
+	        		target.setDocumentNum(null);
+	        		answers.remove(INT_ALREADY_EXISTS);
+	        	} else if (!fieldValue.toString().equals(previous.getDocumentNum())) {
 	                InteressatResourceEntity interessatExistent = interessatResourceRepository.findByExpedientIdAndDocumentNum(previous.getExpedient().getId(), fieldValue.toString()).orElse(null);
 	                if (interessatExistent != null) {
 	                    //Controlar que el interessat no es representa a ell mateix (nomes en cas de estar creant un representant)

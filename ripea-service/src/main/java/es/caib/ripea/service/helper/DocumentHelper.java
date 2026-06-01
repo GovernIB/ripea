@@ -187,7 +187,7 @@ public class DocumentHelper {
 					ExpedientEntity.class,
 					"La multiplicitat del meta-document no permet crear nous documents a dins l'expedient (" +
 					"metaExpedientId=" + expedient.getMetaExpedient().getId() + ", " +
-					"metaDocumentId=" + document.getMetaDocument().getId() + ", " +
+					"metaDocumentId=" + metaDocument.getId() + ", " +
 					"metaDocumentMultiplicitat=" + metaDocument.getMultiplicitat() + ", " +
 					"expedientId=" + expedient.getId() + ")");
 		}

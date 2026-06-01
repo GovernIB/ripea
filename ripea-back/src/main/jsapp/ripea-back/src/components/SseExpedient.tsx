@@ -7,6 +7,7 @@ const sseExpedientKey = 'sseExpedient';
 const fluxCreateKey = 'flux_creat';
 const scanFinalitzatKey = 'scan_finalitzat';
 const validacioChangeKey = 'validacio_change';
+const firmaFinalitzadaKey = 'firma_finalitzada';
 const sseConnectedKey = 'exp_connect';
 
 const useSseExpedientSession = () => useSessionList(sseExpedientKey)
@@ -35,6 +36,7 @@ const useTempSession = (key:string) => {
 export const useFluxCreateSession = () => useTempSession(fluxCreateKey);
 export const useScanFinalitzatSession = () => useTempSession(scanFinalitzatKey);
 export const useValidacioSession = () => useTempSession(validacioChangeKey);
+export const useFirmaFinalitzadaSession = () => useTempSession(firmaFinalitzadaKey);
 
 /**
  * Component que gestiona la connexió SSE amb el servidor
@@ -82,8 +84,11 @@ export const SseExpedient: React.FC<any> = (props:any) => {
             // Gestionar l'esdeveniment de flux creat
             addEventListener(eventSource, fluxCreateKey)
 
-			// Gestionar l'esdeveniment de firma finalitzada
+			// Gestionar l'esdeveniment de scan finalitzat
 			addEventListener(eventSource, scanFinalitzatKey)
+
+			// Gestionar l'esdeveniment de firma finalitzada
+			addEventListener(eventSource, firmaFinalitzadaKey)
 
 			// Gestionar l'esdeveniment de validació d'expedient
 			addEventListener(eventSource, validacioChangeKey)
