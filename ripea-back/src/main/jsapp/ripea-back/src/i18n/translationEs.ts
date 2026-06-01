@@ -1201,6 +1201,7 @@ const translationEs = {
                 actualitzarEstat: {
                     label: "Actualizar estado",
                     ok: "El estado ha sido actualizado",
+                    massiveOk: "Se ha creado la ejecución masiva. Puede consultar su estado en el listado de acciones masivas.",
                 },
                 notificacioInteressat: {
                     label: "Envios",

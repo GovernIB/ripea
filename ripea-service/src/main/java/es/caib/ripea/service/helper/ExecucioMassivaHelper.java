@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.persistence.entity.ContingutEntity;
 import es.caib.ripea.persistence.entity.DocumentEntity;
+import es.caib.ripea.persistence.entity.DocumentNotificacioEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.ExecucioMassivaContingutEntity;
 import es.caib.ripea.persistence.entity.ExecucioMassivaEntity;
@@ -36,6 +37,7 @@ import es.caib.ripea.persistence.entity.InteressatEntity;
 import es.caib.ripea.persistence.entity.MetaDocumentEntity;
 import es.caib.ripea.persistence.entity.RegistreAnnexEntity;
 import es.caib.ripea.persistence.repository.ContingutRepository;
+import es.caib.ripea.persistence.repository.DocumentNotificacioRepository;
 import es.caib.ripea.persistence.repository.ExecucioMassivaContingutRepository;
 import es.caib.ripea.persistence.repository.ExecucioMassivaRepository;
 import es.caib.ripea.persistence.repository.ExpedientPeticioRepository;
@@ -75,7 +77,8 @@ public class ExecucioMassivaHelper {
 	@Autowired private ExpedientPeticioRepository expedientPeticioRepository;
 	@Autowired private ContingutRepository contingutRepository;
 	@Autowired private MetaDocumentRepository metaDocumentRepository;
-	
+	@Autowired private DocumentNotificacioRepository documentNotificacioRepository;
+
 	@Autowired private AlertaHelper alertaHelper;
 	@Autowired private MessageHelper messageHelper;
 	@Autowired private PluginHelper pluginHelper;
@@ -88,7 +91,8 @@ public class ExecucioMassivaHelper {
 	@Autowired private DocumentHelper documentHelper;
 	@Autowired private ContingutHelper contingutHelper;
 	@Autowired private ExpedientPeticioHelper expedientPeticioHelper;
-	
+	@Autowired private DocumentNotificacioHelper documentNotificacioHelper;
+
 	public FitxerDto descarregarDocumentExecMassiva(Long entitatId, Long execMassivaId) {
 		ExecucioMassivaEntity execucioMassiva = execucioMassivaRepository.findById(execMassivaId).orElse(null);
 		if (execucioMassiva!=null && execucioMassiva.getDocumentNom()!=null) {
@@ -396,13 +400,15 @@ public class ExecucioMassivaHelper {
 				elementName = expedientPeticioRepository.getOne(contingutId).getIdentificador();
 			} else if (elementTipus == ElementTipusEnumDto.ANNEX) {
 				elementName = registreAnnexRepository.getOne(contingutId).getNom();
+			} else if (elementTipus == ElementTipusEnumDto.NOTIFICACIO) {
+				elementName = documentNotificacioRepository.getOne(contingutId).getAssumpte();
 			} else if (elementTipus == ElementTipusEnumDto.ACCIO) {
 				elementName = "Element #"+contingutId;
-			}			
-			
+			}
+
 			ExecucioMassivaContingutEntity emc = ExecucioMassivaContingutEntity.getBuilder(
-					execucioMassiva, 
-					contingutId, 
+					execucioMassiva,
+					contingutId,
 					elementName,
 					elementTipus, 
 					ordre++).build();
@@ -618,6 +624,8 @@ public class ExecucioMassivaHelper {
 					exc = retryCreateDocFromAnnex(emc);
 				} else if (ExecucioMassivaTipusDto.ACTUALITZAR_ESTAT_ANOTACIONS.equals(tipus)){
 					exc = reintentarCanviEstatDistribucio(emc);
+				} else if (ExecucioMassivaTipusDto.ACTUALITZAR_ESTAT_NOTIFICACIONS.equals(tipus)){
+					exc = actualitzarEstatNotificacio(emc);
 				} else if (ExecucioMassivaTipusDto.FIRMASIMPLEWEB.equals(tipus)){
 					//TODO: Veurer com es fa a DocumentMassiuFirmaWebController. Es necessita info addicional.
 				} else if (ExecucioMassivaTipusDto.AGAFAR_EXPEDIENT.equals(tipus) ||
@@ -644,6 +652,11 @@ public class ExecucioMassivaHelper {
 						RegistreAnnexEntity ra = registreAnnexRepository.findById(emc.getElementId()).orElseGet(null);
 						if (ra!=null && ra.getDocument()!=null) {
 							contingutId = ra.getDocument().getId();
+						}
+					} else if (ElementTipusEnumDto.NOTIFICACIO.equals(emc.getElementTipus())) {
+						DocumentNotificacioEntity dn = documentNotificacioRepository.findById(emc.getElementId()).orElseGet(null);
+						if (dn!=null && dn.getDocument()!=null) {
+							contingutId = dn.getDocument().getId();
 						}
 					}
 
@@ -723,6 +736,17 @@ public class ExecucioMassivaHelper {
 			exc = expedientPeticioHelper.reintentarCanviEstatDistribucio(emc.getElementId());
 		} catch (Exception ex) {
 			logger.error("CONTINGUT MASSIU:" + emc.getId() + ". No s'ha pogut actualitzat l'estat a distribució de l'element", ex);
+			exc = ex;
+		}
+		return exc;
+	}
+
+	private Throwable actualitzarEstatNotificacio(ExecucioMassivaContingutEntity emc) {
+		Throwable exc = null;
+		try {
+			documentNotificacioHelper.actualitzarEstat(emc.getElementId());
+		} catch (Exception ex) {
+			logger.error("CONTINGUT MASSIU:" + emc.getId() + ". No s'ha pogut actualitzar l'estat de la notificació", ex);
 			exc = ex;
 		}
 		return exc;

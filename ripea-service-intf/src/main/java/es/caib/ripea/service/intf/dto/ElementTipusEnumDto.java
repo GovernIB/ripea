@@ -7,6 +7,7 @@ public enum ElementTipusEnumDto {
 	INTERESSAT,
 	ANOTACIO,
 	ANNEX,
+	NOTIFICACIO,
 	ACCIO,
 	// Accions
 	MOURE_CONTINGUT,

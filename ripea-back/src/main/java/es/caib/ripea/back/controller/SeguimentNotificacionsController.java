@@ -4,12 +4,15 @@ import es.caib.ripea.back.command.SeguimentNotificacionsFiltreCommand;
 import es.caib.ripea.back.helper.*;
 import es.caib.ripea.back.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.plugin.notificacio.EnviamentEstat;
+import es.caib.ripea.service.intf.dto.ElementTipusEnumDto;
 import es.caib.ripea.service.intf.dto.EntitatDto;
+import es.caib.ripea.service.intf.dto.ExecucioMassivaDto;
+import es.caib.ripea.service.intf.dto.ExecucioMassivaTipusDto;
 import es.caib.ripea.service.intf.dto.PaginaDto;
 import es.caib.ripea.service.intf.dto.ResultEnumDto;
 import es.caib.ripea.service.intf.dto.SeguimentDto;
 import es.caib.ripea.service.intf.service.AplicacioService;
-import es.caib.ripea.service.intf.service.DocumentService;
+import es.caib.ripea.service.intf.service.ExecucioMassivaService;
 import es.caib.ripea.service.intf.service.SeguimentService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -39,7 +43,7 @@ public class SeguimentNotificacionsController extends BaseAdminController {
 	private static final String SESSION_ATTRIBUTE_SELECCIO = "SeguimentNotificacionsController.session.seleccio";
 	
     @Autowired private SeguimentService seguimentService;
-	@Autowired private DocumentService documentService;
+	@Autowired private ExecucioMassivaService execucioMassivaService;
 	@Autowired private AplicacioService aplicacioService;
 
     @RequestMapping(method = RequestMethod.GET)
@@ -181,13 +185,14 @@ public class SeguimentNotificacionsController extends BaseAdminController {
     @RequestMapping(value = "/actualitzarEstatMassiu", method = RequestMethod.GET)
 	public String comunicadaConsultarMassiu(
 			HttpServletRequest request) throws Throwable {
-		
-		
+
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+
 		@SuppressWarnings("unchecked")
 		Set<Long> seleccio = ((Set<Long>) RequestSessionHelper.obtenirObjecteSessio(
 				request,
 				getSessionAttributeSelecio(request)));
-		
+
 		if (seleccio == null || seleccio.isEmpty()) {
 			return getModalControllerReturnValueError(
 					request,
@@ -195,38 +200,28 @@ public class SeguimentNotificacionsController extends BaseAdminController {
 					"accio.massiva.seleccio.buida",
 					null);
 		}
-		
-		int errors = 0;
-		int correctes = 0;
-		
-		for (Long id : seleccio) {
-			Exception exception = null;
-			try {
-				documentService.notificacioActualitzarEstat(id);
-			} catch (Exception ex) {
-				exception = ex;
-			}
-			if (exception != null ) {
-				log.error("Error al actualitzar estat del notificacio massiu", exception);
-				errors++;
-			} else {
-				correctes++;
-			}
+
+		try {
+			//Creació d'una execució massiva que actualitzarà l'estat de les notificacions en segon pla
+			ExecucioMassivaDto dto = new ExecucioMassivaDto();
+			dto.setTipus(ExecucioMassivaTipusDto.ACTUALITZAR_ESTAT_NOTIFICACIONS);
+			dto.setContingutIds(new ArrayList<Long>(seleccio));
+			dto.setRolActual(RolHelper.getRolActual(request));
+
+			execucioMassivaService.crearExecucioMassiva(entitatActual.getId(), dto, ElementTipusEnumDto.NOTIFICACIO);
+
+			MissatgesHelper.success(request, getMessage(request, "accio.massiva.creat.ok"));
+		} catch (Exception ex) {
+			log.error("Error al crear l'execució massiva d'actualització d'estat de notificacions", ex);
+			MissatgesHelper.error(request, getMessage(request, "seguiment.list.notificacio.actualitzar.estat.massiu.error", new Object[]{seleccio.size()}), ex);
 		}
-		
-		if (correctes > 0){
-			MissatgesHelper.success(request, getMessage(request, "seguiment.list.notificacio.actualitzar.estat.massiu.ok", new Object[]{correctes}));
-		} 
-		if (errors > 0) {
-			MissatgesHelper.error(request, getMessage(request, "seguiment.list.notificacio.actualitzar.estat.massiu.error", new Object[]{errors}), null);
-		} 
-		
+
 		seleccio.clear();
 		RequestSessionHelper.actualitzarObjecteSessio(
 				request,
 				getSessionAttributeSelecio(request),
 				seleccio);
-		
+
 		return "redirect:/seguimentNotificacions";
 	}
     
