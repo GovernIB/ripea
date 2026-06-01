@@ -296,7 +296,8 @@ const DocumentsGrid = (props: any) => {
     }
     const isValidRowReorder = (context: ReorderValidationContext) => {
         const targetRow = context.apiRef.current.getRow(context.targetNode.id);
-        return targetRow.tipus !== 'DOCUMENT';
+        const canReorder = targetRow.tipus !== 'DOCUMENT' || context.dropPosition !== 'inside';
+        return canReorder;
     }
 
     useEffect(() => {
