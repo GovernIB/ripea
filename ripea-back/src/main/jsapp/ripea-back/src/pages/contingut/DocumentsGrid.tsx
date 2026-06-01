@@ -1,6 +1,6 @@
 import React, {RefObject, useCallback, useEffect, useMemo, useState} from "react";
 import { FormControl, Grid, Select, MenuItem, Icon, Box } from "@mui/material";
-import {GridApiPro, GridTreeDataGroupingCell} from "@mui/x-data-grid-pro";
+import {GridApiPro, GridTreeDataGroupingCell, ReorderValidationContext} from "@mui/x-data-grid-pro";
 import { useMuiDataGridApiRef, useResourceApiService } from 'reactlib';
 import { useTranslation } from "react-i18next";
 import ContingutIcon from "./details/ContingutIcon.tsx";
@@ -255,7 +255,6 @@ const DocumentsGrid = (props: any) => {
 
     const handleDragEnd = (params: any) => {
         if (params.newParent != params.oldParent || params.targetIndex != params.oldIndex) {
-            // console.log('>>> Canvi d\'ordre', params.targetIndex + 1, params)
             const parePerDefecte = params.newParent || contingutScopeId || entity.id;
             const patchData = {
                 pare: parePerDefecte,
@@ -279,7 +278,6 @@ const DocumentsGrid = (props: any) => {
         const newParent = +newRow.treePath.at(-2) || contingutScopeId || entity?.id;
         const oldParent = +oldRow.treePath.at(-2) || contingutScopeId || entity?.id;
         if (newParent != oldParent && carpetes?.find((c: any) => c?.id == newParent) != null) {
-            // console.log('>>> Canvi de pare', oldParent, '->', newParent)
             return new Promise((resolve, reject) => {
                 const patchData = {
                     pare: newParent,
@@ -295,6 +293,10 @@ const DocumentsGrid = (props: any) => {
         } else {
             return newRow;
         }
+    }
+    const isValidRowReorder = (context: ReorderValidationContext) => {
+        const targetRow = context.apiRef.current.getRow(context.targetNode.id);
+        return targetRow.tipus !== 'DOCUMENT';
     }
 
     useEffect(() => {
@@ -410,6 +412,7 @@ const DocumentsGrid = (props: any) => {
                         rowReordering={draggable}
                         processRowUpdate={processRowUpdate}
                         onRowOrderChange={handleDragEnd}
+                        isValidRowReorder={isValidRowReorder}
                         rowsTransformer={(_rows: any) => {
                             if (!_rows) return [];
                             const additionalRows: any[] = _rows;
