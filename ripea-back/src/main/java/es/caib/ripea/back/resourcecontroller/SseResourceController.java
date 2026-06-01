@@ -58,7 +58,7 @@ public class SseResourceController {
 
     private final EventService eventService;
     private final AplicacioService aplicacioService;
-    
+
     private final Map<String, SseEmitter> clientsUsuaris = new HashMap<>();
     //En cas de un expedient, el emmiter es una llista, perque pot estar obert per varis usuaris simultaniament.
     private final Map<Long, List<SseEmitter>> clientsExpedient = new HashMap<>();
@@ -68,7 +68,7 @@ public class SseResourceController {
         public String getEventName() { return name().toLowerCase(); }
         public static UserEventType fromEventName(String name) { return UserEventType.valueOf(name.toUpperCase()); }
     }
-    
+
     private enum ExpedientEventType {
         EXP_CONNECT, FLUX_CREAT, SCAN_FINALITZAT, VALIDACIO_CHANGE;
         public String getEventName() { return name().toLowerCase(); }
@@ -76,9 +76,62 @@ public class SseResourceController {
     }
 
     /**
+     * E N V I A M E N T   D ' E V E N T S   ( H E L P E R S )
+     */
+
+    /** Envia un event a un usuari concret. Si l'emitter falla, l'elimina del mapa. */
+    private void sendToUser(String usuariCodi, SseEmitter.SseEventBuilder event) {
+        SseEmitter emitter = clientsUsuaris.get(usuariCodi);
+        if (emitter == null) return;
+        try {
+            emitter.send(event);
+            logger.debug("... comunicat event al usuari {} a través del emisor {}.", usuariCodi, emitter.hashCode());
+        } catch (Exception e) {
+            clientsUsuaris.remove(usuariCodi);
+            logger.debug("... eliminat emisor {} del usuari {} per error: {}.", emitter.hashCode(), usuariCodi, e.getMessage());
+        }
+    }
+
+    /** Envia un event a tots els usuaris connectats. Elimina els emitters que fallin. */
+    private void sendToAllUsers(SseEmitter.SseEventBuilder event) {
+        Iterator<Map.Entry<String, SseEmitter>> iterator = clientsUsuaris.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<String, SseEmitter> entry = iterator.next();
+            try {
+                entry.getValue().send(event);
+                logger.debug("... comunicat event al usuari {} a través del emisor {}.", entry.getKey(), entry.getValue().hashCode());
+            } catch (Exception e) {
+                iterator.remove();
+                logger.debug("... eliminat emisor {} del usuari {} per error: {}.", entry.getValue().hashCode(), entry.getKey(), e.getMessage());
+            }
+        }
+    }
+
+    /** Envia un event a tots els emitters d'un expedient. Elimina els que fallin i neteja l'entrada del mapa si queda buida. */
+    private void sendToExpedient(Long expedientId, SseEmitter.SseEventBuilder event) {
+        List<SseEmitter> emisors = clientsExpedient.get(expedientId);
+        if (emisors == null) return;
+        List<SseEmitter> toRemove = new ArrayList<>();
+        for (SseEmitter emisor : emisors) {
+            try {
+                emisor.send(event);
+                logger.debug("... comunicat event a l'expedient {} a través del emisor {}.", expedientId, emisor.hashCode());
+            } catch (Exception e) {
+                toRemove.add(emisor);
+                logger.debug("... eliminat emisor {} de l'expedient {} per error: {}.", emisor.hashCode(), expedientId, e.getMessage());
+            }
+        }
+        emisors.removeAll(toRemove);
+        if (emisors.isEmpty()) {
+            clientsExpedient.remove(expedientId);
+            logger.debug("... eliminat expedient {} de la llista per no tenir cap emisor actiu.", expedientId);
+        }
+    }
+
+    /**
      * T E S T I N G
      */
-    
+
     @GetMapping("/testFlux/{fluxId}/{idMetaDoc}/{userCode}/send")
     @ResponseBody
     public ResponseEntity<String> testFlux(
@@ -95,7 +148,7 @@ public class SseResourceController {
 		handleEventFluxCreatEditat(cffe);
 		return ResponseEntity.ok().header("Content-Type", "text/plain; charset=UTF-8").body("OK");
     }
-    
+
     @GetMapping("/test/{eventType}/{idExpedient}/{userCode}/send")
     @ResponseBody
     public ResponseEntity<String> test(
@@ -135,24 +188,30 @@ public class SseResourceController {
     		return ResponseEntity.ok().header("Content-Type", "text/plain; charset=UTF-8").body("Aquesta URL no esta disponible a l'entorn de producció.");
     	}
     }
-    
+
     /**
      * S O C K E T   P E R   U S U A R I
      */
-    
+
     @GetMapping("/subscribe/user/{usuariCodi}")
     public SseEmitter stream(@PathVariable String usuariCodi) {
     	if (Utils.hasValue(usuariCodi) && !"undefined".equalsIgnoreCase(usuariCodi)) {
 	        SseEmitter emitter = new SseEmitter(0L);
-	        clientsUsuaris.put(usuariCodi, emitter);
+	        SseEmitter existing = clientsUsuaris.put(usuariCodi, emitter);
+	        if (existing != null) {
+	        	logger.debug("Substituint emisor anterior {} del usuari {}.", existing.hashCode(), usuariCodi);
+	        	try { existing.complete(); } catch (Exception ignored) {}
+	        }
+	        emitter.onCompletion(() -> clientsUsuaris.remove(usuariCodi, emitter));
+	        emitter.onError(e -> clientsUsuaris.remove(usuariCodi, emitter));
 	        onSubscribeEmisorGlobal(usuariCodi, emitter);
-	        logger.debug("Usuari "+usuariCodi+" suscrit a events globals a travers del Emisor "+emitter.hashCode());
+	        logger.debug("Usuari {} suscrit a events globals a travers del Emisor {}.", usuariCodi, emitter.hashCode());
 	        return emitter;
     	} else {
     		return null;
     	}
     }
-    
+
     private void onSubscribeEmisorGlobal(String usuariCodi, SseEmitter emitter) {
         // Al moment de subscriure enviem un missatge de connexió
         try {
@@ -183,25 +242,31 @@ public class SseResourceController {
             emitter.completeWithError(e);
         }
     }
-    
+
     /**
      * S O C K E T   P E R   E X P E D I E N T
      */
-    
+
     @GetMapping("/subscribe/exp/{expedientId}")
     public SseEmitter streamExpedient(@PathVariable Long expedientId) {
         SseEmitter emitter = new SseEmitter(0L);
-        List<SseEmitter> emisorsExpedient = new ArrayList<SseEmitter>();
-        if (clientsExpedient.containsKey(expedientId)) {
-        	emisorsExpedient = clientsExpedient.get(expedientId);
-        	emisorsExpedient.add(emitter);
-        	logger.debug("Nou expedient "+expedientId+" suscrit a events a travers del Emisor "+emitter.hashCode());
-        } else {
-        	emisorsExpedient = new ArrayList<SseEmitter>();
-        	emisorsExpedient.add(emitter);
-        	logger.debug("Expedient existent "+expedientId+" suscrit a events a travers del Emisor "+emitter.hashCode());
-        }
-        clientsExpedient.put(expedientId, emisorsExpedient);
+        List<SseEmitter> emisorsExpedient = clientsExpedient.computeIfAbsent(expedientId, k -> new ArrayList<>());
+        emisorsExpedient.add(emitter);
+        emitter.onCompletion(() -> {
+            List<SseEmitter> list = clientsExpedient.get(expedientId);
+            if (list != null) {
+                list.remove(emitter);
+                if (list.isEmpty()) clientsExpedient.remove(expedientId);
+            }
+        });
+        emitter.onError(e -> {
+            List<SseEmitter> list = clientsExpedient.get(expedientId);
+            if (list != null) {
+                list.remove(emitter);
+                if (list.isEmpty()) clientsExpedient.remove(expedientId);
+            }
+        });
+        logger.debug("Expedient {} suscrit a events a travers del Emisor {}.", expedientId, emitter.hashCode());
         onSubscribeEmisorExpedient(expedientId, emitter);
         return emitter;
     }
@@ -216,7 +281,7 @@ public class SseResourceController {
             //Carregam els valors inicials de les validacions del expedient
             /**
              * 09/03/2026
-             * 
+             *
              *  No es necessari, ja es carreguen en el afterConversion de ExpedientResourceServiceImpl.
              *  A mes, els resultats que recupera aquí no estan actualitzats i apareixen errors que no haurien d'apareixer.
              */
@@ -236,261 +301,91 @@ public class SseResourceController {
             emitter.completeWithError(e);
         }
     }
-    
+
     /**
-     * M E T O D E S   R E C E P T O R S   D E   E V E N T S 
+     * M E T O D E S   R E C E P T O R S   D E   E V E N T S
      */
 
     @Async
     @JmsListener(destination = "avisos")
     public void handleEventAvisos(AvisosActiusEvent avisos) {
-    	if (avisos!=null) {
+    	if (avisos != null) {
     		logger.debug("Actualització de AvisosActiusEvent a usuaris...");
-    		//Empram iterator per poder eliminar sense problemes elements del mapa mentre el recorrem
-    		Iterator<Map.Entry<String, SseEmitter>> iterator = clientsUsuaris.entrySet().iterator();
-    		//Els avisos s'envien a tots els usuaris connectats
-    		while (iterator.hasNext()) {
-    			Map.Entry<String, SseEmitter> entry = iterator.next();
-                try {
-                	entry.getValue().send(SseEmitter.event().name(UserEventType.AVISOS.getEventName()).data(avisos));
-                	logger.debug("... comunicats AvisosActiusEvent a travers del emissor "+entry.getValue().hashCode()+".");
-                } catch (Exception e) {
-                	clientsUsuaris.remove(entry.getKey());
-                	logger.debug("... eliminat emisor de AvisosActiusEvent "+entry.getValue().hashCode()+" del usuari "+entry.getKey()+" per error: "+e.getMessage()+".");
-                }
-            }
+    		sendToAllUsers(SseEmitter.event().name(UserEventType.AVISOS.getEventName()).data(avisos));
     	}
     }
-    
+
     @Async
     @JmsListener(destination = "firmaNavegadorFinalitzada")
     public void handleEventFirmaNavegadorFinalitzada(FirmaFinalitzadaEvent firmaResultat) {
-    	if (firmaResultat!=null && firmaResultat.getFirmaResultat()!=null && firmaResultat.getFirmaResultat().getUsuari()!=null) {
-    		logger.debug("Actualització de EventFirmaNavegadorMassiva a usuaris...");
-			//Empram iterator per poder eliminar sense problemes elements del mapa mentre el recorrem
-			Iterator<Map.Entry<String, SseEmitter>> iterator = clientsUsuaris.entrySet().iterator();
-			//Els avisos s'envien a tots els usuaris connectats
-			while (iterator.hasNext()) {
-				Map.Entry<String, SseEmitter> usuariClient = iterator.next();
-            	if (firmaResultat.getFirmaResultat().getUsuari().equals(usuariClient.getKey())) {
-            		try {
-            			usuariClient.getValue().send(SseEmitter.event().name(UserEventType.FIRMA_FINALITZADA.getEventName()).data(firmaResultat.getFirmaResultat()));
-            			logger.debug("... comunicats EventFirmaNavegadorMassiva al usuari "+usuariClient.getKey()+" a travers del emissor "+usuariClient.getValue().hashCode()+".");
-    	            } catch (Exception e) {
-    	            	clientsUsuaris.remove(usuariClient.getKey());
-    	            	logger.debug("... eliminat emisor de EventFirmaNavegadorMassiva "+usuariClient.getValue().hashCode()+" del usuari "+usuariClient.getKey()+" per error: "+e.getMessage()+".");
-    	            }	            		
-            	}
-	        }
+    	if (firmaResultat != null && firmaResultat.getFirmaResultat() != null && firmaResultat.getFirmaResultat().getUsuari() != null) {
+    		logger.debug("Actualització de EventFirmaNavegadorMassiva a expedients...");
+    		sendToExpedient(
+    				firmaResultat.getExpedientId(),
+    				SseEmitter.event().name(UserEventType.FIRMA_FINALITZADA.getEventName()).data(firmaResultat.getFirmaResultat()));
+//    		sendToUser(
+//    				firmaResultat.getFirmaResultat().getUsuari(),
+//    				SseEmitter.event().name(UserEventType.FIRMA_FINALITZADA.getEventName()).data(firmaResultat.getFirmaResultat()));
     	}
     }
-    
+
     @Async
     @JmsListener(destination = "tasques")
     public void handleEventTasques(TasquesPendentsEvent tasques) {
-    	if (tasques!=null && tasques.getTasquesPendentsUsuaris()!=null) {
+    	if (tasques != null && tasques.getTasquesPendentsUsuaris() != null) {
     		logger.debug("Actualització de TasquesPendentsEvent a usuaris...");
-			//Empram iterator per poder eliminar sense problemes elements del mapa mentre el recorrem
-			Iterator<Map.Entry<String, SseEmitter>> iterator = clientsUsuaris.entrySet().iterator();
-			//Els avisos s'envien a tots els usuaris connectats
-			while (iterator.hasNext()) {
-				Map.Entry<String, SseEmitter> usuariClient = iterator.next();
-            	Iterator<Map.Entry<String, Long>> tascaInterator = tasques.getTasquesPendentsUsuaris().entrySet().iterator();
-            	if (tascaInterator.hasNext()) {
-            		Map.Entry<String, Long> usuariTasca = tascaInterator.next();
-	            	if (usuariTasca.getKey().equals(usuariClient.getKey())) {
-	            		try {
-	            			usuariClient.getValue().send(SseEmitter.event().name(UserEventType.TASQUES.getEventName()).data(usuariTasca.getValue()));
-	            			logger.debug("... comunicats TasquesPendentsEvent al usuari "+usuariClient.getKey()+" a travers del emissor "+usuariClient.getValue().hashCode()+".");
-	    	            } catch (Exception e) {
-	    	            	clientsUsuaris.remove(usuariClient.getKey());
-	    	            	logger.debug("... eliminat emisor de TasquesPendentsEvent "+usuariClient.getValue().hashCode()+" del usuari "+usuariClient.getKey()+" per error: "+e.getMessage()+".");
-	    	            }	            		
-	            	}
-            	}
-	        }
+    		tasques.getTasquesPendentsUsuaris().forEach((usuariCodi, count) ->
+    			sendToUser(usuariCodi, SseEmitter.event().name(UserEventType.TASQUES.getEventName()).data(count)));
     	}
     }
-    
+
     @Async
     @JmsListener(destination = "anotacions")
     public void handleEventNotificacions(AnotacionsPendentsEvent anotacions) {
-    	if (anotacions!=null && anotacions.getAnotacionsPendentsUsuaris()!=null) {
+    	if (anotacions != null && anotacions.getAnotacionsPendentsUsuaris() != null) {
     		logger.debug("Actualització de AnotacionsPendentsEvent a usuaris...");
-			//Empram iterator per poder eliminar sense problemes elements del mapa mentre el recorrem
-			Iterator<Map.Entry<String, SseEmitter>> iterator = clientsUsuaris.entrySet().iterator();
-			//Els avisos s'envien a tots els usuaris connectats
-			while (iterator.hasNext()) {
-				Map.Entry<String, SseEmitter> usuariClient = iterator.next();
-            	Iterator<Map.Entry<String, Long>> anotacioIterator = anotacions.getAnotacionsPendentsUsuaris().entrySet().iterator();
-            	while (anotacioIterator.hasNext()) {
-	            	Map.Entry<String, Long> usuariTasca = anotacioIterator.next();
-	            	if (usuariTasca.getKey().equals(usuariClient.getKey())) {
-	            		try {
-	            			usuariClient.getValue().send(SseEmitter.event().name(UserEventType.NOTIFICACIONS.getEventName()).data(usuariTasca.getValue()));
-	            			logger.debug("... comunicats AnotacionsPendentsEvent al usuari "+usuariClient.getKey()+" a travers del emissor "+usuariClient.getValue().hashCode()+".");
-	            		} catch (Exception e) {
-	    	            	clientsUsuaris.remove(usuariClient.getKey());
-	    	            	logger.debug("... eliminat emisor de AnotacionsPendentsEvent "+usuariClient.getValue().hashCode()+" del usuari "+usuariClient.getKey()+" per error: "+e.getMessage()+".");
-	    	            }
-	            	}
-            	}
-	        }
+    		anotacions.getAnotacionsPendentsUsuaris().forEach((usuariCodi, count) ->
+    			sendToUser(usuariCodi, SseEmitter.event().name(UserEventType.NOTIFICACIONS.getEventName()).data(count)));
     	}
     }
-    
+
     @Async
     @JmsListener(destination = "fluxCreatEditat")
     public void handleEventFluxCreatEditat(CreacioFluxFinalitzatEvent fluxEvent) {
-    	if (fluxEvent!=null && fluxEvent.getUsuariCodi()!=null) {
-    		logger.debug("Actualització de AnotacionsPendentsEvent a usuaris...");
-			//Empram iterator per poder eliminar sense problemes elements del mapa mentre el recorrem
-			Iterator<Map.Entry<String, SseEmitter>> iterator = clientsUsuaris.entrySet().iterator();
-			//Els avisos s'envien a tots els usuaris connectats
-			while (iterator.hasNext()) {
-				Map.Entry<String, SseEmitter> usuariClient = iterator.next();
-            	if (fluxEvent.getUsuariCodi().equals(usuariClient.getKey())) {
-            		try {
-            			usuariClient.getValue().send(SseEmitter.event().name(UserEventType.FLUX_FINALITZAT.getEventName()).data(fluxEvent));
-            			logger.debug("... comunicats CreacioFluxFinalitzatEvent al usuari "+usuariClient.getKey()+" a travers del emissor "+usuariClient.getValue().hashCode()+".");
-            		} catch (Exception e) {
-    	            	clientsUsuaris.remove(usuariClient.getKey());
-    	            	logger.debug("... eliminat emisor de CreacioFluxFinalitzatEvent "+usuariClient.getValue().hashCode()+" del usuari "+usuariClient.getKey()+" per error: "+e.getMessage()+".");
-    	            }
-            	}
-			}
+    	if (fluxEvent != null && fluxEvent.getUsuariCodi() != null) {
+    		logger.debug("Actualització de CreacioFluxFinalitzatEvent a usuaris...");
+    		sendToUser(fluxEvent.getUsuariCodi(),
+    				SseEmitter.event().name(UserEventType.FLUX_FINALITZAT.getEventName()).data(fluxEvent));
     	}
     }
-    
+
     @Async
     @JmsListener(destination = "errorsValidacioExp")
     public void handleEventErrorsValidacio(ErrorsValidacioChangedEvent errorsValidacioEvent) {
-    	if (errorsValidacioEvent!=null && errorsValidacioEvent.getExpedientId()!=null) {
-    		logger.debug("Actualització de CreacioFluxFinalitzatEvent a expedients...");
-			Iterator<Map.Entry<Long, List<SseEmitter>>> iterator = clientsExpedient.entrySet().iterator();
-			while (iterator.hasNext()) {
-				Map.Entry<Long, List<SseEmitter>> expedientClient = iterator.next();
-            	if (errorsValidacioEvent.getExpedientId().equals(expedientClient.getKey())) {
-            		List<SseEmitter> emisorsExpedient  = expedientClient.getValue();
-            		List<SseEmitter> emisoresAEliminar = new ArrayList<>();
-            		for (SseEmitter emisor : emisorsExpedient) {
-            			try {
-            				emisor.send(SseEmitter.event().name(ExpedientEventType.VALIDACIO_CHANGE.getEventName()).data(errorsValidacioEvent));
-            				logger.debug("... comunicats ErrorsValidacioChangedEvent al expedient "+expedientClient.getKey()+" a travers del emissor "+emisor.hashCode()+".");
-        	            } catch (Exception e) {
-        	            	emisoresAEliminar.add(emisor); //Eliminam el emisor de la llista de emisors del expedient
-        	            	logger.debug("... eliminat emisor de ErrorsValidacioChangedEvent "+emisor.hashCode()+" per error "+e.getMessage()+".");
-        	            }
-            		}
-            		emisorsExpedient.removeAll(emisoresAEliminar);
-            		//Si ja no queden emisors per l'expedient, eliminam l'entrada del mapa
-            		if (emisorsExpedient==null || emisorsExpedient.size()==0) {
-            			clientsExpedient.remove(expedientClient.getKey());
-            			logger.debug("... eliminat expedient "+expedientClient.getKey()+" de la llista de events per no tenir cap emisor actiu.");
-            		} else {
-            			clientsExpedient.put(expedientClient.getKey(), emisorsExpedient);
-            		}
-            	}
-	        }
+    	if (errorsValidacioEvent != null && errorsValidacioEvent.getExpedientId() != null) {
+    		logger.debug("Actualització de ErrorsValidacioChangedEvent a expedients...");
+    		sendToExpedient(errorsValidacioEvent.getExpedientId(),
+    				SseEmitter.event().name(ExpedientEventType.VALIDACIO_CHANGE.getEventName()).data(errorsValidacioEvent));
     	}
     }
-    
+
     @Async
     @JmsListener(destination = "flux")
     public void handleEventFlux(CreacioFluxFinalitzatEvent fluxEvent) {
-    	if (fluxEvent!=null && fluxEvent.getExpedientId()!=null) {
+    	if (fluxEvent != null && fluxEvent.getExpedientId() != null) {
     		logger.debug("Actualització de CreacioFluxFinalitzatEvent a expedients...");
-			Iterator<Map.Entry<Long, List<SseEmitter>>> iterator = clientsExpedient.entrySet().iterator();
-			while (iterator.hasNext()) {
-				Map.Entry<Long, List<SseEmitter>> expedientClient = iterator.next();
-            	if (fluxEvent.getExpedientId().equals(expedientClient.getKey())) {
-            		List<SseEmitter> emisorsExpedient  = expedientClient.getValue();
-            		List<SseEmitter> emisoresAEliminar = new ArrayList<>();
-            		for (SseEmitter emisor : emisorsExpedient) {
-            			try {
-            				emisor.send(SseEmitter.event().name(ExpedientEventType.FLUX_CREAT.getEventName()).data(fluxEvent.getFluxCreat()));
-            				logger.debug("... comunicats CreacioFluxFinalitzatEvent al expedient "+expedientClient.getKey()+" a travers del emissor "+emisor.hashCode()+".");
-        	            } catch (Exception e) {
-        	            	emisoresAEliminar.add(emisor); //Eliminam el emisor de la llista de emisors del expedient
-        	            	logger.debug("... eliminat emisor de CreacioFluxFinalitzatEvent "+emisor.hashCode()+" per error "+e.getMessage()+".");
-        	            }
-            		}
-            		emisorsExpedient.removeAll(emisoresAEliminar);
-            		//Si ja no queden emisors per l'expedient, eliminam l'entrada del mapa
-            		if (emisorsExpedient==null || emisorsExpedient.size()==0) {
-            			clientsExpedient.remove(expedientClient.getKey());
-            			logger.debug("... eliminat expedient "+expedientClient.getKey()+" de la llista de events per no tenir cap emisor actiu.");
-            		} else {
-            			clientsExpedient.put(expedientClient.getKey(), emisorsExpedient);
-            		}
-            	}
-	        }
+    		sendToExpedient(fluxEvent.getExpedientId(),
+    				SseEmitter.event().name(ExpedientEventType.FLUX_CREAT.getEventName()).data(fluxEvent.getFluxCreat()));
     	}
     }
-    
-//    @Async
-//    @JmsListener(destination = "firma")
-//    public void handleEventFirma(FirmaFinalitzadaEvent firmaEvent) {
-//    	if (firmaEvent!=null && firmaEvent.getExpedientId()!=null) {
-//    		logger.debug("Actualització de FirmaFinalitzadaEvent a expedients...");
-//			Iterator<Map.Entry<Long, List<SseEmitter>>> iterator = clientsExpedient.entrySet().iterator();
-//			while (iterator.hasNext()) {
-//				Map.Entry<Long, List<SseEmitter>> expedientClient = iterator.next();
-//            	if (firmaEvent.getExpedientId().equals(expedientClient.getKey())) {
-//            		List<SseEmitter> emisorsExpedient  = expedientClient.getValue();
-//            		List<SseEmitter> emisoresAEliminar = new ArrayList<>();
-//            		for (SseEmitter emisor : emisorsExpedient) {
-//            			try {
-//            				emisor.send(SseEmitter.event().name(ExpedientEventType.FIRMA_FINALITZADA.getEventName()).data(firmaEvent.getFirmaResultat()));
-//            				logger.debug("... comunicats FirmaFinalitzadaEvent al expedient "+expedientClient.getKey()+" a travers del emissor "+emisor.hashCode()+".");
-//        	            } catch (Exception e) {
-//        	            	emisoresAEliminar.add(emisor); //Eliminam el emisor de la llista de emisors del expedient
-//        	            	logger.debug("... eliminat emisor de FirmaFinalitzadaEvent "+emisor.hashCode()+" per error "+e.getMessage()+".");
-//        	            }
-//            		}
-//            		emisorsExpedient.removeAll(emisoresAEliminar);
-//            		//Si ja no queden emisors per l'expedient, eliminam l'entrada del mapa
-//            		if (emisorsExpedient==null || emisorsExpedient.size()==0) {
-//            			clientsExpedient.remove(expedientClient.getKey());
-//            			logger.debug("... eliminat expedient "+expedientClient.getKey()+" de la llista de events per no tenir cap emisor actiu.");
-//            		} else {
-//            			clientsExpedient.put(expedientClient.getKey(), emisorsExpedient);
-//            		}
-//            	}
-//	        }
-//    	}
-//    }
-    
+
     @Async
     @JmsListener(destination = "scan")
     public void handleEventScan(ScanFinalitzatEvent scanEvent) {
-    	if (scanEvent!=null && scanEvent.getExpedientId()!=null) {
+    	if (scanEvent != null && scanEvent.getExpedientId() != null) {
     		logger.debug("Actualització de ScanFinalitzatEvent a expedients...");
-			Iterator<Map.Entry<Long, List<SseEmitter>>> iterator = clientsExpedient.entrySet().iterator();
-			while (iterator.hasNext()) {
-				Map.Entry<Long, List<SseEmitter>> expedientClient = iterator.next();
-            	if (scanEvent.getExpedientId().equals(expedientClient.getKey())) {
-            		List<SseEmitter> emisorsExpedient  = expedientClient.getValue();
-            		List<SseEmitter> emisoresAEliminar = new ArrayList<>();
-            		for (SseEmitter emisor : emisorsExpedient) {
-            			try {
-            				emisor.send(SseEmitter.event().name(ExpedientEventType.SCAN_FINALITZAT.getEventName()).data(scanEvent.getResposta()));
-            				logger.debug("... comunicats ScanFinalitzatEvent al expedient "+expedientClient.getKey()+" a travers del emissor "+emisor.hashCode()+".");
-        	            } catch (Exception e) {
-        	            	emisoresAEliminar.add(emisor); //Eliminam el emisor de la llista de emisors del expedient
-        	            	logger.debug("... eliminat emisor de ScanFinalitzatEvent "+emisor.hashCode()+" per error "+e.getMessage()+".");
-        	            }
-            		}
-            		emisorsExpedient.removeAll(emisoresAEliminar);
-            		//Si ja no queden emisors per l'expedient, eliminam l'entrada del mapa
-            		if (emisorsExpedient==null || emisorsExpedient.size()==0) {
-            			clientsExpedient.remove(expedientClient.getKey());
-            			logger.debug("... eliminat expedient "+expedientClient.getKey()+" de la llista de events per no tenir cap emisor actiu.");
-            		} else {
-            			clientsExpedient.put(expedientClient.getKey(), emisorsExpedient);
-            		}
-            	}
-	        }
+    		sendToExpedient(scanEvent.getExpedientId(),
+    				SseEmitter.event().name(ExpedientEventType.SCAN_FINALITZAT.getEventName()).data(scanEvent.getResposta()));
     	}
     }
 }

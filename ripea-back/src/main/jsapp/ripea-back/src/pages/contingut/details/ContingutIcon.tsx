@@ -18,7 +18,7 @@ const ContingutIcon = (props:any) => {
         {entity?.valid == false && <Icon title={t('page.contingut.alert.valid')} color={"warning"}>warning</Icon>}
         {entity?.tipus!="CARPETA" && !entity?.metaNode &&
             <Icon title={t('page.contingut.alert.metaNode')}
-                  color={"warning"}>warning</Icon>}
+                  color={"warning"}>question_mark</Icon>}
 
         {!entity?.arxiuUuid && !user?.sessionScope?.isCreacioCarpetesLogica &&
             <Icon title={t('page.contingut.alert.guardarPendent')} color={"error"}>warning</Icon>}

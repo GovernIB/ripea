@@ -56,7 +56,7 @@ const NotificarForm = () => {
 	
     const { create, content } = useCreate()
     const onCreateInteressat = (result?:any)=> {
-        formApiRef?.current?.setFieldValue('interessats', [...data?.interessats, {
+        formApiRef?.current?.setFieldValue('interessats', [...(data?.interessats ?? []), {
             id: result?.id,
             description: result?.codiNom
         }])

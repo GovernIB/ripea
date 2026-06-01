@@ -115,6 +115,14 @@ public class ExecucioMassivaHelper {
 		List<FitxerDto> fitxersGenerats = new ArrayList<FitxerDto>();
 		DownloadableFile resultat = null;
 				
+		if (params.isExportarExcel()) {
+			fitxersGenerats.add(expedientHelper.exportacio(entitatId, new HashSet<>(params.getIds()), "ODS"));
+		}
+		
+		if (params.isExportarCsv()) {
+			fitxersGenerats.add(expedientHelper.exportacio(entitatId, new HashSet<>(params.getIds()), "CSV"));
+		}
+		
     	if (params.isExportarIndexXls()) {
     		fitxersGenerats.add(expedientHelper.generarIndexExpedients(
     				entitatId,
@@ -124,7 +132,7 @@ public class ExecucioMassivaHelper {
     	}
     	
     	//Seria redundant exportar index PDF haguent marcat la opció de ExportarIndexPdfEni
-    	if (params.isExportarIndexPdf() && !params.isInlourerEstructEni()) {
+    	if (params.isExportarIndexPdf()) {
     		fitxersGenerats.add(expedientHelper.generarIndexExpedients(
     				entitatId,
     				new HashSet<>(params.getIds()),

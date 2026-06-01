@@ -5,19 +5,14 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
-import es.caib.ripea.service.helper.*;
-import es.caib.ripea.service.intf.base.model.ResourceReference;
-import es.caib.ripea.service.intf.model.InteressatResource;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 
 import com.turkraft.springfilter.FilterBuilder;
 import com.turkraft.springfilter.parser.Filter;
-
-import org.hibernate.Hibernate;
 
 import es.caib.ripea.persistence.entity.DocumentEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
@@ -25,6 +20,14 @@ import es.caib.ripea.persistence.entity.resourceentity.DocumentNotificacioResour
 import es.caib.ripea.persistence.entity.resourcerepository.DocumentNotificacioResourceRepository;
 import es.caib.ripea.plugin.notificacio.RespostaJustificantEnviamentNotib;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
+import es.caib.ripea.service.helper.ConfigHelper;
+import es.caib.ripea.service.helper.DocumentHelper;
+import es.caib.ripea.service.helper.DocumentNotificacioHelper;
+import es.caib.ripea.service.helper.EntityComprovarHelper;
+import es.caib.ripea.service.helper.ExcepcioLogHelper;
+import es.caib.ripea.service.helper.MessageHelper;
+import es.caib.ripea.service.helper.MetaExpedientHelper;
+import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
@@ -32,15 +35,16 @@ import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
 import es.caib.ripea.service.intf.base.exception.ResourceNotDeletedException;
 import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.base.model.ReportFileType;
+import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.DocumentNotificacioTipusEnumDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.model.ContingutResource;
 import es.caib.ripea.service.intf.model.DocumentEnviamentResource;
 import es.caib.ripea.service.intf.model.DocumentNotificacioResource;
-import es.caib.ripea.service.intf.model.DocumentResource;
+import es.caib.ripea.service.intf.model.DocumentNotificacioResource.MassiveAction;
 import es.caib.ripea.service.intf.model.EntitatResource;
 import es.caib.ripea.service.intf.model.ExpedientResource;
-import es.caib.ripea.service.intf.model.DocumentNotificacioResource.MassiveAction;
+import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.resourceservice.DocumentNotificacioResourceService;
 import es.caib.ripea.service.intf.utils.Utils;
 import lombok.RequiredArgsConstructor;
@@ -85,8 +89,8 @@ public class DocumentNotificacioResourceServiceImpl extends BaseMutableResourceS
         Filter filtreBase = FilterBuilder.and(
                 (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null,
                 FilterBuilder.equal(DocumentEnviamentResource.Fields.document + "." + ContingutResource.Fields.entitat + "." + EntitatResource.Fields.codi,
-                		entitatActualCodi != null?entitatActualCodi:"................................................................................"),
-                Filter.parse("exists(documentInteressats.id is not null)")
+                		entitatActualCodi != null?entitatActualCodi:"................................................................................")
+//              ,Filter.parse("exists(documentInteressats.id is not null)")
         );
         
         Filter filtrePermisos = null;
