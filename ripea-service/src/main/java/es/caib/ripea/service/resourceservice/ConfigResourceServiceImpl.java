@@ -11,7 +11,6 @@ import javax.annotation.PostConstruct;
 
 import es.caib.ripea.persistence.entity.resourcerepository.config.ConfigResourceRepository;
 import es.caib.ripea.service.intf.model.ConfigGroupResource;
-import org.apache.commons.lang.SerializationUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;

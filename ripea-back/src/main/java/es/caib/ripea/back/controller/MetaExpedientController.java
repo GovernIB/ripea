@@ -32,12 +32,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.support.RequestContext;
 import org.springframework.web.util.WebUtils;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.introspect.VisibilityChecker;
 
 import es.caib.ripea.back.command.ExpedientEstatCommand;
 import es.caib.ripea.back.command.FileCommand;
@@ -75,7 +73,6 @@ import es.caib.ripea.service.intf.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientTascaDto;
 import es.caib.ripea.service.intf.dto.OrganGestorDto;
 import es.caib.ripea.service.intf.dto.PaginaDto;
-import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
 import es.caib.ripea.service.intf.dto.PortafirmesFluxRespostaDto;
 import es.caib.ripea.service.intf.dto.ProcedimentDto;
 import es.caib.ripea.service.intf.dto.ProgresActualitzacioDto;
