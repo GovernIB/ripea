@@ -59,7 +59,8 @@ public class SseResourceController {
     private final EventService eventService;
     private final AplicacioService aplicacioService;
 
-    private final Map<String, SseEmitter> clientsUsuaris = new HashMap<>();
+    //Per cada usuari el emmiter es una llista, perque pot estar obert per varies connexions simultaniament (p.ex. diferents pestanyes del navegador).
+    private final Map<String, List<SseEmitter>> clientsUsuaris = new HashMap<>();
     //En cas de un expedient, el emmiter es una llista, perque pot estar obert per varis usuaris simultaniament.
     private final Map<Long, List<SseEmitter>> clientsExpedient = new HashMap<>();
     private static final Logger logger = LoggerFactory.getLogger(SseResourceController.class);
@@ -79,30 +80,45 @@ public class SseResourceController {
      * E N V I A M E N T   D ' E V E N T S   ( H E L P E R S )
      */
 
-    /** Envia un event a un usuari concret. Si l'emitter falla, l'elimina del mapa. */
+    /** Envia un event a tots els emitters d'un usuari. Elimina els que fallin i neteja l'entrada del mapa si queda buida. */
     private void sendToUser(String usuariCodi, SseEmitter.SseEventBuilder event) {
-        SseEmitter emitter = clientsUsuaris.get(usuariCodi);
-        if (emitter == null) return;
-        try {
-            emitter.send(event);
-            logger.debug("... comunicat event al usuari {} a través del emisor {}.", usuariCodi, emitter.hashCode());
-        } catch (Exception e) {
+        List<SseEmitter> emisors = clientsUsuaris.get(usuariCodi);
+        if (emisors == null) return;
+        List<SseEmitter> toRemove = new ArrayList<>();
+        for (SseEmitter emitter : emisors) {
+            try {
+                emitter.send(event);
+                logger.debug("... comunicat event al usuari {} a través del emisor {}.", usuariCodi, emitter.hashCode());
+            } catch (Exception e) {
+                toRemove.add(emitter);
+                logger.debug("... eliminat emisor {} del usuari {} per error: {}.", emitter.hashCode(), usuariCodi, e.getMessage());
+            }
+        }
+        emisors.removeAll(toRemove);
+        if (emisors.isEmpty()) {
             clientsUsuaris.remove(usuariCodi);
-            logger.debug("... eliminat emisor {} del usuari {} per error: {}.", emitter.hashCode(), usuariCodi, e.getMessage());
         }
     }
 
-    /** Envia un event a tots els usuaris connectats. Elimina els emitters que fallin. */
+    /** Envia un event a tots els usuaris connectats. Elimina els emitters que fallin i neteja les entrades que quedin buides. */
     private void sendToAllUsers(SseEmitter.SseEventBuilder event) {
-        Iterator<Map.Entry<String, SseEmitter>> iterator = clientsUsuaris.entrySet().iterator();
+        Iterator<Map.Entry<String, List<SseEmitter>>> iterator = clientsUsuaris.entrySet().iterator();
         while (iterator.hasNext()) {
-            Map.Entry<String, SseEmitter> entry = iterator.next();
-            try {
-                entry.getValue().send(event);
-                logger.debug("... comunicat event al usuari {} a través del emisor {}.", entry.getKey(), entry.getValue().hashCode());
-            } catch (Exception e) {
+            Map.Entry<String, List<SseEmitter>> entry = iterator.next();
+            List<SseEmitter> emisors = entry.getValue();
+            List<SseEmitter> toRemove = new ArrayList<>();
+            for (SseEmitter emitter : emisors) {
+                try {
+                    emitter.send(event);
+                    logger.debug("... comunicat event al usuari {} a través del emisor {}.", entry.getKey(), emitter.hashCode());
+                } catch (Exception e) {
+                    toRemove.add(emitter);
+                    logger.debug("... eliminat emisor {} del usuari {} per error: {}.", emitter.hashCode(), entry.getKey(), e.getMessage());
+                }
+            }
+            emisors.removeAll(toRemove);
+            if (emisors.isEmpty()) {
                 iterator.remove();
-                logger.debug("... eliminat emisor {} del usuari {} per error: {}.", entry.getValue().hashCode(), entry.getKey(), e.getMessage());
             }
         }
     }
@@ -197,13 +213,22 @@ public class SseResourceController {
     public SseEmitter stream(@PathVariable String usuariCodi) {
     	if (Utils.hasValue(usuariCodi) && !"undefined".equalsIgnoreCase(usuariCodi)) {
 	        SseEmitter emitter = new SseEmitter(0L);
-	        SseEmitter existing = clientsUsuaris.put(usuariCodi, emitter);
-	        if (existing != null) {
-	        	logger.debug("Substituint emisor anterior {} del usuari {}.", existing.hashCode(), usuariCodi);
-	        	try { existing.complete(); } catch (Exception ignored) {}
-	        }
-	        emitter.onCompletion(() -> clientsUsuaris.remove(usuariCodi, emitter));
-	        emitter.onError(e -> clientsUsuaris.remove(usuariCodi, emitter));
+	        List<SseEmitter> emisorsUsuari = clientsUsuaris.computeIfAbsent(usuariCodi, k -> new ArrayList<>());
+	        emisorsUsuari.add(emitter);
+	        emitter.onCompletion(() -> {
+	            List<SseEmitter> list = clientsUsuaris.get(usuariCodi);
+	            if (list != null) {
+	                list.remove(emitter);
+	                if (list.isEmpty()) clientsUsuaris.remove(usuariCodi);
+	            }
+	        });
+	        emitter.onError(e -> {
+	            List<SseEmitter> list = clientsUsuaris.get(usuariCodi);
+	            if (list != null) {
+	                list.remove(emitter);
+	                if (list.isEmpty()) clientsUsuaris.remove(usuariCodi);
+	            }
+	        });
 	        onSubscribeEmisorGlobal(usuariCodi, emitter);
 	        logger.debug("Usuari {} suscrit a events globals a travers del Emisor {}.", usuariCodi, emitter.hashCode());
 	        return emitter;
@@ -235,8 +260,7 @@ public class SseResourceController {
         	}
         } catch (IOException e) {
             log.error("Error enviant esdeveniment inicial SSE", e);
-            emitter.complete();
-            clientsUsuaris.remove(usuariCodi);
+            emitter.complete(); //el callback onCompletion s'encarrega d'eliminar aquest emisor de la llista
         } catch (Exception e) {
             log.error("Error inesperat onSubscribe", e);
             emitter.completeWithError(e);

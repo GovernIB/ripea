@@ -115,7 +115,7 @@ public class TascaHelper {
 							validacioOk = true; //Si el tipus de document no esta actiu acualment al procediment, no es valida perque no es podrá aportar...
 						} else {
 							for (DocumentEntity docExp: documentsExpedient) {
-								if (docExp.getMetaDocument().getId().equals(validacioTasca.getItemId())) {
+								if (docExp.getMetaDocument()!=null && docExp.getMetaDocument().getId().equals(validacioTasca.getItemId())) {
 									switch (validacioTasca.getTipusValidacio()) {
 									case AP:
 										//S'ha trobat un document del tipus definit a la validació, no fa falta validar res més

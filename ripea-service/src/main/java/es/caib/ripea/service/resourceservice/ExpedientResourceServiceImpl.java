@@ -701,6 +701,10 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 	                .ifPresent(usuariResourceEntity -> resource.setSeguidor(entity.getSeguidors().contains(usuariResourceEntity)));
 	        resource.setUsuariActualWrite(entityComprovarHelper.comprovarPermisExpedient(entity.getId(), ExtendedPermission.WRITE, "WRITE", false));
 	        ExpedientEntity expedientEntity = expedientRepository.findById(entity.getId()).get();
+    		
+	        //Calcular esValid, s'utilitza posteriorment
+	        resource.setErrors(cacheHelper.findErrorsValidacioPerNode(entity.getId()));
+	        resource.setValid(resource.getErrors().isEmpty());
 	        
 	        resource.setConteDocuments(CollectionUtils.isNotEmpty(documentResourceRepository.findByExpedientAndEsborrat(entity, 0)));
 	        resource.setConteDocumentsDefinitius(documentResourceRepository.expedientHasDocumentsDefinitius(entity));
