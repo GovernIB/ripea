@@ -114,7 +114,7 @@ export const MetaExpedientElements = () => {
     if (error)
         return <ErrorPage error={error}/>
 
-    return <GridPage disableMargins>
+    return <GridPage>
         <Load value={metaExpedient}>
             <CardPage title={title}
                       header={<>

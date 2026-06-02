@@ -112,7 +112,7 @@ const AnotacionsComunicadesGrid = () => {
         },
     ]
 
-    return <GridPage disableMargins>
+    return <GridPage>
         <CardPage title={t('page.user.menu.comunicades')}>
             <AnotacionsComunicadesFilter onSpringFilterChange={setSpringFilter}/>
 

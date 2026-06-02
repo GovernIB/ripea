@@ -82,7 +82,7 @@ export const EntitatGrid = () => {
 
     const {actions, components} = useEntitatActions(refresh)
 
-    return <GridPage disableMargins>
+    return <GridPage>
         <CardPage title={t('navigate.entitat')}>
             <StyledMuiGrid
                 apiRef={apiRef}

@@ -58,7 +58,7 @@ export const UrlInstruccioGrid = () => {
         },
     ]
 
-    return <GridPage disableMargins>
+    return <GridPage>
         <CardPage title={t('page.user.menu.url')}>
             <StyledMuiGrid
                 resourceName={"uRLInstruccioResource"}

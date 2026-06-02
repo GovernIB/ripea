@@ -11,9 +11,9 @@ const TasquesFilterForm = () => {
     return <>
         {(!data?.advanced) && <>
             <GridFormField size={{xs: 12, sm: 6, md: 3}} name="metaExpedient"/>
-            <GridFormField size={{xs: 12, sm: 6, md: 2}} name="titol"/>
-            <GridFormField size={{xs: 12, sm: 6, md: 2}} name="prioritat"/>
-            <GridFormField size={{xs: 12, sm: 6, md: 2.5}} name="estats" multiple/>
+            <GridFormField size={{xs: 12, sm: 6, md: 3}} name="titol"/>
+            <GridFormField size={{xs: 12, sm: 6, md: 3}} name="prioritat"/>
+            <GridFormField size={{xs: 12, sm: 6, md: 3}} name="estats" multiple/>
         </>}
         {(data?.advanced) && <>
             <GridFormField size={{xs: 12, sm: 6, md: 3}} name="metaExpedient"/>
@@ -21,11 +21,11 @@ const TasquesFilterForm = () => {
             <GridFormField size={{xs: 12, sm: 4, md: 2}} name="metaExpedientTasca" filter={procedimentFilter}/>
             <GridFormField size={{xs: 12, sm: 4, md: 2}} name="titol"/>
             <GridFormField size={{xs: 12, sm: 4, md: 2}} name="prioritat"/>
-            <GridFormField size={{xs: 12, sm: 6, md: 1.5}} name="dataInici" type={"date"}/>
-            <GridFormField size={{xs: 12, sm: 6, md: 1.5}} name="dataFi" type={"date"}/>
-            <GridFormField size={{xs: 12, sm: 6, md: 1.5}} name="dataLimitInici" type={"date"}/>
-            <GridFormField size={{xs: 12, sm: 6, md: 1.5}} name="dataLimitFi" type={"date"}/>
-            <GridFormField size={{xs: 12, sm: 6, md: 3.5}} name="estats" multiple/>
+            <GridFormField size={{xs: 12, sm: 6, md: 3}} name="dataInici" type={"date"}/>
+            <GridFormField size={{xs: 12, sm: 6, md: 3}} name="dataFi" type={"date"}/>
+            <GridFormField size={{xs: 12, sm: 6, md: 3}} name="dataLimitInici" type={"date"}/>
+            <GridFormField size={{xs: 12, sm: 6, md: 3}} name="dataLimitFi" type={"date"}/>
+            <GridFormField size={{xs: 12, sm: 6, md: 3}} name="estats" multiple/>
         </>}
     </>
 }
@@ -53,6 +53,7 @@ const TasquesFilter = (props:any) => {
         onSpringFilterChange={onSpringFilterChange}
         filterOnFieldEnterKeyPressed
         advancedSearch
+        buttonGridProps={{size: {xs: 12, sm: 6, md: 4}}}
     >
         <TasquesFilterForm/>
     </StyledMuiFilter>

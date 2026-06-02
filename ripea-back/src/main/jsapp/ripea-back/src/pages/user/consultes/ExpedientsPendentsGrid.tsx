@@ -80,7 +80,7 @@ const ExpedientsPendentsGrid = () => {
 
     const {actions, components} = useAnotacioActions();
 
-    return <GridPage disableMargins>
+    return <GridPage>
         <CardPage title={t('page.user.menu.pendents')}>
             <ExpedientsPendentsFilter onSpringFilterChange={setSpringFilter}/>
 

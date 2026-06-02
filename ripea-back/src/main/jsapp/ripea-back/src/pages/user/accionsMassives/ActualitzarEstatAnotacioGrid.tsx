@@ -123,7 +123,7 @@ const ActualitzarEstatAnotacioGrid = () => {
         },
     ]
 
-    return <GridPage disableMargins>
+    return <GridPage>
         <CardPage title={t('navigate.massiu.expedientPeticioCanviEstatDistribucio')}>
             <ActualitzarEstatAnotacioFilter onSpringFilterChange={setSpringFilter}/>
 

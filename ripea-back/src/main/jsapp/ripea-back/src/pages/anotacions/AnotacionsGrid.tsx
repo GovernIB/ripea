@@ -112,7 +112,7 @@ const AnotacionsGrid = () => {
     const {actions, components} = useAnotacioActions(refresh);
     const {handleOpen, dialog} = useAnotacioDetail();
 
-    return <GridPage disableMargins>
+    return <GridPage>
         <CardPage title={t('page.anotacio.filter.title')}>
             <AnotacioFilter onSpringFilterChange={(value:any)=>{
                 setSpringFilter(value)

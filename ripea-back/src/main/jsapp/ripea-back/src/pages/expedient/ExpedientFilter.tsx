@@ -120,12 +120,6 @@ export const springFilterBuilder = (data: any, user?: any, rol?: any): string =>
     return filterStr;
 }
 
-const defaultExpedientFilterData = () => {
-    const dataCreacioInici = new Date();
-    dataCreacioInici.setMonth(dataCreacioInici.getMonth() - 3);
-    return { estat: '0', dataCreacioInici };
-}
-
 const ExpedientFilter = (props: any) => {
     const {onSpringFilterChange} = props;
     const {value: user, rol} = useUserSession();
@@ -137,9 +131,7 @@ const ExpedientFilter = (props: any) => {
         )}
         onSpringFilterChange={onSpringFilterChange}
         advancedSearch
-        filterOnFieldEnterKeyPressed
-        defaultData={defaultExpedientFilterData}
-        buttonGridProps={{size: {xs: 12, sm: 6, md: 2}}}
+        buttonGridProps={{size: {xs: 12, sm: 6, md: 4}}}
     >
         <ExpedientFilterForm/>
     </StyledMuiFilter>

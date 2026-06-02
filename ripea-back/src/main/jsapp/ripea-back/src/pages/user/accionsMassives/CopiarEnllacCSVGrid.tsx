@@ -62,7 +62,7 @@ const CopiarEnllacCSVGrid = () => {
         },
     ]
 
-    return <GridPage disableMargins>
+    return <GridPage>
         <CardPage title={t('navigate.massiu.csv')}>
             <EnviarPortafirmesFilter
                 sessionKey={"MASSIVE_CSV_FILTER"}

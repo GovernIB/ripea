@@ -115,7 +115,7 @@ export const ExcepcioGrid = () => {
         },
     ], [apiIsReady]);
 
-    return <GridPage disableMargins>
+    return <GridPage>
         <CardPage title={t('navigate.exception')}>
             <StyledMuiGrid
                 resourceName={"excepcioLogResource"}

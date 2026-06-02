@@ -350,7 +350,7 @@ const ContingutGrid = () => {
         },
     ], [esborratFilter, t, recuperarMassive, esborrarMassive])
 
-    return <GridPage disableMargins>
+    return <GridPage>
         <CardPage title={t('page.user.menu.continguts')}>
             <ContingutFilter
                 sessionKey={sessionKey}

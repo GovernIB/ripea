@@ -389,7 +389,7 @@ const Expedient = () => {
             </Typography>
         </Box>
     </>;
-    return <GridPage disableMargins>
+    return <GridPage>
         {expedient?.id != null && <SseExpedient id={expedient.id}/>}
         <Load value={expedient} noEffect>
             <CardPage header={headerMain} componentProps={{ justifyContent: 'space-between' }}>

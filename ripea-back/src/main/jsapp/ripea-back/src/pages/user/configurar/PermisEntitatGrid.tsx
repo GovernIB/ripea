@@ -78,7 +78,7 @@ const PermisEntitatGrid = ()=> {
         },
     ]
 
-    return <GridPage disableMargins>
+    return <GridPage>
         <CardPage
             title={t('page.user.menu.permisos')}
             header={ id &&

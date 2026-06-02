@@ -141,7 +141,7 @@ const AdjuntarAnnexosPendentsGrid = () => {
         },
     ]
 
-    return <GridPage disableMargins>
+    return <GridPage>
         <CardPage title={t('navigate.massiu.procesarAnnexosPendents')}>
             
             <Alert severity={'info'} sx={{mb: 1}}>{t('page.anotacio.action.procesarAnnexosPendents.info')}</Alert>

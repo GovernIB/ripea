@@ -8,10 +8,10 @@ const AnotacioFilterForm = () => {
 
     return <>
         {(!data?.advanced) && <>
-            <GridFormField size={{xs: 12, sm: 6, md: 3.5}} name="metaExpedient"/>
-            <GridFormField size={{xs: 12, sm: 6, md: 2}} name="estat"/>
-            <GridFormField size={{xs: 12, sm: 6, md: 2}} name="dataRecepcioInicial" type={"date"}/>
-            <GridFormField size={{xs: 12, sm: 6, md: 2}} name="dataRecepcioFinal" type={"date"}/>
+            <GridFormField size={{xs: 12, sm: 6, md: 3}} name="metaExpedient"/>
+            <GridFormField size={{xs: 12, sm: 6, md: 3}} name="estat"/>
+            <GridFormField size={{xs: 12, sm: 6, md: 3}} name="dataRecepcioInicial" type={"date"}/>
+            <GridFormField size={{xs: 12, sm: 6, md: 3}} name="dataRecepcioFinal" type={"date"}/>
         </>}
         {(data?.advanced) && <>
             <GridFormField size={{xs: 12, sm: 6, md: 4}} name="numRegistre"/>
@@ -43,8 +43,6 @@ const springFilterBuilder = (data: any): string => {
     )
 }
 
-const defaultAnotacioFilterData = () => ({ estat: 'PENDENT' });
-
 const AnotacioFilter = (props: any) => {
     const {onSpringFilterChange} = props;
 
@@ -55,7 +53,7 @@ const AnotacioFilter = (props: any) => {
         onSpringFilterChange={onSpringFilterChange}
         filterOnFieldEnterKeyPressed
         advancedSearch
-        defaultData={defaultAnotacioFilterData}
+        buttonGridProps={{size: {xs: 12, sm: 6, md: 4}}}
     >
         <AnotacioFilterForm/>
     </StyledMuiFilter>

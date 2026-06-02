@@ -81,7 +81,7 @@ const OrganGestorGrid = () => {
         }
     ], [treeView])
 
-    return <GridPage disableMargins>
+    return <GridPage>
         <CardPage title={t('page.user.menu.organs')}>
             <OrganGestorFilter onSpringFilterChange={setSpringFilter}/>
 

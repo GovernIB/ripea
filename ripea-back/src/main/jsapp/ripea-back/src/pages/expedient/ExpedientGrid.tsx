@@ -110,7 +110,7 @@ export const Avisos = (props: any) => {
 const beforeAvis = [
     {
         field: 'numero',
-        flex: 0.90,
+        flex: 0.85,
     },
     {
         field: 'metaExpedient',
@@ -266,7 +266,7 @@ const ExpedientGrid = () => {
                         resourceName={'expedientResource'}
                         popupEditFormDialogResourceTitle={t('page.expedient.title')}
                         columns={columnsAddition}
-                        rowActionsColumnProps={{ width: 35, minWidth: 35 }}
+                        rowActionsColumnProps={{ width: 55, minWidth: 55 }}
                         filter={springFilter}
                         sortModel={sortModel}
                         perspectives={perspectives}
