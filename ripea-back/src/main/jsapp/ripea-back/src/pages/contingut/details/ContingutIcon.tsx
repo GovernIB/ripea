@@ -1,6 +1,7 @@
 import {Grid, Icon} from "@mui/material";
 import {useUserSession} from "../../../components/Session.tsx";
 import {useTranslation} from "react-i18next";
+import { getResumErrorsText } from "@src/pages/expedient/details/ErrorValidacio.tsx";
 
 const isInOptions = (value:string, ...options:string[]) => {
     return options.includes(value)
@@ -10,12 +11,21 @@ const ContingutIcon = (props:any) => {
     const {entity} = props;
     const { t } = useTranslation();
     const { value: user } = useUserSession();
-
+    
     return <Grid display={"flex"} alignItems={"center"}>
         {entity?.tipus=="DOCUMENT" && <DocumentIcon entity={entity}/>}
-        {entity?.tipus=="CARPETA" && <CarpetaIcon entity={entity}/>}
+        {entity?.tipus=="CARPETA" && <CarpetaIcon />}
 
-        {entity?.valid == false && <Icon title={t('page.contingut.alert.valid')} color={"warning"}>warning</Icon>}
+        {entity?.valid == false && (
+            (() => {
+                const llistaErrors = entity?.errors || [];
+                const textTitol = llistaErrors.length > 0 
+                    ? getResumErrorsText(llistaErrors, t)
+                    : t('page.contingut.alert.valid');
+
+                return (<Icon title={textTitol} color={"warning"}>warning</Icon>);
+            })()
+        )}
         {entity?.tipus!="CARPETA" && !entity?.metaNode &&
             <Icon title={t('page.contingut.alert.metaNode')}
                   color={"warning"}>question_mark</Icon>}
@@ -28,6 +38,7 @@ const ContingutIcon = (props:any) => {
         {entity?.restringida && <Icon title={entity?.motiuRestriccio}>lock</Icon>}
     </Grid>
 }
+
 const DocumentIcon = (props:any) => {
     const { t } = useTranslation();
     const {entity} = props;
@@ -89,11 +100,9 @@ const DocumentIcon = (props:any) => {
             <Icon title={t('page.document.alert.errorPortafirmes')} color={"error"}>edit</Icon>}
     </>
 }
-const CarpetaIcon = (_props:any) => {
-    const { t } = useTranslation();
 
-    return <>
-        <Icon title={t('page.carpeta.title')}>folder</Icon>
-    </>
+const CarpetaIcon = () => {
+    const { t } = useTranslation();
+    return <Icon title={t('page.carpeta.title')}>folder</Icon>
 }
 export default ContingutIcon;

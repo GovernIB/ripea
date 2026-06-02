@@ -1926,7 +1926,8 @@ const translationCa = {
             }
         },
         alert: {
-            title: "Errors de validació del expedient",
+            titleExpedient: "Errors de validació del expedient",
+            titleDocument: "Errors de validació del document",
             action: {
                 read: {
                     label: "Marcar com a llegida",
@@ -1936,6 +1937,8 @@ const translationCa = {
                 },
             },
             errors: {
+                altresErrors: ", i altres {{restants}} errors de validació.",
+                unAltreError: ", i un altre error de validació.",
                 metaDada: "Falten les dades següents:",
                 metaDocument: "Falten els documents següents:",
                 metaNode: "Hi ha documents sense un tipus de document assignat",

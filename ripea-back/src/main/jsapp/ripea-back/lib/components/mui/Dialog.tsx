@@ -18,6 +18,7 @@ export type DialogProps = React.PropsWithChildren & {
     closeIcon?: boolean;
     modal?: boolean;
     componentProps?: any;
+    dialogContentProps?: any;
     ref?: React.RefObject<HTMLDivElement | null>;
 };
 
@@ -37,9 +38,7 @@ export const useContentDialog: (
     const [title, setTitle] = React.useState<string | null>();
     const [modal, setModal] = React.useState<boolean | undefined>();
     const [content, setContent] = React.useState<React.ReactElement>();
-    const [buttons, setButtons] = React.useState<DialogButton[]>(
-        dialogButtons ?? defaultDialogButtons
-    );
+    const [buttons, setButtons] = React.useState<DialogButton[]>(dialogButtons ?? defaultDialogButtons);
     const [dialogProps, setDialogProps] = React.useState<any>();
     const [resolveFn, setResolveFn] = React.useState<(value: any) => void>();
     const [rejectFn, setRejectFn] = React.useState<(value: any) => void>();
@@ -99,7 +98,8 @@ export const useContentDialog: (
             buttons={buttons}
             modal={modal}
             componentProps={dialogProps}
-            ref={dialogRef}>
+            ref={dialogRef}
+        >
             {content}
         </Dialog>
     );
@@ -132,6 +132,7 @@ export const Dialog: React.FC<DialogProps> = (props) => {
         closeIcon = true,
         modal = false,
         componentProps,
+        dialogContentProps,
         ref,
         children,
     } = props;
@@ -140,7 +141,8 @@ export const Dialog: React.FC<DialogProps> = (props) => {
             open={open}
             onClose={!modal ? (_event, reason) => closeCallback(reason) : undefined}
             ref={ref}
-            {...componentProps}>
+            {...componentProps}
+        >
             {title && <DialogTitle>{title}</DialogTitle>}
             {closeIcon && !modal && (
                 <IconButton
@@ -152,17 +154,15 @@ export const Dialog: React.FC<DialogProps> = (props) => {
                         right: 8,
                         top: 8,
                         color: theme.palette.grey[500],
-                    })}>
+                    })}
+                >
                     <Icon fontSize="small">close</Icon>
                 </IconButton>
             )}
-            <DialogContent sx={title ? { pt: 0 } : undefined}>{children}</DialogContent>
-            {buttons && (
-                <DialogButtons
-                    buttons={buttons}
-                    handleClose={(value: any) => buttonCallback?.(value)}
-                />
-            )}
+            <DialogContent sx={title ? { pt: 0 } : undefined} {...dialogContentProps}>
+                {children}
+            </DialogContent>
+            {buttons && <DialogButtons buttons={buttons} handleClose={(value: any) => buttonCallback?.(value)} />}
         </MuiDialog>
     );
 };
