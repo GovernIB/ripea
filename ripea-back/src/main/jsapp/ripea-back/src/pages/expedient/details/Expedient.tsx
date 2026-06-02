@@ -22,7 +22,7 @@ import Load from "../../../components/Load.tsx";
 import {useUserSession} from "../../../components/Session.tsx";
 import {useActions} from "./CommonActions.tsx";
 import useAlerta from "./Alerta.tsx";
-import useErrorValidacio from "./ErrorValidacio.tsx";
+import useErrorValidacio, { getResumErrorsText } from "./ErrorValidacio.tsx";
 import SseExpedient, {useValidacioSession} from "../../../components/SseExpedient.tsx";
 import {icons} from "../../user/UserHeadToolbar.tsx";
 import {setTitlePage} from "../../../TitleHeaderConfigurator.tsx";
@@ -165,17 +165,34 @@ const ExpedientAlert = (props:any) => {
                    }
             >{t('page.expedient.alert.alert')}</Alert>
         }
-        { ((!expedient?.valid && validacio?.errorsValidacio == null) || (validacio?.errorsValidacio?.length > 0)) &&
-            <Alert severity="warning"
-                   action={
-                       <Button sx={{py: 0}} variant="outlined"
-                               onClick={() => hanldeErrorValidacio(expedient?.id, expedient)}>
-                            <Icon>search</Icon>
-                           <Typography variant={"subtitle2"} component="span">{t('common.consult')}</Typography>
-                       </Button>
-                   }
-            >{t('page.expedient.alert.validation')}</Alert>
-        }
+        { 
+        ((!expedient?.valid && validacio?.errorsValidacio == null) || (validacio?.errorsValidacio?.length > 0)) && (
+            (() => {
+                const llistaErrors = validacio?.errorsValidacio?.length > 0 
+                    ? validacio.errorsValidacio 
+                    : (expedient?.errors || []);
+
+                const textAlerta = llistaErrors.length > 0 
+                    ? getResumErrorsText(llistaErrors, t)
+                    : t('page.expedient.alert.validation');
+
+                return (
+                    <Alert 
+                        severity="warning"
+                        action={
+                            <Button sx={{py: 0}} variant="outlined"
+                                    onClick={() => hanldeErrorValidacio(expedient?.id, expedient)}>
+                                <Icon>search</Icon>
+                                <Typography variant={"subtitle2"} component="span">{t('common.consult')}</Typography>
+                            </Button>
+                        }
+                    >
+                        {textAlerta}
+                    </Alert>
+                );
+            })()
+        )
+    }
         {dialogAlert}
         {dialogErrorValidacio}
     </>

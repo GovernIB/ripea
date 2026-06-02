@@ -9,7 +9,7 @@ import MetaDadaGrid from "../../dada/MetaDadaGrid.tsx";
 import Load from "../../../components/Load.tsx";
 import {useActions} from "./ContingutActions.tsx";
 import {icons} from "../../user/UserHeadToolbar.tsx";
-import useErrorValidacio from "../../expedient/details/ErrorValidacio.tsx";
+import useErrorValidacio, { getResumErrorsText } from "../../expedient/details/ErrorValidacio.tsx";
 import {FieldData, MuiDetail} from "../../../components/MuiDetail.tsx";
 
 const Contenido = (props:any) => {
@@ -109,7 +109,7 @@ const useDocumentDetail = (expedient:any, refresh?: () => void) => {
     const [numDades, setNumDades] = useState<number>(entity?.numDades);
 
     const {apiDownload} = useActions()
-    const {handleOpen: hanldeErrorValidacio, dialog: dialogErrorValidacio} = useErrorValidacio();
+    const {handleOpen: hanldeErrorValidacio, dialog: dialogErrorValidacio} = useErrorValidacio(t('page.alert.titleDocument'));
 
     const handleOpen = (id:any) => {
         if(apiIsReady && id){
@@ -175,46 +175,63 @@ const useDocumentDetail = (expedient:any, refresh?: () => void) => {
     ]
         .filter((button:any)=>!button?.hidden)
 
-    const dialog =
+    const dialog = (
         <MuiDialog
             open={open}
             closeCallback={handleClose}
             title={entity?.nom}
             componentProps={{ fullWidth: true, maxWidth: 'md' }}
             buttons={buttons}
-            buttonCallback={(value :any) :void => {
-                switch (value){
+            buttonCallback={(value: any): void => {
+                switch (value) {
                     case 'download':
-                        apiDownload(entity?.id, 'adjunt', t('page.document.action.descarregarOriginal.ok'))
+                        apiDownload(entity?.id, 'adjunt', t('page.document.action.descarregarOriginal.ok'));
                         break;
                     case 'descarregarImprimible':
-                        apiDownload(entity?.id, 'imprimible', t('page.document.action.imprimible.ok'))
+                        apiDownload(entity?.id, 'imprimible', t('page.document.action.imprimible.ok'));
                         break;
                 }
                 handleClose();
             }}
         >
             <Load value={entity}>
-            {!entity?.valid &&
-                <Alert severity="warning"
-                       action={
-                           <Button  sx={{py: 0}} variant="outlined"
-                                    onClick={() => hanldeErrorValidacio(entity?.id, entity)}>
-                               <Icon>search</Icon>
-                               <Typography variant={"subtitle2"}>{t('common.consult')}</Typography>
-                           </Button>
-                       }
-                >{t('page.contingut.alert.valid')}</Alert>}
-            {dialogErrorValidacio}
-            <TabComponent
-                indicatorColor={"primary"}
-                textColor={"primary"}
-                aria-label="scrollable force tabs"
-                tabs={tabs}
-                variant="scrollable"
-            />
+                {!entity?.valid &&
+                    (() => {
+                        const llistaErrors = entity?.errors || [];
+                        const textAlerta =
+                            llistaErrors.length > 0
+                                ? getResumErrorsText(llistaErrors, t)
+                                : t('page.contingut.alert.valid');
+
+                        return (
+                            <Alert
+                                severity="warning"
+                                action={
+                                    <Button
+                                        sx={{ py: 0 }}
+                                        variant="outlined"
+                                        onClick={() => hanldeErrorValidacio(entity?.id, entity)}
+                                    >
+                                        <Icon>search</Icon>
+                                        <Typography variant={'subtitle2'}>{t('common.consult')}</Typography>
+                                    </Button>
+                                }
+                            >
+                                {textAlerta}
+                            </Alert>
+                        );
+                    })()}
+                {dialogErrorValidacio}
+                <TabComponent
+                    indicatorColor={'primary'}
+                    textColor={'primary'}
+                    aria-label="scrollable force tabs"
+                    tabs={tabs}
+                    variant="scrollable"
+                />
             </Load>
         </MuiDialog>
+    );
 
     return {
         apiIsReady,

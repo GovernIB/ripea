@@ -1926,7 +1926,8 @@ const translationEs = {
             }
         },
         alert: {
-            title: "Errores de validación del expediente",
+            titleExpedient: "Errores de validación del expediente",
+            titleDocument: "Errores de validación del documento",
             action: {
                 read: {
                     label: "Marcar como leído",
@@ -1936,6 +1937,8 @@ const translationEs = {
                 },
             },
             errors: {
+                altresErrors: ", y otros {{restants}} errores de validación.",
+                unAltreError: ", y otro error de validación.",
                 metaDada: "Faltan los siguientes datos:",
                 metaDocument: "Faltan los siguientes documentos:",
                 metaNode: "Existen documentos sin un tipo de documento asignado",

@@ -16,7 +16,7 @@ import Load from "../../components/Load.tsx";
 import {useUserSession} from "../../components/Session.tsx";
 import {GridSortDirection} from "@mui/x-data-grid-pro";
 import useAlerta from "./details/Alerta.tsx";
-import useErrorValidacio from "./details/ErrorValidacio.tsx";
+import useErrorValidacio, { getResumErrorsText } from "./details/ErrorValidacio.tsx";
 import * as builder from '../../util/springFilterUtils';
 import {StyledLabel} from "../../components/StyledLabel.tsx";
 
@@ -80,13 +80,23 @@ export const Avisos = (props: any) => {
     const {t} = useTranslation();
 
     return <>
-        {!entity?.valid &&
-            <Icon color={"warning"}
-                  title={t('page.expedient.alert.validation')}
-                  onClick={(event:any) => {
-                      event.stopPropagation()
-                      hanldeErrorValidacio?.(entity?.id, entity)
-                  }}>warning</Icon>}
+        {!entity?.valid && (
+            (() => {
+                const llistaErrors = entity?.errors || [];
+                const textTitol = llistaErrors.length > 0 
+                    ? getResumErrorsText(llistaErrors, t)
+                    : t('page.expedient.alert.validation');
+
+                return (
+                    <Icon color={"warning"}
+                        title={textTitol}
+                        onClick={(event:any) => {
+                            event.stopPropagation();
+                            hanldeErrorValidacio?.(entity?.id, entity);
+                        }}>warning</Icon>
+                );
+            })()
+        )}
         {entity?.errorLastEnviament &&
             <Icon color={"error"} title={t('page.expedient.alert.errorEnviament')}>edit</Icon>}
         {entity?.errorLastNotificacio &&
