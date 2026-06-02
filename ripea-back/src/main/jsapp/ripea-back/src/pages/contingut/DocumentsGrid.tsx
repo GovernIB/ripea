@@ -133,10 +133,6 @@ const columns = [
     //     renderCell: (params: any) => <ContingutIcon entity={params?.row}/>
     // },
     {
-        field: 'id',
-        flex: 0.75,
-    },
-    {
         field: 'descripcio',
         flex: 0.75,
     },
