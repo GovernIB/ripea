@@ -76,7 +76,7 @@ const FirmaNavegadorGrid = () => {
         },
     ]
 
-    return <GridPage disableMargins>
+    return <GridPage>
         <CardPage title={t('navigate.massiu.firmasimpleweb')}>
             <EnviarPortafirmesFilter
                 sessionKey={"MASSIVE_FIRMA_NAVEGADOR_FILTER"}

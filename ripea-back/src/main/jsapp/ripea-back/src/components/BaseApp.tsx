@@ -220,7 +220,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
         routerUseLocationPath={useLocationPath}
         routerAnyHistoryEntryExist={anyHistoryEntryExist}
         linkComponent={Link}
-        marginsDisabled
+        marginsDisabled={false}
         formFieldComponents={[{ type: 'reference', component: AppFormFieldReference }]}
         menuEntries={baseAppMenuEntries}>
         <CustomLocalizationProvider>

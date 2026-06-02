@@ -135,7 +135,7 @@ const EnviarPortafirmesGrid = () => {
         },
     ]
 
-    return <GridPage disableMargins>
+    return <GridPage>
         <CardPage title={t('navigate.massiu.portafirmes')}>
             {!haveRequirements &&
                 <Alert severity={'info'} sx={{mb: 1}}>{t('page.document.alert.portafirmes')}</Alert>}

@@ -228,7 +228,7 @@ const MetaDadaGrid = () => {
     if (error)
         return <ErrorPage error={error}/>
 
-    return <GridPage disableMargins>
+    return <GridPage>
         <CardPage title={t('page.user.menu.documentDada', {nom: metaDocument?.nom})}
                   header={<>
                       <Button

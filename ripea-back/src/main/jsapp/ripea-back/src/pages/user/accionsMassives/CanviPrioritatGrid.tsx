@@ -36,7 +36,7 @@ const CanviPrioritatGrid = () => {
         },
     ]
 
-    return <GridPage disableMargins>
+    return <GridPage>
         <CardPage title={t('navigate.massiu.canviPrioritats')}>
             <CanviEstatFilter
                 sessionKey={"MASSIVE_CANVI_PRIORITAT_FILTER"}

@@ -164,7 +164,7 @@ const RemesesNotibGrid = () => {
         },
     ]
 
-    return <GridPage disableMargins>
+    return <GridPage>
         <CardPage title={t('page.user.menu.notib')}>
             <RemesesNotibFilter onSpringFilterChange={setSpringFilter}/>
 

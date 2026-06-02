@@ -152,7 +152,7 @@ const DocumentEnviatsPortafirmesGrid = () => {
         },
     ]
 
-    return <GridPage disableMargins>
+    return <GridPage>
         <CardPage title={t('page.user.menu.portafib')}>
             <DocumentEnviatsPortafirmesFilter onSpringFilterChange={setSpringFilter}/>
 

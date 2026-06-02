@@ -47,7 +47,7 @@ const TipusDocumentalGrid = () => {
         },
     ]
 
-    return <GridPage disableMargins>
+    return <GridPage>
         <CardPage title={t('page.user.menu.nti')}>
             <StyledMuiGrid
                 resourceName={"tipusDocumentalResource"}

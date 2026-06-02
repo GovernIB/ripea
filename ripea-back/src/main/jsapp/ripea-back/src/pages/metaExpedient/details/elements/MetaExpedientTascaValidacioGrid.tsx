@@ -152,7 +152,7 @@ const MetaExpedientTascaValidacioGrid = () => {
     if (error)
         return <ErrorPage error={error}/>
 
-    return <GridPage disableMargins>
+    return <GridPage>
         <Load value={metaExpedientTasca}>
             <CardPage title={t('page.metaExpedientTasca.detall.validacio', {nom: metaExpedientTasca?.nom})}
                       header={<>
