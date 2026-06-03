@@ -29,13 +29,13 @@ const ExpedientFilterForm = () => {
             <GridFormField size={{xs: 12, sm: 6, md: 2}} name="numero"/>
             <GridFormField size={{xs: 12, sm: 6, md: 2}} name="nom"/>
             <GridFormField size={{xs: 12, sm: 6, md: 2}} name="metaExpedient" filter={filterMetaExpedient}/>
-            <GridFormField size={{xs: 12, sm: 6, md: 2}} name="estat" requestParams={requestParamsEstat} />
+            <GridFormField size={{xs: 12, sm: 6, md: 2}} name="estatCustom" requestParams={requestParamsEstat} />
             <GridFormField size={{xs: 12, sm: 6, md: 2}} name="dataCreacioInici"/>
         </>}
         {(data?.advanced) && <>
             <GridFormField size={{xs: 12, sm: 6, md: 3}} name="numero"/>
             <GridFormField size={{xs: 12, sm: 6, md: 3}} name="nom"/>
-            <GridFormField size={{xs: 12, sm: 6, md: 3}} name="estat" requestParams={requestParamsEstat} />
+            <GridFormField size={{xs: 12, sm: 6, md: 3}} name="estatCustom" requestParams={requestParamsEstat} />
             <GridFormField size={{xs: 12, sm: 6, md: 3}} name="interessat"/>
             <GridFormField size={{xs: 12, sm: 6, md: 3}} name="organGestor" />
             <GridFormField size={{xs: 12, sm: 6, md: 3}} name="metaExpedient" filter={filterMetaExpedient}/>
@@ -69,13 +69,8 @@ export const springFilterBuilder = (data: any, user?: any, rol?: any): string =>
     filterStr += builder.and(
         builder.like("numero", data.numero),
         builder.like("nom", data.nom),
-		data.estat && (
-		    (data.estat === 'OBERT' || data.estat === '0')
-		        ? builder.neq("estat", `'TANCAT'`)
-		        : (data.estat === 'TANCAT' || data.estat === '-1')
-		            ? builder.eq("estat", `'TANCAT'`)
-		            : data.metaExpedient?.id && builder.eq("estatAdditional.id", data.estat)
-		),
+        data.estatCustom && builder.equals("estat", `'TANCAT'`, (data.estatCustom === '-1')),
+        data.estatCustom && (data.estatCustom != '0' && data.estatCustom != '-1') && builder.eq("estatAdditional.id", data.estatCustom),
         builder.exists(
             builder.or(
                 builder.like("interessats.documentNum", data.interessat),

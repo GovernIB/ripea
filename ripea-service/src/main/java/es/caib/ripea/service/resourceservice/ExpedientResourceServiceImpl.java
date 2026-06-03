@@ -2146,7 +2146,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         @Override
         public List<FieldOption> getOptions(String fieldName, Map<String, String[]> requestParameterMap) {
             List<FieldOption> resultat = new ArrayList<FieldOption>();
-            if(ExpedientResource.ExpedientFilterForm.Fields.estat.equals(fieldName)) {
+            if(ExpedientResource.ExpedientFilterForm.Fields.estatCustom.equals(fieldName)) {
                 resultat.add(new FieldOption("0", messageHelper.getMessage("es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto.OBERT")));
                 if (!requestParameterMap.containsKey("withoutTancar"))
                     resultat.add(new FieldOption("-1", messageHelper.getMessage("es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto.TANCAT")));
