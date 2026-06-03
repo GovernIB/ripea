@@ -99,7 +99,8 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 			"			from RegistreInteressatEntity interessat " +	
 			"			where (lower(interessat.documentNumero||' '||interessat.nom||' '||interessat.llinatge1||' '||interessat.llinatge2) like lower('%'||:interessat||'%')" +
 			"					or lower(interessat.raoSocial) like lower('%'||:interessat||'%')" +
-			"					or lower(interessat.documentNumero) like lower('%'||:interessat||'%')))) "			
+			"					or lower(interessat.documentNumero) like lower('%'||:interessat||'%')))) " +
+			"and (:isGrupIdNull = true or ep.grup.id = :grupId)"
 			)
 	Page<ExpedientPeticioEntity> findByEntitatAndFiltre(
 			@Param("entitat") EntitatEntity entitat,
@@ -132,7 +133,9 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 			@Param("esNullAccio") boolean esNullAccio,
 			@Param("accio") ExpedientPeticioAccioEnumDto accio, 
 			@Param("esNullInteressat") boolean esNullInteressat, 
-			@Param("interessat") String interessat, 
+			@Param("interessat") String interessat,
+			@Param("isGrupIdNull") boolean isGrupIdNull,
+			@Param("grupId") Long grupId,
 			Pageable pageable);
 
 	@Query("select " +

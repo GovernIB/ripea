@@ -93,19 +93,30 @@ table.dataTable td {
 						inline="true"/>	
 			</div>
  --%>			
-			<div class="col-md-4">							
+			<div class="col-md-4">
 				<rip:inputDate name="dataInicial" inline="true" placeholderKey="expedient.peticio.list.placeholder.dataInicial"/>
 			</div>	
-			<div class="col-md-4">							
+			<div class="col-md-4">
 				<rip:inputDate name="dataFinal" inline="true" placeholderKey="expedient.peticio.list.placeholder.dataFinal"/>
-			</div>	
-			<div class="col-md-4">							
-				<rip:inputSelect name="estat" inline="true" optionEnum="ExpedientPeticioEstatViewEnumDto" emptyOption="true" placeholderKey="expedient.peticio.list.placeholder.estat" templateResultFunction="showEstat"/>
-			</div>		
+			</div>
+            <div class="col-md-3">
+                <rip:inputSelect name="estat" inline="true" optionEnum="ExpedientPeticioEstatViewEnumDto" emptyOption="true" placeholderKey="expedient.peticio.list.placeholder.estat" templateResultFunction="showEstat"/>
+            </div>
 			<div class="col-md-4">
 				<rip:inputText name="interessat" inline="true" placeholderKey="expedient.list.user.placeholder.creacio.interessat"/>
-			</div>						
-			<div class="col-md-3 pull-right">
+			</div>
+			<div class="col-md-3">
+               <rip:inputSelect
+                     name="grupId"
+                     optionItems="${grups}"
+                     optionMinimumResultsForSearch="1"
+                     optionValueAttribute="id"
+                     emptyOption="true"
+                     optionTextAttribute="descripcio"
+                     placeholderKey="expedient.peticio.list.placeholder.grup"
+                     inline="true"/>
+            </div>
+			<div class="col-md-2 pull-right">
 				<div class="pull-right">
 					<button type="submit" name="accio" value="filtrar" class="btn btn-primary" style="display:none;"></button>
 					<button type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>

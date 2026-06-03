@@ -404,7 +404,9 @@ public class SeguimentServiceImpl implements SeguimentService {
 				filtre.getAccioEnum() == null,
 				filtre.getAccioEnum(), 
 				StringUtils.isEmpty(filtre.getInteressat()), 
-				filtre.getInteressat() != null ? StringUtils.trim(filtre.getInteressat()) : "", 
+				filtre.getInteressat() != null ? StringUtils.trim(filtre.getInteressat()) : "",
+				filtre.getGrupId() == null,
+				filtre.getGrupId(),
 				paginacioHelper.toSpringDataPageable(
 						paginacioParams,
 						null));

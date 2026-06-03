@@ -140,6 +140,7 @@ public class ExpedientPeticioResource extends BaseAuditableResource<Long> {
         private Date dataRecepcioFinal;
         private ExpedientPeticioEstatViewEnumDto estat = ExpedientPeticioEstatViewEnumDto.PENDENT;
         private String interessat;
+        private ResourceReference<GrupResource, Long> grup;
     }
 
     @Getter

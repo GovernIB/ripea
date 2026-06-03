@@ -139,6 +139,13 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		model.addAttribute("metaExpedients", metaExpedientsPermesos);
 		model.addAttribute("isRolActualAdmin", rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN"));
 
+		List<GrupDto> grupsPermesos = expedientPeticioService.findGrupsPermesosPerAnotacions(
+				entitatActual.getId(),
+				organActualId,
+				rolActual
+		);
+		model.addAttribute("grups", grupsPermesos);
+
 		// Actualitzar nombre d'anotacions pendents
 		AnotacionsPendentsHelper.resetCounterAnotacionsPendents(request);
 

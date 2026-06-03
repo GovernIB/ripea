@@ -18,8 +18,9 @@ const AnotacioFilterForm = () => {
             <GridFormField size={{xs: 12, sm: 6, md: 4}} name="extracte"/>
             <GridFormField size={{xs: 12, sm: 6, md: 4}} name="destinacio"/>
             <GridFormField size={{xs: 12, sm: 6, md: 4}} name="metaExpedient"/>
-            <GridFormField size={{xs: 12, sm: 6, md: 4}} name="dataRecepcioInicial" type={"date"}/>
-            <GridFormField size={{xs: 12, sm: 6, md: 4}} name="dataRecepcioFinal" type={"date"}/>
+            <GridFormField size={{xs: 12, sm: 6, md: 2}} name="dataRecepcioInicial" type={"date"}/>
+            <GridFormField size={{xs: 12, sm: 6, md: 2}} name="dataRecepcioFinal" type={"date"}/>
+            <GridFormField size={{xs: 12, sm: 6, md: 4}} name="grup" />
             <GridFormField size={{xs: 12, sm: 6, md: 4}} name="estat"/>
             <GridFormField size={{xs: 12, sm: 6, md: 4}} name="interessat"/>
         </>}
@@ -33,6 +34,7 @@ const springFilterBuilder = (data: any): string => {
         builder.likeNormalized("registre.destiCodiINomFiltre", data.destinacio),
         builder.eq("metaExpedient.id", data?.metaExpedient?.id),
         builder.betweenDates("registre.data", data.dataRecepcioInicial, data.dataRecepcioFinal),
+        builder.eq("grup.id", data?.grup?.id),
 
         data.estat == 'ACCEPTAT'
             ? builder.like("estat", "PROCESSAT")

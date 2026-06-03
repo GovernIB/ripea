@@ -26,6 +26,7 @@ public class ExpedientPeticioFiltreCommand {
 	private Long metaExpedientId;
 	private String procedimentCodi;
 	private String interessat;
+	private Long grupId;
 	
 	private ExpedientPeticioEstatPendentDistribucioEnumDto estatPendentEnviarDistribucio;
 	
@@ -77,9 +78,10 @@ public class ExpedientPeticioFiltreCommand {
 			boolean nomesAmbErrorsConsulta) {
 		this.nomesAmbErrorsConsulta = nomesAmbErrorsConsulta;
 	}
+	public void setGrupId(Long grupId) {
+		this.grupId = grupId;
+	}
 
-	
-	
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);

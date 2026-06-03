@@ -10,6 +10,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import es.caib.ripea.persistence.entity.*;
+import es.caib.ripea.persistence.repository.*;
+import es.caib.ripea.service.helper.*;
+import es.caib.ripea.service.intf.config.BaseConfig;
+import es.caib.ripea.service.intf.dto.*;
+import es.caib.ripea.service.permission.ExtendedPermission;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -27,57 +33,7 @@ import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
 import es.caib.plugins.arxiu.api.Firma;
 import es.caib.plugins.arxiu.api.FirmaTipus;
-import es.caib.ripea.persistence.entity.DocumentEntity;
-import es.caib.ripea.persistence.entity.EntitatEntity;
-import es.caib.ripea.persistence.entity.ExpedientEntity;
-import es.caib.ripea.persistence.entity.ExpedientPeticioEntity;
-import es.caib.ripea.persistence.entity.InteressatEntity;
-import es.caib.ripea.persistence.entity.MetaExpedientEntity;
-import es.caib.ripea.persistence.entity.RegistreAnnexEntity;
-import es.caib.ripea.persistence.entity.RegistreEntity;
-import es.caib.ripea.persistence.entity.RegistreInteressatEntity;
-import es.caib.ripea.persistence.repository.DocumentRepository;
-import es.caib.ripea.persistence.repository.EntitatRepository;
-import es.caib.ripea.persistence.repository.ExpedientPeticioRepository;
-import es.caib.ripea.persistence.repository.ExpedientRepository;
-import es.caib.ripea.persistence.repository.MetaExpedientRepository;
-import es.caib.ripea.persistence.repository.RegistreAnnexRepository;
-import es.caib.ripea.persistence.repository.RegistreRepository;
-import es.caib.ripea.service.helper.AnotacioDistribucioHelper;
-import es.caib.ripea.service.helper.CacheHelper;
-import es.caib.ripea.service.helper.ConfigHelper;
-import es.caib.ripea.service.helper.ConversioTipusHelper;
-import es.caib.ripea.service.helper.DateHelper;
-import es.caib.ripea.service.helper.EntityComprovarHelper;
-import es.caib.ripea.service.helper.ExpedientHelper;
-import es.caib.ripea.service.helper.ExpedientPeticioHelper;
-import es.caib.ripea.service.helper.MetaExpedientHelper;
-import es.caib.ripea.service.helper.OrganGestorHelper;
-import es.caib.ripea.service.helper.PaginacioHelper;
-import es.caib.ripea.service.helper.PermisosPerAnotacions;
-import es.caib.ripea.service.helper.PluginHelper;
-import es.caib.ripea.service.helper.SynchronizationHelper;
 import es.caib.ripea.service.intf.config.PropertyConfig;
-import es.caib.ripea.service.intf.dto.ArxiuFirmaDto;
-import es.caib.ripea.service.intf.dto.DocumentDto;
-import es.caib.ripea.service.intf.dto.ExpedientDto;
-import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
-import es.caib.ripea.service.intf.dto.ExpedientPeticioDto;
-import es.caib.ripea.service.intf.dto.ExpedientPeticioEstatEnumDto;
-import es.caib.ripea.service.intf.dto.ExpedientPeticioEstatViewEnumDto;
-import es.caib.ripea.service.intf.dto.ExpedientPeticioFiltreDto;
-import es.caib.ripea.service.intf.dto.ExpedientPeticioListDto;
-import es.caib.ripea.service.intf.dto.FitxerDto;
-import es.caib.ripea.service.intf.dto.MassiuAnnexProcesarFiltreDto;
-import es.caib.ripea.service.intf.dto.MetaExpedientDto;
-import es.caib.ripea.service.intf.dto.MetaExpedientSelectDto;
-import es.caib.ripea.service.intf.dto.PaginaDto;
-import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
-import es.caib.ripea.service.intf.dto.RegistreAnnexDto;
-import es.caib.ripea.service.intf.dto.RegistreDto;
-import es.caib.ripea.service.intf.dto.RegistreJustificantDto;
-import es.caib.ripea.service.intf.dto.ResultDto;
-import es.caib.ripea.service.intf.dto.ResultEnumDto;
 import es.caib.ripea.service.intf.service.ExpedientPeticioService;
 import es.caib.ripea.service.intf.utils.DateUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -104,6 +60,8 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	@Autowired private OrganGestorHelper organGestorHelper;
 	@Autowired private MetaExpedientHelper metaExpedientHelper;
 	@Autowired private AnotacioDistribucioHelper anotacioDistribucioHelper;
+	@Autowired private GrupRepository grupRepository;
+	@Autowired private PermisosHelper permisosHelper;
 	
 	@Transactional(readOnly = true)
 	@Override
@@ -187,7 +145,9 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				filtre.getAccioEnum() == null,
 				filtre.getAccioEnum(), 
 				StringUtils.isEmpty(filtre.getInteressat()), 
-				filtre.getInteressat() != null ? StringUtils.trim(filtre.getInteressat()) : "", 
+				filtre.getInteressat() != null ? StringUtils.trim(filtre.getInteressat()) : "",
+				filtre.getGrupId() == null,
+				filtre.getGrupId(),
 				paginacioHelper.toSpringDataPageable(
 						paginacioParams,
 						ordenacioMap));
@@ -207,8 +167,33 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		return result;
 
 	}
-	
-	
+
+	@Transactional(readOnly = true)
+	@Override
+	public List<GrupDto> findGrupsPermesosPerAnotacions(
+			Long entitatId,
+			Long organActualId,
+			String rolActual) {
+		List<GrupEntity> grupsEntities = new ArrayList<GrupEntity>();
+
+		if (rolActual.equals(BaseConfig.ROLE_ADMIN) || rolActual.equals(BaseConfig.ROLE_ADMIN_LECTURA)) {
+			grupsEntities = grupRepository.findByEntitatId(entitatId);
+		} else {
+			List<Long> idsGrupsPermesos = permisosHelper.getObjectsIdsWithPermission(GrupEntity.class, ExtendedPermission.READ);
+
+			if (idsGrupsPermesos != null && !idsGrupsPermesos.isEmpty()) {
+				grupsEntities = grupRepository.findAllById(idsGrupsPermesos);
+			}
+		}
+
+		List<GrupDto> grupsDtos = new ArrayList<GrupDto>();
+		for (GrupEntity entity : grupsEntities) {
+			grupsDtos.add(conversioTipusHelper.convertir(entity, GrupDto.class));
+		}
+
+		return grupsDtos;
+	}
+
 	@Transactional(readOnly = true)
 	@Override
 	public ResultDto<ExpedientPeticioListDto> findComunicadesAmbFiltre(
