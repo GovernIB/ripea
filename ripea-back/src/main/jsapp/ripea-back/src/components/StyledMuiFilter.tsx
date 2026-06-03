@@ -120,10 +120,12 @@ const StyledMuiFilter = (props:any) => {
                 {advancedSearch && <GridButtonField
                     size={buttonSize}
                     name={"advanced"}
-                    title={t('common.advancedSearchOpen')}
-                    titleActive={t('common.advancedSearchClose')}
-                    icon={<CombinedIcon base={"zoom_in"} badge={"expand_more"}/>}
-                    iconActive={<CombinedIcon base={"zoom_out"} badge={"expand_less"}/>}
+                    title={(active:boolean) => active
+                        ?t('common.advancedSearchClose')
+                        :t('common.advancedSearchOpen')}
+                    icon={(active:boolean) => active
+                        ?<CombinedIcon base={"zoom_out"} badge={"expand_less"}/>
+                        :<CombinedIcon base={"zoom_in"} badge={"expand_more"}/>}
                 />}
                 {
                     buttons?.map((button:FilterButtonProps)=>
