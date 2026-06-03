@@ -1,13 +1,18 @@
 import {ThemeOptions, createTheme, darken} from '@mui/material/styles';
-import backgroundPattern from './assets/background-pattern.png';
 import type {} from '@mui/x-data-grid/themeAugmentation';
+
+// Diagonal hatch pattern reproduced with CSS (no image asset).
+// 1px lines every 3px at 45deg. Colors are overridden per theme below.
+const hatchPattern = (line: string) =>
+    `repeating-linear-gradient(45deg, ${line}, ${line} 1px, transparent 1px, transparent 3px)`;
 
 const base: ThemeOptions = {
     components: {
         MuiCssBaseline: {
             styleOverrides: {
                 body: {
-                    backgroundImage: `url(${backgroundPattern})`,
+                    backgroundColor: '#ffffff',
+                    backgroundImage: hatchPattern('#e1e1e1'),
                     color: '#666666'
                 },
                 '.multi-line-cell': {
@@ -347,6 +352,10 @@ export const darkTheme = createTheme(base, {
     components: {
         MuiCssBaseline: {
             styleOverrides: {
+                body: {
+                    backgroundColor: '#1c1c1c',
+                    backgroundImage: hatchPattern('#2a2a2a'),
+                },
                 '.input': {
                     '& .MuiInputBase-root, & .MuiPickersInputBase-root': {
                         color: 'inherit',

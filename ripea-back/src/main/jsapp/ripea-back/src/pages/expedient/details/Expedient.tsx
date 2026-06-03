@@ -379,7 +379,7 @@ const Expedient = () => {
             <ContingutBreadcrumb expedient={expedient} carpetaNode={isCarpetaUrl ? carpetaNode : null} />
         </Box>
         <Box>
-            <Typography variant={"subtitle1"} component="p" sx={{border}} px={2} hidden={!expedient?.agafatPer}>
+            <Typography variant={"subtitle1"} component="p" sx={{border, flexShrink: 0, whiteSpace: 'nowrap', bgcolor: (theme) => theme.palette.mode === 'dark' ? '#464646' : '#ffffff'}} px={2} hidden={!expedient?.agafatPer}>
                 {t('page.expedient.title')} {t('page.expedient.detall.agafatPer')}: {expedient?.agafatPer?.description}
                 {expedient?.agafatPer?.id == user?.codi &&
                     <IconButton aria-label="lock_open" color={"inherit"} onClick={() => alliberar(expedient?.id, expedient)} title={t('page.expedient.action.lliberar.label')}>
