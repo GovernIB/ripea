@@ -27,7 +27,7 @@ const ExpedientFilterForm = () => {
     return <>
         {(!data?.advanced) && <>
             <GridFormField size={{xs: 12, sm: 6, md: 2}} name="numero"/>
-            <GridFormField size={{xs: 12, sm: 6, md: 1}} name="nom"/>
+            <GridFormField size={{xs: 12, sm: 6, md: 2}} name="nom"/>
             <GridFormField size={{xs: 12, sm: 6, md: 2}} name="metaExpedient" filter={filterMetaExpedient}/>
             <GridFormField size={{xs: 12, sm: 6, md: 2}} name="estat" requestParams={requestParamsEstat} />
             <GridFormField size={{xs: 12, sm: 6, md: 2}} name="dataCreacioInici"/>
@@ -131,7 +131,8 @@ const ExpedientFilter = (props: any) => {
         )}
         onSpringFilterChange={onSpringFilterChange}
         advancedSearch
-        buttonGridProps={{size: {xs: 12, sm: 6, md: 3}}}
+        buttonGridProps={{size: {xs: 12, sm: 6, md: 2}}}
+        buttonIconOnlyBreakpoint={'xl'}
     >
         <ExpedientFilterForm/>
     </StyledMuiFilter>

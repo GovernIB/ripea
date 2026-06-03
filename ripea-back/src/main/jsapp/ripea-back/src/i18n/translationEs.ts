@@ -36,6 +36,8 @@ const translationEs = {
         },
         nouPermis: "Nuevo permiso",
         advancedSearch: "Búsqueda avanzada",
+        advancedSearchOpen: "Abrir la búsqueda avanzada",
+        advancedSearchClose: "Cerrar la búsqueda avanzada",
         error: {
             status: "Código de error",
             title: "Título",

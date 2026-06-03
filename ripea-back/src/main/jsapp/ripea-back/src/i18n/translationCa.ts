@@ -36,6 +36,8 @@ const translationCa = {
         },
         nouPermis: "Nou permís",
         advancedSearch: 'Cerca avançada',
+        advancedSearchOpen: 'Obre la cerca avançada',
+        advancedSearchClose: 'Tanca la cerca avançada',
         error: {
             status: "Codi d'error",
             title: "Títol",

@@ -3,7 +3,7 @@ import {MuiFilter, useFilterApiRef} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {useSession} from "./SessionStorageContext.tsx";
 import {useEffect, useMemo} from "react";
-import {GridButton, GridButtonField} from "./GridFormField.tsx";
+import {CombinedIcon, GridButton, GridButtonField} from "./GridFormField.tsx";
 
 const filterStyle = { className: "styledFilter" };
 
@@ -55,6 +55,7 @@ const StyledMuiFilter = (props:any) => {
         code,
         sessionKey = code,
         advancedSearch = false,
+        buttonIconOnlyBreakpoint = 'lg',
         ...other
     } = props
 
@@ -110,13 +111,21 @@ const StyledMuiFilter = (props:any) => {
             {children}
 
             <Grid container direction={"row"} columnSpacing={1} rowSpacing={1} size={{xs: 12, sm: 6, md: 2.4}} sx={{ display: 'flex', justifyContent: 'end', marginLeft: 'auto' }} {...buttonGridProps}>
-                {advancedSearch && <GridButtonField size={buttonSize} name={"advanced"} title={t('common.advancedSearch')} icon={"manage_search"}/>}
+                {advancedSearch && <GridButtonField
+                    size={buttonSize}
+                    name={"advanced"}
+                    title={t('common.advancedSearchOpen')}
+                    titleActive={t('common.advancedSearchClose')}
+                    icon={<CombinedIcon base={"zoom_in"} badge={"expand_more"}/>}
+                    iconActive={<CombinedIcon base={"zoom_out"} badge={"expand_less"}/>}
+                />}
                 {
                     buttons?.map((button:FilterButtonProps)=>
                         <GridButton size={buttonSize}
                                     key={button.value}
                                     title={button.text}
                                     icon={button.icon}
+                                    iconOnlyBreakpoint={buttonIconOnlyBreakpoint}
                                     onClick={() => callback(button.value)}
                                     {...button?.componentProps}>
                             <Typography sx={{paddingLeft: '5px', marginTop: '1px', maxWidth: 'max-content'}}>{button.text}</Typography>
