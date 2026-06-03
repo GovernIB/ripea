@@ -110,7 +110,7 @@ const StyledMuiFilter = (props:any) => {
             {children}
 
             <Grid container direction={"row"} columnSpacing={1} rowSpacing={1} size={{xs: 12, sm: 6, md: 2.4}} sx={{ display: 'flex', justifyContent: 'end', marginLeft: 'auto' }} {...buttonGridProps}>
-                {advancedSearch && <GridButtonField size={buttonSize} name={"advanced"} title={t('common.advancedSearch')} icon={"search"}/>}
+                {advancedSearch && <GridButtonField size={buttonSize} name={"advanced"} title={t('common.advancedSearch')} icon={"manage_search"}/>}
                 {
                     buttons?.map((button:FilterButtonProps)=>
                         <GridButton size={buttonSize}

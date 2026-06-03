@@ -152,7 +152,7 @@ const ExecucioMassivaGrid = () => {
             columns={columns}
             rowAdditionalActions={actions}
             autoHeight
-            paginationModel={{page: 0, pageSize: 5}}
+            paginationModel={{page: 0, pageSize: 10}}
             readOnly
 
             toolbarElementsWithPositions={[
@@ -357,9 +357,8 @@ export const useExecucioMassivaContingut = () => {
                 apiRef={gridApiRef}
                 sortModel={sortModelContingut}
                 columns={columnsContingut}
-                paginationActive
                 autoHeight
-                paginationModel={{page: 0, pageSize: 5}}
+                paginationModel={{page: 0, pageSize: 10}}
                 readOnly
 
                 rowProps={(row: any) => {
