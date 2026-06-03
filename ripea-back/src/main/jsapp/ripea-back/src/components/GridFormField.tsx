@@ -37,14 +37,14 @@ export const GridButton = (props:any) => {
             aria-label={(title && (iconOnly || !children)) ? title : undefined}
             {...other}
         >
-            {icon && iconNode}
+            {iconNode}
             {!iconOnly && children}
         </Button>
     </Grid>
 }
 
 export const GridButtonField = (props:any) => {
-    const {name, whitLabel, icon, iconActive, title, titleActive, ...other} = props;
+    const {name, whitLabel, icon, title, ...other} = props;
     const {data, apiRef, fields} = useFormContext()
 
     const active = !!data?.[name]
@@ -54,8 +54,8 @@ export const GridButtonField = (props:any) => {
             apiRef?.current?.setFieldValue?.(name, !active)
         }}
         variant={ active ?"contained":"outlined" }
-        title={(active && titleActive) ? titleActive : (title ?? label)}
-        icon={(active && iconActive) ? iconActive : icon}
+        title={(typeof title === 'function') ? title?.(active) :(title ?? label)}
+        icon={(typeof icon === 'function') ? icon?.(active) :icon}
         {...other}
     >
         {whitLabel && label}
