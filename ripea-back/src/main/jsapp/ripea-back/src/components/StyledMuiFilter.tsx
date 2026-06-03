@@ -7,6 +7,12 @@ import {CombinedIcon, GridButton, GridButtonField} from "./GridFormField.tsx";
 
 const filterStyle = { className: "styledFilter" };
 
+// Width (px) below which the advanced-filter action buttons collapse to
+// icon-only, so their text never gets clipped in the narrow button container.
+// Shared by the filters that use advancedSearch (Expedient, Tasques, Anotacions)
+// to keep their collapse point in sync.
+export const FILTER_ADVANCED_ICON_ONLY_BREAKPOINT = 1615;
+
 export type FilterButtonProps = {
     value: string;
     text?: string;

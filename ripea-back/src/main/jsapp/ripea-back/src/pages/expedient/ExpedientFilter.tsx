@@ -3,7 +3,7 @@ import {useMemo} from "react";
 import {useFormContext} from 'reactlib';
 import GridFormField, {GridButtonField} from "../../components/GridFormField.tsx";
 import {useUserSession} from "../../components/Session.tsx";
-import StyledMuiFilter from "../../components/StyledMuiFilter.tsx";
+import StyledMuiFilter, {FILTER_ADVANCED_ICON_ONLY_BREAKPOINT} from "../../components/StyledMuiFilter.tsx";
 import * as builder from '../../util/springFilterUtils';
 
 const ExpedientFilterForm = () => {
@@ -56,9 +56,9 @@ const ExpedientFilterForm = () => {
                 <Grid size={{xs: 12, sm: 12, md: 2}} hidden={!rol?.isUser}/>
                 <Grid size={{xs: 12, sm: 12, md: 6}} hidden={user?.sessionScope?.isDominisEnabled}/>
 
-            <GridButtonField size={{xs: rol?.isUser ?4 :6, sm: 1.5}} name={'agafat'} icon={'lock'} whitLabel/>
-            <GridButtonField size={{xs: rol?.isUser ?4 :6, sm: 1.5}} name={'pendentFirmar'} icon={'edit'} whitLabel/>
-            <GridButtonField size={{xs: 4, sm: 1.5}} name={'seguit'} icon={'group_add'} hidden={!rol?.isUser} whitLabel/>
+            <GridButtonField size={{xs: rol?.isUser ?4 :6, sm: 1.5}} name={'agafat'} icon={'lock'} iconOnlyBreakpoint={FILTER_ADVANCED_ICON_ONLY_BREAKPOINT} whitLabel/>
+            <GridButtonField size={{xs: rol?.isUser ?4 :6, sm: 1.5}} name={'pendentFirmar'} icon={'edit'} iconOnlyBreakpoint={FILTER_ADVANCED_ICON_ONLY_BREAKPOINT} whitLabel/>
+            <GridButtonField size={{xs: 4, sm: 1.5}} name={'seguit'} icon={'group_add'} iconOnlyBreakpoint={FILTER_ADVANCED_ICON_ONLY_BREAKPOINT} hidden={!rol?.isUser} whitLabel/>
         </>}
     </>
 }
@@ -132,7 +132,7 @@ const ExpedientFilter = (props: any) => {
         onSpringFilterChange={onSpringFilterChange}
         advancedSearch
         buttonGridProps={{size: {xs: 12, sm: 6, md: 2}}}
-        buttonIconOnlyBreakpoint={'xl'}
+        buttonIconOnlyBreakpoint={FILTER_ADVANCED_ICON_ONLY_BREAKPOINT}
     >
         <ExpedientFilterForm/>
     </StyledMuiFilter>
