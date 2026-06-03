@@ -450,7 +450,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
 		private String numero;
         private String nom;
         @ResourceField(enumType = true)
-        private String estat = "0";
+        private String estatCustom = "0";
         private String interessat;
         private ResourceReference<OrganGestorResource, Long> organGestor;
         private ResourceReference<MetaExpedientResource, Long> metaExpedient;
@@ -620,7 +620,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
         private Date dataCreacioInici;
         private Date dataCreacioFi;
         @ResourceField(enumType = true)
-        private String estat;
+        private String estatCustom;
         private PrioritatEnumDto prioritat;
         private ResourceReference<GrupResource, Long> grup;
         private boolean mostrarGrups;
