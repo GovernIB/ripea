@@ -230,7 +230,12 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
             rowHideUpdateButton
             rowHideDeleteButton
             readOnly={readOnly ?true :undefined}
-
+            sx={{
+                '& .MuiDataGrid-cell': {
+                    paddingTop: '5px',
+                    paddingBottom: '5px',
+                },
+            }}
             {...others}
             {...paginationProps}
         />

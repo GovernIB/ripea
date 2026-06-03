@@ -294,12 +294,6 @@ const ExpedientGrid = () => {
                             createSuccess: 'page.expedient.action.new.ok',
                             updateSuccess: 'page.expedient.action.update.ok',
                         }}
-                        sx={{
-                            '& .MuiDataGrid-cell': {
-                                paddingTop: '5px',
-                                paddingBottom: '5px',
-                            },
-                        }}
                     />
                 </Load>
                 {components}
