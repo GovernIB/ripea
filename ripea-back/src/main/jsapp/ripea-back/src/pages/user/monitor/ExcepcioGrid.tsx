@@ -115,7 +115,7 @@ export const ExcepcioGrid = () => {
         },
     ], [apiIsReady]);
 
-    return <GridPage>
+    return <GridPage autoHeight>
         <CardPage title={t('navigate.exception')}>
             <StyledMuiGrid
                 resourceName={"excepcioLogResource"}

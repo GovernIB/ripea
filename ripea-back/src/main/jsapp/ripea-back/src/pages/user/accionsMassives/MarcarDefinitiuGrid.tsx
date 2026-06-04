@@ -68,7 +68,7 @@ const MarcarDefinitiuGrid = () => {
         },
     ]
 
-    return <GridPage>
+    return <GridPage autoHeight>
         <CardPage title={t('navigate.massiu.definitiu')}>
             <EnviarPortafirmesFilter
                 sessionKey={"MASSIVE_DEFINITIVE_FILTER"}

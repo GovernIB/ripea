@@ -11,6 +11,7 @@ import {useActions} from "../../contingut/details/ContingutActions.tsx";
 import {useMassiveActions} from "../../contingut/details/ContingutMassiveActions.tsx";
 
 const namedQueriesCsv: string[] = ['MASSIU_ENLLAC_CSV']
+const perspectives: string[] = ['RESUM']
 const sortModel: any = [{field: 'createdDate', sort: 'desc'}]
 const columns = [
     {
@@ -62,7 +63,7 @@ const CopiarEnllacCSVGrid = () => {
         },
     ]
 
-    return <GridPage>
+    return <GridPage autoHeight>
         <CardPage title={t('navigate.massiu.csv')}>
             <EnviarPortafirmesFilter
                 sessionKey={"MASSIVE_CSV_FILTER"}
@@ -73,6 +74,7 @@ const CopiarEnllacCSVGrid = () => {
                 resourceName={"documentResource"}
                 columns={columns}
                 filter={springFilter}
+                perspectives={perspectives}
                 sortModel={sortModel}
                 namedQueries={namedQueriesCsv}
                 rowAdditionalActions={actions}

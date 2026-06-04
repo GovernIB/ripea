@@ -126,7 +126,7 @@ const CustodiarExpedientsPendentsGrid = (props:any) => {
         },
     ]
 
-    return <GridPage>
+    return <GridPage autoHeight>
         <CustodiarPendentsFilter
             sessionKey={"MASSIVE_CUSTODIAR_EXPEDIENT_FILTER"}
             springFilterBuilder={springExpedientFilterBuilder}
@@ -224,7 +224,7 @@ const CustodiarDocumentsPendentsGrid = (props:any) => {
         },
     ]
 
-    return <GridPage>
+    return <GridPage autoHeight>
         <CustodiarPendentsFilter
             sessionKey={"MASSIVE_CUSTODIAR_DOCUMENT_FILTER"}
             springFilterBuilder={springDocumentFilterBuilder}
@@ -322,7 +322,7 @@ const CustodiarInteressatsPendentsGrid = (props:any) => {
         },
     ]
 
-    return <GridPage>
+    return <GridPage autoHeight>
         <CustodiarPendentsFilter
             sessionKey={"MASSIVE_CUSTODIAR_INTERESSAT_FILTER"}
             springFilterBuilder={springInteressatFilterBuilder}
@@ -367,7 +367,7 @@ const CustodiarElementsPendentsGrid = () => {
         },
     ]
 
-    return <GridPage>
+    return <GridPage autoHeight>
         <CardPage title={t('navigate.massiu.seguimentArxiuPendents')}>
             <TabComponent
                 tabs={tabs}

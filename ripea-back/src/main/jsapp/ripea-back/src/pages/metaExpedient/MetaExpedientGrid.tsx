@@ -264,7 +264,7 @@ const MetaExpedientGrid = () => {
     const [load, setLoad] = useState<boolean>(true);
     const {value: revisioEstatMssg, save: setRevisioEstatMssg} = useSessionContext('revisioEstatMssg')
 
-    return <GridPage>
+    return <GridPage autoHeight>
         <CardPage title={ rol?.isRevisor ? t('page.user.menu.revisar') : t('page.user.menu.procedimentsTitle')}>
 
             { rol?.isAdmin && user?.sessionScope?.numProcsPendentsRevisio > 0 && !revisioEstatMssg &&

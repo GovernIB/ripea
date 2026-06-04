@@ -47,7 +47,7 @@ const TipusDocumentalGrid = () => {
         },
     ]
 
-    return <GridPage>
+    return <GridPage autoHeight>
         <CardPage title={t('page.user.menu.nti')}>
             <StyledMuiGrid
                 resourceName={"tipusDocumentalResource"}

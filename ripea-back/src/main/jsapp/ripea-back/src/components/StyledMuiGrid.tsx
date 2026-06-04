@@ -170,14 +170,19 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
     }, [columns])
 
     const paginationProps = useMemo(() => {
-        return user?.conf?.numElementsPagina != null
-            ? {
-                getRowHeight: () => 'auto',
-                autoHeight: true,
-                defaultPaginationModel: {page: 0, pageSize: +user?.conf?.numElementsPagina},
-                pageSizeOptions: [10, 20, 50, 100, 250],
-            }
-            : {autoPageSize: true}
+        // En mode auto-height (scroll global de la pàgina) la graella creix amb el
+        // contingut, per això no es pot usar autoPageSize (necessita alçada fixa i
+        // deixaria el cos buit). S'usa sempre autoHeight amb una mida de pàgina per
+        // defecte quan l'usuari no en té cap de configurada.
+        return {
+            getRowHeight: () => 'auto',
+            autoHeight: true,
+            defaultPaginationModel: {
+                page: 0,
+                pageSize: user?.conf?.numElementsPagina != null ? +user?.conf?.numElementsPagina : 10,
+            },
+            pageSizeOptions: [10, 20, 50, 100, 250],
+        }
     }, [user?.conf?.numElementsPagina])
 
     return <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>

@@ -112,7 +112,7 @@ const AnotacionsGrid = () => {
     const {actions, components} = useAnotacioActions(refresh);
     const {handleOpen, dialog} = useAnotacioDetail();
 
-    return <GridPage>
+    return <GridPage autoHeight>
         <CardPage title={t('page.anotacio.filter.title')}>
             <AnotacioFilter onSpringFilterChange={(value:any)=>{
                 setSpringFilter(value)

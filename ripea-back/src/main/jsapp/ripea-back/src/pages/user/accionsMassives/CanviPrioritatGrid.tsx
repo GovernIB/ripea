@@ -36,7 +36,7 @@ const CanviPrioritatGrid = () => {
         },
     ]
 
-    return <GridPage>
+    return <GridPage autoHeight>
         <CardPage title={t('navigate.massiu.canviPrioritats')}>
             <CanviEstatFilter
                 sessionKey={"MASSIVE_CANVI_PRIORITAT_FILTER"}

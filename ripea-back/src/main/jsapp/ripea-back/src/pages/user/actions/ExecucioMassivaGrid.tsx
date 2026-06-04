@@ -94,7 +94,7 @@ const columns = [
         valueFormatter: (value: any) => formatDate(value),
     },
     {
-        field: 'createdBy',
+        field: 'createdByFullName',
         flex: 0.5,
     },
     {

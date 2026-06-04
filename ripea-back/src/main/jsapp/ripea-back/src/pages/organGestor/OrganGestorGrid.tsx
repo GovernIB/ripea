@@ -81,7 +81,7 @@ const OrganGestorGrid = () => {
         }
     ], [treeView])
 
-    return <GridPage>
+    return <GridPage autoHeight>
         <CardPage title={t('page.user.menu.organs')}>
             <OrganGestorFilter onSpringFilterChange={setSpringFilter}/>
 

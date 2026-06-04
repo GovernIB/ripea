@@ -82,7 +82,7 @@ export const EntitatGrid = () => {
 
     const {actions, components} = useEntitatActions(refresh)
 
-    return <GridPage>
+    return <GridPage autoHeight>
         <CardPage title={t('navigate.entitat')}>
             <StyledMuiGrid
                 apiRef={apiRef}

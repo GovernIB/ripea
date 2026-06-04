@@ -107,7 +107,7 @@ const GrupGrid = () => {
         },
     ]
 
-    return <GridPage>
+    return <GridPage autoHeight>
         <CardPage title={t('page.user.menu.grups')}>
             <GrupFilter onSpringFilterChange={setSpringFilter}/>
 

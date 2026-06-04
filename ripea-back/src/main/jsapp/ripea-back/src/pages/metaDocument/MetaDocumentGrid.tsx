@@ -262,7 +262,7 @@ const MetaDocumentGrid = () => {
         },
     ], [t]);
 
-    return <GridPage>
+    return <GridPage autoHeight>
         <CardPage title={t('page.user.menu.documents')}>
             <StyledMuiGrid
                 apiRef={apiRef}

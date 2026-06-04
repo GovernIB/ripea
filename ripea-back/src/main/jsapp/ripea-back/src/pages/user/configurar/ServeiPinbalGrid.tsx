@@ -49,7 +49,7 @@ export const ServeiPinbalGrid = () => {
         },
     ]
 
-    return <GridPage>
+    return <GridPage autoHeight>
         <CardPage title={t('page.user.menu.pinbal')}>
             <StyledMuiGrid
                 resourceName={"pinbalServeiResource"}

@@ -71,7 +71,7 @@ export const IntegracioGrid = () => {
         }
     ], [apiIsReady, value]);
 
-    return <GridPage>
+    return <GridPage autoHeight>
         <CardPage title={t('navigate.integracio')}>
             <IntegracioFilter integracions={integracions} onSpringFilterChange={setSpringFilter}/>
 

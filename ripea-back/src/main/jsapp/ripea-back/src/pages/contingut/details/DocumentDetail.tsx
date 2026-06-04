@@ -45,7 +45,7 @@ const Dada = (props:any) => {
         entity['potModificar'] = potModificar;
     }
 
-    return <GridPage>
+    return <GridPage autoHeight>
         <Box width={'100%'} height={110 + 52 * 4}>
             <MetaDadaGrid entity={entity} onRowCountChange={onRowCountChange} onRefresh={refresh}/>
         </Box>

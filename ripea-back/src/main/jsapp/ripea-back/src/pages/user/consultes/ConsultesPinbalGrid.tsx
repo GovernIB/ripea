@@ -166,7 +166,7 @@ const ConsultesPinbalGrid = () => {
 
     const {apiIsReady, actions, components} = useConsultaPinbalActions(refresh);
 
-    return <GridPage>
+    return <GridPage autoHeight>
         <CardPage title={t('page.user.menu.pinbalEnviades')}>
             <ConsultesPinbalFilter onSpringFilterChange={setSpringFilter}/>
 

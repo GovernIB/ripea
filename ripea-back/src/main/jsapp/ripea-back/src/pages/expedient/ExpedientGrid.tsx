@@ -252,7 +252,7 @@ const ExpedientGrid = () => {
         .filter((col:any)=>!col?.hidden), [user]);
 
     return (
-        <GridPage>
+        <GridPage autoHeight>
             <CardPage title={t('page.expedient.filter.title')}>
                 <ExpedientFilter
                     onSpringFilterChange={(value: any) => {

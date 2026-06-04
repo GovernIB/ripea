@@ -162,7 +162,7 @@ const CanviEstatGrid = () => {
         },
     ]
 
-    return <GridPage>
+    return <GridPage autoHeight>
         <CardPage title={t('navigate.massiu.canviEstat')}>
             {!haveRequirements &&
                 <Alert severity={'info'} sx={{mb: 1}}>{t('page.expedient.alert.canviEstat')}</Alert>}

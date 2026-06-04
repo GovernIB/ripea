@@ -183,7 +183,7 @@ const RevisioMetaExpedientGrid = () => {
         },
     ], [t])
 
-    return <GridPage>
+    return <GridPage autoHeight>
         <CardPage title={t('page.user.menu.revisar')}>
             <RevisioMetaExpedientFilter onSpringFilterChange={setSpringFilter}/>
             <StyledMuiGrid

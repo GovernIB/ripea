@@ -292,7 +292,7 @@ const PermisMetaExpedientGrid = ()=> {
         setTitlePage(t('page.user.menu.procedimentPermis', {nom: entity?.nom}))
     }, [entity]);
 
-    return <GridPage>
+    return <GridPage autoHeight>
         <Load value={entity}>
             <CardPage title={t('page.user.menu.procedimentPermis', {nom: entity?.nom})}
                       header={<>

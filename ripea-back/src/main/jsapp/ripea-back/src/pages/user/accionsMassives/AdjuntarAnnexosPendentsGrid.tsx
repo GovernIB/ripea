@@ -141,7 +141,7 @@ const AdjuntarAnnexosPendentsGrid = () => {
         },
     ]
 
-    return <GridPage>
+    return <GridPage autoHeight>
         <CardPage title={t('navigate.massiu.procesarAnnexosPendents')}>
             
             <Alert severity={'info'} sx={{mb: 1}}>{t('page.anotacio.action.procesarAnnexosPendents.info')}</Alert>

@@ -343,13 +343,13 @@ public class SseResourceController {
     @JmsListener(destination = "firmaNavegadorFinalitzada")
     public void handleEventFirmaNavegadorFinalitzada(FirmaFinalitzadaEvent firmaResultat) {
     	if (firmaResultat != null && firmaResultat.getFirmaResultat() != null && firmaResultat.getFirmaResultat().getUsuari() != null) {
-    		logger.debug("Actualització de EventFirmaNavegadorMassiva a expedients...");
-    		sendToExpedient(
-    				firmaResultat.getExpedientId(),
+    		// S'envia a l'usuari (no a l'expedient) perquè la firma en navegador es pot iniciar
+    		// tant des d'un expedient com des de les accions massives. El canal d'usuari (SseClient)
+    		// està sempre actiu, mentre que el canal d'expedient només existeix dins la vista d'expedient.
+    		logger.debug("Actualització de EventFirmaNavegadorMassiva a usuaris...");
+    		sendToUser(
+    				firmaResultat.getFirmaResultat().getUsuari(),
     				SseEmitter.event().name(UserEventType.FIRMA_FINALITZADA.getEventName()).data(firmaResultat.getFirmaResultat()));
-//    		sendToUser(
-//    				firmaResultat.getFirmaResultat().getUsuari(),
-//    				SseEmitter.event().name(UserEventType.FIRMA_FINALITZADA.getEventName()).data(firmaResultat.getFirmaResultat()));
     	}
     }
 

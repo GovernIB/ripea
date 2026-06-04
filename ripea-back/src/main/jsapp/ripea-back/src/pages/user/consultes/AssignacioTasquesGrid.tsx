@@ -94,7 +94,7 @@ const AssignacioTasquesGrid = () => {
         },
     ]
 
-    return <GridPage>
+    return <GridPage autoHeight>
         <CardPage title={t('page.user.menu.assignacio')}>
             <AssignacioTasquesFilter onSpringFilterChange={setSpringFilter}/>
 

@@ -350,7 +350,7 @@ const ContingutGrid = () => {
         },
     ], [esborratFilter, t, recuperarMassive, esborrarMassive])
 
-    return <GridPage>
+    return <GridPage autoHeight>
         <CardPage title={t('page.user.menu.continguts')}>
             <ContingutFilter
                 sessionKey={sessionKey}
