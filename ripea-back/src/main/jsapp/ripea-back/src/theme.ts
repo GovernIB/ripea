@@ -2,9 +2,16 @@ import {ThemeOptions, createTheme, darken} from '@mui/material/styles';
 import type {} from '@mui/x-data-grid/themeAugmentation';
 
 // Diagonal hatch pattern reproduced with CSS (no image asset).
-// 1px lines every 3px at 45deg. Colors are overridden per theme below.
+// Lines every 3px at 45deg. Colors are overridden per theme below.
+// La línia es defineix amb una rampa suau simètrica (~0.5px a cada costat
+// del pic) en lloc d'una vora dura. A 45° la separació perpendicular real
+// és 3/√2 ≈ 2.12px, un valor fraccionari que no encaixa a la graella de
+// píxels; amb vores dures cada línia cau en una fase sub-píxel diferent i
+// el navegador les renderitza amb gruixos alternats (efecte moiré/batut).
+// La transició gradual fa que totes les línies rebin el mateix anti-aliasing
+// i el patró es vegi uniforme.
 const hatchPattern = (line: string) =>
-    `repeating-linear-gradient(45deg, ${line}, ${line} 1px, transparent 1px, transparent 3px)`;
+    `repeating-linear-gradient(45deg, transparent 0, transparent 0.75px, ${line} 1.25px, transparent 1.75px, transparent 3px)`;
 
 const base: ThemeOptions = {
     components: {
@@ -14,6 +21,17 @@ const base: ThemeOptions = {
                     backgroundColor: '#ffffff',
                     backgroundImage: hatchPattern('#e1e1e1'),
                     color: '#666666'
+                },
+                // Sticky footer: el contenidor arrel de la pàgina (capçalera +
+                // cos + peu) ha d'ocupar com a mínim tota l'alçada del viewport.
+                // En els llistats amb autoHeight (scroll global del navegador) el
+                // contenidor creix amb el contingut i no té alçada fixa; sense
+                // aquesta regla, quan el contingut no omple la pantalla el peu
+                // queda a mitja alçada. Amb min-height:100vh el cos (flex-grow)
+                // omple l'espai sobrant i el peu torna a quedar enganxat a baix,
+                // tot mantenint el scroll quan el contingut supera el viewport.
+                'div:has(> header):has(> footer)': {
+                    minHeight: '100vh',
                 },
                 '.multi-line-cell': {
                     display: 'flex',
