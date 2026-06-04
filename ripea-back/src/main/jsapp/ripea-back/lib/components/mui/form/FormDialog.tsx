@@ -103,6 +103,9 @@ export const useFormDialog: UseFormDialogFn = (
         dialogButtons ?? formDialogButtons
     );
     const [loading, setLoading] = React.useState<boolean>();
+    React.useEffect(() => {
+        setButtons(dialogButtons ?? formDialogButtons);
+    }, [dialogButtons]);
     const buttonCallback = (value: any) => {
         if (value) {
             const isCustomSubmit = customSubmit != null;
