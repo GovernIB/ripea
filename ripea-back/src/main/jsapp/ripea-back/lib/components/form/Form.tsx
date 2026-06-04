@@ -138,7 +138,7 @@ const formDataReducer = (state: any, action: FormFieldDataAction): any => {
             return {
                 ...state,
                 [payload.fieldName]: payload.value,
-				...payload.changes,
+                ...payload.changes,
             };
         }
     }
@@ -418,19 +418,21 @@ export const Form: React.FC<FormProps> = (props) => {
     const reset = (
         data: any,
         newId?: any,
+        revertData?: any,
         navigateToLink?: boolean,
         isDataInitialized?: boolean
     ) => {
+        const joinedData = { ...data, ...revertData };
         dataDispatchAction({
             type: FormFieldDataActionType.RESET,
-            payload: data,
+            payload: joinedData,
         });
         setIsLoading(false);
         setModified(false);
         setExternalModified(false);
         setRevertData(data);
         setApiFieldErrors(undefined);
-        validateWithValidator(data);
+        validateWithValidator(joinedData);
         setIsDataInitialized(isDataInitialized != null ? isDataInitialized : true);
         if (navigateToLink) {
             if (id == null) {
@@ -444,7 +446,7 @@ export const Form: React.FC<FormProps> = (props) => {
             }
         }
         newId !== undefined && setInternalId(newId);
-        onReset?.(data);
+        onReset?.(joinedData);
     };
     const externalReset = (data?: any, id?: any) => {
         // Versió de reset per a cridar externament mitjançant l'API
@@ -470,25 +472,20 @@ export const Form: React.FC<FormProps> = (props) => {
     const refresh = (force?: boolean) =>
         new Promise((resolve, reject) => {
             if (fields && (force || !isDataInitialized)) {
-                if (initialDataProp != null) {
-                    reset(initialDataProp);
-                    resolve(initialDataProp);
-                } else {
-                    getInitialData(id, fields, additionalData, initOnChangeRequest)
-                        .then((initialData: any) => {
-                            debug && logConsole.debug('Initial data loaded', initialData);
-                            const {
-                                _actions: initialDataActions,
-                                _links: initialDataLinks,
-                                _templates: initialDataTemplates,
-                                ...realInitialData
-                            } = initialData;
-                            id != null && setApiActions(initialDataActions);
-                            reset(realInitialData);
-                            resolve(realInitialData);
-                        })
-                        .catch(reject);
-                }
+                getInitialData(id, fields, additionalData, initOnChangeRequest)
+                    .then((initialData: any) => {
+                        debug && logConsole.debug('Initial data loaded', initialData);
+                        const {
+                            _actions: initialDataActions,
+                            _links: initialDataLinks,
+                            _templates: initialDataTemplates,
+                            ...realInitialData
+                        } = initialData;
+                        id != null && setApiActions(initialDataActions);
+                        reset(realInitialData, undefined, initialDataProp);
+                        resolve(realInitialData);
+                    })
+                    .catch(reject);
             }
         });
     const revert = (unconfirmed?: boolean) => {
@@ -592,7 +589,13 @@ export const Form: React.FC<FormProps> = (props) => {
                                     ? onCreateSuccess(savedData)
                                     : onSaveSuccess?.(data);
                             }
-                            reset(savedData, id == null ? savedData.id : undefined, true, false);
+                            reset(
+                                savedData,
+                                id == null ? savedData.id : undefined,
+                                undefined,
+                                true,
+                                false
+                            );
                             resolve(savedData);
                         })
                         .catch((error: ResourceApiError) => {
@@ -741,6 +744,22 @@ export const Form: React.FC<FormProps> = (props) => {
         handleSubmissionErrors,
     });
     const apiRef = React.useRef<FormApi>(getFormApi());
+    React.useEffect(() => {
+        apiRef.current = getFormApi();
+    }, [
+        getId,
+        getData,
+        refresh,
+        externalReset,
+        revert,
+        validate,
+        save,
+        delette,
+        focus,
+        setFieldValue,
+        setExternalModified,
+        handleSubmissionErrors,
+    ]);
     if (apiRefProp) {
         apiRefProp.current = getFormApi();
     }

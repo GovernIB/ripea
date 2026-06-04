@@ -18,7 +18,7 @@ export type DataGridDialogProps = {
     onRowClickEnabled?: boolean | ((row: any) => boolean);
     dialogComponentProps?: any;
     dataGridComponentProps?: any;
-    apiRef?: React.RefObject<DataGridDialogApi | undefined>;
+    apiRef?: React.RefObject<DataGridDialogApi | null>;
 };
 
 /**
@@ -30,7 +30,6 @@ export const useDataGridDialogApiRef: () => React.RefObject<DataGridDialogApi | 
     const gridApiRef = React.useRef<DataGridDialogApi | null>(null);
     return gridApiRef;
 };
-
 
 export const DataGridDialog: React.FC<DataGridDialogProps> = (props) => {
     const {

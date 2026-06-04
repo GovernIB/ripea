@@ -1,4 +1,9 @@
-export const dateFormatLocale = (date: any, withTime?: boolean, noFixedSize?: boolean) => {
+export const dateFormatLocale = (
+    date: any,
+    withTime?: boolean,
+    noSeconds?: boolean,
+    noFixedSize?: boolean
+) => {
     if (date) {
         let dateFormated;
         if (noFixedSize) {
@@ -18,7 +23,7 @@ export const dateFormatLocale = (date: any, withTime?: boolean, noFixedSize?: bo
                 })
                 .join('');
         }
-        return dateFormated + (withTime ? ' ' + timeFormatLocale(date) : '');
+        return dateFormated + (withTime ? ' ' + timeFormatLocale(date, noSeconds) : '');
     }
 };
 

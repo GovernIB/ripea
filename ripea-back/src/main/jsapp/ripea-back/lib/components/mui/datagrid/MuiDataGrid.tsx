@@ -149,8 +149,6 @@ export type MuiDataGridProps = {
     exportFileType?: ExportFileType;
     /** Dades addicionals pel formulari de creació o modificació d'una fila de la graella */
     formAdditionalData?: ((row: any, action: string) => any) | any;
-    /** Files addicionals per a la vista en arbre (si la vista d'arbre no està activa aquest atribut s'ignorarà) */
-    treeDataAdditionalRows?: any[] | ((rows: any[]) => any[]);
     /** Llista d'ids de les files expandides per defecte */
     treeDataDefaultExpandedRowIds?: any[];
     /** Tipus de barra d'eines que es mostrarà a la part superior */
@@ -633,15 +631,18 @@ const usePersistentState = (
     }, [paginationModelProp]);
     React.useEffect(() => {
         if (active) {
-            const unsubscribe = apiRef.current?.subscribeEvent('rowExpansionChange', (params: any) => {
-                setExpandedRowIds((prev) => {
-                    if (params.childrenExpanded) {
-                        return [...prev, params.id];
-                    } else {
-                        return prev.filter((id) => id !== params.id);
-                    }
-                });
-            });
+            const unsubscribe = apiRef.current?.subscribeEvent(
+                'rowExpansionChange',
+                (params: any) => {
+                    setExpandedRowIds((prev) => {
+                        if (params.childrenExpanded) {
+                            return [...prev, params.id];
+                        } else {
+                            return prev.filter((id) => id !== params.id);
+                        }
+                    });
+                }
+            );
             return unsubscribe;
         }
     }, []);
@@ -740,6 +741,7 @@ const usePersistentState = (
         expandedRowIds,
         setQuickFilter,
         setAutoPageSize,
+        setExpandedRowIds,
     };
 };
 
@@ -1025,6 +1027,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         expandedRowIds,
         setQuickFilter,
         setAutoPageSize,
+        setExpandedRowIds,
     } = usePersistentState(
         persistentStateActive ?? false,
         persistentStateClearPageSortPropsOnTopLevelRouteChange ?? false,
@@ -1075,6 +1078,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
             };
             if (JSON.stringify(findArgs) !== JSON.stringify(newFindArgs)) {
                 setFindArgs(newFindArgs);
+                setExpandedRowIds(treeDataDefaultExpandedRowIds ?? []);
             }
         }
     }, [
@@ -1096,7 +1100,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
             if (firstNode?.depth !== undefined) {
                 expandedRowIds?.forEach((id) => {
                     const node = gridRowNodeSelector(datagridApiRef, id);
-                    if (node) {
+                    if (node?.type === 'group') {
                         const api = datagridApiRef.current as {
                             setRowChildrenExpansion?: (id: any, expanded: boolean) => void;
                         };
