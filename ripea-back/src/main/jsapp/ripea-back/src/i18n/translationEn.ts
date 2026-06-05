@@ -36,6 +36,8 @@ const translationEn = {
         },
         nouPermis: "New permission",
         advancedSearch: "Advanced search",
+        advancedSearchOpen: "Open advanced search",
+        advancedSearchClose: "Close advanced search",
         error: {
             status: "Error code",
             title: "Title",

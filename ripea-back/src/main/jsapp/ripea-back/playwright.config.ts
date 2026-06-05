@@ -34,6 +34,15 @@ export default defineConfig({
             testMatch: /auth[\/\\]admin\.setup\.ts/,
 			workers: 1,
         },
+        {
+            name: 'setup-user',
+            testMatch: /auth[\/\\]user\.setup\.ts/,
+			workers: 1,
+            // Força el català al detector d'idioma de i18next (navigator.language),
+            // perquè la sessió desada quedi en català i coincideixi amb les etiquetes
+            // del backend i amb els selectors dels tests.
+            use: { locale: 'ca-ES' },
+        },
 
         // ── Tests per rol ──
         {
@@ -58,6 +67,19 @@ export default defineConfig({
                 storageState: 'tests_e2e/.auth/admin.json',
             },
             testMatch: '**/*.admin.jsp.spec.ts',
+        },
+        {
+            name: 'user',
+            dependencies: ['setup-user'],
+            use: {
+                ...devices['Desktop Chrome'],
+                channel: 'chrome',
+                // Força el català perquè la UI traducida (i18next) coincideixi amb els
+                // selectors del test; sense això, Chrome arrenca en anglès.
+                locale: 'ca-ES',
+                storageState: 'tests_e2e/.auth/user.json',
+            },
+            testMatch: '**/*.user.spec.ts',
         },
     ],
 });

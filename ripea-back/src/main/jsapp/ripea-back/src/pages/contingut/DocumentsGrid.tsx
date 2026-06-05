@@ -146,7 +146,7 @@ const columns = [
     },
     {
         field: 'createdByFullName',
-        flex: 0.45,
+        flex: 0.65,
     },
 ];
 
@@ -347,7 +347,7 @@ const DocumentsGrid = (props: any) => {
 
                         groupingColDef={{
                             headerName: t('page.contingut.grid.nom'),
-                            flex: 1.5,
+                            flex: 1.3,
                             valueFormatter: (value: any, row: any) => {
                                 if (row?.id) {
                                     if (vista == View.tipus && row?.multiplicitat) {

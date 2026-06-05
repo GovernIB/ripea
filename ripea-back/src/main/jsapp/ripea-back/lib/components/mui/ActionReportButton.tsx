@@ -317,7 +317,7 @@ export const useActionReportLogic = (
                 execAction(id);
             }
         } else if (report != null) {
-            generateReport(null);
+            generateReport(id);
         }
     };
     const [artifact, setArtifact] = React.useState<any>();

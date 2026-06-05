@@ -131,7 +131,7 @@ const PermisOrganGestorGrid = ()=> {
         setTitlePage(t('page.user.menu.organPermis', {nom: entity?.nom}))
     }, [entity]);
 
-    return <GridPage disableMargins>
+    return <GridPage autoHeight>
         <Load value={entity}>
             <CardPage title={t('page.user.menu.organPermis', {nom: entity?.nom})}
                       header={<>

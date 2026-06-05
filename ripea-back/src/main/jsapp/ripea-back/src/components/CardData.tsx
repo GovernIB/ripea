@@ -157,7 +157,13 @@ export const CardPage = (props:CardPageProps) => {
         flexDirection: 'column'
     }}>
         {(title || header) &&
-            <CardHead icon={icon} sx={headerProps} {...other}>
+            <CardHead icon={icon} sx={(theme) => ({
+                // Banner de cabecera de pantalla (solo afecta a CardPage, que lleva el h1)
+                bgcolor: theme.palette.primary.main,
+                borderBottom: 'none',
+                '& h1': { color: theme.palette.mode === 'dark' ? '#464646' : theme.palette.primary.contrastText, fontWeight: 600 },
+                ...headerProps,
+            })} {...other}>
                 {title && <Typography mt={0.5} variant={"h4"} component={"h1"}>{title}</Typography>}
                 {header}
             </CardHead>

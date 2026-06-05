@@ -47,7 +47,7 @@ const TancarGrid = () => {
         },
     ]
 
-    return <GridPage disableMargins>
+    return <GridPage autoHeight>
         <CardPage title={t('navigate.massiu.tancament')}>
             <CanviEstatFilter
                 sessionKey={"MASSIVE_TANCAR_FILTER"}

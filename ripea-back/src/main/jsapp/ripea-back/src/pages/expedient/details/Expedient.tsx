@@ -2,7 +2,7 @@ import {useTranslation} from 'react-i18next';
 import {useNavigate, useParams, Link as RrLink} from 'react-router-dom';
 import {GridPage, useBaseAppContext, useResourceApiService} from 'reactlib';
 import {useState, useEffect} from "react";
-import {Typography, Grid, Icon, IconButton, Link, Alert, Button, Box} from '@mui/material';
+import {Typography, Grid, Icon, IconButton, Link, Alert, Button, Box, alpha} from '@mui/material';
 import {formatDate} from '../../../util/dateUtils.ts';
 import TabComponent from "../../../components/TabComponent.tsx";
 import InteressatsGrid from "../../interessats/InteressatsGrid.tsx";
@@ -372,7 +372,7 @@ const Expedient = () => {
 
     const headerMain = <>
         <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', columnGap: 1, rowGap: 0.5, width: '100%' }}>
-            <Icon sx={{ fontSize: '2rem' }}>{icons.expedient}</Icon>
+            <Icon sx={{ fontSize: '2rem', color: 'primary.light' }}>{icons.expedient}</Icon>
             <Typography variant="h4" component="h1" sx={{ lineHeight: 1.2, flexShrink: 0 }}>
                 {isCarpetaUrl && expedient?.id != null ? (
                     <Link
@@ -396,7 +396,7 @@ const Expedient = () => {
             <ContingutBreadcrumb expedient={expedient} carpetaNode={isCarpetaUrl ? carpetaNode : null} />
         </Box>
         <Box>
-            <Typography variant={"subtitle1"} component="p" sx={{border}} px={2} hidden={!expedient?.agafatPer}>
+            <Typography variant={"subtitle1"} component="p" sx={{border, flexShrink: 0, whiteSpace: 'nowrap', bgcolor: (theme) => alpha(theme.palette.common.white, 0.9), color: (theme) => theme.palette.getContrastText(theme.palette.common.white)}} px={2} hidden={!expedient?.agafatPer}>
                 {t('page.expedient.title')} {t('page.expedient.detall.agafatPer')}: {expedient?.agafatPer?.description}
                 {expedient?.agafatPer?.id == user?.codi &&
                     <IconButton aria-label="lock_open" color={"inherit"} onClick={() => alliberar(expedient?.id, expedient)} title={t('page.expedient.action.lliberar.label')}>
@@ -406,7 +406,7 @@ const Expedient = () => {
             </Typography>
         </Box>
     </>;
-    return <GridPage disableMargins>
+    return <GridPage autoHeight>
         {expedient?.id != null && <SseExpedient id={expedient.id}/>}
         <Load value={expedient} noEffect>
             <CardPage header={headerMain} componentProps={{ justifyContent: 'space-between' }}>

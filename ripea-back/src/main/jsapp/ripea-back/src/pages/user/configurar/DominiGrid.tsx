@@ -90,7 +90,7 @@ const DominiGrid = () => {
         },
     ]
 
-    return <GridPage disableMargins>
+    return <GridPage autoHeight>
         <CardPage title={t('page.user.menu.dominis')}>
             <StyledMuiGrid
                 apiRef={apiRef}

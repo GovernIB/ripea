@@ -58,7 +58,7 @@ export const AvisGrid = () => {
     const { actions, massiveActions, components } = useAvisActions(refresh);
 
     return (
-        <GridPage disableMargins>
+        <GridPage autoHeight>
             <CardPage title={t('navigate.avis')}>
                 <StyledMuiGrid
                     apiRef={apiRef}

@@ -1,5 +1,5 @@
 import React from "react";
-import {Button, Grid, Icon, IconButton, useMediaQuery, useTheme} from "@mui/material";
+import {Box, Button, Grid, Icon, IconButton, useMediaQuery, useTheme} from "@mui/material";
 import {FormField, FormFieldProps, useFormContext} from "reactlib";
 import {FormFieldDataActionType} from "../../lib/components/form/FormContext";
 import Load from "./Load.tsx";
@@ -8,36 +8,54 @@ import {useUserSession} from "./Session.tsx";
 import {useCallback, useEffect, useMemo, useState} from "react";
 import InputAdornment from "@mui/material/InputAdornment";
 
+// Renders a base material icon ligature with a smaller secondary icon placed
+// adjacent to its bottom-right corner (e.g. zoom_in + expand_more), without
+// overlapping the base glyph. Both icons inherit the button's current color.
+export const CombinedIcon = (props:any) => {
+    const { base, badge, sx, badgeSx } = props;
+    return <Box sx={{ display: 'inline-flex', alignItems: 'flex-end', lineHeight: 1, ...sx }}>
+        <Icon>{base}</Icon>
+        <Icon sx={{ fontSize: '0.85rem', lineHeight: 1, ml: '1px', ...badgeSx }}>{badge}</Icon>
+    </Box>
+}
+
 export const GridButton = (props:any) => {
-    const { title, icon, size, children, hidden, sx, ...other} = props;
+    const { title, icon, size, children, hidden, sx, iconOnlyBreakpoint = 'md', ...other} = props;
 
     const theme = useTheme();
-    const iconOnly = useMediaQuery(theme.breakpoints.down('md'));
+    const iconOnly = useMediaQuery(theme.breakpoints.down(iconOnlyBreakpoint));
+
+    const iconNode = typeof icon === 'string'
+        ? <Icon sx={{mr: (!iconOnly && children) ? 0.5 : 0, ...props.iconSx}}>{icon}</Icon>
+        : icon;
 
     return <Grid title={title} size={size} hidden={hidden}>
         <Button
             variant="outlined"
             sx={{ borderRadius: '4px', width: '100%', height: '100%', ...sx }}
             style={{margin: 0}}
+            aria-label={(title && (iconOnly || !children)) ? title : undefined}
             {...other}
         >
-            {icon && <Icon sx={{mr: (!iconOnly && children) ? 0.5 : 0, ...props.iconSx}}>{icon}</Icon>}
+            {iconNode}
             {!iconOnly && children}
         </Button>
     </Grid>
 }
 
 export const GridButtonField = (props:any) => {
-    const {name, whitLabel, ...other} = props;
+    const {name, whitLabel, icon, title, ...other} = props;
     const {data, apiRef, fields} = useFormContext()
 
+    const active = !!data?.[name]
     const label = fields?.find?.(item => item?.name === name)?.label || ''
     return <Load value={apiRef} noEffect><GridButton
         onClick={()=>{
-            apiRef?.current?.setFieldValue?.(name, !data?.[name])
+            apiRef?.current?.setFieldValue?.(name, !active)
         }}
-        variant={ data?.[name] ?"contained":"outlined" }
-        title={label}
+        variant={ active ?"contained":"outlined" }
+        title={(typeof title === 'function') ? title?.(active) :(title ?? label)}
+        icon={(typeof icon === 'function') ? icon?.(active) :icon}
         {...other}
     >
         {whitLabel && label}

@@ -55,7 +55,9 @@ export const formattedFieldValue = (value: any, field?: any, config?: any): stri
     } else if (processedType === 'time') {
         return value ? timeFormatLocale(value, config?.noSeconds) : value;
     } else if (processedType === 'datetime-local') {
-        return value ? dateFormatLocale(value, config?.noTime ? false : true) : value;
+        return value
+            ? dateFormatLocale(value, config?.noTime ? false : true, config?.noSeconds)
+            : value;
     } else if (processedType === 'duration') {
         const duration = parseIsoDuration(value);
         if (duration != null) {

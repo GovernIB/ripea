@@ -6,7 +6,7 @@ import GridFormField from "../../../components/GridFormField.tsx";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 import {useUserSession} from "../../../components/Session.tsx";
 import Iframe from "../../../components/Iframe.tsx";
-import {useFirmaFinalitzadaSession} from "../../../components/SseExpedient.tsx";
+import {useFirmaFinalitzadaSession} from "../../../components/SseClient.tsx";
 
 const FirmaNavegadorForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>

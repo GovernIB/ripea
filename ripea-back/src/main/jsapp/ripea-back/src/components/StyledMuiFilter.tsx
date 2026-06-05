@@ -3,9 +3,15 @@ import {MuiFilter, useFilterApiRef} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {useSession} from "./SessionStorageContext.tsx";
 import {useEffect, useMemo} from "react";
-import {GridButton, GridButtonField} from "./GridFormField.tsx";
+import {CombinedIcon, GridButton, GridButtonField} from "./GridFormField.tsx";
 
 const filterStyle = { className: "styledFilter" };
+
+// Width (px) below which the advanced-filter action buttons collapse to
+// icon-only, so their text never gets clipped in the narrow button container.
+// Shared by the filters that use advancedSearch (Expedient, Tasques, Anotacions)
+// to keep their collapse point in sync.
+export const FILTER_ADVANCED_ICON_ONLY_BREAKPOINT = 1615;
 
 export type FilterButtonProps = {
     value: string;
@@ -55,7 +61,7 @@ const StyledMuiFilter = (props:any) => {
         code,
         sessionKey = code,
         advancedSearch = false,
-        defaultData,
+        buttonIconOnlyBreakpoint = 'lg',
         ...other
     } = props
 
@@ -66,12 +72,10 @@ const StyledMuiFilter = (props:any) => {
         }
     }
     const netejar = ()=> {
-        const data = typeof defaultData === 'function' ? defaultData() : (defaultData ?? {});
         if (sessionKey) {
-            saveFilterData(Object.keys(data).length > 0 ? data : null)
+            saveFilterData(null)
         }
-        apiRef?.current?.reset?.(data)
-        apiRef?.current?.filter?.(data)
+        apiRef?.current?.clear?.()
     }
 
     const callback = (value: string) => {
@@ -113,13 +117,23 @@ const StyledMuiFilter = (props:any) => {
             {children}
 
             <Grid container direction={"row"} columnSpacing={1} rowSpacing={1} size={{xs: 12, sm: 6, md: 2.4}} sx={{ display: 'flex', justifyContent: 'end', marginLeft: 'auto' }} {...buttonGridProps}>
-                {advancedSearch && <GridButtonField size={buttonSize} name={"advanced"} title={t('common.advancedSearch')} icon={"filter_list"}/>}
+                {advancedSearch && <GridButtonField
+                    size={buttonSize}
+                    name={"advanced"}
+                    title={(active:boolean) => active
+                        ?t('common.advancedSearchClose')
+                        :t('common.advancedSearchOpen')}
+                    icon={(active:boolean) => active
+                        ?<CombinedIcon base={"zoom_out"} badge={"expand_less"}/>
+                        :<CombinedIcon base={"zoom_in"} badge={"expand_more"}/>}
+                />}
                 {
                     buttons?.map((button:FilterButtonProps)=>
                         <GridButton size={buttonSize}
                                     key={button.value}
                                     title={button.text}
                                     icon={button.icon}
+                                    iconOnlyBreakpoint={buttonIconOnlyBreakpoint}
                                     onClick={() => callback(button.value)}
                                     {...button?.componentProps}>
                             <Typography sx={{paddingLeft: '5px', marginTop: '1px', maxWidth: 'max-content'}}>{button.text}</Typography>

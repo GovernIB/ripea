@@ -11,7 +11,7 @@ import useFirmaNavegador, {useFirmaNavegadorMassive} from "../../contingut/actio
 import {useExecucioMassivaContingut} from "../actions/ExecucioMassivaGrid.tsx";
 
 const namedQueries: string[] = ['MASSIU_PASARELA']
-const perspectives:any = ['EN_PROCES_FIRMA_WEB'];
+const perspectives:any = ['EN_PROCES_FIRMA_WEB', 'RESUM'];
 const sortModel: any = [{field: 'createdDate', sort: 'desc'}]
 const columns = [
     {
@@ -76,7 +76,7 @@ const FirmaNavegadorGrid = () => {
         },
     ]
 
-    return <GridPage disableMargins>
+    return <GridPage autoHeight>
         <CardPage title={t('navigate.massiu.firmasimpleweb')}>
             <EnviarPortafirmesFilter
                 sessionKey={"MASSIVE_FIRMA_NAVEGADOR_FILTER"}

@@ -109,7 +109,7 @@ const Tasca = () => {
         </Box>
     </>;
 
-    return <GridPage disableMargins>
+    return <GridPage autoHeight>
         <Load value={expedient && tasca} noEffect>
             <CardPage header={headerMain} componentProps={{ justifyContent: 'space-between' }}>
                 <Grid container spacing={2}>

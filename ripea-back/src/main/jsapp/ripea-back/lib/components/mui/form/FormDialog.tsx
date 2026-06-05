@@ -99,7 +99,13 @@ export const useFormDialog: UseFormDialogFn = (
     const [submitReturnedContent, setSubmitReturnedContent] = React.useState<
         React.ReactNode | undefined
     >();
+    const [buttons, setButtons] = React.useState<DialogButton[]>(
+        dialogButtons ?? formDialogButtons
+    );
     const [loading, setLoading] = React.useState<boolean>();
+    React.useEffect(() => {
+        setButtons(dialogButtons ?? formDialogButtons);
+    }, [dialogButtons]);
     const buttonCallback = (value: any) => {
         if (value) {
             const isCustomSubmit = customSubmit != null;
@@ -155,6 +161,7 @@ export const useFormDialog: UseFormDialogFn = (
         setFormContent(args?.formContent ?? defaultFormContent);
         setAdditionalData(args?.additionalData ?? null);
         setInitOnChangeRequest(args?.initOnChangeRequest ?? initOnChangeRequestProp);
+        setButtons(args?.dialogButtons ?? dialogButtons ?? formDialogButtons);
         setDialogComponentProps(
             args?.dialogComponentProps != null
                 ? { ...defaultDialogComponentProps, ...args?.dialogComponentProps }
@@ -174,15 +181,14 @@ export const useFormDialog: UseFormDialogFn = (
         });
     };
     // Deshabilita els botons si s'està en estat loading
-    const buttons = dialogButtons ?? formDialogButtons
     const processedButtons = loading
         ? buttons.map((b) => ({
-            ...b,
-            componentProps: {
-                ...b.componentProps,
-                disabled: true,
-            },
-        }))
+              ...b,
+              componentProps: {
+                  ...b.componentProps,
+                  disabled: true,
+              },
+          }))
         : buttons;
     const close = () => setOpen(false);
     const dialogComponent = (

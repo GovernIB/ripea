@@ -112,7 +112,7 @@ const TasquesGrid = () => {
     const { actions, components, isTramitable } = useTascaActions({potModificar: true}, refresh)
     const { handleOpen, dialog } = useTascaDetail();
 
-    return <GridPage disableMargins>
+    return <GridPage autoHeight>
         <CardPage title={t('page.user.menu.tasca')}>
             <TasquesFilter
                 onSpringFilterChange={(value:any) => {

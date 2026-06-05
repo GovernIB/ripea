@@ -21,7 +21,7 @@ export const CambiarPrioritat = (props:any) => {
         resourceName={"expedientResource"}
         title={t('page.expedient.action.changePrioritat.title')}
         action={"CANVI_PRIORITAT"}
-        dialogButtons={[
+        formDialogButtons={[
             {icon: 'logout', text: t('page.expedient.action.changePrioritat.button'), componentProps: { variant: 'contained' }, value: true },
             {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
         ]}
@@ -31,7 +31,7 @@ export const CambiarPrioritat = (props:any) => {
     </FormActionDialog>
 }
 
-export const useCambiarPrioritat = (refresh?: () => void) => {
+const useCambiarPrioritat = (refresh?: () => void) => {
     const { t } = useTranslation();
     const apiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow} = useBaseAppContext();

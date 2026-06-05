@@ -81,74 +81,81 @@ const OrganGestorGrid = () => {
         }
     ], [treeView])
 
-    return <GridPage disableMargins>
-        <CardPage title={t('page.user.menu.organs')}>
-            <OrganGestorFilter onSpringFilterChange={setSpringFilter}/>
+    return (
+        <GridPage autoHeight>
+            <CardPage title={t('page.user.menu.organs')}>
+                <OrganGestorFilter onSpringFilterChange={setSpringFilter} />
 
-            <StyledMuiGrid
-                resourceName={"organGestorResource"}
-                popupEditUpdateActive
-                popupEditFormDialogResourceTitle={t('page.organGestor.title')}
-                popupEditFormContent={<OrganGestorForm/>}
-                columns={columns}
-                filter={springFilter}
-                perspectives={perspectives}
-                sortModel={sortModel}
-                rowAdditionalActions={actions}
-                toolbarElementsWithPositions={[
-                    {
-                        position: 3,
-                        element: <ToolbarButton
-                            onClick={handleOpen}
-                            icon={'cached'}
-                            color={'primary'}>{t('page.organGestor.action.actualitzar.label')}</ToolbarButton>,
-                    },
-                    {
-                        position: 3,
-                        element: <ToolbarButton
-                            icon={'visibility'}
-                            variant={treeView ?"contained" :"outlined"}
-                            onClick={()=>setTreeView(prev=>!prev)}
-                            color={'primary'}>{t('page.organGestor.action.vista')}</ToolbarButton>,
-                    },
-                ]}
-
-                paginationActive={!treeView}
-                // autoHeight={treeView}
-                treeData={treeView}
-                groupingColDef={{
-                    headerName: t('page.contingut.grid.nom'),
-                    flex: 1,
-                    valueFormatter: (_value: any, row: any) => row?.codi +" - "+ row?.nom,
-                }}
-                rowsTransformer={(rows: any) => {
-                    if (!rows) return [];
-                    const additionalRows: any[] = rows;
-                        if (rows!=null && treeView){
+                <StyledMuiGrid
+                    resourceName={'organGestorResource'}
+                    popupEditUpdateActive
+                    popupEditFormDialogResourceTitle={t('page.organGestor.title')}
+                    popupEditFormContent={<OrganGestorForm />}
+                    columns={columns}
+                    filter={springFilter}
+                    perspectives={perspectives}
+                    sortModel={sortModel}
+                    rowAdditionalActions={actions}
+                    toolbarElementsWithPositions={[
+                        {
+                            position: 3,
+                            element: (
+                                <ToolbarButton onClick={handleOpen} icon={'cached'} color={'primary'}>
+                                    {t('page.organGestor.action.actualitzar.label')}
+                                </ToolbarButton>
+                            ),
+                        },
+                        {
+                            position: 3,
+                            element: (
+                                <ToolbarButton
+                                    icon={'visibility'}
+                                    variant={treeView ? 'contained' : 'outlined'}
+                                    onClick={() => setTreeView((prev) => !prev)}
+                                    color={'primary'}
+                                >
+                                    {t('page.organGestor.action.vista')}
+                                </ToolbarButton>
+                            ),
+                        },
+                    ]}
+                    paginationActive={!treeView}
+                    // autoHeight={treeView}
+                    treeData={treeView}
+                    groupingColDef={{
+                        headerName: t('page.contingut.grid.nom'),
+                        flex: 1,
+                        valueFormatter: (_value: any, row: any) => row?.codi + ' - ' + row?.nom,
+                    }}
+                    rowsTransformer={(rows: any) => {
+                        if (!rows) return [];
+                        const additionalRows: any[] = rows;
+                        if (rows != null && treeView) {
                             for (const row of rows) {
                                 for (const r of row?.path) {
-                                    if (!additionalRows.map((b:any) => b.id).includes(r?.id)
-                                        && !rows.map((b:any) => b.id).includes(r?.id))
-                                    {
-                                        additionalRows.push(r)
+                                    if (
+                                        !additionalRows.map((b: any) => b.id).includes(r?.id) &&
+                                        !rows.map((b: any) => b.id).includes(r?.id)
+                                    ) {
+                                        additionalRows.push(r);
                                     }
                                 }
                             }
                         }
-                    return additionalRows;
-                }}
-                getTreeDataPath={(row: any): string[] => {
-                        return !!row?.pathName ?row?.pathName :[`${row.id}`];
-                }}
-
-                toolbarHideCreate
-                toolbarHideRefresh
-                popupEditFormI18nKeys={{
-                    updateSuccess: 'page.organGestor.action.update.ok',
-                }}
-            />
-        </CardPage>
-        {dialog}
-    </GridPage>
+                        return additionalRows;
+                    }}
+                    getTreeDataPath={(row: any): string[] => {
+                        return !!row?.pathName ? row?.pathName : [`${row.id}`];
+                    }}
+                    toolbarHideCreate
+                    toolbarHideRefresh
+                    popupEditFormI18nKeys={{
+                        updateSuccess: 'page.organGestor.action.update.ok',
+                    }}
+                />
+            </CardPage>
+            {dialog}
+        </GridPage>
+    );
 }
 export default OrganGestorGrid;

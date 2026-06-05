@@ -39,7 +39,7 @@ const CanviEstatFilterFrom = (props:any) => {
 
         <GridFormField size={{xs: 12, sm: 6, md: 3}} name="dataCreacioInici" type={"date"}/>
         <GridFormField size={{xs: 12, sm: 6, md: 3}} name="dataCreacioFi" type={"date"}/>
-        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="estat" requestParams={{metaExpedientId: data?.procediment?.id, withoutTancar: true}}/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="estatCustom" requestParams={{metaExpedientId: data?.procediment?.id, withoutTancar: true}}/>
         <GridFormField size={{xs: 12, sm: 6, md: 3}} name="prioritat"/>
     </>
 }
@@ -51,13 +51,8 @@ const springFilterBuilder = (data: any) => {
         builder.eq("id", data?.expedient?.id),
         builder.like("nom", data?.nom),
         builder.betweenDates("createdDate", data?.dataCreacioInici, data?.dataCreacioFi),
-		data.estat && (
-		    (data.estat === 'OBERT' || data.estat === '0')
-				? builder.neq("estat", `'TANCAT'`)
-				: (data.estat === 'TANCAT' || data.estat === '-1')
-				    ? builder.eq("estat", `'TANCAT'`)
-		            : data?.procediment?.id &&builder.eq("estatAdditional.id", data.estat)
-		),
+        data.estatCustom && builder.equals("estat", `'TANCAT'`, (data.estatCustom === '-1')),
+        data.estatCustom && (data.estatCustom != '0' && data.estatCustom != '-1') && builder.eq("estatAdditional.id", data.estatCustom),
         builder.eq("prioritat", `'${data?.prioritat}'`),
     );
 }
@@ -70,7 +65,6 @@ export const CanviEstatFilter = (props: any) => {
         sessionKey={sessionKey}
         springFilterBuilder={springFilterBuilder}
         onSpringFilterChange={onSpringFilterChange}
-        filterOnFieldEnterKeyPressed
     >
         <CanviEstatFilterFrom findExpedientByName={findExpedientByName}/>
     </StyledMuiFilter>
@@ -168,7 +162,7 @@ const CanviEstatGrid = () => {
         },
     ]
 
-    return <GridPage disableMargins>
+    return <GridPage autoHeight>
         <CardPage title={t('navigate.massiu.canviEstat')}>
             {!haveRequirements &&
                 <Alert severity={'info'} sx={{mb: 1}}>{t('page.expedient.alert.canviEstat')}</Alert>}

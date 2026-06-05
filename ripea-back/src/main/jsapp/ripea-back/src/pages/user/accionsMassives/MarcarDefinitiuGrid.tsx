@@ -12,6 +12,9 @@ import {useMassiveActions} from "../../contingut/details/ContingutMassiveActions
 import {useGridApiRef as useMuiDatagridApiRef} from "@mui/x-data-grid-pro";
 
 const namedQueries: string[] = ['MASSIU_PORTAFIRMES']
+// La perspectiva RESUM omple createdByFullName amb "Nom (codi)"; sense ella
+// la columna només mostra el codi de l'usuari.
+const perspectives: string[] = ['RESUM']
 const sortModel: any = [{field: 'createdDate', sort: 'desc'}]
 const columns = [
     {
@@ -68,7 +71,7 @@ const MarcarDefinitiuGrid = () => {
         },
     ]
 
-    return <GridPage disableMargins>
+    return <GridPage autoHeight>
         <CardPage title={t('navigate.massiu.definitiu')}>
             <EnviarPortafirmesFilter
                 sessionKey={"MASSIVE_DEFINITIVE_FILTER"}
@@ -80,6 +83,7 @@ const MarcarDefinitiuGrid = () => {
                 resourceName={"documentResource"}
                 columns={columns}
                 filter={springFilter}
+                perspectives={perspectives}
                 namedQueries={namedQueries}
                 sortModel={sortModel}
                 rowAdditionalActions={actions}

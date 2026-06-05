@@ -4,6 +4,9 @@ export const shallowEqual = (obj1: any, obj2: any) => {
         const val2 = obj2[key];
         if (Array.isArray(val1) && Array.isArray(val2)) {
             if (val1.length !== val2.length) return false;
+            if (JSON.stringify(val1) !== JSON.stringify(val2)) {
+                return false;
+            }
             continue;
         }
         if (Array.isArray(val1) || Array.isArray(val2)) {
@@ -12,8 +15,10 @@ export const shallowEqual = (obj1: any, obj2: any) => {
         if (typeof val1 === 'object' && typeof val2 === 'object') {
             const bothNull = val1 === null && val2 === null;
             const bothNotNull = val1 !== null && val2 !== null;
-
             if (!bothNull && !bothNotNull) return false;
+            if (JSON.stringify(val1) !== JSON.stringify(val2)) {
+                return false;
+            }
             continue;
         }
         if (val1 !== val2) return false;

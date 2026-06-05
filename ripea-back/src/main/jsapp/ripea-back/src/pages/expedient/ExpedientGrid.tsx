@@ -120,7 +120,7 @@ export const Avisos = (props: any) => {
 const beforeAvis = [
     {
         field: 'numero',
-        flex: 0.70,
+        flex: 0.85,
     },
     {
         field: 'metaExpedient',
@@ -134,7 +134,7 @@ const beforeAvis = [
 const afterAvis = [
     {
         field: 'createdDate',
-        flex: 0.8,
+        flex: 0.75,
         valueFormatter: (value: any) => formatDate(value)
     },
     {
@@ -262,7 +262,7 @@ const ExpedientGrid = () => {
         .filter((col:any)=>!col?.hidden), [user]);
 
     return (
-        <GridPage>
+        <GridPage autoHeight>
             <CardPage title={t('page.expedient.filter.title')}>
                 <ExpedientFilter
                     onSpringFilterChange={(value: any) => {
@@ -276,7 +276,8 @@ const ExpedientGrid = () => {
                         resourceName={'expedientResource'}
                         popupEditFormDialogResourceTitle={t('page.expedient.title')}
                         columns={columnsAddition}
-                        filter={springFilter}
+						rowActionsColumnProps={{ width: 55, minWidth: 55 }}
+						filter={springFilter}
                         sortModel={sortModel}
                         perspectives={perspectives}
                         apiRef={apiRef}

@@ -166,28 +166,26 @@ export const useApiDataCommon = (
         if (apiIsReady) {
             const findDisabled = autoFindDisabled && firstRefresh;
             setFirstRefresh(false);
-            if (!findDisabled) {
-                if (resourceFieldName == null) {
-                    setFields(apiCurrentFields ?? []);
-                } else if (resourceType == null) {
-                    apiFieldOptionsFields({ fieldName: resourceFieldName }).then((fields) => {
+            if (resourceFieldName == null) {
+                setFields(apiCurrentFields ?? []);
+            } else if (resourceType == null) {
+                apiFieldOptionsFields({ fieldName: resourceFieldName }).then((fields) => {
+                    setFields(fields);
+                });
+            } else {
+                const args = {
+                    type: resourceType,
+                    code: resourceTypeCode ?? '',
+                    fieldName: resourceFieldName,
+                };
+                setError(null);
+                apiArtifactFieldOptionsFields(args)
+                    .then((fields) => {
                         setFields(fields);
-                    });
-                } else {
-                    const args = {
-                        type: resourceType,
-                        code: resourceTypeCode ?? '',
-                        fieldName: resourceFieldName,
-                    };
-                    setError(null);
-                    apiArtifactFieldOptionsFields(args)
-                        .then((fields) => {
-                            setFields(fields);
-                        })
-                        .catch(setError);
-                }
-                refresh();
+                    })
+                    .catch(setError);
             }
+            !findDisabled && refresh();
         }
     }, [apiIsReady, autoFindDisabled, findArgs]);
     React.useEffect(() => {

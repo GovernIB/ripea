@@ -3,7 +3,7 @@ import {useMemo} from "react";
 import {useFormContext} from 'reactlib';
 import GridFormField, {GridButtonField} from "../../components/GridFormField.tsx";
 import {useUserSession} from "../../components/Session.tsx";
-import StyledMuiFilter from "../../components/StyledMuiFilter.tsx";
+import StyledMuiFilter, {FILTER_ADVANCED_ICON_ONLY_BREAKPOINT} from "../../components/StyledMuiFilter.tsx";
 import * as builder from '../../util/springFilterUtils';
 
 const ExpedientFilterForm = () => {
@@ -27,15 +27,15 @@ const ExpedientFilterForm = () => {
     return <>
         {(!data?.advanced) && <>
             <GridFormField size={{xs: 12, sm: 6, md: 2}} name="numero"/>
+            <GridFormField size={{xs: 12, sm: 6, md: 2}} name="nom"/>
             <GridFormField size={{xs: 12, sm: 6, md: 2}} name="metaExpedient" filter={filterMetaExpedient}/>
-            <GridFormField size={{xs: 12, sm: 6, md: 2}} name="estat" requestParams={requestParamsEstat} />
+            <GridFormField size={{xs: 12, sm: 6, md: 2}} name="estatCustom" requestParams={requestParamsEstat} />
             <GridFormField size={{xs: 12, sm: 6, md: 2}} name="dataCreacioInici"/>
-            <GridFormField size={{xs: 12, sm: 6, md: 2}} name="dataCreacioFinal"/>
         </>}
         {(data?.advanced) && <>
             <GridFormField size={{xs: 12, sm: 6, md: 3}} name="numero"/>
             <GridFormField size={{xs: 12, sm: 6, md: 3}} name="nom"/>
-            <GridFormField size={{xs: 12, sm: 6, md: 3}} name="estat" requestParams={requestParamsEstat} />
+            <GridFormField size={{xs: 12, sm: 6, md: 3}} name="estatCustom" requestParams={requestParamsEstat} />
             <GridFormField size={{xs: 12, sm: 6, md: 3}} name="interessat"/>
             <GridFormField size={{xs: 12, sm: 6, md: 3}} name="organGestor" />
             <GridFormField size={{xs: 12, sm: 6, md: 3}} name="metaExpedient" filter={filterMetaExpedient}/>
@@ -56,9 +56,9 @@ const ExpedientFilterForm = () => {
                 <Grid size={{xs: 12, sm: 12, md: 2}} hidden={!rol?.isUser}/>
                 <Grid size={{xs: 12, sm: 12, md: 6}} hidden={user?.sessionScope?.isDominisEnabled}/>
 
-            <GridButtonField size={{xs: rol?.isUser ?4 :6, sm: 1.5}} name={'agafat'} icon={'lock'} whitLabel/>
-            <GridButtonField size={{xs: rol?.isUser ?4 :6, sm: 1.5}} name={'pendentFirmar'} icon={'edit'} whitLabel/>
-            <GridButtonField size={{xs: 4, sm: 1.5}} name={'seguit'} icon={'group_add'} hidden={!rol?.isUser} whitLabel/>
+            <GridButtonField size={{xs: rol?.isUser ?4 :6, sm: 1.5}} name={'agafat'} icon={'lock'} iconOnlyBreakpoint={FILTER_ADVANCED_ICON_ONLY_BREAKPOINT} whitLabel/>
+            <GridButtonField size={{xs: rol?.isUser ?4 :6, sm: 1.5}} name={'pendentFirmar'} icon={'edit'} iconOnlyBreakpoint={FILTER_ADVANCED_ICON_ONLY_BREAKPOINT} whitLabel/>
+            <GridButtonField size={{xs: 4, sm: 1.5}} name={'seguit'} icon={'group_add'} iconOnlyBreakpoint={FILTER_ADVANCED_ICON_ONLY_BREAKPOINT} hidden={!rol?.isUser} whitLabel/>
         </>}
     </>
 }
@@ -69,13 +69,8 @@ export const springFilterBuilder = (data: any, user?: any, rol?: any): string =>
     filterStr += builder.and(
         builder.like("numero", data.numero),
         builder.like("nom", data.nom),
-		data.estat && (
-		    (data.estat === 'OBERT' || data.estat === '0')
-		        ? builder.neq("estat", `'TANCAT'`)
-		        : (data.estat === 'TANCAT' || data.estat === '-1')
-		            ? builder.eq("estat", `'TANCAT'`)
-		            : data.metaExpedient?.id && builder.eq("estatAdditional.id", data.estat)
-		),
+        data.estatCustom && builder.equals("estat", `'TANCAT'`, (data.estatCustom === '-1')),
+        data.estatCustom && (data.estatCustom != '0' && data.estatCustom != '-1') && builder.eq("estatAdditional.id", data.estatCustom),
         builder.exists(
             builder.or(
                 builder.like("interessats.documentNum", data.interessat),
@@ -120,12 +115,6 @@ export const springFilterBuilder = (data: any, user?: any, rol?: any): string =>
     return filterStr;
 }
 
-const defaultExpedientFilterData = () => {
-    const dataCreacioInici = new Date();
-    dataCreacioInici.setMonth(dataCreacioInici.getMonth() - 3);
-    return { estat: '0', dataCreacioInici };
-}
-
 const ExpedientFilter = (props: any) => {
     const {onSpringFilterChange} = props;
     const {value: user, rol} = useUserSession();
@@ -137,9 +126,8 @@ const ExpedientFilter = (props: any) => {
         )}
         onSpringFilterChange={onSpringFilterChange}
         advancedSearch
-        filterOnFieldEnterKeyPressed
-        defaultData={defaultExpedientFilterData}
         buttonGridProps={{size: {xs: 12, sm: 6, md: 2}}}
+        buttonIconOnlyBreakpoint={FILTER_ADVANCED_ICON_ONLY_BREAKPOINT}
     >
         <ExpedientFilterForm/>
     </StyledMuiFilter>

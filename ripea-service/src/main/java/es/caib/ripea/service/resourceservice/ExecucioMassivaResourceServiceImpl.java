@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 
 import es.caib.ripea.persistence.entity.resourceentity.ExecucioMassivaContingutResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.ExecucioMassivaResourceEntity;
+import es.caib.ripea.persistence.entity.resourceentity.UsuariResourceEntity;
+import es.caib.ripea.persistence.entity.resourcerepository.UsuariResourceRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.ExecucioMassivaHelper;
 import es.caib.ripea.service.intf.base.model.DownloadableFile;
@@ -33,6 +35,7 @@ public class ExecucioMassivaResourceServiceImpl extends BaseMutableResourceServi
     
 	private final ExecucioMassivaHelper execucioMassivaHelper;
 	private final ConfigHelper configHelper;
+	private final UsuariResourceRepository usuariResourceRepository;
 
     @PostConstruct
     public void init() {
@@ -73,5 +76,12 @@ public class ExecucioMassivaResourceServiceImpl extends BaseMutableResourceServi
         resource.setCancelats( contingutMap.containsKey(ExecucioMassivaEstatDto.ESTAT_CANCELAT) ?contingutMap.get(ExecucioMassivaEstatDto.ESTAT_CANCELAT).size() :0);
 
         resource.setExecutades(continguts.size());
+
+        if (entity.getCreatedBy() != null) {
+            UsuariResourceEntity usuariResourceEntity = usuariResourceRepository.findById(entity.getCreatedBy()).orElse(null);
+            if (usuariResourceEntity != null) {
+                resource.setCreatedByFullName(usuariResourceEntity.getNom() + " (" + usuariResourceEntity.getCodi() + ")");
+            }
+        }
     }
 }

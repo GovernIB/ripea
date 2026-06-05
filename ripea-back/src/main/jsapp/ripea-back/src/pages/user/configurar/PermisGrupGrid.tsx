@@ -50,7 +50,7 @@ const PermisGrupGrid = ()=> {
         setTitlePage(t('page.user.menu.grupPermis'))
     }, [t]);
 
-    return <GridPage disableMargins>
+    return <GridPage autoHeight>
         <CardPage title={t('page.user.menu.grupPermis')}>
             <StyledMuiGrid
                 apiRef={gridApiRef}
