@@ -222,17 +222,17 @@ const translationEs = {
                     ok: "Elemento '{{contingut}}' guardado en archivo",
                 },
                 move: {
-                    label: "Mover...",
+                    label: "Mueve...",
                     title: "Mover contenido",
                     ok: "Documento '{{document}}' movido correctamente",
                 },
                 copy: {
-                    label: "Copiar...",
+                    label: "Copia...",
                     title: "Copiar contenido",
                     ok: "Documento '{{document}}' copiado correctamente",
                 },
                 vincular: {
-                    label: "Vincular...",
+                    label: "Vincula...",
                     title: "Vincular contenido",
                     ok: "Documento '{{document}}' vinculado correctamente",
                 },
@@ -249,7 +249,7 @@ const translationEs = {
                     label: "Información archivo",
                 },
                 importarExpedient: {
-                    label: "Importar expediente relacionado...",
+                    label: "Importa expediente relacionado...",
                     title: "Expedientes relacionados",
                 },
                 seguimentPortafirmes: {
@@ -261,10 +261,10 @@ const translationEs = {
                     title: "Detalles de la firma",
                 },
                 custodiar: {
-                    label: "Custodiar",
+                    label: "Custodia",
                 },
                 replay: {
-                    label: "Recuperar",
+                    label: "Recupera",
                     ok: "El contenido se ha recuperado correctamente",
                     massiveOk: "Los contenidos se han recuperado correctamente",
                 },
@@ -313,33 +313,33 @@ const translationEs = {
                     ok: "El justificante se ha descargado correctamente",
                 },
                 acceptar: {
-                    label: "Aceptar...",
+                    label: "Acepta...",
                     button: "Acepta",
                     title: "Aceptar expediente",
                     ok: "La anotación se ha aceptado correctamente",
                 },
                 rebutjar: {
-                    label: "Rechazar...",
+                    label: "Rechaza...",
                     button: "Rechaza",
                     title: "Rechazar expediente",
                     ok: "La anotación se ha rechazado correctamente",
                 },
                 canviProcediment: {
-                    label: "Modificar...",
+                    label: "Modifica...",
                     title: "Cambiar procedimiento",
                     ok: "La anotación {{data.identificador}} se ha modificado correctamente",
                 },
                 canviEstatDistribucio: {
-                    label: "Cambiar estado a distribución",
+                    label: "Cambia estado a distribución",
                     ok: "El estado ha cambiado correctamente",
                     massiveOk: "Se ha programado una acción masiva para actualizar el estado de '{{data.num}}' anotaciones.",
                 },
                 descargarAnnex: {
-                    label: "Descargar Anexo",
+                    label: "Descarga anexo",
                     ok: "Anexo descargado correctamente",
                 },
                 procesarAnnexosPendents: {
-                    label: "Adjuntar",
+                    label: "Adjunta",
                     ok: "El anexo se ha procesado correctamente",
                     massiveOk: "Se ha programado una acción masiva para procesar '{{data.num}}' anexos.",
                     info: "Si se ha producido algún error al aceptar una anotación desde la pantalla de Anotaciones, de manera que alguno de los documentos de la anotación no se haya adjuntado al expediente, desde este listado podrá volver a intentar adjuntar el documento al expediente.",
@@ -349,12 +349,12 @@ const translationEs = {
                     title: "Firmas",
                 },
                 consultar: {
-                    label: "Consultar",
+                    label: "Consulta",
                     ok: "La anotación se ha consultado y guardado correctamente",
                     massiveOk: "Se han consultado y guardado correctamente {{data.num}} anotaciones",
                 },
                 reintentar: {
-                    title: "Seleccionar tipo de documento para el anexo/anexos pendientes",
+                    title: "Selecciona tipo de documento para el anexo/anexos pendientes",
                 }                
             }
         },
@@ -392,59 +392,59 @@ const translationEs = {
                     ok: "La tarea {{data.titol}} se ha creado correctamente",
                 },
                 tramitar: {
-                    label: "Tramitar",
+                    label: "Tramita",
                 },
                 iniciar: {
-                    label: "Iniciar",
+                    label: "Inicia",
                     ok: "La tarea se ha iniciado correctamente",
                 },
                 rebutjar: {
-                    label: "Rechazar...",
+                    label: "Rechaza...",
                     button: "Rechaza",
                     title: "Rechazar tarea",
                     ok: "La tarea se ha rechazado correctamente",
                 },
                 cancel: {
-                    label: "Cancelar",
+                    label: "Cancela",
                     title: "¿Seguro de que desea cancelar esta tarea?",
                     ok: "La tarea se ha cancelado correctamente",
                 },
                 finalitzar: {
-                    label: "Finalizar",
+                    label: "Finaliza",
                     ok: "La tarea se ha finalizado correctamente",
                 },
                 reassignar: {
-                    label: "Reasignar...",
+                    label: "Reasigna...",
                     button: "Reasigna",
                     title: "Reasignar tarea",
                     ok: "La tarea se ha reasignado correctamente",
                 },
                 delegar: {
-                    label: "Delegar...",
+                    label: "Delega...",
                     button: "Delega",
                     title: "Delegar tarea",
                     ok: "La tarea se ha delegado correctamente",
                 },
                 retomar: {
-                    label: "Cancelar delegación...",
+                    label: "Cancela delegación...",
                     button: "Cancela delegación",
                     title: "Cancelar delegación de tarea",
                     ok: "La delegación de la tarea se ha cancelado correctamente",
                 },
                 changeDataLimit: {
-                    label: "Modificar fecha límite...",
+                    label: "Modifica fecha límite...",
                     button: "Modifica fecha límite",
                     title: "Cambiar fecha límite",
                     ok: "La tarea se ha modificado correctamente",
                 },
                 changePrioritat: {
-                    label: "Cambiar prioridad...",
+                    label: "Cambia prioridad...",
                     button: "Cambia prioridad",
                     title: "Modificar prioridad de la tarea",
                     ok: "La tarea se ha modificado correctamente",
                 },
                 reobrir: {
-                    label: "Reabrir...",
+                    label: "Reabre...",
                     button: "Reabre",
                     title: "Reabrir tarea",
                     ok: "La tarea se ha reabierto correctamente",
@@ -482,42 +482,42 @@ const translationEs = {
                     ok: "El interesado {{data.documentNum}} se ha modificado correctamente",
                 },
                 delete: {
-                    label: "Borrar Interesado",
+                    label: "Borra Interesado",
                     check: "Esta seguro de que quiere seguir con esta acción?",
                     description: "Una vez borrado no se prodra recuperar",
                     ok: "El interesado {{data.documentNum}} se ha borrado correctamente",
                 },
                 createRep: {
-                    label: "Añadir Representante",
+                    label: "Añade Representante",
                     ok: "El representante {{data.documentNum}} se ha creado correctamente",
                 },
                 updateRep: {
-                    label: "Modificar Representante",
+                    label: "Modifica Representante",
                     ok: "El representante {{data.documentNum}} se ha modificar correctamente",
                 },
                 deleteRep: {
-                    label: "Borrar Representante",
+                    label: "Elimina Representante",
                     check: "Esta seguro de que quiere seguir con esta acción?",
                     description: "Una vez borrado no se prodra recuperar",
                     ok: "El representante {{data.documentNum}} se ha borrado correctamente",
                 },
                 importar: {
-                    label: "Importar...",
+                    label: "Importa...",
                     title: "Importar interesados",
                     ok: "Interesados importados correctamente",
                 },
                 exportar: {
-                    label: "Exportar...",
+                    label: "Exporta...",
                     ok: "Interesados exportados correctamente",
                     hint: "Seleccione los interesados que desea exportar.",
                 },
                 importSGD: {
-                    label: "Importar interesados desde Registro...",
+                    label: "Importa interesados desde Registro...",
                     title: "Importar interesados desde Registro",
                     ok: "Interesados importados correctamente",
                 },
 				gestGrups: {
-				    label: "Gestionar grupos...",
+				    label: "Gestiona grupos...",
 					title: "Gestionar grupos",
 				    ok: "Grupos modificados correctamente",
 				},
@@ -546,7 +546,7 @@ const translationEs = {
 						ok: "Grupo modificado correctamente",
 					},
 					delete: {
-					    label: "Borrar Grupo",
+					    label: "Borra Grupo",
 					    check: "Esta seguro de que quiere seguir con esta acción?",
 					    description: "Una vez borrado no se prodra recuperar",
 					    ok: "El grupo {{data.nom}} se ha borrado correctamente",
@@ -571,79 +571,79 @@ const translationEs = {
                     ok: "El expediente '{{data.nom}}' se ha creado correctamente.",
                 },
                 update: {
-                    label: "Modificar...",
+                    label: "Modifica...",
                     title: "Modificar expediente",
                     ok: "El expediente '{{data.nom}}' se ha modificado correctamente.",
                 },
                 detall: {
-                    label: "Gestionar",
+                    label: "Gestiona",
                 },
                 importar: {
-                    label: "Importar expediente",
+                    label: "Importa expediente",
                     ok: "El expediente se ha importado correctamente",
                 },
                 agafar: {
-                    label: "Bloquear",
+                    label: "Bloquea",
                     ok: "El expediente '{{expedient}}' ha sido cogido por el usuario '{{user}}'",
                 },
                 follow: {
-                    label: "Seguir",
+                    label: "Sigue",
                     ok: "EL usuario '{{user}}' ha empezado a seguir al expediente '{{expedient}}'.",
                 },
                 unfollow: {
-                    label: "Dejar de seguir",
+                    label: "Deja de seguir",
                     ok: "EL usuario '{{user}}' ha dejado de seguir al expediente '{{expedient}}'.",
                 },
                 retornar: {
-                    label: "Devolver",
+                    label: "Devuelve",
                     ok: "El expediente '{{expedient}}' ha sido devuelto al gestor original '{{user}}'",
                 },
                 lliberar: {
-                    label: "Liberar",
+                    label: "Libera",
                     ok: "El expediente '{{expedient}}' ha sido liberado",
                 },
                 eliminar: {
-                    label: "Eliminar",
+                    label: "Elimina",
                     ok: "El expediente '{{data.nom}}' ha sido borrado correctamente",
                 },
                 close: {
-                    label: "Cerrar...",
-                    button: "Cierrar",
+                    label: "Cierra...",
+                    button: "Cierra",
                     title: "Cerrar expediente",
                     titleMassive: "Cerrando masivamente {{num}} expedientes",
                     ok: "El expediente '{{expedient}}' ha sido cerrado correctamente",
                 },
                 open: {
-                    label: "Reabrir",
+                    label: "Reabre",
                     description: "¿Desea reabrir el epediente?",
                     ok: "El expediente '{{expedient}}' ha sido reabierto correctamente",
                 },
                 download: {
-                    label: "Descargar documentos...",
+                    label: "Descarga documentos...",
                     button: "Descarga seleccionados",
                     title: "Selección documentos",
                     ok: "Los documentos se han descargado correctamente",
                 },
                 exportFullCalcul: {
-                    label: "Exportar hoja de cálculo",
+                    label: "Exporta hoja de cálculo",
                     ok: "La hoja de cálculo se ha descargado correctamente",
                 },
                 exportZIP: {
-                    label: "Exportar índice ZIP",
+                    label: "Exporta índice ZIP",
                     button: "Exporta ZIP",
                     title: "Exportar documentos a ZIP",
                     ok: "El documento ZIP se ha descargado correctamente",
                 },
                 exportPDF: {
-                    label: "Exportar índice PDF",
+                    label: "Exporta índice PDF",
                     ok: "El documento PDF se ha descargado correctamente",
                 },
                 exportCSV: {
-                    label: "Exportar CSV",
+                    label: "Exporta CSV",
                     ok: "El indice CSV se ha descargado correctamente",
                 },
                 exportEXCEL: {
-                    label: "Exportar índice EXCEL",
+                    label: "Exporta índice EXCEL",
                     ok: "El índice EXCEL se ha descargado correctamente",
                 },
                 exportPDF_ENI: {
@@ -663,51 +663,51 @@ const translationEs = {
                     ok: "Los documentos se han exportado correctamente",
                 },
                 export: {
-                    label: "Exportar los documentos...",
+                    label: "Exporta los documentos...",
                     button: "Exporta los documentos",
                     title: "Exportar documentos",
                     ok: "Los documentos se han descargado correctamente",
                 },
                 sincronitzar: {
-                    label: "Sincronizar estado con archivo",
+                    label: "Sincroniza estado con archivo",
                     ok: "El estado del archivo ha sido sincronizado",
                 },
                 changePrioritat: {
-                    label: "Cambiar prioridad...",
+                    label: "Cambia prioridad...",
                     button: "Cambia prioridad",
                     title: "Modificar prioridad del expediente",
                     ok: "La prioridad del expediente '{{expedient}}' se ha modificado correctamente.",
                     massiveOk: "Se ha cambiado la prioridad de '{{data.num}}' expedientes",
                 },
                 changeEstat: {
-                    label: "Cambiar estado...",
+                    label: "Cambia estado...",
                     button: "Cambia estado",
                     title: "Modificar estado del expediente",
                     ok: "El estado del expediente '{{expedient}}' se ha modificado correctamente.",
                     massiveOk: "Se ha cambiado el estado de '{{data.num}}' expedientes",
                 },
                 assignar: {
-                    label: "Asignar...",
+                    label: "Asigna...",
                     button: "Asigna",
                     title: "Asignar expediente a usuario",
                     ok: "El expediente '{{expedient}}' se ha assignado correctamente.",
                 },
                 relacio: {
-                    label: "Relacionar...",
+                    label: "Relaciona...",
                     button: "Relaciona",
                     title: "Relacionar expediente",
                     ok: "Las relaciones del expediente '{{expedient}}' han cambiado correctamente.",
                 },
                 eliminarRelacio: {
-                    label: "Eliminar relación",
+                    label: "Elimina relación",
                     ok: "La relación entre los 2 expedientes se ha eliminado correctamente.",
                 },
                 excelInteressats: {
-                    title: "Descargar plantilla para importar interesados Excel",
+                    title: "Descarga plantilla para importar interesados Excel",
                     ok: "Los interesados se han exportado correctamente",
                 },
                 impDocMass: {
-                    label: "Importar documentos a los exp. seleccionados...",
+                    label: "Importa documentos a los exp. seleccionados...",
                     title: "Importación de documentos",
                     mssg: "Los documentos que adjunte se incorporarán a los {{num}} expedientes seleccionados",
                     warning: "Los expedientes deben pertenecer al mismo procedimiento.",
@@ -724,8 +724,8 @@ const translationEs = {
                     ok: "Comentario añadido al expediente '{{data.expedient.description}}'",
                 },
 				moureTot: {
-					label: "Mover todo...",
-                    button: "Mover todo",
+					label: "Muévelo todo...",
+                    button: "Muévelo todo",
 				    title: "Mover todo al expediente destino",
 				    ok: "La acción masiva para mover el expediente '{{expedient}}' se ha creado correctamente.",
 				},
@@ -860,13 +860,13 @@ const translationEs = {
                     ok: "El documento {{data.nom}} se ha modificado correctamente"
                 },
                 delete: {
-                    label: "Eliminar",
+                    label: "Elimina",
                     check: "¿Está seguro de que quiere borrar este contenido?",
                     description: "Una vez borrado no se podrá recuperar. Si contenia firmas en curso, seran canceladas.",
                     ok: "El documento {{data.nom}} se ha eliminado correctamente"
                 },
                 pinbal: {
-                    label: "Consultar PINBAL...",
+                    label: "Consulta PINBAL...",
                     button: "Consulta",
                     title: "Nueva consulta PINBAL",
                     ok: "Se ha creado el documento a partir de la consulta pinbal '{{codiServeiPinbal}}'",
@@ -882,7 +882,7 @@ const translationEs = {
 					},
 				},
 				importSgd: {
-				    label: "Importar documentos SGD...",
+				    label: "Importa documentos SGD...",
 				    title: "Importación de documentos desde el SGD",
 				    ok: "Documentos importados correctamente",
 					interessats: "Selecciona los interesados que desea asociar al expediente",
@@ -903,7 +903,7 @@ const translationEs = {
 					}
 				},
                 importZip: {
-                    label: "Importar desde ZIP...",
+                    label: "Importa desde ZIP...",
                     title: "Importación de documentos desde un ZIP",
                     ok: "Documentos importados correctamente",
 					resultat: {
@@ -934,25 +934,25 @@ const translationEs = {
                     ok: "El documenmto original se ha descargado correctamente",
                 },
                 download: {
-                    firma: "Descargar firma",
+                    firma: "Descarga firma",
                     ok: "El documento se ha descargado correctamente",
                 },
                 firma: {
-                    label: "Firmar desde el navegador....",
+                    label: "Firma desde el navegador....",
                     button: "Inicia proceso de firma",
                     title: "Firmar desde el navegador",
                     ok: "Documento firmado correctamente",
                 },
                 view: {
-                    label: "Visualizar",
+                    label: "Visualiza",
                     title: "Visualizar",
                 },
                 csv: {
-                    label: "Copiar enlace CSV",
+                    label: "Copia enlace CSV",
                     ok: "Enlace CSV copiado correctamente",
                 },
                 portafirmes: {
-                    label: "Enviar a portafirmas...",
+                    label: "Envia a portafirmas...",
                     button: "Envia a portafirmas",
                     title: "Enviar documento a portafirmas",
                     ok: "Documento '{{document}}' enviado a portafirmas",
@@ -966,13 +966,13 @@ const translationEs = {
                     button: "Inicia proceso de firma",
                 },
                 viaFirma: {
-                    label: "Enviar viaFirma...",
+                    label: "Envia viaFirma...",
                     button: "Enviar a ViaFirma",
                     title: "Enviar documento a ViaFirma",
                     ok: "Documento '{{document}}' enviado a viaFirma",
                 },
                 mail: {
-                    label: "Enviar via email...",
+                    label: "Envia via email...",
                     button: "Envia via email",
                     title: "Enviar documento por email",
                     ok: "Documento '{{document}}' enviado via email",
@@ -988,7 +988,7 @@ const translationEs = {
                     description: "¿Seguro que desea cancelar la firma actualmente en proceso?",
                 },
                 notificar: {
-                    label: "Notificar o comunicar...",
+                    label: "Notifica o comunica...",
                     button: "Notifica",
                     title: "Crear notificación documento",
                     ok: "Notificación creada correctamente",
@@ -1013,16 +1013,16 @@ const translationEs = {
                     }
                 },
                 notificarMasiva: {
-                    label: "Notificar o comunicar...",
+                    label: "Notifica o comunica...",
                     button: "Notifica",
                     title: "Generar documento para notificar",
                     ok: "Se ha generado un zip de los elementos seleccionados",
                 },
                 comunicar: {
-                    label: "Comunicar...",
+                    label: "Comunica...",
                 },
                 publicar: {
-                    label: "Publicar...",
+                    label: "Publica...",
                     button: "Publica",
                     title: "Crear publicación",
                     ok: "Publicación creada correctamente",
@@ -1036,13 +1036,13 @@ const translationEs = {
                     ok: "La copia auténtica se ha descargado correctamente",
                 },
                 changeType: {
-                    label: "Cambiar tipo...",
+                    label: "Cambia tipo...",
                     button: "Cambia tipo",
                     title: "Cambiar tipo",
                     ok: "Los documentos se han modificado correctamente",
                 },
                 definitive: {
-                    label: "Convertir a definitivo",
+                    label: "Convierte a definitivo",
                     description: "Esta acción hará que los documentos pasen a formar parte del expediente de forma definitiva y no se podrán eliminar.",
                     ok: "Documento '{{document}}' cambiado a definitivo",
                     massiveOk: "Se han marcado como definitivos '{{data.num}}' documentos",
@@ -1083,12 +1083,12 @@ const translationEs = {
                     ok: "Carpeta '{{data.nom}}' creada correctamente",
                 },
                 update: {
-                    label: "Modificar...",
+                    label: "Modifica...",
                     title: "Modificar carpeta",
                     ok: "Carpeta '{{data.nom}}' modificada correctamente",
                 },
                 delete: {
-                    label: "Borrar...",
+                    label: "Borra...",
                     check: "Esta seguro de que quiere seguir con esta acción?",
                     description: "Una vez borrado no se prodra recuperar",
                     ok: "Carpeta '{{data.nom}}' eliminada correctamente",
@@ -1113,7 +1113,7 @@ const translationEs = {
             },
             action: {
                 new: {
-                    label: "Añadir valor para el dato",
+                    label: "Añade valor para el dato",
                     ok: "El dato {{data.valor}} se ha creado correctamente",
                 },
                 update: {
@@ -1133,11 +1133,11 @@ const translationEs = {
             },
             action: {
                 activar: {
-                    label: "Activar",
+                    label: "Activa",
                     ok: "Meta-dato activado",
                 },
                 desactivar: {
-                    label: "Desactivar",
+                    label: "Desactiva",
                     ok: "Meta-dato desactivado",
                 },
                 new: {
@@ -1227,7 +1227,7 @@ const translationEs = {
                     ok: "La remesa {{data.assumpte}} se ha modificado correctamente",
                 },
                 actualitzarEstat: {
-                    label: "Actualizar estado",
+                    label: "Actualiza estado",
                     ok: "El estado ha sido actualizado",
                     massiveOk: "Se ha creado la ejecución masiva. Puede consultar su estado en el listado de acciones masivas.",
                 },
@@ -1269,7 +1269,7 @@ const translationEs = {
             },
             action: {
                 ampliarPlac: {
-                    label: "Ampliar plazo...",
+                    label: "Amplia plazo...",
                     button: "Amplia plazo",
                     title: "Ampliación del plazo de los envíos de la remesa",
                     ok: "El plazo ha sido ampliado",
@@ -1332,21 +1332,21 @@ const translationEs = {
                     ok: "Grupo '{{data.codi}}' eliminado correctamente",
                 },
                 link: {
-                    label: "Vincular grupo...",
+                    label: "Vincula grupo...",
                     button: "Vincula grupo",
                     title: "Vincular grupo",
                     ok: "Grupo vinculado",
                 },
                 unlink: {
-                    label: "Desvincular",
+                    label: "Desvincula",
                     ok: "Grupo desvinculado",
                 },
                 default: {
-                    label: "Marcar por defecto",
+                    label: "Marca por defecto",
                     ok: "Grupo marcado como defecto",
                 },
                 undefault: {
-                    label: "Quitar por defecto",
+                    label: "Quita por defecto",
                     ok: "Grupo desmarcado como predeterminado",
                 },
             },
@@ -1359,7 +1359,7 @@ const translationEs = {
                 },
                 actualitzar: {
                     title: "Predicción de sincronización",
-                    label: "Actualizar órganos gestores de DIR3",
+                    label: "Actualiza órganos gestores de DIR3",
                     ok: "Los órganos están actualizados",
                     button: "Sincronizar",
                     tabs: {
@@ -1381,7 +1381,7 @@ const translationEs = {
             title: "Tipo documental",
             action: {
                 new: {
-                    label: "Añadir tipo documental",
+                    label: "Añade tipo documental",
                     ok: "Tipo documental '{{data.codi}}' creado correctamente",
                 },
                 update: {
@@ -1432,11 +1432,11 @@ const translationEs = {
                 },
                 consultar: {
                     title: "Detalle del procedimiento",
-                    label: "Consultar",
+                    label: "Consulta",
                     revisat: "Este procedimiento no se puede modificar ya que se encuentra en estado revisado",
                 },
                 canviEstat: {
-                    label: "Cambiar el estado de revisión...",
+                    label: "Cambia el estado de revisión...",
                     button: "Cambiar estado",
                     title: "Cambiar estado de revisión",
                     ok: "Estado cambiado correctamente",
@@ -1449,35 +1449,35 @@ const translationEs = {
                     title: "Estado de la regla en Distribución",
                     label: "Regla de distribución",
                     create: {
-                        label: "Crear regla en Distribución",
+                        label: "Crea regla en Distribución",
                         ok: "La regla con código '{{nom}}' se ha creado correctamente.",
                     },
                     active: {
-                        label: "Activar regla en Distribución",
+                        label: "Activa regla en Distribución",
                         ok: "La regla con código '{{nom}}' se ha activado correctamente.",
                     },
                     desactive: {
-                        label: "Desactivar regla en Distribución",
+                        label: "Desactiva regla en Distribución",
                         ok: "La regla con código '{{nom}}' se ha desactivado correctamente",
                     },
                 },
                 activar: {
-                    label: "Activar",
+                    label: "Activa",
                     ok: "Procedimiento activado correctamente",
                 },
                 desactivar: {
-                    label: "Desactivar",
+                    label: "Desactiva",
                     ok: "Procedimiento desactivado correctamente",
                 },
                 comment: {
                     ok: "Comentario añadido al procedimiento '{{data.metaExpedient.description}}'",
                 },
                 importRolsac: {
-                    label: "Importar desde ROLSAC...",
+                    label: "Importa desde ROLSAC...",
                     title: "Importar procedimiento desde ROLSAC",
                 },
                 importFitxer: {
-                    label: "Importar desde fichero...",
+                    label: "Importa desde fichero...",
                     title: "Importar procedimiento",
                     ok: "Procedimiento importado correctamente",
                 },
@@ -1485,20 +1485,20 @@ const translationEs = {
                     ok: "Procedimiento exportado correctamente",
                 },
                 clonar: {
-                    label: "Clonar",
+                    label: "Clona",
                     title: "Clonar procedimiento",
                     ok: "Nuevo procedimiento clonado: {{codi}}",
                 },
                 canviPendent: {
-                    label: "Marcar como pendiente de revisión",
+                    label: "Marca como pendiente de revisión",
                     ok: "Procedimiento marcado como pendiente de revisión",
                 },                
                 canviDisseny: {
-                    label: "Marcar como proceso de diseño",
+                    label: "Marca como proceso de diseño",
                     ok: "Procedimiento marcado como proceso de diseño",
                 },
                 actualize: {
-                    label: "Actualizar desde ROLSAC...",
+                    label: "Actualiza desde ROLSAC...",
                     button: "Actualiza",
                     title: "Actualización de procedimientos",
                     description: "¿Desea actualizar los procedimientos con la información de ROLSAC?",
@@ -1529,19 +1529,19 @@ const translationEs = {
             },
             action: {
                 default: {
-                    label: "Marcar por defecto",
+                    label: "Marca por defecto",
                     ok: "Tipo de documento marcado como defecto",
                 },
                 undefault: {
-                    label: "Quitar por defecto",
+                    label: "Quita por defecto",
                     ok: "Tipo de documento desmarcado como predeterminado",
                 },
                 activar: {
-                    label: "Activar",
+                    label: "Activa",
                     ok: "Tipo de documento activado",
                 },
                 desactivar: {
-                    label: "Desactivar",
+                    label: "Desactiva",
                     ok: "Tipo de documento desactivado",
                 },
                 new: {
@@ -1583,11 +1583,11 @@ const translationEs = {
             },
             action: {
                 activar: {
-                    label: "Activar",
+                    label: "Activa",
                     ok: "Tarea activada",
                 },
                 desactivar: {
-                    label: "Desactivar",
+                    label: "Desactiva",
                     ok: "Tarea desactivada",
                 },
                 new: {
@@ -1609,11 +1609,11 @@ const translationEs = {
             },
             action: {
                 activar: {
-                    label: "Activar",
+                    label: "Activa",
                     ok: "Validación activada",
                 },
                 desactivar: {
-                    label: "Desactivar",
+                    label: "Desactiva",
                     ok: "Validación desactivada",
                 },
                 new: {
@@ -1632,11 +1632,11 @@ const translationEs = {
             title: "Dominio",
             action: {
                 cleanCache: {
-                    label: "Vaciar caché",
+                    label: "Vacía la caché",
                     ok: "La caché se ha vaciado correctamente",
                 },
                 new: {
-                    label: "Añadir dominio",
+                    label: "Añade dominio",
                     ok: "Dominio creado correctamente",
                 },
                 update: {
@@ -1665,14 +1665,14 @@ const translationEs = {
                     ok: "Entidad eliminada correctamente",
                 },
                 config: {
-                    label: "Configurar",
+                    label: "Configura",
                 },
                 activar: {
-                    label: "Activar",
+                    label: "Activa",
                     ok: "Entidad activada",
                 },
                 desactivar: {
-                    label: "Desactivar",
+                    label: "Desactiva",
                     ok: "Entidad desactivada",
                 },
             },
@@ -1691,11 +1691,11 @@ const translationEs = {
                     ok: "Aviso eliminado correctamente",
                 },
                 activar: {
-                    label: "Activar",
+                    label: "Activa",
                     ok: "Aviso activado",
                 },
                 desactivar: {
-                    label: "Desactivar",
+                    label: "Desactiva",
                     ok: "Aviso desactivado",
                 },
             },
@@ -1731,11 +1731,11 @@ const translationEs = {
             empty: "No se han encontrado propiedades",
             action: {
                 sync: {
-                    label: "Sincronizar con JBoss",
+                    label: "Sincroniza con JBoss",
                     ok: "Las propiedades se han sincronizado correctamente",
                 },
                 new: {
-                    label: "Añadir conf. específica",
+                    label: "Añade conf. específica",
                     ok: "La propiedad se ha creado correctamente",
                 },
                 update: {
@@ -1767,11 +1767,11 @@ const translationEs = {
                     label: "Diagnóstico",
                 },
                 reiniciar: {
-                    label: "Reiniciar plugin",
+                    label: "Reinicia plugin",
                     ok: "El plugin con código '{{nom}}' se ha reiniciado correctamente",
                 },
                 reiniciarAll: {
-                    label: "Reiniciar todos",
+                    label: "Reinicia todos",
                     ok: "Los plugins se han reiniciado correctamente",
                 },
             }
@@ -1794,11 +1794,11 @@ const translationEs = {
             },
             action: {
                 restart: {
-                    label: "Reiniciar",
+                    label: "Reinicia",
                     ok: "La tarea se ha reiniciado correctamente",
                 },
                 restartAll: {
-                    label: "Reiniciar seleccionadas",
+                    label: "Reinicia seleccionadas",
                     ok: "Las tareas se han reiniciado correctamente",
                 },
             }
@@ -1826,7 +1826,7 @@ const translationEs = {
                     ok: "El permiso para '{{data.principal}} {{data.sid}}' se ha creado correctamente",
                 },
                 update: {
-                    title: "Modificar permiso",
+                    title: "Modifica permiso",
                     ok: "El permiso para '{{data.principal}} {{data.sid}}' se ha modificado correctamente",
                 },
                 delete: {
@@ -1908,7 +1908,7 @@ const translationEs = {
             },
             action: {
                 massives: {
-                    label: "Consultar acciones masivas",
+                    label: "Consulta acciones masivas",
                     title: "Ejecuciones masivas de {{name}}",
                     detail: "Detalle de la acción masiva: {{tipus}}",
                     ok: "El documento se ha descargado correctamente",
@@ -1931,7 +1931,7 @@ const translationEs = {
             title: "Errores de validación del expediente",
             action: {
                 read: {
-                    label: "Marcar como leído",
+                    label: "Marca como leído",
                     title: "Alertas del expediente",
                     ok: "La alerta se ha marcado como leida",
                     massiveOk: "Las alertas se han marcado como leídas",
