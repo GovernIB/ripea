@@ -145,6 +145,91 @@ const eliminarFila = async (page: Page, fila: Locator) => {
     await esperarGridCarregat(page);
 };
 
+// ── Helper: assegurar el rol actiu del menú d'usuari ─────────────────────────
+//
+// El selector de rol del menú d'usuari té data-testid="user-menu-rol" (afegit a
+// UserMenu.tsx). El seu <input> ocult conté el valor intern del rol (p.ex.
+// "tothom" o "IPA_ADMIN"); l'opció visible mostra l'etiqueta traduïda (CA).
+//
+// En canviar de rol, l'app crida POST usuari/actual/changeInfo i, en rebre la
+// resposta, navega a '/'. Per això esperem la resposta i que el menú es tanqui.
+
+const ROL_LABEL: Record<string, string> = {
+    'IPA_ADMIN': "Administrador d'entitat",
+    'tothom':    'Usuari',
+};
+
+// Obre el menú d'usuari (capçalera) i retorna el valor intern del rol actiu.
+const llegirRolActual = async (page: Page): Promise<string> => {
+    await page.getByRole('button', { name: 'auth menu' }).click();
+    const selectorRol = page.getByTestId('user-menu-rol');
+    await expect(selectorRol).toBeVisible({ timeout: 5_000 });
+    return (await selectorRol.locator('input').first().inputValue()).trim();
+};
+
+// Comprova que el rol actiu sigui `rolDesitjat` i, si no ho és, el canvia.
+//
+// urlDesti: pàgina on ha de quedar la sessió després del canvi. En canviar de rol
+// l'app redirigeix a la interfície per defecte del nou rol, que pot no ser la
+// desitjada (fins i tot pot saltar de React a JSP). Si la URL resultant no és la
+// esperada, hi tornem abans de verificar (la verificació depèn de la interfície).
+const assegurarRol = async (page: Page, rolDesitjat: string, urlDesti: string): Promise<void> => {
+    logInfo(`[Rol] Comprovant que el rol actiu sigui "${rolDesitjat}"...`);
+    const rolActual = await llegirRolActual(page);
+    logDebug(`[Rol] Rol actiu detectat: "${rolActual}"`);
+
+    if (rolActual === rolDesitjat) {
+        logInfo('[Rol] El rol ja és el desitjat; no cal canviar-lo.');
+        await page.keyboard.press('Escape'); // tanca el menú d'usuari
+        return;
+    }
+
+    logInfo(`[Rol] Canviant de "${rolActual}" a "${rolDesitjat}"...`);
+    // Clicar el MenuItem del selector obre el desplegable de rols.
+    await page.getByTestId('user-menu-rol').click();
+    // En aplicar el canvi, l'app fa POST changeInfo i després navega a '/'.
+    const respCanvi = page.waitForResponse(
+        r => r.url().includes('usuari/actual/changeInfo') &&
+             r.request().method() === 'POST' &&
+             r.status() === 200,
+        { timeout: 10_000 }
+    );
+    await page.getByRole('option', { name: ROL_LABEL[rolDesitjat], exact: true }).click();
+    await respCanvi;
+    // El menú es tanca en navegar a '/'.
+    await page.locator('#auth-menu').waitFor({ state: 'detached', timeout: 5_000 }).catch(() => {});
+
+    // Si la redirecció ens ha tret de la interfície/pàgina desitjada, hi tornem.
+    if (!page.url().includes(urlDesti)) {
+        logDebug(`[Rol] Redirigit a ${page.url()}; tornant a ${urlDesti}`);
+        await page.goto(urlDesti);
+    }
+
+    // Re-verifica que el rol s'ha aplicat correctament.
+    const rolNou = await llegirRolActual(page);
+    expect(rolNou).toBe(rolDesitjat);
+    await page.keyboard.press('Escape');
+    logInfo(`[Rol] Rol canviat correctament a "${rolDesitjat}".`);
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Prerequisit: assegurar el rol actiu (bloc propi SENSE beforeEach)
+//
+// Es declara abans del bloc principal perquè s'executi primer (ordre del fitxer).
+// No comparteix el beforeEach del bloc principal: aquí només cal la capçalera per
+// llegir/canviar el rol, no cal carregar la graella d'expedients.
+// ─────────────────────────────────────────────────────────────────────────────
+
+test.describe('Prerequisits — rol usuari base', () => {
+
+    test('ROL ASSEGURAR USUARI', async ({ page }) => {
+        // Navegació mínima per disposar de la capçalera amb el menú d'usuari.
+        await page.goto(URL_EXPEDIENTS);
+        await assegurarRol(page, 'tothom', URL_EXPEDIENTS);
+    });
+
+});
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Pàgina: Gestió d'Expedients REACT  (rol usuari base)
 // ─────────────────────────────────────────────────────────────────────────────

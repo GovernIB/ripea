@@ -166,8 +166,9 @@ body {
                     </c:if>
                     
                     <%------------------------ ROLS ------------------------%>
-                    
-                    <li class="dropdown">
+                    <%-- data-rol exposa el codi del rol actiu (p.ex. IPA_ADMIN, tothom) per
+                         poder identificar-lo des de tests sense dependre de la traducció. --%>
+                    <li class="dropdown" data-testid="user-menu-rol" data-rol="${rolActual}">
                         <c:choose>
                             <c:when test="${fn:length(rolsUsuariActual) > 1}">
                                 <a href="#" data-toggle="dropdown">
@@ -182,7 +183,7 @@ body {
                                                 <c:url var="canviRolUrl" value="/index">
                                                     <c:param name="${requestParameterCanviRol}" value="${rol}"/>
                                                 </c:url>
-                                                <a href="${canviRolUrl}"><spring:message code="decorator.menu.rol.${rol}"/></a>
+                                                <a href="${canviRolUrl}" data-rol="${rol}"><spring:message code="decorator.menu.rol.${rol}"/></a>
                                             </li>
                                         </c:if>
                                     </c:forEach>
