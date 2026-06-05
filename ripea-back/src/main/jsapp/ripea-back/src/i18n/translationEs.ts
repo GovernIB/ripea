@@ -151,8 +151,8 @@ const translationEs = {
     },
     navigate: {
         accessibilitat: "Accesibilidad",
-        expedient: "Buscador de expedientes",
-        expedientPeticio: "Buscador de anotaciones de registro",
+        expedient: "Expedientes",
+        expedientPeticio: "Anotaciones de registro",
         usuariTasca: "Tareas",
         entitat: "Gestión de entidades",
         avis: "Gestión de avisos",
@@ -288,7 +288,7 @@ const translationEs = {
         },
         anotacio: {
             filter: {
-                title: "Buscador de anotaciones de registro"
+                title: "Anotaciones de registro"
             },
             tabs: {
                 resum: "Resumen",
@@ -557,7 +557,7 @@ const translationEs = {
         expedient: {
             title: "Expediente",
             filter: {
-                title: "Buscador de expedientes"
+                title: "Expedientes"
             },
             detall: {
                 title: "Información del expediente",
@@ -1864,7 +1864,7 @@ const translationEs = {
 
                 anotacions: "Anotaciones",
                 procediments: "Procedimientos y servicios",
-                procedimentsTitle: "Gestión de procedimientos y servicios",
+                procedimentsTitle: "Procedimientos y servicios",
                 procedimentsRevisorTitle: "Revisión de procedimientos y servicios",
                 procedimentPermis: "Permisos del procedimiento: {{nom}}",
                 grups: "Grupos",

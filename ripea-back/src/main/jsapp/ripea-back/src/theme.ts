@@ -266,7 +266,7 @@ const base: ThemeOptions = {
 
 const lightPalete = {
     mode: 'light',
-    primary: {main: '#337ab7', contrastText: "#fff"},
+    primary: {main: '#337ab7', light: '#90caf9', contrastText: "#fff"},
     text: { disabled: '#555555 !important' },
     warning: {main: '#8a6d3b'},
     action: {
