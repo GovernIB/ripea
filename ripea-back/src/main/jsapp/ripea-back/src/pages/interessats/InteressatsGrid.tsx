@@ -85,101 +85,120 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
     const {handleOpen, dialog} = useInteressatDetail();
     const {handleOpen: handleGrup, dialog: dialogGrup} = useGrupGridDialog(entity, refresh);
 
-    return <>
-        <StyledMuiGrid
-            resourceName="interessatResource"
-            popupEditFormDialogResourceTitle={t('page.interessat.title')}
-            columns={columns}
-            paginationActive={false}
-            autoHeight
-            apiRef={apiRef}
-            filter={filter}
-            sortModel={sortModel}
-            perspectives={perspectives}
-            // disableColumnSorting
-            popupEditCreateActive
-            popupEditFormContent={<InteressatsGridForm/>}
-            formAdditionalData={{
-                expedient: {id: entity?.id},
-                esRepresentant: false,
-            }}
-            rowAdditionalActions={actions}
-            onRowCountChange={onRowCountChange}
-            toolbarCreateTitle={t('page.interessat.action.new.label')}
-            toolbarShowCreate={!user?.sessionScope?.isMostrarImportacio && entity?.potModificar}
-            toolbarShowQuickFilter
-            toolbarHideRefresh
-            selectionActive
-            onRowSelectionModelChange={(newSelection) => {
-                // console.log('Selection changed:', newSelection);
-                setSelectedRows([...newSelection]);
-            }}
-            toolbarElementsWithPositions={[
-                {
-                    position: 0,
-                    element: <ToolbarButton icon={'upload'}
-                                            onClick={()=> {
-												const originalIds = selectedRows.map(id => idToOriginalIdRef.current[id] ?? id);
-												exportar(originalIds, entity)
-											}}
-                                            disabled={selectedRows?.length==0}
-                                            title={selectedRows?.length==0 ? t('page.interessat.action.exportar.hint') : undefined}
-                    >{t('page.interessat.action.exportar.label')}</ToolbarButton>
-                },
-                {
-                    position: 0,
-                    element: <ToolbarButton icon={'download'}
-                                            onClick={()=>handleImport()}
-                                            hidden={!entity?.potModificar}
-                    >{t('page.interessat.action.importar.label')}</ToolbarButton>
-                },
-				{
-					position: 0,
-				    element: <ToolbarButton icon={'groups'}
-                                            onClick={()=>handleGrup()}
-				                            hidden={!entity?.potModificar}
-                   >{t('page.interessat.grup.title')}</ToolbarButton>
-				},
-                {
-                    position: 0,
-                    element: <ToolbarButton icon={'description'}
-                                            color={'success'}
-                                            variant={'contained'}
-                                            title={t('page.expedient.action.excelInteressats.title')}
-                                            onClick={()=>excelInteressats(entity?.id)}
-                                            // disabled={selectedRows?.length==0}
-                                            hidden={!entity?.potModificar || !num}
-                    />,
-                },
-                {
-                    position: 3,
-                    element: <MenuActionButton
-                        id={'createInteressats'}
-                        hidden={!user?.sessionScope?.isMostrarImportacio || !entity?.potModificar}
-                        buttonLabel={t('page.interessat.action.new.label')}
-                        buttonProps={{
-                            startIcon: <Icon>add</Icon>,
-                            variant: "outlined",
-                            sx: { borderRadius: '4px', minWidth: '20px', minHeight: '32px', py: 0 }
-                        }}
-                        actions={createActions}
-                    />,
-                }
-            ]}
-
-            onRowClick={(params: any) => {
-                handleOpen(params?.row?.id);
-			}}
-            popupEditFormI18nKeys={{
-                createSuccess: 'page.interessat.action.new.ok',
-                updateSuccess: 'page.interessat.action.update.ok',
-            }}
-        />
-        {dialog}
-        {contentImport}
-        {dialogGrup}
-        {components}
-    </>
+    return (
+        <>
+            <StyledMuiGrid
+                resourceName="interessatResource"
+                popupEditFormDialogResourceTitle={t('page.interessat.title')}
+                columns={columns}
+                paginationActive={false}
+                autoHeight
+                apiRef={apiRef}
+                filter={filter}
+                sortModel={sortModel}
+                perspectives={perspectives}
+                // disableColumnSorting
+                popupEditCreateActive
+                popupEditFormContent={<InteressatsGridForm />}
+                formAdditionalData={{
+                    expedient: { id: entity?.id },
+                    esRepresentant: false,
+                }}
+                rowAdditionalActions={actions}
+                onRowCountChange={onRowCountChange}
+                toolbarCreateTitle={t('page.interessat.action.new.label')}
+                toolbarShowCreate={!user?.sessionScope?.isMostrarImportacio && entity?.potModificar}
+                toolbarShowQuickFilter
+                toolbarHideRefresh
+                selectionActive
+                onRowSelectionModelChange={(newSelection) => {
+                    // console.log('Selection changed:', newSelection);
+                    setSelectedRows([...newSelection]);
+                }}
+                toolbarElementsWithPositions={[
+                    {
+                        position: 0,
+                        element: (
+                            <ToolbarButton
+                                icon={'upload'}
+                                onClick={() => {
+                                    const originalIds = selectedRows.map((id) => idToOriginalIdRef.current[id] ?? id);
+                                    exportar(originalIds, entity);
+                                }}
+                                disabled={selectedRows?.length == 0}
+                                title={
+                                    selectedRows?.length == 0 ? t('page.interessat.action.exportar.hint') : undefined
+                                }
+                            >
+                                {t('page.interessat.action.exportar.label')}
+                            </ToolbarButton>
+                        ),
+                    },
+                    {
+                        position: 0,
+                        element: (
+                            <ToolbarButton
+                                icon={'download'}
+                                onClick={() => handleImport()}
+                                hidden={!entity?.potModificar}
+                            >
+                                {t('page.interessat.action.importar.label')}
+                            </ToolbarButton>
+                        ),
+                    },
+                    {
+                        position: 0,
+                        element: (
+                            <ToolbarButton icon={'groups'} onClick={() => handleGrup()} hidden={!entity?.potModificar}>
+                                {t('page.interessat.grup.title')}
+                            </ToolbarButton>
+                        ),
+                    },
+                    {
+                        position: 0,
+                        element: (
+                            <ToolbarButton
+                                icon={'description'}
+                                color={'success'}
+                                variant={'contained'}
+                                title={t('page.expedient.action.excelInteressats.title')}
+                                onClick={() => excelInteressats(entity?.id)}
+                                // disabled={selectedRows?.length==0}
+                                hidden={!entity?.potModificar || !num}
+                            />
+                        ),
+                    },
+                    {
+                        position: 3,
+                        element: (
+                            <MenuActionButton
+                                id={'createInteressats'}
+                                hidden={!user?.sessionScope?.isMostrarImportacio || !entity?.potModificar}
+                                buttonLabel={t('page.interessat.action.new.label')}
+                                buttonProps={{
+                                    startIcon: <Icon>add</Icon>,
+                                    variant: 'outlined',
+                                    sx: { borderRadius: '4px', minWidth: '20px', minHeight: '32px', py: 0 },
+                                }}
+                                actions={createActions}
+                            />
+                        ),
+                    },
+                ]}
+                onRowClick={(params: any) => {
+                    handleOpen(params?.row?.id);
+                }}
+                popupEditFormI18nKeys={{
+                    createSuccess: 'page.interessat.action.new.ok',
+                    updateSuccess: 'page.interessat.action.update.ok',
+                }}
+            />
+            {dialog}
+            {contentImport}
+            {dialogGrup}
+            {components}
+        </>
+    );
 }
 
 export default InteressatsGrid;

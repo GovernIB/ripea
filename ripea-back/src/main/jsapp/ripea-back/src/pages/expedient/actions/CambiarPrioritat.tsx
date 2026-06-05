@@ -31,7 +31,7 @@ export const CambiarPrioritat = (props:any) => {
     </FormActionDialog>
 }
 
-export const useCambiarPrioritat = (refresh?: () => void) => {
+const useCambiarPrioritat = (refresh?: () => void) => {
     const { t } = useTranslation();
     const apiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow} = useBaseAppContext();
