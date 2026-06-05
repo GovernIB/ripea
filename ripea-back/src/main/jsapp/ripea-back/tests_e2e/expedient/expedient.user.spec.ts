@@ -1,5 +1,21 @@
 import { test, expect, Page, Locator } from '@playwright/test';
 
+import {
+    SYSTEM_DELAY,
+    logDebug,
+    logInfo,
+    humanDelay,
+    getGrid,
+    getRows,
+    expectSuccessAlert,
+    obrirMenuAccions,
+    esperarGridCarregat,
+    waitApiGet,
+    waitApiEntityLoad,
+    seleccionarOpcioAutocompletament,
+    assegurarRol,
+} from '../utils/reactHelpers';
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Gestió d'Expedients REACT  (rol usuari base / tramitador)
 //
@@ -12,14 +28,9 @@ import { test, expect, Page, Locator } from '@playwright/test';
 //   - Detall de l'expedient (/contingut/:id)
 //   - Eliminació
 //
-// Convencions reutilitzades de metaExpedient.admin.spec.ts: helpers d'espera de
-// graella (overlay), espera de respostes API abans d'accions, i selectors
-// bilingües (català/castellà) per ser robustos davant l'idioma actiu.
+// Els helpers genèrics (graella, esperes d'API, autocomplete, rol) viuen a
+// ../utils/reactHelpers. Aquí només es defineixen els específics d'aquesta pàgina.
 // ─────────────────────────────────────────────────────────────────────────────
-
-const DEBUG_ACTIVAT  = true;
-const SYSTEM_DELAY   = 500; // milisegons de retard abans de certes accions, NO TOCAR.
-const HUMAN_DELAY    = 100; // milisegons de retard entre execució de accions
 
 const URL_EXPEDIENTS = '/ripeaback/reactapp/expedient';
 
@@ -28,94 +39,13 @@ const PREFIX_TEST    = 'zz_PLAYWRIGHT_EXP_REACT';
 const NOM_TEST       = `${PREFIX_TEST}_zz`;
 const NOM_MODIFICAT  = `${PREFIX_TEST}_MOD_zz`;
 
-// ── Helpers generals ──────────────────────────────────────────────────────────
+// ── Helpers específics d'aquesta pàgina ─────────────────────────────────────────
 
-const logDebug = (message: string) => { if (DEBUG_ACTIVAT) { console.log(message); } };
-const logInfo  = (message: string) => { console.log(message); };
-
-const getGrid            = (page: Page) => page.locator('.MuiDataGrid-root').first();
-const getRows            = (page: Page) => page.locator('.MuiDataGrid-row');
-const getToolbar         = (page: Page) => page.locator('.MuiToolbar-root').filter({ hasText: /nou expedient|nuevo expediente/i });
-const expectSuccessAlert = (page: Page) => expect(page.locator('.MuiAlert-standardSuccess')).toBeVisible({ timeout: 10_000 });
-
-// Obre el menú d'accions d'una fila del DataGrid (botó "més" de la cel·la d'accions).
-const obrirMenuAccions = (fila: Locator) =>
-    fila.locator('.MuiDataGrid-actionsCell button[aria-haspopup="menu"]').click();
-
-const humanDelay = async (page: Page) => {
-    if (HUMAN_DELAY > 0) { await page.waitForTimeout(HUMAN_DELAY); }
-};
-
-// Espera que el DataGrid estigui completament carregat, hagi o no resultats.
-// Condició "carregat" = .MuiDataGrid-root al DOM  AND  .MuiDataGrid-overlay absent.
-const esperarGridCarregat = async (page: Page) => {
-    logDebug('[Grid] Esperant que el grid estigui completament carregat...');
-    await page.waitForFunction(
-        () => {
-            const grid = document.querySelector('.MuiDataGrid-root');
-            if (!grid) return false;                                        // Grid encara no muntat
-            if (grid.querySelector('.MuiDataGrid-overlay')) return false;   // Overlay de càrrega present
-            return true;
-        },
-        { timeout: 15_000 }
-    );
-    logDebug('[Grid] Carregat OK. Num files: ' + await getRows(page).count());
-};
+const getToolbar = (page: Page) =>
+    page.locator('.MuiToolbar-root').filter({ hasText: /nou expedient|nuevo expediente/i });
 
 // Llistat d'expedients: GET /api/expedients?... (exclou sub-rutes com /artifacts o /{id}).
 const esGetLlistat = (url: string) => url.includes('/api/expedients') && !url.includes('/expedients/');
-
-// Registra un listener de resposta GET i, un cop rebuda, espera que el grid acabi
-// de renderitzar. IMPORTANT: cridar ABANS de l'acció que dispara la petició.
-const waitApiGet = async (page: Page, urlMatcher: (url: string) => boolean) => {
-    logDebug('[API] Listener GET registrat...');
-    const response = await page.waitForResponse(
-        resp => urlMatcher(resp.url()) && resp.request().method() === 'GET' && resp.status() === 200,
-        { timeout: 15_000 }
-    );
-    logDebug('[API] GET rebut: ' + response.url().split('?')[0] + ' → status ' + response.status());
-    await esperarGridCarregat(page);
-};
-
-// Espera la resposta GET de l'apiGetOne d'un expedient concret (GET /api/expedients/{id}).
-// En obrir la modal de modificació, Form.tsx crida apiGetOne(id) i, quan respon,
-// reset(entityData) renderitza els camps. Cridar ABANS d'obrir el diàleg.
-const waitApiEntityLoad = (page: Page, id: string | null) =>
-    page.waitForResponse(
-        resp => !!id &&
-                resp.url().endsWith(`/${id}`) &&
-                resp.request().method() === 'GET' &&
-                resp.status() === 200,
-        { timeout: 10_000 }
-    );
-
-// Selecciona la primera opció d'un MUI Autocomplete (camp tipus llista amb cerca):
-//   1. Clica l'input per obrir la llista
-//   2. Espera que desaparegui el CircularProgress (càrrega de dades)
-//   3. Espera que el listbox tingui almenys una opció
-//   4. Selecciona la primera opció
-const seleccionarPrimeraOpcioAutocompletament = async (
-    page: Page,
-    container: Page | Locator,
-    inputSelector: string
-): Promise<void> => {
-    logDebug(`[Autocomplete] Obrint "${inputSelector}" i seleccionant la primera opció`);
-    await container.locator(inputSelector).click();
-    await page.waitForFunction(
-        (sel: string) => {
-            const input = document.querySelector(sel);
-            if (!input) return false;
-            const root = input.closest('[class*="MuiAutocomplete-root"]');
-            if (!root || root.querySelector('.MuiCircularProgress-root')) return false;
-            const listbox = document.querySelector('[role="listbox"]');
-            return !!listbox && listbox.querySelectorAll('[role="option"]').length > 0;
-        },
-        inputSelector,
-        { timeout: 15_000 }
-    );
-    await page.getByRole('option').first().click();
-    await page.waitForSelector('[role="listbox"]', { state: 'detached', timeout: 5_000 }).catch(() => {});
-};
 
 // Filtra el llistat d'expedients pel títol i espera la resposta del llistat.
 // El filtre conserva l'estat per defecte "Obert" (estat != TANCAT), de manera que
@@ -143,73 +73,6 @@ const eliminarFila = async (page: Page, fila: Locator) => {
     await dialog.getByRole('button').filter({ hasText: /accepta|acepta|confirmar|ok/i }).click();
     await expectSuccessAlert(page);
     await esperarGridCarregat(page);
-};
-
-// ── Helper: assegurar el rol actiu del menú d'usuari ─────────────────────────
-//
-// El selector de rol del menú d'usuari té data-testid="user-menu-rol" (afegit a
-// UserMenu.tsx). El seu <input> ocult conté el valor intern del rol (p.ex.
-// "tothom" o "IPA_ADMIN"); l'opció visible mostra l'etiqueta traduïda (CA).
-//
-// En canviar de rol, l'app crida POST usuari/actual/changeInfo i, en rebre la
-// resposta, navega a '/'. Per això esperem la resposta i que el menú es tanqui.
-
-const ROL_LABEL: Record<string, string> = {
-    'IPA_ADMIN': "Administrador d'entitat",
-    'tothom':    'Usuari',
-};
-
-// Obre el menú d'usuari (capçalera) i retorna el valor intern del rol actiu.
-const llegirRolActual = async (page: Page): Promise<string> => {
-    await page.getByRole('button', { name: 'auth menu' }).click();
-    const selectorRol = page.getByTestId('user-menu-rol');
-    await expect(selectorRol).toBeVisible({ timeout: 5_000 });
-    return (await selectorRol.locator('input').first().inputValue()).trim();
-};
-
-// Comprova que el rol actiu sigui `rolDesitjat` i, si no ho és, el canvia.
-//
-// urlDesti: pàgina on ha de quedar la sessió després del canvi. En canviar de rol
-// l'app redirigeix a la interfície per defecte del nou rol, que pot no ser la
-// desitjada (fins i tot pot saltar de React a JSP). Si la URL resultant no és la
-// esperada, hi tornem abans de verificar (la verificació depèn de la interfície).
-const assegurarRol = async (page: Page, rolDesitjat: string, urlDesti: string): Promise<void> => {
-    logInfo(`[Rol] Comprovant que el rol actiu sigui "${rolDesitjat}"...`);
-    const rolActual = await llegirRolActual(page);
-    logDebug(`[Rol] Rol actiu detectat: "${rolActual}"`);
-
-    if (rolActual === rolDesitjat) {
-        logInfo('[Rol] El rol ja és el desitjat; no cal canviar-lo.');
-        await page.keyboard.press('Escape'); // tanca el menú d'usuari
-        return;
-    }
-
-    logInfo(`[Rol] Canviant de "${rolActual}" a "${rolDesitjat}"...`);
-    // Clicar el MenuItem del selector obre el desplegable de rols.
-    await page.getByTestId('user-menu-rol').click();
-    // En aplicar el canvi, l'app fa POST changeInfo i després navega a '/'.
-    const respCanvi = page.waitForResponse(
-        r => r.url().includes('usuari/actual/changeInfo') &&
-             r.request().method() === 'POST' &&
-             r.status() === 200,
-        { timeout: 10_000 }
-    );
-    await page.getByRole('option', { name: ROL_LABEL[rolDesitjat], exact: true }).click();
-    await respCanvi;
-    // El menú es tanca en navegar a '/'.
-    await page.locator('#auth-menu').waitFor({ state: 'detached', timeout: 5_000 }).catch(() => {});
-
-    // Si la redirecció ens ha tret de la interfície/pàgina desitjada, hi tornem.
-    if (!page.url().includes(urlDesti)) {
-        logDebug(`[Rol] Redirigit a ${page.url()}; tornant a ${urlDesti}`);
-        await page.goto(urlDesti);
-    }
-
-    // Re-verifica que el rol s'ha aplicat correctament.
-    const rolNou = await llegirRolActual(page);
-    expect(rolNou).toBe(rolDesitjat);
-    await page.keyboard.press('Escape');
-    logInfo(`[Rol] Rol canviat correctament a "${rolDesitjat}".`);
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -324,7 +187,7 @@ test.describe('Gestió d\'Expedients — usuari base', () => {
 
             // Procediment o servei: primer disponible. En seleccionar-lo, l'òrgan gestor
             // i la seqüència s'omplen automàticament; la prioritat queda "Normal" per defecte.
-            await seleccionarPrimeraOpcioAutocompletament(page, dialog, '[name="metaExpedient"] input[type="text"]');
+            await seleccionarOpcioAutocompletament(page, dialog, '[name="metaExpedient"] input[type="text"]');
             // Esperar que l'òrgan gestor s'hagi autoemplenat abans de continuar.
             await expect(dialog.locator('[name="organGestor"] input[type="text"]')).not.toHaveValue('', { timeout: 10_000 });
 

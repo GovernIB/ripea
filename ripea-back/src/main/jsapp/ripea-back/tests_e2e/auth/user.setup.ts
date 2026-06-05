@@ -1,6 +1,7 @@
 import { test as setup, expect } from '@playwright/test';
 import path from 'path';
 import fs from 'fs';
+import { performLogin } from './login';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Autenticació de l'usuari base (rol tramitador, sense perfil admin).
@@ -41,17 +42,14 @@ const SESSION_FILE = path.join('tests_e2e', '.auth', 'user.json');
 
 setup('autenticar com a usuari base (rol tramitador)', async ({ page }) => {
 
-    // 1. Navegar a l'aplicació → Keycloak redirigeix automàticament al login
+    // 1. Navegar a l'aplicació → l'IdP redirigeix automàticament al login
     await page.goto('/ripeaback/reactapp/');
 
-    // 2. Omplir el formulari de login de Keycloak
-    //    Els selectors #username i #password són els estàndards de Keycloak.
-    await page.locator('#username').fill(USUARI);
-    await page.locator('#password').fill(PASSWORD);
-    await page.locator('#kc-login').click();
+    // 2. Login adaptatiu segons l'IdP detectat (Keycloak en local, Soffid a dev.caib.es)
+    await performLogin(page, { usuari: USUARI, password: PASSWORD });
 
     // 3. Esperar que l'aplicació React hagi carregat completament
-    //    (la URL ja no conté el path de Keycloak)
+    //    (la URL ja no conté el path de l'IdP)
     await page.waitForURL('**/ripeaback/reactapp/**');
     await expect(page.locator('body')).not.toBeEmpty();
 
