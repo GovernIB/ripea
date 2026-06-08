@@ -146,9 +146,8 @@ const afterAvis = [
     },
 ];
 
-// sortModel i perspectives per prevenir re-renders
+// sortModel memoitzat per prevenir re-renders
 const sortModel: any = [{field: 'createdDate', sort: 'desc'}];
-const perspectives = ["BASIC", "AVISOS", "INTERESSATS_RESUM", "ESTAT", 'RELACIONAT', "COUNT", "AUDITORIA"];
 
 const ExpedientGrid = () => {
     const {t} = useTranslation();
@@ -158,6 +157,16 @@ const ExpedientGrid = () => {
     const apiRef = useMuiDataGridApiRef();
 
     const {value: user, rol} = useUserSession();
+
+    // Perspectives memoitzades. Es demana el mínim necessari per pintar el llistat:
+    //  - COUNT_RESUM (en lloc de COUNT) només calcula numComentaris i numSeguidors (badges)
+    //  - INTERESSATS_RESUM només si la columna d'interessats és visible per l'usuari
+    //  - AUDITORIA s'ha eliminat: el llistat no mostra createdByFullName/lastModifiedByFullName
+    const perspectives = useMemo(() => {
+        const p = ["BASIC", "AVISOS", "ESTAT", "RELACIONAT", "COUNT_RESUM"];
+        if (user?.conf?.expedientListInteressats) p.push("INTERESSATS_RESUM");
+        return p;
+    }, [user]);
 
     const refresh = () => {
         apiRef?.current?.refresh?.();
