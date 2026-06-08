@@ -1404,7 +1404,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 				getReadonlyResourceService().artifactFindAll(null);
 		return thisArtifactsAll.stream().
 				filter(a -> a.getType() == ResourceArtifactType.REPORT && a.getRequiresId() != null && a.getRequiresId()).
-				map(a -> buildReportLinkWithAffordances(a, id)).
+				map(a -> buildReportLink(a, id)).
 				collect(Collectors.toList());
 	}
 
@@ -1412,7 +1412,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 		List<ResourceArtifact> artifacts = getReadonlyResourceService().artifactFindAll(null);
 		return artifacts.stream().
 				filter(a -> a.getType() == ResourceArtifactType.REPORT && (a.getRequiresId() == null || !a.getRequiresId())).
-				map(a -> buildReportLinkWithAffordances(a, null)).
+				map(a -> buildReportLink(a, null)).
 				collect(Collectors.toList());
 	}
 
