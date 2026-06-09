@@ -22,45 +22,55 @@ import {useSessionContext} from "../../components/SessionStorageContext.tsx";
 import Load from "../../components/Load.tsx";
 
 // Form
-export const MetaExpedientForm = ({ isAdmin }:any) => {
-    const {t} = useTranslation();
-    const {data} = useFormContext()
+export const MetaExpedientForm = ({ isAdmin }: any) => {
+    const { t } = useTranslation();
+    const { data } = useFormContext();
 
-    return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField name="tipusProcedimentServei" required/>
-        <GridFormField name="codi"/>
-        <GridFormField size={2} name="tipusClassificacio" required/>
-        <GridFormField size={10} name="classificacio" debounce disabled={data?.tipusClassificacio == 'ID'}/>
-        <Grid size={12} hidden={data?.msgSiaRolsac == null}>
-            <Alert severity={'warning'} sx={{ mt: 0.5 }}>{data.msgSiaRolsac}</Alert>
-        </Grid>
-        <GridFormField size={4} name="crearReglaDistribucio" disabled={!isAdmin || data?.id}/>
-        <GridFormField name="nom"/>
-        <GridFormField name="descripcio"/>
-        <GridFormField name="serieDocumental"/>
-        <GridFormField size={4} name="procedimentComu"/>
-        <GridFormField size={8} name="organGestor" required hidden={data?.procedimentComu}/>
-        <GridFormField name="expressioNumero"
-                       componentProps={{ helperText: t('page.metaExpedient.detall.expressioNumero') }}/>
-
-        <GridFormField size={6} name="permetMetadocsGenerals"/>
-        <GridFormField size={6} name="gestioAmbGrupsActiva"/>
-        <GridFormField size={6} name="interessatObligatori"/>
-        <GridFormField size={6} name="permisDirecte" disabled={!isAdmin}
-                       componentProps={{ helperText: t('page.metaExpedient.detall.permisDirecte') }}/>
-
-        {data?.id &&
-            <Grid size={12} sx={{ pl: '8px', pt: '8px' }}>
-                <Alert severity={'info'}>
-                    {t('common.auditoria.create', {createdDate: formatDate(data.createdDate), createdBy: data.createdByFullName})}
-                    &nbsp;
-                    {data.lastModifiedDate != null &&
-                        t('common.auditoria.update', {lastModifiedDate: formatDate(data.lastModifiedDate), lastModifiedBy: data.lastModifiedByFullName})}
+    return (
+        <Grid container direction={'row'} columnSpacing={1} rowSpacing={1} sx={{ pt: 1 }}>
+            <GridFormField name="tipusProcedimentServei" required size={5} />
+            <GridFormField name="codi" size={7} />
+            <GridFormField name="tipusClassificacio" size={2} required />
+            <GridFormField name="classificacio" size={10} debounce disabled={data?.tipusClassificacio == 'ID'} />
+            <Grid size={12} hidden={data?.msgSiaRolsac == null}>
+                <Alert severity={'warning'} sx={{ mt: 0.5 }}>
+                    {data.msgSiaRolsac}
                 </Alert>
             </Grid>
-        }
-    </Grid>
-}
+            <GridFormField name="crearReglaDistribucio" size={4}  disabled={!isAdmin || data?.id} />
+            <GridFormField name="nom" />
+            <GridFormField name="descripcio" />
+            <GridFormField name="serieDocumental" />
+            <GridFormField name="procedimentComu" size={4} />
+            <GridFormField name="organGestor" size={8} required hidden={data?.procedimentComu} />
+            <GridFormField name="expressioNumero" componentProps={{ helperText: t('page.metaExpedient.detall.expressioNumero') }} />
+
+            <GridFormField name="permetMetadocsGenerals" size={6} />
+            <GridFormField name="gestioAmbGrupsActiva" size={6} />
+            <GridFormField name="interessatObligatori" size={6} />
+            <GridFormField
+                name="permisDirecte"
+                size={6}
+                disabled={!isAdmin}
+                componentProps={{ helperText: t('page.metaExpedient.detall.permisDirecte') }}
+            />
+
+            {data?.id && (
+                <Grid size={12} sx={{ pl: '8px', pt: '8px' }}>
+                    <Alert severity={'info'}>
+                        {t('common.auditoria.create', { createdDate: formatDate(data.createdDate), createdBy: data.createdByFullName })}
+                        &nbsp;
+                        {data.lastModifiedDate != null &&
+                            t('common.auditoria.update', {
+                                lastModifiedDate: formatDate(data.lastModifiedDate),
+                                lastModifiedBy: data.lastModifiedByFullName,
+                            })}
+                    </Alert>
+                </Grid>
+            )}
+        </Grid>
+    );
+};
 
 // Grid
 const columns = [

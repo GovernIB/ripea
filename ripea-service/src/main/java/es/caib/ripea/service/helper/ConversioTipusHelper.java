@@ -155,7 +155,7 @@ public class ConversioTipusHelper {
 						return source.toDate();
 					}
 				});
-		
+
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<ExecucioMassivaContingutEntity, ExecucioMassivaContingutDto>() {
 					public ExecucioMassivaContingutDto convert(ExecucioMassivaContingutEntity source, Type<? extends ExecucioMassivaContingutDto>destinationClass, MappingContext mappingContext) {
@@ -198,8 +198,22 @@ public class ConversioTipusHelper {
 					}
 				})
 	        .register();
-	      
-	      mapperFactory.classMap(MetaExpedientEntity.class, MetaExpedientDto.class).byDefault().register();
+
+		mapperFactory.classMap(MetaExpedientEntity.class, MetaExpedientDto.class)
+				.customize(new CustomMapper<MetaExpedientEntity, MetaExpedientDto>() {
+					@Override
+					public void mapAtoB(MetaExpedientEntity source, MetaExpedientDto target, MappingContext context) {
+						if (source.getCreatedDate() != null && source.getCreatedDate().isPresent()) {
+							LocalDateTime localDateTime = source.getCreatedDate().get();
+							target.setCreatedDate(Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant()));
+						}
+						if (source.getLastModifiedDate() != null && source.getLastModifiedDate().isPresent()) {
+							LocalDateTime localDateTime = source.getLastModifiedDate().get();
+							target.setLastModifiedDate(Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant()));
+						}
+					}
+				})
+				.byDefault().register();
 	      
 	      mapperFactory.classMap(MetaExpedientEntity.class, MetaExpedientExportDto.class)
           .field("metaDocuments", "metaDocuments")
