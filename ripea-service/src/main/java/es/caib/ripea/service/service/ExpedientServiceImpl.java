@@ -1455,7 +1455,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 			long t4 = System.currentTimeMillis();
 			UsuariEntity agafatPer = null;
 			
-			if (rolActual.equals("tothom")) {
+		if (rolActual.equals("tothom")) {
 				if (filtre.isMeusExpedients()) {
 					agafatPer = usuariHelper.getUsuariAutenticat();
 				}

@@ -605,12 +605,32 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		    }
 	    }
     	
+    	//VIA 5: el grup de l'expedient dona acces, pero nomes per procediments SENSE permis directe.
+    	//Els procediments amb permisDirecte=true s'accedeixen exclusivament per la VIA 1
+    	//(permis directe real de l'usuari), validada a mes pel filtre permisDirecte de mes avall.
+    	/** (:esNullIdsGrupsPermesos = false and e.grup.id in (:idsGrupsPermesos) and e.metaExpedient.permisDirecte = false) */
+    	Filter filtreGrupsAccess = null;
+    	String grupAccessId = ExpedientResource.Fields.grup + ".id";
+    	List<String> grupsAccessClausulesIn = Utils.getIdsEnGruposMil(permisosPerExpedients.getIdsGrupsPermesos());
+    	if (grupsAccessClausulesIn!=null) {
+    		for (String aux: grupsAccessClausulesIn) {
+    			if (aux != null && !aux.isEmpty()) {
+    				filtreGrupsAccess = FilterBuilder.or(filtreGrupsAccess, Filter.parse(grupAccessId + " IN (" + aux + ")"));
+    			}
+    		}
+    	}
+    	if (filtreGrupsAccess != null) {
+    		String campPermisDirecte = ExpedientResource.Fields.metaExpedient + "." + MetaExpedientResource.Fields.permisDirecte;
+    		filtreGrupsAccess = FilterBuilder.and(filtreGrupsAccess, Filter.parse(campPermisDirecte + "!true"));
+    	}
+
     	filtrePermisos = FilterBuilder.or(
     			filtreMetaExpedientsPermesos,
     			filtreOrgansPermesos,
     			filtreMetaExpedientOrganPairsPermesos,
-    			filtreOrgansAmbProcedimentsComunsPermesos);
-    	
+    			filtreOrgansAmbProcedimentsComunsPermesos,
+    			filtreGrupsAccess);
+
     	return filtrePermisos;
     }
 

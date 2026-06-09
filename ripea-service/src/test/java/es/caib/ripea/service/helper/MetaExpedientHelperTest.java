@@ -988,7 +988,7 @@ class MetaExpedientHelperTest {
                 anyBoolean(), anyBoolean(), any(), any(), any(), any(),
                 anyBoolean(), any(), any(), any(), any(),
                 anyBoolean(), any(), any(), any(), any(),
-                anyBoolean(), anyBoolean(), any(), anyBoolean()))
+                anyBoolean(), anyBoolean(), any(), anyBoolean(), anyBoolean(), any()))
                 .thenReturn(Collections.emptyList());
 
         List<MetaExpedientEntity> resultat = helper.findPermesosAccioMassiva(ENTITAT_ID, "IPA_ADMIN");
@@ -1390,7 +1390,7 @@ class MetaExpedientHelperTest {
                 anyBoolean(), anyBoolean(), any(), any(), any(), any(),
                 anyBoolean(), any(), any(), any(), any(),
                 anyBoolean(), any(), any(), any(), any(),
-                anyBoolean(), anyBoolean(), any(), anyBoolean()))
+                anyBoolean(), anyBoolean(), any(), anyBoolean(), anyBoolean(), any()))
                 .thenReturn(Collections.emptyList());
     }
 

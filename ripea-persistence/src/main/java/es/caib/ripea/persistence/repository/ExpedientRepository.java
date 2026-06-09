@@ -85,7 +85,11 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"			or meogp.organGestor.id in (:idsOrgansPermesos2)" +
 			"			or meogp.organGestor.id in (:idsOrgansPermesos3))) " +
 			"     or (:esNullIdsMetaExpedientOrganPairsPermesos = false and meogp.id in (:idsMetaExpedientOrganPairsPermesos)) " +
-			"     or (:esNullIdsOrgansAmbProcedimentsComunsPermesos = false and meogp.organGestor.id in (:idsOrgansAmbProcedimentsComunsPermesos) and e.metaExpedient.id in (:idsProcedimentsComuns))) " +
+			"     or (:esNullIdsOrgansAmbProcedimentsComunsPermesos = false and meogp.organGestor.id in (:idsOrgansAmbProcedimentsComunsPermesos) and e.metaExpedient.id in (:idsProcedimentsComuns)) " +
+				// VIA 5: el grup de l'expedient dona acces, pero nomes per procediments SENSE permis directe.
+				// Els procediments amb permisDirecte=true s'accedeixen exclusivament per la VIA 1
+				// (permis directe real de l'usuari), validada a mes pel filtre permisDirecte de mes avall.
+				"     or (:esNullIdsGrupsPermesos = false and e.grup.id in (:idsGrupsPermesos) and e.metaExpedient.permisDirecte = false)) " +
 			// Un cop superada la select anterior, es procedeix a afinar per permisos per procediment:
 			// - Per admin i superadmin: es compleix la primera condicio = No filtra
 			// - Per la resta: el procediment no ha de requerir permis directe o en cas contrari, s'ha de tenir el permis directe de lectura.
@@ -225,7 +229,11 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"			or meogp.organGestor.id in (:idsOrgansPermesos2)" +
 			"			or meogp.organGestor.id in (:idsOrgansPermesos3))) " +
 			"     or (:esNullIdsMetaExpedientOrganPairsPermesos = false and meogp.id in (:idsMetaExpedientOrganPairsPermesos)) " +
-			"     or (:esNullIdsOrgansAmbProcedimentsComunsPermesos = false and meogp.organGestor.id in (:idsOrgansAmbProcedimentsComunsPermesos) and e.metaExpedient.id in (:idsProcedimentsComuns))) " +
+			"     or (:esNullIdsOrgansAmbProcedimentsComunsPermesos = false and meogp.organGestor.id in (:idsOrgansAmbProcedimentsComunsPermesos) and e.metaExpedient.id in (:idsProcedimentsComuns)) " +
+				// VIA 5: el grup de l'expedient dona acces, pero nomes per procediments SENSE permis directe.
+				// Els procediments amb permisDirecte=true s'accedeixen exclusivament per la VIA 1
+				// (permis directe real de l'usuari), validada a mes pel filtre permisDirecte de mes avall.
+				"     or (:esNullIdsGrupsPermesos = false and e.grup.id in (:idsGrupsPermesos) and e.metaExpedient.permisDirecte = false)) " +
 			// Un cop superada la select anterior, es procedeix a afinar per permisos per procediment:
 			// - Per admin i superadmin: es compleix la primera condicio = No filtra
 			// - Per la resta: el procediment no ha de requerir permis directe o en cas contrari, s'ha de tenir el permis directe de lectura.

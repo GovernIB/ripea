@@ -585,6 +585,10 @@ public class MetaExpedientHelper {
 //			metaExpedientOrganIds = metaExpedientOrganIds.subList(0, 1000);
 //		}
 			
+		// Cercam els grups amb permis de lectura: donen acces als procediments vinculats,
+		// excepte als que exigeixen permis directe (aquests nomes son seleccionables per la via de permis directe real).
+		List<Long> grupsIdsAmbPermis = Utils.getNullIfEmpty(permisosHelper.getObjectsIdsWithPermission(GrupEntity.class, ExtendedPermission.READ));
+
 		long t5 = System.currentTimeMillis();
 		MetaExpedientFiltre filtre = MetaExpedientFiltre.builder()
 				.entitat(entitat)
@@ -627,7 +631,9 @@ public class MetaExpedientHelper {
 				filtre.isRevisioActiva(),
 				filtre.isOrganGestorIComu(),
 				filtre.getOrgan(),
-				filtre.isAllComuns()
+				filtre.isAllComuns(),
+				grupsIdsAmbPermis == null,
+				grupsIdsAmbPermis
 				);
 		if (cacheHelper.mostrarLogsRendiment())
 			logger.info("MetaExpedientHelper.findAmbPermis findByEntitatAndActiuAndFiltreAndPermes (" + (Utils.isNotEmpty(organProcedimentsComunsIds) ? organProcedimentsComunsIds.size() : 0) + ") time:  " + (System.currentTimeMillis() - t5) + " ms");

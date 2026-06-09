@@ -1555,10 +1555,32 @@ public class EntityComprovarHelper {
 								if (cacheHelper.mostrarLogsPermisos())
 									logger.info("comprovarPermisExpedient: El usuari ni cap dels seus rols té permis de procediments comuns sobre el procediment["+procedimentId+"]-organ["+organId+"] (Proc. Comuns).");
 								
-								if (throwException) {
-									throw new PermissionDeniedException(expedient.getId(), expedient.getClass(), permissionName);
+								//Darrera oportunitat de tenir permisos sobre l'expedient
+								if (expedient.getGrup()!=null) {
+									//A grup nomes es pot assignar un sol permis, i es el de lectura.
+									boolean grantedGrup = permisosHelper.isGrantedAll(
+											expedient.getGrup().getId(),
+											GrupEntity.class,
+											new Permission[] { ExtendedPermission.READ });
+									
+									if (!grantedGrup) {
+										
+										if (cacheHelper.mostrarLogsPermisos())
+											logger.info("comprovarPermisExpedient: El usuari ni cap dels seus rols té permis sobre el grup del expedient["+procedimentId+"]-organ["+organId+"] (Proc. Comuns).");
+										
+										if (throwException) {
+											throw new PermissionDeniedException(expedient.getId(), expedient.getClass(), permissionName);
+										} else {
+											return false;
+										}
+									}
 								} else {
-									return false;
+								
+									if (throwException) {
+										throw new PermissionDeniedException(expedient.getId(), expedient.getClass(), permissionName);
+									} else {
+										return false;
+									}
 								}
 							}
 						} else {
