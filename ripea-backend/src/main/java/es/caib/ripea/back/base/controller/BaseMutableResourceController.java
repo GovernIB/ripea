@@ -671,7 +671,7 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 		List<ResourceArtifact> artifacts = getReadonlyResourceService().artifactFindAll(null);
 		List<Link> links = artifacts.stream().
 				filter(a -> a.getType() == ResourceArtifactType.ACTION && (a.getRequiresId() == null || !a.getRequiresId())).
-				map(a -> buildActionLink(a, null)).
+				map(a -> buildActionLinkWithAffordances(a, null)).
 				collect(Collectors.toList());
 		return Stream.concat(superLinks.stream(), links.stream()).collect(Collectors.toList());
 	}
