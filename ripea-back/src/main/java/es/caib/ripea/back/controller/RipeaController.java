@@ -32,15 +32,28 @@ public class RipeaController {
 		
 		UsuariDto usuariActual = SessioHelper.getUsuariActual(request);
 		String interficieDefecteStr = aplicacioService.propertyFindByNom(PropertyConfig.INTERFACE_DEFECTE);
-		
-		InterficieUsuariEnumDto interficieEfectiva;
-		if (usuariActual != null && usuariActual.getInterficieUsuari() != null) {
-			interficieEfectiva = usuariActual.getInterficieUsuari();
-		} else {
+
+		// Si la petició indica explícitament una interfície (p.ex. en canviar de rol, entitat o
+		// òrgan des de la UI actual), es manté aquesta interfície en lloc de la configurada al
+		// perfil, per no fer saltar l'usuari a l'altra UI.
+		InterficieUsuariEnumDto interficieEfectiva = null;
+		String interficieParam = request.getParameter("interficie");
+		if (interficieParam != null && !interficieParam.isEmpty()) {
 			try {
-				interficieEfectiva = InterficieUsuariEnumDto.valueOf(interficieDefecteStr.toUpperCase());
-			} catch (IllegalArgumentException e) {
-				interficieEfectiva = InterficieUsuariEnumDto.REACT;
+				interficieEfectiva = InterficieUsuariEnumDto.valueOf(interficieParam.toUpperCase());
+			} catch (IllegalArgumentException ignored) {
+				// paràmetre no vàlid: s'ignora i s'aplica la lògica per defecte
+			}
+		}
+		if (interficieEfectiva == null) {
+			if (usuariActual != null && usuariActual.getInterficieUsuari() != null) {
+				interficieEfectiva = usuariActual.getInterficieUsuari();
+			} else {
+				try {
+					interficieEfectiva = InterficieUsuariEnumDto.valueOf(interficieDefecteStr.toUpperCase());
+				} catch (IllegalArgumentException e) {
+					interficieEfectiva = InterficieUsuariEnumDto.REACT;
+				}
 			}
 		}
 

@@ -161,7 +161,12 @@ export const UserMenu = () => {
             (permisos?.organs && permisos.organs.length > 0) ? (
                 <MenuSelect
                     testId="user-menu-organ"
-                    value={organId}
+                    // organId se sincronitza amb user via useEffect i va un render endarrerit.
+                    // Quan es torna a una entitat amb òrgans després de passar per una sense
+                    // (el selector es desmunta i es torna a muntar), cal que el value ja sigui
+                    // correcte en el muntatge; per això es cau a user.organActualId mentre organId
+                    // encara no s'ha actualitzat. Sense això el Select de MUI quedaria buit.
+                    value={organId ?? user?.organActualId ?? ''}
                     onChange={setOrganId}
                     icon={<Icon fontSize={"inherit"}>apartment</Icon>}
                 >

@@ -62,14 +62,9 @@ const ProtectedRoute = ({ allowedRoles = [], params = [] }: any) => {
 const HomeRedirect = () => {
     const {value: user} = useUserSession();
 
-    if (user?.conf?.interficieUsuari === 'JSP') {
-        const pathname = window.location.pathname;
-        const idx = pathname.indexOf('/reactapp');
-        const jspRoot = idx >= 0 ? pathname.substring(0, idx) + '/' : '/';
-        window.location.replace(jspRoot);
-        return null;
-    }
-
+    // En arribar aquí ja estem dins de la UI React (p.ex. després de canviar de rol,
+    // entitat o òrgan). Es manté la interfície actual encara que el perfil de l'usuari
+    // tingui configurada JSP, per no fer-lo saltar a l'altra UI.
     switch (user?.rolActual) {
         case rols.SUPER:
             return <Navigate to="/integracio" replace />;
