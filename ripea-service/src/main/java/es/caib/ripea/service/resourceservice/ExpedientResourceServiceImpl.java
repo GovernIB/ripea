@@ -2224,16 +2224,9 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
                         target.setDataCreacioFinal(null);
                     }
                     break;
-                case ExpedientFilterForm.Fields.agafatPer:
-                    if (previous.getAgafat()!=null && fieldValue!=null){
-                        target.setAgafat(null);
-                    }
-                    break;
-                case ExpedientFilterForm.Fields.agafat:
-                    if(previous.getAgafatPer()!=null && fieldValue!=null && (Boolean) fieldValue){
-                        target.setAgafatPer(null);
-                    }
-                    break;
+                // "Agafat per" (usuari seleccionat) i el pulsador "Agafats per mi" (camp agafat)
+                // poden estar actius simultàniament: el springFilterBuilder del frontend els
+                // combina amb OR. Per això no es neteja cap dels dos quan canvia l'altre.
             }
         }
     }

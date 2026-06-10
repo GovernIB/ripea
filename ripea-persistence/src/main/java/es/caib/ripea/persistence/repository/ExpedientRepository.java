@@ -114,7 +114,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"and (:esNullTancatFi = true or e.tancatData <= :tancatFi) " +
 			"and (:esNullEstatEnum = true or (e.estat = :estatEnum and (e.estatAdditional is null or :esNullMetaNode = true))) " +
 			"and (:esNullEstat = true or e.estatAdditional = :estat) " +
-			"and (:esNullAgafatPer = true or e.agafatPer = :agafatPer) " +
+			"and (:esNullAgafatPer = true or e.agafatPer = :agafatPer or e.agafatPer = :agafatPerActual) " +
 			"and (:esNullSeguitPer = true or :seguitPer MEMBER OF e.seguidors) " +
 			"and (:esNullTipusId = true or e.metaNode.id = :tipusId) " +
 			"and (:esNullExpedientsToBeExcluded = true or e not in (:expedientsToBeExluded)) " +
@@ -189,6 +189,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("estat") ExpedientEstatEntity estat,
 			@Param("esNullAgafatPer") boolean esNullAgafatPer,
 			@Param("agafatPer") UsuariEntity agafatPer,
+			@Param("agafatPerActual") UsuariEntity agafatPerActual,
 			@Param("esNullSeguitPer") boolean esNullSeguitPer,
 			@Param("seguitPer") UsuariEntity seguitPer,
 			@Param("esNullTipusId") boolean esNullTipusId,
@@ -258,7 +259,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"and (:esNullTancatFi = true or e.tancatData <= :tancatFi) " +
 			"and (:esNullEstatEnum = true or (e.estat = :estatEnum and (e.estatAdditional is null or :esNullMetaNode = true))) " +
 			"and (:esNullEstat = true or e.estatAdditional = :estat) " +
-			"and (:esNullAgafatPer = true or e.agafatPer = :agafatPer) " +
+			"and (:esNullAgafatPer = true or e.agafatPer = :agafatPer or e.agafatPer = :agafatPerActual) " +
 			"and (:esNullSeguitPer = true or :seguitPer MEMBER OF e.seguidors) " +
 			"and (:esNullTipusId = true or e.metaNode.id = :tipusId) " +
 			"and (:esNullExpedientsToBeExcluded = true or e not in (:expedientsToBeExluded)) " +
@@ -333,6 +334,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("estat") ExpedientEstatEntity estat,
 			@Param("esNullAgafatPer") boolean esNullAgafatPer,
 			@Param("agafatPer") UsuariEntity agafatPer,
+			@Param("agafatPerActual") UsuariEntity agafatPerActual,
 			@Param("esNullSeguitPer") boolean esNullSeguitPer,
 			@Param("seguitPer") UsuariEntity seguitPer,
 			@Param("esNullTipusId") boolean esNullTipusId,
