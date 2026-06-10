@@ -61,7 +61,7 @@ public class UsuariResource extends BaseResource<String> {
     }
 
 	private boolean rebreEmailsAgrupats = true;
-	private boolean rebreAvisosNovesAnotacions;
+	private boolean rebreAvisosNovesAnotacions = true;
 	private boolean rebreEmailsCanviEstatRevisio = true;
 	private boolean expedientListDataDarrerEnviament = false;
 	private boolean expedientListAgafatPer = true;

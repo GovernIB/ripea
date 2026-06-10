@@ -1920,6 +1920,7 @@ const translationCa = {
                 ok: "Les dades de l'usuari '{{nom}}' s'han modificat correctament",
                 dades: "Dades d'usuari",
                 correu: "Enviament de correus",
+                activarCorreu: "Activar tots els correus",
                 generic: "Configuració genèrica",
                 column: "Configuració de columnes del llistat d'expedients",
                 vista: "Configuració vista de documents dels expedients",

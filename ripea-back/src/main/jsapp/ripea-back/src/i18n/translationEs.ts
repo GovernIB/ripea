@@ -1920,6 +1920,7 @@ const translationEs = {
                 ok: "Los datos del usuario '{{nom}}' se han modificado correctamente",
                 dades: "Datos de usuario",
                 correu: "Envio de correos",
+                activarCorreu: "Activar todos los correos",
                 generic: "Configuración genérica",
                 column: "Configuración de columnas del listado de expedientes",
                 vista: "Configuración vista de documentos de expedientes",
