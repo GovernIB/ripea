@@ -201,7 +201,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 					null,
 					resourcePermissions,
 					false,
-					true,
+					false,
 					buildResourceCollectionLinks(
 							quickFilter,
 							filter,
