@@ -104,6 +104,7 @@ import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.entity.UsuariEntity;
 import es.caib.ripea.persistence.repository.DocumentEnviamentInteressatRepository;
 import es.caib.ripea.persistence.repository.DocumentPortafirmesRepository;
+import es.caib.ripea.persistence.repository.DocumentRepository;
 import es.caib.ripea.persistence.repository.ExpedientPeticioRepository;
 import es.caib.ripea.persistence.repository.FluxFirmaUsuariRepository;
 import es.caib.ripea.persistence.repository.MetaDocumentFluxPortafibRepository;
@@ -300,6 +301,7 @@ public class PluginHelper {
 	@Autowired private MetaDocumentFluxPortafibRepository metaDocumentFluxPortafibRepository;
 	@Autowired private UsuariRepository usuariRepository;
 	@Autowired private DocumentPortafirmesRepository documentPortafirmesRepository;
+	@Autowired private DocumentRepository documentRepository;
 
 	public List<String> rolsUsuariFindAmbCodi(String usuariCodi) {
 
@@ -9361,9 +9363,7 @@ public class PluginHelper {
 	public Exception concsvIntegracioDiagnostic(DiagnosticFiltreDto filtre) {
 		try {
 			IArxiuPluginWrapper iArxiuPluginWrapper = getConcsvPlugin(filtre.getEntitatCodi(), filtre.getOrganCodi());
-			List<String> extensions = new ArrayList<String>();
-			extensions.add("application/pdf");
-			DocumentEntity doc = documentHelper.findLastDocumentPujatArxiuByExtensio(extensions, ArxiuEstatEnumDto.DEFINITIU);
+			DocumentEntity doc = documentRepository.findLastWithCsv();
 			iArxiuPluginWrapper.getPlugin().documentImprimible(doc.getArxiuUuid());
 			return null;
 		} catch (Exception ex) {
