@@ -5,6 +5,9 @@ const CODI_TEST      = 'zz_PLAYWRIGHT_JSP_zz';
 const NOM_MODIFICAT  = 'prova modificació playwright';
 const DESC_MODIFICADA = 'descripció de prova per playwright';
 
+const DEBUG_ACTIVAT	= true;
+const HUMAN_DELAY	= 1000; //milisegons de retard entre execució de accions
+
 const CODI_DOC1     = 'DOC_PW_JSP_01';
 const NOM_DOC1      = 'document tipus doc pw 1';
 const CODI_DOC2     = 'DOC_PW_JSP_02';
@@ -41,6 +44,16 @@ const getGrid       = (page: Page) => page.locator('#metaexpedients');
 const getRows       = (page: Page) => page.locator('#metaexpedients tbody tr').filter({ hasNot: page.locator('td.dataTables_empty') });
 const getToolbar    = (page: Page) => page.locator('[data-toggle="botons-titol"]');
 const getFilterArea = (page: Page) => page.locator('input[name="codi"]');
+
+const logDebug = (message: string) => { if (DEBUG_ACTIVAT) { console.log(message); } };
+const logInfo  = (message: string) => { console.log(message); };
+
+const humanDelay = async (page: Page) => { 
+    if (HUMAN_DELAY>0) { 
+        logDebug('Esperant ' + HUMAN_DELAY + 'ms'); 
+        await page.waitForTimeout(HUMAN_DELAY);
+    }
+};
 
 // Helper: verificar missatge d'èxit (reutilitzable al llarg de tot el test)
 const expectSuccessAlert = (page: Page) =>
@@ -341,6 +354,73 @@ const anarAPermisos = async (page: Page): Promise<Page> => {
     return permisosPage;
 };
 
+// ── Helper: assegurar el rol actiu (menú d'usuari JSP) ───────────────────────
+//
+// El selector de rol del decorador JSP (default.jsp) té data-testid="user-menu-rol"
+// i exposa el codi del rol actiu a l'atribut data-rol (p.ex. "IPA_ADMIN", "tothom"),
+// independent de l'idioma. Quan l'usuari té més d'un rol, el desplegable conté un
+// enllaç per cada rol alternatiu amb data-rol="<codi>" que navega a
+// /index?canviRol=<codi> (recàrrega completa de pàgina).
+
+const SELECTOR_ROL = '[data-testid="user-menu-rol"]';
+
+// Comprova que el rol actiu sigui `rolDesitjat` i, si no ho és, el canvia.
+//
+// urlDesti: pàgina on ha de quedar la sessió després del canvi. En canviar de rol,
+// /index redirigeix a la interfície per defecte del nou rol, que pot no ser la JSP
+// desitjada (fins i tot pot anar a React, on no existeix l'atribut data-rol). Si la
+// URL resultant no és la esperada, hi tornem abans de verificar.
+const assegurarRolJsp = async (page: Page, rolDesitjat: string, urlDesti: string): Promise<void> => {
+    console.log(`[Rol] Comprovant que el rol actiu sigui "${rolDesitjat}"...`);
+    const rolContainer = page.locator(SELECTOR_ROL);
+    await expect(rolContainer).toBeVisible({ timeout: 5_000 });
+
+    const rolActual = await rolContainer.getAttribute('data-rol');
+
+    console.log(`[Rol] Rol actiu detectat: "${rolActual}"`);
+
+    if (rolActual === rolDesitjat) {
+        console.log('[Rol] El rol ja és el desitjat; no cal canviar-lo.');
+        return;
+    }
+
+    console.log(`[Rol] Canviant de "${rolActual}" a "${rolDesitjat}"...`);
+    // Obrir el desplegable de rols (només existeix quan l'usuari té més d'un rol).
+    await rolContainer.locator('a[data-toggle="dropdown"]').click();
+    // Clicar l'enllaç del rol desitjat: navega a /index?canviRol=<codi> i recarrega.
+    await rolContainer.locator(`a[data-rol="${rolDesitjat}"]`).click();
+    // Esperar la recàrrega i que el rol actiu reflecteixi el canvi.
+    await page.waitForLoadState('load');
+
+    // Si la redirecció ens ha tret de la interfície/pàgina desitjada, hi tornem.
+    if (!page.url().includes(urlDesti)) {
+        console.log(`[Rol] Redirigit a ${page.url()}; tornant a ${urlDesti}`);
+        await page.goto(urlDesti);
+    }
+
+    // Verificar que el rol actiu reflecteixi el canvi.
+    await expect(page.locator(SELECTOR_ROL)).toHaveAttribute('data-rol', rolDesitjat, { timeout: 10_000 });
+    console.log(`[Rol] Rol canviat correctament a "${rolDesitjat}".`);
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Prerequisit: assegurar el rol actiu (bloc propi SENSE beforeEach)
+//
+// Es declara abans del bloc principal perquè s'executi primer (ordre del fitxer).
+// No comparteix el beforeEach del bloc principal: aquí només cal la capçalera per
+// llegir/canviar el rol, no cal carregar ni netejar la graella de procediments.
+// ─────────────────────────────────────────────────────────────────────────────
+
+test.describe('Prerequisits JSP — rol IPA_ADMIN', () => {
+
+    test('ROL ASSEGURAR IPA_ADMIN', async ({ page }) => {
+        // Navegació mínima per disposar de la capçalera amb el selector de rol.
+        await page.goto(URL_PROCEDIMENTS);
+        await assegurarRolJsp(page, 'IPA_ADMIN', URL_PROCEDIMENTS);
+    });
+
+});
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Pàgina: Gestió de Procediments JSP  (rol IPA_ADMIN)
 // ─────────────────────────────────────────────────────────────────────────────
@@ -360,8 +440,8 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
 	    await page.locator('button[value="netejar"]').click();
 	    await dt;
 	    await expect(page.locator('#metaexpedients_processing')).toBeHidden();
-	});	
-	
+	});
+
     // ── Disposició ────────────────────────────────────────────────────────────
 
     test('PROCEDIMENT VISTA', async ({ page }) => {

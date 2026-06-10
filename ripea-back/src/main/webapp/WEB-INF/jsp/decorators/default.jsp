@@ -156,6 +156,7 @@ body {
                                         <c:if test="${entitat.id != entitatActual.id}">
                                             <c:url var="urlCanviEntitat" value="/index">
                                                 <c:param name="${requestParameterCanviEntitat}" value="${entitat.id}"/>
+                                                <c:param name="interficie" value="JSP"/>
                                             </c:url>
                                             <li><a href="${urlCanviEntitat}">${entitat.nom}</a></li>
                                         </c:if>
@@ -166,8 +167,9 @@ body {
                     </c:if>
                     
                     <%------------------------ ROLS ------------------------%>
-                    
-                    <li class="dropdown">
+                    <%-- data-rol exposa el codi del rol actiu (p.ex. IPA_ADMIN, tothom) per
+                         poder identificar-lo des de tests sense dependre de la traducció. --%>
+                    <li class="dropdown" data-testid="user-menu-rol" data-rol="${rolActual}">
                         <c:choose>
                             <c:when test="${fn:length(rolsUsuariActual) > 1}">
                                 <a href="#" data-toggle="dropdown">
@@ -181,8 +183,9 @@ body {
                                             <li>
                                                 <c:url var="canviRolUrl" value="/index">
                                                     <c:param name="${requestParameterCanviRol}" value="${rol}"/>
+                                                    <c:param name="interficie" value="JSP"/>
                                                 </c:url>
-                                                <a href="${canviRolUrl}"><spring:message code="decorator.menu.rol.${rol}"/></a>
+                                                <a href="${canviRolUrl}" data-rol="${rol}"><spring:message code="decorator.menu.rol.${rol}"/></a>
                                             </li>
                                         </c:if>
                                     </c:forEach>
@@ -217,12 +220,14 @@ body {
                                     <c:if test="${null != organGestorActual}">
                                         <c:url var="urlCanviOrganGestor" value="/index">
                                             <c:param name="${requestParameterCanviOrganGestor}" value="-1"/>
+                                            <c:param name="interficie" value="JSP"/>
                                         </c:url>
                                     </c:if>
                                         <c:forEach var="og" items="${sessionOrgansGestors}" varStatus="status">
                                             <c:if test="${og.id != organGestorActual.id}">
                                                 <c:url var="urlCanviOrganGestor" value="/index">
                                                     <c:param name="${requestParameterCanviOrganGestor}" value="${og.id}"/>
+                                                    <c:param name="interficie" value="JSP"/>
                                                 </c:url>
                                                 <li><a href="${urlCanviOrganGestor}">${og.nom}</a></li>
                                             </c:if>

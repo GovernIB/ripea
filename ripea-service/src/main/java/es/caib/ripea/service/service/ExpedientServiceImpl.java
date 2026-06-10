@@ -1296,8 +1296,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 						expedientFiltreCalculat.getChosenEstatEnum(),
 						expedientFiltreCalculat.getChosenEstat() == null,
 						expedientFiltreCalculat.getChosenEstat(),
-						expedientFiltreCalculat.getAgafatPer() == null,
+						expedientFiltreCalculat.isAgafatPerEmpty(),
 						expedientFiltreCalculat.getAgafatPer(),
+						expedientFiltreCalculat.getAgafatPerActual(),
 						expedientFiltreCalculat.getSeguitPer() == null,
 						expedientFiltreCalculat.getSeguitPer(),				
 						filtre.getTipusId() == null,
@@ -1384,8 +1385,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 						expedientFiltreCalculat.getChosenEstatEnum(),
 						expedientFiltreCalculat.getChosenEstat() == null,
 						expedientFiltreCalculat.getChosenEstat(),
-						expedientFiltreCalculat.getAgafatPer() == null,
+						expedientFiltreCalculat.isAgafatPerEmpty(),
 						expedientFiltreCalculat.getAgafatPer(),
+						expedientFiltreCalculat.getAgafatPerActual(),
 						expedientFiltreCalculat.getSeguitPer() == null,
 						expedientFiltreCalculat.getSeguitPer(),						
 						filtre.getTipusId() == null,
@@ -1454,17 +1456,25 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 			long t4 = System.currentTimeMillis();
 			UsuariEntity agafatPer = null;
-			
-			if (rolActual.equals("tothom")) {
+			UsuariEntity agafatPerActual = null;
+
+		if (rolActual.equals("tothom")) {
 				if (filtre.isMeusExpedients()) {
-					agafatPer = usuariHelper.getUsuariAutenticat();
+					agafatPerActual = usuariHelper.getUsuariAutenticat();
 				}
 			} else {
+				// El desplegable "Agafat per" (usuari seleccionat) i el pulsador "Agafats per mi"
+				// es poden activar alhora: en aquest cas es filtra pels expedients de qualsevol dels
+				// dos usuaris (OR a la consulta entre agafatPer i agafatPerActual).
 				if (filtre.getAgafatPer() != null && !filtre.getAgafatPer().isEmpty()) {
 					agafatPer = usuariHelper.getUsuariByCodi(filtre.getAgafatPer());
-				} 
+				}
+				if (filtre.isMeusExpedients()) {
+					agafatPerActual = usuariHelper.getUsuariAutenticat();
+				}
 			}
 			expedientFiltreCalculat.setAgafatPer(agafatPer);
+			expedientFiltreCalculat.setAgafatPerActual(agafatPerActual);
 			if (cacheHelper.mostrarLogsRendiment())
 				logger.info("getUsuariAgafat time:  " + (System.currentTimeMillis() - t4) + " ms");
 			

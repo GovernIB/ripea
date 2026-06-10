@@ -21,9 +21,25 @@
 		</exclude-subsystems>
 	</deployment>
 	<sub-deployment name="ripea-back.war">
+		<!-- Exclou el modul EJB3 de JBoss del classloader d'aquest WAR per evitar
+		     que PathMatchingResourcePatternResolver (Spring HATEOAS) intenti accedir
+		     al directori "timers" durant l'escaneig del classpath a l'arrencada.
+		     Les crides als EJB segueixen funcionant (LocalStatelessSessionProxyFactoryBean
+		     resol per JNDI, no per aquest modul). -->
+		<exclusions>
+			<module name="org.jboss.as.ejb3"/>
+		</exclusions>
 		<dependencies>
 			<module name="jdk.management"/>
 		</dependencies>
+	</sub-deployment>
+	<sub-deployment name="ripea-api-interna.war">
+		<!-- Mateixa exclusio que ripea-back.war: el descriptor de l'EAR es l'unic
+		     que JBoss processa; els jboss-deployment-structure.xml dins dels WAR
+		     (WEB-INF) s'ignoren quan existeix aquest a nivell d'EAR. -->
+		<exclusions>
+			<module name="org.jboss.as.ejb3"/>
+		</exclusions>
 	</sub-deployment>
 	<ear-subdeployments-isolated>false</ear-subdeployments-isolated>
 </jboss-deployment-structure>

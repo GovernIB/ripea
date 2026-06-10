@@ -1,4 +1,5 @@
 import {Routes, Route, Navigate, Outlet} from 'react-router-dom';
+import {useTranslation} from 'react-i18next';
 import NotFoundPage from './pages/NotFound';
 import Expedient from './pages/expedient/details/Expedient.tsx';
 import ExpedientGrid from './pages/expedient/ExpedientGrid';
@@ -48,12 +49,13 @@ import Accesibilitat from "./pages/Accesibilitat.tsx";
 
 const ProtectedRoute = ({ allowedRoles = [], params = [] }: any) => {
     const {value: user} = useUserSession();
+    const { t } = useTranslation();
 
-    if (allowedRoles?.length > 0 && !allowedRoles.includes(user.rolActual)) {
-        // return <NotFoundPage />;
+    if (allowedRoles?.length > 0 && !allowedRoles.includes(user?.rolActual)) {
+        return <NotFoundPage message={t('page.forbidden')} variant="h4" />;
     }
     if (params?.length > 0 && params?.some?.((param:string) => !user?.sessionScope?.[param])) {
-        // return <NotFoundPage />;
+        return <NotFoundPage message={t('page.forbidden')} variant="h4" />;
     }
 
     return <Outlet />;
@@ -62,14 +64,9 @@ const ProtectedRoute = ({ allowedRoles = [], params = [] }: any) => {
 const HomeRedirect = () => {
     const {value: user} = useUserSession();
 
-    if (user?.conf?.interficieUsuari === 'JSP') {
-        const pathname = window.location.pathname;
-        const idx = pathname.indexOf('/reactapp');
-        const jspRoot = idx >= 0 ? pathname.substring(0, idx) + '/' : '/';
-        window.location.replace(jspRoot);
-        return null;
-    }
-
+    // En arribar aquí ja estem dins de la UI React (p.ex. després de canviar de rol,
+    // entitat o òrgan). Es manté la interfície actual encara que el perfil de l'usuari
+    // tingui configurada JSP, per no fer-lo saltar a l'altra UI.
     switch (user?.rolActual) {
         case rols.SUPER:
             return <Navigate to="/integracio" replace />;
@@ -110,7 +107,9 @@ const AppRoutes: React.FC = () => {
                 <Route path={"csv"} element={<CopiarEnllacCSVGrid />} />
                 <Route path={"definitiu"} element={<MarcarDefinitiuGrid />} />
                 <Route path={"canviPrioritats"} element={<CanviPrioritatGrid />} />
-                <Route path={"expedientPeticioCanviEstatDistribucio"} element={<ActualitzarEstatAnotacioGrid />} />
+                <Route element={<ProtectedRoute allowedRoles={[rols.ADMIN]} />}>
+                    <Route path={"expedientPeticioCanviEstatDistribucio"} element={<ActualitzarEstatAnotacioGrid />} />
+                </Route>
                 <Route path={"procesarAnnexosPendents"} element={<AdjuntarAnnexosPendentsGrid />} />
             </Route>
             <Route path="seguimentArxiuPendents" element={<CustodiarElementsPendentsGrid />} />
@@ -120,7 +119,6 @@ const AppRoutes: React.FC = () => {
         <Route element={<ProtectedRoute allowedRoles={[rols.ADMIN]} />}>
             <Route path="contingutAdmin" element={<ContingutGrid/>} />
             {/*<Route path="metaExpedientRevisio" element={<RevisioMetaExpedientGrid />} />*/}
-            <Route path="seguimentNotificacions" element={<RemesesNotibGrid />} />
             <Route path="seguimentPinbal" element={<ConsultesPinbalGrid />} />
             <Route path="seguimentTasques" element={<AssignacioTasquesGrid />} />
             <Route path="seguimentExpedientsPendents" element={<ExpedientsPendentsGrid />} />
@@ -128,6 +126,7 @@ const AppRoutes: React.FC = () => {
         </Route>
         <Route element={<ProtectedRoute allowedRoles={[rols.ADMIN, rols.tothom]} />}>
             <Route path="seguimentPortafirmes" element={<DocumentEnviatsPortafirmesGrid />} />
+            <Route path="seguimentNotificacions" element={<RemesesNotibGrid />} />
         </Route>
 
         {/* Configurar */}

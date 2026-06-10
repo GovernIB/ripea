@@ -16,6 +16,7 @@ public class ExpedientFiltreCalculat implements Serializable {
 	private MetaExpedientEntity metaExpedientFiltre;
 	private OrganGestorEntity organGestorFiltre;
 	private UsuariEntity agafatPer;
+	private UsuariEntity agafatPerActual;
 	private UsuariEntity seguitPer;
 	private ExpedientEstatEnumDto chosenEstatEnum;
 	private ExpedientEstatEntity chosenEstat;
@@ -29,6 +30,16 @@ public class ExpedientFiltreCalculat implements Serializable {
 
 	public UsuariEntity getAgafatPer() {
 		return agafatPer;
+	}
+
+	public UsuariEntity getAgafatPerActual() {
+		return agafatPerActual;
+	}
+
+	// Cert quan no s'ha d'aplicar cap filtre per usuari que ha agafat l'expedient
+	// (ni l'usuari seleccionat al desplegable "Agafat per" ni el pulsador "Agafats per mi").
+	public boolean isAgafatPerEmpty() {
+		return agafatPer == null && agafatPerActual == null;
 	}
 
 	public ExpedientEstatEnumDto getChosenEstatEnum() {

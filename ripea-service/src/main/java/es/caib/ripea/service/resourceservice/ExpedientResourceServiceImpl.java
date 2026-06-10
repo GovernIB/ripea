@@ -239,6 +239,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         register(ExpedientResource.PERSPECTIVE_AMB_PINBAL_CODE, new AmbDocumentsPinbalPerspectiveApplicator());
         register(ExpedientResource.PERSPECTIVE_FOLLOWERS, new FollowersPerspectiveApplicator());
         register(ExpedientResource.PERSPECTIVE_COUNT, new CountPerspectiveApplicator());
+        register(ExpedientResource.PERSPECTIVE_COUNT_RESUM, new CountResumPerspectiveApplicator());
         register(ExpedientResource.PERSPECTIVE_INTERESSATS_CODE, new InteressatsPerspectiveApplicator());
         register(ExpedientResource.PERSPECTIVE_ESTAT_CODE, new EstatPerspectiveApplicator());
         register(ExpedientResource.PERSPECTIVE_META_EXPEDIENT_CODE, new MetaExpedientPerspectiveApplicator());
@@ -604,12 +605,32 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		    }
 	    }
     	
+    	//VIA 5: el grup de l'expedient dona acces, pero nomes per procediments SENSE permis directe.
+    	//Els procediments amb permisDirecte=true s'accedeixen exclusivament per la VIA 1
+    	//(permis directe real de l'usuari), validada a mes pel filtre permisDirecte de mes avall.
+    	/** (:esNullIdsGrupsPermesos = false and e.grup.id in (:idsGrupsPermesos) and e.metaExpedient.permisDirecte = false) */
+    	Filter filtreGrupsAccess = null;
+    	String grupAccessId = ExpedientResource.Fields.grup + ".id";
+    	List<String> grupsAccessClausulesIn = Utils.getIdsEnGruposMil(permisosPerExpedients.getIdsGrupsPermesos());
+    	if (grupsAccessClausulesIn!=null) {
+    		for (String aux: grupsAccessClausulesIn) {
+    			if (aux != null && !aux.isEmpty()) {
+    				filtreGrupsAccess = FilterBuilder.or(filtreGrupsAccess, Filter.parse(grupAccessId + " IN (" + aux + ")"));
+    			}
+    		}
+    	}
+    	if (filtreGrupsAccess != null) {
+    		String campPermisDirecte = ExpedientResource.Fields.metaExpedient + "." + MetaExpedientResource.Fields.permisDirecte;
+    		filtreGrupsAccess = FilterBuilder.and(filtreGrupsAccess, Filter.parse(campPermisDirecte + "!true"));
+    	}
+
     	filtrePermisos = FilterBuilder.or(
     			filtreMetaExpedientsPermesos,
     			filtreOrgansPermesos,
     			filtreMetaExpedientOrganPairsPermesos,
-    			filtreOrgansAmbProcedimentsComunsPermesos);
-    	
+    			filtreOrgansAmbProcedimentsComunsPermesos,
+    			filtreGrupsAccess);
+
     	return filtrePermisos;
     }
 
@@ -803,7 +824,20 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
             resource.setNumSeguidors(entity.getSeguidors().size());
         }
     }
-    
+
+    /**
+     * Versió lleugera de {@link CountPerspectiveApplicator} per al llistat d'expedients.
+     * El grid només mostra els badges de comentaris i seguidors, així evitam calcular
+     * els 11 comptadors (i les seves consultes/càrregues lazy) per cada fila.
+     */
+    private class CountResumPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
+        @Override
+        public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
+            resource.setNumComentaris(entity.getComentaris().size());
+            resource.setNumSeguidors(entity.getSeguidors().size());
+        }
+    }
+
     private class InteressatsPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
         @Override
         public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
@@ -2190,16 +2224,9 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
                         target.setDataCreacioFinal(null);
                     }
                     break;
-                case ExpedientFilterForm.Fields.agafatPer:
-                    if (previous.getAgafat()!=null && fieldValue!=null){
-                        target.setAgafat(null);
-                    }
-                    break;
-                case ExpedientFilterForm.Fields.agafat:
-                    if(previous.getAgafatPer()!=null && fieldValue!=null && (Boolean) fieldValue){
-                        target.setAgafatPer(null);
-                    }
-                    break;
+                // "Agafat per" (usuari seleccionat) i el pulsador "Agafats per mi" (camp agafat)
+                // poden estar actius simultàniament: el springFilterBuilder del frontend els
+                // combina amb OR. Per això no es neteja cap dels dos quan canvia l'altre.
             }
         }
     }

@@ -14,10 +14,10 @@ import {useToProgramaAntic} from "./UserHeadToolbar.tsx";
 import {useNavigate} from "react-router-dom";
 
 const MenuSelect = (props:any) => {
-    const {icon, value, onChange, children, ...other} = props
+    const {icon, value, onChange, children, testId, ...other} = props
     const [open, setOpen] = useState<boolean>(false)
 
-    return <MenuItem onClick={()=>setOpen(prev=>!prev)}>
+    return <MenuItem data-testid={testId} onClick={()=>setOpen(prev=>!prev)}>
         <ListItemIcon>
             <Icon fontSize="small">{icon}</Icon>
         </ListItemIcon>
@@ -131,6 +131,7 @@ export const UserMenu = () => {
 
         { !rolActual?.isSupAdmin &&
             <MenuSelect
+                testId="user-menu-entitat"
                 value={entitatId}
                 onChange={setEntitatId}
                 icon={<Icon fontSize={"inherit"}>account_balance</Icon>}
@@ -144,6 +145,7 @@ export const UserMenu = () => {
         }
 
         <MenuSelect
+            testId="user-menu-rol"
             value={rol}
             onChange={setRol}
             icon={<Icon fontSize={"inherit"}>badge</Icon>}
@@ -158,7 +160,13 @@ export const UserMenu = () => {
         { (rolActual?.isOrganAdmin || rolActual?.isDissenyOrgan) && (
             (permisos?.organs && permisos.organs.length > 0) ? (
                 <MenuSelect
-                    value={organId}
+                    testId="user-menu-organ"
+                    // organId se sincronitza amb user via useEffect i va un render endarrerit.
+                    // Quan es torna a una entitat amb òrgans després de passar per una sense
+                    // (el selector es desmunta i es torna a muntar), cal que el value ja sigui
+                    // correcte en el muntatge; per això es cau a user.organActualId mentre organId
+                    // encara no s'ha actualitzat. Sense això el Select de MUI quedaria buit.
+                    value={organId ?? user?.organActualId ?? ''}
                     onChange={setOrganId}
                     icon={<Icon fontSize={"inherit"}>apartment</Icon>}
                 >

@@ -84,6 +84,9 @@ import lombok.experimental.FieldNameConstants;
 						code = ExpedientResource.PERSPECTIVE_COUNT),
 				@ResourceArtifact(
 						type = ResourceArtifactType.PERSPECTIVE,
+						code = ExpedientResource.PERSPECTIVE_COUNT_RESUM),
+				@ResourceArtifact(
+						type = ResourceArtifactType.PERSPECTIVE,
 						code = ExpedientResource.PERSPECTIVE_ESTAT_CODE),
 				@ResourceArtifact(
 						type = ResourceArtifactType.PERSPECTIVE,
@@ -280,6 +283,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
 	public static final String PERSPECTIVE_FOLLOWERS = "FOLLOWERS";
 	public static final String PERSPECTIVE_ARXIU_EXPEDIENT = "ARXIU_EXPEDIENT";
 	public static final String PERSPECTIVE_COUNT = "COUNT";
+	public static final String PERSPECTIVE_COUNT_RESUM = "COUNT_RESUM";
 	public static final String PERSPECTIVE_INTERESSATS_CODE = "INTERESSATS_RESUM";
 	public static final String PERSPECTIVE_ESTAT_CODE = "ESTAT";
 	public static final String PERSPECTIVE_META_EXPEDIENT_CODE = "META_EXPEDIENT";

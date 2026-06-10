@@ -1,8 +1,20 @@
 import { test, expect, Page, Locator } from '@playwright/test';
 
-const DEBUG_ACTIVAT	= true;
-const SYSTEM_DELAY	= 500; //milisegons de retard abans de certes accions, NO TOCAR.
-const HUMAN_DELAY	= 100; //milisegons de retard entre execució de accions
+import {
+    SYSTEM_DELAY,
+    logDebug,
+    logInfo,
+    humanDelay,
+    getGrid,
+    getRows,
+    expectSuccessAlert,
+    obrirMenuAccions,
+    esperarGridCarregat,
+    waitApiGet,
+    waitApiEntityLoad,
+    seleccionarOpcioAutocompletament,
+    assegurarRol,
+} from '../utils/reactHelpers';
 
 const URL_PROCEDIMENTS = '/ripeaback/reactapp/metaExpedient';
 
@@ -43,23 +55,8 @@ const PRINCIPAL_NOM_TEST = 'ROL_PW_REACT_TEST';
 
 // ── Helpers generals ──────────────────────────────────────────────────────────
 
-const getGrid               = (page: Page) => page.locator('.MuiDataGrid-root').first();
-const getRows               = (page: Page) => page.locator('.MuiDataGrid-row');
-const getToolbar            = (page: Page) => page.locator('.MuiToolbar-root').filter({ hasText: /nou procediment|nuevo procedimiento/i });
-const expectSuccessAlert    = (page: Page) => expect(page.locator('.MuiAlert-standardSuccess')).toBeVisible({ timeout: 10_000 });
-
-// Obre el menú d'accions d'una fila del DataGrid.
-// Usa button[aria-haspopup="menu"] dins .MuiDataGrid-actionsCell, independent de l'idioma
-// (l'aria-label varia: "more" / "més" / "más" segons la llengua activa).
-const obrirMenuAccions = (fila: Locator) =>
-    fila.locator('.MuiDataGrid-actionsCell button[aria-haspopup="menu"]').click();
-
-const humanDelay = async (page: Page) => { 
-    if (HUMAN_DELAY>0) { 
-        logDebug('Esperant ' + HUMAN_DELAY + 'ms'); 
-        await page.waitForTimeout(HUMAN_DELAY);
-    }
-};
+const getToolbar = (page: Page) =>
+    page.locator('.MuiToolbar-root').filter({ hasText: /nou procediment|nuevo procedimiento/i });
 
 const guardaAmbDelay = async (page: Page, locator: Locator) => {
 	await page.waitForTimeout(SYSTEM_DELAY);
@@ -82,99 +79,6 @@ const checkBoxOcultClick = async (dialog: Locator, checkbox: string) => {
     await expect(dialog.locator(checkbox)).toBeChecked({ timeout: 3_000 });
 };
 
-// Espera que el DataGrid estigui completament carregat, hagi o no resultats.
-//
-// Estats observats als HTMLs renderitzats (RENDERS/REACT/GRID/):
-//   Loading:     .MuiDataGrid-overlay  PRESENT  (conté el CircularProgress)
-//   Amb dades:   .MuiDataGrid-overlay  ABSENT   (.MuiDataGrid-row presents)
-//   Sense dades: .MuiDataGrid-overlay  ABSENT   (.MuiDataGrid-overlayWrapper amb "Sense dades")
-//
-// Condició "carregat" = .MuiDataGrid-root al DOM  AND  .MuiDataGrid-overlay absent.
-const esperarGridCarregat = async (page: Page) => {
-    logDebug('[Grid] Esperant que el grid estigui completament carregat...');
-    await page.waitForFunction(
-        () => {
-            const grid = document.querySelector('.MuiDataGrid-root');
-            if (!grid) return false;                              // Grid encara no muntat
-            if (grid.querySelector('.MuiDataGrid-overlay')) return false; // Overlay de càrrega present
-            return true;
-        },
-        { timeout: 15_000 }
-    );
-    logDebug('[Grid] Carregat OK. Num files: ' + await getRows(page).count());
-};
-
-// Registra un listener de resposta GET i, un cop rebuda, espera que el grid hagi acabat
-// de renderitzar via esperarGridCarregat.
-// IMPORTANT: cridar ABANS de l'acció que dispara la petició (click/goto) per evitar la
-// race condition en que la resposta arriba abans que el listener estigui actiu.
-//
-// urlMatcher: string → coincidència per includes(); funció → predicat personalitzat.
-// Usa un predicat quan calgui excloure sub-rutes (p.ex. /metaExpedient/artifacts).
-const waitApiGet = async (page: Page, urlMatcher: string | ((url: string) => boolean)) => {
-    const urlCheck = typeof urlMatcher === 'string'
-        ? (url: string) => url.includes(urlMatcher)
-        : urlMatcher;
-    logDebug('[API] Listener registrat...');
-    const response = await page.waitForResponse(
-        resp =>
-            urlCheck(resp.url()) &&
-            resp.request().method() === 'GET' &&
-            resp.status() === 200,
-        { timeout: 15_000 }
-    );
-    logDebug('[API] GET rebut: ' + response.url().split('?')[0] + ' → status ' + response.status());
-    await esperarGridCarregat(page);
-};
-
-// Registra un listener per esperar la resposta GET de l'apiGetOne d'una entitat concreta.
-// En els formularis de modificació, Form.tsx crida apiGetOne(id) i, quan respon, executa
-// reset(entityData) que marca isReady=true i renderitza els camps del formulari.
-// IMPORTANT: cridar ABANS de l'acció que obre el diàleg de modificació.
-const waitApiEntityLoad = (page: Page, id: string | null) =>
-    page.waitForResponse(
-        resp => !!id &&
-                resp.url().endsWith(`/${id}`) &&
-                resp.request().method() === 'GET' &&
-                resp.status() === 200,
-        { timeout: 10_000 }
-    );
-
-// Ordinals disponibles per seleccionar opcions d'un desplegable
-type OrdinalOpcio = 'first' | 'second' | 'third';
-const ORDINAL_IDX: Record<OrdinalOpcio, number> = { first: 0, second: 1, third: 2 };
-
-// Selecciona una opció d'un camp MUI Autocomplete (tipus llista amb cerca):
-//   1. Clica l'input per obrir la llista
-//   2. Espera que desaparegui el MuiCircularProgress-root (indica càrrega de dades)
-//   3. Espera que el listbox contingui almenys una opció visible
-//   4. Selecciona l'opció indicada per ordinal
-//
-// inputSelector: selector CSS de l'<input> del camp (p.ex. '[name="organGestor"] input[type="text"]')
-// ordinal:       'first' | 'second' | 'third' (per defecte: 'first')
-const seleccionarOpcioAutocompletament = async (
-    page: Page,
-    container: Page | Locator,
-    inputSelector: string,
-    ordinal: OrdinalOpcio = 'first'
-): Promise<void> => {
-    logDebug(`[Autocomplete] Obrint "${inputSelector}", seleccionant: ${ordinal}`);
-    await container.locator(inputSelector).click();
-    await page.waitForFunction(
-        (sel: string) => {
-            const input = document.querySelector(sel);
-            if (!input) return false;
-            const root = input.closest('[class*="MuiAutocomplete-root"]');
-            if (!root || root.querySelector('.MuiCircularProgress-root')) return false;
-            const listbox = document.querySelector('[role="listbox"]');
-            return !!listbox && listbox.querySelectorAll('[role="option"]').length > 0;
-        },
-        inputSelector,
-        { timeout: 15_000 }
-    );
-    await page.getByRole('option').nth(ORDINAL_IDX[ordinal]).click();
-    await page.waitForSelector('[role="listbox"]', { state: 'detached', timeout: 5_000 }).catch(() => {});
-};
 
 // Interacciona amb un MUI Select (native input ocult) i selecciona una opció per text/regex
 const triaMuiSelect = async (page: Page, container: Locator, inputName: string, matcher: string | RegExp) => {
@@ -253,9 +157,6 @@ const anarASubPagina = async (page: Page, tabId: 'metaDocument' | 'metaDada' | '
 	//Esperar a que el grid de la pipella del element estigui carregada.
 	await esperarGridCarregat(page);
 };
-
-const logDebug = (message: string) => { if (DEBUG_ACTIVAT) { console.log(message); } };
-const logInfo  = (message: string) => { console.log(message); };
 
 // ── Helpers per a Tipus de Documents ─────────────────────────────────────────
 
@@ -445,6 +346,24 @@ const anarAPermisos = async (page: Page): Promise<void> => {
     await esperarGridCarregat(page);
     await page.waitForTimeout(SYSTEM_DELAY);
 };
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Prerequisit: assegurar el rol actiu (bloc propi SENSE beforeEach)
+//
+// Es declara abans del bloc principal perquè s'executi primer (ordre del fitxer).
+// No comparteix el beforeEach del bloc principal: aquí només cal la capçalera per
+// llegir/canviar el rol, no cal carregar ni netejar la graella de procediments.
+// ─────────────────────────────────────────────────────────────────────────────
+
+test.describe('Prerequisits — rol IPA_ADMIN', () => {
+
+    test('ROL ASSEGURAR IPA_ADMIN', async ({ page }) => {
+        // Navegació mínima per disposar de la capçalera amb el menú d'usuari.
+        await page.goto(URL_PROCEDIMENTS);
+        await assegurarRol(page, 'IPA_ADMIN', URL_PROCEDIMENTS);
+    });
+
+});
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Pàgina: Gestió de Procediments REACT  (rol IPA_ADMIN)

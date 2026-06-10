@@ -90,7 +90,12 @@ export const springFilterBuilder = (data: any, user?: any, rol?: any): string =>
 
         builder.like("registresImportats", data.numeroRegistre),
         builder.eq("grup.id", data.grup?.id),
-        (!rol?.isUser) && builder.eq("agafatPer.codi", `'${data.agafatPer?.id}'`),
+        // El filtre "Agafat per" (usuari seleccionat, només rols no-usuari) i el pulsador "Agafats per mi"
+        // es combinen amb OR: si s'activen tots dos, es filtra pels expedients de qualsevol dels dos usuaris.
+        builder.or(
+            (!rol?.isUser) && builder.eq("agafatPer.codi", `'${data.agafatPer?.id}'`),
+            data.agafat && builder.eq("agafatPer.codi", `'${user.codi}'`)
+        ),
 
         data.pendentFirmar && (
             builder.exists(
@@ -104,7 +109,6 @@ export const springFilterBuilder = (data: any, user?: any, rol?: any): string =>
             )
         ),
 
-        data.agafat && builder.eq("agafatPer.codi", `'${user.codi}'`),
         (rol?.isUser) && data.seguit && (
             builder.exists(
                 builder.eq("seguidors.codi", `'${user.codi}'`)

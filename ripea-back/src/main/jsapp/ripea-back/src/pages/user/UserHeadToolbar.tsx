@@ -304,7 +304,7 @@ const useMenuAdmin = () => {
                 {
                     id: 'procediments',
                     title: t('page.user.menu.procediments'),
-                    barge: user?.sessionScope?.organsNoSincronitzats,
+                    badge: user?.sessionScope?.organsNoSincronitzats,
                     // icon: '',
                     to: '/metaExpedient',
                 },
@@ -459,7 +459,7 @@ const useMenuAdminLectura = () => {
         {
             id: 'procediments',
             title: t('page.user.menu.procediments'),
-            barge: user?.sessionScope?.organsNoSincronitzats,
+            badge: user?.sessionScope?.organsNoSincronitzats,
             hover: t('page.user.menu.procedimentsTitle'),
 			icon: 'integration_instructions',
 			iconVariant: 'material-icons-outlined',
@@ -729,7 +729,7 @@ const useAccionesMassivas = () => {
                     title: t('page.user.massive.csv'),
                     // icon: '',
                     to: '/massiu/csv',
-                    hiddden: !user?.sessionScope?.isUrlValidacioDefinida,
+                    hidden: !user?.sessionScope?.isUrlValidacioDefinida,
                 },
                 {
                     id: 'anexos',

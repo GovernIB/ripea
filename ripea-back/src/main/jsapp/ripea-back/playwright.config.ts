@@ -14,7 +14,8 @@ export default defineConfig({
 
     use: {
         // URL base de l'aplicació sobre JBoss
-        baseURL: 'http://localhost:8080',
+        //baseURL: 'https://dev.caib.es',
+		baseURL: 'http://localhost:8080',
         // Captura screenshot només en cas de fallada
         screenshot: 'only-on-failure',
         // Vídeo de tots els tests (èxit i fallada)

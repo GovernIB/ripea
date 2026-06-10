@@ -2034,6 +2034,7 @@ const translationCa = {
             },
         },
         notFound: "No trobat",
+        forbidden: "No teniu el rol o permís adequat per accedir a aquest recurs.",
     }
 };
 
