@@ -71,9 +71,6 @@ const StyledMuiFilter = (props:any) => {
 
     const cercar = ()=> {
         apiRef?.current?.filter?.()
-        if (sessionKey) {
-            saveFilterData(apiRef?.current?.getData?.())
-        }
     }
     const netejar = ()=> {
         if (sessionKey) {
@@ -89,6 +86,18 @@ const StyledMuiFilter = (props:any) => {
     };
 
     const { value: filterData, save: saveFilterData } = useSession(sessionKey);
+
+    // El guardat es fa aquí (i no a cercar()) perquè onSpringFilterChange és l'únic
+    // punt pel qual passen totes les aplicacions reals del filtre: el botó "Filtrar",
+    // la tecla Intro (filterOnFieldEnterKeyPressed, que dispara filter() dins de lib
+    // sense passar per cercar()) i l'auto-cerca inicial. Així Intro i botó persisteixen
+    // igual. clear() amb buttonControlled no crida filter(), per tant no re-desa.
+    const handleSpringFilterChange = (springFilter:any) => {
+        if (sessionKey) {
+            saveFilterData(apiRef?.current?.getData?.())
+        }
+        onSpringFilterChange?.(springFilter);
+    };
 
     useEffect(() => {
         if (!!sessionKey && filterData && onSpringFilterChange && springFilterBuilder) {
@@ -108,7 +117,7 @@ const StyledMuiFilter = (props:any) => {
 
         initialData={filterData}
         springFilterBuilder={springFilterBuilder}
-        onSpringFilterChange={onSpringFilterChange}
+        onSpringFilterChange={handleSpringFilterChange}
         onDataChange={(data:any) => {
             if (data && Object.keys(data).length > 0 && (!!sessionKey && !filterData)) {
                 cercar()
