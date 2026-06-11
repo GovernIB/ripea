@@ -95,26 +95,6 @@ const columns = [
         field: 'organGestor',
         flex: 2,
     },
-    {
-        field: 'procedimentComu',
-        flex: 0.25,
-        renderCell: (params:any) => (params?.row?.procedimentComu && <Icon>check</Icon>),
-    },
-    {
-        field: 'permisDirecte',
-        flex: 0.25,
-        renderCell: (params:any) => (params?.row?.permisDirecte && <Icon>check</Icon>),
-    },
-    {
-        field: 'gestioAmbGrupsActiva',
-        flex: 0.25,
-        renderCell: (params:any) => (params?.row?.gestioAmbGrupsActiva && <Icon>check</Icon>),
-    },
-    {
-        field: 'actiu',
-        flex: 0.25,
-        renderCell: (params:any) => (params?.row?.actiu && <Icon>check</Icon>),
-    },
 ]
 
 const sortModel: any = [{field: 'nom', sort: 'asc'}]
@@ -138,6 +118,34 @@ const MetaExpedientGrid = () => {
 
     const additionalColumns = useMemo(() => [
         ...columns,
+        {
+            field: 'procedimentComu',
+            headerName: t('page.metaExpedient.columnes.comu'),
+            flex: 0.25,
+            minWidth: 90,
+            renderCell: (params:any) => (params?.row?.procedimentComu && <Icon>check</Icon>),
+        },
+        {
+            field: 'permisDirecte',
+            headerName: t('page.metaExpedient.columnes.directe'),
+            flex: 0.25,
+            minWidth: 90,
+            renderCell: (params:any) => (params?.row?.permisDirecte && <Icon>check</Icon>),
+        },
+        {
+            field: 'gestioAmbGrupsActiva',
+            headerName: t('page.metaExpedient.columnes.grups'),
+            flex: 0.25,
+            minWidth: 90,
+            renderCell: (params:any) => (params?.row?.gestioAmbGrupsActiva && <Icon>check</Icon>),
+        },
+        {
+            field: 'actiu',
+            headerName: t('page.metaExpedient.columnes.actiu'),
+            flex: 0.25,
+            minWidth: 90,
+            renderCell: (params:any) => (params?.row?.actiu && <Icon>check</Icon>),
+        },
         {
             field: 'revisioEstat',
             flex: 0.5,

@@ -59,7 +59,11 @@ const StyledMuiFilter = (props:any) => {
         componentProps,
         children,
         code,
-        sessionKey = code,
+        // La clau de sessió ha d'incloure el resourceName: el `code` sol ("FILTER")
+        // és genèric i el comparteixen filtres sense relació (OrganGestor, Integracio,
+        // Contingut...), provocant que les dades persistides d'un filtre es filtrin a
+        // un altre (p. ex. estat='V' d'òrgans arribant al monitor d'integracions).
+        sessionKey = code != null ? [props.resourceName, code].filter(Boolean).join('.') : undefined,
         advancedSearch = false,
         buttonIconOnlyBreakpoint = 'lg',
         ...other

@@ -198,6 +198,9 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
             disableColumnSorting={!!staticSortModel}
             fixedSortModel={staticSortModel}
 
+			persistentStateActive
+			persistentStateClearPageSortPropsOnTopLevelRouteChange
+			
             apiRef={apiRef}
             datagridApiRef={datagridApiRef}
             columns={columnsWithWordWrap}
