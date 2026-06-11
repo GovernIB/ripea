@@ -1494,10 +1494,17 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     }
 
     private class NotificarActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.NotificarFormAction, DocumentResource> {
+		public static final String COMPATIBILITAT_EXTENSIO_AVIS = "COMPATIBILITAT_EXTENSIO_AVIS";
 
-        @Override
+		@Override
 		public void onChange(Serializable id, NotificarFormAction previous, String fieldName, Object fieldValue,
 				Map<String, AnswerValue> answers, String[] previousFieldNames, NotificarFormAction target) {
+
+			// Si l'usuari ja ha acceptat el diàleg d'advertència, consumim la resposta i el deixam continuar
+			if (answers != null && answers.containsKey(COMPATIBILITAT_EXTENSIO_AVIS)) {
+				answers.remove(COMPATIBILITAT_EXTENSIO_AVIS);
+			}
+
             if (fieldName==null){
                 target.setPermetreEnviamentPostal(ConfigHelper.getEntitat().get().isPermetreEnviamentPostal());
                	target.setDuracio(configHelper.getAsInt(PropertyConfig.NOTIB_PLUGIN_CADUCA, 10));
@@ -1508,6 +1515,12 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                	}
             } else {
                 switch (fieldName) {
+					case NotificarFormAction.Fields.tipus:
+						List<InteressatResourceEntity> interessatsPrevious = interessatResourceRepository.findAllById(previous.getInteressats().stream()
+								.map(ResourceReference::getId).collect(Collectors.toList()));
+						checkComunicacioFormat((DocumentNotificacioTipusEnumDto)fieldValue,interessatsPrevious,id);
+						break;
+
                     case DocumentResource.NotificarFormAction.Fields.duracio:
                         if (fieldValue != null) {
                             Date dataLimit = DateUtils.addDays(new Date(), (Integer) fieldValue);
@@ -1555,11 +1568,11 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                         break;
 
                     case NotificarFormAction.Fields.interessats:
-                        List<InteressatResourceEntity> interesats = interessatResourceRepository.findAllById(((List<ResourceReference<InteressatResource, Long>>) fieldValue).stream()
+                        List<InteressatResourceEntity> interesatsFieldValue = interessatResourceRepository.findAllById(((List<ResourceReference<InteressatResource, Long>>) fieldValue).stream()
                                 .map(ResourceReference::getId).collect(Collectors.toList()));
                         List<ResourceReference<InteressatResource, Long>> interessatsAmbAvis = new ArrayList<>();
                         boolean administracioSir = false;
-                        for (InteressatResourceEntity titular : interesats) {
+                        for (InteressatResourceEntity titular : interesatsFieldValue) {
                         	InteressatResourceEntity destinatari = titular.getRepresentant()!=null?titular.getRepresentant():null;
                         	if (InteressatTipusEnum.InteressatPersonaFisicaEntity.equals(titular.getTipus())) {
 	                            if ((destinatari == null && titular.getDocumentTipus()!=InteressatDocumentTipusEnumDto.NIF && titular.getDocumentTipus()!=InteressatDocumentTipusEnumDto.DOCUMENT_IDENTIFICATIU_ESTRANGERS)
@@ -1580,9 +1593,69 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                         }
                         target.setInteressatsAmbAvis(interessatsAmbAvis);
                         target.setAdministracioSir(administracioSir);
+
+						checkComunicacioFormat(previous.getTipus(),interesatsFieldValue,id);
                         break;
                 }
             }
+		}
+
+		private void checkComunicacioFormat(DocumentNotificacioTipusEnumDto tipusEnviament, List<InteressatResourceEntity> llistaInteressats, Serializable id ){
+			// Només validam si tenim el document a mà per comprovar la seva extensió
+			DocumentResourceEntity documentEntity = documentResourceRepository.findById((Long) id).orElse(null);
+			if (documentEntity != null && documentEntity.getFitxerNom() != null) {
+				String nomFitxer = documentEntity.getFitxerNom().toLowerCase().trim();
+				String extensio = "";
+				int lastDot = nomFitxer.lastIndexOf('.');
+				if (lastDot > 0 && lastDot < nomFitxer.length() - 1) {
+					extensio = nomFitxer.substring(lastDot + 1);
+				}
+
+				if (llistaInteressats != null && !llistaInteressats.isEmpty()) {
+					boolean teAdministracio = false;
+					boolean tePersonaFisicaOJuridica = false;
+
+					// Analitzam el tipus de cada interessat actual al formulari
+					for (InteressatResourceEntity intEnt : llistaInteressats) {
+						if (InteressatTipusEnum.InteressatAdministracioEntity.equals(intEnt.getTipus())) {
+							teAdministracio = true;
+						} else {
+							tePersonaFisicaOJuridica = true;
+						}
+					}
+
+					boolean esComunicacio = DocumentNotificacioTipusEnumDto.COMUNICACIO.equals(tipusEnviament);
+
+					// Determinació dels canals implicats
+					boolean canalSirActiu = esComunicacio && teAdministracio;
+					boolean canalNoSirActiu = (!esComunicacio && teAdministracio) || tePersonaFisicaOJuridica;
+
+					// Formats permesos per a cada canal
+					Set<String> formatsSir = Set.of("jpg", "jpeg", "odt", "odp", "ods", "odg", "docx", "xlsx", "pptx", "pdf", "png", "rtf", "svg", "tiff", "txt", "xml", "xsig");
+					Set<String> formatsNoSir = Set.of("pdf", "zip");
+
+					boolean formatValidPerSir = formatsSir.contains(extensio);
+					boolean formatValidPerNoSir = formatsNoSir.contains(extensio);
+
+					// Validam si hi ha incompatibilitat en qualque canal actiu
+					boolean llançarAvis = false;
+					if (canalSirActiu && !formatValidPerSir) {
+						llançarAvis = true;
+					}
+					if (canalNoSirActiu && !formatValidPerNoSir) {
+						llançarAvis = true;
+					}
+
+					if (llançarAvis) {
+						throw new AnswerRequiredException(
+							DocumentResource.class,
+							COMPATIBILITAT_EXTENSIO_AVIS,
+							//messageHelper.getMessage("notificacio.controller.warning.extensio.incompatible")
+							"Atenció: S'ha detectat que el format del document pot no ser compatible amb tots els destinataris triats. El document es ." + extensio
+						);
+					}
+				}
+			}
 		}
 
 		@Override
