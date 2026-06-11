@@ -1399,6 +1399,7 @@ const translationEn = {
                 directe: "Direct",
                 grups: "Groups",
                 actiu: "Active",
+                estat: "Status",
             },
             detall: {
                 elementsProc: "Procedure management: {{nom}}",
