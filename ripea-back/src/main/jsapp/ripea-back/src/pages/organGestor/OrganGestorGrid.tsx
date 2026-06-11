@@ -130,14 +130,16 @@ const OrganGestorGrid = () => {
                     rowsTransformer={(rows: any) => {
                         if (!rows) return [];
                         const additionalRows: any[] = rows;
-                        if (rows != null && treeView) {
+                        if (treeView) {
                             for (const row of rows) {
-                                for (const r of row?.path) {
-                                    if (
-                                        !additionalRows.map((b: any) => b.id).includes(r?.id) &&
-                                        !rows.map((b: any) => b.id).includes(r?.id)
-                                    ) {
-                                        additionalRows.push(r);
+                                if (row?.path != null) {
+                                    for (const r of row.path) {
+                                        if (
+                                            !additionalRows.map((b: any) => b.id).includes(r?.id) &&
+                                            !rows.map((b: any) => b.id).includes(r?.id)
+                                        ) {
+                                            additionalRows.push(r);
+                                        }
                                     }
                                 }
                             }
