@@ -77,6 +77,11 @@ public class ExecucioMassivaResourceServiceImpl extends BaseMutableResourceServi
 
         resource.setExecutades(continguts.size());
 
+        resource.setPortafirmesResponsables(
+                entity.getPortafirmesResponsablesString() != null
+                        ? entity.getPortafirmesResponsablesString().split(",")
+                        : null);
+
         if (entity.getCreatedBy() != null) {
             UsuariResourceEntity usuariResourceEntity = usuariResourceRepository.findById(entity.getCreatedBy()).orElse(null);
             if (usuariResourceEntity != null) {
