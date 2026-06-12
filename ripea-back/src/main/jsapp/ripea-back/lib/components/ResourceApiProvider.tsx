@@ -571,7 +571,7 @@ const generateResourceApiMethods = (
                             problem,
                             null,
                             args,
-                            create,
+                            (_id: any, args: ResourceApiRequestArgs) => create(args),
                             getOpenAnswerRequiredDialog()
                         )
                             .then(resolve)
@@ -760,7 +760,7 @@ const generateResourceApiMethods = (
                                             error,
                                             null,
                                             args,
-                                            artifactFormOnChange,
+                                            (_id: any, args: ResourceApiArtifactOnChangeArgs) => artifactFormOnChange(args),
                                             getOpenAnswerRequiredDialog()
                                         )
                                             .then(resolve)
