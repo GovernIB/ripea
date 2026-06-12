@@ -47,6 +47,19 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 		return page.hasContent() ? page.getContent().get(0) : null;
 	}
 	
+	@Query(	"select d from DocumentEntity d "
+			+ "where (lower(d.fitxerNom) like '%.pdf' or lower(d.fitxerNom) like '%.odt' or lower(d.fitxerNom) like '%.docx') "
+			+ "and d.createdDate <= :creacioMaxima "
+			+ "order by d.data desc")
+	Page<DocumentEntity> findLastConvertible(
+			@Param("creacioMaxima") LocalDateTime creacioMaxima,
+			Pageable pageable);
+
+	default DocumentEntity findLastConvertible() {
+		Page<DocumentEntity> page = findLastWithCsv(LocalDateTime.now().minusHours(1), PageRequest.of(0, 1));
+		return page.hasContent() ? page.getContent().get(0) : null;
+	}
+	
 	@Query(	"select d from DocumentEntity d where d.arxiuUuid is not null "
 			+ "and d.fitxerContentType in (:fitxerContentTypes) "
 			+ "and (:arxiuEstat is null OR d.arxiuEstat=:arxiuEstat) "

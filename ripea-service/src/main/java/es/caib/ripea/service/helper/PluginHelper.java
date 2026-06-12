@@ -9283,10 +9283,7 @@ public class PluginHelper {
 	
 	public Exception conversioDocumentsDiagnostic(DiagnosticFiltreDto filtre) {
 		try {
-			List<String> extensions = new ArrayList<String>();
-			extensions.add("application/msword");
-			extensions.add("application/vnd.oasis.opendocument.text");
-			DocumentEntity doc = documentHelper.findLastDocumentPujatArxiuByExtensio(extensions);
+			DocumentEntity doc = documentRepository.findLastConvertible();
 			if (doc!=null) {
 	        	FitxerDto fitxerNoPdf = documentHelper.getFitxerAssociat(doc, null);
 	    			ConversioArxiu convertit = getConversioPlugin(filtre.getEntitatCodi(), filtre.getOrganCodi()).convertirPdfIEstamparUrl(

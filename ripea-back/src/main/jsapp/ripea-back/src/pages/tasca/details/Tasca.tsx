@@ -3,7 +3,7 @@ import {useTranslation} from "react-i18next";
 import {useNavigate, useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
 import Load from "../../../components/Load.tsx";
-import {Button, Grid, Icon, Typography, Box} from "@mui/material";
+import {Button, Grid, Icon, Typography, Box, alpha} from "@mui/material";
 import {icons} from "../../user/UserHeadToolbar.tsx";
 import {ExpedientInfo} from "../../expedient/details/Expedient.tsx";
 import DocumentsGrid from "../../contingut/DocumentsGrid.tsx";
@@ -15,6 +15,19 @@ import {ErrorPage} from "../../../components/ErrorPage.tsx";
 
 const expedientPerspectives = ['COUNT', 'ESTAT', 'RELACIONAT', 'AMB_PINBAL', "META_EXPEDIENT", "PERMIS_CONTINGUT"]
 const expedientNamedQueries = ['WITHOUT_PERMISION_CHECK'];
+
+// Botones de la cabecera azul: misma "pastilla" de fondo blanco que la cabecera del expediente
+const headerButtonSx = {
+    borderRadius: '4px',
+    px: 1.25,
+    py: 0,
+    mr: 1,
+    border: '1px solid #e3e3e3',
+    boxShadow: 'none',
+    bgcolor: (theme: any) => alpha(theme.palette.common.white, 0.9),
+    color: (theme: any) => theme.palette.getContrastText(theme.palette.common.white),
+    '&:hover': { boxShadow: 'none', bgcolor: (theme: any) => theme.palette.common.white },
+};
 const Tasca = () => {
     const { t } = useTranslation();
     const { id, tascaId } = useParams();
@@ -57,17 +70,16 @@ const Tasca = () => {
 
     const headerMain = <>
         <Box sx={{ display: 'flex', alignItems: 'center'}}>
-            <Icon sx={{ fontSize: '2rem' }}>{icons.tasca}</Icon>
-            <Typography variant="h4" sx={{ display: 'flex' }}>{tasca?.metaExpedientTasca?.description}</Typography>
+            <Icon sx={{ fontSize: '2rem', color: 'primary.light' }}>{icons.tasca}</Icon>
+            <Typography variant="h4" component="h1" sx={{ display: 'flex' }}>{tasca?.metaExpedientTasca?.description}</Typography>
         </Box>
         <Box>
-            <Typography sx={{ paddingTop: '5px'}} variant="subtitle1" color={'grey'}>{tasca?.metaExpedientTascaDescription}</Typography>
+            <Typography sx={{ paddingTop: '5px', color: (theme) => alpha(theme.palette.primary.contrastText, 0.85) }} variant="subtitle1">{tasca?.metaExpedientTascaDescription}</Typography>
         </Box>
         <Box sx={{ paddingTop: '5px'}}>
             <Button
-                variant="outlined"
-                color={"inherit"}
-                sx={{ borderRadius: '4px', padding: '0px 10px'}}
+                variant="contained"
+                sx={headerButtonSx}
                 onClick={()=>navigate('/usuariTasca')}
             >
                 <Icon>arrow_back</Icon>
@@ -75,9 +87,8 @@ const Tasca = () => {
             </Button>
             {tasca?.estat == 'PENDENT' &&
                 <Button
-                    variant="outlined"
-                    color={"inherit"}
-                    sx={{ borderRadius: '4px', padding: '0px 10px'}}
+                    variant="contained"
+                    sx={headerButtonSx}
                     onClick={()=> {
                         changeEstat(tasca?.id, 'INICIADA', t('page.tasca.action.iniciar.ok'), () => window.location.reload())
                     }}
@@ -88,9 +99,8 @@ const Tasca = () => {
             }
             {tasca?.estat == 'INICIADA' &&
                 <Button
-                    variant="outlined"
-                    color={"inherit"}
-                    sx={{ borderRadius: '4px', padding: '0px 10px'}}
+                    variant="contained"
+                    sx={headerButtonSx}
                     onClick={()=> {
                         changeEstat(tasca?.id, 'FINALITZADA', t('page.tasca.action.finalitzar.ok'), () => navigate('/usuariTasca'))
                     }}
@@ -101,9 +111,7 @@ const Tasca = () => {
             }
             <TascaComment
                 entity={tasca}
-                iconStyle={{ fontSize: '1.2em'}}
-                sx={{ padding: '0px 10px' }}
-                componentProps={{variant: "outlined", sx: { borderRadius: '4px' }}}
+                iconStyle={{ fontSize: '1.2em', color: (theme: any) => theme.palette.primary.contrastText }}
                 readOnly={tasca?.usuariActualOnlyObservador}
             />
         </Box>
