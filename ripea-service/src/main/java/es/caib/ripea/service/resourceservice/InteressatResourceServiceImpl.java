@@ -481,16 +481,31 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
 
         private void carregaDadesAdressa(InteressatResourceEntity entity, InteressatResource resource) {
             if (Utils.hasValue(resource.getPais())) {
-                Pais pais = pluginHelper.dadesExternesPaisFindByCodi(resource.getPais());
-                resource.setPaisNom(pais != null ? pais.getNom() : "");
+            	Pais pais = null;
+            	try {
+            		pais = pluginHelper.dadesExternesPaisFindByCodi(resource.getPais());
+            	} catch (Exception ex) {
+            		//Ja ha deixat traça al monitor de integracions.
+            	}
+                resource.setPaisNom(pais != null ? pais.getNom() : resource.getPais());
             }
             if (Utils.hasValue(resource.getProvincia())) {
-                Provincia prov = pluginHelper.dadesExternesProvinciesFindByCodi(resource.getProvincia());
-                resource.setProvinciaNom(prov != null ? prov.getNom() : "");
+                Provincia prov = null;
+                try {
+                	prov = pluginHelper.dadesExternesProvinciesFindByCodi(resource.getProvincia());
+            	} catch (Exception ex) {
+            		//Ja ha deixat traça al monitor de integracions.
+            	}
+                resource.setProvinciaNom(prov != null ? prov.getNom() : resource.getProvincia());
 
                 if (Utils.hasValue(resource.getMunicipi())) {
-                    Municipi muni = pluginHelper.dadesExternesMunicipisFindByCodi(resource.getProvincia(), resource.getMunicipi());
-                    resource.setMunicipiNom(muni != null ? muni.getNom() : "");
+                    Municipi muni = null;
+                    try {
+                    	muni = pluginHelper.dadesExternesMunicipisFindByCodi(resource.getProvincia(), resource.getMunicipi());
+                	} catch (Exception ex) {
+                		//Ja ha deixat traça al monitor de integracions.
+                	}
+                    resource.setMunicipiNom(muni != null ? muni.getNom() : resource.getMunicipi());
                 }
             }
         }
