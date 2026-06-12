@@ -105,26 +105,6 @@ const columns = [
         field: 'organGestor',
         flex: 2,
     },
-    {
-        field: 'procedimentComu',
-        flex: 0.25,
-        renderCell: (params:any) => (params?.row?.procedimentComu && <Icon>check</Icon>),
-    },
-    {
-        field: 'permisDirecte',
-        flex: 0.25,
-        renderCell: (params:any) => (params?.row?.permisDirecte && <Icon>check</Icon>),
-    },
-    {
-        field: 'gestioAmbGrupsActiva',
-        flex: 0.25,
-        renderCell: (params:any) => (params?.row?.gestioAmbGrupsActiva && <Icon>check</Icon>),
-    },
-    {
-        field: 'actiu',
-        flex: 0.25,
-        renderCell: (params:any) => (params?.row?.actiu && <Icon>check</Icon>),
-    },
 ]
 
 const sortModel: any = [{field: 'nom', sort: 'asc'}]
@@ -149,38 +129,39 @@ const MetaExpedientGrid = () => {
     const additionalColumns = useMemo(() => [
         ...columns,
         {
+            field: 'procedimentComu',
+            headerName: t('page.metaExpedient.columnes.comu'),
+            flex: 0.25,
+            minWidth: 90,
+            renderCell: (params:any) => (params?.row?.procedimentComu && <Icon>check</Icon>),
+        },
+        {
+            field: 'permisDirecte',
+            headerName: t('page.metaExpedient.columnes.directe'),
+            flex: 0.25,
+            minWidth: 90,
+            renderCell: (params:any) => (params?.row?.permisDirecte && <Icon>check</Icon>),
+        },
+        {
+            field: 'gestioAmbGrupsActiva',
+            headerName: t('page.metaExpedient.columnes.grups'),
+            flex: 0.25,
+            minWidth: 90,
+            renderCell: (params:any) => (params?.row?.gestioAmbGrupsActiva && <Icon>check</Icon>),
+        },
+        {
+            field: 'actiu',
+            headerName: t('page.metaExpedient.columnes.actiu'),
+            flex: 0.25,
+            minWidth: 90,
+            renderCell: (params:any) => (params?.row?.actiu && <Icon>check</Icon>),
+        },
+        {
             field: 'revisioEstat',
-            flex: 0.5,
+            headerName: t('page.metaExpedient.columnes.estat'),
+            flex: 0.75,
             renderCell: (params:any) => <StyledEstat entity={params?.row}>{params.formattedValue}</StyledEstat>,
             hidden: !user?.sessionScope?.isRevisioActiva
-        },
-        {
-            field: 'numComentaris',
-            headerName: '',
-            sortable: false,
-            flex: 0.25,
-            renderCell: (params: any) => <MetaExpedientComment
-                entity={params?.row}
-                readOnly={params?.row?.usuariActualOnlyObservador}
-                onClose={refresh}
-            />
-        },
-        {
-            field: 'numPermisos',
-            headerName: '',
-            sortable: false,
-            flex: 0.25,
-            hidden: !(rol?.isAdmin || rol?.isOrganAdmin),
-            renderCell: (params:any) => <LinkIcon
-                aria-label="key"
-                color="inherit"
-                title="Permisos"
-                to={`/metaExpedient/${params?.row?.id}/permis`}
-            >
-                <Badge badgeContent={params?.row?.numPermisos} color="primary" showZero>
-                    <Icon>key</Icon>
-                </Badge>
-            </LinkIcon>
         },
         {
             field: 'id',
@@ -223,6 +204,36 @@ const MetaExpedientGrid = () => {
                     </StyledBadge>
                 </MenuItem>}
             </MenuButton>
+        },
+        {
+            field: 'numComentaris',
+            headerName: '',
+            sortable: false,
+            flex: 0.25,
+            minWidth: 55,
+            renderCell: (params: any) => <MetaExpedientComment
+                entity={params?.row}
+                readOnly={params?.row?.usuariActualOnlyObservador}
+                onClose={refresh}
+            />
+        },
+        {
+            field: 'numPermisos',
+            headerName: '',
+            sortable: false,
+            flex: 0.25,
+            minWidth: 55,
+            hidden: !(rol?.isAdmin || rol?.isOrganAdmin),
+            renderCell: (params:any) => <LinkIcon
+                aria-label="key"
+                color="inherit"
+                title="Permisos"
+                to={`/metaExpedient/${params?.row?.id}/permis`}
+            >
+                <Badge badgeContent={params?.row?.numPermisos} color="primary" showZero>
+                    <Icon>key</Icon>
+                </Badge>
+            </LinkIcon>
         },
     ].filter((col:any)=>!col?.hidden), [t, user?.sessionScope?.isRevisioActiva])
 
@@ -308,6 +319,7 @@ const MetaExpedientGrid = () => {
                 perspectives={perspectives}
                 sortModel={sortModel}
                 rowAdditionalActions={actions}
+                rowActionsColumnProps={{ width: 55, minWidth: 55 }}
                 toolbarMassiveActions={massiveActions}
                 toolbarElementsWithPositions={elementsWithPositions}
 

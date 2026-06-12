@@ -105,7 +105,7 @@ public class UsuariEntity implements Serializable {
 
 	@Column(name="interficie_usuari", length = 5)
 	@Enumerated(EnumType.STRING)
-	private InterficieUsuariEnumDto interficieUsuari = InterficieUsuariEnumDto.REACT;
+	private InterficieUsuariEnumDto interficieUsuari;
 	
 	public ContingutVistaEnumDto getVistaActual() {
 		return vistaActual;

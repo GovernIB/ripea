@@ -12,12 +12,20 @@ import {MenuActionButton} from "../../../../components/MenuButton.tsx";
 import AlertExpand from "../../../../components/AlertExpand.tsx";
 import {ErrorArea} from "../../../../components/ErrorPage.tsx";
 
+const INTEGRACIO_RESOURCE = 'integracioResource';
+const FILTER_PLUGIN_CODE = 'FILTER_PLUGIN';
+// La clau de sessió ha de coincidir amb la que calcula StyledMuiFilter:
+// [resourceName, code].join('.'). El resourceName es va prefixar per evitar
+// col·lisions entre filtres; si aquí es llegís la clau "pelada" (FILTER_PLUGIN)
+// el filtre sempre seria undefined i el diagnòstic es quedaria carregant sense fi.
+const FILTER_PLUGIN_SESSION_KEY = `${INTEGRACIO_RESOURCE}.${FILTER_PLUGIN_CODE}`;
+
 const useActions = () => {
     const {t} = useTranslation()
     const {
         isReady: apiIsReady,
         artifactAction: apiAction
-    } = useResourceApiService('integracioResource');
+    } = useResourceApiService(INTEGRACIO_RESOURCE);
     const {temporalMessageShow} = useBaseAppContext();
 
     const intervalRef = useRef<number | null>(null);
@@ -133,8 +141,8 @@ export const IntegracioDiagnosticFilter = ({apiReiniciar}:any) => {
     ]
 
     return <StyledMuiFilter
-        resourceName={"integracioResource"}
-        code={"FILTER_PLUGIN"}
+        resourceName={INTEGRACIO_RESOURCE}
+        code={FILTER_PLUGIN_CODE}
         springFilterBuilder={()=>{}}
         // onSpringFilterChange={onSpringFilterChange}
         buttons={buttons}
@@ -148,7 +156,7 @@ export const useIntegracioDiagnostic = (integracions:any[]) => {
     const { t } = useTranslation();
 
     const [open, setOpen] = useState(false);
-    const {value: filter} = useSession('FILTER_PLUGIN');
+    const {value: filter} = useSession(FILTER_PLUGIN_SESSION_KEY);
 
     const {apiIsReady, diagnostic, apiDiagnosticAll, apiDiagnostic, apiReiniciar, handleClose: hClose} = useActions()
 

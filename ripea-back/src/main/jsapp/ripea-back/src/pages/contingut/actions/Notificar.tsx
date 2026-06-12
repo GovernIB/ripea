@@ -120,7 +120,10 @@ const NotificarForm = () => {
         <GridFormField name="entregaPostal" hidden={!data?.permetreEnviamentPostal}/>
 
         <Grid size={12}>
-            <Load value={data?.interessats} noEffect>
+            {/* Gatear per longitud: un array buit [] és truthy i faria renderitzar
+                AdditionalInfo amb 0 pestanyes, deixant el Load intern de TabComponent
+                (sense noEffect) girant indefinidament quan no hi ha destinataris. */}
+            <Load value={data?.interessats?.length} noEffect>
                 <AdditionalInfo data={data}/>
             </Load>
         </Grid>

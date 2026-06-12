@@ -1394,6 +1394,13 @@ const translationEs = {
         },
         metaExpedient: {
             title: "Procedimiento",
+            columnes: {
+                comu: "Común",
+                directe: "Directo",
+                grups: "Grupos",
+                actiu: "Activo",
+                estat: "Estado",
+            },
             detall: {
                 elementsProc: "Gestión del procedimiento: {{nom}}",
                 elementsServ: "Gestión del servicio: {{nom}}",

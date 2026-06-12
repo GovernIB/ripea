@@ -52,7 +52,7 @@ public class RipeaController {
 				try {
 					interficieEfectiva = InterficieUsuariEnumDto.valueOf(interficieDefecteStr.toUpperCase());
 				} catch (IllegalArgumentException e) {
-					interficieEfectiva = InterficieUsuariEnumDto.REACT;
+					interficieEfectiva = InterficieUsuariEnumDto.JSP;
 				}
 			}
 		}
