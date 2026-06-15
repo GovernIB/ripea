@@ -577,9 +577,7 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 							false);
 				}
 
-				/**
-				 * Accions comunes, tant per l'acció de crear com de importar.
-				 */
+				//Crea l'expedient a arxiu amb les metadades dels interessats.
 				expCreatArxiuOk = expedientHelper.arxiuPropagarExpedientAmbInteressatsNewTransaction(expedientId);
 
 				if (expCreatArxiuOk) {
@@ -592,13 +590,17 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 							if (entry.getKey()>0) {
 								
 								//És un annex
-								expedientHelper.crearDocFromAnnex(
+								Exception errorMoguentAnnex = expedientHelper.crearDocFromAnnex(
 										expedientId,
 										entry.getKey(),
 										expedientPeticioId,
 										Long.parseLong(entry.getValue()),
 										rolActual);
 								
+								if (errorMoguentAnnex!=null) {
+									expedientHelper.updateRegistreAnnexError(entry.getKey(), ExceptionUtils.getStackTrace(errorMoguentAnnex));
+								}
+
 							} else {
 								
 								//És un justificant
@@ -613,9 +615,7 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 							}
 							
 						} catch (Exception e) {
-							expedientHelper.updateRegistreAnnexError(
-									entry.getKey(),
-									ExceptionUtils.getStackTrace(e));
+							expedientHelper.updateRegistreAnnexError(entry.getKey(), ExceptionUtils.getStackTrace(e));
 						}
 					}
 
@@ -634,10 +634,11 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 					} catch (Exception ex) {}
 
 				} else {
+					//Si ha donat error arxiu, marcam els annexos com a pendents
 	                if (params.getAnnexos()!=null) {
 	                	for (Map.Entry<Long, String> entry : params.getAnnexos().entrySet()) {
 	                		registreAnnexResourceRepository.findById(entry.getKey()).get().setError(
-	                				"Annex no s'ha processat perque l'expedient no s'ha creat en arxiu");
+	                				"Annex no processat perque l'expedient no s'ha creat a l'Arxiu");
 	                	}
 	                }
 				}

@@ -1033,7 +1033,7 @@ public class ExpedientInteressatHelper {
 			
 			boolean throwExcepcionAbans = false;
 			if (throwExcepcionAbans) {
-				throw new RuntimeException("Mock excepcion ABANS de modificar expedient en arxiu");
+				exception = new RuntimeException("Mock excepcion ABANS de modificar expedient en arxiu");
 			}			
 			contingutHelper.arxiuPropagarModificacio(expedient);
 			updateArxiuIntentInteressats(expedient, interessat, true);

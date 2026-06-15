@@ -283,6 +283,7 @@ public class ExpedientHelper {
 			SiNoEnumDto seguidor) {
 
 		Timer.Sample sample = Timer.start(applicationHelper.getMeterRegistry());
+		ExpedientPeticioEntity expedientPeticio = null;
 		
 		try {
 		
@@ -304,7 +305,7 @@ public class ExpedientHelper {
 			}
 			
 			if (expedientPeticioId != null) {
-				ExpedientPeticioEntity expedientPeticio = expedientPeticioRepository.getOne(expedientPeticioId);
+				expedientPeticio = expedientPeticioRepository.getOne(expedientPeticioId);
 				if (expedientPeticio.getExpedient() != null) {
 	 				throw new ValidationException(
 							"<creacio>",
@@ -384,18 +385,12 @@ public class ExpedientHelper {
 			
 			// if expedient comes from distribucio
 			if (expedientPeticioId != null) {
-				relateExpedientWithPeticioAndSetAnnexosPendent(expedientPeticioId, expedient.getId());
-				if (associarInteressats) {
-					associateInteressats(
-							expedient.getId(),
-							expedientPeticioId,
-							PermissionEnumDto.CREATE,
-							rolActual,
-							interessatsAccionsMap);
-				}
-				ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.getOne(expedientPeticioId);
-				expedientPeticioHelper.canviEstatExpedientPeticio(expedientPeticioEntity, ExpedientPeticioEstatEnumDto.PROCESSAT_PENDENT);
-				pluginHelper.comandaAvisDelete(expedientPeticioEntity);
+				relateExpedientWithPeticioAndSetAnnexosPendent(
+						expedientPeticio,
+						expedient,
+						associarInteressats,
+						rolActual,
+						interessatsAccionsMap);
 			}
 			
 			// crear carpetes per defecte del procediment
@@ -448,7 +443,7 @@ public class ExpedientHelper {
 		
 		boolean throwExcepcion = false;
 		if (throwExcepcion) {
-			throw new RuntimeException("Mock excepcion DESPRES de crear expedient en arxiu");
+			exception = new RuntimeException("Mock excepcion DESPRES de crear expedient en arxiu");
 		}
 		
 		if (cacheHelper.mostrarLogsCreacioContingut())
@@ -588,13 +583,12 @@ public class ExpedientHelper {
 	
 	@Transactional
 	public void associateInteressats(
-			Long expedientId,
-			Long expedientPeticioId,
+			ExpedientEntity expedientEntity,
+			ExpedientPeticioEntity expedientPeticioEntity,
 			PermissionEnumDto permission,
 			String rolActual,
 			Map<String, InteressatAssociacioAccioEnum> interessatsAccionsMap) {
-		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.getOne(expedientPeticioId);
-		ExpedientEntity expedientEntity = expedientRepository.getOne(expedientId);
+
 		Map<String, InteressatDto> interessatsOvewritten = getInteressatsOverwritten(expedientEntity, expedientPeticioEntity.getRegistre().getInteressats());
 
 		for (RegistreInteressatEntity interessatDistribucio : expedientPeticioEntity.getRegistre().getInteressats()) {
@@ -617,7 +611,7 @@ public class ExpedientHelper {
 			switch (accioARealitzar) {
 				case ASSOCIAR:
 					associarInteressat(
-							expedientId,
+							expedientEntity.getId(),
 							permission,
 							rolActual,
 							interessatDistribucio,
@@ -626,84 +620,11 @@ public class ExpedientHelper {
 							representantOverwritten,
 							representantDistribucio);
 					break;
-//					if (interessatsOvewritten.get(interessatDistribucio.getDocumentNumero()) != null) {
-//						throw new InteressatAssociarException("No es pot associar el nou interessat amb document número " + interessatDistribucio.getDocumentNumero() + " degut a que ja existeix un interessat amb el mateix document.");
-//					}
-//					if (representantDistribucio != null && interessatsOvewritten.get(representantDistribucio.getDocumentNumero()) != null) {
-//						throw new InteressatAssociarException("No es pot associar el nou representant amb document número " + representantDistribucio.getDocumentNumero() + " degut a que ja existeix un interessat o representant amb el mateix document.");
-//					}
-//					crearInteressatIRepresentant(expedientId, entitatId, permission, rolActual, interessatDistribucio, interessatsOvewritten);
-//					break;
-//				case SOBREESCRIURE:
-//					if (interessatsOvewritten.get(interessatDistribucio.getDocumentNumero()) == null) {
-//						throw new InteressatAssociarException("No es actualitzar l'interessat amb document número " + interessatDistribucio.getDocumentNumero() + " degut a no existeix cap interessat amb aquest document a l'expedient.");
-//					}
-//					updateInteressat();
-//					if (representantDistribucio != null) {
-//						if (interessatsOvewritten.get(representantDistribucio.getDocumentNumero()) == null) {
-//							throw new InteressatAssociarException("No es actualitzar el representant amb document número " + representantDistribucio.getDocumentNumero() + " degut a no existeix cap interessat o representant amb aquest document a l'expedient.");
-//						}
-//						updateRepresentant(entitatId, interessatsOvewritten.get(representantDistribucio.getDocumentNumero()));
-//					}
-//					break;
-//				case SOBREESCRIURE_REPRESENTANT:
-//					if (interessatsOvewritten.get(interessatDistribucio.getDocumentNumero()) == null) {
-//						throw new InteressatAssociarException("No es actualitzar l'interessat amb document número " + interessatDistribucio.getDocumentNumero() + " degut a no existeix cap interessat amb aquest document a l'expedient.");
-//					}
-//					if (representantDistribucio == null) {
-//						throw new InteressatAssociarException("");
-//					}
-//					updateInteressat();
-//					if (isRepresentantUsedOnce) {
-//						deleteRepresentant();
-//					}
-//					createRepresentant(expedientId, entitatId, permission, rolActual, interessatDistribucio, interessatsOvewritten, interessatDto);
-//					break;
-//				case ASSOCIAR_SOBREESCRIURE_REPRESENTANT:
-//					if (interessatsOvewritten.get(interessatDistribucio.getDocumentNumero()) != null) {
-//						throw new InteressatAssociarException("No es pot associar el nou interessat amb document número " + interessatDistribucio.getDocumentNumero() + " degut a que ja existeix un interessat amb el mateix document.");
-//					}
-//					if (representantDistribucio == null || interessatsOvewritten.get(representantDistribucio.getDocumentNumero()) == null) {
-//						throw new InteressatAssociarException("No es actualitzar el representant amb document número " + representantDistribucio.getDocumentNumero() + " degut a no existeix cap interessat o representant amb aquest document a l'expedient.");
-//					}
-//					createInteressat(expedientId, entitatId, permission, rolActual, interessatDistribucio, interessatsOvewritten);
-//					updateRepresentant();
-//					break;
-//				// Si s'ha seleccionat NO_ASSOCIAR, no associarem l'interessat a l'expedient
+				// Si s'ha seleccionat NO_ASSOCIAR, no associarem l'interessat a l'expedient
 				case NO_ASSOCIAR:
 				default:
 					continue;
 			}
-
-//			InteressatDto interessatOvewritten = interessatsOvewritten.get(interessatDistribucio.getDocumentNumero());
-//			InteressatDto representantOvewritten = null;
-//			if (representantDistribucio != null) {
-//				representantOvewritten = interessatsOvewritten.get(representantDistribucio.getDocumentNumero());
-//			}
-//
-//			if (interessatOvewritten != null || representantOvewritten != null) {
-//				InteressatEntity interessatRipea = getInteressatOvewritten(
-//						expedientId,
-//						interessatOvewritten != null ? interessatOvewritten.getDocumentNum() : null,
-//						representantOvewritten != null ? representantOvewritten.getDocumentNum() : null);
-//				if (interessatRipea != null) {
-//					if (interessatRipea.getRepresentant() != null) {
-//						expedientInteressatHelper.deleteRepresentant(
-//								entitatId,
-//								expedientId,
-//								interessatRipea.getId(),
-//								interessatRipea.getRepresentant().getId(),
-//								rolActual);
-//					}
-//					expedientInteressatHelper.delete(
-//							entitatId,
-//							expedientId,
-//							interessatRipea.getId(),
-//							rolActual);
-//				}
-//			}
-//
-//			crearInteressatIRepresentant(expedientId, entitatId, permission, rolActual, interessatDistribucio, interessatsOvewritten);
 		}
 	}
 
@@ -941,27 +862,26 @@ public class ExpedientHelper {
 					ExpedientEntity.class,
 					"Aquesta anotació ja està relacionada amb algun expedient");
 		}
+
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+				expedientId,
+				false,
+				true,
+				false,
+				false,
+				false,
+				rolActual);
 		
 		if (agafarExpedient) {
-			ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-					expedientId,
-					false,
-					true,
-					false,
-					false,
-					false,
-					rolActual);
 			agafar(expedient, usuariHelper.getUsuariAutenticat().getCodi(), null);
 		}
 		
-		relateExpedientWithPeticioAndSetAnnexosPendent(expedientPeticioId, expedientId);
-		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.getOne(expedientPeticioId);
-		expedientPeticioHelper.canviEstatExpedientPeticio(expedientPeticioEntity, ExpedientPeticioEstatEnumDto.PROCESSAT_PENDENT);
-		
-		if (associarInteressats) {
-			associateInteressats(expedientId, expedientPeticioId, PermissionEnumDto.WRITE, rolActual, interessatsAccionsMap);
-			arxiuPropagarExpedientAmbInteressats(expedientId);
-		}
+		relateExpedientWithPeticioAndSetAnnexosPendent(
+				expedientPeticio,
+				expedient,
+				associarInteressats,
+				rolActual,
+				interessatsAccionsMap);
 	}
 
 	public void notificarICanviEstatToProcessatNotificat(ExpedientPeticioEntity expedientPeticioEntity) {
@@ -1060,7 +980,7 @@ public class ExpedientHelper {
 		EntitatEntity entitat = expedientPeticioEntity.getRegistre().getEntitat();
 
 		if (expedientEntity.getArxiuUuid() == null) {
-			throw new RuntimeException("Annex no s'ha processat perque l'expedient no s'ha creat a l'arxiu");
+			return new RuntimeException("Annex no s'ha processat perque l'expedient no s'ha creat a l'arxiu");
 		}
 		
 		if (registreAnnexEntity.getDocument() == null) {
@@ -2586,16 +2506,32 @@ public class ExpedientHelper {
 		}
 	}
 
-	private void relateExpedientWithPeticioAndSetAnnexosPendent(Long expedientPeticioId, Long expedientId) {
-		ExpedientEntity expedient = expedientRepository.getOne(expedientId);
-		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.getOne(expedientPeticioId);
+	private void relateExpedientWithPeticioAndSetAnnexosPendent(
+			ExpedientPeticioEntity expedientPeticioEntity,
+			ExpedientEntity expedient,
+			boolean associarInteressats,
+			String rolActual,
+			Map<String, InteressatAssociacioAccioEnum> interessatsAccionsMap) {
+		
 		expedientPeticioEntity.updateExpedient(expedient);
 		expedient.addExpedientPeticio(expedientPeticioEntity);
+		
 		// set annexos as pending to create in db and to move in arxiu
 		for (RegistreAnnexEntity registreAnnex : expedientPeticioEntity.getRegistre().getAnnexos()) {
 			registreAnnex.updateEstat(RegistreAnnexEstatEnumDto.PENDENT);
 		}
-
+		
+		if (associarInteressats) {
+			associateInteressats(
+					expedient,
+					expedientPeticioEntity,
+					PermissionEnumDto.CREATE,
+					rolActual,
+					interessatsAccionsMap);
+		}
+		
+		expedientPeticioHelper.canviEstatExpedientPeticio(expedientPeticioEntity, ExpedientPeticioEstatEnumDto.PROCESSAT_PENDENT);
+		pluginHelper.comandaAvisDelete(expedientPeticioEntity);
 	}
 
 	private DocumentDto toDocumentDto(RegistreAnnexEntity registreAnnexEntity) {
@@ -3228,7 +3164,12 @@ public class ExpedientHelper {
                 	}
                 }
                 
-                associateInteressats(expedientDesti.getId(), expedientPeticioEntity.getId(), PermissionEnumDto.WRITE, "IPA_ADMIN", interessatsAccionsMap);
+                associateInteressats(
+                		expedientDesti,
+                		expedientPeticioEntity,
+                		PermissionEnumDto.WRITE,
+                		"IPA_ADMIN",
+                		interessatsAccionsMap);
                 
     			arxiuPropagarExpedientAmbInteressats(expedientDesti.getId());
 			} catch (Exception ex) {
