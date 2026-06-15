@@ -49,6 +49,7 @@ const AnotacionsExpedientGrid = (props:any) => {
     return <>
         <StyledMuiGrid
             resourceName="expedientPeticioResource"
+			persistentStateKey={"expedientPeticioResource_expedientTab"}
             filter={builder.eq('expedient.id', id)}
             sortModel={sortModel}
             perspectives={perspectives}

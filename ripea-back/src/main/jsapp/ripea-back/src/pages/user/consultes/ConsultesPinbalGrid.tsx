@@ -174,6 +174,7 @@ const ConsultesPinbalGrid = () => {
             <StyledMuiGrid
                 apiRef={apiRef}
                 resourceName={"consultaPinbalResource"}
+				persistentStateKey={"consultaPinbalResource_consulta"}
                 columns={columns}
                 filter={springFilter}
                 perspectives={perspectives}

@@ -99,6 +99,7 @@ const TancarForm = () => {
                 <Load value={selectedModel} noEffect>
                     <StyledMuiGrid
                         resourceName={"documentResource"}
+                        persistentStateActive={false}
                         columns={columns}
                         filter={filter}
                         selectionActive

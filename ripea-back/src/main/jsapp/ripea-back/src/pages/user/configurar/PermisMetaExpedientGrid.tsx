@@ -240,6 +240,7 @@ const PermisMetaExpedientNodeGrid = (props:any) => {
         <StyledMuiGrid
             apiRef={gridApiRef}
             resourceName={"aclSidResource"}
+            persistentStateActive={false}
             popupEditUpdateActive
             columns={columnsNode}
             sortModel={sortModelNode}

@@ -360,6 +360,7 @@ const ContingutGrid = () => {
             <StyledMuiGrid
                 apiRef={apiRef}
                 resourceName={"contingutResource"}
+				persistentStateKey={"contingutResource_consulta"}
                 columns={additionalColumns}
                 filter={springFilter}
                 sortModel={sortModel}

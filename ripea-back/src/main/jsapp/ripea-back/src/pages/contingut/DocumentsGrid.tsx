@@ -320,6 +320,7 @@ const DocumentsGrid = (props: any) => {
                 {/*<DndContext onDragEnd={handleDragEnd} accessibility={{screenReaderInstructions: dndScreenReaderInstructions}}>*/}
                     <StyledMuiGrid
                         resourceName={"documentResource"}
+                        persistentStateActive={false}
                         popupEditFormDialogResourceTitle={t('page.document.title')}
                         columns={columns}
                         paginationActive={false}

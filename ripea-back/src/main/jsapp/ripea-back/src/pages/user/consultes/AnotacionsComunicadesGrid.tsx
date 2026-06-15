@@ -119,6 +119,7 @@ const AnotacionsComunicadesGrid = () => {
             <StyledMuiGrid
                 apiRef={apiRef}
                 resourceName={"expedientPeticioResource"}
+				persistentStateKey={"expedientPeticioResource_anotacionsComunicades"}
                 columns={columns}
                 filter={springFilter}
                 sortModel={sortModel}

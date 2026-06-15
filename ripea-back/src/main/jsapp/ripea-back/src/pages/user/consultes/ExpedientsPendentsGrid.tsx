@@ -86,6 +86,7 @@ const ExpedientsPendentsGrid = () => {
 
             <StyledMuiGrid
                 resourceName={"expedientPeticioResource"}
+				persistentStateKey={"expedientPeticioResource_pendentsDistribucio"}
                 columns={columns}
                 filter={springFilter}
                 perspectives={perspectives}

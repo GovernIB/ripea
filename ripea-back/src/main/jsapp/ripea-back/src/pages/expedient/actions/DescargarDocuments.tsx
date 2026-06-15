@@ -54,6 +54,7 @@ const DescargarDocumentsForm = () => {
     return <Load value={apiRef && carpetes && expedients && isReady}>
         <StyledMuiGrid
             resourceName="documentResource"
+            persistentStateActive={false}
             columns={columns}
             filter={commonFilter}
             perspectives={perspectives}

@@ -35,6 +35,7 @@ type StyledMuiGridProps = Omit<MuiDataGridProps,
     | 'onRowSelectionModelChange'
     | 'readOnly'
     | 'paginationActive'
+    | 'persistentStateActive'
 > & {
     toolbarCreateTitle?: string,
     toolbarMassiveActions?: MassiveActionProps[],
@@ -51,6 +52,7 @@ type StyledMuiGridProps = Omit<MuiDataGridProps,
     onRowSelectionModelChange?: (ids:any[], detail:any) => void,
     paginationActive?: boolean,
     readOnly?: boolean,
+    persistentStateActive?: boolean,
 }
 
 const StyledMuiGrid = (props:StyledMuiGridProps) => {
@@ -89,6 +91,7 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
         hiddenMassiveDefSelector = false,
         toolbarShowCreate = true,
         toolbarShowQuickFilter = false,
+        persistentStateActive = true,
         ...others
     } = props
     const [gridRows, setGridRows] = useState<any[]>([]);
@@ -198,7 +201,7 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
             disableColumnSorting={!!staticSortModel}
             fixedSortModel={staticSortModel}
 
-			persistentStateActive
+			persistentStateActive={persistentStateActive ? true : undefined}
 			persistentStateClearPageSortPropsOnTopLevelRouteChange
 			
             apiRef={apiRef}

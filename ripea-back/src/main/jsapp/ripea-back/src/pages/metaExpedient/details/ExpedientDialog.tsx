@@ -62,6 +62,7 @@ const ExpedientDialog = (props:any) => {
     return <>
         <StyledMuiGrid
             resourceName={'expedientResource'}
+            persistentStateKey={'expedientResource_expedientDialog'}
             columns={columns}
             filter={builder.eq('metaExpedient.id', entity?.id)}
             sortModel={sortModel}

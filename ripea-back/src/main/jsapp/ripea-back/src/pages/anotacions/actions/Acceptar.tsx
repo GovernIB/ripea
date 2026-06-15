@@ -126,6 +126,7 @@ const AcceptarTabAnnexos = () => {
     return <>
         <StyledMuiGrid
             resourceName={'registreAnnexResource'}
+            persistentStateActive={false}
             filter={filter}
             columns={columnsAnnexos}
             rowAdditionalActions={actions}
@@ -210,6 +211,7 @@ const AcceptarTabInteressats = () => {
     return <>
         <StyledMuiGrid
             resourceName={"registreInteressatResource"}
+            persistentStateActive={false}
             filter={filter}
             columns={columnsInteressats}
             rowAdditionalActions={actions}

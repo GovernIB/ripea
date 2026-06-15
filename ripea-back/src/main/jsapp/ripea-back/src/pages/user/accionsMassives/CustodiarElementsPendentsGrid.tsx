@@ -135,6 +135,7 @@ const CustodiarExpedientsPendentsGrid = (props:any) => {
         <StyledMuiGrid
             apiRef={apiRef}
             resourceName={"expedientResource"}
+            persistentStateKey={"expedientResource_massCustodiarPendents"}
             columns={expedientColumns}
             filter={springFilter}
             sortModel={sortModel}
@@ -234,6 +235,7 @@ const CustodiarDocumentsPendentsGrid = (props:any) => {
         <StyledMuiGrid
             apiRef={apiRef}
             resourceName={"documentResource"}
+            persistentStateKey={"documentResource_custodiarPendents"}
             columns={documentColumns}
             filter={springFilter}
             sortModel={sortModel}
@@ -332,6 +334,7 @@ const CustodiarInteressatsPendentsGrid = (props:any) => {
         <StyledMuiGrid
             apiRef={apiRef}
             resourceName={"interessatResource"}
+            persistentStateKey={"interessatResource_custodiarPendents"}
             columns={interessatColumns}
             filter={springFilter}
             sortModel={sortModel}

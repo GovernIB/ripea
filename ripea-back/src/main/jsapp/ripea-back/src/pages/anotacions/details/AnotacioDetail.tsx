@@ -160,6 +160,7 @@ const Interessats = (props:any) => {
     return <>
         <StyledMuiGrid
             resourceName={'registreInteressatResource'}
+            persistentStateActive={false}
             columns={interessatsColumns}
             filter={`registre.id:${entity?.id}`}
             perspectives={interessatsPerspectives}
@@ -250,6 +251,7 @@ const Annexos = (props:any) => {
     return <>
         <StyledMuiGrid
             resourceName="registreAnnexResource"
+            persistentStateActive={false}
             columns={annexosColumns}
             filter={builder.and(builder.eq('registre.id',entity?.id))}
             perspectives={annexosPerspective}

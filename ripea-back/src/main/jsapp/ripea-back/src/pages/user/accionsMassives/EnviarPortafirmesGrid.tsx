@@ -147,6 +147,7 @@ const EnviarPortafirmesGrid = () => {
             <StyledMuiGrid
                 apiRef={apiRef}
                 resourceName={"documentResource"}
+                persistentStateKey={"documentResource_massEnviarPortafirmes"}
                 columns={columns}
                 filter={springFilter}
                 perspectives={perspectives}

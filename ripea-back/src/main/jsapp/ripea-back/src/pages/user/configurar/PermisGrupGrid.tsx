@@ -55,6 +55,7 @@ const PermisGrupGrid = ()=> {
             <StyledMuiGrid
                 apiRef={gridApiRef}
                 resourceName={"aclSidResource"}
+                persistentStateActive={false}
                 popupEditUpdateActive
                 columns={columns}
                 sortModel={sortModel}

@@ -113,6 +113,7 @@ export const MetaDocumentGrid = ({ entity, onRowCountChange, readOnly } :any) =>
     return <><StyledMuiGrid
         apiRef={apiRef}
         resourceName={"metaDocumentResource"}
+		persistentStateKey={"metaDocumentResource_procedimentTab"}
         popupEditUpdateActive
         popupEditFormDialogResourceTitle={t('page.metaDocument.title')}
         popupEditFormContent={<MetaDocumentForm/>}
@@ -125,10 +126,8 @@ export const MetaDocumentGrid = ({ entity, onRowCountChange, readOnly } :any) =>
         rowAdditionalActions={additionalActions}
         onRowCountChange={onRowCountChange}
         popupEditFormComponentProps={{ perspectives: editPerspectives }}
-
         rowReordering={!readOnly}
         onRowOrderChange={handleDragEnd}
-
         popupEditFormDialogComponentProps={{ fullWidth: true, maxWidth: 'lg' }}
         toolbarCreateTitle={t('page.metaDocument.action.new.label')}
         popupEditFormI18nKeys={{

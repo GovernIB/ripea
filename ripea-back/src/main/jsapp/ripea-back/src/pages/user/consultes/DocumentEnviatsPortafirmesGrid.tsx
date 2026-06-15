@@ -158,6 +158,7 @@ const DocumentEnviatsPortafirmesGrid = () => {
 
             <StyledMuiGrid
                 resourceName={"documentPortafirmesResource"}
+				persistentStateKey={"documentPortafirmesResource_consulta"}
                 columns={columns}
                 filter={springFilter}
                 sortModel={sortModel}

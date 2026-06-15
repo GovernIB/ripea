@@ -167,6 +167,7 @@ export const MetDadaGrid = ({ id, enviable = false, readOnly, ...other }: any) =
     return <><StyledMuiGrid
         apiRef={apiRef}
         resourceName={"metaDadaResource"}
+		persistentStateKey={"metaDadaResource_procedimentTab"}
         popupEditUpdateActive
         popupEditFormDialogResourceTitle={t('page.metaDada.title')}
         popupEditFormContent={<MetaDocumentDadaForm enviable={enviable && user?.sessionScope?.isPropagarMetadades}/>}

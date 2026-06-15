@@ -100,6 +100,7 @@ const AssignacioTasquesGrid = () => {
 
             <StyledMuiGrid
                 resourceName={"expedientTascaResource"}
+				persistentStateKey={"expedientTascaResource_assignacioTasques"}
                 columns={columns}
                 filter={springFilter}
                 perspectives={perspectives}

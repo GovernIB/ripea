@@ -130,6 +130,7 @@ const ActualitzarEstatAnotacioGrid = () => {
             <StyledMuiGrid
                 apiRef={apiRef}
                 resourceName={"expedientPeticioResource"}
+				persistentStateKey={"expedientPeticioResource_massActualitzarEstat"}
                 columns={columns}
                 filter={springFilter}
                 sortModel={sortModel}
