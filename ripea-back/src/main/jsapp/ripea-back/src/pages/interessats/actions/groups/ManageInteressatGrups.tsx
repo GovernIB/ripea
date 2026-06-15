@@ -40,6 +40,7 @@ const InteressatsManageGrupsForm = () => {
 
 	      <StyledMuiGrid
 	        resourceName="interessatGrupResource"
+			persistentStateActive={false}
 	        columns={columns}
 	        filter={filter}
 	        sortModel={sortModel}

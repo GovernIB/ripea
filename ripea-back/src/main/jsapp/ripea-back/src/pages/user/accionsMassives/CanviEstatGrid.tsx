@@ -112,6 +112,7 @@ const columns = [
 export const CanviEstatMuiGrid = (props:any) => {
     return <StyledMuiGrid
         resourceName={"expedientResource"}
+        persistentStateKey={"expedientResource_massiu"}
         columns={columns}
         sortModel={sortModel}
         toolbarHideCreate

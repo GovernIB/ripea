@@ -171,6 +171,7 @@ const RemesesNotibGrid = () => {
             <StyledMuiGrid
                 apiRef={apiRef}
                 resourceName={"documentNotificacioResource"}
+				persistentStateKey={"documentNotificacioResource_remesesEnviades"}
                 columns={columns}
                 filter={springFilter}
                 sortModel={sortModel}

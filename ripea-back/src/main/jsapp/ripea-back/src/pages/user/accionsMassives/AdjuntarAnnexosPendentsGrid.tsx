@@ -155,15 +155,14 @@ const AdjuntarAnnexosPendentsGrid = () => {
             <StyledMuiGrid
                 apiRef={apiRef}
                 resourceName={"registreAnnexResource"}
+				persistentStateKey={"registreAnnexResource_massAdjuntarPendents"}
                 columns={columns}
                 filter={springFilter}
                 perspectives={perspectives}
-                // sortModel={sortModel}
                 namedQueries={namedQuery}
                 rowAdditionalActions={actions}
                 toolbarMassiveActions={massiveActions}
-                isRowSelectable={(params:any) => !params?.row?.execucioMassivaAdjuntarAnnexosId
-                    && haveRequirements}
+                isRowSelectable={(params:any) => !params?.row?.execucioMassivaAdjuntarAnnexosId && haveRequirements}
                 disabledMassiveDefSelector={!haveRequirements}
                 toolbarHideCreate
             />

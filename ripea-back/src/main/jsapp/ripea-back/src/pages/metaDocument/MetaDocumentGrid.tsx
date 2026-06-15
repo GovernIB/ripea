@@ -267,6 +267,7 @@ const MetaDocumentGrid = () => {
             <StyledMuiGrid
                 apiRef={apiRef}
                 resourceName={"metaDocumentResource"}
+				persistentStateKey={"metaDocumentResource_generics"}
                 popupEditUpdateActive
                 popupEditFormDialogResourceTitle={t('page.metaDocument.title')}
                 popupEditFormContent={<MetaDocumentForm/>}
@@ -276,7 +277,6 @@ const MetaDocumentGrid = () => {
                 sortModel={sortModel}
                 perspectives={perspectives}
                 rowAdditionalActions={actions}
-
                 popupEditFormComponentProps={{ perspectives: editPerspectives }}
                 popupEditFormDialogComponentProps={{ fullWidth: true, maxWidth: 'lg' }}
                 toolbarCreateTitle={t('page.metaDocument.action.new.label')}

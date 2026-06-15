@@ -85,6 +85,7 @@ const FirmaNavegadorGrid = () => {
             <StyledMuiGrid
                 apiRef={apiRef}
                 resourceName={"documentResource"}
+                persistentStateKey={"documentResource_massFirmaNavegador"}
                 columns={columns}
                 filter={springFilter}
                 perspectives={perspectives}

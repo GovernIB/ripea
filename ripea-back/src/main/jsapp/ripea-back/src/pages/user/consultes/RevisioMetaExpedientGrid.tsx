@@ -189,12 +189,12 @@ const RevisioMetaExpedientGrid = () => {
             <StyledMuiGrid
                 apiRef={apiRef}
                 resourceName={"metaExpedientResource"}
+				persistentStateKey={"metaExpedientResource_revisioConsulta"}
                 columns={columnsAddition}
                 filter={springFilter}
                 sortModel={sortModel}
                 perspectives={perspectives}
                 namedQueries={namedQueries}
-
                 toolbarHideCreate
                 rowHideUpdateButton={false}
                 popupEditCreateActive

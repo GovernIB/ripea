@@ -110,6 +110,7 @@ const RelacionarForm= () => {
         <Load value={load} noEffect>
         <StyledMuiGrid
             resourceName={'expedientResource'}
+            persistentStateKey={'expedientResource_relacionar'}
             columns={columns}
             filter={builder.and(
                 builder.neq('id', apiRef?.current?.getId()),

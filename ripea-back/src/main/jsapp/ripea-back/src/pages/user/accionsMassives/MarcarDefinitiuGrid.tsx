@@ -81,6 +81,7 @@ const MarcarDefinitiuGrid = () => {
                 apiRef={apiRef}
                 datagridApiRef={dataApiRef}
                 resourceName={"documentResource"}
+                persistentStateKey={"documentResource_massMarcarDefinitiu"}
                 columns={columns}
                 filter={springFilter}
                 perspectives={perspectives}

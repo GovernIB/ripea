@@ -113,6 +113,7 @@ const TasquesExpedientGrid = (props: any) => {
         <StyledMuiGrid
             apiRef={apiRef}
             resourceName="expedientTascaResource"
+			persistentStateKey={"expedientTascaResource_expedientTab"}
             popupEditFormDialogResourceTitle={t('page.tasca.title')}
             columns={additionalColumns}
             paginationActive={false}

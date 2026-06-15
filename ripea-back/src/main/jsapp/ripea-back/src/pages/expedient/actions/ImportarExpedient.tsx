@@ -103,6 +103,7 @@ const ImportarExpedient = (props:any) => {
         <Load value={load} noEffect>
             <StyledMuiGrid
                 resourceName={'expedientResource'}
+                persistentStateKey={'expedientResource_importarExpedient'}
                 columns={columns}
                 filter={builder.and(
                     builder.exists(

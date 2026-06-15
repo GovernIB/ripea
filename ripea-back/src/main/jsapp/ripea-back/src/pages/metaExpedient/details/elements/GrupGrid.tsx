@@ -88,6 +88,7 @@ export const GrupGrid = ({ entity, refresh: refreshEntity, onRowCountChange, rea
         <StyledMuiGrid
             apiRef={apiRef}
             resourceName={'grupResource'}
+			persistentStateKey={"grupResource_procedimentTab"}
             columns={columns}
             toolbarShowQuickFilter
             filter={builder.exists(builder.eq("metaExpedients.id", entity?.id))}

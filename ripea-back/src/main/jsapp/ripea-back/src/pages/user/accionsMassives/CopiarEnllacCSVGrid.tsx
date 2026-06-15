@@ -72,6 +72,7 @@ const CopiarEnllacCSVGrid = () => {
             <StyledMuiGrid
                 apiRef={apiRef}
                 resourceName={"documentResource"}
+                persistentStateKey={"documentResource_massCopiarEnllacCsv"}
                 columns={columns}
                 filter={springFilter}
                 perspectives={perspectives}
