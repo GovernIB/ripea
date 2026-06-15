@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react";
-import {Grid, Alert, Icon} from "@mui/material";
+import {Grid, Alert, Icon, Typography} from "@mui/material";
 import {useMuiFormDialogApiRef, useBaseAppContext, useFormContext, useResourceApiService} from "reactlib";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
@@ -52,9 +52,9 @@ const AdditionalInfo = (props:any) => {
 const NotificarForm = () => {
     const { t } = useTranslation();
     const { data, apiRef: formApiRef } = useFormContext();
-
-	
     const { create, content } = useCreate()
+    const extension = data?.nom?.split('.').pop();
+
     const onCreateInteressat = (result?:any)=> {
         formApiRef?.current?.setFieldValue('interessats', [...(data?.interessats ?? []), {
             id: result?.id,
@@ -92,7 +92,15 @@ const NotificarForm = () => {
         {data?.administracioSir &&
             <Alert severity={'warning'}>
                 {t('page.document.action.notificar.alert.administracioSir.title')}<b>{t('page.document.action.notificar.alert.administracioSir.warning')}</b>
-            </Alert>}
+            </Alert>
+        }
+        {data?.administracioSirFormat && 
+            <Alert severity={'info'} sx={{ mb: 1 }}>
+                    <Typography>{t('page.document.action.notificar.alert.format.document',{extension})}</Typography>
+                    <Typography>{t('page.document.action.notificar.alert.format.noSir')}</Typography>
+                    <Typography>{t('page.document.action.notificar.alert.format.sir')}</Typography>
+            </Alert>
+            }
 
         <GridFormField name="tipus" required hiddenEnumValues={['MANUAL']}/>
         <GridFormField name="estat" required disabled/>
@@ -133,19 +141,21 @@ const NotificarForm = () => {
 const Notificar = (props:any) => {
     const { t } = useTranslation();
 
-    return <FormActionDialog
-        resourceName={"documentResource"}
-        action={"NOTIFICAR"}
-        title={t('page.document.action.notificar.title')}
-        formDialogButtons={[
-            {icon: 'mail', text: t('page.document.action.notificar.button'), componentProps: { variant: 'contained' }, value: true },
-            {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
-        ]}
-        {...props}
-        initialOnChange
-    >
-        <NotificarForm/>
-    </FormActionDialog>
+    return ( 
+        <FormActionDialog
+            resourceName={"documentResource"}
+            action={"NOTIFICAR"}
+            title={t('page.document.action.notificar.title')}
+            formDialogButtons={[
+                {icon: 'mail', text: t('page.document.action.notificar.button'), componentProps: { variant: 'contained' }, value: true },
+                {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
+            ]}
+            {...props}
+            initialOnChange
+        >
+            <NotificarForm/>
+        </FormActionDialog>
+    )
 }
 
 const useNotificar = (refresh?: () => void) => {
