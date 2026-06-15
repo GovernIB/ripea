@@ -1500,10 +1500,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 		public void onChange(Serializable id, NotificarFormAction previous, String fieldName, Object fieldValue,
 				Map<String, AnswerValue> answers, String[] previousFieldNames, NotificarFormAction target) {
 
-			// Si l'usuari ja ha acceptat el diàleg d'advertència, consumim la resposta i el deixam continuar
-			if (answers != null && answers.containsKey(COMPATIBILITAT_EXTENSIO_AVIS)) {
-				answers.remove(COMPATIBILITAT_EXTENSIO_AVIS);
-			}
+			target.setAdministracioSirFormat(answers.containsKey(COMPATIBILITAT_EXTENSIO_AVIS));
 
             if (fieldName==null){
                 target.setPermetreEnviamentPostal(ConfigHelper.getEntitat().get().isPermetreEnviamentPostal());
@@ -1513,94 +1510,104 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                		InteressatResourceEntity interessatUnic = interessatsExp.get(0);
                		target.getInteressats().add(ResourceReference.toResourceReference(interessatUnic.getId(), interessatUnic.getCodiNom()));
                	}
-            } else {
-                switch (fieldName) {
-					case NotificarFormAction.Fields.tipus:
-						List<InteressatResourceEntity> interessatsPrevious = interessatResourceRepository.findAllById(previous.getInteressats().stream()
-								.map(ResourceReference::getId).collect(Collectors.toList()));
-						checkComunicacioFormat((DocumentNotificacioTipusEnumDto)fieldValue,interessatsPrevious,id);
-						break;
-
-                    case DocumentResource.NotificarFormAction.Fields.duracio:
-                        if (fieldValue != null) {
-                            Date dataLimit = DateUtils.addDays(new Date(), (Integer) fieldValue);
-                            if (previous.getDataCaducitat() == null || !DateUtils.isSameDay(previous.getDataCaducitat(), dataLimit)) {
-                                target.setDataCaducitat(dataLimit);
-                            }
-                        } else {
-                            if (previous.getDataCaducitat() != null) {
-                                target.setDataCaducitat(null);
-                            }
-                        }
-                        break;
-
-                    case DocumentResource.NotificarFormAction.Fields.dataCaducitat:
-                        if (fieldValue != null) {
-                            LocalDate start = LocalDate.now();
-                            LocalDate end = ((Date) fieldValue).toInstant()
-                                    .atZone(ZoneId.systemDefault())
-                                    .toLocalDate();
-                            int dias = (int) start.until(end, ChronoUnit.DAYS);
-
-                            if (!Objects.equals(previous.getDuracio(), dias)) {
-                                target.setDuracio(dias);
-                            }
-                        } else {
-                            if (previous.getDuracio() != null) {
-                                target.setDuracio(null);
-                            }
-                        }
-                        break;
-
-                    case DocumentResource.NotificarFormAction.Fields.grups:
-                    	Set<InteressatResourceEntity> interessatSet = new LinkedHashSet<>();
-                        List<Long> ids = ((List<ResourceReference<InteressatGrupResource, Long>>) fieldValue).stream()
-                                .map(ResourceReference::getId).collect(Collectors.toList());
-                        List<InteressatGrupResourceEntity> grups = interessatGrupResourceRepository.findAllById(ids);
-                        for (InteressatGrupResourceEntity grup : grups) {
-                        	interessatSet.addAll(grup.getInteressats());
-                        }
-                        List<InteressatResourceEntity> interessats = new ArrayList<>(interessatSet);
-                        List<ResourceReference<InteressatResource, Long>> interessatsResourceList = interessats.stream()
-                                .map(i->ResourceReference.<InteressatResource, Long>toResourceReference(i.getId(), i.getCodiNom()))
-                                .collect(Collectors.toList());
-                        target.setInteressats(interessatsResourceList);
-                        break;
-
-                    case NotificarFormAction.Fields.interessats:
-                        List<InteressatResourceEntity> interesatsFieldValue = interessatResourceRepository.findAllById(((List<ResourceReference<InteressatResource, Long>>) fieldValue).stream()
-                                .map(ResourceReference::getId).collect(Collectors.toList()));
-                        List<ResourceReference<InteressatResource, Long>> interessatsAmbAvis = new ArrayList<>();
-                        boolean administracioSir = false;
-                        for (InteressatResourceEntity titular : interesatsFieldValue) {
-                        	InteressatResourceEntity destinatari = titular.getRepresentant()!=null?titular.getRepresentant():null;
-                        	if (InteressatTipusEnum.InteressatPersonaFisicaEntity.equals(titular.getTipus())) {
-	                            if ((destinatari == null && titular.getDocumentTipus()!=InteressatDocumentTipusEnumDto.NIF && titular.getDocumentTipus()!=InteressatDocumentTipusEnumDto.DOCUMENT_IDENTIFICATIU_ESTRANGERS)
-	                            ||  (destinatari != null && destinatari.getDocumentTipus()!=InteressatDocumentTipusEnumDto.NIF && destinatari.getDocumentTipus()!=InteressatDocumentTipusEnumDto.DOCUMENT_IDENTIFICATIU_ESTRANGERS)
-	                            ) {
-	                                if(destinatari == null){
-	                                    interessatsAmbAvis.add(ResourceReference.toResourceReference(titular.getId(), titular.getNomComplet()
-	                                    ));
-	                                }else {
-	                                    interessatsAmbAvis.add(ResourceReference.toResourceReference(destinatari.getId(), destinatari.getNomComplet()
-	                                    ));
-	                                }
-	                            }
-                        	}
-                            if (InteressatTipusEnum.InteressatAdministracioEntity.equals(titular.getTipus()) && titular.getAmbOficinaSir()!=null && titular.getAmbOficinaSir().booleanValue()) {
-                            	administracioSir = true;
-                            }
-                        }
-                        target.setInteressatsAmbAvis(interessatsAmbAvis);
-                        target.setAdministracioSir(administracioSir);
-
-						checkComunicacioFormat(previous.getTipus(),interesatsFieldValue,id);
-                        break;
-                }
+			   return;
             }
+			switch (fieldName) {
+				case NotificarFormAction.Fields.tipus:
+					List<InteressatResourceEntity> interessatsPrevious = interessatResourceRepository.findAllById(previous.getInteressats().stream()
+							.map(ResourceReference::getId).collect(Collectors.toList()));
+					if (!answers.containsKey(COMPATIBILITAT_EXTENSIO_AVIS) && isFormatIncompatible((DocumentNotificacioTipusEnumDto)fieldValue, interessatsPrevious, id)){
+						throw new AnswerRequiredException(
+								DocumentResource.class,
+								COMPATIBILITAT_EXTENSIO_AVIS,
+								messageHelper.getMessage("notificacio.controller.warning.incompatible")
+						);
+					}
+					break;
+
+				case DocumentResource.NotificarFormAction.Fields.duracio:
+					if (fieldValue != null) {
+						Date dataLimit = DateUtils.addDays(new Date(), (Integer) fieldValue);
+						if (previous.getDataCaducitat() == null || !DateUtils.isSameDay(previous.getDataCaducitat(), dataLimit)) {
+							target.setDataCaducitat(dataLimit);
+						}
+					} else {
+						if (previous.getDataCaducitat() != null) {
+							target.setDataCaducitat(null);
+						}
+					}
+					break;
+
+				case DocumentResource.NotificarFormAction.Fields.dataCaducitat:
+					if (fieldValue != null) {
+						LocalDate start = LocalDate.now();
+						LocalDate end = ((Date) fieldValue).toInstant()
+								.atZone(ZoneId.systemDefault())
+								.toLocalDate();
+						int dias = (int) start.until(end, ChronoUnit.DAYS);
+
+						if (!Objects.equals(previous.getDuracio(), dias)) {
+							target.setDuracio(dias);
+						}
+					} else {
+						if (previous.getDuracio() != null) {
+							target.setDuracio(null);
+						}
+					}
+					break;
+
+				case DocumentResource.NotificarFormAction.Fields.grups:
+					Set<InteressatResourceEntity> interessatSet = new LinkedHashSet<>();
+					List<Long> ids = ((List<ResourceReference<InteressatGrupResource, Long>>) fieldValue).stream()
+							.map(ResourceReference::getId).collect(Collectors.toList());
+					List<InteressatGrupResourceEntity> grups = interessatGrupResourceRepository.findAllById(ids);
+					for (InteressatGrupResourceEntity grup : grups) {
+						interessatSet.addAll(grup.getInteressats());
+					}
+					List<InteressatResourceEntity> interessats = new ArrayList<>(interessatSet);
+					List<ResourceReference<InteressatResource, Long>> interessatsResourceList = interessats.stream()
+							.map(i->ResourceReference.<InteressatResource, Long>toResourceReference(i.getId(), i.getCodiNom()))
+							.collect(Collectors.toList());
+					target.setInteressats(interessatsResourceList);
+					break;
+
+				case NotificarFormAction.Fields.interessats:
+					List<InteressatResourceEntity> interesatsFieldValue = interessatResourceRepository.findAllById(((List<ResourceReference<InteressatResource, Long>>) fieldValue).stream()
+							.map(ResourceReference::getId).collect(Collectors.toList()));
+					List<ResourceReference<InteressatResource, Long>> interessatsAmbAvis = new ArrayList<>();
+					boolean administracioSir = false;
+					for (InteressatResourceEntity titular : interesatsFieldValue) {
+						InteressatResourceEntity destinatari = titular.getRepresentant()!=null?titular.getRepresentant():null;
+						if (InteressatTipusEnum.InteressatPersonaFisicaEntity.equals(titular.getTipus())) {
+							if ((destinatari == null && titular.getDocumentTipus()!=InteressatDocumentTipusEnumDto.NIF && titular.getDocumentTipus()!=InteressatDocumentTipusEnumDto.DOCUMENT_IDENTIFICATIU_ESTRANGERS)
+							||  (destinatari != null && destinatari.getDocumentTipus()!=InteressatDocumentTipusEnumDto.NIF && destinatari.getDocumentTipus()!=InteressatDocumentTipusEnumDto.DOCUMENT_IDENTIFICATIU_ESTRANGERS)
+							) {
+								if(destinatari == null){
+									interessatsAmbAvis.add(ResourceReference.toResourceReference(titular.getId(), titular.getNomComplet()
+									));
+								}else {
+									interessatsAmbAvis.add(ResourceReference.toResourceReference(destinatari.getId(), destinatari.getNomComplet()
+									));
+								}
+							}
+						}
+						if (InteressatTipusEnum.InteressatAdministracioEntity.equals(titular.getTipus()) && titular.getAmbOficinaSir()!=null && titular.getAmbOficinaSir().booleanValue()) {
+							administracioSir = true;
+						}
+					}
+					target.setInteressatsAmbAvis(interessatsAmbAvis);
+					target.setAdministracioSir(administracioSir);
+					if (!answers.containsKey(COMPATIBILITAT_EXTENSIO_AVIS) && isFormatIncompatible(previous.getTipus(), interesatsFieldValue, id)) {
+						throw new AnswerRequiredException(
+								DocumentResource.class,
+								COMPATIBILITAT_EXTENSIO_AVIS,
+								messageHelper.getMessage("notificacio.controller.warning.incompatible"));
+					}
+					break;
+			}
 		}
 
-		private void checkComunicacioFormat(DocumentNotificacioTipusEnumDto tipusEnviament, List<InteressatResourceEntity> llistaInteressats, Serializable id ){
+		private boolean isFormatIncompatible(DocumentNotificacioTipusEnumDto tipusEnviament, List<InteressatResourceEntity> llistaInteressats, Serializable id){
 			// Només validam si tenim el document a mà per comprovar la seva extensió
 			DocumentResourceEntity documentEntity = documentResourceRepository.findById((Long) id).orElse(null);
 			if (documentEntity != null && documentEntity.getFitxerNom() != null) {
@@ -1638,24 +1645,15 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 					boolean formatValidPerNoSir = formatsNoSir.contains(extensio);
 
 					// Validam si hi ha incompatibilitat en qualque canal actiu
-					boolean llançarAvis = false;
 					if (canalSirActiu && !formatValidPerSir) {
-						llançarAvis = true;
+						return true;
 					}
 					if (canalNoSirActiu && !formatValidPerNoSir) {
-						llançarAvis = true;
-					}
-
-					if (llançarAvis) {
-						throw new AnswerRequiredException(
-							DocumentResource.class,
-							COMPATIBILITAT_EXTENSIO_AVIS,
-							//messageHelper.getMessage("notificacio.controller.warning.extensio.incompatible")
-							"Atenció: S'ha detectat que el format del document pot no ser compatible amb tots els destinataris triats. El document es ." + extensio
-						);
+						return true;
 					}
 				}
 			}
+			return false;
 		}
 
 		@Override
@@ -1688,7 +1686,17 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                     }
                 }
 
-	        	if (DocumentNotificacioTipusEnumDto.COMUNICACIO.equals(params.getTipus()) && 
+
+				if (isFormatIncompatible(params.getTipus(), interessatResourceEntityList, entity.getId())) {
+					throw new ActionExecutionException(
+							entity.getClass(),
+							entity.getId(),
+							code,
+							messageHelper.getMessage("notificacio.controller.warning.incompatible")
+					);
+				}
+
+	        	if (DocumentNotificacioTipusEnumDto.COMUNICACIO.equals(params.getTipus()) &&
 	        		"application/zip".equals(entity.getFitxerContentType()) &&
 	        		anyInteressatIsAdministracio) {
 	        			throw new ActionExecutionException(

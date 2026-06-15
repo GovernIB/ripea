@@ -566,6 +566,8 @@ public class DocumentResource extends NodeResource {
         @Transient 
         private boolean administracioSir = false;
         @Transient
+        private boolean administracioSirFormat;
+        @Transient
         private ResourceReference<ExpedientResource, Long> expedient;
     }
 

@@ -1010,7 +1010,12 @@ const translationCa = {
                             title: "Uno de los interesados seleccionados es una administración SIR.",
                             warning: "TODOS los envíos se realizarán de tipo COMUNICACIÓN",
                         },
-                    }
+                        format: {
+                            document: "El format del document actual és: {{extension}}",
+                            noSir: "Canal No-SIR: Els formats admesos són pdf y zip.",
+                            sir: "Canal SIR: Els formats admesos són jpg, jpeg, odt, odp, ods, odg, docx, xlsx, pptx, pdf, png, rtf, svg, tiff, txt, xml y xsig.",
+                        },
+                    },
                 },
                 notificarMasiva: {
                     label: "Notifica o comunica...",
