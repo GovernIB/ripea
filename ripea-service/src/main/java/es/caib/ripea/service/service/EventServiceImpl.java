@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.service.helper.EventHelper;
 import es.caib.ripea.service.intf.dto.UsuariAnotacioDto;
@@ -91,7 +92,11 @@ public class EventServiceImpl implements EventService {
 		eventHelper.notifyErrorsValidacio(errors);
 	}
 
+	// @Transactional perquè aquest mètode pot ser cridat des d'un fil de @JmsListener (SseResourceController), que
+	// no té Open-Session-In-View; el recàlcul de validacions (findErrorsValidacioPerNode) navega per relacions lazy
+	// i necessita una sessió Hibernate oberta durant tota la crida.
 	@Override
+	@Transactional(readOnly = true)
 	public List<ValidacioErrorDto> getValidacionsInicialsExpedient(Long expedientId) {
 		return eventHelper.getValidacionsInicialsExpedient(expedientId);
 	}

@@ -1,9 +1,13 @@
 package es.caib.ripea.ejb;
 
+import java.util.List;
+
+import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 
 import es.caib.ripea.ejb.base.AbstractServiceEjb;
+import es.caib.ripea.service.intf.dto.ValidacioErrorDto;
 import es.caib.ripea.service.intf.service.EventService;
 import lombok.experimental.Delegate;
 
@@ -15,5 +19,10 @@ public class EventServiceEjb extends AbstractServiceEjb<EventService> implements
 
 	protected void setDelegateService(EventService delegateService) {
 		this.delegateService = delegateService;
+	}
+	
+	@PermitAll
+	public List<ValidacioErrorDto> getValidacionsInicialsExpedient(Long expedientId) {
+		return delegateService.getValidacionsInicialsExpedient(expedientId);
 	}
 }

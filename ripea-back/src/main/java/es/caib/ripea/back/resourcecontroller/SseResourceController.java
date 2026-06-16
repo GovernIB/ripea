@@ -3,6 +3,7 @@ package es.caib.ripea.back.resourcecontroller;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -13,8 +14,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,6 +37,7 @@ import es.caib.ripea.service.intf.model.sse.AnotacionsPendentsEvent;
 import es.caib.ripea.service.intf.model.sse.AvisosActiusEvent;
 import es.caib.ripea.service.intf.model.sse.CreacioFluxFinalitzatEvent;
 import es.caib.ripea.service.intf.model.sse.ErrorsValidacioChangedEvent;
+import es.caib.ripea.service.intf.model.sse.ErrorsValidacioEvictEvent;
 import es.caib.ripea.service.intf.model.sse.FirmaFinalitzadaEvent;
 import es.caib.ripea.service.intf.model.sse.ScanFinalitzatEvent;
 import es.caib.ripea.service.intf.model.sse.TasquesPendentsEvent;
@@ -391,6 +396,60 @@ public class SseResourceController {
     		sendToExpedient(errorsValidacioEvent.getExpedientId(),
     				SseEmitter.event().name(ExpedientEventType.VALIDACIO_CHANGE.getEventName()).data(errorsValidacioEvent));
     	}
+    }
+
+    /**
+     * Rep l'event lleuger amb els ids dels expedients als quals se'ls ha buidat la cache de validacions (per un
+     * canvi de meta-document o metadada del procediment, que afecta tots els expedients oberts). Per no recalcular
+     * la validació de tots ells (que poden ser molts i la majoria no els està mirant ningú), només es recalcula i
+     * notifica via SSE per als expedients que en aquest moment tenen un emisor SSE actiu (algú els està veient).
+     *
+     * El recàlcul (eventService.getValidacionsInicialsExpedient) es fa des d'un fil de @JmsListener que no té
+     * autenticació; per això establim un context de seguretat SYSTEM (igual que SchedulingConfig fa per a les
+     * tasques en segon pla) abans de cridar el servei i el netejam al final.
+     */
+    @Async
+    @JmsListener(destination = "errorsValidacioEvict")
+    public void handleEventErrorsValidacioEvict(ErrorsValidacioEvictEvent evictEvent) {
+    	if (evictEvent == null || evictEvent.getExpedientIds() == null) {
+    		return;
+    	}
+    	boolean contextEstablert = establirContextSeguretatSystem();
+    	try {
+    		for (Long expedientId : evictEvent.getExpedientIds()) {
+    			List<SseEmitter> emisors = clientsExpedient.get(expedientId);
+    			if (emisors == null || emisors.isEmpty()) {
+    				continue; // ningú està veient aquest expedient: ens estalviam el recàlcul
+    			}
+    			logger.debug("Recàlcul i notificació SSE de validacions per l'expedient {} (té emisor actiu).", expedientId);
+    			ErrorsValidacioChangedEvent evce = new ErrorsValidacioChangedEvent(
+    					expedientId,
+    					eventService.getValidacionsInicialsExpedient(expedientId));
+    			sendToExpedient(expedientId,
+    					SseEmitter.event().name(ExpedientEventType.VALIDACIO_CHANGE.getEventName()).data(evce));
+    		}
+    	} catch (Exception ex) {
+    		ex.printStackTrace();
+    	} finally {
+    		if (contextEstablert) {
+    			SecurityContextHolder.clearContext();
+    		}
+    	}
+    }
+
+    /**
+     * Estableix una autenticació SYSTEM al fil actual si encara no n'hi ha cap, perquè les crides als serveis fetes
+     * des de fils sense petició web (p.ex. @JmsListener) tinguin identitat. Retorna true si l'ha establerta aquí
+     * (i per tant el cridador l'ha de netejar). Mateix patró que SchedulingConfig.createAuthenticationContext.
+     */
+    private boolean establirContextSeguretatSystem() {
+    	if (SecurityContextHolder.getContext().getAuthentication() != null) {
+    		return false;
+    	}
+    	User user = new User("SYSTEM_RIPEA", "", Collections.singletonList(new SimpleGrantedAuthority("IPA_ADMIN")));
+    	SecurityContextHolder.getContext().setAuthentication(
+    			new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities()));
+    	return true;
     }
 
     @Async
