@@ -84,6 +84,7 @@ class MetaDocumentHelperTest {
     @Mock private DocumentRepository documentRepository;
     @Mock private UsuariRepository usuariRepository;
     @Mock private ContingutLogHelper contingutLogHelper;
+    @Mock private ValidacioCacheEvictHelper validacioCacheEvictHelper;
 
     @InjectMocks
     private MetaDocumentHelper helper;
@@ -234,66 +235,15 @@ class MetaDocumentHelperTest {
     void evictErrorsValidacioAndNotify_metaExpedientIdNull_noFaRes() {
         helper.evictErrorsValidacioAndNotify(ENTITAT_ID, null, true);
 
-        verify(cacheHelper, never()).evictErrorsValidacioAndNotify(any());
-        verify(cacheHelper, never()).evictErrorsValidacioPerNode(any());
+        verify(validacioCacheEvictHelper, never()).evictValidacioExpedientsPerMetaExpedientEnBackground(any(), any());
     }
 
     @Test
-    void evictErrorsValidacioAndNotify_ambExpedients_notificaSseTrue_crideaAndNotify() {
-        EntitatEntity entitat = mock(EntitatEntity.class);
-        MetaExpedientEntity metaExpedient = mock(MetaExpedientEntity.class);
-        when(entityComprovarHelper.comprovarEntitat(ENTITAT_ID, false, false, false, false, true))
-                .thenReturn(entitat);
-        when(entityComprovarHelper.comprovarMetaExpedient(entitat, META_EXPEDIENT_ID))
-                .thenReturn(metaExpedient);
-        ExpedientEntity expedient = mock(ExpedientEntity.class);
-        when(expedient.getId()).thenReturn(99L);
-        when(expedientRepository.findByEntitatAndMetaExpedientAndEstatAndEsborrat(
-                entitat, metaExpedient, ExpedientEstatEnumDto.OBERT, 0))
-                .thenReturn(Collections.singletonList(expedient));
-
+    void evictErrorsValidacioAndNotify_ambMetaExpedientId_evictaExpedientsEnBackground() {
         helper.evictErrorsValidacioAndNotify(ENTITAT_ID, META_EXPEDIENT_ID, true);
 
-        verify(cacheHelper).evictErrorsValidacioAndNotify(99L);
-        verify(cacheHelper, never()).evictErrorsValidacioPerNode(any());
-    }
-
-    @Test
-    void evictErrorsValidacioAndNotify_ambExpedients_notificaSseFalse_crideaPerNode() {
-        EntitatEntity entitat = mock(EntitatEntity.class);
-        MetaExpedientEntity metaExpedient = mock(MetaExpedientEntity.class);
-        when(entityComprovarHelper.comprovarEntitat(ENTITAT_ID, false, false, false, false, true))
-                .thenReturn(entitat);
-        when(entityComprovarHelper.comprovarMetaExpedient(entitat, META_EXPEDIENT_ID))
-                .thenReturn(metaExpedient);
-        ExpedientEntity expedient = mock(ExpedientEntity.class);
-        when(expedient.getId()).thenReturn(99L);
-        when(expedientRepository.findByEntitatAndMetaExpedientAndEstatAndEsborrat(
-                entitat, metaExpedient, ExpedientEstatEnumDto.OBERT, 0))
-                .thenReturn(Collections.singletonList(expedient));
-
-        helper.evictErrorsValidacioAndNotify(ENTITAT_ID, META_EXPEDIENT_ID, false);
-
-        verify(cacheHelper).evictErrorsValidacioPerNode(99L);
-        verify(cacheHelper, never()).evictErrorsValidacioAndNotify(any());
-    }
-
-    @Test
-    void evictErrorsValidacioAndNotify_senseExpedients_nocrideaCache() {
-        EntitatEntity entitat = mock(EntitatEntity.class);
-        MetaExpedientEntity metaExpedient = mock(MetaExpedientEntity.class);
-        when(entityComprovarHelper.comprovarEntitat(ENTITAT_ID, false, false, false, false, true))
-                .thenReturn(entitat);
-        when(entityComprovarHelper.comprovarMetaExpedient(entitat, META_EXPEDIENT_ID))
-                .thenReturn(metaExpedient);
-        when(expedientRepository.findByEntitatAndMetaExpedientAndEstatAndEsborrat(
-                entitat, metaExpedient, ExpedientEstatEnumDto.OBERT, 0))
-                .thenReturn(Collections.emptyList());
-
-        helper.evictErrorsValidacioAndNotify(ENTITAT_ID, META_EXPEDIENT_ID, true);
-
-        verify(cacheHelper, never()).evictErrorsValidacioAndNotify(any());
-        verify(cacheHelper, never()).evictErrorsValidacioPerNode(any());
+        verify(validacioCacheEvictHelper).evictValidacioExpedientsPerMetaExpedientEnBackground(
+                META_EXPEDIENT_ID, ExpedientEstatEnumDto.OBERT);
     }
 
     // =========================================================================
@@ -559,8 +509,7 @@ class MetaDocumentHelperTest {
 
         helper.update(META_EXPEDIENT_ID, buildMetaDocumentDto(MultiplicitatEnumDto.M_1), null, null, null);
 
-        verify(cacheHelper, never()).evictErrorsValidacioAndNotify(any());
-        verify(cacheHelper, never()).evictErrorsValidacioPerNode(any());
+        verify(validacioCacheEvictHelper, never()).evictValidacioExpedientsPerMetaExpedientEnBackground(any(), any());
     }
 
     @Test
@@ -576,19 +525,10 @@ class MetaDocumentHelperTest {
         when(entitat.getId()).thenReturn(ENTITAT_ID);
         when(metaExpedient.getId()).thenReturn(META_EXPEDIENT_ID);
 
-        when(entityComprovarHelper.comprovarEntitat(ENTITAT_ID, false, false, false, false, true))
-                .thenReturn(entitat);
-        when(entityComprovarHelper.comprovarMetaExpedient(entitat, META_EXPEDIENT_ID))
-                .thenReturn(metaExpedient);
-        ExpedientEntity expedient = mock(ExpedientEntity.class);
-        when(expedient.getId()).thenReturn(55L);
-        when(expedientRepository.findByEntitatAndMetaExpedientAndEstatAndEsborrat(
-                entitat, metaExpedient, ExpedientEstatEnumDto.OBERT, 0))
-                .thenReturn(Collections.singletonList(expedient));
-
         helper.update(META_EXPEDIENT_ID, buildMetaDocumentDto(MultiplicitatEnumDto.M_0_N), null, null, null);
 
-        verify(cacheHelper).evictErrorsValidacioPerNode(55L);
+        verify(validacioCacheEvictHelper).evictValidacioExpedientsPerMetaExpedientEnBackground(
+                META_EXPEDIENT_ID, ExpedientEstatEnumDto.OBERT);
     }
 
     @Test

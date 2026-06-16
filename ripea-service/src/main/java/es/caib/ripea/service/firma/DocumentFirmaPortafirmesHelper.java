@@ -282,6 +282,7 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 		}
 		cacheHelper.evictEnviamentsPortafirmesAmbErrorPerExpedient(document.getExpedient());
 		cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedient().getId());
+		cacheHelper.evictDataDarrerEnviament(document.getExpedient());
 		return resultat;
 	}
 

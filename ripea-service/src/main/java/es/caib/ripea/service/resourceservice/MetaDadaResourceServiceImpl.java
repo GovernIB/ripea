@@ -91,12 +91,10 @@ public class MetaDadaResourceServiceImpl extends BaseMutableResourceService<Meta
 				recursToMetaDadaDto(resource),
 				configHelper.getRolActual(),
 				organId);
-		
-		afterDbChange(entitatEntity.getId(), resource.getMetaNode().getId());
-		
+
 		return resource;
 	}
-	
+
 	@Override
 	public MetaDadaResource update(
 			Long id,
@@ -130,12 +128,10 @@ public class MetaDadaResourceServiceImpl extends BaseMutableResourceService<Meta
 					configHelper.getRolActual(),
 					organId);
 		}
-		
-		afterDbChange(entitatEntity.getId(), metaDada.getMetaNode().getId());
-		
+
 		return resource;
 	}
-	
+
 	@Override
 	public void delete(
 			Long id,
@@ -158,13 +154,9 @@ public class MetaDadaResourceServiceImpl extends BaseMutableResourceService<Meta
 				id,
 				configHelper.getRolActual(),
 				organId);
-		
-		 afterDbChange(entitatEntity.getId(), metaDada.getMetaNode().getId());
+		//L'evict de validacions el fa internament metaDadaHelper.delete (i create/update/updateActiva),
+		//amb els guards d'obligatorietat. No cal repetir-lo aquí (evitava el doble evict i saltava els guards).
 	}
-
-    private void afterDbChange(Long entitatId, Long metaNodeId) {
-    	metaDadaHelper.evictValidacionsExpedients(entitatId, metaNodeId);
-    }
 	
 	private MetaDadaDto recursToMetaDadaDto(MetaDadaResource resource) {
 		MetaDadaDto metaDadaDto = objectMappingHelper.newInstanceMap(resource, MetaDadaDto.class, "valorData", "domini", "serialVersionUID");

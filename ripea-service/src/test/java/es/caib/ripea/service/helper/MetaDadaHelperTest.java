@@ -20,13 +20,11 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
 import es.caib.ripea.persistence.entity.EntitatEntity;
-import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.entity.MetaDadaEntity;
 import es.caib.ripea.persistence.entity.MetaDocumentEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientTascaValidacioEntity;
 import es.caib.ripea.persistence.entity.MetaNodeEntity;
-import es.caib.ripea.persistence.repository.ExpedientRepository;
 import es.caib.ripea.persistence.repository.MetaDadaRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientTascaValidacioRepository;
 import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
@@ -49,13 +47,12 @@ class MetaDadaHelperTest {
 
     // ── Dependències mockejades ──────────────────────────────────────────────
 
-    @Mock private ExpedientRepository expedientRepository;
     @Mock private MetaDadaRepository metaDadaRepository;
     @Mock private MetaExpedientTascaValidacioRepository metaExpedientTascaValidacioRepository;
     @Mock private EntityComprovarHelper entityComprovarHelper;
     @Mock private MetaExpedientHelper metaExpedientHelper;
     @Mock private ApplicationHelper applicationHelper;
-    @Mock private CacheHelper cacheHelper;
+    @Mock private ValidacioCacheEvictHelper validacioCacheEvictHelper;
     @Mock private ContingutLogHelper contingutLogHelper;
 
     @InjectMocks
@@ -288,27 +285,6 @@ class MetaDadaHelperTest {
     }
 
     // =========================================================================
-    // evictValidacionsExpedients(Long, Long)
-    // =========================================================================
-
-    @Test
-    void evictValidacionsExpedientsPerIds_delegaCorrectament() {
-        EntitatEntity entitat = mock(EntitatEntity.class);
-        MetaExpedientEntity metaNode = mock(MetaExpedientEntity.class);
-        when(entityComprovarHelper.comprovarEntitat(ENTITAT_ID)).thenReturn(entitat);
-        when(entityComprovarHelper.comprovarMetaNode(entitat, META_NODE_ID)).thenReturn(metaNode);
-        ExpedientEntity expedient = mock(ExpedientEntity.class);
-        when(expedient.getId()).thenReturn(99L);
-        when(expedientRepository.findByEntitatAndMetaExpedientAndEstatAndEsborrat(
-                entitat, metaNode, ExpedientEstatEnumDto.OBERT, 0))
-                .thenReturn(Collections.singletonList(expedient));
-
-        helper.evictValidacionsExpedients(ENTITAT_ID, META_NODE_ID);
-
-        verify(cacheHelper).evictErrorsValidacioAndNotify(99L);
-    }
-
-    // =========================================================================
     // evictValidacionsExpedients(EntitatEntity, MetaNodeEntity, boolean)
     // =========================================================================
 
@@ -318,65 +294,35 @@ class MetaDadaHelperTest {
 
         helper.evictValidacionsExpedients(entitat, null, true);
 
-        verify(cacheHelper, never()).evictErrorsValidacioAndNotify(any());
-        verify(cacheHelper, never()).evictErrorsValidacioPerNode(any());
+        verify(validacioCacheEvictHelper, never()).evictValidacioExpedientsPerMetaExpedientEnBackground(any(), any());
+        verify(validacioCacheEvictHelper, never()).evictValidacioDocumentsPerMetaDocumentEnBackground(any());
     }
 
     @Test
-    void evictValidacionsExpedients_metaNodeNoEsMetaExpedient_noFaRes() {
+    void evictValidacionsExpedients_metaNodeEsMetaDocument_evictaDocumentsEnBackground() {
         EntitatEntity entitat = mock(EntitatEntity.class);
         MetaDocumentEntity metaNode = mock(MetaDocumentEntity.class);
+        when(metaNode.getId()).thenReturn(META_NODE_ID);
 
         helper.evictValidacionsExpedients(entitat, metaNode, true);
 
-        verify(cacheHelper, never()).evictErrorsValidacioAndNotify(any());
-        verify(cacheHelper, never()).evictErrorsValidacioPerNode(any());
+        //Pels meta-documents el evict és pels documents, en segon pla, no pels expedients
+        verify(validacioCacheEvictHelper).evictValidacioDocumentsPerMetaDocumentEnBackground(META_NODE_ID);
+        verify(validacioCacheEvictHelper, never()).evictValidacioExpedientsPerMetaExpedientEnBackground(any(), any());
     }
 
     @Test
-    void evictValidacionsExpedients_ambExpedients_notificaSseTrue_crideaAndNotify() {
+    void evictValidacionsExpedients_metaNodeEsMetaExpedient_evictaExpedientsEnBackground() {
         EntitatEntity entitat = mock(EntitatEntity.class);
         MetaExpedientEntity metaNode = mock(MetaExpedientEntity.class);
-        ExpedientEntity expedient = mock(ExpedientEntity.class);
-        when(expedient.getId()).thenReturn(5L);
-        when(expedientRepository.findByEntitatAndMetaExpedientAndEstatAndEsborrat(
-                entitat, metaNode, ExpedientEstatEnumDto.OBERT, 0))
-                .thenReturn(Collections.singletonList(expedient));
+        when(metaNode.getId()).thenReturn(META_NODE_ID);
 
         helper.evictValidacionsExpedients(entitat, metaNode, true);
 
-        verify(cacheHelper).evictErrorsValidacioAndNotify(5L);
-        verify(cacheHelper, never()).evictErrorsValidacioPerNode(any());
-    }
-
-    @Test
-    void evictValidacionsExpedients_ambExpedients_notificaSseFalse_crideaPerNode() {
-        EntitatEntity entitat = mock(EntitatEntity.class);
-        MetaExpedientEntity metaNode = mock(MetaExpedientEntity.class);
-        ExpedientEntity expedient = mock(ExpedientEntity.class);
-        when(expedient.getId()).thenReturn(7L);
-        when(expedientRepository.findByEntitatAndMetaExpedientAndEstatAndEsborrat(
-                entitat, metaNode, ExpedientEstatEnumDto.OBERT, 0))
-                .thenReturn(Collections.singletonList(expedient));
-
-        helper.evictValidacionsExpedients(entitat, metaNode, false);
-
-        verify(cacheHelper).evictErrorsValidacioPerNode(7L);
-        verify(cacheHelper, never()).evictErrorsValidacioAndNotify(any());
-    }
-
-    @Test
-    void evictValidacionsExpedients_senseExpedients_nocrideaCache() {
-        EntitatEntity entitat = mock(EntitatEntity.class);
-        MetaExpedientEntity metaNode = mock(MetaExpedientEntity.class);
-        when(expedientRepository.findByEntitatAndMetaExpedientAndEstatAndEsborrat(
-                entitat, metaNode, ExpedientEstatEnumDto.OBERT, 0))
-                .thenReturn(Collections.emptyList());
-
-        helper.evictValidacionsExpedients(entitat, metaNode, true);
-
-        verify(cacheHelper, never()).evictErrorsValidacioAndNotify(any());
-        verify(cacheHelper, never()).evictErrorsValidacioPerNode(any());
+        //Pel meta-expedient el evict és pels expedients oberts, en segon pla
+        verify(validacioCacheEvictHelper).evictValidacioExpedientsPerMetaExpedientEnBackground(
+                META_NODE_ID, ExpedientEstatEnumDto.OBERT);
+        verify(validacioCacheEvictHelper, never()).evictValidacioDocumentsPerMetaDocumentEnBackground(any());
     }
 
     // =========================================================================
@@ -403,29 +349,26 @@ class MetaDadaHelperTest {
 
         helper.update(ENTITAT_ID, META_NODE_ID, dto, "IPA_ADMIN", ORGAN_ID);
 
-        verify(cacheHelper, never()).evictErrorsValidacioAndNotify(any());
-        verify(cacheHelper, never()).evictErrorsValidacioPerNode(any());
+        verify(validacioCacheEvictHelper, never()).evictValidacioExpedientsPerMetaExpedientEnBackground(any(), any());
+        verify(validacioCacheEvictHelper, never()).evictValidacioDocumentsPerMetaDocumentEnBackground(any());
     }
 
     @Test
     void update_multiplicitatCanvia_evictaValidacions() {
         EntitatEntity entitat = mock(EntitatEntity.class);
         MetaExpedientEntity metaNode = mock(MetaExpedientEntity.class);
+        when(metaNode.getId()).thenReturn(META_NODE_ID);
         MetaDadaEntity metaDadaEntity = mock(MetaDadaEntity.class);
         when(metaDadaEntity.getMultiplicitat()).thenReturn(MultiplicitatEnumDto.M_1);
         when(entityComprovarHelper.comprovarEntitatPerMetaExpedients(ENTITAT_ID)).thenReturn(entitat);
         when(entityComprovarHelper.comprovarMetaNode(entitat, META_NODE_ID)).thenReturn(metaNode);
         when(entityComprovarHelper.comprovarMetaDada(entitat, metaNode, META_DADA_ID)).thenReturn(metaDadaEntity);
-        ExpedientEntity expedient = mock(ExpedientEntity.class);
-        when(expedient.getId()).thenReturn(11L);
-        when(expedientRepository.findByEntitatAndMetaExpedientAndEstatAndEsborrat(
-                entitat, metaNode, ExpedientEstatEnumDto.OBERT, 0))
-                .thenReturn(Collections.singletonList(expedient));
         MetaDadaDto dto = buildDtoAmbId(MultiplicitatEnumDto.M_0_N);
 
         helper.update(ENTITAT_ID, META_NODE_ID, dto, "IPA_ADMIN", ORGAN_ID);
 
-        verify(cacheHelper).evictErrorsValidacioPerNode(11L);
+        verify(validacioCacheEvictHelper).evictValidacioExpedientsPerMetaExpedientEnBackground(
+                META_NODE_ID, ExpedientEstatEnumDto.OBERT);
     }
 
     @Test
@@ -661,6 +604,39 @@ class MetaDadaHelperTest {
                 any(), any(), any(), any(),
                 org.mockito.ArgumentMatchers.eq(LogTipusEnumDto.DESACTIVACIO),
                 any(), any());
+    }
+
+    @Test
+    void updateActiva_metadadaObligatoria_evictaValidacionsExpedients() {
+        EntitatEntity entitat = mock(EntitatEntity.class);
+        MetaExpedientEntity metaNode = mock(MetaExpedientEntity.class);
+        when(metaNode.getId()).thenReturn(META_NODE_ID);
+        MetaDadaEntity metaDadaEntity = mock(MetaDadaEntity.class);
+        when(metaDadaEntity.getMultiplicitat()).thenReturn(MultiplicitatEnumDto.M_1);
+        when(entityComprovarHelper.comprovarEntitatPerMetaExpedients(ENTITAT_ID)).thenReturn(entitat);
+        when(entityComprovarHelper.comprovarMetaNode(entitat, META_NODE_ID)).thenReturn(metaNode);
+        when(entityComprovarHelper.comprovarMetaDada(entitat, metaNode, META_DADA_ID)).thenReturn(metaDadaEntity);
+
+        helper.updateActiva(ENTITAT_ID, META_NODE_ID, META_DADA_ID, false, "IPA_ADMIN", ORGAN_ID);
+
+        verify(validacioCacheEvictHelper).evictValidacioExpedientsPerMetaExpedientEnBackground(
+                META_NODE_ID, ExpedientEstatEnumDto.OBERT);
+    }
+
+    @Test
+    void updateActiva_metadadaNoObligatoria_noEvictaValidacions() {
+        EntitatEntity entitat = mock(EntitatEntity.class);
+        MetaExpedientEntity metaNode = mock(MetaExpedientEntity.class);
+        MetaDadaEntity metaDadaEntity = mock(MetaDadaEntity.class);
+        when(metaDadaEntity.getMultiplicitat()).thenReturn(MultiplicitatEnumDto.M_0_N);
+        when(entityComprovarHelper.comprovarEntitatPerMetaExpedients(ENTITAT_ID)).thenReturn(entitat);
+        when(entityComprovarHelper.comprovarMetaNode(entitat, META_NODE_ID)).thenReturn(metaNode);
+        when(entityComprovarHelper.comprovarMetaDada(entitat, metaNode, META_DADA_ID)).thenReturn(metaDadaEntity);
+
+        helper.updateActiva(ENTITAT_ID, META_NODE_ID, META_DADA_ID, false, "IPA_ADMIN", ORGAN_ID);
+
+        verify(validacioCacheEvictHelper, never()).evictValidacioExpedientsPerMetaExpedientEnBackground(any(), any());
+        verify(validacioCacheEvictHelper, never()).evictValidacioDocumentsPerMetaDocumentEnBackground(any());
     }
 
     @Test

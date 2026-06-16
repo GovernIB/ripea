@@ -862,7 +862,15 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("prioritat") String  prioritat);
 
 	List<ExpedientEntity> findByMetaExpedientIdAndEsborrat(Long metaExpedientId, int esborrat);
-	
+
+	@Query(	"select e.id from ExpedientEntity e " +
+			"where e.metaExpedient.id = :metaExpedientId " +
+			"and (:estat is null or e.estat = :estat) " +
+			"and e.esborrat = 0")
+	List<Long> findIdsByMetaExpedientIdAndEstatAndNoEsborrat(
+			@Param("metaExpedientId") Long metaExpedientId,
+			@Param("estat") ExpedientEstatEnumDto estat);
+
 	List<ExpedientEntity> findByEntitatAndMetaExpedientAndEstatAndEsborrat(
 			EntitatEntity entitat,
 			MetaExpedientEntity metaExpedient, 

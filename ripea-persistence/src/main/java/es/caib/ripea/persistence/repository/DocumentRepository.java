@@ -24,6 +24,7 @@ import es.caib.ripea.persistence.entity.MetaNodeEntity;
 import es.caib.ripea.service.intf.dto.ArxiuEstatEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentNotificacioEstatEnumDto;
+import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 
 @Component
 public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> {
@@ -335,7 +336,19 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 
 	List<DocumentEntity> findByMetaNode(
 			MetaNodeEntity metaNode);
-	
+
+	@Query(	"select " +
+			"    d.id " +
+			"from " +
+			"    DocumentEntity d " +
+			"where " +
+			"    d.metaNode.id = :metaNodeId " +
+			"    and d.expedient.estat = :estat " +
+			"    and d.esborrat = 0")
+	List<Long> findIdsByMetaNodeIdAndExpedientEstatAndNoEsborrat(
+			@Param("metaNodeId") Long metaNodeId,
+			@Param("estat") ExpedientEstatEnumDto estat);
+
 	@Query(	"select " +
 			"    c " +
 			"from " +

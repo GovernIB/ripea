@@ -67,7 +67,8 @@ public class MetaDocumentHelper {
 	@Autowired private DocumentRepository documentRepository;
 	@Autowired private UsuariRepository usuariRepository;
 	@Autowired private ContingutLogHelper contingutLogHelper;
-	
+	@Autowired private ValidacioCacheEvictHelper validacioCacheEvictHelper;
+
 	public void moveTo(Long metaDocumentId, int posicio) throws NotFoundException {
 		
 		MetaDocumentEntity metaDocument = metaDocumentRepository.findById(metaDocumentId).get();		
@@ -208,12 +209,16 @@ public class MetaDocumentHelper {
 		}
 
 		metaDocumentEntity.updateActiu(actiu);
-		
+
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
 			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientEntity.getId(), null);
 		}
 
-		evictErrorsValidacioAndNotify(entitat.getId(), metaExpedientEntity!=null?metaExpedientEntity.getId():null, false);
+		//Només cal refrescar la cache de validacions si el meta-document és obligatori: activar o desactivar-ne
+		//un de no obligatori no canvia la validesa de cap expedient.
+		if (metaDocumentEntity.getMultiplicitat() != null && metaDocumentEntity.getMultiplicitat().esObligatoria()) {
+			evictErrorsValidacioAndNotify(entitat.getId(), metaExpedientEntity!=null?metaExpedientEntity.getId():null, false);
+		}
 		
 		//Hi ha metaDocuments generics (sense procediment)
 		if (metaExpedientEntity!=null) {
@@ -230,36 +235,17 @@ public class MetaDocumentHelper {
 		return metaDocumentEntity;
 	}
 	
-	//Nomes es crida desde els serveis ResourceService
+	//Nomes es crida desde els serveis ResourceService.
+	//El evict de validacions dels expedients del procediment es fa en segon pla i després del commit (veure
+	//TransactionAfterCommitUtils i ValidacioCacheEvictHelper). Ja no es notifica per SSE: la validesa es recalcula
+	//peresosament quan algú obre o llista l'expedient. Els paràmetres entitatId/notificaSse es mantenen per
+	//compatibilitat amb els cridadors.
 	public void evictErrorsValidacioAndNotify(Long entitatId, Long metaExpedientId, boolean notificaSse) {
-
-		if (metaExpedientId!=null) {
-			
-			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-					entitatId,
-					false,
-					false,
-					false, 
-					false, 
-					true);
-			
-			MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
-			
-			if (metaExpedient != null) {
-			
-				List<ExpedientEntity> expedients = expedientRepository.findByEntitatAndMetaExpedientAndEstatAndEsborrat(
-						entitat, 
-						metaExpedient, 
-						ExpedientEstatEnumDto.OBERT, 
-						0);
-				for (ExpedientEntity expedient: expedients) {
-					if (notificaSse) {
-						cacheHelper.evictErrorsValidacioAndNotify(expedient.getId());
-					} else {
-						cacheHelper.evictErrorsValidacioPerNode(expedient.getId());
-					}
-				}
-			}
+		if (metaExpedientId != null) {
+			final Long metaExpId = metaExpedientId;
+			TransactionAfterCommitUtils.run(() ->
+					validacioCacheEvictHelper.evictValidacioExpedientsPerMetaExpedientEnBackground(
+							metaExpId, ExpedientEstatEnumDto.OBERT));
 		}
 	}
 	

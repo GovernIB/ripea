@@ -8,13 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import es.caib.ripea.persistence.entity.EntitatEntity;
-import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.entity.MetaDadaEntity;
 import es.caib.ripea.persistence.entity.MetaDocumentEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientTascaValidacioEntity;
 import es.caib.ripea.persistence.entity.MetaNodeEntity;
-import es.caib.ripea.persistence.repository.ExpedientRepository;
 import es.caib.ripea.persistence.repository.MetaDadaRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientTascaValidacioRepository;
 import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
@@ -28,13 +26,12 @@ import io.micrometer.core.instrument.Timer;
 @Component
 public class MetaDadaHelper {
 	
-	@Autowired private ExpedientRepository expedientRepository;
 	@Autowired private MetaDadaRepository metaDadaRepository;
 	@Autowired private MetaExpedientTascaValidacioRepository metaExpedientTascaValidacioRepository;
 	@Autowired private EntityComprovarHelper entityComprovarHelper;
 	@Autowired private MetaExpedientHelper metaExpedientHelper;
 	@Autowired private ApplicationHelper applicationHelper;
-	@Autowired private CacheHelper cacheHelper;
+	@Autowired private ValidacioCacheEvictHelper validacioCacheEvictHelper;
 	@Autowired private ContingutLogHelper contingutLogHelper;
 
 	public MetaDadaEntity findByMetaNodeAndCodi(MetaNodeEntity metaNode, String codi) {
@@ -117,29 +114,25 @@ public class MetaDadaHelper {
 		}			
 	}
 	
-	//Nmoes es crida desde els métodes dels ResourceService
-	public void evictValidacionsExpedients(Long entitatId, Long metaNodeId) {
-		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatId);
-		evictValidacionsExpedients(
-				entitatEntity,
-				entityComprovarHelper.comprovarMetaNode(entitatEntity, metaNodeId), true);
-	}
-	
+	//El evict de validacions es fa sempre en segon pla i després del commit de la transacció (veure
+	//TransactionAfterCommitUtils i ValidacioCacheEvictHelper). Ja no es notifica per SSE: la validesa es
+	//recalcula peresosament quan algú obre o llista el node. Els paràmetres entitat/notificaSse es mantenen
+	//per compatibilitat amb els cridadors.
 	public void evictValidacionsExpedients(EntitatEntity entitat, MetaNodeEntity metaNode, boolean notificaSse) {
-		//Una metaDada pot ser de un meta-document, i el evict i les notificacions son per expedients
-		if (metaNode != null && metaNode instanceof MetaExpedientEntity) {
-			List<ExpedientEntity> expedients = expedientRepository.findByEntitatAndMetaExpedientAndEstatAndEsborrat(
-					entitat, 
-					(MetaExpedientEntity)metaNode,
-					ExpedientEstatEnumDto.OBERT, 
-					0);
-			for (ExpedientEntity expedient: expedients) {
-				if (notificaSse) {
-					cacheHelper.evictErrorsValidacioAndNotify(expedient.getId());
-				} else {
-					cacheHelper.evictErrorsValidacioPerNode(expedient.getId());
-				}
-			}
+		if (metaNode == null) {
+			return;
+		}
+		if (metaNode instanceof MetaExpedientEntity) {
+			//Metadada del meta-expedient: el evict és pels expedients oberts d'aquest procediment
+			final Long metaExpedientId = metaNode.getId();
+			TransactionAfterCommitUtils.run(() ->
+					validacioCacheEvictHelper.evictValidacioExpedientsPerMetaExpedientEnBackground(
+							metaExpedientId, ExpedientEstatEnumDto.OBERT));
+		} else if (metaNode instanceof MetaDocumentEntity) {
+			//Metadada d'un meta-document: el evict és pels documents d'aquest tipus dins expedients oberts
+			final Long metaDocumentId = metaNode.getId();
+			TransactionAfterCommitUtils.run(() ->
+					validacioCacheEvictHelper.evictValidacioDocumentsPerMetaDocumentEnBackground(metaDocumentId));
 		}
 	}
 	
@@ -248,7 +241,13 @@ public class MetaDadaHelper {
 				metaNode,
 				id);
 		metaDadaEntity.updateActiva(activa);
-		
+
+		//Només cal refrescar la cache de validacions si la metadada és obligatòria: activar o desactivar-ne
+		//una de no obligatòria no canvia la validesa de cap expedient ni document.
+		if (metaDadaEntity.getMultiplicitat() != null && metaDadaEntity.getMultiplicitat().esObligatoria()) {
+			evictValidacionsExpedients(entitat, metaNode, false);
+		}
+
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
 			Long metaExpedientId = null;
 			if (metaNode instanceof MetaExpedientEntity) {
@@ -258,7 +257,7 @@ public class MetaDadaHelper {
 			}
 			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientId, organId);
 		}
-		
+
 		if (metaNode instanceof MetaExpedientEntity) {
 			contingutLogHelper.logProcedimentObjecte(
 					metaNode.getId(),

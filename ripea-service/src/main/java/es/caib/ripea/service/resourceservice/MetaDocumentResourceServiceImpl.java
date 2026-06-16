@@ -230,7 +230,6 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
 					entity.getId(),
 					true,
 					configHelper.getRolActual());
-			afterDbChange(entitatEntity.getId(), entity.getMetaExpedient() != null ? entity.getMetaExpedient().getId() : null);
 			return "{\"resultado\": \"OK\"}";
 		}
     }
@@ -249,7 +248,6 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
 					entity.getId(),
 					false,
 					configHelper.getRolActual());
-			afterDbChange(entitatEntity.getId(), entity.getMetaExpedient() != null ? entity.getMetaExpedient().getId() : null);
 			return "{\"resultado\": \"OK\"}";
 		}
     }
@@ -315,9 +313,7 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
 				resource.getPlantilla()!=null?resource.getPlantilla().getContent():null,
 				configHelper.getRolActual(),
 				ogEntity!=null?ogEntity.getId():null);
-		
-		afterDbChange(entitatEntity.getId(), resource.getMetaExpedient()!=null?resource.getMetaExpedient().getId():null);
-		
+
 		return resource;
 	}
     
@@ -343,9 +339,7 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
 					resource.getPlantilla()!=null?resource.getPlantilla().getContentType():null,
 					resource.getPlantilla()!=null?resource.getPlantilla().getContent():null);
 		}
-		
-		afterDbChange(resource.getEntitat().getId(), resource.getMetaExpedient()!=null?resource.getMetaExpedient().getId():null);
-		
+
 		return resource;
 	}
 	
@@ -430,16 +424,13 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
     	try {
     		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
     		OrganGestorEntity ogEntity	= organGestorRepository.findByEntitatIdAndCodi(entitatEntity.getId(), configHelper.getOrganActualCodi());
-    		MetaExpedientResourceEntity metaExpedient = metaDocumentResourceRepository.findById(id).get().getMetaExpedient();
     		metaDocumentHelper.delete(entitatEntity.getId(), null, id, configHelper.getRolActual(), ogEntity!=null?ogEntity.getId():null);
-    		afterDbChange(entitatEntity.getId(), metaExpedient!=null?metaExpedient.getId():null);
+    		//L'evict de validacions el fa internament metaDocumentHelper.delete (i create/update/updateActiu),
+    		//amb els guards d'obligatorietat. No cal repetir-lo aquí (evitava el doble evict i saltava els guards).
     	} catch (Exception ex) {
     		excepcioLogHelper.addExcepcio("/metaDocumentResource/"+id+"/delete", ex);
     		throw new ResourceNotFoundException(getResourceClass(), ex.getMessage());
     	}
     }
     
-    private void afterDbChange(Long entitatId, Long metaNodeId) {
-    	metaDocumentHelper.evictErrorsValidacioAndNotify(entitatId, metaNodeId, true);
-    }
 }

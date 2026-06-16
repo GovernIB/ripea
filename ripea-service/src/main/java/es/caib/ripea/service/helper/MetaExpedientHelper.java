@@ -135,6 +135,7 @@ public class MetaExpedientHelper {
 	@Autowired private MessageHelper messageHelper;
 	@Autowired private MetaExpedientComentariRepository metaExpedientComentariRepository;
 	@Autowired private CacheHelper cacheHelper;
+	@Autowired private ValidacioCacheEvictHelper validacioCacheEvictHelper;
 	@Autowired private MetaNodeHelper metaNodeHelper;
 	@Autowired private MetaDocumentRepository metaDocumentRepository;
 	@Autowired private ApplicationHelper applicationHelper;
@@ -1031,18 +1032,13 @@ public class MetaExpedientHelper {
 			crearEstructuraCarpetes(metaExpedient.getEstructuraCarpetes(), metaExpedientEntity);
 		}
 		
-		List<ExpedientEntity> expedients = expedientRepository.findByMetaExpedientIdAndEsborrat(metaExpedientEntity.getId(), 0);
-		
-		long t0 = System.currentTimeMillis();
-		logger.info("MetaExpedientServiceImpl.update evictErrorsValidacioPerNode start (total expedients:" + (expedients.size()) + "");
-		
-		for (ExpedientEntity expedient: expedients) {
-			cacheHelper.evictErrorsValidacioAndNotify(expedient.getId());
-		}
-		
-		if (cacheHelper.mostrarLogsRendiment())
-			logger.info("MetaExpedientServiceImpl.update evictErrorsValidacioPerNode end:  " + (System.currentTimeMillis() - t0) + " ms");
-		
+		//El evict de validacions dels expedients del procediment es fa en segon pla i després del commit (veure
+		//TransactionAfterCommitUtils i ValidacioCacheEvictHelper). estat=null => tots els expedients no esborrats.
+		final Long metaExpedientIdPerEvict = metaExpedientEntity.getId();
+		TransactionAfterCommitUtils.run(() ->
+				validacioCacheEvictHelper.evictValidacioExpedientsPerMetaExpedientEnBackground(
+						metaExpedientIdPerEvict, null));
+
 		if ("IPA_ORGAN_ADMIN".equals(rolActual)) {
 			if (estatAnterior == MetaExpedientRevisioEstatEnumDto.DISSENY && metaExpedient.getRevisioEstat() == MetaExpedientRevisioEstatEnumDto.PENDENT)
 				canviarRevisioAPendentEnviarEmail(entitatId, metaExpedient.getId(), organId);
