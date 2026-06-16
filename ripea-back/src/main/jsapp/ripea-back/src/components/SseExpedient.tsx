@@ -1,15 +1,42 @@
 import React, {useEffect, useRef} from 'react';
-import {useSessionList} from './SessionStorageContext';
+import {useSessionContext} from './SessionStorageContext';
 import {useResourceApiContext} from "reactlib";
 
-// Keys for session storage
+// Claus dels events SSE de l'expedient.
+// IMPORTANT: són senyals de temps real (transitòries), NO estat persistent. Es guarden en memòria
+// (useSessionContext) i no a sessionStorage: així cada event refresca els components una sola vegada i,
+// en recarregar la pàgina, preval sempre el valor recalculat pel servidor (p.ex. expedient.errors d'AVISOS)
+// en lloc d'un event SSE ranci que hauria sobreviscut a la recàrrega.
 const sseExpedientKey = 'sseExpedient';
 const fluxCreateKey = 'flux_creat';
 const scanFinalitzatKey = 'scan_finalitzat';
 const validacioChangeKey = 'validacio_change';
 const sseConnectedKey = 'exp_connect';
 
-const useSseExpedientSession = () => useSessionList(sseExpedientKey)
+// Bus en memòria amb la mateixa API de llista (get/save/remove/removeAll) que abans donava useSessionList,
+// però recolzat en el store en memòria (useSessionContext) per no persistir res a sessionStorage.
+const useSseExpedientSession = () => {
+    const { value: container, save, clear } = useSessionContext(sseExpedientKey);
+    const containerRef = useRef<Record<string, any>>(container ?? {});
+    containerRef.current = container ?? {};
+
+    const listSave = (key: string, newValue: any) => {
+        const next = { ...containerRef.current, [key]: newValue };
+        containerRef.current = next;
+        save(next);
+    };
+
+    return {
+        container,
+        get: (key: string) => container?.[key],
+        save: listSave,
+        remove: (key: string) => listSave(key, undefined),
+        removeAll: () => {
+            containerRef.current = {};
+            clear();
+        },
+    };
+};
 
 const useTempSession = (key:string) => {
     const { get, remove } = useSseExpedientSession();
