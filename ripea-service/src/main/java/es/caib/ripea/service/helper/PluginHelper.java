@@ -6376,11 +6376,19 @@ public class PluginHelper {
 			}
 		}
 		
+		String responsableActual = null;
 		List<String> usuarisAmbPermis = new ArrayList<String>();
 		if (tascaEntity.getResponsables()!=null) {
 			for (UsuariEntity responsable: tascaEntity.getResponsables()) {
 				usuarisAmbPermis.add(responsable.getCodi());
+				if (responsableActual==null) {
+					responsableActual = responsable.getCodi();
+				}
 			}
+		}
+		
+		if (tascaEntity.getResponsableActual()!=null && tascaEntity.getResponsableActual().getCodi()!=null) {
+			responsableActual = tascaEntity.getResponsableActual().getCodi();
 		}
 		
 		String redireccio = configHelper.getConfig(PropertyConfig.BASE_URL) + "/contingut/"+tascaEntity.getExpedient().getId()+"?tascaId="+tascaEntity.getId()+"&origenTasques=true";
@@ -6398,7 +6406,7 @@ public class PluginHelper {
                 .estat(estatTascaComanda)
                 .estatDescripcio(tascaEntity.getMotiuRebuig())
                 .numeroExpedient(tascaEntity.getExpedient().getNumero())
-                .responsable(tascaEntity.getResponsableActual()!=null?tascaEntity.getResponsableActual().getCodi():null)
+                .responsable(responsableActual)
                 .usuarisAmbPermis(usuarisAmbPermis)
                 .grupsAmbPermis(null)
                 .redireccio(new URL(redireccio))
