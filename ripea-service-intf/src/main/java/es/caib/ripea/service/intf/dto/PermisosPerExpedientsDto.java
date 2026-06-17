@@ -168,8 +168,10 @@ public class PermisosPerExpedientsDto  {
 			(this.idsOrgansPermesos==null || this.idsOrgansPermesos.size()==0) &&
 			(this.idsOrganActualAndDescendents==null || this.idsOrganActualAndDescendents.size()==0) &&
 			(this.idsMetaExpedientOrganPairsPermesos==null || this.idsMetaExpedientOrganPairsPermesos.size()==0) &&
-			(this.idsOrgansAmbProcedimentsComunsPermesos==null || this.idsOrgansAmbProcedimentsComunsPermesos.size()==0) &&
-			(this.idsProcedimentsComuns==null || this.idsProcedimentsComuns.size()==0) &&
+			(
+					(this.idsOrgansAmbProcedimentsComunsPermesos==null || this.idsOrgansAmbProcedimentsComunsPermesos.size()==0) ||
+					(this.idsProcedimentsComuns==null || this.idsProcedimentsComuns.size()==0)
+			) &&
 			(this.idsGrupsPermesos==null || this.idsGrupsPermesos.size()==0)) {
 			return true;
 		}

@@ -601,7 +601,15 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		    }
 		    
 		    if (filtreOrgansAmbProcedimentsComunsPermesos!=null) {
-		    	filtreOrgansAmbProcedimentsComunsPermesos = FilterBuilder.and(filtreOrgansAmbProcedimentsComunsPermesos, filtreIdsProcedimentsComuns);
+		    	// La VIA 4 nomes dona acces si l'expedient pertany a un procediment comu permes. Si no hi ha cap
+		    	// procediment comu (filtreIdsProcedimentsComuns == null), la via no ha d'aportar resultats, igual que
+		    	// fa la query JSP, on "e.metaExpedient.id in (:idsProcedimentsComuns)" amb llista buida no retorna res.
+		    	// Sense aquest else, FilterBuilder.and(x, null) deixaria nomes el match d'organ i ampliaria el resultat.
+		    	if (filtreIdsProcedimentsComuns!=null) {
+		    		filtreOrgansAmbProcedimentsComunsPermesos = FilterBuilder.and(filtreOrgansAmbProcedimentsComunsPermesos, filtreIdsProcedimentsComuns);
+		    	} else {
+		    		filtreOrgansAmbProcedimentsComunsPermesos = null;
+		    	}
 		    }
 	    }
     	

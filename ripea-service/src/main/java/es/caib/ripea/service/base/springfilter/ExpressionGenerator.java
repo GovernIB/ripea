@@ -183,7 +183,13 @@ public class ExpressionGenerator extends com.turkraft.springfilter.parser.genera
 				chain += "." + field;
 			}
 			authorize(authorizer, path, payload, chain);
-			JoinType joinType = path instanceof PluralAttributePath ? JoinType.INNER
+			// Les col·leccions (PluralAttributePath, p.ex. @ManyToMany) s'uneixen amb LEFT, no INNER.
+			// Amb INNER, una entitat sense cap fila a la taula de la relació quedava exclosa encara que
+			// complís el filtre per una altra branca d'un OR (cas del llistat d'expedients: accés per
+			// procediment o per grup quan l'expedient no té files a ipa_expedient_organpare). El llistat
+			// JSP equivalent fa un LEFT JOIN. Per a un predicat dins d'un AND el resultat no canvia
+			// ("coleccio.camp = X" amb LEFT exclou igualment les files de col·lecció buida).
+			JoinType joinType = path instanceof PluralAttributePath ? JoinType.LEFT
 					: (path instanceof SingularAttributePath && ((SingularAttributePath<?>) path).getAttribute().getPersistentAttributeType() != PersistentAttributeType.BASIC
 					? JoinType.LEFT : null);
 			if (joinType != null && hasJoinColumnsOrFormulasAnnotation(from, field)) {
