@@ -1,6 +1,7 @@
 package es.caib.ripea.service.helper;
 
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -9,6 +10,12 @@ import java.util.Map;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 
 import es.caib.ripea.persistence.entity.EntitatEntity;
@@ -150,23 +157,32 @@ public class EventHelper {
 				
 				OrganGestorEntity organGestorEntity = null;
 				if (usuariCodi.getOrganId()!=null)
-					organGestorRepository.findById(usuariCodi.getOrganId()).get();
-				
+					organGestorEntity = organGestorRepository.findById(usuariCodi.getOrganId()).orElse(null);
+
 				UsuariEntity usuari = usuariRepository.getOne(usuariCodi.getCodi());
 
-				//Si en aquest punt ens trobam amb la autenticació SYSTEM_RIPEA, 
-				//Hem de canviar al usuari corresponent perque funcioni les crides a permisosHelper.getObjectsIdsWithPermission
-//				if ("SYSTEM_RIPEA".equals(SecurityContextHolder.getContext().getAuthentication().getName())) {
-//			        User user = new User(usuariCodi.getCodi(), "", Collections.singletonList(new SimpleGrantedAuthority(usuari.getRolActual())));
-//			        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-//			        SecurityContextHolder.getContext().setAuthentication(authentication);
-//				}
-				
-				return cacheHelper.countAnotacionsPendents(
-						entitatEntity,
-						usuari.getRolActual(),
-						usuariCodi.getCodi(),
-						organGestorEntity!=null?organGestorEntity.getId():null);
+				// El comptador depèn dels permisos ACL de l'usuari AFECTAT, que es resolen des de la
+				// SecurityContext del fil. Aquest mètode es crida sovint des d'un context aliè
+				// (WS de Distribució, un altre usuari acceptant/rebutjant...), de manera que cal
+				// suplantar la identitat de l'usuari afectat perquè getObjectsIdsWithPermission
+				// resolgui els SEUS permisos i no els del fil que dispara l'esdeveniment.
+				Authentication authPrevia = SecurityContextHolder.getContext().getAuthentication();
+				try {
+					List<GrantedAuthority> authorities = usuari.getRolActual()!=null
+							? Collections.<GrantedAuthority>singletonList(new SimpleGrantedAuthority(usuari.getRolActual()))
+							: Collections.<GrantedAuthority>emptyList();
+					User principal = new User(usuari.getCodi(), "", authorities);
+					SecurityContextHolder.getContext().setAuthentication(
+							new UsernamePasswordAuthenticationToken(principal, null, authorities));
+
+					return cacheHelper.countAnotacionsPendents(
+							entitatEntity,
+							usuari.getRolActual(),
+							usuariCodi.getCodi(),
+							organGestorEntity!=null?organGestorEntity.getId():null);
+				} finally {
+					SecurityContextHolder.getContext().setAuthentication(authPrevia);
+				}
 			}
 		} catch (Exception ex) {}
 		

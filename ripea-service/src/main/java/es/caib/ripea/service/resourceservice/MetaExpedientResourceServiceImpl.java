@@ -73,7 +73,6 @@ import es.caib.ripea.service.intf.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientCarpetaMinDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientExportDto;
-import es.caib.ripea.service.intf.dto.MetaExpedientFiltreDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientTascaDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientTascaValidacioDto;
@@ -234,6 +233,14 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
         	 * LLISTAT DE PROCEDIMENTS
         	 */
         	
+        	if (isAdmin || isAdminLectura || isRevisor) {
+        		//Aquests rols veuen tots els procediments de l'entitat: n'hi ha prou amb el filtre
+        		//per entitat (filtreBase). Evitam materialitzar un id IN(...) amb tots els
+        		//procediments de l'entitat, que seria redundant amb el filtre per entitat.
+        		Filter filtreAdmin = FilterBuilder.and(filtreBase, revisioActiva);
+        		return filtreAdmin != null ? filtreAdmin.generate() : null;
+        	}
+
         	if (isAdminOrgan || isDissenyador) {
         		OrganGestorEntity ogEntity	= organGestorRepository.findByEntitatIdAndCodi(
         				entitat.getId(),
@@ -247,10 +254,6 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
         				entitat.getId(),
         				ogEntity.getId(),
         				hasPermisAdminComu);
-        	} else if (isAdmin || isAdminLectura || isRevisor) {
-        		MetaExpedientFiltreDto filtre = new MetaExpedientFiltreDto();
-        		metaExpPermesos = metaExpedientHelper.findByEntitat(entitat, filtre, Utils.sensePaginacio(), null).getContent();
-        		procsPermesosIds = metaExpedientEntityToListLong(metaExpPermesos);
         	} else {
 	            metaExpPermesos = metaExpedientHelper.findAmbPermis(
 	            		entitat.getId(),
