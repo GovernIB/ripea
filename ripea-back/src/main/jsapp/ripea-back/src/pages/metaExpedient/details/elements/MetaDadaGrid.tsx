@@ -106,7 +106,7 @@ const columns = [
     },
 ]
 
-export const MetDadaGrid = ({ id, enviable = false, readOnly, ...other }: any) => {
+export const MetDadaGrid = ({ id, enviable = false, readOnly, persistentStateKey = "metaDadaResource_procedimentTab", ...other }: any) => {
     const {t} = useTranslation();
     const apiRef = useMuiDataGridApiRef();
     const {value: user} = useUserSession()
@@ -167,7 +167,7 @@ export const MetDadaGrid = ({ id, enviable = false, readOnly, ...other }: any) =
     return <><StyledMuiGrid
         apiRef={apiRef}
         resourceName={"metaDadaResource"}
-		persistentStateKey={"metaDadaResource_procedimentTab"}
+		persistentStateKey={persistentStateKey}
         popupEditUpdateActive
         popupEditFormDialogResourceTitle={t('page.metaDada.title')}
         popupEditFormContent={<MetaDocumentDadaForm enviable={enviable && user?.sessionScope?.isPropagarMetadades}/>}
@@ -242,7 +242,7 @@ const MetaDadaGrid = () => {
                           {t('common.back')}
                       </Button>
                   </>}>
-            <MetDadaGrid id={id} readOnly={readOnly}/>
+            <MetDadaGrid id={id} readOnly={readOnly} persistentStateKey={"metaDadaResource_metaDocumentTab"}/>
         </CardPage>
     </GridPage>
 }
