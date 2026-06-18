@@ -199,11 +199,12 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 
         Map<String, String> mapaNamedQueries =  Utils.namedQueriesToMap(namedQueries);
         
-        //El llistat del menú "Consulta > Anotacions comunicades" no filtra per entitat
-        if (mapaNamedQueries.isEmpty() || !mapaNamedQueries.containsKey("CONSULTA_COMUNICADES")) {
-	        FilterBuilder.equal(
-	        		ExpedientPeticioResource.Fields.registre + "." + RegistreResource.Fields.entitatCodi, 
-	        		entitat!=null?entitat.getUnitatArrel():"................................................................................");
+        //El filtre per entitat s'aplica sempre (consulta genèrica i named queries),
+        //excepte el llistat del menú "Consulta > Anotacions comunicades", que no filtra per entitat.
+        if (!mapaNamedQueries.containsKey("CONSULTA_COMUNICADES")) {
+	        filters.add(FilterBuilder.equal(
+	        		ExpedientPeticioResource.Fields.registre + "." + RegistreResource.Fields.entitatCodi,
+	        		entitat!=null?entitat.getUnitatArrel():"................................................................................"));
         }
         
     	if (!mapaNamedQueries.isEmpty()) {
@@ -224,7 +225,7 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 							null, //UsuariActual, agafa el autenticat
 							rolActual,
 							ogEntity!=null?ogEntity.getId():null);
-		
+
 					//Aplica filtres de permisos per organ
 					if (isAdminOrgan) {
 						
@@ -239,8 +240,10 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 					        }
 				        }
 
-                        filters.add(filtreOrgansPermesos);
-						
+				        //Sense òrgans permesos no es retornen resultats (igual que la consulta antiga),
+				        //evitant que un filtre nul es perdi a l'AND final.
+                        filters.add(filtreOrgansPermesos!=null ? filtreOrgansPermesos : FilterBuilder.equal("id", 0));
+
 					} else { //Aplica filtres de permisos per procediment
 						
 				        String prId = ExpedientPeticioResource.Fields.metaExpedient + ".id";
@@ -269,7 +272,13 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 				        Filter notGestioGrupsActiva = FilterBuilder.equal(grAct, false);
 				        Filter filterGEstioGrupsActius = FilterBuilder.or(notGestioGrupsActiva, filtregrupsPermesos);
 
-                        filters.add(FilterBuilder.and(filtreProcedimentsPermesos, filterGEstioGrupsActius));
+				        //Sense procediments permesos no es retornen resultats (igual que la consulta antiga).
+				        //Així evitam que FilterBuilder.and(null, ...) elimini la restricció per procediment.
+				        if (filtreProcedimentsPermesos!=null) {
+				        	filters.add(FilterBuilder.and(filtreProcedimentsPermesos, filterGEstioGrupsActius));
+				        } else {
+				        	filters.add(FilterBuilder.equal("id", 0));
+				        }
 					}
     			}
     		} else if (mapaNamedQueries.containsKey("MASSIU_ANOTACIONS_ESTAT")) {
