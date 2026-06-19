@@ -58,7 +58,17 @@ public class SessioHelper {
 				if (usuariActual.getRolActual()!=null && RolHelper.getRolsUsuariActual(request).contains(usuariActual.getRolActual())) {
 					request.getSession().setAttribute(RolHelper.SESSION_ATTRIBUTE_ROL_ACTUAL, usuariActual.getRolActual());
 				} else {
-					request.getSession().setAttribute(RolHelper.SESSION_ATTRIBUTE_ROL_ACTUAL, RolHelper.getRolActual(request));
+					//El rol persistit a BD (IPA_USUARI.ROL_ACTUAL) està obsolet (null o ja no és un rol
+					//vigent de l'usuari a Keycloak). Com que un usuari amb un sol rol no fa mai canvi de
+					//rol, aquest valor fòssil no s'actualitzaria mai i els consumidors sense sessió HTTP
+					//(recompte d'anotacions pendents a EventHelper, EmailHelper...) el llegirien i
+					//entrarien per una branca de permisos incorrecta retornant 0. Per això, a més de
+					//fixar el rol vàlid a la sessió, el persistim a BD (setRolUsuariActual també buida la
+					//caché del comptador perquè es recalculi). Es fa una sola vegada per sessió i val per
+					//a totes dues UIs (JSP i React), ja que aquest interceptor no exclou /api/**.
+					String rolFallback = RolHelper.getRolActual(request);
+					request.getSession().setAttribute(RolHelper.SESSION_ATTRIBUTE_ROL_ACTUAL, rolFallback);
+					aplicacioService.setRolUsuariActual(rolFallback);
 				}
 				if (RolHelper.isRolActualDissenyadorOrgan(request)) {
 					resultat = "/ripeaback/metaExpedient";
