@@ -122,7 +122,13 @@ $(document).ready(function() {
 					
 					//============== estat/errors =========================
 					tableBody += '<td>';
-					tableBody += (enviaments[i].enviamentDatatEstat) ? notificacioEnviamentEstats[enviaments[i].enviamentDatatEstat] : '';
+					if (enviaments[i].registreEstat == 'OFICI_ACCEPTAT') {
+						tableBody += '<spring:message code="notificacio.registreEstat.enum.OFICI_ACCEPTAT"/>';
+					} else if (enviaments[i].registreEstat == 'REBUTJAT') {
+						tableBody += '<spring:message code="notificacio.registreEstat.enum.REBUTJAT"/>';
+					} else {
+						tableBody += (enviaments[i].enviamentDatatEstat) ? notificacioEnviamentEstats[enviaments[i].enviamentDatatEstat] : '';
+					}
 					if (notificacio.error) {
 						var errorTitle = '';
 						if (notificacio.errorDescripcio) {

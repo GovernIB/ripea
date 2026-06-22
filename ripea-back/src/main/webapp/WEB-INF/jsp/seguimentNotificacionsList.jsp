@@ -239,7 +239,11 @@ $(document).ready(function() {
 					{{/if}}
 					{{if notificacioEstat == 'PROCESSADA' || notificacioEstat == 'FINALITZADA'}}
 						<p class="estat_{{:id}}"  style="display:inline">
-							{{if enviamentDatatEstat == 'NOTIB_PENDENT'}}
+							{{if registreEstat == 'OFICI_ACCEPTAT'}}
+								(<spring:message code="notificacio.registreEstat.enum.OFICI_ACCEPTAT"/>)
+							{{else registreEstat == 'REBUTJAT'}}
+								(<spring:message code="notificacio.registreEstat.enum.REBUTJAT"/>)
+							{{else enviamentDatatEstat == 'NOTIB_PENDENT'}}
 								(<spring:message code="notificacio.enviamentEstat.enum.NOTIB_PENDENT"/>)
 							{{else enviamentDatatEstat == 'NOTIB_ENVIADA'}}
 								(<spring:message code="notificacio.enviamentEstat.enum.NOTIB_ENVIADA"/>)

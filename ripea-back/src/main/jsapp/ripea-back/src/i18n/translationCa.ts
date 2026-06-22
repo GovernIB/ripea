@@ -104,6 +104,11 @@ const translationCa = {
             PROCESSADA: "Processada",
             REGISTRADA: "Registrada",
         },
+        registreEstat: {
+            OFICI_SIR: "Ofici SIR",
+            OFICI_ACCEPTAT: "Ofici acceptat",
+            REBUTJAT: "Rebutjada SIR",
+        },
         origen: {
             O0: "Ciutadà",
             O1: "Administració",
@@ -1266,6 +1271,7 @@ const translationCa = {
                 entregaNif: "DEH NIF",
                 classificacio: "DEH procediment",
                 enviamentDatatEstat: "Estat",
+                registreEstat: "Estat de registre",
             },
             action: {
                 ampliarPlac: {

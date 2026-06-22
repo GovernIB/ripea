@@ -35,6 +35,7 @@ public class RespostaConsultaEstatEnviament {
 	private Date registreData;
 	private Integer registreNumero;
 	private String registreNumeroFormatat;
+	private RegistreEstat registreEstat;
 	
 	public boolean isFinalitzat() {
 		if (estat != null && 

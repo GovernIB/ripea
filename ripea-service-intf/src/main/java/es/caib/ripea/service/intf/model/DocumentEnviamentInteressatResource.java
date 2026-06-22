@@ -16,6 +16,7 @@ import es.caib.ripea.service.intf.base.model.Resource;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.EnviamentEstatEnumDto;
+import es.caib.ripea.service.intf.dto.RegistreEstatEnumDto;
 import es.caib.ripea.service.intf.resourcevalidation.InteressatValid;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -60,6 +61,7 @@ public class DocumentEnviamentInteressatResource extends BaseAuditableResource<L
     private Date registreData;
     private Integer registreNumero;
     private String registreNumeroFormatat;
+    private RegistreEstatEnumDto registreEstat;
     private boolean finalitzat;
 
     private ResourceReference<InteressatResource, Long> interessat;

@@ -3,6 +3,7 @@ package es.caib.ripea.persistence.entity.resourceentity;
 import es.caib.ripea.persistence.base.entity.BaseAuditableEntity;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.dto.EnviamentEstatEnumDto;
+import es.caib.ripea.service.intf.dto.RegistreEstatEnumDto;
 import es.caib.ripea.service.intf.model.DocumentEnviamentInteressatResource;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -50,6 +51,9 @@ public class DocumentEnviamentInteressatResourceEntity extends BaseAuditableEnti
     private Integer registreNumero;
     @Column(name="not_env_registre_num_formatat", length = 50)
     private String registreNumeroFormatat;
+    @Column(name="not_env_registre_estat", length = 20)
+    @Enumerated(EnumType.STRING)
+    private RegistreEstatEnumDto registreEstat; //Notib: registreEstat
 
     @Column(name = "error")
     protected Boolean error;
