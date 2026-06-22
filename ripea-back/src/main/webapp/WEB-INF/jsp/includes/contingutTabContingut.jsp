@@ -43,6 +43,11 @@
 	.viewer-padding { padding: 0% 2% 0% 2%; }
 	.rmodal_loading { background: rgba(255, 255, 255, .8) url('<c:url value="../img/loading.gif"/>') 50% 80% no-repeat; }
 	.ui-droppable-hover { background: #999999 !important; }
+	.ui-draggable-dragging { pointer-events: none; }
+	tr.element-droppable.drop-line-before > td { border-top: 3px solid #ffd351; }
+	tr.element-droppable.drop-line-after > td { border-bottom: 3px solid #ffd351; }
+	tr.element-droppable.ui-droppable-hover.drop-line-before,
+	tr.element-droppable.ui-droppable-hover.drop-line-after { background: none !important; }
 	#drop-area { border: 4px dashed transparent; }
 	#drop-area.dragover { border-color: #ffd351; }
 	#drop-message { font-size: 20px; color: #917421; text-align: center; display: none; position: absolute; width: 420px; background-color: #CCC; opacity: 0.75; font-size: 16px; left: calc(50% - 210px); top: 50%; z-index: 10; border-radius: 8px; margin-top: 5px; }
@@ -56,6 +61,42 @@
 	const potModificar = ${potModificar};
 	var   documentDrag = null; //Variable global, fitxer origen del drag&drop
 
+	//Calcula si el document arrastrat s'ha de deixar anar "abans" o "despres" de la fila/element destí
+	function calcularPosicioDrop(event) {
+		let $target = $(event.target);
+		if (!$target.length) {
+			return 'despres';
+		}
+		let targetOffset = $target.offset();
+		if (!targetOffset) {
+			return 'despres';
+		}
+		let relativeY = event.pageY - targetOffset.top;
+		return relativeY < ($target.outerHeight() / 2) ? 'abans' : 'despres';
+	}
+
+	//Mentre s'arrastra una fila de la vista "per carpetes", mostra una línia damunt o davall de la
+	//fila document que hi ha sota el punter (indica que s'inserirà abans/després, es a dir
+	//reordenació). Si la fila és una carpeta es deixa el ressaltat gris, ja que amollar sobre una carpeta sempre vol dir moure a dins seu.
+	function actualitzaIndicadorPosicioDrop(event) {
+		netejaIndicadorsPosicioDrop();
+		let elementSota = document.elementFromPoint(event.clientX, event.clientY);
+		if (!elementSota) {
+			return;
+		}
+		let $fila = $(elementSota).closest('#table-documents tr.element-droppable');
+		if (!$fila.length || $fila.attr('id') == documentDrag || !$fila.hasClass('isDocument')) {
+			return;
+		}
+		let posicio = calcularPosicioDrop({pageY: event.pageY, target: $fila[0]});
+		$fila.addClass(posicio == 'abans' ? 'drop-line-before' : 'drop-line-after');
+	}
+
+	function netejaIndicadorsPosicioDrop() {
+		$('#table-documents tr.drop-line-before, #table-documents tr.drop-line-after')
+			.removeClass('drop-line-before drop-line-after');
+	}
+
 	//Funcio que es crida quant es fa un drop de un document de la mateixa taula
 	//NO quant es molla un fitxer de disc damunt la table, per aquesta funcionalitat cercar dataTransfer.files 	
 	function dropFitxerDinsCarpeta(event) {
@@ -66,11 +107,13 @@
 				if (vistaActiva == 'vistaTreetablePerCarpetes') {
 					showLoadingModal('<spring:message code="contingut.moure.processant"/>');
 					let destiDocDrag = event.target.id;
-					window.location = documentDrag + "/moure/" + destiDocDrag + tascaParam;
+					let posicioParam = (tascaParam ? '&' : '?') + 'posicio=' + calcularPosicioDrop(event);
+					window.location = documentDrag + "/moure/" + destiDocDrag + tascaParam + posicioParam;
 				} else if (vistaActiva == 'vistaGrid') {
 					showLoadingModal('<spring:message code="contingut.moure.processant"/>');
 					let destiDocDrag = event.target.id;
-					window.location = documentDrag + "/moure/" + destiDocDrag + tascaParam;
+					let posicioParam = (tascaParam ? '&' : '?') + 'posicio=' + calcularPosicioDrop(event);
+					window.location = documentDrag + "/moure/" + destiDocDrag + tascaParam + posicioParam;
 					dropped = true;
 					$(event.target).addClass('dropped');
 				} else {
@@ -631,7 +674,7 @@
 	}
 
 	function dragAndDropVistaCarpetes() {
-		// move to another folder by drag and drop (jquery-ui widget) 
+		// move to another folder by drag and drop (jquery-ui widget)
 		$('.element-draggable').draggable({
 			containment: 'parent',
 			helper: 'clone',
@@ -647,12 +690,19 @@
 		        } else {
 		        	documentDrag = this.id;
 			    }
+			},
+			drag: function(event, ui) {
+				actualitzaIndicadorPosicioDrop(event);
+			},
+			stop: function() {
+				netejaIndicadorsPosicioDrop();
 			}
 		});
 		$('.element-droppable').droppable({
 			accept: '.element-draggable',
 			tolerance: 'pointer',
 			drop: function(event, ui) {
+				netejaIndicadorsPosicioDrop();
 				dropFitxerDinsCarpeta(event);
 			}
 		});
