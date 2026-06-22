@@ -1219,7 +1219,9 @@
 
 					var enviaments = notificacio.documentEnviamentInteressats;
 					for (i = 0; i < enviaments.length; i++) {
-						if (enviaments[i].registreEstat == 'OFICI_ACCEPTAT') {
+						if (enviaments[i].registreEstat == 'OFICI_SIR') {
+							content += '<spring:message code="notificacio.registreEstat.enum.OFICI_SIR"/>' + ',';
+						} else if (enviaments[i].registreEstat == 'OFICI_ACCEPTAT') {
 							content += '<spring:message code="notificacio.registreEstat.enum.OFICI_ACCEPTAT"/>' + ',';
 						} else if (enviaments[i].registreEstat == 'REBUTJAT') {
 							content += '<spring:message code="notificacio.registreEstat.enum.REBUTJAT"/>' + ',';

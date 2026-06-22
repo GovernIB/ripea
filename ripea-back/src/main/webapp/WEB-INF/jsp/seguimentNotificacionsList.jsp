@@ -239,7 +239,9 @@ $(document).ready(function() {
 					{{/if}}
 					{{if notificacioEstat == 'PROCESSADA' || notificacioEstat == 'FINALITZADA'}}
 						<p class="estat_{{:id}}"  style="display:inline">
-							{{if registreEstat == 'OFICI_ACCEPTAT'}}
+							{{if registreEstat == 'OFICI_SIR'}}
+								(<spring:message code="notificacio.registreEstat.enum.OFICI_SIR"/>)
+							{{else registreEstat == 'OFICI_ACCEPTAT'}}
 								(<spring:message code="notificacio.registreEstat.enum.OFICI_ACCEPTAT"/>)
 							{{else registreEstat == 'REBUTJAT'}}
 								(<spring:message code="notificacio.registreEstat.enum.REBUTJAT"/>)
