@@ -136,11 +136,18 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
     @PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('FIND'))")
     public ResponseEntity<UserPermissionInfo> postActualInfo(HttpServletRequest request, @RequestBody Map<String, Object> response) throws MethodArgumentNotValidException {
 
-        EntitatHelper.processarCanviEntitats(request, String.valueOf(response.get("canviEntitat")), entitatService, aplicacioService);
+        // Les claus absents al cos de la petició no s'han de tractar com a canvis: el front React envia
+        // només la clau modificada (canviEntitat, canviOrganGestor o canviRol). Convertim-les a null real
+        // (i no a la cadena "null") perquè cada helper processi i notifiqui únicament la dimensió canviada.
+        String canviEntitat = response.get("canviEntitat") != null ? String.valueOf(response.get("canviEntitat")) : null;
+        String canviOrganGestor = response.get("canviOrganGestor") != null ? String.valueOf(response.get("canviOrganGestor")) : null;
+        String canviRol = response.get("canviRol") != null ? String.valueOf(response.get("canviRol")) : null;
+
+        EntitatHelper.processarCanviEntitats(request, canviEntitat, entitatService, aplicacioService, organGestorService, eventService);
         EntitatHelper.findOrganismesEntitatAmbPermisCache(request, organGestorService);
-        EntitatHelper.processarCanviOrganGestor(request, String.valueOf(response.get("canviOrganGestor")), aplicacioService);
+        EntitatHelper.processarCanviOrganGestor(request, canviOrganGestor, aplicacioService, eventService);
         EntitatHelper.findEntitatsAccessibles(request, entitatService);
-        RolHelper.processarCanviRols(request, String.valueOf(response.get("canviRol")), aplicacioService, organGestorService, eventService);
+        RolHelper.processarCanviRols(request, canviRol, aplicacioService, organGestorService, eventService);
         RolHelper.setRolActualFromDb(request, aplicacioService);
 
         return getUsuariActualSecurityInfo(request);

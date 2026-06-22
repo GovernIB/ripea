@@ -112,6 +112,8 @@ export const ExpedientInfo = (props:any) => {
         <FieldData size={8} sx={{ borderBottom: "1px solid" }} field={"estat"} renderCell={(formattedValue:string) => <StyledEstat entity={expedient}>{formattedValue}</StyledEstat>}/>
         <FieldData size={4} sx={{ borderBottom: "1px solid" }} field={"prioritat"} renderCell={(formattedValue:string) => <StyledPrioritat entity={expedient}>{formattedValue}</StyledPrioritat>}/>
 
+        {expedient?.grup && <FieldData field={"grup"}/>}
+
         <ExpedientsRelacionats entity={expedient}/>
 
         {!readOnly &&

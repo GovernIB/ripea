@@ -68,6 +68,12 @@ public class RolHelper {
 		            String rolActualCodi = aplicacioService.getRolActualCodi();
 		            UsuariAnotacioDto uaDto = new UsuariAnotacioDto(SecurityContextHolder.getContext().getAuthentication().getName(), rolActualCodi, organActualId, entitatActualId);
 					eventService.notifyAnotacionsPendents(List.of(uaDto));
+					// El comptador de tasques pendents només és rellevant per al rol base (tothom). Quan es canvia
+					// a aquest rol cal reenviar-lo perquè el badge (només visible per a tothom) es refresqui sense
+					// recàrrega al client React. El valor és global per usuari, així que no cal evict de la caché.
+					if (isRolActualUsuari(request)) {
+						eventService.notifyTasquesPendents(List.of(SecurityContextHolder.getContext().getAuthentication().getName()));
+					}
 				}
 			
 			} catch (Exception ex) {
