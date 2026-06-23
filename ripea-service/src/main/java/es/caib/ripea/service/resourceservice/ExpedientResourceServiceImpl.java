@@ -550,13 +550,16 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		
     	/** (:esNullIdsOrgansPermesos = false and (meogp.organGestor.id in (:idsOrgansPermesos0))) */
     	//Organs gestors permesos (nomes admin organ): Organ actual capçalera + fills
+    	//S'embolcalla amb exists(...) per navegar la col·leccio metaexpedientOrganGestorPares dins una subconsulta
+    	//correlada en comptes d'un INNER JOIN al FROM principal. Aixi un expedient amb 0 files a IPA_EXPEDIENT_ORGANPARE
+    	//no queda descartat pel join i pot fer match per altres vies (1/5), igual que el LEFT JOIN de la query JSP.
     	Filter filtreOrgansPermesos = null;
     	String campOrganId = ExpedientResource.Fields.metaexpedientOrganGestorPares + "." + MetaExpedientOrganGestorResource.Fields.organGestor + ".id";
 	    List<String> organsActualAndFillsClausulesIn = Utils.getIdsEnGruposMil(permisosPerExpedients.getIdsOrgansPermesos());
 	    if (organsActualAndFillsClausulesIn!=null) {
 	    	for (String aux: organsActualAndFillsClausulesIn) {
 	    		if (aux != null && !aux.isEmpty()) {
-	    			filtreOrgansPermesos = FilterBuilder.or(filtreOrgansPermesos, Filter.parse(campOrganId + " IN (" + aux + ")"));
+	    			filtreOrgansPermesos = FilterBuilder.or(filtreOrgansPermesos, Filter.parse("exists(" + campOrganId + " IN (" + aux + "))"));
 	    		}
 	    	}
 	    }
@@ -570,7 +573,8 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 	    if (organsMetaExpClausulesIn!=null) {
 	    	for (String aux: organsMetaExpClausulesIn) {
 	    		if (aux != null && !aux.isEmpty()) {
-	    			filtreMetaExpedientOrganPairsPermesos = FilterBuilder.or(filtreMetaExpedientOrganPairsPermesos, Filter.parse(campMetaExpOrganId + " IN (" + aux + ")"));
+	    			//exists(...): veure comentari a filtreOrgansPermesos (immunitat al tipus de join sobre la col·leccio)
+	    			filtreMetaExpedientOrganPairsPermesos = FilterBuilder.or(filtreMetaExpedientOrganPairsPermesos, Filter.parse("exists(" + campMetaExpOrganId + " IN (" + aux + "))"));
 	    		}
 	    	}
 	    }
@@ -585,7 +589,9 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 	    if (organsMetaExpComunsClausulesIn!=null) {
 	    	for (String aux: organsMetaExpComunsClausulesIn) {
 	    		if (aux != null && !aux.isEmpty()) {
-	    			filtreOrgansAmbProcedimentsComunsPermesos = FilterBuilder.or(filtreOrgansAmbProcedimentsComunsPermesos, Filter.parse(campMetaExpOrganComuId + " IN (" + aux + ")"));
+	    			//exists(...) nomes sobre la part d'organ (col·leccio). El "metaExpedient.id IN (...)" de mes avall
+	    			//es to-one sobre l'arrel i es queda fora, combinat amb AND com fins ara.
+	    			filtreOrgansAmbProcedimentsComunsPermesos = FilterBuilder.or(filtreOrgansAmbProcedimentsComunsPermesos, Filter.parse("exists(" + campMetaExpOrganComuId + " IN (" + aux + "))"));
 	    		}
 	    	}
 	    	

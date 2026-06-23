@@ -1219,7 +1219,15 @@
 
 					var enviaments = notificacio.documentEnviamentInteressats;
 					for (i = 0; i < enviaments.length; i++) {
-						content += (enviaments[i].enviamentDatatEstat) ? notificacioEnviamentEstats[enviaments[i].enviamentDatatEstat] + ',' : '';
+						if (enviaments[i].registreEstat == 'OFICI_SIR') {
+							content += '<spring:message code="notificacio.registreEstat.enum.OFICI_SIR"/>' + ',';
+						} else if (enviaments[i].registreEstat == 'OFICI_ACCEPTAT') {
+							content += '<spring:message code="notificacio.registreEstat.enum.OFICI_ACCEPTAT"/>' + ',';
+						} else if (enviaments[i].registreEstat == 'REBUTJAT') {
+							content += '<spring:message code="notificacio.registreEstat.enum.REBUTJAT"/>' + ',';
+						} else {
+							content += (enviaments[i].enviamentDatatEstat) ? notificacioEnviamentEstats[enviaments[i].enviamentDatatEstat] + ',' : '';
+						}
 					}
 					if (content !== undefined && content != '') {
 						content = "(" + content.replace(/,\s*$/, "") + ")";

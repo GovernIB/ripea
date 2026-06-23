@@ -750,8 +750,9 @@ public class ConversioTipusHelper {
 						target.setDataFinalitzacio(source.getProcessatData());
 						target.setError(source.isError());
 						if (Utils.isNotEmpty(source.getDocumentEnviamentInteressats())) {
-							String enviamentDatatEstat  = source.getDocumentEnviamentInteressats().iterator().next().getEnviamentDatatEstat();
-							target.setEnviamentDatatEstat(enviamentDatatEstat);
+							DocumentEnviamentInteressatEntity enviamentInteressat = source.getDocumentEnviamentInteressats().iterator().next();
+							target.setEnviamentDatatEstat(enviamentInteressat.getEnviamentDatatEstat());
+							target.setRegistreEstat(enviamentInteressat.getRegistreEstat());
 						}
 						
 						InteressatEntity destinatari = !source.getDocumentEnviamentInteressats().isEmpty() ? HibernateHelper.deproxy(source.getDocumentEnviamentInteressats().iterator().next().getInteressat()) : null;

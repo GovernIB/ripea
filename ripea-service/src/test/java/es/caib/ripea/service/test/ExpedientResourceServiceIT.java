@@ -36,12 +36,13 @@ import es.caib.ripea.service.test.config.BaseServiceIT;
  * 1) El tall per capPermis(): si l'usuari no té permís per cap via, additionalSpringFilter
  *    retorna "id : 0" i el llistat dona 0 resultats (no executa la consulta real).
  *
- * 2) El INNER JOIN sobre la col·lecció metaexpedientOrganGestorPares (comportament actual
- *    d'ExpressionGenerator: PluralAttributePath -> JoinType.INNER): quan el filtre de permisos
- *    navega aquesta col·lecció dins d'un OR (vies d'òrgan), un expedient SENSE files a
- *    ipa_expedient_organpare queda EXCLÒS encara que sigui accessible per una altra branca
- *    (procediment). És una limitació coneguda del INNER; amb un LEFT JOIN es retornaria. El
- *    test fixa el comportament actual perquè un canvi de tipus de join no passi desapercebut.
+ * 2) Les vies de permisos que naveguen la col·lecció metaexpedientOrganGestorPares (vies d'òrgan)
+ *    s'embolcallen amb exists(...) a getFiltrePermisos: la navegació es fa dins d'una subconsulta
+ *    correlada, no amb un JOIN al FROM principal. Així un expedient SENSE files a
+ *    ipa_expedient_organpare NO queda descartat pel join i es retorna si és accessible per una
+ *    altra branca (procediment, VIA 1), igual que el LEFT JOIN de la query JSP. El test fixa que
+ *    aquest expedient apareix; si es treu l'exists(...) i torna l'INNER JOIN, l'expedient
+ *    desapareixeria (passaria a 0) i el test fallaria.
  *
  * El rol es força a ROLE_USER (tothom) via configHelper perquè additionalSpringFilter
  * apliqui el camí d'usuari normal (no el bypass d'admin).
@@ -82,17 +83,18 @@ public class ExpedientResourceServiceIT extends BaseServiceIT {
     }
 
     // =========================================================================
-    // 2) INNER JOIN: expedient sense organpare queda exclòs (limitació coneguda)
+    // 2) exists(): expedient sense organpare accessible per procediment es retorna
     // =========================================================================
 
     @Test
-    void donatUnExpedientSenseOrganpareAccessiblePerProcediment_ambInnerJoin_quedaExclos() {
+    void donatUnExpedientSenseOrganpareAccessiblePerProcediment_ambExists_esRetorna() {
         MetaExpedientEntity proc01 = testData.metaExpedients.get(0); // permisDirecte = false
 
         // VIA 1: permís de lectura directe sobre el procediment de l'expedient.
         // VIA 3: parells procediment-òrgan permesos NO buits -> el filtre navega
-        //        metaexpedientOrganGestorPares.id dins de l'OR i força el JOIN a la col·lecció.
-        //        (l'id no cal que existeixi: només serveix per generar el JOIN)
+        //        metaexpedientOrganGestorPares.id dins de l'OR. Amb exists(...) aquesta navegació
+        //        es fa en una subconsulta correlada i NO descarta l'expedient sense organpare.
+        //        (l'id no cal que existeixi: només serveix per generar la via de col·lecció)
         stubPermisos(Arrays.asList(proc01.getId()), Arrays.asList(999999L));
 
         // Expedient de proc01 SENSE cap fila a ipa_expedient_organpare i sense grup
@@ -103,11 +105,11 @@ public class ExpedientResourceServiceIT extends BaseServiceIT {
         Page<ExpedientResource> pagina = expedientResourceService.findPage(
                 null, null, null, null, PageRequest.of(0, 10));
 
-        // Limitació coneguda del INNER JOIN: la col·lecció buida fa que el JOIN intern descarti
-        // l'expedient abans d'avaluar la VIA 1 (procediment). Amb LEFT JOIN seria 1.
-        // Si es torna a posar JoinType.LEFT a ExpressionGenerator, aquesta assercio fallarà
-        // (passaria a 1) i caldrà actualitzar el test conscientment.
-        assertThat(pagina.getTotalElements()).isZero();
+        // Amb exists(...) la col·lecció buida no es descarta al FROM: la VIA 1 (procediment) casa
+        // sobre l'arrel i l'expedient es retorna, igual que el LEFT JOIN de la query JSP.
+        // Si es treu l'exists(...) i torna l'INNER JOIN a la col·lecció, aquesta assercio fallarà
+        // (passaria a 0) i caldrà revisar el canvi conscientment.
+        assertThat(pagina.getTotalElements()).isEqualTo(1);
     }
 
     // =========================================================================

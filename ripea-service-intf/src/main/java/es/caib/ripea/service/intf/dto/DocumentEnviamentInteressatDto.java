@@ -21,6 +21,7 @@ public class DocumentEnviamentInteressatDto {
 	private Date registreData;
 	private Integer registreNumero;
 	private String registreNumeroFormatat;
+	private String registreEstat;
 	private boolean finalitzat;
 	
 	//Utilitzats en formulari de ampliar plaç

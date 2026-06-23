@@ -5453,7 +5453,8 @@ public class PluginHelper {
 					documentEnviamentInteressatEntity.updateEnviamentInfoRegistre(
 							resposta.getRegistreData(),
 							resposta.getRegistreNumero(),
-							resposta.getRegistreNumeroFormatat());
+							resposta.getRegistreNumeroFormatat(),
+							resposta.getRegistreEstat());
 					
 					guardarCertificacio(documentEnviamentInteressatEntity, resposta);
 				} else {
@@ -5480,7 +5481,7 @@ public class PluginHelper {
 				
 				if (estatAnterior != estatDespres &&
 					estatAnterior != DocumentNotificacioEstatEnumDto.FINALITZADA &&
-					estatDespres  != DocumentNotificacioEstatEnumDto.PROCESSADA) {
+					estatAnterior != DocumentNotificacioEstatEnumDto.PROCESSADA) {
 						emailHelper.canviEstatNotificacio(notificacio, estatAnterior);
 				}
 

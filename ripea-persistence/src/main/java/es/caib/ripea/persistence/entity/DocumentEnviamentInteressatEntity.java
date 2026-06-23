@@ -18,6 +18,7 @@ import javax.persistence.TemporalType;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import es.caib.ripea.plugin.notificacio.EnviamentEstat;
+import es.caib.ripea.plugin.notificacio.RegistreEstat;
 import es.caib.ripea.service.intf.config.BaseConfig;
 
 /**
@@ -57,6 +58,8 @@ public class DocumentEnviamentInteressatEntity extends RipeaAuditable<Long> {
 	private Integer registreNumero;
 	@Column(name="not_env_registre_num_formatat", length = 50)
 	private String registreNumeroFormatat;
+	@Column(name="not_env_registre_estat", length = 20)
+	private String registreEstat; //Notib: registreEstat
 	@Column(name = "error")
 	protected Boolean error;
 	@Column(name = "error_desc", length = ERROR_DESC_TAMANY)
@@ -143,10 +146,12 @@ public class DocumentEnviamentInteressatEntity extends RipeaAuditable<Long> {
 	public void updateEnviamentInfoRegistre(
 			Date registreData,
 			Integer numeroRegistre,
-			String numeroRegistreFormatat) {
+			String numeroRegistreFormatat,
+			RegistreEstat registreEstat) {
 		this.registreData = registreData;
 		this.registreNumero = numeroRegistre;
 		this.registreNumeroFormatat = numeroRegistreFormatat;
+		this.registreEstat = registreEstat != null ? registreEstat.name() : null;
 	}
 	
 	public InteressatEntity getInteressat() {
@@ -229,6 +234,14 @@ public class DocumentEnviamentInteressatEntity extends RipeaAuditable<Long> {
 
 	public void setRegistreNumeroFormatat(String registreNumeroFormatat) {
 		this.registreNumeroFormatat = registreNumeroFormatat;
+	}
+
+	public String getRegistreEstat() {
+		return registreEstat;
+	}
+
+	public void setRegistreEstat(String registreEstat) {
+		this.registreEstat = registreEstat;
 	}
 
 	public String getNomCompletAmbDocument() {

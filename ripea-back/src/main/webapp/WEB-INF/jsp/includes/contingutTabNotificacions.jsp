@@ -34,6 +34,10 @@ $(document).ready(function() {
 			} else {
 				var notificacio = json.data;
 			    var enviaments = notificacio.documentEnviamentInteressats;
+
+			    var mostrarRegistreEstat = enviaments.some(function(env) {
+			        return env.registreEstat == 'OFICI_SIR' || env.registreEstat == 'OFICI_ACCEPTAT' || env.registreEstat == 'REBUTJAT';
+			    });
 		    	
 		    	$(td).append(
 		    			'<table class="table teble-striped table-bordered">' +
@@ -43,6 +47,7 @@ $(document).ready(function() {
 						'<th><spring:message code="notificacio.list.enviament.list.titular"/></th>' + 
 		    			'<th><spring:message code="notificacio.list.enviament.list.representants"/></th>' +
 		    			'<th><spring:message code="notificacio.list.enviament.list.estat"/></th>' +
+		    			(mostrarRegistreEstat ? '<th><spring:message code="notificacio.list.enviament.list.registreEstat"/></th>' : '') +
 		    			'<th></th>' +
 		    			'</tr>' +
 						'</thead><tbody></tbody></table>');
@@ -122,7 +127,13 @@ $(document).ready(function() {
 					
 					//============== estat/errors =========================
 					tableBody += '<td>';
-					tableBody += (enviaments[i].enviamentDatatEstat) ? notificacioEnviamentEstats[enviaments[i].enviamentDatatEstat] : '';
+					if (enviaments[i].registreEstat == 'OFICI_ACCEPTAT') {
+						tableBody += '<spring:message code="notificacio.registreEstat.enum.OFICI_ACCEPTAT"/>';
+					} else if (enviaments[i].registreEstat == 'REBUTJAT') {
+						tableBody += '<spring:message code="notificacio.registreEstat.enum.REBUTJAT"/>';
+					} else {
+						tableBody += (enviaments[i].enviamentDatatEstat) ? notificacioEnviamentEstats[enviaments[i].enviamentDatatEstat] : '';
+					}
 					if (notificacio.error) {
 						var errorTitle = '';
 						if (notificacio.errorDescripcio) {
@@ -133,6 +144,19 @@ $(document).ready(function() {
 					}
 
 					tableBody += '</td>';
+
+					//============== estat registre =========================
+					if (mostrarRegistreEstat) {
+						tableBody += '<td>';
+						if (enviaments[i].registreEstat == 'OFICI_SIR') {
+							tableBody += '<spring:message code="notificacio.registreEstat.enum.OFICI_SIR"/>';
+						} else if (enviaments[i].registreEstat == 'OFICI_ACCEPTAT') {
+							tableBody += '<spring:message code="notificacio.registreEstat.enum.OFICI_ACCEPTAT"/>';
+						} else if (enviaments[i].registreEstat == 'REBUTJAT') {
+							tableBody += '<spring:message code="notificacio.registreEstat.enum.REBUTJAT"/>';
+						}
+						tableBody += '</td>';
+					}
 
 					
 					//============== buttons =========================

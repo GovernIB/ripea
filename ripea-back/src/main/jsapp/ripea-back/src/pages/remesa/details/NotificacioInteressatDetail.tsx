@@ -23,6 +23,7 @@ const Dades = (props:any) => {
                 <DetailCardContent title={t('page.interessat.detall.entregaDehObligat')} hidden={!entity?.representantInfo?.entregaDehObligat}>{t(`enum.siNO.${entity?.interessatInfo?.entregaDehObligat}`)}</DetailCardContent>
                 <DetailCardContent title={t('page.notificacio.detall.serveiTipusEnum')}>{entity?.notificacioInfo?.serveiTipusEnum ?? 'NORMAL'}</DetailCardContent>
                 <DetailCardContent title={t('page.notificacioInteressat.detall.enviamentDatatEstat')}>{entity?.enviamentDatatEstat}</DetailCardContent>
+                <DetailCardContent title={t('page.notificacioInteressat.detall.registreEstat')} hidden={!entity?.registreEstat} hiddenIfEmpty>{entity?.registreEstat ? t(`enum.registreEstat.${entity?.registreEstat}`, entity?.registreEstat) : ''}</DetailCardContent>
             </DetailCard>
 
             <DetailCard title={t('page.notificacioInteressat.detall.interessat')}>
