@@ -231,6 +231,7 @@ import es.caib.ripea.service.intf.dto.TipusDocumentalDto;
 import es.caib.ripea.service.intf.dto.TipusImportEnumDto;
 import es.caib.ripea.service.intf.dto.TipusViaDto;
 import es.caib.ripea.service.intf.dto.UnitatOrganitzativaDto;
+import es.caib.ripea.service.intf.dto.UsuariAnotacioDto;
 import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.dto.ValidacioErrorDto;
 import es.caib.ripea.service.intf.dto.ViaFirmaDispositiuDto;
@@ -6387,6 +6388,12 @@ public class PluginHelper {
 			}
 		}
 		
+		if (tascaEntity.getObservadors()!=null) {
+			for (UsuariEntity observador: tascaEntity.getObservadors()) {
+				usuarisAmbPermis.add(observador.getCodi());
+			}
+		}
+		
 		if (tascaEntity.getResponsableActual()!=null && tascaEntity.getResponsableActual().getCodi()!=null) {
 			responsableActual = tascaEntity.getResponsableActual().getCodi();
 		}
@@ -6408,14 +6415,22 @@ public class PluginHelper {
                 .numeroExpedient(tascaEntity.getExpedient().getNumero())
                 .responsable(responsableActual)
                 .usuarisAmbPermis(usuarisAmbPermis)
-                .grupsAmbPermis(null)
-                .redireccio(new URL(redireccio))
-                .grup(tascaEntity.getExpedient().getGrup()!=null?tascaEntity.getExpedient().getGrup().getCodi():null);
+                .redireccio(new URL(redireccio));
+
 		return resultat;
 	}
 	
 	private Avis anotacioRipeaToAvisComanda(ExpedientPeticioEntity expedientPeticioEntity) throws Exception {
 		String redireccio = configHelper.getConfig(PropertyConfig.BASE_URL) + "/expedientPeticio/"+expedientPeticioEntity.getId();
+		
+		List<UsuariAnotacioDto> usuarisAfectatsAnotacio = emailHelper.dadesUsuarisAfectatsAnotacio(expedientPeticioEntity);
+		
+		List<String> usuarisAmbPermis = new ArrayList<String>();
+		if (usuarisAfectatsAnotacio!=null) {
+			for (UsuariAnotacioDto usuariAnotacio: usuarisAfectatsAnotacio) {
+				usuarisAmbPermis.add(usuariAnotacio.getCodi());
+			}
+		}
 		
 		Avis avisComanda = new Avis()
                 .appCodi(configHelper.getConfig(PropertyConfig.COMANDA_APP_CODI))
@@ -6427,7 +6442,8 @@ public class PluginHelper {
                 .descripcio(expedientPeticioEntity.getObservacions())
                 .tipus(AvisTipus.INFO)
                 .redireccio(new URL(redireccio))
-                .grup(expedientPeticioEntity.getGrup()!=null?expedientPeticioEntity.getGrup().getCodi():null);
+                .usuarisAmbPermis(usuarisAmbPermis);
+		
 		return avisComanda;
 	}
 	
@@ -6482,7 +6498,20 @@ public class PluginHelper {
 					descripcio+=". ";
 				}
 			}
-		}		
+		}
+		
+		List<String> usuarisAmbPermis = new ArrayList<String>();
+		String usuariResponsable = null;
+		if (expedient.getAgafatPer()!=null) {
+			usuarisAmbPermis.add(expedient.getAgafatPer().getCodi());
+			usuariResponsable = expedient.getAgafatPer().getCodi();
+		}
+		
+		if (expedient.getSeguidors()!=null) {
+			for (UsuariEntity seguidor: expedient.getSeguidors()) {
+				usuarisAmbPermis.add(seguidor.getCodi());
+			}
+		}
 		
 		String redireccio = configHelper.getConfig(PropertyConfig.BASE_URL) + "/contingut/"+expedient.getId();
 		Avis avisComanda = new Avis()
@@ -6493,9 +6522,11 @@ public class PluginHelper {
                 .identificador(expedient.getId()+"")
                 .nom(expedient.getNumero())
                 .descripcio(descripcio)
+                .usuarisAmbPermis(usuarisAmbPermis)
+                .responsable(usuariResponsable)
                 .tipus(AvisTipus.ALERTA)
-                .redireccio(new URL(redireccio))
-                .grup(expedient.getGrup()!=null?expedient.getGrup().getCodi():null);
+                .redireccio(new URL(redireccio));
+
 		return avisComanda;
 	}
 	

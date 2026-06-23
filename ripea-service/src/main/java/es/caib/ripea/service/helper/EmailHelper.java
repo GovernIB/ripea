@@ -309,11 +309,15 @@ public class EmailHelper {
 	}
 	
 	public List<UsuariAnotacioDto> dadesUsuarisAfectatsAnotacio(Long expedientPeticioId) {
+		ExpedientPeticioEntity expedientPeticio = expedientPeticioRepository.findById(expedientPeticioId).orElse(null);
+		return dadesUsuarisAfectatsAnotacio(expedientPeticio);
+	}
+	
+	public List<UsuariAnotacioDto> dadesUsuarisAfectatsAnotacio(ExpedientPeticioEntity expedientPeticio) {
 
 		long t2 = System.currentTimeMillis();
 		List<UsuariAnotacioDto> resultat = new ArrayList<UsuariAnotacioDto>();
 		
-		ExpedientPeticioEntity expedientPeticio = expedientPeticioRepository.findById(expedientPeticioId).orElse(null);
 		RegistreEntity registre = expedientPeticio.getRegistre();
 		MetaExpedientEntity metaExpedient = expedientPeticio.getMetaExpedient();
 		EntitatEntity entitat = registre.getEntitat();
