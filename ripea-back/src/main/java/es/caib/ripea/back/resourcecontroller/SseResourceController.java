@@ -2,19 +2,27 @@ package es.caib.ripea.back.resourcecontroller;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
 
+import es.caib.ripea.persistence.entity.resourceentity.AvisResourceEntity;
+import es.caib.ripea.service.helper.CacheHelper;
+import es.caib.ripea.service.helper.ConfigHelper;
+import es.caib.ripea.service.helper.RolHelper;
+import es.caib.ripea.service.intf.dto.*;
+import es.caib.ripea.service.intf.model.AvisResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,11 +32,6 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.config.PropertyConfig;
-import es.caib.ripea.service.intf.dto.DigitalitzacioResultatDto;
-import es.caib.ripea.service.intf.dto.FirmaResultatDto;
-import es.caib.ripea.service.intf.dto.PortafirmesFluxRespostaDto;
-import es.caib.ripea.service.intf.dto.StatusEnumDto;
-import es.caib.ripea.service.intf.dto.UsuariAnotacioDto;
 import es.caib.ripea.service.intf.model.sse.AnotacionsPendentsEvent;
 import es.caib.ripea.service.intf.model.sse.AvisosActiusEvent;
 import es.caib.ripea.service.intf.model.sse.CreacioFluxFinalitzatEvent;
@@ -59,11 +62,12 @@ public class SseResourceController {
 
     private final EventService eventService;
     private final AplicacioService aplicacioService;
+    private final ConfigHelper configHelper;
 
     //Per cada usuari el emmiter es una llista, perque pot estar obert per varies connexions simultaniament (p.ex. diferents pestanyes del navegador).
-    private final Map<String, List<SseEmitter>> clientsUsuaris = new HashMap<>();
+    private final Map<String, List<SseEmitter>> clientsUsuaris = new ConcurrentHashMap<>();
     //En cas de un expedient, el emmiter es una llista, perque pot estar obert per varis usuaris simultaniament.
-    private final Map<Long, List<SseEmitter>> clientsExpedient = new HashMap<>();
+    private final Map<Long, List<SseEmitter>> clientsExpedient = new ConcurrentHashMap<>();
     private static final Logger logger = LoggerFactory.getLogger(SseResourceController.class);
     private enum UserEventType {
         USER_CONNECT, AVISOS, NOTIFICACIONS, TASQUES, FIRMA_FINALITZADA, FLUX_FINALITZAT;
@@ -93,7 +97,7 @@ public class SseResourceController {
             } catch (Exception e) {
                 toRemove.add(emitter);
                 logger.debug("... eliminat emisor {} del usuari {} per error: {}.", emitter.hashCode(), usuariCodi, e.getMessage());
-            }
+             }
         }
         emisors.removeAll(toRemove);
         if (emisors.isEmpty()) {
@@ -143,6 +147,43 @@ public class SseResourceController {
             clientsExpedient.remove(expedientId);
             logger.debug("... eliminat expedient {} de la llista per no tenir cap emisor actiu.", expedientId);
         }
+    }
+
+    private void sendToUsersFiltered() {
+        // Crear un usuari autenticat simulat. En portafib no es pot configurar una autenticació BASIC
+        User user = new User("SYSTEM", "SYSTEM", Collections.singletonList(new SimpleGrantedAuthority("tothom")));
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        try {
+//            for (String usuariCodi : new ArrayList<>(clientsUsuaris.keySet())) {
+            for (Map.Entry<String, List<SseEmitter>> entry : clientsUsuaris.entrySet()) {
+                String usuariCodi = entry.getKey();
+                try {
+                    var usuariDB = aplicacioService.findUsuariAmbCodi(usuariCodi);
+                    if (usuariDB == null) {
+                        logger.warn(">>> usuariDB NULL per a {}, s'omet.", usuariCodi);
+                        continue;
+                    }
+                    AvisosActiusEvent eventFiltrat = eventService.getAvisosActiusPerUsuari(usuariDB.getRolActual(), usuariDB.getEntitatActual());
+                    sendToUser(usuariCodi, SseEmitter.event().name(UserEventType.AVISOS.getEventName()).data(eventFiltrat));
+                } catch (Exception e) {
+                    logger.error(">>> ERROR processant avisos per a l'usuari {}: {}", usuariCodi, e.getMessage(), e);
+                }
+            }
+        } finally {
+            SecurityContextHolder.clearContext();
+        }
+    }
+
+    public void actualitzarAvisosPerUsuari(String usuariCodi) {
+        String rol = aplicacioService.getRolActualCodi();
+        Long entitatId = aplicacioService.getEntitatActualId();
+        AvisosActiusEvent eventFiltrat = eventService.getAvisosActiusPerUsuari(rol, entitatId);
+
+        sendToUser(usuariCodi, SseEmitter.event()
+                .name(UserEventType.AVISOS.getEventName())
+                .data(eventFiltrat));
     }
 
     /**
@@ -214,7 +255,7 @@ public class SseResourceController {
     public SseEmitter stream(@PathVariable String usuariCodi) {
     	if (Utils.hasValue(usuariCodi) && !"undefined".equalsIgnoreCase(usuariCodi)) {
 	        SseEmitter emitter = new SseEmitter(0L);
-	        List<SseEmitter> emisorsUsuari = clientsUsuaris.computeIfAbsent(usuariCodi, k -> new ArrayList<>());
+	        List<SseEmitter> emisorsUsuari = clientsUsuaris.computeIfAbsent(usuariCodi, k -> new CopyOnWriteArrayList<>());
 	        emisorsUsuari.add(emitter);
 	        emitter.onCompletion(() -> {
 	            List<SseEmitter> list = clientsUsuaris.get(usuariCodi);
@@ -241,24 +282,29 @@ public class SseResourceController {
     private void onSubscribeEmisorGlobal(String usuariCodi, SseEmitter emitter) {
         // Al moment de subscriure enviem un missatge de connexió
         try {
-        	Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        	if (auth!=null && !"anonymousUser".equals(auth.getName())) {
-	            emitter.send(SseEmitter.event()
-	                    .name(UserEventType.USER_CONNECT.getEventName())
-	                    .data("Connexió establerta a " + LocalDateTime.now())
-	                    .id(String.valueOf(System.currentTimeMillis())));
-	            // Un cop renviat el missatge de connexió correctament, enviem un missatge amb les dades inicials
-	            var avisosActius = eventService.getAvisosActiusEvent();
-	            Long entitatActualId = aplicacioService.getEntitatActualId();
-	            Long organActualId = aplicacioService.getOrganActualId();
-	            String rolActualCodi = aplicacioService.getRolActualCodi();
-	            UsuariAnotacioDto uaDto = new UsuariAnotacioDto(usuariCodi, rolActualCodi, organActualId, entitatActualId);
-	            var anotacionsPendents = eventService.getAnotacionsPendents(uaDto);
-	            var tasquesPendents = eventService.getTasquesPendents(usuariCodi);
-	            emitter.send(SseEmitter.event().name(UserEventType.AVISOS.getEventName()).data(avisosActius));
-	            emitter.send(SseEmitter.event().name(UserEventType.NOTIFICACIONS.getEventName()).data(anotacionsPendents));
-	            emitter.send(SseEmitter.event().name(UserEventType.TASQUES.getEventName()).data(tasquesPendents));
-        	}
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth == null || "anonymousUser".equals(auth.getName())) return;
+
+            // Missatge de connexió
+            emitter.send(SseEmitter.event()
+                    .name(UserEventType.USER_CONNECT.getEventName())
+                    .data("Connexió establerta a " + LocalDateTime.now())
+                    .id(String.valueOf(System.currentTimeMillis())));
+
+            // Notificacions i tasques
+            Long entitatId = aplicacioService.getEntitatActualId();
+            Long organId = aplicacioService.getOrganActualId();
+            String rol = aplicacioService.getRolActualCodi();
+
+            emitter.send(SseEmitter.event().name(UserEventType.NOTIFICACIONS.getEventName())
+                    .data(eventService.getAnotacionsPendents(new UsuariAnotacioDto(usuariCodi, rol, organId, entitatId))));
+            emitter.send(SseEmitter.event().name(UserEventType.TASQUES.getEventName())
+                    .data(eventService.getTasquesPendents(usuariCodi)));
+
+            // Avisos filtrats
+            var event = eventService.getAvisosActiusPerUsuari(rol, entitatId);
+            emitter.send(SseEmitter.event().name(UserEventType.AVISOS.getEventName()).data(event));
+
         } catch (IOException e) {
             log.error("Error enviant esdeveniment inicial SSE", e);
             emitter.complete(); //el callback onCompletion s'encarrega d'eliminar aquest emisor de la llista
@@ -275,7 +321,7 @@ public class SseResourceController {
     @GetMapping("/subscribe/exp/{expedientId}")
     public SseEmitter streamExpedient(@PathVariable Long expedientId) {
         SseEmitter emitter = new SseEmitter(0L);
-        List<SseEmitter> emisorsExpedient = clientsExpedient.computeIfAbsent(expedientId, k -> new ArrayList<>());
+        List<SseEmitter> emisorsExpedient = clientsExpedient.computeIfAbsent(expedientId, k -> new CopyOnWriteArrayList<>());
         emisorsExpedient.add(emitter);
         emitter.onCompletion(() -> {
             List<SseEmitter> list = clientsExpedient.get(expedientId);
@@ -333,11 +379,9 @@ public class SseResourceController {
 
     @Async
     @JmsListener(destination = "avisos")
-    public void handleEventAvisos(AvisosActiusEvent avisos) {
-    	if (avisos != null) {
-    		logger.debug("Actualització de AvisosActiusEvent a usuaris...");
-    		sendToAllUsers(SseEmitter.event().name(UserEventType.AVISOS.getEventName()).data(avisos));
-    	}
+    public void handleEventAvisos(AvisosActiusEvent event) {
+        logger.debug("Actualització de AvisosActiusEvent a usuaris...");
+        sendToUsersFiltered();
     }
 
     @Async

@@ -154,6 +154,20 @@ public class AvisServiceImpl implements AvisService {
 				AvisDto.class);
 	}
 
+	@Override
+	public List<AvisDto> findActiveGlobal() {
+		return conversioTipusHelper.convertirList(
+				avisRepository.findActiveGlobal(DateUtils.truncate(new Date(), Calendar.DATE)),
+				AvisDto.class);
+	}
+
+	@Override
+	public List<AvisDto> findActivePerEntitat(Long entitatId) {
+		return conversioTipusHelper.convertirList(
+				avisRepository.findActivePerEntitat(DateUtils.truncate(new Date(), Calendar.DATE), entitatId),
+				AvisDto.class);
+	}
+
 	private static final Logger logger = LoggerFactory.getLogger(AvisServiceImpl.class);
 
 }

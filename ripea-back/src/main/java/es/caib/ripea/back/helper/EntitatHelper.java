@@ -14,6 +14,10 @@ import es.caib.ripea.service.intf.service.OrganGestorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -147,6 +151,14 @@ public class EntitatHelper {
 			EntitatDto entitatActual,
 			EntitatService entitatService) {
 		request.getSession().setAttribute(SESSION_ATTRIBUTE_ENTITAT_ACTUAL, entitatActual);
+		AplicacioService aplicacioService = getAplicacioService(request);
+
+		if (entitatActual != null) {
+			aplicacioService.setEntitatActual(entitatActual.getId());
+		} else {
+			aplicacioService.setEntitatActual(null);
+		}
+
 		ExpedientHelper.resetAccesUsuariExpedients(request);
 	}
 
@@ -279,5 +291,10 @@ public class EntitatHelper {
 	}
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(EntitatHelper.class);
+
+	private static AplicacioService getAplicacioService(HttpServletRequest request) {
+		WebApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(request.getServletContext());
+		return context.getBean(AplicacioService.class);
+	}
 
 }

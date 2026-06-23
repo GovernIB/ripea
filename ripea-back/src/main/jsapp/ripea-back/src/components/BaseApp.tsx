@@ -190,59 +190,66 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
     }
     const { value } = useAlertesSession();
     const { value: read, save } = useSession('readAlerts')
-    return <MuiBaseApp
-        code={code}
-        headerTitle={title}
-        headerLogo={logo}
-        headerLogoStyle={logoStyle}
-        headerVersion={version}
-        headerAppbarStyle={style}
-        headerAppbarBackgroundColor={appbarBackgroundColor}
-        headerAppbarBackgroundImg={appbarBackgroundImg}
-        headerAdditionalComponents={
-            <MuiBaseAppContext.Provider value={{ defaultMuiComponentProps: {} }}>
-                <UserHeadToolbar/>
-            </MuiBaseAppContext.Provider>
-        }
-        headerAdditionalAuthComponents={
-            <MuiBaseAppContext.Provider value={{ defaultMuiComponentProps: {} }}>
-                <UserMenu/>
-            </MuiBaseAppContext.Provider>
-        }
-        footer={generateFooter(version)}
-        persistentLanguage
-        i18nUseTranslation={i18nUseTranslation}
-        i18nCurrentLanguage={i18nCurrentLanguage}
-        i18nHandleLanguageChange={i18nHandleLanguageChange}
-        i18nAddResourceBundleCallback={i18nAddResourceBundleCallback}
-        routerGoBack={goBack}
-        routerNavigate={navigate}
-        routerUseLocationPath={useLocationPath}
-        routerAnyHistoryEntryExist={anyHistoryEntryExist}
-        linkComponent={Link}
-        marginsDisabled={false}
-        formFieldComponents={[{ type: 'reference', component: AppFormFieldReference }]}
-        menuEntries={baseAppMenuEntries}>
-        <CustomLocalizationProvider>
-            <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
-                {
-                    value?.avisosUsuari?.map((avis:any) => {
+
+    return (
+        <MuiBaseApp
+            code={code}
+            headerTitle={title}
+            headerLogo={logo}
+            headerLogoStyle={logoStyle}
+            headerVersion={version}
+            headerAppbarStyle={style}
+            headerAppbarBackgroundColor={appbarBackgroundColor}
+            headerAppbarBackgroundImg={appbarBackgroundImg}
+            headerAdditionalComponents={
+                <MuiBaseAppContext.Provider value={{ defaultMuiComponentProps: {} }}>
+                    <UserHeadToolbar />
+                </MuiBaseAppContext.Provider>
+            }
+            headerAdditionalAuthComponents={
+                <MuiBaseAppContext.Provider value={{ defaultMuiComponentProps: {} }}>
+                    <UserMenu />
+                </MuiBaseAppContext.Provider>
+            }
+            footer={generateFooter(version)}
+            persistentLanguage
+            i18nUseTranslation={i18nUseTranslation}
+            i18nCurrentLanguage={i18nCurrentLanguage}
+            i18nHandleLanguageChange={i18nHandleLanguageChange}
+            i18nAddResourceBundleCallback={i18nAddResourceBundleCallback}
+            routerGoBack={goBack}
+            routerNavigate={navigate}
+            routerUseLocationPath={useLocationPath}
+            routerAnyHistoryEntryExist={anyHistoryEntryExist}
+            linkComponent={Link}
+            marginsDisabled={false}
+            formFieldComponents={[{ type: 'reference', component: AppFormFieldReference }]}
+            menuEntries={baseAppMenuEntries}
+        >
+            <CustomLocalizationProvider>
+                <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
+                    {value?.avisosUsuari?.map((avis: any) => {
                         if (!read?.includes?.(avis.id)) {
-                            return <AlertExpand
-                                key={avis.id} title={avis.assumpte}
-                                severity={getAlertSeverity(avis.avisNivell)}
-                                sx={{ m: 0 }}
-                                onClose={() => {save([...(read ?? []), avis.id])}}
-                            >
-                                {avis.missatge}
-                            </AlertExpand>
+                            return (
+                                <AlertExpand
+                                    key={avis.id}
+                                    title={avis.assumpte}
+                                    severity={getAlertSeverity(avis.avisNivell)}
+                                    sx={{ m: 0 }}
+                                    onClose={() => {
+                                        save([...(read ?? []), avis.id]);
+                                    }}
+                                >
+                                    {avis.missatge}
+                                </AlertExpand>
+                            );
                         }
-                    })
-                }
-                {i18nInitialized && children}
-            </div>
-        </CustomLocalizationProvider>
-    </MuiBaseApp>;
+                    })}
+                    {i18nInitialized && children}
+                </div>
+            </CustomLocalizationProvider>
+        </MuiBaseApp>
+    );
 }
 
 export default BaseApp;

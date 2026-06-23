@@ -15,6 +15,7 @@ const AvisGridForm = () => {
             <GridFormField name={'dataInici'} type={'date'} size={6} />
             <GridFormField name={'dataFinal'} type={'date'} size={6} />
             <GridFormField name={'avisNivell'} required />
+            <GridFormField name={'entitat'} />
         </Grid>
     );
 };
@@ -25,18 +26,22 @@ const columns = [
         flex: 2,
     },
     {
+        field: 'entitat',
+        flex: 1.75,
+    },
+    {
         field: 'dataInici',
-        flex: 0.75,
+        flex: 0.5,
         valueFormatter: (value: string) => (value ? formatDate(value, 'DD/MM/Y') : ''),
     },
     {
         field: 'dataFinal',
-        flex: 0.75,
+        flex: 0.5,
         valueFormatter: (value: string) => (value ? formatDate(value, 'DD/MM/Y') : ''),
     },
     {
         field: 'actiu',
-        flex: 0.5,
+        flex: 0.35,
         renderCell: (params: any) => params?.row?.actiu && <Icon>check</Icon>,
     },
     {

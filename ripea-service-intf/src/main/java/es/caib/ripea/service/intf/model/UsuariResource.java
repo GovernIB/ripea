@@ -71,6 +71,7 @@ public class UsuariResource extends BaseResource<String> {
 
 	private ResourceReference<MetaExpedientResource, Long> procediment;
 	private ResourceReference<EntitatResource, Long> entitatPerDefecte;
+	private ResourceReference<EntitatResource, Long> entitatActual;
 
 	private boolean expedientExpandit = true;
 

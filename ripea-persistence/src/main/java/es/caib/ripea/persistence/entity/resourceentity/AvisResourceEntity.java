@@ -2,15 +2,10 @@ package es.caib.ripea.persistence.entity.resourceentity;
 
 import java.util.Date;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
 
 import es.caib.ripea.persistence.base.entity.BaseAuditableEntity;
+import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.dto.AvisNivellEnumDto;
 import es.caib.ripea.service.intf.model.AvisResource;
@@ -41,6 +36,10 @@ public class AvisResourceEntity extends BaseAuditableEntity<AvisResource> {
 	private AvisNivellEnumDto avisNivell;
 	@Column(name = "avis_admin", nullable = false)
 	private Boolean avisAdministrador;
-	@Column(name = "entitat_id")
-	private Long entitatId;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(
+		name = "entitat_id",
+		foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "avis_entitat_fk")
+	)
+	private EntitatResourceEntity entitat;
 }

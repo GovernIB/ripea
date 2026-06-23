@@ -76,6 +76,11 @@ public class EventServiceImpl implements EventService {
     	return eventHelper.getAvisosActiusEvent();
     }
 
+	@Override
+	public AvisosActiusEvent getAvisosActiusPerUsuari(String rol, Long entitatId) {
+		return eventHelper.getAvisosActiusPerUsuari(rol, entitatId);
+	}
+
     @Scheduled(cron = "1 0 0 * * *")
     public void notifyAvisosActiusCron() {
         log.debug("Notificació dels avisos activats o desactivats per data.");

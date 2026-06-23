@@ -9,6 +9,7 @@ import es.caib.ripea.service.intf.service.AvisService;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Utilitat per obtenir els avisos de sessió..
@@ -28,12 +29,14 @@ public class AvisHelper {
 		List<AvisDto> avisos = (List<AvisDto>) request.getAttribute(REQUEST_PARAMETER_AVISOS);
 		boolean canviRol = request.getParameter(RolHelper.getRequestParameterCanviRol()) != null;
 		if ((avisos == null && !RequestHelper.isError(request) && avisService != null) || canviRol) {
-			if (RolHelper.isRolActualAdministrador(request)) {
+			// Superusuaris (L'únic que no té entitat assignada)
+			if (RolHelper.isRolActualSuperusuari(request)) {
+				avisos = avisService.findActiveGlobal();
+			} else {
 				EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
-				avisos = avisService.findActiveAdmin(entitatActual.getId());
+				Long entitatId = (entitatActual != null) ? entitatActual.getId() : null;
+				avisos = avisService.findActivePerEntitat(entitatId);
 			}
-			else
-				avisos = avisService.findActive();
 			request.setAttribute(REQUEST_PARAMETER_AVISOS, avisos);
 		}
 	}

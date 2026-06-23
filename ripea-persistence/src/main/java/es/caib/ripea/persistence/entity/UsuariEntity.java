@@ -3,6 +3,7 @@
  */
 package es.caib.ripea.persistence.entity;
 
+import es.caib.ripea.persistence.entity.resourceentity.EntitatResourceEntity;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.dto.ContingutVistaEnumDto;
 import es.caib.ripea.service.intf.dto.InterficieUsuariEnumDto;
@@ -95,6 +96,11 @@ public class UsuariEntity implements Serializable {
 	@JoinColumn(name = "entitat_defecte_id")
 	@ForeignKey(name = BaseConfig.DB_PREFIX + "entitat_usuari_fk")
 	private EntitatEntity entitatPerDefecte;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "entitat_actual")
+	@ForeignKey(name = BaseConfig.DB_PREFIX + "usuari_entitat_actual_fk")
+	private EntitatEntity entitatActual;
 	
 	@Column(name = "expedient_expandit")
 	private boolean expedientExpandit = true;
@@ -224,6 +230,10 @@ public class UsuariEntity implements Serializable {
 				nif,
 				email,
 				idioma);
+	}
+
+	public void updateEntitatActual(EntitatEntity entitatActual) {
+		this.entitatActual = entitatActual;
 	}
 
 	/**

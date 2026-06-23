@@ -29,6 +29,7 @@ public interface EventService {
     public void notifyScanFinalitzat(ScanFinalitzatEvent firmaEvent);
     public void notifyErrorsValidacio(ErrorsValidacioChangedEvent errors);
     public AvisosActiusEvent getAvisosActiusEvent();
+    public AvisosActiusEvent getAvisosActiusPerUsuari(String rol, Long entitatId);
     public long getAnotacionsPendents(UsuariAnotacioDto usuariCodi);
     public long getTasquesPendents(String usuariCodi);
     public List<ValidacioErrorDto> getValidacionsInicialsExpedient(Long expedientId);

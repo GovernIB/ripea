@@ -8,6 +8,8 @@ import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -74,6 +76,9 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
     private final AplicacioService aplicacioService;
     private final EventService eventService;
     private final GrupService grupService;
+    private final SseResourceController sseResourceController;
+
+    private static final Logger logger = LoggerFactory.getLogger(UsuariResourceController.class);
 
     @Hidden
     @GetMapping("/actual/securityInfo")
@@ -149,6 +154,13 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
         EntitatHelper.findEntitatsAccessibles(request, entitatService);
         RolHelper.processarCanviRols(request, canviRol, aplicacioService, organGestorService, eventService);
         RolHelper.setRolActualFromDb(request, aplicacioService);
+
+        try {
+            String usuariCodi = SecurityContextHolder.getContext().getAuthentication().getName();
+            sseResourceController.actualitzarAvisosPerUsuari(usuariCodi);
+        } catch (Exception e) {
+            logger.error("Error en enviar l'actualització d'avisos per SSE al canviar d'entitat", e);
+        }
 
         return getUsuariActualSecurityInfo(request);
     }

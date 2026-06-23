@@ -66,7 +66,7 @@ export const SseClient: React.FC = () => {
     const { get, save: saveSession, removeAll } = useSseClientSession();
     const { value: user } = useUserSession();
     const { apiUrl } = useResourceApiContext();
-
+    
     const addEventListener = (eventSource: EventSource, key: string) => {
         eventSource.addEventListener(key, (event) => {
             try {
@@ -161,7 +161,7 @@ export const SseClient: React.FC = () => {
             saveSession(sseConnectedKey, false)
         };
     }
-    }, [user?.codi]);
+    }, [user?.codi, user?.entitatActualId, user?.rolActual]);
 
     // Aquest component no renderitza res visible
     return null;

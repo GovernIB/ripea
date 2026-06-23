@@ -33,4 +33,8 @@ public interface AvisService {
 	List<AvisDto> findActive();
 
 	List<AvisDto> findActiveAdmin(Long entitatId);
+
+	List<AvisDto> findActiveGlobal();
+
+	List<AvisDto> findActivePerEntitat(Long entitatId);
 }

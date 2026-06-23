@@ -38,6 +38,7 @@ public class UsuariDto implements Serializable {
 	private boolean expedientListGrup;
 	private Long procedimentId;
 	private Long entitatPerDefecteId;
+	private Long entitatActual;
 	private ContingutVistaEnumDto vistaActual;
 	private boolean expedientExpandit;
 	private MoureDestiVistaEnumDto vistaMoureActual;

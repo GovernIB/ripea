@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import es.caib.ripea.service.intf.config.BaseConfig;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
@@ -54,9 +55,8 @@ public class EventHelper {
 
     public void notifyAvisosActius() {
     	try {
-    		AvisosActiusEvent event = getAvisosActiusEvent();
 	        log.debug("notifyAvisosActius a clients");
-	        jmsTemplate.convertAndSend("avisos", event);
+	        jmsTemplate.convertAndSend("avisos", new AvisosActiusEvent(null, null));
     	} catch (Exception ex) {
     		log.error("Error al notifyAvisosActius a clients", ex);
     	}
@@ -217,5 +217,37 @@ public class EventHelper {
                 .build();
         return event;
     }
+
+	private Map<String, List<AvisDto>> obtenirAvisosAdmin() {
+		Map<String, List<AvisDto>> avisosAdmin = new HashMap<>();
+		entitatRepository.findByActiva(true).forEach(entitat -> {
+			var avisos = conversioTipusHelper.convertirList(
+					avisRepository.findActiveAdmin(DateUtils.truncate(new Date(), Calendar.DATE), entitat.getId()),
+					AvisDto.class);
+			if (avisos != null && !avisos.isEmpty())
+				avisosAdmin.put(entitat.getCodi(), avisos);
+		});
+		return avisosAdmin;
+	}
+
+	public AvisosActiusEvent getAvisosActiusPerUsuari(String rol, Long entitatId) {
+		List<AvisDto> avisos;
+		Date dataActual = DateUtils.truncate(new Date(), Calendar.DATE);
+
+		if (BaseConfig.ROLE_SUPER.equals(rol)) {
+			// Només avisos globals
+			avisos = conversioTipusHelper.convertirList(
+					avisRepository.findActiveGlobal(dataActual),AvisDto.class);
+		} else {
+			// Avisos globals + de l'entitat
+			avisos = conversioTipusHelper.convertirList(
+					avisRepository.findActivePerEntitat(dataActual, entitatId), AvisDto.class);
+		}
+
+		return AvisosActiusEvent.builder()
+				.avisosUsuari(avisos)
+				.avisosAdmin(obtenirAvisosAdmin())
+				.build();
+	}
 
 }

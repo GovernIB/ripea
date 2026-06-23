@@ -18,6 +18,7 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import es.caib.ripea.persistence.base.entity.ResourceEntity;
+import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.dto.ContingutVistaEnumDto;
 import es.caib.ripea.service.intf.dto.IdiomaEnumDto;
@@ -91,6 +92,12 @@ public class UsuariResourceEntity implements ResourceEntity<UsuariResource, Stri
 			name = "entitat_defecte_id",
 			foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "entitat_usuari_fk"))
 	private EntitatResourceEntity entitatPerDefecte;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(
+			name = "entitat_actual",
+			foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "usuari_entitat_actual_fk"))
+	private EntitatResourceEntity entitatActual;
 
 	@Column(name = "expedient_expandit")
 	private boolean expedientExpandit = true;

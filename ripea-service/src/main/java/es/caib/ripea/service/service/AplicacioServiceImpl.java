@@ -6,6 +6,8 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Properties;
 
+import es.caib.ripea.persistence.entity.resourceentity.EntitatResourceEntity;
+import es.caib.ripea.persistence.entity.resourceentity.UsuariResourceEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -321,6 +323,30 @@ public class AplicacioServiceImpl implements AplicacioService {
 			usuari.updateRolActual(rolActual);
 			cacheHelper.evictCountAnotacionsPendents(usuari.getCodi());
 		} catch (Exception ex) {
+			ex.printStackTrace();
+			System.out.println(ex.getMessage());
+		}
+	}
+
+	@Transactional
+	@Override
+	public void setEntitatActual(Long entitatId) {
+		try {
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			logger.debug("Actualitzant entitat actual de l'usuari: " + auth.getName());
+
+			UsuariEntity usuari = usuariRepository.getOne(auth.getName());
+
+			// Lògica d'actualització
+			if (entitatId != null) {
+				EntitatEntity entitat = entitatRepository.getOne(entitatId);
+				usuari.updateEntitatActual(entitat);
+			} else {
+				usuari.updateEntitatActual(null);
+			}
+
+		} catch (Exception ex) {
+			// logger.error("Error en actualitzar l'entitat actual de l'usuari", ex);
 			ex.printStackTrace();
 			System.out.println(ex.getMessage());
 		}

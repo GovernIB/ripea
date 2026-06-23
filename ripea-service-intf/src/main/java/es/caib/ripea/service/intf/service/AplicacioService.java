@@ -199,6 +199,9 @@ public interface AplicacioService {
 	@PreAuthorize("isAuthenticated()")
 	public void setRolUsuariActual(String rolActual);
 
+	@PreAuthorize("isAuthenticated()")
+	public void setEntitatActual(Long entitatId);
+
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public List<String> findUsuarisCodisAmbRol(String rol);
 
